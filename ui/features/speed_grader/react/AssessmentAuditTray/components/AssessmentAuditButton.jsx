@@ -18,26 +18,26 @@
 
 import React from 'react'
 import {func} from 'prop-types'
-import {ApplyTheme} from '@instructure/ui-themeable'
+import {InstUISettingsProvider} from '@instructure/emotion'
 import {Link} from '@instructure/ui-link'
 import {IconClockLine} from '@instructure/ui-icons'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('speed_grader')
 
-const theme = {
-  [Link.theme]: {
+const componentOverrides = {
+  [Link.componentId]: {
     smallPadding: '0',
   },
 }
 
 export default function AssessmentAuditButton(props) {
   return (
-    <ApplyTheme theme={theme}>
+    <InstUISettingsProvider theme={{componentOverrides}}>
       <Link renderIcon={IconClockLine} onClick={props.onClick} size="small" as="button">
         {I18n.t('Assessment audit')}
       </Link>
-    </ApplyTheme>
+    </InstUISettingsProvider>
   )
 }
 

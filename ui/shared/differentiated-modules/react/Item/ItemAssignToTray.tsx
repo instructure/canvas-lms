@@ -21,7 +21,6 @@ import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Tray} from '@instructure/ui-tray'
-// @ts-expect-error
 import {uid} from '@instructure/uid'
 import {View} from '@instructure/ui-view'
 import {
@@ -30,16 +29,12 @@ import {
   IconQuizLine,
   IconQuizSolid,
   IconQuestionLine,
-  // @ts-expect-error
 } from '@instructure/ui-icons'
 import ItemAssignToCard from './ItemAssignToCard'
 import TrayFooter from '../Footer'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('differentiated_modules')
-
-// Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
-const {Item: FlexItem} = Flex as any
 
 function itemTypeToIcon(itemType: string) {
   switch (itemType) {
@@ -111,7 +106,7 @@ export default function ItemAssignToTray({
   function Header() {
     const icon = itemTypeToIcon(moduleItemType)
     return (
-      <FlexItem margin="medium 0 0 0" padding="0 medium" width="100%">
+      <Flex.Item margin="medium 0 0 0" padding="0 medium" width="100%">
         <CloseButton
           onClick={onDismiss}
           screenReaderLabel={I18n.t('Close')}
@@ -124,7 +119,7 @@ export default function ItemAssignToTray({
         <View as="div" margin="medium 0 0 0">
           {renderItemType()} {pointsPossible ? `| ${pointsPossible}` : ''}
         </View>
-      </FlexItem>
+      </Flex.Item>
     )
   }
 
@@ -160,24 +155,24 @@ export default function ItemAssignToTray({
 
   function Body() {
     return (
-      <FlexItem padding="small medium 0" shouldGrow={true} shouldShrink={true}>
+      <Flex.Item padding="small medium 0" shouldGrow={true} shouldShrink={true}>
         {renderCards()}
         <Button onClick={handleAddCard} margin="small 0 0 0" renderIcon={IconAddLine}>
           {I18n.t('Add')}
         </Button>
-      </FlexItem>
+      </Flex.Item>
     )
   }
 
   function Footer() {
     return (
-      <FlexItem margin="small 0 0 0" width="100%">
+      <Flex.Item margin="small 0 0 0" width="100%">
         <TrayFooter
           updateButtonLabel={I18n.t('Save')}
           onDismiss={onDismiss}
           onUpdate={handleUpdate}
         />
-      </FlexItem>
+      </Flex.Item>
     )
   }
 

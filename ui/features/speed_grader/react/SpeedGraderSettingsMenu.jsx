@@ -58,7 +58,7 @@ export default function SpeedGraderSettingsMenu(props) {
 
   return (
     <Menu
-      contentRef={props.menuContentRef}
+      menuRef={props.menuContentRef}
       onToggle={handleToggle}
       placement="bottom end"
       trigger={menuTrigger}

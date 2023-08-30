@@ -71,7 +71,7 @@ test('renders the RSSFeedList component loading indicator when not loading', () 
   const props = defaultProps()
   props.hasLoadedFeed = false
   const tree = mount(<RSSFeedList {...props} />)
-  const node = tree.find('Spinner')
+  const node = tree.find('Spinner').at(0)
   expect(node).toHaveLength(1)
 })
 
@@ -81,7 +81,7 @@ test('renders the RSSFeedList component with 5 rows for 5 feeds', () => {
   props.feeds = defaultFeeds()
   const tree = mount(<RSSFeedList {...props} />)
   const node = tree.find('Grid')
-  expect(node).toHaveLength(5)
+  expect(node).toHaveLength(5 * 2) // there are two instances per rendering of <Grid> in InstUI 8
 })
 
 test('calls getExternalFeeds when feed has not been loaded', () => {

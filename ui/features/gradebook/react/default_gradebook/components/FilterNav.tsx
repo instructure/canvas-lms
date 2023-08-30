@@ -24,7 +24,6 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Tag} from '@instructure/ui-tag'
 import {Alert} from '@instructure/ui-alerts'
-// @ts-expect-error
 import {Tooltip} from '@instructure/ui-tooltip'
 import type {CamelizedGradingPeriod} from '@canvas/grading/grading.d'
 import type {Filter, FilterPreset} from '../gradebook.d'
@@ -38,8 +37,6 @@ import {useFilterDropdownData} from './FilterNav.utils'
 import {GradeStatus} from '@canvas/grading/accountGradingStatus'
 
 const I18n = useI18nScope('gradebook')
-
-const {Item: FlexItem} = Flex as any
 
 export type FilterNavProps = {
   modules: Module[]
@@ -96,7 +93,7 @@ export default function FilterNav({
       <Tag
         data-testid={`applied-filter-${label}`}
         key={`staged-filter-${filter.id}`}
-        elementRef={(e: HTMLElement) => {
+        elementRef={(e: Element | null) => {
           filterTagRef.current[i] = e as HTMLElement
         }}
         text={
@@ -154,9 +151,9 @@ export default function FilterNav({
       >
         {announcement}
       </Alert>
-      <FlexItem>
+      <Flex.Item>
         <Flex>
-          <FlexItem padding="0 small 0 0">
+          <Flex.Item padding="0 small 0 0">
             <FilterDropdown
               onOpenTray={() => setIsTrayOpen(true)}
               dataMap={dataMap}
@@ -164,14 +161,14 @@ export default function FilterNav({
               changeAnnouncement={changeAnnouncement}
               applyFiltersButtonRef={applyFiltersButtonRef}
             />
-          </FlexItem>
-          <FlexItem data-testid="filter-tags">
+          </Flex.Item>
+          <Flex.Item data-testid="filter-tags">
             {activeFilterComponents.length > 0 && activeFilterComponents}
-          </FlexItem>
+          </Flex.Item>
         </Flex>
-      </FlexItem>
+      </Flex.Item>
 
-      <FlexItem>
+      <Flex.Item>
         {activeFilterComponents.length > 0 && (
           <Link
             isWithinText={false}
@@ -183,7 +180,7 @@ export default function FilterNav({
             {I18n.t('Clear All Filters')}
           </Link>
         )}
-      </FlexItem>
+      </Flex.Item>
 
       <FilterTray
         isTrayOpen={isTrayOpen}

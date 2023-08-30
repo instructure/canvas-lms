@@ -20,13 +20,13 @@ import PropTypes from 'prop-types'
 import {Tag} from '@instructure/ui-tag'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import {ApplyTheme} from '@instructure/ui-themeable'
+import {InstUISettingsProvider} from '@instructure/emotion'
 import SVGWrapper from '@canvas/svg-wrapper'
 import {svgUrl} from './icons'
 import {proficiencyRatingShape} from './shapes'
 
-const themeOverride = {
-  [Tag.theme]: {
+const componentOverrides = {
+  [Tag.componentId]: {
     defaultBackground: 'white',
     maxWidth: '12rem',
   },
@@ -67,7 +67,7 @@ const ProficiencyRating = ({points, masteryAt, color, description, onClick}) => 
       isWithinText={false}
       padding="0 xx-small 0 xx-small"
     >
-      <ApplyTheme theme={themeOverride}>
+      <InstUISettingsProvider theme={{componentOverrides}}>
         <Tag
           size="small"
           text={
@@ -94,7 +94,7 @@ const ProficiencyRating = ({points, masteryAt, color, description, onClick}) => 
           }
           onClick={() => {}} // Tag doesn't respect disabled without an onClick handler
         />
-      </ApplyTheme>
+      </InstUISettingsProvider>
     </View>
   )
 }

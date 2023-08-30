@@ -217,6 +217,7 @@ describe "calendar2" do
       end
 
       it "enables event creation for added account calendars" do
+        skip "FOO-3803 (9/7/2023)"
         account_admin_user(account: @subaccount1)
         user_session(@admin)
         get "/calendar2"

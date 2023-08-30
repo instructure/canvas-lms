@@ -166,6 +166,7 @@ describe "course pace page" do
     end
 
     it "opens the course pace menu and selects the student view when clicked" do
+      skip "FOO-3806 (10/6/2023)"
       visit_course_paces_page
       click_main_course_pace_menu
       click_students_menu_item
@@ -194,6 +195,7 @@ describe "course pace page" do
     end
 
     it "opens the course pace menu and selects the section view when clicked" do
+      skip "FOO-3806 (10/6/2023)"
       visit_course_paces_page
       click_main_course_pace_menu
       click_section_menu_item

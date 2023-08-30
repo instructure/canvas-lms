@@ -27,6 +27,7 @@ exports[`FileBrowser renders 1`] = `
         }
       }
       defaultExpanded={Array []}
+      getCollectionProps={[Function]}
       getItemProps={[Function]}
       itemIcon={[Function]}
       items={Object {}}
@@ -63,7 +64,6 @@ exports[`FileBrowser renders 1`] = `
       cursor="pointer"
       disabled={true}
       display="inline-block"
-      elementRef={[Function]}
       id="image-upload__upload"
       margin="0"
       onClick={[Function]}

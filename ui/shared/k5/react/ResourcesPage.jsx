@@ -20,7 +20,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 
-import {ApplyTheme} from '@instructure/ui-themeable'
+import {InstUISettingsProvider} from '@instructure/emotion'
 
 import StaffContactInfoLayout from './StaffContactInfoLayout'
 import useImmediate from '@canvas/use-immediate-hook'
@@ -28,7 +28,9 @@ import {fetchCourseInstructors, fetchCourseApps, fetchImportantInfos} from './ut
 import AppsList from './AppsList'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import ImportantInfoLayout from './ImportantInfoLayout'
-import {resourcesTheme} from './k5-theme'
+import {getResourcesTheme} from './k5-theme'
+
+const resourcesTheme = getResourcesTheme()
 
 const I18n = useI18nScope('resources_page')
 
@@ -119,7 +121,7 @@ export default function ResourcesPage({cards, cardsSettled, visible, showStaff, 
   )
 
   return (
-    <ApplyTheme theme={resourcesTheme}>
+    <InstUISettingsProvider theme={{componentOverrides: resourcesTheme}}>
       <section style={{display: visible ? 'block' : 'none'}} aria-hidden={!visible}>
         {(isSingleCourse || homerooms?.length > 0) && (
           <ImportantInfoLayout
@@ -137,7 +139,7 @@ export default function ResourcesPage({cards, cardsSettled, visible, showStaff, 
           <StaffContactInfoLayout isLoading={isStaffLoading} staff={staff} />
         )}
       </section>
-    </ApplyTheme>
+    </InstUISettingsProvider>
   )
 }
 

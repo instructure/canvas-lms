@@ -25,13 +25,71 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Modal} from '@instructure/ui-modal'
 import {View} from '@instructure/ui-view'
 import React from 'react'
-import PropTypes from 'prop-types'
 import NewKeyForm from './NewKeyForm'
+import type {DeveloperKey} from './NewKeyForm'
 
 const I18n = useI18nScope('react_developer_keys')
 
-export default class DeveloperKeyModal extends React.Component {
-  state = {
+type Props = {
+  createOrEditDeveloperKeyState: {
+    isLtiKey: boolean
+    developerKeyCreateOrEditSuccessful: boolean
+    developerKeyCreateOrEditFailed: boolean
+    developerKeyCreateOrEditPending: boolean
+    developerKeyModalOpen: boolean
+    developerKey: DeveloperKey
+    editing: boolean
+  }
+  availableScopes: {
+    [key: string]: Array<{
+      resource: string
+      scope: string
+    }>
+  }
+  availableScopesPending: boolean
+  store: {
+    dispatch: (action: any) => Promise<any>
+  }
+  ctx: {
+    params: {
+      contextId: string
+    }
+  }
+  actions: {
+    createOrEditDeveloperKey: (developerKey: any, url: string, method: string) => Promise<any>
+    developerKeysModalClose: () => void
+    editDeveloperKey: () => void
+    listDeveloperKeyScopesSet: (scopes: Array<string>) => void
+    saveLtiToolConfiguration: (toSave: any) => (dispatch: any) => Promise<any>
+    resetLtiState: () => void
+    updateLtiKey: (
+      developerKey: any,
+      scopes: Array<string>,
+      id: string,
+      settings: any,
+      custom_fields: any
+    ) => Promise<any>
+    listDeveloperKeysReplace: (developerKey: any) => void
+  }
+  selectedScopes: Array<string>
+  handleSuccessfulSave: () => void
+}
+
+type ConfigurationMethod = 'manual' | 'json' | 'url'
+
+type State = {
+  toolConfiguration: any
+  submitted: boolean
+  developerKey: any
+  toolConfigurationUrl: string | null
+  isSaving: boolean
+  configurationMethod: ConfigurationMethod
+}
+
+export default class DeveloperKeyModal extends React.Component<Props, State> {
+  newForm: NewKeyForm | null = null
+
+  state: State = {
     toolConfiguration: {}, // used to save state when saving the key, display what was there if failure
     submitted: false,
     developerKey: {},
@@ -109,7 +167,9 @@ export default class DeveloperKeyModal extends React.Component {
       return false
     }
 
-    return this.developerKey.redirect_uris.split('\n').some(val => val.length > 4096)
+    return (
+      this.developerKey.redirect_uris?.split('\n').some((val: string) => val.length > 4096) || false
+    )
   }
 
   alertAboutInvalidRedirectUris() {
@@ -120,7 +180,8 @@ export default class DeveloperKeyModal extends React.Component {
     )
   }
 
-  updateConfigurationMethod = configurationMethod => this.setState({configurationMethod})
+  updateConfigurationMethod = (configurationMethod: ConfigurationMethod) =>
+    this.setState({configurationMethod})
 
   submitForm = () => {
     const {
@@ -159,7 +220,13 @@ export default class DeveloperKeyModal extends React.Component {
     })
   }
 
-  saveLTIKeyEdit(settings, developerKey) {
+  saveLTIKeyEdit(
+    settings: {
+      scopes?: any
+      custom_fields?: any
+    },
+    developerKey: string
+  ) {
     const {
       store: {dispatch},
       actions,
@@ -194,7 +261,9 @@ export default class DeveloperKeyModal extends React.Component {
       this.alertAboutInvalidRedirectUris()
       return
     }
-    let settings = {}
+    let settings: {
+      scopes?: any
+    } = {}
     if (this.isJsonConfig) {
       if (!this.state.toolConfiguration) {
         this.setState({submitted: true})
@@ -214,7 +283,12 @@ export default class DeveloperKeyModal extends React.Component {
     if (this.props.createOrEditDeveloperKeyState.editing) {
       this.saveLTIKeyEdit(settings, developer_key)
     } else {
-      const toSave = {
+      const toSave: {
+        account_id: string
+        developer_key: string
+        settings_url?: string
+        settings?: any
+      } = {
         account_id: this.props.ctx.params.contextId,
         developer_key,
       }
@@ -242,11 +316,11 @@ export default class DeveloperKeyModal extends React.Component {
     }
   }
 
-  updateToolConfigurationUrl = toolConfigurationUrl => {
+  updateToolConfigurationUrl = (toolConfigurationUrl: string) => {
     this.setState({toolConfigurationUrl})
   }
 
-  updateToolConfiguration = (update, field = null, sync = false) => {
+  updateToolConfiguration = (update: any, field: string | null = null, sync = false) => {
     if (field) {
       this.setState(state => ({toolConfiguration: {...state.toolConfiguration, [field]: update}}))
     } else {
@@ -266,11 +340,11 @@ export default class DeveloperKeyModal extends React.Component {
     this.updateToolConfiguration(this.toolConfiguration, null, true)
   }
 
-  updateDeveloperKey = (field, update) => {
+  updateDeveloperKey = (field: string, update: any) => {
     this.setState(state => ({developerKey: {...state.developerKey, [field]: update}}))
   }
 
-  setNewFormRef = node => {
+  setNewFormRef = (node: NewKeyForm) => {
     this.newForm = node
   }
 
@@ -364,45 +438,4 @@ export default class DeveloperKeyModal extends React.Component {
       </div>
     )
   }
-}
-
-DeveloperKeyModal.propTypes = {
-  availableScopes: PropTypes.objectOf(
-    PropTypes.arrayOf(
-      PropTypes.shape({
-        resource: PropTypes.string,
-        scope: PropTypes.string,
-      })
-    )
-  ).isRequired,
-  store: PropTypes.shape({
-    dispatch: PropTypes.func.isRequired,
-  }).isRequired,
-  actions: PropTypes.shape({
-    createOrEditDeveloperKey: PropTypes.func.isRequired,
-    developerKeysModalClose: PropTypes.func.isRequired,
-    editDeveloperKey: PropTypes.func.isRequired,
-    listDeveloperKeyScopesSet: PropTypes.func.isRequired,
-    saveLtiToolConfiguration: PropTypes.func.isRequired,
-    resetLtiState: PropTypes.func.isRequired,
-    updateLtiKey: PropTypes.func.isRequired,
-    listDeveloperKeysReplace: PropTypes.func.isRequired,
-  }).isRequired,
-  createOrEditDeveloperKeyState: PropTypes.shape({
-    isLtiKey: PropTypes.bool.isRequired,
-    developerKeyCreateOrEditSuccessful: PropTypes.bool.isRequired,
-    developerKeyCreateOrEditFailed: PropTypes.bool.isRequired,
-    developerKeyCreateOrEditPending: PropTypes.bool.isRequired,
-    developerKeyModalOpen: PropTypes.bool.isRequired,
-    developerKey: NewKeyForm.propTypes.developerKey,
-    editing: PropTypes.bool.isRequired,
-  }).isRequired,
-  availableScopesPending: PropTypes.bool.isRequired,
-  ctx: PropTypes.shape({
-    params: PropTypes.shape({
-      contextId: PropTypes.string.isRequired,
-    }),
-  }).isRequired,
-  selectedScopes: PropTypes.arrayOf(PropTypes.string).isRequired,
-  handleSuccessfulSave: PropTypes.func.isRequired,
 }

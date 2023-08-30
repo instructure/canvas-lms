@@ -50,16 +50,12 @@ import PaceModal from './components/pace_modal'
 
 const I18n = useI18nScope('course_paces_app')
 
-const {Item: FlexItem} = Flex as any
-
 interface StoreProps {
   readonly loadingMessage: string
   readonly showLoadingOverlay: boolean
   readonly modalOpen: boolean
   readonly unpublishedChanges: SummarizedChange[]
   readonly coursePace: CoursePace
-  readonly isSyncing: boolean
-  readonly isPacePublishing: boolean
 }
 
 interface DispatchProps {
@@ -117,7 +113,7 @@ export const App = ({
       return (
         <>
           <Flex as="section" alignItems="end" wrap="wrap">
-            <FlexItem margin="0 0 small">
+            <Flex.Item margin="0 0 small">
               <Header
                 handleDrawerToggle={() => setTrayOpen(!trayOpen)}
                 responsiveSize={responsiveSize}
@@ -128,7 +124,7 @@ export const App = ({
                 // Make sure changes have finished before updating contexts
                 <PaceContent />
               )}
-            </FlexItem>
+            </Flex.Item>
           </Flex>
           <PaceModal
             isOpen={modalOpen}
@@ -169,7 +165,7 @@ export const App = ({
   return (
     <View>
       <Overlay open={showLoadingOverlay} transition="fade" label={loadingMessage}>
-        <Mask theme={{zIndex: 10001 /* to appear over the fullscreen modal */}}>
+        <Mask themeOverride={{zIndex: 10001 /* to appear over the fullscreen modal */}}>
           <Spinner renderTitle="Loading" size="large" margin="0 0 0 medium" />
         </Mask>
       </Overlay>

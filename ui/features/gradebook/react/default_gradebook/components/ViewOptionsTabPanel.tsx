@@ -23,12 +23,11 @@ import {bool, func, objectOf, shape, string} from 'prop-types'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {SimpleSelect} from '@instructure/ui-simple-select'
+import type {SimpleSelectProps} from '@instructure/ui-simple-select'
 import {View} from '@instructure/ui-view'
 import StatusColorPanel from './StatusColorPanel'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-
-const {Option: SimpleSelectOption} = SimpleSelect as any
 
 const I18n = useI18nScope('gradebook')
 
@@ -95,10 +94,10 @@ export default function ViewOptionsTabPanel({
         option.direction === columnSort.currentValue.direction
     ) || sortOptions[0]
 
-  const handleColumnSortSelected = (e, {value}) => {
+  const handleColumnSortSelected: SimpleSelectProps['onChange'] = (e, {value}) => {
     const matchingSortOption = sortOptions.find(option => option.value === value)
 
-    if (matchingSortOption != null) {
+    if (typeof matchingSortOption !== 'undefined') {
       const {criterion, direction} = matchingSortOption
       columnSort.onChange({criterion, direction})
     }
@@ -114,9 +113,13 @@ export default function ViewOptionsTabPanel({
           value={selectedSortKey.value}
         >
           {sortOptions.map(option => (
-            <SimpleSelectOption id={`sort-${option.value}`} key={option.value} value={option.value}>
+            <SimpleSelect.Option
+              id={`sort-${option.value}`}
+              key={option.value}
+              value={option.value}
+            >
               {option.label}
-            </SimpleSelectOption>
+            </SimpleSelect.Option>
           ))}
         </SimpleSelect>
 

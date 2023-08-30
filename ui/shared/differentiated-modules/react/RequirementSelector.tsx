@@ -23,7 +23,6 @@ import {Text} from '@instructure/ui-text'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {NumberInput} from '@instructure/ui-number-input'
 import {IconButton} from '@instructure/ui-buttons'
-// @ts-expect-error -- remove once on InstUI 8
 import {IconTrashLine} from '@instructure/ui-icons'
 import CanvasSelect from '@canvas/instui-bindings/react/Select'
 import type {Requirement, ModuleItem} from './types'
@@ -32,9 +31,6 @@ import {groupBy} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('differentiated_modules')
-
-// Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
-const {Item: FlexItem} = Flex as any
 
 const resourceLabelMap: Record<ModuleItem['resource'], string> = {
   assignment: I18n.t('Assignments'),
@@ -82,10 +78,10 @@ export default function RequirementSelector({
     <View data-testid="module-requirement-card" as="div" borderRadius="medium" borderWidth="small">
       <View as="div" padding="medium">
         <Flex direction="row">
-          <FlexItem shouldGrow={true}>
+          <Flex.Item shouldGrow={true}>
             <Text>{I18n.t('Content')}</Text>
-          </FlexItem>
-          <FlexItem padding="0 0 small 0">
+          </Flex.Item>
+          <Flex.Item padding="0 0 small 0">
             <IconButton
               renderIcon={<IconTrashLine color="error" />}
               onClick={() => onDropRequirement(index)}
@@ -93,7 +89,7 @@ export default function RequirementSelector({
               withBackground={false}
               withBorder={false}
             />
-          </FlexItem>
+          </Flex.Item>
         </Flex>
         <View as="div" padding="0 0 small 0">
           <CanvasSelect
@@ -141,7 +137,7 @@ export default function RequirementSelector({
         </CanvasSelect>
         {requirement.type === 'score' && (
           <Flex padding="small 0">
-            <FlexItem shouldShrink={true}>
+            <Flex.Item shouldShrink={true}>
               <NumberInput
                 value={requirement.minimumScore}
                 width="4rem"
@@ -154,15 +150,15 @@ export default function RequirementSelector({
                   )
                 }}
               />
-            </FlexItem>
-            <FlexItem shouldGrow={true} padding="0 0 0 small">
+            </Flex.Item>
+            <Flex.Item shouldGrow={true} padding="0 0 0 small">
               {requirement.pointsPossible && (
                 <View as="div">
                   <ScreenReaderContent>{I18n.t('Points Possible')}</ScreenReaderContent>
                   <Text data-testid="points-possible-value">{`/ ${requirement.pointsPossible}`}</Text>
                 </View>
               )}
-            </FlexItem>
+            </Flex.Item>
           </Flex>
         )}
       </View>

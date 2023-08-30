@@ -23,22 +23,19 @@ import canvasHighContrast from '@instructure/canvas-high-contrast-theme'
 import {TreeBrowser} from '@instructure/ui-tree-browser'
 import {View} from '@instructure/ui-view'
 
-// Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
-const {Node: TreeBrowserNode, Button: TreeBrowserButton} = TreeBrowser as any
-
 const {variables} = ENV.use_high_contrast ? canvasHighContrast : canvas
 const {colors} = variables
 
 // Note: there are a few more style overrides set in account_calendar_settings.scss
 
 export const treeBrowserTheme = {
-  [TreeBrowserNode.theme]: {
+  [TreeBrowser.Node.componentId]: {
     hoverBackgroundColor: colors.backgroundLight,
     nameTextColor: colors.textDarkest,
     hoverTextColor: colors.textDarkest,
     baseSpacingMedium: '2rem',
   },
-  [TreeBrowserButton.theme]: {
+  [TreeBrowser.Button.componentId]: {
     hoverBackgroundColor: colors.backgroundLight,
     nameTextColor: colors.textDarkest,
     hoverTextColor: colors.textDarkest,
@@ -48,7 +45,7 @@ export const treeBrowserTheme = {
   },
 }
 export const accountListTheme = {
-  [View.theme]: {
+  [View.componentId]: {
     borderColorPrimary: colors.porcelain,
   },
 }

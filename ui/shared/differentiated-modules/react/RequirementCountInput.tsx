@@ -17,10 +17,8 @@
  */
 
 import React from 'react'
-// @ts-expect-error -- remove once on InstUI 8
 import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-// @ts-expect-error -- remove once on InstUI 8
 import {Checkbox} from '@instructure/ui-checkbox'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
@@ -28,9 +26,6 @@ import {Text} from '@instructure/ui-text'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('differentiated_modules')
-
-// Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
-const {Item: FlexItem} = Flex as any
 
 export interface RequirementCountInputProps {
   requirementCount: 'all' | 'one'
@@ -51,7 +46,7 @@ export default function RequirementCountInput({
       description={<ScreenReaderContent>{I18n.t('Select Requirement Count')}</ScreenReaderContent>}
     >
       <Flex>
-        <FlexItem align="start">
+        <Flex.Item align="start">
           <RadioInput
             data-testid="complete-all-radio"
             checked={requirementCount === 'all'}
@@ -59,15 +54,15 @@ export default function RequirementCountInput({
             label={<ScreenReaderContent>{I18n.t('Complete all')}</ScreenReaderContent>}
             onClick={() => onChangeRequirementCount('all')}
           />
-        </FlexItem>
-        <FlexItem>
+        </Flex.Item>
+        <Flex.Item>
           <Text>{I18n.t('Complete all')}</Text>
           <View as="div">
             <Text color="secondary" size="small">
               {I18n.t('Students must complete all of these requirements.')}
             </Text>
           </View>
-        </FlexItem>
+        </Flex.Item>
       </Flex>
       {requirementCount === 'all' && (
         <View as="div" padding="0 0 0 medium">
@@ -80,7 +75,7 @@ export default function RequirementCountInput({
         </View>
       )}
       <Flex>
-        <FlexItem align="start">
+        <Flex.Item align="start">
           <RadioInput
             data-testid="complete-one-radio"
             checked={requirementCount === 'one'}
@@ -88,15 +83,15 @@ export default function RequirementCountInput({
             label={<ScreenReaderContent>{I18n.t('Complete one')}</ScreenReaderContent>}
             onClick={() => onChangeRequirementCount('one')}
           />
-        </FlexItem>
-        <FlexItem>
+        </Flex.Item>
+        <Flex.Item>
           <Text>{I18n.t('Complete one')}</Text>
           <View as="div">
             <Text color="secondary" size="small">
               {I18n.t('Students must complete one of these requirements.')}
             </Text>
           </View>
-        </FlexItem>
+        </Flex.Item>
       </Flex>
     </RadioInputGroup>
   )

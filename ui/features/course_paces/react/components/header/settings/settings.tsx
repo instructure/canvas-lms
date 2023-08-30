@@ -30,7 +30,7 @@ import {Tooltip} from '@instructure/ui-tooltip'
 
 import BlackoutDatesModal from '../../../shared/components/blackout_dates_modal'
 import {CoursePace, ResponsiveSizes, StoreState} from '../../../types'
-import {BlackoutDate, Course} from '../../../shared/types'
+import {BlackoutDate} from '../../../shared/types'
 import {getCourse} from '../../../reducers/course'
 import {getCoursePace, getExcludeWeekends} from '../../../reducers/course_paces'
 import {coursePaceActions} from '../../../actions/course_paces'
@@ -41,6 +41,8 @@ import {getResponsiveSize, getSyncing} from '../../../reducers/ui'
 import {EnvCoursePaces} from '@canvas/global/env/EnvCoursePaces'
 import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 
+import type {ButtonProps} from '@instructure/ui-buttons'
+
 // Allow unchecked access to module-specific ENV variables
 declare const ENV: GlobalEnv & EnvCoursePaces
 
@@ -49,8 +51,6 @@ const I18n = useI18nScope('course_paces_settings')
 const {Item: MenuItem} = Menu as any
 interface StoreProps {
   readonly blackoutDates: BlackoutDate[]
-  readonly course: Course
-  readonly courseId: string
   readonly excludeWeekends: boolean
   readonly coursePace: CoursePace
   readonly isSyncing: boolean
@@ -58,14 +58,12 @@ interface StoreProps {
 }
 
 interface DispatchProps {
-  readonly loadLatestPaceByContext: typeof coursePaceActions.loadLatestPaceByContext
-  readonly showLoadingOverlay: typeof uiActions.showLoadingOverlay
   readonly toggleExcludeWeekends: typeof coursePaceActions.toggleExcludeWeekends
   readonly updateBlackoutDates: typeof blackoutDateActions.updateBlackoutDates
 }
 
 interface PassedProps {
-  readonly margin?: string
+  readonly margin?: ButtonProps['margin']
   readonly isBlueprintLocked: boolean | undefined
 }
 

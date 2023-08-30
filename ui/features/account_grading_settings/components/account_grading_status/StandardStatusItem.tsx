@@ -20,7 +20,6 @@ import React, {useRef} from 'react'
 import {GradingStatusListItem} from '@canvas/grading-status-list-item'
 import type {GradeStatus, StandardStatusAllowedName} from '@canvas/grading/accountGradingStatus'
 import {useScope as useI18nScope} from '@canvas/i18n'
-// @ts-expect-error
 import {Grid} from '@instructure/ui-grid'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
@@ -56,7 +55,11 @@ export const StandardStatusItem = ({
     >
       <GradingStatusListItem
         backgroundColor={color}
-        setElementRef={ref => (standardStatusRef.current = ref)}
+        setElementRef={ref => {
+          if (ref instanceof HTMLDivElement) {
+            standardStatusRef.current = ref
+          }
+        }}
       >
         <Grid vAlign="middle">
           <Grid.Row>

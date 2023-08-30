@@ -65,7 +65,7 @@ export default function SubmissionTypeButton({displayName, icon, selected, onSel
             display="block"
             interaction={selected || !context.allowChangesToSubmission ? 'readonly' : 'enabled'}
             onClick={onSelected}
-            theme={{borderWidth: '0'}}
+            themeOverride={{borderWidth: '0'}}
             withBackground={false}
           >
             {iconElement}

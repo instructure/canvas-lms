@@ -83,7 +83,7 @@ describe('DirectShareUserModal', () => {
     await selectUser(getByText, findByLabelText)
     expect(getByText('Send').closest('button').getAttribute('disabled')).toBe(null)
     // remove the selected user from the list
-    fireEvent.click(getAllByText('abc')[1]) // first one is SR alert
+    fireEvent.click(getAllByText('abc')[0])
     expect(getByText('Send').closest('button').getAttribute('disabled')).toBe('')
   })
 

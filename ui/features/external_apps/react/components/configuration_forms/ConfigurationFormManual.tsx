@@ -21,11 +21,9 @@ import React from 'react'
 import {TextInput} from '@instructure/ui-text-input'
 import {FormMessage} from '@instructure/ui-form-field'
 import {SimpleSelect} from '@instructure/ui-simple-select'
-// @ts-expect-error
 // ui-text-area has types in InstUI 7, but they aren't declared in its package.json
 // so just ignore the error for now. Once we're on InstUI 8, we can remove this.
 import {TextArea} from '@instructure/ui-text-area'
-// @ts-expect-error
 // ui-grid has types in InstUI 7, but they aren't declared in its package.json
 // so just ignore the error for now. Once we're on InstUI 8, we can remove this.
 import {Grid} from '@instructure/ui-grid'
@@ -172,10 +170,12 @@ export default class ConfigurationFormManual extends React.Component<
     }
   }
 
-  handlePrivacyChange: (event: React.SyntheticEvent, data: {value?: string; id?: string}) => void =
-    (_, data) => {
-      this.setState({privacyLevel: data.value as keyof typeof PRIVACY_OPTIONS})
-    }
+  handlePrivacyChange: (
+    event: React.SyntheticEvent,
+    data: {value?: string | number; id?: string}
+  ) => void = (_, data) => {
+    this.setState({privacyLevel: data.value as keyof typeof PRIVACY_OPTIONS})
+  }
 
   handleCustomFieldsChange: TextAreaChangeHandler = e => {
     this.setState({customFields: e.target.value})

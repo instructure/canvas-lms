@@ -165,7 +165,7 @@ export default class StudentTray extends React.Component {
             elementRef={b => (this.messageStudentsButton = b)}
             onClick={this.handleMessageButtonClick}
             isWithinText={false}
-            theme={{
+            themeOverride={{
               iconSize: '1.25rem',
               mediumPaddingHorizontal: '0',
               mediumHeight: '1',
@@ -180,7 +180,7 @@ export default class StudentTray extends React.Component {
             onClick={this.handleSubmitForStudent}
             isWithinText={false}
             margin="small auto auto auto"
-            theme={{
+            themeOverride={{
               iconSize: '1.25rem',
               mediumPaddingHorizontal: '0',
               mediumHeight: '1.5rem',

@@ -130,7 +130,7 @@ it('changing points triggers change', () => {
       </tbody>
     </table>
   )
-  wrapper.find('TextInput').at(1).find('input').simulate('change')
+  wrapper.find('TextInput').at(3).find('input').simulate('change')
   expect(onPointsChange).toHaveBeenCalledTimes(1)
 })
 
@@ -143,7 +143,7 @@ it('clicking delete button triggers delete', () => {
       </tbody>
     </table>
   )
-  wrapper.find('IconButton').simulate('click')
+  wrapper.find('IconButton').at(1).simulate('click')
   expect(onDelete).toHaveBeenCalledTimes(1)
 })
 
@@ -161,6 +161,6 @@ it('clicking disabled delete button does not triggers delete', () => {
       </tbody>
     </table>
   )
-  wrapper.find('IconButton').simulate('click')
+  wrapper.find('IconButton').at(1).simulate('click')
   expect(onDelete).toHaveBeenCalledTimes(0)
 })

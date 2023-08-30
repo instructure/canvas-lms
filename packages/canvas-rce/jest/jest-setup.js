@@ -118,4 +118,6 @@ if (typeof window.URL.createObjectURL === 'undefined') {
   Object.defineProperty(window.URL, 'createObjectURL', {value: () => 'http://example.com/whatever'})
 }
 
+global.DataTransferItem = global.DataTransferItem || class DataTransferItem {}
+
 window.scroll = () => {}

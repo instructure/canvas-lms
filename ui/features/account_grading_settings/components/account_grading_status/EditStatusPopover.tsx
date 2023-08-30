@@ -20,9 +20,7 @@ import React, {useState} from 'react'
 import {colorPickerColors, defaultColorLabels} from '@canvas/grading-status-list-item'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Button, IconButton} from '@instructure/ui-buttons'
-// @ts-expect-error
 import {IconEditSolid} from '@instructure/ui-icons'
-// @ts-expect-error
 import {Popover} from '@instructure/ui-popover'
 import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
@@ -31,8 +29,6 @@ import {ColorPicker} from './ColorPicker'
 import {Flex} from '@instructure/ui-flex'
 
 const I18n = useI18nScope('account_grading_status')
-
-const {Item: FlexItem} = Flex as any
 
 type EditStatusPopoverProps = {
   currentColor: string
@@ -112,7 +108,7 @@ export const EditStatusPopover = ({
           setIsValidColor={setIsSelectedColorValid}
         />
         <Flex direction="row-reverse" margin="small 0">
-          <FlexItem>
+          <Flex.Item>
             <Button
               color="secondary"
               onClick={() => {
@@ -133,7 +129,7 @@ export const EditStatusPopover = ({
             >
               {I18n.t('Save')}
             </Button>
-          </FlexItem>
+          </Flex.Item>
         </Flex>
       </View>
     </Popover>

@@ -26,11 +26,8 @@ import React, {
   useState,
 } from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
-// @ts-ignore
 import {Avatar} from '@instructure/ui-avatar'
-// @ts-ignore
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-// @ts-ignore
 import {Grid} from '@instructure/ui-grid'
 import {Text} from '@instructure/ui-text'
 import {DateTimeInput} from '@instructure/ui-date-time-input'
@@ -98,9 +95,6 @@ type RoleName =
 type PermissionName = 'teacher' | 'ta' | 'student' | 'observer' | 'designer'
 
 const I18n = useI18nScope('temporary_enrollment')
-// Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
-// @ts-expect-error
-const FlexItem = Flex.Item as any
 const rolePermissionMapping: Record<RoleName, PermissionName> = {
   StudentEnrollment: 'student',
   TaEnrollment: 'ta',
@@ -376,7 +370,7 @@ export function TempEnrollAssign(props: Props) {
         <Grid.Row vAlign="middle">
           <Grid.Col>
             <Flex margin="small 0 small 0">
-              <FlexItem>
+              <Flex.Item>
                 <Avatar
                   size="small"
                   margin="0 small 0 0"
@@ -385,15 +379,15 @@ export function TempEnrollAssign(props: Props) {
                   data-fs-exclude={true}
                   data-heap-redact-attributes="name"
                 />
-              </FlexItem>
-              <FlexItem shouldShrink={true}>
+              </Flex.Item>
+              <Flex.Item shouldShrink={true}>
                 <Text>
                   {I18n.t('%{enroll} will receive temporary enrollments from %{user}', {
                     enroll: props.enrollment.name,
                     user: props.user.name,
                   })}
                 </Text>
-              </FlexItem>
+              </Flex.Item>
             </Flex>
           </Grid.Col>
         </Grid.Row>

@@ -22,7 +22,7 @@ import keycode from 'keycode'
 import {connect} from 'react-redux'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-import {ApplyTheme} from '@instructure/ui-themeable'
+import {InstUISettingsProvider} from '@instructure/emotion'
 import {IconArrowOpenDownSolid, IconArrowOpenUpSolid} from '@instructure/ui-icons'
 import {Avatar} from '@instructure/ui-avatar'
 import {Heading} from '@instructure/ui-heading'
@@ -46,8 +46,11 @@ const I18n = useI18nScope('course_paces_pace_picker')
 
 const PICKER_WIDTH = '20rem'
 
-// Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
-const {Item} = Menu as any
+const componentOverrides = {
+  [Menu.componentId]: {
+    maxWidth: PICKER_WIDTH,
+  },
+}
 
 interface StoreProps {
   readonly course: Course
@@ -114,25 +117,25 @@ export const PacePicker = ({
   }
 
   const renderOption = (contextKey: string, label: string, key?: string): JSX.Element => (
-    <Item value={contextKey} defaultSelected={contextKey === selectedContextKey} key={key}>
+    <Menu.Item value={contextKey} defaultSelected={contextKey === selectedContextKey} key={key}>
       <View as="div" width={PICKER_WIDTH}>
         <TruncateText>{label}</TruncateText>
       </View>
-    </Item>
+    </Menu.Item>
   )
 
   const renderStudentOption = (enrollment: Enrollment): JSX.Element => {
     const contextKey = createContextKey('Enrollment', enrollment.id)
     const key = `student-${enrollment.id}`
     return (
-      <Item value={contextKey} defaultSelected={contextKey === selectedContextKey} key={key}>
+      <Menu.Item value={contextKey} defaultSelected={contextKey === selectedContextKey} key={key}>
         <View as="div" width={PICKER_WIDTH}>
           <Avatar name={enrollment.full_name} src={enrollment.avatar_url} size="xx-small" />
           <View as="div" display="inline-block" margin="0 0 0 small">
             <TruncateText>{enrollment.full_name}</TruncateText>
           </View>
         </View>
-      </Item>
+      </Menu.Item>
     )
   }
 
@@ -151,7 +154,7 @@ export const PacePicker = ({
       renderAfterInput={
         open ? <IconArrowOpenUpSolid inline={false} /> : <IconArrowOpenDownSolid inline={false} />
       }
-      value={selectedContextName}
+      defaultValue={selectedContextName}
       data-testid="course-pace-picker"
       interaction="readonly"
       role="button"
@@ -169,13 +172,7 @@ export const PacePicker = ({
   }
 
   return (
-    <ApplyTheme
-      theme={{
-        [(Menu as any).theme]: {
-          maxWidth: PICKER_WIDTH,
-        },
-      }}
-    >
+    <InstUISettingsProvider theme={{componentOverrides}}>
       <Menu
         id="course-pace-menu"
         placement="bottom"
@@ -212,7 +209,7 @@ export const PacePicker = ({
         }}
         contextType={selectedContextType}
       />
-    </ApplyTheme>
+    </InstUISettingsProvider>
   )
 }
 

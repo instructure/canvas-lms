@@ -16,46 +16,44 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import React, {useEffect} from 'react'
-import {arrayOf, oneOf, bool, string, shape, func} from 'prop-types'
 import CanvasTray from './Tray'
 import $ from 'jquery'
 import ToolLaunchIframe from '@canvas/external-tools/react/components/ToolLaunchIframe'
 
-const toolShape = shape({
-  id: string.isRequired,
-  title: string.isRequired,
-  base_url: string.isRequired,
-  icon_url: string,
-})
+type Tool = {
+  id: string
+  title: string
+  base_url: string
+  icon_url: string
+}
 
-const moduleShape = shape({
-  id: string.isRequired,
-  name: string.isRequired,
-})
+type KnownResourceType =
+  | 'assignment'
+  | 'assignment_group'
+  | 'audio'
+  | 'discussion_topic'
+  | 'document'
+  | 'image'
+  | 'module'
+  | 'quiz'
+  | 'page'
+  | 'video'
 
-const knownResourceTypes = [
-  'assignment',
-  'assignment_group',
-  'audio',
-  'discussion_topic',
-  'document',
-  'image',
-  'module',
-  'quiz',
-  'page',
-  'video',
-]
+export type SelectableItem = {
+  course_id: string
+  type: KnownResourceType
+}
 
-ContentTypeExternalToolTray.propTypes = {
-  tool: toolShape,
-  placement: string.isRequired,
-  acceptedResourceTypes: arrayOf(oneOf(knownResourceTypes)).isRequired,
-  targetResourceType: oneOf(knownResourceTypes).isRequired,
-  allowItemSelection: bool.isRequired,
-  selectableItems: arrayOf(moduleShape).isRequired,
-  onDismiss: func,
-  onExternalContentReady: func,
-  open: bool,
+type Props = {
+  tool: Tool
+  placement: string
+  acceptedResourceTypes: KnownResourceType[]
+  targetResourceType: KnownResourceType
+  allowItemSelection: boolean
+  selectableItems: SelectableItem[]
+  onDismiss: any
+  onExternalContentReady: any
+  open: boolean
 }
 
 export default function ContentTypeExternalToolTray({
@@ -68,7 +66,7 @@ export default function ContentTypeExternalToolTray({
   onDismiss,
   onExternalContentReady,
   open,
-}) {
+}: Props) {
   const queryParams = {
     com_instructure_course_accept_canvas_resource_types: acceptedResourceTypes,
     com_instructure_course_canvas_resource_type: targetResourceType,
@@ -82,7 +80,7 @@ export default function ContentTypeExternalToolTray({
   const title = tool ? tool.title : ''
 
   useEffect(() => {
-    function handleLtiPostMessage(e) {
+    function handleLtiPostMessage(e: any): void {
       if (onExternalContentReady) {
         onExternalContentReady(e)
       }
@@ -96,8 +94,8 @@ export default function ContentTypeExternalToolTray({
 
   return (
     <CanvasTray
-      open={open}
       label={title}
+      open={open}
       onDismiss={onDismiss}
       placement="end"
       size="regular"
@@ -105,6 +103,7 @@ export default function ContentTypeExternalToolTray({
       headerPadding="medium"
     >
       <ToolLaunchIframe
+        // @ts-expect-error
         style={{border: 'none', display: 'block', width: '100%', height: '100%'}}
         data-testid="ltiIframe"
         src={iframeUrl}

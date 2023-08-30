@@ -23,7 +23,7 @@ import {Link} from '@instructure/ui-link'
 export default function UserLink({size, avatar_url, name, avatarName, ...propsToPassOnToLink}) {
   return (
     <Link
-      theme={{mediumPaddingHorizontal: '0', mediumHeight: '1rem'}}
+      themeOverride={{mediumPaddingHorizontal: '0', mediumHeight: '1rem'}}
       data-heap-redact-text=""
       {...propsToPassOnToLink}
     >
