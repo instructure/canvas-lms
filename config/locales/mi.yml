@@ -21373,7 +21373,7 @@ mi:
           
           Hei tauira, te whakatakotoranga o te Instructure CSV, ka WHAKAIRI, he csv kōnae me te momo mime 'kuputuhi/csv/ ki te pito mutunga tōtika, e mau ana i ngā pou e whai ake nei: 
           
-          "publisher_id", "publisher_sis_id", "course_id", "course_sis_id", "section_id", "section_sis_id", "student_id", "student_sis_id", "enrollment_id", "enrollment_status", "score", "grade"
+          "publisher\_id", "publisher\_sis\_id", "course\_id", "course\_sis\_id", "section\_id", "section\_sis\_id", "student\_id", "student\_sis\_id", "enrollment\_id", "enrollment\_status", "score", "grade"
           
           (Tuhi: te "grade" (kōeke) pou ka whakahokia mehemea kua whakatautia the kōeke mo te paerewa akoranga)
           
