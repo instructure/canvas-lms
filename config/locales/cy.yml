@@ -19450,7 +19450,7 @@ cy:
           
           Er enghraifft, bydd y CSV wedi’i fformatio gan Instructure yn POSTIO ffeil CSV gyda math o mime 'testun/csv’ i’r pwynt gorffen a bennir, gyda’r colofnau canlynol: 
           
-          "publisher_id", "publisher_sis_id", "course_id", "course_sis_id", "section_id", "section_sis_id", "student_id", "student_sis_id", "enrollment_id", "enrollment_status", "sgôr", "gradd"
+          "publisher\_id", "publisher\_sis\_id", "course\_id", "course\_sis\_id", "section\_id", "section\_sis\_id", "student\_id", "student\_sis\_id", "enrollment\_id", "enrollment\_status", "sgôr", "gradd"
           
           (Nodyn: dim ond os yw’r cwrs yn pennu safon graddio y bydd y golofn "gradd" yn cael ei chyflwyno)
           
