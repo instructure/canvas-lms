@@ -34,6 +34,7 @@ class AssignmentOverride < ActiveRecord::Base
   belongs_to :root_account, class_name: "Account"
   belongs_to :assignment, inverse_of: :assignment_overrides
   belongs_to :quiz, class_name: "Quizzes::Quiz", inverse_of: :assignment_overrides
+  belongs_to :context_module, inverse_of: :assignment_overrides
   belongs_to :set, polymorphic: [:group, :course_section], exhaustive: false
   has_many :assignment_override_students, -> { where(workflow_state: "active") }, inverse_of: :assignment_override, dependent: :destroy, validate: false
   validates :assignment_version, presence: { if: :assignment }
@@ -47,6 +48,8 @@ class AssignmentOverride < ActiveRecord::Base
                                    if: ->(override) { override.assignment? && override.active? && concrete_set.call(override) } }
   validates :set_id, uniqueness: { scope: %i[quiz_id set_type workflow_state],
                                    if: ->(override) { override.quiz? && override.active? && concrete_set.call(override) } }
+  validates :set_id, uniqueness: { scope: %i[context_module_id set_type workflow_state],
+                                   if: ->(override) { override.context_module? && override.active? && concrete_set.call(override) } }
 
   before_create :set_root_account_id
 
@@ -69,8 +72,8 @@ class AssignmentOverride < ActiveRecord::Base
   end
 
   validate do |record|
-    if [record.assignment, record.quiz].all?(&:nil?)
-      record.errors.add :base, "assignment or quiz required"
+    if [record.assignment, record.quiz, record.context_module].all?(&:nil?)
+      record.errors.add :base, "assignment, quiz, or module required"
     end
   end
 
@@ -180,6 +183,10 @@ class AssignmentOverride < ActiveRecord::Base
 
   def quiz?
     !!quiz_id
+  end
+
+  def context_module?
+    !!context_module_id
   end
 
   workflow do
@@ -457,7 +464,7 @@ class AssignmentOverride < ActiveRecord::Base
 
   def root_account_id
     # Use the attribute if available, otherwise fall back to getting it from a parent entity
-    super || assignment&.root_account_id || quiz&.root_account_id || quiz&.assignment&.root_account_id
+    super || assignment&.root_account_id || quiz&.root_account_id || quiz&.assignment&.root_account_id || context_module&.root_account_id
   end
 
   def set_root_account_id

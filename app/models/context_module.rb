@@ -32,6 +32,7 @@ class ContextModule < ActiveRecord::Base
   belongs_to :root_account, class_name: "Account"
   has_many :context_module_progressions, dependent: :destroy
   has_many :content_tags, -> { order("content_tags.position, content_tags.title") }, dependent: :destroy
+  has_many :assignment_overrides, dependent: :destroy, inverse_of: :context_module
   has_one :master_content_tag, class_name: "MasterCourses::MasterContentTag", inverse_of: :context_module
   acts_as_list scope: { context: self, workflow_state: ["active", "unpublished"] }
 
