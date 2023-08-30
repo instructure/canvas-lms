@@ -16268,7 +16268,7 @@ th:
           
           เช่น CSV รูปแบบของ Instructure จะโพสต์ไฟล์ csv พร้อมประเภท mime เป็น ‘text/csv’ ไปยังปลายทางที่ระบุโดยมีคอลัมน์ต่อไปนี้ 
           
-          "publisher_id", "publisher_sis_id", "course_id", "course_sis_id", "section_id", "section_sis_id", "student_id", "student_sis_id", "enrollment_id", "enrollment_status", "คะแนน", "เกรด"
+          "publisher\_id", "publisher\_sis\_id", "course\_id", "course\_sis\_id", "section\_id", "section\_sis\_id", "student\_id", "student\_sis\_id", "enrollment\_id", "enrollment\_status", "คะแนน", "เกรด"
           
           (หมายเหตุ: คอลัมน์ “เกรด” จะมีการตีกลับก็ต่อเมื่อบทเรียนระบุมาตรฐานการให้เกรดไว้)
           
