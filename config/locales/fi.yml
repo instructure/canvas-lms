@@ -18342,7 +18342,7 @@ fi:
           
           Esimerkiksi Instructuren  muotoilema CSV lähettää csv-tiedoston jossa on mime-tyyppi "text/csv" määritettyyn päätepisteeseen, sisältäen seuraavat sarakkeet: 
           
-          "publisher_id", "publisher_sis_id", "course_id", "course_sis_id", "section_id", "section_sis_id", "student_id", "student_sis_id", "enrollment_id", "enrollment_status", "score", "grade"
+          "publisher\_id", "publisher\_sis\_id", "course\_id", "course\_sis\_id", "section\_id", "section\_sis\_id", "student\_id", "student\_sis\_id", "enrollment\_id", "enrollment\_status", "score", "grade"
           
           (Huomautus: "grade"-sarake palautetaan vain, jos kurssille on määritetty arvosanojen antostandardi)
           
