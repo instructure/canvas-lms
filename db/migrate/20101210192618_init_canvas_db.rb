@@ -3371,7 +3371,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :account_users, :roles
     add_foreign_key :account_users, :users
     add_foreign_key :accounts, :accounts, column: :parent_account_id
-    add_foreign_key :accounts, :accounts, column: :root_account_id
+    add_foreign_key :accounts, :accounts, column: :root_account_id, deferrable: true
     add_foreign_key :accounts, :brand_configs, column: "brand_config_md5", primary_key: "md5"
     add_foreign_key :accounts, :sis_batches
     add_foreign_key :alert_criteria, :alerts
