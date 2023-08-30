@@ -18,13 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class CleanUpAssignmentOverrides < ActiveRecord::Migration[5.1]
-  tag :postdeploy
+  tag :predeploy
   disable_ddl_transaction!
 
   def self.up
-    DataFixup::RemoveOrphanedAssignmentOverrideStudents
-      .delay_if_production(priority: Delayed::LOW_PRIORITY, n_strand: "long_datafixups")
-      .run
+    DataFixup::RemoveOrphanedAssignmentOverrideStudents.run
 
     # this fix is fast enough to run synchronously, without requiring a multi-deploy rollout of the check constraint
     DataFixup::RemoveInvalidAssignmentOverrides.run
