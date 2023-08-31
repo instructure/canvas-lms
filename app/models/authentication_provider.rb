@@ -301,6 +301,8 @@ class AuthenticationProvider < ActiveRecord::Base
       when "display_name"
         user.short_name = value
       when "email"
+        next if value.empty?
+
         cc = user.communication_channels.email.by_path(value).first
         cc ||= user.communication_channels.email.new(path: value)
         cc.workflow_state = "active"
