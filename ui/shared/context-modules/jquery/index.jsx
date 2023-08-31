@@ -467,6 +467,7 @@ window.modules = (function () {
       $module.fadeIn('fast', () => {})
       $module.addClass('dont_remove')
       $form.find('.module_name').toggleClass('lonely_entry', isNew)
+      $form.find('.module_name label span').hide() // hide the asterisk in the form label
       const $toFocus = $('.ig-header-admin .al-trigger', $module)
       const fullSizeModal = window.matchMedia('(min-width: 600px)').matches
       const responsiveWidth = fullSizeModal ? 600 : 320
