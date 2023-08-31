@@ -1004,7 +1004,7 @@ class CalendarEventsApiController < ApplicationController
         new_series_head = true
 
         front_half_events = (all_events - events).to_a
-        params_for_update_front_half = ActionController::Parameters.new(rrule: update_rrule_count_or_until(rrule, all_events.length - events.length)).permit(:rrule)
+        params_for_update_front_half = ActionController::Parameters.new(rrule: update_rrule_count_or_until(all_events[0]["rrule"], all_events.length - events.length)).permit(:rrule)
       end
     else
       params_for_update[:series_uuid] = target_event[:series_uuid]
@@ -1090,7 +1090,7 @@ class CalendarEventsApiController < ApplicationController
     end
 
     target_event.context.touch
-    json = events.map do |event|
+    json = (front_half_events + events).map do |event|
       event_json(
         event,
         @current_user,

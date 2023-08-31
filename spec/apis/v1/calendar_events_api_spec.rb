@@ -1918,15 +1918,21 @@ describe CalendarEventsApiController, type: :request do
                           { controller: "calendar_events_api", action: "update", id: target_event_id.to_s, format: "json" },
                           { calendar_event: { start_at: new_start_at, title: new_title }, which: "following" })
           assert_status(200)
-          expect(json.length).to be 2
-          orig_events.shift
+          expect(json.length).to be 3
           json.each_with_index do |event, i|
             expect(event.keys).to match_array expected_series_fields
             expect(event["id"]).to eql orig_events[i]["id"]
-            expect(event["title"]).to eql new_title
-            expect(event["start_at"]).to eql (Time.parse(orig_events[i]["start_at"]) + 15.minutes).iso8601
-            # we changed start_at, so the changed events belong to a new series
-            expect(event["series_uuid"]).not_to eql series_uuid
+            if i == 0
+              expect(event["title"]).to eql orig_events[i]["title"]
+              expect(event["start_at"]).to eql orig_events[i]["start_at"]
+              # we changed start_at, so the changed events belong to a new series
+              expect(event["series_uuid"]).to eql series_uuid
+            else
+              expect(event["title"]).to eql new_title
+              expect(event["start_at"]).to eql (Time.parse(orig_events[i]["start_at"]) + 15.minutes).iso8601
+              # we changed start_at, so the changed events belong to a new series
+              expect(event["series_uuid"]).not_to eql series_uuid
+            end
           end
           orig_series = CalendarEvent.where(series_uuid:)
           expect(orig_series.length).to be 1
@@ -1984,28 +1990,31 @@ describe CalendarEventsApiController, type: :request do
           orig_events += @event_series["duplicates"].pluck("calendar_event")
           target_event = @event_series["duplicates"][0]["calendar_event"]
           target_event_id = target_event["id"]
-          rrule = "FREQ=WEEKLY;INTERVAL=1;COUNT=4"
+          rrule = "FREQ=DAILY;INTERVAL=1;COUNT=4"
           new_title = "a new title"
-          new_start_at = (Time.parse(target_event["start_at"]) + 15.minutes).iso8601
 
           json = api_call(:put,
                           "/api/v1/calendar_events/#{target_event_id}",
                           { controller: "calendar_events_api", action: "update", id: target_event_id.to_s, format: "json" },
-                          { calendar_event: { start_at: new_start_at, title: new_title, rrule: }, which: "following" })
+                          { calendar_event: { title: new_title, rrule: }, which: "following" })
           assert_status(200)
-          expect(json.length).to be 4
-          orig_events.shift # we didn't update the first event in teh series
+          expect(json.length).to be 5
+
+          first_event = json.shift # we didn't update the first event in the series
+          expect(first_event["title"]).to eql "many me"
+          expect(first_event["rrule"]).to eql "FREQ=WEEKLY;INTERVAL=1;COUNT=1"
+
+          orig_events.shift
           orig_events.each_with_index do |event, i|
             expect(json[i].keys).to match_array expected_series_fields
             expect(json[i]["id"]).to eql event["id"]
             expect(json[i]["title"]).to eql new_title
-            expect(json[i]["start_at"]).to eql (Time.parse(event["start_at"]) + 15.minutes).iso8601
+            expect(json[i]["rrule"]).to eql "FREQ=DAILY;INTERVAL=1;COUNT=4"
             # we changed start_at, so the changed events belong to a new series
             expect(json[0]["series_uuid"]).not_to eql event["series_uuid"]
           end
           # the new event
           expect(json[2]["title"]).to eql new_title
-          expect(json[2]["start_at"]).to eql (Time.parse(json[1]["start_at"]) + 1.week).iso8601
           expect(CalendarEvent.where(series_uuid: orig_events[0]["series_uuid"]).length).to be 1
           expect(CalendarEvent.where(series_uuid: json[0]["series_uuid"]).length).to be 4
           expect(CalendarEvent.where(series_head: true, id: json[0]["id"]).length).to be 1
