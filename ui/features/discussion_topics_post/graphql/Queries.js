@@ -220,6 +220,36 @@ export const DISCUSSION_SUBENTRIES_QUERY = gql`
   ${PageInfo.fragment}
 `
 
+export const DISCUSSION_ENTRY_ALL_ROOT_ENTRIES_QUERY = gql`
+  query GetDiscussionEntryAllRootEntriesQuery(
+    $discussionEntryID: ID!
+    $courseID: String
+    $rolePillTypes: [String!] = ["TaEnrollment", "TeacherEnrollment", "DesignerEnrollment"]
+  ) {
+    legacyNode(_id: $discussionEntryID, type: DiscussionEntry) {
+      ... on DiscussionEntry {
+        allRootEntries {
+          ...DiscussionEntry
+          editor(courseId: $courseID, roleTypes: $rolePillTypes) {
+            ...User
+            courseRoles(courseId: $courseID, roleTypes: $rolePillTypes)
+          }
+          author(courseId: $courseID, roleTypes: $rolePillTypes) {
+            ...User
+            courseRoles(courseId: $courseID, roleTypes: $rolePillTypes)
+          }
+          anonymousAuthor {
+            ...AnonymousUser
+          }
+        }
+      }
+    }
+  }
+  ${User.fragment}
+  ${AnonymousUser.fragment}
+  ${DiscussionEntry.fragment}
+`
+
 export const COURSE_USER_QUERY = gql`
   query GetCourseUserQuery($courseId: ID!) {
     legacyNode(_id: $courseId, type: Course) {
