@@ -215,9 +215,7 @@ describe "assignments" do
       end
     end
 
-    it "only allows an assignment editor to edit points and title if assignment if assignment has multiple due dates", priority: "2" do
-      skip "DEMO-25 (8/21/20)"
-
+    it "only allows an assignment editor to edit points and title if assignment has multiple due dates" do
       middle_number = "15"
       expected_date = (Time.now - 1.month).strftime("%b #{middle_number}")
       @assignment = @course.assignments.create!(
@@ -233,7 +231,7 @@ describe "assignments" do
       end
       get "/courses/#{@course.id}/assignments"
       wait_for_ajaximations
-      fj("#assignment_#{@assignment.id} a.al-trigger").click
+      fj("#assign_#{@assignment.id}_manage_link").click
       wait_for_ajaximations
       f("#assignment_#{@assignment.id} .edit_assignment").click
       expect(f("#content")).not_to contain_jqcss(".form-dialog .ui-datepicker-trigger:visible")
