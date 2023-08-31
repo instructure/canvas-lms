@@ -296,6 +296,25 @@ describe('Enhanced Individual Gradebook', () => {
         within(gradingResults).getByText('This grade is currently dropped for this student.')
       ).toBeInTheDocument()
     })
+
+    it('does not render another flash message when switching students after setting default grades for the assignment', async () => {
+      mockUserSettings()
+      const {getByTestId, getByRole} = renderEnhancedIndividualGradebook()
+      await new Promise(resolve => setTimeout(resolve, 0))
+      mockedExecuteApiRequest.mockResolvedValue({
+        data: [],
+        status: 201,
+      })
+      fireEvent.change(getByTestId('content-selection-assignment-select'), {target: {value: '1'}})
+      fireEvent.click(getByTestId('default-grade-button'))
+      fireEvent.change(getByTestId('default-grade-input'), {target: {value: '10'}})
+      fireEvent.click(getByTestId('default-grade-submit-button'))
+      await new Promise(resolve => setTimeout(resolve, 0))
+      fireEvent.change(getByTestId('content-selection-student-select'), {target: {value: '5'}})
+      const parentElement = getByRole('alert')
+      const childElements = parentElement?.children
+      expect(childElements?.length).toBe(1)
+    })
   })
 
   describe('student dropdown handler tests', () => {
