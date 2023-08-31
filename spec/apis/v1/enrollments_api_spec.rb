@@ -1208,6 +1208,18 @@ describe EnrollmentsApiController, type: :request do
       end
     end
 
+    it "supports course SIS IDs with slashes, question marks, and periods" do
+      @course.update! sis_source_id: "some_sis_id/with?slashes.andstuff"
+      @path = "/api/v1/courses/sis_course_id:some_sis_id%2Fwith%3Fslashes.andstuff/enrollments"
+      # Can't use api_call(), as that checks whether the course's (numeric) id matches
+      # up with the param (in this case, "sis_source:with...")
+      headers = { HTTP_AUTHORIZATION: "Bearer #{access_token_for_user(@user)}" }
+      get @path, headers:, params: @params
+      expect(response).to have_http_status(:ok)
+      results = JSON.parse(response.body)
+      expect(results.pluck("course_id").uniq).to eq([@course.id])
+    end
+
     context "filtering by SIS IDs" do
       it "returns an error message with insufficient permissions" do
         @params[:sis_user_id] = "12345"

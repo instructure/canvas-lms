@@ -142,4 +142,19 @@ class ApiRouteSet
       super(method, path, opts)
     end
   end
+
+  # Hack around rails routing deficiency: setting constraints on a path segment
+  # not only affects parsing, but also causes constructing a url to fail if the
+  # segment doesn't match the constraint. (see git blame, INTEROP-6659, and
+  # https://github.com/rails/rails/issues/43466)
+  #
+  # NOTE: using rails helpers with IDs ending in ".json" will result in
+  # incorrect/invalid URLs; a fix would require even more monkey-patching.
+  module ConstraintsBugHackRequirements
+    def requirements
+      @_constraints_bug_hack_requirements ||= super.reject { |_k, v| v.equal? ApiRouteSet::V1::ID_REGEX } # rubocop:disable Naming/MemoizedInstanceVariableName
+    end
+  end
+
+  ActionDispatch::Journey::Path::Pattern.prepend ConstraintsBugHackRequirements
 end
