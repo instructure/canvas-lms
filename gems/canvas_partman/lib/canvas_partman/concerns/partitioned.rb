@@ -129,6 +129,14 @@ module CanvasPartman::Concerns
         prev_table = @arel_table
         prev_builder = @predicate_builder
         @arel_table = arel_table_from_key_values(values)
+        # Try to ensure the partition exists before inserting
+        ::CanvasPartman.request_cache.cache("partition_exists?_#{@arel_table.name}") do
+          unless connection.table_exists?(@arel_table.name)
+            attr = values.detect { |(k, _v)| (k.is_a?(String) ? k : k.name) == partitioning_field }
+            value = attr[1].is_a?(ActiveModel::Attribute) ? attr[1].value : attr[1]
+            ::CanvasPartman.partition_creation_wrapper.call { ::CanvasPartman::PartitionManager.create(self).create_partition(value) }
+          end
+        end
         @predicate_builder = nil
         super
       ensure
