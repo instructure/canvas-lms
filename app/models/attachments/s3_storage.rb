@@ -81,7 +81,7 @@ class Attachments::S3Storage
       "x-amz-algorithm" => "AWS4-HMAC-SHA256",
       "x-amz-date" => datetime,
     }
-    params.merge!("x-amz-security-token" => session_token) if session_token
+    params["x-amz-security-token"] = session_token if session_token
     params
   end
 
