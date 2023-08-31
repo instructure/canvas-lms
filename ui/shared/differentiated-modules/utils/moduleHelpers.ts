@@ -17,6 +17,7 @@
  */
 
 import tz from '@canvas/timezone'
+import type {SettingsPanelState} from '../react/settingsReducer'
 
 export function convertFriendlyDatetimeToUTC(date: string | null | undefined): string | undefined {
   if (date) {
@@ -38,5 +39,14 @@ export function parseModule(element: HTMLElement) {
     unlockAt,
     requireSequentialProgress,
     publishFinalGrade,
+  }
+}
+
+export function convertModuleSettingsForApi(moduleSettings: SettingsPanelState) {
+  return {
+    context_module: {
+      name: moduleSettings.moduleName,
+      unlock_at: moduleSettings.lockUntilChecked ? moduleSettings.unlockAt : null,
+    },
   }
 }

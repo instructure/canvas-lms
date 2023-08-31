@@ -17,11 +17,17 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
-import SettingsPanel, {SettingsPanelProps} from '../SettingsPanel'
+import {render, waitFor} from '@testing-library/react'
+import SettingsPanel, {type SettingsPanelProps} from '../SettingsPanel'
+import doFetchApi from '@canvas/do-fetch-api-effect'
+import * as utils from '../../utils/moduleHelpers'
+import * as alerts from '@canvas/alerts/react/FlashAlert'
+
+jest.mock('@canvas/do-fetch-api-effect')
 
 describe('SettingsPanel', () => {
   const props: SettingsPanelProps = {
+    moduleId: '1',
     moduleName: 'Week 1',
     unlockAt: '',
     height: '500px',
@@ -49,5 +55,71 @@ describe('SettingsPanel', () => {
   it('renders the date time input when unlockAt is set', () => {
     const {getByText} = renderComponent({unlockAt: '2020-01-01T00:00:00Z'})
     expect(getByText('Date')).toBeInTheDocument()
+  })
+
+  describe('on update', () => {
+    beforeAll(() => {
+      window.ENV.COURSE_ID = '1'
+    })
+
+    beforeEach(() => {
+      doFetchApi.mockReset()
+    })
+
+    it('validates the module name', () => {
+      const {getByRole, getByText} = renderComponent({moduleName: ''})
+      const updateButton = getByRole('button', {name: 'Update Module'})
+      updateButton.click()
+      expect(getByText('Module Name is required.')).toBeInTheDocument()
+      expect(updateButton).toBeDisabled()
+    })
+
+    it('makes a request to the modules update endpoint', () => {
+      doFetchApi.mockResolvedValue({response: {ok: true}, json: {}})
+      const {getByRole} = renderComponent()
+      getByRole('button', {name: 'Update Module'}).click()
+      expect(doFetchApi).toHaveBeenCalledWith(
+        expect.objectContaining({
+          path: '/courses/1/modules/1',
+          method: 'PUT',
+          body: expect.anything(),
+        })
+      )
+    })
+
+    it('formats the form state for the request body', () => {
+      jest.spyOn(utils, 'convertModuleSettingsForApi')
+      doFetchApi.mockResolvedValue({response: {ok: true}, json: {}})
+      const {getByRole} = renderComponent()
+      getByRole('button', {name: 'Update Module'}).click()
+      expect(utils.convertModuleSettingsForApi).toHaveBeenCalled()
+    })
+
+    it('shows a flash alert on success', async () => {
+      jest.spyOn(alerts, 'showFlashAlert')
+      doFetchApi.mockResolvedValue({response: {ok: true}, json: {}})
+      const {getByRole} = renderComponent()
+      getByRole('button', {name: 'Update Module'}).click()
+      await waitFor(() => {
+        expect(alerts.showFlashAlert).toHaveBeenCalledWith({
+          type: 'success',
+          message: 'Week 1 settings updated successfully.',
+        })
+      })
+    })
+
+    it('shows a flash alert on failure', async () => {
+      jest.spyOn(alerts, 'showFlashAlert')
+      const e = new Error('error')
+      doFetchApi.mockRejectedValue(e)
+      const {getByRole} = renderComponent()
+      getByRole('button', {name: 'Update Module'}).click()
+      await waitFor(() => {
+        expect(alerts.showFlashAlert).toHaveBeenCalledWith({
+          err: e,
+          message: 'Error updating Week 1 settings.',
+        })
+      })
+    })
   })
 })

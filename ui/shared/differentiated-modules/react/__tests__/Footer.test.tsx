@@ -44,10 +44,14 @@ describe('Footer', () => {
     expect(props.onDismiss).toHaveBeenCalled()
   })
 
-  it('calls onUpdate and onDismiss when update button is clicked', () => {
+  it('calls onUpdate when update button is clicked', () => {
     const {getByRole} = renderComponent()
     getByRole('button', {name: /update module/i}).click()
     expect(props.onUpdate).toHaveBeenCalled()
-    expect(props.onDismiss).toHaveBeenCalled()
+  })
+
+  it('disables the update button when disableUpdate is true', () => {
+    const {getByRole} = renderComponent({disableUpdate: true})
+    expect(getByRole('button', {name: /update module/i})).toBeDisabled()
   })
 })
