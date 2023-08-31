@@ -62,7 +62,6 @@ export default class TotalGradeOverrideCellPropFactory {
       finalGradeOverrideTrayProps: {
         ...finalGradeOverrideTrayProps,
         gradeEntry,
-        gradeInfo,
         isFirstStudent,
         isLastStudent,
         studentInfo,

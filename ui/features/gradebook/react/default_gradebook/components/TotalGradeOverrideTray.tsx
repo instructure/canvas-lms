@@ -60,7 +60,7 @@ export function TotalGradeOverrideTrayProvider(props: TotalGradeOverrideTrayProp
 }
 
 export function TotalGradeOverrideTray({
-  customGradeStatuses,
+  customGradeStatuses = [],
   selectedGradingPeriodId,
   handleDismiss,
   handleOnGradeChange,
@@ -83,7 +83,7 @@ export function TotalGradeOverrideTray({
     return null
   }
 
-  const {isOpen, isFirstStudent, isLastStudent, studentInfo, gradeEntry, gradeInfo} =
+  const {isOpen, isFirstStudent, isLastStudent, studentInfo, gradeEntry} =
     finalGradeOverrideTrayProps
 
   if (!studentInfo) {
@@ -132,12 +132,13 @@ export function TotalGradeOverrideTray({
     })
   }
 
-  const gradeInfoInput =
-    gradeEntry && gradeInfo ? gradeEntry.formatGradeInfoForInput(gradeInfo) : ''
-
-  const radioInputDisabled = gradeInfoInput === '' || saveCallStatus === ApiCallStatus.PENDING
-
   const studentFinalGradeOverrides = finalGradeOverrides[studentId]
+  const gradingPeriodId = getNullableSelectedGradingPeriodId()
+  const percentage = gradingPeriodId
+    ? studentFinalGradeOverrides?.gradingPeriodGrades?.[gradingPeriodId]?.percentage
+    : studentFinalGradeOverrides?.courseGrade?.percentage
+
+  const radioInputDisabled = percentage == null || saveCallStatus === ApiCallStatus.PENDING
 
   return (
     <Tray
@@ -193,23 +194,27 @@ export function TotalGradeOverrideTray({
               }}
               pointsBasedGradingSchemesFeatureEnabled={pointsBasedGradingSchemesFeatureEnabled}
               finalGradeOverride={studentFinalGradeOverrides}
-              gradingPeriodId={getNullableSelectedGradingPeriodId()}
+              gradingPeriodId={gradingPeriodId}
               gradingScheme={gradeEntry?.gradingScheme}
               showPercentageLabel={false}
               width="4rem"
             />
           </View>
 
-          <View as="div" margin="small 0" className="hr" />
+          {customGradeStatuses.length > 0 && (
+            <>
+              <View as="div" margin="small 0" className="hr" />
 
-          <View as="div" margin="medium 0">
-            <GradeOverrideTrayRadioInputGroup
-              disabled={radioInputDisabled}
-              handleRadioInputChanged={handleRadioInputChanged}
-              customGradeStatuses={customGradeStatuses}
-              selectedCustomStatusId={selectedCustomStatusId}
-            />
-          </View>
+              <View as="div" margin="medium 0">
+                <GradeOverrideTrayRadioInputGroup
+                  disabled={radioInputDisabled}
+                  handleRadioInputChanged={handleRadioInputChanged}
+                  customGradeStatuses={customGradeStatuses}
+                  selectedCustomStatusId={selectedCustomStatusId}
+                />
+              </View>
+            </>
+          )}
         </View>
       </View>
     </Tray>

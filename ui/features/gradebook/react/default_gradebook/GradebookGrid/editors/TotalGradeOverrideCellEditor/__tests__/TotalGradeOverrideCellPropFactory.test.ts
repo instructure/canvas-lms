@@ -39,7 +39,6 @@ const mockTotalGradeOverrideStore = () => {
           gradesUrl: 'https://canvas.instructure.com/courses/1/grades#tab-assignments',
           enrollmentId: '222',
         },
-        gradeInfo: new GradeOverrideInfo({}),
         isOpen: false,
       },
     }
@@ -218,7 +217,7 @@ describe('GradebookGrid TotalGradeOverrideCellPropFactory', () => {
     describe('finalGradeOverrideTrayProps state', () => {
       it('correctly sets finalGradeOverrideTrayProps state', () => {
         const mockSetState = mockTotalGradeOverrideStore()
-        const {gradeEntry, gradeInfo} = getProps()
+        const {gradeEntry} = getProps()
         expect(mockSetState).toHaveBeenLastCalledWith({
           finalGradeOverrideTrayProps: {
             isFirstStudent: false,
@@ -232,7 +231,6 @@ describe('GradebookGrid TotalGradeOverrideCellPropFactory', () => {
             },
             isOpen: false,
             gradeEntry,
-            gradeInfo,
           },
         })
       })

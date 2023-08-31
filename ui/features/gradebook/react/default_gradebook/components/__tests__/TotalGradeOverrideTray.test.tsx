@@ -54,12 +54,10 @@ describe('TotalGradeOverrideTray Tests', () => {
       gradingScheme: null,
       pointsBasedGradingSchemesFeatureEnabled: true,
     })
-    const gradeInfo = gradeEntry.gradeInfoFromGrade({percentage: 88}, false)
 
     useStore.setState({
       finalGradeOverrideTrayProps: {
         gradeEntry,
-        gradeInfo,
         isFirstStudent: false,
         isLastStudent: false,
         isOpen: true,
@@ -166,6 +164,19 @@ describe('TotalGradeOverrideTray Tests', () => {
       expect(radio3).not.toBeDisabled()
     })
 
+    it('does not render radio inputs when there are no custom statuses', () => {
+      const {queryByLabelText} = getComponent({customGradeStatuses: []})
+      const noneRadio = queryByLabelText('None')
+      const radio1 = queryByLabelText('Custom Status 1')
+      const radio2 = queryByLabelText('Custom Status 2')
+      const radio3 = queryByLabelText('Custom Status 3')
+
+      expect(noneRadio).toBeNull()
+      expect(radio1).toBeNull()
+      expect(radio2).toBeNull()
+      expect(radio3).toBeNull()
+    })
+
     it('renders the correct radio input as checked', () => {
       const {getByLabelText} = getComponent()
       const radio1 = getByLabelText('Custom Status 1')
@@ -187,13 +198,9 @@ describe('TotalGradeOverrideTray Tests', () => {
       expect(radio).toBeChecked()
     })
 
-    it('renders radio inputs disabled when gradeInfo & gradeEntry are not set', () => {
+    it('renders radio inputs disabled when student does not have final grade override', () => {
       useStore.setState({
-        finalGradeOverrideTrayProps: {
-          ...useStore.getState().finalGradeOverrideTrayProps,
-          gradeInfo: undefined,
-          gradeEntry: undefined,
-        },
+        finalGradeOverrides: {},
       })
       const {getByLabelText} = getComponent()
       const noneRadio = getByLabelText('None')
