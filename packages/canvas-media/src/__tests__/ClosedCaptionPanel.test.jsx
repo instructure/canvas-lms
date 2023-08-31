@@ -126,6 +126,27 @@ describe('ClosedCaptionCreator', () => {
     expect(getByPlaceholderText('select language')).toBe(container.ownerDocument.activeElement)
   })
 
+  it('includes inherited caption languages in the list to upload captions', () => {
+    const {getByText, getByRole, getByPlaceholderText} = render(
+      <ClosedCaptionPanel
+        {...makeProps({
+          subtitles: [
+            {locale: 'en', inherited: true, file: {name: 'en.srt'}},
+            {locale: 'es', file: {name: 'es.srt'}},
+            {locale: 'fr', file: {name: 'fr.srt'}},
+          ],
+        })}
+      />
+    )
+
+    const plusBtn = getByText('add new caption')
+    fireEvent.click(plusBtn)
+
+    const selectLang = getByPlaceholderText('select language')
+    fireEvent.click(selectLang)
+    expect(getByRole('option', {name: 'English'})).toBeInTheDocument()
+  })
+
   it('deletes a row when trashcan is clicked', () => {
     const {container, getByText, getByPlaceholderText, getAllByTestId} = render(
       <ClosedCaptionPanel {...makeProps()} />

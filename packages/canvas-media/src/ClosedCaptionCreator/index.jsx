@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, {Component, useEffect, useState} from 'react'
-import {arrayOf, func, objectOf, shape, string, element, oneOfType} from 'prop-types'
+import {arrayOf, bool, func, objectOf, shape, string, element, oneOfType} from 'prop-types'
 import formatMessage from 'format-message'
 
 import {Alert} from '@instructure/ui-alerts'
@@ -60,6 +60,7 @@ export class ClosedCaptionPanel extends Component {
     subtitles: arrayOf(
       shape({
         locale: string.isRequired,
+        inherited: bool,
         file: shape({name: string.isRequired}).isRequired,
       })
     ),
@@ -235,7 +236,9 @@ export class ClosedCaptionPanel extends Component {
               onFileSelected={this.onFileSelected}
               languages={this.closedCaptionLanguages.filter(candidate_lang => {
                 // remove already selected languages form the list
-                return !this.state.subtitles.find(st => st.locale === candidate_lang.id)
+                return !this.state.subtitles.find(
+                  st => !st.inherited && st.locale === candidate_lang.id
+                )
               })}
               selectedLanguage={this.state.newSelectedLanguage}
               selectedFile={this.state.newSelectedFile}
