@@ -24,7 +24,7 @@ import {
   isTopicAuthor,
   getDisplayName,
   getOptimisticResponse,
-  buildQuotedReply,
+  buildQuotedReply, addReplyToAllRootEntries, addSubentriesCountToParentEntry,
 } from '../../utils'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {
@@ -35,7 +35,7 @@ import {
 } from '../../../graphql/Mutations'
 import DateHelper from '@canvas/datetime/dateHelper'
 import {Discussion} from '../../../graphql/Discussion'
-import {DISCUSSION_SUBENTRIES_QUERY} from '../../../graphql/Queries'
+import {DISCUSSION_ENTRY_ALL_ROOT_ENTRIES_QUERY} from '../../../graphql/Queries'
 import {DiscussionEdit} from '../../components/DiscussionEdit/DiscussionEdit'
 import {Flex} from '@instructure/ui-flex'
 import {Highlight} from '../../components/Highlight/Highlight'
@@ -61,6 +61,7 @@ import {View} from '@instructure/ui-view'
 import {ReportReply} from '../../components/ReportReply/ReportReply'
 import {Text} from '@instructure/ui-text'
 import useCreateDiscussionEntry from '../../hooks/useCreateDiscussionEntry'
+import {DiscussionEntry} from '../../../graphql/DiscussionEntry'
 
 const I18n = useI18nScope('discussion_topics_post')
 
@@ -104,6 +105,8 @@ export const DiscussionThreadContainer = props => {
     if (props.removeDraftFromDiscussionCache) props.removeDraftFromDiscussionCache(cache, result)
     const foundParentEntryQuery = addReplyToDiscussionEntry(cache, variables, newDiscussionEntry)
     if (props.refetchDiscussionEntries && !foundParentEntryQuery) props.refetchDiscussionEntries()
+    addReplyToAllRootEntries(cache, newDiscussionEntry)
+    addSubentriesCountToParentEntry(cache, newDiscussionEntry)
     props.setHighlightEntryId(newDiscussionEntry._id)
   }
 
@@ -516,8 +519,8 @@ export const DiscussionThreadContainer = props => {
                                 discussionEntryId: props.discussionEntry.rootEntryId
                                   ? props.discussionEntry.rootEntryId
                                   : props.discussionEntry.id,
-                                read: readState
-                              }
+                                read: readState,
+                              },
                             })
                           }
                         />
@@ -630,6 +633,7 @@ export const DiscussionThreadContainer = props => {
                 parentRefCurrent={threadRefCurrent}
                 highlightEntryId={props.highlightEntryId}
                 setHighlightEntryId={props.setHighlightEntryId}
+                allRootEntries={props.allRootEntries}
               />
             )}
         </>
@@ -652,6 +656,7 @@ DiscussionThreadContainer.propTypes = {
   updateDraftCache: PropTypes.func,
   setHighlightEntryId: PropTypes.func,
   userSplitScreenPreference: PropTypes.bool,
+  allRootEntries: PropTypes.array,
 }
 
 DiscussionThreadContainer.defaultProps = {
@@ -664,20 +669,19 @@ const DiscussionSubentries = props => {
   const {setOnFailure} = useContext(AlertManagerContext)
   const variables = {
     discussionEntryID: props.discussionEntryId,
-    first: ENV.per_page,
-    sort: 'asc',
     courseID: window.ENV?.course_id,
   }
-  const subentries = useQuery(DISCUSSION_SUBENTRIES_QUERY, {
+  const query = useQuery(DISCUSSION_ENTRY_ALL_ROOT_ENTRIES_QUERY, {
     variables,
+    skip: props.allRootEntries && Array.isArray(props.allRootEntries),
   })
 
-  if (subentries.error) {
+  if (query.error) {
     setOnFailure(I18n.t('There was an unexpected error loading the replies.'))
     return null
   }
 
-  if (subentries.loading) {
+  if (query.loading) {
     return (
       <Flex justifyItems="start" margin="0 large" padding="0 x-large">
         <Flex.Item>
@@ -690,7 +694,10 @@ const DiscussionSubentries = props => {
     )
   }
 
-  return subentries.data.legacyNode.discussionSubentriesConnection?.nodes.map(entry => (
+  const allRootEntries = props.allRootEntries || query?.data?.legacyNode?.allRootEntries || []
+  const subentries = allRootEntries.filter(entry => entry.parentId === props.discussionEntryId)
+
+  return subentries.map(entry => (
     <DiscussionThreadContainer
       key={`discussion-thread-${entry.id}`}
       depth={props.depth}
@@ -703,6 +710,7 @@ const DiscussionSubentries = props => {
       updateDraftCache={props.updateDraftCache}
       highlightEntryId={props.highlightEntryId}
       setHighlightEntryId={props.setHighlightEntryId}
+      allRootEntries={allRootEntries}
     />
   ))
 }
@@ -717,4 +725,5 @@ DiscussionSubentries.propTypes = {
   updateDraftCache: PropTypes.func,
   highlightEntryId: PropTypes.string,
   setHighlightEntryId: PropTypes.func,
+  allRootEntries: PropTypes.array,
 }

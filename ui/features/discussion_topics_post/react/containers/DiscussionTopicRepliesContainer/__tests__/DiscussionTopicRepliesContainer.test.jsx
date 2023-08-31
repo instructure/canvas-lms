@@ -21,7 +21,10 @@ import {Discussion} from '../../../../graphql/Discussion'
 import {DiscussionEntry} from '../../../../graphql/DiscussionEntry'
 import {DiscussionTopicRepliesContainer} from '../DiscussionTopicRepliesContainer'
 import {fireEvent, render} from '@testing-library/react'
-import {getDiscussionSubentriesQueryMock} from '../../../../graphql/Mocks'
+import {
+  getDiscussionEntryAllRootEntriesQueryMock,
+  getDiscussionSubentriesQueryMock,
+} from '../../../../graphql/Mocks'
 import {MockedProvider} from '@apollo/react-testing'
 import {PageInfo} from '../../../../graphql/PageInfo'
 import React from 'react'
@@ -97,7 +100,7 @@ describe('DiscussionTopicRepliesContainer', () => {
   it('renders discussion entries', async () => {
     const {queryByText, getByTestId, findByText} = setup(
       defaultProps(),
-      getDiscussionSubentriesQueryMock({first: 20})
+      getDiscussionEntryAllRootEntriesQueryMock()
     )
     expect(await findByText('This is the parent reply')).toBeInTheDocument()
     expect(queryByText('This is the child reply asc')).toBe(null)
