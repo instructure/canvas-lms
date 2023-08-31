@@ -21,7 +21,6 @@ import {getFinalGradeOverrides} from '@canvas/grading/FinalGradeOverrideApi'
 import type {GradebookStore} from './index'
 import type {FinalGradeOverrideMap} from '@canvas/grading/grading.d'
 import type GradeOverrideEntry from '@canvas/grading/GradeEntry/GradeOverrideEntry'
-import type GradeOverrideInfo from '@canvas/grading/GradeEntry/GradeOverrideInfo'
 
 type StudentInfo = {
   id: string
@@ -36,7 +35,6 @@ export type FinalGradeOverrideState = {
   finalGradeOverrides: FinalGradeOverrideMap
   finalGradeOverrideTrayProps: {
     gradeEntry?: GradeOverrideEntry
-    gradeInfo?: GradeOverrideInfo
     isOpen: boolean
     isFirstStudent: boolean
     isLastStudent: boolean

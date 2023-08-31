@@ -91,7 +91,7 @@ export function FinalGradeOverrideTextBox({
       ? finalGradeOverride?.gradingPeriodGrades?.[gradingPeriodId]?.percentage
       : finalGradeOverride?.courseGrade?.percentage
     const gradeOverrideEntry = new GradeOverrideEntry(options)
-    const oldGrade = gradeOverrideEntry.parseValue(percentage != null ? percentage : {})
+    const oldGrade = gradeOverrideEntry.parseValue(percentage)
     const newGrade = gradeOverrideEntry.parseValue(inputValue)
 
     const gradeHasChanged = gradeOverrideEntry.hasGradeChanged(oldGrade, newGrade)
