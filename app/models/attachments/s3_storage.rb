@@ -72,14 +72,17 @@ class Attachments::S3Storage
 
   def cred_params(datetime)
     access_key = bucket.client.config.credentials.credentials.access_key_id
+    session_token = bucket.client.config.credentials.credentials.session_token
     day_string = datetime[0, 8]
     region = bucket.client.config.region
     credential = "#{access_key}/#{day_string}/#{region}/s3/aws4_request"
-    {
+    params = {
       "x-amz-credential" => credential,
       "x-amz-algorithm" => "AWS4-HMAC-SHA256",
-      "x-amz-date" => datetime
+      "x-amz-date" => datetime,
     }
+    params.merge!("x-amz-security-token" => session_token) if session_token
+    params
   end
 
   def shared_secret(datetime)
