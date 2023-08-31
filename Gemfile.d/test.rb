@@ -34,7 +34,7 @@ group :test do
 
   gem "once-ler", "2.0.1"
 
-  gem "selenium-webdriver", "~> 4.11.0", require: false
+  gem "selenium-webdriver", "~> 4.12", require: false
   gem "testrailtagging", "0.3.8.7", require: false
 
   gem "webmock", "~> 3.18", require: false
