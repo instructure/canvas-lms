@@ -127,10 +127,6 @@ gem "twilio-ruby", "~> 6.4", require: false
 gem "vault", "~> 0.17", require: false
 gem "vericite_api", "1.5.3"
 gem "wcag_color_contrast", "0.1.0"
-gem "week_of_month",
-    "1.2.5",
-    github: "instructure/week-of-month",
-    ref: "b3013639e9474f302b5a6f27e4e45313e8d24902"
 
 gem "faraday", "~> 2.7"
 
