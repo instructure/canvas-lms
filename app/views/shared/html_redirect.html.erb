@@ -17,5 +17,13 @@
 %>
 <!DOCTYPE html>
 <html>
-<head><meta http-equiv="refresh" content="0; url='<%= url %>'"></head>
+<head>
+<meta http-equiv="refresh" content="0; url='<%= url %>'">
+<!-- Insurance, in case the above doesn't fire -->
+<script type="text/javascript">
+setTimeout(function(){
+  window.location.href = "<%= url %>";
+});
+</script>
+</head>
 </html>
