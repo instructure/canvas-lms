@@ -37,9 +37,9 @@ const {Item: FlexItem} = Flex as any
 export interface DifferentiatedModulesTrayProps {
   open: boolean
   onDismiss: () => void
+  moduleId?: string
   initialTab?: 'settings' | 'assign-to'
   assignOnly?: boolean
-  moduleId?: string
   moduleName?: string
   unlockAt?: string
 }
@@ -50,9 +50,9 @@ const AssignToPanel = React.lazy(() => import('./AssignToPanel'))
 export default function DifferentiatedModulesTray({
   open,
   onDismiss,
+  moduleId = '',
   initialTab = 'assign-to',
   assignOnly = true,
-  moduleId,
   ...settingsProps
 }: DifferentiatedModulesTrayProps) {
   const [selectedTab, setSelectedTab] = useState(initialTab)

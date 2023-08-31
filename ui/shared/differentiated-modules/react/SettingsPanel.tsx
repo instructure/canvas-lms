@@ -25,7 +25,10 @@ import {Checkbox} from '@instructure/ui-checkbox'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import Footer from './Footer'
 import DateTimeInput from '@canvas/datetime/react/components/DateTimeInput'
-import {actions, reducer} from './settingsReducer'
+import {defaultState, actions, reducer} from './settingsReducer'
+import doFetchApi from '@canvas/do-fetch-api-effect'
+import {convertModuleSettingsForApi} from '../utils/moduleHelpers'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('differentiated_modules')
@@ -36,7 +39,7 @@ const {Item: FlexItem} = Flex as any
 export interface SettingsPanelProps {
   height: string
   onDismiss: () => void
-  moduleId?: string
+  moduleId: string
   moduleName?: string
   unlockAt?: string
 }
@@ -44,14 +47,47 @@ export interface SettingsPanelProps {
 export default function SettingsPanel({
   height,
   onDismiss,
+  moduleId,
   moduleName,
   unlockAt,
 }: SettingsPanelProps) {
   const [state, dispatch] = useReducer(reducer, {
+    ...defaultState,
     moduleName: moduleName ?? '',
     unlockAt: unlockAt ?? new Date().toISOString(),
     lockUntilChecked: !!unlockAt,
   })
+
+  function handleUpdate() {
+    if (state.moduleName.length === 0) {
+      dispatch({
+        type: actions.SET_NAME_INPUT_MESSAGES,
+        payload: [{type: 'error', text: I18n.t('Module Name is required.')}],
+      })
+      return
+    }
+
+    doFetchApi({
+      path: `/courses/${ENV.COURSE_ID}/modules/${moduleId}`,
+      method: 'PUT',
+      body: convertModuleSettingsForApi(state),
+    })
+      .then(() => {
+        onDismiss()
+        showFlashAlert({
+          type: 'success',
+          message: I18n.t('%{moduleName} settings updated successfully.', {
+            moduleName: state.moduleName,
+          }),
+        })
+      })
+      .catch((e: Error) =>
+        showFlashAlert({
+          err: e,
+          message: I18n.t('Error updating %{moduleName} settings.', {moduleName: state.moduleName}),
+        })
+      )
+  }
 
   return (
     <Flex direction="column" justifyItems="space-between" height={height}>
@@ -60,9 +96,14 @@ export default function SettingsPanel({
           <TextInput
             renderLabel={I18n.t('Module Name')}
             value={state.moduleName}
-            onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-              dispatch({type: actions.SET_MODULE_NAME, payload: e.target.value})
-            }
+            messages={state.nameInputMessages}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+              const newValue = e.target.value.trim()
+              dispatch({type: actions.SET_MODULE_NAME, payload: newValue})
+              if (newValue.length > 0) {
+                dispatch({type: actions.SET_NAME_INPUT_MESSAGES, payload: []})
+              }
+            }}
           />
         </View>
         <View as="div" padding="x-small small">
@@ -94,7 +135,11 @@ export default function SettingsPanel({
         <hr />
       </FlexItem>
       <FlexItem>
-        <Footer onDismiss={onDismiss} onUpdate={() => {}} />
+        <Footer
+          onDismiss={onDismiss}
+          onUpdate={handleUpdate}
+          disableUpdate={state.nameInputMessages.length > 0}
+        />
       </FlexItem>
     </Flex>
   )

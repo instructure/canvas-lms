@@ -16,7 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {convertFriendlyDatetimeToUTC, parseModule} from '../moduleHelpers'
+import {
+  convertFriendlyDatetimeToUTC,
+  parseModule,
+  convertModuleSettingsForApi,
+} from '../moduleHelpers'
+import {defaultState} from '../../react/settingsReducer'
 import moment from 'moment'
 import {getFixture} from './fixtures'
 
@@ -82,5 +87,31 @@ describe('parseModule', () => {
       requireSequentialProgress: false,
       publishFinalGrade: true,
     })
+  })
+})
+
+describe('convertModuleSettingsForApi', () => {
+  const moduleSettings = {
+    ...defaultState,
+    moduleName: 'Module 1',
+    lockUntilChecked: true,
+    unlockAt: '2023-08-02T06:00:00.000Z',
+  }
+
+  it('converts the module settings to the format expected by the API', () => {
+    expect(convertModuleSettingsForApi(moduleSettings)).toEqual({
+      context_module: {
+        name: 'Module 1',
+        unlock_at: '2023-08-02T06:00:00.000Z',
+      },
+    })
+  })
+
+  it('excludes unlockAt if lockUntilChecked is false', () => {
+    const formattedSettings = convertModuleSettingsForApi({
+      ...moduleSettings,
+      lockUntilChecked: false,
+    })
+    expect(formattedSettings.context_module.unlock_at).toBe(null)
   })
 })

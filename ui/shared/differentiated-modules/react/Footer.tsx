@@ -30,9 +30,10 @@ const {Item: FlexItem} = Flex as any
 export interface FooterProps {
   onDismiss: () => void
   onUpdate: () => void
+  disableUpdate?: boolean
 }
 
-export default function Footer({onDismiss, onUpdate}: FooterProps) {
+export default function Footer({onDismiss, onUpdate, disableUpdate = false}: FooterProps) {
   return (
     <View as="div" padding="small" background="secondary" borderWidth="small none none none">
       <Flex as="div" justifyItems="end">
@@ -40,13 +41,7 @@ export default function Footer({onDismiss, onUpdate}: FooterProps) {
           <Button onClick={onDismiss}>{I18n.t('Cancel')}</Button>
         </FlexItem>
         <FlexItem margin="0 0 0 small">
-          <Button
-            color="primary"
-            onClick={() => {
-              onUpdate()
-              onDismiss()
-            }}
-          >
+          <Button color="primary" disabled={disableUpdate} onClick={onUpdate}>
             {I18n.t('Update Module')}
           </Button>
         </FlexItem>

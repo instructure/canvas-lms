@@ -16,22 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-type SettingsPanelState = {
+export type SettingsPanelState = {
   moduleName: string
   unlockAt: string
   lockUntilChecked: boolean
+  nameInputMessages: Array<{type: string; text: string}>
 }
 
 export const defaultState: SettingsPanelState = {
   moduleName: '',
   unlockAt: '',
   lockUntilChecked: false,
+  nameInputMessages: [],
 }
 
 export const enum actions {
   SET_MODULE_NAME = 'SET_MODULE_NAME',
   SET_UNLOCK_AT = 'SET_UNLOCK_AT',
   SET_LOCK_UNTIL_CHECKED = 'SET_LOCK_UNTIL_CHECKED',
+  SET_NAME_INPUT_MESSAGES = 'SET_NAME_INPUT_MESSAGES',
 }
 
 export function reducer(
@@ -45,6 +48,8 @@ export function reducer(
       return {...state, unlockAt: action.payload}
     case actions.SET_LOCK_UNTIL_CHECKED:
       return {...state, lockUntilChecked: action.payload}
+    case actions.SET_NAME_INPUT_MESSAGES:
+      return {...state, nameInputMessages: action.payload}
     default:
       return state
   }
