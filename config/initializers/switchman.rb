@@ -159,21 +159,43 @@ Rails.application.config.after_initialize do
     def next_maintenance_window
       return nil unless maintenance_window_start_hour
 
-      start_day = DateTime.now
-      # This array is effectively 1 indexed
-      relevant_weeks = maintenance_window_weeks_of_month.map { |i| WeekOfMonth::Constant::WEEKS_IN_SEQUENCE[i] }
-      maintenance_days = relevant_weeks.map do |ordinal|
-        start_day.send("#{ordinal}_#{maintenance_window_weekday}_in_month".downcase)
-      end + relevant_weeks.map do |ordinal|
-        (start_day + 1.month).send("#{ordinal}_#{maintenance_window_weekday}_in_month".downcase)
+      now = Time.now.utc
+      date = nil
+      weekday = maintenance_window_weekday
+      weeks = maintenance_window_weeks_of_month
+      loop do
+        first_date = first_given_weekday_of_month(weekday, now)
+        # look at the 1st, 3rd, etc. weekday of this month, and see if it's in the future
+        weeks.each do |i|
+          new_date = first_date.advance(weeks: i - 1)
+          # make sure we didn't overrun the current month, like if there's not a 5th thursday this month
+          if new_date.future? && new_date.month == now.month
+            date = new_date
+            break
+          end
+        end
+
+        break if date
+
+        # search the next month
+        now = now.next_month
       end
 
-      next_day = maintenance_days.find(&:future?)
       # Time offsets are strange
-      start_at = next_day.utc.beginning_of_day - maintenance_window_start_hour.hours + maintenance_window_offset.minutes
+      start_at = date.beginning_of_day - maintenance_window_start_hour.hours + maintenance_window_offset.minutes
       end_at = start_at + maintenance_window_duration
 
       [start_at, end_at]
+    end
+
+    # Finds the first day of the month that is a given weekday
+    #
+    # @param [Integer] which weekday we're looking for
+    # @param [Time] start_ref the month to look in
+    def first_given_weekday_of_month(weekday, start_ref)
+      date = start_ref.beginning_of_month
+      date = date.next_day until date.wday == weekday
+      date
     end
 
     def maintenance_window_start_hour
@@ -189,12 +211,15 @@ Rails.application.config.after_initialize do
       ActiveSupport::Duration.parse(Setting.get("maintenance_window_duration", "PT2H"))
     end
 
+    # @return [Integer] the weekday of the maintenance window
     def maintenance_window_weekday
-      Setting.get("maintenance_window_weekday", "thursday").downcase
+      Date::DAYNAMES.index(Setting.get("maintenance_window_weekday", "thursday").capitalize)
     end
 
+    # @return [Array<Integer>]
+    #   the weeks of the month that the maintenance window occurs on, sorted and 1-indexed
     def maintenance_window_weeks_of_month
-      Setting.get("maintenance_window_weeks_of_month", "1,3").split(",").map(&:to_i)
+      Setting.get("maintenance_window_weeks_of_month", "1,3").split(",").map(&:to_i).sort
     end
 
     def self.send_in_each_region(klass, method, enqueue_args, *args, **kwargs)

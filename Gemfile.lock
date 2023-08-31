@@ -7,13 +7,6 @@ GIT
       ffi (~> 1.0, >= 1.0.9)
 
 GIT
-  remote: https://github.com/instructure/week-of-month.git
-  revision: b3013639e9474f302b5a6f27e4e45313e8d24902
-  ref: b3013639e9474f302b5a6f27e4e45313e8d24902
-  specs:
-    week_of_month (1.2.5)
-
-GIT
   remote: https://github.com/kreynolds/cassandra-cql.git
   revision: 02b5abbe441a345c051a180327932566fd66bb36
   ref: 02b5abbe441a345c051a180327932566fd66bb36
@@ -1368,7 +1361,6 @@ DEPENDENCIES
   vericite_api (= 1.5.3)
   wcag_color_contrast (= 0.1.0)
   webmock (~> 3.18)
-  week_of_month (= 1.2.5)!
   workflow!
   yard (~> 0.9)
   yard-appendix (= 0.1.8)
