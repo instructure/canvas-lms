@@ -61,7 +61,8 @@ export default function DefaultGradeModal({
 
   const [gradeInput, setGradeInput] = useState<string>('')
   const [gradeOverwrite, setGradeOverwrite] = useState<boolean>(false)
-  const {defaultGradeStatus, savedGrade, setGrades, updatedSubmissions} = useDefaultGrade()
+  const {defaultGradeStatus, savedGrade, setGrades, updatedSubmissions, resetDefaultGradeStatus} =
+    useDefaultGrade()
 
   const gradeIsMissing = (grade: string) => {
     return grade !== null && grade.toUpperCase() === 'MI'
@@ -96,13 +97,21 @@ export default function DefaultGradeModal({
     switch (defaultGradeStatus) {
       case ApiCallStatus.FAILED:
         showFlashError(I18n.t('Failed to set default grade'))(new Error())
+        resetDefaultGradeStatus()
         break
       case ApiCallStatus.COMPLETED:
         showFlashSuccess(setGradeSuccessText(updatedSubmissions.length))()
         handleSetGrades(updatedSubmissions)
+        resetDefaultGradeStatus()
         break
     }
-  }, [defaultGradeStatus, handleSetGrades, setGradeSuccessText, updatedSubmissions])
+  }, [
+    defaultGradeStatus,
+    handleSetGrades,
+    resetDefaultGradeStatus,
+    setGradeSuccessText,
+    updatedSubmissions,
+  ])
 
   const setDefaultGrade = async () => {
     if (!contextUrl) {

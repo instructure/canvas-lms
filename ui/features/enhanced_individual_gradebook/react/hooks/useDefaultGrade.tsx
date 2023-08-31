@@ -47,6 +47,10 @@ export const useDefaultGrade = () => {
   const [savedGrade, setSavedGrade] = useState<string>('')
   const [updatedSubmissions, setUpdatedSubmissions] = useState<SubmissionGradeChange[]>([])
 
+  const resetDefaultGradeStatus = () => {
+    setDefaultGradeStatus(ApiCallStatus.NOT_STARTED)
+  }
+
   const setGrades = useCallback(
     async (
       contextUrl: string,
@@ -82,6 +86,7 @@ export const useDefaultGrade = () => {
     defaultGradeStatus,
     savedGrade,
     setGrades,
+    resetDefaultGradeStatus,
     updatedSubmissions,
   }
 }
