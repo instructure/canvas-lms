@@ -230,7 +230,7 @@ module CC
         end
         @rewriter.set_handler("courses") do |match|
           if match.obj_id == @course.id
-            "#{COURSE_TOKEN}/"
+            "#{COURSE_TOKEN}/#{match.rest}"
           end
         end
         @rewriter.set_handler("files") do |match|

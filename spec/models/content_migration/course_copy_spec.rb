@@ -68,6 +68,18 @@ describe ContentMigration do
       expect(@cm.reload.migration_settings[:job_ids]).to eq([123])
     end
 
+    it "migrates course home links in rich content on copy" do
+      course_model
+
+      page = @copy_from.wiki_pages.create!(title: "page 1", body: %(<p><a title="Home" href="/courses/#{@copy_from.id}?wrap=1">Home</a></p><p><a title="Home" href="/courses/#{@copy_from.id}">Home 2</a></p>))
+
+      run_course_copy
+
+      new_page = @copy_to.wiki_pages.where(migration_id: mig_id(page)).first
+      expect(new_page).not_to be_nil
+      expect(new_page.body).to match(%r{<p><a title="Home" href="/courses/#{@copy_to.id}/?\?wrap=1">Home</a></p><p><a title="Home" href="/courses/#{@copy_to.id}/?">Home 2</a></p>})
+    end
+
     it "migrates syllabus links on copy" do
       course_model
 
