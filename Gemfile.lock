@@ -750,7 +750,7 @@ GEM
       rack (>= 1.2, < 4)
       snaky_hash (~> 2.0)
       version_gem (~> 1.1)
-    oj (3.16.0)
+    oj (3.16.1)
     once-ler (2.0.1)
       activerecord (>= 6.0, < 7.1)
       rspec (>= 3.6)
