@@ -212,7 +212,7 @@ module UserContent
 
       html.gsub(@toplevel_regex) do |url|
         _absolute_part, prefix, type, obj_id, rest = [$1, $2, $3, $4, $5]
-        next url if !@contextless_types.include?(type) && prefix != @context_prefix && url != @context_prefix
+        next url if !@contextless_types.include?(type) && prefix != @context_prefix && url.split("?").first != @context_prefix
 
         if type != "wiki" && type != "pages" && type != "media_attachments_iframe"
           if obj_id.to_i > 0
