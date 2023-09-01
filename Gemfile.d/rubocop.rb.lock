@@ -58,7 +58,7 @@ GEM
     method_source (1.0.0)
     mini_mime (1.1.5)
     mini_portile2 (2.8.4)
-    minitest (5.19.0)
+    minitest (5.20.0)
     multi_xml (0.6.0)
     nokogiri (1.15.4)
       mini_portile2 (~> 2.8.2)

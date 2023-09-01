@@ -33,7 +33,7 @@ GEM
       bindata
       faraday (~> 2.0)
       faraday-follow_redirects
-    minitest (5.19.0)
+    minitest (5.20.0)
     rake (13.0.6)
     redcarpet (3.6.0)
     rspec (3.12.0)
