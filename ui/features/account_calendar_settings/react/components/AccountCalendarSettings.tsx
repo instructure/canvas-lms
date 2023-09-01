@@ -70,7 +70,6 @@ const useBeforeUnload = (hasChanges: boolean) => {
 }
 
 export const AccountCalendarSettings = ({accountId}: ComponentProps) => {
-  const autoSubscriptionEnabled = window.ENV?.FEATURES?.auto_subscribe_account_calendars ?? false
   const [visibilityChanges, setVisibilityChanges] = useState<VisibilityChange[]>([])
   const [subscriptionChanges, setSubscriptionChanges] = useState<SubscriptionChange[]>([])
   const [showConfirmation, setShowConfirmation] = useState(false)
@@ -102,10 +101,9 @@ export const AccountCalendarSettings = ({accountId}: ComponentProps) => {
   }, [accountTreeRef, footerRef, windowHeight])
 
   useEffect(() => {
-    const askConfirmation =
-      autoSubscriptionEnabled && subscriptionChanges.some(change => change.auto_subscribe)
+    const askConfirmation = subscriptionChanges.some(change => change.auto_subscribe)
     setShowConfirmation(askConfirmation)
-  }, [autoSubscriptionEnabled, subscriptionChanges])
+  }, [subscriptionChanges])
 
   const onAccountToggled = useCallback(
     (id: number, visible: boolean) => {
@@ -236,7 +234,6 @@ export const AccountCalendarSettings = ({accountId}: ComponentProps) => {
                 onAccountToggled={onAccountToggled}
                 onAccountSubscriptionToggled={onAccountSubscriptionToggled}
                 onAccountExpandedToggled={onAccountExpandedToggled}
-                autoSubscriptionEnabled={autoSubscriptionEnabled}
                 expandedAccounts={expandedAccounts}
               />
             </div>
@@ -249,7 +246,6 @@ export const AccountCalendarSettings = ({accountId}: ComponentProps) => {
                 subscriptionChanges={subscriptionChanges}
                 onAccountToggled={onAccountToggled}
                 onAccountSubscriptionToggled={onAccountSubscriptionToggled}
-                autoSubscriptionEnabled={autoSubscriptionEnabled}
               />
             </div>
           </div>

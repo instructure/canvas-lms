@@ -177,17 +177,6 @@ module_publish_menu:
   description: Enable the module publish menus to make mass publishing and unpublishing easier.
   applies_to: SiteAdmin
 
-auto_subscribe_account_calendars:
-  state: hidden
-  display_name: 'Allow auto-subscription to account calendars'
-  description: Allow admins to configure subscription preferences on account calendars.
-  applies_to: SiteAdmin
-  environments:
-    ci:
-      state: allowed_on
-    development:
-      state: allowed_on
-
 blueprint_line_item_support:
   state: hidden
   display_name: 'Blueprint Resource ID Support'

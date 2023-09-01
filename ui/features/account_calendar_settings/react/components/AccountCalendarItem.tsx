@@ -43,7 +43,6 @@ type ComponentProps = {
   readonly onAccountSubscriptionToggled: (id: number, autoSubscription: boolean) => void
   readonly padding?: string
   readonly showTopSeparator?: boolean
-  readonly autoSubscriptionEnabled: boolean
 }
 
 // Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
@@ -57,7 +56,6 @@ export const AccountCalendarItem = ({
   onAccountSubscriptionToggled,
   padding,
   showTopSeparator = false,
-  autoSubscriptionEnabled,
 }: ComponentProps) => {
   const [isVisible, setIsVisible] = useState(item.visible)
   const [isAutoSubscription, setIsAutoSubscription] = useState(item.auto_subscribe)
@@ -97,17 +95,15 @@ export const AccountCalendarItem = ({
         <FlexItem>
           <Text data-testid="account-calendar-name">{item.name}</Text>
         </FlexItem>
-        {autoSubscriptionEnabled && (
-          <FlexItem margin="0 0 0 auto">
-            <SubscriptionsDropDown
-              accountId={item.id}
-              autoSubscription={isAutoSubscription}
-              disabled={!isVisible}
-              onChange={onAccountSubscriptionToggled}
-              accountName={item.name}
-            />
-          </FlexItem>
-        )}
+        <FlexItem margin="0 0 0 auto">
+          <SubscriptionsDropDown
+            accountId={item.id}
+            autoSubscription={isAutoSubscription}
+            disabled={!isVisible}
+            onChange={onAccountSubscriptionToggled}
+            accountName={item.name}
+          />
+        </FlexItem>
       </Flex>
     </View>
   )

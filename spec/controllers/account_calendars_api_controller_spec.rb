@@ -184,17 +184,6 @@ describe AccountCalendarsApiController do
       expect(json["auto_subscribe"]).to be_falsey
     end
 
-    it "does not include auto_subscribe if auto_subscribe_account_calendars flag is disabled" do
-      Account.site_admin.disable_feature!(:auto_subscribe_account_calendars)
-      course_with_student_logged_in(user: @user, account: @subaccount1a)
-      user_session(@user)
-      get :show, params: { account_id: @subaccount1a.id }
-
-      expect(response).to be_successful
-      json = json_parse(response.body)
-      expect(json.key?("auto_subscribe")).to be false
-    end
-
     it "returns a hidden calendar for an admin with :manage_account_calendar_visibility" do
       account_admin_user(active_all: true, account: @root_account, user: @user)
       @subaccount2.account_calendar_visible = false
@@ -301,16 +290,6 @@ describe AccountCalendarsApiController do
       expect(response).to be_unauthorized
     end
 
-    it "does not update auto_subscribe if auto_subscribe_account_calendars is disabled" do
-      Account.site_admin.disable_feature!(:auto_subscribe_account_calendars)
-      account_admin_user(active_all: true, account: @root_account, user: @user)
-      user_session(@user)
-      expect(@root_account.account_calendar_subscription_type).to eq "manual"
-
-      put :update, params: { account_id: @root_account, auto_subscribe: true }
-      expect(@root_account.reload.account_calendar_subscription_type).to eq "manual"
-    end
-
     describe "metrics collection" do
       before do
         account_admin_user(active_all: true, account: @root_account, user: @user)
@@ -400,22 +379,6 @@ describe AccountCalendarsApiController do
         _json: [{ id: @root_account.id, visible: true }, { id: @root_account.id, visible: false }]
       }
       expect(response).to be_bad_request
-    end
-
-    it "does not update auto_subscribe if auto_subscribe_account_calendars is disabled" do
-      Account.site_admin.disable_feature!(:auto_subscribe_account_calendars)
-      account_admin_user(active_all: true, account: @root_account, user: @user)
-      user_session(@user)
-      put :bulk_update, params: {
-        account_id: @root_account,
-        _json: [{ id: @root_account.id, visible: false, auto_subscribe: true }]
-      }
-
-      expect(response).to be_successful
-      json = json_parse(response.body)
-      expect(json["message"]).to eq "Updated 1 account"
-      expect(@root_account.reload.account_calendar_visible).to be_falsey
-      expect(@root_account.account_calendar_subscription_type).to eq "manual"
     end
 
     it "only updates provided attributes" do

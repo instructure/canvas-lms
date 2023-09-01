@@ -49,7 +49,6 @@ type ComponentProps = {
   readonly subscriptionChanges: SubscriptionChange[]
   readonly onAccountToggled: (id: number, visible: boolean) => void
   readonly onAccountSubscriptionToggled: (id: number, autoSubscription: boolean) => void
-  readonly autoSubscriptionEnabled: boolean
 }
 
 // Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
@@ -62,7 +61,6 @@ export const AccountList = ({
   visibilityChanges,
   subscriptionChanges,
   onAccountToggled,
-  autoSubscriptionEnabled,
   onAccountSubscriptionToggled,
 }: ComponentProps) => {
   const [accounts, setAccounts] = useState<Account[]>([])
@@ -142,7 +140,6 @@ export const AccountList = ({
           onAccountSubscriptionToggled={onAccountSubscriptionToggled}
           padding="medium"
           showTopSeparator={index > 0}
-          autoSubscriptionEnabled={autoSubscriptionEnabled}
         />
       ))}
     </>
