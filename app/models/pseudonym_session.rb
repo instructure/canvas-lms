@@ -29,7 +29,8 @@ class PseudonymSession < Authlogic::Session::Base
   allow_http_basic_auth false
   consecutive_failed_logins_limit 0
 
-  attr_accessor :remote_ip, :too_many_attempts
+  attr_accessor :remote_ip
+  attr_reader :login_error
 
   # In authlogic 3.2.0, it tries to parse the last part of the cookie (delimited by '::')
   # as a timestamp to verify whether the cookie is stale.
@@ -93,7 +94,7 @@ class PseudonymSession < Authlogic::Session::Base
 
   # Validate the session using password auth (either local or LDAP, but not
   # SSO). If too many failed attempts have occured, the validation will fail.
-  # In this case, `too_many_attempts?` will be true, rather than
+  # In this case, `login_error` will be non-nil, rather than
   # `invalid_password?`.
   #
   # Note that for IP based max attempt tracking to occur, you'll need to set
@@ -103,15 +104,17 @@ class PseudonymSession < Authlogic::Session::Base
     super
 
     # have to call super first, as that's what loads attempted_record
-    if too_many_attempts? || attempted_record.try(:audit_login, remote_ip, !invalid_password?) == :too_many_attempts
-      self.too_many_attempts = true
-      errors.add(password_field, I18n.t("errors.max_attempts", "Too many failed login attempts. Please try again later or contact your system administrator."))
+    if (@login_error = attempted_record&.audit_login(remote_ip, !invalid_password?))
+      case @login_error
+      when :too_many_attempts
+        errors.add(password_field, I18n.t("errors.max_attempts", "Too many failed login attempts. Please try again later or contact your system administrator."))
+      when :too_recent_login
+        errors.add(password_field, I18n.t("errors.rapid_attempts", "You have recently logged in multiple times too quickly. Please wait a few seconds and try again."))
+      else
+        errors.add(password_field, I18n.t("Login has been denied for security reasons. Please try again later or contact your system administrator."))
+      end
       nil
     end
-  end
-
-  def too_many_attempts?
-    too_many_attempts == true
   end
 
   # This block is pulled from Authlogic::Session::Base.find,
