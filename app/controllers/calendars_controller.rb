@@ -125,7 +125,7 @@ class CalendarsController < ApplicationController
           MAX_NAME_LENGTH: max_name_length,
           DUE_DATE_REQUIRED_FOR_ACCOUNT: due_date_required_for_account
         }
-      elsif (context.is_a? Account) && Account.site_admin.feature_enabled?(:auto_subscribe_account_calendars)
+      elsif context.is_a? Account
         info[:auto_subscribe] = context.account_calendar_subscription_type == "auto"
         info[:viewed_auto_subscribed_account_calendars] = @viewed_auto_subscribed_account_calendars.include?(context.global_id)
       end

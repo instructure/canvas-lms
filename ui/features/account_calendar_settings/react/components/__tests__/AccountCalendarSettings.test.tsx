@@ -105,11 +105,6 @@ describe('AccountCalendarSettings', () => {
   })
 
   describe('auto subscription settings', () => {
-    beforeAll(() => {
-      window.ENV.FEATURES ||= {}
-      window.ENV.FEATURES.auto_subscribe_account_calendars = true
-    })
-
     beforeEach(() => {
       fetchMock.restore()
       fetchMock.get(/\/api\/v1\/accounts\/1\/visible_calendars_count.*/, RESPONSE_ACCOUNT_5.length)

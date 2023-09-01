@@ -4453,17 +4453,6 @@ describe User do
         @associated_subaccount.save!
         expect(@user.enabled_account_calendars.pluck(:id)).to contain_exactly(@root_account.id, @associated_subaccount.id)
       end
-
-      it "returns subscribed account calendars only if the feature flag is off" do
-        Account.site_admin.disable_feature!(:auto_subscribe_account_calendars)
-        @root_account.account_calendar_visible = true
-        @root_account.save!
-        @user.set_preference(:enabled_account_calendars, [@root_account.id])
-
-        @associated_subaccount.account_calendar_subscription_type = "auto"
-        @associated_subaccount.save!
-        expect(@user.enabled_account_calendars.pluck(:id)).to contain_exactly(@root_account.id)
-      end
     end
   end
 

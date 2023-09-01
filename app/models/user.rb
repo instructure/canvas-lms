@@ -3461,10 +3461,7 @@ class User < ActiveRecord::Base
 
   def enabled_account_calendars
     acct_cals = all_account_calendars
-    auto_sub = {
-      account_calendar_subscription_type: Account.site_admin.feature_enabled?(:auto_subscribe_account_calendars) ? "auto" : nil
-    }
-    acct_cals.where(id: get_preference(:enabled_account_calendars) || []).or(acct_cals.where(auto_sub))
+    acct_cals.where(id: get_preference(:enabled_account_calendars) || []).or(acct_cals.where(account_calendar_subscription_type: "auto"))
   end
 
   def inbox_labels

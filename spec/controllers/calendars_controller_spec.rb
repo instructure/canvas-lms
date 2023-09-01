@@ -97,8 +97,7 @@ describe CalendarsController do
       expect(assigns[:js_env][:MAX_NAME_LENGTH]).to eq(15)
     end
 
-    it "sets account's auto_subscribe if auto_subscribe_account_calendars flag is on" do
-      Account.site_admin.enable_feature!(:auto_subscribe_account_calendars)
+    it "sets account's auto_subscribe" do
       account = @user.account
       account.account_calendar_visible = true
       account.account_calendar_subscription_type = "auto"
@@ -110,7 +109,6 @@ describe CalendarsController do
     end
 
     it "sets viewed_auto_subscribed_account_calendars for viewed auto-subscribed account calendars" do
-      Account.site_admin.enable_feature!(:auto_subscribe_account_calendars)
       account = @student.account
       account.account_calendar_visible = true
       account.account_calendar_subscription_type = "auto"
@@ -122,7 +120,6 @@ describe CalendarsController do
     end
 
     it "does not set viewed_auto_subscribed_account_calendars for viewed manual-subscribed account calendars" do
-      Account.site_admin.enable_feature!(:auto_subscribe_account_calendars)
       account = @user.account
       account.account_calendar_visible = true
       account.account_calendar_subscription_type = "manual"
@@ -134,7 +131,6 @@ describe CalendarsController do
     end
 
     it "includes unviewed, auto subscribed calendars to be selected" do
-      Account.site_admin.enable_feature!(:auto_subscribe_account_calendars)
       account = @user.account
       account.account_calendar_visible = true
       account.account_calendar_subscription_type = "auto"
@@ -149,7 +145,6 @@ describe CalendarsController do
     it "has account calendars cope with a non-array user preference" do
       # this was caught in Sentry when the :selected_calendar_contexts preference
       # was a string instead of an array.
-      Account.site_admin.enable_feature!(:auto_subscribe_account_calendars)
       account = @user.account
       account.account_calendar_visible = true
       account.account_calendar_subscription_type = "auto"
@@ -165,7 +160,6 @@ describe CalendarsController do
     it "sets selected_contexts to nil if the user_preference is nil" do
       # this was caught in Sentry when the :selected_calendar_contexts preference
       # was a string instead of an array.
-      Account.site_admin.enable_feature!(:auto_subscribe_account_calendars)
       account = @user.account
       account.account_calendar_visible = true
       account.account_calendar_subscription_type = "auto"

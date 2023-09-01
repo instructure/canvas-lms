@@ -43,7 +43,6 @@ type ComponentProps = {
   readonly subscriptionChanges: SubscriptionChange[]
   readonly onAccountToggled: (id: number, visible: boolean) => void
   readonly onAccountSubscriptionToggled: (id: number, autoSubscription: boolean) => void
-  readonly autoSubscriptionEnabled: boolean
   readonly expandedAccounts: ExpandedAccounts
 }
 
@@ -73,7 +72,6 @@ export const AccountCalendarItemToggleGroup = ({
   subscriptionChanges,
   onAccountToggled,
   onAccountSubscriptionToggled,
-  autoSubscriptionEnabled,
   expandedAccounts,
 }: ComponentProps) => {
   const accountGroupEx = accountGroup
@@ -97,7 +95,6 @@ export const AccountCalendarItemToggleGroup = ({
                 padding="small"
                 showTopSeparator={true}
                 onAccountSubscriptionToggled={onAccountSubscriptionToggled}
-                autoSubscriptionEnabled={autoSubscriptionEnabled}
               />
             </div>
           )
@@ -131,7 +128,6 @@ export const AccountCalendarItemToggleGroup = ({
                     subscriptionChanges={subscriptionChanges}
                     onAccountToggled={onAccountToggled}
                     onAccountSubscriptionToggled={onAccountSubscriptionToggled}
-                    autoSubscriptionEnabled={autoSubscriptionEnabled}
                     expandedAccounts={expandedAccounts}
                   />
                 )}

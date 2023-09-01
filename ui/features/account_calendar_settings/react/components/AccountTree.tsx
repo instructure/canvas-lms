@@ -48,7 +48,6 @@ type ComponentProps = {
   readonly onAccountToggled: (id: number, visible: boolean) => void
   readonly onAccountSubscriptionToggled: (id: number, autoSubscription: boolean) => void
   readonly onAccountExpandedToggled: (id: number, expanded: boolean) => void
-  readonly autoSubscriptionEnabled: boolean
 }
 
 export const AccountTree = ({
@@ -59,7 +58,6 @@ export const AccountTree = ({
   onAccountToggled,
   onAccountSubscriptionToggled,
   onAccountExpandedToggled,
-  autoSubscriptionEnabled,
 }: ComponentProps) => {
   const [collections, setCollections] = useState<Collection>({})
   // ref because we need this to be updated syncronously so we can be sure
@@ -150,7 +148,6 @@ export const AccountTree = ({
           subscriptionChanges={subscriptionChanges}
           onAccountToggled={onAccountToggled}
           onAccountSubscriptionToggled={onAccountSubscriptionToggled}
-          autoSubscriptionEnabled={autoSubscriptionEnabled}
         />
       </div>
     </View>
