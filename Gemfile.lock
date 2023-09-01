@@ -540,7 +540,7 @@ GEM
     gepub (1.0.15)
       nokogiri (>= 1.8.2, < 2.0)
       rubyzip (> 1.1.1, < 2.4)
-    gergich (2.1.1)
+    gergich (2.1.2)
       httparty (~> 0.17)
       sqlite3 (~> 1.4)
     git (1.18.0)
@@ -1221,7 +1221,7 @@ DEPENDENCIES
   flakey_spec_catcher (~> 0.12)
   folio-pagination (= 0.0.12)
   gepub (= 1.0.15)
-  gergich (= 2.1.1)
+  gergich (~> 2.1)
   google_drive!
   graphql (~> 1.12.7)
   graphql-batch (~> 0.5)
