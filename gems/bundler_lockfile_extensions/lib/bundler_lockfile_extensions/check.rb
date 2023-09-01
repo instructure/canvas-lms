@@ -80,7 +80,7 @@ module BundlerLockfileExtensions
         success = false
       end
       unless lockfile.bundler_version == @default_lockfile.bundler_version
-        ::Bundler.ui.error("The Bundler version in #{lockfile_definition[:lockfile].relative_path_from(Dir.pwd)} does not match the default lockfile.")
+        ::Bundler.ui.error("bundler (#{lockfile.bundler_version}) in #{lockfile_definition[:lockfile].relative_path_from(Dir.pwd)} does not match the default lockfile's version (@#{@default_lockfile.bundler_version}).")
         success = false
       end
 
