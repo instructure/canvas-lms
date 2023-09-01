@@ -41,7 +41,7 @@ GEM
     concurrent-ruby (1.2.2)
     crass (1.0.6)
     erubi (1.12.0)
-    gergich (2.1.1)
+    gergich (2.1.2)
       httparty (~> 0.17)
       sqlite3 (~> 1.4)
     httparty (0.21.0)
@@ -157,7 +157,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  gergich (= 2.1.1)
+  gergich (~> 2.1)
   rubocop-canvas!
   rubocop-graphql (~> 1.3)
   rubocop-inst (~> 1)

@@ -23,7 +23,7 @@
 source "https://rubygems.org/"
 
 group :test do
-  gem "gergich", "2.1.1", require: false
+  gem "gergich", "~> 2.1", require: false
 
   gem "rubocop-canvas", require: false, path: "../gems/rubocop-canvas"
   gem "rubocop-inst", "~> 1", require: false
