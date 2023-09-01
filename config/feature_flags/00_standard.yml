@@ -51,6 +51,14 @@ k20_course_readiness:
     k20_course_readiness_description: Enables the new Admin Analytics Course Readiness Dashboard.
   root_opt_in: true
   beta: true
+k20_beta:
+  state: hidden
+  applies_to: Account
+  display_name: K20 - Beta
+  description:
+    k20_beta_description: Enables K20 Beta features in Admin Analytics APP.
+  root_opt_in: true
+  beta: true
 admin_analytics_view_permission:
   state: hidden
   applies_to: Account
