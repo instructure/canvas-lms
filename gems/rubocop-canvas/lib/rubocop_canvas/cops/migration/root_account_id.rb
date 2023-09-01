@@ -135,7 +135,7 @@ module RuboCop
                 example = "e.g. `#{EXAMPLE_REPLICA_IDENTITY_LINE % table_name.value.to_s.camelcase.singularize}`"
               end
               add_offense nil, location: last_line_range(node), message: <<~TEXT, severity: :info
-                Use `add_replica_identity` after the create_table block
+                Ensure another migration in this commit uses `add_replica_identity`
                 #{example}
               TEXT
             end

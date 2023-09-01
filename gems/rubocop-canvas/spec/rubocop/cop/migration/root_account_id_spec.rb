@@ -31,7 +31,7 @@ describe RuboCop::Cop::Migration::RootAccountId do
       end
     RUBY
     expect(cop.offenses.size).to eq 2
-    expect(cop.offenses.first.message).to include "Use `add_replica_identity` after the create_table block"
+    expect(cop.offenses.first.message).to include "Ensure another migration in this commit uses `add_replica_identity`"
     expect(cop.offenses.first.message).to include %(add_replica_identity "Widget")
     expect(cop.offenses.first.severity.name).to eq(:info)
     expect(cop.offenses.last.message).to include "New tables need a root_account reference"
@@ -120,7 +120,7 @@ describe RuboCop::Cop::Migration::RootAccountId do
     expect(cop.offenses.size).to eq 2
     expect(cop.offenses.first.message).to include "Use `index: false` (the replica identity index should suffice)"
     expect(cop.offenses.first.severity.name).to eq(:convention)
-    expect(cop.offenses.last.message).to include "Use `add_replica_identity` after the create_table block"
+    expect(cop.offenses.last.message).to include "Ensure another migration in this commit uses `add_replica_identity`"
     expect(cop.offenses.last.message).to include %(add_replica_identity "PingPongBall")
     expect(cop.offenses.last.severity.name).to eq(:info)
   end
@@ -137,7 +137,7 @@ describe RuboCop::Cop::Migration::RootAccountId do
       end
     RUBY
     expect(cop.offenses.size).to eq 1
-    expect(cop.messages.first).to include "Use `add_replica_identity` after the create_table block"
+    expect(cop.messages.first).to include "Ensure another migration in this commit uses `add_replica_identity`"
     expect(cop.offenses.first.severity.name).to eq(:info)
   end
 
@@ -193,6 +193,6 @@ describe RuboCop::Cop::Migration::RootAccountId do
     expect(cop.offenses.size).to eq 3
     expect(cop.offenses[0].message).to include "New tables need a root_account reference"
     expect(cop.offenses[1].message).to include "Use `index: false`"
-    expect(cop.offenses[2].message).to include "Use `add_replica_identity`"
+    expect(cop.offenses[2].message).to include "Ensure another migration in this commit uses `add_replica_identity`"
   end
 end
