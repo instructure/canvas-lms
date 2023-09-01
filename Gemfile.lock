@@ -513,7 +513,7 @@ GEM
       tzinfo
     expgen (0.1.1)
       parslet
-    factory_bot (6.2.1)
+    factory_bot (6.3.0)
       activesupport (>= 5.0.0)
     faraday (2.7.10)
       faraday-net_http (>= 2.0, < 3.1)
@@ -696,7 +696,7 @@ GEM
     mini_magick (4.12.0)
     mini_mime (1.1.5)
     mini_portile2 (2.8.4)
-    minitest (5.19.0)
+    minitest (5.20.0)
     moodle2cc (0.2.41)
       builder
       instructure-happymapper (~> 0.5.10)
@@ -1208,7 +1208,7 @@ DEPENDENCIES
   encrypted_cookie_store-instructure (= 1.2.12)
   escape_code (= 0.2)
   event_stream!
-  factory_bot (= 6.2.1)
+  factory_bot (~> 6.3)
   ffi-icu (~> 0.5)
   flakey_spec_catcher (~> 0.12)
   gepub (= 1.0.15)

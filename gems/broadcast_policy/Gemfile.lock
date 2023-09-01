@@ -27,7 +27,7 @@ GEM
     i18n (1.14.1)
       concurrent-ruby (~> 1.0)
     method_source (1.0.0)
-    minitest (5.19.0)
+    minitest (5.20.0)
     pry (0.14.2)
       coderay (~> 1.1)
       method_source (~> 1.0)

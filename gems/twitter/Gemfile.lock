@@ -38,7 +38,7 @@ GEM
       concurrent-ruby (~> 1.0)
     idn-ruby (0.1.5)
     mini_portile2 (2.8.4)
-    minitest (5.19.0)
+    minitest (5.20.0)
     nokogiri (1.15.4)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)

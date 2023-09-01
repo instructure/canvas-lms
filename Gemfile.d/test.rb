@@ -50,7 +50,7 @@ group :test do
 
   gem "rspecq", github: "kyler-instructure/rspecq", ref: "8cea6a3225cf0856a26c6c6b93a5ea5605082aa0"
   gem "flakey_spec_catcher", "~> 0.12", require: false
-  gem "factory_bot", "6.2.1", require: false
+  gem "factory_bot", "~> 6.3", require: false
   gem "stormbreaker", "~> 1.0", require: false
 
   # performance tools for instrumenting rspec tests

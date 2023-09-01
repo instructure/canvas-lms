@@ -47,7 +47,7 @@ GEM
       aroi (>= 0.0.7)
       dogstatsd-ruby (>= 4.2, < 6.0, != 5.0.0)
       statsd-ruby (~> 1.0)
-    minitest (5.19.0)
+    minitest (5.20.0)
     multipart-post (2.3.0)
     public_suffix (5.0.3)
     rake (13.0.6)
