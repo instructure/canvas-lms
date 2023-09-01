@@ -51,13 +51,14 @@ module Canvas::Security
     # @param [String] remote_ip the IP the login attempt originated from
     # @param [Boolean] valid_password whether the provided credentials were valid for this user
     #
-    # @return [:too_many_attempts, nil] :too_many_attempts if login is prohibited, nil if it's fine to proceed
+    # @return [:too_many_attempts, :too_recent_login, nil] :too_many_attempts if login is prohibited, nil if it's fine to proceed
     def self.audit_login(pseudonym, remote_ip, valid_password)
-      if !allow_login_attempt?(pseudonym, remote_ip) ||
-         # multiple _successful_ logins in a very short window?!
-         (valid_password && pseudonym.current_login_at &&
-          pseudonym.current_login_at > Time.now.utc - Setting.get("successful_login_window", "5").to_f.seconds)
-        return :too_many_attempts
+      return :too_many_attempts unless allow_login_attempt?(pseudonym, remote_ip)
+
+      if valid_password && pseudonym.current_login_at &&
+         pseudonym.current_login_at > Time.now.utc - Setting.get("successful_login_window", "5").to_f.seconds
+        # multiple _successful_ logins in a very short window?!
+        return :too_recent_login
       end
 
       if valid_password

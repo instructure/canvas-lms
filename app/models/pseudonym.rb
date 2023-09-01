@@ -587,7 +587,7 @@ class Pseudonym < ActiveRecord::Base
       raise ImpossibleCredentialsError, "pseudonym cannot have a unique_id of length #{credentials[:unique_id].length}"
     end
 
-    too_many_attempts = false
+    error = nil
     begin
       associated_shards = associated_shards(credentials[:unique_id])
     rescue => e
@@ -604,11 +604,11 @@ class Pseudonym < ActiveRecord::Base
         .preload(:user)
         .select do |p|
           valid = p.valid_arbitrary_credentials?(credentials[:password])
-          too_many_attempts = true if p.audit_login(remote_ip, valid) == :too_many_attempts
+          error ||= p.audit_login(remote_ip, valid)
           valid
         end
     end
-    return :too_many_attempts if too_many_attempts
+    return error if error
 
     pseudonyms
   end
@@ -621,7 +621,7 @@ class Pseudonym < ActiveRecord::Base
       Rails.logger.info("Impossible pseudonym credentials: #{credentials[:unique_id]}, invalidating session")
       return :impossible_credentials
     end
-    return :too_many_attempts if pseudonyms == :too_many_attempts
+    return pseudonyms if pseudonyms.is_a?(Symbol)
 
     site_admin = pseudonyms.find { |p| p.account_id == Account.site_admin.id }
     # only log them in if these credentials match a single user OR if it matched site admin
