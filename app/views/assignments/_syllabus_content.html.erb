@@ -52,7 +52,7 @@ To add some comments, click the "Edit" link at the top.
     <a href="#" class="jump_to_today_link"><%= t 'links.jump_to_today', "Jump to Today" %></a>
   <% end %>
   <% if can_do(@context, @current_user, :manage_content, :manage_course_content_edit) %>
-    <a href="#" class="edit_syllabus_link btn button-sidebar-wide"><i class="icon-edit"></i> <%= t 'links.edit_syllabus_description', "Edit" %></a>
+    <button class="edit_syllabus_link btn button-sidebar-wide" aria-expanded=”false”><i class="icon-edit"></i> <%= t 'links.edit_syllabus_description', "Edit" %></button>
   <% end %>
   </div>
 </div>
