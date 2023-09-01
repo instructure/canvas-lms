@@ -700,6 +700,12 @@ $(function () {
   $questions
     .delegate(':checkbox,:radio', 'change', function (_event) {
       const $answer = $(this).parents('.answer')
+      setTimeout(() => {
+        const $math = $answer.find('.math_equation_latex script')
+        if ($math) {
+          $(this).attr('aria-label', $math.text())
+        }
+      }, 1000)
       if (lastAnswerSelected == $answer[0]) {
         quizSubmission.updateSubmission()
       }
