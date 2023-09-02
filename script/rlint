@@ -8,7 +8,7 @@ require "bundler/inline"
 gemfile do
   source "https://rubygems.org/"
 
-  gem "gergich", "2.1.1"
+  gem "gergich", "2.1.2"
   gem "colorize", "0.8.1"
 end
 
