@@ -10349,6 +10349,7 @@ describe Assignment do
           expect(assignment.line_items.length).to eq 1
           expect(assignment.line_items.first.label).to eq assignment.title
           expect(assignment.line_items.first.score_maximum).to eq assignment.points_possible
+          expect(assignment.line_items.first.end_date_time).to eq assignment.due_at
           expect(assignment.line_items.first.coupled).to be true
           expect(assignment.line_items.first.resource_link).not_to be_nil
           expect(assignment.line_items.first.resource_link.resource_link_uuid).to eq assignment.lti_context_id
@@ -10362,26 +10363,31 @@ describe Assignment do
       end
 
       shared_examples "assignment to line item attribute sync check" do
-        it "synchronizes assignment title and points_possible changes to the primary line item" do
+        it "synchronizes assignment title, points_possible, and due_at changes to the primary line item" do
           # create a secondary line item (i.e. one that should not be synchronized)
           previous_title = assignment.title
           previous_points_possible = assignment.points_possible
+          previous_due_at = assignment.due_at
           first_line_item = assignment.line_items.first
           line_item_two = assignment.line_items.create!(
             label: previous_title,
             score_maximum: previous_points_possible,
-            resource_link: first_line_item.resource_link
+            resource_link: first_line_item.resource_link,
+            end_date_time: previous_due_at
           )
           line_item_two.update!(created_at: first_line_item.created_at + 1.minute)
           assignment.title += " edit"
           assignment.points_possible += 10
+          assignment.due_at += 3.days
           assignment.save!
           assignment.reload
           expect(assignment.line_items.length).to eq 2
           expect(assignment.line_items.find(&:assignment_line_item?).label).to eq assignment.title
           expect(assignment.line_items.find(&:assignment_line_item?).score_maximum).to eq assignment.points_possible
+          expect(assignment.line_items.find(&:assignment_line_item?).end_date_time).to eq assignment.due_at
           expect(assignment.line_items.find { |li| !li.assignment_line_item? }.label).to eq previous_title
           expect(assignment.line_items.find { |li| !li.assignment_line_item? }.score_maximum).to eq previous_points_possible
+          expect(assignment.line_items.find { |li| !li.assignment_line_item? }.end_date_time).to eq previous_due_at
         end
       end
 
