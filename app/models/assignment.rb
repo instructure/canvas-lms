@@ -1221,14 +1221,15 @@ class Assignment < ActiveRecord::Base
           url: lti_resource_link_url
         )
 
-        li = line_items.create!(label: title, score_maximum: points_possible, resource_link: rl, coupled: true, resource_id: line_item_resource_id, tag: line_item_tag)
+        li = line_items.create!(label: title, score_maximum: points_possible, resource_link: rl, coupled: true, resource_id: line_item_resource_id, tag: line_item_tag, end_date_time: due_at)
         create_results_from_prior_grades(li)
-      elsif saved_change_to_title? || saved_change_to_points_possible?
+      elsif saved_change_to_title? || saved_change_to_points_possible? || saved_change_to_due_at?
         if (li = line_items.find(&:assignment_line_item?))
           li.label = title
           li.score_maximum = points_possible || 0
           li.tag = line_item_tag if line_item_tag
           li.resource_id = line_item_resource_id if line_item_resource_id
+          li.end_date_time = due_at
           li.save!
         end
       end

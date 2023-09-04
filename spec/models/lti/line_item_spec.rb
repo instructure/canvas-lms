@@ -144,4 +144,26 @@ RSpec.describe Lti::LineItem do
       end.not_to change(assignment, :workflow_state)
     end
   end
+
+  context "when updating the associated assignment" do
+    it "updates the line item's end_date_time to match assignment's due date" do
+      current_time = Time.now
+      next_week = current_time + 7.days
+      tool = AccessToken.create!
+      line_item_params = { end_date_time: Time.now, score_maximum: 10.0, label: "a line item" }
+      line_item = Lti::LineItem.create_line_item!(nil, course_model, tool, line_item_params)
+      # This is necessary because the line item only gets associated to the assignment after
+      # the assignment is created. This line_item variable is up-to-date with "knowing" its
+      # relation to the assignment, but the assignment variable is not yet up-to-date with
+      # its relation to the line item, even though we are referencing it with
+      # line_item.assignment -- in the assignment model, when it calls self.line_items,
+      # it will still get nil. So it needs to be reloaded. Since Lti::LineItem.create_line_item!
+      # is only ever called in an API request, this "need to reload" scenario should not
+      # happen in real life.
+      line_item.assignment.reload
+      line_item.assignment.due_at = next_week
+      line_item.assignment.save!
+      expect(line_item.reload.end_date_time).to eq(next_week)
+    end
+  end
 end
