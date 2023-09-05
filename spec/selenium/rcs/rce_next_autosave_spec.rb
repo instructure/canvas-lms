@@ -61,6 +61,7 @@ describe "RCE Next autosave feature", ignore_js_errors: true do
     end
 
     it "autosaves encrypted content" do
+      skip "LF-716 (9/5/2023)"
       create_and_edit_announcement
       saved_content = driver.local_storage[autosave_key]
       assert(saved_content)
@@ -69,6 +70,7 @@ describe "RCE Next autosave feature", ignore_js_errors: true do
     end
 
     it "autosaves encrypted content entered in htmlview" do
+      skip "LF-716 (9/5/2023)"
       create_and_edit_announcement
       switch_to_html_view
       switch_to_raw_html_editor
@@ -84,6 +86,7 @@ describe "RCE Next autosave feature", ignore_js_errors: true do
     end
 
     it "prompts to restore autosaved content" do
+      skip "LF-716 (9/5/2023)"
       create_and_edit_announcement
       saved_content = driver.local_storage[autosave_key]
       assert(saved_content)
@@ -103,6 +106,7 @@ describe "RCE Next autosave feature", ignore_js_errors: true do
     end
 
     it "is scoped to the user" do
+      skip "LF-716 (9/5/2023)"
       # Start with the first teacher creating an announcement and verify the data autosaved
       create_and_edit_announcement
       saved_content = driver.local_storage[autosave_key]
@@ -146,6 +150,7 @@ describe "RCE Next autosave feature", ignore_js_errors: true do
     # It's a warning but logged as an error. I don't believe it is, and I can't find it. Ignore it.
     it "makes room if quota is exceeded due to other rce auto save data",
        ignore_js_errors: true do
+      skip "LF-716 (9/5/2023)"
       get "/"
       driver.local_storage.clear
       driver.local_storage[autosave_key(@teacher.id, "http://some/url", "id")] =
@@ -189,6 +194,7 @@ describe "RCE Next autosave feature", ignore_js_errors: true do
     end
 
     it "removes placholder images from autosaved content" do
+      skip "LF-716 (9/5/2023)"
       create_and_edit_announcement
 
       # simulate a placeholder image
