@@ -182,6 +182,12 @@ function setupCalendarFeedsWithSpecialAccessibilityConsiderationsForNVDA() {
       {
         autoOpen: false,
         modal: true,
+        create: (e, _ui) => {
+          e.target.parentElement.setAttribute(
+            'aria-labelledby',
+            e.target.parentElement.querySelector('.ui-dialog-title').id
+          )
+        },
       },
       $calendarFeedModalOpener.data('dialogOpts')
     )
