@@ -154,7 +154,8 @@ module RruleHelper
   end
 
   def format_month_day(month, day)
-    I18n.l(Date.new(1970, month, day), format: :short)
+    # 2024 is a leap year, and can handle formatting 2/29
+    I18n.l(Date.new(2024, month, day), format: :short)
   end
 
   def parse_daily(rropts)
