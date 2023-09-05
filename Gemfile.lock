@@ -637,9 +637,9 @@ GEM
     instructure-happymapper (0.5.10)
       nokogiri (~> 1.5)
     io-console (0.6.0)
-    irb (1.8.0)
-      rdoc (~> 6.5)
-      reline (>= 0.3.6)
+    irb (1.8.1)
+      rdoc
+      reline (>= 0.3.8)
     iso8601 (0.13.0)
     jira_ref_parser (1.0.1)
     jmespath (1.6.2)
