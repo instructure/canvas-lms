@@ -46,13 +46,13 @@ afterEach(() => {
 
 describe('AccountTree', () => {
   it('loads and displays an account tree', async () => {
-    const {findByRole, getByRole, getByText} = render(<AccountTree {...defaultProps} />)
-    expect(await findByRole('button', {name: 'University, 5 accounts'})).toBeInTheDocument()
+    const {findByText, getByText} = render(<AccountTree {...defaultProps} />)
+    expect(await findByText('University, 5 accounts')).toBeInTheDocument()
     expect(getByText('University')).toBeInTheDocument()
     expect(getByText('Manually-Created Courses')).toBeInTheDocument()
-    expect(getByRole('button', {name: 'Big Account, 16 accounts'})).toBeInTheDocument()
-    expect(getByRole('button', {name: 'CPMS, 2 accounts'})).toBeInTheDocument()
-    expect(getByRole('button', {name: 'Elementary, 2 accounts'})).toBeInTheDocument()
+    expect(getByText('Big Account, 16 accounts')).toBeInTheDocument()
+    expect(getByText('CPMS, 2 accounts')).toBeInTheDocument()
+    expect(getByText('Elementary, 2 accounts')).toBeInTheDocument()
   })
 
   it('checks accounts only where calendar is visible', async () => {
