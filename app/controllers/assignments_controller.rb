@@ -577,7 +577,9 @@ class AssignmentsController < ApplicationController
       visible_students = @context.students_visible_to(@current_user).not_fake_student
       visible_students_assigned_to_assignment = visible_students.joins(:submissions).where(submissions: { assignment: @assignment }).merge(Submission.active)
 
-      @students = visible_students_assigned_to_assignment.distinct.order_by_sortable_name
+      @students_dropdown_list = visible_students_assigned_to_assignment.distinct.order_by_sortable_name
+      @students = params[:search_term].present? ? @students_dropdown_list.name_like(params[:search_term], search_pseudonyms: false) : @students_dropdown_list
+      @students = @students.paginate(page: params[:page], per_page: 10)
       @submissions = @assignment.submissions.include_assessment_requests
     end
   end
