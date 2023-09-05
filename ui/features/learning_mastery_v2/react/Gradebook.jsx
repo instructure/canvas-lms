@@ -58,10 +58,10 @@ const Gradebook = ({courseId, students, outcomes, rollups, visibleRatings}) => {
           overflowX="hidden"
           elementRef={el => (headerRow.current = el)}
         >
-          {outcomes.map(({id, title}, index) => (
+          {outcomes.map((outcome, index) => (
             // eslint-disable-next-line react/no-array-index-key
-            <Flex.Item size={`${COLUMN_WIDTH + COLUMN_PADDING}px`} key={`${id}.${index}`}>
-              <OutcomeHeader title={title} />
+            <Flex.Item size={`${COLUMN_WIDTH + COLUMN_PADDING}px`} key={`${outcome.id}.${index}`}>
+              <OutcomeHeader outcome={outcome} />
             </Flex.Item>
           ))}
         </View>

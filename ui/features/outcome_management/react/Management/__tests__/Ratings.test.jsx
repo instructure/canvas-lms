@@ -36,7 +36,7 @@ describe('Ratings', () => {
     onChangeRatings: onChangeRatingsMock,
     onChangeMasteryPoints: onChangeMasteryPointsMock,
     canManage: true,
-    ratings: [createRating('Exceeds Mastery', 4), createRating('Mastery', 3)],
+    ratings: [createRating('Exceeds Mastery', 4, false), createRating('Mastery', 3, true)],
     masteryPoints: {
       value: 3,
       error: null,
@@ -119,7 +119,7 @@ describe('Ratings', () => {
     })
 
     it('When deleting the rating 3 out of 3, focusField of rating 2 is set to trash', () => {
-      const threeRatings = [...defaultProps().ratings, createRating('Almost Mastery', 2)]
+      const threeRatings = [...defaultProps().ratings, createRating('Almost Mastery', 2, false)]
       const {getByText} = render(<Ratings {...defaultProps({ratings: threeRatings})} />)
       fireEvent.click(getByText('Delete mastery level 3'))
       fireEvent.click(getByText('Confirm'))
@@ -129,7 +129,7 @@ describe('Ratings', () => {
     })
 
     it('When deleting the rating 1 out of 3, focusField of rating 2 is set to trash', () => {
-      const threeRatings = [...defaultProps().ratings, createRating('Almost Mastery', 2)]
+      const threeRatings = [...defaultProps().ratings, createRating('Almost Mastery', 2, false)]
       const {getByText} = render(<Ratings {...defaultProps({ratings: threeRatings})} />)
       fireEvent.click(getByText('Delete mastery level 2'))
       fireEvent.click(getByText('Confirm'))
@@ -139,10 +139,13 @@ describe('Ratings', () => {
     })
 
     it('When adding a rating, focusField should be set on the description of the new rating', () => {
-      const threeRatings = [...defaultProps().ratings, createRating('Almost Mastery', 2, 'trash')]
+      const threeRatings = [...defaultProps().ratings, createRating('Almost Mastery', 2, false)]
+      console.log("ratings")
+      console.log(threeRatings)
       const {getByText} = render(<Ratings {...defaultProps({ratings: threeRatings})} />)
       fireEvent.click(getByText('Add Mastery Level'))
       const newRatingsAfterAdd = onChangeRatingsMock.mock.calls[0][0]
+      console.log(newRatingsAfterAdd)
       expect(newRatingsAfterAdd[0].focusField).toBeNull()
       expect(newRatingsAfterAdd[1].focusField).toBeNull()
       expect(newRatingsAfterAdd[2].focusField).toBeNull()

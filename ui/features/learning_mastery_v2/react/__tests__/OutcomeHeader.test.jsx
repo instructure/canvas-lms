@@ -18,12 +18,27 @@
 
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
+import {pick} from 'lodash'
+import {defaultRatings, defaultMasteryPoints} from '@canvas/outcomes/react/hooks/useRatings'
 import OutcomeHeader from '../OutcomeHeader'
 
 describe('OutcomeHeader', () => {
+  const outcome = {
+    id: '1',
+    title: 'outcome 1',
+    description: 'Outcome description',
+    display_name: 'Friendly outcome name',
+    context_type: 'Account',
+    context_id: '1',
+    calculation_method: 'decaying_average',
+    calculation_int: 65,
+    mastery_points: defaultMasteryPoints,
+    ratings: defaultRatings.map(rating => pick(rating, ['description', 'points', 'color', 'mastery'])),
+  }
+
   const defaultProps = () => {
     return {
-      title: 'outcome 1',
+      outcome: outcome,
     }
   }
 
@@ -40,5 +55,13 @@ describe('OutcomeHeader', () => {
     expect(getByText('Ascending')).toBeInTheDocument()
     expect(getByText('Descending')).toBeInTheDocument()
     expect(getByText('Show Contributing Scores')).toBeInTheDocument()
+    expect(getByText('Outcome Description')).toBeInTheDocument()
+  })
+
+  it('renders the outcome description modal when option is selected', () => {
+    const {getByText, getByTestId} = render(<OutcomeHeader {...defaultProps()} />)
+    fireEvent.click(getByText('Sort Outcome Column'))
+    fireEvent.click(getByText('Outcome Description'))
+    expect(getByTestId('outcome-description-modal')).toBeInTheDocument()
   })
 })

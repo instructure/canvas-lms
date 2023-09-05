@@ -69,7 +69,7 @@ const Ratings = ({
       points = 0.0
     }
     // when a rating is added, set the focusField value to the new rating's description field
-    onChangeRatings([...clearFocusFields(), createRating('', points, 'description', false)])
+    onChangeRatings([...clearFocusFields(), createRating('', points, false, 'description')])
   }
 
   const clearFocusFields = () => ratings.map(r => ({...r, focusField: null}))

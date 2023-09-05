@@ -29,6 +29,10 @@ describe('StudentOutcomeScore', () => {
       outcome: {
         id: '1',
         title: 'Title',
+        description: 'Outcome description',
+        display_name: 'Friendly outcome name',
+        calculation_method: 'decaying_average',
+        calculation_int: 65,
         mastery_points: 5,
         ratings: [],
       },
