@@ -50,6 +50,10 @@ describe('ScoresGrid', () => {
         {
           id: '1',
           title: 'Outcome Title',
+          description: 'Outcome description',
+          display_name: 'Friendly outcome name',
+          calculation_method: 'decaying_average',
+          calculation_int: 65,
           mastery_points: 3,
           ratings: [
             {

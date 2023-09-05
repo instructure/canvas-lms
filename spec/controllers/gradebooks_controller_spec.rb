@@ -2071,6 +2071,22 @@ describe GradebooksController do
           end
         end
 
+        describe "Outcomes Friendly Description" do
+          it "is false if the feature flag is off" do
+            Account.site_admin.disable_feature! :outcomes_friendly_description
+            get :show, params: { course_id: @course.id }
+            gradebook_env = assigns[:js_env][:GRADEBOOK_OPTIONS]
+            expect(gradebook_env[:OUTCOMES_FRIENDLY_DESCRIPTION]).to be false
+          end
+
+          it "is true if the feature flag is on" do
+            Account.site_admin.enable_feature! :outcomes_friendly_description
+            get :show, params: { course_id: @course.id }
+            gradebook_env = assigns[:js_env][:GRADEBOOK_OPTIONS]
+            expect(gradebook_env[:OUTCOMES_FRIENDLY_DESCRIPTION]).to be true
+          end
+        end
+
         describe "outcome_service_results_to_canvas" do
           it "is set to true if outcome_service_results_to_canvas feature flag is enabled" do
             @course.enable_feature!(:outcome_service_results_to_canvas)

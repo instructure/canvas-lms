@@ -40,8 +40,13 @@ export const outcomeRatingShape = {
 }
 
 export const outcomeShape = {
-  title: PropTypes.string.isRequired,
   id: PropTypes.string.isRequired,
+  title: PropTypes.string.isRequired,
+  description: PropTypes.string,
+  display_name: PropTypes.string,
+  friendly_description: PropTypes.string,
+  calculation_method: PropTypes.string.isRequired,
+  calculation_int: PropTypes.number,
   mastery_points: PropTypes.number.isRequired,
   ratings: PropTypes.arrayOf(PropTypes.shape(outcomeRatingShape)).isRequired,
 }

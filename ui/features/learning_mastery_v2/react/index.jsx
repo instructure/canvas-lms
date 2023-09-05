@@ -31,11 +31,11 @@ import GradebookMenu from '@canvas/gradebook-menu/react/GradebookMenu'
 import {Flex} from '@instructure/ui-flex'
 import {InstUISettingsProvider} from '@instructure/emotion'
 import {IconButton} from '@instructure/ui-buttons'
+import LMGBContext, {getLMGBContext} from '@canvas/outcomes/react/contexts/LMGBContext'
 
 const I18n = useI18nScope('LearningMasteryGradebook')
 
-const getRatings = () => {
-  const ratings = ENV.GRADEBOOK_OPTIONS.outcome_proficiency.ratings
+const getRatings = (ratings) => {
   const masteryAt = ratings.find(rating => rating.mastery).points
   return [
     ...ratings.map(({points, description, color}) => ({
@@ -48,7 +48,7 @@ const getRatings = () => {
   ]
 }
 
-const componentOverrides = {
+const gradebookMenuOverride = {
   Link: {
     color: 'licorice'
   }
@@ -61,8 +61,8 @@ const renderLoader = () => (
 )
 
 const LearningMastery = ({courseId}) => {
-  const options = ENV.GRADEBOOK_OPTIONS
-  const accountLevelMasteryScalesFF = options.ACCOUNT_LEVEL_MASTERY_SCALES
+  const contextValues = getLMGBContext()
+  const {contextURL, outcomeProficiency, accountLevelMasteryScalesFF} = contextValues.env
 
   const {isLoading, students, outcomes, rollups} = useRollups({
     courseId,
@@ -77,8 +77,8 @@ const LearningMastery = ({courseId}) => {
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <>
-      <InstUISettingsProvider theme={{componentOverrides}}>
+    <LMGBContext.Provider value={contextValues}>
+      <InstUISettingsProvider theme={gradebookMenuOverride}>
         <Flex
           height="100%"
           display="flex"
@@ -90,7 +90,7 @@ const LearningMastery = ({courseId}) => {
           <Text size='xx-large' weight='bold'>{I18n.t('Learning Mastery Gradebook')}</Text>
           <View padding="xx-small">
             <GradebookMenu
-              courseUrl={options.context_url}
+              courseUrl={contextURL}
               learningMasteryEnabled={true}
               variant="DefaultGradebookLearningMastery"
               customTrigger={
@@ -109,7 +109,7 @@ const LearningMastery = ({courseId}) => {
       {accountLevelMasteryScalesFF && (
         <Flex.Item as="div" width="100%" padding="small 0 0 0">
           <ProficiencyFilter
-            ratings={getRatings()}
+            ratings={getRatings(outcomeProficiency.ratings)}
             visibleRatings={visibleRatings}
             setVisibleRatings={setVisibleRatings}
           />
@@ -126,7 +126,7 @@ const LearningMastery = ({courseId}) => {
           visibleRatings={visibleRatings}
         />
       )}
-    </>
+    </LMGBContext.Provider>
   )
 }
 
