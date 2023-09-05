@@ -59,9 +59,10 @@ module TurnitinApi
           stats_tags = { status: resp.status, message: error_msg }
           InstStatsd::Statsd.increment("lti.tii.outcomes_response_bad", tags: stats_tags)
 
+          body = resp.env[:raw_body] || resp.body
           raise InvalidResponse,
-                "TII returned #{resp.status} code, content length=#{resp.body&.length}, " \
-                "message #{error_msg}, body #{resp.body&.truncate(100).inspect}"
+                "TII returned #{resp.status} code, content length=#{body&.length}, " \
+                "message #{error_msg}, body #{body&.truncate(100).inspect}"
         end
       end
     end
@@ -94,7 +95,7 @@ module TurnitinApi
       @connection ||= Faraday.new do |conn|
         conn.request :multipart
         conn.request :url_encoded
-        conn.response :json, content_type: /\bjson$/
+        conn.response :json, preserve_raw: true
         conn.response :follow_redirects
         conn.adapter :net_http
       end
