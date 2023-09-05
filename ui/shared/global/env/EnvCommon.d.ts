@@ -170,7 +170,6 @@ export type SiteAdminFeatureId =
   | 'explicit_latex_typesetting'
   | 'dev_key_oidc_alert'
   | 'media_links_use_attachment_id'
-  | 'account_calendars_planner_support'
   | 'permanent_page_links'
   | 'developer_key_page_checkboxes'
   | 'improved_no_results_messaging'
