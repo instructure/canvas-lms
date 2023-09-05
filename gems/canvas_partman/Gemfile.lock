@@ -60,7 +60,7 @@ GEM
       racc (~> 1.4)
     nokogiri (1.15.4-x86_64-linux)
       racc (~> 1.4)
-    pg (1.5.3)
+    pg (1.5.4)
     racc (1.7.1)
     rack (2.2.8)
     rack-test (2.1.0)
