@@ -3490,13 +3490,18 @@ describe "Users API", type: :request do
   end
 
   describe "POST pandata_events_token" do
-    let(:fake_secrets) do
+    let(:fake_settings) do
       {
         "url" => "https://example.com/pandata/events",
-        "ios-key" => "IOS_key",
-        "ios-secret" => "LS0tLS1CRUdJTiBFQyBQUklWQVRFIEtFWS0tLS0tCk1JSGJBZ0VCQkVFemZx\nZStiTjhEN2VRY0tKa3hHSlJpd0dqaHE0eXBsdFJ3aXNMUkx6ZXpBSmQ4QTlL\nRTdNY2YKbkorK0ptNGpwcjNUaFpybHRyN2dXQ2VJWWdvZDZPSmhzS0FIQmdV\ncmdRUUFJNkdCaVFPQmhnQUVBSmV5NCszeAp0UGlja2h1RFQ3QWFsTW1BWVdz\neU5IMnlEejRxRjhCamhHZzgwVkE2QWJPMHQ2YVE4TGQyaktMVEFrU1U5SFFW\nClkrMlVVeUp0Q3FTWEg4dVlBTEI0ZmFwbGhwVWNoQ1pSa3pMMXcrZzVDUUJY\nMlhFS25PdXJabU5ieEVSRzJneGoKb3hsbmxub0pwQjR5YUkvbWNpWkJOYlVz\nL0hTSGJtRzRFUFVxeVViQgotLS0tLUVORCBFQyBQUklWQVRFIEtFWS0tLS0t\nCg==\n",
-        "android-key" => "ANDROID_key",
-        "android-secret" => "surrendernoworpreparetofight"
+      }
+    end
+
+    let(:fake_secrets) do
+      {
+        "ios_key" => "IOS_key",
+        "ios_secret" => "LS0tLS1CRUdJTiBFQyBQUklWQVRFIEtFWS0tLS0tCk1JSGJBZ0VCQkVFemZx\nZStiTjhEN2VRY0tKa3hHSlJpd0dqaHE0eXBsdFJ3aXNMUkx6ZXpBSmQ4QTlL\nRTdNY2YKbkorK0ptNGpwcjNUaFpybHRyN2dXQ2VJWWdvZDZPSmhzS0FIQmdV\ncmdRUUFJNkdCaVFPQmhnQUVBSmV5NCszeAp0UGlja2h1RFQ3QWFsTW1BWVdz\neU5IMnlEejRxRjhCamhHZzgwVkE2QWJPMHQ2YVE4TGQyaktMVEFrU1U5SFFW\nClkrMlVVeUp0Q3FTWEg4dVlBTEI0ZmFwbGhwVWNoQ1pSa3pMMXcrZzVDUUJY\nMlhFS25PdXJabU5ieEVSRzJneGoKb3hsbmxub0pwQjR5YUkvbWNpWkJOYlVz\nL0hTSGJtRzRFUFVxeVViQgotLS0tLUVORCBFQyBQUklWQVRFIEtFWS0tLS0t\nCg==\n",
+        "android_key" => "ANDROID_key",
+        "android_secret" => "surrendernoworpreparetofight"
       }
     end
 
@@ -3504,7 +3509,9 @@ describe "Users API", type: :request do
       allow(DynamicSettings).to receive(:find)
         .with(any_args).and_call_original
       allow(DynamicSettings).to receive(:find)
-        .with("events", service: "pandata").and_return(fake_secrets)
+        .with("pandata/events", service: "canvas").and_return(fake_settings)
+
+      allow(Rails.application.credentials).to receive(:pandata_creds).and_return(fake_secrets)
     end
 
     it "returns token and expiration" do
