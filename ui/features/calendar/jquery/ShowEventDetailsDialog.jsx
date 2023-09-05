@@ -330,7 +330,8 @@ export default class ShowEventDetailsDialog {
     }
 
     if (
-      (params.reservations == null || params.reservations === []) &&
+      (params.reservations == null ||
+        (Array.isArray(params.reservations) && params.reservations.length === 0)) &&
       this.event.object.parent_event_id != null
     ) {
       const MAX_PAGE_SIZE = 25
