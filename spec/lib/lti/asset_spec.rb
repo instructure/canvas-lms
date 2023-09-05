@@ -60,5 +60,28 @@ describe Lti::Asset do
       @course.reload
       expect(@course.lti_context_id).to eq "dummy_context_id"
     end
+
+    it "attempts to fix duplicate lti_context_ids for assets" do
+      old_user = user_model
+      new_user = user_model
+
+      allow(new_user).to receive(:global_asset_string).and_return(old_user.global_asset_string)
+      context_id = described_class.opaque_identifier_for(old_user)
+
+      expect(described_class.opaque_identifier_for(new_user)).to_not eq(context_id)
+      expect(described_class.opaque_identifier_for(new_user)).to be_present
+      expect(old_user.reload.lti_context_id).to eq(context_id)
+    end
+
+    it "attempts to fix duplicate lti_context_ids for deleted assets" do
+      old_user = user_model(workflow_state: "deleted")
+      new_user = user_model
+
+      allow(new_user).to receive(:global_asset_string).and_return(old_user.global_asset_string)
+      context_id = described_class.opaque_identifier_for(old_user)
+
+      expect(described_class.opaque_identifier_for(new_user)).to eq context_id
+      expect(old_user.reload.lti_context_id).to be_nil
+    end
   end
 end
