@@ -47,6 +47,7 @@
 <% js_bundle 'assignments_peer_reviews' %>
 
 <h1><%= t :title, "%{assignment} Peer Reviews", :assignment => @assignment.title %></h1>
+<div style="margin-bottom: 10px">
   <% if @assignment.active_rubric_association? %>
     <%= t :overview_with_rubric, "Student peer reviews will be considered complete when students have commented
       at least once on the page and filled out the rubric form for the assignment." %>
@@ -54,6 +55,14 @@
     <%= t :overview, "Student peer reviews will be considered complete when students have commented
       at least once on the page." %>
   <% end %>
+</div>
+<%= form_tag(context_url(@context, :context_assignment_peer_reviews_url), method: :get) do %>
+    <div class="ic-Input-group">
+      <%= text_field_tag :search_term, params[:search_term], class: "ic-Input", placeholder: t('Search People'),
+      'aria-label' => t('Search people. As you type in this field, the list of people will be automatically filtered to only include those whose names match your input.')%>
+      <%= submit_tag t('Search'), class: "Button" %>
+    </div>
+<% end %>
 <ul class="unstyled_list" style="margin-<%= direction('left') %>: 20px;">
   <li style="<%= hidden unless @students.empty? %>" class="no_students_message"><%= t 'messages.no_students_found', "No Students Found" %></li>
   <% @students.each do |student| %>
@@ -89,7 +98,7 @@
 <%= form_tag ".", {:id => "assign_peer_review_form", :style => "display: none;"} do %>
   <select name="reviewee_id">
     <option value=""><%= t 'options.select_student', "[ Select Student ]" %></option>
-    <% @students.each do |student| %>
+    <% @students_dropdown_list.each do |student| %>
       <option value="<%= student.id %>" class="student_<%= student.id %>"><%= student.last_name_first %></option>
     <% end %>
   </select>
@@ -99,3 +108,4 @@
 <ul style="display: none;">
 <%= render :partial => 'peer_review_assignment', :locals => {:request => nil} %>
 </ul>
+<%= will_paginate(@students, :style=>"margin-bottom: 1em;") %>

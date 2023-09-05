@@ -293,7 +293,7 @@ class User < ActiveRecord::Base
       where("enrollments.limit_privileges_to_course_section IS NULL OR enrollments.limit_privileges_to_course_section<>? OR enrollments.course_section_id IN (?)", true, sections)
     end
   }
-  scope :name_like, lambda { |name|
+  scope :name_like, lambda { |name, search_pseudonyms: true|
     next none if name.strip.empty?
 
     scopes = []
@@ -301,8 +301,10 @@ class User < ActiveRecord::Base
       base_scope = except(:select, :order, :group, :having)
       scopes << base_scope.where(wildcard("users.name", name))
       scopes << base_scope.where(wildcard("users.short_name", name))
-      scopes << base_scope.joins(:pseudonyms).where(wildcard("pseudonyms.sis_user_id", name)).where(pseudonyms: { workflow_state: "active" })
-      scopes << base_scope.joins(:pseudonyms).where(wildcard("pseudonyms.unique_id", name)).where(pseudonyms: { workflow_state: "active" })
+      if search_pseudonyms
+        scopes << base_scope.joins(:pseudonyms).where(wildcard("pseudonyms.sis_user_id", name)).where(pseudonyms: { workflow_state: "active" })
+        scopes << base_scope.joins(:pseudonyms).where(wildcard("pseudonyms.unique_id", name)).where(pseudonyms: { workflow_state: "active" })
+      end
     end
 
     scopes.map!(&:to_sql)

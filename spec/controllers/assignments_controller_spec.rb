@@ -2609,4 +2609,33 @@ describe AssignmentsController do
       end
     end
   end
+
+  describe "GET 'peer reviews'" do
+    before do
+      user_session(@teacher)
+      @assignment = @course.assignments.create(title: "Peer Review Assignment", workflow_state: "published")
+      @assignment.update!(peer_reviews: true, submission_types: "text_entry")
+      @student2 = User.create!(name: "Sam")
+      @student3 = User.create!(name: "Samantha")
+      @student4 = User.create!(name: "Jim")
+      @course.enroll_user(@student2, "StudentEnrollment", enrollment_state: "active")
+      @course.enroll_user(@student3, "StudentEnrollment", enrollment_state: "active")
+      @course.enroll_user(@student4, "StudentEnrollment", enrollment_state: "active")
+    end
+
+    it "students instance variable contains students who match the search term parameter" do
+      get "peer_reviews", params: { course_id: @course.id, assignment_id: @assignment.id, search_term: "Sa" }
+      expect(assigns[:students]).to include(have_attributes(name: "Sam"), have_attributes(name: "Samantha"))
+    end
+
+    it "students intance variable has no students when search term parameter does not match any student names" do
+      get "peer_reviews", params: { course_id: @course.id, assignment_id: @assignment.id, search_term: "Hello World" }
+      expect(assigns[:students].length).to eq(0)
+    end
+
+    it "all visible students are listed in the assign peer review dropdown" do
+      get "peer_reviews", params: { course_id: @course.id, assignment_id: @assignment.id, search_term: "Sa" }
+      expect(assigns[:students_dropdown_list].length).to eq(4)
+    end
+  end
 end
