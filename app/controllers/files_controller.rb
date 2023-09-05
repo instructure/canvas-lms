@@ -1041,10 +1041,11 @@ class FilesController < ApplicationController
     @context = model.where(id: params[:context_id]).first
 
     @attachment = if params.key?(:precreated_attachment_id)
-                    att = Attachment.find(params[:precreated_attachment_id])
+                    att = Attachment.where(id: params[:precreated_attachment_id]).take
                     if att.nil?
                       reject! "Requested to use precreated attachment, but attachment with id #{params[:precreated_attachment_id]} doesn't exist", 422
                     else
+                      att.file_state = "available"
                       att
                     end
                   else

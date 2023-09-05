@@ -1727,6 +1727,40 @@ describe FilesController do
           end
         end
       end
+
+      context "with precreated attachment" do
+        let(:attachment) do
+          folder.attachments.create!(
+            context: course,
+            user:,
+            file_state: "deleted"
+          )
+        end
+
+        let(:params) do
+          super().merge(
+            precreated_attachment_id: attachment.id
+          )
+        end
+
+        it "marks attachment available" do
+          post("api_capture", params:)
+          expect(attachment.reload.file_state).to eq "available"
+        end
+
+        context "when id is wrong" do
+          let(:params) do
+            super().merge(
+              precreated_attachment_id: attachment.id + 42
+            )
+          end
+
+          it "returns an error" do
+            post("api_capture", params:)
+            assert_status(422)
+          end
+        end
+      end
     end
 
     context "sharding" do
