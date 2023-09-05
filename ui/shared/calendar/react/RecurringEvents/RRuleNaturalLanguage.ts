@@ -110,7 +110,8 @@ export default function RRuleToNaturalLanguage(rrule: string, locale: string, ti
   }
 
   function format_month_day(month: number, monthdate: number): string {
-    const m = moment({M: month - 1, d: monthdate}).tz(timezone)
+    // 2024 is a leap year and can handle formatting 2/29
+    const m = moment({y: 2024, M: month - 1, d: monthdate}).tz(timezone)
     return monthday_formatter(m.toDate())
   }
 

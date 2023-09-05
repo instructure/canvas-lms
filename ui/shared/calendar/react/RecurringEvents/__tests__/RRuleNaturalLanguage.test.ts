@@ -289,6 +289,15 @@ describe('RRuleToNaturalLanguage', () => {
             )
             expect(str).toEqual(`Annually on Jul 28 until ${format_date(until.toDate())}`)
           })
+
+          it('on a leap day', () => {
+            const str = RRuleToNaturalLanguage(
+              'FREQ=YEARLY;BYMONTH=2;BYMONTHDAY=29;INTERVAL=1;COUNT=3',
+              locale,
+              timezone
+            )
+            expect(str).toEqual('Annually on Feb 29, 3 times')
+          })
         })
         describe('on a day of the week', () => {
           it('with count', () => {
