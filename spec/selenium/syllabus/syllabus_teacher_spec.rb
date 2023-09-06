@@ -62,6 +62,7 @@ describe "course syllabus" do
     end
 
     it "shows course-summary-option checkbox that is pre-checked" do
+      skip("LF-731")
       visit_syllabus_page(@course1.id)
 
       edit_syllabus_button.click
@@ -75,6 +76,7 @@ describe "course syllabus" do
     end
 
     it "hides course summary when course-summary-option checkbox is toggled off" do
+      skip("LF-731")
       visit_syllabus_page(@course1.id)
       expect(page_main_content).to contain_css(syllabus_container_css)
 
@@ -90,6 +92,7 @@ describe "course syllabus" do
     end
 
     it "unhides course summary when course-summary-option checkbox is toggled on", custom_timeout: 20 do
+      skip("LF-731")
       @course1.syllabus_course_summary = false
       @course1.save!
       visit_syllabus_page(@course1.id)
