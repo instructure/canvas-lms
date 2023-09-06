@@ -43,6 +43,7 @@ import {
   GradingSchemeInputHandle,
 } from './form/GradingSchemeInput'
 import {defaultPointsGradingScheme} from '../../defaultPointsGradingScheme'
+import {canManageAccountGradingSchemes} from '../helpers/gradingSchemePermissions'
 
 // Doing this to avoid TS2339 errors -- TODO: remove once we're on InstUI 8
 const {Item} = Flex as any
@@ -59,7 +60,7 @@ interface GradingSchemeTemplateCardData {
   gradingSchemeTemplate: GradingSchemeTemplate
 }
 
-interface ComponentProps {
+export interface GradingSchemesManagementProps {
   contextId: string
   contextType: 'Account' | 'Course'
   onGradingSchemesChanged?: () => any
@@ -71,7 +72,7 @@ export const GradingSchemesManagement = ({
   contextId,
   onGradingSchemesChanged,
   pointsBasedGradingSchemesEnabled,
-}: ComponentProps) => {
+}: GradingSchemesManagementProps) => {
   const {createGradingScheme /* createGradingSchemeStatus */} = useGradingSchemeCreate()
   const {deleteGradingScheme /* deleteGradingSchemeStatus */} = useGradingSchemeDelete()
   const {updateGradingScheme /* deleteGradingSchemeStatus */} = useGradingSchemeUpdate()
@@ -265,6 +266,9 @@ export const GradingSchemesManagement = ({
       return false
     }
     if (!gradingScheme.permissions.manage) {
+      return false
+    }
+    if (!canManageAccountGradingSchemes(contextType, gradingScheme.context_type)) {
       return false
     }
     return !gradingScheme.assessed_assignment

@@ -40,10 +40,11 @@ import {
 } from '../../gradingSchemeApiModel'
 import {defaultPointsGradingScheme} from '../../defaultPointsGradingScheme'
 import {useDefaultGradingScheme} from '../hooks/useDefaultGradingScheme'
+import {canManageAccountGradingSchemes} from '../helpers/gradingSchemePermissions'
 
 const I18n = useI18nScope('GradingSchemeManagement')
 
-export interface ComponentProps {
+export interface GradingSchemeViewEditModalProps {
   contextType: 'Account' | 'Course'
   contextId: string
   gradingSchemeId: string
@@ -53,7 +54,7 @@ export interface ComponentProps {
   onDelete?: () => any
 }
 
-export const GradingSchemeViewEditModal: React.FC<ComponentProps> = ({
+export const GradingSchemeViewEditModal: React.FC<GradingSchemeViewEditModalProps> = ({
   contextType,
   contextId,
   gradingSchemeId,
@@ -163,6 +164,9 @@ export const GradingSchemeViewEditModal: React.FC<ComponentProps> = ({
   function canManageScheme(scheme: GradingScheme | undefined) {
     if (!scheme) return false
     if (!scheme.permissions.manage) {
+      return false
+    }
+    if (!canManageAccountGradingSchemes(contextType, scheme.context_type)) {
       return false
     }
     return !scheme.assessed_assignment
