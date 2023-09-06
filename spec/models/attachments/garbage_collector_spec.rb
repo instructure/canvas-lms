@@ -56,6 +56,30 @@ describe Attachments::GarbageCollector do
       expect(att2.root_attachment_id).to be_nil
     end
 
+    it "reparents if multiple child attachments aren't old enough" do
+      Attachment.where(id: att.id).update_all(created_at: 2.days.ago)
+      export2 = course.content_exports.create!
+      att2 = attachment_model(
+        context: export2,
+        folder: nil,
+        root_attachment_id: att.id,
+        uploaded_data: stub_file_data("folder.zip", "hi", "application/zip")
+      )
+      att3 = attachment_model(
+        context: export2,
+        folder: nil,
+        root_attachment_id: att.id,
+        uploaded_data: stub_file_data("folder.zip", "hi", "application/zip")
+      )
+
+      gc.delete_content
+      expect(att.reload).to be_deleted
+      expect(att2.reload).not_to be_deleted
+      expect(att2.root_attachment_id).to be_nil
+      expect(att3.reload).not_to be_deleted
+      expect(att3.root_attachment_id).to be_nil
+    end
+
     it "properly delineates child attachment age" do
       export2 = course.content_exports.create!
       att2 = attachment_model(
