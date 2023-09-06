@@ -39,6 +39,27 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('planner')
 
+const getAriaLabel = (itemType, itemTitle) => {
+  switch (itemType) {
+    case 'Assignment':
+      return I18n.t('Assignment, %{itemTitle}', {itemTitle: itemTitle})
+    case 'Quiz':
+      return I18n.t('Quiz, %{itemTitle}', {itemTitle: itemTitle})
+    case 'Discussion':
+      return I18n.t('Discussion, %{itemTitle}', {itemTitle: itemTitle})
+    case 'Announcement':
+      return I18n.t('Announcment, %{itemTitle}', {itemTitle: itemTitle})
+    case 'Calendar Event':
+      return I18n.t('Calendar Event, %{itemTitle}', {itemTitle: itemTitle})
+    case 'Page':
+      return I18n.t('Page, %{itemTitle}', {itemTitle: itemTitle})
+    case 'Peer Review':
+      return I18n.t('Peer Review, %{itemTitle}', {itemTitle: itemTitle})
+    default:
+      return I18n.t('To Do, %{itemTitle}', {itemTitle: itemTitle})
+  }
+}
+
 const getIconComponent = itemType => {
   switch (itemType) {
     case 'Assignment':
@@ -113,12 +134,15 @@ export default class ToDoItem extends React.Component {
         elementRef={elt => {
           this.linkRef = elt
         }}
+        aria-label={getAriaLabel(this.props.item.type, this.props.item.title)}
         href={this.props.item.html_url}
       >
         {title}
       </Link>
     ) : (
-      <Text>{title}</Text>
+      <Text aria-label={getAriaLabel(this.props.item.type, this.props.item.title)}>
+        {title}
+      </Text>
     )
 
     return (
