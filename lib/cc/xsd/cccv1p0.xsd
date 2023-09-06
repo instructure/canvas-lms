@@ -782,6 +782,9 @@
               <xs:element name="end_at" type="optional_dateTime" minOccurs="0"/>
               <xs:element name="all_day_date" type="xs:date" minOccurs="0"/>
               <xs:element name="all_day" type="xs:boolean" minOccurs="0"/>
+              <xs:element name="rrule" type="xs:string" minOccurs="0"/>
+              <xs:element name="series_uuid" type="xs:string" minOccurs="0"/>
+              <xs:element name="series_head" type="xs:boolean" minOccurs="0"/>
             </xs:all>
             <xs:attribute name="identifier" type="xs:ID" use="required"/>
           </xs:complexType>
