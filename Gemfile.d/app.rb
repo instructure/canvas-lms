@@ -61,7 +61,7 @@ gem "diplomat", "~> 2.6", require: false
 gem "ims-lti", "~> 2.3", require: "ims"
 gem "rrule", "~> 0.5", require: false
 
-gem "inst_access", "0.1.2"
+gem "inst_access", "~> 0.4"
 gem "inst_statsd", "~> 3.0"
 gem "inst-jobs", "~> 3.1"
 gem "inst-jobs-autoscaling", "2.1.1"
