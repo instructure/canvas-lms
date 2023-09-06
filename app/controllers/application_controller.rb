@@ -1555,7 +1555,9 @@ class ApplicationController < ActionController::Base
 
         redirect_url = remove_query_params(request.original_url, "session_token")
         # do one final redirect to get the token out of the URL
-        if Setting.get("interop_8200_session_token_redirect", nil) == "true"
+        canvas_domain = HostUrl.context_host(@domain_root_account, request.host)
+        if Setting.get("interop_8200_session_token_redirect", nil) == "true" ||
+           Setting.get("interop_8200_session_token_redirect/#{canvas_domain}", nil) == "true"
           # html redirect?
           render template: "shared/html_redirect",
                  layout: false,
