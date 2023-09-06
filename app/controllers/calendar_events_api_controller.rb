@@ -191,16 +191,17 @@ require "rrule"
 #           "type": "uuid"
 #         },
 #         "rrule": {
-#           "description": "An iCalendar RRULE for defining how events in a recurring event series repeat.",
+#           "description": "An iCalendar RRULE for defining how events in a recurring event series repeat. Valid if the calendar_series flag is enabled",
 #           "type": "string"
 #         },
 #         "series_head": {
-#            "description": "Boolean indicating if is the first event in the series of recurring events.",
+#            "description": "Boolean indicating if is the first event in the series of recurring events. Valid if the calendar_series flag is enabled",
 #            "type": "boolean"
 #         },
 #         "series_natural_language": {
-#            "description": "A natural language expression of how events occur in the series. (e.g. Daily, 2 times)",
-#            "type": "string"
+#            "description": "A natural language expression of how events occur in the series. Valid if the calendar_series flag is enabled",
+#            "type": "string",
+#            "example": "Daily 5 times"
 #         },
 #         "blackout_date": {
 #           "description": "Boolean indicating whether this has blackout date.",
@@ -298,6 +299,20 @@ require "rrule"
 #           "description": "Boolean indicating whether this has important dates.",
 #           "example": true,
 #           "type": "boolean"
+#         },
+#         "rrule": {
+#           "description": "An iCalendar RRULE for defining how events in a recurring event series repeat. Valid if the calendar_series flag is enabled",
+#           "type": "string",
+#           "example": "FREQ=DAILY;INTERVAL=1;COUNT=5"
+#         },
+#         "series_head": {
+#            "description": "Trueif this is the first event in the series of recurring events. Valid if the calendar_series flag is enabled",
+#            "type": "boolean"
+#         },
+#         "series_natural_language": {
+#            "description": "A natural language expression of how events occur in the series. Valid if the calendar_series flag is enabled",
+#            "type": "string",
+#            "example": "Daily 5 times"
 #         }
 #       }
 #     }
@@ -344,7 +359,7 @@ class CalendarEventsApiController < ApplicationController
   # @argument excludes[] [Array]
   #   Array of attributes to exclude. Possible values are "description", "child_events" and "assignment"
   # @argument includes[] [Array]
-  #   Array of optional attributes to include. Possible values are "web_conference", "series_head" and "series_natural_language"
+  #   Array of optional attributes to include. Possible values are "web_conference" and if calendar_series flag is on, "series_natural_language"
   # @argument important_dates [Boolean]
   #   Defaults to false.
   #   If true, only events with important dates set to true will be returned.
@@ -393,7 +408,7 @@ class CalendarEventsApiController < ApplicationController
   #   When type is "assignment", specifies the submission types to be excluded from the returned
   #   assignments. Ignored if type is not "assignment".
   # @argument includes[] [Array]
-  #   Array of optional attributes to include. Possible values are "web_conference", "series_head" and "series_natural_language"
+  #   Array of optional attributes to include. Possible values are "web_conference" and if the calendar_series flag is on, "series_natural_language"
   # @argument important_dates [Boolean]
   #   Defaults to false
   #   If true, only events with important dates set to true will be returned.
@@ -512,7 +527,7 @@ class CalendarEventsApiController < ApplicationController
   #   this parameter replaces the calendar_event's duplicate parameter to
   #   create a series of recurring events.
   #   Its value is the {https://icalendar.org/iCalendar-RFC-5545/3-8-5-3-recurrence-rule.html iCalendar RRULE}
-  #   defining how the event repeats, though unending series not supported.
+  #   defining how the event repeats. Unending series not supported.
   # @argument calendar_event[blackout_date] [Boolean]
   #   If the blackout_date is true, this event represents a holiday or some
   #   other special day that does not count in course pacing.
@@ -722,12 +737,14 @@ class CalendarEventsApiController < ApplicationController
   #   Valid if the calendar_series feature is enabled and the event whose
   #   ID is in the URL is part of a series.
   #   This defines the shape of the recurring event series after it's updated.
-  #   Its value is the iCalendar RRULE, though unending series not supported.
+  #   Its value is the iCalendar RRULE. Unending series are not supported.
   # @argument which [Optional, String, "one"|"all"|"following"]
   #   Valid if the calendar_series feature is enabled and the event whose
   #   ID is in the URL is part of a series.
   #   Update just the event whose ID is in in the URL, all events
   #   in the series, or the given event and all those following.
+  #   Some updates may create a new series. For example, changing the start time
+  #   of this and all following events from the middle of a series.
   # @argument calendar_event[blackout_date] [Boolean]
   #   If the blackout_date is true, this event represents a holiday or some
   #   other special day that does not count in course pacing.
@@ -917,6 +934,8 @@ class CalendarEventsApiController < ApplicationController
   #       - use the start_at from the target_event
   #       - limit the dtstart dates generated by the rrule to the
   #         number of affected events.
+  #       - update the RRULE for the events left behind in the original series
+  #         to reflect it's new shorter length.
   #  4. If the RRULE changed, only which=="all" or "following" apply
   #     a. if which="all",
   #        - regenerate the list of dtstarts using the first event's start_at
@@ -924,6 +943,8 @@ class CalendarEventsApiController < ApplicationController
   #     b. if which="following",
   #        - start a new series for the affected events.
   #        - the same as "all", but for the subset of affected events
+  #        - will split the series in two, creating a new series for the updated
+  #          events, and updating the original series to reflect it's new shorter length.
   #   5. If the date-time and RRULE changed, deal with that too.
   #
   def update_from_series(target_event, params_for_update, which)
