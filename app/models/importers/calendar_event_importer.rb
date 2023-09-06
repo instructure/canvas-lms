@@ -24,8 +24,14 @@ module Importers
 
     def self.process_migration(data, migration)
       events = data["calendar_events"] || []
+      series_identifiers = {}
       events.each do |event|
         next unless migration.import_object?("calendar_events", event["migration_id"]) || migration.import_object?("events", event["migration_id"])
+
+        if event["series_uuid"]
+          series_identifiers[event["series_uuid"]] = SecureRandom.uuid unless series_identifiers[event["series_uuid"]]
+          event["series_uuid"] = series_identifiers[event["series_uuid"]]
+        end
 
         begin
           import_from_migration(event, migration.context, migration)
@@ -53,6 +59,9 @@ module Importers
       item.start_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:start_at] || hash[:start_date])
       item.end_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:end_at] || hash[:end_date])
       item.all_day_date = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:all_day_date]).try(:to_date)
+      item.rrule = hash[:rrule]
+      item.series_uuid = hash[:series_uuid]
+      item.series_head = hash[:series_head]
       item.imported = true
 
       item.save_without_broadcasting!

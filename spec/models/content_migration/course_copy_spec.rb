@@ -918,9 +918,14 @@ describe ContentMigration do
       cal3 = @copy_from.calendar_events.create!(title: "deleted event")
       cal3.destroy
 
+      series_uuid = "8233ffdc-9067-4eaf-a726-19c3718dab29"
+      rrule = "FREQ=DAILY;INTERVAL=1;UNTIL=20241001T055959Z"
+      cal4 = @copy_from.calendar_events.create!(series_uuid:, rrule:, series_head: true)
+      cal5 = @copy_from.calendar_events.create!(series_uuid:, rrule:)
+
       run_course_copy
 
-      expect(@copy_to.calendar_events.count).to eq 2
+      expect(@copy_to.calendar_events.count).to eq 4
       cal_2 = @copy_to.calendar_events.where(migration_id: mig_id(cal)).first
       expect(cal_2.title).to eq cal.title
       expect(cal_2.start_at.to_i).to eq cal.start_at.to_i
@@ -934,6 +939,15 @@ describe ContentMigration do
       expect(cal2_2.start_at.to_i).to eq cal2.start_at.to_i
       expect(cal2_2.end_at.to_i).to eq cal2.end_at.to_i
       expect(cal2_2.description).to eq ""
+
+      cal_4 = @copy_to.calendar_events.where(migration_id: mig_id(cal4)).first
+      expect(cal_4.series_head).to be_truthy
+
+      cal_5 = @copy_to.calendar_events.where(migration_id: mig_id(cal5)).first
+      expect(cal_5.rrule).to eq rrule
+      expect(cal_5.series_head).to be_nil
+      expect(cal_5.series_uuid).to be_truthy
+      expect(cal_5.series_uuid).to eq cal_4.series_uuid
     end
 
     it "does not leave link placeholders on catastrophic failure" do
