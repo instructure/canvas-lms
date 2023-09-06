@@ -115,7 +115,7 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.12.0)
     rspec-support (3.12.1)
-    sentry-ruby (5.10.0)
+    sentry-ruby (5.11.0)
       concurrent-ruby (~> 1.0, >= 1.0.2)
     statsd-ruby (1.5.0)
     thor (1.2.2)
