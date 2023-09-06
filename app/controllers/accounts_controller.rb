@@ -1612,7 +1612,6 @@ class AccountsController < ApplicationController
       can_create_courses: @account.grants_any_right?(@current_user, session, :manage_courses, :create_courses),
       can_create_users: @account.root_account.grants_right?(@current_user, session, :manage_user_logins),
       analytics: @account.service_enabled?(:analytics),
-      can_temp_enroll: @account.grants_right?(@current_user, session, :manage_temp_enroll_add),
       can_read_sis: @account.grants_right?(@current_user, session, :read_sis),
       can_masquerade: @account.grants_right?(@current_user, session, :become_user),
       can_message_users: @account.grants_right?(@current_user, session, :send_messages),
@@ -1626,6 +1625,12 @@ class AccountsController < ApplicationController
         ),
       can_create_enrollments: @account.grants_any_right?(@current_user, session, *add_enrollment_permissions(@account))
     }
+    if @account.root_account.feature_enabled?(:temporary_enrollments)
+      js_permissions[:can_add_temporary_enrollments] =
+        @account.grants_right?(@current_user, session, :temporary_enrollments_add)
+      js_permissions[:can_view_temporary_enrollments] =
+        @account.grants_any_right?(@current_user, session, *RoleOverride::MANAGE_TEMPORARY_ENROLLMENT_PERMISSIONS)
+    end
     if @account.root_account.feature_enabled?(:granular_permissions_manage_users)
       js_permissions[:can_allow_course_admin_actions] = @account.grants_right?(@current_user, session, :allow_course_admin_actions)
       js_permissions[:can_add_ta] = @account.grants_right?(@current_user, session, :add_ta_to_course)

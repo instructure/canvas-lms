@@ -72,7 +72,12 @@ export default class UsersPane extends React.Component {
 
     // make page reflect what the querystring params asked for
     const {search_term, role_filter_id} = {...UsersToolbar.defaultProps, ...this.props.queryParams}
-    this.props.store.dispatch(UserActions.updateSearchFilter({search_term, role_filter_id}))
+    this.props.store.dispatch(
+      UserActions.updateSearchFilter({
+        search_term,
+        role_filter_id,
+      })
+    )
 
     this.props.store.dispatch(UserActions.applySearchFilter(MIN_SEARCH_LENGTH))
   }

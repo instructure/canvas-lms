@@ -448,7 +448,9 @@ class UsersController < ApplicationController
                                      sort: params[:sort],
                                      enrollment_role_id: params[:role_filter_id],
                                      enrollment_type: params[:enrollment_type],
-                                     ui_invoked: includes.include?("ui_invoked")
+                                     ui_invoked: includes.include?("ui_invoked"),
+                                     temporary_enrollment_recipients: value_to_boolean(params[:temporary_enrollment_recipients]),
+                                     temporary_enrollment_providers: value_to_boolean(params[:temporary_enrollment_providers])
                                    })
       users = users.with_last_login if params[:sort] == "last_login"
     end

@@ -628,9 +628,9 @@ describe RoleOverride do
     end
 
     describe "manage_temp_enroll" do
-      let(:add_perm) { RoleOverride.permissions[:manage_temp_enroll_add] }
-      let(:edit_perm) { RoleOverride.permissions[:manage_temp_enroll_edit] }
-      let(:del_perm) { RoleOverride.permissions[:manage_temp_enroll_delete] }
+      let(:add_perm) { RoleOverride.permissions[:temporary_enrollments_add] }
+      let(:edit_perm) { RoleOverride.permissions[:temporary_enrollments_edit] }
+      let(:del_perm) { RoleOverride.permissions[:temporary_enrollments_delete] }
 
       it "is true for AccountAdmin by default" do
         expect(edit_perm[:true_for]).to match_array ["AccountAdmin"]

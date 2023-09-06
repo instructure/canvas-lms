@@ -44,7 +44,7 @@ export default function UsersListRow({
 }) {
   // don't show tempEnroll if permission to create enrollments are missing
   const canTempEnroll =
-    permissions.can_temp_enroll &&
+    permissions.can_add_temporary_enrollments &&
     (permissions.can_manage_admin_users ||
       (permissions.can_add_designer &&
         permissions.can_add_student &&
