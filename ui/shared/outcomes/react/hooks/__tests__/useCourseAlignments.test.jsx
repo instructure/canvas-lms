@@ -268,4 +268,23 @@ describe('useCourseAlignments', () => {
       'Outcome 2 - Refetched',
     ])
   })
+
+  it('should wait to load outcomes when arg is true', async () => {
+    const {result, rerender} = renderHook(({shouldWait}) => useCourseAlignments(shouldWait), {
+      wrapper, initialProps: { shouldWait: true }
+    })
+
+    expect(result.current.loading).toBe(false)
+    await act(async () => jest.runAllTimers())
+    expect(result.current.loading).toBe(false)
+    expect(result.current.rootGroup).toBe(null)
+
+    rerender({shouldWait: false})
+
+    expect(result.current.loading).toBe(true)
+    await act(async () => jest.runAllTimers())
+    expect(result.current.loading).toBe(false)
+    expect(result.current.rootGroup).not.toBe(null)
+    expect(result.current.rootGroup._id).toBe('1')
+  })
 })

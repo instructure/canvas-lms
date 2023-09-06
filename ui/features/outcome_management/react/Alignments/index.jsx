@@ -49,7 +49,7 @@ const AlignmentSummary = () => {
     onSearchChangeHandler: updateSearch,
     onSearchClearHandler: clearSearch,
     onFilterChangeHandler: updateFilter,
-  } = useCourseAlignments()
+  } = useCourseAlignments(loadingAlignmentStats)
 
   const [showSingleLoader, setShowSingleLoader] = useState(true)
 

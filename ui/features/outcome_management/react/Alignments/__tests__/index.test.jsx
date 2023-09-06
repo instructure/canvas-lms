@@ -23,6 +23,9 @@ import {createCache} from '@canvas/apollo'
 import {MockedProvider} from '@apollo/react-testing'
 import {courseAlignmentStatsMocks} from '@canvas/outcomes/mocks/Management'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
+import useCourseAlignments from '@canvas/outcomes/react/hooks/useCourseAlignments'
+
+jest.mock('@canvas/outcomes/react/hooks/useCourseAlignments', () => jest.fn())
 
 describe('AlignmentSummary', () => {
   let cache
@@ -30,6 +33,7 @@ describe('AlignmentSummary', () => {
   beforeEach(() => {
     jest.useFakeTimers()
     cache = createCache()
+    mockUseCourseAlignments()
   })
 
   afterEach(() => {
@@ -54,7 +58,18 @@ describe('AlignmentSummary', () => {
     )
   }
 
+  const mockUseCourseAlignments = (loading = false) => useCourseAlignments.mockImplementation(() => ({
+    rootGroup: {_id: "1", outcomesCount: 10},
+    loading,
+    loadMore: jest.fn(),
+    searchString: "",
+    onSearchChangeHandler: jest.fn(),
+    onSearchClearHandler: jest.fn(),
+    onFilterChangeHandler: jest.fn(),
+  }))
+
   it('renders single loader while loading data', () => {
+    mockUseCourseAlignments(true)
     const {getByTestId, queryByTestId} = render(<AlignmentSummary />)
     expect(getByTestId('outcome-alignment-summary-loader')).toBeInTheDocument()
     expect(queryByTestId('outcome-item-list-loader')).not.toBeInTheDocument()
@@ -63,6 +78,15 @@ describe('AlignmentSummary', () => {
   it('renders component after data is loaded', async () => {
     const {getByTestId} = render(<AlignmentSummary />)
     await act(async () => jest.runOnlyPendingTimers())
+    expect(getByTestId('outcome-alignment-summary')).toBeInTheDocument()
+  })
+
+  it('makes graphql calls to first get alignment stats and then outcome alignments', async () => {
+    const {getByTestId} = render(<AlignmentSummary />)
+    expect(getByTestId('outcome-alignment-summary-loader')).toBeInTheDocument()
+    expect(useCourseAlignments).toHaveBeenCalledWith(true)
+    await act(async () => jest.runOnlyPendingTimers())
+    expect(useCourseAlignments).toHaveBeenCalledWith(false)
     expect(getByTestId('outcome-alignment-summary')).toBeInTheDocument()
   })
 })
