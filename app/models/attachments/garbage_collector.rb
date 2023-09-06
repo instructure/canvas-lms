@@ -38,13 +38,11 @@ class Attachments::GarbageCollector
                                       .where.not(context_type:)
                                       .where.not(root_attachment_id: nil) # postgres is being weird
                                       .order([:root_attachment_id, :id])
-                                      .select("distinct on (attachments.root_attachment_id) attachments.*")
                                       .group_by(&:root_attachment_id)
         same_type_children = Attachment.where(root_attachment: to_delete)
                                        .not_deleted
                                        .where(context_type:)
                                        .where.not(root_attachment_id: nil) # postgres is being weird
-                                       .select("distinct on (attachments.root_attachment_id) attachments.*")
                                        .group_by(&:root_attachment_id)
 
         to_delete_ids = []
@@ -54,10 +52,13 @@ class Attachments::GarbageCollector
           older_same_type_children = (same_type_children[att.id] || []) - younger_same_type_children
 
           if non_type_children[att.id].present? || younger_same_type_children.present?
-            stats[:reparent] += 1
+            to_orphan = (non_type_children[att.id] || []) + younger_same_type_children
+            stats[:reparent] += to_orphan.length
             # make_childless separates this object and copies the content to
             # a new root attachment, so we still want to delete the content here.
-            att.make_childless(non_type_children[att.id]&.first || younger_same_type_children.first)
+            to_orphan.each do |child_att|
+              att.make_childless(child_att)
+            end
           elsif att.filename.present?
             stats[:destroyed] += 1
           end
@@ -75,7 +76,7 @@ class Attachments::GarbageCollector
           Attachment.where(id: to_delete_ids).update_all(updates)
         end
 
-        next unless to_break_ids.empty?
+        next if to_break_ids.empty?
 
         stats[:marked_broken] += to_delete_ids.count
         updates = { workflow_state: "deleted", file_state: "broken", deleted_at: Time.now.utc }
@@ -183,6 +184,30 @@ class Attachments::GarbageCollector
       SQL
                                       .where(attachments: { workflow_state: "deleted", file_state: "deleted" })
       while cm_null_scope.limit(1000).update_all(attachment_id: nil) > 0; end
+
+      cm_null_scope = ContentMigration.joins(<<~SQL.squish)
+        INNER JOIN #{Attachment.quoted_table_name}
+        ON attachments.context_type IN ('ContentMigration', 'ContentExport')
+        AND content_migrations.overview_attachment_id = attachments.id
+      SQL
+                                      .where(attachments: { workflow_state: "deleted", file_state: "deleted" })
+      while cm_null_scope.limit(1000).update_all(overview_attachment_id: nil) > 0; end
+
+      cm_null_scope = ContentMigration.joins(<<~SQL.squish)
+        INNER JOIN #{Attachment.quoted_table_name}
+        ON attachments.context_type IN ('ContentMigration', 'ContentExport')
+        AND content_migrations.exported_attachment_id = attachments.id
+      SQL
+                                      .where(attachments: { workflow_state: "deleted", file_state: "deleted" })
+      while cm_null_scope.limit(1000).update_all(exported_attachment_id: nil) > 0; end
+
+      cm_null_scope = ContentMigration.joins(<<~SQL.squish)
+        INNER JOIN #{Attachment.quoted_table_name}
+        ON attachments.context_type IN ('ContentMigration', 'ContentExport')
+        AND content_migrations.asset_map_attachment_id = attachments.id
+      SQL
+                                      .where(attachments: { workflow_state: "deleted", file_state: "deleted" })
+      while cm_null_scope.limit(1000).update_all(asset_map_attachment_id: nil) > 0; end
 
       super
     end
