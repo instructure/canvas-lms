@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class CleanUpAssignmentOverrides < ActiveRecord::Migration[5.1]
+class CleanUpAssignmentOverrides < ActiveRecord::Migration[7.0]
   tag :predeploy
   disable_ddl_transaction!
 
@@ -27,19 +27,15 @@ class CleanUpAssignmentOverrides < ActiveRecord::Migration[5.1]
     # this fix is fast enough to run synchronously, without requiring a multi-deploy rollout of the check constraint
     DataFixup::RemoveInvalidAssignmentOverrides.run
     # we will break the constraint creation and validation into separate queries to reduce time spent in ex-lock
-    execute(<<~SQL.squish)
-      ALTER TABLE #{AssignmentOverride.quoted_table_name}
-      ADD CONSTRAINT require_quiz_or_assignment
-      CHECK (workflow_state='deleted' OR quiz_id IS NOT NULL OR assignment_id IS NOT NULL)
-      NOT VALID
-    SQL
-    execute("ALTER TABLE #{AssignmentOverride.quoted_table_name} VALIDATE CONSTRAINT require_quiz_or_assignment")
+    add_check_constraint(:assignment_overrides,
+                         "workflow_state='deleted' OR quiz_id IS NOT NULL OR assignment_id IS NOT NULL",
+                         name: "require_quiz_or_assignment",
+                         if_not_exists: true,
+                         validate: false)
+    validate_constraint(:assignment_overrides, :require_quiz_or_assignment)
   end
 
   def self.down
-    execute(<<~SQL.squish)
-      ALTER TABLE #{AssignmentOverride.quoted_table_name}
-      DROP CONSTRAINT IF EXISTS require_quiz_or_assignment
-    SQL
+    remove_check_constraint(:assignment_overrides, name: "require_quiz_or_assignment", if_exists: true)
   end
 end

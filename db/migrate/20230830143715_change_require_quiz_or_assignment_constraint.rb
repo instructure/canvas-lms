@@ -27,7 +27,8 @@ class ChangeRequireQuizOrAssignmentConstraint < ActiveRecord::Migration[7.0]
     # Split constraint creation and validation to reduce exclusive locking time
     add_check_constraint(:assignment_overrides,
                          "workflow_state='deleted' OR quiz_id IS NOT NULL OR assignment_id IS NOT NULL OR context_module_id IS NOT NULL",
-                         name: :require_quiz_or_assignment_or_module,
+                         name: "require_quiz_or_assignment_or_module",
+                         if_not_exists: true,
                          validate: false)
     validate_constraint(:assignment_overrides, :require_quiz_or_assignment_or_module)
   end
@@ -36,7 +37,8 @@ class ChangeRequireQuizOrAssignmentConstraint < ActiveRecord::Migration[7.0]
     remove_check_constraint(:assignment_overrides, name: "require_quiz_or_assignment_or_module", if_exists: true)
     add_check_constraint(:assignment_overrides,
                          "workflow_state='deleted' OR quiz_id IS NOT NULL OR assignment_id IS NOT NULL",
-                         name: :require_quiz_or_assignment,
+                         name: "require_quiz_or_assignment",
+                         if_not_exists: true,
                          validate: false)
     validate_constraint(:assignment_overrides, :require_quiz_or_assignment)
   end
