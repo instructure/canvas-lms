@@ -44,5 +44,7 @@ describe "CleanUpAssignmentOverrides" do
     # ensure the check constraint prevents detaching AssignmentOverrides from an assignment or quiz
     override3 = @assignment.assignment_overrides.create! set_type: "ADHOC"
     expect { override3.update_attribute(:assignment_id, nil) }.to raise_error(ActiveRecord::StatementInvalid)
+  ensure
+    CleanUpAssignmentOverrides.up
   end
 end
