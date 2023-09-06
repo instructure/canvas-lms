@@ -2518,7 +2518,7 @@ $(document).ready(function () {
     )
   }
 
-  function renderDifferentiatedModulesTray(open, returnFocusTo, settingsProps) {
+  function renderDifferentiatedModulesTray(open, returnFocusTo, moduleElement, settingsProps) {
     ReactDOM.render(
       <DifferentiatedModulesTray
         open={open}
@@ -2528,6 +2528,7 @@ $(document).ready(function () {
         }}
         initialTab='assign-to'
         assignOnly={false}
+        moduleElement={moduleElement}
         {...settingsProps}
       />,
       document.getElementById('differentiated-modules-mount-point')
@@ -2571,8 +2572,9 @@ $(document).ready(function () {
   $('.assign_module_link').on('click keyclick', function (event) {
     event.preventDefault()
     const returnFocusTo = $(event.target).closest('ul').prev('.al-trigger')
-    const settingsProps = parseModule($(event.target).parents('.context_module')[0])
-    renderDifferentiatedModulesTray(true, returnFocusTo, settingsProps)
+    const moduleElement = $(event.target).parents('.context_module')[0]
+    const settingsProps = parseModule(moduleElement)
+    renderDifferentiatedModulesTray(true, returnFocusTo, moduleElement, settingsProps)
   })
 })
 

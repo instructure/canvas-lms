@@ -27,7 +27,7 @@ import Footer from './Footer'
 import DateTimeInput from '@canvas/datetime/react/components/DateTimeInput'
 import {defaultState, actions, reducer} from './settingsReducer'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {convertModuleSettingsForApi} from '../utils/moduleHelpers'
+import {convertModuleSettingsForApi, updateModuleUI} from '../utils/moduleHelpers'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
@@ -39,12 +39,14 @@ const {Item: FlexItem} = Flex as any
 export interface SettingsPanelProps {
   height: string
   onDismiss: () => void
+  moduleElement: HTMLDivElement
   moduleId: string
   moduleName?: string
   unlockAt?: string
 }
 
 export default function SettingsPanel({
+  moduleElement,
   height,
   onDismiss,
   moduleId,
@@ -74,6 +76,7 @@ export default function SettingsPanel({
     })
       .then(() => {
         onDismiss()
+        updateModuleUI(moduleElement, state)
         showFlashAlert({
           type: 'success',
           message: I18n.t('%{moduleName} settings updated successfully.', {

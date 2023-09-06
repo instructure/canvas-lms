@@ -37,6 +37,7 @@ const {Item: FlexItem} = Flex as any
 export interface DifferentiatedModulesTrayProps {
   open: boolean
   onDismiss: () => void
+  moduleElement: HTMLDivElement
   moduleId?: string
   initialTab?: 'settings' | 'assign-to'
   assignOnly?: boolean
@@ -50,6 +51,7 @@ const AssignToPanel = React.lazy(() => import('./AssignToPanel'))
 export default function DifferentiatedModulesTray({
   open,
   onDismiss,
+  moduleElement,
   moduleId = '',
   initialTab = 'assign-to',
   assignOnly = true,
@@ -111,6 +113,7 @@ export default function DifferentiatedModulesTray({
               <SettingsPanel
                 height={panelHeight}
                 onDismiss={onDismiss}
+                moduleElement={moduleElement}
                 moduleId={moduleId}
                 {...settingsProps}
               />

@@ -27,6 +27,7 @@ jest.mock('@canvas/do-fetch-api-effect')
 
 describe('SettingsPanel', () => {
   const props: SettingsPanelProps = {
+    moduleElement: document.createElement('div'),
     moduleId: '1',
     moduleName: 'Week 1',
     unlockAt: '',

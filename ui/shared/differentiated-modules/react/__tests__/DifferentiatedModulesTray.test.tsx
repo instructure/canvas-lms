@@ -26,6 +26,7 @@ describe('DifferentiatedModulesTray', () => {
   const props: DifferentiatedModulesTrayProps = {
     open: true,
     onDismiss: () => {},
+    moduleElement: document.createElement('div'),
     initialTab: 'assign-to',
     assignOnly: true,
   }
