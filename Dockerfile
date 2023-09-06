@@ -19,6 +19,7 @@ ENV LC_ALL en_US.UTF-8
 ARG CANVAS_RAILS=7.0
 ENV CANVAS_RAILS=${CANVAS_RAILS}
 
+ENV NODE_OPTIONS=--openssl-legacy-provider
 ENV YARN_VERSION 1.19.1-1
 ENV BUNDLER_VERSION 2.3.26
 ENV GEM_HOME /home/docker/.gem/$RUBY
@@ -35,7 +36,7 @@ ARG USER_ID
 RUN if [ -n "$USER_ID" ]; then usermod -u "${USER_ID}" docker \
         && chown --from=9999 docker /usr/src/nginx /usr/src/app -R; fi
 
-RUN curl -sL https://deb.nodesource.com/setup_16.x | bash - \
+RUN curl -sL https://deb.nodesource.com/setup_18.x | bash - \
   && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
   && echo "deb https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list \
   && printf 'path-exclude /usr/share/doc/*\npath-exclude /usr/share/man/*' > /etc/dpkg/dpkg.cfg.d/01_nodoc \
