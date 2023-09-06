@@ -1311,6 +1311,83 @@ describe "Users API", type: :request do
           expect(json.fetch("last_login")).to eq @p.current_login_at.iso8601
         end
       end
+
+      describe "Temporary Enrollments" do
+        let_once(:temporary_enrollment_provider) { user_factory(name: "provider", active_all: true) }
+        let_once(:temporary_enrollment_recipient) { user_factory(name: "recipient", active_all: true) }
+        let_once(:temp_course) { course_with_teacher(active_all: true, user: temporary_enrollment_provider).course }
+        let_once(:temp_enrollment) do
+          temp_course.enroll_user(
+            temporary_enrollment_recipient,
+            "TeacherEnrollment",
+            { role: teacher_role, temporary_enrollment_source_user_id: temporary_enrollment_provider.id }
+          )
+        end
+        let_once(:subject) { account_admin_user(account: temp_course.account) }
+
+        before do
+          temp_enrollment.update!(temporary_enrollment_source_user_id: temporary_enrollment_provider.id)
+        end
+
+        context "when feature flag is enabled" do
+          before(:once) do
+            temp_course.root_account.enable_feature!(:temporary_enrollments)
+          end
+
+          it "returns a list of users filtered by recipients" do
+            json = api_call_as_user(
+              subject,
+              :get,
+              "/api/v1/accounts/#{@account.id}/users",
+              { controller: "users", action: "api_index", format: "json", account_id: @account.id.to_param },
+              { temporary_enrollment_recipients: true }
+            )
+            expect(json.count).to eq 1
+            expect(json.pluck("name")).to eq [temporary_enrollment_recipient.name]
+          end
+
+          it "returns a list of users filtered by providers" do
+            json = api_call_as_user(
+              subject,
+              :get,
+              "/api/v1/accounts/#{@account.id}/users",
+              { controller: "users", action: "api_index", format: "json", account_id: @account.id.to_param },
+              { temporary_enrollment_providers: true }
+            )
+            expect(json.count).to eq 1
+            expect(json.pluck("name")).to eq [temporary_enrollment_provider.name]
+          end
+
+          it "returns a list of users filtered by providers and recipients" do
+            json = api_call_as_user(
+              subject,
+              :get,
+              "/api/v1/accounts/#{@account.id}/users",
+              { controller: "users", action: "api_index", format: "json", account_id: @account.id.to_param },
+              { temporary_enrollment_recipients: true, temporary_enrollment_providers: true }
+            )
+            expect(json.count).to eq 2
+            expect(json.pluck("name").sort).to eq [temporary_enrollment_provider.name, temporary_enrollment_recipient.name].sort
+          end
+        end
+
+        context "when feature flag is disabled" do
+          before(:once) do
+            temp_course.root_account.disable_feature!(:temporary_enrollments)
+          end
+
+          it "does not filter by providers or recipients" do
+            json = api_call_as_user(
+              subject,
+              :get,
+              "/api/v1/accounts/#{@account.id}/users",
+              { controller: "users", action: "api_index", format: "json", account_id: @account.id.to_param },
+              { temporary_enrollment_recipients: true, temporary_enrollment_providers: true }
+            )
+            expect(json.size).to eq 7
+          end
+        end
+      end
     end
 
     it "does return a next header on the last page" do

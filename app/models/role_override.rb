@@ -105,6 +105,11 @@ class RoleOverride < ActiveRecord::Base
     manage_assignments_edit
     manage_assignments_delete
   ].freeze
+  MANAGE_TEMPORARY_ENROLLMENT_PERMISSIONS = %i[
+    temporary_enrollments_add
+    temporary_enrollments_edit
+    temporary_enrollments_delete
+  ].freeze
 
   # immediately register stock canvas-lms permissions
   # NOTE: manage_alerts = Global Announcements and manage_interaction_alerts = Alerts
@@ -1387,34 +1392,34 @@ class RoleOverride < ActiveRecord::Base
         group_label: -> { t("Users - Students") },
         account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_users) }
       },
-      manage_temp_enroll_add: {
-        label: -> { t("permissions.manage_temp_enroll_add", "Add temporary enrollments") },
+      temporary_enrollments_add: {
+        label: -> { t("permissions.temporary_enrollments_add", "Add temporary enrollments") },
         label_v2: -> { t("Temporary Enrollments - add") },
         available_to: %w[AccountAdmin AccountMembership],
         true_for: ["AccountAdmin"],
         account_only: true,
         account_allows: ->(a) { a.root_account.feature_enabled?(:temporary_enrollments) },
-        group: "manage_temp_enroll",
+        group: "manage_temporary_enrollments",
         group_label: -> { t("Users - Temporary Enrollments") }
       },
-      manage_temp_enroll_edit: {
-        label: -> { t("permissions.manage_temp_enroll_edit", "Edit temporary enrollments") },
+      temporary_enrollments_edit: {
+        label: -> { t("permissions.temporary_enrollments_edit", "Edit temporary enrollments") },
         label_v2: -> { t("Temporary Enrollments - edit") },
         available_to: %w[AccountAdmin AccountMembership],
         true_for: ["AccountAdmin"],
         account_only: true,
         account_allows: ->(a) { a.root_account.feature_enabled?(:temporary_enrollments) },
-        group: "manage_temp_enroll",
+        group: "manage_temporary_enrollments",
         group_label: -> { t("Users - Temporary Enrollments") }
       },
-      manage_temp_enroll_delete: {
-        label: -> { t("permissions.manage_temp_enroll_delete", "Delete temporary enrollments") },
+      temporary_enrollments_delete: {
+        label: -> { t("permissions.temporary_enrollments_delete", "Delete temporary enrollments") },
         label_v2: -> { t("Temporary Enrollments - delete") },
         available_to: %w[AccountAdmin AccountMembership],
         true_for: ["AccountAdmin"],
         account_only: true,
         account_allows: ->(a) { a.root_account.feature_enabled?(:temporary_enrollments) },
-        group: "manage_temp_enroll",
+        group: "manage_temporary_enrollments",
         group_label: -> { t("Users - Temporary Enrollments") }
       },
       manage_user_notes: {

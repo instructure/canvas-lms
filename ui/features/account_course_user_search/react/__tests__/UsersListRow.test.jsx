@@ -38,7 +38,7 @@ function makeProps() {
       can_masquerade: true,
       can_message_users: true,
       can_edit_users: true,
-      can_temp_enroll: true,
+      can_add_temporary_enrollments: true,
       can_manage_admin_users: true,
     },
   }
@@ -77,7 +77,7 @@ describe('UsersListRow', () => {
         can_masquerade: false,
         can_message_users: false,
         can_edit_users: false,
-        can_temp_enroll: false,
+        can_add_temporary_enrollments: false,
       },
     }
 
