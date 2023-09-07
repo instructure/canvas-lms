@@ -1244,6 +1244,16 @@ describe AssignmentsController do
       assert_require_login
     end
 
+    it "sets 'ROOT_OUTCOME_GROUP' for external tool assignments in the teacher view" do
+      user_session(@teacher)
+      @assignment.submission_types = "external_tool"
+      @assignment.build_external_tool_tag(url: "http://example.com/test")
+      @assignment.save!
+
+      get "show", params: { course_id: @course.id, id: @assignment.id }
+      expect(assigns[:js_env][:ROOT_OUTCOME_GROUP]).not_to be_nil
+    end
+
     it "sets first_annotation_submission to true if it's the first submission and the assignment is annotatable" do
       user_session(@student)
       attachment = attachment_model(content_type: "application/pdf", display_name: "file.pdf", user: @teacher)

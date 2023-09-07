@@ -325,7 +325,10 @@ class AssignmentsController < ApplicationController
           end
         end
 
-        env = js_env({ COURSE_ID: @context.id })
+        env = js_env({
+                       COURSE_ID: @context.id,
+                       ROOT_OUTCOME_GROUP: outcome_group_json(@context.root_outcome_group, @current_user, session)
+                     })
         submission = @assignment.submissions.find_by(user: @current_user)
         if submission
           js_env({ SUBMISSION_ID: submission.id })
@@ -423,7 +426,6 @@ class AssignmentsController < ApplicationController
                  EULA_URL: tool_eula_url,
                  EXTERNAL_TOOLS: external_tools_json(@external_tools, @context, @current_user, session),
                  PERMISSIONS: permissions,
-                 ROOT_OUTCOME_GROUP: outcome_group_json(@context.root_outcome_group, @current_user, session),
                  SIMILARITY_PLEDGE: @similarity_pledge,
                  CONFETTI_ENABLED: @domain_root_account&.feature_enabled?(:confetti_for_assignments),
                  EMOJIS_ENABLED: @context.feature_enabled?(:submission_comment_emojis),
