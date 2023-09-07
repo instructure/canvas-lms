@@ -207,6 +207,8 @@ Object.assign(CommonEvent.prototype, {
       this.start.seconds(0)
       if (!this.end) {
         this.end = fcUtil.clone(this.start)
+      } else if (this.end.isBefore(this.start)) {
+        this.end.add(30, 'minutes')
       }
     } else {
       // minimum duration should only be enforced if not due at midnight
