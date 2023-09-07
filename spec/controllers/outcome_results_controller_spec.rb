@@ -241,6 +241,14 @@ describe OutcomeResultsController do
         format: "json"
   end
 
+  def get_linked_users(rollups)
+    users = []
+    rollups.each do |r|
+      users.append(r["links"])
+    end
+    users
+  end
+
   describe "retrieving outcome results" do
     it "does not have a false failure if an outcome exists in two places within the same context" do
       user_session(@teacher)
@@ -1050,6 +1058,125 @@ describe OutcomeResultsController do
                                                 per_page: 5,
                                                 page: 1))
               expect(json["rollups"].length).to be 3
+            end
+
+            it "removes inactive student if they have no results, even though they are not explicitly excluded" do
+              create_result(@student.id, @outcome, outcome_assignment, 2, { possible: 5 })
+              student4 = student_in_course(active_all: true, course: outcome_course, name: "OS user").user
+              # deactivating student 4 will cause them to be inactive
+              StudentEnrollment.find_by(user_id: student4.id).deactivate
+              json = parse_response(get_rollups(sort_by: "student",
+                                                sort_order: "desc",
+                                                exclude: ["missing_user_rollups"],
+                                                per_page: 5,
+                                                page: 1))
+              expect(json["rollups"].length).to be 3
+            end
+
+            it "removes concluded student if they have no results, even though they are not explicitly excluded" do
+              create_result(@student.id, @outcome, outcome_assignment, 2, { possible: 5 })
+              student4 = student_in_course(active_all: true, course: outcome_course, name: "OS user").user
+              # concluding student 4 will cause them to be concluded
+              StudentEnrollment.find_by(user_id: student4.id).conclude
+              json = parse_response(get_rollups(sort_by: "student",
+                                                sort_order: "desc",
+                                                exclude: ["missing_user_rollups"],
+                                                per_page: 5,
+                                                page: 1))
+              expect(json["rollups"].length).to be 3
+            end
+
+            context "multiple excludes with rollups" do
+              it "inactive & concluded" do
+                create_result(@student.id, @outcome, outcome_assignment, 2, { possible: 5 })
+                inactive_student = student_in_course(active_all: true, course: outcome_course, name: "Inactive User").user
+                concluded_student = student_in_course(active_all: true, course: outcome_course, name: "Concluded User").user
+                # Set appropriate status for each student
+                StudentEnrollment.find_by(user_id: inactive_student.id).deactivate
+                StudentEnrollment.find_by(user_id: concluded_student.id).conclude
+                # Create results for each student
+                create_result(inactive_student.id, @outcome, outcome_assignment, 2, { possible: 5 })
+                create_result(concluded_student.id, @outcome, outcome_assignment, 2, { possible: 5 })
+
+                json = parse_response(get_rollups(sort_by: "student",
+                                                  sort_order: "desc",
+                                                  exclude: ["inactive_enrollments", "concluded_enrollments"],
+                                                  per_page: 5,
+                                                  page: 1))
+                expect(json["rollups"].length).to be 3
+                user_links = get_linked_users(json["rollups"])
+                user_links.each do |user|
+                  expect(user["status"]).not_to eq("inactive")
+                  expect(user["status"]).not_to eq("completed")
+                end
+              end
+
+              it "inactive & unassessed" do
+                inactive_student = student_in_course(active_all: true, course: outcome_course, name: "Inactive User").user
+                concluded_student = student_in_course(active_all: true, course: outcome_course, name: "Concluded User").user
+                # Set appropriate status for each student
+                StudentEnrollment.find_by(user_id: inactive_student.id).deactivate
+                StudentEnrollment.find_by(user_id: concluded_student.id).conclude
+                # Create results for each student
+                create_result(inactive_student.id, @outcome, outcome_assignment, 2, { possible: 5 })
+                create_result(concluded_student.id, @outcome, outcome_assignment, 2, { possible: 5 })
+
+                json = parse_response(get_rollups(sort_by: "student",
+                                                  sort_order: "desc",
+                                                  exclude: ["inactive_enrollments", "missing_user_rollups"],
+                                                  per_page: 5,
+                                                  page: 1))
+                expect(json["rollups"].length).to be 3
+                user_links = get_linked_users(json["rollups"])
+                user_links.each do |user|
+                  expect(user["status"]).not_to eq("inactive")
+                end
+              end
+
+              it "concluded & unassessed" do
+                inactive_student = student_in_course(active_all: true, course: outcome_course, name: "Inactive User").user
+                concluded_student = student_in_course(active_all: true, course: outcome_course, name: "Concluded User").user
+                # Set appropriate status for each student
+                StudentEnrollment.find_by(user_id: inactive_student.id).deactivate
+                StudentEnrollment.find_by(user_id: concluded_student.id).conclude
+                # Create results for each student
+                create_result(inactive_student.id, @outcome, outcome_assignment, 2, { possible: 5 })
+                create_result(concluded_student.id, @outcome, outcome_assignment, 2, { possible: 5 })
+
+                json = parse_response(get_rollups(sort_by: "student",
+                                                  sort_order: "desc",
+                                                  exclude: ["concluded_enrollments", "missing_user_rollups"],
+                                                  per_page: 5,
+                                                  page: 1))
+                expect(json["rollups"].length).to be 3
+                user_links = get_linked_users(json["rollups"])
+                user_links.each do |user|
+                  expect(user["status"]).not_to eq("completed")
+                end
+              end
+
+              it "inactive, concluded, and unassessed" do
+                inactive_student = student_in_course(active_all: true, course: outcome_course, name: "Inactive User").user
+                concluded_student = student_in_course(active_all: true, course: outcome_course, name: "Concluded User").user
+                # Set appropriate status for each student
+                StudentEnrollment.find_by(user_id: inactive_student.id).deactivate
+                StudentEnrollment.find_by(user_id: concluded_student.id).conclude
+                # Create results for each student
+                create_result(inactive_student.id, @outcome, outcome_assignment, 2, { possible: 5 })
+                create_result(concluded_student.id, @outcome, outcome_assignment, 2, { possible: 5 })
+
+                json = parse_response(get_rollups(sort_by: "student",
+                                                  sort_order: "desc",
+                                                  exclude: %w[inactive_enrollments concluded_enrollments missing_user_rollups],
+                                                  per_page: 5,
+                                                  page: 1))
+                expect(json["rollups"].length).to be 2
+                user_links = get_linked_users(json["rollups"])
+                user_links.each do |user|
+                  expect(user["status"]).not_to eq("inactive")
+                  expect(user["status"]).not_to eq("completed")
+                end
+              end
             end
           end
         end

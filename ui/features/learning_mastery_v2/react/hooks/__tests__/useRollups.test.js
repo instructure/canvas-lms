@@ -31,6 +31,21 @@ describe('useRollups', () => {
       name: 'Student 1',
       display_name: 'Student 1',
       avatar_url: 'url',
+      status: 'active',
+    },
+    {
+      id: '2',
+      name: 'Student 2',
+      display_name: 'Student 2',
+      avatar_url: 'url',
+      status: 'inactive',
+    },
+    {
+      id: '3',
+      name: 'Student 3',
+      display_name: 'Student 3',
+      avatar_url: 'url',
+      status: 'concluded',
     },
   ]
 
@@ -61,10 +76,39 @@ describe('useRollups', () => {
     {
       links: {
         user: '1',
+        status: 'active',
       },
       scores: [
         {
           score: 4,
+          links: {
+            outcome: '1',
+          },
+        },
+      ],
+    },
+    {
+      links: {
+        user: '2',
+        status: 'inactive',
+      },
+      scores: [
+        {
+          score: 4,
+          links: {
+            outcome: '1',
+          },
+        },
+      ],
+    },
+    {
+      links: {
+        user: '3',
+        status: 'completed',
+      },
+      scores: [
+        {
+          score: 0,
           links: {
             outcome: '1',
           },
@@ -90,11 +134,12 @@ describe('useRollups', () => {
   describe('useRollups hook', () => {
     it('returns defaults until the request finishes loading', async () => {
       const {result} = renderHook(() => useRollups({courseId: '1'}))
-      const {isLoading, students, outcomes, rollups} = result.current
+      const {isLoading, students, outcomes, rollups, gradebookFilters} = result.current
       expect(isLoading).toEqual(true)
       expect(students).toEqual([])
       expect(outcomes).toEqual([])
       expect(rollups).toEqual([])
+      expect(gradebookFilters).toEqual([])
       await act(async () => jest.runAllTimers())
       expect(result.current.isLoading).toEqual(false)
     })
@@ -102,10 +147,11 @@ describe('useRollups', () => {
     it('returns the response after the request finishes', async () => {
       const {result} = renderHook(() => useRollups({courseId: '1'}))
       await act(async () => jest.runAllTimers())
-      const {students, outcomes, rollups} = result.current
+      const {students, outcomes, rollups, gradebookFilters} = result.current
       expect(fetchMock).toHaveBeenCalled()
       expect(students).toEqual(mockedUsers)
       expect(outcomes).toEqual(mockedOutcomes)
+      expect(gradebookFilters).toEqual([])
       expect(rollups).toStrictEqual([
         {
           studentId: '1',
@@ -113,7 +159,33 @@ describe('useRollups', () => {
             {outcomeId: '1', rating: {...mockedRatings[0], color: `#${mockedRatings[0].color}`}},
           ],
         },
+        {
+          studentId: '2',
+          outcomeRollups: [
+            {outcomeId: '1', rating: {...mockedRatings[0], color: `#${mockedRatings[0].color}`}},
+          ],
+        },
+        {
+          studentId: '3',
+          outcomeRollups: [
+            {outcomeId: '1', rating: {...mockedRatings[1], color: `#${mockedRatings[1].color}`}},
+          ],
+        },
       ])
+    })
+
+    it("correctly translates student status from 'completed' to 'concluded' when loading rollups", async () => {
+      const {result} = renderHook(() => useRollups({courseId: '1'}))
+      await act(async () => jest.runAllTimers())
+      const {students} = result.current
+      expect(fetchMock).toHaveBeenCalled()
+      expect(students[2]).toStrictEqual({
+        id: '3',
+        name: 'Student 3',
+        display_name: 'Student 3',
+        avatar_url: 'url',
+        status: 'concluded',
+      })
     })
 
     it('calls the /rollups URL with the right parameters', async () => {
@@ -123,6 +195,7 @@ describe('useRollups', () => {
         params: {
           rating_percents: true,
           per_page: 20,
+          exclude: [],
           include: ['outcomes', 'users', 'outcome_paths', 'alignments'],
           sort_by: 'student',
           add_defaults: true,

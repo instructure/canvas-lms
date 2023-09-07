@@ -63,11 +63,23 @@ const LearningMastery = ({courseId}) => {
   const contextValues = getLMGBContext()
   const {contextURL, outcomeProficiency, accountLevelMasteryScalesFF} = contextValues.env
 
-  const {isLoading, students, outcomes, rollups} = useRollups({
+  const {isLoading, students, outcomes, rollups, gradebookFilters, setGradebookFilters} = useRollups({
     courseId,
     accountLevelMasteryScalesFF,
   })
   const [visibleRatings, setVisibleRatings] = useState([])
+
+  const onGradebookFilterChange = filterItem => {
+    const filters = new Set(gradebookFilters)
+
+    if (filters.has(filterItem)) {
+      filters.delete(filterItem)
+    } else {
+      filters.add(filterItem)
+    }
+
+    setGradebookFilters(Array.from(filters))
+  }
 
   useEffect(() => {
     if (accountLevelMasteryScalesFF) {
@@ -125,6 +137,8 @@ const LearningMastery = ({courseId}) => {
           students={students}
           rollups={rollups}
           visibleRatings={visibleRatings}
+          gradebookFilters={gradebookFilters}
+          gradebookFilterHandler={onGradebookFilterChange}
         />
       )}
     </LMGBContext.Provider>
