@@ -639,29 +639,6 @@ class User < ActiveRecord::Base
     results
   end
 
-  # Users are tied to accounts a couple ways:
-  #   Through enrollments:
-  #      User -> Enrollment -> Section -> Course -> Account
-  #      User -> Enrollment -> Section -> Non-Xlisted Course -> Account
-  #   Through pseudonyms:
-  #      User -> Pseudonym -> Account
-  #   Through account_users
-  #      User -> AccountUser -> Account
-  def self.calculate_account_associations(user, data, account_chain_cache)
-    return [] if %w[creation_pending deleted].include?(user.workflow_state) || user.fake_student?
-
-    enrollments = data[:enrollments][user.id] || []
-    sections = enrollments.map { |e| data[:sections][e.course_section_id] }
-    courses = sections.map { |s| data[:courses][s.course_id] }
-    courses += sections.select(&:nonxlist_course_id).map { |s| data[:courses][s.nonxlist_course_id] }
-    starting_account_ids = courses.map(&:account_id)
-    starting_account_ids += (data[:pseudonyms][user.id] || []).map(&:account_id)
-    starting_account_ids += (data[:account_users][user.id] || []).map(&:account_id)
-    starting_account_ids.uniq!
-
-    calculate_account_associations_from_accounts(starting_account_ids, account_chain_cache)
-  end
-
   def self.update_account_associations(users_or_user_ids, opts = {})
     return if users_or_user_ids.empty?
 
@@ -695,42 +672,42 @@ class User < ActiveRecord::Base
         shards = shards.to_a
       end
 
-      # basically we're going to do a huge preload here, but custom sql to only load the columns we need
-      data = { enrollments: [], sections: [], courses: [], pseudonyms: [], account_users: [] }
+      # Users are tied to accounts a couple ways:
+      #   Through enrollments:
+      #      User -> Enrollment -> Section -> Course -> Account
+      #      User -> Enrollment -> Section -> Non-Xlisted Course -> Account
+      #   Through pseudonyms:
+      #      User -> Pseudonym -> Account
+      #   Through account_users
+      #      User -> AccountUser -> Account
+      account_mappings = Hash.new { |h, k| h[k] = Set.new }
+      base_shard = Shard.current
       Shard.with_each_shard(shards) do
-        shard_user_ids = users.map(&:id)
+        courses_relation = Course.select("enrollments.user_id", :account_id).distinct
+                                 .joins(course_sections: :enrollments)
+                                 .where("enrollments.user_id": users)
+                                 .where.not("enrollments.workflow_state": [:deleted, :rejected])
+                                 .where.not("enrollments.type": "StudentViewEnrollment")
+        non_xlist_relation = Course.select("enrollments.user_id", :account_id).distinct
+                                   .joins("INNER JOIN #{CourseSection.quoted_table_name} on course_sections.nonxlist_course_id=courses.id")
+                                   .joins("INNER JOIN #{Enrollment.quoted_table_name} on enrollments.course_section_id=course_sections.id")
+                                   .where("enrollments.user_id": users)
+                                   .where.not("enrollments.workflow_state": [:deleted, :rejected])
+                                   .where.not("enrollments.type": "StudentViewEnrollment")
+        pseudonym_relation = Pseudonym.active.select(:user_id, :account_id).distinct.where(user: users)
+        account_user_relation = AccountUser.active.select(:user_id, :account_id).distinct.where(user: users)
 
-        data[:enrollments] += shard_enrollments =
-          Enrollment.where("workflow_state NOT IN ('deleted','rejected') AND type<>'StudentViewEnrollment'")
-                    .where(user_id: shard_user_ids)
-                    .select(%i[user_id course_id course_section_id])
-                    .distinct.to_a
+        results = connection.select_rows(<<~SQL.squish)
+          #{courses_relation.to_sql} UNION
+          #{non_xlist_relation.to_sql} UNION
+          #{pseudonym_relation.to_sql} UNION
+          #{account_user_relation.to_sql}
+        SQL
 
-        # probably a lot of dups, so more efficient to use a set than uniq an array
-        course_section_ids = Set.new
-        shard_enrollments.each { |e| course_section_ids << e.course_section_id }
-        unless course_section_ids.empty?
-          data[:sections] += shard_sections = CourseSection.select(%i[id course_id nonxlist_course_id])
-                                                           .where(id: course_section_ids.to_a).to_a
+        results.each do |row|
+          account_mappings[Shard.relative_id_for(row.first, Shard.current, base_shard)] << Shard.relative_id_for(row.second, Shard.current, base_shard)
         end
-        shard_sections ||= []
-        course_ids = Set.new
-        shard_sections.each do |s|
-          course_ids << s.course_id
-          course_ids << s.nonxlist_course_id if s.nonxlist_course_id
-        end
-
-        data[:courses] += Course.select([:id, :account_id]).where(id: course_ids.to_a).to_a unless course_ids.empty?
-
-        data[:pseudonyms] += Pseudonym.active.select([:user_id, :account_id]).distinct.where(user_id: shard_user_ids).to_a
-        data[:account_users] += AccountUser.active.select([:user_id, :account_id]).distinct.where(user_id: shard_user_ids).to_a
       end
-      # now make it easy to get the data by user id
-      data[:enrollments] = data[:enrollments].group_by(&:user_id)
-      data[:sections] = data[:sections].index_by(&:id)
-      data[:courses] = data[:courses].index_by(&:id)
-      data[:pseudonyms] = data[:pseudonyms].group_by(&:user_id)
-      data[:account_users] = data[:account_users].group_by(&:user_id)
     end
 
     # TODO: transaction on each shard?
@@ -744,12 +721,6 @@ class User < ActiveRecord::Base
         UserAccountAssociation.where(user_id: shard_user_ids).to_a
       end.each do |aa|
         key = [aa.user_id, aa.account_id]
-        # duplicates. the unique index prevents these now, but this code
-        # needs to hang around for the migration itself
-        if current_associations.key?(key)
-          to_delete << aa.id
-          next
-        end
         current_associations[key] = [aa.id, aa.depth]
       end
 
@@ -764,7 +735,11 @@ class User < ActiveRecord::Base
         account_ids_with_depth = precalculated_associations
         if account_ids_with_depth.nil?
           user ||= User.find(user_id)
-          account_ids_with_depth = calculate_account_associations(user, data, account_chain_cache)
+          account_ids_with_depth = if %w[creation_pending deleted].include?(user.workflow_state) || user.fake_student?
+                                     []
+                                   else
+                                     calculate_account_associations_from_accounts(account_mappings[user.id], account_chain_cache)
+                                   end
         end
 
         account_ids_with_depth.sort_by(&:first).each do |account_id, depth|
