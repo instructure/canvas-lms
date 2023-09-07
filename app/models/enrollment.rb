@@ -1239,7 +1239,13 @@ class Enrollment < ActiveRecord::Base
   end
 
   def temporary_enrollment?
-    read_attribute(:temporary_enrollment_source_user_id).present?
+    temporary_enrollment_source_user_id.present?
+  end
+
+  def temporary_enrollment_source_user
+    return nil unless temporary_enrollment?
+
+    User.find(temporary_enrollment_source_user_id)
   end
 
   def observer?
