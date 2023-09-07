@@ -331,6 +331,30 @@ describe AssignmentOverride do
       expect(@override).to be_valid
     end
 
+    it "accepts course sets" do
+      @override.set = @course
+      expect(@override).to be_valid
+      expect(@override.set_id).to eq @course.id
+    end
+
+    it "rejects course sets with an incorrect set_id" do
+      @override.set = @course
+      @override.set_id = 123
+      expect(@override).not_to be_valid
+    end
+
+    it "rejects course set if unassign_item is true" do
+      @override.set = @course
+      @override.unassign_item = true
+      expect(@override).not_to be_valid
+    end
+
+    it "accepts unassign_item is true if not everyone set_type" do
+      @override.set = @course.course_sections.create!
+      @override.unassign_item = true
+      expect(@override).to be_valid
+    end
+
     it "accepts noop with arbitrary set_id" do
       @override.set_type = "Noop"
       @override.set_id = 9000
@@ -382,11 +406,6 @@ describe AssignmentOverride do
       @override.set = @category.groups.create!(context: @assignment.context)
       @override.workflow_state = "deleted"
       expect(@override).to be_valid
-    end
-
-    it "rejects unrecognized sets" do
-      @override.set = @override.assignment.context
-      expect(@override).not_to be_valid
     end
 
     it "rejects duplicate sets" do
@@ -1015,6 +1034,15 @@ describe AssignmentOverride do
       @course.enroll_student(@student, enrollment_state: "active", section: @override.set)
 
       expect(@override.applies_to_students).to include(@active_student, @student)
+    end
+
+    it "returns the right students for course sets" do
+      @override = assignment_override_model(course: @course)
+      @override.set = @course
+      @override.save!
+
+      expect(@override.applies_to_students).to include(@active_student)
+      expect(@override.applies_to_students).to eq @course.participating_students
     end
   end
 
