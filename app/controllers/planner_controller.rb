@@ -365,7 +365,6 @@ class PlannerController < ApplicationController
     @page = params[:page] || "first"
     @include_concluded = includes.include? "concluded"
     @include_account_calendars = includes.include? "account_calendars"
-    @enabled_account_calendars = @user&.enabled_account_calendars&.map(&:id) || []
 
     # for specs, that do multiple requests in a single spec, we have to reset these ivars
     @course_ids = @group_ids = @user_ids = @account_ids = nil
@@ -383,8 +382,10 @@ class PlannerController < ApplicationController
       @user_ids = [@user.id] if params.key?(:observed_user_id) && @user.grants_right?(@current_user, session, :read_as_parent)
     end
 
+    allowed_account_calendars = @user&.all_account_calendars&.map { |a| Shard.relative_id_for(a.id, Shard.current, @user.shard) } || []
+    enabled_account_calendars = @user&.enabled_account_calendars&.map { |a| Shard.relative_id_for(a.id, Shard.current, @user.shard) } || []
     if @include_account_calendars && context_ids["Account"].nil?
-      @account_ids = @enabled_account_calendars
+      @account_ids = enabled_account_calendars
     end
 
     # make IDs relative to the user's shard
@@ -398,8 +399,8 @@ class PlannerController < ApplicationController
       if @user
         @course_ids = @user.course_ids_for_todo_lists(:student, course_ids: @course_ids, include_concluded:)
         @group_ids = @user.group_ids_for_todo_lists(group_ids: @group_ids)
-        @account_ids ||= @enabled_account_calendars
-        @account_ids &= @enabled_account_calendars
+        @account_ids ||= enabled_account_calendars
+        @account_ids &= allowed_account_calendars
         @user_ids ||= [@user.id]
         @user_ids &= [@user.id]
       else
