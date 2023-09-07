@@ -2051,7 +2051,7 @@ de:
       account_reports: 
         unused_courses: 
           main: 
-            text: "Dies ist ein Bericht über alle Kurse, die keines der folgenden Elemente aufweisen: Aufgaben, Ankündigungen, Diskussionen, Dateien, Module, Seiten oder Quizze."
+            text: "Dies ist ein Bericht über alle Kurse, die keines der folgenden Elemente aufweisen: Aufgaben, Ankündigungen, Diskussionen, Dateien, Module, Seiten oder Quiz."
     update_failed_notice: "Aktualisierung der Kontoeinstellungen fehlgeschlagen"
     user_access_csv_parameters: 
       account_reports: 
@@ -2183,7 +2183,7 @@ de:
   add_as_a_faculty_journal_entry_55a38a30: "Als Fachjournaleintrag hinzufügen"
   add_as_allowed_e95540be: "Als „erlaubt“ hinzufügen"
   add_assignment_to_name_caf173b0: "Aufgabe zu %{name} hinzufügen"
-  add_assignments_and_quizzes_1085d2af: "Aufgaben und Quizze hinzufügen"
+  add_assignments_and_quizzes_1085d2af: "Aufgaben und Quiz hinzufügen"
   add_attachment_93868828: "Anhang hinzufügen"
   add_attachment_dcdb8bf8: "Anhang hinzufügen"
   add_attribute_6d6d4a65: "Attribut hinzufügen"
@@ -2309,7 +2309,7 @@ de:
   add_scope_a5208f8b: "Geltungsbereich hinzufügen"
   add_section_8b027a1c: "Abschnitt hinzufügen"
   add_set_of_grading_periods_5b4d6e51: "Set von Benotungszeiträumen hinzufügen"
-  add_speedgrader_links_to_assignments_and_quizzes_i_990a17cd: "SpeedGrader-Links zu den Indexansichten für Aufgaben und Quizze hinzufügen"
+  add_speedgrader_links_to_assignments_and_quizzes_i_990a17cd: "SpeedGrader-Links zu den Indexansichten für Aufgaben und Quiz hinzufügen"
   add_status_2df2bdd6: "Status hinzufügen"
   add_student_1152afc0: "Studierende\\*n hinzufügen"
   add_students_by_searching_by_name_course_section_o_abb9e2f2: "Hinzufügen von Studierenden per Suche nach Name, Kursabschnitt oder Gruppe Navigieren Sie nach der Eingabe von Text in den Ergebnissen mithilfe der Pfeil-nach-unten-Taste. Durch Drücken der Eingabetaste wählen Sie ein Ergebnis aus."
@@ -2385,7 +2385,7 @@ de:
   adds_comment_bank_for_assignment_comments_within_s_1b69dc2: "Fügt einen Kommentarpool für Aufgabenkommentare innerhalb von Speedgrader hinzu"
   adds_granular_permissions_for_adding_and_removing__e1e484a3: "Fügt granulare Berechtigungen für das Hinzufügen oder Entfernen jeder Rolle hinzu sowie eine separate Berechtigung für andere Kursadmin-Aktionen"
   adds_menu_option_for_accessing_alignments_at_the_o_6d3bce6: "Fügt eine Menüoption für den Zugriff auf Abgleiche auf Lernergebnis-Ebene mit verbesserter Verwaltung von Lernergebnissen hinzu"
-  adds_the_option_to_grade_by_question_in_speedgrade_5eac06f3: "Fügt die Option hinzu, Quizzes.Next-Quizze in SpeedGrader nach Fragen zu benoten."
+  adds_the_option_to_grade_by_question_in_speedgrade_5eac06f3: "Fügt die Option hinzu, Quizzes.Next-Quiz in SpeedGrader nach Fragen zu benoten."
   adds_visual_indicators_to_the_submission_details_p_c7b9d191: |-
       Fügt visuelle Indikatoren auf der Seite mit den Übermittlungsdetails hinzu, um die Studierenden darauf hinzuweisen, dass ungelesene
       Dokument- oder Rubriken-Kommentare vorhanden sind
@@ -2614,7 +2614,7 @@ de:
       Ermöglicht die Einstellung des Abonnenments von Live-Ereignissen für die Zustellung 
       über HTTPS-Webhooks.
   allow_lor_tools: "Benutzern die Anzeige und Verwendung externer für LOR konfigurierter Tools ermöglichen."
-  allow_migration_of_quizzes_during_course_copy_and__35d80756: "Ermöglicht die Migration von Quizzen während des Kopierens und Importierens eines Kurses"
+  allow_migration_of_quizzes_during_course_copy_and__35d80756: "Ermöglicht die Migration von Quiz während des Kopierens und Importierens eines Kurses"
   allow_moderator_to_review_multiple_independent_gra_c59d64f6: "Moderatoren erlauben, mehrere unabhängige Noten für ausgewählte Abgaben zu überprüfen"
   allow_multiple_attempts_e67a0a37: "Mehrere Versuche zulassen"
   allow_multiple_file_ags_submissions_to_count_as_on_6e24aa34: "Erlauben, dass mehrere AGS-Abgaben als eine einzige Abgabe gezählt werden"
@@ -2799,7 +2799,7 @@ de:
       Erlaubt dem Benutzer, auf den Notenbuchverlauf zuzugreifen.
   allows_user_to_add_edit_delete_and_publish_and_unp_4f9c2fd4: "Erlaubt dem Benutzer, Aufgaben hinzuzufügen, zu bearbeiten, zu löschen und zu veröffentlichen oder die Veröffentlichung zurückzunehmen. Erlaubt dem Benutzer, die Aufgabeneinstellungen zu verwalten. Erlaubt dem Benutzer, Aufgabengruppen zu einem Kurs hinzuzufügen. Erlaubt dem Benutzer, die Aufgabengruppengewichtung in einem Kurs zu aktivieren und zu ändern."
   allows_user_to_add_edit_delete_and_publish_and_unp_5b1059b: "Erlaubt dem/der Benutzer\\*in, Aufgaben hinzuzufügen, zu bearbeiten, zu löschen und zu veröffentlichen oder die Veröffentlichung zurückzunehmen."
-  allows_user_to_add_edit_delete_and_publish_and_unp_5f5b97aa: "Erlaubt dem/der Benutzer\\*in, Quizze hinzuzufügen, zu bearbeiten, zu löschen und zu veröffentlichen oder die Veröffentlichung zurückzunehmen."
+  allows_user_to_add_edit_delete_and_publish_and_unp_5f5b97aa: "Erlaubt dem/der Benutzer\\*in, Quiz hinzuzufügen, zu bearbeiten, zu löschen und zu veröffentlichen oder die Veröffentlichung zurückzunehmen."
   allows_user_to_add_edit_delete_and_publish_unpubli_bc6374cf: "Erlaubt dem Benutzer, Quizze hinzuzufügen, zu bearbeiten, zu löschen und zu veröffentlichen oder die Veröffentlichung zurückzunehmen."
   allows_user_to_add_edit_delete_and_publish_unpubli_f1906287: |-
       Erlaubt dem Benutzer, Aufgaben hinzuzufügen, zu bearbeiten, zu löschen und zu veröffentlichen oder die Veröffentlichung zurückzunehmen.
@@ -2825,7 +2825,7 @@ de:
   allows_user_to_add_observers_to_the_course_from_th_dd0ccafa: "Erlaubt dem Benutzer, auf der Kurs-Seite des Kontos Beobachter zu einem Kurs hinzuzufügen. Erlaubt dem Benutzer, Beobachter zum Kurs hinzuzufügen. Erlaubt dem Benutzer, Anmelde-ID-Informationen für Beobachter einzusehen. Erlaubt dem Benutzer, die Benutzerdetails für Beobachter einzusehen. Erlaubt dem Benutzer, den Abschnitt oder die Rolle eines Beobachters zu ändern."
   allows_user_to_add_page_to_student_to_do_list_7085a054: "Erlaubt dem/der Benutzer\\*in, Seiten zur studentischen To-do-Liste hinzuzufügen."
   allows_user_to_add_pages_to_list_view_dashboard_vi_a661a203: "Erlaubt dem/der Benutzer\\*in, Seiten zur Listenansicht „Dashboard“ per Kontrollkästchen „Zu Studierendenaufgaben hinzufügen“ hinzuzufügen."
-  allows_user_to_add_quizzes_in_a_course_80916c02: "Erlaubt dem/der Benutzer\\*in, Quizze in einem Kurs hinzuzufügen."
+  allows_user_to_add_quizzes_in_a_course_80916c02: "Erlaubt dem/der Benutzer\\*in, Quiz in einem Kurs hinzuzufügen."
   allows_user_to_add_remove_other_teachers_course_de_702821d4: |-
       Erlaubt dem Benutzer, andere Lehrern, Kursdesigner oder TAs hinzuzufügen oder zu entfernen.
       Erlaubt dem Benutzer, Kursbeobachter hinzuzufügen oder zu entfernen.
@@ -2940,7 +2940,7 @@ de:
   allows_user_to_delete_course_sections_19193a35: "Erlaubt dem/der Benutzer\\*in, Kursabschnitte zu löschen."
   allows_user_to_delete_course_sections_allows_user__649d2d0d: "Erlaubt dem Benutzer, Kursabschnitte zu löschen. Erlaubt dem Benutzer, einen Benutzer aus einem Kursabschnitt zu löschen."
   allows_user_to_delete_question_banks_in_a_course_o_d9cd0b2f: "Erlaubt dem/der Benutzer\\*in, Fragenpools in einem Kurs oder Konto zu löschen."
-  allows_user_to_delete_quizzes_in_a_course_acdbdfba: "Erlaubt dem/der Benutzer\\*in, Quizze in einem Kurs zu löschen."
+  allows_user_to_delete_quizzes_in_a_course_acdbdfba: "Erlaubt dem/der Benutzer\\*in, Quiz in einem Kurs zu löschen."
   allows_user_to_designate_a_course_as_a_blueprint_c_15109885: "Erlaubt dem/der Benutzer\\*in, einen Kurs zum Blueprint-Kurs zu erklären."
   allows_user_to_designate_a_course_as_a_blueprint_c_208ec223: "Erlaubt dem Benutzer, einen Kurs zum Musterkurs zu erklären. Erlaubt dem Benutzer, die Musterkurseinstellungen in den Kurseinstellungen zu verwalten. Erlaubt dem Benutzer, zugehörige Kurse hinzuzufügen."
   allows_user_to_designate_a_course_as_a_blueprint_c_255aca84: |-
@@ -2953,14 +2953,14 @@ de:
   allows_user_to_differentiate_assignments_to_indivi_37f701a5: "Erlaubt dem/der Benutzer\\*in, Aufgaben für einzelne Studierende zu differenzieren."
   allows_user_to_download_all_comments_in_a_student__33b36d0a: "Dem Benutzer erlauben, alle Kommentare in einer studentischen Einsendung herunterzuladen."
   allows_user_to_duplicate_assignments_in_a_course_a3bf4f54: "Erlaubt dem/der Benutzer\\*in, Aufgaben in einem Kurs zu duplizieren."
-  allows_user_to_duplicate_quizzes_in_a_course_1d3437f2: "Erlaubt dem/der Benutzer\\*in, Quizze in einem Kurs zu duplizieren."
+  allows_user_to_duplicate_quizzes_in_a_course_1d3437f2: "Erlaubt dem/der Benutzer\\*in, Quiz in einem Kurs zu duplizieren."
   allows_user_to_edit_a_list_of_assignment_blackout__9c734bf0: "Erlaubt Benutzer\\*innen die Bearbeitung einer Liste mit Sperrterminen für Aufgaben."
   allows_user_to_edit_a_student_s_section_or_role_d2b312ad: "Erlaubt dem Benutzer, den Abschnitt oder die Rolle eines Studenten zu ändern."
   allows_user_to_edit_a_user_s_section_or_role_if_no_cf272262: "Erlaubt dem/der Benutzer\\*in, den Abschnitt oder die Rolle eines Benutzers zu ändern (falls nicht per SIS hinzugefügt)."
   allows_user_to_edit_account_and_course_groups_259139c0: "Erlaubt dem/der Benutzer\\*in, Konto- oder Kursgruppen zu ändern."
   allows_user_to_edit_and_publish_a_course_pace_via__1ccb27ef: "Erlaubt Benutzer\\*innen die Bearbeitung und Veröffentlichung eines Kurs-Tempos."
   allows_user_to_edit_and_publish_unpublish_assignme_54d13630: "Erlaubt dem/der Benutzer\\*in, Aufgaben zu ändern und zu veröffentlichen oder die Veröffentlichung zurückzunehmen."
-  allows_user_to_edit_and_publish_unpublish_quizzes_bdc5b306: "Erlaubt dem/der Benutzer\\*in, Quizze zu ändern und zu veröffentlichen oder die Veröffentlichung zurückzunehmen."
+  allows_user_to_edit_and_publish_unpublish_quizzes_bdc5b306: "Erlaubt dem/der Benutzer\\*in, Quiz zu ändern und zu veröffentlichen oder die Veröffentlichung zurückzunehmen."
   allows_user_to_edit_assignment_details_on_individu_3e50993a: "Erlaubt dem Benutzer, die Aufgabendetails bei einzelnen Diskussionen zu bearbeiten. Module: Erlaubt dem Benutzer, neue Aufgaben zu einem Modul hinzuzufügen."
   allows_user_to_edit_assignment_details_on_individu_ecf19e63: "Erlaubt dem Benutzer, die Aufgabendetails bei einzelnen Diskussionen zu bearbeiten."
   allows_user_to_edit_blueprint_content_lock_setting_25128c82: "Erlaubt dem Benutzer, bei einzelnen Diskussionen die Sperreinstellungen für Musterinhalte zu ändern."
@@ -4522,10 +4522,10 @@ de:
       created: "Die Aufgabe wurde erfolgreich erstellt."
       quizzes_published: 
         one: "1 Quiz erfolgreich veröffentlicht"
-        other: "%{count} Quizze erfolgreich veröffentlicht"
+        other: "%{count} Quiz erfolgreich veröffentlicht"
       quizzes_unpublished: 
         one: "Veröffentlichung von 1 Quiz erfolgreich rückgängig gemacht"
-        other: "Veröffentlichung von %{count} Quizzen erfolgreich rückgängig gemacht"
+        other: "Veröffentlichung von %{count} Quiz erfolgreich rückgängig gemacht"
       updated: "Die Aufgabe wurde erfolgreich aktualisiert."
     number_of_assignments: 
       one: "1 Aufgabe"
@@ -4863,10 +4863,10 @@ de:
   assignments_2_teacher_view_error_page_8e45dedc: "Aufgaben 2 Lehreransicht Fehlerseite"
   assignments_989ed7fb: Aufgaben
   assignments_and_gradebook_37e43d4f: "Aufgaben und Notenbuch"
-  assignments_and_quizzes_add_b1473591: "Aufgaben und Quizze – hinzufügen"
-  assignments_and_quizzes_add_edit_delete_5bac17ed: "Aufgaben und Quizze – hinzufügen/bearbeiten/löschen"
-  assignments_and_quizzes_delete_84ecc680: "Aufgaben und Quizze – löschen"
-  assignments_and_quizzes_edit_1c23f658: "Aufgaben und Quizze – bearbeiten"
+  assignments_and_quizzes_add_b1473591: "Aufgaben und Quiz – hinzufügen"
+  assignments_and_quizzes_add_edit_delete_5bac17ed: "Aufgaben und Quiz – hinzufügen/bearbeiten/löschen"
+  assignments_and_quizzes_delete_84ecc680: "Aufgaben und Quiz – löschen"
+  assignments_and_quizzes_edit_1c23f658: "Aufgaben und Quiz – bearbeiten"
   assignments_and_quizzes_manage_edit_8b4b1edc: "Aufgaben und Quizze – verwalten/bearbeiten"
   assignments_and_quizzes_view_answer_matrix_e7a65578: "Aufgaben und Quizze – Antwortmatrix anzeigen"
   assignments_and_speedgrader_7a7cd90: "Aufgaben und SpeedGrader"
@@ -4879,7 +4879,7 @@ de:
   assignments_in_this_group_have_no_points_possible__3cd35922: "Für die Aufgaben in dieser Gruppe können keine Punkte vergeben werden, und sie können bei der Notenberechnung nicht berücksichtigt werden"
   assignments_in_this_group_have_no_points_possible__ab0adb72: "Aufgaben in dieser Gruppe haben keine möglichen Punkte und können nicht in die Notenberechnung aufgenommen werden."
   assignments_include_quizzes_graded_discussions_and_182e5899: |-
-      Zu den Aufgaben gehören Quizze, benotete Diskussionen und viele Arten
+      Zu den Aufgaben gehören Quiz, benotete Diskussionen und viele Arten
             von Online-Abgaben (Dateien, Bilder, Text, URLs und Medien). Ordnen Sie
             sie allen Teilnehmer\*innen eines Kurses zu oder weisen Sie unterschiedliche Fälligkeitstermine für bestimmte
             Abschnitte oder Benutzer\*innen zu. Erstellen Sie Aufgabengruppen, um Ihre Aufgaben zu organisieren
@@ -5562,7 +5562,7 @@ de:
   by_assignment_group_and_position_57a4be14: "Nach Aufgabengruppe und Position"
   by_b90c6b6f: von
   by_client_id_4f2fe02c: "Nach Client-ID"
-  by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "Standardmäßig sind alle Links für einen Kurs aktiviert.  Den Studierenden werden keine Links zu Kursabschnitten angezeigt, die keinen Inhalt haben.  Wenn Sie beispielsweise keine Quizze erstellt haben, werden keine Quiz-Links angezeigt.  Sie können die Links sortieren und gezielt deaktivieren, wenn Ihre Studierenden auf bestimmte Kursbereiche nicht zugreifen sollen."
+  by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "Standardmäßig sind alle Links für einen Kurs aktiviert.  Den Studierenden werden keine Links zu Kursabschnitten angezeigt, die keinen Inhalt haben.  Wenn Sie beispielsweise keine Quiz erstellt haben, werden keine Quiz-Links angezeigt.  Sie können die Links sortieren und gezielt deaktivieren, wenn Ihre Studierenden auf bestimmte Kursbereiche nicht zugreifen sollen."
   by_default_students_are_able_to_create_groups_to_r_ac2a70bd: "Standardmäßig können Studierende Gruppen einrichten. Um dies auszuschließen, müssen Sie in den Kurseinstellungen das Kontrollkästchen „Studierenden eigene Gruppen organisieren lassen“ deaktivieren."
   by_default_students_are_able_to_create_groups_to_r_ba7f2450: |-
       Standardmäßig können Studenten Gruppen einrichten; um dies auszuschließen, deaktivieren Sie
@@ -7153,8 +7153,8 @@ de:
       this_may_take_a_bit: "Dieser Vorgang kann einige Minuten dauern ..."
     quiz_export_checklist: 
       labels: 
-        all_quizzes: "Alle Quizze"
-      select_quizzes: "Quizze zum Exportieren auswählen"
+        all_quizzes: "Alle Quiz"
+      select_quizzes: "Quiz zum Exportieren auswählen"
   content_exports_e5a66f6a: Inhaltsexporte
   content_for_section_1_7ecfb319: "Inhalt für Abschnitt 1"
   content_for_section_2_e7c6e2a3: "Inhalt für Abschnitt 2"
@@ -7326,7 +7326,7 @@ de:
       import_blueprint_settings: 
         checkbox_label: "Einstellungen für Blueprint-Kurs importieren"
       import_quizzes_next_view: 
-        import_new_quizzes: "Vorhandene Quizze als *New Quizzes* importieren"
+        import_new_quizzes: "Vorhandene Quiz als *New Quizzes* importieren"
         import_new_quizzes_help_text: "New Quizzes ist das neue Bewertungssystem für Canvas. %{p_p}Für weitere Informationen, wenden Sie sich an Ihre/n Systemadministrator\\*in, oder besuchen Sie"
         import_quizzesNext_help_label: "Bewertung als Hilfesymbol für „New Quizzes“ importieren"
         import_quizzesNext_help_text: "Quizzes.Next ist das neue Bewertungssystem für Canvas.%{p_p}Für weitere Informationen wenden Sie sich an Ihren Systemadministrator, oder besuchen Sie"
@@ -7782,7 +7782,7 @@ de:
       external_tools: "Externe Tools"
       external_urls: "Externe URLs"
       files: Dateien
-      quizzes: Quizze
+      quizzes: Quiz
     points_possible_short: "%{points} Pkte."
     titles: 
       add: "Modul hinzufügen"
@@ -8261,8 +8261,8 @@ de:
   count_pushed_changes_6fe7fba: "%{count} Veranlasste Änderungen"
   count_quizzes_found_e5e29bb4: 
     one: "1 Quiz gefunden."
-    other: "%{count} Quizze gefunden."
-    zero: "Keine passenden Quizze gefunden."
+    other: "%{count} Quiz gefunden."
+    zero: "Keine passenden Quiz gefunden."
   count_recording_5ba8a655: "%{count} Aufzeichnung"
   count_recordings_9f8e4148: "%{count} Aufzeichnungen"
   count_release_notes_6f50a89f: 
@@ -8504,7 +8504,7 @@ de:
       question_bank: "Der Fragenpool „%{title}“ konnte nicht exportiert werden."
       quiz: "Das Quiz „%{title}“ konnte nicht exportiert werden."
       quiz_is_locked: "Das Quiz „%{title}“ konnte nicht kopiert werden, weil es gesperrt ist."
-      quizzes: "Einige Quizze konnten nicht exportiert werden."
+      quizzes: "Einige Quiz konnten nicht exportiert werden."
       resources: "Einige Ressourcen konnten nicht verknüpft werden."
       rubrics: "Rubriken konnten nicht exportiert werden."
       tool_profiles: "Der Export einiger Tool-Profile schlug fehl."
@@ -9236,7 +9236,7 @@ de:
       headings: 
         current_users: "Derzeitige Benutzer\\*innen"
       help: 
-        reset_course_content: "Die Kursinhalte zurückzusetzen, bewirkt eine endgültige Löschung aller zugehörigen Aufgaben, Diskussionen, Quizze, Module, Bewertungsschemata, Seiten, Dateien, Lernresultate, Fragenpools, Gruppenarbeiten, Konferenzen oder sonstiger Inhalte. Diese Aktion ist unumkehrbar und die Daten *können nicht* wiederhergestellt werden. Möchten Sie wirklich fortfahren?"
+        reset_course_content: "Die Kursinhalte zurückzusetzen, bewirkt eine endgültige Löschung aller zugehörigen Aufgaben, Diskussionen, Quiz, Module, Bewertungsschemata, Seiten, Dateien, Lernresultate, Fragenpools, Gruppenarbeiten, Konferenzen oder sonstiger Inhalte. Diese Aktion ist unumkehrbar und die Daten *können nicht* wiederhergestellt werden. Möchten Sie wirklich fortfahren?"
       links: 
         calendar: Kurskalender
         conclude: "Diesen Kurs abschließen"
@@ -9565,7 +9565,7 @@ de:
     plugins: Plug-ins
     prior_users: "Vorherige Benutzer\\*innen"
     question_banks: Fragenpools
-    quizzes: Quizze
+    quizzes: Quiz
     registered_services: "Registrierte Services"
     revisions: Überarbeitungen
     rubrics: Bewertungsschemata
@@ -9956,7 +9956,7 @@ de:
   default_order_8c409051: Standardreihenfolge
   default_question_name: Frage
   default_question_text: Fragetext
-  default_sis_sync_for_assignments_quizzes_grade_dis_3b2b4878: "Standard-SIS-Synchronisierung für Aufgaben, Quizze, Notendiskussionen"
+  default_sis_sync_for_assignments_quizzes_grade_dis_3b2b4878: "Standard-SIS-Synchronisierung für Aufgaben, Quiz, Notendiskussionen"
   default_skin_tone_f378d31c: Standardfarbton
   default_template_f2a759ed: Standardvorlage
   default_templates_are_used_as_starting_points_for__f06f9e33: "Standardvorlagen werden als Ausgangspunkte für neue Themen verwendet und können nicht gelöscht werden."
@@ -9978,7 +9978,7 @@ de:
   delete_assignment_5d3f3f15: "Aufgabe löschen"
   delete_assignment_group_7c3b01c4: "Aufgabengruppe löschen"
   delete_assignment_name_deec56e3: "Aufgabe %{name} löschen"
-  delete_assignments_and_quizzes_b30347d7: "Aufgaben und Quizze löschen"
+  delete_assignments_and_quizzes_b30347d7: "Aufgaben und Quiz löschen"
   delete_bank_d8f4cb64: "Löschen %{bank}"
   delete_collaboration_23035eaf: "Zusammenarbeit löschen"
   delete_comment_a71040c3: "Kommentar löschen"
@@ -10354,9 +10354,9 @@ de:
   disabling_f594bda: "Wird deaktiviert ..."
   disabling_post_to_sis_is_not_available_for_non_pub_ee031373: "Das Deaktivieren von „An SIS posten“ ist für unveröffentlichte Kurse nicht verfügbar."
   disabling_sync_to_name_failed_e7521ebb: "Das Deaktivieren der Synchronisierung mit %{name} schlug fehl."
-  disabling_the_assignments_and_quizzes_add_permissi_e06f1379: "Das Deaktivieren der Berechtigung „Aufgaben- und Quizze – hinzufügen“ wird (falls aktiviert) die Berechtigung „Bewertungsschemata – hinzufügen/bearbeiten/löschen“ außer Kraft setzen, um zu verhindern, dass Benutzer\\*in Bewertungsschemata für eine einzelne Aufgabe erstellen."
-  disabling_the_assignments_and_quizzes_delete_permi_ad890eb3: "Das Deaktivieren der Berechtigung „Aufgaben- und Quizze – löschen“ wird (falls aktiviert) die Berechtigung „Bewertungsschemata – hinzufügen/bearbeiten/löschen“ außer Kraft setzen, um zu verhindern, dass Benutzer\\*in Bewertungsschemata für eine einzelne Aufgabe löschen."
-  disabling_the_assignments_and_quizzes_edit_permiss_529f9360: "Das Deaktivieren der Berechtigung „Aufgaben- und Quizze – bearbeiten“ wird (falls aktiviert) die Berechtigung „Bewertungsschemata – hinzufügen/bearbeiten/löschen“ außer Kraft setzen, um zu verhindern, dass Benutzer\\*innen Bewertungsschemata für eine einzelne Aufgabe bearbeiten."
+  disabling_the_assignments_and_quizzes_add_permissi_e06f1379: "Das Deaktivieren der Berechtigung „Aufgaben- und Quiz – hinzufügen“ wird (falls aktiviert) die Berechtigung „Bewertungsschemata – hinzufügen/bearbeiten/löschen“ außer Kraft setzen, um zu verhindern, dass Benutzer\\*in Bewertungsschemata für eine einzelne Aufgabe erstellen."
+  disabling_the_assignments_and_quizzes_delete_permi_ad890eb3: "Das Deaktivieren der Berechtigung „Aufgaben- und Quiz – löschen“ wird (falls aktiviert) die Berechtigung „Bewertungsschemata – hinzufügen/bearbeiten/löschen“ außer Kraft setzen, um zu verhindern, dass Benutzer\\*in Bewertungsschemata für eine einzelne Aufgabe löschen."
+  disabling_the_assignments_and_quizzes_edit_permiss_529f9360: "Das Deaktivieren der Berechtigung „Aufgaben- und Quiz – bearbeiten“ wird (falls aktiviert) die Berechtigung „Bewertungsschemata – hinzufügen/bearbeiten/löschen“ außer Kraft setzen, um zu verhindern, dass Benutzer\\*innen Bewertungsschemata für eine einzelne Aufgabe bearbeiten."
   disabling_the_elementary_theme_will_change_the_fon_d7f31a3b: "Das Deaktivieren des elementaren Designs ändert die Schriftart in der Canvas-Oberfläche für alle Benutzer\\*innen in Ihrem Kurs."
   disabling_the_mastery_paths_feature_will_release_c_4b96c86d: "Wenn Sie die Funktion „Masterpfade“ deaktivieren, werden konfigurierte Aufgaben und Inhalte für alle Studierende freigegeben. Wenn die Funktion erneut aktiviert wird, müssen diese Aufgaben für Masterpfade erneut konfiguriert werden."
   disabling_the_mastery_paths_feature_will_release_c_8a001169: "Wenn Sie die Funktion „Masterpfade“ deaktivieren, werden konfigurierte Aufgaben und Inhalte für alle Studierenden freigegeben. %{br} Wenn die Funktion erneut aktiviert wird, müssen diese Aufgaben für Leistungszielpfade erneut konfiguriert werden."
@@ -10894,7 +10894,7 @@ de:
   download_the_complete_list_of_errors_and_warnings__7d993f7b: "Vollständige Liste der Fehler und Warnungen hier herunterladen"
   download_these_results_as_csv_9a890883: "Download der Ergebnisse als CSV"
   download_this_file_669f9174: "Diese Datei herunterladen"
-  downloading_course_content_allows_access_to_conten_164d9336: "Das Herunterladen von Kursinhalten ermöglicht den Offline-Zugang zu den Inhalten. Die Inhalte können aus Dateien, Seiten, Aufgaben, Diskussionsthemen oder Quizzen bestehen. Klicken Sie für jeden Kurs auf „ePub erzeugen“ und öffnen Sie sie mit jeder beliebigen eReader-Software, um sie anzusehen."
+  downloading_course_content_allows_access_to_conten_164d9336: "Das Herunterladen von Kursinhalten ermöglicht den Offline-Zugang zu den Inhalten. Die Inhalte können aus Dateien, Seiten, Aufgaben, Diskussionsthemen oder Quiz bestehen. Klicken Sie für jeden Kurs auf „ePub erzeugen“ und öffnen Sie sie mit jeder beliebigen eReader-Software, um sie anzusehen."
   draft_92507c72: (Entwurf)
   draft_comment_b2376ea4: Kommentarentwurf
   draft_comment_warning_modal_in_speedgrader_ded232c1: "Warnmodal für Kommentarentwurf in SpeedGrader"
@@ -13947,7 +13947,7 @@ de:
   granular_course_notification_settings_will_be_conf_68f122db: "In Zukunft werden hier granulare Kursbenachrichtigungseinstellungen konfigurierbar sein."
   granular_permissions_for_add_remove_admin_roles_fr_9a06a75d: "Granulare Berechtigungen zum Hinzufügen/Entfernen von Admin-Rollen zum/vom Kurs"
   granular_permissions_for_add_remove_roles_from_cou_b0a34301: "Einzelberechtigungen zum Hinzufügen/Entfernen von Rollen zu/aus Kursen"
-  granular_permissions_for_assignments_and_quizzes_6b3bddc6: "Detaillierte Berechtigungen für Aufgaben und Quizze"
+  granular_permissions_for_assignments_and_quizzes_6b3bddc6: "Detaillierte Berechtigungen für Aufgaben und Quiz"
   granular_permissions_for_managing_course_content_91375668: "Granulare Berechtigungen für die Verwaltung von Kursinhalten"
   granular_permissions_for_managing_course_files_1ed7f019: "Granulare Berechtigungen für die Verwaltung von Kursdateien"
   granular_permissions_for_managing_course_sections_da4b04b: "Granulare Berechtigungen für die Verwaltung von Kursabschnitten"
@@ -14893,7 +14893,7 @@ de:
       Wenn ein mit der Platzierung konfiguriertes LTI-Werkzeug installiert ist, wird ein neuer Eintrag in der
       Dropdown-Liste für den Zuordnungstyp angezeigt, um die Zuordnung für das Werkzeug schnell zu konfigurieren.
   if_blueprint_courses_add_edit_associate_delete_and_82f7ee06: "Falls die Berechtigungen „Musterkurse – hinzufügen/bearbeiten/verknüpfen/löschen“ und „Kurse – verwalten/aktualisieren“ aktiviert sind, „Aufgaben und Quizze – bearbeiten“ jedoch nicht aktiviert ist, können Musterkurs-Sperreinstellungen für eine Aufgabe auf der Detailseite der Aufgabe verwaltet werden."
-  if_blueprint_courses_add_edit_associate_delete_and_9ebd192d: "Wenn „Blueprint-Kurse - Hinzufügen/Bearbeiten/Verknüpfen/Löschen“ und „Kurse - Verwalten“ aktiviert sind, aber „Aufgaben und Quizze –  Bearbeiten“ nicht aktiviert ist, können die Blueprint-Sperreinstellungen für eine Aufgabe auf der Detailseite der Aufgabe verwaltet werden."
+  if_blueprint_courses_add_edit_associate_delete_and_9ebd192d: "Wenn „Blueprint-Kurse - Hinzufügen/Bearbeiten/Verknüpfen/Löschen“ und „Kurse - Verwalten“ aktiviert sind, aber „Aufgaben und Quiz –  Bearbeiten“ nicht aktiviert ist, können die Blueprint-Sperreinstellungen für eine Aufgabe auf der Detailseite der Aufgabe verwaltet werden."
   if_both_grades_edit_and_grades_view_all_grades_are_795578a5: "Wenn sowohl „Noten – ändern“ als auch „Noten – alle Noten anzeigen“ deaktiviert sind, wird das Notenbuch in der Kursnavigation ausgeblendet."
   if_both_grades_edit_and_grades_view_all_grades_are_9bfa7a61: "Wenn sowohl „Noten – ändern“ als auch „Noten – alle Noten anzeigen“ deaktiviert sind, wird das Notenbuch in der Kursnavigation ausgeblendet."
   if_both_grades_edit_and_grades_view_all_grades_are_ed522d43: "Wenn sowohl „Noten – ändern“ als auch „Noten – alle Noten anzeigen“ deaktiviert sind, wird das Notenbuch in der Kursnavigation ausgeblendet."
@@ -14982,7 +14982,7 @@ de:
       Schaltflächen Deaktivieren/Zulassen/Aktivieren weiterhin sichtbar.
   if_enabled_scopes_will_be_validated_on_api_request_99cab83f: "Falls aktiviert, werden Geltungsbereiche auf Anforderung von APIs überprüft, falls der verwendete Entwicklerschlüssel Geltungsbereiche erfordert."
   if_enabled_sourcedids_used_by_canvas_for_basic_out_aa2ea4b1: "Von Canvas verwendete SourcedIDs für grundlegende Ergebnisse werden verschlüsselt."
-  if_enabled_submission_history_for_new_quizzes_quiz_fc295f42: "Falls aktiviert, wird der Abgabeverlauf für Quizze von „New Quizzes“ separat behandelt."
+  if_enabled_submission_history_for_new_quizzes_quiz_fc295f42: "Falls aktiviert, wird der Abgabeverlauf für Quiz von „New Quizzes“ separat behandelt."
   if_enabled_submission_history_for_quizzes_next_qui_fd70161: "Wenn aktiviert, Abgabeverlauf für Quizzes.Next Quizze werden separat behandelt."
   if_enabled_syncing_course_enrollments_to_microsoft_6f4f2bf9: |-
       Falls diese Option aktiviert ist, können Kursanmeldungen mit Microsoft-Gruppen synchronisiert
@@ -15038,7 +15038,7 @@ de:
   if_multiple_due_date_overrides_apply_to_a_student__d766b09c: "Falls mehrere Fälligkeitsüberschreitungen auf einen Studierenden bei einer bestimmten Aufgabe zutreffen und eine dieser Zeitüberschreitungen eine individuelle Zeitüberschreitung ist, verwenden Sie immer das Datum der individuellen Zeitüberschreitung. Bisher galt immer, das Datum der Zeitüberschreitung auszuwählen, die dem Studenten die meiste Zeit für die Abgabe einräumte."
   if_new_quizzes_is_enabled_this_allows_for_the_crea_87343d6f: |-
       Falls „New Quizzes“ aktiviert ist, ist es möglich, Objektpools
-      im Besitz bestimmter Kurse und des Stammkontos in neuen Quizzen zu erstellen und zu verwalten.
+      im Besitz bestimmter Kurse und des Stammkontos in neuen Quiz zu erstellen und zu verwalten.
   if_none_are_selected_send_to_everyone_in_the_entir_16aa0bb0: "(Falls keine ausgewählt sind, an jeden im gesamten Konto senden)"
   if_none_are_selected_send_to_everyone_in_the_entir_21119709: "(Falls keine ausgewählt sind, an jeden im gesamten Unterkonto senden)"
   if_none_are_selected_show_to_everyone_in_the_entir_568a1dfc: "(Wenn keine ausgewählt sind, zeigen Sie sie allen im gesamten Unterkonto an)."
@@ -15131,7 +15131,7 @@ de:
   if_the_open_registration_account_setting_is_enable_f3b9a75f: "Falls die Kontoeinstellung „Offene Registrierung“ aktiviert ist, können Benutzer mit dieser Berechtigung Studenten oder Beobachter über die E-Mail-Adresse oder Login-ID zu einem Kurs hinzufügen, auch wenn der Student oder Beobachter noch kein Canvas-Konto hat."
   if_the_option_requiring_users_to_post_before_seein_a9274f5f: "Wenn die Option ausgewählt ist, dass Benutzer\\*innen erst einen Beitrag schreiben müssen, bevor sie die Antworten sehen können, müssen die Benutzer eine Antwort schreiben, um alle Beiträge zu sehen, es sei denn, Diskussionen - moderieren ist ebenfalls aktiviert."
   if_the_pages_update_permission_is_disabled_the_use_3df16c25: "Falls die Berechtigung „Seiten – Update“ deaktiviert ist, kann der/die Benutzer\\*in trotzdem noch Content-Sperreinstellungen für einzelne Seiten in einem Blueprint-Hauptkurs anpassen."
-  if_these_additional_permissions_are_enabled_but_as_d264879d: "Falls diese zusätzlichen Berechtigungen aktiviert sind, jedoch „Aufgaben und Quizze – hinzufügen/bearbeiten/löschen“ nicht aktiviert ist, können Blueprint-Sperreinstellungen für eine Aufgabe auf der Detailseite der Aufgabe verwaltet werden."
+  if_these_additional_permissions_are_enabled_but_as_d264879d: "Falls diese zusätzlichen Berechtigungen aktiviert sind, jedoch „Aufgaben und Quiz – hinzufügen/bearbeiten/löschen“ nicht aktiviert ist, können Blueprint-Sperreinstellungen für eine Aufgabe auf der Detailseite der Aufgabe verwaltet werden."
   if_this_account_already_uses_sftp_please_reach_out_377296d1: "Falls dieses Konto bereits SFTP benutzt, wenden Sie sich in Slack an #Canvas-SRE. Ihr Benutzername entspricht nicht unserem Standard für Benutzernamen."
   if_this_account_does_not_use_sftp_currently_press__eb1b3b88: "Falls dieses Konto derzeit nicht SFTP verwendet, klicken Sie auf „Aktivieren“, um eine/n SFTP-Benutzer\\*in einzurichten."
   if_this_permission_is_disabled_and_courses_add_edi_5f31ce8f: "Falls diese Berechtigung deaktiviert ist und „Kurse – hinzufügen / ändern / löschen“ aktiviert ist, können Benutzer anhand der Schaltfläche „Neuen Kurs hinzufügen“ in den Kontoeinstellungen einen neuen Kurs hinzufügen."
@@ -16166,7 +16166,7 @@ de:
         external_tools: "Externe Tools"
         groups: Studierendegruppen
         learning_outcomes: Lernergebnisse
-        quizzes: Quizze
+        quizzes: Quiz
         rubrics: Bewertungsschemata
         syllabus_body: Kursplan-Textkörper
         tool_profiles: Tool-Profile
@@ -16693,7 +16693,7 @@ de:
   manage_announcement_with_title_title_f2ce92de: "Ankündigung mit Titel %{title} verwalten"
   manage_app_list_994cc26c: "App-Liste verwalten"
   manage_assignment_31a132fb: "Aufgabe verwalten"
-  manage_assignments_and_quizzes_170ccaf4: "Aufgaben und Quizze verwalten"
+  manage_assignments_and_quizzes_170ccaf4: "Aufgaben und Quiz verwalten"
   manage_avatars: 
     errors: 
       update_failed: "Aktualisierung fehlgeschlagen. Bitte erneut versuchen"
@@ -16715,7 +16715,7 @@ de:
   manage_discussion_by_author_ac2b9c9e: "Diskussion von %{author} verwalten"
   manage_discussion_c1dd8f4e: "Diskussion verwalten"
   manage_discussion_title_a2ecb3fb: "Diskussion verwalten %{title}"
-  manage_edit_assignments_and_quizzes_572f3589: "Aufgaben und Quizze verwalten/bearbeiten"
+  manage_edit_assignments_and_quizzes_572f3589: "Aufgaben und Quiz verwalten/bearbeiten"
   manage_enrollment_status_create_groups_and_add_use_3c91de1b: "Anmeldestatus verwalten, Gruppen einrichten und Benutzer von dieser Seite hinzufügen."
   manage_grading_schemes_in_context_name_e3678273: "Benotungssysteme in %{context_name} verwalten"
   manage_group_group_name_ac8578c6: "Die Gruppe %{group_name} verwalten"
@@ -19944,7 +19944,7 @@ de:
     all_submissions_description: |-
         *Nur Lehrende und Administrator\*in:*
         
-        Aufgabe (außer Quizze) Abgabe/erneute Abgabe
+        Aufgabe (außer Quiz) Abgabe/erneute Abgabe
     all_submissions_display: "Alle Abgaben"
     announcement_created_by_you_description: |-
         * Von Ihnen verfasste Ankündigungen
@@ -22445,7 +22445,7 @@ de:
         delete: "Pool löschen"
         edit: "Pool-Details bearbeiten"
         move_questions: "Mehrere Fragen verschieben"
-      edit_warning: "Bedenken Sie, dass Änderungen an Fragenvorlagen nicht automatisch zur Aktualisierung der Quizze führen, die diese Fragen verwenden."
+      edit_warning: "Bedenken Sie, dass Änderungen an Fragenvorlagen nicht automatisch zur Aktualisierung der Quiz führen, die diese Fragen verwenden."
       headings: 
         aligned_outcomes: "Angepasste Lernergebnisse"
       labels: 
@@ -22782,9 +22782,9 @@ de:
       add_quiz: Quiz
       links: 
         manage_question_banks: "Fragenpools verwalten"
-        publish_multiple_quizzes: "Mehrere Quizze veröffentlichen"
+        publish_multiple_quizzes: "Mehrere Quiz veröffentlichen"
         settings: Einstellungen
-      quizzes_title: Quizze
+      quizzes_title: Quiz
       search_for_quiz: "Quiz suchen"
       title_add_quiz: "Quiz hinzufügen"
     label: 
@@ -22850,7 +22850,7 @@ de:
     no_quizzes_view: 
       headers: 
         course_quizzes: Kursquizze
-      no_quizzes: "Keine Quizze verfügbar"
+      no_quizzes: "Keine Quiz verfügbar"
     notices: 
       message_sent: "Nachricht wurde gesendet."
     question: 
@@ -22885,7 +22885,7 @@ de:
         no_permissions: "Der/die Benutzer\\*in war nicht berechtigt, zum Bezug auf den Fragenpool in der Quizgruppe %{group_name} zu nehmen."
       question_group: Fragengruppe
     quiz_item_group_view: 
-      no_quizzes: "Es wurden keine Quizze gefunden."
+      no_quizzes: "Es wurden keine Quiz gefunden."
       no_surveys: "Es wurden keine Befragungen gefunden."
     quiz_item_view: 
       links: 
@@ -23168,7 +23168,7 @@ de:
         unnamed_survey_results: "Befragungsergebnisse für %{user}"
         view_log: "Protokoll anzeigen"
       index: 
-        page_titles: Quizze
+        page_titles: Quiz
       invalid_ip: 
         quiz_protected: "Dieses Quiz ist geschützt und nur an bestimmten Standorten verfügbar. Der Standort des Computers, den Sie gerade verwenden, scheint für dieses Quiz nicht gültig zu sein."
         survey_protected: "Diese Befragung ist geschützt und nur an bestimmten Standorten verfügbar. Der Standort des Computers, den Sie gerade verwenden, scheint für diese Befragung nicht gültig zu sein."
@@ -23326,10 +23326,10 @@ de:
         quiz_updated: "Quiz erfolgreich aktualisiert"
         quizzes_published: 
           one: "1 Quiz erfolgreich veröffentlicht"
-          other: "%{count} Quizze erfolgreich veröffentlicht"
+          other: "%{count} Quiz erfolgreich veröffentlicht"
         quizzes_unpublished: 
           one: "Veröffentlichung von 1 Quiz erfolgreich rückgängig gemacht"
-          other: "Veröffentlichung von %{count} Quizzen erfolgreich rückgängig gemacht"
+          other: "Veröffentlichung von %{count} Quiz erfolgreich rückgängig gemacht"
         submission_doesnt_count: "Dieses Quiz wird nicht mehr für Ihre Note berücksichtigt."
       question_group: 
         buttons: 
@@ -23533,7 +23533,7 @@ de:
           show_student_survey_results: "Befragungsergebnisse der/des Studierenden anzeigen"
           survey_statistics: Befragungsstatistik
         manage: Verwalten
-        only_registered_users: "Nur registrierte eingeschriebene Benutzer\\*innen dürfen an benoteten Quizzen teilnehmen."
+        only_registered_users: "Nur registrierte eingeschriebene Benutzer\\*innen dürfen an benoteten Quiz teilnehmen."
         quiz_regraded_your_score_affected: 
           one: "Dieses Quiz wurde neu benotet. Dies hat sich auf Ihren Punktestand ausgewirkt."
           other: "Dieses Quiz wurde neu benotet. Ihr neuer Punktestand gilt für %{count} Fragen, die davon betroffen waren."
@@ -23740,10 +23740,10 @@ de:
     : Wahr
   quizzes/quiz: 
     submission_action_take_quiz: "%{title} nehmen"
-  quizzes_7e598f57: Quizze
-  quizzes_and_question_banks_9b7569e3: "Quizze und Fragenpools"
-  quizzes_are_not_yet_handled_in_the_new_assignments_3898536a: "Quizze wurden im neuen Aufgabenfluss noch nicht berücksichtigt. Zur angestammten Seite zum Erstellen von Quizzen gehen?"
-  quizzes_b1e4b6cb: Quizze
+  quizzes_7e598f57: Quiz
+  quizzes_and_question_banks_9b7569e3: "Quiz und Fragenpools"
+  quizzes_are_not_yet_handled_in_the_new_assignments_3898536a: "Quiz wurden im neuen Aufgabenfluss noch nicht berücksichtigt. Zur angestammten Seite zum Erstellen von Quiz gehen?"
+  quizzes_b1e4b6cb: Quiz
   quizzes_index: 
     headers: 
       assignment_quizzes: Aufgabenquizze
@@ -23842,7 +23842,7 @@ de:
     question_limit_reached: |-
         Sie haben die maximal für ein Quiz zulässige Fragenanzahl (%{count}/%{limit}) erreicht.
         
-        Notfalls können Sie Ihre Materialien auf mehrere Quizze verteilen.
+        Notfalls können Sie Ihre Materialien auf mehrere Quiz verteilen.
     quiz_attempts_length_error: "Die Anzahl der Quiz-Versuche ist auf 3 Stellen beschränkt. Wenn Sie Ihren Studierenden eine unbegrenzte Anzahl Versuche zur Verfügung stellen möchten, lassen Sie das Kontrollkästchen „Mehrere Versuche zulassen“ auf der linken Seite leer."
     quiz_attempts_nan_error: "Quizversuche können nur als Zahl angegeben werden."
     quiz_short_answer_length_error: "Antworten, bei denen Leerfelder ausgefüllt werden müssen, dürfen höchstens 80 Zeichen lang sein."
@@ -23861,8 +23861,8 @@ de:
     top_level: "– Oberste Ebene –"
     ? "true"
     : Wahr
-  quizzes_tutorial_tray_6f87cdd3: "Quizze Übungsfach"
-  quizzes_view_submission_log_ec105e3e: "Quizze – Sendeprotokoll anzeigen"
+  quizzes_tutorial_tray_6f87cdd3: "Quiz Übungsfach"
+  quizzes_view_submission_log_ec105e3e: "Quiz – Sendeprotokoll anzeigen"
   quotas_account_settings_22c12b8d: "Quoten (Kontoeinstellungen)"
   quote_ae4462ad: Zitat
   quote_reply_e56ad360: "Antwort zitieren"
@@ -24505,7 +24505,7 @@ de:
       manage_account_settings: "Einstellungen der Kontoebene verwalten"
       manage_admin_users: "Andere Lehrende, Kursdesigner oder Lehrassistenten zum Kurs hinzufügen bzw. daraus entfernen"
       manage_announcements: "Globale Ankündigungen verwalten"
-      manage_assignments: "Aufgaben und Quizze verwalten (hinzufügen/bearbeiten/löschen)"
+      manage_assignments: "Aufgaben und Quiz verwalten (hinzufügen/bearbeiten/löschen)"
       manage_calendar: "Kurskalenderereignisse hinzufügen, bearbeiten und löschen"
       manage_canvasnet_courses: "Canvas Network-Kurse verwalten"
       manage_catalog: "Katalog verwalten"
@@ -25413,7 +25413,7 @@ de:
   sent_f4ee89ec: Gesendet
   sent_fe0a1eb4: Gesendet
   separate_columns_for_first_last_names_in_gradebook_419126c3: "Getrennte Spalten für Vor- und Nachnamen im Notenbuch"
-  separate_out_granular_add_and_delete_permissions_f_c63d37b6: "Trennen Sie Einzelberechtigungen für Hinzufügen und Löschen für Aufgaben und Quizze von der bestehenden Berechtigung zum Verwalten, die alle drei steuert."
+  separate_out_granular_add_and_delete_permissions_f_c63d37b6: "Trennen Sie Einzelberechtigungen für Hinzufügen und Löschen für Aufgaben und Quiz von der bestehenden Berechtigung zum Verwalten, die alle drei steuert."
   september_9d32dd4b: September
   sequence_footer: 
     next_module: "Nächstes Modul:"
@@ -27482,7 +27482,7 @@ de:
   sync_enrollments_from_homeroom_c75285f4: "Anmeldungen in der Organisationsstunde synchronisieren"
   sync_grades_a16622ca: "Noten synchronisieren"
   sync_grades_to_sis_4e7fbc08: "Noten mit SIS synchronisieren"
-  sync_grades_to_sis_checkbox_is_enabled_by_default__fad7a785: "Das Kontrollkästchen „Noten mit SIS synchronisieren“ ist für Aufgaben, benotete Diskussionen und Quizze standardmäßig angekreuzt."
+  sync_grades_to_sis_checkbox_is_enabled_by_default__fad7a785: "Das Kontrollkästchen „Noten mit SIS synchronisieren“ ist für Aufgaben, benotete Diskussionen und Quiz standardmäßig angekreuzt."
   sync_grades_to_sis_fd01f7fd: "Noten mit SIS synchronisieren"
   sync_history_3d46eb19: Synchronisierungsverlauf
   sync_in_progress_12ff1d3c: "Synchronisierung läuft ..."
@@ -27547,7 +27547,7 @@ de:
     people: Personen
     profile: Profil
     qr_mobile_login: "QR für die mobile Anmeldung"
-    quizzes: Quizze
+    quizzes: Quiz
     rubrics: Bewertungsschemata
     schedule: Zeitplan
     settings: Einstellungen
@@ -29009,7 +29009,7 @@ de:
   to_access_the_courses_link_in_account_navigation_c_eee259fa: "Für den Zugriff auf Kurs-Links in der Kontonavigation müssen „Kurse - verwalten / aktualisieren“ und „Kurse - Liste anzeigen“ aktiviert sein."
   to_access_the_courses_link_in_account_navigation_m_ce68b53d: "Zugreifen auf den Kurse-Link in der Kursnavigation, Kurse verwalten: „Admin – verwalten/aktualisieren“ und „Kurse – Liste anzeigen“ müssen aktiviert sein."
   to_access_the_manage_question_banks_link_in_a_cour_202b4cd8: "Um auf einer Kursquizindexseite auf den Link „Fragenpools verwalten“ zugreifen zu können, müssen „Kurs-Content – anzeigen“ und „Aufgaben und Quizze – hinzufügen/bearbeiten/löschen“ ebenfalls aktiviert sein."
-  to_access_the_manage_question_banks_link_in_a_cour_cc26af7c: "Um auf einer Kursquizindexseite auf den Link „Fragenpools verwalten“ zugreifen zu können, müssen die Berechtigungen „Kurs-Inhalt – anzeigen“ und „Aufgaben und Quizze – verwalten/bearbeiten“ ebenfalls aktiviert sein."
+  to_access_the_manage_question_banks_link_in_a_cour_cc26af7c: "Um auf einer Kursquizindexseite auf den Link „Fragenpools verwalten“ zugreifen zu können, müssen die Berechtigungen „Kurs-Inhalt – anzeigen“ und „Aufgaben und Quiz – verwalten/bearbeiten“ ebenfalls aktiviert sein."
   to_access_the_mastery_tab_the_outcome_mastery_scal_46ae1c5b: "Um auf die Registerkarte „Beherrschung“ zugreifen zu können, muss die Berechtigung „Berechnungen des Kenntnisstands – hinzufügen/bearbeiten“ ebenfalls aktiviert sein. Um auf die Registerkarte „Verwalten“ zugreifen zu können, muss die Berechtigung „Lernergebnisse – hinzufügen/bearbeiten/löschen“ ebenfalls aktiviert sein."
   to_access_the_people_page_and_view_course_groups_u_e2dc13eb: "Um auf die Seite „Teilnehmer\\*innen“ zugreifen und Kursgruppen anzeigen zu können, muss die Berechtigung „Benutzer – Liste anzeigen“ aktiviert sein."
   to_access_the_people_page_and_view_groups_users_vi_43aceac3: "Um die Seite „Teilnehmer“ zu öffnen und „Gruppen“ anzeigen zu können, muss die Option „Benutzer – Liste anzeigen“ ebenfalls aktiviert sein."
@@ -29219,7 +29219,7 @@ de:
   to_edit_lock_settings_on_files_courses_manage_and__f4718695: "Um die Sperreinstellungen für Dateien zu bearbeiten, müssen „Kurse - verwalten“ und „Kursdateien - bearbeiten“ ebenfalls aktiviert sein."
   to_edit_lock_settings_on_files_courses_manage_upda_1ae54c88: "Um die Sperreinstellungen für Dateien zu bearbeiten, müssen „Kurse - verwalten / aktualisieren“ und „Kursdateien - bearbeiten“ ebenfalls aktiviert sein."
   to_edit_lock_settings_on_files_manage_courses_admi_de9c4e6f: "Um Sperreinstellungen für Dateien ändern zu können, müssen „Kurse verwalten“: „Admin – verwalten/aktualisieren“ und „Kursdateien – bearbeiten“ ebenfalls aktiviert werden."
-  to_edit_lock_settings_on_quizzes_courses_manage_an_eb629aa9: "Um die Sperreinstellungen für Quizze zu bearbeiten, müssen „Kurse - verwalten“ und „Aufgaben und Quizze - verwalten / bearbeiten“ ebenfalls aktiviert sein."
+  to_edit_lock_settings_on_quizzes_courses_manage_an_eb629aa9: "Um die Sperreinstellungen für Quiz zu bearbeiten, müssen „Kurse - verwalten“ und „Aufgaben und Quiz - verwalten / bearbeiten“ ebenfalls aktiviert sein."
   to_edit_lock_settings_on_quizzes_courses_manage_up_6366321f: "Um Sperreinstellungen bei Quizzen ändern zu können, müssen die Berechtigungen „Kurse – verwalten/aktualisieren“ und „Aufgaben und Quizze – verwalten/bearbeiten“ ebenfalls aktiviert sein."
   to_edit_lock_settings_on_quizzes_courses_manage_up_ca877392: "Um die Sperreinstellungen für Quizze zu bearbeiten, müssen „Kurse - verwalten / aktualisieren“ und „Aufgaben und Quizze - hinzufügen / bearbeiten / löschen“ ebenfalls aktiviert sein."
   to_edit_lock_settings_on_quizzes_manage_courses_ad_ebe40e19: "Um Sperreinstellungen für Quizze ändern zu können, müssen „Kurse verwalten“: „Admin – verwalten/aktualisieren“ und „Aufgaben und Quizze – hinzufügen/bearbeiten/löschen“ ebenfalls aktiviert werden."
@@ -29230,7 +29230,7 @@ de:
   to_edit_lock_settings_on_the_pages_index_page_page_40e7352c: "Um die Sperreinstellungen auf der Seiten Indexseite zu bearbeiten, müssen „Seiten - aktualisieren“, „Musterkurse - hinzufügen / bearbeiten / zuordnen / löschen“ und „Kurse - verwalten / aktualisieren“ ebenfalls aktiviert sein."
   to_edit_lock_settings_on_the_pages_index_page_page_5e65b3d6: "Um die Sperreinstellungen auf der Seiten Indexseite zu bearbeiten, müssen „Seiten - aktualisieren“, „Blueprint-Kurse - hinzufügen / bearbeiten / zuordnen / löschen“ und „Kurse - verwalten“ ebenfalls aktiviert sein."
   to_edit_lock_settings_on_the_pages_index_page_page_ce2c99e: "Um die Sperreinstellungen auf der Seitenindexseite ändern zu können, müssen „Seiten – Update“, „Musterkurs – hinzufügen/bearbeiten/verknüpfen/löschen“ und „Kurse verwalten“: „Admin – verwalten/aktualisieren“ aktiviert werden."
-  to_edit_quizzes_assignments_and_quizzes_manage_edi_d57651dd: "Um Quizze ändern zu können, muss die Berechtigung „Aufgaben und Quizze – verwalten/bearbeiten“ ebenfalls aktiviert sein."
+  to_edit_quizzes_assignments_and_quizzes_manage_edi_d57651dd: "Um Quiz ändern zu können, muss die Berechtigung „Aufgaben und Quiz – verwalten/bearbeiten“ ebenfalls aktiviert sein."
   to_edit_the_course_sis_id_courses_manage_and_sis_d_dfe90e4e: "Um die Kurs-SIS-ID zu bearbeiten, müssen „Kurse - verwalten“ und „SIS-Daten - verwalten“ ebenfalls aktiviert sein."
   to_edit_the_course_sis_id_courses_manage_update_an_47dfbeb: "Um die Kurs-SIS-ID zu bearbeiten, müssen „Kurse - verwalten / aktualisieren“ und „SIS-Daten - verwalten“ ebenfalls aktiviert sein."
   to_edit_the_course_sis_id_manage_courses_admin_man_421b31b8: "Zum Ändern der Kurs-SIS-ID, müssen „Kurse verwalten“: „Admin – verwalten/aktualisieren“ und „SIS-Daten – verwalten“ ebenfalls aktiviert werden."
@@ -29246,7 +29246,7 @@ de:
   to_end_a_long_running_conference_the_course_conten_63e3f993: "Um eine lange andauernde Konferenz zu beenden, muss „Kurs-Inhalt – Berechtigung“ aktiviert sein."
   to_f0e90538: "An:"
   to_fully_manage_course_level_question_banks_assign_2c31396f: "Um Fragenpools auf Kursebene vollständig verwalten zu können, muss „Aufgaben und Quizze – hinzufügen/ändern/löschen“ ebenfalls aktiviert werden."
-  to_fully_manage_course_level_question_banks_assign_3e5eb580: "Um Fragenpools auf Kursebene vollständig verwalten zu können, muss die Berechtigung „Aufgaben und Quizze – verwalten/ändern“ ebenfalls aktiviert werden."
+  to_fully_manage_course_level_question_banks_assign_3e5eb580: "Um Fragenpools auf Kursebene vollständig verwalten zu können, muss die Berechtigung „Aufgaben und Quiz – verwalten/ändern“ ebenfalls aktiviert werden."
   to_generate_a_pairing_code_from_a_student_s_user_d_28a10a61: "Um einen Pairing-Code auf der Detailseite eines Studenten zu generieren, muss „Benutzer – Studenten zu Kursen hinzufügen oder daraus entfernen“ ebenfalls aktiviert sein."
   to_generate_a_pairing_code_from_a_student_s_user_d_7a282f3d: "Um einen Pairing-Code auf der Benutzerdetailseite eines Studenten zu generieren, muss „Benutzer – administrative Aktionen erlauben“ ebenfalls aktiviert sein."
   to_generate_a_pairing_code_from_a_student_s_user_d_9c907ed3: "Um einen Pairing-Code auf der Detailseite eines Studenten zu generieren, muss „Benutzer – Studenten zu Kursen hinzufügen oder daraus entfernen“ ebenfalls aktiviert sein."
@@ -29262,7 +29262,7 @@ de:
   to_generate_login_logout_activity_in_admin_tools_u_253c565b: "Um Anmelde-/Abmeldeaktivitäten in den Admin-Tools zu erstellen, müssen „Benutzer – Login-Details verwalten“ oder „Statistiken – anzeigen“ ebenfalls aktiviert sein. Um Protokolle zu Notenänderungen in den Admin-Tools zu erstellen, muss „Noten – Änderungsprotokolle anzeiegn“ ebenfalls aktiviert sein."
   to_generate_login_logout_activity_in_admin_tools_u_603c40a0: "Zu generieren Um in Admin-Tools eine An- oder Abmeldaktivität generieren zu können, muss „Benutzer\\*innen – Anmeldedetails verwalten“ oder „Statistik – anzeigen“ ebenfalls aktiviert werden."
   to_generate_login_logout_activity_in_admin_tools_u_c5712e03: "Um in Admin-Tools An-/Abmeldetätigkeiten zu generieren, muss „Benutzer – Anmeldedetails verwalten“ oder „Statistik – anzeigen“ ebenfalls aktiviert sein. Um in Admin-Tools Notenänderungsprotokolle zu generieren, muss „Noten – Änderungsprotokolle anzeigen“ ebenfalls aktiviert sein."
-  to_import_assignments_and_quizzes_using_the_course_86c5bdbb: "Um Aufgaben und Quizze mit dem Course Import Tool zu importieren, muss „Kurs-Inhalt – hinzufügen / ändern / löschen“ aktiviert sein."
+  to_import_assignments_and_quizzes_using_the_course_86c5bdbb: "Um Aufgaben und Quiz mit dem Course Import Tool zu importieren, muss „Kurs-Inhalt – hinzufügen / ändern / löschen“ aktiviert sein."
   to_import_files_using_the_course_import_tool_cours_a0c2db0c: "Um Dateien mit dem Course Import Tool zu importieren, muss „Kurs-Content – hinzufügen / ändern / löschen“ aktiviert sein."
   to_import_files_using_the_course_import_tool_cours_eb0ce4e1: "Um Dateien mit dem Kursimport-Tool zu importieren,müssen „Kursdateien – hinzufügen“ und „Kurs-Inhalt – hinzufügen/bearbeiten/ löschen“ aktiviert sein."
   to_import_learning_outcomes_learning_outcomes_impo_5abbd2fb: "Um Lernergebnisse zu importieren, muss auch „Lernergebnisse - Import“ aktiviert sein."
@@ -29338,7 +29338,7 @@ de:
               Für die Anzeige der Spalte „SIS-ID für Benutzer“ in der CSV-Datei der Quiz-Objektanalyse muss „SIS-Daten – Lesen“ ebenfalls aktiviert sein.
               Für die Anzeige des Abgabeprotokolls, muss „Quizze – Abgabeprotokoll anzeigen“ ebenfalls aktiviert sein.
   to_moderate_a_quiz_assignments_and_quizzes_add_edi_ebdecaf8: "Um ein Quiz zu moderieren, muss „Aufgaben und Quizze – hinzufügen / ändern / löschen“ ebenfalls aktiviert sein."
-  to_moderate_a_quiz_assignments_and_quizzes_manage__b96b1937: "Um ein Quiz moderieren zu können, muss die Berechtigung „Aufgaben und Quizze – verwalten/bearbeiten“ ebenfalls aktiviert sein."
+  to_moderate_a_quiz_assignments_and_quizzes_manage__b96b1937: "Um ein Quiz moderieren zu können, muss die Berechtigung „Aufgaben und Quiz – verwalten/bearbeiten“ ebenfalls aktiviert sein."
   to_moderate_a_quiz_grades_edit_must_also_be_enable_72ca6ca1: "Um ein Quiz zu moderieren, muss „Noten – ändern“ ebenfalls aktiviert sein."
   to_moderate_a_quiz_grades_edit_must_also_be_enable_eae38da2: "Um ein Quiz moderieren zu können, muss die Berechtigung „Noten – bearbeiten“ ebenfalls aktiviert sein."
   to_moderate_grades_grades_select_final_grade_for_m_57d4f675: "Um Noten moderieren zu können, muss „Noten – Abschlussnote für Moderation auswählen“ ebenfalls aktiviert sein. Um Gesamtnoten für eine Aufgabe zu veröffentlichen oder auszublenden, muss „Noten – ändern“ ebenfalls aktiviert sein."
@@ -30197,7 +30197,7 @@ de:
   use_pairing_code_for_parent_sign_up_10b091f8: "Pairing-Code für Elternanmeldung verwenden"
   use_parent_account_setting_f25a721f: "Verwenden die Parent-Kontoeinstellung"
   use_quizzes_to_challenge_student_understanding_and_a340ff1c: |-
-      Verwenden Sie Quizze, um den Fortschritt der Studierenden zu prüfen und das Verständnis des
+      Verwenden Sie Quiz, um den Fortschritt der Studierenden zu prüfen und das Verständnis des
             Kursmaterials zu beurteilen. Mit der Bewertungsmaschine für New Quizzes können Sie bis zu
             13 Arten von Fragetypen und Inhalten erstellen. Wenn New Quizzes für Ihre Einrichtung nicht aktiviert ist, sind die
             Classic Quizzes dennoch verfügbar, um Ihnen beim Erreichen Ihrer Ziele zu helfen.
@@ -30731,9 +30731,9 @@ de:
       Admins von Unterkonten sind nicht in der Lage, SIS-Informationen anzuzeigen, sofern sie nicht außerdem die Rolle eines Lehrers in einem Kurs haben. Admins von Unterkonten können SIS-Informationen nicht ohne die Kursverknüpfung ansehen, da die Lehrerrolle berechtigt die SIS-Daten auf Kontoebene zu lesen.
   users_and_terms_are_located_at_the_account_so_the__6896b895: "Benutzer und Bedingungen befinden sich auf dem Konto, sodass der SIS-Endpunkt die Berechtigungen des Benutzers immer dem Konto entsprechend bestätigt. Unterkonten sind die Eigentümer von Kursen und Abschnitten. Sie haben keine eigenen Benutzerdaten. Admins von Unterkonten sind nicht in der Lage, SIS-Informationen anzuzeigen, sofern sie nicht außerdem die Rolle eines Lehrers in einem Kurs haben. Admins von Unterkonten können SIS-Informationen nicht ohne die Kursverknüpfung ansehen, da die Lehrerrolle berechtigt die SIS-Daten auf Kontoebene zu lesen."
   users_and_terms_are_located_at_the_account_so_the__8f3258e6: "Benutzer\\*innen und Bedingungen befinden sich auf dem Konto, sodass der SIS-Endpunkt die Berechtigungen des Benutzers immer dem Konto entsprechend bestätigt."
-  users_can_access_and_create_but_not_edit_individua_59bcb8dd: "Die Benutzer\\*innen können über „Aufgaben“ auf individuelle Aufgabenbewertungsschemata zugreifen und sie erstellen (aber nicht ändern), wenn „Aufgaben und Quizze – hinzufügen“ aktiviert ist."
+  users_can_access_and_create_but_not_edit_individua_59bcb8dd: "Die Benutzer\\*innen können über „Aufgaben“ auf individuelle Aufgabenbewertungsschemata zugreifen und sie erstellen (aber nicht ändern), wenn „Aufgaben und Quiz – hinzufügen“ aktiviert ist."
   users_can_access_and_create_but_not_edit_individua_72b88c41: "Über „Aufgaben“ können die Benutzer auf individuelle Aufgabenbewertungsschemata zugreifen und neue erstellen (aber sie nicht ändern), wenn „Kurs-Content – hinzufügen / ändern / löschen“ aktiviert ist."
-  users_can_access_and_create_but_not_edit_individua_a0b26adf: "Die Benutzer\\*innen können über „Aufgaben“ auf individuelle Aufgabenbewertungsschemata zugreifen und sie erstellen (aber nicht ändern), wenn die Berechtigungen „Kurs-Content – anzeigen“ und „Aufgaben und Quizze – hinzufügen“ aktiviert sind."
+  users_can_access_and_create_but_not_edit_individua_a0b26adf: "Die Benutzer\\*innen können über „Aufgaben“ auf individuelle Aufgabenbewertungsschemata zugreifen und sie erstellen (aber nicht ändern), wenn die Berechtigungen „Kurs-Content – anzeigen“ und „Aufgaben und Quiz – hinzufügen“ aktiviert sind."
   users_can_access_and_create_but_not_edit_individua_c8a62c74: "Benutzer können auf individuelle Zuweisungsschemata zugreifen und sie erstellen (aber nicht bearbeiten), wenn „Zuweisungen“ und „Quizze - Hinzufügen / Bearbeiten / Löschen“ aktiviert sind."
   users_can_access_the_manage_question_banks_link_on_e411d01: "Die Benutzer können auf der Indexseite Quizze auf den Link „Fragenpools verwalten“ zugreifen, wenn „Kurs-Content – anzeigen“ und „Aufgaben und Quizze – hinzufügen / ändern / löschen“ aktiviert ist."
   users_can_add_this_calendar_to_their_other_calenda_69daaa69: "Benutzer\\*innen können diesen Kalender zur Liste „Andere Kalender“ hinzufügen."
