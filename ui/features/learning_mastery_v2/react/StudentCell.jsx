@@ -26,9 +26,13 @@ import {studentShape} from './shapes'
 
 const StudentCell = ({courseId, student}) => {
   const student_grades_url = `/courses/${courseId}/grades/${student.id}#tab-outcomes`
+
+  const shouldShowStudentStatus = (student.status === 'inactive' || student.status === 'concluded')
+  const displayNameWidth = shouldShowStudentStatus ? "50%" : "75%"
+
   return (
     <>
-      <Flex height="100%" alignItems="center" justifyItems="start">
+      <Flex maxWidth="100%" height="100%" alignItems="center" justifyItems="start">
         <Flex.Item as="div" padding="0 0 0 small" maxWidth="25%">
           <Avatar
             alt={student.display_name}
@@ -39,11 +43,16 @@ const StudentCell = ({courseId, student}) => {
             data-testid="student-avatar"
           />
         </Flex.Item>
-        <Flex.Item as="div" padding="0 small 0 small" maxWidth="75%">
+        <Flex.Item as="div" padding="0 xx-small 0 small" maxWidth={displayNameWidth}>
           <Link isWithinText={false} href={student_grades_url} data-testid="student-cell-link">
             <TruncateText>{student.display_name}</TruncateText>
           </Link>
         </Flex.Item>
+        {shouldShowStudentStatus && (
+          <Flex.Item maxWidth="25%" data-testid="student-status">
+            <span className="label">{student.status}</span>
+          </Flex.Item>
+        )}
       </Flex>
     </>
   )

@@ -17,11 +17,12 @@
  */
 import axios from '@canvas/axios'
 
-export const loadRollups = (courseId, needDefaults = false, page = 1) => {
+export const loadRollups = (courseId, gradebookFilters, needDefaults = false, page = 1) => {
   const params = {
     params: {
       rating_percents: true,
       per_page: 20,
+      exclude: gradebookFilters,
       include: ['outcomes', 'users', 'outcome_paths', 'alignments'],
       sort_by: 'student',
       page,
