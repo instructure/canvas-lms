@@ -103,6 +103,18 @@
   width: 1px;
   height: 1px;
 }
+
+.mejs-button [role="menu"] ul li input[type="radio"]:not(:checked)+span {
+  display: none;
+}
+
+.mejs-button [role="menu"] ul li input[type="radio"]:checked+span {
+  display: inline;
+  position: absolute;
+  top: 5px;
+  left: 2px;
+}
+
 .mejs-button [role="menu"] ul li label {
   cursor: pointer;
 }
