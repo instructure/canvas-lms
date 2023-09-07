@@ -3,14 +3,12 @@
 
 exit 0 if ENV["DISABLE_RUBOCOP"] == "1"
 
-require "bundler/inline"
+ENV["BUNDLE_GEMFILE"] = File.expand_path("../Gemfile.d/rubocop.rb", __dir__)
 
-gemfile do
-  source "https://rubygems.org/"
+require "rubygems"
+require "bundler/setup"
 
-  gem "gergich", "2.1.2"
-  gem "colorize", "0.8.1"
-end
+Bundler.setup
 
 require_relative "linter"
 require "optparse"
