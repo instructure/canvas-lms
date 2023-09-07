@@ -27,6 +27,10 @@ import React from 'react'
 import store from '../lib/AppCenterStore'
 import $ from 'jquery'
 import '@canvas/rails-flash-notifications'
+import {IconButton} from '@instructure/ui-buttons'
+import {IconSearchLine, IconTroubleLine} from '@instructure/ui-icons'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {TextInput} from '@instructure/ui-text-input'
 
 const I18n = useI18nScope('external_tools')
 
@@ -60,6 +64,31 @@ export default class AppFilters extends React.Component {
   announceFilterResults = () => {
     const apps = store.filteredApps()
     $.screenReaderFlashMessageExclusive(I18n.t('%{count} apps found', {count: apps.length}))
+  }
+
+  handleClear = e => {
+    e.stopPropagation()
+    this.filterText.value = ''
+    this.applyFilter()
+    this.inputRef.focus()
+  }
+
+  renderClearButton = () => {
+    if (!this.filterText?.value?.length) return
+
+    return (
+      <IconButton
+        type="button"
+        size="small"
+        withBackground={false}
+        withBorder={false}
+        screenReaderLabel="Clear search"
+        disabled={this.state.disabled || this.state.readOnly}
+        onClick={this.handleClear}
+      >
+        <IconTroubleLine />
+      </IconButton>
+    )
   }
 
   render() {
@@ -106,19 +135,14 @@ export default class AppFilters extends React.Component {
               </ul>
             </div>
             <div className="col-xs-5">
-              <label htmlFor="filterText" className="screenreader-only">
-                {I18n.t('Filter by name')}
-              </label>
-              <input
-                type="text"
-                id="filterText"
-                ref={c => {
-                  this.filterText = c
-                }}
-                defaultValue={this.state.filterText}
-                className="input-block-level search-query"
+              <TextInput
+                renderLabel={<ScreenReaderContent>{I18n.t('Filter by name')}</ScreenReaderContent>}
                 placeholder={I18n.t('Filter by name')}
-                onKeyUp={this.applyFilter}
+                defaultValue={this.state.filterText}
+                onInput={this.applyFilter}
+                inputRef={el => (this.filterText = el)}
+                renderBeforeInput={<IconSearchLine inline={false} />}
+                renderAfterInput={this.renderClearButton()}
               />
             </div>
           </div>
