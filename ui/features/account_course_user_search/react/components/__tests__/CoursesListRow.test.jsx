@@ -57,6 +57,25 @@ it('indicates if a course is a blueprint course', () => {
   ).toBe(true)
 })
 
+it('filters addable roles by blueprint and permissions', () => {
+  const add_users_button = 'Tooltip[renderTip="Add Users to A"] IconButton'
+  const wrapper = shallow(<CoursesListRow
+    {...props}
+    blueprint={true}
+    can_create_enrollments={true}
+    concluded={false}
+    roles={[
+      {id: '1', base_role_name: 'TeacherEnrollment', manageable_by_user: true},
+      {id: '2', base_role_name: 'TaEnrollment', manageable_by_user: true},
+      {id: '3', base_role_name: 'StudentEnrollment', manageable_by_user: true},
+      {id: '4', base_role_name: 'ObserverEnrollment', manageable_by_user: true},
+      {id: '5', base_role_name: 'DesignerEnrollment', manageable_by_user: false},
+    ]}
+  />)
+  const role_ids = wrapper.instance().getAvailableRoles().map(role => role.id).sort()
+  expect(role_ids).toEqual(['1', '2'])
+})
+
 it('indicates if a course is a course template', () => {
   const tooltip = 'Tooltip[renderTip="This is a course template"] IconCollectionSolid'
   expect(
