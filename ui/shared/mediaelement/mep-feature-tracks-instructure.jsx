@@ -123,6 +123,9 @@ const I18n = useI18nScope('mepfeaturetracksinstructure')
           '_captions_none" value="none" checked="checked" role="menuitemradio" aria-selected="true" aria-label="' +
           mejs.i18n.t('mejs.none') +
           '" tabindex="-1" />' +
+          '<span for ="' +
+          player.id +
+          '_captions_none" aria-hidden="true">✓</span>' +
           '<label for="' +
           player.id +
           '_captions_none" aria-hidden="true">' +
@@ -353,6 +356,10 @@ const I18n = useI18nScope('mepfeaturetracksinstructure')
         .find('input[type=radio]') // make radios not focusable
         .attr('tabindex', '-1')
       this.captionsButton.find('.mejs-captions-selector a').attr('tabindex', '-1')
+      this.captionsButton
+        .find('svg[name="IconQuestion"]')
+        .attr('tabindex', '-1')
+        .attr('aria-hidden', 'true')
     },
 
     showCaptionsSelector() {
@@ -364,6 +371,12 @@ const I18n = useI18nScope('mepfeaturetracksinstructure')
         .find('input[type=radio]')
         .attr('tabindex', '0')
       this.captionsButton.find('.mejs-captions-selector a').attr('tabindex', '0')
+      this.captionsButton
+        .find('svg[name="IconQuestion"]')
+        .attr('tabindex', '0')
+        .attr('aria-hidden', 'false')
+        .removeAttr('focusable')
+        .removeAttr('role')
     },
 
     setTrackAriaLabel() {
@@ -537,6 +550,7 @@ const I18n = useI18nScope('mepfeaturetracksinstructure')
             .attr('aria-label', label)
             .val(lang)
         )
+        .append($('<span aria-hidden="true">').attr('for', id).text("✓"))
         .append($('<label aria-hidden="true">').attr('for', id).text(label))
 
       if (
