@@ -384,6 +384,18 @@ describe PlannerController do
           expect(default_account_event["plannable"]["title"]).to eq @default_account_event.title
           expect(course_event["plannable"]["title"]).to eq course_ac_event.title
         end
+
+        context "with sharding" do
+          specs_require_sharding
+
+          it "allows user to request trusted accounts on another shard" do
+            @account = Account.default
+            @shard2.activate do
+              get :index, params: { context_codes: ["account_#{@account.global_id}"] }
+              expect(response).to be_successful
+            end
+          end
+        end
       end
 
       context "with context codes" do
