@@ -24,6 +24,9 @@
             "name": "AdhocStudents"
           },
           {
+            "name": "Course"
+          },
+          {
             "name": "Group"
           },
           {

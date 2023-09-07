@@ -35,13 +35,13 @@ class AssignmentOverride < ActiveRecord::Base
   belongs_to :assignment, inverse_of: :assignment_overrides
   belongs_to :quiz, class_name: "Quizzes::Quiz", inverse_of: :assignment_overrides
   belongs_to :context_module, inverse_of: :assignment_overrides
-  belongs_to :set, polymorphic: [:group, :course_section], exhaustive: false
+  belongs_to :set, polymorphic: %i[group course_section course], exhaustive: false
   has_many :assignment_override_students, -> { where(workflow_state: "active") }, inverse_of: :assignment_override, dependent: :destroy, validate: false
   validates :assignment_version, presence: { if: :assignment }
   validates :title, :workflow_state, presence: true
-  validates :set_type, inclusion: ["CourseSection", "Group", "ADHOC", SET_TYPE_NOOP]
+  validates :set_type, inclusion: ["CourseSection", "Group", "ADHOC", SET_TYPE_NOOP, "Course"]
   validates :title, length: { maximum: maximum_string_length, allow_nil: true }
-  concrete_set = ->(override) { ["CourseSection", "Group"].include?(override.set_type) }
+  concrete_set = ->(override) { %w[CourseSection Group Course].include?(override.set_type) }
 
   validates :set, :set_id, presence: { if: concrete_set }
   validates :set_id, uniqueness: { scope: %i[assignment_id set_type workflow_state],
@@ -61,6 +61,8 @@ class AssignmentOverride < ActiveRecord::Base
       when Group
         valid_group_category_id = record.assignment.group_category_id || record.assignment.discussion_topic.try(:group_category_id)
         record.errors.add :set, "not from assignment's group category" unless record.set.group_category_id == valid_group_category_id
+      when Course
+        record.errors.add :set, "not from assignment's course" unless record.set.id == record.assignment.context_id
       end
     end
   end
@@ -89,6 +91,12 @@ class AssignmentOverride < ActiveRecord::Base
     end
   end
 
+  validate do |record|
+    if record.set_type == "Course" && record.unassign_item
+      record.errors.add :unassign_item, "must be false with set_type Course"
+    end
+  end
+
   after_save :touch_assignment, if: :assignment
   after_save :update_grading_period_grades
   after_save :update_due_date_smart_alerts, if: :update_cached_due_dates?
@@ -96,7 +104,7 @@ class AssignmentOverride < ActiveRecord::Base
 
   def set_not_empty?
     overridable = assignment? ? assignment : quiz
-    ["CourseSection", "Group", SET_TYPE_NOOP].include?(set_type) ||
+    ["CourseSection", "Group", SET_TYPE_NOOP, "Course"].include?(set_type) ||
       (set.any? && overridable.context.current_enrollments.where(user_id: set).exists?)
   end
 
@@ -262,7 +270,7 @@ class AssignmentOverride < ActiveRecord::Base
     case self.set_type
     when "ADHOC"
       assignment_override_students.preload(:user).map(&:user)
-    when "CourseSection", "Group"
+    when "CourseSection", "Group", "Course"
       super
     else
       nil
@@ -384,7 +392,7 @@ class AssignmentOverride < ActiveRecord::Base
     case set_type
     when "ADHOC"
       set
-    when "CourseSection"
+    when "CourseSection", "Course"
       set.participating_students
     when "Group"
       set.participants

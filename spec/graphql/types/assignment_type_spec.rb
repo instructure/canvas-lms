@@ -684,6 +684,20 @@ describe Types::AssignmentType do
         GQL
       ).to eq ["555"]
     end
+
+    it "works for Course tags" do
+      assignment.assignment_overrides.create!(set: course)
+
+      expect(
+        assignment_type.resolve(<<~GQL, current_user: teacher)
+          assignmentOverrides { edges { node { set {
+            ... on Course {
+              _id
+            }
+          } } } }
+        GQL
+      ).to eq [course.id.to_s]
+    end
   end
 
   describe Types::LockInfoType do
