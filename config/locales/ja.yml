@@ -10234,7 +10234,7 @@ ja:
   descriptivename_was_set_to_formattednewvalue_cd78b357: "%{descriptiveName}が%{formattedNewValue}に送信されました。"
   descriptivename_was_turned_off_38771a19: "%{descriptiveName}のシャッフルがオフになりました。"
   descriptivename_was_turned_on_132583bb: "%{descriptiveName}がオンになりました。"
-  designer_c458392: 設計者
+  designer_c458392: デザイナー
   designers_add_c6335849: "デザイナー - 追加"
   designers_add_fe7e1ea9: "デザイナー - 追加"
   designers_remove_39f50ec9: "デザイナー - 削除"
@@ -11457,7 +11457,7 @@ ja:
     default_email: 電子メールなし
     default_user_name: 不明なユーザ
     roles: 
-      designer: 設計者
+      designer: デザイナー
       designer_with_indefinite_article: 設計者
       observer: オブザーバ
       observer_with_indefinite_article: オブザーバ
@@ -11479,7 +11479,7 @@ ja:
       rejected: 拒否済み
   enrollmentNames: 
     course_designer: コース設計者
-    designer: 設計者
+    designer: デザイナー
     observer: オブザーバ
     student: 受講者
     teacher: 教員
@@ -24658,8 +24658,8 @@ ja:
       view_statistics: 統計情報の表示
     roles: 
       account_admin: アカウント管理者
-      designer: 設計者
-      designers: 設計者
+      designer: デザイナー
+      designers: デザイナー
       observer: オブザーバ
       observers: オブザーバ
       student: 受講者
@@ -25144,7 +25144,7 @@ ja:
     confirms: 
       delete_enrollment: この登録を完全に削除してもよろしいですか?
     default_course_name: "コース ID \"%{course_id}\""
-    enrolled_as_designer: （）として登録：設計者
+    enrolled_as_designer: （）として登録：デザイナー
     enrolled_as_limited_designer: （）として登録：セクションのみアクセスを持つ設計者
     enrolled_as_limited_observer: （）として登録：セクションのみアクセスを持つオブザーバー
     enrolled_as_limited_student: （）として登録：セクションのみアクセスを持つ受講者
