@@ -2057,6 +2057,16 @@ describe DiscussionTopicsController, type: :request do
     end
   end
 
+  it "paginates by the per_page" do
+    100.times { |i| @course.discussion_topics.create!(title: i.to_s, message: i.to_s) }
+    expect(@course.discussion_topics.count).to eq 100
+    json = api_call(:get,
+                    "/api/v1/courses/#{@course.id}/discussion_topics.json?per_page=90",
+                    { controller: "discussion_topics", action: "index", format: "json", course_id: @course.id.to_s, per_page: "90" })
+
+    expect(json.length).to eq 90
+  end
+
   it "paginates and return proper pagination headers for courses" do
     7.times { |i| @course.discussion_topics.create!(title: i.to_s, message: i.to_s) }
     expect(@course.discussion_topics.count).to eq 7
