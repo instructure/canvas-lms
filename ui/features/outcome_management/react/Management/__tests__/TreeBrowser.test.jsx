@@ -69,6 +69,13 @@ describe('TreeBrowser', () => {
     }
     onCollectionToggle = jest.fn()
     onCreateGroup = jest.fn()
+
+    ENV = {
+      current_user: {
+        fake_student: undefined,
+      },
+      current_user_is_student: false,
+    }
   })
 
   afterEach(() => {
@@ -86,6 +93,38 @@ describe('TreeBrowser', () => {
     it('does not render when the group is not expanded', () => {
       const {queryByText} = render(<TreeBrowser {...defaultProps({defaultExpandedIds: []})} />)
       expect(queryByText('Create New Group')).not.toBeInTheDocument()
+    })
+
+    it('does not render when is a student', () => {
+      ENV.current_user_is_student = true
+      const {queryByText} = render(<TreeBrowser {...defaultProps({loadedGroups: ['1']})} />)
+      expect(queryByText('Create New Group')).not.toBeInTheDocument()
+    })
+
+    it('does not render when is a fake student', () => {
+      ENV.current_user.fake_student = true
+      const {queryByText} = render(<TreeBrowser {...defaultProps({loadedGroups: ['1']})} />)
+      expect(queryByText('Create New Group')).not.toBeInTheDocument()
+    })
+
+    it('does not render an item for each expanded group when is a student', () => {
+      ENV.current_user_is_student = true
+      const {queryAllByText} = render(
+        <TreeBrowser
+          {...defaultProps({defaultExpandedIds: ['1', '100'], loadedGroups: ['1', '100']})}
+        />
+      )
+      expect(queryAllByText('Create New Group')).toHaveLength(0)
+    })
+
+    it('does not render an item for each expanded group when is a fake student', () => {
+      ENV.current_user.fake_student = true
+      const {queryAllByText} = render(
+        <TreeBrowser
+          {...defaultProps({defaultExpandedIds: ['1', '100'], loadedGroups: ['1', '100']})}
+        />
+      )
+      expect(queryAllByText('Create New Group')).toHaveLength(0)
     })
 
     it('does not render when the group is not loaded', () => {
