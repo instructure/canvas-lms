@@ -26,7 +26,8 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Tabs} from '@instructure/ui-tabs'
 // @ts-expect-error
 import {IconModuleSolid} from '@instructure/ui-icons'
-import {calculatePanelHeight} from '../utils/panelHelpers'
+import {calculatePanelHeight} from '../utils/miscHelpers'
+import type {Module} from './types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('differentiated_modules')
@@ -43,6 +44,8 @@ export interface DifferentiatedModulesTrayProps {
   assignOnly?: boolean
   moduleName?: string
   unlockAt?: string
+  prerequisites?: Module[]
+  moduleList?: Module[]
 }
 
 const SettingsPanel = React.lazy(() => import('./SettingsPanel'))

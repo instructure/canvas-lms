@@ -21,6 +21,16 @@ const fixtures = {
   unlockAt: `<div class="unlock_at">Aug 2, 2023 at 12am</div>`,
   requiresSequentialProgress: `<div class="require_sequential_progress">true</div>`,
   publishFinalGrade: `<div class="publish_final_grade">true</div>`,
+  prerequisites: `
+    <div class="prerequisite_criterion">
+      <span class="id" style="display: none;">14</span>
+      <span class="name" style="display: none;">Module A</span>
+    </div>
+    <div class="prerequisite_criterion">
+      <span class="id" style="display: none;">15</span>
+      <span class="name" style="display: none;">Module B</span>
+    </div>
+  `,
 }
 
 export function getFixture(fixtureType: keyof typeof fixtures) {

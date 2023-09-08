@@ -16,35 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {
-  convertFriendlyDatetimeToUTC,
-  parseModule,
-  convertModuleSettingsForApi,
-} from '../moduleHelpers'
-import {defaultState} from '../../react/settingsReducer'
-import moment from 'moment'
+import {parseModule} from '../moduleHelpers'
 import {getFixture} from './fixtures'
+import moment from 'moment'
 
-describe('convertFriendlyDatetimeToUTC', () => {
+describe('parseModule', () => {
   beforeAll(() => {
     window.ENV.TIMEZONE = 'America/Denver'
     moment.tz.setDefault('America/Denver')
   })
 
-  it('returns undefined if input is undefined, null, or empty', () => {
-    expect(convertFriendlyDatetimeToUTC(undefined)).toBe(undefined)
-    expect(convertFriendlyDatetimeToUTC(null)).toBe(undefined)
-    expect(convertFriendlyDatetimeToUTC('')).toBe(undefined)
-  })
-
-  it('returns a UTC date string if input is a date-like string', () => {
-    expect(convertFriendlyDatetimeToUTC('Aug 2, 2023 at 12am')).toBe('2023-08-02T06:00:00.000Z')
-    expect(convertFriendlyDatetimeToUTC('Jan 8, 2023')).toBe('2023-01-08T07:00:00.000Z')
-    expect(convertFriendlyDatetimeToUTC('May 10, 2022 at 1:44pm')).toBe('2022-05-10T19:44:00.000Z')
-  })
-})
-
-describe('parseModule', () => {
   it('parses the name', () => {
     const element = getFixture('name')
     expect(parseModule(element)).toEqual({
@@ -53,6 +34,8 @@ describe('parseModule', () => {
       unlockAt: undefined,
       requireSequentialProgress: false,
       publishFinalGrade: false,
+      prerequisites: [],
+      moduleList: [],
     })
   })
 
@@ -64,6 +47,8 @@ describe('parseModule', () => {
       unlockAt: '2023-08-02T06:00:00.000Z',
       requireSequentialProgress: false,
       publishFinalGrade: false,
+      prerequisites: [],
+      moduleList: [],
     })
   })
 
@@ -75,6 +60,8 @@ describe('parseModule', () => {
       unlockAt: undefined,
       requireSequentialProgress: true,
       publishFinalGrade: false,
+      prerequisites: [],
+      moduleList: [],
     })
   })
 
@@ -86,32 +73,24 @@ describe('parseModule', () => {
       unlockAt: undefined,
       requireSequentialProgress: false,
       publishFinalGrade: true,
-    })
-  })
-})
-
-describe('convertModuleSettingsForApi', () => {
-  const moduleSettings = {
-    ...defaultState,
-    moduleName: 'Module 1',
-    lockUntilChecked: true,
-    unlockAt: '2023-08-02T06:00:00.000Z',
-  }
-
-  it('converts the module settings to the format expected by the API', () => {
-    expect(convertModuleSettingsForApi(moduleSettings)).toEqual({
-      context_module: {
-        name: 'Module 1',
-        unlock_at: '2023-08-02T06:00:00.000Z',
-      },
+      prerequisites: [],
+      moduleList: [],
     })
   })
 
-  it('excludes unlockAt if lockUntilChecked is false', () => {
-    const formattedSettings = convertModuleSettingsForApi({
-      ...moduleSettings,
-      lockUntilChecked: false,
+  it('parses prerequisites', () => {
+    const element = getFixture('prerequisites')
+    expect(parseModule(element)).toEqual({
+      moduleId: '8',
+      moduleName: '',
+      unlockAt: undefined,
+      requireSequentialProgress: false,
+      publishFinalGrade: false,
+      prerequisites: [
+        {id: '14', name: 'Module A'},
+        {id: '15', name: 'Module B'},
+      ],
+      moduleList: [],
     })
-    expect(formattedSettings.context_module.unlock_at).toBe(null)
   })
 })
