@@ -356,9 +356,11 @@ class DiscussionTopicsController < ApplicationController
       scope = scope.active.where("delayed_post_at IS NULL OR delayed_post_at<?", Time.now.utc)
     end
 
+    per_page = params[:per_page] || 100
+
     @topics = []
     if @context.is_a?(Group) || request.format.json?
-      @topics = Api.paginate(scope, self, topic_pagination_url)
+      @topics = Api.paginate(scope, self, topic_pagination_url, per_page:)
       if params[:exclude_context_module_locked_topics]
         ActiveRecord::Associations.preload(@topics, context_module_tags: :context_module)
         @topics = DiscussionTopic.reject_context_module_locked_topics(@topics, @current_user)
@@ -389,7 +391,7 @@ class DiscussionTopicsController < ApplicationController
         end
 
         fetch_params = {
-          per_page: 50,
+          per_page:,
           plain_messages: true,
           include_assignment: true,
           exclude_assignment_descriptions: true,
@@ -430,6 +432,7 @@ class DiscussionTopicsController < ApplicationController
           discussion_anonymity_enabled: @context.feature_enabled?(:react_discussions_post),
           discussion_topic_index_menu_tools: external_tools_display_hashes(:discussion_topic_index_menu),
           show_additional_speed_grader_links: Account.site_admin.feature_enabled?(:additional_speedgrader_links),
+          PER_PAGE: per_page,
         }
         if @context.is_a?(Course) && @context.grants_right?(@current_user, session, :read) && @js_env&.dig(:COURSE_ID).blank?
           hash[:COURSE_ID] = @context.id.to_s

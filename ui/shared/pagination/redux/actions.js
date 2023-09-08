@@ -194,7 +194,7 @@ function wrapGetPageThunk(actions, name, thunk) {
     }
 }
 
-function fetchAllEntries(actions, totalCount, getThunk) {
+function fetchAllEntries(actions, totalCount, getThunk, perPage) {
   return () => (dispatch, getState) => {
     dispatch({type: actions.start, payload: {page: 1}})
     const state = getState()
@@ -206,7 +206,7 @@ function fetchAllEntries(actions, totalCount, getThunk) {
       }
       dispatch({type: actions.success, payload: successPayload})
     } else {
-      const promises = Array(Math.ceil(totalCount / 50))
+      const promises = Array(Math.ceil(totalCount / perPage))
         .fill()
         .map((_, i) => getThunk(state, {page: i + 1}))
       Promise.all(promises)
@@ -271,11 +271,12 @@ function fetchAllEntries(actions, totalCount, getThunk) {
 export function createPaginationActions(name, thunk, opts = {}) {
   const fetchAll = opts.fetchAll || false
   const totalCount = opts.totalCount
+  const perPage = opts.perPage || 50
 
   const capitalizedName = name.charAt(0).toUpperCase() + name.slice(1)
   const actionTypes = createActionTypes(name)
   const fetchFunction = fetchAll
-    ? () => fetchAllEntries(actionTypes, totalCount, thunk)
+    ? () => fetchAllEntries(actionTypes, totalCount, thunk, perPage)
     : () => wrapGetPageThunk(actionTypes, name, thunk)
 
   return {
