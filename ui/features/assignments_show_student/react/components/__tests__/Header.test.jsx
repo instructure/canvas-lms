@@ -27,7 +27,7 @@ jest.mock('../AttemptSelect')
 jest.mock('../CommentsTray', () => () => '')
 
 afterEach(() => {
-  // @ts-ignore
+  // @ts-expect-error
   window.ENV = {}
 })
 

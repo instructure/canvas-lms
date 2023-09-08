@@ -76,7 +76,7 @@ export default class AssignmentGroupCellFormatter {
     }
   }
 
-  // @ts-ignore
+  // @ts-expect-error
   render = (_row, _cell, value, _columnDef, _dataContext) => {
     if (value == null) {
       return ''

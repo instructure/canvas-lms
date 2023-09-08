@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -19,7 +18,6 @@
 
 import type JQuery from 'jquery'
 import authenticity_token from '@canvas/authenticity-token'
-// @ts-expect-error
 import re_upload_submissions_form from '@canvas/grading/jst/re_upload_submissions_form.handlebars'
 import {setupSubmitHandler} from '@canvas/assignments/jquery/reuploadSubmissionsHelper'
 import $ from 'jquery'
@@ -42,9 +40,11 @@ class ReuploadSubmissionsDialogManager {
 
   constructor(
     assignment: Assignment,
-    reuploadUrlTemplate,
+    reuploadUrlTemplate: string,
     userAssetString: string,
-    downloadedSubmissionsMap
+    downloadedSubmissionsMap: {
+      [assignmentId: string]: boolean
+    }
   ) {
     this.assignment = assignment
     this.downloadedSubmissionsMap = downloadedSubmissionsMap
@@ -58,7 +58,7 @@ class ReuploadSubmissionsDialogManager {
     return this.downloadedSubmissionsMap[this.assignment.id]
   }
 
-  getReuploadForm(cb) {
+  getReuploadForm(cb: () => void) {
     if (this.reuploadForm) {
       return this.reuploadForm
     }
@@ -82,7 +82,7 @@ class ReuploadSubmissionsDialogManager {
     return this.reuploadForm
   }
 
-  showDialog(cb) {
+  showDialog(cb: () => void) {
     const form = this.getReuploadForm(cb)
     form.attr('action', this.reuploadUrl).dialog('open')
   }

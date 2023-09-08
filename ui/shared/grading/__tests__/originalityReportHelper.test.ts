@@ -62,7 +62,7 @@ describe('originalityReportSubmissionKey', () => {
 
   it('returns the key for the camelized graphql submission', async () => {
     const gqlSubmission = await mockSubmission({
-      // @ts-ignore
+      // @ts-expect-error
       Submission: {
         submittedAt: '2011-10-05T14:48:00Z',
         id: 1,
@@ -217,7 +217,7 @@ describe('getOriginalityData', () => {
 
   it('returns the camelized data if there is originality data associated with the text entry using a gql submission', async () => {
     const gqlSubmission = await mockSubmission({
-      // @ts-ignore
+      // @ts-expect-error
       Submission: {
         id: 'asefasdfasdfasdfasdf',
         _id: 4,

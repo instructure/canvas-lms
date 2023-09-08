@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2015 - present Instructure, Inc.
  *
@@ -38,7 +37,13 @@ export default class EditorConfig {
    *  @param idAttribute the "id" attribute of the element that's going
    *    to be transformed with a tinymce editor
    */
-  constructor(tinymce, public readonly instConfig: any, public readonly idAttribute: string) {
+  constructor(
+    tinymce: {
+      baseURL: string
+    },
+    public readonly instConfig: any,
+    public readonly idAttribute: string
+  ) {
     this.baseURL = tinymce.baseURL
     this.extraButtons = instConfig.editorButtons || []
   }
@@ -73,7 +78,7 @@ export default class EditorConfig {
 
       content_css: window.ENV.url_to_what_gets_loaded_inside_the_tinymce_editor_css,
 
-      init_instance_callback: ed => {
+      init_instance_callback: (ed: {id: string}) => {
         $(`#tinymce-parent-of-${ed.id}`) // eslint-disable-line no-undef
           .css('visibility', 'visible')
       },

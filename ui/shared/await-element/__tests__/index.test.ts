@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -32,7 +31,7 @@ describe('awaitElement', () => {
   beforeEach(() => {
     jest
       .spyOn(window, 'requestAnimationFrame')
-      .mockImplementation(function (cb: (number) => void): number {
+      .mockImplementation(function (cb: (number: number) => void): number {
         return window.setTimeout(function () {
           cb(0)
         }, 50)
