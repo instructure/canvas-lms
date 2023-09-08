@@ -669,8 +669,6 @@ describe('ContentTabs', () => {
         uploadedFileCount += 1
         return {id: `${uploadedFileCount}`}
       })
-
-      global.DataTransferItem = global.DataTransferItem || class DataTransferItem {}
     })
 
     afterEach(() => {

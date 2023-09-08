@@ -515,7 +515,7 @@ export const AddressBook = ({
         setIsloadingRecipientsTotal(false)
       }
       menuItem.totalRecipients = totalRecipients
-      let shouldCloseMenu = !(e?.ctrlKey || e?.metaKey)
+      const shouldCloseMenu = !(e?.ctrlKey || e?.metaKey)
       addTag(menuItem, shouldCloseMenu)
       onSelect(menuItem)
       if (onUserFilterSelect) {

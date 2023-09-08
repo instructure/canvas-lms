@@ -71,7 +71,11 @@ export default function DefaultGradeInput({disabled, gradingType, onGradeInputCh
           value={selectInput}
           defaultValue={selectInput}
           renderLabel="Uncontrolled Select"
-          onChange={(e, {value}) => setSelectInput(value)}
+          onChange={(e, {value}) => {
+            if (typeof value === 'string') {
+              setSelectInput(value)
+            }
+          }}
         >
           <SimpleSelectOption id="emptyOption" value="">
             ---

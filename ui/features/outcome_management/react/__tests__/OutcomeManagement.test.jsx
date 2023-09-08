@@ -45,7 +45,6 @@ describe('OutcomeManagement', () => {
       'showOutcomesImporterIfInProgress'
     )
     jest.useFakeTimers()
-    global.DataTransferItem = global.DataTransferItem || class DataTransferItem {}
   })
 
   afterEach(() => {
@@ -387,7 +386,6 @@ describe('OutcomeManagement', () => {
         },
         current_user: {id: '1'},
       }
-      global.DataTransferItem = global.DataTransferItem || class DataTransferItem {}
     })
 
     afterEach(() => {

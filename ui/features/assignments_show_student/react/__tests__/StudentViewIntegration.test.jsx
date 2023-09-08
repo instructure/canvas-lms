@@ -47,7 +47,6 @@ describe('student view integration tests', () => {
       PREREQS: {},
       current_user_roles: ['user', 'student'],
     }
-    global.DataTransferItem = global.DataTransferItem || class DataTransferItem {}
   })
 
   afterEach(() => {
@@ -144,7 +143,7 @@ describe('student view integration tests', () => {
         },
       })
 
-      const {findByRole, findByTestId} = render(
+      const {findAllByRole, findByRole, findByTestId} = render(
         <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
           <MockedProvider mocks={mocks} cache={createCache()}>
             <StudentViewQuery assignmentLid="1" submissionID="1" />
@@ -156,9 +155,11 @@ describe('student view integration tests', () => {
       const fileInput = await findByTestId('input-file-drop')
       fireEvent.change(fileInput, {target: {files}})
       await findByRole('progressbar', {name: /Upload progress/})
-      // this sometimes slightly exceeds the default 1000ms threshold, so give
-      // it a bit more time
-      expect(await findByRole('cell', {name: 'test.jpg'}, {timeout: 2000})).toBeInTheDocument()
+      const allCells = await findAllByRole('cell')
+      const targetCell = allCells.find(cell => {
+        return cell.textContent.includes('test.jpg')
+      })
+      expect(targetCell).toBeTruthy()
     })
 
     it('displays a progress bar for each new file being uploaded', async () => {

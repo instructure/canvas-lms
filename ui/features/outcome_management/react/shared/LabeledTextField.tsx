@@ -19,9 +19,16 @@
 import React from 'react'
 import {useField} from 'react-final-form'
 import {TextInput} from '@instructure/ui-text-input'
-import PropTypes from 'prop-types'
 
-const LabeledTextField = ({name, validate, Component = TextInput, ...props}) => {
+type Props = {
+  label: string
+  name: string
+  renderLabel: () => React.ReactNode | string
+  type: 'search' | 'text' | 'email' | 'url' | 'tel' | 'password'
+  validate?: (value: string) => string | undefined
+}
+
+const LabeledTextField = ({name, validate, ...props}: Props) => {
   const {
     input,
     meta: {touched, error, submitError},
@@ -41,18 +48,15 @@ const LabeledTextField = ({name, validate, Component = TextInput, ...props}) => 
     }
   }
 
-  errorMessages = errorMessages.map(text => ({
+  const errorMessages_: Array<{
+    text: string
+    type: 'error' | 'hint' | 'success' | 'screenreader-only'
+  }> = errorMessages.map(text => ({
     text,
     type: 'error',
   }))
 
-  return <Component {...input} messages={errorMessages} {...props} />
-}
-
-LabeledTextField.propTypes = {
-  name: PropTypes.string.isRequired,
-  validate: PropTypes.func,
-  Component: PropTypes.elementType,
+  return <TextInput {...input} {...props} messages={errorMessages_} />
 }
 
 export default LabeledTextField

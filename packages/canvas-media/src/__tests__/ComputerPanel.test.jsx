@@ -77,7 +77,6 @@ describe('UploadMedia: ComputerPanel', () => {
     liveRegion.setAttribute('role', 'alert')
     document.body.appendChild(liveRegion)
 
-    global.DataTransferItem = global.DataTransferItem || class DataTransferItem {}
     window.matchMedia =
       window.matchMedia ||
       (() => ({
@@ -202,7 +201,6 @@ describe('UploadMedia: ComputerPanel', () => {
   })
   describe('shows closed captions panel', () => {
     beforeEach(() => {
-      global.DataTransferItem = global.DataTransferItem || class DataTransferItem {}
       window.matchMedia =
         window.matchMedia ||
         (() => ({

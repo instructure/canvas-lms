@@ -58,10 +58,8 @@ class Outcome extends React.Component {
   renderScoreAndPill() {
     const {outcome} = this.props
     const {mastered, score, points_possible, results} = outcome
-    const pillAttributes = {text: I18n.t('Not mastered')}
-    if (mastered) {
-      Object.assign(pillAttributes, {text: I18n.t('Mastered'), variant: 'success'})
-    }
+    const text = mastered ? I18n.t('Mastered') : I18n.t('Not mastered')
+    const pillAttributes = mastered ? {variant: 'success'} : {}
 
     return (
       <Flex direction="row" justifyItems="start" padding="0 0 0 x-small">
@@ -83,7 +81,7 @@ class Outcome extends React.Component {
           </Flex.Item>
         )}
         <Flex.Item>
-          <Pill {...pillAttributes} />
+          <Pill {...pillAttributes}>{text}</Pill>
         </Flex.Item>
       </Flex>
     )

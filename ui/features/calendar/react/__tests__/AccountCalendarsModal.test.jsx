@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {act, render, fireEvent, waitFor} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import fetchMock from 'fetch-mock'
 import MockDate from 'mockdate'
 import {
@@ -87,7 +88,7 @@ describe('Other Calendars modal ', () => {
 
   const openModal = addCalendarButton => {
     expect(addCalendarButton).toBeInTheDocument()
-    act(() => addCalendarButton.click())
+    userEvent.click(addCalendarButton)
   }
 
   const advance = ms => {
@@ -129,8 +130,8 @@ describe('Other Calendars modal ', () => {
     openModal(addCalendarButton)
     const calendarToEnable = await findByTestId(`account-${page1Results[1].id}-checkbox`)
     const saveButton = getByTestId('save-calendars-button')
-    act(() => calendarToEnable.click())
-    act(() => saveButton.click())
+    userEvent.click(calendarToEnable)
+    userEvent.click(saveButton)
     advance(500)
     expect(fetchMock.called(onSaveUrl)).toBe(true)
   })
@@ -141,7 +142,7 @@ describe('Other Calendars modal ', () => {
     const addCalendarButton = getByTestId('add-other-calendars-button')
     openModal(addCalendarButton)
     const showMoreLink = await findByText('Show more')
-    act(() => showMoreLink.click())
+    userEvent.click(showMoreLink)
     expect(fetchMock.called(showMoreUrl)).toBe(true)
   })
 
@@ -163,7 +164,7 @@ describe('Other Calendars modal ', () => {
     expect(fetchMock.called(markAsSeenUrl)).toBe(true)
     expect(fetchMock.calls(markAsSeenUrl)).toHaveLength(1)
     const closeButton = getByTestId('footer-close-button')
-    act(() => closeButton.click())
+    userEvent.click(closeButton)
     // wait for the modal to be closed
     await waitFor(() => expect(closeButton).not.toBeInTheDocument())
     openModal(addCalendarButton)
@@ -188,7 +189,7 @@ describe('Other Calendars modal ', () => {
     const saveButton = getByTestId('save-calendars-button')
     expect(saveButton).toHaveAttribute('disabled')
     const calendarToEnable = await findByTestId(`account-${page1Results[1].id}-checkbox`)
-    act(() => calendarToEnable.click())
+    userEvent.click(calendarToEnable)
     expect(saveButton).not.toHaveAttribute('disabled')
   })
 
@@ -246,7 +247,7 @@ describe('Other Calendars modal ', () => {
       expect(await findByText('Select Calendars')).toBeInTheDocument()
       const helpButton = getByText('help').closest('button')
       expect(helpButton).toBeInTheDocument()
-      act(() => helpButton.click())
+      userEvent.click(helpButton)
       expect(getByText('Calendars added by the admin cannot be removed')).toBeInTheDocument()
     })
   })

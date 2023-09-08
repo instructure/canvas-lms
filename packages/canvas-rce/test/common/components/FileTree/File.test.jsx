@@ -29,16 +29,13 @@ describe('FileTree/File', () => {
     file = {
       id: 1,
       name: 'foo',
-      type: 'text/plain'
+      type: 'text/plain',
     }
   })
 
   it('renders a button with file name', () => {
     const tree = sd.shallowRender(<File file={file} />)
-    const text = tree
-      .subTree('button')
-      .text()
-      .trim()
+    const text = tree.subTree('button').text().trim()
     assert(new RegExp(file.name).test(text))
   })
 

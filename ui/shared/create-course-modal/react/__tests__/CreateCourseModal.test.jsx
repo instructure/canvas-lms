@@ -18,7 +18,8 @@
 
 import React from 'react'
 import fetchMock from 'fetch-mock'
-import {render, waitFor, fireEvent, act} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import {render, waitFor, act, cleanup} from '@testing-library/react'
 
 import {CreateCourseModal} from '../CreateCourseModal'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
@@ -83,8 +84,9 @@ const STUDENT_ENROLLMENTS_URL = encodeURI(
 )
 const MCC_ACCOUNT_URL = 'api/v1/manually_created_courses_account'
 
-describe('CreateCourseModal', () => {
+describe('CreateCourseModal (1)', () => {
   const setModalOpen = jest.fn()
+  let originalEnv
 
   const getProps = (overrides = {}) => ({
     isModalOpen: true,
@@ -96,6 +98,8 @@ describe('CreateCourseModal', () => {
   })
 
   beforeEach(() => {
+    originalEnv = JSON.parse(JSON.stringify(window.ENV))
+
     // mock requests that are made, but not explicitly tested, to clean up console warnings
     fetchMock.get('/api/v1/users/self/courses?homeroom=true&per_page=100', 200)
     fetchMock.get('begin:/api/v1/accounts/', 200)
@@ -103,6 +107,9 @@ describe('CreateCourseModal', () => {
   })
 
   afterEach(() => {
+    cleanup()
+    window.ENV = originalEnv
+    fetchMock.reset()
     fetchMock.restore()
   })
 
@@ -130,7 +137,7 @@ describe('CreateCourseModal', () => {
     fetchMock.get(MANAGEABLE_COURSES_URL, MANAGEABLE_COURSES)
     const {getByText, getByRole} = render(<CreateCourseModal {...getProps()} />)
     await waitFor(() => expect(getByRole('button', {name: 'Cancel'})).not.toBeDisabled())
-    fireEvent.click(getByText('Cancel'))
+    userEvent.click(getByText('Cancel'))
     expect(setModalOpen).toHaveBeenCalledWith(false)
   })
 
@@ -140,10 +147,10 @@ describe('CreateCourseModal', () => {
     await waitFor(() => expect(getByLabelText('Subject Name')).toBeInTheDocument())
     const createButton = getByRole('button', {name: 'Create'})
     expect(createButton).toBeDisabled()
-    fireEvent.change(getByLabelText('Subject Name'), {target: {value: 'New course'}})
+    userEvent.type(getByLabelText('Subject Name'), 'New course')
     expect(createButton).toBeDisabled()
-    fireEvent.click(getByLabelText('Which account will this subject be associated with?'))
-    fireEvent.click(getByText('Elementary'))
+    userEvent.click(getByLabelText('Which account will this subject be associated with?'))
+    userEvent.click(getByText('Elementary'))
     await waitFor(() => expect(getByLabelText('Subject Name')).toBeInTheDocument())
     expect(createButton).not.toBeDisabled()
   })
@@ -174,7 +181,7 @@ describe('CreateCourseModal', () => {
     fetchMock.get('/api/v1/manageable_accounts?per_page=100&page=2', accountsPage2)
     const {getByText, getByLabelText} = render(<CreateCourseModal {...getProps()} />)
     await waitFor(() => expect(getByLabelText('Subject Name')).toBeInTheDocument())
-    fireEvent.click(getByLabelText('Which account will this subject be associated with?'))
+    userEvent.click(getByLabelText('Which account will this subject be associated with?'))
     accountsPage1.forEach(a => {
       expect(getByText(a.name)).toBeInTheDocument()
     })
@@ -190,11 +197,11 @@ describe('CreateCourseModal', () => {
     })
     const {getByText, getByLabelText} = render(<CreateCourseModal {...getProps()} />)
     await waitFor(() => expect(getByLabelText('Subject Name')).toBeInTheDocument())
-    fireEvent.click(getByLabelText('Which account will this subject be associated with?'))
-    fireEvent.click(getByText('Elementary'))
+    userEvent.click(getByLabelText('Which account will this subject be associated with?'))
+    userEvent.click(getByText('Elementary'))
     await waitFor(() => expect(getByLabelText('Subject Name')).toBeInTheDocument())
-    fireEvent.change(getByLabelText('Subject Name'), {target: {value: 'Science'}})
-    fireEvent.click(getByText('Create'))
+    userEvent.type(getByLabelText('Subject Name'), 'Science')
+    userEvent.click(getByText('Create'))
     expect(getByText('Creating new subject...')).toBeInTheDocument()
   })
 
@@ -205,11 +212,11 @@ describe('CreateCourseModal', () => {
       <CreateCourseModal {...getProps()} />
     )
     await waitFor(() => expect(getByLabelText('Subject Name')).toBeInTheDocument())
-    fireEvent.click(getByLabelText('Which account will this subject be associated with?'))
-    fireEvent.click(getByText('CS'))
+    userEvent.click(getByLabelText('Which account will this subject be associated with?'))
+    userEvent.click(getByText('CS'))
     await waitFor(() => expect(getByLabelText('Subject Name')).toBeInTheDocument())
-    fireEvent.change(getByLabelText('Subject Name'), {target: {value: 'Math'}})
-    fireEvent.click(getByText('Create'))
+    userEvent.type(getByLabelText('Subject Name'), 'Math')
+    userEvent.click(getByText('Create'))
     await waitFor(() => expect(getAllByText('Error creating new subject')[0]).toBeInTheDocument())
     expect(getByRole('button', {name: 'Cancel'})).not.toBeDisabled()
   })
@@ -372,13 +379,13 @@ describe('CreateCourseModal', () => {
 
     it('fetches accounts from enrollments api', async () => {
       render(<CreateCourseModal {...getProps()} />)
-      expect(fetchMock.calls()[0][0]).toEqual("/api/v1/course_creation_accounts?per_page=100")
+      expect(fetchMock.calls()[0][0]).toEqual('/api/v1/course_creation_accounts?per_page=100')
       render(<CreateCourseModal {...getProps({permissions: 'teacher'})} />)
-      expect(fetchMock.calls()[0][0]).toEqual("/api/v1/course_creation_accounts?per_page=100")
+      expect(fetchMock.calls()[0][0]).toEqual('/api/v1/course_creation_accounts?per_page=100')
       render(<CreateCourseModal {...getProps({permissions: 'student'})} />)
-      expect(fetchMock.calls()[0][0]).toEqual("/api/v1/course_creation_accounts?per_page=100")
+      expect(fetchMock.calls()[0][0]).toEqual('/api/v1/course_creation_accounts?per_page=100')
       render(<CreateCourseModal {...getProps({permissions: 'no_enrollments'})} />)
-      expect(fetchMock.calls()[0][0]).toEqual("/api/v1/course_creation_accounts?per_page=100")
+      expect(fetchMock.calls()[0][0]).toEqual('/api/v1/course_creation_accounts?per_page=100')
     })
   })
 })

@@ -103,6 +103,7 @@ export default class FindAppointment extends React.Component {
                 onChange={e => this.selectCourse(e.target.value)}
                 value={this.state.selectedCourse.id}
                 className="ic-Input"
+                data-testid="select-course"
               >
                 {this.props.courses.map(c => (
                   <option key={c.id} value={c.id}>

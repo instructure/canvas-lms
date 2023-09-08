@@ -312,7 +312,7 @@ test('displays the developer key on click of show key button', () => {
 })
 
 test('renders the spinner', () => {
-  const applicationState = {
+  const overrides = {
     listDeveloperKeyScopes,
     createOrEditDeveloperKey: {isLtiKey: false},
     listDeveloperKeys: {
@@ -328,10 +328,22 @@ test('renders the spinner', () => {
     },
   }
 
-  const component = renderComponent({applicationState})
-  const spinner = TestUtils.findRenderedComponentWithType(component, Spinner)
-
-  ok(spinner)
+  const props = {
+    applicationState: {
+      ...initialApplicationState(),
+      ...overrides,
+    },
+    actions: {},
+    store: fakeStore(),
+    ctx: {
+      params: {
+        contextId: '',
+      },
+    },
+  }
+  const wrapper = mount(<DeveloperKeysApp {...props} />)
+  const spinner = wrapper.find(Spinner)
+  ok(spinner.exists())
 })
 
 test('opens the key selection menu when the create button is clicked', () => {

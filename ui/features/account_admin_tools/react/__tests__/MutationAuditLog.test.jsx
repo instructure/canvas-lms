@@ -176,7 +176,7 @@ describe('AuditLogResults', () => {
     },
   ]
 
-  it('renders', async () => {
+  it('renders (flaky)', async () => {
     const {getByText} = render(
       <MockedProvider mocks={mocks}>
         <AuditLogResults assetString="user_123" pageSize={1} />

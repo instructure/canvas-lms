@@ -74,15 +74,15 @@ it('registers and deregisters drop components', () => {
 
 it('renders disabled file drop with loading billboard', () => {
   component = mount(<ModuleFileDrop {...props} />)
-  expect(component.find('FileDrop').props().interaction).toEqual('disabled')
-  expect(component.find('Billboard').text()).toEqual('Loading...')
+  expect(component.find('FileDrop').first().props().interaction).toEqual('disabled')
+  expect(component.find('Billboard').first().text()).toEqual('Loading...')
 })
 
 it('renders enabled file drop with active billboard', () => {
   component = mount(<ModuleFileDrop {...props} />)
   component.find(ModuleFileDrop).setState({folder: {files: []}}, () => {
-    expect(component.find('FileDrop').props().interaction).toEqual('enabled')
-    const billboard = component.find('Billboard')
+    expect(component.find('FileDrop').first().props().interaction).toEqual('enabled')
+    const billboard = component.find('Billboard').first()
     expect(billboard.text()).toContain('Drop files here to add to module')
     expect(billboard.text()).toContain('or choose files')
   })

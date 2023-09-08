@@ -113,30 +113,37 @@ describe('ManageOutcomeItem', () => {
   })
 
   it('displays disabled caret button with "not-allowed" cursor if description is a single line html with no extra formatting', () => {
-    const {queryByTestId} = render(<ManageOutcomeItem {...defaultProps({description: "<p>The quick brown fox.</p>"})} />)
-    expect(queryByTestId('icon-arrow-right').closest('button')).toHaveAttribute('disabled')
-    expect(queryByTestId('icon-arrow-right').closest('button').style).toHaveProperty(
-      'cursor',
-      'not-allowed'
+    const {queryByTestId} = render(
+      <ManageOutcomeItem {...defaultProps({description: '<p>The quick brown fox.</p>'})} />
     )
+    expect(queryByTestId('icon-arrow-right').closest('button')).toHaveAttribute('disabled')
+    expect(queryByTestId('icon-arrow-right').closest('button')).toHaveStyle('cursor: not-allowed')
   })
 
   it('displays down pointing caret when description is expanded for multi-line html text', () => {
-    const {queryByTestId, getByText} = render(<ManageOutcomeItem {...defaultProps({description: "<p>aaaaaaadfhausdfhkjsadhfkjsadhfkjhsadfkjhasdfkjh</p>".repeat(10)})} />)
+    const {queryByTestId, getByText} = render(
+      <ManageOutcomeItem
+        {...defaultProps({
+          description: '<p>aaaaaaadfhausdfhkjsadhfkjsadhfkjhsadfkjhasdfkjh</p>'.repeat(10),
+        })}
+      />
+    )
     fireEvent.click(getByText('Expand description for outcome Outcome Title'))
     expect(queryByTestId('icon-arrow-down').closest('button')).not.toHaveAttribute('disabled')
-
   })
 
   it('expands description when user clicks on button with right pointing caret', () => {
-    const {queryByTestId, getByText} = render(<ManageOutcomeItem {...defaultProps({description: "<p>aa</p><p>bb</p>"})} />)
+    const {queryByTestId, getByText} = render(
+      <ManageOutcomeItem {...defaultProps({description: '<p>aa</p><p>bb</p>'})} />
+    )
     fireEvent.click(getByText('Expand description for outcome Outcome Title'))
     expect(queryByTestId('description-expanded')).toBeInTheDocument()
   })
 
   it('collapses description when user clicks on button with down pointing caret', () => {
     const {queryByTestId, getByText} = render(
-    <ManageOutcomeItem {...defaultProps({description: "<p>aa</p><p>bbbb</p>"})} />)
+      <ManageOutcomeItem {...defaultProps({description: '<p>aa</p><p>bbbb</p>'})} />
+    )
     fireEvent.click(getByText('Expand description for outcome Outcome Title'))
     fireEvent.click(getByText('Collapse description for outcome Outcome Title'))
     expect(queryByTestId('description-truncated')).toBeInTheDocument()
@@ -147,7 +154,6 @@ describe('ManageOutcomeItem', () => {
     expect(queryByTestId('icon-arrow-right').closest('button')).toHaveAttribute('disabled')
     expect(queryByTestId('icon-arrow-right').closest('button')).toHaveStyle('cursor: not-allowed')
   })
-
 
   it('displays enabled caret button if no description and accountLevelMasteryScales is disabled', () => {
     const {queryByTestId} = render(<ManageOutcomeItem {...defaultProps({description: null})} />, {

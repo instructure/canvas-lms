@@ -18,6 +18,7 @@
 
 import {Alert} from '@instructure/ui-alerts'
 import React, {createContext, PropsWithChildren} from 'react'
+import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 
 export type AlertManagerContextType = {
   setOnFailure: (alertMessage: string) => void
@@ -76,7 +77,7 @@ export default class AlertManager extends React.Component<
       return (
         <Alert
           variant="success"
-          liveRegion={() => document.getElementById('flash_screenreader_holder')}
+          liveRegion={getLiveRegion}
           onDismiss={this.closeAlert}
           screenReaderOnly={this.state.successScreenReaderOnly}
           timeout={ALERT_TIMEOUT}
@@ -87,7 +88,7 @@ export default class AlertManager extends React.Component<
     } else if (this.state.alertStatus === 'error') {
       return (
         <Alert
-          liveRegion={() => document.getElementById('flash_screenreader_holder')}
+          liveRegion={getLiveRegion}
           margin="small"
           onDismiss={this.closeAlert}
           timeout={ALERT_TIMEOUT}

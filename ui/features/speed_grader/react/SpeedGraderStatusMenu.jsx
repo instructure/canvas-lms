@@ -49,7 +49,8 @@ export default function SpeedGraderStatusMenu(props) {
       data = {excuse: true}
     } else if (newSelection === 'late') {
       data = {latePolicyStatus: newSelection, secondsLateOverride: props.secondsLate}
-    } else if (!isNaN(parseInt(newSelection))) {
+      // eslint-disable-next-line no-restricted-globals
+    } else if (!isNaN(parseInt(newSelection, 10))) {
       data = {customGradeStatusId: newSelection}
     }
     props.updateSubmission(data)

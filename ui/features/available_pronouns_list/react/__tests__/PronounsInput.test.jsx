@@ -21,8 +21,15 @@ import {render, fireEvent} from '@testing-library/react'
 import React from 'react'
 
 describe('render available pronouns input', () => {
-  beforeAll(() => {
-    ENV.PRONOUNS_LIST = ['She/Her', 'He/Him', 'They/Them']
+  let originalEnv
+
+  beforeEach(() => {
+    originalEnv = JSON.parse(JSON.stringify(window.ENV))
+    window.ENV.PRONOUNS_LIST = ['She/Her', 'He/Him', 'They/Them']
+  })
+
+  afterEach(() => {
+    window.ENV = originalEnv
   })
 
   it('renders tooltip when focused', () => {

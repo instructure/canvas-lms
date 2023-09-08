@@ -120,20 +120,25 @@ export const PaceContent = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedContextType, currentPage, currentSortBy, currentOrderType])
 
-  const changeTab = (_ev, {id}) => {
-    const type = id.split('-')
-    setSelectedContextType(type[1])
-    setSearchTerm('')
-    setOrderType('asc')
-  }
-
   const handleContextSelect = (paceContext: PaceContext) => {
     setSelectedContext(paceContext)
     setSelectedModalContext(API_CONTEXT_TYPE_MAP[selectedContextType], paceContext.item_id)
   }
 
   return (
-    <Tabs onRequestTabChange={changeTab}>
+    <Tabs
+      onRequestTabChange={(_ev, {id}) => {
+        if (typeof id === 'undefined') throw new Error('tab id cannot be undefined here')
+        const type = id.split('-')
+        // Guarantee that the following typecast to APIPaceContextTypes is valid
+        if (!['Course', 'Section', 'Enrollment', 'student_enrollment'].includes(type[1])) {
+          throw new Error('unexpected context type here')
+        }
+        setSelectedContextType(type[1] as APIPaceContextTypes)
+        setSearchTerm('')
+        setOrderType('asc')
+      }}
+    >
       <TabPanel
         key="tab-section"
         renderTitle={I18n.t('Sections')}

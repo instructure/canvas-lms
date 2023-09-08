@@ -228,7 +228,7 @@ class AssignmentConfigurationTools extends React.Component {
           onBlur={this.handleAlertBlur}
           className={afterAlertStyles}
           // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
-          tabIndex="0"
+          tabIndex={0}
         >
           <div className="ic-flash-info" style={{width: 'auto', margin: '20px'}}>
             <div className="ic-flash__icon" aria-hidden="true">

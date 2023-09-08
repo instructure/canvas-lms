@@ -42,6 +42,7 @@ const CopyToClipboard = props => {
 
   return (
     <TextInput
+      onChange={() => {}}
       {...textInputProps}
       renderAfterInput={
         <Button onClick={copyToClipboard} size="small">
