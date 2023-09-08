@@ -858,7 +858,7 @@ describe BasicLTI::BasicOutcomes do
       stub_const("BasicLTI::BasicOutcomes::MAX_ATTEMPTS", 1)
       stub_request(:get, "http://example.com/download").to_return(status: 500)
       run_jobs
-      expect(Delayed::Job.strand_size("file_download/example.com/failed")).to be == 0
+      expect(Delayed::Job.strand_size("file_download/example.com/failed")).to eq 0
       submission = assignment.submissions.find_by(user: @user)
       expect(submission.reload.versions.count).to eq 1
       expect(submission.attachments.count).to eq 1
@@ -875,7 +875,7 @@ describe BasicLTI::BasicOutcomes do
       end
       Timecop.freeze(6.seconds.from_now) do
         run_jobs
-        expect(Delayed::Job.strand_size("file_download/example.com/failed")).to be == 0
+        expect(Delayed::Job.strand_size("file_download/example.com/failed")).to eq 0
         submission = assignment.submissions.find_by(user: @user)
         expect(submission.reload.versions.count).to eq 1
         expect(submission.attachments.count).to eq 1

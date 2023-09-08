@@ -138,7 +138,7 @@ describe "native canvas conditional release" do
       expect(ConditionalReleaseObjects.division_cutoff2.attribute("value")).to eq("47 pts")
     end
 
-    it "is able to add an assignment to a range", ignore_js_errors: true do
+    it "is able to add an assignment to a range", :ignore_js_errors do
       main_assignment = assignment_model(course: @course, points_possible: 100)
       assignment_for_mp = assignment_model(course: @course, points_possible: 10, title: "Assignment for MP")
       get "/courses/#{@course.id}/assignments/#{main_assignment.id}/edit"
@@ -150,7 +150,7 @@ describe "native canvas conditional release" do
       expect(ConditionalReleaseObjects.assignment_card_exists?(assignment_for_mp.title)).to be(true)
     end
 
-    it "is able to toggle and/or between two assignments", ignore_js_errors: true do
+    it "is able to toggle and/or between two assignments", :ignore_js_errors do
       main_assignment = assignment_model(course: @course, points_possible: 100)
       assignment1_for_mp = assignment_model(course: @course, points_possible: 10, title: "Assignment 1 for MP")
       assignment2_for_mp = assignment_model(course: @course, points_possible: 10, title: "Assignment 2 for MP")
@@ -172,7 +172,7 @@ describe "native canvas conditional release" do
       expect(ConditionalReleaseObjects.and_toggle_button_exists?).to be(true)
     end
 
-    it "is able to move assignment to next row", ignore_js_errors: true do
+    it "is able to move assignment to next row", :ignore_js_errors do
       main_assignment = assignment_model(course: @course, points_possible: 100)
       assignment_for_mp = assignment_model(course: @course, points_possible: 10, title: "Assignment for MP")
       get "/courses/#{@course.id}/assignments/#{main_assignment.id}/edit"

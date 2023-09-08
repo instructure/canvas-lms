@@ -25,7 +25,7 @@ require_relative "pages/rce_next_page"
 # while there's a mix of instui 6 and 7 in canvas we're getting
 # "Warning: [themeable] A theme registry has already been initialized." js errors
 # Ignore js errors so specs can pass
-describe "RCE Next toolbar features", ignore_js_errors: true do
+describe "RCE Next toolbar features", :ignore_js_errors do
   include_context "in-process server selenium tests"
   include WikiAndTinyCommon
   include RCSSidebarPage

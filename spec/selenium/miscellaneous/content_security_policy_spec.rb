@@ -37,7 +37,7 @@ describe "content security policy" do
 
     before { create_session(@csp_pseudonym) }
 
-    it "displays a flash alert for non-whitelisted iframe", ignore_js_errors: true do
+    it "displays a flash alert for non-whitelisted iframe", :ignore_js_errors do
       @csp_course.wiki_pages.create!(title: "Page1", body: <<~HTML)
         <iframe
          width="560"

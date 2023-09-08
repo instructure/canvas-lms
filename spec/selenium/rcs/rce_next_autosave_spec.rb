@@ -21,7 +21,7 @@ require_relative "../helpers/wiki_and_tiny_common"
 require_relative "../test_setup/common_helper_methods/custom_selenium_actions"
 require_relative "pages/rce_next_page"
 
-describe "RCE Next autosave feature", ignore_js_errors: true do
+describe "RCE Next autosave feature", :ignore_js_errors do
   include_context "in-process server selenium tests"
   include CustomSeleniumActions
   include RCENextPage
@@ -134,7 +134,7 @@ describe "RCE Next autosave feature", ignore_js_errors: true do
     end
 
     # localStorage in chrome is limitedto 5120k, and that seems to include the key
-    it "handles quota exceeded", ignore_js_errors: true do
+    it "handles quota exceeded", :ignore_js_errors do
       # remove ignore_js_errors in LS-1163
       get "/"
       driver.local_storage.clear
@@ -148,8 +148,7 @@ describe "RCE Next autosave feature", ignore_js_errors: true do
     # get '/' is emitting
     # "Warning: [themeable] A theme registry has already been initialized. Ensure that you are importing only one copy of '@instructure/ui-themeable'."
     # It's a warning but logged as an error. I don't believe it is, and I can't find it. Ignore it.
-    it "makes room if quota is exceeded due to other rce auto save data",
-       ignore_js_errors: true do
+    it "makes room if quota is exceeded due to other rce auto save data", :ignore_js_errors do
       skip "LF-716 (9/5/2023)"
       get "/"
       driver.local_storage.clear
@@ -162,7 +161,7 @@ describe "RCE Next autosave feature", ignore_js_errors: true do
       driver.local_storage.clear
     end
 
-    it "cleans up expired autosaved entries", ignore_js_errors: true do
+    it "cleans up expired autosaved entries", :ignore_js_errors do
       get "/"
       driver.local_storage.clear
       Timecop.freeze(2.hours.ago) do
@@ -236,8 +235,7 @@ describe "RCE Next autosave feature", ignore_js_errors: true do
       user_session(@admin)
     end
 
-    it "does not prompt to restore autosaved content if the RCE is hidden",
-       ignore_js_errors: true do
+    it "does not prompt to restore autosaved content if the RCE is hidden", :ignore_js_errors do
       get "/accounts/#{@account.id}/settings#tab-announcements"
       fj('button:contains("New Announcement")').click
       wait_for_rce

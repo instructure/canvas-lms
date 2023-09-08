@@ -37,7 +37,7 @@ describe "Account Reports" do
       report2 = run_report("unpublished_courses_csv")
 
       expect(report1.attachment.md5).to eq report2.attachment.md5
-      expect(report1.attachment.filename).not_to be == report2.attachment.filename
+      expect(report1.attachment.filename).not_to eq report2.attachment.filename
     end
   end
 
@@ -48,7 +48,7 @@ describe "Account Reports" do
     report2 = run_report("unpublished_courses_csv")
 
     expect(report1.attachment.md5).to eq report2.attachment.md5
-    expect(report1.attachment.filename).not_to be == report2.attachment.filename
+    expect(report1.attachment.filename).not_to eq report2.attachment.filename
   end
 
   it "records the job id" do

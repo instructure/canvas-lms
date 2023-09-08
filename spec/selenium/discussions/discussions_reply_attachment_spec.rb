@@ -91,7 +91,7 @@ describe "reply attachment" do
     end
   end
 
-  context "when react_discussions_post ff is ON", ignore_js_errors: true do
+  context "when react_discussions_post ff is ON", :ignore_js_errors do
     before :once do
       Account.site_admin.enable_feature! :react_discussions_post
     end

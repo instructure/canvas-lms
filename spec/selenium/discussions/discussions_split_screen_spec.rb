@@ -85,7 +85,7 @@ describe "threaded discussions" do
     expect(f("body")).not_to contain_jqcss("div[data-testid='drawer-layout-tray']")
   end
 
-  it "allows you to click the mobile RCE without closing", ignore_js_errors: true do
+  it "allows you to click the mobile RCE without closing", :ignore_js_errors do
     driver.manage.window.resize_to(565, 836)
 
     # initially set user preference discussions_split_screen, so 'split-screen will be the initial View'

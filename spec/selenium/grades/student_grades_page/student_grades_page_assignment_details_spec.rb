@@ -157,7 +157,7 @@ describe "Student Gradebook - Assignment Details" do
         @course.save!
       end
 
-      it "shows submission comments", ignore_js_errors: true do
+      it "shows submission comments", :ignore_js_errors do
         @asn.grade_student(@students[0], grade: "10", grader: @teacher)
         @sub.submission_comments.create!(comment: "good job")
         user_session @students[0]

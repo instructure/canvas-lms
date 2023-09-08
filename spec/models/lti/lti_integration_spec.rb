@@ -458,7 +458,7 @@ describe "LTI integration tests" do
     specs_require_sharding
 
     # TODO: Replace this once we have LTIInbound
-    it "roundtrips source ids from mixed shards", skip: true do
+    it "roundtrips source ids from mixed shards", :skip do
       @shard1.activate do
         @account = Account.create!
         course_with_teacher(active_all: true, account: @account)

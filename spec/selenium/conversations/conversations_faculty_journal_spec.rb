@@ -141,7 +141,7 @@ describe "conversations new" do
       end
     end
 
-    context "when react_inbox feature flag is ON", ignore_js_errors: true do
+    context "when react_inbox feature flag is ON", :ignore_js_errors do
       before do
         Account.default.enable_feature! :react_inbox
       end

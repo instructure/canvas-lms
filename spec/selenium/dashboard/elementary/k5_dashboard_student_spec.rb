@@ -357,7 +357,7 @@ describe "student k5 dashboard" do
       expect(k5_app_buttons[0].text).to eq lti_resource_name
     end
 
-    it "shows course modal to choose which LTI resource context when button clicked", ignore_js_errors: true do
+    it "shows course modal to choose which LTI resource context when button clicked", :ignore_js_errors do
       second_course_title = "Second Course"
       course_with_student(
         active_course: 1,

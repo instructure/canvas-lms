@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-RSpec.describe SentryTraceScrubber, rack: true do
+RSpec.describe SentryTraceScrubber, :rack do
   let(:uri) { "https://my-host.com" }
   let(:default_options) { { HTTP_SENTRY_TRACE: "8ee36e389f474d74bf28d36b6a254d31-a9e542af8c94d1dc-1" } }
   let(:stack) { described_class.new(->(_) { [200, {}, ["okay"]] }) }

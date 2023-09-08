@@ -228,7 +228,7 @@ module Canvas::OAuth
             provider.valid?
           end
 
-          it "returns an error message when #{assertion} missing", skip_before: true do
+          it "returns an error message when #{assertion} missing", :skip_before do
             expect(subject).not_to be_empty
           end
         end
