@@ -90,8 +90,8 @@ describe('FrequencyPicker', () => {
         it('with open modal with the current selected frequency', () => {
           const props = defaultProps({timezone: TZ})
           const {getByText, getByDisplayValue} = render(<FrequencyPicker {...props} />)
-          selectOption(/frequency:/i, /weekly on thursday/i)
-          selectOption(/frequency:/i, /custom/i)
+          selectOption(/frequency/i, /weekly on thursday/i)
+          selectOption(/frequency/i, /custom/i)
           const modal = getByText('Custom Repeating Event')
           expect(modal).toBeInTheDocument()
 
@@ -111,7 +111,7 @@ describe('FrequencyPicker', () => {
           )
           expect(getByDisplayValue('Weekly on Mon, Wed, 5 times')).toBeInTheDocument()
 
-          selectOption(/frequency:/i, /Weekly on Mon, Wed, 5 times/)
+          selectOption(/frequency/i, /Weekly on Mon, Wed, 5 times/)
           selectOption(/frequency/i, /custom/i)
           const modal = getByText('Custom Repeating Event')
           expect(modal).toBeInTheDocument()
@@ -139,7 +139,7 @@ describe('FrequencyPicker', () => {
     it('returns focus to the frequency picker button when the modal is closed', () => {
       const props = defaultProps()
       const {getByText, getByRole} = render(<FrequencyPicker {...props} />)
-      selectOption(/frequency:/i, /custom/i)
+      selectOption(/frequency/i, /custom/i)
       const modal = getByText('Custom Repeating Event')
       expect(modal).toBeInTheDocument()
       userEvent.click(getByRole('button', {name: /cancel/i}))
@@ -161,7 +161,7 @@ describe('FrequencyPicker', () => {
     it('retains auto width after selecting a custom frequency', () => {
       const props = defaultProps({width: 'auto'})
       const {container, getByText, getByRole} = render(<FrequencyPicker {...props} />)
-      selectOption(/frequency:/i, /custom/i)
+      selectOption(/frequency/i, /custom/i)
       const modal = getByText('Custom Repeating Event')
       expect(modal).toBeInTheDocument()
       userEvent.click(getByRole('button', {name: /done/i}))
@@ -237,7 +237,7 @@ describe('FrequencyPicker', () => {
     it('when user changes frequency', () => {
       const props = defaultProps()
       render(<FrequencyPicker {...props} />)
-      selectOption(/frequency:/i, /annually on april 12/i)
+      selectOption(/frequency/i, /annually on april 12/i)
       expect(props.onChange).toHaveBeenCalledWith(
         'annually',
         'FREQ=YEARLY;BYMONTH=04;BYMONTHDAY=12;INTERVAL=1;COUNT=5'

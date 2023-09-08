@@ -219,7 +219,7 @@ export default function FrequencyPicker({
           freqPickerRef.current = node
         }}
         interaction={interaction}
-        renderLabel={I18n.t('frequency', 'Frequency:')}
+        renderLabel={I18n.t('frequency', 'Frequency')}
         data-testid="frequency-picker"
         value={frequency}
         width={selectTextWidth}

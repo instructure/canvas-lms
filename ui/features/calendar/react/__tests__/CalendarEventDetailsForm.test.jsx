@@ -48,19 +48,13 @@ const setTime = (component, testid, time) => {
   return clock
 }
 
-const select = (component, role, name) => {
-  const child = component.getByRole(role, {name})
-  expect(child).toBeInTheDocument()
-  act(() => child.click())
-}
-
 const testTimezone = async (timezone, inputDate, expectedDate, time) => {
   defaultProps.timezone = timezone
   const component = render(<CalendarEventDetailsForm {...defaultProps} />)
   const date = changeValue(component, 'edit-calendar-event-form-date', inputDate)
   expect(date.value).toBe('Thu, Jul 14, 2022')
   if (time) setTime(component, 'event-form-end-time', time)
-  select(component, 'button', 'Submit')
+  component.getByText('Submit').click()
 
   waitFor(() =>
     expect(defaultProps.event.save).toHaveBeenCalledWith(
@@ -77,8 +71,8 @@ const testTimezone = async (timezone, inputDate, expectedDate, time) => {
 const testBlackoutDateSuccess = () => {
   const component = render(<CalendarEventDetailsForm {...defaultProps} />)
 
-  select(component, 'checkbox', 'Add to Course Pacing blackout dates')
-  select(component, 'button', 'Submit')
+  component.getByText('Add to Course Pacing blackout dates').click()
+  component.getByText('Submit').click()
   expect(defaultProps.event.save).toHaveBeenCalledWith(
     expect.objectContaining({
       'calendar_event[blackout_date]': true,
@@ -121,7 +115,7 @@ describe('CalendarEventDetailsForm', () => {
     const component = render(<CalendarEventDetailsForm {...defaultProps} />)
     expect(defaultProps.setSetContextCB).toHaveBeenCalled()
     expect(defaultProps.contextChangeCB).toHaveBeenCalled()
-    select(component, 'button', 'Submit')
+    component.getByText('Submit').click()
 
     await waitFor(() => expect(defaultProps.closeCB).toHaveBeenCalled())
 
@@ -138,10 +132,10 @@ describe('CalendarEventDetailsForm', () => {
     changeValue(component, 'edit-calendar-event-form-date', '2022-07-23T00:00:00.000Z')
     setTime(component, 'event-form-start-time', '2:00 AM')
     setTime(component, 'event-form-end-time', '3:00 PM')
-    select(component, 'button', 'Calendar:')
-    select(component, 'option', 'Geometry')
+    component.getByText('Calendar').click()
+    component.getByText('Geometry').click()
     expect(component.getByText('More Options')).toBeInTheDocument()
-    select(component, 'button', 'Submit')
+    component.getByText('Submit').click()
     await waitFor(() => expect(defaultProps.closeCB).toHaveBeenCalled())
     expect(defaultProps.event.save).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -170,7 +164,7 @@ describe('CalendarEventDetailsForm', () => {
     }
 
     const component = render(<CalendarEventDetailsForm {...props} />)
-    select(component, 'button', 'Submit')
+    component.getByText('Submit').click()
 
     expect(UpdateCalendarEventDialogModule.renderUpdateCalendarEventDialog).toHaveBeenCalled()
     await waitFor(() =>
@@ -191,7 +185,7 @@ describe('CalendarEventDetailsForm', () => {
     expect(date.value).toBe('Thu, Jul 14, 2022')
     date = changeValue(component, 'edit-calendar-event-form-date', '2022-07-23T00:00:00.000Z')
     expect(date.value).toBe('Sat, Jul 23, 2022')
-    select(component, 'button', 'Submit')
+    component.getByText('Submit').click()
 
     await waitFor(() =>
       expect(defaultProps.event.save).toHaveBeenCalledWith(
@@ -216,7 +210,7 @@ describe('CalendarEventDetailsForm', () => {
       act(() => date.blur())
     }
 
-    select(component, 'button', 'Submit')
+    component.getByText('Submit').click()
 
     await waitFor(() =>
       expect(defaultProps.event.save).toHaveBeenCalledWith(
@@ -322,8 +316,8 @@ describe('CalendarEventDetailsForm', () => {
     defaultProps.event.webConference = conference
     const component = render(<CalendarEventDetailsForm {...defaultProps} />)
 
-    expect(component.getByText('Conferencing:')).toBeInTheDocument()
-    select(component, 'button', 'Submit')
+    expect(component.getByText('Conferencing')).toBeInTheDocument()
+    component.getByText('Submit').click()
     expect(defaultProps.event.save).toHaveBeenCalledWith(
       expect.objectContaining({
         'calendar_event[web_conference][conference_type]': 'BigBlueButton',
@@ -338,8 +332,8 @@ describe('CalendarEventDetailsForm', () => {
     defaultProps.event.webConference = conference
     const component = render(<CalendarEventDetailsForm {...defaultProps} />)
 
-    select(component, 'button', 'Remove conference: Conference')
-    select(component, 'button', 'Submit')
+    component.getByText('Remove conference: Conference').click()
+    component.getByText('Submit').click()
     expect(defaultProps.event.save).toHaveBeenCalledWith(
       expect.objectContaining({
         'calendar_event[web_conference]': '',
@@ -354,8 +348,8 @@ describe('CalendarEventDetailsForm', () => {
     event.contextInfo.k5_course = true
     const component = render(<CalendarEventDetailsForm {...defaultProps} event={event} />)
 
-    select(component, 'checkbox', 'Mark as Important Date')
-    select(component, 'button', 'Submit')
+    component.getByText('Mark as Important Date').click()
+    component.getByText('Submit').click()
     expect(defaultProps.event.save).toHaveBeenCalledWith(
       expect.objectContaining({
         'calendar_event[important_dates]': true,
@@ -370,8 +364,8 @@ describe('CalendarEventDetailsForm', () => {
     event.contextInfo.k5_account = true
     const component = render(<CalendarEventDetailsForm {...defaultProps} event={event} />)
 
-    select(component, 'checkbox', 'Mark as Important Date')
-    select(component, 'button', 'Submit')
+    component.getByText('Mark as Important Date').click()
+    component.getByText('Submit').click()
     expect(defaultProps.event.save).toHaveBeenCalledWith(
       expect.objectContaining({
         'calendar_event[important_dates]': true,
@@ -417,30 +411,30 @@ describe('CalendarEventDetailsForm', () => {
     const component = render(<CalendarEventDetailsForm {...defaultProps} />)
 
     expectFieldsToBeEnabled(component, [
-      'Title:',
-      'Location:',
-      'Date:',
-      'From:',
-      'To:',
-      'Calendar:',
+      'Title',
+      'Location',
+      'Date',
+      'From',
+      'To',
+      'Calendar',
       'More Options',
       'Submit',
     ])
 
-    select(component, 'button', 'Calendar:')
-    select(component, 'option', 'Geometry')
-    select(component, 'checkbox', 'Add to Course Pacing blackout dates')
+    component.getByText('Calendar').click()
+    component.getByText('Geometry').click()
+    component.getByText('Add to Course Pacing blackout dates').click()
 
-    expectFieldsToBeEnabled(component, ['Title:', 'Date:', 'Calendar:', 'More Options', 'Submit'])
-    expectFieldsToBeDisabled(component, ['Location:', 'From:', 'To:'])
+    expectFieldsToBeEnabled(component, ['Title', 'Date', 'Calendar', 'More Options', 'Submit'])
+    expectFieldsToBeDisabled(component, ['Location', 'From', 'To'])
   })
 
   it('does not render the location input for child (section) events', () => {
     const props = {...defaultProps}
     props.event.calendarEvent.parent_event_id = '133'
     const {getByText, queryByText} = render(<CalendarEventDetailsForm {...props} />)
-    expect(getByText('Title:')).toBeInTheDocument()
-    expect(queryByText('Location:')).not.toBeInTheDocument()
+    expect(getByText('Title')).toBeInTheDocument()
+    expect(queryByText('Location')).not.toBeInTheDocument()
   })
 
   describe('frequency picker', () => {
@@ -458,26 +452,26 @@ describe('CalendarEventDetailsForm', () => {
 
     it('renders when creating', async () => {
       const component = render(<CalendarEventDetailsForm {...defaultProps} />)
-      expect(component.queryByRole('button', {name: 'Frequency:'})).toBeInTheDocument()
+      expect(component.queryByRole('button', {name: 'Frequency'})).toBeInTheDocument()
     })
 
     it('renders when editing', async () => {
       defaultProps.event.isNewEvent = () => false
       const component = render(<CalendarEventDetailsForm {...defaultProps} />)
-      expect(component.queryByRole('button', {name: 'Frequency:'})).toBeInTheDocument()
+      expect(component.queryByRole('button', {name: 'Frequency'})).toBeInTheDocument()
     })
 
     it('does not render when calendar_series is disabled', async () => {
       ENV.FEATURES.calendar_series = false
       const component = render(<CalendarEventDetailsForm {...defaultProps} />)
-      expect(component.queryByRole('button', {name: 'Frequency:'})).not.toBeInTheDocument()
+      expect(component.queryByRole('button', {name: 'Frequency'})).not.toBeInTheDocument()
     })
 
     it('with option selected contains RRULE on submit', async () => {
       const component = render(<CalendarEventDetailsForm {...defaultProps} />)
-      select(component, 'button', 'Frequency:')
-      select(component, 'option', 'Daily')
-      select(component, 'button', 'Submit')
+      component.getByText('Frequency').click() // open the dropdown
+      component.getByText('Daily').click() // select the option
+      component.getByText('Submit').click()
       expect(defaultProps.closeCB).toHaveBeenCalled()
       expect(defaultProps.event.save).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -490,7 +484,7 @@ describe('CalendarEventDetailsForm', () => {
 
     it('with not-repeat option selected does not contain RRULE on submit', async () => {
       const component = render(<CalendarEventDetailsForm {...defaultProps} />)
-      select(component, 'button', 'Submit')
+      component.getByText('Submit').click()
 
       expect(defaultProps.event.save).toHaveBeenCalledWith(
         expect.not.objectContaining({
@@ -503,8 +497,8 @@ describe('CalendarEventDetailsForm', () => {
 
     it('with custom option selected opens the modal', async () => {
       const component = render(<CalendarEventDetailsForm {...defaultProps} />)
-      select(component, 'button', 'Frequency:')
-      select(component, 'option', 'Custom...')
+      component.getByText('Frequency').click()
+      component.getByText('Custom...').click()
       const modal = await component.findByText('Custom Repeating Event')
       expect(modal).toBeInTheDocument()
     })
@@ -515,8 +509,8 @@ describe('CalendarEventDetailsForm', () => {
       const nextDate = props.event.startDate().clone().add(1, 'day').format('ddd, MMM D, YYYY')
 
       const component = render(<CalendarEventDetailsForm {...props} />)
-      select(component, 'button', 'Frequency:')
-      select(component, 'option', 'Daily')
+      component.getByText('Frequency').click()
+      component.getByText('Daily').click()
       await waitFor(() => expect(component.queryByDisplayValue('Daily')).toBeInTheDocument())
       changeValue(component, 'edit-calendar-event-form-date', nextDate)
       expect(component.queryByDisplayValue('Daily')).toBeInTheDocument()
@@ -531,7 +525,7 @@ describe('CalendarEventDetailsForm', () => {
       const nextDate = d.clone().add(1, 'day').format('ddd, MMM D, YYYY')
 
       const component = render(<CalendarEventDetailsForm {...props} />)
-      select(component, 'button', 'Frequency:')
+      component.getByText('Frequency').click()
       screen.getByText('Weekly on Monday').click()
       await waitFor(() =>
         expect(component.queryByDisplayValue('Weekly on Monday')).toBeInTheDocument()
