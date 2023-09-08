@@ -71,6 +71,7 @@ class GradingSchemesJsonController < ApplicationController
 
       respond_to do |format|
         if grading_standard.save
+          track_create_metrics(grading_standard)
           format.json { render json: GradingSchemesJsonController.to_grading_scheme_json(grading_standard, @current_user) }
         else
           format.json { render json: grading_standard.errors, status: :bad_request }
@@ -86,6 +87,7 @@ class GradingSchemesJsonController < ApplicationController
 
       respond_to do |format|
         if grading_standard.update(grading_scheme_payload)
+          track_update_metrics(grading_standard)
           format.json { render json: GradingSchemesJsonController.to_grading_scheme_json(grading_standard, @current_user) }
         else
           format.json { render json: grading_standard.errors, status: :bad_request }
@@ -178,5 +180,17 @@ class GradingSchemesJsonController < ApplicationController
       { title: params[:title],
         data: GradingSchemesJsonController.to_grading_standard_data(params[:data]) }
     end
+  end
+
+  def track_update_metrics(grading_standard)
+    if grading_standard.changed.include?("points_based")
+      InstStatsd::Statsd.increment("grading_scheme.update.points_based") if grading_standard.points_based
+      InstStatsd::Statsd.increment("grading_scheme.update.percentage_based") unless grading_standard.points_based
+    end
+  end
+
+  def track_create_metrics(grading_standard)
+    InstStatsd::Statsd.increment("grading_scheme.create.points_based") if grading_standard.points_based
+    InstStatsd::Statsd.increment("grading_scheme.create.percentage_based") unless grading_standard.points_based
   end
 end
