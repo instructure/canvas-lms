@@ -173,7 +173,7 @@ async function ltiMessageHandler(
   // insanely weird behavior where sending a message from the RCE iframe
   // makes 'source' the parent Canvas window, only present in some browsers
   if (targetWindow === window && isFromRce) {
-    // @ts-ignore TS7015 - it's ok to access frames by name not index
+    // @ts-expect-error TS7015 - it's ok to access frames by name not index
     targetWindow = window.frames[nameFromMessage]
   }
 

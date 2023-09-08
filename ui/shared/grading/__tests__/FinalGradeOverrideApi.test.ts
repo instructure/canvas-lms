@@ -108,19 +108,19 @@ describe('Gradebook FinalGradeOverrideApi', () => {
       })
 
       afterEach(() => {
-        // @ts-ignore
+        // @ts-expect-error
         FlashAlert.showFlashAlert.restore()
       })
 
       it('shows a flash alert', async () => {
         await getFinalGradeOverrides()
-        // @ts-ignore
+        // @ts-expect-error
         expect(FlashAlert.showFlashAlert.callCount).toBe(1)
       })
 
       it('flashes an error', async () => {
         await getFinalGradeOverrides()
-        // @ts-ignore
+        // @ts-expect-error
         const [{type}] = FlashAlert.showFlashAlert.lastCall.args
         expect(type).toBe('error')
       })

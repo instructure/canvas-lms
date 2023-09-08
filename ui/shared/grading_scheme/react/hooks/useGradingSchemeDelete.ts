@@ -45,7 +45,6 @@ export const useGradingSchemeDelete = (): {
         const contextPath = buildContextPath(contextType, contextId)
         setDeleteGradingSchemeStatus(ApiCallStatus.PENDING)
 
-        // @ts-ignore
         const result = await doFetchApi({
           path: `${contextPath}/grading_schemes/${gradingSchemeId}`,
           method: 'DELETE',

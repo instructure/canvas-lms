@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -69,7 +68,7 @@ const thunkActions = {
           )
           dispatch(regularActions.blackoutDatesSynced(remainingCalendarEvents))
         })
-        .catch(error => {
+        .catch((error: Error) => {
           dispatch(regularActions.blackoutDatesSyncFailed())
           dispatch(uiActions.setCategoryError('blackout_dates', error?.toString()))
           throw error

@@ -44,7 +44,7 @@ export const useDefaultGradingScheme = (): {
       try {
         setLoadDefaultGradingSchemeStatus(ApiCallStatus.PENDING)
 
-        // @ts-ignore
+        // @ts-expect-error
         const result = await doFetchApi<GradingSchemeTemplate>({
           path: `${contextPath}/grading_schemes/default`,
           method: 'GET',

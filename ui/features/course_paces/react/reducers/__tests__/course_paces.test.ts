@@ -70,12 +70,12 @@ describe('course_paces reducer', () => {
 
   describe('isNewPace', () => {
     it('is new if it has no id and is not a student pace', () => {
-      // @ts-ignore
+      // @ts-expect-error
       expect(isNewPace({coursePace: {id: undefined, context_type: 'Course'}})).toBe(true)
     })
 
     it('is not new if it has an id', () => {
-      // @ts-ignore
+      // @ts-expect-error
       expect(isNewPace({coursePace: {id: '1'}})).toBe(false)
     })
 
@@ -85,7 +85,7 @@ describe('course_paces reducer', () => {
       // but we need it for the start_date to show the user's
       // assignment due dates in their pace
       expect(
-        // @ts-ignore
+        // @ts-expect-error
         isNewPace({coursePace: {id: undefined, context_type: 'Enrollment'}})
       ).toBe(false)
     })
@@ -98,7 +98,7 @@ describe('course_paces reducer', () => {
 
       it('is new if it is a student pace', () => {
         expect(
-          // @ts-ignore
+          // @ts-expect-error
           isNewPace({coursePace: {id: undefined, context_type: 'Enrollment'}})
         ).toBe(true)
       })

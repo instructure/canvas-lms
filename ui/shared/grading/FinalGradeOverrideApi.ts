@@ -96,7 +96,7 @@ export function updateFinalGradeOverride(
   return (
     createClient()
       .mutate({mutation})
-      // @ts-ignore
+      // @ts-expect-error
       .then(response => {
         const {overrideScore, customGradeStatusId} = response.data.setOverrideScore.grades
         return overrideScore != null ? {percentage: overrideScore, customGradeStatusId} : null
