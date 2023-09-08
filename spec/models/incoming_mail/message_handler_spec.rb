@@ -98,6 +98,24 @@ describe IncomingMail::MessageHandler do
       end
     end
 
+    it "Sets html to nil if it is too long but keeps the plain text" do
+      # Set the max text length to 10
+      allow(ActiveRecord::Base).to receive(:maximum_text_length).and_return(10)
+
+      expected_reply_from_parameters = {
+        purpose: "general",
+        user: original_message.user,
+        subject: IncomingMailProcessor::IncomingMessageProcessor.utf8ify(incoming_message.subject, incoming_message.header[:subject].try(:charset)),
+        html: nil,
+        text: "a"
+      }
+
+      expect(context).to receive(:reply_from).with(expected_reply_from_parameters)
+      allow(subject).to receive(:get_original_message).with(original_message_id, timestamp).and_return(original_message)
+
+      subject.handle(outgoing_from_address, "a", "b" * (ActiveRecord::Base.maximum_text_length + 1), incoming_message, tag)
+    end
+
     context "when a reply from error occurs" do
       context "silent failures" do
         it "silently fails on no message notification id" do
