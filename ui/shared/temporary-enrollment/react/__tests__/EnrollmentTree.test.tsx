@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, fireEvent, waitFor} from '@testing-library/react'
+import {fireEvent, render, waitFor} from '@testing-library/react'
 import {EnrollmentTree} from '../EnrollmentTree'
 import fetchMock from 'fetch-mock'
 
@@ -28,7 +28,7 @@ const simpleProps = {
   ],
   selectedRole: {
     id: '',
-    baseRoleName: '',
+    name: '',
   },
   list: [
     {id: '1', course_id: '11', course_section_id: '111', role_id: '93'},
@@ -45,7 +45,7 @@ const complexProps = {
   ],
   selectedRole: {
     id: '',
-    baseRoleName: '',
+    name: '',
   },
   list: [
     {id: '1', course_id: '11', course_section_id: '111', role_id: '93'},
@@ -63,7 +63,7 @@ const submitProps = {
   ],
   selectedRole: {
     id: '',
-    baseRoleName: '',
+    name: '',
   },
   list: [
     {id: '1', course_id: '11', course_section_id: '111', role_id: '93'},

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {fireEvent, render} from '@testing-library/react'
 import {EnrollmentTreeItem} from '../EnrollmentTreeItem'
 
 const callback = jest.fn()

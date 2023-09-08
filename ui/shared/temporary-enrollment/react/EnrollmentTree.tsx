@@ -16,16 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// @ts-ignore
 import React, {useEffect, useState} from 'react'
-// @ts-ignore
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {EnrollmentTreeGroup} from './EnrollmentTreeGroup'
 import {Spinner} from '@instructure/ui-spinner'
+import {splitArrayByProperty} from './helpers'
 
 interface RoleChoice {
   id: string
-  baseRoleName: string
+  name: string
 }
 
 interface Props {
@@ -57,17 +56,6 @@ interface Section {
 export function EnrollmentTree(props: Props) {
   const [tree, setTree] = useState<NodeStructure[]>([])
   const [loading, setLoading] = useState(true)
-
-  function splitArrayByProperty(arr: any[], property: string | number) {
-    return arr.reduce((result: {[x: string]: any[]}, obj: {[x: string]: any}) => {
-      const index = obj[property]
-      if (!result[index]) {
-        result[index] = []
-      }
-      result[index].push(obj)
-      return result
-    }, {})
-  }
 
   const sortByBase = (a: NodeStructure, b: NodeStructure) => {
     const aId = a.id.slice(1)
@@ -107,13 +95,15 @@ export function EnrollmentTree(props: Props) {
 
   useEffect(() => {
     if (!loading) {
-      if (props.selectedRole.baseRoleName !== '') {
+      if (props.selectedRole.name !== '') {
         for (const roles in tree) {
-          if (tree[roles].label.toLowerCase() === props.selectedRole.baseRoleName.toLowerCase()) {
+          if (tree[roles].label.toLowerCase() === props.selectedRole.name.toLowerCase()) {
             tree[roles].isToggle = true
+
             // set mismatch for all sections and courses with role
             for (const course of tree[roles].children) {
               course.isMismatch = false
+
               for (const section of course.children) {
                 section.isMismatch = false
               }
@@ -121,6 +111,7 @@ export function EnrollmentTree(props: Props) {
           } else {
             for (const course of tree[roles].children) {
               course.isMismatch = course.isCheck
+
               for (const section of course.children) {
                 section.isMismatch = section.isCheck
               }
@@ -129,9 +120,10 @@ export function EnrollmentTree(props: Props) {
         }
       }
     }
+
     setTree([...tree])
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.selectedRole.baseRoleName, loading])
+  }, [props.selectedRole.name, loading])
 
   // builds basic object tree
   useEffect(() => {
