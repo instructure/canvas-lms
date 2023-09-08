@@ -186,9 +186,9 @@ export default function SubmissionTrayRadioInputGroup({
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             handleRadioInputChanged(e, status.isCustom)
           }
-          // @ts-ignore
+          // @ts-expect-error
           updateSubmission={updateSubmission}
-          // @ts-ignore
+          // @ts-expect-error
           submission={submission}
           text={status.name}
           value={status.key}

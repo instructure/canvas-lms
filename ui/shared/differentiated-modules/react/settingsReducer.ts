@@ -20,7 +20,7 @@ export type SettingsPanelState = {
   moduleName: string
   unlockAt: string
   lockUntilChecked: boolean
-  nameInputMessages: Array<{type: string; text: string}>
+  nameInputMessages: Array<{type: 'error' | 'hint' | 'success' | 'screenreader-only'; text: string}>
 }
 
 export const defaultState: SettingsPanelState = {

@@ -121,9 +121,14 @@ test('renders the media tracks properly', () => {
   const changes = tree.find('tr[data-testid="bcs__unsynced-item"]')
   equal(changes.length, 4)
   const assetName = changes.findWhere(
-    node => node.name() === 'Text' && node.text() === 'media.mp4 (English)'
+    node =>
+      node.name() === 'Text' &&
+      node.text() === 'media.mp4 (English)' &&
+      node.parent().type() === 'span'
   )
   equal(assetName.length, 1)
-  const assetType = changes.findWhere(node => node.name() === 'Text' && node.text() === 'Caption')
+  const assetType = changes.findWhere(
+    node => node.name() === 'Text' && node.text() === 'Caption' && node.parent().type() === 'td'
+  )
   equal(assetType.length, 1)
 })

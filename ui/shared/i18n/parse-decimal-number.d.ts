@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 - present Instructure, Inc.
+ * Copyright (C) 2023 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,20 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-global.MutationObserver = class {
-  disconnect() {}
-
-  observe() {}
+interface InOptions {
+  thousands?: string
+  group?: string
+  decimal?: string
 }
 
-module.exports = {
-  require: [
-    '@instructure/canvas-theme',
-    'jsdom-global/register',
-    'source-map-support/register',
-    require.resolve('./babel-register.js'),
-    'ts-node/register/transpile-only',
-    'source-map-support'
-  ],
-  extension: ['ts', 'tsx', 'js']
+type FormatString = string
+type FormatArray = [string, string]
+
+declare module 'parse-decimal-number' {
+  function parseNumber(
+    value: string,
+    inOptions?: InOptions | FormatString | FormatArray,
+    enforceGroupSize?: boolean
+  ): number
+  export = parseNumber
 }

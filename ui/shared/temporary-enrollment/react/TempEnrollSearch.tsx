@@ -219,7 +219,9 @@ export function TempEnrollSearch(props: Props) {
           name="search_type"
           defaultValue={searchType}
           description={I18n.t('Find user by')}
-          onChange={(e: Event, val: string) => setSearchType(val)}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>, value: string) =>
+            setSearchType(value)
+          }
           layout="columns"
         >
           <RadioInput

@@ -38,7 +38,7 @@ export default function RoleMismatchToolTip() {
     </>
   )
 
-  const tipTriggers = ['click', 'hover', 'focus']
+  const tipTriggers: Array<'click' | 'hover' | 'focus'> = ['click', 'hover', 'focus']
   const renderToolTip = () => {
     return (
       <Tooltip renderTip={tipText} on={tipTriggers} placement="top">

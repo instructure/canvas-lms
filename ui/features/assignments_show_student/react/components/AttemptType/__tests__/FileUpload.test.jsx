@@ -80,7 +80,6 @@ beforeAll(() => {
 
 beforeEach(() => {
   uploadFileModule.uploadFile = jest.fn().mockResolvedValue(null)
-  global.DataTransferItem = global.DataTransferItem || class DataTransferItem {}
 })
 
 describe('FileUpload', () => {

@@ -25,7 +25,6 @@ describe('UploadFile', () => {
   let trayProps
   let fakeEditor
   beforeEach(() => {
-    global.DataTransferItem = global.DataTransferItem || class DataTransferItem {}
     trayProps = {
       source: {
         initializeCollection() {},

@@ -22,7 +22,7 @@ import I18n from './i18nObj'
 const helper = {
   _parseNumber: parseNumber,
 
-  parse(input) {
+  parse(input: number | string) {
     if (input == null) {
       return NaN
     } else if (typeof input === 'number') {
@@ -47,7 +47,7 @@ const helper = {
     return num
   },
 
-  validate(input) {
+  validate(input: number | string) {
     return !Number.isNaN(Number(helper.parse(input)))
   },
 }

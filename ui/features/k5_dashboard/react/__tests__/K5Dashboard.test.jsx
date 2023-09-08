@@ -228,7 +228,7 @@ describe('K-5 Dashboard', () => {
       expect(getByText('Your homeroom is currently unpublished.')).toBeInTheDocument()
     })
 
-    it('shows due today and missing items links pointing to the schedule tab of the course', async () => {
+    it('shows due today and missing items links pointing to the schedule tab of the course (flaky)', async () => {
       const {findByTestId} = render(<K5Dashboard {...defaultProps} plannerEnabled={true} />)
       const dueTodayLink = await findByTestId('number-due-today')
       expect(dueTodayLink).toBeInTheDocument()

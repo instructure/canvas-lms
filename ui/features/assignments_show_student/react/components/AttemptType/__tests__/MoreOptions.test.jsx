@@ -18,7 +18,9 @@
 
 import axios from '@canvas/axios'
 import {USER_GROUPS_QUERY} from '@canvas/assignments/graphql/student/Queries'
-import {act, fireEvent, render} from '@testing-library/react'
+import {act, render, cleanup} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+
 import {MockedProvider} from '@apollo/react-testing'
 import {mockQuery} from '@canvas/assignments/graphql/studentMocks'
 import MoreOptions from '../MoreOptions/index'
@@ -99,6 +101,16 @@ beforeEach(() => {
 })
 
 describe('MoreOptions', () => {
+  beforeEach(() => {
+    document.body.innerHTML = ''
+    jest.clearAllMocks()
+    jest.useRealTimers()
+  })
+
+  afterEach(() => {
+    cleanup()
+  })
+
   it('renders a button for selecting Canvas files when handleCanvasFiles is not null', async () => {
     const mocks = await createGraphqlMocks()
     const {findByRole} = render(
@@ -127,6 +139,13 @@ describe('MoreOptions', () => {
 
     beforeEach(() => {
       selectedCanvasFiles = []
+      document.body.innerHTML = ''
+      jest.clearAllMocks()
+      jest.useRealTimers()
+    })
+
+    afterEach(() => {
+      cleanup()
     })
 
     it('renders user and group folders', async () => {
@@ -142,7 +161,7 @@ describe('MoreOptions', () => {
         </MockedProvider>
       )
       const canvasFilesButton = await findByRole('button', {name: /Files/})
-      fireEvent.click(canvasFilesButton)
+      userEvent.click(canvasFilesButton)
 
       expect((await findAllByText('my files'))[0]).toBeInTheDocument()
       expect(
@@ -163,10 +182,10 @@ describe('MoreOptions', () => {
         </MockedProvider>
       )
       const canvasFilesButton = await findByRole('button', {name: /Files/})
-      fireEvent.click(canvasFilesButton)
+      userEvent.click(canvasFilesButton)
 
       const myFilesButton = (await findAllByText('my files'))[0]
-      fireEvent.click(myFilesButton)
+      userEvent.click(myFilesButton)
 
       const fileSelect = await findByTestId('upload-file-modal')
       expect(fileSelect).toContainElement((await findAllByText('dank memes'))[0])
@@ -189,10 +208,10 @@ describe('MoreOptions', () => {
         </MockedProvider>
       )
       const canvasFilesButton = await findByRole('button', {name: /Files/})
-      fireEvent.click(canvasFilesButton)
+      userEvent.click(canvasFilesButton)
 
       const myFilesButton = (await findAllByText('my files'))[0]
-      fireEvent.click(myFilesButton)
+      userEvent.click(myFilesButton)
 
       const fileSelect = await findByTestId('upload-file-modal')
       expect(fileSelect).not.toContainElement(
@@ -214,10 +233,10 @@ describe('MoreOptions', () => {
         </MockedProvider>
       )
       const canvasFilesButton = await findByRole('button', {name: /Files/})
-      fireEvent.click(canvasFilesButton)
+      userEvent.click(canvasFilesButton)
 
       const myFilesButton = (await findAllByText('my files'))[0]
-      fireEvent.click(myFilesButton)
+      userEvent.click(myFilesButton)
 
       const fileSelect = await findByTestId('upload-file-modal')
       expect(fileSelect).toContainElement(
@@ -238,16 +257,16 @@ describe('MoreOptions', () => {
         </MockedProvider>
       )
       const canvasFilesButton = await findByRole('button', {name: /Files/})
-      fireEvent.click(canvasFilesButton)
+      userEvent.click(canvasFilesButton)
 
       const myFilesButton = (await findAllByText('my files'))[0]
-      fireEvent.click(myFilesButton)
+      userEvent.click(myFilesButton)
 
       const fileSelect = await findByTestId('upload-file-modal')
       expect(fileSelect).toContainElement((await findAllByText('dank memes'))[0])
 
       const rootFolderBreadcrumbLink = (await findAllByText('Root'))[0]
-      fireEvent.click(rootFolderBreadcrumbLink)
+      userEvent.click(rootFolderBreadcrumbLink)
 
       expect((await findAllByText('my files'))[0]).toBeInTheDocument()
       expect(
@@ -268,17 +287,17 @@ describe('MoreOptions', () => {
         </MockedProvider>
       )
       const canvasFilesButton = await findByRole('button', {name: /Files/})
-      fireEvent.click(canvasFilesButton)
+      userEvent.click(canvasFilesButton)
 
       const myFilesButton = (await findAllByText('my files'))[0]
-      fireEvent.click(myFilesButton)
+      userEvent.click(myFilesButton)
 
       const file = (await findAllByText('www.creedthoughts.gov.www/creedthoughts'))[0]
       expect(file).toBeInTheDocument()
 
       expect(queryByText('Upload')).not.toBeInTheDocument()
 
-      fireEvent.click(file)
+      userEvent.click(file)
       expect(await findByText('Upload')).toBeInTheDocument()
     })
 
@@ -295,16 +314,16 @@ describe('MoreOptions', () => {
         </MockedProvider>
       )
       const canvasFilesButton = await findByRole('button', {name: /Files/})
-      fireEvent.click(canvasFilesButton)
+      userEvent.click(canvasFilesButton)
 
       const myFilesButton = (await findAllByText('my files'))[0]
-      fireEvent.click(myFilesButton)
+      userEvent.click(myFilesButton)
 
       const file = (await findAllByText('www.creedthoughts.gov.www/creedthoughts'))[0]
-      fireEvent.click(file)
+      userEvent.click(file)
 
       const uploadButton = await findByRole('button', {name: 'Upload'})
-      fireEvent.click(uploadButton)
+      userEvent.click(uploadButton)
 
       expect(selectedCanvasFiles).toEqual(['11'])
     })
@@ -357,28 +376,28 @@ describe('MoreOptions', () => {
       const {findByRole} = await renderComponent()
 
       const webcamButton = await findByRole('button', {name: /Webcam/})
-      fireEvent.click(webcamButton)
+      userEvent.click(webcamButton)
 
       const modal = await findByRole('dialog')
       expect(modal).toContainHTML('Take a Photo via Webcam')
     })
 
-    it.skip('calls the handleWebcamPhotoUpload when the user has taken a photo and saved it', async () => {
+    it('calls the handleWebcamPhotoUpload when the user has taken a photo and saved it', async () => {
       // unskip in EVAL-2661 (9/27/22)
       const {findByRole} = await renderComponent()
 
       const webcamButton = await findByRole('button', {name: /Webcam/})
-      fireEvent.click(webcamButton)
+      userEvent.click(webcamButton)
 
       const recordButton = await findByRole('button', {name: 'Take Photo'})
-      fireEvent.click(recordButton)
+      userEvent.click(recordButton)
 
       act(() => {
         jest.advanceTimersByTime(10000)
       })
 
       const saveButton = await findByRole('button', {name: 'Save'})
-      fireEvent.click(saveButton)
+      userEvent.click(saveButton)
 
       expect(handleWebcamPhotoUpload).toHaveBeenCalledTimes(1)
     })

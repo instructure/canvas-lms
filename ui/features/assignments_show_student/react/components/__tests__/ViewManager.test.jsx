@@ -90,7 +90,7 @@ async function makeProps(opts = {}) {
 }
 
 describe('ViewManager', () => {
-  const originalEnv = window.ENV
+  const originalEnv = JSON.parse(JSON.stringify(window.ENV))
   beforeEach(() => {
     window.ENV = {
       context_asset_string: 'test_1',
@@ -168,25 +168,21 @@ describe('ViewManager', () => {
 
       it('sets focus on the assignment toggle details when clicked', async () => {
         const props = await makeProps({currentAttempt: 1})
-        const {getByText} = render(
+        const {getByText, getByTestId} = render(
           <MockedProvider>
             <ViewManager {...props} />
           </MockedProvider>
         )
 
-        const mockElement = {
-          focus: jest.fn(),
-        }
-        document.querySelector = jest.fn().mockReturnValue(mockElement)
+        const mockFocus = jest.fn()
+        const assignmentToggle = getByTestId('assignments-2-assignment-toggle-details')
+        assignmentToggle.focus = mockFocus
 
         const newButton = getByText('New Attempt')
         fireEvent.click(newButton)
 
         await waitFor(() => {
-          expect(document.querySelector).toHaveBeenCalledWith(
-            'button[data-testid=assignments-2-assignment-toggle-details]'
-          )
-          expect(mockElement.focus).toHaveBeenCalled()
+          expect(mockFocus).toHaveBeenCalled()
         })
       })
 

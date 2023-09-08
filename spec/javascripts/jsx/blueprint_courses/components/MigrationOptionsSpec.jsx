@@ -56,10 +56,20 @@ test('renders the add a message checkbox', () => {
   props.willSendNotification = true
 
   const tree = enzyme.mount(<MigrationOptions {...props} />)
-  const checkboxes = tree.find('Checkbox')
-  equal(checkboxes.length, 3)
-  equal(checkboxes.at(1).prop('checked'), true)
-  equal(checkboxes.at(2).prop('checked'), false)
+
+  ok(tree.find('Checkbox[label="Include Course Settings"]').first().exists())
+  equal(tree.find('Checkbox[label="Include Course Settings"]').first().prop('checked'), false)
+
+  ok(tree.find('Checkbox[label="Send Notification"]').first().exists())
+  equal(tree.find('Checkbox[label="Send Notification"]').first().prop('checked'), true)
+
+  const checkbox3 = tree
+    .find('Checkbox')
+    .filterWhere(n => n.text().includes('0/140'))
+    .first()
+  ok(checkbox3.exists())
+  equal(checkbox3.prop('checked'), false)
+
   const messagebox = tree.find('TextArea')
   ok(!messagebox.exists())
 })
@@ -70,10 +80,6 @@ test('renders the message text area', () => {
   props.willIncludeCustomNotificationMessage = true
 
   const tree = enzyme.mount(<MigrationOptions {...props} />)
-  const checkboxes = tree.find('Checkbox')
-  equal(checkboxes.length, 3)
-  equal(checkboxes.at(1).prop('checked'), true)
-  equal(checkboxes.at(2).prop('checked'), true)
   const messagebox = tree.find('TextArea')
   ok(messagebox.exists())
 })

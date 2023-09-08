@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2023 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -17,30 +17,30 @@
  */
 
 import React from 'react'
-import TestUtils from 'react-dom/test-utils'
+import {mount} from 'enzyme'
 import Rating from '@canvas/context-cards/react/Rating'
 import {Rating as InstUIRating} from '@instructure/ui-rating'
 
-QUnit.module('StudentContextTray/Rating', () => {
+describe('StudentContextTray/Rating', () => {
   let subject
   const participationsLevel = 2
 
-  QUnit.module('formatValueText', hooks => {
-    hooks.beforeEach(() => {
-      subject = TestUtils.renderIntoDocument(<Rating label="whatever" metric={{level: 1}} />)
+  describe('formatValueText', () => {
+    beforeEach(() => {
+      subject = mount(<Rating label="whatever" metric={{level: 1}} />)
     })
 
     const valueText = ['None', 'Low', 'Moderate', 'High']
     valueText.forEach((v, i) => {
-      test(`returns value ${v} for rating ${i}`, () => {
-        equal(subject.formatValueText(i, 3), v)
+      it(`returns value ${v} for rating ${i}`, () => {
+        expect(subject.instance().formatValueText(i, 3)).toEqual(v)
       })
     })
   })
 
-  QUnit.module('render', () => {
-    test('delegates to InstUIRating', () => {
-      subject = TestUtils.renderIntoDocument(
+  describe('render', () => {
+    it('delegates to InstUIRating', () => {
+      subject = mount(
         <Rating
           label="Participation"
           metric={{
@@ -48,8 +48,8 @@ QUnit.module('StudentContextTray/Rating', () => {
           }}
         />
       )
-      const instUIRating = TestUtils.findRenderedComponentWithType(subject, InstUIRating)
-      equal(instUIRating.props.label, subject.props.label)
+      const instUIRating = subject.find(InstUIRating)
+      expect(instUIRating.props().label).toEqual(subject.props().label)
     })
   })
 })

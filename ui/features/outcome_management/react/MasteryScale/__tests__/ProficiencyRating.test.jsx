@@ -151,8 +151,10 @@ describe('ProficiencyRating', () => {
     })
 
     it('changing points triggers change', () => {
-      const wrapper = mount(<ProficiencyRating {...defaultProps({canManage: true})} />)
-      wrapper.find('TextInput').at(1).find('input').simulate('change')
+      const {getAllByRole} = render(<ProficiencyRating {...defaultProps({canManage: true})} />)
+      const secondInput = getAllByRole('textbox')[1]
+      fireEvent.change(secondInput, {target: {value: 'some new value'}})
+
       expect(onPointsChangeMock).toHaveBeenCalledTimes(1)
     })
 

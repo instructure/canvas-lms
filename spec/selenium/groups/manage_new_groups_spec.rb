@@ -32,11 +32,10 @@ describe "manage groups" do
       it "auto-splits students into groups" do
         groups_student_enrollment 4
         get "/courses/#{@course.id}/groups"
-
         f("#add-group-set").click
-        replace_and_proceed f("#new-group-set-name"), "zomg"
-        force_click('[data-testid="group-structure-selector"]')
-        force_click('[data-testid="group-structure-num-groups"]')
+        f("#new-group-set-name").send_keys("zomg")
+        f('[data-testid="group-structure-selector"]').click
+        f('[data-testid="group-structure-num-groups"]').click
         f('[data-testid="split-groups"]').send_keys("2")
         f(%(button[data-testid="group-set-save"])).click
         run_jobs

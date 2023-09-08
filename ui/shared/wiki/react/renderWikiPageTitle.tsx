@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {ReactNode, useEffect, useRef, useState} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import ReactDOM from 'react-dom'
 import {TextInput, TextInputProps} from '@instructure/ui-text-input'
 import {Text} from '@instructure/ui-text'
@@ -37,8 +37,8 @@ interface ComponentProps {
 }
 
 export interface Message {
-  text: ReactNode | string
-  type: string
+  text: React.ReactNode
+  type: 'error' | 'hint' | 'success' | 'screenreader-only'
 }
 
 interface FormDataError {
@@ -63,7 +63,7 @@ const EditableContent = (props: Props) => {
       const dataErrors = props.validationCallback(data)
       const titleErrors = dataErrors?.title || []
       if (titleErrors.length > 0) {
-        const parsedErrors = titleErrors.map((error: FormDataError) => ({
+        const parsedErrors: Message[] = titleErrors.map((error: FormDataError) => ({
           text: error.message,
           type: 'error',
         }))

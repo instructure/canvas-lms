@@ -186,8 +186,13 @@ export default function GradingResults({
     setGradeInput(input)
   }
 
-  const handleChangePassFailStatus = (event: React.SyntheticEvent, data: {value: string}) => {
-    setGradeInput(data.value)
+  const handleChangePassFailStatus = (
+    event: React.SyntheticEvent,
+    data: {value?: string | number | undefined}
+  ) => {
+    if (typeof data.value === 'string') {
+      setGradeInput(data.value)
+    }
     setPassFailStatusIndex(passFailStatusOptions.findIndex(option => option.value === data.value))
   }
 

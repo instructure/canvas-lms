@@ -28,6 +28,7 @@ describe('IntegrationRow', () => {
     loading: false,
     available: true,
     onChange,
+    onToggle: () => {},
     ...overrides,
   })
   const subject = overrides => render(<IntegrationRow {...props(overrides)} />)

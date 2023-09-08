@@ -167,7 +167,7 @@ export default function FrequencyPicker({
   }, [customRRule, locale, options, parsedMoment, timezone, width])
 
   const handleSelectOption = useCallback(
-    (e: any, option: FrequencyOption) => {
+    (e: any, option: any) => {
       setFrequency(option.id)
       if (option.id === 'custom') {
         setIsModalOpen(true)

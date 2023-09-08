@@ -18,7 +18,8 @@
 
 import React from 'react'
 import ClearBadgeCountsButton from '../ClearBadgeCountsButton'
-import {render, fireEvent} from '@testing-library/react'
+import {render} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {waitFor} from '@testing-library/dom'
 import axios from '@canvas/axios'
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
@@ -50,7 +51,7 @@ describe('ClearBadgeCountsButton', () => {
   it('disables the button and makes API call on click', async () => {
     const {getByRole} = render(<ClearBadgeCountsButton {...props} />)
     const button = getByRole('button', {name: 'Clear Badge Counts'})
-    fireEvent.click(button)
+    userEvent.click(button)
     expect(button).toBeInTheDocument()
     expect(button).toHaveAttribute('disabled')
     expect(axios.put).toHaveBeenCalledWith(
@@ -58,11 +59,11 @@ describe('ClearBadgeCountsButton', () => {
     )
   })
 
-  it('shows success message when API call is successful and status is 204', async () => {
+  it('shows success message when API call is successful and status is 204 (flaky)', async () => {
     ;(axios.put as jest.Mock).mockResolvedValue({status: 204})
     const {getByRole} = render(<ClearBadgeCountsButton {...props} />)
     const button = getByRole('button', {name: 'Clear Badge Counts'})
-    fireEvent.click(button)
+    userEvent.click(button)
     await waitFor(() => expect(showFlashSuccess).toHaveBeenCalledWith('Badge counts cleared!'))
   })
 
@@ -71,7 +72,7 @@ describe('ClearBadgeCountsButton', () => {
     ;(axios.put as jest.Mock).mockResolvedValue({status: 200})
     const {getByRole} = render(<ClearBadgeCountsButton {...props} />)
     const button = getByRole('button', {name: 'Clear Badge Counts'})
-    fireEvent.click(button)
+    userEvent.click(button)
     await waitFor(() => expect(showFlashError).toHaveBeenCalledWith(errorMessage))
   })
 
@@ -81,7 +82,7 @@ describe('ClearBadgeCountsButton', () => {
     ;(axios.put as jest.Mock).mockRejectedValue(err)
     const {getByRole} = render(<ClearBadgeCountsButton {...props} />)
     const button = getByRole('button', {name: 'Clear Badge Counts'})
-    fireEvent.click(button)
+    userEvent.click(button)
     await waitFor(() => expect(showFlashError).toHaveBeenCalledWith(errorMessage))
   })
 })

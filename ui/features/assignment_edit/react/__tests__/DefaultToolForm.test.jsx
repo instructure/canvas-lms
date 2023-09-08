@@ -58,17 +58,17 @@ describe('DefaultToolForm', () => {
 
   it('renders the information mesage', () => {
     wrapper = mount(<DefaultToolForm {...newProps()} />)
-    expect(wrapper.find('Alert').html()).toContain('Click the button above to add content')
+    expect(wrapper.find('Alert').first().html()).toContain('Click the button above to add content')
   })
 
   it('sets the button text', () => {
     wrapper = mount(<DefaultToolForm {...newProps()} />)
-    expect(wrapper.find('Button').html()).toContain('Add Content')
+    expect(wrapper.find('Button').first().html()).toContain('Add Content')
   })
 
   it('renders the success message if previouslySelected is true', () => {
     wrapper = mount(<DefaultToolForm {...newProps({previouslySelected: true})} />)
-    expect(wrapper.find('Alert').html()).toContain('Successfully Added')
+    expect(wrapper.find('Alert').first().html()).toContain('Successfully Added')
   })
 
   describe('when the configured tool is not installed', () => {

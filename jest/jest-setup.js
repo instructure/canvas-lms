@@ -195,6 +195,8 @@ if (!('matchMedia' in window)) {
   window.matchMedia._mocked = true
 }
 
+global.DataTransferItem = global.DataTransferItem || class DataTransferItem {}
+
 if (!('scrollIntoView' in window.HTMLElement.prototype)) {
   window.HTMLElement.prototype.scrollIntoView = () => {}
 }
@@ -242,3 +244,22 @@ if (typeof window.URL.createObjectURL === 'undefined') {
 if (typeof window.URL.revokeObjectURL === 'undefined') {
   Object.defineProperty(window.URL, 'revokeObjectURL', {value: () => undefined})
 }
+
+Document.prototype.createRange =
+  Document.prototype.createRange ||
+  function () {
+    return {
+      setEnd() {},
+      setStart() {},
+      getBoundingClientRect() {
+        return {right: 0}
+      },
+      getClientRects() {
+        return {
+          length: 0,
+          left: 0,
+          right: 0,
+        }
+      },
+    }
+  }
