@@ -17,7 +17,7 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import React, {useState, useEffect} from 'react'
+import React, {useEffect, useState} from 'react'
 import {Select} from '@instructure/ui-select'
 import {Alert} from '@instructure/ui-alerts'
 import {Spinner} from '@instructure/ui-spinner'
@@ -30,21 +30,20 @@ const I18n = useI18nScope('managed_course_selector')
 
 const NO_OPTIONS_OPTION_ID = '___noOptionsOption__'
 
-// Regular expression special character escaper
+// regular expression special character escaper
 const reEscapeMatcher = /(\^|\$|\|\.|\*|\+|\?|\(|\)|\[|\]|\{|\}|\||\\)/g
 const reEscape = (str: string) => str.replace(reEscapeMatcher, '\\$1')
 
-/* eslint-disable react/no-unused-prop-types */
 const SearchableSelectOption = () => <div />
+/* eslint-disable react/no-unused-prop-types */
 SearchableSelectOption.propTypes = {
   id: string,
   value: string,
   children: string,
   label: string,
 }
-SearchableSelectOption.displayName = 'Option'
-
 /* eslint-enable react/no-unused-prop-types */
+SearchableSelectOption.displayName = 'Option'
 
 function flattenOptions(nodes: any) {
   const options: any[][] = []

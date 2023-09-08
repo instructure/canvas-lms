@@ -34,6 +34,13 @@ import {Button} from '@instructure/ui-buttons'
 import {EnrollmentTree, NodeStructure} from './EnrollmentTree'
 import {Flex} from '@instructure/ui-flex'
 import {unstable_batchedUpdates} from 'react-dom'
+import {
+  getDayBoundaries,
+  getFromLocalStorage,
+  removeStringAffix,
+  safeDateConversion,
+  updateLocalStorageObject,
+} from './helpers'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 
 interface Role {
@@ -66,7 +73,12 @@ interface Props {
 }
 interface RoleChoice {
   id: string
-  baseRoleName: string
+  name: string
+}
+interface StoredData {
+  roleChoice: RoleChoice
+  startDate: Date
+  endDate: Date
 }
 
 type RoleName =
@@ -89,35 +101,48 @@ const rolePermissionMapping: Record<RoleName, PermissionName> = {
   ObserverEnrollment: 'observer',
 }
 
-function removeStringSuffix(mainString: string, suffix: string): string {
-  if (mainString.endsWith(suffix)) {
-    return mainString.slice(0, -suffix.length)
-  }
-  return mainString
+export const tempEnrollAssignData = 'tempEnrollAssignData'
+const defaultRoleChoice: RoleChoice = {
+  id: '',
+  name: '',
 }
 
-function getDayBoundaries(date = new Date()) {
-  const start = new Date(date)
-  const end = new Date(date)
+// get data from local storage or set defaults
+function getStoredData(): StoredData {
+  // destructure result into local variables
+  const [defaultStartDate, defaultEndDate] = getDayBoundaries()
 
-  start.setHours(0, 0, 0, 0)
-  end.setHours(24, 0, 0, 0)
+  const defaultStoredData: StoredData = {
+    roleChoice: defaultRoleChoice,
+    // start and end Date of the current day
+    startDate: defaultStartDate,
+    endDate: defaultEndDate,
+  }
+  const rawStoredData: Partial<StoredData> =
+    getFromLocalStorage<StoredData>(tempEnrollAssignData) || {}
 
-  return [start, end]
+  const parsedStartDate = safeDateConversion(rawStoredData.startDate)
+  const parsedEndDate = safeDateConversion(rawStoredData.endDate)
+
+  // return local data or defaults
+  return {
+    roleChoice: rawStoredData.roleChoice || defaultStoredData.roleChoice,
+    startDate: parsedStartDate || defaultStoredData.startDate,
+    endDate: parsedEndDate || defaultStoredData.endDate,
+  }
 }
 
 export function TempEnrollAssign(props: Props) {
-  const roleOptions = []
+  const storedData = getStoredData()
 
-  const [roleChoice, setRoleChoice] = useState<RoleChoice>({
-    id: '',
-    baseRoleName: '',
-  })
   const [errorMsg, setErrorMsg] = useState('')
   const [listEnroll, setListEnroll] = useState<{}[]>([])
   const [loading, setLoading] = useState(true)
-  const [startDate, setStartDate] = useState(getDayBoundaries()[0])
-  const [endDate, setEndDate] = useState(getDayBoundaries()[1])
+  const [startDate, setStartDate] = useState<Date>(storedData.startDate)
+  const [endDate, setEndDate] = useState<Date>(storedData.endDate)
+  const [roleChoice, setRoleChoice] = useState<RoleChoice>(storedData.roleChoice)
+
+  const roleOptions = []
 
   // using useMemo to compute and memoize roleLabel thus avoiding unnecessary re-renders
   const roleLabel = useMemo(() => {
@@ -163,26 +188,59 @@ export function TempEnrollAssign(props: Props) {
     fetchData()
   }, [props.user.id])
 
-  function handleRoleSearchChange(event: React.ChangeEvent, selectedOption: {id: string}) {
-    const foundRole: Role | undefined = props.roles.find(role => role.id === selectedOption.id)
-    const baseRoleName = foundRole ? removeStringSuffix(foundRole.base_role_name, 'Enrollment') : ''
+  /**
+   * Handle change to date value in the DateTimeInput component
+   *
+   * Update the date state and localStorage values
+   *
+   * @param {React.SyntheticEvent<Element, Event>} event Event object
+   * @param {React.Dispatch<React.SetStateAction<Date>>} setDateState React state setter
+   * @param {string} localStorageKey localStorage key to update
+   * @param {string} [dateValue] Optional date value, which may not be a valid date
+   *                             (e.g. bad user input or corrupted localStorage value)
+   * @returns {void}
+   */
+  function handleDateChange(
+    event: React.SyntheticEvent<Element, Event>,
+    setDateState: React.Dispatch<React.SetStateAction<Date>>,
+    localStorageKey: string,
+    dateValue?: string
+  ): void {
+    const validatedDate = safeDateConversion(dateValue)
 
-    setRoleChoice({
-      id: selectedOption.id,
-      baseRoleName,
-    })
+    // only update state and localStorage if the date is valid
+    if (validatedDate) {
+      setDateState(validatedDate)
+      updateLocalStorageObject(tempEnrollAssignData, {[localStorageKey]: validatedDate})
+    } else {
+      // eslint-disable-next-line no-console
+      console.error('Invalid date in handleDateChange:', dateValue)
+    }
   }
 
   function handleStartDateChange(event: React.SyntheticEvent<Element, Event>, dateValue?: string) {
-    if (dateValue) {
-      setStartDate(new Date(dateValue))
-    }
+    handleDateChange(event, setStartDate, 'startDate', dateValue)
   }
 
   function handleEndDateChange(event: React.SyntheticEvent<Element, Event>, dateValue?: string) {
-    if (dateValue) {
-      setEndDate(new Date(dateValue))
-    }
+    handleDateChange(event, setEndDate, 'endDate', dateValue)
+  }
+
+  function handleRoleSearchChange(event: React.ChangeEvent, selectedOption: {id: string}) {
+    const foundRole: Role | undefined = props.roles.find(role => role.id === selectedOption.id)
+    const name = foundRole ? removeStringAffix(foundRole.base_role_name, 'Enrollment') : ''
+
+    setRoleChoice({
+      id: selectedOption.id,
+      name,
+    })
+
+    updateLocalStorageObject(tempEnrollAssignData, {
+      roleChoice: {
+        id: selectedOption.id,
+        name,
+      },
+    })
   }
 
   function handleValidationError(message: string) {
@@ -341,7 +399,7 @@ export function TempEnrollAssign(props: Props) {
         <Grid.Row vAlign="top">
           <Grid.Col width={8}>
             <DateTimeInput
-              data-testId="start-date-input"
+              data-testid="start-date-input"
               layout="columns"
               isRequired={true}
               description={
@@ -376,7 +434,7 @@ export function TempEnrollAssign(props: Props) {
         <Grid.Row>
           <Grid.Col width={8}>
             <DateTimeInput
-              data-testId="end-date-input"
+              data-testid="end-date-input"
               layout="columns"
               isRequired={true}
               description={
@@ -398,7 +456,7 @@ export function TempEnrollAssign(props: Props) {
           <Grid.Col>
             <Text as="p" data-testid="temp-enroll-summary">
               {I18n.t(
-                "Canvas will enroll %{recipient} as a %{role} in %{source}'s selected courses from %{start} - %{end}",
+                'Canvas will enroll %{recipient} as a %{role} in %{source}’s selected courses from %{start} - %{end}',
                 {
                   recipient: props.enrollment.name,
                   role: roleLabel,

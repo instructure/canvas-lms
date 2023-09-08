@@ -15,10 +15,11 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 import React, {useEffect, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 // @ts-ignore
-import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
+import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {Avatar} from '@instructure/ui-avatar'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 // @ts-ignore

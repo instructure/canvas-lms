@@ -19,12 +19,12 @@
 import {IconButton} from '@instructure/ui-buttons'
 import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
-// @ts-ignore
-import {IconArrowOpenEndSolid, IconArrowOpenDownSolid} from '@instructure/ui-icons'
+// @ts-expect-error
+import {IconArrowOpenDownSolid, IconArrowOpenEndSolid} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {EnrollmentTreeItem} from './EnrollmentTreeItem'
 import {NodeStructure} from './EnrollmentTree'
-// @ts-ignore
+// @ts-expect-error
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
 import RoleMismatchToolTip from './RoleMismatchToolTip'

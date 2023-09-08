@@ -18,7 +18,7 @@
 
 import React, {ReactElement, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
-// @ts-ignore
+// @ts-expect-error
 import {Modal} from '@instructure/ui-modal'
 import {Button} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
