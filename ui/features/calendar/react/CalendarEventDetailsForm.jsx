@@ -398,7 +398,7 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
       <FormFieldGroup description="" rowSpacing="small" vAlign="middle">
         <TextInput
           data-testid="edit-calendar-event-form-title"
-          renderLabel={I18n.t('Title:')}
+          renderLabel={I18n.t('Title')}
           value={title}
           placeholder={I18n.t('Input Event Title...')}
           interaction={event.lockedTitle ? 'disabled' : 'enabled'}
@@ -406,7 +406,7 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
         />
         <CanvasDateInput
           dataTestid="edit-calendar-event-form-date"
-          renderLabel={I18n.t('Date:')}
+          renderLabel={I18n.t('Date')}
           selectedDate={date?.toISOString()}
           formatDate={dateFormatter}
           onSelectedDateChange={handleDateChange}
@@ -419,7 +419,7 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
             <TimeSelect
               disabled={!shouldEnableTimeFields()}
               data-testid="event-form-start-time"
-              renderLabel={I18n.t('From:')}
+              renderLabel={I18n.t('From')}
               value={shouldEnableTimeFields() ? startTime : ''}
               placeholder={I18n.t('Start Time')}
               onChange={(e, {value}) => trySetStartTime(value)}
@@ -434,7 +434,7 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
             <TimeSelect
               disabled={!shouldEnableTimeFields()}
               data-testid="event-form-end-time"
-              renderLabel={I18n.t('To:')}
+              renderLabel={I18n.t('To')}
               value={shouldEnableTimeFields() ? endTime : ''}
               placeholder={I18n.t('End Time')}
               onChange={(e, {value}) => trySetEndTime(value)}
@@ -463,14 +463,14 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
           <TextInput
             data-testid="edit-calendar-event-form-location"
             disabled={!shouldEnableLocationField()}
-            renderLabel={I18n.t('Location:')}
+            renderLabel={I18n.t('Location')}
             value={shouldEnableLocationField() ? location : ''}
             placeholder={I18n.t('Input Event Location...')}
             onChange={(e, value) => setLocation(value)}
           />
         )}
         {shouldShowConferenceField() && (
-          <FormField id="edit-calendar-event-form-conferencing" label={I18n.t('Conferencing:')}>
+          <FormField id="edit-calendar-event-form-conferencing" label={I18n.t('Conferencing')}>
             <CalendarConferenceWidget
               disabled={!shouldEnableConferenceField()}
               context={context.asset_string}
@@ -483,7 +483,7 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
         {shouldShowContextField() && (
           <SimpleSelect
             data-testid="edit-calendar-event-form-context"
-            renderLabel={I18n.t('Calendar:')}
+            renderLabel={I18n.t('Calendar')}
             assistiveText={I18n.t('Use arrow keys to navigate options.')}
             value={context.asset_string}
             onChange={(e, {value}) => changeContext(value)}

@@ -264,7 +264,7 @@ describe('EditEventView', () => {
     it('displays the frequency picker', async () => {
       render()
 
-      expect(within(document.body).getByText('Frequency:')).toBeVisible()
+      expect(within(document.body).getByTestId('frequency-picker')).toBeVisible()
       expect(within(document.body).getByDisplayValue('Does not repeat')).toBeVisible()
     })
 
@@ -313,11 +313,11 @@ describe('EditEventView', () => {
         id: 'use_section_dates', // name should work, but doesn't
       })
       expect(section_checkbox).toBeVisible()
-      expect(within(document.body).getByText('Frequency:')).toBeVisible()
+      expect(within(document.body).getByTestId('frequency-picker')).toBeVisible()
       expect(within(document.body).getByDisplayValue('Does not repeat')).toBeVisible()
 
       fireEvent.click(section_checkbox)
-      expect(within(document.body).queryByText('Frequency:')).not.toBeVisible()
+      expect(within(document.body).queryByTestId('frequency-picker')).not.toBeVisible()
     })
 
     it('renders update calendar event dialog', async () => {
