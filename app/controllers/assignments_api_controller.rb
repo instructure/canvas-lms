@@ -1700,11 +1700,13 @@ class AssignmentsApiController < ApplicationController
     end
   end
 
-  def track_update_metrics(_assignment, params)
-    InstStatsd::Statsd.increment("api.assignment.hide_in_gradebook") if params["hide_in_gradebook"]
+  def track_update_metrics(assignment, _params)
+    if assignment.hide_in_gradebook_changed?(to: true)
+      InstStatsd::Statsd.increment("assignment.hide_in_gradebook")
+    end
   end
 
   def track_create_metrics(assignment)
-    InstStatsd::Statsd.increment("api.assignment.hide_in_gradebook") if assignment.hide_in_gradebook
+    InstStatsd::Statsd.increment("assignment.hide_in_gradebook") if assignment.hide_in_gradebook
   end
 end
