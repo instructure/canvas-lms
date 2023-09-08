@@ -40,8 +40,12 @@ module IncomingMail
         from_channel = sent_from_channel(user, incoming_message)
         raise IncomingMail::Errors::UnknownSender unless from_channel
         raise IncomingMail::Errors::MessageTooLong if body.length > ActiveRecord::Base.maximum_text_length
-        raise IncomingMail::Errors::MessageTooLong if html_body.length > ActiveRecord::Base.maximum_text_length
         raise IncomingMail::Errors::BlankMessage if body.blank?
+
+        # Check if html_body is too long, if yes, set html_body to nil so that the plain text is used instead
+        if html_body.length > ActiveRecord::Base.maximum_text_length
+          html_body = nil
+        end
 
         Rails.cache.fetch(["incoming_mail_reply_from", context, incoming_message.message_id].cache_key, expires_in: 7.days) do
           context.reply_from({
