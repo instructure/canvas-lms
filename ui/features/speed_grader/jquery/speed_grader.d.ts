@@ -24,25 +24,45 @@ import type {
   SubmissionState,
 } from '@canvas/grading/grading.d'
 import type {
+  Assignment,
   Attachment,
   AttachmentData,
+  Enrollment,
+  GradingPeriod,
   Student,
   Submission,
   SubmissionComment,
 } from '../../../api.d'
 import PostPolicies from '../react/PostPolicies/index'
+import AssessmentAuditTray from '../react/AssessmentAuditTray'
 
 interface Window {
-  jsonData: any
+  jsonData: {
+    assignment: Assignment
+    context: {
+      active_course_sections: CourseSection[]
+      enrollments: Enrollment[]
+      grading_periods: GradingPeriod[]
+      students: Student[]
+    }
+    grades_published_at: string
+    GROUP_GRADING_MODE: boolean
+    id: string
+    moderated_grading: boolean
+    submissions: Submission[]
+    title: string
+  }
 }
 
 export type StudentWithSubmission = Student & {
   id: string
   anonymous_id: string
+  anonymous_name_position: number
   provisional_crocodoc_urls: ProvisionalCrocodocUrl[]
   rubric_assessments: RubricAssessment[]
   submission: Submission & {
     currentSelectedIndex: number
+    // TODO: remove the any
     submission_history: any | Submission[]
     provisional_grades: ProvisionalGrade[]
     show_grade_in_dropdown: boolean
@@ -66,7 +86,7 @@ export type SpeedGrader = {
     final_provisional_grade: string
   }) => void
   anyUnpostedComment: () => boolean
-  assessmentAuditTray?: JQuery | null
+  assessmentAuditTray?: AssessmentAuditTray | null
   attachmentIframeContents: (attachment: Attachment) => string
   beforeLeavingSpeedgrader: (event: BeforeUnloadEvent) => void
   changeToSection: (sectionId: string) => void
@@ -227,4 +247,9 @@ export type GradeLoadingData = {
 
 export type ProvisionalCrocodocUrl = {
   attachment_id: string
+}
+
+export type CourseSection = {
+  id: string
+  name: string
 }

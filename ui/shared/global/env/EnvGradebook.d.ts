@@ -127,7 +127,7 @@ export interface EnvGradebookSpeedGrader {
 
   new_gradebook_plagiarism_icons_enabled?: boolean
 
-  quiz_history_url?: string
+  quiz_history_url: string
 
   assignment_comment_library_feature_enabled: boolean
 

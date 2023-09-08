@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export function replaceOneTag(text: string, name: string, value: string) {
+export function replaceOneTag(text: string, name: string, value?: string) {
   if (!text) {
     return text
   }
@@ -28,8 +28,8 @@ export function replaceOneTag(text: string, name: string, value: string) {
 
 export default function replaceTags(
   text: string,
-  mapping_or_name: Record<string, string> | string,
-  maybe_value: string
+  mapping_or_name: Record<string, string | undefined> | string,
+  maybe_value?: string
 ) {
   if (typeof mapping_or_name === 'object') {
     for (const name in mapping_or_name) {

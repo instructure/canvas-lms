@@ -430,10 +430,10 @@ QUnit.module('SpeedGrader', rootHooks => {
 
   test('displays proxy submitter when one is present on the submission (multiple submissions)', () => {
     SpeedGrader.setup()
-    const history = SpeedGrader.EG.currentStudent.submission.submission_history.map(h => {
+    const history_ = SpeedGrader.EG.currentStudent.submission.submission_history.map(h => {
       return {...h, proxy_submitter: 'George Washington'}
     })
-    SpeedGrader.EG.currentStudent.submission.submission_history = history
+    SpeedGrader.EG.currentStudent.submission.submission_history = history_
     SpeedGrader.EG.refreshSubmissionsToView()
     const submissionDropdown = document.getElementById('multiple_submissions')
     ok(submissionDropdown.innerHTML.includes('(George Washington)'))

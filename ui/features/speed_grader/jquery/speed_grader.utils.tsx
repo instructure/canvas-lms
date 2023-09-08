@@ -22,10 +22,22 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import SpeedGraderSettingsMenu from '../react/SpeedGraderSettingsMenu'
 import htmlEscape from 'html-escape'
-import type {SpeedGrader} from './speed_grader.d'
+import {Pill} from '@instructure/ui-pill'
+import * as Alerts from '@instructure/ui-alerts'
+import type {Assignment, Submission} from '../../../api.d'
+import type {RubricAssessment} from '@canvas/grading/grading.d'
+import type {GradingError, SpeedGrader, StudentWithSubmission} from './speed_grader.d'
+import SpeedGraderPostGradesMenu from '../react/SpeedGraderPostGradesMenu'
+import {isGraded, isPostable} from '@canvas/grading/SubmissionHelper'
+import JQuerySelectorCache from '../JQuerySelectorCache'
+
+const selectors = new JQuerySelectorCache()
 
 const I18n = useI18nScope('speed_grader_helpers')
+
+const {Alert} = Alerts as any
 
 export const SPEED_GRADER_COMMENT_TEXTAREA_MOUNT_POINT = 'speed_grader_comment_textarea_mount_point'
 export const SPEED_GRADER_SUBMISSION_COMMENTS_DOWNLOAD_MOUNT_POINT =
@@ -210,16 +222,13 @@ export function initKeyCodes(
   })
 }
 
-export function renderStatusMenu(
-  component: React.DOMElement<React.DOMAttributes<Element>, Element>,
-  mountPoint: Element
-) {
+export function renderStatusMenu(component: React.ReactElement | null, mountPoint: HTMLElement) {
   const unmountPoint =
     mountPoint.id === SPEED_GRADER_EDIT_STATUS_MENU_MOUNT_POINT
       ? SPEED_GRADER_EDIT_STATUS_MENU_SECONDARY_MOUNT_POINT
       : SPEED_GRADER_EDIT_STATUS_MENU_MOUNT_POINT
   ReactDOM.render(<></>, document.getElementById(unmountPoint))
-  ReactDOM.render(component, mountPoint)
+  ReactDOM.render(component || <></>, mountPoint)
 }
 
 export function plagiarismResubmitButton(hasOriginalityScore: boolean, buttonContainer: JQuery) {
@@ -228,4 +237,264 @@ export function plagiarismResubmitButton(hasOriginalityScore: boolean, buttonCon
   } else {
     buttonContainer.show()
   }
+}
+
+// anonymous_name is preferred and will be available for all anonymous
+// assignments. Fall back to naming based on index for assignments that are not
+// anonymous, but the teacher has selected to 'Hide Student Names' in SpeedGrader.
+export function anonymousName(student: StudentWithSubmission): string {
+  return student.anonymous_name || I18n.t('Student %{number}', {number: student.index + 1})
+}
+
+export function unmountCommentTextArea() {
+  const node = document.getElementById(SPEED_GRADER_COMMENT_TEXTAREA_MOUNT_POINT)
+  if (!node) throw new Error('comment textarea mount point not found')
+  ReactDOM.unmountComponentAtNode(node)
+}
+
+export function teardownSettingsMenu() {
+  const mountPoint = document.getElementById(SPEED_GRADER_SETTINGS_MOUNT_POINT)
+  if (!mountPoint) throw new Error('could not find mount point for settings menu')
+  ReactDOM.unmountComponentAtNode(mountPoint)
+}
+
+export function tearDownAssessmentAuditTray(EG: SpeedGrader) {
+  const mount1 = document.getElementById(ASSESSMENT_AUDIT_TRAY_MOUNT_POINT)
+  if (mount1) ReactDOM.unmountComponentAtNode(mount1)
+  const mount2 = document.getElementById(ASSESSMENT_AUDIT_BUTTON_MOUNT_POINT)
+  if (mount2) ReactDOM.unmountComponentAtNode(mount2)
+  EG.assessmentAuditTray = null
+}
+
+export function unexcuseSubmission(grade: string, submission: Submission, assignment: Assignment) {
+  return grade === '' && submission.excused && assignment.grading_type === 'pass_fail'
+}
+
+export function renderPostGradesMenu(EG: SpeedGrader) {
+  const {submissionsMap} = window.jsonData
+  const submissions = window.jsonData.studentsWithSubmissions.map(
+    (student: StudentWithSubmission) => student.submission
+  )
+
+  const hasGradesOrPostableComments = submissions.some(
+    (submission: Submission) =>
+      submission && (isGraded(submission) || submission.has_postable_comments)
+  )
+  const allowHidingGradesOrComments = submissions.some(
+    (submission: Submission) => submission && submission.posted_at != null
+  )
+  const allowPostingGradesOrComments = submissions.some(
+    (submission: Submission) => submission && isPostable(submission)
+  )
+
+  function onHideGrades() {
+    EG.postPolicies?.showHideAssignmentGradesTray({submissionsMap, submissions})
+  }
+
+  function onPostGrades() {
+    EG.postPolicies?.showPostAssignmentGradesTray({submissionsMap, submissions})
+  }
+
+  const props = {
+    allowHidingGradesOrComments,
+    allowPostingGradesOrComments,
+    hasGradesOrPostableComments,
+    onHideGrades,
+    onPostGrades,
+  }
+
+  ReactDOM.render(
+    <SpeedGraderPostGradesMenu {...props} />,
+    document.getElementById(SPEED_GRADER_POST_GRADES_MENU_MOUNT_POINT)
+  )
+}
+
+export function getStatusPills() {
+  return document.querySelectorAll(
+    '.submission-missing-pill, .submission-late-pill, .submission-excused-pill, .submission-extended-pill, [class^="submission-custom-grade-status-pill-"]'
+  )
+}
+
+export function hideMediaRecorderContainer() {
+  $('#media_media_recording').hide().removeData('comment_id').removeData('comment_type')
+}
+
+export function renderHiddenSubmissionPill(submission: Submission) {
+  const mountPoint = document.getElementById(SPEED_GRADER_HIDDEN_SUBMISSION_PILL_MOUNT_POINT)
+  if (!mountPoint) throw new Error('hidden submission pill mount point not found')
+
+  if (isPostable(submission)) {
+    ReactDOM.render(
+      <Pill color="warning" margin="0 0 small">
+        {I18n.t('Hidden')}
+      </Pill>,
+      mountPoint
+    )
+  } else {
+    ReactDOM.unmountComponentAtNode(mountPoint)
+  }
+}
+
+export function toggleGradeVisibility(show: boolean): void {
+  const gradeInput = $('#grading')
+  if (show) {
+    gradeInput.show().height('auto')
+  } else {
+    gradeInput.hide()
+  }
+}
+
+export function allowsReassignment(submission: Submission) {
+  const reassignableTypes = [
+    'media_recording',
+    'online_text_entry',
+    'online_upload',
+    'online_url',
+    'student_annotation',
+  ]
+
+  return (
+    submission.cached_due_date != null &&
+    reassignableTypes.includes(submission.submission_type as string)
+  )
+}
+
+export function renderDeleteAttachmentLink(
+  $submission_file: JQuery,
+  attachment: {
+    display_name: string
+  }
+) {
+  const $full_width_container = $('#full_width_container')
+
+  if (ENV.can_delete_attachments) {
+    const $delete_link = $submission_file.find('a.submission-file-delete')
+    $delete_link.click(function (this: HTMLElement, event: JQuery.ClickEvent) {
+      event.preventDefault()
+      const url = $(this).attr('href')
+      if (!url) throw new Error('submission-file-delete href not found')
+      if (
+        // eslint-disable-next-line no-alert
+        window.confirm(
+          I18n.t(
+            'Deleting a submission file is typically done only when a student posts inappropriate or private material.\n\nThis action is irreversible. Are you sure you wish to delete %{file}?',
+            {file: attachment.display_name}
+          )
+        )
+      ) {
+        $full_width_container.disableWhileLoading(
+          $.ajaxJSON(
+            url,
+            'DELETE',
+            {},
+            (_data: unknown) => {
+              // a more targeted refresh would be preferable but this works (and `EG.showSubmission()` doesn't)
+              window.location.reload()
+            },
+            (data: {status: string}) => {
+              if (data.status === 'unauthorized') {
+                $.flashError(
+                  I18n.t(
+                    'You do not have permission to delete %{file}. Please contact your account administrator.',
+                    {file: attachment.display_name}
+                  )
+                )
+              } else {
+                $.flashError(I18n.t('Error deleting %{file}', {file: attachment.display_name}))
+              }
+            }
+          )
+        )
+      }
+    })
+    $delete_link.show()
+  }
+}
+
+export function isAssessmentEditableByMe(assessment: {
+  assessor_id: string
+  assessment_type: string
+}) {
+  // if the assessment is mine or I can :manage_grades then it is editable
+  if (
+    !assessment ||
+    assessment.assessor_id === ENV.RUBRIC_ASSESSMENT.assessor_id ||
+    (ENV.RUBRIC_ASSESSMENT.assessment_type === 'grading' &&
+      assessment.assessment_type === 'grading')
+  ) {
+    return true
+  }
+  return false
+}
+
+export function teardownHandleStatePopped(EG: SpeedGrader) {
+  window.removeEventListener('popstate', EG.handleStatePopped)
+}
+
+export function renderSettingsMenu(header) {
+  function showKeyboardShortcutsModal() {
+    // need to place at end of execution queue to make focus work properly
+    setTimeout(header.keyboardShortcutInfoModal.bind(header), 0)
+  }
+
+  function showOptionsModal() {
+    // need to place at end of execution queue to make focus work properly
+    setTimeout(header.showSettingsModal.bind(header), 0)
+  }
+
+  const props = {
+    assignmentID: ENV.assignment_id,
+    courseID: ENV.course_id,
+    helpURL: ENV.help_url,
+    openOptionsModal: showOptionsModal,
+    openKeyboardShortcutsModal: showKeyboardShortcutsModal,
+    showModerationMenuItem: ENV.grading_role === 'moderator',
+    showHelpMenuItem: ENV.show_help_menu_item,
+    showKeyboardShortcutsMenuItem: !ENV.disable_keyboard_shortcuts,
+  }
+
+  const mountPoint = document.getElementById(SPEED_GRADER_SETTINGS_MOUNT_POINT)
+  ReactDOM.render(<SpeedGraderSettingsMenu {...props} />, mountPoint)
+}
+
+export function speedGraderJSONErrorFn(
+  _data: GradingError,
+  xhr: XMLHttpRequest,
+  _textStatus: string,
+  _errorThrown: Error
+) {
+  if (xhr.status === 504) {
+    const alertProps = {
+      variant: 'error',
+      dismissible: false,
+    }
+
+    ReactDOM.render(
+      <Alert {...alertProps}>
+        <span dangerouslySetInnerHTML={buildAlertMessage()} />
+      </Alert>,
+      document.getElementById('speed_grader_timeout_alert')
+    )
+  }
+}
+
+export function getSelectedAssessment(EG) {
+  const selectMenu = selectors.get('#rubric_assessments_select')
+
+  return $.grep(
+    EG.currentStudent.rubric_assessments,
+    (n: RubricAssessment) => n.id === selectMenu.val()
+  )[0]
+}
+
+export function rubricAssessmentToPopulate(EG) {
+  const assessment = getSelectedAssessment(EG)
+  const userIsNotAssessor = !!assessment && assessment.assessor_id !== ENV.current_user_id
+  const userCanAssess = isAssessmentEditableByMe(assessment)
+
+  if (userIsNotAssessor && !userCanAssess) {
+    return {}
+  }
+
+  return assessment
 }

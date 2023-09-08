@@ -233,6 +233,7 @@
     "@types/jqueryui": "^1.12.16",
     "@types/lodash": "^4.14.72",
     "@types/parse-link-header": "^1.0.0",
+    "@types/qs": "^6.9.8",
     "@types/react": "^17.0.19",
     "@types/react-dom": "^17.0.9",
     "@typescript-eslint/eslint-plugin": "^5.59.5",
