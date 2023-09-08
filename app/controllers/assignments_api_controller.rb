@@ -1310,6 +1310,7 @@ class AssignmentsApiController < ApplicationController
     @assignment.workflow_state = "unpublished"
     if authorized_action(@assignment, @current_user, :create)
       @assignment.content_being_saved_by(@current_user)
+      track_create_metrics(@assignment)
       result = create_api_assignment(@assignment,
                                      params.require(:assignment),
                                      @current_user,
@@ -1529,6 +1530,8 @@ class AssignmentsApiController < ApplicationController
       # update_api_assignment mutates params so this has to be done here
       opts = assignment_json_opts
 
+      track_update_metrics(@assignment, params[:assignment])
+
       @assignment.skip_downstream_changes! if params[:skip_downstream_changes].present?
       result = update_api_assignment(@assignment, params.require(:assignment), @current_user, @context)
       render_create_or_update_result(result, opts)
@@ -1695,5 +1698,13 @@ class AssignmentsApiController < ApplicationController
     assignment.shard.activate do
       assignment.resource_map = ContentMigration.find_most_recent_by_course_ids(@context.global_id, assignment.context.global_id)&.asset_map_url
     end
+  end
+
+  def track_update_metrics(_assignment, params)
+    InstStatsd::Statsd.increment("api.assignment.hide_in_gradebook") if params["hide_in_gradebook"]
+  end
+
+  def track_create_metrics(assignment)
+    InstStatsd::Statsd.increment("api.assignment.hide_in_gradebook") if assignment.hide_in_gradebook
   end
 end
