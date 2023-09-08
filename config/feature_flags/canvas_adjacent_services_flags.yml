@@ -4,3 +4,8 @@ docviewer_enable_iwork_files:
   display_name: "Docviewer Apple iWork file support"
   description: "Allows Canvas to send iWork files to docviewer."
   visible_on: docviewer_enable_iwork_visible_on_hook
+enhanced_docviewer_url_security:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Enhanced DocViewer URL Security
+  description: DocViewer will be launched more securely (using an asymmetrically signed JWT with a JTI claim to prevent token reuse)
