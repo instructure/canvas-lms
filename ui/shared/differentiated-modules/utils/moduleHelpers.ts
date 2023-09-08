@@ -16,19 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import tz from '@canvas/timezone'
 import type {SettingsPanelState} from '../react/settingsReducer'
+import type {Module} from '../react/types'
 import {updateModulePublishedState} from '@canvas/context-modules/utils/publishAllModulesHelper'
 import {datetimeString} from '@canvas/datetime/date-functions'
+import {convertFriendlyDatetimeToUTC} from './miscHelpers'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('differentiated_modules')
-
-export function convertFriendlyDatetimeToUTC(date: string | null | undefined): string | undefined {
-  if (date) {
-    return tz.parse(date, ENV.TIMEZONE)?.toISOString()
-  }
-}
 
 export function parseModule(element: HTMLDivElement) {
   const moduleId = element.getAttribute('data-module-id')
@@ -37,6 +32,8 @@ export function parseModule(element: HTMLDivElement) {
   const requireSequentialProgress = !!element.querySelector('.require_sequential_progress')
     ?.textContent
   const publishFinalGrade = !!element.querySelector('.publish_final_grade')?.textContent
+  const prerequisites = parsePrerequisites(element)
+  const moduleList = parseModuleList()
 
   return {
     moduleId,
@@ -44,20 +41,39 @@ export function parseModule(element: HTMLDivElement) {
     unlockAt,
     requireSequentialProgress,
     publishFinalGrade,
+    prerequisites,
+    moduleList,
   }
 }
 
-export function convertModuleSettingsForApi(moduleSettings: SettingsPanelState) {
-  return {
-    context_module: {
-      name: moduleSettings.moduleName,
-      unlock_at: moduleSettings.lockUntilChecked ? moduleSettings.unlockAt : null,
-    },
-  }
+function parsePrerequisites(element: HTMLDivElement) {
+  return Array.from(element.querySelectorAll('.prerequisite_criterion')).map(prerequisite => {
+    return {
+      id: prerequisite.querySelector('.id')?.textContent ?? '',
+      name: prerequisite.querySelector('.name')?.textContent ?? '',
+    }
+  })
+}
+
+function parseModuleList() {
+  const potentialModules = Array.from(
+    document.querySelectorAll('.item-group-condensed.context_module.editable_context_module')
+  )
+  const parsedModules = potentialModules.reduce((moduleList: Module[], moduleNode: Element) => {
+    const id = moduleNode.getAttribute('data-module-id') ?? ''
+    const name = moduleNode.getAttribute('aria-label')
+    if (!Number.isNaN(parseInt(id, 10)) && name) {
+      moduleList.push({id, name})
+    }
+    return moduleList
+  }, [])
+  return parsedModules
 }
 
 export function updateModuleUI(moduleElement: HTMLDivElement, moduleSettings: SettingsPanelState) {
-  ;[updateName, updateUnlockTime].forEach(fn => fn(moduleElement, moduleSettings))
+  ;[updateName, updateUnlockTime, updatePrerequisites].forEach(fn =>
+    fn(moduleElement, moduleSettings)
+  )
 }
 
 function updateName(moduleElement: HTMLDivElement, moduleSettings: SettingsPanelState) {
@@ -139,5 +155,42 @@ function updateUnlockTime(moduleElement: HTMLDivElement, moduleSettings: Setting
     } else {
       unlockDetailsElement.style.display = 'none'
     }
+  }
+}
+
+function updatePrerequisites(moduleElement: HTMLDivElement, moduleSettings: SettingsPanelState) {
+  const prerequisiteElement = moduleElement.querySelector('.prerequisites')
+  if (prerequisiteElement) {
+    // Clear everything out so we can start fresh
+    prerequisiteElement.innerHTML = ''
+
+    // Remove any "[ Select Module ]" options
+    const actualPrerequisites = moduleSettings.prerequisites.filter(prereq => prereq.id !== '-1')
+
+    if (actualPrerequisites.length === 0) {
+      return
+    }
+
+    // For parsing when opening the tray
+    // Would love to simplify this, but we need backwards compatitibility
+    actualPrerequisites.forEach(prerequisite => {
+      const div = document.createElement('div')
+      div.classList.add(...['prerequisite_criterion', 'context_module_criterion'])
+      div.style.float = 'left'
+      div.innerHTML = `
+        <span class="id" style="display: none;">${prerequisite.id}</span>
+        <span class="type" style="display: none;">context_module</span>
+        <span class="name" style="display: none;" title="${moduleSettings.moduleName}">${prerequisite.name}</span>
+      `
+      prerequisiteElement.appendChild(div)
+    })
+
+    const prereqMessageElement =
+      moduleElement.querySelector('.prerequisites_message') || document.createElement('div')
+    prereqMessageElement.classList.add('prerequisites_message')
+    prereqMessageElement.textContent = I18n.t('Prerequisites: %{names}', {
+      names: actualPrerequisites.map(prerequisite => prerequisite.name).join(', '),
+    })
+    prerequisiteElement.appendChild(prereqMessageElement)
   }
 }

@@ -76,6 +76,7 @@ type State = {
 type OptionProps = {
   id: string
   value: string
+  children?: string
 }
 
 type GroupProps = {

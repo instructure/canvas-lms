@@ -20,7 +20,8 @@ import React from 'react'
 import {render, waitFor} from '@testing-library/react'
 import SettingsPanel, {type SettingsPanelProps} from '../SettingsPanel'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import * as utils from '../../utils/moduleHelpers'
+import * as miscUtils from '../../utils/miscHelpers'
+import * as moduleUtils from '../../utils/moduleHelpers'
 import * as alerts from '@canvas/alerts/react/FlashAlert'
 
 jest.mock('@canvas/do-fetch-api-effect')
@@ -58,6 +59,21 @@ describe('SettingsPanel', () => {
     expect(getByText('Date')).toBeInTheDocument()
   })
 
+  it('does not render prerequisites when there are no modules available', () => {
+    const {queryByTestId} = renderComponent()
+    expect(queryByTestId('prerequisite-form')).not.toBeInTheDocument()
+  })
+
+  it('renders prerequisite when there are modules available', () => {
+    const {getByTestId} = renderComponent({
+      moduleList: [
+        {id: '0', name: 'Week 0'},
+        {id: '1', name: 'Week 1'},
+      ],
+    })
+    expect(getByTestId('prerequisite-form')).toBeInTheDocument()
+  })
+
   describe('on update', () => {
     beforeAll(() => {
       window.ENV.COURSE_ID = '1'
@@ -89,11 +105,21 @@ describe('SettingsPanel', () => {
     })
 
     it('formats the form state for the request body', () => {
-      jest.spyOn(utils, 'convertModuleSettingsForApi')
+      jest.spyOn(miscUtils, 'convertModuleSettingsForApi')
       doFetchApi.mockResolvedValue({response: {ok: true}, json: {}})
       const {getByRole} = renderComponent()
       getByRole('button', {name: 'Update Module'}).click()
-      expect(utils.convertModuleSettingsForApi).toHaveBeenCalled()
+      expect(miscUtils.convertModuleSettingsForApi).toHaveBeenCalled()
+    })
+
+    it('updates the modules page UI', async () => {
+      jest.spyOn(moduleUtils, 'updateModuleUI')
+      doFetchApi.mockResolvedValue({response: {ok: true}, json: {}})
+      const {getByRole} = renderComponent()
+      getByRole('button', {name: 'Update Module'}).click()
+      await waitFor(() => {
+        expect(moduleUtils.updateModuleUI).toHaveBeenCalled()
+      })
     })
 
     it('shows a flash alert on success', async () => {

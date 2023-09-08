@@ -16,19 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useReducer} from 'react'
+import React, {useReducer, useMemo} from 'react'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {TextInput} from '@instructure/ui-text-input'
-// @ts-expect-error
+// @ts-expect-error -- remove once on InstUI 8
 import {Checkbox} from '@instructure/ui-checkbox'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import PrerequisiteForm from './PrerequisiteForm'
 import Footer from './Footer'
 import DateTimeInput from '@canvas/datetime/react/components/DateTimeInput'
 import {defaultState, actions, reducer} from './settingsReducer'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {convertModuleSettingsForApi, updateModuleUI} from '../utils/moduleHelpers'
+import {convertModuleSettingsForApi} from '../utils/miscHelpers'
+import {updateModuleUI} from '../utils/moduleHelpers'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import type {Module} from './types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('differentiated_modules')
@@ -43,6 +46,8 @@ export interface SettingsPanelProps {
   moduleId: string
   moduleName?: string
   unlockAt?: string
+  prerequisites?: Module[]
+  moduleList?: Module[]
 }
 
 export default function SettingsPanel({
@@ -52,13 +57,21 @@ export default function SettingsPanel({
   moduleId,
   moduleName,
   unlockAt,
+  prerequisites,
+  moduleList = [],
 }: SettingsPanelProps) {
   const [state, dispatch] = useReducer(reducer, {
     ...defaultState,
     moduleName: moduleName ?? '',
     unlockAt: unlockAt ?? new Date().toISOString(),
     lockUntilChecked: !!unlockAt,
+    prerequisites: prerequisites ?? [],
   })
+
+  const availableModules = useMemo(() => {
+    const cutoffIndex = moduleList.findIndex(module => module.name === moduleName)
+    return cutoffIndex === -1 ? moduleList : moduleList.slice(0, cutoffIndex)
+  }, [moduleList, moduleName])
 
   function handleUpdate() {
     if (state.moduleName.length === 0) {
@@ -101,9 +114,9 @@ export default function SettingsPanel({
             value={state.moduleName}
             messages={state.nameInputMessages}
             onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-              const newValue = e.target.value.trim()
-              dispatch({type: actions.SET_MODULE_NAME, payload: newValue})
-              if (newValue.length > 0) {
+              const {value} = e.target
+              dispatch({type: actions.SET_MODULE_NAME, payload: value})
+              if (value.trim().length > 0) {
                 dispatch({type: actions.SET_NAME_INPUT_MESSAGES, payload: []})
               }
             }}
@@ -136,6 +149,42 @@ export default function SettingsPanel({
           </View>
         )}
         <hr />
+        {availableModules.length > 0 && (
+          <View as="div">
+            <View as="div" padding="x-small small">
+              <PrerequisiteForm
+                prerequisites={state.prerequisites}
+                availableModules={availableModules}
+                onAddPrerequisite={module =>
+                  dispatch({
+                    type: actions.SET_PREREQUISITES,
+                    payload: [...state.prerequisites, module],
+                  })
+                }
+                onDropPrerequisite={index =>
+                  dispatch({
+                    type: actions.SET_PREREQUISITES,
+                    payload: [
+                      ...state.prerequisites.slice(0, index),
+                      ...state.prerequisites.slice(index + 1),
+                    ],
+                  })
+                }
+                onUpdatePrerequisite={(module, index) =>
+                  dispatch({
+                    type: actions.SET_PREREQUISITES,
+                    payload: [
+                      ...state.prerequisites.slice(0, index),
+                      module,
+                      ...state.prerequisites.slice(index + 1),
+                    ],
+                  })
+                }
+              />
+            </View>
+            <hr />
+          </View>
+        )}
       </FlexItem>
       <FlexItem>
         <Footer
