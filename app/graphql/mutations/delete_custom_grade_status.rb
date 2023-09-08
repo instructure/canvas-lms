@@ -36,6 +36,9 @@ module Mutations
       custom_grade_status_id = custom_grade_status.id
       custom_grade_status.deleted_by = current_user
       custom_grade_status.destroy
+
+      InstStatsd::Statsd.increment("custom_grade_status.graphql.delete")
+
       { custom_grade_status_id: }
     rescue ActiveRecord::RecordNotFound
       raise GraphQL::ExecutionError, "custom grade status not found"

@@ -850,6 +850,8 @@ class SubmissionsApiController < ApplicationController
                  end
 
     if authorized
+      track_update_metrics(@submission, params)
+
       submission = { grader: @current_user }
       if params[:submission].is_a?(ActionController::Parameters)
         submission[:grade] = params[:submission].delete(:posted_grade)
@@ -1656,5 +1658,12 @@ class SubmissionsApiController < ApplicationController
     @assignment = api_find(@context.assignments.active, params[:assignment_id])
     @user = get_user_considering_section(params[:user_id])
     @submission = @assignment.submission_for_student(@user)
+  end
+
+  def track_update_metrics(submission, params)
+    custom_grade_status_id = params.dig(:submission, :custom_grade_status_id).to_s
+    if !custom_grade_status_id.empty? && custom_grade_status_id != submission.custom_grade_status_id.to_s
+      InstStatsd::Statsd.increment("custom_grade_status.applied_to.submission")
+    end
   end
 end
