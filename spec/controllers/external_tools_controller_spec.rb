@@ -1726,7 +1726,7 @@ describe ExternalToolsController do
               deep_link_return_url = launch_params["https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings"]["deep_link_return_url"]
               return_jwt = deep_link_return_url.match(/data=([^&]*)/)[1]
               jwt = JSON::JWT.decode(return_jwt, :skip_verification)
-              expect(jwt[:parent_frame_context]).to be == tool.id.to_s
+              expect(jwt[:parent_frame_context]).to eq tool.id.to_s
               expect(response).to be_successful
             end
 

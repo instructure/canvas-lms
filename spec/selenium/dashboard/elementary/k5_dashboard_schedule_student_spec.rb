@@ -59,7 +59,7 @@ describe "student k5 dashboard schedule" do
       expect(todo_editor_modal).to be_displayed
     end
 
-    it "provide close without edit button", ignore_js_errors: true do
+    it "provide close without edit button", :ignore_js_errors do
       get "/#schedule"
 
       click_todo_edit_pencil

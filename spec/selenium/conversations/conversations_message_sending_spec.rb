@@ -37,7 +37,7 @@ describe "conversations new" do
   end
 
   describe "message sending" do
-    context "when react_inbox feature flag is off", ignore_js_errors: true do
+    context "when react_inbox feature flag is off", :ignore_js_errors do
       before do
         Account.default.set_feature_flag! :react_inbox, "off"
       end
@@ -322,7 +322,7 @@ describe "conversations new" do
       end
     end
 
-    context "when react_inbox feature flag is on", ignore_js_errors: true do
+    context "when react_inbox feature flag is on", :ignore_js_errors do
       before do
         Account.default.enable_feature! :react_inbox
       end
@@ -767,7 +767,7 @@ describe "conversations new" do
       end
 
       context "sent scope" do
-        it "defaults to reply to recipients", ignore_js_errors: true do
+        it "defaults to reply to recipients", :ignore_js_errors do
           conversation(@teacher, @s1, @s2, body: "hi there", workflow_state: "unread")
           user_session(@teacher)
           get "/conversations#filter=type=sent"

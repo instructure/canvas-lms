@@ -79,7 +79,7 @@ describe "discussion assignments" do
       @g1.add_user @student1
     end
 
-    it "allows the student to reply and teacher to see the unread count", ignore_js_errors: true, priority: "1" do
+    it "allows the student to reply and teacher to see the unread count", :ignore_js_errors, priority: "1" do
       get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}"
       expect(f(".new-and-total-badge .new-items").text).to include ""
       user_session(@student1)

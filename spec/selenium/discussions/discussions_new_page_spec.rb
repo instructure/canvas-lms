@@ -409,7 +409,7 @@ describe "discussions" do
     end
   end
 
-  context "when discussion_create feature flag is ON", ignore_js_errors: true do
+  context "when discussion_create feature flag is ON", :ignore_js_errors do
     before do
       Account.site_admin.enable_feature! :discussion_create
       # we will turn react_discussions_post on here as well (altough it is not required)

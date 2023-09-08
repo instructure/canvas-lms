@@ -57,7 +57,7 @@ describe "conversations new" do
   end
 
   # the js errors caught in here are captured by VICE-2507
-  context "when react_inbox feature flag is on", ignore_js_errors: true do
+  context "when react_inbox feature flag is on", :ignore_js_errors do
     before do
       Account.default.set_feature_flag! :react_inbox, "on"
     end

@@ -44,7 +44,7 @@ describe "announcements" do
     end
 
     # ignore RCE error since it has nothing to do with the test
-    it "shows the no notifications on edit info alert when editing an announcement", ignore_js_errors: true do
+    it "shows the no notifications on edit info alert when editing an announcement", :ignore_js_errors do
       @announcement = @course.announcements.create!(user: @teacher, message: "hello my favorite section!")
       get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}/edit"
       expect(fj("div:contains('Users do not receive updated notifications when editing an announcement. If you wish to have users notified of this update via their notification settings, you will need to create a new announcement.')")).to be_present
@@ -221,7 +221,7 @@ describe "announcements" do
       expect(topic.delayed_post_at).to be_nil
     end
 
-    it "changes the save button to publish when delayed_post_at is removed", ignore_js_errors: true, priority: "1" do
+    it "changes the save button to publish when delayed_post_at is removed", :ignore_js_errors, priority: "1" do
       topic = @course.announcements.create!(title: @topic_title, user: @user, delayed_post_at: 10.days.from_now, message: "message")
 
       get "/courses/#{@course.id}/discussion_topics/#{topic.id}/edit"

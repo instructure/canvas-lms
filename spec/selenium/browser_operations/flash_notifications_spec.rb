@@ -22,7 +22,7 @@ require_relative "../common"
 describe "flash notifications" do
   include_context "in-process server selenium tests"
 
-  it "shows unsupported browser message but allow you to dismiss it", ignore_js_errors: true do
+  it "shows unsupported browser message but allow you to dismiss it", :ignore_js_errors do
     # fix console errors in DE-186 (8/10/2020)
     allow_any_instance_of(ApplicationController).to receive(:browser_supported?).and_return(false)
     get "/login"

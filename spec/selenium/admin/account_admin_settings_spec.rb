@@ -41,7 +41,7 @@ describe "root account basic settings" do
     expect(Account.default.reload.settings[:enable_gravatar]).to be false
   end
 
-  it "lets admins enable kill_joy on root account settings", ignore_js_errors: true do
+  it "lets admins enable kill_joy on root account settings", :ignore_js_errors do
     account.settings[:kill_joy] = false
     account.save!
 
@@ -58,7 +58,7 @@ describe "root account basic settings" do
       account.enable_feature!(:restrict_quantitative_data)
     end
 
-    it "lets admins enable restrict_quantitative_data on root account settings", ignore_js_errors: true do
+    it "lets admins enable restrict_quantitative_data on root account settings", :ignore_js_errors do
       account.settings[:restrict_quantitative_data] = { value: false, locked: false }
       account.save!
 
@@ -77,7 +77,7 @@ describe "root account basic settings" do
     end
 
     context "restrict_quantitative_data enabled" do
-      it "lets admins enable restrict_quantitative_data_lock on root account settings", ignore_js_errors: true do
+      it "lets admins enable restrict_quantitative_data_lock on root account settings", :ignore_js_errors do
         account.settings[:restrict_quantitative_data] = { value: false, locked: false }
         account.save!
 
@@ -109,7 +109,7 @@ describe "root account basic settings" do
     end
   end
 
-  it "lets admins enable suppress_notifications on root account settings", ignore_js_errors: true do
+  it "lets admins enable suppress_notifications on root account settings", :ignore_js_errors do
     account.settings[:suppress_notifications] = false
     account.save!
 

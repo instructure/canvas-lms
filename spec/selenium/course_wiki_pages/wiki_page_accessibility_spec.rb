@@ -264,7 +264,7 @@ describe "Wiki Pages" do
       end
     end
 
-    context "Edit Page", ignore_js_errors: true do
+    context "Edit Page", :ignore_js_errors do
       before do
         visit_wiki_edit_page(@course.id, "bar")
         wait_for_ajaximations

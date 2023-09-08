@@ -207,7 +207,7 @@ describe "blueprinted course pace page" do
           expect(f(".pace-redesign-inner-modal #blueprint-lock-banner")).to be_displayed
         end
 
-        it "disables all editing and publishing elements", custom_timeout: 25, ignore_js_errors: true do
+        it "disables all editing and publishing elements", :ignore_js_errors, custom_timeout: 25 do
           visit_course_paces_page course_id_override: @minion.id
           wait_for_ajaximations
           click_edit_default_pace_button

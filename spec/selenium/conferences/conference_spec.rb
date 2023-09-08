@@ -44,7 +44,7 @@ describe "Web conferences" do
     close_extra_windows
   end
 
-  context "when bbb_modal_update is ON", ignore_js_errors: true do
+  context "when bbb_modal_update is ON", :ignore_js_errors do
     before :once do
       Account.site_admin.enable_feature! :bbb_modal_update
     end
@@ -146,7 +146,7 @@ describe "Web conferences" do
     end
   end
 
-  context "when bbb_modal_update is OFF", ignore_js_errors: true do
+  context "when bbb_modal_update is OFF", :ignore_js_errors do
     before :once do
       Account.site_admin.disable_feature! :bbb_modal_update
     end

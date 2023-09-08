@@ -372,7 +372,7 @@ RSpec/ExpectActual:
 RSpec/ExpectChange:
   Enabled: false
   AutoCorrect: false
-RSpec/FilePath:
+RSpec/SpecFilePathFormat:
   Severity: convention
 RSpec/HooksBeforeExamples:
   Severity: convention
