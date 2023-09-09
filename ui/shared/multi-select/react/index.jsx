@@ -273,6 +273,7 @@ CanvasMultiSelect.propTypes = {
   id: string,
   customMatcher: func,
   customRenderBeforeInput: func,
+  renderAfterInput: node,
   disabled: bool,
   label: oneOfType([node, func]).isRequired,
   onChange: func.isRequired,
@@ -280,6 +281,7 @@ CanvasMultiSelect.propTypes = {
   children: node.isRequired,
   selectedOptionIds: arrayOf(string).isRequired,
   noOptionsLabel: string,
+  size: string,
 }
 
 CanvasMultiSelect.defaultProps = {

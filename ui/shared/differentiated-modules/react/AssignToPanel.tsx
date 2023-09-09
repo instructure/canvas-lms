@@ -25,6 +25,7 @@ import {Text} from '@instructure/ui-text'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import AssigneeSelector from './AssigneeSelector'
 
 const I18n = useI18nScope('differentiated_modules')
 
@@ -42,7 +43,7 @@ interface Option {
   getDescription: () => string
 }
 
-const options: Option[] = [
+const OPTIONS: Option[] = [
   {
     value: 'everyone',
     getLabel: () => I18n.t('Everyone'),
@@ -57,7 +58,7 @@ const options: Option[] = [
 ]
 
 export default function AssignToPanel({height, onDismiss}: AssignToPanelProps) {
-  const [selectedOption, setSelectedOption] = useState<string>(options[0].value)
+  const [selectedOption, setSelectedOption] = useState<string>(OPTIONS[0].value)
 
   return (
     <Flex direction="column" justifyItems="start" height={height}>
@@ -68,7 +69,7 @@ export default function AssignToPanel({height, onDismiss}: AssignToPanelProps) {
       </FlexItem>
       <FlexItem padding="x-small medium" overflowX="hidden">
         <RadioInputGroup description={I18n.t('Select Access Type')} name="access_type">
-          {options.map(option => (
+          {OPTIONS.map(option => (
             <Flex key={option.value}>
               <FlexItem align="start">
                 <View as="div" margin="none">
@@ -90,6 +91,11 @@ export default function AssignToPanel({height, onDismiss}: AssignToPanelProps) {
                     {option.getDescription()}
                   </Text>
                 </View>
+                {option.value === OPTIONS[1].value && selectedOption === OPTIONS[1].value && (
+                  <View as="div" margin="small large none none">
+                    <AssigneeSelector />
+                  </View>
+                )}
               </FlexItem>
             </Flex>
           ))}
