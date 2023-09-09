@@ -23,19 +23,17 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import GenericErrorPage from '@canvas/generic-error-page'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 
-import {CloseButton} from '@instructure/ui-buttons'
+import SubmissionCommentsTray from '../SubmissionCommentsTray'
+
 import {Flex} from '@instructure/ui-flex'
-import {Heading} from '@instructure/ui-heading'
 import {Responsive} from '@instructure/ui-responsive'
 import {Spinner} from '@instructure/ui-spinner'
-import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
 
 import {ASSIGNMENTS} from '../../graphql/queries'
 import {UPDATE_SUBMISSIONS_READ_STATE} from '../../graphql/Mutations'
 
 import AssignmentTable from './AssignmentTable'
-import SubmissionComment from './SubmissionComment'
 import {getGradingPeriodID} from './utils'
 import {GradeSummaryContext} from './context'
 
@@ -43,9 +41,8 @@ const I18n = useI18nScope('grade_summary')
 
 const GradeSummaryContainer = () => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
-  const [showTray, setShowTray] = useState(false)
-  const [selectedSubmission, setSelectedSubmission] = useState('')
   const [submissionIdsForUpdate, setSubmissionIdsForUpdate] = useState([])
+  const [submissionAssignmentId, setSubmissionAssignmentId] = useState('')
 
   const gradingPeriod = ENV?.grading_period?.id || getGradingPeriodID()
   const viewingUserId = ENV?.student_id
@@ -137,24 +134,6 @@ const GradeSummaryContainer = () => {
     )
   }
 
-  const renderCloseButton = () => {
-    return (
-      <Flex>
-        <Flex.Item shouldGrow={true} shouldShrink={true}>
-          <Heading>Submission Comments</Heading>
-        </Flex.Item>
-        <Flex.Item>
-          <CloseButton
-            placement="end"
-            offset="small"
-            screenReaderLabel="Close"
-            onClick={() => setShowTray(false)}
-          />
-        </Flex.Item>
-      </Flex>
-    )
-  }
-
   return (
     <Responsive
       query={{
@@ -168,30 +147,20 @@ const GradeSummaryContainer = () => {
     >
       {({layout}) => (
         <GradeSummaryContext.Provider value={gradeSummaryContext}>
-          <View as="div">
+          <View as="div" padding="medium">
             <AssignmentTable
               queryData={assignmentQuery?.data?.legacyNode}
               layout={layout}
-              setShowTray={setShowTray}
-              setSelectedSubmission={setSelectedSubmission}
               handleReadStateChange={handleReadStateChange}
+              setSubmissionAssignmentId={setSubmissionAssignmentId}
             />
-            <Tray
-              label={I18n.t('Submission Comments Tray')}
-              open={showTray}
+            <SubmissionCommentsTray
               onDismiss={() => {
-                setShowTray(false)
+                document
+                  .querySelector(`[data-testid="submission_comment_tray_${submissionAssignmentId}"`)
+                  .focus()
               }}
-              size="medium"
-              placement="end"
-            >
-              <View as="div" padding="medium">
-                {renderCloseButton()}
-                {selectedSubmission?.commentsConnection?.nodes?.map(comment => {
-                  return <SubmissionComment comment={comment} key={comment?._id} />
-                })}
-              </View>
-            </Tray>
+            />
           </View>
         </GradeSummaryContext.Provider>
       )}

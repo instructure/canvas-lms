@@ -46,7 +46,7 @@ function SubmissionCommentsTray({onDismiss}: SubmissionCommentsTrayProps) {
   return (
     <Tray
       data-testid="submission-tray"
-      label={I18n.t('Submission Comments tray')}
+      label={I18n.t('Submission Comments Tray')}
       open={open}
       shouldContainFocus={true}
       placement="end"
