@@ -118,6 +118,17 @@ describe Types::SubmissionType do
     end
   end
 
+  describe "custom_grade_status" do
+    before do
+      custom_grade_status = CustomGradeStatus.create!(name: "foo", color: "#FFE8E5", root_account_id: Account.default.id, created_by_id: @teacher.id)
+      @submission.update!(custom_grade_status_id: custom_grade_status.id)
+    end
+
+    it "returns the custom grade status" do
+      expect(submission_type.resolve("customGradeStatus")).to eq "foo"
+    end
+  end
+
   describe "grading period id" do
     it "returns the grading period id" do
       grading_period_group = GradingPeriodGroup.create!(title: "foo", course_id: @course.id)
