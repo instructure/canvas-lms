@@ -130,7 +130,7 @@ class GradebooksController < ApplicationController
         json[:custom_grade_status_id] = submission.custom_grade_status_id if custom_gradebook_statuses_enabled
       end
 
-      if Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
+      if Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page) || Account.site_admin.feature_enabled?(:student_grade_summary_upgrade) || @context.restrict_quantitative_data?(@current_user)
         json[:submission_comments] = submission.visible_submission_comments.map do |comment|
           comment_map = {
             id: comment.id,

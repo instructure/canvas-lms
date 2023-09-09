@@ -20,6 +20,8 @@ import React from 'react'
 import DateHelper from '@canvas/datetime/dateHelper'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
+import useStore from '../../stores'
+
 import {Badge} from '@instructure/ui-badge'
 import {Flex} from '@instructure/ui-flex'
 import {IconCommentLine, IconMutedLine, IconAnalyticsLine} from '@instructure/ui-icons'
@@ -34,14 +36,50 @@ import {getDisplayStatus, getDisplayScore, submissionCommentsPresent} from '../u
 
 const I18n = useI18nScope('grade_summary')
 
+const getSubmissionCommentsTrayProps = assignmentId => {
+  const matchingSubmission = ENV.submissions.find(x => x.assignment_id === assignmentId)
+  const {submission_comments, assignment_url: assignmentUrl} = matchingSubmission
+  const attempts = submission_comments?.reduce((attemptsMessages, comment) => {
+    const currentAttempt = comment.attempt < 1 ? 1 : comment.attempt
+
+    if (attemptsMessages[currentAttempt]) {
+      attemptsMessages[currentAttempt].push(comment)
+    } else {
+      attemptsMessages[currentAttempt] = [comment]
+    }
+
+    return attemptsMessages
+  }, {})
+  return {
+    attempts,
+    assignmentUrl,
+  }
+}
+
+const handleSubmissionsCommentTray = assignmentId => {
+  const {submissionTrayAssignmentId, submissionTrayOpen} = useStore.getState()
+
+  if (submissionTrayAssignmentId === assignmentId && submissionTrayOpen) {
+    useStore.setState({submissionTrayOpen: false, submissionTrayAssignmentId: undefined})
+  } else {
+    const {attempts, assignmentUrl} = getSubmissionCommentsTrayProps(assignmentId)
+    useStore.setState({
+      submissionCommentsTray: {attempts},
+      submissionTrayOpen: true,
+      submissionTrayAssignmentId: assignmentId,
+      submissionTrayAssignmentUrl: assignmentUrl,
+    })
+  }
+}
+
 export const assignmentRow = (
   assignment,
   queryData,
   setShowTray,
-  setSelectedSubmission,
   handleReadStateChange,
   setOpenAssignmentDetailIds,
-  openAssignmentDetailIds
+  openAssignmentDetailIds,
+  setSubmissionAssignmentId
 ) => {
   const handleAssignmentDetailOpen = () => {
     if (!openAssignmentDetailIds.includes(assignment._id)) {
@@ -133,12 +171,14 @@ export const assignmentRow = (
           <Flex.Item>
             {submissionCommentsPresent(assignment) ? (
               <IconButton
+                data-testid={`submission_comment_tray_${assignment?._id}`}
                 margin="0 small"
                 screenReaderLabel="Submission Comments"
                 size="small"
                 onClick={() => {
-                  setShowTray(true)
-                  setSelectedSubmission(assignment?.submissionsConnection?.nodes[0])
+                  handleSubmissionsCommentTray(assignment?._id)
+                  setSubmissionAssignmentId(assignment?._id)
+                  setShowTray()
                 }}
               >
                 <IconCommentLine />

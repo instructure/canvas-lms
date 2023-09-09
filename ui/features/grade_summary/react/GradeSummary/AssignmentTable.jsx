@@ -30,6 +30,7 @@ import {
   listDroppedAssignments,
   filteredAssignments,
 } from './utils'
+import useStore, {updateState} from '../stores'
 import {calculateCourseGrade} from './gradeCalculatorConversions'
 
 import {totalRow} from './AssignmentTableRows/TotalRow'
@@ -60,13 +61,7 @@ const getCurrentOrFinalGrade = (
   }
 }
 
-const AssignmentTable = ({
-  queryData,
-  layout,
-  setShowTray,
-  setSelectedSubmission,
-  handleReadStateChange,
-}) => {
+const AssignmentTable = ({queryData, layout, handleReadStateChange, setSubmissionAssignmentId}) => {
   const {assignmentSortBy} = React.useContext(GradeSummaryContext)
   const [calculateOnlyGradedAssignments, setCalculateOnlyGradedAssignments] = useState(true)
 
@@ -103,6 +98,10 @@ const AssignmentTable = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  const open = useStore(state => state.submissionTrayOpen)
+
+  const setShowTray = () => updateState({submissionTrayOpen: !open})
+
   return (
     <Table caption={I18n.t('Student Grade Summary')} layout={layout} hover={true}>
       <Table.Head>
@@ -132,10 +131,10 @@ const AssignmentTable = ({
                 modifiedAssignment,
                 queryData,
                 setShowTray,
-                setSelectedSubmission,
                 handleReadStateChange,
                 setOpenAssignmentDetailIds,
-                openAssignmentDetailIds
+                openAssignmentDetailIds,
+                setSubmissionAssignmentId
               ),
               openAssignmentDetailIds.includes(modifiedAssignment._id) &&
               modifiedAssignment?.scoreStatistic

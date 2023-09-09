@@ -54,7 +54,6 @@ describe "Student Gradebook - Assignment Details" do
     before do
       init_course_with_students 3
       user_session(@teacher)
-
       means = []
       [0, 3, 6].each do |i|
         # the format below ensures that 18.0 is displayed as 18.
