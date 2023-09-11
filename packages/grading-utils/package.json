@@ -1,6 +1,6 @@
 {
   "name": "@instructure/grading-utils",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Grading utilities for Instructure apps.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -20,7 +20,6 @@
     "jest": "^28",
     "@babel/preset-env": "^7"
   },
-  "type": "module",
   "jest": {
     "verbose": true,
     "transform": {
