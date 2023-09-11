@@ -451,7 +451,7 @@ describe('publishOneModuleHelper', () => {
     })
     it('renders the ContextModulesPublishIcon', () => {
       renderContextModulesPublishIcon(1, 2, true, false, 'loading message')
-      expect(getByText(document.body, 'Lesson 2 Module publish options')).toBeInTheDocument()
+      expect(getByText(document.body, 'Lesson 2 module publish options, published')).toBeInTheDocument()
     })
   })
 

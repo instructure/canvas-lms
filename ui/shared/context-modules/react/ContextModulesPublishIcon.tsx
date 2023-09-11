@@ -88,6 +88,8 @@ const ContextModulesPublishIcon = ({
     publishModule(courseId, moduleId, true)
   }
 
+  const publishedStatus = published ? I18n.t('published') : I18n.t('unpublished')
+
   return (
     <View textAlign="center">
       <Menu
@@ -96,7 +98,10 @@ const ContextModulesPublishIcon = ({
         trigger={
           <IconButton
             withBorder={false}
-            screenReaderLabel={I18n.t('%{moduleName} Module publish options', {moduleName})}
+            screenReaderLabel={I18n.t('%{moduleName} module publish options, %{publishedStatus}', {
+              moduleName,
+              publishedStatus,
+            })}
           >
             {statusIcon()}
           </IconButton>

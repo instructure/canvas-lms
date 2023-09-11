@@ -79,7 +79,7 @@ describe('ContextModulesPublishIcon', () => {
       const {container, getByText} = render(
         <ContextModulesPublishIcon {...defaultProps} published={false} />
       )
-      expect(getByText('Lesson 2 Module publish options')).toBeInTheDocument()
+      expect(getByText('Lesson 2 module publish options, unpublished')).toBeInTheDocument()
       expect(container.querySelector('[name="IconUnpublished"]')).toBeInTheDocument()
     })
 
@@ -87,7 +87,7 @@ describe('ContextModulesPublishIcon', () => {
       const {container, getByText} = render(
         <ContextModulesPublishIcon {...defaultProps} published={true} />
       )
-      expect(getByText('Lesson 2 Module publish options')).toBeInTheDocument()
+      expect(getByText('Lesson 2 module publish options, published')).toBeInTheDocument()
       expect(container.querySelector('[name="IconPublish"]')).toBeInTheDocument()
     })
   })
@@ -103,7 +103,7 @@ describe('ContextModulesPublishIcon', () => {
 
   it('calls publishAll when clicked publish all menu item is clicked', async () => {
     const {getByRole, getByText} = render(<ContextModulesPublishIcon {...defaultProps} />)
-    const menuButton = getByRole('button', {name: 'Lesson 2 Module publish options'})
+    const menuButton = getByRole('button', {name: 'Lesson 2 module publish options, published'})
     act(() => menuButton.click())
     const publishButton = getByText('Publish module and all items')
     act(() => publishButton.click())
@@ -120,7 +120,7 @@ describe('ContextModulesPublishIcon', () => {
 
   it('calls publishModuleOnly when clicked publish module menu item is clicked', async () => {
     const {getByRole, getByText} = render(<ContextModulesPublishIcon {...defaultProps} />)
-    const menuButton = getByRole('button', {name: 'Lesson 2 Module publish options'})
+    const menuButton = getByRole('button', {name: 'Lesson 2 module publish options, published'})
     act(() => menuButton.click())
     const publishButton = getByText('Publish module only')
     act(() => publishButton.click())
@@ -137,7 +137,7 @@ describe('ContextModulesPublishIcon', () => {
 
   it('calls unpublishAll when clicked unpublish all items is clicked', async () => {
     const {getByRole, getByText} = render(<ContextModulesPublishIcon {...defaultProps} />)
-    const menuButton = getByRole('button', {name: 'Lesson 2 Module publish options'})
+    const menuButton = getByRole('button', {name: 'Lesson 2 module publish options, published'})
     act(() => menuButton.click())
     const publishButton = getByText('Unpublish module and all items')
     act(() => publishButton.click())
