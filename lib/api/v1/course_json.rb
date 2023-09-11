@@ -66,6 +66,7 @@ module Api::V1
       methods << "hide_final_grades" if @includes.include?(:hide_final_grades)
       methods << "storage_quota_used_mb" if @includes.include?(:storage_quota_used_mb)
       methods << "account_name" if @includes.include?(:account_name)
+      methods << "global_id" if @includes.include?(:global_id)
       methods
     end
 
