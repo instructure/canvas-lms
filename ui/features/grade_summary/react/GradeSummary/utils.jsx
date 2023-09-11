@@ -130,26 +130,39 @@ export const submissionCommentsPresent = assignment => {
 }
 
 export const getAssignmentStatus = assignment => {
-  if (assignment?.submissionsConnection?.nodes[0]?.gradingStatus === 'excused') {
-    return ASSIGNMENT_STATUS.EXCUSED
-  } else if (assignment?.dropped) {
-    return ASSIGNMENT_STATUS.DROPPED
-  } else if (assignment?.gradingType === 'not_graded') {
-    return ASSIGNMENT_STATUS.NOT_GRADED
-  } else if (assignment?.submissionsConnection?.nodes?.length === 0) {
-    return getAssignmentNoSubmissionStatus(assignment?.dueAt)
-  } else if (assignment?.submissionsConnection?.nodes[0]?.late) {
-    const gradingStatus = assignment?.submissionsConnection?.nodes[0]?.gradingStatus
+  const {submissionsConnection, dropped, gradingType, dueAt} = assignment || {}
+
+  const latestSubmission = submissionsConnection?.nodes?.[0]
+  const {gradingStatus, late, customGradeStatus} = latestSubmission || {}
+
+  let status = null
+
+  if (gradingStatus === 'excused') {
+    status = ASSIGNMENT_STATUS.EXCUSED
+  } else if (dropped) {
+    status = ASSIGNMENT_STATUS.DROPPED
+  } else if (gradingType === 'not_graded') {
+    status = ASSIGNMENT_STATUS.NOT_GRADED
+  } else if (submissionsConnection?.nodes?.length === 0) {
+    status = getAssignmentNoSubmissionStatus(dueAt)
+  } else if (late) {
     if (gradingStatus === 'graded') {
-      return ASSIGNMENT_STATUS.LATE_GRADED
+      status = ASSIGNMENT_STATUS.LATE_GRADED
     } else {
-      return ASSIGNMENT_STATUS.LATE_NOT_GRADED
+      status = ASSIGNMENT_STATUS.LATE_NOT_GRADED
     }
-  } else if (assignment?.submissionsConnection?.nodes[0]?.gradingStatus === 'graded') {
-    return ASSIGNMENT_STATUS.GRADED
+  } else if (gradingStatus === 'graded') {
+    status = ASSIGNMENT_STATUS.GRADED
   } else {
-    return ASSIGNMENT_STATUS.NOT_GRADED
+    status = ASSIGNMENT_STATUS.NOT_GRADED
   }
+
+  if (customGradeStatus) {
+    status.label = customGradeStatus
+    status.color = 'primary'
+  }
+
+  return status
 }
 
 export const getAssignmentNoSubmissionStatus = dueDate => {
