@@ -1948,6 +1948,10 @@ CanvasRails::Application.routes.draw do
       post "courses/:course_id/modules/items/:id/duplicate", action: :duplicate, as: :course_context_module_item_duplicate
     end
 
+    scope(controller: :module_assignment_overrides) do
+      get "courses/:course_id/modules/:context_module_id/assignment_overrides", action: :index, as: "module_assignment_overrides_index"
+    end
+
     scope(controller: "quizzes/quiz_assignment_overrides") do
       get "courses/:course_id/quizzes/assignment_overrides", action: :index, as: "course_quiz_assignment_overrides"
       get "courses/:course_id/new_quizzes/assignment_overrides", action: :new_quizzes, as: "course_new_quizzes_assignment_overrides"
