@@ -44,7 +44,7 @@ const I18n = useI18nScope('grade_summary')
 const headers = [
   {key: 'name', value: I18n.t('Name'), id: nanoid(), alignment: 'start', width: '30%'},
   {key: 'dueAt', value: I18n.t('Due Date'), id: nanoid(), alignment: 'start', width: '20%'},
-  {key: 'status', value: I18n.t('Status'), id: nanoid(), alignment: 'center', width: '10%'},
+  {key: 'status', value: I18n.t('Status'), id: nanoid(), alignment: 'center', width: '15%'},
   {key: 'score', value: I18n.t('Score'), id: nanoid(), alignment: 'center', width: '10%'},
 ]
 

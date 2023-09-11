@@ -25,6 +25,7 @@ export const Submission = {
   fragment: gql`
     fragment Submission on Submission {
       _id
+      customGradeStatus
       gradingStatus
       grade
       score
@@ -44,6 +45,7 @@ export const Submission = {
   `,
   shape: {
     _id: string,
+    customGradeStatus: string,
     gradingStatus: string,
     grade: string,
     score: float,
@@ -66,8 +68,8 @@ export const Submission = {
   },
   mock: ({
     _id = '1',
+    customGradeStatus = null,
     gradingStatus = 'graded',
-
     grade = 'A-',
     score = 90,
     gradingPeriodId = '1',
@@ -90,6 +92,7 @@ export const Submission = {
     },
   } = {}) => ({
     _id,
+    customGradeStatus,
     gradingStatus,
     grade,
     score,
