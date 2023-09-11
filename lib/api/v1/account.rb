@@ -69,6 +69,8 @@ module Api::V1::Account
         hash["services"] = Account.services_exposed_to_ui_hash(nil, user, account).keys.index_with { |k| account.service_enabled?(k) }
       end
 
+      hash["global_id"] = account.global_id if includes.include?("global_id")
+
       Api::V1::Account.extensions.each do |extension|
         hash = extension.extend_account_json(hash, account, user, session, includes)
       end
