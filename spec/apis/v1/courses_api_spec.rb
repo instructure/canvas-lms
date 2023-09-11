@@ -4364,6 +4364,24 @@ describe CoursesController, type: :request do
         expect(json["template"]).to be false
       end
 
+      context "include[]=global_id" do
+        it "includes global_id" do
+          json = api_call(
+            :get,
+            "/api/v1/courses/#{@course1.id}.json?include[]=global_id",
+            {
+              controller: "courses",
+              action: "show",
+              id: @course1.to_param,
+              format: "json",
+              include: ["global_id"]
+            }
+          )
+
+          expect(json["global_id"]).to eq @course1.global_id
+        end
+      end
+
       context "include[]=sections" do
         before :once do
           @other_section = @course1.course_sections.create! name: "Other Section", start_at: DateTime.parse("2020-01-01T00:00:00Z")
