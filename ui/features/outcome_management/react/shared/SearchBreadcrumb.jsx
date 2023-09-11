@@ -30,7 +30,7 @@ import {addZeroWidthSpace} from '@canvas/outcomes/addZeroWidthSpace'
 const I18n = useI18nScope('OutcomeManagement')
 
 const SearchBreadcrumb = ({groupTitle, searchString, loading}) => (
-  <Heading level="h4">
+  <Heading level="h3">
     {searchString ? (
       <Flex>
         <Flex.Item shouldShrink={true}>
@@ -76,7 +76,7 @@ const SearchBreadcrumb = ({groupTitle, searchString, loading}) => (
       </Flex>
     ) : (
       <View as="div" padding="x-small medium x-small 0">
-        <Text wrap="break-word">
+        <Text wrap="break-word" size="medium" weight="bold">
           {I18n.t('All %{groupTitle} Outcomes', {
             groupTitle: addZeroWidthSpace(groupTitle),
           })}

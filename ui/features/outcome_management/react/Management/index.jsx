@@ -47,6 +47,7 @@ import {showImportOutcomesModal} from '@canvas/outcomes/react/ImportOutcomesModa
 import useOutcomesRemove from '@canvas/outcomes/react/hooks/useOutcomesRemove'
 import {getOutcomeGroupAncestorsWithSelf} from '../../helpers/getOutcomeGroupAncestorsWithSelf'
 import {ROOT_GROUP} from '@canvas/outcomes/react/hooks/useOutcomesImport'
+import { Heading } from '@instructure/ui-heading'
 
 const I18n = useI18nScope('OutcomeManagement')
 
@@ -401,9 +402,11 @@ const OutcomeManagementPanel = ({
               minHeight="calc(720px - 10.75rem)"
               height="calc(100vh - 16.35rem)"
             >
-              <Text size="large" weight="light" fontStyle="normal">
-                {I18n.t('Outcome Groups')}
-              </Text>
+              <Heading level="h2">
+                <Text size="large" weight="bold" fontStyle="normal">
+                  {I18n.t('Outcome Groups')}
+                </Text>
+              </Heading>
               <View
                 data-testid="outcomes-management-tree-browser"
                 elementRef={el => (treeBrowserViewRef.current = el)}
