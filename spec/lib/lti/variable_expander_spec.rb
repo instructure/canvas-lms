@@ -456,6 +456,20 @@ module Lti
         end
       end
 
+      describe "with 'com.instructure.Context.globalId'" do
+        let(:exp_hash) { { test: "$com.instructure.Context.globalId" } }
+
+        context "when the launch context is present" do
+          let(:course) { course_model }
+          let(:variable_expander_opts) { super().merge(context: course) }
+
+          it "yields the global ID of the context" do
+            variable_expander.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq course.global_id
+          end
+        end
+      end
+
       context "$com.instructure.Assignment.restrict_quantitative_data" do
         let(:exp_hash) { { test: "$com.instructure.Assignment.restrict_quantitative_data" } }
 
