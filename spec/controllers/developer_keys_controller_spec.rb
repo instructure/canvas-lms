@@ -545,7 +545,7 @@ describe DeveloperKeysController do
 
       it "is dev keys plus 1 key" do
         post "create", params: create_params
-        expect(test_domain_root_account.developer_keys.all.count).to be 1
+        expect(test_domain_root_account.developer_keys.count).to be 1
       end
     end
 

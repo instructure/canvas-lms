@@ -205,7 +205,7 @@ describe ConversationMessage do
       @submission = @assignment.submit_homework(@user, body: "some message")
       @submission.add_comment(author: @user, comment: "hello")
 
-      expect(StreamItem.all.select { |i| i.asset_string.include?("conversation_") }).to be_empty
+      expect(StreamItem.select { |i| i.asset_string.include?("conversation_") }).to be_empty
     end
 
     it "does not create additional stream_items for additional messages in the same conversation" do

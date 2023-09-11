@@ -61,7 +61,7 @@ describe DiscussionTopicUsersController, type: :request do
     end
 
     it "with search string john" do
-      user = User.all.last
+      user = User.last
       user.name = "John"
       user.save
 
@@ -82,7 +82,7 @@ describe DiscussionTopicUsersController, type: :request do
     end
 
     it "with search string donald" do
-      user = User.all.last
+      user = User.last
       user.name = "John"
       user.save
 

@@ -22,7 +22,7 @@ describe I18nTimeZone do
     it "provides an array of i18n tz instances" do
       tzs = I18nTimeZone.all
       expect(tzs.first.class).to eq I18nTimeZone
-      expect(tzs.count).to eq ActiveSupport::TimeZone.all.count
+      expect(tzs.count).to eq ActiveSupport::TimeZone.all.count # rubocop:disable Rails/RedundantActiveRecordAllMethod
     end
   end
 

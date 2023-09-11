@@ -323,7 +323,7 @@ describe SIS::CSV::GroupImporter do
                            sis_source_id: group_sis_id)
 
       # "Student Groups" is automatically created
-      group_category = GroupCategory.all.first
+      group_category = GroupCategory.first
       # update context_id to mimic an old "Student Groups" group_category
       group_category&.update_attribute(:context_id, 1234)
       expect(group_category&.context_id).to eq 1234

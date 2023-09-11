@@ -331,14 +331,14 @@ describe GradingSchemesJsonController, type: :request do
         account_level_grading_standard = @account.grading_standards.build(title: "My Grading Scheme to Delete", data: GradingSchemesJsonController.to_grading_standard_data(data))
         account_level_grading_standard.save
 
-        expect(GradingStandard.all.count).to be 1
+        expect(GradingStandard.count).to be 1
         user_session(@admin)
         delete "/accounts/" + @account.id.to_s + "/grading_schemes/" + account_level_grading_standard.id.to_s, as: :json
         expect(response).to have_http_status(:ok)
         response_json = response.parsed_body
 
         # it's a soft delete
-        expect(GradingStandard.all.count).to be 1
+        expect(GradingStandard.count).to be 1
         expect(GradingStandard.first.title).to eq "My Grading Scheme to Delete"
         expect(GradingStandard.first.workflow_state).to eq "deleted"
         expect(response_json).to eq({})
@@ -748,14 +748,14 @@ describe GradingSchemesJsonController, type: :request do
         course_level_grading_standard = @course.grading_standards.build(title: "My Grading Scheme to Delete", data: GradingSchemesJsonController.to_grading_standard_data(data))
         course_level_grading_standard.save
 
-        expect(GradingStandard.all.count).to be 1
+        expect(GradingStandard.count).to be 1
         user_session(@teacher)
         delete "/courses/" + @course.id.to_s + "/grading_schemes/" + course_level_grading_standard.id.to_s, as: :json
         expect(response).to have_http_status(:ok)
         response_json = response.parsed_body
 
         # it's a soft delete
-        expect(GradingStandard.all.count).to be 1
+        expect(GradingStandard.count).to be 1
         expect(GradingStandard.first.title).to eq "My Grading Scheme to Delete"
         expect(GradingStandard.first.workflow_state).to eq "deleted"
         expect(response_json).to eq({})

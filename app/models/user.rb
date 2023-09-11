@@ -1988,23 +1988,27 @@ class User < ActiveRecord::Base
 
   def course_creating_teacher_enrollment_accounts
     Rails.cache.fetch_with_batched_keys("course_creating_teacher_enrollment_accounts", batch_object: self, batched_keys: :enrollments) do
-      Account.where(id: Course.select(:account_id).where(id: enrollments.active.shard(in_region_associated_shards)
-               .select(:course_id)
-               .where(type: %w[TeacherEnrollment DesignerEnrollment])
-               .joins(:root_account)
-               .where("accounts.settings LIKE ?", "%teachers_can_create_courses: true%")
-               .map(&:course_id)).map(&:account_id))
+      Shard.with_each_shard(in_region_associated_shards) do
+        Account.where(id: Course.where(id: enrollments.active.shard(Shard.current)
+                                .select(:course_id)
+                                .where(type: %w[TeacherEnrollment DesignerEnrollment])
+                                .joins(:root_account)
+                                .where("accounts.settings LIKE ?", "%teachers_can_create_courses: true%"))
+               .select(:account_id))
+      end
     end
   end
 
   def course_creating_student_enrollment_accounts
     Rails.cache.fetch_with_batched_keys("course_creating_student_enrollment_accounts", batch_object: self, batched_keys: :enrollments) do
-      Account.where(id: Course.select(:account_id).where(id: enrollments.active.shard(in_region_associated_shards)
-               .select(:course_id)
-               .where(type: %w[StudentEnrollment ObserverEnrollment])
-               .joins(:root_account)
-               .where("accounts.settings LIKE ?", "%students_can_create_courses: true%")
-               .map(&:course_id)).map(&:account_id))
+      Shard.with_each_shard(in_region_associated_shards) do
+        Account.where(id: Course.where(id: enrollments.active.shard(Shard.current)
+                                .select(:course_id)
+                                .where(type: %w[StudentEnrollment ObserverEnrollment])
+                                .joins(:root_account)
+                                .where("accounts.settings LIKE ?", "%students_can_create_courses: true%"))
+               .select(:account_id))
+      end
     end
   end
 
