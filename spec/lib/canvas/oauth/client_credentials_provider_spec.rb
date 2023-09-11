@@ -137,6 +137,20 @@ module Canvas::OAuth
         end
       end
 
+      context "when invalid json is returned" do
+        let(:public_jwk_url_response) { "<html></html>" }
+
+        before do
+          dev_key.update!(public_jwk_url: url)
+        end
+
+        it do
+          expected_url_called(url, :get, stubbed_response)
+          expect(subject).to be false
+          expect(provider.error_message).to be("JWK Error: Invalid JSON")
+        end
+      end
+
       context "when the url is not valid giving a 404" do
         let(:stubbed_response) { instance_double(Net::HTTPNotFound, body: public_jwk_url_response) }
 
