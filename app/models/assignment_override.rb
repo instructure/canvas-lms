@@ -333,7 +333,7 @@ class AssignmentOverride < ActiveRecord::Base
     return Enrollment.none if overrides.empty? || user.nil?
 
     override = overrides.first
-    (override.assignment || override.quiz).context.enrollments_visible_to(user)
+    (override.assignment || override.quiz || override.context_module).context.enrollments_visible_to(user)
   end
 
   OVERRIDDEN_DATES = %i[due_at unlock_at lock_at].freeze
