@@ -75,8 +75,8 @@ module ActiveRecord
         it "cleans up the cursor" do
           # two cursors with the same name; if it didn't get cleaned up, it would error
           expect do
-            User.all.find_each { nil }
-            User.all.find_each { nil } # rubocop:disable Style/CombinableLoops
+            User.find_each { nil }
+            User.find_each { nil } # rubocop:disable Style/CombinableLoops
           end.to_not raise_error
         end
 
@@ -84,12 +84,12 @@ module ActiveRecord
           User.create!
           # two temp tables with the same name; if it didn't get cleaned up, it would error
           expect do
-            User.all.find_each do
+            User.find_each do
               raise ArgumentError
             end
           end.to raise_error(ArgumentError)
 
-          User.all.find_each { nil }
+          User.find_each { nil }
         end
 
         it "doesnt obfuscate the error when it dies in a transaction" do
@@ -98,7 +98,7 @@ module ActiveRecord
           User.create!
           expect do
             ActiveRecord::Base.transaction do
-              User.all.find_each do
+              User.find_each do
                 # to force a foreign key error
                 Account.where(id: account).delete_all
               end
@@ -151,8 +151,8 @@ module ActiveRecord
         it "cleans up the temp table" do
           # two temp tables with the same name; if it didn't get cleaned up, it would error
           expect do
-            User.all.find_in_batches(strategy: :temp_table) { nil }
-            User.all.find_in_batches(strategy: :temp_table) { nil }
+            User.find_in_batches(strategy: :temp_table) { nil }
+            User.find_in_batches(strategy: :temp_table) { nil }
           end.to_not raise_error
         end
 
@@ -160,12 +160,12 @@ module ActiveRecord
           User.create!
           # two temp tables with the same name; if it didn't get cleaned up, it would error
           expect do
-            User.all.find_in_batches(strategy: :temp_table) do
+            User.find_in_batches(strategy: :temp_table) do
               raise ArgumentError
             end
           end.to raise_error(ArgumentError)
 
-          User.all.find_in_batches(strategy: :temp_table) { nil }
+          User.find_in_batches(strategy: :temp_table) { nil }
         end
 
         it "does not die with index error when table size is exactly batch size" do
@@ -173,7 +173,7 @@ module ActiveRecord
           User.delete_all
           user_count.times { user_model }
           expect(User.count).to eq(user_count)
-          User.all.find_in_batches(strategy: :temp_table, batch_size: user_count) { nil }
+          User.find_in_batches(strategy: :temp_table, batch_size: user_count) { nil }
         end
 
         it "doesnt obfuscate the error when it dies in a transaction" do
@@ -182,7 +182,7 @@ module ActiveRecord
           User.create!
           expect do
             ActiveRecord::Base.transaction do
-              User.all.find_in_batches(strategy: :temp_table) do
+              User.find_in_batches(strategy: :temp_table) do
                 # to force a foreign key error
                 Account.where(id: account).delete_all
               end
@@ -478,13 +478,13 @@ module ActiveRecord
 
         it "ignores null scopes" do
           s1 = Assignment.all
-          s2 = Assignment.all.none
+          s2 = Assignment.none
           expect(s1.union(s2)).to be s1
         end
 
         it "just returns self if everything is null scope" do
-          s1 = Assignment.all.none
-          s2 = Assignment.all.none
+          s1 = Assignment.none
+          s2 = Assignment.none
           expect(s1).not_to be s2
           expect(s1.union(s2)).to be s1
         end

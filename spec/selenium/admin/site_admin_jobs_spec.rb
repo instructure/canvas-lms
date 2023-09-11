@@ -183,7 +183,7 @@ describe "site admin jobs ui" do
         expect(f("#jobs-grid .even")).to be_displayed
         expect(f("#jobs-total").text).to eq "3"
         expect(future_jobs.count).to eq 3
-        num_of_jobs = Delayed::Job.all.count
+        num_of_jobs = Delayed::Job.count
 
         delete = f("#delete-jobs")
         keep_trying_until do

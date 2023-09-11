@@ -1258,7 +1258,7 @@ describe LearningOutcome do
       ->(*courses) { courses.each { |c| student_in_course(course: c) } }
     end
 
-    let(:account) { -> { Account.all.find { |a| !a.site_admin? && a.root_account? } } }
+    let(:account) { -> { Account.find { |a| !a.site_admin? && a.root_account? } } }
 
     let(:create_rubric) do
       lambda do |outcome|

@@ -65,14 +65,14 @@ describe Switchman::Shard do
     it "Returns an empty window if no start is defined" do
       allow(Setting).to receive(:get).with("maintenance_window_start_hour", anything).and_return(nil)
 
-      expect(DatabaseServer.all.first.next_maintenance_window).to be_nil
+      expect(DatabaseServer.all.first.next_maintenance_window).to be_nil # rubocop:disable Rails/RedundantActiveRecordAllMethod
     end
 
     it "Returns a window of the correct duration" do
       allow(Setting).to receive(:get).with("maintenance_window_start_hour", anything).and_return("0")
       allow(Setting).to receive(:get).with("maintenance_window_duration", anything).and_return("PT3H")
 
-      window = DatabaseServer.all.first.next_maintenance_window
+      window = DatabaseServer.all.first.next_maintenance_window # rubocop:disable Rails/RedundantActiveRecordAllMethod
 
       expect(window[1] - window[0]).to eq(3.hours)
     end
@@ -80,13 +80,13 @@ describe Switchman::Shard do
     it "Returns a window starting at the correct time" do
       allow(Setting).to receive(:get).with("maintenance_window_start_hour", anything).and_return("3")
 
-      window = DatabaseServer.all.first.next_maintenance_window
+      window = DatabaseServer.all.first.next_maintenance_window # rubocop:disable Rails/RedundantActiveRecordAllMethod
 
       expect(window[0].utc.hour).to eq(21)
 
       allow(Setting).to receive(:get).with("maintenance_window_start_hour", anything).and_return("-7")
 
-      window = DatabaseServer.all.first.next_maintenance_window
+      window = DatabaseServer.all.first.next_maintenance_window # rubocop:disable Rails/RedundantActiveRecordAllMethod
 
       expect(window[0].utc.hour).to eq(7)
     end
@@ -95,7 +95,7 @@ describe Switchman::Shard do
       allow(Setting).to receive(:get).with("maintenance_window_start_hour", anything).and_return("0")
       allow(Setting).to receive(:get).with("maintenance_window_weekday", anything).and_return("Tuesday")
 
-      window = DatabaseServer.all.first.next_maintenance_window
+      window = DatabaseServer.all.first.next_maintenance_window # rubocop:disable Rails/RedundantActiveRecordAllMethod
 
       expect(window[0].wday).to eq(Date::DAYNAMES.index("Tuesday"))
     end
@@ -114,7 +114,7 @@ describe Switchman::Shard do
         allow(Setting).to receive(:get).with("maintenance_window_start_hour", anything).and_return("0")
         allow(Setting).to receive(:get).with("maintenance_window_weekday", anything).and_return("Tuesday")
 
-        window = DatabaseServer.all.first.next_maintenance_window
+        window = DatabaseServer.all.first.next_maintenance_window # rubocop:disable Rails/RedundantActiveRecordAllMethod
 
         expect(window[0].wday).to eq(Date::DAYNAMES.index("Tuesday"))
       end
@@ -126,14 +126,14 @@ describe Switchman::Shard do
       allow(Setting).to receive(:get).with("maintenance_window_weeks_of_month", anything).and_return("2,4")
 
       Timecop.freeze(Time.utc(2021, 3, 1, 12, 0)) do
-        window = DatabaseServer.all.first.next_maintenance_window
+        window = DatabaseServer.all.first.next_maintenance_window # rubocop:disable Rails/RedundantActiveRecordAllMethod
 
         # The 9th was the second tuesday of that month
         expect(window[0].day).to eq(9)
       end
 
       Timecop.freeze(Time.utc(2021, 3, 10, 12, 0)) do
-        window = DatabaseServer.all.first.next_maintenance_window
+        window = DatabaseServer.all.first.next_maintenance_window # rubocop:disable Rails/RedundantActiveRecordAllMethod
 
         # The 23rd was the fourth tuesday of that month
         expect(window[0].day).to eq(23)
