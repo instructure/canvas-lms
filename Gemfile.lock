@@ -460,6 +460,7 @@ GEM
     coercible (1.0.0)
       descendants_tracker (~> 0.0.1)
     colored (1.2)
+    colorize (1.1.0)
     concurrent-ruby (1.2.2)
     crack (0.4.5)
       rexml
@@ -1192,6 +1193,7 @@ DEPENDENCIES
   canvas_webex (= 0.18.2)
   cassandra-cql (= 1.2.3)!
   code_ownership (~> 1.33)
+  colorize (~> 1.0)
   config_file!
   crocodoc-ruby (= 0.0.1)
   crystalball!

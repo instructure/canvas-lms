@@ -23,6 +23,7 @@
 source "https://rubygems.org/"
 
 group :test do
+  gem "colorize", "~> 1.0", require: false
   gem "gergich", "~> 2.1", require: false
 
   gem "rubocop-canvas", require: false, path: "../gems/rubocop-canvas"
