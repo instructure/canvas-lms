@@ -222,29 +222,15 @@ const Ratings = ({
     </Flex>
   )
 
-  const renderRatingDescription = (description, position) => (
+  const renderRatingDescription = (description) => (
     <Text>
-      <ScreenReaderContent>
-        {I18n.t(`Description for mastery level %{position}: %{description}`, {
-          position,
-          description,
-        })}
-      </ScreenReaderContent>
-
       <PresentationContent>{description}</PresentationContent>
     </Text>
   )
 
-  const renderRatingsPoints = (points, position) => (
+  const renderRatingsPoints = (points) => (
     <div className={isMobileView ? '' : 'points'}>
       <View margin={isMobileView ? '0' : '0 0 0 small'}>
-        <ScreenReaderContent>
-          {I18n.t(`Points for mastery level %{position}: %{points}`, {
-            position,
-            points,
-          })}
-        </ScreenReaderContent>
-
         <PresentationContent>
           {I18n.n(points)}
 
@@ -260,35 +246,35 @@ const Ratings = ({
         <Table.Head>
           <Table.Row themeOverride={{borderColor: 'white'}}>
             <Table.ColHeader id="rating" themeOverride={{padding: '0.5rem 0rem'}}>
-              <div aria-hidden="true" className="header">
+              <div className="header">
                 {I18n.t('Proficiency Rating')}
               </div>
             </Table.ColHeader>
             {!isMobileView && (
               <Table.ColHeader id="points" textAlign="end" themeOverride={{padding: '0.5rem 0rem'}}>
-                <div aria-hidden="true" className="header">
+                <div className="header">
                   {I18n.t('Points')}
                 </div>
               </Table.ColHeader>
             )}
           </Table.Row>
         </Table.Head>
-        {ratings.map(({description, points, key}, index) => (
+        {ratings.map(({description, points, key}) => (
           <Table.Body key={key}>
             <Table.Row themeOverride={{borderColor: 'white'}}>
               <Table.Cell themeOverride={{padding: '0.5rem 0rem'}}>
-                {renderRatingDescription(description, index + 1)}
+                {renderRatingDescription(description)}
               </Table.Cell>
               {!isMobileView && (
                 <Table.Cell textAlign="end" themeOverride={{padding: '0.5rem 1.25rem'}}>
-                  {renderRatingsPoints(points, index + 1)}
+                  {renderRatingsPoints(points)}
                 </Table.Cell>
               )}
             </Table.Row>
             {isMobileView && (
               <Table.Row themeOverride={{borderColor: 'white', padding: '0rem 0rem'}}>
                 <Table.Cell themeOverride={{padding: '0.5rem 0rem'}}>
-                  {renderRatingsPoints(points, index + 1)}
+                  {renderRatingsPoints(points)}
                 </Table.Cell>
               </Table.Row>
             )}
@@ -310,13 +296,13 @@ const Ratings = ({
         {canManage ? (
           <>
             <Flex.Item size={isMobileView ? '75%' : canManage ? '80%' : '60%'}>
-              <div aria-hidden="true" className="header">
+              <div className="header">
                 {I18n.t('Proficiency Rating')}
               </div>
             </Flex.Item>
             {!isMobileView && (
               <Flex.Item size="10%">
-                <div aria-hidden="true" className="header">
+                <div className="header">
                   {I18n.t('Points')}
                 </div>
               </Flex.Item>
