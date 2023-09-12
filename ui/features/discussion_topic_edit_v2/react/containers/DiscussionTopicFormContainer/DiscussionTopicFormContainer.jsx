@@ -83,10 +83,10 @@ export default function DiscussionTopicFormContainer() {
     <DiscussionTopicForm
       isEditing={isEditing}
       currentDiscussionTopic={currentDiscussionTopic}
-      isStudent={ENV.is_student}
+      isStudent={ENV.current_user_is_student}
       sections={sections}
       groupCategories={groupCategories}
-      onSubmit={({title, message, shouldPublish, requireInitialPost}) => {
+      onSubmit={({title, message, shouldPublish, requireInitialPost, discussionAnonymousState}) => {
         isEditing ? () => {console.log("call updateDiscussion")} :
         createDiscussionTopic({
           variables: {
@@ -95,7 +95,8 @@ export default function DiscussionTopicFormContainer() {
             title,
             message,
             published: shouldPublish,
-            requireInitialPost
+            requireInitialPost,
+            anonymousState: discussionAnonymousState,
           },
         })
       }}

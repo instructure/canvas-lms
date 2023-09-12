@@ -37,6 +37,7 @@ describe Mutations::CreateDiscussionTopic do
             message
             published
             requireInitialPost
+            anonymousState
           }
           errors {
             attribute
@@ -63,6 +64,7 @@ describe Mutations::CreateDiscussionTopic do
       message: "#{message}"
       published: #{published}
       requireInitialPost: #{require_initial_post}
+      anonymousState: "off"
     GQL
 
     result = execute_with_input(query)
@@ -76,7 +78,76 @@ describe Mutations::CreateDiscussionTopic do
     expect(created_discussion_topic["message"]).to eq message
     expect(created_discussion_topic["published"]).to eq published
     expect(created_discussion_topic["requireInitialPost"]).to be true
+    expect(created_discussion_topic["anonymousState"]).to be_nil
     expect(DiscussionTopic.where("id = #{created_discussion_topic["_id"]}").count).to eq 1
+  end
+
+  it "creates a published discussion topic" do
+    context_type = "Course"
+    title = "Test Title"
+    message = "A message"
+    published = true
+    query = <<~GQL
+      contextId: "#{@course.id}"
+      contextType: "#{context_type}"
+      title: "#{title}"
+      message: "#{message}"
+      published: #{published}
+      anonymousState: "off"
+    GQL
+
+    result = execute_with_input(query)
+    created_discussion_topic = result.dig("data", "createDiscussionTopic", "discussionTopic")
+
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "discussionTopic", "errors")).to be_nil
+    expect(created_discussion_topic["published"]).to be true
+  end
+
+  it "creates a full_anonymity discussion topic" do
+    context_type = "Course"
+    title = "Test Title"
+    message = "A message"
+    published = true
+    anonymous_state = "full_anonymity"
+    query = <<~GQL
+      contextId: "#{@course.id}"
+      contextType: "#{context_type}"
+      title: "#{title}"
+      message: "#{message}"
+      published: #{published}
+      anonymousState: "#{anonymous_state}"
+    GQL
+
+    result = execute_with_input(query)
+    created_discussion_topic = result.dig("data", "createDiscussionTopic", "discussionTopic")
+
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "discussionTopic", "errors")).to be_nil
+    expect(created_discussion_topic["anonymousState"]).to eq anonymous_state
+  end
+
+  it "creates a partial_anonymity discussion topic" do
+    context_type = "Course"
+    title = "Test Title"
+    message = "A message"
+    published = true
+    anonymous_state = "partial_anonymity"
+    query = <<~GQL
+      contextId: "#{@course.id}"
+      contextType: "#{context_type}"
+      title: "#{title}"
+      message: "#{message}"
+      published: #{published}
+      anonymousState: "#{anonymous_state}"
+    GQL
+
+    result = execute_with_input(query)
+    created_discussion_topic = result.dig("data", "createDiscussionTopic", "discussionTopic")
+
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "discussionTopic", "errors")).to be_nil
+    expect(created_discussion_topic["anonymousState"]).to eq anonymous_state
   end
 
   context "errors" do
@@ -86,7 +157,7 @@ describe Mutations::CreateDiscussionTopic do
       expect(errors[0]["message"]).to match(/#{message}/)
     end
 
-    describe "invalid context" do
+    context "invalid context" do
       it "returns 'not found' with an incorrect ID" do
         query = <<~GQL
           contextId: "1"
@@ -103,6 +174,30 @@ describe Mutations::CreateDiscussionTopic do
         GQL
         result = execute_with_input(query)
         expect_error(result, "Invalid context type")
+      end
+    end
+
+    context "anonymous_state" do
+      it "returns error for anonymous discussions when context is a Group" do
+        gc = @course.group_categories.create! name: "foo"
+        group = gc.groups.create! context: @course, name: "baz"
+        context_type = "Group"
+        title = "Test Title"
+        message = "A message"
+        published = true
+        anonymous_state = "partial_anonymity"
+
+        query = <<~GQL
+          contextId: "#{group.id}"
+          contextType: "#{context_type}"
+          title: "#{title}"
+          message: "#{message}"
+          published: #{published}
+          anonymousState: "#{anonymous_state}"
+        GQL
+
+        result = execute_with_input(query)
+        expect_error(result, "You are not able to create an anonymous discussion in a group")
       end
     end
   end

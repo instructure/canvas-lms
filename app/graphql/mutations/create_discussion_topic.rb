@@ -20,6 +20,7 @@
 class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
   graphql_name "CreateDiscussionTopic"
 
+  argument :anonymous_state, String, required: false
   argument :context_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Context")
   argument :context_type, String, required: true
   # most arguments inherited from DiscussionBase
@@ -40,6 +41,23 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
 
     return validation_error(I18n.t("Invalid context")) unless discussion_topic_context
 
+    # if the passed value is neither "partial_anonymity" nor "full_anonymity", set it to nil
+    anonymous_state = input[:anonymous_state]
+    if anonymous_state && anonymous_state != "partial_anonymity" && anonymous_state != "full_anonymity"
+      anonymous_state = nil
+    end
+
+    if anonymous_state &&
+       discussion_topic_context.is_a?(Course) &&
+       !discussion_topic_context.settings[:allow_student_anonymous_discussion_topics] &&
+       discussion_topic_context.grants_right?(@current_user, session, :manage)
+      return validation_error(I18n.t("You are not able to create an anonymous discussion"))
+    end
+
+    if anonymous_state && discussion_topic_context.is_a?(Group)
+      return validation_error(I18n.t("You are not able to create an anonymous discussion in a group"))
+    end
+
     discussion_topic = DiscussionTopic.new(
       {
         context_id: discussion_topic_context.id,
@@ -47,7 +65,8 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
         title: input[:title],
         message: input[:message],
         workflow_state: input[:published] ? "active" : "unpublished",
-        require_initial_post: input[:require_initial_post]
+        require_initial_post: input[:require_initial_post],
+        anonymous_state:
       }
     )
     verify_authorized_action!(discussion_topic, :create)
