@@ -307,7 +307,7 @@ $.fn.timepicker = function () {
         $picker.data('attached_to', $(this)[0])
         const windowHeight = $(window).height()
         const windowWidth = $(window).width()
-        const scrollTop = $.windowScrollTop()
+        const scrollTop = window.scrollY
         if (offset.top + height - scrollTop + pickerHeight > windowHeight) {
           $picker.css({
             top: offset.top - pickerHeight,

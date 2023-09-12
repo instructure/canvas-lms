@@ -349,7 +349,7 @@ const rubricEditing = {
   originalSizeRatings() {
     const $visibleCriteria = $('.rubric:not(.rubric_summary) .criterion:visible')
     if ($visibleCriteria.length) {
-      const scrollTop = $.windowScrollTop()
+      const scrollTop = window.scrollY
       $visibleCriteria.each(function () {
         const $this = $(this),
           $ratings = $this.find('.ratings:visible')
