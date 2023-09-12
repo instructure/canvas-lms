@@ -38,6 +38,12 @@ import ready from '@instructure/ready'
 
 const I18n = useI18nScope('discussions')
 
+// Backbone routes
+$('body').on('click', '[data-pushstate]', function (event) {
+  if (event) event.preventDefault()
+  Backbone.history.navigate($(this).attr('href'), true)
+})
+
 import('@canvas/rubrics/jquery/rubricEditBinding')
 if (ENV.STUDENT_CONTEXT_CARDS_ENABLED)
   import('@canvas/context-cards/react/StudentContextCardTrigger')

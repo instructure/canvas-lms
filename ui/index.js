@@ -25,7 +25,6 @@ import './boot'
 // true modules that we use in this file
 import $ from 'jquery'
 import ready from '@instructure/ready'
-import Backbone from '@canvas/backbone'
 import splitAssetString from '@canvas/util/splitAssetString'
 import {Mathml} from '@instructure/canvas-rce'
 import loadBundle from 'bundles-generated'
@@ -189,12 +188,6 @@ function doRandomThingsToDOM() {
     import('./boot/initializers/enableHelpDialog').then(({default: helpDialog}) =>
       helpDialog.open()
     )
-  })
-
-  // Backbone routes
-  $('body').on('click', '[data-pushstate]', function (event) {
-    if (event) event.preventDefault()
-    Backbone.history.navigate($(this).attr('href'), true)
   })
 }
 
