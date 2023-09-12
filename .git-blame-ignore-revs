@@ -114,5 +114,7 @@ b973c7ca270fd7204ae7d2861aac22df21dc4b87 # Style/ParenthesesAroundCondition
 dd84f1faed7d028148e429c257af4ad3842f01d0 # Prettier/trailingComma
 a78f3fca8ca022a97759234218213e4f8d887989 # Prettier /spec/javascripts/
 86d0e7ced231f1e75b3c2c0e42472d4aa353421c # Prettier /ui
+c893bf9d12390b846f5437e98db60046f1e9f364 # Prettier /public/javascripts/
+03e16bc261c135f448f416104dfaa8e2353a8203 # eslint
 b2b0bff902677f75180fc8e6139badb4a8ec62f4 # Style/TernaryParentheses, Style/RedundantParentheses
 62fc5c033d6361bcbdbbe3ad8f93ff085b21713d # RSpec/Be*
