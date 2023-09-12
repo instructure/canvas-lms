@@ -3448,4 +3448,50 @@ class User < ActiveRecord::Base
   def inbox_labels
     preferences[:inbox_labels] || []
   end
+
+  # Returns all sub accounts that the user can administer
+  # On the shard the starting_root_account resides on.
+  #
+  # This method first plucks (and caches) the adminable account
+  # IDs and then makes a second query to fetch the accounts.
+  #
+  # This two-query approach was taken intentionally: We do have to store
+  # the plucked IDs in memory and make a second query, but it
+  # means we can return an ActiveRecord::Relation instead of an Array.
+  #
+  # This is important to prevent initializing _all_ adminable account
+  # models into memory, even if this scope is used in a controller processing
+  # a request with pagination params that require a single, small page.
+  def adminable_accounts_recursive(starting_root_account:)
+    starting_root_account.shard.activate do
+      Account.where(id: adminable_account_ids_recursive(starting_root_account:))
+    end
+  end
+
+  def adminable_account_ids_recursive(starting_root_account:)
+    starting_root_account.shard.activate do
+      Rails.cache.fetch(
+        adminable_account_ids_cache_key(starting_root_account:),
+        expires_in: 5.minutes
+      ) do
+        Account.select(:id, :parent_account_id, :workflow_state).active.multi_parent_sub_accounts_recursive(
+          adminable_accounts_scope(
+            shard_scope: starting_root_account.shard
+          ).where(
+            root_account: starting_root_account
+          )
+        ).pluck(:id)
+      end
+    end
+  end
+
+  def adminable_account_ids_cache_key(starting_root_account:)
+    [
+      "adminable_account_ids_recursive",
+      global_id,
+      "starting_root_account",
+      starting_root_account.global_id,
+    ].cache_key
+  end
+  private :adminable_account_ids_cache_key
 end

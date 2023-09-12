@@ -4510,4 +4510,48 @@ describe User do
       expect(@user.suspended?).to be_falsey
     end
   end
+
+  describe "#adminable_accounts_recursive and #adminable_account_ids_recursive" do
+    let(:root_account) { Account.create!(name: "Root Account") }
+    let(:account) { Account.create!(name: "Account", parent_account: root_account) }
+    let(:sub_account_a) { Account.create!(name: "Account", parent_account: account) }
+    let(:sub_account_b) { Account.create!(name: "Account", parent_account: account) }
+    let(:sub_account_b_1) { Account.create!(name: "Account", parent_account: sub_account_b) }
+    let(:sub_account_a_1) { Account.create!(name: "Account", parent_account: sub_account_a) }
+
+    let(:root_account2) { Account.create!(name: "Root Account 2") }
+    let(:ra2_subaccount) { Account.create!(name: "Account", parent_account: root_account2) }
+
+    let(:user) { User.create! }
+
+    let(:expected_adminable) { [sub_account_b_1, sub_account_a, sub_account_a_1] }
+
+    before do
+      # Create all accounts:
+      sub_account_b_1
+      sub_account_a_1
+      ra2_subaccount
+
+      AccountUser.create!(account: sub_account_b_1, user:)
+      AccountUser.create!(account: sub_account_a, user:)
+      AccountUser.create!(account: ra2_subaccount, user:)
+    end
+
+    describe "#adminable_accounts_recursive" do
+      subject { user.adminable_accounts_recursive(starting_root_account: root_account) }
+
+      it "returns a scope with all subaccounts" do
+        expect(subject).to be_an ActiveRecord::Relation
+        expect(subject.to_a).to contain_exactly(*expected_adminable)
+      end
+    end
+
+    describe "#adminable_accounts_ids_recursive" do
+      subject { user.adminable_account_ids_recursive(starting_root_account: root_account) }
+
+      it "returns all subaccount ids" do
+        expect(subject).to contain_exactly(*expected_adminable.map(&:id))
+      end
+    end
+  end
 end
