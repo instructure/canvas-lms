@@ -75,6 +75,21 @@ describe('clean input state', () => {
     expect(getByPlaceholderText('some placeholder text')).toBeInTheDocument()
   })
 
+  it('renders the message if provided', () => {
+    const {getByText} = renderInput({
+      messages: [{type: 'hint', text: 'This is the hint'}],
+    })
+    expect(getByText('This is the hint')).toBeInTheDocument()
+  })
+
+  it('renders the invalidDateMessage when the input cannot be parsed', () => {
+    const {getByText, getInput} = renderInput({
+      invalidDateMessage: 'This is the invalid date message',
+    })
+    fireEvent.change(getInput(), {target: {value: 'asdf'}})
+    expect(getByText('This is the invalid date message')).toBeInTheDocument()
+  })
+
   it('displays the formatted date when the initial date is not null', () => {
     const now = new Date()
     const formatter = jest.fn(() => 'formatted date')
@@ -155,6 +170,12 @@ describe('choosing a day on the calendar', () => {
 })
 
 describe('dirty input state', () => {
+  it('clears the input when blurred with invalid input', () => {
+    const {getInput} = renderAndDirtyInput('asdf')
+    fireEvent.blur(getInput())
+    expect(getInput().value).toBe('')
+  })
+
   it('resets the input when selectedDate changes to a new date', () => {
     const {props, rerender, getInput} = renderAndDirtyInput('asdf')
     expect(getInput().value).toBe('asdf')
@@ -345,5 +366,28 @@ describe('locales', () => {
     const headerRow = lundi.closest('tr')
     const lundiHeader = lundi.closest('th')
     expect(headerRow.children[0]).toBe(lundiHeader)
+  })
+})
+
+describe('with defaultToToday set to true', () => {
+  it('defaults to today when the input is empty', () => {
+    const today = new Date()
+    const {getInput} = renderInput({defaultToToday: true})
+    fireEvent.click(getInput())
+    expect(getInput().value).toBe('')
+    fireEvent.blur(getInput())
+    expect(getInput().value).toBe(today.toISOString())
+  })
+
+  it('leaves invalid input in place', () => {
+    const {getByText, getInput} = renderInput({
+      defaultToToday: true,
+      messages: [{type: 'hint', text: 'This is the hint'}],
+    })
+    fireEvent.change(getInput(), {target: {value: 'asdf'}})
+    fireEvent.blur(getInput())
+    expect(getInput().value).toBe('asdf')
+    expect(getByText('Invalid Date')).toBeInTheDocument()
+    expect(getByText('This is the hint')).toBeInTheDocument()
   })
 })
