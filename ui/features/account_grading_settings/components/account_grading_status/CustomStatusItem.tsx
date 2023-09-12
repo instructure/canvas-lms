@@ -68,7 +68,12 @@ export const CustomStatusItem = ({
     }
   }
   return (
-    <View as="div" margin="small 0 0 0" data-testid={`custom-status-${gradeStatus.id}`}>
+    <View
+      as="div"
+      margin="small 0 0 0"
+      data-testid={`custom-status-${gradeStatus.id}`}
+      id="saved-custom-status"
+    >
       <GradingStatusListItem
         backgroundColor={color}
         setElementRef={ref => (customStatusItemRef.current = ref)}
@@ -98,6 +103,7 @@ export const CustomStatusItem = ({
                 withBorder={false}
                 screenReaderLabel={I18n.t('Delete Status %{name}', {name})}
                 onClick={confirmStatusDelete}
+                data-testid="delete-custom-status-button"
               >
                 <IconTrashSolid />
               </IconButton>

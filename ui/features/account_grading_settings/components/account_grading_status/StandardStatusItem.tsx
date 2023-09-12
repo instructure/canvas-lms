@@ -48,7 +48,12 @@ export const StandardStatusItem = ({
 
   const statusName = statusesTitleMap[name as StandardStatusAllowedName]
   return (
-    <View as="div" margin="small 0 0 0" data-testid={`standard-status-${gradeStatus.id}`}>
+    <View
+      as="div"
+      margin="small 0 0 0"
+      data-testid={`standard-status-${gradeStatus.id}`}
+      id="standard-status"
+    >
       <GradingStatusListItem
         backgroundColor={color}
         setElementRef={ref => (standardStatusRef.current = ref)}

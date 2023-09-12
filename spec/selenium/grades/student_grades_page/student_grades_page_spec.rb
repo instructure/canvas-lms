@@ -661,4 +661,32 @@ describe "gradebook - logged in as a student" do
       expect(f("[data-testid='assignment-row']")).to include_text("Loser")
     end
   end
+
+  context "grade status" do
+    before do
+      course_with_student({ active_course: true, active_enrollment: true })
+      @teacher = User.create!
+      @course.enroll_teacher(@teacher)
+      @assignment = @course.assignments.create!(due_at: 1.week.from_now, title: "Current Assignment", grading_type: "points", points_possible: 10)
+    end
+
+    it "displays the standard grade status if one is applied" do
+      @submission = @assignment.grade_student(@student, grade: 10, grader: @teacher).first
+      @submission.update!(late_policy_status: "late")
+      user_session(@student)
+      StudentGradesPage.visit_as_student(@course)
+
+      expect(f(".submission-late-pill")).to be_displayed
+    end
+
+    it "displays the custom grade status if one is applied" do
+      @custom_status = CustomGradeStatus.create!(name: "Custom Status", color: "#000000", root_account_id: @course.root_account_id, created_by: @teacher)
+      @submission = @assignment.grade_student(@student, grade: 10, grader: @teacher).first
+      @submission.update!(custom_grade_status: @custom_status)
+      user_session(@student)
+      StudentGradesPage.visit_as_student(@course)
+
+      expect(f(".submission-custom-grade-status-pill-#{@custom_status.id}")).to be_displayed
+    end
+  end
 end

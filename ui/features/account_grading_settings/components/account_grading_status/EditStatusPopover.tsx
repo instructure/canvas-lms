@@ -78,6 +78,7 @@ export const EditStatusPopover = ({
               editButtonLabel,
             })}
             onClick={handleEditStatusToggle}
+            data-testid="color-picker-edit-button"
           >
             <IconEditSolid />
           </IconButton>
