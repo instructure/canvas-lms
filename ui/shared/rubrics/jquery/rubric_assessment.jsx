@@ -216,7 +216,7 @@ window.rubricAssessment = {
   sizeRatings() {
     const $visibleCriteria = $('.rubric .criterion:visible')
     if ($visibleCriteria.length) {
-      const scrollTop = $.windowScrollTop()
+      const scrollTop = window.scrollY
       $('.rubric .criterion:visible').each(function () {
         const $this = $(this),
           $ratings = $this.find('.ratings:visible')

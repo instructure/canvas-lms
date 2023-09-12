@@ -22,7 +22,7 @@
 import $ from 'jquery'
 import './jquery.scrollTo'
 
-$.fn.scrollToVisible = function(obj) {
+$.fn.scrollToVisible = function (obj) {
   const options = {}
   const $obj = $(obj)
 
@@ -36,14 +36,14 @@ $.fn.scrollToVisible = function(obj) {
     bottom = top + height,
     left = innerOffset.left,
     right = left + width,
-    currentTop = this.selector == 'html,body' ? $.windowScrollTop() : this.scrollTop(),
+    currentTop = this.selector == 'html,body' ? window.scrollY : this.scrollTop(),
     currentLeft = this.scrollLeft(),
     currentHeight = this.outerHeight(),
     currentWidth = this.outerWidth()
 
   if (this.selector != 'html,body') {
     let outerOffset = $('body').offset()
-    this.each(function() {
+    this.each(function () {
       try {
         outerOffset = $(this).offset()
         return false
