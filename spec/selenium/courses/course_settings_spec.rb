@@ -335,6 +335,8 @@ describe "course settings" do
         wait_for_ajaximations
         expect(f("body")).not_to contain_jqcss("#course_hide_distribution_graphs")
         expect(f("body")).not_to contain_jqcss("#course_hide_final_grades")
+        # Verify that other parts of the settings are not visilbe when they shouldn't be
+        expect(f("#tab-sections").css_value("display")).to eq "none"
       end
 
       it "is shown when only restrict_quantitative_data account locked setting and feature flags are ON" do
