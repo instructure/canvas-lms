@@ -64,6 +64,7 @@ export const CustomStatusNewItem = ({
           borderColor="transparent"
           background="transparent"
           onClick={() => handleEditStatusToggle()}
+          data-testid="new-custom-status"
         >
           <Text as="div" size="medium" color="brand" weight="bold" wrap="break-word">
             <IconAddSolid color="brand" />

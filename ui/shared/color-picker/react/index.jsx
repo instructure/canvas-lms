@@ -547,6 +547,7 @@ const ColorPicker = createReactClass({
             inputRef={r => {
               this.hexInputRef = r
             }}
+            data-testid="color-picker-input"
           />
         </div>
 

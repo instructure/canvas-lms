@@ -36,6 +36,9 @@ describe "Grade Detail Tray:" do
     create_assignments
     make_submissions
     grade_assignments
+    @custom_status = CustomGradeStatus.create!(name: "Custom Status", color: "#000000", root_account_id: @course.root_account_id, created_by: @teacher)
+    @a5 = @course.assignments.create!(name: "Assignment 5", points_possible: 10, submission_types: "online_text_entry")
+    @course.students.first.submissions.find_by(assignment_id: @a5.id).update!(custom_grade_status: @custom_status)
   end
 
   context "status" do
@@ -72,6 +75,12 @@ describe "Grade Detail Tray:" do
       expect(Gradebook::GradeDetailTray.is_radio_button_selected("excused")).to be true
     end
 
+    it "submisison with custom status has custom status radio-button selected" do
+      Gradebook::Cells.open_tray(@course.students.first, @a5)
+
+      expect(Gradebook::GradeDetailTray.is_radio_button_selected(@custom_status.id)).to be true
+    end
+
     it "updates status when excused-option is selected", priority: "1" do
       Gradebook::Cells.open_tray(@course.students.first, @a2)
       Gradebook::GradeDetailTray.change_status_to("Excused")
@@ -88,6 +97,15 @@ describe "Grade Detail Tray:" do
       late_policy_status = @course.students.first.submissions.find_by(assignment_id: @a2.id).late_policy_status
 
       expect(late_policy_status).to eq "missing"
+    end
+
+    it "updates the status when custom status is selected" do
+      Gradebook::Cells.open_tray(@course.students.first, @a2)
+      Gradebook::GradeDetailTray.change_status_to("Custom Status")
+      submission = @course.students.first.submissions.find_by(assignment_id: @a2.id)
+
+      expect(submission.late_policy_status).to be_nil
+      expect(submission.custom_grade_status).to eq @custom_status
     end
 
     it "grade input is saved", priority: "1" do
@@ -193,7 +211,7 @@ describe "Grade Detail Tray:" do
       end
 
       it "right arrow button is not present when rightmost assignment is selected", priority: "2" do
-        Gradebook::Cells.open_tray(@course.students.first, @a4)
+        Gradebook::Cells.open_tray(@course.students.first, @a5)
 
         expect(Gradebook::GradeDetailTray.submission_tray_full_content)
           .not_to contain_css("#assignment-carousel .right-arrow-button-container button")
@@ -335,6 +353,48 @@ describe "Grade Detail Tray:" do
       Gradebook::Cells.open_tray(@course.students.first, @a1)
       expect(Gradebook::GradeDetailTray.proxy_submitter_name.text).to include("Submitted by " + @teacher.short_name)
       expect(Gradebook::GradeDetailTray.proxy_date_time).to be_displayed
+    end
+  end
+
+  context "final grade override" do
+    before do
+      @course.update!(allow_final_grade_override: true)
+      @course.enable_feature!(:final_grades_override)
+      user_session(@teacher)
+      Gradebook.visit(@course)
+    end
+
+    it "allows a custom grade status to be selected" do
+      Gradebook::Cells.edit_override(@students.first, 90.0)
+      f(Gradebook::Cells.grade_override_selector(@students.first)).click
+      Gradebook::Cells.grade_tray_button.click
+      wait_for_ajaximations
+      student_enrollment_score = @students.first.enrollments.first.find_score
+
+      expect { Gradebook::GradeDetailTray.change_status_to("Custom Status") }.to change { student_enrollment_score.reload.custom_grade_status }.from(nil).to(@custom_status)
+    end
+
+    it "removes the custom grade status when the final grade override is removed" do
+      Gradebook::Cells.edit_override(@students.first, 90.0)
+      student_enrollment_score = @students.first.enrollments.first.find_score
+      student_enrollment_score.reload.update!(custom_grade_status: @custom_status)
+
+      expect { Gradebook::Cells.edit_override(@students.first, "") }.to change { student_enrollment_score.reload.custom_grade_status }.from(@custom_status).to(nil)
+      f(Gradebook::Cells.grade_override_selector(@students.first)).click
+      Gradebook::Cells.grade_tray_button.click
+      wait_for_ajaximations
+
+      expect(Gradebook::GradeDetailTray.is_radio_button_selected("none")).to be true
+    end
+
+    it "does not allow a custom grade status to be selected when the final grade override does not have a score" do
+      student_enrollment_score = @students.first.enrollments.first.find_score
+      Gradebook::Cells.edit_override(@students.first, "")
+      f(Gradebook::Cells.grade_override_selector(@students.first)).click
+      Gradebook::Cells.grade_tray_button.click
+      wait_for_ajaximations
+
+      expect { Gradebook::GradeDetailTray.change_status_to("Custom Status") }.not_to change { student_enrollment_score.reload.custom_grade_status }
     end
   end
 end

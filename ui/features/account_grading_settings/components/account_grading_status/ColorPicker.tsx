@@ -142,6 +142,7 @@ export const ColorPicker = ({
               value={currentColor}
               onChange={setInputColor}
               onBlur={warnIfInvalid}
+              data-testid="color-picker-input"
             />
           </View>
         </FlexItem>
