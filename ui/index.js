@@ -183,8 +183,6 @@ if (ENV.badge_counts) {
 isolate(doRandomThingsToDOM)()
 
 function doRandomThingsToDOM() {
-  $('html').removeClass('scripts-not-loaded')
-
   $('.help_dialog_trigger').click(event => {
     event.preventDefault()
     // eslint-disable-next-line promise/catch-or-return

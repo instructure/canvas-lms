@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 -%><!DOCTYPE html>
-<html class="scripts-not-loaded" dir="<%= I18n.rtl? ? 'rtl' : 'ltr' %>"   lang=<%= raw I18n.locale.to_json %>>
+<html dir="<%= I18n.rtl? ? 'rtl' : 'ltr' %>"   lang=<%= raw I18n.locale.to_json %>>
 <head>
   <meta charset="utf-8">
   <% if @sentry_trace.present? %>

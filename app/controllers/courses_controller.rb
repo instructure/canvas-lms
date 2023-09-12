@@ -2353,7 +2353,7 @@ class CoursesController < ApplicationController
         when "assignments"
           js_bundle :assignment_index
           css_bundle :new_assignments
-          add_body_class("hide-content-while-scripts-not-loaded", "with_item_groups")
+          add_body_class("with_item_groups")
         when "syllabus"
           deferred_js_bundle :syllabus
           css_bundle :syllabus, :tinymce
