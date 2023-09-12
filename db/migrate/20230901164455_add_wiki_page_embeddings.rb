@@ -26,7 +26,7 @@ class AddWikiPageEmbeddings < ActiveRecord::Migration[7.0]
   def change
     create_table :wiki_page_embeddings do |t|
       t.references :wiki_page, null: false, foreign_key: true
-      t.column :embedding, "public.vector", limit: 1536, null: false
+      t.column :embedding, "#{connection.extension("vector").schema}.vector", limit: 1536, null: false
       t.timestamps null: false
       t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
     end
