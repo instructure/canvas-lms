@@ -2192,6 +2192,14 @@ module Lti
           expect(exp_hash[:test]).to be true
         end
 
+        it "has substitution for $Canvas.user.adminableAccounts" do
+          allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
+          allow(substitution_helper).to receive(:adminable_account_ids_recursive_truncated).and_return("123,456")
+          exp_hash = { test: "$Canvas.user.adminableAccounts" }
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq "123,456"
+        end
+
         it "has substitution for $Canvas.xuser.allRoles" do
           allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
           allow(substitution_helper).to receive(:all_roles).and_return("Admin,User")

@@ -257,6 +257,24 @@ module Lti
       e || @user.email
     end
 
+    def adminable_account_ids_recursive_truncated(limit_chars: 40_000)
+      full_list = @user.adminable_account_ids_recursive(starting_root_account: @root_account).join(",")
+
+      # Some browsers break when the POST param field value is too long, as
+      # seen in 95fad766f / INTEROP-6390. It's unclear what the limit is, but from
+      # that, 40000 (1000 * course.lti_context_id.length) seems to be safe.
+      if full_list.length <= limit_chars
+        full_list
+      else
+        warning_str = ",truncated"
+        # Get the index of the last "," before the limit (minus room for the warning string)
+        # The maximum possible for truncate_after would be (limit_chars - warning_str.length),
+        # in which case adding warning_str puts us exactly at limit_chars chars.
+        truncate_after = full_list.rindex(",", limit_chars - warning_str.length)
+        full_list[0...truncate_after] + warning_str
+      end
+    end
+
     def recursively_fetch_previous_lti_context_ids(limit: 1000)
       return "" unless @context.is_a?(Course)
 

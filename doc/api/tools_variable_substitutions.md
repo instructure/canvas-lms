@@ -1027,6 +1027,24 @@ Returns true for root account admins and false for all other roles.
 ```
 true
 ```
+## Canvas.user.adminableAccounts
+Returns a string with a comma-separated list of the (local) account IDs
+that a user has admin rights in, which fall under the root account that
+the tool was launched under. This list includes the IDs of
+all subaccounts of these accounts (and their subaccounts, etc.), since
+the admin privileges carry from an account to all its subaccounts.
+
+Will show a limit of 40000 characters. If the account IDs list is too big
+to fit into 40000 characters, 'truncated' will show at the end of the
+list.
+
+**Availability**: *when launched by a logged in user*  
+
+
+```
+123,456,798
+123,456,789,1234,truncated
+```
 ## User.username [duplicates Canvas.user.loginId]
 Username/Login ID for the primary pseudonym for the user for the account.
 This may not be the pseudonym the user is actually logged in with.
