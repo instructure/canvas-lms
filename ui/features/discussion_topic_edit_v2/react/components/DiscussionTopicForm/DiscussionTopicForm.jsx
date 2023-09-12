@@ -255,51 +255,55 @@ export default function DiscussionTopicForm({
           </View>
         )}
         <Text size="large">{I18n.t('Options')}</Text>
-        <View display="block" margin="medium 0">
-          <RadioInputGroup
-            name="anonymous"
-            description={I18n.t('Anonymous Discussion')}
-            value={discussionAnonymousState}
-            onChange={(_event, value) => {
-              if (value !== 'off') {
-                setIsGraded(false)
-                setIsGroupDiscussion(false)
-                setGroupCategoryId(null)
-              }
-              setDiscussionAnonymousState(value)
-            }}
-            disabled={isEditing}
-          >
-            <RadioInput
-              key="off"
-              value="off"
-              label={I18n.t(
-                'Off: student names and profile pictures will be visible to other members of this course'
-              )}
-            />
-            <RadioInput
-              key="partial_anonymity"
-              value="partial_anonymity"
-              label={I18n.t(
-                'Partial: students can choose to reveal their name and profile picture'
-              )}
-            />
-            <RadioInput
-              key="full_anonymity"
-              value="full_anonymity"
-              label={I18n.t('Full: student names and profile pictures will be hidden')}
-            />
-          </RadioInputGroup>
-          {!isEditing && discussionAnonymousState === 'partial_anonymity' && isStudent && (
+        {ENV.context_is_not_group &&
+          (ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MODERATE ||
+            ENV.allow_student_anonymous_discussion_topics) && (
             <View display="block" margin="medium 0">
-              <AnonymousResponseSelector
-                username={ENV.current_user.display_name}
-                setAnonymousAuthorState={setAnonymousAuthorState}
-                discussionAnonymousState={discussionAnonymousState}
-              />
+              <RadioInputGroup
+                name="anonymous"
+                description={I18n.t('Anonymous Discussion')}
+                value={discussionAnonymousState}
+                onChange={(_event, value) => {
+                  if (value !== 'off') {
+                    setIsGraded(false)
+                    setIsGroupDiscussion(false)
+                    setGroupCategoryId(null)
+                  }
+                  setDiscussionAnonymousState(value)
+                }}
+                disabled={isEditing}
+              >
+                <RadioInput
+                  key="off"
+                  value="off"
+                  label={I18n.t(
+                    'Off: student names and profile pictures will be visible to other members of this course'
+                  )}
+                />
+                <RadioInput
+                  key="partial_anonymity"
+                  value="partial_anonymity"
+                  label={I18n.t(
+                    'Partial: students can choose to reveal their name and profile picture'
+                  )}
+                />
+                <RadioInput
+                  key="full_anonymity"
+                  value="full_anonymity"
+                  label={I18n.t('Full: student names and profile pictures will be hidden')}
+                />
+              </RadioInputGroup>
+              {!isEditing && discussionAnonymousState === 'partial_anonymity' && isStudent && (
+                <View display="block" margin="medium 0">
+                  <AnonymousResponseSelector
+                    username={ENV.current_user.display_name}
+                    setAnonymousAuthorState={setAnonymousAuthorState}
+                    discussionAnonymousState={discussionAnonymousState}
+                  />
+                </View>
+              )}
             </View>
           )}
-        </View>
         <FormFieldGroup description="" rowSpacing="small">
           <Checkbox
             data-testid="require-initial-post-checkbox"

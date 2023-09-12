@@ -1862,6 +1862,34 @@ describe DiscussionTopicsController do
         expect(DiscussionTopic.last).to be_anonymous
       end
 
+      it "returns an error for creating anonymous discussions in a Group" do
+        @course.enable_feature! :react_discussions_post
+        group_category = @course.group_categories.create(name: "gc")
+        group = @course.groups.create!(group_category:)
+        user_session @teacher
+        post "create", params: group_topic_params(group, { anonymous_state: "full_anonymity" }), format: :json
+        expect(response).to have_http_status :bad_request
+        expect(response.parsed_body["errors"]).to(include { "anonymous_state" => "Group discussions cannot be anonymous." })
+      end
+
+      it "returns an error for creating anonymous discussions assigned to a Group Category in a Course" do
+        @course.enable_feature! :react_discussions_post
+        group_category = @course.group_categories.create(name: "gc")
+        user_session @teacher
+        post "create", params: topic_params(@course, { anonymous_state: "full_anonymity", group_category_id: group_category.id }), format: :json
+        expect(response).to have_http_status :bad_request
+        expect(response.parsed_body["errors"]).to(include { "anonymous_state" => "Group discussions cannot be anonymous." })
+      end
+
+      it "returns an error for creating a graded anonymous discussion" do
+        @course.enable_feature! :react_discussions_post
+        obj_params = topic_params(@course, { anonymous_state: "full_anonymity" }).merge(assignment_params(@course))
+        user_session(@teacher)
+        post "create", params: obj_params, format: :json
+        expect(response).to have_http_status :bad_request
+        expect(response.parsed_body["errors"]).to(include { "anonymous_state" => "Anonymous discussions cannot be graded" })
+      end
+
       it "allows partial_anonymity" do
         Account.site_admin.enable_feature! :react_discussions_post
         user_session @teacher
