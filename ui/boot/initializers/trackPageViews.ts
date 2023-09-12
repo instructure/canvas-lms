@@ -17,15 +17,16 @@
  */
 
 import $ from 'jquery'
+import type JQuery from 'jquery'
 import authenticity_token from '@canvas/authenticity-token'
 import '@canvas/jquery/jquery.ajaxJSON'
 
-if (!('INST' in window)) window.INST = {}
+window.INST = window.INST || {}
 
 let update_url = window.ENV.page_view_update_url
 if (update_url) {
   $(() => {
-    let interactionSeconds = 0
+    let interactionSeconds: number = 0
 
     INST.interaction_contexts = {}
 
@@ -37,13 +38,16 @@ if (update_url) {
         update_url = new_update_url
       })
 
-      let updateTrigger
-      $(document).bind('page_view_update', (event, force) => {
-        const data = {}
+      let updateTrigger: number
+      $(document).bind('page_view_update', (_event, force) => {
+        const data: {
+          interaction_seconds?: number
+        } = {}
 
         if (force || (interactionSeconds > 10 && secondsSinceLastEvent < intervalInSeconds)) {
           data.interaction_seconds = interactionSeconds
-          $.ajaxJSON(update_url, 'PUT', data, null, (result, xhr) => {
+          // TODO: use fetch
+          $.ajaxJSON(update_url, 'PUT', data, null, (_result: any, xhr: JQuery.jqXHR) => {
             if (xhr.status === 422) {
               clearInterval(updateTrigger)
             }
@@ -52,9 +56,11 @@ if (update_url) {
         }
       })
 
+      // despite "lib": ["DOM", "ES2020", "ESNext"] in tsconfig.json,
+      // setInterval return still typed as NodeJS.Timer
       updateTrigger = setInterval(() => {
         $(document).triggerHandler('page_view_update')
-      }, 1000 * intervalInSeconds)
+      }, 1000 * intervalInSeconds) as unknown as number
 
       window.addEventListener(
         'unload',
@@ -64,7 +70,7 @@ if (update_url) {
             // but because sendBeacon only sends POST requests, we have to use FormData to fake the "_method" to PUT
             // like Rail's `form_for` does
             const formData = new FormData()
-            formData.append('interaction_seconds', interactionSeconds)
+            formData.append('interaction_seconds', String(interactionSeconds))
             formData.append('_method', 'put')
             formData.append('authenticity_token', authenticity_token())
             formData.append('utf8', '&#x2713')
