@@ -46,7 +46,8 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
         context_type: input[:context_type],
         title: input[:title],
         message: input[:message],
-        workflow_state: input[:published] ? "active" : "unpublished"
+        workflow_state: input[:published] ? "active" : "unpublished",
+        require_initial_post: input[:require_initial_post]
       }
     )
     verify_authorized_action!(discussion_topic, :create)

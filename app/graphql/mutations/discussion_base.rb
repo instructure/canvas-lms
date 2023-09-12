@@ -23,6 +23,7 @@ class Mutations::DiscussionBase < Mutations::BaseMutation
   argument :message, String, required: false
   argument :published, Boolean, required: false
   argument :title, String, required: false
+  argument :require_initial_post, Boolean, required: false
 
   field :discussion_topic, Types::DiscussionType, null: true
 end

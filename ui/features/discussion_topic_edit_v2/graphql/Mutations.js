@@ -26,6 +26,7 @@ export const CREATE_DISCUSSION_TOPIC = gql`
     $title: String
     $message: String
     $published: Boolean
+    $requireInitialPost: Boolean
   ) {
     createDiscussionTopic(
       input: {
@@ -34,6 +35,7 @@ export const CREATE_DISCUSSION_TOPIC = gql`
         title: $title
         message: $message
         published: $published
+        requireInitialPost: $requireInitialPost
       }
     ) {
       discussionTopic {
