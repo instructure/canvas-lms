@@ -17,8 +17,8 @@ RUN --mount=target=/tmp/src \
     gems/**/*.gemspec \
     gems/**/gem_version.rb \
     gems/**/version.rb \
-    gems/bundler_lockfile_extensions \
     gems/plugins/**/Gemfile.d \
+    vendor/gems/bundler-multilock \
     \
     | tee /tmp/dst/ruby-runner.tar | md5sum > /tmp/dst/ruby-runner.tar.md5 && \
   \

@@ -11,9 +11,19 @@
 
 source "https://rubygems.org/"
 
-plugin "bundler_lockfile_extensions", path: "gems/bundler_lockfile_extensions"
+# cleanup local envs automatically from the old plugin
+Plugin.uninstall(["bundler_lockfile_extensions"], {}) if Plugin.installed?("bundler_lockfile_extensions")
 
-require File.expand_path("config/canvas_rails_switcher", __dir__)
+# vendored until https://github.com/rubygems/rubygems/pull/6957 is merged and released
+plugin "bundler-multilock", "1.0.7", path: "vendor/gems/bundler-multilock"
+# the extra check here is in case `bundle check` or `bundle exec` gets run before `bundle install`,
+# and is also fixed by the same PR
+raise GemNotFound, "bundler-multilock plugin is not installed" if !is_a?(Bundler::Plugin::DSL) && !Plugin.installed?("bundler-multilock")
+return unless Plugin.installed?("bundler-multilock")
+
+Plugin.send(:load_plugin, "bundler-multilock")
+
+require_relative "config/canvas_rails_switcher"
 
 # Bundler evaluates this from a non-global context for plugins, so we have
 # to explicitly pop up to set global constants
@@ -22,47 +32,29 @@ require File.expand_path("config/canvas_rails_switcher", __dir__)
 # will already be defined during the second Gemfile evaluation
 ::CANVAS_INCLUDE_PLUGINS = true unless defined?(::CANVAS_INCLUDE_PLUGINS)
 
-if Plugin.installed?("bundler_lockfile_extensions")
-  Plugin.send(:load_plugin, "bundler_lockfile_extensions") unless defined?(BundlerLockfileExtensions)
+SUPPORTED_RAILS_VERSIONS.product([nil, true]).each do |rails_version, include_plugins|
+  lockfile = ["rails#{rails_version.delete(".")}", include_plugins && "plugins"].compact.join(".")
+  lockfile = nil if rails_version == SUPPORTED_RAILS_VERSIONS.first && !include_plugins
 
-  unless BundlerLockfileExtensions.enabled?
-    default = true
-    SUPPORTED_RAILS_VERSIONS.product([nil, true]).each do |rails_version, include_plugins|
-      prepare = lambda do
-        Object.send(:remove_const, :CANVAS_RAILS)
-        ::CANVAS_RAILS = rails_version
-        Object.send(:remove_const, :CANVAS_INCLUDE_PLUGINS)
-        ::CANVAS_INCLUDE_PLUGINS = include_plugins
-      end
+  default = rails_version == CANVAS_RAILS && !!include_plugins
 
-      lockfile = ["Gemfile", "rails#{rails_version.delete(".")}", include_plugins && "plugins", "lock"].compact.join(".")
-      lockfile = nil if default
-      # only the first lockfile is the default
-      default = false
-
-      current = rails_version == CANVAS_RAILS && include_plugins
-
-      add_lockfile(lockfile,
-                   current:,
-                   prepare:,
-                   allow_mismatched_dependencies: rails_version != SUPPORTED_RAILS_VERSIONS.first,
-                   enforce_pinned_additional_dependencies: include_plugins)
-    end
-
-    Dir["Gemfile.d/*.lock", "gems/*/Gemfile.lock", base: Bundler.root].each do |gem_lockfile_name|
-      return unless add_lockfile(gem_lockfile_name,
-                                 gemfile: gem_lockfile_name.sub(/\.lock$/, ""),
-                                 allow_mismatched_dependencies: false)
-    end
+  lockfile(lockfile,
+           default:,
+           allow_mismatched_dependencies: rails_version != SUPPORTED_RAILS_VERSIONS.first,
+           enforce_pinned_additional_dependencies: include_plugins) do
+    Object.send(:remove_const, :CANVAS_RAILS)
+    ::CANVAS_RAILS = rails_version
+    Object.send(:remove_const, :CANVAS_INCLUDE_PLUGINS)
+    ::CANVAS_INCLUDE_PLUGINS = include_plugins
   end
 end
-# rubocop:enable Style/RedundantConstantBase
 
-# Bundler's first pass parses the entire Gemfile and calls to additional sources
-# makes it actually go and retrieve metadata from them even though the plugin will
-# never exist there. Short-circuit it here if we're in the plugin-specific DSL
-# phase to prevent that from happening.
-return if method(:source).owner == Bundler::Plugin::DSL
+Dir["Gemfile.d/*.lock", "gems/*/Gemfile.lock", base: Bundler.root].each do |gem_lockfile_name|
+  return unless lockfile(gem_lockfile_name,
+                         gemfile: gem_lockfile_name.sub(/\.lock$/, ""),
+                         allow_mismatched_dependencies: false)
+end
+# rubocop:enable Style/RedundantConstantBase
 
 module PreferGlobalRubyGemsSource
   def rubygems_sources
