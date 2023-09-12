@@ -112,7 +112,16 @@ class LearningOutcomeGroup < ActiveRecord::Base
       }
     end
 
-    ContentTag.insert_all(new_tags)
+    tags = ContentTag.insert_all(new_tags, returning: %w[id content_id associated_asset_id context_id context_type workflow_state])
+
+    Struct.new("OutcomeLink", :id, :content_id, :associated_asset_id, :context_id, :context_type, :workflow_state)
+
+    tags.rows.each do |tag|
+      link = Struct::OutcomeLink.new(tag[0], tag[1], tag[2], tag[3], tag[4], tag[5])
+      Canvas::LiveEvents.learning_outcome_link_created(link)
+    rescue => e
+      Canvas::Errors.capture_exception(:learning_outcome_link_creation, e, :error)
+    end
 
     touch_set.group_by(&:class).each do |cls, idset|
       cls.where(id: idset).update_all(updated_at: timestamp)

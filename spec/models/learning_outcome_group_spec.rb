@@ -163,6 +163,15 @@ describe LearningOutcomeGroup do
       expect(group.reload.child_outcome_links.map(&:content_id)).to include(outcome.id)
     end
 
+    it "triggers live event manually to create outcome edge" do
+      group = @course.learning_outcome_groups.create!(title: "groupage")
+      outcome = @course.created_learning_outcomes.create!(title: "o1")
+
+      expect(group.child_outcome_links.map(&:content_id)).not_to include(outcome.id)
+      expect(Canvas::LiveEvents).to receive(:learning_outcome_link_created)
+      LearningOutcomeGroup.bulk_link_outcome(outcome, LearningOutcomeGroup.where(id: group.id), root_account_id: Account.default.id)
+    end
+
     it "touches context when adding outcome to group" do
       group = @course.learning_outcome_groups.create!(title: "groupage")
       outcome = @course.created_learning_outcomes.create!(title: "o1")
