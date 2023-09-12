@@ -1234,4 +1234,55 @@ describe SIS::CSV::EnrollmentImporter do
     expect(@observer.enrollments.size).to eq 0
     expect(importer.errors.map(&:last)).to eq ["Observer enrollment for \"dee\" not allowed in blueprint course \"blue\""]
   end
+
+  describe "temporary enrollments" do
+    before(:once) do
+      process_csv_data_cleanly(
+        "course_id,short_name,long_name,account_id,term_id,status",
+        "test_1,TC 101,Test Course 101,,,active"
+      )
+      process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status",
+        "provider,provider,Temp,Provider,provider@example.com,active",
+        "recipient,recipient,Temp,Recipient,recipient@example.com,active"
+      )
+      @course = Course.where(sis_source_id: "test_1").first
+      @recipient = Pseudonym.where(sis_user_id: "recipient").first.user
+      @provider = Pseudonym.where(sis_user_id: "provider").first.user
+    end
+
+    context "when feature flag is enabled" do
+      before(:once) do
+        @course.root_account.enable_feature!(:temporary_enrollments)
+        process_csv_data_cleanly(
+          "course_id,user_id,role,status,start_date,end_date,temporary_enrollment_source_user_id",
+          "test_1,provider,teacher,active,2023-09-10T23:08:51Z,2023-09-30T23:08:51Z,,",
+          "test_1,recipient,teacher,active,2023-09-10T23:08:51Z,2043-09-30T23:08:51Z,provider"
+        )
+      end
+
+      it "creates a new temporary enrollment association" do
+        expect(@course.enrollments.count).to eq 2
+        expect(@recipient.enrollments.map(&:type)).to eq ["TeacherEnrollment"]
+        expect(@recipient.enrollments.take.temporary_enrollment_source_user_id).to eq @provider.id
+      end
+    end
+
+    context "when feature flag is disabled" do
+      before(:once) do
+        @course.root_account.disable_feature!(:temporary_enrollments)
+        process_csv_data_cleanly(
+          "course_id,user_id,role,status,start_date,end_date,temporary_enrollment_source_user_id",
+          "test_1,provider,teacher,active,2023-09-10T23:08:51Z,2023-09-30T23:08:51Z,,",
+          "test_1,recipient,teacher,active,2023-09-10T23:08:51Z,2043-09-30T23:08:51Z,provider"
+        )
+      end
+
+      it "does not create a new temporary enrollment association" do
+        expect(@course.enrollments.count).to eq 2
+        expect(@recipient.enrollments.map(&:type)).to eq ["TeacherEnrollment"]
+        expect(@recipient.enrollments.take.temporary_enrollment_source_user_id).to be_nil
+      end
+    end
+  end
 end
