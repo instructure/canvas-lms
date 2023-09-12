@@ -412,8 +412,6 @@ describe "discussions" do
   context "when discussion_create feature flag is ON", :ignore_js_errors do
     before do
       Account.site_admin.enable_feature! :discussion_create
-      # we will turn react_discussions_post on here as well (altough it is not required)
-      Account.site_admin.enable_feature! :react_discussions_post
     end
 
     context "as a teacher" do
@@ -422,24 +420,36 @@ describe "discussions" do
       end
 
       it "creates a new discussion topic successfully" do
+        get "/courses/#{course.id}/discussion_topics/new"
+
         title = "My Test Topic"
         message = "replying to topic"
-        get "/courses/#{course.id}/discussion_topics/new"
+
+        # Set title
         f("input[placeholder='Topic Title']").send_keys title
+        # Set Message
         type_in_tiny("textarea", message)
+        # Set require_initial_post
+        force_click("input[data-testid='require-initial-post-checkbox']")
+        # Save and publish
         f("button[data-testid='save-and-publish-button']").click
         wait_for_ajaximations
+
         dt = DiscussionTopic.last
         expect(dt.title).to eq title
         expect(dt.message).to include message
+        expect(dt.require_initial_post).to be true
         expect(dt).to be_published
-        expect(fj("div[data-testid='discussion-topic-container'] span:contains('#{title}')")).to be_present
+
+        # Verify that the discussion topic redirected the page to the new discussion topic
+        expect(driver.current_url).to end_with("/courses/#{course.id}/discussion_topics/#{dt.id}")
       end
 
       it "shows course sections or course group categories" do
         new_section
         group_category
         group
+
         get "/courses/#{course.id}/discussion_topics/new"
         f("[data-testid='section-select']").click
         # verify all sections exist in the dropdown

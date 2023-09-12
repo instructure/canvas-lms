@@ -36,6 +36,7 @@ describe Mutations::CreateDiscussionTopic do
             title
             message
             published
+            requireInitialPost
           }
           errors {
             attribute
@@ -48,17 +49,20 @@ describe Mutations::CreateDiscussionTopic do
     CanvasSchema.execute(mutation_command, context:)
   end
 
-  it "creates the discussion entry and returns id" do
+  it "successfully creates the discussion topic" do
     context_type = "Course"
     title = "Test Title"
     message = "A message"
     published = false
+    require_initial_post = true
+
     query = <<~GQL
       contextId: "#{@course.id}"
       contextType: "#{context_type}"
       title: "#{title}"
       message: "#{message}"
       published: #{published}
+      requireInitialPost: #{require_initial_post}
     GQL
 
     result = execute_with_input(query)
@@ -66,10 +70,12 @@ describe Mutations::CreateDiscussionTopic do
 
     expect(result["errors"]).to be_nil
     expect(result.dig("data", "discussionTopic", "errors")).to be_nil
+
     expect(created_discussion_topic["contextType"]).to eq context_type
     expect(created_discussion_topic["title"]).to eq title
     expect(created_discussion_topic["message"]).to eq message
     expect(created_discussion_topic["published"]).to eq published
+    expect(created_discussion_topic["requireInitialPost"]).to be true
     expect(DiscussionTopic.where("id = #{created_discussion_topic["_id"]}").count).to eq 1
   end
 

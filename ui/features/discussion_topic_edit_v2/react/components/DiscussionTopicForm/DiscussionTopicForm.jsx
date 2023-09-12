@@ -62,7 +62,7 @@ export default function DiscussionTopicForm({
 
   const [discussionAnonymousState, setDiscussionAnonymousState] = useState('off')
   const [anonymousAuthorState, setAnonymousAuthorState] = useState(false)
-  const [respondBeforeReply, setRespondBeforeReply] = useState(false)
+  const [requireInitialPost, setRequireInitialPost] = useState(false)
   const [enablePodcastFeed, setEnablePodcastFeed] = useState(false)
   const [includeRepliesInFeed, setIncludeRepliesInFeed] = useState(false)
   const [isGraded, setIsGraded] = useState(false)
@@ -102,7 +102,7 @@ export default function DiscussionTopicForm({
 
     setDiscussionAnonymousState(currentDiscussionTopic.anonymousState || 'off')
     // setAnonymousAuthorState() TODO: is this necessary? Designs are unclear
-    setRespondBeforeReply(currentDiscussionTopic.requireInitialPost)
+    setRequireInitialPost(currentDiscussionTopic.requireInitialPost)
     setEnablePodcastFeed(currentDiscussionTopic.podcastEnabled)
     setIncludeRepliesInFeed(currentDiscussionTopic.podcastHasStudentPosts)
     // setIsGraded TODO: phase 2
@@ -161,7 +161,7 @@ export default function DiscussionTopicForm({
         sectionIdsToPostTo,
         discussionAnonymousState,
         anonymousAuthorState,
-        respondBeforeReply,
+        requireInitialPost,
         enablePodcastFeed,
         includeRepliesInFeed,
         isGraded,
@@ -302,10 +302,11 @@ export default function DiscussionTopicForm({
         </View>
         <FormFieldGroup description="" rowSpacing="small">
           <Checkbox
+            data-testid="require-initial-post-checkbox"
             label={I18n.t('Participants must respond to the topic before viewing other replies')}
             value="must-respond-before-viewing-replies"
-            checked={respondBeforeReply}
-            onChange={() => setRespondBeforeReply(!respondBeforeReply)}
+            checked={requireInitialPost}
+            onChange={() => setRequireInitialPost(!requireInitialPost)}
           />
           <Checkbox
             label={I18n.t('Enable podcast feed')}

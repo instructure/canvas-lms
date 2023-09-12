@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useContext} from 'react'
+import React, {useContext} from 'react'
 
 import {useQuery, useMutation} from 'react-apollo'
 import {COURSE_QUERY, DISCUSSION_TOPIC_QUERY} from '../../../graphql/Queries'
@@ -75,21 +75,6 @@ export default function DiscussionTopicFormContainer() {
     },
   })
 
-  const createDiscussionTopicOnSubmit = useCallback(
-    ({title, message, shouldPublish}) => {
-      createDiscussionTopic({
-        variables: {
-          contextId: ENV.context_id,
-          contextType: 'Course',
-          title,
-          message,
-          published: shouldPublish,
-        },
-      })
-    },
-    [createDiscussionTopic]
-  )
-
   if (courseIsLoading || topicIsLoading) {
     return <LoadingIndicator />
   }
@@ -101,14 +86,19 @@ export default function DiscussionTopicFormContainer() {
       isStudent={ENV.is_student}
       sections={sections}
       groupCategories={groupCategories}
-      onSubmit={
-        isEditing
-          ? () => {
-              // eslint-disable-next-line no-console
-              console.log('change this to call updateDiscussionTopicOnSubmit later')
-            }
-          : createDiscussionTopicOnSubmit
-      }
+      onSubmit={({title, message, shouldPublish, requireInitialPost}) => {
+        isEditing ? () => {console.log("call updateDiscussion")} :
+        createDiscussionTopic({
+          variables: {
+            contextId: ENV.context_id,
+            contextType: 'Course',
+            title,
+            message,
+            published: shouldPublish,
+            requireInitialPost
+          },
+        })
+      }}
     />
   )
 }
