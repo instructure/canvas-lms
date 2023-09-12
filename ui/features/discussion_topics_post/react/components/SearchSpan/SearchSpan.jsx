@@ -19,17 +19,46 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+// add highlighting and remove HTML from all incoming text
+// with the exception of anything within the <iframe></iframe> HTML tag
 const addSearchHighlighting = (searchTerm, searchArea, isIsolatedView) => {
-  if (!!searchArea && !!searchTerm && !isIsolatedView) {
-    const searchExpression = new RegExp(`(${searchTerm})`, 'gi')
+  // Check for conditions where highlighting should not be applied
+  if (!searchArea || !searchTerm || isIsolatedView) {
     return searchArea
-      .replace(/<[^>]*>?/gm, '')
-      .replace(
-        searchExpression,
-        '<span data-testid="highlighted-search-item" style="background-color: rgba(0,142,226,0.2); border-radius: .25rem; padding-bottom: 3px; padding-top: 1px;">$1</span>'
-      )
   }
-  return searchArea
+
+  let cursor = 0 // Initialize cursor to keep track of position in searchArea
+  const iframePattern = /<iframe[\s\S]*?<\/iframe>/gi // Regular expression to match <iframe> elements
+
+  // Get an array of all matches using matchAll, then process them
+  const iframeMatches = Array.from(searchArea.matchAll(iframePattern))
+  const modifiedHtml = iframeMatches
+    .map(iframeMatch => {
+      const startIndexOfIframeHtml = iframeMatch.index
+      const endIndexOfIframeHtml = startIndexOfIframeHtml + iframeMatch[0].length
+      const highlightedPart = highlightText(
+        searchArea.substring(cursor, startIndexOfIframeHtml),
+        searchTerm
+      )
+      cursor = endIndexOfIframeHtml
+      // Construct modified HTML for this match
+      return `${highlightedPart}<br>${iframeMatch[0]}<br>`
+    })
+    .join('') // Join all modified HTML strings into a single string
+
+  // Highlight any remaining text after the last match
+  return modifiedHtml + highlightText(searchArea.substring(cursor), searchTerm)
+}
+
+// Highlight the search term and remove HTML
+const highlightText = (text, searchTerm) => {
+  const searchExpression = new RegExp(`(${searchTerm})`, 'gi')
+  return text
+    .replace(/<[^>]*>?/gm, '')
+    .replace(
+      searchExpression,
+      '<span data-testid="highlighted-search-item" style="background-color: rgba(0,142,226,0.2); border-radius: .25rem; padding-bottom: 3px; padding-top: 1px;">$1</span>'
+    )
 }
 
 export function SearchSpan({...props}) {

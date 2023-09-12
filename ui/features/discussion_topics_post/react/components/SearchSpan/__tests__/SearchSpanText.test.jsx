@@ -73,4 +73,21 @@ describe('SearchSpan', () => {
     expect(container.queryAllByTestId('highlighted-search-item').length).toBe(0)
     expect(container.queryByText('strong')).toBeNull()
   })
+
+  it('should ignore iframe html tags', () => {
+    const iframe = `<iframe style="width: 400px; height: 225px; display: inline-block;" title="Video player for 2023-05-23 13-24-01.mp4" data-media-type="video" src="https://mediacenter.com" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-4ws5T"></iframe>`
+    const content = `<p>Testing whether only the iframe html tag is ignored: ${iframe}<br /> will the i-f-r-a-m-e html ta get highlighted?</p>`
+
+    const container = setup({
+      searchTerm: 'iframe',
+      text: content,
+    })
+
+    // iframe is in the content 3 times
+    expect(content.split('iframe').length - 1).toBe(3)
+    // only the 'iframe' text that is not in an html tag should be highlighted.
+    expect(container.queryAllByTestId('highlighted-search-item').length).toBe(1)
+    // The iframe html tag wasn't removed
+    expect(container.container.innerHTML).toContain('<iframe')
+  })
 })
