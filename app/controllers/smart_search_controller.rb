@@ -47,13 +47,13 @@ class SmartSearchController < ApplicationController
         # TODO: Paginate and remove the hardcoded limit (ADV-23)
         sql = <<-SQL.squish
                 SELECT wp.*, (wpe.embedding <=> ?) AS distance
-                FROM "wiki_pages" wp
-                INNER JOIN "enrollments" AS e
+                FROM #{WikiPage.quoted_table_name} wp
+                INNER JOIN #{Enrollment.quoted_table_name} AS e
                     ON wp.context_type = 'Course'
                     AND wp.context_id = e.course_id
-                INNER JOIN "enrollment_states" AS es
+                INNER JOIN #{EnrollmentState.quoted_table_name} AS es
                     ON e.id = es.enrollment_id
-                INNER JOIN "wiki_page_embeddings" AS wpe
+                INNER JOIN #{WikiPageEmbedding.quoted_table_name} AS wpe
                     ON wp.id = wpe.wiki_page_id
                 WHERE
                     e.user_id = ?
