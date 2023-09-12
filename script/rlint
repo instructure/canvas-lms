@@ -15,7 +15,7 @@ require "optparse"
 
 linter_options = {
   linter_name: "Rubocop",
-  file_regex: %r{(?:\.rb|\.rake|\.gemspec|/[^./]+)$},
+  file_regex: %r{(?:\.rb|\.rake|\.gemspec|Gemfile|/[^./]+)$},
   format: "rubocop",
   command: +"bin/rubocop --force-exclusion",
   auto_correct: false,
