@@ -670,8 +670,8 @@
                 <div class="checkbox-flex-container">
                 <%= f.check_box :hide_final_grades, :disabled => !can_manage %>
                 <%= f.label :hide_final_grades, :en => "Hide totals in student grades summary" %><br/>
+                </div>
               <% end %>
-              </div>
               <% unless @context.elementary_subject_course? || (@context.restrict_quantitative_data && @context.root_account.feature_enabled?(:restrict_quantitative_data)) %>
                 <div class="checkbox-flex-container">
                 <%= f.check_box :hide_distribution_graphs, :disabled => !can_manage %>
