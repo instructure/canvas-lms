@@ -233,6 +233,7 @@ module SIS
           incrementally_update_account_associations if @section != @last_section && !@incrementally_update_account_associations_user_ids.empty?
 
           associated_user_id = nil
+          temporary_enrollment_source_user_id = nil
 
           role = nil
           if enrollment_info.role_id
@@ -280,9 +281,22 @@ module SIS
               next
             end
           end
+
+          if enrollment_info.temporary_enrollment_source_user_id
+            a_pseudo = root_account.pseudonyms.where(sis_user_id: enrollment_info.temporary_enrollment_source_user_id).take
+            if a_pseudo
+              temporary_enrollment_source_user_id = a_pseudo.user_id
+            else
+              message = "An enrollment referenced a non-existent temporary enrollment source user #{enrollment_info.temporary_enrollment_source_user_id}"
+              @messages << SisBatch.build_error(enrollment_info.csv, message, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info.row_info)
+              next
+            end
+          end
+
           enrollment = @section.all_enrollments.where(user_id: user,
                                                       type:,
                                                       associated_user_id:,
+                                                      temporary_enrollment_source_user_id:,
                                                       role_id: role).take
 
           enrollment ||= Enrollment.typed_enrollment(type).new
@@ -296,8 +310,17 @@ module SIS
           if enrollment_info.limit_section_privileges
             enrollment.limit_privileges_to_course_section = Canvas::Plugin.value_to_boolean(enrollment_info.limit_section_privileges)
           end
+          if @course.root_account&.feature_enabled?(:temporary_enrollments)
+            enrollment.temporary_enrollment_source_user_id = temporary_enrollment_source_user_id
+          end
 
-          next if enrollment_status(associated_user_id, enrollment, enrollment_info, pseudo, role, user)
+          next if enrollment_status(associated_user_id,
+                                    temporary_enrollment_source_user_id,
+                                    enrollment,
+                                    enrollment_info,
+                                    pseudo,
+                                    role,
+                                    user)
 
           unless enrollment.stuck_sis_fields.intersect?([:start_at, :end_at])
             enrollment.start_at = enrollment_info.start_date
@@ -382,7 +405,7 @@ module SIS
 
       private
 
-      def enrollment_status(associated_user_id, enrollment, enrollment_info, pseudo, role, user)
+      def enrollment_status(associated_user_id, temporary_enrollment_source_user_id, enrollment, enrollment_info, pseudo, role, user)
         all_done = false
         return true if enrollment.workflow_state == "deleted" && pseudo.workflow_state == "deleted"
 
@@ -398,7 +421,9 @@ module SIS
           # if any matching enrollment for the same user in the same course
           # exists, we will mark the enrollment as deleted, but if it is the
           # last enrollment it gets marked as completed
-          if @course.enrollments.active.where(user:, associated_user_id:, role:).where.not(id: enrollment.id).exists?
+          if @course.enrollments.active
+                    .where(user:, associated_user_id:, temporary_enrollment_source_user_id:, role:)
+                    .where.not(id: enrollment.id).exists?
             all_done = deleted_status(enrollment)
           else
             completed_status(enrollment)
