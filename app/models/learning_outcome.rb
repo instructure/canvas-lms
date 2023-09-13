@@ -209,7 +209,7 @@ class LearningOutcome < ActiveRecord::Base
 
   def default_calculation_method
     if new_decaying_average_calculation_ff_enabled?
-      "weighted_average"
+      "standard_decaying_average"
     else
       "decaying_average"
     end
