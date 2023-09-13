@@ -46,7 +46,7 @@ class SmartSearchController < ApplicationController
         # TODO: Prevent duplicates after chunking embeddings is implemented
         # TODO: Paginate and remove the hardcoded limit (ADV-23)
         sql = <<-SQL.squish
-                SELECT wp.*, (wpe.embedding <=> ?) AS distance
+                SELECT wp.*, (wpe.embedding #{quoted_operator_name("<=>")} ?) AS distance
                 FROM #{WikiPage.quoted_table_name} wp
                 INNER JOIN #{Enrollment.quoted_table_name} AS e
                     ON wp.context_type = 'Course'
@@ -75,5 +75,11 @@ class SmartSearchController < ApplicationController
   def show
     render_unauthorized_action unless OpenAi.smart_search_available?(@domain_root_account)
     # TODO: Add state required for new page render
+  end
+
+  protected
+
+  def quoted_operator_name(operator)
+    "operator(#{PG::Connection.quote_ident(ActiveRecord::Base.connection.extension("vector").schema)}.#{operator})"
   end
 end
