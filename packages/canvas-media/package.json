@@ -35,7 +35,7 @@
   "dependencies": {
     "@instructure/canvas-theme": "7",
     "@instructure/k5uploader": "*",
-    "@instructure/media-capture": "~8.4.1-rc.16",
+    "@instructure/media-capture": "^9.0.0",
     "@instructure/ui-a11y-content": "^7",
     "@instructure/ui-alerts": "^7",
     "@instructure/ui-billboard": "^7",
@@ -46,7 +46,7 @@
     "@instructure/ui-flex": "^7",
     "@instructure/ui-heading": "^7",
     "@instructure/ui-icons": "7",
-    "@instructure/ui-media-player": "^7.2",
+    "@instructure/ui-media-player": "^9.0.0",
     "@instructure/ui-modal": "^7",
     "@instructure/ui-pagination": "^7",
     "@instructure/ui-progress": "^7",
