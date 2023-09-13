@@ -104,7 +104,7 @@ class SplitUsers
       users = new(user, merge_data).split_users
     else
       users = []
-      UserMergeData.active.splitable.where(user_id: user).shard(user).find_each do |data|
+      UserMergeData.active.splitable.where(user_id: user).shard(user).order(created_at: :desc).uniq(&:from_user_id).each do |data|
         splitters = new(user, data).split_users
         users = splitters | users
       end
