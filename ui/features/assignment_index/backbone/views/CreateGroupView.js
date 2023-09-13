@@ -176,7 +176,7 @@ class CreateGroupView extends DialogFormView {
       label_id: this.model.get('id') || 'new',
       drop_lowest: this.model.rules()?.drop_lowest || 0,
       drop_highest: this.model.rules()?.drop_highest || 0,
-      editable_drop: this.model.get('assignments').length > 0,
+      editable_drop: this.model.get('assignments').length > 0 || this.model.get('id'),
       // Safari is not fully compatiable with html5 validation - needs to be set to text instead to ensure our validations work
       number_input: navigator.userAgent.match(/Version\/[\d\.]+.*Safari/) ? 'text' : 'number',
       small_tablet: isSmallTablet,
@@ -184,7 +184,7 @@ class CreateGroupView extends DialogFormView {
   }
 
   openAgain() {
-    if (this.model.get('assignments').length === 0) {
+    if (this.model.get('assignments').length === 0 && this.model.get('id') === undefined) {
       this.setDimensions(this.defaults.width, SHORT_HEIGHT)
     }
 

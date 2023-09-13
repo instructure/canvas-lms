@@ -61,7 +61,8 @@ test('should be accessible', assert => {
   assertions.isAccessible(view, done, {a11yReport: true})
 })
 
-test('hides drop options for no assignments', () => {
+// when creating a new Assignment Group
+test('it does hides drop options for no assignments and undefined assignmentGroup id', () => {
   const view = createView()
   view.render()
   ok(view.$('[name="rules[drop_lowest]"]').length)
