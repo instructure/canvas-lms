@@ -1589,6 +1589,55 @@ describe ContentMigration do
         run_migration
       end
 
+      context "when you delete the rubric and the outcome from the blueprint and run a sync" do
+        it "outcome is deleted from the associated course" do
+          @rubric_from = outcome_with_rubric context: @course_from, outcome: @outcome_from
+          @rubric_from.associate_with(@course_from, @course_from)
+          run_migration
+          expect(@course_to.reload.rubrics.count).to eq 1
+          @rubric_from.destroy!
+          @outcome_from.destroy!
+          @outcome_to = @course_to.learning_outcomes.where(migration_id: mig_id(@outcome_from)).first
+          run_migration
+          expect(@outcome_to.reload).to be_deleted
+        end
+      end
+
+      context "when you un-associate the outcome from the rubric and delete the outcome from the blueprint and run a sync" do
+        it "outcome is deleted from the associated course" do
+          @rubric_from = outcome_with_rubric context: @course_from, outcome: @outcome_from
+          @rubric_from.associate_with(@course_from, @course_from)
+          run_migration
+          expect(@course_to.reload.rubrics.count).to eq 1
+          criteria = {
+            "1" => {
+              points: 5,
+              description: "no outcome row",
+              long_description: "non outcome criterion",
+              ratings: {
+                "0" => {
+                  points: 5,
+                  description: "Amazing",
+                },
+                "1" => {
+                  points: 3,
+                  description: "not too bad",
+                },
+                "2" => {
+                  points: 0,
+                  description: "no bueno",
+                }
+              }
+            }
+          }
+          @rubric_from.update_criteria({ criteria: })
+          @outcome_from.destroy!
+          @outcome_to = @course_to.learning_outcomes.where(migration_id: mig_id(@outcome_from)).first
+          run_migration
+          expect(@outcome_to.reload).to be_deleted
+        end
+      end
+
       it "there are no learning outcome results, authoritative results, and alignments" do
         @outcome_to = @course_to.learning_outcomes.where(migration_id: mig_id(@outcome_from)).first
         @outcome_from.destroy!
