@@ -25,9 +25,20 @@ export interface EnvCommon {
   ASSET_HOST: string
   active_brand_config_json_url: string
   active_brand_config: object
+  badge_counts?: {
+    discussions: number
+    assignments: number
+    conversations: number
+    grades: number
+    alerts: number
+    announcements: number
+    submissions: number
+    total: number
+  }
   confetti_branding_enabled: boolean
   url_to_what_gets_loaded_inside_the_tinymce_editor_css: string
   url_for_high_contrast_tinymce_editor_css: string
+  csp?: string
   current_user_id: string
   current_user_global_id: string
   current_user_roles: string[]
@@ -53,6 +64,7 @@ export interface EnvCommon {
   DEEP_LINKING_POST_MESSAGE_ORIGIN: string
   DEEP_LINKING_LOGGING: null | unknown
   comment_library_suggestions_enabled: boolean
+  INCOMPLETE_REGISTRATION: boolean
   SETTINGS: {
     open_registration: boolean
     collapse_global_nav: boolean
@@ -207,7 +219,7 @@ export type BrandAccountFeatureId = 'embedded_release_notes'
  * Feature id exported in ApplicationController that aren't mentioned in
  * JS_ENV_SITE_ADMIN_FEATURES or JS_ENV_ROOT_ACCOUNT_FEATURES or JS_ENV_BRAND_ACCOUNT_FEATURES
  */
-export type OtherFeatureId = 'canvas_k6_theme'
+export type OtherFeatureId = 'canvas_k6_theme' | 'new_math_equation_handling'
 
 /**
  * From ApplicationHelper#set_tutorial_js_env

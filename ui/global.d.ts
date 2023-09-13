@@ -54,6 +54,10 @@ declare global {
     jsonData: any
     messageStudents: (options: ReturnType<typeof sendMessageStudentsWho>) => void
     updateGrades: () => void
+
+    bundles: Array<() => void>
+    deferredBundles: Array<() => void>
+    canvasReadyState?: 'loading' | 'complete'
   }
 
   /**

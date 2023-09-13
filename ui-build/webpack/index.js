@@ -134,7 +134,7 @@ module.exports = {
   devtool: getDevtool(skipSourcemaps),
 
   // we don't yet use multiple entry points
-  entry: {main: resolve(canvasDir, 'ui/index.js')},
+  entry: {main: resolve(canvasDir, 'ui/index.ts')},
 
   watchOptions: {ignored: ['**/node_modules/']},
 

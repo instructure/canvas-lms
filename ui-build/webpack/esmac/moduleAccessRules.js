@@ -19,7 +19,7 @@
 module.exports = [
   {
     rule: 'Let the initializer do what it needs to',
-    source: 'ui/index.js',
+    source: 'ui/index.ts',
     target: '**',
     specifier: 'any',
   },
