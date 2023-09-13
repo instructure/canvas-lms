@@ -26,7 +26,7 @@ import $ from 'jquery'
 import {isolate} from '@canvas/sentry'
 import ReactDOM from 'react-dom'
 import React from 'react'
-import {GroupNavigationSelector} from '../../shared/group-navigation-selector'
+import GroupNavigationSelector from '@canvas/group-navigation-selector'
 
 // modules that do their own thing on every page that simply need to be required
 import './addBrowserClasses'
