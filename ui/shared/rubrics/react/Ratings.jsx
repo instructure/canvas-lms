@@ -246,6 +246,7 @@ const Ratings = props => {
             onClick={() => handleClick(tier, selected)}
             shaderClass={getShaderClass(selected)}
             tierColor={getTierColor(selected)}
+            long_description={tier.long_description}
             hidePoints={isSummary || hidePoints}
             isSummary={isSummary}
             selected={selected}

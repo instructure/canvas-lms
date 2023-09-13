@@ -27,8 +27,15 @@ import {Table} from '@instructure/ui-table'
 
 const defaultProps = {
   assignment: Assignment.mock(),
+  queryData: {gradingStandard: null},
+  setShowTray: () => {},
+  handleReadStateChange: () => {},
   setOpenAssignmentDetailIds: () => {},
   openAssignmentDetailIds: [],
+  setSubmissionAssignmentId: () => {},
+  submissionAssignmentId: '',
+  setOpenRubricDetailIds: () => {},
+  openRubricDetailIds: [],
 }
 
 const setup = (props = defaultProps) => {
@@ -37,8 +44,15 @@ const setup = (props = defaultProps) => {
       <Table.Body>
         {assignmentRow(
           props.assignment,
+          props.queryData,
+          props.setShowTray,
+          props.handleReadStateChange,
           props.setOpenAssignmentDetailIds,
-          props.openAssignmentDetailIds
+          props.openAssignmentDetailIds,
+          props.setSubmissionAssignmentId,
+          props.submissionAssignmentId,
+          props.setOpenRubricDetailIds,
+          props.openRubricDetailIds
         )}
       </Table.Body>
     </Table>
@@ -66,6 +80,43 @@ describe('AssignmentRow', () => {
       })
       const {getByText} = setup({...defaultProps, assignment})
       expect(getByText('Ridiculous')).toBeInTheDocument()
+    })
+  })
+
+  describe('Rubric button', () => {
+    it('renders rubric button', () => {
+      const assignment = Assignment.mock({
+        rubric: {
+          id: '1',
+        },
+      })
+      const {queryByTestId} = setup({...defaultProps, assignment})
+      expect(queryByTestId('rubric_detail_button')).toBeInTheDocument()
+    })
+
+    it('hide rubric button if there is no rubric', () => {
+      const assignment = Assignment.mock({
+        rubric: null,
+      })
+      const {queryByTestId} = setup({...defaultProps, assignment})
+      expect(queryByTestId('rubric_detail_button')).not.toBeInTheDocument()
+    })
+
+    it('hide rubric button if there is no rubric assessment on the submission', () => {
+      const assignment = Assignment.mock({
+        submissionsConnection: {
+          nodes: [
+            Submission.mock({
+              rubricAssessmentsConnection: {
+                nodes: [],
+              },
+            }),
+          ],
+        },
+      })
+
+      const {queryByTestId} = setup({...defaultProps, assignment})
+      expect(queryByTestId('rubric_detail_button')).not.toBeInTheDocument()
     })
   })
 })

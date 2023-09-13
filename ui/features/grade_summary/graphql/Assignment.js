@@ -20,6 +20,8 @@ import gql from 'graphql-tag'
 import {arrayOf, bool, string, number} from 'prop-types'
 
 import {Submission} from './Submission'
+import {Rubric} from '@canvas/assignments/graphql/student/Rubric'
+import {RubricAssociation} from '@canvas/assignments/graphql/student/RubricAssociation'
 
 export const Assignment = {
   fragment: gql`
@@ -72,8 +74,16 @@ export const Assignment = {
           }
         }
       }
+      rubric {
+        ...Rubric
+      }
+      rubricAssociation {
+        ...RubricAssociation
+      }
     }
     ${Submission.fragment}
+    ${Rubric.fragment}
+    ${RubricAssociation.fragment}
   `,
   shape: {
     _id: string,
@@ -124,6 +134,8 @@ export const Assignment = {
         },
       }),
     }),
+    rubric: Rubric.shape,
+    rubricAssociation: RubricAssociation.shape,
   },
   mock: ({
     _id = '1',
@@ -178,6 +190,8 @@ export const Assignment = {
         ],
       },
     ],
+    rubric = Rubric.mock(),
+    rubricAssociation = RubricAssociation.mock(),
   } = {}) => ({
     _id,
     allowedAttempts,
@@ -204,5 +218,7 @@ export const Assignment = {
     scoreStatistic,
     submissionsConnection,
     modules,
+    rubric,
+    rubricAssociation,
   }),
 }
