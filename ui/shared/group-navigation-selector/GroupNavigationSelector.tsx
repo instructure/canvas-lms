@@ -23,57 +23,71 @@
 // the critical code to display a page will be executed sooner
 
 import React, {useState} from 'react'
-
 import {Select} from '@instructure/ui-select'
 import {View} from '@instructure/ui-view'
-
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('groupNavigationSelector')
 
-const getOptionById = (options, queryId) => {
-  return options.find(opt => opt.id === queryId)
+type GroupOption = {
+  id: string
+  label: string
 }
 
-export const GroupNavigationSelector = props => {
-  const defaultOption = getOptionById(props.options, window.location.pathname.split('/')[2])
-  const [isShowingOptions, setIsShowingOptions] = useState(false)
-  const [selectedOptionId, setSelectedOptionId] = useState(defaultOption.id)
-  const [highlightedOptionId, setHighlightedOptionId] = useState(null)
-  const [inputValue, setInputValue] = useState(defaultOption.label)
+type Props = {
+  options: GroupOption[]
+}
 
-  const handleShowOptions = _event => {
+const getOptionById = (options: GroupOption[], queryId: string): GroupOption => {
+  const option = options.find(opt => opt.id === queryId)
+  if (!option) {
+    throw new Error('No option found for id: ' + queryId)
+  }
+  return option
+}
+
+const GroupNavigationSelector = (props: Props) => {
+  const defaultOption = getOptionById(props.options, window.location.pathname.split('/')[2])
+  const [isShowingOptions, setIsShowingOptions] = useState<boolean>(false)
+  const [selectedOptionId, setSelectedOptionId] = useState<string>(defaultOption.id)
+  const [highlightedOptionId, setHighlightedOptionId] = useState<string | null>(null)
+  const [inputValue, setInputValue] = useState<string>(defaultOption.label)
+
+  const handleShowOptions = (_event: Event) => {
     setIsShowingOptions(true)
   }
 
-  const handleBlur = _event => {
+  const handleBlur = (_event: Event) => {
     setHighlightedOptionId(null)
   }
 
-  const handleHideOptions = _event => {
+  const handleHideOptions = (_event: Event) => {
     const option = getOptionById(props.options, selectedOptionId).label
     setIsShowingOptions(false)
     setHighlightedOptionId(null)
     setInputValue(selectedOptionId ? option : '')
   }
 
-  const handleHighlightOption = (event, {id}) => {
+  const handleHighlightOption = (event: React.KeyboardEvent<Element>, {id}: {id: string}) => {
     event.persist()
-    const option = getOptionById(props.options, id).label
+    const option = getOptionById(props.options, id)
+    const label = option.label
     setHighlightedOptionId(id)
-    setInputValue(event.type === 'keydown' ? option : inputValue)
+    setInputValue(event.type === 'keydown' ? label : inputValue)
   }
 
-  const handleSelectOption = (_event, {id}) => {
-    const option = getOptionById(props.options, id).label
+  const handleSelectOption = (_event: Event, {id}: {id: string}) => {
+    const option = getOptionById(props.options, id)
+    const label = option.label
     setSelectedOptionId(id)
-    setInputValue(option)
+    setInputValue(label)
     setIsShowingOptions(false)
     const path = window.location.pathname.split('/')
     path[2] = id
 
     // we don't want anything after index 4 (i.e. a specific discussion or announcement)
     const newPath = path.length >= 5 ? path.slice(0, 4) : path
+    // @ts-expect-error
     window.location = newPath.join('/')
   }
 
@@ -91,7 +105,7 @@ export const GroupNavigationSelector = props => {
         onRequestHighlightOption={handleHighlightOption}
         onRequestSelectOption={handleSelectOption}
       >
-        {props.options.map(option => {
+        {props.options.map((option: GroupOption) => {
           return (
             <Select.Option
               data-testid={`group-id-${option.id}`}
@@ -108,3 +122,5 @@ export const GroupNavigationSelector = props => {
     </View>
   )
 }
+
+export default GroupNavigationSelector

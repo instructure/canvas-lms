@@ -37,7 +37,10 @@ export interface EnvCommon {
   current_user_visited_tabs: null | unknown
   discussions_reporting: boolean
   files_domain: string
-  group_information: null | unknown
+  group_information: {
+    id: string
+    label: string
+  }[]
   DOMAIN_ROOT_ACCOUNT_ID: string
   k12: false
   help_link_name: string
