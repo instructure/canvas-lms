@@ -21,7 +21,6 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import ExternalToolDialog from '../ExternalToolDialog'
 import {InstUISettingsProvider} from '@instructure/emotion'
-import {Transition} from '@instructure/ui-motion'
 import {send} from '@canvas/rce/RceCommandShim'
 
 // jest.mock('../../deep_linking/ContentItemProcessor')
@@ -94,7 +93,7 @@ function fakeRCEReplaceContentItem(text) {
 }
 
 const componentOverrides = {
-  [Transition.componentId]: {
+  Transition: {
     duration: '0ms',
   },
 }

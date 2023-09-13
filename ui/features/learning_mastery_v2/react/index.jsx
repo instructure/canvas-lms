@@ -29,7 +29,7 @@ import Gradebook from './Gradebook'
 import useRollups from './hooks/useRollups'
 import GradebookMenu from '@canvas/gradebook-menu/react/GradebookMenu'
 import {Flex} from '@instructure/ui-flex'
-import {ApplyTheme} from '@instructure/ui-themeable'
+import {InstUISettingsProvider} from '@instructure/emotion'
 import {IconButton} from '@instructure/ui-buttons'
 
 const I18n = useI18nScope('LearningMasteryGradebook')
@@ -48,8 +48,8 @@ const getRatings = () => {
   ]
 }
 
-const gradebookMenuOverride = {
-  [Link.theme]: {
+const componentOverrides = {
+  Link: {
     color: 'licorice'
   }
 }
@@ -78,7 +78,7 @@ const LearningMastery = ({courseId}) => {
 
   return (
     <>
-      <ApplyTheme theme={gradebookMenuOverride}>
+      <InstUISettingsProvider theme={{componentOverrides}}>
         <Flex
           height="100%"
           display="flex"
@@ -105,7 +105,7 @@ const LearningMastery = ({courseId}) => {
             />
           </View>
         </Flex>
-      </ApplyTheme>
+      </InstUISettingsProvider>
       {accountLevelMasteryScalesFF && (
         <Flex.Item as="div" width="100%" padding="small 0 0 0">
           <ProficiencyFilter

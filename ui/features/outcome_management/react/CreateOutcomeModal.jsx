@@ -56,7 +56,7 @@ import Ratings from './Management/Ratings'
 const I18n = useI18nScope('OutcomeManagement')
 
 const componentOverrides = {
-  [Mask.componentId]: {
+  Mask: {
     zIndex: '1000',
   },
 }

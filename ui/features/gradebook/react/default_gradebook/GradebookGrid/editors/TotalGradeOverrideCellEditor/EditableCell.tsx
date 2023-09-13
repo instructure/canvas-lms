@@ -20,9 +20,9 @@
 import React from 'react'
 import {bool, func} from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {InstUISettingsProvider} from '@instructure/emotion'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconExpandStartLine} from '@instructure/ui-icons'
-import {ApplyTheme} from '@instructure/ui-themeable'
 import {View} from '@instructure/ui-view'
 
 import GradeInput from '../GradeInput/GradeInput'
@@ -34,9 +34,11 @@ import useStore from '../../../stores'
 const I18n = useI18nScope('gradebook')
 
 const themeOverrides = {
-  [IconButton.theme]: {
-    iconPadding: '0 3px',
-    smallHeight: '23px',
+  componentOverrides: {
+    IconButton: {
+      iconPadding: '0 3px',
+      smallHeight: '23px',
+    },
   },
 }
 
@@ -120,7 +122,7 @@ export default class EditableCell extends CellEditorComponent {
     const gradeIsInvalid = this.props.pendingGradeInfo && !this.props.pendingGradeInfo.valid
 
     return (
-      <ApplyTheme theme={themeOverrides}>
+      <InstUISettingsProvider theme={themeOverrides}>
         <div className={`Grid__GradeCell ${this.props.gradeEntry.enterGradesAs}`}>
           <div className="Grid__GradeCell__StartContainer">
             {gradeIsInvalid && (
@@ -167,7 +169,7 @@ export default class EditableCell extends CellEditorComponent {
             )}
           </View>
         </div>
-      </ApplyTheme>
+      </InstUISettingsProvider>
     )
   }
 }
