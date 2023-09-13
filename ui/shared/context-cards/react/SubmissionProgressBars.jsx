@@ -121,7 +121,7 @@ class SubmissionProgressBars extends React.Component {
                 <Tooltip renderTip={submission.assignment.name} placement="top">
                   <Link
                     href={`${submission.assignment.html_url}/submissions/${submission.user._id}`}
-                    theme={{textDecoration: 'none'}}
+                    themeOverride={{textDecoration: 'none'}}
                     display="block"
                   >
                     <ProgressBar

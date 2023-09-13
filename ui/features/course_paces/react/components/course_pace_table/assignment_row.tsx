@@ -330,7 +330,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
     const labelMargin = this.props.isStacked ? '0 0 0 small' : undefined
 
     const componentOverrides = {
-      [Table.Cell.componentId]: {
+      'Table.Cell': {
         background: this.state.hovering ? '#eef7ff' : '#fff',
       },
     }

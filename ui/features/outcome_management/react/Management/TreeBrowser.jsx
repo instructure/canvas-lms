@@ -78,7 +78,7 @@ const contentItem = ({
     focus()
   }
 
-  const themeOverrides = {
+  const componentOverrides = {
     hoverBackgroundColor: 'white',
     hoverTextColor: 'brand',
   }
@@ -96,7 +96,7 @@ const contentItem = ({
         )
       }
       variant="indent"
-      theme={expanded ? themeOverrides : null}
+      themeOverride={expanded ? componentOverrides : undefined}
     >
       {expanded ? (
         <AddContentItem

@@ -49,7 +49,7 @@ import {outcomeEditShape} from './shapes'
 const I18n = useI18nScope('OutcomeManagement')
 
 const componentOverrides = {
-  [Mask.componentId]: {
+  Mask: {
     zIndex: '1000',
   },
 }

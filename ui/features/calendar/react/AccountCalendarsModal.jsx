@@ -247,7 +247,7 @@ const AccountCalendarsModal = ({
         onDismiss={closeModal}
         open={isOpen}
         label={I18n.t('Add Calendar')}
-        theme={{smallMaxWidth: '34rem'}}
+        themeOverride={{smallMaxWidth: '34rem'}}
       >
         <Modal.Header>
           <CloseButton

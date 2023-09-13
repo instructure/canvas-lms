@@ -258,7 +258,7 @@ export default class StudentContextTray extends React.Component {
                                     ? `${user.short_name} ${user.pronouns}`
                                     : user.short_name,
                               })}
-                              theme={{largePadding: '0', largeHeight: 'normal'}}
+                              themeOverride={{largePadding: '0', largeHeight: 'normal'}}
                               display="block"
                               textAlign="start"
                             >

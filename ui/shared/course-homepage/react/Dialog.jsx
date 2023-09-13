@@ -173,7 +173,7 @@ class CourseHomeDialog extends React.Component {
               <Link
                 href={wikiUrl}
                 isWithinText={false}
-                theme={{mediumPaddingHorizontal: '0', mediumHeight: '1.5rem'}}
+                themeOverride={{mediumPaddingHorizontal: '0', mediumHeight: '1.5rem'}}
               >
                 {I18n.t('Front Page must be set first')}
               </Link>

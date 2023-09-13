@@ -301,13 +301,13 @@ const K5DashboardCard = ({
           margin="small"
           color="inherit"
           border="bottom"
-          theme={{borderColor: backgroundColor, borderPadding: '0.5rem'}}
+          themeOverride={{borderColor: backgroundColor, borderPadding: '0.5rem'}}
         >
           <Link
             href={href}
             display="block"
             isWithinText={false}
-            theme={{
+            themeOverride={{
               color: k5ThemeVariables.colors.textDarkest,
               hoverColor: k5ThemeVariables.colors.textDarkest,
               fontWeight: 700,
