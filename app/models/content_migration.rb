@@ -589,7 +589,7 @@ class ContentMigration < ActiveRecord::Base
 
         # handle deletions before files are copied
         deletions = data["deletions"].presence
-        process_master_deletions(deletions.except("AssignmentGroup")) if deletions # wait until after the import to do AssignmentGroups
+        process_master_deletions(deletions.except("LearningOutcome", "AssignmentGroup")) if deletions # wait until after the import to do LearningOutcomes and AssignmentGroups
 
         # copy the attachments
         source_export = ContentExport.find(migration_settings[:master_course_export_id])
@@ -630,7 +630,7 @@ class ContentMigration < ActiveRecord::Base
 
       import!(data)
 
-      process_master_deletions(deletions.slice("AssignmentGroup")) if deletions
+      process_master_deletions(deletions.slice("LearningOutcome", "AssignmentGroup")) if deletions
 
       unless import_immediately?
         update_import_progress(100)
