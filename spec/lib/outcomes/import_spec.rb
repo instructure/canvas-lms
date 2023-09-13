@@ -334,7 +334,7 @@ RSpec.describe Outcomes::Import do
         expect(existing_outcome.reload.calculation_method).to eq "decaying_average"
       end
 
-      it "defaults to decaying_average if no calculation_method is given and feature_flag is ON" do
+      it "defaults to standard_decaying_average if no calculation_method is given and new Decaying Average FF is ON" do
         context.root_account.enable_feature!(:outcomes_new_decaying_average_calculation)
         expect(existing_outcome.reload.calculation_method).to eq "highest"
         importer.import_outcome(
@@ -342,7 +342,7 @@ RSpec.describe Outcomes::Import do
           calculation_method: nil,
           calculation_int: nil
         )
-        expect(existing_outcome.reload.calculation_method).to eq "decaying_average"
+        expect(existing_outcome.reload.calculation_method).to eq "standard_decaying_average"
       end
 
       context "importing outcome into visible context" do

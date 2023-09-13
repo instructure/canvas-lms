@@ -1152,9 +1152,9 @@ describe LearningOutcome do
         LoadAccount.default_domain_root_account.enable_feature!(:outcomes_new_decaying_average_calculation)
       end
 
-      it "defaults calculation_method to weighted_average" do
+      it "defaults calculation_method to standard_decaying_average" do
         @outcome = LearningOutcome.create!(title: "outcome")
-        expect(@outcome.calculation_method).to eql("weighted_average")
+        expect(@outcome.calculation_method).to eql("standard_decaying_average")
         expect(@outcome.calculation_int).to be 65
       end
 
