@@ -612,7 +612,6 @@ pipeline {
 
                       callableWithDelegate(lintersStage.bundleStage(nestedStages, buildConfig))()
                       callableWithDelegate(lintersStage.codeStage(nestedStages))()
-                      callableWithDelegate(lintersStage.groovyStage(nestedStages, buildConfig))()
                       callableWithDelegate(lintersStage.masterBouncerStage(nestedStages))()
                       callableWithDelegate(lintersStage.yarnStage(nestedStages, buildConfig))()
 
