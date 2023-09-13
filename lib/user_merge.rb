@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class UserMerge
+  class UnsafeMergeError < StandardError; end
+
   def self.from(user)
     new(user)
   end
@@ -36,6 +38,11 @@ class UserMerge
     return unless target_user
     return if target_user == from_user
     raise "cannot merge a test student" if from_user.preferences[:fake_student] || target_user.preferences[:fake_student]
+
+    if UserMergeData.active.splitable.where(user_id: target_user, from_user_id: from_user).exists?
+      raise UnsafeMergeError,
+            "There is already an existing active user merge for target user, from user: (#{target_user.id}, #{from_user.id})}"
+    end
 
     @target_user = target_user
     target_user.associate_with_shard(from_user.shard, :shadow)
