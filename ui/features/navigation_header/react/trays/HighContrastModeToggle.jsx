@@ -18,7 +18,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {bool} from 'prop-types'
-import React, {useState, useRef} from 'react'
+import React, {useEffect, useState, useRef} from 'react'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {colors as hcmColors} from '@instructure/canvas-high-contrast-theme'
@@ -55,9 +55,11 @@ const componentOverrides = {
 
 const HighContrastLabel = ({loading, isMobile}) => {
   const labelText = isMobile ? I18n.t('Hi-contrast') : I18n.t('Use High Contrast UI')
+  const mobileTipText = I18n.t('Enhance color contrast of content')
+  const dekstopTipText = I18n.t('Enhances the color contrast of text, buttons, etc.')
   const tipText = isMobile
-    ? I18n.t('Enhance color contrast of content')
-    : I18n.t('Enhances the color contrast of text, buttons, etc.')
+    ? mobileTipText
+    : dekstopTipText
   const tipTriggers = ['click']
 
   if (!isMobile) {
@@ -65,10 +67,28 @@ const HighContrastLabel = ({loading, isMobile}) => {
     tipTriggers.push('focus')
   }
 
+  const [tipTextState, setTipTextState] = useState(tipText)
+
+  const handleResize = () => {
+    if (window.devicePixelRatio >= 4) {
+      setTipTextState(mobileTipText)
+    } else if (window.devicePixelRatio < 4 && !isMobile) {
+      setTipTextState(dekstopTipText)
+    }
+  }
+
+  useEffect(() => {
+    window.addEventListener("resize", handleResize)
+
+    return () => {
+      window.removeEventListener("resize", handleResize)
+    }
+  }, [])
+
   return (
     <View as="span">
       <Text>{labelText}</Text>
-      <Tooltip renderTip={tipText} on={tipTriggers} placement="bottom start">
+      <Tooltip renderTip={tipTextState} on={tipTriggers} placement="bottom start">
         <IconButton
           renderIcon={IconInfoLine}
           size="small"
