@@ -26,7 +26,6 @@ import './initializers/fakeRequireJSFallback'
 import './initializers/ujsLinks'
 import {up as configureDateTimeMomentParser} from './initializers/configureDateTimeMomentParser'
 import {up as configureDateTime} from './initializers/configureDateTime'
-import {up as enableDTNPI} from './initializers/enableDTNPI'
 import {initSentry} from './initializers/initSentry'
 import {up as renderRailsFlashNotifications} from './initializers/renderRailsFlashNotifications'
 import {up as activateCourseMenuToggler} from './initializers/activateCourseMenuToggler'
@@ -65,10 +64,6 @@ window.addEventListener('canvasReadyStateChange', function ({detail}) {
     runOnceAfterLocaleFiles()
     runOnceAfterLocaleFiles = () => {}
   }
-})
-
-isolate(enableDTNPI)({
-  endpoint: window.ENV.DATA_COLLECTION_ENDPOINT,
 })
 
 // In non-prod environments only, arrange for filtering of "useless" console

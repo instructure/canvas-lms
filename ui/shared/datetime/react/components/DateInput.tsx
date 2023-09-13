@@ -27,8 +27,6 @@ import {DateInput} from '@instructure/ui-date-input'
 import {IconButton} from '@instructure/ui-buttons'
 // @ts-ignore
 import {IconArrowOpenEndSolid, IconArrowOpenStartSolid} from '@instructure/ui-icons'
-import {nanoid} from 'nanoid'
-import {log} from '@canvas/datetime-natural-parsing-instrument'
 import {
   DateInputInteraction,
   DateInputLayout,
@@ -170,7 +168,6 @@ export default function CanvasDateInput({
   const [isShowingCalendar, setIsShowingCalendar] = useState(false)
   const [renderedMoment, setRenderedMoment] = useState(selectedMoment || todayMoment)
   const [internalMessages, setInternalMessages] = useState<typeof messages>([])
-  const [widgetId] = useState(nanoid())
   const [inputDetails, setInputDetails] = useState<{
     method: 'paste' | 'pick'
     value: string
@@ -269,9 +266,9 @@ export default function CanvasDateInput({
     const parsedMoment = moment.tz(date, timezone)
     let input = parsedMoment
     if (selectedDate) {
-      const selectedMoment = moment.tz(selectedDate, timezone)
-      if (selectedMoment.isSame(parsedMoment, 'day')) {
-        input = selectedMoment
+      const selectedMoment_ = moment.tz(selectedDate, timezone)
+      if (selectedMoment_.isSame(parsedMoment, 'day')) {
+        input = selectedMoment_
       }
     }
     syncInput(input)
@@ -288,34 +285,9 @@ export default function CanvasDateInput({
     onSelectedDateChange(newDate, 'other')
 
     if (inputDetails?.method === 'pick') {
-      const date = inputDetails.value
-
       setInputDetails(null)
-
-      log({
-        id: widgetId,
-        method: 'pick',
-        parsed: (newDate && newDate.toISOString()) || undefined,
-        value: date,
-      })
     } else if (inputDetails?.method === 'paste') {
-      const pastedValue = inputDetails.value
-
       setInputDetails(null)
-
-      log({
-        id: widgetId,
-        method: 'paste',
-        parsed: (newDate && newDate.toISOString()) || undefined,
-        value: pastedValue,
-      })
-    } else if (!inputEmpty) {
-      log({
-        id: widgetId,
-        method: 'type',
-        parsed: (newDate && newDate.toISOString()) || undefined,
-        value: inputValue.trim(),
-      })
     }
     onBlur?.(event)
   }
