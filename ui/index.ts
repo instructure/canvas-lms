@@ -27,6 +27,7 @@ import $ from 'jquery'
 import ready from '@instructure/ready'
 import splitAssetString from '@canvas/util/splitAssetString'
 import {Mathml} from '@instructure/canvas-rce'
+// @ts-expect-error
 import loadBundle from 'bundles-generated'
 import {isolate} from '@canvas/sentry'
 import {Capabilities as C, up} from '@canvas/engine'
@@ -57,7 +58,7 @@ up({
     ready(afterDocumentReady)
   },
   requires: [C.I18n],
-}).catch(e => {
+}).catch((e: Error) => {
   // eslint-disable-next-line no-console
   console.error(`Canvas front-end did not successfully start! (${e.message})`)
 })
@@ -67,7 +68,7 @@ const readinessTargets = [
   ['deferredBundles', false],
   ['capabilities', false],
 ]
-const advanceReadiness = target => {
+const advanceReadiness = (target: string) => {
   const entry = readinessTargets.find(x => x[0] === target)
 
   if (!entry) {
@@ -196,7 +197,7 @@ async function loadNewUserTutorials() {
     window.ENV.NEW_USER_TUTORIALS &&
     window.ENV.NEW_USER_TUTORIALS.is_enabled &&
     window.ENV.context_asset_string &&
-    splitAssetString(window.ENV.context_asset_string)[0] === 'courses'
+    splitAssetString(window.ENV.context_asset_string)?.[0] === 'courses'
   ) {
     const {default: initializeNewUserTutorials} = await import('./features/new_user_tutorial/index')
 
