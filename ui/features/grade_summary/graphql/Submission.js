@@ -19,6 +19,7 @@
 import gql from 'graphql-tag'
 import {arrayOf, float, string, bool} from 'prop-types'
 
+import {RubricAssessment} from '@canvas/assignments/graphql/student/RubricAssessment'
 import {SubmissionComment} from './SubmissionComment'
 
 export const Submission = {
@@ -40,7 +41,13 @@ export const Submission = {
           ...SubmissionComment
         }
       }
+      rubricAssessmentsConnection {
+        nodes {
+          ...RubricAssessment
+        }
+      }
     }
+    ${RubricAssessment.fragment}
     ${SubmissionComment.fragment}
   `,
   shape: {
@@ -65,6 +72,7 @@ export const Submission = {
         },
       }),
     }),
+    rubricAssessmentsConnection: {nods: arrayOf(RubricAssessment.shape)},
   },
   mock: ({
     _id = '1',
@@ -90,6 +98,9 @@ export const Submission = {
         },
       ],
     },
+    rubricAssessmentsConnection = {
+      nodes: [RubricAssessment.mock()],
+    },
   } = {}) => ({
     _id,
     customGradeStatus,
@@ -103,6 +114,6 @@ export const Submission = {
     updatedAt,
     excused,
     commentsConnection,
-    __typename: 'Submission',
+    rubricAssessmentsConnection,
   }),
 }

@@ -38,6 +38,7 @@ import {assignmentGroupRow} from './AssignmentTableRows/AssignmentGroupRow'
 import {gradingPeriodRow} from './AssignmentTableRows/GradingPeriodRow'
 import {assignmentRow} from './AssignmentTableRows/AssignmentRow'
 import {scoreDistributionRow} from './AssignmentTableRows/ScoreDistributionRow'
+import {rubricRow} from './AssignmentTableRows/RubricRow'
 
 const I18n = useI18nScope('grade_summary')
 
@@ -61,7 +62,13 @@ const getCurrentOrFinalGrade = (
   }
 }
 
-const AssignmentTable = ({queryData, layout, handleReadStateChange, setSubmissionAssignmentId}) => {
+const AssignmentTable = ({
+  queryData,
+  layout,
+  handleReadStateChange,
+  setSubmissionAssignmentId,
+  submissionAssignmentId,
+}) => {
   const {assignmentSortBy} = React.useContext(GradeSummaryContext)
   const [calculateOnlyGradedAssignments, setCalculateOnlyGradedAssignments] = useState(true)
 
@@ -74,6 +81,7 @@ const AssignmentTable = ({queryData, layout, handleReadStateChange, setSubmissio
   )
 
   const [openAssignmentDetailIds, setOpenAssignmentDetailIds] = useState([])
+  const [openRubricDetailIds, setOpenRubricDetailIds] = useState([])
 
   const [droppedAssignments, setDroppedAssignments] = useState(
     listDroppedAssignments(queryData, getGradingPeriodID() === '0', true)
@@ -100,7 +108,13 @@ const AssignmentTable = ({queryData, layout, handleReadStateChange, setSubmissio
 
   const open = useStore(state => state.submissionTrayOpen)
 
-  const setShowTray = () => updateState({submissionTrayOpen: !open})
+  const setShowTray = () => {
+    const newState = !open
+    if (!newState) {
+      setSubmissionAssignmentId('')
+    }
+    updateState({submissionTrayOpen: newState})
+  }
 
   return (
     <Table caption={I18n.t('Student Grade Summary')} layout={layout} hover={true}>
@@ -134,7 +148,10 @@ const AssignmentTable = ({queryData, layout, handleReadStateChange, setSubmissio
                 handleReadStateChange,
                 setOpenAssignmentDetailIds,
                 openAssignmentDetailIds,
-                setSubmissionAssignmentId
+                setSubmissionAssignmentId,
+                submissionAssignmentId,
+                setOpenRubricDetailIds,
+                openRubricDetailIds
               ),
               openAssignmentDetailIds.includes(modifiedAssignment._id) &&
               modifiedAssignment?.scoreStatistic
@@ -143,6 +160,9 @@ const AssignmentTable = ({queryData, layout, handleReadStateChange, setSubmissio
                     setOpenAssignmentDetailIds,
                     openAssignmentDetailIds
                   )
+                : null,
+              openRubricDetailIds.includes(modifiedAssignment._id) && modifiedAssignment.rubric
+                ? rubricRow(assignment, setOpenRubricDetailIds, openRubricDetailIds)
                 : null,
             ]
           })
@@ -188,9 +208,9 @@ const AssignmentTable = ({queryData, layout, handleReadStateChange, setSubmissio
 AssignmentTable.propTypes = {
   queryData: PropTypes.object,
   layout: PropTypes.string,
-  setShowTray: PropTypes.func,
-  setSelectedSubmission: PropTypes.func,
   handleReadStateChange: PropTypes.func,
+  setSubmissionAssignmentId: PropTypes.func,
+  submissionAssignmentId: PropTypes.string,
 }
 
 export default AssignmentTable

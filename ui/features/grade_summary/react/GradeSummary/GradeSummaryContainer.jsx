@@ -61,6 +61,8 @@ const GradeSummaryContainer = () => {
 
   const assignmentQuery = useQuery(ASSIGNMENTS, {
     variables,
+    // disabling cache because ratings don't have unique cache keys causing collisions
+    fetchPolicy: 'no-cache',
   })
 
   const [readStateChangeSubmission] = useMutation(UPDATE_SUBMISSIONS_READ_STATE, {
@@ -153,12 +155,14 @@ const GradeSummaryContainer = () => {
               layout={layout}
               handleReadStateChange={handleReadStateChange}
               setSubmissionAssignmentId={setSubmissionAssignmentId}
+              submissionAssignmentId={submissionAssignmentId}
             />
             <SubmissionCommentsTray
               onDismiss={() => {
                 document
                   .querySelector(`[data-testid="submission_comment_tray_${submissionAssignmentId}"`)
                   .focus()
+                setSubmissionAssignmentId('')
               }}
             />
           </View>

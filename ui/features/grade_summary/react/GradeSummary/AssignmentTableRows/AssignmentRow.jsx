@@ -24,7 +24,12 @@ import useStore from '../../stores'
 
 import {Badge} from '@instructure/ui-badge'
 import {Flex} from '@instructure/ui-flex'
-import {IconCommentLine, IconMutedLine, IconAnalyticsLine} from '@instructure/ui-icons'
+import {
+  IconCommentLine,
+  IconMutedLine,
+  IconAnalyticsLine,
+  IconRubricLine,
+} from '@instructure/ui-icons'
 import {IconButton} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Table} from '@instructure/ui-table'
@@ -79,7 +84,10 @@ export const assignmentRow = (
   handleReadStateChange,
   setOpenAssignmentDetailIds,
   openAssignmentDetailIds,
-  setSubmissionAssignmentId
+  setSubmissionAssignmentId,
+  submissionAssignmentId,
+  setOpenRubricDetailIds,
+  openRubricDetailIds
 ) => {
   const handleAssignmentDetailOpen = () => {
     if (!openAssignmentDetailIds.includes(assignment._id)) {
@@ -90,6 +98,19 @@ export const assignmentRow = (
       if (index > -1) {
         arr.splice(index, 1)
         setOpenAssignmentDetailIds(arr)
+      }
+    }
+  }
+
+  const handleRubricDetailOpen = () => {
+    if (!openRubricDetailIds.includes(assignment._id)) {
+      setOpenRubricDetailIds([...openRubricDetailIds, assignment._id])
+    } else {
+      const arr = [...openRubricDetailIds]
+      const index = arr.indexOf(assignment._id)
+      if (index > -1) {
+        arr.splice(index, 1)
+        setOpenRubricDetailIds(arr)
       }
     }
   }
@@ -157,15 +178,37 @@ export const assignmentRow = (
       <Table.Cell textAlign="end">
         <Flex justifyItems="end">
           <Flex.Item>
-            {!ENV.restrict_quantitative_data && assignment?.scoreStatistic && (
+            {!ENV.restrict_quantitative_data &&
+            assignment?.rubric &&
+            assignment?.submissionsConnection?.nodes[0]?.rubricAssessmentsConnection?.nodes.length >
+              0 ? (
+              <IconButton
+                data-testid="rubric_detail_button"
+                margin="0 small"
+                screenReaderLabel="Rubric Results"
+                size="small"
+                onClick={handleRubricDetailOpen}
+                aria-expanded={openRubricDetailIds.includes(assignment._id)}
+              >
+                <IconRubricLine />
+              </IconButton>
+            ) : (
+              <View as="div" width="52px" />
+            )}
+          </Flex.Item>
+          <Flex.Item>
+            {!ENV.restrict_quantitative_data && assignment?.scoreStatistic ? (
               <IconButton
                 margin="0 small"
-                screenReaderLabel="Assignment Details"
+                screenReaderLabel="Assignment Statistics"
                 size="small"
                 onClick={handleAssignmentDetailOpen}
+                aria-expanded={openAssignmentDetailIds.includes(assignment._id)}
               >
                 <IconAnalyticsLine />
               </IconButton>
+            ) : (
+              <View as="div" width="52px" />
             )}
           </Flex.Item>
           <Flex.Item>
@@ -180,6 +223,7 @@ export const assignmentRow = (
                   setSubmissionAssignmentId(assignment?._id)
                   setShowTray()
                 }}
+                aria-expanded={assignment?._id === submissionAssignmentId}
               >
                 <IconCommentLine />
                 <Text size="small">
