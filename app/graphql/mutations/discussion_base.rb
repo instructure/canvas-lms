@@ -19,6 +19,8 @@
 #
 
 class Mutations::DiscussionBase < Mutations::BaseMutation
+  argument :delayed_post_at, Types::DateTimeType, required: false
+  argument :lock_at, Types::DateTimeType, required: false
   argument :locked, Boolean, required: false
   argument :message, String, required: false
   argument :published, Boolean, required: false
