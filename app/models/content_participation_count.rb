@@ -80,6 +80,39 @@ class ContentParticipationCount < ActiveRecord::Base
     end
   end
 
+  def self.potential_submissions_by_type(context, user)
+    submission_conditions = sanitize_sql_for_conditions([<<~SQL.squish, user.id, context.class.to_s, context.id])
+      submissions.user_id = ? AND
+      assignments.context_type = ? AND
+      assignments.context_id = ? AND
+      assignments.workflow_state NOT IN ('deleted', 'unpublished') AND
+      assignments.submission_types != 'not_graded' AND
+      (submissions.posted_at IS NOT NULL OR post_policies.post_manually IS FALSE)
+    SQL
+
+    subs_with_grades = Submission.active.graded
+                                 .joins(assignment: [:post_policy])
+                                 .where(submission_conditions)
+                                 .where.not(submissions: { score: nil })
+                                 .pluck(:id)
+    subs_with_comments = Submission.active
+                                   .joins(:submission_comments, assignment: [:post_policy])
+                                   .where(submission_conditions)
+                                   .where(<<~SQL.squish, user).pluck(:id)
+                                     (submission_comments.hidden IS NULL OR NOT submission_comments.hidden)
+                                     AND NOT submission_comments.draft
+                                     AND submission_comments.provisional_grade_id IS NULL
+                                     AND submission_comments.author_id <> ?
+                                   SQL
+    subs_with_assessments = Submission.active
+                                      .joins(:rubric_assessments, assignment: [:post_policy])
+                                      .where(submission_conditions)
+                                      .where.not(rubric_assessments: { data: nil })
+                                      .pluck(:id)
+
+    { subs_with_grades:, subs_with_comments:, subs_with_assessments: }
+  end
+
   def self.unread_submission_count_for(context, user)
     return 0 unless context.is_a?(Course) && context.user_is_student?(user)
 
@@ -87,36 +120,8 @@ class ContentParticipationCount < ActiveRecord::Base
       potential_ids = Rails.cache.fetch_with_batched_keys(["potential_unread_submission_ids", context.global_id].cache_key,
                                                           batch_object: user,
                                                           batched_keys: [:submissions, :potential_unread_submission_ids]) do
-        submission_conditions = sanitize_sql_for_conditions([<<~SQL.squish, user.id, context.class.to_s, context.id])
-          submissions.user_id = ? AND
-          assignments.context_type = ? AND
-          assignments.context_id = ? AND
-          assignments.workflow_state NOT IN ('deleted', 'unpublished') AND
-          assignments.submission_types != 'not_graded'
-        SQL
-
-        posted_at_condition = " AND (submissions.posted_at IS NOT NULL OR post_policies.post_manually IS FALSE)"
-        submission_conditions << posted_at_condition
-
-        subs_with_grades = Submission.active.graded
-                                     .joins(assignment: [:post_policy])
-                                     .where(submission_conditions)
-                                     .where.not(submissions: { score: nil })
-                                     .pluck(:id)
-        subs_with_comments = Submission.active
-                                       .joins(:submission_comments, assignment: [:post_policy])
-                                       .where(submission_conditions)
-                                       .where(<<~SQL.squish, user).pluck(:id)
-                                         (submission_comments.hidden IS NULL OR NOT submission_comments.hidden)
-                                         AND NOT submission_comments.draft
-                                         AND submission_comments.provisional_grade_id IS NULL
-                                         AND submission_comments.author_id <> ?
-                                       SQL
-        subs_with_assessments = Submission.active
-                                          .joins(:rubric_assessments, assignment: [:post_policy])
-                                          .where(submission_conditions)
-                                          .where.not(rubric_assessments: { data: nil })
-                                          .pluck(:id)
+        potential_subs_by_type = potential_submissions_by_type(context, user)
+        subs_with_grades, subs_with_comments, subs_with_assessments = potential_subs_by_type.values
         (subs_with_grades + subs_with_comments + subs_with_assessments).uniq
       end
       potential_ids.size - already_read_count(potential_ids, user)
