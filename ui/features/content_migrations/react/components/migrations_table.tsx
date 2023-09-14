@@ -18,6 +18,7 @@
 
 import React, {useEffect, useState} from 'react'
 import {Table} from '@instructure/ui-table'
+import {StatusPill} from './status_pill'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {datetimeString} from '@canvas/datetime/date-functions'
@@ -68,7 +69,12 @@ export const ContentMigrationsTable = () => {
             <Table.Cell>
               {datetimeString(cm.created_at, {timezone: ENV.CONTEXT_TIMEZONE})}
             </Table.Cell>
-            <Table.Cell> </Table.Cell>
+            <Table.Cell>
+              <StatusPill
+                hasIssues={cm.migration_issues_count !== 0}
+                workflowState={cm.workflow_state}
+              />
+            </Table.Cell>
             <Table.Cell> </Table.Cell>
           </Table.Row>
         ))}
