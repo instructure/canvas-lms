@@ -268,36 +268,70 @@ describe('CanvasRce', () => {
       return rceRef
     }
 
-    it('is set to elementary-theme if canvas_k6_theme is enabled', async () => {
-      const rceRef = await setupRCEWithENV({
-        FEATURES: {
-          canvas_k6_theme: true,
-        },
+    describe('with canvas_k6_theme enabled', () => {
+      it('is set to elementary-theme if not in a k5 course', async () => {
+        const rceRef = await setupRCEWithENV({
+          FEATURES: {
+            canvas_k6_theme: true,
+          },
+        })
+        expect(rceRef.current.props.editorOptions.body_class).toEqual('elementary-theme')
       })
-      expect(rceRef.current.props.editorOptions.body_class).toEqual('elementary-theme')
+
+      it('is set to elementary-theme in a k5+balsamiq course', async () => {
+        const rceRef = await setupRCEWithENV({
+          FEATURES: {
+            canvas_k6_theme: true,
+          },
+          K5_SUBJECT_COURSE: true,
+          USE_CLASSIC_FONT: false,
+        })
+        expect(rceRef.current.props.editorOptions.body_class).toEqual('elementary-theme')
+      })
+
+      it('is set to default-theme in a k5+lato course', async () => {
+        const rceRef = await setupRCEWithENV({
+          FEATURES: {
+            canvas_k6_theme: true,
+          },
+          K5_SUBJECT_COURSE: true,
+          USE_CLASSIC_FONT: true,
+        })
+        expect(rceRef.current.props.editorOptions.body_class).toEqual('default-theme')
+      })
     })
 
-    it('is set to elementary-theme if in a k5 course with balsamiq font selected', async () => {
-      const rceRef = await setupRCEWithENV({
-        K5_SUBJECT_COURSE: true,
-        USE_CLASSIC_FONT: false,
+    describe('with canvas_k6_theme disabled', () => {
+      it('is set to elementary-theme if in a k5+balsamiq course', async () => {
+        const rceRef = await setupRCEWithENV({
+          K5_SUBJECT_COURSE: true,
+          USE_CLASSIC_FONT: false,
+        })
+        expect(rceRef.current.props.editorOptions.body_class).toEqual('elementary-theme')
       })
-      expect(rceRef.current.props.editorOptions.body_class).toEqual('elementary-theme')
-    })
 
-    it('is set to default-theme if in a k5 course with lato font selected', async () => {
-      const rceRef = await setupRCEWithENV({
-        K5_SUBJECT_COURSE: true,
-        USE_CLASSIC_FONT: true,
+      it('is set to default-theme if in a k5+lato course', async () => {
+        const rceRef = await setupRCEWithENV({
+          K5_SUBJECT_COURSE: true,
+          USE_CLASSIC_FONT: true,
+        })
+        expect(rceRef.current.props.editorOptions.body_class).toEqual('default-theme')
       })
-      expect(rceRef.current.props.editorOptions.body_class).toEqual('default-theme')
-    })
 
-    it('is set to default-theme if in a classic course', async () => {
-      const rceRef = await setupRCEWithENV({
-        K5_SUBJECT_COURSE: false,
+      it('is set to default-theme if in a classic course', async () => {
+        const rceRef = await setupRCEWithENV({
+          K5_SUBJECT_COURSE: false,
+        })
+        expect(rceRef.current.props.editorOptions.body_class).toEqual('default-theme')
       })
-      expect(rceRef.current.props.editorOptions.body_class).toEqual('default-theme')
+
+      it('is set to elementary-theme in a k5+balsamiq homeroom course', async () => {
+        const rceRef = await setupRCEWithENV({
+          K5_HOMEROOM_COURSE: true,
+          USE_CLASSIC_FONT: false,
+        })
+        expect(rceRef.current.props.editorOptions.body_class).toEqual('elementary-theme')
+      })
     })
   })
 })
