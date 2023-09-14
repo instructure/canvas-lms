@@ -23,6 +23,7 @@ import {CloseButton, Button} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
 import {Flex} from '@instructure/ui-flex'
+import {View} from '@instructure/ui-view'
 
 import ErrorBoundary from './ErrorBoundary'
 import Bridge from '../../../bridge/Bridge'
@@ -477,20 +478,17 @@ export default function CanvasContentTray(props) {
           data-canvascontenttray-content={true}
         >
           <Flex.Item padding="medium" shadow="above">
-            <Flex margin="none none medium none">
-              <Flex.Item shouldgrow={true} shouldshrink={true}>
-                <Heading level="h2">{getHeader()}</Heading>
-              </Flex.Item>
+            <View as="div" margin="none none medium none">
+              <Heading level="h2">{getHeader()}</Heading>
 
-              <Flex.Item>
-                <CloseButton
-                  placement="end"
-                  onClick={handleDismissTray}
-                  data-testid="CloseButton_ContentTray"
-                  screenReaderLabel={formatMessage('Close')}
-                />
-              </Flex.Item>
-            </Flex>
+              <CloseButton
+                placement="end"
+                offset="medium"
+                onClick={handleDismissTray}
+                data-testid="CloseButton_ContentTray"
+                screenReaderLabel={formatMessage('Close')}
+              />
+            </View>
             {isEditTray && (
               <LinkDisplay
                 linkText={linkText}
@@ -519,8 +517,8 @@ export default function CanvasContentTray(props) {
             />
           </Flex.Item>
           <Flex.Item
-            grow={true}
-            shrink={true}
+            shouldGrow={true}
+            shouldShrink={true}
             margin="xx-small xxx-small 0"
             elementRef={el => (scrollingAreaRef.current = el)}
           >
