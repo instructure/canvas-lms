@@ -100,7 +100,7 @@ export default class DeveloperKeyStateControl extends React.Component {
   }
 
   render() {
-    if (this.isSiteAdmin() || !ENV.FEATURES?.developer_key_page_checkboxes) {
+    if (this.isSiteAdmin()) {
       return (
         <RadioInputGroup
           size="medium"

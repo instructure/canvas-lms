@@ -217,38 +217,6 @@ describe('DeveloperKeys App', () => {
       })
     })
 
-    // Temporary big ole' copy-paste of the above tests until the
-    // developer_key_page_checkboxes feature flag is removed in the next deploy
-    describe('when parent keys are present with the developer_key_page_checkboxes flag off', () => {
-      beforeEach(() => {
-        ENV = {FEATURES: {developer_key_page_checkboxes: false}}
-        setup(ENV, [...parentKeys, ...siteAdminKeys])
-      })
-
-      it('renders Parent Keys heading', () => {
-        expect(getByText('Consortium Parent Keys')).toBeInTheDocument()
-      })
-
-      it('renders parent keys table', () => {
-        expect(getByText('Parent Inherited Developer Keys')).toBeInTheDocument()
-      })
-
-      it('renders Global Keys heading', () => {
-        expect(getByText('Global Keys')).toBeInTheDocument()
-      })
-
-      it('renders row per parent key', () => {
-        parentKeys.forEach(key => expect(getByText(key.name)).toBeInTheDocument())
-      })
-
-      it('does not allow parent key state toggling', () => {
-        const toggles = getAllByRole('radio', {name: /On/})
-        parentKeys.forEach(key => {
-          expect(toggles.some(t => t.name === key.id && t.disabled)).toBe(true)
-        })
-      })
-    })
-
     describe('when parent keys are not present', () => {
       beforeEach(() => {
         setup({}, siteAdminKeys)

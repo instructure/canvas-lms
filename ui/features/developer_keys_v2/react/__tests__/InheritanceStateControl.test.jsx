@@ -61,7 +61,6 @@ describe('InheritanceStateControl', () => {
     oldConfirmation = window.confirm
     window.ENV.FEATURES ||= {}
     oldFeatures = window.ENV.FEATURES
-    window.ENV.FEATURES.developer_key_page_checkboxes = true
 
     moxios.install()
   })
@@ -99,33 +98,6 @@ describe('InheritanceStateControl', () => {
     expect(checkedBtn.value).toBe('on')
   })
 
-  it('with the dev key checkbox flag off uses the "off" state from the store for a root account key', () => {
-    window.ENV.FEATURES.developer_key_page_checkboxes = false
-    const key = sampleDeveloperKey({
-      developer_key_account_binding: {
-        developer_key_id: '1',
-        workflow_state: 'off',
-        account_owns_binding: true,
-      },
-    })
-    const wrapper = mount(<InheritanceStateControl {...getProps(key, false)} />)
-    const checkedBtn = wrapper.find('input[checked=true]').getDOMNode()
-    expect(checkedBtn.value).toBe('off')
-  })
-
-  it('with the dev key checkbox flag off uses the "on" state from the store for a root account key', () => {
-    window.ENV.FEATURES.developer_key_page_checkboxes = false
-    const key = sampleDeveloperKey({
-      developer_key_account_binding: {
-        developer_key_id: '1',
-        workflow_state: 'on',
-        account_owns_binding: true,
-      },
-    })
-    const wrapper = mount(<InheritanceStateControl {...getProps(key, false)} />)
-    const checkedBtn = wrapper.find('input[checked=true]').getDOMNode()
-    expect(checkedBtn.value).toBe('on')
-  })
   it('uses the "off" state from the store', () => {
     const key = sampleDeveloperKey({
       developer_key_account_binding: {
@@ -276,20 +248,6 @@ describe('InheritanceStateControl', () => {
       'input[type="checkbox"]'
     )
     expect(checkbox.disabled).toBe(true)
-  })
-
-  it('with the dev key checkbox flag off disables the radio group if the account does not own the binding and it is set', () => {
-    window.ENV.FEATURES.developer_key_page_checkboxes = false
-    const radioGroup = componentNode(mockDevKey('off')).querySelector('input[type="radio"]')
-    expect(radioGroup.disabled).toBe(true)
-  })
-
-  it('with the dev key checkbox flag off disabled the radio group if the account does not own the binding and it is not set and the account is a child account', () => {
-    window.ENV.FEATURES.developer_key_page_checkboxes = false
-    const radioGroup = componentNode(mockDevKey('allow', false, 'child_account')).querySelector(
-      'input[type="radio"]'
-    )
-    expect(radioGroup.disabled).toBe(true)
   })
 
   it('enables the radio group if the account does not own the binding and it is not set and the account is not a child account', () => {
