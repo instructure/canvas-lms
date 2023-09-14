@@ -16,10 +16,12 @@ GEM
       minitest (>= 5.1)
       tzinfo (~> 2.0)
     aes_key_wrap (1.1.0)
+    base64 (0.1.1)
     bindata (2.4.15)
     concurrent-ruby (1.2.2)
     diff-lcs (1.5.0)
-    faraday (2.7.10)
+    faraday (2.7.11)
+      base64
       faraday-net_http (>= 2.0, < 3.1)
       ruby2_keywords (>= 0.0.4)
     faraday-follow_redirects (0.3.0)
