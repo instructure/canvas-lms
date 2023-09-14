@@ -62,11 +62,11 @@ describe('AccountCalendarSettings', () => {
 
   it('saves changes when clicking apply', async () => {
     fetchMock.put(/\/api\/v1\/accounts\/1\/account_calendars/, {message: 'Updated 1 account'})
-    const {findByText, getByText, findAllByText, getByTestId, getByRole} = render(
+    const {findByText, getByText, findAllByText, getByTestId, findAllByTestId} = render(
       <AccountCalendarSettings {...defaultProps} />
     )
     expect(await findByText('University (5)')).toBeInTheDocument()
-    const universityCheckbox = getByRole('checkbox', {name: 'Show account calendar for University'})
+    const universityCheckbox = (await findAllByTestId('account-calendar-checkbox-University'))[0]
     const applyButton = getByTestId('save-button')
     expect(applyButton).toBeDisabled()
     act(() => universityCheckbox.click())
