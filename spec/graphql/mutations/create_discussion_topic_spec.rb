@@ -127,6 +127,27 @@ describe Mutations::CreateDiscussionTopic do
     expect(created_discussion_topic["anonymousState"]).to eq anonymous_state
   end
 
+  it "allows teachers to still create anonymous discussions even when students cannot" do
+    @course.allow_student_anonymous_discussion_topics = false
+    @course.save!
+
+    query = <<~GQL
+      contextId: "#{@course.id}"
+      contextType: "Course"
+      title: "Student Anonymous Create"
+      message: "this should return an error"
+      published: true
+      anonymousState: "full_anonymity"
+    GQL
+
+    result = execute_with_input(query, @teacher)
+    created_discussion_topic = result.dig("data", "createDiscussionTopic", "discussionTopic")
+
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "discussionTopic", "errors")).to be_nil
+    expect(created_discussion_topic["anonymousState"]).to eq "full_anonymity"
+  end
+
   it "creates a partial_anonymity discussion topic" do
     context_type = "Course"
     title = "Test Title"
@@ -198,6 +219,24 @@ describe Mutations::CreateDiscussionTopic do
 
         result = execute_with_input(query)
         expect_error(result, "You are not able to create an anonymous discussion in a group")
+      end
+
+      it "returns an error for non-teachers without anonymous discussion creation permissions" do
+        @course.allow_student_anonymous_discussion_topics = false
+        @course.save!
+        student_in_course(active_all: true)
+
+        query = <<~GQL
+          contextId: "#{@course.id}"
+          contextType: "Course"
+          title: "Student Anonymous Create"
+          message: "this should return an error"
+          published: true
+          anonymousState: "full_anonymity"
+        GQL
+
+        result = execute_with_input(query, @student)
+        expect_error(result, "You are not able to create an anonymous discussion")
       end
     end
   end

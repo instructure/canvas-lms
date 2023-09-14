@@ -41,8 +41,9 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
 
     return validation_error(I18n.t("Invalid context")) unless discussion_topic_context
 
-    # if the passed value is neither "partial_anonymity" nor "full_anonymity", set it to nil
     anonymous_state = input[:anonymous_state]
+
+    # if the passed value is neither "partial_anonymity" nor "full_anonymity", set it to nil
     if anonymous_state && anonymous_state != "partial_anonymity" && anonymous_state != "full_anonymity"
       anonymous_state = nil
     end
@@ -50,7 +51,7 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
     if anonymous_state &&
        discussion_topic_context.is_a?(Course) &&
        !discussion_topic_context.settings[:allow_student_anonymous_discussion_topics] &&
-       discussion_topic_context.grants_right?(@current_user, session, :manage)
+       !discussion_topic_context.grants_right?(current_user, session, :manage)
       return validation_error(I18n.t("You are not able to create an anonymous discussion"))
     end
 
