@@ -20,3 +20,70 @@ export interface Module {
   id: string
   name: string
 }
+
+type RequirementType = 'view' | 'mark' | 'submit' | 'score' | 'contribute'
+type ResourceType =
+  | 'assignment'
+  | 'quiz'
+  | 'file'
+  | 'page'
+  | 'discussion'
+  | 'externalUrl'
+  | 'externalTool'
+
+export interface ModuleItem {
+  name: string
+  resource: ResourceType
+}
+
+interface BaseRequirement {
+  name: string
+  resource: ResourceType
+  type: RequirementType
+}
+
+interface AssignmentRequirement extends BaseRequirement {
+  resource: 'assignment'
+  type: Extract<RequirementType, 'view' | 'mark' | 'submit' | 'score'>
+  minimumScore: string
+}
+
+interface QuizRequirement extends BaseRequirement {
+  resource: 'quiz'
+  type: Extract<RequirementType, 'view' | 'submit' | 'score'>
+  minimumScore: string
+}
+
+interface FileRequirement extends BaseRequirement {
+  resource: 'file'
+  type: Extract<RequirementType, 'view'>
+}
+
+interface PageRequirement extends BaseRequirement {
+  resource: 'page'
+  type: Extract<RequirementType, 'view' | 'mark' | 'contribute'>
+}
+
+interface DiscussionRequirement extends BaseRequirement {
+  resource: 'discussion'
+  type: Extract<RequirementType, 'view' | 'contribute'>
+}
+
+interface ExternalUrlRequirement extends BaseRequirement {
+  resource: 'externalUrl'
+  type: Extract<RequirementType, 'view'>
+}
+
+interface ExternalToolRequirement extends BaseRequirement {
+  resource: 'externalTool'
+  type: Extract<RequirementType, 'view'>
+}
+
+export type Requirement =
+  | AssignmentRequirement
+  | QuizRequirement
+  | FileRequirement
+  | PageRequirement
+  | DiscussionRequirement
+  | ExternalUrlRequirement
+  | ExternalToolRequirement

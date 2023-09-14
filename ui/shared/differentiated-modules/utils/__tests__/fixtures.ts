@@ -19,6 +19,7 @@
 const fixtures = {
   name: `<div class="name" title="Module 1"></div>`,
   unlockAt: `<div class="unlock_at">Aug 2, 2023 at 12am</div>`,
+  requirementCount: `<div class="requirements_message" data-requirement-type="one"></div>`,
   requiresSequentialProgress: `<div class="require_sequential_progress">true</div>`,
   publishFinalGrade: `<div class="publish_final_grade">true</div>`,
   prerequisites: `
@@ -29,6 +30,26 @@ const fixtures = {
     <div class="prerequisite_criterion">
       <span class="id" style="display: none;">15</span>
       <span class="name" style="display: none;">Module B</span>
+    </div>
+  `,
+  requirements: `
+    <div class="ig-row with-completion-requirements ig-published">
+      <span class="type_icon" title="Assignment" role="none">
+      <span class="item_name">
+        <a title="HW 1" class="ig-title title item_link" href="/courses/13/modules/items/45">HW 1</a>
+      </span>
+      <span class="requirement_type min_score_requirement" style="display: none;"></span>
+      <span class="requirement_type must_mark_done_requirement" style="display: block;"></span>
+    </div>
+    <div class="ig-row with-completion-requirements ig-published">
+      <span class="type_icon" title="Quiz" role="none"></span>
+      <span class="item_name">
+        <a title="Quiz 1" class="ig-title title item_link" href="/courses/13/modules/items/54">Quiz 1</a>
+      </span>
+      <span class="requirement_type min_score_requirement" style="display: block;">
+        <span class="min_score">70</span>
+      </span>
+      <span class="requirement_type must_mark_done_requirement" style="display: none;"></span>
     </div>
   `,
 }

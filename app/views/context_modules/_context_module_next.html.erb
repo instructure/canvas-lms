@@ -79,7 +79,7 @@
     <div class="module_header_items">
       <div class="ig-header-admin">
 
-        <div class="requirements_message">
+        <div class="requirements_message" data-requirement-type="<%= context_module&.requirement_type %>">
           <% if context_module && context_module.completion_requirements.present? %>
             <ul class="pill">
               <% count = context_module.requirement_count %>

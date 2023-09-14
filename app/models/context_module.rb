@@ -965,4 +965,8 @@ class ContextModule < ActiveRecord::Base
     end
     callbacks
   end
+
+  def requirement_type
+    (completion_requirements.present? && requirement_count == 1) ? "one" : "all"
+  end
 end

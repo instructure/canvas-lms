@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {Module} from './types'
+import type {Module, Requirement} from './types'
 
 export type SettingsPanelState = {
   moduleName: string
@@ -24,6 +24,9 @@ export type SettingsPanelState = {
   lockUntilChecked: boolean
   nameInputMessages: Array<{type: 'error'; text: string}>
   prerequisites: Module[]
+  requirementCount: 'all' | 'one'
+  requireSequentialProgress: boolean
+  requirements: Requirement[]
 }
 
 export const defaultState: SettingsPanelState = {
@@ -32,6 +35,9 @@ export const defaultState: SettingsPanelState = {
   lockUntilChecked: false,
   nameInputMessages: [],
   prerequisites: [],
+  requirementCount: 'all',
+  requireSequentialProgress: false,
+  requirements: [],
 }
 
 export const enum actions {
@@ -40,6 +46,9 @@ export const enum actions {
   SET_LOCK_UNTIL_CHECKED = 'SET_LOCK_UNTIL_CHECKED',
   SET_NAME_INPUT_MESSAGES = 'SET_NAME_INPUT_MESSAGES',
   SET_PREREQUISITES = 'SET_PREREQUISITES',
+  SET_REQUIREMENT_COUNT = 'SET_REQUIREMENT_COUNT',
+  SET_REQUIRE_SEQUENTIAL_PROGRESS = 'SET_REQUIRE_SEQUENTIAL_PROGRESS',
+  SET_REQUIREMENTS = 'SET_REQUIREMENTS',
 }
 
 export function reducer(
@@ -57,6 +66,12 @@ export function reducer(
       return {...state, nameInputMessages: action.payload}
     case actions.SET_PREREQUISITES:
       return {...state, prerequisites: action.payload}
+    case actions.SET_REQUIREMENT_COUNT:
+      return {...state, requirementCount: action.payload}
+    case actions.SET_REQUIRE_SEQUENTIAL_PROGRESS:
+      return {...state, requireSequentialProgress: action.payload}
+    case actions.SET_REQUIREMENTS:
+      return {...state, requirements: action.payload}
     default:
       return state
   }

@@ -841,6 +841,7 @@ const updateOtherPrerequisites = function (id, name) {
 }
 const newPillMessage = function ($module, requirement_count) {
   const $message = $module.find('.requirements_message')
+  $message.attr('data-requirement-type', requirement_count === 1 ? 'one' : 'all')
 
   if (requirement_count != 0) {
     const $pill = $('<ul class="pill"><li></li></ul></div>')
@@ -928,7 +929,7 @@ modules.initModuleManagement = function (duplicate) {
 
     // Update requirement message pill
     if (data.context_module.completion_requirements.length === 0) {
-      $module.find('.requirements_message').empty()
+      $module.find('.requirements_message').empty().attr('data-requirement-type', 'all')
     } else {
       newPillMessage($module, data.context_module.requirement_count)
     }
