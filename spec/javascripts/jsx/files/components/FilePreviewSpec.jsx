@@ -99,12 +99,15 @@ test('clicking the info button should render out the info panel', () => {
       currentFolder={currentFolder}
     />
   )
-  $('.ef-file-preview-header-info').click()
+  const infoButton = $('.ef-file-preview-header-info')
+  equal(infoButton.attr('aria-expanded'), 'false')
+  infoButton.click()
   equal($('tr:contains("Name")').find('td').text(), 'Test File.file1')
-
+  equal(infoButton.attr('aria-expanded'), 'true')
   // click it again to hide it
-  $('.ef-file-preview-header-info').click()
+  infoButton.click()
   equal($('tr:contains("Name")').length, 0)
+  equal(infoButton.attr('aria-expanded'), 'false')
   component.unmount()
 })
 
