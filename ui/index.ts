@@ -19,6 +19,7 @@
 // main entry for frontend code
 
 import './boot/initializers/setWebpackCdnHost'
+import './boot/initializers/router'
 import '@canvas/jquery/jquery.instructure_jquery_patches' // this needs to be before anything else that requires jQuery
 import './boot'
 

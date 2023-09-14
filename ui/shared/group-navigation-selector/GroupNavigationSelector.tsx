@@ -46,7 +46,7 @@ const getOptionById = (options: GroupOption[], queryId: string): GroupOption => 
   return option
 }
 
-const GroupNavigationSelector = (props: Props) => {
+export default function GroupNavigationSelector(props: Props) {
   const defaultOption = getOptionById(props.options, window.location.pathname.split('/')[2])
   const [isShowingOptions, setIsShowingOptions] = useState<boolean>(false)
   const [selectedOptionId, setSelectedOptionId] = useState<string>(defaultOption.id)
@@ -122,5 +122,3 @@ const GroupNavigationSelector = (props: Props) => {
     </View>
   )
 }
-
-export default GroupNavigationSelector
