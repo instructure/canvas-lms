@@ -22,7 +22,6 @@ import React, {ReactElement} from 'react'
 
 import {CloseButton} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
-import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
 
@@ -65,18 +64,14 @@ function CanvasModal({
   return (
     <Modal label={label} onDismiss={onDismiss} {...otherModalProps}>
       <Modal.Header>
-        <Flex>
-          <Flex.Item grow={true}>
-            <Heading>{title}</Heading>
-          </Flex.Item>
-          <Flex.Item margin="0 0 0 x-small">
-            <CloseButton
-              onClick={onDismiss}
-              size={closeButtonSize}
-              screenReaderLabel={I18n.t('Close')}
-            />
-          </Flex.Item>
-        </Flex>
+        <Heading>{title}</Heading>
+        <CloseButton
+          onClick={onDismiss}
+          size={closeButtonSize}
+          screenReaderLabel={I18n.t('Close')}
+          placement="end"
+          offset="medium"
+        />
       </Modal.Header>
       <Modal.Body padding={padding}>
         <View as="div" height="100%">
