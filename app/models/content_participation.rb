@@ -182,6 +182,42 @@ class ContentParticipation < ActiveRecord::Base
       .count
   end
 
+  def self.create_read_item(user_id:, content_id:, content_item:)
+    { user_id:, content_id:, content_type: "Submission", content_item:, workflow_state: "read" }
+  end
+  private_class_method :create_read_item
+
+  def self.add_missing_content_participation_items(course, user)
+    user_id = user.id
+    potential_subs_by_type = ContentParticipationCount.potential_submissions_by_type(course, user)
+    subs_with_grades, subs_with_comments, subs_with_assessments = potential_subs_by_type.values
+    uniq_submission_ids = (subs_with_grades + subs_with_comments + subs_with_assessments).uniq
+
+    cp = ContentParticipation.where(user:, content: uniq_submission_ids).pluck(:content_item, :content_id)
+
+    grouped_cp_items = cp.group_by(&:first).transform_values { |values| values.map(&:last) }
+
+    missing_subs_with_grades = subs_with_grades - (grouped_cp_items["grade"] || [])
+    missing_subs_with_comments = subs_with_comments - (grouped_cp_items["comment"] || [])
+    missing_subs_with_assessments = subs_with_assessments - (grouped_cp_items["rubric"] || [])
+
+    new_content_participations = []
+
+    missing_subs_with_grades.each do |content_id|
+      new_content_participations << create_read_item(user_id:, content_id:, content_item: "grade")
+    end
+    missing_subs_with_comments.each do |content_id|
+      new_content_participations << create_read_item(user_id:, content_id:, content_item: "comment")
+    end
+    missing_subs_with_assessments.each do |content_id|
+      new_content_participations << create_read_item(user_id:, content_id:, content_item: "rubric")
+    end
+
+    ContentParticipation.insert_all(new_content_participations) if new_content_participations.any?
+
+    new_content_participations
+  end
+
   def self.mark_all_as_read_for_user(user, contents, course)
     content_participations = ContentParticipation.where(user:, content: contents, workflow_state: "unread")
     ids = content_participations.pluck(:id)

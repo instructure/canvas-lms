@@ -1428,6 +1428,7 @@ class SubmissionsApiController < ApplicationController
     user = User.find(user_id)
     course = Course.find(course_id)
     submissions = course.submissions.where(user:)
+    ContentParticipation.add_missing_content_participation_items(course, user)
     ids = ContentParticipation.mark_all_as_read_for_user(user, submissions, course)
 
     opts = { type: :submissions_clear_unread }

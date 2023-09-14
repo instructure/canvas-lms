@@ -478,6 +478,62 @@ describe ContentParticipation do
     end
   end
 
+  context "add_missing_content_participation_items" do
+    before :once do
+      course_with_teacher(active_all: true)
+      student_in_course(active_all: true)
+      assignment_model(course: @course)
+      @content = @assignment.submit_homework(@student)
+      @assignment2 = assignment_model(course: @course)
+      @content2 = @assignment2.submit_homework(@student)
+      @assignment.ensure_post_policy(post_manually: false)
+      @assignment2.ensure_post_policy(post_manually: false)
+      @submission_ids = [@content, @content2].map(&:id)
+      rubric_model
+
+      Submission.where(id: @submission_ids).update_all(posted_at: Time.now.utc, workflow_state: "graded", score: 10)
+      SubmissionComment.insert_all([
+                                     {
+                                       submission_id: @content2.id,
+                                       comment: "hi",
+                                       author_id: @teacher.id,
+                                       context_id: @course.id,
+                                       context_type: "Course"
+                                     }
+                                   ])
+      RubricAssessment.insert_all([
+                                    {
+                                      user_id: @student.id,
+                                      artifact_id: @content.id,
+                                      artifact_type: "Submission",
+                                      assessment_type: "peer_review",
+                                      rubric_id: @rubric.id,
+                                      data: []
+                                    }
+                                  ])
+    end
+
+    it "adds missing participation records from ContentParticipationCount query" do
+      expect(ContentParticipation.where(user: @student).count).to eq(0)
+
+      ContentParticipation.add_missing_content_participation_items(@course, @student)
+      expect(ContentParticipation.where(user: @student).count).to eq(4)
+    end
+
+    it "adds missing participation records from ContentParticipationCount query without duplicating records" do
+      ContentParticipation.participate(content: @content, user: @student, workflow_state: "unread")
+      ContentParticipation.participate(content: @content2, user: @student, workflow_state: "unread")
+      ContentParticipation.participate(content: @content2, user: @student, workflow_state: "unread", content_item: "comment")
+      ContentParticipation.participate(content: @content, user: @student, workflow_state: "unread", content_item: "rubric")
+
+      expect(ContentParticipation.where(user: @student).count).to eq(4)
+
+      new_content_participations = ContentParticipation.add_missing_content_participation_items(@course, @student)
+      expect(new_content_participations.count).to eq 0
+      expect(ContentParticipation.where(user: @student).count).to eq(4)
+    end
+  end
+
   context "clear unread submissions" do
     before :once do
       course_with_teacher(active_all: true)
