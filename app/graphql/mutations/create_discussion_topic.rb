@@ -67,14 +67,32 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
         message: input[:message],
         workflow_state: input[:published] ? "active" : "unpublished",
         require_initial_post: input[:require_initial_post],
-        anonymous_state:
+        anonymous_state:,
+        user: current_user
       }
     )
     verify_authorized_action!(discussion_topic, :create)
+
+    process_future_date_inputs(input[:delayed_post_at], input[:lock_at], discussion_topic)
+
     return errors_for(discussion_topic) unless discussion_topic.save
 
     { discussion_topic: }
   rescue ActiveRecord::RecordNotFound
     raise GraphQL::ExecutionError, "Not found"
+  end
+
+  def process_future_date_inputs(delayed_post_at, lock_at, discussion_topic)
+    discussion_topic.delayed_post_at = delayed_post_at if delayed_post_at
+    discussion_topic.lock_at = lock_at if lock_at
+
+    if discussion_topic.delayed_post_at_changed? || discussion_topic.lock_at_changed?
+      discussion_topic.workflow_state = discussion_topic.should_not_post_yet ? "post_delayed" : discussion_topic.workflow_state
+      if discussion_topic.should_lock_yet
+        discussion_topic.lock(without_save: true)
+      else
+        discussion_topic.unlock(without_save: true)
+      end
+    end
   end
 end
