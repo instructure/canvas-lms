@@ -1950,6 +1950,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :module_assignment_overrides) do
       get "courses/:course_id/modules/:context_module_id/assignment_overrides", action: :index, as: "module_assignment_overrides_index"
+      put "courses/:course_id/modules/:context_module_id/assignment_overrides", action: :bulk_update
     end
 
     scope(controller: "quizzes/quiz_assignment_overrides") do

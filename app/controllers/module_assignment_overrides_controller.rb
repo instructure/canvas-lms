@@ -100,6 +100,55 @@ class ModuleAssignmentOverridesController < ApplicationController
     end
   end
 
+  # @API Update a module's overrides
+  #
+  # Accepts a list of overrides and applies them to the ContextModule. Returns 204 No Content response
+  # code if successful.
+  #
+  # Note: this API is still under development and will not function until the feature is enabled.
+  #
+  # @argument overrides[] [Required, Array]
+  #   List of overrides to apply to the module. Overrides that already exist should include an ID
+  #   and will be updated if needed. New overrides will be created for overrides in the list
+  #   without an ID. Overrides not included in the list will be deleted. Providing an empty list
+  #   will delete all of the module's overrides. Keys for each override object can include: 'id',
+  #   'title', 'student_ids', and 'course_section_id'.
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/courses/:course_id/modules/:context_module_id/assignment_overrides \
+  #     -X PUT \
+  #     -H 'Authorization: Bearer <token>' \
+  #     -H 'Content-Type: application/json' \
+  #     -d '{
+  #           "overrides": [
+  #             {
+  #               "id": 212,
+  #               "course_section_id": 3564
+  #             },
+  #             {
+  #               "title": "an assignment override",
+  #               "student_ids": [1, 2, 3]
+  #             }
+  #           ]
+  #         }'
+  #
+  def bulk_update
+    override_list = params[:overrides] || []
+    return render json: { error: "List of overrides required" }, status: :bad_request unless override_list.is_a?(Array)
+
+    override_list.each do |override|
+      unless override["id"].present? || override["student_ids"].present? || override["course_section_id"].present?
+        return render json: { error: "id, student_ids, or course_section_id required with each override" }, status: :bad_request
+      end
+      if override["course_section_id"].present? && override["student_ids"].present?
+        return render json: { error: "cannot provide course_section_id and student_ids on the same override" }, status: :bad_request
+      end
+    end
+
+    bulk_update_overrides(override_list)
+    head :no_content
+  end
+
   private
 
   def require_feature_flag
@@ -112,5 +161,58 @@ class ModuleAssignmentOverridesController < ApplicationController
 
   def require_context_module
     @context_module = @context.context_modules.not_deleted.find(params[:context_module_id])
+  end
+
+  def bulk_update_overrides(override_list)
+    overrides_to_update, overrides_to_create = override_list.partition { |override| override["id"].present? }
+    override_ids_to_delete = @context_module.assignment_overrides.active.pluck(:id) - overrides_to_update.pluck("id").map(&:to_i)
+
+    AssignmentOverride.transaction do
+      delete_existing_overrides(override_ids_to_delete)
+      update_existing_overrides(overrides_to_update)
+      create_new_overrides(overrides_to_create)
+    end
+  end
+
+  def delete_existing_overrides(override_ids)
+    @context_module.assignment_override_students.where(assignment_override_id: override_ids).delete_all
+    @context_module.assignment_overrides.active.where(id: override_ids).destroy_all
+  end
+
+  def update_existing_overrides(overrides)
+    overrides.each do |override|
+      current_override = @context_module.assignment_overrides.active.find(override["id"])
+      current_override.title = override["title"] if override["title"].present?
+      if override["course_section_id"].present?
+        current_override.assignment_override_students.delete_all if current_override.set_type == "ADHOC"
+        current_override.course_section = @context.course_sections.find(override["course_section_id"])
+      elsif override["student_ids"].present?
+        if current_override.set_type == "ADHOC"
+          user_ids_to_delete = current_override.assignment_override_students.pluck(:user_id) - override["student_ids"].map(&:to_i)
+          current_override.assignment_override_students.where(user_id: user_ids_to_delete).delete_all
+        else
+          current_override.set_type = "ADHOC"
+          current_override.set_id = nil
+        end
+        existing_user_ids = current_override.assignment_override_students.pluck(:user_id)
+        override["student_ids"].map(&:to_i).each do |student_id|
+          current_override.assignment_override_students.create!(user: @context.students.find(student_id)) unless existing_user_ids.include?(student_id)
+        end
+      end
+      current_override.save!
+    end
+  end
+
+  def create_new_overrides(overrides)
+    overrides.each do |override|
+      new_override = @context_module.assignment_overrides.build
+      new_override.title = override["title"] if override["title"].present?
+      if override["course_section_id"].present?
+        new_override.course_section = @context.course_sections.find(override["course_section_id"])
+      elsif override["student_ids"].present?
+        override["student_ids"].each { |student_id| new_override.assignment_override_students.build(user: @context.students.find(student_id)) }
+      end
+      new_override.save!
+    end
   end
 end
