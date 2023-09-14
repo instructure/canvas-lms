@@ -87,18 +87,21 @@ export default function DiscussionTopicFormContainer() {
       sections={sections}
       groupCategories={groupCategories}
       onSubmit={({title, message, shouldPublish, requireInitialPost, discussionAnonymousState}) => {
-        isEditing ? () => {console.log("call updateDiscussion")} :
-        createDiscussionTopic({
-          variables: {
-            contextId: ENV.context_id,
-            contextType: 'Course',
-            title,
-            message,
-            published: shouldPublish,
-            requireInitialPost,
-            anonymousState: discussionAnonymousState,
-          },
-        })
+        if (isEditing) {
+          console.log('call updateDiscussion')
+        } else {
+          createDiscussionTopic({
+            variables: {
+              contextId: ENV.context_id,
+              contextType: 'Course',
+              title,
+              message,
+              published: shouldPublish,
+              requireInitialPost,
+              anonymousState: discussionAnonymousState,
+            },
+          })
+        }
       }}
     />
   )
