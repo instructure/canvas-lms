@@ -71,6 +71,7 @@ GEM
     aroi (1.0.0)
       activerecord (>= 5.2)
       activesupport (>= 5.2)
+    base64 (0.1.1)
     bindata (2.4.15)
     builder (3.2.4)
     byebug (11.1.3)
@@ -93,7 +94,8 @@ GEM
     erubi (1.12.0)
     et-orbi (1.2.7)
       tzinfo
-    faraday (2.7.10)
+    faraday (2.7.11)
+      base64
       faraday-net_http (>= 2.0, < 3.1)
       ruby2_keywords (>= 0.0.4)
     faraday-follow_redirects (0.3.0)

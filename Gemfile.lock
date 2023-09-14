@@ -516,7 +516,8 @@ GEM
       parslet
     factory_bot (6.3.0)
       activesupport (>= 5.0.0)
-    faraday (2.7.10)
+    faraday (2.7.11)
+      base64
       faraday-net_http (>= 2.0, < 3.1)
       ruby2_keywords (>= 0.0.4)
     faraday-follow_redirects (0.3.0)
