@@ -491,7 +491,6 @@ class UsersController < ApplicationController
         return_to(return_url, request.referer || dashboard_url)
       end
     else
-      js_bundle :act_as_modal
       css_bundle :act_as_modal
 
       @page_title = t("Act as %{user_name}", user_name: @user.short_name)

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {shallow, mount} from 'enzyme'
-import ActAsModal from '../index'
+import ActAsModal from '../ActAsModal'
 import ActAsMask from '../svg/ActAsMask'
 import ActAsPanda from '../svg/ActAsPanda'
 import {Avatar} from '@instructure/ui-avatar'
