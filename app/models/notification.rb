@@ -135,8 +135,6 @@ class Notification < Switchman::UnshardedRecord
   has_many :notification_policy_overrides, inverse_of: :notification, dependent: :destroy
   before_save :infer_default_content
 
-  scope :to_show_in_feed, -> { where("messages.category='TestImmediately' OR messages.notification_name IN (?)", TYPES_TO_SHOW_IN_FEED) }
-
   validates :name, uniqueness: true
 
   after_create { self.class.reset_cache! }
