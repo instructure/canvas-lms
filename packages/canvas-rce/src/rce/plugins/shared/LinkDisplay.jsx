@@ -75,7 +75,12 @@ export const LinkDisplay = ({
               <Icon size="x-small" />
             </Text>
           </Flex.Item>
-          <Flex.Item padding="0 x-small 0 0" grow={true} shrink={true} textAlign="start">
+          <Flex.Item
+            padding="0 x-small 0 0"
+            shouldGrow={true}
+            shouldShrink={true}
+            textAlign="start"
+          >
             <View as="div">
               <span data-testid="selected-link-name">{linkFileName}</span>
               {linkType && (
