@@ -32,10 +32,13 @@ describe('parseModule', () => {
       moduleId: '8',
       moduleName: 'Module 1',
       unlockAt: undefined,
+      requirementCount: 'all',
       requireSequentialProgress: false,
       publishFinalGrade: false,
       prerequisites: [],
       moduleList: [],
+      requirements: [],
+      moduleItems: [],
     })
   })
 
@@ -45,10 +48,29 @@ describe('parseModule', () => {
       moduleId: '8',
       moduleName: '',
       unlockAt: '2023-08-02T06:00:00.000Z',
+      requirementCount: 'all',
       requireSequentialProgress: false,
       publishFinalGrade: false,
       prerequisites: [],
       moduleList: [],
+      requirements: [],
+      moduleItems: [],
+    })
+  })
+
+  it('parses requirementCount', () => {
+    const element = getFixture('requirementCount')
+    expect(parseModule(element)).toEqual({
+      moduleId: '8',
+      moduleName: '',
+      unlockAt: undefined,
+      requirementCount: 'one',
+      requireSequentialProgress: false,
+      publishFinalGrade: false,
+      prerequisites: [],
+      moduleList: [],
+      requirements: [],
+      moduleItems: [],
     })
   })
 
@@ -58,10 +80,13 @@ describe('parseModule', () => {
       moduleId: '8',
       moduleName: '',
       unlockAt: undefined,
+      requirementCount: 'all',
       requireSequentialProgress: true,
       publishFinalGrade: false,
       prerequisites: [],
       moduleList: [],
+      requirements: [],
+      moduleItems: [],
     })
   })
 
@@ -71,26 +96,38 @@ describe('parseModule', () => {
       moduleId: '8',
       moduleName: '',
       unlockAt: undefined,
+      requirementCount: 'all',
       requireSequentialProgress: false,
       publishFinalGrade: true,
       prerequisites: [],
       moduleList: [],
+      requirements: [],
+      moduleItems: [],
     })
   })
 
   it('parses prerequisites', () => {
     const element = getFixture('prerequisites')
-    expect(parseModule(element)).toEqual({
-      moduleId: '8',
-      moduleName: '',
-      unlockAt: undefined,
-      requireSequentialProgress: false,
-      publishFinalGrade: false,
-      prerequisites: [
-        {id: '14', name: 'Module A'},
-        {id: '15', name: 'Module B'},
-      ],
-      moduleList: [],
-    })
+    expect(parseModule(element).prerequisites).toEqual([
+      {id: '14', name: 'Module A'},
+      {id: '15', name: 'Module B'},
+    ])
+  })
+
+  it('parses requirements', () => {
+    const element = getFixture('requirements')
+    expect(parseModule(element).requirements).toEqual([
+      {
+        name: 'HW 1',
+        resource: 'assignment',
+        type: 'mark',
+      },
+      {
+        name: 'Quiz 1',
+        resource: 'quiz',
+        type: 'score',
+        minimumScore: '70',
+      },
+    ])
   })
 })

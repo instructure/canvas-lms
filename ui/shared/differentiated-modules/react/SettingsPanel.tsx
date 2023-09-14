@@ -30,7 +30,7 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {convertModuleSettingsForApi} from '../utils/miscHelpers'
 import {updateModuleUI} from '../utils/moduleHelpers'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import type {Module} from './types'
+import type {Module, ModuleItem, Requirement} from './types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('differentiated_modules')
@@ -44,6 +44,10 @@ export interface SettingsPanelProps {
   unlockAt?: string
   prerequisites?: Module[]
   moduleList?: Module[]
+  requirementCount?: 'all' | 'one'
+  requireSequentialProgress?: boolean
+  requirements?: Requirement[]
+  moduleItems?: ModuleItem[]
 }
 
 export default function SettingsPanel({
@@ -54,7 +58,14 @@ export default function SettingsPanel({
   moduleName,
   unlockAt,
   prerequisites,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  requirementCount,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  requireSequentialProgress,
+  requirements,
   moduleList = [],
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  moduleItems = [],
 }: SettingsPanelProps) {
   const [state, dispatch] = useReducer(reducer, {
     ...defaultState,
@@ -62,6 +73,7 @@ export default function SettingsPanel({
     unlockAt: unlockAt ?? new Date().toISOString(),
     lockUntilChecked: !!unlockAt,
     prerequisites: prerequisites ?? [],
+    requirements: requirements ?? [],
   })
 
   const availableModules = useMemo(() => {

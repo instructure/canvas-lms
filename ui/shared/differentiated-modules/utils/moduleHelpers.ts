@@ -17,7 +17,7 @@
  */
 
 import type {SettingsPanelState} from '../react/settingsReducer'
-import type {Module} from '../react/types'
+import type {Module, Requirement} from '../react/types'
 import {updateModulePublishedState} from '@canvas/context-modules/utils/publishAllModulesHelper'
 import {datetimeString} from '@canvas/datetime/date-functions'
 import {convertFriendlyDatetimeToUTC} from './miscHelpers'
@@ -25,24 +25,49 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('differentiated_modules')
 
+const resourceTypeMap: Record<string, Requirement['resource']> = {
+  Assignment: 'assignment',
+  Quiz: 'quiz',
+  Attachment: 'file',
+  Page: 'page',
+  'Discussion Topic': 'discussion',
+  'External Url': 'externalUrl',
+  'External Tool': 'externalTool',
+}
+
+const requirementTypeMap: Record<string, Requirement['type']> = {
+  min_score_requirement: 'score',
+  must_view_requirement: 'view',
+  must_mark_done_requirement: 'mark',
+  must_contribute_requirement: 'contribute',
+  must_submit_requirement: 'submit',
+}
+
 export function parseModule(element: HTMLDivElement) {
   const moduleId = element.getAttribute('data-module-id')
   const moduleName = element.querySelector('.name')?.getAttribute('title') ?? ''
   const unlockAt = convertFriendlyDatetimeToUTC(element.querySelector('.unlock_at')?.textContent)
-  const requireSequentialProgress = !!element.querySelector('.require_sequential_progress')
-    ?.textContent
+  const requirementCount =
+    element.querySelector('.requirements_message')?.getAttribute('data-requirement-type') ?? 'all'
+  const requireSequentialProgress =
+    element.querySelector('.require_sequential_progress')?.textContent === 'true'
   const publishFinalGrade = !!element.querySelector('.publish_final_grade')?.textContent
   const prerequisites = parsePrerequisites(element)
   const moduleList = parseModuleList()
+  const requirements = parseRequirements(element)
+  const moduleItems = parseModuleItems(element)
 
   return {
     moduleId,
     moduleName,
     unlockAt,
+    requirementCount,
     requireSequentialProgress,
     publishFinalGrade,
     prerequisites,
     moduleList,
+    requirements,
+    moduleItems,
   }
 }
 
@@ -68,6 +93,44 @@ function parseModuleList() {
     return moduleList
   }, [])
   return parsedModules
+}
+
+function parseRequirements(element: HTMLDivElement) {
+  const requirementElements = Array.from(
+    element.querySelectorAll('.ig-row.with-completion-requirements')
+  )
+  return requirementElements.map((requirementNode: Element) => {
+    const name = requirementNode.querySelector('.item_name a')?.textContent?.trim() || ''
+    const resource =
+      resourceTypeMap[
+        requirementNode
+          .querySelector('.type_icon')
+          ?.getAttribute('title') as Requirement['resource']
+      ]
+    // One of these (the active one) has "display: block;" and the others are hidden
+    const activeRequirementNode = Array.from(
+      requirementNode.querySelectorAll('.requirement_type')
+    ).filter(node => window.getComputedStyle(node).display !== 'none')[0]
+    const type = requirementTypeMap[activeRequirementNode.classList[1] as Requirement['type']]
+    if (type === 'score') {
+      const minimumScore = activeRequirementNode.querySelector('.min_score')?.textContent || '0'
+      return {name, resource, type, minimumScore}
+    } else {
+      return {name, resource, type}
+    }
+  }) as Requirement[]
+}
+
+function parseModuleItems(element: HTMLDivElement) {
+  const moduleItemElements = Array.from(element.querySelectorAll('.ig-row'))
+  return moduleItemElements.map(moduleItem => {
+    const name = moduleItem.querySelector('.item_name a')?.textContent?.trim() || ''
+    const resource =
+      resourceTypeMap[
+        moduleItem.querySelector('.type_icon')?.getAttribute('title') as Requirement['resource']
+      ]
+    return {name, resource}
+  })
 }
 
 export function updateModuleUI(moduleElement: HTMLDivElement, moduleSettings: SettingsPanelState) {
