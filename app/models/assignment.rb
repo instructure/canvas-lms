@@ -1885,8 +1885,7 @@ class Assignment < ActiveRecord::Base
     can :submit
 
     given do |user, session|
-      (submittable_type? || %w[discussion_topic online_quiz].include?(submission_types) ||
-      (a2_enabled? && submission_types == "none")) &&
+      (submittable_type? || %w[discussion_topic online_quiz none not_graded].include?(submission_types)) &&
         context.grants_right?(user, session, :participate_as_student) &&
         visible_to_user?(user)
     end
