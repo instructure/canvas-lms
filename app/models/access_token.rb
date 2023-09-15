@@ -151,10 +151,39 @@ class AccessToken < ActiveRecord::Base
     Setting.get("access_token_last_used_threshold", 10.minutes).to_i
   end
 
-  def used!
-    if !last_used_at || last_used_at < record_last_used_threshold.seconds.ago
-      self.last_used_at = Time.now.utc
-      save
+  def used!(at: nil)
+    return if last_used_at && last_used_at >= record_last_used_threshold.seconds.ago
+
+    at ||= Time.now.utc
+
+    if Rails.env.production? && !shard.in_current_region? && !Delayed::Job.in_delayed_job?
+      # just choose a random shard in the current region to ensure the job
+      # is queued in the current region
+      Shard.in_current_region.first&.activate do
+        delay(singleton: "update_access_token_last_user/#{global_id}",
+              on_conflict: :loose).used!(at:)
+        return
+      end
+    end
+
+    if changed?
+      self.last_used_at = at
+      save!
+      return
+    end
+
+    # only update if nobody else has touched last_used_at, to avoid multiple
+    # writes for the same interval
+    prior_last_used_at = last_used_at
+    self.last_used_at = at
+
+    shard.activate do
+      # not only use optimistic locking, but also don't update if someone else
+      # is already in the process of updating it
+      updated = AccessToken.where(id: AccessToken.where(id: self, last_used_at: prior_last_used_at)
+                                                 .lock("FOR UPDATE SKIP LOCKED"))
+                           .update_all(last_used_at: at, updated_at: at)
+      changes_applied if updated == 1
     end
   end
 

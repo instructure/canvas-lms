@@ -604,7 +604,7 @@ describe AccessToken do
     end
   end
 
-  describe ".site_admin?" do
+  describe "#site_admin?" do
     specs_require_sharding
     let(:account) { account_model }
     let(:access_token) { AccessToken.create!(user: user_model, developer_key: DeveloperKey.create!(account:)) }
@@ -616,20 +616,88 @@ describe AccessToken do
       AccessToken.site_admin?("token-string")
     end
 
-    describe "#site_admin?" do
-      it "returns false" do
-        @shard2.activate do
-          expect(access_token.site_admin?).to be false
-        end
+    it "normally returns false" do
+      @shard2.activate do
+        expect(access_token.site_admin?).to be false
+      end
+    end
+
+    context "when access token is for site admin" do
+      let(:account) { Account.site_admin }
+
+      it "returns true" do
+        expect(access_token.site_admin?).to be true
+      end
+    end
+  end
+
+  describe "#used!" do
+    let_once(:access_token) { AccessToken.create!(user: user_model, developer_key: DeveloperKey.default) }
+
+    it "updates last_used_at when not set yet" do
+      access_token.used!
+      expect(access_token.last_used_at).not_to be_nil
+      expect(access_token).not_to be_changed
+    end
+
+    it "does not update last_used_at within the threshold" do
+      access_token.used!
+      last_used = access_token.last_used_at
+      access_token.used!
+      expect(access_token.last_used_at).to eq last_used
+    end
+
+    it "updates last used after the threshold" do
+      access_token.used!
+      last_used = access_token.last_used_at
+      Timecop.travel(20.minutes) { access_token.used! }
+      expect(access_token.last_used_at).not_to eq last_used
+    end
+
+    context "when out-of-region" do
+      before do
+        allow(access_token.shard).to receive(:in_current_region?).and_return(false)
+        allow(Rails.env).to receive(:production?).and_return(true)
       end
 
-      context "access token is for site admin" do
-        let(:account) { Account.site_admin }
-
-        it "returns true" do
-          expect(access_token.site_admin?).to be true
-        end
+      it "simply queues a job" do
+        expect(access_token).to receive(:delay).and_call_original
+        access_token.used!
+        expect(access_token.last_used_at).to be_nil
       end
+
+      it "updates immediately if already in a job" do
+        allow(Delayed::Job).to receive(:in_delayed_job?).and_return(true)
+        expect(access_token).not_to receive(:delay)
+        access_token.used!
+        expect(access_token.last_used_at).not_to be_nil
+      end
+    end
+
+    it "uses save! if there are other changes" do
+      access_token.created_at = 1.day.ago
+      expect(access_token).to receive(:save!).and_call_original
+      access_token.used!
+      expect(access_token.last_used_at).not_to be_nil
+      expect(access_token).not_to be_changed
+    end
+
+    it "skips the update if someone else has changed it" do
+      access_token.used!
+      Timecop.travel(20.minutes) do
+        AccessToken.where(id: access_token).update_all(last_used_at: 1.day.ago)
+        expect(access_token).not_to receive(:save!)
+        expect(AccessToken).to receive(:where).twice.and_call_original
+        access_token.used!
+        expect(access_token).to be_changed
+      end
+    end
+
+    it "normally uses a custom query to skip locks" do
+      expect(access_token).not_to receive(:save!)
+      expect(AccessToken).to receive(:where).twice.and_call_original
+      access_token.used!
+      expect(access_token).not_to be_changed
     end
   end
 end
