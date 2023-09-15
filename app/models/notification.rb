@@ -19,8 +19,9 @@
 #
 
 class Notification < Switchman::UnshardedRecord
-  include Workflow
   include TextHelper
+
+  self.ignored_columns += %i[workflow_state]
 
   TYPES_TO_SHOW_IN_FEED = [
     # Assignment
@@ -138,16 +139,6 @@ class Notification < Switchman::UnshardedRecord
   validates :name, uniqueness: true
 
   after_create { self.class.reset_cache! }
-
-  workflow do
-    state :active do
-      event :deactivate, transitions_to: :inactive
-    end
-
-    state :inactive do
-      event :reactivate, transitions_to: :active
-    end
-  end
 
   def self.all_cached
     @all ||= all.to_a.each(&:readonly!)

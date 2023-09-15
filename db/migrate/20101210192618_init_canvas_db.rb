@@ -2205,7 +2205,6 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :notification_policies, [:communication_channel_id, :notification_id], unique: true, name: "index_notification_policies_on_cc_and_notification_id"
 
     create_table "notifications", force: true do |t|
-      t.string   "workflow_state", null: false, limit: 255
       t.string   "name", limit: 255
       t.string   "subject", limit: 255
       t.string   "category", limit: 255
