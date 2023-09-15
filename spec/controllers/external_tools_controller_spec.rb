@@ -1334,7 +1334,7 @@ describe ExternalToolsController do
 
     context "for Quizzes Next launch" do
       let(:assignment) do
-        a = assignment_model(course: @course)
+        a = assignment_model(course: @course, title: "A Quizzes.Next Assignment")
         a.submission_types = "external_tool"
         a.external_tool_tag_attributes = { url: tool.url }
         a.save!
@@ -1352,30 +1352,35 @@ describe ExternalToolsController do
                                                })
       end
 
+      let(:retrieve_params) do
+        {
+          course_id: @course.id,
+          assignment_id: assignment.id,
+          url: "http://example.com/launch"
+        }
+      end
+
       before do
         u = user_factory(active_all: true)
         account.account_users.create!(user: u)
         user_session(@user)
       end
 
-      it "sets consistent resource_link_id with that in regular lti launch" do
-        get :retrieve, params: {
-          course_id: @course.id,
-          assignment_id: assignment.id,
-          url: "http://example.com/launch"
-        }
+      it "sets resource_link_id to that of the assignment's launch" do
+        get :retrieve, params: retrieve_params
 
         expect(assigns[:lti_launch].params["resource_link_id"]).to eq assignment.lti_resource_link_id
         expect(assigns[:lti_launch].params["context_id"]).to eq opaque_id(@course)
       end
 
+      it "sets resource_link_title to that of the title" do
+        get :retrieve, params: retrieve_params
+
+        expect(assigns[:lti_launch].params["resource_link_title"]).to eq assignment.title
+      end
+
       it "includes extra assignment info during relaunch" do
-        get :retrieve, params: {
-          course_id: @course.id,
-          assignment_id: assignment.id,
-          url: "http://example.com/launch",
-          placement: :assignment_selection
-        }
+        get :retrieve, params: retrieve_params.merge(placement: :assignment_selection)
 
         # this is a sampling of that extra assignment info, which is fully tested in
         # `lti_integration_spec.rb`. This is just enough to know that it exists.
@@ -1487,13 +1492,12 @@ describe ExternalToolsController do
 
       let(:tool) do
         account.context_external_tools.create!({
-                                                 name: "Quizzes.Next",
+                                                 name: "Some awesome LTI tool",
                                                  url: "http://example.com/launch",
                                                  domain: "example.com",
                                                  consumer_key: "test_key",
                                                  shared_secret: "test_secret",
                                                  privacy_level: "public",
-                                                 tool_id: "Quizzes 2",
                                                  settings: {
                                                    custom_fields: { "canvas_assignment_due_at" => "$Canvas.assignment.dueAt.iso8601" }
                                                  }
@@ -1501,8 +1505,19 @@ describe ExternalToolsController do
       end
 
       let(:due_at) { "2021-07-29 08:26:56.000000000 +0000".to_datetime }
-
       let(:due_at_diff) { "2021-07-30 08:26:56.000000000 +0000".to_datetime }
+
+      let(:retrieve_params) do
+        {
+          course_id: @course.id,
+          assignment_id: assignment.id,
+          url: "http://example.com/launch",
+          placement: :assignment_selection
+        }
+      end
+
+      let(:launch_resource_link_id) { assigns[:lti_launch].params["resource_link_id"] }
+      let(:launch_resource_link_title) { assigns[:lti_launch].params["resource_link_title"] }
 
       before do
         student_in_course
@@ -1520,12 +1535,7 @@ describe ExternalToolsController do
         expect(assignment.due_at).to eq due_at
 
         user_session(@student)
-        get :retrieve, params: {
-          course_id: @course.id,
-          assignment_id: assignment.id,
-          url: "http://example.com/launch",
-          placement: :assignment_selection
-        }
+        get :retrieve, params: retrieve_params
 
         expect(
           assigns[:lti_launch].params["custom_canvas_assignment_due_at"].to_datetime
@@ -1536,16 +1546,51 @@ describe ExternalToolsController do
         expect(assignment.due_at).to eq due_at
 
         user_session(@user)
-        get :retrieve, params: {
-          course_id: @course.id,
-          assignment_id: assignment.id,
-          url: "http://example.com/launch",
-          placement: :assignment_selection
-        }
+        get :retrieve, params: retrieve_params
 
         expect(
           assigns[:lti_launch].params["custom_canvas_assignment_due_at"].to_datetime
         ).to eq due_at_diff
+      end
+
+      context "with the lti_resource_link_id_speedgrader_launches_reference_assignment feature flag off" do
+        before { account.disable_feature!(:lti_resource_link_id_speedgrader_launches_reference_assignment) }
+
+        it "uses the resource_link_id of the course and title of the tool" do
+          user_session(@user)
+          get :retrieve, params: retrieve_params
+          expect(launch_resource_link_id).to eq opaque_id(@course)
+          expect(launch_resource_link_title).to eq tool.name
+        end
+      end
+
+      context "with the lti_resource_link_id_speedgrader_launches_reference_assignment feature flag on" do
+        before { account.enable_feature!(:lti_resource_link_id_speedgrader_launches_reference_assignment) }
+
+        it "uses the resource_link_id and resource_link_title of the assignment" do
+          user_session(@student)
+          get :retrieve, params: retrieve_params
+          expect(launch_resource_link_id).to eq assignment.lti_resource_link_id
+          expect(launch_resource_link_title).to eq assignment.title
+        end
+
+        context "when launching as a student" do
+          it "uses the resource_link_id and resource_link_title of the assignment" do
+            user_session(@student)
+            get :retrieve, params: retrieve_params
+            expect(launch_resource_link_id).to eq assignment.lti_resource_link_id
+            expect(launch_resource_link_title).to eq assignment.title
+          end
+        end
+      end
+
+      context "when launching as a student but the assigment is unpublished" do
+        it "returns a 401" do
+          user_session(@student)
+          assignment.update! workflow_state: "unpublished"
+          get :retrieve, params: retrieve_params
+          expect(response).to have_http_status(:unauthorized)
+        end
       end
     end
   end
