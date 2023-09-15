@@ -139,7 +139,8 @@ module.exports = {
   watchOptions: {ignored: ['**/node_modules/']},
 
   output: {
-    publicPath: '',
+    publicPath:
+      process.env.NODE_ENV !== 'production' ? '/dist/webpack-dev/' : '/dist/webpack-production/',
     clean: true, // clean /dist folder before each build
     path: join(canvasDir, 'public', webpackPublicPath),
     hashFunction: 'xxhash64',
