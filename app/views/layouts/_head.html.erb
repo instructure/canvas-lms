@@ -42,27 +42,6 @@
   <% end %>
   <%= benchmark("include_css_bundles") { include_css_bundles } %>
   <%= include_account_css %>
-  <script>
-    <%#
-      listen for any clicks on links that have href="#" or data-method set and queue them to be fired on dom ready.
-      note: the events targeted for a[data-method] elems don't get properly replayed, but
-      at least we can gobble them up here to prevent errors.
-    %>
-    function _earlyClick(e){
-      var c = e.target
-      while (c && c.ownerDocument) {
-        if (c.getAttribute('href') == '#' || c.getAttribute('data-method')) {
-          if (!e.defaultPrevented) {
-            e.preventDefault()
-          }
-          (_earlyClick.clicks = _earlyClick.clicks || []).push(c)
-          break
-        }
-        c = c.parentNode
-      }
-    }
-    document.addEventListener('click', _earlyClick)
-  </script>
 
   <% js_bundle :navigation_header unless @headers == false %>
 

@@ -23,8 +23,6 @@ import {
 import filterUselessConsoleMessages from '../../packages/filter-console-messages'
 import moment from 'moment'
 import './initializers/fakeRequireJSFallback'
-// must run before retriggerEarlyClicks to make sure data-method is
-// respected on quickly-clicked buttons
 import './initializers/ujsLinks'
 import {up as configureDateTimeMomentParser} from './initializers/configureDateTimeMomentParser'
 import {up as configureDateTime} from './initializers/configureDateTime'
