@@ -2531,6 +2531,7 @@ $(document).ready(function () {
         initialTab='assign-to'
         assignOnly={false}
         moduleElement={moduleElement}
+        courseId={ENV.COURSE_ID}
         {...settingsProps}
       />,
       document.getElementById('differentiated-modules-mount-point')

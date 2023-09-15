@@ -29,6 +29,7 @@ describe('DifferentiatedModulesTray', () => {
     moduleElement: document.createElement('div'),
     initialTab: 'assign-to',
     assignOnly: true,
+    courseId: '1',
   }
 
   const renderComponent = (overrides = {}) =>

@@ -16,15 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useRef, useMemo} from 'react'
+import React, {useState, useEffect, useRef, useMemo} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import keycode from 'keycode'
 import {Select} from '@instructure/ui-select'
 import {Tag} from '@instructure/ui-tag'
-import {func, string, node, arrayOf, oneOfType, bool} from 'prop-types'
+import {func, string, node, arrayOf, oneOfType, bool, number} from 'prop-types'
 import {matchComponentTypes} from '@instructure/ui-react-utils'
 import {compact, uniqueId} from 'lodash'
 import {Alert} from '@instructure/ui-alerts'
+import {Spinner} from '@instructure/ui-spinner'
 
 const I18n = useI18nScope('app_shared_components')
 
@@ -33,6 +34,7 @@ const CanvasMultiSelectOption = () => <div />
 CanvasMultiSelectOption.propTypes = {
   id: string.isRequired, // eslint-disable-line react/no-unused-prop-types
   value: string.isRequired, // eslint-disable-line react/no-unused-prop-types
+  group: string, // eslint-disable-line react/no-unused-prop-types
 }
 
 function alwaysArray(scalarOrArray) {
@@ -57,6 +59,8 @@ function CanvasMultiSelect(props) {
     disabled,
     customRenderBeforeInput,
     customMatcher,
+    customOnInputChange,
+    isLoading,
     ...otherProps
   } = props
 
@@ -84,6 +88,8 @@ function CanvasMultiSelect(props) {
   }
 
   function renderChildren() {
+  const groups = [...new Set(children.map(child => child.props.group))].filter(group => group);
+
     function renderOption(child) {
       const {id, children, ...optionProps} = child.props
       return (
@@ -101,7 +107,8 @@ function CanvasMultiSelect(props) {
     function renderNoOptionsOption() {
       return (
         <Select.Option id={noOptionId.current} isHighlighted={false} isSelected={false}>
-          {noOptionsLabel}
+          { isLoading ? <Spinner renderTitle="Loading" size="x-small" /> :
+          noOptionsLabel}
         </Select.Option>
       )
     }
@@ -119,7 +126,16 @@ function CanvasMultiSelect(props) {
       })
     )
 
-    return filteredChildren.length === 0 ? renderNoOptionsOption() : filteredChildren
+    function renderGroups() {
+      const groupsToRender = groups.filter(group => filteredChildren.some(child => child.props.group === group))
+      return groupsToRender.map((group) => <Select.Group key={group} renderLabel={group}>
+        {filteredChildren.filter(({props}) => props.group === group).map(option => renderOption(option))}
+      </Select.Group>)
+    }
+
+    if(filteredChildren.length === 0) return renderNoOptionsOption();
+
+    return groups.length === 0 ? filteredChildren : renderGroups()
   }
 
   function dismissTag(e, id) {
@@ -156,8 +172,20 @@ function CanvasMultiSelect(props) {
     return customRenderBeforeInput ? customRenderBeforeInput(tags) : tags
   }
 
+  useEffect(() => {
+    if(inputValue !== ''){
+      filterOptions(inputValue)
+    }
+  }, [childProps])
+
   function onInputChange(e) {
     const {value} = e.target
+    filterOptions(value)
+    setInputValue(value)
+    customOnInputChange(value)
+  }
+
+  function filterOptions(value) {
     const defaultMatcher = (option, term) => option.label.match(new RegExp(`^${term}`, 'i'))
     const matcher = customMatcher || defaultMatcher
     const filtered = childProps.filter(child => matcher(child, value.trim()))
@@ -175,7 +203,6 @@ function CanvasMultiSelect(props) {
     if (message && filtered.length > 0 && highlightedOptionId !== filtered[0].id) {
       message = getChildById(filtered[0].id).label + '. ' + message
     }
-    setInputValue(value)
     setFilteredOptionIds(filtered.map(f => f.id))
     if (filtered.length > 0) setHighlightedOptionId(filtered[0].id)
     setIsShowingOptions(true)
@@ -282,6 +309,9 @@ CanvasMultiSelect.propTypes = {
   selectedOptionIds: arrayOf(string).isRequired,
   noOptionsLabel: string,
   size: string,
+  customOnInputChange: func,
+  visibleOptionsCount: number,
+  isLoading: bool,
 }
 
 CanvasMultiSelect.defaultProps = {
@@ -290,6 +320,8 @@ CanvasMultiSelect.defaultProps = {
   noOptionsLabel: '---',
   selectedOptionIds: [],
   disabled: false,
+  isLoading: false,
+  customOnInputChange: () => {}
 }
 
 CanvasMultiSelect.Option = CanvasMultiSelectOption

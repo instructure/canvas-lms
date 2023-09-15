@@ -42,6 +42,7 @@ export interface DifferentiatedModulesTrayProps {
   unlockAt?: string
   prerequisites?: Module[]
   moduleList?: Module[]
+  courseId: string
 }
 
 const SettingsPanel = React.lazy(() => import('./SettingsPanel'))
@@ -54,6 +55,7 @@ export default function DifferentiatedModulesTray({
   moduleId = '',
   initialTab = 'assign-to',
   assignOnly = true,
+  courseId,
   ...settingsProps
 }: DifferentiatedModulesTrayProps) {
   const [selectedTab, setSelectedTab] = useState<string | undefined>(initialTab)
@@ -95,7 +97,7 @@ export default function DifferentiatedModulesTray({
     return (
       <React.Suspense fallback={<Fallback />}>
         {assignOnly ? (
-          <AssignToPanel height={panelHeight} onDismiss={onDismiss} />
+          <AssignToPanel courseId={courseId} height={panelHeight} onDismiss={onDismiss} />
         ) : (
           <Tabs onRequestTabChange={(_e: any, {id}: {id?: string}) => setSelectedTab(id)}>
             <Tabs.Panel
@@ -120,7 +122,7 @@ export default function DifferentiatedModulesTray({
               isSelected={selectedTab === 'assign-to'}
               padding="none"
             >
-              <AssignToPanel height={panelHeight} onDismiss={onDismiss} />
+              <AssignToPanel courseId={courseId} height={panelHeight} onDismiss={onDismiss} />
             </Tabs.Panel>
           </Tabs>
         )}
