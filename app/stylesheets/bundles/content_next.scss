@@ -116,11 +116,24 @@
     }
   }
 
+  .view_assign {
+    margin-inline-end: 12px;
+  }
+
+  .module_header_items{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    margin-left: auto;
+  }
+
   .ig-header-admin {
     flex: 0 0 auto;
     display: flex;
     align-self: center;
     margin-inline-start: auto;
+    justify-content: flex-end;
+    flex-wrap: wrap;
 
     .completion_status {
       margin: 0 16px;

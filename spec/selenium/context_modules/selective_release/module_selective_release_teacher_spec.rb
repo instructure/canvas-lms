@@ -77,5 +77,18 @@ describe "selective_release module set up" do
       click_assign_to_tab
       expect(assign_to_tab).to be_displayed
     end
+
+    it "shows 'View Assign To' when a module has an assignment override" do
+      @module.assignment_overrides.create!
+      go_to_modules
+
+      expect(view_assign.text).to eq "View Assign To"
+    end
+
+    it "doesn't show 'View Assign To' when a module has no assignment overrides" do
+      go_to_modules
+
+      expect(view_assign.text).to eq ""
+    end
   end
 end

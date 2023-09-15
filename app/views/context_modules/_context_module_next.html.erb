@@ -75,165 +75,178 @@
       <i class="icon-mini-arrow-right"></i>
       <span class="name ellipsis"><%= context_module.try_rescue(:name) || nbsp %></span>
     </span>
-
     <%= render :partial => "context_modules/prerequisites_message", :locals => {:viewable => @can_view, :context_module => context_module} %>
+    <div class="module_header_items">
+      <div class="ig-header-admin">
 
-    <div class="requirements_message">
-      <% if context_module && context_module.completion_requirements.present? %>
-        <ul class="pill">
-          <% count = context_module.requirement_count %>
-          <% completion_label = count == 1 ? t("Complete One Item") : t("Complete All Items") %>
-          <li aria-label="<%= completion_label %>" data-requirement-count="<%= count %>">
-            <%= completion_label %>
-          </li>
-        </ul>
-      <% end %>
-    </div>
+        <div class="requirements_message">
+          <% if context_module && context_module.completion_requirements.present? %>
+            <ul class="pill">
+              <% count = context_module.requirement_count %>
+              <% completion_label = count == 1 ? t("Complete One Item") : t("Complete All Items") %>
+              <li aria-label="<%= completion_label %>" data-requirement-count="<%= count %>">
+                <%= completion_label %>
+              </li>
+            </ul>
+          <% end %>
+        </div>
 
-    <div class="ig-header-admin">
-      <% unless @can_view %>
-        <% if context_module %>
-          <div class="completion_status">
-            <i class="icon-check complete_icon"
-               data-tooltip
-               title="<%= t('Completed')%>"
-            >
-              <span class="screenreader-only"><%= t("Module Completed") %></span>
-            </i>
-            <i class="icon-minimize in_progress_icon"
-               data-tooltip
-               title="<%= t('In Progress') %>"
-            >
-              <span class="screenreader-only"><%= t("Module In Progress") %></span>
-            </i>
-            <i class="icon-lock locked_icon"
-               data-tooltip
-               title="<%= context_module && context_module.to_be_unlocked ?
-                       t('Locked until %{unlock_date}', :unlock_date => (datetime_string(context_module.try_rescue(:unlock_at)) || nbsp)) : t('Locked') %>"
-             >
-              <span class="screenreader-only"><%= t("Module Locked") %></span>
-            </i>
-          </div>
+        <% unless @can_view %>
+          <% if context_module %>
+            <div class="completion_status">
+              <i class="icon-check complete_icon"
+                data-tooltip
+                title="<%= t('Completed')%>"
+              >
+                <span class="screenreader-only"><%= t("Module Completed") %></span>
+              </i>
+              <i class="icon-minimize in_progress_icon"
+                data-tooltip
+                title="<%= t('In Progress') %>"
+              >
+                <span class="screenreader-only"><%= t("Module In Progress") %></span>
+              </i>
+              <i class="icon-lock locked_icon"
+                data-tooltip
+                title="<%= context_module && context_module.to_be_unlocked ?
+                        t('Locked until %{unlock_date}', :unlock_date => (datetime_string(context_module.try_rescue(:unlock_at)) || nbsp)) : t('Locked') %>"
+              >
+                <span class="screenreader-only"><%= t("Module Locked") %></span>
+              </i>
+            </div>
+          <% end %>
         <% end %>
-      <% end %>
 
-      <% if @can_edit%>
-        <% if Account.site_admin.feature_enabled?(:module_publish_menu) %>
-          <div
-            data-course-id="<%= context_module && context_module.context_id %>"
-            data-module-id="<%= context_module && context_module.id %>"
-            data-published="<%= module_data[:published_status] == 'published' %>"
-            class="module-publish-icon">
-          </div>
-        <% else %>
-          <span
-            data-module-type="module"
-            data-id="<%= context_module && context_module.id %>"
-            data-course-id="<%= context_module && context_module.context_id %>"
-            data-published="<%= module_data[:published_status] == 'published' %>"
-            data-publishable="<%= true %>"
-            data-publish-title="<%= context_module ? context_module.name : 'module' %>"
-            title=""
-            data-tooltip
-            class="publish-icon module <%= module_data[:published_status] %>"
-          >
-            <i class="icon-<%= module_data[:published_status] %>" alt="<%= module_data[:published_status] == 'published' ? t('published') : t('unpublished') %>"></i>
-          </span>
+        <% if @can_edit%>
+          <% if Account.site_admin.feature_enabled?(:module_publish_menu) %>
+            <div
+              data-course-id="<%= context_module && context_module.context_id %>"
+              data-module-id="<%= context_module && context_module.id %>"
+              data-published="<%= module_data[:published_status] == 'published' %>"
+              class="module-publish-icon">
+            </div>
+          <% else %>
+            <span
+              data-module-type="module"
+              data-id="<%= context_module && context_module.id %>"
+              data-course-id="<%= context_module && context_module.context_id %>"
+              data-published="<%= module_data[:published_status] == 'published' %>"
+              data-publishable="<%= true %>"
+              data-publish-title="<%= context_module ? context_module.name : 'module' %>"
+              title=""
+              data-tooltip
+              class="publish-icon module <%= module_data[:published_status] %>"
+            >
+              <i class="icon-<%= module_data[:published_status] %>" alt="<%= module_data[:published_status] == 'published' ? t('published') : t('unpublished') %>"></i>
+            </span>
+          <% end %>
         <% end %>
-      <% end %>
 
-      <% if @can_add %>
-        <button
-          aria-label="<%= t('Add Content to %{module_name}', {module_name: context_module ? context_module.name : 'module'}) %>"
-          rel="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>/items"
-          class="add_module_item_link Button--icon-action"><i class="icon-plus"></i><span class="screenreader-only"><%= t('Add Content to %{module_name}', {module_name: context_module ? context_module.name : 'module'}) %></span>
-        </button>
-      <% end %>
+        <% if @can_add %>
+          <button
+            aria-label="<%= t('Add Content to %{module_name}', {module_name: context_module ? context_module.name : 'module'}) %>"
+            rel="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>/items"
+            class="add_module_item_link Button--icon-action"><i class="icon-plus"></i><span class="screenreader-only"><%= t('Add Content to %{module_name}', {module_name: context_module ? context_module.name : 'module'}) %></span>
+          </button>
+        <% end %>
 
-      <% if @can_view || can_direct_share %>
-        <button class="Button--icon-action al-trigger" aria-label="<%= t('Manage %{module_name}', {module_name: context_module ? context_module.name : 'module'})  %>">
-          <i class="icon-more" aria-hidden="true"></i>
-        </button>
-        <ul class="al-options">
-          <% if @can_edit %>
-            <li role="presentation">
-              <a
-                href="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>"
-                class="icon-edit edit_module_link"
-                title="<%= t('links.title.edit_module', %{Edit}) %>"><%= t('links.text.edit_module', %{Edit}) %></a>
-            </li>
-            <li role="presentation">
-              <a
-                href="#<%= context_module ? context_module.id : "{{ id }}" %>"
-                class="move_module_contents_link icon-move-down"
-                title="<%= t('Move module contents') %>"><%= t('Move Contents...') %></a>
-            </li>
-            <li role="presentation">
-              <a
-                href="#<%= context_module ? context_module.id : "{{ id }}" %>"
-                class="move_module_link icon-updown"
-                title="<%= t('Move this module') %>"><%= t('Move Module...') %></a>
-            </li>
-            <% if Account.site_admin.feature_enabled?(:differentiated_modules) %>
+        <% if @can_view || can_direct_share %>
+          <button class="Button--icon-action al-trigger" aria-label="<%= t('Manage %{module_name}', {module_name: context_module ? context_module.name : 'module'})  %>">
+            <i class="icon-more" aria-hidden="true"></i>
+          </button>
+          <ul class="al-options">
+            <% if @can_edit %>
               <li role="presentation">
-                  <a
-                    href="#<%= context_module ? context_module.id : "{{ id }}" %>"
-                    class="assign_module_link icon-permissions"
-                    title="<%= t('Assign this module') %>"><%= t('Assign To...') %>
-                  </a>
+                <a
+                  href="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>"
+                  class="icon-edit edit_module_link"
+                  title="<%= t('links.title.edit_module', %{Edit}) %>"><%= t('links.text.edit_module', %{Edit}) %></a>
+              </li>
+              <li role="presentation">
+                <a
+                  href="#<%= context_module ? context_module.id : "{{ id }}" %>"
+                  class="move_module_contents_link icon-move-down"
+                  title="<%= t('Move module contents') %>"><%= t('Move Contents...') %></a>
+              </li>
+              <li role="presentation">
+                <a
+                  href="#<%= context_module ? context_module.id : "{{ id }}" %>"
+                  class="move_module_link icon-updown"
+                  title="<%= t('Move this module') %>"><%= t('Move Module...') %></a>
+              </li>
+              <% if Account.site_admin.feature_enabled?(:differentiated_modules) %>
+                <li role="presentation">
+                    <a
+                      href="#<%= context_module ? context_module.id : "{{ id }}" %>"
+                      class="assign_module_link icon-permissions"
+                      title="<%= t('Assign this module') %>"><%= t('Assign To...') %>
+                    </a>
+                </li>
+              <% end %>
+            <% end %>
+            <% if @can_delete %>
+              <li role="presentation">
+                <a
+                  href="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>"
+                  class="delete_module_link icon-trash"
+                  title="<%= t('links.title.delete_module', %{Delete this module}) %>"><%= t('links.text.delete_module', %{Delete}) %></a>
               </li>
             <% end %>
+            <% if @can_add %>
+              <li role="presentation" class="duplicate_module_menu_item">
+                <a
+                  href="/api/v1<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>/duplicate"
+                  class="duplicate_module_link icon-copy-course"
+                  aria-label="<%= t('Duplicate %{module_name}', {module_name: context_module ? context_module.name : 'module'} ) %>"
+                  title="<%= t(%{Duplicate this module}) %>"><%= t(%{Duplicate}) %></a>
+              </li>
+            <% end %>
+            <% if can_direct_share %>
+              <li role="presentation">
+                <a
+                  href="#"
+                  class="module_send_to icon-user"
+                  aria-label="<%= t("Send this module to another user..." ) %>"
+                  title="<%= t("Send this module to another user..." ) %>">
+                    <%= t("Send To...") %>
+                </a>
+              </li>
+              <li role="presentation">
+                <a
+                  href="#"
+                  class="module_copy_to icon-duplicate"
+                  aria-label="<%= t("Copy this module to a course..." ) %>"
+                  title="<%= t("Copy this module to a course..." ) %>">
+                    <%= t("Copy To...") %>
+                </a>
+              </li>
+            <% end %>
+            <% if @can_view %>
+              <%= external_tools_menu_items(@menu_tools[:module_menu], {link_class: "menu_tool_link", settings_key: :module_menu, in_list: true, url_params: {:modules => [context_module ? context_module.id : "{{ id }}"]}}) %>
+              <%= external_tools_menu_items(@menu_tools[:module_group_menu], {link_class: "menu_tray_tool_link", settings_key: :module_group_menu, in_list: true}) %>
+              <%= external_tools_menu_items(@menu_tools[:module_menu_modal], {link_class: "menu_tray_tool_link", settings_key: :module_menu_modal, in_list: true}) %>
+            <% end %>
+          </ul>
+        <% end %>
+        <span style="display: none;">
+          <span class="name"><%= context_module && context_module.name %></span>
+          <span class="id"><%= context_module && context_module.id %></span>
+          <span class="publish_final_grade"><%= context_module.try_rescue(:publish_final_grade?) || nbsp %></span>
+          <span class="require_sequential_progress"><%= context_module.try_rescue(:require_sequential_progress) || nbsp %></span>
+        </span>
+      </div>
+      <% if @can_edit && Account.site_admin.feature_enabled?(:differentiated_modules) %>
+        <div class="view_assign">
+          <% if context_module && @module_ids_with_overrides.include?(context_module.id) %>
+            <i aria-hidden="true" class="icon-group"></i>
+            <a
+              href="#<%= context_module ? context_module.id : "{{ id }}" %>"
+              class="view_assign_link"
+              title="<%= t('View Assign To') %>"><%= t('View Assign To') %>
+            </a>
           <% end %>
-          <% if @can_delete %>
-            <li role="presentation">
-              <a
-                href="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>"
-                class="delete_module_link icon-trash"
-                title="<%= t('links.title.delete_module', %{Delete this module}) %>"><%= t('links.text.delete_module', %{Delete}) %></a>
-            </li>
-          <% end %>
-          <% if @can_add %>
-            <li role="presentation" class="duplicate_module_menu_item">
-              <a
-                href="/api/v1<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>/duplicate"
-                class="duplicate_module_link icon-copy-course"
-                aria-label="<%= t('Duplicate %{module_name}', {module_name: context_module ? context_module.name : 'module'} ) %>"
-                title="<%= t(%{Duplicate this module}) %>"><%= t(%{Duplicate}) %></a>
-            </li>
-          <% end %>
-          <% if can_direct_share %>
-            <li role="presentation">
-              <a
-                href="#"
-                class="module_send_to icon-user"
-                aria-label="<%= t("Send this module to another user..." ) %>"
-                title="<%= t("Send this module to another user..." ) %>">
-                  <%= t("Send To...") %>
-              </a>
-            </li>
-            <li role="presentation">
-              <a
-                href="#"
-                class="module_copy_to icon-duplicate"
-                aria-label="<%= t("Copy this module to a course..." ) %>"
-                title="<%= t("Copy this module to a course..." ) %>">
-                  <%= t("Copy To...") %>
-              </a>
-            </li>
-          <% end %>
-          <% if @can_view %>
-            <%= external_tools_menu_items(@menu_tools[:module_menu], {link_class: "menu_tool_link", settings_key: :module_menu, in_list: true, url_params: {:modules => [context_module ? context_module.id : "{{ id }}"]}}) %>
-            <%= external_tools_menu_items(@menu_tools[:module_group_menu], {link_class: "menu_tray_tool_link", settings_key: :module_group_menu, in_list: true}) %>
-            <%= external_tools_menu_items(@menu_tools[:module_menu_modal], {link_class: "menu_tray_tool_link", settings_key: :module_menu_modal, in_list: true}) %>
-          <% end %>
-        </ul>
+        </div>
       <% end %>
-      <span style="display: none;">
-        <span class="name"><%= context_module && context_module.name %></span>
-        <span class="id"><%= context_module && context_module.id %></span>
-        <span class="publish_final_grade"><%= context_module.try_rescue(:publish_final_grade?) || nbsp %></span>
-        <span class="require_sequential_progress"><%= context_module.try_rescue(:require_sequential_progress) || nbsp %></span>
-      </span>
     </div>
   </div>
 
