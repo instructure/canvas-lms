@@ -991,7 +991,7 @@ GEM
       activesupport (>= 3.2, < 7.1)
       nokogiri (>= 1.5.8, < 2.0)
       nokogiri-xmlsec-instructure (~> 0.9, >= 0.9.5)
-    sanitize (6.0.2)
+    sanitize (6.1.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
     scrypt (3.0.7)
