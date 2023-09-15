@@ -17,36 +17,99 @@
  */
 
 import CanvasMultiSelect from '@canvas/multi-select/react'
-import React, {ReactElement, useState} from 'react'
+import React, {ReactElement, useEffect, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Link} from '@instructure/ui-link'
 import {View} from '@instructure/ui-view'
+import doFetchApi from '@canvas/do-fetch-api-effect'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {debounce, uniqBy} from 'lodash'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 const {Option: CanvasMultiSelectOption} = CanvasMultiSelect as any
 
 const I18n = useI18nScope('differentiated_modules')
 
+interface Props {
+  courseId: string
+}
+
 interface Option {
   id: string
   value: string
+  group: string
 }
-export const OPTIONS = [
-  {id: '1', value: 'Section A'},
-  {id: '2', value: 'Section B'},
-  {id: '3', value: 'Section C'},
-  {id: '4', value: 'Section D'},
-  {id: '5', value: 'Section E'},
-  {id: '6', value: 'Section F'},
-]
 
-const AssigneeSelector = () => {
+const AssigneeSelector = ({courseId}: Props) => {
   const [selectedAssignees, setSelectedAssignees] = useState<Option[]>([])
+  const [searchTerm, setSearchTerm] = useState('')
+  const [options, setOptions] = useState<Option[]>([])
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleChange = (newSelected: string[]) => {
     const newSelectedSet = new Set(newSelected)
-    const selected = OPTIONS.filter(option => newSelectedSet.has(option.id))
+    const selected = options.filter(option => newSelectedSet.has(option.id))
     setSelectedAssignees(selected)
   }
+
+  const handleInputChange = (value: string) => {
+    debounce(() => setSearchTerm(value), 300)()
+  }
+
+  useEffect(() => {
+    const params: Record<string, string> = {}
+    const shouldSearchTerm = searchTerm.length > 2
+    if (shouldSearchTerm || searchTerm === '') {
+      setIsLoading(true)
+      if (shouldSearchTerm) {
+        params.search_term = searchTerm
+      }
+      const fetchSections = doFetchApi({
+        path: `/api/v1/courses/${courseId}/sections`,
+        params,
+      })
+      const fetchStudents = doFetchApi({
+        path: `/api/v1/courses/${courseId}/users`,
+        params: {...params, enrollment_type: 'student'},
+      })
+
+      Promise.allSettled([fetchSections, fetchStudents])
+        .then(results => {
+          const sectionsResult = results[0]
+          const studentsResult = results[1]
+          let sectionsParsedResult = []
+          let studentsParsedResult = []
+          if (sectionsResult.status === 'fulfilled') {
+            sectionsParsedResult = sectionsResult.value.json.map(({id, name}: any) => ({
+              id: `section-${id}`,
+              value: name,
+              group: I18n.t('Sections'),
+            }))
+          } else {
+            showFlashError(I18n.t('Failed to load sections data'))(sectionsResult.reason)
+          }
+
+          if (studentsResult.status === 'fulfilled') {
+            studentsParsedResult = studentsResult.value.json.map(({id, name}: any) => ({
+              id: `student-${id}`,
+              value: name,
+              group: I18n.t('Students'),
+            }))
+          } else {
+            showFlashError(I18n.t('Failed to load students data'))(studentsResult.reason)
+          }
+
+          const newOptions = uniqBy(
+            [...options, ...sectionsParsedResult, ...studentsParsedResult],
+            'id'
+          )
+          setOptions(newOptions)
+          setIsLoading(false)
+        })
+        .catch(e => showFlashError(I18n.t('Something went wrong while fetching data'))(e))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [courseId, searchTerm])
 
   return (
     <>
@@ -57,6 +120,9 @@ const AssigneeSelector = () => {
         selectedOptionIds={selectedAssignees.map(val => val.id)}
         onChange={handleChange}
         renderAfterInput={<></>}
+        customOnInputChange={handleInputChange}
+        visibleOptionsCount={14}
+        isLoading={isLoading}
         customRenderBeforeInput={tags =>
           tags?.map((tag: ReactElement) => (
             <View
@@ -71,10 +137,15 @@ const AssigneeSelector = () => {
           ))
         }
       >
-        {OPTIONS.map(role => {
+        {options.map(option => {
           return (
-            <CanvasMultiSelectOption id={role.id} value={role.id} key={role.id}>
-              {role.value}
+            <CanvasMultiSelectOption
+              id={option.id}
+              value={option.id}
+              key={option.id}
+              group={option.group}
+            >
+              {option.value}
             </CanvasMultiSelectOption>
           )
         })}
@@ -85,7 +156,8 @@ const AssigneeSelector = () => {
           onClick={() => setSelectedAssignees([])}
           isWithinText={false}
         >
-          {I18n.t('Clear All')}
+          <span aria-hidden={true}>{I18n.t('Clear All')}</span>
+          <ScreenReaderContent>{I18n.t('Clear Assign To')}</ScreenReaderContent>
         </Link>
       </View>
     </>

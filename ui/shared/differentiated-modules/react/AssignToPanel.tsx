@@ -32,6 +32,7 @@ const I18n = useI18nScope('differentiated_modules')
 const {Item: FlexItem} = Flex as any
 
 export interface AssignToPanelProps {
+  courseId: string
   height: string
   onDismiss: () => void
 }
@@ -56,7 +57,7 @@ const OPTIONS: Option[] = [
   },
 ]
 
-export default function AssignToPanel({height, onDismiss}: AssignToPanelProps) {
+export default function AssignToPanel({courseId, height, onDismiss}: AssignToPanelProps) {
   const [selectedOption, setSelectedOption] = useState<string>(OPTIONS[0].value)
 
   return (
@@ -92,7 +93,7 @@ export default function AssignToPanel({height, onDismiss}: AssignToPanelProps) {
                 </View>
                 {option.value === OPTIONS[1].value && selectedOption === OPTIONS[1].value && (
                   <View as="div" margin="small large none none">
-                    <AssigneeSelector />
+                    <AssigneeSelector courseId={courseId} />
                   </View>
                 )}
               </FlexItem>

@@ -31,7 +31,7 @@ describe('CanvasMultiSelect', () => {
     return renderFn(
       <CanvasMultiSelect {...props}>
         {options.map(o => (
-          <CanvasMultiSelect.Option id={o.id} key={o.id} value={o.id}>
+          <CanvasMultiSelect.Option id={o.id} key={o.id} value={o.id} group={o.group}>
             {o.text}
           </CanvasMultiSelect.Option>
         ))}
@@ -70,6 +70,31 @@ describe('CanvasMultiSelect', () => {
     fireEvent.click(combobox)
     expect(getByRole('option', {name: 'Broccoli'})).toBeInTheDocument()
   })
+
+  it('categorizes by groups if set in the options', () => {
+    options = [
+      {id: '1', text: 'Cucumber', group: 'Vegetable'},
+      {id: '2', text: 'Broccoli', group: 'Vegetable'},
+      {id: '3', text: 'Apple', group: 'Fruit'},
+    ]
+    const {getByRole} = renderComponent()
+
+    const combobox = getByRole('combobox', {name: 'Vegetables'})
+    fireEvent.click(combobox)
+    expect(getByRole('group', {name: 'Vegetable'})).toBeInTheDocument()
+    expect(getByRole('group', {name: 'Fruit'})).toBeInTheDocument()
+    expect(getByRole('option', {name: 'Apple'})).toBeInTheDocument()
+  })
+
+  it('does not categorize by groups if they are not set in the options', () => {
+    const {queryByRole} = renderComponent()
+
+    const combobox = queryByRole('combobox', {name: 'Vegetables'})
+    fireEvent.click(combobox)
+    expect(queryByRole('group', {name: 'Vegetable'})).not.toBeInTheDocument()
+    expect(queryByRole('group', {name: 'Fruit'})).not.toBeInTheDocument()
+  })
+
 
   it('filters available options when text is input', () => {
     const {getByRole, queryByRole} = renderComponent()
