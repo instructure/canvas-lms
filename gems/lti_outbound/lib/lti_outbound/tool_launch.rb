@@ -88,6 +88,7 @@ module LtiOutbound
     def generate(overrides = {})
       hash["lti_message_type"] = "basic-lti-launch-request"
       hash["lti_version"] = "LTI-1p0"
+
       hash["resource_link_id"] = link_code
       hash["resource_link_title"] = overrides["resource_link_title"] || tool.name
       hash["user_id"] = user.opaque_identifier

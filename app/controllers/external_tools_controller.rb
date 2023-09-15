@@ -661,6 +661,15 @@ class ExternalToolsController < ApplicationController
     end
   end
 
+  def assignment_from_assignment_id
+    return nil unless params[:assignment_id].present?
+
+    assignment = api_find(@context.assignments.active, params[:assignment_id])
+    raise Lti::Errors::UnauthorizedError unless assignment.grants_right?(@current_user, :read)
+
+    assignment
+  end
+
   # This handles non-content item 1.1 launches, and 1.3 launches including deep linking requests.
   # LtiAdvantageAdapter#generate_lti_params (called via
   # adapter.generate_post_payload) determines whether or not an LTI 1.3 launch
@@ -676,15 +685,19 @@ class ExternalToolsController < ApplicationController
     opts = default_opts.merge(opts)
     opts[:launch_url] = tool.url_with_environment_overrides(opts[:launch_url])
 
-    assignment = api_find(@context.assignments.active, params[:assignment_id]) if params[:assignment_id]
+    assignment = assignment_from_assignment_id
 
     if assignment.present? && @current_user.present?
       assignment = AssignmentOverrideApplicator.assignment_overridden_for(assignment, @current_user)
     end
 
-    # from specs, seems this is only a fix for Quizzes Next
-    # resource_link_id in regular QN launches is assignment.lti_resource_link_id
-    opts[:link_code] = @tool.opaque_identifier_for(assignment.external_tool_tag) if assignment.present? && assignment.quiz_lti?
+    if assignment.present? && ((@current_user && assignment.quiz_lti?) || assignment.root_account.feature_enabled?(:lti_resource_link_id_speedgrader_launches_reference_assignment))
+      # Set assignment LTI launch parameters for this code path (e.g. launches
+      # from Speedgrader)
+      opts[:link_code] = @tool.opaque_identifier_for(assignment.external_tool_tag)
+      opts[:overrides] ||= {}
+      opts[:overrides]["resource_link_title"] = assignment.title
+    end
 
     # This is only for 1.3: editing collaborations for 1.1 goes thru content_item_selection_request()
     if selection_type == "collaboration"
@@ -814,7 +827,7 @@ class ExternalToolsController < ApplicationController
                                                              tool:,
                                                              secure_params: params[:secure_params])
 
-    assignment = api_find(@context.assignments.active, params[:assignment_id]) if params[:assignment_id].present?
+    assignment = assignment_from_assignment_id
 
     opts = {
       post_only: @tool.settings["post_only"].present?,

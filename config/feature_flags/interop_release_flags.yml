@@ -250,3 +250,13 @@ lti_rce_postmessage_support:
       state: allowed_on
     ci:
       state: allowed_on
+lti_resource_link_id_speedgrader_launches_reference_assignment:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Make SpeedGrader LTI submission launches use assignment (not tool) resource_link_id
+  description: |-
+    When enabled, LTI 1.1 SpeedGrader launches will set the resource_link_id and
+    resource_link_title to the assignment opaque identifier and assignment
+    title. With the feature flag off, in SpeedGrader launches, resource_link_id
+    and resource_link_title reference the tool (not the assignment) for
+    non-NewQuizzes LTI 1.1 tools.
