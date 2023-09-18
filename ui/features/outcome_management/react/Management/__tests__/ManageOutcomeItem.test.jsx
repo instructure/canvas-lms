@@ -121,31 +121,31 @@ describe('ManageOutcomeItem', () => {
   })
 
   it('displays down pointing caret when description is expanded for multi-line html text', () => {
-    const {queryByTestId, getByText} = render(
+    const {queryByTestId} = render(
       <ManageOutcomeItem
         {...defaultProps({
           description: '<p>aaaaaaadfhausdfhkjsadhfkjsadhfkjhsadfkjhasdfkjh</p>'.repeat(10),
         })}
       />
     )
-    fireEvent.click(getByText('Expand description for outcome Outcome Title'))
+    fireEvent.click(queryByTestId('manage-outcome-item-expand-toggle'))
     expect(queryByTestId('icon-arrow-down').closest('button')).not.toHaveAttribute('disabled')
   })
 
   it('expands description when user clicks on button with right pointing caret', () => {
-    const {queryByTestId, getByText} = render(
+    const {queryByTestId} = render(
       <ManageOutcomeItem {...defaultProps({description: '<p>aa</p><p>bb</p>'})} />
     )
-    fireEvent.click(getByText('Expand description for outcome Outcome Title'))
+    fireEvent.click(queryByTestId('manage-outcome-item-expand-toggle'))
     expect(queryByTestId('description-expanded')).toBeInTheDocument()
   })
 
   it('collapses description when user clicks on button with down pointing caret', () => {
-    const {queryByTestId, getByText} = render(
+    const {queryByTestId} = render(
       <ManageOutcomeItem {...defaultProps({description: '<p>aa</p><p>bbbb</p>'})} />
     )
-    fireEvent.click(getByText('Expand description for outcome Outcome Title'))
-    fireEvent.click(getByText('Collapse description for outcome Outcome Title'))
+    fireEvent.click(queryByTestId('manage-outcome-item-expand-toggle'))
+    fireEvent.click(queryByTestId('manage-outcome-item-expand-toggle'))
     expect(queryByTestId('description-truncated')).toBeInTheDocument()
   })
 
@@ -176,6 +176,18 @@ describe('ManageOutcomeItem', () => {
     expect(onMenuHandlerMock).toHaveBeenCalledTimes(1)
     expect(onMenuHandlerMock.mock.calls[0][0]).toBe('2')
     expect(onMenuHandlerMock.mock.calls[0][1]).toBe('remove')
+  })
+
+  it('toggles aria-expanded attribute', () => {
+    const {queryByTestId} = render(
+      <ManageOutcomeItem {...defaultProps({description: '<p>aa</p><p>bb</p>'})} />
+    )
+    const button = queryByTestId('manage-outcome-item-expand-toggle')
+    const ariaExpandedValueBeforeClick = button.getAttribute('aria-expanded')
+    expect(ariaExpandedValueBeforeClick).toBe('false')
+    fireEvent.click(button)
+    const ariaExpandedValueAfterClick = button.getAttribute('aria-expanded')
+    expect(ariaExpandedValueAfterClick).toBe('true')
   })
 
   describe('Kebab menu -> edit option', () => {
