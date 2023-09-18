@@ -19,13 +19,15 @@
 #
 
 class Mutations::DiscussionBase < Mutations::BaseMutation
+  argument :allow_rating, Boolean, required: false
   argument :delayed_post_at, Types::DateTimeType, required: false
   argument :lock_at, Types::DateTimeType, required: false
   argument :locked, Boolean, required: false
   argument :message, String, required: false
+  argument :only_graders_can_rate, Boolean, required: false
   argument :published, Boolean, required: false
-  argument :title, String, required: false
   argument :require_initial_post, Boolean, required: false
+  argument :title, String, required: false
 
   field :discussion_topic, Types::DiscussionType, null: true
 end

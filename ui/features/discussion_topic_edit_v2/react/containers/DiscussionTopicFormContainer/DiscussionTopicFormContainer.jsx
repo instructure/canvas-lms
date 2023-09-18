@@ -95,6 +95,8 @@ export default function DiscussionTopicFormContainer() {
         availableFrom,
         availableUntil,
         anonymousAuthorState,
+        allowLiking,
+        onlyGradersCanLike,
       }) => {
         if (isEditing) {
           console.log('call updateDiscussion')
@@ -111,6 +113,8 @@ export default function DiscussionTopicFormContainer() {
               delayedPostAt: availableFrom,
               lockAt: availableUntil,
               isAnonymousAuthor: anonymousAuthorState,
+              allowRating: allowLiking,
+              onlyGradersCanRate: onlyGradersCanLike,
             },
           })
         }

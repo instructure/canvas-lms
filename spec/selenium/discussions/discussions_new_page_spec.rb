@@ -566,6 +566,45 @@ describe "discussions" do
         expect(f("span[data-testid='author_name']").text).to eq "teacher"
       end
 
+      it "creates an allow_rating discussion topic successfully" do
+        get "/courses/#{course.id}/discussion_topics/new"
+        f("input[placeholder='Topic Title']").send_keys "This is allow_rating"
+        force_click("input[value='allow-liking']")
+        f("button[data-testid='save-and-publish-button']").click
+        wait_for_ajaximations
+        dt = DiscussionTopic.last
+        expect(dt.allow_rating).to be true
+        expect(dt.only_graders_can_rate).to be false
+      end
+
+      it "creates an only_graders_can_rate discussion topic successfully" do
+        get "/courses/#{course.id}/discussion_topics/new"
+        f("input[placeholder='Topic Title']").send_keys "This is only_graders_can_rate"
+        force_click("input[value='allow-liking']")
+        force_click("input[value='only-graders-can-like']")
+        f("button[data-testid='save-and-publish-button']").click
+        wait_for_ajaximations
+        dt = DiscussionTopic.last
+        expect(dt.allow_rating).to be true
+        expect(dt.only_graders_can_rate).to be true
+      end
+
+      it "does not show allow liking options when course is a k5 homeroom course" do
+        Account.default.enable_as_k5_account!
+        course.homeroom_course = true
+        course.save!
+
+        get "/courses/#{course.id}/discussion_topics/new"
+        f("input[placeholder='Topic Title']").send_keys "Liking not settable in k5 homeroom courses"
+        expect(f("body")).not_to contain_jqcss "input[value='allow-liking']"
+        expect(f("body")).not_to contain_jqcss "input[value='only-graders-can-like']"
+        f("button[data-testid='save-and-publish-button']").click
+        wait_for_ajaximations
+        dt = DiscussionTopic.last
+        expect(dt.allow_rating).to be false
+        expect(dt.only_graders_can_rate).to be false
+      end
+
       it "shows course sections or course group categories" do
         new_section
         group_category
