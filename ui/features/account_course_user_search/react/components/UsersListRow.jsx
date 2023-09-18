@@ -85,15 +85,23 @@ export default function UsersListRow({
           >
             <Tooltip
               data-testid="user-list-row-tooltip"
-              renderTip={I18n.t('Create a temporary enrollment')}
+              renderTip={I18n.t('Create temporary enrollment based on %{name}', {
+                name: user.name,
+              })}
             >
               <IconButton
                 withBorder={false}
                 withBackground={false}
                 size="small"
-                screenReaderLabel={I18n.t('Create a temporary enrollment')}
+                screenReaderLabel={I18n.t('Create temporary enrollment based on %{name}', {
+                  name: user.name,
+                })}
               >
-                <IconCalendarClockLine title={I18n.t('Create a temporary enrollment')} />
+                <IconCalendarClockLine
+                  title={I18n.t('Create temporary enrollment based on %{name}', {
+                    name: user.name,
+                  })}
+                />
               </IconButton>
             </Tooltip>
           </TempEnrollModal>

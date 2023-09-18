@@ -24,6 +24,7 @@ import {Button} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {TempEnrollSearch} from './TempEnrollSearch'
 import {TempEnrollAssign} from './TempEnrollAssign'
+import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = useI18nScope('temporary_enrollment')
 
@@ -60,6 +61,7 @@ export function TempEnrollModal(props: Props) {
       setPage(0)
       setEnrollment(null)
       setOpen(false)
+      showFlashSuccess(I18n.t('Temporary enrollment was successfully created.'))()
     } else {
       setPage(2)
     }
