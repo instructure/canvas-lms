@@ -32,7 +32,7 @@ describe "discussions" do
       g.add_user(student, "accepted", nil)
     end
   end
-  let(:student) { student_in_course(course:, name: "student", active_all: true).user }
+  let(:student) { student_in_course(course:, name: "student", display_name: "mister student", active_all: true).user }
   let(:teacher) { teacher_in_course(course:, name: "teacher", active_all: true).user }
   let(:assignment_group) { course.assignment_groups.create!(name: "assignment group") }
   let(:group_category) { course.group_categories.create!(name: "group category") }
@@ -412,6 +412,85 @@ describe "discussions" do
   context "when discussion_create feature flag is ON", :ignore_js_errors do
     before do
       Account.site_admin.enable_feature! :discussion_create
+      # we must turn react_discussions_post ON as well since some new
+      # features, like, anonymous discussions, are dependent on it
+      Account.site_admin.enable_feature! :react_discussions_post
+    end
+
+    context "as a student" do
+      before do
+        user_session(student)
+      end
+
+      it "does not show anonymity options when not allowed" do
+        course.allow_student_anonymous_discussion_topics = false
+        course.save!
+        get "/courses/#{course.id}/discussion_topics/new"
+        expect(f("body")).not_to contain_jqcss "input[value='full_anonymity']"
+      end
+
+      it "lets students create fully anonymous discussions when allowed" do
+        course.allow_student_anonymous_discussion_topics = true
+        course.save!
+        get "/courses/#{course.id}/discussion_topics/new"
+        f("input[placeholder='Topic Title']").send_keys "This is fully anonymous"
+        force_click("input[value='full_anonymity']")
+        f("button[data-testid='save-and-publish-button']").click
+        wait_for_ajaximations
+        expect(f("span[data-testid='anon-conversation']").text).to eq "This is an anonymous Discussion, Your name and profile picture will be hidden from other course members."
+        expect(f("span[data-testid='author_name']").text).to include "Anonymous"
+      end
+
+      it "lets students create partially anonymous discussions when allowed (anonymous author by default)" do
+        course.allow_student_anonymous_discussion_topics = true
+        course.save!
+        get "/courses/#{course.id}/discussion_topics/new"
+        f("input[placeholder='Topic Title']").send_keys "This is partially anonymous"
+        force_click("input[value='partial_anonymity']")
+        f("button[data-testid='save-and-publish-button']").click
+        wait_for_ajaximations
+        expect(f("span[data-testid='anon-conversation']").text).to eq "When creating a reply, you will have the option to show your name and profile picture to other course members or remain anonymous."
+        expect(f("span[data-testid='author_name']").text).to include "Anonymous"
+      end
+
+      it "lets students create partially anonymous discussions using their real name" do
+        course.allow_student_anonymous_discussion_topics = true
+        course.save!
+        get "/courses/#{course.id}/discussion_topics/new"
+        f("input[placeholder='Topic Title']").send_keys "This is partially anonymous"
+        force_click("input[value='partial_anonymity']")
+
+        # open anonymous selector
+        # select real name to begin with
+        force_click("input[value='Anonymous']")
+        fj("li:contains('student')").click
+
+        f("button[data-testid='save-and-publish-button']").click
+        wait_for_ajaximations
+        expect(f("span[data-testid='anon-conversation']").text).to eq "When creating a reply, you will have the option to show your name and profile picture to other course members or remain anonymous."
+        expect(f("span[data-testid='author_name']").text).to include "student"
+      end
+
+      it "lets students create partially anonymous discussions when allowed (anonymous author by choice)" do
+        course.allow_student_anonymous_discussion_topics = true
+        course.save!
+        get "/courses/#{course.id}/discussion_topics/new"
+        f("input[placeholder='Topic Title']").send_keys "This is partially anonymous"
+        force_click("input[value='partial_anonymity']")
+
+        # open anonymous selector
+        # select real name to begin with
+        force_click("input[value='Anonymous']")
+        fj("li:contains('student')").click
+        # now go back to anonymous
+        force_click("input[value='student']")
+        fj("li:contains('Anonymous')").click
+
+        f("button[data-testid='save-and-publish-button']").click
+        wait_for_ajaximations
+        expect(f("span[data-testid='anon-conversation']").text).to eq "When creating a reply, you will have the option to show your name and profile picture to other course members or remain anonymous."
+        expect(f("span[data-testid='author_name']").text).to include "Anonymous"
+      end
     end
 
     context "as a teacher" do
@@ -460,10 +539,31 @@ describe "discussions" do
         expect(dt.require_initial_post).to be true
         expect(dt.delayed_post_at).to eq Time.zone.parse("2020-09-10 00:00:00")
         expect(dt.lock_at).to eq Time.zone.parse("2020-09-14 23:59:59.999999000")
+        expect(dt.anonymous_state).to be_nil
         expect(dt).to be_published
 
         # Verify that the discussion topic redirected the page to the new discussion topic
         expect(driver.current_url).to end_with("/courses/#{course.id}/discussion_topics/#{dt.id}")
+      end
+
+      it "creates a fully anonymous discussion topic successfully" do
+        get "/courses/#{course.id}/discussion_topics/new"
+        f("input[placeholder='Topic Title']").send_keys "This is fully anonymous"
+        force_click("input[value='full_anonymity']")
+        f("button[data-testid='save-and-publish-button']").click
+        wait_for_ajaximations
+        expect(f("span[data-testid='anon-conversation']").text).to eq "This is an anonymous Discussion. Though student names and profile pictures will be hidden, your name and profile picture will be visible to all course members."
+        expect(f("span[data-testid='author_name']").text).to eq "teacher"
+      end
+
+      it "creates a partially anonymous discussion topic successfully" do
+        get "/courses/#{course.id}/discussion_topics/new"
+        f("input[placeholder='Topic Title']").send_keys "This is partially anonymous"
+        force_click("input[value='partial_anonymity']")
+        f("button[data-testid='save-and-publish-button']").click
+        wait_for_ajaximations
+        expect(f("span[data-testid='anon-conversation']").text).to eq "When creating a reply, students will have the option to show their name and profile picture or remain anonymous. Your name and profile picture will be visible to all course members."
+        expect(f("span[data-testid='author_name']").text).to eq "teacher"
       end
 
       it "shows course sections or course group categories" do

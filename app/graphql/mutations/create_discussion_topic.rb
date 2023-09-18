@@ -20,6 +20,7 @@
 class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
   graphql_name "CreateDiscussionTopic"
 
+  argument :is_anonymous_author, Boolean, required: false
   argument :anonymous_state, String, required: false
   argument :context_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Context")
   argument :context_type, String, required: true
@@ -67,6 +68,7 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
         message: input[:message],
         workflow_state: input[:published] ? "active" : "unpublished",
         require_initial_post: input[:require_initial_post],
+        is_anonymous_author: input[:is_anonymous_author] || false,
         anonymous_state:,
         user: current_user
       }

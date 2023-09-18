@@ -94,6 +94,7 @@ export default function DiscussionTopicFormContainer() {
         discussionAnonymousState,
         availableFrom,
         availableUntil,
+        anonymousAuthorState,
       }) => {
         if (isEditing) {
           console.log('call updateDiscussion')
@@ -109,6 +110,7 @@ export default function DiscussionTopicFormContainer() {
               anonymousState: discussionAnonymousState,
               delayedPostAt: availableFrom,
               lockAt: availableUntil,
+              isAnonymousAuthor: anonymousAuthorState,
             },
           })
         }

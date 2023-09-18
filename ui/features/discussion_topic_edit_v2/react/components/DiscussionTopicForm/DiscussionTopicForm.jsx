@@ -61,7 +61,9 @@ export default function DiscussionTopicForm({
   const [sectionIdsToPostTo, setSectionIdsToPostTo] = useState(['all-sections'])
 
   const [discussionAnonymousState, setDiscussionAnonymousState] = useState('off')
-  const [anonymousAuthorState, setAnonymousAuthorState] = useState(false)
+  // default anonymousAuthorState to true, since it is the default selection for partial anonymity
+  // otherwise, it is just ignored anyway
+  const [anonymousAuthorState, setAnonymousAuthorState] = useState(true)
   const [requireInitialPost, setRequireInitialPost] = useState(false)
   const [enablePodcastFeed, setEnablePodcastFeed] = useState(false)
   const [includeRepliesInFeed, setIncludeRepliesInFeed] = useState(false)
@@ -99,9 +101,8 @@ export default function DiscussionTopicForm({
     setRceContent(currentDiscussionTopic.message)
 
     setSectionIdsToPostTo(currentDiscussionTopic.courseSections.map(section => section._id))
-
     setDiscussionAnonymousState(currentDiscussionTopic.anonymousState || 'off')
-    // setAnonymousAuthorState() TODO: is this necessary? Designs are unclear
+    setAnonymousAuthorState(currentDiscussionTopic.isAnonymousAuthor)
     setRequireInitialPost(currentDiscussionTopic.requireInitialPost)
     setEnablePodcastFeed(currentDiscussionTopic.podcastEnabled)
     setIncludeRepliesInFeed(currentDiscussionTopic.podcastHasStudentPosts)
@@ -117,7 +118,7 @@ export default function DiscussionTopicForm({
     setAvailableUntil(currentDiscussionTopic.lockAt)
 
     setPublished(currentDiscussionTopic.published)
-  }, [isEditing, currentDiscussionTopic])
+  }, [isEditing, currentDiscussionTopic, discussionAnonymousState])
 
   const validateTitle = newTitle => {
     if (newTitle.length > 255) {

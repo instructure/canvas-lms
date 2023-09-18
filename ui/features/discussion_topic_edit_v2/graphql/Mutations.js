@@ -30,6 +30,7 @@ export const CREATE_DISCUSSION_TOPIC = gql`
     $anonymousState: String
     $delayedPostAt: DateTime
     $lockAt: DateTime
+    $isAnonymousAuthor: Boolean
   ) {
     createDiscussionTopic(
       input: {
@@ -42,6 +43,7 @@ export const CREATE_DISCUSSION_TOPIC = gql`
         anonymousState: $anonymousState
         delayedPostAt: $delayedPostAt
         lockAt: $lockAt
+        isAnonymousAuthor: $isAnonymousAuthor
       }
     ) {
       discussionTopic {
@@ -54,6 +56,7 @@ export const CREATE_DISCUSSION_TOPIC = gql`
         anonymousState
         delayedPostAt
         lockAt
+        isAnonymousAuthor
       }
       errors {
         ...Error
