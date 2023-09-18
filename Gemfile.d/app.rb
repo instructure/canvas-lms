@@ -77,7 +77,7 @@ gem "neighbor", "~> 0.3"
 gem "net-http", "~> 0.1", require: false
 gem "net-ldap", "~> 0.18", require: false
 gem "oauth", "~> 1.1", require: false
-gem "oauth2", "~> 1.4", require: false
+gem "oauth2", "~> 2.0", require: false
 gem "oj", "~> 3.16"
 gem "outrigger", "3.0.1"
 gem "parallel", "~> 1.23", require: false
