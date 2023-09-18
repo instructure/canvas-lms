@@ -86,7 +86,15 @@ export default function DiscussionTopicFormContainer() {
       isStudent={ENV.current_user_is_student}
       sections={sections}
       groupCategories={groupCategories}
-      onSubmit={({title, message, shouldPublish, requireInitialPost, discussionAnonymousState}) => {
+      onSubmit={({
+        title,
+        message,
+        shouldPublish,
+        requireInitialPost,
+        discussionAnonymousState,
+        availableFrom,
+        availableUntil,
+      }) => {
         if (isEditing) {
           console.log('call updateDiscussion')
         } else {
@@ -99,6 +107,8 @@ export default function DiscussionTopicFormContainer() {
               published: shouldPublish,
               requireInitialPost,
               anonymousState: discussionAnonymousState,
+              delayedPostAt: availableFrom,
+              lockAt: availableUntil,
             },
           })
         }
