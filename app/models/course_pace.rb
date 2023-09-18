@@ -207,6 +207,7 @@ class CoursePace < ActiveRecord::Base
                 current_override.update(due_at:)
               else
                 assignment_override = assignment.assignment_overrides.create!(
+                  title: I18n.t("Course Pacing"),
                   set_type: "ADHOC",
                   due_at_overridden: true,
                   due_at:
