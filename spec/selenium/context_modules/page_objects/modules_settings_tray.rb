@@ -21,6 +21,10 @@ require_relative "../../common"
 
 module ModulesSettingsTray
   #------------------------------ Selectors -----------------------------
+  def add_prerequisites_button_selector
+    "//*[@data-testid = 'settings-panel']//button[contains(text(),'Add Prerequisite')]"
+  end
+
   def assign_to_panel_selector
     "[data-testid='assign-to-panel']"
   end
@@ -29,8 +33,24 @@ module ModulesSettingsTray
     "#tab-assign-to"
   end
 
+  def everyone_radio_selector
+    "[data-testid='everyone-option']"
+  end
+
   def module_settings_tray_selector
     "[aria-label='Edit Module Settings']"
+  end
+
+  def prerequisites_dropdown_selector
+    "#prerequisite"
+  end
+
+  def prerequisite_message_selector(context_module)
+    "#context_module_#{context_module.id} .prerequisites_message"
+  end
+
+  def remove_prerequisite_button_selector
+    "//button[contains(text(), 'Remove Prerequisite')]"
   end
 
   def settings_panel_selector
@@ -55,6 +75,10 @@ module ModulesSettingsTray
 
   #------------------------------ Elements ------------------------------
 
+  def add_prerequisites_button
+    fxpath(add_prerequisites_button_selector)
+  end
+
   def assign_to_panel
     f(assign_to_panel_selector)
   end
@@ -63,8 +87,24 @@ module ModulesSettingsTray
     f(assign_to_tab_selector)
   end
 
+  def everyone_radio
+    f(everyone_radio_selector)
+  end
+
   def module_settings_tray
     f(module_settings_tray_selector)
+  end
+
+  def prerequisites_dropdown
+    ff(prerequisites_dropdown_selector)
+  end
+
+  def prerequisite_message(context_module)
+    f(prerequisite_message_selector(context_module))
+  end
+
+  def remove_prerequisite_button
+    fxpath(remove_prerequisite_button_selector)
   end
 
   def settings_panel
@@ -89,8 +129,24 @@ module ModulesSettingsTray
 
   #------------------------------ Actions ------------------------------
 
+  def add_prerequisites_button_exists?
+    element_exists?(add_prerequisites_button_selector, true)
+  end
+
+  def click_add_prerequisites_button
+    add_prerequisites_button.click
+  end
+
   def click_assign_to_tab
     assign_to_tab.click
+  end
+
+  def click_everyone_radio
+    everyone_radio.click
+  end
+
+  def click_remove_prerequisite_button
+    remove_prerequisite_button.click
   end
 
   def click_settings_tab
@@ -107,6 +163,14 @@ module ModulesSettingsTray
 
   def click_settings_tray_update_module_button
     settings_tray_update_module_button.click
+  end
+
+  def prerequisites_dropdown_value(dropdown_list_item)
+    element_value_for_attr(prerequisites_dropdown[dropdown_list_item], "value")
+  end
+
+  def select_prerequisites_dropdown_option(item_number, option)
+    click_option(prerequisites_dropdown[item_number], option)
   end
 
   def settings_tray_exists?
