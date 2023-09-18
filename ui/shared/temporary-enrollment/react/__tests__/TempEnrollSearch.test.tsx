@@ -94,9 +94,7 @@ describe('TempEnrollSearch', () => {
     fetchMock.get('/api/v1/users/2', mockFindUser.users[0])
     const {queryByText} = render(<TempEnrollSearch page={1} {...props} />)
     await waitFor(() =>
-      expect(
-        queryByText('The user below is ready to be assigned temporary enrollments.')
-      ).toBeTruthy()
+      expect(queryByText(/is ready to be assigned temporary enrollments/)).toBeTruthy()
     )
   })
 

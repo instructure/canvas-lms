@@ -189,7 +189,9 @@ export function TempEnrollSearch(props: Props) {
       <>
         {renderAvatar()}
         <Alert variant="success">
-          {I18n.t('The user below is ready to be assigned temporary enrollments.')}
+          {I18n.t('%{name} is ready to be assigned temporary enrollments.', {
+            name: enrollment.name,
+          })}
         </Alert>
         <Table caption={<ScreenReaderContent>{I18n.t('User information')}</ScreenReaderContent>}>
           <Table.Head>
@@ -204,10 +206,10 @@ export function TempEnrollSearch(props: Props) {
           </Table.Head>
           <Table.Body>
             <Table.Row>
-              <Table.RowHeader>{(enrollment as any).name}</Table.RowHeader>
-              <Table.Cell>{(enrollment as any).email}</Table.Cell>
-              <Table.Cell>{(enrollment as any).login_id}</Table.Cell>
-              {props.canReadSIS ? <Table.Cell>{(enrollment as any).sis_user_id}</Table.Cell> : null}
+              <Table.RowHeader>{enrollment.name}</Table.RowHeader>
+              <Table.Cell>{enrollment.email}</Table.Cell>
+              <Table.Cell>{enrollment.login_id}</Table.Cell>
+              {props.canReadSIS ? <Table.Cell>{enrollment.sis_user_id}</Table.Cell> : null}
             </Table.Row>
           </Table.Body>
         </Table>

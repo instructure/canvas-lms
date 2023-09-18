@@ -21,12 +21,14 @@ import {fireEvent, render, waitFor} from '@testing-library/react'
 import {TempEnrollModal} from '../TempEnrollModal'
 import fetchMock from 'fetch-mock'
 import userEvent from '@testing-library/user-event'
+import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 // import {prettyDOM} from '@testing-library/dom'
 
 type DateRange = {
   startDate: string
   nextDayDate: string
 }
+
 // returns ISO strings for a date and its next day, both at local timezone start
 function getLocalStartAndNextDayDates(year: number, month: number, day: number): DateRange {
   const startDate = new Date(year, month, day)
@@ -136,6 +138,10 @@ const userListsParams = Object.entries(userListsData)
   .map(([key, value]) => `${key}=${value}`)
   .join('&')
 
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashSuccess: jest.fn(() => jest.fn(() => {})),
+}))
+
 describe('TempEnrollModal', () => {
   beforeEach(() => {
     localStorage.clear()
@@ -231,7 +237,7 @@ describe('TempEnrollModal', () => {
 
     // assertions for search results screen
     expect(
-      await screen.findByText('The user below is ready to be assigned temporary enrollments.')
+      await screen.findByText(/is ready to be assigned temporary enrollments/)
     ).toBeInTheDocument()
 
     // click next to go to the assign screen (page 3)
@@ -263,6 +269,12 @@ describe('TempEnrollModal', () => {
     // simulate clicking the submit button
     fireEvent.click(await screen.findByText('Submit'.trim()))
     // console.log(prettyDOM(screen.baseElement as Element, 10000000))
+
+    await waitFor(() =>
+      expect(showFlashSuccess).toHaveBeenCalledWith(
+        'Temporary enrollment was successfully created.'
+      )
+    )
 
     // ensure the modal is closed
     await screen.findByText('Cancel')
@@ -304,7 +316,7 @@ describe('TempEnrollModal', () => {
 
     // assertions for search results screen
     expect(
-      await screen.findByText('The user below is ready to be assigned temporary enrollments.')
+      await screen.findByText(/is ready to be assigned temporary enrollments/)
     ).toBeInTheDocument()
 
     // click next to go to the assign screen (page 3)
@@ -352,7 +364,7 @@ describe('TempEnrollModal', () => {
 
     // assertions for search results screen
     expect(
-      await screen.findByText('The user below is ready to be assigned temporary enrollments.')
+      await screen.findByText(/is ready to be assigned temporary enrollments/)
     ).toBeInTheDocument()
 
     // simulate clicking the start over button
@@ -361,9 +373,7 @@ describe('TempEnrollModal', () => {
     // modal is back on the search screen (page 1)
     await waitFor(() => {
       expect(screen.queryByText('Start Over')).toBeNull()
-      expect(
-        screen.queryByText(`The user below is ready to be assigned temporary enrollments.`)
-      ).toBeNull()
+      expect(screen.queryByText(/is ready to be assigned temporary enrollments/)).toBeNull()
     })
 
     // confirm mocks were called the expected number of times
@@ -397,7 +407,7 @@ describe('TempEnrollModal', () => {
 
     // assertions for search results screen
     expect(
-      await screen.findByText('The user below is ready to be assigned temporary enrollments.')
+      await screen.findByText(/is ready to be assigned temporary enrollments/)
     ).toBeInTheDocument()
 
     // click next to go to the assign screen (page 3)
@@ -406,9 +416,7 @@ describe('TempEnrollModal', () => {
     // confirm the modal is on the assign screen (page 3)
     await waitFor(() => {
       expect(screen.queryByText('Back')).toBeInTheDocument()
-      expect(
-        screen.queryByText(`The user below is ready to be assigned temporary enrollments.`)
-      ).toBeNull()
+      expect(screen.queryByText(/is ready to be assigned temporary enrollments/)).toBeNull()
     })
 
     // simulate clicking the back button
@@ -418,7 +426,7 @@ describe('TempEnrollModal', () => {
     await waitFor(() => {
       expect(screen.queryByText('Back')).toBeNull()
       expect(
-        screen.queryByText(`The user below is ready to be assigned temporary enrollments.`)
+        screen.queryByText(/is ready to be assigned temporary enrollments/)
       ).toBeInTheDocument()
     })
 
