@@ -61,6 +61,22 @@ describe('Grading Results Tests', () => {
   beforeEach(() => {
     $.subscribe = jest.fn()
   })
+  describe('the assignment grading type is points', () => {
+    it('renders the grade input with the screen reader message', () => {
+      const props = {
+        ...gradingResultsDefaultProps,
+        assignment: {
+          ...defaultAssignment,
+        },
+      }
+
+      const {getByTestId, getByText} = renderGradingResults(props)
+      expect(getByTestId('student_and_assignment_grade_input')).toBeInTheDocument()
+      expect(
+        getByText('Student Grade Text Input: (out of 10)', {selector: 'span'})
+      ).toBeInTheDocument()
+    })
+  })
   describe('the submission is late', () => {
     it('renders the correct final grade and late penalty labels when late is true', () => {
       const props = {
@@ -402,6 +418,20 @@ describe('Grading Results Tests', () => {
         method: 'PUT',
         path: 'testUrl',
       })
+    })
+    it('renders the grade select with the screen reader message', () => {
+      const props = {
+        ...gradingResultsDefaultProps,
+        studentSubmissions: [modifiedDefaultStudentSubmissions],
+        assignment: modifiedDefaultAssignments,
+      }
+
+      const {getByTestId, getByText} = renderGradingResults(props)
+
+      expect(getByTestId('student_and_assignment_grade_select')).toBeInTheDocument()
+      expect(
+        getByText('Student Grade Pass-Fail Grade Options: ( - out of 10)', {selector: 'span'})
+      ).toBeInTheDocument()
     })
   })
   describe('the assignment is in a closed grading period', () => {

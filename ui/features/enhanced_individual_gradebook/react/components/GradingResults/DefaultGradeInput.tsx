@@ -71,7 +71,10 @@ export default function DefaultGradeInput({
           <SimpleSelect
             renderLabel={
               <ScreenReaderContent>
-                {I18n.t('Student Grade Pass-Fail Grade Options')}
+                {`${I18n.t('Student Grade Pass-Fail Grade Options')}: ${outOfText(
+                  assignment,
+                  submission
+                )}`}
               </ScreenReaderContent>
             }
             size="medium"
@@ -94,7 +97,9 @@ export default function DefaultGradeInput({
         <View as={elementWrapper} className="grade" margin={margin}>
           <TextInput
             renderLabel={
-              <ScreenReaderContent>{I18n.t('Student Grade Text Input')}</ScreenReaderContent>
+              <ScreenReaderContent>
+                {`${I18n.t('Student Grade Text Input')}: ${outOfText(assignment, submission)}`}
+              </ScreenReaderContent>
             }
             display="inline-block"
             width="14rem"
