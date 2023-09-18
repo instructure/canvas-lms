@@ -4,17 +4,15 @@
     id=input-id
     items=passFailGrades
     value=value
+    ariaDescribedBy="grading-out-of-text"
   }}
 {{ else }}
-  {{
-    input
-    value=value
-    id=input-id
-    type="text"
-    disabled=isInPastGradingPeriodAndNotAdmin
-  }}
+  <input {{bind-attr value=value id=input-id disabled=isInPastGradingPeriodAndNotAdmin}}
+          type="text" aria-describedby="grading-out-of-text" />
 {{/if}}
-{{outOfText}}
+<span id="grading-out-of-text">
+    {{outOfText}}
+</span>
 
 {{#if submission.late}}
   <div class="deduction-box">

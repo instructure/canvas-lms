@@ -31,11 +31,15 @@ const FastSelectComponent = Component.extend({
   valueDefault: '',
   value: null,
   selected: null,
+  ariaDescribedBy: null,
 
   tagName: 'select',
 
   didInsertElement() {
     const self = this
+    if (this.get('ariaDescribedBy')) {
+      this.$().attr('aria-describedby', this.get('ariaDescribedBy'))
+    }
     return this.$().on('change', function () {
       return set(self, 'value', this.value)
     })
