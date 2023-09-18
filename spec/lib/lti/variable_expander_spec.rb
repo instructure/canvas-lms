@@ -2068,6 +2068,57 @@ module Lti
             expect(exp_hash[:test]).to eq "$Canvas.assignment.dueAt.iso8601"
           end
         end
+
+        describe "$Canvas.assignment.earliestEnrollmentDueAt.iso8601" do
+          before do
+            course.save!
+            user.save!
+            assignment.update!(course:)
+          end
+
+          context "student launch" do
+            before do
+              course.enroll_user(user, "StudentEnrollment")
+            end
+
+            it "expands to the due_at on the assignment (which will be the due date for the student)" do
+              exp_hash = { test: "$Canvas.assignment.earliestEnrollmentDueAt.iso8601" }
+              expect(assignment).to receive(:due_at).and_return(right_now)
+              variable_expander.expand_variables!(exp_hash)
+              expect(exp_hash[:test]).to eq right_now.utc.iso8601
+            end
+
+            it "expands to an empty string if there is no due date for the student" do
+              course.enroll_user(user, "StudentEnrollment")
+              exp_hash = { test: "$Canvas.assignment.earliestEnrollmentDueAt.iso8601" }
+              variable_expander.expand_variables!(exp_hash)
+              expect(exp_hash[:test]).to eq ""
+            end
+          end
+
+          context "teacher launch" do
+            before do
+              course.enroll_user(user, "TeacherEnrollment")
+              course.enroll_user(User.create!, "StudentEnrollment")
+              course.enroll_user(User.create!, "StudentEnrollment")
+            end
+
+            it "expands to earliest due date of many sections" do
+              subm1, subm2 = assignment.submissions.to_a
+              subm1.update! cached_due_date: "2090-01-01T00:00:00Z"
+              subm2.update! cached_due_date: "2090-01-02T00:00:00Z"
+              exp_hash = { test: "$Canvas.assignment.earliestEnrollmentDueAt.iso8601" }
+              variable_expander.expand_variables!(exp_hash)
+              expect(exp_hash[:test]).to eq "2090-01-01T00:00:00Z"
+            end
+
+            it "expands to an empty string if there are no due dates for any student" do
+              exp_hash = { test: "$Canvas.assignment.earliestEnrollmentDueAt.iso8601" }
+              variable_expander.expand_variables!(exp_hash)
+              expect(exp_hash[:test]).to eq ""
+            end
+          end
+        end
       end
 
       context "user is not logged in" do
