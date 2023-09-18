@@ -38,6 +38,7 @@ describe Mutations::CreateDiscussionTopic do
             published
             requireInitialPost
             anonymousState
+            isAnonymousAuthor
             delayedPostAt
             lockAt
           }
@@ -150,7 +151,7 @@ describe Mutations::CreateDiscussionTopic do
     expect(created_discussion_topic["anonymousState"]).to eq "full_anonymity"
   end
 
-  it "creates a partial_anonymity discussion topic" do
+  it "creates a partial_anonymity discussion topic where is_anonymous_author defaults to false" do
     context_type = "Course"
     title = "Test Title"
     message = "A message"
@@ -171,6 +172,57 @@ describe Mutations::CreateDiscussionTopic do
     expect(result["errors"]).to be_nil
     expect(result.dig("data", "discussionTopic", "errors")).to be_nil
     expect(created_discussion_topic["anonymousState"]).to eq anonymous_state
+    expect(created_discussion_topic["isAnonymousAuthor"]).to be false
+  end
+
+  it "creates a partial_anonymity discussion topic with is_anonymous_author set to true" do
+    context_type = "Course"
+    title = "Test Title"
+    message = "A message"
+    published = true
+    anonymous_state = "partial_anonymity"
+    query = <<~GQL
+      contextId: "#{@course.id}"
+      contextType: "#{context_type}"
+      title: "#{title}"
+      message: "#{message}"
+      published: #{published}
+      anonymousState: "#{anonymous_state}"
+      isAnonymousAuthor: true
+    GQL
+
+    result = execute_with_input(query)
+    created_discussion_topic = result.dig("data", "createDiscussionTopic", "discussionTopic")
+
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "discussionTopic", "errors")).to be_nil
+    expect(created_discussion_topic["anonymousState"]).to eq anonymous_state
+    expect(created_discussion_topic["isAnonymousAuthor"]).to be true
+  end
+
+  it "creates a partial_anonymity discussion topic with is_anonymous_author set to false" do
+    context_type = "Course"
+    title = "Test Title"
+    message = "A message"
+    published = true
+    anonymous_state = "partial_anonymity"
+    query = <<~GQL
+      contextId: "#{@course.id}"
+      contextType: "#{context_type}"
+      title: "#{title}"
+      message: "#{message}"
+      published: #{published}
+      anonymousState: "#{anonymous_state}"
+      isAnonymousAuthor: false
+    GQL
+
+    result = execute_with_input(query)
+    created_discussion_topic = result.dig("data", "createDiscussionTopic", "discussionTopic")
+
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "discussionTopic", "errors")).to be_nil
+    expect(created_discussion_topic["anonymousState"]).to eq anonymous_state
+    expect(created_discussion_topic["isAnonymousAuthor"]).to be false
   end
 
   context "errors" do
