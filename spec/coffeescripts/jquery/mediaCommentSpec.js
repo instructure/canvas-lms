@@ -34,7 +34,7 @@ QUnit.module('mediaComment', {
     $('#fixtures').empty()
   },
 })
-const mockServerResponse = (server, id, type = 'video') => {
+const mockServerResponse = (server, id) => {
   const resp = {
     media_sources: [
       {
@@ -60,11 +60,13 @@ const mockXssServerResponse = (server, id) => {
     media_sources: [
       {
         content_type: 'flv',
+        // eslint-disable-next-line no-script-url
         url: 'javascript:alert(document.cookie);//',
         bitrate: '200',
       },
       {
         content_type: 'mp4',
+        // eslint-disable-next-line no-script-url
         url: 'javascript:alert(document.cookie);//',
         bitrate: '100',
       },
@@ -84,10 +86,26 @@ test('video player is displayed inline', function () {
   ok(video_tag_exists, 'There should be a video tag')
 })
 
+test('video player is displayed inline when a specific video MIME type is specified', function () {
+  const id = 10 // ID doesn't matter since we mock out the server
+  this.$holder.mediaComment('show_inline', id, 'video/quicktime')
+  mockServerResponse(this.server, id)
+  const video_tag_exists = this.$holder.find('video').length === 1
+  ok(video_tag_exists, 'There should be a video tag')
+})
+
 test('audio player is displayed correctly', function () {
   const id = 10 // ID doesn't matter since we mock out the server
   this.$holder.mediaComment('show_inline', id, 'audio')
-  mockServerResponse(this.server, id, 'audio')
+  mockServerResponse(this.server, id)
+  equal(this.$holder.find('audio').length, 1, 'There should be a audio tag')
+  equal(this.$holder.find('video').length, 0, 'There should not be a video tag')
+})
+
+test('audio player is displayed correctly when a specific audio MIME type is specified', function () {
+  const id = 10 // ID doesn't matter since we mock out the server
+  this.$holder.mediaComment('show_inline', id, 'audio/wav')
+  mockServerResponse(this.server, id)
   equal(this.$holder.find('audio').length, 1, 'There should be a audio tag')
   equal(this.$holder.find('video').length, 0, 'There should not be a video tag')
 })
@@ -144,6 +162,25 @@ test('dialog returns focus to opening element when closed', function () {
   equal(openingElement.focus.callCount, 1)
   openingElement.remove()
   $('.ui-dialog').remove()
+})
+
+test('audio dialog is returned when media type is a specific MIME type', function () {
+  const id = 10
+  this.$holder.mediaComment('show', id, 'audio/wav')
+  mockServerResponse(this.server, id)
+  const mediaPlayerHolder = document.querySelector('.play_media_comment')
+  const audioTag = mediaPlayerHolder.querySelector('audio')
+  ok(audioTag, '<audio> tag should be found')
+  $('.ui-dialog').remove()
+})
+
+test('video dialog is returned when media type is a specific MIME type', function () {
+  const id = 10
+  this.$holder.mediaComment('show', id, 'video/quicktime')
+  mockServerResponse(this.server, id)
+  const mediaPlayerHolder = document.querySelector('.play_media_comment')
+  const videoTag = mediaPlayerHolder.querySelector('video')
+  ok(videoTag, '<video> tag should be found')
 })
 
 QUnit.module('MediaCommentUtils functions', {

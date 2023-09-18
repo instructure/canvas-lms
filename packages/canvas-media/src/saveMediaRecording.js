@@ -72,13 +72,11 @@ function addUploaderFileErrorEventListeners(uploader, done, file) {
 function mediaTypeToSymbol(type) {
   switch (type) {
     case '2':
-      'image'
-      break
+      return 'image'
     case '5':
-      'audio'
-      break
+      return 'audio'
     default: // 1
-      'video'
+      return 'video'
   }
 }
 
