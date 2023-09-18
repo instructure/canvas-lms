@@ -20,7 +20,6 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {func, bool, string} from 'prop-types'
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
-import {InstUISettingsProvider} from '@instructure/emotion'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {
@@ -44,12 +43,9 @@ const I18n = useI18nScope('permission_button')
 
 // let's cinch up that large margin around the IconButtons so that their
 // decorations snuggle up a little closer and are more obviously a part
-// of the button itself
-const componentOverrides = {
-  [IconButton.componentId]: {
-    largeHeight: '1.75rem',
-  },
-}
+// of the button itself. Only do this for the table view, though, since
+// the tray view is already pretty tight.
+const themeOverride = {largeHeight: '1.75rem'}
 
 const MENU_ID_DEFAULT = 1
 const MENU_ID_ENABLED = 2
@@ -148,8 +144,9 @@ export default class PermissionButton extends Component {
 
     const stateColor = enabled === ENABLED_FOR_NONE ? 'danger' : 'success'
 
-    const button = (
+    return (
       <IconButton
+        themeOverride={this.props.inTray ? undefined : themeOverride}
         elementRef={this.setupButtonRef}
         onClick={this.toggleMenu}
         onFocus={this.props.onFocus}
@@ -167,12 +164,6 @@ export default class PermissionButton extends Component {
       >
         {stateIcon()}
       </IconButton>
-    )
-
-    return this.props.inTray ? (
-      button
-    ) : (
-      <InstUISettingsProvider theme={{componentOverrides}}>{button}</InstUISettingsProvider>
     )
   }
 
@@ -200,11 +191,7 @@ export default class PermissionButton extends Component {
     const perm = this.props.permission
     const selected = this.checkedSelection(perm)
 
-    function unboundAdjustPermissions({
-      enabled = undefined,
-      locked = false,
-      explicit = false,
-    } = {}) {
+    function unboundAdjustPermissions({enabled, locked, explicit}) {
       this.props.handleClick({
         name: this.props.permissionName,
         id: this.props.roleId,
@@ -220,23 +207,31 @@ export default class PermissionButton extends Component {
     // Since the enum enabled values exist only here on the front end and
     // the backend uses only Booleans for the granular permissions, we
     // will convert them back to Booleans for the API call.
-    function enable() {
-      adjustPermissions({enabled: true, locked: perm.locked, explicit: true})
-    }
-
-    function disable() {
-      adjustPermissions({enabled: false, locked: perm.locked, explicit: true})
-    }
-
-    // Toggling the locked state also requires us to send along the current
-    // overridden enabled value, if any. Otherwise unlocking with an
-    // inferred value will just revert to the default, which isn't always
-    // what we want.
-    function toggleLock() {
+    function menuChange(_e, _updated, _selected, selectedMenuItem) {
+      const value = selectedMenuItem.props.value
       let enabled = SelectionState.INFERRED
-      if (selected.includes(MENU_ID_DISABLED)) enabled = SelectionState.DISABLED
-      else if (selected.includes(MENU_ID_ENABLED)) enabled = SelectionState.ENABLED
-      adjustPermissions({enabled, locked: !perm.locked, explicit: true})
+      switch (value) {
+        case MENU_ID_ENABLED:
+          adjustPermissions({enabled: true, locked: perm.locked, explicit: true})
+          return
+        case MENU_ID_DISABLED:
+          adjustPermissions({enabled: false, locked: perm.locked, explicit: true})
+          return
+        case MENU_ID_LOCKED:
+          // Toggling the locked state also requires us to send along the current
+          // overridden enabled value, if any. Otherwise unlocking with an
+          // inferred value will just revert to the default, which isn't always
+          // what we want.
+          if (selected.includes(MENU_ID_DISABLED)) enabled = SelectionState.DISABLED
+          else if (selected.includes(MENU_ID_ENABLED)) enabled = SelectionState.ENABLED
+          adjustPermissions({enabled, locked: !perm.locked, explicit: true})
+          return
+        case MENU_ID_DEFAULT:
+          adjustPermissions({locked: false, explicit: false})
+          return
+        default:
+          throw new Error('Unhandled value sent to menuChange')
+      }
     }
 
     return (
@@ -249,7 +244,7 @@ export default class PermissionButton extends Component {
         onDismiss={closeMenuIfInTray}
         onBlur={closeMenuIfInTray}
       >
-        <Menu.Group label="" selected={selected}>
+        <Menu.Group label="" selected={selected} onSelect={menuChange}>
           {/* "partially enabled" callout removed for now per Product until they can decide on wording
           {selected.includes(MENU_ID_PARTIAL) && [
             <Menu.Item id="permission_table_partial_menu_item" value={MENU_ID_PARTIAL} disabled>
@@ -258,33 +253,17 @@ export default class PermissionButton extends Component {
             <Menu.Separator />
           ]}
           */}
-          <Menu.Item
-            id="permission_table_enable_menu_item"
-            value={MENU_ID_ENABLED}
-            onClick={enable}
-          >
+          <Menu.Item id="permission_table_enable_menu_item" value={MENU_ID_ENABLED}>
             <Text>{I18n.t('Enable')}</Text>
           </Menu.Item>
-          <Menu.Item
-            id="permission_table_disable_menu_item"
-            value={MENU_ID_DISABLED}
-            onClick={disable}
-          >
+          <Menu.Item id="permission_table_disable_menu_item" value={MENU_ID_DISABLED}>
             <Text>{I18n.t('Disable')}</Text>
           </Menu.Item>
-          <Menu.Item
-            id="permission_table_lock_menu_item"
-            value={MENU_ID_LOCKED}
-            onClick={toggleLock}
-          >
+          <Menu.Item id="permission_table_lock_menu_item" value={MENU_ID_LOCKED}>
             <Text>{I18n.t('Lock')}</Text>
           </Menu.Item>
           <Menu.Separator />
-          <Menu.Item
-            id="permission_table_use_default_menu_item"
-            value={MENU_ID_DEFAULT}
-            onClick={adjustPermissions}
-          >
+          <Menu.Item id="permission_table_use_default_menu_item" value={MENU_ID_DEFAULT}>
             <Text>{I18n.t('Use Default')}</Text>
           </Menu.Item>
         </Menu.Group>
