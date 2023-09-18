@@ -330,6 +330,7 @@ describe CoursePace do
       expect(@course_pace.publish).to be(true)
       expect(@assignment.assignment_overrides.count).to eq(1)
       assignment_override = @assignment.assignment_overrides.first
+      expect(assignment_override.title).to eq("Course Pacing")
       expect(assignment_override.due_at).to eq(fancy_midnight_rounded_to_last_second(@course.start_at.to_s))
       expect(assignment_override.assignment_override_students.first.user_id).to eq(@student.id)
     end
