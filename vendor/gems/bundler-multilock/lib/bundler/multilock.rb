@@ -55,10 +55,6 @@ module Bundler
         lockfile = Bundler.root.join(lockfile).expand_path if lockfile
         # use the default lockfile (Gemfile.lock) if none was given
         lockfile ||= Bundler.default_lockfile(force_original: true)
-        if current && (old_current = lockfile_definitions.find { |definition| definition[:current] })
-          raise ArgumentError, "Only one lockfile (#{old_current[:lockfile]}) can be flagged as the default"
-        end
-
         raise ArgumentError, "Lockfile #{lockfile} is already defined" if lockfile_definitions.any? do |definition|
                                                                             definition[:lockfile] == lockfile
                                                                           end
@@ -70,6 +66,10 @@ module Bundler
           end
           env_lockfile = Bundler.root.join(env_lockfile).expand_path
           current = env_lockfile == lockfile
+        end
+
+        if current && (old_current = lockfile_definitions.find { |definition| definition[:current] })
+          raise ArgumentError, "Only one lockfile (#{old_current[:lockfile]}) can be flagged as the default"
         end
 
         lockfile_definitions << (lockfile_def = {
