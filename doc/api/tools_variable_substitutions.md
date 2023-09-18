@@ -386,6 +386,15 @@ an opaque identifier that uniquely identifies the context of the tool launch.
 ```
 "cdca1fe2c392a208bd8a657f8865ddb9ca359534"
 ```
+## com.instructure.Context.globalId
+The Canvas global identifer for the launch context.
+
+**Availability**: *always*  
+
+
+```
+10000000000070
+```
 ## Context.sourcedId [duplicates Person.sourcedId]
 If the context is a Course, returns sourced Id of the context.
 
@@ -1298,10 +1307,35 @@ Only available when launched as an assignment with a `lock_at` set.
 2018-02-20:00:00Z
 ```
 ## Canvas.assignment.dueAt.iso8601
-Returns the `due_at` date of the assignment that was launched.
-Only available when launched as an assignment with a `due_at` set.
+Returns the `due_at` date of the assignment that was launched. Only
+available when launched as an assignment with a `due_at` set. If the tool
+is launched as a student, this will be the date that assignment is due
+for that student (or unexpanded -- "$Canvas.assignment.dueAt.iso8601" --
+if there is no due date for the student). If the tool is launched as an
+instructor and there are multiple possible due dates (i.e., there are
+multiple sections and at least one has a due date override), this will be
+the LATEST effective due date of any section or student (or unexpanded if
+there is at least one section or student with no effective due date).
 
 **Availability**: *always*  
+
+
+```
+2018-02-19:00:00Z
+```
+## Canvas.assignment.earliestEnrollmentDueAt.iso8601
+Returns the `due_at` date of the assignment that was launched.
+If the tool is launched as a student, this will be the date that
+assignment is due for that student (or an empty string if there is no due
+date for the student). If the tool is launched as an instructor and different
+students are assigned multiple due dates (i.e., there are students in sections
+with overrides / different effective due dates), this will be the
+EARLIEST due date of any enrollment (or an empty string if there are no
+enrollments with due dates). Note than like allDueAts, but unlike the dueAt
+expansion, there must be at least one enrollment in a section for its due
+date to be considered.
+
+**Availability**: *when launched as an assignment*  
 
 
 ```
@@ -1315,7 +1349,7 @@ will be present in the list (hence the ",," in the example)
 
 Only available when launched as an assignment.
 
-**Availability**: *always*  
+**Availability**: *when launched as an assignment*  
 
 
 ```

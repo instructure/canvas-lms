@@ -1645,8 +1645,15 @@ module Lti
                        -> { @assignment.lock_at.utc.iso8601 },
                        -> { @assignment && @assignment.lock_at.present? }
 
-    # Returns the `due_at` date of the assignment that was launched.
-    # Only available when launched as an assignment with a `due_at` set.
+    # Returns the `due_at` date of the assignment that was launched. Only
+    # available when launched as an assignment with a `due_at` set. If the tool
+    # is launched as a student, this will be the date that assignment is due
+    # for that student (or unexpanded -- "$Canvas.assignment.dueAt.iso8601" --
+    # if there is no due date for the student). If the tool is launched as an
+    # instructor and there are multiple possible due dates (i.e., there are
+    # multiple sections and at least one has a due date override), this will be
+    # the LATEST effective due date of any section or student (or unexpanded if
+    # there is at least one section or student with no effective due date).
     #
     # @example
     #   ```
@@ -1656,6 +1663,26 @@ module Lti
                        [],
                        -> { @assignment.due_at.utc.iso8601 },
                        -> { @assignment && @assignment.due_at.present? }
+
+    # Returns the `due_at` date of the assignment that was launched.
+    # If the tool is launched as a student, this will be the date that
+    # assignment is due for that student (or an empty string if there is no due
+    # date for the student). If the tool is launched as an instructor and different
+    # students are assigned multiple due dates (i.e., there are students in sections
+    # with overrides / different effective due dates), this will be the
+    # EARLIEST due date of any enrollment (or an empty string if there are no
+    # enrollments with due dates). Note than like allDueAts, but unlike the dueAt
+    # expansion, there must be at least one enrollment in a section for its due
+    # date to be considered.
+    #
+    # @example
+    #   ```
+    #   2018-02-19:00:00Z
+    #   ```
+    register_expansion "Canvas.assignment.earliestEnrollmentDueAt.iso8601",
+                       [],
+                       -> { earliest_due_at&.utc&.iso8601.to_s },
+                       ASSIGNMENT_GUARD
 
     # In Canvas, users, sections and groups can have distinct due dates for the same assignment.
     # This returns all possible `due_at` dates of the assignment that was launched.
@@ -1671,7 +1698,7 @@ module Lti
     register_expansion "Canvas.assignment.allDueAts.iso8601",
                        [],
                        -> { unique_submission_dates.map { |d| d.present? ? d.utc.iso8601 : "" }.join(",") },
-                       -> { @assignment }
+                       ASSIGNMENT_GUARD
 
     # Returns true if the assignment that was launched is published.
     # Only available when launched as an assignment.
@@ -1942,6 +1969,19 @@ module Lti
 
     def unique_submission_dates
       @assignment.submissions.pluck(:cached_due_date).uniq
+    end
+
+    def earliest_due_at
+      context = @assignment.context
+      # Mirrors logic in AssignmentOverrideApplicator to determine if user is a student or teacher.
+      # If a user is a student, we return their due date. Otherwise, in our case here, we return
+      # the earliest of all due dates for the assignment.
+      if context.user_has_been_admin?(current_user) || (context.user_has_no_enrollments?(current_user) &&
+                                               context.grants_any_right?(current_user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS))
+        @assignment.submissions.minimum(:cached_due_date)
+      else
+        @assignment.due_at
+      end
     end
 
     def sis_pseudonym
