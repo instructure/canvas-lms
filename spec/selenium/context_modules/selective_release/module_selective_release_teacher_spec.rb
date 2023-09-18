@@ -90,5 +90,94 @@ describe "selective_release module set up" do
 
       expect(view_assign.text).to eq ""
     end
+
+    it "show the everyone radio button as checked when selecting Assign To tray" do
+      go_to_modules
+      manage_module_button(@module).click
+
+      module_index_menu_tool_link("Assign To...").click
+
+      expect(is_checked(everyone_radio)).to be true
+    end
+  end
+
+  context "uses tray to update prerequisites" do
+    before(:once) do
+      Account.site_admin.enable_feature! :differentiated_modules
+      course_with_teacher(active_all: true)
+      module_setup
+      @module2 = @course.context_modules.create!(name: "module2")
+      @module3 = @course.context_modules.create!(name: "module3")
+    end
+
+    before do
+      user_session(@teacher)
+    end
+
+    it "has no add prerequisites button when first module" do
+      go_to_modules
+      manage_module_button(@module).click
+      module_index_menu_tool_link("Assign To...").click
+      click_settings_tab
+
+      expect(add_prerequisites_button_exists?).to be_falsey
+    end
+
+    it "accesses prerequisites dropdown for module and assigns prerequisites" do
+      go_to_modules
+      manage_module_button(@module3).click
+      module_index_menu_tool_link("Assign To...").click
+      click_settings_tab
+
+      click_add_prerequisites_button
+      expect(prerequisites_dropdown[0]).to be_displayed
+
+      select_prerequisites_dropdown_option(0, "module2")
+
+      expect(prerequisites_dropdown_value(0)).to eq("module2")
+
+      click_settings_tray_update_module_button
+
+      expect(prerequisite_message(@module3).text).to eq("Prerequisites: module2")
+    end
+
+    it "adds more than one prerequisite to a module" do
+      go_to_modules
+      manage_module_button(@module3).click
+      module_index_menu_tool_link("Assign To...").click
+      click_settings_tab
+
+      click_add_prerequisites_button
+
+      select_prerequisites_dropdown_option(0, "module2")
+      expect(prerequisites_dropdown_value(0)).to eq("module2")
+
+      click_add_prerequisites_button
+
+      select_prerequisites_dropdown_option(1, "module")
+      expect(prerequisites_dropdown_value(1)).to eq("module")
+
+      click_settings_tray_update_module_button
+
+      expect(prerequisite_message(@module3).text).to eq("Prerequisites: module2, module")
+    end
+
+    it "does not save prerequisites selected when update cancelled." do
+      go_to_modules
+      manage_module_button(@module2).click
+      module_index_menu_tool_link("Assign To...").click
+      click_settings_tab
+
+      click_add_prerequisites_button
+      expect(prerequisites_dropdown[0]).to be_displayed
+
+      select_prerequisites_dropdown_option(0, "module")
+
+      expect(prerequisites_dropdown_value(0)).to eq("module")
+
+      click_settings_tray_cancel_button
+
+      expect(prerequisite_message(@module2).text).not_to eq("Prerequisites: module2")
+    end
   end
 end
