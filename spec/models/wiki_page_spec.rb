@@ -1121,5 +1121,11 @@ describe WikiPage do
       run_jobs
       expect(@page.reload.wiki_page_embeddings.count).to eq 1
     end
+
+    it "strips HTML from the body before indexing" do
+      wiki_page_model(title: "test", body: "<ul><li>foo</li></ul>")
+      expect(OpenAi).to receive(:generate_embedding).with("* foo")
+      run_jobs
+    end
   end
 end

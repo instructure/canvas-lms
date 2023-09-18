@@ -36,6 +36,7 @@ class WikiPage < ActiveRecord::Base
   include DuplicatingObjects
   include SearchTermHelper
   include LockedFor
+  include HtmlTextHelper
 
   include MasterCourses::Restrictor
   restrict_columns :content, [:body, :title]
@@ -108,7 +109,8 @@ class WikiPage < ActiveRecord::Base
     return unless OpenAi.smart_search_available?(root_account)
 
     # TODO: chunk content and create multiple
-    embedding = OpenAi.generate_embedding(body)[0]
+    text = html_to_text(body)
+    embedding = OpenAi.generate_embedding(text)[0]
     # TODO: delete via the association once pgvector is available everywhere
     # (without :dependent, that would try to nullify the fk in violation of the constraint
     #  but with :dependent, instances without pgvector would try to access the nonexistent table when a page is deleted)
