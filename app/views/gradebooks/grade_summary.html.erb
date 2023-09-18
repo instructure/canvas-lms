@@ -251,7 +251,7 @@
                     <span>/ <%= n(round_if_whole(assignment.points_possible)) %></span>
                   <% end %>
                   <% if assignment_presenter.graded? && assignment_presenter.item_unread?("grade") %>
-                    <span class="unread_dot grade_dot" id="submission_unread_dot_<%= submission.id %>">&nbsp;</span>
+                    <span class="unread_dot grade_dot" id="submission_unread_dot_<%= submission.id %>" aria-label="<%= t('This grade is unread') %>">&nbsp;</span>
                   <% end %>
                 </span>
                 <div style="display: none;">
