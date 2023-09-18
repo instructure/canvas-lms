@@ -419,11 +419,21 @@ describe "discussions" do
         user_session(teacher)
       end
 
+      def set_datetime_input(input, date)
+        input.click
+        wait_for_ajaximations
+        input.send_keys date
+        input.send_keys :return
+        wait_for_ajaximations
+      end
+
       it "creates a new discussion topic successfully" do
         get "/courses/#{course.id}/discussion_topics/new"
 
         title = "My Test Topic"
         message = "replying to topic"
+        available_from = "September 10, 2020"
+        available_until = "September 14, 2020"
 
         # Set title
         f("input[placeholder='Topic Title']").send_keys title
@@ -431,6 +441,15 @@ describe "discussions" do
         type_in_tiny("textarea", message)
         # Set require_initial_post
         force_click("input[data-testid='require-initial-post-checkbox']")
+
+        available_from_input = ff("input[placeholder='Select Date']")[0]
+        available_until_input = ff("input[placeholder='Select Date']")[1]
+
+        # Set available_from
+        set_datetime_input(available_from_input, available_from)
+        # Set available_until
+        set_datetime_input(available_until_input, available_until)
+
         # Save and publish
         f("button[data-testid='save-and-publish-button']").click
         wait_for_ajaximations
@@ -439,6 +458,8 @@ describe "discussions" do
         expect(dt.title).to eq title
         expect(dt.message).to include message
         expect(dt.require_initial_post).to be true
+        expect(dt.delayed_post_at).to eq Time.zone.parse("2020-09-10 00:00:00")
+        expect(dt.lock_at).to eq Time.zone.parse("2020-09-14 23:59:59.999999000")
         expect(dt).to be_published
 
         # Verify that the discussion topic redirected the page to the new discussion topic

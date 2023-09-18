@@ -28,6 +28,8 @@ export const CREATE_DISCUSSION_TOPIC = gql`
     $published: Boolean
     $requireInitialPost: Boolean
     $anonymousState: String
+    $delayedPostAt: DateTime
+    $lockAt: DateTime
   ) {
     createDiscussionTopic(
       input: {
@@ -38,6 +40,8 @@ export const CREATE_DISCUSSION_TOPIC = gql`
         published: $published
         requireInitialPost: $requireInitialPost
         anonymousState: $anonymousState
+        delayedPostAt: $delayedPostAt
+        lockAt: $lockAt
       }
     ) {
       discussionTopic {
@@ -46,7 +50,10 @@ export const CREATE_DISCUSSION_TOPIC = gql`
         title
         message
         published
+        requireInitialPost
         anonymousState
+        delayedPostAt
+        lockAt
       }
       errors {
         ...Error
