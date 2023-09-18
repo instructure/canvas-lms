@@ -57,6 +57,7 @@ describe "calendar2" do
         # Clicks plus button, saves event, and verifies a row has been added
         expect(fj(".agenda-wrapper:visible")).to be_present
         calendar_create_event_button.click
+        replace_content(edit_calendar_event_form_title, "Test event")
         edit_calendar_event_form_submit_button.click
         wait_for_ajaximations
         expect(all_agenda_items.length).to eq 1

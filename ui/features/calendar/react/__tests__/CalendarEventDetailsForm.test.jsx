@@ -312,6 +312,48 @@ describe('CalendarEventDetailsForm', () => {
     expect(errMessage).not.toBeInTheDocument()
   })
 
+  it('cannot submit with an empty title', () => {
+    const event = {...defaultProps.event, title: ''}
+    const component = render(<CalendarEventDetailsForm {...defaultProps} event={event} />)
+    expect(component.getByRole('button', {name: 'Submit'})).toBeDisabled()
+    expect(component.queryByText('You must enter a title.')).not.toBeInTheDocument()
+  })
+
+  it('shows an error when user clears the title', () => {
+    const component = render(<CalendarEventDetailsForm {...defaultProps} />)
+    changeValue(component, 'edit-calendar-event-form-title', 'avocado')
+
+    expect(component.getByRole('button', {name: 'Submit'})).toBeEnabled()
+
+    changeValue(component, 'edit-calendar-event-form-title', '')
+
+    expect(component.getByRole('button', {name: 'Submit'})).toBeDisabled()
+    expect(component.getByText('You must enter a title.')).toBeInTheDocument()
+  })
+
+  it('autofills date when input was cleared', () => {
+    const component = render(<CalendarEventDetailsForm {...defaultProps} />)
+    changeValue(component, 'edit-calendar-event-form-date', '')
+    fireEvent.blur(component.getByTestId('edit-calendar-event-form-date'))
+    expect(component.getByTestId('edit-calendar-event-form-date').value).toMatch(
+      /^(Sun|Mon|Tue|Wed|Thu|Fri|Sat), (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{1,2}, \d{4}$/
+    )
+
+    const errMessage = component.queryByText('This date is invalid.')
+    expect(errMessage).not.toBeInTheDocument()
+  })
+
+  it('shows an error when user input is an invalid string', () => {
+    const component = render(<CalendarEventDetailsForm {...defaultProps} />)
+    changeValue(component, 'edit-calendar-event-form-date', 'avocado')
+    // Work-around to raise blur event listener on date field
+    component.getByTestId('edit-calendar-event-form-title').focus()
+
+    expect(component.getByRole('button', {name: 'Submit'})).toBeDisabled()
+    expect(component.getByText('This date is invalid.')).toBeInTheDocument()
+    expect(component.getByTestId('edit-calendar-event-form-date')).toHaveValue('avocado')
+  })
+
   it('renders and updates an event with conferencing when it is available', async () => {
     defaultProps.event.webConference = conference
     const component = render(<CalendarEventDetailsForm {...defaultProps} />)

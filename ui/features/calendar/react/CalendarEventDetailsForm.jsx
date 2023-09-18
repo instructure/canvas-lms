@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import React, {useState, useEffect, useLayoutEffect, useCallback} from 'react'
+import React, {useState, useEffect, useLayoutEffect, useCallback, useRef} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {TextInput} from '@instructure/ui-text-input'
 import {Flex} from '@instructure/ui-flex'
@@ -41,6 +41,7 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 import {DateTime} from '@instructure/ui-i18n'
 import {View} from '@instructure/ui-view'
+import {Text} from '@instructure/ui-text'
 import {
   updateRRuleForNewDate,
   RRULEToFrequencyOptionValue,
@@ -54,11 +55,14 @@ const screenReaderMessageCallback = msg => {
   return () => showFlashAlert({message: msg, type: 'info', srOnly: true})
 }
 
+const hasFormErrors = errors => Object.keys(errors).some(key => errors[key])
+
 const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContextCB, timezone}) => {
   timezone = timezone || ENV?.TIMEZONE || DateTime.browserTimeZone()
   const locale = ENV?.MOMENT_LOCALE || ENV?.LOCALE || 'en'
 
   const initTime = time => (!time || event.allDay ? '' : time)
+  const today = moment().tz(timezone)
 
   const [title, setTitle] = useState(event.title || '')
   const [context, setContext] = useState(event.contextInfo || event.allPossibleContexts[0])
@@ -78,6 +82,12 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
   const [endMessages, setEndMessages] = useState([])
   const [firstRender, setFirstRender] = useState(true)
   const [isWorking, setIsWorking] = useState(false)
+  const [formErrors, setFormErrors] = useState(() => ({
+    title: title.trim().length === 0,
+    date: !moment.tz(date, timezone).isValid(),
+  }))
+
+  const hasChanged = useRef(false)
 
   const allContexts = event.allPossibleContexts
 
@@ -259,13 +269,14 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
   }, [])
 
   const handleDateChange = useCallback(
-    d => {
+    (d, dateInputType) => {
       setDate(d)
+      setFormErrors({...formErrors, date: dateInputType === 'error'})
       if (rrule === null || frequency === 'saved-custom') return
       const newRRule = updateRRuleForNewDate(moment.tz(d, timezone), rrule)
       setRRule(newRRule)
     },
-    [frequency, rrule, timezone]
+    [frequency, rrule, timezone, formErrors]
   )
 
   const addTimeToDate = time => {
@@ -402,17 +413,50 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
           value={title}
           placeholder={I18n.t('Input Event Title...')}
           interaction={event.lockedTitle ? 'disabled' : 'enabled'}
-          onChange={(e, value) => setTitle(value)}
+          onChange={(e, value) => {
+            hasChanged.current = true
+            setTitle(value)
+            setFormErrors({...formErrors, title: value.trim().length === 0})
+          }}
+          messages={
+            hasChanged.current && formErrors.title
+              ? [{text: I18n.t('errors.title_required', 'You must enter a title.'), type: 'error'}]
+              : []
+          }
         />
         <CanvasDateInput
           dataTestid="edit-calendar-event-form-date"
-          renderLabel={I18n.t('Date')}
+          renderLabel={
+            <Flex>
+              <Flex.Item>
+                <Text weight="bold">{I18n.t('Date')}</Text>
+              </Flex.Item>
+              <Flex.Item>
+                <Tooltip
+                  renderTip={I18n.t("Default date will be today's date")}
+                  placement="top"
+                  on={['hover', 'focus']}
+                >
+                  <IconButton
+                    renderIcon={IconInfoLine}
+                    withBackground={false}
+                    withBorder={false}
+                    size="small"
+                    shape="circle"
+                    screenReaderLabel={I18n.t("Default date will be today's date")}
+                  />
+                </Tooltip>
+              </Flex.Item>
+            </Flex>
+          }
           selectedDate={date?.toISOString()}
           formatDate={dateFormatter}
           onSelectedDateChange={handleDateChange}
           width="100%"
           display="block"
           timezone={timezone}
+          defaultToToday={true}
+          invalidDateMessage={I18n.t('This date is invalid.')}
         />
         <Flex justifyItems="space-between" alignItems="start">
           <Flex.Item padding="none small none none" shouldShrink={true}>
@@ -448,8 +492,8 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
         </Flex>
         {shouldShowFrequencyPicker() && (
           <FrequencyPicker
-            key={date}
-            date={date}
+            key={date || today}
+            date={date || today}
             locale={locale}
             timezone={timezone}
             width="auto"
@@ -579,6 +623,7 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
                   isWorking ? e.preventDefault() : formSubmit(e)
                 }}
                 type="submit"
+                interaction={hasFormErrors(formErrors) ? 'disabled' : 'enabled'}
               >
                 {isWorking ? (
                   <Spinner renderTitle={I18n.t('Saving')} size="x-small" />

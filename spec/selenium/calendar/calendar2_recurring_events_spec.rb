@@ -68,6 +68,7 @@ describe "recurring events" do
     it "selects monthly with specific day in frequency picker in dropdown" do
       get "/calendar2#view_name=month&view_start=2023-07-01"
       create_new_calendar_event
+      enter_event_title("Test event")
       newdate = "July 20, 2023"
       enter_new_event_date(newdate)
 
@@ -81,6 +82,7 @@ describe "recurring events" do
     it "selects annually with specific day in frequency picker in dropdown" do
       get "/calendar2#view_name=month&view_start=2023-07-01"
       create_new_calendar_event
+      enter_event_title("Test event")
       newdate = "July 20, 2023"
       enter_new_event_date(newdate)
 
@@ -95,6 +97,7 @@ describe "recurring events" do
     it "selects weekly with specific day in frequency picker in dropdown" do
       get "/calendar2#view_name=month&view_start=2023-07-01"
       create_new_calendar_event
+      enter_event_title("Test event")
       newdate = "July 20, 2023"
       enter_new_event_date(newdate)
 
