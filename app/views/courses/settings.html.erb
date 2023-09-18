@@ -347,8 +347,8 @@
       <div class="form-row language-row">
         <div class="form-label"><%= f.blabel :default_due_time, en: "Default due time" %></div>
         <div class="tall-row">
-          <%= f.select :default_due_time, options_for_select(default_due_time_options(@context), default_due_time_key(@context)) %>
-          <div class="aside palign">
+          <%= f.select :default_due_time, options_for_select(default_due_time_options(@context), default_due_time_key(@context)), {}, {'aria-describedby' => 'due-time-description'} %>
+          <div class="aside palign" id="due-time-description">
             <%= t("This influences the user interface for setting due dates. It does not change the time due for any existing assignments.") %>
           </div>
         </div>
@@ -363,10 +363,10 @@
             <div>
               <%= f.select :locale,
                            [[no_language, nil]] + available_locales.invert.sort_by { |desc, _| Canvas::ICU.collation_key(desc) },
-                           {:selected => @context.locale}, {:class => 'locale'} %>
+                           {:selected => @context.locale}, {:class => 'locale', 'aria-describedby' => 'language-description'} %>
               <%= render :partial => 'shared/locale_warning' %>
             </div>
-            <div class="aside palign">
+            <div class="aside palign" id="language-description">
               <%= t('language_overrides_preferences', "This will override any user/system language preferences. This is only recommended for foreign language courses") %>
             </div>
           <% else %>
