@@ -321,7 +321,7 @@ module CC
         end
       end
 
-      if assignment.annotated_document? && assignment.annotatable_attachment&.available?
+      if assignment.annotated_document? && assignment.annotatable_attachment
         node.annotatable_attachment_migration_id(key_generator.create_key(assignment.annotatable_attachment))
       end
     end
