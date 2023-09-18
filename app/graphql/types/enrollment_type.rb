@@ -90,6 +90,11 @@ module Types
 
     field :type, EnrollmentTypeType, null: false
 
+    field :sis_import_id, ID, null: true
+    def sis_import_id
+      enrollment.sis_batch_id
+    end
+
     field :grades, GradesType, null: true do
       argument :grading_period_id,
                ID,
