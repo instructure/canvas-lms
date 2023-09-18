@@ -15,16 +15,36 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {useEffect, useState} from 'react'
+import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {func, string} from 'prop-types'
 import formatMessage from '../format-message'
-import {SourceCodeEditor} from '@instructure/ui-source-code-editor'
+import {CodeEditor} from '@instructure/ui-code-editor'
 import beautify from 'js-beautify'
 
 const RceHtmlEditor = React.forwardRef(({onFocus, ...props}, editorRef) => {
   const [code, setCode] = useState(props.code)
   const label = formatMessage('html code editor')
   const [dir, setDir] = useState(getComputedStyle(document.body, null).direction)
+  const [codeMirrorEditorDiv, setCodeMirrorEditorDiv] = useState(null)
+
+  useEffect(() => {
+    ;(async () => {
+      const p = new Promise(resolve => {
+        const timerid = setInterval(() => {
+          // scoping querySelector to the container div makes sure we're targeting this CodeEditor
+          // The CodeMirror docs (https://codemirror.net/doc/manual.html#styling)
+          // say this is the element we use to set the editor's height
+          const editor = editorRef.current.querySelector('.CodeMirror')
+          if (editor) {
+            clearInterval(timerid)
+            setCodeMirrorEditorDiv(editor)
+            resolve()
+          }
+        }, 60)
+      })
+      await p
+    })()
+  }, [editorRef])
 
   useEffect(() => {
     setCode(beautify.html(props.code))
@@ -56,7 +76,27 @@ const RceHtmlEditor = React.forwardRef(({onFocus, ...props}, editorRef) => {
     setDir(getComputedStyle(editorRef.current || document.body, null).direction)
   }, [dir, editorRef])
 
-  const direction = ['ltr', 'rtl'].includes(dir) ? dir : 'ltr'
+  useEffect(() => {
+    if (codeMirrorEditorDiv) {
+      codeMirrorEditorDiv.CodeMirror.setSize(null, props.height)
+      codeMirrorEditorDiv.style.margin = '0'
+      codeMirrorEditorDiv.style.border = '0'
+    }
+  }, [codeMirrorEditorDiv, props.height])
+
+  const isFocused = useRef(false)
+
+  // move cursor to the top of the html code when the editor is focused for the first time
+  const handleFocus = useCallback(
+    (editor, event) => {
+      if (!isFocused.current) {
+        editor.setCursor(0, 0)
+        isFocused.current = true
+      }
+      onFocus(event)
+    },
+    [onFocus]
+  )
 
   // setting height on the container keeps the RCE toolbar from jumping
   return (
@@ -65,28 +105,25 @@ const RceHtmlEditor = React.forwardRef(({onFocus, ...props}, editorRef) => {
       className="RceHtmlEditor"
       style={{height: props.height, overflow: 'hidden', textAlign: 'start'}}
     >
-      <SourceCodeEditor
+      <CodeEditor
         label={label}
         language="html"
-	// see LF-745 for tracking of the following:
-        // TODO: needs prop for
-        // options={{
-        //   extraKeys: {Tab: false, 'Shift-Tab': false},
-        // }}
-        // TODO: may need
-        // attachment={none | bottom | top}
-        lineNumbers={true}
-        lineWrapping={true}
-        autoFocus={false}
-        spellcheck={true}
-        direction={direction}
-        rtlMoveVisually={true}
-        height={props.height}
+        options={{
+          lineNumbers: true,
+          lineWrapping: true,
+          autofocus: false,
+          spellcheck: true,
+          extraKeys: {Tab: false, 'Shift-Tab': false},
+          screenReaderLabel: label,
+          direction: dir,
+          rtlMoveVisually: true,
+        }}
         value={code}
         onChange={value => {
           setCode(value)
           props.onChange(value)
         }}
+        onFocus={handleFocus}
       />
     </div>
   )
