@@ -41,6 +41,8 @@ describe Mutations::CreateDiscussionTopic do
             isAnonymousAuthor
             delayedPostAt
             lockAt
+            allowRating
+            onlyGradersCanRate
           }
           errors {
             attribute
@@ -82,7 +84,48 @@ describe Mutations::CreateDiscussionTopic do
     expect(created_discussion_topic["published"]).to eq published
     expect(created_discussion_topic["requireInitialPost"]).to be true
     expect(created_discussion_topic["anonymousState"]).to be_nil
+    expect(created_discussion_topic["allowRating"]).to be false
+    expect(created_discussion_topic["onlyGradersCanRate"]).to be false
     expect(DiscussionTopic.where("id = #{created_discussion_topic["_id"]}").count).to eq 1
+  end
+
+  it "creates an allow_rating discussion topic" do
+    query = <<~GQL
+      contextId: "#{@course.id}"
+      contextType: "Course"
+      title: "Allows Ratings"
+      message: "You can like this"
+      allowRating: true
+      published: true
+    GQL
+
+    result = execute_with_input(query)
+    created_discussion_topic = result.dig("data", "createDiscussionTopic", "discussionTopic")
+
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "discussionTopic", "errors")).to be_nil
+    expect(created_discussion_topic["allowRating"]).to be true
+    expect(created_discussion_topic["onlyGradersCanRate"]).to be false
+  end
+
+  it "creates an only_graders_can_rate discussion topic" do
+    query = <<~GQL
+      contextId: "#{@course.id}"
+      contextType: "Course"
+      title: "Allows Ratings"
+      message: "You can like this"
+      allowRating: true
+      onlyGradersCanRate: true
+      published: true
+    GQL
+
+    result = execute_with_input(query)
+    created_discussion_topic = result.dig("data", "createDiscussionTopic", "discussionTopic")
+
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "discussionTopic", "errors")).to be_nil
+    expect(created_discussion_topic["allowRating"]).to be true
+    expect(created_discussion_topic["onlyGradersCanRate"]).to be true
   end
 
   it "creates a published discussion topic" do

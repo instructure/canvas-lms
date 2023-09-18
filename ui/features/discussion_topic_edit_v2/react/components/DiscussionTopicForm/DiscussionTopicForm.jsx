@@ -341,26 +341,30 @@ export default function DiscussionTopicForm({
               // disabled={sectionIdsToPostTo === [allSectionsOption._id]}
             />
           )}
-          <Checkbox
-            label={I18n.t('Allow liking')}
-            value="allow-liking"
-            checked={allowLiking}
-            onChange={() => {
-              setOnlyGradersCanLike(!allowLiking && onlyGradersCanLike)
-              setAllowLiking(!allowLiking)
-            }}
-          />
-          {allowLiking && (
-            <View display="block" padding="none none none large">
-              <FormFieldGroup description="" rowSpacing="small">
-                <Checkbox
-                  label={I18n.t('Only graders can like')}
-                  value="only-graders-can-like"
-                  checked={onlyGradersCanLike}
-                  onChange={() => setOnlyGradersCanLike(!onlyGradersCanLike)}
-                />
-              </FormFieldGroup>
-            </View>
+          {!ENV.K5_HOMEROOM_COURSE && (
+            <>
+              <Checkbox
+                label={I18n.t('Allow liking')}
+                value="allow-liking"
+                checked={allowLiking}
+                onChange={() => {
+                  setOnlyGradersCanLike(!allowLiking && onlyGradersCanLike)
+                  setAllowLiking(!allowLiking)
+                }}
+              />
+              {allowLiking && (
+                <View display="block" padding="small none none large">
+                  <FormFieldGroup description="" rowSpacing="small">
+                    <Checkbox
+                      label={I18n.t('Only graders can like')}
+                      value="only-graders-can-like"
+                      checked={onlyGradersCanLike}
+                      onChange={() => setOnlyGradersCanLike(!onlyGradersCanLike)}
+                    />
+                  </FormFieldGroup>
+                </View>
+              )}
+            </>
           )}
           {!isGraded && (
             <Checkbox

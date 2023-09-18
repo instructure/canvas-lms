@@ -70,6 +70,8 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
         require_initial_post: input[:require_initial_post],
         is_anonymous_author: input[:is_anonymous_author] || false,
         anonymous_state:,
+        allow_rating: input[:allow_rating],
+        only_graders_can_rate: input[:only_graders_can_rate],
         user: current_user
       }
     )

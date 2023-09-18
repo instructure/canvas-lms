@@ -31,6 +31,8 @@ export const CREATE_DISCUSSION_TOPIC = gql`
     $delayedPostAt: DateTime
     $lockAt: DateTime
     $isAnonymousAuthor: Boolean
+    $allowRating: Boolean
+    $onlyGradersCanRate: Boolean
   ) {
     createDiscussionTopic(
       input: {
@@ -44,6 +46,8 @@ export const CREATE_DISCUSSION_TOPIC = gql`
         delayedPostAt: $delayedPostAt
         lockAt: $lockAt
         isAnonymousAuthor: $isAnonymousAuthor
+        allowRating: $allowRating
+        onlyGradersCanRate: $onlyGradersCanRate
       }
     ) {
       discussionTopic {
@@ -57,6 +61,8 @@ export const CREATE_DISCUSSION_TOPIC = gql`
         delayedPostAt
         lockAt
         isAnonymousAuthor
+        allowRating
+        onlyGradersCanRate
       }
       errors {
         ...Error
