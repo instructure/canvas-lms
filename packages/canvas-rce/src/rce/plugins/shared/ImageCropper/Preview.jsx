@@ -26,7 +26,6 @@ import {useMouseWheel} from './useMouseWheel'
 import {useKeyMouseTouchEvents} from './useKeyMouseEvents'
 import checkerboardStyle from '../CheckerboardStyling'
 import {View} from '@instructure/ui-view'
-import {getBrowser} from '../../../getBrowser'
 
 /**
  * Remove the node contents and append the svg element.
@@ -74,13 +73,17 @@ export const Preview = ({image, settings, dispatch}) => {
     scaleRatio: tempScaleRatio,
   })
 
+  function isSafariVersion15OrLesser() {
+    const match = /Version\/(\d+).+Safari/.exec(navigator.userAgent)
+    return match ? parseInt(match[1], 10) < 16 : false
+  }
+
   // Clip is not supported in Safari until v16.
   // It's needed here to prevent a strange screenreader
   // behavior that makes the cropper look bad. 'hidden'
   // suffices when clip is not available, although it's not perfect
   // TODO: remove when Safari versions >= 16 are more commonplace
-  const {name, version} = getBrowser()
-  const overflow = name === 'Safari' && parseFloat(version) < 16 ? 'hidden' : 'clip'
+  const overflow = isSafariVersion15OrLesser() ? 'hidden' : 'clip'
 
   return (
     <div
