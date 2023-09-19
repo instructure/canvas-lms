@@ -47,7 +47,7 @@ class Attachments::GarbageCollector
 
         to_delete_ids = []
         to_break_ids = []
-        to_delete.each do |att|
+        Parallel.each(to_delete, in_threads: 10) do |att|
           younger_same_type_children = younger_children(same_type_children[att.id] || [])
           older_same_type_children = (same_type_children[att.id] || []) - younger_same_type_children
 
@@ -94,7 +94,7 @@ class Attachments::GarbageCollector
 
     def to_delete_scope
       scope = Attachment.where(root_attachment_id: nil, context_type:)
-                        .where.not(file_state: ["deleted", "broken"])
+                        .where.not(file_state: ["deleted", "broken"]).order(:created_at)
       if Array.wrap(context_type).include?("ContentExport")
         scope = scope.where.not("EXISTS (
           SELECT 1
