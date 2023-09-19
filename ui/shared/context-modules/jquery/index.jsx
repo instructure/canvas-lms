@@ -2577,6 +2577,14 @@ $(document).ready(function () {
     const settingsProps = parseModule(moduleElement)
     renderDifferentiatedModulesTray(true, returnFocusTo, moduleElement, settingsProps)
   })
+
+  $('.view_assign_link').on('click keyclick', function (event) {
+    event.preventDefault()
+    const returnFocusTo = $(event.target).closest('ul').prev('.al-trigger')
+    const moduleElement = $(event.target).parents('.context_module')[0]
+    const settingsProps = parseModule(moduleElement)
+    renderDifferentiatedModulesTray(true, returnFocusTo, moduleElement, settingsProps)
+  })
 })
 
 export default modules

@@ -91,6 +91,15 @@ describe "selective_release module set up" do
       expect(view_assign.text).to eq ""
     end
 
+    it "accesses the modules tray for a module via the 'View Assign To' button" do
+      @module.assignment_overrides.create!
+      go_to_modules
+
+      view_assign.click
+
+      expect(settings_tray_exists?).to be true
+    end
+
     it "show the everyone radio button as checked when selecting Assign To tray" do
       go_to_modules
       manage_module_button(@module).click
