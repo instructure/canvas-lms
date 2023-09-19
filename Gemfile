@@ -49,9 +49,9 @@ SUPPORTED_RAILS_VERSIONS.product([nil, true]).each do |rails_version, include_pl
   end
 end
 
-Dir["Gemfile.d/*.lock", "gems/*/Gemfile.lock", base: Bundler.root].each do |gem_lockfile_name|
+(gemfile_root.glob("Gemfile.d/*.lock") + gemfile_root.glob("gems/*/Gemfile.lock")).each do |gem_lockfile_name|
   return unless lockfile(gem_lockfile_name,
-                         gemfile: gem_lockfile_name.sub(/\.lock$/, ""),
+                         gemfile: gem_lockfile_name.to_s.sub(/\.lock$/, ""),
                          allow_mismatched_dependencies: false)
 end
 # rubocop:enable Style/RedundantConstantBase
@@ -81,11 +81,11 @@ end
 Bundler::Dsl.prepend(GemOverride)
 
 if CANVAS_INCLUDE_PLUGINS
-  Dir[File.join(File.dirname(__FILE__), "gems/plugins/*/Gemfile.d/_before.rb")].each do |file|
+  gemfile_root.glob("gems/plugins/*/Gemfile.d/_before.rb") do |file|
     eval_gemfile(file)
   end
 end
 
-Dir.glob(File.join(File.dirname(__FILE__), "Gemfile.d", "*.rb")).each do |file|
+gemfile_root.glob("Gemfile.d/*.rb").each do |file|
   eval_gemfile(file)
 end
