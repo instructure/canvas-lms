@@ -19,9 +19,11 @@
 import React, {useEffect, useState} from 'react'
 import {Table} from '@instructure/ui-table'
 import {StatusPill} from './status_pill'
+import {SourceLink} from './source_link'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {datetimeString} from '@canvas/datetime/date-functions'
+import {ContentMigrationItem} from './types'
 
 const I18n = useI18nScope('content_migrations_redesign')
 
@@ -60,12 +62,14 @@ export const ContentMigrationsTable = () => {
         </Table.Row>
       </Table.Head>
       <Table.Body>
-        {migrations.map((cm: any) => (
+        {migrations.map((cm: ContentMigrationItem) => (
           <Table.Row key={cm.id}>
             <Table.Cell themeOverride={{padding: '1.1rem 0rem'}}>
               {cm.migration_type_title}
             </Table.Cell>
-            <Table.Cell> </Table.Cell>
+            <Table.Cell>
+              <SourceLink item={cm} />
+            </Table.Cell>
             <Table.Cell>
               {datetimeString(cm.created_at, {timezone: ENV.CONTEXT_TIMEZONE})}
             </Table.Cell>
