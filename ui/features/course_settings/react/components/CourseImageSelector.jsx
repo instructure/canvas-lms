@@ -86,6 +86,11 @@ export default class CourseImageSelector extends React.Component {
                 trigger={
                   <div className="CourseImageSelector__Button">
                     <Button
+                      themeOverride={{
+                        primaryBorderColor: '#fff',
+                        borderWidth: '1px',
+                        borderStyle: 'solid',
+                      }}
                       size="small"
                       color="primary"
                       shape="circle"
