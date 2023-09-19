@@ -2024,6 +2024,37 @@ describe GradebookImporter do
         end
       end
 
+      it "does not output override statuses when custom statuses FF is OFF and override status or grade columns not existing" do
+        Account.site_admin.disable_feature!(:custom_gradebook_statuses)
+        importer = importer_with_rows(
+          "Student,ID,Section,Final Score",
+          "Cyrus,#{student_with_override.id},My Course,0"
+        )
+
+        output = importer.as_json
+
+        aggregate_failures do
+          expect(output[:students].length).to eq 0
+        end
+      end
+
+      it "does not output override statuses when custom statuses FF is OFF and override status column not existing" do
+        Account.site_admin.disable_feature!(:custom_gradebook_statuses)
+        importer = importer_with_rows(
+          "Student,ID,Section,Final Score,Override Score (First GP)",
+          "Cyrus,#{student_with_override.id},My Course,0,70"
+        )
+
+        output = importer.as_json
+        overrides = output[:students].first[:override_scores]
+
+        aggregate_failures do
+          expect(overrides.length).to eq 1
+          expect(overrides.first[:grading_period_id]).to eq first_grading_period.id
+          expect(overrides.first[:new_score]).to eq "70"
+        end
+      end
+
       it "does not output override statuses when allow_override_scores is false" do
         @course.allow_final_grade_override = false
         @course.save!
