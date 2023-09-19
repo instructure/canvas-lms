@@ -372,6 +372,21 @@ class Auditors::GradeChange
     bulk_insert_records(event_records)
   end
 
+  def self.create_content_participations(plucked_submissions, assignment, unique_users)
+    root_account_id = assignment.root_account_id
+    content_participations = []
+    content_participation_counts = []
+    plucked_submissions.each do |user_id, submission_id, course_id|
+      context_type = course_id ? "Course" : assignment.context_type
+      context_id = course_id || assignment.context_id
+      content_participations << { content_type: "Submission", user_id:, content_id: submission_id, workflow_state: "unread", content_item: "grade", root_account_id:, }
+      content_participation_counts << { content_type: "Submission", context_type:, user_id:, root_account_id:, unread_count: 0, context_id:, }
+    end
+    content_participations.each_slice(1000) { |batch| ContentParticipation.insert_all(batch) }
+    content_participation_counts.each_slice(1000) { |batch| ContentParticipationCount.insert_all(batch) }
+    assignment.course.refresh_content_participation_counts_for_users(unique_users)
+  end
+
   def self.insert_record(event_record)
     Auditors::GradeChange::Stream.insert(event_record)
   end

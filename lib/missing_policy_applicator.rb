@@ -55,6 +55,7 @@ class MissingPolicyApplicator
     now = Time.zone.now
 
     GuardRail.activate(:primary) do
+      plucked_submissions = submissions.pluck(:user_id, :id, :course_id)
       submissions = Submission.active.where(id: submissions)
 
       submissions.update_all(
@@ -77,8 +78,9 @@ class MissingPolicyApplicator
       if Account.site_admin.feature_enabled?(:fix_missing_policy_applicator_gradebook_history)
         Auditors::GradeChange.delay_if_production.bulk_record_submission_events(submissions.reload)
       end
-
-      assignment.course.recompute_student_scores(submissions.map(&:user_id).uniq)
+      unique_users = submissions.map(&:user_id).uniq
+      Auditors::GradeChange.delay_if_production(strand: "CreateParticipationsForMissingPolicy:#{assignment.root_account.global_id}").create_content_participations(plucked_submissions, assignment, unique_users)
+      assignment.course.recompute_student_scores(unique_users)
     end
   end
 end
