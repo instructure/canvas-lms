@@ -17,8 +17,8 @@
  */
 
 import React, {useRef} from 'react'
-import {arrayOf, bool, func, objectOf, oneOf, shape, string} from 'prop-types'
-import {mediaObjectShape} from '../../shared/fileShape'
+import {func, oneOf, shape, string} from 'prop-types'
+import {contentTrayDocumentShape} from '../../shared/fileShape'
 import formatMessage from '../../../../format-message'
 
 import {Text} from '@instructure/ui-text'
@@ -116,15 +116,7 @@ MediaPanel.propTypes = {
   fetchInitialMedia: func.isRequired,
   fetchNextMedia: func.isRequired,
   onMediaEmbed: func.isRequired,
-  media: objectOf(
-    shape({
-      files: arrayOf(shape(mediaObjectShape)).isRequired,
-      bookmark: string,
-      hasMore: bool,
-      isLoading: bool,
-      error: string,
-    })
-  ).isRequired,
+  media: contentTrayDocumentShape.isRequired,
   sortBy: shape({
     sort: oneOf(['date_added', 'alphabetical']).isRequired,
     order: oneOf(['asc', 'desc']).isRequired,
