@@ -412,6 +412,7 @@ module ApplicationHelper
     link_to(
       icon,
       "#",
+      role: "button",
       class: "license_help_link no-hover",
       title: I18n.t("Help with content licensing")
     )
@@ -423,6 +424,7 @@ module ApplicationHelper
     link_to(
       icon,
       "#",
+      role: "button",
       class: "visibility_help_link no-hover",
       title: I18n.t("Help with course visibilities")
     )
