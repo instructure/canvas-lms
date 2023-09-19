@@ -615,7 +615,7 @@ import 'compiled/jquery.rails_flash_notifications'
 
       addItemToModule: function($module, data) {
         if (!data) { return $('<div/>'); }
-        data.id = data.id || 'new'
+        data.id = data['item[id'] || 'new'
         data.type = data.type || data['item[type]'] || $.underscore(data.content_type);
         data.title = data.title || data['item[title]'];
         data.new_tab = data.new_tab ? '1' : '0';
