@@ -340,7 +340,7 @@
                 id="assignment_comment_<%= assignment.id %>"
                 class="toggle_comments_link tooltip"
                 aria-label="<%= t('Read comments') %>"
-
+                aria-haspopup="true"
                 aria-describedby="comment_count_for_assignment_<%= assignment.id %>"
                 <% if assignment_presenter.has_comments? && !assignment_presenter.hide_grade_from_student? %>
                   aria-expanded="false"
