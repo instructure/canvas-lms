@@ -265,7 +265,6 @@ class RCEWrapper extends React.Component {
         typeof IntersectionObserver === 'undefined' ||
         maxInitRenderedRCEs <= 0 ||
         currentRCECount < maxInitRenderedRCEs,
-      popupMountNode: instuiPopupMountNode(),
     }
     this._statusBarId = `${this.state.id}_statusbar`
 
@@ -690,7 +689,6 @@ class RCEWrapper extends React.Component {
         FocusRegionManager.blurRegion(event.target, this._focusRegion.id)
       }
     }
-    this.setState({popupMountNode: instuiPopupMountNode()})
     this.focusCurrentView()
   }
 
@@ -1888,7 +1886,7 @@ class RCEWrapper extends React.Component {
                 />
                 {this.props.trayProps?.containingContext && (
                   <CanvasContentTray
-                    mountNode={this.state.popupMountNode}
+                    mountNode={instuiPopupMountNode}
                     key={this.id}
                     canvasOrigin={this.getCanvasUrl()}
                     bridge={bridge}
