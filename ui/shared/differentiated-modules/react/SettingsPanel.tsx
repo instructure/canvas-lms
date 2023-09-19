@@ -24,6 +24,7 @@ import {TextInput} from '@instructure/ui-text-input'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import PrerequisiteForm from './PrerequisiteForm'
+import RequirementForm from './RequirementForm'
 import Footer from './Footer'
 import DateTimeInput from '@canvas/datetime/react/components/DateTimeInput'
 import {defaultState, actions, reducer} from './settingsReducer'
@@ -62,13 +63,10 @@ export default function SettingsPanel({
   moduleName,
   unlockAt,
   prerequisites,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   requirementCount,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   requireSequentialProgress,
   requirements,
   moduleList = [],
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   moduleItems = [],
 }: SettingsPanelProps) {
   const [state, dispatch] = useReducer(reducer, {
@@ -78,6 +76,8 @@ export default function SettingsPanel({
     lockUntilChecked: !!unlockAt,
     prerequisites: prerequisites ?? [],
     requirements: requirements ?? [],
+    requirementCount: requirementCount ?? 'all',
+    requireSequentialProgress: requireSequentialProgress ?? false,
   })
 
   const availableModules = useMemo(() => {
@@ -195,6 +195,50 @@ export default function SettingsPanel({
               />
             </View>
             <hr />
+          </View>
+        )}
+        {moduleItems.length > 0 && (
+          <View as="div" padding="x-small small">
+            <RequirementForm
+              requirements={state.requirements}
+              requirementCount={state.requirementCount}
+              requireSequentialProgress={state.requireSequentialProgress}
+              moduleItems={moduleItems}
+              onChangeRequirementCount={type => {
+                dispatch({type: actions.SET_REQUIREMENT_COUNT, payload: type})
+              }}
+              onToggleSequentialProgress={() =>
+                dispatch({
+                  type: actions.SET_REQUIRE_SEQUENTIAL_PROGRESS,
+                  payload: !state.requireSequentialProgress,
+                })
+              }
+              onAddRequirement={requirement => {
+                dispatch({
+                  type: actions.SET_REQUIREMENTS,
+                  payload: [...state.requirements, requirement],
+                })
+              }}
+              onDropRequirement={index => {
+                dispatch({
+                  type: actions.SET_REQUIREMENTS,
+                  payload: [
+                    ...state.requirements.slice(0, index),
+                    ...state.requirements.slice(index + 1),
+                  ],
+                })
+              }}
+              onUpdateRequirement={(requirement, index) => {
+                dispatch({
+                  type: actions.SET_REQUIREMENTS,
+                  payload: [
+                    ...state.requirements.slice(0, index),
+                    requirement,
+                    ...state.requirements.slice(index + 1),
+                  ],
+                })
+              }}
+            />
           </View>
         )}
       </FlexItem>

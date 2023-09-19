@@ -18,6 +18,7 @@
 
 import tz from '@canvas/timezone'
 import type {SettingsPanelState} from '../react/settingsReducer'
+import type {ModuleItem, Requirement} from '../react/types'
 
 export function calculatePanelHeight(withinTabs: boolean): string {
   let headerHeight = 79.5
@@ -41,5 +42,26 @@ export function convertModuleSettingsForApi(moduleSettings: SettingsPanelState) 
         .map(prerequisite => `module_${prerequisite.id}`)
         .join(','),
     },
+  }
+}
+
+export function requirementTypesForResource(
+  resource: ModuleItem['resource']
+): Requirement['type'][] {
+  switch (resource) {
+    case 'assignment':
+      return ['view', 'mark', 'submit', 'score']
+    case 'quiz':
+      return ['view', 'submit', 'score']
+    case 'file':
+      return ['view']
+    case 'page':
+      return ['view', 'mark', 'contribute']
+    case 'discussion':
+      return ['view', 'contribute']
+    case 'externalUrl':
+      return ['view']
+    case 'externalTool':
+      return ['view']
   }
 }

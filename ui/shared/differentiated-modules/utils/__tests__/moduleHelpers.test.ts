@@ -118,15 +118,20 @@ describe('parseModule', () => {
     const element = getFixture('requirements')
     expect(parseModule(element).requirements).toEqual([
       {
+        id: '93',
         name: 'HW 1',
         resource: 'assignment',
         type: 'mark',
+        minimumScore: '0',
+        pointsPossible: '10',
       },
       {
+        id: '94',
         name: 'Quiz 1',
         resource: 'quiz',
         type: 'score',
         minimumScore: '70',
+        pointsPossible: null,
       },
     ])
   })

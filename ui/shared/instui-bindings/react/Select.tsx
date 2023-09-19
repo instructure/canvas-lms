@@ -81,6 +81,7 @@ type OptionProps = {
 
 type GroupProps = {
   label: string
+  children?: ReactElement | ReactElement[]
 }
 
 // CanvasSelectOption and CanvasSelectGroup are components our client can create thru CanvasSelect

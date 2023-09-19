@@ -100,6 +100,9 @@ function parseRequirements(element: HTMLDivElement) {
     element.querySelectorAll('.ig-row.with-completion-requirements')
   )
   return requirementElements.map((requirementNode: Element) => {
+    const id = requirementNode
+      .querySelector('[data-module-item-id]')
+      ?.getAttribute('data-module-item-id')
     const name = requirementNode.querySelector('.item_name a')?.textContent?.trim() || ''
     const resource =
       resourceTypeMap[
@@ -112,11 +115,15 @@ function parseRequirements(element: HTMLDivElement) {
       requirementNode.querySelectorAll('.requirement_type')
     ).filter(node => window.getComputedStyle(node).display !== 'none')[0]
     const type = requirementTypeMap[activeRequirementNode.classList[1] as Requirement['type']]
-    if (type === 'score') {
+    if (resource === 'assignment' || resource === 'quiz') {
       const minimumScore = activeRequirementNode.querySelector('.min_score')?.textContent || '0'
-      return {name, resource, type, minimumScore}
+      const pointsPossibleString = requirementNode.querySelector(
+        '.points_possible_display'
+      )?.textContent
+      const pointsPossible = pointsPossibleString ? pointsPossibleString.split(/\s/)[0] : null
+      return {id, name, resource, type, minimumScore, pointsPossible}
     } else {
-      return {name, resource, type}
+      return {id, name, resource, type}
     }
   }) as Requirement[]
 }
@@ -124,12 +131,15 @@ function parseRequirements(element: HTMLDivElement) {
 function parseModuleItems(element: HTMLDivElement) {
   const moduleItemElements = Array.from(element.querySelectorAll('.ig-row'))
   return moduleItemElements.map(moduleItem => {
+    const id = moduleItem
+      .querySelector('[data-module-item-id]')
+      ?.getAttribute('data-module-item-id')
     const name = moduleItem.querySelector('.item_name a')?.textContent?.trim() || ''
     const resource =
       resourceTypeMap[
         moduleItem.querySelector('.type_icon')?.getAttribute('title') as Requirement['resource']
       ]
-    return {name, resource}
+    return {id, name, resource}
   })
 }
 

@@ -40,6 +40,8 @@ const fixtures = {
       </span>
       <span class="requirement_type min_score_requirement" style="display: none;"></span>
       <span class="requirement_type must_mark_done_requirement" style="display: block;"></span>
+      <span class="points_possible_display">10 pts</span>
+      <span data-module-item-id="93" />
     </div>
     <div class="ig-row with-completion-requirements ig-published">
       <span class="type_icon" title="Quiz" role="none"></span>
@@ -50,6 +52,7 @@ const fixtures = {
         <span class="min_score">70</span>
       </span>
       <span class="requirement_type must_mark_done_requirement" style="display: none;"></span>
+      <span data-module-item-id="94" />
     </div>
   `,
 }
