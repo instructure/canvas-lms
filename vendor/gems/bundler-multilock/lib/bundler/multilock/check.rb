@@ -56,10 +56,7 @@ module Bundler
 
         begin
           definition.validate_runtime!
-          Bundler.ui.silence do
-            definition.resolve_only_locally!
-          end
-          not_installed = definition.missing_specs
+          not_installed = Bundler.ui.silence { definition.missing_specs }
         rescue RubyVersionMismatch, GemNotFound, SolveFailure
           return return_missing ? [] : false
         end

@@ -46,5 +46,3 @@ end
 Bundler::Plugin.add_hook(Bundler::Plugin::Events::GEM_AFTER_INSTALL_ALL) do |_|
   Bundler::Multilock.after_install_all
 end
-
-Bundler::Multilock.inject_preamble unless Bundler::Multilock.loaded?
