@@ -884,8 +884,10 @@ class GradebookImporter
       end
       matching_score_change&.current_score = existing_score.override_score&.to_s
 
-      matching_status_change = @gradebook_importer_override_statuses[student_id].detect do |status_change|
-        status_change.grading_period_id == existing_score.grading_period_id
+      if allow_override_grade_statuses?
+        matching_status_change = @gradebook_importer_override_statuses[student_id].detect do |status_change|
+          status_change.grading_period_id == existing_score.grading_period_id
+        end
       end
 
       matching_status_change&.current_grade_status = @custom_grade_statuses_map[existing_score.custom_grade_status_id]
