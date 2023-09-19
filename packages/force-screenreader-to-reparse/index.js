@@ -41,6 +41,7 @@ const forceScreenreaderToReparse = node => {
   const oldDisplay = node.style.display || ''
   node.style.display = 'none'
   // We just access this property to force recalculation of data and a redraw
+  // eslint-disable-next-line babel/no-unused-expressions
   node.offsetHeight
   node.style.display = oldDisplay
 
