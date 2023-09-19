@@ -65,7 +65,9 @@ export const EditStatusPopover = ({
       on="click"
       isShowingContent={isOpen}
       shouldReturnFocus={true}
+      shouldContainFocus={true}
       positionTarget={positionTarget}
+      screenReaderLabel={I18n.t('Edit Status Dialog for %{editButtonLabel}', {editButtonLabel})}
       renderTrigger={
         !hideRenderTrigger && (
           <IconButton
