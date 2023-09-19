@@ -87,6 +87,10 @@ module Lti
       @context.is_a?(Course) && @context.enrollment_term &&
         @context.enrollment_term.start_at
     end
+    TERM_END_DATE_GUARD = lambda do
+      @context.is_a?(Course) && @context.enrollment_term &&
+        @context.enrollment_term.end_at
+    end
     TERM_NAME_GUARD = -> { @context.is_a?(Course) && @context.enrollment_term&.name }
     USER_GUARD = -> { @current_user }
     SIS_USER_GUARD = -> { sis_pseudonym&.sis_user_id }
@@ -908,6 +912,16 @@ module Lti
                        [],
                        -> { @context.enrollment_term.start_at },
                        TERM_START_DATE_GUARD
+
+    # returns the current course's term end date.
+    # @example
+    #   ```
+    #   2018-01-12 00:00:00 -0700
+    #   ```
+    register_expansion "Canvas.term.endAt",
+                       [],
+                       -> { @context.enrollment_term.end_at },
+                       TERM_END_DATE_GUARD
 
     # returns the current course's term name.
     # @example
