@@ -74,6 +74,18 @@ describe('SettingsPanel', () => {
     expect(getByTestId('prerequisite-form')).toBeInTheDocument()
   })
 
+  it('does not render requirements when there are no module items', () => {
+    const {queryByTestId} = renderComponent()
+    expect(queryByTestId('requirement-form')).not.toBeInTheDocument()
+  })
+
+  it('renders requirements when there are moduleItems', () => {
+    const {getByTestId} = renderComponent({
+      moduleItems: [{id: '0', name: 'Page 0', type: 'page'}],
+    })
+    expect(getByTestId('requirement-form')).toBeInTheDocument()
+  })
+
   describe('on update', () => {
     beforeAll(() => {
       window.ENV.COURSE_ID = '1'

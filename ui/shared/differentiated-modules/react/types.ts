@@ -16,12 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export interface Module {
-  id: string
-  name: string
-}
-
 type RequirementType = 'view' | 'mark' | 'submit' | 'score' | 'contribute'
+
 type ResourceType =
   | 'assignment'
   | 'quiz'
@@ -31,14 +27,16 @@ type ResourceType =
   | 'externalUrl'
   | 'externalTool'
 
-export interface ModuleItem {
+export interface Module {
+  id: string
   name: string
+}
+
+export interface ModuleItem extends Module {
   resource: ResourceType
 }
 
-interface BaseRequirement {
-  name: string
-  resource: ResourceType
+interface BaseRequirement extends ModuleItem {
   type: RequirementType
 }
 
@@ -46,12 +44,14 @@ interface AssignmentRequirement extends BaseRequirement {
   resource: 'assignment'
   type: Extract<RequirementType, 'view' | 'mark' | 'submit' | 'score'>
   minimumScore: string
+  pointsPossible: null | string
 }
 
 interface QuizRequirement extends BaseRequirement {
   resource: 'quiz'
   type: Extract<RequirementType, 'view' | 'submit' | 'score'>
   minimumScore: string
+  pointsPossible: null | string
 }
 
 interface FileRequirement extends BaseRequirement {
