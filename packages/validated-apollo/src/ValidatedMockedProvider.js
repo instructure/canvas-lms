@@ -24,14 +24,14 @@ import ValidatedApolloClient from './ValidatedApolloClient'
 export default class ValidatedMockedProvider extends React.Component {
   static propTypes = {
     // props are used implicitly by passing them to the client constructor
-    /* eslint-disable react/no-unused-prop-types, react/forbid-prop-types */
+    /* eslint-disable react/no-unused-prop-types */
     schema: oneOfType([string, object]).isRequired,
     children: element.isRequired,
     mocks: arrayOf(object),
     addTypename: bool,
     link: object,
-    cache: object
-    /* eslint-enable react/no-unused-prop-types, react/forbid-prop-types */
+    cache: object,
+    /* eslint-enable react/no-unused-prop-types */
   }
 
   constructor(props) {
@@ -40,6 +40,6 @@ export default class ValidatedMockedProvider extends React.Component {
   }
 
   render() {
-    return <ApolloProvider client={this.client}>{this.props.children}</ApolloProvider>
+    return React.createElement(ApolloProvider, {client: this.client}, this.props.children)
   }
 }
