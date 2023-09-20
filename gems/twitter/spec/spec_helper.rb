@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require "twitter"
-require "byebug"
+require "debug"
 
 I18n.load_path += Dir[File.join("spec", "locales", "*.yml")]
 

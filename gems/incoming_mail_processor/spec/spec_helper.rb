@@ -24,7 +24,7 @@
 #
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 
-require "byebug"
+require "debug"
 require "timecop"
 require "incoming_mail_processor/mailbox_spec_helper"
 require "incoming_mail_processor"

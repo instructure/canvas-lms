@@ -146,10 +146,10 @@ COMPOSE_FILE=docker-compose.yml:docker-compose.override.yml:docker-compose/rdebu
 ```
 4. Press F5, set breakpoints, and start debugging!
 
-### Byebug
+### Debugging
 
-A byebug server is running in development mode on the web and job containers
-to allow you to remotely control any sessions where `byebug` has yielded
+A Ruby debug server is running in development mode on the web and job containers
+to allow you to remotely control any sessions where the debugger has yielded
 execution. To use it, you will need to enable `REMOTE_DEBUGGING_ENABLED` in your
 `docker-compose.<user>.override.yml` file in your app's root directory. If you don't have
 this file, you will need to create it and add the following:
@@ -164,23 +164,23 @@ services:
 
 Make sure you add this new file to your `COMPOSE_FILE` var in `.env`.
 
-You can attach to the byebug server once the container is started:
+You can attach to the server once the container is started:
 
 Debugging web:
 
 ```
-docker-compose exec web bin/byebug-remote
+docker-compose exec web bin/rdbg --attach
 ```
 
 Debugging jobs:
 
 ```
-docker-compose exec jobs bin/byebug-remote
+docker-compose exec jobs bin/rdbg --attach
 ```
 
 ### Prefer pry?
 
-Unfortunately, you can't start a pry session in a remote byebug session. What
+Unfortunately, you can't start a pry session in a remote debug session. What
 you can do instead is use `pry-remote`.
 
 1. Add `pry-remote` to your Gemfile

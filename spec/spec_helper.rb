@@ -25,7 +25,7 @@
 # from their use, making things harder to find
 
 begin
-  require "byebug"
+  require "debug"
 rescue LoadError
   nil
 end

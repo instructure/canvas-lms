@@ -37,7 +37,7 @@ Rails.env = "test"
 
 require "canvas_cassandra"
 require "yaml"
-require "byebug"
+require "debug"
 
 RSpec.configure do |config|
   config.run_all_when_everything_filtered = true

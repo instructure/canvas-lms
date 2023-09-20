@@ -45,21 +45,11 @@ environment_configuration(defined?(config) && config) do |config|
   config.action_mailer.raise_delivery_errors = true
 
   # allow debugging only in development environment by default
-  #
-  # Option to DISABLE_RUBY_DEBUGGING is helpful IDE-based debugging.
-  # The ruby debug gems conflict with the IDE-based debugger gem.
-  # Set this option in your dev environment to disable.
-  unless ENV["DISABLE_RUBY_DEBUGGING"] || RUBY_ENGINE != "ruby"
-    require "byebug"
+  if RUBY_ENGINE == "ruby"
+    ENV["RUBY_DEBUG_LAZY"] = "true"
+    require "debug"
     if ENV["REMOTE_DEBUGGING_ENABLED"]
-      require "byebug/core"
-      Byebug.start_server("0.0.0.0", 0)
-      puts "Byebug listening on 0.0.0.0:#{Byebug.actual_port}" # rubocop:disable Rails/Output
-      byebug_port_file = File.join(Dir.tmpdir, "byebug.port")
-      File.write(byebug_port_file, Byebug.actual_port)
-
-      require "debase"
-      require "ruby-debug-ide"
+      require "debug/open_nonstop"
     end
   end
 
