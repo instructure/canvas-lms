@@ -43,7 +43,7 @@ export default function CourseWizard({onHideWizard}) {
       shouldReturnFocus={true}
       unmountOnExit={true}
     >
-      <Mask themeOverride={{background: 'transparent'}} fullscreen={true}>
+      <Mask theme={{background: 'transparent'}} fullscreen={true}>
         <main role="main">
           <div className="ic-wizard-box">
             <div className="ic-wizard-box__header">

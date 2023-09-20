@@ -29,13 +29,19 @@ export default class ScopesMethod extends React.Component {
     }
   }
 
+  themeOverride() {
+    return {
+      color: '#6D7883',
+    }
+  }
+
   render() {
     return (
       <Pill
         data-automation="developer-key-scope-pill"
         margin={this.props.margin}
         color="primary"
-        themeOverride={{color: '#6D7883'}}
+        theme={this.themeOverride()}
       >
         {this.props.method}
       </Pill>

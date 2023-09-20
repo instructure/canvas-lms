@@ -102,7 +102,7 @@ function ColorOptions({color, focusedColorIndex, onChange, onChangeFocus}) {
           margin="0 x-small x-small 0"
           size="small"
           color="secondary"
-          themeOverride={{
+          theme={{
             secondaryColor: 'white',
             secondaryBackground: option,
             secondaryBorderColor: option,

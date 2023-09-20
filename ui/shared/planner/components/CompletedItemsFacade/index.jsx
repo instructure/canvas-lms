@@ -40,7 +40,7 @@ export class CompletedItemsFacade extends Component {
           iconColor: this.style.theme.labelColor,
           iconMargin: this.style.theme.gutterWidth,
         }
-      : undefined
+      : null
   }
 
   static propTypes = {
@@ -163,7 +163,7 @@ export class CompletedItemsFacade extends Component {
               },
               {count: this.props.itemCount}
             )}
-            themeOverride={this.conditionalTheme}
+            theme={this.conditionalTheme}
           >
             ToggleDetails requires a child
           </ToggleDetails>

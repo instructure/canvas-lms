@@ -114,7 +114,7 @@ const Todo = ({
           </View>
           {/* The dot is tiny in Balsamiq Sans, which is why we're forcing Lato here */}
           <PresentationContent>
-            <View margin="0 small" themeOverride={{fontFamily: 'Lato, Arial, sans-serif'}}>
+            <View margin="0 small" theme={{fontFamily: 'Lato, Arial, sans-serif'}}>
               •
             </View>
           </PresentationContent>

@@ -28,7 +28,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {TruncateText} from '@instructure/ui-truncate-text'
 
 const componentOverrides = {
-  Tag: {
+  [Tag.componentId]: {
     defaultBackground: 'white',
   },
 }

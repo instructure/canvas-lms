@@ -100,7 +100,7 @@ export default class RSSFeedList extends React.Component {
                   size="small"
                   href={url}
                   isWithinText={false}
-                  themeOverride={{smallPadding: '0', smallHeight: '1rem'}}
+                  theme={{smallPadding: '0', smallHeight: '1rem'}}
                 >
                   {display_name}
                 </Link>

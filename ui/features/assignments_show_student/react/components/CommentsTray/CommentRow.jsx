@@ -52,7 +52,7 @@ export default function CommentRow(props) {
         <div style={{display: 'flex', alignItems: 'center'}}>
           <Badge
             margin="0 xx-small 0 0"
-            themeOverride={read ? {colorPrimary: 'white'} : undefined}
+            theme={read ? {colorPrimary: 'white'} : undefined}
             type="notification"
             standalone={true}
           />
@@ -83,7 +83,7 @@ export default function CommentRow(props) {
             href={attachment.url}
             isWithinText={false}
             renderIcon={getIconByType(attachment.mimeClass)}
-            themeOverride={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
+            theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
           >
             {attachment.displayName}
           </Link>

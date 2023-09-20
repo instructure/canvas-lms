@@ -36,7 +36,7 @@ import blackoutDatesIcon from '../../utils/blackout-dates-lined.svg'
 const I18n = useI18nScope('course_paces_blackout_date_row')
 
 const componentOverrides = {
-  'Table.Cell': {
+  [Table.Cell.componentId]: {
     background: '#F5F5F5',
   },
 }
