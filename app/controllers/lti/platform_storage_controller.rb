@@ -40,6 +40,9 @@ module Lti
   #   * postMessage Storage: https://www.imsglobal.org/spec/lti-pm-s/v0p1
   #   * Implementation Guide: https://www.imsglobal.org/spec/lti-cs-oidc/v0p1
   class PlatformStorageController < ApplicationController
+    # TODO: include this once it's overridable
+    # include Lti::Oidc
+
     def post_message_forwarding
       unless Lti::PlatformStorage.flag_enabled?
         render status: :not_found

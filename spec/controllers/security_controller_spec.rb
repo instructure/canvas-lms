@@ -82,4 +82,70 @@ RSpec.describe SecurityController, type: :request do
                          ])
     end
   end
+
+  describe "openid_configuration" do
+    it "rejects timed-out tokens" do
+      jwt = Canvas::Security.create_jwt({
+                                          user_id: 1,
+                                          root_account_uuid: Account.default.uuid
+                                        },
+                                        5.minutes.ago)
+
+      get "/api/lti/security/openid-configuration", params: { registration_token: jwt }
+      expect(response).to have_http_status :unauthorized
+    end
+
+    it "contains the correct information" do
+      jwt = Canvas::Security.create_jwt({
+                                          user_id: 1,
+                                          root_account_global_id: Account.default.global_id
+                                        },
+                                        5.minutes.from_now)
+
+      get "/api/lti/security/openid-configuration", params: { registration_token: jwt }
+      expect(response).to have_http_status :ok
+      parsed_body = response.parsed_body
+      expect(parsed_body["issuer"]).to eq "https://canvas.instructure.com"
+      expect(parsed_body["authorization_endpoint"]).to eq "http://canvas.instructure.com/api/lti/authorize_redirect"
+      expect(parsed_body["registration_endpoint"]).to eq "http://localhost/api/lti/registrations"
+      lti_platform_configuration = parsed_body["https://purl.imsglobal.org/spec/lti-platform-configuration"]
+      expect(lti_platform_configuration["product_family_code"]).to eq "canvas"
+      expect(lti_platform_configuration["version"]).to eq "OpenSource"
+      expect(lti_platform_configuration["https://canvas.instructure.com/lti/account_name"]).to eq "Default Account"
+    end
+  end
+
+  context "sharding" do
+    specs_require_sharding
+
+    describe "openid_configuration" do
+      it "works cross-shard" do
+        account_name = "Shard 2 Account"
+
+        account = nil
+
+        @shard2.activate do
+          account = Account.create!(name: account_name, lti_guid: "shard2")
+        end
+
+        jwt = Canvas::Security.create_jwt({
+                                            user_id: 1,
+                                            root_account_global_id: account.global_id
+                                          },
+                                          5.minutes.from_now)
+
+        get "/api/lti/security/openid-configuration", params: { registration_token: jwt }
+        expect(response).to have_http_status :ok
+        parsed_body = response.parsed_body
+        expect(parsed_body["issuer"]).to eq "https://canvas.instructure.com"
+        expect(parsed_body["authorization_endpoint"]).to eq "http://canvas.instructure.com/api/lti/authorize_redirect"
+        expect(parsed_body["registration_endpoint"]).to eq "http://localhost/api/lti/registrations"
+        lti_platform_configuration = parsed_body["https://purl.imsglobal.org/spec/lti-platform-configuration"]
+        expect(lti_platform_configuration["product_family_code"]).to eq "canvas"
+        expect(lti_platform_configuration["version"]).to eq "OpenSource"
+        expect(lti_platform_configuration["https://canvas.instructure.com/lti/account_name"]).to eq "Shard 2 Account"
+        expect(lti_platform_configuration["https://canvas.instructure.com/lti/account_lti_guid"]).to eq "shard2"
+      end
+    end
+  end
 end
