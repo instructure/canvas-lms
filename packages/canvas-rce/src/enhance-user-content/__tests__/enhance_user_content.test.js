@@ -134,6 +134,22 @@ describe('enhanceUserContent()', () => {
     })
   })
 
+  describe('when tool launch iframe has display=in_rce', () => {
+    const canvasOrigin = 'https://canvas.is.here:2000/'
+
+    it('replaces with display=borderless', () => {
+      subject(
+        `<iframe id="iframe" src="${canvasOrigin}courses/1/external_tools/retrieve?display=in_rce" />`
+      )
+
+      enhanceUserContent(document, {canvasOrigin})
+
+      expect(document.getElementById('iframe').getAttribute('src')).toEqual(
+        `${canvasOrigin}courses/1/external_tools/retrieve?display=borderless`
+      )
+    })
+  })
+
   describe('when a link has an href that matches a canvas file path', () => {
     it('makes relative links absolute', () => {
       subject(

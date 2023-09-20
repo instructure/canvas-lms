@@ -22,6 +22,7 @@ module Lti
   module AppUtil
     TOOL_DISPLAY_TEMPLATES = {
       "borderless" => { template: "lti/unframed_launch", layout: "borderless_lti" }.freeze,
+      "in_rce" => { template: "lti/in_rce_launch", layout: false }.freeze,
       "full_width" => { template: "lti/full_width_launch" }.freeze,
       "in_context" => { template: "lti/framed_launch" }.freeze,
       "in_nav_context" => { template: "lti/full_width_in_context" }.freeze,
@@ -37,6 +38,10 @@ module Lti
 
       if display_override && TOOL_DISPLAY_TEMPLATES.include?(display_override)
         display_type = display_override
+      end
+
+      if display_type == "in_rce" && !Account.site_admin.feature_enabled?(:lti_rce_postmessage_support)
+        display_type = "borderless"
       end
 
       TOOL_DISPLAY_TEMPLATES[display_type].dup

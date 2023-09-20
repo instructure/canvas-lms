@@ -1287,6 +1287,51 @@ describe ExternalToolsController do
       let(:pfc_tool_context) { @course }
     end
 
+    context "with display type 'in_rce'" do
+      render_views
+
+      subject do
+        get :retrieve, params: {
+          url: tool.url,
+          course_id: @course.id,
+          display: "in_rce"
+        }
+      end
+
+      before do
+        user_session(@student)
+        Account.site_admin.enable_feature!(:lti_rce_postmessage_support)
+      end
+
+      context "with platform storage flag enabled" do
+        before { Account.site_admin.enable_feature!(:lti_platform_storage) }
+
+        it "renders the sibling forwarder frame once" do
+          subject
+          expect(response.body.scan('id="post_message_forwarding').count).to eq 1
+        end
+      end
+
+      context "with platform storage flag disabled" do
+        before { Account.site_admin.disable_feature!(:lti_platform_storage) }
+
+        it "does not render the sibling forwarder frame" do
+          subject
+          expect(response.body.scan('id="post_message_forwarding').count).to eq 0
+        end
+      end
+
+      it "renders the tool launch iframe" do
+        subject
+        expect(response.body).to include("id=\"tool_content\"")
+      end
+
+      it "includes post_message_forwarding JS for main frame" do
+        subject
+        expect(response.body).to include(".push('post_message_forwarding')")
+      end
+    end
+
     context "for Quizzes Next launch" do
       let(:assignment) do
         a = assignment_model(course: @course)

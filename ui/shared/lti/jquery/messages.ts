@@ -162,20 +162,14 @@ async function ltiMessageHandler(
     return false
   }
 
-  // the RCE (via TinyMCE) presents its editor box in an iframe
-  // and sends along the window name in the message for explicit
-  // identification
-  const nameFromMessage = getKey('frameName', message) as string
-  deleteKey('frameName', message)
+  // tools launched from within the RCE are wrapped in an iframe
+  // that will forward postMessages, so that the tool can have
+  // the sibling forwarder frame for Platform Storage, and thus
+  // may not respond correctly to some message types.
+  const isFromRce = !!getKey('in_rce', message)
+  deleteKey('in_rce', message)
 
-  const isFromRce = !!nameFromMessage
-  let targetWindow = e.source as Window
-  // insanely weird behavior where sending a message from the RCE iframe
-  // makes 'source' the parent Canvas window, only present in some browsers
-  if (targetWindow === window && isFromRce) {
-    // @ts-expect-error TS7015 - it's ok to access frames by name not index
-    targetWindow = window.frames[nameFromMessage]
-  }
+  const targetWindow = e.source as Window
 
   // look at messageType for backwards compatibility
   const subject = getKey('subject', message) || getKey('messageType', message)

@@ -28,12 +28,14 @@ describe('post_message_forwarding', () => {
     // eslint-disable-next-line no-undef
     let source: MessageEventSource
     let parentWindow: Window
+    let includeRCESignal: boolean
 
     const subject = () =>
       handler(
         parentDomain,
         windowReferences,
-        parentWindow
+        parentWindow,
+        includeRCESignal
       )({data: message, origin, source} as MessageEvent)
 
     describe('when message is not JSON string or JS object', () => {
@@ -52,6 +54,7 @@ describe('post_message_forwarding', () => {
         origin = 'https://test.tool.com'
         parentDomain = 'https://parent.domain.com'
         windowReferences = []
+        includeRCESignal = false
         source = {
           postMessage: jest.fn(),
         } as unknown as Window
@@ -99,6 +102,17 @@ describe('post_message_forwarding', () => {
       it('addresses message to parent domain', () => {
         subject()
         expect(parentWindow.postMessage).toHaveBeenCalledWith(expect.anything(), parentDomain)
+      })
+
+      describe('when includeRCESignal is true', () => {
+        beforeEach(() => {
+          includeRCESignal = true
+        })
+
+        it('adds in_rce=true to message', () => {
+          subject()
+          expect(parentWindow.postMessage.mock.calls[0][0].in_rce).toBe(true)
+        })
       })
     })
 
