@@ -24,7 +24,7 @@ describe Types::SubmissionType do
   before(:once) do
     student_in_course(active_all: true)
     @assignment = @course.assignments.create! name: "asdf", points_possible: 10
-    @submission = @assignment.grade_student(@student, score: 8, grader: @teacher).first
+    @submission = @assignment.grade_student(@student, score: 8, grader: @teacher, student_entered_score: 13).first
   end
 
   let(:submission_type) { GraphQLTypeTester.new(@submission, current_user: @teacher) }
@@ -38,6 +38,7 @@ describe Types::SubmissionType do
     expect(submission_type.resolve("assignmentId")).to eq @assignment.id.to_s
     expect(submission_type.resolve("redoRequest")).to eq @submission.redo_request?
     expect(submission_type.resolve("cachedDueDate")).to eq @submission.cached_due_date
+    expect(submission_type.resolve("studentEnteredScore")).to eq @submission.student_entered_score
   end
 
   it "requires read permission" do
