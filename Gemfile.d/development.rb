@@ -24,13 +24,5 @@ group :development do
   gem "spring-commands-rubocop", "~> 0.4"
   gem "active_record_query_trace", "~> 1.8", require: false
 
-  gem "byebug", "11.1.3", platform: :mri
-  gem "pry-byebug", "3.10.1", platform: :mri
-  # These gems aren't compatible with newer rubies; just use the built-in debug gem instead
-  # Only try to install them if the env var is set so we don't have conditional gems in the
-  # production build
-  if ENV["REMOTE_DEBUGGING_ENABLED"]
-    gem "debase", "0.2.5.beta2", require: false
-    gem "ruby-debug-ide", "0.7.3", require: false
-  end
+  gem "debug", "~> 1.8", platform: :mri, require: false
 end
