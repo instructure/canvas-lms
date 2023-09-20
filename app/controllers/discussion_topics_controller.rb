@@ -525,7 +525,9 @@ class DiscussionTopicsController < ApplicationController
         CAN_ATTACH: @topic.grants_right?(@current_user, session, :attach),
         CAN_MODERATE: user_can_moderate,
         CAN_SET_GROUP: can_set_group_category,
-        CAN_EDIT_GRADES: can_do(@context, @current_user, :manage_grades)
+        CAN_EDIT_GRADES: can_do(@context, @current_user, :manage_grades),
+        # if not a course content manager, or if topic is graded, do not show add to todo list checkbox
+        CAN_MANAGE_CONTENT: @context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_add)
       }
     }
 

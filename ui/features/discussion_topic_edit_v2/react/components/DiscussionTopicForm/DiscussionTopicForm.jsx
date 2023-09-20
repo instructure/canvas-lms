@@ -366,19 +366,22 @@ export default function DiscussionTopicForm({
               )}
             </>
           )}
-          {!isGraded && (
-            <Checkbox
-              label={I18n.t('Add to student to-do')}
-              value="add-to-student-to-do"
-              checked={addToTodo}
-              onChange={() => {
-                setTodoDate(!addToTodo ? todoDate : null)
-                setAddToTodo(!addToTodo)
-              }}
-            />
-          )}
+          {/* TODO: for the checkbox to show, this should not be an announcement */}
+          {!isGraded &&
+            ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MANAGE_CONTENT &&
+            ENV.STUDENT_PLANNER_ENABLED && (
+              <Checkbox
+                label={I18n.t('Add to student to-do')}
+                value="add-to-student-to-do"
+                checked={addToTodo}
+                onChange={() => {
+                  setTodoDate(!addToTodo ? todoDate : null)
+                  setAddToTodo(!addToTodo)
+                }}
+              />
+            )}
           {addToTodo && (
-            <View display="block" padding="none none none large">
+            <View display="block" padding="none none none large" data-testid="todo-date-section">
               <DateTimeInput
                 description=""
                 dateRenderLabel=""

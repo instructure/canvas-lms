@@ -33,6 +33,7 @@ export const CREATE_DISCUSSION_TOPIC = gql`
     $isAnonymousAuthor: Boolean
     $allowRating: Boolean
     $onlyGradersCanRate: Boolean
+    $todoDate: DateTime
   ) {
     createDiscussionTopic(
       input: {
@@ -48,6 +49,7 @@ export const CREATE_DISCUSSION_TOPIC = gql`
         isAnonymousAuthor: $isAnonymousAuthor
         allowRating: $allowRating
         onlyGradersCanRate: $onlyGradersCanRate
+        todoDate: $todoDate
       }
     ) {
       discussionTopic {
@@ -63,6 +65,7 @@ export const CREATE_DISCUSSION_TOPIC = gql`
         isAnonymousAuthor
         allowRating
         onlyGradersCanRate
+        todoDate
       }
       errors {
         ...Error
