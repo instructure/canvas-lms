@@ -35,7 +35,9 @@ export default class Indicator extends Component {
   render() {
     return (
       <div ref={this.props.indicatorRef}>
-        <Badge standalone={true} type="notification" variant={this.props.variant} />
+        {this.props.variant !== 'invisible' && (
+          <Badge standalone={true} type="notification" variant={this.props.variant} />
+        )}
         <ScreenReaderContent>{this.props.title}</ScreenReaderContent>
       </div>
     )

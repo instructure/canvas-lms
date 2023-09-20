@@ -25,7 +25,7 @@ const I18n = useI18nScope('planner')
 
 export default function MissingIndicator(props) {
   const badgeMessage = I18n.t('Missing items for %{title}', {title: props.title})
-  return <Indicator title={badgeMessage} variant="danger" />
+  return <Indicator title={badgeMessage} variant="invisible" />
 }
 
 MissingIndicator.propTypes = {
