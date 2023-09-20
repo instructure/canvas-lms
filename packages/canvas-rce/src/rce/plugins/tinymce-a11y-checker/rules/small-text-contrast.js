@@ -32,6 +32,13 @@ export default {
     if (disabled || noText || onlyContainsLink(elem) || contrast.isLargeText(elem)) {
       return true
     }
+    for (let e = elem; e; e = e.parentElement) {
+      const bgimage = window.getComputedStyle(e).getPropertyValue('background-image')
+      if (bgimage !== 'none' && bgimage !== '') {
+        // ignore background images and gradients
+        return true
+      }
+    }
     return contrast(elem)
   },
 

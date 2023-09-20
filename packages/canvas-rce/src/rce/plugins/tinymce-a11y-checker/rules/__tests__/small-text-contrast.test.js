@@ -55,6 +55,26 @@ describe('test', () => {
     expect(rule.test(elem)).toBe(true)
   })
 
+  test('returns true if the element has a background image', () => {
+    const elem = document.createElement('div')
+    elem.style.fontSize = '10px'
+    elem.style.backgroundColor = '#fff'
+    elem.style.color = '#000'
+    elem.textContent = 'hello'
+    elem.style.backgroundImage = 'url(http://example.com)'
+    expect(rule.test(elem)).toBe(true)
+  })
+
+  test('returns true if the element has a background gradient', () => {
+    const elem = document.createElement('div')
+    elem.style.fontSize = '10px'
+    elem.style.backgroundColor = '#fff'
+    elem.style.color = '#000'
+    elem.textContent = 'hello'
+    elem.style.background = 'linear-gradient(90deg, rgba(33,27,99,1) 70%, rgba(102,40,145,1) 100%)'
+    expect(rule.test(elem)).toBe(true)
+  })
+
   test('returns false if large text does not have high enough contrast', () => {
     const elem = document.createElement('div')
     elem.style.fontSize = '10px'
