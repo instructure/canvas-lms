@@ -16,7 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useMemo, useState} from 'react'
+import React, {
+  ChangeEvent,
+  Dispatch,
+  SetStateAction,
+  SyntheticEvent,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 // @ts-ignore
 import {Avatar} from '@instructure/ui-avatar'
@@ -40,7 +48,7 @@ import {
   removeStringAffix,
   safeDateConversion,
   updateLocalStorageObject,
-} from './helpers'
+} from './util/helpers'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 
 interface Role {
@@ -193,19 +201,19 @@ export function TempEnrollAssign(props: Props) {
    *
    * Update the date state and localStorage values
    *
-   * @param {React.SyntheticEvent<Element, Event>} event Event object
-   * @param {React.Dispatch<React.SetStateAction<Date>>} setDateState React state setter
+   * @param {SyntheticEvent<Element, Event>} event Event object
+   * @param {Dispatch<SetStateAction<Date>>} setDateState React state setter
    * @param {string} localStorageKey localStorage key to update
    * @param {string} [dateValue] Optional date value, which may not be a valid date
    *                             (e.g. bad user input or corrupted localStorage value)
    * @returns {void}
    */
-  function handleDateChange(
-    event: React.SyntheticEvent<Element, Event>,
-    setDateState: React.Dispatch<React.SetStateAction<Date>>,
+  const handleDateChange = (
+    event: SyntheticEvent<Element, Event>,
+    setDateState: Dispatch<SetStateAction<Date>>,
     localStorageKey: string,
     dateValue?: string
-  ): void {
+  ): void => {
     const validatedDate = safeDateConversion(dateValue)
 
     // only update state and localStorage if the date is valid
@@ -218,15 +226,15 @@ export function TempEnrollAssign(props: Props) {
     }
   }
 
-  function handleStartDateChange(event: React.SyntheticEvent<Element, Event>, dateValue?: string) {
+  const handleStartDateChange = (event: SyntheticEvent<Element, Event>, dateValue?: string) => {
     handleDateChange(event, setStartDate, 'startDate', dateValue)
   }
 
-  function handleEndDateChange(event: React.SyntheticEvent<Element, Event>, dateValue?: string) {
+  const handleEndDateChange = (event: SyntheticEvent<Element, Event>, dateValue?: string) => {
     handleDateChange(event, setEndDate, 'endDate', dateValue)
   }
 
-  function handleRoleSearchChange(event: React.ChangeEvent, selectedOption: {id: string}) {
+  const handleRoleSearchChange = (event: ChangeEvent, selectedOption: {id: string}) => {
     const foundRole: Role | undefined = props.roles.find(role => role.id === selectedOption.id)
     const name = foundRole ? removeStringAffix(foundRole.base_role_name, 'Enrollment') : ''
 
@@ -243,13 +251,13 @@ export function TempEnrollAssign(props: Props) {
     })
   }
 
-  function handleValidationError(message: string) {
+  const handleValidationError = (message: string) => {
     setErrorMsg(message)
     props.setEnrollmentStatus(false)
     setLoading(false)
   }
 
-  function collectSelectedEnrollments(tree: NodeStructure[]): SelectedEnrollment[] {
+  const handleCollectSelectedEnrollments = (tree: NodeStructure[]): SelectedEnrollment[] => {
     const selectedEnrolls: SelectedEnrollment[] = []
 
     for (const role in tree) {
@@ -270,7 +278,7 @@ export function TempEnrollAssign(props: Props) {
     return selectedEnrolls
   }
 
-  async function processEnrollments(submitEnrolls: SelectedEnrollment[]) {
+  const handleProcessEnrollments = async (submitEnrolls: SelectedEnrollment[]) => {
     let success = true
 
     try {
@@ -306,7 +314,7 @@ export function TempEnrollAssign(props: Props) {
     })
   }
 
-  async function createTempEnroll(tree: NodeStructure[]) {
+  const handleCreateTempEnroll = async (tree: NodeStructure[]) => {
     setLoading(true)
 
     if (endDate.getTime() <= startDate.getTime()) {
@@ -317,7 +325,7 @@ export function TempEnrollAssign(props: Props) {
       return handleValidationError(I18n.t('Please select a role before submitting'))
     }
 
-    const submitEnrolls = collectSelectedEnrollments(tree)
+    const submitEnrolls = handleCollectSelectedEnrollments(tree)
 
     if (submitEnrolls.length === 0) {
       return handleValidationError(
@@ -325,7 +333,7 @@ export function TempEnrollAssign(props: Props) {
       )
     }
 
-    await processEnrollments(submitEnrolls)
+    await handleProcessEnrollments(submitEnrolls)
   }
 
   for (const role of props.roles) {
@@ -474,7 +482,7 @@ export function TempEnrollAssign(props: Props) {
           list={listEnroll}
           roles={props.roles}
           selectedRole={roleChoice}
-          createEnroll={createTempEnroll}
+          createEnroll={handleCreateTempEnroll}
         />
       ) : (
         <EnrollmentTree list={listEnroll} roles={props.roles} selectedRole={roleChoice} />

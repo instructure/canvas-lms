@@ -16,14 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {ChangeEvent, useEffect, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
-// @ts-ignore
+// @ts-expect-error
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {Avatar} from '@instructure/ui-avatar'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-// @ts-ignore
-import {Grid} from '@instructure/ui-grid'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Alert} from '@instructure/ui-alerts'
 import {Text} from '@instructure/ui-text'
@@ -58,14 +56,25 @@ interface Props {
   readonly foundEnroll?: AssignUser
 }
 
+const emptyEnroll = {name: '', sis_user_id: '', email: '', login_id: ''}
+
 export function TempEnrollSearch(props: Props) {
   // 'cc_path' | 'unique_id' | 'sis_user_id'
   const [searchType, setSearchType] = useState('cc_path')
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
   const [search, setSearch] = useState('')
-  const emptyEnroll = {name: '', sis_user_id: '', email: '', login_id: ''}
   const [enrollment, setEnrollment] = useState<AssignUser>(emptyEnroll)
+
+  const handleSearchTypeChange = (event: ChangeEvent<HTMLInputElement>, value: string) => {
+    setSearchType(value)
+  }
+
+  const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
+    if (event.target !== null) {
+      setSearch(event.target.value)
+    }
+  }
 
   // user_lists.json does not always return email, sis id, and login
   const fetchUserDetails = async (user: any) => {
@@ -86,7 +95,7 @@ export function TempEnrollSearch(props: Props) {
     }
   }
 
-  const handleResponse = (response: any) => {
+  const processSearchApiResponse = (response: any) => {
     const foundUser = response.users[0]
     if (typeof foundUser === 'undefined') {
       setMessage(I18n.t('User could not be found.'))
@@ -114,27 +123,23 @@ export function TempEnrollSearch(props: Props) {
             name: props.user.name,
           })}
         </Text>
-        <Grid>
-          <Grid.Row vAlign="middle">
-            <Grid.Col>
-              <Flex as="div" margin="small 0 small 0">
-                <FlexItem>
-                  <Avatar
-                    size="large"
-                    margin="0 small 0 0"
-                    name={props.user.name}
-                    src={props.user.avatar_url}
-                    data-fs-exclude={true}
-                    data-heap-redact-attributes="name"
-                  />
-                </FlexItem>
-                <FlexItem shouldShrink={true}>
-                  <Text size="large">{props.user.name}</Text>
-                </FlexItem>
-              </Flex>
-            </Grid.Col>
-          </Grid.Row>
-        </Grid>
+
+        <Flex margin="small 0 small 0">
+          <FlexItem>
+            <Avatar
+              size="large"
+              margin="0 small 0 0"
+              name={props.user.name}
+              src={props.user.avatar_url}
+              data-fs-exclude={true}
+              data-heap-redact-attributes="name"
+            />
+          </FlexItem>
+
+          <FlexItem shouldShrink={true}>
+            <Text size="large">{props.user.name}</Text>
+          </FlexItem>
+        </Flex>
       </>
     )
   }
@@ -149,7 +154,7 @@ export function TempEnrollSearch(props: Props) {
             method: 'POST',
             params: {user_list: search, v2: true, search_type: searchType},
           })
-          handleResponse(json)
+          processSearchApiResponse(json)
         } catch (error: any) {
           setMessage(error.message)
           setEnrollment(emptyEnroll)
@@ -231,9 +236,7 @@ export function TempEnrollSearch(props: Props) {
           name="search_type"
           defaultValue={searchType}
           description={I18n.t('Find user by')}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>, value: string) =>
-            setSearchType(value)
-          }
+          onChange={handleSearchTypeChange}
           layout="columns"
         >
           <RadioInput
@@ -267,11 +270,7 @@ export function TempEnrollSearch(props: Props) {
             }
             value={search}
             placeholder={exampleText}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-              if (e.target !== null) {
-                setSearch(e.target.value)
-              }
-            }}
+            onChange={handleSearchChange}
           />
         </fieldset>
       </>

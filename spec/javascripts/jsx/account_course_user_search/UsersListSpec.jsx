@@ -17,149 +17,165 @@
  */
 
 import React from 'react'
-import {shallow, mount} from 'enzyme'
+import {mount, shallow} from 'enzyme'
 import UsersList from 'ui/features/account_course_user_search/react/components/UsersList'
 import UsersListRow from 'ui/features/account_course_user_search/react/components/UsersListRow'
+import fetchMock from 'fetch-mock'
+import sinon from 'sinon'
 
-QUnit.module('Account Course User Search UsersList View')
+QUnit.module('Account Course User Search UsersList View', function (hooks) {
+  hooks.beforeEach(() => {
+    fetchMock.mock(
+      '/api/v1/users/1/enrollments?state%5B%5D=active&state%5B%5D=invited&temporary_enrollment_providers=true',
+      {
+        status: 200,
+        body: {},
+      }
+    )
+  })
 
-const usersProps = {
-  accountId: '1',
-  users: [
-    {
-      id: '1',
-      name: 'UserA',
-      avatar_url: 'http://someurl',
-    },
-    {
-      id: '2',
-      name: 'UserB',
-      avatar_url: 'http://someurl',
-    },
-    {
-      id: '3',
-      name: 'UserC',
-      avatar_url: 'http://someurl',
-    },
-  ],
-  handlers: {
-    handleOpenEditUserDialog() {},
-    handleSubmitEditUserForm() {},
-    handleCloseEditUserDialog() {},
-  },
-  permissions: {
-    can_masquerade: true,
-    can_message_users: true,
-    can_edit_users: true,
-  },
-  searchFilter: {
-    search_term: 'User',
-    sort: 'username',
-    order: 'asc',
-  },
-  onUpdateFilters: sinon.spy(),
-  onApplyFilters: sinon.spy(),
-  sortColumnHeaderRef: sinon.spy(),
-  roles: {},
-}
+  hooks.afterEach(() => {
+    fetchMock.restore()
+  })
 
-test('displays users that are passed in as props', () => {
-  const wrapper = shallow(<UsersList {...usersProps} />)
-  const nodes = wrapper.find(UsersListRow).getElements()
-
-  equal(nodes[0].props.user.name, 'UserA')
-  equal(nodes[1].props.user.name, 'UserB')
-  equal(nodes[2].props.user.name, 'UserC')
-})
-
-Object.entries({
-  username: 'Name',
-  email: 'Email',
-  sis_id: 'SIS ID',
-  last_login: 'Last Login',
-}).forEach(([columnID, label]) => {
-  Object.entries({
-    asc: {
-      expectedArrow: 'Up',
-      unexpectedArrow: 'Down',
-      expectedTip: `Click to sort by ${label} descending`,
-    },
-    desc: {
-      expectedArrow: 'Down',
-      unexpectedArrow: 'Up',
-      expectedTip: `Click to sort by ${label} ascending`,
-    },
-  }).forEach(([sortOrder, {expectedArrow, unexpectedArrow, expectedTip}]) => {
-    const props = {
-      ...usersProps,
-      searchFilter: {
-        search_term: 'User',
-        sort: columnID,
-        order: sortOrder,
+  const usersProps = {
+    accountId: '1',
+    users: [
+      {
+        id: '1',
+        name: 'UserA',
+        avatar_url: 'http://someurl',
       },
-    }
+      {
+        id: '2',
+        name: 'UserB',
+        avatar_url: 'http://someurl',
+      },
+      {
+        id: '3',
+        name: 'UserC',
+        avatar_url: 'http://someurl',
+      },
+    ],
+    handlers: {
+      handleOpenEditUserDialog() {},
+      handleSubmitEditUserForm() {},
+      handleCloseEditUserDialog() {},
+    },
+    permissions: {
+      can_masquerade: true,
+      can_message_users: true,
+      can_edit_users: true,
+    },
+    searchFilter: {
+      search_term: 'User',
+      sort: 'username',
+      order: 'asc',
+    },
+    onUpdateFilters: sinon.spy(),
+    onApplyFilters: sinon.spy(),
+    sortColumnHeaderRef: sinon.spy(),
+    roles: {},
+  }
 
-    test(`sorting by ${columnID} ${sortOrder} puts ${expectedArrow}-arrow on ${label} only`, () => {
-      const wrapper = mount(<UsersList {...props} />)
-      equal(
-        wrapper.find(`IconMiniArrow${unexpectedArrow}Solid`).length,
-        0,
-        `no columns have an ${unexpectedArrow} arrow`
-      )
-      const icons = wrapper.find(`IconMiniArrow${expectedArrow}Solid`)
-      equal(icons.length, 1, `only one ${expectedArrow} arrow`)
-      const header = icons.closest('[data-testid="UsersListHeader"]')
-      ok(
-        header.find('Tooltip').first().prop('renderTip').match(RegExp(expectedTip, 'i')),
-        'has right tooltip'
-      )
-      ok(header.text().includes(label), `${label} is the one that has the ${expectedArrow} arrow`)
-    })
+  test('displays users that are passed in as props', () => {
+    const wrapper = shallow(<UsersList {...usersProps} />)
+    const nodes = wrapper.find(UsersListRow).getElements()
 
-    test(`clicking the ${label} column header calls onChangeSort with ${columnID}`, () => {
-      const sortSpy = sinon.spy()
-      const wrapper = mount(
-        <UsersList
-          {...{
-            ...props,
-            onUpdateFilters: sortSpy,
-          }}
-        />
-      )
-      const header = wrapper
-        .find('[data-testid="UsersListHeader"]')
-        .filterWhere(n => n.text().includes(label))
-        .find('button')
-      header.simulate('click')
-      ok(sortSpy.calledOnce)
-      ok(
-        sortSpy.calledWith({
+    equal(nodes[0].props.user.name, 'UserA')
+    equal(nodes[1].props.user.name, 'UserB')
+    equal(nodes[2].props.user.name, 'UserC')
+  })
+
+  Object.entries({
+    username: 'Name',
+    email: 'Email',
+    sis_id: 'SIS ID',
+    last_login: 'Last Login',
+  }).forEach(([columnID, label]) => {
+    Object.entries({
+      asc: {
+        expectedArrow: 'Up',
+        unexpectedArrow: 'Down',
+        expectedTip: `Click to sort by ${label} descending`,
+      },
+      desc: {
+        expectedArrow: 'Down',
+        unexpectedArrow: 'Up',
+        expectedTip: `Click to sort by ${label} ascending`,
+      },
+    }).forEach(([sortOrder, {expectedArrow, unexpectedArrow, expectedTip}]) => {
+      const props = {
+        ...usersProps,
+        searchFilter: {
           search_term: 'User',
           sort: columnID,
-          order: sortOrder === 'asc' ? 'desc' : 'asc',
-          role_filter_id: undefined,
-        })
-      )
+          order: sortOrder,
+        },
+      }
+
+      test(`sorting by ${columnID} ${sortOrder} puts ${expectedArrow}-arrow on ${label} only`, () => {
+        const wrapper = mount(<UsersList {...props} />)
+        equal(
+          wrapper.find(`IconMiniArrow${unexpectedArrow}Solid`).length,
+          0,
+          `no columns have an ${unexpectedArrow} arrow`
+        )
+        const icons = wrapper.find(`IconMiniArrow${expectedArrow}Solid`)
+        equal(icons.length, 1, `only one ${expectedArrow} arrow`)
+        const header = icons.closest('[data-testid="UsersListHeader"]')
+        ok(
+          header.find('Tooltip').first().prop('renderTip').match(RegExp(expectedTip, 'i')),
+          'has right tooltip'
+        )
+        ok(header.text().includes(label), `${label} is the one that has the ${expectedArrow} arrow`)
+      })
+
+      test(`clicking the ${label} column header calls onChangeSort with ${columnID}`, () => {
+        const sortSpy = sinon.spy()
+        const wrapper = mount(
+          <UsersList
+            {...{
+              ...props,
+              onUpdateFilters: sortSpy,
+            }}
+          />
+        )
+        const header = wrapper
+          .find('[data-testid="UsersListHeader"]')
+          .filterWhere(n => n.text().includes(label))
+          .find('button')
+        header.simulate('click')
+        ok(sortSpy.calledOnce)
+        ok(
+          sortSpy.calledWith({
+            search_term: 'User',
+            sort: columnID,
+            order: sortOrder === 'asc' ? 'desc' : 'asc',
+            role_filter_id: undefined,
+          })
+        )
+      })
     })
   })
-})
 
-test('component should not update if props do not change', () => {
-  const instance = new UsersList(usersProps)
-  notOk(instance.shouldComponentUpdate({...usersProps}))
-})
+  test('component should not update if props do not change', () => {
+    const instance = new UsersList(usersProps)
+    notOk(instance.shouldComponentUpdate({...usersProps}))
+  })
 
-test('component should update if a prop is added', () => {
-  const instance = new UsersList(usersProps)
-  ok(instance.shouldComponentUpdate({...usersProps, newProp: true}))
-})
+  test('component should update if a prop is added', () => {
+    const instance = new UsersList(usersProps)
+    ok(instance.shouldComponentUpdate({...usersProps, newProp: true}))
+  })
 
-test('component should update if a prop is changed', () => {
-  const instance = new UsersList(usersProps)
-  ok(instance.shouldComponentUpdate({...usersProps, users: {}}))
-})
+  test('component should update if a prop is changed', () => {
+    const instance = new UsersList(usersProps)
+    ok(instance.shouldComponentUpdate({...usersProps, users: {}}))
+  })
 
-test('component should not update if only the searchFilter prop is changed', () => {
-  const instance = new UsersList(usersProps)
-  notOk(instance.shouldComponentUpdate({...usersProps, searchFilter: {}}))
+  test('component should not update if only the searchFilter prop is changed', () => {
+    const instance = new UsersList(usersProps)
+    notOk(instance.shouldComponentUpdate({...usersProps, searchFilter: {}}))
+  })
 })

@@ -58,6 +58,16 @@ export function EnrollmentTreeGroup(props: Props) {
   // Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
   const {Item: FlexItem} = Flex as any
 
+  const handleCheckboxChange = () => {
+    if (props.updateCheck) {
+      props.updateCheck(props, !props.isCheck)
+    }
+  }
+
+  const handleIconButtonClick = () => {
+    props.updateToggle(props, !props.isToggle)
+  }
+
   const renderChildren = () => {
     const childRows = []
     if (props.isToggle) {
@@ -140,20 +150,14 @@ export function EnrollmentTreeGroup(props: Props) {
               size="large"
               checked={props.isCheck}
               indeterminate={props.isMixed}
-              onChange={() => {
-                if (props.updateCheck) {
-                  props.updateCheck(props, !props.isCheck)
-                }
-              }}
+              onChange={handleCheckboxChange}
             />
           </FlexItem>
           <FlexItem margin="0 0 0 x-small">
             <IconButton
               withBorder={false}
               withBackground={false}
-              onClick={() => {
-                props.updateToggle(props, !props.isToggle)
-              }}
+              onClick={handleIconButtonClick}
               value={props.isToggle}
               screenReaderLabel={I18n.t('Toggle group %{group}', {group: props.label})}
             >

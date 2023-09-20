@@ -19,6 +19,7 @@
 import UsersListRow from '../components/UsersListRow'
 import React from 'react'
 import {render} from '@testing-library/react'
+import fetchMock from 'fetch-mock'
 
 function makeProps() {
   return {
@@ -46,6 +47,48 @@ function makeProps() {
 
 describe('UsersListRow', () => {
   const defaultProps = makeProps()
+
+  beforeEach(() => {
+    // enrollment providers
+    fetchMock.get(
+      '/api/v1/users/1/enrollments?state%5B%5D=active&state%5B%5D=invited&temporary_enrollment_providers=true',
+      [
+        {
+          id: '47',
+          course_id: '5',
+          user: {
+            id: '7',
+            name: 'Provider Person',
+          },
+          start_at: '2019-09-26T00:00:00Z',
+          end_at: '2019-09-27T23:59:59Z',
+          type: 'TeacherEnrollment',
+        },
+      ]
+    )
+
+    // enrollment recipients
+    fetchMock.get(
+      '/api/v1/users/1/enrollments?state%5B%5D=active&state%5B%5D=invited&temporary_enrollment_recipients=true',
+      [
+        {
+          id: '48',
+          course_id: '5',
+          user: {
+            id: '2',
+            name: 'Recipient Person',
+          },
+          start_at: '2019-09-26T00:00:00Z',
+          end_at: '2019-09-27T23:59:59Z',
+          type: 'TeacherEnrollment',
+        },
+      ]
+    )
+  })
+
+  afterEach(() => {
+    fetchMock.restore()
+  })
 
   it('renders an avatar', () => {
     const {getByText} = render(
