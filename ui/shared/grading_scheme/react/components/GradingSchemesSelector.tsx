@@ -38,6 +38,8 @@ import {GradingSchemeViewEditModal} from './GradingSchemeViewEditModal'
 import {GradingSchemeViewCopyTemplateModal} from './GradingSchemeViewCopyTemplateModal'
 
 const I18n = useI18nScope('assignments.grading_type_selector')
+// Doing this to avoid TS2339 errors -- TODO: remove once we're on InstUI 8
+const {Item} = Flex as any
 
 interface ComponentProps {
   canManage: boolean
@@ -210,7 +212,7 @@ export const GradingSchemesSelector = ({
           margin="small none small none"
           withVisualDebug={false}
         >
-          <Flex.Item shouldShrink={true} shouldGrow={true}>
+          <Item shouldShrink={true} shouldGrow={true}>
             <View as="div" withVisualDebug={false}>
               <FormField label="" id={shortid()}>
                 <select
@@ -228,14 +230,14 @@ export const GradingSchemesSelector = ({
                 </select>
               </FormField>
             </View>
-          </Flex.Item>
-          <Flex.Item>
+          </Item>
+          <Item>
             <View as="div" margin="none none none xx-small" withVisualDebug={false}>
               <Button onClick={openGradingSchemeViewEditModal}>
                 {canManage ? I18n.t('View/Edit') : I18n.t('View')}
               </Button>
             </View>
-          </Flex.Item>
+          </Item>
         </Flex>
 
         {canManage && (

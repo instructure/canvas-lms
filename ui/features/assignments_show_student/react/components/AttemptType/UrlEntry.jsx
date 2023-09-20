@@ -217,7 +217,7 @@ class UrlEntry extends React.Component {
         headingAs="span"
         headingLevel="h4"
         message={this.renderURLInput()}
-        themeOverride={{backgroundColor: 'transparent'}}
+        theme={{backgroundColor: 'transparent'}}
       />
     </View>
   )

@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+// @ts-expect-error
 import {IconMiniArrowDownSolid} from '@instructure/ui-icons'
 import {Link} from '@instructure/ui-link'
 import {Menu} from '@instructure/ui-menu'

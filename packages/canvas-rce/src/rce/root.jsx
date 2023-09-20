@@ -22,7 +22,7 @@ import RCEWrapper from './RCEWrapper'
 import normalizeProps from './normalizeProps'
 import formatMessage from '../format-message'
 
-if (!process || !process.env || !process.env.BUILD_LOCALE) {
+if (!process?.env?.BUILD_LOCALE) {
   formatMessage.setup({
     locale: 'en',
     generateId: require('format-message-generate-id/underscored_crc32'),

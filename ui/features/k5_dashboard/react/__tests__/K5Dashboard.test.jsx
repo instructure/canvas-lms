@@ -228,8 +228,7 @@ describe('K-5 Dashboard', () => {
       expect(getByText('Your homeroom is currently unpublished.')).toBeInTheDocument()
     })
 
-    // FOO-3830
-    it.skip('shows due today and missing items links pointing to the schedule tab of the course (flaky)', async () => {
+    it('shows due today and missing items links pointing to the schedule tab of the course (flaky)', async () => {
       const {findByTestId} = render(<K5Dashboard {...defaultProps} plannerEnabled={true} />)
       const dueTodayLink = await findByTestId('number-due-today')
       expect(dueTodayLink).toBeInTheDocument()
@@ -256,8 +255,7 @@ describe('K-5 Dashboard', () => {
       expect(getAllByText('Loading Card')[0]).toBeInTheDocument()
     })
 
-    // FOO-3830
-    it.skip('displays an empty state on the homeroom and schedule tabs if the user has no cards (flaky)', async () => {
+    it('displays an empty state on the homeroom and schedule tabs if the user has no cards', async () => {
       moxios.stubs.reset()
       moxios.stubRequest('/api/v1/dashboard/dashboard_cards', {
         status: 200,

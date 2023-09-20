@@ -146,7 +146,7 @@ export default class PermissionButton extends Component {
 
     return (
       <IconButton
-        themeOverride={this.props.inTray ? undefined : themeOverride}
+        theme={this.props.inTray ? undefined : themeOverride}
         elementRef={this.setupButtonRef}
         onClick={this.toggleMenu}
         onFocus={this.props.onFocus}

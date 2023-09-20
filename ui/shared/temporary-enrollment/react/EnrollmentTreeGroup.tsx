@@ -32,7 +32,7 @@ import RoleMismatchToolTip from './RoleMismatchToolTip'
 const I18n = useI18nScope('temporary_enrollment')
 
 interface Props extends NodeStructure {
-  indent: any
+  indent: string
   updateCheck: Function
   updateToggle: Function
 }
@@ -55,6 +55,9 @@ export function translateState(workflow: string) {
 }
 
 export function EnrollmentTreeGroup(props: Props) {
+  // Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
+  const {Item: FlexItem} = Flex as any
+
   const renderChildren = () => {
     const childRows = []
     if (props.isToggle) {
@@ -130,7 +133,7 @@ export function EnrollmentTreeGroup(props: Props) {
     return (
       <>
         <Flex key={props.id} padding="x-small" as="div" alignItems="center">
-          <Flex.Item margin={props.indent}>
+          <FlexItem margin={props.indent}>
             <Checkbox
               data-testid={'check ' + props.id}
               label=""
@@ -143,35 +146,34 @@ export function EnrollmentTreeGroup(props: Props) {
                 }
               }}
             />
-          </Flex.Item>
-          <Flex.Item margin="0 0 0 x-small">
+          </FlexItem>
+          <FlexItem margin="0 0 0 x-small">
             <IconButton
               withBorder={false}
               withBackground={false}
               onClick={() => {
                 props.updateToggle(props, !props.isToggle)
               }}
-              // @ts-expect-error
               value={props.isToggle}
               screenReaderLabel={I18n.t('Toggle group %{group}', {group: props.label})}
             >
               {toggleIcon}
             </IconButton>
-          </Flex.Item>
-          <Flex.Item margin="0 0 0 x-small">
+          </FlexItem>
+          <FlexItem margin="0 0 0 x-small">
             <Text>{props.label}</Text>
-          </Flex.Item>
+          </FlexItem>
           {props.isMismatch ? (
-            <Flex.Item>
+            <FlexItem>
               <RoleMismatchToolTip />
-            </Flex.Item>
+            </FlexItem>
           ) : null}
           {props.workState ? (
-            <Flex.Item margin="0 large">
+            <FlexItem margin="0 large">
               <Text weight="light">
                 {I18n.t('course status: %{state}', {state: translateState(props.workState)})}
               </Text>
-            </Flex.Item>
+            </FlexItem>
           ) : null}
         </Flex>
         {renderChildren()}

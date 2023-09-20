@@ -6,7 +6,7 @@ exports[`ProficiencyRating can manage renders the ProficiencyRating component 1`
   as="span"
   direction="row"
   display="flex"
-  gap="none"
+  elementRef={[Function]}
   justifyItems="start"
   padding="0 small small small"
   width="100%"
@@ -15,6 +15,7 @@ exports[`ProficiencyRating can manage renders the ProficiencyRating component 1`
 >
   <Item
     as="span"
+    elementRef={[Function]}
     padding="0 medium 0 0"
     shouldGrow={false}
     shouldShrink={false}
@@ -37,6 +38,7 @@ exports[`ProficiencyRating can manage renders the ProficiencyRating component 1`
           </ScreenReaderContent>
         }
         onChange={[Function]}
+        onClick={[Function]}
         readOnly={false}
         size="medium"
         variant="simple"
@@ -46,6 +48,7 @@ exports[`ProficiencyRating can manage renders the ProficiencyRating component 1`
   <Item
     align="start"
     as="span"
+    elementRef={[Function]}
     padding="0 small 0 0"
     shouldGrow={false}
     shouldShrink={false}
@@ -58,11 +61,13 @@ exports[`ProficiencyRating can manage renders the ProficiencyRating component 1`
         data-testid="rating-description-input"
         defaultValue="Stellar"
         display="block"
+        inputContainerRef={[Function]}
         inputRef={[Function]}
         isRequired={false}
         messages={null}
         onBlur={[Function]}
         onChange={[Function]}
+        onFocus={[Function]}
         renderLabel={
           <ScreenReaderContent
             as="span"
@@ -81,6 +86,7 @@ exports[`ProficiencyRating can manage renders the ProficiencyRating component 1`
   <Item
     align="start"
     as="span"
+    elementRef={[Function]}
     padding="0 small 0 0"
     shouldGrow={false}
     shouldShrink={false}
@@ -93,11 +99,13 @@ exports[`ProficiencyRating can manage renders the ProficiencyRating component 1`
         data-testid="rating-points-input"
         defaultValue="10"
         display="block"
+        inputContainerRef={[Function]}
         inputRef={[Function]}
         isRequired={false}
         messages={null}
         onBlur={[Function]}
         onChange={[Function]}
+        onFocus={[Function]}
         renderLabel={
           <ScreenReaderContent
             as="span"
@@ -121,6 +129,7 @@ exports[`ProficiencyRating can manage renders the ProficiencyRating component 1`
   </Item>
   <Item
     as="span"
+    elementRef={[Function]}
     shouldGrow={false}
     shouldShrink={false}
   >
@@ -130,13 +139,22 @@ exports[`ProficiencyRating can manage renders the ProficiencyRating component 1`
       <Popover
         color="primary"
         constrain="window"
+        contentRef={[Function]}
         defaultIsShowingContent={false}
         insertAt="bottom"
         isShowingContent={false}
         offsetX={0}
         offsetY={0}
         on="click"
+        onBlur={[Function]}
+        onClick={[Function]}
+        onFocus={[Function]}
         onHideContent={[Function]}
+        onKeyDown={[Function]}
+        onKeyUp={[Function]}
+        onMouseOut={[Function]}
+        onMouseOver={[Function]}
+        onPositionChanged={[Function]}
         onPositioned={[Function]}
         onShowContent={[Function]}
         placement="bottom center"
@@ -144,7 +162,6 @@ exports[`ProficiencyRating can manage renders the ProficiencyRating component 1`
           <Link
             as="button"
             color="link"
-            forceButtonRole={true}
             iconPlacement="start"
             isWithinText={false}
           >
@@ -274,6 +291,7 @@ exports[`ProficiencyRating can manage renders the ProficiencyRating component 1`
   </Item>
   <Item
     as="span"
+    elementRef={[Function]}
     padding="0 small 0 small"
     shouldGrow={false}
     shouldShrink={false}
@@ -318,7 +336,7 @@ exports[`ProficiencyRating can not manage renders the ProficiencyRating componen
   as="span"
   direction="row"
   display="flex"
-  gap="none"
+  elementRef={[Function]}
   justifyItems="start"
   padding="0 small small small"
   width="100%"
@@ -327,6 +345,7 @@ exports[`ProficiencyRating can not manage renders the ProficiencyRating componen
 >
   <Item
     as="span"
+    elementRef={[Function]}
     padding="0 medium 0 0"
     shouldGrow={false}
     shouldShrink={false}
@@ -340,6 +359,7 @@ exports[`ProficiencyRating can not manage renders the ProficiencyRating componen
   <Item
     align="start"
     as="span"
+    elementRef={[Function]}
     padding="0 small 0 0"
     shouldGrow={false}
     shouldShrink={false}
@@ -370,6 +390,7 @@ exports[`ProficiencyRating can not manage renders the ProficiencyRating componen
   <Item
     align="start"
     as="span"
+    elementRef={[Function]}
     padding="0 small 0 0"
     shouldGrow={false}
     shouldShrink={false}
@@ -410,6 +431,7 @@ exports[`ProficiencyRating can not manage renders the ProficiencyRating componen
   </Item>
   <Item
     as="span"
+    elementRef={[Function]}
     shouldGrow={false}
     shouldShrink={false}
   >

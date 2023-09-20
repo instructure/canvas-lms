@@ -27,6 +27,7 @@ import {Tray} from '@instructure/ui-tray'
 import SubmissionAttempts from './SubmissionAttempts'
 import useStore, {updateState} from './stores'
 
+const {Item: FlexItem} = Flex as any
 const I18n = useI18nScope('grade_summary')
 
 type SubmissionCommentsTrayProps = {
@@ -55,20 +56,20 @@ function SubmissionCommentsTray({onDismiss}: SubmissionCommentsTrayProps) {
     >
       <View as="div" padding="small" data-testid="submission-tray-details">
         <Flex as="div" alignItems="center" justifyItems="space-between">
-          <Flex.Item shouldShrink={true}>
+          <FlexItem shouldShrink={true}>
             <Heading as="h2" level="h3">
               <Text>{I18n.t('Feedback')}</Text>
             </Heading>
-          </Flex.Item>
+          </FlexItem>
 
-          <Flex.Item>
+          <FlexItem>
             <CloseButton
               onClick={handleDismiss}
               screenReaderLabel={I18n.t('Close')}
               margin="0 x-small 0 0"
               data-testid="submission-tray-dismiss"
             />
-          </Flex.Item>
+          </FlexItem>
         </Flex>
       </View>
       <SubmissionAttempts attempts={attempts} />

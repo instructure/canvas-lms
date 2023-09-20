@@ -476,7 +476,7 @@ export default class Navigation extends React.Component {
           shouldCloseOnDocumentClick={true}
           shouldContainFocus={!this.state.noFocus}
           mountNode={getPortal()}
-          themeOverride={{smallWidth: '28em'}}
+          theme={{smallWidth: '28em'}}
           onEntered={() => {
             tourPubSub.publish('navigation-tray-opened', this.state.type)
           }}

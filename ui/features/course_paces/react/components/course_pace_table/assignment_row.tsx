@@ -23,7 +23,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {debounce, pick} from 'lodash'
 import moment from 'moment-timezone'
 
-import {InstUISettingsProvider} from '@instructure/emotion'
+import {ApplyTheme} from '@instructure/ui-themeable'
 import {FlaggableNumberInput} from './flaggable_number_input'
 import {Flex} from '@instructure/ui-flex'
 import {
@@ -32,6 +32,7 @@ import {
   IconPublishSolid,
   IconQuizLine,
   IconUnpublishedLine,
+  // @ts-expect-error
 } from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Table} from '@instructure/ui-table'
@@ -60,6 +61,9 @@ import {getBlackoutDates} from '../../shared/reducers/blackout_dates'
 import {Change} from '../../utils/change_tracking'
 
 const I18n = useI18nScope('course_paces_assignment_row')
+
+// Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
+const {Cell, Row} = Table as any
 
 interface PassedProps {
   readonly datesVisible: boolean
@@ -328,46 +332,38 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
 
   render() {
     const labelMargin = this.props.isStacked ? '0 0 0 small' : undefined
-
-    const componentOverrides = {
-      [Table.Cell.componentId]: {
-        background: this.state.hovering ? '#eef7ff' : '#fff',
-      },
-    }
+    const themeOverrides = {background: this.state.hovering ? '#eef7ff' : '#fff'}
 
     return (
-      <InstUISettingsProvider theme={{componentOverrides}}>
-        <Table.Row
+      <ApplyTheme theme={{[(Cell as any).theme]: themeOverrides}}>
+        <Row
           data-testid="pp-module-item-row"
           onMouseEnter={() => this.setState({hovering: true})}
           onMouseLeave={() => this.setState({hovering: false})}
           {...pick(this.props, ['hover', 'isStacked', 'headers'])}
         >
-          <Table.Cell data-testid="pp-title-cell">
+          <Cell data-testid="pp-title-cell">
             <View margin={labelMargin}>{this.renderTitle()}</View>
-          </Table.Cell>
-          <Table.Cell data-testid="pp-duration-cell" textAlign="center">
+          </Cell>
+          <Cell data-testid="pp-duration-cell" textAlign="center">
             <View data-testid="duration-input" margin={labelMargin}>
               {this.renderDurationInput()}
             </View>
-          </Table.Cell>
+          </Cell>
           {(this.props.showProjections || this.props.datesVisible) && (
-            <Table.Cell data-testid="pp-due-date-cell" textAlign="center">
+            <Cell data-testid="pp-due-date-cell" textAlign="center">
               <View data-testid="assignment-due-date" margin={labelMargin}>
                 <span style={{whiteSpace: this.props.isStacked ? 'normal' : 'nowrap'}}>
                   {this.renderDate()}
                 </span>
               </View>
-            </Table.Cell>
+            </Cell>
           )}
-          <Table.Cell
-            data-testid="pp-status-cell"
-            textAlign={this.props.isStacked ? 'start' : 'center'}
-          >
+          <Cell data-testid="pp-status-cell" textAlign={this.props.isStacked ? 'start' : 'center'}>
             <View margin={labelMargin}>{this.renderPublishStatusBadge()}</View>
-          </Table.Cell>
-        </Table.Row>
-      </InstUISettingsProvider>
+          </Cell>
+        </Row>
+      </ApplyTheme>
     )
   }
 }

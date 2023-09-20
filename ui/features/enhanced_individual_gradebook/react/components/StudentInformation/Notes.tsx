@@ -18,7 +18,9 @@
 
 import React, {useEffect, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
+// @ts-expect-error TODO: fix in instui 8?
 import {TextArea} from '@instructure/ui-text-area'
+// @ts-expect-error TODO: fix in instui 8?
 import {Grid} from '@instructure/ui-grid'
 import {View} from '@instructure/ui-view'
 

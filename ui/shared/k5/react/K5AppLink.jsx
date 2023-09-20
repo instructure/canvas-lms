@@ -28,10 +28,8 @@ import {TruncateText} from '@instructure/ui-truncate-text'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {IconLtiSolid} from '@instructure/ui-icons'
 import {PresentationContent} from '@instructure/ui-a11y-content'
-import {getK5ThemeVars} from './k5-theme'
+import k5Theme from './k5-theme'
 import {Flex} from '@instructure/ui-flex'
-
-const k5ThemeVariables = getK5ThemeVars()
 
 const I18n = useI18nScope('k5_app_link')
 
@@ -114,8 +112,8 @@ export default function K5AppLink({app}) {
                   href={launchUrl(course.id)}
                   isWithinText={false}
                   theme={{
-                    color: k5ThemeVariables.colors.textDarkest,
-                    hoverColor: k5ThemeVariables.colors.textDarkest,
+                    color: k5Theme.variables.colors.textDarkest,
+                    hoverColor: k5Theme.variables.colors.textDarkest,
                   }}
                   target={app.windowTarget}
                 >

@@ -17,14 +17,30 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
+import ReactDOM from 'react-dom'
+import TestUtils from 'react-dom/test-utils'
 import Avatar from '@canvas/context-cards/react/Avatar'
 import {Avatar as InstUIAvatar} from '@instructure/ui-avatar'
 
-QUnit.module('StudentContextTray/Avatar', _ => {
+QUnit.module('StudentContextTray/Avatar', hooks => {
+  let subject
+
+  hooks.afterEach(() => {
+    if (subject) {
+      const componentNode = ReactDOM.findDOMNode(subject)
+      if (componentNode) {
+        ReactDOM.unmountComponentAtNode(componentNode.parentNode)
+      }
+    }
+    subject = null
+  })
+
   test('renders no avatars by default', () => {
-    const wrapper = mount(<Avatar name="" user={{}} courseId="1" canMasquerade={true} />)
-    equal(wrapper.find(InstUIAvatar).first().length, 0)
+    subject = TestUtils.renderIntoDocument(<Avatar name="" user={{}} courseId="1" canMasquerade />)
+
+    throws(() => {
+      TestUtils.findRenderedComponentWithType(subject, InstUIAvatar)
+    })
   })
 
   test('renders avatar with user object when provided', () => {
@@ -35,15 +51,15 @@ QUnit.module('StudentContextTray/Avatar', _ => {
       avatar_url: avatarUrl,
       _id: '17',
     }
+    subject = TestUtils.renderIntoDocument(
+      <Avatar name="" user={user} courseId="1" canMasquerade />
+    )
 
-    const wrapper = mount(<Avatar name="" user={user} courseId="1" canMasquerade={true} />)
-
-    const avatar = wrapper.find(InstUIAvatar).first()
-
-    equal(avatar.prop('name'), user.name)
-    equal(avatar.prop('src'), user.avatar_url)
-
-    const link = wrapper.find('a').first()
-    equal(link.prop('href'), '/courses/1/users/17')
+    const avatar = TestUtils.findRenderedComponentWithType(subject, InstUIAvatar)
+    equal(avatar.props.name, user.name)
+    equal(avatar.props.src, user.avatar_url)
+    const componentNode = ReactDOM.findDOMNode(subject)
+    const link = componentNode.querySelector('a')
+    equal(link.getAttribute('href'), '/courses/1/users/17')
   })
 })

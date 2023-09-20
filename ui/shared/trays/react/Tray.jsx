@@ -18,17 +18,18 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
+import {string, node} from 'prop-types'
 import {CloseButton} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
-import type {ViewProps} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Tray} from '@instructure/ui-tray'
-import {TruncateText} from '@instructure/ui-truncate-text'
+
 import ErrorBoundary from '@canvas/error-boundary'
 import GenericErrorPage from '@canvas/generic-error-page'
-// @ts-expect-error
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
+
+import {TruncateText} from '@instructure/ui-truncate-text'
 
 const I18n = useI18nScope('tray')
 
@@ -38,36 +39,35 @@ This is a wrapper around an InstUi Tray component that provides:
  * An ErrorBoundary around the children displaying GenericErrorPage
 */
 
-type Props = {
-  label: string
-
-  open?: boolean
-
-  children: React.ReactNode
-
-  size?: 'small' | 'regular' | 'large'
-
-  placement?: 'start' | 'end' | 'top' | 'bottom'
+CanvasTray.propTypes = {
+  children: node.isRequired,
 
   // padding to be applied around the whole tray contents
-  padding?: ViewProps['padding']
+  padding: View.propTypes.padding,
 
   // Additional padding to be applied around the header specifically. By
   // default, the header will have bottom padding equal to the padding prop to
   // separate it from the content.
-  headerPadding?: ViewProps['padding']
+  headerPadding: View.propTypes.padding,
 
   // Additional padding to be applied around the content area
-  contentPadding?: ViewProps['padding']
+  contentPadding: View.propTypes.padding,
 
   // specify this if the header text should be different than the modal's label
-  title?: string
+  title: string,
 
   // Optional props to pass to the GenericErrorPage in ErrorBoundary
-  errorSubject?: string
-  errorCategory?: string
-  errorImageUrl?: string
-  onDismiss: () => void
+  errorSubject: string,
+  errorCategory: string,
+  errorImageUrl: string,
+
+  ...Tray.propTypes,
+}
+
+CanvasTray.defaultProps = {
+  padding: 'small',
+  contentPadding: '0',
+  errorImageUrl: errorShipUrl,
 }
 
 export default function CanvasTray({
@@ -82,10 +82,8 @@ export default function CanvasTray({
   onDismiss,
   children,
   ...otherTrayProps
-}: Props) {
-  if (headerPadding == null) {
-    headerPadding = `0 0 ${padding} 0` as ViewProps['padding']
-  }
+}) {
+  if (headerPadding == null) headerPadding = `0 0 ${padding} 0`
   if (title == null) title = label
 
   function renderHeader() {
@@ -156,10 +154,4 @@ export default function CanvasTray({
       </View>
     </Tray>
   )
-}
-
-CanvasTray.defaultProps = {
-  padding: 'small',
-  contentPadding: '0',
-  errorImageUrl: errorShipUrl,
 }

@@ -23,7 +23,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconMoreSolid, IconOffLine} from '@instructure/ui-icons'
 import {Grid} from '@instructure/ui-grid'
-import {InstUISettingsProvider} from '@instructure/emotion'
+import {ApplyTheme} from '@instructure/ui-themeable'
 import {Menu} from '@instructure/ui-menu'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {ApolloProvider} from 'react-apollo'
@@ -293,7 +293,7 @@ export default class AssignmentColumnHeader extends ColumnHeader<
     const assignment = this.props.assignment
 
     return (
-      <InstUISettingsProvider
+      <ApplyTheme
         theme={{smallPaddingHorizontal: '0', smallFontSize: '0.75rem', smallHeight: '1rem'}}
       >
         <Link ref={this.bindAssignmentLink} href={assignment.htmlUrl} isWithinText={false}>
@@ -301,7 +301,7 @@ export default class AssignmentColumnHeader extends ColumnHeader<
             <span className="assignment-name">{assignment.name}</span>
           </Text>
         </Link>
-      </InstUISettingsProvider>
+      </ApplyTheme>
     )
   }
 

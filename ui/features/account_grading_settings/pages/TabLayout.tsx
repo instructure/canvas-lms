@@ -23,6 +23,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {TabLayoutPanel} from '../types/tabLayout'
 
 const I18n = useI18nScope('gradingCourseTabContainer')
+const {Panel: TabsPanel} = Tabs as any
 
 export const TabLayout = () => {
   const navigate = useNavigate()
@@ -56,30 +57,33 @@ export const TabLayout = () => {
       <Tabs
         margin="large auto"
         padding="medium"
-        onRequestTabChange={(_event: any, {index}: {index: number}) => handleTabChange(index)}
+        onRequestTabChange={(
+          _event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+          {index}: {index: number}
+        ) => handleTabChange(index)}
       >
-        <Tabs.Panel
+        <TabsPanel
           id="gradingPeriodTab"
           renderTitle={I18n.t('Grading Periods')}
           selected={selectedTab === 'periods'}
         >
           {selectedTab === 'periods' ? <Outlet /> : null}
-        </Tabs.Panel>
-        <Tabs.Panel
+        </TabsPanel>
+        <TabsPanel
           id="gradingSchemeTab"
           renderTitle={I18n.t('Schemes')}
           isSelected={selectedTab === 'schemes'}
         >
           {selectedTab === 'schemes' ? <Outlet /> : null}
-        </Tabs.Panel>
+        </TabsPanel>
         {isCustomGradebookStatusesEnabled && (
-          <Tabs.Panel
+          <TabsPanel
             id="gradingStatusTab"
             renderTitle={I18n.t('Statuses')}
             isSelected={selectedTab === 'statuses'}
           >
             {selectedTab === 'statuses' ? <Outlet /> : null}
-          </Tabs.Panel>
+          </TabsPanel>
         )}
       </Tabs>
     </>

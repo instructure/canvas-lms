@@ -22,6 +22,7 @@ import {CustomColumn, HandleCheckboxChange, TeacherNotes} from '../../../types'
 import {executeApiRequest} from '@canvas/util/apiRequest'
 import {View} from '@instructure/ui-view'
 import {ApplyTheme} from '@instructure/ui-themeable'
+// @ts-expect-error TODO: fix in instui 8
 import {Checkbox, CheckboxFacade} from '@instructure/ui-checkbox'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
@@ -87,15 +88,13 @@ export default function ShowNotesColumnCheckbox({
   return (
     <ApplyTheme
       theme={{
-        componentOverrides: {
-          [CheckboxFacade.componentId]: {
-            checkedBackground: '#0375ff',
-            borderColor: '#777777',
-            labelFontSizeSmall: '1rem',
-          },
-          [View.componentId]: {
-            paddingMedium: '16px',
-          },
+        [CheckboxFacade.theme]: {
+          checkedBackground: '#0375ff',
+          borderColor: '#777777',
+          labelFontSizeSmall: '1rem',
+        },
+        [View.theme]: {
+          paddingMedium: '16px',
         },
       }}
     >
@@ -106,7 +105,7 @@ export default function ShowNotesColumnCheckbox({
         borderRadius="medium"
         background="primary"
         padding="medium"
-        themeOverride={{backgroundPrimary: '#eee'}}
+        theme={{backgroundPrimary: '#eee'}}
       >
         <Checkbox
           data-testid="show-notes-column-checkbox"

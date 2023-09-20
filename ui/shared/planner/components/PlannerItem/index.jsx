@@ -356,7 +356,7 @@ export class PlannerItem_raw extends Component {
         <div className={this.style.classNames.title} style={{position: 'relative'}}>
           <Link
             isWithinText={false}
-            themeOverride={{
+            theme={{
               mediumPaddingHorizontal: '0',
               linkColor: this.props.simplifiedControls ? colors.licorice : undefined,
               linkHoverColor: this.props.simplifiedControls ? colors.licorice : undefined,
@@ -383,7 +383,7 @@ export class PlannerItem_raw extends Component {
       <Link
         href={this.props.html_url}
         isWithinText={false}
-        themeOverride={{
+        theme={{
           linkColor: this.props.simplifiedControls ? colors.licorice : undefined,
           linkHoverColor: this.props.simplifiedControls ? colors.licorice : undefined,
         }}
@@ -494,7 +494,7 @@ export class PlannerItem_raw extends Component {
         color="primary"
         letterSpacing="expanded"
         transform="uppercase"
-        themeOverride={{primaryColor: this.props.color}}
+        theme={{primaryColor: this.props.color}}
         data-testid="MissingAssignments-CourseName"
       >
         {this.props.courseName}

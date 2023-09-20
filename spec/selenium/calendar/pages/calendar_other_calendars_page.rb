@@ -211,9 +211,8 @@ module CalendarOtherCalendarsPage
   end
 
   def select_other_calendar(context_id)
-    f("input[data-testid='account-#{context_id}-checkbox']")
-    label_element = driver.find_element(:css, "input[data-testid='account-#{context_id}-checkbox'] + label")
-    label_element.click
+    # because clicking the checkbox clicks on a sibling span
+    driver.execute_script("$('#{account_calendar_checkbox_selector(context_id)}').click()")
   end
 
   def open_create_new_event_modal

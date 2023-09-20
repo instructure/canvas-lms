@@ -37,6 +37,7 @@ import {
 } from '../../../reducers/course_paces'
 import {coursePaceTimezone, coursePaceDateFormatter} from '../../../shared/api/backend_serializer'
 
+const {Item: FlexItem} = Flex as any
 const I18n = useI18nScope('course_paces_projected_dates')
 
 const DASH = String.fromCharCode(0x2013)
@@ -133,7 +134,7 @@ export const ProjectedDates = ({
   const renderSummary = () => {
     return (
       <Flex as="section" direction="column" alignItems="end" wrap="wrap">
-        <Flex.Item margin="0">
+        <FlexItem margin="0">
           <View padding="0 xxx-small 0 0" margin="0 x-small 0 0">
             <Text data-testid="number-of-assignments" size="small" fontStyle="italic">
               {I18n.t(
@@ -167,12 +168,12 @@ export const ProjectedDates = ({
               )}{' '}
             </Text>
           </View>
-        </Flex.Item>
-        <Flex.Item margin="0">
+        </FlexItem>
+        <FlexItem margin="0">
           <Text data-testid="dates-shown-time-zone" fontStyle="italic" size="small">
             {I18n.t('Dates shown in course time zone')}
           </Text>
-        </Flex.Item>
+        </FlexItem>
       </Flex>
     )
   }
@@ -182,22 +183,22 @@ export const ProjectedDates = ({
       <Flex as="section" alignItems="end" margin="0" wrap="wrap">
         {hasAtLeastOneDate() && (
           <>
-            <Flex.Item margin="0 medium medium 0">
+            <FlexItem margin="0 medium medium 0">
               {renderDate(
                 I18n.t('Start Date'),
                 startDateValue,
                 startHelpText,
                 'coursepace-start-date'
               )}
-            </Flex.Item>
-            <Flex.Item margin="0 medium medium 0" shouldGrow={true}>
+            </FlexItem>
+            <FlexItem margin="0 medium medium 0" shouldGrow={true}>
               {renderDate(I18n.t('End Date'), endDateValue, endHelpText, 'coursepace-end-date')}
-            </Flex.Item>
+            </FlexItem>
           </>
         )}
-        <Flex.Item margin="0 0 x-small 0" shouldGrow={true}>
+        <FlexItem margin="0 0 x-small 0" shouldGrow={true}>
           {renderSummary()}
-        </Flex.Item>
+        </FlexItem>
       </Flex>
     </div>
   )

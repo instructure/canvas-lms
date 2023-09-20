@@ -20,6 +20,7 @@ import React, {useReducer, useMemo} from 'react'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {TextInput} from '@instructure/ui-text-input'
+// @ts-expect-error -- remove once on InstUI 8
 import {Checkbox} from '@instructure/ui-checkbox'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import PrerequisiteForm from './PrerequisiteForm'
@@ -34,6 +35,9 @@ import type {Module, ModuleItem, Requirement} from './types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('differentiated_modules')
+
+// Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
+const {Item: FlexItem} = Flex as any
 
 export interface SettingsPanelProps {
   height: string
@@ -115,13 +119,13 @@ export default function SettingsPanel({
 
   return (
     <Flex direction="column" justifyItems="space-between" height={height}>
-      <Flex.Item shouldGrow={true} padding="small">
+      <FlexItem shouldGrow={true} padding="small">
         <View as="div" padding="small">
           <TextInput
             renderLabel={I18n.t('Module Name')}
             value={state.moduleName}
             messages={state.nameInputMessages}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
               const {value} = e.target
               dispatch({type: actions.SET_MODULE_NAME, payload: value})
               if (value.trim().length > 0) {
@@ -193,14 +197,14 @@ export default function SettingsPanel({
             <hr />
           </View>
         )}
-      </Flex.Item>
-      <Flex.Item>
+      </FlexItem>
+      <FlexItem>
         <Footer
           onDismiss={onDismiss}
           onUpdate={handleUpdate}
           disableUpdate={state.nameInputMessages.length > 0}
         />
-      </Flex.Item>
+      </FlexItem>
     </Flex>
   )
 }

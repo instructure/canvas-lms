@@ -423,7 +423,7 @@ exports[`renders a CompletedItemsFacade when completed items are present by defa
           onClick={[Function]}
           responsiveSize="large"
           simplifiedControls={false}
-          themeOverride={
+          theme={
             Object {
               "labelColor": "#5678",
             }

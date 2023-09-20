@@ -19,7 +19,7 @@
 
 import React, {PureComponent} from 'react'
 import {bool} from 'prop-types'
-import {InstUISettingsProvider} from '@instructure/emotion'
+import {ApplyTheme} from '@instructure/ui-themeable'
 import {Button} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextInput} from '@instructure/ui-text-input'
@@ -35,13 +35,13 @@ const CLASSNAME_FOR_ENTER_GRADES_AS = {
   percent: 'Grid__GradeCell__PercentInput',
 }
 
-const componentOverrides = {
-  [Button.componentId]: {
+const themeOverrides = {
+  [Button.theme]: {
     iconPadding: '0 3px',
     smallHeight: '23px',
   },
 
-  [TextInput.componentId]: {
+  [TextInput.theme]: {
     smallHeight: '27px',
   },
 }
@@ -107,7 +107,7 @@ export default class GradeInput extends PureComponent {
 
     return (
       <div className={className}>
-        <InstUISettingsProvider theme={{componentOverrides}}>
+        <ApplyTheme theme={themeOverrides}>
           <TextGradeInput
             {...this.props}
             label={<ScreenReaderContent>{I18n.t('Grade')}</ScreenReaderContent>}
@@ -116,7 +116,7 @@ export default class GradeInput extends PureComponent {
               this.gradeInput = ref
             }}
           />
-        </InstUISettingsProvider>
+        </ApplyTheme>
       </div>
     )
   }

@@ -18,8 +18,10 @@
 import React, {useCallback, useEffect, useState} from 'react'
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {useScope as useI18nScope} from '@canvas/i18n'
+// @ts-expect-error
 import {Modal} from '@instructure/ui-modal'
 import {Button, CloseButton} from '@instructure/ui-buttons'
+// @ts-expect-error
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
@@ -142,7 +144,7 @@ export default function DefaultGradeModal({
       size="small"
       label="Set Default Grade Modal"
       shouldCloseOnDocumentClick={false}
-      themeOverride={{mediumMaxWidth: '40em'}}
+      theme={{mediumMaxWidth: '40em'}}
     >
       <ModalHeader>
         <CloseButton

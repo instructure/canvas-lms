@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
-import ColorField from '../ColorField'
+import ColorField from '../color-field'
 
 test('it renders', () => {
   const {getByTestId, getByText} = render(
@@ -43,13 +43,16 @@ test('it calls onChange prop with proper values when the picker changes', () => 
 test('it calls onChange prop with the value when the text input blurs', () => {
   const changeSpy = jest.fn()
   const {getByTestId} = render(
-    <ColorField label="color" value="rgba(100,100,100,0.7)" onChange={changeSpy} name="testing" />
+    <ColorField
+      label="color"
+      value="rgba(100,100,100,0.7)"
+      onChange={changeSpy}
+      name="testing"
+    />
   )
 
   const colorTextInput = getByTestId('color-field-text-input')
   fireEvent.blur(colorTextInput, {target: {value: 'rgba(100, 100, 100, 1)'}})
 
-  expect(changeSpy).toHaveBeenCalledWith({
-    target: {name: 'testing', value: 'rgba(100, 100, 100, 1)'},
-  })
+  expect(changeSpy).toHaveBeenCalledWith({target: {name: 'testing', value: 'rgba(100, 100, 100, 1)'}})
 })

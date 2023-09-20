@@ -6,7 +6,7 @@ exports[`renders the AlignmentResult component 1`] = `
   as="span"
   direction="column"
   display="flex"
-  gap="none"
+  elementRef={[Function]}
   justifyItems="start"
   padding="small"
   withVisualDebug={false}
@@ -14,12 +14,12 @@ exports[`renders the AlignmentResult component 1`] = `
 >
   <Item
     as="span"
+    elementRef={[Function]}
     shouldGrow={false}
     shouldShrink={false}
   >
     <Link
       color="link"
-      forceButtonRole={true}
       href="http://foo"
       iconPlacement="start"
       isWithinText={false}
@@ -37,6 +37,7 @@ exports[`renders the AlignmentResult component 1`] = `
   </Item>
   <Item
     as="span"
+    elementRef={[Function]}
     padding="x-small 0"
     shouldGrow={false}
     shouldShrink={false}
@@ -68,6 +69,7 @@ exports[`renders the AlignmentResult component 1`] = `
   <Item
     as="span"
     borderWidth="small"
+    elementRef={[Function]}
     shouldGrow={false}
     shouldShrink={false}
   >

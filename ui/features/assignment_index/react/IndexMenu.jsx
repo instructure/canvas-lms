@@ -17,52 +17,34 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import ExternalToolModalLauncher from '@canvas/external-tools/react/components/ExternalToolModalLauncher'
 import Actions from './actions/IndexMenuActions'
 import ReactDOM from 'react-dom'
 import ContentTypeExternalToolTray from '@canvas/trays/react/ContentTypeExternalToolTray'
-import type {SelectableItem} from '@canvas/trays/react/ContentTypeExternalToolTray'
 import {ltiState} from '@canvas/lti/jquery/messages'
 
 const I18n = useI18nScope('assignment_index_menu')
 
-type Props = {
-  store: any
-  contextType: string
-  contextId: string
-  requestBulkEdit?: () => void
-  setTrigger: (node: HTMLElement | null) => void
-  setDisableTrigger: (node: HTMLElement | null) => void
-  registerWeightToggle: (name: string, callback: (value: boolean) => void, context: any) => void
-  disableSyncToSis: () => void
-  sisName: string
-  postToSisDefault: boolean
-  hasAssignments: boolean
-  currentWindow: Window
-}
-
-type State = {
-  externalTools: any[]
-  modalIsOpen: boolean
-  selectedTool: any
-  weighted: boolean
-}
-
-export default class IndexMenu extends React.Component<Props, State> {
-  triggerRef: HTMLElement | null
-
-  unsubscribe: () => void = () => {}
-
-  node: HTMLDivElement | null = null
-
-  disableTrigger: HTMLButtonElement | null = null
-
-  constructor(props: Props) {
-    super(props)
-    this.state = props.store.getState()
-    this.triggerRef = null
+export default class IndexMenu extends React.Component {
+  static propTypes = {
+    store: PropTypes.object.isRequired,
+    contextType: PropTypes.string.isRequired,
+    contextId: PropTypes.number.isRequired,
+    requestBulkEdit: PropTypes.func, // not required. no menu item if not specified
+    setTrigger: PropTypes.func.isRequired,
+    setDisableTrigger: PropTypes.func.isRequired,
+    registerWeightToggle: PropTypes.func.isRequired,
+    disableSyncToSis: PropTypes.func.isRequired,
+    sisName: PropTypes.string.isRequired,
+    postToSisDefault: PropTypes.bool.isRequired,
+    hasAssignments: PropTypes.bool.isRequired,
+    assignmentGroupsCollection: PropTypes.object,
+    currentWindow: PropTypes.object,
   }
+
+  state = this.props.store.getState()
 
   UNSAFE_componentWillMount() {
     this.setState(this.props.store.getState())
@@ -82,7 +64,7 @@ export default class IndexMenu extends React.Component<Props, State> {
     ].join('')
 
     this.props.store.dispatch(Actions.apiGetLaunches(null, toolsUrl))
-    this.props.setTrigger(this.triggerRef)
+    this.props.setTrigger(this.refs.trigger)
     this.props.setDisableTrigger(this.disableTrigger)
     this.props.registerWeightToggle('weightedToggle', this.onWeightedToggle, this)
   }
@@ -91,11 +73,11 @@ export default class IndexMenu extends React.Component<Props, State> {
     this.unsubscribe()
   }
 
-  onWeightedToggle = (value: any) => {
+  onWeightedToggle = value => {
     this.props.store.dispatch(Actions.setWeighted(value))
   }
 
-  onLaunchTool = (tool: any) => (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+  onLaunchTool = tool => e => {
     e.preventDefault()
     this.props.store.dispatch(Actions.launchTool(tool))
   }
@@ -149,9 +131,7 @@ export default class IndexMenu extends React.Component<Props, State> {
     ))
 
   renderTrayTools = () => {
-    // @ts-expect-error
     if (ENV.assignment_index_menu_tools) {
-      // @ts-expect-error
       return ENV.assignment_index_menu_tools.map(tool => (
         <li key={tool.id} role="menuitem">
           {/* TODO: use InstUI button */}
@@ -165,7 +145,7 @@ export default class IndexMenu extends React.Component<Props, State> {
     }
   }
 
-  iconForTrayTool(tool: {canvas_icon_class: string; icon_url: string}) {
+  iconForTrayTool(tool) {
     if (tool.canvas_icon_class) {
       return <i className={tool.canvas_icon_class} />
     } else if (tool.icon_url) {
@@ -173,15 +153,14 @@ export default class IndexMenu extends React.Component<Props, State> {
     }
   }
 
-  onLaunchTrayTool =
-    (tool: string | null) => (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
-      if (e != null) {
-        e.preventDefault()
-      }
-      this.setExternalToolTray(tool, document.getElementById('course_assignment_settings_link'))
+  onLaunchTrayTool = tool => e => {
+    if (e != null) {
+      e.preventDefault()
     }
+    this.setExternalToolTray(tool, document.getElementById('course_assignment_settings_link'))
+  }
 
-  setExternalToolTray(tool: any, returnFocusTo: any = null) {
+  setExternalToolTray(tool, returnFocusTo) {
     const handleDismiss = () => {
       this.setExternalToolTray(null)
       returnFocusTo.focus()
@@ -189,7 +168,7 @@ export default class IndexMenu extends React.Component<Props, State> {
         window.location.reload()
       }
     }
-    const groupData: SelectableItem[] = [
+    const groupData = [
       {
         course_id: this.props.contextId,
         type: 'assignment_group',
@@ -223,7 +202,7 @@ export default class IndexMenu extends React.Component<Props, State> {
           type="button"
           className="al-trigger btn Button"
           id="course_assignment_settings_link"
-          tabIndex={0}
+          tabIndex="0"
           title={I18n.t('Assignments Settings')}
           aria-label={I18n.t('Assignments Settings')}
         >
@@ -237,7 +216,7 @@ export default class IndexMenu extends React.Component<Props, State> {
               {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
               <a
                 href="#"
-                tabIndex={0}
+                tabIndex="0"
                 id="requestBulkEditMenuItem"
                 className="requestBulkEditMenuItem"
                 role="button"
@@ -253,9 +232,7 @@ export default class IndexMenu extends React.Component<Props, State> {
             {/* TODO: use InstUI button */}
             {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
             <a
-              ref={ref => {
-                this.triggerRef = ref
-              }}
+              ref="trigger"
               href="#"
               id="assignmentSettingsCog"
               role="button"

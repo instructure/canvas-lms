@@ -18,15 +18,15 @@
 
 import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
+
 import {Table} from '@instructure/ui-table'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import {IconCheckDarkSolid, IconXSolid} from '@instructure/ui-icons'
 import {AccessibleContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Badge} from '@instructure/ui-badge'
-import {getK5ThemeVars} from '@canvas/k5/react/k5-theme'
 
-const k5ThemeVariables = getK5ThemeVars()
+import k5Theme from '@canvas/k5/react/k5-theme'
 
 const I18n = useI18nScope('grade_row')
 
@@ -158,9 +158,9 @@ export const GradeRow = ({
       <Link
         href={url}
         isWithinText={false}
-        themeOverride={{
-          color: k5ThemeVariables.colors.textDarkest,
-          hoverColor: k5ThemeVariables.colors.textDarkest,
+        theme={{
+          color: k5Theme.variables.colors.textDarkest,
+          hoverColor: k5Theme.variables.colors.textDarkest,
         }}
       >
         {assignmentName}

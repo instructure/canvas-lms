@@ -96,8 +96,7 @@ export default class MigrationSync extends Component {
               {I18n.t('This may take a bit...')}
             </Text>
             <ProgressBar
-              screenReaderLabel={I18n.t('Sync in progress')}
-              renderLabel={I18n.t('Sync in progress')}
+              label={I18n.t('Sync in progress')}
               size="x-small"
               valueNow={MigrationStates.getLoadingValue(migrationStatus)}
               valueMax={MigrationStates.maxLoadingValue}

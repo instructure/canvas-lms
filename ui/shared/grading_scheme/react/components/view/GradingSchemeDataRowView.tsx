@@ -33,6 +33,10 @@ interface ComponentProps {
   viewAsPercentage: boolean
 }
 
+// Doing this to avoid TS2339 errors -- TODO: remove once we're on InstUI 8
+const {Item} = Flex as any
+const {Row, Cell} = Table as any
+
 const GradingSchemeDataRowView: React.FC<ComponentProps> = ({
   dataRow,
   highRange,
@@ -53,31 +57,31 @@ const GradingSchemeDataRowView: React.FC<ComponentProps> = ({
 
   return (
     <>
-      <Table.Row themeOverride={{borderColor: 'transparent'}}>
-        <Table.Cell themeOverride={{padding: 'none'}}>{dataRow.name}</Table.Cell>
-        <Table.Cell themeOverride={{padding: 'none'}}>
+      <Row theme={{borderColor: 'transparent'}}>
+        <Cell theme={{padding: 'none'}}>{dataRow.name}</Cell>
+        <Cell theme={{padding: 'none'}}>
           <Flex display="inline-flex">
-            <Flex.Item>
+            <Item>
               <span aria-label={I18n.t('Upper limit of range')}>
                 {isFirstRow ? '' : '< '}
                 {renderHighRange()}
                 {viewAsPercentage ? <>%</> : <></>}
               </span>
-            </Flex.Item>
+            </Item>
           </Flex>
-        </Table.Cell>
-        <Table.Cell themeOverride={{padding: 'none'}}>
+        </Cell>
+        <Cell theme={{padding: 'none'}}>
           <Flex>
-            <Flex.Item padding="x-small">{I18n.t('to')}</Flex.Item>
-            <Flex.Item>
+            <Item padding="x-small">{I18n.t('to')}</Item>
+            <Item>
               <span aria-label={I18n.t('Lower limit of range')}>
                 {renderLowRange()}
                 {viewAsPercentage ? <>%</> : <></>}
               </span>
-            </Flex.Item>
+            </Item>
           </Flex>
-        </Table.Cell>
-      </Table.Row>
+        </Cell>
+      </Row>
     </>
   )
 }

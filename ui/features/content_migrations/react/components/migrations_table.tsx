@@ -44,19 +44,19 @@ export const ContentMigrationsTable = () => {
     <Table caption={I18n.t('Content Migrations')}>
       <Table.Head>
         <Table.Row>
-          <Table.ColHeader themeOverride={{padding: '0.6rem 0'}} id="content_type">
+          <Table.ColHeader theme={{padding: '0.6rem 0'}} id="content_type">
             {I18n.t('Content Type')}
           </Table.ColHeader>
-          <Table.ColHeader themeOverride={{padding: '0.6rem 0'}} id="source_link">
+          <Table.ColHeader theme={{padding: '0.6rem 0'}} id="source_link">
             {I18n.t('Source Link')}
           </Table.ColHeader>
-          <Table.ColHeader themeOverride={{padding: '0.6rem 0'}} id="date_imported">
+          <Table.ColHeader theme={{padding: '0.6rem 0'}} id="date_imported">
             {I18n.t('Date Imported')}
           </Table.ColHeader>
-          <Table.ColHeader themeOverride={{padding: '0.6rem 0'}} id="status">
+          <Table.ColHeader theme={{padding: '0.6rem 0'}} id="status">
             {I18n.t('Status')}
           </Table.ColHeader>
-          <Table.ColHeader themeOverride={{padding: '0.6rem 0'}} id="progress">
+          <Table.ColHeader theme={{padding: '0.6rem 0'}} id="progress">
             {I18n.t('Progress')}
           </Table.ColHeader>
         </Table.Row>
@@ -64,9 +64,7 @@ export const ContentMigrationsTable = () => {
       <Table.Body>
         {migrations.map((cm: ContentMigrationItem) => (
           <Table.Row key={cm.id}>
-            <Table.Cell themeOverride={{padding: '1.1rem 0rem'}}>
-              {cm.migration_type_title}
-            </Table.Cell>
+            <Table.Cell theme={{padding: '1.1rem 0rem'}}>{cm.migration_type_title}</Table.Cell>
             <Table.Cell>
               <SourceLink item={cm} />
             </Table.Cell>

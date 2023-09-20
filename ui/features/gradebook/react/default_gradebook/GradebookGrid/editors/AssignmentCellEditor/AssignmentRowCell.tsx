@@ -18,7 +18,7 @@
  */
 
 import React, {Component} from 'react'
-import {InstUISettingsProvider} from '@instructure/emotion'
+import {ApplyTheme} from '@instructure/ui-themeable'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconExpandStartLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
@@ -27,17 +27,17 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import AssignmentGradeInput from '../AssignmentGradeInput/index'
 import InvalidGradeIndicator from '../InvalidGradeIndicator'
 import SimilarityIndicator from '../SimilarityIndicator'
-import type {Submission} from '../../../../../../../api.d' // !!!! FIXME
+import type {Submission} from '../../../../../../../api.d'
 import type {CamelizedAssignment, GradeEntryMode} from '@canvas/grading/grading.d'
 
 const I18n = useI18nScope('gradebook')
 
-const componentOverrides = {
-  [IconButton.componentId]: {
+const themeOverrides = {
+  [IconButton.theme]: {
     iconPadding: '0 3px',
     smallHeight: '23px',
   },
-  [TextInput.componentId]: {
+  [TextInput.theme]: {
     smallHeight: '27px',
   },
 }
@@ -89,9 +89,9 @@ export default class AssignmentRowCell extends Component<Props> {
 
   gradeInput: AssignmentGradeInput | null = null
 
-  bindToggleTrayButtonRef: (ref: Element | null) => void
+  bindToggleTrayButtonRef: (ref: HTMLButtonElement | null) => void
 
-  trayButton: Element | null = null
+  trayButton: HTMLButtonElement | null = null
 
   submissionIsUpdating: boolean = false
 
@@ -209,7 +209,7 @@ export default class AssignmentRowCell extends Component<Props> {
     const showSimilarityIcon = !gradeIsInvalid && similarityInfo != null
 
     return (
-      <InstUISettingsProvider theme={{componentOverrides}}>
+      <ApplyTheme theme={themeOverrides}>
         <div className={`Grid__GradeCell ${this.props.enterGradesAs}`}>
           <div className="Grid__GradeCell__StartContainer">
             {gradeIsInvalid && (
@@ -254,7 +254,7 @@ export default class AssignmentRowCell extends Component<Props> {
             </div>
           </div>
         </div>
-      </InstUISettingsProvider>
+      </ApplyTheme>
     )
   }
 }

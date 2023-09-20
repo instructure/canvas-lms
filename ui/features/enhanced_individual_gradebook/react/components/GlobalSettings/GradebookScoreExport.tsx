@@ -23,6 +23,7 @@ import {View} from '@instructure/ui-view'
 import {ApiCallStatus} from '../../../types'
 import {Link} from '@instructure/ui-link'
 import {Button} from '@instructure/ui-buttons'
+// @ts-expect-error -- TODO: remove once we're on InstUI 8
 import {IconDownloadLine} from '@instructure/ui-icons'
 import DateHelper from '@canvas/datetime/dateHelper'
 import {useExportGradebook} from '../../hooks/useExportGradebook'
@@ -94,11 +95,7 @@ export default function GradebookScoreExport({
         lastGeneratedCsvLinkText &&
         gradebookCsvProgress && (
           <Link
-            elementRef={e => {
-              if (e instanceof HTMLAnchorElement) {
-                linkRef.current = e
-              }
-            }}
+            elementRef={(e: HTMLAnchorElement) => (linkRef.current = e)}
             href={lastGeneratedCsvLink}
             isWithinText={false}
             margin="0 xx-small"

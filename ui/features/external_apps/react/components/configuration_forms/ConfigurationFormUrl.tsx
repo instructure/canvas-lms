@@ -20,6 +20,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {TextInput} from '@instructure/ui-text-input'
 import {FormMessage} from '@instructure/ui-form-field'
+// @ts-expect-error
 // Misconfigured types in Grid's package.json mean we have to ignore errors here
 import {Grid} from '@instructure/ui-grid'
 import '@canvas/rails-flash-notifications'

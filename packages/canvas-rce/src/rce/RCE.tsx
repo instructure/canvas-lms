@@ -36,7 +36,7 @@ import getTranslations from '../getTranslations'
 import '@instructure/canvas-theme'
 import {Editor} from 'tinymce'
 
-if (!process || !process.env || !process.env.BUILD_LOCALE) {
+if (!process?.env?.BUILD_LOCALE) {
   formatMessage.setup({
     locale: 'en',
     generateId: require('format-message-generate-id/underscored_crc32'),

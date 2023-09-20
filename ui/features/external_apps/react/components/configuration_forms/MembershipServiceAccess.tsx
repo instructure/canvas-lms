@@ -18,6 +18,8 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
+// @ts-expect-error
+// Again, doesn't have types defined in package.json. InstUI 8 will fix this.
 import {Checkbox} from '@instructure/ui-checkbox'
 import {I18nType} from './types'
 

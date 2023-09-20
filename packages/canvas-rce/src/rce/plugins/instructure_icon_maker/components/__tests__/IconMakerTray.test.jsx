@@ -50,7 +50,7 @@ const setIconColor = hex => {
   fireEvent.input(input, {target: {value: hex}})
 }
 
-describe.skip('RCE "Icon Maker" Plugin > IconMakerTray', () => {
+describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
   const defaults = {
     onUnmount: jest.fn(),
     editing: false,

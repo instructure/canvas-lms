@@ -20,7 +20,7 @@ import React from 'react'
 import {render} from 'react-dom'
 import PropTypes from 'prop-types'
 import {Alert} from '@instructure/ui-alerts'
-import {InstUISettingsProvider} from '@instructure/emotion'
+import {ApplyTheme} from '@instructure/ui-themeable'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 import {Img} from '@instructure/ui-img'
@@ -35,8 +35,8 @@ import TeamsIcon from '../images/teams.svg'
 
 const I18n = useI18nScope('conferences_alternatives')
 
-const componentOverrides = {
-  [Alert.componentId]: {
+const theme = {
+  [Alert.theme]: {
     boxShadow: 'none',
   },
 }
@@ -144,7 +144,7 @@ const Teams = props => (
 
 function ConferenceAlternatives({responsiveSize}) {
   return (
-    <InstUISettingsProvider theme={{componentOverrides}}>
+    <ApplyTheme theme={theme}>
       <Alert margin="none none medium none" variant="warning">
         {I18n.t(`Conferences, powered by BigBlueButton, is unable to handle current demand.  Consider upgrading to
         Premium BigBlueButton or use one of the following video conferencing providers.  Please talk to your local
@@ -167,7 +167,7 @@ function ConferenceAlternatives({responsiveSize}) {
           </Flex.Item>
         </Flex>
       </View>
-    </InstUISettingsProvider>
+    </ApplyTheme>
   )
 }
 
@@ -177,6 +177,7 @@ ConferenceAlternatives.propTypes = {
 
 const ResponsiveConferenceAlternatives = responsiviser()(ConferenceAlternatives)
 
-export default function renderConferenceAlternatives(node) {
-  render(<ResponsiveConferenceAlternatives />, node)
+export default function renderConferenceAlternatives() {
+  const $container = document.getElementById('conference-alternatives-container')
+  render(<ResponsiveConferenceAlternatives />, $container)
 }

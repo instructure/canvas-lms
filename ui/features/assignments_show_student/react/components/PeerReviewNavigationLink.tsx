@@ -18,9 +18,13 @@
 
 import React, {useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
+// @ts-expect-error
 import {Popover} from '@instructure/ui-popover'
+// @ts-expect-error
 import {IconPeerReviewLine, IconCheckLine} from '@instructure/ui-icons'
+// @ts-expect-error
 import {TruncateText} from '@instructure/ui-truncate-text'
+// @ts-expect-error
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Menu} from '@instructure/ui-menu'
 import {Flex} from '@instructure/ui-flex'
@@ -32,6 +36,8 @@ import {AssignedAssessments} from 'api'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 
 const I18n = useI18nScope('assignments_2_student_header')
+
+const {Item: MenuItem, Group: MenuGroup} = Menu as any
 
 type PeerReviewNavigationLinkProps = {
   assignedAssessments: AssignedAssessments[]
@@ -82,15 +88,15 @@ export default ({assignedAssessments, currentAssessmentIndex}: PeerReviewNavigat
     peerReviewStatus: string
   ) => {
     return (
-      <Menu.Item
+      <MenuItem
         key={assessment.assetId}
         href={getPeerReviewUrl(assessment)}
         /* currentAssessmentIndex is a passed in prop that is already 1-indexed while the parameter 'index' is 0-indexed, hence the need for a +1.
            This is comparing to see if the current peer review page we are on matches the current item in the map, which will then add a custom background
            to the theme to the rendered menu item.
         */
-        themeOverride={
-          currentAssessmentIndex === index + 1 ? {background: '#6B7780', labelColor: 'white'} : {}
+        theme={
+          currentAssessmentIndex === index + 1 ? {background: '#6B7780', labelColor: 'white'} : null
         }
         data-testid={`${testId}-${assessment.assetId}`}
       >
@@ -108,7 +114,7 @@ export default ({assignedAssessments, currentAssessmentIndex}: PeerReviewNavigat
             peerReviewStatus={peerReviewStatus}
           />
         </Flex>
-      </Menu.Item>
+      </MenuItem>
     )
   }
 
@@ -130,7 +136,7 @@ export default ({assignedAssessments, currentAssessmentIndex}: PeerReviewNavigat
       placement="bottom end"
     >
       <Menu>
-        <Menu.Group label={I18n.t('Ready to Review')} />
+        <MenuGroup label={I18n.t('Ready to Review')} />
         {assignedAssessments?.map(
           (assessment, index) =>
             assessment.assetSubmissionType != null &&
@@ -143,7 +149,7 @@ export default ({assignedAssessments, currentAssessmentIndex}: PeerReviewNavigat
             )
         )}
 
-        <Menu.Group label={I18n.t('Not Yet Submitted')} />
+        <MenuGroup label={I18n.t('Not Yet Submitted')} />
         {assignedAssessments?.map(
           (assessment, index) =>
             assessment.assetSubmissionType === null &&
@@ -155,7 +161,7 @@ export default ({assignedAssessments, currentAssessmentIndex}: PeerReviewNavigat
             )
         )}
 
-        <Menu.Group label={I18n.t('Completed Peer Reviews')} />
+        <MenuGroup label={I18n.t('Completed Peer Reviews')} />
         {assignedAssessments?.map(
           (assessment, index) =>
             assessment.assetSubmissionType != null &&

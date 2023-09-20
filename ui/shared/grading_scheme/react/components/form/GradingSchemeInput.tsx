@@ -23,6 +23,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {TextInput} from '@instructure/ui-text-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+// @ts-expect-error -- TODO: remove once we're on InstUI 8
 import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
 import numberHelper from '@canvas/i18n/numberHelper'
 

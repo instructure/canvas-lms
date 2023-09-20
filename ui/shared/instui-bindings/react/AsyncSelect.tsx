@@ -22,15 +22,18 @@ import React, {useState, useRef, ReactElement, ReactNode, ChangeEvent, useEffect
 import {Alert} from '@instructure/ui-alerts'
 import {Select} from '@instructure/ui-select'
 import {Spinner} from '@instructure/ui-spinner'
-import getLiveRegion from './liveRegion'
-
-import type {SelectProps} from '@instructure/ui-select'
 
 const I18n = useI18nScope('canvas_async_search_selesct')
 
 const noOptionsId = '~~empty-option~~'
 
-export type CanvasAsyncSelectProps = {
+const {Option} = Select as any
+// eslint-disable-next-line react/forbid-foreign-prop-types
+const {propTypes: selectPropTypes} = Select as any
+
+CanvasAsyncSelect.Option = Option
+
+type Props = {
   inputValue?: string
   isLoading: boolean
   selectedOptionId?: string
@@ -47,10 +50,13 @@ export type CanvasAsyncSelectProps = {
   [key: string]: any
 }
 
+CanvasAsyncSelect.propTypes = {
+  ...selectPropTypes,
+}
+
 export default function CanvasAsyncSelect({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   options = [],
-  renderLabel = '',
   inputValue,
   isLoading = false,
   selectedOptionId,
@@ -63,13 +69,13 @@ export default function CanvasAsyncSelect({
   onBlur = () => {},
   children = [],
   ...selectProps
-}: CanvasAsyncSelectProps): ReactElement {
+}: Props): ReactElement {
   const previousLoadingRef = useRef(isLoading)
   const previousLoading = previousLoadingRef.current
   const previousSelectedOptionIdRef = useRef(selectedOptionId)
 
   const [isShowingOptions, setIsShowingOptions] = useState(false)
-  const [highlightedOptionId, setHighlightedOptionId] = useState<string | null>(null)
+  const [highlightedOptionId, setHighlightedOptionId] = useState(null)
   const [announcement, setAnnouncement] = useState<ReactNode>('')
   const [hasFocus, setHasFocus] = useState(false)
   const [managedInputValue, setManagedInputValue] = useState('')
@@ -79,7 +85,7 @@ export default function CanvasAsyncSelect({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [highlightedOptionId])
 
-  function findOptionById(id: string | undefined): ReactElement {
+  function findOptionById(id: string): ReactElement {
     let option
     React.Children.forEach(children, (c: ReactElement) => {
       if (c?.props.id === id) option = c
@@ -100,33 +106,27 @@ export default function CanvasAsyncSelect({
       typeof optionChildren === 'function' ? optionChildren(props) : optionChildren
 
     return (
-      <Select.Option
-        key={id}
-        id={id}
-        {...optionProps}
-        {...props}
-        renderBeforeLabel={renderBeforeText}
-      >
+      <Option key={id} id={id} {...optionProps} {...props} renderBeforeLabel={renderBeforeText}>
         {renderChildren}
-      </Select.Option>
+      </Option>
     )
   }
 
   function renderOptions(): ReactElement | ReactElement[] {
     if (isLoading) {
       return (
-        <Select.Option id={noOptionsId}>
+        <Option id={noOptionsId}>
           <Spinner renderTitle={I18n.t('Loading options...')} size="x-small" />
-        </Select.Option>
+        </Option>
       )
     } else if (React.Children.count(children) === 0) {
-      return <Select.Option id={noOptionsId}>{noOptionsLabel}</Select.Option>
+      return <Option id={noOptionsId}>{noOptionsLabel}</Option>
     } else {
       return React.Children.map(children, renderOption)
     }
   }
 
-  const handleInputChange: SelectProps['onInputChange'] = function (ev) {
+  function handleInputChange(ev: ChangeEvent<HTMLInputElement>): void {
     // user typing in the input negates the selection
     const newValue = ev.target.value
     if (typeof inputValue === 'undefined') setManagedInputValue(newValue)
@@ -143,23 +143,27 @@ export default function CanvasAsyncSelect({
     setAnnouncement(I18n.t('List Collapsed'))
   }
 
-  const handleHighlightOption: SelectProps['onRequestHighlightOption'] = function (ev, {id}) {
+  function handleHighlightOption(ev: ChangeEvent, {id}): void {
     const option = findOptionById(id)
     if (option) {
-      setHighlightedOptionId(id ?? null)
+      setHighlightedOptionId(id)
       setAnnouncement(option.props.children)
     }
   }
 
-  const handleSelectOption: SelectProps['onRequestSelectOption'] = function (ev, {id}) {
+  function handleSelectOption(ev: ChangeEvent, {id}): void {
     const selectedOption = findOptionById(id)
     const selectedText = selectedOption?.props.children
     if (!selectedOption) return
     setIsShowingOptions(false)
-    setAnnouncement(I18n.t('Option selected: %{text}. List collapsed.', {text: selectedText}))
+    setAnnouncement(
+      <>
+        {I18n.t('Option selected:')} {selectedText} {I18n.t('List collapsed.')}
+      </>
+    )
     if (id !== noOptionsId) {
       if (typeof inputValue === 'undefined') setManagedInputValue(selectedText)
-      onOptionSelected(ev, id ?? noOptionsValue)
+      onOptionSelected(ev, id)
     }
   }
 
@@ -202,7 +206,6 @@ export default function CanvasAsyncSelect({
   const controlledProps = {
     inputValue: typeof inputValue === 'undefined' ? managedInputValue : inputValue,
     isShowingOptions,
-    renderLabel,
     assistiveText: I18n.t('Type to search'),
     onFocus: handleFocus,
     onBlur: handleBlur,
@@ -222,11 +225,13 @@ export default function CanvasAsyncSelect({
       <Select {...controlledProps} {...selectProps}>
         {renderOptions()}
       </Select>
-      <Alert liveRegion={getLiveRegion} liveRegionPoliteness="assertive" screenReaderOnly={true}>
+      <Alert
+        liveRegion={() => document.getElementById('flash_screenreader_holder')}
+        liveRegionPoliteness="assertive"
+        screenReaderOnly={true}
+      >
         {announcement}
       </Alert>
     </>
   )
 }
-
-CanvasAsyncSelect.Option = Select.Option

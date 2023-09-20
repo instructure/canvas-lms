@@ -24,7 +24,6 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-// @ts-expect-error
 import SpacePandaUrl from '@canvas/images/SpacePanda.svg'
 import useDebouncedSearchTerm from '@canvas/search-item-selector/react/hooks/useDebouncedSearchTerm'
 import useFetchApi from '@canvas/use-fetch-api-hook'
@@ -51,6 +50,9 @@ type ComponentProps = {
   readonly onAccountToggled: (id: number, visible: boolean) => void
   readonly onAccountSubscriptionToggled: (id: number, autoSubscription: boolean) => void
 }
+
+// Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
+const {Item: FlexItem} = Flex as any
 
 export const AccountList = ({
   originAccountId,
@@ -111,17 +113,17 @@ export const AccountList = ({
   if (accounts.length === 0) {
     return (
       <Flex direction="column" alignItems="center" justifyItems="center" padding="xx-large medium">
-        <Flex.Item data-testid="empty-account-search" margin="0 0 medium">
+        <FlexItem data-testid="empty-account-search" margin="0 0 medium">
           <Img src={SpacePandaUrl} />
-        </Flex.Item>
-        <Flex.Item>
+        </FlexItem>
+        <FlexItem>
           <Text size="x-large">{I18n.t('No results found')}</Text>
-        </Flex.Item>
-        <Flex.Item>
+        </FlexItem>
+        <FlexItem>
           <Text>
             {I18n.t('Please try another search term, filter, or search with fewer characters')}
           </Text>
-        </Flex.Item>
+        </FlexItem>
       </Flex>
     )
   }
