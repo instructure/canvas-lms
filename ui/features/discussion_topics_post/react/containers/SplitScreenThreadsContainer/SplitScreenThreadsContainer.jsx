@@ -335,6 +335,7 @@ const SplitScreenThreadContainer = props => {
                     isTopic={false}
                     postUtilities={
                       <ThreadActions
+                        authorName={getDisplayName(props.discussionEntry)}
                         id={props.discussionEntry.id}
                         isUnread={!props.discussionEntry.entryParticipant?.read}
                         onToggleUnread={() => props.onToggleUnread(props.discussionEntry)}

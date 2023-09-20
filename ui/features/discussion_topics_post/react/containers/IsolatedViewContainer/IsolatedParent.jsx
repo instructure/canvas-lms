@@ -133,6 +133,7 @@ export const IsolatedParent = props => {
         isReadOnly={!props.RCEOpen}
         isExpanded={false}
         onClick={() => props.setRCEOpen(false)}
+        authorName={getDisplayName(props.discussionEntry)}
       />
     )
   }

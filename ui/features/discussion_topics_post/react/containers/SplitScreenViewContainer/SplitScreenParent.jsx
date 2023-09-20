@@ -133,6 +133,7 @@ export const SplitScreenParent = props => {
         isReadOnly={!props.RCEOpen}
         isExpanded={false}
         onClick={() => props.setRCEOpen(false)}
+        authorName={getDisplayName(props.discussionEntry)}
       />
     )
   }
@@ -199,6 +200,7 @@ export const SplitScreenParent = props => {
                     threadParent={true}
                     postUtilities={
                       <ThreadActions
+                        authorName={getDisplayName(props.discussionEntry)}
                         id={props.discussionEntry.id}
                         isUnread={!props.discussionEntry.entryParticipant?.read}
                         onToggleUnread={props.onToggleUnread}
