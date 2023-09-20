@@ -23,9 +23,8 @@ import classnames from 'classnames'
 import {Tabs} from '@instructure/ui-tabs'
 import {View} from '@instructure/ui-view'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
-import {getK5ThemeVars} from './k5-theme'
 
-const k5ThemeVariables = getK5ThemeVars()
+import k5Theme from './k5-theme'
 
 const I18n = useI18nScope('k5_tabs')
 
@@ -82,7 +81,7 @@ const K5Tabs = ({children, currentTab, onTabChange, tabs, tabsRef, courseContext
     <div
       className="ic-Dashboard-tabs"
       ref={containerRef}
-      style={{backgroundColor: k5ThemeVariables.colors.background.backgroundLightest}}
+      style={{backgroundColor: k5Theme.variables.colors.background.backgroundLightest}}
     >
       <View as="div" borderWidth="none none small none">
         {children(sticky)}

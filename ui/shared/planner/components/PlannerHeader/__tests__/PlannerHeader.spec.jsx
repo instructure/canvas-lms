@@ -17,8 +17,6 @@
  */
 import React from 'react'
 import {shallow, mount} from 'enzyme'
-import {render, screen} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import moment from 'moment-timezone'
 import sinon from 'sinon'
 import {PlannerHeader} from '../index'
@@ -98,6 +96,10 @@ function findEditTray(wrapper) {
   return wrapper.find('Tray').at(0)
 }
 
+function findGradesTray(wrapper) {
+  return wrapper.find('Tray').at(1)
+}
+
 let ariaLive
 
 beforeAll(() => {
@@ -126,16 +128,14 @@ it('does not render the Add To Do option when isObserving', () => {
 
 it('toggles the new item tray', () => {
   const mockCancel = jest.fn()
-  const {getByTestId} = render(
-    <PlannerHeader {...defaultProps()} cancelEditingPlannerItem={mockCancel} />
-  )
-  const button = getByTestId('add-to-do-button')
-  userEvent.click(button)
-  const heading1 = screen.getByRole('heading', {name: /Add To Do/i})
-  expect(heading1).toBeInTheDocument()
-  userEvent.click(button)
-  const heading2 = screen.queryByRole('heading', {name: /Add To Do/i})
-  expect(heading2).not.toBeInTheDocument()
+  const wrapper = mount(<PlannerHeader {...defaultProps()} cancelEditingPlannerItem={mockCancel} />)
+  const button = wrapper.find('ScreenReaderContent [children="Add To Do"]').closest('button')
+
+  button.simulate('click')
+  expect(findEditTray(wrapper).props().open).toEqual(true)
+  expect(mockCancel).not.toHaveBeenCalled()
+  button.simulate('click')
+  expect(findEditTray(wrapper).props().open).toEqual(false)
   expect(mockCancel).toHaveBeenCalled()
 })
 
@@ -167,7 +167,7 @@ describe('when component is mounted', () => {
 it('toggles aria-hidden on the ariaHideElement when opening the opportunities popover', () => {
   const fakeElement = document.createElement('div')
   const wrapper = mount(<PlannerHeader {...defaultProps()} ariaHideElement={fakeElement} />)
-  const button = wrapper.find('Popover').first().find('IconButton').first()
+  const button = wrapper.find('Popover').find('IconButton')
   button.simulate('click')
   expect(fakeElement.getAttribute('aria-hidden')).toBe('true')
   button.simulate('click')
@@ -621,7 +621,7 @@ it('shows all opportunities on badge even when we have over 10 items', () => {
     wrapper.find('Badge').filterWhere(item => {
       return item.prop('count') === props.opportunities.items.length // src undefined
     }).length
-  ).toEqual(3)
+  ).toEqual(1)
 })
 
 it('edits new item in open tray', () => {
@@ -671,18 +671,12 @@ it('opens the tray when it gets an updateTodoItem prop', () => {
 })
 
 it('toggles the grades tray', () => {
-  const {getByTestId} = render(<PlannerHeader {...defaultProps()} />)
-
-  const button = getByTestId('show-my-grades-button')
-  userEvent.click(button)
-
-  const heading1 = screen.getByRole('heading', {name: /My Grades/i})
-  expect(heading1).toBeInTheDocument()
-
-  userEvent.click(button)
-
-  const heading2 = screen.queryByRole('heading', {name: /My Grades/i})
-  expect(heading2).not.toBeInTheDocument()
+  const wrapper = mount(<PlannerHeader {...defaultProps()} />)
+  const button = wrapper.find('button [children="Show My Grades"]').first()
+  button.simulate('click')
+  expect(findGradesTray(wrapper).props().open).toEqual(true)
+  button.simulate('click')
+  expect(findGradesTray(wrapper).props().open).toEqual(false)
 })
 
 it('calls startLoadingGradesSaga when grades are not loaded and the grades tray opens', () => {

@@ -379,7 +379,6 @@ describe "student planner" do
     end
 
     it "adds date and time to a to-do item.", priority: "1" do
-      skip "FOO-3821 cf. https://github.com/instructure/instructure-ui/issues/1276"
       go_to_list_view
       todo_modal_button.click
       modal = todo_sidebar_modal
@@ -389,6 +388,7 @@ describe "student planner" do
       title_input.send_keys("the title")
       time_input.click
       fj("span[role=option]:contains('9:00 AM')").click
+
       todo_save_button.click
       expect(ff(".planner-item").last).to include_text "DUE: 9:00 AM"
     end

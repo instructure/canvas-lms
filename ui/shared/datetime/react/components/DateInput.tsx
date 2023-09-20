@@ -17,37 +17,33 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import React, {useRef, useCallback, useEffect, useState} from 'react'
+import React, {useRef, ReactNode, useCallback, useEffect, useState} from 'react'
 import moment, {Moment} from 'moment-timezone'
 import tz from '@canvas/timezone'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {Calendar} from '@instructure/ui-calendar'
+// @ts-expect-error
 import {DateInput} from '@instructure/ui-date-input'
 import {IconButton} from '@instructure/ui-buttons'
+// @ts-expect-error
 import {IconArrowOpenEndSolid, IconArrowOpenStartSolid} from '@instructure/ui-icons'
-
-import type {ViewProps} from '@instructure/ui-view'
-import type {
-  ClipboardEvent,
-  ReactNode,
-  MouseEvent,
-  ChangeEvent,
-  FocusEvent,
-  KeyboardEvent,
-  SyntheticEvent,
-} from 'react'
-import type {DateInputProps} from '@instructure/ui-date-input'
-
-type Messages = DateInputProps['messages']
-
-// This is a little gross, but as written this component can return either the original
-// SyntheticEvent from the DateInput onBlur handler, -OR- a KeyboardEvent from the
-// DateInput onKeyUp handler. Rather than change this component's behavior, we will just
-// create this union type. It doesn't look like anything that uses this component and is
-// making use of the onBlur callback is paying any attention to the actual event anyway.
-type BlurReturn = SyntheticEvent<Element, Event> | KeyboardEvent<DateInputProps>
+import {
+  DateInputInteraction,
+  DateInputLayout,
+  DateInputDisplay,
+  DateInputSize,
+} from '@instructure/ui-date-input/types'
 
 const I18n = useI18nScope('app_shared_components_canvas_date_time')
+
+// can use INSTUI definition of the message type once
+// https://github.com/instructure/instructure-ui/issues/815 is closed
+// import {FormPropTypes} from '@instructure/ui-form-field'
+// export type CanvasDateInputMessageType = FormPropTypes.message
+export type CanvasDateInputMessageType = {
+  text: string | JSX.Element
+  type: 'error' | 'warning' | 'hint' | 'success' | 'screenreader-only'
+}
 
 export type CanvasDateInputProps = {
   /**
@@ -62,7 +58,7 @@ export type CanvasDateInputProps = {
    * Passed along to `DateInput`, can be used to describe messages and validation for the input. Note that this
    * component may display its own messages as well.
    */
-  messages?: Messages
+  messages?: CanvasDateInputMessageType[]
   /**
    * Specifies the time zone that the `DateInput` picker is operating in. Defaults to either `ENV.TIMEZONE` if present,
    * or the browser's timezone otherwise. It also depends on moment.js's default locale being set (always the case in
@@ -84,15 +80,15 @@ export type CanvasDateInputProps = {
   /**
    * focus and blur event handlers
    */
-  onBlur?: (event: BlurReturn) => void // see comment above the type definition for BlurReturn
-  onFocus?: (event: FocusEvent<DateInputProps>) => void
+  onBlur?: (event: React.FormEvent<HTMLInputElement>) => void
+  onFocus?: (event: React.FormEvent<HTMLInputElement>) => void
   /**
    * Passed along to `DateInput`. Specifies if interaction with the input is enabled, disabled, or read-only. Read-only
    * prevents interactions, but is styled as if it were enabled.
    */
-  interaction: DateInputProps['interaction']
+  interaction?: DateInputInteraction
   locale?: string
-  onRequestValidateDate?: (event: SyntheticEvent<EventTarget>) => boolean
+  onRequestValidateDate?: (event: React.SyntheticEvent<EventTarget>) => boolean
   placement?: any // passed through to `DateInput`, which accepts `any`
   /**
    * Controls whether or not a message continually appears at the bottom of the field showing what date WOULD be
@@ -109,7 +105,7 @@ export type CanvasDateInputProps = {
   /**
    * Passed along to `DateInput`. Controls whether the label is stacked on top of the input or placed next to the input.
    */
-  layout?: DateInputProps['layout']
+  layout?: DateInputLayout
   /**
    * Passed along to `DateInput`. Controls width of the input. Defaults to `null`, which leaves width setting up to
    * `size` prop.
@@ -126,11 +122,11 @@ export type CanvasDateInputProps = {
   /**
    * Specifies the input size. One of: small medium large
    */
-  size?: DateInputProps['size']
+  size?: DateInputSize
   /**
    * Specifies the display property of the container. One of: inline-block block
    */
-  display?: DateInputProps['display']
+  display?: DateInputDisplay
   /**
    * Passed on to `DateInput`. Text to show when input is empty.
    */
@@ -168,9 +164,9 @@ export default function CanvasDateInput({
   onFocus,
   onRequestValidateDate,
   onSelectedDateChange,
-  placeholder = '',
+  placeholder,
   placement = 'bottom center',
-  renderLabel = <span>{I18n.t('Choose a date')}</span>,
+  renderLabel = I18n.t('Choose a date'),
   selectedDate,
   size,
   timezone = ENV?.TIMEZONE || Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -244,7 +240,7 @@ export default function CanvasDateInput({
 
   function renderDays() {
     // This is expensive, so only do it if the calendar is open
-    if (!isShowingCalendar) return undefined
+    if (!isShowingCalendar) return null
 
     const locale = specifiedLocale || ENV?.LOCALE || navigator.language
 
@@ -282,13 +278,15 @@ export default function CanvasDateInput({
     return invalidDateMessage
   }
 
-  function handleChange(_event: ChangeEvent<HTMLInputElement>, {value}: {value: string}) {
+  function handleChange(_event: any, {value}: {value: string}) {
     setInputValue(value)
     // If we have been asked to show the running value, hide the popup
     if (isShowingCalendar && withRunningValue) handleHideCalendar()
     const newDate = tz.parse(value, timezone)
     if (newDate) {
-      const msgs: Messages = withRunningValue ? [{type: 'success', text: formatDate(newDate)}] : []
+      const msgs: CanvasDateInputMessageType[] = withRunningValue
+        ? [{type: 'success', text: formatDate(newDate)}]
+        : []
       setRenderedMoment(moment.tz(newDate, timezone))
       setInternalMessages(msgs)
     } else if (value === '') {
@@ -299,7 +297,7 @@ export default function CanvasDateInput({
     }
   }
 
-  function handleDayClick(_event: MouseEvent<ViewProps>, {date}: {date: string}) {
+  function handleDayClick(_event: any, {date}: {date: string}) {
     const parsedMoment = moment.tz(date, timezone)
     let input = parsedMoment
     if (selectedDate) {
@@ -313,7 +311,7 @@ export default function CanvasDateInput({
     setInputDetails({method: 'pick', value: date})
   }
 
-  function handleBlur(event: BlurReturn) {
+  function handleBlur(event: React.FormEvent<HTMLInputElement>) {
     const inputEmpty = inputValue.trim().length === 0
     const errorsExist = isInError()
     let newDate = null
@@ -341,13 +339,13 @@ export default function CanvasDateInput({
     onBlur?.(event)
   }
 
-  function handleKey(e: KeyboardEvent<DateInputProps>) {
+  function handleKey(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === 'Enter') {
       handleBlur(e)
     }
   }
 
-  function trackPasteEvent(e: ClipboardEvent<DateInputProps>) {
+  function trackPasteEvent(e: any) {
     setInputDetails({
       method: 'paste',
       value: e.clipboardData?.getData('text') || '',
@@ -358,15 +356,14 @@ export default function CanvasDateInput({
     setIsShowingCalendar(false)
   }
 
-  function handleShowCalendar(e: SyntheticEvent) {
+  function handleShowCalendar({nativeEvent: e}: {nativeEvent: KeyboardEvent}) {
     // Do not re-show the calendar if input was typing and we have been asked to
     // show the running value. For some reason DateInput reflects an InputEvent for
     // all typing EXCEPT for spaces, which come in as KeyboardEvents, so we have to
     // deal with both. 🤷🏼‍♂️
-    const ne: unknown = e.nativeEvent
     if (withRunningValue) {
-      if ((ne as InputEvent).constructor.name === 'InputEvent') return
-      if ((ne as KeyboardEvent)?.key === ' ') {
+      if (e.constructor.name === 'InputEvent') return
+      if (e?.key === ' ') {
         setInputValue(v => v + ' ')
         return
       }

@@ -347,7 +347,6 @@ describe "BigBlueButton conferences" do
     end
 
     it "sets start and end date on WebConference when created and edited from the calendar" do
-      skip "FOO-3804 (10/6/2023)"
       get "/calendar"
 
       # Create calendar event with conference

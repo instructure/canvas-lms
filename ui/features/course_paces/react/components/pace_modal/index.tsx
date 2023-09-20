@@ -95,11 +95,12 @@ interface PassedProps {
   readonly onClose: () => void
 }
 
+const {Item: FlexItem} = Flex as any
+
 type ComponentProps = PassedProps & DispatchProps & StoreProps
 
 type ResponsiveComponentProps = ComponentProps & {
   readonly outerResponsiveSize: ResponsiveSizes
-  responsiveSize: ResponsiveSizes
 }
 
 export const PaceModal = ({
@@ -171,12 +172,12 @@ export const PaceModal = ({
     >
       <Modal.Header>
         <Flex>
-          <Flex.Item shouldGrow={true} shouldShrink={true} align="center">
+          <FlexItem shouldGrow={true} shouldShrink={true} align="center">
             <Heading data-testid="course-pace-title" level="h2">
               <TruncateText>{modalTitle()}</TruncateText>
             </Heading>
-          </Flex.Item>
-          <Flex.Item>
+          </FlexItem>
+          <FlexItem>
             <IconButton
               data-testid="course-pace-edit-close-x"
               withBackground={false}
@@ -186,7 +187,7 @@ export const PaceModal = ({
               onClick={handleClose}
               elementRef={e => (closeButtonRef.current = e)}
             />
-          </Flex.Item>
+          </FlexItem>
         </Flex>
       </Modal.Header>
       <Modal.Body padding={props.responsiveSize === 'small' ? 'none small' : 'none large'}>
@@ -249,7 +250,7 @@ export const PaceModal = ({
           contextType={props.coursePace.context_type}
         />
       </Modal.Body>
-      <Modal.Footer themeOverride={{padding: '0'}}>
+      <Modal.Footer theme={{padding: '0'}}>
         <Footer
           handleCancel={handleClose}
           handleDrawerToggle={() => setTrayOpen(!trayOpen)}

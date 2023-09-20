@@ -33,6 +33,8 @@ import {CamelizedAssignment} from '@canvas/grading/grading'
 
 const I18n = useI18nScope('post_grades_tray')
 
+const {Item: FlexItem} = Flex as any
+
 type Props = {}
 
 type State = {
@@ -138,17 +140,17 @@ export default class AssignmentPostingPolicyTray extends PureComponent<Props, St
       >
         <View as="div" padding="small">
           <Flex as="div" alignItems="start" margin="0 0 medium 0">
-            <Flex.Item>
+            <FlexItem>
               <CloseButton onClick={this.handleDismiss} screenReaderLabel={I18n.t('Close')} />
-            </Flex.Item>
+            </FlexItem>
 
-            <Flex.Item margin="0 0 0 small" shouldShrink={true}>
+            <FlexItem margin="0 0 0 small" shouldShrink={true}>
               <Heading as="h2" level="h3">
                 <TruncateText maxLines={3}>
                   {I18n.t('Grade Posting Policy: %{name}', {name: assignment.name})}
                 </TruncateText>
               </Heading>
-            </Flex.Item>
+            </FlexItem>
           </Flex>
         </View>
 

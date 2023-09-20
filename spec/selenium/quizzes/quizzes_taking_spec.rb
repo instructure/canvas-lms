@@ -31,7 +31,6 @@ describe "quiz taking" do
 
   it "toggles only the essay question that was toggled leaving others on the page alone",
      custom_timeout: 30 do
-    skip "FOO-3812 (10/6/2023)"
     @quiz = quiz_with_essay_questions(false)
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
     expect_new_page_load { f("#take_quiz_link").click }

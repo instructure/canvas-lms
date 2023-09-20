@@ -216,7 +216,7 @@ describe('JobsIndex', () => {
     expect(getByText('4/2/22, 7:02 AM')).toBeInTheDocument()
   })
 
-  it.skip('performs time-zone aware date filtering (flaky)', async () => {
+  it('performs time-zone aware date filtering', async () => {
     const {getByText, getByLabelText} = render(<JobsIndex />)
     fireEvent.click(getByText('Date/Time options', {selector: 'button span'}))
     changeAndBlurInput(getByLabelText('After'), '2022-04-02 09:00')

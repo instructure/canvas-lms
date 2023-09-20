@@ -50,12 +50,12 @@ describe('when configuration method is by JSON', () => {
   })
 
   it('renders the tool configuration JSON in a text area', () => {
-    const textArea = wrapper.find('TextArea').at(0)
+    const textArea = wrapper.find('TextArea')
     expect(textArea.text()).toEqual(expect.stringContaining(newProps().toolConfiguration.url))
   })
 
   it('transitions to configuring by URL when the url option is selected', () => {
-    const select = wrapper.find('SimpleSelect').at(1)
+    const select = wrapper.find('SimpleSelect')
     select.instance().props.onChange({}, {value: 'url'})
     expect(wrapper.instance().props.updateConfigurationMethod).toHaveBeenCalled()
   })
@@ -67,13 +67,13 @@ describe('when configuration method is by URL', () => {
   })
 
   it('renders the tool configuration URL in a text input', () => {
-    const textInput = wrapper.find('TextInput').at(3)
+    const textInput = wrapper.find('TextInput').at(1)
     const expectedString = newProps().toolConfigurationUrl
     expect(textInput.html()).toEqual(expect.stringContaining(expectedString))
   })
 
   it('transitions to configuring by JSON when the json option is selected', () => {
-    const select = wrapper.find('SimpleSelect').at(1)
+    const select = wrapper.find('SimpleSelect')
     select.instance().props.onChange({}, {value: 'json'})
     expect(wrapper.instance().props.updateConfigurationMethod).toHaveBeenCalled()
   })

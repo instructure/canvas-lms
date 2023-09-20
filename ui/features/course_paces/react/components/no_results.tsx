@@ -28,17 +28,19 @@ import SpacePandaUrl from '@canvas/images/SpacePanda.svg'
 
 const I18n = useI18nScope('course_paces_no_results')
 
+const {Item: FlexItem} = Flex as any
+
 const NoResults = () => (
   <Flex direction="column" alignItems="center" justifyItems="center" padding="xx-large medium">
-    <Flex.Item margin="0 0 medium">
+    <FlexItem margin="0 0 medium">
       <Img src={SpacePandaUrl} />
-    </Flex.Item>
-    <Flex.Item>
+    </FlexItem>
+    <FlexItem>
       <Text size="x-large">{I18n.t('No results found')}</Text>
-    </Flex.Item>
-    <Flex.Item>
+    </FlexItem>
+    <FlexItem>
       <Text>{I18n.t('Please try another search term')}</Text>
-    </Flex.Item>
+    </FlexItem>
   </Flex>
 )
 

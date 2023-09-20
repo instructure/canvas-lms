@@ -162,7 +162,7 @@ QUnit.module('SubmissionTray', hooks => {
   }
 
   function radioInputGroupDiv() {
-    return document.querySelector('[data-testid="SubmissionTray__RadioInputGroup"]')
+    return document.querySelector('#SubmissionTray__RadioInputGroup')
   }
 
   function assertElementDisabled($elt, disabled, message) {

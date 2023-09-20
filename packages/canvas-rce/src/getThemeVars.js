@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {getRegistry} from '@instructure/theme-registry'
+import {ThemeRegistry} from '@instructure/ui-themeable'
+// ^^ at InstUI 8, just directly import getRegistry directly from @instructure/theme-registry
 import {merge, cloneDeep} from 'lodash'
 
 // The running theme is the running theme for this page load, and it never
@@ -26,13 +27,13 @@ let memoizedVariables
 function getThemeVars() {
   if (memoizedVariables) return memoizedVariables
 
-  const {defaultThemeKey, overrides, themes} = getRegistry()
+  const {defaultThemeKey, overrides, themes} = ThemeRegistry.getRegistry()
   // Just assume the "canvas" theme if the default key is null. This will
   // never happen in the live app because one way or another a theme gets
   // used, but unit tests don't always do that.
   // Also we have to cloneDeep this because the merge below is about to
   // mutate the whole thing.
-  const variables = cloneDeep(themes[defaultThemeKey ?? 'canvas'])
+  const variables = cloneDeep(themes[defaultThemeKey ?? 'canvas'].variables)
   merge(variables, overrides)
 
   memoizedVariables = {variables, key: defaultThemeKey}

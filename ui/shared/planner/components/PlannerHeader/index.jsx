@@ -419,7 +419,6 @@ export class PlannerHeader extends Component {
           {!this.props.isObserving && (
             <IconButton
               renderIcon={IconPlusLine}
-              data-testid="add-to-do-button"
               screenReaderLabel={I18n.t('Add To Do')}
               withBorder={false}
               withBackground={false}
@@ -431,7 +430,6 @@ export class PlannerHeader extends Component {
             />
           )}
           <IconButton
-            data-testid="show-my-grades-button"
             renderIcon={IconGradebookLine}
             screenReaderLabel={I18n.t('Show My Grades')}
             withBorder={false}

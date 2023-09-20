@@ -6,6 +6,7 @@ exports[`The CriterionInfo component renders the root component as expected 1`] 
     as="button"
     color="secondary"
     cursor="pointer"
+    elementRef={[Function]}
     margin="0"
     onClick={[Function]}
     renderIcon={<IconQuestionLine />}
@@ -25,6 +26,7 @@ exports[`The CriterionInfo component renders the root component as expected 2`] 
     as="button"
     color="secondary"
     cursor="pointer"
+    elementRef={[Function]}
     margin="0"
     onClick={[Function]}
     renderIcon={<IconQuestionLine />}
@@ -38,9 +40,21 @@ exports[`The CriterionInfo component renders the root component as expected 2`] 
   <Modal
     as="form"
     constrain="window"
+    contentRef={[Function]}
+    defaultFocusElement={null}
     insertAt="bottom"
     label="Criterion Ratings"
+    liveRegion={null}
+    mountNode={null}
+    onClose={[Function]}
     onDismiss={[Function]}
+    onEnter={[Function]}
+    onEntered={[Function]}
+    onEntering={[Function]}
+    onExit={[Function]}
+    onExited={[Function]}
+    onExiting={[Function]}
+    onOpen={[Function]}
     open={true}
     overflow="scroll"
     shouldCloseOnDocumentClick={true}

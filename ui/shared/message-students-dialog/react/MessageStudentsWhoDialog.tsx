@@ -74,6 +74,12 @@ export type SendMessageArgs = {
 
 const I18n = useI18nScope('public_message_students_who')
 
+// Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
+const {Item} = Flex as any
+const {Header: ModalHeader, Body: ModalBody, Footer: ModalFooter} = Modal as any
+const {Option} = SimpleSelect as any
+const {Body: TableBody, Cell, ColHeader, Head: TableHead, Row} = Table as any
+
 export type Student = {
   id: string
   grade?: string | null
@@ -509,7 +515,7 @@ const MessageStudentsWhoDialog = ({
         shouldCloseOnDocumentClick={false}
         size="large"
       >
-        <Modal.Header>
+        <ModalHeader>
           <CloseButton
             placement="end"
             offset="small"
@@ -517,29 +523,29 @@ const MessageStudentsWhoDialog = ({
             screenReaderLabel={I18n.t('Close')}
           />
           <Heading>{I18n.t('Compose Message')}</Heading>
-        </Modal.Header>
+        </ModalHeader>
 
-        <Modal.Body>
+        <ModalBody>
           <Flex alignItems="end">
-            <Flex.Item>
+            <Item>
               <SimpleSelect
                 renderLabel={I18n.t('For students who…')}
                 onChange={handleCriterionSelected}
                 value={selectedCriterion.value}
               >
                 {availableCriteria.map(criterion => (
-                  <SimpleSelect.Option
+                  <Option
                     id={`criteria_${criterion.value}`}
                     key={criterion.value}
                     value={criterion.value}
                   >
                     {criterion.title}
-                  </SimpleSelect.Option>
+                  </Option>
                 ))}
               </SimpleSelect>
-            </Flex.Item>
+            </Item>
             {selectedCriterion.requiresCutoff && (
-              <Flex.Item margin="0 0 0 small">
+              <Item margin="0 0 0 small">
                 <NumberInput
                   value={cutoff}
                   onChange={(_e, value) => {
@@ -555,15 +561,15 @@ const MessageStudentsWhoDialog = ({
                   }
                   width="5em"
                 />
-              </Flex.Item>
+              </Item>
             )}
           </Flex>
           <br />
           <Flex>
-            <Flex.Item>
+            <Item>
               <Text weight="bold">{I18n.t('Send Message To:')}</Text>
-            </Flex.Item>
-            <Flex.Item margin="0 0 0 medium">
+            </Item>
+            <Item margin="0 0 0 medium">
               <Checkbox
                 indeterminate={isIndeterminateStudentsCheckbox}
                 disabled={isDisabledStudentsCheckbox}
@@ -576,8 +582,8 @@ const MessageStudentsWhoDialog = ({
                   </Text>
                 }
               />
-            </Flex.Item>
-            <Flex.Item margin="0 0 0 medium">
+            </Item>
+            <Item margin="0 0 0 medium">
               <Checkbox
                 indeterminate={isIndeterminateObserversCheckbox}
                 disabled={isDisabledObserversCheckbox}
@@ -591,8 +597,8 @@ const MessageStudentsWhoDialog = ({
                   </Text>
                 }
               />
-            </Flex.Item>
-            <Flex.Item as="div" shouldGrow={true} textAlign="end">
+            </Item>
+            <Item as="div" shouldGrow={true} textAlign="end">
               <Link
                 onClick={() => setShowTable(!showTable)}
                 renderIcon={showTable ? <IconArrowOpenUpLine /> : <IconArrowOpenDownLine />}
@@ -601,34 +607,34 @@ const MessageStudentsWhoDialog = ({
               >
                 {showTable ? I18n.t('Hide all recipients') : I18n.t('Show all recipients')}
               </Link>
-            </Flex.Item>
+            </Item>
           </Flex>
           {showTable && (
             <Table caption={I18n.t('List of students and observers')}>
-              <Table.Head>
-                <Table.Row>
-                  <Table.ColHeader id="students">{I18n.t('Students')}</Table.ColHeader>
-                  <Table.ColHeader id="observers">{I18n.t('Observers')}</Table.ColHeader>
-                </Table.Row>
-              </Table.Head>
-              <Table.Body>
+              <TableHead>
+                <Row>
+                  <ColHeader id="students">{I18n.t('Students')}</ColHeader>
+                  <ColHeader id="observers">{I18n.t('Observers')}</ColHeader>
+                </Row>
+              </TableHead>
+              <TableBody>
                 {filteredStudents.map(student => (
-                  <Table.Row key={student.id}>
-                    <Table.Cell>
+                  <Row key={student.id}>
+                    <Cell>
                       <Pill
                         studentId={student.id}
                         text={student.name}
                         selected={selectedStudents.includes(student.id)}
                         onClick={toggleStudentSelection}
                       />
-                    </Table.Cell>
-                    <Table.Cell>
+                    </Cell>
+                    <Cell>
                       <Flex direction="row" margin="0 0 0 small" wrap="wrap">
                         {_.sortBy(
                           observersByStudentID[student.id] || [],
                           observer => observer.sortableName
                         ).map(observer => (
-                          <Flex.Item key={observer._id}>
+                          <Item key={observer._id}>
                             <Pill
                               studentId={student.id}
                               observerId={observer._id}
@@ -636,13 +642,13 @@ const MessageStudentsWhoDialog = ({
                               selected={selectedObservers[student.id]?.includes(observer._id)}
                               onClick={toggleObserverSelection}
                             />
-                          </Flex.Item>
+                          </Item>
                         ))}
                       </Flex>
-                    </Table.Cell>
-                  </Table.Row>
+                    </Cell>
+                  </Row>
                 ))}
-              </Table.Body>
+              </TableBody>
             </Table>
           )}
 
@@ -669,7 +675,7 @@ const MessageStudentsWhoDialog = ({
 
           <Flex alignItems="start">
             {mediaUploadFile && mediaPreviewURL && (
-              <Flex.Item>
+              <Item>
                 <MediaAttachment
                   file={{
                     mediaID: mediaUploadFile.media_id,
@@ -680,22 +686,22 @@ const MessageStudentsWhoDialog = ({
                   }}
                   onRemoveMediaComment={onRemoveMediaComment}
                 />
-              </Flex.Item>
+              </Item>
             )}
 
-            <Flex.Item shouldShrink={true}>
+            <Item shouldShrink={true}>
               <AttachmentDisplay
                 attachments={[...attachments, ...pendingUploads]}
                 onDeleteItem={onDeleteAttachment}
                 onReplaceItem={onReplaceAttachment}
               />
-            </Flex.Item>
+            </Item>
           </Flex>
-        </Modal.Body>
+        </ModalBody>
 
-        <Modal.Footer>
+        <ModalFooter>
           <Flex justifyItems="space-between" width="100%">
-            <Flex.Item>
+            <Item>
               <FileAttachmentUpload onAddItem={onAddAttachment} />
 
               <Tooltip renderTip={I18n.t('Record an audio or video comment')} placement="top">
@@ -709,16 +715,16 @@ const MessageStudentsWhoDialog = ({
                   <IconAttachMediaLine />
                 </IconButton>
               </Tooltip>
-            </Flex.Item>
+            </Item>
 
-            <Flex.Item>
+            <Item>
               <Flex>
-                <Flex.Item>
+                <Item>
                   <Button focusColor="info" color="primary-inverse" onClick={close}>
                     {I18n.t('Cancel')}
                   </Button>
-                </Flex.Item>
-                <Flex.Item margin="0 0 0 x-small">
+                </Item>
+                <Item margin="0 0 0 x-small">
                   <Button
                     data-testid="send-message-button"
                     interaction={isFormDataValid ? 'enabled' : 'disabled'}
@@ -727,11 +733,11 @@ const MessageStudentsWhoDialog = ({
                   >
                     {I18n.t('Send')}
                   </Button>
-                </Flex.Item>
+                </Item>
               </Flex>
-            </Flex.Item>
+            </Item>
           </Flex>
-        </Modal.Footer>
+        </ModalFooter>
       </Modal>
       <AttachmentUploadSpinner
         sendMessage={onSend}

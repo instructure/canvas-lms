@@ -21,6 +21,6 @@ require_relative "../../common"
 module EditExistingUserModalPage
   # ---------------------- Controls ----------------------
   def edit_full_name_input
-    f('input[data-testid="Full Name"]')
+    fj('label:contains("Full Name") input')
   end
 end

@@ -46,6 +46,9 @@ import type {
 
 const I18n = useI18nScope('gradebook')
 
+const {Item: FlexItem} = Flex as any
+const {Panel: TabsPanel} = Tabs as any
+
 function isLatePolicySaveable({latePolicy: {changes, validationErrors}}): boolean {
   return !_.isEmpty(changes) && _.isEmpty(validationErrors)
 }
@@ -374,28 +377,28 @@ export default class GradebookSettingsModal extends React.Component<
         size="medium"
       >
         <Flex direction="column" height="100vh">
-          <Flex.Item as="header" padding="medium">
+          <FlexItem as="header" padding="medium">
             <Flex direction="row">
-              <Flex.Item shouldGrow={true} shouldShrink={true}>
+              <FlexItem shouldGrow={true} shouldShrink={true}>
                 <Heading level="h3">{I18n.t('Gradebook Settings')}</Heading>
-              </Flex.Item>
+              </FlexItem>
 
-              <Flex.Item>
+              <FlexItem>
                 <CloseButton
                   placement="static"
                   onClick={this.close}
                   screenReaderLabel={I18n.t('Close')}
                 />
-              </Flex.Item>
+              </FlexItem>
             </Flex>
-          </Flex.Item>
-          <Flex.Item shouldGrow={true} shouldShrink={true} overflowX="hidden">
+          </FlexItem>
+          <FlexItem shouldGrow={true} shouldShrink={true} overflowX="hidden">
             <Tabs
               onRequestTabChange={(_ev, {id}) => {
                 this.setState({selectedTab: id})
               }}
             >
-              <Tabs.Panel
+              <TabsPanel
                 renderTitle={I18n.t('Late Policies')}
                 id="tab-panel-late"
                 isSelected={tab === 'tab-panel-late'}
@@ -407,10 +410,10 @@ export default class GradebookSettingsModal extends React.Component<
                   showAlert={this.props.gradedLateSubmissionsExist}
                   gradebookIsEditable={this.props.gradebookIsEditable}
                 />
-              </Tabs.Panel>
+              </TabsPanel>
 
               {this.props.postPolicies != null && (
-                <Tabs.Panel
+                <TabsPanel
                   renderTitle={I18n.t('Grade Posting Policy')}
                   id="tab-panel-post"
                   isSelected={tab === 'tab-panel-post'}
@@ -421,11 +424,11 @@ export default class GradebookSettingsModal extends React.Component<
                     settings={this.state.coursePostPolicy}
                     gradebookIsEditable={this.props.gradebookIsEditable}
                   />
-                </Tabs.Panel>
+                </TabsPanel>
               )}
 
               {includeAdvancedTab && (
-                <Tabs.Panel
+                <TabsPanel
                   renderTitle={I18n.t('Advanced')}
                   id="tab-panel-advanced"
                   isSelected={tab === 'tab-panel-advanced'}
@@ -434,11 +437,11 @@ export default class GradebookSettingsModal extends React.Component<
                     courseSettings={this.state.courseSettings}
                     onCourseSettingsChange={this.handleCourseSettingsChange}
                   />
-                </Tabs.Panel>
+                </TabsPanel>
               )}
 
               {this.props.loadCurrentViewOptions && this.state.viewOptions && (
-                <Tabs.Panel
+                <TabsPanel
                   renderTitle={I18n.t('View Options')}
                   id="tab-panel-view-options"
                   isSelected={tab === 'tab-panel-view-options'}
@@ -508,16 +511,11 @@ export default class GradebookSettingsModal extends React.Component<
                       },
                     }}
                   />
-                </Tabs.Panel>
+                </TabsPanel>
               )}
             </Tabs>
-          </Flex.Item>
-          <Flex.Item
-            id="gradebook-settings-modal-footer"
-            align="end"
-            as="footer"
-            overflowY="hidden"
-          >
+          </FlexItem>
+          <FlexItem id="gradebook-settings-modal-footer" align="end" as="footer" overflowY="hidden">
             <Button id="gradebook-settings-cancel-button" onClick={this.close} margin="0 small">
               {I18n.t('Cancel')}
             </Button>
@@ -530,7 +528,7 @@ export default class GradebookSettingsModal extends React.Component<
             >
               {I18n.t('Apply Settings')}
             </Button>
-          </Flex.Item>
+          </FlexItem>
         </Flex>
       </Tray>
     )

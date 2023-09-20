@@ -225,7 +225,7 @@ export class Grouping extends Component {
             animatableIndex={animatableIndex}
             animatableItemIds={completedItemIds}
             notificationBadge={notificationBadge}
-            themeOverride={{
+            theme={{
               labelColor: this.props.simplifiedControls ? undefined : this.props.color,
             }}
             date={theDay}

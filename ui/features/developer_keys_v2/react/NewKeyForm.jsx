@@ -27,102 +27,46 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Grid} from '@instructure/ui-grid'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import type {FormMessageChild, FormMessageType} from '@instructure/ui-form-field/src/FormPropTypes'
 
 import React from 'react'
+import PropTypes from 'prop-types'
 
 import Scopes from './Scopes'
 import ToolConfigurationForm from './ToolConfigurationForm'
 
-export type DeveloperKey = {
-  notes: string | null
-  icon_url: string | null
-  vendor_code: string | null
-  redirect_uri: string | null
-  redirect_uris?: string
-  public_jwk_url?: string
-  public_jwk?: string
-  email: string | null
-  name: string | null
-  require_scopes: boolean | null
-  tool_configuration: {
-    oidc_initiation_url: string
-  } | null
-  test_cluster_only?: boolean
-  client_credentials_audience: string | null
-}
-
-type Props = {
-  dispatch: Function
-  listDeveloperKeyScopesSet: Function
-  isLtiKey: boolean
-  isRedirectUriRequired: boolean
-  developerKey: DeveloperKey
-  availableScopes: {
-    [key: string]: Array<{
-      resource: string
-      scope: string
-    }>
-  }
-  availableScopesPending: boolean
-  editing: boolean
-  tool_configuration: {
-    oidc_initiation_url?: string
-  }
-  showRequiredMessages: boolean
-  showMissingRedirectUrisMessage: boolean
-  updateToolConfiguration: (update: any, field?: string | null, sync?: boolean) => void
-  updateToolConfigurationUrl: Function
-  updateDeveloperKey: Function
-  toolConfigurationUrl: string | null
-  configurationMethod: string
-  updateConfigurationMethod: Function
-  hasRedirectUris: boolean
-  syncRedirectUris: Function
-}
-
 const I18n = useI18nScope('react_developer_keys')
 
-const validationMessage: {
-  text: FormMessageChild
-  type: FormMessageType
-}[] = [{text: I18n.t('Must have at least one redirect_uri defined.'), type: 'error'}]
+const validationMessage = [
+  {text: I18n.t('Must have at least one redirect_uri defined.'), type: 'error'},
+]
 
 const clientCredentialsAudienceTooltip = I18n.t(
   'Will credentials issued by this key be presented to Canvas or to a peer service (e.g. Canvas Data)?'
 )
 
-export default class NewKeyForm extends React.Component<Props> {
-  keyFormRef: HTMLFormElement | null = null
-
-  toolConfigRef: ToolConfigurationForm | null = null
-
+export default class NewKeyForm extends React.Component {
   state = {
     invalidJson: null,
     parsedJson: null,
   }
 
-  static defaultProps = {
-    developerKey: {},
-  }
-
   generateToolConfiguration = () => {
-    return this.toolConfigRef?.generateToolConfiguration()
+    return this.toolConfigRef.generateToolConfiguration()
   }
 
   valid = () => {
-    return this.toolConfigRef?.valid()
+    return this.toolConfigRef.valid()
   }
 
   get keyForm() {
     return this.keyFormRef
   }
 
-  setKeyFormRef = (node: HTMLFormElement | null) => {
+  setKeyFormRef = node => {
     this.keyFormRef = node
   }
 
-  setToolConfigRef = (node: ToolConfigurationForm) => {
+  setToolConfigRef = node => {
     this.toolConfigRef = node
   }
 
@@ -134,7 +78,7 @@ export default class NewKeyForm extends React.Component<Props> {
     this.props.updateDeveloperKey('test_cluster_only', !this.props.developerKey.test_cluster_only)
   }
 
-  updatePastedJson = (value: string) => {
+  updatePastedJson = value => {
     try {
       const settings = JSON.parse(value)
       this.setState({invalidJson: null, parsedJson: settings})
@@ -151,7 +95,7 @@ export default class NewKeyForm extends React.Component<Props> {
     }
   }
 
-  updateToolConfiguration = (update: any) => {
+  updateToolConfiguration = update => {
     this.props.updateToolConfiguration(update)
   }
 
@@ -187,14 +131,14 @@ export default class NewKeyForm extends React.Component<Props> {
                 <TextInput
                   renderLabel={I18n.t('Key Name:')}
                   name="developer_key[name]"
-                  value={developerKey.name || ''}
+                  value={developerKey.name}
                   onChange={e => updateDeveloperKey('name', e.target.value)}
                   placeholder="Unnamed Tool"
                 />
                 <TextInput
                   renderLabel={I18n.t('Owner Email:')}
                   name="developer_key[email]"
-                  value={developerKey.email || ''}
+                  value={developerKey.email}
                   onChange={e => updateDeveloperKey('email', e.target.value)}
                 />
                 <TextArea
@@ -219,19 +163,19 @@ export default class NewKeyForm extends React.Component<Props> {
                     <TextInput
                       renderLabel={I18n.t('Redirect URI (Legacy):')}
                       name="developer_key[redirect_uri]"
-                      value={developerKey.redirect_uri || ''}
+                      value={developerKey.redirect_uri}
                       onChange={e => updateDeveloperKey('redirect_uri', e.target.value)}
                     />
                     <TextInput
                       renderLabel={I18n.t('Vendor Code (LTI 2):')}
                       name="developer_key[vendor_code]"
-                      value={developerKey.vendor_code || ''}
+                      value={developerKey.vendor_code}
                       onChange={e => updateDeveloperKey('vendor_code', e.target.value)}
                     />
                     <TextInput
                       renderLabel={I18n.t('Icon URL:')}
                       name="developer_key[icon_url]"
-                      value={developerKey.icon_url || ''}
+                      value={developerKey.icon_url}
                       onChange={e => updateDeveloperKey('icon_url', e.target.value)}
                     />
                   </div>
@@ -239,16 +183,15 @@ export default class NewKeyForm extends React.Component<Props> {
                 <TextArea
                   label={I18n.t('Notes:')}
                   name="developer_key[notes]"
-                  value={developerKey.notes || ''}
+                  value={developerKey.notes}
                   onChange={e => updateDeveloperKey('notes', e.target.value)}
                   resize="both"
                 />
-                {/* @ts-expect-error */}
                 {ENV.enableTestClusterChecks && !isLtiKey ? (
                   <Checkbox
                     label={I18n.t('Test Cluster Only')}
                     name="developer_key[test_cluster_only]"
-                    checked={Boolean(developerKey.test_cluster_only)}
+                    checked={developerKey.test_cluster_only}
                     onChange={this.handleTestClusterOnlyChange}
                   />
                 ) : null}
@@ -272,7 +215,7 @@ export default class NewKeyForm extends React.Component<Props> {
                       </div>
                     }
                     name="developer_key[client_credentials_audience]"
-                    value={developerKey.client_credentials_audience || undefined}
+                    value={developerKey.client_credentials_audience}
                     onChange={(_, {value}) =>
                       updateDeveloperKey('client_credentials_audience', value)
                     }
@@ -298,9 +241,7 @@ export default class NewKeyForm extends React.Component<Props> {
                   toolConfigurationUrl={toolConfigurationUrl}
                   configurationMethod={this.props.configurationMethod}
                   updateConfigurationMethod={this.props.updateConfigurationMethod}
-                  // @ts-expect-error
                   validScopes={ENV.validLtiScopes}
-                  // @ts-expect-error
                   validPlacements={ENV.validLtiPlacements}
                   invalidJson={this.state.invalidJson}
                   parsedJson={this.state.parsedJson}
@@ -324,4 +265,53 @@ export default class NewKeyForm extends React.Component<Props> {
       </form>
     )
   }
+}
+
+NewKeyForm.defaultProps = {
+  developerKey: {},
+}
+
+NewKeyForm.propTypes = {
+  dispatch: PropTypes.func.isRequired,
+  listDeveloperKeyScopesSet: PropTypes.func.isRequired,
+  isLtiKey: PropTypes.bool.isRequired,
+  isRedirectUriRequired: PropTypes.bool.isRequired,
+  developerKey: PropTypes.shape({
+    notes: PropTypes.string,
+    icon_url: PropTypes.string,
+    vendor_code: PropTypes.string,
+    redirect_uri: PropTypes.string,
+    redirect_uris: PropTypes.string,
+    email: PropTypes.string,
+    name: PropTypes.string,
+    require_scopes: PropTypes.bool,
+    tool_configuration: PropTypes.shape({
+      oidc_initiation_url: PropTypes.string,
+    }),
+    test_cluster_only: PropTypes.bool,
+    client_credentials_audience: PropTypes.string,
+  }),
+  availableScopes: PropTypes.objectOf(
+    PropTypes.arrayOf(
+      PropTypes.shape({
+        resource: PropTypes.string,
+        scope: PropTypes.string,
+      })
+    )
+  ).isRequired,
+  availableScopesPending: PropTypes.bool.isRequired,
+  editing: PropTypes.bool.isRequired,
+  tool_configuration: PropTypes.shape({
+    oidc_initiation_url: PropTypes.string,
+  }),
+  showRequiredMessages: PropTypes.bool,
+  showMissingRedirectUrisMessage: PropTypes.bool,
+  updateToolConfiguration: PropTypes.func,
+  updateToolConfigurationUrl: PropTypes.func,
+  updateDeveloperKey: PropTypes.func.isRequired,
+  toolConfigurationUrl: PropTypes.string,
+  configurationMethod: PropTypes.string.isRequired,
+  updateConfigurationMethod: PropTypes.func.isRequired,
+  hasRedirectUris: PropTypes.bool.isRequired,
+  syncRedirectUris: PropTypes.func.isRequired,
 }

@@ -36,7 +36,7 @@ export default function AssignmentGroupModuleNav({assignment}) {
             data-testid="module-link"
             href={env.moduleUrl}
             isWithinText={false}
-            themeOverride={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
+            theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
           >
             {module.name}
           </Link>
@@ -48,7 +48,7 @@ export default function AssignmentGroupModuleNav({assignment}) {
             data-testid="more-module-link"
             href={env.moduleUrl}
             isWithinText={false}
-            themeOverride={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
+            theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
           >
             {I18n.t('More Modules')}
           </Link>
@@ -61,7 +61,7 @@ export default function AssignmentGroupModuleNav({assignment}) {
             data-testid="assignmentgroup-link"
             href={env.assignmentUrl}
             isWithinText={false}
-            themeOverride={{mediumPadmediumPaddingHorizontalding: '0', mediumHeight: 'normal'}}
+            theme={{mediumPadmediumPaddingHorizontalding: '0', mediumHeight: 'normal'}}
           >
             {assignmentGroup.name}
           </Link>

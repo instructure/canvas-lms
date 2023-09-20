@@ -34,7 +34,7 @@ import {
   IconStudentViewLine,
   IconXLine,
 } from '@instructure/ui-icons'
-import {InstUISettingsProvider} from '@instructure/emotion'
+import {ApplyTheme} from '@instructure/ui-themeable'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
@@ -57,7 +57,7 @@ import {
   TAB_IDS,
   MOBILE_NAV_BREAKPOINT_PX,
 } from '@canvas/k5/react/utils'
-import {getK5ThemeOverrides} from '@canvas/k5/react/k5-theme'
+import {theme} from '@canvas/k5/react/k5-theme'
 import EmptyCourse from './EmptyCourse'
 import OverviewPage from './OverviewPage'
 import {GradesPage} from './GradesPage'
@@ -739,12 +739,10 @@ K5Course.propTypes = {
 
 const WrappedK5Course = connect(mapStateToProps)(K5Course)
 
-const k5Theme = getK5ThemeOverrides()
-
 export default props => (
-  <InstUISettingsProvider theme={{componentOverrides: k5Theme}}>
+  <ApplyTheme theme={theme}>
     <Provider store={store}>
       <WrappedK5Course {...props} />
     </Provider>
-  </InstUISettingsProvider>
+  </ApplyTheme>
 )

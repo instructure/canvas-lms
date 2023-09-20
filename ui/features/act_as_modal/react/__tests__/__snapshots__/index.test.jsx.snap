@@ -115,6 +115,7 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
                 margin="medium 0 x-small 0"
                 name="foo"
                 onImageLoaded={[Function]}
+                renderIcon={null}
                 shape="circle"
                 size="small"
                 src="testImageUrl"

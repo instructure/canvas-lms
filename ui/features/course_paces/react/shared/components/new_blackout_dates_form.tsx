@@ -34,6 +34,8 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('course_paces_app')
 
+const {Item: FlexItem} = Flex as any
+
 const dateTimeFormatter = new Intl.DateTimeFormat(ENV.LOCALE, {
   month: 'numeric',
   day: 'numeric',
@@ -195,7 +197,7 @@ class NewBlackoutDatesForm extends React.Component<PassedProps, LocalState> {
           return (
             <div data-testid="new_blackout_dates_form">
               <Flex alignItems="start" justifyItems="start" wrap="wrap">
-                <Flex.Item margin="0 small small 0">
+                <FlexItem margin="0 small small 0">
                   <TextInput
                     inputRef={el => (this.titleInputRef = el)}
                     renderLabel="Event Title"
@@ -206,10 +208,10 @@ class NewBlackoutDatesForm extends React.Component<PassedProps, LocalState> {
                     onBlur={this.validateTitle}
                     messages={this.state.titleMessages}
                   />
-                </Flex.Item>
-                <Flex.Item>
+                </FlexItem>
+                <FlexItem>
                   <Flex alignItems="start" justifyItems="space-between" wrap="wrap">
-                    <Flex.Item data-testid="blackout-start-date" margin="0 small small 0">
+                    <FlexItem data-testid="blackout-start-date" margin="0 small small 0">
                       <CanvasDateInput
                         key={`start-${this.state.key}`}
                         renderLabel={I18n.t('Start Date')}
@@ -222,8 +224,8 @@ class NewBlackoutDatesForm extends React.Component<PassedProps, LocalState> {
                         messages={this.state.startMessages}
                         withRunningValue={true}
                       />
-                    </Flex.Item>
-                    <Flex.Item data-testid="blackout-end-date" margin="0 small small 0">
+                    </FlexItem>
+                    <FlexItem data-testid="blackout-end-date" margin="0 small small 0">
                       <CanvasDateInput
                         key={`end-${this.state.key}`}
                         renderLabel={I18n.t('End Date')}
@@ -235,10 +237,10 @@ class NewBlackoutDatesForm extends React.Component<PassedProps, LocalState> {
                         messages={this.state.endMessages}
                         withRunningValue={true}
                       />
-                    </Flex.Item>
+                    </FlexItem>
                   </Flex>
-                </Flex.Item>
-                <Flex.Item margin="0 0 small">
+                </FlexItem>
+                <FlexItem margin="0 0 small">
                   <div style={{marginTop: addBtnMarginTop}}>
                     <Tooltip
                       renderTip={this.disabledAdd() && NewBlackoutDatesForm.missingInput}
@@ -255,7 +257,7 @@ class NewBlackoutDatesForm extends React.Component<PassedProps, LocalState> {
                       </Button>
                     </Tooltip>
                   </div>
-                </Flex.Item>
+                </FlexItem>
               </Flex>
             </div>
           )

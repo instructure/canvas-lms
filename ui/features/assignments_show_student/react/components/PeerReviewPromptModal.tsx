@@ -26,12 +26,6 @@ import React from 'react'
 // @ts-ignore
 import successSVG from '../../images/Success.svg'
 
-import type {ViewProps} from '@instructure/ui-view'
-
-type Spacing = ViewProps['margin']
-type BorderWidth = ViewProps['borderWidth']
-type BorderColor = ViewProps['borderColor']
-
 const I18n = useI18nScope('assignments_2')
 
 export type PeerReviewSubheader = {
@@ -57,7 +51,7 @@ type SubHeaderMap = {
 
 export type PeerReviewPromptModalProps = {
   headerText: string[]
-  headerMargin?: Spacing
+  headerMargin?: string
   subHeaderText?: PeerReviewSubheader[]
   showSubHeaderBorder?: boolean
   peerReviewButtonText: string | null
@@ -80,11 +74,11 @@ export default ({
 }: PeerReviewPromptModalProps) => {
   const subHeaderBorder = showSubHeaderBorder
     ? {
-        borderWidth: 'small none none' as BorderWidth,
-        borderColor: 'primary' as BorderColor,
-        padding: 'small 0 0' as Spacing,
+        borderWidth: 'small none none',
+        borderColor: 'primary',
+        padding: 'small 0 0',
       }
-    : {borderWidth: undefined, borderColor: undefined, padding: undefined}
+    : {}
   const headerTextMap: HeaderMap[] = headerText.map((header, idx) => ({id: idx, header}))
   const subHeaderTextMap: SubHeaderMap[] | undefined = subHeaderText?.map((subHeader, idx) => {
     return {
@@ -102,13 +96,9 @@ export default ({
       data-testid="peer-review-prompt-modal"
     >
       <Modal.Body>
-        <CloseButton
-          placement="end"
-          offset="medium"
-          color="primary"
-          onClick={onClose}
-          screenReaderLabel={I18n.t('Close')}
-        />
+        <CloseButton placement="end" offset="medium" variant="icon" onClick={onClose}>
+          {I18n.t('Close')}
+        </CloseButton>
         <View as="div">
           <View as="div" margin="small 0" textAlign="center">
             <Text lineHeight="fit" size="x-large">
@@ -157,7 +147,7 @@ export default ({
           <Button
             interaction={peerReviewButtonDisabled ? 'disabled' : 'enabled'}
             onClick={onRedirect}
-            color="primary"
+            variant="primary"
             data-testid="peer-review-next-button"
           >
             {peerReviewButtonText}

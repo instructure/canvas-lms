@@ -26,15 +26,15 @@ module NewUserEditModalPage
   end
 
   def full_name_input
-    f('input[data-testid="Full Name"]', modal_object)
+    fj('label:contains("Full Name") input', modal_object)
   end
 
   def email_input
-    f('input[data-testid="Email"]', modal_object)
+    fj('label:contains("Email") input', modal_object)
   end
 
   def sortable_name_input
-    f('input[data-testid="Sortable Name"]', modal_object)
+    fj('label:contains("Sortable Name") input', modal_object)
   end
 
   def email_about_creation_check

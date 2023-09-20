@@ -52,6 +52,8 @@ import {RemovePaceWarningModal} from './remove_pace_warning_modal'
 
 const I18n = useI18nScope('course_paces_footer')
 
+const {Item: FlexItem} = Flex as any
+
 interface StoreProps {
   readonly autoSaving: boolean
   readonly pacePublishing: boolean
@@ -225,7 +227,7 @@ export const Footer = ({
           contextType={studentPace ? 'Enrollment' : 'Section'}
           paceName={paceName}
         />
-        <Flex.Item>
+        <FlexItem>
           {showRemovePaceButton && (
             <Tooltip
               renderTip={removeDisabled ? removeTip : ''}
@@ -248,8 +250,8 @@ export const Footer = ({
               )}
             </Tooltip>
           )}
-        </Flex.Item>
-        <Flex.Item>
+        </FlexItem>
+        <FlexItem>
           {!showCondensedView && renderChangesIndicator()}
           <Tooltip
             renderTip={cancelDisabled ? cancelTip : ''}
@@ -277,7 +279,7 @@ export const Footer = ({
               {publishLabel}
             </Button>
           </Tooltip>
-        </Flex.Item>
+        </FlexItem>
       </Flex>
     </View>
   )

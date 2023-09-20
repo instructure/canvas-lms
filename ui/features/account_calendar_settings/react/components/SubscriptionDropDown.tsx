@@ -19,7 +19,7 @@
 import React, {useState, useEffect} from 'react'
 
 import {Text} from '@instructure/ui-text'
-import {Select, SelectProps} from '@instructure/ui-select'
+import {Select} from '@instructure/ui-select'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -66,7 +66,7 @@ const SubscriptionDropDown: React.FC<ComponentProps> = ({
   accountName,
 }) => {
   const [isShowingOptions, setIsShowingOptions] = useState(false)
-  const [highlightedOptionId, setHighlightedOptionId] = useState<string | undefined>(undefined)
+  const [highlightedOptionId, setHighlightedOptionId] = useState<string | null>(null)
   const [selectedOption, setSelectedOption] = useState<SubscriptionOption>(SUBSCRIPTION_OPTIONS[1])
 
   useEffect(() => {
@@ -76,14 +76,14 @@ const SubscriptionDropDown: React.FC<ComponentProps> = ({
     setSelectedOption(newSelectedOption)
   }, [autoSubscription])
 
-  const handleSelectOption: SelectProps['onRequestSelectOption'] = (e, {id}) => {
+  const handleSelectOption = (e: any, {id}: {id: string}) => {
     const newSelectedOption =
       SUBSCRIPTION_OPTIONS.find(option => option.id === id) ?? SUBSCRIPTION_OPTIONS[1]
     setSelectedOption(newSelectedOption)
     onChange(accountId, newSelectedOption.value)
     setIsShowingOptions(false)
   }
-  const handleHighlightOption: SelectProps['onRequestHighlightOption'] = (e, {id}) => {
+  const handleHighlightOption = (e: any, {id}: {id: string}) => {
     setHighlightedOptionId(id)
   }
 

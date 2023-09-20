@@ -24,7 +24,7 @@ import {Story, Meta} from '@storybook/react'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import CanvasDateInput, {CanvasDateInputProps} from './DateInput'
-import type {FormMessage} from '@instructure/ui-form-field'
+import type {CanvasDateInputMessageType} from './DateInput'
 
 export default {
   title: 'Examples/Shared/Date and Time Helpers/CanvasDateInput',
@@ -68,7 +68,7 @@ const Template: Story<typeof CanvasDateInput> = (args: UnknownSubset<CanvasDateI
     args.selectedDate ? new Date(args.selectedDate) : null
   )
 
-  const [messages] = useState<FormMessage[]>([
+  const [messages] = useState<CanvasDateInputMessageType[]>([
     {type: 'hint', text: "Default date will be today's date"},
   ])
   const [dateFormatter, setDateFormatter] = useState<(date: Date) => string>(() =>

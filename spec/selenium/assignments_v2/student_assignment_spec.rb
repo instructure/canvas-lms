@@ -48,7 +48,6 @@ describe "as a student" do
 
       context "not submitted" do
         it "does not show points possible for points grading_type" do
-          skip "FOO-3525 (10/6/2023)"
           assignment = @course.assignments.create!(
             name: "assignment",
             due_at: 5.days.ago,

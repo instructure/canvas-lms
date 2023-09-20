@@ -37,6 +37,8 @@ import {GradeStatus} from '@canvas/grading/accountGradingStatus'
 
 const I18n = useI18nScope('gradebook')
 
+const {Item: FlexItem} = Flex as any
+
 export type FilterNavProps = {
   modules: Module[]
   assignmentGroups: AssignmentGroup[]
@@ -144,9 +146,9 @@ export default function FilterNav({
       >
         {announcement}
       </Alert>
-      <Flex.Item>
+      <FlexItem>
         <Flex>
-          <Flex.Item padding="0 small 0 0">
+          <FlexItem padding="0 small 0 0">
             <FilterDropdown
               onOpenTray={() => setIsTrayOpen(true)}
               dataMap={dataMap}
@@ -154,14 +156,14 @@ export default function FilterNav({
               changeAnnouncement={changeAnnouncement}
               applyFiltersButtonRef={applyFiltersButtonRef}
             />
-          </Flex.Item>
-          <Flex.Item data-testid="filter-tags">
+          </FlexItem>
+          <FlexItem data-testid="filter-tags">
             {activeFilterComponents.length > 0 && activeFilterComponents}
-          </Flex.Item>
+          </FlexItem>
         </Flex>
-      </Flex.Item>
+      </FlexItem>
 
-      <Flex.Item>
+      <FlexItem>
         {activeFilterComponents.length > 0 && (
           <Link
             isWithinText={false}
@@ -173,7 +175,7 @@ export default function FilterNav({
             {I18n.t('Clear All Filters')}
           </Link>
         )}
-      </Flex.Item>
+      </FlexItem>
 
       <FilterTray
         isTrayOpen={isTrayOpen}

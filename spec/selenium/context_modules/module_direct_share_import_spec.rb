@@ -43,7 +43,6 @@ describe "modules" do
   end
 
   it "shares a module" do
-    skip "FOO-3805 (10/6/2023)"
     visit_modules_index_page(@course.id)
     manage_module_button(@module1).click
     module_index_menu_tool_link("Send To...").click
@@ -70,7 +69,6 @@ describe "modules" do
   end
 
   it "shares a module item" do
-    skip "FOO-3805 (10/6/2023)"
     visit_modules_index_page(@course.id)
     manage_module_item_button(@item1).click
     module_index_menu_tool_link("Send To...").click
@@ -97,7 +95,6 @@ describe "modules" do
   end
 
   it "shares a newly created module item" do
-    skip "FOO-3805 (10/6/2023)"
     wiki_page = @course.wiki_pages.create!(title: "New Page Title", body: "Here is the body")
     @module1.add_item({ id: wiki_page.id, type: "wiki_page" })
     visit_modules_index_page(@course.id)

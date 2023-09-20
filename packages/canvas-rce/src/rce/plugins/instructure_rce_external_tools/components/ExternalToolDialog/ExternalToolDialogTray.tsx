@@ -17,27 +17,26 @@
  */
 
 import React from 'react'
-import {Tray} from '@instructure/ui-tray'
+import PropTypes, {ReactNodeLike} from 'prop-types'
+import {Tray, TrayMountNode} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {CloseButton} from '@instructure/ui-buttons'
 import formatMessage from 'format-message'
 
-import type {TrayProps} from '@instructure/ui-tray'
+const FlexItem = Flex.Item as any
 
-interface ExternalToolDialogTrayProps {
-  open: TrayProps['open']
-  label: TrayProps['label']
-  mountNode: TrayProps['mountNode']
-  onOpen?: TrayProps['onOpen']
-  onClose?: TrayProps['onClose']
-  onCloseButton?: () => void
+export function ExternalToolDialogTray(props: {
+  open?: boolean
+  label: string
+  onOpen?: () => void
+  onClose?: () => void
+  onCloseButton: () => void
   name: string
-  children: TrayProps['children']
-}
-
-export function ExternalToolDialogTray(props: ExternalToolDialogTrayProps) {
+  mountNode?: TrayMountNode
+  children: ReactNodeLike
+}) {
   const {label, onCloseButton, name, children, ...extraProps} = props
 
   const padding = '0'
@@ -62,16 +61,16 @@ export function ExternalToolDialogTray(props: ExternalToolDialogTrayProps) {
             section rather than the whole Tray */}
         <div style={{display: 'flex', flexDirection: 'column', width: '100%', height: '100%'}}>
           <Flex as="div" padding="small">
-            <Flex.Item shouldGrow={true}>
+            <FlexItem shouldGrow={true}>
               <Heading>{name}</Heading>
-            </Flex.Item>
-            <Flex.Item>
+            </FlexItem>
+            <FlexItem>
               <CloseButton
                 onClick={onCloseButton}
                 size="small"
                 screenReaderLabel={formatMessage('Close')}
               />
-            </Flex.Item>
+            </FlexItem>
           </Flex>
 
           <div style={{position: 'relative', flex: 1}}>
@@ -83,4 +82,15 @@ export function ExternalToolDialogTray(props: ExternalToolDialogTrayProps) {
       </View>
     </Tray>
   )
+}
+
+ExternalToolDialogTray.propTypes = {
+  open: PropTypes.bool,
+  label: PropTypes.string.isRequired,
+  mountNode: PropTypes.oneOfType([PropTypes.element, PropTypes.func]),
+  onOpen: PropTypes.func,
+  onClose: PropTypes.func,
+  onCloseButton: PropTypes.func,
+  name: PropTypes.string.isRequired,
+  children: PropTypes.node,
 }

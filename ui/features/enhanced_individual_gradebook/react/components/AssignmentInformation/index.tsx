@@ -20,6 +20,7 @@ import React, {useCallback, useMemo, useState} from 'react'
 import _ from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
+// @ts-expect-error
 import {IconWarningLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
 import {Link} from '@instructure/ui-link'

@@ -17,8 +17,6 @@
  */
 import moment from 'moment-timezone'
 import React from 'react'
-import {within, render} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import {shallow, mount} from 'enzyme'
 import {UpdateItemTray_ as UpdateItemTray} from '../index'
 
@@ -93,17 +91,20 @@ it('renders Add To Do header when creating a new to do', () => {
 })
 
 it('shows title inputs', () => {
-  const {getAllByRole} = render(<UpdateItemTray {...defaultProps} />)
-  const input = getAllByRole('textbox')[0]
-  userEvent.type(input, 'New Text')
-  expect(input).toHaveValue('New Text')
+  const wrapper = mount(<UpdateItemTray {...defaultProps} />)
+  // DateTimeInput appears to only render 2 TextInputs, but in reality
+  // renders 6, 3 for Dates and 3 for Time :mindblown:
+  expect(wrapper.find('TextInput')).toHaveLength(8)
+  const input = wrapper.find('TextInput').first()
+  input.find('input').simulate('change', {target: {value: 'New Text'}})
+  expect(input.instance().props.value).toEqual('New Text')
 })
 
 it('shows details inputs', () => {
-  const {getAllByRole} = render(<UpdateItemTray {...defaultProps} />)
-  const input = getAllByRole('textbox')[0]
-  userEvent.type(input, 'New Details')
-  expect(input).toHaveValue('New Details')
+  const wrapper = mount(<UpdateItemTray {...defaultProps} />)
+  const input = wrapper.find('TextArea')
+  input.find('textarea').simulate('change', {target: {value: 'New Details'}})
+  expect(input.instance().props.value).toEqual('New Details')
 })
 
 it('disables the save button when title is empty', () => {
@@ -181,14 +182,12 @@ it('clears the error message when a title is typed in', () => {
 })
 
 // The Date picker does not support error handling yet we are working with instui to get it working
-// TODO: Needs ticket
 it.skip('does not set an initial error message on date', () => {
   const wrapper = shallow(<UpdateItemTray {...defaultProps} />)
   const dateInput = wrapper.find('TextInput').at(1)
   expect(dateInput.props().messages).toEqual([])
 })
 
-// TODO: Needs ticket
 it.skip('sets error message on date field when date is set to blank', () => {
   const wrapper = shallow(<UpdateItemTray {...defaultProps} noteItem={simpleItem()} />)
   wrapper.instance().handleDateChange({target: {value: ''}})
@@ -198,7 +197,6 @@ it.skip('sets error message on date field when date is set to blank', () => {
   expect(messages[0].type).toBe('error')
 })
 
-// TODO: Needs ticket
 it.skip('clears the error message when a date is typed in', () => {
   const wrapper = shallow(<UpdateItemTray {...defaultProps} noteItem={simpleItem()} />)
   wrapper.instance().handleTitleChange({target: {value: ''}})
@@ -292,17 +290,18 @@ it('does render the delete button if an item is specified', () => {
 })
 
 it('renders just an optional option when no courses', () => {
-  const {getByTitle, getByRole} = render(<UpdateItemTray {...defaultProps} />)
-  const option = getByTitle('Optional: Add Course')
-  userEvent.click(option)
-  const listbox = getByRole('listbox', {hidden: true})
-  const {getAllByRole} = within(listbox)
-  const listItems = getAllByRole('option')
-  expect(listItems).toHaveLength(1)
+  const wrapper = mount(<UpdateItemTray {...defaultProps} />)
+  // SimpleSelect doesn't make it easy to test what
+  // options are rendered into the DOM
+  const courseSelect = wrapper.find('SimpleSelect')
+  courseSelect.simulate('click')
+  const optListId = courseSelect.getDOMNode().querySelector('input').getAttribute('aria-owns')
+  const optList = document.getElementById(optListId)
+  expect(optList.querySelectorAll('li')).toHaveLength(1)
 })
 
 it('renders course options plus an optional option when provided with courses', () => {
-  const {getByTitle, getByRole} = render(
+  const wrapper = mount(
     <UpdateItemTray
       {...defaultProps}
       courses={[
@@ -311,12 +310,11 @@ it('renders course options plus an optional option when provided with courses', 
       ]}
     />
   )
-  const option = getByTitle('Optional: Add Course')
-  userEvent.click(option)
-  const listbox = getByRole('listbox', {hidden: true})
-  const {getAllByRole} = within(listbox)
-  const listItems = getAllByRole('option')
-  expect(listItems).toHaveLength(3)
+  const courseSelect = wrapper.find('SimpleSelect')
+  courseSelect.simulate('click')
+  const optListId = courseSelect.getDOMNode().querySelector('input').getAttribute('aria-owns')
+  const optList = document.getElementById(optListId)
+  expect(optList.querySelectorAll('li')).toHaveLength(3)
 })
 
 it('invokes save callback with updated data', () => {

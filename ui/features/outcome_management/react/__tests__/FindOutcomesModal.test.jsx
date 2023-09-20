@@ -77,8 +77,7 @@ const defaultTreeGroupMocks = () =>
     withGroupDetailsRefetch: true,
   })
 
-// passes locally, flaky on Jenkins
-describe.skip('FindOutcomesModal', () => {
+describe('FindOutcomesModal', () => {
   let cache
   let onCloseHandlerMock
   let setTargetGroupIdsToRefetchMock

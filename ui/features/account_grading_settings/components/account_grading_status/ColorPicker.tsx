@@ -22,11 +22,15 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Color} from '@canvas/grading-status-list-item'
 import '@canvas/rails-flash-notifications'
+// @ts-expect-error
 import {Tooltip} from '@instructure/ui-tooltip'
+// @ts-expect-error
 import {IconWarningSolid, IconCheckSolid} from '@instructure/ui-icons'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
+
+const {Item: FlexItem} = Flex as any
 
 const I18n = useI18nScope('calendar_color_picker')
 
@@ -122,10 +126,10 @@ export const ColorPicker = ({
       {renderColorRows()}
 
       <Flex wrap="wrap" justifyItems="space-between" margin="small 0 0 0">
-        <Flex.Item margin="0 x-small 0 0">
+        <FlexItem margin="0 x-small 0 0">
           <ColorPreview currentColor={currentColor} isValidHex={isValidHex} />
-        </Flex.Item>
-        <Flex.Item margin="0 0 0 x-small">
+        </FlexItem>
+        <FlexItem margin="0 0 0 x-small">
           <View as="span">
             <TextInput
               renderLabel={
@@ -140,7 +144,7 @@ export const ColorPicker = ({
               onBlur={warnIfInvalid}
             />
           </View>
-        </Flex.Item>
+        </FlexItem>
       </Flex>
     </View>
   )
@@ -178,7 +182,7 @@ const ColorRow = ({colors, colorLabels, currentColor, handleOnClick}: ColorRowsP
         const isSelected = currentColor === hexcode
         const colorLabel = colorLabels[colorName]
         return (
-          <Flex.Item key={colorName}>
+          <FlexItem key={colorName}>
             <ColorTile
               isSelected={isSelected}
               hexcode={hexcode}
@@ -194,7 +198,7 @@ const ColorRow = ({colors, colorLabels, currentColor, handleOnClick}: ColorRowsP
                 </>
               )}
             </ColorTile>
-          </Flex.Item>
+          </FlexItem>
         )
       })}
     </Flex>
@@ -228,7 +232,7 @@ const ColorTile = ({
       tabIndex={isFocusable ? 0 : -1}
       borderColor="primary"
       data-testid={`color-picker-${hexcode}`}
-      themeOverride={{backgroundPrimary: hexcode, borderColorPrimary: '#000000'}}
+      theme={{backgroundPrimary: hexcode, borderColorPrimary: '#000000'}}
       onClick={handleOnClick}
     >
       {children}

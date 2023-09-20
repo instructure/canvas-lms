@@ -21,27 +21,104 @@ import {render, fireEvent} from '@testing-library/react'
 
 import PeerReviewNavigationLink from '../PeerReviewNavigationLink'
 
-describe('PeerReviewNavigationLink', () => {
+const props = {
+  assignedAssessments: [
+    {
+      assetId: '1',
+      anonymizedUser: {_id: '1', displayName: 'Jim'},
+      anonymousId: null,
+      workflowState: 'completed',
+      assetSubmissionType: 'online_text_entry',
+    },
+    {
+      assetId: '2',
+      anonymizedUser: {_id: '2', displayName: 'Bob'},
+      anonymousId: null,
+      workflowState: 'assigned',
+      assetSubmissionType: null,
+    },
+    {
+      assetId: '3',
+      anonymizedUser: {_id: '3', displayName: 'Jill'},
+      anonymousId: null,
+      workflowState: 'assigned',
+      assetSubmissionType: 'online_text_entry',
+    },
+  ],
+  currentAssessmentIndex: 1,
+}
+
+it('displays the labels for peer review states', () => {
+  const {getByTestId, getByText} = render(<PeerReviewNavigationLink {...props} />)
+  fireEvent.click(getByTestId('header-peer-review-link'))
+  expect(getByText('Ready to Review')).toBeInTheDocument()
+  expect(getByText('Not Yet Submitted')).toBeInTheDocument()
+  expect(getByText('Completed Peer Reviews')).toBeInTheDocument()
+})
+
+it('displays a gray highlight on the current peer review', () => {
+  const {getByTestId} = render(<PeerReviewNavigationLink {...props} />)
+  fireEvent.click(getByTestId('header-peer-review-link'))
+  const completedMenuItem = getByTestId('peer-review-completed-1')
+  const style = window.getComputedStyle(completedMenuItem as Element) as {[key: string]: any}
+  const labelColorKey = Object.keys(style._values).find(key => key.includes('labelColor'))
+  const backgroundKey = Object.keys(style._values).find(key => key.includes('background'))
+  expect(style._values[labelColorKey ?? '']).toEqual('white')
+  expect(style._values[backgroundKey ?? '']).toEqual('#6B7780')
+})
+
+describe('required peer review link when the anonymous peer review option is disabled', () => {
+  it('displays a ready peer review in the Ready to Review section', () => {
+    const {getByTestId} = render(<PeerReviewNavigationLink {...props} />)
+    fireEvent.click(getByTestId('header-peer-review-link'))
+    expect(getByTestId('peer-review-ready-3')).toHaveTextContent('Jill')
+  })
+
+  it('displays a ready peer review in the Not Yet Submitted section', () => {
+    const {getByTestId} = render(<PeerReviewNavigationLink {...props} />)
+    fireEvent.click(getByTestId('header-peer-review-link'))
+    expect(getByTestId('peer-review-not-submitted-2')).toHaveTextContent('Bob')
+  })
+
+  it('displays a ready peer review in the Completed Peer Reviews section', () => {
+    const {getByTestId} = render(<PeerReviewNavigationLink {...props} />)
+    fireEvent.click(getByTestId('header-peer-review-link'))
+    expect(getByTestId('peer-review-completed-1')).toHaveTextContent('Jim')
+  })
+
+  it('contains the correct url for the item is clicked on', () => {
+    ENV.COURSE_ID = '1'
+    ENV.ASSIGNMENT_ID = '1'
+    const {getByTestId} = render(<PeerReviewNavigationLink {...props} />)
+    fireEvent.click(getByTestId('header-peer-review-link'))
+    expect(getByTestId('peer-review-completed-1')).toHaveAttribute(
+      'href',
+      '/courses/1/assignments/1?reviewee_id=1'
+    )
+  })
+})
+
+describe('required peer review link when the anonymous peer review option is enabled', () => {
   const props = {
     assignedAssessments: [
       {
         assetId: '1',
-        anonymizedUser: {_id: '1', displayName: 'Jim'},
-        anonymousId: null,
+        anonymizedUser: null,
+        anonymousId: 'anon_1',
         workflowState: 'completed',
         assetSubmissionType: 'online_text_entry',
       },
       {
         assetId: '2',
-        anonymizedUser: {_id: '2', displayName: 'Bob'},
-        anonymousId: null,
+        anonymizedUser: null,
+        anonymousId: 'anon_2',
         workflowState: 'assigned',
         assetSubmissionType: null,
       },
       {
         assetId: '3',
-        anonymizedUser: {_id: '3', displayName: 'Jill'},
-        anonymousId: null,
+        anonymizedUser: null,
+        anonymousId: 'anon_3',
         workflowState: 'assigned',
         assetSubmissionType: 'online_text_entry',
       },
@@ -49,108 +126,32 @@ describe('PeerReviewNavigationLink', () => {
     currentAssessmentIndex: 1,
   }
 
-  it('displays the labels for peer review states', () => {
-    const {getByTestId, getByText} = render(<PeerReviewNavigationLink {...props} />)
-    fireEvent.click(getByTestId('header-peer-review-link'))
-    expect(getByText('Ready to Review')).toBeInTheDocument()
-    expect(getByText('Not Yet Submitted')).toBeInTheDocument()
-    expect(getByText('Completed Peer Reviews')).toBeInTheDocument()
-  })
-
-  it('displays a gray highlight on the current peer review', () => {
+  it('displays a ready peer review in the Ready to Review section', () => {
     const {getByTestId} = render(<PeerReviewNavigationLink {...props} />)
     fireEvent.click(getByTestId('header-peer-review-link'))
-    const completedMenuItem = getByTestId('peer-review-completed-1')
-    expect(completedMenuItem.firstChild?.firstChild).toHaveStyle('color: white')
-    expect(completedMenuItem).toHaveStyle('background: #6B7780')
+    expect(getByTestId('peer-review-ready-3')).toHaveTextContent('Anonymous 3')
   })
 
-  describe('required peer review link when the anonymous peer review option is disabled', () => {
-    it('displays a ready peer review in the Ready to Review section', () => {
-      const {getByTestId} = render(<PeerReviewNavigationLink {...props} />)
-      fireEvent.click(getByTestId('header-peer-review-link'))
-      expect(getByTestId('peer-review-ready-3')).toHaveTextContent('Jill')
-    })
-
-    it('displays a ready peer review in the Not Yet Submitted section', () => {
-      const {getByTestId} = render(<PeerReviewNavigationLink {...props} />)
-      fireEvent.click(getByTestId('header-peer-review-link'))
-      expect(getByTestId('peer-review-not-submitted-2')).toHaveTextContent('Bob')
-    })
-
-    it('displays a ready peer review in the Completed Peer Reviews section', () => {
-      const {getByTestId} = render(<PeerReviewNavigationLink {...props} />)
-      fireEvent.click(getByTestId('header-peer-review-link'))
-      expect(getByTestId('peer-review-completed-1')).toHaveTextContent('Jim')
-    })
-
-    it('contains the correct url for the item is clicked on', () => {
-      ENV.COURSE_ID = '1'
-      ENV.ASSIGNMENT_ID = '1'
-      const {getByTestId} = render(<PeerReviewNavigationLink {...props} />)
-      fireEvent.click(getByTestId('header-peer-review-link'))
-      expect(getByTestId('peer-review-completed-1')).toHaveAttribute(
-        'href',
-        '/courses/1/assignments/1?reviewee_id=1'
-      )
-    })
+  it('displays a ready peer review in the Not Yet Submitted section', () => {
+    const {getByTestId} = render(<PeerReviewNavigationLink {...props} />)
+    fireEvent.click(getByTestId('header-peer-review-link'))
+    expect(getByTestId('peer-review-not-submitted-2')).toHaveTextContent('Anonymous 2')
   })
 
-  describe('required peer review link when the anonymous peer review option is enabled', () => {
-    const props_ = {
-      assignedAssessments: [
-        {
-          assetId: '1',
-          anonymizedUser: null,
-          anonymousId: 'anon_1',
-          workflowState: 'completed',
-          assetSubmissionType: 'online_text_entry',
-        },
-        {
-          assetId: '2',
-          anonymizedUser: null,
-          anonymousId: 'anon_2',
-          workflowState: 'assigned',
-          assetSubmissionType: null,
-        },
-        {
-          assetId: '3',
-          anonymizedUser: null,
-          anonymousId: 'anon_3',
-          workflowState: 'assigned',
-          assetSubmissionType: 'online_text_entry',
-        },
-      ],
-      currentAssessmentIndex: 1,
-    }
+  it('displays a ready peer review in the Completed Peer Reviews section', () => {
+    const {getByTestId} = render(<PeerReviewNavigationLink {...props} />)
+    fireEvent.click(getByTestId('header-peer-review-link'))
+    expect(getByTestId('peer-review-completed-1')).toHaveTextContent('Anonymous 1')
+  })
 
-    it('displays a ready peer review in the Ready to Review section', () => {
-      const {getByTestId} = render(<PeerReviewNavigationLink {...props_} />)
-      fireEvent.click(getByTestId('header-peer-review-link'))
-      expect(getByTestId('peer-review-ready-3')).toHaveTextContent('Anonymous 3')
-    })
-
-    it('displays a ready peer review in the Not Yet Submitted section', () => {
-      const {getByTestId} = render(<PeerReviewNavigationLink {...props_} />)
-      fireEvent.click(getByTestId('header-peer-review-link'))
-      expect(getByTestId('peer-review-not-submitted-2')).toHaveTextContent('Anonymous 2')
-    })
-
-    it('displays a ready peer review in the Completed Peer Reviews section', () => {
-      const {getByTestId} = render(<PeerReviewNavigationLink {...props_} />)
-      fireEvent.click(getByTestId('header-peer-review-link'))
-      expect(getByTestId('peer-review-completed-1')).toHaveTextContent('Anonymous 1')
-    })
-
-    it('contains the correct url for the item is clicked on', () => {
-      ENV.COURSE_ID = '1'
-      ENV.ASSIGNMENT_ID = '1'
-      const {getByTestId} = render(<PeerReviewNavigationLink {...props_} />)
-      fireEvent.click(getByTestId('header-peer-review-link'))
-      expect(getByTestId('peer-review-completed-1')).toHaveAttribute(
-        'href',
-        '/courses/1/assignments/1?anonymous_asset_id=anon_1'
-      )
-    })
+  it('contains the correct url for the item is clicked on', () => {
+    ENV.COURSE_ID = '1'
+    ENV.ASSIGNMENT_ID = '1'
+    const {getByTestId} = render(<PeerReviewNavigationLink {...props} />)
+    fireEvent.click(getByTestId('header-peer-review-link'))
+    expect(getByTestId('peer-review-completed-1')).toHaveAttribute(
+      'href',
+      '/courses/1/assignments/1?anonymous_asset_id=anon_1'
+    )
   })
 })

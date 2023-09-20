@@ -19,7 +19,6 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React from 'react'
-import {View} from '@instructure/ui-view'
 import {Link} from '@instructure/ui-link'
 import {IconLikeLine, IconLikeSolid} from '@instructure/ui-icons'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
@@ -66,7 +65,7 @@ export function Like({...props}) {
         },
       }}
       render={responsiveProps => (
-        <View className="discussion-like-btn" margin={responsiveProps.itemSpacing}>
+        <span className="discussion-like-btn">
           <Link
             isWithinText={false}
             as="button"
@@ -74,6 +73,7 @@ export function Like({...props}) {
             renderIcon={icon()}
             data-testid="like-button"
             interaction={props.interaction}
+            margin={responsiveProps.itemSpacing}
           >
             {props.likeCount > 0 && (
               <>
@@ -88,7 +88,7 @@ export function Like({...props}) {
               </>
             )}
           </Link>
-        </View>
+        </span>
       )}
     />
   )

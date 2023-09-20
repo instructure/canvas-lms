@@ -51,6 +51,8 @@ import {
 const I18n = useI18nScope('assignments_2')
 const COMPLETED_WORKFLOW_STATE = 'completed'
 
+const {Item: FlexItem} = Flex as any
+
 export default function CommentsTrayBody(props) {
   const [isFetchingMoreComments, setIsFetchingMoreComments] = useState(false)
   const [peerReviewModalOpen, setPeerReviewModalOpen] = useState(false)
@@ -136,7 +138,7 @@ export default function CommentsTrayBody(props) {
       }
     >
       <Flex as="div" direction="column" height="100%" data-testid="comments-container">
-        <Flex.Item shouldGrow={true}>
+        <FlexItem shouldGrow={true}>
           {!props.isPeerReviewEnabled && props.submission.gradeHidden && comments.length === 0 && (
             <SVGWithTextPlaceholder
               text={hiddenCommentsMessage}
@@ -168,17 +170,17 @@ export default function CommentsTrayBody(props) {
             isPeerReviewEnabled={props.isPeerReviewEnabled}
             reviewerSubmission={props.reviewerSubmission}
           />
-        </Flex.Item>
+        </FlexItem>
 
         {allowChangesToSubmission && (
           <Flex as="div" direction="column">
             {gradeAsGroup && (
-              <Flex.Item padding="x-small medium">
+              <FlexItem padding="x-small medium">
                 <Text as="div">{I18n.t('All comments are sent to the whole group.')}</Text>
-              </Flex.Item>
+              </FlexItem>
             )}
 
-            <Flex.Item padding="x-small medium">
+            <FlexItem padding="x-small medium">
               <CommentTextArea
                 assignment={props.assignment}
                 submission={props.submission}
@@ -191,7 +193,7 @@ export default function CommentsTrayBody(props) {
                   }
                 }}
               />
-            </Flex.Item>
+            </FlexItem>
           </Flex>
         )}
 

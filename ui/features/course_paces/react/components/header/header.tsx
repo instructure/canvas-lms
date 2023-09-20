@@ -43,7 +43,17 @@ import {generateModalLauncherId} from '../../utils/utils'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Table} from '@instructure/ui-table'
 
+const {
+  Body: TableBody,
+  Head: TableHead,
+  Row: TableRow,
+  Cell: TableCell,
+  ColHeader: TableColHeader,
+} = Table as any
+
 const I18n = useI18nScope('course_paces_header')
+
+const {Item: FlexItem} = Flex as any
 
 interface DispatchProps {
   readonly fetchDefaultPaceContext: () => void
@@ -125,7 +135,7 @@ export const Header = (props: HeaderProps) => {
         {props.defaultPaceContext?.name ? (
           <Heading
             level="h1"
-            themeOverride={{h1FontWeight: 700, h1FontSize: '1.75rem'}}
+            theme={{h1FontWeight: 700, h1FontSize: '1.75rem'}}
             margin="0 0 small 0"
           >
             {props.defaultPaceContext?.name}
@@ -141,14 +151,14 @@ export const Header = (props: HeaderProps) => {
             justifyItems="space-between"
             direction={props.responsiveSize !== 'small' ? 'row' : 'column'}
           >
-            <Flex.Item>
+            <FlexItem>
               <Flex justifyItems={props.responsiveSize !== 'small' ? 'start' : 'center'}>
                 {props.responsiveSize !== 'small' ? (
-                  <Flex.Item padding="0 medium 0 0">
+                  <FlexItem padding="0 medium 0 0">
                     <IconCoursesLine size="small" />
-                  </Flex.Item>
+                  </FlexItem>
                 ) : null}
-                <Flex.Item>
+                <FlexItem>
                   <span className="course-paces-metrics-heading">
                     <Table
                       elementRef={e => {
@@ -157,31 +167,31 @@ export const Header = (props: HeaderProps) => {
                       caption={I18n.t('Metrics')}
                       layout="auto"
                     >
-                      <Table.Head>
-                        <Table.Row themeOverride={{borderColor: 'transparent'}}>
-                          <Table.ColHeader
+                      <TableHead>
+                        <TableRow theme={{borderColor: 'transparent'}}>
+                          <TableColHeader
                             id="students-col-header"
-                            themeOverride={{padding: '0rem 0.75rem'}}
+                            theme={{padding: '0rem 0.75rem'}}
                           >
                             <Text size="small">{I18n.t('Students')}</Text>
-                          </Table.ColHeader>
-                          <Table.ColHeader
+                          </TableColHeader>
+                          <TableColHeader
                             id="sections-col-header"
-                            themeOverride={{padding: '0rem  0.75rem'}}
+                            theme={{padding: '0rem  0.75rem'}}
                           >
                             <Text size="small">{I18n.t('Sections')}</Text>
-                          </Table.ColHeader>
-                          <Table.ColHeader
+                          </TableColHeader>
+                          <TableColHeader
                             id="duration-col-header"
                             data-testid="duration-col-header"
-                            themeOverride={{padding: '0rem  0.75rem'}}
+                            theme={{padding: '0rem  0.75rem'}}
                           >
                             <View
                               as="div"
                               aria-label={I18n.t('Pace Duration')}
                               display="inline-flex"
                               margin="x-small none none none"
-                              themeOverride={{
+                              theme={{
                                 marginXSmall: '0.475rem',
                               }}
                             >
@@ -201,28 +211,28 @@ export const Header = (props: HeaderProps) => {
                                 </View>
                               </Tooltip>
                             </View>
-                          </Table.ColHeader>
-                        </Table.Row>
-                      </Table.Head>
-                      <Table.Body>
-                        <Table.Row theme={{borderColor: 'transparent'}}>
-                          <Table.Cell
+                          </TableColHeader>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        <TableRow theme={{borderColor: 'transparent'}}>
+                          <TableCell
                             data-testid="number-of-students"
                             theme={{padding: '0rem  0.75rem'}}
                           >
                             <Text size="medium" weight="bold" theme={{fontSizeMedium: '1.125rem'}}>
                               {props.defaultPaceContext?.associated_student_count}
                             </Text>
-                          </Table.Cell>
-                          <Table.Cell
+                          </TableCell>
+                          <TableCell
                             data-testid="number-of-sections"
                             theme={{padding: '0rem  0.75rem'}}
                           >
                             <Text size="medium" weight="bold" theme={{fontSizeMedium: '1.125rem'}}>
                               {props.defaultPaceContext?.associated_section_count}
                             </Text>
-                          </Table.Cell>
-                          <Table.Cell
+                          </TableCell>
+                          <TableCell
                             data-testid="default-pace-duration"
                             theme={{padding: '0rem  0.75rem'}}
                           >
@@ -230,15 +240,15 @@ export const Header = (props: HeaderProps) => {
                               {getDurationLabel(props.defaultPaceContext?.applied_pace?.duration) ||
                                 '--'}
                             </Text>
-                          </Table.Cell>
-                        </Table.Row>
-                      </Table.Body>
+                          </TableCell>
+                        </TableRow>
+                      </TableBody>
                     </Table>
                   </span>
-                </Flex.Item>
+                </FlexItem>
               </Flex>
-            </Flex.Item>
-            <Flex.Item
+            </FlexItem>
+            <FlexItem
               fontSize="0.875rem"
               textAlign="center"
               margin={props.responsiveSize !== 'small' ? '0' : 'small 0 0'}
@@ -259,7 +269,7 @@ export const Header = (props: HeaderProps) => {
                   ? I18n.t('Create Course Pace')
                   : I18n.t('Edit Default Course Pace')}
               </Link>
-            </Flex.Item>
+            </FlexItem>
           </Flex>
         </View>
       </View>
@@ -283,14 +293,14 @@ export const Header = (props: HeaderProps) => {
           </Alert>
         )}
         <Flex as="section" alignItems="end" wrap="wrap">
-          <Flex.Item margin="0 0 small">
+          <FlexItem margin="0 0 small">
             <PacePicker />
-          </Flex.Item>
-          <Flex.Item margin="0 0 small" shouldGrow={true}>
+          </FlexItem>
+          <FlexItem margin="0 0 small" shouldGrow={true}>
             <Settings isBlueprintLocked={props.blueprintLocked} margin="0 0 0 small" />
             <BlueprintLock newPace={props.newPace} />
-          </Flex.Item>
-          <Flex.Item textAlign="end" margin="0 0 small small">
+          </FlexItem>
+          <FlexItem textAlign="end" margin="0 0 small small">
             {(props.context_type !== 'Enrollment' ||
               window.ENV.FEATURES.course_paces_for_students) && (
               <UnpublishedChangesIndicator
@@ -298,7 +308,7 @@ export const Header = (props: HeaderProps) => {
                 onClick={props.handleDrawerToggle}
               />
             )}
-          </Flex.Item>
+          </FlexItem>
         </Flex>
       </View>
       <ProjectedDates key={`${props.context_type}-${props.context_id}`} />

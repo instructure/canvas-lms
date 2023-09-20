@@ -19,6 +19,7 @@
 import React, {useState} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import Footer from './Footer'
+// @ts-expect-error -- TODO: remove once we're on InstUI 8
 import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
 import {Text} from '@instructure/ui-text'
 import {useScope as useI18nScope} from '@canvas/i18n'

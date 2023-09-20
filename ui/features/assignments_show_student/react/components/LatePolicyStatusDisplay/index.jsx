@@ -56,7 +56,7 @@ export default function LatePolicyStatusDisplay(props) {
             <Link
               href="#"
               isWithinText={false}
-              themeOverride={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
+              theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
             >
               <ScreenReaderContent>
                 {I18n.t(

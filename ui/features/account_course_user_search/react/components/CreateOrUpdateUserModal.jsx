@@ -92,7 +92,6 @@ export default class CreateOrUpdateUserModal extends React.Component {
         const key = name.match(/user\[(.*)\]/)[1] // extracts 'short_name' from 'user[short_name]'
         return {...memo, [key]: this.props.user[key]}
       }, {})
-      // eslint-disable-next-line react/no-access-state-in-setstate
       this.setState(update(this.state, {data: {user: {$set: userDataFromProps}}}))
     }
   }
@@ -126,7 +125,6 @@ export default class CreateOrUpdateUserModal extends React.Component {
   onSubmit = () => {
     if (!isEmpty(this.state.errors)) return
     const method = {create: 'POST', update: 'PUT'}[this.props.createOrUpdate]
-    // eslint-disable-next-line promise/catch-or-return
     axios({url: this.props.url, method, data: this.state.data}).then(
       response => {
         const getUserObj = o => (o.user ? getUserObj(o.user) : o)
@@ -159,22 +157,18 @@ export default class CreateOrUpdateUserModal extends React.Component {
     return [
       {
         name: 'user[name]',
-        renderLabel: (
-          <>
-            {I18n.t('Full Name')} <Text color="danger"> *</Text>
-          </>
-        ),
+        label: <>{I18n.t('Full Name')} <Text color="danger"> *</Text></>,
         hint: I18n.t('This name will be used by teachers for grading.'),
         required: I18n.t('Full name is required'),
       },
       {
         name: 'user[short_name]',
-        renderLabel: I18n.t('Display Name'),
+        label: I18n.t('Display Name'),
         hint: I18n.t('People will see this name in discussions, messages and comments.'),
       },
       {
         name: 'user[sortable_name]',
-        renderLabel: I18n.t('Sortable Name'),
+        label: I18n.t('Sortable Name'),
         hint: I18n.t('This name appears in sorted lists.'),
       },
     ]
@@ -183,12 +177,11 @@ export default class CreateOrUpdateUserModal extends React.Component {
           ? [
               {
                 name: 'pseudonym[unique_id]',
-                renderLabel: (
-                  <>
-                    {this.props.customized_login_handle_name || I18n.t('Email')}
-                    <Text color="danger"> *</Text>
-                  </>
-                ),
+                label:
+                <>
+                  {this.props.customized_login_handle_name || I18n.t('Email')}
+                  <Text color="danger"> *</Text>
+                </>,
                 required: this.props.customized_login_handle_name
                   ? I18n.t('%{login_handle} is required', {
                       login_handle: this.props.customized_login_handle_name,
@@ -197,17 +190,16 @@ export default class CreateOrUpdateUserModal extends React.Component {
               },
               showCustomizedLoginId && {
                 name: 'pseudonym[path]',
-                renderLabel: (
-                  <>
-                    {I18n.t('Email')}
-                    <Text color="danger"> *</Text>
-                  </>
-                ),
+                label:
+                <>
+                  {I18n.t('Email')}
+                  <Text color="danger"> *</Text>
+                </>,
                 required: I18n.t('Email is required'),
               },
               this.props.showSIS && {
                 name: 'pseudonym[sis_user_id]',
-                renderLabel: I18n.t('SIS ID'),
+                label: I18n.t('SIS ID'),
               },
               {
                 name: 'pseudonym[send_confirmation]',
@@ -218,7 +210,7 @@ export default class CreateOrUpdateUserModal extends React.Component {
           : [
               {
                 name: 'user[email]',
-                renderLabel: I18n.t('Default Email'),
+                label: I18n.t('Default Email'),
               },
               {
                 name: 'user[time_zone]',
@@ -246,30 +238,26 @@ export default class CreateOrUpdateUserModal extends React.Component {
       >
         <Modal.Body>
           <FormFieldGroup layout="stacked" rowSpacing="small" description="">
-            {this.getInputFields().map(
-              ({name, renderLabel, label, hint, required, Component = TextInput}) => (
-                <Component
-                  key={name}
-                  renderLabel={renderLabel}
-                  label={label}
-                  data-testid={label ?? renderLabel}
-                  value={get(this.state.data, name) ?? ''}
-                  checked={get(this.state.data, name) ?? false}
-                  onChange={e =>
-                    this.onChange(
-                      name,
-                      e.target.type === 'checkbox' ? e.target.checked : e.target.value
-                    )
-                  }
-                  isRequired={!!required}
-                  layout="inline"
-                  messages={(this.state.errors[name] || [])
-                    .map(errMsg => ({type: 'error', text: errMsg}))
-                    .concat(hint && {type: 'hint', text: hint})
-                    .filter(Boolean)}
-                />
-              )
-            )}
+            {this.getInputFields().map(({name, label, hint, required, Component = TextInput}) => (
+              <Component
+                key={name}
+                label={label}
+                value={get(this.state.data, name)}
+                checked={get(this.state.data, name)}
+                onChange={e =>
+                  this.onChange(
+                    name,
+                    e.target.type === 'checkbox' ? e.target.checked : e.target.value
+                  )
+                }
+                required={!!required}
+                layout="inline"
+                messages={(this.state.errors[name] || [])
+                  .map(errMsg => ({type: 'error', text: errMsg}))
+                  .concat(hint && {type: 'hint', text: hint})
+                  .filter(Boolean)}
+              />
+            ))}
           </FormFieldGroup>
         </Modal.Body>
         <Modal.Footer>

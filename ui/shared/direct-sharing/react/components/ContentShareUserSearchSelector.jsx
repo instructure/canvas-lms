@@ -18,12 +18,25 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useState} from 'react'
-import CanvasAsyncSelect, {CanvasAsyncSelectProps} from '@canvas/instui-bindings/react/AsyncSelect'
+import {arrayOf, func, string} from 'prop-types'
+
+import CanvasAsyncSelect from '@canvas/instui-bindings/react/AsyncSelect'
 import useDebouncedSearchTerm from '@canvas/search-item-selector/react/hooks/useDebouncedSearchTerm'
 import useContentShareUserSearchApi from '../effects/useContentShareUserSearchApi'
 import UserSearchSelectorItem from './UserSearchSelectorItem'
+import {basicUser} from '@canvas/users/react/proptypes/user'
 
 const I18n = useI18nScope('user_search_selector')
+
+ContentShareUserSearchSelector.propTypes = {
+  courseId: string.isRequired,
+  onUserSelected: func.isRequired, // (basicUser) => {} (see proptypes/user.js)
+  selectedUsers: arrayOf(basicUser),
+  ...(() => {
+    const {renderLabel, ...restOfSelectPropTypes} = CanvasAsyncSelect.propTypes
+    return restOfSelectPropTypes
+  })(),
+}
 
 ContentShareUserSearchSelector.defaultProps = {
   selectedUsers: [],
@@ -31,28 +44,15 @@ ContentShareUserSearchSelector.defaultProps = {
 
 const MINIMUM_SEARCH_LENGTH = 3
 
-const isSearchableTerm = (term: string) => term.length >= MINIMUM_SEARCH_LENGTH
-
-type BasicUser = {
-  id: string
-  name: string
-  avatar_url?: string
-  email?: string
-}
-
-type Props = {
-  courseId: string
-  onUserSelected: (user: any) => void
-  selectedUsers: BasicUser[]
-} & Omit<CanvasAsyncSelectProps, 'renderLabel'>
+const isSearchableTerm = term => term.length >= MINIMUM_SEARCH_LENGTH
 
 export default function ContentShareUserSearchSelector({
   courseId,
   onUserSelected,
   selectedUsers,
   ...restOfSelectProps
-}: Props) {
-  const [searchedUsers, setSearchedUsers] = useState<BasicUser[] | null>(null)
+}) {
+  const [searchedUsers, setSearchedUsers] = useState(null)
   const [error, setError] = useState(null)
   const [inputValue, setInputValue] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -60,9 +60,7 @@ export default function ContentShareUserSearchSelector({
     isSearchableTerm,
   })
 
-  const userSearchParams: {
-    search_term?: string
-  } = {}
+  const userSearchParams = {}
   if (searchTerm.length >= 3) userSearchParams.search_term = searchTerm
   useContentShareUserSearchApi({
     courseId,
@@ -72,14 +70,14 @@ export default function ContentShareUserSearchSelector({
     params: userSearchParams,
   })
 
-  function handleUserSelected(_ev: React.MouseEvent<HTMLButtonElement>, id: string) {
+  function handleUserSelected(_ev, id) {
     if (searchedUsers === null) return
     const user = searchedUsers.find(u => u.id === id)
     onUserSelected(user)
     setInputValue('')
   }
 
-  function handleInputChanged(ev: React.ChangeEvent<HTMLInputElement>) {
+  function handleInputChanged(ev) {
     setInputValue(ev.target.value)
     setSearchTerm(ev.target.value)
   }
@@ -101,7 +99,7 @@ export default function ContentShareUserSearchSelector({
     onOptionSelected: handleUserSelected,
   }
 
-  let userOptions: any = []
+  let userOptions = []
   if (searchedUsers !== null && isSearchableTerm(inputValue)) {
     const selectedUsersIds = selectedUsers.map(user => user.id)
     userOptions = searchedUsers

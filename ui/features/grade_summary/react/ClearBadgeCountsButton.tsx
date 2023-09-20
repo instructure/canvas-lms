@@ -19,6 +19,7 @@
 import React, {useState} from 'react'
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {Button} from '@instructure/ui-buttons'
+// @ts-expect-error
 import {IconAlertsSolid} from '@instructure/ui-icons'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import axios from '@canvas/axios'
