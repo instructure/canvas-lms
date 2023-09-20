@@ -39,9 +39,10 @@ export default class SearchApp extends React.Component {
   async handleKey(event) {
     if (event.key === 'Enter' && event.type === 'keydown') {
       const searchString = this.state.searchString
-      this.setState({searchString: '', searching: true})
+      this.setState({searching: true})
       await this.runSearch(searchString)
       this.setState({searching: false})
+      this.textInput.focus()
     }
   }
 
@@ -63,6 +64,8 @@ export default class SearchApp extends React.Component {
       <View>
         <div onKeyDown={this.handleKey}>
           <TextInput
+            interaction={this.state.searching ? 'disabled' : 'enabled'}
+            ref={e => (this.textInput = e)}
             onChange={this.handleChange}
             value={this.state.searchString}
             renderAfterInput={() => <IconSearchLine />}
