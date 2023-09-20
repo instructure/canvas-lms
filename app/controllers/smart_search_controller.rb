@@ -40,31 +40,24 @@ class SmartSearchController < ApplicationController
         # response[:results].concat( wiki_pages.select { |x| x.neighbor_distance >= MIN_DISTANCE }.first(MAX_RESULT))
 
         # Wiki Pages
-        # TODO: Make this more ActiveRecord(y) while still enforcing the right visibility
         # TODO: Enforce enrollment types
-        # TODO: Prevent multiple inner-product calls, if possible
         # TODO: Prevent duplicates after chunking embeddings is implemented
-        # TODO: Paginate and remove the hardcoded limit (ADV-23)
-        sql = <<-SQL.squish
-                SELECT wp.*, (wpe.embedding #{quoted_operator_name("<=>")} ?) AS distance
-                FROM #{WikiPage.quoted_table_name} wp
-                INNER JOIN #{Enrollment.quoted_table_name} AS e
-                    ON wp.context_type = 'Course'
-                    AND wp.context_id = e.course_id
-                INNER JOIN #{EnrollmentState.quoted_table_name} AS es
-                    ON e.id = es.enrollment_id
-                INNER JOIN #{WikiPageEmbedding.quoted_table_name} AS wpe
-                    ON wp.id = wpe.wiki_page_id
-                WHERE
-                    e.user_id = ?
-                    AND e.workflow_state <> 'deleted'
-                    AND es.restricted_access = FALSE
-                    AND es.state IN ('active', 'invited', 'pending_invited', 'pending_active')
-                    AND e.type IN ('TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment', 'StudentViewEnrollment')
-                ORDER BY distance asc
-                LIMIT 25
-        SQL
-        wiki_pages = WikiPage.find_by_sql([sql, embedding.to_s, @current_user.id])
+        scope = WikiPage
+                .select(WikiPage.send(:sanitize_sql, ["wiki_pages.*, (wpe.embedding #{quoted_operator_name("<=>")} ?) AS distance", embedding.to_s]))
+                .joins("INNER JOIN #{Enrollment.quoted_table_name} e ON wiki_pages.context_type = 'Course' AND wiki_pages.context_id = e.course_id")
+                .joins("INNER JOIN #{EnrollmentState.quoted_table_name} es ON e.id = es.enrollment_id")
+                .joins("INNER JOIN #{WikiPageEmbedding.quoted_table_name} wpe ON wiki_pages.id = wpe.wiki_page_id")
+                .where(e: {
+                         user_id: @current_user,
+                         type: %w[TeacherEnrollment TaEnrollment DesignerEnrollment StudentViewEnrollment]
+                       },
+                       es: {
+                         restricted_access: false,
+                         state: %w[active invited pending_invited pending_active]
+                       })
+                .where.not(e: { workflow_state: "deleted" })
+                .order("distance ASC")
+        wiki_pages = Api.paginate(scope, self, smart_search_query_url)
         response[:results].concat(wiki_pages)
       end
 
