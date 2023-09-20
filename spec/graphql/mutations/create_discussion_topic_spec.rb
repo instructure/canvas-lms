@@ -43,6 +43,7 @@ describe Mutations::CreateDiscussionTopic do
             lockAt
             allowRating
             onlyGradersCanRate
+            todoDate
           }
           errors {
             attribute
@@ -86,6 +87,7 @@ describe Mutations::CreateDiscussionTopic do
     expect(created_discussion_topic["anonymousState"]).to be_nil
     expect(created_discussion_topic["allowRating"]).to be false
     expect(created_discussion_topic["onlyGradersCanRate"]).to be false
+    expect(created_discussion_topic["todoDate"]).to be_nil
     expect(DiscussionTopic.where("id = #{created_discussion_topic["_id"]}").count).to eq 1
   end
 
@@ -181,7 +183,7 @@ describe Mutations::CreateDiscussionTopic do
       contextId: "#{@course.id}"
       contextType: "Course"
       title: "Student Anonymous Create"
-      message: "this should return an error"
+      message: "this should not return an error"
       published: true
       anonymousState: "full_anonymity"
     GQL
@@ -268,6 +270,29 @@ describe Mutations::CreateDiscussionTopic do
     expect(created_discussion_topic["isAnonymousAuthor"]).to be false
   end
 
+  it "creates a todo_date discussion topic" do
+    @course.allow_student_anonymous_discussion_topics = false
+    @course.save!
+
+    todo_date = 5.days.from_now.iso8601
+
+    query = <<~GQL
+      contextId: "#{@course.id}"
+      contextType: "Course"
+      title: "TODO Discussion"
+      published: true
+      anonymousState: "full_anonymity"
+      todoDate: "#{todo_date}"
+    GQL
+
+    result = execute_with_input(query, @teacher)
+    created_discussion_topic = result.dig("data", "createDiscussionTopic", "discussionTopic")
+
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "discussionTopic", "errors")).to be_nil
+    expect(created_discussion_topic["todoDate"]).to eq todo_date
+  end
+
   context "errors" do
     def expect_error(result, message)
       errors = result["errors"] || result.dig("data", "createDiscussionTopic", "errors")
@@ -334,6 +359,20 @@ describe Mutations::CreateDiscussionTopic do
 
         result = execute_with_input(query, @student)
         expect_error(result, "You are not able to create an anonymous discussion")
+      end
+    end
+
+    context "todo_date" do
+      it "returns an error when user has neither manage_content nor manage_course_content_add permissions" do
+        todo_date = 5.days.from_now.iso8601
+        query = <<~GQL
+          contextId: "#{@course.id}"
+          contextType: "Course",
+          todoDate: "#{todo_date}"
+        GQL
+
+        result = execute_with_input(query, @student)
+        expect_error(result, "You do not have permission to add this topic to the student to-do list.")
       end
     end
   end

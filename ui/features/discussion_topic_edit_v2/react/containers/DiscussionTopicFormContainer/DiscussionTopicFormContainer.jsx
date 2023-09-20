@@ -97,6 +97,8 @@ export default function DiscussionTopicFormContainer() {
         anonymousAuthorState,
         allowLiking,
         onlyGradersCanLike,
+        addToTodo,
+        todoDate,
       }) => {
         if (isEditing) {
           console.log('call updateDiscussion')
@@ -115,6 +117,7 @@ export default function DiscussionTopicFormContainer() {
               isAnonymousAuthor: anonymousAuthorState,
               allowRating: allowLiking,
               onlyGradersCanRate: onlyGradersCanLike,
+              todoDate: addToTodo ? todoDate : null,
             },
           })
         }

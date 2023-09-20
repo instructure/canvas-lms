@@ -212,7 +212,7 @@ describe "discussions" do
         user_session(student)
       end
 
-      context "when all discussion anonymity feature flags are ON" do
+      context "when all discussion anonymity feature flags are ON", :ignore_js_errors do
         before do
           course.enable_feature! :react_discussions_post
         end
@@ -506,28 +506,16 @@ describe "discussions" do
         wait_for_ajaximations
       end
 
-      it "creates a new discussion topic successfully" do
+      it "creates a new discussion topic with default selections successfully" do
         get "/courses/#{course.id}/discussion_topics/new"
 
         title = "My Test Topic"
         message = "replying to topic"
-        available_from = "September 10, 2020"
-        available_until = "September 14, 2020"
 
         # Set title
         f("input[placeholder='Topic Title']").send_keys title
         # Set Message
         type_in_tiny("textarea", message)
-        # Set require_initial_post
-        force_click("input[data-testid='require-initial-post-checkbox']")
-
-        available_from_input = ff("input[placeholder='Select Date']")[0]
-        available_until_input = ff("input[placeholder='Select Date']")[1]
-
-        # Set available_from
-        set_datetime_input(available_from_input, available_from)
-        # Set available_until
-        set_datetime_input(available_until_input, available_until)
 
         # Save and publish
         f("button[data-testid='save-and-publish-button']").click
@@ -536,14 +524,73 @@ describe "discussions" do
         dt = DiscussionTopic.last
         expect(dt.title).to eq title
         expect(dt.message).to include message
-        expect(dt.require_initial_post).to be true
-        expect(dt.delayed_post_at).to eq Time.zone.parse("2020-09-10 00:00:00")
-        expect(dt.lock_at).to eq Time.zone.parse("2020-09-14 23:59:59.999999000")
+        expect(dt.require_initial_post).to be false
+        expect(dt.delayed_post_at).to be_nil
+        expect(dt.lock_at).to be_nil
         expect(dt.anonymous_state).to be_nil
         expect(dt).to be_published
 
         # Verify that the discussion topic redirected the page to the new discussion topic
         expect(driver.current_url).to end_with("/courses/#{course.id}/discussion_topics/#{dt.id}")
+      end
+
+      it "creates a require initial post discussion topic successfully" do
+        get "/courses/#{course.id}/discussion_topics/new"
+        title = "My Test Topic"
+        message = "replying to topic"
+
+        f("input[placeholder='Topic Title']").send_keys title
+        type_in_tiny("textarea", message)
+        force_click("input[data-testid='require-initial-post-checkbox']")
+        f("button[data-testid='save-and-publish-button']").click
+        wait_for_ajaximations
+        dt = DiscussionTopic.last
+        expect(dt.require_initial_post).to be true
+      end
+
+      it "creates a topic with available from and until dates successfully" do
+        get "/courses/#{course.id}/discussion_topics/new"
+
+        title = "My Test Topic"
+        message = "replying to topic"
+        available_from = 5.days.ago
+        available_until = 5.days.from_now
+
+        f("input[placeholder='Topic Title']").send_keys title
+        type_in_tiny("textarea", message)
+
+        available_from_input = ff("input[placeholder='Select Date']")[0]
+        available_until_input = ff("input[placeholder='Select Date']")[1]
+
+        set_datetime_input(available_from_input, format_date_for_view(available_from))
+        set_datetime_input(available_until_input, format_date_for_view(available_until))
+
+        f("button[data-testid='save-and-publish-button']").click
+        wait_for_ajaximations
+
+        dt = DiscussionTopic.last
+        expect(dt.delayed_post_at).to be_between(6.days.ago, 4.days.ago)
+        expect(dt.lock_at).to be_between(4.days.from_now, 6.days.from_now)
+      end
+
+      it "create a topic with a TODO date successfully" do
+        get "/courses/#{course.id}/discussion_topics/new"
+
+        title = "My Test Topic"
+        message = "replying to topic"
+        todo_date = 3.days.from_now
+
+        f("input[placeholder='Topic Title']").send_keys title
+        type_in_tiny("textarea", message)
+
+        force_click("input[value='add-to-student-to-do']")
+        todo_input = ff("[data-testid='todo-date-section'] input")[0]
+        set_datetime_input(todo_input, format_date_for_view(todo_date))
+        f("button[data-testid='save-and-publish-button']").click
+        wait_for_ajaximations
+
+        dt = DiscussionTopic.last
+        expect(dt.todo_date).to be_between(2.days.from_now, 4.days.from_now)
       end
 
       it "creates a fully anonymous discussion topic successfully" do

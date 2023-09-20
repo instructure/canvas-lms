@@ -60,6 +60,14 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
       return validation_error(I18n.t("You are not able to create an anonymous discussion in a group"))
     end
 
+    # TODO: return an error when user tries to create a graded anonymous discussion
+
+    if input[:todo_date] && !discussion_topic_context.grants_any_right?(current_user, session, :manage_content, :manage_course_content_add)
+      return validation_error(I18n.t("You do not have permission to add this topic to the student to-do list."))
+    end
+
+    # TODO: return an error when user tries to add a todo_date to a graded discussion
+
     discussion_topic = DiscussionTopic.new(
       {
         context_id: discussion_topic_context.id,
@@ -72,7 +80,8 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
         anonymous_state:,
         allow_rating: input[:allow_rating],
         only_graders_can_rate: input[:only_graders_can_rate],
-        user: current_user
+        user: current_user,
+        todo_date: input[:todo_date]
       }
     )
     verify_authorized_action!(discussion_topic, :create)

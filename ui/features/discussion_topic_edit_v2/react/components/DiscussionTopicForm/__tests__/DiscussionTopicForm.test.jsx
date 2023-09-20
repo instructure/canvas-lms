@@ -100,6 +100,15 @@ describe('DiscussionTopicForm', () => {
     // })
 
     it('hides post to section, student ToDo, and ungraded options when Graded', () => {
+      window.ENV = {
+        STUDENT_PLANNER_ENABLED: true,
+        DISCUSSION_TOPIC: {
+          PERMISSIONS: {
+            CAN_MANAGE_CONTENT: true,
+          },
+        },
+      }
+
       const {queryByText, getByLabelText, queryByLabelText} = setup()
       expect(queryByLabelText('Add to student to-do')).toBeInTheDocument()
       expect(queryByText('All Sections')).toBeInTheDocument()
