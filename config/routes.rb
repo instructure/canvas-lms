@@ -2632,7 +2632,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: "lti/ims/authentication") do
       post "authorize_redirect", action: :authorize_redirect
-      get "authorize_redirect", action: :authorize_redirect
+      get "authorize_redirect", action: :authorize_redirect, as: "lti_authorize_redirect"
       get "authorize", action: :authorize, as: :lti_1_3_authorization
     end
 
@@ -2755,6 +2755,7 @@ CanvasRails::Application.routes.draw do
     # Security
     scope(controller: "security") do
       get "security/jwks", action: :jwks, as: :jwks_show
+      get "security/openid-configuration", action: :openid_configuration, as: :openid_configuration
     end
 
     # Feature Flags
