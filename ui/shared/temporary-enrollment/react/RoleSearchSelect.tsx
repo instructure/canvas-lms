@@ -17,7 +17,7 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import React, {useEffect, useState} from 'react'
+import React, {Children, useEffect, useState} from 'react'
 import {Select} from '@instructure/ui-select'
 import {Alert} from '@instructure/ui-alerts'
 import {Spinner} from '@instructure/ui-spinner'
@@ -48,7 +48,7 @@ SearchableSelectOption.displayName = 'Option'
 function flattenOptions(nodes: any) {
   const options: any[][] = []
 
-  React.Children.forEach(nodes, n => {
+  Children.forEach(nodes, n => {
     if (Array.isArray(n)) {
       options.push(flattenOptions(n))
     } else if (n?.type?.displayName === 'Option') {
@@ -78,10 +78,33 @@ export default function RoleSearchSelect(props: Props) {
     name: n.props.label,
   }))
   const matchingOptions = options.filter(i => i.name?.match(matcher))
-  const noResults = React.Children.count(children) === 0
+  const noResults = Children.count(children) === 0
+
+  useEffect(() => {
+    setMatcher(new RegExp(''))
+    setSelectedOptionId(null)
+    setIsShowingOptions(false)
+    handleUpdateSearchStatusMessage(true)
+    if (!value || inputValue) return
+    const initialValue = options.find(i => i.value === value)
+    if (initialValue) setInputValue(initialValue.name)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value, Children.count(children)])
+
+  const matcherFor = (v: any) => new RegExp('^(\\s*)' + reEscape(v), 'i')
+
+  const handleInputChange = (e: any) => {
+    const newMatcher = matcherFor(e.target.value)
+    const doesAnythingMatch = options.some(i => i.name.match(newMatcher))
+    setInputValue(e.target.value)
+    setMatcher(newMatcher)
+    setSelectedOptionId(null)
+    handleUpdateSearchStatusMessage(doesAnythingMatch)
+    setIsShowingOptions(doesAnythingMatch)
+  }
 
   // messages are not being accidentally set
-  function setSearchResultMessage(matches: any) {
+  const handleUpdateSearchStatusMessage = (matches: any) => {
     if (!matches) {
       setMessages([{type: 'error', text: noSearchMatchLabel}])
       return
@@ -93,49 +116,26 @@ export default function RoleSearchSelect(props: Props) {
     setMessages([{}])
   }
 
-  useEffect(() => {
-    setMatcher(new RegExp(''))
-    setSelectedOptionId(null)
-    setIsShowingOptions(false)
-    setSearchResultMessage(true)
-    if (!value || inputValue) return
-    const initialValue = options.find(i => i.value === value)
-    if (initialValue) setInputValue(initialValue.name)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value, React.Children.count(children)])
-
-  const matcherFor = (v: any) => new RegExp('^(\\s*)' + reEscape(v), 'i')
-
-  function onInputChange(e: any) {
-    const newMatcher = matcherFor(e.target.value)
-    const doesAnythingMatch = options.some(i => i.name.match(newMatcher))
-    setInputValue(e.target.value)
-    setMatcher(newMatcher)
-    setSelectedOptionId(null)
-    setSearchResultMessage(doesAnythingMatch)
-    setIsShowingOptions(doesAnythingMatch)
-  }
-
-  function onRequestHideOptions(event: any) {
+  const handleRequestHideOptions = (event: any) => {
     setIsShowingOptions(false)
     setHighlightedOptionId(null)
     if (event.type !== 'blur') setAnnouncement(I18n.t('List collapsed. ') + inputValue)
   }
 
-  function onRequestShowOptions() {
+  const handleRequestShowOptions = () => {
     if (messages.hasOwnProperty('type')) return
     setIsShowingOptions(true)
     setAnnouncement(I18n.t('List expanded.'))
   }
 
-  function onRequestHighlightOption(event: any, {id}: any) {
+  const handleRequestHighlightOption = (event: any, {id}: any) => {
     const text = options.find(o => o.id === id)?.name
     if (event.type === 'keydown') setInputValue(text)
     setHighlightedOptionId(id)
     setAnnouncement(text)
   }
 
-  function onRequestSelectOption(event: any, {id}: any) {
+  const handleRequestSelectOption = (event: any, {id}: any) => {
     const selectedOption = options.find(o => o.id === id)
     setInputValue(selectedOption?.name)
     setMatcher(new RegExp(''))
@@ -145,12 +145,12 @@ export default function RoleSearchSelect(props: Props) {
     onChange(event, {id, option: selectedOption})
   }
 
-  function onBlur(e: any) {
+  const handleBlur = (e: any) => {
     // set possible selection if narrowed to a single match or disregard as no op
     const possibleSelection = matchingOptions.length === 1 ? matchingOptions[0] : false
     if (possibleSelection) {
-      onRequestSelectOption(e, possibleSelection)
-      setSearchResultMessage(true)
+      handleRequestSelectOption(e, possibleSelection)
+      handleUpdateSearchStatusMessage(true)
     }
   }
 
@@ -174,7 +174,7 @@ export default function RoleSearchSelect(props: Props) {
 
     const result: (any[] | JSX.Element | null)[] = []
 
-    React.Children.forEach(nodes, child => {
+    Children.forEach(nodes, child => {
       if (Array.isArray(child)) {
         result.push(renderOptions(child))
       } else if (child?.type?.displayName === 'Option') {
@@ -212,13 +212,13 @@ export default function RoleSearchSelect(props: Props) {
     assistiveText: I18n.t('Type to search, use arrow keys to navigate options.') + ' ',
     placeholder,
     renderLabel: () => label,
-    onBlur,
+    onBlur: handleBlur,
     messages,
-    onInputChange,
-    onRequestShowOptions,
-    onRequestHideOptions,
-    onRequestHighlightOption,
-    onRequestSelectOption,
+    onInputChange: handleInputChange,
+    onRequestShowOptions: handleRequestShowOptions,
+    onRequestHideOptions: handleRequestHideOptions,
+    onRequestHighlightOption: handleRequestHighlightOption,
+    onRequestSelectOption: handleRequestSelectOption,
   }
 
   return (

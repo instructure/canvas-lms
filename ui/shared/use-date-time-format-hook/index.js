@@ -99,6 +99,13 @@ const optionsList = {
     month: 'short',
     day: 'numeric',
   },
+  'date.formats.short_with_time': {
+    // M/D h:mm a
+    month: 'numeric',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+  },
   'date.formats.full_compact': {
     // M/D/YY, H:M a
     dateStyle: 'short',

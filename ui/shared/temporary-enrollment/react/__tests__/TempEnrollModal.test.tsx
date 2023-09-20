@@ -22,6 +22,7 @@ import {TempEnrollModal} from '../TempEnrollModal'
 import fetchMock from 'fetch-mock'
 import userEvent from '@testing-library/user-event'
 import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {EnrollmentType} from '@canvas/temporary-enrollment/react/types'
 // import {prettyDOM} from '@testing-library/dom'
 
 type DateRange = {
@@ -65,6 +66,8 @@ const recipientUser = {
 }
 
 const modalProps = {
+  title: 'Create a temporary enrollment',
+  enrollmentType: 'provider' as EnrollmentType,
   accountId: '1',
   canReadSIS: true,
   permissions: {
@@ -84,6 +87,8 @@ const modalProps = {
   user: {
     ...providerUser,
   },
+  isEditMode: false,
+  onToggleEditMode: jest.fn(),
 }
 
 const userData = {

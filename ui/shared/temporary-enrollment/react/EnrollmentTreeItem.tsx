@@ -45,6 +45,14 @@ export function EnrollmentTreeItem(props: Props) {
     }
   }, [props.isCheck])
 
+  const handleCheckboxChange = () => {
+    setChecked(!checked)
+
+    if (props.updateCheck) {
+      props.updateCheck(props, !props.isCheck)
+    }
+  }
+
   const renderRow = () => {
     return (
       <Flex key={props.id} padding="x-small" as="div" alignItems="center">
@@ -54,12 +62,7 @@ export function EnrollmentTreeItem(props: Props) {
             label=""
             size="large"
             checked={checked}
-            onChange={() => {
-              setChecked(!checked)
-              if (props.updateCheck) {
-                props.updateCheck(props, !props.isCheck)
-              }
-            }}
+            onChange={handleCheckboxChange}
           />
         </FlexItem>
         <FlexItem margin="0 0 0 x-small">
