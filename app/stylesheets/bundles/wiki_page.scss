@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
-@import "pages/shared/mark_as_done.scss";
+@import 'base/environment';
+@import 'pages/shared/mark_as_done.scss';
 
 .delete-wiki-pages-header {
   padding-bottom: 12px;
@@ -31,7 +31,8 @@
     padding-#{direction(left)}: 4px;
     padding-#{direction(right)}: 4px;
   }
-  .hide-overflow, .hide-overflow a {
+  .hide-overflow,
+  .hide-overflow a {
     max-width: 40vw;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -45,6 +46,22 @@
     @include desktop-only {
       display: none;
     }
+  }
+}
+
+.ic-Table.wiki-page-table td div.wiki-page-title {
+  display: inline-block;
+  max-width: calc(100% - 8px);
+  padding: 2px;
+  &:focus-within {
+    border: 2px solid var(--ic-link-color);
+    border-radius: 4px;
+    a.wiki-page-link:focus {
+      text-decoration: none;
+    }
+  }
+  a.wiki-page-link:focus-within {
+    outline: none;
   }
 }
 
