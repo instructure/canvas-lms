@@ -572,6 +572,9 @@ window.modules = (function () {
       }
       $item.addClass('indent_' + (data.indent || 0))
       $item.addClass(modules.itemClass(data))
+      if (isAssignmentOrQuiz) {
+        $item.find('.assign-to-option').removeClass('hidden')
+      }
 
       // don't just tack onto the bottom, put it in its correct position
       let $before = null
@@ -2528,7 +2531,7 @@ $(document).ready(function () {
           renderDifferentiatedModulesTray(false, returnFocusTo)
           returnFocusTo.focus()
         }}
-        initialTab='assign-to'
+        initialTab="assign-to"
         assignOnly={false}
         moduleElement={moduleElement}
         courseId={ENV.COURSE_ID}

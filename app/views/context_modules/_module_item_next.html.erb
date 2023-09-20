@@ -34,6 +34,8 @@
     'copy_to' => "<i class='icon-duplicate'></i>".html_safe,
     'send_to' => "<i class='icon-user'></i>".html_safe,
     'speed_grader' => "<i class='icon-speed-grader'></i>".html_safe,
+    'assign_to' => "<i class='icon-permissions'></i>".html_safe,
+    'move_to' => "<i class='icon-updown'></i>".html_safe
   }
 
   menu_type_to_class = {
@@ -258,19 +260,26 @@
                   <a href="<%= context_url(@context, :context_url) %>/gradebook/speed_grader?assignment_id=<%= module_item&.assignment&.present? ? module_item.assignment.id : "{{ assignment_id }}" %>" title="<%= t('SpeedGrader')%>"><%= @module_item_image_tags['speed_grader'] %> <%= t('SpeedGrader') %></a>
                 </li>
               <% end %>
+              <% if  @context.grants_right?(@current_user, :manage_assignments_edit) %>
+                <li class="assign-to-option <%= (Account.site_admin.feature_enabled?(:differentiated_modules) && module_item.present? && ["Assignment", "Quizzes::Quiz"].include?(module_item[:content_type])) ? "" : "hidden" %>" role="presentation">
+                  <a
+                    href="#<%= module_item ? module_item.id : "{{ id }}" %>"
+                    title="<%= t('Assign this module') %>"
+                  >
+                    <%= @module_item_image_tags['assign_to'] %> <%= t('Assign To...') %>
+                  </a>
+                </li>
+              <% end %>
               <% if @can_add || module_item.nil? %>
                 <li class="dupe-option" role="presentation"><a href="/api/v1<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>/duplicate" class="duplicate_item_link" title="<%= t('Duplicate Item') %>"><%= @module_item_image_tags['duplicate'] %> <%= t('Duplicate') %></a></li>
-              <% end %>
-              <% if @can_delete || module_item.nil? %>
-                <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>" class="delete_item_link delete_link" title="<%= t('Remove this item from the module') %>"><i class="icon-trash"></i> <%= t('Remove') %></a></li>
               <% end %>
               <% if @can_edit || module_item.nil? %>
                 <li role="presentation">
                   <a href="#<%= module_item ? module_item.id : "{{ id }}" %>"
                     aria-label="<%= t('Move this item') %>"
-                    class="move_module_item_link icon-updown"
+                    class="move_module_item_link"
                     title="<%= t('Move this item') %>"
-                  ><%= t("Move to...") %></a>
+                  ><%= @module_item_image_tags["move_to"]%> <%= t("Move to...") %></a>
                 </li>
                 <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>" class="outdent_item_link" title="<%= t('Decrease indent') %>"><%= @module_item_image_tags['outdent'] %> <%= t('Decrease indent') %></a></li>
                 <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>" class="indent_item_link" title="<%= t('Increase indent') %>"><%= @module_item_image_tags['indent'] %> <%= t('Increase indent') %></a></li>
@@ -313,6 +322,9 @@
                     <%= external_tools_menu_items(@menu_tools[menu_type], {link_class: "menu_tool_link", settings_key: menu_type, in_list: true, url_params: launch_options}) %>
                   <% end %>
                 <% end %>
+              <% end %>
+              <% if @can_delete || module_item.nil? %>
+                <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>" class="delete_item_link delete_link" title="<%= t('Remove this item from the module') %>"><i class="icon-trash"></i> <%= t('Remove') %></a></li>
               <% end %>
             </ul>
           <% else %>
