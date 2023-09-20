@@ -20,7 +20,8 @@
 import React from 'react'
 import ExternalToolDialog, {ExternalToolDialogProps} from '../ExternalToolDialog/ExternalToolDialog'
 import ReactDOM, {Container} from 'react-dom'
-import {InstUISettingsProvider} from '@instructure/emotion'
+import {Transition} from '@instructure/ui-motion'
+import {ApplyTheme} from '@instructure/ui-themeable'
 import {createDeepMockProxy} from '../../../../../util/__tests__/deepMockProxy'
 import {RceToolWrapper} from '../../RceToolWrapper'
 import RCEWrapper from '../../../../RCEWrapper'
@@ -98,9 +99,9 @@ function getInstance(
       ...overrides,
     }
     ReactDOM.render(
-      <InstUISettingsProvider theme={{componentOverrides: {Transition: {duration: '0ms'}}}}>
+      <ApplyTheme theme={{[(Transition as any).theme]: {duration: '0ms'}}}>
         <ExternalToolDialog ref={it => resolve(it!)} {...props} />
-      </InstUISettingsProvider>,
+      </ApplyTheme>,
       _container ?? null
     )
   })

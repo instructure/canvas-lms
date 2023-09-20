@@ -24,7 +24,7 @@ exports[`renders the AlignmentResult component 1`] = `
       iconPlacement="start"
       isWithinText={false}
       renderIcon={[Function]}
-      themeOverride={
+      theme={
         Object {
           "fontWeight": "700",
           "mediumHeight": "normal",

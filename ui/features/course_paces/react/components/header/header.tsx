@@ -205,40 +205,28 @@ export const Header = (props: HeaderProps) => {
                         </Table.Row>
                       </Table.Head>
                       <Table.Body>
-                        <Table.Row themeOverride={{borderColor: 'transparent'}}>
+                        <Table.Row theme={{borderColor: 'transparent'}}>
                           <Table.Cell
                             data-testid="number-of-students"
-                            themeOverride={{padding: '0rem  0.75rem'}}
+                            theme={{padding: '0rem  0.75rem'}}
                           >
-                            <Text
-                              size="medium"
-                              weight="bold"
-                              themeOverride={{fontSizeMedium: '1.125rem'}}
-                            >
+                            <Text size="medium" weight="bold" theme={{fontSizeMedium: '1.125rem'}}>
                               {props.defaultPaceContext?.associated_student_count}
                             </Text>
                           </Table.Cell>
                           <Table.Cell
                             data-testid="number-of-sections"
-                            themeOverride={{padding: '0rem  0.75rem'}}
+                            theme={{padding: '0rem  0.75rem'}}
                           >
-                            <Text
-                              size="medium"
-                              weight="bold"
-                              themeOverride={{fontSizeMedium: '1.125rem'}}
-                            >
+                            <Text size="medium" weight="bold" theme={{fontSizeMedium: '1.125rem'}}>
                               {props.defaultPaceContext?.associated_section_count}
                             </Text>
                           </Table.Cell>
                           <Table.Cell
                             data-testid="default-pace-duration"
-                            themeOverride={{padding: '0rem  0.75rem'}}
+                            theme={{padding: '0rem  0.75rem'}}
                           >
-                            <Text
-                              size="medium"
-                              weight="bold"
-                              themeOverride={{fontSizeMedium: '1.125rem'}}
-                            >
+                            <Text size="medium" weight="bold" theme={{fontSizeMedium: '1.125rem'}}>
                               {getDurationLabel(props.defaultPaceContext?.applied_pace?.duration) ||
                                 '--'}
                             </Text>

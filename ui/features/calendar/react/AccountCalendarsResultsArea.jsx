@@ -115,7 +115,7 @@ const AccountCalendarResultsArea = ({
       <List data-testid="account-calendars-list" isUnstyled={true} margin="small none">
         {results.map(r => (
           <List.Item key={r.id}>
-            <View as="div" borderWidth="none none small" themeOverride={{borderColorPrimary: '#e6e6e6'}}>
+            <View as="div" borderWidth="none none small" theme={{borderColorPrimary: '#e6e6e6'}}>
               <Flex margin="small 0">
                 <Flex.Item margin="0 small">
                   <Checkbox

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -30,25 +31,15 @@ import {
 } from '../types'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
-import {View} from '@instructure/ui-view'
+import {View, ViewTextAlign} from '@instructure/ui-view'
 import {Link} from '@instructure/ui-link'
 import {TruncateText} from '@instructure/ui-truncate-text'
-import {Spinner} from '@instructure/ui-spinner'
+import {Spinner, SpinnerSize} from '@instructure/ui-spinner'
 import Paginator from '@canvas/instui-bindings/react/Paginator'
 import {formatTimeAgoDate} from '../utils/date_stuff/date_helpers'
 import {paceContextsActions} from '../actions/pace_contexts'
 import {generateModalLauncherId} from '../utils/utils'
 import NoResults from './no_results'
-
-import type {SpinnerProps} from '@instructure/ui-spinner'
-import type {ViewProps} from '@instructure/ui-view'
-import type {TableColHeaderProps} from '@instructure/ui-table'
-
-type SortingProps = {
-  onRequestSort: () => void
-  sortDirection: TableColHeaderProps['sortDirection']
-  'data-button-label': string
-}
 
 const I18n = useI18nScope('course_paces_app')
 
@@ -74,7 +65,7 @@ interface Header {
   sortable?: boolean
 }
 
-const PACE_TYPES: {[index: string]: string} = {
+const PACE_TYPES = {
   StudentEnrollment: I18n.t('Individual'),
   CourseSection: I18n.t('Section'),
   Course: I18n.t('Default'),
@@ -90,6 +81,13 @@ const SORT_TYPE: SortType = {
 }
 
 const {screenReaderFlashMessage} = $ as any
+const {
+  Body: TableBody,
+  Head: TableHead,
+  Row: TableRow,
+  Cell: TableCell,
+  ColHeader: TableColHeader,
+} = Table as any
 
 const PaceContextsTable = ({
   currentPage,
@@ -133,7 +131,7 @@ const PaceContextsTable = ({
       // this overrides the column header aria-sort and sets a custom announcement
       // for the sorting button
       el.removeAttribute('aria-sort')
-      sortingButton?.setAttribute('aria-label', buttonHeaderLabel ?? '???')
+      sortingButton?.setAttribute('aria-label', buttonHeaderLabel)
     })
   }, [newOrderType])
 
@@ -241,7 +239,7 @@ const PaceContextsTable = ({
   }
 
   const renderHeader = () => {
-    const sortingProps: SortingProps = {
+    const sortingProps = {
       onRequestSort: handleSort,
       sortDirection: currentSortBy ? SORT_TYPE[currentOrderType] : 'none',
       'data-button-label': I18n.t('Sort %{orderType} by %{sortBy}', {
@@ -250,10 +248,10 @@ const PaceContextsTable = ({
       }),
     }
     return (
-      <Table.Head renderSortLabel={I18n.t('Sort By')}>
-        <Table.Row>
+      <TableHead renderSortLabel={I18n.t('Sort By')}>
+        <TableRow>
           {headers.map(header => (
-            <Table.ColHeader
+            <TableColHeader
               id={`header-table-${header.key}`}
               key={`contexts-header-table-${header.key}`}
               width={header.width}
@@ -267,28 +265,28 @@ const PaceContextsTable = ({
               <View display="inline-block">
                 <Text weight="bold">{header.text}</Text>
               </View>
-            </Table.ColHeader>
+            </TableColHeader>
           ))}
-        </Table.Row>
-      </Table.Head>
+        </TableRow>
+      </TableHead>
     )
   }
 
   const renderRow = (paceContext: PaceContext) => {
     const rowCells = getValuesByContextType(paceContext)
     return (
-      <Table.Row data-testid="course-pace-row" key={paceContext.item_id}>
+      <TableRow data-testid="course-pace-row" key={paceContext.item_id}>
         {rowCells.map((cell, index) => (
-          <Table.Cell
+          <TableCell
             data-testid="course-pace-item"
             // eslint-disable-next-line react/no-array-index-key
             key={`contexts-table-cell-${index}`}
-            themeOverride={{padding: '0.7rem'}}
+            theme={{padding: '0.7rem'}}
           >
             {cell}
-          </Table.Cell>
+          </TableCell>
         ))}
-      </Table.Row>
+      </TableRow>
     )
   }
 
@@ -318,8 +316,8 @@ const PaceContextsTable = ({
   const loadingView = (
     dataTestId: string,
     title: string,
-    size: SpinnerProps['size'] = 'large',
-    align: ViewProps['textAlign'] = 'center'
+    size: SpinnerSize = 'large',
+    align: ViewTextAlign = 'center'
   ) => (
     <View data-testid={dataTestId} as="div" textAlign={align}>
       <Spinner size={size} renderTitle={title} margin="none" />
@@ -346,16 +344,16 @@ const PaceContextsTable = ({
         <View as="div" margin="none none large none" borderWidth="0 small">
           <Table
             elementRef={e => {
-              tableRef.current = e as HTMLElement
+              tableRef.current = e
             }}
             data-testid="course-pace-context-table"
             caption={tableCaption}
           >
             {renderHeader()}
             {!isLoading && (
-              <Table.Body>
+              <TableBody>
                 {paceContexts.map((paceContext: PaceContext) => renderRow(paceContext))}
-              </Table.Body>
+              </TableBody>
             )}
           </Table>
         </View>

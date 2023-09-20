@@ -26,7 +26,12 @@ import {
   canvas as canvasBaseTheme,
   canvasHighContrast as canvasHighContrastTheme,
 } from '@instructure/ui-themes'
+import {Heading} from '@instructure/ui-heading'
+import {Tabs} from '@instructure/ui-tabs'
 import {mergeDeep} from '@instructure/ui-utils'
+import {Table} from '@instructure/ui-table'
+import {IconButton} from '@instructure/ui-buttons'
+import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {Day, Grouping, PlannerItem} from '@canvas/planner'
 
 export function getBaseThemeVars() {
@@ -70,7 +75,7 @@ export function getBaseThemeVars() {
 export const getK5ThemeOverrides = () => {
   const {typography, borders, colors} = getK5ThemeVars()
   return {
-    Heading: {
+    [Heading.componentId]: {
       h1FontWeight: typography.fontWeightBold,
       h2FontSize: '1.5rem',
       h2FontWeight: typography.fontWeightBold,
@@ -81,7 +86,7 @@ export const getK5ThemeOverrides = () => {
       h5FontSize: '1rem',
       h5FontWeight: typography.fontWeightNormal,
     },
-    'Tabs.Tab': {
+    [Tabs.Tab.componentId]: {
       fontSize: '1.25rem',
     },
     [Grouping.componentId]: {
@@ -95,10 +100,10 @@ export const getK5ThemeOverrides = () => {
       iconColor: colors.licorice,
       secondaryColor: colors.licorice,
     },
-    'Table.Cell': {
+    [Table.Cell.componentId]: {
       padding: '1rem 0.75rem',
     },
-    IconButton: {
+    [IconButton.componentId]: {
       iconSizeMedium: '1.5rem',
     },
   }
@@ -106,7 +111,7 @@ export const getK5ThemeOverrides = () => {
 
 /** Overrides applied specifically to resources pages */
 export const getResourcesTheme = () => ({
-  Heading: {
+  [Heading.componentId]: {
     h2FontSize: '1.375rem',
     h3FontSize: '1.125rem',
   },
@@ -117,7 +122,7 @@ export const getPlannerTheme = () => {
   const {colors} = getBaseThemeVars()
 
   return {
-    ToggleDetails: {
+    [ToggleDetails.componentId]: {
       iconColor: colors.brand,
       textColor: colors.textBrand,
     },

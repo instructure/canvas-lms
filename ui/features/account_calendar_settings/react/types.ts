@@ -34,8 +34,7 @@ export type AccountData = {
 export type Account = {
   id: number
   name: string
-  heading?: string
-  label?: string
+  heading: string | undefined
   parent_account_id: number | null
   sub_account_count: number
   children: any[]

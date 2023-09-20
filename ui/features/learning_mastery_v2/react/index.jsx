@@ -29,17 +29,17 @@ import Gradebook from './Gradebook'
 import useRollups from './hooks/useRollups'
 import GradebookMenu from '@canvas/gradebook-menu/react/GradebookMenu'
 import {Flex} from '@instructure/ui-flex'
-import {InstUISettingsProvider} from '@instructure/emotion'
+import {ApplyTheme} from '@instructure/ui-themeable'
 import {IconButton} from '@instructure/ui-buttons'
 import LMGBContext, {getLMGBContext} from '@canvas/outcomes/react/contexts/LMGBContext'
 
 const I18n = useI18nScope('LearningMasteryGradebook')
 
-const getRatings = (ratings) => {
+const getRatings = ratings => {
   const masteryAt = ratings.find(rating => rating.mastery).points
   return [
     ...ratings.map(({points, description, color}) => ({
-      description: description === I18n.t("Below Mastery") ? I18n.t("Remediation") : description,
+      description: description === I18n.t('Below Mastery') ? I18n.t('Remediation') : description,
       points,
       masteryAt,
       color: '#' + color,
@@ -49,9 +49,9 @@ const getRatings = (ratings) => {
 }
 
 const gradebookMenuOverride = {
-  Link: {
-    color: 'licorice'
-  }
+  [Link.theme]: {
+    color: 'licorice',
+  },
 }
 
 const renderLoader = () => (
@@ -78,7 +78,7 @@ const LearningMastery = ({courseId}) => {
 
   return (
     <LMGBContext.Provider value={contextValues}>
-      <InstUISettingsProvider theme={gradebookMenuOverride}>
+      <ApplyTheme theme={gradebookMenuOverride}>
         <Flex
           height="100%"
           display="flex"
@@ -87,7 +87,9 @@ const LearningMastery = ({courseId}) => {
           padding="medium 0 0 0"
           data-testid="lmgb-gradebook-menu"
         >
-          <Text size='xx-large' weight='bold'>{I18n.t('Learning Mastery Gradebook')}</Text>
+          <Text size="xx-large" weight="bold">
+            {I18n.t('Learning Mastery Gradebook')}
+          </Text>
           <View padding="xx-small">
             <GradebookMenu
               courseUrl={contextURL}
@@ -97,15 +99,15 @@ const LearningMastery = ({courseId}) => {
                 <IconButton
                   withBorder={false}
                   withBackground={false}
-                  screenReaderLabel={I18n.t("Gradebook Menu Dropdown")}
+                  screenReaderLabel={I18n.t('Gradebook Menu Dropdown')}
                 >
-                  <IconArrowOpenDownSolid size='x-small'/>
+                  <IconArrowOpenDownSolid size="x-small" />
                 </IconButton>
               }
             />
           </View>
         </Flex>
-      </InstUISettingsProvider>
+      </ApplyTheme>
       {accountLevelMasteryScalesFF && (
         <Flex.Item as="div" width="100%" padding="small 0 0 0">
           <ProficiencyFilter

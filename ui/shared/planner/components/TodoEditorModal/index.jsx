@@ -70,7 +70,7 @@ export default function TodoEditorModal({
       data-testid="todo-editor-modal"
       label={getModalLabel()}
       size="auto"
-      themeOverride={{autoMinWidth: '25em'}}
+      theme={{autoMinWidth: '25em'}}
       open={!!todoItem}
       onDismiss={onClose}
       // clicking the calendar closes the Modal if we do not set this to false

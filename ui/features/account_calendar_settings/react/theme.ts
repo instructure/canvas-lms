@@ -20,19 +20,22 @@
 import canvas from '@instructure/canvas-theme'
 import canvasHighContrast from '@instructure/canvas-high-contrast-theme'
 
+import {TreeBrowser} from '@instructure/ui-tree-browser'
+import {View} from '@instructure/ui-view'
+
 const {variables} = ENV.use_high_contrast ? canvasHighContrast : canvas
 const {colors} = variables
 
 // Note: there are a few more style overrides set in account_calendar_settings.scss
 
 export const treeBrowserTheme = {
-  'TreeBrowser.Node': {
+  [TreeBrowser.Node.componentId]: {
     hoverBackgroundColor: colors.backgroundLight,
     nameTextColor: colors.textDarkest,
     hoverTextColor: colors.textDarkest,
     baseSpacingMedium: '2rem',
   },
-  'TreeBrowser.Button': {
+  [TreeBrowser.Button.componentId]: {
     hoverBackgroundColor: colors.backgroundLight,
     nameTextColor: colors.textDarkest,
     hoverTextColor: colors.textDarkest,
@@ -42,7 +45,7 @@ export const treeBrowserTheme = {
   },
 }
 export const accountListTheme = {
-  View: {
+  [View.componentId]: {
     borderColorPrimary: colors.porcelain,
   },
 }
