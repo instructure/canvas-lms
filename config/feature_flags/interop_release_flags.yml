@@ -237,3 +237,16 @@ lti_find_external_tool_prefer_original_client_id:
     When possible, the LTI tool finding logic will prefer tools installed from the same
     developer key as the original tool. This prevents the edge case where multiple developer
     keys share the same domain, and a tool from the wrong developer key would be matched first.
+lti_rce_postmessage_support:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Support all LTI postMessages from within active RCE
+  description: |-
+    Respond to all LTI postMessages sent from tools launched within iframes in an active RCE
+    window. Supports standard postMessages sent to window.parent and Platform Storage
+    messages sent to the sibling post_message_forwarding frame.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on

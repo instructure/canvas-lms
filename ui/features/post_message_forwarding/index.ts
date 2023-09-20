@@ -31,7 +31,12 @@ type Message = {
 type WindowReferences = [Window]
 
 export const handler =
-  (PARENT_ORIGIN: string, windowReferences: WindowReferences, parentWindow: Window | null) =>
+  (
+    parentOrigin: string,
+    windowReferences: WindowReferences,
+    parentWindow: Window | null,
+    includeRCESignal: false
+  ) =>
   (e: MessageEvent) => {
     let message: Message
     try {
@@ -41,10 +46,8 @@ export const handler =
       return false
     }
 
-    // NOTE: the code to encode/decode `sourceToolInfo` is duplicated in
-    // the RCE code (packages/canvas-rce/src/rce/RCEWrapper.jsx), and
-    // cannot be DRY'd because RCE is in a package
-    if (e.origin === PARENT_ORIGIN) {
+    if (e.origin === parentOrigin) {
+      // message from canvas -> tool
       const {sourceToolInfo, ...messageWithoutSourceToolInfo} = message
       if (!sourceToolInfo) {
         return false
@@ -53,6 +56,7 @@ export const handler =
       const targetWindow = windowReferences[sourceToolInfo?.windowId]
       targetWindow?.postMessage(messageWithoutSourceToolInfo, targetOrigin)
     } else {
+      // message from tool -> canvas
       // We can't forward the whole `e.source` window in the postMessage,
       // so we keep a list (`windowReferences`) of all windows we've received
       // messages from, and include the index into that list as `windowId`
@@ -62,12 +66,23 @@ export const handler =
         windowId = windowReferences.length - 1
       }
       const newMessage = {...message, sourceToolInfo: {origin: e.origin, windowId}}
-      parentWindow?.postMessage(newMessage, PARENT_ORIGIN)
+      if (includeRCESignal) {
+        newMessage.in_rce = true
+      }
+      parentWindow?.postMessage(newMessage, parentOrigin)
     }
   }
 
 ready(() => {
-  const {PARENT_ORIGIN} = window.ENV as EnvPlatformStoragePostMessageForwarding
+  const {PARENT_ORIGIN, IN_RCE} = window.ENV as EnvPlatformStoragePostMessageForwarding
   const windowReferences = [] as WindowReferences
-  window.addEventListener('message', handler(PARENT_ORIGIN, windowReferences, window.top))
+
+  if (IN_RCE) {
+    // Canvas renders the RCE/TinyMCE, which uses an iframe to enclose the content being edited
+    // tools inside the editor should send _all_ postMessages directly to Canvas
+    const canvasWindow = window.parent.parent
+    window.addEventListener('message', handler(window.origin, windowReferences, canvasWindow, true))
+  } else {
+    window.addEventListener('message', handler(PARENT_ORIGIN, windowReferences, window.top))
+  }
 })

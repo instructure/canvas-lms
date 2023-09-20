@@ -239,6 +239,15 @@ export function enhanceUserContent(container = document, opts = {}) {
       })
     }
 
+    // tell LTI tools that they are launching from within the active RCE
+    unenhanced_elem.querySelectorAll('iframe[src]').forEach(iframeElem => {
+      const src = iframeElem.getAttribute('src')
+
+      if (src.startsWith(canvasOrigin)) {
+        iframeElem.setAttribute('src', src.replace('display=in_rce', 'display=borderless'))
+      }
+    })
+
     unenhanced_elem.querySelectorAll('a:not(.not_external, .external)').forEach(childLink => {
       if (!isExternalLink(childLink, canvasOrigin)) return
       if (childLink.tagName === 'IMG' || childLink.querySelectorAll('img').length > 0) return
