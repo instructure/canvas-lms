@@ -280,6 +280,9 @@ body:not(.responsive_student_grades_page) {
     position: relative;
     display: inline-block;
     width: fit-content;
+    &:focus {
+      outline: 2px solid var(--ic-link-color);
+    }
   }
 
   a.tooltip {
