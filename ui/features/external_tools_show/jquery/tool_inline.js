@@ -23,13 +23,23 @@ import ToolLaunchResizer from '@canvas/lti/jquery/tool_launch_resizer'
 import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
 import ready from '@instructure/ready'
 
+const logMessageWithWindowUrl = (message, extras = {}) => {
+  console.log({
+    message,
+    location: window.location.href,
+    ...extras,
+  })
+}
+
 ready(() => {
   const $toolForm = $('#tool_form')
+  logMessageWithWindowUrl('found tool form', {toolForm: $toolForm})
 
   const launchToolManually = function () {
     const $button = $toolForm.find('button')
 
     $toolForm.show()
+    logMessageWithWindowUrl('showing tool form', {toolForm: $toolForm})
 
     // Firefox remembers disabled state after page reloads
     $button.attr('disabled', false)
@@ -39,7 +49,9 @@ ready(() => {
       $button.attr('disabled', true).text($button.data('expired_message'))
     }, 60 * 2.5 * 1000)
 
+    logMessageWithWindowUrl('submitting tool form', {toolForm: $toolForm})
     $toolForm.submit(function () {
+      logMessageWithWindowUrl('submitted tool form', {toolForm: $toolForm})
       $(this).find('.load_tab,.tab_loaded').toggle()
     })
   }
@@ -55,12 +67,15 @@ ready(() => {
       launchToolInNewTab()
       break
     case 'self':
+      logMessageWithWindowUrl('tool launch type is self', {toolForm: $toolForm})
       $toolForm.removeAttr('target')
       $toolForm.submit()
+      logMessageWithWindowUrl('case self: submitted tool form', {toolForm: $toolForm})
       break
     default:
       // Firefox throws an error when submitting insecure content
       $toolForm.submit()
+      logMessageWithWindowUrl('case default: submitted tool form', {toolForm: $toolForm})
 
       $('#tool_content').bind('load', () => {
         if (
@@ -69,10 +84,16 @@ ready(() => {
         ) {
           $('#insecure_content_msg').hide()
           $toolForm.hide()
+          logMessageWithWindowUrl('hid insecure content message and hid toolForm', {
+            toolForm: $toolForm,
+          })
         }
       })
       setTimeout(() => {
         if ($('#insecure_content_msg').is(':visible')) {
+          logMessageWithWindowUrl('insecure content message still visible, launching in new tab', {
+            toolForm: $toolForm,
+          })
           $('#load_failure').show()
           launchToolInNewTab()
         }
