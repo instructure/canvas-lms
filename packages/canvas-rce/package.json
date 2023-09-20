@@ -113,6 +113,7 @@
     "@instructure/ui-radio-input": "^8",
     "@instructure/ui-react-utils": "^8",
     "@instructure/ui-simple-select": "^8",
+    "@instructure/ui-source-code-editor": "^8",
     "@instructure/ui-spinner": "^8",
     "@instructure/ui-svg-images": "^8",
     "@instructure/ui-table": "^8",
