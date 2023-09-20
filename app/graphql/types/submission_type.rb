@@ -68,6 +68,8 @@ module Types
 
     field :grading_period_id, ID, null: true
 
+    field :student_entered_score, Float, null: true
+
     field :redo_request, Boolean, null: true
 
     field :user_id, ID, null: false

@@ -102,6 +102,7 @@ class Types::MutationType < Types::ApplicationObjectType
   field :create_internal_setting, mutation: Mutations::CreateInternalSetting
   field :update_internal_setting, mutation: Mutations::UpdateInternalSetting
   field :delete_internal_setting, mutation: Mutations::DeleteInternalSetting
+  field :update_submission_student_entered_score, mutation: Mutations::UpdateSubmissionStudentEnteredScore
   field :update_submissions_read_state, mutation: Mutations::UpdateSubmissionsReadState
   field :update_submission_grade, mutation: Mutations::UpdateSubmissionGrade
   field :update_user_discussions_splitscreen_view, mutation: Mutations::UpdateUserDiscussionsSplitscreenView
