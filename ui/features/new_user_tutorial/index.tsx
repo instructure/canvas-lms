@@ -30,12 +30,15 @@ const initializeNewUserTutorials = () => {
     window.ENV.NEW_USER_TUTORIALS &&
     window.ENV.NEW_USER_TUTORIALS.is_enabled &&
     window.ENV.context_asset_string &&
-    splitAssetString(window.ENV.context_asset_string)[0] === 'courses'
+    splitAssetString(window.ENV.context_asset_string)?.[0] === 'courses'
   ) {
     const API_URL = '/api/v1/users/self/new_user_tutorial_statuses'
-    axios.get(API_URL).then(response => {
-      let onPageToggleButton
+    return axios.get(API_URL).then(response => {
+      let onPageToggleButton: NewUserTutorialToggleButton | null = null
       const trayObj = getProperTray()
+      if (!trayObj) {
+        throw new Error('No tray found')
+      }
       const collapsedStatus = response.data.new_user_tutorial_statuses.collapsed[trayObj.pageName]
       const store = createTutorialStore({
         isCollapsed: collapsedStatus,
@@ -60,7 +63,7 @@ const initializeNewUserTutorials = () => {
       }
       ReactDOM.render(
         <NewUserTutorialToggleButton
-          ref={c => {
+          ref={(c: NewUserTutorialToggleButton | null) => {
             onPageToggleButton = c
           }}
           store={store}
