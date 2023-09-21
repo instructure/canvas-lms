@@ -41,6 +41,7 @@ const localConfig = {
     },
   },
   showMathMenu: true,
+  messageStyle: 'none',
 }
 
 class Mathml {
