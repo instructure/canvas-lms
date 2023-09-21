@@ -24,6 +24,7 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {datetimeString} from '@canvas/datetime/date-functions'
 import {ContentMigrationItem} from './types'
+import {CompletionProgressBar} from './completion_progress_bar'
 
 const I18n = useI18nScope('content_migrations_redesign')
 
@@ -77,7 +78,9 @@ export const ContentMigrationsTable = () => {
                 workflowState={cm.workflow_state}
               />
             </Table.Cell>
-            <Table.Cell> </Table.Cell>
+            <Table.Cell>
+              <CompletionProgressBar progress_url={cm.progress_url} />
+            </Table.Cell>
           </Table.Row>
         ))}
       </Table.Body>

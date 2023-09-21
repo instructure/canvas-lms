@@ -27,6 +27,13 @@ export type ContentMigrationItemAttachment = {
   url: string
 }
 
+export type ContentMigrationWorkflowState =
+  | 'pre_processing'
+  | 'failed'
+  | 'waiting_for_select'
+  | 'running'
+  | 'completed'
+
 export type ContentMigrationItem = {
   id: string
   migration_type:
@@ -37,9 +44,10 @@ export type ContentMigrationItem = {
     | 'moodle_converter'
     | 'qti_converter'
   migration_type_title: string
+  progress_url: string
   settings: ContentMigrationItemSettings
   attachment?: ContentMigrationItemAttachment
-  workflow_state: 'pre_processing' | 'failed' | 'waiting_for_select' | 'running' | 'completed'
+  workflow_state: ContentMigrationWorkflowState
   migration_issues_count: number
   created_at: string
 }
