@@ -24,6 +24,8 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Tag} from '@instructure/ui-tag'
 import {Alert} from '@instructure/ui-alerts'
+// @ts-expect-error
+import {Tooltip} from '@instructure/ui-tooltip'
 import type {CamelizedGradingPeriod} from '@canvas/grading/grading.d'
 import type {Filter, FilterPreset} from '../gradebook.d'
 import type {AssignmentGroup, Module, Section, StudentGroupCategoryMap} from '../../../../../api.d'
@@ -64,6 +66,7 @@ export default function FilterNav({
   const addFilters = useStore(state => state.addFilters)
   const appliedFilters = useStore(state => state.appliedFilters)
   const applyFiltersButtonRef = useRef<HTMLButtonElement>(null)
+  const filterTagRef = useRef<(HTMLElement | null)[]>([])
 
   const handleClearFilters = () => {
     setAnnouncement(I18n.t('All Filters Have Been Cleared'))
@@ -71,7 +74,7 @@ export default function FilterNav({
     applyFiltersButtonRef.current?.focus()
   }
 
-  const activeFilterComponents = appliedFilters.filter(isFilterNotEmpty).map(filter => {
+  const activeFilterComponents = appliedFilters.filter(isFilterNotEmpty).map((filter, i) => {
     const label = getLabelForFilter(
       filter,
       assignmentGroups,
@@ -93,9 +96,14 @@ export default function FilterNav({
       <Tag
         data-testid={`applied-filter-${label}`}
         key={`staged-filter-${filter.id}`}
+        elementRef={(e: HTMLElement) => {
+          filterTagRef.current[i] = e as HTMLElement
+        }}
         text={
           <AccessibleContent alt={I18n.t('Remove %{filterName} Filter', {filterName: label})}>
-            {label}
+            <Tooltip renderTip={label} positionTarget={filterTagRef.current[i]}>
+              {label}
+            </Tooltip>
           </AccessibleContent>
         }
         dismissible={true}
