@@ -28,12 +28,18 @@ const I18n = useI18nScope('differentiated_modules')
 const {Item: FlexItem} = Flex as any
 
 export interface FooterProps {
+  updateButtonLabel: string
   onDismiss: () => void
   onUpdate: () => void
   disableUpdate?: boolean
 }
 
-export default function Footer({onDismiss, onUpdate, disableUpdate = false}: FooterProps) {
+export default function Footer({
+  updateButtonLabel,
+  onDismiss,
+  onUpdate,
+  disableUpdate = false,
+}: FooterProps) {
   return (
     <View as="div" padding="small" background="secondary" borderWidth="small none none none">
       <Flex as="div" justifyItems="end">
@@ -42,7 +48,7 @@ export default function Footer({onDismiss, onUpdate, disableUpdate = false}: Foo
         </FlexItem>
         <FlexItem margin="0 0 0 small">
           <Button color="primary" disabled={disableUpdate} onClick={onUpdate}>
-            {I18n.t('Update Module')}
+            {updateButtonLabel}
           </Button>
         </FlexItem>
       </Flex>

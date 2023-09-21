@@ -22,6 +22,7 @@ import Footer, {FooterProps} from '../Footer'
 
 describe('Footer', () => {
   const props: FooterProps = {
+    updateButtonLabel: 'Update Module',
     onDismiss: jest.fn(),
     onUpdate: jest.fn(),
   }
@@ -36,6 +37,11 @@ describe('Footer', () => {
     const {getByText} = renderComponent()
     expect(getByText('Cancel')).toBeInTheDocument()
     expect(getByText('Update Module')).toBeInTheDocument()
+  })
+
+  it('labels the update button from the prop', () => {
+    const {getByRole} = renderComponent({updateButtonLabel: 'Save'})
+    expect(getByRole('button', {name: 'Save'})).toBeInTheDocument()
   })
 
   it('calls onDismiss when cancel button is clicked', () => {

@@ -263,7 +263,12 @@
               <% if  @context.grants_right?(@current_user, :manage_assignments_edit) %>
                 <li class="assign-to-option <%= (Account.site_admin.feature_enabled?(:differentiated_modules) && module_item.present? && ["Assignment", "Quizzes::Quiz"].include?(module_item[:content_type])) ? "" : "hidden" %>" role="presentation">
                   <a
+                    class="module-item-assign-to-link"
                     href="#<%= module_item ? module_item.id : "{{ id }}" %>"
+                    data-item-id="<%= module_item ? module_item.id : '' %>"
+                    data-item-name="<%= module_item ? module_item.title : '' %>"
+                    data-item-type="<%= module_item ? module_item[:content_type] : '' %>"
+                    data-item-context-id="<%= module_item ? module_item.context_id : '' %>"
                     title="<%= t('Assign this module') %>"
                   >
                     <%= @module_item_image_tags['assign_to'] %> <%= t('Assign To...') %>

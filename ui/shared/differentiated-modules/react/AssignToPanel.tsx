@@ -104,7 +104,11 @@ export default function AssignToPanel({courseId, moduleId, height, onDismiss}: A
         </RadioInputGroup>
       </FlexItem>
       <FlexItem margin="auto none none none">
-        <Footer onDismiss={onDismiss} onUpdate={() => {}} />
+        <Footer
+          updateButtonLabel={I18n.t('Update Module')}
+          onDismiss={onDismiss}
+          onUpdate={() => {}}
+        />
       </FlexItem>
     </Flex>
   )
