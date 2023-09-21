@@ -48,7 +48,7 @@ import {
 } from '../../utils/constants'
 import {DiscussionEntryContainer} from '../DiscussionEntryContainer/DiscussionEntryContainer'
 import PropTypes from 'prop-types'
-import React, {useContext, useEffect, useState, useCallback} from 'react'
+import React, {useContext, useEffect, useState, useCallback, useRef} from 'react'
 import * as ReactDOMServer from 'react-dom/server'
 import {ReplyInfo} from '../../components/ReplyInfo/ReplyInfo'
 import {Responsive} from '@instructure/ui-responsive'
@@ -61,7 +61,6 @@ import {View} from '@instructure/ui-view'
 import {ReportReply} from '../../components/ReportReply/ReportReply'
 import {Text} from '@instructure/ui-text'
 import useCreateDiscussionEntry from '../../hooks/useCreateDiscussionEntry'
-import {DiscussionEntry} from '../../../graphql/DiscussionEntry'
 
 const I18n = useI18nScope('discussion_topics_post')
 
@@ -78,6 +77,9 @@ const defaultExpandedReplies = id => {
 }
 
 export const DiscussionThreadContainer = props => {
+  const replyButtonRef = useRef()
+  const moreOptionsButtonRef = useRef()
+
   const {searchTerm, filter, allThreadsStatus, expandedThreads, setExpandedThreads} =
     useContext(SearchContext)
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
@@ -259,6 +261,7 @@ export const DiscussionThreadContainer = props => {
   if (props.discussionEntry.permissions.reply) {
     threadActions.push(
       <ThreadingToolbar.Reply
+        replyButtonRef={replyButtonRef}
         key={`reply-${props.discussionEntry._id}`}
         authorName={getDisplayName(props.discussionEntry)}
         delimiterKey={`reply-delimiter-${props.discussionEntry._id}`}
@@ -464,6 +467,7 @@ export const DiscussionThreadContainer = props => {
                     postUtilities={
                       filter !== 'drafts' && !props.discussionEntry.deleted ? (
                         <ThreadActions
+                          moreOptionsButtonRef={moreOptionsButtonRef}
                           id={props.discussionEntry._id}
                           authorName={getDisplayName(props.discussionEntry)}
                           isUnread={!props.discussionEntry.entryParticipant?.read}
@@ -531,7 +535,12 @@ export const DiscussionThreadContainer = props => {
                     message={props.discussionEntry.message}
                     isEditing={isEditing}
                     onSave={onUpdate}
-                    onCancel={() => setIsEditing(false)}
+                    onCancel={() => {
+                      setIsEditing(false)
+                      setTimeout(() => {
+                        moreOptionsButtonRef?.current?.focus()
+                      }, 0)
+                    }}
                     isIsolatedView={false}
                     editor={props.discussionEntry.editor}
                     isUnread={
@@ -607,7 +616,12 @@ export const DiscussionThreadContainer = props => {
                   onSubmit={(message, quotedEntryId, file, anonymousAuthorState) => {
                     onReplySubmit(message, quotedEntryId, anonymousAuthorState, file)
                   }}
-                  onCancel={() => setEditorExpanded(false)}
+                  onCancel={() => {
+                    setEditorExpanded(false)
+                    setTimeout(() => {
+                      replyButtonRef?.current?.focus()
+                    }, 0)
+                  }}
                   quotedEntry={buildQuotedReply([props.discussionEntry], replyFromId)}
                   value={
                     props.discussionEntry.depth > 2
