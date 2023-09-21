@@ -24,7 +24,9 @@ import {
   isTopicAuthor,
   getDisplayName,
   getOptimisticResponse,
-  buildQuotedReply, addReplyToAllRootEntries, addSubentriesCountToParentEntry,
+  buildQuotedReply,
+  addReplyToAllRootEntries,
+  addSubentriesCountToParentEntry,
 } from '../../utils'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {
@@ -48,7 +50,7 @@ import {
 } from '../../utils/constants'
 import {DiscussionEntryContainer} from '../DiscussionEntryContainer/DiscussionEntryContainer'
 import PropTypes from 'prop-types'
-import React, {useContext, useEffect, useState, useCallback, useRef} from 'react'
+import React, {useContext, useEffect, useState, useCallback, useRef, useMemo} from 'react'
 import * as ReactDOMServer from 'react-dom/server'
 import {ReplyInfo} from '../../components/ReplyInfo/ReplyInfo'
 import {Responsive} from '@instructure/ui-responsive'
@@ -61,6 +63,7 @@ import {View} from '@instructure/ui-view'
 import {ReportReply} from '../../components/ReportReply/ReportReply'
 import {Text} from '@instructure/ui-text'
 import useCreateDiscussionEntry from '../../hooks/useCreateDiscussionEntry'
+import {DiscussionEntry} from '../../../graphql/DiscussionEntry'
 
 const I18n = useI18nScope('discussion_topics_post')
 
@@ -712,10 +715,9 @@ const DiscussionSubentries = props => {
   const subentries = allRootEntries.filter(entry => entry.parentId === props.discussionEntryId)
 
   return subentries.map(entry => (
-    <DiscussionThreadContainer
+    <DiscussionSubentriesMemo
       key={`discussion-thread-${entry.id}`}
       depth={props.depth}
-      refetchDiscussionEntries={subentries.refetch || null}
       discussionEntry={entry}
       discussionTopic={props.discussionTopic}
       markAsRead={props.markAsRead}
@@ -732,6 +734,39 @@ const DiscussionSubentries = props => {
 DiscussionSubentries.propTypes = {
   discussionTopic: Discussion.shape,
   discussionEntryId: PropTypes.string,
+  depth: PropTypes.number,
+  markAsRead: PropTypes.func,
+  parentRefCurrent: PropTypes.object,
+  removeDraftFromDiscussionCache: PropTypes.func,
+  updateDraftCache: PropTypes.func,
+  highlightEntryId: PropTypes.string,
+  setHighlightEntryId: PropTypes.func,
+  allRootEntries: PropTypes.array,
+}
+
+const DiscussionSubentriesMemo = props => {
+  return useMemo(() => {
+    return (
+      <DiscussionThreadContainer
+        depth={props.depth}
+        discussionEntry={props.discussionEntry}
+        discussionTopic={props.discussionTopic}
+        markAsRead={props.markAsRead}
+        parentRefCurrent={props.parentRefCurrent}
+        removeDraftFromDiscussionCache={props.removeDraftFromDiscussionCache}
+        updateDraftCache={props.updateDraftCache}
+        highlightEntryId={props.highlightEntryId}
+        setHighlightEntryId={props.setHighlightEntryId}
+        allRootEntries={props.allRootEntries}
+      />
+    )
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.depth, props.discussionEntry, props.highlightEntryId])
+}
+
+DiscussionSubentries.propTypes = {
+  discussionTopic: Discussion.shape,
+  discussionEntry: DiscussionEntry.shape,
   depth: PropTypes.number,
   markAsRead: PropTypes.func,
   parentRefCurrent: PropTypes.object,
