@@ -33,6 +33,7 @@ const item: ContentMigrationItem = {
     source_course_name: 'My Course',
     source_course_html_url: 'https://localhost/courses/1',
   },
+  progress_url: 'https://mock.progress.url',
 }
 
 const attachment: ContentMigrationItemAttachment = {
