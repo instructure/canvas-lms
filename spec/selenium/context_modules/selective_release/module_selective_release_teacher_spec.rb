@@ -99,15 +99,6 @@ describe "selective_release module set up" do
 
       expect(settings_tray_exists?).to be true
     end
-
-    it "show the everyone radio button as checked when selecting Assign To tray" do
-      go_to_modules
-      manage_module_button(@module).click
-
-      module_index_menu_tool_link("Assign To...").click
-
-      expect(is_checked(everyone_radio)).to be true
-    end
   end
 
   context "uses tray to update prerequisites" do
@@ -187,6 +178,134 @@ describe "selective_release module set up" do
       click_settings_tray_cancel_button
 
       expect(prerequisite_message(@module2).text).not_to eq("Prerequisites: module2")
+    end
+  end
+
+  context "uses tray to update assign to settings" do
+    before(:once) do
+      Account.site_admin.enable_feature! :differentiated_modules
+      course_with_teacher(active_all: true)
+      @section1 = @course.course_sections.create!(name: "section1")
+      @section2 = @course.course_sections.create!(name: "section2")
+      @student1 = user_factory(name: "user1", active_all: true, active_state: "active")
+      @student2 = user_factory(name: "user2", active_all: true, active_state: "active", section: @section2)
+      @course.enroll_user(@student1, "StudentEnrollment", enrollment_state: "active")
+      @course.enroll_user(@student2, "StudentEnrollment", enrollment_state: "active")
+
+      module_setup
+    end
+
+    before do
+      user_session(@teacher)
+    end
+
+    it "shows the everyone radio button as checked when selecting Assign To tray" do
+      go_to_modules
+      manage_module_button(@module).click
+
+      module_index_menu_tool_link("Assign To...").click
+
+      expect(is_checked(everyone_radio_checked)).to be true
+    end
+
+    it "selects the custom radio button for module assign to when clicked" do
+      go_to_modules
+      manage_module_button(@module).click
+      module_index_menu_tool_link("Assign To...").click
+
+      click_custom_access_radio
+
+      expect(is_checked(custom_access_radio_checked)).to be true
+    end
+
+    it "selects the custom radio button for module assign to and cancels" do
+      go_to_modules
+      manage_module_button(@module).click
+      module_index_menu_tool_link("Assign To...").click
+      click_custom_access_radio
+
+      expect(is_checked(custom_access_radio_checked)).to be true
+
+      click_settings_tray_cancel_button
+      expect(settings_tray_exists?).to be_falsey
+    end
+
+    it "searches for a user to assign to and selects the user" do
+      go_to_modules
+      manage_module_button(@module).click
+      module_index_menu_tool_link("Assign To...").click
+      click_custom_access_radio
+      expect(assignee_selection).to be_displayed
+
+      assignee_selection.send_keys("user")
+      click_option(assignee_selection, "user1")
+      expect(assignee_selection_item[0].text).to eq("user1")
+    end
+
+    it "adds more than one name to the assign to list" do
+      go_to_modules
+      manage_module_button(@module).click
+      module_index_menu_tool_link("Assign To...").click
+      click_custom_access_radio
+      assignee_selection.send_keys("user")
+      click_option(assignee_selection, "user1")
+      assignee_selection.send_keys("user")
+      click_option(assignee_selection, "user2")
+
+      assignee_list = assignee_selection_item.map(&:text)
+      expect(assignee_list.sort).to eq(%w[user1 user2])
+    end
+
+    it "adds a section to the list of assignees" do
+      go_to_modules
+      manage_module_button(@module).click
+      module_index_menu_tool_link("Assign To...").click
+      click_custom_access_radio
+
+      assignee_selection.send_keys("section")
+      click_option(assignee_selection, "section1")
+      expect(assignee_selection_item[0].text).to eq("section1")
+    end
+
+    it "adds both user and section to assignee list" do
+      go_to_modules
+      manage_module_button(@module).click
+      module_index_menu_tool_link("Assign To...").click
+      click_custom_access_radio
+
+      assignee_selection.send_keys("user")
+      click_option(assignee_selection, "user1")
+      assignee_selection.send_keys("section")
+      click_option(assignee_selection, "section1")
+
+      assignee_list = assignee_selection_item.map(&:text)
+      expect(assignee_list.sort).to eq(%w[section1 user1])
+    end
+
+    it "deletes added assignee by clicking on it" do
+      go_to_modules
+      manage_module_button(@module).click
+      module_index_menu_tool_link("Assign To...").click
+      click_custom_access_radio
+
+      assignee_selection.send_keys("user")
+      click_option(assignee_selection, "user1")
+
+      assignee_selection_item_remove("user1").click
+      expect(element_exists?(assignee_selection_item_selector)).to be false
+    end
+
+    it "clears the assignee list when clear all is clicked" do
+      go_to_modules
+      manage_module_button(@module).click
+      module_index_menu_tool_link("Assign To...").click
+      click_custom_access_radio
+
+      assignee_selection.send_keys("user")
+      click_option(assignee_selection, "user1")
+
+      click_clear_all
+      expect(element_exists?(assignee_selection_item_selector)).to be false
     end
   end
 end

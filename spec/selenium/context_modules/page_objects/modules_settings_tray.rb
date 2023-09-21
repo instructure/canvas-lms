@@ -29,12 +29,40 @@ module ModulesSettingsTray
     "[data-testid='assign-to-panel']"
   end
 
+  def assignee_selection_selector
+    "[data-testid='assignee_selector']"
+  end
+
+  def assignee_selection_item_selector
+    "[data-testid='assignee_selector_selected_option']"
+  end
+
+  def assignee_selection_item_remove_selector(assignee)
+    "//*[@data-testid='assignee_selector_selected_option']//*[contains(@title, 'Remove #{assignee}')]"
+  end
+
   def assign_to_tab_selector
     "#tab-assign-to"
   end
 
-  def everyone_radio_selector
-    "[data-testid='everyone-option']"
+  def clear_all_selector
+    "[data-testid='clear_selection_button']"
+  end
+
+  def custom_access_radio_checked_selector
+    "[data-testid = 'custom-option']"
+  end
+
+  def custom_access_radio_click_selector
+    "//label[../input[@data-testid = 'custom-option']]"
+  end
+
+  def everyone_radio_checked_selector
+    "[data-testid = 'everyone-option']"
+  end
+
+  def everyone_radio_click_selector
+    "//label[../input[@data-testid = 'everyone-option']]"
   end
 
   def module_settings_tray_selector
@@ -87,8 +115,36 @@ module ModulesSettingsTray
     f(assign_to_tab_selector)
   end
 
-  def everyone_radio
-    f(everyone_radio_selector)
+  def assignee_selection
+    f(assignee_selection_selector)
+  end
+
+  def assignee_selection_item
+    ff(assignee_selection_item_selector)
+  end
+
+  def assignee_selection_item_remove(assignee)
+    fxpath(assignee_selection_item_remove_selector(assignee))
+  end
+
+  def clear_all
+    f(clear_all_selector)
+  end
+
+  def custom_access_radio_checked
+    f(custom_access_radio_checked_selector)
+  end
+
+  def custom_access_radio_click
+    fxpath(custom_access_radio_click_selector)
+  end
+
+  def everyone_radio_checked
+    f(everyone_radio_checked_selector)
+  end
+
+  def everyone_radio_click
+    fxpath(everyone_radio_click_selector)
   end
 
   def module_settings_tray
@@ -141,8 +197,16 @@ module ModulesSettingsTray
     assign_to_tab.click
   end
 
+  def click_clear_all
+    clear_all.click
+  end
+
+  def click_custom_access_radio
+    custom_access_radio_click.click
+  end
+
   def click_everyone_radio
-    everyone_radio.click
+    everyone_radio_click.click
   end
 
   def click_remove_prerequisite_button
