@@ -89,6 +89,7 @@ export default function DiscussionTopicFormContainer() {
       onSubmit={({
         title,
         message,
+        sectionIdsToPostTo,
         shouldPublish,
         requireInitialPost,
         discussionAnonymousState,
@@ -113,6 +114,7 @@ export default function DiscussionTopicFormContainer() {
               contextType: 'Course',
               title,
               message,
+              specificSections: sectionIdsToPostTo.join(),
               published: shouldPublish,
               requireInitialPost,
               anonymousState: discussionAnonymousState,

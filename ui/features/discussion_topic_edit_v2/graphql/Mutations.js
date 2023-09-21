@@ -38,6 +38,7 @@ export const CREATE_DISCUSSION_TOPIC = gql`
     $podcastHasStudentPosts: Boolean
     $locked: Boolean
     $isAnnouncement: Boolean
+    $specificSections: String
   ) {
     createDiscussionTopic(
       input: {
@@ -58,6 +59,7 @@ export const CREATE_DISCUSSION_TOPIC = gql`
         podcastHasStudentPosts: $podcastHasStudentPosts
         locked: $locked
         isAnnouncement: $isAnnouncement
+        specificSections: $specificSections
       }
     ) {
       discussionTopic {

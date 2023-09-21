@@ -77,7 +77,7 @@ export default function DiscussionTopicForm({
     }
   }
 
-  const allSectionsOption = {_id: 'all-sections', name: 'All Sections'}
+  const allSectionsOption = {_id: 'all', name: 'All Sections'}
 
   const inputWidth = '100%'
 
@@ -88,7 +88,7 @@ export default function DiscussionTopicForm({
 
   const [rceContent, setRceContent] = useState('')
 
-  const [sectionIdsToPostTo, setSectionIdsToPostTo] = useState(['all-sections'])
+  const [sectionIdsToPostTo, setSectionIdsToPostTo] = useState(['all'])
 
   const [discussionAnonymousState, setDiscussionAnonymousState] = useState('off')
   // default anonymousAuthorState to true, since it is the default selection for partial anonymity
