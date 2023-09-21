@@ -92,7 +92,7 @@ const AlignmentItem = ({
     <Flex as="div" direction="column" padding="xxx-small" alignItems="start">
       <Flex.Item as="div">
         <div style={{paddingTop: '0.14rem'}}>
-          <Text size="small" weight="bold">
+          <Text size="small" weight="bold" data-testid="aligned-questions">
             {I18n.t('Aligned Questions')}
           </Text>
         </div>
@@ -105,7 +105,7 @@ const AlignmentItem = ({
             </Flex.Item>
             <Flex.Item as="div" size="50%" shouldGrow={true}>
               <div style={{paddingTop: '0.14rem'}}>
-                <Text size="small">
+                <Text size="small" data-testid="aligned-question-title">
                   <TruncateText>{title}</TruncateText>
                 </Text>
               </div>
