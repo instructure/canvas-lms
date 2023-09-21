@@ -177,9 +177,9 @@ const FilterDropdown = ({
               >
                 {items.map(a => {
                   return (
-                    <MenuItem key={a.id} as="div" data-testid={`${a.name}-enable-preset`}>
-                      <TruncateText position="middle">{a.name}</TruncateText>
-                    </MenuItem>
+                    <Menu.Item key={a.id} as="div" data-testid={`${a.name}-enable-preset`}>
+                      <TruncateWithTooltip position="middle">{a.name}</TruncateWithTooltip>
+                    </Menu.Item>
                   )
                 })}
               </MenuGroup>
