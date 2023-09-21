@@ -50,6 +50,17 @@ describe('Account Grading Status Management', () => {
     return style._values[backgroundKey]
   }
 
+  const getScreenreaderAlert = () => {
+    return document.querySelector('#flash_screenreader_holder')?.textContent
+  }
+
+  beforeAll(() => {
+    const liveRegion = document.createElement('div')
+    liveRegion.id = 'flash_screenreader_holder'
+    liveRegion.setAttribute('role', 'alert')
+    document.body.appendChild(liveRegion)
+  })
+
   beforeEach(async () => {
     await new Promise(resolve => setTimeout(resolve, 0))
   })
@@ -117,6 +128,8 @@ describe('Account Grading Status Management', () => {
       const updatedStatusItem = getByTestId('standard-status-1')
       const updatedStatusColor = getStatusColor(updatedStatusItem)
       expect(updatedStatusColor).toEqual('#F0E8EF')
+
+      expect(getScreenreaderAlert()).toEqual('Missing status successfully saved')
     })
 
     it('should delete a custom status item', async () => {
@@ -133,6 +146,8 @@ describe('Account Grading Status Management', () => {
       fireEvent.click(confirmDeleteButton)
       await waitFor(() => expect(queryAllByTestId(/custom\-status\-[0-9]/)).toHaveLength(1))
       expect(queryAllByTestId(/custom\-status\-new\-[0-2]/)).toHaveLength(2)
+
+      expect(getScreenreaderAlert()).toEqual('Successfully deleted custom status custom 2')
     })
 
     it('should pick edit color & name of custom status item', async () => {
@@ -154,6 +169,8 @@ describe('Account Grading Status Management', () => {
 
       const customStatusItemUpdated = getByTestId('custom-status-1')
       expect(customStatusItemUpdated.textContent).toContain('New Status 10')
+
+      expect(getScreenreaderAlert()).toEqual('Custom status New Status 10 updated')
     })
 
     it('should add a new custom status item', async () => {
@@ -179,6 +196,8 @@ describe('Account Grading Status Management', () => {
 
       expect(newItem.textContent).toContain('New Status 11')
       expect(getStatusColor(newItem)).toEqual('#E5F3FC')
+
+      expect(getScreenreaderAlert()).toEqual('Custom status New Status 11 added')
     })
   })
 

@@ -20,11 +20,14 @@ import React, {useEffect, useState} from 'react'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import type {GradeStatus, GradeStatusType} from '@canvas/grading/accountGradingStatus'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 import LoadingIndicator from '@canvas/loading-indicator'
+import {Alert} from '@instructure/ui-alerts'
 // @ts-expect-error -- TODO: remove once we're on InstUI 8
 import {Grid} from '@instructure/ui-grid'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
 import {CustomStatusItem} from './CustomStatusItem'
 import {StandardStatusItem} from './StandardStatusItem'
 import {CustomStatusNewItem} from './CustomStatusNewItem'
@@ -52,6 +55,7 @@ export const AccountStatusManagement = ({
     isLoadingStatusError,
     loadingStatuses,
     standardStatuses,
+    successMessage,
     removeCustomStatus,
     saveCustomStatus,
     saveStandardStatus,
@@ -66,7 +70,7 @@ export const AccountStatusManagement = ({
 
   useEffect(() => {
     if (hasSaveCustomStatusError || hasSaveStandardStatusError) {
-      const statusType = hasSaveCustomStatusError ? 'custom' : 'standard'
+      const statusType = hasSaveCustomStatusError ? I18n.t('custom') : I18n.t('standard')
       const flashText = I18n.t('Error saving %{statusType} status', {statusType})
       showFlashError(flashText)(new Error())
     }
@@ -113,64 +117,77 @@ export const AccountStatusManagement = ({
   }
 
   return (
-    <Grid startAt="large" margin="small 0">
-      <GridRow>
-        <GridCol width={{large: 4}}>
-          <Heading level="h2">
-            <Text size="large">{I18n.t('Standard Statuses')}</Text>
-          </Heading>
-          {standardStatuses.map(gradeStatus => {
-            const editStatusId = getEditStatusId(gradeStatus.id, 'standard')
-            return (
-              <StandardStatusItem
-                key={`standard-status-${gradeStatus.id}`}
-                editable={isRootAccount}
-                gradeStatus={gradeStatus}
-                handleEditSave={(newColor: string) => {
-                  handleSaveStandardStatus({...gradeStatus, color: newColor})
-                }}
-                isEditOpen={openEditStatusId === editStatusId}
-                handleEditStatusToggle={() => handleEditStatusToggle(editStatusId)}
-              />
-            )
-          })}
-        </GridCol>
-        <GridCol>
-          <Heading level="h2">
-            <Text size="large">{I18n.t('Custom Statuses')}</Text>
-          </Heading>
-          {customStatuses.map(gradeStatus => {
-            const editStatusId = getEditStatusId(gradeStatus.id, 'custom')
-            return (
-              <CustomStatusItem
-                key={`custom-status-${gradeStatus.id}`}
-                editable={isRootAccount}
-                gradeStatus={gradeStatus}
-                handleEditSave={(newColor: string, name: string) => {
-                  handleSaveCustomStatus(newColor, name, gradeStatus.id)
-                }}
-                handleStatusDelete={remove}
-                isEditOpen={openEditStatusId === editStatusId}
-                handleEditStatusToggle={() => handleEditStatusToggle(editStatusId)}
-              />
-            )
-          })}
-          {isRootAccount &&
-            [...Array(allowedCustomStatusAdditions)].map((_, index) => {
-              const editStatusId = getEditStatusId(index.toString(), 'new')
+    <View>
+      {successMessage && (
+        <Alert
+          variant="success"
+          screenReaderOnly={true}
+          liveRegionPoliteness="polite"
+          isLiveRegionAtomic={true}
+          liveRegion={getLiveRegion}
+        >
+          {successMessage}
+        </Alert>
+      )}
+      <Grid startAt="large" margin="small 0">
+        <GridRow>
+          <GridCol width={{large: 4}}>
+            <Heading level="h2">
+              <Text size="large">{I18n.t('Standard Statuses')}</Text>
+            </Heading>
+            {standardStatuses.map(gradeStatus => {
+              const editStatusId = getEditStatusId(gradeStatus.id, 'standard')
               return (
-                <CustomStatusNewItem
-                  // eslint-disable-next-line react/no-array-index-key
-                  key={`custom-status-new-${index}-${allowedCustomStatusAdditions}`}
-                  handleSave={handleSaveCustomStatus}
-                  index={index}
+                <StandardStatusItem
+                  key={`standard-status-${gradeStatus.id}`}
+                  editable={isRootAccount}
+                  gradeStatus={gradeStatus}
+                  handleEditSave={(newColor: string) => {
+                    handleSaveStandardStatus({...gradeStatus, color: newColor})
+                  }}
                   isEditOpen={openEditStatusId === editStatusId}
                   handleEditStatusToggle={() => handleEditStatusToggle(editStatusId)}
                 />
               )
             })}
-        </GridCol>
-      </GridRow>
-    </Grid>
+          </GridCol>
+          <GridCol>
+            <Heading level="h2">
+              <Text size="large">{I18n.t('Custom Statuses')}</Text>
+            </Heading>
+            {customStatuses.map(gradeStatus => {
+              const editStatusId = getEditStatusId(gradeStatus.id, 'custom')
+              return (
+                <CustomStatusItem
+                  key={`custom-status-${gradeStatus.id}`}
+                  editable={isRootAccount}
+                  gradeStatus={gradeStatus}
+                  handleEditSave={(newColor: string, name: string) => {
+                    handleSaveCustomStatus(newColor, name, gradeStatus.id)
+                  }}
+                  handleStatusDelete={remove}
+                  isEditOpen={openEditStatusId === editStatusId}
+                  handleEditStatusToggle={() => handleEditStatusToggle(editStatusId)}
+                />
+              )
+            })}
+            {isRootAccount &&
+              [...Array(allowedCustomStatusAdditions)].map((_, index) => {
+                const editStatusId = getEditStatusId(index.toString(), 'new')
+                return (
+                  <CustomStatusNewItem
+                    // eslint-disable-next-line react/no-array-index-key
+                    key={`custom-status-new-${index}-${allowedCustomStatusAdditions}`}
+                    handleSave={handleSaveCustomStatus}
+                    index={index}
+                    isEditOpen={openEditStatusId === editStatusId}
+                    handleEditStatusToggle={() => handleEditStatusToggle(editStatusId)}
+                  />
+                )
+              })}
+          </GridCol>
+        </GridRow>
+      </Grid>
+    </View>
   )
 }
