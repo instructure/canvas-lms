@@ -30,7 +30,7 @@ const I18n = useI18nScope('SpeedGraderSettingsMenu')
 const menuTrigger = (
   <button
     type="button"
-    className="Button Button--icon-action gradebookActions__Button"
+    className="Button Button--icon-action-rev gradebookActions__Button"
     title={I18n.t('Settings')}
   >
     <i className="icon-settings" aria-hidden="true" />
