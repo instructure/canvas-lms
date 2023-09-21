@@ -81,6 +81,7 @@ export const ThreadActions = props => {
                   withBackground={false}
                   withBorder={false}
                   data-testid="thread-actions-menu"
+                  ref={props.moreOptionsButtonRef}
                 />
               </span>
             }
@@ -265,6 +266,7 @@ ThreadActions.propTypes = {
   onReport: PropTypes.func,
   isReported: PropTypes.bool,
   isSearch: PropTypes.bool,
+  moreOptionsButtonRef: PropTypes.any,
 }
 
 ThreadActions.defaultProps = {

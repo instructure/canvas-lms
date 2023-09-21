@@ -55,6 +55,7 @@ export function Reply({...props}) {
             onClick={props.onClick}
             data-testid="threading-toolbar-reply"
             interaction={props.isReadOnly ? 'disabled' : 'enabled'}
+            ref={props.replyButtonRef}
           >
             <AccessibleContent
               alt={I18n.t('Reply to post from %{author}', {author: props.authorName})}
@@ -107,4 +108,5 @@ Reply.propTypes = {
    */
   isIsolatedView: PropTypes.bool,
   hasDraftEntry: PropTypes.bool,
+  replyButtonRef: PropTypes.any,
 }

@@ -505,6 +505,11 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                               }}
                               onCancel={() => {
                                 setExpandedReply(false)
+                                setTimeout(() => {
+                                  document
+                                    .querySelector('.discussion-topic-reply-button button')
+                                    ?.focus()
+                                }, 0)
                               }}
                               value={findRootEntryDraftMessage()}
                               onSetDraftSaved={setDraftSaved}
