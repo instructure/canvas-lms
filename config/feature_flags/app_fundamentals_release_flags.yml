@@ -10,26 +10,41 @@ granular_permissions_manage_course_content:
   applies_to: RootAccount
   display_name: Granular permissions for managing course content
   description: Add granularity to permissions around managing all other course content
+  environments:
+    development:
+      state: allowed_on
 granular_permissions_manage_courses:
   state: hidden
   applies_to: RootAccount
   display_name: Granular permissions for managing courses
   description: Add granularity to permissions around managing courses i.e. Add / Publish / Conclude / Delete
+  environments:
+    development:
+      state: allowed_on
 granular_permissions_manage_users:
   state: hidden
   applies_to: RootAccount
   display_name: Granular permissions for Add/Remove roles from Course
   description: Adds granular permissions for adding and removing each role, and a separate permission for other course admin actions
+  environments:
+    development:
+      state: allowed_on
 granular_permissions_manage_groups:
   state: hidden
   applies_to: RootAccount
   display_name: Granular permissions for managing groups in Account or Course contexts
   description: Add granularity to permissions around managing groups in Account or Course contexts
+  environments:
+    development:
+      state: allowed_on
 granular_permissions_manage_lti:
   state: hidden
   applies_to: RootAccount
   display_name: Granular permissions for managing LTI tools in Account or Course contexts
   description: Add granularity to permissions around managing LTI tools in Account or Course contexts
+  environments:
+    development:
+      state: allowed_on
 course_templates:
   state: hidden
   applies_to: RootAccount
@@ -51,6 +66,9 @@ granular_permissions_manage_assignments:
   applies_to: RootAccount
   display_name: Granular permissions for assignments and quizzes
   description: Separate out granular add and delete permissions for assignments and quizzes from the existing manage permission that controls all three.
+  environments:
+    development:
+      state: allowed_on
 course_admin_role_masquerade_permission_check:
   state: allowed
   applies_to: RootAccount
