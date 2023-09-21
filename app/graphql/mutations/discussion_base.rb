@@ -31,6 +31,7 @@ class Mutations::DiscussionBase < Mutations::BaseMutation
   argument :todo_date, Types::DateTimeType, required: false
   argument :podcast_enabled, Boolean, required: false
   argument :podcast_has_student_posts, Boolean, required: false
+  argument :specific_sections, String, required: false
 
   field :discussion_topic, Types::DiscussionType, null: true
 
@@ -77,6 +78,35 @@ class Mutations::DiscussionBase < Mutations::BaseMutation
     else
       discussion_topic.lock_at = nil
       discussion_topic.unlock(without_save: true)
+    end
+  end
+
+  def set_sections(specific_sections, discussion_topic)
+    if specific_sections && specific_sections != "all"
+      discussion_topic.is_section_specific = true
+      section_ids = specific_sections
+      section_ids = section_ids.split(",") if section_ids.is_a?(String)
+      new_section_ids = section_ids.map { |id| Shard.relative_id_for(id, Shard.current, Shard.current) }.sort
+      if discussion_topic.course_sections.pluck(:id).sort != new_section_ids
+        discussion_topic.course_sections = CourseSection.find(new_section_ids)
+        discussion_topic.sections_changed = true
+      end
+    else
+      discussion_topic.is_section_specific = false
+    end
+  end
+
+  def verify_specific_section_visibilities(discussion_topic)
+    return unless discussion_topic.is_section_specific && discussion_topic.context.is_a?(Course)
+
+    visibilities = discussion_topic.context.course_section_visibility(current_user)
+    case visibilities
+    when :all
+      []
+    when :none
+      discussion_topic.course_sections.map(&:id)
+    else
+      discussion_topic.course_sections.map(&:id) - visibilities
     end
   end
 end

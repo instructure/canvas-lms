@@ -28,7 +28,6 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
   # most arguments inherited from DiscussionBase
 
   def resolve(input:)
-    # This is only required on creation of the Discussion Topic or Announcement
     discussion_topic_context = find_context(input)
     return validation_error(I18n.t("Invalid context")) unless discussion_topic_context
 
@@ -73,6 +72,13 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
     unless is_announcement
       discussion_topic.is_anonymous_author = input[:is_anonymous_author] || false
       discussion_topic.anonymous_state = anonymous_state
+    end
+
+    set_sections(input[:specific_sections], discussion_topic)
+    invalid_sections = verify_specific_section_visibilities(discussion_topic) || []
+
+    unless invalid_sections.empty?
+      return validation_error(I18n.t("You do not have permissions to modify discussion for section(s) %{section_ids}", section_ids: invalid_sections.join(", ")))
     end
 
     process_common_inputs(input, is_announcement, discussion_topic)
