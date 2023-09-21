@@ -43,7 +43,7 @@
     <div id="gradebook_header" class="subheadContent" style="display:none;">
       <div class="subheadContent subheadContent--flex-start">
         <div id="speedgrader-icons" class="gradebookActions">
-          <a href="<%= polymorphic_url([@context, :gradebook]) %>" id="speed_grader_gradebook_link" class="Button Button--icon-action gradebookActions__Button gradebook-icon-link" title="<%= t('Gradebook') %>">
+          <a href="<%= polymorphic_url([@context, :gradebook]) %>" id="speed_grader_gradebook_link" class="Button Button--icon-action-rev gradebookActions__Button gradebook-icon-link" title="<%= t('Gradebook') %>">
             <i class="icon-gradebook" aria-hidden="true"></i>
             <span class="screenreader-only" aria-hidden="true"><%= t("Gradebook") %></span>
           </a>
@@ -77,7 +77,7 @@
           </div>
         </div>
         <div class="studentSelection">
-          <button id="prev-student-button" class="Button Button--icon-action gradebookMoveToNext prev" type="button" aria-label="<%= t("Previous") %>">
+          <button id="prev-student-button" class="Button Button--icon-action-rev gradebookMoveToNext prev" type="button" aria-label="<%= t("Previous") %>">
             <i class="icon-arrow-left prev" aria-hidden="true"></i>
           </button>
           <% if service_enabled?(:avatars) %>
@@ -86,7 +86,7 @@
             </div>
           <% end %>
           <div id="combo_box_container"></div>
-          <button id="next-student-button" class="Button Button--icon-action gradebookMoveToNext next" type="button" aria-label="<%= t("Next") %>">
+          <button id="next-student-button" class="Button Button--icon-action-rev gradebookMoveToNext next" type="button" aria-label="<%= t("Next") %>">
             <i class="icon-arrow-right next" aria-hidden="true"></i>
           </button>
         </div>
