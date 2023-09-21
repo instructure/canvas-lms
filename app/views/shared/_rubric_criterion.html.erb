@@ -39,9 +39,9 @@
     <div class="container">
       <div class="links editing">
         <% if !learning_outcome_criterion %>
-          <a href="#" class="edit_criterion_link"><i class="icon-edit standalone-icon"></i><span class="screenreader-only"><%= t 'Edit criterion description' %></span></a>
+          <a href="#" class="edit_criterion_link" role="button"><i class="icon-edit standalone-icon"></i><span class="screenreader-only"><%= t 'Edit criterion description' %></span></a>
         <% end %>
-        <a href="#" class="delete_criterion_link"><i class="icon-trash standalone-icon"></i><span class="screenreader-only"><%= t 'Delete criterion row' %></span></a>
+        <a href="#" class="delete_criterion_link" role="button"><i class="icon-trash standalone-icon"></i><span class="screenreader-only"><%= t 'Delete criterion row' %></span></a>
       </div>
       <div class="description_content">
         <span class="outcome_sr_content" aria-hidden="<%= learning_outcome_criterion.nil? %>">
@@ -116,7 +116,7 @@
               <div class="rating-main">
                 <% if !learning_outcome_criterion %>
                   <div class="editing links">
-                    <a href="#" class="edit_rating_link"><i class="icon-edit standalone-icon"></i><span class="screenreader-only"><%= t 'Edit rating' %></span></a>
+                    <a href="#" class="edit_rating_link" role="button"><i class="icon-edit standalone-icon"></i><span class="screenreader-only"><%= t 'Edit rating' %></span></a>
                     <a href="#" class="delete_rating_link"><i class="icon-trash standalone-icon" ></i><span class="screenreader-only"><%= t 'Delete rating' %></span></a>
                   </div>
                   <div class="clear"></div>
@@ -131,7 +131,7 @@
               </div>
               <% if !learning_outcome_criterion && !last_rating %>
                 <div class="editing links add_rating_link">
-                  <a href="#" class="add_rating_link_after" aria-label="<%= t 'Add rating' %>"><i class="icon-add icon-Solid"></i></a>
+                  <a href="#" class="add_rating_link_after" aria-label="<%= t 'Add rating' %>" role="button"><i class="icon-add icon-Solid"></i></a>
                 </div>
               <% end %>
             </div>
