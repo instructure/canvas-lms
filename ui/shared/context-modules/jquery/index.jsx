@@ -73,6 +73,7 @@ import {renderContextModulesPublishIcon} from '../utils/publishOneModuleHelper'
 import {underscoreString} from '@canvas/convert-case'
 import {selectContentDialog} from '@canvas/select-content-dialog'
 import DifferentiatedModulesTray from '@canvas/differentiated-modules'
+import ItemAssignToTray from '@canvas/differentiated-modules/react/Item/ItemAssignToTray'
 import {parseModule} from '@canvas/differentiated-modules/utils/moduleHelpers'
 
 if (!('INST' in window)) window.INST = {}
@@ -2589,6 +2590,52 @@ $(document).ready(function () {
     const moduleElement = $(event.target).parents('.context_module')[0]
     const settingsProps = parseModule(moduleElement)
     renderDifferentiatedModulesTray(true, returnFocusTo, moduleElement, settingsProps)
+  })
+
+  function renderItemAssignToTray(open, returnFocusTo, itemProps) {
+    ReactDOM.render(
+      <ItemAssignToTray
+        open={open}
+        onDismiss={() => {
+          renderItemAssignToTray(false, returnFocusTo, itemProps)
+          returnFocusTo.focus()
+        }}
+        onSave={() => {}}
+        courseId={itemProps.courseId}
+        moduleItemId={itemProps.moduleItemId}
+        moduleItemName={itemProps.moduleItemName}
+        moduleItemType={itemProps.moduleItemType}
+        pointsPossible={itemProps.pointsPossible}
+      />,
+      document.getElementById('differentiated-modules-mount-point')
+    )
+  }
+
+  // I don't think this is a long-term solution. We're going to need access
+  // to all the assignment's data (due due dates, availability, etc)
+  function parseModuleItemElement(element) {
+    const pointsPossibleElem = element?.querySelector('.points_possible_display')
+    const points = pointsPossibleElem?.textContent
+    return {pointsPossible: points}
+  }
+
+  $('.module-item-assign-to-link').on('click keyclick', function (event) {
+    event.preventDefault()
+    const returnFocusTo = $(event.target).closest('ul').prev('.al-trigger')
+    const moduleItemId = event.target.getAttribute('data-item-id')
+    const moduleItemName = event.target.getAttribute('data-item-name')
+    const moduleItemType = event.target.getAttribute('data-item-type')
+    const courseId = event.target.getAttribute('data-item-context-id')
+    const itemProps = parseModuleItemElement(
+      document.getElementById(`context_module_item_${moduleItemId}`)
+    )
+    renderItemAssignToTray(true, returnFocusTo, {
+      courseId,
+      moduleItemId,
+      moduleItemName,
+      moduleItemType,
+      ...itemProps,
+    })
   })
 })
 

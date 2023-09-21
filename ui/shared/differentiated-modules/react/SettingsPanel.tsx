@@ -244,6 +244,7 @@ export default function SettingsPanel({
       </FlexItem>
       <FlexItem>
         <Footer
+          updateButtonLabel={I18n.t('Update Module')}
           onDismiss={onDismiss}
           onUpdate={handleUpdate}
           disableUpdate={state.nameInputMessages.length > 0}
