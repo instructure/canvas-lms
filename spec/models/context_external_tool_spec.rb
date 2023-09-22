@@ -3617,6 +3617,42 @@ describe ContextExternalTool do
 
         it_behaves_like "finds related assignments"
       end
+
+      context "with assignments that error" do
+        let(:valid_assignment) do
+          a = assignment_model(context: course, title: "valid", submission_types: "external_tool")
+          a.external_tool_tag = ContentTag.create!(context: a, content: old_tool)
+          a
+        end
+        let(:invalid_assignment) do
+          a = assignment_model(context: course, title: "invalid", submission_types: "external_tool", points_possible: nil)
+          a.external_tool_tag = ContentTag.create!(context: a, content: old_tool)
+          a
+        end
+        let(:scope) { double("scope") }
+
+        before do
+          valid_assignment
+          invalid_assignment
+          allow(Sentry).to receive(:capture_message).and_return(nil)
+          allow(Sentry).to receive(:with_scope).and_yield(scope)
+          allow(scope).to receive(:set_tags)
+          allow(scope).to receive(:set_context)
+        end
+
+        it "sends errors to sentry" do
+          subject
+          expect(Sentry).to have_received(:capture_message)
+          expect(scope).to have_received(:set_tags).with(assignment_id: invalid_assignment.global_id)
+          expect(scope).to have_received(:set_tags).with(tool_id: tool.global_id)
+          expect(scope).to have_received(:set_tags).with(exception_class: "ActiveRecord::RecordInvalid")
+        end
+
+        it "completes the batch" do
+          subject
+          expect(valid_assignment.reload.line_items.count).to eq 1
+        end
+      end
     end
   end
 
