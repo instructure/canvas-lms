@@ -115,14 +115,37 @@ class WikiPage < ActiveRecord::Base
       (saved_change_to_workflow_state? && workflow_state_before_last_save == "deleted")
   end
 
+  def chunk_content(max_character_length = 4000)
+    body_text = html_to_text(body)
+
+    if body_text.length > max_character_length
+      # Chunk
+      # Hard split on character length, back up to the nearest word boundary
+      remaining_text = body_text
+      while remaining_text
+        # Find the last space before the max length
+        last_space = remaining_text.rindex(/\b/, max_character_length)
+        if last_space.nil?
+          # No space found, just split at max length
+          last_space = max_character_length
+        end
+        yield title + "\n" + remaining_text[0..last_space]
+        remaining_text = remaining_text[(last_space + 1)..]
+      end
+    else
+      # No need for chunking
+      yield title + "\n" + body_text
+    end
+  end
+
   def generate_embeddings
     return unless OpenAi.smart_search_available?(root_account)
 
-    # TODO: chunk content and create multiple
-    text = html_to_text(body)
-    embedding = OpenAi.generate_embedding(text)[0]
     delete_embeddings
-    wiki_page_embeddings.create!(embedding:)
+    chunk_content do |chunk|
+      embedding = OpenAi.generate_embedding(chunk)
+      wiki_page_embeddings.create!(embedding:)
+    end
   end
   handle_asynchronously :generate_embeddings, priority: Delayed::LOW_PRIORITY
 

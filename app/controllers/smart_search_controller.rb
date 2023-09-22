@@ -33,7 +33,7 @@ class SmartSearchController < ApplicationController
       }
 
       if params[:q].present?
-        embedding = OpenAi.generate_embedding(params[:q])[0]
+        embedding = OpenAi.generate_embedding(params[:q])
 
         # Prototype query using "neighbor". Embedding is now on join table so manual SQL for now
         # wiki_pages = WikiPage.nearest_neighbors(:embedding, embedding, distance: "inner_product")
@@ -41,9 +41,8 @@ class SmartSearchController < ApplicationController
 
         # Wiki Pages
         # TODO: Enforce enrollment types
-        # TODO: Prevent duplicates after chunking embeddings is implemented
         scope = WikiPage
-                .select(WikiPage.send(:sanitize_sql, ["wiki_pages.*, (wpe.embedding #{quoted_operator_name("<=>")} ?) AS distance", embedding.to_s]))
+                .select(WikiPage.send(:sanitize_sql, ["wiki_pages.*, MIN(wpe.embedding #{quoted_operator_name("<=>")} ?) AS distance", embedding.to_s]))
                 .joins("INNER JOIN #{Enrollment.quoted_table_name} e ON wiki_pages.context_type = 'Course' AND wiki_pages.context_id = e.course_id")
                 .joins("INNER JOIN #{EnrollmentState.quoted_table_name} es ON e.id = es.enrollment_id")
                 .joins("INNER JOIN #{WikiPageEmbedding.quoted_table_name} wpe ON wiki_pages.id = wpe.wiki_page_id")
@@ -56,6 +55,7 @@ class SmartSearchController < ApplicationController
                          state: %w[active invited pending_invited pending_active]
                        })
                 .where.not(e: { workflow_state: "deleted" })
+                .group("wiki_pages.id")
                 .order("distance ASC")
         wiki_pages = Api.paginate(scope, self, smart_search_query_url)
         response[:results].concat(wiki_pages)
