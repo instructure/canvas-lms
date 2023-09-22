@@ -537,8 +537,8 @@ ca:
       enrollment_state: "Inclou l'estat d'inscripció: cert;"
       enrollment_states: "Estats d'inscripció: %{states};"
   account_reports_eeb41194: "Informes de l'usuari"
-  account_roles_10fea071: "Rols de l'usuari"
-  account_roles_d13f8f75: "Rols de l'usuari"
+  account_roles_10fea071: "Rols de compte"
+  account_roles_d13f8f75: "Rols de compte"
   account_rubrics_40c190a8: "Rúbriques de l'usuari"
   account_settings: 
     account: Compte
@@ -574,7 +574,7 @@ ca:
   account_surveys_b0039876: "Enquestes de l'usuari"
   account_user: 
     types: 
-      account_admin: "Administrador de l'usuari"
+      account_admin: "Administrador de compte"
   accountname_accountcount_a6e2ba71: "%{accountName} (%{accountCount})"
   accountname_accountcount_accounts_e2c19840: "%{accountName}, %{accountCount} comptes"
   accountname_subaccountcount_960a41c: "%{accountName} (%{subaccountCount})"
@@ -1025,7 +1025,7 @@ ca:
           account_reports: 
             default: 
               description: 
-                text: "En aquest informe es mostren els resultats de qualificació final de tots els estudiants d’un període acadèmic determinat. Al fitxer CSV resultant hi haurà una fila per inscripció i es mostraran les notes actual i final que es visualitzen al llibre de qualificacions de l’assignatura."
+                text: "En aquest informe es mostren els resultats de qualificació final de tots els estudiants d’un període acadèmic determinat. Al fitxer CSV resultant hi haurà una fila per inscripció i es mostraran les notes actual i final que es visualitzen al llibre de notes de l’assignatura."
     ivy_tech: 
       rubric_detail_score_report: 
         parameters: 
@@ -2319,7 +2319,7 @@ ca:
   allows_for_discussion_replies_to_be_sorted_accordi_1065cccc: |-
       Permet ordenar les respostes al debat segons les dates i hores
       de creació. L’ordre per defecte és de més nova a més antiga per a les respostes de nivell d’arrel.
-  allows_graders_to_type_mi_in_the_gradebook_or_spee_a9bb3577: "Permet que els qualificadors anotin MI al Llibre de qualificacions o a SpeedGrader per etiquetar manualment una tasca com a no presentada"
+  allows_graders_to_type_mi_in_the_gradebook_or_spee_a9bb3577: "Permet que els qualificadors anotin MI al Llibre de notes o a SpeedGrader per etiquetar manualment una tasca com a no presentada"
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Permet etiquetar enllaços d'ajuda com a Destacats o Nous i mostrar de manera visible l'enllaç d'ajuda destacat al menú Ajuda."
   allows_instructors_to_apply_scores_to_ungraded_sub_7e772795: "Permet que els instructors apliquin massivament puntuacions a les entregues sense qualificar."
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: "Permet que els instructors apliquin massivament puntuacions a les entregues sense nota des dels menús Grup d'activitats i Total de columnes del Llibre de notes."
@@ -5038,7 +5038,7 @@ ca:
   cannot_set_sis_account_id_on_a_root_account_dc7a969e: "No es pot establir sis_account_id en un root_account."
   cannot_set_the_due_date_to_a_date_within_a_closed__8c88c45d: "No pot establir la data de lliurament en una data dins d'un període de qualificació tancat"
   cannot_undelete_a_child_topic_when_the_root_course_bf6d75ef: "No es pot desfer la supressió d’un tema secundari quan també s’ha suprimit el tema de l’assignatura arrel. Primer desfeu la supressió del tema de l’assignatura arrel."
-  cannot_use_gradebook_importer_reserved_names_8f3b5748: "no podeu utilitzar noms reservats per a importadors del llibre de qualificacions"
+  cannot_use_gradebook_importer_reserved_names_8f3b5748: "no podeu utilitzar noms reservats per a importadors del llibre de notes"
   cannot_view_detailed_reports_for_anonymous_assignm_d6c42475: "Els informes detallats de les activitats anònimes no es poden visualitzar fins que es publiquin les notes."
   canvas: 
     migration: 
@@ -5192,7 +5192,7 @@ ca:
   change_description_for_proficiency_rating_position_97626231: "Canvia la descripció de la classificació de competència %{position}"
   change_ending_date_to_d2cebd54: "Canvia la data de fi a"
   change_existing_group_2c91a32b: "Canvia el grup existent"
-  change_gradebook_view_d2d9a101: "Canvieu la vista del llibre de qualificacions"
+  change_gradebook_view_d2d9a101: "Canvieu la vista del llibre de notes"
   change_mastery_f4d43c07: "Canvia el domini"
   change_mastery_points_c4f68a36: "Canvia els punts de domini"
   change_name_c8cce76c: "Canvia el nom"
@@ -8834,7 +8834,7 @@ ca:
   display_grades_as_points_percentages_complete_inco_fa848380: |-
       Visualitzeu les notes com a
             punts, percentatges, complet/incomplet o qualsevol altre mètode que coincideixi
-            amb el vostre esquema de qualificació de l'assignatura, i filtreu i organitzeu les entrades del Llibre de qualificacions
+            amb el vostre esquema de qualificació de l'assignatura, i filtreu i organitzeu les entrades del Llibre de notes
             segons les vostres preferències. Apliqueu automàticament una nota a les entregues endarrerides
             o no presentades, i amagueu fàcilment les notes fins que estigueu a punt perquè els estudiants
             les visualitzin. Per a una nota simplificada, utilitzeu l'SpeedGrader per veure i qualificar les entregues.
@@ -8862,7 +8862,7 @@ ca:
   divide_into_equal_time_slots_in_minutes_234312fa: "Divideix en interval de temps iguals (en minuts)"
   division_cutoff_cutoff_value_e938bc9d: "Límit de divisió %{cutoff_value}"
   do_not_count_this_assignment_towards_the_final_gra_4dd92e00: "No comptis aquesta activitat en la nota final"
-  do_not_display_in_gradebook_or_the_student_s_grade_3de05e1c: "No el mostreu al llibre de qualificacions ni a la pàgina de notes de l’estudiant"
+  do_not_display_in_gradebook_or_the_student_s_grade_3de05e1c: "No el mostreu al llibre de notes ni a la pàgina de notes de l’estudiant"
   do_not_show_again_for_this_assignment_d0abd4ae: "No ho tornis a mostrar per a aquesta activitat"
   do_nothing_9672b478: "No facis res"
   doc_50924b72: DOC
@@ -9337,7 +9337,7 @@ ca:
   enhance_color_contrast_of_content_685ddd49: "Millora el contrast del color del contingut"
   enhanced_grade_change_auditing_2b155dfa: "Auditoria de canvis de qualificació millorada"
   enhanced_gradebook_filters_a3be5e7d: "Filtres del llibre de notes millorats"
-  enhanced_gradebook_filters_description: "Aquesta característica opcional proporciona opcions de filtratge avançades al llibre de qualificacions del Canvas. Si s’habilita aquesta marca, l'accés previ a les millores en curs es mostrarà automàticament amb cada llançament. Per obtenir la informació completa, consulteu el *Grup d’usuaris de filtres del llibre de qualificacions* a la Canvas Community."
+  enhanced_gradebook_filters_description: "Aquesta característica opcional proporciona opcions de filtratge avançades al llibre de notes del Canvas. Si s’habilita aquesta marca, l'accés previ a les millores en curs es mostrarà automàticament amb cada llançament. Per obtenir la informació completa, consulteu el *Grup d’usuaris de filtres del llibre de notes* a la Canvas Community."
   enhanced_individual_gradebook: 
     assignment_order_alpha: Alfabèticament
     assignment_order_assignment_groups: "Per grup d’activitats i posició"
@@ -10045,9 +10045,9 @@ ca:
   explanation_of_statuses_90a26d07: "Explicació dels estats:"
   explicit_latex_typesetting_c1c569c9: "Composició LaTeX explícita"
   export_course_content_f4774b74: "Exporta el contingut de l'assignatura"
-  export_current_gradebook_view_6cb376a3: "Exporta la visualització actual del llibre de qualificacions"
+  export_current_gradebook_view_6cb376a3: "Exporta la visualització actual del llibre de notes"
   export_de71cd8e: Exporta
-  export_entire_gradebook_e980d946: "Exporta el llibre de qualificacions sencer"
+  export_entire_gradebook_e980d946: "Exporta el llibre de notes sencer"
   export_failed_5d615d6d: "No s'ha pogut exportar"
   export_in_progress_70db262a: "Exportació en curs"
   export_pairing_codes_5749f6f1: "Exporta els codis d'emparellament"
@@ -10485,9 +10485,9 @@ ca:
   first_9685680a: primer
   first_last_name_9820d256: "Nom, cognoms"
   first_name_d5c12500: Nom
-  fix_missing_policy_applicator_gradebook_history_f3e62bc1: "Corregiu l’historial del llibre de qualificacions de l’aplicador de polítiques que falta"
+  fix_missing_policy_applicator_gradebook_history_f3e62bc1: "Corregiu l’historial del llibre de notes de l’aplicador de polítiques que falta"
   fix_missing_policy_grade_change_records_c404507c: "Corregeix els registres de canvi a les qualificacions que falten a la política"
-  fixes_the_missing_policy_applicator_to_insert_reco_dedabe12: "Corregeix l’aplicador de polítiques que falta per inserir registres a l’historial del llibre de qualificacions per a cada entrega marcada com a no presentada."
+  fixes_the_missing_policy_applicator_to_insert_reco_dedabe12: "Corregeix l’aplicador de polítiques que falta per inserir registres a l’historial del llibre de notes per a cada entrega marcada com a no presentada."
   flagged_as_possible_spam_ebbc4683: "Marcat com a possible correu brossa"
   flags_ce30e8e3: Marques
   flags_new_eportfolio_content_matching_specific_key_a66af560: "Marca el contingut nou d'ePortfolio que coincideixi amb paraules clau concretes com a possible correu brossa i permet als administradors confirmar els ePortfolios marcats o marcar-los com a segurs."
@@ -10790,10 +10790,10 @@ ca:
     grades_filename: Notes
   gradebook_data_loading_performance_improvements_421e1c93: "Millores del rendiment de la càrrega de dades al llibre de qualificacions"
   gradebook_enhanced_individual_view_d532923f: "Llibre de qualificacions: Vista individual millorada"
-  gradebook_export_failed_error_57442a4c: "No s’ha pogut exportar el llibre de qualificacions: %{error}"
+  gradebook_export_failed_error_57442a4c: "No s’ha pogut exportar el llibre de notes: %{error}"
   gradebook_export_failed_reason_2b0f6c53: "No s'ha pogut exportar el llibre de notes: %{reason}"
-  gradebook_export_has_completed_5d535028: "S’ha completat l’exportació del llibre de qualificacions"
-  gradebook_export_has_started_this_may_take_a_few_m_11b5b7a8: "S’ha iniciat l’exportació del llibre de qualificacions. Pot ser que trigui uns minuts."
+  gradebook_export_has_completed_5d535028: "S’ha completat l’exportació del llibre de notes"
+  gradebook_export_has_started_this_may_take_a_few_m_11b5b7a8: "S’ha iniciat l’exportació del llibre de notes. Pot ser que trigui uns minuts."
   gradebook_export_sort_order_bugfix_tally_219_62bfaacb: "Correcció de l'error de l'ordre de classificació d'exportació del llibre de qualificacions (Tally-219)"
   gradebook_export_started_723461b9: "S'ha iniciat l'exportació del llibre de notes"
   gradebook_filters_fc25f772: "Filtres del llibre de notes"
@@ -12225,7 +12225,7 @@ ca:
   include_deleted_objects_3cced3b5: "Inclou els objectes suprimits;"
   include_deleted_objects_4b75ef93: "Inclou els objectes suprimits"
   include_fullstory_recording_of_the_user_s_session_656d131e: "Inclou un enregistrament FullStory de la sessió de l'usuari"
-  include_integration_ids_in_the_gradebook_exports_1b48bbdc: "Incloeu els ID d’integració a les exportacions del llibre de qualificacions"
+  include_integration_ids_in_the_gradebook_exports_1b48bbdc: "Incloeu els ID d’integració a les exportacions del llibre de notes"
   include_integration_ids_in_the_gradebook_exports_4b94c795: "Inclou els IDs d'integració a les exportacions del llibre de notes."
   include_last_activity_dates_4eb97ed5: "Inclou les dates de la darrera activitat;"
   include_last_activity_dates_ee2d3de0: "Inclou les dates de la darrera activitat"
@@ -12270,9 +12270,9 @@ ca:
   individual_2033c005: Individual
   individual_assignment_grade_posting_d8322b99: "Publicació de notes d'activitats individuals"
   individual_case_permission_76452b92: "Permís de cas individual"
-  individual_gradebook_117281bb: "Llibre de qualificacions individual"
+  individual_gradebook_117281bb: "Llibre de notes individual"
   individual_gradebook_c7de9821: "Llibre de notes individual…"
-  individual_gradebook_enhancements_de33aa3d: "Millores del llibre de qualificacions individual"
+  individual_gradebook_enhancements_de33aa3d: "Millores del llibre de notes individual"
   individual_outcome_calculation_values_cannot_be_mo_9193a7ed: "No es poden modificar valors de càlcul dels resultats individuals."
   individual_outcome_mastery_points_cannot_be_modifi_cf390a79: "No es poden modificar punts de domini dels resultats individuals."
   individual_outcome_rating_and_calculation_method_o_f0eae85f: "Opcions de classificació de resultats individuals i mètodes de càlcul"
@@ -12834,7 +12834,7 @@ ca:
   learning_mastery_gradebook_72097130: "Llibre de notes de domini de l'aprenentatge"
   learning_mastery_gradebook_description: |-
       El Llibre de notes de domini de l'aprenentatge és una eina per als professors que els permet visualitzar el progrés de l'estudiant
-      i de l'assignatura pel que fa als resultats d'aprenentatge de l'assignatura. Els resultats es presenten en un format similar a un llibre de qualificacions
+      i de l'assignatura pel que fa als resultats d'aprenentatge de l'assignatura. Els resultats es presenten en un format similar a un llibre de notes
       i el progrés de l'estudiant es mostra com a puntuació numèrica i com a domini assolit/domini
       gairebé assolit/endarrerit.
   learning_mastery_gradebook_redesign_9ca88020: "Disseny nou del llibre de notes de domini de l'aprenentatge"
@@ -13111,8 +13111,8 @@ ca:
   loading_feature_options_82e07ee4: "S'estan carregant les característiques opcionals"
   loading_features_d26820f6: "S'estan carregant les característiques"
   loading_folders_d8b5869e: "S'estan carregant les carpetes"
-  loading_gradebook_b0b75cd3: "S’està carregant el llibre de qualificacions"
-  loading_gradebook_submissions_d2ba017f: "S’estan carregant les entregues del llibre de qualificacions"
+  loading_gradebook_b0b75cd3: "S’està carregant el llibre de notes"
+  loading_gradebook_submissions_d2ba017f: "S’estan carregant les entregues del llibre de notes"
   loading_graders_f6a76142: "S'estan carregant els qualificadors"
   loading_grades_446fc226: "S'estan carregant les notes..."
   loading_grades_c842c887: "S'estan carregant les notes"
@@ -13250,13 +13250,13 @@ ca:
           verify: Verifica
         details: 
           mfa_enrollment: |-
-              L'autenticació multifactorial augmenta la seguretat en requerir-te la possessió física d'alguna cosa,
-              a més de saber la contrasenya, per iniciar la sessió al Canvas. Pot ser un dispositiu que pugui generar
-              codis de verificació, o bé un telèfon que pugui rebre missatges de text. L'aplicació Google Authenticator per
-              a iPhone o Android es pot configurar escanejant el codi QR següent. Es poden configurar altres testimonis introduint
-              la clau secreta **%{secret_key}**. Quan hàgiu configurat l'autenticació multifactorial, és recomanable que aneu
-              a la vostra pàgina de perfil i imprimiu un conjunt de codis de còpia de seguretat, en cas que el dispositiu
-              multifactorial normal no estigui disponible.
+              L'autenticació multifactorial augmenta la seguretat en requerir-vos la possessió física d'alguna cosa, a més de saber
+              la contrasenya, per iniciar la sessió al Canvas. Pot ser un dispositiu que pugui generar codis de verificació,
+              o bé un telèfon que pugui rebre missatges de text. Per configurar l’MFA es pot escanejar el codi QR de sota mitjançant
+              una aplicació d'autenticació de contrasenya única basada en el temps (TOTP) a iPhone o Android (per exemple: Google Authenticator,
+              Microsoft Authenticator o Authy). Per configurar altres testimonis, introduïu la clau secreta **%{secret_key}**.
+              Quan hàgiu configurat l'autenticació multifactorial, és recomanable que aneu a la vostra pàgina de perfil i imprimiu
+              un conjunt de codis de còpia de seguretat, en cas que el dispositiu multifactorial normal no estigui disponible.
           mfa_required: "Cal que configureu l'autenticació multifactorial."
           otp_impaired: "Actualment tenim un problema amb el nostre proveïdor d’SMS. Mentre provem de resoldre’l, si observeu un retard a l’hora de rebre el codi per SMS, reviseu el correu electrònic."
           otp_on_device: "Introduïu el codi de verificació que es mostra al vostre testimoni."
@@ -16518,7 +16518,7 @@ ca:
       \x20           "
   once_a_grade_is_posted_manually_it_will_automatica_bb90f67c: "Un cop una nota s'ha publicat manualment, s'enviaran les notificacions noves i seran visibles per als estudiants automàticament."
   once_enabled_for_new_quizzes_anonymous_grading_wil_468104d3: "Un cop activada per a proves noves, no es podrà desactivar la qualificació anònima."
-  once_enabled_this_option_is_visible_in_gradebook_f_3bbe5849: "Un cop activada, aquesta opció és visible al Llibre de qualificacions per als instructors."
+  once_enabled_this_option_is_visible_in_gradebook_f_3bbe5849: "Un cop activada, aquesta opció és visible al Llibre de notes per als instructors."
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: "Un cop hàgiu enviat una resposta, no la podreu canviar més tard. No podreu visualitzar la pregunta anterior."
   once_you_start_debugging_all_info_about_the_next_a_e871403b: "Quan comenceu a depurar, es recollirà tota la informació sobre el següent intent d'inici de sessió. Feu clic a \"Actualitza\" per veure si s'han recollit més dades, o a \"Atura la depuració\" per suprimir les dades recollides i aturar l'intent actual de depuració."
   one_of_the_supplied_redirect_uris_is_too_long_plea_18ec42c0: "Un dels redirect_uris proporcionats és massa llarg. Assegureu-vos d’haver introduït els valors correctes del vostre redirect_uris."
@@ -19951,7 +19951,7 @@ ca:
       view_quiz_answer_audits: "Visualitza la matriu de resposta als Registres d'enviament de la prova"
       view_statistics: "Visualitza les estadístiques"
     roles: 
-      account_admin: "Administrador de l'usuari"
+      account_admin: "Administrador de compte"
       designer: Dissenyador
       designers: Dissenyadors
       observer: Observador
@@ -21825,7 +21825,7 @@ ca:
   student_number_db6f06c1: "Estudiant %{number}"
   student_outcome_gradebook_description: |-
       El Llibre de notes de domini de l'aprenentatge de l'estudiant és una eina per als estudiants que els permet visualitzar ràpidament el seu progrés
-      en els resultats d'aprenentatge de l'assignatura. Els resultats es presenten en un format similar a un llibre de qualificacions
+      en els resultats d'aprenentatge de l'assignatura. Els resultats es presenten en un format similar a un llibre de notes
       i el progrés es mostra com a puntuació numèrica i com a domini assolit/domini
       gairebé assolit/endarrerit.
   student_outcome_result_b26b7ab4: "Resultats de l'estudiant"
@@ -22931,13 +22931,13 @@ ca:
   there_was_an_error_checking_plan_publishing_status_e7edfd25: "S’ha produït un erro en comprovar l’estat de publicació del pla."
   there_was_an_error_creating_a_new_filter_e93bb765: "S'ha produït un error en crear un filtre."
   there_was_an_error_deleting_name_aa3050e5: "S'ha produït un error en suprimir “%{name}”."
-  there_was_an_error_exporting_the_gradebook_30f4a95: "S'ha produït un error en exportar el llibre de qualificacions"
+  there_was_an_error_exporting_the_gradebook_30f4a95: "S'ha produït un error en exportar el llibre de notes"
   there_was_an_error_fetching_assignment_groups_data_bdb14b5a: "S’ha produït un error en obtenir les dades de grups de tasques."
   there_was_an_error_fetching_course_statistics_96e9dbad: "S'ha produït un error en recollir les estadístiques de l'assignatura"
-  there_was_an_error_fetching_custom_column_data_for_3278acb4: "S’ha produït un error en obtenir les dades de la columna personalitzada per al llibre de qualificacions"
+  there_was_an_error_fetching_custom_column_data_for_3278acb4: "S’ha produït un error en obtenir les dades de la columna personalitzada per al llibre de notes"
   there_was_an_error_fetching_custom_columns_542014ef: "S'ha produït un error en recollir les columnes personalitzades."
   there_was_an_error_fetching_data_for_gradebook_174e82f9: "S’ha produït un error en obtenir les dades per al llibre de qualificacions"
-  there_was_an_error_fetching_gradebook_filters_3b4607ac: "S'ha produït un error en recollir els filtres del llibre de qualificacions."
+  there_was_an_error_fetching_gradebook_filters_3b4607ac: "S'ha produït un error en recollir els filtres del llibre de notes."
   there_was_an_error_fetching_grading_period_assignm_179dce2e: "S’ha produït un error en obtenir les dades de les activitats del període de qualificació."
   there_was_an_error_fetching_modules_8ee451bb: "S'ha produït un error en recollir els continguts."
   there_was_an_error_fetching_outcome_results_45c57590: "S'ha produït un error en recollir els resultats"
@@ -23128,7 +23128,7 @@ ca:
   this_feature_flag_enables_the_use_of_the_updated_d_b78aa2b8: |-
       La marca d’aquesta característica opcional permet utilitzar la
       pàgina Crea/edita el fòrum actualitzada
-  this_feature_introduces_performance_and_maintenanc_50c325aa: "Aquesta característica opcional introdueix millores de rendiment i manteniment al Llibre de qualificacions individual"
+  this_feature_introduces_performance_and_maintenanc_50c325aa: "Aquesta característica opcional introdueix millores de rendiment i manteniment al Llibre de notes individual"
   this_feature_makes_it_so_that_when_multiple_files__1973ed91: |-
       Aquesta característica opcional actua de manera que quan
       una eina de tercers envia diversos fitxers conjuntament a través de l’API del Servei d’assignatures i notes, els fitxers
@@ -23204,7 +23204,7 @@ ca:
   this_is_an_anonymous_discussion_student_names_and__bc19b64d: "Aquest és un fòrum anònim. Algunes imatges de perfil i alguns noms estan amagats."
   this_is_an_anonymous_discussion_though_student_nam_f98abe71: "Aquest és un fòrum anònim. Tot i que s’amagaran els noms i les imatges de perfil dels estudiants, tots els membres del curs podran veure el vostre nom i la vostra imatge de perfil."
   this_is_an_anonymous_discussion_your_name_and_prof_72c49b77: "Aquest fòrum és anònim; el teu nom i la teva imatge del perfil estaran ocults, i els altres membres de l'assignatura no els podran veure."
-  this_is_enabled_by_default_as_assignments_can_not__767e9b16: "Aquesta acció està activada per defecte ja que les activitats no es poden retenir al llibre de qualificacions i encara hi compten."
+  this_is_enabled_by_default_as_assignments_can_not__767e9b16: "Aquesta acció està activada per defecte ja que les activitats no es poden retenir al llibre de notes i encara hi compten."
   this_is_not_a_breaking_change_all_lti_1_3_tool_beh_16df3ac0: "Aquest canvi *no* és gaire profund. Tot el comportament de l’eina LTI 1.3 seguirà sent el mateix independentment de l’extrem que es faci servir, amb l’excepció de l’especificació de l’emmagatzematge de la plataforma, compatible des de fa poc. Aquest canvi s’aplicarà en una data posterior que encara no s’ha especificat."
   this_is_not_a_breaking_change_all_lti_1_3_tool_beh_af22b9c9: "Aquest canvi *no* és gaire profund. Tot el comportament de l’eina LTI 1.3 seguirà sent el mateix independentment de l’extrem que es faci servir, amb l’excepció de l’especificació de l’emmagatzematge de la plataforma, compatible des de fa poc. Tampoc **no** cal que es dugui a terme abans del %{date}. Aquest canvi s’aplicarà en una data posterior que encara no s’ha especificat."
   this_is_not_a_valid_grade_9cc2cb8: "Aquesta no és una nota vàlida"
@@ -24094,7 +24094,7 @@ ca:
   totals_be24703: Totals
   track_student_performance_and_activity_a92a2a8b: "Feu un seguiment del rendiment i l'activitat dels estudiants"
   traditional_gradebook_d7ad59c6: "Llibre de qualificacions tradicional…"
-  traditional_gradebook_d90461dc: "Llibre de qualificacions tradicional"
+  traditional_gradebook_d90461dc: "Llibre de notes tradicional"
   transferred_student_enrollments_90dc27d3: "Inscripcions d’estudiants transferides"
   transform_rce_content_on_load_1f521086: "Transformació del contingut de l’RCE en carregar-lo"
   transforms_absolute_urls_to_relative_urls_and_remo_f06a81d8: |-
@@ -25150,7 +25150,7 @@ ca:
   view_file_8a1c62e5: "Visualitza el fitxer"
   view_gradebook_d6713dd1: "Visualitza el llibre de notes"
   view_gradebook_for_course_10cbf171: "Visualitza el llibre de notes de %{course}"
-  view_gradebook_history_a9272918: "Visualitzeu l’historial del llibre de qualificacions"
+  view_gradebook_history_a9272918: "Visualitzeu l’historial del llibre de notes"
   view_grades_8d3bae6c: "Visualitza les notes"
   view_grades_for_name_45aeb2f2: "Visualitza les notes de %{name}"
   view_grading_scheme_ac66bcdd: "Mostra l'esquema de qualificació"
@@ -25384,7 +25384,7 @@ ca:
   when_selected_the_course_is_in_a_read_only_state_o_5aaeb0d: "Si se selecciona, el curs tindrà l'estat de només lectura fora d'aquestes dates."
   when_selected_the_course_is_inaccessible_outside_c_af595406: "Si se selecciona, el curs serà inaccessible fora de les dates del curs. Si les dates del curs estan en blanc, aquestes dates d'inici i fi s'aplicaran a les dates del període acadèmic."
   when_selected_the_course_section_is_in_a_read_only_a7571eb2: "Si se selecciona, la secció de l'assignatura tindrà l'estat de només lectura fora d'aquestes dates."
-  when_set_an_option_to_not_display_a_new_quiz_with__3bd930bf: "Un cop establerta, una opció de no mostrar una prova nova amb 0 punts possibles al llibre de qualificacions estarà disponible en forma de casella de verificació en crear o editar la prova."
+  when_set_an_option_to_not_display_a_new_quiz_with__3bd930bf: "Un cop establerta, una opció de no mostrar una prova nova amb 0 punts possibles al llibre de notes estarà disponible en forma de casella de verificació en crear o editar la prova."
   when_set_determines_if_the_workflow_state_of_a_new_1470e23e: "Un cop establert, determina si l'estat del flux de treball d’una prova nova s’ha d'establir com a qualificat o pending_review en cas que un usuari tingués una prova nova pending_review anterior, però s’hagi tornat a inscriure en l'assignatura."
   when_the_title_to_a_page_is_changed_old_links_to_t_9a2737b7: "En canviar el títol d’una pàgina, els enllaços antics a aquesta pàgina enllaçaran a la pàgina correcta."
   when_this_flag_is_enabled_the_course_navigation_wi_93477517: |-
@@ -25925,7 +25925,7 @@ ca:
   your_email_address_f881e583: "La vostra adreça electrònica"
   your_email_b5364bee: "La vostra adreça electrònica"
   your_grade_has_been_updated_f1cd8f06: "S’ha actualitzat la vostra nota"
-  your_gradebook_export_has_been_cancelled_c1b99ca1: "S’ha cancel·lat l’exportació del vostre llibre de qualificacions"
+  your_gradebook_export_has_been_cancelled_c1b99ca1: "S’ha cancel·lat l’exportació del vostre llibre de notes"
   your_group_is_being_created_88c0c024: "S’està creant el vostre grup"
   your_groups_are_being_created_50156e34: "S'estan creant els vostres grups."
   your_homeroom_is_currently_unpublished_93c14f4f: "La vostra tutoria no està publicada actualment."
