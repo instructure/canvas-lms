@@ -23,6 +23,7 @@ import AssignToPanel, {AssignToPanelProps} from '../AssignToPanel'
 describe('AssignToPanel', () => {
   const props: AssignToPanelProps = {
     courseId: '1',
+    moduleId: '2',
     height: '500px',
     onDismiss: () => {},
   }

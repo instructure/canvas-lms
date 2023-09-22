@@ -25,6 +25,7 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {debounce, uniqBy} from 'lodash'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Spinner} from '@instructure/ui-spinner'
 
 const {Option: CanvasMultiSelectOption} = CanvasMultiSelect as any
 
@@ -32,19 +33,34 @@ const I18n = useI18nScope('differentiated_modules')
 
 interface Props {
   courseId: string
+  moduleId: string
+}
+
+interface AssignmentOverride {
+  context_module_id: string
+  id: string
+  students: {
+    id: string
+    name: string
+  }[]
+  course_section: {
+    id: string
+    name: string
+  }
 }
 
 interface Option {
   id: string
   value: string
-  group: string
+  group?: string
 }
 
-const AssigneeSelector = ({courseId}: Props) => {
+const AssigneeSelector = ({courseId, moduleId}: Props) => {
   const [selectedAssignees, setSelectedAssignees] = useState<Option[]>([])
   const [searchTerm, setSearchTerm] = useState('')
   const [options, setOptions] = useState<Option[]>([])
   const [isLoading, setIsLoading] = useState(false)
+  const [isLoadingDefaultValues, setIsLoadingDefaultValues] = useState(false)
 
   const handleChange = (newSelected: string[]) => {
     const newSelectedSet = new Set(newSelected)
@@ -55,6 +71,36 @@ const AssigneeSelector = ({courseId}: Props) => {
   const handleInputChange = (value: string) => {
     debounce(() => setSearchTerm(value), 300)()
   }
+
+  useEffect(() => {
+    setIsLoadingDefaultValues(true)
+    doFetchApi({
+      path: `/api/v1/courses/${courseId}/modules/${moduleId}/assignment_overrides`,
+    })
+      .then(({json}: {json: AssignmentOverride[]}) => {
+        const parsedOptions = json.reduce((acc: Option[], override) => {
+          const overrideOptions =
+            override.students?.map(({id, name}) => ({
+              id: `student-${id}`,
+              value: name,
+              group: I18n.t('Students'),
+            })) ?? []
+          if (override.course_section !== undefined) {
+            const sectionId = `section-${override.course_section.id}`
+            overrideOptions.push({
+              id: sectionId,
+              value: override.course_section.name,
+              group: I18n.t('Sections'),
+            })
+          }
+          return [...acc, ...overrideOptions]
+        }, [])
+        setOptions(parsedOptions)
+        setSelectedAssignees(parsedOptions)
+      })
+      .catch((e: Error) => showFlashError(I18n.t('Something went wrong while fetching data'))(e))
+      .finally(() => setIsLoadingDefaultValues(false))
+  }, [courseId, moduleId])
 
   useEffect(() => {
     const params: Record<string, string> = {}
@@ -111,6 +157,8 @@ const AssigneeSelector = ({courseId}: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [courseId, searchTerm])
 
+  if (isLoadingDefaultValues) return <Spinner renderTitle="Loading" size="small" />
+
   return (
     <>
       <CanvasMultiSelect
@@ -127,7 +175,7 @@ const AssigneeSelector = ({courseId}: Props) => {
           tags?.map((tag: ReactElement) => (
             <View
               key={tag.key}
-              data-testid="assignee_selector_option"
+              data-testid="assignee_selector_selected_option"
               as="div"
               display="inline-block"
               margin="xx-small none"
