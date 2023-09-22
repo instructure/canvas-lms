@@ -25,28 +25,64 @@ describe AccountGradingSettingsController, type: :request do
 
   context "account admin" do
     before(:once) do
-      @account = Account.default
-      @admin = account_admin_user(account: @account)
+      @root_account = Account.default
+      @admin = account_admin_user(account: @root_account)
       Account.site_admin.enable_feature!(:points_based_grading_schemes)
-    end
-
-    it "js_env POINTS_BASED_GRADING_SCHEMES_ENABLED is true when points_based_grading_schemes ff is on" do
-      user_session(@admin)
-      get "/accounts/#{@account.id}/grading_settings"
-      expect(response).to be_successful
-      expect((controller.js_env[:POINTS_BASED_GRADING_SCHEMES_ENABLED] || [])).to be(true)
     end
 
     it "grants access to account admins" do
       user_session(@admin)
-      get "/accounts/#{@account.id}/grading_settings"
+      get "/accounts/#{@root_account.id}/grading_settings"
       expect(response).to be_successful
     end
 
     it "denies access to non-account-admins" do
-      course_with_teacher_logged_in(account: @account, active_all: true)
-      get "/accounts/#{@account.id}/grading_settings"
+      course_with_teacher_logged_in(account: @root_account, active_all: true)
+      get "/accounts/#{@root_account.id}/grading_settings"
       expect(response).to be_unauthorized
+    end
+
+    describe "js_env variables" do
+      it "POINTS_BASED_GRADING_SCHEMES_ENABLED is true when points_based_grading_schemes ff is on" do
+        user_session(@admin)
+        get "/accounts/#{@root_account.id}/grading_settings"
+        expect(response).to be_successful
+        expect((controller.js_env[:POINTS_BASED_GRADING_SCHEMES_ENABLED] || [])).to be(true)
+      end
+
+      context "when the account is a root account" do
+        it "IS_ROOT_ACCOUNT is true" do
+          user_session(@admin)
+          get "/accounts/#{@root_account.id}/grading_settings"
+          expect(response).to be_successful
+          expect(controller.js_env[:IS_ROOT_ACCOUNT]).to be(true)
+        end
+
+        it "ROOT_ACCOUNT_ID returns the account's ID" do
+          user_session(@admin)
+          get "/accounts/#{@root_account.id}/grading_settings"
+          expect(response).to be_successful
+          expect(controller.js_env[:ROOT_ACCOUNT_ID]).to eq(@root_account.id.to_s)
+        end
+      end
+
+      context "when the account is a sub account" do
+        let(:sub_account) { @root_account.sub_accounts.create! }
+
+        it "IS_ROOT_ACCOUNT is false" do
+          user_session(@admin)
+          get "/accounts/#{sub_account.id}/grading_settings"
+          expect(response).to be_successful
+          expect(controller.js_env[:IS_ROOT_ACCOUNT]).to be(false)
+        end
+
+        it "ROOT_ACCOUNT_ID returns the root account id" do
+          user_session(@admin)
+          get "/accounts/#{sub_account.id}/grading_settings"
+          expect(response).to be_successful
+          expect(controller.js_env[:ROOT_ACCOUNT_ID]).to eq(@root_account.id.to_s)
+        end
+      end
     end
   end
 end

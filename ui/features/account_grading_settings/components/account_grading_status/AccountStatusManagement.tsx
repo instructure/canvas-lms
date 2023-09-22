@@ -37,9 +37,13 @@ const {Row: GridRow, Col: GridCol} = Grid as any
 const TOTAL_ALLOWED_CUSTOM_STATUSES = 3
 
 type AccountStatusManagementProps = {
-  accountId: string
+  isRootAccount: boolean
+  rootAccountId: string
 }
-export const AccountStatusManagement = ({accountId}: AccountStatusManagementProps) => {
+export const AccountStatusManagement = ({
+  isRootAccount,
+  rootAccountId,
+}: AccountStatusManagementProps) => {
   const {
     customStatuses,
     hasDeleteCustomStatusError,
@@ -51,7 +55,7 @@ export const AccountStatusManagement = ({accountId}: AccountStatusManagementProp
     removeCustomStatus,
     saveCustomStatus,
     saveStandardStatus,
-  } = useAccountGradingStatuses(accountId)
+  } = useAccountGradingStatuses(rootAccountId)
   const [openEditStatusId, setEditStatusId] = useState<string | undefined>(undefined)
 
   useEffect(() => {
@@ -120,6 +124,7 @@ export const AccountStatusManagement = ({accountId}: AccountStatusManagementProp
             return (
               <StandardStatusItem
                 key={`standard-status-${gradeStatus.id}`}
+                editable={isRootAccount}
                 gradeStatus={gradeStatus}
                 handleEditSave={(newColor: string) => {
                   handleSaveStandardStatus({...gradeStatus, color: newColor})
@@ -139,6 +144,7 @@ export const AccountStatusManagement = ({accountId}: AccountStatusManagementProp
             return (
               <CustomStatusItem
                 key={`custom-status-${gradeStatus.id}`}
+                editable={isRootAccount}
                 gradeStatus={gradeStatus}
                 handleEditSave={(newColor: string, name: string) => {
                   handleSaveCustomStatus(newColor, name, gradeStatus.id)
@@ -149,19 +155,20 @@ export const AccountStatusManagement = ({accountId}: AccountStatusManagementProp
               />
             )
           })}
-          {[...Array(allowedCustomStatusAdditions)].map((_, index) => {
-            const editStatusId = getEditStatusId(index.toString(), 'new')
-            return (
-              <CustomStatusNewItem
-                // eslint-disable-next-line react/no-array-index-key
-                key={`custom-status-new-${index}-${allowedCustomStatusAdditions}`}
-                handleSave={handleSaveCustomStatus}
-                index={index}
-                isEditOpen={openEditStatusId === editStatusId}
-                handleEditStatusToggle={() => handleEditStatusToggle(editStatusId)}
-              />
-            )
-          })}
+          {isRootAccount &&
+            [...Array(allowedCustomStatusAdditions)].map((_, index) => {
+              const editStatusId = getEditStatusId(index.toString(), 'new')
+              return (
+                <CustomStatusNewItem
+                  // eslint-disable-next-line react/no-array-index-key
+                  key={`custom-status-new-${index}-${allowedCustomStatusAdditions}`}
+                  handleSave={handleSaveCustomStatus}
+                  index={index}
+                  isEditOpen={openEditStatusId === editStatusId}
+                  handleEditStatusToggle={() => handleEditStatusToggle(editStatusId)}
+                />
+              )
+            })}
         </GridCol>
       </GridRow>
     </Grid>

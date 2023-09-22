@@ -35,6 +35,7 @@ const I18n = useI18nScope('account_grading_status')
 const {Item: FlexItem} = Flex as any
 
 type CustomStatusItemProps = {
+  editable: boolean
   gradeStatus: GradeStatus
   isEditOpen: boolean
   handleEditSave: (color: string, name: string) => void
@@ -42,6 +43,7 @@ type CustomStatusItemProps = {
   handleStatusDelete: (statusId: string) => void
 }
 export const CustomStatusItem = ({
+  editable,
   gradeStatus,
   isEditOpen,
   handleEditSave,
@@ -77,28 +79,30 @@ export const CustomStatusItem = ({
               <TruncateText position="middle">{name}</TruncateText>
             </Text>
           </FlexItem>
-          <FlexItem>
-            <EditStatusPopover
-              currentColor={color}
-              customStatusName={name}
-              editButtonLabel={`${I18n.t('Custom Status')} ${name}`}
-              handleEditSave={handleEditSave}
-              isCustomStatus={true}
-              isOpen={isEditOpen}
-              handleEditStatusToggle={handleEditStatusToggle}
-              positionTarget={customStatusItemRef.current}
-            />
+          {editable && (
+            <FlexItem>
+              <EditStatusPopover
+                currentColor={color}
+                customStatusName={name}
+                editButtonLabel={`${I18n.t('Custom Status')} ${name}`}
+                handleEditSave={handleEditSave}
+                isCustomStatus={true}
+                isOpen={isEditOpen}
+                handleEditStatusToggle={handleEditStatusToggle}
+                positionTarget={customStatusItemRef.current}
+              />
 
-            <IconButton
-              size="small"
-              withBackground={false}
-              withBorder={false}
-              screenReaderLabel={I18n.t('Delete Status %{name}', {name})}
-              onClick={confirmStatusDelete}
-            >
-              <IconTrashSolid />
-            </IconButton>
-          </FlexItem>
+              <IconButton
+                size="small"
+                withBackground={false}
+                withBorder={false}
+                screenReaderLabel={I18n.t('Delete Status %{name}', {name})}
+                onClick={confirmStatusDelete}
+              >
+                <IconTrashSolid />
+              </IconButton>
+            </FlexItem>
+          )}
         </Flex>
       </GradingStatusListItem>
     </View>
