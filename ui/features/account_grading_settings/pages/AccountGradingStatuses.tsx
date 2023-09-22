@@ -25,7 +25,14 @@ import {AccountStatusManagement} from '../components/account_grading_status/Acco
 
 const I18n = useI18nScope('account_grading_status')
 
-export const AccountGradingStatuses = () => {
+type AccountGradingStatusesProps = {
+  isRootAccount: boolean
+  rootAccountId: string
+}
+export const AccountGradingStatuses = ({
+  isRootAccount,
+  rootAccountId,
+}: AccountGradingStatusesProps) => {
   const pathMatch = useMatch('/accounts/:accountId/*')
   const accountId = pathMatch?.params?.accountId
   if (!accountId) {
@@ -47,7 +54,7 @@ export const AccountGradingStatuses = () => {
 
   return (
     <ApolloProvider client={client}>
-      <AccountStatusManagement accountId={accountId} />
+      <AccountStatusManagement isRootAccount={isRootAccount} rootAccountId={rootAccountId} />
     </ApolloProvider>
   )
 }

@@ -30,12 +30,14 @@ import {statusesTitleMap} from '../../utils/accountStatusUtils'
 const I18n = useI18nScope('standard_grading_status')
 
 type StandardStatusItemProps = {
+  editable: boolean
   gradeStatus: GradeStatus
   isEditOpen: boolean
   handleEditSave: (color: string) => void
   handleEditStatusToggle: () => void
 }
 export const StandardStatusItem = ({
+  editable,
   gradeStatus,
   isEditOpen,
   handleEditSave,
@@ -56,16 +58,18 @@ export const StandardStatusItem = ({
             <Grid.Col>
               <Text weight="bold">{statusName}</Text>
             </Grid.Col>
-            <Grid.Col width="auto">
-              <EditStatusPopover
-                currentColor={color}
-                editButtonLabel={`${I18n.t('Standard Status')} ${statusName}`}
-                isOpen={isEditOpen}
-                handleEditSave={handleEditSave}
-                handleEditStatusToggle={handleEditStatusToggle}
-                positionTarget={standardStatusRef.current}
-              />
-            </Grid.Col>
+            {editable && (
+              <Grid.Col width="auto">
+                <EditStatusPopover
+                  currentColor={color}
+                  editButtonLabel={`${I18n.t('Standard Status')} ${statusName}`}
+                  isOpen={isEditOpen}
+                  handleEditSave={handleEditSave}
+                  handleEditStatusToggle={handleEditStatusToggle}
+                  positionTarget={standardStatusRef.current}
+                />
+              </Grid.Col>
+            )}
           </Grid.Row>
         </Grid>
       </GradingStatusListItem>
