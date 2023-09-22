@@ -1081,7 +1081,7 @@ GEM
       sync
     trailblazer-option (0.1.2)
     ttfunk (1.7.0)
-    twilio-ruby (6.6.0)
+    twilio-ruby (6.7.0)
       faraday (>= 0.9, < 3.0)
       jwt (>= 1.5, < 3.0)
       nokogiri (>= 1.6, < 2.0)
