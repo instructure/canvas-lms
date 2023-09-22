@@ -49,7 +49,12 @@ environment_configuration(defined?(config) && config) do |config|
     ENV["RUBY_DEBUG_LAZY"] = "true"
     require "debug"
     if ENV["REMOTE_DEBUGGING_ENABLED"]
-      require "debug/open_nonstop"
+      if defined?(PhusionPassenger)
+        # only initialize in forked child process (to prevent EADDRINUSE)
+        PhusionPassenger.on_event(:starting_worker_process) { require "debug/open_nonstop" }
+      else
+        require "debug/open_nonstop"
+      end
     end
   end
 
