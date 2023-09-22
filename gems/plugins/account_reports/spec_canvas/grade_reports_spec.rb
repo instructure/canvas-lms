@@ -1156,8 +1156,8 @@ describe "Default Account Reports" do
         gpg.root_account = @course2.root_account
         gpg.enrollment_terms << @default_term
         gpg.save!
-        past   = gpg.grading_periods.create! title: "Past", start_date: 1.week.ago, end_date: 1.day.ago
-        future = gpg.grading_periods.create! title: "Future", start_date: 1.day.from_now, end_date: 1.week.from_now
+        @past   = gpg.grading_periods.create! title: "Past", start_date: 1.week.ago, end_date: 1.day.ago
+        @future = gpg.grading_periods.create! title: "Future", start_date: 1.day.from_now, end_date: 1.week.from_now
 
         @account.enable_feature!(:final_grades_override)
 
@@ -1172,231 +1172,246 @@ describe "Default Account Reports" do
         @course3.enroll_user(@user4, "StudentEnrollment", enrollment_state: :active)
         @course3.default_post_policy.update!(post_manually: false)
 
-        teacher = User.create!
-        @course2.enroll_teacher(teacher)
-        @course3.enroll_teacher(teacher)
+        @teacher = User.create!
+        @course2.enroll_teacher(@teacher)
+        @course3.enroll_teacher(@teacher)
+      end
 
-        # set up assignments
-        past_assignment = @course2.assignments.create! points_possible: 100, due_at: 3.days.ago
-        future_assignment = @course2.assignments.create! points_possible: 100, due_at: 3.days.from_now
-        unposted_future_assignment = @course2.assignments.create! points_possible: 100, due_at: 3.days.from_now
-        unposted_future_assignment.ensure_post_policy(post_manually: true)
+      context "courses with assignments" do
+        before(:once) do
+          # set up assignments
+          past_assignment = @course2.assignments.create! points_possible: 100, due_at: 3.days.ago
+          future_assignment = @course2.assignments.create! points_possible: 100, due_at: 3.days.from_now
+          unposted_future_assignment = @course2.assignments.create! points_possible: 100, due_at: 3.days.from_now
+          unposted_future_assignment.ensure_post_policy(post_manually: true)
 
-        Timecop.freeze(past.end_date - 1.day) do
-          past_assignment.grade_student(@user2, grade: 25, grader: teacher)
-          past_assignment.grade_student(@user4, grade: 75, grader: teacher)
+          Timecop.freeze(@past.end_date - 1.day) do
+            past_assignment.grade_student(@user2, grade: 25, grader: @teacher)
+            past_assignment.grade_student(@user4, grade: 75, grader: @teacher)
+          end
+          future_assignment.grade_student(@user2, grade: 75, grader: @teacher)
+          future_assignment.grade_student(@user4, grade: 25, grader: @teacher)
+
+          unposted_future_assignment.grade_student(@user2, grade: 95, grader: @teacher)
+          unposted_future_assignment.grade_student(@user4, grade: 75, grader: @teacher)
+
+          user2_enrollment = @user2.enrollments.find_by(course: @course2)
+          user2_enrollment.find_score({ grading_period: @past }).update!(override_score: 26)
+          user2_enrollment.find_score({ grading_period: @future }).update!(override_score: 77)
+
+          user4_enrollment = @user4.enrollments.find_by(course: @course2)
+          user4_enrollment.find_score({ grading_period: @past }).update!(override_score: 78)
+          user4_enrollment.find_score({ grading_period: @future }).update!(override_score: 29)
+
+          past_assignment = @course3.assignments.create! points_possible: 100, due_at: 3.days.ago
+          future_assignment = @course3.assignments.create! points_possible: 100, due_at: 3.days.from_now
+
+          Timecop.freeze(@past.end_date - 1.day) do
+            past_assignment.grade_student(@user2, grade: 75, grader: @teacher)
+            past_assignment.grade_student(@user4, grade: 25, grader: @teacher)
+          end
+          future_assignment.grade_student(@user2, grade: 25, grader: @teacher)
+          future_assignment.grade_student(@user4, grade: 75, grader: @teacher)
         end
-        future_assignment.grade_student(@user2, grade: 75, grader: teacher)
-        future_assignment.grade_student(@user4, grade: 25, grader: teacher)
 
-        unposted_future_assignment.grade_student(@user2, grade: 95, grader: teacher)
-        unposted_future_assignment.grade_student(@user4, grade: 75, grader: teacher)
+        it "reports mgp grades" do
+          reports = read_report("mgp_grade_export_csv",
+                                params: { enrollment_term_id: @default_term.id },
+                                parse_header: true,
+                                order: ["student name", "course"])
+          csv = reports["Default Term.csv"]
+          expect(csv.size).to eq 4
+          expect(
+            csv.all? do |student|
+              ["Math 101", "Fun 404"].include?(student["course"])
+              student["grading period set"] == "Grading Periods"
+            end
+          ).to be true
 
-        user2_enrollment = @user2.enrollments.find_by(course: @course2)
-        user2_enrollment.find_score({ grading_period: past }).update!(override_score: 26)
-        user2_enrollment.find_score({ grading_period: future }).update!(override_score: 77)
+          jason1, jason2, mike1, mike2 = csv
 
-        user4_enrollment = @user4.enrollments.find_by(course: @course2)
-        user4_enrollment.find_score({ grading_period: past }).update!(override_score: 78)
-        user4_enrollment.find_score({ grading_period: future }).update!(override_score: 29)
+          expect(jason1["student name"]).to eq "Jason Donovan"
+          expect(jason1["course"]).to eq "Fun 404"
+          expect(jason1["Past current score"].to_f).to eq 25
+          expect(jason1["Future current score"].to_f).to eq 75
+          expect(jason1["Past unposted current score"].to_f).to eq 25
+          expect(jason1["Future unposted current score"].to_f).to eq 75
+          expect(jason1["Past override score"]).to be_nil
+          expect(jason1["Future override score"]).to be_nil
 
-        past_assignment = @course3.assignments.create! points_possible: 100, due_at: 3.days.ago
-        future_assignment = @course3.assignments.create! points_possible: 100, due_at: 3.days.from_now
+          expect(jason2["student name"]).to eq "Jason Donovan"
+          expect(jason2["course"]).to eq "Math 101"
+          expect(jason2["Past current score"].to_f).to eq 75
+          expect(jason2["Future current score"].to_f).to eq 25
+          expect(jason2["Past unposted current score"].to_f).to eq 75
+          expect(jason2["Future unposted current score"].to_f).to eq 50
+          expect(jason2["Past override score"].to_f).to eq 78
+          expect(jason2["Future override score"].to_f).to eq 29
 
-        Timecop.freeze(past.end_date - 1.day) do
-          past_assignment.grade_student(@user2, grade: 75, grader: teacher)
-          past_assignment.grade_student(@user4, grade: 25, grader: teacher)
+          expect(mike1["student name"]).to eq "Michael Bolton"
+          expect(mike1["course"]).to eq "Fun 404"
+          expect(mike1["Past final score"].to_f).to eq 75
+          expect(mike1["Future final score"].to_f).to eq 25
+          expect(mike1["Past unposted final score"].to_f).to eq 75
+          expect(mike1["Future unposted final score"].to_f).to eq 25
+          expect(mike1["Past override score"]).to be_nil
+          expect(mike1["Future override score"]).to be_nil
+
+          expect(mike2["student name"]).to eq "Michael Bolton"
+          expect(mike2["course"]).to eq "Math 101"
+          expect(mike2["Past final score"].to_f).to eq 25
+          expect(mike2["Future final score"].to_f).to eq 37.5
+          expect(mike2["Past unposted final score"].to_f).to eq 25
+          expect(mike2["Future unposted final score"].to_f).to eq 85
+          expect(mike2["Past override score"].to_f).to eq 26
+          expect(mike2["Future override score"].to_f).to eq 77
         end
-        future_assignment.grade_student(@user2, grade: 25, grader: teacher)
-        future_assignment.grade_student(@user4, grade: 75, grader: teacher)
-      end
 
-      it "reports mgp grades" do
-        reports = read_report("mgp_grade_export_csv",
-                              params: { enrollment_term_id: @default_term.id },
-                              parse_header: true,
-                              order: ["student name", "course"])
-        csv = reports["Default Term.csv"]
-        expect(csv.size).to eq 4
-        expect(
-          csv.all? do |student|
-            ["Math 101", "Fun 404"].include?(student["course"])
-            student["grading period set"] == "Grading Periods"
-          end
-        ).to be true
+        it "works with students in multiple sections" do
+          section2 = @course2.course_sections.create! name: "section 2"
+          @course2.enroll_student(@user2,
+                                  section: section2,
+                                  workflow_state: "active",
+                                  allow_multiple_enrollments: true).tap(&:accept)
 
-        jason1, jason2, mike1, mike2 = csv
+          reports = read_report("mgp_grade_export_csv",
+                                params: { enrollment_term_id: @default_term.id },
+                                parse_header: true,
+                                order: ["student name", "section id"])
+          csv = reports["Default Term.csv"]
 
-        expect(jason1["student name"]).to eq "Jason Donovan"
-        expect(jason1["course"]).to eq "Fun 404"
-        expect(jason1["Past current score"].to_f).to eq 25
-        expect(jason1["Future current score"].to_f).to eq 75
-        expect(jason1["Past unposted current score"].to_f).to eq 25
-        expect(jason1["Future unposted current score"].to_f).to eq 75
-        expect(jason1["Past override score"]).to be_nil
-        expect(jason1["Future override score"]).to be_nil
+          # Just look at the course2 enrollments
+          jason, mike1, mike2 = csv[0], csv[2], csv[4]
 
-        expect(jason2["student name"]).to eq "Jason Donovan"
-        expect(jason2["course"]).to eq "Math 101"
-        expect(jason2["Past current score"].to_f).to eq 75
-        expect(jason2["Future current score"].to_f).to eq 25
-        expect(jason2["Past unposted current score"].to_f).to eq 75
-        expect(jason2["Future unposted current score"].to_f).to eq 50
-        expect(jason2["Past override score"].to_f).to eq 78
-        expect(jason2["Future override score"].to_f).to eq 29
+          expect(jason["student name"]).to eq "Jason Donovan"
+          expect(mike1["student name"]).to eq "Michael Bolton"
+          expect(mike2["student name"]).to eq "Michael Bolton"
+          expect(mike1["section"]).to eq "Math 101"
+          expect(mike2["section"]).to eq "section 2"
+          expect(mike1["Past final score"].to_f).to eq 25
+          expect(mike2["Past final score"].to_f).to eq 25
+          expect(mike1["Past unposted final score"].to_f).to eq 25
+          expect(mike2["Past unposted final score"].to_f).to eq 25
+          expect(mike1["Past override score"].to_f).to eq 26
+          expect(mike2["Past override score"].to_f).to eq 26
+        end
 
-        expect(mike1["student name"]).to eq "Michael Bolton"
-        expect(mike1["course"]).to eq "Fun 404"
-        expect(mike1["Past final score"].to_f).to eq 75
-        expect(mike1["Future final score"].to_f).to eq 25
-        expect(mike1["Past unposted final score"].to_f).to eq 75
-        expect(mike1["Future unposted final score"].to_f).to eq 25
-        expect(mike1["Past override score"]).to be_nil
-        expect(mike1["Future override score"]).to be_nil
+        it "returns empty score values when a score for a grading period/enrollment is missing" do
+          enrollment = Enrollment.find_by(course: @course3, user: @user2)
+          past_grading_period = GradingPeriod.find_by(title: "Past")
+          Score.find_by(enrollment:, grading_period: past_grading_period).destroy!
 
-        expect(mike2["student name"]).to eq "Michael Bolton"
-        expect(mike2["course"]).to eq "Math 101"
-        expect(mike2["Past final score"].to_f).to eq 25
-        expect(mike2["Future final score"].to_f).to eq 37.5
-        expect(mike2["Past unposted final score"].to_f).to eq 25
-        expect(mike2["Future unposted final score"].to_f).to eq 85
-        expect(mike2["Past override score"].to_f).to eq 26
-        expect(mike2["Future override score"].to_f).to eq 77
-      end
+          reports = read_report("mgp_grade_export_csv",
+                                params: { enrollment_term_id: @default_term.id },
+                                parse_header: true,
+                                order: ["student name", "course"])
+          csv = reports["Default Term.csv"]
 
-      it "works with students in multiple sections" do
-        section2 = @course2.course_sections.create! name: "section 2"
-        @course2.enroll_student(@user2,
-                                section: section2,
-                                workflow_state: "active",
-                                allow_multiple_enrollments: true).tap(&:accept)
+          deleted_score_row = csv.find { |row| row["student name"] == "Michael Bolton" && row["course"] == "Fun 404" }
+          expect(deleted_score_row["section"]).to eq "Fun 404"
+          expect(deleted_score_row.to_hash).to include(
+            "Past current score" => nil,
+            "Past unposted current score" => nil,
+            "Past final score" => nil,
+            "Past unposted final score" => nil,
+            "Past override score" => nil
+          )
+        end
 
-        reports = read_report("mgp_grade_export_csv",
-                              params: { enrollment_term_id: @default_term.id },
-                              parse_header: true,
-                              order: ["student name", "section id"])
-        csv = reports["Default Term.csv"]
+        it "returns nothing for terms without grading periods" do
+          reports = read_report("mgp_grade_export_csv",
+                                params: { enrollment_term_id: @term1.id },
+                                header: true,
+                                order: "skip")
+          csv = reports["Fall.csv"]
+          expect(csv.size).to eq 1
+          expect(csv.first).to eq ["no grading periods configured for this term"]
+        end
 
-        # Just look at the course2 enrollments
-        jason, mike1, mike2 = csv[0], csv[2], csv[4]
+        it "returns integration_ids on mgp report when account setting set" do
+          @account.settings[:include_integration_ids_in_gradebook_exports] = true
+          @account.save!
 
-        expect(jason["student name"]).to eq "Jason Donovan"
-        expect(mike1["student name"]).to eq "Michael Bolton"
-        expect(mike2["student name"]).to eq "Michael Bolton"
-        expect(mike1["section"]).to eq "Math 101"
-        expect(mike2["section"]).to eq "section 2"
-        expect(mike1["Past final score"].to_f).to eq 25
-        expect(mike2["Past final score"].to_f).to eq 25
-        expect(mike1["Past unposted final score"].to_f).to eq 25
-        expect(mike2["Past unposted final score"].to_f).to eq 25
-        expect(mike1["Past override score"].to_f).to eq 26
-        expect(mike2["Past override score"].to_f).to eq 26
-      end
+          reports = read_report("mgp_grade_export_csv",
+                                params: { enrollment_term_id: @default_term.id },
+                                parse_header: true,
+                                order: ["student name", "section id"])
+          csv = reports["Default Term.csv"]
+          expect(csv[1]["student integration id"]).to eq "int2"
+        end
 
-      it "returns empty score values when a score for a grading period/enrollment is missing" do
-        enrollment = Enrollment.find_by(course: @course3, user: @user2)
-        past_grading_period = GradingPeriod.find_by(title: "Past")
-        Score.find_by(enrollment:, grading_period: past_grading_period).destroy!
+        it "omits override scores if Final Grade Override is disabled for the account" do
+          @account.disable_feature!(:final_grades_override)
+          reports = read_report("mgp_grade_export_csv",
+                                params: { enrollment_term_id: @term1.id },
+                                header: true,
+                                order: "skip")
+          csv = reports["Fall.csv"]
+          first_row = csv[0]
 
-        reports = read_report("mgp_grade_export_csv",
-                              params: { enrollment_term_id: @default_term.id },
-                              parse_header: true,
-                              order: ["student name", "course"])
-        csv = reports["Default Term.csv"]
+          expect(first_row).not_to include("Past override score", "Future override score")
+        end
 
-        deleted_score_row = csv.find { |row| row["student name"] == "Michael Bolton" && row["course"] == "Fun 404" }
-        expect(deleted_score_row["section"]).to eq "Fun 404"
-        expect(deleted_score_row.to_hash).to include(
-          "Past current score" => nil,
-          "Past unposted current score" => nil,
-          "Past final score" => nil,
-          "Past unposted final score" => nil,
-          "Past override score" => nil
-        )
-      end
+        describe "grading scheme values" do
+          context "when the Add Grading Scheme to Admin Grade Reports flag is enabled" do
+            before do
+              @account.enable_feature!(:final_grades_override)
+            end
 
-      it "returns nothing for terms without grading periods" do
-        reports = read_report("mgp_grade_export_csv",
-                              params: { enrollment_term_id: @term1.id },
-                              header: true,
-                              order: "skip")
-        csv = reports["Fall.csv"]
-        expect(csv.size).to eq 1
-        expect(csv.first).to eq ["no grading periods configured for this term"]
-      end
+            let(:default_term_csv) do
+              reports = read_report(
+                "mgp_grade_export_csv",
+                params: { enrollment_term_id: @default_term.id },
+                parse_header: true,
+                order: "skip"
+              )
+              reports["Default Term.csv"]
+            end
 
-      it "returns integration_ids on mgp report when account setting set" do
-        @account.settings[:include_integration_ids_in_gradebook_exports] = true
-        @account.save!
+            it "returns commensurate grade values for courses using grading schemes" do
+              jason_row = default_term_csv.detect { |row| row["course"] == @course2.name && row["student name"] == "Michael Bolton" }
+              aggregate_failures do
+                expect(jason_row["Past current grade"]).to eq "F"
+                expect(jason_row["Past final grade"]).to eq "F"
+                expect(jason_row["Past unposted current grade"]).to eq "F"
+                expect(jason_row["Past unposted final grade"]).to eq "F"
+                expect(jason_row["Past override grade"]).to eq "F"
 
-        reports = read_report("mgp_grade_export_csv",
-                              params: { enrollment_term_id: @default_term.id },
-                              parse_header: true,
-                              order: ["student name", "section id"])
-        csv = reports["Default Term.csv"]
-        expect(csv[1]["student integration id"]).to eq "int2"
-      end
+                expect(jason_row["current grade"]).to eq "F"
+                expect(jason_row["final grade"]).to eq "F"
+                expect(jason_row["unposted current grade"]).to eq "D"
+                expect(jason_row["unposted final grade"]).to eq "D"
+              end
+            end
 
-      it "omits override scores if Final Grade Override is disabled for the account" do
-        @account.disable_feature!(:final_grades_override)
-        reports = read_report("mgp_grade_export_csv",
-                              params: { enrollment_term_id: @term1.id },
-                              header: true,
-                              order: "skip")
-        csv = reports["Fall.csv"]
-        first_row = csv[0]
+            it "returns empty values for courses not using a grading scheme" do
+              mike_row = default_term_csv.detect { |row| row["course"] == @course3.name && row["student name"] == "Michael Bolton" }
+              aggregate_failures do
+                expect(mike_row["Past current grade"]).to be_nil
+                expect(mike_row["Past final grade"]).to be_nil
+                expect(mike_row["Past unposted current grade"]).to be_nil
+                expect(mike_row["Past unposted final grade"]).to be_nil
+                expect(mike_row["Past override grade"]).to be_nil
 
-        expect(first_row).not_to include("Past override score", "Future override score")
-      end
-
-      describe "grading scheme values" do
-        context "when the Add Grading Scheme to Admin Grade Reports flag is enabled" do
-          before do
-            @account.enable_feature!(:final_grades_override)
-          end
-
-          let(:default_term_csv) do
-            reports = read_report(
-              "mgp_grade_export_csv",
-              params: { enrollment_term_id: @default_term.id },
-              parse_header: true,
-              order: "skip"
-            )
-            reports["Default Term.csv"]
-          end
-
-          it "returns commensurate grade values for courses using grading schemes" do
-            jason_row = default_term_csv.detect { |row| row["course"] == @course2.name && row["student name"] == "Michael Bolton" }
-            aggregate_failures do
-              expect(jason_row["Past current grade"]).to eq "F"
-              expect(jason_row["Past final grade"]).to eq "F"
-              expect(jason_row["Past unposted current grade"]).to eq "F"
-              expect(jason_row["Past unposted final grade"]).to eq "F"
-              expect(jason_row["Past override grade"]).to eq "F"
-
-              expect(jason_row["current grade"]).to eq "F"
-              expect(jason_row["final grade"]).to eq "F"
-              expect(jason_row["unposted current grade"]).to eq "D"
-              expect(jason_row["unposted final grade"]).to eq "D"
+                expect(mike_row["current grade"]).to be_nil
+                expect(mike_row["final grade"]).to be_nil
+                expect(mike_row["unposted current grade"]).to be_nil
+                expect(mike_row["unposted final grade"]).to be_nil
+                expect(mike_row["override grade"]).to be_nil
+              end
             end
           end
+        end
+      end
 
-          it "returns empty values for courses not using a grading scheme" do
-            mike_row = default_term_csv.detect { |row| row["course"] == @course3.name && row["student name"] == "Michael Bolton" }
-            aggregate_failures do
-              expect(mike_row["Past current grade"]).to be_nil
-              expect(mike_row["Past final grade"]).to be_nil
-              expect(mike_row["Past unposted current grade"]).to be_nil
-              expect(mike_row["Past unposted final grade"]).to be_nil
-              expect(mike_row["Past override grade"]).to be_nil
-
-              expect(mike_row["current grade"]).to be_nil
-              expect(mike_row["final grade"]).to be_nil
-              expect(mike_row["unposted current grade"]).to be_nil
-              expect(mike_row["unposted final grade"]).to be_nil
-              expect(mike_row["override grade"]).to be_nil
-            end
-          end
+      context "courses without assignments" do
+        it "returns data for students in courses without assignments" do
+          reports = read_report("mgp_grade_export_csv",
+                                params: { enrollment_term_id: @default_term.id },
+                                parse_header: true,
+                                order: ["student name", "course"])
+          csv = reports["Default Term.csv"]
+          expect(csv.size).to eq 4
         end
       end
     end
