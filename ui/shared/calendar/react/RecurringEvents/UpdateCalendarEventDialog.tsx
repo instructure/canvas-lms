@@ -21,6 +21,7 @@ import ReactDOM from 'react-dom'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import CanvasModal from '@canvas/instui-bindings/react/Modal'
 import {Button} from '@instructure/ui-buttons'
+// @ts-expect-error
 import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
@@ -73,7 +74,7 @@ const UpdateCalendarEventDialog = ({event, isOpen, onUpdate, onCancel}: Props) =
           name="which"
           defaultValue="one"
           description={I18n.t('Change:')}
-          onChange={(_event, value: any) => setWhich(value)}
+          onChange={(_event: Event, value: Which) => setWhich(value)}
         >
           <RadioInput value="one" label={I18n.t('This event')} />
           <RadioInput value="all" label={I18n.t('All events')} />

@@ -27,7 +27,7 @@ import {getFileThumbnail} from '@canvas/util/fileHelper'
 import {uploadFile} from '@canvas/upload-file'
 import theme from '@instructure/canvas-theme'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {Alert} from '@instructure/ui-alerts'
+import {Alert, AlertVariant} from '@instructure/ui-alerts'
 import {Button, CloseButton, IconButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {IconCompleteSolid, IconTrashLine, IconCheckLine} from '@instructure/ui-icons'
@@ -40,7 +40,6 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-// @ts-expect-error
 import UploadFileSVG from '../../../features/assignments_show_student/images/UploadFile.svg'
 
 const I18n = useI18nScope('conversations_2')
@@ -53,9 +52,11 @@ const {
   Head: TableHead,
 } = Table as any
 
+const {Item: FlexItem} = Flex as any
+
 type AlertType = {
   text: string
-  variant: 'error' | 'success' | 'info' | 'warning' | undefined
+  variant: AlertVariant
 }
 
 type FileUploadType = {
@@ -88,7 +89,7 @@ export type ProxyDetails = {
   submitted_at: string
 }
 
-const elideString = (title: string) => {
+const elideString = title => {
   if (title.length > 21) {
     return `${title.substr(0, 9)}${I18n.t('...')}${title.substr(-9)}`
   } else {
@@ -171,7 +172,7 @@ const ProxyUploadModal = ({
     })
   }
 
-  const grabFileId = (file: {id: string; preview_url: string}) => {
+  const grabFileId = file => {
     if (typeof file.id === 'number' && file.id > 10000000000000 && file.preview_url) {
       const pattern = /\/files\/(\d+)~(\d+)/
       const match = file.preview_url.match(pattern)
@@ -229,15 +230,7 @@ const ProxyUploadModal = ({
     })
   }
 
-  const updateUploadProgress = ({
-    index,
-    loaded,
-    total,
-  }: {
-    index: number
-    loaded: number
-    total: number
-  }) => {
+  const updateUploadProgress = ({index, loaded, total}) => {
     setFilesToUpload(prevFiles => {
       const files = [...prevFiles]
       files[index] = {...files[index], loaded, total}
@@ -298,7 +291,7 @@ const ProxyUploadModal = ({
     return Promise.all(uploadPromises)
   }
 
-  const handleRemoveFile = (e: Event) => {
+  const handleRemoveFile = e => {
     const target = e.currentTarget
     const fileId = parseInt(target.id, 10)
     const fileIndex = uploadedFiles.findIndex(file => parseInt(file.id, 10) === fileId)
@@ -328,7 +321,7 @@ const ProxyUploadModal = ({
     setFilesUploading(false)
   }
 
-  const renderFileProgress = (file: {name: string; loaded: number; total: number}) => {
+  const renderFileProgress = file => {
     // If we're calling this function, we know that "file" represents one of
     // the entries in filesToUpload, and so it will have values
     // representing the progress of the upload.
@@ -390,13 +383,7 @@ const ProxyUploadModal = ({
     )
   }
 
-  const renderTableRow = (file: {
-    _id: string
-    id: string
-    display_name: string
-    name: string
-    isLoading: boolean
-  }) => {
+  const renderTableRow = file => {
     // "file" is either a previously-uploaded file or one being uploaded right
     // now.  For the former, we can use the displayName property; files being
     // uploaded don't have that set yet, so use the local name (which we've set
@@ -455,18 +442,18 @@ const ProxyUploadModal = ({
     if (uploadSuccess) {
       return (
         <Flex justifyItems="center" margin="large">
-          <Flex.Item>
+          <FlexItem>
             <IconCheckLine color="success" size="x-large" />
-          </Flex.Item>
+          </FlexItem>
         </Flex>
       )
     }
     if (submitting) {
       return (
         <Flex justifyItems="center" margin="large" data-testid="proxy-submitting-spinner">
-          <Flex.Item>
+          <FlexItem>
             <Spinner renderTitle="Uploading files for submission" size="large" />
-          </Flex.Item>
+          </FlexItem>
         </Flex>
       )
     }

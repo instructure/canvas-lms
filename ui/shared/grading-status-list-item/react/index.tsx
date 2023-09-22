@@ -18,27 +18,16 @@
 
 import React from 'react'
 import {View} from '@instructure/ui-view'
-import type {BorderWidth} from '@instructure/emotion'
-import type {Cursor} from '@instructure/ui-prop-types'
 
 type GradingStatusListItemProps = {
   children: React.ReactNode
-  cursor?: Cursor
+  cursor?: string
   backgroundColor: string
-  borderColor?:
-    | 'transparent'
-    | 'primary'
-    | 'secondary'
-    | 'brand'
-    | 'info'
-    | 'success'
-    | 'warning'
-    | 'alert'
-    | 'danger'
+  borderColor?: string
   borderStyle?: string
-  borderWidth?: BorderWidth
-  display?: 'auto' | 'inline' | 'block' | 'inline-block' | 'flex' | 'inline-flex'
-  setElementRef?: (ref: Element | null) => void
+  borderWidth?: string
+  display?: string
+  setElementRef?: (ref: HTMLDivElement) => void
 }
 export const GradingStatusListItem = ({
   backgroundColor,
@@ -53,6 +42,7 @@ export const GradingStatusListItem = ({
   return (
     <View
       as="div"
+      backgroundColor="primary"
       borderWidth={borderWidth ?? 'medium'}
       borderColor={borderColor ?? 'primary'}
       borderRadius="large"
@@ -63,7 +53,7 @@ export const GradingStatusListItem = ({
       width="16.25rem"
       display={display ?? 'block'}
       elementRef={setElementRef}
-      themeOverride={{backgroundPrimary: backgroundColor, borderStyle: borderStyle ?? 'solid'}}
+      theme={{backgroundPrimary: backgroundColor, borderStyle: borderStyle ?? 'solid'}}
     >
       {children}
     </View>

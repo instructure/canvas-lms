@@ -1067,7 +1067,6 @@ describe "threaded discussions" do
 
     context "replies reporting" do
       it "lets users report replies" do
-        skip "FOO-3823"
         @topic.discussion_entries.create!(
           user: @student,
           message: "this is offensive content"

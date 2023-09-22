@@ -21,6 +21,7 @@ import CanvasSelect from '@canvas/instui-bindings/react/Select'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Flex} from '@instructure/ui-flex'
 import {IconButton} from '@instructure/ui-buttons'
+// @ts-expect-error -- remove once on InstUI 8
 import {IconEndLine} from '@instructure/ui-icons'
 import type {Module} from './types'
 import {useScope as useI18nScope} from '@canvas/i18n'

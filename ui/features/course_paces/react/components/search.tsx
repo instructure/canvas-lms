@@ -34,6 +34,8 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = useI18nScope('course_paces_search')
 
+const {Item: FlexItem} = Flex as any
+
 interface StoreProps {
   readonly searchTerm: string
   readonly currentSortBy: SortableColumn
@@ -124,7 +126,7 @@ export const Search = ({
         autoComplete="off"
       >
         <Flex>
-          <Flex.Item shouldGrow={true}>
+          <FlexItem shouldGrow={true}>
             <TextInput
               renderLabel={<ScreenReaderContent>{placeholderText()}</ScreenReaderContent>}
               placeholder={placeholderText()}
@@ -136,8 +138,8 @@ export const Search = ({
               renderAfterInput={renderClearButton()}
               data-testid="search-input"
             />
-          </Flex.Item>
-          <Flex.Item>
+          </FlexItem>
+          <FlexItem>
             <Button
               color="primary"
               margin="0 0 0 small"
@@ -146,7 +148,7 @@ export const Search = ({
             >
               {I18n.t('Search')}
             </Button>
-          </Flex.Item>
+          </FlexItem>
         </Flex>
       </form>
     </View>

@@ -139,7 +139,7 @@ export class Opportunity extends Component {
             <div className={this.style.classNames.title}>
               <Link
                 isWithinText={false}
-                themeOverride={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
+                theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
                 href={this.props.url}
                 elementRef={this.linkRef}
               >

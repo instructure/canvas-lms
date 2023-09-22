@@ -325,8 +325,7 @@ describe('RCE Plugins > CanvasContentTray', () => {
       expect(mockFocus).toHaveBeenCalledWith(false)
     })
 
-    // FOO-3820
-    it.skip('is not set on tinymce after tray closes if focus was elsewhere', async () => {
+    it('is not set on tinymce after tray closes if focus was elsewhere', async () => {
       const mockFocus = jest.fn()
       props.bridge.focusActiveEditor = mockFocus
 

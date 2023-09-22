@@ -40,7 +40,7 @@ test('renders correct student view for the pinnedDiscussionBackground ', () => {
   props.permissions.manage_content = false
   const tree = mount(pinnedDiscussionBackground(props))
   const node = tree.find('Text')
-  equal(node.length, '2')
+  equal(node.length, '1')
   tree.unmount()
 })
 
@@ -58,6 +58,6 @@ test('renders correct student view for the closedDiscussionBackground decorative
   props.permissions.manage_content = false
   const tree = mount(closedDiscussionBackground(props))
   const node = tree.find('Text')
-  equal(node.length, '2')
+  equal(node.length, '1')
   tree.unmount()
 })

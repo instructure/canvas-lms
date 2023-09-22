@@ -100,7 +100,7 @@ export function showLoadingImage($link, position = 'adjacent') {
     )
     $link.appendChild($imageHolder)
   }
-  ReactDOM.render(<Spinner size="x-small" renderTitle={formatMessage('Loading')} />, $imageHolder)
+  ReactDOM.render(<Spinner size="x-small" title={formatMessage('Loading')} />, $imageHolder)
   return $link
 }
 

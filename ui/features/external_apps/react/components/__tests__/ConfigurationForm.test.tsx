@@ -52,9 +52,8 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
-// FOO-3829
 // Remove this whole nasty mess as soon as the flag is enabled in prod and the dust has settled.
-describe.skip('when the use InstUI feature flag is disabled', () => {
+describe('when the use InstUI feature flag is disabled', () => {
   const oldWindowEnv = window.ENV
   const oldFlashError = $.screenReaderFlashError
   beforeAll(() => {
@@ -433,8 +432,7 @@ describe.skip('when the use InstUI feature flag is disabled', () => {
   })
 })
 
-// FOO-3829
-describe.skip('when the use InstUI feature flag is enabled', () => {
+describe('when the use InstUI feature flag is enabled', () => {
   const oldWindowEnv = window.ENV
   beforeAll(() => {
     ;(window.ENV as any) = {

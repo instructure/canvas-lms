@@ -49,8 +49,8 @@ test('displays correct table data', () => {
   const rows = tree.find('tr[data-testid="bca-table__course-row"]')
 
   equal(rows.length, props.courses.length)
-  equal(rows.at(0).find('Cell').at(1).text(), `Toggle select course ${props.courses[0].name}`)
-  equal(rows.at(1).find('Cell').at(1).text(), `Toggle select course ${props.courses[1].name}`)
+  equal(rows.at(0).find('Cell').at(1).text(), props.courses[0].name)
+  equal(rows.at(1).find('Cell').at(1).text(), props.courses[1].name)
 })
 
 test('calls onSelectedChanged when courses are selected', () => {

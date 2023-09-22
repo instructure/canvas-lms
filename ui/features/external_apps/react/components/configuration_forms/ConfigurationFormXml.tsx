@@ -20,7 +20,12 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {TextInput} from '@instructure/ui-text-input'
 import {FormMessage} from '@instructure/ui-form-field'
+// @ts-expect-error
+// ui-text-area has types in InstUI 7, but they aren't declared in its package.json
+// so just ignore the error for now. Once we're on InstUI 8, we can remove this.
 import {TextArea} from '@instructure/ui-text-area'
+// @ts-expect-error
+// Grid doesn't export types in it's package.json in InstUI 7, so ignore for now
 import {Grid} from '@instructure/ui-grid'
 import '@canvas/rails-flash-notifications'
 import {I18nType, TextAreaChangeHandler, TextInputChangeHandler} from './types'

@@ -21,12 +21,16 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {getIconByType} from '@canvas/mime/react/mimeClassIconHelper'
 import {Button, CloseButton} from '@instructure/ui-buttons'
+// @ts-expect-error
 import {IconAudioSolid, IconUserSolid} from '@instructure/ui-icons'
 import {Heading} from '@instructure/ui-heading'
+// @ts-expect-error
 import {Modal} from '@instructure/ui-modal'
+// @ts-expect-error
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
+// @ts-expect-error
 import {TextArea} from '@instructure/ui-text-area'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Link} from '@instructure/ui-link'
@@ -53,6 +57,10 @@ import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import DefaultGradeInput from './DefaultGradeInput'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
+
+const {Header: ModalHeader, Body: ModalBody} = Modal as any
+
+const {Item: FlexItem} = Flex as any
 
 export type GradeChangeApiUpdate = {
   status: ApiCallStatus
@@ -98,9 +106,9 @@ export default function SubmissionDetailModal({
       size="medium"
       label="Student Submission Detail Modal"
       shouldCloseOnDocumentClick={false}
-      themeOverride={{mediumMaxWidth: '40em'}}
+      theme={{mediumMaxWidth: '40em'}}
     >
-      <Modal.Header>
+      <ModalHeader>
         <CloseButton
           placement="end"
           offset="small"
@@ -108,8 +116,8 @@ export default function SubmissionDetailModal({
           screenReaderLabel="Close Submission Detail"
         />
         <Heading level="h4">{student.name}</Heading>
-      </Modal.Header>
-      <Modal.Body padding="none">
+      </ModalHeader>
+      <ModalBody padding="none">
         <View
           as="div"
           padding="medium medium 0 medium"
@@ -160,7 +168,7 @@ export default function SubmissionDetailModal({
           submitScoreUrl={submitScoreUrl}
           onPostComment={onPostComment}
         />
-      </Modal.Body>
+      </ModalBody>
     </Modal>
   )
 }
@@ -176,7 +184,7 @@ function SubmissionComment({comment, showDivider}: SubmissionCommentProps) {
       as="div"
       key={comment.id}
       padding="0 medium"
-      elementRef={current => {
+      elementRef={(current: HTMLDivElement) => {
         if (current) {
           current.scrollIntoView()
         }
@@ -186,7 +194,7 @@ function SubmissionComment({comment, showDivider}: SubmissionCommentProps) {
         <Link href={author.htmlUrl} isWithinText={false}>
           <SubmissionCommentAvatar comment={comment} />
         </Link>
-        <Flex.Item shouldGrow={true} shouldShrink={true} padding="0 0 0 small">
+        <FlexItem shouldGrow={true} shouldShrink={true} padding="0 0 0 small">
           <Heading level="h5">
             <Link href={author.htmlUrl} isWithinText={false}>
               {author.name}
@@ -209,12 +217,12 @@ function SubmissionComment({comment, showDivider}: SubmissionCommentProps) {
             attachments.map(attachment => (
               <CommentAttachment key={attachment.id} attachment={attachment} />
             ))}
-        </Flex.Item>
-        <Flex.Item align="start">
+        </FlexItem>
+        <FlexItem align="start">
           <Heading level="h5">
             <FriendlyDatetime dateTime={comment.updatedAt} />
           </Heading>
-        </Flex.Item>
+        </FlexItem>
       </Flex>
 
       {showDivider && <hr key="hrcomment-{comment.id}" style={{margin: '.6rem 0'}} />}
@@ -293,20 +301,15 @@ function SubmissionGradeForm({
     await submit(assignment, submission, gradeInput, submitScoreUrl)
   }
 
-  const handleChangePassFailStatus = (
-    event: React.SyntheticEvent,
-    data: {value?: string | number}
-  ) => {
-    if (typeof data.value === 'string') {
-      setGradeInput(data.value)
-      setPassFailStatusIndex(passFailStatusOptions.findIndex(option => option.value === data.value))
-    }
+  const handleChangePassFailStatus = (event: React.SyntheticEvent, data: {value: string}) => {
+    setGradeInput(data.value)
+    setPassFailStatusIndex(passFailStatusOptions.findIndex(option => option.value === data.value))
   }
 
   return (
     <View as="div" margin="small 0" padding="0 medium">
-      <Flex.Item>
-        <Flex.Item shouldGrow={true} shouldShrink={true}>
+      <Flex>
+        <FlexItem shouldGrow={true} shouldShrink={true}>
           <Text>{I18n.t('Grade:')} </Text>
           <DefaultGradeInput
             assignment={assignment}
@@ -320,8 +323,8 @@ function SubmissionGradeForm({
             handleSetGradeInput={setGradeInput}
             handleChangePassFailStatus={handleChangePassFailStatus}
           />
-        </Flex.Item>
-        <Flex.Item align="start">
+        </FlexItem>
+        <FlexItem align="start">
           <Button
             data-testid="submission-details-submit-button"
             disabled={disableGrading(assignment, submitScoreStatus)}
@@ -329,8 +332,8 @@ function SubmissionGradeForm({
           >
             {I18n.t('Update Grade')}
           </Button>
-        </Flex.Item>
-      </Flex.Item>
+        </FlexItem>
+      </Flex>
     </View>
   )
 }
@@ -386,8 +389,8 @@ function PostCommentForm({assignment, submitScoreUrl, onPostComment}: PostCommen
           value={newComment}
           onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setNewComment(e.target.value)}
         />
-        <Flex.Item margin="small 0 0 0">
-          <Flex.Item padding="x-small" shouldShrink={true} shouldGrow={true}>
+        <Flex margin="small 0 0 0">
+          <FlexItem padding="x-small" shouldShrink={true} shouldGrow={true}>
             {groupCategoryId && (
               <div>
                 {gradeGroupStudentsIndividually ? (
@@ -408,13 +411,13 @@ function PostCommentForm({assignment, submitScoreUrl, onPostComment}: PostCommen
                 )}
               </div>
             )}
-          </Flex.Item>
-          <Flex.Item align="start">
+          </FlexItem>
+          <FlexItem align="start">
             <Button disabled={postCommentStatus === ApiCallStatus.PENDING} onClick={submitComment}>
               {I18n.t('Post Comment')}
             </Button>
-          </Flex.Item>
-        </Flex.Item>
+          </FlexItem>
+        </Flex>
       </View>
     </div>
   )

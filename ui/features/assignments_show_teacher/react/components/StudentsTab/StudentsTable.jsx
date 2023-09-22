@@ -132,7 +132,7 @@ export default class StudentsTable extends React.Component {
             href={viewLink}
             isWithinText={false}
             target="_blank"
-            themeOverride={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
+            theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
           >
             {I18n.t('Attempt %{number}', {number: attempt.attempt})}
           </Link>

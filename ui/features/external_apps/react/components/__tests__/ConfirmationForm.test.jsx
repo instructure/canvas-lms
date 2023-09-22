@@ -48,7 +48,7 @@ it('uses the specified cancelLabel', () => {
 
 it('uses the specified confirmLabel', () => {
   mountSubject()
-  expect(wrapper.find('Button').at(2).html()).toContain('Yes, please')
+  expect(wrapper.find('Button').at(1).html()).toContain('Yes, please')
 })
 
 it('uses the specified message', () => {
@@ -67,6 +67,6 @@ it('calls "onCancel" when cancel button is clicked', () => {
 it('calls "onConfirm" when confirm button is clicked', () => {
   const props = newProps()
   mountSubject(props)
-  wrapper.find('Button').at(2).simulate('click')
+  wrapper.find('Button').at(1).simulate('click')
   expect(props.onConfirm).toHaveBeenCalled()
 })

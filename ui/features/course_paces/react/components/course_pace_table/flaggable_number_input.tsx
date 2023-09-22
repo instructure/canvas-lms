@@ -31,6 +31,8 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('course_paces_flaggable_number_input')
 
+const {Item: FlexItem} = Flex as any
+
 const baseTheme = ENV.use_high_contrast ? canvasHighContrast : canvas
 const borderRadiusMedium = baseTheme.variables.borders.radiusMedium
 
@@ -60,7 +62,7 @@ export const FlaggableNumberInput = ({
   return (
     <Flex as="div" wrap="no-wrap" justifyItems="end">
       {showFlag && (
-        <Flex.Item align="stretch">
+        <FlexItem align="stretch">
           <AccessibleContent alt={I18n.t('Unsaved change')}>
             <View
               as="div"
@@ -72,9 +74,9 @@ export const FlaggableNumberInput = ({
               borderWidth="small 0 small small"
             />
           </AccessibleContent>
-        </Flex.Item>
+        </FlexItem>
       )}
-      <Flex.Item>
+      <FlexItem>
         <Tooltip
           placement="top"
           color="primary"
@@ -91,7 +93,7 @@ export const FlaggableNumberInput = ({
             onDecrement={onDecrement}
             onIncrement={onIncrement}
             display="inline-block"
-            themeOverride={{
+            theme={{
               borderRadius: showFlag
                 ? `0 ${borderRadiusMedium} ${borderRadiusMedium} 0`
                 : undefined,
@@ -99,7 +101,7 @@ export const FlaggableNumberInput = ({
             data-testid="flaggable-number-input"
           />
         </Tooltip>
-      </Flex.Item>
+      </FlexItem>
     </Flex>
   )
 }

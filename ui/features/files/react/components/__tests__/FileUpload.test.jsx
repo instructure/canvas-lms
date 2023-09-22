@@ -64,8 +64,8 @@ describe('FileUpload', () => {
     const props = defaultProps()
     sandbox.stub(props.currentFolder, 'isEmpty').returns(true)
     const wrapper = mount(<FileUpload {...props} />)
-    expect(wrapper.find('Billboard')).toHaveLength(2)
-    expect(wrapper.find('FileDrop')).toHaveLength(3)
+    expect(wrapper.find('Billboard')).toHaveLength(1)
+    expect(wrapper.find('FileDrop')).toHaveLength(1)
     expect(wrapper.find('.FileUpload__full')).toHaveLength(1)
   })
 

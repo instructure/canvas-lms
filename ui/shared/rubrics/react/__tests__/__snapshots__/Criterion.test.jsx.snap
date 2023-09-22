@@ -5,9 +5,21 @@ exports[`Criterion can open and close the long description dialog 1`] = `"<div><
 exports[`Free-form Rubric with a custom criterion by default renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
 <Modal
   constrain="window"
+  contentRef={[Function]}
+  defaultFocusElement={null}
   insertAt="bottom"
   label="Criterion Long Description"
+  liveRegion={null}
+  mountNode={null}
+  onClose={[Function]}
   onDismiss={[Function]}
+  onEnter={[Function]}
+  onEntered={[Function]}
+  onEntering={[Function]}
+  onExit={[Function]}
+  onExited={[Function]}
+  onExiting={[Function]}
+  onOpen={[Function]}
   open={false}
   overflow="scroll"
   shouldCloseOnDocumentClick={true}
@@ -156,9 +168,21 @@ exports[`Free-form Rubric with a custom criterion by default renders the root co
 exports[`Free-form Rubric with a custom criterion when assessing renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
 <Modal
   constrain="window"
+  contentRef={[Function]}
+  defaultFocusElement={null}
   insertAt="bottom"
   label="Criterion Long Description"
+  liveRegion={null}
+  mountNode={null}
+  onClose={[Function]}
   onDismiss={[Function]}
+  onEnter={[Function]}
+  onEntered={[Function]}
+  onEntering={[Function]}
+  onExit={[Function]}
+  onExited={[Function]}
+  onExiting={[Function]}
+  onOpen={[Function]}
   open={false}
   overflow="scroll"
   shouldCloseOnDocumentClick={true}
@@ -307,9 +331,21 @@ exports[`Free-form Rubric with a custom criterion when assessing renders the roo
 exports[`Free-form Rubric with a custom criterion without an assessment renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
 <Modal
   constrain="window"
+  contentRef={[Function]}
+  defaultFocusElement={null}
   insertAt="bottom"
   label="Criterion Long Description"
+  liveRegion={null}
+  mountNode={null}
+  onClose={[Function]}
   onDismiss={[Function]}
+  onEnter={[Function]}
+  onEntered={[Function]}
+  onEntering={[Function]}
+  onExit={[Function]}
+  onExited={[Function]}
+  onExiting={[Function]}
+  onOpen={[Function]}
   open={false}
   overflow="scroll"
   shouldCloseOnDocumentClick={true}
@@ -429,7 +465,6 @@ exports[`Free-form Rubric with a outcome criterion by default renders the LongDe
 <Link
   color="link"
   display="block"
-  forceButtonRole={true}
   iconPlacement="start"
   isWithinText={true}
   onClick={[Function]}
@@ -449,9 +484,21 @@ exports[`Free-form Rubric with a outcome criterion by default renders the LongDe
 exports[`Free-form Rubric with a outcome criterion by default renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
 <Modal
   constrain="window"
+  contentRef={[Function]}
+  defaultFocusElement={null}
   insertAt="bottom"
   label="Criterion Long Description"
+  liveRegion={null}
+  mountNode={null}
+  onClose={[Function]}
   onDismiss={[Function]}
+  onEnter={[Function]}
+  onEntered={[Function]}
+  onEntering={[Function]}
+  onExit={[Function]}
+  onExited={[Function]}
+  onExiting={[Function]}
+  onOpen={[Function]}
   open={false}
   overflow="scroll"
   shouldCloseOnDocumentClick={true}
@@ -634,7 +681,6 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the Lo
 <Link
   color="link"
   display="block"
-  forceButtonRole={true}
   iconPlacement="start"
   isWithinText={true}
   onClick={[Function]}
@@ -654,9 +700,21 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the Lo
 exports[`Free-form Rubric with a outcome criterion when assessing renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
 <Modal
   constrain="window"
+  contentRef={[Function]}
+  defaultFocusElement={null}
   insertAt="bottom"
   label="Criterion Long Description"
+  liveRegion={null}
+  mountNode={null}
+  onClose={[Function]}
   onDismiss={[Function]}
+  onEnter={[Function]}
+  onEntered={[Function]}
+  onEntering={[Function]}
+  onExit={[Function]}
+  onExited={[Function]}
+  onExiting={[Function]}
+  onOpen={[Function]}
   open={false}
   overflow="scroll"
   shouldCloseOnDocumentClick={true}
@@ -839,7 +897,6 @@ exports[`Free-form Rubric with a outcome criterion without an assessment renders
 <Link
   color="link"
   display="block"
-  forceButtonRole={true}
   iconPlacement="start"
   isWithinText={true}
   onClick={[Function]}
@@ -859,9 +916,21 @@ exports[`Free-form Rubric with a outcome criterion without an assessment renders
 exports[`Free-form Rubric with a outcome criterion without an assessment renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
 <Modal
   constrain="window"
+  contentRef={[Function]}
+  defaultFocusElement={null}
   insertAt="bottom"
   label="Criterion Long Description"
+  liveRegion={null}
+  mountNode={null}
+  onClose={[Function]}
   onDismiss={[Function]}
+  onEnter={[Function]}
+  onEntered={[Function]}
+  onEntering={[Function]}
+  onExit={[Function]}
+  onExited={[Function]}
+  onExiting={[Function]}
+  onOpen={[Function]}
   open={false}
   overflow="scroll"
   shouldCloseOnDocumentClick={true}
@@ -1011,9 +1080,21 @@ exports[`Free-form Rubric with a outcome criterion without an assessment renders
 exports[`Point Rubric with a custom criterion by default renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
 <Modal
   constrain="window"
+  contentRef={[Function]}
+  defaultFocusElement={null}
   insertAt="bottom"
   label="Criterion Long Description"
+  liveRegion={null}
+  mountNode={null}
+  onClose={[Function]}
   onDismiss={[Function]}
+  onEnter={[Function]}
+  onEntered={[Function]}
+  onEntering={[Function]}
+  onExit={[Function]}
+  onExited={[Function]}
+  onExiting={[Function]}
+  onOpen={[Function]}
   open={false}
   overflow="scroll"
   shouldCloseOnDocumentClick={true}
@@ -1201,9 +1282,21 @@ exports[`Point Rubric with a custom criterion by default renders the root compon
 exports[`Point Rubric with a custom criterion when assessing renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
 <Modal
   constrain="window"
+  contentRef={[Function]}
+  defaultFocusElement={null}
   insertAt="bottom"
   label="Criterion Long Description"
+  liveRegion={null}
+  mountNode={null}
+  onClose={[Function]}
   onDismiss={[Function]}
+  onEnter={[Function]}
+  onEntered={[Function]}
+  onEntering={[Function]}
+  onExit={[Function]}
+  onExited={[Function]}
+  onExiting={[Function]}
+  onOpen={[Function]}
   open={false}
   overflow="scroll"
   shouldCloseOnDocumentClick={true}
@@ -1391,9 +1484,21 @@ exports[`Point Rubric with a custom criterion when assessing renders the root co
 exports[`Point Rubric with a custom criterion without an assessment renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
 <Modal
   constrain="window"
+  contentRef={[Function]}
+  defaultFocusElement={null}
   insertAt="bottom"
   label="Criterion Long Description"
+  liveRegion={null}
+  mountNode={null}
+  onClose={[Function]}
   onDismiss={[Function]}
+  onEnter={[Function]}
+  onEntered={[Function]}
+  onEntering={[Function]}
+  onExit={[Function]}
+  onExited={[Function]}
+  onExiting={[Function]}
+  onOpen={[Function]}
   open={false}
   overflow="scroll"
   shouldCloseOnDocumentClick={true}
@@ -1539,7 +1644,6 @@ exports[`Point Rubric with a outcome criterion by default renders the LongDescri
 <Link
   color="link"
   display="block"
-  forceButtonRole={true}
   iconPlacement="start"
   isWithinText={true}
   onClick={[Function]}
@@ -1559,9 +1663,21 @@ exports[`Point Rubric with a outcome criterion by default renders the LongDescri
 exports[`Point Rubric with a outcome criterion by default renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
 <Modal
   constrain="window"
+  contentRef={[Function]}
+  defaultFocusElement={null}
   insertAt="bottom"
   label="Criterion Long Description"
+  liveRegion={null}
+  mountNode={null}
+  onClose={[Function]}
   onDismiss={[Function]}
+  onEnter={[Function]}
+  onEntered={[Function]}
+  onEntering={[Function]}
+  onExit={[Function]}
+  onExited={[Function]}
+  onExiting={[Function]}
+  onOpen={[Function]}
   open={false}
   overflow="scroll"
   shouldCloseOnDocumentClick={true}
@@ -1783,7 +1899,6 @@ exports[`Point Rubric with a outcome criterion when assessing renders the LongDe
 <Link
   color="link"
   display="block"
-  forceButtonRole={true}
   iconPlacement="start"
   isWithinText={true}
   onClick={[Function]}
@@ -1803,9 +1918,21 @@ exports[`Point Rubric with a outcome criterion when assessing renders the LongDe
 exports[`Point Rubric with a outcome criterion when assessing renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
 <Modal
   constrain="window"
+  contentRef={[Function]}
+  defaultFocusElement={null}
   insertAt="bottom"
   label="Criterion Long Description"
+  liveRegion={null}
+  mountNode={null}
+  onClose={[Function]}
   onDismiss={[Function]}
+  onEnter={[Function]}
+  onEntered={[Function]}
+  onEntering={[Function]}
+  onExit={[Function]}
+  onExited={[Function]}
+  onExiting={[Function]}
+  onOpen={[Function]}
   open={false}
   overflow="scroll"
   shouldCloseOnDocumentClick={true}
@@ -2027,7 +2154,6 @@ exports[`Point Rubric with a outcome criterion without an assessment renders the
 <Link
   color="link"
   display="block"
-  forceButtonRole={true}
   iconPlacement="start"
   isWithinText={true}
   onClick={[Function]}
@@ -2047,9 +2173,21 @@ exports[`Point Rubric with a outcome criterion without an assessment renders the
 exports[`Point Rubric with a outcome criterion without an assessment renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
 <Modal
   constrain="window"
+  contentRef={[Function]}
+  defaultFocusElement={null}
   insertAt="bottom"
   label="Criterion Long Description"
+  liveRegion={null}
+  mountNode={null}
+  onClose={[Function]}
   onDismiss={[Function]}
+  onEnter={[Function]}
+  onEntered={[Function]}
+  onEntering={[Function]}
+  onExit={[Function]}
+  onExited={[Function]}
+  onExiting={[Function]}
+  onOpen={[Function]}
   open={false}
   overflow="scroll"
   shouldCloseOnDocumentClick={true}

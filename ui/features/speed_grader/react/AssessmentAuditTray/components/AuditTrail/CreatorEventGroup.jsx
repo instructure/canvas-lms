@@ -17,7 +17,7 @@
  */
 
 import React, {PureComponent} from 'react'
-import {InstUISettingsProvider} from '@instructure/emotion'
+import {ApplyTheme} from '@instructure/ui-themeable'
 import {IconButton} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
@@ -35,8 +35,8 @@ import {roleLabelFor, creatorNameFor} from '../../AuditTrailHelpers'
 
 const I18n = useI18nScope('speed_grader')
 
-const componentOverrides = {
-  [View.componentId]: {
+const themeOverride = {
+  [View.theme]: {
     borderStyle: 'dashed',
   },
 }
@@ -56,7 +56,7 @@ export default class CreatorEventGroup extends PureComponent {
 
     return (
       <View as="div">
-        <InstUISettingsProvider theme={{componentOverrides}}>
+        <ApplyTheme theme={themeOverride}>
           <ToggleGroup
             border={false}
             id={`creator-event-group-${creator.key}`}
@@ -98,7 +98,7 @@ export default class CreatorEventGroup extends PureComponent {
               ))}
             </div>
           </ToggleGroup>
-        </InstUISettingsProvider>
+        </ApplyTheme>
 
         <View as="div" borderWidth="none none small" margin="none" padding="none" />
       </View>

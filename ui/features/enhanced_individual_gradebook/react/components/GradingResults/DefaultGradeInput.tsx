@@ -24,7 +24,6 @@ import {TextInput} from '@instructure/ui-text-input'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {ApiCallStatus, AssignmentConnection, GradebookUserSubmissionDetails} from '../../../types'
-import type {Spacing} from '@instructure/emotion'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
@@ -37,14 +36,11 @@ type Props = {
   gradeInput: string
   submitScoreStatus: ApiCallStatus
   context: string
-  elementWrapper?: 'span' | 'div'
-  margin?: Spacing
+  elementWrapper?: string
+  margin?: string
   handleSetGradeInput: (grade: string) => void
   handleSubmitGrade?: () => void
-  handleChangePassFailStatus: (
-    e: React.SyntheticEvent<Element, Event>,
-    data: {value?: string | number}
-  ) => void
+  handleChangePassFailStatus: (e: React.SyntheticEvent, data: {value: string}) => void
 }
 
 export default function DefaultGradeInput({

@@ -22,8 +22,10 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Table} from '@instructure/ui-table'
+// @ts-expect-error -- TODO: remove once we're on InstUI 8
 import {IconCopyLine} from '@instructure/ui-icons'
 import {IconButton} from '@instructure/ui-buttons'
+// @ts-expect-error -- TODO: remove once we're on InstUI 8
 import {Tooltip} from '@instructure/ui-tooltip'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
@@ -40,6 +42,10 @@ interface ComponentProps {
   onDuplicationRequested?: () => any
 }
 
+// Doing this to avoid TS2339 errors -- TODO: remove once we're on InstUI 8
+const {Item} = Flex as any
+const {Head, Row, ColHeader, Body} = Table as any
+
 export const GradingSchemeTemplateView: React.FC<ComponentProps> = ({
   gradingSchemeTemplate,
   allowDuplicate,
@@ -48,13 +54,13 @@ export const GradingSchemeTemplateView: React.FC<ComponentProps> = ({
   return (
     <View as="div" margin="none none none x-large" data-testid="default_canvas_grading_scheme">
       <Flex>
-        <Flex.Item shouldGrow={true} shouldShrink={true} padding="none medium none none">
+        <Item shouldGrow={true} shouldShrink={true} padding="none medium none none">
           <Heading level="h3" margin="0 0 x-small">
             <ScreenReaderContent>{I18n.t('Grading scheme title')}</ScreenReaderContent>
             {gradingSchemeTemplate.title}
           </Heading>
-        </Flex.Item>
-        <Flex.Item>
+        </Item>
+        <Item>
           {allowDuplicate ? (
             <Tooltip renderTip={I18n.t('edit a copy')} placement="bottom">
               <IconButton
@@ -70,10 +76,10 @@ export const GradingSchemeTemplateView: React.FC<ComponentProps> = ({
           ) : (
             <></>
           )}
-        </Flex.Item>
+        </Item>
       </Flex>
       <Flex>
-        <Flex.Item>
+        <Item>
           <Table
             caption={I18n.t(
               'A table that contains the default canvas grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.'
@@ -81,17 +87,17 @@ export const GradingSchemeTemplateView: React.FC<ComponentProps> = ({
             layout="fixed"
             data-testid="default_canvas_grading_scheme_data_table"
           >
-            <Table.Head>
-              <Table.Row themeOverride={{borderColor: 'transparent'}}>
-                <Table.ColHeader themeOverride={{padding: 'none'}} id="1">
+            <Head>
+              <Row theme={{borderColor: 'transparent'}}>
+                <ColHeader theme={{padding: 'none'}} id="1">
                   {I18n.t('Letter Grade')}
-                </Table.ColHeader>
-                <Table.ColHeader themeOverride={{padding: 'none'}} id="2">
+                </ColHeader>
+                <ColHeader theme={{padding: 'none'}} id="2">
                   {I18n.t('Range')}
-                </Table.ColHeader>
-              </Table.Row>
-            </Table.Head>
-            <Table.Body>
+                </ColHeader>
+              </Row>
+            </Head>
+            <Body>
               {gradingSchemeTemplate.data.map((dataRow, idx, array) => (
                 <GradingSchemeDataRowView
                   key={shortid()}
@@ -102,9 +108,9 @@ export const GradingSchemeTemplateView: React.FC<ComponentProps> = ({
                   viewAsPercentage={true}
                 />
               ))}
-            </Table.Body>
+            </Body>
           </Table>
-        </Flex.Item>
+        </Item>
       </Flex>
     </View>
   )

@@ -96,7 +96,6 @@ describe "eportfolios" do
     end
 
     it "reorders a page", :ignore_js_errors, priority: "1" do
-      skip "FOO-3814 (10/6/2023)"
       get "/eportfolios/#{@eportfolio.id}"
 
       # add 3 pages
@@ -136,7 +135,6 @@ describe "eportfolios" do
     end
 
     it "reorders a section", :ignore_js_errors, priority: "1" do
-      skip "FOO-3814 (10/6/2023)"
       get "/eportfolios/#{@eportfolio.id}"
 
       # add a 3 sections

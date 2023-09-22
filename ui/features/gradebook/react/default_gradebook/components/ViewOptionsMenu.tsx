@@ -44,6 +44,7 @@ function renderTriggerButton(bindButton) {
 type Props = {
   showUnpublishedAssignments: boolean
   allowShowSeparateFirstLastNames: boolean
+  filterColumnsBy: string
   viewUngradedAsZero: boolean
   columnSortSettings: {
     columnId: string
@@ -158,8 +159,8 @@ class ViewOptionsMenu extends React.Component<Props> {
 
   render() {
     return (
-      <Menu trigger={renderTriggerButton(this.bindButton)} menuRef={this.bindMenuContent}>
-        <Menu menuRef={this.bindArrangeByMenuContent} label={I18n.t('Arrange By')}>
+      <Menu trigger={renderTriggerButton(this.bindButton)} contentRef={this.bindMenuContent}>
+        <Menu contentRef={this.bindArrangeByMenuContent} label={I18n.t('Arrange By')}>
           <MenuGroup label={<ScreenReaderContent>{I18n.t('Arrange By')}</ScreenReaderContent>}>
             <MenuItem
               disabled={this.props.columnSortSettings.disabled}
@@ -242,7 +243,7 @@ class ViewOptionsMenu extends React.Component<Props> {
         <MenuSeparator />
 
         {this.props.filterSettings.available.length > 0 && (
-          <Menu menuRef={this.bindFiltersMenuContent} label={I18n.t('Filters')}>
+          <Menu contentRef={this.bindFiltersMenuContent} label={I18n.t('Filters')}>
             <MenuGroup
               allowMultiple={true}
               label={<ScreenReaderContent>{I18n.t('Filters')}</ScreenReaderContent>}

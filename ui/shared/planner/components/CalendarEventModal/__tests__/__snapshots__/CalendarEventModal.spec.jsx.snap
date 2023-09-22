@@ -3,9 +3,21 @@
 exports[`renders 1`] = `
 <Modal
   constrain="window"
+  contentRef={[Function]}
+  defaultFocusElement={null}
   insertAt="bottom"
   label="Calendar Event Details"
+  liveRegion={null}
+  mountNode={null}
+  onClose={[Function]}
   onDismiss={[MockFunction]}
+  onEnter={[Function]}
+  onEntered={[Function]}
+  onEntering={[Function]}
+  onExit={[Function]}
+  onExited={[Function]}
+  onExiting={[Function]}
+  onOpen={[Function]}
   open={true}
   overflow="scroll"
   shouldCloseOnDocumentClick={true}
@@ -25,7 +37,6 @@ exports[`renders 1`] = `
     >
       <Link
         color="link"
-        forceButtonRole={true}
         href="http://example.com"
         iconPlacement="start"
         isWithinText={false}
@@ -54,12 +65,14 @@ exports[`renders 1`] = `
     <List
       as="ul"
       delimiter="none"
+      elementRef={[Function]}
       isUnstyled={true}
       itemSpacing="small"
       size="medium"
     >
       <ListItem
         delimiter="none"
+        elementRef={[Function]}
         padding="none"
         size="medium"
         spacing="none"
@@ -97,6 +110,7 @@ exports[`renders 1`] = `
       </ListItem>
       <ListItem
         delimiter="none"
+        elementRef={[Function]}
         padding="none"
         size="medium"
         spacing="none"
@@ -134,6 +148,7 @@ exports[`renders 1`] = `
       </ListItem>
       <ListItem
         delimiter="none"
+        elementRef={[Function]}
         padding="none"
         size="medium"
         spacing="none"
@@ -171,6 +186,7 @@ exports[`renders 1`] = `
       </ListItem>
       <ListItem
         delimiter="none"
+        elementRef={[Function]}
         padding="none"
         size="medium"
         spacing="none"
@@ -208,6 +224,7 @@ exports[`renders 1`] = `
       </ListItem>
       <ListItem
         delimiter="none"
+        elementRef={[Function]}
         margin="large 0 0 0"
         padding="none"
         size="medium"
@@ -238,9 +255,21 @@ exports[`renders 1`] = `
 exports[`renders with allDay 1`] = `
 <Modal
   constrain="window"
+  contentRef={[Function]}
+  defaultFocusElement={null}
   insertAt="bottom"
   label="Calendar Event Details"
+  liveRegion={null}
+  mountNode={null}
+  onClose={[Function]}
   onDismiss={[MockFunction]}
+  onEnter={[Function]}
+  onEntered={[Function]}
+  onEntering={[Function]}
+  onExit={[Function]}
+  onExited={[Function]}
+  onExiting={[Function]}
+  onOpen={[Function]}
   open={true}
   overflow="scroll"
   shouldCloseOnDocumentClick={true}
@@ -260,7 +289,6 @@ exports[`renders with allDay 1`] = `
     >
       <Link
         color="link"
-        forceButtonRole={true}
         href="http://example.com"
         iconPlacement="start"
         isWithinText={false}
@@ -289,12 +317,14 @@ exports[`renders with allDay 1`] = `
     <List
       as="ul"
       delimiter="none"
+      elementRef={[Function]}
       isUnstyled={true}
       itemSpacing="small"
       size="medium"
     >
       <ListItem
         delimiter="none"
+        elementRef={[Function]}
         padding="none"
         size="medium"
         spacing="none"
@@ -332,6 +362,7 @@ exports[`renders with allDay 1`] = `
       </ListItem>
       <ListItem
         delimiter="none"
+        elementRef={[Function]}
         padding="none"
         size="medium"
         spacing="none"
@@ -369,6 +400,7 @@ exports[`renders with allDay 1`] = `
       </ListItem>
       <ListItem
         delimiter="none"
+        elementRef={[Function]}
         padding="none"
         size="medium"
         spacing="none"
@@ -406,6 +438,7 @@ exports[`renders with allDay 1`] = `
       </ListItem>
       <ListItem
         delimiter="none"
+        elementRef={[Function]}
         padding="none"
         size="medium"
         spacing="none"
@@ -443,6 +476,7 @@ exports[`renders with allDay 1`] = `
       </ListItem>
       <ListItem
         delimiter="none"
+        elementRef={[Function]}
         margin="large 0 0 0"
         padding="none"
         size="medium"
@@ -473,9 +507,21 @@ exports[`renders with allDay 1`] = `
 exports[`renders with only the startTime 1`] = `
 <Modal
   constrain="window"
+  contentRef={[Function]}
+  defaultFocusElement={null}
   insertAt="bottom"
   label="Calendar Event Details"
+  liveRegion={null}
+  mountNode={null}
+  onClose={[Function]}
   onDismiss={[MockFunction]}
+  onEnter={[Function]}
+  onEntered={[Function]}
+  onEntering={[Function]}
+  onExit={[Function]}
+  onExited={[Function]}
+  onExiting={[Function]}
+  onOpen={[Function]}
   open={true}
   overflow="scroll"
   shouldCloseOnDocumentClick={true}
@@ -495,7 +541,6 @@ exports[`renders with only the startTime 1`] = `
     >
       <Link
         color="link"
-        forceButtonRole={true}
         href="http://example.com"
         iconPlacement="start"
         isWithinText={false}
@@ -524,12 +569,14 @@ exports[`renders with only the startTime 1`] = `
     <List
       as="ul"
       delimiter="none"
+      elementRef={[Function]}
       isUnstyled={true}
       itemSpacing="small"
       size="medium"
     >
       <ListItem
         delimiter="none"
+        elementRef={[Function]}
         padding="none"
         size="medium"
         spacing="none"
@@ -567,6 +614,7 @@ exports[`renders with only the startTime 1`] = `
       </ListItem>
       <ListItem
         delimiter="none"
+        elementRef={[Function]}
         padding="none"
         size="medium"
         spacing="none"
@@ -604,6 +652,7 @@ exports[`renders with only the startTime 1`] = `
       </ListItem>
       <ListItem
         delimiter="none"
+        elementRef={[Function]}
         padding="none"
         size="medium"
         spacing="none"
@@ -641,6 +690,7 @@ exports[`renders with only the startTime 1`] = `
       </ListItem>
       <ListItem
         delimiter="none"
+        elementRef={[Function]}
         padding="none"
         size="medium"
         spacing="none"
@@ -678,6 +728,7 @@ exports[`renders with only the startTime 1`] = `
       </ListItem>
       <ListItem
         delimiter="none"
+        elementRef={[Function]}
         margin="large 0 0 0"
         padding="none"
         size="medium"
@@ -708,9 +759,21 @@ exports[`renders with only the startTime 1`] = `
 exports[`renders with user displayName for calendar 1`] = `
 <Modal
   constrain="window"
+  contentRef={[Function]}
+  defaultFocusElement={null}
   insertAt="bottom"
   label="Calendar Event Details"
+  liveRegion={null}
+  mountNode={null}
+  onClose={[Function]}
   onDismiss={[MockFunction]}
+  onEnter={[Function]}
+  onEntered={[Function]}
+  onEntering={[Function]}
+  onExit={[Function]}
+  onExited={[Function]}
+  onExiting={[Function]}
+  onOpen={[Function]}
   open={true}
   overflow="scroll"
   shouldCloseOnDocumentClick={true}
@@ -730,7 +793,6 @@ exports[`renders with user displayName for calendar 1`] = `
     >
       <Link
         color="link"
-        forceButtonRole={true}
         href="http://example.com"
         iconPlacement="start"
         isWithinText={false}
@@ -759,12 +821,14 @@ exports[`renders with user displayName for calendar 1`] = `
     <List
       as="ul"
       delimiter="none"
+      elementRef={[Function]}
       isUnstyled={true}
       itemSpacing="small"
       size="medium"
     >
       <ListItem
         delimiter="none"
+        elementRef={[Function]}
         padding="none"
         size="medium"
         spacing="none"
@@ -802,6 +866,7 @@ exports[`renders with user displayName for calendar 1`] = `
       </ListItem>
       <ListItem
         delimiter="none"
+        elementRef={[Function]}
         padding="none"
         size="medium"
         spacing="none"
@@ -839,6 +904,7 @@ exports[`renders with user displayName for calendar 1`] = `
       </ListItem>
       <ListItem
         delimiter="none"
+        elementRef={[Function]}
         padding="none"
         size="medium"
         spacing="none"
@@ -876,6 +942,7 @@ exports[`renders with user displayName for calendar 1`] = `
       </ListItem>
       <ListItem
         delimiter="none"
+        elementRef={[Function]}
         padding="none"
         size="medium"
         spacing="none"
@@ -913,6 +980,7 @@ exports[`renders with user displayName for calendar 1`] = `
       </ListItem>
       <ListItem
         delimiter="none"
+        elementRef={[Function]}
         margin="large 0 0 0"
         padding="none"
         size="medium"
@@ -943,9 +1011,21 @@ exports[`renders with user displayName for calendar 1`] = `
 exports[`renders without address 1`] = `
 <Modal
   constrain="window"
+  contentRef={[Function]}
+  defaultFocusElement={null}
   insertAt="bottom"
   label="Calendar Event Details"
+  liveRegion={null}
+  mountNode={null}
+  onClose={[Function]}
   onDismiss={[MockFunction]}
+  onEnter={[Function]}
+  onEntered={[Function]}
+  onEntering={[Function]}
+  onExit={[Function]}
+  onExited={[Function]}
+  onExiting={[Function]}
+  onOpen={[Function]}
   open={true}
   overflow="scroll"
   shouldCloseOnDocumentClick={true}
@@ -965,7 +1045,6 @@ exports[`renders without address 1`] = `
     >
       <Link
         color="link"
-        forceButtonRole={true}
         href="http://example.com"
         iconPlacement="start"
         isWithinText={false}
@@ -994,12 +1073,14 @@ exports[`renders without address 1`] = `
     <List
       as="ul"
       delimiter="none"
+      elementRef={[Function]}
       isUnstyled={true}
       itemSpacing="small"
       size="medium"
     >
       <ListItem
         delimiter="none"
+        elementRef={[Function]}
         padding="none"
         size="medium"
         spacing="none"
@@ -1037,6 +1118,7 @@ exports[`renders without address 1`] = `
       </ListItem>
       <ListItem
         delimiter="none"
+        elementRef={[Function]}
         padding="none"
         size="medium"
         spacing="none"
@@ -1074,6 +1156,7 @@ exports[`renders without address 1`] = `
       </ListItem>
       <ListItem
         delimiter="none"
+        elementRef={[Function]}
         padding="none"
         size="medium"
         spacing="none"
@@ -1111,6 +1194,7 @@ exports[`renders without address 1`] = `
       </ListItem>
       <ListItem
         delimiter="none"
+        elementRef={[Function]}
         margin="large 0 0 0"
         padding="none"
         size="medium"
@@ -1141,9 +1225,21 @@ exports[`renders without address 1`] = `
 exports[`renders without details 1`] = `
 <Modal
   constrain="window"
+  contentRef={[Function]}
+  defaultFocusElement={null}
   insertAt="bottom"
   label="Calendar Event Details"
+  liveRegion={null}
+  mountNode={null}
+  onClose={[Function]}
   onDismiss={[MockFunction]}
+  onEnter={[Function]}
+  onEntered={[Function]}
+  onEntering={[Function]}
+  onExit={[Function]}
+  onExited={[Function]}
+  onExiting={[Function]}
+  onOpen={[Function]}
   open={true}
   overflow="scroll"
   shouldCloseOnDocumentClick={true}
@@ -1163,7 +1259,6 @@ exports[`renders without details 1`] = `
     >
       <Link
         color="link"
-        forceButtonRole={true}
         href="http://example.com"
         iconPlacement="start"
         isWithinText={false}
@@ -1192,12 +1287,14 @@ exports[`renders without details 1`] = `
     <List
       as="ul"
       delimiter="none"
+      elementRef={[Function]}
       isUnstyled={true}
       itemSpacing="small"
       size="medium"
     >
       <ListItem
         delimiter="none"
+        elementRef={[Function]}
         padding="none"
         size="medium"
         spacing="none"
@@ -1235,6 +1332,7 @@ exports[`renders without details 1`] = `
       </ListItem>
       <ListItem
         delimiter="none"
+        elementRef={[Function]}
         padding="none"
         size="medium"
         spacing="none"
@@ -1272,6 +1370,7 @@ exports[`renders without details 1`] = `
       </ListItem>
       <ListItem
         delimiter="none"
+        elementRef={[Function]}
         padding="none"
         size="medium"
         spacing="none"
@@ -1309,6 +1408,7 @@ exports[`renders without details 1`] = `
       </ListItem>
       <ListItem
         delimiter="none"
+        elementRef={[Function]}
         padding="none"
         size="medium"
         spacing="none"
@@ -1352,9 +1452,21 @@ exports[`renders without details 1`] = `
 exports[`renders without location 1`] = `
 <Modal
   constrain="window"
+  contentRef={[Function]}
+  defaultFocusElement={null}
   insertAt="bottom"
   label="Calendar Event Details"
+  liveRegion={null}
+  mountNode={null}
+  onClose={[Function]}
   onDismiss={[MockFunction]}
+  onEnter={[Function]}
+  onEntered={[Function]}
+  onEntering={[Function]}
+  onExit={[Function]}
+  onExited={[Function]}
+  onExiting={[Function]}
+  onOpen={[Function]}
   open={true}
   overflow="scroll"
   shouldCloseOnDocumentClick={true}
@@ -1374,7 +1486,6 @@ exports[`renders without location 1`] = `
     >
       <Link
         color="link"
-        forceButtonRole={true}
         href="http://example.com"
         iconPlacement="start"
         isWithinText={false}
@@ -1403,12 +1514,14 @@ exports[`renders without location 1`] = `
     <List
       as="ul"
       delimiter="none"
+      elementRef={[Function]}
       isUnstyled={true}
       itemSpacing="small"
       size="medium"
     >
       <ListItem
         delimiter="none"
+        elementRef={[Function]}
         padding="none"
         size="medium"
         spacing="none"
@@ -1446,6 +1559,7 @@ exports[`renders without location 1`] = `
       </ListItem>
       <ListItem
         delimiter="none"
+        elementRef={[Function]}
         padding="none"
         size="medium"
         spacing="none"
@@ -1483,6 +1597,7 @@ exports[`renders without location 1`] = `
       </ListItem>
       <ListItem
         delimiter="none"
+        elementRef={[Function]}
         padding="none"
         size="medium"
         spacing="none"
@@ -1520,6 +1635,7 @@ exports[`renders without location 1`] = `
       </ListItem>
       <ListItem
         delimiter="none"
+        elementRef={[Function]}
         margin="large 0 0 0"
         padding="none"
         size="medium"

@@ -71,12 +71,14 @@ exports[`renders desert when completely empty 1`] = `
       <InlineList
         as="ul"
         delimiter="pipe"
+        elementRef={[Function]}
         itemSpacing="none"
         margin="none"
         size="medium"
       >
         <InlineListItem
           delimiter="none"
+          elementRef={[Function]}
           padding="none"
           size="medium"
           spacing="none"
@@ -84,7 +86,6 @@ exports[`renders desert when completely empty 1`] = `
           <Link
             as="button"
             color="link"
-            forceButtonRole={true}
             iconPlacement="start"
             id="PlannerEmptyState_CardView"
             isWithinText={false}
@@ -95,6 +96,7 @@ exports[`renders desert when completely empty 1`] = `
         </InlineListItem>
         <InlineListItem
           delimiter="none"
+          elementRef={[Function]}
           padding="none"
           size="medium"
           spacing="none"
@@ -102,7 +104,6 @@ exports[`renders desert when completely empty 1`] = `
           <Link
             as="button"
             color="link"
-            forceButtonRole={true}
             iconPlacement="start"
             id="PlannerEmptyState_AddToDo"
             isWithinText={false}

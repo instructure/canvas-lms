@@ -129,7 +129,7 @@ const ObserverOptions = ({
       renderBeforeLabel={props => <IconAddLine color={!props.isHighlighted ? 'brand' : null} />}
       // according to the documentation the next line should override the default color
       // on inst-ui 8.7.0, but it doesn't seem to work on inst-ui 7.9.0
-      // themeOverride={{color: k5ThemeVariables.colors.brand}}
+      // themeOverride={{color: k5Theme.variables.colors.brand}}
     >
       <Text color={highlightedOption !== ADD_STUDENT_OPTION_ID ? 'brand' : null}>
         {I18n.t('Add Student')}

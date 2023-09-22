@@ -30,7 +30,7 @@ import {
   IconStarLightLine,
   IconCalendarReservedLine,
 } from '@instructure/ui-icons'
-import {InstUISettingsProvider} from '@instructure/emotion'
+import {ApplyTheme} from '@instructure/ui-themeable'
 import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
@@ -54,7 +54,7 @@ import {
   TAB_IDS,
   MOBILE_NAV_BREAKPOINT_PX,
 } from '@canvas/k5/react/utils'
-import {getK5ThemeOverrides} from '@canvas/k5/react/k5-theme'
+import {theme} from '@canvas/k5/react/k5-theme'
 import useFetchApi from '@canvas/use-fetch-api-hook'
 import usePlanner from '@canvas/k5/react/hooks/usePlanner'
 import useTabState from '@canvas/k5/react/hooks/useTabState'
@@ -63,8 +63,6 @@ import ImportantDates from './ImportantDates'
 import ObserverOptions, {ObservedUsersListShape} from '@canvas/observer-picker'
 import {savedObservedId} from '@canvas/observer-picker/ObserverGetObservee'
 import {fetchShowK5Dashboard} from '@canvas/observer-picker/react/utils'
-
-const componentOverrides = getK5ThemeOverrides()
 
 const I18n = useI18nScope('k5_dashboard')
 
@@ -511,9 +509,9 @@ K5Dashboard.propTypes = {
 const WrappedK5Dashboard = connect(mapStateToProps)(responsiviser()(K5Dashboard))
 
 export default props => (
-  <InstUISettingsProvider theme={{componentOverrides}}>
+  <ApplyTheme theme={theme}>
     <Provider store={store}>
       <WrappedK5Dashboard {...props} />
     </Provider>
-  </InstUISettingsProvider>
+  </ApplyTheme>
 )

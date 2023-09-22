@@ -58,20 +58,18 @@ import PostPolicies from '../react/PostPolicies/index'
 import SpeedGraderProvisionalGradeSelector from '../react/SpeedGraderProvisionalGradeSelector'
 import SpeedGraderStatusMenu from '../react/SpeedGraderStatusMenu'
 import {isPostable, similarityIcon} from '@canvas/grading/SubmissionHelper'
-// @ts-expect-error
 import studentViewedAtTemplate from '../jst/student_viewed_at.handlebars'
-// @ts-expect-error
 import submissionsDropdownTemplate from '../jst/submissions_dropdown.handlebars'
-// @ts-expect-error
 import speechRecognitionTemplate from '../jst/speech_recognition.handlebars'
-// @ts-expect-error
 import unsubmittedCommentsTemplate from '../jst/unsubmitted_comment.handlebars'
 import useStore from '../stores/index'
+// @ts-expect-error
 import {Tooltip} from '@instructure/ui-tooltip'
 import {
   IconUploadLine,
   IconWarningLine,
   IconCheckMarkIndeterminateLine,
+  // @ts-expect-error
 } from '@instructure/ui-icons'
 import {Pill} from '@instructure/ui-pill'
 import {
@@ -119,13 +117,9 @@ import {
   speedGraderJSONErrorFn,
 } from './speed_grader.utils'
 import SpeedGraderAlerts from '../react/SpeedGraderAlerts'
-// @ts-expect-error
 import turnitinInfoTemplate from '../jst/_turnitinInfo.handlebars'
-// @ts-expect-error
 import turnitinScoreTemplate from '@canvas/grading/jst/_turnitinScore.handlebars'
-// @ts-expect-error
 import vericiteInfoTemplate from '../jst/_vericiteInfo.handlebars'
-// @ts-expect-error
 import vericiteScoreTemplate from '@canvas/grading/jst/_vericiteScore.handlebars'
 import 'jqueryui/draggable'
 import '@canvas/jquery/jquery.ajaxJSON' /* getJSON, ajaxJSON */

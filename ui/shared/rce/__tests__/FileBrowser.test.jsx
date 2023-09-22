@@ -56,8 +56,7 @@ const testFile = overrides => ({
   ...overrides,
 })
 
-// rewrite using testing-library
-describe.skip('FileBrowser', () => {
+describe('FileBrowser', () => {
   beforeEach(() => {
     moxios.install()
     window.ENV = {context_asset_string: 'courses_1'}
@@ -100,7 +99,8 @@ describe.skip('FileBrowser', () => {
     wrapper.find('TreeButton').first().simulate('click')
     moxios.wait(() => {
       wrapper.find('TreeButton').at(1).simulate('click')
-      expect(wrapper.find('TreeButton')).toHaveLength(2)
+      expect(wrapper.find('TreeButton')).toHaveLength(3)
+      expect(wrapper.find('Img')).toHaveLength(1)
       done()
     })
   })
@@ -439,7 +439,7 @@ describe.skip('FileBrowser', () => {
       }
       wrapper.instance().setState({collections, items})
       wrapper.update()
-      wrapper.find('TreeButton').first().simulate('click')
+      wrapper.find('TreeButton').simulate('click')
       wrapper.find('TreeButton').at(1).simulate('click')
       expect(spy.getCall(0).args[0]).toEqual(items[1])
       wrapper.find('TreeButton').at(2).simulate('click')
@@ -475,7 +475,7 @@ describe.skip('FileBrowser', () => {
       wrapper.instance().getFolderData(1)
       wrapper.update()
       moxios.wait(() => {
-        const node = wrapper.find('TreeBrowser').first()
+        const node = wrapper.find('TreeBrowser')
         expect(node.instance().props.collections[1].collections).toEqual([5, 7, 6])
         done()
       })
@@ -508,7 +508,7 @@ describe.skip('FileBrowser', () => {
       wrapper.instance().getFolderData(1)
       wrapper.update()
       moxios.wait(() => {
-        const node = wrapper.find('TreeBrowser').first()
+        const node = wrapper.find('TreeBrowser')
         expect(node.instance().props.collections[1].items).toEqual([1, 3, 2])
         done()
       })
@@ -669,7 +669,7 @@ describe.skip('FileBrowser', () => {
         status: 200,
         response: {id: 1, display_name: 'file 1', 'content-type': 'image/png', folder_id: 1},
       })
-      wrapper.find('TreeButton').first().simulate('click')
+      wrapper.find('TreeButton').simulate('click')
       wrapper.find('input').simulate('change', {
         target: {
           files: [{name: 'file 1', size: 0}],
@@ -680,8 +680,8 @@ describe.skip('FileBrowser', () => {
           wrapper.update()
           expect(spy.calledOnce).toBeTruthy()
           expect(spy.calledWith('Success: File uploaded')).toBeTruthy()
-          const button = wrapper.find('TreeButton').at(0)
-          expect(button.text()).toEqual('folder 1')
+          const button = wrapper.find('TreeButton').at(1)
+          expect(button.text()).toEqual('file 1')
           done()
         })
       })
@@ -716,15 +716,12 @@ describe.skip('FileBrowser', () => {
       })
       wrapper.instance().setState({collections})
       wrapper.update()
-      wrapper.find('TreeButton').first().simulate('click')
-      wrapper
-        .find('input')
-        .first()
-        .simulate('change', {
-          target: {
-            files: [{name: 'file 1', size: 0}],
-          },
-        })
+      wrapper.find('TreeButton').simulate('click')
+      wrapper.find('input').simulate('change', {
+        target: {
+          files: [{name: 'file 1', size: 0}],
+        },
+      })
       moxios.wait(() => {
         expect(spy.calledOnce).toBeTruthy()
         expect(spy.calledWith('File upload failed')).toBeTruthy()

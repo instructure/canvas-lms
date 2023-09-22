@@ -18,6 +18,7 @@
  */
 
 import React, {useState} from 'react'
+import {func, number, string, bool, oneOf} from 'prop-types'
 import {View} from '@instructure/ui-view'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
@@ -29,7 +30,9 @@ import NumberHelper from '@canvas/i18n/numberHelper'
 
 const I18n = useI18nScope('speed_grader')
 
-function defaultDurationLate(interval, secondsLate): number {
+const {Item: FlexItem} = Flex as any
+
+function defaultDurationLate(interval, secondsLate) {
   let durationLate = secondsLate / 3600
 
   if (interval === 'day') {
@@ -39,22 +42,10 @@ function defaultDurationLate(interval, secondsLate): number {
   return round(durationLate, 2)
 }
 
-type Props = {
-  disabled: boolean
-  lateSubmissionInterval: 'day' | 'hour'
-  locale: string
-  renderLabelBefore: boolean
-  secondsLate: number
-  onSecondsLateUpdated: (submission: {secondsLateOverride: number}) => void
-  width: string
-  visible: boolean
-}
-
-export default function TimeLateInput(props: Props) {
+export default function TimeLateInput(props) {
   const [numberInputValue, setNumberInputValue] = useState(
     defaultDurationLate(props.lateSubmissionInterval, props.secondsLate)
   )
-  const [numberInputValueSinceBlur, setNumberInputValueSinceBlur] = useState(numberInputValue)
 
   const numberInputLabel =
     props.lateSubmissionInterval === 'day' ? I18n.t('Days late') : I18n.t('Hours late')
@@ -75,13 +66,9 @@ export default function TimeLateInput(props: Props) {
 
     const parsedValue = NumberHelper.parse(value)
     const roundedValue = round(parsedValue, 2)
-
-    const hasChanged = roundedValue !== numberInputValueSinceBlur
-    if (!hasChanged) {
+    if (roundedValue === numberInputValue) {
       return
     }
-
-    setNumberInputValueSinceBlur(roundedValue)
 
     let secondsLateOverride = parsedValue * 3600
     if (props.lateSubmissionInterval === 'day') {
@@ -97,33 +84,42 @@ export default function TimeLateInput(props: Props) {
   return (
     <span className="NumberInput__Container NumberInput__Container-LeftIndent">
       <Flex direction={props.renderLabelBefore ? 'row-reverse' : 'row'}>
-        <Flex.Item>
+        <FlexItem>
           <NumberInput
-            value={numberInputValue}
+            value={numberInputValue.toString()}
             interaction={props.disabled ? 'disabled' : 'enabled'}
             display="inline-block"
             renderLabel={<ScreenReaderContent>{numberInputLabel}</ScreenReaderContent>}
+            // @ts-ignore
             locale={props.locale}
             min="0"
             onBlur={handleNumberInputBlur}
-            onChange={(e, value) => {
-              const inputValue = parseInt(value, 10)
-              setNumberInputValue(Number.isNaN(inputValue) ? 0 : inputValue)
-            }}
+            onChange={(e, value) => setNumberInputValue(value)}
             showArrows={false}
             width={props.width}
           />
-        </Flex.Item>
-        <Flex.Item>
+        </FlexItem>
+        <FlexItem>
           <PresentationContent>
             <View as="div" margin="0 small">
               <Text>{numberInputText}</Text>
             </View>
           </PresentationContent>
-        </Flex.Item>
+        </FlexItem>
       </Flex>
     </span>
   )
+}
+
+TimeLateInput.propTypes = {
+  disabled: bool,
+  lateSubmissionInterval: oneOf(['day', 'hour']).isRequired,
+  locale: string.isRequired,
+  renderLabelBefore: bool.isRequired,
+  secondsLate: number.isRequired,
+  onSecondsLateUpdated: func.isRequired,
+  width: string.isRequired,
+  visible: bool,
 }
 
 TimeLateInput.defaultProps = {

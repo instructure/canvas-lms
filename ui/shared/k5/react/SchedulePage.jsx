@@ -27,12 +27,10 @@ import {
   preloadInitialItems,
   reloadPlannerForObserver,
 } from '@canvas/planner'
-import {InstUISettingsProvider} from '@instructure/emotion'
+import {ApplyTheme} from '@instructure/ui-themeable'
 
 import EmptyDashboardState from './EmptyDashboardState'
-import {getPlannerTheme} from './k5-theme'
-
-const plannerTheme = getPlannerTheme()
+import {plannerTheme} from './k5-theme'
 
 const SchedulePage = ({
   plannerEnabled,
@@ -88,7 +86,7 @@ const SchedulePage = ({
   }
 
   return (
-    <InstUISettingsProvider theme={{componentOverrides: plannerTheme}}>
+    <ApplyTheme theme={plannerTheme}>
       <section
         id="dashboard_page_schedule"
         style={{
@@ -99,7 +97,7 @@ const SchedulePage = ({
       >
         {content}
       </section>
-    </InstUISettingsProvider>
+    </ApplyTheme>
   )
 }
 

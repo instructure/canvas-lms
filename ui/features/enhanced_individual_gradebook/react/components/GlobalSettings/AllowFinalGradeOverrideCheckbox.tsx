@@ -21,7 +21,8 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {executeApiRequest} from '@canvas/util/apiRequest'
 import {HandleCheckboxChange} from '../../../types'
 import {View} from '@instructure/ui-view'
-import {InstUISettingsProvider} from '@instructure/emotion'
+import {ApplyTheme} from '@instructure/ui-themeable'
+// @ts-expect-error TODO: fix in instui 8
 import {Checkbox, CheckboxFacade} from '@instructure/ui-checkbox'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
@@ -49,17 +50,15 @@ export default function AllowFinalGradeOverrideCheckbox({
   }
 
   return (
-    <InstUISettingsProvider
+    <ApplyTheme
       theme={{
-        componentOverrides: {
-          [CheckboxFacade.componentId]: {
-            checkedBackground: '#0375ff',
-            borderColor: '#777777',
-            labelFontSizeSmall: '1rem',
-          },
-          [View.componentId]: {
-            paddingMedium: '16px',
-          },
+        [CheckboxFacade.theme]: {
+          checkedBackground: '#0375ff',
+          borderColor: '#777777',
+          labelFontSizeSmall: '1rem',
+        },
+        [View.theme]: {
+          paddingMedium: '16px',
         },
       }}
     >
@@ -70,7 +69,7 @@ export default function AllowFinalGradeOverrideCheckbox({
         borderRadius="medium"
         background="primary"
         padding="medium"
-        themeOverride={{backgroundPrimary: '#eee'}}
+        theme={{backgroundPrimary: '#eee'}}
       >
         <Checkbox
           size="small"
@@ -80,6 +79,6 @@ export default function AllowFinalGradeOverrideCheckbox({
           data-testid="allow-final-grade-override-checkbox"
         />
       </View>
-    </InstUISettingsProvider>
+    </ApplyTheme>
   )
 }

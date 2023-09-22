@@ -273,7 +273,7 @@ export default class FilePreview extends React.PureComponent {
         shouldReturnFocus={true}
         unmountOnExit={true}
       >
-        <Mask themeOverride={{background: 'rgba(0, 0, 0, 0.75)'}}>
+        <Mask theme={{background: 'rgba(0, 0, 0, 0.75)'}}>
           <div className="ef-file-preview-overlay">
             <div className="ef-file-preview-header">
               <h1 className="ef-file-preview-header-filename">

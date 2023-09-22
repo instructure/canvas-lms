@@ -21,7 +21,7 @@ import React from 'react'
 import {Button} from '@instructure/ui-buttons'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import type {SimilarityScore} from '../../../../../../api.d' // !!! FIXME
+import type {SimilarityScore} from '../../../../../../api.d'
 
 import SimilarityIcon from '../../components/SimilarityIcon'
 

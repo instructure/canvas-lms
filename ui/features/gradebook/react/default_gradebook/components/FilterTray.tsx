@@ -31,6 +31,8 @@ import type {CamelizedGradingPeriod} from '@canvas/grading/grading.d'
 import type {FilterPreset, PartialFilterPreset} from '../gradebook.d'
 import type {AssignmentGroup, Module, Section, StudentGroupCategoryMap} from '../../../../../api.d'
 
+const {Item: FlexItem} = Flex as any
+
 const I18n = useI18nScope('gradebook')
 
 export type FilterTrayProps = {
@@ -77,18 +79,14 @@ export default function FilterTray({
     >
       <View as="div" padding="medium">
         <Flex margin="0 0 small 0">
-          <Flex.Item shouldGrow={true} shouldShrink={true}>
+          <FlexItem shouldGrow={true} shouldShrink={true}>
             <Heading level="h3" as="h3" margin="0 0 x-small">
               {I18n.t('Saved Filter Presets')}
             </Heading>
-          </Flex.Item>
-          <Flex.Item>
+          </FlexItem>
+          <FlexItem>
             <CloseButton
-              elementRef={ref => {
-                if (ref instanceof HTMLElement) {
-                  closeRef.current = ref
-                }
-              }}
+              elementRef={(ref: HTMLElement) => (closeRef.current = ref)}
               placement="end"
               offset="small"
               screenReaderLabel="Close"
@@ -97,12 +95,12 @@ export default function FilterTray({
                 setExpandedFilterPresetId(null)
               }}
             />
-          </Flex.Item>
+          </FlexItem>
         </Flex>
 
         {filterPresets.length === 0 && (
-          <Flex as="div" margin="small" display="inline-flex">
-            <Flex.Item width="100px" height="128px">
+          <Flex as="div" margin="small">
+            <FlexItem display="inline-block" width="100px" height="128px">
               <img
                 data-testid="friendly-panda"
                 src="/images/tutorial-tray-images/Panda_People.svg"
@@ -112,8 +110,8 @@ export default function FilterTray({
                   height: '128px',
                 }}
               />
-            </Flex.Item>
-            <Flex.Item shouldShrink={true}>
+            </FlexItem>
+            <FlexItem shouldShrink={true}>
               <ContextView
                 padding="x-small small"
                 margin="small"
@@ -124,7 +122,7 @@ export default function FilterTray({
                   'Did you know you can now create filter presets and save them for future use?'
                 )}
               </ContextView>
-            </Flex.Item>
+            </FlexItem>
           </Flex>
         )}
 

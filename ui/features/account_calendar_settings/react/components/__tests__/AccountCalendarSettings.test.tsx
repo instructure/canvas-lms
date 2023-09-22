@@ -191,7 +191,7 @@ describe('AccountCalendarSettings', () => {
         )
       })
 
-      it.skip('calendar visibility changes (flaky)', async () => {
+      it('calendar visibility changes', async () => {
         const getUniversityCheckbox = () =>
           getByRole('checkbox', {
             name: 'Show account calendar for University',

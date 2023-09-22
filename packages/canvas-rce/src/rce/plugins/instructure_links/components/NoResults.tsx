@@ -24,6 +24,9 @@ import {Link} from '@instructure/ui-link'
 import formatMessage from '../../../../format-message'
 import {getIcon} from '../../shared/linkUtils'
 
+// Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
+const {Item: FlexItem} = Flex as any
+
 type ContextType = 'course' | 'group'
 
 export type CollectionType =
@@ -92,19 +95,22 @@ export const NoResults = ({
   return (
     <View padding="xx-large">
       <Flex justifyItems="center" alignItems="center" direction="column">
-        <Flex.Item>
-          {/* @ts-expect-error  not sure padding is even allowed on Icons */}
+        <FlexItem>
           <Icon size="large" color="secondary" padding="large" />
-        </Flex.Item>
-        <Flex.Item margin="small 0 0">
+        </FlexItem>
+        <FlexItem margin="small 0 0">
           <Text>{getMessage(collectionType, isSearchResult)}</Text>
-        </Flex.Item>
+        </FlexItem>
         {!isSearchResult && (
-          <Flex.Item>
-            <Link href={buildUrl(contextType, contextId, collectionType)} target="_blank">
+          <FlexItem>
+            <Link
+              href={buildUrl(contextType, contextId, collectionType)}
+              // @ts-expect-error
+              target="_blank"
+            >
               {formatMessage('Add one!')}
             </Link>
-          </Flex.Item>
+          </FlexItem>
         )}
       </Flex>
     </View>

@@ -114,11 +114,10 @@ exports[`renders the base component correctly 1`] = `
         <Link
           color="link"
           elementRef={[Function]}
-          forceButtonRole={true}
           href="http://www.non_default_url.com"
           iconPlacement="start"
           isWithinText={false}
-          themeOverride={
+          theme={
             Object {
               "mediumHeight": "normal",
               "mediumPaddingHorizontal": "0",
@@ -179,6 +178,7 @@ exports[`renders the base component correctly 1`] = `
         as="button"
         color="secondary"
         cursor="pointer"
+        elementRef={[Function]}
         margin="0"
         onClick={[Function]}
         renderIcon={[Function]}
@@ -308,11 +308,10 @@ exports[`renders the base component correctly with 0 points 1`] = `
         <Link
           color="link"
           elementRef={[Function]}
-          forceButtonRole={true}
           href="http://www.non_default_url.com"
           iconPlacement="start"
           isWithinText={false}
-          themeOverride={
+          theme={
             Object {
               "mediumHeight": "normal",
               "mediumPaddingHorizontal": "0",
@@ -373,6 +372,7 @@ exports[`renders the base component correctly with 0 points 1`] = `
         as="button"
         color="secondary"
         cursor="pointer"
+        elementRef={[Function]}
         margin="0"
         onClick={[Function]}
         renderIcon={[Function]}
@@ -502,11 +502,10 @@ exports[`renders the base component correctly without points 1`] = `
         <Link
           color="link"
           elementRef={[Function]}
-          forceButtonRole={true}
           href="http://www.non_default_url.com"
           iconPlacement="start"
           isWithinText={false}
-          themeOverride={
+          theme={
             Object {
               "mediumHeight": "normal",
               "mediumPaddingHorizontal": "0",
@@ -553,6 +552,7 @@ exports[`renders the base component correctly without points 1`] = `
         as="button"
         color="secondary"
         cursor="pointer"
+        elementRef={[Function]}
         margin="0"
         onClick={[Function]}
         renderIcon={[Function]}

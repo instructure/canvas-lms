@@ -71,7 +71,6 @@ describe "observer k5 dashboard" do
     end
 
     it "show the grades progress bar with the appropriate progress" do
-      skip "FOO-3808 (10/6/2023)"
       subject_grade = "75"
 
       assignment = create_and_submit_assignment(@subject_course, "Assignment 1", "new assignment", 100)
