@@ -387,7 +387,7 @@
         "message": "{ count, plural,\n    one {# Objekt geladen}\n  other {# Objekte geladen}\n}"
     },
     "course_documents_104d76e0": {
-        "message": "Kursunterlagen"
+        "message": "Kursdokumente"
     },
     "course_files_62deb8f8": {
         "message": "Kursdateien"
@@ -2442,16 +2442,16 @@
         "message": "Wird von Screenreadern verwendet, um das Video zu beschreiben."
     },
     "user_documents_c206e61f": {
-        "message": "Benutzer*in Dokumente"
+        "message": "Meine Dokumente"
     },
     "user_files_78e21703": {
         "message": "Benutzerdateien"
     },
     "user_images_b6490852": {
-        "message": "Benutzerbilder"
+        "message": "Meine Bilder"
     },
     "user_media_14fbf656": {
-        "message": "Nutzer-Medien"
+        "message": "Meine Medien"
     },
     "vector_notation_cf6086ab": {
         "message": "Vektor (Notation)"
