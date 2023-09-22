@@ -34,14 +34,14 @@ module OpenAi
       }
 
       data = {
-        input: input.codepoints.take(8000).pack("U*"), # TODO: chunk input instead of truncating
+        input:,
         model: "text-embedding-ada-002"
       }
 
       response = JSON.parse(Net::HTTP.post(URI(url), data.to_json, headers).body)
       raise response["error"]["message"] if response["error"]
 
-      response["data"].pluck("embedding")
+      response["data"].pluck("embedding")[0]
     end
 
     def generate_completion(prompt)

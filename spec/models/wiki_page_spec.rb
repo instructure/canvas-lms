@@ -1138,5 +1138,17 @@ describe WikiPage do
       run_jobs
       expect(@page.reload.wiki_page_embeddings.count).to eq 1
     end
+
+    it "generates multiple embeddings for a page with long content" do
+      wiki_page_model(title: "test", body: "foo" * 2000)
+      run_jobs
+      expect(@page.reload.wiki_page_embeddings.count).to eq 2
+    end
+
+    it "generates multiple embeddings and doesn't split words" do
+      wiki_page_model(title: "test", body: "supercalifragilisticexpialidocious " * 228)
+      run_jobs
+      expect(@page.reload.wiki_page_embeddings.count).to eq 3
+    end
   end
 end
