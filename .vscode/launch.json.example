@@ -1,14 +1,21 @@
 {
   "version": "0.2.0",
   "configurations": [
+    // Make sure to set your preferred ruby version manager in your user settings, in order for the extension to launch
+    // with the correct ruby version:
+    //
+    // In settings.json:
+    //      "rdbg.rubyVersionManager": "asdf"
+    //
+    // If you have trouble with that approach (see ruby/vscode-rdbg#295), you can also set your path to `rdbg` below:
+    //      "rdbgPath": "~/.asdf/shims/rdbg"
+    //
     {
-      "name": "Debug with rdebug-ide",
-      "type": "Ruby",
-      "request": "attach",
-      "remoteHost": "127.0.0.1",
-      "remotePort": "1234",
-      "remoteWorkspaceRoot": "/usr/src/app",
-      "cwd": "${workspaceRoot}"
-    }
+        "type": "rdbg",
+        "name": "Web - Attach with rdbg",
+        "request": "attach",
+        "debugPort": "4363",
+        "localfsMap": "/usr/src/app:${workspaceFolder}",
+    },
   ]
 }
