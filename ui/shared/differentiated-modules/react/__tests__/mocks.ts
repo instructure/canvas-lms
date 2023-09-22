@@ -39,3 +39,30 @@ export const STUDENTS_DATA = [
 export const FILTERED_STUDENTS_DATA = [
   {id: '4', name: 'Secilia', created_at: '2023-01-01', sortable_name: 'Secilia'},
 ]
+
+export const ASSIGNMENT_OVERRIDES_DATA = [
+  {
+    id: '1',
+    title: 'Test',
+    context_module_id: '2',
+    students: [
+      {
+        id: '1',
+        name: 'Ben',
+      },
+      {
+        id: '2',
+        name: 'Peter',
+      },
+    ],
+  },
+  {
+    id: '2',
+    title: 'Course',
+    context_module_id: '2',
+    course_section: {
+      id: '2',
+      name: 'Section A',
+    },
+  },
+]

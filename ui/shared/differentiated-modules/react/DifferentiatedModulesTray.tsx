@@ -101,7 +101,12 @@ export default function DifferentiatedModulesTray({
     return (
       <React.Suspense fallback={<Fallback />}>
         {assignOnly ? (
-          <AssignToPanel courseId={courseId} height={panelHeight} onDismiss={onDismiss} />
+          <AssignToPanel
+            courseId={courseId}
+            moduleId={moduleId}
+            height={panelHeight}
+            onDismiss={onDismiss}
+          />
         ) : (
           <Tabs
             onRequestTabChange={(_e: Event, {id}: {id: 'settings' | 'assign-to'}) =>
@@ -130,7 +135,12 @@ export default function DifferentiatedModulesTray({
               isSelected={selectedTab === 'assign-to'}
               padding="none"
             >
-              <AssignToPanel courseId={courseId} height={panelHeight} onDismiss={onDismiss} />
+              <AssignToPanel
+                courseId={courseId}
+                moduleId={moduleId}
+                height={panelHeight}
+                onDismiss={onDismiss}
+              />
             </Tabs.Panel>
           </Tabs>
         )}
