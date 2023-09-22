@@ -202,7 +202,7 @@ const locale = {
   "count_plural_one_item_loaded_other_items_loaded_857023b7": {
     "message": "{ count, plural,\n    one {# Objekt geladen}\n  other {# Objekte geladen}\n}"
   },
-  "course_documents_104d76e0": { "message": "Kursunterlagen" },
+  "course_documents_104d76e0": { "message": "Kursdokumente" },
   "course_files_62deb8f8": { "message": "Kursdateien" },
   "course_files_a31f97fc": { "message": "Kursdateien" },
   "course_images_f8511d04": { "message": "Kursbilder" },
@@ -1195,10 +1195,10 @@ const locale = {
   "used_by_screen_readers_to_describe_the_video_37ebad25": {
     "message": "Wird von Screenreadern verwendet, um das Video zu beschreiben."
   },
-  "user_documents_c206e61f": { "message": "Benutzer*in Dokumente" },
+  "user_documents_c206e61f": { "message": "Meine Dokumente" },
   "user_files_78e21703": { "message": "Benutzerdateien" },
-  "user_images_b6490852": { "message": "Benutzerbilder" },
-  "user_media_14fbf656": { "message": "Nutzer-Medien" },
+  "user_images_b6490852": { "message": "Meine Bilder" },
+  "user_media_14fbf656": { "message": "Meine Medien" },
   "vector_notation_cf6086ab": { "message": "Vektor (Notation)" },
   "vertical_bar_set_builder_notation_4300495f": {
     "message": "Vertikale Leiste (Set Builder Notation)"
