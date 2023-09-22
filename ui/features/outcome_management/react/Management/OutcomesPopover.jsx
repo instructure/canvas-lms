@@ -32,7 +32,7 @@ import {outcomeShape} from './shapes'
 const I18n = useI18nScope('OutcomeManagement')
 
 const componentOverrides = {
-  Heading: {
+  [Heading.componentId]: {
     h5FontWeight: 700,
   },
 }

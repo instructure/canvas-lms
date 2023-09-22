@@ -51,7 +51,7 @@ const renderLinkedResult = (name, url, isQuiz) => (
   <Link
     href={url}
     isWithinText={false}
-    themeOverride={{mediumPaddingHorizontal: '0', mediumHeight: 'normal', fontWeight: '700'}}
+    theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal', fontWeight: '700'}}
     renderIcon={isQuiz ? IconQuizLine : IconAssignmentLine}
   >
     {name}

@@ -356,8 +356,8 @@ class FileUpload extends Component {
 
     return (
       <Table.Row key={file._id}>
-        <Table.Cell themeOverride={cellTheme}>{getFileThumbnail(file, 'small')}</Table.Cell>
-        <Table.Cell themeOverride={cellTheme}>
+        <Table.Cell theme={cellTheme}>{getFileThumbnail(file, 'small')}</Table.Cell>
+        <Table.Cell theme={cellTheme}>
           {displayName && (
             <>
               <span aria-hidden={true} title={displayName}>
@@ -367,11 +367,11 @@ class FileUpload extends Component {
             </>
           )}
         </Table.Cell>
-        <Table.Cell themeOverride={cellTheme}>{file.isLoading && this.renderFileProgress(file)}</Table.Cell>
-        <Table.Cell themeOverride={cellTheme}>
+        <Table.Cell theme={cellTheme}>{file.isLoading && this.renderFileProgress(file)}</Table.Cell>
+        <Table.Cell theme={cellTheme}>
           {!file.isLoading && <IconCompleteSolid color="success" />}
         </Table.Cell>
-        <Table.Cell themeOverride={cellTheme}>
+        <Table.Cell theme={cellTheme}>
           {!file.isLoading && (
             <IconButton
               id={file._id}
@@ -396,13 +396,13 @@ class FileUpload extends Component {
       <Table caption={I18n.t('Uploaded files')} data-testid="uploaded_files_table">
         <Table.Head>
           <Table.Row>
-            <Table.ColHeader id="thumbnail" width="1rem" themeOverride={cellTheme} />
-            <Table.ColHeader id="filename" themeOverride={cellTheme}>
+            <Table.ColHeader id="thumbnail" width="1rem" theme={cellTheme} />
+            <Table.ColHeader id="filename" theme={cellTheme}>
               {I18n.t('File Name')}
             </Table.ColHeader>
-            <Table.ColHeader id="upload-progress" width="30%" themeOverride={cellTheme} />
-            <Table.ColHeader id="upload-success" width="1rem" themeOverride={cellTheme} />
-            <Table.ColHeader id="delete" width="1rem" themeOverride={cellTheme} />
+            <Table.ColHeader id="upload-progress" width="30%" theme={cellTheme} />
+            <Table.ColHeader id="upload-success" width="1rem" theme={cellTheme} />
+            <Table.ColHeader id="delete" width="1rem" theme={cellTheme} />
           </Table.Row>
         </Table.Head>
         <Table.Body>{files.map(this.renderTableRow)}</Table.Body>

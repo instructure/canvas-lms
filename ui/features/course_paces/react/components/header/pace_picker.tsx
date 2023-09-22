@@ -47,7 +47,7 @@ const I18n = useI18nScope('course_paces_pace_picker')
 const PICKER_WIDTH = '20rem'
 
 const componentOverrides = {
-  Menu: {
+  [Menu.componentId]: {
     maxWidth: PICKER_WIDTH,
   },
 }

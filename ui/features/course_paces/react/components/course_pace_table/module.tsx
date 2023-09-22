@@ -21,7 +21,7 @@ import React, {useEffect, useRef, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {InstUISettingsProvider} from '@instructure/emotion'
-import {IconButton} from '@instructure/ui-buttons'
+import {Button, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {
@@ -42,19 +42,13 @@ import {ModuleWithDueDates, ResponsiveSizes} from '../../types'
 const I18n = useI18nScope('course_paces_module')
 
 const componentOverrides = {
-  Button: {
+  [Button.componentId]: {
     borderRadius: '0',
     mediumPaddingTop: '1rem',
     mediumPaddingBottom: '1rem',
   },
-  'Table.ColHeader': {
+  [Table.ColHeader.componentId]: {
     padding: '0',
-  },
-  ToggleDetails: {
-    iconMargin: '0.5rem',
-    filledBorderRadius: '0',
-    filledPadding: '2rem',
-    togglePadding: '0',
   },
 }
 
@@ -196,6 +190,12 @@ export const Module = (props: ComponentProps) => {
           variant="filled"
           defaultExpanded={true}
           size="large"
+          theme={{
+            iconMargin: '0.5rem',
+            filledBorderRadius: '0',
+            filledPadding: '2rem',
+            togglePadding: '0',
+          }}
         >
           <View as="div" borderWidth="0 small">
             <Table

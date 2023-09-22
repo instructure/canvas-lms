@@ -89,7 +89,7 @@ const K5Tabs = ({children, currentTab, onTabChange, tabs, tabsRef, courseContext
         <Tabs
           elementRef={tabsRef}
           onRequestTabChange={(_, {id}) => onTabChange(id)}
-          themeOverride={{tabVerticalOffset: '0'}}
+          theme={{tabVerticalOffset: '0'}}
         >
           {tabs.map(({id, icon, label}) => (
             <Tabs.Panel

@@ -533,7 +533,7 @@ export const IsolatedViewContainer = props => {
       <span className="discussions-isolated-view-content">
         <Flex>
           <Flex.Item shouldGrow={true} shouldShrink={true}>
-            <Heading margin="medium medium none" themeOverride={{h2FontWeight: 700}}>
+            <Heading margin="medium medium none" theme={{h2FontWeight: 700}}>
               Thread
             </Heading>
           </Flex.Item>

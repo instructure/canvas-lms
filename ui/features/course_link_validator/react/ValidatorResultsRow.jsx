@@ -142,7 +142,7 @@ export default function ValidatorResultsRow(props) {
             <Link
               href={props.result.content_url}
               isWithinText={false}
-              themeOverride={{mediumPaddingHorizontal: '0', mediumHeight: '1.25rem'}}
+              theme={{mediumPaddingHorizontal: '0', mediumHeight: '1.25rem'}}
             >
               {props.result.name}
             </Link>
