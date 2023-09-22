@@ -1534,6 +1534,20 @@ class ContextExternalTool < ActiveRecord::Base
 
   def prepare_assignment_for_ags(assignment)
     assignment.prepare_for_ags_if_needed!(self, use_tool: true)
+  rescue ActiveRecord::RecordInvalid, PG::UniqueViolation => e
+    Sentry.with_scope do |scope|
+      scope.set_tags(assignment_id: assignment.global_id)
+      scope.set_tags(tool_id: global_id)
+      scope.set_tags(exception_class: e.class.name)
+      scope.set_context(
+        "exception",
+        {
+          name: e.class.name,
+          message: e.message
+        }
+      )
+      Sentry.capture_message("ContextExternalTool#prepare_assignment_for_ags", level: :warning)
+    end
   end
 
   # Intended to return true only for Instructure-owned tools that have been
