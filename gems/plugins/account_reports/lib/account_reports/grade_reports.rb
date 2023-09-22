@@ -310,7 +310,7 @@ module AccountReports
         students = students.where(
           "c.workflow_state='available'
            AND enrollments.workflow_state IN ('active', 'completed')
-           AND sc.workflow_state <> 'deleted'"
+           AND (sc.workflow_state IS DISTINCT FROM 'deleted')"
         )
       end
       students
