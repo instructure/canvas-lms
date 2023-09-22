@@ -40,8 +40,7 @@ module Lti
   #   * postMessage Storage: https://www.imsglobal.org/spec/lti-pm-s/v0p1
   #   * Implementation Guide: https://www.imsglobal.org/spec/lti-cs-oidc/v0p1
   class PlatformStorageController < ApplicationController
-    # TODO: include this once it's overridable
-    # include Lti::Oidc
+    include Lti::Oidc
 
     def post_message_forwarding
       unless Lti::PlatformStorage.flag_enabled?
@@ -49,8 +48,8 @@ module Lti
         return
       end
 
-      unless current_domain == oidc_auth_domain
-        redirect_to "#{HostUrl.protocol}://#{oidc_auth_domain}/post_message_forwarding?token=#{create_jwt}"
+      unless current_domain == oidc_authorization_domain(current_domain)
+        redirect_to "#{HostUrl.protocol}://#{oidc_authorization_domain(current_domain)}/post_message_forwarding?token=#{create_jwt}"
         return
       end
 
