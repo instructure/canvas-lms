@@ -2234,6 +2234,7 @@ nl:
   add_contact_method_d2dfea03: "Een contactmethode toevoegen"
   add_content_58b4305a: "Inhoud toevoegen"
   add_content_to_module_name_589a8d54: "Inhoud toevoegen aan %{module_name}"
+  add_content_to_name_4b862e98: "Inhoud toevoegen aan %{name}"
   add_course_406cb773: "Cursus toevoegen"
   add_course_assignments_628ed6d0: "Cursus toevoegen"
   add_course_calendar_events_146154a5: "Gebeurtenissen aan de cursuskalender toevoegen"
@@ -2319,6 +2320,7 @@ nl:
   add_people_7ee4b2ec: "Personen toevoegen"
   add_people_and_courses_to_canvas_5c4bfff9: "Personen en cursussen toevoegen aan Canvas"
   add_people_to_coursename_5ea234e1: "Personen toevoegen aan: %{courseName}"
+  add_prerequisite_6409bd9: "Eerste vereiste toevoegen"
   add_proficiency_level_93bd72d0: "Vaardigheidsniveau toevoegen"
   add_proficiency_rating_d819f6b8: "Vaardigheidsbeoordeling toevoegen"
   add_pronouns_option_906ff625: "Optie voor toevoegen van voornaamwoorden"
@@ -2472,6 +2474,7 @@ nl:
   after_the_first_attempt_you_cannot_leave_comments__3922325f: "Na de eerste poging kun je pas opmerkingen achterlaten nadat je de opdracht hebt ingeleverd."
   after_throttling_the_selected_jobs_the_newly_creat_44952b37: "Nadat de geselecteerde taken zijn doorgegeven, wordt de nieuw gemaakte strand geselecteerd."
   ahead_21f22939: Vooruit
+  ai_driven_smart_search_feature_597dbd4f: "Slimme op KI gebaseerde zoekfunctie."
   ajax_errors: 
     error_heading: "Ajax-fout: %{status_code}"
     errors: 
@@ -3255,6 +3258,7 @@ nl:
   allows_user_to_view_create_edit_delete_and_publish_9d6c0bfa: |-
       Hiermee kan een gebruiker pagina's weergeven, maken, bewerken, verwijderen en publiceren of de publicatie ervan ongedaan maken.
       Hiermee kan een gebruiker de paginageschiedenis weergeven en een voorpagina instellen.
+  allows_user_to_view_drill_into_and_export_admin_an_83845f0b: "Hiermee kunnen gebruikers Admin Analytics-gegevens weergeven, erop inzoomen en exporteren op de tabbladen Overzicht, Cursus en Student."
   allows_user_to_view_edit_and_delete_collaborations_f2281cb0: "Hiermee kan een gebruiker de zelfgemaakte samenwerkingen weergeven, bewerken en verwijderen."
   allows_user_to_view_edit_and_delete_conferences_th_7c93c8e1: "Hiermee kan een gebruiker de zelfgemaakte vergaderingen weergeven, bewerken en verwijderen."
   allows_user_to_view_enrollments_on_the_sections_ta_6279a03e: "Hiermee kan een gebruiker inschrijvingen weergeven op het tabblad Secties."
@@ -3688,6 +3692,7 @@ nl:
   announcements_tutorial_tray_994287d6: "Zelfstudiemenu Aankondigingen"
   announcements_unlocked_successfully_1432da9d: "Aankondigingen zijn ontgrendeld"
   announcements_view_1019d00d: "Aankondigingen - weergeven"
+  announcment_itemtitle_c0fe1c06: "Aankondiging: %{itemTitle}"
   anonymize_all_annotations_made_by_instructors_on_s_4f2b70a5: "Maak alle aantekeningen van andere cursusleiders anoniem bij inzendingen voor deze opdracht in SpeedGrader"
   anonymize_all_annotations_made_by_instructors_on_s_5540bc09: "Maak alle aantekeningen van andere cursusleiders anoniem bij inleveringen voor deze opdracht in DocViewer"
   anonymize_all_instructor_comments_and_annotations__713924c9: "Anomiseer alle opmerkingen en aantekeningen van cursusleiders binnen DocViewer."
@@ -4183,6 +4188,7 @@ nl:
   assignment_is_incomplete_ff55e07c: "%{assignment} is niet voltooid"
   assignment_is_reassigned_dd6b6ef2: "Opdracht is opnieuw toegewezen."
   assignment_is_reassigned_ebb31807: "%{assignment} is opnieuw toegewezen"
+  assignment_itemtitle_fee53607: "Opdracht: %{itemTitle}"
   assignment_locked_a6233228: "Opdracht vergrendeld"
   assignment_locked_until_future_date_80cd0df2: "Opdracht vergrendeld tot datum in de toekomst"
   assignment_locked_with_prerequisite_5b8cb148: "Opdracht vergrendeld met vereiste"
@@ -5609,6 +5615,7 @@ nl:
   by_b90c6b6f: Door
   by_client_id_4f2fe02c: "Door Client-ID"
   by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "Alle links zijn standaard voor een cursus ingeschakeld. Cursisten zullen links voor onderdelen zonder inhoud niet kunnen zien. Bijvoorbeeld, als je geen toetsen hebt gemaakt dan zullen ze de link voor de toetsen niet kunnen zien. Je kunt deze links sorteren en expliciet uitschakelen als er gebieden in de cursus zijn waarvan je niet wilt dat cursisten er toegang tot hebben."
+  by_default_everyone_in_this_course_has_assigned_ac_b6bcd94f: "Standaard heeft iedereen in deze cursus toegang tot deze module."
   by_default_students_are_able_to_create_groups_to_r_ac2a70bd: "Standaard kunnen cursisten groepen maken. Om te voorkomen dat cursisten groepen kunnen maken, moet je het selectievakje Toestaan dat cursisten hun eigen groepen indelen in Cursusinstellingen niet inschakelen."
   by_default_students_are_able_to_create_groups_to_r_ba7f2450: |-
       Standaard kunnen cursisten groepen maken. Je kunt dit uitschakelen door het selectievakje
@@ -5988,6 +5995,7 @@ nl:
     see_quiz: "%{quiz_name} zien"
     see_related_link: "Gerelateerde link zien"
   calendar_event_89aadc1c: "Gebeurtenis op kalender"
+  calendar_event_itemtitle_812caedd: "Kalendergebeurtenis: %{itemTitle}"
   calendar_events: 
     crumbs: 
       new: "Nieuwe gebeurtenis op de kalender"
@@ -6466,6 +6474,7 @@ nl:
   classic_view_33f29576: "Klassieke weergave"
   clear_2084585f: Wissen
   clear_all_da755751: "Alles wissen"
+  clear_all_e23811b1: "Alles wissen"
   clear_all_filters_9c7e870: "Alle filters wissen"
   clear_badge_counts_6f776710: "Badge-tellingen wijzigen"
   clear_course_selection_b0762ae2: "Cursusselectie wissen"
@@ -9481,6 +9490,7 @@ nl:
   create_a_new_module_6f31b0fe: "Een nieuwe module maken"
   create_a_new_user_for_address_7487e9c9: "Maak een nieuwe gebruiker voor \"%{address}\""
   create_a_temporary_enrollment_167f05f1: "Een tijdelijke inschrijving maken"
+  create_a_temporary_enrollment_43de562a: "Een tijdelijke inschrijving maken"
   create_a_temporary_enrollment_for_name_2c9828f7: "Maak een tijdelijke inschrijving voor %{name}"
   create_account_263ec6: "Account maken"
   create_an_ba36d171: "Maak een"
@@ -9504,6 +9514,7 @@ nl:
   create_course_pace_3dff129: "Cursustempo maken"
   create_course_templates_f5c4e039: "Cursussjablonen maken"
   create_criterion_6df4d4ad: "Criterium maken"
+  create_custom_access_and_optionally_set_lock_until_e3fc500f: "Aangepaste toegang maken en eventueel Vergrendelen tot datum instellen voor elke groep."
   create_default_pace_dd21415b: "Standaardtempo maken"
   create_delete_edit_157bb1a3: maken/verwijderen/bewerken
   create_delete_update_4ff115bf: maken/verwijderen/bijwerken
@@ -9748,6 +9759,7 @@ nl:
     this_is_permanent: "Gewijzigde cijferverdeling kan niet ongedaan gemaakt worden. De cijfers van vóór de cijferverdeling zijn nog wel beschikbaar, maar de gewijzigde verdeling kan niet teruggedraaid worden."
   curving_assignments_e9479ee3: "Cijfers van opdrachten bijstellen"
   custom_6979cd81: Aangepast
+  custom_access_84b29d73: "Aangepaste toegang"
   custom_css_and_javascript_may_cause_accessibility__93d2a823: "Aangepaste CSS en Javascript kunnen toegangsproblemen of conflicten veroorzaken met toekomstige Canvas updates!"
   custom_fields_fc3e55af: "Aangepaste velden"
   custom_gradebook_columns_81944594: "Aangepaste cijferlijstkolommen"
@@ -10471,6 +10483,7 @@ nl:
   discussion_filter_5d68de61: Discussiefilter
   discussion_group_category_locked: "Groep categorieën kunnen niet direct op een opdracht discussie ingesteld worden, maar zouden op de discussie ingesteld moeten worden"
   discussion_inline_grading_4631a62e: "Inline beoordeling van discussie"
+  discussion_itemtitle_1a5ff063: "Discussie: %{itemTitle}"
   discussion_mention_c70cb87a: Discussievermelding
   discussion_opened_for_comments_successfully_b320dc39: "Discussie geopend voor opmerkingen"
   discussion_pinned_successfully_f9c03d9f: "Discussie is vastgezet"
@@ -10917,6 +10930,7 @@ nl:
   docviewer_strikeout_created_84cccd3b: "Docviewer-doorhaling gemaakt"
   docviewer_strikeout_deleted_ddca34b0: "Docviewer-doorhaling verwijderd"
   docviewer_strikeout_updated_f06aec74: "Docviewer-doorhaling bijgewerkt"
+  docviewer_will_be_launched_more_securely_using_an__7b0a6976: "DocViewer wordt veiliger gestart (via een asymmetrisch ondertekende JWT met een JTI-claim, waardoor het token niet opnieuw kan worden gebruikt)"
   does_not_meet_expectations_b0736d20: "Voldoet niet aan verwachtingen"
   domain_3b54c511: Domein
   domain_editing_is_disabled_when_security_settings__3feb6da0: "Het bewerken van domeinen is uitgeschakeld wanneer er beveiligingsinstellingen worden overgenomen van een bovenliggend account."
@@ -11067,6 +11081,7 @@ nl:
   duplicate_module_module_name_be40ad50: "Module dupliceren %{module_name}"
   duplicate_module_name_ab26e5c3: "Dupliceren %{module_name}"
   duplicate_modules_8ea35557: "Modules dupliceren"
+  duplicate_name_dd0c8801: "%{name} dupliceren"
   duplicate_objects_120eda73: "Dubbele objecten"
   duplicate_provider_provider_d9842134: "Provider dupliceren %{provider}"
   duplicate_quiz_name_79fdcb3e: "Toets %{name} dupliceren"
@@ -11454,6 +11469,7 @@ nl:
   english_canada_12688ee4: "Engels (Canada)"
   english_united_kingdom_a613f831: "Engels (Verenigd Koninkrijk)"
   enhance_color_contrast_of_content_685ddd49: "Verbeter het kleurcontrast van content"
+  enhanced_docviewer_url_security_72e9baa9: "Verbeterde DocViewer-URL-beveiliging"
   enhanced_grade_change_auditing_2b155dfa: "Verbeterde auditing voor cijferwijzigingen"
   enhanced_gradebook_filters_a3be5e7d: "Verbeterde cijferlijstfilters"
   enhanced_gradebook_filters_description: "Deze functie biedt verbeterde filteropties in de Canvas Cijferlijst. Wanneer deze vlag is ingeschakeld, wordt vroege toegang tot lopende verbeteringen automatisch weergegeven bij elke release. Zie voor alle details de *Cijferlijstfilters gebruikersgroep* in de Canvas Community."
@@ -11922,6 +11938,7 @@ nl:
   error_creating_comment_cbbfc0f0: "Fout bij maken van opmerking"
   error_creating_conversation_1d814618: "Fout bij maken van gesprek"
   error_creating_course_ae61c2bd: "Fout bij maken van cursus"
+  error_creating_discussion_topic_a5f809ec: "Fout bij maken van discussieonderwerp"
   error_creating_new_course_9d3903bc: "Fout bij maken van nieuwe cursus"
   error_creating_new_subject_89f16abe: "Fout bij maken van nieuw vak"
   error_creating_submission_comment_a5374fcf: "Fout tijdens maken van opmerking bij inlevering"
@@ -11983,6 +12000,7 @@ nl:
   error_the_tool_returned_an_invalid_content_type_co_10a11c07: "Fout: De tool heeft een ongeldig inhoudtype \"%{contentType} geretourneerd\""
   error_updating_cluster_error_674e5f2e: "Fout bij bijwerken van %{cluster} %{error}"
   error_updating_comment_4b80c76d: "Fout bij bijwerken van opmerking"
+  error_updating_modulename_settings_da982acf: "Fout bij bijwerken van %{moduleName}-instellingen."
   error_updating_notes_31b24785: "Fout tijdens bijwerken van opmerkingen"
   error_updating_pacename_ad07f9df: "Fout bij bijwerken van %{paceName}"
   error_updating_status_of_module_item_80336274: "Fout bij bijwerken van status voor module-item"
@@ -12047,6 +12065,7 @@ nl:
     no_attached_file: "Je moet minimaal één bestand als bijlage aan deze opdracht toevoegen"
     notices: 
       error_reported: "Dank voor je hulp! We gaan hier direct naar kijken"
+    rapid_attempts: "Je hebt je onlangs meerdere malen te snel aangemeld. Wacht een paar seconden en probeer het opnieuw."
     registration_incomplete: "Je moet jouw e-mailadres bevestigen voordat je deze pagina kunt weergeven"
     required: Vereist
     sis_id_in_use: "SIS-ID \"%{sis_id}\" is al in gebruik"
@@ -12430,6 +12449,7 @@ nl:
   failed_to_create_domain_lookup_4d40fa17: "Maken van zoekopdracht voor domein mislukt"
   failed_to_create_internal_setting_f60fb462: "Kan interne instelling niet maken"
   failed_to_create_new_role_e336e461: "Nieuwe rol maken mislukt"
+  failed_to_create_temporary_enrollment_please_try_a_ad6fefb0: "Kan geen tijdelijke inschrijving maken. Probeer het nogmaals."
   failed_to_create_webhook_b766cf5c: "Kon geen webhook maken."
   failed_to_create_zip_file_1a943d06: "Kon geen zip bestand creëren "
   failed_to_delete_auth_tokens_on_canvas_side_1d871f46: "Verwijderen van verificatietokens aan Canvas-zijde mislukt"
@@ -12817,6 +12837,7 @@ nl:
     titles: 
       bookmark_search: "Zoekopdracht aan bladwijzer: %{service_name}"
   find_8d605019: Zoeken
+  find_a_recipient_of_temporary_enrollments_from_nam_3451f654: "Zoek een ontvanger van tijdelijke inschrijvingen van %{name}"
   find_an_assignee_of_temporary_enrollments_from_nam_ba08bb2b: "Zoek een ontvanger van tijdelijke inschrijvingen van %{name}"
   find_an_existing_grading_scheme_d836ea: "Bestaand beoordelingsschema zoeken"
   find_an_outcome_919328e6: "Een leerdoel zoeken"
@@ -13450,6 +13471,7 @@ nl:
   gradebook_history_b03f8524: "Geschiedenis van de cijferlijst..."
   gradebook_import_reserved_names_bugfix_apg_122_32a77a18: "Bugfix voor gererserveerde namen Cijferlijst importeren (APG-122)"
   gradebook_individual_view_8846598e: "Cijferlijst: Individuele weergave"
+  gradebook_menu_dropdown_3692d623: "Vervolgkeuzelijst menu Cijferlijst"
   gradebook_performance_764d8b3d: "Cijferlijst prestaties"
   gradebook_settings_b45c6df9: "Instellingen cijferlijst"
   gradebook_settings_updated_fef63d60: "Instellingen cijferlijst bijgewerkt"
@@ -14776,6 +14798,7 @@ nl:
   hiding_grades_is_not_allowed_because_grades_have_n_55e83813: "Het verbergen van cijfers is niet toegestaan omdat de cijfers niet zijn vrijgegeven voor deze opdracht."
   hiding_grades_will_refresh_your_browser_this_may_t_65085e24: "Door de cijfers te verbergen wordt je browser vernieuwd. Dit kan enkele momenten duren."
   high_b5cbd048: Hoog
+  high_cacb3ff9: "Hoog:"
   high_contrast_course_colors_5750fb5: "Cursuskleuren met hoog contrast"
   high_contrast_course_colors_description: |-
       Cursuskleuren met hoog contrast maakt door systeem geleverde kleuren en kleurenkiezer-cursuskleuren
@@ -15984,6 +16007,8 @@ nl:
   jwk_method_6d5d0c84: "* JWK-methode"
   jwts_4f397c85: JWT's
   k12_description: "Werk de pictogrammen in het menu Globale navigatie bij zodat ze beter aansluiten bij een omgeving voor basisonderwijs."
+  k20_beta_538e64fb: "K20 - Beta"
+  k20_beta_description: "Hiermee worden de K20 Beta-functies ingeschakeld in Admin Analytics APP."
   k20_course_readiness_alpha_testing_description: "Deze vlag is voor onderwijsinstellingen die deelnemen aan Advanced Analytics Alpha-tests. Deze vlag schakelt het dashboard Cursusgereedheid voor deze onderwijsinstellingen in."
   k20_course_readiness_alpha_testing_f45597b6: "K20 - Alfatest Cursusgereedheid"
   k20_course_readiness_description: "Hiermee wordt het nieuwe Dashboard van Admin Analytics - Cursusgereedheid ingeschakeld."
@@ -16642,12 +16667,13 @@ nl:
           verify: Verifiëren
         details: 
           mfa_enrollment: |-
-              Multi-Factor-verificatie verbetert de beveiliging omdat je niet alleen je wachtwoord moet kennen, maar ook iets fysieks in
-              je bezit moet hebben om je te kunnen aanmelden bij Canvas. Dat kan een apparaat zijn dat verificatiecodes genereert of een
-              telefoon die SMS-berichten kan ontvangen. De Google Authenticator-app voor iPhone of Android
-              kan worden geconfigureerd door de QR-code hieronder te scannen. Andere tokens kunnen worden geconfigureerd door de geheime sleutel
-              **%{secret_key}** in te voeren. Nadat je Multi-Factor-verificatie hebt geconfigureerd, is het raadzaam naar je profielpagina
-              te gaan en daar een reeks back-upcodes af te drukken voor het geval je normale multi-factor-apparaat niet beschikbaar is.
+              Multi-Factor-verificatie (MFA) verbetert de beveiliging omdat je niet alleen je wachtwoord moet kennen, maar ook iets fysieks
+              in je bezit moet hebben om je te kunnen aanmelden bij Canvas. Dat kan een apparaat zijn dat verificatiecodes genereert
+              of een telefoon die SMS-berichten kan ontvangen. MFA kan worden geconfigureerd door de QR-code hieronder te scannen met
+              behulp van een authenticator-app voor een op tijd gebaseerd eenmalig wachtwoord op iPhone of Android (bijv.: Google Authenticator,
+              Microsoft Authenticator, Authy). Andere tokens kunnen worden geconfigureerd door de geheime sleutel **%{secret_key}**in te voeren.
+              Nadat je Multi-Factor-verificatie hebt geconfigureerd, is het raadzaam naar je profielpagina te gaan en daar een reeks back-upcodes
+              af te drukken voor het geval je normale multi-factor-apparaat niet beschikbaar is.
           mfa_required: "Je bent verplicht om de Multi-Factor-verificatie in te stellen."
           otp_impaired: "We hebben momenteel een probleem met onze sms-provider. We werken aan een oplossing. Als je vertraging ondervindt bij het ontvangen van je sms-code, controleer dan je e-mail."
           otp_on_device: "Voer de verificatiecode in zoals door je token getoond wordt."
@@ -16680,6 +16706,7 @@ nl:
   login_footer_link_badb3898: "Aanmelding voettekstkoppeling"
   login_footer_link_hover_1b474e6c: "Aanmelding voettekstlink aanwijzen"
   login_handle_is_required_90ab7fe0: "%{login_handle} is vereist"
+  login_has_been_denied_for_security_reasons_please__66869692: "De aanmelding is om veiligheidsredenen geweigerd. Probeer het later opnieuw of neem contact op met je systeembeheerder."
   login_id_12109693: Aanmeldings-ID
   login_id_bc943b97: Inlog-ID
   login_ids_required_ff2273ab: Inlog-ID's(vereist)
@@ -16707,11 +16734,13 @@ nl:
   looks_like_there_isn_t_anything_here_77a5e716: "Het lijkt erop dat er hier niets is"
   los_gatos_saratoga_joint_union_high_school_distric_91f5b3c6: "Cijferrapport voor Los Gatos-Saratoga Joint Union High School District"
   low_eab1cadd: Laag
+  low_f1831924: "Laag:"
   low_score_4eeb95b2: "Laag: %{score}"
   low_score_6d05905b: "Laagste score"
   lower_bound_ed528347: Onderlimiet
   lower_bound_to_upper_bound_48d093c2: "%{lower_bound} tot %{upper_bound}"
   lower_limit_of_range_6ddd4983: "Ondergrens van bereik"
+  lower_quartile_c7fceee8: "Onderste kwartiel:"
   lowerbound_to_upperbound_352a3c0b: "%{lowerBound}+ naar %{upperBound}"
   lowest_possible_grade_ae5510be: "Laagst mogelijke cijfer"
   lowest_possible_grade_must_be_between_0_and_100_51256ea5: "Laagst mogelijke beoordeling moet tussen 0 en 100 liggen"
@@ -16958,6 +16987,8 @@ nl:
   maximum_number_of_communication_channels_reached_70c4d2f9: "Maximumaantal communicatiekanalen bereikt"
   may_9248a063: Mei
   may_have_one_featured_link_and_one_new_link_at_a_t_21106efe: "(Kan één Aanbevolen-link en één Nieuwe link tegelijk hebben)"
+  mean_1a2ad405: "Gemiddelde:"
+  mean_mean_high_high_low_low_8ce76ca1: "Gemiddelde: %{mean}, Hoog: %{high}, Laag: %{low}"
   media_af190855: Media
   media_comment_content_5c2341fb: "Inhoud van opmerkingen bij media"
   media_comment_dialog_manager: 
@@ -17044,6 +17075,7 @@ nl:
   media_recording_submissions_require_a_media_id_to__ff740090: "Voor %{media_recording} inleveringen is een %{media_id} vereist om in te leveren"
   media_recordings_749aef6d: Mediaopnames
   media_submission_464829f0: Media-inzending
+  median_9b4a2bd8: "Mediaan:"
   median_ed291842: Mediaan
   median_median_high_high_low_low_f356c5f1: "Mediaan %{median}, hoog %{high}, laag %{low}"
   median_score_4657e907: "Mediaan: %{score}"
@@ -19183,11 +19215,14 @@ nl:
   module_menu_modal_6b20c03: "Modulemenu (modaal)"
   module_module_name_was_successfully_deleted_fc9e9d47: "Module %{module_name} succesvol verwijderd."
   module_name_1127ebdb: "Naam van module"
+  module_name_is_required_de75de0a: "Modulenaam is vereist."
   module_navigation_97043417: Modulenavigatie
   module_publish_menu_30b638dd: "Menu Module publiceren"
   module_publish_menu_88b54c1b: "Menu Module publiceren"
   module_published_80f0b9b8: "Module gepubliceerd"
   modulename_module_publish_options_69ef1ece: "%{moduleName} Opties voor publiceren van modules"
+  modulename_module_publish_options_publishedstatus_94ea7f49: "Opties van %{moduleName}-module voor publiceren: %{publishedStatus}"
+  modulename_settings_updated_successfully_a09bfef6: "Instellingen van %{moduleName} bijgewerkt."
   modules: 
     add: 
       assignment: 
@@ -19589,6 +19624,7 @@ nl:
   name_override_score_7f6a5216: "%{name} overschrijvingsscore"
   name_parent_directory_b61d10a9: ", naam: bovenliggende map "
   name_quiz_15f55961: "%{name} (toets)"
+  name_toggle_module_visibility_f948faf8: "Zichtbaarheid van %{name} in-/uitschakelen"
   name_unposted_current_grade_824d0c98: "%{name} niet-gepost huidig cijfer"
   name_unposted_current_score_e98e95fd: "%{name} niet-gepubliceerde huidige score"
   name_unposted_final_grade_798491b7: "%{name} niet-gepost eindcijfer"
@@ -20638,6 +20674,7 @@ nl:
   option_selected_49a37af2: "{option} geselecteerd"
   option_selected_737b6f72: "Geselecteerde optie:"
   option_selected_list_collapsed_70a356b4: "%{option} geselecteerd. Lijst samengevouwen."
+  option_selected_text_list_collapsed_9874e7cb: "Geselecteerde optie: %{text}. Lijst samengevouwen."
   optional_add_course_ef0d70fc: "Optioneel: Cursus toevoegen"
   optional_filters_9dc03f5e: "Optionele filters"
   optionally_include_a_byte_order_mark_in_compatible_f3d0d243: "Je kunt desgewenst een byte-order mark opnemen in compatibele spreadsheetexports zodat deze voor gebruikers in sommige landen kunnen worden geïmporteerd in Excel."
@@ -20959,6 +20996,7 @@ nl:
   page_comments: 
     errors: 
       create_failed: "Het maken van samenwerking mislukt"
+  page_itemtitle_9396198f: "Pagina: %{itemTitle}"
   page_menu_2f8bee0: "Menu Pagina"
   page_name_21defa75: Paginanaam
   page_name_is_required_d8c2736e: "Paginanaam is vereist"
@@ -21105,6 +21143,7 @@ nl:
   peer_review_for_itemtitle_91198440: "Peerbeoordeling voor %{itemTitle}"
   peer_review_for_name_bcffa32f: "Peerbeoordeling voor %{name}"
   peer_review_for_name_due_dueattext_f5f6547d: "Peerbeoordeling voor %{name} in te leveren: %{dueAtText}"
+  peer_review_itemtitle_112ccc67: "Peerbeoordeling: %{itemTitle}"
   peer_review_not_yet_submitted_2ab13b19: "Peerbeoordeling nog niet ingeleverd"
   peer_review_prompt_571c5d22: "Prompt voor peer review"
   peer_review_support_in_assignment_enhancements_b1df2b76: "Ondersteuning voor peerbeoordeling in Opdrachtverbeteringen"
@@ -21275,8 +21314,10 @@ nl:
   please_select_a_group_set_for_this_assignment_e1da63d3: "Selecteer een groep voor deze opdracht"
   please_select_a_reason_for_reporting_this_reply_51719e8d: "Selecteer een reden voor het rapporteren van dit antwoord"
   please_select_a_recipient_c9273f8e: "Selecteer een ontvanger."
+  please_select_a_role_before_submitting_7f6cc61a: "Selecteer een rol alvorens de peerbeoordeling te verzenden"
   please_select_a_user_role_for_this_link_9fb4e655: "Selecteer een gebruikersrol voor deze koppeling."
   please_select_an_item_30c287ef: "Selecteer een item"
+  please_select_at_least_one_enrollment_before_submi_56b92b37: "Selecteer ten minste één inschrijving alvorens de peerbeoordeling te verzenden"
   please_select_at_least_one_filter_aafaa1a7: "Selecteer minimaal één filter."
   please_select_one_f931e883: "Maak een keuze"
   please_select_the_level_of_privacy_desired_for_sup_7744af5: "Selecteer het gewenste privacyniveau voor toegang tot Ondersteuning"
@@ -21887,12 +21928,14 @@ nl:
   prefetch_user_ids_in_gradebook_b96521b0: "Gebruikers-ID’s sneller laden in de Cijferlijst"
   prerequisite_completion_period_c562d63: "Periode voor voltooiing voorwaarde"
   prerequisites_49659f16: "Eerste vereisten"
+  prerequisites_98b324e0: Vereisten
   prerequisites_list_62d66d12: "Eerste vereisten %{list}"
   prerequisites_lookup: 
     headers: 
       completion_prerequisites: "Voorwaarden voor voltooiing"
     labels: 
       requirements_must_be_completed: "De volgende voorwaarden moeten voldaan zijn, voordat deze pagina ontgrendeld zal worden"
+  prerequisites_names_e4fffb88: "Vereisten: %{names}"
   presentation_2d9387ca: Presentatie
   presents_the_quiz_setting_to_avoid_automatic_submi_363b91ff: "Toont de toetsinstelling om automatische inlevering van een tijdgebonden toets te voorkomen wanneer de beschikbare tijd is verstreken."
   press_alt_f8_to_see_a_list_of_keyboard_shortcuts_2a8c7bc0: "Druk op ALT + F8 om een lijst van toetsenbordsneltoetsen te zien"
@@ -22332,6 +22375,7 @@ nl:
       dat ze de reactie van de discoveryservice kunnen volgen.
   provide_tutorial_information_for_instructors_new_t_163c8ed4: "Geef informatie over het leerprogramma aan cursusleiders die nieuw zijn bij Canvas."
   provide_tutorial_information_for_new_users_in_a_fl_c23462ac: "Verstrek informatie over zelfstudie voor nieuwe gebruikers in een uitklapmenu."
+  provider_35796463: "| %{provider}"
   provider_attribute_b1cad655: "Provider kenmerk"
   provider_enforces_mfa_when_logging_in_through_this_54adcd1d: "Provider vereist Multi-Factor-verificatie (MFA) *Wanneer je inlogt via deze provider, slaat Canvas het gebruik van MFA expliciet over. Deze optie moet alleen worden gebruikt als de provider MFA al heeft gegarandeerd voorafgaand aan eenmalige aanmelding (SSO) voor Canvas.*"
   provider_icon_5064fa6e: "Provider pictogram"
@@ -22628,6 +22672,7 @@ nl:
   quiz_failed_to_update_2b66fa4d: "Bijwerken van toets mislukt"
   quiz_ip_address_filters_49a75ec8: Toets-IP-adresfilters
   quiz_ip_filters_685f7f63: Toets-IP-filters
+  quiz_itemtitle_28f5bba5: "Toets: %{itemTitle}"
   quiz_log_auditing: 
     buttons: 
       reload_events: "Opnieuw laden"
@@ -24273,6 +24318,7 @@ nl:
   relinking_paces_fb1a0047: "Tempo's opnieuw linken..."
   relinking_plans_a0d5f19d: "Plannen opnieuw linken..."
   reload_the_page_or_navigate_to_a_new_page_for_this_e6335972: "Laad de pagina opnieuw of ga naar een andere pagina om deze wijziging door te voeren."
+  remediation_feccc1fd: Herstel
   remember_course_navigation_collapsed_state_60fe6c95: "Onthoud samenvouwen toestand voor Cursusnavigatie"
   remember_my_choice_for_this_course_5a3b7206: "Onthoud mijn keuze voor deze cursus"
   remember_whether_module_links_load_in_new_tab_91fccb4f: "Onthoud of modulelinks wel of niet in nieuw tabblad worden geladen"
@@ -24346,6 +24392,7 @@ nl:
   remove_pace_97381e05: "Cursustempo verwijderen"
   remove_placement_90862c13: "Verwijder %{placement}"
   remove_points_from_rubric_dcd4b585: "Punten uit rubriek verwijderen"
+  remove_prerequisite_13ab96eb: "Vereisten verwijderen"
   remove_pronouns_5ff760ff: "Voornaamwoorden verwijderen"
   remove_pronouns_pronoun_c8b03d78: "Voornaamwoorden %{pronoun} verwijderen"
   remove_recipient_name_a6b83cef: "Verwijder geadresseerde %{name}"
@@ -24692,6 +24739,9 @@ nl:
       send_messages: "Berichten naar individuele cursisten sturen"
       send_messages_all: "Berichten naar de volledige klas sturen"
       suspend_accounts: "Accounts tijdelijk blokkeren"
+      temporary_enrollments_add: "Tijdelijke inschrijvingen toevoegen"
+      temporary_enrollments_delete: "Tijdelijke inschrijvingen verwijderen"
+      temporary_enrollments_edit: "Tijdelijke inschrijvingen bewerken"
       undelete_courses: "Verwijderen van cursussen ongedaan maken"
       view_all_grades: "Alle cijfers weergeven"
       view_analytics: "Analyse - pagina's weergeven"
@@ -24963,6 +25013,8 @@ nl:
   scope_to_a_specific_course_deb646df: "Bereik voor een specifieke cursus"
   score_68107950: "%{score}%"
   score_change_notifications_6b94f27f: "Meldingen over score-wijziging"
+  score_details_2995369: "Details van de score"
+  score_distribution_graph_title_45e8fe7e: "Grafiek met cijferverdeling - %{title}"
   score_does_not_include_groups_because_they_have_no_80d12f42: 
     one: "Score bevat geen %{groups} omdat er geen 'maximaal aantal' punten zijn ingesteld"
     other: "Scores bevatten geen %{groups} omdat er geen 'maximaal aantal' punten zijn ingesteld"
@@ -25331,6 +25383,7 @@ nl:
   select_a_student_to_view_281d17b9: "Selecteer een cursist om te bekijken"
   select_a_student_to_view_additional_information_he_c371e40c: "Een student selecteren om hier extra informatie weer te geven."
   select_a_student_to_view_the_page_will_refresh_aut_eaa5d00c: "Selecteer een cursist om te bekijken. Deze pagina wordt automatisch vernieuwd."
+  select_access_type_e5955544: "Toegangstype selecteren"
   select_all_assignments_bd07b919: "Alle opdrachten selecteren"
   select_all_count_9ad54aa1: "Alle selecteren (%{count})"
   select_all_count_courses_4fc63811: 
@@ -25394,6 +25447,7 @@ nl:
   select_itemname_f70db487: "Selecteren van %{itemName}"
   select_language_7c93a900: "Taal selecteren"
   select_message_type_806b2dea: "Berichttype selecteren"
+  select_module_4642d8e6: "Module selecteren"
   select_module_item_to_place_item_before_or_after_84bc26c5: "Module-item selecteren om item te plaatsen voor of na"
   select_module_to_move_before_or_after_c28e8f46: "Module selecteren om te plaatsen voor of na"
   select_module_to_move_item_into_89fb2ac7: "Module selecteren om item te plaatsen in"
@@ -25406,8 +25460,10 @@ nl:
   select_outcome_title_b99b3ca0: "Leerdoel %{title} selecteren"
   select_page_e93fc123: "Selecteer pagina"
   select_placements_type_or_use_arrow_keys_to_naviga_a6bfd561: "Selecteer plaatsingen. Typ of gebruik de pijltoetsen om te navigeren. Meerdere selecties zijn toegestaan."
+  select_prerequisite_3b049b02: "Vereiste selecteren"
   select_prerequisite_module_57894963: "Vereiste module selecteren"
   select_prerequite_module_e9042bb0: "Vereiste module selecteren"
+  select_role_aa5cfd69: "Rol selecteren"
   select_rubric_2aa2ffa2: "Rubriek selecteren"
   select_sections_to_post_to_type_or_use_arrow_keys__902a41ed: "Secties selecteren waarnaar moet worden gepost. Typ of gebruik de pijltoetsen om te navigeren. Meerdere selecties zijn toegestaan."
   select_student_group_c0be9f3e: "Cursistengroep selecteren"
@@ -26520,6 +26576,8 @@ nl:
   show_only_disabled_calendars_cb8e2bdc: "Alleen uitgeschakelde kalenders tonen"
   show_only_enabled_calendars_8caef0df: "Alleen ingeschakelde kalenders tonen"
   show_only_public_courses_517ad255: "Alleen openbare cursussen weergeven"
+  show_only_temporary_enrollment_providers_f25e70b9: "Alleen aanbieders van tijdelijke inschrijvingen weergeven"
+  show_only_temporary_enrollment_recipients_620b3174: "Alleen ontvangers van tijdelijke inschrijvingen weergeven"
   show_originality_report_to_students_be22f5ee: "Originaliteitrapport weergeven aan cursisten"
   show_outcomes_statistics_3c2b34eb: "Leerdoelstatistieken weergeven"
   show_params_3401895b: "Parameters tonen"
@@ -26711,6 +26769,7 @@ nl:
     threshold_24h: 24u
     threshold_36h: 36u
   smart_assignment_alerts_abc2224: "Slimme waarschuwingen voor opdrachten"
+  smart_search_fd7cd4: "Slimme zoekfunctie"
   smartbanner: 
     android_banner_author: "Instructure Inc."
     android_banner_in_google_play: "In Google Play"
@@ -26948,6 +27007,7 @@ nl:
   start_a_new_subject_7271b3ec: "Een nieuw vak starten"
   start_assignment_d56256d3: "Opdracht starten"
   start_at_c7a5789: "Beginnen op: "
+  start_at_end_at_b375cbe7: "| %{start_at} - %{end_at}"
   start_auto_refresh_e2feafb2: "Start automatisch vernieuwen"
   start_date_c41cb23a: "Begindatum:"
   start_date_e937be8a: Startdatum
@@ -27092,7 +27152,9 @@ nl:
   student_first_name_aaa42cbc: "Voornaam van cursist"
   student_first_name_options_82f5685f: "Opties voor voornaam cursist"
   student_grade_4122806e: Studentcijfer
+  student_grade_pass_fail_grade_options_742e29c6: "Studentcijfer Cijferopties voor Voldoende/Onvoldoende"
   student_grade_summary_d7a5cac0: "Cijferoverzicht student"
+  student_grade_text_input_3225c78b: "Studentcijfer Tekstinvoer"
   student_grades_4cbc59a1: "Cijfers cursist"
   student_group_75b86a9f: Cursistengroep
   student_group_filter_185fb085: "Filter cursistengroepen"
@@ -27918,6 +27980,7 @@ nl:
   the_account_uuid_of_the_account_to_which_the_repor_dd3fcd79: "De account-UUID van het account waar de rapporterende gebruiker bijhoort"
   the_account_wide_sync_settings_were_changed_while__90c48497: "De synchronisatie-instellingen voor het hele account zijn tijdens het synchroniseren veranderd. Probeer opnieuw te synchroniseren."
   the_active_directory_attribute_that_will_be_used_t_96f5824e: "Het Active Directory-kenmerk dat wordt gebruikt om een Canvas-gebruiker aan een Microsoft-gebruiker te koppelen"
+  the_admin_analytics_feature_must_be_enabled_in_acc_fb6d03c5: "De functieoptie Admin Analytics moet zijn ingeschakeld in Accountinstellingen om Admin Analytics-dashboards te kunnen weergeven."
   the_algorithm_to_use_for_signing_authnrequest_logo_67a75cc9: "Het algoritme voor het ondertekenen van AuthnRequest, LogoutRequest en LogoutResponse-berichten verzonden naar de IdP."
   the_analytics_feature_must_be_enabled_in_account_s_37b80011: |-
       Analytics moet zijn ingeschakeld in Accountinstellingen om Analytics-pagina's te kunnen weergeven.
@@ -28259,6 +28322,7 @@ nl:
   the_unique_id_used_for_representing_the_specific_r_3bdf5870: "De unieke ID die gebruikt wordt voor het weergeven van de specifieke vraag/antwoord-cyclus waar dit foutenrapport op gebaseerd is"
   the_url_a_sufficiently_priviledged_user_could_use__e6b02c56: "De URL die een voldoende bevoorrechte gebruiker zou kunnen gebruiken om zich voor te doen als de rapporterende gebruiker op dezelfde pagina om te proberen het probleem te reproduceren"
   the_url_of_the_page_the_user_was_on_when_they_repo_11dfa92f: "De URL van de pagina waar de gebruiker op was toen hij de fout meldde"
+  the_user_below_is_ready_to_be_assigned_temporary_e_fd6bb909: "Aan de onderstaande gebruiker kunnen nu tijdelijke inschrijvingen worden toegewezen."
   the_user_found_matches_the_source_user_please_sear_a1d0004f: "De gevonden gebruiker komt overeen met de opgegeven gebruiker. Zoek een andere gebruiker."
   the_user_id_s_of_the_admin_s_making_submissions_5432b2ce: "De user_id(s) van de beheerder(s) die inleveringen doet"
   the_user_id_to_report_on_b1de2577: "De gebruikers-ID voor rapportage"
@@ -28414,6 +28478,7 @@ nl:
   there_was_an_error_while_loading_the_default_gradi_bb879ed1: "Er is een fout opgetreden bij het laden van het standaard beoordelingsschema"
   there_was_an_error_while_refreshing_grading_scheme_ab1136b9: "Er is een fout opgetreden bij het vernieuwen van beoordelingsschema's"
   there_was_an_error_while_removing_the_grading_sche_2a481e33: "Er is een fout opgetreden bij het verwijderen van het beoordelingsschema"
+  there_was_an_error_while_requesting_user_enrollmen_10634f3c: "Er is een fout opgetreden bij het opvragen van gebruikersinschrijvingen. Probeer het opnieuw."
   there_was_an_error_while_saving_the_grading_scheme_b6c1eb7: "Er is een fout opgetreden bij het opslaan van het beoordelingsschema"
   there_was_an_error_while_saving_your_changes_5fa5eb65: "Er is een fout opgetreden bij het opslaan van je wijzigingen"
   there_was_an_error_while_updating_the_grading_sche_99608d3a: "Er is een fout opgetreden bij het bijwerken van het beoordelingsschema"
@@ -28698,6 +28763,7 @@ nl:
       \x20     presteren."
   this_module_is_locked_until_completing_all_of_the__ddf06070: "Deze module is vergrendeld tot alle vereisten voor de volgende modules voltooid zijn: %{prerequisites}"
   this_module_is_locked_until_datetime_b2486751: "Deze module is vergrendeld tot %{datetime}"
+  this_module_will_be_visible_to_everyone_adf05126: "Deze module is zichtbaar voor iedereen."
   this_most_likely_happened_because_you_imported_cou_a78ea880: "Dit gebeurde zeer waarschijnlijk omdat je de inhoud van de cursus zonder gekoppelde bestanden hebt geïmporteerd."
   this_name_appears_in_sorted_lists_dccbd84b: "Deze naam wordt weergegeven in gesorteerde lijsten."
   this_name_will_be_used_by_teachers_for_grading_9b6aa8a0: "Docenten gebruiken deze naam bij een beoordeling."
@@ -29318,6 +29384,7 @@ nl:
   to_do_date_descending_25b2141d: "Datum to-do: Aflopend"
   to_do_item_d76ecb78: To-do-item
   to_do_items_loading_d1cdfcd5: "To-do-items laden"
+  to_do_itemtitle_5ab47e98: "To-do: %{itemTitle}"
   to_do_list_dashboard_d741f64e: "To-Do lijst in het dashboard"
   to_do_time_a7e17623: "Tijd to-do"
   to_edit_a_discussion_discussions_moderate_must_als_bd4c60f7: "Om een discussie te bewerken, moet Discussies - modereren ook zijn ingeschakeld."
@@ -30026,6 +30093,7 @@ nl:
   underline_links_e7cf9b4f: "Links onderstrepen"
   undo_a7be8fef: "Ongedaan maken"
   undo_remove_course_association_name_68eb4037: "Verwijderen van cursuskoppeling ongedaan maken %{name}"
+  unenroll_943490fb: Uitschrijven
   unenrolled_bc89d5e3: Uitgeschreven
   unenrolled_users_e7632d24: "Uitgeschreven gebruikers"
   unexpected_error_while_performing_export_1e6b4207: "Onverwachte fout tijdens uitvoeren van export"
@@ -30301,6 +30369,7 @@ nl:
   uploading_submission_4c8d944b: "Bezig met uploaden van inzending"
   upper_limit_of_range_c454a8f2: "Bovengrens van het bereik"
   upper_lower_56cad16c: "%{upper} - %{lower}"
+  upper_quartile_b8b9e80a: "Bovenste kwartiel:"
   upper_to_lower_168f5fe7: "%{upper} naar %{lower}"
   uri_redirect_uri_d4aad2b9: "URI: %{redirect_uri}"
   url_22a5f3b8: URL
@@ -31570,6 +31639,8 @@ nl:
   you_are_here_54075d8c: "Je bent hier:"
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "Je bent aangemeld bij %{institution1} met jouw referenties van %{institution2}"
   you_are_logged_out_of_canvas_8b5fc59a: "Je bent afgemeld bij Canvas."
+  you_are_not_able_to_create_an_anonymous_discussion_1d06f9a7: "Je kunt geen anonieme discussie maken in een groep"
+  you_are_not_able_to_create_an_anonymous_discussion_d2e8f591: "Je kunt geen anonieme discussie maken"
   you_are_not_allowed_to_create_an_anonymous_graded__3eeb1382: "Je hebt geen toestemming om een anoniem beoordeelde discussie te maken"
   you_are_not_authorized_to_disable_the_sync_to_name_d283c3e0: "Je bent niet bevoegd om de optie Synchroniseren naar %{name} uit te schakelen."
   you_are_not_authorized_to_disable_the_sync_to_sisn_54aebeb0: "Je bent niet bevoegd om de optie Synchroniseren naar %{sisName} uit te schakelen."
@@ -31719,6 +31790,7 @@ nl:
   you_have_reached_the_limit_of_len_characters_in_th_babea8fe: "Je hebt de limiet van %{len} tekens in het meldingsbericht bereikt."
   you_have_reached_the_maximum_webhooks_per_account__ae9a7f83: "Jij hebt het maximum aantal webhooks per accountlimiet (%{max}) bereikt "
   you_have_reached_the_maximum_webhooks_per_user_lim_2af4b256: "Jij hebt het maximum aantal webhooks per gebruikerslimiet (%{max}) bereikt "
+  you_have_recently_logged_in_multiple_times_too_qui_f3b876a1: "Je hebt je onlangs meerdere malen te snel aangemeld. Wacht een paar seconden en probeer het opnieuw."
   you_have_reported_this_reply_4b21b6ce: "Je hebt dit antwoord gerapporteerd."
   you_have_submitted_the_assignment_7ef8a51a: "Je  hebt de opdracht ingeleverd"
   you_have_successfully_marked_all_as_read_f246ef1a: "Je hebt alles als gelezen gemarkeerd."
