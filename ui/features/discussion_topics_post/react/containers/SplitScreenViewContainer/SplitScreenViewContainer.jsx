@@ -46,7 +46,7 @@ import {SplitScreenThreadsContainer} from '../SplitScreenThreadsContainer/SplitS
 import {SplitScreenParent} from './SplitScreenParent'
 import LoadingIndicator from '@canvas/loading-indicator'
 import PropTypes from 'prop-types'
-import React, {useCallback, useContext, useEffect, useMemo, useState} from 'react'
+import React, {useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react'
 import {useMutation, useQuery} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 import * as ReactDOMServer from 'react-dom/server'
@@ -60,6 +60,7 @@ export const SplitScreenViewContainer = props => {
   const [fetchingMoreOlderReplies, setFetchingMoreOlderReplies] = useState(false)
   const [fetchingMoreNewerReplies, setFetchingMoreNewerReplies] = useState(false)
   const [draftSaved, setDraftSaved] = useState(true)
+  const closeButtonRef = useRef()
 
   const updateCache = (cache, result) => {
     const newDiscussionEntry = result.data.createDiscussionEntry.discussionEntry
@@ -430,6 +431,10 @@ export const SplitScreenViewContainer = props => {
     if (!props.RCEOpen) setReplyFromId(null)
   }, [props.RCEOpen, setReplyFromId])
 
+  useEffect(() => {
+    closeButtonRef?.current?.focus()
+  }, [props.discussionEntryId])
+
   const renderSplitScreenView = () => {
     return (
       <>
@@ -561,6 +566,9 @@ export const SplitScreenViewContainer = props => {
               if (props.onClose) {
                 props.onClose()
               }
+            }}
+            elementRef={el => {
+              closeButtonRef.current = el
             }}
           />
         </Flex.Item>
