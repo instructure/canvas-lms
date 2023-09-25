@@ -38,7 +38,7 @@ ready(() => {
   //  `http://canvas.example.com/media_attachments_iframe/12345678
   let media_id = window.location.pathname.split('media_objects_iframe/').pop()
   // This covers a timing issue between canvas/RCE when the media_links_use_attachment flag is flipped off
-  if (media_id.includes('media_attachments_iframe') && ENV?.media_object.media_id) 
+  if (media_id?.includes('media_attachments_iframe') && ENV?.media_object?.media_id) 
   {
     media_id = ENV.media_object.media_id
   }
