@@ -22,6 +22,7 @@ import ready from '@instructure/ready'
 import {BrowserRouter, Routes, Route} from 'react-router-dom'
 import GroupNavigationSelectorRoute from '@canvas/group-navigation-selector/GroupNavigationSelectorRoute'
 import ActAsModalRoute from '../../features/act_as_modal/react/ActAsModalRoute'
+import NavigationHeaderRoute from '../../features/navigation_header/react/NavigationHeaderRoute'
 
 const App = () => {
   return (
@@ -29,6 +30,10 @@ const App = () => {
       <Routes>
         <Route path="/groups/:groupId/*" element={<GroupNavigationSelectorRoute />} />
         <Route path="/users/:userId/masquerade" element={<ActAsModalRoute />} />
+
+        {(window.ENV.FEATURES.instui_nav || localStorage.instui_nav_dev) && (
+          <Route path="/accounts/:accountId/*" element={<NavigationHeaderRoute />} />
+        )}
       </Routes>
     </BrowserRouter>
   )

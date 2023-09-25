@@ -178,6 +178,7 @@ export type SiteAdminFeatureId =
   | 'account_level_blackout_dates'
   | 'account_calendar_events'
   | 'rce_ux_improvements'
+  | 'instui_nav'
   | 'render_both_to_do_lists'
   | 'course_paces_redesign'
   | 'course_paces_for_students'

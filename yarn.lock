@@ -2289,20 +2289,20 @@
     "@babel/runtime" "^7.9.2"
     axe-core "^3.3.2"
 
-"@instructure/ui-badge@^7":
-  version "7.14.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-badge/-/ui-badge-7.14.0.tgz#d1e6e308fc2bcfc97b3c8434dd3ff03dd30ca89c"
-  integrity sha512-sgc/6KDCwCDR0BTJisUDn4I9ICE5Vrjkd2+Jq2keudr5yn+1ic2g6sGvUvxb7ObeMzz/WK6q944A6npf7nDJ1A==
+"@instructure/ui-badge@^7", "@instructure/ui-badge@^7.22.1":
+  version "7.22.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-badge/-/ui-badge-7.22.1.tgz#05c4bd1d480fdbb8397bae1084100e2de81c3a8e"
+  integrity sha512-8nOkqnlVPBAAC22wH7Ut5/ODUGQUUtP4FZjLW7CADCozNn9CVl7vMNybELnPLJA0MZpy6VgS0AqHKDMCjChUCw==
   dependencies:
     "@babel/runtime" "^7.9.2"
-    "@instructure/console" "^7.14.0"
-    "@instructure/ui-color-utils" "^7.14.0"
-    "@instructure/ui-position" "^7.14.0"
-    "@instructure/ui-react-utils" "^7.14.0"
-    "@instructure/ui-testable" "^7.14.0"
-    "@instructure/ui-themeable" "^7.14.0"
-    "@instructure/ui-view" "^7.14.0"
-    "@instructure/uid" "^7.14.0"
+    "@instructure/console" "^7.22.1"
+    "@instructure/ui-color-utils" "^7.22.1"
+    "@instructure/ui-position" "^7.22.1"
+    "@instructure/ui-react-utils" "^7.22.1"
+    "@instructure/ui-testable" "^7.22.1"
+    "@instructure/ui-themeable" "^7.22.1"
+    "@instructure/ui-view" "^7.22.1"
+    "@instructure/uid" "^7.22.1"
     classnames "^2"
     prop-types "^15"
 
@@ -3143,24 +3143,24 @@
     keycode "^2"
     prop-types "^15"
 
-"@instructure/ui-menu@^7", "@instructure/ui-menu@^7.14.0":
-  version "7.21.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-menu/-/ui-menu-7.21.0.tgz#853a6dacf93b73ea4bf7e4293557f27b1f66f36f"
-  integrity sha512-u2fi6KU7/mtMDnFaONa8f7rVLcAV+AOvWCVn5vhZbc0oHdjUWsLJEgP02Qnc24n6qkAA6yQmpy1fn7/EWv5t8Q==
+"@instructure/ui-menu@^7", "@instructure/ui-menu@^7.14.0", "@instructure/ui-menu@^7.22.1":
+  version "7.22.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-menu/-/ui-menu-7.22.1.tgz#5208fd5b754a72a0b723020ed30b5d149736ed95"
+  integrity sha512-Hqn4uSHgMNUCJ6PWXrPoY6pGQPfihv9Tfi7j99nNNB7cUOhRgU3blXcpv3cmUTyaAYgDTSMtP9Wzjw5zzM++AQ==
   dependencies:
     "@babel/runtime" "^7.9.2"
-    "@instructure/console" "^7.21.0"
-    "@instructure/ui-a11y-utils" "^7.21.0"
-    "@instructure/ui-dom-utils" "^7.21.0"
-    "@instructure/ui-icons" "^7.21.0"
-    "@instructure/ui-popover" "^7.21.0"
-    "@instructure/ui-position" "^7.21.0"
-    "@instructure/ui-prop-types" "^7.21.0"
-    "@instructure/ui-react-utils" "^7.21.0"
-    "@instructure/ui-testable" "^7.21.0"
-    "@instructure/ui-themeable" "^7.21.0"
-    "@instructure/ui-utils" "^7.21.0"
-    "@instructure/uid" "^7.21.0"
+    "@instructure/console" "^7.22.1"
+    "@instructure/ui-a11y-utils" "^7.22.1"
+    "@instructure/ui-dom-utils" "^7.22.1"
+    "@instructure/ui-icons" "^7.22.1"
+    "@instructure/ui-popover" "^7.22.1"
+    "@instructure/ui-position" "^7.22.1"
+    "@instructure/ui-prop-types" "^7.22.1"
+    "@instructure/ui-react-utils" "^7.22.1"
+    "@instructure/ui-testable" "^7.22.1"
+    "@instructure/ui-themeable" "^7.22.1"
+    "@instructure/ui-utils" "^7.22.1"
+    "@instructure/uid" "^7.22.1"
     classnames "^2"
     keycode "^2"
     prop-types "^15"
@@ -3226,6 +3226,31 @@
     "@instructure/ui-testable" "^7.22.1"
     "@instructure/ui-themeable" "^7.22.1"
     "@instructure/ui-utils" "^7.22.1"
+    prop-types "^15"
+
+"@instructure/ui-navigation@^7":
+  version "7.22.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-navigation/-/ui-navigation-7.22.1.tgz#b0c84ef941b0e9d9e93d29728e0bce5902044b11"
+  integrity sha512-JQ/AV2PUU2ZA45dBHP/Qc09VQr9wH+Stwk6lj23wo/EfDED6rwzQCNYiKCYcZxFFi8938jWkIf0E/x2UoZ5Arw==
+  dependencies:
+    "@babel/runtime" "^7.9.2"
+    "@instructure/console" "^7.22.1"
+    "@instructure/debounce" "^7.22.1"
+    "@instructure/ui-a11y-content" "^7.22.1"
+    "@instructure/ui-a11y-utils" "^7.22.1"
+    "@instructure/ui-badge" "^7.22.1"
+    "@instructure/ui-dom-utils" "^7.22.1"
+    "@instructure/ui-focusable" "^7.22.1"
+    "@instructure/ui-icons" "^7.22.1"
+    "@instructure/ui-menu" "^7.22.1"
+    "@instructure/ui-prop-types" "^7.22.1"
+    "@instructure/ui-react-utils" "^7.22.1"
+    "@instructure/ui-testable" "^7.22.1"
+    "@instructure/ui-themeable" "^7.22.1"
+    "@instructure/ui-tooltip" "^7.22.1"
+    "@instructure/ui-utils" "^7.22.1"
+    "@instructure/ui-view" "^7.22.1"
+    classnames "^2"
     prop-types "^15"
 
 "@instructure/ui-number-input@^7":
