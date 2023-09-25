@@ -25,7 +25,8 @@ def getPinnedVersionFlag(name) {
 }
 
 def hasGemOverrides() {
-  return OVERRIDABLE_GEMS.any { gem ->
+  gems = (commitMessageFlag('canvas-lms-plugins') as String).split(' ')
+  return (gems + OVERRIDABLE_GEMS + ["qti_migration_tool"]).any { gem ->
     return getPinnedVersionFlag(gem)
   }
 }
