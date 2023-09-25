@@ -141,6 +141,8 @@ RSpec:
   Severity: error
 RSpec/AnyInstance:
   Enabled: false # while using an instance double would be preferable, it's a pain
+RSpec/FilePath:
+  Enabled: false # superceded by RSpec/SpecFilePathSuffix and RSpec/SpecFilePathFormat
 RSpec/IndexedLet:
   Enabled: false
 RSpec/InstanceVariable:
