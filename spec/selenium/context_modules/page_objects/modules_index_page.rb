@@ -60,7 +60,7 @@ module ModulesIndexPage
   end
 
   def manage_module_button(context_module)
-    f("#context_module_#{context_module.id} button[aria-label='Manage #{context_module.name}']")
+    f("#context_module_#{context_module.id} .module_header_items button[aria-label='Manage #{context_module.name}']")
   end
 
   def manage_module_item_button(module_item)
@@ -84,5 +84,13 @@ module ModulesIndexPage
     replace_content(f("##{type}s_select input.item_title"), name)
     fj(".add_item_button:visible").click
     wait_for_ajax_requests
+  end
+
+  # method to scroll to the top of the modules page, especially for the canvas for elementary pages that
+  # have a collapsing head that hides content.
+  def scroll_to_the_top_of_modules_page
+    where_to_scroll = element_exists?("#student-view-btn") ? "#student-view-btn" : "#easy_student_view"
+    scroll_to(f(where_to_scroll))
+    wait_for_ajaximations
   end
 end
