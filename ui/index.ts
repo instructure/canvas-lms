@@ -21,6 +21,7 @@
 import './boot/initializers/setWebpackCdnHost'
 import '@canvas/jquery/jquery.instructure_jquery_patches' // this needs to be before anything else that requires jQuery
 import './boot'
+import './boot/initializers/router'
 
 // true modules that we use in this file
 import $ from 'jquery'
@@ -41,7 +42,6 @@ import './boot/initializers/ajax_errors'
 import './boot/initializers/activateKeyClicks'
 import './boot/initializers/activateTooltips'
 import './boot/initializers/injectAuthTokenIntoForms'
-import './boot/initializers/router'
 
 window.canvasReadyState = 'loading'
 window.dispatchEvent(new CustomEvent('canvasReadyStateChange'))
