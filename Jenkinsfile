@@ -345,7 +345,7 @@ pipeline {
                 } else if (extendedStage.isAllowStagesFilterUsed() || extendedStage.isIgnoreStageResultsFilterUsed() || extendedStage.isSkipStagesFilterUsed()) {
                   submitGerritReview('--label Lint-Review=-2', 'One or more build flags causes a subset of the build to be run')
                 } else if (setupStage.hasGemOverrides()) {
-                  submitGerritReview('--label Lint-Review=-2', 'One or more build flags causes the build to be run against an unmerged gem version override')
+                  submitGerritReview('--label Lint-Review=-2', 'One or more build flags causes the build to be run against an unmerged gem or plugin version; if you need to coordinate merging multiple changes at once, you may want to edit the commit message to remove this flag after Jenkins has run tests')
                 } else {
                   submitGerritReview('--label Lint-Review=0')
                 }
