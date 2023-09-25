@@ -35,6 +35,13 @@ const I18n = useI18nScope('discussion_posts')
 export function PostMessage({...props}) {
   const {searchTerm} = useContext(SearchContext)
 
+  let heading = 'h2'
+
+  if (props.discussionEntry) {
+    const depth = Math.min(props.discussionEntry.depth + 2, 5)
+    heading = 'h' + depth.toString()
+  }
+
   return (
     <Responsive
       match="media"
@@ -57,7 +64,7 @@ export function PostMessage({...props}) {
         <View>
           {props.title ? (
             <View
-              as="h2"
+              as={heading}
               margin={responsiveProps.titleMargin}
               padding={props.isTopic ? 'small 0 0 0' : '0'}
             >
@@ -68,7 +75,7 @@ export function PostMessage({...props}) {
               </Text>
             </View>
           ) : (
-            <View as="h2" margin={responsiveProps.titleMargin}>
+            <View as={heading} margin={responsiveProps.titleMargin}>
               <Text size={responsiveProps.titleTextSize} weight={responsiveProps.titleTextWeight}>
                 <AccessibleContent
                   alt={I18n.t('Reply from %{author}', {
