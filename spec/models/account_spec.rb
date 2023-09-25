@@ -2496,6 +2496,8 @@ describe Account do
     it "works for root accounts" do
       Account.default.name = "Something new"
       expect(Account).to receive(:invalidate_cache).with(Account.default.id).at_least(1)
+      allow(Rails.cache).to receive(:delete)
+      expect(Rails.cache).to receive(:delete).with(["account2", Account.default.id].cache_key)
       Account.default.save!
     end
 
