@@ -94,6 +94,7 @@ export const SplitScreenParent = props => {
         delimiterKey={`reply-delimiter-${props.discussionEntry._id}`}
         onClick={() => props.setRCEOpen(true)}
         isReadOnly={props.RCEOpen}
+        replyButtonRef={props.replyButtonRef}
       />
     )
   }
@@ -240,6 +241,7 @@ export const SplitScreenParent = props => {
                             : null
                         }
                         isReported={props.discussionEntry?.entryParticipant?.reportType != null}
+                        moreOptionsButtonRef={props.moreOptionsButtonRef}
                       />
                     }
                     author={props.discussionEntry.author}
@@ -252,7 +254,12 @@ export const SplitScreenParent = props => {
                         setIsEditing(false)
                       }
                     }}
-                    onCancel={() => setIsEditing(false)}
+                    onCancel={() => {
+                      setIsEditing(false)
+                      setTimeout(() => {
+                        props.moreOptionsButtonRef?.current?.focus()
+                      }, 0)
+                    }}
                     isIsolatedView={true}
                     editor={props.discussionEntry.editor}
                     isUnread={!props.discussionEntry.entryParticipant?.read}
@@ -329,4 +336,6 @@ SplitScreenParent.propTypes = {
   isHighlighted: PropTypes.bool,
   goToTopic: PropTypes.func,
   updateDraftCache: PropTypes.func,
+  replyButtonRef: PropTypes.any,
+  moreOptionsButtonRef: PropTypes.any,
 }

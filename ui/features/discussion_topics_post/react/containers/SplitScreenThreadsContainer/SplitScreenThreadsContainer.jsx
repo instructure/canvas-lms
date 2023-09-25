@@ -143,6 +143,7 @@ export const SplitScreenThreadsContainer = props => {
           goToTopic={props.goToTopic}
           isHighlighted={entry._id === props.highlightEntryId}
           updateDraftCache={props.updateDraftCache}
+          moreOptionsButtonRef={props.moreOptionsButtonRef}
         />
       ))}
       {props.hasMoreNewerReplies && (
@@ -183,6 +184,7 @@ SplitScreenThreadsContainer.propTypes = {
   fetchingMoreOlderReplies: PropTypes.bool,
   fetchingMoreNewerReplies: PropTypes.bool,
   updateDraftCache: PropTypes.func,
+  moreOptionsButtonRef: PropTypes.any,
 }
 
 export default SplitScreenThreadsContainer
@@ -387,6 +389,7 @@ const SplitScreenThreadContainer = props => {
                             : null
                         }
                         isReported={props.discussionEntry?.entryParticipant?.reportType != null}
+                        moreOptionsButtonRef={props.moreOptionsButtonRef}
                       />
                     }
                     author={props.discussionEntry.author}
@@ -394,7 +397,12 @@ const SplitScreenThreadContainer = props => {
                     message={props.discussionEntry.message}
                     isEditing={isEditing}
                     onSave={onUpdate}
-                    onCancel={() => setIsEditing(false)}
+                    onCancel={() => {
+                      setIsEditing(false)
+                      setTimeout(() => {
+                        props.moreOptionsButtonRef?.current?.focus()
+                      }, 0)
+                    }}
                     isIsolatedView={true}
                     editor={props.discussionEntry.editor}
                     isUnread={!props.discussionEntry.entryParticipant?.read}
@@ -465,4 +473,5 @@ SplitScreenThreadContainer.propTypes = {
   goToTopic: PropTypes.func,
   isHighlighted: PropTypes.bool,
   updateDraftCache: PropTypes.func,
+  moreOptionsButtonRef: PropTypes.any,
 }
