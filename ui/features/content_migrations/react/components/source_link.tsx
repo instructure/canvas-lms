@@ -29,10 +29,14 @@ const obtainText = ({
   attachment,
   settings,
   workflow_state,
-}: ContentMigrationItem): string | null => {
-  if (migration_type === 'course_copy_importer') {
+}: ContentMigrationItem): string | null | undefined => {
+  if (migration_type === 'course_copy_importer' && settings?.source_course_name) {
     return settings.source_course_name
-  } else if (migration_type === 'canvas_cartridge_importer' && workflow_state === 'completed') {
+  } else if (
+    migration_type === 'canvas_cartridge_importer' &&
+    workflow_state === 'completed' &&
+    settings?.source_course_name
+  ) {
     return settings.source_course_name
   }
   // For uncompleted canvas_cartridge_importer, zip_file_importer, common_cartridge_importer, moodle_converter & qti_converter
@@ -44,10 +48,14 @@ const obtainLink = ({
   attachment,
   settings,
   workflow_state,
-}: ContentMigrationItem): string | null => {
-  if (migration_type === 'course_copy_importer') {
+}: ContentMigrationItem): string | null | undefined => {
+  if (migration_type === 'course_copy_importer' && settings?.source_course_html_url) {
     return settings.source_course_html_url
-  } else if (migration_type === 'canvas_cartridge_importer' && workflow_state === 'completed') {
+  } else if (
+    migration_type === 'canvas_cartridge_importer' &&
+    workflow_state === 'completed' &&
+    settings?.source_course_html_url
+  ) {
     return settings.source_course_html_url
   }
   // For uncompleted canvas_cartridge_importer, zip_file_importer, common_cartridge_importer, moodle_converter & qti_converter

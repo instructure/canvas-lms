@@ -64,6 +64,18 @@ describe('SourceLink', () => {
       )
     })
 
+    it('does not break on undefined settings', () => {
+      const component = renderComponent({
+        migration_type: 'canvas_cartridge_importer',
+        settings: undefined,
+        attachment,
+      })
+      expect(component.getByRole('link', {name: 'file.zip'})).toHaveAttribute(
+        'href',
+        'https://localhost/files/1/download'
+      )
+    })
+
     it('renders the correct link when is not completed', () => {
       const component = renderComponent({
         migration_type: 'canvas_cartridge_importer',
