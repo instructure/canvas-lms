@@ -40,7 +40,7 @@ describe Lti::AccountLookupController do
 
     context "when given just an account it" do
       let(:params_overrides) do
-        { account_id: Account.root_accounts.first.id }
+        { account_id: root_account.id }
       end
 
       it "returns id, uuid, and other fields on account" do
