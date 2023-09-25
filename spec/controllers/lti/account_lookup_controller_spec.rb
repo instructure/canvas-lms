@@ -32,7 +32,7 @@ describe Lti::AccountLookupController do
       let(:expected_mime_type) { described_class::MIME_TYPE }
       let(:scope_to_remove) { "https://canvas.instructure.com/lti/account_lookup/scope/show" }
       let(:params_overrides) do
-        { account_id: Account.root_accounts.first.id }
+        { account_id: root_account.id }
       end
     end
 
@@ -45,7 +45,7 @@ describe Lti::AccountLookupController do
 
       it "returns id, uuid, and other fields on account" do
         send_request
-        acct = Account.root_accounts.first
+        acct = root_account
         body = response.parsed_body
         expect(body).to include(
           "id" => acct.id,
@@ -73,7 +73,7 @@ describe Lti::AccountLookupController do
 
     context "when an ID on an invalid shard given" do
       let(:params_overrides) do
-        { account_id: 1_987_650_000_000_000_000 + Account.root_accounts.first.local_id }
+        { account_id: 1_987_650_000_000_000_000 + root_account.local_id }
       end
 
       it "returns a 404" do
@@ -85,12 +85,12 @@ describe Lti::AccountLookupController do
 
     context "when given a global ID" do
       let(:params_overrides) do
-        { account_id: Account.root_accounts.first.global_id }
+        { account_id: root_account.global_id }
       end
 
       it "returns id, uuid, and other fields on account" do
         send_request
-        acct = Account.root_accounts.first
+        acct = root_account
         body = response.parsed_body
         expect(body).to include(
           "id" => acct.id,
