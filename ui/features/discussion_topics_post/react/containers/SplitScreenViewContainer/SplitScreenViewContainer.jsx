@@ -62,6 +62,9 @@ export const SplitScreenViewContainer = props => {
   const [draftSaved, setDraftSaved] = useState(true)
   const closeButtonRef = useRef()
 
+  const replyButtonRef = useRef()
+  const moreOptionsButtonRef = useRef()
+
   const updateCache = (cache, result) => {
     const newDiscussionEntry = result.data.createDiscussionEntry.discussionEntry
     const variables = {
@@ -453,6 +456,8 @@ export const SplitScreenViewContainer = props => {
           RCEOpen={props.RCEOpen}
           goToTopic={props.goToTopic}
           isHighlighted={props.highlightEntryId === props.discussionEntryId}
+          replyButtonRef={replyButtonRef}
+          moreOptionsButtonRef={moreOptionsButtonRef}
         >
           {props.RCEOpen && props.isTrayFinishedOpening && (
             <View
@@ -470,7 +475,12 @@ export const SplitScreenViewContainer = props => {
                   onReplySubmit(message, file, quotedEntryId, anonymousAuthorState)
                   props.setRCEOpen(false)
                 }}
-                onCancel={() => props.setRCEOpen(false)}
+                onCancel={() => {
+                  props.setRCEOpen(false)
+                  setTimeout(() => {
+                    replyButtonRef?.current?.focus()
+                  }, 0)
+                }}
                 quotedEntry={buildQuotedReply(
                   [
                     splitScreenEntryOlderDirection.data.legacyNode,
@@ -533,6 +543,7 @@ export const SplitScreenViewContainer = props => {
               fetchingMoreOlderReplies={fetchingMoreOlderReplies}
               fetchingMoreNewerReplies={fetchingMoreNewerReplies}
               updateDraftCache={props.updateDraftCache}
+              moreOptionsButtonRef={moreOptionsButtonRef}
             />
           </View>
         )}
