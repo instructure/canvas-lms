@@ -18,6 +18,7 @@
 
 import React, {useEffect, useState} from 'react'
 import {Table} from '@instructure/ui-table'
+import {Heading} from '@instructure/ui-heading'
 import {StatusPill} from './status_pill'
 import {SourceLink} from './source_link'
 import doFetchApi from '@canvas/do-fetch-api-effect'
@@ -42,49 +43,52 @@ export const ContentMigrationsTable = () => {
   }, [])
 
   return (
-    <Table caption={I18n.t('Content Migrations')}>
-      <Table.Head>
-        <Table.Row>
-          <Table.ColHeader theme={{padding: '0.6rem 0'}} id="content_type">
-            {I18n.t('Content Type')}
-          </Table.ColHeader>
-          <Table.ColHeader theme={{padding: '0.6rem 0'}} id="source_link">
-            {I18n.t('Source Link')}
-          </Table.ColHeader>
-          <Table.ColHeader theme={{padding: '0.6rem 0'}} id="date_imported">
-            {I18n.t('Date Imported')}
-          </Table.ColHeader>
-          <Table.ColHeader theme={{padding: '0.6rem 0'}} id="status">
-            {I18n.t('Status')}
-          </Table.ColHeader>
-          <Table.ColHeader theme={{padding: '0.6rem 0'}} id="progress">
-            {I18n.t('Progress')}
-          </Table.ColHeader>
-        </Table.Row>
-      </Table.Head>
-      <Table.Body>
-        {migrations.map((cm: ContentMigrationItem) => (
-          <Table.Row key={cm.id}>
-            <Table.Cell theme={{padding: '1.1rem 0rem'}}>{cm.migration_type_title}</Table.Cell>
-            <Table.Cell>
-              <SourceLink item={cm} />
-            </Table.Cell>
-            <Table.Cell>
-              {datetimeString(cm.created_at, {timezone: ENV.CONTEXT_TIMEZONE})}
-            </Table.Cell>
-            <Table.Cell>
-              <StatusPill
-                hasIssues={cm.migration_issues_count !== 0}
-                workflowState={cm.workflow_state}
-              />
-            </Table.Cell>
-            <Table.Cell>
-              <CompletionProgressBar progress_url={cm.progress_url} />
-            </Table.Cell>
+    <>
+      <Heading margin="small 0">{I18n.t('Import Queue')}</Heading>
+      <Table caption={I18n.t('Content Migrations')}>
+        <Table.Head>
+          <Table.Row>
+            <Table.ColHeader theme={{padding: '0.6rem 0'}} id="content_type">
+              {I18n.t('Content Type')}
+            </Table.ColHeader>
+            <Table.ColHeader theme={{padding: '0.6rem 0'}} id="source_link">
+              {I18n.t('Source Link')}
+            </Table.ColHeader>
+            <Table.ColHeader theme={{padding: '0.6rem 0'}} id="date_imported">
+              {I18n.t('Date Imported')}
+            </Table.ColHeader>
+            <Table.ColHeader theme={{padding: '0.6rem 0'}} id="status">
+              {I18n.t('Status')}
+            </Table.ColHeader>
+            <Table.ColHeader theme={{padding: '0.6rem 0'}} id="progress">
+              {I18n.t('Progress')}
+            </Table.ColHeader>
           </Table.Row>
-        ))}
-      </Table.Body>
-    </Table>
+        </Table.Head>
+        <Table.Body>
+          {migrations.map((cm: ContentMigrationItem) => (
+            <Table.Row key={cm.id}>
+              <Table.Cell theme={{padding: '1.1rem 0rem'}}>{cm.migration_type_title}</Table.Cell>
+              <Table.Cell>
+                <SourceLink item={cm} />
+              </Table.Cell>
+              <Table.Cell>
+                {datetimeString(cm.created_at, {timezone: ENV.CONTEXT_TIMEZONE})}
+              </Table.Cell>
+              <Table.Cell>
+                <StatusPill
+                  hasIssues={cm.migration_issues_count !== 0}
+                  workflowState={cm.workflow_state}
+                />
+              </Table.Cell>
+              <Table.Cell>
+                <CompletionProgressBar progress_url={cm.progress_url} />
+              </Table.Cell>
+            </Table.Row>
+          ))}
+        </Table.Body>
+      </Table>
+    </>
   )
 }
 

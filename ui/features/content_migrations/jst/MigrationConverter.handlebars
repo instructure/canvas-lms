@@ -1,22 +1,50 @@
 <h1>{{#t "header"}}Import Content{{/t}}</h1>
-<div class="control-group">
-  <label class="control-label" for="chooseMigrationConverter"><strong>{{#t "import_from_label"}}Content Type{{/t}}</strong></label>
-  <div class="controls">
-    <select id="chooseMigrationConverter" class="span3">
-      <option value="none" >{{#t "default_option"}}Select One{{/t}}</option>
-      {{#each selectOptions}}
-      <option value="{{id}}" >{{label}}</option>
-      {{/each}}
-    </select>
+{{#if ENV.FEATURES.instui_for_import_page}}
+  <p>{{#t "migration_tool_summary"}}Use the Import Content tool to migrate course materials from other sources into this course.{{/t}}</p>
+  
+  <div id="overwrite-warning" />
+
+  <hr aria-hidden="true">
+
+  <div class="control-group" style="margin-top: 20px">
+    <label class="control-label" for="chooseMigrationConverter"><strong>{{#t "import_from_label"}}Content Type{{/t}}</strong></label>
+    <div class="controls">
+      <select id="chooseMigrationConverter" class="span3">
+        <option value="none" >{{#t "default_option"}}Select One{{/t}}</option>
+        {{#each selectOptions}}
+        <option value="{{id}}">{{label}}</option>
+        {{/each}}
+      </select>
+    </div>
   </div>
-</div>
+  
+  <div id="converter" aria-live="assertive" aria-relevant="additions text" aria-atomic="true"></div>
 
-<div id="converter" aria-live="assertive" aria-relevant="additions text" aria-atomic="true"></div>
-
-<div class="form-container" style="display: none">
-  <div id="overwrite-warning" style="max-width: 34em" />
-  <div class="controls control-height">
-    <input class="cancelBtn btn btn-small" type="button" value="{{#t 'cancel_migration'}}Cancel{{/t}}">&nbsp;&nbsp;<input id="submitMigration" type="submit" value="{{#t "import_migration"}}Import{{/t}}" class="btn btn-small btn-primary span2" />
+  <div class="form-container" style="display: none">
+    <div class="controls control-height">
+      <input class="cancelBtn btn btn-small" type="button" value="{{#t 'cancel_migration'}}Cancel{{/t}}">&nbsp;&nbsp;<input id="submitMigration" type="submit" value="{{#t "import_migration"}}Import{{/t}}" class="btn btn-small btn-primary span2" />
+    </div>
+    <hr aria-hidden="true">
   </div>
-</div>
+{{else}}
+  <div class="control-group">
+    <label class="control-label" for="chooseMigrationConverter"><strong>{{#t "import_from_label"}}Content Type{{/t}}</strong></label>
+    <div class="controls">
+      <select id="chooseMigrationConverter" class="span3">
+        <option value="none">{{#t "default_option"}}Select One{{/t}}</option>
+        {{#each selectOptions}}
+        <option value="{{id}}">{{label}}</option>
+        {{/each}}
+      </select>
+    </div>
+  </div>
 
+  <div id="converter" aria-live="assertive" aria-relevant="additions text" aria-atomic="true"></div>
+
+  <div class="form-container" style="display: none">
+    <div id="overwrite-warning" style="max-width: 34em" />
+    <div class="controls control-height">
+      <input class="cancelBtn btn btn-small" type="button" value="{{#t 'cancel_migration'}}Cancel{{/t}}">&nbsp;&nbsp;<input id="submitMigration" type="submit" value="{{#t "import_migration"}}Import{{/t}}" class="btn btn-small btn-primary span2" />
+    </div>
+  </div>
+{{/if}}
