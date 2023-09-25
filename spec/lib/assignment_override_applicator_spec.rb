@@ -53,6 +53,27 @@ describe AssignmentOverrideApplicator do
     @membership = @group.add_user(@student)
   end
 
+  def create_section_context_module_override(section)
+    @module = @course.context_modules.create!(name: "Module 1")
+    @assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: "context_module"
+
+    @module_override = @module.assignment_overrides.create!
+    @module_override.set_type = "CourseSection"
+    @module_override.set_id = section
+    @module_override.save!
+  end
+
+  def create_context_module_and_override_adhoc
+    @module = @course.context_modules.create!(name: "Module 1")
+    @assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: "context_module"
+
+    @module_override = @module.assignment_overrides.create!
+    @override_student = @module_override.assignment_override_students.build
+    @override_student.user = @student
+    @override_student.save!
+    @module_override
+  end
+
   def create_assignment(*args)
     # need to make sure it doesn't invalidate the cache right away
     Timecop.freeze(5.seconds.ago) do
@@ -459,6 +480,15 @@ describe AssignmentOverrideApplicator do
           result = AssignmentOverrideApplicator.adhoc_override(@assignment, @student)
           expect(result).to be_an_instance_of(AssignmentOverrideStudent)
         end
+
+        it "includes context module overrides" do
+          @override.destroy!
+          Account.site_admin.enable_feature!(:differentiated_modules)
+          create_context_module_and_override_adhoc
+
+          result = AssignmentOverrideApplicator.adhoc_override(@assignment, @student)
+          expect(result.assignment_override_id).to eq @module_override.id
+        end
       end
 
       describe "for teachers" do
@@ -475,6 +505,14 @@ describe AssignmentOverrideApplicator do
           overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @teacher)
           expect(overrides).to eq [@override]
         end
+
+        it "includes context module overrides" do
+          Account.site_admin.enable_feature!(:differentiated_modules)
+          create_context_module_and_override_adhoc
+
+          overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @teacher)
+          expect(overrides).to eq [@override, @module_override]
+        end
       end
 
       describe "for observers" do
@@ -484,6 +522,16 @@ describe AssignmentOverrideApplicator do
           overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @observer)
           expect(overrides).to eq [@override]
         end
+
+        it "includes context module overrides" do
+          @override.destroy!
+          Account.site_admin.enable_feature!(:differentiated_modules)
+          course_with_observer({ course: @course, active_all: true })
+          @course.enroll_user(@observer, "ObserverEnrollment", { associated_user_id: @student.id })
+          create_context_module_and_override_adhoc
+          overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @observer)
+          expect(overrides).to eq [@module_override]
+        end
       end
 
       describe "for admins" do
@@ -491,6 +539,14 @@ describe AssignmentOverrideApplicator do
           account_admin_user
           overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @admin)
           expect(overrides).to eq [@override]
+        end
+
+        it "includes context module overrides" do
+          Account.site_admin.enable_feature!(:differentiated_modules)
+          account_admin_user
+          create_context_module_and_override_adhoc
+          overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @admin)
+          expect(overrides).to eq [@override, @module_override]
         end
       end
     end
@@ -686,6 +742,13 @@ describe AssignmentOverrideApplicator do
           overrides = AssignmentOverrideApplicator.section_overrides(assignment, @student)
           expect(overrides).to be_empty
         end
+
+        it "includes context module overrides" do
+          Account.site_admin.enable_feature!(:differentiated_modules)
+          create_section_context_module_override(@course.default_section)
+          overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
+          expect(overrides).to include(@module_override)
+        end
       end
 
       describe "for teachers" do
@@ -693,6 +756,14 @@ describe AssignmentOverrideApplicator do
           teacher_in_course
           result = AssignmentOverrideApplicator.section_overrides(@assignment, @teacher)
           expect(result).to include(@override, @override2)
+        end
+
+        it "includes context module overrides" do
+          Account.site_admin.enable_feature!(:differentiated_modules)
+          teacher_in_course
+          create_section_context_module_override(@course.default_section)
+          result = AssignmentOverrideApplicator.section_overrides(@assignment, @teacher)
+          expect(result).to include(@module_override)
         end
       end
 
@@ -703,6 +774,17 @@ describe AssignmentOverrideApplicator do
           overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @observer)
           expect(overrides).to eq [@override2]
         end
+
+        it "includes context module overrides" do
+          Account.site_admin.enable_feature!(:differentiated_modules)
+          course_with_observer({ course: @course, active_all: true })
+          @course.enroll_user(@observer, "ObserverEnrollment", { associated_user_id: @student2.id })
+
+          create_section_context_module_override(@section2)
+
+          overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @observer)
+          expect(overrides).to eq [@override2, @module_override]
+        end
       end
 
       describe "for admins" do
@@ -710,6 +792,14 @@ describe AssignmentOverrideApplicator do
           account_admin_user
           result = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @admin)
           expect(result).to include(@override, @override2)
+        end
+
+        it "includes context module overrides" do
+          Account.site_admin.enable_feature!(:differentiated_modules)
+          account_admin_user
+          create_section_context_module_override(@section2)
+          result = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @admin)
+          expect(result).to include(@module_override)
         end
       end
     end
@@ -755,6 +845,16 @@ describe AssignmentOverrideApplicator do
         @override_student.user = @student
         @override_student.save!
 
+        result = AssignmentOverrideApplicator.has_invalid_args?(@assignment, @student)
+        expect(result).to be_falsey
+      end
+
+      it "returns false if the assignment has context module overrides" do
+        Account.site_admin.enable_feature!(:differentiated_modules)
+        @module = @course.context_modules.create!(name: "Module 1")
+        @assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: "context_module"
+
+        @module_override = @module.assignment_overrides.create!
         result = AssignmentOverrideApplicator.has_invalid_args?(@assignment, @student)
         expect(result).to be_falsey
       end

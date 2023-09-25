@@ -65,15 +65,31 @@ module DatesOverridable
 
   def has_overrides?
     if current_version?
-      assignment_overrides.loaded? ? assignment_overrides.any?(&:active?) : assignment_overrides.active.exists?
+      all_assignment_overrides.loaded? ? all_assignment_overrides.any?(&:active?) : all_assignment_overrides.active.exists?
     else
       # the old version's overrides might have be deleted too but it's probably more trouble than it's worth to check here
-      assignment_overrides.loaded? ? assignment_overrides.any? : assignment_overrides.exists?
+      all_assignment_overrides.loaded? ? all_assignment_overrides.any? : all_assignment_overrides.exists?
     end
   end
 
   def has_active_overrides?
     active_assignment_overrides.any?
+  end
+
+  def all_assignment_overrides
+    if Account.site_admin.feature_enabled? :differentiated_modules
+      assignment_overrides.or(context_module_overrides)
+    else
+      assignment_overrides
+    end
+  end
+
+  def context_module_overrides
+    AssignmentOverride.active.where(context_module_id: assignment_context_modules.select(:id))
+  end
+
+  def assignment_context_modules
+    ContextModule.active.where(id: context_module_tags.select(:context_module_id))
   end
 
   def multiple_due_dates?
@@ -98,7 +114,7 @@ module DatesOverridable
   end
 
   def all_due_dates
-    due_at_overrides = assignment_overrides.loaded? ? assignment_overrides.select { |ao| ao.active? && ao.due_at_overridden } : assignment_overrides.active.overriding_due_at
+    due_at_overrides = all_assignment_overrides.loaded? ? all_assignment_overrides.select { |ao| ao.active? && ao.due_at_overridden } : all_assignment_overrides.active.overriding_due_at
     dates = due_at_overrides.map(&:as_hash)
     dates << base_due_date_hash unless differentiated_assignments_applies?
     dates

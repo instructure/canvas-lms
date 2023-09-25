@@ -101,7 +101,7 @@ module AssignmentOverrideApplicator
 
         context.shard.activate do
           if (context.user_has_been_admin?(user) || context.user_has_no_enrollments?(user)) && context.grants_right?(user, :read_as_admin)
-            overrides = assignment_or_quiz.assignment_overrides
+            overrides = assignment_or_quiz.all_assignment_overrides
             if assignment_or_quiz.current_version?
               visible_user_ids = context.enrollments_visible_to(user).select(:user_id)
 
@@ -189,12 +189,17 @@ module AssignmentOverrideApplicator
   def self.adhoc_override(assignment_or_quiz, user)
     return nil unless user
 
-    if assignment_or_quiz.preloaded_override_students && (overrides = assignment_or_quiz.preloaded_override_students[user.id])
-      overrides.first
-    else
-      key = assignment_or_quiz.is_a?(Quizzes::Quiz) ? :quiz_id : :assignment_id
-      AssignmentOverrideStudent.where(key => assignment_or_quiz, :user_id => user).active.first
+    override = if assignment_or_quiz.preloaded_override_students && (overrides = assignment_or_quiz.preloaded_override_students[user.id])
+                 overrides.first
+               else
+                 key = assignment_or_quiz.is_a?(Quizzes::Quiz) ? :quiz_id : :assignment_id
+                 AssignmentOverrideStudent.where(key => assignment_or_quiz, :user_id => user).active.first
+               end
+    # only bother to check context_modules if no other override was found
+    if !override && Account.site_admin.feature_enabled?(:differentiated_modules) && assignment_or_quiz.context_module_overrides
+      override = AssignmentOverrideStudent.where(context_module_id: assignment_or_quiz.assignment_context_modules.select(:id), user_id: user).active.first
     end
+    override
   end
 
   def self.group_overrides(assignment_or_quiz, user)
@@ -243,10 +248,10 @@ module AssignmentOverrideApplicator
         end.pluck(:course_section_id).uniq
     end
 
-    overrides = if assignment_or_quiz.assignment_overrides.loaded?
-                  assignment_or_quiz.assignment_overrides.select { |o| o.set_type == "CourseSection" && section_ids.include?(o.set_id) }
+    overrides = if assignment_or_quiz.all_assignment_overrides.loaded?
+                  assignment_or_quiz.all_assignment_overrides.select { |o| o.set_type == "CourseSection" && section_ids.include?(o.set_id) }
                 else
-                  assignment_or_quiz.assignment_overrides.where(set_type: "CourseSection", set_id: section_ids)
+                  assignment_or_quiz.all_assignment_overrides.where(set_type: "CourseSection", set_id: section_ids)
                 end
 
     if Account.site_admin.feature_enabled?(:deprioritize_section_overrides_for_nonactive_enrollments)
