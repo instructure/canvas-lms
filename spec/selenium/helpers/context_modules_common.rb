@@ -45,7 +45,7 @@ module ContextModulesCommon
   end
 
   def module_setup
-    @module = @course.context_modules.create!(name: "module")
+    @module = @course.context_modules.create!(name: "Module 1")
 
     # create module items
     # add first and last module items to get previous and next displayed
