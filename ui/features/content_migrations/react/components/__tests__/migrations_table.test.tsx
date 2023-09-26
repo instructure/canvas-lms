@@ -28,7 +28,7 @@ it('Calls the API and renders the InstUI table', async () => {
   expect(getByRole('table', {hidden: false})).toBeInTheDocument()
   expect(
     getByRole('row', {
-      name: 'Content Type Source Link Date Imported Status Progress',
+      name: 'Content Type Source Link Date Imported Status Progress Action',
       hidden: false,
     })
   ).toBeInTheDocument()

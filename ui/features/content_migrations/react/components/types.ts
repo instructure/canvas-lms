@@ -49,5 +49,6 @@ export type ContentMigrationItem = {
   attachment?: ContentMigrationItemAttachment
   workflow_state: ContentMigrationWorkflowState
   migration_issues_count: number
+  migration_issues_url: string
   created_at: string
 }
