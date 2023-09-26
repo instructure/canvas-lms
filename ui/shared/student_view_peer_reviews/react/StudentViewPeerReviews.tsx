@@ -21,7 +21,7 @@ import React from 'react'
 import {IconArrowNestLine, IconPeerReviewLine, IconPeerGradedLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {Assignment, AssessmentRequest} from '../../../../api.d'
+import {Assignment, AssessmentRequest} from '../../../api.d'
 
 const I18n = useI18nScope('assignment')
 
@@ -30,7 +30,7 @@ type StudentPeerUrlQueryParams = {
   reviewee_id?: string
 }
 
-type AssignmentPeerReview = Pick<
+export type AssignmentPeerReview = Pick<
   Assignment,
   'id' | 'course_id' | 'anonymous_peer_reviews' | 'assessment_requests' | 'name'
 >

@@ -45,6 +45,10 @@ describe Types::AssessmentRequestType do
     expect(submission_type.resolve("assignedAssessments { workflowState }").first).to eq @assessment_request.workflow_state
   end
 
+  it "works for available?" do
+    expect(submission_type.resolve("assignedAssessments { available }").first).to eq @assessment_request.available?
+  end
+
   it "works for user" do
     expect(submission_type.resolve("assignedAssessments { user { _id } }").first).to eq @assessment_request.user.id.to_s
   end
