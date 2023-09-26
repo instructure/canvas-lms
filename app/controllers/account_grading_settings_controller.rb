@@ -36,7 +36,6 @@ class AccountGradingSettingsController < ApplicationController
                IS_ROOT_ACCOUNT: @account.root_account?,
                ROOT_ACCOUNT_ID: @account.root_account.id.to_s,
              })
-      js_bundle :react_content_router
       css_bundle :grading_period_sets, :enrollment_terms
       render html: "".html_safe, layout: true
     end

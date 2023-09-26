@@ -20,7 +20,7 @@ import React, {useEffect} from 'react'
 import {useMatch} from 'react-router-dom'
 import GradingPeriodSetCollection from '../components/grading_period/GradingPeriodSetCollection'
 
-export const AccountGradingPeriods = () => {
+export function Component() {
   const pathMatch = useMatch('/accounts/:accountId/*')
   if (!pathMatch || !pathMatch.params || !pathMatch.params.accountId) {
     throw new Error('account id is not present on path')

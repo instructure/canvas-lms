@@ -22,19 +22,16 @@ import {ApolloProvider, createClient} from '@canvas/apollo'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {AccountStatusManagement} from '../components/account_grading_status/AccountStatusManagement'
+import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 
 const I18n = useI18nScope('account_grading_status')
 
-type AccountGradingStatusesProps = {
-  isRootAccount: boolean
-  rootAccountId: string
-  isExtendedStatusEnabled?: boolean
+declare const ENV: GlobalEnv & {
+  IS_ROOT_ACCOUNT: boolean
+  ROOT_ACCOUNT_ID: string
 }
-export const AccountGradingStatuses = ({
-  isRootAccount,
-  rootAccountId,
-  isExtendedStatusEnabled,
-}: AccountGradingStatusesProps) => {
+
+export function Component() {
   const pathMatch = useMatch('/accounts/:accountId/*')
   const accountId = pathMatch?.params?.accountId
   if (!accountId) {
@@ -57,9 +54,9 @@ export const AccountGradingStatuses = ({
   return (
     <ApolloProvider client={client}>
       <AccountStatusManagement
-        isRootAccount={isRootAccount}
-        rootAccountId={rootAccountId}
-        isExtendedStatusEnabled={isExtendedStatusEnabled}
+        isRootAccount={Boolean(ENV.IS_ROOT_ACCOUNT)}
+        rootAccountId={ENV.ROOT_ACCOUNT_ID}
+        isExtendedStatusEnabled={ENV.FEATURES.extended_submission_state}
       />
     </ApolloProvider>
   )

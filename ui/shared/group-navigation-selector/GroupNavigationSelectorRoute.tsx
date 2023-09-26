@@ -17,15 +17,10 @@
  */
 
 import React from 'react'
-import {Spinner} from '@instructure/ui-spinner'
 import {Portal} from '@instructure/ui-portal'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import GroupNavigationSelector from './GroupNavigationSelector'
 
-const I18n = useI18nScope('group-navigation-selector')
-
-const GroupNavigationSelector = React.lazy(() => import('./GroupNavigationSelector'))
-
-export default function GroupNavigationSelectorRoute() {
+export function Component() {
   const groupSwitchMountPoint: HTMLElement | null = document.querySelector(
     '#group-switch-mount-point'
   )
@@ -34,14 +29,8 @@ export default function GroupNavigationSelectorRoute() {
   }
 
   return (
-    <React.Suspense
-      fallback={
-        <Spinner renderTitle={() => <Spinner renderTitle={I18n.t('Loading')} size="x-small" />} />
-      }
-    >
-      <Portal open={true} mountNode={groupSwitchMountPoint}>
-        <GroupNavigationSelector options={ENV.group_information || []} />
-      </Portal>
-    </React.Suspense>
+    <Portal open={true} mountNode={groupSwitchMountPoint}>
+      <GroupNavigationSelector options={ENV.group_information || []} />
+    </Portal>
   )
 }

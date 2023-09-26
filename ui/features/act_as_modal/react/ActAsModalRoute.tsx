@@ -17,29 +17,18 @@
  */
 
 import React from 'react'
-import {Spinner} from '@instructure/ui-spinner'
-import {useScope as useI18nScope} from '@canvas/i18n'
 import {Portal} from '@instructure/ui-portal'
+import ActAsModal from './ActAsModal'
 
-const I18n = useI18nScope('act_as')
-
-const ActAsModal = React.lazy(() => import('./ActAsModal'))
-
-export default function GroupNavigationSelectorRoute() {
+export function Component() {
   const mountPoint: HTMLElement | null = document.querySelector('#act_as_modal')
   if (!mountPoint) {
     return null
   }
   return (
-    <React.Suspense
-      fallback={
-        <Spinner renderTitle={() => <Spinner renderTitle={I18n.t('Loading')} size="x-small" />} />
-      }
-    >
-      <Portal open={true} mountNode={mountPoint}>
-        {/* @ts-expect-error */}
-        <ActAsModal user={ENV.act_as_user_data.user} />
-      </Portal>
-    </React.Suspense>
+    <Portal open={true} mountNode={mountPoint}>
+      {/* @ts-expect-error */}
+      <ActAsModal user={ENV.act_as_user_data.user} />
+    </Portal>
   )
 }

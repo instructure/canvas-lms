@@ -17,36 +17,15 @@
  */
 
 import React from 'react'
-import {Navigate} from 'react-router-dom'
-import {TabLayout} from '../pages/TabLayout'
-import {AccountGradingSchemes} from '../pages/AccountGradingSchemes'
-import {AccountGradingPeriods} from '../pages/AccountGradingPeriods'
-import {AccountGradingStatuses} from '../pages/AccountGradingStatuses'
-import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import {Navigate, Route} from 'react-router-dom'
 
-declare const ENV: GlobalEnv & {
-  IS_ROOT_ACCOUNT: boolean
-  ROOT_ACCOUNT_ID: string
-}
+const AccountGradingSettingsRoutes = (
+  <Route path="/accounts/:accountId/grading_settings" lazy={() => import('../pages/TabLayout')}>
+    <Route path="" element={<Navigate to="schemes" replace={true} />} />
+    <Route path="periods" lazy={() => import('../pages/AccountGradingPeriods')} />
+    <Route path="schemes" lazy={() => import('../pages/AccountGradingSchemes')} />
+    <Route path="statuses" lazy={() => import('../pages/AccountGradingStatuses')} />
+  </Route>
+)
 
-export const accountGradingSettingsRoutes = [
-  {
-    path: 'grading_settings',
-    element: <TabLayout />,
-    children: [
-      {path: '', element: <Navigate to="schemes" replace={true} />},
-      {path: 'periods', element: <AccountGradingPeriods />},
-      {path: 'schemes', element: <AccountGradingSchemes />},
-      {
-        path: 'statuses',
-        element: (
-          <AccountGradingStatuses
-            isRootAccount={ENV.IS_ROOT_ACCOUNT}
-            rootAccountId={ENV.ROOT_ACCOUNT_ID}
-            isExtendedStatusEnabled={ENV.FEATURES.extended_submission_state}
-          />
-        ),
-      },
-    ],
-  },
-]
+export default AccountGradingSettingsRoutes

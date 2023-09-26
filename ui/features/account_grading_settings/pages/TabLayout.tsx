@@ -20,27 +20,33 @@ import React from 'react'
 import {Outlet, useNavigate, useMatch} from 'react-router-dom'
 import {Tabs} from '@instructure/ui-tabs'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {Portal} from '@instructure/ui-portal'
 import {TabLayoutPanel} from '../types/tabLayout'
 
 const I18n = useI18nScope('gradingCourseTabContainer')
 
-export const TabLayout = () => {
+export const Component = () => {
   const navigate = useNavigate()
   const isCustomGradebookStatusesEnabled = !!ENV.CUSTOM_GRADEBOOK_STATUSES_ENABLED
 
   const pathMatch = useMatch('/accounts/:accountId/grading_settings/:tabPath/*')
   const selectedTab = pathMatch?.params?.tabPath
 
+  const mountPoint: HTMLElement | null = document.querySelector('#content')
+  if (!mountPoint) {
+    return null
+  }
+
   const handleTabChange = (index: number) => {
     switch (index) {
       case TabLayoutPanel.GRADING_PERIODS:
-        navigate('periods')
+        navigate('../periods', {relative: 'path'})
         break
       case TabLayoutPanel.GRADING_SCHEMES:
-        navigate('schemes')
+        navigate('../schemes', {relative: 'path'})
         break
       case TabLayoutPanel.GRADING_STATUSES:
-        navigate('statuses')
+        navigate('../statuses', {relative: 'path'})
         break
     }
   }
@@ -51,7 +57,7 @@ export const TabLayout = () => {
     return <Outlet />
   }
   return (
-    <>
+    <Portal open={true} mountNode={mountPoint}>
       <h1>{I18n.t('Account Grading Settings')}</h1>
       <Tabs
         margin="large auto"
@@ -82,6 +88,6 @@ export const TabLayout = () => {
           </Tabs.Panel>
         )}
       </Tabs>
-    </>
+    </Portal>
   )
 }
