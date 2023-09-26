@@ -71,20 +71,18 @@ export const ThreadActions = props => {
             placement="bottom"
             key={`threadActionMenu-${props.id}`}
             trigger={
-              <span className="discussion-thread-action-button">
-                <IconButton
-                  size="medium"
-                  screenReaderLabel={I18n.t('Manage Discussion by %{author}', {
-                    author: props.authorName,
-                  })}
-                  renderIcon={IconMoreLine}
-                  withBackground={false}
-                  withBorder={false}
-                  data-testid="thread-actions-menu"
-                  ref={props.moreOptionsButtonRef}
-                />
-              </span>
+              <IconButton
+                size="medium"
+                screenReaderLabel={I18n.t('Manage Discussion by %{author}', {
+                  author: props.authorName,
+                })}
+                renderIcon={IconMoreLine}
+                withBackground={false}
+                withBorder={false}
+                data-testid="thread-actions-menu"
+              />
             }
+            ref={props.moreOptionsButtonRef}
           >
             {menuItems}
           </Menu>
