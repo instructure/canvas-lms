@@ -527,6 +527,7 @@ describe "threaded discussions" do
         it "replies correctly to second reply" do
           f("button[data-testid='expand-button']").click
           wait_for_ajaximations
+          wait_for(method: nil, timeout: 5) { ff("button[data-testid='threading-toolbar-reply']").length >= 3 }
           ff("button[data-testid='threading-toolbar-reply']")[2].click
           wait_for_ajaximations
           type_in_tiny("textarea", "replying to 2nd level reply")
@@ -548,6 +549,7 @@ describe "threaded discussions" do
         it "replies correctly to third reply" do
           f("button[data-testid='expand-button']").click
           wait_for_ajaximations
+          wait_for(method: nil, timeout: 5) { ff("button[data-testid='threading-toolbar-reply']").length >= 3 }
           ff("button[data-testid='threading-toolbar-reply']")[2].click
           wait_for_ajaximations
           type_in_tiny("textarea", "replying to 3rd level reply")
@@ -572,6 +574,7 @@ describe "threaded discussions" do
           f("button[data-testid='expand-button']").click
           wait_for_ajaximations
           wait_for_ajaximations
+          wait_for(method: nil, timeout: 5) { ff("button[data-testid='threading-toolbar-reply']").length >= 4 }
           ff("button[data-testid='threading-toolbar-reply']")[3].click
           wait_for_ajaximations
           type_in_tiny("textarea", "replying to 4th level reply")
@@ -618,6 +621,7 @@ describe "threaded discussions" do
           it "quotes second_reply correctly" do
             f("button[data-testid='expand-button']").click
             wait_for_ajaximations
+            wait_for(method: nil, timeout: 5) { ff("button[data-testid='thread-actions-menu']").length >= 2 }
             ff("button[data-testid='thread-actions-menu']")[1].click
             f("span[data-testid='quote']").click
             wait_for_ajaximations
@@ -637,12 +641,14 @@ describe "threaded discussions" do
             expect(new_reply.quoted_entry_id).to eq @second_reply.id
 
             # Verify that the correct quote is created after submission
+            wait_for(method: nil, timeout: 5) { fj("div[data-testid='reply-preview']:contains('#{@second_reply.summary}')").displayed? }
             expect(fj("div[data-testid='reply-preview']:contains('#{@second_reply.summary}')")).to be_present
           end
 
           it "quotes third_reply correctly" do
             f("button[data-testid='expand-button']").click
             wait_for_ajaximations
+            wait_for(method: nil, timeout: 5) { ff("button[data-testid='thread-actions-menu']").length >= 3 }
             ff("button[data-testid='thread-actions-menu']")[2].click
             f("span[data-testid='quote']").click
             wait_for_ajaximations
@@ -670,6 +676,7 @@ describe "threaded discussions" do
             f("button[data-testid='expand-button']").click
             wait_for_ajaximations
             wait_for_ajaximations
+            wait_for(method: nil, timeout: 5) { ff("button[data-testid='thread-actions-menu']").length >= 4 }
             ff("button[data-testid='thread-actions-menu']")[3].click
             f("span[data-testid='quote']").click
             wait_for_ajaximations
@@ -1055,6 +1062,7 @@ describe "threaded discussions" do
       expect(f("body")).not_to contain_jqcss("div:contains('2nd level reply')")
       f("button[data-testid='expand-button']").click
       wait_for_ajaximations
+      wait_for(method: nil, timeout: 5) { ff("button[data-testid='threading-toolbar-reply']").length >= 3 }
       ff("button[data-testid='threading-toolbar-reply']")[2].click
       wait_for_ajaximations
       type_in_tiny("textarea", "replying to 3rd level reply")

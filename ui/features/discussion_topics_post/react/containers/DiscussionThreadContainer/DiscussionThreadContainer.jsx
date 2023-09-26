@@ -684,51 +684,67 @@ export default DiscussionThreadContainer
 
 const DiscussionSubentries = props => {
   const {setOnFailure} = useContext(AlertManagerContext)
+  const [loadedSubentries, setLoadedSubentries] = useState([])
+
   const variables = {
     discussionEntryID: props.discussionEntryId,
     courseID: window.ENV?.course_id,
   }
+
   const query = useQuery(DISCUSSION_ENTRY_ALL_ROOT_ENTRIES_QUERY, {
     variables,
     skip: props.allRootEntries && Array.isArray(props.allRootEntries),
   })
+
+  const allRootEntries = props.allRootEntries || query?.data?.legacyNode?.allRootEntries || []
+  const subentries = allRootEntries.filter(entry => entry.parentId === props.discussionEntryId)
+  const subentriesIds = subentries.map(entry => entry._id).join('')
+
+  useEffect(() => {
+    const loadedSubentriesIds = loadedSubentries.map(entry => entry._id).join('')
+
+    if (subentries.length > 0 && subentriesIds !== loadedSubentriesIds) {
+      if (loadedSubentries.length < subentries.length) {
+        setTimeout(() => {
+          const newLoadedSubentries = loadedSubentries.concat(
+            subentries.slice(loadedSubentries.length, loadedSubentries.length + 10)
+          )
+          setLoadedSubentries(newLoadedSubentries)
+        }, 500)
+      } else {
+        // There is a mismatch of IDs, so we need to reset the loadedSubentries
+        setLoadedSubentries(subentries)
+      }
+    }
+  }, [subentries, loadedSubentries, subentriesIds])
 
   if (query.error) {
     setOnFailure(I18n.t('There was an unexpected error loading the replies.'))
     return null
   }
 
-  if (query.loading) {
-    return (
-      <Flex justifyItems="start" margin="0 large" padding="0 x-large">
-        <Flex.Item>
-          <Spinner renderTitle={I18n.t('Loading more replies')} size="x-small" />
-        </Flex.Item>
-        <Flex.Item margin="0 0 0 small">
-          <Text>{I18n.t('Loading replies...')}</Text>
-        </Flex.Item>
-      </Flex>
-    )
-  }
+  const isLoading = query.loading || loadedSubentries.length < subentries.length
 
-  const allRootEntries = props.allRootEntries || query?.data?.legacyNode?.allRootEntries || []
-  const subentries = allRootEntries.filter(entry => entry.parentId === props.discussionEntryId)
-
-  return subentries.map(entry => (
-    <DiscussionSubentriesMemo
-      key={`discussion-thread-${entry.id}`}
-      depth={props.depth}
-      discussionEntry={entry}
-      discussionTopic={props.discussionTopic}
-      markAsRead={props.markAsRead}
-      parentRefCurrent={props.parentRefCurrent}
-      removeDraftFromDiscussionCache={props.removeDraftFromDiscussionCache}
-      updateDraftCache={props.updateDraftCache}
-      highlightEntryId={props.highlightEntryId}
-      setHighlightEntryId={props.setHighlightEntryId}
-      allRootEntries={allRootEntries}
-    />
-  ))
+  return (
+    <>
+      {loadedSubentries.map(entry => (
+        <DiscussionSubentriesMemo
+          key={`discussion-thread-${entry._id}`}
+          depth={props.depth}
+          discussionEntry={entry}
+          discussionTopic={props.discussionTopic}
+          markAsRead={props.markAsRead}
+          parentRefCurrent={props.parentRefCurrent}
+          removeDraftFromDiscussionCache={props.removeDraftFromDiscussionCache}
+          updateDraftCache={props.updateDraftCache}
+          highlightEntryId={props.highlightEntryId}
+          setHighlightEntryId={props.setHighlightEntryId}
+          allRootEntries={allRootEntries}
+        />
+      ))}
+      <LoadingReplies isLoading={isLoading} />
+    </>
+  )
 }
 
 DiscussionSubentries.propTypes = {
@@ -760,8 +776,18 @@ const DiscussionSubentriesMemo = props => {
         allRootEntries={props.allRootEntries}
       />
     )
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.depth, props.discussionEntry, props.highlightEntryId])
+  }, [
+    props.depth,
+    props.discussionEntry,
+    props.discussionTopic,
+    props.markAsRead,
+    props.parentRefCurrent,
+    props.removeDraftFromDiscussionCache,
+    props.updateDraftCache,
+    props.highlightEntryId,
+    props.setHighlightEntryId,
+    props.allRootEntries,
+  ])
 }
 
 DiscussionSubentries.propTypes = {
@@ -775,4 +801,25 @@ DiscussionSubentries.propTypes = {
   highlightEntryId: PropTypes.string,
   setHighlightEntryId: PropTypes.func,
   allRootEntries: PropTypes.array,
+}
+
+const LoadingReplies = props => {
+  return useMemo(() => {
+    return (
+      props.isLoading && (
+        <Flex justifyItems="start" margin="0 large" padding="0 x-large">
+          <Flex.Item>
+            <Spinner renderTitle={I18n.t('Loading more replies')} size="x-small" />
+          </Flex.Item>
+          <Flex.Item margin="0 0 0 small">
+            <Text>{I18n.t('Loading replies...')}</Text>
+          </Flex.Item>
+        </Flex>
+      )
+    )
+  }, [props.isLoading])
+}
+
+LoadingReplies.propTypes = {
+  isLoading: PropTypes.bool,
 }
