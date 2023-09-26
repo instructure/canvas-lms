@@ -407,7 +407,21 @@ module SIS
 
       def enrollment_status(associated_user_id, temporary_enrollment_source_user_id, enrollment, enrollment_info, pseudo, role, user)
         all_done = false
-        return true if enrollment.workflow_state == "deleted" && pseudo.workflow_state == "deleted"
+        if enrollment.deleted?
+          message = if user.deleted?
+                      invalid_active_enrollment(enrollment, enrollment_info)
+                    elsif pseudo.deleted?
+                      "Attempted enrolling with deleted sis login #{pseudo.id} in course #{enrollment_info.course_id}"
+                    end
+          if message
+            @messages << SisBatch.build_error(enrollment_info.csv,
+                                              message,
+                                              sis_batch: @batch,
+                                              row: enrollment_info.lineno,
+                                              row_info: enrollment_info.row_info)
+            return true
+          end
+        end
 
         case enrollment_info.status
         when /\Aactive/i
@@ -455,7 +469,7 @@ module SIS
           else
             @enrollments_to_delete << enrollment
           end
-          # we are done and we con go to the next enrollment
+          # we are done and we can go to the next enrollment
           true
         end
       end
@@ -480,7 +494,7 @@ module SIS
       end
 
       def invalid_active_enrollment(enrollment, enrollment_info)
-        enrollment.workflow_state = "deleted"
+        enrollment.workflow_state = "deleted" unless enrollment.deleted?
         "Attempted enrolling of deleted user #{enrollment_info.user_id} in course #{enrollment_info.course_id}"
       end
 

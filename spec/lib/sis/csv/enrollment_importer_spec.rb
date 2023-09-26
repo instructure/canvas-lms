@@ -383,10 +383,12 @@ describe SIS::CSV::EnrollmentImporter do
       "test_1,user_1,student,,deleted,"
     )
     # skipped enrollment update
-    importer = process_csv_data_cleanly(
+    importer = process_csv_data(
       "course_id,user_id,role,section_id,status,associated_user_id",
       "test_1,user_1,student,,active,"
     )
+    errors = importer.errors.map(&:last)
+    expect(errors).to include(/Attempted enrolling with deleted sis login/)
     expect(importer.batch.roll_back_data.count).to eq 0
   end
 
@@ -966,7 +968,7 @@ describe SIS::CSV::EnrollmentImporter do
     expect(g.group_memberships.active.count).to eq 1
   end
 
-  it "does not create enrollments for deleted users" do
+  it "does not create active enrollments for deleted users" do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "test_1,TC 101,Test Course 101,,,active"
@@ -989,6 +991,32 @@ describe SIS::CSV::EnrollmentImporter do
     student = Pseudonym.where(sis_user_id: "student_user").first.user
     expect(student.enrollments.count).to eq 1
     expect(student.enrollments.first).to be_deleted
+  end
+
+  it "does not create new enrollments for an already deleted user and enrollment" do
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "test_1,TC 101,Test Course 101,,,active"
+    )
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "student_user,user1,User,Uno,user@example.com,active"
+    )
+    User.where(id: Pseudonym.find_by(sis_user_id: "student_user").user_id).update_all(workflow_state: "deleted")
+    process_csv_data(
+      "user_id,course_id,role,status",
+      "student_user,test_1,student,active"
+    )
+    importer = process_csv_data(
+      "user_id,course_id,role,status",
+      "student_user,test_1,student,active"
+    )
+    student = Pseudonym.where(sis_user_id: "student_user").first.user
+    expect(student.enrollments.count).to eq 1
+    expect(student.enrollments.first).to be_deleted
+    errors = importer.errors.map(&:last)
+    expect(errors).to include(/Attempted enrolling of deleted user/)
+    expect(importer.batch.roll_back_data.count).to eq 0
   end
 
   it "do not create enrollments for deleted pseudonyms except when they have an active pseudonym too" do
