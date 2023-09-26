@@ -409,6 +409,7 @@ describe "Speedgrader" do
         assignment.grade_student(@students[3], grader: @teacher, excused: true)
         @submission = assignment.submissions.find_by!(user: @students[4])
         @custom_status = CustomGradeStatus.create!(name: "Custom Status", color: "#000000", root_account_id: @course.root_account_id, created_by: @teacher)
+        @second_custom_status = CustomGradeStatus.create!(name: "Second Status", color: "#000000", root_account_id: @course.root_account_id, created_by: @teacher)
         @submission.update!(custom_grade_status: @custom_status)
         user_session(@teacher)
         Speedgrader.visit(@course.id, assignment.id)
@@ -424,6 +425,44 @@ describe "Speedgrader" do
         expect(f(".submission-excused-pill")).to be_displayed
         Speedgrader.click_next_student_btn
         expect(f(".submission-custom-grade-status-pill-#{@custom_status.id}")).to be_displayed
+      end
+
+      it "updates status pill when standard status is changed to another standard status" do
+        expect(f(".submission-missing-pill")).to be_displayed
+        f("[data-testid='speedGraderStatusMenu-editButton']").click
+        late_status = f("[data-testid='speedGraderStatusMenu-late']")
+        expect(late_status).to be_displayed
+        late_status.click
+        expect(f(".submission-late-pill")).to be_displayed
+      end
+
+      it "updates status pill when standard status is changed to custom status" do
+        expect(f(".submission-missing-pill")).to be_displayed
+        f("[data-testid='speedGraderStatusMenu-editButton']").click
+        custom_status = f("[data-testid='speedGraderStatusMenu-#{@custom_status.id}']")
+        expect(custom_status).to be_displayed
+        custom_status.click
+        expect(f(".submission-custom-grade-status-pill-#{@custom_status.id}")).to be_displayed
+      end
+
+      it "updates status pill when custom status is changed to another custom status" do
+        Speedgrader.visit(@course.id, @submission.assignment_id, 10, @submission.user_id)
+        expect(f(".submission-custom-grade-status-pill-#{@custom_status.id}")).to be_displayed
+        f("[data-testid='speedGraderStatusMenu-editButton']").click
+        second_custom_status_button = f("[data-testid='speedGraderStatusMenu-#{@second_custom_status.id}']")
+        expect(second_custom_status_button).to be_displayed
+        second_custom_status_button.click
+        expect(f(".submission-custom-grade-status-pill-#{@second_custom_status.id}")).to be_displayed
+      end
+
+      it "updates status pill when custom status is changed to standard status" do
+        Speedgrader.visit(@course.id, @submission.assignment_id, 10, @submission.user_id)
+        expect(f(".submission-custom-grade-status-pill-#{@custom_status.id}")).to be_displayed
+        f("[data-testid='speedGraderStatusMenu-editButton']").click
+        late_status = f("[data-testid='speedGraderStatusMenu-late']")
+        expect(late_status).to be_displayed
+        late_status.click
+        expect(f(".submission-late-pill")).to be_displayed
       end
     end
   end

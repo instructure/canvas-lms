@@ -348,8 +348,8 @@ class Speedgrader
     end
 
     # action
-    def visit(course_id, assignment_id, timeout = 10)
-      get "/courses/#{course_id}/gradebook/speed_grader?assignment_id=#{assignment_id}"
+    def visit(course_id, assignment_id, timeout = 10, student_id = nil)
+      get "/courses/#{course_id}/gradebook/speed_grader?assignment_id=#{assignment_id}#{student_id ? "&student_id=#{student_id}" : ""}"
       visibility_check = grade_input
       wait_for(method: :visit, timeout:) { visibility_check.displayed? }
     end

@@ -1218,6 +1218,7 @@ function updateSubmissionAndPageEffects(data?: {
   excuse?: boolean
   latePolicyStatus?: string
   secondsLateOverride?: number
+  customGradeStatusId?: string
 }) {
   const submission = EG.currentStudent.submission
 
@@ -3414,7 +3415,7 @@ EG = {
       student.submission?.submission_history?.findIndex(
         (history: {submission?: Submission; attempt?: number | null}) => {
           const historySubmission = history.submission || history
-          if (historySubmission.attempt == null) {
+          if (historySubmission.attempt === undefined) {
             return false
           }
           return historySubmission.attempt === submission.attempt
