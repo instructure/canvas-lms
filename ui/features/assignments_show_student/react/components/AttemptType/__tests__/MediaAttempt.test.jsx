@@ -128,8 +128,7 @@ describe('MediaAttempt', () => {
     })
   })
 
-  describe.skip('submitted', () => {
-    // unskip in EVAL-2504
+  describe('submitted', () => {
     it('renders the current submission', async () => {
       const props = await makeProps({
         Submission: {
