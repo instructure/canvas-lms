@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 5.10.0 - 2023-09-26
+
+### Fixed
+- An issue where media controls don't respond in Safari
+- An issue where embedded Studio videos cause unresponsiveness
+- A potential race condition in postMessage forwarding
+
+### Changed
+- Ignore a11y check on elements with a background image or gradient
+- Remove math processing percentage indicator
+
 ## 5.9.0 - 2023-08-30
 
 ### Fixed
