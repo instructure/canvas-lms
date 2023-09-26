@@ -16,44 +16,44 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, { useState } from 'react'
 import {TextArea} from '@instructure/ui-text-area'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {Rating} from '@instructure/ui-rating'
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-export default class SearchResult extends React.Component {
-  constructor(props) {
-    super(props)
+const I18n = useI18nScope('SmartSearch')
 
-    this.MAX_TOKENS = 100
-  }
+export default function SearchResult(props) {
+  const MAX_TOKENS = 100
 
-  elideText(text) {
-    if (text.split(' ').length <= this.MAX_TOKENS) {
+  function elideText(text) {
+    if (text.split(' ').length <= MAX_TOKENS) {
       return text
     }
-    return text.split(' ').slice(0, this.MAX_TOKENS).join(' ') + '...'
+    return text.split(' ').slice(0, MAX_TOKENS).join(' ') + '...'
   }
 
-  cleanText(text) {
+  function cleanText(text) {
     // TODO: any other "cleaning"?
     return text.replace(/\\n/g, '\n')
   }
 
-  cleanAndElideText(text) {
-    return this.elideText(this.cleanText(text))
+  function cleanAndElideText(text) {
+    return elideText(cleanText(text))
   }
 
-  generateWikiUrl(wiki_page) {
+  function generateWikiUrl(wiki_page) {
     return `/courses/${wiki_page.context_id}/pages/${wiki_page.url}`
   }
 
-  generateDiscussionUrl(discussion_topic) {
+  function generateDiscussionUrl(discussion_topic) {
     return `/courses/${discussion_topic.context_id}/discussion_topics/${discussion_topic.id}`
   }
 
-  getRelevance(record) {
+  // TODO: Make this more user friendly and add I18n
+  function getRelevance(record) {
     return (
       <View as="div">
         <Text>Distance: {record.distance}</Text>
@@ -61,60 +61,37 @@ export default class SearchResult extends React.Component {
     )
   }
 
-  render() {
-    if (this.props.searchResult.wiki_page) {
-      // id, wiki_id, title, body, etc.
-      const wiki_page = this.props.searchResult.wiki_page
-      return (
+  if (props.searchResult.wiki_page) {
+    // id, wiki_id, title, body, etc.
+    const wiki_page = props.searchResult.wiki_page
+    return (
+      <View
+        as="div"
+        margin="small"
+        padding="small"
+        borderWidth="small"
+        borderRadius="medium"
+        shadow="resting"
+      >
+        <h3>{wiki_page.title}</h3>
+        <span>{I18n.t('Course Page')}</span>
         <View
           as="div"
-          margin="small"
-          padding="small"
-          borderWidth="small"
-          borderRadius="medium"
-          shadow="resting"
-        >
-          <h3>{wiki_page.title}</h3>
-          <span>Course Page</span>
-          <View
-            as="div"
-            maxHeight="200px"
-            dangerouslySetInnerHTML={{__html: this.elideText(wiki_page.body)}}
-          />
-          {this.getRelevance(wiki_page)}
-          <a href={this.generateWikiUrl(wiki_page)}>View Full Page</a>
-        </View>
-      )
-    } else if (this.props.searchResult.discussion_topic) {
-      // id, title, message, etc.
-      const discussion_topic = this.props.searchResult.discussion_topic
-      return (
-        <View
-          as="div"
-          margin="small"
-          padding="small"
-          borderWidth="small"
-          borderRadius="medium"
-          shadow="resting"
-        >
-          <h3>{discussion_topic.title}</h3>
-          <span>Discussion Topic / Announcement</span>
-          <View
-            as="div"
-            maxHeight="200px"
-            dangerouslySetInnerHTML={{__html: this.elideText(discussion_topic.message)}}
-          />
-          {this.getRelevance(discussion_topic)}
-          <a href={this.generateDiscussionUrl(discussion_topic)}>View Full Post</a>
-        </View>
-      )
-    } else {
-      // Unknown type, just dump json
-      return (
-        <View as="div" margin="small" padding="small">
-          <TextArea value={JSON.stringify(this.props.searchResult)} />
-        </View>
-      )
-    }
+          maxHeight="200px"
+          dangerouslySetInnerHTML={{__html: elideText(wiki_page.body)}}
+        />
+        {getRelevance(wiki_page)}
+        <a href={generateWikiUrl(wiki_page)}>{I18n.t('View Full Page')}</a>
+      </View>
+    )
+  } else if (props.searchResult.discussion_topic) {
+    // TODO: implement discussion_topic or other record type
+  } else {
+    // Unknown type, just dump json
+    return (
+      <View as="div" margin="small" padding="small">
+        <TextArea value={JSON.stringify(props.searchResult)} />
+      </View>
+    )
   }
 }

@@ -20,21 +20,21 @@ import React from 'react'
 import {Flex} from '@instructure/ui-flex'
 import SearchResult from './SearchResult'
 
-export default class SearchResults extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {}
+export default function SearchResults(props) {
+  function searchItemKey(searchItem){
+    if(searchItem.wiki_page){
+      return "wiki_page-" + searchItem.wiki_page.id
+    } // TODO: add other search item types
+    return "unknown";
   }
 
-  render() {
-    return (
-      <Flex as="div" direction="column">
-        {this.props.searchResults.map(s => (
-          <Flex.Item as="div">
-            <SearchResult key={s.id} searchResult={s} />
-          </Flex.Item>
-        ))}
-      </Flex>
-    )
-  }
+  return (
+    <Flex as="div" direction="column">
+      {props.searchResults.map(s => (
+        <Flex.Item key={searchItemKey(s)} as="div">
+          <SearchResult searchResult={s} />
+        </Flex.Item>
+      ))}
+    </Flex>
+  )
 }
