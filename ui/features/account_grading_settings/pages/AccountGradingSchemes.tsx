@@ -20,7 +20,7 @@ import React, {useEffect} from 'react'
 import {useMatch} from 'react-router-dom'
 import {GradingSchemesManagement} from '@canvas/grading-scheme'
 
-export const AccountGradingSchemes = () => {
+export function Component() {
   const pathMatch = useMatch('/accounts/:accountId/*')
   if (!pathMatch || !pathMatch.params || !pathMatch.params.accountId) {
     throw new Error('account id is not present on path')
