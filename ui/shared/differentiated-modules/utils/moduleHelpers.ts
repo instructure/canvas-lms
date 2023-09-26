@@ -43,6 +43,39 @@ const requirementTypeMap: Record<string, Requirement['type']> = {
   must_submit_requirement: 'submit',
 }
 
+const requirementTypeMapReverse: Record<Requirement['type'], string> = {
+  score: 'min_score_requirement',
+  view: 'must_view_requirement',
+  mark: 'must_mark_done_requirement',
+  contribute: 'must_contribute_requirement',
+  submit: 'must_submit_requirement',
+}
+
+const requirementFriendlyLabelMap: Record<Requirement['type'], string> = {
+  score: I18n.t('Score at least'),
+  view: I18n.t('View'),
+  mark: I18n.t('Mark done'),
+  contribute: I18n.t('Contribute'),
+  submit: I18n.t('Submit'),
+}
+
+function requirementScreenreaderMessage(requirement: Requirement) {
+  switch (requirement.type) {
+    case 'score':
+      return I18n.t('Must score at least %{points} to complete this module item', {
+        points: requirement.minimumScore,
+      })
+    case 'view':
+      return I18n.t('Must view in order to complete this module item')
+    case 'mark':
+      return I18n.t('Must mark this module item done in order to complete')
+    case 'contribute':
+      return I18n.t('Must contribute to this module item to complete it')
+    case 'submit':
+      return I18n.t('Must submit this module item to complete it')
+  }
+}
+
 export function parseModule(element: HTMLDivElement) {
   const moduleId = element.getAttribute('data-module-id')
   const moduleName = element.querySelector('.name')?.getAttribute('title') ?? ''
@@ -144,7 +177,7 @@ function parseModuleItems(element: HTMLDivElement) {
 }
 
 export function updateModuleUI(moduleElement: HTMLDivElement, moduleSettings: SettingsPanelState) {
-  ;[updateName, updateUnlockTime, updatePrerequisites].forEach(fn =>
+  ;[updateName, updateUnlockTime, updatePrerequisites, updateRequirements].forEach(fn =>
     fn(moduleElement, moduleSettings)
   )
 }
@@ -266,4 +299,74 @@ function updatePrerequisites(moduleElement: HTMLDivElement, moduleSettings: Sett
     })
     prerequisiteElement.appendChild(prereqMessageElement)
   }
+}
+
+function updateRequirements(moduleElement: HTMLDivElement, moduleSettings: SettingsPanelState) {
+  const requirementsMessageElement = moduleElement.querySelector('.requirements_message')
+  if (requirementsMessageElement) {
+    requirementsMessageElement.setAttribute(
+      'data-requirement-type',
+      moduleSettings.requirementCount
+    )
+
+    if (moduleSettings.requirements.length === 0) {
+      requirementsMessageElement.innerHTML = ``
+    } else {
+      const requirementText =
+        moduleSettings.requirementCount === 'all' ? 'Complete All Items' : 'Complete One Item'
+      requirementsMessageElement.innerHTML = `
+        <ul class="pill">
+          <li aria-label="${requirementText}">${requirementText}</li>
+        </ul>
+      `
+    }
+  }
+
+  const sequentialProgressElement = moduleElement.querySelector('.require_sequential_progress')
+  if (sequentialProgressElement) {
+    sequentialProgressElement.textContent = moduleSettings.requireSequentialProgress.toString()
+  }
+
+  // Clear everything out so we can start with a fresh slate
+  moduleElement.querySelectorAll('.ig-row').forEach(item => {
+    item.classList.remove('with-completion-requirements')
+    const descriptionElement = item.querySelector('.requirement-description')
+    if (descriptionElement) {
+      descriptionElement.innerHTML = ''
+    }
+  })
+
+  moduleSettings.requirements.forEach(requirement => {
+    const moduleItemElement = moduleElement.querySelector(`#context_module_item_${requirement.id}`)
+    if (moduleItemElement) {
+      moduleItemElement.querySelector('.ig-row')?.classList.add('with-completion-requirements')
+
+      const descriptionElement = moduleItemElement.querySelector('.requirement-description')
+      if (descriptionElement) {
+        const scoreElement =
+          requirement.type === 'score'
+            ? `<span class="min_score"> ${requirement.minimumScore}</span>`
+            : ''
+        descriptionElement.innerHTML = `
+          <span class="requirement_type ${requirementTypeMapReverse[requirement.type]}">
+            <span class="unfulfilled">
+              ${requirementFriendlyLabelMap[requirement.type]}${scoreElement}
+              <span class="screenreader-only">${requirementScreenreaderMessage(requirement)}</span>
+            </span>
+          </span>
+        `
+      }
+
+      const pointsPossibleElement = moduleItemElement.querySelector('.points_possible_display')
+      if (pointsPossibleElement) {
+        if (requirement.type === 'score' && requirement.pointsPossible) {
+          pointsPossibleElement.textContent = I18n.t('%{points} pts', {
+            points: I18n.n(requirement.pointsPossible),
+          })
+        } else {
+          pointsPossibleElement.textContent = ''
+        }
+      }
+    }
+  })
 }

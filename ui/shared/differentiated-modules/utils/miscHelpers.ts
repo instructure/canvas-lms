@@ -33,6 +33,14 @@ export function convertFriendlyDatetimeToUTC(date: string | null | undefined): s
 }
 
 export function convertModuleSettingsForApi(moduleSettings: SettingsPanelState) {
+  const typeMap: Record<Requirement['type'], string> = {
+    view: 'must_view',
+    mark: 'must_mark_done',
+    submit: 'must_submit',
+    score: 'min_score',
+    contribute: 'must_contribute',
+  }
+
   return {
     context_module: {
       name: moduleSettings.moduleName,
@@ -41,6 +49,16 @@ export function convertModuleSettingsForApi(moduleSettings: SettingsPanelState) 
         .filter(prerequisite => prerequisite.id !== '-1')
         .map(prerequisite => `module_${prerequisite.id}`)
         .join(','),
+      completion_requirements: moduleSettings.requirements.reduce((requirements, requirement) => {
+        requirements[requirement.id] = {
+          type: typeMap[requirement.type],
+          min_score: requirement.type === 'score' ? requirement.minimumScore : '',
+        }
+        return requirements
+      }, {} as Record<string, Record<string, string>>),
+      requirement_count: moduleSettings.requirementCount === 'one' ? '1' : '',
+      require_sequential_progress:
+        moduleSettings.requirementCount === 'all' && moduleSettings.requireSequentialProgress,
     },
   }
 }
