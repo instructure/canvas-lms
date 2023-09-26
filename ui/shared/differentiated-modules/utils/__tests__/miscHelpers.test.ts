@@ -23,6 +23,7 @@ import {
   convertFriendlyDatetimeToUTC,
   convertModuleSettingsForApi,
 } from '../miscHelpers'
+import type {Requirement} from '../../react/types'
 
 describe('calculatePanelHeight', () => {
   it('computes the correct height when withinTabs is true', () => {
@@ -63,6 +64,29 @@ describe('convertModuleSettingsForApi', () => {
       {id: '1', name: 'Week 1'},
       {id: '2', name: 'Week 2'},
     ],
+    requirements: [
+      {type: 'view', id: '1', name: 'Mod 1', resource: 'externalUrl'},
+      {type: 'mark', id: '2', name: 'Mod 2', resource: 'page'},
+      {
+        type: 'submit',
+        id: '3',
+        name: 'Mod 3',
+        resource: 'assignment',
+        minimumScore: '50',
+        pointsPossible: '100',
+      },
+      {
+        type: 'score',
+        id: '4',
+        name: 'Mod 4',
+        resource: 'quiz',
+        minimumScore: '50',
+        pointsPossible: '100',
+      },
+      {type: 'contribute', id: '5', name: 'Mod 5', resource: 'discussion'},
+    ] as Requirement[],
+    requirementCount: 'all' as const,
+    requireSequentialProgress: false,
   }
 
   it('converts the module settings to the format expected by the API', () => {
@@ -71,6 +95,15 @@ describe('convertModuleSettingsForApi', () => {
         name: 'Module 1',
         unlock_at: '2023-08-02T06:00:00.000Z',
         prerequisites: 'module_1,module_2',
+        completion_requirements: {
+          1: {min_score: '', type: 'must_view'},
+          2: {min_score: '', type: 'must_mark_done'},
+          3: {min_score: '', type: 'must_submit'},
+          4: {min_score: '50', type: 'min_score'},
+          5: {min_score: '', type: 'must_contribute'},
+        },
+        requirement_count: '',
+        require_sequential_progress: false,
       },
     })
   })
@@ -81,5 +114,31 @@ describe('convertModuleSettingsForApi', () => {
       lockUntilChecked: false,
     })
     expect(formattedSettings.context_module.unlock_at).toBe(null)
+  })
+
+  it('has requirement_count of 1 if requirementCount is one', () => {
+    const formattedSettings = convertModuleSettingsForApi({
+      ...moduleSettings,
+      requirementCount: 'one',
+    })
+    expect(formattedSettings.context_module.requirement_count).toBe('1')
+  })
+
+  it('has require_sequential_progress of true if count is all and RSP is true', () => {
+    const formattedSettings = convertModuleSettingsForApi({
+      ...moduleSettings,
+      requirementCount: 'all',
+      requireSequentialProgress: true,
+    })
+    expect(formattedSettings.context_module.require_sequential_progress).toBe(true)
+  })
+
+  it('has requirem_sequential_progress of false if count is one and RSP is true', () => {
+    const formattedSettings = convertModuleSettingsForApi({
+      ...moduleSettings,
+      requirementCount: 'one',
+      requireSequentialProgress: true,
+    })
+    expect(formattedSettings.context_module.require_sequential_progress).toBe(false)
   })
 })
