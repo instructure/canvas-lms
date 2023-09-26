@@ -16,15 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback} from 'react'
+import React, {useCallback, useState} from 'react'
+import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
-import {Tray} from '@instructure/ui-tray'
-import {View} from '@instructure/ui-view'
-import {CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
+import {Tray} from '@instructure/ui-tray'
 // @ts-expect-error
-import {IconAssignmentLine, IconQuizLine, IconQuestionLine} from '@instructure/ui-icons'
-// import ItemAssignToPanel from './ItemAssignToPanel'
+import {uid} from '@instructure/uid'
+import {View} from '@instructure/ui-view'
+import {
+  IconAddLine,
+  IconAssignmentLine,
+  IconQuizLine,
+  IconQuestionLine,
+  // @ts-expect-error
+} from '@instructure/ui-icons'
+import ItemAssignToCard from './ItemAssignToCard'
 import TrayFooter from '../Footer'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
@@ -44,6 +51,7 @@ function itemTypeToIcon(itemType: string) {
   }
 }
 
+// TODO: need props to initialize with cards corresponding to current assignments
 export interface ItemAssignToTrayProps {
   open: boolean
   onDismiss: () => void
@@ -55,19 +63,47 @@ export interface ItemAssignToTrayProps {
   pointsPossible: string
 }
 
+// TODO: will eventually be ItemAssignToCardProps, I think
+interface CardProps {
+  courseId: string
+  moduleItemId: string
+}
+interface CardMap {
+  [key: string]: CardProps
+}
+
 export default function ItemAssignToTray({
   open,
   onDismiss,
   onSave,
-  // courseId,
-  // moduleItemId,
+  courseId,
+  moduleItemId,
   moduleItemName,
   moduleItemType,
   pointsPossible,
 }: ItemAssignToTrayProps) {
+  const [assignToCards, setAssignToCards] = useState<CardMap>(() => {
+    const cardId = uid('assign-to-card', 3)
+    return {[cardId]: {courseId, moduleItemId}} as CardMap
+  })
+
+  const handleAddCard = useCallback(() => {
+    const cardId = uid('assign-to-card', 3)
+    setAssignToCards({...assignToCards, [cardId]: {courseId, moduleItemId}} as any)
+  }, [assignToCards, courseId, moduleItemId])
+
   const handleUpdate = useCallback(() => {
     onSave()
   }, [onSave])
+
+  const handleDeleteCard = useCallback(
+    (cardId: string) => {
+      const cards = {...assignToCards}
+      delete cards[cardId]
+      setAssignToCards(cards)
+    },
+    [assignToCards]
+  )
 
   function Header() {
     const icon = itemTypeToIcon(moduleItemType)
@@ -100,18 +136,30 @@ export default function ItemAssignToTray({
     }
   }
 
+  function renderCards() {
+    const cardIds = Object.keys(assignToCards)
+    const cardCount = cardIds.length
+    return cardIds.map(cardId => {
+      const props = assignToCards[cardId]
+      return (
+        <View key={cardId} as="div" margin="small 0 0 0">
+          <ItemAssignToCard
+            {...props}
+            cardId={cardId}
+            onDelete={cardCount === 1 ? undefined : handleDeleteCard}
+          />
+        </View>
+      )
+    })
+  }
+
   function Body() {
     return (
-      <FlexItem margin="medium medium 0" width="100%" shouldGrow={true} shouldShrink={true}>
-        <View as="div">content here</View>
-        {/*
-        <View as="div" margin="small 0 0 0">
-          <ItemAssignToPanel courseId={courseId} moduleItemId={moduleItemId} canDelete={true} />
-        </View>
-         <View as="div" margin="small small 0 small">
-           <ItemAssignToPanel courseId={courseId} moduleItemId={moduleItemId} />
-      </View>
-*/}
+      <FlexItem padding="small medium 0" shouldGrow={true} shouldShrink={true}>
+        {renderCards()}
+        <Button onClick={handleAddCard} margin="small 0 0 0" renderIcon={IconAddLine}>
+          {I18n.t('Add')}
+        </Button>
       </FlexItem>
     )
   }
@@ -130,10 +178,10 @@ export default function ItemAssignToTray({
 
   return (
     <Tray
-      open={open}
       label={I18n.t('Edit assignment %{name}', {
         name: moduleItemName,
       })}
+      open={open}
       placement="end"
       size="regular"
     >
