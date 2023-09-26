@@ -16,65 +16,60 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, { useState } from 'react'
 import {TextInput} from '@instructure/ui-text-input'
 import {View} from '@instructure/ui-view'
 import {IconSearchLine} from '@instructure/ui-icons'
 import {Spinner} from '@instructure/ui-spinner'
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 import SearchResults from './SearchResults'
 
-export default class SearchApp extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      searchResults: [],
-      searchString: '',
-      searching: false,
-    }
-    this.handleKey = this.handleKey.bind(this)
-    this.handleChange = this.handleChange.bind(this)
-  }
+const I18n = useI18nScope('SmartSearch')
 
-  async handleKey(event) {
+export default function SearchApp() {
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchString, setSearchString] = useState('');
+  const [searching, setSearching] = useState(false);
+  const [textInput, setTextInput] = useState(null);
+
+  async function handleKey(event) {
     if (event.key === 'Enter' && event.type === 'keydown') {
-      const searchString = this.state.searchString
-      this.setState({searching: true})
-      await this.runSearch(searchString)
-      this.setState({searching: false})
-      this.textInput.focus()
+      setSearching(true)
+      await runSearch(searchString)
+      setSearching(false)
+      textInput.focus()
     }
   }
 
-  handleChange(e, value) {
-    this.setState({searchString: value})
+  function handleChange(e, value) {
+    setSearchString(value)
   }
 
-  async runSearch(searchString) {
+  async function runSearch(searchString) {
     const res = await fetch(`/smartsearch?q=${searchString}`)
     const json = await res.json()
 
     const searchResults = json.results
 
-    this.setState({searchResults})
+    setSearchResults(searchResults)
   }
 
-  render() {
-    return (
-      <View>
-        <div onKeyDown={this.handleKey}>
-          <TextInput
-            interaction={this.state.searching ? 'disabled' : 'enabled'}
-            ref={e => (this.textInput = e)}
-            onChange={this.handleChange}
-            value={this.state.searchString}
-            renderAfterInput={() => <IconSearchLine />}
-          />
-        </div>
-        {this.state.searching ? <Spinner /> : null}
+  return (
+    <View>
+      <div onKeyDown={handleKey}>
+        <TextInput
+          renderLabel={<h1>{I18n.t('Search')}</h1>}
+          interaction={searching ? 'disabled' : 'enabled'}
+          ref={e => (setTextInput(e))}
+          onChange={handleChange}
+          value={searchString}
+          renderAfterInput={() => <IconSearchLine />}
+        />
+      </div>
+      {searching ? <Spinner renderTitle={I18n.t('Searching')} /> : null}
 
-        <SearchResults searchResults={this.state.searchResults} />
-      </View>
-    )
-  }
+      <SearchResults searchResults={searchResults} />
+    </View>
+  )
 }
