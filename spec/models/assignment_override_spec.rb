@@ -77,6 +77,13 @@ describe AssignmentOverride do
     expect(@override.set).to be_nil
   end
 
+  it "doesn't crash when calling polymorphic getters on an adhoc override" do
+    @override = assignment_override_model
+    expect(@override.course).to be_nil
+    expect(@override.course_section).to be_nil
+    expect(@override.group).to be_nil
+  end
+
   it "removes adhoc associations when an adhoc override is deleted" do
     @override = assignment_override_model(course: @course)
     @override_student = @override.assignment_override_students.build

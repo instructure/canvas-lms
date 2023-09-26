@@ -285,6 +285,20 @@ class AssignmentOverride < ActiveRecord::Base
     end
   end
 
+  # since we override `set`, we also need to override the implicitly generated polymorphic getters
+  # or else it will try to instantiate `ADHOC` or `Noop`
+  def course
+    set if set_type == "Course"
+  end
+
+  def course_section
+    set if set_type == "CourseSection"
+  end
+
+  def group
+    set if set_type == "Group"
+  end
+
   def for_nonactive_enrollment?
     !!@for_nonactive_enrollment
   end
