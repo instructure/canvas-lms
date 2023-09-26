@@ -1179,7 +1179,7 @@ describe "Files API", type: :request do
       expect(json.keys & prohibited_fields).to be_empty
     end
 
-    context "when the attachment is locked and replacement params are inlucded" do
+    context "when the attachment is locked and replacement params are included" do
       subject do
         api_call(
           :get,

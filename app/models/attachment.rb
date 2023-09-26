@@ -1422,11 +1422,30 @@ class Attachment < ActiveRecord::Base
     @associated_with_submission ||= attachment_associations.where(context_type: "Submission").exists?
   end
 
+  def can_read_through_assignment?(user, session)
+    return false unless assignment
+
+    # grader
+    return true if assignment.grants_right?(user, session, :grade)
+
+    # submitter
+    student_submission = assignment.submissions.active.where(user_id: user)
+    student_submission.joins(:versions)
+                      .where(%(#{id}=any(regexp_split_to_array((regexp_match(versions.yaml,'attachment_ids: [''"]([0-9,]+)[''"]'))[1], ',')::INT8[])))
+                      .union(
+                        student_submission.joins(:submission_comments)
+                          .merge(SubmissionComment.published.visible)
+                          .where("#{id}=any(regexp_split_to_array(nullif(submission_comments.attachment_ids,''), ',')::INT8[])")
+                      ).exists?
+  end
+
   def user_can_read_through_context?(user, session, through_assessment: true)
     return true if through_assessment && context.is_a?(AssessmentQuestion) && context.user_can_see_through_quiz_question?(user, session)
 
     if supports_visibility?
       context&.grants_right?(user, session, :read_as_member) || context.try(:unenrolled_user_can_read?, user, computed_visibility_level)
+    elsif context.is_a?(Assignment)
+      can_read_through_assignment?(user, session)
     else
       context&.grants_right?(user, session, :read)
     end
