@@ -1309,6 +1309,82 @@ describe Attachment do
       expect(aq_att2.grants_right?(student, :download)).to be false
     end
 
+    context "attachments with assignment context" do
+      before :once do
+        assignment_model(course: @course, submission_types: "online_upload")
+        @submission = @assignment.submit_homework(student, attachments: [attachment_model(context: student)])
+        @course.enroll_student(user_model).accept
+        @student2 = @user
+        @course.enroll_teacher(user_model).accept
+        @teacher = @user
+      end
+
+      it "only allows graders to access the 'download all submissions' zip folder on an assignment" do
+        attachment = SubmissionsController.new.submission_zip(@assignment)
+        expect(attachment.grants_right?(@teacher, :download)).to be true
+        expect(attachment.grants_right?(student, :download)).to be false
+      end
+
+      it "allows graders to access attachments from students on submission comments" do
+        @submission.add_comment(author: student, comment: "comment", attachments: [attachment_model(context: @assignment)])
+        expect(@attachment.grants_right?(@teacher, :download)).to be true
+      end
+
+      it "allows students to access attachments on submission comments associated to their submissions" do
+        @submission.add_comment(author: @teacher, comment: "comment", attachments: [attachment_model(context: @assignment)])
+        expect(@attachment.grants_right?(student, :download)).to be true
+
+        @submission.add_comment(author: student, comment: "comment", attachments: [attachment_model(context: @assignment)])
+        expect(@attachment.grants_right?(student, :download)).to be true
+      end
+
+      it "does not allow students to access attachments on submission comments for other's submissions" do
+        @submission.add_comment(author: @teacher, comment: "comment", attachments: [attachment_model(context: @assignment)])
+        expect(@attachment.grants_right?(@student2, :download)).to be false
+
+        @submission.add_comment(author: student, comment: "comment", attachments: [attachment_model(context: @assignment)])
+        expect(@attachment.grants_right?(@student2, :download)).to be false
+      end
+
+      it "does not allow users to access attachments for deleted submissions" do
+        attachment_model(context: @assignment)
+        submission = @assignment.submit_homework(student, attachments: [attachment_model(context: @attachment)])
+        submission.destroy
+
+        expect(@attachment.grants_right?(student, :download)).to be false
+      end
+
+      it "does not allow users to access attachments for deleted submission comments" do
+        attachment1 = attachment_model(context: @assignment)
+        attachment2 = attachment_model(context: @assignment)
+        comment1 = @submission.add_comment(author: @user, comment: "comment", attachments: [attachment1])
+        comment2 = @submission.add_comment(author: student, comment: "comment", attachments: [attachment2])
+        comment1.destroy
+        comment2.destroy
+
+        expect(attachment1.grants_right?(student, :download)).to be false
+        expect(attachment2.grants_right?(student, :download)).to be false
+      end
+
+      context "submission attachments with an attachment context (LTI submissions?)" do
+        before :once do
+          @submission = @assignment.submit_homework(student, attachments: [attachment_model(context: @assignment)])
+        end
+
+        it "allows graders to access attachments for submissions on an assignment" do
+          expect(@attachment.grants_right?(@teacher, :download)).to be true
+        end
+
+        it "allows students to access submission attachments for their submissions" do
+          expect(@attachment.grants_right?(student, :download)).to be true
+        end
+
+        it "does not allow students to access submission attachments for other's submissions" do
+          expect(@attachment.grants_right?(@student2, :download)).to be false
+        end
+      end
+    end
+
     context "group assignment" do
       before :once do
         group_category = @course.group_categories.create!(name: "Group Category")
