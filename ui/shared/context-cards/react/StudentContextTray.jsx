@@ -207,7 +207,7 @@ export default class StudentContextTray extends React.Component {
                 displayName: user.short_name,
               },
             ]}
-            title="Send a message"
+            title={I18n.t('Send a message')}
           />
         ) : null}
 
