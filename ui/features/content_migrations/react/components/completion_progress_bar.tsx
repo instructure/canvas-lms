@@ -18,8 +18,10 @@
 
 import React, {useCallback, useEffect, useState, useRef} from 'react'
 import {ProgressBar} from '@instructure/ui-progress'
+import {Text} from '@instructure/ui-text'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {ContentMigrationWorkflowState} from './types'
 
 const I18n = useI18nScope('content_migrations_redesign')
 
@@ -90,4 +92,15 @@ export const CompletionProgressBar = ({progress_url}: CompletionProgressBarProps
       shouldAnimate={true}
     />
   )
+}
+
+export const buildProgressCellContent = (
+  workflow_state: ContentMigrationWorkflowState,
+  migration_issues_count: number,
+  progress_url: string
+) => {
+  if (['failed', 'completed'].includes(workflow_state) && migration_issues_count > 0) {
+    return <Text>{I18n.t('%{count} issues', {count: migration_issues_count})}</Text>
+  }
+  return <CompletionProgressBar progress_url={progress_url} />
 }

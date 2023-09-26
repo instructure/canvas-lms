@@ -19,7 +19,7 @@
 import React from 'react'
 import {render, waitFor} from '@testing-library/react'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {CompletionProgressBar} from '../completion_progress_bar'
+import {CompletionProgressBar, buildProgressCellContent} from '../completion_progress_bar'
 
 jest.mock('@canvas/do-fetch-api-effect')
 
@@ -141,5 +141,19 @@ describe('CompletionProgressBar', () => {
     })
     const component = renderComponent()
     expect(component.container).toBeEmptyDOMElement()
+  })
+})
+
+describe('buildProgressCellContent()', () => {
+  it('renders text', () => {
+    const component = render(buildProgressCellContent('failed', 5, 'https://mock.progress.url'))
+    expect(component.getByText('5 issues')).toBeInTheDocument()
+  })
+
+  it('renders progress bar', async () => {
+    doFetchApi.mockImplementation(() => Promise.resolve({json: {completion: 75.0}}))
+    const component = render(buildProgressCellContent('running', 0, 'https://mock.progress.url'))
+    await waitFor(() => expect(component.getByRole('progressbar')).toBeInTheDocument())
+    expect(component.getByRole('progressbar')).toHaveAttribute('value', '75')
   })
 })

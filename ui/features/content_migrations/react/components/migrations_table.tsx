@@ -25,7 +25,8 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {datetimeString} from '@canvas/datetime/date-functions'
 import {ContentMigrationItem} from './types'
-import {CompletionProgressBar} from './completion_progress_bar'
+import {ActionButton} from './action_button'
+import {buildProgressCellContent} from './completion_progress_bar'
 
 const I18n = useI18nScope('content_migrations_redesign')
 
@@ -63,6 +64,9 @@ export const ContentMigrationsTable = () => {
             <Table.ColHeader theme={{padding: '0.6rem 0'}} id="progress">
               {I18n.t('Progress')}
             </Table.ColHeader>
+            <Table.ColHeader theme={{padding: '0.6rem 0'}} id="action">
+              {I18n.t('Action')}
+            </Table.ColHeader>
           </Table.Row>
         </Table.Head>
         <Table.Body>
@@ -82,7 +86,18 @@ export const ContentMigrationsTable = () => {
                 />
               </Table.Cell>
               <Table.Cell>
-                <CompletionProgressBar progress_url={cm.progress_url} />
+                {buildProgressCellContent(
+                  cm.workflow_state,
+                  cm.migration_issues_count,
+                  cm.progress_url
+                )}
+              </Table.Cell>
+              <Table.Cell>
+                <ActionButton
+                  migration_type_title={cm.migration_type_title}
+                  migration_issues_count={cm.migration_issues_count}
+                  migration_issues_url={cm.migration_issues_url}
+                />
               </Table.Cell>
             </Table.Row>
           ))}
