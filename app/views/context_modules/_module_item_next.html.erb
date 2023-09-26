@@ -404,17 +404,7 @@
   </div>
 </li>
 
+
 <% if @is_student && @context.feature_enabled?(:peer_reviews_for_a2) && module_item && module_item.content_type == 'Assignment' %>
-  <% current_user_submission = module_item.assignment.submission_for_student(@current_user) %>
-  <% assigned_assessments = current_user_submission&.assigned_assessments&.preload([:asset, assessor_asset: :assignment]) || [] %>
-  <% assigned_assessments.each.with_index(1) do |assessment, index| %>
-    <%
-      locals = {
-        index: index,
-        module_item: module_item,
-        assessment: assessment
-      }
-    %>
-    <%= render :partial => 'context_modules/asessment_request', locals: locals %>
-  <% end %>
+  <div id="module_student_view_peer_reviews_<%= module_item.content_id %>_<%= module_item.id %>"></div>
 <% end %>

@@ -27,6 +27,7 @@ module Types
 
     field :workflow_state, String, null: false
     field :asset_id, String, null: false
+    field :available, Boolean, method: :available?, null: true
 
     field :user, UserType, null: false
     def user
