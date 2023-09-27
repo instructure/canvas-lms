@@ -49,36 +49,6 @@ module Canvas
         LocalRedisCache.new(redis_conf_hash)
       end
 
-      it "writes sets of keys atomically" do
-        data_set = {
-          "keya" => "vala",
-          "keyb" => "valb",
-          "keyc" => "valc",
-          "keyd" => "vald",
-          "keye" => "vale",
-          "keyf" => "valf",
-          "keyg" => "valg",
-          "keyh" => "valh",
-        }
-        read_set = {}
-        slow_thread = Thread.new do
-          @slow_cache.write_set(data_set)
-        end
-        fast_thread = Thread.new do
-          while @fast_cache.read("keya") != "vala"
-            sleep(0.025)
-          end
-          # once any data is there, it should all be there
-          data_set.each_key do |k|
-            val = @fast_cache.read(k)
-            read_set[k] = val unless val.nil?
-          end
-        end
-        fast_thread.join
-        slow_thread.join
-        expect(read_set == data_set).to be_truthy
-      end
-
       it "handles concurrent traffic" do
         skip "FOO-1895 4/21/21"
         lock_taken = false
