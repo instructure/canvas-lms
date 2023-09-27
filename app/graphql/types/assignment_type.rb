@@ -467,6 +467,11 @@ module Types
       SubmissionSearch.new(assignment, current_user, session, filter).search
     end
 
+    field :grading_standard, GradingStandardType, null: true
+    def grading_standard
+      load_association(:grading_standard)
+    end
+
     field :group_submissions_connection, SubmissionType.connection_type, null: true do
       description "returns submissions grouped to one submission object per group"
       argument :filter, SubmissionSearchFilterInputType, required: false
