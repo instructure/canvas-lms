@@ -15,11 +15,19 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import {Dispatch, SetStateAction} from 'react'
 
 export type ContentMigrationItemSettings = {
   source_course_id: string
   source_course_name: string
   source_course_html_url: string
+}
+
+export type Migrator = {
+  type: string
+  requires_file_upload: true
+  name: string
+  required_settings: string
 }
 
 export type ContentMigrationItemAttachment = {
@@ -52,3 +60,17 @@ export type ContentMigrationItem = {
   migration_issues_url: string
   created_at: string
 }
+
+export type submitMigrationProps = {
+  selectiveImport: boolean
+  importAsNewQuizzes: boolean
+  adjustDates: boolean
+}
+
+export type submitMigrationCallbackType = ({
+  selectiveImport,
+  importAsNewQuizzes,
+  adjustDates,
+}: submitMigrationProps) => void
+
+export type setSourceCourseType = Dispatch<SetStateAction<string>>

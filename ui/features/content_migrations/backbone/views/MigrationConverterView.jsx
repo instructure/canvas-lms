@@ -194,8 +194,9 @@ MigrationConverterView.prototype.afterRender = function () {
     hasShadow: false,
     margin: '0 0 medium 0',
   })
-  // eslint-disable-next-line react/no-render-return-value
-  return ReactDOM.render(alert, this.$overwriteWarning[0])
+  if(this.$overwriteWarning[0]){
+    return ReactDOM.render(alert, this.$overwriteWarning[0])
+  }
 }
 
 export default MigrationConverterView

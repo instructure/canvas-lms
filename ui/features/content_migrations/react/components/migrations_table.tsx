@@ -16,13 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useEffect} from 'react'
 import {Table} from '@instructure/ui-table'
 import {Heading} from '@instructure/ui-heading'
 import {StatusPill} from './status_pill'
 import {SourceLink} from './source_link'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {datetimeString} from '@canvas/datetime/date-functions'
 import {ContentMigrationItem} from './types'
 import {ActionButton} from './action_button'
@@ -30,18 +31,25 @@ import {buildProgressCellContent} from './completion_progress_bar'
 
 const I18n = useI18nScope('content_migrations_redesign')
 
-export const ContentMigrationsTable = () => {
-  const [migrations, setMigrations] = useState<any>([])
+type responseType = {json: ContentMigrationItem[]}
 
+export const ContentMigrationsTable = ({
+  migrations,
+  setMigrations,
+}: {
+  migrations: ContentMigrationItem[]
+  setMigrations: (migrations: ContentMigrationItem[]) => void
+}) => {
   useEffect(() => {
-    // eslint-disable-next-line promise/catch-or-return
     doFetchApi({
       path: `/api/v1/courses/${window.ENV.COURSE_ID}/content_migrations`,
       params: {per_page: 25},
-    }).then((response: any) => {
-      setMigrations(response.json)
     })
-  }, [])
+      .then((response: responseType) => {
+        setMigrations(response.json)
+      })
+      .catch(showFlashError(I18n.t("Couldn't load previous content migrations")))
+  }, [setMigrations])
 
   return (
     <>
