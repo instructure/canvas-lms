@@ -27,6 +27,7 @@ import {Responsive} from '@instructure/ui-responsive'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {Link} from '@instructure/ui-link'
+import {AccessibleContent} from '@instructure/ui-a11y-content'
 
 const I18n = useI18nScope('discussion_topics_post')
 
@@ -66,6 +67,10 @@ export const ReplyPreview = ({...props}) => {
         const readMoreButtonText = shouldShowTruncatedText
           ? I18n.t('Read More')
           : I18n.t('Read Less')
+        const author = getDisplayName(props)
+        const readMoreButtonScreenReaderText = shouldShowTruncatedText
+          ? I18n.t('Read More, Reply from %{author}', {author})
+          : I18n.t('Read Less, Reply from %{author}', {author})
 
         return (
           <View
@@ -101,7 +106,9 @@ export const ReplyPreview = ({...props}) => {
                           margin="small"
                           onClick={() => setShouldShowTruncatedText(!shouldShowTruncatedText)}
                         >
-                          <Text size={responsiveProps.textSize}>{readMoreButtonText}</Text>
+                          <AccessibleContent alt={readMoreButtonScreenReaderText}>
+                            <Text size={responsiveProps.textSize}>{readMoreButtonText}</Text>
+                          </AccessibleContent>
                         </Link>
                       </span>
                     </Flex.Item>
