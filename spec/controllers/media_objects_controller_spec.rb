@@ -1126,6 +1126,8 @@ describe MediaObjectsController do
     end
 
     it "returns the embedded_iframe_url" do
+      Account.site_admin.disable_feature!(:media_links_use_attachment_id)
+
       post :create_media_object,
            params: {
              context_code: "user_#{@user.id}", id: "new_object", type: "audio", title: "title"
@@ -1134,6 +1136,32 @@ describe MediaObjectsController do
       expect(response.parsed_body["embedded_iframe_url"]).to eq media_object_iframe_url(
         @media_object.media_id
       )
+    end
+
+    context "with media_links_use_attachment_id feature flag enabled" do
+      before do
+        Account.site_admin.enable_feature!(:media_links_use_attachment_id)
+      end
+
+      it "returns the embedded_iframe_url" do
+        post :create_media_object,
+             params: {
+               context_code: "user_#{@user.id}", id: "new_object", type: "audio", title: "title"
+             }
+        @media_object = @user.reload.media_objects.last
+        expect(response.parsed_body["embedded_iframe_url"]).to eq media_attachment_iframe_url(
+          @media_object.attachment_id
+        )
+      end
+
+      it "returns the uuid" do
+        post :create_media_object,
+             params: {
+               context_code: "user_#{@user.id}", id: "new_object", type: "audio", title: "title"
+             }
+        @media_object = @user.reload.media_objects.last
+        expect(response.parsed_body["media_object"]["uuid"]).to eq @media_object.attachment.uuid
+      end
     end
   end
 

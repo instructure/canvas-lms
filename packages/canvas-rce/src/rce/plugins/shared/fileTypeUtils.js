@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {parse} from 'url'
+import {format, parse} from 'url'
 import {absoluteToRelativeUrl} from '../../../common/fileUrl'
 import {
   IconAudioLine,
@@ -105,13 +105,18 @@ export function mediaPlayerURLFromFile(file, canvasOrigin) {
     isAudioOrVideo(content_type) &&
     file.id
   ) {
-    if (!file.url && !file.href) {
-      return `/media_attachments_iframe/${file.id}?type=${type}&embedded=true`
+    const url = parse(`/media_attachments_iframe/${file.id}`, true)
+    url.query.type = type
+    url.query.embedded = true
+    if (file.uuid && file.contextType == 'User') {
+      url.query.verifier = file.uuid
+    } else if (file.url || file.href) {
+      const parsed_url = parse(file.url || file.href, true)
+      if (parsed_url.query.verifier) {
+        url.query.verifier = parsed_url.query.verifier
+      }
     }
-
-    const parsed_url = parse(file.url || file.href, true)
-    const verifier = parsed_url.query.verifier ? `&verifier=${parsed_url.query.verifier}` : ''
-    return `/media_attachments_iframe/${file.id}?type=${type}${verifier}&embedded=true`
+    return format(url)
   }
 
   if (file.embedded_iframe_url) {
