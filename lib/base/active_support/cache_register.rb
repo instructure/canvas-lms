@@ -45,7 +45,7 @@ module ActiveSupport
           if batch_object && !opts[:force] &&
              defined?(::ActiveSupport::Cache::RedisCacheStore) && is_a?(::ActiveSupport::Cache::RedisCacheStore) && Canvas::CacheRegister.enabled? &&
              batched_keys.all? { |type| batch_object.class.valid_cache_key_type?(type) }
-            fetch_with_cache_register(key, batch_object, batched_keys, opts, &block)
+            fetch_with_cache_register(key, batch_object, batched_keys, **opts, &block)
           elsif skip_cache_if_disabled
             yield # use for new caches that we're not already using updated_at+touch for
           else
@@ -62,7 +62,7 @@ module ActiveSupport
 
         private
 
-        def fetch_with_cache_register(name, batch_object, batched_keys, options, &)
+        def fetch_with_cache_register(name, batch_object, batched_keys, **options, &)
           options = merged_options(options)
           key = normalize_key(name, options)
           key += "/#{batch_object.model_name.cache_key}/#{batch_object.id}"
@@ -82,7 +82,9 @@ module ActiveSupport
             ::Rails.logger.debug("Running redis read with batched keys - #{keys.join(", ")}")
             # get the entry (if it exists) as well as the full frd cache_key used (after batching in the register keys)
             # in case we need to write to it
-            frd_key, cached_entry = Canvas::CacheRegister.lua.run(:get_with_batched_keys, keys, [now], redis)
+            frd_key, cached_entry = failsafe :read_entry do
+              Canvas::CacheRegister.lua.run(:get_with_batched_keys, keys, [now], redis)
+            end
             cached_entry = Marshal.load(cached_entry) if cached_entry # rubocop:disable Security/MarshalLoad
 
             entry = handle_expired_entry(cached_entry, frd_key, options)
@@ -93,12 +95,14 @@ module ActiveSupport
           end
 
           if entry
-            get_entry_value(entry, name, options)
+            get_entry_value(entry, name, **options)
           else
-            result = instrument(:generate, name, options, &)
-            instrument(:write, name, options) do
+            result = instrument(:generate, name, **options, &)
+            instrument(:write, name, **options) do
               entry = ::ActiveSupport::Cache::Entry.new(result, **options)
-              redis.set(frd_key, Marshal.dump(entry), options.merge(raw: true)) # write to the key generated in the lua script
+              failsafe :write_entry, returning: false do
+                redis.set(frd_key, Marshal.dump(entry), options.merge(raw: true)) # write to the key generated in the lua script
+              end
             end
             result
           end
