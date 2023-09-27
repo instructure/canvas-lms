@@ -60,6 +60,9 @@ function CanvasMultiSelect(props) {
     customRenderBeforeInput,
     customMatcher,
     customOnInputChange,
+    customOnRequestShowOptions,
+    customOnRequestHideOptions,
+    customOnRequestSelectOption,
     isLoading,
     ...otherProps
   } = props
@@ -211,6 +214,7 @@ function CanvasMultiSelect(props) {
 
   function onRequestShowOptions() {
     setIsShowingOptions(true)
+    customOnRequestShowOptions()
   }
 
   function onRequestHideOptions() {
@@ -223,6 +227,7 @@ function CanvasMultiSelect(props) {
       onChange([...selectedOptionIds, filteredOptionIds[0]])
     }
     setFilteredOptionIds(null)
+    customOnRequestHideOptions()
   }
 
   function onRequestHighlightOption(e, {id}) {
@@ -242,6 +247,7 @@ function CanvasMultiSelect(props) {
     if (typeof option === 'undefined') return
     setAnnouncement(I18n.t('%{label} selected. List collapsed.', {label: option.label}))
     onChange([...selectedOptionIds, id])
+    customOnRequestSelectOption([...selectedOptionIds, id])
   }
 
   // if backspace is pressed and there's no input to backspace over, remove the
@@ -312,6 +318,11 @@ CanvasMultiSelect.propTypes = {
   customOnInputChange: func,
   visibleOptionsCount: number,
   isLoading: bool,
+  listRef: func,
+  isShowingOptions: bool,
+  customOnRequestShowOptions: func,
+  customOnRequestHideOptions: func,
+  customOnRequestSelectOption: func
 }
 
 CanvasMultiSelect.defaultProps = {
@@ -321,7 +332,10 @@ CanvasMultiSelect.defaultProps = {
   selectedOptionIds: [],
   disabled: false,
   isLoading: false,
-  customOnInputChange: () => {}
+  customOnInputChange: () => {},
+  customOnRequestShowOptions: () => {},
+  customOnRequestHideOptions: () => {},
+  customOnRequestSelectOption: () => {}
 }
 
 CanvasMultiSelect.Option = CanvasMultiSelectOption

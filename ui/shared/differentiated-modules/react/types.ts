@@ -36,6 +36,19 @@ export interface ModuleItem extends Module {
   resource: ResourceType
 }
 
+export interface AssignmentOverride {
+  context_module_id: string
+  id: string
+  students: {
+    id: string
+    name: string
+  }[]
+  course_section: {
+    id: string
+    name: string
+  }
+}
+
 interface BaseRequirement extends ModuleItem {
   type: RequirementType
 }
