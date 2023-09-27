@@ -36,16 +36,8 @@ module Canvas
     CanvasCache::Redis.redis
   end
 
-  def self.redis_config
-    CanvasCache::Redis.config
-  end
-
   def self.redis_enabled?
     CanvasCache::Redis.enabled?
-  end
-
-  def self.reconnect_redis
-    CanvasCache::Redis.reconnect_redis
   end
 
   def self.cache_store_config_for(cluster)
