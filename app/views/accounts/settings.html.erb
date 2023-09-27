@@ -919,7 +919,7 @@ acknowledge that you have read and agreed to the
                 limit(Setting.get('max_visible_course_templates', 25).to_i).
                 order(Course.best_unicode_collation_key('courses.name')).
                 pluck(:name, :id)
-              if @account.course_template_id && !visible_templates.find { |_, id| @account.course_template_id == id }
+              if @account.course_template_id && !@account.course_template_id.zero?  && !visible_templates.find { |_, id| @account.course_template_id == id }
                 visible_templates.unshift([@account.course_template.name, @account.course_template_id])
               end
               options.concat(visible_templates)
