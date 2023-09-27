@@ -49,6 +49,7 @@ export function Expansion({...props}) {
             onClick={props.onClick}
             data-testid="expand-button"
             interaction={props.isReadOnly ? 'disabled' : 'enabled'}
+            aria-expanded={props.isExpanded}
           >
             <ScreenReaderContent
               data-testid={

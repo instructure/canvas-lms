@@ -324,7 +324,7 @@ export const DiscussionThreadContainer = props => {
             setExpandReplies(!expandReplies)
           }
         }}
-        isExpanded={expandReplies && !!searchTerm}
+        isExpanded={expandReplies}
       />
     )
   }
