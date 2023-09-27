@@ -19,23 +19,12 @@
 #
 
 class Setting < Switchman::UnshardedRecord
-  def self.skip_cache
-    @skip_cache, old_enabled = true, @skip_cache
-    yield
-  ensure
-    @skip_cache = old_enabled
-  end
+  def self.get(name, default, expires_in: nil, set_if_nx: false, skip_cache: false)
+    raise ArgumentError, "Cannot specify both `expires_in` and `skip_cache`" if expires_in && skip_cache
 
-  def self.get(name, default, expires_in: nil, set_if_nx: false)
     cache.fetch(name, expires_in:) do
-      if @skip_cache && expires_in
-        obj = Setting.find_by(name:)
-        Setting.set(name, default) if !obj && set_if_nx
-        next obj ? obj.value&.to_s : default&.to_s
-      end
-
       fetch = proc { Setting.pluck(:name, :value).to_h }
-      all_settings = if @skip_cache
+      all_settings = if skip_cache
                        # we want to skip talking to redis, but it's okay to use the in-proc cache
                        @all_settings ||= fetch.call
                      elsif expires_in

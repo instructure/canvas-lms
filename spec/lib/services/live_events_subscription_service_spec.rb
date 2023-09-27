@@ -23,11 +23,9 @@ module Services
   describe LiveEventsSubscriptionService do
     include WebMock::API
 
-    around { |example| Setting.skip_cache(&example) }
-
     context "service unavailable" do
       before do
-        allow(DynamicSettings).to receive(:find).with(any_args).and_call_original
+        allow(DynamicSettings).to receive(:find).and_call_original
         allow(DynamicSettings).to receive(:find)
           .with("live-events-subscription-service", default_ttl: 5.minutes)
           .and_return(nil)
@@ -42,6 +40,7 @@ module Services
 
     context "service available" do
       before do
+        allow(DynamicSettings).to receive(:find).and_call_original
         allow(DynamicSettings).to receive(:find)
           .with("live-events-subscription-service", default_ttl: 5.minutes)
           .and_return({

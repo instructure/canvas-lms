@@ -99,7 +99,7 @@ module CanvasCache
     end
 
     def self.ignore_redis_failures?
-      settings_store.get("ignore_redis_failures", "true") == "true"
+      settings_store.get("ignore_redis_failures", "true", skip_cache: true) == "true"
     end
 
     def self.ignore_redis_guards?
@@ -134,11 +134,9 @@ module CanvasCache
     end
 
     def self.handle_redis_failure(failure_retval, redis_name)
-      settings_store.skip_cache do
-        if redis_failure?(redis_name)
-          Rails.logger.warn("  [REDIS] Short circuiting due to recent redis failure (#{redis_name})")
-          return failure_retval
-        end
+      if redis_failure?(redis_name)
+        Rails.logger.warn("  [REDIS] Short circuiting due to recent redis failure (#{redis_name})")
+        return failure_retval
       end
       reply = yield
       raise reply if reply.is_a?(Exception)
@@ -166,15 +164,11 @@ module CanvasCache
                                    tags: { redis_name: InstStatsd::Statsd.escape(redis_name) })
       Rails.logger.error "Failure handling redis command on #{redis_name}: #{e.inspect}"
 
-      settings_store.skip_cache do
-        if ignore_redis_failures?
-          CanvasCache.invoke_on_captured_error(e)
-          last_redis_failure[redis_name] = Time.now.utc
-          failure_retval
-        else
-          raise
-        end
-      end
+      raise unless ignore_redis_failures?
+
+      CanvasCache.invoke_on_captured_error(e)
+      last_redis_failure[redis_name] = Time.now.utc
+      failure_retval
     end
 
     class UnsupportedRedisMethod < RuntimeError

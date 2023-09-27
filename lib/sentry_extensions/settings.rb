@@ -25,8 +25,8 @@ module SentryExtensions
         @sentry_settings.presence || {}
       end
 
-      def get(name, default = nil)
-        settings[name.to_sym] || Setting.get(name, default)
+      def get(name, default = nil, skip_cache: false)
+        settings[name.to_sym] || Setting.get(name, default, skip_cache:)
       rescue PG::ConnectionBad
         default
       end

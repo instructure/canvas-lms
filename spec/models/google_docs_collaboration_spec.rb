@@ -35,9 +35,7 @@ describe GoogleDocsCollaboration do
       google_docs_collaboration.user = user
       stub_service
       expect(Rails.cache).to receive(:fetch).and_return(["token", "secret"])
-      Setting.skip_cache do
-        google_docs_collaboration.initialize_document
-      end
+      google_docs_collaboration.initialize_document
     end
   end
 
