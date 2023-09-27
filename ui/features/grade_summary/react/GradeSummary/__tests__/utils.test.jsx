@@ -566,10 +566,10 @@ describe('util', () => {
       expect(getDisplayStatus(assignment)).toStrictEqual(expectedOutput)
     })
 
-    it('should return "Not Submission" status when no submissions exist', () => {
+    it('should return "Not Submitted" status when no submissions exist', () => {
       const assignment = {
         submissionsConnection: {
-          nodes: [],
+          nodes: [Submission.mock({state: 'unsubmitted'})],
         },
         dueAt: getTime(false),
       }
@@ -605,9 +605,11 @@ describe('util', () => {
       expect(getDisplayStatus(assignment)).toStrictEqual(expectedOutput)
     })
 
-    it('should return "Not Graded" status for other cases', () => {
-      const assignment = {}
-      const expectedOutput = <Pill>Not Graded</Pill>
+    it('should return "Not Submitted" status for other cases', () => {
+      const assignment = Assignment.mock({
+        submissionsConnection: {nodes: [Submission.mock({gradingStatus: null})]},
+      })
+      const expectedOutput = <Pill>Not Submitted</Pill>
       expect(getDisplayStatus(assignment)).toStrictEqual(expectedOutput)
     })
 
@@ -615,7 +617,7 @@ describe('util', () => {
       const assignment = {
         dueAt: getTime(true),
         submissionsConnection: {
-          nodes: [],
+          nodes: [Submission.mock({state: 'unsubmitted'})],
         },
       }
 
@@ -627,7 +629,7 @@ describe('util', () => {
       const assignment = {
         dueAt: getTime(false),
         submissionsConnection: {
-          nodes: [],
+          nodes: [Submission.mock({state: 'unsubmitted'})],
         },
       }
 

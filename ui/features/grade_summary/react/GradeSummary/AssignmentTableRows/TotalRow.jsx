@@ -23,12 +23,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 
-import {
-  formatNumber,
-  scorePercentageToLetterGrade,
-  getTotal,
-  filteredAssignments,
-} from '../utils'
+import {formatNumber, scorePercentageToLetterGrade, getTotal, filteredAssignments} from '../utils'
 
 const I18n = useI18nScope('grade_summary')
 

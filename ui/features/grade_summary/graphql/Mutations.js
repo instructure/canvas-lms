@@ -17,6 +17,7 @@
  */
 
 import {Error} from '../../../shared/graphql/Error'
+import {Submission} from './Submission'
 import gql from 'graphql-tag'
 
 export const UPDATE_SUBMISSIONS_READ_STATE = gql`
@@ -32,4 +33,21 @@ export const UPDATE_SUBMISSIONS_READ_STATE = gql`
     }
   }
   ${Error.fragment}
+`
+
+export const UPDATE_SUBMISSION_STUDENT_ENTERED_SCORE = gql`
+  mutation UpdateSubmissionStudentEnteredScore(
+    $submissionId: ID!
+    $enteredScore: Float!
+    $courseID: ID!
+  ) {
+    updateSubmissionStudentEnteredScore(
+      input: {submissionId: $submissionId, enteredScore: $enteredScore}
+    ) {
+      submission {
+        ...Submission
+      }
+    }
+  }
+  ${Submission.fragment}
 `

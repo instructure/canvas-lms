@@ -71,17 +71,31 @@ const AssignmentTable = ({
 }) => {
   const {assignmentSortBy} = React.useContext(GradeSummaryContext)
   const [calculateOnlyGradedAssignments, setCalculateOnlyGradedAssignments] = useState(true)
-
-  const courseGrades = calculateCourseGrade(
-    queryData?.relevantGradingPeriodGroup,
-    queryData?.assignmentGroupsConnection?.nodes,
-    filteredAssignments(queryData, calculateOnlyGradedAssignments),
-    calculateOnlyGradedAssignments,
-    queryData?.applyGroupWeights
-  )
-
   const [openAssignmentDetailIds, setOpenAssignmentDetailIds] = useState([])
   const [openRubricDetailIds, setOpenRubricDetailIds] = useState([])
+  const [activeWhatIfScores, setActiveWhatIfScores] = useState([])
+  const [courseGrades, setCourseGrades] = useState(
+    calculateCourseGrade(
+      queryData?.relevantGradingPeriodGroup,
+      queryData?.assignmentGroupsConnection?.nodes,
+      filteredAssignments(queryData, calculateOnlyGradedAssignments, activeWhatIfScores),
+      calculateOnlyGradedAssignments,
+      queryData?.applyGroupWeights,
+      activeWhatIfScores
+    )
+  )
+
+  useEffect(() => {
+    const grades = calculateCourseGrade(
+      queryData?.relevantGradingPeriodGroup,
+      queryData?.assignmentGroupsConnection?.nodes,
+      filteredAssignments(queryData, calculateOnlyGradedAssignments, activeWhatIfScores),
+      calculateOnlyGradedAssignments,
+      queryData?.applyGroupWeights,
+      activeWhatIfScores
+    )
+    setCourseGrades(grades)
+  }, [activeWhatIfScores, calculateOnlyGradedAssignments, queryData])
 
   const [droppedAssignments, setDroppedAssignments] = useState(
     listDroppedAssignments(queryData, getGradingPeriodID() === '0', true)
@@ -151,7 +165,9 @@ const AssignmentTable = ({
                 setSubmissionAssignmentId,
                 submissionAssignmentId,
                 setOpenRubricDetailIds,
-                openRubricDetailIds
+                openRubricDetailIds,
+                setActiveWhatIfScores,
+                activeWhatIfScores
               ),
               openAssignmentDetailIds.includes(modifiedAssignment._id) &&
               modifiedAssignment?.scoreStatistic
@@ -197,7 +213,8 @@ const AssignmentTable = ({
             getGradingPeriodID() === '0',
             calculateOnlyGradedAssignments,
             courseGrades?.current,
-            courseGrades?.final
+            courseGrades?.final,
+            activeWhatIfScores
           )
         )}
       </Table.Body>
