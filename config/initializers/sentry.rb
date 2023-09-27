@@ -91,7 +91,7 @@ Rails.configuration.to_prepare do
   SentryProxy.register_ignorable_error("Grade pass back unsupported")
 
   CanvasErrors.register!(:sentry_notification) do |exception, data, level|
-    setting = SentryExtensions::Settings.get("sentry_error_logging_enabled", "true")
+    setting = SentryExtensions::Settings.get("sentry_error_logging_enabled", "true", skip_cache: data[:skip_setting_cache])
     SentryProxy.capture(exception, data, level) if setting == "true"
   end
 end

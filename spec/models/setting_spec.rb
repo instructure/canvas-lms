@@ -39,6 +39,7 @@ describe Setting do
       expect(Setting.get("my_new_setting", "0", expires_in: 1.minute)).to eq "0"
       # some other process sets the value out from under us
       Setting.create!(name: "my_new_setting", value: "1")
+      MultiCache.delete("all_settings")
       # but we still see the cached value for now
       expect(Setting.get("my_new_setting", "0", expires_in: 1.minute)).to eq "0"
       # until the expiration has passed
@@ -47,13 +48,20 @@ describe Setting do
       end
     end
 
-    it "doesn't need to query if all settings are already cached, even when skipping cache" do
+    it "doesn't need to query if all settings are already cached" do
       Setting.reset_cache!
       Setting.get("setting1", nil)
       expect(Setting).not_to receive(:find_by)
       expect(Setting).not_to receive(:pluck)
       expect(MultiCache).not_to receive(:fetch)
-      Setting.skip_cache { Setting.get("setting2", nil) }
+      Setting.get("setting2", nil)
+    end
+
+    it "doesn't touch MultiCache if skip_cache is true" do
+      Setting.reset_cache!
+      expect(MultiCache).not_to receive(:fetch)
+      expect(Setting).to receive(:pluck).and_call_original
+      Setting.get("setting1", nil, skip_cache: true)
     end
   end
 
