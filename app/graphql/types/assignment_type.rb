@@ -463,6 +463,7 @@ module Types
       filter = filter.to_h
       order_by ||= []
       filter[:states] ||= DEFAULT_SUBMISSION_STATES
+      filter[:states] = filter[:states] + ["unsubmitted"].freeze if filter[:include_unsubmitted]
       filter[:order_by] = order_by.map(&:to_h)
       SubmissionSearch.new(assignment, current_user, session, filter).search
     end
