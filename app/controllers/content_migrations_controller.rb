@@ -146,44 +146,48 @@ class ContentMigrationsController < ApplicationController
   def index
     Folder.root_folders(@context) # ensure course root folder exists so file imports can run
 
-    scope = @context.content_migrations.where(child_subscription_id: nil).order("id DESC")
-    @migrations = Api.paginate(scope, self, api_v1_course_content_migration_list_url(@context))
-    @migrations.each(&:check_for_pre_processing_timeout)
-    content_migration_json_hash = content_migrations_json(@migrations, @current_user, session)
-
-    if api_request?
-      render json: content_migration_json_hash
+    if Account.site_admin.feature_enabled?(:instui_for_import_page) && !api_request?
+      js_env COURSE_ID: @context.id # Only js_env used for the redesign code
     else
-      @plugins = ContentMigration.migration_plugins(true).sort_by { |p| [p.metadata(:sort_order) || CanvasSort::Last, p.metadata(:select_text)] }
+      scope = @context.content_migrations.where(child_subscription_id: nil).order("id DESC")
+      @migrations = Api.paginate(scope, self, api_v1_course_content_migration_list_url(@context))
+      @migrations.each(&:check_for_pre_processing_timeout)
+      content_migration_json_hash = content_migrations_json(@migrations, @current_user, session)
 
-      options = @plugins.map { |p| { label: p.metadata(:select_text), id: p.id } }
+      if api_request?
+        render json: content_migration_json_hash
+      else # Block below should be removed when instui_for_import_page FF stops begin a thing
+        @plugins = ContentMigration.migration_plugins(true).sort_by { |p| [p.metadata(:sort_order) || CanvasSort::Last, p.metadata(:select_text)] }
 
-      external_tools = Lti::ContextToolFinder.all_tools_for(@context, placements: :migration_selection, root_account: @domain_root_account, current_user: @current_user)
-      options.concat(external_tools.map do |et|
-        {
-          id: et.asset_string,
-          label: et.label_for("migration_selection", I18n.locale)
-        }
-      end)
+        options = @plugins.map { |p| { label: p.metadata(:select_text), id: p.id } }
 
-      js_env EXTERNAL_TOOLS: external_tools_json(external_tools, @context, @current_user, session)
-      js_env UPLOAD_LIMIT: Attachment.quota_available(@context)
-      js_env SELECT_OPTIONS: options
-      js_env QUESTION_BANKS: @context.assessment_question_banks.except(:preload).select([:title, :id]).active
-      js_env COURSE_ID: @context.id
-      js_env CONTENT_MIGRATIONS: content_migration_json_hash
-      js_env(OLD_START_DATE: datetime_string(@context.start_at, :verbose))
-      js_env(OLD_END_DATE: datetime_string(@context.conclude_at, :verbose))
+        external_tools = Lti::ContextToolFinder.all_tools_for(@context, placements: :migration_selection, root_account: @domain_root_account, current_user: @current_user)
+        options.concat(external_tools.map do |et|
+          {
+            id: et.asset_string,
+            label: et.label_for("migration_selection", I18n.locale)
+          }
+        end)
 
-      js_env(SHOW_SELECT: should_show_course_copy_dropdown)
-      js_env(CONTENT_MIGRATIONS_EXPIRE_DAYS: ContentMigration.expire_days)
-      js_env(QUIZZES_NEXT_ENABLED: new_quizzes_enabled?)
-      js_env(NEW_QUIZZES_IMPORT: new_quizzes_import_enabled?)
-      js_env(NEW_QUIZZES_MIGRATION: new_quizzes_migration_enabled?)
-      js_env(NEW_QUIZZES_MIGRATION_DEFAULT: new_quizzes_migration_default)
-      js_env(SHOW_SELECTABLE_OUTCOMES_IN_IMPORT: @domain_root_account.feature_enabled?("selectable_outcomes_in_course_copy"))
-      js_env(BLUEPRINT_ELIGIBLE_IMPORT: MasterCourses::MasterTemplate.blueprint_eligible?(@context))
-      set_tutorial_js_env
+        js_env EXTERNAL_TOOLS: external_tools_json(external_tools, @context, @current_user, session)
+        js_env UPLOAD_LIMIT: Attachment.quota_available(@context)
+        js_env SELECT_OPTIONS: options
+        js_env QUESTION_BANKS: @context.assessment_question_banks.except(:preload).select([:title, :id]).active
+        js_env COURSE_ID: @context.id
+        js_env CONTENT_MIGRATIONS: content_migration_json_hash
+        js_env(OLD_START_DATE: datetime_string(@context.start_at, :verbose))
+        js_env(OLD_END_DATE: datetime_string(@context.conclude_at, :verbose))
+
+        js_env(SHOW_SELECT: should_show_course_copy_dropdown)
+        js_env(CONTENT_MIGRATIONS_EXPIRE_DAYS: ContentMigration.expire_days)
+        js_env(QUIZZES_NEXT_ENABLED: new_quizzes_enabled?)
+        js_env(NEW_QUIZZES_IMPORT: new_quizzes_import_enabled?)
+        js_env(NEW_QUIZZES_MIGRATION: new_quizzes_migration_enabled?)
+        js_env(NEW_QUIZZES_MIGRATION_DEFAULT: new_quizzes_migration_default)
+        js_env(SHOW_SELECTABLE_OUTCOMES_IN_IMPORT: @domain_root_account.feature_enabled?("selectable_outcomes_in_course_copy"))
+        js_env(BLUEPRINT_ELIGIBLE_IMPORT: MasterCourses::MasterTemplate.blueprint_eligible?(@context))
+        set_tutorial_js_env
+      end
     end
   end
 

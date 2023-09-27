@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 - present Instructure, Inc.
+ * Copyright (C) 2023 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,14 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// Eventually when the feature flag is retired
-// we can divorce from these shenanigans
-if (ENV.FEATURES.instui_for_import_page) {
-  import('./instui_setup')
-    .then(() => {})
-    .catch(() => {})
-} else {
-  import('./setup')
-    .then(() => {})
-    .catch(() => {})
+import React from 'react'
+import CourseCopyImporter from './migrator_forms/course_copy'
+import {setSourceCourseType} from './types'
+
+export const MigratorSpecificForm = ({
+  migrator,
+  setSourceCourse,
+}: {
+  migrator: string
+  setSourceCourse: setSourceCourseType
+}) => {
+  if (migrator === 'course_copy_importer') {
+    return <CourseCopyImporter setSourceCourse={setSourceCourse} />
+  } else {
+    return null
+  }
 }
+
+export default MigratorSpecificForm

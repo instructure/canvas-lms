@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 - present Instructure, Inc.
+ * Copyright (C) 2023 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,14 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// Eventually when the feature flag is retired
-// we can divorce from these shenanigans
-if (ENV.FEATURES.instui_for_import_page) {
-  import('./instui_setup')
-    .then(() => {})
-    .catch(() => {})
-} else {
-  import('./setup')
-    .then(() => {})
-    .catch(() => {})
-}
+import React from 'react'
+import ReactDOM from 'react-dom'
+import ready from '@instructure/ready'
+import App from './react/app'
+
+ready(() => {
+  if (document.getElementById('instui_content_migrations')) {
+    ReactDOM.render(<App />, document.getElementById('instui_content_migrations'))
+  }
+})

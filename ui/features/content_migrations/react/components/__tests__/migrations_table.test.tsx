@@ -17,20 +17,31 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, waitFor, screen} from '@testing-library/react'
 import ContentMigrationsTable from '../migrations_table'
 import fetchMock from 'fetch-mock'
 
-it('Calls the API and renders the InstUI table', async () => {
-  window.ENV.COURSE_ID = '0'
-  fetchMock.mock('/api/v1/courses/0/content_migrations?per_page=25', [])
-  const {getByRole} = render(<ContentMigrationsTable />)
-  expect(getByRole('table', {hidden: false})).toBeInTheDocument()
-  expect(
-    getByRole('row', {
-      name: 'Content Type Source Link Date Imported Status Progress Action',
-      hidden: false,
+describe('ContentMigrationTable', () => {
+  let setMigrationsMock: () => void
+
+  beforeAll(() => {
+    setMigrationsMock = jest.fn(() => {})
+    fetchMock.mock('/api/v1/courses/0/content_migrations?per_page=25', ['api_return'])
+  })
+
+  it('Calls the API and renders the InstUI table', async () => {
+    window.ENV.COURSE_ID = '0'
+    render(<ContentMigrationsTable migrations={[]} setMigrations={setMigrationsMock} />)
+    expect(screen.getByRole('table', {hidden: false})).toBeInTheDocument()
+    expect(
+      screen.getByRole('row', {
+        name: 'Content Type Source Link Date Imported Status Progress Action',
+        hidden: false,
+      })
+    ).toBeInTheDocument()
+    expect(fetchMock.called('/api/v1/courses/0/content_migrations?per_page=25', 'GET')).toBe(true)
+    await waitFor(() => {
+      expect(setMigrationsMock).toHaveBeenCalledWith(['api_return'])
     })
-  ).toBeInTheDocument()
-  expect(fetchMock.called('/api/v1/courses/0/content_migrations?per_page=25', 'GET')).toBe(true)
+  })
 })
