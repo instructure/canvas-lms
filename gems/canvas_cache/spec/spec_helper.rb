@@ -50,7 +50,7 @@ RSpec.shared_context "caching_helpers", shared_context: :metadata do
   def set_cache(new_cache)
     cache_opts = {}
     if new_cache == :redis_cache_store
-      if CanvasCache::Redis.redis_enabled?
+      if CanvasCache::Redis.enabled?
         cache_opts[:redis] = CanvasCache::Redis.redis
       else
         skip "redis required"

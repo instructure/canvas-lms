@@ -62,11 +62,6 @@ module CanvasCache
       @redis = nil
     end
 
-    class << self
-      alias_method :redis_config, :config
-      alias_method :redis_enabled?, :enabled?
-    end
-
     def self.reset_config!
       @config = nil
       @enabled = nil

@@ -27,7 +27,7 @@ module Canvas
 
     RSpec.describe LocalRedisCache do
       let(:redis_conf_hash) do
-        rc = Canvas.redis_config
+        rc = CanvasCache::Redis.config
         {
           store: "redis",
           redis_url: rc.fetch("servers", ["redis://redis"]).first,

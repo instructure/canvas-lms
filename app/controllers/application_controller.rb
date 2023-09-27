@@ -803,7 +803,7 @@ class ApplicationController < ActionController::Base
   end
 
   def clear_idle_connections
-    Canvas::Redis.clear_idle_connections
+    Canvas::RedisConnections.clear_idle!
   end
 
   def annotate_apm

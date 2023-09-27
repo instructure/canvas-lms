@@ -24,7 +24,7 @@ require "dynamic_settings"
 # implementation that works on a redis store
 RSpec.describe "DynamicSettings::PrefixProxy with redis local cache" do
   let(:redis_conf_hash) do
-    rc = Canvas.redis_config
+    rc = CanvasCache::Redis.config
     {
       store: "redis",
       redis_url: rc.fetch("servers", ["redis://redis"]).first,
