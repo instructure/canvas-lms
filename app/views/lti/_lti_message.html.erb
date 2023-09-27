@@ -37,7 +37,7 @@
 
 <% js_bundle :edit_rubric %>
 
-<% if @assignment.present? && can_do(@assignment, @current_user, :update) %>
+<% if @assignment.present? && !@assignment.quiz_lti? && can_do(@assignment, @current_user, :update) %>
   <div class="content-box">
     <a
       href="<%= context_url(@context, :context_rubrics_url) %>"
@@ -50,7 +50,7 @@
   </div>
 <% end %>
 
-<%= render partial: "shared/rubrics_component" if @assignment.present? %>
+<%= render partial: "shared/rubrics_component" if @assignment.present? && !@assignment.quiz_lti? %>
 
 <%= render @append_template if @append_template %>
 <div id="module_sequence_footer"></div>
