@@ -211,7 +211,10 @@ export const getDisplayScore = (assignment, gradingStandard) => {
     assignment?.gradingType === 'letter_grade' ||
     assignment?.gradingType === 'gpa_scale'
   ) {
-    return getAssignmentLetterGrade(assignment, gradingStandard)
+    return getAssignmentLetterGrade(
+      assignment,
+      assignment?.gradingStandard ? assignment?.gradingStandard : gradingStandard
+    )
   } else if (assignment?.gradingType === 'percentage') {
     return `${getAssignmentPercentage(assignment)}%`
   } else if (assignment?.gradingType === 'pass_fail') {

@@ -635,4 +635,25 @@ describe "gradebook - logged in as a student" do
       expect(f(".final_grade").text).to eq("Total: N/A")
     end
   end
+
+  context "assignment specific grading standard" do
+    before do
+      Account.site_admin.enable_feature! :student_grade_summary_upgrade
+      course_with_student({ active_course: true, active_enrollment: true })
+      @teacher = User.create!
+      @course.enroll_teacher(@teacher)
+      grading_standard = @course.grading_standards.create!(title: "Win/Lose", data: [["Winner", 0.94], ["Loser", 0]])
+      @assignment = @course.assignments.build(points_possible: 20, grading_type: "letter_grade", grading_standard_id: grading_standard.id)
+      @assignment.publish
+      @assignment.grade_student(@student, grade: 10, grader: @teacher)
+      @course.save!
+    end
+
+    it "shows the correct grading standard" do
+      user_session(@student)
+      get "/courses/#{@course.id}/grades/#{@student.id}"
+
+      expect(f("[data-testid='assignment-row']")).to include_text("Loser")
+    end
+  end
 end

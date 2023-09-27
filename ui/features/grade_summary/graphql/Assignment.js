@@ -19,6 +19,7 @@
 import gql from 'graphql-tag'
 import {arrayOf, bool, string, number} from 'prop-types'
 
+import {GradingStandard} from './GradingStandard'
 import {Submission} from './Submission'
 import {Rubric} from '@canvas/assignments/graphql/student/Rubric'
 import {RubricAssociation} from '@canvas/assignments/graphql/student/RubricAssociation'
@@ -36,6 +37,9 @@ export const Assignment = {
       gradesPublished
       gradingPeriodId
       gradingType
+      gradingStandard {
+        ...GradingStandard
+      }
       groupCategoryId
       hasSubmittedSubmissions
       lockAt
@@ -81,9 +85,10 @@ export const Assignment = {
         ...RubricAssociation
       }
     }
-    ${Submission.fragment}
+    ${GradingStandard.fragment}
     ${Rubric.fragment}
     ${RubricAssociation.fragment}
+    ${Submission.fragment}
   `,
   shape: {
     _id: string,
@@ -96,6 +101,7 @@ export const Assignment = {
     gradesPublished: bool,
     gradingPeriodId: string,
     gradingType: string,
+    gradingStandard: GradingStandard.shape,
     groupCategoryId: string,
     hasSubmittedSubmissions: bool,
     lockAt: string,
@@ -148,6 +154,7 @@ export const Assignment = {
     gradesPublished = false,
     gradingPeriodId = '1',
     gradingType = 'points',
+    gradingStandard = GradingStandard.mock(),
     groupCategoryId = '1',
     hasSubmittedSubmissions = true,
     lockAt = null,
@@ -203,6 +210,7 @@ export const Assignment = {
     gradesPublished,
     gradingPeriodId,
     gradingType,
+    gradingStandard,
     groupCategoryId,
     hasSubmittedSubmissions,
     lockAt,
