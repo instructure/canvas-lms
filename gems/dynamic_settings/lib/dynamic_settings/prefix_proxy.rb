@@ -179,7 +179,7 @@ module DynamicSettings
             # when there's no tree
             nil
           else
-            populate_cache(values, subtree_ttl)
+            cache.write_multi(values.to_h { |kv| [CACHE_KEY_PREFIX + kv[:key], kv[:value]] }, ttl: subtree_ttl)
             values
           end
         end
@@ -294,10 +294,6 @@ module DynamicSettings
         key_array << cluster
       end
       key_array.push(prefix, key).compact.join("/")
-    end
-
-    def populate_cache(subtree, ttl)
-      cache.write_set(subtree.to_h { |st| [CACHE_KEY_PREFIX + st[:key], st[:value]] }, ttl:)
     end
   end
 end
