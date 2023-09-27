@@ -22,6 +22,8 @@ module Types
   class SubmissionSearchFilterInputType < Types::BaseInputObject
     graphql_name "SubmissionSearchFilterInput"
 
+    argument :include_unsubmitted, Boolean, required: false
+
     argument :states, [SubmissionStateType], required: false, default_value: DEFAULT_SUBMISSION_STATES
     argument :section_ids, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("Section")
 

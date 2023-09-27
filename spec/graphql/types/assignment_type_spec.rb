@@ -359,6 +359,41 @@ describe Types::AssignmentType do
                                                            })
     end
 
+    context "include_unsubmitted" do
+      it "returns unsubmitted submission when include_unsubmitted is true" do
+        assignment_unsubmitted = course.assignments.create!
+        assignment_unsubmitted.update!(submission_types: "online_text_entry")
+        assignment_type_2 = GraphQLTypeTester.new(assignment_unsubmitted, current_user: student)
+
+        result = assignment_type_2.resolve(<<~GQL, current_user: student)
+          submissionsConnection(
+            filter: {
+              includeUnsubmitted: true
+            }
+          ) { nodes { state } }
+        GQL
+
+        expect(result.count).to eq 1
+        expect(result[0]).to eq "unsubmitted"
+      end
+
+      it "does not return unsubmitted submission when include_unsubmitted is false" do
+        assignment_unsubmitted = course.assignments.create!
+        assignment_unsubmitted.update!(submission_types: "online_text_entry")
+        assignment_type_2 = GraphQLTypeTester.new(assignment_unsubmitted, current_user: student)
+
+        result = assignment_type_2.resolve(<<~GQL, current_user: student)
+          submissionsConnection(
+            filter: {
+              includeUnsubmitted: false
+            }
+          ) { nodes { state } }
+        GQL
+
+        expect(result.count).to eq 0
+      end
+    end
+
     it "returns 'real' submissions from with permissions" do
       submission1 = assignment.submit_homework(student, { body: "sub1", submission_type: "online_text_entry" })
       submission2 = assignment.submit_homework(other_student, { body: "sub1", submission_type: "online_text_entry" })
