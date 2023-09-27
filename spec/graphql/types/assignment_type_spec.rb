@@ -307,6 +307,19 @@ describe Types::AssignmentType do
     expect(assignment_type.resolve("allowedAttempts")).to eq 7
   end
 
+  describe "gradingStandard" do
+    it "returns the grading standard" do
+      grading_standard = course.grading_standards.create!(title: "Win/Lose", data: [["Winner", 0.94], ["Loser", 0]])
+      assignment.update(grading_type: "letter_grade", grading_standard_id: grading_standard.id)
+      assignment.save!
+      expect(assignment_type.resolve("gradingStandard { title }")).to eq grading_standard.title
+    end
+
+    it "returns null if no grading standard is set" do
+      expect(assignment_type.resolve("gradingStandard { title }")).to be_nil
+    end
+  end
+
   describe "submissionsConnection" do
     let_once(:other_student) { student_in_course(course:, active_all: true).user }
 
