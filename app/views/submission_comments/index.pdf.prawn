@@ -28,9 +28,9 @@ prawn_document(page_layout: :portrait, page_size: page_size) do |pdf|
       comment_body = "#{comment.body}#{comment.draft? ? " <color rgb=\'ff0000\'>#{draft}</color>" : ''}"
       comment_body_and_timestamp = "#{comment_body} #{timestamps_by_id.fetch(comment.id)}"
 
-      current_author = if comment.author.id != current_author
-        pdf.text "<b>#{comment.author.name}</b>: #{comment_body_and_timestamp}", inline_format: true
-        comment.author.id
+      current_author = if comment.author_id.nil? || comment.author_id != current_author
+        pdf.text "<b>#{comment.author_name}</b>: #{comment_body_and_timestamp}", inline_format: true
+        comment.author_id
       else
         pdf.indent(10) do
           pdf.text comment_body_and_timestamp, inline_format: true
