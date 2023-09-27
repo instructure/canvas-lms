@@ -98,15 +98,10 @@ module ActiveSupport::Cache::SafeRedisRaceCondition
   def lock(key, options)
     nonce = SecureRandom.hex(20)
     lock_timeout = options.fetch(:lock_timeout, 5).to_i * 1000
-    case redis.set(key, nonce, raw: true, px: lock_timeout, nx: true)
-    when true
-      nonce
-    when nil
-      # redis failed for reasons unknown; say "true" that we locked, but the
-      # nonce is useless
-      true
-    when false
-      false
+    # redis failed for reasons unknown; say "true" that we locked, but the
+    # nonce is useless
+    failsafe :lock, returning: true do
+      nonce if redis.set(key, nonce, px: lock_timeout, nx: true)
     end
   end
 
@@ -119,14 +114,16 @@ module ActiveSupport::Cache::SafeRedisRaceCondition
 
     node = redis
     node = redis.node_for(key) if redis.is_a?(Redis::Distributed)
-    delif_script.run(node, [key], [nonce])
+    failsafe :unlock do
+      delif_script.run(node, [key], [nonce])
+    end
   end
 
   # redis does not have a built in "delete if", this lua script
   # is written to delete a key, but only if it's value matches the
   # provided value (so if someone else has re-written it since we won't delete it)
   def delif_script
-    @_delif ||= Redis::Scripting::Script.new(File.expand_path("delif.lua", __dir__))
+    @delif_script ||= Redis::Scripting::Script.new(File.expand_path("delif.lua", __dir__))
   end
 
   # vanilla Rails is weird, and assumes "race_condition_ttl" is 5 minutes; override that to actually do math
