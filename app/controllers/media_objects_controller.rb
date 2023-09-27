@@ -231,8 +231,14 @@ class MediaObjectsController < ApplicationController
         @media_object.user_entered_title = CanvasTextHelper.truncate_text(params[:user_entered_title], max_length: 255) if params[:user_entered_title].present?
         @media_object.save
       end
-      render json: @media_object.as_json.merge(embedded_iframe_url: media_object_iframe_url(@media_object.media_id))
-      # render :json => media_object_api_json(@media_object, @current_user, session, %w[sources tracks])
+      media_object_json = @media_object.as_json
+      if Account.site_admin.feature_enabled?(:media_links_use_attachment_id)
+        embedded_iframe_url = media_attachment_iframe_url(@media_object.attachment_id)
+        media_object_json["media_object"]["uuid"] = @media_object.attachment.uuid
+      else
+        embedded_iframe_url = media_object_iframe_url(@media_object.media_id)
+      end
+      render json: media_object_json.merge(embedded_iframe_url:)
     end
   end
 
