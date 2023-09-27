@@ -243,6 +243,7 @@ describe "gradebook - logged in as a student" do
 
         # Check the "calculate based only on graded assignments" option
         f("#only_consider_graded_assignments_wrapper").click
+        wait_for_ajaximations
 
         # Verify that the correct assignments are being dropped
         dropped_assignments = ffj("tr[data-testid='assignment-row']:contains('Dropped')")
@@ -293,6 +294,7 @@ describe "gradebook - logged in as a student" do
 
         # Check the "calculate based only on graded assignments" option
         f("#only_consider_graded_assignments_wrapper").click
+        wait_for_ajaximations
 
         # Verify that the correct assignments are being dropped
         dropped_assignments = ffj("tr[data-testid='assignment-row']::contains('Dropped')")
@@ -333,6 +335,7 @@ describe "gradebook - logged in as a student" do
 
         # Check the "calculate based only on graded assignments" option
         f("#only_consider_graded_assignments_wrapper").click
+        wait_for_ajaximations
 
         # Verify that the correct assignments are being dropped
         dropped_assignments = ffj("tr[data-testid='assignment-row']::contains('Dropped')")
@@ -401,6 +404,7 @@ describe "gradebook - logged in as a student" do
 
         # Check the "calculate based only on graded assignments" option
         f("#only_consider_graded_assignments_wrapper").click
+        wait_for_ajaximations
 
         # Verify that the correct assignments are being dropped
         dropped_assignments = ffj("tr[data-testid='assignment-row']:contains('Dropped')")
@@ -476,6 +480,7 @@ describe "gradebook - logged in as a student" do
 
         # Check the "calculate based only on graded assignments" option
         f("#only_consider_graded_assignments_wrapper").click
+        wait_for_ajaximations
 
         # Verify that the correct assignments are being dropped
         dropped_assignments = ffj("tr[data-testid='assignment-row']:contains('Dropped'), tr[data-testid='assignment-row']:contains('Excused')")

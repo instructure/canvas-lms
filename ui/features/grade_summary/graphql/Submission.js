@@ -36,6 +36,8 @@ export const Submission = {
       late
       updatedAt
       excused
+      studentEnteredScore
+      state
       commentsConnection {
         nodes {
           ...SubmissionComment
@@ -62,6 +64,8 @@ export const Submission = {
     late: bool,
     updatedAt: string,
     excused: bool,
+    studentEnteredScore: string,
+    state: string,
     commentsConnection: arrayOf({
       nodes: arrayOf({
         comment: string,
@@ -86,6 +90,8 @@ export const Submission = {
     late = false,
     updatedAt = '2019-01-01T00:00:00Z',
     excused = false,
+    studentEnteredScore = '8',
+    state = 'graded',
     commentsConnection = {
       nodes: [
         {
@@ -113,6 +119,8 @@ export const Submission = {
     late,
     updatedAt,
     excused,
+    studentEnteredScore,
+    state,
     commentsConnection,
     rubricAssessmentsConnection,
   }),

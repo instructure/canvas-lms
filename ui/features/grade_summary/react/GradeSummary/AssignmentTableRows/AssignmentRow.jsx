@@ -37,6 +37,7 @@ import {Text} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
 
+import WhatIfGrade from '../WhatIfGrade'
 import {getDisplayStatus, getDisplayScore, submissionCommentsPresent} from '../utils'
 
 const I18n = useI18nScope('grade_summary')
@@ -87,7 +88,9 @@ export const assignmentRow = (
   setSubmissionAssignmentId,
   submissionAssignmentId,
   setOpenRubricDetailIds,
-  openRubricDetailIds
+  openRubricDetailIds,
+  setActiveWhatIfScores,
+  activeWhatIfScores
 ) => {
   const handleAssignmentDetailOpen = () => {
     if (!openAssignmentDetailIds.includes(assignment._id)) {
@@ -148,7 +151,52 @@ export const assignmentRow = (
           </Tooltip>
         ) : (
           <Flex justifyItems="center">
-            <Flex.Item>{getDisplayScore(assignment, queryData?.gradingStandard)}</Flex.Item>
+            <Flex.Item
+              onClick={() => {
+                if (
+                  !ENV.restrict_quantitative_data &&
+                  !activeWhatIfScores.includes(assignment._id)
+                ) {
+                  setActiveWhatIfScores([...activeWhatIfScores, assignment._id])
+                }
+              }}
+            >
+              <View as="div" position="relative">
+                {!ENV.restrict_quantitative_data &&
+                activeWhatIfScores.includes(assignment._id) &&
+                assignment?.gradingType !== 'not_graded' ? (
+                  <WhatIfGrade
+                    assignment={assignment}
+                    setActiveWhatIfScores={setActiveWhatIfScores}
+                    activeWhatIfScores={activeWhatIfScores}
+                  />
+                ) : (
+                  <View
+                    tabIndex="0"
+                    role="button"
+                    position="relative"
+                    onKeyDown={event => {
+                      if (event.key === 'Enter') {
+                        if (
+                          !ENV.restrict_quantitative_data &&
+                          !activeWhatIfScores.includes(assignment._id)
+                        ) {
+                          setActiveWhatIfScores([...activeWhatIfScores, assignment._id])
+                        }
+                      }
+                    }}
+                  >
+                    {ENV.restrict_quantitative_data ? (
+                      getDisplayScore(assignment, queryData?.gradingStandard)
+                    ) : (
+                      <Tooltip renderTip={I18n.t('Click to test a different score')}>
+                        {getDisplayScore(assignment, queryData?.gradingStandard)}
+                      </Tooltip>
+                    )}
+                  </View>
+                )}
+              </View>
+            </Flex.Item>
             {assignment?.submissionsConnection?.nodes.length > 0 &&
               assignment?.submissionsConnection?.nodes[0]?.readState !== 'read' && (
                 <Flex.Item>
