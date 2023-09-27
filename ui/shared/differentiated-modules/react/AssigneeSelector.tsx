@@ -17,7 +17,7 @@
  */
 
 import CanvasMultiSelect from '@canvas/multi-select/react'
-import React, {ReactElement, useEffect, useState} from 'react'
+import React, {ReactElement, useEffect, useRef, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Link} from '@instructure/ui-link'
 import {View} from '@instructure/ui-view'
@@ -26,6 +26,8 @@ import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {debounce, uniqBy} from 'lodash'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Spinner} from '@instructure/ui-spinner'
+import {AssignmentOverride} from './types'
+import {setContainScrollBehavior} from '../utils/assignToHelper'
 
 const {Option: CanvasMultiSelectOption} = CanvasMultiSelect as any
 
@@ -34,19 +36,6 @@ const I18n = useI18nScope('differentiated_modules')
 interface Props {
   courseId: string
   moduleId: string
-}
-
-interface AssignmentOverride {
-  context_module_id: string
-  id: string
-  students: {
-    id: string
-    name: string
-  }[]
-  course_section: {
-    id: string
-    name: string
-  }
 }
 
 interface Option {
@@ -61,26 +50,20 @@ const AssigneeSelector = ({courseId, moduleId}: Props) => {
   const [options, setOptions] = useState<Option[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [isLoadingDefaultValues, setIsLoadingDefaultValues] = useState(false)
-
-  const handleChange = (newSelected: string[]) => {
-    const newSelectedSet = new Set(newSelected)
-    const selected = options.filter(option => newSelectedSet.has(option.id))
-    setSelectedAssignees(selected)
-  }
-
-  const handleInputChange = (value: string) => {
-    debounce(() => setSearchTerm(value), 300)()
-  }
+  const listElementRef = useRef<HTMLElement | null>(null)
+  const [isShowingOptions, setIsShowingOptions] = useState(false)
 
   useEffect(() => {
     setIsLoadingDefaultValues(true)
     doFetchApi({
       path: `/api/v1/courses/${courseId}/modules/${moduleId}/assignment_overrides`,
     })
-      .then(({json}: {json: AssignmentOverride[]}) => {
-        const parsedOptions = json.reduce((acc: Option[], override) => {
+      .then((data: any) => {
+        if (data.json === undefined) return
+        const json = data.json as AssignmentOverride[]
+        const parsedOptions = json.reduce((acc: Option[], override: AssignmentOverride) => {
           const overrideOptions =
-            override.students?.map(({id, name}) => ({
+            override.students?.map(({id, name}: {id: string; name: string}) => ({
               id: `student-${id}`,
               value: name,
               group: I18n.t('Students'),
@@ -123,24 +106,28 @@ const AssigneeSelector = ({courseId, moduleId}: Props) => {
         .then(results => {
           const sectionsResult = results[0]
           const studentsResult = results[1]
-          let sectionsParsedResult = []
-          let studentsParsedResult = []
+          let sectionsParsedResult: Option[] = []
+          let studentsParsedResult: Option[] = []
           if (sectionsResult.status === 'fulfilled') {
-            sectionsParsedResult = sectionsResult.value.json.map(({id, name}: any) => ({
-              id: `section-${id}`,
-              value: name,
-              group: I18n.t('Sections'),
-            }))
+            const sectionsJSON = sectionsResult.value.json as Record<string, string>[]
+            sectionsParsedResult =
+              sectionsJSON?.map(({id, name}: any) => ({
+                id: `section-${id}`,
+                value: name,
+                group: I18n.t('Sections'),
+              })) ?? []
           } else {
             showFlashError(I18n.t('Failed to load sections data'))(sectionsResult.reason)
           }
 
           if (studentsResult.status === 'fulfilled') {
-            studentsParsedResult = studentsResult.value.json.map(({id, name}: any) => ({
-              id: `student-${id}`,
-              value: name,
-              group: I18n.t('Students'),
-            }))
+            const studentsJSON = studentsResult.value.json as Record<string, string>[]
+            studentsParsedResult =
+              studentsJSON?.map(({id, name}: any) => ({
+                id: `student-${id}`,
+                value: name,
+                group: I18n.t('Students'),
+              })) ?? []
           } else {
             showFlashError(I18n.t('Failed to load students data'))(studentsResult.reason)
           }
@@ -157,6 +144,27 @@ const AssigneeSelector = ({courseId, moduleId}: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [courseId, searchTerm])
 
+  const handleSelectOption = () => {
+    setIsShowingOptions(false)
+  }
+
+  const handleChange = (newSelected: string[]) => {
+    const newSelectedSet = new Set(newSelected)
+    const selected = options.filter(option => newSelectedSet.has(option.id))
+    setSelectedAssignees(selected)
+  }
+
+  const handleInputChange = (value: string) => {
+    debounce(() => setSearchTerm(value), 300)()
+  }
+
+  const handleShowOptions = () => {
+    setIsShowingOptions(true)
+    setTimeout(() => {
+      setContainScrollBehavior(listElementRef.current)
+    }, 500)
+  }
+
   if (isLoadingDefaultValues) return <Spinner renderTitle="Loading" size="small" />
 
   return (
@@ -169,8 +177,13 @@ const AssigneeSelector = ({courseId, moduleId}: Props) => {
         onChange={handleChange}
         renderAfterInput={<></>}
         customOnInputChange={handleInputChange}
-        visibleOptionsCount={14}
+        visibleOptionsCount={10}
         isLoading={isLoading}
+        listRef={e => (listElementRef.current = e)}
+        isShowingOptions={isShowingOptions}
+        customOnRequestShowOptions={handleShowOptions}
+        customOnRequestHideOptions={() => setIsShowingOptions(false)}
+        customOnRequestSelectOption={handleSelectOption}
         customRenderBeforeInput={tags =>
           tags?.map((tag: ReactElement) => (
             <View
