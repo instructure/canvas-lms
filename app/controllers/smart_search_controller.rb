@@ -58,7 +58,7 @@ class SmartSearchController < ApplicationController
                 .group("wiki_pages.id")
                 .order("distance ASC")
         wiki_pages = Api.paginate(scope, self, smart_search_query_url)
-        response[:results].concat(wiki_pages)
+        response[:results].concat(wiki_pages_search_json(wiki_pages))
       end
 
       render json: response

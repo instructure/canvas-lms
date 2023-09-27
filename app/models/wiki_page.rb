@@ -116,8 +116,6 @@ class WikiPage < ActiveRecord::Base
   end
 
   def chunk_content(max_character_length = 4000)
-    body_text = html_to_text(body)
-
     if body_text.length > max_character_length
       # Chunk
       # Hard split on character length, back up to the nearest word boundary
@@ -136,6 +134,10 @@ class WikiPage < ActiveRecord::Base
       # No need for chunking
       yield title + "\n" + body_text
     end
+  end
+
+  def body_text
+    html_to_text(body)
   end
 
   def generate_embeddings

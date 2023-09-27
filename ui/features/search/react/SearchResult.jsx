@@ -17,7 +17,6 @@
  */
 
 import React, { useState } from 'react'
-import {TextArea} from '@instructure/ui-text-area'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {Rating} from '@instructure/ui-rating'
@@ -26,30 +25,12 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 const I18n = useI18nScope('SmartSearch')
 
 export default function SearchResult(props) {
-  const MAX_TOKENS = 100
 
-  function elideText(text) {
-    if (text.split(' ').length <= MAX_TOKENS) {
-      return text
+  function ellipsize(str, max) {
+    if (str.length > max) {
+      return str.substring(0, max - 3) + '...'
     }
-    return text.split(' ').slice(0, MAX_TOKENS).join(' ') + '...'
-  }
-
-  function cleanText(text) {
-    // TODO: any other "cleaning"?
-    return text.replace(/\\n/g, '\n')
-  }
-
-  function cleanAndElideText(text) {
-    return elideText(cleanText(text))
-  }
-
-  function generateWikiUrl(wiki_page) {
-    return `/courses/${wiki_page.context_id}/pages/${wiki_page.url}`
-  }
-
-  function generateDiscussionUrl(discussion_topic) {
-    return `/courses/${discussion_topic.context_id}/discussion_topics/${discussion_topic.id}`
+    return str
   }
 
   // TODO: Make this more user friendly and add I18n
@@ -75,13 +56,15 @@ export default function SearchResult(props) {
       >
         <h3>{wiki_page.title}</h3>
         <span>{I18n.t('Course Page')}</span>
-        <View
+        <Text
           as="div"
-          maxHeight="200px"
-          dangerouslySetInnerHTML={{__html: elideText(wiki_page.body)}}
-        />
+          size="medium"
+          color="secondary"
+        >
+          {ellipsize(wiki_page.body_text, 1000)}
+        </Text>
         {getRelevance(wiki_page)}
-        <a href={generateWikiUrl(wiki_page)}>{I18n.t('View Full Page')}</a>
+        <a href={wiki_page.url}>{I18n.t('View Full Page')}</a>
       </View>
     )
   } else if (props.searchResult.discussion_topic) {
