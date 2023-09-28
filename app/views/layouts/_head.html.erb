@@ -83,6 +83,9 @@
       if (ENV.DOMAIN_ROOT_ACCOUNT_UUID) {
         props['Canvas.accountId'] = ENV.DOMAIN_ROOT_ACCOUNT_UUID
       }
+      if (ENV.DOMAIN_ROOT_ACCOUNT_SFID) {
+        props['Canvas.salesforceAccountId'] = ENV.DOMAIN_ROOT_ACCOUNT_SFID
+      }
       if (Object.keys(props).length > 0) {
         heap.addUserProperties(props);
       }
