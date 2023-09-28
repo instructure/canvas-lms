@@ -654,7 +654,7 @@ class ExternalToolsController < ApplicationController
     # Verify the resource link was intended for the domain it's being
     # launched from
     if params[:url] && !resource_link&.current_external_tool(@context)
-      &.matches_host?(params[:url])
+                                     &.matches_host?(params[:url])
       nil
     else
       resource_link
