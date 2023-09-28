@@ -233,6 +233,7 @@ class ApplicationController < ActionController::Base
           files_domain: HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
           group_information:,
           DOMAIN_ROOT_ACCOUNT_ID: @domain_root_account&.global_id,
+          DOMAIN_ROOT_ACCOUNT_UUID: @domain_root_account&.uuid,
           k12: k12?,
           help_link_name:,
           help_link_icon:,
