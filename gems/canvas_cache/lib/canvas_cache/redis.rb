@@ -38,7 +38,7 @@ module CanvasCache
 
     module Client
       def disconnect_if_idle(since_when)
-        disconnect if !@process_start || @process_start < since_when
+        close if !@process_start || @process_start < since_when
       end
     end
 
@@ -72,6 +72,7 @@ module CanvasCache
         # so don't call disconnect on the cache too.
         return if Rails.cache.respond_to?(:redis) && @redis == Rails.cache.redis
 
+        @redis.close
         @redis = nil
       end
 
