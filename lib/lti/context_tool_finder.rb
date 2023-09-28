@@ -54,8 +54,8 @@ module Lti
     # parameter
     def single_shard_scope
       scopes(include_federated_parent: false).first
-            &.order(ContextExternalTool.best_unicode_collation_key("context_external_tools.name"))
-            &.order(Arel.sql("context_external_tools.id"))
+                                             &.order(ContextExternalTool.best_unicode_collation_key("context_external_tools.name"))
+                                             &.order(Arel.sql("context_external_tools.id"))
     end
 
     # If exclude_admin_visibility is true, does not return any tools where the options[:type]
