@@ -96,4 +96,17 @@ describe('DiscussionEntryVersionHistory', () => {
     expect(container.queryByText('Message 2')).toBeTruthy()
     expect(container.queryByText('Message 3')).toBeFalsy()
   })
+
+  it('shows only one button for Expand all or Collapse all', () => {
+    const container = setup()
+    fireEvent.click(container.getByText('View History'))
+
+    expect(container.queryByText('Expand all')).toBeTruthy()
+    expect(container.queryByText('Collapse all')).toBeFalsy()
+
+    fireEvent.click(container.getByText('Expand all'))
+
+    expect(container.queryByText('Expand all')).toBeFalsy()
+    expect(container.queryByText('Collapse all')).toBeTruthy()
+  })
 })

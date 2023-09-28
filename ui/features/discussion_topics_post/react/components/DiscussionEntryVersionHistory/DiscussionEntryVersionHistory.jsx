@@ -35,6 +35,7 @@ const I18n = useI18nScope('discussion_posts')
 export const DiscussionEntryVersionHistory = props => {
   const [open, setOpen] = useState(false)
   const [expanded, setExpanded] = useState([])
+  const [isExpandedAll, setIsExpandedAll] = useState(false)
 
   const setAllExpandedTo = value => {
     const newExpanded = [...expanded]
@@ -53,7 +54,10 @@ export const DiscussionEntryVersionHistory = props => {
   const closeAndReset = () => {
     setOpen(false)
     setAllExpandedTo(false)
+    setIsExpandedAll(false)
   }
+
+  const expandCollapseAllButtonText = isExpandedAll ? I18n.t('Collapse all') : I18n.t('Expand all')
 
   return (
     <>
@@ -97,20 +101,15 @@ export const DiscussionEntryVersionHistory = props => {
               <Button
                 size="small"
                 onClick={() => {
-                  setAllExpandedTo(true)
+                  if (isExpandedAll) {
+                    setAllExpandedTo(false)
+                  } else {
+                    setAllExpandedTo(true)
+                  }
+                  setIsExpandedAll(!isExpandedAll)
                 }}
               >
-                {I18n.t('Expand all')}
-              </Button>
-            </Flex.Item>
-            <Flex.Item margin="xx-small">
-              <Button
-                size="small"
-                onClick={() => {
-                  setAllExpandedTo(false)
-                }}
-              >
-                {I18n.t('Collapse all')}
+                {expandCollapseAllButtonText}
               </Button>
             </Flex.Item>
           </Flex>
