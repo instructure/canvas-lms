@@ -132,8 +132,11 @@ class EnrollmentState < ActiveRecord::Base
       self.user_needs_touch = true
       unless skip_touch_user
         self.class.connection.after_transaction_commit do
-          enrollment.user.touch unless User.skip_touch_for_type?(:enrollments)
-          enrollment.user.clear_cache_key(:enrollments)
+          user = enrollment.user
+          user = User.find(user.id) unless user.canonical?
+
+          user.touch unless User.skip_touch_for_type?(:enrollments)
+          user.clear_cache_key(:enrollments)
         end
       end
     end
