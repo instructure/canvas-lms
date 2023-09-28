@@ -1,8 +1,16 @@
 production:
   url: redis://<%= ENV.fetch('CANVAS_REDIS_HOST', 'redis') %>
+  connect_timeout: 0.5
+  circuit_breaker:
+    error_threshold: 1
+    error_timeout: 2
 
 development:
   url: redis://<%= ENV.fetch('CANVAS_REDIS_HOST', 'redis') %>
+  connect_timeout: 0.5
+  circuit_breaker:
+    error_threshold: 1
+    error_timeout: 2
 
 test:
   # warning: the redis database will get cleared before each test, so if you
@@ -10,3 +18,4 @@ test:
   # these tests to use.
   # only tests that are exercising the integration with redis require redis to run.
   url: redis://<%= ENV.fetch('CANVAS_REDIS_HOST', 'redis') %>/<%= ENV.fetch('PARALLEL_INDEX', '1') %>
+  connect_timeout: 0.5
