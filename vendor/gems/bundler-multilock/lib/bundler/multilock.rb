@@ -243,7 +243,10 @@ module Bundler
                   end
                 end
                 lockfile.instance_variable_set(:@ruby_version, default_lockfile.ruby_version)
-                lockfile.instance_variable_set(:@bundler_version, default_lockfile.bundler_version)
+                unless lockfile.bundler_version == default_lockfile.bundler_version
+                  unlocking_bundler = true
+                  lockfile.instance_variable_set(:@bundler_version, default_lockfile.bundler_version)
+                end
 
                 new_contents = LockfileGenerator.generate(lockfile)
               else
@@ -261,7 +264,8 @@ module Bundler
                 had_changes = write_lockfile(lockfile_definition,
                                              temp_lockfile.path,
                                              install: install,
-                                             dependency_changes: dependency_changes)
+                                             dependency_changes: dependency_changes,
+                                             unlocking_bundler: unlocking_bundler)
               end
 
               # if we had changes, bundler may have updated some common
@@ -375,7 +379,7 @@ module Bundler
         true
       end
 
-      def write_lockfile(lockfile_definition, lockfile, install:, dependency_changes: false)
+      def write_lockfile(lockfile_definition, lockfile, install:, dependency_changes: false, unlocking_bundler: false)
         prepare_block = lockfile_definition[:prepare]
 
         gemfile = lockfile_definition[:gemfile]
@@ -385,7 +389,7 @@ module Bundler
         builder.eval_gemfile(gemfile, &prepare_block) if prepare_block
         builder.eval_gemfile(gemfile)
 
-        definition = builder.to_definition(lockfile, {})
+        definition = builder.to_definition(lockfile, { bundler: unlocking_bundler })
         definition.instance_variable_set(:@dependency_changes, dependency_changes) if dependency_changes
         orig_definition = definition.dup # we might need it twice
 
@@ -393,7 +397,7 @@ module Bundler
         if current_lockfile.exist?
           definition.instance_variable_set(:@lockfile_contents, current_lockfile.read)
           if install
-            current_definition = builder.to_definition(current_lockfile, {})
+            current_definition = builder.to_definition(current_lockfile, { bundler: unlocking_bundler })
             begin
               current_definition.resolve_with_cache!
               if current_definition.missing_specs.any?
