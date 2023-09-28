@@ -157,6 +157,9 @@ module Lti::IMS
     # @argument https://canvas.instructure.com/lti/submission[new_submission] [Optional, Boolean]
     #   (EXTENSION field) flag to indicate that this is a new submission. Defaults to true unless submission_type is none.
     #
+    # @argument https://canvas.instructure.com/lti/submission[preserve_score] [Optional, Boolean]
+    #   (EXTENSION field) flag to prevent a request from clearing an existing grade for a submission. Defaults to true.
+    #
     # @argument https://canvas.instructure.com/lti/submission[prioritize_non_tool_grade] [Optional, Boolean]
     #   (EXTENSION field) flag to prevent a request from overwriting an existing grade for a submission. Defaults to false.
     #
@@ -190,6 +193,7 @@ module Lti::IMS
     #     "userId": "5323497",
     #     "https://canvas.instructure.com/lti/submission": {
     #       "new_submission": true,
+    #       "preserve_score": true,
     #       "submission_type": "online_url",
     #       "submission_data": "https://instructure.com",
     #       "submitted_at": "2017-04-14T18:54:36.736+00:00",
@@ -282,6 +286,7 @@ module Lti::IMS
     OPTIONAL_PARAMS = %i[scoreGiven scoreMaximum comment].freeze
     EXTENSION_PARAMS = [
       :new_submission,
+      :preserve_score,
       :submission_type,
       :prioritize_non_tool_grade,
       :submission_data,
@@ -341,7 +346,7 @@ module Lti::IMS
     end
 
     def verify_valid_score_maximum
-      return if ignore_score?
+      return if reset_score?
 
       if params.key?(:scoreMaximum)
         if params[:scoreMaximum].to_f >= 0
@@ -358,7 +363,7 @@ module Lti::IMS
     end
 
     def verify_valid_score_given
-      return if ignore_score?
+      return if reset_score?
 
       if params.key?(:scoreGiven)
         return if params[:scoreGiven].to_f >= 0
@@ -392,6 +397,10 @@ module Lti::IMS
       ActiveRecord::Type::Boolean.new.cast(scores_params.dig(:extensions, Lti::Result::AGS_EXT_SUBMISSION, :prioritize_non_tool_grade))
     end
 
+    def preserve_score?
+      ActiveRecord::Type::Boolean.new.cast(scores_params.dig(:extensions, Lti::Result::AGS_EXT_SUBMISSION, :preserve_score))
+    end
+
     def submission_has_score?
       line_item.assignment.find_or_create_submission(user)&.score&.present?
     end
@@ -399,9 +408,9 @@ module Lti::IMS
     def score_submission
       return unless line_item.assignment_line_item?
 
-      if ignore_score?
+      if preserve_score? || reset_score?
         submission = line_item.assignment.find_or_create_submission(user)
-        submission.update(score: nil)
+        submission.update(score: nil) unless preserve_score?
       elsif prioritize_non_tool_grade? && submission_has_score?
         submission = line_item.assignment.find_or_create_submission(user)
       else
@@ -414,6 +423,7 @@ module Lti::IMS
         end
         submission = line_item.assignment.grade_student(user, submission_hash).first
       end
+
       submission.add_comment(comment: scores_params[:comment], skip_author: true) if scores_params[:comment].present?
       submission
     end
@@ -540,7 +550,7 @@ module Lti::IMS
       line_item.score_maximum / scores_params[:result_maximum].to_f
     end
 
-    def ignore_score?
+    def reset_score?
       Lti::Result::ACCEPT_GIVEN_SCORE_TYPES.exclude?(params[:gradingProgress]) || params[:scoreGiven].nil?
     end
 
