@@ -348,7 +348,7 @@ module Lti::IMS
             end
 
             context "with comment in payload" do
-              let(:params_overrides) { super().merge(comment: "Test coment") }
+              let(:params_overrides) { super().merge(comment: "Test comment") }
 
               it "creates a new submission_comment" do
                 send_request
@@ -387,6 +387,28 @@ module Lti::IMS
               result.reload
               expect(result.needs_review?).to be true
               expect(result.submission.needs_review?).to be true
+            end
+
+            context "with submission already graded and using preserve_score param" do
+              let(:result) do
+                lti_result_model line_item:,
+                                 user:,
+                                 result_score: 5,
+                                 result_maximum: 20
+              end
+              let(:params_overrides) do
+                super().merge(gradingProgress: "PendingManual",
+                              scoreGiven: 100,
+                              scoreMaximum: line_item.score_maximum,
+                              "https://canvas.instructure.com/lti/submission": { preserve_score: true })
+              end
+
+              it "does not update submission score" do
+                send_request
+                result.reload
+                expect(result.needs_review?).to be true
+                expect(result.submission.score).to eq 5
+              end
             end
           end
 
