@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require_relative "../../outcome_alignments_spec_helper"
+
 describe Outcomes::LearningOutcomeGroupChildren do
   subject { described_class.new(context) }
 
@@ -207,6 +209,45 @@ describe Outcomes::LearningOutcomeGroupChildren do
           course.account.disable_feature!(:improved_outcomes_management)
           expect(subject.total_outcomes(cg0.id, { filter: "WITH_ALIGNMENTS" })).to eq 3
           expect(subject.total_outcomes(cg0.id, { filter: "NO_ALIGNMENTS" })).to eq 3
+        end
+
+        context "when outcome is aligned to New Quizzes" do
+          before do
+            @new_quiz = course.assignments.create!(title: "new quiz - aligned in OS", submission_types: "external_tool")
+            allow_any_instance_of(OutcomesServiceAlignmentsHelper)
+              .to receive(:get_os_aligned_outcomes)
+              .and_return(OutcomeAlignmentsSpecHelper.mock_os_aligned_outcomes([o8], @new_quiz.id))
+          end
+
+          context "when Outcome Alignment Summary with NQ FF is enabled" do
+            before do
+              course.enable_feature!(:outcome_alignment_summary_with_new_quizzes)
+            end
+
+            it "returns the total outcomes aligned in Canvas and Outcomes-Service based on filter argument" do
+              expect(subject.total_outcomes(cg0.id, { filter: "WITH_ALIGNMENTS" })).to eq 2
+              expect(subject.total_outcomes(cg0.id, { filter: "NO_ALIGNMENTS" })).to eq 1
+            end
+
+            context "when new quiz aligned to outcome is deleted in Canvas but not in Outcomes-Service" do
+              it "returns the total outcomes aligned in Canvas and Outcomes-Service and filters out alignments to deleted quizzes" do
+                @new_quiz.destroy!
+                expect(subject.total_outcomes(cg0.id, { filter: "WITH_ALIGNMENTS" })).to eq 1
+                expect(subject.total_outcomes(cg0.id, { filter: "NO_ALIGNMENTS" })).to eq 2
+              end
+            end
+          end
+
+          context "when Outcome Alignment Summary with NQ FF is disabled" do
+            before do
+              course.disable_feature!(:outcome_alignment_summary_with_new_quizzes)
+            end
+
+            it "returns the total outcomes only aligned in Canvas based on filter argument" do
+              expect(subject.total_outcomes(cg0.id, { filter: "WITH_ALIGNMENTS" })).to eq 1
+              expect(subject.total_outcomes(cg0.id, { filter: "NO_ALIGNMENTS" })).to eq 2
+            end
+          end
         end
       end
 
@@ -591,14 +632,13 @@ describe Outcomes::LearningOutcomeGroupChildren do
       end
 
       context "when Outcome Alignment Summary with NQ FF is enabled" do
-        let!(:os_aligned_outcomes_mock) { { o8.id => [] } }
-
         before do
           cg1.add_outcome o5
           course.enable_feature!(:outcome_alignment_summary_with_new_quizzes)
+          @new_quiz = course.assignments.create!(title: "new quiz - aligned in OS", submission_types: "external_tool")
           allow_any_instance_of(OutcomesServiceAlignmentsHelper)
             .to receive(:get_os_aligned_outcomes)
-            .and_return(os_aligned_outcomes_mock)
+            .and_return(OutcomeAlignmentsSpecHelper.mock_os_aligned_outcomes([o8], @new_quiz.id))
         end
 
         it "filters outcomes without alignments in Canvas or Outcomes-Service" do
@@ -611,6 +651,15 @@ describe Outcomes::LearningOutcomeGroupChildren do
           outcomes = subject.suboutcomes_by_group_id(cg1.id, { filter: "WITH_ALIGNMENTS" })
                             .map { |o| o.learning_outcome_content.id }
           expect(outcomes).to eql([o3.id, o8.id])
+        end
+
+        context "when new quiz aligned to outcome is deleted in Canvas but not in Outcomes-Service" do
+          it "filters outcomes with alignments in Canvas or Outcomes-Service and filters out alignments to deleted quizzes" do
+            @new_quiz.destroy!
+            outcomes = subject.suboutcomes_by_group_id(cg1.id, { filter: "WITH_ALIGNMENTS" })
+                              .map { |o| o.learning_outcome_content.id }
+            expect(outcomes).to eql([o3.id])
+          end
         end
 
         it "filters outcomes without alignments in Canvas or Outcomes-Service and with search" do
