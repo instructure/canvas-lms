@@ -403,6 +403,9 @@ class CourseSection < ActiveRecord::Base
         data = []
       end
     end
+
+    SisBatchRollBackData.bulk_insert_roll_back_data(data) if data.any?
+
     AssignmentOverride.where(set_type: "CourseSection", set_id: cs.map(&:id)).find_each(&:destroy)
     DiscussionTopicSectionVisibility.where(course_section_id: cs.map(&:id)).find_in_batches do |d_batch|
       DiscussionTopicSectionVisibility.where(id: d_batch).update_all(workflow_state: "deleted")
