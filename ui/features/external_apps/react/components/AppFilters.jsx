@@ -28,17 +28,18 @@ import store from '../lib/AppCenterStore'
 import $ from 'jquery'
 import '@canvas/rails-flash-notifications'
 import {IconButton} from '@instructure/ui-buttons'
-import {IconSearchLine, IconTroubleLine} from '@instructure/ui-icons'
+import {IconSearchLine, IconXLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextInput} from '@instructure/ui-text-input'
 
 const I18n = useI18nScope('external_tools')
 
 export default class AppFilters extends React.Component {
-  state = store.getState()
+  state = {filter: 'all', filterText: '', disabled: false, readOnly: false}
 
   componentDidMount() {
     store.addChangeListener(this.onChange)
+    this.onChange()
   }
 
   componentWillUnmount() {
@@ -46,7 +47,13 @@ export default class AppFilters extends React.Component {
   }
 
   onChange = () => {
-    this.setState(store.getState())
+    const s = store.getState()
+    this.setState({
+      disabled: !!s.disabled,
+      readOnly: !!s.readOnly,
+      filterText: s.filterText,
+      filter: s.filter,
+    })
   }
 
   handleFilterClick = (filter, e) => {
@@ -55,9 +62,8 @@ export default class AppFilters extends React.Component {
     this.announceFilterResults()
   }
 
-  applyFilter = () => {
-    const filterText = this.filterText.value
-    store.setState({filterText})
+  applyFilter = (_e, value) => {
+    store.setState({filterText: value})
     this.announceFilterResults()
   }
 
@@ -68,13 +74,18 @@ export default class AppFilters extends React.Component {
 
   handleClear = e => {
     e.stopPropagation()
-    this.filterText.value = ''
-    this.applyFilter()
-    this.inputRef.focus()
+    this.applyFilter(null, '')
+    this.filterText.focus()
+  }
+
+  interaction = () => {
+    if (this.state.disabled) return 'disabled'
+    if (this.state.readOnly) return 'readonly'
+    return 'enabled'
   }
 
   renderClearButton = () => {
-    if (!this.filterText?.value?.length) return
+    if (!this.state.filterText.length) return null
 
     return (
       <IconButton
@@ -83,16 +94,16 @@ export default class AppFilters extends React.Component {
         withBackground={false}
         withBorder={false}
         screenReaderLabel="Clear search"
-        disabled={this.state.disabled || this.state.readOnly}
+        interaction={this.interaction()}
         onClick={this.handleClear}
       >
-        <IconTroubleLine />
+        <IconXLine />
       </IconButton>
     )
   }
 
   render() {
-    const activeFilter = store.getState().filter || 'all'
+    const activeFilter = this.state.filter || 'all'
     return (
       <div className="AppFilters">
         <div className="content-box">
@@ -137,9 +148,10 @@ export default class AppFilters extends React.Component {
             <div className="col-xs-5">
               <TextInput
                 renderLabel={<ScreenReaderContent>{I18n.t('Filter by name')}</ScreenReaderContent>}
+                interaction={this.interaction()}
                 placeholder={I18n.t('Filter by name')}
-                defaultValue={this.state.filterText}
-                onInput={this.applyFilter}
+                value={this.state.filterText}
+                onChange={this.applyFilter}
                 inputRef={el => (this.filterText = el)}
                 renderBeforeInput={<IconSearchLine inline={false} />}
                 renderAfterInput={this.renderClearButton()}
