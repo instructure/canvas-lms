@@ -8,4 +8,5 @@ enhanced_docviewer_url_security:
   state: hidden
   applies_to: SiteAdmin
   display_name: Enhanced DocViewer URL Security
-  description: DocViewer will be launched more securely (using an asymmetrically signed JWT with a JTI claim to prevent token reuse)
+  description: |-
+    DocViewer will be launched more securely (using a JWT with a JTI claim to prevent token reuse)

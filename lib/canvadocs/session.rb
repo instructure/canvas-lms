@@ -30,6 +30,7 @@ module Canvadocs
       opts[:url] = attachment.public_url(expires_in: 7.days)
       opts[:locale] = I18n.locale || I18n.default_locale
       opts[:send_usage_metrics] = user.account.feature_enabled?(:send_usage_metrics) if user
+      opts[:is_launch_token] = Account.site_admin.feature_enabled?(:enhanced_docviewer_url_security)
 
       Canvas.timeout_protection("canvadocs", raise_on_timeout: true) do
         session = canvadocs_api.session(document_id, opts)

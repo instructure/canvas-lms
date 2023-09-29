@@ -121,6 +121,23 @@ describe "Canvadoc" do
       expect(canvadocs_api).to receive(:session).with(anything, hash_including(user_crocodoc_id: @attachment.user.crocodoc_id)).and_return({})
       @doc.session_url(user: @attachment.user, enable_annotations: true)
     end
+
+    context "if enhanced_docviewer_url_security feature flag set" do
+      before do
+        Account.site_admin.enable_feature!(:enhanced_docviewer_url_security)
+      end
+
+      after do
+        Account.site_admin.disable_feature!(:enhanced_docviewer_url_security)
+      end
+
+      it "passes is_launch_token=true to canvadocs_api" do
+        @doc.upload
+        canvadocs_api = @doc.send(:canvadocs_api)
+        expect(canvadocs_api).to receive(:session).with(anything, hash_including(is_launch_token: true)).and_return({})
+        @doc.session_url(user: @attachment.user, enable_annotations: false)
+      end
+    end
   end
 
   describe "#available?" do
