@@ -80,7 +80,7 @@ module DatesOverridable
     if Account.site_admin.feature_enabled? :differentiated_modules
       assignment_overrides.or(context_module_overrides)
     else
-      assignment_overrides
+      assignment_overrides.where.not(set_type: "Course")
     end
   end
 

@@ -734,6 +734,7 @@ describe Types::AssignmentType do
     end
 
     it "works for Course tags" do
+      Account.site_admin.enable_feature!(:differentiated_modules)
       assignment.assignment_overrides.create!(set: course)
 
       expect(

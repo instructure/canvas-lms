@@ -140,6 +140,8 @@ module AssignmentOverrideApplicator
             overrides += groups if groups
             sections = section_overrides(assignment_or_quiz, user)
             overrides += sections if sections
+            everyone = course_overrides(assignment_or_quiz, user)
+            overrides += everyone if everyone
           else
             observed = observer_overrides(assignment_or_quiz, user)
             overrides += observed if observed
@@ -259,6 +261,19 @@ module AssignmentOverrideApplicator
     end
 
     overrides
+  end
+
+  def self.course_overrides(assignment_or_quiz, user)
+    if Account.site_admin.feature_enabled? :differentiated_modules
+      context = assignment_or_quiz.context
+      return nil if user.enrollments.active.where(course: context).empty?
+
+      if assignment_or_quiz.all_assignment_overrides.loaded?
+        assignment_or_quiz.all_assignment_overrides.select { |o| o.set_type == "Course" && o.set_id == context.id }
+      else
+        assignment_or_quiz.all_assignment_overrides.where(set_type: "Course", set_id: context.id)
+      end
+    end
   end
 
   def self.current_override_version(assignment_or_quiz, all_overrides)
