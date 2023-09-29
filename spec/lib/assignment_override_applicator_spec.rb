@@ -429,6 +429,22 @@ describe AssignmentOverrideApplicator do
         expect(overrides.last).to eq @section_override
       end
 
+      it "orders section override before course overrides" do
+        Account.site_admin.enable_feature!(:differentiated_modules)
+        @section_override = assignment_override_model(assignment: @assignment)
+        @section_override.set = @course.default_section
+        @section_override.save!
+
+        @course_override = assignment_override_model(assignment: @assignment)
+        @course_override.set = @course
+        @course_override.save!
+
+        overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
+        expect(overrides.size).to eq 2
+        expect(overrides.first).to eq @section_override
+        expect(overrides.last).to eq @course_override
+      end
+
       it "should order section overrides by position" # see TODO in implementation
 
       context "sharding" do
@@ -800,6 +816,82 @@ describe AssignmentOverrideApplicator do
           create_section_context_module_override(@section2)
           result = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @admin)
           expect(result).to include(@module_override)
+        end
+      end
+    end
+
+    context "course overrides" do
+      before do
+        @override = assignment_override_model(assignment: @assignment)
+        @override.set = @course
+        @override.save!
+      end
+
+      describe "for students" do
+        it "returns course overrides" do
+          Account.site_admin.enable_feature!(:differentiated_modules)
+          result = AssignmentOverrideApplicator.course_overrides(@assignment, @student)
+          expect(result.length).to eq 1
+        end
+
+        it "doesn't include course overrides if flag is off" do
+          result = AssignmentOverrideApplicator.course_overrides(@assignment, @student)
+          expect(result).to be_nil
+        end
+
+        it "doesn't include course overrides for student not in course" do
+          Account.site_admin.enable_feature!(:differentiated_modules)
+          course2 = course_factory
+          student2 = student_in_course(course: course2)
+          result = AssignmentOverrideApplicator.course_overrides(@assignment, student2.user)
+          expect(result).to be_nil
+        end
+      end
+
+      describe "for teachers" do
+        it "works" do
+          Account.site_admin.enable_feature!(:differentiated_modules)
+          teacher_in_course
+          result = AssignmentOverrideApplicator.course_overrides(@assignment, @teacher)
+          expect(result).to include(@override)
+        end
+
+        it "doesn't include course overrides if flag is off" do
+          teacher_in_course
+          result = AssignmentOverrideApplicator.course_overrides(@assignment, @teacher)
+          expect(result).to be_nil
+        end
+      end
+
+      describe "for observers" do
+        it "works" do
+          Account.site_admin.enable_feature!(:differentiated_modules)
+          course_with_observer({ course: @course, active_all: true })
+          @course.enroll_user(@observer, "ObserverEnrollment", { associated_user_id: @student.id })
+          overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @observer)
+          expect(overrides).to eq [@override]
+        end
+
+        it "doesn't include course overrides if flag is off" do
+          course_with_observer({ course: @course, active_all: true })
+          @course.enroll_user(@observer, "ObserverEnrollment", { associated_user_id: @student.id })
+          overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @observer)
+          expect(overrides).to eq []
+        end
+      end
+
+      describe "for admins" do
+        it "works" do
+          Account.site_admin.enable_feature!(:differentiated_modules)
+          account_admin_user
+          overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @admin)
+          expect(overrides).to eq [@override]
+        end
+
+        it "doesn't include course overrides if flag is off" do
+          account_admin_user
+          overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @admin)
+          expect(overrides).to eq []
         end
       end
     end
