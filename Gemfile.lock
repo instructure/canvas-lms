@@ -913,7 +913,7 @@ GEM
       rspec-core (~> 3.12.0)
       rspec-expectations (~> 3.12.0)
       rspec-mocks (~> 3.12.0)
-    rspec-collection_matchers (1.2.0)
+    rspec-collection_matchers (1.2.1)
       rspec-expectations (>= 2.99.0.beta1)
     rspec-core (3.12.2)
       rspec-support (~> 3.12.0)
@@ -1292,7 +1292,7 @@ DEPENDENCIES
   rqrcode (~> 2.2)
   rrule (~> 0.5)
   rspec (~> 3.12)
-  rspec-collection_matchers (= 1.2.0)
+  rspec-collection_matchers (~> 1.2)
   rspec-rails (~> 6.0)
   rspec_around_all (= 0.2.0)
   rspecq!
