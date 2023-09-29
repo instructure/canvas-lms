@@ -99,6 +99,8 @@ export default function DiscussionTopicFormContainer() {
         onlyGradersCanLike,
         addToTodo,
         todoDate,
+        enablePodcastFeed,
+        includeRepliesInFeed,
       }) => {
         if (isEditing) {
           console.log('call updateDiscussion')
@@ -118,6 +120,8 @@ export default function DiscussionTopicFormContainer() {
               allowRating: allowLiking,
               onlyGradersCanRate: onlyGradersCanLike,
               todoDate: addToTodo ? todoDate : null,
+              podcastEnabled: enablePodcastFeed,
+              podcastHasStudentPosts: includeRepliesInFeed,
             },
           })
         }

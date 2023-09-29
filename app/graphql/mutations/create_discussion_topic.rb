@@ -81,7 +81,9 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
         allow_rating: input[:allow_rating],
         only_graders_can_rate: input[:only_graders_can_rate],
         user: current_user,
-        todo_date: input[:todo_date]
+        todo_date: input[:todo_date],
+        podcast_enabled: input[:podcast_enabled] || false,
+        podcast_has_student_posts: input[:podcast_has_student_posts] || false
       }
     )
     verify_authorized_action!(discussion_topic, :create)

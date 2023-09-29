@@ -636,6 +636,19 @@ describe "discussions" do
         expect(dt.only_graders_can_rate).to be true
       end
 
+      it "creates a discussion topic successfully with podcast_enabled and podcast_has_student_posts" do
+        get "/courses/#{course.id}/discussion_topics/new"
+        f("input[placeholder='Topic Title']").send_keys "This is a topic with podcast_enabled and podcast_has_student_posts"
+        force_click("input[value='enable-podcast-feed']")
+        wait_for_ajaximations
+        force_click("input[value='include-student-replies-in-podcast-feed']")
+        f("button[data-testid='save-and-publish-button']").click
+        wait_for_ajaximations
+        dt = DiscussionTopic.last
+        expect(dt.podcast_enabled).to be true
+        expect(dt.podcast_has_student_posts).to be true
+      end
+
       it "does not show allow liking options when course is a k5 homeroom course" do
         Account.default.enable_as_k5_account!
         course.homeroom_course = true
