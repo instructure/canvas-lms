@@ -617,12 +617,28 @@ describe FilesController do
         expect(@module.evaluate_for(@student).state).to be(:completed)
       end
 
-      it "marks pdf files viewed when rendering html with file_preview" do
-        @file = attachment_model(context: @course, uploaded_data: stub_file_data("test.pdf", "asdf", "application/pdf"))
+      it "marks previewable files as viewed when rendering html with file_preview" do
+        odp = attachment_model(context: @course, uploaded_data: stub_file_data("test.odp", "asdf", "application/vnd.oasis.opendocument.presentation"))
+        odt = attachment_model(context: @course, uploaded_data: stub_file_data("test.odt", "asdf", "application/vnd.oasis.opendocument.text"))
+        docx = attachment_model(context: @course, uploaded_data: stub_file_data("test.docx", "asdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
+        pptx = attachment_model(context: @course, uploaded_data: stub_file_data("test.pptx", "asdf", "application/vnd.openxmlformats-officedocument.presentationml.presentation"))
+        pdf = attachment_model(context: @course, uploaded_data: stub_file_data("test.pdf", "asdf", "application/pdf"))
+        rft = attachment_model(context: @course, uploaded_data: stub_file_data("test.rft", "asdf", "application/rtf"))
+        [odp, odt, docx, pptx, pdf, rft].each do |file|
+          @file = file
+          file_in_a_module
+          get "show", params: { course_id: @course.id, id: @file.id }, format: :html
+          @module.reload
+          expect(@module.evaluate_for(@student).state).to be(:completed)
+        end
+      end
+
+      it "does not mark as viewed not previewable files" do
+        @file = attachment_model(context: @course, uploaded_data: stub_file_data("test", "asdf", "application/unknown"))
         file_in_a_module
         get "show", params: { course_id: @course.id, id: @file.id }, format: :html
         @module.reload
-        expect(@module.evaluate_for(@student).state).to be(:completed)
+        expect(@module.evaluate_for(@student).state).to be(:unlocked)
       end
 
       it "redirects to the user's files URL when browsing to an attachment with the same path as a deleted attachment" do
