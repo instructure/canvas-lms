@@ -84,7 +84,7 @@ export function parseModule(element: HTMLDivElement) {
     element.querySelector('.requirements_message')?.getAttribute('data-requirement-type') ?? 'all'
   const requireSequentialProgress =
     element.querySelector('.require_sequential_progress')?.textContent === 'true'
-  const publishFinalGrade = !!element.querySelector('.publish_final_grade')?.textContent
+  const publishFinalGrade = element.querySelector('.publish_final_grade')?.textContent === 'true'
   const prerequisites = parsePrerequisites(element)
   const moduleList = parseModuleList()
   const requirements = parseRequirements(element)
@@ -177,9 +177,13 @@ function parseModuleItems(element: HTMLDivElement) {
 }
 
 export function updateModuleUI(moduleElement: HTMLDivElement, moduleSettings: SettingsPanelState) {
-  ;[updateName, updateUnlockTime, updatePrerequisites, updateRequirements].forEach(fn =>
-    fn(moduleElement, moduleSettings)
-  )
+  ;[
+    updateName,
+    updateUnlockTime,
+    updatePrerequisites,
+    updateRequirements,
+    updatePublishFinalGrade,
+  ].forEach(fn => fn(moduleElement, moduleSettings))
 }
 
 function updateName(moduleElement: HTMLDivElement, moduleSettings: SettingsPanelState) {
@@ -369,4 +373,14 @@ function updateRequirements(moduleElement: HTMLDivElement, moduleSettings: Setti
       }
     }
   })
+}
+
+function updatePublishFinalGrade(
+  moduleElement: HTMLDivElement,
+  moduleSettings: SettingsPanelState
+) {
+  const publishFinalGradeElement = moduleElement.querySelector('.publish_final_grade')
+  if (publishFinalGradeElement) {
+    publishFinalGradeElement.textContent = moduleSettings.publishFinalGrade.toString()
+  }
 }

@@ -125,6 +125,7 @@ export default function DifferentiatedModulesTray({
                 onDismiss={onDismiss}
                 moduleElement={moduleElement}
                 moduleId={moduleId}
+                enablePublishFinalGrade={ENV?.PUBLISH_FINAL_GRADE}
                 {...settingsProps}
               />
             </Tabs.Panel>
