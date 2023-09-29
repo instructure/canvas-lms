@@ -59,6 +59,7 @@ export function convertModuleSettingsForApi(moduleSettings: SettingsPanelState) 
       requirement_count: moduleSettings.requirementCount === 'one' ? '1' : '',
       require_sequential_progress:
         moduleSettings.requirementCount === 'all' && moduleSettings.requireSequentialProgress,
+      publish_final_grade: moduleSettings.publishFinalGrade,
     },
   }
 }

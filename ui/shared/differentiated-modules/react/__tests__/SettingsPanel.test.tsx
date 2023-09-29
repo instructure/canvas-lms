@@ -86,6 +86,16 @@ describe('SettingsPanel', () => {
     expect(getByTestId('requirement-form')).toBeInTheDocument()
   })
 
+  it('does not render publish final grade if not enabled', () => {
+    const {queryByRole} = renderComponent()
+    expect(queryByRole('checkbox', {name: /Publish final grade/})).not.toBeInTheDocument()
+  })
+
+  it('renders publish final grade if enabled', () => {
+    const {getByRole} = renderComponent({enablePublishFinalGrade: true})
+    expect(getByRole('checkbox', {name: /Publish final grade/})).toBeInTheDocument()
+  })
+
   describe('on update', () => {
     beforeAll(() => {
       window.ENV.COURSE_ID = '1'

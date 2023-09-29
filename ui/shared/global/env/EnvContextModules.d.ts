@@ -44,4 +44,5 @@ export interface EnvContextModules {
     IS_CHILD_COURSE: boolean
     MASTER_COURSE_DATA_URL: string
   }
+  PUBLISH_FINAL_GRADE: boolean
 }

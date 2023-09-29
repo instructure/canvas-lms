@@ -53,6 +53,8 @@ export interface SettingsPanelProps {
   requireSequentialProgress?: boolean
   requirements?: Requirement[]
   moduleItems?: ModuleItem[]
+  publishFinalGrade?: boolean
+  enablePublishFinalGrade?: boolean
 }
 
 export default function SettingsPanel({
@@ -66,6 +68,8 @@ export default function SettingsPanel({
   requirementCount,
   requireSequentialProgress,
   requirements,
+  publishFinalGrade,
+  enablePublishFinalGrade = false,
   moduleList = [],
   moduleItems = [],
 }: SettingsPanelProps) {
@@ -78,6 +82,7 @@ export default function SettingsPanel({
     requirements: requirements ?? [],
     requirementCount: requirementCount ?? 'all',
     requireSequentialProgress: requireSequentialProgress ?? false,
+    publishFinalGrade: publishFinalGrade ?? false,
   })
 
   const availableModules = useMemo(() => {
@@ -238,6 +243,17 @@ export default function SettingsPanel({
                   ],
                 })
               }}
+            />
+          </View>
+        )}
+        {enablePublishFinalGrade && (
+          <View as="div" padding="small">
+            <Checkbox
+              label={I18n.t('Publish final grade for the student when this module is completed')}
+              checked={state.publishFinalGrade}
+              onChange={() =>
+                dispatch({type: actions.SET_PUBLISH_FINAL_GRADE, payload: !state.publishFinalGrade})
+              }
             />
           </View>
         )}
