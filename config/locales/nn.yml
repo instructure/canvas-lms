@@ -24589,11 +24589,11 @@ nn:
   to_search_for_a_course_in_the_restore_courses_tab__46e75739: |-
       For å søke etter eit emne i gjenopprett emne-fana, må 'Emneinnhald - vis' òg vere slått på.
       For å gjenopprette eit sletta emne i ein konto, må 'Emne - legg til / endre / slette', 'Emneinnhald - vis' og 'Emne - opphev sletting' alle vere slått på.
-  to_search_for_a_course_in_the_restore_courses_tab__93dffdd5: "For å søke etter eit emne i Gjenopprett Emne -valet så må \"Emne Innhald - sjå\" og vere slått på"
+  to_search_for_a_course_in_the_restore_courses_tab__93dffdd5: "For å søke etter eit emne i Gjenopprett Emne -valet, så må \"Emne Innhald - sjå\" og vere slått på"
   to_search_for_a_course_in_the_restore_courses_tab__a903343: "For å søke etter eit emne i gjenopprett emne-fana, må 'Emneinnhald - vis' òg vere slått på. For å gjenopprette eit sletta emne i ein konto, må 'Emne - legg til / endre / slette', 'Emneinnhald - vis' og 'Emne - opphev sletting' alle vere slått på. "
   to_search_grade_change_logs_grades_view_change_log_8d2f6d30: "For å søke etter vurderingsloggar, må 'Vurderingar - vis endringsloggar' òg vere slått på."
   to_search_grade_change_logs_grades_view_change_log_d4d40cf2: "For å søke i vurderingsloggane, må 'Vurderingar - vis endringsloggar' òg vere slått på."
-  to_see_the_analytics_link_in_the_user_sidebar_from_6a8b20d9: "For å kunne sjå Analyticslenka i sidemenyen frå Personsida så må \"Profilar\" vere slått av for din konto."
+  to_see_the_analytics_link_in_the_user_sidebar_from_6a8b20d9: "For å kunne sjå Analyticslenka i sidemenyen frå Personsida, så må \"Profilar\" vere slått av for din konto."
   to_see_the_course_setup_checklist_option_on_the_co_41322a29: "For å sjå sjekklista for emneoppsett på forsida til emnet, må 'Administrer ( legg til / endre / slett ) emne' òg vere slått på. "
   to_see_the_course_setup_checklist_option_on_the_co_6c485483: "For å sjå valet for sjekklista for emneetablering på emnets heimeside må «Administrer, legg til, rediger, slett emner» også være aktivert."
   to_send_a_message_to_an_individual_user_conversati_8d86a0da: "For å sende ei melding til ein individuell brukar må 'Samtaler - send meldingar til individulle emnemedlem' òg vere slått på."
@@ -24607,12 +24607,12 @@ nn:
       For å sjå læringsmål på eit emne i lesemodus, må 'Emneinnhald - vis' vere slått på.
       For å importere læringsmål frå læringsmålsida, må 'Vurderingsskjema - legg til / endre / slett' òg vere slått på.
       Brukarar kan sjå og opprette (men ikkje endre) vurderingsskjema for individuelle innleveringar frå Oppgåver så lenge 'Emneinnhald - vis' og 'Oppgåver og quizer - legg til / endre / slett' er slått på.
-  to_view_a_user_s_integration_id_sis_data_manage_mu_99438830: "For å sjå ein brukar sin integrasjons-ID, SIS Data - Administrer må også være skrudd på."
+  to_view_a_user_s_integration_id_sis_data_manage_mu_99438830: "For å sjå ein brukar sin integrasjons-ID, må også SIS Data - Administrer være skrudd på."
   to_view_a_user_s_login_details_users_view_list_and_6d42118b: "For å sjå innlogingsdetaljane til ein bruker, må 'Brukarar - vis liste' og 'Modifiser innloggingsdetaljar for brukarar' òg vere slått på. "
-  to_view_a_user_s_sis_id_sis_data_manage_or_sis_dat_1f603502: "For å sjå ein brukar sin SIS ID, SIS Data - administrer eller SIS Data - les må også være skrudd på."
+  to_view_a_user_s_sis_id_sis_data_manage_or_sis_dat_1f603502: "For å sjå ein brukar sin SIS ID, må også SIS Data - administrer eller SIS Data - les  være skrudd på."
   to_view_account_level_groups_groups_add_edit_delet_bf12e984: "For å sjå grupper på kontonivå, må 'Grupper - legg til / endre / slett' òg vere slått på."
-  to_view_account_level_groups_groups_manage_must_al_ca16b035: "For å sjå grupper på kontonivå, Grupper - administrer må også være skrudd på."
-  to_view_account_level_groups_users_view_list_must__3e933ddf: "For å sjå grupper på kontonivå. Brukarar - sjå liste må også være skrudd på."
+  to_view_account_level_groups_groups_manage_must_al_ca16b035: "For å sjå grupper på kontonivå, må også Grupper - administrer  være skrudd på."
+  to_view_account_level_groups_users_view_list_must__3e933ddf: "For å sjå grupper på kontonivå, må også Brukarar - sjå liste  være skrudd på."
   to_view_all_notifications_sent_to_a_canvas_user_se_6172daa: "Dersom du vil sjå alle varslingane som er sende til ein Canvas-brukar, må du markere brukaren og datointervallet for søket."
   to_view_all_student_groups_in_a_course_groups_view_7a16b659: "For å sjå alle grupper i eit emne, Grupper - sjå alle grupper må også være skrudd på."
   to_view_announcements_announcements_view_must_also_75f652df: "For å sjå kunngjeringar, må 'Kunngjeringar - vis' òg vere slått på."
