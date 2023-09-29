@@ -135,7 +135,7 @@ module Outcomes
                                               .uniq
 
         if outcome_alignment_summary_with_new_quizzes_enabled?(@context)
-          outcomes_with_alignments_in_os = get_os_aligned_outcomes(@context)
+          outcomes_with_alignments_in_os = get_active_os_alignments(@context)
 
           if outcomes_with_alignments_in_os
             outcomes_with_alignments_in_context
