@@ -44,6 +44,8 @@ describe Mutations::CreateDiscussionTopic do
             allowRating
             onlyGradersCanRate
             todoDate
+            podcastEnabled
+            podcastHasStudentPosts
           }
           errors {
             attribute
@@ -88,6 +90,8 @@ describe Mutations::CreateDiscussionTopic do
     expect(created_discussion_topic["allowRating"]).to be false
     expect(created_discussion_topic["onlyGradersCanRate"]).to be false
     expect(created_discussion_topic["todoDate"]).to be_nil
+    expect(created_discussion_topic["podcastEnabled"]).to be false
+    expect(created_discussion_topic["podcastHasStudentPosts"]).to be false
     expect(DiscussionTopic.where("id = #{created_discussion_topic["_id"]}").count).to eq 1
   end
 
@@ -291,6 +295,37 @@ describe Mutations::CreateDiscussionTopic do
     expect(result["errors"]).to be_nil
     expect(result.dig("data", "discussionTopic", "errors")).to be_nil
     expect(created_discussion_topic["todoDate"]).to eq todo_date
+  end
+
+  it "successfully creates the discussion topic with podcast_enabled and podcast_has_student_posts" do
+    context_type = "Course"
+    title = "Test Title"
+    message = "A message"
+    published = false
+    require_initial_post = true
+    podcast_enabled = true
+    podcast_has_student_posts = true
+
+    query = <<~GQL
+      contextId: "#{@course.id}"
+      contextType: "#{context_type}"
+      title: "#{title}"
+      message: "#{message}"
+      published: #{published}
+      requireInitialPost: #{require_initial_post}
+      anonymousState: "off"
+      podcastEnabled: #{podcast_enabled}
+      podcastHasStudentPosts: #{podcast_has_student_posts}
+    GQL
+
+    result = execute_with_input(query)
+    created_discussion_topic = result.dig("data", "createDiscussionTopic", "discussionTopic")
+
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "discussionTopic", "errors")).to be_nil
+
+    expect(created_discussion_topic["podcastEnabled"]).to be true
+    expect(created_discussion_topic["podcastHasStudentPosts"]).to be true
   end
 
   context "errors" do

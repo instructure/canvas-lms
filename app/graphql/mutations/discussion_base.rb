@@ -29,6 +29,8 @@ class Mutations::DiscussionBase < Mutations::BaseMutation
   argument :require_initial_post, Boolean, required: false
   argument :title, String, required: false
   argument :todo_date, Types::DateTimeType, required: false
+  argument :podcast_enabled, Boolean, required: false
+  argument :podcast_has_student_posts, Boolean, required: false
 
   field :discussion_topic, Types::DiscussionType, null: true
 end
