@@ -61,6 +61,7 @@ module Types
       # criterions can associate back to the criterions on the rubric. It's all
       # sorts of terrible.
       object.data.map do |assessment_rating|
+        assessment_rating[:rubric_assessment_id] = object.id
         assessment_rating[:rubric_id] = object.rubric_id
         assessment_rating[:artifact_attempt] = object.artifact_attempt
         assessment_rating
