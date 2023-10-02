@@ -297,9 +297,6 @@ Rails.application.config.after_initialize do
     Shard.default.instance_variable_set(:@attributes, Shard.attributes_builder.build_from_database(Shard.default.attributes_before_type_cast))
   end
 
-  # TODO: fix canvas so we don't need this because this is not good
-  Switchman.config[:writable_shadow_records] = true
-
   Switchman::Deprecation.behavior = [
     :log,
     lambda do |message, callstack, _deprecation_horizon, _gem_name|
