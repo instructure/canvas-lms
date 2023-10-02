@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useState} from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
@@ -63,8 +63,7 @@ export interface ItemAssignToTrayProps {
 
 // TODO: will eventually be ItemAssignToCardProps, I think
 interface CardProps {
-  courseId: string
-  moduleItemId: string
+  isValid: boolean
 }
 interface CardMap {
   [key: string]: CardProps
@@ -82,13 +81,19 @@ export default function ItemAssignToTray({
 }: ItemAssignToTrayProps) {
   const [assignToCards, setAssignToCards] = useState<CardMap>(() => {
     const cardId = uid('assign-to-card', 3)
-    return {[cardId]: {courseId, moduleItemId}} as CardMap
+    return {[cardId]: {isValid: true}} as CardMap
   })
+
+  // TODO: data needs to come from api
+  useEffect(() => {
+    const cardId = uid('assign-to-card', 3)
+    setAssignToCards({[cardId]: {isValid: true}} as CardMap)
+  }, [courseId, moduleItemId])
 
   const handleAddCard = useCallback(() => {
     const cardId = uid('assign-to-card', 3)
-    setAssignToCards({...assignToCards, [cardId]: {courseId, moduleItemId}} as any)
-  }, [assignToCards, courseId, moduleItemId])
+    setAssignToCards({...assignToCards, [cardId]: {isValid: true}} as any)
+  }, [assignToCards])
 
   const handleUpdate = useCallback(() => {
     onSave()
@@ -102,6 +107,19 @@ export default function ItemAssignToTray({
     },
     [assignToCards]
   )
+
+  const handleCardValidityChange = useCallback(
+    (cardId: string, isValid: boolean) => {
+      const cards = {...assignToCards}
+      cards[cardId].isValid = isValid
+      setAssignToCards(cards)
+    },
+    [assignToCards]
+  )
+
+  const allCardsValid = useCallback(() => {
+    return Object.values(assignToCards).every(card => card.isValid)
+  }, [assignToCards])
 
   function Header() {
     const icon = itemTypeToIcon(moduleItemType)
@@ -147,6 +165,7 @@ export default function ItemAssignToTray({
             {...props}
             cardId={cardId}
             onDelete={cardCount === 1 ? undefined : handleDeleteCard}
+            onValidityChange={handleCardValidityChange}
           />
         </View>
       )
@@ -168,6 +187,7 @@ export default function ItemAssignToTray({
     return (
       <Flex.Item margin="small 0 0 0" width="100%">
         <TrayFooter
+          disableUpdate={!allCardsValid()}
           updateButtonLabel={I18n.t('Save')}
           onDismiss={onDismiss}
           onUpdate={handleUpdate}

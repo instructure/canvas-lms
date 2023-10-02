@@ -2947,6 +2947,24 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def set_js_module_data
+    js_env({
+             HAS_GRADING_PERIODS: @context.grading_periods?,
+             VALID_DATE_RANGE: CourseDateRange.new(@context),
+             POST_TO_SIS: Assignment.sis_grade_export_enabled?(@context),
+             SECTION_LIST: @context.course_sections.active.map do |section|
+                             {
+                               id: section.id,
+                               start_at: section.start_at,
+                               end_at: section.end_at,
+                               override_course_and_term_dates: section.restrict_enrollments_to_section_dates
+                             }
+                           end,
+             DUE_DATE_REQUIRED_FOR_ACCOUNT: AssignmentUtil.due_date_required_for_account?(@context),
+           })
+    js_env(active_grading_periods: GradingPeriod.json_for(@context, @current_user)) if @context.grading_periods?
+  end
+
   def google_drive_connection
     return @google_drive_connection if @google_drive_connection
 

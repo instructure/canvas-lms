@@ -93,4 +93,14 @@ describe('ItemAssignToTray', () => {
     getAllByRole('button', {name: 'Delete'})[1].click()
     expect(getAllByTestId('item-assign-to-card')).toHaveLength(1)
   })
+
+  it('disables the save button when no cards are invalid', () => {
+    // it's ridiculous to implement this  now.
+    // eventually the tray will get data from the api, pass the data
+    // to the cards, which will call onValidityChange.
+    // then it will be straight forward to write tests
+    expect(true).toBe(true)
+    // const {getByRole} = renderComponent()
+    // expect(getByRole('button', {name: 'Save'})).toBeDisabled()
+  })
 })

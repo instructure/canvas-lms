@@ -136,6 +136,7 @@ class ContextModulesController < ApplicationController
              MODULE_TOOLS: module_tool_definitions,
              DEFAULT_POST_TO_SIS: @context.account.sis_default_grade_export[:value] && !AssignmentUtil.due_date_required_for_account?(@context.account),
              PUBLISH_FINAL_GRADE: Canvas::Plugin.find!("grade_export").enabled?
+      set_js_module_data
 
       is_master_course = MasterCourses::MasterTemplate.is_master_course?(@context)
       is_child_course = MasterCourses::ChildSubscription.is_child_course?(@context)
