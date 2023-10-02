@@ -21,6 +21,21 @@ require_relative "../../common"
 
 module ModulesIndexPage
   #------------------------------ Selectors -----------------------------
+  def module_item_selector(module_item_id)
+    "#context_module_item_#{module_item_id}"
+  end
+
+  def pill_message_selector(module_id)
+    "#context_module_#{module_id} .requirements_message li"
+  end
+
+  def require_sequential_progress_selector(module_id)
+    "#context_module_#{module_id} .module_header_items .require_sequential_progress"
+  end
+
+  def unlock_details_selector(module_id)
+    "context_module_content_#{module_id} .unlock_details"
+  end
 
   #------------------------------ Elements ------------------------------
   def modules_index_settings_button
@@ -29,6 +44,10 @@ module ModulesIndexPage
 
   def module_index_menu_tool_link(tool_text)
     fj("[role=menuitem]:contains('#{tool_text}')")
+  end
+
+  def module_item(module_item_id)
+    f(module_item_selector(module_item_id))
   end
 
   def module_row(module_id)
@@ -41,6 +60,14 @@ module ModulesIndexPage
 
   def module_index_settings_menu
     f(".module_index_tools ul[role=menu]")
+  end
+
+  def pill_message(module_id)
+    f(pill_message_selector(module_id))
+  end
+
+  def require_sequential_progress(module_id)
+    f(require_sequential_progress_selector(module_id))
   end
 
   def tool_dialog
@@ -71,6 +98,10 @@ module ModulesIndexPage
     f("#context_module_#{context_module.id} .add_module_item_link")
   end
 
+  def unlock_details(module_id)
+    f(unlock_details_selector(module_id))
+  end
+
   #------------------------------ Actions ------------------------------
   def visit_modules_index_page(course_id)
     get "/courses/#{course_id}/modules"
@@ -86,11 +117,19 @@ module ModulesIndexPage
     wait_for_ajax_requests
   end
 
+  def retrieve_assignment_content_tag(content_module, assignment)
+    ContentTag.where(context_module_id: content_module.id, content_type: "Assignment", content_id: assignment.id)
+  end
+
   # method to scroll to the top of the modules page, especially for the canvas for elementary pages that
   # have a collapsing head that hides content.
   def scroll_to_the_top_of_modules_page
     where_to_scroll = element_exists?("#student-view-btn") ? "#student-view-btn" : "#easy_student_view"
     scroll_to(f(where_to_scroll))
     wait_for_ajaximations
+  end
+
+  def scroll_to_module(module_name)
+    scroll_to(f("[aria-label='Manage #{module_name}']"))
   end
 end

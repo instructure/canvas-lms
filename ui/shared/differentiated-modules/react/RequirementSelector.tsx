@@ -79,7 +79,7 @@ export default function RequirementSelector({
   const options = useMemo(() => groupBy(moduleItems, 'resource'), [moduleItems])
 
   return (
-    <View as="div" borderRadius="medium" borderWidth="small">
+    <View data-testid="module-requirement-card" as="div" borderRadius="medium" borderWidth="small">
       <View as="div" padding="medium">
         <Flex direction="row">
           <FlexItem shouldGrow={true}>

@@ -44,18 +44,18 @@ module ContextModulesCommon
     wait_for_ajaximations
   end
 
-  def module_setup
-    @module = @course.context_modules.create!(name: "Module 1")
+  def module_setup(course = @course)
+    @module = course.context_modules.create!(name: "Module 1")
 
     # create module items
     # add first and last module items to get previous and next displayed
-    @assignment1 = @course.assignments.create!(title: "first item in module")
-    @assignment2 = @course.assignments.create!(title: "assignment")
-    @assignment3 = @course.assignments.create!(title: "last item in module")
-    @quiz = @course.quizzes.create!(title: "quiz assignment")
+    @assignment1 = course.assignments.create!(title: "first item in module")
+    @assignment2 = course.assignments.create!(title: "assignment")
+    @assignment3 = course.assignments.create!(title: "last item in module")
+    @quiz = course.quizzes.create!(title: "quiz assignment")
     @quiz.publish!
-    @wiki = @course.wiki_pages.create!(title: "wiki", body: "hi")
-    @discussion = @course.discussion_topics.create!(title: "discussion")
+    @wiki = course.wiki_pages.create!(title: "wiki", body: "hi")
+    @discussion = course.discussion_topics.create!(title: "discussion")
 
     # add items to module
     @module.add_item type: "assignment", id: @assignment1.id
@@ -66,11 +66,11 @@ module ContextModulesCommon
     @module.add_item type: "assignment", id: @assignment3.id
 
     # add external tool
-    @tool = @course.context_external_tools.create!(name: "new tool",
-                                                   consumer_key: "key",
-                                                   shared_secret: "secret",
-                                                   domain: "example.com",
-                                                   custom_fields: { "a" => "1", "b" => "2" })
+    @tool = course.context_external_tools.create!(name: "new tool",
+                                                  consumer_key: "key",
+                                                  shared_secret: "secret",
+                                                  domain: "example.com",
+                                                  custom_fields: { "a" => "1", "b" => "2" })
     @external_tool_tag = @module.add_item({
                                             type: "context_external_tool",
                                             title: "Example",
@@ -132,7 +132,7 @@ module ContextModulesCommon
     end
   end
 
-  def vaildate_correct_pill_message(module_id, message_expected)
+  def validate_correct_pill_message(module_id, message_expected)
     pill_message = f("#context_module_#{module_id} .requirements_message li").text
     expect(pill_message).to eq message_expected
   end

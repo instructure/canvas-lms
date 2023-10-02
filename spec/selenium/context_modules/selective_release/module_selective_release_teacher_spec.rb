@@ -109,6 +109,131 @@ describe "selective_release module set up" do
     end
   end
 
+  context "uses tray to update module requirements" do
+    before(:once) do
+      Account.site_admin.enable_feature! :differentiated_modules
+      course_with_teacher(active_all: true)
+      module_setup
+      @module2 = @course.context_modules.create!(name: "module2")
+      @module2.add_item type: "assignment", id: @assignment2.id
+      @module3 = @course.context_modules.create!(name: "module3")
+    end
+
+    before do
+      user_session(@teacher)
+    end
+
+    it "selects complete all requirements shows one requirement card" do
+      go_to_modules
+
+      scroll_to_the_top_of_modules_page
+      manage_module_button(@module).click
+      module_index_menu_tool_link("Edit").click
+
+      click_add_requirement_button
+
+      expect(is_checked(complete_all_radio_checked)).to be true
+      expect(module_requirement_card.length).to eq(1)
+    end
+
+    it "selects complete all requirements and clicks sequential order" do
+      go_to_modules
+
+      scroll_to_the_top_of_modules_page
+      expect(require_sequential_progress(@module.id).attribute("textContent")).to eq("")
+      manage_module_button(@module).click
+      module_index_menu_tool_link("Edit").click
+      click_add_requirement_button
+      click_sequential_order_checkbox
+      click_settings_tray_update_module_button
+
+      expect(require_sequential_progress(@module.id).attribute("textContent")).to eq("true")
+    end
+
+    it "selects complete one requirement" do
+      go_to_modules
+
+      scroll_to_the_top_of_modules_page
+      manage_module_button(@module).click
+      module_index_menu_tool_link("Edit").click
+      click_add_requirement_button
+      click_complete_one_radio
+      expect(is_checked(complete_one_radio_checked)).to be true
+      expect(module_requirement_card.length).to eq(1)
+      expect(element_exists?(sequential_order_checkbox_selector, true)).to be false
+    end
+
+    it "does not show Requirements button for module with no items" do
+      go_to_modules
+
+      scroll_to_module(@module3.name)
+
+      manage_module_button(@module3).click
+      module_index_menu_tool_link("Edit").click
+      expect(element_exists?(module_requirement_card_selector)).to be false
+    end
+
+    it "deletes a requirement that was created" do
+      go_to_modules
+
+      scroll_to_the_top_of_modules_page
+      manage_module_button(@module).click
+      module_index_menu_tool_link("Edit").click
+
+      click_add_requirement_button
+      select_requirement_item_option(0, @assignment2.title)
+      expect(element_value_for_attr(requirement_item[0], "title")).to eq(@assignment2.title)
+
+      click_add_requirement_button
+      select_requirement_item_option(1, @assignment3.title)
+      expect(element_value_for_attr(requirement_item[1], "title")).to eq(@assignment3.title)
+      expect(module_requirement_card.length).to eq(2)
+      click_remove_requirement_button(1)
+      expect(module_requirement_card.length).to eq(1)
+    end
+
+    it "update complete all with no sequential order for several requirements" do
+      go_to_modules
+
+      scroll_to_the_top_of_modules_page
+      manage_module_button(@module).click
+      module_index_menu_tool_link("Assign To...").click
+      click_settings_tab
+      click_add_requirement_button
+      click_sequential_order_checkbox
+      select_requirement_item_option(0, @assignment2.title)
+      select_requirement_type_option(0, "Mark as done")
+      click_add_requirement_button
+      select_requirement_item_option(1, @assignment3.title)
+      select_requirement_type_option(1, "Submit the assignment")
+
+      click_settings_tray_update_module_button
+      validate_correct_pill_message(@module.id, "Complete All Items")
+    end
+
+    it "updates requirement type and shows on modules page" do
+      go_to_modules
+
+      scroll_to_the_top_of_modules_page
+      manage_module_button(@module).click
+      module_index_menu_tool_link("Edit").click
+      click_add_requirement_button
+      select_requirement_item_option(0, @assignment2.title)
+      select_requirement_type_option(0, "Mark as done")
+      click_settings_tray_update_module_button
+      assignment_tag = retrieve_assignment_content_tag(@module, @assignment2)
+      expect(f("#{module_item_selector(assignment_tag.ids[0])} .requirement_type")).to have_class "must_mark_done_requirement"
+
+      manage_module_button(@module).click
+      module_index_menu_tool_link("Edit").click
+      select_requirement_type_option(0, "Submit the assignment")
+      click_settings_tray_update_module_button
+      expect(f("#{module_item_selector(assignment_tag.ids[0])} .requirement_type")).to have_class "must_submit_requirement"
+    end
+
+    it_behaves_like "selective release module tray requirements", :context_modules
+  end
+
   context "uses tray to update assign to settings" do
     before(:once) do
       Account.site_admin.enable_feature! :differentiated_modules
@@ -121,6 +246,9 @@ describe "selective_release module set up" do
       @course.enroll_user(@student2, "StudentEnrollment", enrollment_state: "active")
 
       module_setup
+      @module2 = @course.context_modules.create!(name: "module2")
+      @module2.add_item type: "assignment", id: @assignment2.id
+      @module3 = @course.context_modules.create!(name: "module3")
     end
 
     before do
@@ -228,21 +356,14 @@ describe "selective_release module set up" do
     before :once do
       Account.site_admin.enable_feature! :differentiated_modules
       teacher_setup
-      @module = @subject_course.context_modules.create!(name: "Module 1")
-      @assignment1 = @subject_course.assignments.create!(title: "first item in module")
-      @module.add_item type: "assignment", id: @assignment1.id
+      module_setup(@subject_course)
       @section1 = @subject_course.course_sections.create!(name: "section1")
       @section2 = @subject_course.course_sections.create!(name: "section2")
-      @student1 = user_factory(name: "user1", active_all: true, active_state: "active")
-      @student2 = user_factory(name: "user2", active_all: true, active_state: "active", section: @section2)
-      @subject_course.enroll_user(@student1, "StudentEnrollment", enrollment_state: "active")
-      @subject_course.enroll_user(@student2, "StudentEnrollment", enrollment_state: "active")
-      @assignment2 = @subject_course.assignments.create!(title: "first item in module 2")
-      @assignment3 = @subject_course.assignments.create!(title: "first item in module 3")
-      @module2 = @course.context_modules.create!(name: "module2")
+      @student1 = student_in_course(course: @subject_course, active_all: true, name: "user1").user
+      @student2 = student_in_course(coure: @subject_course, active_all: true, name: "Student 4", section: @section2).user
+      @module2 = @subject_course.context_modules.create!(name: "module2")
       @module2.add_item type: "assignment", id: @assignment2.id
-      @module3 = @course.context_modules.create!(name: "module3")
-      @module3.add_item type: "assignment", id: @assignment3.id
+      @module3 = @subject_course.context_modules.create!(name: "module3")
     end
 
     before do
@@ -252,5 +373,6 @@ describe "selective_release module set up" do
     it_behaves_like "selective_release module tray", :canvas_for_elementary
     it_behaves_like "selective_release module tray prerequisites", :canvas_for_elementary
     it_behaves_like "selective_release module tray assign to", :canvas_for_elementary
+    it_behaves_like "selective release module tray requirements", :canvas_for_elementary
   end
 end

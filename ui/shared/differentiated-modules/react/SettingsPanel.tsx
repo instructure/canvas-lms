@@ -141,6 +141,7 @@ export default function SettingsPanel({
         </View>
         <View as="div" padding="x-small small">
           <Checkbox
+            data-testid="lock-until-checkbox"
             label={I18n.t('Lock Until')}
             checked={state.lockUntilChecked}
             onChange={() =>
@@ -149,7 +150,7 @@ export default function SettingsPanel({
           />
         </View>
         {state.lockUntilChecked && (
-          <View as="div" padding="small">
+          <View data-testid="lock-until-input" as="div" padding="small">
             <DateTimeInput
               value={state.unlockAt}
               layout="columns"

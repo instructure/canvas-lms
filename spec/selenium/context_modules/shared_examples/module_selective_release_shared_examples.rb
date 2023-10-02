@@ -115,6 +115,7 @@ shared_examples_for "selective_release module tray" do |context|
   it "accesses the modules tray for a module via the 'View Assign To' button" do
     @module.assignment_overrides.create!
     get @mod_url
+    scroll_to_the_top_of_modules_page
     view_assign.click
 
     expect(settings_tray_exists?).to be true
@@ -142,6 +143,8 @@ shared_examples_for "selective_release module tray prerequisites" do |context|
 
   it "adds more than one prerequisite to a module" do
     get @mod_url
+
+    scroll_to_module(@module3.name)
 
     manage_module_button(@module3).click
     module_index_menu_tool_link("Assign To...").click
@@ -198,5 +201,78 @@ shared_examples_for "selective_release module tray assign to" do |context|
 
     assignee_list = assignee_selection_item.map(&:text)
     expect(assignee_list.sort).to eq(%w[section1 user1])
+  end
+end
+
+shared_examples_for "selective release module tray requirements" do |context|
+  include ContextModulesCommon
+  include ModulesIndexPage
+  include ModulesSettingsTray
+  include K5DashboardPageObject
+  include K5DashboardCommonPageObject
+  include K5Common
+
+  before do
+    case context
+    when :context_modules
+      @mod_course = @course
+      @mod_url = "/courses/#{@mod_course.id}/modules"
+    when :canvas_for_elementary
+      @mod_course = @subject_course
+      @mod_url = "/courses/#{@mod_course.id}#modules"
+    end
+  end
+
+  it "adds two requirements for complete all requirements with sequential order" do
+    get @mod_url
+
+    scroll_to_the_top_of_modules_page
+    manage_module_button(@module).click
+    module_index_menu_tool_link("Edit").click
+
+    click_add_requirement_button
+    click_sequential_order_checkbox
+    select_requirement_item_option(0, @assignment2.title)
+    expect(element_value_for_attr(requirement_item[0], "title")).to eq(@assignment2.title)
+
+    click_add_requirement_button
+    select_requirement_item_option(1, @assignment3.title)
+    expect(element_value_for_attr(requirement_item[1], "title")).to eq(@assignment3.title)
+
+    click_settings_tray_update_module_button
+    validate_correct_pill_message(@module.id, "Complete All Items")
+    expect(require_sequential_progress(@module.id).attribute("textContent")).to eq("true")
+  end
+
+  it "adds a requirement and validates complete one requirement pill" do
+    get @mod_url
+
+    scroll_to_the_top_of_modules_page
+    manage_module_button(@module).click
+    module_index_menu_tool_link("Edit").click
+
+    click_add_requirement_button
+    click_complete_one_radio
+    select_requirement_item_option(0, @assignment2.title)
+    expect(element_value_for_attr(requirement_item[0], "title")).to eq(@assignment2.title)
+
+    click_settings_tray_update_module_button
+    validate_correct_pill_message(@module.id, "Complete One Item")
+  end
+
+  it "cancels a requirement session" do
+    get @mod_url
+
+    scroll_to_the_top_of_modules_page
+    manage_module_button(@module).click
+    module_index_menu_tool_link("Edit").click
+
+    click_add_requirement_button
+    click_complete_one_radio
+    select_requirement_item_option(0, @assignment2.title)
+    expect(element_value_for_attr(requirement_item[0], "title")).to eq(@assignment2.title)
+
+    click_settings_tray_cancel_button
+    expect(element_exists?(pill_message_selector(@module.id))).to be_falsey
   end
 end

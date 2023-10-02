@@ -25,6 +25,10 @@ module ModulesSettingsTray
     "//*[@data-testid = 'settings-panel']//button[.//*[.='Prerequisite']]"
   end
 
+  def add_requirement_button_selector
+    "//*[@data-testid = 'settings-panel']//button[.//*[.='Requirement']]"
+  end
+
   def assign_to_panel_selector
     "[data-testid='assign-to-panel']"
   end
@@ -49,6 +53,22 @@ module ModulesSettingsTray
     "[data-testid='clear_selection_button']"
   end
 
+  def complete_all_radio_click_selector
+    "//label[../input[@data-testid = 'complete-all-radio']]"
+  end
+
+  def complete_all_radio_checked_selector
+    "[data-testid = 'complete-all-radio']"
+  end
+
+  def complete_one_radio_click_selector
+    "//label[../input[@data-testid = 'complete-one-radio']]"
+  end
+
+  def complete_one_radio_checked_selector
+    "[data-testid = 'complete-one-radio']"
+  end
+
   def custom_access_radio_checked_selector
     "[data-testid = 'custom-option']"
   end
@@ -65,6 +85,14 @@ module ModulesSettingsTray
     "//label[../input[@data-testid = 'everyone-option']]"
   end
 
+  def lock_until_checkbox_selector
+    "//label[../input[@data-testid='lock-until-checkbox']]"
+  end
+
+  def module_requirement_card_selector
+    "[data-testid='module-requirement-card']"
+  end
+
   def module_settings_tray_selector
     "[aria-label='Edit Module Settings']"
   end
@@ -79,6 +107,22 @@ module ModulesSettingsTray
 
   def remove_prerequisite_button_selector
     "//button[contains(text(), 'Remove Prerequisite')]"
+  end
+
+  def remove_requirement_button_selector
+    "//button[.//*[.='Remove Requirement']]"
+  end
+
+  def requirement_item_selector
+    "#requirement-item"
+  end
+
+  def requirement_type_selector
+    "#requirement-type"
+  end
+
+  def sequential_order_checkbox_selector
+    "//label[../input[@data-testid='sequential-progress-checkbox']]"
   end
 
   def settings_panel_selector
@@ -107,6 +151,10 @@ module ModulesSettingsTray
     fxpath(add_prerequisites_button_selector)
   end
 
+  def add_requirement_button
+    fxpath(add_requirement_button_selector)
+  end
+
   def assign_to_panel
     f(assign_to_panel_selector)
   end
@@ -131,6 +179,22 @@ module ModulesSettingsTray
     f(clear_all_selector)
   end
 
+  def complete_all_radio_checked
+    f(complete_all_radio_checked_selector)
+  end
+
+  def complete_all_radio_click
+    fxpath(complete_all_radio_click_selector)
+  end
+
+  def complete_one_radio_checked
+    f(complete_one_radio_checked_selector)
+  end
+
+  def complete_one_radio_click
+    fxpath(complete_one_radio_click_selector)
+  end
+
   def custom_access_radio_checked
     f(custom_access_radio_checked_selector)
   end
@@ -147,6 +211,14 @@ module ModulesSettingsTray
     fxpath(everyone_radio_click_selector)
   end
 
+  def lock_until_checkbox
+    fxpath(lock_until_checkbox_selector)
+  end
+
+  def module_requirement_card
+    ff(module_requirement_card_selector)
+  end
+
   def module_settings_tray
     f(module_settings_tray_selector)
   end
@@ -161,6 +233,22 @@ module ModulesSettingsTray
 
   def remove_prerequisite_button
     fxpath(remove_prerequisite_button_selector)
+  end
+
+  def remove_requirement_button
+    ffxpath(remove_requirement_button_selector)
+  end
+
+  def requirement_item
+    ff(requirement_item_selector)
+  end
+
+  def requirement_type
+    ff(requirement_type_selector)
+  end
+
+  def sequential_order_checkbox
+    fxpath(sequential_order_checkbox_selector)
   end
 
   def settings_panel
@@ -193,12 +281,24 @@ module ModulesSettingsTray
     add_prerequisites_button.click
   end
 
+  def click_add_requirement_button
+    add_requirement_button.click
+  end
+
   def click_assign_to_tab
     assign_to_tab.click
   end
 
   def click_clear_all
     clear_all.click
+  end
+
+  def click_complete_all_radio
+    complete_all_radio_click.click
+  end
+
+  def click_complete_one_radio
+    complete_one_radio_click.click
   end
 
   def click_custom_access_radio
@@ -209,8 +309,20 @@ module ModulesSettingsTray
     everyone_radio_click.click
   end
 
+  def click_lock_until_checkbox
+    lock_until_checkbox.click
+  end
+
   def click_remove_prerequisite_button
     remove_prerequisite_button.click
+  end
+
+  def click_remove_requirement_button(item_number)
+    remove_requirement_button[item_number].click
+  end
+
+  def click_sequential_order_checkbox
+    sequential_order_checkbox.click
   end
 
   def click_settings_tab
@@ -235,6 +347,14 @@ module ModulesSettingsTray
 
   def select_prerequisites_dropdown_option(item_number, option)
     click_option(prerequisites_dropdown[item_number], option)
+  end
+
+  def select_requirement_item_option(item_number, option)
+    click_option(requirement_item[item_number], option)
+  end
+
+  def select_requirement_type_option(item_number, option)
+    click_option(requirement_type[item_number], option)
   end
 
   def settings_tray_exists?
