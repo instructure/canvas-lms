@@ -147,7 +147,7 @@ GEM
     thor (1.2.2)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
-    unicode-display_width (2.4.2)
+    unicode-display_width (2.5.0)
     zeitwerk (2.6.12)
 
 PLATFORMS
