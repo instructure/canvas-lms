@@ -36,6 +36,8 @@ export const CREATE_DISCUSSION_TOPIC = gql`
     $todoDate: DateTime
     $podcastEnabled: Boolean
     $podcastHasStudentPosts: Boolean
+    $locked: Boolean
+    $isAnnouncement: Boolean
   ) {
     createDiscussionTopic(
       input: {
@@ -54,6 +56,8 @@ export const CREATE_DISCUSSION_TOPIC = gql`
         todoDate: $todoDate
         podcastEnabled: $podcastEnabled
         podcastHasStudentPosts: $podcastHasStudentPosts
+        locked: $locked
+        isAnnouncement: $isAnnouncement
       }
     ) {
       discussionTopic {
@@ -72,6 +76,7 @@ export const CREATE_DISCUSSION_TOPIC = gql`
         todoDate
         podcastEnabled
         podcastHasStudentPosts
+        isAnnouncement
       }
       errors {
         ...Error

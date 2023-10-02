@@ -104,6 +104,8 @@ export default function DiscussionTopicForm({
   const [todoDate, setTodoDate] = useState(null)
   const [isGroupDiscussion, setIsGroupDiscussion] = useState(false)
   const [groupCategoryId, setGroupCategoryId] = useState(null)
+  const [delayPosting, setDelayPosting] = useState(false)
+  const [locked, setLocked] = useState(false)
 
   const [availableFrom, setAvailableFrom] = useState(null)
   const [availableUntil, setAvailableUntil] = useState(null)
@@ -205,6 +207,8 @@ export default function DiscussionTopicForm({
         availableFrom,
         availableUntil,
         shouldPublish: isEditing ? published : shouldPublish,
+        locked,
+        isAnnouncement
       })
       return true
     }
@@ -290,6 +294,7 @@ export default function DiscussionTopicForm({
         )}
         <Text size="large">{I18n.t('Options')}</Text>
         {ENV.context_is_not_group &&
+          !isAnnouncement &&
           (ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MODERATE ||
             ENV.allow_student_anonymous_discussion_topics) && (
             <View display="block" margin="medium 0">
@@ -339,12 +344,51 @@ export default function DiscussionTopicForm({
             </View>
           )}
         <FormFieldGroup description="" rowSpacing="small">
+          {isAnnouncement && (
+            <Checkbox
+              label={I18n.t('Delay Posting')}
+              value="enable-delay-posting"
+              checked={delayPosting}
+              onChange={() => {
+                setDelayPosting(!delayPosting)
+                setAvailableFrom(null)
+              }}
+            />
+          )}
+          {delayPosting && (
+            <View display="block" padding="none none none large" data-testid="delay-posting">
+              <DateTimeInput
+                description={I18n.t('Post At')}
+                prevMonthLabel={I18n.t('previous')}
+                nextMonthLabel={I18n.t('next')}
+                onChange={(_event, newDate) => setAvailableFrom(newDate)}
+                value={availableFrom}
+                invalidDateTimeMessage={I18n.t('Invalid date and time')}
+                layout="columns"
+                datePlaceholder={I18n.t('Select Date')}
+                dateRenderLabel=""
+                timeRenderLabel=""
+              />
+            </View>
+          )}
+          {isAnnouncement && (
+            <Checkbox
+              label={I18n.t('Allow Participants to Comment')}
+              value="enable-participants-commenting"
+              checked={!locked}
+              onChange={() => {
+                setLocked(!locked)
+                setRequireInitialPost(false)
+              }}
+            />
+          )}
           <Checkbox
             data-testid="require-initial-post-checkbox"
             label={I18n.t('Participants must respond to the topic before viewing other replies')}
             value="must-respond-before-viewing-replies"
             checked={requireInitialPost}
             onChange={() => setRequireInitialPost(!requireInitialPost)}
+            disabled={!(isAnnouncement === false || (isAnnouncement && locked))}
           />
           <Checkbox
             label={I18n.t('Enable podcast feed')}
@@ -365,7 +409,7 @@ export default function DiscussionTopicForm({
               />
             </View>
           )}
-          {discussionAnonymousState === 'off' && (
+          {discussionAnonymousState === 'off' && !isAnnouncement && (
             <Checkbox
               label={I18n.t('Graded')}
               value="graded"
@@ -399,8 +443,8 @@ export default function DiscussionTopicForm({
               )}
             </>
           )}
-          {/* TODO: for the checkbox to show, this should not be an announcement */}
           {!isGraded &&
+            !isAnnouncement &&
             ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MANAGE_CONTENT &&
             ENV.STUDENT_PLANNER_ENABLED && (
               <Checkbox
@@ -428,7 +472,7 @@ export default function DiscussionTopicForm({
               />
             </View>
           )}
-          {discussionAnonymousState === 'off' && (
+          {discussionAnonymousState === 'off' && !isAnnouncement && (
             <Checkbox
               data-testid="group-discussion-checkbox"
               label={I18n.t('This is a Group Discussion')}
@@ -486,43 +530,44 @@ export default function DiscussionTopicForm({
             </View>
           )}
         </FormFieldGroup>
-        {isGraded ? (
-          <div>Graded options here</div>
-        ) : (
-          <FormFieldGroup description="" width={inputWidth}>
-            <DateTimeInput
-              description={I18n.t('Available from')}
-              dateRenderLabel=""
-              timeRenderLabel=""
-              prevMonthLabel={I18n.t('previous')}
-              nextMonthLabel={I18n.t('next')}
-              value={availableFrom}
-              onChange={(_event, newAvailableFrom) => {
-                validateAvailability(newAvailableFrom, availableUntil)
-                setAvailableFrom(newAvailableFrom)
-              }}
-              datePlaceholder={I18n.t('Select Date')}
-              invalidDateTimeMessage={I18n.t('Invalid date and time')}
-              layout="columns"
-            />
-            <DateTimeInput
-              description={I18n.t('Until')}
-              dateRenderLabel=""
-              timeRenderLabel=""
-              prevMonthLabel={I18n.t('previous')}
-              nextMonthLabel={I18n.t('next')}
-              value={availableUntil}
-              onChange={(_event, newAvailableUntil) => {
-                validateAvailability(availableFrom, newAvailableUntil)
-                setAvailableUntil(newAvailableUntil)
-              }}
-              datePlaceholder={I18n.t('Select Date')}
-              invalidDateTimeMessage={I18n.t('Invalid date and time')}
-              messages={availabiltyValidationMessages}
-              layout="columns"
-            />
-          </FormFieldGroup>
-        )}
+        {!isAnnouncement &&
+          (isGraded ? (
+            <div>Graded options here</div>
+          ) : (
+            <FormFieldGroup description="" width={inputWidth}>
+              <DateTimeInput
+                description={I18n.t('Available from')}
+                dateRenderLabel=""
+                timeRenderLabel=""
+                prevMonthLabel={I18n.t('previous')}
+                nextMonthLabel={I18n.t('next')}
+                value={availableFrom}
+                onChange={(_event, newAvailableFrom) => {
+                  validateAvailability(newAvailableFrom, availableUntil)
+                  setAvailableFrom(newAvailableFrom)
+                }}
+                datePlaceholder={I18n.t('Select Date')}
+                invalidDateTimeMessage={I18n.t('Invalid date and time')}
+                layout="columns"
+              />
+              <DateTimeInput
+                description={I18n.t('Until')}
+                dateRenderLabel=""
+                timeRenderLabel=""
+                prevMonthLabel={I18n.t('previous')}
+                nextMonthLabel={I18n.t('next')}
+                value={availableUntil}
+                onChange={(_event, newAvailableUntil) => {
+                  validateAvailability(availableFrom, newAvailableUntil)
+                  setAvailableUntil(newAvailableUntil)
+                }}
+                datePlaceholder={I18n.t('Select Date')}
+                invalidDateTimeMessage={I18n.t('Invalid date and time')}
+                messages={availabiltyValidationMessages}
+                layout="columns"
+              />
+            </FormFieldGroup>
+          ))}
         <View
           display="block"
           textAlign="end"
