@@ -27,6 +27,7 @@ import {Flex} from '@instructure/ui-flex'
 import FilterComponent from './FilterTrayFilter'
 import {ToggleGroup} from '@instructure/ui-toggle-details'
 import {Text} from '@instructure/ui-text'
+import {TruncateText} from '@instructure/ui-truncate-text'
 import type {CamelizedGradingPeriod} from '@canvas/grading/grading.d'
 import type {Filter, FilterPreset, FilterType, PartialFilterPreset} from '../gradebook.d'
 import type {AssignmentGroup, Module, Section, StudentGroupCategoryMap} from '../../../../../api.d'
@@ -189,9 +190,9 @@ export default function FilterTrayPreset({
         <Flex margin="0 0 0 xxx-small">
           <Flex direction="column">
             <View>
-              <Text weight="bold">
+              <TruncateText position="middle">
                 {filterPreset.id ? filterPreset.name : I18n.t('Create Filter Preset')}
-              </Text>
+              </TruncateText>
             </View>
             {filterPreset.id && (
               <View>
