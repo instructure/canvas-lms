@@ -57,6 +57,8 @@ import '@canvas/rails-flash-notifications'
 import '../../../../boot/initializers/activateTooltips'
 import {AnnotatedDocumentSelector} from '../../react/EditAssignment'
 import {selectContentDialog} from '@canvas/select-content-dialog'
+import {addDeepLinkingListener} from '@canvas/deep-linking/DeepLinking'
+import {ResourceLinkContentItem} from '@canvas/deep-linking/models/ResourceLinkContentItem'
 
 const I18n = useI18nScope('assignment_editview')
 
@@ -187,6 +189,7 @@ function EditView() {
   this.toggleRestrictFileUploads = this.toggleRestrictFileUploads.bind(this)
   this.showExternalToolsDialog = this.showExternalToolsDialog.bind(this)
   this.handleAssignmentSelectionSubmit = this.handleAssignmentSelectionSubmit.bind(this)
+  this.handleContentItem = this.handleContentItem.bind(this)
   this.showTurnitinDialog = this.showTurnitinDialog.bind(this)
   this.cacheAssignmentSettings = this.cacheAssignmentSettings.bind(this)
   this.setDefaultsIfNew = this.setDefaultsIfNew.bind(this)
@@ -592,40 +595,65 @@ EditView.prototype.showTurnitinDialog = function (ev) {
 }
 
 EditView.prototype.handleAssignmentSelectionSubmit = function (data) {
-  const line_items_enabled = !!window.ENV.FEATURES.lti_assignment_page_line_items
-  this.$externalToolsCustomParams.val(data['item[custom_params]'])
-  this.$externalToolsContentType.val(data['item[type]'])
-  this.$externalToolsContentId.val(data['item[id]'])
-  this.$externalToolsUrl.val(data['item[url]'])
-  this.$externalToolsNewTab.prop('checked', data['item[new_tab]'] === '1')
-  this.$externalToolsIframeWidth.val(data['item[iframe][width]'])
-  this.$externalToolsIframeHeight.val(data['item[iframe][height]'])
+  // data comes in a funky format from SelectContentDialog,
+  // so reconstruct it into a ResourceLinkContentItem
+  const contentItem = {
+    id: data['item[id]'],
+    type: data['item[type]'],
+    title: data['item[title]'],
+    text: data['item[description]'],
+    url: data['item[url]'],
+    custom: tryJsonParse(data['item[custom_params]']),
+    window: {
+      targetName: data['item[new_tab]'] === '1' ? '_blank' : '_self',
+    },
+    iframe: {
+      width: data['item[iframe][width]'],
+      height: data['item[iframe][height]'],
+    },
+    lineItem: tryJsonParse(data['item[line_item]']),
+  }
+  this.handleContentItem(contentItem)
+}
 
-  if (data['item[line_item]']) {
-    const line_item = tryJsonParse(data['item[line_item]'])
-    if (typeof line_item !== 'undefined') {
-      this.$externalToolsLineItem.val(data['item[line_item]'])
-    }
+/**
+ * Sets assignment values based on LTI 1.3 deep linking Content Item.
+ * Values are stored in form fields that get rolled up in getFormData
+ * when Save is clicked.
+ * @param {ResourceLinkContentItem} item
+ */
+EditView.prototype.handleContentItem = function (item) {
+  const line_items_enabled = !!window.ENV.FEATURES.lti_assignment_page_line_items
+  this.$externalToolsCustomParams.val(JSON.stringify(item.custom))
+  this.$externalToolsContentType.val(item.type)
+  this.$externalToolsContentId.val(item.id || this.selectedTool?.id)
+  this.$externalToolsUrl.val(item.url)
+  this.$externalToolsNewTab.prop('checked', item.window?.targetName === '_blank')
+  this.$externalToolsIframeWidth.val(item.iframe?.width)
+  this.$externalToolsIframeHeight.val(item.iframe?.height)
+
+  const line_item = item.lineItem
+  if (line_item) {
+    this.$externalToolsLineItem.val(JSON.stringify(line_item))
     if (
-      line_item &&
       'scoreMaximum' in line_item &&
       (line_items_enabled || this.$assignmentPointsPossible.val() === '0')
     ) {
       this.$assignmentPointsPossible.val(line_item.scoreMaximum)
     }
-    const new_assignment_name = 'label' in line_item ? line_item.label : data['item[title]']
+    const new_assignment_name = 'label' in line_item ? line_item.label : item.title
 
     if (new_assignment_name && (line_items_enabled || this.$name.val() === '')) {
       this.$name.val(new_assignment_name)
     }
   } else {
-    const new_assignment_name = data['item[title]']
+    const new_assignment_name = item.title
     if (new_assignment_name && (line_items_enabled || this.$name.val() === '')) {
       this.$name.val(new_assignment_name)
     }
   }
 
-  const description = data['item[description]']
+  const description = item.text
   if (description) {
     const existing_desc = RichContentEditor.callOnRCE(this.$description, 'get_code')
     if (line_items_enabled || existing_desc === '') {
@@ -655,11 +683,9 @@ EditView.prototype.showExternalToolsDialog = function () {
     dialog_title: I18n.t('select_external_tool_dialog_title', 'Configure External Tool'),
     select_button_text: I18n.t('buttons.select_url', 'Select'),
     no_name_input: true,
-    submit: (function (_this) {
-      return function (data) {
-        return _this.handleAssignmentSelectionSubmit(data)
-      }
-    })(this),
+    submit: data => {
+      this.handleAssignmentSelectionSubmit(data)
+    },
   })
 }
 
@@ -957,6 +983,15 @@ EditView.prototype.handlePlacementExternalToolSelect = function (selection) {
 }
 
 EditView.prototype.handleSubmissionTypeSelectionLaunch = function () {
+  const removeListener = addDeepLinkingListener(event => {
+    if (event.data.content_items?.length >= 1) {
+      this.handleContentItem(event.data.content_items[0])
+    }
+
+    removeListener()
+    this.handleSubmissionTypeSelectionDialogClose()
+  })
+
   return this.renderSubmissionTypeSelectionDialog(true)
 }
 
