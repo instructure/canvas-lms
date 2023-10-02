@@ -34,6 +34,7 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 import {DateTimeInput} from '@instructure/ui-date-time-input'
 import CanvasMultiSelect from '@canvas/multi-select'
 import CanvasRce from '@canvas/rce/react/CanvasRce'
+import {Alert} from '@instructure/ui-alerts'
 
 const I18n = useI18nScope('discussion_create')
 
@@ -47,9 +48,38 @@ export default function DiscussionTopicForm({
 }) {
   const rceRef = useRef()
 
+  const isAnnouncement = ENV.DISCUSSION_TOPIC?.ATTRIBUTES?.is_announcement ?? false
+  const isUnpublishedAnnouncement =
+    isAnnouncement && !ENV.DISCUSSION_TOPIC?.ATTRIBUTES.course_published
+  const isEditingAnnouncement = isAnnouncement && ENV.DISCUSSION_TOPIC?.ATTRIBUTES.id
+
+  const announcementAlertProps = () => {
+    if (isUnpublishedAnnouncement) {
+      return {
+        id: 'announcement-course-unpublished-alert',
+        key: 'announcement-course-unpublished-alert',
+        variant: 'warning',
+        text: I18n.t(
+          'Notifications will not be sent retroactively for announcements created before publishing your course or before the course start date. You may consider using the Delay Posting option and set to publish on a future date.'
+        ),
+      }
+    } else if (isEditingAnnouncement) {
+      return {
+        id: 'announcement-no-notification-on-edit',
+        key: 'announcement-no-notification-on-edit',
+        variant: 'info',
+        text: I18n.t(
+          'Users do not receive updated notifications when editing an announcement. If you wish to have users notified of this update via their notification settings, you will need to create a new announcement.'
+        ),
+      }
+    } else {
+      return null
+    }
+  }
+
   const allSectionsOption = {_id: 'all-sections', name: 'All Sections'}
 
-  const inputWidth = '50%'
+  const inputWidth = '100%'
 
   const [title, setTitle] = useState('')
   const [titleValidationMessages, setTitleValidationMessages] = useState([
@@ -184,6 +214,9 @@ export default function DiscussionTopicForm({
   return (
     <>
       <FormFieldGroup description="" rowSpacing="small">
+        {(isUnpublishedAnnouncement || isEditingAnnouncement) && (
+          <Alert variant={announcementAlertProps().variant}>{announcementAlertProps().text}</Alert>
+        )}
         <TextInput
           renderLabel={I18n.t('Topic Title')}
           type={I18n.t('text')}
