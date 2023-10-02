@@ -133,7 +133,7 @@ class EnrollmentState < ActiveRecord::Base
       unless skip_touch_user
         self.class.connection.after_transaction_commit do
           user = enrollment.user
-          user = User.find(user.id) unless user.canonical?
+          user.reload unless user.canonical?
 
           user.touch unless User.skip_touch_for_type?(:enrollments)
           user.clear_cache_key(:enrollments)
