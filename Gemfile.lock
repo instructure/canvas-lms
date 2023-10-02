@@ -409,14 +409,14 @@ GEM
       aws-sigv4 (~> 1.1)
     aws-sigv4 (1.6.0)
       aws-eventstream (~> 1, >= 1.0.2)
-    axe-core-api (4.7.0)
+    axe-core-api (4.8.0)
       dumb_delegator
       virtus
-    axe-core-rspec (4.7.0)
+    axe-core-rspec (4.8.0)
       axe-core-api
       dumb_delegator
       virtus
-    axe-core-selenium (4.7.0)
+    axe-core-selenium (4.8.0)
       axe-core-api
       dumb_delegator
     axiom-types (0.1.1)
