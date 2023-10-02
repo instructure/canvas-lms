@@ -88,8 +88,7 @@
   </div>
 
 
-  <fieldset id="assignment_group_selector" class="control-group">
-  </fieldset>
+  <div id="assignment_group_selector" class="control-group"></div>
 
   <div id="grading_type_selector"></div>
 
@@ -120,7 +119,7 @@
     {{#if hideZeroPointQuizzesOptionEnabled}}
       {{#if isQuizLTIAssignment}}
           <div id="assignment_hide_in_gradebook_option">
-            <fieldset id="hide-in-gradebook-set">
+            <div id="hide-in-gradebook-set">
               <div class="form-column-left"></div>
               <div id="hide_in_gradebook" class="form-column-right">
                 <label class="checkbox">
@@ -140,7 +139,7 @@
                   {{#t}}Do not display in gradebook or the student's grade page{{/t}}
                 </label>
               </div>
-            <fieldset>
+            <div>
           </div>
       {{/if}}
     {{/if}}
@@ -148,7 +147,7 @@
     {{>ui/features/assignment_edit/jst/_submission_types_form.handlebars}}
 
     {{#if assignment_attempts}}
-      <fieldset id="allowed_attempts_fields" class="control-group">
+      <div id="allowed_attempts_fields" class="control-group">
         <div class="form-column-left">
           {{#t "submission_attempts"}}Submission Attempts{{/t}}
         </div>
@@ -157,28 +156,28 @@
             <div id="allowed-attempts-target" />
           </div>
         </div>
-      </fieldset>
+      </div>
     {{/if}}
 
-    <fieldset id="similarity_detection_tools">
-    </fieldset>
+    <div id="similarity_detection_tools">
+    </div>
 
     {{#unless isLargeRoster}}
-      <fieldset id="group_category_selector"
+      <div id="group_category_selector"
         class="control-group"
         style="{{hiddenIf isExternalTool}}">
-      </fieldset>
+      </div>
     {{/unless}}
 
     {{#unless isLargeRoster}}
-      <fieldset id="assignment_peer_reviews_fields"
+      <div id="assignment_peer_reviews_fields"
         class="control-group"
         style="{{hiddenIf isExternalTool}}">
-      </fieldset>
+      </div>
     {{/unless}}
 
     {{#if postToSISEnabled}}
-      <fieldset>
+      <div>
         <div class="form-column-left">{{#t}}Sync to {{postToSISName}}{{/t}}</div>
           <div class="form-column-right" style="margin-top: 14px;">
             <label class="checkbox">
@@ -189,7 +188,7 @@
               {{#t}}Include this assignment's grades when syncing to your school's Student Information System{{/t}}
             </label>
         </div>
-      </fieldset>
+      </div>
     {{/if}}
 
     {{#unless isQuizLTIAssignment}}
@@ -197,7 +196,7 @@
     {{/unless}}
 
     {{#if anonymousGradingEnabled}}
-      <fieldset>
+      <div>
         <div class="form-column-left">{{#t}}Anonymous Grading{{/t}}</div>
         <div id="enable-anonymous-grading" class="form-column-right">
           <div class="border border-trbl border-round">
@@ -223,11 +222,11 @@
             </label>
           </div>
         </div>
-      </fieldset>
+      </div>
     {{/if}}
 
     {{#if anonymousInstructorAnnotationsEnabled}}
-      <fieldset>
+      <div>
         <div class="form-column-left">{{#t}}Anonymous Instructor Annotations{{/t}}</div>
         <div class="form-column-right" style="margin-top: 14px;">
           <label class="checkbox">
@@ -235,31 +234,34 @@
             {{#t}}Anonymize all annotations made by instructors on submissions for this assignment in DocViewer{{/t}}
           </label>
         </div>
-      </fieldset>
+      </div>
     {{/if}}
   </div>
 
   {{#if canFreeze}}
     <div class="form-column-left"></div>
     <div class="form-column-right">
-      <fieldset>
+      <div>
         <label class="checkbox" for="assignment_freeze_on_copy">
           {{checkbox "freezeOnCopy"
             id="assignment_freeze_on_copy"
             name="freeze_on_copy"}}
             {{#t "freeze_properties"}}Lock assignment properties when copied{{/t}}
         </label>
-      </fieldset>
+      </div>
     </div>
   {{/if}}
-
-  <div id="overrides-wrapper">
+  <fieldset id="overrides-wrapper">
     <div class="form-column-left">
-      {{#t}}Assign{{/t}}
+      <legend id="assignment_overrides">
+        <label for="assignment_overrides">
+          {{#t}}Assign{{/t}}
+        </label>
+      </legend>
     </div>
     <div class="overrides-column-right js-assignment-overrides overrideFormFlex">
     </div>
-  </div>
+  </fieldset>
 </div>
 
 {{#if conditionalReleaseServiceEnabled}}
