@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useEffect, useMemo} from 'react'
+import React, {useState, useMemo} from 'react'
 import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
@@ -36,7 +36,6 @@ const I18n = useI18nScope('differentiated_modules')
 const {Item: FlexItem} = Flex as any
 
 export interface DifferentiatedModulesTrayProps {
-  open: boolean
   onDismiss: () => void
   moduleElement: HTMLDivElement
   moduleId?: string
@@ -53,7 +52,6 @@ const SettingsPanel = React.lazy(() => import('./SettingsPanel'))
 const AssignToPanel = React.lazy(() => import('./AssignToPanel'))
 
 export default function DifferentiatedModulesTray({
-  open,
   onDismiss,
   moduleElement,
   moduleId = '',
@@ -63,11 +61,6 @@ export default function DifferentiatedModulesTray({
   ...settingsProps
 }: DifferentiatedModulesTrayProps) {
   const [selectedTab, setSelectedTab] = useState(initialTab)
-
-  useEffect(() => {
-    if (!open) setSelectedTab(initialTab)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open])
 
   const panelHeight = useMemo(() => calculatePanelHeight(!assignOnly), [assignOnly])
 
@@ -150,7 +143,7 @@ export default function DifferentiatedModulesTray({
   }
 
   return (
-    <Tray open={open} label={I18n.t('Edit Module Settings')} placement="end" size="regular">
+    <Tray open={true} label={I18n.t('Edit Module Settings')} placement="end" size="regular">
       <Header />
       <Body />
     </Tray>

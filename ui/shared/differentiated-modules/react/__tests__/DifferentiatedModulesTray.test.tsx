@@ -24,7 +24,6 @@ import DifferentiatedModulesTray, {
 
 describe('DifferentiatedModulesTray', () => {
   const props: DifferentiatedModulesTrayProps = {
-    open: true,
     onDismiss: () => {},
     moduleElement: document.createElement('div'),
     initialTab: 'assign-to',
@@ -59,15 +58,15 @@ describe('DifferentiatedModulesTray', () => {
     expect(getByTestId('settings-panel')).toBeInTheDocument()
   })
 
-  it('always opens to the initialTab', async () => {
-    const {getByRole, rerender} = renderComponent({assignOnly: false})
+  it('opens to assign to when initialTab is "assign-to"', () => {
+    const {getByRole} = renderComponent({assignOnly: false})
     expect(getByRole('tab', {name: /Assign To/})).toHaveAttribute('aria-selected', 'true')
-    getByRole('tab', {name: /Settings/}).click()
-    await waitFor(() => {
+  })
+
+  it('opens to settings when initialTab is "settings"', async () => {
+    const {getByRole} = renderComponent({assignOnly: false, initialTab: 'settings'})
+    await waitFor(() =>
       expect(getByRole('tab', {name: /Settings/})).toHaveAttribute('aria-selected', 'true')
-    })
-    rerender(<DifferentiatedModulesTray {...props} open={false} assignOnly={false} />)
-    rerender(<DifferentiatedModulesTray {...props} assignOnly={false} />)
-    expect(getByRole('tab', {name: /Assign To/})).toHaveAttribute('aria-selected', 'true')
+    )
   })
 })
