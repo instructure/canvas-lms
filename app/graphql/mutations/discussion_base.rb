@@ -31,6 +31,8 @@ class Mutations::DiscussionBase < Mutations::BaseMutation
   argument :todo_date, Types::DateTimeType, required: false
   argument :podcast_enabled, Boolean, required: false
   argument :podcast_has_student_posts, Boolean, required: false
+  argument :locked, Boolean, required: false
+  argument :is_announcement, Boolean, required: false
 
   field :discussion_topic, Types::DiscussionType, null: true
 end

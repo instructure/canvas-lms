@@ -101,6 +101,8 @@ export default function DiscussionTopicFormContainer() {
         todoDate,
         enablePodcastFeed,
         includeRepliesInFeed,
+        locked,
+        isAnnouncement
       }) => {
         if (isEditing) {
           console.log('call updateDiscussion')
@@ -122,6 +124,8 @@ export default function DiscussionTopicFormContainer() {
               todoDate: addToTodo ? todoDate : null,
               podcastEnabled: enablePodcastFeed,
               podcastHasStudentPosts: includeRepliesInFeed,
+              locked,
+              isAnnouncement
             },
           })
         }

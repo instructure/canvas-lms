@@ -681,5 +681,24 @@ describe "discussions" do
         expect(f("[data-testid='group-category-opt-#{group_category.id}']")).to be_present
       end
     end
+
+    context "announcements" do
+      it "displays correct fields for a new announcement" do
+        user_session(teacher)
+        get "/courses/#{course.id}/discussion_topics/new?is_announcement=true"
+        # Expect certain field to be present
+        expect(f("body")).to contain_jqcss "input[value='enable-delay-posting']"
+        expect(f("body")).to contain_jqcss "input[value='enable-participants-commenting']"
+        expect(f("body")).to contain_jqcss "input[value='must-respond-before-viewing-replies']"
+        expect(f("body")).to contain_jqcss "input[value='enable-podcast-feed']"
+        expect(f("body")).to contain_jqcss "input[value='allow-liking']"
+
+        # Expect certain field to not be present
+        expect(f("body")).not_to contain_jqcss "input[value='full_anonymity']"
+        expect(f("body")).not_to contain_jqcss "input[value='graded']"
+        expect(f("body")).not_to contain_jqcss "input[value='group-discussion']"
+        expect(f("body")).not_to contain_jqcss "input[value='add-to-student-to-do']"
+      end
+    end
   end
 end
