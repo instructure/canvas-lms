@@ -33,6 +33,7 @@ import fakeENV from 'helpers/fakeENV'
 import userSettings from '@canvas/user-settings'
 import assertions from 'helpers/assertions'
 import 'helpers/jquery.simulate'
+import ExternalToolModalLauncher from '@canvas/external-tools/react/components/ExternalToolModalLauncher'
 
 const s_params = 'some super secure params'
 const fixtures = document.getElementById('fixtures')
@@ -1428,7 +1429,7 @@ test('#handleAssignmentSelectionSubmit updates the external_tool_tag_attributes 
     'item[assignment_id]': '',
     'item[custom_params]':
       '{"RootAccountId":"$Canvas.rootAccount.id","ExternalToolGlobalId":"$Canvas.externalTool.global_id","ShardId":"$Canvas.shard.id"}',
-    'item[type]': 'context_external_tool',
+    'item[type]': 'LtiResourceLink',
     'item[id]': 1,
     'item[url]': 'https://foo.bar/internal_link/klIknZO7sE',
     'item[new_tab]': '1',
@@ -1449,56 +1450,136 @@ test('#handleAssignmentSelectionSubmit updates the external_tool_tag_attributes 
     view.$externalToolsCustomParams.val(),
     '{"RootAccountId":"$Canvas.rootAccount.id","ExternalToolGlobalId":"$Canvas.externalTool.global_id","ShardId":"$Canvas.shard.id"}'
   )
-  equal(view.$externalToolsContentType.val(), 'context_external_tool')
+  equal(view.$externalToolsContentType.val(), 'LtiResourceLink')
   equal(view.$externalToolsContentId.val(), '1')
   equal(view.$externalToolsUrl.val(), 'https://foo.bar/internal_link/klIknZO7sE')
   equal(view.$externalToolsNewTab.val(), '1')
   equal(view.$assignmentPointsPossible.val(), '1234')
   equal(view.$externalToolsIframeWidth.val(), '111')
   equal(view.$externalToolsIframeHeight.val(), '222')
+  equal(view.$externalToolsLineItem.val(), '{"scoreMaximum":1234}')
 })
 
-test('has the expected DOM structure for handling deep linking messages', async () => {
-  // see ui/features/assignment_edit/deepLinking.js
+test('#handleContentItem updates the external_tool_tag_attributes input fields', async () => {
+  const data = {
+    custom: {
+      RootAccountId: '$Canvas.rootAccount.id',
+      ExternalToolGlobalId: '$Canvas.externalTool.global_id',
+      ShardId: '$Canvas.shard.id',
+    },
+    type: 'LtiResourceLink',
+    id: 1,
+    url: 'https://foo.bar/internal_link/klIknZO7sE',
+    window: {
+      targetName: '_blank',
+    },
+    iframe: {
+      width: '111',
+      height: '222',
+    },
+    lineItem: {
+      scoreMaximum: 1234,
+    },
+    submission: {
+      endDateTime: '2023-04-21T00:00:00.000Z',
+    },
+    available: {
+      startDateTime: '2023-04-13T00:00:00.000Z',
+      endDateTime: '2023-04-14T00:00:00.000Z',
+    },
+    text: 'todo_fix_me',
+  }
   const view = editView()
 
-  // Input elements exists
-  equal(
-    view.$("input[name='external_tool_tag_attributes[content_id]']").attr('id'),
-    'assignment_external_tool_tag_attributes_content_id'
-  )
+  // when selectContentDialog.submit is triggered the handleAssignmentSelectionSubmit function is called
+  view.handleContentItem(data)
 
   equal(
-    view.$("input[name='external_tool_tag_attributes[content_type]']").attr('id'),
-    'assignment_external_tool_tag_attributes_content_type'
+    view.$externalToolsCustomParams.val(),
+    '{"RootAccountId":"$Canvas.rootAccount.id","ExternalToolGlobalId":"$Canvas.externalTool.global_id","ShardId":"$Canvas.shard.id"}'
   )
+  equal(view.$externalToolsContentType.val(), 'LtiResourceLink')
+  equal(view.$externalToolsContentId.val(), '1')
+  equal(view.$externalToolsUrl.val(), 'https://foo.bar/internal_link/klIknZO7sE')
+  equal(view.$externalToolsNewTab.val(), '1')
+  equal(view.$assignmentPointsPossible.val(), '1234')
+  equal(view.$externalToolsIframeWidth.val(), '111')
+  equal(view.$externalToolsIframeHeight.val(), '222')
+  equal(view.$externalToolsLineItem.val(), '{"scoreMaximum":1234}')
+})
 
-  // _submission_types_form.handlebars creates 2 inputs with the same name:
-  //   1st is input[type="hidden"] without id
-  //   2nd is input[type="checkbox"] with id
-  equal(view.$("input[name='external_tool_tag_attributes[new_tab]']").attr('type'), 'hidden')
-  equal(view.$('input#assignment_external_tool_tag_attributes_new_tab').attr('type'), 'checkbox')
+test('submission_type_selection modal opens on tool click', () => {
+  ENV.context_asset_string = 'course_1'
+  ENV.PERMISSIONS = {can_edit_grades: true}
+
+  const view = editView()
+  view.$el.appendTo($('#fixtures'))
+
+  sinon.spy(React, 'createElement')
+
+  view.selectedTool = {
+    id: '1',
+    selection_width: '100%',
+    selection_height: '400',
+    title: 'test',
+  }
+  view.handleSubmissionTypeSelectionLaunch()
 
   equal(
-    view.$("input[name='external_tool_tag_attributes[url]']").attr('id'),
-    'assignment_external_tool_tag_attributes_url'
-  )
-  equal(
-    view.$("input[name='external_tool_tag_attributes[link_settings][selection_width]']").attr('id'),
-    'assignment_external_tool_tag_attributes_iframe_width'
+    React.createElement.calledWith(ExternalToolModalLauncher, sinon.match({isOpen: true})),
+    true
   )
 
-  equal(
-    view
-      .$("input[name='external_tool_tag_attributes[link_settings][selection_height]']")
-      .attr('id'),
-    'assignment_external_tool_tag_attributes_iframe_height'
-  )
+  React.createElement.restore()
+})
+
+test('submission_type_selection modal closes on deep link postMessage', () => {
+  ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN = window.origin
+  ENV.context_asset_string = 'course_1'
+  ENV.PERMISSIONS = {can_edit_grades: true}
+
+  const view = editView()
+  view.$el.appendTo($('#fixtures'))
+
+  sinon.spy(React, 'createElement')
+
+  view.selectedTool = {
+    id: '1',
+    selection_width: '100%',
+    selection_height: '400',
+    title: 'test',
+  }
+  view.handleSubmissionTypeSelectionLaunch()
 
   equal(
-    view.$("input[name='external_tool_tag_attributes[custom_params]']").attr('id'),
-    'assignment_external_tool_tag_attributes_custom_params'
+    React.createElement.calledWith(ExternalToolModalLauncher, sinon.match({isOpen: true})),
+    true
   )
+
+  const event = new MessageEvent('message', {
+    data: {
+      subject: 'LtiDeepLinkingResponse',
+      content_items: [
+        {
+          type: 'LtiResourceLink',
+          url: 'https://foo.bar/internal_link/klIknZO7sE',
+          lineItem: {
+            scoreMaximum: 1234,
+          },
+        },
+      ],
+    },
+    origin: window.origin,
+  })
+
+  window.dispatchEvent(event)
+
+  equal(
+    React.createElement.calledWith(ExternalToolModalLauncher, sinon.match({isOpen: false})),
+    true
+  )
+
+  React.createElement.restore()
 })
 
 QUnit.module('EditView: Quizzes 2', {
