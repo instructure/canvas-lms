@@ -753,6 +753,44 @@
 #         }
 #       }
 #     }
+#
+# @model AssignmentDates
+#     {
+#       "id": "AssignmentDates",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "the ID of the assignment or quiz",
+#           "example": 4,
+#           "type": "integer"
+#         },
+#         "due_at": {
+#           "description": "the due date for the assignment or quiz. returns null if not present",
+#           "example": "2012-07-01T23:59:00-06:00",
+#           "type": "datetime"
+#         },
+#         "lock_at": {
+#           "description": "the lock date (assignment is locked after this date). returns null if not present",
+#           "example": "2012-07-01T23:59:00-06:00",
+#           "type": "datetime"
+#         },
+#         "unlock_at": {
+#           "description": "the unlock date (assignment is unlocked after this date). returns null if not present",
+#           "example": "2012-07-01T23:59:00-06:00",
+#           "type": "datetime"
+#         },
+#         "only_visible_to_overrides": {
+#           "description": "whether the assignment is only visible to overrides",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "overrides": {
+#           "description": "paginated list of AssignmentOverride objects",
+#           "type": "array",
+#           "items": { "$ref": "AssignmentOverride" }
+#         }
+#       }
+#     }
 class AssignmentsApiController < ApplicationController
   before_action :require_context
   before_action :require_user_visibility, only: [:user_index]
@@ -1595,6 +1633,32 @@ class AssignmentsApiController < ApplicationController
                          { strand: "assignment_bulk_update:#{@context.global_id}" },
                          data)
     render json: progress_json(progress, @current_user, session)
+  end
+
+  # @API Get an assignment or quiz's date information
+  #
+  # Get an assignment or quiz's date-related information, including due date, availability dates,
+  # override status, and a paginated list of all assignment overrides for the item.
+  #
+  # @returns AssignmentDates
+  def date_details
+    return render_unauthorized_action unless @context.grants_any_right?(@current_user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
+
+    if params[:assignment_id].present?
+      collection = @context.active_assignments
+      url = api_v1_course_assignment_date_details_url
+    else
+      collection = @context.active_quizzes
+      url = api_v1_course_quiz_date_details_url
+    end
+
+    item = collection.find(params[:assignment_id] || params[:quiz_id])
+    overrides = Api.paginate(item.assignment_overrides.active, self, url)
+
+    render json: {
+      **assignment_date_details_json(item, @current_user, session),
+      overrides: assignment_overrides_json(overrides, @current_user, include_student_names: true)
+    }
   end
 
   private

@@ -99,6 +99,14 @@ module Api::V1::Assignment
     grader_names_visible_to_final_grader
   ].freeze
 
+  ASSIGNMENT_DATE_DETAILS_FIELDS = %w[
+    id
+    due_at
+    unlock_at
+    lock_at
+    only_visible_to_overrides
+  ].freeze
+
   def assignments_json(assignments, user, session, opts = {})
     # check if all assignments being serialized belong to the same course
     contexts = assignments.map { |a| [a.context_id, a.context_type] }.uniq
@@ -465,6 +473,10 @@ module Api::V1::Assignment
     hash["restrict_quantitative_data"] = assignment.restrict_quantitative_data?(user, true) || false
 
     hash
+  end
+
+  def assignment_date_details_json(assignment, user, session)
+    api_json(assignment, user, session, only: ASSIGNMENT_DATE_DETAILS_FIELDS)
   end
 
   def turnitin_settings_json(assignment)
