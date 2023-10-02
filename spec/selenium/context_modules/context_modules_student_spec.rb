@@ -461,14 +461,14 @@ describe "context modules" do
     describe "module header icons" do
       it "shows a pill message that says 'Complete All Items'", priority: "1" do
         go_to_modules
-        vaildate_correct_pill_message(@module_1.id, "Complete All Items")
+        validate_correct_pill_message(@module_1.id, "Complete All Items")
       end
 
       it "shows a pill message that says 'Complete One Item'", priority: "1" do
         make_module_1_complete_one
         go_to_modules
 
-        vaildate_correct_pill_message(@module_1.id, "Complete One Item")
+        validate_correct_pill_message(@module_1.id, "Complete One Item")
       end
 
       it "shows a completed icon and unlocks next when module is complete for 'Complete All Items' requirement", priority: "1" do
@@ -487,7 +487,7 @@ describe "context modules" do
         go_to_modules
 
         navigate_to_module_item(0, @assignment_1.title)
-        vaildate_correct_pill_message(@module_1.id, "Complete One Item")
+        validate_correct_pill_message(@module_1.id, "Complete One Item")
         validate_context_module_status_icon(@module_1.id, @completed_icon)
       end
 

@@ -53,6 +53,7 @@ export default function RequirementCountInput({
       <Flex>
         <FlexItem align="start">
           <RadioInput
+            data-testid="complete-all-radio"
             checked={requirementCount === 'all'}
             value="all"
             label={<ScreenReaderContent>{I18n.t('Complete all')}</ScreenReaderContent>}
@@ -71,6 +72,7 @@ export default function RequirementCountInput({
       {requirementCount === 'all' && (
         <View as="div" padding="0 0 0 medium">
           <Checkbox
+            data-testid="sequential-progress-checkbox"
             checked={requireSequentialProgress}
             onChange={onToggleSequentialProgress}
             label={I18n.t('Students must move through requirements in sequential order')}
@@ -80,6 +82,7 @@ export default function RequirementCountInput({
       <Flex>
         <FlexItem align="start">
           <RadioInput
+            data-testid="complete-one-radio"
             checked={requirementCount === 'one'}
             value="one"
             label={<ScreenReaderContent>{I18n.t('Complete one')}</ScreenReaderContent>}
