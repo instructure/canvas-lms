@@ -596,6 +596,7 @@ class ApplicationController < ActionController::Base
         canAutoPublishCourses: can_manage
       )
     end
+
     js_env BLUEPRINT_COURSES_DATA: bc_data
     if is_master && js_env.key?(:NEW_USER_TUTORIALS)
       js_env[:NEW_USER_TUTORIALS][:is_enabled] = false

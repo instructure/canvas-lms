@@ -45,14 +45,12 @@ module Api::V1::Attachment
   end
 
   def attachment_json(attachment, user, url_options = {}, options = {})
-    hash = {
-      "id" => attachment.id,
-      "uuid" => attachment.uuid,
-      "folder_id" => attachment.folder_id,
-      "display_name" => attachment.display_name,
-      "filename" => attachment.filename,
-      "upload_status" => AttachmentUploadStatus.upload_status(attachment)
-    }
+    hash = attachment.slice("id", "uuid", "folder_id", "display_name", "filename")
+    hash["upload_status"] = AttachmentUploadStatus.upload_status(attachment)
+
+    if options[:can_view_hidden_files] && options[:context] && options[:include].include?("blueprint_course_status") && !options[:master_course_status]
+      options[:master_course_status] = setup_master_course_restrictions([attachment], options[:context])
+    end
 
     if options[:master_course_status]
       hash.merge!(attachment.master_course_api_restriction_data(options[:master_course_status]))
