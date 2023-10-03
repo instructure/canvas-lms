@@ -332,7 +332,7 @@ module SeleniumDriverSetup
     def ruby_firefox_driver
       puts "Thread: provisioning local firefox driver"
       Selenium::WebDriver.for(:firefox,
-                              capabilities: desired_capabilities)
+                              options: desired_capabilities)
     end
 
     def browser_name
