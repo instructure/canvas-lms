@@ -388,7 +388,7 @@ export default function DiscussionTopicForm({
             value="must-respond-before-viewing-replies"
             checked={requireInitialPost}
             onChange={() => setRequireInitialPost(!requireInitialPost)}
-            disabled={!(isAnnouncement === false || (isAnnouncement && locked))}
+            disabled={!(isAnnouncement === false || (isAnnouncement && !locked))}
           />
           <Checkbox
             label={I18n.t('Enable podcast feed')}
