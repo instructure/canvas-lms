@@ -95,6 +95,78 @@ describe Mutations::CreateDiscussionTopic do
     expect(DiscussionTopic.where("id = #{created_discussion_topic["_id"]}").count).to eq 1
   end
 
+  it "successfully creates an announcement" do
+    is_announcement = true
+    context_type = "Course"
+    title = "Test Title"
+    message = "A message"
+    published = true
+    require_initial_post = true
+
+    query = <<~GQL
+      isAnnouncement: #{is_announcement}
+      contextId: "#{@course.id}"
+      contextType: "#{context_type}"
+      title: "#{title}"
+      message: "#{message}"
+      published: #{published}
+      requireInitialPost: #{require_initial_post}
+      anonymousState: "off"
+    GQL
+
+    result = execute_with_input(query)
+    created_announcement = result.dig("data", "createDiscussionTopic", "discussionTopic")
+
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "discussionTopic", "errors")).to be_nil
+
+    expect(created_announcement["contextType"]).to eq context_type
+    expect(created_announcement["title"]).to eq title
+    expect(created_announcement["message"]).to eq message
+    expect(created_announcement["published"]).to eq published
+    expect(created_announcement["requireInitialPost"]).to be true
+    expect(created_announcement["anonymousState"]).to be_nil
+    expect(created_announcement["allowRating"]).to be false
+    expect(created_announcement["onlyGradersCanRate"]).to be false
+    expect(created_announcement["todoDate"]).to be_nil
+    expect(created_announcement["podcastEnabled"]).to be false
+    expect(created_announcement["podcastHasStudentPosts"]).to be false
+    expect(Announcement.where("id = #{created_announcement["_id"]}").count).to eq 1
+  end
+
+  it "successfully creates a locked announcement" do
+    is_announcement = true
+    context_type = "Course"
+    title = "Test Title"
+    message = "A message"
+    published = true
+    require_initial_post = false
+    locked = true
+
+    query = <<~GQL
+      isAnnouncement: #{is_announcement}
+      contextId: "#{@course.id}"
+      contextType: "#{context_type}"
+      title: "#{title}"
+      message: "#{message}"
+      published: #{published}
+      requireInitialPost: #{require_initial_post}
+      anonymousState: "off"
+      locked: #{locked}
+    GQL
+
+    result = execute_with_input(query)
+    created_announcement = result.dig("data", "createDiscussionTopic", "discussionTopic")
+
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "discussionTopic", "errors")).to be_nil
+
+    announcement = Announcement.find(created_announcement["_id"])
+
+    expect(announcement.locked_announcement?).to be true
+    expect(announcement.workflow_state).to eq "active"
+  end
+
   it "creates an allow_rating discussion topic" do
     query = <<~GQL
       contextId: "#{@course.id}"
@@ -351,7 +423,7 @@ describe Mutations::CreateDiscussionTopic do
           contextType: "NotAContextType"
         GQL
         result = execute_with_input(query)
-        expect_error(result, "Invalid context type")
+        expect_error(result, "Invalid context")
       end
     end
 
