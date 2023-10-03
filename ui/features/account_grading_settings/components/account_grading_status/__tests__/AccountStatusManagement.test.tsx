@@ -21,11 +21,17 @@ import {BrowserRouter, Route, Routes} from 'react-router-dom'
 import {MockedProvider} from '@apollo/react-testing'
 import {render, fireEvent, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {AccountStatusManagement} from '../AccountStatusManagement'
+import {AccountStatusManagement, AccountStatusManagementProps} from '../AccountStatusManagement'
 import {setupGraphqlMocks} from './fixtures'
 
 describe('Account Grading Status Management', () => {
-  const renderGradingStatusManagement = ({isRootAccount}: {isRootAccount: boolean}) => {
+  const renderGradingStatusManagement = (props: Partial<AccountStatusManagementProps>) => {
+    const componentProps: AccountStatusManagementProps = {
+      rootAccountId: '2',
+      isRootAccount: true,
+      isExtendedStatusEnabled: true,
+      ...props,
+    }
     return render(
       <BrowserRouter basename="">
         <Routes>
@@ -33,7 +39,7 @@ describe('Account Grading Status Management', () => {
             path="/"
             element={
               <MockedProvider mocks={setupGraphqlMocks()} addTypename={false}>
-                <AccountStatusManagement rootAccountId="2" isRootAccount={isRootAccount} />
+                <AccountStatusManagement {...componentProps} />
               </MockedProvider>
             }
           />
@@ -58,6 +64,18 @@ describe('Account Grading Status Management', () => {
       expect(queryAllByTestId(/standard-status-/)).toHaveLength(6)
       expect(queryAllByTestId(/custom\-status\-[0-9]/)).toHaveLength(2)
       expect(queryAllByTestId(/custom\-status\-new\-[0-2]/)).toHaveLength(1)
+    })
+
+    it('should not render extended status when isExtendedStatusEnabled is false', async () => {
+      const {queryByText, queryAllByTestId, queryByTestId} = renderGradingStatusManagement({
+        isRootAccount: true,
+        isExtendedStatusEnabled: false,
+      })
+      await new Promise(resolve => setTimeout(resolve, 0))
+
+      expect(queryAllByTestId(/standard-status-/)).toHaveLength(5)
+      expect(queryByText('Extended')).not.toBeInTheDocument()
+      expect(queryByTestId('standard-status-extended')).not.toBeInTheDocument()
     })
 
     it('should open a single edit popover when clicking on the edit button', async () => {

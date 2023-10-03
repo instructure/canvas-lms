@@ -28,10 +28,12 @@ const I18n = useI18nScope('account_grading_status')
 type AccountGradingStatusesProps = {
   isRootAccount: boolean
   rootAccountId: string
+  isExtendedStatusEnabled?: boolean
 }
 export const AccountGradingStatuses = ({
   isRootAccount,
   rootAccountId,
+  isExtendedStatusEnabled,
 }: AccountGradingStatusesProps) => {
   const pathMatch = useMatch('/accounts/:accountId/*')
   const accountId = pathMatch?.params?.accountId
@@ -54,7 +56,11 @@ export const AccountGradingStatuses = ({
 
   return (
     <ApolloProvider client={client}>
-      <AccountStatusManagement isRootAccount={isRootAccount} rootAccountId={rootAccountId} />
+      <AccountStatusManagement
+        isRootAccount={isRootAccount}
+        rootAccountId={rootAccountId}
+        isExtendedStatusEnabled={isExtendedStatusEnabled}
+      />
     </ApolloProvider>
   )
 }

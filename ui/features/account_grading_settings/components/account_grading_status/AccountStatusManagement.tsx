@@ -38,13 +38,15 @@ const {Row: GridRow, Col: GridCol} = Grid as any
 
 const TOTAL_ALLOWED_CUSTOM_STATUSES = 3
 
-type AccountStatusManagementProps = {
+export type AccountStatusManagementProps = {
   isRootAccount: boolean
   rootAccountId: string
+  isExtendedStatusEnabled?: boolean
 }
 export const AccountStatusManagement = ({
   isRootAccount,
   rootAccountId,
+  isExtendedStatusEnabled,
 }: AccountStatusManagementProps) => {
   const {
     customStatuses,
@@ -58,7 +60,7 @@ export const AccountStatusManagement = ({
     removeCustomStatus,
     saveCustomStatus,
     saveStandardStatus,
-  } = useAccountGradingStatuses(rootAccountId)
+  } = useAccountGradingStatuses(rootAccountId, isExtendedStatusEnabled)
   const [openEditStatusId, setEditStatusId] = useState<string | undefined>(undefined)
 
   useEffect(() => {
