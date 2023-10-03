@@ -194,11 +194,6 @@ export interface RCEPropTypes {
   instRecordDisabled?: boolean
 
   /**
-   * key value pair telling which attachment ids are locked
-   */
-  lockedAttachments?: {[key: number]: boolean}
-
-  /**
    * locale of the user's language
    */
   language?: string
