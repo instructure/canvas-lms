@@ -32,6 +32,8 @@ const logMessageWithWindowUrl = (message, extras = {}) => {
 }
 
 ready(() => {
+  const formSubmissionDelay = window.ENV.INTEROP_8200_DELAY_FORM_SUBMIT
+
   const $toolForm = $('#tool_form')
   logMessageWithWindowUrl('found tool form', {toolForm: $toolForm})
 
@@ -50,10 +52,21 @@ ready(() => {
     }, 60 * 2.5 * 1000)
 
     logMessageWithWindowUrl('submitting tool form', {toolForm: $toolForm})
-    $toolForm.submit(function () {
-      logMessageWithWindowUrl('submitted tool form', {toolForm: $toolForm})
-      $(this).find('.load_tab,.tab_loaded').toggle()
-    })
+    if (formSubmissionDelay) {
+      setTimeout(
+        () =>
+          $toolForm.submit(function () {
+            logMessageWithWindowUrl('submitted tool form', {toolForm: $toolForm})
+            $(this).find('.load_tab,.tab_loaded').toggle()
+          }),
+        formSubmissionDelay
+      )
+    } else {
+      $toolForm.submit(function () {
+        logMessageWithWindowUrl('submitted tool form', {toolForm: $toolForm})
+        $(this).find('.load_tab,.tab_loaded').toggle()
+      })
+    }
   }
 
   const launchToolInNewTab = function () {
@@ -69,12 +82,20 @@ ready(() => {
     case 'self':
       logMessageWithWindowUrl('tool launch type is self', {toolForm: $toolForm})
       $toolForm.removeAttr('target')
-      $toolForm.submit()
+      if (formSubmissionDelay) {
+        setTimeout(() => $toolForm.submit(), formSubmissionDelay)
+      } else {
+        $toolForm.submit()
+      }
       logMessageWithWindowUrl('case self: submitted tool form', {toolForm: $toolForm})
       break
     default:
       // Firefox throws an error when submitting insecure content
-      $toolForm.submit()
+      if (formSubmissionDelay) {
+        setTimeout(() => $toolForm.submit(), formSubmissionDelay)
+      } else {
+        $toolForm.submit()
+      }
       logMessageWithWindowUrl('case default: submitted tool form', {toolForm: $toolForm})
 
       $('#tool_content').bind('load', () => {
