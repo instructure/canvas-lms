@@ -2453,7 +2453,8 @@ class CoursesController < ApplicationController
         # clear notices that would have been displayed as a result of processing
         # an enrollment invitation, since we're giving an error
         flash[:notice] = nil
-        render_unauthorized_action
+        # We know this will fail since we got to this block, but this way we can reuse the error handling
+        authorized_action(@context, @current_user, :read)
       end
     end
   end
