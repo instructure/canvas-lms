@@ -29,6 +29,7 @@ describe('PrerequisiteForm', () => {
     availableModules: [
       {id: '1', name: 'Module 1'},
       {id: '2', name: 'Module 2'},
+      {id: '3', name: 'Module 3'},
     ],
     onAddPrerequisite: jest.fn(),
     onDropPrerequisite: () => {},
@@ -57,7 +58,12 @@ describe('PrerequisiteForm', () => {
 
   it('calls onAddPrerequisite when the add button is clicked', () => {
     const {getByText} = renderComponent()
-    getByText('Add Prerequisite').click()
+    getByText('Prerequisite').click()
     expect(props.onAddPrerequisite).toHaveBeenCalled()
+  })
+
+  it('does not render the add button when all available modules have prerequisites', () => {
+    const {queryByText} = renderComponent({prerequisites: [...props.availableModules]})
+    expect(queryByText('Prerequisite')).not.toBeInTheDocument()
   })
 })
