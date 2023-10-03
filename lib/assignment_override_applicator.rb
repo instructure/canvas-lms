@@ -38,6 +38,11 @@ module AssignmentOverrideApplicator
 
     overrides = overrides_for_assignment_and_user(assignment_or_quiz, user)
 
+    if Account.site_admin.feature_enabled?(:differentiated_modules)
+      is_unassigned = overrides.find { |o| o&.unassign_item? }
+      overrides = overrides.split(is_unassigned)[0]
+    end
+
     result_assignment_or_quiz = assignment_with_overrides(assignment_or_quiz, overrides, user)
     result_assignment_or_quiz.overridden_for_user = user
 
@@ -131,7 +136,7 @@ module AssignmentOverrideApplicator
 
           overrides = []
 
-          # priority: adhoc, group, section (do not exclude deleted)
+          # priority: adhoc, group, section, course (do not exclude deleted)
           adhoc = adhoc_override(assignment_or_quiz, user)
           overrides << adhoc.assignment_override if adhoc
 
@@ -425,12 +430,15 @@ module AssignmentOverrideApplicator
   #   considered an "inactive override" for that enrollment's user.
   def self.select_override_by_attribute(assignment_or_quiz, overrides, attribute, comparison)
     nonactive_overrides, applicable_overrides = overrides.partition(&:for_nonactive_enrollment?)
-    if applicable_overrides.any?
-      select_override(applicable_overrides, attribute, comparison)
-    elsif assignment_or_quiz.only_visible_to_overrides && nonactive_overrides.any?
-      select_override(nonactive_overrides, attribute, comparison)
-    else
+    selected = if applicable_overrides.any?
+                 select_override(applicable_overrides, attribute, comparison)
+               elsif assignment_or_quiz.only_visible_to_overrides && nonactive_overrides.any?
+                 select_override(nonactive_overrides, attribute, comparison)
+               end
+    if !selected || (Account.site_admin.feature_enabled?(:differentiated_modules) && selected.unassign_item)
       assignment_or_quiz
+    else
+      selected
     end
   end
   private_class_method :select_override_by_attribute
