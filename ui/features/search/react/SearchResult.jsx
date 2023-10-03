@@ -64,7 +64,7 @@ export default function SearchResult(props) {
           {ellipsize(wiki_page.body_text, 1000)}
         </Text>
         {getRelevance(wiki_page)}
-        <a href={wiki_page.url}>{I18n.t('View Full Page')}</a>
+        <a href={wiki_page.url} target="_blank">{I18n.t('View Full Page')}</a>
       </View>
     )
   } else if (props.searchResult.discussion_topic) {
