@@ -43,7 +43,7 @@ const I18n = useI18nScope('temporary_enrollment')
 const FlexItem = Flex.Item as any
 
 interface Props {
-  readonly title: string | ((enrollmentType: EnrollmentType) => string)
+  readonly title: string | ((enrollmentType: EnrollmentType, name: string) => string)
   readonly enrollmentType: EnrollmentType
   readonly children: ReactElement
   readonly user: {
@@ -98,7 +98,7 @@ export function TempEnrollModal(props: Props) {
   const [enrollmentData, setEnrollmentData] = useState<Enrollment[]>([])
 
   const isEditModeLocal = isEditMode
-  const dynamicTitle = typeof title === 'function' ? title(enrollmentType) : title
+  const dynamicTitle = typeof title === 'function' ? title(enrollmentType, user.name) : title
 
   useEffect(() => {
     if (tempEnrollments) {
