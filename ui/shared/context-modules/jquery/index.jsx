@@ -573,8 +573,21 @@ window.modules = (function () {
       }
       $item.addClass('indent_' + (data.indent || 0))
       $item.addClass(modules.itemClass(data))
-      if (isAssignmentOrQuiz) {
-        $item.find('.assign-to-option').removeClass('hidden')
+      // The Assign To menu option is currently valid for assignments and quizzes only.
+      // This function is called twice, once with the data the user just entered
+      // and again after the api request returns. The second time we have
+      // all the real data, including the module item's id. Wait until then
+      // to add the option.
+      if (isAssignmentOrQuiz && 'id' in data) {
+        const $assignToMenuItem = $item.find('.assign-to-option')
+        if ($assignToMenuItem.length) {
+          $assignToMenuItem.removeClass('hidden')
+          const $a = $assignToMenuItem.find('a')
+          $a.attr('data-item-id', data.id)
+          $a.attr('data-item-name', data.title)
+          $a.attr('data-item-type', data.quiz_lti ? 'lti-quiz' : data.type)
+          $a.attr('data-item-context-id', data.context_id)
+        }
       }
 
       // don't just tack onto the bottom, put it in its correct position
@@ -2519,7 +2532,12 @@ $(document).ready(function () {
     )
   }
 
-  function renderDifferentiatedModulesTray(returnFocusTo, moduleElement, settingsProps, options = {}) {
+  function renderDifferentiatedModulesTray(
+    returnFocusTo,
+    moduleElement,
+    settingsProps,
+    options = {}
+  ) {
     const container = document.getElementById('differentiated-modules-mount-point')
     ReactDOM.render(
       <DifferentiatedModulesTray
@@ -2576,7 +2594,9 @@ $(document).ready(function () {
     const returnFocusTo = $(event.target).closest('ul').prev('.al-trigger')
     const moduleElement = $(event.target).parents('.context_module')[0]
     const settingsProps = parseModule(moduleElement)
-    renderDifferentiatedModulesTray(returnFocusTo, moduleElement, settingsProps, {initialTab: "assign-to"})
+    renderDifferentiatedModulesTray(returnFocusTo, moduleElement, settingsProps, {
+      initialTab: 'assign-to',
+    })
   })
 
   $('.view_assign_link').on('click keyclick', function (event) {
@@ -2584,7 +2604,9 @@ $(document).ready(function () {
     const returnFocusTo = $(event.target).closest('ul').prev('.al-trigger')
     const moduleElement = $(event.target).parents('.context_module')[0]
     const settingsProps = parseModule(moduleElement)
-    renderDifferentiatedModulesTray(returnFocusTo, moduleElement, settingsProps, {initialTab: "assign-to"})
+    renderDifferentiatedModulesTray(returnFocusTo, moduleElement, settingsProps, {
+      initialTab: 'assign-to',
+    })
   })
 
   $(document).on('click', '.edit_module_link', function (event) {
@@ -2593,7 +2615,9 @@ $(document).ready(function () {
       const returnFocusTo = $(event.target).closest('ul').prev('.al-trigger')
       const moduleElement = $(event.target).parents('.context_module')[0]
       const settingsProps = parseModule(moduleElement)
-      renderDifferentiatedModulesTray(returnFocusTo, moduleElement, settingsProps, {initialTab: "settings"})
+      renderDifferentiatedModulesTray(returnFocusTo, moduleElement, settingsProps, {
+        initialTab: 'settings',
+      })
     } else {
       modules.editModule($(this).parents('.context_module'))
     }
