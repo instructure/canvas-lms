@@ -82,7 +82,7 @@ describe AssignmentOverrideApplicator do
   end
 
   describe "assignment_overridden_for" do
-    before do
+    before :once do
       student_in_course(active_all: true)
       @assignment = create_assignment(course: @course)
     end
@@ -228,6 +228,47 @@ describe AssignmentOverrideApplicator do
             AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student).due_at
           }.from(@section2_override.due_at).to(new_due_at)
         end
+      end
+    end
+
+    context "with unassign_item" do
+      before :once do
+        @adhoc_override = assignment_override_model(assignment: @assignment)
+        @override_student = @adhoc_override.assignment_override_students.build
+        @override_student.user = @student
+        @override_student.save!
+        @adhoc_override.override_due_at(7.days.from_now)
+        @adhoc_override.save!
+
+        @section_override = assignment_override_model(assignment: @assignment, set: @course.default_section)
+        @section_override.override_due_at(7.days.from_now)
+        @section_override.save!
+      end
+
+      it "does not apply overrides if adhoc override is unassigned" do
+        Account.site_admin.enable_feature!(:differentiated_modules)
+        @adhoc_override.unassign_item = true
+        @adhoc_override.save!
+
+        due_at = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student).due_at
+        expect(due_at).to eq @assignment.due_at
+      end
+
+      it "applies unassigned overrides if flag is off" do
+        @adhoc_override.unassign_item = true
+        @adhoc_override.save!
+
+        due_at = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student).due_at
+        expect(due_at).to eq @adhoc_override.due_at
+      end
+
+      it "applies adhoc override even if section override is unassigned" do
+        Account.site_admin.enable_feature!(:differentiated_modules)
+        @section_override.unassign_item = true
+        @section_override.save!
+
+        due_at = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student).due_at
+        expect(due_at).to eq @adhoc_override.due_at
       end
     end
 
@@ -1343,6 +1384,18 @@ describe AssignmentOverrideApplicator do
       it "always uses the adhoc due_at, if one exists" do
         expect(due_at).to eq @adhoc_override.due_at
       end
+
+      it "uses no override if the override is unassigned" do
+        Account.site_admin.enable_feature!(:differentiated_modules)
+        @adhoc_override.unassign_item = true
+        expect(due_at).to eq @assignment.due_at
+      end
+
+      it "uses adhoc override even if section override is unassigned" do
+        Account.site_admin.enable_feature!(:differentiated_modules)
+        @section_override.unassign_item = true
+        expect(due_at).to eq @adhoc_override.due_at
+      end
     end
 
     it "uses overrides that override due_at" do
@@ -1391,6 +1444,16 @@ describe AssignmentOverrideApplicator do
       due_at = AssignmentOverrideApplicator.overridden_due_at(@assignment, [@override])
       expect(due_at).to eq @override.due_at
     end
+
+    it "uses no override with no adhoc override due_at and section override unassigned" do
+      Account.site_admin.enable_feature!(:differentiated_modules)
+      @section_override = assignment_override_model(assignment: @assignment, set: @course.default_section)
+      @section_override.override_due_at(7.days.from_now)
+      @section_override.unassign_item = true
+
+      due_at = AssignmentOverrideApplicator.overridden_due_at(@assignment, [@override, @section_override])
+      expect(due_at).to eq @assignment.due_at
+    end
   end
 
   # specs for overridden_due_at cover all_day and all_day_date, since they're
@@ -1400,6 +1463,27 @@ describe AssignmentOverrideApplicator do
     before do
       @assignment = create_assignment(due_at: 11.days.from_now, unlock_at: 10.days.from_now)
       @override = assignment_override_model(assignment: @assignment)
+    end
+
+    it "uses no override if the override is unassigned" do
+      Account.site_admin.enable_feature!(:differentiated_modules)
+      @override.override_unlock_at(7.days.from_now)
+      @override.unassign_item = true
+      unlock_at = AssignmentOverrideApplicator.overridden_unlock_at(@assignment, [@override])
+      expect(unlock_at).to eq @assignment.unlock_at
+    end
+
+    it "uses adhoc override even if section override is unassigned" do
+      Account.site_admin.enable_feature!(:differentiated_modules)
+      @adhoc_override = @override
+      @adhoc_override.override_unlock_at(7.days.from_now)
+
+      @section_override = assignment_override_model(assignment: @assignment, set: @course.default_section)
+      @section_override.override_unlock_at(7.days.from_now)
+      @section_override.unassign_item = true
+
+      unlock_at = AssignmentOverrideApplicator.overridden_unlock_at(@assignment, [@adhoc_override, @section_override])
+      expect(unlock_at).to eq @adhoc_override.unlock_at
     end
 
     it "uses overrides that override unlock_at" do
@@ -1477,6 +1561,27 @@ describe AssignmentOverrideApplicator do
     before do
       @assignment = create_assignment(due_at: 1.day.from_now, lock_at: 5.days.from_now)
       @override = assignment_override_model(assignment: @assignment)
+    end
+
+    it "uses no override if the override is unassigned" do
+      Account.site_admin.enable_feature!(:differentiated_modules)
+      @override.override_lock_at(7.days.from_now)
+      @override.unassign_item = true
+      lock_at = AssignmentOverrideApplicator.overridden_lock_at(@assignment, [@override])
+      expect(lock_at).to eq @assignment.lock_at
+    end
+
+    it "uses adhoc override even if section override is unassigned" do
+      Account.site_admin.enable_feature!(:differentiated_modules)
+      @adhoc_override = @override
+      @adhoc_override.override_lock_at(7.days.from_now)
+
+      @section_override = assignment_override_model(assignment: @assignment, set: @course.default_section)
+      @section_override.override_lock_at(7.days.from_now)
+      @section_override.unassign_item = true
+
+      lock_at = AssignmentOverrideApplicator.overridden_lock_at(@assignment, [@adhoc_override, @section_override])
+      expect(lock_at).to eq @adhoc_override.lock_at
     end
 
     it "uses overrides that override lock_at" do
