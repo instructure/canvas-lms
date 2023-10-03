@@ -28,6 +28,7 @@ import {
   IconAddLine,
   IconAssignmentLine,
   IconQuizLine,
+  IconQuizSolid,
   IconQuestionLine,
   // @ts-expect-error
 } from '@instructure/ui-icons'
@@ -42,10 +43,12 @@ const {Item: FlexItem} = Flex as any
 
 function itemTypeToIcon(itemType: string) {
   switch (itemType) {
-    case 'Assignment':
+    case 'assignment':
       return <IconAssignmentLine />
-    case 'Quizzes::Quiz':
+    case 'quiz':
       return <IconQuizLine />
+    case 'lti-quiz':
+      return <IconQuizSolid />
     default:
       return <IconQuestionLine />
   }
@@ -127,9 +130,11 @@ export default function ItemAssignToTray({
 
   function renderItemType() {
     switch (moduleItemType) {
-      case 'Assignment':
+      case 'assignment':
         return I18n.t('Assignment')
-      case 'Quizzes::Quiz':
+      case 'quiz':
+        return I18n.t('Quiz')
+      case 'lti-quiz':
         return I18n.t('Quiz')
       default:
         return ''

@@ -32,7 +32,7 @@ describe('ItemAssignToTray', () => {
     courseId: '1',
     moduleItemId: '2',
     moduleItemName: 'Item Name',
-    moduleItemType: 'Assignment',
+    moduleItemType: 'assignment',
     pointsPossible: '10 pts',
   }
 
@@ -45,6 +45,16 @@ describe('ItemAssignToTray', () => {
     expect(getByText('Assignment | 10 pts')).toBeInTheDocument()
     expect(getByLabelText('Edit assignment Item Name')).toBeInTheDocument()
     expect(getAllByTestId('item-assign-to-card')).toHaveLength(1)
+  })
+
+  it('renders a quiz', () => {
+    const {getByText} = renderComponent({moduleItemType: 'quiz'})
+    expect(getByText('Quiz | 10 pts')).toBeInTheDocument()
+  })
+
+  it('renders a new quiz', () => {
+    const {getByText} = renderComponent({moduleItemType: 'lti-quiz'})
+    expect(getByText('Quiz | 10 pts')).toBeInTheDocument()
   })
 
   it('renders with no points', () => {
