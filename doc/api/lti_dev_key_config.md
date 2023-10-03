@@ -213,6 +213,10 @@ also found in the placements sub-menu in the left-navigation of this documentati
   "title": "The Best Tool",
   "description": "1.3 Test Tool used for documentation purposes.",
   "oidc_initiation_url": "https://your.oidc_initiation_url",
+  "oidc_initiation_urls": {
+    "eu-west-1": "https://your.eu-specific1.oidc_initiation_url",
+    "eu-central-1": "https://your.eu-specific2.oidc_initiation_url"
+  },
   "target_link_uri": "https://your.target_link_uri",
   "scopes": [
     "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem",
@@ -335,6 +339,7 @@ also found in the placements sub-menu in the left-navigation of this documentati
 
     <tr class="request-param ">
       <td>oidc_initiation_url</td>
+
       <td>
 
         Required
@@ -347,6 +352,24 @@ also found in the placements sub-menu in the left-navigation of this documentati
       <td class="param-desc">
 
 <p>The <a href="https://www.imsglobal.org/spec/security/v1p0#step-1-third-party-initiated-login" target="_blank">login initiation url</a> that Canvas should redirect the User Agent to.
+
+      </td>
+    </tr>
+
+<!-- oidc_initiation_urls -->
+
+    <tr class="request-param ">
+      <td><a name="param-oidc-initial-urls"></a>oidc_initiation_urls</td>
+      <td>
+
+      </td>
+      <td>JSON object</td>
+
+
+
+      <td class="param-desc">
+
+<p>Optional region-specific <a href="https://www.imsglobal.org/spec/security/v1p0#step-1-third-party-initiated-login" target="_blank">login initiation urls</a> that Canvas should redirect the User Agent to. Each institution's Canvas install lives in a particular AWS region, typically one close to the institution's physical region. If ths AWS region is listed as a key in this object, the URL in the value will override the default `oidc_initiation_url`. As of 2023, the regions used by Canvas are: us-east-1, us-west-2, ca-central-1, eu-west-1, eu-central-1, ap-southeast-1, ap-southeast-2.
 
       </td>
     </tr>
@@ -413,7 +436,7 @@ object for placement-specific target_link_uri's</p>
       <td>
 
       </td>
-      <td>JSON object</td>
+      <td>array of JSON objects</td>
 
 
 
@@ -665,7 +688,8 @@ object for placement-specific target_link_uri's</p>
         <p>LTI 1.1 tools <a href="file.tools_xml.html">support environment-specific domains and launch urls</a>, used for launching
         from beta or test instances of Canvas. This config option is not supported for LTI 1.3. Tools instead should use the
         <code>canvas_environment</code> parameter of the OIDC Login request to redirect to environment-specific launch urls or
-        instances of the tool, as specified in <a href="file.lti_dev_key_config.html#login-redirect">Step 1.5</a> above.
+        instances of the tool, as specified in <a href="file.lti_dev_key_config.html#login-redirect">Step 1.5</a> above, and/or
+        use the region-specific <a href="#param-oidc-initial-urls">oidc_initiation_urls</a>.
         </p>
       </td>
     </tr>

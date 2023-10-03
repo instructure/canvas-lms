@@ -181,7 +181,11 @@ module Schemas::Lti
           "type" => "string"
         }.freeze,
         "oidc_initiation_url" => {
-          "type" => "string"
+          "type" => "string",
+        }.freeze,
+        "oidc_initiation_urls" => {
+          "type" => "object",
+          "properties" => Switchman::DatabaseServer.regions.index_with { { "type" => "string" } },
         }.freeze,
         "custom_fields" => {
           "anyOf" => [
