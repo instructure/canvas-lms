@@ -1429,14 +1429,16 @@ class Attachment < ActiveRecord::Base
     return true if assignment.grants_right?(user, session, :grade)
 
     # submitter
-    student_submission = assignment.submissions.active.where(user_id: user)
-    student_submission.joins(:versions)
-                      .where(%(#{id}=any(regexp_split_to_array((regexp_match(versions.yaml,'attachment_ids: [''"]([0-9,]+)[''"]'))[1], ',')::INT8[])))
-                      .union(
-                        student_submission.joins(:submission_comments)
-                          .merge(SubmissionComment.published.visible)
-                          .where("#{id}=any(regexp_split_to_array(nullif(submission_comments.attachment_ids,''), ',')::INT8[])")
-                      ).exists?
+    assignment.shard.activate do
+      student_submission = assignment.submissions.active.where(user_id: user)
+      student_submission.joins(:versions)
+                        .where(%(#{id}=any(regexp_split_to_array((regexp_match(versions.yaml,'attachment_ids: [''"]([0-9,]+)[''"]'))[1], ',')::INT8[])))
+                        .union(
+                          student_submission.joins(:submission_comments)
+                            .merge(SubmissionComment.published.visible)
+                            .where("#{id}=any(regexp_split_to_array(nullif(submission_comments.attachment_ids,''), ',')::INT8[])")
+                        ).exists?
+    end
   end
 
   def user_can_read_through_context?(user, session, through_assessment: true)
