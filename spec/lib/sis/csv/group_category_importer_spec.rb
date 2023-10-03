@@ -276,5 +276,17 @@ describe SIS::CSV::GroupCategoryImporter do
       expect(new_course.group_categories).to be_empty
       expect(new_course.groups).to be_empty
     end
+
+    it "does not move a group or group category when the group is modified without providing context" do
+      course = course_factory(account: @account, sis_source_id: "c1")
+      group_category = course.group_categories.create!(name: "gc1", sis_source_id: "gc1")
+      group = course.groups.create!(group_category:, name: "g1", sis_source_id: "g1")
+      process_csv_data_cleanly(
+        "group_id,name,status",
+        "g1,g1frd,available"
+      )
+      expect(group.reload.context).to eq course
+      expect(group_category.reload.context).to eq course
+    end
   end
 end

@@ -88,10 +88,15 @@ module SIS
         # group_category's context, so assign context
         if group_category
           context = group_category.context
-          group ? group.group_category = group_category : group = group_category.groups.new(name:, sis_source_id: group_id)
+          if group
+            group.group_category = group_category
+          else
+            group = group_category.groups.new(name:, sis_source_id: group_id)
+          end
         end
-        # no account_id, course_id, or group_category, assign context to root_account
-        context ||= @root_account
+        # no account_id, course_id, or group_category, use the group's existing context if present,
+        # otherwise assign context to root_account
+        context ||= (group&.context || @root_account)
 
         if group&.group_memberships&.exists? &&
            !(context.id == group.context_id && context.class.base_class.name == group.context_type) &&
@@ -108,7 +113,9 @@ module SIS
 
         # ensure that the assigned group.group_category corresponds to the same context_id as the group
         # in the case of an SIS import, the group.group_category may not be set (unless group_category_id was passed)
-        if group&.group_category && group.group_category.context_id != context.id
+        if group&.group_category &&
+           group.group_category.context_id != context.id &&
+           group.group_category.context_type == context.class_name
           group.group_category.update!(context_id: context.id)
         end
 
