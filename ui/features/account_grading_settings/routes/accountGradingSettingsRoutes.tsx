@@ -43,6 +43,7 @@ export const accountGradingSettingsRoutes = [
           <AccountGradingStatuses
             isRootAccount={ENV.IS_ROOT_ACCOUNT}
             rootAccountId={ENV.ROOT_ACCOUNT_ID}
+            isExtendedStatusEnabled={ENV.FEATURES.extended_submission_state}
           />
         ),
       },

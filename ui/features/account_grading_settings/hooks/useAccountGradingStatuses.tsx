@@ -40,7 +40,7 @@ import {
 
 const I18n = useI18nScope('account_grading_status')
 
-export const useAccountGradingStatuses = (accountId: string) => {
+export const useAccountGradingStatuses = (accountId: string, isExtendedStatusEnabled?: boolean) => {
   const [standardStatuses, setStandardStatuses] = useState<GradeStatus[]>([])
   const [customStatuses, setCustomStatuses] = useState<GradeStatus[]>([])
   const [isLoadingStatusError, setIsLoadingStatusError] = useState<boolean>(false)
@@ -82,8 +82,10 @@ export const useAccountGradingStatuses = (accountId: string) => {
     const {account} = fetchStatusesData
     const {customGradeStatusesConnection, standardGradeStatusesConnection} = account
     setCustomStatuses(mapCustomStatusQueryResults(customGradeStatusesConnection.nodes))
-    setStandardStatuses(mapStandardStatusQueryResults(standardGradeStatusesConnection.nodes))
-  }, [fetchStatusesData, fetchStatusesError])
+    setStandardStatuses(
+      mapStandardStatusQueryResults(standardGradeStatusesConnection.nodes, isExtendedStatusEnabled)
+    )
+  }, [fetchStatusesData, fetchStatusesError, isExtendedStatusEnabled])
 
   const saveStandardStatus = async (updatedStatus: GradeStatus) => {
     setHasSaveStandardStatusError(false)
