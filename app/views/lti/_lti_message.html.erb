@@ -16,6 +16,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
+<%
+  form_submission_delay = Setting.get("interop_8200_delay_form_submit_#{@domain_root_account.global_id}", nil)
+  if form_submission_delay.present?
+    js_env({
+      INTEROP_8200_DELAY_FORM_SUBMIT: form_submission_delay.to_i
+    })
+  end
+%>
+
 <% provide :page_title do %><%= @lti_launch.link_text %><% end %>
 
 <% js_bundle :external_tools_show %>
