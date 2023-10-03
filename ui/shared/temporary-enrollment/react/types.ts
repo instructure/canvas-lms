@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// TBD separate API response types from others
 export interface Enrollment {
   id: number
   course_id: number
@@ -26,7 +25,10 @@ export interface Enrollment {
   type: string
 }
 
-export type EnrollmentType = 'provider' | 'recipient' | null
+export const PROVIDER = 'provider' as const
+export const RECIPIENT = 'recipient' as const
+
+export type EnrollmentType = typeof PROVIDER | typeof RECIPIENT | null
 
 export interface User {
   id: number
