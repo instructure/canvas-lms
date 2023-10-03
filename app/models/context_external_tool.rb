@@ -678,9 +678,15 @@ class ContextExternalTool < ActiveRecord::Base
     extension_setting(extension_type, :display_type) || "in_context"
   end
 
+  def lti_1_3_login_url
+    return nil unless use_1_3? && developer_key
+
+    settings.dig("oidc_initiation_urls", shard.database_server.config[:region]) ||
+      developer_key.oidc_initiation_url
+  end
+
   def login_or_launch_url(extension_type: nil, preferred_launch_url: nil)
-    (use_1_3? && developer_key&.oidc_initiation_url) ||
-      launch_url(extension_type:, preferred_launch_url:)
+    lti_1_3_login_url || launch_url(extension_type:, preferred_launch_url:)
   end
 
   def launch_url(extension_type: nil, preferred_launch_url: nil)

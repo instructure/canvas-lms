@@ -31,8 +31,9 @@ module Lti
 
     validates :developer_key_id, :settings, presence: true
     validates :developer_key_id, uniqueness: true
-    validate :valid_configuration?, unless: proc { |c| c.developer_key_id.blank? || c.settings.blank? }
-    validate :valid_placements
+    validate :validate_configuration, unless: proc { |c| c.developer_key_id.blank? || c.settings.blank? }
+    validate :validate_placements
+    validate :validate_oidc_initiation_urls
 
     attr_accessor :configuration_url, :settings_url
 
@@ -140,7 +141,7 @@ module Lti
       developer_key.update_external_tools!
     end
 
-    def valid_configuration?
+    def validate_configuration
       if configuration["public_jwk"].blank? && configuration["public_jwk_url"].blank?
         errors.add(:lti_key, "tool configuration must have public jwk or public jwk url")
       end
@@ -158,11 +159,26 @@ module Lti
       end
     end
 
-    def valid_placements
+    def validate_placements
       return if disabled_placements.blank?
 
       invalid = disabled_placements.reject { |p| Lti::ResourcePlacement::PLACEMENTS.include?(p.to_sym) }
       errors.add(:disabled_placements, "Invalid placements: #{invalid.join(", ")}") if invalid.present?
+    end
+
+    def validate_oidc_initiation_urls
+      urls_hash = configuration&.dig("oidc_initiation_urls")
+      return unless urls_hash.is_a?(Hash)
+
+      urls_hash.each_value do |url|
+        if url.is_a?(String)
+          CanvasHttp.validate_url(url, allowed_schemes: nil)
+        else
+          errors.add(:configuration, "oidc_initiation_urls must be strings")
+        end
+      end
+    rescue CanvasHttp::Error, URI::Error, ArgumentError
+      errors.add(:configuration, "oidc_initiation_urls must be valid urls")
     end
 
     def importable_configuration

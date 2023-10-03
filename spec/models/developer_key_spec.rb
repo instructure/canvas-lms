@@ -1083,6 +1083,11 @@ describe DeveloperKey do
     expect(developer_key_not_saved).not_to be_valid
   end
 
+  it "doesn't allow non-URIs" do
+    developer_key_not_saved.redirect_uris = ["@?!"]
+    expect(developer_key_not_saved).not_to be_valid
+  end
+
   it "returns the correct count of access_tokens" do
     expect(developer_key_saved.access_token_count).to eq 0
 

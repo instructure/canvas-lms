@@ -106,6 +106,11 @@ module Importers
           end
         end
       end
+
+      if hash[:oidc_initiation_urls].is_a?(Hash)
+        settings[:oidc_initiation_urls] = hash[:oidc_initiation_urls]
+      end
+
       settings
     end
 

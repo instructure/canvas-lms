@@ -254,6 +254,53 @@ describe ContextExternalTool do
       it "returns the oidc login url" do
         expect(tool.login_or_launch_url).to eq oidc_initiation_url
       end
+
+      context "when the tool configuration has oidc_initiation_urls" do
+        before do
+          tool.settings["oidc_initiation_urls"] = {
+            "us-west-2" => "http://www.test.com/oidc/login/oregon",
+            "eu-west-1" => "http://www.test.com/oidc/login/ireland"
+          }
+        end
+
+        it "returns the region-specific oidc login url" do
+          allow(Shard.current.database_server).to receive(:config).and_return({ region: "eu-west-1" })
+          expect(tool.login_or_launch_url).to eq "http://www.test.com/oidc/login/ireland"
+        end
+
+        it "falls back to the default oidc login url if there is none for the current region" do
+          allow(Shard.current.database_server).to receive(:config).and_return({ region: "us-east-1" })
+          expect(tool.login_or_launch_url).to eq "http://www.test.com/oidc/login"
+        end
+
+        context "when the developer key and active shard are different from the tool shard" do
+          specs_require_sharding
+
+          it "uses the tool shard for region" do
+            shard1_tool = @shard1.activate do
+              opts = {
+                lti_version: 1.3,
+                developer_key:,
+                settings: {
+                  "oidc_initiation_urls" => {
+                    "us-west-2" => "http://www.test.com/oidc/login/oregon-tool2",
+                    "eu-west-1" => "http://www.test.com/oidc/login/ireland-tool2"
+                  }
+                }
+              }
+              external_tool_model(context: account_model, opts:)
+            end
+
+            @shard2.activate do
+              possible_shards = [developer_key.shard, shard1_tool.shard, Shard.current]
+              expect(possible_shards.map(&:id).uniq.length).to eq(3)
+              allow(shard1_tool.shard.database_server).to receive(:config).and_return({ region: "eu-west-1" })
+              allow(Shard.current.database_server).to receive(:config).and_return({ region: "us-west-2" })
+              expect(shard1_tool.login_or_launch_url).to eq "http://www.test.com/oidc/login/ireland-tool2"
+            end
+          end
+        end
+      end
     end
   end
 
