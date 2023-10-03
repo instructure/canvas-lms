@@ -31,8 +31,52 @@ class Mutations::DiscussionBase < Mutations::BaseMutation
   argument :todo_date, Types::DateTimeType, required: false
   argument :podcast_enabled, Boolean, required: false
   argument :podcast_has_student_posts, Boolean, required: false
-  argument :locked, Boolean, required: false
-  argument :is_announcement, Boolean, required: false
 
   field :discussion_topic, Types::DiscussionType, null: true
+
+  def process_common_inputs(input, is_announcement, discussion_topic)
+    discussion_topic.user = current_user
+    discussion_topic.title = input[:title]
+    discussion_topic.message = input[:message]
+    discussion_topic.workflow_state = (input[:published] || is_announcement) ? "active" : "unpublished"
+    discussion_topic.require_initial_post = input[:require_initial_post] || false
+
+    discussion_topic.allow_rating = input[:allow_rating] || false
+    discussion_topic.only_graders_can_rate = input[:only_graders_can_rate] || false
+
+    unless is_announcement
+      discussion_topic.todo_date = input[:todo_date]
+    end
+
+    discussion_topic.podcast_enabled = input[:podcast_enabled] || false
+    discussion_topic.podcast_has_student_posts = input[:podcast_has_student_posts] || false
+  end
+
+  def process_future_date_inputs(delayed_post_at, lock_at, discussion_topic)
+    discussion_topic.delayed_post_at = delayed_post_at if delayed_post_at
+    discussion_topic.lock_at = lock_at if lock_at
+
+    if discussion_topic.delayed_post_at_changed? || discussion_topic.lock_at_changed?
+      discussion_topic.workflow_state = discussion_topic.should_not_post_yet ? "post_delayed" : discussion_topic.workflow_state
+      if discussion_topic.should_lock_yet
+        discussion_topic.lock(without_save: true)
+      else
+        discussion_topic.unlock(without_save: true)
+      end
+    end
+  end
+
+  def process_locked_parameter(locked, discussion_topic)
+    return unless locked != discussion_topic.locked? && !discussion_topic.lock_at_changed?
+
+    # TODO: Remove this comment when reused for Create/Update...
+    # This makes no sense now but will help in the future when we
+    # want to update the locked state of a discussion topic
+    if locked
+      discussion_topic.lock(without_save: true)
+    else
+      discussion_topic.lock_at = nil
+      discussion_topic.unlock(without_save: true)
+    end
+  end
 end
