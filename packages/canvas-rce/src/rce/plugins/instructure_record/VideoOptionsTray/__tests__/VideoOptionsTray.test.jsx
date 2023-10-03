@@ -21,7 +21,6 @@ import {render, waitFor} from '@testing-library/react'
 
 import VideoOptionsTray from '..'
 import VideoOptionsTrayDriver from './VideoOptionsTrayDriver'
-import RCEGlobals from '../../../../RCEGlobals'
 import {createLiveRegion, removeLiveRegion} from '../../../../__tests__/liveRegionHelper'
 
 jest.useFakeTimers()
@@ -250,28 +249,6 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
           (props.videoOptions.naturalHeight / props.videoOptions.naturalWidth) * 400
         )
         expect(appliedHeight).toEqual(expectedHt)
-      })
-    })
-  })
-
-  describe('Attachment Media Options Tray', () => {
-    it('does not have closed caption controls or title input for locked attachments', () => {
-      RCEGlobals.getConfig = jest.fn().mockReturnValue({lockedAttachments: {10: true}})
-      props.videoOptions = {attachmentId: 10}
-      const {queryByText} = render(<VideoOptionsTray {...props} />)
-      expect(queryByText('Closed Captions/Subtitles')).not.toBeInTheDocument()
-      expect(queryByText('Title')).not.toBeInTheDocument()
-    })
-
-    it('shows closed caption controls and title input for unlocked attachments', async () => {
-      RCEGlobals.getConfig = jest.fn().mockReturnValue({lockedAttachments: {9: true}})
-      props.videoOptions = {attachmentId: 10}
-      renderComponent()
-      await waitFor(() => {
-        expect(tray.$closedCaptionPanel).toBeInTheDocument()
-      })
-      await waitFor(() => {
-        expect(tray.$titleTextField).toBeInTheDocument()
       })
     })
   })

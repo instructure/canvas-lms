@@ -23,7 +23,6 @@ require_relative "../helpers/blueprint_common"
 describe "blueprint courses - file locking" do
   include_context "in-process server selenium tests"
   include_context "blueprint courses files context"
-  include BlueprintCourseCommon
 
   context "In the associated course" do
     before :once do
@@ -105,20 +104,6 @@ describe "blueprint courses - file locking" do
 
       options_button.click
       expect(options_panel).to include_text("Delete")
-    end
-
-    context "with media_links_use_attachment_id ON" do
-      before { Account.site_admin.enable_feature!(:media_links_use_attachment_id) }
-
-      it "loads attachment's locked statuses to the JS environment" do
-        run_master_course_migration(@copy_from)
-        get "/courses/#{@copy_to.id}/files"
-        expect(driver.execute_script("return ENV.CHILD_COURSE_ATTACHMENTS_LOCKED_STATUSES")).to eq({ @copy_to.attachments.last.id.to_s => false })
-        @tag.update!(restrictions: { all: true })
-        run_master_course_migration(@copy_from)
-        get "/courses/#{@copy_to.id}/files"
-        expect(driver.execute_script("return ENV.CHILD_COURSE_ATTACHMENTS_LOCKED_STATUSES")).to eq({ @copy_to.attachments.last.id.to_s => true })
-      end
     end
   end
 

@@ -177,7 +177,6 @@ const RCELoader = {
       highContrastCSS: window.ENV?.url_for_high_contrast_tinymce_editor_css,
       use_rce_icon_maker: shouldUseFeature(Feature.IconMaker, window.ENV),
       features: ENV?.FEATURES || {},
-      lockedAttachments: window.ENV?.CHILD_COURSE_ATTACHMENTS_LOCKED_STATUSES || {},
       flashAlertTimeout: ENV?.flashAlertTimeout || 10000,
       timezone: ENV?.TIMEZONE,
       userCacheKey: ENV?.user_cache_key,
