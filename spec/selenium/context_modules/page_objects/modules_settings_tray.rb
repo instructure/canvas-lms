@@ -22,7 +22,7 @@ require_relative "../../common"
 module ModulesSettingsTray
   #------------------------------ Selectors -----------------------------
   def add_prerequisites_button_selector
-    "//*[@data-testid = 'settings-panel']//button[contains(text(),'Add Prerequisite')]"
+    "//*[@data-testid = 'settings-panel']//button[.//*[.='Prerequisite']]"
   end
 
   def assign_to_panel_selector

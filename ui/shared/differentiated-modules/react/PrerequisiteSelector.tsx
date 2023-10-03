@@ -22,7 +22,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Flex} from '@instructure/ui-flex'
 import {IconButton} from '@instructure/ui-buttons'
 // @ts-expect-error -- remove once on InstUI 8
-import {IconEndLine} from '@instructure/ui-icons'
+import {IconTrashLine} from '@instructure/ui-icons'
 import type {Module} from './types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
@@ -68,7 +68,7 @@ export default function PrerequisiteSelector({
       </FlexItem>
       <FlexItem margin="0 0 0 medium">
         <IconButton
-          renderIcon={<IconEndLine color="secondary" />}
+          renderIcon={<IconTrashLine color="error" />}
           onClick={() => onDropPrerequisite(index)}
           screenReaderLabel={I18n.t('Remove Prerequisite')}
           withBackground={false}
