@@ -48,6 +48,7 @@ export interface EnvContextModules {
   HAS_GRADING_PERIODS?: boolean
   VALID_DATE_RANGE: {
     start_at: {date: string; date_context: string}
+    end_at?: {date: string; date_context: string}
   }
   POST_TO_SIS: boolean
 }

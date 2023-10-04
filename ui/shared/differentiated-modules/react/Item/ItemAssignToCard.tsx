@@ -42,9 +42,9 @@ function arrayEquals(a: any[], b: any[]) {
 }
 
 export interface DateValidatorInputArgs {
-  lock_at?: string
-  unlock_at?: string
-  due_at?: string
+  lock_at: string | null
+  unlock_at: string | null
+  due_at: string | null
   set_type?: string
   course_section_id?: string
   student_ids?: string[]
@@ -52,12 +52,18 @@ export interface DateValidatorInputArgs {
 
 export type ItemAssignToCardProps = {
   cardId: string
+  due_at: string | null
+  unlock_at: string | null
+  lock_at: string | null
   onDelete?: (cardId: string) => void
   onValidityChange?: (cardId: string, isValid: boolean) => void
 }
 
 export default function ItemAssignToCard({
   cardId,
+  due_at,
+  unlock_at,
+  lock_at,
   onDelete,
   onValidityChange,
 }: ItemAssignToCardProps) {
@@ -70,13 +76,9 @@ export default function ItemAssignToCard({
       postToSIS: ENV.POST_TO_SIS && ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT,
     })
   )
-  const [dueDate, setDueDate] = useState<string | undefined>(new Date().toISOString())
-  const [availableFromDate, setAvailableFromDate] = useState<string | undefined>(
-    new Date().toISOString()
-  )
-  const [availableToDate, setAvailableToDate] = useState<string | undefined>(
-    new Date().toISOString()
-  )
+  const [dueDate, setDueDate] = useState<string | null>(due_at)
+  const [availableFromDate, setAvailableFromDate] = useState<string | null>(unlock_at)
+  const [availableToDate, setAvailableToDate] = useState<string | null>(lock_at)
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({})
 
   const handleDelete = useCallback(() => {
@@ -85,21 +87,21 @@ export default function ItemAssignToCard({
 
   const handleDueDateChange = useCallback(
     (_event: React.SyntheticEvent, value: string | undefined) => {
-      setDueDate(value)
+      setDueDate(value || null)
     },
     []
   )
 
   const handleAvailableFromDateChange = useCallback(
     (_event: React.SyntheticEvent, value: string | undefined) => {
-      setAvailableFromDate(value)
+      setAvailableFromDate(value || null)
     },
     []
   )
 
   const handleAvailableToDateChange = useCallback(
     (_event: React.SyntheticEvent, value: string | undefined) => {
-      setAvailableToDate(value)
+      setAvailableToDate(value || null)
     },
     []
   )
@@ -173,7 +175,7 @@ export default function ItemAssignToCard({
           invalidDateTimeMessage={I18n.t('Invalid date')}
           prevMonthLabel={I18n.t('Previous month')}
           nextMonthLabel={I18n.t('Next month')}
-          value={dueDate}
+          value={dueDate || undefined}
           layout="columns"
           messages={validationErrors.due_at ? [{type: 'error', text: validationErrors.due_at}] : []}
           onChange={handleDueDateChange}
@@ -193,7 +195,7 @@ export default function ItemAssignToCard({
           invalidDateTimeMessage={I18n.t('Invalid date')}
           prevMonthLabel={I18n.t('Previous month')}
           nextMonthLabel={I18n.t('Next month')}
-          value={availableFromDate}
+          value={availableFromDate || undefined}
           layout="columns"
           messages={
             validationErrors.unlock_at ? [{type: 'error', text: validationErrors.unlock_at}] : []
@@ -215,7 +217,7 @@ export default function ItemAssignToCard({
           invalidDateTimeMessage={I18n.t('Invalid date')}
           prevMonthLabel={I18n.t('Previous month')}
           nextMonthLabel={I18n.t('Next month')}
-          value={availableToDate}
+          value={availableToDate || undefined}
           layout="columns"
           messages={
             validationErrors.lock_at ? [{type: 'error', text: validationErrors.lock_at}] : []

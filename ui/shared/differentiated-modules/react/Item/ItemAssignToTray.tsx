@@ -17,6 +17,7 @@
  */
 
 import React, {useCallback, useEffect, useState} from 'react'
+import moment from 'moment-timezone'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
@@ -30,9 +31,10 @@ import {
   IconQuizSolid,
   IconQuestionLine,
 } from '@instructure/ui-icons'
+import {useScope as useI18nScope} from '@canvas/i18n'
+import {BaseDateDetails, DateDetails} from './types'
 import ItemAssignToCard from './ItemAssignToCard'
 import TrayFooter from '../Footer'
-import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('differentiated_modules')
 
@@ -49,6 +51,10 @@ function itemTypeToIcon(itemType: string) {
   }
 }
 
+function makeCardId(): string {
+  return uid('assign-to-card', 3)
+}
+
 // TODO: need props to initialize with cards corresponding to current assignments
 export interface ItemAssignToTrayProps {
   open: boolean
@@ -61,12 +67,15 @@ export interface ItemAssignToTrayProps {
   pointsPossible: string
 }
 
-// TODO: will eventually be ItemAssignToCardProps, I think
-interface CardProps {
+// TODO: will eventually be ItemAssignToCardSpec, I think
+interface CardSpec {
   isValid: boolean
+  due_at: string | null
+  unlock_at: string | null
+  lock_at: string | null
 }
 interface CardMap {
-  [key: string]: CardProps
+  [key: string]: CardSpec
 }
 
 export default function ItemAssignToTray({
@@ -79,19 +88,82 @@ export default function ItemAssignToTray({
   moduleItemType,
   pointsPossible,
 }: ItemAssignToTrayProps) {
-  const [assignToCards, setAssignToCards] = useState<CardMap>(() => {
-    const cardId = uid('assign-to-card', 3)
-    return {[cardId]: {isValid: true}} as CardMap
-  })
+  const [assignToCards, setAssignToCards] = useState<CardMap>({})
 
-  // TODO: data needs to come from api
   useEffect(() => {
-    const cardId = uid('assign-to-card', 3)
-    setAssignToCards({[cardId]: {isValid: true}} as CardMap)
+    setTimeout(() => {
+      const courseStart = moment(ENV.VALID_DATE_RANGE?.start_at.date)
+      const dateDetailsApiResponse: DateDetails = {
+        id: 23,
+        due_at: courseStart.clone().add(2, 'day').toISOString(),
+        unlock_at: ENV.VALID_DATE_RANGE?.start_at?.date || null,
+        lock_at: ENV.VALID_DATE_RANGE?.end_at?.date || null,
+        only_visible_to_overrides: false,
+        overrides: [
+          {
+            id: 2,
+            assignment_id: 23,
+            title: 'Section 4',
+            due_at: courseStart.clone().add(4, 'day').toISOString(),
+            all_day: false,
+            all_day_date: '2023-10-02',
+            unlock_at: null,
+            lock_at: null,
+            course_section_id: 4,
+          },
+          {
+            id: 3,
+            assignment_id: 23,
+            title: 'Section 5',
+            due_at: courseStart.clone().add(6, 'day').toISOString(),
+            all_day: false,
+            all_day_date: '2023-10-03',
+            unlock_at: null,
+            lock_at: null,
+            course_section_id: 5,
+          },
+        ],
+      }
+
+      const overrides = dateDetailsApiResponse.overrides
+      delete dateDetailsApiResponse.overrides
+      const baseDates: BaseDateDetails = dateDetailsApiResponse
+
+      const cards: CardMap = {}
+      if ('id' in dateDetailsApiResponse) {
+        const cardId = makeCardId()
+        cards[cardId] = {
+          isValid: true,
+          due_at: baseDates.due_at,
+          unlock_at: baseDates.unlock_at,
+          lock_at: baseDates.lock_at,
+        }
+      }
+      if (overrides?.length) {
+        overrides.forEach(override => {
+          const cardId = makeCardId()
+          cards[cardId] = {
+            isValid: true,
+            due_at: override.due_at,
+            unlock_at: override.unlock_at,
+            lock_at: override.lock_at,
+          }
+        })
+      } else {
+        const cardId = makeCardId()
+        cards[cardId] = {
+          isValid: true,
+          due_at: null,
+          unlock_at: null,
+          lock_at: null,
+        }
+      }
+      setAssignToCards(cards)
+    }, 0)
   }, [courseId, moduleItemId])
 
   const handleAddCard = useCallback(() => {
-    const cardId = uid('assign-to-card', 3)
+    const cardId = makeCardId()
     setAssignToCards({...assignToCards, [cardId]: {isValid: true}} as any)
   }, [assignToCards])
 
@@ -162,8 +234,10 @@ export default function ItemAssignToTray({
       return (
         <View key={cardId} as="div" margin="small 0 0 0">
           <ItemAssignToCard
-            {...props}
             cardId={cardId}
+            due_at={props.due_at}
+            unlock_at={props.unlock_at}
+            lock_at={props.lock_at}
             onDelete={cardCount === 1 ? undefined : handleDeleteCard}
             onValidityChange={handleCardValidityChange}
           />
