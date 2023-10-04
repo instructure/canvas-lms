@@ -46,8 +46,7 @@ environment_configuration(defined?(config) && config) do |config|
 
   # allow debugging only in development environment by default
   if RUBY_ENGINE == "ruby"
-    ENV["RUBY_DEBUG_LAZY"] = "true"
-    require "debug"
+    require "debug/prelude"
     if ENV["REMOTE_DEBUGGING_ENABLED"]
       if defined?(PhusionPassenger)
         # only initialize in forked child process (to prevent EADDRINUSE)
