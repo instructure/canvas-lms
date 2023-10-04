@@ -34,7 +34,11 @@ module ConditionalRelease
         return render json: { message: "student_id required" }, status: :bad_request
       end
 
-      render json: Stats.student_details(rule, student_id)
+      if rule.trigger_assignment&.assigned_students&.find_by(id: student_id)
+        return render json: Stats.student_details(rule, student_id)
+      end
+
+      render json: { message: "student not assigned to assignment" }, status: :bad_request
     end
 
     private
