@@ -1,9 +1,6 @@
 version: '2.3'
 services:
-  web: &DEBUG
+  web:
     environment:
       REMOTE_DEBUGGING_ENABLED: 1
-      RUBY_DEBUG_PORT: 4363
-      RUBY_DEBUG_HOST: "*"
-    ports:
-      - "4363:4363"
+      USER: docker

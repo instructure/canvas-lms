@@ -115,35 +115,31 @@ Changes you're making are not showing up? See the Caveats section below.
 
 
 ### With VS Code
-Canvas supports the [vscode-rdbg](https://github.com/ruby/vscode-rdbg) extension to establish
-communication between the debugger engine and VS Code.
 
-#### Example VS Code Configuration
-1. Add `docker-compose/rdbg.override.yml` to the `COMPOSE_FILE` variable in the `.env` file. Example:
+First you'll need to enable the specific debug configuration for VSCode by
+adding `docker-compose/rdbg.override.yml` to the `COMPOSE_FILE` variable in the
+`.env` file. Example:
 ```
 COMPOSE_FILE=docker-compose.yml:docker-compose.override.yml:docker-compose/rdbg.override.yml
 ```
-2. Install the VS Code extension from [the Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=KoichiSasada.vscode-rdbg)
-3. Create a `.vscode/launch.json` file at the repo root, mirroring the contents of `.vscode/launch.json.example`.
-4. Press F5, set breakpoints, and start debugging!
+
+Once you have built your container, open the folder in VSCode.
+If you don't already have the Dev Containers extension installed, it will prompt you that it is a recommended extension.
+Once that is installed, it should prompt you to reopen the folder in the container.
+Go ahead and do so.
+Debug configurations will already be set up.
+You can attach to the currently running web server, or run specs for the currently active spec file.
 
 ### Debugging
 
 A Ruby debug server is running in development mode on the web and job containers
 to allow you to remotely control any sessions where the debugger has yielded
-execution. To use it, you will need to enable `REMOTE_DEBUGGING_ENABLED` in your
-`docker-compose.<user>.override.yml` file in your app's root directory. If you don't have
-this file, you will need to create it and add the following:
-
+execution. To use it, you will need to enable `REMOTE_DEBUGGING_ENABLED`.
+You can easily add it by adding `docker-compose/rdbg.override.yml` to the
+`COMPOSE_FILE` variable in the `.env` file. Example:
 ```
-version: '2.3'
-services:
-  web:
-    environment:
-      REMOTE_DEBUGGING_ENABLED: 'true'
+COMPOSE_FILE=docker-compose.yml:docker-compose.override.yml:docker-compose/rdbg.override.yml
 ```
-
-Make sure you add this new file to your `COMPOSE_FILE` var in `.env`.
 
 You can attach to the server once the container is started:
 

@@ -1,0 +1,16 @@
+{
+	"name": "canvas-lms",
+	"dockerComposeFile": [],
+	"service": "web",
+	"workspaceFolder": "/usr/src/app",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"koichisasada.vscode-rdbg",
+				"ms-azuretools.vscode-docker",
+				"redhat.vscode-yaml",
+				"Shopify.ruby-lsp"
+			]
+		}
+	}
+}
