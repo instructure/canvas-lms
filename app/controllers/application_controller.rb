@@ -378,6 +378,7 @@ class ApplicationController < ActionController::Base
     lti_assignment_page_line_items
     mobile_offline_mode
     react_discussions_post
+    instui_nav
   ].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = [
     :embedded_release_notes
