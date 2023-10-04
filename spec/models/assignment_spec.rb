@@ -7667,7 +7667,7 @@ describe Assignment do
       expect(submission_user_ids.sort).to eq [s1.id, s2.id]
     end
 
-    it "works with groups that has number more than 2 strings separeted by underscore" do
+    it "works with groups that has number more than 2 strings separated by underscore" do
       s1, s2 = @students
 
       gc = @course.group_categories.create! name: "12345 Groups"
@@ -7696,6 +7696,47 @@ describe Assignment do
                          grade_group_students_individually: false
       g1, _g2 = Array.new(2) { |i| gc.groups.create! name: "eval123group_12345#{i}", context: @course }
 
+      g1.add_user(s1)
+      g1.add_user(s2)
+
+      submit_homework(s1)
+
+      generate_comments(@teacher)
+      results = @assignment.submission_reupload_progress.results
+      submission_user_ids = results[:comments].map { |c| c[:submission][:user_id] }
+
+      expect(submission_user_ids.sort).to eq [s1.id, s2.id]
+    end
+
+    it "works when the group name is numbers only with one or more spaces" do
+      s1, s2 = @students
+
+      gc = @course.group_categories.create! name: "12345 Groups"
+      @assignment.update group_category_id: gc.id,
+                         grade_group_students_individually: false
+
+      g1 = gc.groups.create!(name: "1 2", context: @course)
+      g1.add_user(s1)
+      g1.add_user(s2)
+
+      submit_homework(s1)
+
+      generate_comments(@teacher)
+      results = @assignment.submission_reupload_progress.results
+      submission_user_ids = results[:comments].map { |c| c[:submission][:user_id] }
+
+      expect(submission_user_ids.sort).to eq [s1.id, s2.id]
+    end
+
+    it "works when there's a group name that matches the end of a student's ID" do
+      s1, s2 = @students
+
+      gc = @course.group_categories.create! name: "12345 Groups"
+      @assignment.update group_category_id: gc.id,
+                         grade_group_students_individually: false
+
+      g1 = gc.groups.create!(name: "012345", context: @course)
+      gc.groups.create!(name: s1.id.to_s.last, context: @course)
       g1.add_user(s1)
       g1.add_user(s2)
 
@@ -11156,11 +11197,11 @@ describe Assignment do
     @assignment.reload
   end
 
-  def submit_homework(student)
+  def submit_homework(student, filename: "homework.pdf")
     file_context = @assignment.group_category.group_for(student) if @assignment.has_group_category?
     file_context ||= student
     a = Attachment.create! context: file_context,
-                           filename: "homework.pdf",
+                           filename:,
                            uploaded_data: StringIO.new("blah blah blah")
     @assignment.submit_homework(student,
                                 attachments: [a],
