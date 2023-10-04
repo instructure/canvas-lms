@@ -20,11 +20,21 @@ import React from 'react'
 import {Navigation} from '@instructure/ui-navigation'
 import {Badge} from '@instructure/ui-badge'
 import {Avatar} from '@instructure/ui-avatar'
-import {IconAdminLine, IconDashboardLine, IconUserLine, IconInboxLine} from '@instructure/ui-icons'
+import {
+  IconAdminLine,
+  IconDashboardLine,
+  IconUserLine,
+  IconInboxLine,
+  IconCanvasLogoSolid,
+} from '@instructure/ui-icons'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('new_user_tutorial')
 
 const SideNav = () => {
   return (
-    <div>
+    <div style={{height: '100vh'}} data-testid="sidenav-container">
       <Navigation
         label="Main navigation"
         toggleLabel={{
@@ -32,6 +42,18 @@ const SideNav = () => {
           minimizedLabel: 'Expand Navigation',
         }}
       >
+        <Navigation.Item
+          icon={<IconCanvasLogoSolid size="medium" data-testid="icon-canvas-logo" />}
+          label={<ScreenReaderContent>{I18n.t('Home')}</ScreenReaderContent>}
+          href="#"
+          themeOverride={{
+            iconColor: 'white',
+            contentPadding: '1rem',
+            backgroundColor: 'transparent',
+            hoverBackgroundColor: 'transparent',
+          }}
+          data-testid="sidenav-header-logo"
+        />
         <Navigation.Item
           icon={<Avatar name="Ziggy Marley" size="x-small" />}
           label="Account"
