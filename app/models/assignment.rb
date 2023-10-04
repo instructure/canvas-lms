@@ -3272,7 +3272,10 @@ class Assignment < ActiveRecord::Base
     # last value and strip off everything after the first period.
 
     # remove group name from file name
-    student_group_names.each { |group_name| filename.sub!("#{group_name}_", "") }
+    matched_group_name = student_group_names.find { |group_name| filename.match?(/^#{Regexp.quote(group_name)}_/) }
+    if matched_group_name
+      filename.sub!(/^#{Regexp.quote(matched_group_name)}_/, "")
+    end
 
     split_filename = filename.split("_") - ["LATE"]
 
@@ -4200,6 +4203,7 @@ class Assignment < ActiveRecord::Base
     # ids when teachers upload graded submissions
     user_name.gsub!(/_(\d+)_/, '\1')
     user_name.gsub!(/^(\d+)$/, '\1')
+    user_name.gsub!(/[^[[:word:]]]/, "")
     user_name.downcase
   end
 
