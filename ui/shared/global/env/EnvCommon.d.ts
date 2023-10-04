@@ -209,6 +209,7 @@ export type RootAccountFeatureId =
   | 'send_usage_metrics'
   | 'rce_transform_loaded_content'
   | 'mobile_offline_mode'
+  | 'instui_nav'
 
 /**
  * From ApplicationController#JS_ENV_BRAND_ACCOUNT_FEATURES
