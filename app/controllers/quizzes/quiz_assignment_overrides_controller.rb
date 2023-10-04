@@ -104,7 +104,7 @@ class Quizzes::QuizAssignmentOverridesController < ApplicationController
   # Retrieve the actual due-at, unlock-at, and available-at dates for quizzes
   # based on the assignment overrides active for the current API user.
   #
-  # @argument quiz_assignment_overrides[0][quiz_ids][] [Optional, Integer|String]
+  # @argument quiz_assignment_overrides[][quiz_ids][] [Optional, Integer|String]
   #   An array of quiz IDs. If omitted, overrides for all quizzes available to
   #   the operating user will be returned.
   #
@@ -133,7 +133,7 @@ class Quizzes::QuizAssignmentOverridesController < ApplicationController
   # Retrieve the actual due-at, unlock-at, and available-at dates for quizzes
   # based on the assignment overrides active for the current API user.
   #
-  # @argument quiz_assignment_overrides[0][quiz_ids][] [Optional, Integer|String]
+  # @argument quiz_assignment_overrides[][quiz_ids][] [Optional, Integer|String]
   #   An array of quiz IDs. If omitted, overrides for all quizzes available to
   #   the operating user will be returned.
   #
