@@ -31,6 +31,13 @@ describe Message do
     end
   end
 
+  describe "#notification_targets" do
+    it "returns an empty array when path_type is 'twitter' and no twitter service exists" do
+      message_model(path_type: "twitter", user: user_factory(active_all: true))
+      expect(@message.notification_targets).to eq []
+    end
+  end
+
   describe "#populate body" do
     it "saves an html body if a template exists" do
       expect_any_instance_of(Message).to receive(:apply_html_template).and_return("template")

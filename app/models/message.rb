@@ -819,7 +819,7 @@ self.user,
       user.notification_endpoints.pluck(:arn)
     when "twitter"
       twitter_service = user.user_services.where(service: "twitter").first
-      return nil unless twitter_service
+      return [] unless twitter_service
 
       [
         "access_token" => twitter_service.token,
