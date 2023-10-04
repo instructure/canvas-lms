@@ -22,10 +22,18 @@ module Types
   class RubricRatingType < ApplicationObjectType
     description "Possible rating for a rubric criterion"
 
+    def initialize(object, context)
+      @rubric_id = context[:rubric_id]
+      super(object, context)
+    end
+
     implements Interfaces::LegacyIDInterface
 
     field :description, String, null: false
     field :long_description, String, null: true
     field :points, Float, null: false
+
+    field :rubric_id, ID, null: false
+    attr_reader :rubric_id
   end
 end

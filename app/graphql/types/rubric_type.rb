@@ -28,6 +28,10 @@ module Types
     field :criteria, [RubricCriterionType], <<~MD, null: false
       The different criteria that makes up this rubric
     MD
+    def criteria
+      context[:rubric_id] = object.id
+      object.criteria
+    end
 
     field :free_form_criterion_comments, Boolean, null: false
     def free_form_criterion_comments
