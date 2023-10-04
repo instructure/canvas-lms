@@ -76,7 +76,7 @@ GEM
       activerecord (>= 6.0, < 7.1)
       railties (>= 6.0, < 7.1)
     parallel (1.23.0)
-    parser (3.2.2.3)
+    parser (3.2.2.4)
       ast (~> 2.4.1)
       racc
     racc (1.7.1)
