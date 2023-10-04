@@ -236,7 +236,7 @@ describe MasterCourses::MasterMigration do
         @original_assignment.touch
         run_master_migration
 
-        # The one line item downstream change stops assignment synch as a whole
+        # The one line item downstream change stops assignment sync as a whole
         expect(@assignment_copy.reload.title).to eq("updated assignment title")
         expect(@line_item_copy.reload.label).to eq("updated assignment title")
         expect(@line_item_copy.reload.resource_id).to eq("downstream_resource_id")
@@ -259,7 +259,7 @@ describe MasterCourses::MasterMigration do
     end
 
     context "with blueprint_line_item_support OFF" do
-      it "respects line item downstream editing and assignment locking" do
+      it "ignores downstream editing" do
         Account.site_admin.disable_feature! :blueprint_line_item_support
 
         expect(@original_line_item.resource_id).to eq("some_resource_id")
@@ -273,11 +273,23 @@ describe MasterCourses::MasterMigration do
         @original_line_item.update!(resource_id: "updated_resource_id AGAIN")
         @original_assignment.update!(title: "updated assignment title AGAIN")
         @original_assignment.touch
-        run_master_migration
-
+        Timecop.freeze(1.minute.from_now) { run_master_migration }
         expect(@assignment_copy.reload.title).to eq("updated assignment title AGAIN")
         expect(@line_item_copy.reload.label).to eq("updated assignment title AGAIN")
         expect(@line_item_copy.reload.resource_id).to eq("updated_resource_id AGAIN")
+      end
+
+      it "ignores assignment locking" do
+        Account.site_admin.disable_feature! :blueprint_line_item_support
+        expect(@original_line_item.resource_id).to eq("some_resource_id")
+
+        @template.content_tag_for(@original_assignment).update_attribute(:restrictions, { content: true })
+        @original_line_item.update!(resource_id: "updated_resource_id")
+        @original_assignment.update!(title: "updated assignment title")
+
+        Timecop.freeze(1.minute.from_now) { run_master_migration }
+        expect(@line_item_copy.reload.label).to eq("updated assignment title")
+        expect(@line_item_copy.reload.resource_id).to eq("updated_resource_id")
       end
     end
   end

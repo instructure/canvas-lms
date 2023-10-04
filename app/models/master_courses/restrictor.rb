@@ -101,6 +101,8 @@ module MasterCourses::Restrictor
     def check_for_restricted_column_changes
       return true if !check_restrictions? || skip_restrictions?
 
+      return true if is_a?(Lti::LineItem) && !Account.site_admin.feature_enabled?(:blueprint_line_item_support) # hopefully remove when the FF is retired
+
       locked_columns = []
       self.class.base_class.restricted_column_settings.each do |type, columns|
         changed_columns = (changes.keys & columns)
