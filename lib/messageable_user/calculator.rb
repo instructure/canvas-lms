@@ -538,7 +538,17 @@ class MessageableUser
       end
       state_clauses.compact!
       return nil if state_clauses.empty?
-      "(#{state_clauses.join(' OR ')}) AND enrollments.type != 'StudentViewEnrollment'"
+
+      teacher_message_conditions = "(#{state_clauses.join(' OR ')}) AND enrollments.type != 'StudentViewEnrollment'"
+      teacher_message_conditions << primary_teacher_enrollment_conditions if options[:primary_teacher_only]
+      teacher_message_conditions
+    end
+
+    def self.primary_teacher_enrollment_conditions()
+      # We want to include a messaging group for primary teachers, but not for non-primary teacher roles,
+      # such as Synchronous Teacher, Community Lead Teacher, Learning Success Partner etc. However, we do still want
+      # to make TA's messageable, so only the non-primary teacher roles are excluded.
+      " AND (enrollments.type != 'TeacherEnrollment' OR (enrollments.type = 'TeacherEnrollment' AND roles.name = 'TeacherEnrollment'))"
     end
 
     def base_scope(options={})
@@ -565,11 +575,12 @@ class MessageableUser
     def enrollment_scope(options={})
       options = {
         :common_course_column => 'enrollments.course_id',
-        :common_role_column => 'enrollments.type'
+        :common_role_column => 'enrollments.type',
+        :primary_teacher_only => true
       }.merge(options)
       scope = base_scope(options)
       scope = scope.joins("INNER JOIN #{Enrollment.quoted_table_name} ON enrollments.user_id=users.id")
-
+      scope = scope.joins("LEFT JOIN #{Role.quoted_table_name} ON roles.id=enrollments.role_id")
       enrollment_conditions = self.class.enrollment_conditions(options)
       if enrollment_conditions
         scope = scope.joins("INNER JOIN #{Course.quoted_table_name} ON courses.id=enrollments.course_id") unless options[:course_workflow_state]
@@ -790,6 +801,7 @@ class MessageableUser
             enrollments.user_id=users.id AND
             enrollments.course_id=groups.context_id
           INNER JOIN #{Course.quoted_table_name} ON courses.id=enrollments.course_id
+          LEFT JOIN roles ON roles.id = enrollments.role_id
         SQL
         where(:workflow_state => 'accepted').
         where("groups.workflow_state<>'deleted'").

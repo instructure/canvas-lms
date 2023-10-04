@@ -38,11 +38,11 @@ class Login::Oauth2Controller < Login::OauthBaseController
       unique_id = @aac.unique_id(token)
       provider_attributes = @aac.provider_attributes(token)
 
-      if identity_v2_applicable? && @aac&.admin_role?(token)
+      if identity_v2_applicable? && @aac&.aad_account?(token)
         unless unique_id && Pseudonym.exists?(integration_id: unique_id)
           unique_id = @aac.identity_email_address(token)
         end
-        provider_attributes["is_admin"] = true
+        provider_attributes["is_aad_user"] = true
       end
     end
 
