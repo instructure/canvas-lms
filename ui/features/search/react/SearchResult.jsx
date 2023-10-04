@@ -20,6 +20,7 @@ import React, { useState } from 'react'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {Rating} from '@instructure/ui-rating'
+import {Tooltip} from '@instructure/ui-tooltip'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('SmartSearch')
@@ -33,12 +34,23 @@ export default function SearchResult(props) {
     return str
   }
 
-  // TODO: Make this more user friendly and add I18n
+  // Cosine distance = 1 — cosine similarity.
+  // Range of cosine distance is from 0 to 2,
+  // 0 — identical vectors, 1 — no correlation,
+  // 2 — absolutely different.
+  // We are interested in range of 0 to 1, so we
+  // subtract the distance from 1 and multiply by 100.
+
   function getRelevance(record) {
+    let relevance = 100.0 * (1.0 - record.distance)
+    let tooltipText = `
+      ${I18n.t('Relevance')}: ${Math.round(relevance)}%
+      ${I18n.t('Distance')}: ${record.distance.toFixed(3)}
+    `
     return (
-      <View as="div">
-        <Text>Distance: {record.distance}</Text>
-      </View>
+        <Tooltip renderTip={tooltipText} as="span">
+          <Rating label={I18n.t('Relevance')} valueNow={relevance} iconCount={5} valueMax={100} />
+        </Tooltip>
     )
   }
 
@@ -55,7 +67,7 @@ export default function SearchResult(props) {
         shadow="resting"
       >
         <h3>{wiki_page.title}</h3>
-        <span>{I18n.t('Course Page')}</span>
+        <h4>{I18n.t('Course Page')}</h4>
         <Text
           as="div"
           size="medium"
@@ -63,8 +75,12 @@ export default function SearchResult(props) {
         >
           {ellipsize(wiki_page.body_text, 1000)}
         </Text>
-        {getRelevance(wiki_page)}
-        <a href={wiki_page.url} target="_blank">{I18n.t('View Full Page')}</a>
+        <View as="div">
+          {getRelevance(wiki_page)}
+        </View>
+        <View as="div">
+          <a href={wiki_page.url} target="_blank">{I18n.t('View Full Page')}</a>
+        </View>
       </View>
     )
   } else if (props.searchResult.discussion_topic) {
