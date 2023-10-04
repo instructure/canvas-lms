@@ -25,6 +25,20 @@ export type UnknownSubset<T> = {
 }
 
 describe('ItemAssignToTray', () => {
+  beforeAll(() => {
+    // @ts-expect-error
+    window.ENV ||= {}
+    ENV.VALID_DATE_RANGE = {
+      start_at: {date: '2023-08-20T22:00:00Z', date_context: 'course'},
+      end_at: {date: '2023-12-30T23:00:00Z', date_context: 'course'},
+    }
+    ENV.HAS_GRADING_PERIODS = false
+    // @ts-expect-error
+    ENV.SECTION_LIST = [{id: '4'}, {id: '5'}]
+    ENV.POST_TO_SIS = false
+    ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT = false
+  })
+
   const props: ItemAssignToTrayProps = {
     open: true,
     onDismiss: () => {},
@@ -39,12 +53,14 @@ describe('ItemAssignToTray', () => {
   const renderComponent = (overrides: UnknownSubset<ItemAssignToTrayProps> = {}) =>
     render(<ItemAssignToTray {...props} {...overrides} />)
 
-  it('renders', () => {
-    const {getByText, getByLabelText, getAllByTestId} = renderComponent()
+  it('renders', async () => {
+    const {getByText, getByLabelText, findAllByTestId} = renderComponent()
     expect(getByText('Item Name')).toBeInTheDocument()
     expect(getByText('Assignment | 10 pts')).toBeInTheDocument()
     expect(getByLabelText('Edit assignment Item Name')).toBeInTheDocument()
-    expect(getAllByTestId('item-assign-to-card')).toHaveLength(1)
+    // the tray is mocking an api response that makes 3 cards
+    const cards = await findAllByTestId('item-assign-to-card')
+    expect(cards).toHaveLength(3)
   })
 
   it('renders a quiz', () => {
@@ -79,19 +95,20 @@ describe('ItemAssignToTray', () => {
     expect(onSave).toHaveBeenCalled()
   })
 
-  it('adds a card when add button is clicked', () => {
-    const {getByRole, getAllByTestId} = renderComponent()
-    expect(getAllByTestId('item-assign-to-card')).toHaveLength(1)
+  it('adds a card when add button is clicked', async () => {
+    const {getByRole, findAllByTestId, getAllByTestId} = renderComponent()
+    const cards = await findAllByTestId('item-assign-to-card')
+    expect(cards).toHaveLength(3)
     getByRole('button', {name: 'Add'}).click()
-    expect(getAllByTestId('item-assign-to-card')).toHaveLength(2)
+    expect(getAllByTestId('item-assign-to-card')).toHaveLength(4)
   })
 
-  it('deletes a card when delete button is clicked', () => {
-    const {getByRole, getAllByRole, getAllByTestId} = renderComponent()
-    getByRole('button', {name: 'Add'}).click()
-    expect(getAllByTestId('item-assign-to-card')).toHaveLength(2)
+  it('deletes a card when delete button is clicked', async () => {
+    const {getAllByRole, findAllByTestId, getAllByTestId} = renderComponent()
+    const cards = await findAllByTestId('item-assign-to-card')
+    expect(cards).toHaveLength(3)
     getAllByRole('button', {name: 'Delete'})[1].click()
-    expect(getAllByTestId('item-assign-to-card')).toHaveLength(1)
+    expect(getAllByTestId('item-assign-to-card')).toHaveLength(2)
   })
 
   it('disables the save button when no cards are invalid', () => {
