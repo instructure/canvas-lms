@@ -20,7 +20,7 @@
 # Non-standard Canvas extension to Bundler behavior -- load the Gemfiles from
 # plugins.
 
-if CANVAS_INCLUDE_PLUGINS
+if @include_plugins
   gemfile_root.glob("../gems/plugins/*/Gemfile.d/*") do |g|
     next if g.basename == "_before.rb"
 

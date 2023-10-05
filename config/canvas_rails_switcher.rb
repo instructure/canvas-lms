@@ -29,13 +29,13 @@
 # the default version (corresponding to the bare Gemfile.lock) must be listed first
 SUPPORTED_RAILS_VERSIONS = %w[7.0].freeze
 
-unless defined?(CANVAS_RAILS)
+unless defined?($canvas_rails)
   file_path = File.expand_path("RAILS_VERSION", __dir__)
 
   if ENV["CANVAS_RAILS"]
-    CANVAS_RAILS = ENV["CANVAS_RAILS"]
+    $canvas_rails = ENV["CANVAS_RAILS"]
   elsif File.exist?(file_path)
-    CANVAS_RAILS = File.read(file_path).strip
+    $canvas_rails = File.read(file_path).strip
   else
     begin
       # have to do the consul communication without any gems, because
@@ -63,13 +63,13 @@ unless defined?(CANVAS_RAILS)
           break if result
         end
       end
-      CANVAS_RAILS = result ? Base64.decode64(JSON.parse(result.body).first["Value"]).strip : SUPPORTED_RAILS_VERSIONS.first
+      $canvas_rails = result ? Base64.decode64(JSON.parse(result.body).first["Value"]).strip : SUPPORTED_RAILS_VERSIONS.first
     rescue
-      CANVAS_RAILS = SUPPORTED_RAILS_VERSIONS.first
+      $canvas_rails = SUPPORTED_RAILS_VERSIONS.first
     end
   end
 end
 
-unless SUPPORTED_RAILS_VERSIONS.any?(CANVAS_RAILS)
-  raise "unsupported Rails version specified #{CANVAS_RAILS}"
+unless SUPPORTED_RAILS_VERSIONS.any?($canvas_rails)
+  raise "unsupported Rails version specified #{$canvas_rails}"
 end
