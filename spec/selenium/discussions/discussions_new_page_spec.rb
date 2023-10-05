@@ -700,5 +700,121 @@ describe "discussions" do
         expect(f("body")).not_to contain_jqcss "input[value='add-to-student-to-do']"
       end
     end
+
+    context "editing" do
+      before do
+        user_session(teacher)
+      end
+
+      context "discussion" do
+        before do
+          # TODO: Update to cover: graded, group discussions, file attachment, any other options later implemented
+          all_discussion_options_enabled = {
+            title: "value for title",
+            message: "value for message",
+            is_anonymous_author: false,
+            anonymous_state: "full_anonymity",
+            todo_date: "Thu, 12 Oct 2023 15:59:59.000000000 UTC +00:00",
+            allow_rating: true,
+            only_graders_can_rate: true,
+            podcast_enabled: true,
+            podcast_has_student_posts: true,
+            require_initial_post: true,
+            discussion_type: "side_comment",
+            delayed_post_at: "Tue, 10 Oct 2023 16:00:00.000000000 UTC +00:00",
+            lock_at: "Wed, 11 Nov 2023 15:59:59.999999000 UTC +00:00",
+            is_section_specific: false,
+          }
+
+          @topic_all_options = course.discussion_topics.create!(all_discussion_options_enabled)
+          @topic_no_options = course.discussion_topics.create!(title: "no options enabled - topic", message: "test")
+        end
+
+        it "displays all selected options correctly" do
+          get "/courses/#{course.id}/discussion_topics/#{@topic_all_options.id}/edit"
+
+          expect(f("input[value='full_anonymity']").selected?).to be_truthy
+          expect(f("input[value='full_anonymity']").attribute("disabled")).to eq "true"
+
+          expect(f("input[value='must-respond-before-viewing-replies']").selected?).to be_truthy
+          expect(f("input[value='enable-podcast-feed']").selected?).to be_truthy
+          expect(f("input[value='include-student-replies-in-podcast-feed']").selected?).to be_truthy
+          expect(f("input[value='allow-liking']").selected?).to be_truthy
+          expect(f("input[value='only-graders-can-like']").selected?).to be_truthy
+          expect(f("input[value='add-to-student-to-do']").selected?).to be_truthy
+
+          # Just checking for a value. Formatting and TZ differences between front-end and back-end
+          # makes an exact comparison too fragile.
+          expect(ff("input[placeholder='Select Date']")[0].attribute("value")).to be_truthy
+          expect(ff("input[placeholder='Select Date']")[1].attribute("value")).to be_truthy
+        end
+
+        it "displays all unselected options correctly" do
+          get "/courses/#{course.id}/discussion_topics/#{@topic_no_options.id}/edit"
+
+          expect(f("input[value='full_anonymity']").selected?).to be_falsey
+          expect(f("input[value='full_anonymity']").attribute("disabled")).to eq "true"
+
+          # There are less checks here because certain options are only visible if their parent input is selected
+          expect(f("input[value='must-respond-before-viewing-replies']").selected?).to be_falsey
+          expect(f("input[value='enable-podcast-feed']").selected?).to be_falsey
+          expect(f("input[value='allow-liking']").selected?).to be_falsey
+          expect(f("input[value='add-to-student-to-do']").selected?).to be_falsey
+
+          # Just checking for a value. Formatting and TZ differences between front-end and back-end
+          # makes an exact comparison too fragile.
+          expect(ff("input[placeholder='Select Date']")[0].attribute("value")).to eq("")
+          expect(ff("input[placeholder='Select Date']")[1].attribute("value")).to eq("")
+        end
+      end
+
+      context "announcement" do
+        before do
+          # TODO: Update to cover: file attachments and any other options later implemented
+          all_announcement_options = {
+            title: "value for title",
+            message: "value for message",
+            delayed_post_at: "Thu, 16 Nov 2023 17:00:00.000000000 UTC +00:00",
+            podcast_enabled: true,
+            podcast_has_student_posts: true,
+            require_initial_post: true,
+            discussion_type: "side_comment",
+            allow_rating: true,
+            only_graders_can_rate: true,
+            locked: false,
+          }
+
+          @announcement_all_options = course.announcements.create!(all_announcement_options)
+          # In this case, locked: true displays itself as an unchecked "allow participants to comment" option
+          @announcement_no_options = course.announcements.create!({ title: "no options", message: "nothing else", locked: true })
+        end
+
+        it "displays all selected options correctly" do
+          get "/courses/#{course.id}/discussion_topics/#{@announcement_all_options.id}/edit"
+
+          expect(f("input[value='enable-delay-posting']").selected?).to be_truthy
+          expect(f("input[value='enable-participants-commenting']").selected?).to be_truthy
+          expect(f("input[value='must-respond-before-viewing-replies']").selected?).to be_truthy
+          expect(f("input[value='allow-liking']").selected?).to be_truthy
+          expect(f("input[value='only-graders-can-like']").selected?).to be_truthy
+          expect(f("input[value='enable-podcast-feed']").selected?).to be_truthy
+          expect(f("input[value='include-student-replies-in-podcast-feed']").selected?).to be_truthy
+
+          # Just checking for a value. Formatting and TZ differences between front-end and back-end
+          # makes an exact comparison too fragile.
+          expect(ff("input[placeholder='Select Date']")[0].attribute("value")).to be_truthy
+        end
+
+        it "displays all unselected options correctly" do
+          get "/courses/#{course.id}/discussion_topics/#{@announcement_no_options.id}/edit"
+
+          expect(f("input[value='enable-delay-posting']").selected?).to be_falsey
+          expect(f("input[value='enable-participants-commenting']").selected?).to be_falsey
+          expect(f("input[value='must-respond-before-viewing-replies']").selected?).to be_falsey
+          expect(f("input[value='allow-liking']").selected?).to be_falsey
+          expect(f("input[value='enable-podcast-feed']").selected?).to be_falsey
+        end
+      end
+    end
   end
 end

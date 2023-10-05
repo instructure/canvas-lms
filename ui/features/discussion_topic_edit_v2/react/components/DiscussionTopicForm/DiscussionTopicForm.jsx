@@ -131,8 +131,11 @@ export default function DiscussionTopicForm({
 
     setTitle(currentDiscussionTopic.title)
     setRceContent(currentDiscussionTopic.message)
-
-    setSectionIdsToPostTo(currentDiscussionTopic.courseSections.map(section => section._id))
+    const sectionIds =
+      currentDiscussionTopic.courseSections && currentDiscussionTopic.courseSections.length > 0
+        ? currentDiscussionTopic.courseSections.map(section => section._id)
+        : ['all']
+    setSectionIdsToPostTo(sectionIds)
     setDiscussionAnonymousState(currentDiscussionTopic.anonymousState || 'off')
     setAnonymousAuthorState(currentDiscussionTopic.isAnonymousAuthor)
     setRequireInitialPost(currentDiscussionTopic.requireInitialPost)
@@ -148,9 +151,11 @@ export default function DiscussionTopicForm({
 
     setAvailableFrom(currentDiscussionTopic.delayedPostAt)
     setAvailableUntil(currentDiscussionTopic.lockAt)
+    setDelayPosting(!!currentDiscussionTopic.delayedPostAt && isAnnouncement)
+    setLocked(currentDiscussionTopic.locked && isAnnouncement)
 
     setPublished(currentDiscussionTopic.published)
-  }, [isEditing, currentDiscussionTopic, discussionAnonymousState])
+  }, [isEditing, currentDiscussionTopic, discussionAnonymousState, isAnnouncement])
 
   const validateTitle = newTitle => {
     if (newTitle.length > 255) {
@@ -208,7 +213,7 @@ export default function DiscussionTopicForm({
         availableUntil,
         shouldPublish: isEditing ? published : shouldPublish,
         locked,
-        isAnnouncement
+        isAnnouncement,
       })
       return true
     }
@@ -356,20 +361,18 @@ export default function DiscussionTopicForm({
             />
           )}
           {delayPosting && (
-            <View display="block" padding="none none none large" data-testid="delay-posting">
-              <DateTimeInput
-                description={I18n.t('Post At')}
-                prevMonthLabel={I18n.t('previous')}
-                nextMonthLabel={I18n.t('next')}
-                onChange={(_event, newDate) => setAvailableFrom(newDate)}
-                value={availableFrom}
-                invalidDateTimeMessage={I18n.t('Invalid date and time')}
-                layout="columns"
-                datePlaceholder={I18n.t('Select Date')}
-                dateRenderLabel=""
-                timeRenderLabel=""
-              />
-            </View>
+            <DateTimeInput
+              description={I18n.t('Post At')}
+              prevMonthLabel={I18n.t('previous')}
+              nextMonthLabel={I18n.t('next')}
+              onChange={(_event, newDate) => setAvailableFrom(newDate)}
+              value={availableFrom}
+              invalidDateTimeMessage={I18n.t('Invalid date and time')}
+              layout="columns"
+              datePlaceholder={I18n.t('Select Date')}
+              dateRenderLabel=""
+              timeRenderLabel=""
+            />
           )}
           {isAnnouncement && (
             <Checkbox

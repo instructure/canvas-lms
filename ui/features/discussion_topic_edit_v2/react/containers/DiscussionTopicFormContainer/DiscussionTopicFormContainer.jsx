@@ -40,16 +40,17 @@ export default function DiscussionTopicFormContainer() {
     variables: contextQueryVariables,
   })
   const currentContext = contextData?.legacyNode
+  const currentDiscussionTopicId = ENV.DISCUSSION_TOPIC?.ATTRIBUTES?.id
+  const isEditing = !!currentDiscussionTopicId
 
   // sections and groupCategories are only available for Course and not group
   const sections = currentContext?.sectionsConnection?.nodes
   const groupCategories = currentContext?.groupSetsConnection?.nodes
 
-  const isEditing = !!ENV.discussion_topic_id
   const {data: topicData, loading: topicIsLoading} = useQuery(DISCUSSION_TOPIC_QUERY, {
     skip: !isEditing,
     variables: {
-      discussionTopicId: ENV.discussion_topic_id,
+      discussionTopicId: currentDiscussionTopicId,
     },
   })
   const currentDiscussionTopic = topicData?.legacyNode
