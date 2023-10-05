@@ -61,6 +61,76 @@ describe('Grading Results Tests', () => {
   beforeEach(() => {
     $.subscribe = jest.fn()
   })
+  describe('status pills', () => {
+    it('renders late pill', () => {
+      const props = {
+        ...gradingResultsDefaultProps,
+        studentSubmissions: [
+          {
+            ...defaultStudentSubmissions,
+            late: true,
+          },
+        ],
+      }
+      const {getByTestId} = renderGradingResults(props)
+      expect(getByTestId('submission-status-pill')).toHaveTextContent('LATE')
+    })
+    it('renders missing pill', () => {
+      const props = {
+        ...gradingResultsDefaultProps,
+        studentSubmissions: [
+          {
+            ...defaultStudentSubmissions,
+            missing: true,
+          },
+        ],
+      }
+      const {getByTestId} = renderGradingResults(props)
+      expect(getByTestId('submission-status-pill')).toHaveTextContent('MISSING')
+    })
+    it('renders extended pill', () => {
+      const props = {
+        ...gradingResultsDefaultProps,
+        studentSubmissions: [
+          {
+            ...defaultStudentSubmissions,
+            latePolicyStatus: 'extended',
+          },
+        ],
+      }
+      const {getByTestId} = renderGradingResults(props)
+      expect(getByTestId('submission-status-pill')).toHaveTextContent('EXTENDED')
+    })
+    it('renders custom status pill and makes text upper case', () => {
+      const props = {
+        ...gradingResultsDefaultProps,
+        studentSubmissions: [
+          {
+            ...defaultStudentSubmissions,
+            customGradeStatus: 'carrot',
+          },
+        ],
+      }
+      const {getByTestId} = renderGradingResults(props)
+      expect(getByTestId('submission-status-pill')).toHaveTextContent('CARROT')
+    })
+    it('renders custom status pill even if other statuses are true', () => {
+      const props = {
+        ...gradingResultsDefaultProps,
+        studentSubmissions: [
+          {
+            ...defaultStudentSubmissions,
+            late: true,
+            missing: true,
+            latePolicyStatus: 'extended',
+            customGradeStatus: 'POTATO',
+          },
+        ],
+      }
+      const {getByTestId} = renderGradingResults(props)
+      expect(getByTestId('submission-status-pill')).toHaveTextContent('POTATO')
+    })
+  })
   describe('the assignment grading type is points', () => {
     it('renders the grade input with the screen reader message', () => {
       const props = {
@@ -367,6 +437,7 @@ describe('Grading Results Tests', () => {
       expect(getByTestId('submission_details_grade_select')).toHaveValue('Ungraded')
       expect(getByTestId('submission_details_grade_out_of_text')).toHaveTextContent('- out of 10')
     })
+
     it('renders Complete in both the submission detail modal and main page drop downs and sets the max score in the Out of Text', () => {
       const props = {
         ...gradingResultsDefaultProps,
