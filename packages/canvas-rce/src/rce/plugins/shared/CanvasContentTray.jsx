@@ -250,6 +250,7 @@ export default function CanvasContentTray(props) {
 
   const trayRef = useRef(null)
   const scrollingAreaRef = useRef(null)
+  const closeButtonRef = useRef(null)
   const [filterSettings, setFilterSettings] = useFilterSettings()
   const [isEditTray, setIsEditTray] = useState(false)
   const [link, setLink] = useState(null)
@@ -293,6 +294,7 @@ export default function CanvasContentTray(props) {
         } else {
           setIsEditTray(false)
         }
+        closeButtonRef.current?.focus()
       },
       hideTray(forceClose) {
         if (forceClose || hidingTrayOnAction) {
@@ -487,6 +489,7 @@ export default function CanvasContentTray(props) {
                 onClick={handleDismissTray}
                 data-testid="CloseButton_ContentTray"
                 screenReaderLabel={formatMessage('Close')}
+                elementRef={el => (closeButtonRef.current = el)}
               />
             </View>
             {isEditTray && (
