@@ -459,6 +459,8 @@ Style/FormatString:
   Severity: convention
   AutoCorrect: false
 Style/GlobalVars:
+  AllowedVariables:
+  - $canvas_rails
   Severity: convention
 Style/GuardClause:
   Enabled: false

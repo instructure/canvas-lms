@@ -25,36 +25,32 @@ Plugin.send(:load_plugin, "bundler-multilock")
 
 require_relative "config/canvas_rails_switcher"
 
-# Bundler evaluates this from a non-global context for plugins, so we have
-# to explicitly pop up to set global constants
-# rubocop:disable Style/RedundantConstantBase
+if Bundler.default_gemfile == gemfile
+  SUPPORTED_RAILS_VERSIONS.product([nil, true]).each do |rails_version, include_plugins|
+    lockfile = ["rails#{rails_version.delete(".")}", include_plugins && "plugins"].compact.join(".")
+    if rails_version == SUPPORTED_RAILS_VERSIONS.first
+      lockfile = nil unless include_plugins
+    elsif include_plugins
+      parent = "rails#{rails_versions.delete(".")}"
+    end
 
-# will already be defined during the second Gemfile evaluation
-::CANVAS_INCLUDE_PLUGINS = true unless defined?(::CANVAS_INCLUDE_PLUGINS)
+    active = rails_version == $canvas_rails && !!include_plugins
 
-SUPPORTED_RAILS_VERSIONS.product([nil, true]).each do |rails_version, include_plugins|
-  lockfile = ["rails#{rails_version.delete(".")}", include_plugins && "plugins"].compact.join(".")
-  lockfile = nil if rails_version == SUPPORTED_RAILS_VERSIONS.first && !include_plugins
+    lockfile(lockfile,
+             active:,
+             parent:,
+             enforce_pinned_additional_dependencies: include_plugins) do
+      $canvas_rails = rails_version
+      @include_plugins = include_plugins
+    end
+  end
 
-  active = rails_version == CANVAS_RAILS && !!include_plugins
-
-  lockfile(lockfile,
-           active:,
-           allow_mismatched_dependencies: rails_version != SUPPORTED_RAILS_VERSIONS.first,
-           enforce_pinned_additional_dependencies: include_plugins) do
-    Object.send(:remove_const, :CANVAS_RAILS)
-    ::CANVAS_RAILS = rails_version
-    Object.send(:remove_const, :CANVAS_INCLUDE_PLUGINS)
-    ::CANVAS_INCLUDE_PLUGINS = include_plugins
+  (gemfile_root.glob("Gemfile.d/*.lock") + gemfile_root.glob("gems/*/Gemfile.lock")).each do |gem_lockfile_name|
+    return unless lockfile(gem_lockfile_name,
+                           gemfile: gem_lockfile_name.to_s.sub(/\.lock$/, ""),
+                           allow_mismatched_dependencies: false)
   end
 end
-
-(gemfile_root.glob("Gemfile.d/*.lock") + gemfile_root.glob("gems/*/Gemfile.lock")).each do |gem_lockfile_name|
-  return unless lockfile(gem_lockfile_name,
-                         gemfile: gem_lockfile_name.to_s.sub(/\.lock$/, ""),
-                         allow_mismatched_dependencies: false)
-end
-# rubocop:enable Style/RedundantConstantBase
 
 module PreferGlobalRubyGemsSource
   def rubygems_sources
@@ -80,7 +76,7 @@ module GemOverride
 end
 Bundler::Dsl.prepend(GemOverride)
 
-if CANVAS_INCLUDE_PLUGINS
+if @include_plugins
   gemfile_root.glob("gems/plugins/*/Gemfile.d/_before.rb") do |file|
     eval_gemfile(file)
   end
