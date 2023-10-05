@@ -29,6 +29,7 @@ import {Submission} from '../../../../api.d'
 const I18n = useI18nScope('enhanced_individual_gradebook_submit_score')
 
 type SubmitScoreRequestBody = {
+  originator?: string
   submission: {
     posted_grade?: string
     excuse?: boolean | string
@@ -81,7 +82,10 @@ export const useSubmitScore = () => {
         }
       }
 
-      const requestBody: SubmitScoreRequestBody = {submission: {}}
+      const requestBody: SubmitScoreRequestBody = {
+        originator: 'individual_gradebook',
+        submission: {},
+      }
 
       if (isExcusedText) {
         requestBody.submission.excuse = true
