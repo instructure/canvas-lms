@@ -19,7 +19,7 @@
 import React, {useContext} from 'react'
 
 import {useQuery, useMutation} from 'react-apollo'
-import {COURSE_QUERY, DISCUSSION_TOPIC_QUERY} from '../../../graphql/Queries'
+import {COURSE_QUERY, GROUP_QUERY, DISCUSSION_TOPIC_QUERY} from '../../../graphql/Queries'
 import {CREATE_DISCUSSION_TOPIC} from '../../../graphql/Mutations'
 
 import LoadingIndicator from '@canvas/loading-indicator'
@@ -31,14 +31,19 @@ const I18n = useI18nScope('discussion_create')
 
 export default function DiscussionTopicFormContainer() {
   const {setOnFailure} = useContext(AlertManagerContext)
-  const {data: courseData, loading: courseIsLoading} = useQuery(COURSE_QUERY, {
-    variables: {
-      courseId: ENV.context_id, // TODO: what if it's a group?
-    },
+  const contextType = ENV.context_is_not_group ? 'Course' : 'Group'
+  const contextQueryToUse = contextType === 'Course' ? COURSE_QUERY : GROUP_QUERY
+  const contextQueryVariables =
+    contextType === 'Course' ? {courseId: ENV.context_id} : {groupId: ENV.context_id}
+
+  const {data: contextData, loading: courseIsLoading} = useQuery(contextQueryToUse, {
+    variables: contextQueryVariables,
   })
-  const currentCourse = courseData?.legacyNode
-  const sections = currentCourse?.sectionsConnection?.nodes
-  const groupCategories = currentCourse?.groupSetsConnection?.nodes
+  const currentContext = contextData?.legacyNode
+
+  // sections and groupCategories are only available for Course and not group
+  const sections = currentContext?.sectionsConnection?.nodes
+  const groupCategories = currentContext?.groupSetsConnection?.nodes
 
   const isEditing = !!ENV.discussion_topic_id
   const {data: topicData, loading: topicIsLoading} = useQuery(DISCUSSION_TOPIC_QUERY, {
@@ -103,7 +108,7 @@ export default function DiscussionTopicFormContainer() {
         enablePodcastFeed,
         includeRepliesInFeed,
         locked,
-        isAnnouncement
+        isAnnouncement,
       }) => {
         if (isEditing) {
           console.log('call updateDiscussion')
@@ -127,7 +132,7 @@ export default function DiscussionTopicFormContainer() {
               podcastEnabled: enablePodcastFeed,
               podcastHasStudentPosts: includeRepliesInFeed,
               locked,
-              isAnnouncement
+              isAnnouncement,
             },
           })
         }

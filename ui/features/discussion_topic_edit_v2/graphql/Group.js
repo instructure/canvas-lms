@@ -16,34 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Course} from './Course'
-import {Group} from './Group'
-import {DiscussionTopic} from './DiscussionTopic'
+import {shape, string} from 'prop-types'
 import gql from 'graphql-tag'
 
-export const DISCUSSION_TOPIC_QUERY = gql`
-  query GetDiscussionTopic($discussionTopicId: ID!) {
-    legacyNode(_id: $discussionTopicId, type: Discussion) {
-      ...DiscussionTopic
+export const Group = {
+  fragment: gql`
+    fragment Group on Group {
+      _id
+      id
+      name
     }
-  }
-  ${DiscussionTopic.fragment}
-`
-
-export const COURSE_QUERY = gql`
-  query GetCourseQuery($courseId: ID!) {
-    legacyNode(_id: $courseId, type: Course) {
-      ...Course
-    }
-  }
-  ${Course.fragment}
-`
-
-export const GROUP_QUERY = gql`
-  query GetGroupQuery($groupId: ID!) {
-    legacyNode(_id: $groupId, type: Group) {
-      ...Group
-    }
-  }
-  ${Group.fragment}
-`
+  `,
+  shape: shape({
+    _id: string,
+    id: string,
+    name: string,
+  }),
+  mock: {
+    _id: '5',
+    id: 'J2n9F08vw6',
+    name: 'Super Group',
+  },
+}
