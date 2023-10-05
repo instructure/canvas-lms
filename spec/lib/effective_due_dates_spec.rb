@@ -937,6 +937,69 @@ describe Course do
         end
       end
 
+      context "when course overrides apply" do
+        before :once do
+          Account.site_admin.enable_feature!(:differentiated_modules)
+          @override = @assignment1.assignment_overrides.create!(
+            due_at: 1.day.from_now(@now),
+            due_at_overridden: true,
+            set_type: "Course",
+            set_id: @test_course.id
+          )
+          @expected = {
+            @assignment1.id => {
+              @student1.id => {
+                due_at: 1.day.from_now(@now),
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: @override.id,
+                override_source: "Course"
+              },
+              @student2.id => {
+                due_at: 1.day.from_now(@now),
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: @override.id,
+                override_source: "Course"
+              },
+              @student3.id => {
+                due_at: 1.day.from_now(@now),
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: @override.id,
+                override_source: "Course"
+              }
+            }
+          }
+        end
+
+        it "applies course overrides" do
+          edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+          expect(edd.to_hash).to eq @expected
+        end
+
+        it "does not unassign students when they are deactivated" do
+          @student1_enrollment.deactivate
+
+          edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+          expect(edd.to_hash).to eq @expected
+        end
+
+        it "does not unassign students when they are concluded" do
+          @student1_enrollment.conclude
+
+          edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+          expect(edd.to_hash).to eq @expected
+        end
+
+        it "does not apply course overrides with flag off" do
+          Account.site_admin.disable_feature!(:differentiated_modules)
+          edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+          result = edd.to_hash
+          expect(result).to eq({})
+        end
+      end
+
       context "when multiple override types apply" do
         it "picks the individual override due date, if one exists" do
           # adhoc
@@ -979,6 +1042,50 @@ describe Course do
                 in_closed_grading_period: false,
                 override_id: nil,
                 override_source: "Everyone Else"
+              }
+            }
+          }
+          expect(result).to eq expected
+        end
+
+        it "picks the individual override due date, even with a course override" do
+          # adhoc
+          individual_override = @assignment2.assignment_overrides.create!(due_at: 3.days.from_now(@now), due_at_overridden: true)
+          individual_override.assignment_override_students.create!(user: @student1)
+
+          # course override
+          Account.site_admin.enable_feature!(:differentiated_modules)
+          course_override = @assignment2.assignment_overrides.create!(
+            due_at: 5.days.from_now(@now),
+            due_at_overridden: true,
+            set_type: "Course",
+            set_id: @test_course.id
+          )
+
+          edd = EffectiveDueDates.for_course(@test_course, @assignment2)
+          result = edd.to_hash
+          expected = {
+            @assignment2.id => {
+              @student1.id => {
+                due_at: individual_override.due_at,
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: individual_override.id,
+                override_source: "ADHOC"
+              },
+              @student2.id => {
+                due_at: course_override.due_at,
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: course_override.id,
+                override_source: "Course"
+              },
+              @student3.id => {
+                due_at: course_override.due_at,
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: course_override.id,
+                override_source: "Course"
               }
             }
           }

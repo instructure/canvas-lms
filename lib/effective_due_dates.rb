@@ -158,6 +158,43 @@ class EffectiveDueDates
     end
   end
 
+  def course_overrides
+    if Account.site_admin.feature_enabled?(:differentiated_modules)
+      "/* fetch all students affected by course overrides */
+      override_course_students AS (
+        SELECT
+          e.user_id AS student_id,
+          TRUE as active_in_section,
+          o.assignment_id,
+          o.id AS override_id,
+          date_trunc('minute', o.due_at) AS trunc_due_at,
+          o.due_at,
+          o.set_type AS override_type,
+          o.due_at_overridden,
+          2 AS priority
+        FROM
+          overrides o
+        INNER JOIN #{Enrollment.quoted_table_name} e ON e.course_id = o.set_id
+        WHERE
+          o.set_type = 'Course' AND
+          e.workflow_state NOT IN ('rejected', 'deleted') AND
+          e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
+          #{filter_students_sql("e")}
+          ),"
+    else
+      ""
+    end
+  end
+
+  def union_course_overrides
+    if Account.site_admin.feature_enabled?(:differentiated_modules)
+      "SELECT * FROM override_course_students
+        UNION ALL"
+    else
+      ""
+    end
+  end
+
   # This beauty of a method brings together assignment overrides,
   # due dates, grading periods, course/group enrollments, etc
   # to calculate each student's effective due date and whether or
@@ -292,6 +329,8 @@ class EffectiveDueDates
               #{filter_students_sql("e")}
           ),
 
+          #{course_overrides}
+
           /* fetch all students who have an 'Everyone Else'
             due date applied to them from the assignment */
           override_everyonelse_students AS (
@@ -323,6 +362,7 @@ class EffectiveDueDates
             UNION ALL
             SELECT * FROM override_sections_students
             UNION ALL
+            #{union_course_overrides}
             SELECT * FROM override_everyonelse_students
           ),
 
