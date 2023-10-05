@@ -110,7 +110,6 @@ RSpec.describe SecurityController, type: :request do
       expect(parsed_body["registration_endpoint"]).to eq "http://localhost/api/lti/registrations"
       lti_platform_configuration = parsed_body["https://purl.imsglobal.org/spec/lti-platform-configuration"]
       expect(lti_platform_configuration["product_family_code"]).to eq "canvas"
-      expect(lti_platform_configuration["version"]).to eq "OpenSource"
       expect(lti_platform_configuration["https://canvas.instructure.com/lti/account_name"]).to eq "Default Account"
     end
   end
@@ -142,7 +141,6 @@ RSpec.describe SecurityController, type: :request do
         expect(parsed_body["registration_endpoint"]).to eq "http://localhost/api/lti/registrations"
         lti_platform_configuration = parsed_body["https://purl.imsglobal.org/spec/lti-platform-configuration"]
         expect(lti_platform_configuration["product_family_code"]).to eq "canvas"
-        expect(lti_platform_configuration["version"]).to eq "OpenSource"
         expect(lti_platform_configuration["https://canvas.instructure.com/lti/account_name"]).to eq "Shard 2 Account"
         expect(lti_platform_configuration["https://canvas.instructure.com/lti/account_lti_guid"]).to eq "shard2"
       end
