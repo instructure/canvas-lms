@@ -60,6 +60,54 @@ it('renders a "late" status pill if the last graded submission is late', async (
   expect(getByText('Late')).toBeInTheDocument()
 })
 
+it('renders a custom status pill if the last graded submission has a custom status', async () => {
+  const props = await mockAssignmentAndSubmission({
+    Assignment: {
+      gradingType: 'points',
+      pointsPossible: 10,
+    },
+    Submission: {
+      ...SubmissionMocks.graded,
+      attempt: 1,
+      deductedPoints: 4,
+      enteredGrade: 10,
+      grade: 6,
+      customGradeStatus: 'Carrot',
+    },
+  })
+  const {getByText} = render(
+    <StudentViewContext.Provider value={{lastSubmittedSubmission: props.submission}}>
+      <Header {...props} />
+    </StudentViewContext.Provider>
+  )
+  expect(getByText('Carrot')).toBeInTheDocument()
+})
+
+it('prioritizes rendering custom status pills over other pills', async () => {
+  const props = await mockAssignmentAndSubmission({
+    Assignment: {
+      gradingType: 'points',
+      pointsPossible: 10,
+    },
+    Submission: {
+      ...SubmissionMocks.graded,
+      attempt: 1,
+      deductedPoints: 4,
+      enteredGrade: 10,
+      grade: 6,
+      customGradeStatus: 'Carrot',
+      submissionStatus: 'late',
+      gradingStatus: 'excused',
+    },
+  })
+  const {getByText} = render(
+    <StudentViewContext.Provider value={{lastSubmittedSubmission: props.submission}}>
+      <Header {...props} />
+    </StudentViewContext.Provider>
+  )
+  expect(getByText('Carrot')).toBeInTheDocument()
+})
+
 it('shows the grade for a late submission if it is not hidden from the student', async () => {
   const props = await mockAssignmentAndSubmission({
     Assignment: {
@@ -911,21 +959,21 @@ describe('Peer reviews counter', () => {
         assignedAssessments: [
           {
             assetId: '1',
-            anonymizedUser: {_id: '1', displayName: "Jim"},
+            anonymizedUser: {_id: '1', displayName: 'Jim'},
             anonymousId: null,
             workflowState: 'assigned',
             assetSubmissionType: 'online_text_entry',
           },
           {
             assetId: '2',
-            anonymizedUser: {_id: '2', displayName: "Bob"},
+            anonymizedUser: {_id: '2', displayName: 'Bob'},
             anonymousId: null,
             workflowState: 'assigned',
             assetSubmissionType: 'online_text_entry',
           },
           {
             assetId: '3',
-            anonymizedUser: {_id: '3', displayName: "Tim"},
+            anonymizedUser: {_id: '3', displayName: 'Tim'},
             anonymousId: null,
             workflowState: 'assigned',
             assetSubmissionType: 'online_text_entry',
