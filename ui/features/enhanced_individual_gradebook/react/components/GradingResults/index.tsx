@@ -392,7 +392,9 @@ type SubmissionStatusProps = {
 function SubmissionStatus({submission}: SubmissionStatusProps) {
   let text = ''
 
-  if (submission.late) {
+  if (submission.customGradeStatus) {
+    text = submission.customGradeStatus.toUpperCase()
+  } else if (submission.late) {
     text = 'LATE'
   } else if (submission.missing) {
     text = 'MISSING'
@@ -404,11 +406,19 @@ function SubmissionStatus({submission}: SubmissionStatusProps) {
 
   return (
     <View as="span">
-      <Pill margin="small" color="danger" data-testid="submission-status-pill">
-        <View as="strong" padding="x-small">
-          {I18n.t('%{text}', {text})}
-        </View>
-      </Pill>
+      {submission.customGradeStatus ? (
+        <Pill margin="small" data-testid="submission-status-pill">
+          <View as="strong" padding="x-small">
+            {text}
+          </View>
+        </Pill>
+      ) : (
+        <Pill margin="small" color="danger" data-testid="submission-status-pill">
+          <View as="strong" padding="x-small">
+            {I18n.t('%{text}', {text})}
+          </View>
+        </Pill>
+      )}
     </View>
   )
 }
