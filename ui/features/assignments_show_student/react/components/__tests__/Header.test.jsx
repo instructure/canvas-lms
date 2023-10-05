@@ -1101,4 +1101,64 @@ describe('Peer reviews counter', () => {
       expect(queryByTestId('assignment-student-header')).toHaveTextContent('Required Peer Reviews')
     })
   })
+
+  describe('render AnonymousLabel with ungraded submission', () => {
+    let props
+    beforeAll(async () => {
+      props = await mockAssignmentAndSubmission()
+      props.submission = {
+        ...props.submission,
+        hideGradeFromStudent: false,
+        grade: null
+      }
+    })
+
+    it('not renders the anonymous label', () => {
+      const {queryByTestId} = render(<Header {...props} />)
+      expect(queryByTestId('assignment-student-anonymous-label')).not.toBeInTheDocument()
+    })
+  });
+
+
+
+  describe('render AnonymousLabel hiding grade from student submission', () => {
+    let props
+    beforeAll(async () => {
+      props = await mockAssignmentAndSubmission()
+      props.submission = {
+        ...props.submission,
+        hideGradeFromStudent: true,
+        grade: 10
+      }
+    })
+
+    it('not renders the anonymous label', () => {
+      const {queryByTestId} = render(<Header {...props} />)
+      expect(queryByTestId('assignment-student-anonymous-label')).not.toBeInTheDocument()
+    })
+  });
+
+  describe('renderAnonymousLabel with graded submission', () => {
+    let props
+    beforeAll(async () => {
+      props = await mockAssignmentAndSubmission()
+      props.submission = {
+        ...props.submission,
+        hideGradeFromStudent: false,
+        grade: 10
+      }
+    })
+
+    it('renders a label graded anonymously', () => {
+      props.submission.gradedAnonymously = true
+      const {queryByTestId} = render(<Header {...props} />)
+      expect(queryByTestId('assignment-student-anonymus-label')).toHaveTextContent('Anonymous Grading:yes')
+    })
+
+    it('renders a label graded visibly', () => {
+      props.submission.gradedAnonymously = false
+      const {queryByTestId} = render(<Header {...props} />)
+      expect(queryByTestId('assignment-student-anonymus-label')).toHaveTextContent('Anonymous Grading:no')
+    })
+  });
 })

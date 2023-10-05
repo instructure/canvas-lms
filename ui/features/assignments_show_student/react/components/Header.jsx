@@ -249,6 +249,22 @@ class Header extends React.Component {
       </>
     )
   }
+  renderAnonymousLabel = () => {
+    return (
+      <Flex as="div" direction="row" alignItems="end" data-testid="assignment-student-anonymus-label">
+        <Flex.Item padding="0 xxx-small 0 0">
+          <Text size="small">
+            {I18n.t('Anonymous Grading')}:
+          </Text>
+        </Flex.Item>
+        <Flex.Item>
+          <Text size="small" weight='bold'>
+            {this.props.submission?.gradedAnonymously ? I18n.t('yes') : I18n.t('no')}
+          </Text>
+        </Flex.Item>
+      </Flex>
+    )
+  }
 
   render() {
     const lockAssignment =
@@ -429,6 +445,16 @@ class Header extends React.Component {
               </Flex>
             </Flex.Item>
           </Flex>
+          {this.props.submission?.grade &&
+            !this.props.submission?.hideGradeFromStudent && (
+              <Flex justifyItems="end" direction="row">
+                <Flex.Item shouldShrink={true}>
+                  <Flex as="div" wrap="wrap">
+                    <Flex.Item margin="0 small 0 0">{this.renderAnonymousLabel()}</Flex.Item>
+                  </Flex>
+                </Flex.Item>
+              </Flex>
+            )}
         </div>
       </>
     )
