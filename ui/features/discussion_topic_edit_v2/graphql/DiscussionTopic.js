@@ -39,6 +39,7 @@ export const DiscussionTopic = {
       onlyGradersCanRate
       delayedPostAt
       lockAt
+      locked
       courseSections {
         ...Section
       }
