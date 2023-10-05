@@ -16,213 +16,291 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {Fragment, ComponentClass, useCallback, useState} from 'react'
+import React, {Fragment, ComponentClass, useState, useEffect, useRef, useCallback} from 'react'
 import {Flex} from '@instructure/ui-flex'
+// @ts-ignore
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Text} from '@instructure/ui-text'
-import {View} from '@instructure/ui-view'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('collapsable_list')
 
-type ParentItem = {
+const {Item: FlexItem} = Flex as any
+
+type Item = {
   id: string
   label: string
   icon?: ComponentClass<{size: string}>
-  children: [ChildItem]
-}
-
-type ChildItem = {
-  id: string
-  label: string
-}
-
-type SingleItem = {
-  id: string
-  label: string
-  icon?: ComponentClass<{size: string}>
-  children: [ChildItem]
-}
-type ParentItemCheckboxProps = {
-  parentId: string
-  label: string
-  items: [ChildItem]
-  icon?: ComponentClass<{size: string}>
-  onChange: (ids: Set<string>) => void
-}
-
-type ChildItemCheckboxProps = {
-  id: string
-  label: string
-  parentId: string
-  selection: Set<string>
-  onChange: (checked: boolean, id: string) => void
+  children?: Item[]
 }
 
 type SingleItemCheckboxProps = {
   id: string
   label: string
   icon?: ComponentClass<{size: string}>
-  onChange: (selected: boolean) => void
+  isRoot?: boolean
+  state?: CheckboxState
+  onNotifyChangeToParent: (newState: CheckboxState, updatedCheckedIds: string[]) => void
 }
 
+type ParentItemCheckboxProps = SingleItemCheckboxProps & {
+  items: Item[]
+}
+
+type CheckboxState = 'checked' | 'unchecked' | 'indeterminate'
+type ChildrenStates = {[key: string]: CheckboxState}
+type ChildrenSelectedIds = {[key: string]: string[]}
+
 export type CollapsableListProps = {
-  items: [ParentItem]
+  items: Item[]
   onChange: (selectedIds: string[]) => void
 }
 
-const ParentItemCheckbox = ({parentId, label, items, icon, onChange}: ParentItemCheckboxProps) => {
-  const [selection, setSelection] = useState(new Set<string>())
+const generateParentState = (childrenValues: CheckboxState[]): CheckboxState => {
+  const hasIndeterminateChild = childrenValues.some(childValue => childValue === 'indeterminate')
+  if (hasIndeterminateChild) return 'indeterminate'
 
-  const isParentChecked = useCallback(() => {
-    const checked = selection.has(parentId)
-    const indeterminate = !checked && selection.size > 0 && selection.size < items.length
-    return [checked, indeterminate]
-  }, [parentId, selection, items.length])
+  const checkedChildren = childrenValues.filter(childValue => childValue === 'checked')
+  if (checkedChildren.length === childrenValues.length) return 'checked'
+  if (checkedChildren.length > 0 && checkedChildren.length < childrenValues.length)
+    return 'indeterminate'
+  return 'unchecked'
+}
 
-  const cleanSelection = useCallback(() => {
-    if (selection.has(parentId)) {
-      // Delete all except parent id
-      items.forEach(i => selection.delete(i.id))
-    } else if (selection.size === items.length) {
-      // Means all items are selected
-      items.forEach(i => selection.delete(i.id))
-      selection.add(parentId)
-    }
-  }, [parentId, selection, items])
+const generateCheckedIds = (
+  states: {[key: string]: CheckboxState},
+  id?: string,
+  newState?: CheckboxState
+): string[] => {
+  let selectedIds: string[]
+  if (id && newState === 'checked') {
+    selectedIds = [id]
+  } else if (id && newState === 'unchecked') {
+    selectedIds = []
+  } else {
+    selectedIds = Object.keys(states).filter(childKey => states[childKey] === 'checked')
+  }
+  return selectedIds
+}
 
-  const handleItemCheck = useCallback(
-    (checked: boolean, itemId: string) => {
-      if (checked) {
-        selection.add(itemId)
-      } else if (selection.has(parentId) && itemId !== parentId) {
-        selection.delete(parentId)
-        items.forEach(i => itemId !== i.id && selection.add(i.id))
-      } else {
-        selection.delete(itemId)
-      }
-      cleanSelection()
-      setSelection(selection)
-      onChange(selection)
+const generateUpdatedCheckedIds = (
+  childrenStates: ChildrenStates,
+  childrenSelectedIds: ChildrenSelectedIds,
+  id?: string,
+  newParentState?: CheckboxState
+) => {
+  const checkedIds = generateCheckedIds(childrenStates, id, newParentState)
+  if (id && newParentState === 'checked') {
+    return checkedIds
+  }
+
+  const joinedChildrenCheckedIds = Object.values(childrenSelectedIds).reduce(
+    (result, ids) => [...result, ...ids],
+    []
+  )
+  return Array.from(new Set([...joinedChildrenCheckedIds, ...checkedIds]))
+}
+
+const ParentItemCheckbox = ({
+  id,
+  label,
+  icon,
+  items,
+  onNotifyChangeToParent,
+  state = 'unchecked',
+  isRoot = false,
+}: ParentItemCheckboxProps) => {
+  const [innerState, setInnerState] = useState(state)
+  const [expanded, setExpanded] = useState(false)
+  const [childrenStates, setChildrenStates] = useState<ChildrenStates>(() => {
+    const initialValue: {[key: string]: CheckboxState} = {}
+    items.forEach(item => (initialValue[item.id] = state))
+    return initialValue
+  })
+  const childrenSelectedIdsRef = useRef<ChildrenSelectedIds>({})
+
+  useEffect(() => {
+    items.forEach(
+      item => (childrenSelectedIdsRef.current[item.id] = state === 'checked' ? [item.id] : [])
+    )
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const handleCheck = useCallback(
+    (checked: boolean) => {
+      const newParentState = checked ? 'checked' : 'unchecked'
+      Object.keys(childrenStates).forEach(k => (childrenStates[k] = newParentState))
+      const checkedIds = generateCheckedIds(childrenStates, id, newParentState)
+
+      setInnerState(newParentState)
+      setChildrenStates(childrenStates)
+      onNotifyChangeToParent(newParentState, checkedIds)
     },
-    [items, parentId, selection, onChange, cleanSelection]
+    [id, childrenStates, onNotifyChangeToParent]
   )
 
-  const [checked, indeterminate] = isParentChecked()
+  const handleNotifyChangeToParent = useCallback(
+    (itemId: string) => (newChildState: CheckboxState, childSelectedIds: string[]) => {
+      childrenStates[itemId] = newChildState
+      childrenSelectedIdsRef.current[itemId] = childSelectedIds
+
+      const newState = generateParentState(Object.values(childrenStates))
+      const updatedCheckedIds = generateUpdatedCheckedIds(
+        childrenStates,
+        childrenSelectedIdsRef.current,
+        id,
+        newState
+      )
+
+      setInnerState(newState)
+      setChildrenStates(childrenStates)
+      onNotifyChangeToParent(newState, updatedCheckedIds)
+    },
+    [id, childrenStates, onNotifyChangeToParent]
+  )
+
   const ParentIcon = icon
 
   return (
-    <ToggleDetails
-      data-testid={`toggle-${parentId}`}
-      aria-label={I18n.t('%{label}, Navigate inside to interact with the checkbox', {label})}
-      summary={
-        <Flex>
-          <Flex.Item padding="x-small" shouldShrink={true}>
-            <Checkbox
-              checked={checked}
-              indeterminate={indeterminate}
-              onChange={e => handleItemCheck(e.target.checked, parentId)}
-              label={<ScreenReaderContent>{label}</ScreenReaderContent>}
-              data-testid={`checkbox-${parentId}`}
-            />
-          </Flex.Item>
-          <Flex.Item shouldShrink={true}>{ParentIcon && <ParentIcon size="small" />}</Flex.Item>
-          <Flex.Item padding="0 small" shouldShrink={true}>
-            <Text aria-hidden="true">{label}</Text>
-          </Flex.Item>
-        </Flex>
-      }
+    <Flex
+      margin={isRoot ? '0' : 'xxx-small 0 0 medium'}
+      padding={isRoot ? 'x-small 0 x-small 0' : 'x-small 0 0 0'}
     >
-      {items.map(item => (
-        <ChildItemCheckbox
-          key={item.id}
-          id={item.id}
-          label={item.label}
-          parentId={parentId}
-          selection={selection}
-          onChange={handleItemCheck}
-        />
-      ))}
-    </ToggleDetails>
-  )
-}
-
-const ChildItemCheckbox = ({id, label, parentId, selection, onChange}: ChildItemCheckboxProps) => {
-  return (
-    <Flex margin="small 0 medium x-large">
-      <Flex.Item padding="0 xxx-small">
-        <Checkbox
-          checked={selection.has(id) || selection.has(parentId)}
-          onChange={e => onChange(e.target.checked, id)}
-          label={
-            <View padding="0 0 0 small">
-              <Text>{label}</Text>
-            </View>
+      <FlexItem shouldShrink={true}>
+        <ToggleDetails
+          data-testid={`toggle-${id}`}
+          aria-label={I18n.t('%{label}, Navigate inside to interact with the checkbox', {label})}
+          expanded={expanded}
+          onToggle={() => setExpanded(!expanded)}
+          summary={
+            <Flex>
+              <FlexItem padding={isRoot ? 'x-small' : 'x-small'} shouldShrink={true}>
+                <Checkbox
+                  checked={innerState === 'checked'}
+                  indeterminate={innerState === 'indeterminate'}
+                  onChange={(e: any) => handleCheck(e.target.checked)}
+                  label={<ScreenReaderContent>{label}</ScreenReaderContent>}
+                  data-testid={`checkbox-${id}`}
+                />
+              </FlexItem>
+              {ParentIcon && (
+                <FlexItem shouldShrink={true}>
+                  <ParentIcon size="small" />
+                </FlexItem>
+              )}
+              <FlexItem padding="0 small" shouldShrink={true}>
+                <Text aria-hidden="true">{label}</Text>
+              </FlexItem>
+            </Flex>
           }
-          data-testid={`checkbox-${id}`}
-        />
-      </Flex.Item>
+        >
+          {items.map(item =>
+            item.children ? (
+              <ParentItemCheckbox
+                key={item.id}
+                id={item.id}
+                label={item.label}
+                icon={item.icon}
+                items={item.children}
+                state={childrenStates[item.id]}
+                onNotifyChangeToParent={handleNotifyChangeToParent(item.id)}
+              />
+            ) : (
+              <SingleItemCheckbox
+                key={item.id}
+                id={item.id}
+                label={item.label}
+                icon={item.icon}
+                state={childrenStates[item.id]}
+                onNotifyChangeToParent={handleNotifyChangeToParent(item.id)}
+              />
+            )
+          )}
+        </ToggleDetails>
+      </FlexItem>
     </Flex>
   )
 }
 
-const SingleItemCheckbox = ({id, label, icon, onChange}: SingleItemCheckboxProps) => {
-  const [checked, setChecked] = useState(false)
-  const ParentIcon = icon
+const SingleItemCheckbox = ({
+  id,
+  label,
+  icon,
+  onNotifyChangeToParent,
+  state = 'unchecked',
+  isRoot = false,
+}: SingleItemCheckboxProps) => {
+  const [innerState, seInnerState] = useState<CheckboxState>(state)
 
-  const handleChecked = useCallback(
-    (e: any) => {
-      setChecked(e.target.checked)
-      onChange(e.target.checked)
+  const handleCheck = useCallback(
+    (checked: boolean) => {
+      const newState = checked ? 'checked' : 'unchecked'
+      seInnerState(newState)
+      onNotifyChangeToParent(newState, newState === 'checked' ? [id] : [])
     },
-    [onChange]
+    [id, onNotifyChangeToParent]
   )
 
+  useEffect(() => {
+    innerState !== state && seInnerState(state)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state])
+
+  const ParentIcon = icon
+
   return (
-    <Flex margin="x-small 0 x-small small" padding="0 0 0 xx-small">
-      <Flex.Item padding="x-small" shouldShrink={true}>
+    <Flex
+      margin={isRoot ? '0 0 0 medium' : '0 0 0 x-large'}
+      padding={isRoot ? 'x-small xxx-small' : 'x-small 0'}
+    >
+      {/* Needed to do that to properly indent the item */}
+      {!isRoot && <FlexItem margin="0 xxx-small 0 0" />}
+      <FlexItem margin="0 x-small 0 0" shouldShrink={true}>
         <Checkbox
-          checked={checked}
-          onChange={handleChecked}
+          checked={innerState === 'checked'}
+          onChange={(e: any) => handleCheck(e.target.checked)}
           label={<ScreenReaderContent>{label}</ScreenReaderContent>}
           data-testid={`checkbox-${id}`}
         />
-      </Flex.Item>
-      <Flex.Item shouldShrink={true}>{ParentIcon && <ParentIcon size="small" />}</Flex.Item>
-      <Flex.Item padding="0 small" shouldShrink={true}>
+      </FlexItem>
+      {ParentIcon && (
+        <FlexItem margin="0 small 0 0" shouldShrink={true}>
+          <ParentIcon size="small" />
+        </FlexItem>
+      )}
+      <FlexItem shouldShrink={true}>
         <Text aria-hidden="true">{label}</Text>
-      </Flex.Item>
+      </FlexItem>
     </Flex>
   )
 }
 
 export const CollapsableList = ({items, onChange}: CollapsableListProps) => {
-  const [selectedItems, setSelectedItems] = useState(new Set<string>())
+  const [childrenStates, setChildrenStates] = useState<ChildrenStates>(() => {
+    const initialValue: ChildrenStates = {}
+    items.forEach(item => (initialValue[item.id] = 'unchecked'))
+    return initialValue
+  })
+  const childrenSelectedIdsRef = useRef<ChildrenSelectedIds>({})
 
-  const handleParentChange = useCallback(
-    (item: ParentItem) => (updatedIds: Set<string>) => {
-      const allItemIds = [item.id, ...item.children.map(i => i.id)]
-      const deletedIds = allItemIds.filter(id => !updatedIds.has(id))
-      deletedIds.forEach(i => selectedItems.delete(i))
-      Array.from(updatedIds).forEach(i => selectedItems.add(i))
-      setSelectedItems(selectedItems)
-      onChange(Array.from(selectedItems))
-    },
-    [onChange, selectedItems]
-  )
+  useEffect(() => {
+    items.forEach(item => (childrenSelectedIdsRef.current[item.id] = []))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
-  const handleItemChange = useCallback(
-    (item: SingleItem) => (selected: boolean) => {
-      if (selected) {
-        selectedItems.add(item.id)
-      } else {
-        selectedItems.delete(item.id)
-      }
-      onChange(Array.from(selectedItems))
+  const handleNotifyChangeToParent = useCallback(
+    (itemId: string) => (newChildState: CheckboxState, childSelectedIds: string[]) => {
+      childrenStates[itemId] = newChildState
+      childrenSelectedIdsRef.current[itemId] = childSelectedIds
+
+      const checkedIds = generateUpdatedCheckedIds(childrenStates, childrenSelectedIdsRef.current)
+
+      setChildrenStates(childrenStates)
+      onChange(checkedIds)
     },
-    [onChange, selectedItems]
+    [childrenStates, onChange]
   )
 
   return (
@@ -232,22 +310,23 @@ export const CollapsableList = ({items, onChange}: CollapsableListProps) => {
           <Fragment key={item.id}>
             {item.children ? (
               <ParentItemCheckbox
-                parentId={item.id}
-                label={item.label}
-                items={item.children}
-                icon={item.icon}
-                onChange={handleParentChange(item)}
-              />
-            ) : (
-              <SingleItemCheckbox
-                key={item.id}
                 id={item.id}
                 label={item.label}
                 icon={item.icon}
-                onChange={handleItemChange(item)}
+                items={item.children}
+                state={childrenStates[item.id]}
+                onNotifyChangeToParent={handleNotifyChangeToParent(item.id)}
+              />
+            ) : (
+              <SingleItemCheckbox
+                id={item.id}
+                label={item.label}
+                icon={item.icon}
+                state={childrenStates[item.id]}
+                onNotifyChangeToParent={handleNotifyChangeToParent(item.id)}
               />
             )}
-            {index + 1 < items.length && <hr aria-hidden="true" />}
+            {index + 1 < items.length && <hr />}
           </Fragment>
         )
       })}

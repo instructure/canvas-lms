@@ -36,7 +36,7 @@ import {
 } from '@instructure/ui-icons'
 
 export default {
-  title: 'Examples/ContentMigrations/CollapsableList',
+  title: 'Examples/Content Migrations/CollapsableList',
   component: CollapsableList,
 } as Meta
 
@@ -84,14 +84,55 @@ Default.args = {
         {
           id: 'module-1',
           label: 'Module 1',
+          icon: IconModuleLine,
         },
         {
           id: 'module-2',
           label: 'Module 2',
+          icon: IconModuleLine,
         },
         {
           id: 'module-3',
           label: 'Module 3',
+          icon: IconModuleLine,
+        },
+        {
+          id: 'module-4',
+          label: 'Module 4',
+          icon: IconModuleLine,
+          children: [
+            {
+              id: 'sub-module-1',
+              label: 'Sub-Module 1',
+            },
+            {
+              id: 'sub-module-2',
+              label: 'Sub-Module 2',
+            },
+            {
+              id: 'sub-module-3',
+              label: 'Sub-Module 3',
+            },
+          ],
+        },
+        {
+          id: 'module-5',
+          label: 'Module 5',
+          icon: IconModuleLine,
+          children: [
+            {
+              id: 'sub-module-4',
+              label: 'Sub-Module 4',
+            },
+            {
+              id: 'sub-module-5',
+              label: 'Sub-Module 5',
+            },
+            {
+              id: 'sub-module-6',
+              label: 'Sub-Module 6',
+            },
+          ],
         },
       ],
     },
