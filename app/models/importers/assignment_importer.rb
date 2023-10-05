@@ -317,6 +317,7 @@ module Importers
          position
          peer_review_count
          omit_from_final_grade
+         hide_in_gradebook
          intra_group_peer_reviews
          grader_count
          grader_comments_visible_to_graders
