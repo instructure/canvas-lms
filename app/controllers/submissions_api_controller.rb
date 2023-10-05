@@ -1665,5 +1665,13 @@ class SubmissionsApiController < ApplicationController
     if !custom_grade_status_id.empty? && custom_grade_status_id != submission.custom_grade_status_id.to_s
       InstStatsd::Statsd.increment("custom_grade_status.applied_to.submission")
     end
+
+    if params.dig(:submission, :posted_grade)
+      if params["originator"] == "individual_gradebook"
+        InstStatsd::Statsd.increment("individual_gradebook.submission.posted_grade")
+      elsif params["originator"] == "gradebook"
+        InstStatsd::Statsd.increment("gradebook.submission.posted_grade")
+      end
+    end
   end
 end

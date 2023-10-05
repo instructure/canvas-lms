@@ -60,6 +60,7 @@ function updateSubmission(
     submission: underscoreProperties(submission),
     include: ['visibility'],
     prefer_points_over_scheme: enterGradesAs === 'points',
+    originator: 'gradebook',
   })
 }
 

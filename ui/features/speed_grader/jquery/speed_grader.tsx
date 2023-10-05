@@ -3490,6 +3490,7 @@ EG = {
       'submission[assignment_id]': window.jsonData.id,
       [`submission[${anonymizableUserId}]`]: EG.currentStudent[anonymizableId],
       'submission[graded_anonymously]': isAnonymous ? true : utils.shouldHideStudentNames(),
+      originator: 'speed_grader',
     }
 
     const grade = SpeedgraderHelpers.determineGradeToSubmit(

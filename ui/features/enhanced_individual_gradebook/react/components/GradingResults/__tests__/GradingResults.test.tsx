@@ -444,6 +444,7 @@ describe('Grading Results Tests', () => {
       userEvent.tab()
       expect(executeApiRequest).toHaveBeenCalledWith({
         body: {
+          originator: 'individual_gradebook',
           submission: {
             posted_grade: 'complete',
           },
@@ -465,6 +466,7 @@ describe('Grading Results Tests', () => {
       userEvent.click(getByTestId('submission-details-submit-button'))
       expect(executeApiRequest).toHaveBeenCalledWith({
         body: {
+          originator: 'individual_gradebook',
           submission: {
             posted_grade: 'complete',
           },
