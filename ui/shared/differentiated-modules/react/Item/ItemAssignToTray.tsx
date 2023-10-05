@@ -17,10 +17,12 @@
  */
 
 import React, {useCallback, useEffect, useState} from 'react'
-import moment from 'moment-timezone'
 import {Button, CloseButton} from '@instructure/ui-buttons'
+import {ApplyLocale} from '@instructure/ui-i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
+import {Mask} from '@instructure/ui-overlays'
+import {Spinner} from '@instructure/ui-spinner'
 import {Tray} from '@instructure/ui-tray'
 import {uid} from '@instructure/uid'
 import {View} from '@instructure/ui-view'
@@ -31,8 +33,10 @@ import {
   IconQuizSolid,
   IconQuestionLine,
 } from '@instructure/ui-icons'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {BaseDateDetails, DateDetails} from './types'
+import doFetchApi from '@canvas/do-fetch-api-effect'
+import {BaseDateDetails, FetchDueDatesResponse} from './types'
 import ItemAssignToCard from './ItemAssignToCard'
 import TrayFooter from '../Footer'
 
@@ -51,6 +55,18 @@ function itemTypeToIcon(itemType: string) {
   }
 }
 
+function itemTypeToApiURL(courseId: string, itemType: string, itemId: string) {
+  switch (itemType) {
+    case 'assignment':
+    case 'lti-quiz':
+      return `/api/v1/courses/${courseId}/assignments/${itemId}/date_details`
+    case 'quiz':
+      return `/api/v1/courses/${courseId}/quizzes/${itemId}/date_details`
+    default:
+      return ''
+  }
+}
+
 function makeCardId(): string {
   return uid('assign-to-card', 3)
 }
@@ -58,13 +74,18 @@ function makeCardId(): string {
 // TODO: need props to initialize with cards corresponding to current assignments
 export interface ItemAssignToTrayProps {
   open: boolean
+  onClose: () => void
   onDismiss: () => void
   onSave: () => void
   courseId: string
   moduleItemId: string
   moduleItemName: string
   moduleItemType: string
+  moduleItemContentType: string
+  moduleItemContentId: string
   pointsPossible: string
+  locale: string
+  timezone: string
 }
 
 // TODO: will eventually be ItemAssignToCardSpec, I think
@@ -80,87 +101,62 @@ interface CardMap {
 
 export default function ItemAssignToTray({
   open,
+  onClose,
   onDismiss,
   onSave,
   courseId,
   moduleItemId,
   moduleItemName,
   moduleItemType,
+  moduleItemContentType,
+  moduleItemContentId,
   pointsPossible,
+  locale,
+  timezone,
 }: ItemAssignToTrayProps) {
   const [assignToCards, setAssignToCards] = useState<CardMap>({})
+  const [fetchInFlight, setFetchInFlight] = useState(false)
 
   useEffect(() => {
-    setTimeout(() => {
-      const courseStart = moment(ENV.VALID_DATE_RANGE?.start_at.date)
-      const dateDetailsApiResponse: DateDetails = {
-        id: 23,
-        due_at: courseStart.clone().add(2, 'day').toISOString(),
-        unlock_at: ENV.VALID_DATE_RANGE?.start_at?.date || null,
-        lock_at: ENV.VALID_DATE_RANGE?.end_at?.date || null,
-        only_visible_to_overrides: false,
-        overrides: [
-          {
-            id: 2,
-            assignment_id: 23,
-            title: 'Section 4',
-            due_at: courseStart.clone().add(4, 'day').toISOString(),
-            all_day: false,
-            all_day_date: '2023-10-02',
-            unlock_at: null,
-            lock_at: null,
-            course_section_id: 4,
-          },
-          {
-            id: 3,
-            assignment_id: 23,
-            title: 'Section 5',
-            due_at: courseStart.clone().add(6, 'day').toISOString(),
-            all_day: false,
-            all_day_date: '2023-10-03',
-            unlock_at: null,
-            lock_at: null,
-            course_section_id: 5,
-          },
-        ],
-      }
+    setFetchInFlight(true)
+    doFetchApi({
+      path: itemTypeToApiURL(courseId, moduleItemType, moduleItemContentId),
+    })
+      .then((response: FetchDueDatesResponse) => {
+        // TODO: exhaust pagination
+        const dateDetailsApiResponse = response.json
+        const overrides = dateDetailsApiResponse.overrides
+        delete dateDetailsApiResponse.overrides
+        const baseDates: BaseDateDetails = dateDetailsApiResponse
 
-      const overrides = dateDetailsApiResponse.overrides
-      delete dateDetailsApiResponse.overrides
-      const baseDates: BaseDateDetails = dateDetailsApiResponse
-
-      const cards: CardMap = {}
-      if ('id' in dateDetailsApiResponse) {
-        const cardId = makeCardId()
-        cards[cardId] = {
-          isValid: true,
-          due_at: baseDates.due_at,
-          unlock_at: baseDates.unlock_at,
-          lock_at: baseDates.lock_at,
-        }
-      }
-      if (overrides?.length) {
-        overrides.forEach(override => {
+        const cards: CardMap = {}
+        if ('id' in dateDetailsApiResponse) {
           const cardId = makeCardId()
           cards[cardId] = {
             isValid: true,
-            due_at: override.due_at,
-            unlock_at: override.unlock_at,
-            lock_at: override.lock_at,
+            due_at: baseDates.due_at,
+            unlock_at: baseDates.unlock_at,
+            lock_at: baseDates.lock_at,
           }
-        })
-      } else {
-        const cardId = makeCardId()
-        cards[cardId] = {
-          isValid: true,
-          due_at: null,
-          unlock_at: null,
-          lock_at: null,
         }
-      }
-      setAssignToCards(cards)
-    }, 0)
-  }, [courseId, moduleItemId])
+        if (overrides?.length) {
+          overrides.forEach(override => {
+            const cardId = makeCardId()
+            cards[cardId] = {
+              isValid: true,
+              due_at: override.due_at,
+              unlock_at: override.unlock_at,
+              lock_at: override.lock_at,
+            }
+          })
+        }
+        setAssignToCards(cards)
+      })
+      .catch(showFlashError())
+      .finally(() => {
+        setFetchInFlight(false)
+      })
+  }, [courseId, moduleItemContentId, moduleItemContentType, moduleItemId, moduleItemType])
 
   const handleAddCard = useCallback(() => {
     const cardId = makeCardId()
@@ -196,7 +192,7 @@ export default function ItemAssignToTray({
   function Header() {
     const icon = itemTypeToIcon(moduleItemType)
     return (
-      <Flex.Item margin="medium 0 0 0" padding="0 medium" width="100%">
+      <Flex.Item margin="medium 0" padding="0 medium" width="100%">
         <CloseButton
           onClick={onDismiss}
           screenReaderLabel={I18n.t('Close')}
@@ -230,14 +226,14 @@ export default function ItemAssignToTray({
     const cardIds = Object.keys(assignToCards)
     const cardCount = cardIds.length
     return cardIds.map(cardId => {
-      const props = assignToCards[cardId]
+      const dateProps = assignToCards[cardId]
       return (
         <View key={cardId} as="div" margin="small 0 0 0">
           <ItemAssignToCard
             cardId={cardId}
-            due_at={props.due_at}
-            unlock_at={props.unlock_at}
-            lock_at={props.lock_at}
+            due_at={dateProps.due_at}
+            unlock_at={dateProps.unlock_at}
+            lock_at={dateProps.lock_at}
             onDelete={cardCount === 1 ? undefined : handleDeleteCard}
             onValidityChange={handleCardValidityChange}
           />
@@ -249,7 +245,15 @@ export default function ItemAssignToTray({
   function Body() {
     return (
       <Flex.Item padding="small medium 0" shouldGrow={true} shouldShrink={true}>
-        {renderCards()}
+        {fetchInFlight && (
+          <Mask>
+            <Spinner renderTitle={I18n.t('Loading')} />
+          </Mask>
+        )}
+        <ApplyLocale locale={locale} timezone={timezone}>
+          {renderCards()}
+        </ApplyLocale>
+
         <Button onClick={handleAddCard} margin="small 0 0 0" renderIcon={IconAddLine}>
           {I18n.t('Add')}
         </Button>
@@ -261,7 +265,7 @@ export default function ItemAssignToTray({
     return (
       <Flex.Item margin="small 0 0 0" width="100%">
         <TrayFooter
-          disableUpdate={!allCardsValid()}
+          updateInteraction={allCardsValid() ? 'enabled' : 'inerror'}
           updateButtonLabel={I18n.t('Save')}
           onDismiss={onDismiss}
           onUpdate={handleUpdate}
@@ -273,6 +277,7 @@ export default function ItemAssignToTray({
   return (
     <Tray
       data-testid="module-item-edit-tray"
+      onClose={onClose}
       label={I18n.t('Edit assignment %{name}', {
         name: moduleItemName,
       })}
