@@ -17,9 +17,8 @@
  */
 
 import React from 'react'
-import {render, screen, waitFor} from '@testing-library/react'
+import {render, screen} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
-
 import UsersListRow, {determineToggleFunction, generateIcon, generateTitle} from '../UsersListRow'
 import {PROVIDER, RECIPIENT} from '@canvas/temporary-enrollment/react/types'
 
@@ -47,35 +46,35 @@ function makeProps() {
   }
 }
 
+function renderUsersListRowWithProps(props) {
+  render(
+    <table>
+      <tbody>
+        <UsersListRow {...props} />
+      </tbody>
+    </table>
+  )
+}
+
 describe('UsersListRow', () => {
-  const defaultProps = makeProps()
+  let defaultProps
+
+  beforeEach(() => {
+    // ensures these props are reset before each test
+    defaultProps = makeProps()
+  })
 
   it('renders an avatar', () => {
-    const {getByText} = render(
-      <table>
-        <tbody>
-          <UsersListRow {...defaultProps} />
-        </tbody>
-      </table>
-    )
-    const avatar = getByText('foo').querySelector('span')
+    renderUsersListRowWithProps(defaultProps)
+    const avatar = screen.getByText('foo').querySelector('span')
 
     expect(avatar.getAttribute('src')).toBe(defaultProps.user.avatar_url)
   })
 
   it('renders all tooltips when permissions true', async () => {
-    render(
-      <table>
-        <tbody>
-          <UsersListRow {...defaultProps} />
-        </tbody>
-      </table>
-    )
+    renderUsersListRowWithProps(defaultProps)
 
-    await waitFor(() => {
-      const tooltips = screen.getAllByRole('tooltip')
-      expect(tooltips.length).toBe(3)
-    })
+    expect(screen.getAllByRole('tooltip').length).toBe(3)
   })
 
   it('renders no tooltips when permissions are false', async () => {
@@ -90,29 +89,13 @@ describe('UsersListRow', () => {
       },
     }
 
-    const {queryByRole} = render(
-      <table>
-        <tbody>
-          <UsersListRow {...noPermission} />
-        </tbody>
-      </table>
-    )
+    renderUsersListRowWithProps(noPermission)
 
-    await waitFor(() => {
-      const tooltips = queryByRole('tooltip')
-
-      expect(tooltips).toBeNull()
-    })
+    expect(screen.queryByRole('tooltip')).toBeNull()
   })
 
   describe('temporary enrollments', () => {
-    const temporaryEnrollmentProps = {
-      ...defaultProps,
-      permissions: {
-        ...defaultProps.permissions,
-        can_add_temporary_enrollments: true,
-      },
-    }
+    let temporaryEnrollmentProps
 
     beforeEach(() => {
       // enrollment providers
@@ -151,14 +134,17 @@ describe('UsersListRow', () => {
         ]
       )
 
+      // ensures these props are reset before each test
+      temporaryEnrollmentProps = {
+        ...defaultProps,
+        permissions: {
+          ...defaultProps.permissions,
+          can_add_temporary_enrollments: true,
+        },
+      }
+
       // for the tests that look at the UsersListRow dom
-      render(
-        <table>
-          <tbody>
-            <UsersListRow {...temporaryEnrollmentProps} />
-          </tbody>
-        </table>
-      )
+      renderUsersListRowWithProps(temporaryEnrollmentProps)
     })
 
     afterEach(() => {
@@ -209,11 +195,9 @@ describe('UsersListRow', () => {
     })
 
     it('renders all tooltips when permissions true', async () => {
-      await waitFor(() => {
-        const tooltips = screen.getAllByRole('tooltip')
+      const tooltips = screen.getAllByRole('tooltip')
 
-        expect(tooltips.length).toBe(5)
-      })
+      expect(tooltips.length).toBe(5)
     })
 
     describe('SVG Icons for temporary enrollments', () => {
