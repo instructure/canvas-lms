@@ -20,17 +20,13 @@ import React from 'react'
 import {act, fireEvent, render} from '@testing-library/react'
 import AssigneeSelector from '../AssigneeSelector'
 import fetchMock from 'fetch-mock'
-import {
-  FILTERED_SECTIONS_DATA,
-  FILTERED_STUDENTS_DATA,
-  SECTIONS_DATA,
-  STUDENTS_DATA,
-  ASSIGNMENT_OVERRIDES_DATA,
-} from './mocks'
+import {FILTERED_SECTIONS_DATA, FILTERED_STUDENTS_DATA, SECTIONS_DATA, STUDENTS_DATA} from './mocks'
 
 const props = {
   courseId: '1',
   moduleId: '2',
+  onSelect: jest.fn(),
+  selectedOptionIds: [],
 }
 
 const SECTIONS_URL = `/api/v1/courses/${props.courseId}/sections`
@@ -56,11 +52,13 @@ describe('AssigneeSelector', () => {
     fetchMock.getOnce(FILTERED_STUDENTS_URL, FILTERED_STUDENTS_DATA)
     fetchMock.getOnce(ASSIGNMENT_OVERRIDES_URL, [])
   })
+
   afterEach(() => {
     fetchMock.restore()
   })
 
-  const renderComponent = () => render(<AssigneeSelector {...props} />)
+  const renderComponent = (overrides?: Partial<typeof props>) =>
+    render(<AssigneeSelector {...props} {...overrides} />)
 
   it('displays sections and students as options', async () => {
     const {findByTestId, findByText, getByText} = renderComponent()
@@ -89,38 +87,15 @@ describe('AssigneeSelector', () => {
     })
   })
 
-  it('selects multiple options', async () => {
-    const {findByTestId, findByText, getAllByTestId} = renderComponent()
+  it('calls onSelect with parsed options', async () => {
+    const onSelect = jest.fn()
+    const {findByTestId, findByText} = renderComponent({onSelect})
     const assigneeSelector = await findByTestId('assignee_selector')
     act(() => assigneeSelector.click())
     const option1 = await findByText(SECTIONS_DATA[0].name)
     act(() => option1.click())
-    act(() => assigneeSelector.click())
-    const option2 = await findByText(SECTIONS_DATA[2].name)
-    act(() => option2.click())
-    expect(getAllByTestId('assignee_selector_selected_option').length).toBe(2)
-  })
-
-  it('clears selection', async () => {
-    const {findByTestId, getByTestId, queryAllByTestId, findByText} = renderComponent()
-    const assigneeSelector = await findByTestId('assignee_selector')
-    act(() => assigneeSelector.click())
-    const option = await findByText(STUDENTS_DATA[0].name)
-    act(() => option.click())
-    expect(queryAllByTestId('assignee_selector_selected_option').length).toBe(1)
-    act(() => getByTestId('clear_selection_button').click())
-    expect(queryAllByTestId('assignee_selector_selected_option').length).toBe(0)
-  })
-
-  it('shows existing assignmentOverrides as the default selection', async () => {
-    fetchMock.getOnce(ASSIGNMENT_OVERRIDES_URL, ASSIGNMENT_OVERRIDES_DATA, {overwriteRoutes: true})
-    const assignedSections = ASSIGNMENT_OVERRIDES_DATA.filter(
-      override => override.course_section !== undefined
-    )
-    const {getAllByTestId, findByText} = renderComponent()
-    expect(await findByText(ASSIGNMENT_OVERRIDES_DATA[0].students![0].name)).toBeInTheDocument()
-    expect(getAllByTestId('assignee_selector_selected_option').length).toBe(
-      ASSIGNMENT_OVERRIDES_DATA[0].students!.length + assignedSections.length
-    )
+    expect(onSelect).toHaveBeenCalledWith([
+      {group: 'Sections', id: `section-${SECTIONS_DATA[0].id}`, value: SECTIONS_DATA[0].name},
+    ])
   })
 })

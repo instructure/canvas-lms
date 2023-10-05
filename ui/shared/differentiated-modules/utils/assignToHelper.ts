@@ -16,6 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {AssigneeOption} from '../react/AssigneeSelector'
+import {AssignmentOverridePayload, AssignmentOverridesPayload} from '../react/types'
+
 export const setContainScrollBehavior = (element: HTMLElement | null) => {
   if (element !== null) {
     let parent = element.parentElement
@@ -28,4 +31,30 @@ export const setContainScrollBehavior = (element: HTMLElement | null) => {
       parent = parent.parentElement
     }
   }
+}
+
+export const generateAssignmentOverridesPayload = (
+  selectedAssignees: AssigneeOption[]
+): AssignmentOverridesPayload => {
+  const studentsOverrideId = selectedAssignees.find(
+    assignee => assignee.id.includes('student') && assignee.overrideId
+  )?.overrideId
+  const sectionOverrides = selectedAssignees
+    .filter(assignee => assignee.id.includes('section'))
+    ?.map(section => ({
+      course_section_id: section.id.split('-')[1],
+      id: section.overrideId,
+    }))
+  const studentIds = selectedAssignees
+    .filter(assignee => assignee.id.includes('student'))
+    ?.map(({id}) => id.split('-')[1])
+  const overrides: AssignmentOverridePayload[] = [...sectionOverrides]
+  if (studentIds.length > 0) {
+    overrides.push({
+      id: studentsOverrideId,
+      student_ids: studentIds,
+    })
+  }
+
+  return {overrides}
 }
