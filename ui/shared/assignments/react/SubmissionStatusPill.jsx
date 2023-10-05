@@ -24,7 +24,9 @@ import {Pill} from '@instructure/ui-pill'
 const I18n = useI18nScope('assignments_2')
 
 export default function SubmissionStatusPill(props) {
-  if (props.excused) {
+  if (props.customGradeStatus) {
+    return <Pill data-testid={`custom-grade-pill-${props.customGradeStatus}`}>{props.customGradeStatus}</Pill>
+  } else if (props.excused) {
     return <Pill data-testid="excused-pill">{I18n.t('Excused')}</Pill>
   } else if (props.submissionStatus === 'missing') {
     return (
@@ -52,4 +54,5 @@ export default function SubmissionStatusPill(props) {
 SubmissionStatusPill.propTypes = {
   excused: bool,
   submissionStatus: string,
+  customGradeStatus: string,
 }

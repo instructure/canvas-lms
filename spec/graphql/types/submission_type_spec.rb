@@ -580,6 +580,27 @@ describe Types::SubmissionType do
     end
   end
 
+  describe "customGradeStatus" do
+    before(:once) do
+      Account.site_admin.enable_feature!(:custom_gradebook_statuses)
+      assignment = @course.assignments.create!(
+        name: "custom status assignment",
+        points_possible: 10,
+        due_at: 1.hour.ago,
+        submission_types: ["online_text_entry"]
+      )
+      @submission1 = Submission.where(assignment_id: assignment.id, user_id: @student.id).first
+      @custom_status = CustomGradeStatus.create(name: "Test Status", color: "#000000", root_account: @course.root_account, created_by: @teacher)
+    end
+
+    let(:submission_type) { GraphQLTypeTester.new(@submission1, current_user: @teacher) }
+
+    it "returns customGradeStatus" do
+      @submission1.update!(custom_grade_status: @custom_status)
+      expect(submission_type.resolve("customGradeStatus")).to eq @custom_status.name
+    end
+  end
+
   describe "gradeMatchesCurrentSubmission" do
     before(:once) do
       assignment = @course.assignments.create!(name: "assignment", points_possible: 10)
