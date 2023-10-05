@@ -34,17 +34,18 @@ const fixtures = {
   `,
   requirements: `
     <div class="ig-row with-completion-requirements ig-published">
-      <span class="type_icon" title="Assignment" role="none">
       <span class="item_name">
         <a title="HW 1" class="ig-title title item_link" href="/courses/13/modules/items/45">HW 1</a>
       </span>
       <span class="requirement_type min_score_requirement" style="display: none;"></span>
       <span class="requirement_type must_mark_done_requirement" style="display: block;"></span>
       <span class="points_possible_display">10 pts</span>
-      <span data-module-item-id="93" />
+      <div class="module_item_icons nobr">
+        <span class="type" style="display: none;">assignment</span>
+        <span class="id" style="display: none;">93</span>
+      </div>
     </div>
     <div class="ig-row with-completion-requirements ig-published">
-      <span class="type_icon" title="Quiz" role="none"></span>
       <span class="item_name">
         <a title="Quiz 1" class="ig-title title item_link" href="/courses/13/modules/items/54">Quiz 1</a>
       </span>
@@ -52,7 +53,10 @@ const fixtures = {
         <span class="min_score">70</span>
       </span>
       <span class="requirement_type must_mark_done_requirement" style="display: none;"></span>
-      <span data-module-item-id="94" />
+      <div class="module_item_icons nobr">
+        <span class="type" style="display: none;">quiz</span>
+        <span class="id" style="display: none;">94</span>
+      </div>
     </div>
   `,
 }
