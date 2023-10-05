@@ -169,7 +169,7 @@ describe ContentMigration do
     end
 
     it "copies assignment attributes" do
-      assignment_model(course: @copy_from, points_possible: 40, submission_types: "file_upload", grading_type: "points")
+      assignment_model(course: @copy_from, points_possible: 0, submission_types: "file_upload", grading_type: "points")
       @assignment.turnitin_enabled = true
       @assignment.vericite_enabled = true
       @assignment.vericite_settings = {
@@ -185,7 +185,7 @@ describe ContentMigration do
       @assignment.allowed_extensions = ["doc", "xls"]
       @assignment.position = 2
       @assignment.muted = true
-      @assignment.hide_in_gradebook = false
+      @assignment.hide_in_gradebook = true
       @assignment.omit_from_final_grade = true
       @assignment.only_visible_to_overrides = true
       @assignment.post_to_sis = true
