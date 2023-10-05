@@ -19,7 +19,7 @@
 import React, {useState, useRef, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import AnonymousResponseSelector from '@canvas/discussions/react/components/AnonymousResponseSelector/AnonymousResponseSelector'
-import GroupCategoryModalContainer from '../../containers/GroupCategoryModalContainer/GroupCategoryModalContainer'
+import {CreateOrEditSetModal} from '@canvas/groups/react/CreateOrEditSetModal'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {View} from '@instructure/ui-view'
@@ -37,6 +37,8 @@ import CanvasRce from '@canvas/rce/react/CanvasRce'
 import {Alert} from '@instructure/ui-alerts'
 import {GradedDiscussionOptions} from '../GradedDiscussionOptions/GradedDiscussionOptions'
 
+import {addNewGroupCategoryToCache} from '../../utils'
+
 const I18n = useI18nScope('discussion_create')
 
 export default function DiscussionTopicForm({
@@ -48,6 +50,7 @@ export default function DiscussionTopicForm({
   groupCategories,
   onSubmit,
   isGroupContext,
+  apolloClient,
 }) {
   const rceRef = useRef()
 
@@ -107,6 +110,7 @@ export default function DiscussionTopicForm({
   const [todoDate, setTodoDate] = useState(null)
   const [isGroupDiscussion, setIsGroupDiscussion] = useState(false)
   const [groupCategoryId, setGroupCategoryId] = useState(null)
+  const [groupCategorySelectError, setGroupCategorySelectError] = useState([])
   const [delayPosting, setDelayPosting] = useState(false)
   const [locked, setLocked] = useState(false)
 
@@ -190,8 +194,23 @@ export default function DiscussionTopicForm({
     }
   }
 
+  const validateSelectGroup = () => {
+    if (!isGroupDiscussion) return true // if not a group discussion, no need to validate
+    if (groupCategoryId) return true // if a group category is selected, validated
+
+    // if not a group discussion and no group category is selected, show error
+    setGroupCategorySelectError([{text: I18n.t('Please select a group category.'), type: 'error'}])
+    return false
+  }
+
   const validateFormFields = () => {
-    return validateTitle(title) && validateAvailability(availableFrom, availableUntil)
+    let isValid = true
+
+    if (!validateTitle(title)) isValid = false
+    if (!validateAvailability(availableFrom, availableUntil)) isValid = false
+    if (!validateSelectGroup()) isValid = false
+
+    return isValid
   }
 
   const submitForm = shouldPublish => {
@@ -211,7 +230,7 @@ export default function DiscussionTopicForm({
         addToTodo,
         todoDate,
         isGroupDiscussion,
-        groupCategoryId,
+        groupCategoryId: isGroupDiscussion ? groupCategoryId : null,
         availableFrom,
         availableUntil,
         shouldPublish: isEditing ? published : shouldPublish,
@@ -506,9 +525,11 @@ export default function DiscussionTopicForm({
                     setShowGroupCategoryModal(true)
                   } else {
                     setGroupCategoryId(value)
+                    setGroupCategorySelectError([])
                   }
                 }}
-                placeholder={I18n.t('Select Group')}
+                messages={groupCategorySelectError}
+                placeholder={I18n.t('Select a group category')}
                 width={inputWidth}
               >
                 {groupCategories.map(({_id: id, name: label}) => (
@@ -526,16 +547,27 @@ export default function DiscussionTopicForm({
                   id="opt-new-group-category"
                   value="new-group-category"
                   renderBeforeLabel={IconAddLine}
+                  data-testid="group-category-opt-new-group-category"
                 >
                   {I18n.t('New Group Category')}
                 </SimpleSelect.Option>
               </SimpleSelect>
 
-              <GroupCategoryModalContainer
-                show={showGroupCategoryModal}
-                setShow={setShowGroupCategoryModal}
-                afterCreate={setGroupCategoryId}
-              />
+              {showGroupCategoryModal && (
+                <CreateOrEditSetModal
+                  closed={!showGroupCategoryModal}
+                  onDismiss={newGroupCategory => {
+                    setShowGroupCategoryModal(false)
+                    if (!newGroupCategory) return
+                    addNewGroupCategoryToCache(apolloClient.cache, newGroupCategory)
+                    setGroupCategoryId(newGroupCategory.id)
+                  }}
+                  studentSectionCount={sections.length}
+                  context={ENV.context_type.toLocaleLowerCase()}
+                  contextId={ENV.context_id}
+                  allowSelfSignup={ENV.allow_self_signup}
+                />
+              )}
             </View>
           )}
         </FormFieldGroup>
@@ -636,6 +668,7 @@ DiscussionTopicForm.propTypes = {
   groupCategories: PropTypes.arrayOf(PropTypes.object),
   onSubmit: PropTypes.func,
   isGroupContext: PropTypes.bool,
+  apolloClient: PropTypes.object,
 }
 
 DiscussionTopicForm.defaultProps = {

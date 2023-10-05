@@ -51,7 +51,7 @@ export const DiscussionTopicEdit = _props => {
           />
         }
       >
-        <DiscussionTopicFormContainer />
+        <DiscussionTopicFormContainer apolloClient={client} />
       </ErrorBoundary>
     </ApolloProvider>
   )

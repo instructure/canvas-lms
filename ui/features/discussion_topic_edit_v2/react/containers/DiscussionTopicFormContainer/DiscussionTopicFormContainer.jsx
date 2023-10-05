@@ -19,7 +19,7 @@
 import React, {useContext} from 'react'
 
 import {useQuery, useMutation} from 'react-apollo'
-import {COURSE_QUERY, GROUP_QUERY, DISCUSSION_TOPIC_QUERY} from '../../../graphql/Queries'
+import {DISCUSSION_TOPIC_QUERY} from '../../../graphql/Queries'
 import {CREATE_DISCUSSION_TOPIC} from '../../../graphql/Mutations'
 
 import LoadingIndicator from '@canvas/loading-indicator'
@@ -27,14 +27,14 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import DiscussionTopicForm from '../../components/DiscussionTopicForm/DiscussionTopicForm'
 
+import {getContextQuery} from '../../utils'
+
 const I18n = useI18nScope('discussion_create')
 
-export default function DiscussionTopicFormContainer() {
+export default function DiscussionTopicFormContainer({apolloClient}) {
   const {setOnFailure} = useContext(AlertManagerContext)
   const contextType = ENV.context_is_not_group ? 'Course' : 'Group'
-  const contextQueryToUse = contextType === 'Course' ? COURSE_QUERY : GROUP_QUERY
-  const contextQueryVariables =
-    contextType === 'Course' ? {courseId: ENV.context_id} : {groupId: ENV.context_id}
+  const {contextQueryToUse, contextQueryVariables} = getContextQuery(contextType)
 
   const {data: contextData, loading: courseIsLoading} = useQuery(contextQueryToUse, {
     variables: contextQueryVariables,
@@ -94,6 +94,7 @@ export default function DiscussionTopicFormContainer() {
       assignmentGroups={currentContext?.assignmentGroupsConnection?.nodes}
       sections={sections}
       groupCategories={groupCategories}
+      apolloClient={apolloClient}
       onSubmit={({
         title,
         message,

@@ -676,9 +676,29 @@ describe "discussions" do
         expect(f("[data-testid='section-opt-#{default_section.id}']")).to be_present
         expect(f("[data-testid='section-opt-#{new_section.id}']")).to be_present
         force_click("input[data-testid='group-discussion-checkbox']")
-        f("input[placeholder='Select Group']").click
+        f("input[placeholder='Select a group category']").click
         # very group category exists in the dropdown
         expect(f("[data-testid='group-category-opt-#{group_category.id}']")).to be_present
+      end
+
+      it "creates group via shared group modal" do
+        new_section
+        group_category
+        group
+
+        get "/courses/#{course.id}/discussion_topics/new"
+        force_click("input[data-testid='group-discussion-checkbox']")
+        f("input[placeholder='Select a group category']").click
+        wait_for_ajaximations
+        force_click("[data-testid='group-category-opt-new-group-category']")
+        wait_for_ajaximations
+        expect(f("[data-testid='modal-create-groupset']")).to be_present
+        f("#new-group-set-name").send_keys("Onyx 1")
+        force_click("[data-testid='group-set-save']")
+        wait_for_ajaximations
+        new_group_category = GroupCategory.last
+        expect(new_group_category.name).to eq("Onyx 1")
+        expect(f("input[placeholder='Select a group category']")["value"]).to eq(new_group_category.name)
       end
     end
 
