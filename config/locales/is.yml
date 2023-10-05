@@ -10187,7 +10187,7 @@ is:
   divide_into_equal_slots_value_is_in_minutes_13fe14d2: "Skipta í jöfn hólf (gildi í mínútum)"
   divide_into_equal_time_slots_in_minutes_234312fa: "Skipta í jöfn tímahólf (í mínútum"
   division_cutoff_cutoff_value_e938bc9d: "Stýfing skiptingar %{cutoff_value}"
-  do_not_count_this_assignment_towards_the_final_gra_4dd92e00: "Ekki reikna þetta verkefni með í lokaeinunn"
+  do_not_count_this_assignment_towards_the_final_gra_4dd92e00: "Ekki reikna þetta verkefni með í lokaeinkunn"
   do_not_display_in_gradebook_or_the_student_s_grade_3de05e1c: "Ekki birta í einkunnabók eða einkunnasíðu nemandans"
   do_not_show_again_for_this_assignment_d0abd4ae: "Ekki sýna aftur fyrir þetta verkefni"
   do_nothing_9672b478: "Gera ekkert"
