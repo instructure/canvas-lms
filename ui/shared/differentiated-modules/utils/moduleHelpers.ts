@@ -26,13 +26,13 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 const I18n = useI18nScope('differentiated_modules')
 
 const resourceTypeMap: Record<string, Requirement['resource']> = {
-  Assignment: 'assignment',
-  Quiz: 'quiz',
-  Attachment: 'file',
-  Page: 'page',
-  'Discussion Topic': 'discussion',
-  'External Url': 'externalUrl',
-  'External Tool': 'externalTool',
+  assignment: 'assignment',
+  quiz: 'quiz',
+  attachment: 'file',
+  wiki_page: 'page',
+  discussion_topic: 'discussion',
+  external_url: 'externalUrl',
+  context_external_tool: 'externalTool',
 }
 
 const requirementTypeMap: Record<string, Requirement['type']> = {
@@ -133,16 +133,10 @@ function parseRequirements(element: HTMLDivElement) {
     element.querySelectorAll('.ig-row.with-completion-requirements')
   )
   return requirementElements.map((requirementNode: Element) => {
-    const id = requirementNode
-      .querySelector('[data-module-item-id]')
-      ?.getAttribute('data-module-item-id')
-    const name = requirementNode.querySelector('.item_name a')?.textContent?.trim() || ''
+    const id = requirementNode.querySelector('.id')?.textContent
+    const name = requirementNode.querySelector('.item_name a')?.getAttribute('title')?.trim() || ''
     const resource =
-      resourceTypeMap[
-        requirementNode
-          .querySelector('.type_icon')
-          ?.getAttribute('title') as Requirement['resource']
-      ]
+      resourceTypeMap[requirementNode.querySelector('.type')?.textContent || 'external_url']
     // One of these (the active one) has "display: block;" and the others are hidden
     const activeRequirementNode = Array.from(
       requirementNode.querySelectorAll('.requirement_type')
@@ -164,14 +158,10 @@ function parseRequirements(element: HTMLDivElement) {
 function parseModuleItems(element: HTMLDivElement) {
   const moduleItemElements = Array.from(element.querySelectorAll('.ig-row'))
   return moduleItemElements.map(moduleItem => {
-    const id = moduleItem
-      .querySelector('[data-module-item-id]')
-      ?.getAttribute('data-module-item-id')
-    const name = moduleItem.querySelector('.item_name a')?.textContent?.trim() || ''
+    const id = moduleItem.querySelector('.id')?.textContent
+    const name = moduleItem.querySelector('.item_name a')?.getAttribute('title')?.trim() || ''
     const resource =
-      resourceTypeMap[
-        moduleItem.querySelector('.type_icon')?.getAttribute('title') as Requirement['resource']
-      ]
+      resourceTypeMap[moduleItem.querySelector('.type')?.textContent || 'external_url']
     return {id, name, resource}
   })
 }
