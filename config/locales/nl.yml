@@ -8061,7 +8061,7 @@ nl:
   conversations_69a8dc26: Gesprekken
   conversations_send_messages_to_entire_class_3f414741: "Gesprekken - berichten naar de hele groep sturen"
   conversations_send_messages_to_individual_course_m_733620b: "Gesprekken - berichten naar individuele cursisten sturen"
-  copy_9748f9f: Kopiëren
+  copy_9748f9f: Kopie
   copy_assignment_name_to_another_course_b62d0a54: "Kopieer opdracht %{name} naar een andere cursus"
   copy_blueprint_course_settings_31a97e96: "Instellingen voor blauwdrukcursus kopiëren"
   copy_list_of_shard_ids_d51cd846: "Lijst met shard-ID's kopiëren"
@@ -8167,7 +8167,7 @@ nl:
     one: "1 poging"
     other: "%{count} pogingen"
     zero: "Onbeperkt aantal pogingen"
-  count_changes_pushed_by_user_654aade2: "%{count} wijzigingen bewerkstelligt door %{user}"
+  count_changes_pushed_by_user_654aade2: "%{count} wijzigingen bewerkstelligd door %{user}"
   count_comments_cb137ab8: 
     one: "1 opmerking"
     other: "%{count} opmerkingen"
@@ -15581,7 +15581,7 @@ nl:
   insert_row_below_25187f89: "Rij hieronder invoegen"
   insert_row_below_name_a5b3bd41: "Rij invoegen onder %{name}"
   insert_row_in_edit_mode_5976f269: "Rij invoegen in bewerkingsmodus"
-  insert_subject_9f0d8e49: "Vak invoegen"
+  insert_subject_9f0d8e49: "Onderwerp invoegen"
   insights_b514ad8d: Inzichten
   instaccess_tokens_b13a8390: "InstAccess tokens"
   install_c54fad9b: Installeren
@@ -19908,7 +19908,7 @@ nl:
   no_longer_available_1557d25d: "Niet meer beschikbaar"
   no_longer_observing_user_efa5298a: "%{user} wordt niet langer waargenomen"
   no_ltis_configured_f4b9bc6b: "Geen LTI's geconfigureerd"
-  no_marks_5e7d2b59: "Geen markeringen"
+  no_marks_5e7d2b59: "Geen score"
   no_matched_jobs_c1fc8222: "Geen overeenkomende taken"
   no_matches_found_please_insert_a_valid_recipient_4cef9d47: "Geen overeenkomsten gevonden. Voeg een geldige ontvanger in."
   no_matches_to_your_search_16d3d3b1: "Geen overeenkomsten met je zoekopdracht"
@@ -23292,7 +23292,7 @@ nl:
           essay: "Vraag met essay"
           file_upload: "Bestand uploaden als inzending"
           fill_in_multiple_blanks: "Lege velden invullen"
-          matching: Overeenkomen
+          matching: Matching
           missing_word: "Ontbrekend woord"
           multiple_answers: "Meerdere antwoorden"
           multiple_choice: Meerkeuze
@@ -26178,7 +26178,7 @@ nl:
       delete_criterion_row: "Rij met criterium verwijderen"
       description: 
         custom_comments_area: "Dit gebied zal door de beoordelaar gebruikt worden om opmerkingen gerelateerd aan dit criterium achter te laten."
-      full_marks: "Volledige markeringen"
+      full_marks: "Volledige score"
       icons: 
         add_new_rating_after: "Na huidige beoordeling nieuwe classificatie categorie toevoegen"
         additional_comments: "Extra opmerkingen"
@@ -26193,7 +26193,7 @@ nl:
       links: 
         additional_comments: "Extra opmerkingen"
         view_longer_description: "Uitgebreidere beschrijving weergeven"
-      no_marks: "Geen markeringen"
+      no_marks: "Geen score"
       options: 
         select: "[ Selecteren ]"
       points: "%{points} punten"
@@ -26235,12 +26235,12 @@ nl:
     rubric_summary_criterion: 
       defaults: 
         description: "Beschrijving van criterium"
-      full_marks: "Volledige markeringen"
+      full_marks: "Volledige score"
       labels: 
         long_description: "Lange beschrijving"
       links: 
         view_longer_description: "langere beschrijving weergeven"
-      no_marks: "Geen markeringen"
+      no_marks: "Geen score"
       out_of_points: "%{points}/%{total} punten"
       titles: 
         full_comments: "Klikken om volledige opmerkingen te zien"
