@@ -260,7 +260,7 @@ export default function SettingsPanel({
           updateButtonLabel={I18n.t('Update Module')}
           onDismiss={onDismiss}
           onUpdate={handleUpdate}
-          disableUpdate={state.nameInputMessages.length > 0}
+          updateInteraction={state.nameInputMessages.length > 0 ? 'inerror' : 'enabled'}
         />
       </Flex.Item>
     </Flex>

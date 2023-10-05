@@ -269,6 +269,8 @@
                     data-item-name="<%= module_item ? module_item.title : '' %>"
                     data-item-type="<%= module_item ? module_item.content_type_class : '' %>"
                     data-item-context-id="<%= module_item ? module_item.context_id : '' %>"
+                    data-item-content-type="<%= module_item ? module_item.content_type : '' %>"
+                    data-item-content-id="<%= module_item ? module_item.content_id : '' %>"
                     title="<%= t('Assign this module') %>"
                   >
                     <%= @module_item_image_tags['assign_to'] %> <%= t('Assign To...') %>

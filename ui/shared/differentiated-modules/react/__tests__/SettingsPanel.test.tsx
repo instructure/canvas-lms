@@ -108,9 +108,11 @@ describe('SettingsPanel', () => {
     it('validates the module name', () => {
       const {getByRole, getByText} = renderComponent({moduleName: ''})
       const updateButton = getByRole('button', {name: 'Update Module'})
+
       updateButton.click()
+      updateButton.focus()
+      expect(getByText('Please fix errors before continuing')).toBeInTheDocument()
       expect(getByText('Module Name is required.')).toBeInTheDocument()
-      expect(updateButton).toBeDisabled()
     })
 
     it('makes a request to the modules update endpoint', () => {

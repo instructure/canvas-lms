@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {FetchLinkHeader} from '@canvas/do-fetch-api-effect/types'
+
 export interface BaseDateDetails {
   id: number
   due_at: string | null
@@ -24,18 +26,28 @@ export interface BaseDateDetails {
   only_visible_to_overrides: boolean
 }
 
+export interface StudentInfo {
+  id: string
+  name: string
+}
 export interface DateDetailsOverride {
   id: number
-  assignment_id: number
+  assignment_id: number | null
   title: string
-  course_section_id: number
+  course_section_id: number | null
+  students?: StudentInfo[]
   due_at: string
   unlock_at: string | null
   lock_at: string | null
   all_day: boolean
-  all_day_date: string
+  all_day_date: string | null
 }
 
 export interface DateDetails extends BaseDateDetails {
   overrides?: DateDetailsOverride[]
+}
+
+export interface FetchDueDatesResponse {
+  json: DateDetails
+  link?: FetchLinkHeader
 }

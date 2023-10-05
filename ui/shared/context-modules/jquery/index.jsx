@@ -587,6 +587,9 @@ window.modules = (function () {
           $a.attr('data-item-name', data.title)
           $a.attr('data-item-type', data.quiz_lti ? 'lti-quiz' : data.type)
           $a.attr('data-item-context-id', data.context_id)
+          $a.attr('data-item-context-type', data.context_type)
+          $a.attr('data-item-content-id', data.content_id)
+          $a.attr('data-item-content-type', data.content_type)
         }
       }
 
@@ -2627,6 +2630,11 @@ $(document).ready(function () {
     ReactDOM.render(
       <ItemAssignToTray
         open={open}
+        onClose={() => {
+          ReactDOM.unmountComponentAtNode(
+            document.getElementById('differentiated-modules-mount-point')
+          )
+        }}
         onDismiss={() => {
           renderItemAssignToTray(false, returnFocusTo, itemProps)
           returnFocusTo.focus()
@@ -2636,7 +2644,11 @@ $(document).ready(function () {
         moduleItemId={itemProps.moduleItemId}
         moduleItemName={itemProps.moduleItemName}
         moduleItemType={itemProps.moduleItemType}
+        moduleItemContentType={itemProps.moduleItemContentType}
+        moduleItemContentId={itemProps.moduleItemContentId}
         pointsPossible={itemProps.pointsPossible}
+        locale={ENV.LOCALE || 'en'}
+        timezone={ENV.TIMEZONE || 'UTC'}
       />,
       document.getElementById('differentiated-modules-mount-point')
     )
@@ -2657,6 +2669,8 @@ $(document).ready(function () {
     const moduleItemName = event.target.getAttribute('data-item-name')
     const moduleItemType = event.target.getAttribute('data-item-type')
     const courseId = event.target.getAttribute('data-item-context-id')
+    const moduleItemContentType = event.target.getAttribute('data-item-content-type')
+    const moduleItemContentId = event.target.getAttribute('data-item-content-id')
     const itemProps = parseModuleItemElement(
       document.getElementById(`context_module_item_${moduleItemId}`)
     )
@@ -2665,6 +2679,8 @@ $(document).ready(function () {
       moduleItemId,
       moduleItemName,
       moduleItemType,
+      moduleItemContentType,
+      moduleItemContentId,
       ...itemProps,
     })
   })
