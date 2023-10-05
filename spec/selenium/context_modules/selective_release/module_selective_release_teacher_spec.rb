@@ -64,8 +64,7 @@ describe "selective_release module set up" do
     it "has no add prerequisites button when first module" do
       go_to_modules
       manage_module_button(@module).click
-      module_index_menu_tool_link("Assign To...").click
-      click_settings_tab
+      module_index_menu_tool_link("Edit").click
 
       expect(add_prerequisites_button_exists?).to be_falsey
     end
@@ -73,8 +72,7 @@ describe "selective_release module set up" do
     it "accesses prerequisites dropdown for module and assigns prerequisites" do
       go_to_modules
       manage_module_button(@module3).click
-      module_index_menu_tool_link("Assign To...").click
-      click_settings_tab
+      module_index_menu_tool_link("Edit").click
 
       click_add_prerequisites_button
       expect(prerequisites_dropdown[0]).to be_displayed
@@ -93,8 +91,7 @@ describe "selective_release module set up" do
     it "does not save prerequisites selected when update cancelled." do
       go_to_modules
       manage_module_button(@module2).click
-      module_index_menu_tool_link("Assign To...").click
-      click_settings_tab
+      module_index_menu_tool_link("Edit").click
 
       click_add_prerequisites_button
       expect(prerequisites_dropdown[0]).to be_displayed
@@ -197,8 +194,7 @@ describe "selective_release module set up" do
 
       scroll_to_the_top_of_modules_page
       manage_module_button(@module).click
-      module_index_menu_tool_link("Assign To...").click
-      click_settings_tab
+      module_index_menu_tool_link("Edit").click
       click_add_requirement_button
       click_sequential_order_checkbox
       select_requirement_item_option(0, @assignment2.title)

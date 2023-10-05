@@ -147,8 +147,7 @@ shared_examples_for "selective_release module tray prerequisites" do |context|
     scroll_to_module(@module3.name)
 
     manage_module_button(@module3).click
-    module_index_menu_tool_link("Assign To...").click
-    click_settings_tab
+    module_index_menu_tool_link("Edit").click
 
     click_add_prerequisites_button
 
