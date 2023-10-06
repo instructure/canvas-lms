@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2012 - present Instructure, Inc.
+# Copyright (C) 2023 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "../common"
-require_relative "page_objects/content_migration_page"
+require_relative "page_objects/new_content_migration_page"
 require_relative "page_objects/select_content_page"
-require_relative "page_objects/course_copy_page"
+require_relative "page_objects/new_course_copy_page"
 
 def visit_page
   @course.reload
@@ -95,9 +95,9 @@ def test_selective_content(source_course = nil)
   expect(@course.assignments.count).to eq(source_course ? source_course.assignments.count : 1)
 end
 
-describe "content migrations", :non_parallel do
+describe "content migrations", :non_parallel, skip: "Not Implemented" do
   before(:once) do
-    Account.site_admin.disable_feature! :instui_for_import_page
+    Account.site_admin.enable_feature! :instui_for_import_page
   end
 
   include_context "in-process server selenium tests"
@@ -197,6 +197,7 @@ describe "content migrations", :non_parallel do
     end
 
     it "submit's queue and list migrations" do
+      # TODO: ADD TO PAGE
       visit_page
       fill_migration_form
       ContentMigrationPage.selective_imports(0).click
@@ -237,6 +238,7 @@ describe "content migrations", :non_parallel do
     it "should overwrite quizzes when option is checked and duplicate otherwise"
 
     it "shifts dates" do
+      # TODO: fix click option
       visit_page
       fill_migration_form
       CourseCopyPage.date_adjust_checkbox.click
@@ -506,6 +508,7 @@ describe "content migrations", :non_parallel do
     end
 
     it "sets day substitution and date adjustment settings", priority: "1" do
+      # TODO: fix click_option
       new_course = Course.create!(name: "day sub")
       new_course.enroll_teacher(@user).accept
 

@@ -19,9 +19,9 @@
 
 require_relative "../common"
 require_relative "../helpers/calendar2_common"
-require_relative "page_objects/course_copy_page"
-require_relative "page_objects/content_migration_page"
-describe "course copy" do
+require_relative "page_objects/new_course_copy_page"
+require_relative "page_objects/new_content_migration_page"
+describe "course copy", skip: "Not Implemented" do
   include_context "in-process server selenium tests"
   include Calendar2Common
 
@@ -37,7 +37,7 @@ describe "course copy" do
   end
 
   before(:once) do
-    Account.site_admin.disable_feature! :instui_for_import_page
+    Account.site_admin.enable_feature! :instui_for_import_page
   end
 
   it "copies the course" do
