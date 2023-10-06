@@ -93,69 +93,9 @@ Rails.application.config.after_initialize do
     reset_column_information if connected? # make sure that the id column object knows it is the primary key
 
     before_save :encrypt_settings
-
-    delegate :in_current_region?, to: :database_server
-
-    class << self
-      def non_existent_database_servers
-        @non_existent_database_servers ||= Shard.distinct.pluck(:database_server_id).compact - DatabaseServer.all.map(&:id)
-      end
-    end
-
-    scope :in_region, lambda { |region|
-      next in_current_region if region.nil?
-
-      dbs_by_region = DatabaseServer.all.group_by { |db| db.config[:region] }
-      db_count_in_this_region = dbs_by_region[region]&.length.to_i + dbs_by_region[nil]&.length.to_i
-      db_count_in_other_regions = DatabaseServer.all.length - db_count_in_this_region + non_existent_database_servers.length
-
-      dbs_in_this_region = dbs_by_region[region]&.map(&:id) || []
-      dbs_in_this_region += dbs_by_region[nil]&.map(&:id) || [] if Shard.default.database_server.in_region?(region)
-
-      if db_count_in_this_region <= db_count_in_other_regions
-        if dbs_in_this_region.include?(Shard.default.database_server.id)
-          where("database_server_id IN (?) OR database_server_id IS NULL", dbs_in_this_region)
-        else
-          where(database_server_id: dbs_in_this_region)
-        end
-      elsif db_count_in_other_regions == 0
-        all
-      else
-        dbs_not_in_this_region = DatabaseServer.all.map(&:id) - dbs_in_this_region + non_existent_database_servers
-        if dbs_in_this_region.include?(Shard.default.database_server.id)
-          where("database_server_id NOT IN (?) OR database_server_id IS NULL", dbs_not_in_this_region)
-        else
-          where.not(database_server_id: dbs_not_in_this_region)
-        end
-      end
-    }
-
-    scope :in_current_region, lambda {
-      # sharding isn't set up? maybe we're in tests, or a somehow degraded environment
-      # either way there's only one shard, and we always want to see it
-      return [default] unless default.is_a?(Switchman::Shard)
-      return all if !ApplicationController.region || DatabaseServer.all.all? { |db| !db.config[:region] }
-
-      in_region(ApplicationController.region)
-    }
   end
 
   Switchman::DatabaseServer.class_eval do
-    def self.regions
-      @regions ||= all.filter_map { |db| db.config[:region] }.uniq.sort
-    end
-
-    def in_region?(region)
-      !config[:region] || (region.is_a?(Array) ? region.include?(config[:region]) : config[:region] == region)
-    end
-
-    def in_current_region?
-      unless instance_variable_defined?(:@in_current_region)
-        @in_current_region = !config[:region] || !ApplicationController.region || config[:region] == ApplicationController.region
-      end
-      @in_current_region
-    end
-
     def next_maintenance_window
       return nil unless maintenance_window_start_hour
 
@@ -277,14 +217,6 @@ Rails.application.config.after_initialize do
     def settings
       {}
     end
-
-    def in_region?(_region)
-      true
-    end
-
-    def in_current_region?
-      true
-    end
   end
 
   if !Shard.default.is_a?(Shard) && Switchman.config[:force_sharding] && !ENV["SKIP_FORCE_SHARDING"]
@@ -305,4 +237,6 @@ Rails.application.config.after_initialize do
       Sentry.capture_exception(e, level: :warning)
     end
   ]
+
+  Switchman.config[:region] = Canvas.region
 end
