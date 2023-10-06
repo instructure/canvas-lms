@@ -274,8 +274,8 @@ GEM
   remote: https://rubygems.org/
   specs:
     Ascii85 (1.1.0)
-    academic_benchmarks (1.1.2)
-      activesupport (>= 3.2.22, < 7.1)
+    academic_benchmarks (1.1.3)
+      activesupport (>= 3.2.22)
       httparty (~> 0.13)
     actioncable (7.0.8)
       actionpack (= 7.0.8)
@@ -1141,7 +1141,7 @@ PLATFORMS
 
 DEPENDENCIES
   academic_benchmark!
-  academic_benchmarks (= 1.1.2)
+  academic_benchmarks (~> 1.1)
   account_reports!
   active_model-better_errors (= 1.6.7)
   active_model_serializers (~> 0.9.9)
