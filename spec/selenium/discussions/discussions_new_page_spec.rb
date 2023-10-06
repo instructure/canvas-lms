@@ -410,6 +410,14 @@ describe "discussions" do
   end
 
   context "when discussion_create feature flag is ON", :ignore_js_errors do
+    def set_datetime_input(input, date)
+      input.click
+      wait_for_ajaximations
+      input.send_keys date
+      input.send_keys :return
+      wait_for_ajaximations
+    end
+
     before do
       Account.site_admin.enable_feature! :discussion_create
       # we must turn react_discussions_post ON as well since some new
@@ -496,14 +504,6 @@ describe "discussions" do
     context "as a teacher" do
       before do
         user_session(teacher)
-      end
-
-      def set_datetime_input(input, date)
-        input.click
-        wait_for_ajaximations
-        input.send_keys date
-        input.send_keys :return
-        wait_for_ajaximations
       end
 
       it "creates a new discussion topic with default selections successfully" do
@@ -698,6 +698,46 @@ describe "discussions" do
         expect(f("body")).not_to contain_jqcss "input[value='graded']"
         expect(f("body")).not_to contain_jqcss "input[value='group-discussion']"
         expect(f("body")).not_to contain_jqcss "input[value='add-to-student-to-do']"
+      end
+    end
+
+    context "group context" do
+      before do
+        user_session(teacher)
+      end
+
+      it "shows only and creates only group context discussions options" do
+        get "/groups/#{group.id}/discussion_topics/new"
+        expect(f("body")).not_to contain_jqcss "input[value='enable-delay-posting']"
+        expect(f("body")).not_to contain_jqcss "input[value='enable-participants-commenting']"
+        expect(f("body")).not_to contain_jqcss "input[value='must-respond-before-viewing-replies']"
+        expect(f("body")).not_to contain_jqcss "input[value='full_anonymity']"
+        expect(f("body")).not_to contain_jqcss "input[value='graded']"
+        expect(f("body")).not_to contain_jqcss "input[value='group-discussion']"
+
+        title = "Group Context Discussion"
+        message = "this is a group context discussion"
+        todo_date = 3.days.from_now
+
+        f("input[placeholder='Topic Title']").send_keys title
+        type_in_tiny("textarea#discussion-topic-message-body", message)
+        force_click("input[value='enable-podcast-feed']")
+        force_click("input[value='allow-liking']")
+        force_click("input[value='only-graders-can-like']")
+        force_click("input[value='add-to-student-to-do']")
+        todo_input = ff("[data-testid='todo-date-section'] input")[0]
+        set_datetime_input(todo_input, format_date_for_view(todo_date))
+        f("button[data-testid='save-and-publish-button']").click
+        wait_for_ajaximations
+
+        dt = DiscussionTopic.last
+        expect(dt.title).to eq title
+        expect(dt.message).to include message
+        expect(dt.podcast_enabled).to be true
+        expect(dt.only_graders_can_rate).to be true
+        expect(dt.allow_rating).to be true
+        expect(dt.context_type).to eq "Group"
+        expect(driver.current_url).to end_with("/groups/#{group.id}/discussion_topics/#{dt.id}")
       end
     end
 
