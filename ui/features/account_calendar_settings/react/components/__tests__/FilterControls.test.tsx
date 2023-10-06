@@ -46,7 +46,7 @@ describe('FilterControls', () => {
     const {getByRole, getByText} = render(
       <FilterControls {...defaultProps} setFilterValue={setFilterValue} />
     )
-    const filter = getByRole('button', {name: 'Filter Calendars'})
+    const filter = getByRole('combobox', {name: 'Filter Calendars'})
     expect(filter).toBeInTheDocument()
     act(() => filter.click())
     expect(getByText('Show all')).toBeInTheDocument()

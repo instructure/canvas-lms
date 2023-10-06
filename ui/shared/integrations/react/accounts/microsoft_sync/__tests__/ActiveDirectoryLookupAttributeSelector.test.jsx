@@ -38,7 +38,7 @@ describe('RemoteLookupFieldSelector', () => {
     })
 
     fireEvent.click(
-      container.getByRole('button', {name: /active directory lookup attribute selector/i})
+      container.getByRole('combobox', {name: /active directory lookup attribute selector/i})
     )
     fireEvent.click(container.getByText(/user principal name \(upn\)/i))
 
@@ -51,7 +51,7 @@ describe('RemoteLookupFieldSelector', () => {
     })
 
     expect(
-      container.getByRole('button', {
+      container.getByRole('combobox', {
         name: /active directory lookup attribute selector/i,
       }).value
     ).toMatch(/email alias \(mailNickname\)/i)

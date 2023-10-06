@@ -344,6 +344,7 @@ export default function RecurrenceEndPicker({
           />
         </div>
         <CanvasDateInput
+          dataTestid="recurrence-ends-on-input"
           interaction={mode === 'ON' ? 'enabled' : 'disabled'}
           locale={locale}
           timezone={timezone}

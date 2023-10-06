@@ -494,19 +494,19 @@ describe('CalendarEventDetailsForm', () => {
 
     it('renders when creating', async () => {
       const component = render(<CalendarEventDetailsForm {...defaultProps} />)
-      expect(component.queryByRole('button', {name: 'Frequency'})).toBeInTheDocument()
+      expect(component.queryByRole('combobox', {name: 'Frequency'})).toBeInTheDocument()
     })
 
     it('renders when editing', async () => {
       defaultProps.event.isNewEvent = () => false
       const component = render(<CalendarEventDetailsForm {...defaultProps} />)
-      expect(component.queryByRole('button', {name: 'Frequency'})).toBeInTheDocument()
+      expect(component.queryByRole('combobox', {name: 'Frequency'})).toBeInTheDocument()
     })
 
     it('does not render when calendar_series is disabled', async () => {
       ENV.FEATURES.calendar_series = false
       const component = render(<CalendarEventDetailsForm {...defaultProps} />)
-      expect(component.queryByRole('button', {name: 'Frequency'})).not.toBeInTheDocument()
+      expect(component.queryByRole('combobox', {name: 'Frequency'})).not.toBeInTheDocument()
     })
 
     it('with option selected contains RRULE on submit', async () => {

@@ -31,21 +31,21 @@ const defaultProps = {
 describe('GradingPeriodSelect', () => {
   it('renders a select with the title "Select Grading Period"', () => {
     const {getByRole} = render(<GradingPeriodSelect {...defaultProps} />)
-    const select = getByRole('button', {name: 'Select Grading Period'})
+    const select = getByRole('combobox', {name: 'Select Grading Period'})
 
     expect(select).toBeInTheDocument()
   })
 
   it('has "Current Grading Period" selected by default', () => {
     const {getByRole} = render(<GradingPeriodSelect {...defaultProps} />)
-    const select = getByRole('button', {name: 'Select Grading Period'})
+    const select = getByRole('combobox', {name: 'Select Grading Period'})
 
     expect(select.value).toBe('Current Grading Period')
   })
 
   it('Renders an option for every active grading period plus current grading periods', () => {
     const {getByRole, getByText, queryByText} = render(<GradingPeriodSelect {...defaultProps} />)
-    act(() => getByRole('button', {name: 'Select Grading Period'}).click())
+    act(() => getByRole('combobox', {name: 'Select Grading Period'}).click())
 
     expect(getByText('Current Grading Period')).toBeInTheDocument()
     expect(getByText('Spring 2020')).toBeInTheDocument()
@@ -62,7 +62,7 @@ describe('GradingPeriodSelect', () => {
         handleSelectGradingPeriod={handleSelectGradingPeriod}
       />
     )
-    act(() => getByRole('button', {name: 'Select Grading Period'}).click())
+    act(() => getByRole('combobox', {name: 'Select Grading Period'}).click())
     act(() => getByText('Fall 2020').click())
 
     expect(handleSelectGradingPeriod).toHaveBeenCalledWith(
