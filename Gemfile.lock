@@ -506,8 +506,8 @@ GEM
       pygments.rb
       redcarpet
     dumb_delegator (1.0.0)
-    encrypted_cookie_store-instructure (1.2.12)
-      actionpack (>= 4.2, < 7.1)
+    encrypted_cookie_store-instructure (1.2.13)
+      actionpack (>= 4.2, < 7.2)
     erubi (1.12.0)
     escape_code (0.2)
     et-orbi (1.2.7)
@@ -1210,7 +1210,7 @@ DEPENDENCIES
   dotenv (~> 2.8)
   dress_code (= 1.2.1)
   dynamic_settings!
-  encrypted_cookie_store-instructure (= 1.2.12)
+  encrypted_cookie_store-instructure (~> 1.2)
   escape_code (= 0.2)
   event_stream!
   factory_bot (~> 6.3)
