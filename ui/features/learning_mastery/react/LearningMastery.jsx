@@ -24,15 +24,6 @@ import '@canvas/jquery/jquery.ajaxJSON'
 import OutcomeGradebookView from '../backbone/views/OutcomeGradebookView'
 import GradebookMenu from '@canvas/gradebook-menu'
 import Paginator from '@canvas/instui-bindings/react/Paginator'
-import {InstUISettingsProvider} from '@instructure/emotion'
-import {IconButton} from '@instructure/ui-buttons'
-import {IconArrowOpenDownSolid} from '@instructure/ui-icons'
-import {Flex} from '@instructure/ui-flex'
-import {View} from '@instructure/ui-view'
-import {Text} from '@instructure/ui-text'
-import {useScope as useI18nScope} from '@canvas/i18n'
-
-const I18n = useI18nScope('LearningMasteryGradebook')
 
 function normalizeSections(options) {
   const sections = options.sections || []
@@ -112,45 +103,6 @@ export default class LearningMastery {
 
   // PRIVATE
 
-  _createGradebookMenu(props) {
-    const componentOverrides = {
-      Link: {
-        color: 'licorice',
-      },
-    }
-
-    return (
-      <InstUISettingsProvider theme={{componentOverrides}}>
-        <Flex
-          height="100%"
-          display="flex"
-          alignItems="center"
-          justifyItems="start"
-          padding="small 0 small 0"
-          data-testid="gradebook-menu"
-        >
-          <Text size="xx-large" weight="bold">
-            {I18n.t('Learning Mastery Gradebook')}
-          </Text>
-          <View padding="xx-small">
-            <GradebookMenu
-              customTrigger={
-                <IconButton
-                  withBorder={false}
-                  withBackground={false}
-                  screenReaderLabel={I18n.t('Gradebook Menu Dropdown')}
-                >
-                  <IconArrowOpenDownSolid size="x-small" />
-                </IconButton>
-              }
-              {...props}
-            />
-          </View>
-        </Flex>
-      </InstUISettingsProvider>
-    )
-  }
-
   _renderGradebookMenu() {
     // This only needs to render once.
     const $container = document.querySelector('[data-component="GradebookMenu"]')
@@ -162,8 +114,7 @@ export default class LearningMastery {
       ),
       variant: 'DefaultGradebookLearningMastery',
     }
-    const gradebookMenu = this._createGradebookMenu(props)
-    ReactDOM.render(gradebookMenu, $container)
+    ReactDOM.render(<GradebookMenu {...props} />, $container)
   }
 
   _setCurrentSectionId(sectionId) {

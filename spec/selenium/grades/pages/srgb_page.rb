@@ -34,7 +34,7 @@ class SRGB
     end
 
     def switch_to_default_gradebook
-      f('[data-component="GradebookSelector"]').click
+      f('[data-testid="gradebook-select-dropdown"]').click
       wait_for_animations
       fj("[role=\"menuitemradio\"]:contains(\"Gradebook\")").click
     end

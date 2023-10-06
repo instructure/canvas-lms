@@ -171,7 +171,7 @@ $gradebook_cell_padding_top: 8px;
 
 .gradebook .ic-Layout-contentMain {
   position: relative;
-  padding: 0 $ic-sp*2;
+  padding: $ic-sp * 3 $ic-sp * 4;
 }
 
 #gradebook-grid-wrapper {
@@ -832,20 +832,31 @@ $gradebook_checkbox_size: 16px;
 /* Total Grade Override Cell END */
 
 // STUFF FOR HEADER
-#gradebook-toolbar {
+// EVAL-3711 Remove ICE Evaluate feature flag
+#gradebook-toolbar, #gradebook-toolbar-instui-nav {
   display: flex;
   flex-direction: row;
   position: relative;
-  padding: $ic-sp 0;
   border-top: none;
+
   @include breakpoint(desktop) {
     align-items: center;
     justify-content: space-between;
   }
+
   @include mobile-only {
     flex-direction: column;
   }
 }
+
+#gradebook-toolbar {
+  margin-bottom: $ic-sp * 3;
+}
+// EVAL-3711 Remove ICE Evaluate feature flag
+#gradebook-toolbar-instui-nav {
+  padding: $ic-sp 0;
+}
+
 
 .section-button-placeholder {
   display: inline-block;
@@ -859,6 +870,7 @@ $gradebook_checkbox_size: 16px;
 #gradebook-actions {
   display: inline-block;
   white-space: nowrap;
+  font-size:0;
 }
 
 .gradebook-filter-container {
@@ -884,7 +896,6 @@ $gradebook_checkbox_size: 16px;
 
 .gradebook_menu {
   display: inline-block;
-  margin-#{direction(left)}: $ic-sp*0.5;
 }
 
 @mixin gradebook_menu_label($fontsize) {
