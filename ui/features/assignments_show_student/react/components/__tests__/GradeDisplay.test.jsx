@@ -35,17 +35,17 @@ describe('GradeDisplay', () => {
     describe('when no grade has been awarded', () => {
       it('renders the number of possible points', () => {
         const {getByTestId} = render(<GradeDisplay pointsPossible={5} gradingType="points" />)
-        expect(getByTestId('grade-display')).toHaveTextContent('5 Possible Points')
+        expect(getByTestId('grade-display')).toHaveTextContent('5 Points Possible')
       })
 
       it('renders the number of possible points in decimal', () => {
         const {getByTestId} = render(<GradeDisplay pointsPossible={5.4} gradingType="points" />)
-        expect(getByTestId('grade-display')).toHaveTextContent('5.4 Possible Points')
+        expect(getByTestId('grade-display')).toHaveTextContent('5.4 Points Possible')
       })
 
       it('renders the number of possible points in decimal with rounding', () => {
         const {getByTestId} = render(<GradeDisplay pointsPossible={5.0001} gradingType="points" />)
-        expect(getByTestId('grade-display')).toHaveTextContent('5 Possible Points')
+        expect(getByTestId('grade-display')).toHaveTextContent('5 Points Possible')
       })
 
       it('renders a screenreader string including "Ungraded" and the number of points', () => {
@@ -60,7 +60,7 @@ describe('GradeDisplay', () => {
 
       it('renders "1 Possible Point" when possiblePoints is 1', () => {
         const {getByTestId} = render(<GradeDisplay pointsPossible={1} gradingType="points" />)
-        expect(getByTestId('grade-display')).toHaveTextContent('1 Possible Point')
+        expect(getByTestId('grade-display')).toHaveTextContent('1 Point Possible')
       })
 
       it('renders a screenreader string including "Ungraded" when possiblePoints is 1', () => {

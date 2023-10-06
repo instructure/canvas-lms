@@ -17,12 +17,17 @@
  */
 
 import {fireEvent, render, waitFor, within} from '@testing-library/react'
-import {mockAssignmentAndSubmission, mockQuery} from '@canvas/assignments/graphql/studentMocks'
+import {
+  mockAssignmentAndSubmission,
+  mockSubmission,
+  mockQuery,
+} from '@canvas/assignments/graphql/studentMocks'
 import {MockedProvider} from '@apollo/react-testing'
 import {initializeReaderButton} from '../../../../../shared/immersive-reader/ImmersiveReader'
 import React from 'react'
 import StudentViewContext from '../Context'
 import StudentContent from '../StudentContent'
+import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
 import {AssignmentMocks} from '@canvas/assignments/graphql/student/Assignment'
 import ContextModuleApi from '../../apis/ContextModuleApi'
 import {RUBRIC_QUERY, SUBMISSION_COMMENT_QUERY} from '@canvas/assignments/graphql/student/Queries'
@@ -183,6 +188,220 @@ describe('Assignment Student Content View', () => {
     )
     const sticker = queryByRole('button', {name: 'A sticker with a picture of an apple.'})
     expect(sticker).not.toBeInTheDocument()
+  })
+
+  it('shows N/A for a late submission if the grade is hidden from the student', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Assignment: {
+        gradingType: 'points',
+        pointsPossible: 10,
+      },
+      Submission: {
+        ...SubmissionMocks.submitted,
+        attempt: 1,
+        gradeHidden: true,
+        submissionStatus: 'late',
+      },
+    })
+    const {container} = render(
+      <StudentViewContext.Provider
+        value={{lastSubmittedSubmission: props.submission, latestSubmission: props.submission}}
+      >
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      </StudentViewContext.Provider>
+    )
+    expect(container).toHaveTextContent(/Attempt 1 Score:\s*N\/A/)
+  })
+
+  it('renders the grade for the currently selected attempt', async () => {
+    const lastSubmittedSubmission = await mockSubmission({
+      Submission: {
+        ...SubmissionMocks.graded,
+        grade: '147',
+        enteredGrade: '147',
+      },
+    })
+
+    const props = await mockAssignmentAndSubmission({
+      Assignment: {pointsPossible: 150},
+      Submission: {
+        ...SubmissionMocks.graded,
+        attempt: 7,
+        grade: '131',
+        enteredGrade: '131',
+        gradingStatus: 'graded',
+      },
+    })
+
+    const {container} = render(
+      <StudentViewContext.Provider
+        value={{lastSubmittedSubmission, latestSubmission: props.submission}}
+      >
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      </StudentViewContext.Provider>
+    )
+
+    expect(container).toHaveTextContent(/Attempt 7 Score:\s*131\/150/)
+  })
+
+  it('renders "N/A" for the currently selected attempt if it has no grade', async () => {
+    const lastSubmittedSubmission = await mockSubmission({
+      Submission: {
+        ...SubmissionMocks.graded,
+        grade: '147',
+        enteredGrade: '147',
+      },
+    })
+
+    const props = await mockAssignmentAndSubmission({
+      Assignment: {pointsPossible: 150},
+      Submission: {
+        ...SubmissionMocks.submitted,
+        attempt: 7,
+        grade: '131',
+        enteredGrade: '131',
+        gradingStatus: 'needs_grading',
+      },
+    })
+
+    const {container} = render(
+      <StudentViewContext.Provider
+        value={{lastSubmittedSubmission, latestSubmission: props.submission}}
+      >
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      </StudentViewContext.Provider>
+    )
+
+    expect(container).toHaveTextContent(/Attempt 7 Score:\s*N\/A/)
+  })
+
+  it('renders "Offline Score" when the student is graded before submitting', async () => {
+    const lastSubmittedSubmission = await mockSubmission({
+      Submission: {
+        ...SubmissionMocks.graded,
+        grade: '147',
+        enteredGrade: '147',
+        attempt: 0,
+      },
+    })
+
+    const props = await mockAssignmentAndSubmission({
+      Assignment: {pointsPossible: 150},
+      Submission: {
+        ...SubmissionMocks.graded,
+        attempt: 0,
+        grade: '131',
+        enteredGrade: '131',
+      },
+    })
+
+    const {container} = render(
+      <StudentViewContext.Provider
+        value={{lastSubmittedSubmission, latestSubmission: props.submission}}
+      >
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      </StudentViewContext.Provider>
+    )
+
+    expect(container).toHaveTextContent(/Offline Score:\s*131\/150/)
+  })
+
+  it('renders the attempt select', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Submission: {...SubmissionMocks.submitted},
+    })
+    props.allSubmissions = [props.submission]
+    const {queryByTestId} = render(
+      <MockedProvider>
+        <StudentContent {...props} />
+      </MockedProvider>
+    )
+    expect(queryByTestId('attemptSelect')).toBeInTheDocument()
+  })
+
+  it('does not render the attempt select if there is no submission', async () => {
+    const props = await mockAssignmentAndSubmission({Submission: null})
+    props.allSubmissions = [{id: '1', _id: '1'}]
+    const {queryByTestId} = render(
+      <MockedProvider>
+        <StudentContent {...props} />
+      </MockedProvider>
+    )
+    expect(queryByTestId('attemptSelect')).not.toBeInTheDocument()
+  })
+
+  it('does not render the attempt select if allSubmissions is not provided', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Submission: {...SubmissionMocks.submitted},
+    })
+    const {queryByTestId} = render(
+      <MockedProvider>
+        <StudentContent {...props} />
+      </MockedProvider>
+    )
+    expect(queryByTestId('attemptSelect')).not.toBeInTheDocument()
+  })
+
+  it('does not render the attempt select if the assignment has non-digital submissions', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Assignment: {nonDigitalSubmission: true},
+      Submission: {...SubmissionMocks.submitted},
+    })
+    const {queryByTestId} = render(
+      <MockedProvider>
+        <StudentContent {...props} />
+      </MockedProvider>
+    )
+    expect(queryByTestId('attemptSelect')).not.toBeInTheDocument()
+  })
+
+  it('does not render the attempt select if peerReviewModeEnabled is set to true', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Submission: {...SubmissionMocks.submitted},
+    })
+    props.assignment.env.peerReviewModeEnabled = true
+    props.assignment.env.peerReviewAvailable = true
+    props.allSubmissions = [props.submission]
+    props.reviewerSubmission = {
+      ...props.submission,
+      assignedAssessments: [
+        {
+          assetId: '1',
+          anonymousUser: null,
+          anonymousId: 'xaU9cd',
+          workflowState: 'assigned',
+          assetSubmissionType: 'online_text_entry',
+        },
+      ],
+    }
+    const {queryByTestId} = render(
+      <MockedProvider>
+        <StudentContent {...props} />
+      </MockedProvider>
+    )
+    expect(queryByTestId('attemptSelect')).not.toBeInTheDocument()
+  })
+
+  it('renders the attempt select if peerReviewModeEnabled is set to false', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Submission: {...SubmissionMocks.submitted},
+    })
+    props.assignment.env.peerReviewModeEnabled = false
+    props.allSubmissions = [props.submission]
+    const {queryByTestId} = render(
+      <MockedProvider>
+        <StudentContent {...props} />
+      </MockedProvider>
+    )
+    expect(queryByTestId('attemptSelect')).toBeInTheDocument()
   })
 
   describe('when the assignment does not expect digital submissions', () => {
@@ -437,140 +656,6 @@ describe('Assignment Student Content View', () => {
     })
   })
 
-  describe('number of attempts', () => {
-    beforeEach(() => {
-      oldEnv = window.ENV
-      window.ENV = {...window.ENV}
-    })
-
-    afterEach(() => {
-      window.ENV = oldEnv
-    })
-
-    it('renders the number of attempts with one attempt', async () => {
-      const props = await mockAssignmentAndSubmission({
-        Assignment: {allowedAttempts: 1},
-      })
-
-      const {getByText} = render(
-        <MockedProvider>
-          <StudentContent {...props} />
-        </MockedProvider>
-      )
-      expect(getByText('1 Attempt Allowed')).toBeInTheDocument()
-    })
-
-    it('renders the number of attempts with unlimited attempts', async () => {
-      const props = await mockAssignmentAndSubmission({
-        Assignment: {allowedAttempts: null},
-      })
-      const {getByText} = render(
-        <MockedProvider>
-          <StudentContent {...props} />
-        </MockedProvider>
-      )
-      expect(getByText('Unlimited Attempts Allowed')).toBeInTheDocument()
-    })
-
-    it('renders the number of attempts with multiple attempts', async () => {
-      const props = await mockAssignmentAndSubmission({
-        Assignment: {allowedAttempts: 3},
-      })
-      const {getByText} = render(
-        <MockedProvider>
-          <StudentContent {...props} />
-        </MockedProvider>
-      )
-      expect(getByText('3 Attempts Allowed')).toBeInTheDocument()
-    })
-
-    it('does not render the number of attempts if the assignment does not involve digital submissions', async () => {
-      const props = await mockAssignmentAndSubmission({
-        Assignment: {...AssignmentMocks.onPaper},
-      })
-
-      const {queryByText} = render(
-        <MockedProvider>
-          <StudentContent {...props} />
-        </MockedProvider>
-      )
-      expect(queryByText('3 Attempts Allowed')).not.toBeInTheDocument()
-    })
-
-    it('does not render the number of attempts if peer review mode is enabled', async () => {
-      window.ENV.current_user = {id: '2'}
-      const props = await mockAssignmentAndSubmission({
-        Assignment: {allowedAttempts: 3},
-      })
-      props.assignment.env.peerReviewModeEnabled = true
-      props.assignment.env.peerReviewAvailable = true
-      props.reviewerSubmission = {
-        ...props.submission,
-        assignedAssessments: [
-          {
-            anonymousUser: null,
-            anonymousId: 'xaU9cd',
-            workflowState: 'assigned',
-          },
-        ],
-      }
-      const {queryByText} = render(
-        <MockedProvider>
-          <StudentContent {...props} />
-        </MockedProvider>
-      )
-      expect(queryByText('3 Attempts Allowed')).not.toBeInTheDocument()
-    })
-
-    it('takes into account extra attempts awarded to the student', async () => {
-      const props = await mockAssignmentAndSubmission({
-        Assignment: {allowedAttempts: 3},
-        Submission: {attempt: 1, extraAttempts: 1},
-      })
-      const {getByText} = render(
-        <StudentViewContext.Provider value={{latestSubmission: {extraAttempts: 2}}}>
-          <MockedProvider>
-            <StudentContent {...props} />
-          </MockedProvider>
-        </StudentViewContext.Provider>
-      )
-      expect(getByText('5 Attempts Allowed')).toBeInTheDocument()
-    })
-
-    it('treats a null value for extraAttempts as zero', async () => {
-      const props = await mockAssignmentAndSubmission({
-        Assignment: {allowedAttempts: 3},
-        Submission: {extraAttempts: null},
-      })
-      const {getByText} = render(
-        <MockedProvider>
-          <StudentContent {...props} />
-        </MockedProvider>
-      )
-      expect(getByText('3 Attempts Allowed')).toBeInTheDocument()
-    })
-  })
-
-  describe('availability dates', () => {
-    it('renders AvailabilityDates', async () => {
-      const props = await mockAssignmentAndSubmission({
-        Assignment: {
-          unlockAt: '2016-07-11T18:00:00-01:00',
-          lockAt: '2016-11-11T18:00:00-01:00',
-        },
-      })
-      const {getAllByText} = render(
-        <MockedProvider>
-          <StudentContent {...props} />
-        </MockedProvider>
-      )
-      // Reason why this is showing up twice is once for screenreader content and again for regular content
-      expect(getAllByText('Available: Jul 11, 2016 7:00pm until Nov 11, 2016 7:00pm')).toHaveLength(
-        2
-      )
-    })
-  })
-
   describe('Unpublished module', () => {
     it('renders UnpublishedModule', async () => {
       const props = await mockAssignmentAndSubmission()
@@ -711,6 +796,608 @@ describe('Assignment Student Content View', () => {
 
       await new Promise(resolve => setTimeout(resolve, 0))
       expect(initializeReaderButton).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('Add Comment/View Feedback button', () => {
+    it('renders as "Add Comment" by default', async () => {
+      const props = await mockAssignmentAndSubmission()
+      const {getByText} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      expect(getByText('Add Comment')).toBeInTheDocument()
+    })
+
+    it('shows the unread comments badge if there are unread comments', async () => {
+      const props = await mockAssignmentAndSubmission({Submission: {unreadCommentCount: 1}})
+      const {getByTestId} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      expect(getByTestId('unread_comments_badge')).toBeInTheDocument()
+    })
+
+    it('does not show the unread comments badge if there are no unread comments', async () => {
+      const props = await mockAssignmentAndSubmission({Submission: {unreadCommentCount: 0}})
+      const {queryByTestId} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      expect(queryByTestId('unread_comments_badge')).not.toBeInTheDocument()
+    })
+
+    it('renders as "Add Comment" by default for nonDigitalSubmission', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Assignment: {nonDigitalSubmission: true},
+        Submission: {...SubmissionMocks.submitted},
+      })
+      const {getByText} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      expect(getByText('Add Comment')).toBeInTheDocument()
+    })
+
+    it('renders as "View Feedback" for observers', async () => {
+      const props = await mockAssignmentAndSubmission()
+
+      const {getByText} = render(
+        <StudentViewContext.Provider
+          value={{
+            allowChangesToSubmission: false,
+            isObserver: true,
+            latestSubmission: props.submission,
+          }}
+        >
+          <MockedProvider>
+            <StudentContent {...props} />
+          </MockedProvider>
+        </StudentViewContext.Provider>
+      )
+      expect(getByText('View Feedback')).toBeInTheDocument()
+    })
+
+    it('renders as "View Feedback" if feedback exists', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Submission: {feedbackForCurrentAttempt: true},
+      })
+      const {getByText} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      expect(getByText('View Feedback')).toBeInTheDocument()
+    })
+
+    it('renders as "View Feedback" if feedback exists for nonDigitalSubmission', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Assignment: {nonDigitalSubmission: true},
+        Submission: {feedbackForCurrentAttempt: true},
+      })
+      const {getByText} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      expect(getByText('View Feedback')).toBeInTheDocument()
+    })
+
+    it('renders as "Add Comment" and disabled if unsubmitted attempt>1', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Submission: {
+          ...SubmissionMocks.unsubmitted,
+          attempt: 2,
+        },
+      })
+      props.assignment.env.peerReviewModeEnabled = false
+      props.assignment.env.peerReviewAvailable = false
+      const {getByText} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      expect(getByText('Add Comment').closest('button')).toBeDisabled()
+    })
+
+    it('renders additional info button if unsubmitted attempt>1', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Submission: {
+          ...SubmissionMocks.unsubmitted,
+          attempt: 2,
+        },
+      })
+      props.assignment.env.peerReviewModeEnabled = false
+      props.assignment.env.peerReviewAvailable = false
+      const {getByText} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      const screenText = getByText(
+        /After the first attempt, you cannot leave comments until you submit the assignment./
+      )
+      expect(screenText).toBeInTheDocument()
+    })
+
+    it('does not render additional info button if unsubmitted attempt==1', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Submission: {
+          ...SubmissionMocks.unsubmitted,
+          attempt: 1,
+        },
+      })
+      const {queryByRole} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      expect(
+        queryByRole('button', {
+          name: /After the first attempt, you cannot leave comments until you submit the assignment./,
+        })
+      ).not.toBeInTheDocument()
+    })
+
+    it('does not render additional info button if submitted attempt>1', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Submission: {
+          ...SubmissionMocks.submitted,
+          attempt: 2,
+        },
+      })
+      const {queryByRole} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      expect(
+        queryByRole('button', {
+          name: /After the first attempt, you cannot leave comments until you submit the assignment./,
+        })
+      ).not.toBeInTheDocument()
+    })
+
+    it('does not show the unread comments badge if peerReviewModeEnabled is set to true', async () => {
+      const props = await mockAssignmentAndSubmission({Submission: {unreadCommentCount: 1}})
+      props.assignment.env.peerReviewModeEnabled = true
+      props.reviewerSubmission = {
+        ...props.submission,
+        assignedAssessments: [
+          {
+            assetId: '1',
+            anonymousUser: null,
+            anonymousId: 'xaU9cd',
+            workflowState: 'assigned',
+            assetSubmissionType: 'online_text_entry',
+          },
+        ],
+      }
+      const {queryByTestId} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      expect(queryByTestId('unread_comments_badge')).not.toBeInTheDocument()
+    })
+
+    it('shows the unread comments badge if peerReviewModeEnabled is set to false', async () => {
+      const props = await mockAssignmentAndSubmission({Submission: {unreadCommentCount: 1}})
+      props.assignment.env.peerReviewModeEnabled = false
+      const {getByTestId} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      expect(getByTestId('unread_comments_badge')).toBeInTheDocument()
+    })
+  })
+  describe('submission workflow tracker', () => {
+    it('is rendered when a submission exists and the assignment is available', async () => {
+      const props = await mockAssignmentAndSubmission()
+      const {queryByTestId} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      expect(queryByTestId('submission-workflow-tracker')).toBeInTheDocument()
+    })
+
+    it('is not rendered when no submission object is present', async () => {
+      const props = await mockAssignmentAndSubmission({Submission: null})
+      props.allSubmissions = [{id: '1', _id: '1'}]
+      const {queryByTestId} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      expect(queryByTestId('submission-workflow-tracker')).not.toBeInTheDocument()
+    })
+
+    it('is not rendered when there is no current user', async () => {
+      const props = await mockAssignmentAndSubmission()
+      props.assignment.env.currentUser = null
+      const {queryByTestId} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      expect(queryByTestId('submission-workflow-tracker')).not.toBeInTheDocument()
+    })
+
+    it('is not rendered when the assignment has not been unlocked yet', async () => {
+      const props = await mockAssignmentAndSubmission()
+      props.assignment.env.modulePrereq = 'simulate not null'
+      const {queryByTestId} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      expect(queryByTestId('submission-workflow-tracker')).not.toBeInTheDocument()
+    })
+
+    it('is not rendered when the assignment has uncompleted prerequisites', async () => {
+      const props = await mockAssignmentAndSubmission()
+      props.assignment.env.unlockDate = 'soon'
+      const {queryByTestId} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      expect(queryByTestId('submission-workflow-tracker')).not.toBeInTheDocument()
+    })
+
+    it('is rendered if peerReviewModeEnabled is set to false', async () => {
+      const props = await mockAssignmentAndSubmission()
+      props.assignment.env.peerReviewModeEnabled = false
+      const {queryByTestId} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      expect(queryByTestId('submission-workflow-tracker')).toBeInTheDocument()
+    })
+
+    it('is not rendered if peerReviewModeEnabled is set to true', async () => {
+      const props = await mockAssignmentAndSubmission()
+      props.assignment.env.peerReviewModeEnabled = true
+      props.assignment.env.peerReviewAvailable = true
+      props.reviewerSubmission = {
+        ...props.submission,
+        assignedAssessments: [
+          {
+            assetId: '1',
+            anonymousUser: null,
+            anonymousId: 'xaU9cd',
+            workflowState: 'assigned',
+            assetSubmissionType: 'online_text_entry',
+          },
+        ],
+      }
+      const {queryByTestId} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      expect(queryByTestId('submission-workflow-tracker')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('originality report', () => {
+    it('is rendered when a submission exists with turnitinData attached and the assignment is available with a text entry submission', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Submission: {submissionType: 'online_text_entry'},
+      })
+
+      props.submission.originalityData = {
+        submission_1: {
+          similarity_score: 10,
+          state: 'acceptable',
+          report_url: 'http://example.com',
+          status: 'scored',
+          data: '{}',
+        },
+      }
+      props.assignment.env.originalityReportsForA2Enabled = true
+      const {queryByTestId} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      expect(queryByTestId('originality_report')).toBeInTheDocument()
+    })
+
+    it('is not rendered when the originality reports for a2 FF is not enabled', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Submission: {submissionType: 'online_text_entry'},
+      })
+      props.submission.originalityData = {
+        submission_1: {
+          similarity_score: 10,
+          state: 'acceptable',
+          report_url: 'http://example.com',
+          status: 'scored',
+          data: '{}',
+        },
+      }
+      props.assignment.env.originalityReportsForA2Enabled = false
+      const {queryByTestId} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      expect(queryByTestId('originality_report')).not.toBeInTheDocument()
+    })
+
+    it('is not rendered when the originality report is not visibile to the student', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Submission: {submissionType: 'online_text_entry'},
+      })
+      props.submission.originalityData = {
+        submission_1: {
+          similarity_score: 10,
+          state: 'acceptable',
+          report_url: 'http://example.com',
+          status: 'scored',
+          data: '{}',
+        },
+      }
+      const today = new Date()
+      const tomorrow = new Date(today)
+      tomorrow.setDate(tomorrow.getDate() + 1)
+      props.assignment.dueAt = tomorrow.toString()
+      props.assignment.originalityReportVisibility = 'after_due_date'
+      props.assignment.env.originalityReportsForA2Enabled = true
+      const {queryByTestId} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      expect(queryByTestId('originality_report')).not.toBeInTheDocument()
+    })
+
+    it('is rendered when the originality report is visibile to the student', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Submission: {submissionType: 'online_text_entry'},
+      })
+      props.submission.originalityData = {
+        submission_1: {
+          similarity_score: 10,
+          state: 'acceptable',
+          report_url: 'http://example.com',
+          status: 'scored',
+          data: '{}',
+        },
+      }
+      const today = new Date()
+      const yesterday = new Date(today)
+      yesterday.setDate(yesterday.getDate() - 1)
+      props.assignment.dueAt = yesterday.toString()
+      props.assignment.originalityReportVisibility = 'after_due_date'
+      props.assignment.env.originalityReportsForA2Enabled = true
+      const {queryByTestId} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      expect(queryByTestId('originality_report')).toBeInTheDocument()
+    })
+
+    it('is rendered when a submission exists with turnitinData attached and the assignment is available with a online upload submission with only one attachment', async () => {
+      const file = {
+        _id: '1',
+        displayName: 'file_1.png',
+        id: '1',
+        mimeClass: 'image',
+        submissionPreviewUrl: '/preview_url',
+        thumbnailUrl: '/thumbnail_url',
+        url: '/url',
+      }
+      const props = await mockAssignmentAndSubmission({
+        Submission: {submissionType: 'online_upload', attachments: [file]},
+      })
+      props.submission.originalityData = {
+        attachment_1: {
+          similarity_score: 10,
+          state: 'acceptable',
+          report_url: 'http://example.com',
+          status: 'scored',
+          data: '{}',
+        },
+      }
+      props.assignment.env.originalityReportsForA2Enabled = true
+      const {queryByTestId} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      expect(queryByTestId('originality_report')).toBeInTheDocument()
+    })
+
+    it('is not rendered when a submission exists with turnitinData attached and the assignment is available with a online upload submission with more than one attachment', async () => {
+      const files = [
+        {
+          _id: '1',
+          displayName: 'file_1.png',
+          id: '1',
+          mimeClass: 'image',
+          submissionPreviewUrl: '/preview_url',
+          thumbnailUrl: '/thumbnail_url',
+          url: '/url',
+        },
+        {
+          _id: '1',
+          displayName: 'file_1.png',
+          id: '1',
+          mimeClass: 'image',
+          submissionPreviewUrl: '/preview_url',
+          thumbnailUrl: '/thumbnail_url',
+          url: '/url',
+        },
+      ]
+      const props = await mockAssignmentAndSubmission({
+        Submission: {submissionType: 'online_upload', attachments: files},
+      })
+      props.submission.turnitinData = [
+        {
+          similarity_score: 10,
+          state: 'acceptable',
+          report_url: 'http://example.com',
+          status: 'scored',
+          data: '{}',
+        },
+        {
+          similarity_score: 10,
+          state: 'acceptable',
+          report_url: 'http://example.com',
+          status: 'scored',
+          data: '{}',
+        },
+      ]
+      const {queryByTestId} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      expect(queryByTestId('originality_report')).not.toBeInTheDocument()
+    })
+
+    it('is not rendered when no submission object is present', async () => {
+      const props = await mockAssignmentAndSubmission({Submission: null})
+      props.allSubmissions = [{id: '1', _id: '1'}]
+      const {queryByTestId} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      expect(queryByTestId('originality_report')).not.toBeInTheDocument()
+    })
+
+    it('is not rendered when there is no current user', async () => {
+      const props = await mockAssignmentAndSubmission()
+      props.assignment.env.currentUser = null
+      const {queryByTestId} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      expect(queryByTestId('originality_report')).not.toBeInTheDocument()
+    })
+
+    it('is not rendered when the assignment has not been unlocked yet', async () => {
+      const props = await mockAssignmentAndSubmission()
+      props.assignment.env.modulePrereq = 'simulate not null'
+      const {queryByTestId} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      expect(queryByTestId('originality_report')).not.toBeInTheDocument()
+    })
+
+    it('is not rendered when the assignment has uncompleted prerequisites', async () => {
+      const props = await mockAssignmentAndSubmission()
+      props.assignment.env.unlockDate = 'soon'
+      const {queryByTestId} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      expect(queryByTestId('originality_report')).not.toBeInTheDocument()
+    })
+
+    it('is not rendered when the submission has no turnitinData', async () => {
+      const props = await mockAssignmentAndSubmission()
+      props.submission.turnitinData = null
+      props.assignment.env.unlockDate = 'soon'
+      const {queryByTestId} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      expect(queryByTestId('originality_report')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('render AnonymousLabel with ungraded submission', () => {
+    let props
+    beforeAll(async () => {
+      props = await mockAssignmentAndSubmission()
+      props.submission = {
+        ...props.submission,
+        hideGradeFromStudent: false,
+        grade: null,
+      }
+    })
+
+    it('not renders the anonymous label', () => {
+      const {queryByTestId} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      expect(queryByTestId('assignment-student-anonymous-label')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('render AnonymousLabel hiding grade from student submission', () => {
+    let props
+    beforeAll(async () => {
+      props = await mockAssignmentAndSubmission()
+      props.submission = {
+        ...props.submission,
+        hideGradeFromStudent: true,
+        grade: 10,
+      }
+    })
+
+    it('not renders the anonymous label', () => {
+      const {queryByTestId} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      expect(queryByTestId('assignment-student-anonymous-label')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('renderAnonymousLabel with graded submission', () => {
+    let props
+    beforeAll(async () => {
+      props = await mockAssignmentAndSubmission()
+      props.submission = {
+        ...props.submission,
+        hideGradeFromStudent: false,
+        grade: 10,
+      }
+    })
+
+    it('renders a label graded anonymously', () => {
+      props.submission.gradedAnonymously = true
+      const {queryByTestId} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      expect(queryByTestId('assignment-student-anonymus-label')).toHaveTextContent(
+        'Anonymous Grading:yes'
+      )
+    })
+
+    it('renders a label graded visibly', () => {
+      props.submission.gradedAnonymously = false
+      const {queryByTestId} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      expect(queryByTestId('assignment-student-anonymus-label')).toHaveTextContent(
+        'Anonymous Grading:no'
+      )
     })
   })
 })

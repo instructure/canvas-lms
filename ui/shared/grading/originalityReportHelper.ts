@@ -69,7 +69,8 @@ export function getOriginalityData(
       [key: string]: SubmissionOriginalityData
     }
     attachments: any
-    submitted_at: string
+    submittedAt?: null | string | Date
+    submitted_at?: null | string | Date
   },
   index: number
 ): false | OriginalityData {

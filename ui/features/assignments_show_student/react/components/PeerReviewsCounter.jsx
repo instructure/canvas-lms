@@ -31,11 +31,14 @@ PeerReviewsCounter.propTypes = {
 export default function PeerReviewsCounter(props) {
   return (
     <>
+      <Text as="span" size="x-large">
+        {I18n.t('Review ')}
+      </Text>
       <Text as="span" color="primary" size="x-large" weight="bold" data-testid="current-counter">
         {props.current}
       </Text>
       &nbsp;
-      <Text as="span" color="secondary" size="x-large" weight="light" data-testid="total-counter">
+      <Text as="span" size="x-large" data-testid="total-counter">
         {I18n.t('of %{total}', {total: props.total})}
       </Text>
     </>
