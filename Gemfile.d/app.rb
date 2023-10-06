@@ -26,7 +26,7 @@ gem "guardrail", "~> 3.0"
 gem "switchman-inst-jobs", "~> 4.0"
 gem "irb", "~> 1.7"
 
-gem "academic_benchmarks", "1.1.2", require: false
+gem "academic_benchmarks", "~> 1.1", require: false
 gem "active_model-better_errors", "1.6.7", require: "active_model/better_errors"
 gem "active_model_serializers", "~> 0.9.9"
 gem "addressable", "~> 2.8", require: false
