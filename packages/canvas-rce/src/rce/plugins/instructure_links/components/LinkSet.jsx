@@ -106,7 +106,7 @@ class LinkSet extends Component {
           {formatMessage('Click to insert a link into the editor.')}
         </ScreenReaderContent>
 
-        <List variant="unstyled" as="ul" margin="0">
+        <List isUnstyled={true} as="ul" margin="0">
           {this.props.collection.links.map((link, index, array) => (
             <List.Item key={link.href} spacing="none" padding="0">
               <Link
