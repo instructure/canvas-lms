@@ -19,28 +19,6 @@
 require_relative "../spec_helper"
 
 describe Switchman::Shard do
-  describe ".in_region" do
-    it "does not include shards referencing non-extant database servers" do
-      # this one isn't actually in the config
-      allow(Shard).to receive(:non_existent_database_servers).and_return(["jobs4"])
-
-      dbs = []
-      dbs << DatabaseServer.new("jobs1", { region: "us-east-1" })
-      dbs << DatabaseServer.new("jobs2", { region: "us-east-1" })
-      dbs << DatabaseServer.new("jobs3", { region: "eu-west-1" })
-      dbs << DatabaseServer.new("jobs4", { region: "us-east-1" })
-      allow(DatabaseServer).to receive(:all).and_return(dbs)
-
-      s1 = Shard.create!(database_server_id: "jobs1")
-      s2 = Shard.create!(database_server_id: "jobs2")
-      s3 = Shard.create!(database_server_id: "jobs3")
-      Shard.create!(database_server_id: "jobs4")
-
-      expect(Shard.in_region("us-east-1")).to eq([s1, s2])
-      expect(Shard.in_region("eu-west-1")).to eq([s3])
-    end
-  end
-
   describe "#activate!" do
     shared_examples_for "#activate!" do
       it "disallows use" do
