@@ -40,6 +40,7 @@ describe('student view integration tests', () => {
 
   beforeEach(() => {
     window.ENV = {
+      FEATURES: {instui_nav: true},
       context_asset_string: 'test_1',
       ASSIGNMENT_ID: '1',
       COURSE_ID: '1',
