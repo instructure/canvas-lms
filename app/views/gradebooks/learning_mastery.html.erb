@@ -33,7 +33,8 @@
   <% else %>
     <% js_bundle :learning_mastery %>
     <div class="outcome-gradebook-container">
-      <nav style="display: flex; justify-content: space-between; padding: 0.4em 0;">
+      <%# EVAL-3711 Remove ICE Feature Flag %>
+      <nav style="display: flex; justify-content: space-between; padding: <%= @domain_root_account.feature_enabled?(:instui_nav) ? '2.25em 0' : '0.4em 0' %>;">
         <span
           style="display: flex; flex-direction: column; justify-content: center;"
           data-component="GradebookMenu"></span>

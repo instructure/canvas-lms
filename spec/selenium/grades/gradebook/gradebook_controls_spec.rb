@@ -33,10 +33,20 @@ describe "Gradebook Controls" do
   end
 
   context "using Gradebook dropdown" do
-    it "navigates to Individual View", priority: "1" do
+    # EVAL-3711 Remove ICE Evaluate feature flag
+    it "navigates to Individual View when ICE feature flag is OFF", priority: "1" do
+      @course.root_account.disable_feature!(:instui_nav)
       Gradebook.visit(@course)
       expect_new_page_load { Gradebook.gradebook_dropdown_item_click("Individual View") }
       expect(f("h1")).to include_text("Gradebook: Individual View")
+    end
+
+    # EVAL-3711 Remove ICE Evaluate feature flag
+    it "navigates to Individual View when ICE feature flag is ON", priority: "1" do
+      @course.root_account.enable_feature!(:instui_nav)
+      Gradebook.visit(@course)
+      expect_new_page_load { Gradebook.gradebook_dropdown_item_click("Individual View") }
+      expect(Gradebook.gradebook_title).to include_text("Individual Gradebook")
     end
 
     it "navigates to Gradebook History", priority: "2" do
@@ -49,7 +59,7 @@ describe "Gradebook Controls" do
       Account.default.set_feature_flag!("outcome_gradebook", "on")
       Gradebook.visit(@course)
       Gradebook.gradebook_dropdown_item_click("Learning Mastery")
-      expect(fj('span:contains("Learning Mastery")')).to be_displayed
+      expect(fj('button:contains("Learning Mastery")')).to be_displayed
     end
   end
 
@@ -114,7 +124,7 @@ describe "Gradebook Controls" do
     it "navigates to upload page", priority: "1" do
       @course.enable_feature!(:enhanced_gradebook_filters)
       Gradebook.visit(@course)
-      Gradebook.select_import
+      Gradebook.select_import(@course)
 
       expect(driver.current_url).to include "courses/#{@course.id}/gradebook_upload/new"
     end

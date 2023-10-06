@@ -21,14 +21,17 @@ import $ from 'jquery'
 import React, {useRef, useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {
-  IconMiniArrowDownSolid,
   IconGradebookExportLine,
   IconGradebookImportLine,
   IconSisSyncedLine,
+  IconArrowOpenDownLine,
+  IconArrowOpenUpLine,
+  IconKeyboardShortcutsLine,
 } from '@instructure/ui-icons'
 import {Button} from '@instructure/ui-buttons'
 import {Menu} from '@instructure/ui-menu'
 import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
 import GradebookExportManager from '../../shared/GradebookExportManager'
 import PostGradesApp from '../../SISGradePassback/PostGradesApp'
 import tz from '@canvas/timezone'
@@ -82,8 +85,14 @@ export default function EnhancedActionMenu(props: EnhancedActionMenuProps) {
     attachmentUrl: string
   }>(null)
   const exportManager = useRef<GradebookExportManager | null>(null)
+  const [toggleExportMenu, setToggleExportMenu] = useState(false)
+  const [toggleSyncMenu, setToggleSyncMenu] = useState(false)
+  const [openKeyboardShortcut, setOpenKeyboardShortcut] = useState(null)
 
   useEffect(() => {
+    const questionMarkKeyDown = new KeyboardEvent('keydown', {keyCode: 191, shiftKey: true})
+    setOpenKeyboardShortcut(questionMarkKeyDown)
+
     const existingExport = getExistingExport()
     exportManager.current = new GradebookExportManager(
       props.gradebookExportUrl,
@@ -118,6 +127,10 @@ export default function EnhancedActionMenu(props: EnhancedActionMenuProps) {
       attachmentId: props.attachment.id,
       workflowState: props.lastExport.workflowState,
     }
+  }
+
+  const handleKeyboardShortcuts = () => {
+    document.dispatchEvent(openKeyboardShortcut)
   }
 
   const handleExport = async currentView => {
@@ -311,6 +324,10 @@ export default function EnhancedActionMenu(props: EnhancedActionMenuProps) {
     )
   }
 
+  const handleRenderArrowIconSyncMenu = () => {
+    setToggleSyncMenu(!toggleSyncMenu)
+  }
+
   const renderSyncDropdown = () => {
     const {isEnabled, publishToSisUrl} = props.publishGradesToSis
     const shouldRenderPublishGradesToSis = isEnabled && publishToSisUrl
@@ -319,13 +336,16 @@ export default function EnhancedActionMenu(props: EnhancedActionMenuProps) {
       return (
         <Menu
           trigger={
-            <Button color="secondary" margin="0 xx-small" renderIcon={IconSisSyncedLine}>
-              <Text weight="normal" fontStyle="normal" size="medium" color="primary">
-                {I18n.t('Sync')}
-                <IconMiniArrowDownSolid />
-              </Text>
+            <Button color="secondary" margin="0 small 0 0" renderIcon={IconSisSyncedLine}>
+              <View margin="0 x-small 0 0">
+                <Text weight="normal" fontStyle="normal" size="medium" color="primary">
+                  {I18n.t('Sync')}
+                </Text>
+              </View>
+              {toggleSyncMenu ? <IconArrowOpenUpLine /> : <IconArrowOpenDownLine />}
             </Button>
           }
+          onToggle={handleRenderArrowIconSyncMenu}
         >
           {renderPostGradesTools()}
           {renderPublishGradesToSis()}
@@ -336,13 +356,25 @@ export default function EnhancedActionMenu(props: EnhancedActionMenuProps) {
     }
   }
 
+  const handleRenderArrowIconExportMenu = () => {
+    setToggleExportMenu(!toggleExportMenu)
+  }
+
   return (
     <>
+      {/* EVAL-3711 Remove Evaluate ICE feature flag */}
+      {window.ENV.FEATURES.instui_nav && !ENV.disable_keyboard_shortcuts && (
+        <Button
+          data-testid="keyboard-shortcuts"
+          margin="0 small 0 0"
+          onClick={handleKeyboardShortcuts}
+          renderIcon={IconKeyboardShortcutsLine}
+        />
+      )}
       {renderSyncDropdown()}
-
       <Button
         color="secondary"
-        margin="0 xx-small"
+        margin="0 small 0 0"
         renderIcon={IconGradebookImportLine}
         interaction={disableImports() ? 'disabled' : undefined}
         onClick={handleImport}
@@ -352,13 +384,16 @@ export default function EnhancedActionMenu(props: EnhancedActionMenuProps) {
 
       <Menu
         trigger={
-          <Button color="secondary" margin="0 xx-small" renderIcon={IconGradebookExportLine}>
-            <Text weight="normal" fontStyle="normal" size="medium" color="primary">
-              <span data-menu-id="export-dropdown">{I18n.t('Export')}</span>
-              <IconMiniArrowDownSolid />
-            </Text>
+          <Button color="secondary" margin="0 small 0 0" renderIcon={IconGradebookExportLine}>
+            <View margin="0 x-small 0 0" data-menu-id="export-dropdown" as="span">
+              <Text weight="normal" fontStyle="normal" size="medium" color="primary">
+                {I18n.t('Export')}
+              </Text>
+            </View>
+            {toggleExportMenu ? <IconArrowOpenUpLine /> : <IconArrowOpenDownLine />}
           </Button>
         }
+        onToggle={handleRenderArrowIconExportMenu}
       >
         <MenuItem
           disabled={exportInProgress}

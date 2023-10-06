@@ -129,6 +129,21 @@ describe('EnhancedActionMenu', () => {
       }
     })
 
+    it('renders the keyboard shortcut button when the disable keyboard shortcut setting is turned off', async () => {
+      // EVAL-3711 Remove ICE Evaluate feature flag
+      window.ENV.FEATURES.instui_nav = true
+      const {getByTestId} = renderComponent(props)
+      expect(getByTestId('keyboard-shortcuts')).toBeInTheDocument()
+    })
+
+    it('does not render the keyboard shortcut button when the disable keyboard shortcut setting is turned on', async () => {
+      // EVAL-3711 Remove ICE Evaluate feature flag
+      window.ENV.FEATURES.instui_nav = true
+      ENV.disable_keyboard_shortcuts = true
+      const {queryByTestId} = renderComponent(props)
+      expect(queryByTestId('keyboard-shortcuts')).not.toBeInTheDocument()
+    })
+
     it('renders the Import button', async () => {
       component = renderComponent(props)
       const specificMenuItem = component.container.querySelector('[data-menu-id="import"]')

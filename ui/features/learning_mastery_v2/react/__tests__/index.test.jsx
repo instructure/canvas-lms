@@ -92,13 +92,21 @@ describe('LearningMastery', () => {
       ...props,
     }
   }
-
+  // EVAL-3711 Remove Evaluate ICE feature flag
   let oldEnv
   beforeEach(() => {
-    useRollups.mockReturnValue({isLoading: false, students: users, gradebookFilters: [], setGradebookFilters: () => {}, outcomes, rollups})
+    useRollups.mockReturnValue({
+      isLoading: false,
+      students: users,
+      gradebookFilters: [],
+      setGradebookFilters: () => {},
+      outcomes,
+      rollups,
+    })
     oldEnv = {...window.ENV}
     window.ENV = {
       GRADEBOOK_OPTIONS: {outcome_proficiency: {ratings}, ACCOUNT_LEVEL_MASTERY_SCALES: true},
+      FEATURES: {instui_nav: true},
     }
   })
 
