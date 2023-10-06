@@ -32,7 +32,7 @@ group :test do
   gem "rspec-collection_matchers", "~> 1.2"
   gem "shoulda-matchers", "~> 5.3"
 
-  gem "once-ler", "2.0.1"
+  gem "once-ler", "~> 2.0"
 
   gem "selenium-webdriver", "~> 4.12", require: false
   gem "testrailtagging", "0.3.8.7", require: false
