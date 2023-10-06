@@ -863,29 +863,6 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
-      "fingerprint": "8ddd54b324d84f7db45c1f45295d77be2449745f9fdfc87bf3e2621302576aa7",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "app/controllers/smart_search_controller.rb",
-      "line": 67,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "WikiPage.find_by_sql([\"                SELECT wp.*, (wpe.embedding #{quoted_operator_name(\"<=>\")} ?) AS distance\\n                FROM #{WikiPage.quoted_table_name} wp\\n                INNER JOIN #{Enrollment.quoted_table_name} AS e\\n                    ON wp.context_type = 'Course'\\n                    AND wp.context_id = e.course_id\\n                INNER JOIN #{EnrollmentState.quoted_table_name} AS es\\n                    ON e.id = es.enrollment_id\\n                INNER JOIN #{WikiPageEmbedding.quoted_table_name} AS wpe\\n                    ON wp.id = wpe.wiki_page_id\\n                WHERE\\n                    e.user_id = ?\\n                    AND e.workflow_state <> 'deleted'\\n                    AND es.restricted_access = FALSE\\n                    AND es.state IN ('active', 'invited', 'pending_invited', 'pending_active')\\n                    AND e.type IN ('TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment', 'StudentViewEnrollment')\\n                ORDER BY distance asc\\n                LIMIT 25\\n\".squish, OpenAi.generate_embedding(params[:q])[0].to_s, ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).id])",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "SmartSearchController",
-        "method": "index"
-      },
-      "user_input": "quoted_operator_name(\"<=>\")",
-      "confidence": "Medium",
-      "cwe_id": [
-        89
-      ],
-      "note": "no user input is interpolated"
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
       "fingerprint": "96ad8f781198eb407e8e108f14a4aa2c4d98bf212125ff66f6cde643bc5bf029",
       "check_name": "SQL",
       "message": "Possible SQL injection",
