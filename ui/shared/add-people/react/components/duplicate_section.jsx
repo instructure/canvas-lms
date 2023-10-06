@@ -211,7 +211,7 @@ class DuplicateSection extends React.Component {
                 isWithinText={false}
                 as="button"
                 onClick={this.onSelectNewForDuplicate}
-                theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
+                themeOverride={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
               >
                 <Text>
                   {I18n.t('Create a new user for "%{address}"', {address: duplicateSet.address})}
@@ -243,7 +243,7 @@ class DuplicateSection extends React.Component {
             isWithinText={false}
             as="button"
             onClick={this.onSkipDuplicate}
-            theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
+            themeOverride={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
           >
             <Text>{I18n.t('Don’t add this user for now.')}</Text>
           </Link>

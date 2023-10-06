@@ -59,6 +59,7 @@ export default function AllowFinalGradeOverrideCheckbox({
           },
           [View.componentId]: {
             paddingMedium: '16px',
+            backgroundPrimary: '#eee',
           },
         },
       }}
@@ -70,7 +71,6 @@ export default function AllowFinalGradeOverrideCheckbox({
         borderRadius="medium"
         background="primary"
         padding="medium"
-        themeOverride={{backgroundPrimary: '#eee'}}
       >
         <Checkbox
           size="small"

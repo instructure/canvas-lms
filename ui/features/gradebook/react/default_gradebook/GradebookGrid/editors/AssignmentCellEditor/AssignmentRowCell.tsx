@@ -22,7 +22,6 @@ import {InstUISettingsProvider} from '@instructure/emotion'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconExpandStartLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
-import {TextInput} from '@instructure/ui-text-input'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import AssignmentGradeInput from '../AssignmentGradeInput/index'
 import InvalidGradeIndicator from '../InvalidGradeIndicator'
@@ -33,11 +32,11 @@ import type {CamelizedAssignment, GradeEntryMode} from '@canvas/grading/grading.
 const I18n = useI18nScope('gradebook')
 
 const componentOverrides = {
-  [IconButton.componentId]: {
+  IconButton: {
     iconPadding: '0 3px',
     smallHeight: '23px',
   },
-  [TextInput.componentId]: {
+  TextInput: {
     smallHeight: '27px',
   },
 }

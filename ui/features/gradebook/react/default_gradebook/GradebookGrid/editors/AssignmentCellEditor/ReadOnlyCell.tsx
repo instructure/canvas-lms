@@ -30,7 +30,7 @@ import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 const I18n = useI18nScope('gradebook')
 
 const componentOverrides = {
-  [IconButton.componentId]: {
+  IconButton: {
     iconPadding: '0 3px',
     smallHeight: '23px',
   },

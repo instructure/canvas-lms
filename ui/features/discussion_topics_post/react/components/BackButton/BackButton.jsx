@@ -48,7 +48,7 @@ export function BackButton({onClick, ...props}) {
             withBackground={false}
             color="primary"
             renderIcon={<IconArrowStartLine />}
-            theme={{borderWidth: '0'}}
+            themeOverride={{borderWidth: 0}}
             data-testid="back-button"
             {...props}
           >
