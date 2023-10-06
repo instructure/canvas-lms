@@ -577,9 +577,9 @@ GEM
     graphql-batch (0.5.3)
       graphql (>= 1.12.18, < 3)
       promise.rb (~> 0.7.2)
-    guardrail (3.0.2)
-      activerecord (>= 6.1, < 7.1)
-      railties (>= 6.1, < 7.1)
+    guardrail (3.0.3)
+      activerecord (>= 6.1, < 7.2)
+      railties (>= 6.1, < 7.2)
     hana (1.3.7)
     hashdiff (1.0.1)
     hashery (2.1.2)
@@ -1221,7 +1221,7 @@ DEPENDENCIES
   google_drive!
   graphql (~> 1.12.7)
   graphql-batch (~> 0.5)
-  guardrail (= 3.0.2)
+  guardrail (~> 3.0)
   headless (= 2.3.1)
   highline (~> 2.0)
   html_text_helper!
