@@ -87,6 +87,7 @@ export default function DiscussionTopicFormContainer() {
 
   return (
     <DiscussionTopicForm
+      isGroupContext={contextType === 'Group'}
       isEditing={isEditing}
       currentDiscussionTopic={currentDiscussionTopic}
       isStudent={ENV.current_user_is_student}
@@ -117,7 +118,7 @@ export default function DiscussionTopicFormContainer() {
           createDiscussionTopic({
             variables: {
               contextId: ENV.context_id,
-              contextType: 'Course',
+              contextType: ENV.context_is_not_group ? 'Course' : 'Group',
               title,
               message,
               specificSections: sectionIdsToPostTo.join(),

@@ -45,6 +45,7 @@ export default function DiscussionTopicForm({
   sections,
   groupCategories,
   onSubmit,
+  isGroupContext,
 }) {
   const rceRef = useRef()
 
@@ -255,7 +256,7 @@ export default function DiscussionTopicForm({
           defaultContent={isEditing ? currentDiscussionTopic?.message : ''}
           autosave={false}
         />
-        {!isGraded && !isGroupDiscussion && (
+        {!isGraded && !isGroupDiscussion && !isGroupContext && (
           <View display="block" padding="medium none">
             <CanvasMultiSelect
               data-testid="section-select"
@@ -298,7 +299,7 @@ export default function DiscussionTopicForm({
           </View>
         )}
         <Text size="large">{I18n.t('Options')}</Text>
-        {ENV.context_is_not_group &&
+        {!isGroupContext &&
           !isAnnouncement &&
           (ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MODERATE ||
             ENV.allow_student_anonymous_discussion_topics) && (
@@ -349,7 +350,7 @@ export default function DiscussionTopicForm({
             </View>
           )}
         <FormFieldGroup description="" rowSpacing="small">
-          {isAnnouncement && (
+          {isAnnouncement && !isGroupContext && (
             <Checkbox
               label={I18n.t('Delay Posting')}
               value="enable-delay-posting"
@@ -360,7 +361,7 @@ export default function DiscussionTopicForm({
               }}
             />
           )}
-          {delayPosting && (
+          {delayPosting && !isGroupContext && (
             <DateTimeInput
               description={I18n.t('Post At')}
               prevMonthLabel={I18n.t('previous')}
@@ -374,7 +375,7 @@ export default function DiscussionTopicForm({
               timeRenderLabel=""
             />
           )}
-          {isAnnouncement && (
+          {isAnnouncement && !isGroupContext && (
             <Checkbox
               label={I18n.t('Allow Participants to Comment')}
               value="enable-participants-commenting"
@@ -385,14 +386,17 @@ export default function DiscussionTopicForm({
               }}
             />
           )}
-          <Checkbox
-            data-testid="require-initial-post-checkbox"
-            label={I18n.t('Participants must respond to the topic before viewing other replies')}
-            value="must-respond-before-viewing-replies"
-            checked={requireInitialPost}
-            onChange={() => setRequireInitialPost(!requireInitialPost)}
-            disabled={!(isAnnouncement === false || (isAnnouncement && !locked))}
-          />
+          {!isGroupContext && (
+            <Checkbox
+              data-testid="require-initial-post-checkbox"
+              label={I18n.t('Participants must respond to the topic before viewing other replies')}
+              value="must-respond-before-viewing-replies"
+              checked={requireInitialPost}
+              onChange={() => setRequireInitialPost(!requireInitialPost)}
+              disabled={!(isAnnouncement === false || (isAnnouncement && !locked))}
+            />
+          )}
+
           <Checkbox
             label={I18n.t('Enable podcast feed')}
             value="enable-podcast-feed"
@@ -402,7 +406,7 @@ export default function DiscussionTopicForm({
               setEnablePodcastFeed(!enablePodcastFeed)
             }}
           />
-          {enablePodcastFeed && (
+          {enablePodcastFeed && !isGroupContext && (
             <View display="block" padding="none none none large">
               <Checkbox
                 label={I18n.t('Include student replies in podcast feed')}
@@ -412,7 +416,7 @@ export default function DiscussionTopicForm({
               />
             </View>
           )}
-          {discussionAnonymousState === 'off' && !isAnnouncement && (
+          {discussionAnonymousState === 'off' && !isAnnouncement && !isGroupContext && (
             <Checkbox
               label={I18n.t('Graded')}
               value="graded"
@@ -475,7 +479,7 @@ export default function DiscussionTopicForm({
               />
             </View>
           )}
-          {discussionAnonymousState === 'off' && !isAnnouncement && (
+          {discussionAnonymousState === 'off' && !isAnnouncement && !isGroupContext && (
             <Checkbox
               data-testid="group-discussion-checkbox"
               label={I18n.t('This is a Group Discussion')}
@@ -487,7 +491,7 @@ export default function DiscussionTopicForm({
               }}
             />
           )}
-          {discussionAnonymousState === 'off' && isGroupDiscussion && (
+          {discussionAnonymousState === 'off' && isGroupDiscussion && !isGroupContext && (
             <View display="block" padding="none none none large">
               <SimpleSelect
                 renderLabel={I18n.t('Group Set')}
@@ -534,6 +538,7 @@ export default function DiscussionTopicForm({
           )}
         </FormFieldGroup>
         {!isAnnouncement &&
+          !isGroupContext &&
           (isGraded ? (
             <div>Graded options here</div>
           ) : (
@@ -611,6 +616,7 @@ DiscussionTopicForm.propTypes = {
   sections: PropTypes.arrayOf(PropTypes.object),
   groupCategories: PropTypes.arrayOf(PropTypes.object),
   onSubmit: PropTypes.func,
+  isGroupContext: PropTypes.bool,
 }
 
 DiscussionTopicForm.defaultProps = {
