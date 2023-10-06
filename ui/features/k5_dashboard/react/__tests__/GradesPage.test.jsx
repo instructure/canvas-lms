@@ -321,7 +321,7 @@ describe('GradesPage', () => {
     expect(getByText('A-')).toBeInTheDocument()
     expect(getByText('C')).toBeInTheDocument()
 
-    await act(async () => getByRole('button', {name: 'Select Grading Period'}).click())
+    await act(async () => getByRole('combobox', {name: 'Select Grading Period'}).click())
     await act(async () => getByText('The First One').click())
 
     await waitFor(() => expect(getByText('B-')).toBeInTheDocument())
@@ -330,7 +330,7 @@ describe('GradesPage', () => {
     expect(getByText('Not Graded')).toBeInTheDocument()
     expect(queryByText('C')).not.toBeInTheDocument()
 
-    act(() => getByRole('button', {name: 'Select Grading Period'}).click())
+    act(() => getByRole('combobox', {name: 'Select Grading Period'}).click())
     act(() => getByText('All Grading Periods').click())
 
     expect(getByText('B+')).toBeInTheDocument()

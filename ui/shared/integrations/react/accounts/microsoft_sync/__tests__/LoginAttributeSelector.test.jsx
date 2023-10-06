@@ -35,7 +35,7 @@ describe('LoginAttributeSelector', () => {
     const changedMock = jest.fn()
     const container = setup({attributeChangedHandler: changedMock})
 
-    fireEvent.click(container.getByRole('button', {name: /login attribute selector/i}))
+    fireEvent.click(container.getByRole('combobox', {name: /login attribute selector/i}))
     fireEvent.click(container.getByText(/email/i))
 
     expect(changedMock).toHaveBeenCalledTimes(1)
@@ -45,7 +45,7 @@ describe('LoginAttributeSelector', () => {
     const container = setup({selectedLoginAttribute: 'preferred_username'})
 
     expect(
-      container.getByRole('button', {
+      container.getByRole('combobox', {
         name: /login attribute selector/i,
       }).value
     ).toMatch(/Unique User ID/i)

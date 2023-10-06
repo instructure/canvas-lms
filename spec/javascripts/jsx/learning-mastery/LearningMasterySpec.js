@@ -176,7 +176,7 @@ QUnit.module('Learning Mastery > LearningMastery', suiteHooks => {
     })
 
     QUnit.module('when given null (All Sections)', () => {
-      QUnit.module('when the current section id is a different section id', contextHooks => {
+      QUnit.module('when the current section id is a different section id (2)', contextHooks => {
         contextHooks.beforeEach(() => {
           learningMastery._setCurrentSectionId('2002')
         })
@@ -192,7 +192,7 @@ QUnit.module('Learning Mastery > LearningMastery', suiteHooks => {
         })
       })
 
-      QUnit.module('when the current section id is null', contextHooks => {
+      QUnit.module('when the current section id is null (2)', contextHooks => {
         contextHooks.beforeEach(() => {
           learningMastery._setCurrentSectionId(null)
         })
@@ -210,7 +210,7 @@ QUnit.module('Learning Mastery > LearningMastery', suiteHooks => {
     })
 
     QUnit.module('when given "0" (All Sections)', () => {
-      QUnit.module('when the current section id is a different section id', contextHooks => {
+      QUnit.module('when the current section id is a different section id (3)', contextHooks => {
         contextHooks.beforeEach(() => {
           learningMastery._setCurrentSectionId('2002')
         })
@@ -226,7 +226,7 @@ QUnit.module('Learning Mastery > LearningMastery', suiteHooks => {
         })
       })
 
-      QUnit.module('when the current section id is null', contextHooks => {
+      QUnit.module('when the current section id is null (3)', contextHooks => {
         contextHooks.beforeEach(() => {
           learningMastery._setCurrentSectionId(null)
         })
