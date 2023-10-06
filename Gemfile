@@ -15,7 +15,7 @@ source "https://rubygems.org/"
 Plugin.uninstall(["bundler_lockfile_extensions"], {}) if Plugin.installed?("bundler_lockfile_extensions")
 
 # vendored until https://github.com/rubygems/rubygems/pull/6957 is merged and released
-plugin "bundler-multilock", "1.0.11", path: "vendor/gems/bundler-multilock"
+plugin "bundler-multilock", "1.1.2", path: "vendor/gems/bundler-multilock"
 # the extra check here is in case `bundle check` or `bundle exec` gets run before `bundle install`,
 # and is also fixed by the same PR
 raise GemNotFound, "bundler-multilock plugin is not installed" if !is_a?(Bundler::Plugin::DSL) && !Plugin.installed?("bundler-multilock")
@@ -36,10 +36,10 @@ SUPPORTED_RAILS_VERSIONS.product([nil, true]).each do |rails_version, include_pl
   lockfile = ["rails#{rails_version.delete(".")}", include_plugins && "plugins"].compact.join(".")
   lockfile = nil if rails_version == SUPPORTED_RAILS_VERSIONS.first && !include_plugins
 
-  default = rails_version == CANVAS_RAILS && !!include_plugins
+  active = rails_version == CANVAS_RAILS && !!include_plugins
 
   lockfile(lockfile,
-           default:,
+           active:,
            allow_mismatched_dependencies: rails_version != SUPPORTED_RAILS_VERSIONS.first,
            enforce_pinned_additional_dependencies: include_plugins) do
     Object.send(:remove_const, :CANVAS_RAILS)
