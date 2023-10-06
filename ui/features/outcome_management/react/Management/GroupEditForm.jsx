@@ -39,7 +39,7 @@ const I18n = useI18nScope('FindOutcomesModal')
 const titleValidator = composeValidators(requiredValidator, maxLengthValidator(255))
 
 const componentOverrides = {
-  [Mask.componentId]: {
+  Mask: {
     zIndex: '1000',
   },
 }

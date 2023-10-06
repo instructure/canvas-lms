@@ -26,7 +26,7 @@ import {svgUrl} from './icons'
 import {proficiencyRatingShape} from './shapes'
 
 const componentOverrides = {
-  [Tag.componentId]: {
+  Tag: {
     defaultBackground: 'white',
     maxWidth: '12rem',
   },

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -23,7 +22,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {ToggleGroup} from '@instructure/ui-toggle-details'
 import {IconMiniArrowEndSolid, IconMiniArrowDownSolid} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
-import {ApplyTheme} from '@instructure/ui-themeable'
+import {InstUISettingsProvider} from '@instructure/emotion'
 import {accountListTheme} from '../theme'
 
 import {AccountCalendarItem} from './AccountCalendarItem'
@@ -35,7 +34,7 @@ const I18n = useI18nScope('account_calendar_settings_account_group')
 
 type ComponentProps = {
   readonly parentId: null | number
-  readonly accountGroup: Account[] | number[]
+  readonly accountGroup: number[]
   readonly collections: Collection
   readonly loadingCollectionIds: number[]
   readonly handleToggle: (account: Account, expanded: boolean) => void
@@ -46,7 +45,7 @@ type ComponentProps = {
   readonly expandedAccounts: ExpandedAccounts
 }
 
-const accGroupSortCalback = (a, b, parentId) => {
+const accGroupSortCalback = (a: Account, b: Account, parentId: number | null) => {
   if (a.id === parentId) {
     return -1
   }
@@ -101,7 +100,10 @@ export const AccountCalendarItemToggleGroup = ({
         }
 
         return (
-          <ApplyTheme theme={accountListTheme} key={`toggle-group-${acc.id}`}>
+          <InstUISettingsProvider
+            theme={{componentOverrides: accountListTheme}}
+            key={`toggle-group-${acc.id}`}
+          >
             <View as="div" borderWidth={`${parentId !== null ? 'small' : '0'} 0 0 0`}>
               <ToggleGroup
                 border={false}
@@ -133,7 +135,7 @@ export const AccountCalendarItemToggleGroup = ({
                 )}
               </ToggleGroup>
             </View>
-          </ApplyTheme>
+          </InstUISettingsProvider>
         )
       })}
     </div>

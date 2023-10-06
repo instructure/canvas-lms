@@ -38,9 +38,9 @@ function eatEvent(event) {
   event.preventDefault()
 }
 
-function AddName({address, namePrompt, onClick, theme}) {
+function AddName({address, namePrompt, onClick, themeOverride}) {
   return (
-    <Link data-address={address} isWithinText={false} as="button" onClick={onClick} theme={theme}>
+    <Link data-address={address} isWithinText={false} as="button" onClick={onClick} themeOverride={themeOverride}>
       <Text>{namePrompt}</Text>
     </Link>
   )
@@ -312,7 +312,7 @@ class MissingPeopleSection extends React.Component {
                 address={missing.address}
                 namePrompt={namePrompt}
                 onClick={this.onSelectNewForMissing}
-                theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
+                themeOverride={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
               />
             </Table.Cell>
             <Table.RowHeader>{missing.address}</Table.RowHeader>

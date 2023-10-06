@@ -278,7 +278,7 @@ export default class StudentTray extends React.Component {
                     isWithinText={false}
                     aria-label={I18n.t("Go to %{name}'s profile", {name: student.shortName})}
                     target="_blank"
-                    theme={{largePadding: '0.75rem', largeHeight: 'normal'}}
+                    themeOverride={{largePadding: '0.75rem', largeHeight: 'normal'}}
                   >
                     {student.shortName}
                   </Link>

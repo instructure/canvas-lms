@@ -173,7 +173,7 @@ export const GradeRow = ({
 
   return (
     <Table.Row data-testid="grades-table-row" key={id}>
-      <Table.Cell theme={cellTheme}>
+      <Table.Cell themeOverride={cellTheme}>
         {unread ? (
           <Badge
             type="notification"
@@ -184,7 +184,7 @@ export const GradeRow = ({
                 {I18n.t('New grade for %{assignmentName}', {assignmentName})}
               </ScreenReaderContent>
             )}
-            theme={{
+            themeOverride={{
               sizeNotification: '0.45rem',
             }}
           >
@@ -194,11 +194,11 @@ export const GradeRow = ({
           renderTitleCell()
         )}
       </Table.Cell>
-      <Table.Cell theme={cellTheme}>{dueDate && <Text>{dateFormatter(dueDate)}</Text>}</Table.Cell>
-      <Table.Cell theme={cellTheme}>
+      <Table.Cell themeOverride={cellTheme}>{dueDate && <Text>{dateFormatter(dueDate)}</Text>}</Table.Cell>
+      <Table.Cell themeOverride={cellTheme}>
         <Text>{assignmentGroupName}</Text>
       </Table.Cell>
-      <Table.Cell theme={cellTheme}>
+      <Table.Cell themeOverride={cellTheme}>
         <div className="grade-details__score">
           {renderScore()}
           {shouldShowPoints && (

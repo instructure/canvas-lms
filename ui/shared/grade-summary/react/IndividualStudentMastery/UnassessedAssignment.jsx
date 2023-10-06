@@ -29,9 +29,11 @@ import {Link} from '@instructure/ui-link'
 const I18n = useI18nScope('IndividualStudentMasteryUnassessedAssignment')
 
 const componentOverrides = {
-  [Link.componentId]: {
+  Link: {
     fontWeight: '700',
     color: '#68777D',
+    mediumPaddingHorizontal: '0',
+    mediumHeight: 'normal',
   },
 }
 
@@ -43,7 +45,6 @@ const UnassessedAssignment = ({assignment}) => {
         <Link
           href={url}
           isWithinText={false}
-          theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
           renderIcon={
             _.includes(submission_types, 'online_quiz') ? IconQuizLine : IconAssignmentLine
           }

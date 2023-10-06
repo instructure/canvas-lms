@@ -96,7 +96,7 @@ SubmissionTypeButton.defaultProps = {
 
 const MoreOptionsButton = ({selected}) => (
   <ButtonContainer selected={selected}>
-    <Button as="span" display="block" theme={{borderWidth: '0'}} withBackground={false}>
+    <Button as="span" display="block" themeOverride={{borderWidth: '0'}} withBackground={false}>
       <IconMoreLine size="small" color={foregroundColor(selected)} />
 
       <View as="div" margin="small 0 0">

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -45,14 +44,6 @@ import UploadFileSVG from '../../../features/assignments_show_student/images/Upl
 
 const I18n = useI18nScope('conversations_2')
 
-const {
-  Cell: TableCell,
-  Body: TableBody,
-  Row: TableRow,
-  ColHeader: TableColHeader,
-  Head: TableHead,
-} = Table as any
-
 type AlertType = {
   text: string
   variant: 'error' | 'success' | 'info' | 'warning' | undefined
@@ -78,7 +69,7 @@ export type ProxyUploadModalProps = {
   submission: {
     id: string
   }
-  reloadSubmission: (proxyDetails) => void
+  reloadSubmission: (proxyDetails: ProxyDetails) => void
 }
 
 export type ProxyDetails = {
@@ -134,7 +125,7 @@ const ProxyUploadModal = ({
     setUploadSuccess(false)
   }
 
-  const handleSuccess = sub => {
+  const handleSuccess = (sub: any) => {
     setAlert({text: I18n.t('Submission uploaded successfully!'), variant: 'success'})
     setUploadSuccess(true)
     setTimeout(() => reload(sub), 3000)
@@ -145,7 +136,7 @@ const ProxyUploadModal = ({
     setAlert({text: I18n.t('Error sending submission'), variant: 'error'})
   }
 
-  const reload = sub => {
+  const reload = (sub: any) => {
     const proxyDetails: ProxyDetails = {
       submission_type: 'online_upload',
       proxy_submitter: sub.proxySubmitter,
@@ -157,7 +148,7 @@ const ProxyUploadModal = ({
     resetState()
   }
 
-  const handleSubmitClick = e => {
+  const handleSubmitClick = (e: KeyboardEvent | MouseEvent) => {
     e.preventDefault()
     setSubmitting(true)
     createSubmissionMutation({
@@ -175,6 +166,7 @@ const ProxyUploadModal = ({
     if (typeof file.id === 'number' && file.id > 10000000000000 && file.preview_url) {
       const pattern = /\/files\/(\d+)~(\d+)/
       const match = file.preview_url.match(pattern)
+      if (match === null) throw new RangeError('Could not parse files from preview_url')
       const numberBeforeTilde = match[1]
       const numberAfterTilde = match[2]
       // this simulates multiplying the shard id by 10^13 and adding the file id
@@ -187,7 +179,7 @@ const ProxyUploadModal = ({
     return file.id
   }
 
-  const handleDropAccept = async files => {
+  const handleDropAccept = async (files: any) => {
     if (!files.length) {
       setAlert({text: I18n.t('Error adding files'), variant: 'error'})
       return
@@ -203,8 +195,9 @@ const ProxyUploadModal = ({
     })
   }
 
+  // @ts-expect-error
   const onUploadRequested = async ({files, onSuccess, onError}) => {
-    const newFiles = files.map((file, i) => {
+    const newFiles = files.map((file: any, i: number) => {
       // "text" is filename in LTI Content Item
       const name = file.name || file.text || file.url
       const _id = `${i}-${file.url || file.name}`
@@ -245,10 +238,11 @@ const ProxyUploadModal = ({
     })
   }
 
-  const uploadFiles = async files => {
+  const uploadFiles = async (files: any) => {
     // This is taken almost verbatim from the uploadFiles method in the
     // upload-file module.  Rather than calling that method, we call uploadFile
     // for each file to track progress for the individual uploads.
+    // @ts-expect-error
     const assignmentCourseId = assignment.courseId || assignment.course_id
     const uploadUrl =
       assignment.groupSet?.currentGroup == null
@@ -256,7 +250,8 @@ const ProxyUploadModal = ({
         : `/api/v1/groups/${assignment.groupSet.currentGroup._id}/files`
 
     const uploadPromises: any[] = []
-    files.forEach((file, i) => {
+    files.forEach((file: any, i: number) => {
+      // @ts-expect-error
       const onProgress = event => {
         const {loaded, total} = event
         updateUploadProgress({index: i, loaded, total})
@@ -298,8 +293,10 @@ const ProxyUploadModal = ({
     return Promise.all(uploadPromises)
   }
 
-  const handleRemoveFile = (e: Event) => {
+  const handleRemoveFile = (e: KeyboardEvent | MouseEvent) => {
     const target = e.currentTarget
+    if (target === null) throw new RangeError('Could not find target')
+    // @ts-expect-error
     const fileId = parseInt(target.id, 10)
     const fileIndex = uploadedFiles.findIndex(file => parseInt(file.id, 10) === fileId)
 
@@ -322,7 +319,7 @@ const ProxyUploadModal = ({
     setUploadedFiles(updatedFiles)
   }
 
-  const updateUploadingFiles = async wrappedFunc => {
+  const updateUploadingFiles = async (wrappedFunc: any) => {
     setFilesUploading(true)
     await wrappedFunc()
     setFilesUploading(false)
@@ -366,26 +363,26 @@ const ProxyUploadModal = ({
         data-testid="proxy_uploaded_files_table"
         margin="none none small none"
       >
-        <TableHead>
-          <TableRow>
-            <TableColHeader id="thumbnail" width="1rem" theme={cellTheme}>
+        <Table.Head>
+          <Table.Row>
+            <Table.ColHeader id="thumbnail" width="1rem" themeOverride={cellTheme}>
               <ScreenReaderContent>{I18n.t('File Type')}</ScreenReaderContent>
-            </TableColHeader>
-            <TableColHeader id="filename" theme={cellTheme}>
+            </Table.ColHeader>
+            <Table.ColHeader id="filename" themeOverride={cellTheme}>
               {I18n.t('File Name')}
-            </TableColHeader>
-            <TableColHeader id="upload-progress" width="30%" theme={cellTheme}>
+            </Table.ColHeader>
+            <Table.ColHeader id="upload-progress" width="30%" themeOverride={cellTheme}>
               <ScreenReaderContent>{I18n.t('Upload Progress')}</ScreenReaderContent>
-            </TableColHeader>
-            <TableColHeader id="upload-success" width="1rem" theme={cellTheme}>
+            </Table.ColHeader>
+            <Table.ColHeader id="upload-success" width="1rem" themeOverride={cellTheme}>
               <ScreenReaderContent>{I18n.t('Upload Success')}</ScreenReaderContent>
-            </TableColHeader>
-            <TableColHeader id="delete" width="1rem" theme={cellTheme}>
+            </Table.ColHeader>
+            <Table.ColHeader id="delete" width="1rem" themeOverride={cellTheme}>
               <ScreenReaderContent>{I18n.t('Remove file')}</ScreenReaderContent>
-            </TableColHeader>
-          </TableRow>
-        </TableHead>
-        <TableBody>{files.map(renderTableRow)}</TableBody>
+            </Table.ColHeader>
+          </Table.Row>
+        </Table.Head>
+        <Table.Body>{files.map(renderTableRow)}</Table.Body>
       </Table>
     )
   }
@@ -404,9 +401,9 @@ const ProxyUploadModal = ({
     const displayName = file.display_name || file.name
     const cellTheme = {background: theme.variables.colors.backgroundLight}
     return (
-      <TableRow key={file._id || file.id}>
-        <TableCell theme={cellTheme}>{getFileThumbnail(file, 'small')}</TableCell>
-        <TableCell theme={cellTheme}>
+      <Table.Row key={file._id || file.id}>
+        <Table.Cell themeOverride={cellTheme}>{getFileThumbnail(file, 'small')}</Table.Cell>
+        <Table.Cell themeOverride={cellTheme}>
           {displayName && (
             <>
               <span aria-hidden={true} title={displayName}>
@@ -415,27 +412,31 @@ const ProxyUploadModal = ({
               <ScreenReaderContent>{displayName}</ScreenReaderContent>
             </>
           )}
-        </TableCell>
-        <TableCell theme={cellTheme}>
-          {file.isLoading && renderFileProgress(file)}
+        </Table.Cell>
+        <Table.Cell themeOverride={cellTheme}>
+          {
+            // @ts-expect-error
+            file.isLoading && renderFileProgress(file)
+          }
           <ScreenReaderContent>
             {file.isLoading
               ? I18n.t('%{displayName} loading in progress', {displayName})
               : I18n.t('%{displayName} loaded', {displayName})}
           </ScreenReaderContent>
-        </TableCell>
-        <TableCell theme={cellTheme}>
+        </Table.Cell>
+        <Table.Cell themeOverride={cellTheme}>
           {!file.isLoading && <IconCompleteSolid color="success" />}
           <ScreenReaderContent>
             {file.isLoading
               ? I18n.t('%{displayName} loading pending', {displayName})
               : I18n.t('%{displayName} loading success', {displayName})}
           </ScreenReaderContent>
-        </TableCell>
-        <TableCell theme={cellTheme}>
+        </Table.Cell>
+        <Table.Cell themeOverride={cellTheme}>
           {!file.isLoading && (
             <IconButton
               id={file.id}
+              // @ts-expect-error
               onClick={handleRemoveFile}
               screenReaderLabel={I18n.t('Remove %{displayName}', {displayName})}
               size="small"
@@ -446,8 +447,8 @@ const ProxyUploadModal = ({
               <IconTrashLine />
             </IconButton>
           )}
-        </TableCell>
-      </TableRow>
+        </Table.Cell>
+      </Table.Row>
     )
   }
 
@@ -542,7 +543,8 @@ const ProxyUploadModal = ({
             color="primary"
             type="submit"
             disabled={filesUploading || submitting}
-            onClick={e => handleSubmitClick(e)}
+            // @ts-expect-error
+            onClick={(e: KeyboardEvent | MouseEvent) => handleSubmitClick(e)}
           >
             Submit
           </Button>

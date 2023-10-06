@@ -21,8 +21,8 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {HandleCheckboxChange} from '../../../types'
 import {View} from '@instructure/ui-view'
-import {ApplyTheme} from '@instructure/ui-themeable'
-import {Checkbox, CheckboxFacade} from '@instructure/ui-checkbox'
+import {InstUISettingsProvider} from '@instructure/emotion'
+import {Checkbox} from '@instructure/ui-checkbox'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 type Props = {
@@ -30,6 +30,18 @@ type Props = {
   handleCheckboxChange: HandleCheckboxChange
   showConcludedEnrollments: boolean
 }
+
+const componentOverrides = {
+  Checkbox: {
+    checkedBackground: '#0375ff',
+    borderColor: '#777777',
+    labelFontSizeSmall: '1rem',
+  },
+  View: {
+    paddingMedium: '16px',
+  },
+}
+
 export default function ShowConcludedEnrollmentsCheckbox({
   settingsUpdateUrl,
   handleCheckboxChange,
@@ -50,18 +62,7 @@ export default function ShowConcludedEnrollmentsCheckbox({
   }
 
   return (
-    <ApplyTheme
-      theme={{
-        [CheckboxFacade.componentId]: {
-          checkedBackground: '#0375ff',
-          borderColor: '#777777',
-          labelFontSizeSmall: '1rem',
-        },
-        [View.componentId]: {
-          paddingMedium: '16px',
-        },
-      }}
-    >
+    <InstUISettingsProvider theme={{componentOverrides}}>
       <View
         as="div"
         className="checkbox"
@@ -79,6 +80,6 @@ export default function ShowConcludedEnrollmentsCheckbox({
           data-testid="show-concluded-enrollments-checkbox"
         />
       </View>
-    </ApplyTheme>
+    </InstUISettingsProvider>
   )
 }

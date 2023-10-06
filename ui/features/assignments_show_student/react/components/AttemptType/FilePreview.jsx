@@ -129,26 +129,26 @@ export default class FilePreview extends Component {
       <Table caption={I18n.t('Uploaded files')} data-testid="uploaded_files_table">
         <Table.Head>
           <Table.Row>
-            <Table.ColHeader id="thumbnail" width="1rem" theme={cellTheme} />
-            <Table.ColHeader id="filename" theme={cellTheme}>
+            <Table.ColHeader id="thumbnail" width="1rem" themeOverride={cellTheme} />
+            <Table.ColHeader id="filename" themeOverride={cellTheme}>
               {I18n.t('File Name')}
             </Table.ColHeader>
-            <Table.ColHeader id="size" theme={cellTheme}>
+            <Table.ColHeader id="size" themeOverride={cellTheme}>
               {I18n.t('Size')}
             </Table.ColHeader>
-            <Table.ColHeader id="originality_report" theme={cellTheme} />
-            <Table.ColHeader id="upload-success" width="1rem" theme={cellTheme} />
+            <Table.ColHeader id="originality_report" themeOverride={cellTheme} />
+            <Table.ColHeader id="upload-success" width="1rem" themeOverride={cellTheme} />
           </Table.Row>
         </Table.Head>
         <Table.Body>
           {this.props.submission.attachments.map((file, index) => (
             <Table.Row key={file._id}>
-              <Table.Cell theme={cellTheme}>
+              <Table.Cell themeOverride={cellTheme}>
                 {this.shouldDisplayThumbnail(file)
                   ? this.renderThumbnail(file, index)
                   : this.renderIcon(file, index)}
               </Table.Cell>
-              <Table.Cell theme={cellTheme}>
+              <Table.Cell themeOverride={cellTheme}>
                 <>
                   <Link onClick={() => this.selectFile(index)}>
                     {elideString(file.displayName || file.name)}
@@ -156,10 +156,10 @@ export default class FilePreview extends Component {
                   <ScreenReaderContent>{file.displayName || file.name}</ScreenReaderContent>
                 </>
               </Table.Cell>
-              <Table.Cell theme={cellTheme} data-testid="file-size">
+              <Table.Cell themeOverride={cellTheme} data-testid="file-size">
                 {file.size}
               </Table.Cell>
-              <Table.Cell theme={cellTheme}>
+              <Table.Cell themeOverride={cellTheme}>
                 {this.props.submission.originalityData &&
                   this.props.isOriginalityReportVisible &&
                   getOriginalityData(this.props.submission, index) && (
@@ -170,7 +170,7 @@ export default class FilePreview extends Component {
                     </Flex.Item>
                   )}
               </Table.Cell>
-              <Table.Cell theme={cellTheme}>
+              <Table.Cell themeOverride={cellTheme}>
                 <IconCompleteSolid color="success" />
               </Table.Cell>
             </Table.Row>
