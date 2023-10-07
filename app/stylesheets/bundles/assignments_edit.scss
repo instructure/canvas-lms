@@ -140,6 +140,9 @@ div.form-column-right, div.overrides-column-right {
     .nest {
       padding-#{direction(left)}: 20px;
     }
+    .datetime_suggest{
+      padding-#{direction(left)}: 70px;
+    }
   }
 }
 
