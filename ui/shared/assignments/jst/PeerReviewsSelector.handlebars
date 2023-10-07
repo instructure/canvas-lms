@@ -73,7 +73,7 @@
             <input id="assignment_peer_reviews_assign_at"
               name="{{#if nested}}assignment[peer_reviews_assign_at]{{else}}peer_reviews_assign_at{{/if}}"
               class="date_field datetime_field hasDatePicker"
-              value="{{datetimeFormatted peerReviewsAssignAt}}"
+              value="{{datetimeFormatted peerReviewsAssignAt format='medium'}}"
               type="text"
               aria-labelledby="assign_peer_review_at_accessible_label"
               aria-describedby="peer_reviews_assign_at_explanation"
