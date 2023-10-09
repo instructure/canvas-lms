@@ -21,7 +21,18 @@
 
 /* header */
 .assignment-edit-header {
-  margin-bottom: 12px;
+  margin-bottom: 24px;
+}
+
+.assignment-edit-header-group-left{
+  padding-top: 2px;
+}
+
+.assignment-edit-header-title{
+  font-weight: 700;
+  font-size: 38px;
+  line-height: 40px;
+  margin:0;
 }
 
 #edit_assignment_header {

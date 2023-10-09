@@ -779,7 +779,16 @@ class AssignmentsController < ApplicationController
           @context.root_account.feature_enabled?(:outcomes_new_decaying_average_calculation)
       }
 
-      add_crumb(@assignment.title, polymorphic_url([@context, @assignment])) unless @assignment.new_record?
+      if @context.root_account.feature_enabled?(:instui_nav)
+        if on_quizzes_page? && params.key?(:quiz_lti)
+          add_crumb("Edit Quiz") unless @assignment.new_record?
+        else
+          add_crumb("Edit Assignment") unless @assignment.new_record?
+        end
+      else
+        add_crumb(@assignment.title, polymorphic_url([@context, @assignment])) unless @assignment.new_record?
+      end
+
       hash[:POST_TO_SIS_DEFAULT] = @context.account.sis_default_grade_export[:value] if post_to_sis && @assignment.new_record?
       hash[:ASSIGNMENT] = assignment_json(@assignment, @current_user, session, override_dates: false)
       hash[:ASSIGNMENT][:has_submitted_submissions] = @assignment.has_submitted_submissions?
@@ -1081,11 +1090,13 @@ class AssignmentsController < ApplicationController
 
     if on_quizzes_page? && params.key?(:quiz_lti)
       add_crumb(t("#crumbs.quizzes", "Quizzes"), course_quizzes_path(@context))
+      add_crumb(t("Create Quiz")) if new_quiz && @context.root_account.feature_enabled?(:instui_nav)
     else
       add_crumb(t("#crumbs.assignments", "Assignments"), course_assignments_path(@context))
+      add_crumb(t("Create New Assignment")) if new_quiz && @context.root_account.feature_enabled?(:instui_nav)
     end
 
-    add_crumb(t("Create new")) if new_quiz
+    add_crumb(t("Create new")) if new_quiz && !@context.root_account.feature_enabled?(:instui_nav)
   end
 
   def setup_active_tab(controller)

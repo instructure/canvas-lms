@@ -24,11 +24,15 @@ import fakeENV from 'helpers/fakeENV'
 import Backbone from '@canvas/backbone'
 import assertions from 'helpers/assertions'
 
-const defaultAssignmentOpts = {
-  name: 'Test Assignment',
-  assignment_overrides: [],
-}
-const editHeaderView = function (assignmentOptions = {}, viewOptions = {}, beforeRender) {
+const editHeaderView = function (
+  assignmentOptions = {},
+  viewOptions = {},
+  beforeRender,
+  defaultAssignmentOpts = {
+    name: 'Test Assignment',
+    assignment_overrides: [],
+  }
+) {
   Object.assign(assignmentOptions, defaultAssignmentOpts)
   const assignment = new Assignment(assignmentOptions)
   const app = new EditHeaderView({
@@ -51,6 +55,7 @@ QUnit.module('EditHeaderView', {
   },
 })
 
+// eslint-disable-next-line qunit/resolve-async
 test('should be accessible', assert => {
   const view = editHeaderView()
   const done = assert.async()
@@ -59,7 +64,81 @@ test('should be accessible', assert => {
 
 test('renders', () => {
   const view = editHeaderView()
-  ok(view.$('.header-bar-right').length > 0, 'header bar is rendered')
+  ok(view.$('.assignment-edit-header').length > 0, 'header bar is rendered')
+})
+
+test('renders correct header title when the assignment is new and not an LTI quiz', () => {
+  ENV.FEATURES.instui_nav = true
+  const view = editHeaderView({}, {}, false, {})
+  strictEqual(view.$('.assignment-edit-header-title').text(), 'Create New Assignment')
+})
+
+test('renders correct screenreader content when the assignment is new and not an LTI quiz', () => {
+  ENV.FEATURES.instui_nav = true
+  const view = editHeaderView({}, {}, false, {})
+  ok(view.$('.screenreader-only').text().includes('Create New Assignment'))
+})
+
+test('renders correct header title when the assignment is new and is an LTI quiz', () => {
+  ENV.FEATURES.instui_nav = true
+  const view = editHeaderView({}, {}, false, {is_quiz_lti_assignment: true})
+  strictEqual(view.$('.assignment-edit-header-title').text(), 'Create Quiz')
+})
+
+test('renders correct screenreader content when the assignment is new and is an LTI quiz', () => {
+  ENV.FEATURES.instui_nav = true
+  const view = editHeaderView({}, {}, false, {is_quiz_lti_assignment: true})
+  ok(view.$('.screenreader-only').text().includes('Create Quiz'))
+})
+
+test('renders correct header title when the assignment is existing and is an LTI quiz', () => {
+  ENV.FEATURES.instui_nav = true
+  const view = editHeaderView({}, {}, false, {name: 'Hello World', is_quiz_lti_assignment: true})
+  strictEqual(view.$('.assignment-edit-header-title').text(), 'Edit Quiz')
+})
+
+test('renders correct header title when the assignment is existing and not an LTI quiz', () => {
+  ENV.FEATURES.instui_nav = true
+  const view = editHeaderView()
+  strictEqual(view.$('.assignment-edit-header-title').text(), 'Edit Assignment')
+})
+
+test('renders Not Published pill when the assignment is not a LTI quiz and has not been published', () => {
+  ENV.FEATURES.instui_nav = true
+  const view = editHeaderView({}, {}, false, {
+    name: 'Hello World',
+    published: false,
+  })
+  strictEqual(view.$('.published-assignment-container').text(), 'Not Published')
+})
+
+test('renders Published pill when the assignment is not a LTI quiz and has been published', () => {
+  ENV.FEATURES.instui_nav = true
+  const view = editHeaderView({}, {}, false, {
+    name: 'Hello World',
+    published: true,
+  })
+  strictEqual(view.$('.published-assignment-container').text(), 'Published')
+})
+
+test('renders Not Published pill when the assignment is a LTI quiz and has not been published', () => {
+  ENV.FEATURES.instui_nav = true
+  const view = editHeaderView({}, {}, false, {
+    name: 'Hello World',
+    is_quiz_lti_assignment: true,
+    published: false,
+  })
+  strictEqual(view.$('.published-assignment-container').text(), 'Not Published')
+})
+
+test('renders Published pill when the assignment is a LTI quiz and has been published', () => {
+  ENV.FEATURES.instui_nav = true
+  const view = editHeaderView({}, {}, false, {
+    name: 'Hello World',
+    is_quiz_lti_assignment: true,
+    published: true,
+  })
+  strictEqual(view.$('.published-assignment-container').text(), 'Published')
 })
 
 test('delete works for an un-saved assignment', () => {
@@ -171,19 +250,19 @@ QUnit.module('EditHeaderView - ConditionalRelease', {
 
 test('disables conditional release tab on load when grading type is not_graded', () => {
   const view = editHeaderView({grading_type: 'not_graded'})
-  equal(true, view.$headerTabsCr.tabs('option', 'disabled'))
+  equal(view.$headerTabsCr.tabs('option', 'disabled'), true)
 })
 
 test('enables conditional release tab when grading type switched from not_graded', () => {
   const view = editHeaderView({grading_type: 'not_graded'})
   view.onGradingTypeUpdate({target: {value: 'points'}})
-  equal(false, view.$headerTabsCr.tabs('option', 'disabled'))
+  equal(view.$headerTabsCr.tabs('option', 'disabled'), false)
 })
 
 test('disables conditional release tab when grading type switched to not_graded', () => {
   const view = editHeaderView({grading_type: 'points'})
   view.onGradingTypeUpdate({target: {value: 'not_graded'}})
-  equal(true, view.$headerTabsCr.tabs('option', 'disabled'))
+  equal(view.$headerTabsCr.tabs('option', 'disabled'), true)
 })
 
 test('switches to conditional release tab if save error contains conditional release error', () => {
@@ -194,7 +273,7 @@ test('switches to conditional release tab if save error contains conditional rel
     foo: 'bar',
     conditional_release: 'baz',
   })
-  equal(1, view.$headerTabsCr.tabs('option', 'active'))
+  equal(view.$headerTabsCr.tabs('option', 'active'), 1)
 })
 
 test('switches to details tab if save error does not contain conditional release error', () => {
@@ -205,5 +284,5 @@ test('switches to details tab if save error does not contain conditional release
     foo: 'bar',
     baz: 'bat',
   })
-  equal(0, view.$headerTabsCr.tabs('option', 'active'))
+  equal(view.$headerTabsCr.tabs('option', 'active'), 0)
 })
