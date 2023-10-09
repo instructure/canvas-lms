@@ -21,13 +21,13 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
 import {AssignmentGroupSelect} from './AssignmentGroupSelect'
-import {PointsPossible} from './PointsPossible'
 import {DisplayGradeAs} from './DisplayGradeAs'
+import {PointsPossible} from './PointsPossible'
+import {PeerReviewOptions} from './PeerReviewOptions'
 
 // TODO: remove eslint-disable once this component is implemented
 // at the top of the file
@@ -41,6 +41,10 @@ export const GradedDiscussionOptions = ({
   setAssignmentGroup,
   peerReviewAssignment,
   setPeerReviewAssignment,
+  peerReviewsPerStudent,
+  setPeerReviewsPerStudent,
+  peerReviewDueDate,
+  setPeerReviewDueDate,
   assignTo,
   setAssignTo,
   dueDate,
@@ -61,8 +65,15 @@ export const GradedDiscussionOptions = ({
           availableAssignmentGroups={assignmentGroups}
         />
       </View>
-      <View as="div" margin="medium 0">
-        <Text>Peer Review</Text>
+      <View as="div" margin="small 0">
+        <PeerReviewOptions
+          peerReviewAssignment={peerReviewAssignment}
+          setPeerReviewAssignment={setPeerReviewAssignment}
+          peerReviewsPerStudent={peerReviewsPerStudent}
+          setPeerReviewsPerStudent={setPeerReviewsPerStudent}
+          peerReviewDueDate={peerReviewDueDate}
+          setPeerReviewDueDate={setPeerReviewDueDate}
+        />
       </View>
       <View as="div" margin="medium 0">
         <Text>Assignment Settings</Text>
@@ -81,6 +92,10 @@ GradedDiscussionOptions.propTypes = {
   setAssignmentGroup: PropTypes.func,
   peerReviewAssignment: PropTypes.string,
   setPeerReviewAssignment: PropTypes.func,
+  peerReviewsPerStudent: PropTypes.number,
+  setPeerReviewsPerStudent: PropTypes.func,
+  peerReviewDueDate: PropTypes.string,
+  setPeerReviewDueDate: PropTypes.func,
   assignTo: PropTypes.string,
   setAssignTo: PropTypes.func,
   dueDate: PropTypes.string,
