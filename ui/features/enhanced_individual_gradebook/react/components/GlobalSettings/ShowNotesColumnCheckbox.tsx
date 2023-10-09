@@ -20,9 +20,7 @@ import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {CustomColumn, HandleCheckboxChange, TeacherNotes} from '../../../types'
 import {executeApiRequest} from '@canvas/util/apiRequest'
-import {View} from '@instructure/ui-view'
-import {InstUISettingsProvider} from '@instructure/emotion'
-import {Checkbox} from '@instructure/ui-checkbox'
+import CheckboxTemplate from './CheckboxTemplate'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 type Props = {
@@ -34,17 +32,6 @@ type Props = {
   handleCheckboxChange: HandleCheckboxChange
   showNotesColumn: boolean
   onTeacherNotesCreation: (teacherNotes: TeacherNotes) => void
-}
-
-const componentOverrides = {
-  CheckboxFacade: {
-    checkedBackground: '#0375ff',
-    borderColor: '#777777',
-    labelFontSizeSmall: '1rem',
-  },
-  View: {
-    paddingMedium: '16px',
-  },
 }
 
 export default function ShowNotesColumnCheckbox({
@@ -97,24 +84,11 @@ export default function ShowNotesColumnCheckbox({
   }
 
   return (
-    <InstUISettingsProvider theme={{componentOverrides}}>
-      <View
-        as="div"
-        className="checkbox"
-        margin="x-small 0"
-        borderRadius="medium"
-        background="primary"
-        padding="medium"
-        themeOverride={{backgroundPrimary: '#eee'}}
-      >
-        <Checkbox
-          data-testid="show-notes-column-checkbox"
-          size="small"
-          label={I18n.t('Show Notes in Student Info')}
-          checked={showNotesColumn}
-          onChange={handleShowNotesColumnChange}
-        />
-      </View>
-    </InstUISettingsProvider>
+    <CheckboxTemplate
+      dataTestId="show-notes-column-checkbox"
+      label={I18n.t('Show Notes in Student Info')}
+      checked={showNotesColumn}
+      onChange={handleShowNotesColumnChange}
+    />
   )
 }

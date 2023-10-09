@@ -20,9 +20,7 @@ import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {executeApiRequest} from '@canvas/util/apiRequest'
 import {HandleCheckboxChange} from '../../../types'
-import {View} from '@instructure/ui-view'
-import {InstUISettingsProvider} from '@instructure/emotion'
-import {Checkbox, CheckboxFacade} from '@instructure/ui-checkbox'
+import CheckboxTemplate from './CheckboxTemplate'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
@@ -49,37 +47,11 @@ export default function AllowFinalGradeOverrideCheckbox({
   }
 
   return (
-    <InstUISettingsProvider
-      theme={{
-        componentOverrides: {
-          [CheckboxFacade.componentId]: {
-            checkedBackground: '#0375ff',
-            borderColor: '#777777',
-            labelFontSizeSmall: '1rem',
-          },
-          [View.componentId]: {
-            paddingMedium: '16px',
-            backgroundPrimary: '#eee',
-          },
-        },
-      }}
-    >
-      <View
-        as="div"
-        className="checkbox"
-        margin="x-small 0"
-        borderRadius="medium"
-        background="primary"
-        padding="medium"
-      >
-        <Checkbox
-          size="small"
-          label={I18n.t('Allow Final Grade Override')}
-          checked={allowFinalGradeOverride}
-          onChange={handleAllowFinalGradeOverrideChange}
-          data-testid="allow-final-grade-override-checkbox"
-        />
-      </View>
-    </InstUISettingsProvider>
+    <CheckboxTemplate
+      label={I18n.t('Allow Final Grade Override')}
+      checked={allowFinalGradeOverride}
+      onChange={handleAllowFinalGradeOverrideChange}
+      dataTestId="allow-final-grade-override-checkbox"
+    />
   )
 }
