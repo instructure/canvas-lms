@@ -22,6 +22,7 @@ import {render, waitFor} from '@testing-library/react'
 import VideoOptionsTray from '..'
 import VideoOptionsTrayDriver from './VideoOptionsTrayDriver'
 import {createLiveRegion, removeLiveRegion} from '../../../../__tests__/liveRegionHelper'
+import RceApiSource from '../../../../../rcs/api'
 
 jest.useFakeTimers()
 
@@ -59,6 +60,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
 
   afterEach(() => {
     removeLiveRegion()
+    jest.resetAllMocks()
   })
 
   function renderComponent() {
@@ -240,7 +242,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
         expect(displayAs).toEqual('link')
       })
 
-      it.skip('includes the size to be applied', async () => {
+      it('includes the size to be applied', async () => {
         await tray.setSize('Large')
         tray.$doneButton.click()
         const [{appliedHeight, appliedWidth}] = props.onSave.mock.calls[0]
@@ -250,6 +252,42 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
         )
         expect(appliedHeight).toEqual(expectedHt)
       })
+    })
+  })
+
+  describe('Attachment Media Options Tray', () => {
+    it('does not have closed caption controls or title input for locked attachments', async () => {
+      const getFileMock = jest
+        .spyOn(RceApiSource.prototype, 'getFile')
+        .mockImplementation(() => {
+          return Promise.resolve({
+            "id": "10",
+            "is_master_course_child_content": true,
+            "restricted_by_master_course": true,
+          })
+        })
+      props.videoOptions = {attachmentId: 10}
+      renderComponent()
+      await waitFor(() => {expect(getFileMock).toHaveBeenCalled()})
+      expect(tray.$closedCaptionPanel).not.toBeInTheDocument()
+      expect(tray.$titleTextField).not.toBeInTheDocument()
+    })
+
+    it('shows closed caption controls and title input for unlocked attachments', async () => {
+      const getFileMock = jest
+        .spyOn(RceApiSource.prototype, 'getFile')
+        .mockImplementation(() => {
+          return Promise.resolve({
+            "id": "10",
+            "is_master_course_master_content": true,
+            "restricted_by_master_course": true,
+          })
+        })
+      props.videoOptions = {attachmentId: 10}
+      renderComponent()
+      await waitFor(() => {expect(getFileMock).toHaveBeenCalled()})
+      expect(tray.$closedCaptionPanel).toBeInTheDocument()
+      expect(tray.$titleTextField).toBeInTheDocument()
     })
   })
 
