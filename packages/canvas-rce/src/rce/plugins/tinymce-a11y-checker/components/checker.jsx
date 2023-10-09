@@ -378,6 +378,8 @@ export default class Checker extends React.Component {
                                 screenReaderLabel={formatMessage('Why')}
                                 renderIcon={IconQuestionLine}
                                 onClick={() => this.setState({showWhyPopover: true})}
+                                withBackground={false}
+                                withBorder={false}
                               >
                                 <IconQuestionLine />
                               </IconButton>
