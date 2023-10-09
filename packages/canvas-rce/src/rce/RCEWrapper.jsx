@@ -319,7 +319,6 @@ class RCEWrapper extends React.Component {
       explicit_latex_typesetting = false,
       rce_transform_loaded_content = false,
       media_links_use_attachment_id = false,
-      improved_no_results_messaging = false,
     } = this.props.features
 
     return {
@@ -328,7 +327,6 @@ class RCEWrapper extends React.Component {
       explicit_latex_typesetting,
       rce_transform_loaded_content,
       media_links_use_attachment_id,
-      improved_no_results_messaging,
     }
   }
 

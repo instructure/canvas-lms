@@ -357,7 +357,6 @@ class ApplicationController < ActionController::Base
     dev_key_oidc_alert
     media_links_use_attachment_id
     permanent_page_links
-    improved_no_results_messaging
     differentiated_modules
     enhanced_course_creation_account_fetching
     instui_for_import_page

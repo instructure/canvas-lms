@@ -127,19 +127,13 @@ class LinkSet extends Component {
   }
 
   renderEmptyIndicator() {
-    return RCEGlobals.getFeatures()?.improved_no_results_messaging ?
-    (
+    return (
       <NoResults
         contextType={this.props.contextType}
         contextId={this.props.contextId}
         collectionType={this.props.type}
         isSearchResult={this.props.searchString?.length >= 3}
       />
-    )
-    : (
-      <View as="div" role="alert" padding="medium">
-        {formatMessage('No results.')}
-      </View>
     )
   }
 
