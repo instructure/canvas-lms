@@ -91,6 +91,7 @@ export default function DiscussionTopicFormContainer() {
       isEditing={isEditing}
       currentDiscussionTopic={currentDiscussionTopic}
       isStudent={ENV.current_user_is_student}
+      assignmentGroups={currentContext?.assignmentGroupsConnection?.nodes}
       sections={sections}
       groupCategories={groupCategories}
       onSubmit={({

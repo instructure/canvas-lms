@@ -17,6 +17,7 @@
  */
 
 import {GroupSet} from './GroupSet'
+import {AssignmentGroup} from './AssignmentGroup'
 import {Section} from './Section'
 import {arrayOf, shape, string} from 'prop-types'
 import gql from 'graphql-tag'
@@ -27,6 +28,11 @@ export const Course = {
       _id
       id
       name
+      assignmentGroupsConnection {
+        nodes {
+          ...AssignmentGroup
+        }
+      }
       enrollmentsConnection {
         nodes {
           user {
@@ -48,11 +54,15 @@ export const Course = {
         }
       }
     }
+    ${AssignmentGroup.fragment}
   `,
   shape: shape({
     _id: string,
     id: string,
     name: string,
+    assignmentGroupsConnection: shape({
+      nodes: arrayOf(AssignmentGroup.shape),
+    }),
     enrollmentsConnection: shape({
       nodes: arrayOf({
         user: {
@@ -72,6 +82,9 @@ export const Course = {
     _id: '1',
     id: 'K3n9F08vw4',
     name: 'X-Men School',
+    assignmentGroupsConnection: shape({
+      nodes: [AssignmentGroup.mock()],
+    }),
     enrollmentsConnection: shape({
       nodes: [
         {

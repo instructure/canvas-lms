@@ -35,6 +35,7 @@ import {DateTimeInput} from '@instructure/ui-date-time-input'
 import CanvasMultiSelect from '@canvas/multi-select'
 import CanvasRce from '@canvas/rce/react/CanvasRce'
 import {Alert} from '@instructure/ui-alerts'
+import {GradedDiscussionOptions} from '../GradedDiscussionOptions/GradedDiscussionOptions'
 
 const I18n = useI18nScope('discussion_create')
 
@@ -42,6 +43,7 @@ export default function DiscussionTopicForm({
   isEditing,
   currentDiscussionTopic,
   isStudent,
+  assignmentGroups,
   sections,
   groupCategories,
   onSubmit,
@@ -118,12 +120,12 @@ export default function DiscussionTopicForm({
   const [published, setPublished] = useState(false)
 
   // To be implemented in phase 2, kept as a reminder
-  // const [pointsPossible, setPointsPossible] = useState(0)
-  // const [displayGradeAs, setDisplayGradeAs] = useState('letter')
-  // const [assignmentGroup, setAssignmentGroup] = useState('')
-  // const [peerReviewAssignment, setPeerReviewAssignment] = useState('off')
-  // const [assignTo, setAssignTo] = useState('')
-  // const [dueDate, setDueDate] = useState(0)
+  const [pointsPossible, setPointsPossible] = useState(0)
+  const [displayGradeAs, setDisplayGradeAs] = useState('points')
+  const [assignmentGroup, setAssignmentGroup] = useState('')
+  const [peerReviewAssignment, setPeerReviewAssignment] = useState('off')
+  const [assignTo, setAssignTo] = useState('')
+  const [dueDate, setDueDate] = useState('')
 
   const [showGroupCategoryModal, setShowGroupCategoryModal] = useState(false)
 
@@ -316,7 +318,7 @@ export default function DiscussionTopicForm({
                   }
                   setDiscussionAnonymousState(value)
                 }}
-                disabled={isEditing}
+                disabled={isEditing || isGraded}
               >
                 <RadioInput
                   key="off"
@@ -540,7 +542,23 @@ export default function DiscussionTopicForm({
         {!isAnnouncement &&
           !isGroupContext &&
           (isGraded ? (
-            <div>Graded options here</div>
+            <View as="div" data-testid="assignment-settings-section">
+              <GradedDiscussionOptions
+                assignmentGroups={assignmentGroups}
+                pointsPossible={pointsPossible}
+                setPointsPossible={setPointsPossible}
+                displayGradeAs={displayGradeAs}
+                setDisplayGradeAs={setDisplayGradeAs}
+                assignmentGroup={assignmentGroup}
+                setAssignmentGroup={setAssignmentGroup}
+                peerReviewAssignment={peerReviewAssignment}
+                setPeerReviewAssignment={setPeerReviewAssignment}
+                assignTo={assignTo}
+                setAssignTo={setAssignTo}
+                dueDate={dueDate}
+                setDueDate={setDueDate}
+              />
+            </View>
           ) : (
             <FormFieldGroup description="" width={inputWidth}>
               <DateTimeInput
@@ -610,6 +628,7 @@ export default function DiscussionTopicForm({
 }
 
 DiscussionTopicForm.propTypes = {
+  assignmentGroups: PropTypes.arrayOf(PropTypes.object),
   isEditing: PropTypes.bool,
   currentDiscussionTopic: PropTypes.object,
   isStudent: PropTypes.bool,
