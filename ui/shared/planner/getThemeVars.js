@@ -41,7 +41,7 @@ function getThemeVars() {
   // used, but unit tests don't always do that.
   // Also we have to cloneDeep this because the merge below is about to
   // mutate the whole thing.
-  const variables = cloneDeep(themes[defaultThemeKey ?? 'canvas']?.variables || fallback)
+  const variables = cloneDeep(themes[defaultThemeKey ?? 'canvas'] || fallback)
   merge(variables, overrides)
 
   memoizedVariables = {variables, key: defaultThemeKey}
