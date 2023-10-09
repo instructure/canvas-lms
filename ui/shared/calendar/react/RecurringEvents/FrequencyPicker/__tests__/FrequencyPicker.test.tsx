@@ -136,14 +136,14 @@ describe('FrequencyPicker', () => {
       expect(modal).toBeInTheDocument()
     })
 
-    it.skip('returns focus to the frequency picker button when the modal is closed', () => {
+    it('returns focus to the frequency picker button when the modal is closed', () => {
       const props = defaultProps()
       const {getByText, getByRole} = render(<FrequencyPicker {...props} />)
       selectOption(/frequency/i, /custom/i)
       const modal = getByText('Custom Repeating Event')
       expect(modal).toBeInTheDocument()
       userEvent.click(getByRole('button', {name: /cancel/i}))
-      expect(getByRole('button', {name: /frequency/i})).toHaveFocus()
+      expect(getByRole('combobox', {name: /frequency/i})).toHaveFocus()
     })
 
     it('sets width to auto', () => {
