@@ -38,32 +38,14 @@ function renderComponent(props) {
 }
 
 describe('RCE "Links" Plugin > LinkSet', () => {
-  describe('when improved_no_results_messaging is off', () => {
-    it('renders empty notice', () => {
-      const {getByText} = renderComponent()
-      expect(getByText('No results.')).toBeInTheDocument()
-    })
-
-    it('does not render empty notice if suppressed', () => {
-      const {queryByText} = renderComponent({suppressRenderEmpty: true})
-      expect(queryByText('No results.')).toBeNull()
-    })
+  it('renders empty notice', () => {
+    const {getByText} = renderComponent()
+    expect(getByText('No assignments created yet.')).toBeInTheDocument()
   })
 
-  describe('when improved_no_results_messaging is on', () => {
-    beforeAll(() => {
-      RCEGlobals.getFeatures = jest.fn().mockReturnValue({improved_no_results_messaging: true})
-    })
-
-    it('renders empty notice', () => {
-      const {getByText} = renderComponent()
-      expect(getByText('No assignments created yet.')).toBeInTheDocument()
-    })
-
-    it('does not render empty notice if suppressed', () => {
-      const {queryByText} = renderComponent({suppressRenderEmpty: true})
-      expect(queryByText('No assignments created yet.')).toBeNull()
-    })
+  it('does not render empty notice if suppressed', () => {
+    const {queryByText} = renderComponent({suppressRenderEmpty: true})
+    expect(queryByText('No assignments created yet.')).toBeNull()
   })
 
   it('renders a collection of assignments', () => {
