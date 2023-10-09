@@ -257,7 +257,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
       })
     })
 
-    it('does not updates the video w/o a media_object_id', async () => {
+    it('does not update the video w/o a media_object_id', async () => {
       const updateMediaObject = jest.fn().mockResolvedValue()
       trayController.showTrayForEditor(editors[0])
       trayController._applyVideoOptions({
@@ -275,6 +275,17 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
       expect(videoIframe.getAttribute('title')).toBe('new title')
       expect(videoContainer.style.height).toBe('101px')
       expect(videoContainer.style.width).toBe('321px')
+      expect(updateMediaObject).not.toHaveBeenCalled()
+    })
+
+    it('does not try to save data to the db on a locked media attachment', () => {
+      const updateMediaObject = jest.fn().mockResolvedValue()
+      trayController.showTrayForEditor(editors[0])
+      trayController._applyVideoOptions({
+        editLocked: true,
+        media_object_id: 'm_somevideo',
+        updateMediaObject,
+      })
       expect(updateMediaObject).not.toHaveBeenCalled()
     })
 

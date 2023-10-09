@@ -133,7 +133,7 @@ export default class TrayController {
       // If the video just edited came from a file uploaded to canvas
       // and not notorious, we probably don't have a media_object_id.
       // If not, we can't update the MediaObject in the canvas db.
-      if (videoOptions.media_object_id && videoOptions.media_object_id !== 'undefined') {
+      if (videoOptions.media_object_id && videoOptions.media_object_id !== 'undefined' && !videoOptions.editLocked) {
         videoOptions
           .updateMediaObject(data)
           .then(_r => {

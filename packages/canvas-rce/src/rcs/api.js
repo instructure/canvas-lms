@@ -446,11 +446,12 @@ class RceApiSource {
     const base = this.baseUri('file')
 
     // Valid query parameters for getFile
-    const {replacement_chain_context_type, replacement_chain_context_id} = options
+    const {replacement_chain_context_type, replacement_chain_context_id, include} = options
 
     const uri = this.addParamsIfPresent(`${base}/${id}`, {
       replacement_chain_context_type,
       replacement_chain_context_id,
+      include,
     })
 
     return this.apiFetch(uri, headers).then(normalizeFileData)
@@ -538,9 +539,9 @@ class RceApiSource {
       .then(res => res.json())
       .catch(throwConnectionError)
       .catch(e =>
-        e.response.json().then(body => {
+        e.response.json().then(responseBody => {
           console.error(e) // eslint-disable-line no-console
-          this.alertFunc(buildError(body))
+          this.alertFunc(buildError(responseBody))
           throw e
         })
       )
