@@ -25,16 +25,8 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('collapsable_list')
-
 const {Item: FlexItem} = Flex as any
-
-type Item = {
-  id: string
-  label: string
-  icon?: ComponentClass<{size: string}>
-  children?: Item[]
-}
+const I18n = useI18nScope('collapsable_list')
 
 type SingleItemCheckboxProps = {
   id: string
@@ -52,6 +44,13 @@ type ParentItemCheckboxProps = SingleItemCheckboxProps & {
 type CheckboxState = 'checked' | 'unchecked' | 'indeterminate'
 type ChildrenStates = {[key: string]: CheckboxState}
 type ChildrenSelectedIds = {[key: string]: string[]}
+
+export type Item = {
+  id: string
+  label: string
+  icon?: ComponentClass<{size: string}>
+  children?: Item[]
+}
 
 export type CollapsableListProps = {
   items: Item[]
