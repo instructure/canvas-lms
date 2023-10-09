@@ -710,6 +710,15 @@ returns the current course's term start date.
 ```
 2018-01-12 00:00:00 -0700
 ```
+## Canvas.term.endAt
+returns the current course's term end date.
+
+**Availability**: **  
+
+
+```
+2018-01-12 00:00:00 -0700
+```
 ## Canvas.term.name
 returns the current course's term name.
 
