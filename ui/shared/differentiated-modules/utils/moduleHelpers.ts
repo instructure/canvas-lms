@@ -177,6 +177,28 @@ export function updateModuleUI(moduleElement: HTMLDivElement, moduleSettings: Se
 }
 
 function updateName(moduleElement: HTMLDivElement, moduleSettings: SettingsPanelState) {
+  // Update other modules' prerequisites if they refer to this module
+  // Must be done before we update the old name to the new name below
+  const oldModuleName = moduleElement.getAttribute('aria-label')
+  if (oldModuleName && oldModuleName !== moduleSettings.moduleName) {
+    // Update the visible pieces that users see
+    document.querySelectorAll('.prerequisites_message').forEach(messageElement => {
+      if (messageElement.textContent?.includes(oldModuleName)) {
+        messageElement.textContent = messageElement.textContent.replace(
+          oldModuleName,
+          moduleSettings.moduleName
+        )
+      }
+    })
+
+    // Update the hidden piece that is used for parsing when opening the tray
+    document.querySelectorAll('.prerequisite_criterion > .name').forEach(nameElement => {
+      if (nameElement.textContent === oldModuleName) {
+        nameElement.textContent = moduleSettings.moduleName
+      }
+    })
+  }
+
   moduleElement.setAttribute('aria-label', moduleSettings.moduleName)
 
   const screenreaderOnlyElement = moduleElement.querySelector('.screenreader-only')
@@ -264,16 +286,11 @@ function updatePrerequisites(moduleElement: HTMLDivElement, moduleSettings: Sett
     // Clear everything out so we can start fresh
     prerequisiteElement.innerHTML = ''
 
-    // Remove any "[ Select Module ]" options
-    const actualPrerequisites = moduleSettings.prerequisites.filter(prereq => prereq.id !== '-1')
-
-    if (actualPrerequisites.length === 0) {
-      return
-    }
+    if (moduleSettings.prerequisites.length === 0) return
 
     // For parsing when opening the tray
     // Would love to simplify this, but we need backwards compatitibility
-    actualPrerequisites.forEach(prerequisite => {
+    moduleSettings.prerequisites.forEach(prerequisite => {
       const div = document.createElement('div')
       div.classList.add(...['prerequisite_criterion', 'context_module_criterion'])
       div.style.float = 'left'
@@ -289,7 +306,7 @@ function updatePrerequisites(moduleElement: HTMLDivElement, moduleSettings: Sett
       moduleElement.querySelector('.prerequisites_message') || document.createElement('div')
     prereqMessageElement.classList.add('prerequisites_message')
     prereqMessageElement.textContent = I18n.t('Prerequisites: %{names}', {
-      names: actualPrerequisites.map(prerequisite => prerequisite.name).join(', '),
+      names: moduleSettings.prerequisites.map(prerequisite => prerequisite.name).join(', '),
     })
     prerequisiteElement.appendChild(prereqMessageElement)
   }
