@@ -139,3 +139,13 @@ react_people_page:
   description: |-
     This feature flag enables the React/InstUI and GraphQL People page upgrade.
   applies_to: RootAccount
+
+discussion_checkpoints:
+  state: hidden
+  display_name: Discussion Checkpoints
+  description: |-
+    Enables checkpoints for graded discussions. Checkpoints allow teachers to
+    create separate due dates for the initial response and replies. The initial
+    response and replies are then graded separately, and those grades are
+    combined to form a final discussion grade.
+  applies_to: RootAccount
