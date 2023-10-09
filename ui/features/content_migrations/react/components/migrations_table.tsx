@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect} from 'react'
+import React, {useEffect, useCallback} from 'react'
 import {Table} from '@instructure/ui-table'
 import {Heading} from '@instructure/ui-heading'
 import {StatusPill} from './status_pill'
@@ -29,9 +29,18 @@ import {ContentMigrationItem} from './types'
 import {ActionButton} from './action_button'
 import {buildProgressCellContent} from './completion_progress_bar'
 
+const {
+  Head: TableHead,
+  Row: TableRow,
+  ColHeader: TableColHeader,
+  Body: TableBody,
+  Cell: TableCell,
+} = Table as any
+
 const I18n = useI18nScope('content_migrations_redesign')
 
-type responseType = {json: ContentMigrationItem[]}
+type MigrationsResponse = {json: ContentMigrationItem[]}
+type MigrationResponse = {json: ContentMigrationItem}
 
 export const ContentMigrationsTable = ({
   migrations,
@@ -45,11 +54,23 @@ export const ContentMigrationsTable = ({
       path: `/api/v1/courses/${window.ENV.COURSE_ID}/content_migrations`,
       params: {per_page: 25},
     })
-      .then((response: responseType) => {
-        setMigrations(response.json)
-      })
+      .then((response: MigrationsResponse) => setMigrations(response.json))
       .catch(showFlashError(I18n.t("Couldn't load previous content migrations")))
   }, [setMigrations])
+
+  const refetchMigrationItem = useCallback(
+    (migrationId: string) => () => {
+      doFetchApi({
+        path: `/api/v1/courses/${window.ENV.COURSE_ID}/content_migrations/${migrationId}`,
+      })
+        .then((response: MigrationResponse) =>
+          // I needed to do this to force re-render
+          setMigrations(migrations.map(m => (m.id === migrationId ? response.json : m)))
+        )
+        .catch(showFlashError(I18n.t("Couldn't update content migrations")))
+    },
+    [migrations, setMigrations]
+  )
 
   return (
     <>
@@ -57,63 +78,57 @@ export const ContentMigrationsTable = ({
         {I18n.t('Import Queue')}
       </Heading>
       <Table caption={I18n.t('Content Migrations')}>
-        <Table.Head>
-          <Table.Row>
-            <Table.ColHeader themeOverride={{padding: '0.6rem 0'}} id="content_type">
+        <TableHead>
+          <TableRow>
+            <TableColHeader themeOverride={{padding: '0.6rem 0'}} id="content_type">
               {I18n.t('Content Type')}
-            </Table.ColHeader>
-            <Table.ColHeader themeOverride={{padding: '0.6rem 0'}} id="source_link">
+            </TableColHeader>
+            <TableColHeader themeOverride={{padding: '0.6rem 0'}} id="source_link">
               {I18n.t('Source Link')}
-            </Table.ColHeader>
-            <Table.ColHeader themeOverride={{padding: '0.6rem 0'}} id="date_imported">
+            </TableColHeader>
+            <TableColHeader themeOverride={{padding: '0.6rem 0'}} id="date_imported">
               {I18n.t('Date Imported')}
-            </Table.ColHeader>
-            <Table.ColHeader themeOverride={{padding: '0.6rem 0'}} id="status">
+            </TableColHeader>
+            <TableColHeader themeOverride={{padding: '0.6rem 0'}} id="status">
               {I18n.t('Status')}
-            </Table.ColHeader>
-            <Table.ColHeader themeOverride={{padding: '0.6rem 0'}} id="progress">
+            </TableColHeader>
+            <TableColHeader themeOverride={{padding: '0.6rem 0'}} id="progress">
               {I18n.t('Progress')}
-            </Table.ColHeader>
-            <Table.ColHeader themeOverride={{padding: '0.6rem 0'}} id="action">
+            </TableColHeader>
+            <TableColHeader themeOverride={{padding: '0.6rem 0'}} id="action">
               {I18n.t('Action')}
-            </Table.ColHeader>
-          </Table.Row>
-        </Table.Head>
-        <Table.Body>
+            </TableColHeader>
+          </TableRow>
+        </TableHead>
+        <TableBody>
           {migrations.map((cm: ContentMigrationItem) => (
-            <Table.Row key={cm.id}>
-              <Table.Cell themeOverride={{padding: '1.1rem 0rem'}}>
+            <TableRow key={cm.id}>
+              <TableCell themeOverride={{padding: '1.1rem 0rem'}}>
                 {cm.migration_type_title}
-              </Table.Cell>
-              <Table.Cell>
+              </TableCell>
+              <TableCell>
                 <SourceLink item={cm} />
-              </Table.Cell>
-              <Table.Cell>
+              </TableCell>
+              <TableCell>
                 {datetimeString(cm.created_at, {timezone: ENV.CONTEXT_TIMEZONE})}
-              </Table.Cell>
-              <Table.Cell>
+              </TableCell>
+              <TableCell>
                 <StatusPill
                   hasIssues={cm.migration_issues_count !== 0}
                   workflowState={cm.workflow_state}
                 />
-              </Table.Cell>
-              <Table.Cell>
-                {buildProgressCellContent(
-                  cm.workflow_state,
-                  cm.migration_issues_count,
-                  cm.progress_url
-                )}
-              </Table.Cell>
-              <Table.Cell>
+              </TableCell>
+              <TableCell>{buildProgressCellContent(cm, refetchMigrationItem(cm.id))}</TableCell>
+              <TableCell>
                 <ActionButton
                   migration_type_title={cm.migration_type_title}
                   migration_issues_count={cm.migration_issues_count}
                   migration_issues_url={cm.migration_issues_url}
                 />
-              </Table.Cell>
-            </Table.Row>
+              </TableCell>
+            </TableRow>
           ))}
-        </Table.Body>
+        </TableBody>
       </Table>
     </>
   )

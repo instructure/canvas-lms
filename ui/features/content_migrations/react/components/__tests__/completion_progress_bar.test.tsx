@@ -17,9 +17,10 @@
  */
 
 import React from 'react'
-import {render, waitFor} from '@testing-library/react'
+import {render, screen, waitFor} from '@testing-library/react'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {CompletionProgressBar, buildProgressCellContent} from '../completion_progress_bar'
+import {ContentMigrationItem} from '../types'
 
 jest.mock('@canvas/do-fetch-api-effect')
 
@@ -31,9 +32,9 @@ describe('CompletionProgressBar', () => {
 
   it('renders with the correct progress', async () => {
     doFetchApi.mockImplementation(() => Promise.resolve({json: {completion: 75.0}}))
-    const component = renderComponent()
-    await waitFor(() => expect(component.getByRole('progressbar')).toBeInTheDocument())
-    expect(component.getByRole('progressbar')).toHaveAttribute('value', '75')
+    renderComponent()
+    await waitFor(() => expect(screen.getByRole('progressbar')).toBeInTheDocument())
+    expect(screen.getByRole('progressbar')).toHaveAttribute('value', '75')
   })
 
   it('updates bar with the progress', async () => {
@@ -49,20 +50,20 @@ describe('CompletionProgressBar', () => {
       if (updates > 4) completion = 100
       return Promise.resolve({json: {completion}})
     })
-    const component = renderComponent()
-    await waitFor(() => expect(component.getByRole('progressbar')).toHaveAttribute('value', '0'))
+    renderComponent()
+    await waitFor(() => expect(screen.getByRole('progressbar')).toHaveAttribute('value', '0'))
 
     jest.advanceTimersByTime(1000)
-    await waitFor(() => expect(component.getByRole('progressbar')).toHaveAttribute('value', '25'))
+    await waitFor(() => expect(screen.getByRole('progressbar')).toHaveAttribute('value', '25'))
 
     jest.advanceTimersByTime(1000)
-    await waitFor(() => expect(component.getByRole('progressbar')).toHaveAttribute('value', '50'))
+    await waitFor(() => expect(screen.getByRole('progressbar')).toHaveAttribute('value', '50'))
 
     jest.advanceTimersByTime(1000)
-    await waitFor(() => expect(component.getByRole('progressbar')).toHaveAttribute('value', '75'))
+    await waitFor(() => expect(screen.getByRole('progressbar')).toHaveAttribute('value', '75'))
 
     jest.advanceTimersByTime(1000)
-    await waitFor(() => expect(component.getByRole('progressbar')).toHaveAttribute('value', '100'))
+    await waitFor(() => expect(screen.getByRole('progressbar')).toHaveAttribute('value', '100'))
 
     expect(doFetchApi).toHaveBeenCalledTimes(5)
     jest.useRealTimers()
@@ -83,10 +84,10 @@ describe('CompletionProgressBar', () => {
         json: {completion, workflow_state},
       })
     })
-    const component = renderComponent()
-    await waitFor(() => expect(component.getByRole('progressbar')).toBeInTheDocument())
+    renderComponent()
+    await waitFor(() => expect(screen.getByRole('progressbar')).toBeInTheDocument())
     jest.advanceTimersByTime(4000)
-    await waitFor(() => expect(component.container).toBeEmptyDOMElement())
+    await waitFor(() => expect(document.body.firstChild).toBeEmptyDOMElement())
     jest.useRealTimers()
   })
 
@@ -103,57 +104,79 @@ describe('CompletionProgressBar', () => {
         json: {completion, workflow_state},
       })
     })
-    const component = renderComponent()
-    await waitFor(() => expect(component.getByRole('progressbar')).toBeInTheDocument())
+    renderComponent()
+    await waitFor(() => expect(screen.getByRole('progressbar')).toBeInTheDocument())
     jest.advanceTimersByTime(4000)
-    await waitFor(() => expect(component.container).toBeEmptyDOMElement())
+    await waitFor(() => expect(document.body.firstChild).toBeEmptyDOMElement())
     jest.useRealTimers()
   })
 
   it('does not render if url does not exist', () => {
-    const component = renderComponent({progress_url: ''})
-    expect(component.container).toBeEmptyDOMElement()
+    renderComponent({progress_url: ''})
+    expect(document.body.firstChild).toBeEmptyDOMElement()
   })
 
   it('does not render if fetch fails', () => {
     doFetchApi.mockImplementation(() => Promise.reject())
-    const component = renderComponent()
-    expect(component.container).toBeEmptyDOMElement()
+    renderComponent()
+    expect(document.body.firstChild).toBeEmptyDOMElement()
   })
 
   it('does not render if response is null', () => {
     doFetchApi.mockImplementation(() => Promise.resolve({json: null}))
-    const component = renderComponent()
-    expect(component.container).toBeEmptyDOMElement()
+    renderComponent()
+    expect(document.body.firstChild).toBeEmptyDOMElement()
   })
 
   it('does not render if completed', () => {
     doFetchApi.mockImplementation(() => {
       return Promise.resolve({json: {completion: 100.0, workflow_state: 'completed'}})
     })
-    const component = renderComponent()
-    expect(component.container).toBeEmptyDOMElement()
+    renderComponent()
+    expect(document.body.firstChild).toBeEmptyDOMElement()
   })
 
   it('does not render if failed', () => {
     doFetchApi.mockImplementation(() => {
       return Promise.resolve({json: {completion: 100.0, workflow_state: 'failed'}})
     })
-    const component = renderComponent()
-    expect(component.container).toBeEmptyDOMElement()
+    renderComponent()
+    expect(document.body.firstChild).toBeEmptyDOMElement()
   })
 })
 
 describe('buildProgressCellContent()', () => {
   it('renders text', () => {
-    const component = render(buildProgressCellContent('failed', 5, 'https://mock.progress.url'))
-    expect(component.getByText('5 issues')).toBeInTheDocument()
+    const cm = {
+      id: '1',
+      workflow_state: 'failed',
+      migration_issues_count: 5,
+      progress_url: 'https://mock.progress.url',
+    } as ContentMigrationItem
+    render(buildProgressCellContent(cm, jest.fn()))
+    expect(screen.getByText('5 issues')).toBeInTheDocument()
   })
 
   it('renders progress bar', async () => {
+    const cm = {
+      id: '1',
+      workflow_state: 'running',
+      migration_issues_count: 0,
+      progress_url: 'https://mock.progress.url',
+    } as ContentMigrationItem
     doFetchApi.mockImplementation(() => Promise.resolve({json: {completion: 75.0}}))
-    const component = render(buildProgressCellContent('running', 0, 'https://mock.progress.url'))
-    await waitFor(() => expect(component.getByRole('progressbar')).toBeInTheDocument())
-    expect(component.getByRole('progressbar')).toHaveAttribute('value', '75')
+    render(buildProgressCellContent(cm, jest.fn()))
+    await waitFor(() => expect(screen.getByRole('progressbar')).toBeInTheDocument())
+    expect(screen.getByRole('progressbar')).toHaveAttribute('value', '75')
+  })
+
+  it('renders content selection modal button', () => {
+    window.ENV.COURSE_ID = '1'
+    const cm = {
+      id: '1',
+      workflow_state: 'waiting_for_select',
+    } as ContentMigrationItem
+    render(buildProgressCellContent(cm, jest.fn()))
+    expect(screen.getByRole('button')).toHaveTextContent('Select content')
   })
 })

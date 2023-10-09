@@ -21,7 +21,8 @@ import {ProgressBar} from '@instructure/ui-progress'
 import {Text} from '@instructure/ui-text'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {ContentMigrationWorkflowState} from './types'
+import {ContentMigrationItem} from './types'
+import {ContentSelectionModal} from './content_selection_modal'
 
 const I18n = useI18nScope('content_migrations_redesign')
 
@@ -95,12 +96,20 @@ export const CompletionProgressBar = ({progress_url}: CompletionProgressBarProps
 }
 
 export const buildProgressCellContent = (
-  workflow_state: ContentMigrationWorkflowState,
-  migration_issues_count: number,
-  progress_url: string
+  {id, workflow_state, migration_issues_count, progress_url}: ContentMigrationItem,
+  onContentSelectionSubmit: () => void
 ) => {
+  const courseId = ENV.COURSE_ID
   if (['failed', 'completed'].includes(workflow_state) && migration_issues_count > 0) {
     return <Text>{I18n.t('%{count} issues', {count: migration_issues_count})}</Text>
+  } else if (courseId && workflow_state === 'waiting_for_select') {
+    return (
+      <ContentSelectionModal
+        courseId={courseId}
+        migrationId={id}
+        onSubmit={onContentSelectionSubmit}
+      />
+    )
   }
   return <CompletionProgressBar progress_url={progress_url} />
 }
