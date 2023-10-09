@@ -131,7 +131,7 @@ export const PaceContent = ({
         if (typeof id === 'undefined') throw new Error('tab id cannot be undefined here')
         const type = id.split('-')
         // Guarantee that the following typecast to APIPaceContextTypes is valid
-        if (!['Course', 'Section', 'Enrollment', 'student_enrollment'].includes(type[1])) {
+        if (!['course', 'section', 'student_enrollment'].includes(type[1])) {
           throw new Error('unexpected context type here')
         }
         setSelectedContextType(type[1] as APIPaceContextTypes)
