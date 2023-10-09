@@ -18,6 +18,10 @@
 
 /* eslint-disable no-void */
 
+import React from 'react'
+import ReactDOM from 'react-dom'
+import {Pill} from '@instructure/ui-pill'
+import { IconPublishSolid, IconUnpublishedLine } from '@instructure/ui-icons'
 import {extend} from '@canvas/backbone/utils'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import Backbone from '@canvas/backbone'
@@ -68,6 +72,18 @@ EditHeaderView.prototype.afterRender = function () {
   this.$headerTabsCr.tabs()
   if (ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED) {
     return this.toggleConditionalReleaseTab(this.model.gradingType())
+  }
+  // EVAL-3711 Remove ICE feature flag
+  if (ENV.FEATURES.instui_nav) {
+    ReactDOM.render(
+      <Pill
+        renderIcon={this.model.published() ? <IconPublishSolid /> : <IconUnpublishedLine />}
+        color={this.model.published() ? 'success' : 'primary'}
+      >
+        {this.model.published() ? 'Published' : 'Not Published'}
+      </Pill>,
+      this.$el.find('.published-assignment-container')[0]
+    )
   }
 }
 
@@ -147,12 +163,25 @@ EditHeaderView.prototype.onShowErrors = function (errors) {
   }
 }
 
+EditHeaderView.prototype.renderHeaderTitle = function () {
+  return this.model.name()
+    ? this.model.isQuizLTIAssignment()
+      ? 'Edit Quiz'
+      : 'Edit Assignment'
+    : this.model.isQuizLTIAssignment()
+    ? 'Create Quiz'
+    : 'Create New Assignment'
+}
+
 EditHeaderView.prototype.toJSON = function () {
   let ref
   const json = this.model.toView()
   json.canDelete = this.canDelete()
+  json.renderHeaderTitle = this.renderHeaderTitle()
   json.CONDITIONAL_RELEASE_SERVICE_ENABLED = ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
   json.courseId = ENV.COURSE_ID
+  // EVAL-3711 Remove ICE feature flag
+  json.instui_nav = ENV.FEATURES.instui_nav
   json.showSpeedGraderLink = ENV.SHOW_SPEED_GRADER_LINK
   json.is_locked =
     ((ref = ENV.MASTER_COURSE_DATA) != null ? ref.is_master_course_child_content : void 0) &&

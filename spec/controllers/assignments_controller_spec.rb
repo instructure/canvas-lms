@@ -1961,6 +1961,7 @@ describe AssignmentsController do
         @course.root_account.save!
         @course.root_account.enable_feature! :quizzes_next
         @course.root_account.enable_feature! :newquizzes_on_quiz_page
+        @course.root_account.enable_feature! :instui_nav
       end
 
       it "sets active tab to quizzes for new quizzes" do
@@ -1973,6 +1974,30 @@ describe AssignmentsController do
         user_session(@teacher)
         get "new", params: { course_id: @course.id, quiz_lti: true }
         expect(assigns[:_crumbs]).to include(["Quizzes", "/courses/#{@course.id}/quizzes", {}])
+      end
+
+      it "sets crumb to Create Quiz for new quizzes" do
+        user_session(@teacher)
+        get "new", params: { course_id: @course.id, quiz_lti: true }
+        expect(assigns[:_crumbs]).to include(["Create Quiz", nil, {}])
+      end
+
+      it "sets crumb to Create Assignment for new assignments" do
+        user_session(@teacher)
+        get "new", params: { course_id: @course.id }
+        expect(assigns[:_crumbs]).to include(["Create New Assignment", nil, {}])
+      end
+
+      it "sets crumb to Edit Quiz for new quizzes" do
+        user_session(@teacher)
+        post "edit", params: { course_id: @course.id, id: @assignment.id, quiz_lti: true }
+        expect(assigns[:_crumbs]).to include(["Edit Quiz", nil, {}])
+      end
+
+      it "sets crumb to Edit Assignment for new assignments" do
+        user_session(@teacher)
+        post "edit", params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:_crumbs]).to include(["Edit Assignment", nil, {}])
       end
 
       it "sets active tab to quizzes for editing quizzes" do
