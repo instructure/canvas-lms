@@ -747,7 +747,8 @@ describe "Pages API", type: :request do
         new_page = @course.wiki_pages.where(url: json["url"]).first!
 
         expect(@course.wiki.front_page).to eq original_page
-        expect(new_page.title).to eq "#{page_title}-2"
+        expect(new_page.title).to eq page_title
+        expect(new_page.url).to eq "#{original_page.url}-2"
       end
 
       it "processes body with process_incoming_html_content" do
