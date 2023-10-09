@@ -315,7 +315,6 @@ class RCEWrapper extends React.Component {
   getRequiredFeatureStatuses() {
     const {
       new_math_equation_handling = false,
-      rce_ux_improvements = false,
       explicit_latex_typesetting = false,
       rce_transform_loaded_content = false,
       media_links_use_attachment_id = false,
@@ -323,7 +322,6 @@ class RCEWrapper extends React.Component {
 
     return {
       new_math_equation_handling,
-      rce_ux_improvements,
       explicit_latex_typesetting,
       rce_transform_loaded_content,
       media_links_use_attachment_id,

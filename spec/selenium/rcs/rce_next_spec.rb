@@ -595,9 +595,8 @@ describe "RCE next tests", :ignore_js_errors do
       end
     end
 
-    context "edit course link sidebar with rce_ux_improvements enabled" do
+    context "edit course link sidebar" do
       before do
-        Account.site_admin.enable_feature!(:rce_ux_improvements)
         @wiki_page_title1 = "test_page"
         @wiki_page_title2 = "test_page2"
         unpublished = false
