@@ -26,10 +26,9 @@ import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
 import {Tooltip} from '@instructure/ui-tooltip'
-import {Checkbox, ToggleFacade} from '@instructure/ui-checkbox'
+import {Checkbox} from '@instructure/ui-checkbox'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconInfoLine} from '@instructure/ui-icons'
-import {InstUISettingsProvider} from '@instructure/emotion'
 
 const I18n = useI18nScope('ProfileTray')
 
@@ -39,27 +38,23 @@ const {porcelain, licorice, shamrock, brand} = hcmColors.values
 // as all the other page elements are just primary-color text, which is
 // the same in both the normal Canvas theme and the Canvas High Contrast
 // theme.
-const componentOverrides = {
-  [ToggleFacade.componentId]: {
-    color: porcelain,
-    toggleBackground: porcelain,
-    labelColor: licorice,
-    background: licorice,
-    borderColor: licorice,
-    uncheckedIconColor: licorice,
-    checkedBackground: shamrock,
-    checkedIconColor: shamrock,
-    focusOutlineColor: brand,
-  },
+const checkboxThemeOverrides = {
+  color: porcelain,
+  toggleBackground: porcelain,
+  labelColor: licorice,
+  background: licorice,
+  borderColor: licorice,
+  uncheckedIconColor: licorice,
+  checkedBackground: shamrock,
+  checkedIconColor: shamrock,
+  focusOutlineColor: brand,
 }
 
 const HighContrastLabel = ({loading, isMobile}) => {
   const labelText = isMobile ? I18n.t('Hi-contrast') : I18n.t('Use High Contrast UI')
   const mobileTipText = I18n.t('Enhance color contrast of content')
   const dekstopTipText = I18n.t('Enhances the color contrast of text, buttons, etc.')
-  const tipText = isMobile
-    ? mobileTipText
-    : dekstopTipText
+  const tipText = isMobile ? mobileTipText : dekstopTipText
   const tipTriggers = ['click']
 
   if (!isMobile) {
@@ -77,13 +72,15 @@ const HighContrastLabel = ({loading, isMobile}) => {
     }
   }
 
+  /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
-    window.addEventListener("resize", handleResize)
+    window.addEventListener('resize', handleResize)
 
     return () => {
-      window.removeEventListener("resize", handleResize)
+      window.removeEventListener('resize', handleResize)
     }
   }, [])
+  /* eslint-enable react-hooks/exhaustive-deps */
 
   return (
     <View as="span">
@@ -154,23 +151,22 @@ export default function HighContrastModeToggle({isMobile}) {
   // By definition this control for turning on HCM has to be in HCM all the time,
   // regardless of the global theme, so we have to apply some overrides.
   return (
-    <InstUISettingsProvider theme={{componentOverrides}}>
-      <View as="div" margin={margins}>
-        <Checkbox
-          variant="toggle"
-          size="small"
-          label={<HighContrastLabel loading={loading} isMobile={isMobile} />}
-          checked={enabled}
-          readOnly={loading}
-          onChange={toggleHiContrast}
-        />
-        {changed && (
-          <Text size="small">
-            {I18n.t('Reload the page or navigate to a new page for this change to take effect.')}
-          </Text>
-        )}
-      </View>
-    </InstUISettingsProvider>
+    <View as="div" margin={margins}>
+      <Checkbox
+        themeOverride={checkboxThemeOverrides}
+        variant="toggle"
+        size="small"
+        label={<HighContrastLabel loading={loading} isMobile={isMobile} />}
+        checked={enabled}
+        readOnly={loading}
+        onChange={toggleHiContrast}
+      />
+      {changed && (
+        <Text size="small">
+          {I18n.t('Reload the page or navigate to a new page for this change to take effect.')}
+        </Text>
+      )}
+    </View>
   )
 }
 
