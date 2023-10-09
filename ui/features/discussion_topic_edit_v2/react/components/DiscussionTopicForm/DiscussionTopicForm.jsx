@@ -128,6 +128,8 @@ export default function DiscussionTopicForm({
   const [displayGradeAs, setDisplayGradeAs] = useState('points')
   const [assignmentGroup, setAssignmentGroup] = useState('')
   const [peerReviewAssignment, setPeerReviewAssignment] = useState('off')
+  const [peerReviewsPerStudent, setPeerReviewsPerStudent] = useState(1)
+  const [peerReviewDueDate, setPeerReviewDueDate] = useState('')
   const [assignTo, setAssignTo] = useState('')
   const [dueDate, setDueDate] = useState('')
 
@@ -585,6 +587,10 @@ export default function DiscussionTopicForm({
                 setAssignmentGroup={setAssignmentGroup}
                 peerReviewAssignment={peerReviewAssignment}
                 setPeerReviewAssignment={setPeerReviewAssignment}
+                peerReviewsPerStudent={peerReviewsPerStudent}
+                setPeerReviewsPerStudent={setPeerReviewsPerStudent}
+                peerReviewDueDate={peerReviewDueDate}
+                setPeerReviewDueDate={setPeerReviewDueDate}
                 assignTo={assignTo}
                 setAssignTo={setAssignTo}
                 dueDate={dueDate}

@@ -31,6 +31,10 @@ const defaultProps = {
   setAssignmentGroup: () => {},
   peerReviewAssignment: '',
   setPeerReviewAssignment: () => {},
+  peerReviewsPerStudent: 0,
+  setPeerReviewsPerStudent: () => {},
+  peerReviewDueDate: '',
+  setPeerReviewDueDate: () => {},
   assignTo: '',
   setAssignTo: () => {},
   dueDate: '',
@@ -46,7 +50,7 @@ describe('GradedDiscussionOptions', () => {
     expect(getByText('Points Possible')).toBeInTheDocument()
     expect(getByText('Display Grade As')).toBeInTheDocument()
     expect(getByText('Assignment Group')).toBeInTheDocument()
-    expect(getByText('Peer Review')).toBeInTheDocument()
+    expect(getByText('Peer Reviews')).toBeInTheDocument()
     expect(getByText('Assignment Settings')).toBeInTheDocument()
   })
 })
