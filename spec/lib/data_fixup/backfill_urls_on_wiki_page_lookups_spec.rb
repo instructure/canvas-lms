@@ -20,6 +20,7 @@
 
 describe DataFixup::BackfillUrlsOnWikiPageLookups do
   before(:once) do
+    Account.site_admin.disable_feature! :permanent_page_links
     course_factory
     @wp1 = @course.wiki_pages.create!(title: "test1")
     @wp2 = @course.wiki_pages.create!(title: "test2")

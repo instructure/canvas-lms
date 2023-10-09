@@ -24,6 +24,10 @@ module WikiAndTinyCommon
     f("textarea.body")
   end
 
+  def wiki_page_title_input
+    f("input[data-testid='wikipage-title-input']")
+  end
+
   def clear_wiki_rce
     wait_for_rce
     clear_tiny(element)
@@ -98,7 +102,7 @@ module WikiAndTinyCommon
     f(".new_page").click
     wait_for_ajaximations
     wait_for_rce
-    replace_content(f("#title"), title)
+    replace_content(wiki_page_title_input, title)
     type_in_tiny("textarea.body", body)
     expect_new_page_load { f("form.edit-form button.submit").click }
     expect(f(".page-title")).to include_text(title)

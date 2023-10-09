@@ -183,6 +183,11 @@ permanent_page_links:
   description: |-
     When the title to a page is changed, old links to that page will link to the correct page.
   applies_to: SiteAdmin
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
 
 authenticated_iframe_content:
   state: hidden
