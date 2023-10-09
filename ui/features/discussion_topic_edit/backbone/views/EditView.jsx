@@ -230,12 +230,14 @@ EditView.prototype.isAnnouncement = function () {
   return this.model.constructor === Announcement
 }
 
-EditView.prototype.willPublish = function ({ delayed_post_at } = {}) {
+EditView.prototype.willPublish = function ({delayed_post_at} = {}) {
   const delayedString = delayed_post_at || this.getFormData().delayed_post_at // date string
   // When the page is first loaded, the delay_post checkbox info is not available. In that case we want to default to true and
   // Rely on the existence of the delayedString to determine if the announcement will publish immediately or not
-  const delayPostingCheckbox = this.getFormData().delay_posting ? this.getFormData().delay_posting : "1" // status of the checkbox
-  const isDelayedPostedAtChecked = delayPostingCheckbox === "1"
+  const delayPostingCheckbox = this.getFormData().delay_posting
+    ? this.getFormData().delay_posting
+    : '1' // status of the checkbox
+  const isDelayedPostedAtChecked = delayPostingCheckbox === '1'
 
   if (delayedString && isDelayedPostedAtChecked) {
     const delayedDate = new Date(delayedString)
@@ -873,11 +875,11 @@ EditView.prototype.toggleGradingDependentOptions = function () {
 }
 
 EditView.prototype.hanldeDelayedPostAtChange = function () {
-  const submitButton = $(".submit_button")
-  if(!this.willPublish()){
-    submitButton.text("Save")
+  const submitButton = $('.submit_button')
+  if (!this.willPublish()) {
+    submitButton.text(I18n.t('Save'))
   } else {
-    submitButton.text("Publish")
+    submitButton.text(I18n.t('Publish'))
   }
 }
 
