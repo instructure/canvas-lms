@@ -26,6 +26,7 @@ jest.mock('@canvas/rce/react/CanvasRce')
 const setup = ({
   isEditing = false,
   currentDiscussionTopic = {},
+  assignmentGroups = [],
   isStudent = false,
   sections = [],
   groupCategories = [],
@@ -33,6 +34,7 @@ const setup = ({
 } = {}) => {
   return render(
     <DiscussionTopicForm
+      assignmentGroups={assignmentGroups}
       isEditing={isEditing}
       currentDiscussionTopic={currentDiscussionTopic}
       isStudent={isStudent}
@@ -171,14 +173,14 @@ describe('DiscussionTopicForm', () => {
         },
       }
 
-      const {queryByText, getByLabelText, queryByLabelText} = setup()
+      const {queryByText, queryByTestId, getByLabelText, queryByLabelText} = setup()
       expect(queryByLabelText('Add to student to-do')).toBeInTheDocument()
       expect(queryByText('All Sections')).toBeInTheDocument()
-      expect(queryByText('Graded options here')).not.toBeInTheDocument() // TODO: Update in Phase 2
+      expect(queryByTestId('assignment-settings-section')).not.toBeInTheDocument()
       getByLabelText('Graded').click()
       expect(queryByLabelText('Add to student to-do')).not.toBeInTheDocument()
       expect(queryByLabelText('Post to')).not.toBeInTheDocument()
-      expect(queryByText('Graded options here')).toBeInTheDocument() // TODO: Update in Phase 2
+      expect(queryByTestId('assignment-settings-section')).toBeInTheDocument()
     })
   })
 })
