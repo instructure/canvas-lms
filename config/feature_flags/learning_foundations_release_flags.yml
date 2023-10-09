@@ -9,12 +9,6 @@ buttons_and_icons_root_account:
     production:
       state: hidden
 
-rce_ux_improvements:
-  state: hidden
-  display_name: RCE UX Improvements
-  description: Improve and streamline the RCE button and tray UX
-  applies_to: SiteAdmin
-
 explicit_latex_typesetting:
   state: hidden
   display_name: Explicit LaTeX Typesetting

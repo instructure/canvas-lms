@@ -348,7 +348,6 @@ class ApplicationController < ActionController::Base
     lti_platform_storage
     calendar_series
     account_level_blackout_dates
-    rce_ux_improvements
     render_both_to_do_lists
     course_paces_redesign
     course_paces_for_students
