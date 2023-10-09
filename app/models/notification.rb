@@ -57,6 +57,8 @@ class Notification < Switchman::UnshardedRecord
     invitation
     student_appointment_signups
     submission_comment
+    discussion
+    discussion_entry
   ].freeze
 
   ALLOWED_PUSH_NOTIFICATION_TYPES = [
@@ -89,7 +91,9 @@ class Notification < Switchman::UnshardedRecord
     "Submission Graded",
     "Submission Needs Grading",
     "Upcoming Assignment Alert",
-    "Web Conference Invitation"
+    "Web Conference Invitation",
+    "New Topic",
+    "New Reply"
   ].freeze
 
   NON_CONFIGURABLE_TYPES = %w[Migration Registration Summaries Alert].freeze
