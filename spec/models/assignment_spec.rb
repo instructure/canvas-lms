@@ -11349,4 +11349,38 @@ describe Assignment do
       end
     end
   end
+
+  describe "checkpointed assignments" do
+    before do
+      @parent = @course.assignments.create!(checkpointed: true)
+      @child = @parent.checkpoint_assignments.create!(context: @course, checkpoint_label: "reply_to_topic")
+    end
+
+    it "does not allow parent assignments to have their own parent assignments" do
+      assignment = @course.assignments.create!
+      @parent.parent_assignment = assignment
+      expect(@parent).not_to be_valid
+      expect(@parent.errors.full_messages).to include "Parent assignment must be blank"
+    end
+
+    it "does not allow child assignments to be marked as checkpointed" do
+      @child.checkpointed = true
+      expect(@child).not_to be_valid
+      expect(@child.errors.full_messages).to include "Parent assignment must be blank"
+    end
+
+    it "does not allow child assignments to reference themselves as a parent assignment" do
+      @child.parent_assignment = @child
+      expect(@child).not_to be_valid
+      expect(@child.errors.full_messages).to include "Parent assignment cannot reference self"
+    end
+
+    it "excludes soft-deleted child assignments from the checkpoint_assignments association" do
+      expect { @child.destroy }.to change { @parent.checkpoint_assignments.exists? }.from(true).to(false)
+    end
+
+    it "soft-deletes child assignments when the parent assignment is soft-deleted" do
+      expect { @parent.destroy }.to change { @child.reload.deleted? }.from(false).to(true)
+    end
+  end
 end
