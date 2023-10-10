@@ -15,7 +15,7 @@ source "https://rubygems.org/"
 Plugin.uninstall(["bundler_lockfile_extensions"], {}) if Plugin.installed?("bundler_lockfile_extensions")
 
 # vendored until https://github.com/rubygems/rubygems/pull/6957 is merged and released
-plugin "bundler-multilock", "1.1.2", path: "vendor/gems/bundler-multilock"
+plugin "bundler-multilock", "1.2.0", path: "vendor/gems/bundler-multilock"
 # the extra check here is in case `bundle check` or `bundle exec` gets run before `bundle install`,
 # and is also fixed by the same PR
 raise GemNotFound, "bundler-multilock plugin is not installed" if !is_a?(Bundler::Plugin::DSL) && !Plugin.installed?("bundler-multilock")
@@ -47,8 +47,7 @@ if Bundler.default_gemfile == gemfile
 
   (gemfile_root.glob("Gemfile.d/*.lock") + gemfile_root.glob("gems/*/Gemfile.lock")).each do |gem_lockfile_name|
     return unless lockfile(gem_lockfile_name,
-                           gemfile: gem_lockfile_name.to_s.sub(/\.lock$/, ""),
-                           allow_mismatched_dependencies: false)
+                           gemfile: gem_lockfile_name.to_s.sub(/\.lock$/, ""))
   end
 end
 
