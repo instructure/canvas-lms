@@ -18,7 +18,7 @@
 
 import {render, fireEvent, act, waitFor} from '@testing-library/react'
 import React from 'react'
-import AssignmentAssignedInfo from '../AssignmentAssignedInfo'
+import {AssignmentAssignedInfo} from '../AssignmentAssignedInfo'
 import {DateTime} from '@instructure/ui-i18n'
 
 const setup = ({
@@ -36,6 +36,20 @@ const setup = ({
 }
 
 describe('AssignmentAssignedInfo', () => {
+  // ariaLive is required to avoid unnecessary warnings
+  let ariaLive
+
+  beforeAll(() => {
+    ariaLive = document.createElement('div')
+    ariaLive.id = 'flash_screenreader_holder'
+    ariaLive.setAttribute('role', 'alert')
+    document.body.appendChild(ariaLive)
+  })
+
+  afterAll(() => {
+    if (ariaLive) ariaLive.remove()
+  })
+
   it('renders DateTimeInput fields correctly', () => {
     const {queryAllByText} = setup()
 

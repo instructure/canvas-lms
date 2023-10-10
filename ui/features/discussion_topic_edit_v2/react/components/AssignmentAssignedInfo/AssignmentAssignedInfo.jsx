@@ -21,20 +21,33 @@ import PropTypes from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {DateTimeInput} from '@instructure/ui-date-time-input'
 import {FormFieldGroup} from '@instructure/ui-form-field'
+import {AssignedTo} from '../AssignedTo/AssignedTo'
 
 const I18n = useI18nScope('discussion_create')
 
-export default function AssignmentAssignedInfo({
+export const AssignmentAssignedInfo = ({
   initialAssignedInformation,
-  assignedListOptions, // this will get passed into the AssignedTo component when it is implmemented
+  availableAssignToOptions,
   onAssignedInfoChange,
-}) {
+}) => {
   const [assignedInformation, setAssignedInformation] = useState(initialAssignedInformation)
 
   // Form properties
   return (
     <>
       <FormFieldGroup description="" width="100%">
+        <AssignedTo
+          availableAssignToOptions={availableAssignToOptions}
+          initialAssignedToInformation={initialAssignedInformation.assignedList}
+          onOptionSelect={selectedOption => {
+            const newInfo = {
+              ...assignedInformation,
+              assignedList: [...assignedInformation.assignedList, selectedOption],
+            }
+            setAssignedInformation(newInfo)
+            onAssignedInfoChange(newInfo)
+          }}
+        />
         <DateTimeInput
           description={I18n.t('Due')}
           prevMonthLabel={I18n.t('previous')}
@@ -89,7 +102,14 @@ export default function AssignmentAssignedInfo({
 }
 
 AssignmentAssignedInfo.propTypes = {
-  assignedListOptions: PropTypes.arrayOf(PropTypes.object).isRequired,
+  availableAssignToOptions: PropTypes.objectOf(
+    PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.string.isRequired,
+        label: PropTypes.string.isRequired,
+      })
+    )
+  ).isRequired,
   initialAssignedInformation: PropTypes.shape({
     assignedList: PropTypes.arrayOf(PropTypes.object),
     dueDate: PropTypes.string,
@@ -100,7 +120,7 @@ AssignmentAssignedInfo.propTypes = {
 }
 
 AssignmentAssignedInfo.defaultProps = {
-  assignedListOptions: [],
+  availableAssignToOptions: {},
   initialAssignedInformation: {
     assignedList: [],
     dueDate: '',
