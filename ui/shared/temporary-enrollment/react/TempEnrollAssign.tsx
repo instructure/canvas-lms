@@ -47,6 +47,13 @@ import {
   updateLocalStorageObject,
 } from './util/helpers'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
+import {createAnalyticPropsGenerator, setAnalyticPropsOnRef} from './util/analytics'
+import {MODULE_NAME} from './types'
+
+const I18n = useI18nScope('temporary_enrollment')
+
+// initialize analytics props
+const analyticProps = createAnalyticPropsGenerator(MODULE_NAME)
 
 interface Role {
   id: string
@@ -95,7 +102,6 @@ type RoleName =
   | 'ObserverEnrollment'
 type PermissionName = 'teacher' | 'ta' | 'student' | 'observer' | 'designer'
 
-const I18n = useI18nScope('temporary_enrollment')
 const rolePermissionMapping: Record<RoleName, PermissionName> = {
   StudentEnrollment: 'student',
   TaEnrollment: 'ta',
@@ -364,6 +370,7 @@ export function TempEnrollAssign(props: Props) {
                 onClick={() => {
                   props.goBack()
                 }}
+                {...analyticProps('Back')}
               >
                 {I18n.t('Back')}
               </Button>
@@ -419,6 +426,8 @@ export function TempEnrollAssign(props: Props) {
               value={startDate.toISOString()}
               onChange={handleStartDateChange}
               invalidDateTimeMessage={I18n.t('The chosen date and time is invalid.')}
+              dateInputRef={ref => setAnalyticPropsOnRef(ref, analyticProps('StartDate'))}
+              timeInputRef={ref => setAnalyticPropsOnRef(ref, analyticProps('StartTime'))}
             />
           </Grid.Col>
           <Grid.Col>
@@ -454,6 +463,8 @@ export function TempEnrollAssign(props: Props) {
               value={endDate.toISOString()}
               onChange={handleEndDateChange}
               invalidDateTimeMessage={I18n.t('The chosen date and time is invalid.')}
+              dateInputRef={ref => setAnalyticPropsOnRef(ref, analyticProps('EndDate'))}
+              timeInputRef={ref => setAnalyticPropsOnRef(ref, analyticProps('EndTime'))}
             />
           </Grid.Col>
         </Grid.Row>

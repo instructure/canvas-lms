@@ -28,8 +28,13 @@ import {Spinner} from '@instructure/ui-spinner'
 import {TextInput} from '@instructure/ui-text-input'
 import {Table} from '@instructure/ui-table'
 import {Flex} from '@instructure/ui-flex'
+import {createAnalyticPropsGenerator} from './util/analytics'
+import {MODULE_NAME} from './types'
 
 const I18n = useI18nScope('temporary_enrollment')
+
+// initialize analytics props
+const analyticProps = createAnalyticPropsGenerator(MODULE_NAME)
 
 interface AssignUser {
   name: string
@@ -239,12 +244,14 @@ export function TempEnrollSearch(props: Props) {
             key="cc_path"
             value="cc_path"
             label={I18n.t('Email Address')}
+            {...analyticProps('EmailAddress')}
           />
           <RadioInput
             id="peoplesearch_radio_unique_id"
             key="unique_id"
             value="unique_id"
             label={I18n.t('Login ID')}
+            {...analyticProps('LoginID')}
           />
           {props.canReadSIS ? (
             <RadioInput
@@ -252,6 +259,7 @@ export function TempEnrollSearch(props: Props) {
               key="sis_user_id"
               value="sis_user_id"
               label={I18n.t('SIS ID')}
+              {...analyticProps('SISID')}
             />
           ) : null}
         </RadioInputGroup>
@@ -266,6 +274,7 @@ export function TempEnrollSearch(props: Props) {
             value={search}
             placeholder={exampleText}
             onChange={handleSearchChange}
+            {...analyticProps('TextInput')}
           />
         </fieldset>
       </>
