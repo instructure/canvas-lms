@@ -1424,6 +1424,7 @@ class Attachment < ActiveRecord::Base
 
   def can_read_through_assignment?(user, session)
     return false unless assignment
+    return true if user_id == user.id
 
     # grader
     return true if assignment.grants_right?(user, session, :grade)
@@ -1431,8 +1432,11 @@ class Attachment < ActiveRecord::Base
     # submitter
     assignment.shard.activate do
       student_submission = assignment.submissions.active.where(user_id: user)
-      student_submission.joins(:versions)
-                        .where(%(#{id}=any(regexp_split_to_array((regexp_match(versions.yaml,'attachment_ids: [''"]([0-9,]+)[''"]'))[1], ',')::INT8[])))
+      student_submission.where("#{id}=any(regexp_split_to_array(nullif(submissions.attachment_ids,''), ',')::INT8[])")
+                        .union(
+                          student_submission.joins(:versions)
+                            .where(%(#{id}=any(regexp_split_to_array((regexp_match(versions.yaml,'attachment_ids: [''"]([0-9,]+)[''"]'))[1], ',')::INT8[])))
+                        )
                         .union(
                           student_submission.joins(:submission_comments)
                             .merge(SubmissionComment.published.visible)

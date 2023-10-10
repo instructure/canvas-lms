@@ -1330,6 +1330,11 @@ describe Attachment do
         expect(@attachment.grants_right?(@teacher, :download)).to be true
       end
 
+      it "allows students access to files they just created" do
+        attachment_model(context: @assignment, user: student)
+        expect(@attachment.grants_right?(student, :download)).to be true
+      end
+
       it "allows students to access attachments on submission comments associated to their submissions" do
         @submission.add_comment(author: @teacher, comment: "comment", attachments: [attachment_model(context: @assignment)])
         expect(@attachment.grants_right?(student, :download)).to be true
@@ -1346,9 +1351,16 @@ describe Attachment do
         expect(@attachment.grants_right?(@student2, :download)).to be false
       end
 
+      it "allows students to access attachments on submissions" do
+        attachment_model(context: @assignment)
+        @assignment.submit_homework(student, attachments: [@attachment])
+
+        expect(@attachment.grants_right?(student, :download)).to be true
+      end
+
       it "does not allow users to access attachments for deleted submissions" do
         attachment_model(context: @assignment)
-        submission = @assignment.submit_homework(student, attachments: [attachment_model(context: @attachment)])
+        submission = @assignment.submit_homework(student, attachments: [@attachment])
         submission.destroy
 
         expect(@attachment.grants_right?(student, :download)).to be false
