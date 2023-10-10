@@ -55,6 +55,8 @@ module CC
           standards_node.gradingStandard(identifier: migration_id, version: standard.version) do |standard_node|
             standard_node.title standard.title unless standard.title.blank?
             standard_node.data standard.data.to_json
+            standard_node.points_based standard.points_based
+            standard_node.scaling_factor standard.scaling_factor
           end
         end
       end
