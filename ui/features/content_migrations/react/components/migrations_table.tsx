@@ -53,7 +53,9 @@ export const ContentMigrationsTable = ({
 
   return (
     <>
-      <Heading margin="small 0">{I18n.t('Import Queue')}</Heading>
+      <Heading level="h2" as="h2" margin="small 0">
+        {I18n.t('Import Queue')}
+      </Heading>
       <Table caption={I18n.t('Content Migrations')}>
         <Table.Head>
           <Table.Row>

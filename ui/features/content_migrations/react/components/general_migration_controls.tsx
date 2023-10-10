@@ -19,10 +19,11 @@
 import {View} from '@instructure/ui-view'
 import React, {useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
-// @ts-ignore
+import {IconAddSolid} from '@instructure/ui-icons'
 import {Checkbox, CheckboxGroup} from '@instructure/ui-checkbox'
 import {Button} from '@instructure/ui-buttons'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
+import {DateAdjustment} from './date_adjustment'
 import {submitMigrationCallbackType} from './types'
 
 const I18n = useI18nScope('content_migrations_redesign')
@@ -37,7 +38,7 @@ export const GeneralMigrationControls = ({
   const [adjustDates, setAdjustDates] = useState<boolean>(false)
   return (
     <>
-      <View as="div" margin="large none none none">
+      <View as="div" margin="medium none none none">
         <RadioInputGroup
           name={I18n.t('Selective import')}
           layout="stacked"
@@ -86,8 +87,9 @@ export const GeneralMigrationControls = ({
             }}
           />
         </CheckboxGroup>
+        {adjustDates ? <DateAdjustment /> : null}
       </View>
-      <View as="div" margin="large none none none">
+      <View as="div" margin="medium none none none">
         <Button>{I18n.t('Cancel')}</Button>
         <Button
           onClick={() => {
@@ -100,9 +102,11 @@ export const GeneralMigrationControls = ({
           margin="small"
           color="primary"
         >
+          <IconAddSolid /> &nbsp;
           {I18n.t('Add to Import Queue')}
         </Button>
       </View>
+      <hr />
     </>
   )
 }
