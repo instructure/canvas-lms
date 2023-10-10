@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+export const MODULE_NAME = 'TempEnroll'
+
 export interface Enrollment {
   id: number
   course_id: number

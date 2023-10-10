@@ -35,9 +35,13 @@ import CreateOrUpdateUserModal from './CreateOrUpdateUserModal'
 import UserLink from './UserLink'
 import {TempEnrollModal} from '@canvas/temporary-enrollment/react/TempEnrollModal'
 import {fetchTemporaryEnrollments} from '@canvas/temporary-enrollment/react/api/enrollment'
-import {PROVIDER, RECIPIENT} from '@canvas/temporary-enrollment/react/types'
+import {MODULE_NAME, PROVIDER, RECIPIENT} from '@canvas/temporary-enrollment/react/types'
+import {createAnalyticPropsGenerator} from '@canvas/temporary-enrollment/react/util/analytics'
 
 const I18n = useI18nScope('account_course_user_search')
+
+// initialize analytics props
+const analyticProps = createAnalyticPropsGenerator(MODULE_NAME)
 
 /**
  * Generate an appropriate icon based on the user’s role
@@ -175,6 +179,7 @@ export default function UsersListRow({
       >
         <Tooltip data-testid="user-list-row-tooltip" renderTip={tooltipText}>
           <IconButton
+            {...analyticProps(icon.type.displayName)}
             withBorder={false}
             withBackground={false}
             size="small"

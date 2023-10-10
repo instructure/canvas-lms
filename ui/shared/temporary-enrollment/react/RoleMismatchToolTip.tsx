@@ -22,8 +22,13 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconWarningLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
+import {createAnalyticPropsGenerator} from './util/analytics'
+import {MODULE_NAME} from './types'
 
 const I18n = useI18nScope('temporary_enrollment')
+
+// initialize analytics props
+const analyticProps = createAnalyticPropsGenerator(MODULE_NAME)
 
 export default function RoleMismatchToolTip() {
   const tipText = (
@@ -47,6 +52,7 @@ export default function RoleMismatchToolTip() {
           withBackground={false}
           withBorder={false}
           screenReaderLabel={I18n.t('Toggle tooltip')}
+          {...analyticProps('Tooltip')}
         />
       </Tooltip>
     )

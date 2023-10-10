@@ -26,12 +26,16 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 import {Avatar} from '@instructure/ui-avatar'
-import {Enrollment} from './types'
+import {Enrollment, MODULE_NAME} from './types'
 import {deleteEnrollment} from './api/enrollment'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {createAnalyticPropsGenerator} from './util/analytics'
 
 const I18n = useI18nScope('temporary_enrollment')
+
+// initialize analytics props
+const analyticProps = createAnalyticPropsGenerator(MODULE_NAME)
 
 interface Props {
   enrollments: Enrollment[]
@@ -108,6 +112,7 @@ export function TempEnrollEdit(props: Props) {
             size="small"
             screenReaderLabel={I18n.t('Edit')}
             onClick={() => handleEditClick(enrollment)}
+            {...analyticProps('Edit')}
           >
             <IconEditLine title={I18n.t('Edit')} />
           </IconButton>
@@ -122,6 +127,7 @@ export function TempEnrollEdit(props: Props) {
             size="small"
             screenReaderLabel={I18n.t('Delete')}
             onClick={() => handleDeleteClick(enrollment)}
+            {...analyticProps('Delete')}
           >
             <IconTrashLine title={I18n.t('Delete')} />
           </IconButton>
@@ -148,12 +154,6 @@ export function TempEnrollEdit(props: Props) {
           <div>
             <Text size="large">{props.user.name}</Text>
           </div>
-
-          {/*
-          <Text size="small" color="secondary">
-            ROLE (TBD)
-          </Text>
-          */}
         </Flex.Item>
       </Flex>
     )
@@ -165,7 +165,11 @@ export function TempEnrollEdit(props: Props) {
         <Flex.Item>{renderAvatar()}</Flex.Item>
 
         <Flex.Item margin="0 0 0 auto">
-          <Button onClick={handleAddNewClick} aria-label={I18n.t('Create temporary enrollment')}>
+          <Button
+            onClick={handleAddNewClick}
+            aria-label={I18n.t('Create temporary enrollment')}
+            {...analyticProps('Create')}
+          >
             <IconPlusLine />
 
             {I18n.t('Recipient')}
