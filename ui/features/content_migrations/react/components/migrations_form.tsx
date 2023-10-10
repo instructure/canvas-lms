@@ -21,15 +21,15 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {SimpleSelect} from '@instructure/ui-simple-select'
+import {Text} from '@instructure/ui-text'
+import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
+import {Alert} from '@instructure/ui-alerts'
 import {MigratorSpecificForm} from './migrator_specific_form'
 import {GeneralMigrationControls} from './general_migration_controls'
 import {ContentMigrationItem, Migrator, submitMigrationProps} from './types'
 
 const I18n = useI18nScope('content_migrations_redesign')
-
-// TODO: Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
-const {Option: SimpleSelectOption} = SimpleSelect as any
 
 export const ContentMigrationsForm = ({
   migrations,
@@ -89,8 +89,22 @@ export const ContentMigrationsForm = ({
   }
 
   return (
-    <View as="div" padding="0 x-small 0 0" margin="0 x-small 0 0">
-      <View as="div" maxWidth="22.5rem">
+    <View as="div" padding="0 x-small 0 0" margin="small x-small xx-large 0">
+      <Heading level="h2" as="h2" margin="0 0 small">
+        {I18n.t('Import Content')}
+      </Heading>
+      <Text>
+        {I18n.t(
+          'Use the Import Content tool to migrate course materials from other sources into this course.'
+        )}
+      </Text>
+      <Alert variant="warning">
+        {I18n.t(
+          'Importing the same course content more than once will overwrite any existing content in the course.'
+        )}
+      </Alert>
+      <hr />
+      <View as="div" margin="medium 0" maxWidth="22.5rem">
         {migrators.length > 0 ? (
           <SimpleSelect
             renderLabel={I18n.t('Select Content Type')}
@@ -98,13 +112,13 @@ export const ContentMigrationsForm = ({
               handleMigratorChange(value)
             }}
           >
-            <SimpleSelectOption key="empty-option" id="empty" value="empty">
+            <SimpleSelect.Option key="empty-option" id="empty" value="empty">
               {I18n.t('Select one')}
-            </SimpleSelectOption>
+            </SimpleSelect.Option>
             {migrators.map((o: Migrator) => (
-              <SimpleSelectOption key={o.type} id={o.type} value={o.type}>
+              <SimpleSelect.Option key={o.type} id={o.type} value={o.type}>
                 {o.name}
-              </SimpleSelectOption>
+              </SimpleSelect.Option>
             ))}
           </SimpleSelect>
         ) : (
