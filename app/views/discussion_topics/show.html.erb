@@ -69,11 +69,22 @@
         </div>
         <div class="pull-right">
           <% if !@topic.is_announcement && can_do(@context, @current_user, :moderate_forum) %>
-            <button
-              id="topic_publish_button"
-              data-id='<%= @topic.id %>'
-              class='btn <%= "published" if @topic.published? %> <%= "disabled" if @topic.published? && !@topic.can_unpublish? %>'>
-            </button>
+            <% if @topic.published? && !@topic.can_unpublish? %>
+              <% unpublish_tooltip = t('tooltips.cannot_unpublish_discussion', "Can't unpublish if there are student replies") %>
+              <span data-tooltip="left" title="<%= unpublish_tooltip %>" id='course-status' class='published-status published'>
+                <button
+                  id="topic_publish_button"
+                  data-id='<%= @topic.id %>'
+                  class='btn disabled <%= "published" if @topic.published? %>'>
+                </button>
+              </span>
+            <% else %>
+              <button
+                id="topic_publish_button"
+                data-id='<%= @topic.id %>'
+                class='btn <%= "published" if @topic.published? %>'>
+              </button>
+            <% end %>
           <% end %>
 
           <% if @topic.grants_right?(@current_user, :update) %>
