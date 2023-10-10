@@ -226,6 +226,8 @@ module CC::Importer::Canvas
         standard["version"] = node["version"]
         standard["title"] = get_node_val(node, "title")
         standard["data"] = get_node_val(node, "data")
+        standard["points_based"] = get_bool_val(node, "points_based")
+        standard["scaling_factor"] = get_node_val(node, "scaling_factor")
         standards << standard
       end
 

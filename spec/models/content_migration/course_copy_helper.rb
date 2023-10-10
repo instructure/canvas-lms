@@ -81,6 +81,8 @@ shared_context "course copy" do
   def make_grading_standard(context, opts = {})
     gs = context.grading_standards.new
     gs.title = opts[:title] || "Standard eh"
+    gs.points_based = opts[:points_based] || false
+    gs.scaling_factor = opts[:scaling_factor] || 1.0
     gs.data = [["A", 0.93], ["A-", 0.89], ["B+", 0.85], ["B", 0.83], ["B!-", 0.80], ["C+", 0.77], ["C", 0.74], ["C-", 0.70], ["D+", 0.67], ["D", 0.64], ["D-", 0.61], ["F", 0]]
     gs.save!
     gs
