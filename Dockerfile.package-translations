@@ -9,7 +9,7 @@ ARG NPM_PRIVATE_EMAIL
 USER root
 
 RUN apt-get update \
-    && apt-get install -y jq python openssh-client git awscli \
+    && apt-get install -y jq openssh-client git awscli \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/
 RUN npm install -g npm@9.8.1 && npm cache clean --force
