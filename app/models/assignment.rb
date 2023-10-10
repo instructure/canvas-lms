@@ -164,6 +164,9 @@ class Assignment < ActiveRecord::Base
   has_many :conditional_release_associations, class_name: "ConditionalRelease::AssignmentSetAssociation", dependent: :destroy, inverse_of: :assignment
   has_one :master_content_tag, class_name: "MasterCourses::MasterContentTag", inverse_of: :assignment
 
+  belongs_to :parent_assignment, class_name: "Assignment", optional: true, inverse_of: :checkpoint_assignments
+  has_many :checkpoint_assignments, -> { active }, class_name: "Assignment", foreign_key: :parent_assignment_id, inverse_of: :parent_assignment
+
   scope :assigned_to_student, ->(student_id) { joins(:submissions).where(submissions: { user_id: student_id }) }
   scope :anonymous, -> { where(anonymous_grading: true) }
   scope :moderated, -> { where(moderated_grading: true) }
@@ -210,6 +213,8 @@ class Assignment < ActiveRecord::Base
   validates :grader_count, numericality: true
   validates :allowed_attempts, numericality: { greater_than: 0 }, unless: proc { |a| a.allowed_attempts == -1 }, allow_nil: true
   validates :sis_source_id, uniqueness: { scope: :root_account_id }, allow_nil: true
+  validates :parent_assignment_id, absence: true, if: :checkpointed?
+  validates :parent_assignment_id, comparison: { other_than: :id, message: -> { "cannot reference self" } }, allow_nil: true
 
   with_options unless: :moderated_grading? do
     validates :graders_anonymous_to_graders, absence: true
@@ -1426,6 +1431,7 @@ class Assignment < ActiveRecord::Base
     each_submission_type { |submission| submission.destroy if submission && !submission.deleted? }
     conditional_release_rules.destroy_all
     conditional_release_associations.destroy_all
+    checkpoint_assignments.destroy_all
     refresh_course_content_participation_counts
 
     ScheduledSmartAlert.where(context_type: "Assignment", context_id: id).destroy_all
