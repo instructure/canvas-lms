@@ -150,7 +150,7 @@ GEM
     mini_mime (1.1.5)
     mini_portile2 (2.8.4)
     minitest (5.20.0)
-    net-imap (0.4.0)
+    net-imap (0.4.1)
       date
       net-protocol
     net-pop (0.1.2)
