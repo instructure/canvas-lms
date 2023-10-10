@@ -280,9 +280,10 @@
                 <label class="screenreader-only" for="discussion-search">
                   <%= t("Search entries or author") %>
                 </label>
+                <span id="search_entries_container"></span>
                 <input
                   id               = "discussion-search"
-                  type             = "search"
+                  type             = "hidden"
                   placeholder      = "<%= t("Search entries or author") %>"
                   size             = 50
                 >
