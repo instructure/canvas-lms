@@ -71,7 +71,7 @@ describe "threaded discussions" do
       driver.action.send_keys("n").perform
       expect(f(".tox-editor-container")).to be_present
 
-      fj("a:contains('Cancel')").click
+      fj("button:contains('Cancel')").click
 
       # open the editor for a reply, then put focus outside of editor
       f("a[data-event='addReply']").click

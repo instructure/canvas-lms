@@ -35,7 +35,8 @@ describe "reply attachment" do
     stub_rcs_config
   end
 
-  context "when react_discussions_post ff is OFF" do
+  # ignoring unrelated rce errors
+  context "when react_discussions_post ff is OFF", :ignore_js_errors do
     before :once do
       Account.site_admin.disable_feature! :react_discussions_post
     end
