@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import AssignmentAssignedInfo from './AssignmentAssignedInfo'
+import {AssignmentAssignedInfo} from './AssignmentAssignedInfo'
 
 export default {
   title: 'Examples/Discussion Create\\Edit/Components/AssignmentAssignedInfo',
@@ -33,9 +33,25 @@ export function Primary(args) {
     />
   )
 }
-// Update this
+
+const DEFAULT_LIST_OPTIONS = {
+  'Master Paths': [{id: 'mp_option1', label: 'Master Path Option'}],
+  'Course Sections': [
+    {id: 'sec_1', label: 'Section 1'},
+    {id: 'sec_2', label: 'Section 2'},
+  ],
+  Students: [
+    {id: 'u_1', label: 'Jason'},
+    {id: 'u_2', label: 'Drake'},
+    {id: 'u_3', label: 'Caleb'},
+    {id: 'u_4', label: 'Aaron'},
+    {id: 'u_5', label: 'Chawn'},
+    {id: 'u_6', label: 'Omar'},
+  ],
+}
+
 Primary.args = {
-  assignedListOptions: [],
+  assignedListOptions: DEFAULT_LIST_OPTIONS,
   initialAssignedInformation: {
     assignedList: [],
     dueDate: '',
