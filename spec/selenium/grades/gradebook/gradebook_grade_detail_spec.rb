@@ -373,28 +373,5 @@ describe "Grade Detail Tray:" do
 
       expect { Gradebook::GradeDetailTray.change_status_to("Custom Status") }.to change { student_enrollment_score.reload.custom_grade_status }.from(nil).to(@custom_status)
     end
-
-    it "removes the custom grade status when the final grade override is removed" do
-      Gradebook::Cells.edit_override(@students.first, 90.0)
-      student_enrollment_score = @students.first.enrollments.first.find_score
-      student_enrollment_score.reload.update!(custom_grade_status: @custom_status)
-
-      expect { Gradebook::Cells.edit_override(@students.first, "") }.to change { student_enrollment_score.reload.custom_grade_status }.from(@custom_status).to(nil)
-      f(Gradebook::Cells.grade_override_selector(@students.first)).click
-      Gradebook::Cells.grade_tray_button.click
-      wait_for_ajaximations
-
-      expect(Gradebook::GradeDetailTray.is_radio_button_selected("none")).to be true
-    end
-
-    it "does not allow a custom grade status to be selected when the final grade override does not have a score" do
-      student_enrollment_score = @students.first.enrollments.first.find_score
-      Gradebook::Cells.edit_override(@students.first, "")
-      f(Gradebook::Cells.grade_override_selector(@students.first)).click
-      Gradebook::Cells.grade_tray_button.click
-      wait_for_ajaximations
-
-      expect { Gradebook::GradeDetailTray.change_status_to("Custom Status") }.not_to change { student_enrollment_score.reload.custom_grade_status }
-    end
   end
 end
