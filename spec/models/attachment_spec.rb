@@ -1358,6 +1358,13 @@ describe Attachment do
         expect(@attachment.grants_right?(student, :download)).to be true
       end
 
+      it "doesn't crash when there is no user" do
+        attachment_model(context: @assignment)
+        @assignment.submit_homework(student, attachments: [@attachment])
+
+        expect(@attachment.grants_right?(nil, :download)).to be false
+      end
+
       it "does not allow users to access attachments for deleted submissions" do
         attachment_model(context: @assignment)
         submission = @assignment.submit_homework(student, attachments: [@attachment])
