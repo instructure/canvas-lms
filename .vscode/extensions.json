@@ -1,5 +1,6 @@
 {
     "recommendations": [
+        "github.copilot",
         "ms-vscode-remote.remote-containers"
     ]
 }
