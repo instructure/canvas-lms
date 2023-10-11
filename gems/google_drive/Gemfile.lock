@@ -49,7 +49,7 @@ GEM
     mini_mime (1.1.5)
     multi_json (1.15.0)
     os (1.1.4)
-    psych (5.1.0)
+    psych (5.1.1)
       stringio
     public_suffix (5.0.3)
     rake (13.0.6)
