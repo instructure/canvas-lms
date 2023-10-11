@@ -32,13 +32,15 @@ export const GroupSetName = ({onChange, errormsg, elementRef}) => {
   return (
     <Flex elementRef={elementRef}>
       <Flex.Item padding="none medium none none">
-        <Text>{I18n.t('Group Set Name')}</Text>
+        <Text>{I18n.t('Group Set Name*')}</Text>
       </Flex.Item>
       <Flex.Item shouldGrow={true}>
         <TextInput
-          isRequired={true}
           id="new-group-set-name"
-          renderLabel={<ScreenReaderContent>{I18n.t('Group Set Name')}</ScreenReaderContent>}
+          placeholder={I18n.t('Enter Group Set Name')}
+          renderLabel={
+            <ScreenReaderContent>{I18n.t('Group Set Name Required')}</ScreenReaderContent>
+          }
           value={name}
           onChange={(_e, val) => {
             onChange(val)
