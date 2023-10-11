@@ -47,6 +47,9 @@ describe Mutations::CreateDiscussionTopic do
             podcastEnabled
             podcastHasStudentPosts
             isSectionSpecific
+            groupSet {
+              _id
+            }
             courseSections{
               _id
               name
@@ -430,6 +433,57 @@ describe Mutations::CreateDiscussionTopic do
         GQL
         result = execute_with_input(query)
         expect_error(result, "Invalid context")
+      end
+    end
+
+    context "group category id" do
+      it "creates parent and child dicussion topics" do
+        gc = @course.group_categories.create! name: "foo"
+        gc.groups.create! context: @course, name: "baz"
+        context_type = "Course"
+        title = "Test Title"
+        message = "A message"
+        published = true
+
+        query = <<~GQL
+          contextId: "#{@course.id}"
+          contextType: "#{context_type}"
+          title: "#{title}"
+          message: "#{message}"
+          published: #{published}
+          groupCategoryId: "#{gc.id}"
+        GQL
+
+        result = execute_with_input(query)
+        returned_discussion_topic = result.dig("data", "createDiscussionTopic", "discussionTopic")
+        expect(result["errors"]).to be_nil
+        expect(returned_discussion_topic["groupSet"]["_id"]).to eq gc.id.to_s
+        discussion_topics = DiscussionTopic.last(2)
+        expect(discussion_topics[0].group_category_id).to eq gc.id
+        expect(discussion_topics[1].group_category_id).to eq gc.id
+      end
+
+      it "does not create when id is invalid" do
+        context_type = "Course"
+        title = "Test Title"
+        message = "A message"
+        published = true
+
+        query = <<~GQL
+          contextId: "#{@course.id}"
+          contextType: "#{context_type}"
+          title: "#{title}"
+          message: "#{message}"
+          published: #{published}
+          groupCategoryId: "foo"
+        GQL
+
+        result = execute_with_input(query)
+        returned_discussion_topic = result.dig("data", "createDiscussionTopic", "discussionTopic")
+        expect(result["errors"]).to be_nil
+        expect(returned_discussion_topic["groupSet"]).to be_nil
+        discussion_topics = DiscussionTopic.last
+        expect(discussion_topics.group_category_id).to be_nil
       end
     end
 
