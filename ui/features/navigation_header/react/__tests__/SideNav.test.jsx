@@ -19,6 +19,16 @@ import SideNav from '../SideNav'
 
 describe('SideNav', () => {
   // test that SideNav renders without errors
+  beforeEach(() => {
+    window.ENV.current_user = {
+      id: '',
+      avatar_image_url: 'testSrc',
+      anonymous_id: '',
+      display_name: 'Test DisplayName',
+      html_url: '',
+      pronouns: '',
+    }
+  })
   it('renders', () => {
     const unreadComponent = jest.fn(() => <></>)
 
@@ -43,4 +53,12 @@ describe('SideNav', () => {
     const iconCanvasLogo = getByTestId('icon-canvas-logo')
     expect(iconCanvasLogo).toBeInTheDocument()
   })
+
+  it('should render the avatar component with the corresponding src from ENV', () => {
+    const {getByTestId} = render(<SideNav />)
+
+    const avatarComponent = getByTestId('avatar')
+    expect(avatarComponent).toHaveAttribute('src', 'testSrc')
+  })
+
 })
