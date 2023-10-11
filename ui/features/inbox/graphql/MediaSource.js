@@ -25,6 +25,7 @@ export const MediaSource = {
       src: url
       height
       width
+      bitrate
     }
   `,
 
@@ -33,6 +34,7 @@ export const MediaSource = {
     src: string,
     height: string,
     width: string,
+    bitrate: string,
   }),
 
   mock: ({
@@ -40,11 +42,13 @@ export const MediaSource = {
     src = 'https://nv.instructuremedia.com/fetch/QkFoYkIxc0hhUVRndjZZU01Hd3JCOUd4WEdBPS0tNTU1MTlhMTMyOGI0MTFkMjVjNzkwNmEwZDYzOWJkYzVjM2U0OTBlZQ.mp4',
     height = '720',
     width = '1280',
+    bitrate = '339734',
   } = {}) => ({
     type,
     src,
     height,
     width,
+    bitrate,
     __typename: 'MediaSource',
   }),
 }
