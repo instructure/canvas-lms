@@ -22,7 +22,7 @@ import Footer, {FooterProps} from '../Footer'
 
 describe('Footer', () => {
   const props: FooterProps = {
-    updateButtonLabel: 'Update Module',
+    saveButtonLabel: 'Update Module',
     updateInteraction: 'enabled',
     onDismiss: jest.fn(),
     onUpdate: jest.fn(),
@@ -41,7 +41,7 @@ describe('Footer', () => {
   })
 
   it('labels the update button from the prop', () => {
-    const {getByRole} = renderComponent({updateButtonLabel: 'Save'})
+    const {getByRole} = renderComponent({saveButtonLabel: 'Save'})
     expect(getByRole('button', {name: 'Save'})).toBeInTheDocument()
   })
 

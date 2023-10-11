@@ -113,7 +113,7 @@ function parsePrerequisites(element: HTMLDivElement) {
   })
 }
 
-function parseModuleList() {
+export function parseModuleList() {
   const potentialModules = Array.from(
     document.querySelectorAll('.item-group-condensed.context_module.editable_context_module')
   )

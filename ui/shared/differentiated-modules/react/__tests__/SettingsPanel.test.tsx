@@ -34,6 +34,7 @@ describe('SettingsPanel', () => {
     unlockAt: '',
     height: '500px',
     onDismiss: () => {},
+    addModuleUI: () => {},
   }
 
   const renderComponent = (overrides = {}) => render(<SettingsPanel {...props} {...overrides} />)
@@ -170,6 +171,23 @@ describe('SettingsPanel', () => {
           err: e,
           message: 'Error updating Week 1 settings.',
         })
+      })
+    })
+  })
+
+  describe('on create', () => {
+    it('calls addModuleUI when module is created', async () => {
+      jest.spyOn(alerts, 'showFlashAlert')
+      const addModuleUI = jest.fn()
+      doFetchApi.mockResolvedValue({response: {ok: true}, json: {}})
+      const {getByRole} = renderComponent({moduleId: undefined, addModuleUI})
+      getByRole('button', {name: 'Add Module'}).click()
+      await waitFor(() => {
+        expect(alerts.showFlashAlert).toHaveBeenCalledWith({
+          type: 'success',
+          message: 'Week 1 created successfully.',
+        })
+        expect(addModuleUI).toHaveBeenCalled()
       })
     })
   })

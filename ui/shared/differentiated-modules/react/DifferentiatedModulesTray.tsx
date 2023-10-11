@@ -36,12 +36,12 @@ export interface DifferentiatedModulesTrayProps {
   moduleElement: HTMLDivElement
   moduleId?: string
   initialTab?: 'settings' | 'assign-to'
-  assignOnly?: boolean
   moduleName?: string
   unlockAt?: string
   prerequisites?: Module[]
   moduleList?: Module[]
   courseId: string
+  addModuleUI?: (data: Record<string, any>, element: HTMLDivElement) => void
 }
 
 const SettingsPanel = React.lazy(() => import('./SettingsPanel'))
@@ -50,28 +50,41 @@ const AssignToPanel = React.lazy(() => import('./AssignToPanel'))
 export default function DifferentiatedModulesTray({
   onDismiss,
   moduleElement,
-  moduleId = '',
+  moduleId,
   initialTab = 'assign-to',
-  assignOnly = true,
   courseId,
   ...settingsProps
 }: DifferentiatedModulesTrayProps) {
   const [selectedTab, setSelectedTab] = useState<string | undefined>(initialTab)
+  const headerLabel = moduleId ? I18n.t('Edit Module Settings') : I18n.t('Add Module')
+  const panelHeight = useMemo(() => calculatePanelHeight(moduleId !== undefined), [moduleId])
 
-  const panelHeight = useMemo(() => calculatePanelHeight(!assignOnly), [assignOnly])
+  function customOnDismiss() {
+    if (!moduleId) {
+      // remove the temp module element on cancel
+      moduleElement?.remove()
+    }
+    onDismiss()
+  }
 
   function Header() {
     return (
       <View as="div" padding="small">
         <Flex as="div" margin="0 0 medium 0">
           <Flex.Item>
-            <CloseButton onClick={onDismiss} screenReaderLabel={I18n.t('Close')} placement="end" />
+            <CloseButton
+              onClick={customOnDismiss}
+              screenReaderLabel={I18n.t('Close')}
+              placement="end"
+            />
           </Flex.Item>
           <Flex.Item>
             <IconModuleSolid size="x-small" />
           </Flex.Item>
           <Flex.Item margin="0 0 0 small">
-            <Heading as="h3">{I18n.t('Edit Module Settings')}</Heading>
+            <Heading data-testid="header-label" as="h3">
+              {headerLabel}
+            </Heading>
           </Flex.Item>
         </Flex>
       </View>
@@ -89,12 +102,13 @@ export default function DifferentiatedModulesTray({
   function Body() {
     return (
       <React.Suspense fallback={<Fallback />}>
-        {assignOnly ? (
-          <AssignToPanel
-            courseId={courseId}
-            moduleId={moduleId}
+        {moduleId === undefined ? (
+          <SettingsPanel
             height={panelHeight}
             onDismiss={onDismiss}
+            moduleElement={moduleElement}
+            enablePublishFinalGrade={ENV?.PUBLISH_FINAL_GRADE}
+            {...settingsProps}
           />
         ) : (
           <Tabs onRequestTabChange={(_e: any, {id}: {id?: string}) => setSelectedTab(id)}>
@@ -135,7 +149,7 @@ export default function DifferentiatedModulesTray({
   }
 
   return (
-    <Tray open={true} label={I18n.t('Edit Module Settings')} placement="end" size="regular">
+    <Tray open={true} label={headerLabel} placement="end" size="regular">
       <Header />
       <Body />
     </Tray>

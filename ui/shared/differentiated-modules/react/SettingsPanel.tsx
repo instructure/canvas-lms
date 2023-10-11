@@ -40,7 +40,7 @@ export interface SettingsPanelProps {
   height: string
   onDismiss: () => void
   moduleElement: HTMLDivElement
-  moduleId: string
+  moduleId?: string
   moduleName?: string
   unlockAt?: string
   prerequisites?: Module[]
@@ -51,6 +51,7 @@ export interface SettingsPanelProps {
   moduleItems?: ModuleItem[]
   publishFinalGrade?: boolean
   enablePublishFinalGrade?: boolean
+  addModuleUI?: (data: Record<string, any>, element: HTMLDivElement) => void
 }
 
 export default function SettingsPanel({
@@ -68,6 +69,7 @@ export default function SettingsPanel({
   enablePublishFinalGrade = false,
   moduleList = [],
   moduleItems = [],
+  addModuleUI = () => {},
 }: SettingsPanelProps) {
   const [state, dispatch] = useReducer(reducer, {
     ...defaultState,
@@ -86,36 +88,84 @@ export default function SettingsPanel({
     return cutoffIndex === -1 ? moduleList : moduleList.slice(0, cutoffIndex)
   }, [moduleList, moduleName])
 
-  function handleUpdate() {
-    if (state.moduleName.length === 0) {
-      dispatch({
-        type: actions.SET_NAME_INPUT_MESSAGES,
-        payload: [{type: 'error', text: I18n.t('Module Name is required.')}],
-      })
-      return
-    }
-
+  function doRequest(
+    path: string,
+    method: string,
+    onSucces: (res: Record<string, any>) => void,
+    successMessage: string,
+    errorMessage: string
+  ) {
     doFetchApi({
-      path: `/courses/${ENV.COURSE_ID}/modules/${moduleId}`,
-      method: 'PUT',
+      path,
+      method,
       body: convertModuleSettingsForApi(state),
     })
-      .then(() => {
+      .then((data: {json: Record<string, any>}) => {
         onDismiss()
-        updateModuleUI(moduleElement, state)
+        onSucces(data.json)
         showFlashAlert({
           type: 'success',
-          message: I18n.t('%{moduleName} settings updated successfully.', {
-            moduleName: state.moduleName,
-          }),
+          message: successMessage,
         })
       })
       .catch((e: Error) =>
         showFlashAlert({
           err: e,
-          message: I18n.t('Error updating %{moduleName} settings.', {moduleName: state.moduleName}),
+          message: errorMessage,
         })
       )
+  }
+
+  const handleUpdate = () => {
+    if (!moduleId) return
+
+    doRequest(
+      `/courses/${ENV.COURSE_ID}/modules/${moduleId}`,
+      'PUT',
+      () => updateModuleUI(moduleElement, state),
+      I18n.t('%{moduleName} settings updated successfully.', {
+        moduleName: state.moduleName,
+      }),
+      I18n.t('Error updating %{moduleName} settings.', {moduleName: state.moduleName})
+    )
+  }
+
+  const handleCreate = () =>
+    doRequest(
+      `/courses/${ENV.COURSE_ID}/modules/`,
+      'POST',
+      res => addModuleUI(res, moduleElement),
+      I18n.t('%{moduleName} created successfully.', {
+        moduleName: state.moduleName,
+      }),
+      I18n.t('Error creating %{moduleName}.', {moduleName: state.moduleName})
+    )
+
+  const handleSave = () => {
+    if (state.moduleName.length === 0) {
+      dispatch({
+        type: actions.SET_NAME_INPUT_MESSAGES,
+        payload: [
+          {
+            type: 'error',
+            text: I18n.t('Module Name is required.'),
+          },
+        ],
+      })
+      return
+    }
+
+    const callback = moduleId ? handleUpdate : handleCreate
+
+    callback()
+  }
+
+  function customOnDismiss() {
+    if (!moduleId) {
+      // remove the temp module element on cancel
+      moduleElement?.remove()
+    }
+    onDismiss()
   }
 
   return (
@@ -257,9 +307,9 @@ export default function SettingsPanel({
       </Flex.Item>
       <Flex.Item>
         <Footer
-          updateButtonLabel={I18n.t('Update Module')}
-          onDismiss={onDismiss}
-          onUpdate={handleUpdate}
+          saveButtonLabel={moduleId ? I18n.t('Update Module') : I18n.t('Add Module')}
+          onDismiss={customOnDismiss}
+          onUpdate={handleSave}
           updateInteraction={state.nameInputMessages.length > 0 ? 'inerror' : 'enabled'}
         />
       </Flex.Item>
