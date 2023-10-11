@@ -44,7 +44,6 @@ const ignoredErrors = [
   /An update to %s inside a test was not wrapped in act/,
   /Can't perform a React state update on an unmounted component/,
   /Function components cannot be given refs/,
-  /Invalid prop `children` supplied to `(Option)`/,
   /Invalid prop `heading` of type `object` supplied to `Billboard`/, // https://instructure.atlassian.net/browse/QUIZ-8870
   /Invariant Violation/,
   /Prop `children` should be supplied unless/, // https://instructure.atlassian.net/browse/FOO-3407
