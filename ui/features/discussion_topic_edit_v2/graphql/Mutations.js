@@ -39,6 +39,7 @@ export const CREATE_DISCUSSION_TOPIC = gql`
     $locked: Boolean
     $isAnnouncement: Boolean
     $specificSections: String
+    $groupCategoryId: ID
   ) {
     createDiscussionTopic(
       input: {
@@ -60,6 +61,7 @@ export const CREATE_DISCUSSION_TOPIC = gql`
         locked: $locked
         isAnnouncement: $isAnnouncement
         specificSections: $specificSections
+        groupCategoryId: $groupCategoryId
       }
     ) {
       discussionTopic {

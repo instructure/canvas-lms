@@ -113,6 +113,7 @@ export default function DiscussionTopicFormContainer({apolloClient}) {
         includeRepliesInFeed,
         locked,
         isAnnouncement,
+        groupCategoryId,
       }) => {
         if (isEditing) {
           console.log('call updateDiscussion')
@@ -137,6 +138,7 @@ export default function DiscussionTopicFormContainer({apolloClient}) {
               podcastHasStudentPosts: includeRepliesInFeed,
               locked,
               isAnnouncement,
+              groupCategoryId: groupCategoryId || null,
             },
           })
         }

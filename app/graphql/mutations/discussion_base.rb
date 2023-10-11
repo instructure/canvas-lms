@@ -21,6 +21,7 @@
 class Mutations::DiscussionBase < Mutations::BaseMutation
   argument :allow_rating, Boolean, required: false
   argument :delayed_post_at, Types::DateTimeType, required: false
+  argument :group_category_id, ID, required: false
   argument :lock_at, Types::DateTimeType, required: false
   argument :locked, Boolean, required: false
   argument :message, String, required: false
@@ -47,6 +48,7 @@ class Mutations::DiscussionBase < Mutations::BaseMutation
 
     unless is_announcement
       discussion_topic.todo_date = input[:todo_date]
+      discussion_topic.group_category_id = input[:group_category_id] if input[:group_category_id]
     end
 
     discussion_topic.podcast_enabled = input[:podcast_enabled] || false
