@@ -352,13 +352,13 @@ describe CoursePacesController do
 
         get :api_show, params: { course_id: @course.id, id: @course_pace.id }
         pace = response.parsed_body["course_pace"]
-        expect(pace["modules"][0]["items"].select { |item| item["assignment_title"] == "Del this assn" }.present?).to be_truthy
+        expect(pace["modules"][0]["items"].any? { |item| item["assignment_title"] == "Del this assn" }).to be_truthy
 
         a.destroy!
 
         get :api_show, params: { course_id: @course.id, id: @course_pace.id }
         pace = response.parsed_body["course_pace"]
-        expect(pace["modules"][0]["items"].select { |item| item["assignment_title"] == "Del this assn" }.present?).to be_falsey
+        expect(pace["modules"][0]["items"].any? { |item| item["assignment_title"] == "Del this assn" }).to be_falsey
       end
 
       it "handles quizzes" do
@@ -369,13 +369,13 @@ describe CoursePacesController do
 
         get :api_show, params: { course_id: @course.id, id: @course_pace.id }
         pace = response.parsed_body["course_pace"]
-        expect(pace["modules"][0]["items"].select { |item| item["assignment_title"] == "Del this quiz" }.present?).to be_truthy
+        expect(pace["modules"][0]["items"].any? { |item| item["assignment_title"] == "Del this quiz" }).to be_truthy
 
         q.destroy!
 
         get :api_show, params: { course_id: @course.id, id: @course_pace.id }
         pace = response.parsed_body["course_pace"]
-        expect(pace["modules"][0]["items"].select { |item| item["assignment_title"] == "Del this quiz" }.present?).to be_falsey
+        expect(pace["modules"][0]["items"].any? { |item| item["assignment_title"] == "Del this quiz" }).to be_falsey
       end
 
       it "handles graded discussions" do
@@ -386,13 +386,13 @@ describe CoursePacesController do
 
         get :api_show, params: { course_id: @course.id, id: @course_pace.id }
         pace = response.parsed_body["course_pace"]
-        expect(pace["modules"][0]["items"].select { |item| item["assignment_title"] == "Del this disc" }.present?).to be_truthy
+        expect(pace["modules"][0]["items"].any? { |item| item["assignment_title"] == "Del this disc" }).to be_truthy
 
         d.destroy!
 
         get :api_show, params: { course_id: @course.id, id: @course_pace.id }
         pace = response.parsed_body["course_pace"]
-        expect(pace["modules"][0]["items"].select { |item| item["assignment_title"] == "Del this disc" }.present?).to be_falsey
+        expect(pace["modules"][0]["items"].any? { |item| item["assignment_title"] == "Del this disc" }).to be_falsey
       end
     end
   end
