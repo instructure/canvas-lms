@@ -26,7 +26,7 @@ import {colors} from '@instructure/canvas-theme'
 const I18n = useI18nScope('conversations_2')
 
 type MediaAttachmentProps = {
-  onRemoveMediaComment: () => void
+  onRemoveMediaComment?: () => void
   file: {
     mediaID: string
     mediaTracks?: {
@@ -43,8 +43,9 @@ type MediaAttachmentProps = {
       src: string
       height: string
       width: string
+      bitrate: string
     }[]
-    type: string
+    type?: string
   }
 }
 
@@ -83,10 +84,16 @@ type MediaAttachmentPlayerProps = Omit<MediaAttachmentProps, 'onRemoveMediaComme
 const MediaAttachmentPlayer = (props: MediaAttachmentPlayerProps) => {
   const mediaSources = (): string[] => {
     if (props.file.src) {
-      return [props.file.src]
+      return [{label: I18n.t('Standard'), src: props.file.src, bitrate: '0'}]
     }
 
-    return props.file.mediaSources?.map(media => media.src) ?? []
+    return (
+      props.file.mediaSources?.map(media => ({
+        label: media.width + ' x ' + media.height,
+        src: media.src,
+        bitrate: media.bitrate,
+      })) ?? []
+    )
   }
 
   return (
