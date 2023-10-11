@@ -112,16 +112,6 @@ describe "Canvadoc" do
       @doc.session_url(user: @attachment.user, enable_annotations: true)
     end
 
-    it "Session creation sends users crocodoc id" do
-      @doc.upload
-      @doc.has_annotations = true
-      @attachment.user.crocodoc_id = 6
-      canvadocs_api = @doc.send(:canvadocs_api)
-
-      expect(canvadocs_api).to receive(:session).with(anything, hash_including(user_crocodoc_id: @attachment.user.crocodoc_id)).and_return({})
-      @doc.session_url(user: @attachment.user, enable_annotations: true)
-    end
-
     context "if enhanced_docviewer_url_security feature flag set" do
       before do
         Account.site_admin.enable_feature!(:enhanced_docviewer_url_security)

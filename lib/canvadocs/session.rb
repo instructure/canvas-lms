@@ -105,15 +105,13 @@ module Canvadocs
     private :canvadocs_permissions
 
     def canvadocs_default_options_for_user(user, read_only)
-      opts = {
+      {
         annotation_context: canvadocs_annotation_context,
         permissions: canvadocs_permissions(user, read_only),
         user_id: canvadocs_user_id(user),
         user_name: canvadocs_user_name(user),
         user_filter: canvadocs_user_id(user),
       }
-      opts[:user_crocodoc_id] = user.crocodoc_id if user.crocodoc_id
-      opts
     end
     private :canvadocs_default_options_for_user
   end
