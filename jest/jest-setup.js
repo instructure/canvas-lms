@@ -43,7 +43,6 @@ const globalError = global.console.error
 const ignoredErrors = [
   /An update to %s inside a test was not wrapped in act/,
   /Can't perform a React state update on an unmounted component/,
-  /contextType was defined as an instance property on %s/,
   /Function components cannot be given refs/,
   /Invalid prop `children` supplied to `(Option)`/,
   /Invalid prop `heading` of type `object` supplied to `Billboard`/, // https://instructure.atlassian.net/browse/QUIZ-8870
