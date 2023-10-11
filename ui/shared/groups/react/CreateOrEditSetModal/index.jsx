@@ -175,7 +175,7 @@ export const CreateOrEditSetModal = ({
 
   function validateNameSection() {
     if (st.name.trim().length < 1) {
-      dispatch({ev: 'error', name: I18n.t('You must provide a name for the Group Set')})
+      dispatch({ev: 'error', name: I18n.t('Required')})
       return false
     }
     return true
