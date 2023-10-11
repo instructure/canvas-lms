@@ -60,3 +60,9 @@ export interface User {
   id: number
   name: string
 }
+
+export interface TempEnrollPermissions {
+  canEdit: boolean
+  canAdd: boolean
+  canDelete: boolean
+}

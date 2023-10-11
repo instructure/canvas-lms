@@ -1628,6 +1628,10 @@ class AccountsController < ApplicationController
     if @account.root_account.feature_enabled?(:temporary_enrollments)
       js_permissions[:can_add_temporary_enrollments] =
         @account.grants_right?(@current_user, session, :temporary_enrollments_add)
+      js_permissions[:can_edit_temporary_enrollments] =
+        @account.grants_right?(@current_user, session, :temporary_enrollments_edit)
+      js_permissions[:can_delete_temporary_enrollments] =
+        @account.grants_right?(@current_user, session, :temporary_enrollments_delete)
       js_permissions[:can_view_temporary_enrollments] =
         @account.grants_any_right?(@current_user, session, *RoleOverride::MANAGE_TEMPORARY_ENROLLMENT_PERMISSIONS)
     end

@@ -32,7 +32,7 @@ import {TempEnrollSearch} from './TempEnrollSearch'
 import {TempEnrollEdit} from './TempEnrollEdit'
 import {TempEnrollAssign} from './TempEnrollAssign'
 import {Flex} from '@instructure/ui-flex'
-import {Enrollment, EnrollmentType, MODULE_NAME} from './types'
+import {Enrollment, EnrollmentType, MODULE_NAME, TempEnrollPermissions} from './types'
 import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {createAnalyticPropsGenerator} from './util/analytics'
 
@@ -69,6 +69,7 @@ interface Props {
   readonly onToggleEditMode: (mode?: boolean) => void
   // TODO add onDeleteEnrollment prop to parent component and update user list
   readonly onDeleteEnrollment?: (enrollmentId: number) => void
+  readonly tempEnrollPermissions: TempEnrollPermissions
 }
 
 export function TempEnrollModal(props: Props) {
@@ -215,6 +216,8 @@ export function TempEnrollModal(props: Props) {
           onAddNew={handleOpenForNewEnrollment}
           onEdit={handleGoToAssignPageWithEnrollment}
           onDelete={handleEnrollmentDeletion}
+          contextType={enrollmentType}
+          tempEnrollPermissions={props.tempEnrollPermissions}
         />
       )
     } else {
