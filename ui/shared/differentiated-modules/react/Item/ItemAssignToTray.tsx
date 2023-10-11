@@ -266,7 +266,7 @@ export default function ItemAssignToTray({
       <Flex.Item margin="small 0 0 0" width="100%">
         <TrayFooter
           updateInteraction={allCardsValid() ? 'enabled' : 'inerror'}
-          updateButtonLabel={I18n.t('Save')}
+          saveButtonLabel={I18n.t('Save')}
           onDismiss={onDismiss}
           onUpdate={handleUpdate}
         />

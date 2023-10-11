@@ -34,7 +34,6 @@ import vddTooltipView from '../jst/_vddTooltip.handlebars'
 import Publishable from '../backbone/models/Publishable'
 import PublishButtonView from '@canvas/publish-button-view'
 import htmlEscape from 'html-escape'
-import setupContentIds from './setupContentIds'
 import ContentTypeExternalToolTray from '@canvas/trays/react/ContentTypeExternalToolTray'
 import {monitorLtiMessages, ltiState} from '@canvas/lti/jquery/messages'
 import get from 'lodash/get'
@@ -55,7 +54,6 @@ import 'jqueryui/sortable'
 import '@canvas/rails-flash-notifications'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
-import {Mathml} from '@instructure/canvas-rce'
 import {addDeepLinkingListener} from '@canvas/deep-linking/DeepLinking'
 import ExternalToolModalLauncher from '@canvas/external-tools/react/components/ExternalToolModalLauncher'
 import {
@@ -74,7 +72,8 @@ import {underscoreString} from '@canvas/convert-case'
 import {selectContentDialog} from '@canvas/select-content-dialog'
 import DifferentiatedModulesTray from '@canvas/differentiated-modules'
 import ItemAssignToTray from '@canvas/differentiated-modules/react/Item/ItemAssignToTray'
-import {parseModule} from '@canvas/differentiated-modules/utils/moduleHelpers'
+import {parseModule, parseModuleList} from '@canvas/differentiated-modules/utils/moduleHelpers'
+import {addModuleElement} from '../utils/moduleHelpers'
 
 if (!('INST' in window)) window.INST = {}
 
@@ -800,6 +799,29 @@ window.modules = (function () {
   }
 })()
 
+const renderDifferentiatedModulesTray = (
+  returnFocusTo,
+  moduleElement,
+  settingsProps,
+  options = {initialTab: 'settings'},
+) => {
+  const container = document.getElementById('differentiated-modules-mount-point')
+  ReactDOM.render(
+    <DifferentiatedModulesTray
+      onDismiss={() => {
+        ReactDOM.unmountComponentAtNode(container)
+        returnFocusTo.focus()
+      }}
+      initialTab={options.initialTab}
+      moduleElement={moduleElement}
+      courseId={ENV.COURSE_ID ?? ''}
+      {...settingsProps}
+    />,
+    container
+  )
+}
+
+
 const updatePrerequisites = function ($module, prereqs) {
   const $prerequisitesDiv = $module.find('.prerequisites')
   let prereqsList = ''
@@ -890,6 +912,7 @@ const updatePublishMenuDisabledState = function (disabled) {
     )
   }
 }
+
 modules.updatePublishMenuDisabledState = updatePublishMenuDisabledState
 
 modules.initModuleManagement = function (duplicate) {
@@ -1027,98 +1050,7 @@ modules.initModuleManagement = function (duplicate) {
       $module.removeClass('dont_remove')
       return $module
     },
-    success(data, $module) {
-      $module.loadingImage('remove')
-      $module.attr('id', 'context_module_' + data.context_module.id)
-      setupContentIds($module, data.context_module.id)
-
-      // Set this module up with correct data attributes
-      $module.data('moduleId', data.context_module.id)
-      $module.data(
-        'module-url',
-        '/courses/' +
-          data.context_module.context_id +
-          '/modules/' +
-          data.context_module.id +
-          'items?include[]=content_details'
-      )
-      $module.data('workflow-state', data.context_module.workflow_state)
-      if (data.context_module.workflow_state === 'unpublished') {
-        $module.find('.workflow-state-action').text('Publish')
-        $module
-          .find('.workflow-state-icon')
-          .addClass('publish-module-link')
-          .removeClass('unpublish-module-link')
-        $module.addClass('unpublished_module')
-      }
-
-      $('#no_context_modules_message').slideUp()
-      $('#expand_collapse_all').show()
-      setExpandAllButton()
-      const published = data.context_module.workflow_state === 'active'
-      const $publishIcon = $module.find('.publish-icon')
-      // new module, setup publish icon and other stuff
-      if (!$publishIcon.data('id')) {
-        const fixLink = function (locator, attribute) {
-          const el = $module.find(locator)
-          el.attr(attribute, el.attr(attribute).replace('{{ id }}', data.context_module.id))
-        }
-        fixLink('span.collapse_module_link', 'href')
-        fixLink('span.expand_module_link', 'href')
-        fixLink('.add_module_item_link', 'rel')
-        fixLink('.add_module_item_link', 'rel')
-        const publishData = {
-          moduleType: 'module',
-          id: data.context_module.id,
-          courseId: data.context_module.context_id,
-          published,
-          publishable: true,
-        }
-        const view = initPublishButton($publishIcon, publishData)
-        overrideModel(moduleItems, relock_modules_dialog, view.model, view)
-      }
-      if (window.ENV?.FEATURES?.module_publish_menu) {
-        const isPublishing =
-          document.querySelector('#context-modules-publish-menu').dataset['data-progress-id'] !==
-          undefined
-        updatePublishMenuDisabledState(isPublishing)
-        renderContextModulesPublishIcon(
-          data.context_module.context_id,
-          data.context_module.id,
-          published,
-          isPublishing
-        )
-      }
-      relock_modules_dialog.renderIfNeeded(data.context_module)
-      $module.triggerHandler('update', data)
-      const module_dnd = $module.find('.module_dnd')[0]
-      if (module_dnd) {
-        const contextModules = document.getElementById('context_modules')
-        ReactDOM.render(
-          <ModuleFileDrop
-            courseId={ENV.course_id}
-            moduleId={data.context_module.id}
-            contextModules={contextModules}
-          />,
-          module_dnd
-        )
-      }
-
-      const mathml = new Mathml(
-        {
-          new_math_equation_handling: !!ENV?.FEATURES?.new_math_equation_handling,
-          explicit_latex_typesetting: !!ENV?.FEATURES?.explicit_latex_typesetting,
-        },
-        {locale: ENV?.LOCALE || 'en'}
-      )
-      if (mathml.isMathMLOnPage()) {
-        if (mathml.isMathJaxLoaded()) {
-          mathml.reloadElement('content')
-        } else {
-          mathml.loadMathJax(undefined)
-        }
-      }
-    },
+    success: (data, $module) => addModuleElement(data, $module, updatePublishMenuDisabledState, relock_modules_dialog, moduleItems),
     error(data, $module) {
       $module.loadingImage('remove')
     },
@@ -1706,7 +1638,21 @@ modules.initModuleManagement = function (duplicate) {
 
   $(document).on('click', '.add_module_link', event => {
     event.preventDefault()
-    modules.addModule()
+    if (ENV.FEATURES.differentiated_modules) {
+      const options = {initialTab: 'settings'};
+      const settings = {
+        moduleList: parseModuleList(),
+        addModuleUI: (data, $moduleElement) =>
+        {
+          addModuleElement(data, $moduleElement, updatePublishMenuDisabledState, relock_modules_dialog, moduleItems);
+          $moduleElement.css('display', 'block');
+        }}
+      const $module = $('#context_module_blank').clone(true).attr('id', 'context_module_new')
+      $('#context_modules').append($module)
+      renderDifferentiatedModulesTray(event.target, $module, settings, options)
+    }else{
+      modules.addModule()
+    }
   })
 
   // This allows ModuleFileDrop to create module items
@@ -2532,29 +2478,6 @@ $(document).ready(function () {
         }}
       />,
       document.getElementById('direct-share-mount-point')
-    )
-  }
-
-  function renderDifferentiatedModulesTray(
-    returnFocusTo,
-    moduleElement,
-    settingsProps,
-    options = {}
-  ) {
-    const container = document.getElementById('differentiated-modules-mount-point')
-    ReactDOM.render(
-      <DifferentiatedModulesTray
-        onDismiss={() => {
-          ReactDOM.unmountComponentAtNode(container)
-          returnFocusTo.focus()
-        }}
-        initialTab={options.initialTab}
-        assignOnly={false}
-        moduleElement={moduleElement}
-        courseId={ENV.COURSE_ID}
-        {...settingsProps}
-      />,
-      container
     )
   }
 

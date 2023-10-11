@@ -151,7 +151,7 @@ export default function AssignToPanel({courseId, moduleId, height, onDismiss}: A
       </FlexItem>
       <FlexItem margin="auto none none none">
         <Footer
-          updateButtonLabel={I18n.t('Update Module')}
+          saveButtonLabel={moduleId ? I18n.t('Update Module') : I18n.t('Add Module')}
           onDismiss={onDismiss}
           onUpdate={handleSave}
         />

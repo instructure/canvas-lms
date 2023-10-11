@@ -29,14 +29,14 @@ const I18n = useI18nScope('differentiated_modules')
 const {Item: FlexItem} = Flex as any
 
 export interface FooterProps {
-  updateButtonLabel: string
+  saveButtonLabel: string
   onDismiss: () => void
   onUpdate: () => void
   updateInteraction?: 'enabled' | 'inerror'
 }
 
 export default function Footer({
-  updateButtonLabel,
+  saveButtonLabel,
   onDismiss,
   onUpdate,
   updateInteraction = 'enabled',
@@ -59,7 +59,7 @@ export default function Footer({
             on={updateInteraction === 'inerror' ? ['click', 'hover'] : undefined}
           >
             <Button color="primary" onClick={handleUpdate}>
-              {updateButtonLabel}
+              {saveButtonLabel}
             </Button>
           </Tooltip>
         </FlexItem>
