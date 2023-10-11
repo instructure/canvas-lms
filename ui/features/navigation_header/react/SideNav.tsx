@@ -55,7 +55,14 @@ const SideNav = () => {
           data-testid="sidenav-header-logo"
         />
         <Navigation.Item
-          icon={<Avatar name="Ziggy Marley" size="x-small" />}
+          icon={
+            <Avatar
+              data-testid="avatar"
+              name={window.ENV.current_user.display_name}
+              size="x-small"
+              src={window.ENV.current_user.avatar_image_url}
+            />
+          }
           label="Account"
           onClick={() => {
             // this.loadSubNav('account')
