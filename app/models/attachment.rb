@@ -1424,7 +1424,7 @@ class Attachment < ActiveRecord::Base
 
   def can_read_through_assignment?(user, session)
     return false unless assignment
-    return true if user_id == user.id
+    return true if user && user.id == user_id
 
     # grader
     return true if assignment.grants_right?(user, session, :grade)
