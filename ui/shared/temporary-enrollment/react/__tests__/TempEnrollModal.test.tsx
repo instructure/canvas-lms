@@ -67,6 +67,11 @@ const modalProps = {
   },
   isEditMode: false,
   onToggleEditMode: jest.fn(),
+  tempEnrollPermissions: {
+    canAdd: true,
+    canDelete: true,
+    canEdit: true,
+  },
 }
 
 const userData = {

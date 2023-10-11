@@ -133,6 +133,12 @@ export default function UsersListRow({
     designer: permissions.can_add_observer || permissions.can_manage_admin_users,
   }
 
+  const tempEnrollPermissions = {
+    canEdit: permissions.can_edit_temporary_enrollments,
+    canAdd: permissions.can_add_temporary_enrollments,
+    canDelete: permissions.can_delete_temporary_enrollments,
+  }
+
   useEffect(() => {
     const fetchAllEnrollments = async () => {
       try {
@@ -151,8 +157,10 @@ export default function UsersListRow({
       }
     }
 
-    fetchAllEnrollments()
-  }, [user.id])
+    if (canTempEnroll) {
+      fetchAllEnrollments()
+    }
+  }, [user.id, canTempEnroll])
 
   // render temporary enrollment modal, tooltip, and icon
   function renderTempEnrollModal(
@@ -176,6 +184,7 @@ export default function UsersListRow({
         tempEnrollments={tempEnrollments}
         isEditMode={editModeStatus}
         onToggleEditMode={toggleOrSetEditModeFunction}
+        tempEnrollPermissions={tempEnrollPermissions}
       >
         <Tooltip data-testid="user-list-row-tooltip" renderTip={tooltipText}>
           <IconButton
