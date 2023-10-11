@@ -41,7 +41,6 @@ rceFormatMessage.setup({
 /* eslint-disable no-console */
 const globalError = global.console.error
 const ignoredErrors = [
-  /\[object Object\]/,
   /An update to %s inside a test was not wrapped in act/,
   /Can't perform a React state update on an unmounted component/,
   /contextType was defined as an instance property on %s/,
