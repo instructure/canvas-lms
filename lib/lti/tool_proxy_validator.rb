@@ -100,7 +100,7 @@ module Lti
     def restricted_security_profile_errors
       messages = {}
       profiles = %w[oauth2_access_token_ws_security lti_jwt_ws_security]
-      if tool_proxy.tool_profile.security_profiles.select { |s| profiles.include?(s.security_profile_name) }.present? &&
+      if tool_proxy.tool_profile.security_profiles.any? { |s| profiles.include?(s.security_profile_name) } &&
          !tool_proxy.enabled_capabilities.include?("Security.splitSecret")
         messages[:restricted_security_profiles] = ["Security.splitSecret is required"]
       end

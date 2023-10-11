@@ -163,7 +163,7 @@ class ApplicationController < ActionController::Base
   end
 
   def set_sentry_trace
-    @sentry_trace = Sentry&.get_current_scope&.get_transaction&.to_sentry_trace
+    @sentry_trace = Sentry.get_current_scope&.get_transaction&.to_sentry_trace
   end
 
   ##
