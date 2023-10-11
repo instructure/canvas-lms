@@ -54,6 +54,7 @@ const props = {
   goBack: backCall,
   setEnrollmentStatus: jest.fn(),
   doSubmit: () => false,
+  isInAssignEditMode: false,
 }
 
 const johnEnrollments = [
@@ -111,6 +112,17 @@ describe('TempEnrollAssign', () => {
       fireEvent.click(backButton)
 
       expect(backCall).toHaveBeenCalled()
+    })
+
+    it('does not render Back button when isEditMode is true', async () => {
+      const modifiedProps = {
+        ...props,
+        isInAssignEditMode: true,
+      }
+      const {queryByText} = render(<TempEnrollAssign {...modifiedProps} />)
+      const backButton = queryByText('Back')
+
+      expect(backButton).toBeNull()
     })
 
     it('changes summary when role is selected', async () => {
