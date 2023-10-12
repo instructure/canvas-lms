@@ -110,6 +110,7 @@ module CC::Importer::Canvas
          usage_rights_required
          restrict_student_future_view
          restrict_student_past_view
+         restrict_quantitative_data
          show_total_grade_as_points
          organize_epub_by_content_type
          enable_offline_web_export
