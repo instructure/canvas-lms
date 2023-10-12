@@ -101,6 +101,11 @@ class ErrorReport < ActiveRecord::Base
         begin
           report = ErrorReport.new
           report.assign_data(opts)
+          unless Shard.current.in_current_region?
+            report = nil
+            raise "Out of region error report received"
+          end
+
           report.save!
           Rails.logger.info("Created ErrorReport ID #{report.global_id}")
         rescue => e
