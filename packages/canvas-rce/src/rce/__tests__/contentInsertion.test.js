@@ -141,9 +141,7 @@ describe('contentInsertion', () => {
       link.href = 'https://mycanvas.com:3000/some/path'
       link.url = 'https://mycanvas.com:3000/some/path'
       contentInsertion.insertLink(editor, link, canvasOrigin)
-      expect(editor.content).toEqual(
-        '<a href="/some/path?wrap=1" title="Here Be Links">Click On Me</a>'
-      )
+      expect(editor.content).toEqual('<a href="/some/path" title="Here Be Links">Click On Me</a>')
     })
 
     it('leaves non-Canvas URLs as absolute', () => {
@@ -159,7 +157,7 @@ describe('contentInsertion', () => {
       link.embed = {type: 'image'}
       contentInsertion.insertLink(editor, link)
       expect(editor.content).toEqual(
-        '<a href="/some/path?wrap=1" title="Here Be Links" class="instructure_file_link instructure_image_thumbnail">Click On Me</a>'
+        '<a href="/some/path" title="Here Be Links" class="instructure_file_link instructure_image_thumbnail">Click On Me</a>'
       )
     })
 
@@ -167,7 +165,7 @@ describe('contentInsertion', () => {
       link.embed = {type: 'scribd'}
       contentInsertion.insertLink(editor, link)
       expect(editor.content).toEqual(
-        '<a href="/some/path?wrap=1" title="Here Be Links" class="instructure_file_link instructure_scribd_file">Click On Me</a>'
+        '<a href="/some/path" title="Here Be Links" class="instructure_file_link instructure_scribd_file">Click On Me</a>'
       )
     })
 
@@ -184,9 +182,7 @@ describe('contentInsertion', () => {
 
       it('uses the anchor text', () => {
         contentInsertion.insertLink(editor, link)
-        expect(editor.content).toEqual(
-          '<a href="/some/path?wrap=1" title="Here Be Links">anchor text</a>'
-        )
+        expect(editor.content).toEqual('<a href="/some/path" title="Here Be Links">anchor text</a>')
       })
 
       describe('with "forceRename" set to "true"', () => {
@@ -195,7 +191,7 @@ describe('contentInsertion', () => {
         it('uses the link "text"', () => {
           contentInsertion.insertLink(editor, link)
           expect(editor.content).toEqual(
-            '<a href="/some/path?wrap=1" title="Here Be Links">Click On Me</a>'
+            '<a href="/some/path" title="Here Be Links">Click On Me</a>'
           )
         })
       })
@@ -205,7 +201,7 @@ describe('contentInsertion', () => {
       link.embed = {noPreview: true}
       contentInsertion.insertLink(editor, link)
       expect(editor.content).toEqual(
-        '<a href="/some/path?wrap=1" title="Here Be Links" class="instructure_file_link no_preview">Click On Me</a>'
+        '<a href="/some/path" title="Here Be Links" class="instructure_file_link no_preview">Click On Me</a>'
       )
     })
 
@@ -214,7 +210,7 @@ describe('contentInsertion', () => {
       link.class = 'instructure_file_link foo'
       contentInsertion.insertLink(editor, link)
       expect(editor.content).toEqual(
-        '<a href="/some/path?wrap=1" title="Here Be Links" data-canvas-previewable="true" class="instructure_file_link foo">Click On Me</a>'
+        '<a href="/some/path" title="Here Be Links" data-canvas-previewable="true" class="instructure_file_link foo">Click On Me</a>'
       )
     })
 
@@ -223,7 +219,7 @@ describe('contentInsertion', () => {
       link['data-course-type'] = 'wikiPages'
       contentInsertion.insertLink(editor, link)
       expect(editor.content).toEqual(
-        '<a href="/some/path?wrap=1" title="Here Be Links" data-course-type="wikiPages" data-published="true">Click On Me</a>'
+        '<a href="/some/path" title="Here Be Links" data-course-type="wikiPages" data-published="true">Click On Me</a>'
       )
     })
 
@@ -263,9 +259,7 @@ describe('contentInsertion', () => {
       link.href = undefined
       link.url = '/other/path'
       contentInsertion.insertLink(editor, link)
-      expect(editor.content).toEqual(
-        '<a href="/other/path?wrap=1" title="Here Be Links">Click On Me</a>'
-      )
+      expect(editor.content).toEqual('<a href="/other/path" title="Here Be Links">Click On Me</a>')
     })
 
     it('cleans a url with no protocol', () => {
@@ -455,7 +449,7 @@ describe('contentInsertion', () => {
       editor.dom.$ = elem => {
         return {
           is: () => {
-            const item = HTMLCollection.prototype.isPrototypeOf(elem) ? elem[0] : item
+            const item = HTMLCollection.prototype.isPrototypeOf(elem) ? elem[0] : null
             return !!item && item.tagName === 'IMG'
           },
         }
