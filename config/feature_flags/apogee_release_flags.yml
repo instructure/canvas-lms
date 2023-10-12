@@ -306,3 +306,13 @@ external_tools_for_a2:
       state: allowed_on # enable for automated testing builds and local testing
     development:
       state: allowed_on # enable for local development
+archived_grading_schemes:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Archived Grading Schemes
+  description: Users can now archive grading schemes, preventing them from being added to courses/assignments. Grading schemes in old contexts where it is being used will continue being used. Archived grading schemes can be accessed on the account level grading scheme settings page, but cannot be edited or deleted.
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
