@@ -227,7 +227,6 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
     let(:top_level_items) do
       [{ type: "course_settings", property: "copy[all_course_settings]", title: "Course Settings" },
        { type: "syllabus_body", property: "copy[all_syllabus_body]", title: "Syllabus Body" },
-       { type: "blueprint_settings", property: "copy[all_blueprint_settings]", title: "Blueprint Settings" },
        { type: "context_modules", property: "copy[all_context_modules]", title: "Modules", count: 1, sub_items_url: "https://example.com?type=context_modules" },
        { type: "tool_profiles", property: "copy[all_tool_profiles]", title: "Tool Profiles", count: 1, sub_items_url: "https://example.com?type=tool_profiles" },
        { type: "discussion_topics", property: "copy[all_discussion_topics]", title: "Discussion Topics", count: 1, sub_items_url: "https://example.com?type=discussion_topics" },
@@ -267,6 +266,16 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
       expect(formatter.get_content_list("attachments").length).to eq 1
       expect(formatter.get_content_list("discussion_topics").length).to eq 1
       expect(formatter.get_content_list("announcements").length).to eq 1
+    end
+
+    it "lists blueprint_settings when appropriate" do
+      allow(@migration).to receive(:context).and_return(course_model)
+      allow(MasterCourses::MasterTemplate).to receive(:is_master_course?).and_return(true)
+      expect(formatter.get_content_list).to include({
+                                                      property: "copy[all_blueprint_settings]",
+                                                      title: "Blueprint Settings",
+                                                      type: "blueprint_settings"
+                                                    })
     end
 
     context "with selectable_outcomes_in_course_copy disabled" do
@@ -369,8 +378,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
 
       it "ignores in top-level list" do
         expect(formatter.get_content_list).to eq [{ type: "course_settings", property: "copy[all_course_settings]", title: "Course Settings" },
-                                                  { type: "syllabus_body", property: "copy[all_syllabus_body]", title: "Syllabus Body" },
-                                                  { type: "blueprint_settings", property: "copy[all_blueprint_settings]", title: "Blueprint Settings" }]
+                                                  { type: "syllabus_body", property: "copy[all_syllabus_body]", title: "Syllabus Body" }]
       end
 
       it "ignores in specific item request" do
