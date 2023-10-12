@@ -21,7 +21,7 @@ require_relative "../common"
 require_relative "../helpers/calendar2_common"
 require_relative "page_objects/new_course_copy_page"
 require_relative "page_objects/new_content_migration_page"
-describe "course copy", skip: "Not Implemented" do
+describe "course copy" do
   include_context "in-process server selenium tests"
   include Calendar2Common
 
@@ -49,7 +49,7 @@ describe "course copy", skip: "Not Implemented" do
     @course.save!
     get "/courses/#{@course.id}/copy"
     expect_new_page_load { CourseCopyPage.create_course_button.click }
-    expect(ContentMigrationPage.progress_status_label.text.include?("Queued")).to be(true)
+    expect(ContentMigrationPage.progress_status_label.text.include?("RUNNING")).to be(true)
     run_jobs
     wait_for_ajaximations
     wait_for_migration_to_complete

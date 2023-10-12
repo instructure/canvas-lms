@@ -21,11 +21,6 @@ class CourseCopyPage
   class << self
     include SeleniumDependencies
 
-    # CSS
-    def migration_type_dropdown_id
-      "#Select_0"
-    end
-
     # Selectors
     def header
       f("#breadcrumbs .home + li a")
@@ -93,6 +88,10 @@ class CourseCopyPage
 
     def migration_type_options
       ff("#Selectable_0-list > li")
+    end
+
+    def migration_type_options_values
+      ff("#Selectable_0-list > li > span")
     end
 
     def cancel_copy_button
