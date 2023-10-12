@@ -223,6 +223,22 @@ module Canvas::LiveEventsCallbacks
     end
   end
 
+  # Exercise caution when triggering events using after_save callback
+  # it will run for both creating and updating an object
+  def self.after_save(obj)
+    case obj
+    # RubricAssessment events must be triggered on after_save.
+    # RubricAssessments are simply versioned meaning the object
+    # is updated when subsequent assessments are made by an
+    # an instructor. This means the event should trigger after a
+    # record is created and after it is updated.
+    when RubricAssessment
+      if obj.active_rubric_association?
+        Canvas::LiveEvents.rubric_assessed(obj)
+      end
+    end
+  end
+
   def self.attachment_eligible?(attachment)
     # We only send live events for attachments that would show up in Files
     # sections of Canvas.
