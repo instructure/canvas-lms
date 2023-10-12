@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useState, useRef} from 'react'
+import React, {useCallback, useEffect, useState, useRef, ReactElement} from 'react'
 import {ProgressBar} from '@instructure/ui-progress'
 import {Text} from '@instructure/ui-text'
 import doFetchApi from '@canvas/do-fetch-api-effect'
@@ -42,9 +42,15 @@ type CompletionProgressResponse = {
   url: string
 }
 
-type CompletionProgressBarProps = {progress_url: string}
+type CompletionProgressBarProps = {
+  progress_url: string
+  onProgressFinish?: () => void
+}
 
-export const CompletionProgressBar = ({progress_url}: CompletionProgressBarProps) => {
+export const CompletionProgressBar = ({
+  progress_url,
+  onProgressFinish,
+}: CompletionProgressBarProps) => {
   const [response, setResponse] = useState<CompletionProgressResponse | null>(null)
   const fetchIntervalRef = useRef<any>(null)
 
@@ -70,9 +76,10 @@ export const CompletionProgressBar = ({progress_url}: CompletionProgressBarProps
   useEffect(() => {
     // Stop fetching when response returned completed or failed
     if (response && ['completed', 'failed'].includes(response.workflow_state)) {
+      onProgressFinish?.()
       clearInterval(fetchIntervalRef.current)
     }
-  }, [response])
+  }, [response, onProgressFinish])
 
   // Renders null the first time until we get the response
   if (
@@ -97,19 +104,24 @@ export const CompletionProgressBar = ({progress_url}: CompletionProgressBarProps
 
 export const buildProgressCellContent = (
   {id, workflow_state, migration_issues_count, progress_url}: ContentMigrationItem,
-  onContentSelectionSubmit: () => void
+  onReloadMigrationItem: () => void
 ) => {
   const courseId = ENV.COURSE_ID
   if (['failed', 'completed'].includes(workflow_state) && migration_issues_count > 0) {
     return <Text>{I18n.t('%{count} issues', {count: migration_issues_count})}</Text>
+  } else if (workflow_state === 'running') {
+    return (
+      <CompletionProgressBar progress_url={progress_url} onProgressFinish={onReloadMigrationItem} />
+    )
   } else if (courseId && workflow_state === 'waiting_for_select') {
     return (
       <ContentSelectionModal
         courseId={courseId}
         migrationId={id}
-        onSubmit={onContentSelectionSubmit}
+        onSubmit={onReloadMigrationItem}
       />
     )
   }
-  return <CompletionProgressBar progress_url={progress_url} />
+  // Return null for pre_processing
+  return null
 }
