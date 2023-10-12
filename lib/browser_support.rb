@@ -30,6 +30,10 @@ BrowserSupport = Struct.new(:browser, :version) do
       true # if we don't recognize it (e.g. Android), be nice
     end
 
+    def safari?(user_agent)
+      Browser.new(user_agent).safari?
+    end
+
     def configuration
       @configuration ||= YAML.load_file(File.expand_path("../config/browsers.yml", __dir__))
     end
