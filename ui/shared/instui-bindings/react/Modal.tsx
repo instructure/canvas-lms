@@ -66,6 +66,7 @@ function CanvasModal({
       <Modal.Header>
         <Heading>{title}</Heading>
         <CloseButton
+          data-instui-modal-close-button="true"
           onClick={onDismiss}
           size={closeButtonSize}
           screenReaderLabel={I18n.t('Close')}
