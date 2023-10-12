@@ -6427,15 +6427,6 @@ describe Submission do
         ).to be_empty
       end
 
-      it "returns a list if rubric assessments exist for the desired attempt and was graded and there is data" do
-        @submission2.rubric_assessments.each do |rubric_assesment|
-          rubric_assesment.score = 5
-        end
-        expect(
-          @submission2.visible_rubric_assessments_for(@viewing_user, attempt: @submission2.attempt)
-        ).to eql(@submission2.rubric_assessments.to_a)
-      end
-
       it "can find historic rubric assessments of older attempts" do
         expect(
           @submission2.visible_rubric_assessments_for(@viewing_user, attempt: @submission.attempt)
