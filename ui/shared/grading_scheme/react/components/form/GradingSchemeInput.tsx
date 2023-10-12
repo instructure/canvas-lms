@@ -41,7 +41,6 @@ export interface ComponentProps {
     points: GradingSchemeEditableData
   }
   onSave: (updatedGradingSchemeData: GradingSchemeEditableData) => any
-  pointsBasedGradingSchemesFeatureEnabled: boolean
   schemeInputType: 'percentage' | 'points'
   archivedGradingSchemesEnabled?: boolean
 }
@@ -70,13 +69,7 @@ export type GradingSchemeInputHandle = {
 
 export const GradingSchemeInput = React.forwardRef<GradingSchemeInputHandle, ComponentProps>(
   (
-    {
-      initialFormDataByInputType,
-      schemeInputType,
-      onSave,
-      pointsBasedGradingSchemesFeatureEnabled,
-      archivedGradingSchemesEnabled = false,
-    },
+    {initialFormDataByInputType, schemeInputType, onSave, archivedGradingSchemesEnabled = false},
     ref
   ) => {
     interface GradingSchemeInputState {
@@ -354,22 +347,18 @@ export const GradingSchemeInput = React.forwardRef<GradingSchemeInputHandle, Com
                   placeholder={I18n.t('New Grading Scheme')}
                 />
               </Flex.Item>
-              {pointsBasedGradingSchemesFeatureEnabled ? (
-                <Flex.Item padding="none none small x-small" margin="small none none none">
-                  <RadioInputGroup
-                    layout="columns"
-                    name={`pointsBased_${shortid()}`}
-                    defaultValue={formState.pointsBased ? 'points' : 'percentage'}
-                    description={I18n.t('Grade by')}
-                    onChange={(event: any, newValue: string) => handlePointsBasedChanged(newValue)}
-                  >
-                    <RadioInput value="percentage" label={I18n.t('Percentage')} />
-                    <RadioInput value="points" label={I18n.t('Points')} />
-                  </RadioInputGroup>
-                </Flex.Item>
-              ) : (
-                <></>
-              )}
+              <Flex.Item padding="none none small x-small" margin="small none none none">
+                <RadioInputGroup
+                  layout="columns"
+                  name={`pointsBased_${shortid()}`}
+                  defaultValue={formState.pointsBased ? 'points' : 'percentage'}
+                  description={I18n.t('Grade by')}
+                  onChange={(event: any, newValue: string) => handlePointsBasedChanged(newValue)}
+                >
+                  <RadioInput value="percentage" label={I18n.t('Percentage')} />
+                  <RadioInput value="points" label={I18n.t('Points')} />
+                </RadioInputGroup>
+              </Flex.Item>
             </Flex>
           </View>
           <table style={{width: '100%'}}>

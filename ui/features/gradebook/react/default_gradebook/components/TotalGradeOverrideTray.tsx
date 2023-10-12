@@ -55,7 +55,6 @@ export type TotalGradeOverrideTrayProps = {
   selectedGradingPeriodId?: string
   navigateDown: () => void
   navigateUp: () => void
-  pointsBasedGradingSchemesFeatureEnabled: boolean
 }
 
 export function TotalGradeOverrideTrayProvider(props: TotalGradeOverrideTrayProps) {
@@ -73,7 +72,6 @@ export function TotalGradeOverrideTray({
   handleOnGradeChange,
   navigateDown,
   navigateUp,
-  pointsBasedGradingSchemesFeatureEnabled,
 }: TotalGradeOverrideTrayProps) {
   const {finalGradeOverrideTrayProps, toggleFinalGradeOverrideTray, finalGradeOverrides} =
     useStore()
@@ -211,7 +209,6 @@ export function TotalGradeOverrideTray({
               onGradeChange={newGrade => {
                 handleOnGradeChange(studentId, newGrade)
               }}
-              pointsBasedGradingSchemesFeatureEnabled={pointsBasedGradingSchemesFeatureEnabled}
               finalGradeOverride={studentFinalGradeOverrides}
               gradingPeriodId={gradingPeriodId}
               gradingScheme={gradeEntry?.gradingScheme}

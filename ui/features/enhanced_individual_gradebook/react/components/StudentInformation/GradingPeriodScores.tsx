@@ -28,7 +28,6 @@ type Props = {
   }
   gradingPeriodSet: GradingPeriodSet
   gradingScheme?: DeprecatedGradingScheme | null
-  pointsBasedGradingSchemesFeatureEnabled: boolean
   includeUngradedAssignments: boolean
 }
 export function GradingPeriodScores({
@@ -36,7 +35,6 @@ export function GradingPeriodScores({
   gradingPeriods,
   gradingPeriodSet,
   gradingScheme,
-  pointsBasedGradingSchemesFeatureEnabled,
   includeUngradedAssignments,
 }: Props) {
   const matchingGradingPeriod = gradingPeriodSet.grading_periods.find(
@@ -57,7 +55,6 @@ export function GradingPeriodScores({
   return (
     <RowScore
       gradingScheme={gradingScheme}
-      pointsBasedGradingSchemesFeatureEnabled={pointsBasedGradingSchemesFeatureEnabled}
       name={title}
       possible={possible}
       score={score}

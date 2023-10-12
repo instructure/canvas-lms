@@ -35,7 +35,7 @@ import round from '@canvas/round'
 import numberHelper from '@canvas/i18n/numberHelper'
 import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
 import {scopeToUser} from '@canvas/grading/EffectiveDueDates'
-import {scoreToGrade, scoreToLetterGrade} from '@instructure/grading-utils'
+import {scoreToLetterGrade} from '@instructure/grading-utils'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import StatusPill from '@canvas/grading-status-pill'
 import GradeSummaryManager from '../react/GradeSummary/GradeSummaryManager'
@@ -392,11 +392,7 @@ function calculateSubtotals(byGradingPeriod, calculatedGrades, currentOrFinal) {
         grade = {score: 0, possible: 0}
       }
       let subtotal
-      if (
-        ENV.POINTS_BASED_GRADING_SCHEMES_ENABLED &&
-        ENV.course_active_grading_scheme &&
-        ENV.course_active_grading_scheme.points_based
-      ) {
+      if (ENV.course_active_grading_scheme && ENV.course_active_grading_scheme.points_based) {
         const scoreText = I18n.n(grade.score, {precision: round.DEFAULT})
         const possibleText = I18n.n(grade.possible, {precision: round.DEFAULT})
 
@@ -477,22 +473,14 @@ function calculateTotals(calculatedGrades, currentOrFinal, groupWeightingScheme)
       ? ENV.effective_final_score
       : calculatePercentGrade(finalScore, finalPossible)
 
-    let letterGrade
-    if (ENV.POINTS_BASED_GRADING_SCHEMES_ENABLED) {
-      letterGrade =
-        scoreToLetterGrade(scoreToUse, ENV.course_active_grading_scheme?.data) || I18n.t('N/A')
-    } else {
-      letterGrade = scoreToGrade(scoreToUse, ENV.grading_scheme) || I18n.t('N/A')
-    }
+    const grading_scheme = ENV.course_active_grading_scheme?.data
+    const letterGrade = scoreToLetterGrade(scoreToUse, grading_scheme) || I18n.t('N/A')
+
     $('.final_grade .letter_grade').text(GradeFormatHelper.replaceDashWithMinus(letterGrade))
   }
 
   if (!gradeChanged && overrideScorePresent()) {
-    if (
-      ENV.POINTS_BASED_GRADING_SCHEMES_ENABLED &&
-      gradingSchemeEnabled() &&
-      ENV.course_active_grading_scheme.points_based
-    ) {
+    if (gradingSchemeEnabled() && ENV.course_active_grading_scheme?.points_based) {
       const scaledPointsPossible = ENV.course_active_grading_scheme.scaling_factor
       const scaledPointsOverride = scoreToScaledPoints(
         (ENV.effective_final_score / 100.0) * finalPossible,
@@ -505,11 +493,7 @@ function calculateTotals(calculatedGrades, currentOrFinal, groupWeightingScheme)
       finalGrade = formatPercentGrade(ENV.effective_final_score)
       teaserText = scoreAsPoints
     }
-  } else if (
-    ENV.POINTS_BASED_GRADING_SCHEMES_ENABLED &&
-    gradingSchemeEnabled() &&
-    ENV.course_active_grading_scheme.points_based
-  ) {
+  } else if (gradingSchemeEnabled() && ENV.course_active_grading_scheme?.points_based) {
     const scaledPointsEarned = scoreToScaledPoints(
       finalScore,
       finalPossible,
@@ -560,14 +544,7 @@ function calculateTotals(calculatedGrades, currentOrFinal, groupWeightingScheme)
 // This element is only rendered by the erb if the course has enabled grading
 // schemes.
 function gradingSchemeEnabled() {
-  if (ENV.POINTS_BASED_GRADING_SCHEMES_ENABLED) {
-    return ENV.course_active_grading_scheme
-  } else {
-    // We can't rely on only checking for the presence of
-    // ENV.grading_scheme as that, in this case, always returns Canvas's default
-    // grading scheme even if grading schemes are not enabled.
-    return $('.final_grade .letter_grade').length > 0 && ENV.grading_scheme
-  }
+  return ENV.course_active_grading_scheme
 }
 
 function overrideScorePresent() {

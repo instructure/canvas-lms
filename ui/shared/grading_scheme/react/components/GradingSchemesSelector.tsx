@@ -45,7 +45,6 @@ interface ComponentProps {
   contextId: string
   courseDefaultSchemeId?: string
   initiallySelectedGradingSchemeId?: string
-  pointsBasedGradingSchemesEnabled: boolean
   archivedGradingSchemesEnabled: boolean
   onChange: (gradingStandardId?: string) => any
 }
@@ -56,7 +55,6 @@ export const GradingSchemesSelector = ({
   contextType,
   contextId,
   courseDefaultSchemeId,
-  pointsBasedGradingSchemesEnabled,
   archivedGradingSchemesEnabled,
 }: ComponentProps) => {
   if (initiallySelectedGradingSchemeId === '0' || initiallySelectedGradingSchemeId === '') {
@@ -258,7 +256,6 @@ export const GradingSchemesSelector = ({
                 onCancel={closeGradingSchemeViewEditModal}
                 onUpdate={handleUpdatedGradingScheme}
                 onDelete={() => handleDeletedGradingScheme(selectedGradingSchemeId)}
-                pointsBasedGradingSchemesEnabled={pointsBasedGradingSchemesEnabled}
                 archivedGradingSchemesEnabled={archivedGradingSchemesEnabled}
               />
             ) : courseDefaultSchemeId && courseDefaultSchemeId !== '0' ? (
@@ -269,7 +266,6 @@ export const GradingSchemesSelector = ({
                 onCancel={closeGradingSchemeViewEditModal}
                 onUpdate={handleUpdatedGradingScheme}
                 onDelete={() => handleDeletedGradingScheme(courseDefaultSchemeId)}
-                pointsBasedGradingSchemesEnabled={pointsBasedGradingSchemesEnabled}
                 archivedGradingSchemesEnabled={archivedGradingSchemesEnabled}
               />
             ) : (
@@ -279,7 +275,6 @@ export const GradingSchemesSelector = ({
                 contextType={contextType}
                 onCancel={closeGradingSchemeViewEditModal}
                 onCreate={handleCreatedGradingScheme}
-                pointsBasedGradingSchemesEnabled={pointsBasedGradingSchemesEnabled}
               />
             )}
           </>
@@ -309,7 +304,6 @@ export const GradingSchemesSelector = ({
                   contextId={contextId}
                   contextType={contextType}
                   onGradingSchemesChanged={handleGradingSchemesChanged}
-                  pointsBasedGradingSchemesEnabled={pointsBasedGradingSchemesEnabled}
                   archivedGradingSchemesEnabled={archivedGradingSchemesEnabled}
                 />
               </>

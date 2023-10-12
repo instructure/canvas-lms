@@ -91,10 +91,6 @@ describe('GradebookGrid TotalGradeOverrideCellPropFactory', () => {
           return gradingScheme
         },
 
-        pointsBasedGradingSchemesFeatureEnabled() {
-          return gradingScheme
-        },
-
         gradebookGrid: {
           updateRowCell: sinon.stub(),
         },

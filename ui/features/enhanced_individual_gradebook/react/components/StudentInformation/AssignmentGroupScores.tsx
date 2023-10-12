@@ -30,14 +30,12 @@ type Props = {
   assignmentGroups: AssignmentGroupGradeMap
   includeUngradedAssignments: boolean
   gradingScheme?: DeprecatedGradingScheme | null
-  pointsBasedGradingSchemesFeatureEnabled: boolean
 }
 export function AssignmentGroupScores({
   assignmentGroupId,
   assignmentGroupMap,
   assignmentGroups,
   gradingScheme,
-  pointsBasedGradingSchemesFeatureEnabled,
   includeUngradedAssignments,
 }: Props) {
   const {name: groupName, group_weight} = assignmentGroupMap[assignmentGroupId]
@@ -48,7 +46,6 @@ export function AssignmentGroupScores({
   return (
     <RowScore
       gradingScheme={gradingScheme}
-      pointsBasedGradingSchemesFeatureEnabled={pointsBasedGradingSchemesFeatureEnabled}
       name={groupName}
       possible={possible}
       score={score}

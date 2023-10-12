@@ -42,7 +42,6 @@ describe('Grading Schemes View Edit Tests', () => {
         contextId="1"
         contextType="Course"
         gradingSchemeId="1"
-        pointsBasedGradingSchemesEnabled={true}
         archivedGradingSchemesEnabled={false}
         onCancel={() => {}}
         onUpdate={() => {}}

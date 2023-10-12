@@ -27,7 +27,6 @@ describe AccountGradingSettingsController, type: :request do
     before(:once) do
       @root_account = Account.default
       @admin = account_admin_user(account: @root_account)
-      Account.site_admin.enable_feature!(:points_based_grading_schemes)
     end
 
     it "grants access to account admins" do
@@ -43,13 +42,6 @@ describe AccountGradingSettingsController, type: :request do
     end
 
     describe "js_env variables" do
-      it "POINTS_BASED_GRADING_SCHEMES_ENABLED is true when points_based_grading_schemes ff is on" do
-        user_session(@admin)
-        get "/accounts/#{@root_account.id}/grading_settings"
-        expect(response).to be_successful
-        expect((controller.js_env[:POINTS_BASED_GRADING_SCHEMES_ENABLED] || [])).to be(true)
-      end
-
       context "when the account is a root account" do
         it "IS_ROOT_ACCOUNT is true" do
           user_session(@admin)

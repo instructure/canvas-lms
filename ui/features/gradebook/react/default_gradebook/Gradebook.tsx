@@ -4219,8 +4219,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   getCourseGradingScheme = (): DeprecatedGradingScheme | null =>
     this.courseContent.courseGradingScheme
 
-  pointsBasedGradingSchemesFeatureEnabled = () => !!ENV.POINTS_BASED_GRADING_SCHEMES_ENABLED
-
   getDefaultGradingScheme = () => this.courseContent.defaultGradingScheme
 
   getGradingScheme = (gradingSchemeId: string | null): DeprecatedGradingScheme | undefined =>
@@ -5180,7 +5178,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
               this.gradebookGrid?.grid?.navigateUp()
               this.gradebookGrid?.gridSupport?.helper.commitCurrentEdit()
             }}
-            pointsBasedGradingSchemesFeatureEnabled={!!ENV.POINTS_BASED_GRADING_SCHEMES_ENABLED}
             selectedGradingPeriodId={this.gradingPeriodId}
           />
         )}

@@ -58,7 +58,6 @@ function render(assignmentGroupCellData: AssignmentGroupCellData) {
 }
 
 type Getters = {
-  pointsBasedGradingSchemesFeatureEnabled(): boolean
   getCourseGradingScheme(): DeprecatedGradingScheme | null
 }
 
@@ -67,9 +66,6 @@ export default class AssignmentGroupCellFormatter {
 
   constructor(gradebook: Gradebook) {
     this.options = {
-      pointsBasedGradingSchemesFeatureEnabled(): boolean {
-        return gradebook.pointsBasedGradingSchemesFeatureEnabled()
-      },
       getCourseGradingScheme(): DeprecatedGradingScheme | null {
         return gradebook.getCourseGradingScheme()
       },
@@ -91,20 +87,18 @@ export default class AssignmentGroupCellFormatter {
     let scaledScore = NaN
     let scaledPossible = NaN
 
-    if (this.options.pointsBasedGradingSchemesFeatureEnabled()) {
-      const scheme = this.options.getCourseGradingScheme()
-      if (scheme) {
-        displayAsScaledPoints = scheme.pointsBased
-        const scalingFactor = scheme.scalingFactor
+    const scheme = this.options.getCourseGradingScheme()
+    if (scheme) {
+      displayAsScaledPoints = scheme.pointsBased
+      const scalingFactor = scheme.scalingFactor
 
-        if (displayAsScaledPoints && value.possible) {
-          scaledPossible = I18n.n(scalingFactor, {
-            precision: 1,
-          })
-          scaledScore = I18n.n(scoreToScaledPoints(value.score, value.possible, scalingFactor), {
-            precision: 1,
-          })
-        }
+      if (displayAsScaledPoints && value.possible) {
+        scaledPossible = I18n.n(scalingFactor, {
+          precision: 1,
+        })
+        scaledScore = I18n.n(scoreToScaledPoints(value.score, value.possible, scalingFactor), {
+          precision: 1,
+        })
       }
     }
 

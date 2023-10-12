@@ -54,7 +54,6 @@ const renderTextBox = (props: Partial<FinalGradeOverrideTextBoxProps> = {}) => {
     gradingScheme,
     finalGradeOverride: finalGradeOverrides,
     onGradeChange: mockedOnGradeChange,
-    pointsBasedGradingSchemesFeatureEnabled: false,
   }
   return render(<FinalGradeOverrideTextBox {...defaultProps} {...props} />)
 }

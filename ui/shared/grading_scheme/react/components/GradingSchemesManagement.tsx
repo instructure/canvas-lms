@@ -65,7 +65,6 @@ export interface GradingSchemesManagementProps {
   contextId: string
   contextType: 'Account' | 'Course'
   onGradingSchemesChanged?: () => any
-  pointsBasedGradingSchemesEnabled: boolean
   archivedGradingSchemesEnabled: boolean
 }
 
@@ -73,7 +72,6 @@ export const GradingSchemesManagement = ({
   contextType,
   contextId,
   onGradingSchemesChanged,
-  pointsBasedGradingSchemesEnabled,
   archivedGradingSchemesEnabled,
 }: GradingSchemesManagementProps) => {
   const {createGradingScheme /* createGradingSchemeStatus */} = useGradingSchemeCreate()
@@ -355,7 +353,6 @@ export const GradingSchemesManagement = ({
                         pointsBased: true,
                       },
                     }}
-                    pointsBasedGradingSchemesFeatureEnabled={pointsBasedGradingSchemesEnabled}
                     onSave={handleCreateScheme}
                     archivedGradingSchemesEnabled={archivedGradingSchemesEnabled}
                   />
@@ -416,7 +413,6 @@ export const GradingSchemesManagement = ({
                 handleClose={() => setSelectedGradingScheme(undefined)}
                 handleGradingSchemeDelete={handleGradingSchemeDelete}
                 editGradingScheme={editGradingScheme}
-                pointsBasedGradingSchemesEnabled={pointsBasedGradingSchemesEnabled}
                 canManageScheme={canManageScheme}
               />
               <GradingSchemeEditModal
@@ -426,14 +422,12 @@ export const GradingSchemesManagement = ({
                 handleUpdateScheme={handleUpdateScheme}
                 defaultGradingSchemeTemplate={defaultGradingScheme}
                 defaultPointsGradingScheme={defaultPointsGradingScheme}
-                pointsBasedGradingSchemesEnabled={pointsBasedGradingSchemesEnabled}
                 archivedGradingSchemesEnabled={archivedGradingSchemesEnabled}
                 handleGradingSchemeDelete={handleGradingSchemeDelete}
               />
               <GradingSchemeCreateModal
                 open={!!gradingSchemeCreating}
                 handleCreateScheme={handleCreateScheme}
-                pointsBasedGradingSchemesEnabled={pointsBasedGradingSchemesEnabled}
                 archivedGradingSchemesEnabled={archivedGradingSchemesEnabled}
                 defaultGradingSchemeTemplate={defaultGradingScheme}
                 defaultPointsGradingScheme={defaultPointsGradingScheme}
@@ -478,7 +472,6 @@ export const GradingSchemesManagement = ({
                           },
                         }}
                         ref={gradingSchemeUpdateRef}
-                        pointsBasedGradingSchemesFeatureEnabled={pointsBasedGradingSchemesEnabled}
                         archivedGradingSchemesEnabled={archivedGradingSchemesEnabled}
                         onSave={modifiedGradingScheme =>
                           handleUpdateScheme(
@@ -511,7 +504,6 @@ export const GradingSchemesManagement = ({
                     <View display="block">
                       <GradingSchemeView
                         gradingScheme={gradingSchemeCard.gradingScheme}
-                        pointsBasedGradingSchemesEnabled={pointsBasedGradingSchemesEnabled}
                         archivedGradingSchemesEnabled={archivedGradingSchemesEnabled}
                         disableDelete={!canManageScheme(gradingSchemeCard.gradingScheme)}
                         disableEdit={!canManageScheme(gradingSchemeCard.gradingScheme)}

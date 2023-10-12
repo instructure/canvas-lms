@@ -59,25 +59,22 @@ const AssignmentSubtotalGradesComponent = Ember.Component.extend({
   percent: function () {
     let scoreText = I18n.n(round(this.get('rawPercent'), round.DEFAULT), {percentage: true})
 
-    if (this.get('pointsBasedGradingSchemesFeatureEnabled')) {
-      if (this.get('gradingStandard') && this.get('gradingStandardPointsBased')) {
-        const scalingFactor = this.get('gradingStandardScalingFactor')
-        const values = this.get('values')
-        if (values.possible) {
-          const scaledPossible = I18n.n(scalingFactor, {
+    if (this.get('gradingStandard') && this.get('gradingStandardPointsBased')) {
+      const scalingFactor = this.get('gradingStandardScalingFactor')
+      const values = this.get('values')
+      if (values.possible) {
+        const scaledPossible = I18n.n(scalingFactor, {
+          precision: 1,
+        })
+        const scaledScore = I18n.n(
+          scoreToScaledPoints(values.score, values.possible, scalingFactor),
+          {
             precision: 1,
-          })
-          const scaledScore = I18n.n(
-            scoreToScaledPoints(values.score, values.possible, scalingFactor),
-            {
-              precision: 1,
-            }
-          )
-          scoreText = `${scaledScore} / ${scaledPossible}`
-        }
+          }
+        )
+        scoreText = `${scaledScore} / ${scaledPossible}`
       }
     }
-
     return scoreText
   }.property('values'),
 

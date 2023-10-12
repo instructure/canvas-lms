@@ -138,7 +138,7 @@ export default class GradeOverrideEntry extends GradeEntry {
       }
       valid = true
       // points based grading scheme
-    } else if (this.options.pointsBasedGradingSchemesFeatureEnabled && gradingScheme?.pointsBased) {
+    } else if (gradingScheme?.pointsBased) {
       // entered percentage or is from backend which should be treated as percentage
       if (parseResult.isPercentage || !inputByUser) {
         enteredAs = EnterGradesAs.PERCENTAGE
@@ -164,6 +164,18 @@ export default class GradeOverrideEntry extends GradeEntry {
         schemeKey: schemeKeyForPercentage(parseResult.value, gradingScheme),
       }
       valid = true
+      if (gradingScheme && gradingScheme.pointsBased) {
+        // points based scheme
+        if (inputByUser) {
+          // don't allow user to input percents or points for points based scheme
+          valid = false
+        } else {
+          // the initial (ie, saved to server value) in percent format is valid
+          valid = true
+        }
+      } else {
+        valid = true
+      }
     }
 
     if (grade != null) {

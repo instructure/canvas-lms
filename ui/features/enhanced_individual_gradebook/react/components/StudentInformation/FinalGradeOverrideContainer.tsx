@@ -32,7 +32,6 @@ type Props = {
   enrollmentId: string
   onSubmit: (finalGradeOverride: FinalGradeOverride) => void
   gradingPeriodId?: string
-  pointsBasedGradingSchemesFeatureEnabled: boolean
 }
 function FinalGradeOverrideContainer({
   finalGradeOverride,
@@ -40,7 +39,6 @@ function FinalGradeOverrideContainer({
   enrollmentId,
   onSubmit,
   gradingPeriodId,
-  pointsBasedGradingSchemesFeatureEnabled,
 }: Props) {
   const [apiCallStatus, setApiCallStatus] = useState<ApiCallStatus>(ApiCallStatus.NOT_STARTED)
 
@@ -81,7 +79,6 @@ function FinalGradeOverrideContainer({
         finalGradeOverride={finalGradeOverride}
         gradingScheme={gradingScheme}
         gradingPeriodId={gradingPeriodId}
-        pointsBasedGradingSchemesFeatureEnabled={pointsBasedGradingSchemesFeatureEnabled}
         onGradeChange={handleFinalGradeOverrideChange}
         disabled={apiCallStatus === ApiCallStatus.PENDING}
         showPercentageLabel={true}

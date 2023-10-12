@@ -118,7 +118,6 @@ describe('GradeOverrideEntry', () => {
             scalingFactor: 4.0,
             title: 'A Points Based Grading Scheme',
           },
-          pointsBasedGradingSchemesFeatureEnabled: true,
         }
 
         const gradeOverrideEntry = new GradeOverrideEntry(gradeEntryOptions)
@@ -687,31 +686,6 @@ describe('GradeOverrideEntry', () => {
           expect(gradeInfoFromGrade({schemeKey: 'B-'}).valid).toBe(false)
         })
 
-        it('is set to true when the scheme is a points based grading scheme and the user inputs a number and returns the equivalent percentage', () => {
-          const gradeEntryOptions = {
-            gradingScheme: {
-              data: [
-                ['A', 0.9],
-                ['B', 0.8],
-                ['C', 0.7],
-                ['D', 0.6],
-                ['F', 0.5],
-              ],
-              id: 'some-id',
-              pointsBased: true,
-              scalingFactor: 10.0,
-              title: 'A Points Based Grading Scheme',
-            },
-            pointsBasedGradingSchemesFeatureEnabled: true,
-          }
-
-          const gradeOverrideEntry = new GradeOverrideEntry(gradeEntryOptions)
-          const res = gradeOverrideEntry.gradeInfoFromGrade({percentage: '9.7'}, true)
-          expect(res.valid).toBe(true)
-          expect(res.enteredAs).toBe(EnterGradesAs.POINTS)
-          expect(res.grade?.percentage).toBe(97)
-        })
-
         it('is set to true when the scheme is a points based grading scheme and the user inputs a percentage and returns the percentage and schemeKey', () => {
           const gradeEntryOptions = {
             gradingScheme: {
@@ -727,7 +701,6 @@ describe('GradeOverrideEntry', () => {
               scalingFactor: 4.0,
               title: 'A Points Based Grading Scheme',
             },
-            pointsBasedGradingSchemesFeatureEnabled: true,
           }
 
           const gradeOverrideEntry = new GradeOverrideEntry(gradeEntryOptions)
@@ -754,7 +727,6 @@ describe('GradeOverrideEntry', () => {
               scalingFactor: 4.0,
               title: 'A Points Based Grading Scheme',
             },
-            pointsBasedGradingSchemesFeatureEnabled: true,
           }
 
           const gradeOverrideEntry = new GradeOverrideEntry(gradeEntryOptions)

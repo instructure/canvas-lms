@@ -69,7 +69,6 @@ class GradebooksController < ApplicationController
              restrict_quantitative_data: @context.restrict_quantitative_data?(@current_user),
              student_grade_summary_upgrade: Account.site_admin.feature_enabled?(:student_grade_summary_upgrade),
              can_clear_badge_counts: Account.site_admin.grants_right?(@current_user, :manage_students),
-             POINTS_BASED_GRADING_SCHEMES_ENABLED: Account.site_admin.feature_enabled?(:points_based_grading_schemes),
              custom_grade_statuses: @context.custom_grade_statuses.as_json(include_root: false)
            })
     return render :grade_summary_list unless @presenter.student
@@ -189,31 +188,30 @@ class GradebooksController < ApplicationController
       outcome_service_results_to_canvas: outcome_service_results_to_canvas_enabled?
     }
 
-    if Account.site_admin.feature_enabled?(:points_based_grading_schemes)
-      course_active_grading_standard = if @context.grading_standard_id.nil?
-                                         nil
-                                       elsif @context.grading_standard_id == 0
+    course_active_grading_standard = if @context.grading_standard_id.nil?
+                                       if @context.restrict_quantitative_data?(@current_user)
                                          GradingSchemesJsonController.default_canvas_grading_standard(@context)
                                        else
-                                         standard = GradingStandard.for(@context).find_by(id: @context.grading_standard_id)
-                                         if standard.nil?
-                                           # course's grading standard was soft deleted. use canvas default scheme, since grading
-                                           # schemes are enabled for the course (or else course would have a nil grading standard id)
-                                           GradingSchemesJsonController.default_canvas_grading_standard(@context)
-                                         else
-                                           standard
-                                         end
+                                         nil
                                        end
-      course_active_grading_scheme = if course_active_grading_standard
-                                       GradingSchemesJsonController.to_grading_scheme_json(course_active_grading_standard, @current_user)
+                                     elsif @context.grading_standard_id == 0
+                                       GradingSchemesJsonController.default_canvas_grading_standard(@context)
                                      else
-                                       nil
+                                       standard = GradingStandard.for(@context).find_by(id: @context.grading_standard_id)
+                                       if standard.nil?
+                                         # course's grading standard was soft deleted. use canvas default scheme, since grading
+                                         # schemes are enabled for the course (or else course would have a nil grading standard id)
+                                         GradingSchemesJsonController.default_canvas_grading_standard(@context)
+                                       else
+                                         standard
+                                       end
                                      end
-      js_hash[:course_active_grading_scheme] = course_active_grading_scheme
-    else
-      # TODO: remove after points grading scheme feature flag is turned on globally
-      js_hash[:grading_scheme] = @context.grading_standard_or_default.data
-    end
+    course_active_grading_scheme = if course_active_grading_standard
+                                     GradingSchemesJsonController.to_grading_scheme_json(course_active_grading_standard, @current_user)
+                                   else
+                                     nil
+                                   end
+    js_hash[:course_active_grading_scheme] = course_active_grading_scheme
 
     # This really means "if the final grade override feature flag is enabled AND
     # the context in question has enabled the setting in the gradebook"
@@ -580,7 +578,6 @@ class GradebooksController < ApplicationController
     js_env({
              EMOJIS_ENABLED: @context.feature_enabled?(:submission_comment_emojis),
              EMOJI_DENY_LIST: @context.root_account.settings[:emoji_deny_list],
-             POINTS_BASED_GRADING_SCHEMES_ENABLED: Account.site_admin.feature_enabled?(:points_based_grading_schemes),
              GRADEBOOK_OPTIONS: gradebook_options
            })
   end
@@ -636,7 +633,6 @@ class GradebooksController < ApplicationController
     }
     js_env({
              GRADEBOOK_OPTIONS: gradebook_options,
-             POINTS_BASED_GRADING_SCHEMES_ENABLED: Account.site_admin.feature_enabled?(:points_based_grading_schemes),
            })
   end
 
@@ -754,7 +750,6 @@ class GradebooksController < ApplicationController
     js_env({
              GRADEBOOK_OPTIONS: gradebook_options,
              outcome_service_results_to_canvas: outcome_service_results_to_canvas_enabled?,
-             POINTS_BASED_GRADING_SCHEMES_ENABLED: Account.site_admin.feature_enabled?(:points_based_grading_schemes),
            })
   end
 
@@ -1402,19 +1397,11 @@ class GradebooksController < ApplicationController
   private
 
   def active_grading_standard_scaling_factor(grading_standard)
-    if Account.site_admin.feature_enabled?(:points_based_grading_schemes) && grading_standard
-      grading_standard.scaling_factor
-    else
-      1.0
-    end
+    grading_standard.scaling_factor
   end
 
   def active_grading_standard_points_based(grading_standard)
-    if Account.site_admin.feature_enabled?(:points_based_grading_schemes) && grading_standard
-      grading_standard.points_based
-    else
-      false
-    end
+    grading_standard.points_based
   end
 
   def gradebook_group_categories_json

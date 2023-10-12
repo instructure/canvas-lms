@@ -69,7 +69,6 @@ export default class TotalGradeOverrideCellFormatter {
   constructor(gradebook: Gradebook) {
     const gradeEntry = new GradeOverrideEntry({
       gradingScheme: gradebook.getCourseGradingScheme(),
-      pointsBasedGradingSchemesFeatureEnabled: gradebook.pointsBasedGradingSchemesFeatureEnabled(),
     })
 
     this.options = {

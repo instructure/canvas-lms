@@ -42,7 +42,6 @@ describe('TotalGradeOverrideTray Tests', () => {
       selectedGradingPeriodId: '0',
       navigateDown,
       navigateUp,
-      pointsBasedGradingSchemesFeatureEnabled: true,
       ...props,
     }
 
@@ -52,7 +51,6 @@ describe('TotalGradeOverrideTray Tests', () => {
   beforeEach(() => {
     const gradeEntry = new GradeOverrideEntry({
       gradingScheme: null,
-      pointsBasedGradingSchemesFeatureEnabled: true,
     })
 
     useStore.setState({
