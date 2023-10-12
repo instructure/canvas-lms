@@ -197,6 +197,18 @@ class DeveloperKeysApp extends React.Component {
     }
   }
 
+  tempSafariNoticeText() {
+    return I18n.t(
+      '*Note*: LTI Platform Storage is temporarily only available in Safari. See **the API docs** for details.',
+      {
+        wrappers: [
+          '<strong>$1</strong>',
+          '<a target="_blank" href="https://canvas.instructure.com/doc/api/file.lti_dev_key_config.html#cookie-less">$1</a>',
+        ],
+      }
+    )
+  }
+
   /**
    * Due to some annoying accessibility issues related to modal focus
    * returning and screenreader issues, we have to use a setTimeout here
@@ -242,7 +254,15 @@ class DeveloperKeysApp extends React.Component {
         </View>
         {ENV?.FEATURES?.dev_key_oidc_alert && (
           <div data-testid="OIDC_alert">
-            <Alert variant="info" margin="small">
+            <Alert
+              variant="warning"
+              margin="small"
+              renderCloseButtonLabel="Close"
+              transition="none"
+            >
+              <Text dangerouslySetInnerHTML={{__html: this.tempSafariNoticeText()}} />
+            </Alert>
+            <Alert variant="info" margin="small" renderCloseButtonLabel="Close" transition="none">
               {this.buildDevKeyOIDCText(ENV.FEATURES)}
             </Alert>
           </div>

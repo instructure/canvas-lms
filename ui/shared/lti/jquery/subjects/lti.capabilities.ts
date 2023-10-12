@@ -17,21 +17,23 @@
  */
 
 import {LtiMessageHandler} from '../lti_message_handler'
-import {SUBJECT_ALLOW_LIST} from '../messages'
+import {SUBJECT_ALLOW_LIST, isPlatformStorageSubject} from '../messages'
 
 const handler: LtiMessageHandler<unknown> = ({responseMessages}) => {
-  const useFrame = ENV?.FEATURES?.lti_platform_storage
+  const isPlatformStorageEnabled = ENV?.LTI_PLATFORM_STORAGE_ENABLED
 
-  const supported_messages = SUBJECT_ALLOW_LIST.map(subject => {
-    if (['lti.get_data', 'lti.put_data'].includes(subject) && useFrame) {
-      return {
-        subject,
-        frame: 'post_message_forwarding',
-      }
+  const supported_messages = SUBJECT_ALLOW_LIST.filter(subject => {
+    if (isPlatformStorageSubject(subject) && !isPlatformStorageEnabled) {
+      return false
     }
 
-    return {subject}
-  })
+    if (subject.includes('org.imsglobal')) {
+      return false
+    }
+
+    return true
+  }).map(subject => ({subject}))
+
   responseMessages.sendResponse({supported_messages})
   return true
 }

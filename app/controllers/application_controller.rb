@@ -244,6 +244,7 @@ class ApplicationController < ActionController::Base
           LTI_LAUNCH_FRAME_ALLOWANCES: Lti::Launch.iframe_allowances,
           DEEP_LINKING_POST_MESSAGE_ORIGIN: request.base_url,
           DEEP_LINKING_LOGGING: Setting.get("deep_linking_logging", nil),
+          LTI_PLATFORM_STORAGE_ENABLED: Lti::PlatformStorage.flag_enabled? && browser_requires_lti_platform_storage?,
           comment_library_suggestions_enabled: @current_user&.comment_library_suggestions_enabled?,
           SETTINGS: {
             open_registration: @domain_root_account&.open_registration?,
@@ -2130,7 +2131,7 @@ class ApplicationController < ActionController::Base
                       context: @context,
                       return_url: @return_url,
                       expander: variable_expander,
-                      include_storage_target: !in_lti_mobile_webview?,
+                      include_storage_target: browser_requires_lti_platform_storage?,
                       opts: opts.merge(
                         resource_link: @tag.associated_asset_lti_resource_link
                       )
@@ -2772,6 +2773,17 @@ class ApplicationController < ActionController::Base
 
     !!(mobile_device? && (in_android_app || in_ios_app))
   end
+
+  # only signal support for LTI Platform Storage in browsers
+  # that block 3rd party cookies _and_ support postMessages/
+  # require this API, meaning (currently):
+  # * not any mobile browser
+  # * only desktop Safari
+  def browser_requires_lti_platform_storage?
+    !in_lti_mobile_webview? &&
+      BrowserSupport.safari?(request.user_agent)
+  end
+  helper_method :browser_requires_lti_platform_storage?
 
   def ms_office?
     request.user_agent.to_s.include?("ms-office") ||
