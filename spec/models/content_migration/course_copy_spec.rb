@@ -471,6 +471,7 @@ describe ContentMigration do
       @copy_from.allow_student_discussion_editing = false
       @copy_from.restrict_student_future_view = true
       @copy_from.restrict_student_past_view = true
+      @copy_from.restrict_quantitative_data = true
       @copy_from.show_total_grade_as_points = true
       @copy_from.organize_epub_by_content_type = true
       @copy_from.enable_offline_web_export = true
