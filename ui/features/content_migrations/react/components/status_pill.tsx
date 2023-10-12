@@ -58,7 +58,7 @@ export const StatusPill = ({
   }
 
   return (
-    <Pill margin="x-small" color={color}>
+    <Pill margin="x-small" color={color} data-testid="migrationStatus">
       {text}
     </Pill>
   )
