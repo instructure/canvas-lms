@@ -158,7 +158,7 @@ module Lti::IMS
     #   (EXTENSION field) flag to indicate that this is a new submission. Defaults to true unless submission_type is none.
     #
     # @argument https://canvas.instructure.com/lti/submission[preserve_score] [Optional, Boolean]
-    #   (EXTENSION field) flag to prevent a request from clearing an existing grade for a submission. Defaults to true.
+    #   (EXTENSION field) flag to prevent a request from clearing an existing grade for a submission. Defaults to false.
     #
     # @argument https://canvas.instructure.com/lti/submission[prioritize_non_tool_grade] [Optional, Boolean]
     #   (EXTENSION field) flag to prevent a request from overwriting an existing grade for a submission. Defaults to false.
@@ -193,7 +193,7 @@ module Lti::IMS
     #     "userId": "5323497",
     #     "https://canvas.instructure.com/lti/submission": {
     #       "new_submission": true,
-    #       "preserve_score": true,
+    #       "preserve_score": false,
     #       "submission_type": "online_url",
     #       "submission_data": "https://instructure.com",
     #       "submitted_at": "2017-04-14T18:54:36.736+00:00",
