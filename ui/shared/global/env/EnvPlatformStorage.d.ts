@@ -25,4 +25,5 @@ export interface EnvPlatformStoragePostMessageForwarding {
   PARENT_ORIGIN: string
   IN_RCE?: boolean
   IGNORE_LTI_POST_MESSAGES?: boolean
+  LTI_PLATFORM_STORAGE_ENABLED?: boolean
 }

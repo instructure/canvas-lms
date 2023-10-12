@@ -114,9 +114,11 @@ describe UsersController do
       let(:redis_key) { "#{assigns[:domain_root_account].class_name}:#{Lti::RedisMessageClient::LTI_1_3_PREFIX}#{verifier}" }
       let(:cached_launch) { JSON.parse(Canvas.redis.get(redis_key)) }
       let(:developer_key) { DeveloperKey.create! }
+      let(:in_safari) { false }
 
       before do
         allow(SecureRandom).to receive(:hex).and_return(verifier)
+        allow(BrowserSupport).to receive(:safari?).and_return in_safari
         tool.use_1_3 = true
         tool.developer_key = developer_key
         tool.save!
@@ -133,8 +135,25 @@ describe UsersController do
           canvas_environment
           client_id
           deployment_id
-          lti_storage_target
         ]
+      end
+
+      context "login message in Safari" do
+        let(:in_safari) { true }
+
+        it "includes lti_storage_target" do
+          expect(assigns[:lti_launch].params.keys).to match_array %w[
+            iss
+            login_hint
+            target_link_uri
+            lti_message_hint
+            canvas_region
+            canvas_environment
+            client_id
+            deployment_id
+            lti_storage_target
+          ]
+        end
       end
 
       it 'sets the "login_hint" to the current user lti id' do

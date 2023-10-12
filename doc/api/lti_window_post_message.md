@@ -75,8 +75,14 @@ window.parent.postMessage({subject: 'lti.capabilities'}, '*')
 
 ## lti.put_data
 
-**At one point, this message type was named 'org.imsglobal.lti.put_data', but the prefix**
-**was dropped before finalizing the spec. This format is no longer supported.**
+<div class="warning-message">!! LTI Platform Storage support is temporarily only available for Safari !!</div>
+
+> **Due to unforeseen issues, Platform Storage access is being temporarily limited to only LTI tools launched in Safari. All non-Safari launches that may be using Platform Storage should fall back to using cookies to secure the LTI 1.3 launch for now, as described in the Platform Storage specification.**
+
+> **We expect to resolve this issue soon in upcoming releases so that LTI launches from all browsers can continue using Platform Storage.**
+
+_At one point, this message type was named 'org.imsglobal.lti.put_data', but the prefix_
+_was dropped before finalizing the spec. This format is no longer supported._
 
 Stores the provided `value` at the provided `key` in Canvas's [localstorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage),
 partitioned by tool. Data stored by one tool cannot be accessed by another, is
@@ -108,7 +114,7 @@ fall back to sending the message to the parent window using the wildcard `*` ori
 
 Returned postMessage includes the following properties:
 
-- subject: "lti.fetchWindowSize.response"
+- subject: "lti.put_data.response"
 - key: the same key provided in the initial message
 - value: the same value provided in the initial message
 - message_id: the same message_id provided in the initial message
@@ -137,8 +143,14 @@ window.parent.postMessage(
 
 ## lti.get_data
 
-**At one point, this message type was named 'org.imsglobal.lti.get_data', but the prefix**
-**was dropped before finalizing the spec. This format is no longer supported.**
+<div class="warning-message">!! LTI Platform Storage support is temporarily only available for Safari !!</div>
+
+> **Due to unforeseen issues, Platform Storage access is being temporarily limited to only LTI tools launched in Safari. All non-Safari launches that may be using Platform Storage should fall back to using cookies to secure the LTI 1.3 launch for now, as described in the Platform Storage specification.**
+
+> **We expect to resolve this issue soon in upcoming releases so that LTI launches from all browsers can continue using Platform Storage.**
+
+_At one point, this message type was named 'org.imsglobal.lti.get_data', but the prefix_
+_was dropped before finalizing the spec. This format is no longer supported._
 
 Fetches the value stored at the provided `key` in Canvas's [localstorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage),
 partitioned by tool. Data stored by one tool cannot be accessed by another, is
@@ -169,7 +181,7 @@ fall back to sending the message to the parent window using the wildcard `*` ori
 
 Returning postMessage includes the following properties:
 
-- subject: "lti.get_data"
+- subject: "lti.get_data.response"
 - key: the same key provided in the initial message
 - value: the value, if any, stored at that key in Canvas's localstorage. `null` will be sent if the key/value pair doesn't exist.
 - message_id: the same message_id provided in the initial message

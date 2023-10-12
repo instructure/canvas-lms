@@ -20,7 +20,9 @@
     # Don't render the forwarder frame _inside_ the forwarder frame
     action_name != "post_message_forwarding" &&
     # or on any login pages/when not logged in
-    !request.path.starts_with?("/login")
+    !request.path.starts_with?("/login") &&
+    # or for any browser except Safari
+    browser_requires_lti_platform_storage?
   %>
   <%= iframe(
     lti_post_message_forwarding_url,
