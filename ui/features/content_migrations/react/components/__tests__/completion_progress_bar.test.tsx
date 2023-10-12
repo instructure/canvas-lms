@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {ReactElement} from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {CompletionProgressBar, buildProgressCellContent} from '../completion_progress_bar'
@@ -28,7 +28,10 @@ const renderComponent = (overrideProps?: any) =>
   render(<CompletionProgressBar progress_url="https://mock.progress.url" {...overrideProps} />)
 
 describe('CompletionProgressBar', () => {
-  afterEach(() => jest.clearAllMocks())
+  afterEach(() => {
+    jest.clearAllMocks()
+    jest.restoreAllMocks()
+  })
 
   it('renders with the correct progress', async () => {
     doFetchApi.mockImplementation(() => Promise.resolve({json: {completion: 75.0}}))
@@ -143,40 +146,78 @@ describe('CompletionProgressBar', () => {
     renderComponent()
     expect(document.body.firstChild).toBeEmptyDOMElement()
   })
+
+  it('calls onProgressFinish when workflow_state changes', async () => {
+    jest.useFakeTimers()
+    let updates = 0
+    doFetchApi.mockImplementation(() => {
+      updates++
+      let completion = 50
+      if (updates === 1) completion = 0
+      if (updates === 2) completion = 25
+      const workflow_state = completion >= 50 ? 'failed' : 'running'
+      return Promise.resolve({
+        json: {completion, workflow_state},
+      })
+    })
+    const mockCallback = jest.fn()
+    renderComponent({onProgressFinish: mockCallback})
+    jest.advanceTimersByTime(4000)
+    await waitFor(() => expect(mockCallback).toHaveBeenCalled())
+    jest.useRealTimers()
+  })
 })
 
 describe('buildProgressCellContent()', () => {
-  it('renders text', () => {
+  it('renders issues on completed', () => {
+    const cm = {
+      id: '1',
+      workflow_state: 'completed',
+      migration_issues_count: 1,
+    } as ContentMigrationItem
+    render(buildProgressCellContent(cm, jest.fn()) as ReactElement)
+    expect(screen.getByText('1 issues')).toBeInTheDocument()
+  })
+
+  it('renders issues on failed', () => {
     const cm = {
       id: '1',
       workflow_state: 'failed',
       migration_issues_count: 5,
-      progress_url: 'https://mock.progress.url',
     } as ContentMigrationItem
-    render(buildProgressCellContent(cm, jest.fn()))
+    render(buildProgressCellContent(cm, jest.fn()) as ReactElement)
     expect(screen.getByText('5 issues')).toBeInTheDocument()
   })
 
-  it('renders progress bar', async () => {
+  it('renders progress bar on running', async () => {
     const cm = {
       id: '1',
       workflow_state: 'running',
-      migration_issues_count: 0,
       progress_url: 'https://mock.progress.url',
     } as ContentMigrationItem
     doFetchApi.mockImplementation(() => Promise.resolve({json: {completion: 75.0}}))
-    render(buildProgressCellContent(cm, jest.fn()))
+    render(buildProgressCellContent(cm, jest.fn()) as ReactElement)
     await waitFor(() => expect(screen.getByRole('progressbar')).toBeInTheDocument())
     expect(screen.getByRole('progressbar')).toHaveAttribute('value', '75')
+    doFetchApi.mockRestore()
   })
 
-  it('renders content selection modal button', () => {
+  it('renders content selection modal button for waiting_for_select', () => {
     window.ENV.COURSE_ID = '1'
     const cm = {
       id: '1',
       workflow_state: 'waiting_for_select',
     } as ContentMigrationItem
-    render(buildProgressCellContent(cm, jest.fn()))
+    render(buildProgressCellContent(cm, jest.fn()) as ReactElement)
     expect(screen.getByRole('button')).toHaveTextContent('Select content')
+  })
+
+  it('does not render for pre_processing', async () => {
+    const cm = {
+      id: '1',
+      workflow_state: 'pre_processing',
+    } as ContentMigrationItem
+    render(buildProgressCellContent(cm, jest.fn()) as ReactElement)
+    expect(document.body.firstChild).toBeEmptyDOMElement()
   })
 })
