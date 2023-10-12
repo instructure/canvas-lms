@@ -724,7 +724,7 @@ class ExternalToolsController < ApplicationController
                   context: @context,
                   return_url: @return_url,
                   expander:,
-                  include_storage_target: !in_lti_mobile_webview?,
+                  include_storage_target: browser_requires_lti_platform_storage?,
                   opts: opts.merge(
                     resource_link: lookup_resource_link(tool)
                   )

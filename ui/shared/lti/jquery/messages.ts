@@ -67,6 +67,10 @@ const isIgnoredSubject = (subject: unknown): subject is SubjectId =>
 const isUnsupportedInRCE = (subject: unknown): subject is SubjectId =>
   typeof subject === 'string' && (UNSUPPORTED_IN_RCE as ReadonlyArray<string>).includes(subject)
 
+const isPlatformStorageSubject = (subject: unknown): subject is SubjectId =>
+  typeof subject === 'string' &&
+  (PLATFORM_STORAGE_SUBJECTS as ReadonlyArray<string>).includes(subject)
+
 // These are handled elsewhere so ignore them
 const SUBJECT_IGNORE_LIST = [
   'A2ExternalContentReady',
@@ -86,6 +90,15 @@ const UNSUPPORTED_IN_RCE = [
   'lti.scrollToTop',
   'lti.setUnloadMessage',
   'lti.removeUnloadMessage',
+] as const
+
+const PLATFORM_STORAGE_SUBJECTS = [
+  // explicitly always allowing lti.capabilities
+  'lti.get_data',
+  'lti.put_data',
+  'org.imsglobal.lti.capabilities',
+  'org.imsglobal.put_data',
+  'org.imsglobal.get_data',
 ] as const
 
 const isObject = (u: unknown): u is object => {
@@ -143,7 +156,7 @@ const handlers: Record<
  */
 async function ltiMessageHandler(
   e: MessageEvent<unknown>,
-  platformStorageFeatureFlag: boolean = false
+  platformStorageEnabled: boolean = false
 ) {
   if (isDevtoolMessageData(e.data)) {
     return false
@@ -184,7 +197,7 @@ async function ltiMessageHandler(
   if (subject === undefined || isIgnoredSubject(subject) || responseMessages.isResponse(e)) {
     // These messages are handled elsewhere
     return false
-  } else if (!isAllowedSubject(subject)) {
+  } else if (!isAllowedSubject(subject) || subject.includes('org.imsglobal')) {
     responseMessages.sendUnsupportedSubjectError()
     return false
   } else if (isUnsupportedInRCE(subject) && isFromRce) {
@@ -192,8 +205,12 @@ async function ltiMessageHandler(
     // iframe, some subjects can't find the tool frame and so are not supported
     responseMessages.sendUnsupportedSubjectError('Not supported inside Rich Content Editor')
     return false
-  } else if (platformStorageFeatureFlag && subject.includes('org.imsglobal.')) {
-    responseMessages.sendUnsupportedSubjectError()
+  } else if (!platformStorageEnabled && isPlatformStorageSubject(subject)) {
+    // Don't accept platform storage messages if flag is disabled
+    // OR (temporarily) in browsers that still allow cookies
+    responseMessages.sendUnsupportedSubjectError(
+      'LTI Platform Storage is temporarily not supported in this browser'
+    )
     return false
   } else {
     try {
@@ -248,9 +265,10 @@ function monitorLtiMessages() {
   // This should only be true when canvas is in an iframe (like for postMessage forwarding),
   // to prevent duplicate listeners across canvas windows.
   const shouldIgnoreLtiPostMessages: boolean = ENV?.IGNORE_LTI_POST_MESSAGES || false
-  const platformStorageFeatureFlag: boolean = ENV?.FEATURES?.lti_platform_storage || false
+  const platformStorageEnabled: boolean = ENV?.LTI_PLATFORM_STORAGE_ENABLED || false
+
   const cb = (e: MessageEvent<unknown>) => {
-    if (e.data !== '') ltiMessageHandler(e, platformStorageFeatureFlag)
+    if (e.data !== '') ltiMessageHandler(e, platformStorageEnabled)
   }
   if (!hasListener && !shouldIgnoreLtiPostMessages) {
     window.addEventListener('message', cb)
@@ -258,4 +276,11 @@ function monitorLtiMessages() {
   }
 }
 
-export {ltiState, SUBJECT_ALLOW_LIST, SUBJECT_IGNORE_LIST, ltiMessageHandler, monitorLtiMessages}
+export {
+  ltiState,
+  SUBJECT_ALLOW_LIST,
+  SUBJECT_IGNORE_LIST,
+  isPlatformStorageSubject,
+  ltiMessageHandler,
+  monitorLtiMessages,
+}
