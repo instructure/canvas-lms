@@ -36,7 +36,7 @@ describe('contentRendering', () => {
     it('uses link data to build html', () => {
       const rendered = contentRendering.renderLink(link)
       expect(rendered).toEqual(
-        '<a href="/users/2/files/17/download?verifier=xyzzy&amp;wrap=1" title="Here Be Links">Click On Me</a>'
+        '<a href="/users/2/files/17/download?verifier=xyzzy" title="Here Be Links">Click On Me</a>'
       )
     })
 
@@ -45,7 +45,7 @@ describe('contentRendering', () => {
       link.href = undefined
       const rendered = contentRendering.renderLink(link)
       expect(rendered).toEqual(
-        '<a href="/users/2/files/17/download?verifier=xyzzy&amp;wrap=1" title="Here Be Links">Click On Me</a>'
+        '<a href="/users/2/files/17/download?verifier=xyzzy" title="Here Be Links">Click On Me</a>'
       )
     })
 
@@ -53,7 +53,7 @@ describe('contentRendering', () => {
       link.title = undefined
       const rendered = contentRendering.renderLink(link)
       expect(rendered).toEqual(
-        '<a href="/users/2/files/17/download?verifier=xyzzy&amp;wrap=1" title="Link">Click On Me</a>'
+        '<a href="/users/2/files/17/download?verifier=xyzzy" title="Link">Click On Me</a>'
       )
     })
 
@@ -61,7 +61,7 @@ describe('contentRendering', () => {
       link.text = undefined
       const rendered = contentRendering.renderLink(link)
       expect(rendered).toEqual(
-        '<a href="/users/2/files/17/download?verifier=xyzzy&amp;wrap=1" title="Here Be Links">Here Be Links</a>'
+        '<a href="/users/2/files/17/download?verifier=xyzzy" title="Here Be Links">Here Be Links</a>'
       )
     })
 
@@ -70,7 +70,7 @@ describe('contentRendering', () => {
       link.title = undefined
       const rendered = contentRendering.renderLink(link)
       expect(rendered).toEqual(
-        '<a href="/users/2/files/17/download?verifier=xyzzy&amp;wrap=1" title="Link">Link</a>'
+        '<a href="/users/2/files/17/download?verifier=xyzzy" title="Link">Link</a>'
       )
     })
 
@@ -85,7 +85,7 @@ describe('contentRendering', () => {
       const rendered = contentRendering.renderLink(doc, doc.text)
       expect(rendered).toEqual(
         '<a ' +
-          'href="/users/2/files/17/download?verifier=xyzzy&amp;wrap=1" target="_blank" rel="noopener" title="Link" ' +
+          'href="/users/2/files/17/download?verifier=xyzzy" target="_blank" rel="noopener" title="Link" ' +
           'class="instructure_file_link instructure_scribd_file">' +
           'somefile.pdf</a>'
       )
@@ -103,7 +103,7 @@ describe('contentRendering', () => {
       link.href = '/users/2/files/17/preview?verifier=xyzzy'
       const rendered = contentRendering.renderLink(link)
       expect(rendered).toEqual(
-        '<a href="/users/2/files/17?verifier=xyzzy&amp;wrap=1" title="Here Be Links">Click On Me</a>'
+        '<a href="/users/2/files/17?verifier=xyzzy" title="Here Be Links">Click On Me</a>'
       )
     })
   })
