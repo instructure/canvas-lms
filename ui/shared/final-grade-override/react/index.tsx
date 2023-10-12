@@ -39,7 +39,6 @@ export type FinalGradeOverrideTextBoxProps = {
   width?: string
   onGradeChange: (grade: GradeOverrideInfo) => void
   gradingPeriodId?: string | null
-  pointsBasedGradingSchemesFeatureEnabled: boolean
   disabled?: boolean
   showPercentageLabel?: boolean
 }
@@ -49,7 +48,6 @@ export function FinalGradeOverrideTextBox({
   onGradeChange,
   width = '14rem',
   gradingPeriodId,
-  pointsBasedGradingSchemesFeatureEnabled,
   disabled = false,
   showPercentageLabel = false,
 }: FinalGradeOverrideTextBoxProps) {
@@ -84,7 +82,7 @@ export function FinalGradeOverrideTextBox({
   }
 
   const handleFinalGradeOverrideBlur = async () => {
-    const options: GradeEntryOptions = {pointsBasedGradingSchemesFeatureEnabled}
+    const options: GradeEntryOptions = {}
     if (gradingScheme?.data && gradingScheme.data.length > 0) {
       options.gradingScheme = gradingScheme
     }

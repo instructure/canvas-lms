@@ -32,7 +32,6 @@ type Props = {
   handleClose: () => void
   handleGradingSchemeDelete: (gradingSchemeId: string) => void
   editGradingScheme: (gradingSchemeId: string) => void
-  pointsBasedGradingSchemesEnabled: boolean
   canManageScheme: (gradingScheme: GradingScheme) => boolean
 }
 const GradingSchemeViewModal = ({
@@ -41,7 +40,6 @@ const GradingSchemeViewModal = ({
   handleClose,
   handleGradingSchemeDelete,
   editGradingScheme,
-  pointsBasedGradingSchemesEnabled,
   canManageScheme,
 }: Props) => {
   if (!gradingScheme) {
@@ -67,7 +65,6 @@ const GradingSchemeViewModal = ({
       <Modal.Body>
         <GradingSchemeView
           gradingScheme={gradingScheme}
-          pointsBasedGradingSchemesEnabled={pointsBasedGradingSchemesEnabled}
           archivedGradingSchemesEnabled={true}
           disableDelete={!canManageScheme(gradingScheme)}
           disableEdit={!canManageScheme(gradingScheme)}

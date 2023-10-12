@@ -346,7 +346,6 @@ export function gradebookOptionsSetup(env: GlobalEnv) {
     groupWeightingScheme: env.GRADEBOOK_OPTIONS?.group_weighting_scheme,
     lastGeneratedCsvAttachmentUrl: env.GRADEBOOK_OPTIONS?.attachment_url,
     messageAttachmentUploadFolderId: env.GRADEBOOK_OPTIONS?.message_attachment_upload_folder_id,
-    pointsBasedGradingSchemesFeatureEnabled: !!env.POINTS_BASED_GRADING_SCHEMES_ENABLED,
     proxySubmissionEnabled: !!env.GRADEBOOK_OPTIONS?.proxy_submissions_allowed,
     publishToSisEnabled: env.GRADEBOOK_OPTIONS?.publish_to_sis_enabled,
     publishToSisUrl: env.GRADEBOOK_OPTIONS?.publish_to_sis_url,

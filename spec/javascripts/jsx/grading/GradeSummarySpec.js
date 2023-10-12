@@ -410,6 +410,14 @@ QUnit.module('GradeSummary.calculateTotals', suiteHooks => {
     contextHooks.beforeEach(() => {
       exampleGrades = createExampleGrades()
       exampleGrades.current = {score: 23, possible: 100}
+      const gradingSchemeDataRows = [
+        {name: 'A', value: 0.9},
+        {name: 'B', value: 0.8},
+        {name: 'C', value: 0.7},
+        {name: 'D', value: 0.6},
+        {name: 'F', value: 0},
+      ]
+      ENV.course_active_grading_scheme = {data: gradingSchemeDataRows}
       ENV.grading_scheme = [
         ['A', 0.9],
         ['B', 0.8],

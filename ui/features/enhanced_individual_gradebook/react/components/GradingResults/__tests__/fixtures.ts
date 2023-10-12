@@ -87,7 +87,6 @@ export const defaultGradebookOptions: GradebookOptions = {
   },
   gradingStandardScalingFactor: 1,
   gradingStandardPointsBased: false,
-  pointsBasedGradingSchemesFeatureEnabled: false,
   proxySubmissionEnabled: false,
 }
 

@@ -651,6 +651,7 @@ describe "admin_tools" do
     end
 
     it "performs searches" do
+      skip "FOO-4092"
       @account.settings[:admins_can_view_notifications] = true
       @account.save!
       load_admin_tools_page

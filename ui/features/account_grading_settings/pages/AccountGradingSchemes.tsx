@@ -31,8 +31,6 @@ export function Component() {
   }, [])
   return (
     <GradingSchemesManagement
-      // TODO: remove after grading_scheme_updates feature flag is turned on globally
-      pointsBasedGradingSchemesEnabled={!!ENV.POINTS_BASED_GRADING_SCHEMES_ENABLED}
       contextType="Account"
       contextId={pathMatch.params.accountId}
       archivedGradingSchemesEnabled={!!ENV.ARCHIVED_GRADING_SCHEMES_ENABLED}

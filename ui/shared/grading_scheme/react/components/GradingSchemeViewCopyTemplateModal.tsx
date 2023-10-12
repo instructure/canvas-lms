@@ -40,7 +40,6 @@ export interface ComponentProps {
   contextType: 'Account' | 'Course'
   contextId: string
   allowDuplication: boolean
-  pointsBasedGradingSchemesEnabled: boolean
   onCreate?: (gradingSchemeSummary: GradingSchemeSummary) => any
   onCancel: () => any
 }
@@ -51,7 +50,6 @@ export const GradingSchemeViewCopyTemplateModal = ({
   onCreate,
   onCancel,
   allowDuplication,
-  pointsBasedGradingSchemesEnabled,
 }: ComponentProps) => {
   const {createGradingScheme /* deleteGradingSchemeStatus */} = useGradingSchemeCreate()
   const {loadDefaultGradingScheme /* deleteGradingSchemeStatus */} = useDefaultGradingScheme()
@@ -148,7 +146,6 @@ export const GradingSchemeViewCopyTemplateModal = ({
                       pointsBased: true,
                     },
                   }}
-                  pointsBasedGradingSchemesFeatureEnabled={pointsBasedGradingSchemesEnabled}
                   onSave={modifiedGradingScheme => handleCreateScheme(modifiedGradingScheme)}
                 />
               ) : (

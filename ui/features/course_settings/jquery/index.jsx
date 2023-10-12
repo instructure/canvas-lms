@@ -390,8 +390,6 @@ $(document).ready(function () {
           contextId={ENV.COURSE_ID}
           contextType="Course"
           initiallySelectedGradingSchemeId={selectedGradingSchemeId}
-          // TODO: remove after grading_scheme_updates feature flag is turned on globally
-          pointsBasedGradingSchemesEnabled={!!ENV.POINTS_BASED_GRADING_SCHEMES_ENABLED}
           onChange={gradingSchemeId => handleSelectedGradingSchemeIdChanged(gradingSchemeId)}
         />,
         grading_scheme_selector

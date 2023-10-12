@@ -44,7 +44,6 @@ type Props = {
   ) => void
   defaultGradingSchemeTemplate: GradingScheme
   defaultPointsGradingScheme: GradingSchemeTemplate
-  pointsBasedGradingSchemesEnabled: boolean
   archivedGradingSchemesEnabled: boolean
 }
 const GradingSchemeEditModal = ({
@@ -53,7 +52,6 @@ const GradingSchemeEditModal = ({
   handleCancelEdit,
   handleGradingSchemeDelete,
   handleUpdateScheme,
-  pointsBasedGradingSchemesEnabled,
   archivedGradingSchemesEnabled,
   defaultGradingSchemeTemplate,
   defaultPointsGradingScheme,
@@ -104,7 +102,6 @@ const GradingSchemeEditModal = ({
             },
           }}
           ref={gradingSchemeUpdateRef}
-          pointsBasedGradingSchemesFeatureEnabled={pointsBasedGradingSchemesEnabled}
           archivedGradingSchemesEnabled={archivedGradingSchemesEnabled}
           onSave={modifiedGradingScheme =>
             handleUpdateScheme(modifiedGradingScheme, gradingScheme.id)

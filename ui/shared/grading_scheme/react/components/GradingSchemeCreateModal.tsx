@@ -38,14 +38,12 @@ type Props = {
   handleCreateScheme: (gradingSchemeFormInput: GradingSchemeEditableData) => Promise<void>
   defaultGradingSchemeTemplate: GradingScheme
   defaultPointsGradingScheme: GradingSchemeTemplate
-  pointsBasedGradingSchemesEnabled: boolean
   archivedGradingSchemesEnabled: boolean
   handleCancelCreate: () => void
 }
 const GradingSchemeCreateModal = ({
   open,
   handleCreateScheme,
-  pointsBasedGradingSchemesEnabled,
   archivedGradingSchemesEnabled,
   defaultGradingSchemeTemplate,
   defaultPointsGradingScheme,
@@ -91,7 +89,6 @@ const GradingSchemeCreateModal = ({
             },
           }}
           ref={gradingSchemeCreateRef}
-          pointsBasedGradingSchemesFeatureEnabled={pointsBasedGradingSchemesEnabled}
           archivedGradingSchemesEnabled={archivedGradingSchemesEnabled}
           onSave={handleCreateScheme}
         />

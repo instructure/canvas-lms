@@ -42,7 +42,6 @@ describe('Grading Schemes Management Tests', () => {
       <GradingSchemesManagement
         contextId="1"
         contextType="Course"
-        pointsBasedGradingSchemesEnabled={true}
         archivedGradingSchemesEnabled={false}
         onGradingSchemesChanged={() => {}}
         {...props}

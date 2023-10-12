@@ -147,8 +147,8 @@ describe "grading standards" do
     @assignment = @course.assignments.create!(title: "new assignment", points_possible: 1000, assignment_group: @course.assignment_groups.first, grading_type: "points")
     @assignment.grade_student(student, grade: 899, grader: @teacher)
     get "/courses/#{@course.id}/grades/#{student.id}"
-    grading_scheme = driver.execute_script "return ENV.grading_scheme"
-    expect(grading_scheme[2][0]).to eq "B+"
+    grading_scheme = driver.execute_script "return ENV.course_active_grading_scheme"
+    expect(grading_scheme["data"][2]["name"]).to eq "B+"
     expect(f("#right-side .final_grade .grade").text).to eq "89.9%"
     expect(f("#final_letter_grade_text").text).to eq "B+"
   end

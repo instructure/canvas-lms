@@ -47,7 +47,6 @@ export interface GradingSchemeViewEditModalProps {
   contextType: 'Account' | 'Course'
   contextId: string
   gradingSchemeId: string
-  pointsBasedGradingSchemesEnabled: boolean
   archivedGradingSchemesEnabled: boolean
   onUpdate?: (gradingSchemeSummary: GradingSchemeSummary) => any
   onCancel: () => any
@@ -58,7 +57,6 @@ export const GradingSchemeViewEditModal: React.FC<GradingSchemeViewEditModalProp
   contextType,
   contextId,
   gradingSchemeId,
-  pointsBasedGradingSchemesEnabled,
   archivedGradingSchemesEnabled,
   onUpdate,
   onCancel,
@@ -218,11 +216,9 @@ export const GradingSchemeViewEditModal: React.FC<GradingSchemeViewEditModalProp
                     },
                   }}
                   onSave={modifiedGradingScheme => handleUpdateScheme(modifiedGradingScheme)}
-                  pointsBasedGradingSchemesFeatureEnabled={pointsBasedGradingSchemesEnabled}
                 />
               ) : (
                 <GradingSchemeView
-                  pointsBasedGradingSchemesEnabled={pointsBasedGradingSchemesEnabled}
                   archivedGradingSchemesEnabled={archivedGradingSchemesEnabled}
                   disableEdit={!canManageScheme(gradingScheme)}
                   disableDelete={!canManageScheme(gradingScheme)}
