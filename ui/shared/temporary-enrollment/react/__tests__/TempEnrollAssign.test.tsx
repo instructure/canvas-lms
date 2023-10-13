@@ -39,6 +39,26 @@ const truePermissions = {
   designer: true,
 }
 
+const enrollmentsByCourse = [
+  {
+    id: '1',
+    name: 'Apple Music',
+    workflow_state: 'available',
+    enrollments: [
+      {
+        role_id: '1',
+      },
+    ],
+    sections: [
+      {
+        id: '1',
+        name: 'Section 1',
+        enrollment_role: 'TeacherEnrollment',
+      },
+    ],
+  },
+]
+
 const props = {
   enrollment: {login_id: 'mel123', email: 'mel@email.com', name: 'Melvin', sis_user_id: '5'},
   user: {
@@ -57,12 +77,9 @@ const props = {
   isInAssignEditMode: false,
 }
 
-const johnEnrollments = [
-  // student enrollment
-  {course_id: '1', course_section_id: '11', id: '1', role_id: '91'},
-]
-
-const ENROLLMENTS_URL = `/api/v1/users/1/enrollments?state%5B%5D=active&state%5B%5D=completed&state%5B%5D=invited`
+const ENROLLMENTS_URI = encodeURI(
+  `/api/v1/users/${props.user.id}/courses?enrollment_state=active&include[]=sections`
+)
 
 // converts local time to UTC time based on a given date and time
 // returns UTC time in 'HH:mm' format
@@ -72,16 +89,6 @@ function localToUTCTime(date: string, time: string): string {
   const utcMinutes = localDate.getUTCMinutes()
 
   return `${String(utcHours).padStart(2, '0')}:${String(utcMinutes).padStart(2, '0')}`
-}
-
-const setupMocksForSuccess = () => {
-  fetchMock.get(ENROLLMENTS_URL, johnEnrollments)
-  fetchMock.get(`/api/v1/courses/1`, {name: 'coures1', workflow_state: 'available'})
-  fetchMock.get('/api/v1/courses/1/sections/11', {name: 'section1'})
-}
-
-const setupMocksForFailure = () => {
-  fetchMock.get(ENROLLMENTS_URL, 500)
 }
 
 describe('TempEnrollAssign', () => {
@@ -94,7 +101,9 @@ describe('TempEnrollAssign', () => {
   })
 
   describe('With Successful API calls', () => {
-    beforeEach(setupMocksForSuccess)
+    beforeEach(() => {
+      fetchMock.get(ENROLLMENTS_URI, enrollmentsByCourse)
+    })
 
     it('initializes with ROLE as the default role in the summary', async () => {
       const {findByText} = render(<TempEnrollAssign {...props} />)
@@ -292,15 +301,15 @@ describe('TempEnrollAssign', () => {
       // mock console.error
       jest.spyOn(console, 'error').mockImplementation(() => {})
 
-      setupMocksForFailure()
+      fetchMock.get(ENROLLMENTS_URI, 500)
     })
 
     it('shows error for failed enrollments fetch', async () => {
-      const {findByText} = render(<TempEnrollAssign {...props} />)
-      const errorMessage = await findByText(
+      const {findAllByText} = render(<TempEnrollAssign {...props} />)
+      const errorMessage = await findAllByText(
         /There was an error while requesting user enrollments, please try again/i
       )
-      expect(errorMessage).toBeInTheDocument()
+      expect(errorMessage).toBeTruthy()
     })
   })
 })

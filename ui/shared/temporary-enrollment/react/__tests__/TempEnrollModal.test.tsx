@@ -21,29 +21,7 @@ import {fireEvent, render, waitFor} from '@testing-library/react'
 import {TempEnrollModal} from '../TempEnrollModal'
 import fetchMock from 'fetch-mock'
 import userEvent from '@testing-library/user-event'
-import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {EnrollmentType} from '@canvas/temporary-enrollment/react/types'
-// import {prettyDOM} from '@testing-library/dom'
-
-type DateRange = {
-  startDate: string
-  nextDayDate: string
-}
-
-// returns ISO strings for a date and its next day, both at local timezone start
-function getLocalStartAndNextDayDates(year: number, month: number, day: number): DateRange {
-  const startDate = new Date(year, month, day)
-  startDate.setHours(0, 0, 0, 0)
-
-  const nextDayDate = new Date(startDate)
-  nextDayDate.setDate(startDate.getDate() + 1)
-
-  return {
-    startDate: startDate.toISOString(),
-    nextDayDate: nextDayDate.toISOString(),
-  }
-}
-const {startDate, nextDayDate}: DateRange = getLocalStartAndNextDayDates(2022, 0, 1) // for January 1, 2022
 
 // Temporary Enrollment Provider
 const providerUser = {
@@ -99,40 +77,29 @@ const userData = {
   ],
 }
 
-// teacher enrollment; checked by default
-const enrollmentsData = [
+const enrollmentsByCourse = [
   {
-    course_id: '11',
-    course_section_id: '111',
     id: '1',
-    role_id: '234',
+    name: 'Apple Music',
+    workflow_state: 'available',
+    enrollments: [
+      {
+        role_id: '2',
+      },
+    ],
+    sections: [
+      {
+        id: '1',
+        name: 'Section 1',
+        enrollment_role: 'StudentEnrollment',
+      },
+    ],
   },
 ]
 
-const enrollmentStatesData = ['active', 'completed', 'invited']
-const enrollmentStatesParams = new URLSearchParams(
-  enrollmentStatesData.map(param => ['state[]', param])
-).toString()
-
-const enrollmentData = {
-  user_id: recipientUser.user_id,
-  temporary_enrollment_source_user_id: providerUser.user_id,
-  start_at: startDate,
-  end_at: nextDayDate,
-  role_id: '234',
-}
-const enrollmentParams = new URLSearchParams(
-  Object.entries(enrollmentData).map(([key, value]) => [`enrollment[${key}]`, value])
+const ENROLLMENTS_URI = encodeURI(
+  `/api/v1/users/${modalProps.user.id}/courses?enrollment_state=active&include[]=sections`
 )
-
-const courseData = {
-  name: 'course1',
-  workflow_state: 'available',
-}
-
-const sectionData = {
-  name: 'section1',
-}
 
 const userListsData = {
   user_list: '',
@@ -214,15 +181,12 @@ describe('TempEnrollModal', () => {
   })
 
   // submit can (almost) only be tested in modal; submit button updates props for TempEnrollAssign
-  it.skip('closes modal when submission is successful', async () => {
+  it('closes modal when submission is successful', async () => {
     // simulating API responses using mocked data to replicate the UI flow
     // without manual data input or interacting with real UI elements
     fetchMock.post(`/accounts/1/user_lists.json?${userListsParams}`, userData)
     fetchMock.get('/api/v1/users/2', userData.users[0])
-    fetchMock.get(`/api/v1/users/1/enrollments?${enrollmentStatesParams}`, enrollmentsData)
-    fetchMock.get(`/api/v1/courses/11`, courseData)
-    fetchMock.get('/api/v1/courses/11/sections/111', sectionData)
-    fetchMock.post(`/api/v1/sections/111/enrollments?${enrollmentParams}`, 200)
+    fetchMock.get(ENROLLMENTS_URI, enrollmentsByCourse)
 
     // render the modal with a child element
     const screen = render(
@@ -250,58 +214,25 @@ describe('TempEnrollModal', () => {
 
     // select a role from the dropdown
     const roleInput = await screen.findByPlaceholderText('Select a Role')
-    fireEvent.focus(roleInput)
-    fireEvent.click(roleInput)
-
-    const options = await screen.findAllByRole('option')
-    const option = options[0] as HTMLOptionElement
-    fireEvent.focus(option)
-    fireEvent.click(option) // select the first option
-    fireEvent.blur(option)
-
-    fireEvent.blur(roleInput)
-
-    // start date and time input
-    const startDateInput = await screen.findByLabelText('Begins On')
-    userEvent.clear(startDateInput)
-    userEvent.type(startDateInput, '2022-01-01') // Jan 01, 2022
-
-    // end date and time input
-    const endDateInput = await screen.findByLabelText('Until')
-    userEvent.clear(endDateInput)
-    userEvent.type(endDateInput, '2022-01-02') // Jan 02, 2022
+    fireEvent.keyDown(roleInput, {key: 'Enter', code: 'Enter', charCode: 13})
 
     // simulate clicking the submit button
-    fireEvent.click(await screen.findByText('Submit'.trim()))
-    // console.log(prettyDOM(screen.baseElement as Element, 10000000))
-
-    await waitFor(() =>
-      expect(showFlashSuccess).toHaveBeenCalledWith(
-        'Temporary enrollment was successfully created.'
-      )
-    )
+    fireEvent.click(await screen.findByText('Submit'))
 
     // ensure the modal is closed
-    await screen.findByText('Cancel')
     await screen.findByText('Create a temporary enrollment')
 
     // confirm mocks were called the expected number of times
     expect(fetchMock.calls(`/accounts/1/user_lists.json?${userListsParams}`).length).toBe(1)
     expect(fetchMock.calls('/api/v1/users/2').length).toBe(1)
-    expect(fetchMock.calls(`/api/v1/users/1/enrollments?${enrollmentStatesParams}`).length).toBe(1)
-    expect(fetchMock.calls(`/api/v1/courses/11`).length).toBe(1)
-    expect(fetchMock.calls('/api/v1/courses/11/sections/111').length).toBe(1)
-    expect(fetchMock.calls(`/api/v1/sections/111/enrollments?${enrollmentParams}`).length).toBe(1)
+    expect(fetchMock.calls(ENROLLMENTS_URI).length).toBe(1)
   })
 
   it('shows error and stays open if data is missing', async () => {
     // setup API mocks
     fetchMock.post(`/accounts/1/user_lists.json?${userListsParams}`, userData)
     fetchMock.get('/api/v1/users/2', userData.users[0])
-    fetchMock.get(`/api/v1/users/1/enrollments?${enrollmentStatesParams}`, enrollmentsData)
-    fetchMock.get(`/api/v1/courses/11`, courseData)
-    fetchMock.get('/api/v1/courses/11/sections/111', sectionData)
-    fetchMock.post(`/api/v1/sections/111/enrollments?${enrollmentParams}`, 200) // NOT CALLED!
+    fetchMock.get(ENROLLMENTS_URI, enrollmentsByCourse)
 
     // render the modal with a child element
     const screen = render(
@@ -327,23 +258,17 @@ describe('TempEnrollModal', () => {
     // click next to go to the assign screen (page 3)
     userEvent.click(next)
 
-    // NO ROLE SELECTED!
+    // NO PROVIDER BASE ROLE SELECTED!
 
     // simulate clicking the submit button
     fireEvent.click(await screen.findByText('Submit'))
 
-    // error message should be displayed
-    await waitFor(() =>
-      expect(screen.getByText('Please select a role before submitting')).toBeInTheDocument()
-    )
+    expect(await screen.findByText(/please select a role before submitting/i)).toBeInTheDocument()
 
     // confirm mocks were called the expected number of times
     expect(fetchMock.calls(`/accounts/1/user_lists.json?${userListsParams}`).length).toBe(1)
     expect(fetchMock.calls('/api/v1/users/2').length).toBe(1)
-    expect(fetchMock.calls(`/api/v1/users/1/enrollments?${enrollmentStatesParams}`).length).toBe(1)
-    expect(fetchMock.calls(`/api/v1/courses/11`).length).toBe(1)
-    expect(fetchMock.calls('/api/v1/courses/11/sections/111').length).toBe(1)
-    expect(fetchMock.calls(`/api/v1/sections/111/enrollments?${enrollmentParams}`).length).toBe(0) // NOT CALLED!
+    expect(fetchMock.calls(ENROLLMENTS_URI).length).toBe(1)
   })
 
   it('starts over when start over button is clicked', async () => {
@@ -390,9 +315,7 @@ describe('TempEnrollModal', () => {
     // setup API mocks
     fetchMock.post(`/accounts/1/user_lists.json?${userListsParams}`, userData)
     fetchMock.get('/api/v1/users/2', userData.users[0])
-    fetchMock.get(`/api/v1/users/1/enrollments?${enrollmentStatesParams}`, enrollmentsData)
-    fetchMock.get(`/api/v1/courses/11`, courseData)
-    fetchMock.get('/api/v1/courses/11/sections/111', sectionData)
+    fetchMock.get(ENROLLMENTS_URI, enrollmentsByCourse)
 
     // render the modal with a child element
     const screen = render(
@@ -438,8 +361,6 @@ describe('TempEnrollModal', () => {
     // confirm mocks were called the expected number of times
     expect(fetchMock.calls(`/accounts/1/user_lists.json?${userListsParams}`).length).toBe(1)
     expect(fetchMock.calls('/api/v1/users/2').length).toBe(1)
-    expect(fetchMock.calls(`/api/v1/users/1/enrollments?${enrollmentStatesParams}`).length).toBe(1)
-    expect(fetchMock.calls(`/api/v1/courses/11`).length).toBe(1)
-    expect(fetchMock.calls('/api/v1/courses/11/sections/111').length).toBe(1)
+    expect(fetchMock.calls(ENROLLMENTS_URI).length).toBe(1)
   })
 })

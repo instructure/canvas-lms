@@ -74,6 +74,7 @@ export function EnrollmentTreeGroup(props: Props) {
       // if parent is a role
       if (props.id.startsWith('r')) {
         for (const course of props.children) {
+          if (course.children.length === 0) return
           if (course.children.length > 1) {
             childRows.push(
               <EnrollmentTreeGroup
