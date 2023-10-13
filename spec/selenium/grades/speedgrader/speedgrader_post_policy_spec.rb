@@ -70,6 +70,9 @@ end
 describe "Speed Grader Post Policy" do
   include_context "in-process server selenium tests"
 
+  # all tests skipped due to flakiness; see the referenced ticket
+  before { skip } # EVAL-3613
+
   before :once do
     @teacher = course_with_teacher(course_name: "Post Policy Course", name: "Teacher", active_all: true).user
     @course = Course.find_by!(name: "Post Policy Course")

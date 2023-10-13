@@ -18,6 +18,7 @@
 
 import ReactDOM from 'react-dom'
 
+import {waitFor} from '@testing-library/dom'
 import TrayController, {CONTAINER_ID} from '../TrayController'
 import FakeEditor from '../../../../__tests__/FakeEditor'
 import VideoOptionsTrayDriver from './VideoOptionsTrayDriver'
@@ -167,10 +168,10 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
   })
 
   describe('#hideTrayForEditor()', () => {
-    it('closes the tray when open for the given editor', () => {
+    it('closes the tray when open for the given editor', async () => {
       trayController.showTrayForEditor(editors[0])
       trayController.hideTrayForEditor(editors[0])
-      expect(getTray()).toBeNull()
+      await waitFor(() => expect(getTray()).toBeNull()) // the tray is closed after a transition
     })
 
     it('does not close the tray when open for a different editor', () => {
@@ -196,7 +197,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
       jest.resetAllMocks()
     })
 
-    it('updates the video', () => {
+    it('updates the video', async () => {
       const updateMediaObject = jest.fn().mockResolvedValue()
       trayController.showTrayForEditor(editors[0])
       trayController._applyVideoOptions({
@@ -207,7 +208,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
         media_object_id: 'm_somevideo',
         updateMediaObject,
       })
-      expect(getTray()).toBeNull() // the tray is closed
+      await waitFor(() => expect(getTray()).toBeNull()) // the tray is closed after a transition
       const videoIframe = trayController.$videoContainer
       const videoContainer = videoIframe.parentElement
       expect(videoContainer.getAttribute('data-mce-p-title')).toBe('new title')
@@ -256,7 +257,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
       })
     })
 
-    it('does not updates the video w/o a media_object_id', () => {
+    it('does not updates the video w/o a media_object_id', async () => {
       const updateMediaObject = jest.fn().mockResolvedValue()
       trayController.showTrayForEditor(editors[0])
       trayController._applyVideoOptions({
@@ -267,7 +268,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
         media_object_id: undefined,
         updateMediaObject,
       })
-      expect(getTray()).toBeNull() // the tray is closed
+      await waitFor(() => expect(getTray()).toBeNull()) // the tray is closed after a transition
       const videoIframe = trayController.$videoContainer
       const videoContainer = videoIframe.parentElement
       expect(videoContainer.getAttribute('data-mce-p-title')).toBe('new title')
@@ -277,7 +278,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
       expect(updateMediaObject).not.toHaveBeenCalled()
     })
 
-    it('replaces the video with a link', () => {
+    it('replaces the video with a link', async () => {
       const updateMediaObject = jest.fn().mockResolvedValue()
       const ed = editors[0]
       trayController.showTrayForEditor(ed)
@@ -287,7 +288,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
         media_object_id: 'm_somevideo',
         updateMediaObject,
       })
-      expect(getTray()).toBeNull() // the tray is closed
+      await waitFor(() => expect(getTray()).toBeNull()) // the tray is closed after a transition
       const videoContainer = trayController.$videoContainer
       expect(videoContainer).toBe(null)
       const sel = ed.selection.getNode()
