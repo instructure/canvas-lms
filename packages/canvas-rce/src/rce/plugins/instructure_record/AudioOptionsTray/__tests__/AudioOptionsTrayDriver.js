@@ -16,15 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {queryByLabelText, queryByTestId} from '@testing-library/dom'
+import {queryAllByLabelText, queryByTestId} from '@testing-library/dom'
 
 export default class AudioOptionsTrayDriver {
   static find() {
-    const $tray = queryByLabelText(document.body, 'Audio Options Tray')
-    if (!$tray) {
+    const $tray = queryAllByLabelText(document.body, 'Audio Options Tray')
+    if ($tray.length === 0) {
       return null
     }
-    return new AudioOptionsTrayDriver($tray)
+    return new AudioOptionsTrayDriver($tray[0])
   }
 
   constructor($element) {
