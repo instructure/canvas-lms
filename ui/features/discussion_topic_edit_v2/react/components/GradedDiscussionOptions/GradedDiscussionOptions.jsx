@@ -28,6 +28,7 @@ import {AssignmentGroupSelect} from './AssignmentGroupSelect'
 import {DisplayGradeAs} from './DisplayGradeAs'
 import {PointsPossible} from './PointsPossible'
 import {PeerReviewOptions} from './PeerReviewOptions'
+import {AssignmentDueDatesManager} from './AssignmentDueDatesManager'
 
 // TODO: remove eslint-disable once this component is implemented
 // at the top of the file
@@ -76,7 +77,7 @@ export const GradedDiscussionOptions = ({
         />
       </View>
       <View as="div" margin="medium 0">
-        <Text>Assignment Settings</Text>
+        <AssignmentDueDatesManager />
       </View>
     </View>
   )

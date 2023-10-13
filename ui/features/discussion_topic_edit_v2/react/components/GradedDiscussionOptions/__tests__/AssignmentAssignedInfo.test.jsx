@@ -18,7 +18,7 @@
 
 import {render, fireEvent, act, waitFor} from '@testing-library/react'
 import React from 'react'
-import {AssignmentAssignedInfo} from '../AssignmentAssignedInfo'
+import {AssignmentDueDate} from '../AssignmentDueDate'
 import {DateTime} from '@instructure/ui-i18n'
 
 const setup = ({
@@ -27,7 +27,7 @@ const setup = ({
   onAssignedInfoChange = () => {},
 } = {}) => {
   return render(
-    <AssignmentAssignedInfo
+    <AssignmentDueDate
       initialAssignedInformation={initialAssignedInformation}
       assignedListOptions={assignedListOptions}
       onAssignedInfoChange={onAssignedInfoChange}
@@ -35,7 +35,7 @@ const setup = ({
   )
 }
 
-describe('AssignmentAssignedInfo', () => {
+describe('AssignmentDueDate', () => {
   // ariaLive is required to avoid unnecessary warnings
   let ariaLive
 
@@ -72,7 +72,7 @@ describe('AssignmentAssignedInfo', () => {
     expect(queryAllByText('Friday, November 10, 2023 12:00 AM')[0]).toBeInTheDocument()
   })
 
-  describe('AssignmentAssignedInfo callbacks', () => {
+  describe('AssignmentDueDate callbacks', () => {
     it('updates dueDate on change and triggers callback', async () => {
       const locale = 'en'
       const timeZone = DateTime.browserTimeZone()

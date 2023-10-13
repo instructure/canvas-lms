@@ -21,11 +21,11 @@ import PropTypes from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {DateTimeInput} from '@instructure/ui-date-time-input'
 import {FormFieldGroup} from '@instructure/ui-form-field'
-import {AssignedTo} from '../AssignedTo/AssignedTo'
+import {AssignedTo} from './AssignedTo'
 
 const I18n = useI18nScope('discussion_create')
 
-export const AssignmentAssignedInfo = ({
+export const AssignmentDueDate = ({
   initialAssignedInformation,
   availableAssignToOptions,
   onAssignedInfoChange,
@@ -101,7 +101,7 @@ export const AssignmentAssignedInfo = ({
   )
 }
 
-AssignmentAssignedInfo.propTypes = {
+AssignmentDueDate.propTypes = {
   availableAssignToOptions: PropTypes.objectOf(
     PropTypes.arrayOf(
       PropTypes.shape({
@@ -119,7 +119,7 @@ AssignmentAssignedInfo.propTypes = {
   onAssignedInfoChange: PropTypes.func,
 }
 
-AssignmentAssignedInfo.defaultProps = {
+AssignmentDueDate.defaultProps = {
   availableAssignToOptions: {},
   initialAssignedInformation: {
     assignedList: [],

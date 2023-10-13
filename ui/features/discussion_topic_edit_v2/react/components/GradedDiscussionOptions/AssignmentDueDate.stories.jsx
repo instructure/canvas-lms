@@ -16,17 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {AssignmentAssignedInfo} from './AssignmentAssignedInfo'
+import {AssignmentDueDate} from './AssignmentDueDate'
 
 export default {
-  title: 'Examples/Discussion Create\\Edit/Components/AssignmentAssignedInfo',
-  component: AssignmentAssignedInfo,
+  title: 'Examples/Discussion Create\\Edit/Components/AssignmentDueDate',
+  component: AssignmentDueDate,
   argTypes: {},
 }
 
 export function Primary(args) {
   return (
-    <AssignmentAssignedInfo
+    <AssignmentDueDate
       assignedListOptions={args.assignedListOptions}
       initialAssignedInformation={args.initialAssignedInformation}
       onAssignedInfoChange={args.onAssignedInfoChange}
