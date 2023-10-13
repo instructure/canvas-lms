@@ -18,12 +18,36 @@
 
 export const MODULE_NAME = 'TempEnroll'
 
+export interface Course {
+  id: string
+  name: string
+  workflow_state: string
+  enrollments: Enrollment[]
+  sections: Section[]
+}
+
+export interface Section {
+  course_section_id: string
+  course_id: string
+  id: string
+  name: string
+  enrollment_role: string
+}
+
+export interface Role {
+  id: string
+  role: string
+  label: string
+  base_role_name: string
+}
+
 export interface Enrollment {
   id: number
   course_id: number
   user: User
   start_at: string | null
   end_at: string | null
+  role_id: string
   type: string
 }
 

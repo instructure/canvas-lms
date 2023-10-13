@@ -17,10 +17,9 @@
  */
 
 import React, {useEffect, useState} from 'react'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {EnrollmentTreeGroup} from './EnrollmentTreeGroup'
 import {Spinner} from '@instructure/ui-spinner'
-import {splitArrayByProperty} from './util/helpers'
+import {Course, Enrollment, Role, Section} from './types'
 
 interface RoleChoice {
   id: string
@@ -28,8 +27,8 @@ interface RoleChoice {
 }
 
 interface Props {
-  list: {}[]
-  roles: {id: string; label: string; base_role_name: string}[]
+  enrollmentsByCourse: Course[] | any
+  roles: Role[] | any
   selectedRole: RoleChoice
   createEnroll?: Function
 }
@@ -47,22 +46,16 @@ export interface NodeStructure {
   workState?: string
 }
 
-interface Section {
-  course_section_id: string
-  course_id: string
-  id: string
-}
-
 export function EnrollmentTree(props: Props) {
-  const [tree, setTree] = useState<NodeStructure[]>([])
+  const [tree, setTree] = useState([] as NodeStructure[])
   const [loading, setLoading] = useState(true)
 
   const sortByBase = (a: NodeStructure, b: NodeStructure) => {
     const aId = a.id.slice(1)
     const bId = b.id.slice(1)
 
-    const aBase = props.roles[props.roles.findIndex(r => r.id === aId)].base_role_name
-    const bBase = props.roles[props.roles.findIndex(r => r.id === bId)].base_role_name
+    const aBase = props.roles[props.roles.findIndex((r: Role) => r.id === aId)].base_role_name
+    const bBase = props.roles[props.roles.findIndex((r: Role) => r.id === bId)].base_role_name
 
     switch (aBase) {
       case 'TeacherEnrollment':
@@ -125,142 +118,90 @@ export function EnrollmentTree(props: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.selectedRole.name, loading])
 
-  // builds basic object tree
+  // builds object tree
   useEffect(() => {
     // populate a data structure with the information needed for each row
-    const enrollByRole = splitArrayByProperty(props.list, 'role_id')
-    const coursePromises = []
     // ids are shared between role/course/section, so we need a prefix to distinguish type
-    for (const role in enrollByRole) {
-      const roleData = props.roles.find((r: any) => {
-        return r.id === role
-      })
-      if (roleData === undefined) {
-        return
-      }
-      const rId = 'r' + role
-      let roleCheck = false
-      if (roleData.base_role_name === 'TeacherEnrollment') {
-        roleCheck = true
-      }
-      const rNode = {
-        id: rId,
-        label: roleData?.label,
-        // eslint-disable-next-line no-array-constructor
-        children: new Array<NodeStructure>(),
-        isToggle: false,
-        isMixed: false,
-        isCheck: roleCheck,
-      }
-      tree.push(rNode)
+    props.enrollmentsByCourse.forEach((course: Course) => {
+      course.enrollments.forEach((enrollment: Enrollment) => {
+        const roleData = props.roles.find((role: Role) => {
+          return role.id === enrollment.role_id
+        })
+        if (roleData === undefined) {
+          return
+        }
+        const roleId = 'r' + enrollment.role_id
+        let roleCheck = false
 
-      const enrollByCourse = splitArrayByProperty(enrollByRole[role], 'course_id')
-      coursePromises.push(getRoles(enrollByCourse, rNode))
-    }
-    Promise.all(coursePromises)
-      .then(() => {
-        tree.sort(sortByBase)
-        setTree([...tree])
-        setLoading(false)
+        if (roleData.base_role_name === 'TeacherEnrollment') {
+          roleCheck = true
+        }
+
+        let roleNode = {
+          id: roleId,
+          label: roleData?.label,
+          // eslint-disable-next-line no-array-constructor
+          children: new Array<NodeStructure>(),
+          isToggle: false,
+          isMixed: false,
+          isCheck: roleCheck,
+        }
+        roleNode = findOrAppendNewNode(roleNode, tree)
+
+        const courseId = course.id
+        const cId = 'c' + courseId
+        const childArray: NodeStructure[] = []
+        let courseNode = {
+          isMismatch: false,
+          id: cId,
+          label: course.name,
+          parent: roleNode,
+          isCheck: roleNode.isCheck,
+          children: childArray,
+          isToggle: false,
+          workState: course.workflow_state,
+          isMixed: false,
+        }
+        courseNode = findOrAppendNewNode(courseNode, roleNode.children)
+
+        course.sections.forEach((section: Section) => {
+          if (section.enrollment_role !== roleData.base_role_name) {
+            return // skip if section role doesn't match role base
+          }
+          const sectionNode = {
+            isMismatch: false,
+            id: `s${section.id}`,
+            label: section.name,
+            parent: courseNode,
+            isCheck: courseNode.isCheck,
+            children: [],
+            enrollId: section.id,
+            isMixed: false,
+          }
+          findOrAppendNewNode(sectionNode, courseNode.children)
+        })
       })
-      .catch(() => {})
+    })
+
+    tree.sort(sortByBase)
+    setTree([...tree])
+    setLoading(false)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const getRoles = (role: any[], rNode: NodeStructure) => {
-    const coursePromises = []
-
-    for (const [, value] of Object.entries(role)) {
-      const coursePromise = getCourses(value, rNode).catch(error => {
-        // eslint-disable-next-line no-console
-        console.error('Error fetching courses for role:', value, error)
-
-        // preserve the role structure and coursePromises continuity by returning null
-        return null
-      })
-
-      coursePromises.push(coursePromise)
-    }
-
-    return Promise.all(coursePromises)
-  }
-
-  const getCourses = async (course: any[], rNode: NodeStructure) => {
-    const courseId = course[0].course_id
-    const cId = 'c' + courseId
-    const childArray: NodeStructure[] = []
-
-    let cJson
-    try {
-      cJson = await doFetchApi({path: `/api/v1/courses/${courseId}`})
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('Error fetching course data for ID:', courseId, error)
-
-      // re-throw the error to be caught by the calling function
-      throw error
-    }
-
-    const cNode = {
-      isMismatch: false,
-      id: cId,
-      label: cJson.json.name,
-      parent: rNode,
-      isCheck: rNode.isCheck,
-      children: childArray,
-      isToggle: false,
-      workState: cJson.json.workflow_state,
-      isMixed: false,
-    }
-
-    const secPromises = [cJson]
-    rNode.children.push(cNode)
-
-    for (const section of course) {
-      const sectionPromise = getSectionDetails(section, cNode).catch(error => {
-        // eslint-disable-next-line no-console
-        console.error('Error fetching section data for section:', section, error)
-      })
-
-      secPromises.push(sectionPromise)
-    }
-
-    return Promise.all(secPromises)
-  }
-
-  const getSectionDetails = async (
-    section: Section,
-    courseNode: NodeStructure
-  ): Promise<any | null> => {
-    try {
-      const sectionJson = await doFetchApi({
-        path: `/api/v1/courses/${section.course_id}/sections/${section.course_section_id}`,
-      })
-
-      const sectionNode = {
-        isMismatch: false,
-        id: `s${section.course_section_id}`,
-        label: sectionJson.json.name,
-        parent: courseNode,
-        isCheck: courseNode.isCheck,
-        children: [],
-        enrollId: section.id,
-        isMixed: false,
+  const findOrAppendNewNode = (currentNode: any, parentNode: any) => {
+    let found = false
+    parentNode.find((node: NodeStructure) => {
+      if (node.label === currentNode.label) {
+        currentNode = node
+        found = true
       }
-
-      courseNode.children.push(sectionNode)
-
-      return sectionJson
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error(
-        `Error fetching section details for course_section_id: ${section.course_section_id} and course_id: ${section.course_id}`,
-        error
-      )
-
-      // returning null as fallback
-      return null
+      return found
+    })
+    if (!found) {
+      parentNode.push(currentNode)
     }
+    return currentNode
   }
 
   const locateNode = (node: NodeStructure) => {

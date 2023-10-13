@@ -49,6 +49,7 @@ import {
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 import {createAnalyticPropsGenerator, setAnalyticPropsOnRef} from './util/analytics'
 import {MODULE_NAME} from './types'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = useI18nScope('temporary_enrollment')
 
@@ -145,7 +146,7 @@ export function TempEnrollAssign(props: Props) {
   const storedData = getStoredData()
 
   const [errorMsg, setErrorMsg] = useState('')
-  const [listEnroll, setListEnroll] = useState<{}[]>([])
+  const [enrollmentsByCourse, setEnrollmentsByCourse] = useState<{}[]>([])
   const [loading, setLoading] = useState(true)
   const [startDate, setStartDate] = useState<Date>(storedData.startDate)
   const [endDate, setEndDate] = useState<Date>(storedData.endDate)
@@ -163,6 +164,25 @@ export function TempEnrollAssign(props: Props) {
   const formatDateTime = useDateTimeFormat('date.formats.full_with_weekday')
 
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const result = await doFetchApi({
+          path: `/api/v1/users/${props.user.id}/courses`,
+          params: {enrollment_state: 'active', include: ['sections']},
+        })
+        setEnrollmentsByCourse(result.json)
+      } catch (error: any) {
+        showFlashError(
+          I18n.t('There was an error while requesting user enrollments, please try again')
+        )(error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchData()
+  }, [props.user.id])
+
+  useEffect(() => {
     if (endDate.getTime() <= startDate.getTime()) {
       setErrorMsg(I18n.t('The start date must be before the end date'))
     } else if (errorMsg !== '') {
@@ -170,32 +190,6 @@ export function TempEnrollAssign(props: Props) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [endDate, startDate])
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setErrorMsg('')
-
-        const result = await doFetchApi({
-          path: `/api/v1/users/${props.user.id}/enrollments`,
-          params: {state: ['active', 'completed', 'invited']},
-        })
-
-        setListEnroll([...result.json])
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error('User enrollments API request error:', error)
-
-        setErrorMsg(
-          I18n.t('There was an error while requesting user enrollments, please try again')
-        )
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchData()
-  }, [props.user.id])
 
   /**
    * Handle change to date value in the DateTimeInput component
@@ -487,13 +481,17 @@ export function TempEnrollAssign(props: Props) {
       </Grid>
       {props.doSubmit() ? (
         <EnrollmentTree
-          list={listEnroll}
+          enrollmentsByCourse={enrollmentsByCourse}
           roles={props.roles}
           selectedRole={roleChoice}
           createEnroll={handleCreateTempEnroll}
         />
       ) : (
-        <EnrollmentTree list={listEnroll} roles={props.roles} selectedRole={roleChoice} />
+        <EnrollmentTree
+          enrollmentsByCourse={enrollmentsByCourse}
+          roles={props.roles}
+          selectedRole={roleChoice}
+        />
       )}
     </>
   )
