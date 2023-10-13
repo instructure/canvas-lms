@@ -16,39 +16,95 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useState} from 'react'
 import {AssignmentDueDate} from './AssignmentDueDate'
 import {Text} from '@instructure/ui-text'
+import {useScope as useI18nScope} from '@canvas/i18n'
+import {Button, CloseButton} from '@instructure/ui-buttons'
+import {nanoid} from 'nanoid'
+import {View} from '@instructure/ui-view'
+import {Flex} from '@instructure/ui-flex'
+import {IconAddLine} from '@instructure/ui-icons'
+import theme from '@instructure/canvas-theme'
+
+const I18n = useI18nScope('discussion_create')
+
+const DEFAULT_LIST_OPTIONS = {
+  'Master Paths': [{id: 'mp_option1', label: 'Master Path Option'}],
+  'Course Sections': [
+    {id: 'sec_1', label: 'Section 1'},
+    {id: 'sec_2', label: 'Section 2'},
+  ],
+  Students: [
+    {id: 'u_1', label: 'Jason'},
+    {id: 'u_2', label: 'Drake'},
+    {id: 'u_3', label: 'Caleb'},
+    {id: 'u_4', label: 'Aaron'},
+    {id: 'u_5', label: 'Chawn'},
+    {id: 'u_6', label: 'Omar'},
+  ],
+}
 
 export const AssignmentDueDatesManager = () => {
   // This default information will be replaced by queried information
-  const DEFAULT_LIST_OPTIONS = {
-    'Master Paths': [{id: 'mp_option1', label: 'Master Path Option'}],
-    'Course Sections': [
-      {id: 'sec_1', label: 'Section 1'},
-      {id: 'sec_2', label: 'Section 2'},
-    ],
-    Students: [
-      {id: 'u_1', label: 'Jason'},
-      {id: 'u_2', label: 'Drake'},
-      {id: 'u_3', label: 'Caleb'},
-      {id: 'u_4', label: 'Aaron'},
-      {id: 'u_5', label: 'Chawn'},
-      {id: 'u_6', label: 'Omar'},
-    ],
+  const [assignedInfoList, setAssignedInfoList] = useState([{id: nanoid()}]) // Initialize with one object with a unique id
+
+  const handleAssignedInfoChange = (newInfo, id) => {
+    const updatedInfoList = assignedInfoList.map(info =>
+      info.id === id ? {...info, ...newInfo} : info
+    )
+    setAssignedInfoList(updatedInfoList)
   }
 
-  const handleAssignedInfoChange = newInfo => {
-    console.log('new Assigned Info', newInfo)
+  const handleAddAssignment = () => {
+    setAssignedInfoList([...assignedInfoList, {id: nanoid()}]) // Add a new object with a unique id
+  }
+
+  const handleCloseAssignmentDueDate = id => () => {
+    const updatedInfoList = assignedInfoList.filter(info => info.id !== id)
+    setAssignedInfoList(updatedInfoList)
   }
 
   return (
     <>
-      <Text>Assignment Settings</Text>
-      <AssignmentDueDate
-        availableAssignToOptions={DEFAULT_LIST_OPTIONS}
-        onAssignedInfoChange={handleAssignedInfoChange}
-      />
+      <Text size="large">{I18n.t('Assignment Settings')}</Text>
+      {assignedInfoList.map((info, index) => (
+        <View key={info.id}>
+          <div
+            style={{
+              paddingTop: assignedInfoList.length === 1 ? theme.variables.spacing.medium : '0',
+              borderBottom: index < assignedInfoList.length - 1 ? '1px solid #C7CDD1' : 'none',
+              paddingBottom: theme.variables.spacing.medium,
+            }}
+          >
+            {assignedInfoList.length > 1 && (
+              <View display="block">
+                <Flex justifyItems="space-between" alignItems="center" padding="small none small">
+                  <Flex.Item shouldShrink={true} shouldGrow={true}>
+                    <Text size="x-small" color="secondary">{`(${index + 1}/${
+                      assignedInfoList.length
+                    })`}</Text>
+                  </Flex.Item>
+                  <Flex.Item padding="none none none none">
+                    <CloseButton
+                      size="small"
+                      screenReaderLabel={I18n.t('Close')}
+                      onClick={handleCloseAssignmentDueDate(info.id)}
+                    />
+                  </Flex.Item>
+                </Flex>
+              </View>
+            )}
+            <AssignmentDueDate
+              availableAssignToOptions={DEFAULT_LIST_OPTIONS}
+              onAssignedInfoChange={newInfo => handleAssignedInfoChange(newInfo, info.id)}
+            />
+          </div>
+        </View>
+      ))}
+      <Button renderIcon={IconAddLine} onClick={handleAddAssignment}>
+        {I18n.t('Add Assignment')}
+      </Button>
     </>
   )
 }

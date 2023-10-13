@@ -35,7 +35,7 @@ export const AssignmentDueDate = ({
   // Form properties
   return (
     <>
-      <FormFieldGroup description="" width="100%">
+      <FormFieldGroup description="" width="100%" data-testid="assignment-due-date">
         <AssignedTo
           availableAssignToOptions={availableAssignToOptions}
           initialAssignedToInformation={initialAssignedInformation.assignedList}
