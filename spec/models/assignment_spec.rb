@@ -11393,8 +11393,8 @@ describe Assignment do
 
   describe "checkpointed assignments" do
     before do
-      @parent = @course.assignments.create!(checkpointed: true)
-      @child = @parent.checkpoint_assignments.create!(context: @course, checkpoint_label: "reply_to_topic")
+      @parent = @course.assignments.create!(checkpointed: true, checkpoint_label: CheckpointLabels::PARENT)
+      @child = @parent.checkpoint_assignments.create!(context: @course, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC)
     end
 
     it "does not allow parent assignments to have their own parent assignments" do
