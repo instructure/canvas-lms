@@ -2957,4 +2957,50 @@ describe DiscussionTopic do
       end
     end
   end
+
+  describe "checkpoints" do
+    before do
+      @topic = @course.discussion_topics.create!(title: "Discussion Topic Title", user: @teacher)
+    end
+
+    it "not in place in the topic" do
+      expect(@topic.checkpoints?).to be false
+      expect(@topic.checkpoint_assignments.length).to eq 0
+      expect(@topic.reply_to_topic_checkpoint).to be_nil
+      expect(@topic.reply_to_entry_checkpoint).to be_nil
+    end
+
+    describe "in place" do
+      before do
+        @course.root_account.enable_feature!(:discussion_checkpoints)
+        @topic.reload
+        @topic.create_checkpoints(reply_to_topic_points: 10, reply_to_entry_points: 15)
+      end
+
+      it "in the topic" do
+        expect(@topic.checkpoints?).to be true
+        expect(@topic.checkpoint_assignments.length).to eq 2
+        expect(@topic.assignment.checkpoint_label).to eq CheckpointLabels::PARENT
+        expect(@topic.reply_to_topic_checkpoint.checkpoint_label).to eq CheckpointLabels::REPLY_TO_TOPIC
+        expect(@topic.reply_to_entry_checkpoint.checkpoint_label).to eq CheckpointLabels::REPLY_TO_ENTRY
+      end
+
+      it "correctly marks the reply to topic checkpoint submission as submitted when the student replies to topic" do
+        @topic.discussion_entries.create!(user: @student, message: "reply to topic")
+
+        expect(@topic.assignment.submissions.where(user: @student).first.workflow_state).to eq "unsubmitted"
+        expect(@topic.reply_to_topic_checkpoint.submissions.where(user: @student).first.workflow_state).to eq "submitted"
+        expect(@topic.reply_to_entry_checkpoint.submissions.where(user: @student).first.workflow_state).to eq "unsubmitted"
+      end
+
+      it "does not mark the reply to topic checkpoint submission as submitted when the student replies to an entry" do
+        entry = @topic.discussion_entries.create!(user: @teacher, message: "reply to topic")
+        @topic.discussion_entries.create!(user: @student, message: "reply to entry", root_entry_id: entry.id, parent_id: entry.id)
+
+        expect(@topic.assignment.submissions.where(user: @student).first.workflow_state).to eq "unsubmitted"
+        expect(@topic.reply_to_topic_checkpoint.submissions.where(user: @student).first.workflow_state).to eq "unsubmitted"
+        expect(@topic.reply_to_entry_checkpoint.submissions.where(user: @student).first.workflow_state).to eq "unsubmitted"
+      end
+    end
+  end
 end

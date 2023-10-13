@@ -1321,19 +1321,44 @@ class DiscussionTopic < ActiveRecord::Base
   def ensure_submission(user, only_update = false)
     topic = (root_topic? && child_topic_for(user)) || self
 
-    submission = Submission.active.where(assignment_id:, user_id: user).first
+    submissions = []
+    all_entries_for_user = topic.discussion_entries.all_for_user(user)
+
+    if topic.root_account&.feature_enabled?(:discussion_checkpoints) && checkpoints?
+      reply_to_topic_submitted_at = topic.discussion_entries.top_level_for_user(user).minimum(:created_at)
+
+      if reply_to_topic_submitted_at.present?
+        submission = ensure_particular_submission(reply_to_topic_checkpoint, user, reply_to_topic_submitted_at, only_update:)
+        submissions << submission if submission.present?
+      end
+
+      # TODO: Call ensure_particular_submission for reply to entries
+    else
+      submitted_at = all_entries_for_user.minimum(:created_at)
+
+      submission = ensure_particular_submission(assignment, user, submitted_at, only_update:)
+      submissions << submission if submission.present?
+    end
+
+    return unless submissions.any?
+
+    attachment_ids = all_entries_for_user.where.not(attachment_id: nil).pluck(:attachment_id).sort.map(&:to_s).join(",")
+
+    submissions.each do |s|
+      s.attachment_ids = attachment_ids
+      s.save! if s.changed?
+    end
+  end
+
+  def ensure_particular_submission(assignment, user, submitted_at, only_update: false)
+    submission = Submission.active.where(assignment_id: assignment.id, user_id: user).first
     unless only_update || (submission && submission.submission_type == "discussion_topic" && submission.workflow_state != "unsubmitted")
       submission = assignment.submit_homework(user,
                                               submission_type: "discussion_topic",
-                                              submitted_at: topic && topic.discussion_entries.active.where(user_id: user).minimum(:created_at))
+                                              submitted_at:)
     end
-    return unless submission
 
-    if topic
-      attachment_ids = topic.discussion_entries.active.where(user_id: user).where.not(attachment_id: nil).pluck(:attachment_id)
-      submission.attachment_ids = attachment_ids.sort.map(&:to_s).join(",")
-      submission.save! if submission.changed?
-    end
+    submission
   end
 
   def send_notification_for_context?
@@ -1757,5 +1782,29 @@ class DiscussionTopic < ActiveRecord::Base
 
   def anonymous?
     !anonymous_state.nil?
+  end
+
+  def checkpoints?
+    checkpoint_assignments.any?
+  end
+
+  def reply_to_topic_checkpoint
+    checkpoint_assignments.find_by(checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC)
+  end
+
+  def reply_to_entry_checkpoint
+    checkpoint_assignments.find_by(checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY)
+  end
+
+  def create_checkpoints(reply_to_topic_points:, reply_to_entry_points:)
+    return false if checkpoints?
+    return false unless context.is_a?(Course)
+
+    parent = context.assignments.create!(checkpointed: true, checkpoint_label: CheckpointLabels::PARENT)
+    parent.checkpoint_assignments.create!(context:, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC, points_possible: reply_to_topic_points)
+    parent.checkpoint_assignments.create!(context:, checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY, points_possible: reply_to_entry_points)
+    self.assignment = parent
+
+    save
   end
 end
