@@ -3055,6 +3055,66 @@ describe GradebooksController do
         expect(response_json.dig("errors", "error_code")).to eq "PROVISIONAL_GRADE_INVALID_SCORE"
       end
     end
+
+    describe "checkpointed discussions" do
+      before do
+        @course.root_account.enable_feature!(:discussion_checkpoints)
+        assignment = @course.assignments.create!(checkpointed: true, checkpoint_label: CheckpointLabels::PARENT)
+        assignment.checkpoint_assignments.create!(context: @course, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC, due_at: 2.days.from_now)
+        assignment.checkpoint_assignments.create!(context: @course, checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY, due_at: 3.days.from_now)
+        @topic = @course.discussion_topics.create!(assignment:)
+      end
+
+      let(:post_params) do
+        {
+          course_id: @course.id,
+          submission: {
+            assignment_id: @topic.assignment_id,
+            user_id: @student.id,
+            grade: 10
+          }
+        }
+      end
+
+      let(:reply_to_topic_submission) do
+        @topic.reply_to_topic_checkpoint.submissions.find_by(user: @student)
+      end
+
+      it "supports grading checkpoints" do
+        user_session(@teacher)
+        post(
+          "update_submission",
+          params: post_params.merge(checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC),
+          format: :json
+        )
+        expect(response).to be_successful
+        expect(reply_to_topic_submission.score).to eq 10
+      end
+
+      it "raises an error if no checkpoint label is provided" do
+        user_session(@teacher)
+        post(
+          "update_submission",
+          params: post_params,
+          format: :json
+        )
+        expect(response).to have_http_status :bad_request
+        expect(json_parse.dig("errors", "base")).to eq "Must provide a valid checkpoint label when grading checkpointed discussions"
+      end
+
+      it "ignores checkpoints when the feature flag is disabled" do
+        @course.root_account.disable_feature!(:discussion_checkpoints)
+        user_session(@teacher)
+        post(
+          "update_submission",
+          params: post_params.merge(checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC),
+          format: :json
+        )
+        expect(response).to be_successful
+        expect(reply_to_topic_submission.score).to be_nil
+        expect(@topic.assignment.submissions.find_by(user: @student).score).to eq 10
+      end
+    end
   end
 
   describe "GET 'speed_grader'" do

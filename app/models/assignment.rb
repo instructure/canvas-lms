@@ -35,6 +35,7 @@ class Assignment < ActiveRecord::Base
   include Plannable
   include DuplicatingObjects
   include LockedFor
+  include Checkpointable
 
   self.ignored_columns += %i[context_code]
 
@@ -164,9 +165,6 @@ class Assignment < ActiveRecord::Base
   has_many :conditional_release_associations, class_name: "ConditionalRelease::AssignmentSetAssociation", dependent: :destroy, inverse_of: :assignment
   has_one :master_content_tag, class_name: "MasterCourses::MasterContentTag", inverse_of: :assignment
 
-  belongs_to :parent_assignment, class_name: "Assignment", optional: true, inverse_of: :checkpoint_assignments
-  has_many :checkpoint_assignments, -> { active }, class_name: "Assignment", foreign_key: :parent_assignment_id, inverse_of: :parent_assignment
-
   scope :assigned_to_student, ->(student_id) { joins(:submissions).where(submissions: { user_id: student_id }) }
   scope :anonymous, -> { where(anonymous_grading: true) }
   scope :moderated, -> { where(moderated_grading: true) }
@@ -213,8 +211,6 @@ class Assignment < ActiveRecord::Base
   validates :grader_count, numericality: true
   validates :allowed_attempts, numericality: { greater_than: 0 }, unless: proc { |a| a.allowed_attempts == -1 }, allow_nil: true
   validates :sis_source_id, uniqueness: { scope: :root_account_id }, allow_nil: true
-  validates :parent_assignment_id, absence: true, if: :checkpointed?
-  validates :parent_assignment_id, comparison: { other_than: :id, message: -> { "cannot reference self" } }, allow_nil: true
 
   with_options unless: :moderated_grading? do
     validates :graders_anonymous_to_graders, absence: true
@@ -2067,6 +2063,18 @@ class Assignment < ActiveRecord::Base
     group, students = group_students(original_student)
     submissions = []
     grade_group_students = !(grade_group_students_individually || opts[:excused])
+
+    if checkpointed? && root_account&.feature_enabled?(:discussion_checkpoints)
+      checkpoint_label = opts.delete(:checkpoint_label)
+      checkpoint_assignment = find_checkpoint(checkpoint_label)
+      if checkpoint_label.blank? || checkpoint_assignment.nil?
+        raise GradeError, "Must provide a valid checkpoint label when grading checkpointed discussions"
+      end
+
+      checkpoint_submissions = checkpoint_assignment.grade_student(original_student, opts)
+      parent_submissions = all_submissions.where(user_id: checkpoint_submissions.map(&:user_id))
+      return parent_submissions.preload(:grading_period, :stream_item).to_a
+    end
 
     # grading a student results in a teacher occupying a grader slot for that assignment if it is moderated.
     ensure_grader_can_adjudicate(grader: opts[:grader], provisional: opts[:provisional], occupy_slot: true) do

@@ -3588,6 +3588,66 @@ describe "Submissions API", type: :request do
       }.by(1)
     end
 
+    describe "checkpointed discussions" do
+      before do
+        @course.root_account.enable_feature!(:discussion_checkpoints)
+        assignment = @course.assignments.create!(checkpointed: true, checkpoint_label: CheckpointLabels::PARENT)
+        assignment.checkpoint_assignments.create!(context: @course, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC, due_at: 2.days.from_now)
+        assignment.checkpoint_assignments.create!(context: @course, checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY, due_at: 3.days.from_now)
+        @topic = @course.discussion_topics.create!(assignment:)
+      end
+
+      let(:api_call_args) do
+        [
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@topic.assignment_id}/submissions/#{@student.id}.json",
+          {
+            controller: "submissions_api",
+            action: "update",
+            format: "json",
+            course_id: @course.id.to_s,
+            assignment_id: @topic.assignment_id.to_s,
+            user_id: @student.id.to_s
+          }
+        ]
+      end
+
+      let(:reply_to_topic_submission) do
+        @topic.reply_to_topic_checkpoint.submissions.find_by(user: @student)
+      end
+
+      it "supports grading checkpoints" do
+        api_call(
+          *api_call_args,
+          submission: { posted_grade: 10 },
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC
+        )
+        expect(response).to be_successful
+        expect(reply_to_topic_submission.score).to eq 10
+      end
+
+      it "raises an error if no checkpoint label is provided" do
+        api_call(
+          *api_call_args,
+          submission: { posted_grade: 10 }
+        )
+        expect(response).to have_http_status :bad_request
+        expect(json_parse.fetch("error")).to eq "Must provide a valid checkpoint label when grading checkpointed discussions"
+      end
+
+      it "ignores checkpoints when the feature flag is disabled" do
+        @course.root_account.disable_feature!(:discussion_checkpoints)
+        api_call(
+          *api_call_args,
+          submission: { posted_grade: 10 },
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC
+        )
+        expect(response).to be_successful
+        expect(reply_to_topic_submission.score).to be_nil
+        expect(@topic.assignment.submissions.find_by(user: @student).score).to eq 10
+      end
+    end
+
     describe "stickers" do
       let(:update_sticker_api_call) do
         api_call(
