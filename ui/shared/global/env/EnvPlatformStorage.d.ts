@@ -24,5 +24,4 @@ export type EnvPlatformStorage = Partial<EnvPlatformStoragePostMessageForwarding
 export interface EnvPlatformStoragePostMessageForwarding {
   PARENT_ORIGIN: string
   IGNORE_LTI_POST_MESSAGES?: boolean
-  LTI_PLATFORM_STORAGE_ENABLED?: boolean
 }
