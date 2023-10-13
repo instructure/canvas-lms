@@ -210,9 +210,12 @@ export const AssignedTo = ({
       >
         {renderGroups()}
       </Select>
-      <Alert liveRegion={liveRegion} liveRegionPoliteness="assertive" screenReaderOnly={true}>
-        {announcement}
-      </Alert>
+      {/* This condition allows tests that don't have the flash_screenreader_holder to run without having to mock the live region */}
+      {liveRegion() && (
+        <Alert liveRegion={liveRegion} liveRegionPoliteness="assertive" screenReaderOnly={true}>
+          {announcement}
+        </Alert>
+      )}
     </>
   )
 }
