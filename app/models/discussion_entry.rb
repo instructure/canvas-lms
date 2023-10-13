@@ -393,6 +393,8 @@ class DiscussionEntry < ActiveRecord::Base
   # when there is no discussion_entry_participant for a user, it is considered unread
   scope :unread_for_user, ->(user) { joins(participant_join_sql(user)).where(discussion_entry_participants: { workflow_state: ["unread", nil] }) }
   scope :unread_for_user_before, ->(user, unread_before = 1.minute.ago.utc) { where(discussion_entry_participants: { workflow_state: ["unread", nil] }).or(where("discussion_entry_participants.workflow_state = 'read' AND COALESCE(discussion_entry_participants.read_at, '2022-10-28') >= ?", unread_before)).joins(participant_join_sql(user)) }
+  scope :all_for_user, ->(user) { active.where(user_id: user) }
+  scope :top_level_for_user, ->(user) { all_for_user(user).where(root_entry_id: nil) }
 
   def self.participant_join_sql(current_user)
     sanitize_sql(["LEFT OUTER JOIN #{DiscussionEntryParticipant.quoted_table_name} ON discussion_entries.id = discussion_entry_participants.discussion_entry_id
