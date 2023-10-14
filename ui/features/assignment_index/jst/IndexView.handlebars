@@ -17,8 +17,94 @@
     {{#t}}Warning: for improved accessibility of reordering assignments and groups, please use the Move To Dialog option found in the menu.{{/t}}
   </div>
 {{/if}}
-<div class="header-bar">
-  <div class="header-bar-left ic-Form-control assignment-search">
+<div class="{{#if ENV.FEATURES.instui_nav}}assignment_index_header{{else}}header-bar{{/if}}">
+  {{#if ENV.FEATURES.instui_nav}}
+    <div class="header-bar-left assignment_index_header_left">
+      <h1 class="assignment_index_header_title">{{#t}}Assignments{{/t}}</h1>
+    </div>
+  {{else}}
+    <div class="header-bar-left ic-Form-control assignment-search">
+      <div class="ic-Multi-input">
+        {{#if ENV.HAS_GRADING_PERIODS}}
+          <select class="ic-Input" id="grading_period_selector" aria-label="{{#t}}Select a Grading Period{{/t}}">
+            <option value="all">{{#t}}All Grading Periods{{/t}}</option>
+            {{#each ENV.active_grading_periods}}
+              <option id="grading_period_{{id}}" value="{{@index}}">{{title}}</option>
+            {{/each}}
+          </select>
+        {{/if}}
+        <label for="search_term" class="screenreader-only">
+          {{#t "search_for_assignment"}}Search for Assignment{{/t}}
+        </label>
+        <span id="search_input_container"></span>
+        <input
+          class="ic-Input"
+          id="search_term"
+          type="hidden"
+          name="search_term"
+          data-view="inputFilter"
+          value=""
+          disabled
+          placeholder="{{#t "search_for_assignment"}}Search for Assignment{{/t}}"
+        >
+      </div>
+    </div>
+  {{/if}}
+
+  <div class="header-bar-right {{#if ENV.FEATURES.instui_nav}}assignment_index_header_right{{/if}}">
+    {{#ifAny ENV.PERMISSIONS.manage_assignments ENV.PERMISSIONS.manage_assignments_add}}
+      {{#if ENV.FEATURES.instui_nav}}
+        {{#if ENV.PERMISSIONS.manage_assignments}}
+          <div id="settingsMountPoint"></div>
+        {{/if}}
+        <div id="indexCreateMountPoint"></div>
+        <a
+          style="display:none"
+          data-view="addGroup"
+          id="addGroup"
+        />
+      {{else}}
+        {{#if ENV.PERMISSIONS.manage_assignments_add}}
+          {{#if ENV.QUIZ_LTI_ENABLED}}
+            <span class="new_quiz_lti_wrapper">
+              <a
+                href="{{ENV.URLS.new_assignment_url}}?quiz_lti"
+                class="new_quiz_lti btn icon-plus"
+                title='{{#t "title_add_quiz_lti"}}Add Quiz/Test{{/t}}'
+                aria-label='{{#t "title_add_quiz_lti"}}Add Quiz/Test{{/t}}'
+              >{{#t "add_quiz_lti"}}Quiz/Test{{/t}}</a>
+            </span>
+          {{/if}}
+
+          <button
+            class="btn Button"
+            id="addGroup"
+            title='{{#t "title_add_group"}}Add Assignment Group{{/t}}'
+            aria-label='{{#t "title_add_group"}}Add Assignment Group{{/t}}'
+          ><i class="icon-plus">{{#t "add_group"}}Group{{/t}}</i></button>
+
+          <a
+            href="{{ENV.URLS.new_assignment_url}}"
+            class="new_assignment btn btn-primary icon-plus"
+            title='{{#t "title_add_assignment"}}Add Assignment{{/t}}'
+            aria-label='{{#t "title_add_assignment"}}Add Assignment{{/t}}'
+          >{{#t "add_assignment"}}Assignment{{/t}}</a>
+        {{/if}}
+      {{/if}}
+
+      {{#unless ENV.FEATURES.instui_nav}}
+        {{#if ENV.PERMISSIONS.manage_assignments}}
+          <span id="settingsMountPoint"></span>
+        {{/if}}
+      {{/unless}}
+    {{else}}
+      <div style="display:inline-block" data-view="showBy"></div>
+    {{/ifAny}}
+  </div>
+</div>
+
+{{#if ENV.FEATURES.instui_nav}}
+  <div class="ic-Form-control assignment-search">
     <div class="ic-Multi-input">
       {{#if ENV.HAS_GRADING_PERIODS}}
         <select class="ic-Input" id="grading_period_selector" aria-label="{{#t}}Select a Grading Period{{/t}}">
@@ -44,44 +130,7 @@
       >
     </div>
   </div>
-
-  <div class="header-bar-right">
-    {{#ifAny ENV.PERMISSIONS.manage_assignments ENV.PERMISSIONS.manage_assignments_add}}
-      {{#if ENV.PERMISSIONS.manage_assignments_add}}
-        {{#if ENV.QUIZ_LTI_ENABLED}}
-          <span class="new_quiz_lti_wrapper">
-            <a
-              href="{{ENV.URLS.new_assignment_url}}?quiz_lti"
-              class="new_quiz_lti btn icon-plus"
-              title='{{#t "title_add_quiz_lti"}}Add Quiz/Test{{/t}}'
-              aria-label='{{#t "title_add_quiz_lti"}}Add Quiz/Test{{/t}}'
-            >{{#t "add_quiz_lti"}}Quiz/Test{{/t}}</a>
-          </span>
-        {{/if}}
-
-        <button
-          class="btn Button"
-          id="addGroup"
-          title='{{#t "title_add_group"}}Add Assignment Group{{/t}}'
-          aria-label='{{#t "title_add_group"}}Add Assignment Group{{/t}}'
-        ><i class="icon-plus">{{#t "add_group"}}Group{{/t}}</i></button>
-
-        <a
-          href="{{ENV.URLS.new_assignment_url}}"
-          class="new_assignment btn btn-primary icon-plus"
-          title='{{#t "title_add_assignment"}}Add Assignment{{/t}}'
-          aria-label='{{#t "title_add_assignment"}}Add Assignment{{/t}}'
-        >{{#t "add_assignment"}}Assignment{{/t}}</a>
-      {{/if}}
-
-      {{#if ENV.PERMISSIONS.manage_assignments}}
-        <span id="settingsMountPoint"></span>
-      {{/if}}
-    {{else}}
-      <div data-view="showBy"></div>
-    {{/ifAny}}
-  </div>
-</div>
+{{/if}}
 
 <div data-view="assignmentGroups" class="item-group-container" id="ag-list"></div>
 <div id="copy-to-mount-point" />

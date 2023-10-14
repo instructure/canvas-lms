@@ -29,6 +29,7 @@ describe "external tool assignments" do
   end
 
   it "allows creating through index", priority: "2" do
+    @course.root_account.enable_feature!(:instui_nav)
     get "/courses/#{@course.id}/assignments"
     expect_no_flash_message :error
     # create assignment

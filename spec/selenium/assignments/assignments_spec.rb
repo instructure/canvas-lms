@@ -186,6 +186,7 @@ describe "assignments" do
       expect(driver.title).to include(assignment_name + " edit")
     end
 
+    # EVAL-3711 Remove this test when instui_nav feature flag is removed
     it "creates an assignment using main add button", :xbrowser, priority: "1" do
       assignment_name = "first assignment"
       # freeze for a certain time, so we don't get unexpected ui complications
@@ -196,6 +197,36 @@ describe "assignments" do
         get "/courses/#{@course.id}/assignments"
         # create assignment
         wait_for_new_page_load { f(".new_assignment").click }
+        f("#assignment_name").send_keys(assignment_name)
+        replace_content(f("#assignment_points_possible"), "10")
+        click_option("#assignment_submission_type", "Online")
+        ["#assignment_text_entry", "#assignment_online_url", "#assignment_online_upload"].each do |element|
+          f(element).click
+        end
+        replace_content(f(".DueDateInput"), due_at)
+
+        submit_assignment_form
+        wait_for_ajaximations
+        # confirm all our settings were saved and are now displayed
+        expect(f("h1.title")).to include_text(assignment_name)
+        expect(f("#assignment_show .points_possible")).to include_text("10")
+        expect(f("#assignment_show fieldset")).to include_text("a text entry box, a website url, or a file upload")
+
+        expect(f(".assignment_dates")).to include_text(due_at)
+      end
+    end
+
+    it "creates an assignment using main add button with the instui nav feature flag on", :xbrowser, priority: "1" do
+      @course.root_account.enable_feature!(:instui_nav)
+      assignment_name = "first assignment"
+      # freeze for a certain time, so we don't get unexpected ui complications
+      time = DateTime.new(Time.now.year, 1, 7, 2, 13)
+      Timecop.freeze(time) do
+        due_at = format_time_for_view(time)
+
+        get "/courses/#{@course.id}/assignments"
+        # create assignment
+        wait_for_new_page_load { f("[data-testid='new_assignment_button']").click }
         f("#assignment_name").send_keys(assignment_name)
         replace_content(f("#assignment_points_possible"), "10")
         click_option("#assignment_submission_type", "Online")
@@ -449,10 +480,42 @@ describe "assignments" do
         @assignment = @course.assignments.create(name: "Student Annotation", submission_types: "student_annotation,online_text_entry", annotatable_attachment_id: attachment.id)
       end
 
+      # EVAL-3711 Remove this test when instui_nav feature flag is removed
       it "creates a student annotation assignment with annotatable attachment with usage rights" do
         get "/courses/#{@course.id}/assignments"
-
         wait_for_new_page_load { f(".new_assignment").click }
+        f("#assignment_name").send_keys("Annotated Test")
+
+        replace_content(f("#assignment_points_possible"), "10")
+        click_option("#assignment_submission_type", "Online")
+
+        ["#assignment_annotated_document", "#assignment_text_entry"].each do |element|
+          f(element).click
+        end
+
+        wait_for_ajaximations
+
+        expect(f("#assignment_annotated_document_info")).to be_displayed
+
+        # select attachment from file explorer
+        fxpath('//*[@id="annotated_document_chooser_container"]/div/div[1]/ul/li[1]/button').click
+        fxpath('//*[@id="annotated_document_chooser_container"]/div/div[1]/ul/li[1]/ul/li/button').click
+
+        # set usage rights
+        f("#usageRightSelector").click
+        fxpath('//*[@id="usageRightSelector"]/option[2]').click
+        f("#copyrightHolder").send_keys("Me")
+
+        submit_assignment_form
+        wait_for_ajaximations
+
+        expect(f("#assignment_show fieldset")).to include_text("a text entry box or a student annotation")
+      end
+
+      it "creates a student annotation assignment with annotatable attachment with usage rights with the instui nav feature flag on" do
+        @course.root_account.enable_feature!(:instui_nav)
+        get "/courses/#{@course.id}/assignments"
+        wait_for_new_page_load { f("[data-testid='new_assignment_button']").click }
         f("#assignment_name").send_keys("Annotated Test")
 
         replace_content(f("#assignment_points_possible"), "10")
@@ -772,11 +835,20 @@ describe "assignments" do
       end
     end
 
+    # EVAL-3711 Remove this test when instui_nav feature flag is removed
     it "goes to the assignment index page from left nav", priority: "1" do
       get "/courses/#{@course.id}"
       f("#wrapper .assignments").click
       wait_for_ajaximations
       expect(f(".header-bar-right .new_assignment")).to include_text("Assignment")
+    end
+
+    it "goes to the assignment index page from left nav with the instui nav feature flag on", priority: "1" do
+      @course.root_account.enable_feature!(:instui_nav)
+      get "/courses/#{@course.id}"
+      f("#wrapper .assignments").click
+      wait_for_ajaximations
+      expect(f("[data-testid='new_assignment_button']")).to include_text("Assignment")
     end
   end
 

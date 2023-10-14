@@ -24,6 +24,10 @@ import Backbone from '@canvas/backbone'
 import Cache from '../../cache'
 import AssignmentGroup from '@canvas/assignments/backbone/models/AssignmentGroup'
 import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
+import {Menu} from '@instructure/ui-menu'
+import {Button} from '@instructure/ui-buttons'
+import {View} from '@instructure/ui-view'
+import {IconArrowOpenDownLine, IconArrowOpenUpLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 const I18n = useI18nScope('assignmentsToggleShowByView')
@@ -31,12 +35,14 @@ const I18n = useI18nScope('assignmentsToggleShowByView')
 export default class ToggleShowByView extends Backbone.View {
   initialize(...args) {
     super.initialize(...args)
+    this.menuOpened = false
     this.initialized = $.Deferred()
     this.course.on('change', () => this.initializeCache())
     this.course.on('change', this.render, this)
     this.assignmentGroups.once('change:submissions', () => this.initializeDateGroups())
     this.on('changed:showBy', () => this.setAssignmentGroups())
     this.on('changed:showBy', this.render, this)
+    this.on('changed:toggleMenu', this.render, this)
   }
 
   initializeCache() {
@@ -117,19 +123,56 @@ export default class ToggleShowByView extends Backbone.View {
     return $.when(this.initialized).then(() => this.renderToggle())
   }
 
+  showByMenuTrigger() {
+    return (
+      <Button>
+        {I18n.t('Show By')}
+        <View margin="0 0 0 small">
+          {this.menuOpened ? <IconArrowOpenUpLine /> : <IconArrowOpenDownLine />}
+        </View>
+      </Button>
+    )
+  }
+
+  toggleMenu() {
+    this.menuOpened = !this.menuOpened
+    this.trigger('changed:toggleMenu')
+  }
+
   renderToggle() {
     ReactDOM.render(
-      <RadioInputGroup
-        description={<ScreenReaderContent>{I18n.t('Show By')}</ScreenReaderContent>}
-        size="medium"
-        name="show_by"
-        variant="toggle"
-        defaultValue={this.showByDate() ? 'date' : 'type'}
-        onChange={(e, val) => this.toggleShowBy(val)}
-      >
-        <RadioInput id="show_by_date" label={I18n.t('Show by Date')} value="date" context="off" />
-        <RadioInput id="show_by_type" label={I18n.t('Show by Type')} value="type" context="off" />
-      </RadioInputGroup>,
+      ENV.FEATURES.instui_nav ? (
+        <Menu trigger={this.showByMenuTrigger()} onToggle={() => this.toggleMenu()}>
+          <Menu.Group label="" selected={[this.showByDate() ? 'date' : 'type']}>
+            <Menu.Item
+              data-testid="show_by_date"
+              onSelect={(e, val) => this.toggleShowBy(val)}
+              value="date"
+            >
+              {I18n.t('Date')}
+            </Menu.Item>
+            <Menu.Item
+              data-testid="show_by_type"
+              onSelect={(e, val) => this.toggleShowBy(val)}
+              value="type"
+            >
+              {I18n.t('Type')}
+            </Menu.Item>
+          </Menu.Group>
+        </Menu>
+      ) : (
+        <RadioInputGroup
+          description={<ScreenReaderContent>{I18n.t('Show By')}</ScreenReaderContent>}
+          size="medium"
+          name="show_by"
+          variant="toggle"
+          defaultValue={this.showByDate() ? 'date' : 'type'}
+          onChange={(e, val) => this.toggleShowBy(val)}
+        >
+          <RadioInput id="show_by_date" label={I18n.t('Show by Date')} value="date" context="off" />
+          <RadioInput id="show_by_type" label={I18n.t('Show by Type')} value="type" context="off" />
+        </RadioInputGroup>
+      ),
       this.el
     )
   }
@@ -170,9 +213,9 @@ export default class ToggleShowByView extends Backbone.View {
     ]
   }
 
-  toggleShowBy(sort) {
+  toggleShowBy(value) {
     const key = this.cacheKey()
-    const showByDate = sort === 'date'
+    const showByDate = value === 'date'
     const currentlyByDate = this.cache.get(key)
     if (currentlyByDate !== showByDate) {
       this.cache.set(key, showByDate)
