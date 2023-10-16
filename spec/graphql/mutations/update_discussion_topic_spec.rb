@@ -29,7 +29,13 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
   def mutation_str(
     id: nil,
     published: nil,
-    locked: nil
+    locked: nil,
+    title: nil,
+    message: nil,
+    require_initial_post: nil,
+    specific_sections: nil,
+    delayed_post_at: nil,
+    lock_at: nil
   )
     <<~GQL
       mutation {
@@ -37,6 +43,12 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
           discussionTopicId: #{id}
           #{"published: #{published}" unless published.nil?}
           #{"locked: #{locked}" unless locked.nil?}
+          #{"title: \"#{title}\"" unless title.nil?}
+          #{"message: \"#{message}\"" unless message.nil?}
+          #{"requireInitialPost: #{require_initial_post}" unless require_initial_post.nil?}
+          #{"specificSections: \"#{specific_sections}\"" unless specific_sections.nil?}
+          #{"delayedPostAt: \"#{delayed_post_at}\"" unless delayed_post_at.nil?}
+          #{"lockAt: \"#{lock_at}\"" unless lock_at.nil?}
         }) {
           discussionTopic {
             published
@@ -57,6 +69,31 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       }
     )
     result.to_h.with_indifferent_access
+  end
+
+  it "updates the discussion topic" do
+    delayed_post_at = 5.days.from_now.iso8601
+    lock_at = 10.days.from_now.iso8601
+
+    updated_params = {
+      id: @topic.id,
+      title: "Updated Title",
+      message: "Updated Message",
+      require_initial_post: true,
+      specific_sections: "all",
+      delayed_post_at: delayed_post_at.to_s,
+      lock_at: lock_at.to_s
+    }
+    result = run_mutation(updated_params)
+
+    expect(result["errors"]).to be_nil
+    @topic.reload
+    expect(@topic.title).to eq "Updated Title"
+    expect(@topic.message).to eq "Updated Message"
+    expect(@topic.require_initial_post).to be true
+    expect(@topic.is_section_specific).to be false
+    expect(@topic.delayed_post_at).to eq delayed_post_at
+    expect(@topic.lock_at).to eq lock_at
   end
 
   it "publishes the discussion topic" do
