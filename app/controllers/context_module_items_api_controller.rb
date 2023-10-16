@@ -486,7 +486,11 @@ class ContextModuleItemsApiController < ApplicationController
       return render json: { message: "missing module item parameter" }, status: :bad_request unless params[:module_item]
 
       @tag.title = params[:module_item][:title] if params[:module_item][:title]
-      @tag.url = params[:module_item][:external_url] if %w[ExternalUrl ContextExternalTool].include?(@tag.content_type) && params[:module_item][:external_url]
+      if %w[ExternalUrl ContextExternalTool].include?(@tag.content_type) && params[:module_item][:external_url]
+        @tag.url = params[:module_item][:external_url]
+        # If they are changing the external_url we attempt to find the new tool
+        @tag.content_id = ContextExternalTool.find_external_tool(@tag.url, @context)&.id if @tag.content_type == "ContextExternalTool"
+      end
       @tag.indent = params[:module_item][:indent] if params[:module_item][:indent]
       @tag.new_tab = value_to_boolean(params[:module_item][:new_tab]) if params[:module_item][:new_tab]
       if (target_module_id = params[:module_item][:module_id]) && target_module_id.to_i != @tag.context_module_id
