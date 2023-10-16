@@ -1159,8 +1159,11 @@ EditView.prototype.toJSON = function () {
     lockedItems: this.lockedItems,
     cannotEditGrades: this.cannotEditGrades,
     anonymousGradingEnabled:
-      (typeof ENV !== 'undefined' && ENV !== null ? ENV.ANONYMOUS_GRADING_ENABLED : void 0) ||
-      false,
+      (typeof ENV !== 'undefined' && ENV !== null
+        ? this.assignment.isQuizLTIAssignment() && !ENV.NEW_QUIZZES_ANONYMOUS_GRADING_ENABLED
+          ? void 0
+          : ENV.ANONYMOUS_GRADING_ENABLED
+        : void 0) || false,
     anonymousInstructorAnnotationsEnabled:
       (typeof ENV !== 'undefined' && ENV !== null
         ? ENV.ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED
