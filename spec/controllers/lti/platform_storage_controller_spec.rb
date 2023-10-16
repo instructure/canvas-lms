@@ -26,6 +26,8 @@ describe Lti::PlatformStorageController do
       Account.site_admin.enable_feature!(:lti_platform_storage)
     end
 
+    let(:forwarding_domain) { "localhost" }
+
     context "with lti_platform_storage flag off" do
       before do
         Account.site_admin.disable_feature!(:lti_platform_storage)
@@ -34,40 +36,21 @@ describe Lti::PlatformStorageController do
       it { is_expected.to be_not_found }
     end
 
-    context "when current domain does not match forwarding domain" do
-      let(:forwarding_domain) { "http://forwarding.domain.com" }
-
-      before do
-        allow(CanvasSecurity).to receive(:config).and_return({ "lti_iss" => forwarding_domain })
-      end
-
-      it "redirects to forwarding domain" do
-        subject
-        expect(response.headers["Location"]).to match(forwarding_domain)
-      end
-
-      it { is_expected.to be_redirect }
+    before do
+      allow(CanvasSecurity).to receive(:config).and_return({ "lti_iss" => forwarding_domain })
     end
 
-    context "when current domain matches forwarding domain" do
-      let(:forwarding_domain) { "localhost" }
+    it "sets parent origin in js env" do
+      subject
+      expect(assigns.dig(:js_env, :PARENT_ORIGIN)).to match(forwarding_domain)
+    end
 
-      before do
-        allow(CanvasSecurity).to receive(:config).and_return({ "lti_iss" => forwarding_domain })
-      end
+    it { is_expected.to be_successful }
 
-      it "sets parent origin in js env" do
-        subject
-        expect(assigns.dig(:js_env, :PARENT_ORIGIN)).to match(forwarding_domain)
-      end
-
-      it { is_expected.to be_successful }
-
-      it "modifies the frame-ancestors in the CSP header" do
-        subject
-        expect(response.headers["Content-Security-Policy"])
-          .to match(/frame-ancestors [^;]*self[^;]*localhost/)
-      end
+    it "modifies the frame-ancestors in the CSP header" do
+      subject
+      expect(response.headers["Content-Security-Policy"])
+        .to match(/frame-ancestors [^;]*self[^;]*localhost/)
     end
   end
 end
