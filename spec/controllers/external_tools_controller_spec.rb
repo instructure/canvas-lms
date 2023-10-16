@@ -121,12 +121,8 @@ describe ExternalToolsController do
       let(:verifier) { "e5e774d015f42370dcca2893025467b414d39009dfe9a55250279cca16f5f3c2704f9c56fef4cea32825a8f72282fa139298cf846e0110238900567923f9d057" }
       let(:redis_key) { "#{@course.class.name}:#{Lti::RedisMessageClient::LTI_1_3_PREFIX}#{verifier}" }
       let(:cached_launch) { JSON.parse(Canvas.redis.get(redis_key)) }
-      let(:in_safari) { false }
 
-      before do
-        allow(SecureRandom).to receive(:hex).and_return(verifier)
-        allow(BrowserSupport).to receive(:safari?).and_return in_safari
-      end
+      before { allow(SecureRandom).to receive(:hex).and_return(verifier) }
 
       context "when the current user is nil" do
         context "and the context is a public course" do
@@ -162,25 +158,8 @@ describe ExternalToolsController do
             canvas_environment
             client_id
             deployment_id
+            lti_storage_target
           ]
-        end
-
-        context "login message in Safari" do
-          let(:in_safari) { true }
-
-          it "includes lti_storage_target" do
-            expect(assigns[:lti_launch].params.keys).to match_array %w[
-              iss
-              login_hint
-              target_link_uri
-              lti_message_hint
-              canvas_region
-              canvas_environment
-              client_id
-              deployment_id
-              lti_storage_target
-            ]
-          end
         end
 
         it 'sets the "login_hint" to the current user lti id' do
@@ -1327,22 +1306,9 @@ describe ExternalToolsController do
       context "with platform storage flag enabled" do
         before { Account.site_admin.enable_feature!(:lti_platform_storage) }
 
-        context "and in safari" do
-          before do
-            allow(BrowserSupport).to receive(:safari?).and_return true
-          end
-
-          it "renders the sibling forwarder frame once" do
-            subject
-            expect(response.body.scan('id="post_message_forwarding').count).to eq 1
-          end
-        end
-
-        context "in non-safari browsers" do
-          it "does not render the sibling forwarder frame" do
-            subject
-            expect(response.body.scan('id="post_message_forwarding').count).to eq 0
-          end
+        it "renders the sibling forwarder frame once" do
+          subject
+          expect(response.body.scan('id="post_message_forwarding').count).to eq 1
         end
       end
 

@@ -1493,7 +1493,7 @@ class UsersController < ApplicationController
                   context: @domain_root_account,
                   return_url: @return_url,
                   expander: variable_expander,
-                  include_storage_target: browser_requires_lti_platform_storage?,
+                  include_storage_target: !in_lti_mobile_webview?,
                   opts:
                 )
               else
