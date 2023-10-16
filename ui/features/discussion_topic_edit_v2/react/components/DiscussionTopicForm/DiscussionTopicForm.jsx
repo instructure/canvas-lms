@@ -58,7 +58,7 @@ export default function DiscussionTopicForm({
   const isUnpublishedAnnouncement =
     isAnnouncement && !ENV.DISCUSSION_TOPIC?.ATTRIBUTES.course_published
   const isEditingAnnouncement = isAnnouncement && ENV.DISCUSSION_TOPIC?.ATTRIBUTES.id
-
+  const published = currentDiscussionTopic?.published ?? false
   const announcementAlertProps = () => {
     if (isUnpublishedAnnouncement) {
       return {
@@ -116,6 +116,7 @@ export default function DiscussionTopicForm({
 
   const [availableFrom, setAvailableFrom] = useState(null)
   const [availableUntil, setAvailableUntil] = useState(null)
+  const [willAnnouncementPostRightAway, setWillAnnouncementPostRightAway] = useState(true)
   const [availabiltyValidationMessages, setAvailabilityValidationMessages] = useState([
     {text: '', type: 'success'},
   ])
@@ -129,7 +130,6 @@ export default function DiscussionTopicForm({
   const [peerReviewDueDate, setPeerReviewDueDate] = useState('')
   const [assignTo, setAssignTo] = useState('')
   const [dueDate, setDueDate] = useState('')
-
   const [showGroupCategoryModal, setShowGroupCategoryModal] = useState(false)
 
   useEffect(() => {
@@ -159,8 +159,17 @@ export default function DiscussionTopicForm({
     setAvailableUntil(currentDiscussionTopic.lockAt)
     setDelayPosting(!!currentDiscussionTopic.delayedPostAt && isAnnouncement)
     setLocked(currentDiscussionTopic.locked && isAnnouncement)
-
   }, [isEditing, currentDiscussionTopic, discussionAnonymousState, isAnnouncement])
+
+  useEffect(() => {
+    if (delayPosting) {
+      const rightNow = new Date()
+      const availableFromIntoDate = new Date(availableFrom)
+      setWillAnnouncementPostRightAway(availableFromIntoDate <= rightNow)
+    } else {
+      setWillAnnouncementPostRightAway(true)
+    }
+  }, [availableFrom, delayPosting])
 
   const validateTitle = newTitle => {
     if (newTitle.length > 255) {
@@ -635,28 +644,54 @@ export default function DiscussionTopicForm({
           margin="xx-large none"
           padding="large none"
         >
-          <Button type="button" color="secondary">
+          <Button
+            type="button"
+            color="secondary"
+            onClick={() => {
+              window.location.assign(ENV.CANCEL_TO)
+            }}
+          >
             {I18n.t('Cancel')}
           </Button>
-          <Button
-            type="submit"
-            onClick={() => submitForm(true)}
-            color="secondary"
-            margin="xxx-small"
-            data-testid="save-and-publish-button"
-          >
-            {I18n.t('Save and Publish')}
-          </Button>
-          <Button
-            type="submit"
-            data-testid="save-button"
-            onClick={() =>
-              submitForm(currentDiscussionTopic ? currentDiscussionTopic.published : false)
-            }
-            color="primary"
-          >
-            {I18n.t('Save')}
-          </Button>
+          {/* discussion moderators viewing a new or still unpublished discussion */}
+          {!isAnnouncement && ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MODERATE && !published && (
+            <Button
+              type="submit"
+              onClick={() => submitForm(true)}
+              color="secondary"
+              margin="xxx-small"
+              data-testid="save-and-publish-button"
+            >
+              {I18n.t('Save and Publish')}
+            </Button>
+          )}
+          {/* for announcements, show publish when the available until da */}
+          {isAnnouncement ? (
+            <Button
+              type="submit"
+              // we always process announcements as published.
+              onClick={() => submitForm(true)}
+              color="primary"
+              margin="xxx-small"
+              data-testid="announcement-submit-button"
+            >
+              {willAnnouncementPostRightAway ? I18n.t('Publish') : I18n.t('Save')}
+            </Button>
+          ) : (
+            <Button
+              type="submit"
+              data-testid="save-button"
+              // when editing, use the current published state, otherwise:
+              // students will always save as published while for moderators in this case they
+              // can save as unpublished
+              onClick={() =>
+                submitForm(isEditing ? published : !ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MODERATE)
+              }
+              color="primary"
+            >
+              {I18n.t('Save')}
+            </Button>
+          )}
         </View>
       </FormFieldGroup>
     </>

@@ -642,11 +642,42 @@ describe Mutations::CreateDiscussionTopic do
   end
 
   context "delayed_post_at and lock_at" do
-    it "successfully creates a discussion topic with delayed_post_at and lock_at" do
+    it "successfully creates an unpublished discussion topic with delayed_post_at and lock_at" do
       context_type = "Course"
       title = "Delayed Topic"
       message = "Lorem ipsum..."
       published = false
+      require_initial_post = true
+      delayed_post_at = 5.days.from_now.iso8601
+      lock_at = 10.days.from_now.iso8601
+
+      query = <<~GQL
+        contextId: "#{@course.id}"
+        contextType: "#{context_type}"
+        title: "#{title}"
+        message: "#{message}"
+        published: #{published}
+        requireInitialPost: #{require_initial_post}
+        anonymousState: "off"
+        delayedPostAt: "#{delayed_post_at}"
+        lockAt: "#{lock_at}"
+      GQL
+
+      result = execute_with_input(query)
+      discussion_topic = result.dig("data", "createDiscussionTopic", "discussionTopic")
+
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "discussionTopic", "errors")).to be_nil
+      expect(discussion_topic["delayedPostAt"]).to eq delayed_post_at
+      expect(discussion_topic["lockAt"]).to eq lock_at
+      expect(DiscussionTopic.last.workflow_state).to eq "unpublished"
+    end
+
+    it "coerces a created published discussion into post_delayed if delayed_post_at is in the future" do
+      context_type = "Course"
+      title = "Delayed Topic"
+      message = "Lorem ipsum..."
+      published = true
       require_initial_post = true
       delayed_post_at = 5.days.from_now.iso8601
       lock_at = 10.days.from_now.iso8601
