@@ -48,11 +48,6 @@ module Lti
         return
       end
 
-      unless current_domain == oidc_authorization_domain(current_domain)
-        redirect_to "#{HostUrl.protocol}://#{oidc_authorization_domain(current_domain)}/post_message_forwarding?token=#{create_jwt}"
-        return
-      end
-
       js_env({
                # postMessage origins require a protocol
                PARENT_ORIGIN: "#{HostUrl.protocol}://#{parent_domain}",
@@ -98,26 +93,20 @@ module Lti
     end
 
     def parent_domain
-      decoded_jwt["parent_domain"] || current_domain
+      domain_from_referer || current_domain
+    end
+
+    def domain_from_referer
+      return nil unless request.referer
+
+      URI(request.referer)&.host
+    rescue URI::InvalidURIError
+      nil
     end
 
     # format: canvas.docker, school.instructure.com, etc.
     def current_domain
       HostUrl.context_host(@domain_root_account, request.host)
-    end
-
-    def decoded_jwt
-      return {} unless params[:token]
-
-      CanvasSecurity.decode_jwt(params[:token], [signing_secret])
-    end
-
-    def create_jwt
-      CanvasSecurity.create_jwt({ parent_domain: current_domain }, nil, signing_secret, :HS512)
-    end
-
-    def signing_secret
-      Lti::PlatformStorage.signing_secret
     end
   end
 end
