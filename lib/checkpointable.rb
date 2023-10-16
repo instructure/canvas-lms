@@ -19,10 +19,16 @@
 
 module Checkpointable
   def self.included(klass)
-    klass.has_many :checkpoint_assignments, -> { active }, class_name: "Assignment", foreign_key: :parent_assignment_id, inverse_of: :parent_assignment
     klass.belongs_to :parent_assignment, class_name: "Assignment", optional: true, inverse_of: :checkpoint_assignments
+    klass.has_many :checkpoint_assignments, -> { active }, class_name: "Assignment", foreign_key: :parent_assignment_id, inverse_of: :parent_assignment
+    klass.has_many :checkpoint_submissions, through: :checkpoint_assignments, source: :submissions
+
     klass.validates :parent_assignment_id, absence: true, if: :checkpointed?
     klass.validates :parent_assignment_id, comparison: { other_than: :id, message: -> { I18n.t("cannot reference self") } }, allow_nil: true
+  end
+
+  def checkpoint?
+    parent_assignment_id.present?
   end
 
   def find_checkpoint(checkpoint_label)

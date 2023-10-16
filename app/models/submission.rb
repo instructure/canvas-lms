@@ -447,6 +447,8 @@ class Submission < ActiveRecord::Base
   after_save :delete_submission_drafts!, if: :saved_change_to_attempt?
   after_save :send_timing_data_if_needed
 
+  after_commit :aggregate_checkpoint_submissions, if: :checkpoint_changes?
+
   def reset_regraded
     @regraded = false
   end
@@ -3058,6 +3060,27 @@ class Submission < ActiveRecord::Base
   end
 
   private
+
+  def aggregate_checkpoint_submissions
+    Checkpoints::SubmissionAggregatorService.call(
+      assignment: assignment.parent_assignment,
+      student: user
+    )
+  end
+
+  def checkpoint_changes?
+    checkpoint_submission? && checkpoint_attributes_changed?
+  end
+
+  def checkpoint_submission?
+    assignment.present? && assignment.checkpoint? && !!root_account&.feature_enabled?(:discussion_checkpoints)
+  end
+
+  def checkpoint_attributes_changed?
+    tracked_attributes = Checkpoints::SubmissionAggregatorService::AggregateSubmission.members.map(&:to_s) - ["updated_at"]
+    relevant_changes = tracked_attributes & previous_changes.keys
+    relevant_changes.any?
+  end
 
   def graded_by_new_quizzes?
     cached_quiz_lti && autograded?
