@@ -20,6 +20,7 @@
 
 class Mutations::DiscussionBase < Mutations::BaseMutation
   argument :allow_rating, Boolean, required: false
+  argument :assignment, Mutations::AssignmentCreateOrUpdate, required: false
   argument :delayed_post_at, Types::DateTimeType, required: false
   argument :group_category_id, ID, required: false
   argument :lock_at, Types::DateTimeType, required: false
