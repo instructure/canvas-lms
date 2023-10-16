@@ -37,8 +37,8 @@ function postMessageEvent(data, origin, source) {
   }
 }
 
-const expectMessage = async (data, wasProcessed, platformStorageEnabled = true) => {
-  const wasCalled = await ltiMessageHandler(postMessageEvent(data), platformStorageEnabled)
+const expectMessage = async (data, wasProcessed) => {
+  const wasCalled = await ltiMessageHandler(postMessageEvent(data))
   expect(wasCalled).toBe(wasProcessed)
 }
 
@@ -92,10 +92,10 @@ describe('ltiMessageHander', () => {
   })
 
   describe('LTI Platform Storage subjects', () => {
-    it('rejects older org.imsglobal.lti.* subjects', async () => {
-      await expectMessage({subject: 'org.imsglobal.lti.capabilities'}, false)
-      await expectMessage({subject: 'org.imsglobal.lti.put_data'}, false)
-      await expectMessage({subject: 'org.imsglobal.lti.get_data'}, false)
+    it('processes older org.imsglobal.lti.* subjects', async () => {
+      await expectMessage({subject: 'org.imsglobal.lti.capabilities'}, true)
+      await expectMessage({subject: 'org.imsglobal.lti.put_data'}, true)
+      await expectMessage({subject: 'org.imsglobal.lti.get_data'}, true)
     })
 
     it('processes newer lti.* subjects', async () => {
@@ -104,11 +104,14 @@ describe('ltiMessageHander', () => {
       await expectMessage({subject: 'lti.get_data'}, true)
     })
 
-    describe('when platform storage is not enabled (like in non-safari browsers)', () => {
-      it('rejects lti.*_data subjects', async () => {
-        expect(await ltiMessageHandler(postMessageEvent({subject: 'lti.get_data'}), false)).toBe(
-          false
-        )
+    describe('when flag is enabled', () => {
+      it('rejects older org.imsglobal.lti.* subjects', async () => {
+        expect(
+          await ltiMessageHandler(
+            postMessageEvent({subject: 'org.imsglobal.lti.capabilities'}),
+            true
+          )
+        ).toBe(false)
       })
     })
   })

@@ -141,25 +141,14 @@ Other LTI Platform Storage spec docs:
 - [postMessage Platform Storage](https://www.imsglobal.org/spec/lti-pm-s/v0p1)
 - [Canvas postMessage documentation](file.lti_window_post_message.html)
 
-<div class="warning-message">!! LTI Platform Storage support is temporarily only available for Safari !!</div>
-
-> **Due to unforeseen issues, Platform Storage access is being temporarily limited to only LTI tools launched in Safari. All non-Safari launches that may be using Platform Storage should fall back to using cookies to secure the LTI 1.3 launch for now, as described in the Platform Storage specification.**
-
-> **We expect to resolve this issue soon in upcoming releases so that LTI launches from all browsers can continue using Platform Storage.**
-
 Support for this API is determined by either:
 
 1. the presence of the `lti_storage_target` as an extra body parameter in both the login (Step 1) and launch (Step 3) requests, or
 2. a response postMessage to the `lti.capabilities` postMessage that contains the `lti.get_data` and `lti.put_data` subjects.
 
-**Note** that `lti_storage_target` is currently only present in launches from Safari.
-This temporarily excludes all other browsers and the Canvas mobile apps. Support for this API
-in all other browsers will be reinstated in an upcoming release.
-Support for this API in the Canvas mobile apps is not yet implemented, and
-the requirements for supporting it are currently under review.
-
-Tools should confirm using the `lti.capabilities` postMessage if the current launch supports this API. If tools do not get a
-response to that or any message in this API, or the supported messages in the response does not contain lti.get_data or lti.put_data, they should assume that this API is not supported and try to set a cookie instead.
+**Note** that `lti_storage_target` is currently present in all launches, including from the Canvas mobile apps. Support for this API in the Canvas mobile apps is not yet implemented, and
+the requirements for supporting it are currently under review. Tools should confirm using the `lti.capabilities` postMessage if the current launch supports this API. If tools do not get a
+response to that or any message in this API, they should assume that this API is not supported and try to set a cookie instead.
 
 <a name="config-in-tool"></a>
 Configuring Canvas in the Tool
