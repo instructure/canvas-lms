@@ -1756,13 +1756,22 @@ QUnit.module('EditView: anonymous grading', hooks => {
   })
 
   test('shows warning text under checkbox when assignment is Quiz LTI', () => {
+    ENV.NEW_QUIZZES_ANONYMOUS_GRADING_ENABLED = true
     ENV.ANONYMOUS_GRADING_ENABLED = true
     const view = editView({is_quiz_lti_assignment: true})
     strictEqual(view.toJSON().anonymousGradingEnabled, true)
     strictEqual(view.$el.find('#anonymous-lti-text').length, 1)
   })
 
+  test('hides the anonymous grading box if ENV.NEW_QUIZZES_ANONYMOUS_GRADING_ENABLED if off', () => {
+    ENV.ANONYMOUS_GRADING_ENABLED = true
+    const view = editView({is_quiz_lti_assignment: true})
+    strictEqual(view.toJSON().anonymousGradingEnabled, false)
+    strictEqual(view.$el.find('#anonymous-lti-text').length, 0)
+  })
+
   test('is disabled when group assignment is enabled', () => {
+    ENV.NEW_QUIZZES_ANONYMOUS_GRADING_ENABLED = true
     ENV.ANONYMOUS_GRADING_ENABLED = true
     ENV.GROUP_CATEGORIES = [{id: '1', name: 'Group Category #1'}]
     const view = editView({group_category_id: '1'})
@@ -1774,6 +1783,7 @@ QUnit.module('EditView: anonymous grading', hooks => {
   })
 
   test('is disabled when editing a quiz lti assignment with anonymous grading turned on', () => {
+    ENV.NEW_QUIZZES_ANONYMOUS_GRADING_ENABLED = true
     ENV.ANONYMOUS_GRADING_ENABLED = true
     const view = editView({id: '1', is_quiz_lti_assignment: true, anonymous_grading: true})
     view.$el.appendTo($('#fixtures'))
@@ -1783,6 +1793,7 @@ QUnit.module('EditView: anonymous grading', hooks => {
   })
 
   test('is enabled when creating a quiz lti assignment with anonymous grading turned on', () => {
+    ENV.NEW_QUIZZES_ANONYMOUS_GRADING_ENABLED = true
     ENV.ANONYMOUS_GRADING_ENABLED = true
     const view = editView({id: null, is_quiz_lti_assignment: true, anonymous_grading: true})
     view.$el.appendTo($('#fixtures'))
