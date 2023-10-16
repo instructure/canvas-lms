@@ -47,6 +47,20 @@ class Mutations::AssignmentPeerReviewsUpdate < GraphQL::Schema::InputObject
   argument :automatic_reviews, Boolean, required: false
 end
 
+class Mutations::AssignmentCreateOrUpdate < GraphQL::Schema::InputObject
+  argument :assignment_group_id, ID, required: false
+  argument :assignment_overrides, [Mutations::AssignmentOverrideCreateOrUpdate], required: false
+  argument :course_id, ID, required: true
+  argument :due_at, Types::DateTimeType, required: false
+  argument :grading_type, Types::AssignmentType::AssignmentGradingType, required: false
+  argument :grading_standard_id, ID, required: false
+  argument :lock_at, Types::DateTimeType, required: false
+  argument :name, String, required: true
+  argument :peer_reviews, Mutations::AssignmentPeerReviewsUpdate, required: false
+  argument :points_possible, Float, required: false
+  argument :unlock_at, Types::DateTimeType, required: false
+end
+
 class Mutations::AssignmentBase < Mutations::BaseMutation
   # we are required to wrap the update method with a proxy class because
   # we are required to include `Api` for instance methods within the module.
@@ -109,6 +123,7 @@ class Mutations::AssignmentBase < Mutations::BaseMutation
   argument :allowed_attempts, Int, required: false
   argument :only_visible_to_overrides, Boolean, required: false
   argument :submission_types, [Types::AssignmentSubmissionType], required: false
+  argument :grading_standard_id, ID, required: false
   argument :peer_reviews, Mutations::AssignmentPeerReviewsUpdate, required: false
   argument :moderated_grading, Mutations::AssignmentModeratedGradingUpdate, required: false
   argument :grade_group_students_individually, Boolean, required: false
