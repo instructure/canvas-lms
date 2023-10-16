@@ -19,6 +19,10 @@
 require "yaml"
 
 describe Lti::IMS::DynamicRegistrationController do
+  before do
+    Account.default.root_account.enable_feature! :lti_dynamic_registration
+  end
+
   let(:controller_routes) do
     dynamic_registration_routes = []
     CanvasRails::Application.routes.routes.each do |route|
@@ -40,12 +44,11 @@ describe Lti::IMS::DynamicRegistrationController do
     end
   end
 
-  describe "#create" do
-    subject { get :create, params: { registration_url: "https://example.com" } }
+  describe "#redirect_to_tool_registration" do
+    subject { get :redirect_to_tool_registration, params: { registration_url: "https://example.com" } }
 
     before do
       account_admin_user
-      @admin.account.enable_feature! :lti_dynamic_registration
       user_session(@admin)
     end
 
@@ -81,6 +84,113 @@ describe Lti::IMS::DynamicRegistrationController do
         expect(Time.parse(jwt_hash["initiated_at"])).to be_within(1.minute).of(Time.now)
         expect(jwt_hash["user_id"]).to eq(@admin.id)
         expect(jwt_hash["root_account_global_id"]).to eq(@admin.account.root_account.global_id)
+      end
+    end
+  end
+
+  describe "#create" do
+    let(:registration_params) do
+      {
+        "application_type" => "web",
+        "grant_types" => ["client_credentials", "implicit"],
+        "response_types" => ["id_token"],
+        "redirect_uris" => ["https://example.com/launch"],
+        "initiate_login_uri" => "https://example.com/login",
+        "client_name" => "the client name",
+        "jwks_uri" => "https://example.com/api/jwks",
+        "token_endpoint_auth_method" => "private_key_jwt",
+        "https://purl.imsglobal.org/spec/lti-tool-configuration" => {
+          "domain" => "example.com",
+          "messages" => [{
+            "type" => "LtiResourceLinkRequest",
+            "label" => "deep link label",
+          }],
+          "claims" => ["iss", "sub"],
+          "target_link_uri" => "https://example.com/launch",
+        },
+      }
+    end
+
+    context "with a valid token" do
+      let(:token_hash) do
+        {
+          user_id: User.create!.id,
+          initiated_at: 1.minute.ago,
+          root_account_global_id: Account.first.root_account_id,
+        }
+      end
+      let(:valid_token) do
+        Canvas::Security.create_jwt(token_hash, 1.hour.from_now)
+      end
+
+      context "and with valid registration params" do
+        subject { get :create, params: { registration_token: valid_token, **registration_params } }
+
+        it "accepts valid params and creates a registration model" do
+          subject
+          parsed_body = response.parsed_body
+          expected_response_keys = registration_params
+          expected_response_keys["lti_tool_configuration"] = registration_params["https://purl.imsglobal.org/spec/lti-tool-configuration"]
+          expected_response_keys.delete("https://purl.imsglobal.org/spec/lti-tool-configuration")
+
+          expect(parsed_body["registration"]).to include(expected_response_keys)
+          created_registration = Lti::IMS::Registration.last
+          expect(created_registration).not_to be_nil
+          expect(parsed_body["registration"]["id"]).to eq(created_registration.id)
+        end
+
+        it "fills in values on the developer key" do
+          subject
+          dk = DeveloperKey.last
+          expect(dk.name).to eq(registration_params["client_name"])
+          expect(dk.account.id).to eq(token_hash[:root_account_global_id])
+          expect(dk.redirect_uris).to eq(registration_params["redirect_uris"])
+          expect(dk.public_jwk_url).to eq(registration_params["jwks_uri"])
+          expect(dk.is_lti_key).to be(true)
+        end
+      end
+
+      context "and with invalid registration params" do
+        subject { get :create, params: { registration_token: valid_token, **invalid_registration_params } }
+
+        let(:invalid_registration_params) do
+          wrong_grant_types = registration_params
+          wrong_grant_types["grant_types"] = ["not_part_of_the_spec", "implicit"]
+          wrong_grant_types
+        end
+
+        it "returns a 422 with validation errors" do
+          subject
+          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response.body).to include("Must include client_credentials, implicit")
+        end
+
+        it "doesn't create a stray developer key" do
+          previous_key_count = DeveloperKey.count
+          subject
+          expect(DeveloperKey.count).to eq(previous_key_count)
+        end
+      end
+    end
+
+    context "with an invalid token" do
+      subject { get :create, params: { registration_token: invalid_token, **registration_params } }
+
+      context "from more than an hour ago" do
+        let(:invalid_token) do
+          initiation_time = 62.minutes.ago # this should be too long ago to be accepted
+          token_hash = {
+            user_id: User.create!.id,
+            initiated_at: initiation_time,
+            root_account_global_id: Account.first.root_account_id,
+          }
+          Canvas::Security.create_jwt(token_hash, initiation_time)
+        end
+
+        it "returns a 401" do
+          subject
+          expect(response).to have_http_status(:unauthorized)
+        end
       end
     end
   end
