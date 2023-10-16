@@ -40,6 +40,7 @@ export const DiscussionTopic = {
       delayedPostAt
       lockAt
       locked
+      published
       courseSections {
         ...Section
       }

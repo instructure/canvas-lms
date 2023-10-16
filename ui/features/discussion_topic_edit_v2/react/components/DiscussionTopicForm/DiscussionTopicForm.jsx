@@ -120,9 +120,6 @@ export default function DiscussionTopicForm({
     {text: '', type: 'success'},
   ])
 
-  // only for discussions being edited
-  const [published, setPublished] = useState(false)
-
   // To be implemented in phase 2, kept as a reminder
   const [pointsPossible, setPointsPossible] = useState(0)
   const [displayGradeAs, setDisplayGradeAs] = useState('points')
@@ -163,7 +160,6 @@ export default function DiscussionTopicForm({
     setDelayPosting(!!currentDiscussionTopic.delayedPostAt && isAnnouncement)
     setLocked(currentDiscussionTopic.locked && isAnnouncement)
 
-    setPublished(currentDiscussionTopic.published)
   }, [isEditing, currentDiscussionTopic, discussionAnonymousState, isAnnouncement])
 
   const validateTitle = newTitle => {
@@ -235,7 +231,7 @@ export default function DiscussionTopicForm({
         groupCategoryId: isGroupDiscussion ? groupCategoryId : null,
         availableFrom,
         availableUntil,
-        shouldPublish: isEditing ? published : shouldPublish,
+        shouldPublish,
         locked,
         isAnnouncement,
       })
@@ -654,7 +650,9 @@ export default function DiscussionTopicForm({
           <Button
             type="submit"
             data-testid="save-button"
-            onClick={() => submitForm(false)}
+            onClick={() =>
+              submitForm(currentDiscussionTopic ? currentDiscussionTopic.published : false)
+            }
             color="primary"
           >
             {I18n.t('Save')}
