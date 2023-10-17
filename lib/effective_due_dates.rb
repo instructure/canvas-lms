@@ -158,6 +158,70 @@ class EffectiveDueDates
     end
   end
 
+  def context_module_overrides
+    if Account.site_admin.feature_enabled?(:differentiated_modules)
+      "/* fetch all module overrides for this assignment */
+      modules AS (
+        SELECT
+          m.id
+        FROM
+          models a
+        INNER JOIN #{ContentTag.quoted_table_name} t ON t.content_id = a.id AND t.content_type = 'Assignment'
+        INNER JOIN #{ContextModule.quoted_table_name} m ON m.id = t.context_module_id
+        WHERE
+          m.workflow_state = 'active' AND t.tag_type='context_module' AND t.workflow_state<>'deleted'
+      ),
+
+      module_overrides AS (
+        SELECT
+          o.id,
+          a.id,
+          o.set_type,
+          o.set_id,
+          FALSE,
+          a.due_at
+        FROM
+          models a, modules m
+        INNER JOIN #{AssignmentOverride.quoted_table_name} o on o.context_module_id = m.id
+        WHERE
+           o.workflow_state = 'active'
+      ),"
+    else
+      ""
+    end
+  end
+
+  def visible_to_everyone
+    if Account.site_admin.feature_enabled?(:differentiated_modules)
+      "a.only_visible_to_overrides IS NOT TRUE AND (NOT EXISTS (SELECT * FROM modules) OR EXISTS (
+        SELECT
+          *
+        FROM
+          modules m
+        LEFT JOIN #{AssignmentOverride.quoted_table_name} o on o.context_module_id = m.id AND o.workflow_state = 'active'
+        WHERE
+          o.context_module_id IS NULL
+        )
+      )"
+    else
+      "a.only_visible_to_overrides IS NOT TRUE"
+    end
+  end
+
+  def union_all_overrides
+    if Account.site_admin.feature_enabled?(:differentiated_modules)
+      "overrides AS (
+        SELECT * FROM assignment_overrides
+        UNION ALL
+        SELECT * FROM module_overrides
+      ),"
+    else
+      "overrides AS (
+        SELECT * FROM assignment_overrides
+      ),"
+    end
+  end
+
   def course_overrides
     if Account.site_admin.feature_enabled?(:differentiated_modules)
       "/* fetch all students affected by course overrides */
@@ -246,7 +310,7 @@ class EffectiveDueDates
           ),
 
           /* fetch all overrides for this assignment */
-          overrides AS (
+          assignment_overrides AS (
             SELECT
               o.id,
               o.assignment_id,
@@ -260,6 +324,10 @@ class EffectiveDueDates
             WHERE
               o.workflow_state = 'active'
           ),
+
+          #{context_module_overrides}
+
+          #{union_all_overrides}
 
           /* fetch all students affected by adhoc overrides */
           override_adhoc_students AS (
@@ -350,7 +418,7 @@ class EffectiveDueDates
             WHERE
               e.workflow_state NOT IN ('rejected', 'deleted') AND
               e.type IN ('StudentEnrollment', 'StudentViewEnrollment') AND
-              a.only_visible_to_overrides IS NOT TRUE
+              #{visible_to_everyone}
               #{filter_students_sql("e")}
           ),
 
