@@ -91,7 +91,7 @@ class ContextModule < ActiveRecord::Base
 
     self.class.connection.after_transaction_commit do
       relocked_modules << self
-      progression_scope = context_module_progressions.where(current: true).where.not(workflow_state: "locked")
+      progression_scope = context_module_progressions.where.not(workflow_state: "locked")
       progression_scope = progression_scope.where(user_id: student_ids) if student_ids
 
       if progression_scope.in_batches(of: 10_000).update_all(["workflow_state = 'locked', lock_version = lock_version + 1, current = ?", false]) > 0

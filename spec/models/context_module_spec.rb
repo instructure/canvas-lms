@@ -1766,6 +1766,32 @@ describe ContextModule do
     end
   end
 
+  describe "relock_progressions" do
+    before :once do
+      course_with_student(active_all: true)
+      @module1 = @course.context_modules.create!
+      @module2 = @course.context_modules.create!
+      assignment = @course.assignments.create!
+      tag1 = @module1.add_item({ id: assignment.id, type: "assignment" })
+      @module1.update!(completion_requirements: { tag1.id => { type: "min_score", min_score: 90 } })
+      @module2.update!(prerequisites: [{ id: @module1.id, type: "context_module", name: "some module" }])
+      @progression = @module2.evaluate_for(@user)
+    end
+
+    it "does not relock progressions that are already locked" do
+      expect(@progression.workflow_state).to eq "locked"
+      progression1_lock_version = @progression.lock_version
+      @module2.relock_progressions
+      expect(@progression.reload.lock_version).to eq progression1_lock_version
+    end
+
+    it "locks progressions even if not current" do
+      @progression.update!(current: false, workflow_state: "completed")
+      @module2.relock_progressions
+      expect(@progression.reload.workflow_state).to eq "locked"
+    end
+  end
+
   it "evaluates progressions after save" do
     course_module
     course_with_student(course: @course, user: @student, active_all: true)
