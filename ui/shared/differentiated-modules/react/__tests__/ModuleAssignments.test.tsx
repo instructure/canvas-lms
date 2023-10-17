@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {act, fireEvent, render} from '@testing-library/react'
-import AssigneeSelector from '../AssigneeSelector'
+import ModuleAssignments from '../ModuleAssignments'
 import fetchMock from 'fetch-mock'
 import {FILTERED_SECTIONS_DATA, FILTERED_STUDENTS_DATA, SECTIONS_DATA, STUDENTS_DATA} from './mocks'
 
@@ -26,7 +26,6 @@ const props = {
   courseId: '1',
   moduleId: '2',
   onSelect: jest.fn(),
-  selectedOptionIds: [],
 }
 
 const SECTIONS_URL = `/api/v1/courses/${props.courseId}/sections`
@@ -35,7 +34,7 @@ const FILTERED_SECTIONS_URL = `/api/v1/courses/${props.courseId}/sections?search
 const FILTERED_STUDENTS_URL = `api/v1/courses/${props.courseId}/users?search_term=sec&enrollment_type=student`
 const ASSIGNMENT_OVERRIDES_URL = `/api/v1/courses/${props.courseId}/modules/${props.moduleId}/assignment_overrides`
 
-describe('AssigneeSelector', () => {
+describe('ModuleAssignments', () => {
   beforeAll(() => {
     if (!document.getElementById('flash_screenreader_holder')) {
       const liveRegion = document.createElement('div')
@@ -58,12 +57,12 @@ describe('AssigneeSelector', () => {
   })
 
   const renderComponent = (overrides?: Partial<typeof props>) =>
-    render(<AssigneeSelector {...props} {...overrides} />)
+    render(<ModuleAssignments {...props} {...overrides} />)
 
   it('displays sections and students as options', async () => {
     const {findByTestId, findByText, getByText} = renderComponent()
-    const assigneeSelector = await findByTestId('assignee_selector')
-    act(() => assigneeSelector.click())
+    const moduleAssignments = await findByTestId('assignee_selector')
+    act(() => moduleAssignments.click())
     await findByText(SECTIONS_DATA[0].name)
     SECTIONS_DATA.forEach(section => {
       expect(getByText(section.name)).toBeInTheDocument()
@@ -75,9 +74,9 @@ describe('AssigneeSelector', () => {
 
   it('fetches filtered results from both APIs', async () => {
     const {findByTestId, findByText, getByText} = renderComponent()
-    const assigneeSelector = await findByTestId('assignee_selector')
-    act(() => assigneeSelector.click())
-    fireEvent.change(assigneeSelector, {target: {value: 'sec'}})
+    const moduleAssignments = await findByTestId('assignee_selector')
+    act(() => moduleAssignments.click())
+    fireEvent.change(moduleAssignments, {target: {value: 'sec'}})
     await findByText(FILTERED_SECTIONS_DATA[0].name)
     FILTERED_SECTIONS_DATA.forEach(section => {
       expect(getByText(section.name)).toBeInTheDocument()
@@ -90,8 +89,8 @@ describe('AssigneeSelector', () => {
   it('calls onSelect with parsed options', async () => {
     const onSelect = jest.fn()
     const {findByTestId, findByText} = renderComponent({onSelect})
-    const assigneeSelector = await findByTestId('assignee_selector')
-    act(() => assigneeSelector.click())
+    const moduleAssignments = await findByTestId('assignee_selector')
+    act(() => moduleAssignments.click())
     const option1 = await findByText(SECTIONS_DATA[0].name)
     act(() => option1.click())
     expect(onSelect).toHaveBeenCalledWith([
