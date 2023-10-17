@@ -21,4 +21,5 @@
  */
 export interface EnvContentMigrations {
   SHOW_SELECTABLE_OUTCOMES_IN_IMPORT?: boolean
+  UPLOAD_LIMIT?: number
 }

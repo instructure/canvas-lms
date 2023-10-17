@@ -25,11 +25,36 @@ import {Text} from '@instructure/ui-text'
 import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
 import {Alert} from '@instructure/ui-alerts'
+import {completeUpload} from '@canvas/upload-file'
 import {MigratorSpecificForm} from './migrator_specific_form'
 import {GeneralMigrationControls} from './general_migration_controls'
-import {ContentMigrationItem, Migrator, submitMigrationProps} from './types'
+import {
+  AttachmentProgressResponse,
+  ContentMigrationItem,
+  ContentMigrationResponse,
+  Migrator,
+  submitMigrationProps,
+} from './types'
 
 const I18n = useI18nScope('content_migrations_redesign')
+
+const {Option: SimpleSelectOption} = SimpleSelect as any
+
+type RequestBody = {
+  course_id: string
+  migration_type: string
+  settings: {
+    import_quizzes_next: boolean
+    source_course_id?: string
+  }
+  selective_import: boolean
+  date_shift_options: boolean
+  pre_attachment?: {
+    name: string
+    no_redirect: boolean
+    size: number
+  }
+}
 
 export const ContentMigrationsForm = ({
   migrations,
@@ -41,12 +66,13 @@ export const ContentMigrationsForm = ({
   const [migrators, setMigrators] = useState<any>([])
   const [chosenMigrator, setChosenMigrator] = useState<string>('empty')
   const [sourceCourse, setSourceCourse] = useState<string>('')
+  const [preAttachmentFile, setPreAttachmentFile] = useState<File | null>(null)
 
   useEffect(() => {
     doFetchApi({
       path: `/api/v1/courses/${window.ENV.COURSE_ID}/content_migrations/migrators`,
     })
-      .then((response: any) => {
+      .then((response: {json: Migrator[]}) =>
         setMigrators(
           response.json.sort((a: Migrator, _b: Migrator) => {
             if (a.type === 'course_copy_importer' || a.type === 'canvas_cartridge_importer') {
@@ -55,12 +81,21 @@ export const ContentMigrationsForm = ({
             return 0
           })
         )
-      })
+      )
       .catch(showFlashError(I18n.t("Couldn't load migrators")))
   }, [])
 
+  const handleFileProgress = (_: AttachmentProgressResponse) => {}
+  // console.log(`${(response.loaded / response.total) * 100}%`)
+
   const handleMigratorChange = (migrator_type: string) => {
     setChosenMigrator(migrator_type)
+  }
+
+  const resetForm = () => {
+    setChosenMigrator('empty')
+    setSourceCourse('')
+    setPreAttachmentFile(null)
   }
 
   const submitMigration = async ({
@@ -68,24 +103,44 @@ export const ContentMigrationsForm = ({
     importAsNewQuizzes,
     adjustDates,
   }: submitMigrationProps) => {
-    const requestBody = {
-      course_id: window.ENV.COURSE_ID,
+    const courseId = window.ENV.COURSE_ID
+    if (!courseId) {
+      return
+    }
+    const requestBody: RequestBody = {
+      course_id: courseId,
       migration_type: chosenMigrator,
       settings: {
         import_quizzes_next: importAsNewQuizzes,
-        source_course_id: sourceCourse,
       },
       selective_import: selectiveImport,
       date_shift_options: adjustDates,
     }
+    if (chosenMigrator === 'course_copy_importer') {
+      requestBody.settings.source_course_id = sourceCourse
+    } else if (chosenMigrator === 'canvas_cartridge_importer' && preAttachmentFile) {
+      const {size, name} = preAttachmentFile
+      requestBody.pre_attachment = {
+        size,
+        name,
+        no_redirect: true,
+      }
+    }
+
     const {json} = (await doFetchApi({
       method: 'POST',
       headers: {'Content-Type': 'application/json; charset=utf-8'},
-      path: `/api/v1/courses/${window.ENV.COURSE_ID}/content_migrations`,
+      path: `/api/v1/courses/${courseId}/content_migrations`,
       body: requestBody,
-    })) as {json: ContentMigrationItem} // TODO: remove type assertion once doFetchApi is typed
-    setMigrations([json].concat(migrations))
-    setChosenMigrator('empty')
+    })) as {json: ContentMigrationResponse} // TODO: remove type assertion once doFetchApi is typed
+    if (preAttachmentFile && json.pre_attachment) {
+      completeUpload(json.pre_attachment, preAttachmentFile, {
+        ignoreResult: true,
+        onProgress: handleFileProgress,
+      })
+    }
+    setMigrations([json as ContentMigrationItem].concat(migrations))
+    resetForm()
   }
 
   return (
@@ -112,20 +167,24 @@ export const ContentMigrationsForm = ({
               handleMigratorChange(value)
             }}
           >
-            <SimpleSelect.Option key="empty-option" id="empty" value="empty">
+            <SimpleSelectOption key="empty-option" id="empty" value="empty">
               {I18n.t('Select one')}
-            </SimpleSelect.Option>
+            </SimpleSelectOption>
             {migrators.map((o: Migrator) => (
-              <SimpleSelect.Option key={o.type} id={o.type} value={o.type}>
+              <SimpleSelectOption key={o.type} id={o.type} value={o.type}>
                 {o.name}
-              </SimpleSelect.Option>
+              </SimpleSelectOption>
             ))}
           </SimpleSelect>
         ) : (
           I18n.t('Loading options...')
         )}
       </View>
-      <MigratorSpecificForm migrator={chosenMigrator} setSourceCourse={setSourceCourse} />
+      <MigratorSpecificForm
+        migrator={chosenMigrator}
+        setSourceCourse={setSourceCourse}
+        onSelectPreAttachmentFile={setPreAttachmentFile}
+      />
       {chosenMigrator !== 'empty' ? (
         <GeneralMigrationControls submitMigration={submitMigration} />
       ) : null}
