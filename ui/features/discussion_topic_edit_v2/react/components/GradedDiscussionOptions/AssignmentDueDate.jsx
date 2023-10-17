@@ -51,7 +51,7 @@ export const AssignmentDueDate = ({
             const newInfo = {
               ...assignedInformation,
               assignedList: assignedInformation.assignedList.filter(
-                option => option.id !== dismissedOption.id
+                option => option.assetCode !== dismissedOption.assetCode
               ),
             }
             setAssignedInformation(newInfo)
@@ -115,7 +115,7 @@ AssignmentDueDate.propTypes = {
   availableAssignToOptions: PropTypes.objectOf(
     PropTypes.arrayOf(
       PropTypes.shape({
-        id: PropTypes.string.isRequired,
+        assetCode: PropTypes.string.isRequired,
         label: PropTypes.string.isRequired,
       })
     )

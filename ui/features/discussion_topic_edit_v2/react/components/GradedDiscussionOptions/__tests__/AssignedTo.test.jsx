@@ -21,18 +21,18 @@ import React from 'react'
 import {AssignedTo} from '../AssignedTo'
 
 const DEFAULT_LIST_OPTIONS = {
-  'Master Paths': [{id: 'mp_option1', label: 'Master Path Option'}],
+  'Master Paths': [{assetCode: 'mp_option1', label: 'Master Path Option'}],
   'Course Sections': [
-    {id: 'sec_1', label: 'Section 1'},
-    {id: 'sec_2', label: 'Section 2'},
+    {assetCode: 'sec_1', label: 'Section 1'},
+    {assetCode: 'sec_2', label: 'Section 2'},
   ],
   Students: [
-    {id: 'u_1', label: 'Jason'},
-    {id: 'u_2', label: 'Drake'},
-    {id: 'u_3', label: 'Caleb'},
-    {id: 'u_4', label: 'Aaron'},
-    {id: 'u_5', label: 'Chawn'},
-    {id: 'u_6', label: 'Omar'},
+    {assetCode: 'u_1', label: 'Jason'},
+    {assetCode: 'u_2', label: 'Drake'},
+    {assetCode: 'u_3', label: 'Caleb'},
+    {assetCode: 'u_4', label: 'Aaron'},
+    {assetCode: 'u_5', label: 'Chawn'},
+    {assetCode: 'u_6', label: 'Omar'},
   ],
 }
 
