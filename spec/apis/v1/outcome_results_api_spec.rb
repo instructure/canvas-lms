@@ -688,6 +688,26 @@ describe "Outcome Results API", type: :request do
           expect(json["linked"].keys.sort).to eq %w[users]
           expect(json["linked"]["users"].size).to eq outcome_course_sections[0].students.count
         end
+
+        it "users with rejected enrollments are included" do
+          rejected_student = User.create!(name: "Student - Rejected")
+          rejected_student.register!
+          section1 = add_section "s1", course: outcome_course
+          student_in_section section1, user: rejected_student, allow_multiple_enrollments: true
+          rejected_student.enrollments.first.reject
+          user_session @teacher
+          api_call(:get,
+                   outcome_rollups_url(outcome_course, section_id: section1.id.to_s, include: ["users"]),
+                   controller: "outcome_results",
+                   action: "rollups",
+                   format: "json",
+                   course_id: outcome_course.id.to_s,
+                   section_id: section1.id.to_s,
+                   include: ["users"])
+          json = JSON.parse(response.body)
+          expect(json["linked"]["users"].size).to eq 1
+          expect(json["linked"]["users"][0]["name"]).to eq "Student - Rejected"
+        end
       end
 
       describe "include[] parameter" do
