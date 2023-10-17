@@ -150,7 +150,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
 
   const onDelete = () => {
     // eslint-disable-next-line no-alert
-    if (window.confirm(I18n.t('Are you sure you want to delete this topic'))) {
+    if (window.confirm(I18n.t('Are you sure you want to delete this topic?'))) {
       deleteDiscussionTopic({
         variables: {
           id: props.discussionTopic._id,
