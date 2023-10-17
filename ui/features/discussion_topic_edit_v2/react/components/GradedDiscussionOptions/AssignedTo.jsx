@@ -35,10 +35,10 @@ export const AssignedTo = ({
   errorMessage,
   onOptionDismiss,
 }) => {
-  const [selectedOptionId, setSelectedOptionId] = useState(initialAssignedToInformation)
+  const [selectedOptionAssetCode, setSelectedOptionAssetCode] = useState(initialAssignedToInformation)
   const [inputValue, setInputValue] = useState('')
   const [isShowingOptions, setIsShowingOptions] = useState(false)
-  const [highlightedOptionId, setHighlightedOptionId] = useState(null)
+  const [highlightedOptionAssetCode, setHighlightedOptionAssetCode] = useState(null)
   const [announcement, setAnnouncement] = useState(null)
   const inputRef = useRef(null)
 
@@ -60,46 +60,47 @@ export const AssignedTo = ({
     }, {})
   }, [inputValue, availableAssignToOptions])
 
-  const getOptionById = id => {
+  const getOptionByAssetCode = assetCode => {
     return Object.values(availableAssignToOptions)
       .flat()
-      .find(o => o?.id === id)
+      .find(o => o?.assetCode === assetCode)
   }
 
-  const handleOptionSelected = id => {
-    setSelectedOptionId(prev => [...prev, id])
-    onOptionSelect(id) // Notify parent
+  // Might rely on id
+  const handleOptionSelected = assetCode => {
+    setSelectedOptionAssetCode(prev => [...prev, assetCode])
+    onOptionSelect(assetCode) // Notify parent
   }
 
   const getDefaultHighlightedOption = (newOptions = {}) => {
     const defaultOptions = Object.values(newOptions).flat()
-    return defaultOptions.length > 0 ? defaultOptions[0].id : null
+    return defaultOptions.length > 0 ? defaultOptions[0].assetCode : null
   }
 
   const handleBlur = () => {
-    setHighlightedOptionId(null)
+    setHighlightedOptionAssetCode(null)
   }
 
   // Don't highlight groups
-  const handleHighlightOption = (event, {id}) => {
+  const handleHighlightOption = (event, {id: assetCode}) => {
     event.persist()
-    const option = getOptionById(id)
+    const option = getOptionByAssetCode(assetCode)
     if (!option) return
-    setHighlightedOptionId(id)
+    setHighlightedOptionAssetCode(assetCode)
     setInputValue(event.type === 'keydown' ? option.label : inputValue)
     setAnnouncement(option.label)
   }
 
-  const handleSelectOption = (event, {id}) => {
-    const option = getOptionById(id)
+  const handleSelectOption = (event, {id: assetCode}) => {
+    const option = getOptionByAssetCode(assetCode)
     if (!option) return
 
     // Check if the option is already selected
-    if (selectedOptionId.includes(id)) {
+    if (selectedOptionAssetCode.includes(assetCode)) {
       return
     }
 
-    handleOptionSelected(id)
+    handleOptionSelected(assetCode)
     setInputValue('')
     setIsShowingOptions(false)
     setAnnouncement(I18n.t('%{optionName} selected. List collapsed.', {optionName: option.label}))
@@ -111,8 +112,8 @@ export const AssignedTo = ({
         ? I18n.t('%{optionCount} options available.', {optionCount: newOptions.length}) // options changed, announce new total
         : null // options haven't changed, don't announce
     if (message && newOptions.length > 0) {
-      if (highlightedOptionId !== newOptions[0].id) {
-        const option = getOptionById(newOptions[0].id).label
+      if (highlightedOptionAssetCode !== newOptions[0].assetCode) {
+        const option = getOptionByAssetCode(newOptions[0].assetCode).label
         message = `${option}. ${message}`
       }
     }
@@ -123,7 +124,7 @@ export const AssignedTo = ({
     const value = event.target.value
     const newFilteredOptions = filterOptions(value)
     setInputValue(value)
-    setHighlightedOptionId(getDefaultHighlightedOption(newFilteredOptions))
+    setHighlightedOptionAssetCode(getDefaultHighlightedOption(newFilteredOptions))
     setIsShowingOptions(true)
     setAnnouncement(getOptionsChangedMessage(newFilteredOptions))
   }
@@ -136,25 +137,25 @@ export const AssignedTo = ({
     setIsShowingOptions(false)
   }
 
-  const dismissTag = (e, tag) => {
+  const dismissTag = (e, tagAssetCode) => {
     e.stopPropagation()
     e.preventDefault()
-    const newSelection = selectedOptionId.filter(id => id !== tag)
-    setSelectedOptionId(newSelection)
-    setHighlightedOptionId(null)
-    onOptionDismiss(tag) // Notify parent
+    const newSelection = selectedOptionAssetCode.filter(assetCode => assetCode !== tagAssetCode)
+    setSelectedOptionAssetCode(newSelection)
+    setHighlightedOptionAssetCode(null)
+    onOptionDismiss(tagAssetCode) // Notify parent
     inputRef.current.focus()
   }
 
   const renderTags = () => {
-    return selectedOptionId.map((id, index) => (
+    return selectedOptionAssetCode.map((assetCode, index) => (
       <Tag
         dismissible={true}
-        key={id}
-        title={I18n.t('Remove %{optionName}', {optionName: getOptionById(id).label})}
-        text={getOptionById(id).label}
+        key={assetCode}
+        title={I18n.t('Remove %{optionName}', {optionName: getOptionByAssetCode(assetCode).label})}
+        text={getOptionByAssetCode(assetCode).label}
         margin={index > 0 ? 'xxx-small 0 xxx-small xx-small' : 'xxx-small 0'}
-        onClick={e => dismissTag(e, id)}
+        onClick={e => dismissTag(e, assetCode)}
       />
     ))
   }
@@ -165,16 +166,16 @@ export const AssignedTo = ({
       return (
         <Select.Group key={key} renderLabel={key}>
           {filteredOptions[key].map(option => {
-            const isOptionSelected = selectedOptionId.includes(option.id)
+            const isOptionSelected = selectedOptionAssetCode.includes(option.assetCode)
             // If the option is selected, show the checkmark icon
             const iconStyle = {
               opacity: isOptionSelected ? 1 : 0,
             }
             return (
               <Select.Option
-                id={option.id}
-                key={option.id}
-                isHighlighted={option.id === highlightedOptionId}
+                id={option.assetCode}
+                key={option.assetCode}
+                isHighlighted={option.assetCode === highlightedOptionAssetCode}
                 data-testid="assign-to-select-option"
               >
                 <View padding="none xx-small none none">
@@ -207,7 +208,7 @@ export const AssignedTo = ({
         onRequestHideOptions={handleHideOptions}
         onRequestHighlightOption={handleHighlightOption}
         onRequestSelectOption={handleSelectOption}
-        renderBeforeInput={selectedOptionId.length > 0 ? renderTags() : null}
+        renderBeforeInput={selectedOptionAssetCode.length > 0 ? renderTags() : null}
         messages={errorMessage}
         data-testid="assign-to-select"
       >
@@ -229,7 +230,7 @@ AssignedTo.propTypes = {
   availableAssignToOptions: PropTypes.objectOf(
     PropTypes.arrayOf(
       PropTypes.shape({
-        id: PropTypes.string.isRequired,
+        assetCode: PropTypes.string.isRequired,
         label: PropTypes.string.isRequired,
       })
     )

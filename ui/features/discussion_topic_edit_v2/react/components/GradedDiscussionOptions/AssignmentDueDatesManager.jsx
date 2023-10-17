@@ -30,56 +30,56 @@ import theme from '@instructure/canvas-theme'
 const I18n = useI18nScope('discussion_create')
 
 const DEFAULT_LIST_OPTIONS = {
-  'Master Paths': [{id: 'mp_option1', label: 'Master Path Option'}],
+  'Master Paths': [{assetCode: 'mp_option1', label: 'Master Path Option'}],
   'Course Sections': [
-    {id: 'sec_1', label: 'Section 1'},
-    {id: 'sec_2', label: 'Section 2'},
-    {id: 'sec_3', label: 'Section 3'},
+    {assetCode: 'sec_1', label: 'Section 1'},
+    {assetCode: 'sec_2', label: 'Section 2'},
+    {assetCode: 'sec_3', label: 'Section 3'},
   ],
   Students: [
-    {id: 'u_1', label: 'Jason'},
-    {id: 'u_2', label: 'Drake'},
-    {id: 'u_3', label: 'Caleb'},
-    {id: 'u_4', label: 'Aaron'},
-    {id: 'u_5', label: 'Chawn'},
-    {id: 'u_6', label: 'Omar'},
+    {assetCode: 'u_1', label: 'Jason'},
+    {assetCode: 'u_2', label: 'Drake'},
+    {assetCode: 'u_3', label: 'Caleb'},
+    {assetCode: 'u_4', label: 'Aaron'},
+    {assetCode: 'u_5', label: 'Chawn'},
+    {assetCode: 'u_6', label: 'Omar'},
   ],
 }
 
 export const AssignmentDueDatesManager = () => {
   // This default information will be replaced by queried information
-  const [assignedInfoList, setAssignedInfoList] = useState([{id: nanoid()}]) // Initialize with one object with a unique id
+  const [assignedInfoList, setAssignedInfoList] = useState([{dueDateId: nanoid()}]) // Initialize with one object with a unique id
 
-  const handleAssignedInfoChange = (newInfo, id) => {
+  const handleAssignedInfoChange = (newInfo, dueDateId) => {
     const updatedInfoList = assignedInfoList.map(info =>
-      info.id === id ? {...info, ...newInfo} : info
+      info.dueDateId === dueDateId ? {...info, ...newInfo} : info
     )
     setAssignedInfoList(updatedInfoList)
   }
 
   const handleAddAssignment = () => {
-    setAssignedInfoList([...assignedInfoList, {id: nanoid()}]) // Add a new object with a unique id
+    setAssignedInfoList([...assignedInfoList, {dueDateId: nanoid()}]) // Add a new object with a unique id
   }
 
-  const handleCloseAssignmentDueDate = id => () => {
-    const updatedInfoList = assignedInfoList.filter(info => info.id !== id)
+  const handleCloseAssignmentDueDate = dueDateId => () => {
+    const updatedInfoList = assignedInfoList.filter(info => info.dueDateId !== dueDateId)
     setAssignedInfoList(updatedInfoList)
   }
 
-  const getAvailableOptionsFor = id => {
+  const getAvailableOptionsFor = dueDateId => {
     // Get all assignedList arrays, except for the one matching the given id
     const allAssignedListsExceptCurrent = assignedInfoList
-      .filter(info => info.id !== id)
+      .filter(info => info.dueDateId !== dueDateId)
       .map(info => info.assignedList || [])
 
     // Combine all assigned lists into one array
-    const allAssignedIds = [].concat(...allAssignedListsExceptCurrent)
+    const allAssignedDueDateIds = [].concat(...allAssignedListsExceptCurrent)
 
     // Filter out options based on assigned ids
     const filteredOptions = {}
     Object.keys(DEFAULT_LIST_OPTIONS).forEach(category => {
       filteredOptions[category] = DEFAULT_LIST_OPTIONS[category].filter(option => {
-        return !allAssignedIds.includes(option.id)
+        return !allAssignedDueDateIds.includes(option.assetCode)
       })
     })
 
@@ -90,7 +90,7 @@ export const AssignmentDueDatesManager = () => {
     <>
       <Text size="large">{I18n.t('Assignment Settings')}</Text>
       {assignedInfoList.map((info, index) => (
-        <View key={info.id}>
+        <View key={info.dueDateId}>
           <div
             style={{
               paddingTop: assignedInfoList.length === 1 ? theme.variables.spacing.medium : '0',
@@ -110,15 +110,15 @@ export const AssignmentDueDatesManager = () => {
                     <CloseButton
                       size="small"
                       screenReaderLabel={I18n.t('Close')}
-                      onClick={handleCloseAssignmentDueDate(info.id)}
+                      onClick={handleCloseAssignmentDueDate(info.dueDateId)}
                     />
                   </Flex.Item>
                 </Flex>
               </View>
             )}
             <AssignmentDueDate
-              availableAssignToOptions={getAvailableOptionsFor(info.id)}
-              onAssignedInfoChange={newInfo => handleAssignedInfoChange(newInfo, info.id)}
+              availableAssignToOptions={getAvailableOptionsFor(info.dueDateId)}
+              onAssignedInfoChange={newInfo => handleAssignedInfoChange(newInfo, info.dueDateId)}
             />
           </div>
         </View>
