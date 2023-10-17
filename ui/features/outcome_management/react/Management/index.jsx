@@ -22,6 +22,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import {InstUISettingsProvider} from '@instructure/emotion'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import ManageOutcomesView from './ManageOutcomesView'
 import ManageOutcomesFooter from './ManageOutcomesFooter'
@@ -287,6 +288,12 @@ const OutcomeManagementPanel = ({
   const singleOutcomeSelected =
     selectedOutcome || (selectedOutcomes.length === 1 && selectedOutcomes[0])
 
+  const componentOverrides = {
+    View: {
+      paddingLarge: '1.9rem'
+    }
+  }
+
   // if only one outcome is selected (kebab or bulk action)
   if (singleOutcomeSelected) {
     // set the initial target group as the outcome parent group
@@ -386,105 +393,107 @@ const OutcomeManagementPanel = ({
           )}
         </View>
       ) : (
-        <Flex elementRef={setContainerRef}>
-          <Flex.Item
-            width="33%"
-            display="inline-block"
-            position="relative"
-            as="div"
-            overflowY="auto"
-            overflowX="hidden"
-            elementRef={setLeftColumnRef}
-          >
-            <View
+        <InstUISettingsProvider theme={{componentOverrides}}>
+          <Flex elementRef={setContainerRef}>
+            <Flex.Item
+              width="33%"
+              display="inline-block"
+              position="relative"
               as="div"
-              padding="small x-small none x-small"
-              minHeight="calc(720px - 10.75rem)"
-              height="calc(100vh - 16.35rem)"
+              overflowY="auto"
+              overflowX="hidden"
+              elementRef={setLeftColumnRef}
             >
-              <Heading level="h2">
-                <Text size="large" weight="bold" fontStyle="normal">
-                  {I18n.t('Outcome Groups')}
-                </Text>
-              </Heading>
-              <View
-                data-testid="outcomes-management-tree-browser"
-                elementRef={el => (treeBrowserViewRef.current = el)}
+              <View 
+                as="div"
+                padding="large none none none"
+                minHeight="calc(720px - 10.75rem)"
+                height="calc(100vh - 16.35rem)"
               >
-                <TreeBrowser
-                  onCollectionToggle={queryCollections}
-                  collections={collections}
-                  rootId={rootId}
-                  showRootCollection={true}
-                  defaultExpandedIds={[rootId]}
-                  onCreateGroup={createGroup}
-                  loadedGroups={loadedGroups}
-                />
+                <Heading level="h2">
+                  <Text size="large" weight="bold" fontStyle="normal">
+                    {I18n.t('Outcome Groups')}
+                  </Text>
+                </Heading>
+                <View
+                  data-testid="outcomes-management-tree-browser"
+                  elementRef={el => (treeBrowserViewRef.current = el)}
+                >
+                  <TreeBrowser
+                    onCollectionToggle={queryCollections}
+                    collections={collections}
+                    rootId={rootId}
+                    showRootCollection={true}
+                    defaultExpandedIds={[rootId]}
+                    onCreateGroup={createGroup}
+                    loadedGroups={loadedGroups}
+                  />
+                </View>
               </View>
-            </View>
-          </Flex.Item>
-          <Flex.Item
-            as="div"
-            position="relative"
-            width="1%"
-            display="inline-block"
-            tabIndex="0"
-            role="separator"
-            aria-hidden="true"
-            aria-orientation="vertical"
-            onKeyDown={onKeyDownHandler}
-            elementRef={setDelimiterRef}
-          >
-            <div
-              style={{
-                width: '1vw',
-                cursor: 'col-resize',
-                minHeight: 'calc(720px - 10.5rem)',
-                height: 'calc(100vh - 16.35rem)',
-                background:
-                  '#EEEEEE url("/images/splitpane_handle-ew.gif") no-repeat scroll 50% 50%',
-              }}
-            />
-          </Flex.Item>
-          <Flex.Item
-            as="div"
-            width="66%"
-            display="inline-block"
-            position="relative"
-            overflowY="visible"
-            overflowX="auto"
-            elementRef={el => {
-              setRightColumnRef(el)
-              setScrollContainer(el)
-            }}
-          >
-            <View
+            </Flex.Item>
+            <Flex.Item
               as="div"
-              padding="small none none x-small"
-              minHeight="calc(720px - 10.75rem)"
-              height="calc(100vh - 16.35rem)"
+              position="relative"
+              width="1%"
+              display="inline-block"
+              tabIndex="0"
+              role="separator"
+              aria-hidden="true"
+              aria-orientation="vertical"
+              onKeyDown={onKeyDownHandler}
+              elementRef={setDelimiterRef}
             >
-              {selectedGroupId && (
-                <ManageOutcomesView
-                  key={selectedGroupId}
-                  outcomeGroup={group}
-                  loading={loading}
-                  removeOutcomesStatus={removeOutcomesStatus}
-                  selectedOutcomes={selectedOutcomes}
-                  searchString={searchString}
-                  onSelectOutcomesHandler={toggleSelectedOutcomes}
-                  onOutcomeGroupMenuHandler={groupMenuHandler}
-                  onOutcomeMenuHandler={outcomeMenuHandler}
-                  onSearchChangeHandler={onSearchChangeHandler}
-                  onSearchClearHandler={onSearchClearHandler}
-                  loadMore={loadMore}
-                  scrollContainer={scrollContainer}
-                  isRootGroup={collections[selectedGroupId]?.isRootGroup}
-                />
-              )}
-            </View>
-          </Flex.Item>
-        </Flex>
+              <div
+                style={{
+                  width: '1vw',
+                  cursor: 'col-resize',
+                  minHeight: 'calc(720px - 10.5rem)',
+                  height: 'calc(100vh - 16.35rem)',
+                  background:
+                    '#EEEEEE url("/images/splitpane_handle-ew.gif") no-repeat scroll 50% 50%',
+                }}
+              />
+            </Flex.Item>
+            <Flex.Item
+              as="div"
+              width="66%"
+              display="inline-block"
+              position="relative"
+              overflowY="visible"
+              overflowX="auto"
+              elementRef={el => {
+                setRightColumnRef(el)
+                setScrollContainer(el)
+              }}
+            >
+              <View
+                as="div"
+                padding="large none none none"
+                minHeight="calc(720px - 10.75rem)"
+                height="calc(100vh - 16.35rem)"
+              >
+                {selectedGroupId && (
+                  <ManageOutcomesView
+                    key={selectedGroupId}
+                    outcomeGroup={group}
+                    loading={loading}
+                    removeOutcomesStatus={removeOutcomesStatus}
+                    selectedOutcomes={selectedOutcomes}
+                    searchString={searchString}
+                    onSelectOutcomesHandler={toggleSelectedOutcomes}
+                    onOutcomeGroupMenuHandler={groupMenuHandler}
+                    onOutcomeMenuHandler={outcomeMenuHandler}
+                    onSearchChangeHandler={onSearchChangeHandler}
+                    onSearchClearHandler={onSearchClearHandler}
+                    loadMore={loadMore}
+                    scrollContainer={scrollContainer}
+                    isRootGroup={collections[selectedGroupId]?.isRootGroup}
+                  />
+                )}
+              </View>
+            </Flex.Item>
+          </Flex>
+        </InstUISettingsProvider>
       )}
       {canManage && (
         <ManageOutcomesFooter
