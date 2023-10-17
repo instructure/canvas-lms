@@ -35,12 +35,18 @@ export const AssignedTo = ({
   errorMessage,
   onOptionDismiss,
 }) => {
-  const [selectedOptionAssetCode, setSelectedOptionAssetCode] = useState(initialAssignedToInformation)
-  const [inputValue, setInputValue] = useState('')
+  const [selectedOptionAssetCode, setSelectedOptionAssetCode] = useState(
+    initialAssignedToInformation
+  )
   const [isShowingOptions, setIsShowingOptions] = useState(false)
   const [highlightedOptionAssetCode, setHighlightedOptionAssetCode] = useState(null)
   const [announcement, setAnnouncement] = useState(null)
   const inputRef = useRef(null)
+
+  // This is the value that is visible in the search input
+  const [inputValue, setInputValue] = useState('')
+  // This is the value that is used to filter out the available options
+  const [currentFilterInput, setCurrentFilterInput] = useState('')
 
   const filterOptions = value => {
     return Object.values(availableAssignToOptions)
@@ -50,15 +56,15 @@ export const AssignedTo = ({
 
   // filterOptions only occur based on user input.
   const filteredOptions = useMemo(() => {
-    if (!inputValue) return availableAssignToOptions
+    if (!currentFilterInput) return availableAssignToOptions
 
     return Object.keys(availableAssignToOptions).reduce((acc, key) => {
       acc[key] = availableAssignToOptions[key].filter(option =>
-        option.label.toLowerCase().includes(inputValue.toLowerCase())
+        option.label.toLowerCase().includes(currentFilterInput.toLowerCase())
       )
       return acc
     }, {})
-  }, [inputValue, availableAssignToOptions])
+  }, [currentFilterInput, availableAssignToOptions])
 
   const getOptionByAssetCode = assetCode => {
     return Object.values(availableAssignToOptions)
@@ -87,7 +93,13 @@ export const AssignedTo = ({
     const option = getOptionByAssetCode(assetCode)
     if (!option) return
     setHighlightedOptionAssetCode(assetCode)
-    setInputValue(event.type === 'keydown' ? option.label : inputValue)
+    // Set the visible input correctly when using keyboard
+    if (event.type === 'keydown') {
+      setInputValue(option.label)
+    } else {
+      setCurrentFilterInput(inputValue)
+      setInputValue(inputValue)
+    }
     setAnnouncement(option.label)
   }
 
@@ -102,6 +114,7 @@ export const AssignedTo = ({
 
     handleOptionSelected(assetCode)
     setInputValue('')
+    setCurrentFilterInput('')
     setIsShowingOptions(false)
     setAnnouncement(I18n.t('%{optionName} selected. List collapsed.', {optionName: option.label}))
   }
@@ -120,9 +133,12 @@ export const AssignedTo = ({
     return message
   }
 
+  // Changes that occur when the user types in the input
   const handleInputChange = event => {
     const value = event.target.value
     const newFilteredOptions = filterOptions(value)
+    // Any time input is typed, the filter should change
+    setCurrentFilterInput(value)
     setInputValue(value)
     setHighlightedOptionAssetCode(getDefaultHighlightedOption(newFilteredOptions))
     setIsShowingOptions(true)
