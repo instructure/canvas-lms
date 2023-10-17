@@ -49,6 +49,18 @@ SearchableSelectOption.propTypes = {
 /* eslint-enable react/no-unused-prop-types */
 SearchableSelectOption.displayName = 'Option'
 
+interface Props {
+  id: string
+  isLoading: boolean
+  value: string
+  onChange: Function
+  label: string
+  placeholder: string
+  noResultsLabel: string
+  noSearchMatchLabel: string
+  children: any
+}
+
 function flattenOptions(nodes: any) {
   const options: any[][] = []
 
@@ -247,18 +259,6 @@ export default function RoleSearchSelect(props: Props) {
       </Alert>
     </>
   )
-}
-
-interface Props {
-  id: string
-  isLoading: boolean
-  value: string
-  onChange: Function
-  label: string
-  placeholder: string
-  noResultsLabel: string
-  noSearchMatchLabel: string
-  children: any
 }
 
 RoleSearchSelect.Option = SearchableSelectOption

@@ -18,8 +18,13 @@
 
 import React from 'react'
 import {fireEvent, render, waitFor, within} from '@testing-library/react'
-import {TempEnrollAssign, tempEnrollAssignData} from '../TempEnrollAssign'
+import {
+  getEnrollmentAndUserProps,
+  TempEnrollAssign,
+  tempEnrollAssignData,
+} from '../TempEnrollAssign'
 import fetchMock from 'fetch-mock'
+import {PROVIDER, RECIPIENT} from '../types'
 
 const backCall = jest.fn()
 
@@ -60,7 +65,13 @@ const enrollmentsByCourse = [
 ]
 
 const props = {
-  enrollment: {login_id: 'mel123', email: 'mel@email.com', name: 'Melvin', sis_user_id: '5'},
+  enrollment: {
+    email: 'mel@email.com',
+    id: '2',
+    login_id: 'mel123',
+    name: 'Melvin',
+    sis_user_id: '5',
+  },
   user: {
     name: 'John Smith',
     avatar_url: '',
@@ -75,6 +86,7 @@ const props = {
   setEnrollmentStatus: jest.fn(),
   doSubmit: () => false,
   isInAssignEditMode: false,
+  contextType: PROVIDER,
 }
 
 const ENROLLMENTS_URI = encodeURI(
@@ -310,6 +322,42 @@ describe('TempEnrollAssign', () => {
         /There was an error while requesting user enrollments, please try again/i
       )
       expect(errorMessage).toBeTruthy()
+    })
+  })
+
+  describe('getEnrollmentAndUserProps', () => {
+    it('should return unchanged values when contextType is null', () => {
+      const {enrollmentProps, userProps} = getEnrollmentAndUserProps({
+        contextType: null,
+        enrollment: props.enrollment,
+        user: props.user,
+      })
+
+      expect(enrollmentProps).toEqual(props.enrollment)
+      expect(userProps).toEqual(props.user)
+    })
+
+    it('should return enrollmentProps and userProps correctly when contextType is RECIPIENT', () => {
+      const {enrollmentProps, userProps} = getEnrollmentAndUserProps({
+        contextType: RECIPIENT,
+        enrollment: props.enrollment,
+        user: props.user,
+      })
+
+      // Assert
+      expect(enrollmentProps).toEqual(props.user)
+      expect(userProps).toEqual(props.enrollment)
+    })
+
+    it('should return enrollmentProps and userProps correctly when contextType is PROVIDER', () => {
+      const {enrollmentProps, userProps} = getEnrollmentAndUserProps({
+        contextType: PROVIDER,
+        enrollment: props.enrollment,
+        user: props.user,
+      })
+
+      expect(enrollmentProps).toEqual(props.enrollment)
+      expect(userProps).toEqual(props.user)
     })
   })
 })

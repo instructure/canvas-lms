@@ -183,7 +183,7 @@ describe('TempEnrollEdit component', () => {
 
         fireEvent.click(screen.getByTestId('edit-button'))
 
-        expect(props.onEdit).toHaveBeenCalledWith(props.enrollments[0])
+        expect(props.onEdit).toHaveBeenCalledWith(props.enrollments[0].user) // must be user object
       })
     })
 
