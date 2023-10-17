@@ -33,6 +33,7 @@ export const AssignedTo = ({
   availableAssignToOptions,
   onOptionSelect,
   errorMessage,
+  onOptionDismiss,
 }) => {
   const [selectedOptionId, setSelectedOptionId] = useState(initialAssignedToInformation)
   const [inputValue, setInputValue] = useState('')
@@ -141,6 +142,7 @@ export const AssignedTo = ({
     const newSelection = selectedOptionId.filter(id => id !== tag)
     setSelectedOptionId(newSelection)
     setHighlightedOptionId(null)
+    onOptionDismiss(tag) // Notify parent
     inputRef.current.focus()
   }
 
@@ -173,6 +175,7 @@ export const AssignedTo = ({
                 id={option.id}
                 key={option.id}
                 isHighlighted={option.id === highlightedOptionId}
+                data-testid="assign-to-select-option"
               >
                 <View padding="none xx-small none none">
                   <IconCheckSolid style={iconStyle} />
@@ -232,6 +235,7 @@ AssignedTo.propTypes = {
     )
   ).isRequired,
   errorMessage: PropTypes.array,
+  onOptionDismiss: PropTypes.func,
 }
 
 AssignedTo.defaultProps = {
@@ -243,4 +247,5 @@ AssignedTo.defaultProps = {
   },
   errorMessage: [],
   onOptionSelect: () => {},
+  onOptionDismiss: () => {},
 }
