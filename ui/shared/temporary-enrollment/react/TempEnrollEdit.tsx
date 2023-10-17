@@ -26,7 +26,14 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 import {Avatar} from '@instructure/ui-avatar'
-import {Enrollment, EnrollmentType, MODULE_NAME, PROVIDER, TempEnrollPermissions} from './types'
+import {
+  Enrollment,
+  EnrollmentType,
+  MODULE_NAME,
+  PROVIDER,
+  TempEnrollPermissions,
+  User,
+} from './types'
 import {deleteEnrollment} from './api/enrollment'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
@@ -39,12 +46,8 @@ const analyticProps = createAnalyticPropsGenerator(MODULE_NAME)
 
 interface Props {
   readonly enrollments: Enrollment[]
-  readonly user: {
-    readonly name: string
-    readonly avatar_url?: string
-    readonly id: string
-  }
-  readonly onEdit?: (enrollment: Enrollment) => void
+  readonly user: User
+  readonly onEdit?: (enrollment: User) => void
   readonly onDelete?: (enrollmentId: number) => void
   readonly onAddNew?: () => void
   readonly contextType: EnrollmentType
@@ -88,22 +91,12 @@ async function handleConfirmAndDeleteEnrollment(
 export function TempEnrollEdit(props: Props) {
   const formatDateTime = useDateTimeFormat('date.formats.short_with_time')
 
-  const {
-    enrollments,
-    user,
-    onEdit = () => {},
-    onDelete = () => {},
-    onAddNew = () => {},
-    contextType,
-    tempEnrollPermissions,
-  } = props
-
   // destructure and cache permission checks (for use in eager and lazy evaluations)
-  const {canEdit, canDelete, canAdd} = tempEnrollPermissions
+  const {canEdit, canDelete, canAdd} = props.tempEnrollPermissions
 
   const handleEditClick = (enrollment: Enrollment) => {
     if (canEdit) {
-      onEdit(enrollment)
+      props.onEdit?.(enrollment.user)
     } else {
       // eslint-disable-next-line no-console
       console.error('User does not have permission to edit enrollment')
@@ -112,7 +105,7 @@ export function TempEnrollEdit(props: Props) {
 
   const handleDeleteClick = (enrollment: Enrollment) => {
     if (canDelete) {
-      handleConfirmAndDeleteEnrollment(enrollment.course_id, enrollment.id, onDelete)
+      handleConfirmAndDeleteEnrollment(enrollment.course_id, enrollment.id, props.onDelete)
     } else {
       // eslint-disable-next-line no-console
       console.error('User does not have permission to delete enrollment')
@@ -121,7 +114,7 @@ export function TempEnrollEdit(props: Props) {
 
   const handleAddNewClick = () => {
     if (canAdd) {
-      onAddNew()
+      props.onAddNew?.()
     } else {
       // eslint-disable-next-line no-console
       console.error('User does not have permission to add enrollment')
@@ -175,8 +168,8 @@ export function TempEnrollEdit(props: Props) {
           <Avatar
             size="large"
             margin="0 small 0 0"
-            name={user.name}
-            src={user.avatar_url}
+            name={props.user.name}
+            src={props.user.avatar_url}
             data-fs-exclude={true}
             data-heap-redact-attributes="name"
           />
@@ -184,7 +177,7 @@ export function TempEnrollEdit(props: Props) {
 
         <Flex.Item>
           <div>
-            <Text size="large">{user.name}</Text>
+            <Text size="large">{props.user.name}</Text>
           </div>
         </Flex.Item>
       </Flex>
@@ -196,7 +189,7 @@ export function TempEnrollEdit(props: Props) {
       <Flex wrap="wrap" margin="0 small 0 0">
         <Flex.Item>{renderAvatar()}</Flex.Item>
 
-        {canAdd && contextType === PROVIDER && (
+        {canAdd && props.contextType === PROVIDER && (
           <Flex.Item margin="0 0 0 auto">
             <Button
               data-testid="add-button"
@@ -228,7 +221,7 @@ export function TempEnrollEdit(props: Props) {
           </Table.Row>
         </Table.Head>
         <Table.Body>
-          {enrollments.map(enrollment => (
+          {props.enrollments.map(enrollment => (
             <Table.Row key={enrollment.id}>
               <Table.RowHeader>{enrollment.user.name}</Table.RowHeader>
               <Table.Cell>
