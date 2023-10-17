@@ -34,6 +34,7 @@ const DEFAULT_LIST_OPTIONS = {
   'Course Sections': [
     {id: 'sec_1', label: 'Section 1'},
     {id: 'sec_2', label: 'Section 2'},
+    {id: 'sec_3', label: 'Section 3'},
   ],
   Students: [
     {id: 'u_1', label: 'Jason'},
@@ -63,6 +64,26 @@ export const AssignmentDueDatesManager = () => {
   const handleCloseAssignmentDueDate = id => () => {
     const updatedInfoList = assignedInfoList.filter(info => info.id !== id)
     setAssignedInfoList(updatedInfoList)
+  }
+
+  const getAvailableOptionsFor = id => {
+    // Get all assignedList arrays, except for the one matching the given id
+    const allAssignedListsExceptCurrent = assignedInfoList
+      .filter(info => info.id !== id)
+      .map(info => info.assignedList || [])
+
+    // Combine all assigned lists into one array
+    const allAssignedIds = [].concat(...allAssignedListsExceptCurrent)
+
+    // Filter out options based on assigned ids
+    const filteredOptions = {}
+    Object.keys(DEFAULT_LIST_OPTIONS).forEach(category => {
+      filteredOptions[category] = DEFAULT_LIST_OPTIONS[category].filter(option => {
+        return !allAssignedIds.includes(option.id)
+      })
+    })
+
+    return filteredOptions
   }
 
   return (
@@ -96,7 +117,7 @@ export const AssignmentDueDatesManager = () => {
               </View>
             )}
             <AssignmentDueDate
-              availableAssignToOptions={DEFAULT_LIST_OPTIONS}
+              availableAssignToOptions={getAvailableOptionsFor(info.id)}
               onAssignedInfoChange={newInfo => handleAssignedInfoChange(newInfo, info.id)}
             />
           </div>

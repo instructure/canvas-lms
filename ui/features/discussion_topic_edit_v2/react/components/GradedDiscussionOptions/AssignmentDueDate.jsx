@@ -47,6 +47,16 @@ export const AssignmentDueDate = ({
             setAssignedInformation(newInfo)
             onAssignedInfoChange(newInfo)
           }}
+          onOptionDismiss={dismissedOption => {
+            const newInfo = {
+              ...assignedInformation,
+              assignedList: assignedInformation.assignedList.filter(
+                option => option.id !== dismissedOption.id
+              ),
+            }
+            setAssignedInformation(newInfo)
+            onAssignedInfoChange(newInfo)
+          }}
         />
         <DateTimeInput
           description={I18n.t('Due')}

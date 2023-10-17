@@ -68,4 +68,40 @@ describe('AssignmentDueDatesManager', () => {
     closeButtons = screen.queryAllByText('Close')
     expect(closeButtons.length).toBe(0)
   })
+
+  // currently this will use options from the DEFAULT_LIST_OPTIONS, will get replaced in the future.
+  it('correctly manages available assignTo options', () => {
+    setup()
+    const addButton = screen.getByText('Add Assignment')
+    // Add an assignment
+    fireEvent.click(addButton)
+
+    // There should be 2 menus
+    const selectOptions = screen.getAllByTestId('assign-to-select')
+    const assignToOptionOne = selectOptions[0]
+    const assignToOptionTwo = selectOptions[1]
+
+    fireEvent.click(assignToOptionOne)
+
+    let availableOptions = screen.getAllByTestId('assign-to-select-option')
+
+    // Currently there are 10 DEFAULT_OPTIONS defined in AssignmentDueDatesManager.jsx.
+    // All the checks below rely on this.
+    // When VICE-3865 is complete, the default data will be replaced with real data that will
+    // Need to be mocked. and the data below will need to be updated
+
+    // Select an option
+    expect(availableOptions.length).toBe(10)
+    fireEvent.click(availableOptions[1])
+
+    // Verify that all options still appear in the menu where the item was selected
+    fireEvent.click(assignToOptionOne)
+    availableOptions = screen.getAllByTestId('assign-to-select-option')
+    expect(availableOptions.length).toBe(10)
+
+    // open second menu, and verify that the selected option is not available
+    fireEvent.click(assignToOptionTwo)
+    availableOptions = screen.getAllByTestId('assign-to-select-option')
+    expect(availableOptions.length).toBe(9)
+  })
 })
