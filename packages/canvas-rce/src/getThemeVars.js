@@ -26,16 +26,17 @@ let memoizedVariables
 function getThemeVars() {
   if (memoizedVariables) return memoizedVariables
 
-  const {defaultThemeKey, overrides, themes} = getRegistry()
+  const {currentThemeKey, overrides, themes} = getRegistry()
   // Just assume the "canvas" theme if the default key is null. This will
   // never happen in the live app because one way or another a theme gets
   // used, but unit tests don't always do that.
   // Also we have to cloneDeep this because the merge below is about to
   // mutate the whole thing.
-  const variables = cloneDeep(themes[defaultThemeKey ?? 'canvas'])
+  const themeKey = currentThemeKey || 'canvas'
+  const variables = cloneDeep(themes[themeKey])
   merge(variables, overrides)
 
-  memoizedVariables = {variables, key: defaultThemeKey}
+  memoizedVariables = {variables, key: themeKey}
   return memoizedVariables
 }
 
