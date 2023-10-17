@@ -271,7 +271,7 @@ module ContextModulesCommon
     expect(f("#context_modules")).to include_text(module_name)
   end
 
-  def add_new_module_item(item_select_selector, module_name, new_item_text, item_title_text)
+  def add_new_module_item_and_yield(item_select_selector, module_name, new_item_text, item_title_text)
     f(".ig-header-admin .al-trigger").click
     f(".add_module_item_link").click
     select_module_item("#add_module_item_select", module_name)
