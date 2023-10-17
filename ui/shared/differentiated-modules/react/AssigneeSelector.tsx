@@ -25,8 +25,6 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {debounce, uniqBy} from 'lodash'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {Spinner} from '@instructure/ui-spinner'
-import {AssignmentOverride} from './types'
 import {setContainScrollBehavior} from '../utils/assignToHelper'
 
 const {Option: CanvasMultiSelectOption} = CanvasMultiSelect as any
@@ -35,8 +33,9 @@ const I18n = useI18nScope('differentiated_modules')
 
 interface Props {
   courseId: string
-  moduleId: string
   onSelect: (options: AssigneeOption[]) => void
+  isLoadingDefaultValues?: boolean
+  defaultValues: AssigneeOption[]
   selectedOptionIds: string[]
 }
 
@@ -47,55 +46,21 @@ export interface AssigneeOption {
   group?: string
 }
 
-const AssigneeSelector = ({courseId, moduleId, onSelect, selectedOptionIds}: Props) => {
+const AssigneeSelector = ({
+  courseId,
+  onSelect,
+  isLoadingDefaultValues,
+  defaultValues,
+  selectedOptionIds,
+}: Props) => {
   const [searchTerm, setSearchTerm] = useState('')
-  const [options, setOptions] = useState<AssigneeOption[]>([])
+  const [options, setOptions] = useState<AssigneeOption[]>(defaultValues)
   const [isLoading, setIsLoading] = useState(false)
-  const [isLoadingDefaultValues, setIsLoadingDefaultValues] = useState(false)
   const listElementRef = useRef<HTMLElement | null>(null)
   const [isShowingOptions, setIsShowingOptions] = useState(false)
-  const mountedRef = useRef(false)
 
   useEffect(() => {
-    setIsLoadingDefaultValues(true)
-    doFetchApi({
-      path: `/api/v1/courses/${courseId}/modules/${moduleId}/assignment_overrides`,
-    })
-      .then((data: any) => {
-        if (data.json === undefined) return
-        const json = data.json as AssignmentOverride[]
-        const parsedOptions = json.reduce((acc: AssigneeOption[], override: AssignmentOverride) => {
-          const overrideOptions =
-            override.students?.map(({id, name}: {id: string; name: string}) => ({
-              id: `student-${id}`,
-              overrideId: override.id,
-              value: name,
-              group: I18n.t('Students'),
-            })) ?? []
-          if (override.course_section !== undefined) {
-            const sectionId = `section-${override.course_section.id}`
-            overrideOptions.push({
-              id: sectionId,
-              overrideId: override.id,
-              value: override.course_section.name,
-              group: I18n.t('Sections'),
-            })
-          }
-          return [...acc, ...overrideOptions]
-        }, [])
-        setOptions(parsedOptions)
-        onSelect(parsedOptions)
-      })
-      .catch((e: Error) => showFlashError(I18n.t('Something went wrong while fetching data'))(e))
-      .finally(() => {
-        setIsLoadingDefaultValues(false)
-        mountedRef.current = true
-      })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [courseId, moduleId])
-
-  useEffect(() => {
-    if (!mountedRef.current) return
+    if (isLoadingDefaultValues) return
 
     const params: Record<string, string> = {}
     const shouldSearchTerm = searchTerm.length > 2
@@ -124,6 +89,7 @@ const AssigneeSelector = ({courseId, moduleId, onSelect, selectedOptionIds}: Pro
             sectionsParsedResult =
               sectionsJSON?.map(({id, name}: any) => {
                 const parsedId = `section-${id}`
+                // if an existing override exists for this section, use it so we have its overrideId
                 const existing = options.find(option => option.id === parsedId)
                 if (existing !== undefined) {
                   return existing
@@ -143,6 +109,7 @@ const AssigneeSelector = ({courseId, moduleId, onSelect, selectedOptionIds}: Pro
             studentsParsedResult =
               studentsJSON?.map(({id, name}: any) => {
                 const parsedId = `student-${id}`
+                // if an existing override exists for this student, use it so we have its overrideId
                 const existing = options.find(option => option.id === parsedId)
                 if (existing !== undefined) {
                   return existing
@@ -167,7 +134,7 @@ const AssigneeSelector = ({courseId, moduleId, onSelect, selectedOptionIds}: Pro
         .catch(e => showFlashError(I18n.t('Something went wrong while fetching data'))(e))
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [courseId, searchTerm, mountedRef.current])
+  }, [courseId, isLoadingDefaultValues, searchTerm])
 
   const handleSelectOption = () => {
     setIsShowingOptions(false)
@@ -189,8 +156,6 @@ const AssigneeSelector = ({courseId, moduleId, onSelect, selectedOptionIds}: Pro
       setContainScrollBehavior(listElementRef.current)
     }, 500)
   }
-
-  if (isLoadingDefaultValues) return <Spinner renderTitle="Loading" size="small" />
 
   return (
     <>
