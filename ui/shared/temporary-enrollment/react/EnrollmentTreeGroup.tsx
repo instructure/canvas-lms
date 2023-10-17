@@ -142,12 +142,12 @@ export function EnrollmentTreeGroup(props: Props) {
 
     return (
       <>
-        <Flex key={props.id} padding="x-small" as="div" alignItems="center">
+        <Flex key={props.id} padding="xx-small" as="div" alignItems="center">
           <Flex.Item margin={props.indent}>
             <Checkbox
               data-testid={'check ' + props.id}
               label=""
-              size="large"
+              size="medium"
               checked={props.isCheck}
               indeterminate={props.isMixed}
               onChange={handleCheckboxChange}
@@ -159,7 +159,7 @@ export function EnrollmentTreeGroup(props: Props) {
               withBorder={false}
               withBackground={false}
               onClick={handleIconButtonClick}
-              // value={props.isToggle}  <--- this is an invalid prop to IconButton. FIXME
+              size="small"
               screenReaderLabel={I18n.t('Toggle group %{group}', {group: props.label})}
               {...analyticProps('Group')}
             >
