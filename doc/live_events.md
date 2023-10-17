@@ -14,20 +14,20 @@ There are two components to local development:
 
 ### Kinesis Stream
 
-If using the docker-compose dev setup, there is a "fake kinesis" available in 
-docker-compose/kinesis.override.yml available for use. To start this kinesis 
-container run `docker-compose up -d kinesis`. Once it's up, make sure you have 
-the `aws` cli installed, and run the following command to create a stream (with 
-canvas running). Keep in mind that we are running this locally so actual AWS 
+If using the docker-compose dev setup, there is a "fake kinesis" available in
+docker-compose/kinesis.override.yml available for use. To start this kinesis
+container run `docker-compose up -d kinesis`. Once it's up, make sure you have
+the `aws` cli installed, and run the following command to create a stream (with
+canvas running). Keep in mind that we are running this locally so actual AWS
 credentials are not needed, run the following command as you see it here:
 
 ```bash
 AWS_ACCESS_KEY_ID=key AWS_SECRET_ACCESS_KEY=secret aws --endpoint-url http://kinesis.docker/ kinesis create-stream --stream-name=live-events --shard-count=1 --region=us-east-1
 ```
 
-Once the stream is created, configure your Canvas to use it in your 
+Once the stream is created, configure your Canvas to use it in your
 `config/dynamic_settings.yml`. This file is a local shim for Consul. If you have
-copied the example file at `config/dynamic_settings.yml.example` recently, you 
+copied the example file at `config/dynamic_settings.yml.example` recently, you
 should already see a live_events block and it should already be configured properly.
 If you don't see a live_events block, check the example file or copy this block:
 

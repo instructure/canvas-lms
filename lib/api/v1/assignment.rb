@@ -623,6 +623,61 @@ module Api::V1::Assignment
       SubmissionLifecycleManager.recompute(prepared_update[:assignment], update_grades: true, executing_user: user)
     end
 
+    # At present, when an assignment linked to a LTI tool is copied, there is no way for canvas
+    # to know what resouces the LTI tool needs copied as well. New Quizzes has a problem
+    # when an assignment linked to a New Quiz is copied, none of the content referenced in the RCE
+    # html is moved to the destination course. This code block gives New Quizzes the ability
+    # to let canvas know what additional assets need to be copied.
+    # Note: this is intended to be a short term solution to resolve an ongoing production issue.
+    if assignment_params.key?("migrated_urls_report_url")
+      url = assignment_params["migrated_urls_report_url"]
+      res = CanvasHttp.get(url)
+      data = JSON.parse(res.body)
+
+      unless data.empty?
+        migration_type = "course_copy_importer"
+        source_course = assignment.duplicate_of.context
+        plugin = Canvas::Plugin.find(migration_type)
+        content_migration = context.content_migrations.build(
+          user:,
+          context:,
+          migration_type:,
+          initiated_source: :api
+        )
+        content_migration.update_migration_settings({
+                                                      import_quizzes_next: false,
+                                                      source_course_id: source_course.id
+                                                    })
+        content_migration.workflow_state = "created"
+        content_migration.source_course = source_course
+        content_migration.migration_settings[:import_immediately] = false
+        content_migration.save
+
+        copy_values = {}
+        use_global_identifiers = content_migration.use_global_identifiers?
+        data.each do |key, _|
+          import_object = Context.find_asset_by_url(key)
+          if import_object.is_a?(WikiPage)
+            copy_values[:wiki_pages] ||= []
+            copy_values[:wiki_pages] << CC::CCHelper.create_key(import_object, global: use_global_identifiers)
+          elsif import_object.is_a?(Attachment)
+            copy_values[:attachments] ||= []
+            copy_values[:attachments] << CC::CCHelper.create_key(import_object, global: use_global_identifiers)
+          end
+        end
+
+        copy_options = ContentMigration.process_copy_params(copy_values, global_identifiers: use_global_identifiers)
+        content_migration.migration_settings[:migration_ids_to_import] ||= {}
+        content_migration.migration_settings[:migration_ids_to_import][:copy] = copy_options
+        content_migration.copy_options = copy_options
+        content_migration.save
+
+        content_migration.shard.activate do
+          content_migration.queue_migration(plugin)
+        end
+      end
+    end
+
     response
   rescue ActiveRecord::RecordInvalid => e
     assignment.errors.add("invalid_record", e)
