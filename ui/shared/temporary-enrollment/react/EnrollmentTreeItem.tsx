@@ -57,12 +57,12 @@ export function EnrollmentTreeItem(props: Props) {
 
   const renderRow = () => {
     return (
-      <Flex key={props.id} padding="x-small" as="div" alignItems="center">
+      <Flex key={props.id} padding="xxx-small" as="div" alignItems="center">
         <Flex.Item margin={props.indent}>
           <Checkbox
             data-testid={'check ' + props.id}
             label=""
-            size="large"
+            size="medium"
             checked={checked}
             onChange={handleCheckboxChange}
             {...analyticProps('Course')}
