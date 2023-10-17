@@ -1328,11 +1328,16 @@ class DiscussionTopic < ActiveRecord::Base
       reply_to_topic_submitted_at = topic.discussion_entries.top_level_for_user(user).minimum(:created_at)
 
       if reply_to_topic_submitted_at.present?
-        submission = ensure_particular_submission(reply_to_topic_checkpoint, user, reply_to_topic_submitted_at, only_update:)
-        submissions << submission if submission.present?
+        reply_to_topic_submission = ensure_particular_submission(reply_to_topic_checkpoint, user, reply_to_topic_submitted_at, only_update:)
+        submissions << reply_to_topic_submission if reply_to_topic_submission.present?
       end
 
-      # TODO: Call ensure_particular_submission for reply to entries
+      reply_to_entry_submitted_at = topic.discussion_entries.non_top_level_for_user(user).minimum(:created_at)
+
+      if reply_to_entry_submitted_at.present?
+        reply_to_entry_submission = ensure_particular_submission(reply_to_entry_checkpoint, user, reply_to_entry_submitted_at, only_update:)
+        submissions << reply_to_entry_submission if reply_to_entry_submission.present?
+      end
     else
       submitted_at = all_entries_for_user.minimum(:created_at)
 
