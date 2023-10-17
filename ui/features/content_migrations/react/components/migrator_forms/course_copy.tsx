@@ -25,7 +25,6 @@ import {View} from '@instructure/ui-view'
 import {IconSearchLine} from '@instructure/ui-icons'
 import {Select} from '@instructure/ui-select'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {setSourceCourseType} from '../types'
 
 const I18n = useI18nScope('content_migrations_redesign')
 
@@ -34,7 +33,11 @@ type CourseOption = {
   label: string
 }
 
-export const CourseCopyImporter = ({setSourceCourse}: {setSourceCourse: setSourceCourseType}) => {
+type CourseCopyImporterProps = {
+  setSourceCourse: (sourceCodeId: string) => void
+}
+
+export const CourseCopyImporter = ({setSourceCourse}: CourseCopyImporterProps) => {
   const [searchParam, setSearchParam] = useState<string>('')
   const [courseOptions, setCourseOptions] = useState<any>([])
   const [selectedCourse, setSelectedCourse] = useState<any>(false)

@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {Dispatch, SetStateAction} from 'react'
 
 export type ContentMigrationItemSettings = {
   source_course_id: string
@@ -44,13 +43,7 @@ export type ContentMigrationWorkflowState =
 
 export type ContentMigrationItem = {
   id: string
-  migration_type:
-    | 'course_copy_importer'
-    | 'canvas_cartridge_importer'
-    | 'zip_file_importer'
-    | 'common_cartridge_importer'
-    | 'moodle_converter'
-    | 'qti_converter'
+  migration_type: string
   migration_type_title: string
   progress_url: string
   settings: ContentMigrationItemSettings
@@ -73,4 +66,21 @@ export type submitMigrationCallbackType = ({
   adjustDates,
 }: submitMigrationProps) => void
 
-export type setSourceCourseType = Dispatch<SetStateAction<string>>
+export type ContentMigrationResponse = ContentMigrationItem & {
+  pre_attachment?: {
+    file_param: string
+    progress: number | null
+    upload_url: string
+    upload_params: {
+      filename: string
+      content_type: string
+    }
+  }
+}
+
+export type AttachmentProgressResponse = ContentMigrationItem & {
+  type: string
+  total: number
+  timeStamp: number
+  loaded: number
+}
