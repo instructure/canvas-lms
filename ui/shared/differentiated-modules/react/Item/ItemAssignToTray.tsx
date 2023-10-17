@@ -206,7 +206,7 @@ export default function ItemAssignToTray({
         <Heading as="h3">
           {icon} {moduleItemName}
         </Heading>
-        <View as="div" margin="medium 0 0 0">
+        <View data-testid="item-type-text" as="div" margin="medium 0 0 0">
           {renderItemType()} {pointsPossible ? `| ${pointsPossible}` : ''}
         </View>
       </Flex.Item>
@@ -272,6 +272,7 @@ export default function ItemAssignToTray({
 
   return (
     <Tray
+      data-testid="module-item-edit-tray"
       label={I18n.t('Edit assignment %{name}', {
         name: moduleItemName,
       })}

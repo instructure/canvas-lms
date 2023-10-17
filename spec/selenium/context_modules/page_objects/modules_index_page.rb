@@ -21,6 +21,10 @@ require_relative "../../common"
 
 module ModulesIndexPage
   #------------------------------ Selectors -----------------------------
+  def manage_module_item_assign_to_selector
+    ".module-item-assign-to-link"
+  end
+
   def module_item_selector(module_item_id)
     "#context_module_item_#{module_item_id}"
   end
@@ -38,6 +42,10 @@ module ModulesIndexPage
   end
 
   #------------------------------ Elements ------------------------------
+  def manage_module_item_assign_to
+    f(manage_module_item_assign_to_selector)
+  end
+
   def modules_index_settings_button
     fj("[role=button]:contains('Modules Settings')")
   end
@@ -115,6 +123,10 @@ module ModulesIndexPage
     replace_content(f("##{type}s_select input.item_title"), name)
     fj(".add_item_button:visible").click
     wait_for_ajax_requests
+  end
+
+  def click_manage_module_item_assign_to
+    manage_module_item_assign_to.click
   end
 
   def retrieve_assignment_content_tag(content_module, assignment)
