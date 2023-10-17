@@ -2988,18 +2988,30 @@ describe DiscussionTopic do
       it "correctly marks the reply to topic checkpoint submission as submitted when the student replies to topic" do
         @topic.discussion_entries.create!(user: @student, message: "reply to topic")
 
-        expect(@topic.assignment.submissions.where(user: @student).first.workflow_state).to eq "unsubmitted"
-        expect(@topic.reply_to_topic_checkpoint.submissions.where(user: @student).first.workflow_state).to eq "submitted"
-        expect(@topic.reply_to_entry_checkpoint.submissions.where(user: @student).first.workflow_state).to eq "unsubmitted"
+        expect(@topic.assignment.submissions.find_by(user: @student).workflow_state).to eq "unsubmitted"
+        expect(@topic.reply_to_topic_checkpoint.submissions.find_by(user: @student).workflow_state).to eq "submitted"
+        expect(@topic.reply_to_entry_checkpoint.submissions.find_by(user: @student).workflow_state).to eq "unsubmitted"
       end
 
-      it "does not mark the reply to topic checkpoint submission as submitted when the student replies to an entry" do
+      it "correctly marks the reply to entry checkpoint submission as submitted when the student replies to an entry" do
         entry = @topic.discussion_entries.create!(user: @teacher, message: "reply to topic")
         @topic.discussion_entries.create!(user: @student, message: "reply to entry", root_entry_id: entry.id, parent_id: entry.id)
 
-        expect(@topic.assignment.submissions.where(user: @student).first.workflow_state).to eq "unsubmitted"
-        expect(@topic.reply_to_topic_checkpoint.submissions.where(user: @student).first.workflow_state).to eq "unsubmitted"
-        expect(@topic.reply_to_entry_checkpoint.submissions.where(user: @student).first.workflow_state).to eq "unsubmitted"
+        expect(@topic.assignment.submissions.find_by(user: @student).workflow_state).to eq "unsubmitted"
+        expect(@topic.reply_to_topic_checkpoint.submissions.find_by(user: @student).workflow_state).to eq "unsubmitted"
+        expect(@topic.reply_to_entry_checkpoint.submissions.find_by(user: @student).workflow_state).to eq "submitted"
+      end
+
+      it "correctly marks both checkpoint submissions when the user replies to both topic and entry" do
+        entry_by_teacher = @topic.discussion_entries.create!(user: @teacher, message: "reply to topic by teacher")
+        @topic.discussion_entries.create!(user: @student, message: "reply to topic by student")
+        @topic.discussion_entries.create!(user: @student, message: "reply to entry by student", root_entry_id: entry_by_teacher.id, parent_id: entry_by_teacher.id)
+
+        # TODO: When all the children submissions are marked as submitted, the parent submission should be marked as submitted too.
+        # This will be done in a subsequent ticket.
+        expect(@topic.assignment.submissions.find_by(user: @student).workflow_state).to eq "unsubmitted"
+        expect(@topic.reply_to_topic_checkpoint.submissions.find_by(user: @student).workflow_state).to eq "submitted"
+        expect(@topic.reply_to_entry_checkpoint.submissions.find_by(user: @student).workflow_state).to eq "submitted"
       end
     end
   end
