@@ -103,20 +103,20 @@ shared_examples_for "selective_release module tray" do |context|
     @module.assignment_overrides.create!
     get @mod_url
 
-    expect(view_assign.text).to eq "View Assign To"
+    expect(view_assign[0].text).to eq "View Assign To"
   end
 
   it "doesn't show 'View Assign To' when a module has no assignment overrides" do
     get @mod_url
 
-    expect(view_assign.text).to eq ""
+    expect(view_assign[0].text).to eq ""
   end
 
   it "accesses the modules tray for a module via the 'View Assign To' button" do
     @module.assignment_overrides.create!
     get @mod_url
     scroll_to_the_top_of_modules_page
-    view_assign.click
+    view_assign[0].click
 
     expect(settings_tray_exists?).to be true
   end
@@ -200,6 +200,29 @@ shared_examples_for "selective_release module tray assign to" do |context|
 
     assignee_list = assignee_selection_item.map(&:text)
     expect(assignee_list.sort).to eq(%w[section1 user1])
+  end
+
+  it "adds to assignee list and updates shows assign to after update" do
+    get @mod_url
+
+    scroll_to_the_top_of_modules_page
+
+    manage_module_button(@module).click
+    module_index_menu_tool_link("Assign To...").click
+    click_custom_access_radio
+
+    assignee_selection.send_keys("user")
+    click_option(assignee_selection, "user1")
+    assignee_selection.send_keys("section")
+    click_option(assignee_selection, "section1")
+
+    assignee_list = assignee_selection_item.map(&:text)
+    expect(assignee_list.sort).to eq(%w[section1 user1])
+
+    click_settings_tray_update_module_button
+    expect(element_exists?(module_settings_tray_selector)).to be_falsey
+    # This will be uncommented when the modules page is updated to show the assign to
+    # expect(view_assign[0].text).to eq "View Assign To"
   end
 end
 

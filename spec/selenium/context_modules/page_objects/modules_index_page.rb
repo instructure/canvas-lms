@@ -91,7 +91,7 @@ module ModulesIndexPage
   end
 
   def view_assign
-    f(".view_assign")
+    ff(".view_assign")
   end
 
   def manage_module_button(context_module)
