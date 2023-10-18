@@ -7910,7 +7910,7 @@ describe Course do
         end
       end
 
-      context "relation to acount restrict_quantitative_data setting" do
+      context "relation to account restrict_quantitative_data setting" do
         it "is unaffected by account setting for existing courses" do
           expect(@course.restrict_quantitative_data).to be false
           @course.account.settings[:restrict_quantitative_data] = { locked: true, value: true }
@@ -7931,6 +7931,14 @@ describe Course do
           Account.default.save!
           crs = Course.create!(account: Account.default)
           expect(crs.restrict_quantitative_data).to be false
+        end
+
+        it "sets restrict_quantitative_data for newly created courses in sub accounts when account setting is true and locked" do
+          @sub_account = Account.create(parent_account: @root, name: "English")
+          @root.settings[:restrict_quantitative_data] = { locked: true, value: true }
+          @root.save!
+          crs = Course.create!(account: @sub_account)
+          expect(crs.restrict_quantitative_data).to be true
         end
       end
 
