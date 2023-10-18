@@ -20,28 +20,118 @@ import React from 'react'
 import {render, waitFor, screen} from '@testing-library/react'
 import ContentMigrationsTable from '../migrations_table'
 import fetchMock from 'fetch-mock'
+import {ContentMigrationItem} from '../types'
+
+const migrations: ContentMigrationItem[] = [
+  {
+    id: '123',
+    migration_type: 'course_copy_importer',
+    migration_type_title: 'Copy a Canvas Course',
+    progress_url: 'http://mock.progress.url',
+    settings: {
+      source_course_id: '456',
+      source_course_name: 'Other course',
+      source_course_html_url: 'http://mock.other-course.url',
+    },
+    workflow_state: 'waiting_for_select',
+    migration_issues_count: 0,
+    migration_issues_url: 'http://mock.issues.url',
+    created_at: 'Apr 15 at 9:11pm',
+  },
+]
+let setMigrationsMock: () => void
+
+const renderComponent = () => {
+  return render(
+    <ContentMigrationsTable migrations={migrations} setMigrations={setMigrationsMock} />
+  )
+}
 
 describe('ContentMigrationTable', () => {
-  let setMigrationsMock: () => void
+  // This is used to mock the result INST-UI Responsive component for rendering
+  const originalMediaResult = window.matchMedia('(min-width: 768px)')
 
   beforeAll(() => {
     setMigrationsMock = jest.fn(() => {})
+    window.ENV.COURSE_ID = '0'
     fetchMock.mock('/api/v1/courses/0/content_migrations?per_page=25', ['api_return'])
   })
 
-  it('Calls the API and renders the InstUI table', async () => {
-    window.ENV.COURSE_ID = '0'
-    render(<ContentMigrationsTable migrations={[]} setMigrations={setMigrationsMock} />)
-    expect(screen.getByRole('table', {hidden: false})).toBeInTheDocument()
-    expect(
-      screen.getByRole('row', {
-        name: 'Content Type Source Link Date Imported Status Progress Action',
-        hidden: false,
+  describe('ContentMigrationTableCondensedView', () => {
+    beforeAll(() => {
+      Object.defineProperty(originalMediaResult, 'matches', {
+        value: false,
+        writable: true,
+        configurable: true,
+        enumerable: true,
       })
-    ).toBeInTheDocument()
-    expect(fetchMock.called('/api/v1/courses/0/content_migrations?per_page=25', 'GET')).toBe(true)
-    await waitFor(() => {
-      expect(setMigrationsMock).toHaveBeenCalledWith(['api_return'])
+      window.matchMedia = jest.fn().mockReturnValueOnce(originalMediaResult)
+    })
+
+    it('renders the table', () => {
+      renderComponent()
+
+      const headers = Array.from(document.querySelectorAll('span[as="th"]')).map(e => e.textContent)
+      const data = Array.from(document.querySelectorAll('span[as="td"]')).map(e => e.textContent)
+
+      expect(headers).toEqual([
+        'Content Type',
+        'Source Link',
+        'Date Imported',
+        'Status',
+        'Progress',
+        'Action',
+      ])
+      expect(data).toEqual([
+        'Copy a Canvas Course',
+        'Other course',
+        'Apr 15 at 9:11pm',
+        'Waiting for selection',
+        'Select content',
+        '',
+      ])
+    })
+
+    it('calls the API', async () => {
+      renderComponent()
+
+      expect(fetchMock.called('/api/v1/courses/0/content_migrations?per_page=25', 'GET')).toBe(true)
+      await waitFor(() => {
+        expect(setMigrationsMock).toHaveBeenCalledWith(['api_return'])
+      })
+    })
+  })
+
+  describe('ContentMigrationTableExpandedView', () => {
+    beforeAll(() => {
+      Object.defineProperty(originalMediaResult, 'matches', {
+        value: true,
+        writable: true,
+        configurable: true,
+        enumerable: true,
+      })
+      window.matchMedia = jest.fn().mockReturnValueOnce(originalMediaResult)
+    })
+
+    it('renders the table', () => {
+      renderComponent()
+
+      expect(screen.getByRole('table', {hidden: false})).toBeInTheDocument()
+      expect(
+        screen.getByRole('row', {
+          name: 'Content Type Source Link Date Imported Status Progress Action',
+          hidden: false,
+        })
+      ).toBeInTheDocument()
+    })
+
+    it('calls the API', async () => {
+      renderComponent()
+
+      expect(fetchMock.called('/api/v1/courses/0/content_migrations?per_page=25', 'GET')).toBe(true)
+      await waitFor(() => {
+        expect(setMigrationsMock).toHaveBeenCalledWith(['api_return'])
+      })
     })
   })
 })
