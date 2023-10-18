@@ -575,6 +575,15 @@ describe Api::V1::Submission do
         expect(submission).to be_read(user)
       end
     end
+
+    it "submission json returns video when media comment type is a specific video mime type" do
+      submission = assignment.submission_for_student(user)
+      submission.media_comment_id = 1
+      submission.media_comment_type = "video/mp4"
+      fake_controller.current_user = user
+      submission_json = fake_controller.submission_json(submission, assignment, user, session, context)
+      expect(submission_json.fetch("media_comment")["media_type"]).to eq "video"
+    end
   end
 
   describe "#submission_zip" do

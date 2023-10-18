@@ -541,11 +541,12 @@ module Api
 
   def media_comment_json(media_object_or_hash)
     media_object_or_hash = OpenStruct.new(media_object_or_hash) if media_object_or_hash.is_a?(Hash)
+    convert_media_type = Attachment.mime_class(media_object_or_hash.media_type)
     {
-      "content-type" => "#{media_object_or_hash.media_type}/mp4",
+      "content-type" => "#{convert_media_type}/mp4",
       "display_name" => media_object_or_hash.title.presence || media_object_or_hash.user_entered_title,
       "media_id" => media_object_or_hash.media_id,
-      "media_type" => media_object_or_hash.media_type,
+      "media_type" => convert_media_type,
       "url" => user_media_download_url(user_id: @current_user.id,
                                        entryId: media_object_or_hash.media_id,
                                        type: "mp4",
