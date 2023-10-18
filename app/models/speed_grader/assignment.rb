@@ -213,6 +213,7 @@ module SpeedGrader
                 end,
               submissions:
             )
+          json[:fake_student] = !!student.preferences[:fake_student]
           json
         end
 
