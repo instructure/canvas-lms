@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 /*
  * Copyright (C) 2023 - present Instructure, Inc.
  *
@@ -21,7 +19,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
 import {AssignmentGroupSelect} from './AssignmentGroupSelect'
@@ -46,10 +43,6 @@ export const GradedDiscussionOptions = ({
   setPeerReviewsPerStudent,
   peerReviewDueDate,
   setPeerReviewDueDate,
-  assignTo,
-  setAssignTo,
-  dueDate,
-  setDueDate,
 }) => {
   return (
     <View as="div">
@@ -97,8 +90,4 @@ GradedDiscussionOptions.propTypes = {
   setPeerReviewsPerStudent: PropTypes.func,
   peerReviewDueDate: PropTypes.string,
   setPeerReviewDueDate: PropTypes.func,
-  assignTo: PropTypes.string,
-  setAssignTo: PropTypes.func,
-  dueDate: PropTypes.string,
-  setDueDate: PropTypes.func,
 }

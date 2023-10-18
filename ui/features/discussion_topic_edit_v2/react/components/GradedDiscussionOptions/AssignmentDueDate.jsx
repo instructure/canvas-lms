@@ -51,7 +51,7 @@ export const AssignmentDueDate = ({
             const newInfo = {
               ...assignedInformation,
               assignedList: assignedInformation.assignedList.filter(
-                option => option.assetCode !== dismissedOption.assetCode
+                option => option !== dismissedOption
               ),
             }
             setAssignedInformation(newInfo)

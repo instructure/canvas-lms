@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {COURSE_QUERY, GROUP_QUERY} from '../graphql/Queries'
+import {COURSE_QUERY, GROUP_QUERY} from '../../graphql/Queries'
 
 export const getContextQuery = contextType => {
   const contextQueryToUse = contextType === 'Course' ? COURSE_QUERY : GROUP_QUERY

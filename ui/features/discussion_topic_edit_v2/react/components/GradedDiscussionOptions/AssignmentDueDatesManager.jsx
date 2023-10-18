@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useContext} from 'react'
 import {AssignmentDueDate} from './AssignmentDueDate'
 import {Text} from '@instructure/ui-text'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -26,9 +26,11 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {IconAddLine} from '@instructure/ui-icons'
 import theme from '@instructure/canvas-theme'
+import {GradedDiscussionDueDatesContext} from '../../util/constants'
 
 const I18n = useI18nScope('discussion_create')
 
+// This default information will be replaced by queried information
 const DEFAULT_LIST_OPTIONS = {
   'Master Paths': [{assetCode: 'mp_option1', label: 'Master Path Option'}],
   'Course Sections': [
@@ -47,8 +49,7 @@ const DEFAULT_LIST_OPTIONS = {
 }
 
 export const AssignmentDueDatesManager = () => {
-  // This default information will be replaced by queried information
-  const [assignedInfoList, setAssignedInfoList] = useState([{dueDateId: nanoid()}]) // Initialize with one object with a unique id
+  const {assignedInfoList, setAssignedInfoList} = useContext(GradedDiscussionDueDatesContext)
 
   const handleAssignedInfoChange = (newInfo, dueDateId) => {
     const updatedInfoList = assignedInfoList.map(info =>
@@ -71,15 +72,13 @@ export const AssignmentDueDatesManager = () => {
     const allAssignedListsExceptCurrent = assignedInfoList
       .filter(info => info.dueDateId !== dueDateId)
       .map(info => info.assignedList || [])
-
-    // Combine all assigned lists into one array
-    const allAssignedDueDateIds = [].concat(...allAssignedListsExceptCurrent)
+      .flat()
 
     // Filter out options based on assigned ids
     const filteredOptions = {}
     Object.keys(DEFAULT_LIST_OPTIONS).forEach(category => {
       filteredOptions[category] = DEFAULT_LIST_OPTIONS[category].filter(option => {
-        return !allAssignedDueDateIds.includes(option.assetCode)
+        return !allAssignedListsExceptCurrent.includes(option.assetCode)
       })
     })
 
