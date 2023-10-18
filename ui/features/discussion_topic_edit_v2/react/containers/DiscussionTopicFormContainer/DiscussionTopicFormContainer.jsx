@@ -26,7 +26,7 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import DiscussionTopicForm from '../../components/DiscussionTopicForm/DiscussionTopicForm'
 
-import {getContextQuery} from '../../utils'
+import {getContextQuery} from '../../util/utils'
 
 const I18n = useI18nScope('discussion_create')
 

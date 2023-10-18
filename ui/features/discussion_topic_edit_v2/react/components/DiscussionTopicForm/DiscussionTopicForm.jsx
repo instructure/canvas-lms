@@ -36,8 +36,10 @@ import CanvasMultiSelect from '@canvas/multi-select'
 import CanvasRce from '@canvas/rce/react/CanvasRce'
 import {Alert} from '@instructure/ui-alerts'
 import {GradedDiscussionOptions} from '../GradedDiscussionOptions/GradedDiscussionOptions'
+import {GradedDiscussionDueDatesContext} from '../../util/constants'
+import {nanoid} from 'nanoid'
 
-import {addNewGroupCategoryToCache} from '../../utils'
+import {addNewGroupCategoryToCache} from '../../util/utils'
 
 const I18n = useI18nScope('discussion_create')
 
@@ -128,8 +130,13 @@ export default function DiscussionTopicForm({
   const [peerReviewAssignment, setPeerReviewAssignment] = useState('off')
   const [peerReviewsPerStudent, setPeerReviewsPerStudent] = useState(1)
   const [peerReviewDueDate, setPeerReviewDueDate] = useState('')
-  const [assignTo, setAssignTo] = useState('')
-  const [dueDate, setDueDate] = useState('')
+  // This contains the list of assignment due dates / overrides. This default should be set to everyone in VICE-3866
+  const [assignedInfoList, setAssignedInfoList] = useState([{dueDateId: nanoid()}]) // Initialize with one object with a unique id
+  
+  const assignmentDueDateContext = {
+    assignedInfoList,
+    setAssignedInfoList,
+  }
   const [showGroupCategoryModal, setShowGroupCategoryModal] = useState(false)
 
   useEffect(() => {
@@ -582,25 +589,23 @@ export default function DiscussionTopicForm({
           !isGroupContext &&
           (isGraded ? (
             <View as="div" data-testid="assignment-settings-section">
-              <GradedDiscussionOptions
-                assignmentGroups={assignmentGroups}
-                pointsPossible={pointsPossible}
-                setPointsPossible={setPointsPossible}
-                displayGradeAs={displayGradeAs}
-                setDisplayGradeAs={setDisplayGradeAs}
-                assignmentGroup={assignmentGroup}
-                setAssignmentGroup={setAssignmentGroup}
-                peerReviewAssignment={peerReviewAssignment}
-                setPeerReviewAssignment={setPeerReviewAssignment}
-                peerReviewsPerStudent={peerReviewsPerStudent}
-                setPeerReviewsPerStudent={setPeerReviewsPerStudent}
-                peerReviewDueDate={peerReviewDueDate}
-                setPeerReviewDueDate={setPeerReviewDueDate}
-                assignTo={assignTo}
-                setAssignTo={setAssignTo}
-                dueDate={dueDate}
-                setDueDate={setDueDate}
-              />
+              <GradedDiscussionDueDatesContext.Provider value={assignmentDueDateContext}>
+                <GradedDiscussionOptions
+                  assignmentGroups={assignmentGroups}
+                  pointsPossible={pointsPossible}
+                  setPointsPossible={setPointsPossible}
+                  displayGradeAs={displayGradeAs}
+                  setDisplayGradeAs={setDisplayGradeAs}
+                  assignmentGroup={assignmentGroup}
+                  setAssignmentGroup={setAssignmentGroup}
+                  peerReviewAssignment={peerReviewAssignment}
+                  setPeerReviewAssignment={setPeerReviewAssignment}
+                  peerReviewsPerStudent={peerReviewsPerStudent}
+                  setPeerReviewsPerStudent={setPeerReviewsPerStudent}
+                  peerReviewDueDate={peerReviewDueDate}
+                  setPeerReviewDueDate={setPeerReviewDueDate}
+                />
+              </GradedDiscussionDueDatesContext.Provider>
             </View>
           ) : (
             <FormFieldGroup description="" width={inputWidth}>
