@@ -72,8 +72,6 @@ describe DeveloperKeysController do
         end
 
         it "does not include non-siteadmin keys" do
-          Account.site_admin.enable_feature!(:site_admin_keys_only)
-
           site_admin_key = DeveloperKey.create!
           DeveloperKey.create!(account: Account.default)
 

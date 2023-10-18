@@ -5,16 +5,6 @@ developer_key_support_includes:
   description: |-
     Provides a flag on the Developer Key to support Include Parameters on API requests
   applies_to: SiteAdmin
-site_admin_keys_only:
-  state: hidden
-  display_name: Only show site admin keys in the site admin UI
-  description: |-
-    If enabled, the site admin developer key UI will only show
-    site admin developer keys. Note that this only affects
-    Canvas instances where root accounts are on the same shard
-    as the site admin account. Behavior in other instances
-    already behaved in this way.
-  applies_to: SiteAdmin
 disable_graphql_authentication:
   state: hidden
   display_name: Disable authentication for GraphQL
