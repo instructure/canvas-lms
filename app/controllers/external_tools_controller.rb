@@ -1473,6 +1473,10 @@ class ExternalToolsController < ApplicationController
     assignment = options[:assignment]
     resource_link_lookup_uuid = options[:resource_link_lookup_uuid]
 
+    if assignment.present? && @current_user.present?
+      assignment = AssignmentOverrideApplicator.assignment_overridden_for(assignment, @current_user)
+    end
+
     unless tool_id || launch_url || module_item || resource_link_lookup_uuid
       message = "A tool id, tool url, module item id, or resource link lookup uuid must be provided"
       @context.errors.add(:id, message)
