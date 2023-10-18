@@ -2968,13 +2968,14 @@ describe DiscussionTopic do
       expect(@topic.checkpoint_assignments.length).to eq 0
       expect(@topic.reply_to_topic_checkpoint).to be_nil
       expect(@topic.reply_to_entry_checkpoint).to be_nil
+      expect(@topic.reply_to_entry_required_count).to eq 0
     end
 
     describe "in place" do
       before do
         @course.root_account.enable_feature!(:discussion_checkpoints)
         @topic.reload
-        @topic.create_checkpoints(reply_to_topic_points: 10, reply_to_entry_points: 15)
+        @topic.create_checkpoints(reply_to_topic_points: 10, reply_to_entry_points: 15, reply_to_entry_required_count: 5)
       end
 
       it "in the topic" do
@@ -3012,6 +3013,10 @@ describe DiscussionTopic do
         expect(@topic.assignment.submissions.find_by(user: @student).workflow_state).to eq "unsubmitted"
         expect(@topic.reply_to_topic_checkpoint.submissions.find_by(user: @student).workflow_state).to eq "submitted"
         expect(@topic.reply_to_entry_checkpoint.submissions.find_by(user: @student).workflow_state).to eq "submitted"
+      end
+
+      it "has the correct reply_to_entry_required_count" do
+        expect(@topic.reply_to_entry_required_count).to eq 5
       end
     end
   end
