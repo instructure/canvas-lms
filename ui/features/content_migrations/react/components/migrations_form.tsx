@@ -38,8 +38,6 @@ import {
 
 const I18n = useI18nScope('content_migrations_redesign')
 
-const {Option: SimpleSelectOption} = SimpleSelect as any
-
 type RequestBody = {
   course_id: string
   migration_type: string
@@ -144,7 +142,7 @@ export const ContentMigrationsForm = ({
   }
 
   return (
-    <View as="div" padding="0 x-small 0 0" margin="small x-small xx-large 0">
+    <View as="div" margin="small none xx-large none">
       <Heading level="h2" as="h2" margin="0 0 small">
         {I18n.t('Import Content')}
       </Heading>
@@ -158,7 +156,7 @@ export const ContentMigrationsForm = ({
           'Importing the same course content more than once will overwrite any existing content in the course.'
         )}
       </Alert>
-      <hr />
+      <hr role="presentation" aria-hidden="true" />
       <View as="div" margin="medium 0" maxWidth="22.5rem">
         {migrators.length > 0 ? (
           <SimpleSelect
@@ -167,13 +165,13 @@ export const ContentMigrationsForm = ({
               handleMigratorChange(value)
             }}
           >
-            <SimpleSelectOption key="empty-option" id="empty" value="empty">
+            <SimpleSelect.Option key="empty-option" id="empty" value="empty">
               {I18n.t('Select one')}
-            </SimpleSelectOption>
+            </SimpleSelect.Option>
             {migrators.map((o: Migrator) => (
-              <SimpleSelectOption key={o.type} id={o.type} value={o.type}>
+              <SimpleSelect.Option key={o.type} id={o.type} value={o.type}>
                 {o.name}
-              </SimpleSelectOption>
+              </SimpleSelect.Option>
             ))}
           </SimpleSelect>
         ) : (
