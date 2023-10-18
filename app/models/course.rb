@@ -4464,7 +4464,7 @@ class Course < ActiveRecord::Base
   end
 
   def set_restrict_quantitative_data_when_needed
-    if account.feature_enabled?(:restrict_quantitative_data) &&
+    if root_account.feature_enabled?(:restrict_quantitative_data) &&
        account.restrict_quantitative_data[:value] == true &&
        account.restrict_quantitative_data[:locked] == true
       self.restrict_quantitative_data = true
