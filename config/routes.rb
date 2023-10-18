@@ -1046,7 +1046,6 @@ CanvasRails::Application.routes.draw do
 
   scope(controller: :smart_search) do
     get "search", action: :show
-    get "smartsearch", action: :index, as: "smart_search_query"
   end
 
   ### API routes ###
@@ -2545,6 +2544,10 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: "course_pacing/pace_contexts_api") do
       get "courses/:course_id/pace_contexts", action: :index, as: :pace_contexts
+    end
+
+    scope(controller: "smart_search") do
+      get "courses/:course_id/smartsearch", action: :search, as: :course_smart_search_query
     end
   end
 
