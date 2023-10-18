@@ -1801,7 +1801,7 @@ class DiscussionTopic < ActiveRecord::Base
     checkpoint_assignments.find_by(checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY)
   end
 
-  def create_checkpoints(reply_to_topic_points:, reply_to_entry_points:)
+  def create_checkpoints(reply_to_topic_points:, reply_to_entry_points:, reply_to_entry_required_count: 0)
     return false if checkpoints?
     return false unless context.is_a?(Course)
 
@@ -1809,6 +1809,7 @@ class DiscussionTopic < ActiveRecord::Base
     parent.checkpoint_assignments.create!(context:, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC, points_possible: reply_to_topic_points)
     parent.checkpoint_assignments.create!(context:, checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY, points_possible: reply_to_entry_points)
     self.assignment = parent
+    self.reply_to_entry_required_count = reply_to_entry_required_count
 
     save
   end
