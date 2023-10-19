@@ -1508,7 +1508,7 @@ class Account < ActiveRecord::Base
     can [:read_outcomes, :launch_external_tool]
 
     # any user with an admin enrollment in one of the courses can read
-    given { |user| user && courses.where(id: user.enrollments.active.admin.pluck(:course_id)).exists? }
+    given { |user| !site_admin? && user && courses.where(id: user.enrollments.active.admin.pluck(:course_id)).exists? }
     can [:read, :read_files]
 
     given { |user| !site_admin? && primary_settings_root_account? && grants_right?(user, :manage_site_settings) }
