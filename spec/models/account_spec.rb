@@ -880,6 +880,14 @@ describe Account do
   context "sharding" do
     specs_require_sharding
 
+    it "does not query when the target account is site admin" do
+      teacher_in_course
+      site_admin = Account.site_admin
+
+      expect(Course).not_to receive(:connection)
+      expect(site_admin.grants_right?(@user, :read)).to be false
+    end
+
     it "queries for enrollments correctly when another shard is active" do
       teacher_in_course
       @enrollment.accept!
