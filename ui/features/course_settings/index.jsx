@@ -135,11 +135,7 @@ ready(() => {
   if (restrictQuantitativeDataContainer) {
     ReactDOM.render(
       <Suspense fallback={<Loading />}>
-        <QuantitativeDataOptions
-          canManage={
-            ENV.PERMISSIONS.edit_course_availability && ENV.CAN_EDIT_RESTRICT_QUANTITATIVE_DATA
-          }
-        />
+        <QuantitativeDataOptions canManage={ENV.CAN_EDIT_RESTRICT_QUANTITATIVE_DATA} />
       </Suspense>,
       restrictQuantitativeDataContainer
     )

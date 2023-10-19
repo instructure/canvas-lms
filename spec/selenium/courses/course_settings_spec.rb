@@ -652,6 +652,14 @@ describe "course settings" do
         expect(f("input[data-testid='restrict-quantitative-data-checkbox']")).not_to be_disabled
         expect(is_checked(f("input[data-testid='restrict-quantitative-data-checkbox']"))).to be_truthy
       end
+
+      it "the setting is not disabled if prevent course availability editing is enabled" do
+        @account.settings[:restrict_quantitative_data] = { locked: false, value: true }
+        @account.settings[:prevent_course_availability_editing_by_teachers] = true
+        @account.save
+        get "/courses/#{@course.id}/settings"
+        expect(f("input[data-testid='restrict-quantitative-data-checkbox']")).not_to be_disabled
+      end
     end
   end
 
