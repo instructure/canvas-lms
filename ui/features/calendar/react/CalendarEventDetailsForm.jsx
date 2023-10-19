@@ -230,6 +230,7 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
     params.blackout_date = isBlackout
     params.context_type = context.type
     params.course_pacing_enabled = context.course_pacing_enabled
+    params.calendar_event_context_code = event.calendarEvent?.context_code
     if (typeof rrule === 'string') {
       params.rrule = rrule
     }
