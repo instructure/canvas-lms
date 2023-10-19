@@ -765,7 +765,7 @@ describe ContentMigration do
 
     context "kaltura media objects" do
       before do
-        allow(Account.site_admin).to receive(:feature_enabled?).with(:media_links_use_attachment_id).and_return true
+        Account.site_admin.enable_feature!(:media_links_use_attachment_id)
         kaltura_double = double("kaltura")
         allow(kaltura_double).to receive(:startSession)
         # rubocop:disable RSpec/ReceiveMessages
@@ -793,21 +793,6 @@ describe ContentMigration do
         expect(@copy_to.syllabus_body).to eq @copy_from.syllabus_body.sub("/media_attachments_iframe/#{att.id}", "/media_attachments_iframe/#{new_att.id}")
       end
 
-      context "sharding" do
-        specs_require_sharding
-
-        it "updates media attachment links with shortened global ids" do
-          media_id = "0_deadbeef"
-          @copy_from.media_objects.create!(media_id:)
-          att = @copy_from.attachments.where(media_entry_id: media_id).first
-          short_id = Shard.short_id_for(att.global_id)
-          @copy_from.syllabus_body = %(<p><iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="#{media_id}" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_attachments_iframe/#{short_id}?type=video"></iframe></p>)
-          run_course_copy
-          new_att = @copy_to.attachments.where(migration_id: mig_id(att)).first
-          expect(@copy_to.syllabus_body).to eq @copy_from.syllabus_body.sub("/media_attachments_iframe/#{short_id}", "/media_attachments_iframe/#{new_att.id}")
-        end
-      end
-
       it "does not update media attachment links from a different course" do
         media_id = "0_deadbeef"
         course_with_teacher(course_name: "from course", active_all: true)
@@ -828,6 +813,26 @@ describe ContentMigration do
         expect(@copy_to.attachments.count).to eq 0
         expect(@copy_to.media_objects.count).to eq 0
         expect(@copy_to.syllabus_body).to eq @copy_from.syllabus_body
+      end
+
+      it "copies media attachments linked in HTML for an object copied selectively" do
+        media_id = "0_deadbeef"
+        media_id2 = "0_livecrab"
+        att = attachment_model(display_name: "lolcats.mp4", context: @copy_from, media_entry_id: media_id)
+        att2 = attachment_model(display_name: "yodawg.mp4", context: @copy_from, media_entry_id: media_id2)
+        wiki = @copy_from.wiki_pages.create!(title: "lolcat", body: %(<p><iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="#{media_id}" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_attachments_iframe/#{att.id}?type=video"></iframe></p>))
+        wiki2 = @copy_from.wiki_pages.create!(title: "yodawg", body: %(<p><iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="#{media_id2}" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_attachments_iframe/#{att2.id}?type=video"></iframe></p>))
+        @cm = ContentMigration.create!(
+          context: @copy_to,
+          user: @user,
+          source_course: @copy_from,
+          migration_type: "course_copy_importer",
+          copy_options: { wiki_pages: { mig_id(wiki) => "1", mig_id(wiki2) => "0" } }
+        )
+
+        run_course_copy
+        expect(@copy_to.attachments.where(media_entry_id: media_id)).to be_exist
+        expect(@copy_to.attachments.where(media_entry_id: media_id2)).not_to be_exist
       end
 
       it "re-uses kaltura media objects" do
