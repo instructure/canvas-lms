@@ -103,6 +103,8 @@ module CC
     BLUEPRINT_SETTINGS = "blueprint.xml"
     CONTEXT_INFO = "context.xml"
 
+    REPLACEABLE_MEDIA_TYPES = ["audio", "video"].freeze
+
     def ims_date(date = nil, default = Time.now)
       CCHelper.ims_date(date, default)
     end
@@ -233,7 +235,7 @@ module CC
             "#{COURSE_TOKEN}/#{match.rest}"
           end
         end
-        @rewriter.set_handler("files") do |match|
+        file_handler = proc do |match|
           if match.obj_id.nil?
             if (match_data = match.url.match(%r{/files/folder/(.*)}))
               # this might not be the best idea but let's keep going and see what happens
@@ -254,19 +256,30 @@ module CC
 
             @referenced_files[obj.id] = @key_generator.create_key(obj) if @track_referenced_files && !@referenced_files[obj.id]
 
-            if @for_course_copy
-              "#{COURSE_TOKEN}/file_ref/#{@key_generator.create_key(obj)}#{match.rest}"
-            else
-              # for files in exports, turn it into a relative link by path, rather than by file id
-              # we retain the file query string parameters
-              folder = obj.folder.full_name.sub(/course( |%20)files/, WEB_CONTENT_TOKEN)
-              folder = folder.split("/").map { |part| URI::DEFAULT_PARSER.escape(part) }.join("/")
-              path = "#{folder}/#{URI::DEFAULT_PARSER.escape(obj.display_name)}"
-              path = HtmlTextHelper.escape_html(path)
-              "#{path}#{CCHelper.file_query_string(match.rest)}"
+            url = if @for_course_copy
+                    "#{COURSE_TOKEN}/file_ref/#{@key_generator.create_key(obj)}#{match.rest}"
+                  else
+                    # for files in exports, turn it into a relative link by path, rather than by file id
+                    # we retain the file query string parameters
+                    folder = obj.folder.full_name.sub(/course( |%20)files/, WEB_CONTENT_TOKEN)
+                    folder = folder.split("/").map { |part| URI::DEFAULT_PARSER.escape(part) }.join("/")
+                    path = "#{folder}/#{URI::DEFAULT_PARSER.escape(obj.display_name)}"
+                    path = HtmlTextHelper.escape_html(path)
+                    "#{path}#{CCHelper.file_query_string(match.rest)}"
+                  end
+            # when media attachments is stable on production and media objects export code is removed,
+            # this block should be removed (after LF-197 is complete)
+            uri = Addressable::URI.parse(url)
+            if match.type == "media_attachments_iframe"
+              query_values = uri.query_values || {}
+              query_values["media_attachment"] = true
+              uri.query_values = query_values
             end
+            uri.to_s
           end
         end
+        @rewriter.set_handler("files", &file_handler)
+        @rewriter.set_handler("media_attachments_iframe", &file_handler) # do |match|
         wiki_handler = proc do |match|
           # WikiPagesController allows loosely-matching URLs; fix them before exporting
           if match.obj_id.present?
@@ -296,16 +309,6 @@ module CC
           item = ContentTag.find(match.obj_id)
           migration_id = @key_generator.create_key(item)
           "#{COURSE_TOKEN}/modules/#{match.type}/#{migration_id}#{match.query}"
-        end
-        @rewriter.set_handler("media_attachments_iframe") do |match|
-          att = @course.attachments.find_by(id: match.obj_id) if match.obj_id
-          if att
-            migration_id = @key_generator.create_key(att)
-            query = translate_module_item_query(match.query)
-            "#{OBJECT_TOKEN}/#{match.type}/#{migration_id}#{query}"
-          else
-            match.url
-          end
         end
         @rewriter.set_default_handler do |match|
           new_url = match.url
@@ -368,16 +371,34 @@ module CC
         %(<html>\n<head>\n<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>\n<title>#{HtmlTextHelper.escape_html(title)}</title>\n#{meta_html}</head>\n<body>\n#{content}\n</body>\n</html>)
       end
 
+      def replace_media_iframe(iframe)
+        return iframe unless REPLACEABLE_MEDIA_TYPES.include?(iframe["data-media-type"])
+
+        iframe.name = iframe["data-media-type"]
+        source = Nokogiri::XML::Node.new("source", iframe)
+        source["src"] = iframe["src"]
+        source["data-media-id"] = iframe["data-media-id"]
+        source["data-media-type"] = iframe["data-media-type"]
+        iframe.add_child(source)
+        iframe.remove_attribute("src")
+        iframe
+      end
+
       def html_content(html)
         return html if @disable_content_rewriting
 
         html = @rewriter.translate_content(html)
-        return html if html.blank? || @for_course_copy
+        return html if html.blank?
+
+        doc = Nokogiri::HTML5.fragment(html)
+        doc.css("iframe[src*=media_attachment]").each do |iframe|
+          replace_media_iframe(iframe)
+        end
+        return doc.to_s if @for_course_copy
 
         # keep track of found media comments, and translate them into links into the files tree
         # if imported back into canvas, they'll get uploaded to the media server
         # and translated back into media comments
-        doc = Nokogiri::HTML5.fragment(html)
         doc.css("a.instructure_inline_media_comment").each do |anchor|
           next unless anchor["id"]
 
@@ -406,17 +427,8 @@ module CC
           iframe["src"] = File.join(WEB_CONTENT_TOKEN, info[:path])
         end
 
-        replaceable_media_types = ["audio", "video"]
         doc.css("iframe[data-media-type]").each do |iframe|
-          next unless replaceable_media_types.include?(iframe["data-media-type"])
-
-          iframe.name = iframe["data-media-type"]
-          source = Nokogiri::XML::Node.new("source", iframe)
-          source["src"] = iframe["src"]
-          source["data-media-id"] = iframe["data-media-id"]
-          source["data-media-type"] = iframe["data-media-type"]
-          iframe.add_child(source)
-          iframe.remove_attribute("src")
+          replace_media_iframe(iframe)
         end
 
         # prepend the Canvas domain to remaining absolute paths that are missing the host
