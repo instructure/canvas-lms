@@ -156,11 +156,36 @@ export const AssignedTo = ({
   const dismissTag = (e, tagAssetCode) => {
     e.stopPropagation()
     e.preventDefault()
+    const optionBeingRemoved = getOptionByAssetCode(tagAssetCode)
     const newSelection = selectedOptionAssetCode.filter(assetCode => assetCode !== tagAssetCode)
     setSelectedOptionAssetCode(newSelection)
     setHighlightedOptionAssetCode(null)
     onOptionDismiss(tagAssetCode) // Notify parent
+    setAnnouncement(
+      I18n.t('%{optionName} selection has been removed', {optionName: optionBeingRemoved.label})
+    )
     inputRef.current.focus()
+  }
+
+  const handleKeyDown = event => {
+    const BACKSPACE_KEY_CODE = 8
+
+    // when backspace key is pressed
+    if (
+      inputValue === '' &&
+      selectedOptionAssetCode.length > 0 &&
+      event.keyCode === BACKSPACE_KEY_CODE
+    ) {
+      // remove last selected option, if input has no entered text
+      const lastSelectedTagAssetCode = selectedOptionAssetCode[selectedOptionAssetCode.length - 1]
+      const optionBeingRemoved = getOptionByAssetCode(lastSelectedTagAssetCode)
+      setHighlightedOptionAssetCode(null)
+      setSelectedOptionAssetCode(prevSelectedOptionId => prevSelectedOptionId.slice(0, -1))
+      onOptionDismiss(lastSelectedTagAssetCode)
+      setAnnouncement(
+        I18n.t('%{optionName} selection has been removed', {optionName: optionBeingRemoved.label})
+      )
+    }
   }
 
   const renderTags = () => {
@@ -226,6 +251,7 @@ export const AssignedTo = ({
         onRequestSelectOption={handleSelectOption}
         renderBeforeInput={selectedOptionAssetCode.length > 0 ? renderTags() : null}
         messages={errorMessage}
+        onKeyDown={handleKeyDown}
         data-testid="assign-to-select"
       >
         {renderGroups()}

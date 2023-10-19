@@ -41,6 +41,7 @@ const setup = ({
   onOptionSelect = () => {},
   initialAssignedToInformation = [],
   errorMessage = [],
+  onOptionDismiss = () => {},
 } = {}) => {
   return render(
     <AssignedTo
@@ -48,6 +49,7 @@ const setup = ({
       onOptionSelect={onOptionSelect}
       initialAssignedToInformation={initialAssignedToInformation}
       errorMessage={errorMessage}
+      onOptionDismiss={onOptionDismiss}
     />
   )
 }
@@ -75,6 +77,26 @@ describe('AssignTo', () => {
   it('pre-selects options based on initialAssignedToInformation', () => {
     const {queryByText} = setup({initialAssignedToInformation: ['u_1', 'u_2']})
     expect(queryByText('Jason')).toBeInTheDocument()
+  })
+
+  it('allows backspace to remove tags', () => {
+    const onOptionDismiss = jest.fn()
+
+    const {queryByText, getByTestId} = setup({
+      initialAssignedToInformation: ['u_1', 'u_2'],
+      onOptionDismiss,
+    })
+    expect(queryByText('Jason')).toBeInTheDocument()
+
+    // Select menu
+    const selectOption = getByTestId('assign-to-select')
+    fireEvent.click(selectOption)
+
+    // Press backspace
+    fireEvent.keyDown(selectOption, {keyCode: 8})
+    // Expect the last selected option to be passed into the onOptionDismiss callback
+    expect(onOptionDismiss).toHaveBeenCalled()
+    expect(onOptionDismiss).toHaveBeenCalledWith('u_2')
   })
 
   it('shows an error message when provided', () => {
