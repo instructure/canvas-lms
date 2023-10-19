@@ -49,6 +49,7 @@ describe('GradingSchemeInput', () => {
         schemeInputType="percentage"
         onSave={onSave}
         pointsBasedGradingSchemesFeatureEnabled={true}
+        archivedGradingSchemesEnabled={false}
       />
     )
 
@@ -94,6 +95,7 @@ describe('GradingSchemeInput', () => {
         schemeInputType="points"
         onSave={onSave}
         pointsBasedGradingSchemesFeatureEnabled={true}
+        archivedGradingSchemesEnabled={false}
       />
     )
 
@@ -136,6 +138,7 @@ describe('GradingSchemeInput', () => {
         schemeInputType="percentage"
         onSave={onSave}
         pointsBasedGradingSchemesFeatureEnabled={false}
+        archivedGradingSchemesEnabled={false}
       />
     )
 
@@ -172,6 +175,7 @@ describe('GradingSchemeInput', () => {
         onSave={onSave}
         ref={gradingSchemeInputRef}
         pointsBasedGradingSchemesFeatureEnabled={true}
+        archivedGradingSchemesEnabled={false}
       />
     )
     act(() => gradingSchemeInputRef.current?.savePressed())
@@ -190,6 +194,7 @@ describe('GradingSchemeInput', () => {
         onSave={onSave}
         ref={gradingSchemeInputRef}
         pointsBasedGradingSchemesFeatureEnabled={true}
+        archivedGradingSchemesEnabled={false}
       />
     )
     act(() => gradingSchemeInputRef.current?.savePressed())
@@ -209,6 +214,7 @@ describe('GradingSchemeInput', () => {
         onSave={onSave}
         ref={gradingSchemeInputRef}
         pointsBasedGradingSchemesFeatureEnabled={false}
+        archivedGradingSchemesEnabled={false}
       />
     )
     act(() => gradingSchemeInputRef.current?.savePressed())
@@ -227,6 +233,7 @@ describe('GradingSchemeInput', () => {
         onSave={onSave}
         ref={gradingSchemeInputRef}
         pointsBasedGradingSchemesFeatureEnabled={false}
+        archivedGradingSchemesEnabled={false}
       />
     )
     const deleteRowButtons = screen.getAllByText('Remove letter grade row')
@@ -255,6 +262,7 @@ describe('GradingSchemeInput', () => {
         onSave={onSave}
         ref={gradingSchemeInputRef}
         pointsBasedGradingSchemesFeatureEnabled={false}
+        archivedGradingSchemesEnabled={false}
       />
     )
     const deleteRowButtons = screen.getAllByText('Remove letter grade row')
@@ -284,6 +292,7 @@ describe('GradingSchemeInput', () => {
         onSave={onSave}
         ref={gradingSchemeInputRef}
         pointsBasedGradingSchemesFeatureEnabled={false}
+        archivedGradingSchemesEnabled={false}
       />
     )
     const deleteRowButtons = screen.getAllByText('Remove letter grade row')
@@ -316,6 +325,7 @@ describe('GradingSchemeInput', () => {
         onSave={onSave}
         ref={gradingSchemeInputRef}
         pointsBasedGradingSchemesFeatureEnabled={true}
+        archivedGradingSchemesEnabled={false}
       />
     )
     const addRowButtons = screen.getAllByText(
@@ -353,6 +363,7 @@ describe('GradingSchemeInput', () => {
         onSave={onSave}
         ref={gradingSchemeInputRef}
         pointsBasedGradingSchemesFeatureEnabled={true}
+        archivedGradingSchemesEnabled={false}
       />
     )
     const addRowButtons = screen.getAllByText(
@@ -390,6 +401,7 @@ describe('GradingSchemeInput', () => {
         onSave={onSave}
         ref={gradingSchemeInputRef}
         pointsBasedGradingSchemesFeatureEnabled={false}
+        archivedGradingSchemesEnabled={false}
       />
     )
     const addRowButtons = screen.getAllByText(
@@ -426,6 +438,7 @@ describe('GradingSchemeInput', () => {
         onSave={onSave}
         ref={gradingSchemeInputRef}
         pointsBasedGradingSchemesFeatureEnabled={true}
+        archivedGradingSchemesEnabled={false}
       />
     )
     const rangeInputs = screen.getAllByLabelText('Upper limit of range')
@@ -455,6 +468,7 @@ describe('GradingSchemeInput', () => {
         onSave={onSave}
         ref={gradingSchemeInputRef}
         pointsBasedGradingSchemesFeatureEnabled={true}
+        archivedGradingSchemesEnabled={false}
       />
     )
     const rangeInputs = screen.getAllByLabelText('Upper limit of range')
@@ -483,6 +497,7 @@ describe('GradingSchemeInput', () => {
         onSave={onSave}
         ref={gradingSchemeInputRef}
         pointsBasedGradingSchemesFeatureEnabled={true}
+        archivedGradingSchemesEnabled={false}
       />
     )
 
@@ -509,6 +524,7 @@ describe('GradingSchemeInput', () => {
         onSave={onSave}
         ref={gradingSchemeInputRef}
         pointsBasedGradingSchemesFeatureEnabled={true}
+        archivedGradingSchemesEnabled={false}
       />
     )
     const rangeInputs = screen.getAllByLabelText<HTMLInputElement>('Lower limit of range')
@@ -534,6 +550,7 @@ describe('GradingSchemeInput', () => {
         onSave={onSave}
         ref={gradingSchemeInputRef}
         pointsBasedGradingSchemesFeatureEnabled={true}
+        archivedGradingSchemesEnabled={false}
       />
     )
     const rangeInputs = screen.getAllByLabelText<HTMLInputElement>('Lower limit of range')
@@ -559,6 +576,7 @@ describe('GradingSchemeInput', () => {
         onSave={onSave}
         ref={gradingSchemeInputRef}
         pointsBasedGradingSchemesFeatureEnabled={false}
+        archivedGradingSchemesEnabled={false}
       />
     )
     const rangeInputs = screen.getAllByLabelText<HTMLInputElement>('Lower limit of range')
@@ -596,6 +614,7 @@ describe('GradingSchemeInput', () => {
         onSave={onSave}
         ref={gradingSchemeInputRef}
         pointsBasedGradingSchemesFeatureEnabled={false}
+        archivedGradingSchemesEnabled={false}
       />
     )
     const rangeInputs = screen.getAllByLabelText<HTMLInputElement>('Lower limit of range')
@@ -621,6 +640,7 @@ describe('GradingSchemeInput', () => {
         onSave={onSave}
         ref={gradingSchemeInputRef}
         pointsBasedGradingSchemesFeatureEnabled={false}
+        archivedGradingSchemesEnabled={false}
       />
     )
     const rangeInputs = screen.getAllByLabelText<HTMLInputElement>('Lower limit of range')
@@ -646,6 +666,7 @@ describe('GradingSchemeInput', () => {
         onSave={onSave}
         ref={gradingSchemeInputRef}
         pointsBasedGradingSchemesFeatureEnabled={false}
+        archivedGradingSchemesEnabled={false}
       />
     )
     act(() => gradingSchemeInputRef.current?.savePressed())
@@ -668,6 +689,7 @@ describe('GradingSchemeInput', () => {
         onSave={onSave}
         ref={gradingSchemeInputRef}
         pointsBasedGradingSchemesFeatureEnabled={false}
+        archivedGradingSchemesEnabled={false}
       />
     )
     act(() => gradingSchemeInputRef.current?.savePressed())
@@ -690,6 +712,7 @@ describe('GradingSchemeInput', () => {
         onSave={onSave}
         ref={gradingSchemeInputRef}
         pointsBasedGradingSchemesFeatureEnabled={false}
+        archivedGradingSchemesEnabled={false}
       />
     )
     act(() => gradingSchemeInputRef.current?.savePressed())
@@ -712,6 +735,7 @@ describe('GradingSchemeInput', () => {
         onSave={onSave}
         ref={gradingSchemeInputRef}
         pointsBasedGradingSchemesFeatureEnabled={false}
+        archivedGradingSchemesEnabled={false}
       />
     )
     act(() => gradingSchemeInputRef.current?.savePressed())
@@ -732,6 +756,7 @@ describe('GradingSchemeInput', () => {
         schemeInputType="percentage"
         onSave={onSave}
         pointsBasedGradingSchemesFeatureEnabled={true}
+        archivedGradingSchemesEnabled={false}
       />
     )
 
@@ -781,6 +806,7 @@ describe('GradingSchemeInput', () => {
         onSave={onSave}
         pointsBasedGradingSchemesFeatureEnabled={true}
         schemeInputType="percentage"
+        archivedGradingSchemesEnabled={false}
       />
     )
 
@@ -847,6 +873,7 @@ describe('GradingSchemeInput', () => {
         schemeInputType="percentage"
         onSave={onSave}
         pointsBasedGradingSchemesFeatureEnabled={false}
+        archivedGradingSchemesEnabled={false}
       />
     )
 

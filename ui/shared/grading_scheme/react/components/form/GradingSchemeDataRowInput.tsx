@@ -26,6 +26,7 @@ import {IconPlusLine, IconTrashLine} from '@instructure/ui-icons'
 import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Tooltip} from '@instructure/ui-tooltip'
+import {View} from '@instructure/ui-view'
 
 const I18n = useI18nScope('GradingSchemeManagement')
 
@@ -44,6 +45,7 @@ interface ComponentProps {
   onRowAddRequested: () => any
   pointsBased: boolean
   displayScalingFactor: number
+  archivedGradingSchemesEnabled: boolean
 }
 
 export const GradingSchemeDataRowInput = ({
@@ -61,6 +63,7 @@ export const GradingSchemeDataRowInput = ({
   onRowDeleteRequested,
   pointsBased,
   displayScalingFactor,
+  archivedGradingSchemesEnabled,
 }: ComponentProps) => {
   const [lowRangeValid, setLowRangeValid] = useState<boolean>(true)
   const [highRangeValid, setHighRangeValid] = useState<boolean>(true)
@@ -163,71 +166,54 @@ export const GradingSchemeDataRowInput = ({
     <>
       <tr>
         <td>
-          <Tooltip renderTip={I18n.t('add a letter grade')}>
-            <IconButton
-              withBackground={false}
-              withBorder={false}
-              screenReaderLabel={I18n.t(
-                'Add new row for a letter grade to grading scheme after this row'
-              )}
-              onClick={onRowAddRequested}
-              elementRef={buttonRef => {
-                if (!buttonRef) return
-                // @ts-expect-error
-                buttonRef.onmouseover = () => setAddButtonHovering(true)
-                // @ts-expect-error
-                buttonRef.onmouseout = () => setAddButtonHovering(false)
-              }}
-            >
-              <IconPlusLine />
-            </IconButton>
-          </Tooltip>
+          <Flex>
+            <Flex.Item margin="xxx-small 0 0 0">
+              <TextInput
+                isRequired={true}
+                renderLabel={<ScreenReaderContent>{I18n.t('Letter Grade')}</ScreenReaderContent>}
+                display="inline-block"
+                width="6rem"
+                onChange={handleLetterGradeChange}
+                defaultValue={letterGrade}
+                messages={[{text: <></>, type: 'hint'}]}
+              />
+            </Flex.Item>
+          </Flex>
         </td>
-        <td>
-          <TextInput
-            isRequired={true}
-            renderLabel={<ScreenReaderContent>{I18n.t('Letter Grade')}</ScreenReaderContent>}
-            display="inline-block"
-            width="6rem"
-            onChange={handleLetterGradeChange}
-            defaultValue={letterGrade}
-            messages={[{text: <></>, type: 'hint'}]}
-          />
-        </td>
-        <td style={{width: '25%'}}>
-          <span aria-label={I18n.t('Upper limit of range')}>
-            {isFirstRow && pointsBased ? (
-              <>
-                <TextInput
-                  elementRef={ref => {
-                    if (ref instanceof HTMLInputElement) {
-                      highRangeInputRef.current = ref
-                    }
-                  }}
-                  isRequired={true}
-                  renderLabel={
-                    <ScreenReaderContent>{I18n.t('Upper limit of range')}</ScreenReaderContent>
-                  }
-                  display="inline-block"
-                  width="4.5rem"
-                  htmlSize={3}
-                  onChange={handleRowHighRangeChange}
-                  onBlur={handleHighRangeBlur}
-                  defaultValue={highRangeDefaultDisplay}
-                  messages={[{text: <></>, type: highRangeValid ? 'hint' : 'error'}]}
-                />
-              </>
-            ) : (
-              <>
-                {isFirstRow ? '' : '< '}
-                {highRangeDefaultDisplay}
-              </>
-            )}
-            {pointsBased ? <></> : <>%</>}
-          </span>
-        </td>
-        <td style={{width: '25%'}}>
-          <Flex display="inline-flex">
+        <td style={{width: '40%'}}>
+          <Flex justifyItems={archivedGradingSchemesEnabled ? 'end' : 'start'}>
+            <span aria-label={I18n.t('Upper limit of range')}>
+              <Flex.Item margin="xxx-small 0 0 0">
+                {isFirstRow && pointsBased ? (
+                  <>
+                    <TextInput
+                      elementRef={ref => {
+                        if (ref instanceof HTMLInputElement) {
+                          highRangeInputRef.current = ref
+                        }
+                      }}
+                      isRequired={true}
+                      renderLabel={
+                        <ScreenReaderContent>{I18n.t('Upper limit of range')}</ScreenReaderContent>
+                      }
+                      display="inline-block"
+                      width="4.5rem"
+                      htmlSize={3}
+                      onChange={handleRowHighRangeChange}
+                      onBlur={handleHighRangeBlur}
+                      defaultValue={highRangeDefaultDisplay}
+                      messages={[{text: <></>, type: highRangeValid ? 'hint' : 'error'}]}
+                    />
+                  </>
+                ) : (
+                  <>
+                    {isFirstRow ? '' : '< '}
+                    {highRangeDefaultDisplay}
+                  </>
+                )}
+                {pointsBased ? <></> : <>%</>}
+              </Flex.Item>
+            </span>
             <Flex.Item padding="x-small">{I18n.t('to')} </Flex.Item>
             <Flex.Item>
               <span aria-label={I18n.t('Lower limit of range')}>
@@ -253,19 +239,36 @@ export const GradingSchemeDataRowInput = ({
                       defaultValue={lowRangeDefaultDisplay}
                       messages={[{text: <></>, type: lowRangeValid ? 'hint' : 'error'}]}
                     />
-                    {pointsBased ? <></> : <>%</>}
+                    <View padding="0 0 0 x-small">{pointsBased ? <></> : <>%</>}</View>
                   </>
                 )}
               </span>
             </Flex.Item>
           </Flex>
         </td>
-        <td>
+
+        <td style={{verticalAlign: 'top', width: '100%'}}>
           <Flex justifyItems="end">
             <Flex.Item>
+              <Tooltip renderTip={I18n.t('add a letter grade')}>
+                <IconButton
+                  screenReaderLabel={I18n.t(
+                    'Add new row for a letter grade to grading scheme after this row'
+                  )}
+                  onClick={onRowAddRequested}
+                  elementRef={buttonRef => {
+                    if (!buttonRef) return
+                    // @ts-expect-error
+                    buttonRef.onmouseover = () => setAddButtonHovering(true)
+                    // @ts-expect-error
+                    buttonRef.onmouseout = () => setAddButtonHovering(false)
+                  }}
+                  margin="0 small 0 0"
+                >
+                  <IconPlusLine />
+                </IconButton>
+              </Tooltip>
               <IconButton
-                withBackground={false}
-                withBorder={false}
                 screenReaderLabel={I18n.t('Remove letter grade row')}
                 onClick={onRowDeleteRequested}
               >

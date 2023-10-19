@@ -21,6 +21,7 @@ export type {
   GradingSchemeTemplate,
   GradingSchemeUpdateRequest,
   GradingSchemeSummary,
+  GradingSchemeCardData,
 } from './gradingSchemeApiModel'
 
 export {GradingSchemesManagement} from './react/components/GradingSchemesManagement'

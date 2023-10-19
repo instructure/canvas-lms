@@ -36,6 +36,8 @@ export interface GradingScheme {
   assessed_assignment: boolean
   scaling_factor: number
   points_based: boolean
+  // TODO: update this once the API is created
+  used_locations?: string[]
 }
 
 export interface GradingSchemeUpdateRequest {
@@ -49,4 +51,9 @@ export interface GradingSchemeUpdateRequest {
 export interface GradingSchemeSummary {
   title: string
   id: string
+}
+
+export interface GradingSchemeCardData {
+  editing: boolean
+  gradingScheme: GradingScheme
 }
