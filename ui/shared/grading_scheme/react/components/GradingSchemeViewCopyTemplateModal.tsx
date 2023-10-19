@@ -30,7 +30,7 @@ import {
   GradingSchemeEditableData,
   GradingSchemeInputHandle,
 } from './form/GradingSchemeInput'
-import {GradingSchemeSummary, GradingSchemeTemplate} from '../../gradingSchemeApiModel'
+import {GradingScheme, GradingSchemeSummary} from '../../gradingSchemeApiModel'
 import {GradingSchemeTemplateView} from './view/GradingSchemeTemplateView'
 import {defaultPointsGradingScheme} from '../../defaultPointsGradingScheme'
 
@@ -56,7 +56,7 @@ export const GradingSchemeViewCopyTemplateModal = ({
   const {createGradingScheme /* deleteGradingSchemeStatus */} = useGradingSchemeCreate()
   const {loadDefaultGradingScheme /* deleteGradingSchemeStatus */} = useDefaultGradingScheme()
   const [defaultCanvasGradingSchemeTemplate, setDefaultCanvasGradingSchemeTemplate] = useState<
-    GradingSchemeTemplate | undefined
+    GradingScheme | undefined
   >(undefined)
   const [copying, setCopying] = useState<boolean>(false)
   const toggleCopying = () => {

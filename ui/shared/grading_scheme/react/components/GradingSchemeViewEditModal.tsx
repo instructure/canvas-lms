@@ -48,6 +48,7 @@ export interface GradingSchemeViewEditModalProps {
   contextId: string
   gradingSchemeId: string
   pointsBasedGradingSchemesEnabled: boolean
+  archivedGradingSchemesEnabled: boolean
   onUpdate?: (gradingSchemeSummary: GradingSchemeSummary) => any
   onCancel: () => any
   onDelete?: () => any
@@ -58,6 +59,7 @@ export const GradingSchemeViewEditModal: React.FC<GradingSchemeViewEditModalProp
   contextId,
   gradingSchemeId,
   pointsBasedGradingSchemesEnabled,
+  archivedGradingSchemesEnabled,
   onUpdate,
   onCancel,
   onDelete,
@@ -221,6 +223,7 @@ export const GradingSchemeViewEditModal: React.FC<GradingSchemeViewEditModalProp
               ) : (
                 <GradingSchemeView
                   pointsBasedGradingSchemesEnabled={pointsBasedGradingSchemesEnabled}
+                  archivedGradingSchemesEnabled={archivedGradingSchemesEnabled}
                   disableEdit={!canManageScheme(gradingScheme)}
                   disableDelete={!canManageScheme(gradingScheme)}
                   onEditRequested={toggleEditing}
