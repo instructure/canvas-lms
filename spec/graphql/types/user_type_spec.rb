@@ -451,6 +451,19 @@ describe Types::UserType do
       ).to eq c.conversation.conversation_messages.first.body
     end
 
+    it "handles orphaned ConversationParticipant gracefully" do
+      conversation(@student, @teacher)
+
+      # Create orphaned ConversationParticipant, must have every field set or it will get filtered out automatically
+      ConversationParticipant.create!(user: @student, conversation_id: -1, workflow_state: "read", last_message_at: Time.now)
+
+      type = GraphQLTypeTester.new(@student, current_user: @student, domain_root_account: @student.account, request: ActionDispatch::TestRequest.create)
+
+      results = type.resolve("conversationsConnection { nodes { conversation { id } } }")
+
+      expect(results.size).to eq(1)
+    end
+
     context "recipient user deleted" do
       def delete_recipient
         # The short issue is CP and CMP are not fk attached to the user, but our code expects an associated user.
