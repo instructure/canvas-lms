@@ -106,11 +106,15 @@ module Types
       load_association(:discussion_topic).then do |topic|
         if topic.anonymous_state == "full_anonymity" || (topic.anonymous_state == "partial_anonymity" && object.is_anonymous_author)
           Loaders::DiscussionTopicParticipantLoader.for(topic.id).load(object.user_id).then do |participant|
-            {
-              id: participant.id.to_s(36),
-              short_name: (object.user_id == current_user.id) ? "current_user" : participant.id.to_s(36),
-              avatar_url: nil
-            }
+            if participant.nil?
+              nil
+            else
+              {
+                id: participant.id.to_s(36),
+                short_name: (object.user_id == current_user.id) ? "current_user" : participant.id.to_s(36),
+                avatar_url: nil
+              }
+            end
           end
         end
       end

@@ -245,6 +245,12 @@ describe Types::DiscussionEntryType do
       expect(GraphQLTypeTester.new(@anon_teacher_discussion_entry, current_user: @student).resolve("anonymousAuthor { shortName }")).to eq @anon_discussion.discussion_topic_participants.where(user_id: @teacher.id).first.id.to_s(36)
     end
 
+    it "returns nil if for anonymousAuthor when participant is nil" do
+      DiscussionTopicParticipant.where(discussion_topic_id: @anon_discussion.id, user_id: [@teacher.id]).delete_all
+      student_in_course(active_all: true)
+      expect(GraphQLTypeTester.new(@anon_teacher_discussion_entry, current_user: @student).resolve("anonymousAuthor { shortName }")).to be_nil
+    end
+
     it "returns the teacher author if a course id is provided" do
       expect(@anon_teacher_discussion_entry_type.resolve("author(courseId: \"#{@course.id}\") { shortName }")).to eq @teacher.short_name
     end

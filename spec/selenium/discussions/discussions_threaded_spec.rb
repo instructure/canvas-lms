@@ -1135,6 +1135,15 @@ describe "threaded discussions" do
           message: "this a student entry"
         )
 
+        # make sure nil_participant_entries do not cause the page to 500 and continues to
+        # load the good entries instead
+        nil_participant = student_in_course(course: @course, name: "Mr Nil", active_all: true).user
+        anon_topic.discussion_entries.create!(
+          user: nil_participant,
+          message: "this a nil participant entry"
+        )
+        DiscussionTopicParticipant.where(discussion_topic_id: anon_topic.id, user_id: [nil_participant.id]).delete_all
+
         user_session(@teacher)
         get "/courses/#{@course.id}/discussion_topics/#{anon_topic.id}"
         expect(fj("span[data-testid='non-graded-discussion-info'] span:contains('Anonymous Discussion')")).to be_present
@@ -1144,6 +1153,7 @@ describe "threaded discussions" do
         expect(student_entry.author_name).to include "Anonymous "
         expect(authors).to include("teacher", "TA", "Designer", student_entry.author_name)
         expect(authors).not_to include("student")
+        expect(authors).not_to include("Mr Nil")
       end
     end
 
