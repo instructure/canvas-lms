@@ -90,6 +90,12 @@ describe Types::UserType do
     end
   end
 
+  context "uuid" do
+    it "is displayed when requested" do
+      expect(user_type.resolve("uuid")).to eq @student.uuid.to_s
+    end
+  end
+
   context "avatarUrl" do
     before(:once) do
       @student.update! avatar_image_url: "not-a-fallback-avatar.png"
