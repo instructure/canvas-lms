@@ -66,18 +66,6 @@ api_auth_error_updates:
     the "status" field will not be localized; it will always be given in
     English.
   applies_to: SiteAdmin
-no_redirect_on_oauth_token_method:
-  state: hidden
-  display_name: Updates to OAuth 2.0 flow to stop redirecting in the 'token' authentication
-  description: |-
-    If enabled, the OAuth 2.0 will now correctly return 4xx status codes to the
-    requesting client instead of redirecting them to themselves
-  applies_to: SiteAdmin
-  environments:
-    development:
-      state: on
-    ci:
-      state: on
 variable_substitution_numeric_to_string:
   state: hidden
   display_name: Returns string values instead of numeric values in variable substitutions
@@ -217,7 +205,7 @@ lti_overwrite_user_url_input_select_content_dialog:
   applies_to: RootAccount
   display_name: Overwrite user LTI URL input on select content dialog
   description: |-
-    If enabled, the user's LTI URL input on the select content dialog will be overwritten 
+    If enabled, the user's LTI URL input on the select content dialog will be overwritten
     if the tool responds with a valid LTI URL.
 lti_find_external_tool_prefer_original_client_id:
   state: hidden
