@@ -85,7 +85,16 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
     process_future_date_inputs(input[:delayed_post_at], input[:lock_at], discussion_topic)
     process_locked_parameter(input[:locked], discussion_topic)
 
+    topic_assignment = discussion_topic.build_assignment(input[:assignment].to_h) if input[:assignment]
+
+    return validation_error(I18n.t("You do not have permissions to create assignments in the provided course")) unless topic_assignment.nil? || topic_assignment&.grants_right?(current_user, :create)
+
+    discussion_topic.assignment = topic_assignment if topic_assignment&.grants_right?(current_user, :create)
     return errors_for(discussion_topic) unless discussion_topic.save
+
+    if topic_assignment
+      return errors_for(topic_assignment) unless topic_assignment.save
+    end
 
     { discussion_topic: }
   rescue ActiveRecord::RecordNotFound

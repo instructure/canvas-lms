@@ -351,6 +351,40 @@ class DiscussionTopic < ActiveRecord::Base
     end
   end
 
+  def build_assignment(assignment_input = {})
+    return if deleted?
+
+    working_assignment = course.assignments.build
+
+    working_assignment.context = context
+    working_assignment.title = title
+    working_assignment.description = message
+    working_assignment.submission_types = "discussion_topic"
+    working_assignment.workflow_state = (workflow_state == "active") ? "published" : "unpublished"
+
+    %i[assignment_group_id assignment_overrides due_at grading_type grading_standard_id lock_at name points_possible unlock_at].each do |field|
+      working_assignment.send("#{field}=", assignment_input[field]) if assignment_input[field]
+    end
+
+    working_peer_reviews = assignment_input[:peer_reviews].to_h if assignment_input[:peer_reviews]
+    if working_peer_reviews
+      peer_review_mappings = {
+        enabled: :peer_reviews,
+        count: :peer_review_count,
+        due_at: :peer_reviews_due_at,
+        intra_reviews: :intra_group_peer_reviews,
+        anonymous_reviews: :anonymous_peer_reviews,
+        automatic_reviews: :automatic_peer_reviews
+      }
+
+      peer_review_mappings.each do |field_from_peer_reviews, attribute_on_assignment|
+        working_assignment.send("#{attribute_on_assignment}=", working_peer_reviews[field_from_peer_reviews]) if working_peer_reviews[field_from_peer_reviews]
+      end
+    end
+
+    working_assignment
+  end
+
   def update_assignment
     return if deleted?
 
