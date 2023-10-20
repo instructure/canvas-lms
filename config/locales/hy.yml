@@ -86,8 +86,10 @@ hy:
       removed: "Խումբը հաջողությամբ ջնջված է:"
     student_count: 
       one: "% {count} ուսանողներ"
+      other: "% {count} ունկնդիրներ"
     user_count: 
       one: "% {count}  օգտագործողներ"
+      other: "% {count}  օգտագործողներ"
   GroupUserCollection: 
     flash: 
       userAlreadyInGroup: "ՆԱԽԱԶԳՈՒՇԱՑՈՒՄ. %{user}ը արդեն %{group} խմբի անդամ է"
@@ -3276,6 +3278,7 @@ hy:
   choose_an_authentication_service_47dc8875: "Ընտրել իսկության ստուգման ծառայությունը"
   choose_one_2c4277df: "Ընտրել մեկը"
   choose_usage_rights_33683854: "Ընտրել օգտագործման իրավունքները..."
+  chosencolor_is_not_a_valid_color_5d542cc: "'%{ընտրված գույն}'-ը վավեր գույն չէ"
   clear_2084585f: Մաքրել
   click_for_more_details_on_this_outcome_8c018d2f: "Սեղմել այս արդյունքի մանրամասները տեսնելու համար"
   click_here_for_an_account_9536cb36: "Սեղմեք այստեղ հաշվի համար"
@@ -3543,6 +3546,7 @@ hy:
     no_concluded_conferences: "Չկան ավարտված կոնֆերանսներ"
     no_new_conferences: "Չկան նոր կոնֆերանսներ"
     no_settings_error: "Կոնֆերանսը չունի լրացուցիչ կարգաբերումների էջ"
+    no_urls_error: "Ցավոք, այս կոնֆերանսի համար դեռևս չկան %{type) էջեր"
     notifications: 
       inaccessible: "Նախազգուշացում. Այս էջը պարունակում է երրորդ անձին վերաբերող բովանդակություն, որը էկրանից կարդալու համար հասանելի չէ:"
     show: 
@@ -6526,6 +6530,7 @@ hy:
     required: "Պահանջվում է"
     sis_id_in_use: " %{sis_id} SIS ID-ն արդեն իսկ գործածվում է"
     unsaved_changes: "Դուք չպահպանված փոփոխություններ եք արել:"
+    wrong_file_extension: "Ձեր կողմից ընտրված \"{extension}\" ընդլայնմամբ ֆայլը թույլատրված չէ ուղարկման համար:"
   event_date_c9459fe3: "Միջոցառման ամսաթիվ"
   event_date_f05219e7: "Միջոցառման ամսաթիվ՝"
   event_end_time_ef830e66: "Միջոցառման ավարտման ամսաթիվ"
@@ -11473,6 +11478,8 @@ hy:
     notices: 
       delete_failed: "Էջի \"%{title}\"-ը հնարավոր չէ ջնջել:"
       page_deleted: "Էջի \"%{title}\" ջնջվել է: "
+    reload_editing_page: "Այս էջը փոխվել է այն բանից հետո, երբ դուք սկսեցիք խմբագրել այն: \"Կրկին բեռնելով\", դուք կկորցնենք ձեր բոլոր փոփոխությունները:"
+    reload_viewing_page: "Այս էջը փոխվել է այն բանից հետո, երբ դուք սկսել եք այն դիտել: \"Կրկին բեռնել\""
     restore_failed: "Չհաջողվեց վերականգնել էջի նախկին տարբերակը"
     save_button: Պահպանել
     saving_button: "Պահպանվում է..."
@@ -13807,6 +13814,7 @@ hy:
         spelled: "Համոզվեք, որ բոլոր բառերը ճիշտ եք գրել:"
         suggestions: Առաջարկություններ
         three_chars: "Որոնման տողում մուտքագրեք առնվազն 3 տառ: "
+        your_search: "Ձեր որոնման օբյեկտը՝ \"%{search_item}\" չի համընկնում որևէ ֆայլի հետ:"
     file_list: "Ֆայլերի ցանկ"
     files: Ֆայլեր
     files_heading: Ֆայլեր

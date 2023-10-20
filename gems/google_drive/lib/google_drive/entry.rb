@@ -19,30 +19,28 @@
 #
 module GoogleDrive
   class Entry
-    attr_reader :document_id, :folder, :entry
+    attr_reader :folder, :file
 
-    def initialize(google_drive_entry, preferred_extensions = nil)
-      @entry = google_drive_entry
-      @document_id = @entry["id"]
+    def initialize(file, preferred_extensions = nil)
+      @file = file
       @preferred_extensions = preferred_extensions
-      parent = @entry["parents"].empty? ? nil : @entry["parents"][0]
+      parent = file.parents.first
       @folder = ((parent.nil? || parent["isRoot"]) ? nil : parent["id"])
     end
 
-    def alternate_url
-      @entry["alternateLink"] || "http://docs.google.com"
-    end
+    def document_id = @file.id
 
-    def edit_url
-      alternate_url rescue "https://docs.google.com/document/d/#{@document_id}/edit?usp=drivesdk"
+    def alternate_url
+      @file.alternate_link || "http://docs.google.com"
     end
+    alias_method :edit_url, :alternate_url
 
     def extension
       file_data[:ext]
     end
 
     def display_name
-      @entry["title"] || "google_doc.#{extension}"
+      @file.name || "google_doc.#{extension}"
     end
 
     def download_url
@@ -52,7 +50,7 @@ module GoogleDrive
     def to_hash
       {
         name: display_name,
-        document_id: @document_id,
+        document_id:,
         extension:,
         alternate_url: { href: alternate_url }
       }
@@ -63,15 +61,15 @@ module GoogleDrive
     def file_data
       # First we check export links for our preferred formats
       # then we fail over to the file properties
-      if @entry["exportLinks"]
+      if @file.export_links && !@file.export_links.empty?
         url, extension = preferred_export_link @preferred_extensions
       end
 
       # we'll have to find the url and extensions some other place
-      extension ||= @entry["fileExtension"] if @entry.key? "fileExtension"
+      extension ||= @file.file_extension
       extension ||= "none"
 
-      url ||= @entry["downloadUrl"] if @entry.key? "downloadUrl"
+      url ||= @file.web_content_link
 
       {
         url:,
@@ -80,24 +78,21 @@ module GoogleDrive
     end
 
     def preferred_export_link(preferred_extensions = nil)
-      preferred_urls = preferred_mime_types.map do |mime_type|
-        next unless @entry["exportLinks"][mime_type]
+      preferred_mime_types.each do |mime_type|
+        next unless (current_url = @file.export_links[mime_type])
 
-        current_url = @entry["exportLinks"][mime_type]
         current_extension = /([a-z]+)$/.match(current_url).to_s
         has_preferred_extension = preferred_extensions&.include?(current_extension)
 
         # our extension is in the preferred list or we have no preferences
-        [current_url, current_extension] if has_preferred_extension || !preferred_extensions
+        return [current_url, current_extension] if has_preferred_extension || !preferred_extensions
       end
-
-      url, extension = preferred_urls.find { |i| i }
 
       # if we dont have any "preferred extension" just return the default.
       # they will be filtered out by the folderize method
-      return preferred_export_link if url.nil? && preferred_extensions
+      return preferred_export_link if preferred_extensions
 
-      [url, extension]
+      [nil, nil]
     end
 
     def preferred_mime_types

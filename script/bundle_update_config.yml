@@ -1,0 +1,51 @@
+ignored_gems:
+  - aws-partitions
+  - sorbet-runtime
+
+# don't bother trying to update dependent gems unless their primary dependency
+# doesn't need updated as well
+cohort_gems:
+  aws:
+    - aws-partitions
+    - aws-sdk-applicationautoscaling
+    - aws-sdk-autoscaling
+    - aws-sdk-core
+    - aws-sdk-dynamodb
+    - aws-sdk-kinesis
+    - aws-sdk-kms
+    - aws-sdk-s3
+    - aws-sdk-sns
+    - aws-sdk-sqs
+    - aws-sigv4
+  faraday:
+    - faraday_middleware
+  rails:
+    - actioncable
+    - actionmailbox
+    - actionmailer
+    - actionpack
+    - actiontext
+    - actionview
+    - activejob
+    - activemodel
+    - activerecord
+    - activestorage
+    - activesupport
+    - railties
+  rspec:
+    - rspec-core
+    - rspec-expectations
+    - rspec-mocks
+  rubocop:
+    - rubocop-ast
+    - rubocop-factory_bot
+    - rubocop-graphql
+    - rubocop-inst
+    - rubocop-performance
+    - rubocop-rails
+    - rubocop-rake
+    - rubocop-rspec
+  stormbreaker:
+    - axe-core-api
+    - axe-core-rspec
+    - axe-core-selenium

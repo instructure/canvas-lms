@@ -85,9 +85,9 @@ describe "Gradebook editing grades" do
     assignment_model(course: @course, grading_type: "letter_grade", points_possible: nil, title: "no-points")
     Gradebook.visit(@course)
 
-    edit_grade("#gradebook_grid .container_1 .slick-row:nth-child(1) .b4", "A-")
+    edit_grade("#gradebook_grid .container_1 .slick-row:nth-child(1) .b4", "A−")
 
-    expect(f("#gradebook_grid .container_1 .slick-row:nth-child(1) .b4")).to include_text("A-")
+    expect(f("#gradebook_grid .container_1 .slick-row:nth-child(1) .b4")).to include_text("A−")
     expect(@assignment.submissions.where.not(grade: nil).count).to eq 1
 
     sub = @assignment.submissions.where.not(grade: nil).first

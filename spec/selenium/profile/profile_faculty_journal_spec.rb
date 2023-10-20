@@ -34,6 +34,7 @@ describe "profile faculty journal" do
       title: "this is a user note for #{@student.name}",
       note: "#{@student.name} is an excellent student"
     )
+    Account.site_admin.disable_feature!(:deprecate_faculty_journal)
   end
 
   it "checks the Journal messages for correct info" do

@@ -18,73 +18,103 @@
 
 import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import doFetchApi from '@canvas/do-fetch-api-effect'
-import {HandleCheckboxChange, TeacherNotes} from '../../../types'
+import {CustomColumn, HandleCheckboxChange, TeacherNotes} from '../../../types'
+import {executeApiRequest} from '@canvas/util/apiRequest'
+import {View} from '@instructure/ui-view'
+import {InstUISettingsProvider} from '@instructure/emotion'
+import {Checkbox} from '@instructure/ui-checkbox'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 type Props = {
   teacherNotes?: TeacherNotes | null
+  customColumns?: CustomColumn[] | null
   customColumnsUrl?: string | null
   customColumnUrl?: string | null
+  reorderCustomColumnsUrl?: string | null
   handleCheckboxChange: HandleCheckboxChange
   showNotesColumn: boolean
+  onTeacherNotesCreation: (teacherNotes: TeacherNotes) => void
 }
+
+const componentOverrides = {
+  CheckboxFacade: {
+    checkedBackground: '#0375ff',
+    borderColor: '#777777',
+    labelFontSizeSmall: '1rem',
+  },
+  View: {
+    paddingMedium: '16px',
+  },
+}
+
 export default function ShowNotesColumnCheckbox({
   teacherNotes,
+  customColumns,
   customColumnsUrl,
   customColumnUrl,
-  handleCheckboxChange,
+  reorderCustomColumnsUrl,
   showNotesColumn,
+  handleCheckboxChange,
+  onTeacherNotesCreation,
 }: Props) {
-  const handleShowNotesColumnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const checked = event.target.checked
-    let url: string
-    let method: string
-    let body: {}
-    if (customColumnUrl && customColumnsUrl) {
-      if (teacherNotes) {
-        method = 'PUT'
-        url = customColumnUrl.replace(':id', teacherNotes?.id)
-        body = {column: {hidden: !checked}}
-      } else if (checked) {
-        url = customColumnsUrl
-        method = 'POST'
-        body = {
-          column: {
-            title: I18n.t('notes', 'Notes'),
-            position: 1,
-            teacher_notes: true,
-          },
-        }
-      } else {
-        return
-      }
-    } else {
+  const handleShowNotesColumnChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!customColumnUrl || !customColumnsUrl) {
       return
     }
-    doFetchApi({
-      method,
-      body,
-      path: url,
-    })
+    const checked = event.target.checked
+    if (teacherNotes) {
+      executeApiRequest({
+        method: 'PUT',
+        body: {column: {hidden: !checked}},
+        path: customColumnUrl.replace(':id', teacherNotes?.id),
+      })
+    } else {
+      const {data} = await executeApiRequest<TeacherNotes>({
+        method: 'POST',
+        body: {
+          column: {
+            title: I18n.t('Notes'),
+            position: 1,
+            teacher_notes: true,
+            hidden: !checked,
+          },
+        },
+        path: customColumnsUrl,
+      })
+      onTeacherNotesCreation(data)
+    }
     handleCheckboxChange('showNotesColumn', checked)
+    if (!checked || !reorderCustomColumnsUrl || !customColumns) {
+      return
+    }
+    executeApiRequest({
+      method: 'POST',
+      path: reorderCustomColumnsUrl,
+      body: {
+        order: customColumns.map(column => Number(column.id)),
+      },
+    })
   }
 
   return (
-    <div
-      className="checkbox"
-      style={{padding: 12, margin: '10px 0px', background: '#eee', borderRadius: 5}}
-    >
-      <label className="checkbox" htmlFor="show_notes_checkbox">
-        <input
-          type="checkbox"
-          id="show_notes_checkbox"
-          name="show_notes_checkbox"
+    <InstUISettingsProvider theme={{componentOverrides}}>
+      <View
+        as="div"
+        className="checkbox"
+        margin="x-small 0"
+        borderRadius="medium"
+        background="primary"
+        padding="medium"
+        themeOverride={{backgroundPrimary: '#eee'}}
+      >
+        <Checkbox
+          data-testid="show-notes-column-checkbox"
+          size="small"
+          label={I18n.t('Show Notes in Student Info')}
           checked={showNotesColumn}
           onChange={handleShowNotesColumnChange}
         />
-        {I18n.t('Show Notes in Student Info')}
-      </label>
-    </div>
+      </View>
+    </InstUISettingsProvider>
   )
 }

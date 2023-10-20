@@ -79,9 +79,8 @@ describe EpubExport do
     end
 
     it "is stored in instfs if instfs is enabled" do
-      allow(InstFS).to receive(:enabled?).and_return(true)
       uuid = "1234-abcd"
-      allow(InstFS).to receive(:direct_upload).and_return(uuid)
+      allow(InstFS).to receive_messages(enabled?: true, direct_upload: uuid)
       epub_export.convert_to_epub(synchronous: true)
       expect(epub_export.epub_attachment.instfs_uuid).to eq uuid
     end

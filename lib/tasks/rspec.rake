@@ -70,7 +70,7 @@ unless Rails.env.production? || ARGV.any? { |a| a.start_with?("gems") }
         end
         processes << pid
       end
-      exit(Process.waitall.map(&:last).map(&:exitstatus).count { |x| x != 0 }) unless child
+      exit(Process.waitall.count { |ps| ps.last.exitstatus != 0 }) unless child
     else
       t.send(spec_files_attr, spec_files)
     end

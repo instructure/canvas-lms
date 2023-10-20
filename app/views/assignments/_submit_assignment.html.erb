@@ -23,10 +23,6 @@
       action: :create,
       assignment_id: @assignment.id
     )
-    # Force this plugin to be unusable for now.
-    # This plugin is deprecated and all related
-    # code will be removed soon.
-    show_google_docs = false
 -%>
 <%
   js_bundle :submit_assignment
@@ -56,9 +52,6 @@
       <% end %>
       <% if @assignment.submission_types && @assignment.submission_types.match(/online_url/) %>
         <li><a href="#submit_online_url_form" class="submit_online_url_option"><%= t 'links.submit.website', "Website URL" %></a></li>
-      <% end %>
-      <% if show_google_docs %>
-        <li><a href="#submit_google_doc_form" class="submit_online_url_option"><%= t 'links.submit.google_doc', 'Google Doc' %></a></li>
       <% end %>
       <% if @assignment.submission_types && @assignment.submission_types.match(/media_recording/) %>
         <li><a href="#submit_media_recording_form" class="submit_media_recording_option"><%= t 'links.submit.media', "Media" %></a></li>
@@ -178,89 +171,6 @@
       float: <%= direction('right') %>;
     }
     </style>
-    <% if show_google_docs %>
-      <% if @user_has_google_drive %>
-        <% if @domain_root_account.feature_enabled?(:google_docs_domain_restriction) &&
-              @domain_root_account.settings[:google_docs_domain] &&
-             !@current_user.gmail.match(%r{@#{@domain_root_account.settings[:google_docs_domain]}$}) %>
-          <div id="submit_google_doc_form">
-            <p class="alert alert-error">
-              <i class="icon-warning" aria-hidden="true"></i>
-              <%= t(:invalid_google_docs_domain, 'Invalid domain') %>
-            </p>
-
-           <p>
-            <%= t(:gmail_restriction_description, <<-END, domain: @domain_root_account.settings[:google_docs_domain])
-              Your account has restricted Google Doc submissions to Google accounts
-              on the %{domain} domain. To submit this assignment with a Google Doc,
-              you will need to reconfigure the Google Docs integration on your
-              user settings page.
-            END
-            %>
-           </p>
-            </div>
-         <% else %>
-          <%= form_tag(submission_create_url, {:id => "submit_google_doc_form", :class => "submit_assignment_form"}) do %>
-            <%= hidden_field :submission, :submission_type, :value => "google_doc" %>
-            <%= hidden_field :google_doc, :document_id, :value => "", :class => "google_doc_id" %>
-            <table class="formtable" style="width: 100%;">
-              <tr>
-                <td style="padding-bottom: 10px;" colspan="2">
-                  <%= t 'instructions.google_docs', "Select the file from the list below." %>
-                  <%= render :partial => "assignments/group_submission_reminder" if @assignment.has_group_category? %>
-                  </td>
-              </tr><tr>
-                <td colspan="2">
-                  <div id="google_docs_container" style="height: 200px; overflow: auto;">
-                    <div style="text-align: center; margin: 10px;">
-                      <%= image_tag "ajax-loader-bar.gif", :alt => '' %>
-                    </div>
-                  </div>
-                </td>
-              </tr><tr>
-                <td colspan="2" style="text-align: center;">
-                  <div style="text-align: <%= direction('left') %>;">
-                    <div class="textarea-emoji-container">
-                      <div class="textarea-container">
-                        <%= text_area :submission, :comment, :class => 'submission_comment_textarea', :placeholder => t('comments_placeholder', 'Comments...'), :title => t('additional_comments', 'Additional comments') %>
-                        <span class="emoji-picker-container" style="display: none;"></span>
-                      </div>
-                      <div class="emoji-quick-picker-container" style="display: none;"></div>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-              <%= render :partial => "group_comment" %>
-              <% if @assignment.turnitin_enabled? %>
-                <%= render :partial => "turnitin" %>
-              <% end %>
-              <% if @assignment.vericite_enabled? %>
-                <%= render :partial => "vericite" %>
-              <% end %>
-              <tr>
-                <td colspan="2" class='button-container'>
-                  <button type="button" class='cancel_button btn'><%= t '#buttons.cancel', "Cancel" %></button>
-                  <button type="submit" class="btn btn-primary"><%= t 'buttons.submit_assignment', "Submit Assignment" %></button>
-                </td>
-              </tr>
-            </table>
-            <div id="uploading_google_doc_message" style="display: none;">
-              <%= t 'messages.uploading', "Retrieving a copy of your Google Doc to submit for this assignment.  This may take a little while, depending on the size of the file..." %>
-              <div style="text-align: center; margin: 10px;">
-                <%= image_tag "ajax-loader-bar.gif", :alt => '' %>
-              </div>
-            </div>
-          <% end %>
-        <% end %>
-      <% else %>
-        <div id="submit_google_doc_form">
-          <%= t 'messages.google_drives_auth_required', "Before you can submit assignments directly from Google Drive you need to authorize Canvas to access your Google Drive account:" %>
-          <div style="font-size: 1.1em; text-align: center; margin: 10px;">
-            <a class="btn" href="<%= oauth_url(:service => :google_drive, :return_to => (request.url + "#submit_google_doc_form")) %>"><%= t 'links.authorize_google_drive', "Authorize Google Drive Access" %></a>
-          </div>
-        </div>
-      <% end %>
-    <% end %>
 
     <% if @assignment.submission_types && @assignment.submission_types.match(/media_recording/) %>
       <% if !feature_enabled?(:kaltura) %>

@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 group :redis do
-  gem "redis", "4.1.4"
+  gem "redis-clustering", "~> 5.0"
   gem "redis-scripting", "1.0.1"
-
-  gem "digest-murmurhash", "1.1.1"
 end

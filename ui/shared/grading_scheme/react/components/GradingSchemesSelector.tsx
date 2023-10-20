@@ -30,29 +30,32 @@ import {Spinner} from '@instructure/ui-spinner'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
 import {useGradingSchemeSummaries} from '../hooks/useGradingSchemeSummaries'
+import {useDefaultGradingScheme} from '../hooks/useDefaultGradingScheme'
 import {GradingSchemesManagement} from './GradingSchemesManagement'
 
-import {GradingSchemeSummary} from '../../gradingSchemeApiModel'
+import {GradingSchemeTemplate, GradingSchemeSummary} from '../../gradingSchemeApiModel'
 import {GradingSchemeViewEditModal} from './GradingSchemeViewEditModal'
 import {GradingSchemeViewCopyTemplateModal} from './GradingSchemeViewCopyTemplateModal'
 
 const I18n = useI18nScope('assignments.grading_type_selector')
-// Doing this to avoid TS2339 errors -- TODO: remove once we're on InstUI 8
-const {Item} = Flex as any
 
 interface ComponentProps {
+  canManage: boolean
   contextType: 'Course' | 'Account'
   contextId: string
   courseDefaultSchemeId?: string
   initiallySelectedGradingSchemeId?: string
+  pointsBasedGradingSchemesEnabled: boolean
   onChange: (gradingStandardId?: string) => any
 }
 export const GradingSchemesSelector = ({
   initiallySelectedGradingSchemeId,
   onChange,
+  canManage,
   contextType,
   contextId,
   courseDefaultSchemeId,
+  pointsBasedGradingSchemesEnabled,
 }: ComponentProps) => {
   if (initiallySelectedGradingSchemeId === '0' || initiallySelectedGradingSchemeId === '') {
     initiallySelectedGradingSchemeId = undefined
@@ -62,11 +65,15 @@ export const GradingSchemesSelector = ({
   const [gradingSchemeSummaries, setGradingSchemeSummaries] = useState<
     GradingSchemeSummary[] | undefined
   >(undefined)
+  const [defaultCanvasGradingScheme, setDefaultCanvasGradingScheme] = useState<
+    GradingSchemeTemplate | undefined
+  >(undefined)
 
   const [selectedGradingSchemeId, setSelectedGradingSchemeId] = useState<string | undefined>(
     initiallySelectedGradingSchemeId
   )
   const {loadGradingSchemeSummaries /* loadGradingSchemesStatus */} = useGradingSchemeSummaries()
+  const {loadDefaultGradingScheme /* loadGradingSchemesStatus */} = useDefaultGradingScheme()
 
   useEffect(() => {
     loadGradingSchemeSummaries(contextType, contextId)
@@ -76,10 +83,20 @@ export const GradingSchemesSelector = ({
       .catch(error => {
         showFlashError(I18n.t('There was an error while loading grading schemes'))(error)
       })
+    // defaultCanvasGradingScheme
+    loadDefaultGradingScheme(contextType, contextId)
+      .then(defaultGradingScheme => {
+        setDefaultCanvasGradingScheme(defaultGradingScheme)
+      })
+      .catch(error => {
+        showFlashError(
+          I18n.t('There was an error while loading the default canvas grading scheme')
+        )(error)
+      })
     return () => {
       // this is called when the component unmounts
     }
-  }, [loadGradingSchemeSummaries, contextType, contextId])
+  }, [loadGradingSchemeSummaries, loadDefaultGradingScheme, contextType, contextId])
 
   if (gradingSchemeSummaries && selectedGradingSchemeId) {
     const matchSelect = gradingSchemeSummaries.filter(
@@ -162,7 +179,7 @@ export const GradingSchemesSelector = ({
         showFlashError(I18n.t('There was an error while refreshing grading schemes'))(error)
       })
   }
-  if (!gradingSchemeSummaries) {
+  if (!gradingSchemeSummaries || !defaultCanvasGradingScheme) {
     return (
       <>
         <Spinner renderTitle="Loading" size="x-small" />
@@ -193,7 +210,7 @@ export const GradingSchemesSelector = ({
           margin="small none small none"
           withVisualDebug={false}
         >
-          <Item shouldShrink={true} shouldGrow={true}>
+          <Flex.Item shouldShrink={true} shouldGrow={true}>
             <View as="div" withVisualDebug={false}>
               <FormField label="" id={shortid()}>
                 <select
@@ -211,19 +228,23 @@ export const GradingSchemesSelector = ({
                 </select>
               </FormField>
             </View>
-          </Item>
-          <Item>
+          </Flex.Item>
+          <Flex.Item>
             <View as="div" margin="none none none xx-small" withVisualDebug={false}>
-              <Button onClick={openGradingSchemeViewEditModal}>{I18n.t('View/Edit')}</Button>
+              <Button onClick={openGradingSchemeViewEditModal}>
+                {canManage ? I18n.t('View/Edit') : I18n.t('View')}
+              </Button>
             </View>
-          </Item>
+          </Flex.Item>
         </Flex>
 
-        <View as="div" margin="none none small none" withVisualDebug={false}>
-          <CondensedButton color="primary" onClick={openManageGradingSchemesModal}>
-            {I18n.t('Manage All Grading Schemes')}
-          </CondensedButton>
-        </View>
+        {canManage && (
+          <View as="div" margin="none none small none" withVisualDebug={false}>
+            <CondensedButton color="primary" onClick={openManageGradingSchemesModal}>
+              {I18n.t('Manage All Grading Schemes')}
+            </CondensedButton>
+          </View>
+        )}
 
         {showViewEditGradingSchemeModal ? (
           <>
@@ -235,6 +256,7 @@ export const GradingSchemesSelector = ({
                 onCancel={closeGradingSchemeViewEditModal}
                 onUpdate={handleUpdatedGradingScheme}
                 onDelete={() => handleDeletedGradingScheme(selectedGradingSchemeId)}
+                pointsBasedGradingSchemesEnabled={pointsBasedGradingSchemesEnabled}
               />
             ) : courseDefaultSchemeId && courseDefaultSchemeId !== '0' ? (
               <GradingSchemeViewEditModal
@@ -244,14 +266,16 @@ export const GradingSchemesSelector = ({
                 onCancel={closeGradingSchemeViewEditModal}
                 onUpdate={handleUpdatedGradingScheme}
                 onDelete={() => handleDeletedGradingScheme(courseDefaultSchemeId)}
+                pointsBasedGradingSchemesEnabled={pointsBasedGradingSchemesEnabled}
               />
             ) : (
               <GradingSchemeViewCopyTemplateModal
-                allowDuplication={true}
+                allowDuplication={canManage}
                 contextId={contextId}
                 contextType={contextType}
                 onCancel={closeGradingSchemeViewEditModal}
                 onCreate={handleCreatedGradingScheme}
+                pointsBasedGradingSchemesEnabled={pointsBasedGradingSchemesEnabled}
               />
             )}
           </>
@@ -281,6 +305,7 @@ export const GradingSchemesSelector = ({
                   contextId={contextId}
                   contextType={contextType}
                   onGradingSchemesChanged={handleGradingSchemesChanged}
+                  pointsBasedGradingSchemesEnabled={pointsBasedGradingSchemesEnabled}
                 />
               </>
             </Modal.Body>

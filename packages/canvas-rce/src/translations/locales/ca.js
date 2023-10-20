@@ -35,6 +35,7 @@ const locale = {
   "add_another_f4e50d57": { "message": "Afegeix-ne un altre" },
   "add_cc_subtitles_55f0394e": { "message": "Afegeix CC/subtítols" },
   "add_image_60b2de07": { "message": "Afegeix la imatge" },
+  "add_one_9e34a6f8": { "message": "Afegiu-ne una!" },
   "additional_considerations_f3801683": {
     "message": "Consideracions addicionals"
   },
@@ -234,6 +235,7 @@ const locale = {
   "crop_image_807ebb08": { "message": "Retalla la imatge" },
   "cup_product_14174434": { "message": "Producte amb tassa" },
   "current_image_f16c249c": { "message": "Imatge actual" },
+  "current_link_945a47ee": { "message": "Enllaç actual" },
   "current_volume_level_c55ab825": { "message": "Nivell de volum actual" },
   "custom_6979cd81": { "message": "Personalitzat" },
   "custom_width_and_height_pixels_946eea7c": {
@@ -596,6 +598,9 @@ const locale = {
   "light_blue_5374f600": { "message": "Blau clar" },
   "link_7262adec": { "message": "Enllaç" },
   "link_options_a16b758b": { "message": "Opcions d''enllaç" },
+  "link_type_linktypemessage_c6d26815": {
+    "message": "tipus d’enllaç: { linkTypeMessage }"
+  },
   "link_with_text_starting_with_start_b3fcbe71": {
     "message": "L’enllaç conté text que comença per { start }"
   },
@@ -658,6 +663,7 @@ const locale = {
   "minus_plus_3461f637": { "message": "Menys/més" },
   "misc_3b692ea7": { "message": "Miscel·lània" },
   "miscellaneous_e9818229": { "message": "Diversos" },
+  "module_90d9fd32": { "message": "Contingut" },
   "modules_c4325335": { "message": "Continguts" },
   "moving_image_to_crop_directionword_6f66cde2": {
     "message": "S''està movent la imatge perquè es retalli { directionWord }"
@@ -682,21 +688,51 @@ const locale = {
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navegueu pel menú o per la barra d''eines"
   },
+  "navigation_ee9af92d": { "message": "Navegació" },
   "nested_greater_than_d852e60d": {
     "message": "Estructura imbricada més gran que"
   },
   "nested_less_than_27d17e58": { "message": "Estructura imbricada inferior a" },
+  "new_quiz_34aacba6": { "message": "Prova nova" },
   "next_40e12421": { "message": "Següent" },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "No s’ha detectat cap problema d’accessibilitat."
   },
+  "no_announcements_created_yet_c44a94f4": {
+    "message": "Encara no s''ha creat cap anunci."
+  },
+  "no_announcements_found_20185afc": {
+    "message": "No s''ha trobat cap anunci."
+  },
+  "no_assignments_created_yet_1b236d87": {
+    "message": "Encara no s''ha creat cap activitat."
+  },
+  "no_assignments_found_79e46d7f": {
+    "message": "No s''ha trobat cap activitat."
+  },
   "no_changes_to_save_d29f6e91": { "message": "No hi ha cap canvi per desar." },
+  "no_discussions_created_yet_ff99abe3": {
+    "message": "Encara no s''ha creat cap fòrum."
+  },
+  "no_discussions_found_9284063b": { "message": "No s''ha trobat cap fòrum." },
   "no_e16d9132": { "message": "No" },
   "no_file_chosen_9a880793": { "message": "No s''ha triat cap fitxer" },
   "no_headers_9bc7dc7f": { "message": "No hi ha cap capçalera" },
+  "no_modules_created_yet_c71b6d4d": {
+    "message": "Encara no s''ha creat cap contingut."
+  },
+  "no_modules_found_2df43a40": { "message": "No s''ha trobat cap contingut." },
+  "no_pages_created_yet_c379fa6e": {
+    "message": "Encara no s''ha creat cap pàgina."
+  },
+  "no_pages_found_6799350": { "message": "No s''ha trobat cap pàgina." },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "No hi ha cap visualització prèvia disponible per a aquest fitxer."
   },
+  "no_quizzes_created_yet_1a2370b9": {
+    "message": "Encara no s''ha creat cap prova."
+  },
+  "no_quizzes_found_c80c537a": { "message": "No s''ha trobat cap prova." },
   "no_results_940393cf": { "message": "Sense resultats." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "No s''ha trobat cap resultat per a { filterTerm }"
@@ -903,6 +939,7 @@ const locale = {
   },
   "select_language_7c93a900": { "message": "Selecciona l''idioma" },
   "select_video_source_1b5c9dbe": { "message": "Selecciona una font de vídeo" },
+  "selected_274ce24f": { "message": "Seleccionat" },
   "selected_linkfilename_c093b1f2": {
     "message": "{ linkFileName } seleccionat"
   },
@@ -1133,6 +1170,7 @@ const locale = {
     "message": "Fletxa ascendent dreta en diagonal"
   },
   "up_c553575d": { "message": "Amunt" },
+  "updated_link_a827e441": { "message": "S’ha actualitzat l''enllaç" },
   "upload_document_253f0478": { "message": "Penja un document" },
   "upload_file_fd2361b8": { "message": "Penja el fitxer" },
   "upload_image_6120b609": { "message": "Penja una imatge" },

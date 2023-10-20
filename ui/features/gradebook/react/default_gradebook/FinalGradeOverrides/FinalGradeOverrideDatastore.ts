@@ -17,6 +17,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import useStore from '../stores'
+
 export default class FinalGradeOverrideDatastore {
   _gradesByUserId: {
     [userId: string]: {
@@ -55,6 +57,14 @@ export default class FinalGradeOverrideDatastore {
     } else {
       gradeOverrides.courseGrade = grade
     }
+
+    const {finalGradeOverrides: existingFinalGradeOverrides} = useStore.getState()
+    useStore.setState({
+      finalGradeOverrides: {
+        ...existingFinalGradeOverrides,
+        [userId]: {...gradeOverrides},
+      },
+    })
   }
 
   setGrades(gradeOverrides) {

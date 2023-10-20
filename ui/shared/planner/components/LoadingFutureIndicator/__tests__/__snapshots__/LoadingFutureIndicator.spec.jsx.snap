@@ -1,0 +1,157 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders all future items loaded regardless of other props 1`] = `
+<div>
+  <View
+    as="div"
+    borderColor="primary"
+    display="auto"
+    focusColor="info"
+    focusPosition="offset"
+    overflowX="visible"
+    overflowY="visible"
+    overscrollBehavior="auto"
+    padding="x-large"
+    position="static"
+    shouldAnimateFocus={true}
+    textAlign="center"
+    withVisualDebug={false}
+  >
+    <Text
+      as="span"
+      color="secondary"
+      letterSpacing="normal"
+      size="small"
+      wrap="normal"
+    >
+      No more items to show
+    </Text>
+  </View>
+</div>
+`;
+
+exports[`renders load more by default 1`] = `
+<div>
+  <View
+    as="div"
+    borderColor="primary"
+    display="auto"
+    focusColor="info"
+    focusPosition="offset"
+    overflowX="visible"
+    overflowY="visible"
+    overscrollBehavior="auto"
+    padding="x-large"
+    position="static"
+    shouldAnimateFocus={true}
+    textAlign="center"
+    withVisualDebug={false}
+  >
+    <Link
+      as="button"
+      color="link"
+      forceButtonRole={true}
+      iconPlacement="start"
+      isWithinText={false}
+      onClick={[Function]}
+    >
+      Load more
+    </Link>
+  </View>
+</div>
+`;
+
+exports[`renders loading when indicated 1`] = `
+<div>
+  <View
+    as="div"
+    borderColor="primary"
+    display="auto"
+    focusColor="info"
+    focusPosition="offset"
+    overflowX="visible"
+    overflowY="visible"
+    overscrollBehavior="auto"
+    padding="x-large"
+    position="static"
+    shouldAnimateFocus={true}
+    textAlign="center"
+    withVisualDebug={false}
+  >
+    <View
+      borderColor="primary"
+      display="auto"
+      focusColor="info"
+      focusPosition="offset"
+      overflowX="visible"
+      overflowY="visible"
+      overscrollBehavior="auto"
+      position="static"
+      shouldAnimateFocus={true}
+      withVisualDebug={false}
+    >
+      <Spinner
+        as="div"
+        margin="0 x-small 0 0"
+        renderTitle={[Function]}
+        size="small"
+        variant="default"
+      />
+      <Text
+        as="span"
+        color="secondary"
+        letterSpacing="normal"
+        size="small"
+        wrap="normal"
+      >
+        Loading...
+      </Text>
+    </View>
+  </View>
+</div>
+`;
+
+exports[`shows an Alert when there's a query error 1`] = `
+<div>
+  <View
+    as="div"
+    borderColor="primary"
+    display="auto"
+    focusColor="info"
+    focusPosition="offset"
+    overflowX="visible"
+    overflowY="visible"
+    overscrollBehavior="auto"
+    padding="x-large"
+    position="static"
+    shouldAnimateFocus={true}
+    textAlign="center"
+    withVisualDebug={false}
+  >
+    <div
+      style={
+        Object {
+          "margin": "0 auto",
+          "width": "50%",
+        }
+      }
+    >
+      <ErrorAlert
+        error="uh oh"
+      >
+        Error loading more items
+      </ErrorAlert>
+    </div>
+    <Link
+      as="button"
+      color="link"
+      forceButtonRole={true}
+      iconPlacement="start"
+      isWithinText={false}
+      onClick={[Function]}
+    >
+      Load more
+    </Link>
+  </View>
+</div>
+`;

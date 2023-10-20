@@ -25,6 +25,7 @@ import {
   selectContentDialog,
 } from '@canvas/select-content-dialog'
 import $ from 'jquery'
+import fakeENV from './helpers/fakeENV'
 
 let fixtures = null
 let clickEvent = {}
@@ -80,6 +81,11 @@ test('sets the iframe "data-lti-launch" attribute', function () {
 })
 
 test('close dialog when 1.1 content items are empty', () => {
+  fakeENV.setup({
+    FEATURES: {
+      lti_overwrite_user_url_input_select_content_dialog: true,
+    },
+  })
   const l = document.getElementById('test-tool')
   Events.onContextExternalToolSelect.bind(l)(clickEvent)
   const $dialog = $('#resource_selection_dialog')
@@ -154,6 +160,11 @@ test('opens a dialog with the dialog_title option', () => {
 
 QUnit.module('SelectContentDialog: deepLinkingResponseHandler', {
   setup() {
+    fakeENV.setup({
+      FEATURES: {
+        lti_overwrite_user_url_input_select_content_dialog: true,
+      },
+    })
     $('#fixtures').html(`
       <div>
         <div id='select_context_content_dialog'>
@@ -189,7 +200,12 @@ QUnit.module('SelectContentDialog: deepLinkingResponseHandler', {
     }
 
     const tool = $('#context_external_tools_select .tools .tool.selected')
-    tool.data('tool', {name: 'mytool', definition_id: 0, placements: {resource_selection: {}}})
+    tool.data('tool', {
+      name: 'mytool',
+      url: 'https://www.my-tool.com/tool-url',
+      definition_id: 0,
+      placements: {resource_selection: {}},
+    })
 
     $selectContextContentDialog.dialog(options).dialog('open')
     $resourceSelectionDialog.dialog(options).dialog('open')
@@ -219,11 +235,14 @@ const contentItem = {
   submission: {startDateTime: '2023-04-12T00:00:00.000Z', endDateTime: '2023-04-21T00:00:00.000Z'},
   text: 'Description text',
 }
-const makeDeepLinkingEvent = (additionalContentItemFields = {}) => {
+const makeDeepLinkingEvent = (additionalContentItemFields = {}, omitFields = []) => {
+  const omittedContentItem = Object.fromEntries(
+    Object.entries(contentItem).filter(([key]) => !omitFields.includes(key))
+  )
   return {
     data: {
       subject: 'LtiDeepLinkingResponse',
-      content_items: [{...contentItem, ...additionalContentItemFields}],
+      content_items: [{...omittedContentItem, ...additionalContentItemFields}],
       ltiEndpoint: 'https://canvas.instructure.com/api/lti/deep_linking',
     },
   }
@@ -249,6 +268,42 @@ test('sets the tool url without the optional title', async () => {
   equal($('#external_tool_create_url').val(), url)
 })
 
+test('sets the tool url from the tool if the url isnt included', async () => {
+  deepLinkingResponseHandler(
+    makeDeepLinkingEvent(
+      {
+        title: 'My Tool',
+      },
+      'url'
+    )
+  )
+  equal($('#external_tool_create_url').val(), 'https://www.my-tool.com/tool-url')
+})
+
+test('Overwrites the tool url if the lti_overwrite_user_url_input_select_content_dialog feature flag is set', async () => {
+  $('#external_tool_create_url').val('foo')
+  deepLinkingResponseHandler(
+    makeDeepLinkingEvent(
+      {
+        title: 'My Tool',
+      },
+      'url'
+    )
+  )
+  equal($('#external_tool_create_url').val(), 'https://www.my-tool.com/tool-url')
+})
+
+test("Doesn't overwrite the tool url if the lti_overwrite_user_url_input_select_content_dialog feature flag is not set", async () => {
+  ENV.FEATURES.lti_overwrite_user_url_input_select_content_dialog = false
+  $('#external_tool_create_url').val('foo')
+  deepLinkingResponseHandler(
+    makeDeepLinkingEvent({
+      title: 'My Tool',
+    })
+  )
+  equal($('#external_tool_create_url').val(), 'foo')
+})
+
 test('sets the tool title', async () => {
   deepLinkingResponseHandler(deepLinkingEvent)
   const {title} = deepLinkingEvent.data.content_items[0]
@@ -262,7 +317,7 @@ test('sets the tool title to the tool name if no content_item title is given', a
 
 test('does not set the tool title to the tool name if no content_item title is given with no_name_input set', async () => {
   selectContentDialog({
-    no_name_input: true
+    no_name_input: true,
   })
   deepLinkingResponseHandler(makeDeepLinkingEvent())
   equal($('#external_tool_create_title').val(), '')

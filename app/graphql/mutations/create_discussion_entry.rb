@@ -25,7 +25,7 @@ class Mutations::CreateDiscussionEntry < Mutations::BaseMutation
   argument :message, String, required: true
   argument :parent_entry_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("DiscussionEntry")
   argument :file_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Attachment")
-  argument :include_reply_preview, Boolean, required: false
+
   argument :is_anonymous_author, Boolean, required: false
   argument :quoted_entry_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("DiscussionEntry")
 
@@ -40,7 +40,6 @@ class Mutations::CreateDiscussionEntry < Mutations::BaseMutation
     if input[:parent_entry_id]
       parent_entry = topic.discussion_entries.find(input[:parent_entry_id])
       entry.parent_entry = parent_entry
-      entry.include_reply_preview = input[:include_reply_preview].present?
     end
 
     if input[:quoted_entry_id] && DiscussionEntry.find(input[:quoted_entry_id])
@@ -50,6 +49,17 @@ class Mutations::CreateDiscussionEntry < Mutations::BaseMutation
     if input[:file_id]
       attachment = Attachment.find(input[:file_id])
       raise ActiveRecord::RecordNotFound unless attachment.user == current_user
+
+      topic_context = topic.context
+      unless topic.grants_right?(@current_user, session, :attach) ||
+             (topic_context.respond_to?(:allow_student_forum_attachments) &&
+               topic_context.allow_student_forum_attachments &&
+               topic_context.grants_right?(current_user, session, :post_to_forum) &&
+               topic.available_for?(current_user)
+             )
+
+        return validation_error(I18n.t("Insufficient attach permissions"))
+      end
 
       entry.attachment = attachment
     end

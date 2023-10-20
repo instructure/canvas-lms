@@ -156,6 +156,19 @@ describe SectionsController, type: :request do
       expect(json.size).to eq @course2.course_sections.count
     end
 
+    it "returns only sections matching the search term if provided" do
+      @course1.course_sections.create!(name: "Normal Section 1")
+      @course1.course_sections.create!(name: "Normal Section 2")
+      @course1.course_sections.create!(name: "Advanced Section 1")
+      @course1.course_sections.create!(name: "Advanced Section 2")
+
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course1.id}/sections?search_term=normal",
+                      { controller: "sections", action: "index", course_id: @course1.id, search_term: "normal", format: "json" })
+      expect(json.length).to eq 2
+      expect(json.pluck("name")).to match_array(["Normal Section 1", "Normal Section 2"])
+    end
+
     it "returns permissions if specified" do
       section1 = @course1.default_section
       section2 = @course1.course_sections.create!(name: "Section 2")

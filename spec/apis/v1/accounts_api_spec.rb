@@ -332,6 +332,24 @@ describe "Accounts API", type: :request do
       expect(json[0]["lti_guid"]).to eq "hey"
     end
 
+    context "when the includes query param includes 'global_id'" do
+      it "includes the account's global ID" do
+        json = api_call(
+          :get,
+          "/api/v1/accounts?includes[]=global_id",
+          {
+            controller: "accounts",
+            action: "index",
+            format: "json",
+            includes: ["global_id"]
+          },
+          {}
+        )
+
+        expect(json[0]["global_id"]).to eq @a1.global_id
+      end
+    end
+
     it "honors deprecated includes parameter" do
       @a1.lti_guid = "hey"
       @a1.save!

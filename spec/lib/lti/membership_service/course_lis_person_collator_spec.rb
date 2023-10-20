@@ -122,7 +122,7 @@ module Lti::MembershipService
                             user_lti_id: "old_lti_id",
                             user_lti_context_id: "old_lti_context_id")
       memberships = collator.memberships
-      expect(memberships.map(&:member).map(&:user_id)).to eq([@teacher.reload.lti_context_id])
+      expect(memberships.map { |m| m.member.user_id }).to eq([@teacher.reload.lti_context_id])
     end
 
     context "course with user that has many enrollments" do
@@ -243,9 +243,7 @@ module Lti::MembershipService
 
     context "OAuth 1" do
       subject do
-        collator_one.memberships.map(&:member).map(&:user_id) +
-          collator_two.memberships.map(&:member).map(&:user_id) +
-          collator_three.memberships.map(&:member).map(&:user_id)
+        [collator_one, collator_two, collator_three].flat_map { |ms| ms.memberships.map { |m| m.member.user_id } }
       end
 
       let(:collator_one) { CourseLisPersonCollator.new(@course, @teacher, per_page: 2, page: 1) }

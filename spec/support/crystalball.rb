@@ -172,6 +172,30 @@ module Crystalball
   end
 
   class Predictor
+    module Helpers
+      module AffectedExampleGroupsDetector
+        def detect_examples(files, map)
+          # prepend CRYSTALBALL_REPO_PATH to each file in files for plugins
+          if ENV["CRYSTALBALL_REPO_PATH"]&.include?("gems/plugins")
+            files = files.map do |file|
+              if file.include?(ENV["CRYSTALBALL_REPO_PATH"][/gems.+/])
+                file
+              else
+                ENV["CRYSTALBALL_REPO_PATH"][/gems.+/] + file
+              end
+            end
+            Crystalball.log :info, "Modified Plugin Filepath: #{files}"
+          end
+
+          map.example_groups.filter_map do |uid, example_group_map|
+            uid if files.any? { |file| example_group_map.include?(file) }
+          end
+        end
+      end
+    end
+  end
+
+  class Predictor
     # Queues a total re-run if any files are added. If no new files, don't add any predictions
     # Possible git operation types for SourceDiff include: ['new', 'modified', 'moved', 'deleted]
     class ChangedFiles
@@ -179,6 +203,8 @@ module Crystalball
       include Strategy
 
       CONFIG_CHANGES = [%r{config/.*.rb$}, %r{config/feature_flags/.*yml}, /Dockerfile/, /Jenkinsfile/, %r{build/new-jenkins/}].freeze
+      GEMFILE_CHANGES = [/Gemfile.lock/].freeze
+      PLUGINS_GEMFILE_CHANGES = [%r{Gemfile.d/.*.rb}, /.*.gemspec/].freeze
 
       # @param [Crystalball::SourceDiff] diff - the diff from which to predict
       #   which specs should run
@@ -209,6 +235,14 @@ module Crystalball
             Crystalball.log :warn, "Crystalball detected ruby config/ file changes!"
             Crystalball.log :warn, "Crystalball requesting entire suite re-run"
             ["."]
+          elsif file_changes["modified"].find { |path| GEMFILE_CHANGES.any? { |gemfile_path| path =~ gemfile_path } }
+            Crystalball.log :warn, "Crystalball detected Gemfile.lock changes!"
+            Crystalball.log :warn, "Crystalball requesting entire suite re-run"
+            ["."]
+          elsif ENV["CRYSTALBALL_REPO_PATH"]&.include?("gems/plugins") && file_changes["modified"].find { |path| PLUGINS_GEMFILE_CHANGES.any? { |gemfile_path| path =~ gemfile_path } }
+            Crystalball.log :warn, "Crystalball detected Plugin Gemfile/Gemfile.lock changes!"
+            Crystalball.log :warn, "Crystalball requesting entire suite re-run"
+            ["."]
           else
             []
           end
@@ -232,6 +266,20 @@ module Crystalball
 
     private
 
+    def filter(example_groups)
+      example_groups.compact.select do |example_group|
+        # Example_group filepath is realtive to the root of the repo, so we need to chdir to the root
+        Dir.chdir("/usr/src/app") do
+          if Pathname.new(example_group.split("[").first).exist?
+            true
+          else
+            Crystalball.log :info, "Filepath does not exist, removing from prediction: #{Pathname.new(example_group.split("[").first)}"
+            false
+          end
+        end
+      end.uniq
+    end
+
     def includes_root?(prediction_list)
       prediction_list.include?(".") ||
         prediction_list.include?("./.") ||
@@ -241,7 +289,7 @@ module Crystalball
     def filter_out_specs(prediction_list)
       prediction_list.reject do |spec|
         if spec =~ %r{gems/.*spec\.rb} && spec !~ %r{gems/plugins/.*/spec_canvas/.*spec\.rb}
-          puts "Filtering out #{spec}"
+          Crystalball.log :info, "Filtering out #{spec}"
           true
         else
           false

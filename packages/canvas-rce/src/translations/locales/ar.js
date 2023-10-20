@@ -33,6 +33,7 @@ const locale = {
     "message": "إضافة شرح مكتوب لأحداث العرض/أشرطة الترجمة"
   },
   "add_image_60b2de07": { "message": "إضافة صورة" },
+  "add_one_9e34a6f8": { "message": "إضافة المزيد!" },
   "additional_considerations_f3801683": { "message": "الاعتبارات الإضافية" },
   "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
     "message": "يجب أن تكون الروابط المتجاورة بنفس عنوان URL رابطًا فرديًا."
@@ -212,6 +213,7 @@ const locale = {
   "crop_image_807ebb08": { "message": "قص صورة" },
   "cup_product_14174434": { "message": "Cup Product" },
   "current_image_f16c249c": { "message": "الصورة الحالية" },
+  "current_link_945a47ee": { "message": "الارتباط الحالي" },
   "current_volume_level_c55ab825": { "message": "مستوى الصوت الحالي" },
   "custom_6979cd81": { "message": "مخصص" },
   "custom_width_and_height_pixels_946eea7c": {
@@ -554,6 +556,9 @@ const locale = {
   "light_blue_5374f600": { "message": "أزرق فاتح" },
   "link_7262adec": { "message": "ارتباط" },
   "link_options_a16b758b": { "message": "خيارات الارتباط" },
+  "link_type_linktypemessage_c6d26815": {
+    "message": "نوع الارتباط: { linkTypeMessage }"
+  },
   "link_with_text_starting_with_start_b3fcbe71": {
     "message": "رابط بنص يبدأ بـ { start }"
   },
@@ -606,6 +611,7 @@ const locale = {
   "minus_plus_3461f637": { "message": "سالب/موجب" },
   "misc_3b692ea7": { "message": "متنوع" },
   "miscellaneous_e9818229": { "message": "متنوعات" },
+  "module_90d9fd32": { "message": "الوحدة" },
   "modules_c4325335": { "message": "الوحدات النمطية" },
   "moving_image_to_crop_directionword_6f66cde2": {
     "message": "جارٍ نقل الصورة إلى القص { directionWord }"
@@ -630,18 +636,48 @@ const locale = {
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "تنقل من خلال القائمة أو شريط الأدوات"
   },
+  "navigation_ee9af92d": { "message": "التنقل" },
   "nested_greater_than_d852e60d": { "message": "Nested Greater Than" },
   "nested_less_than_27d17e58": { "message": "Nested Less Than" },
+  "new_quiz_34aacba6": { "message": "اختبار جديد" },
   "next_40e12421": { "message": "التالي" },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "لم يتم الكشف عن مشاكل إمكانية الوصول."
   },
+  "no_announcements_created_yet_c44a94f4": {
+    "message": "لم يتم إنشاء أي إعلانات حتى الآن."
+  },
+  "no_announcements_found_20185afc": {
+    "message": "لم يتم العثور على إعلانات."
+  },
+  "no_assignments_created_yet_1b236d87": {
+    "message": "لم يتم إنشاء مهام حتى الآن."
+  },
+  "no_assignments_found_79e46d7f": { "message": "لم يتم العثور على مهام." },
   "no_changes_to_save_d29f6e91": { "message": "لا توجد تغييرات للحفظ." },
+  "no_discussions_created_yet_ff99abe3": {
+    "message": "لم يتم إنشاء نقاشات حتى الآن."
+  },
+  "no_discussions_found_9284063b": { "message": "لم يتم العثور على نقاشات." },
   "no_e16d9132": { "message": "لا" },
   "no_file_chosen_9a880793": { "message": "لم يتم اختيار ملف" },
   "no_headers_9bc7dc7f": { "message": "بلا رؤوس" },
+  "no_modules_created_yet_c71b6d4d": {
+    "message": "لم يتم إنشاء وحدات حتى الآن."
+  },
+  "no_modules_found_2df43a40": { "message": "لم يتم العثور على وحدات." },
+  "no_pages_created_yet_c379fa6e": {
+    "message": "لم يتم إنشاء صفحات حتى الآن."
+  },
+  "no_pages_found_6799350": { "message": "لم يتم العثور على صفحات." },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "لا توجد معاينة متوفرة لهذا الملف."
+  },
+  "no_quizzes_created_yet_1a2370b9": {
+    "message": "لم يتم إنشاء اختبارات موجزة حتى الآن."
+  },
+  "no_quizzes_found_c80c537a": {
+    "message": "لم يتم العثور على اختبارات موجزة."
   },
   "no_results_940393cf": { "message": "لا توجد نتائج." },
   "no_results_found_for_filterterm_ad1b04c8": {
@@ -829,6 +865,7 @@ const locale = {
   "select_crop_shape_d441feeb": { "message": "حدد قص شكل" },
   "select_language_7c93a900": { "message": "اختر اللغة" },
   "select_video_source_1b5c9dbe": { "message": "حدد مصدر الفيديو" },
+  "selected_274ce24f": { "message": "تم التحديد" },
   "selected_linkfilename_c093b1f2": { "message": "{ linkFileName } المحدد" },
   "selection_b52c4c5e": { "message": "تحديد" },
   "set_header_scope_8c548f40": { "message": "تعيين نطاق الرأس" },
@@ -1037,6 +1074,7 @@ const locale = {
     "message": "Up And Right Diagonal Arrow"
   },
   "up_c553575d": { "message": "لأعلى" },
+  "updated_link_a827e441": { "message": "الارتباط المحدث" },
   "upload_document_253f0478": { "message": "تحميل المستند" },
   "upload_file_fd2361b8": { "message": "تحميل ملف" },
   "upload_image_6120b609": { "message": "تحميل صورة" },

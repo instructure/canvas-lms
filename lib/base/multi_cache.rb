@@ -23,24 +23,23 @@ class MultiCache
     delegate :fetch, :delete, :validate_consul_event, to: :cache
 
     def cache
-      unless defined?(@multi_cache)
-        ha_cache_config = YAML.safe_load(DynamicSettings.find(tree: :private, cluster: Canvas.cluster)["ha_cache.yml"] || "{}").symbolize_keys || {}
-        @multi_cache = if ha_cache_config[:cache_store]
-                         ha_cache_config[:url] = ha_cache_config[:servers] if ha_cache_config[:servers]
-                         ActiveSupport::Cache.lookup_store(ha_cache_config[:cache_store].to_sym, ha_cache_config)
-                       else
-                         config = Canvas.cache_store_config_for(Rails.env).dup || {}
-                         # MultiCache has to have an expiration
-                         config[:expires_in] ||= 300
-                         Canvas.lookup_cache_store(config, Rails.env)
-                       end
-        @multi_cache.options.delete(:namespace) # remove the namespace that switchman added; MultiCache is global
+      unless defined?(@cache)
+        ha_cache_config = YAML.safe_load(DynamicSettings.find(tree: :private, cluster: Canvas.cluster)["ha_cache.yml", failsafe_cache: Rails.root.join("config")] || "{}").symbolize_keys || {}
+        @cache = if ha_cache_config[:cache_store]
+                   ActiveSupport::Cache.lookup_store(ha_cache_config.delete(:cache_store).to_sym, ha_cache_config.to_h.deep_symbolize_keys)
+                 else
+                   config = Canvas.cache_store_config_for(Rails.env).dup || {}
+                   # MultiCache has to have an expiration
+                   config[:expires_in] ||= 300
+                   Canvas.lookup_cache_store(config, Rails.env)
+                 end
+        @cache.options.delete(:namespace) # remove the namespace that switchman added; MultiCache is global
       end
-      @multi_cache
+      @cache
     end
 
     def reset
-      remove_instance_variable(:@multi_cache) if instance_variable_defined?(:@multi_cache)
+      remove_instance_variable(:@cache) if instance_variable_defined?(:@cache)
     end
   end
 

@@ -31,7 +31,7 @@ class CoursePacing::StudentEnrollmentPaceService < CoursePacing::PaceServiceInte
   def self.valid_context?(student_enrollment)
     course = course_for(student_enrollment)
     latest_student_enrollment = course.student_enrollments.order(created_at: :desc).find_by(user_id: student_enrollment.user_id)
-    latest_student_enrollment.id == student_enrollment.id
+    latest_student_enrollment&.id == student_enrollment.id
   end
 
   def self.template_pace_for(student_enrollment)

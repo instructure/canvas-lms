@@ -1,0 +1,14 @@
+# This is used to attribute Sentry errors, and may eventually be used
+# for code reviews.
+# See https://github.com/rubyatscale/code_ownership and config/teams/.
+
+# NB: we're skipping codeownership validation until there's broader ownership.
+# The 2 main validations are:
+# 1. Every file is owned -- this is the complicated one, and requires either mass adoption
+#    or listing many paths as `unowned_globs`
+# 2. Every file is uniquely owned -- this is fine
+skip_codeowners_validation: true
+
+js_package_paths:
+  - ui
+  - packages

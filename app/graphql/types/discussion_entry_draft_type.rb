@@ -31,7 +31,6 @@ module Types
     field :parent_id, ID, null: true
     field :root_entry_id, ID, null: true
     field :message, String, null: false
-    field :include_reply_preview, Boolean, null: false
 
     field :attachment, Types::FileType, null: true
     def attachment

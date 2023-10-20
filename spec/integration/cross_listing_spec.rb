@@ -59,7 +59,7 @@ describe "cross listing" do
         "C4,S3,active"
       )
 
-      expect(CommunicationChannel.by_path("u1@example.com").first.user.cached_currentish_enrollments.map(&:course).map(&:sis_source_id).sort).to eq %w[C1 X1 C4].sort
+      expect(CommunicationChannel.by_path("u1@example.com").first.user.cached_currentish_enrollments.map { |e| e.course.sis_source_id }.sort).to eq %w[C1 X1 C4].sort
     end
 
     it "does not give an admin inappropriate access to the original account course" do

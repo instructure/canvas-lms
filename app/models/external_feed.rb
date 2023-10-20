@@ -137,7 +137,7 @@ class ExternalFeed < ActiveRecord::Base
         url: item.link,
         uuid:
       )
-      return entry if entry.save
+      entry if entry.save
     when :atom
       uuid = item.id || Digest::SHA256.hexdigest("#{item.title}#{item.published.utc.strftime("%Y-%m-%d")}")
       entry = external_feed_entries.where(uuid:).first
@@ -177,7 +177,7 @@ class ExternalFeed < ActiveRecord::Base
         author_email: author.email,
         uuid:
       )
-      return entry if entry.save
+      entry if entry.save
     end
   end
 end

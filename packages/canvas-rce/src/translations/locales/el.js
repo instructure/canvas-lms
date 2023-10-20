@@ -21,6 +21,7 @@ import '../tinymce/el'
 
 const locale = {
   "add_8523c19b": { "message": "Πρόσθεση" },
+  "add_one_9e34a6f8": { "message": "Προσθήκη!" },
   "all_4321c3a1": { "message": "Όλα" },
   "alpha_15d59033": { "message": "Alpha" },
   "announcement_fb4cb645": { "message": "Ανακοίνωση" },
@@ -134,6 +135,9 @@ const locale = {
   "new_quiz_34aacba6": { "message": "Νέο Κουίζ" },
   "next_40e12421": { "message": "Επόμενο" },
   "no_e16d9132": { "message": "μη δημοσιευμένο" },
+  "no_pages_created_yet_c379fa6e": {
+    "message": "Δεν έχουν δημιουργηθεί σελίδες ακόμη."
+  },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "Δεν υπάρχει διαθέσιμη προεπισκόπηση για αυτό το αρχείο."
   },

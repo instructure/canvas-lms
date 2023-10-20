@@ -79,6 +79,7 @@ describe('router', () => {
             subject: 'LtiDeepLinkingResponse',
             content_items: [item],
             service_id: 123,
+            tool_id: 1234,
           },
           ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN
         )
@@ -86,6 +87,7 @@ describe('router', () => {
 
         expect(actions.externalContentReady).toHaveBeenCalledWith({
           service_id: 123,
+          tool_id: 1234,
           contentItems: [item],
         })
         expect(actions.externalContentRetrievalFailed).not.toHaveBeenCalled()

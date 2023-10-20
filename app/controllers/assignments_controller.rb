@@ -223,6 +223,24 @@ class AssignmentsController < ApplicationController
     render html: "", layout: true
   end
 
+  # Provide an easy entry point for A2 or other consumers to directly launch the LTI tool associated with
+  # an assignment, while reusing the authorization and business logic of #show.
+  # Hacky; relies on
+  #   - content_tag_redirect reads `display` directly for rendering the LTI tool
+  #   - assignments_2=false shortcircuits the A2 rendering in #show so that content_tag_redirect can be called
+  def tool_launch
+    @assignment = @context.assignments.find(params[:assignment_id])
+
+    unless @assignment.submission_types == "external_tool" && @assignment.external_tool_tag
+      flash[:error] = t "The assignment you requested is not associated with an LTI tool."
+      return redirect_to named_context_url(@context, :context_assignments_url)
+    end
+
+    params[:display] = "borderless" # render the LTI launch full screen, without any Canvas chrome
+    params[:assignments_2] = false # bypass A2 rendering to get to the call to content_tag_redirect
+    show
+  end
+
   def show
     unless request.format.html?
       return render body: "endpoint does not support #{request.format.symbol}", status: :bad_request
@@ -252,6 +270,12 @@ class AssignmentsController < ApplicationController
 
         @locked = @assignment.locked_for?(@current_user, check_policies: true, deep_check_if_needed: true)
         @unlocked = !@locked || @assignment.grants_right?(@current_user, session, :update)
+
+        if @assignment.submission_types == "external_tool" && Account.site_admin.feature_enabled?(:external_tools_for_a2) && @unlocked
+          @tool = ContextExternalTool.from_assignment(@assignment)
+
+          js_env({ LTI_TOOL: "true" })
+        end
 
         unless @assignment.new_record? || (@locked && !@locked[:can_view])
           GuardRail.activate(:primary) do
@@ -287,7 +311,10 @@ class AssignmentsController < ApplicationController
 
           student_to_view, active_enrollment = a2_active_student_and_enrollment
           if student_to_view.present?
-            js_env({ enrollment_state: active_enrollment&.state_based_on_date })
+            js_env({
+                     enrollment_state: active_enrollment&.state_based_on_date,
+                     stickers_enabled: @context.feature_enabled?(:submission_stickers)
+                   })
             rce_js_env
 
             render_a2_student_view(student: student_to_view)
@@ -298,7 +325,10 @@ class AssignmentsController < ApplicationController
           end
         end
 
-        env = js_env({ COURSE_ID: @context.id })
+        env = js_env({
+                       COURSE_ID: @context.id,
+                       ROOT_OUTCOME_GROUP: outcome_group_json(@context.root_outcome_group, @current_user, session)
+                     })
         submission = @assignment.submissions.find_by(user: @current_user)
         if submission
           js_env({ SUBMISSION_ID: submission.id })
@@ -396,12 +426,12 @@ class AssignmentsController < ApplicationController
                  EULA_URL: tool_eula_url,
                  EXTERNAL_TOOLS: external_tools_json(@external_tools, @context, @current_user, session),
                  PERMISSIONS: permissions,
-                 ROOT_OUTCOME_GROUP: outcome_group_json(@context.root_outcome_group, @current_user, session),
                  SIMILARITY_PLEDGE: @similarity_pledge,
                  CONFETTI_ENABLED: @domain_root_account&.feature_enabled?(:confetti_for_assignments),
                  EMOJIS_ENABLED: @context.feature_enabled?(:submission_comment_emojis),
                  EMOJI_DENY_LIST: @context.root_account.settings[:emoji_deny_list],
                  USER_ASSET_STRING: @current_user&.asset_string,
+                 OUTCOMES_NEW_DECAYING_AVERAGE_CALCULATION: @context.root_account.feature_enabled?(:outcomes_new_decaying_average_calculation),
                })
 
         set_master_course_js_env_data(@assignment, @context)
@@ -414,9 +444,6 @@ class AssignmentsController < ApplicationController
           visible_student_ids = @context.apply_enrollment_visibility(@context.all_student_enrollments, @current_user).pluck(:user_id)
           @current_student_submissions = @assignment.submissions.where.not(submissions: { submission_type: nil }).where(user_id: visible_student_ids).to_a
         end
-
-        # this will set @user_has_google_drive
-        user_has_google_drive
 
         @can_direct_share = @context.grants_right?(@current_user, session, :direct_share)
         @can_link_to_speed_grader = Account.site_admin.feature_enabled?(:additional_speedgrader_links) && @assignment.can_view_speed_grader?(@current_user)
@@ -466,7 +493,7 @@ class AssignmentsController < ApplicationController
 
   def downloadable_submissions?(current_user, context, assignment)
     types = %w[online_upload online_url online_text_entry]
-    return unless assignment.submission_types.split(",").intersect?(types) && current_user
+    return false unless assignment.submission_types.split(",").intersect?(types) && current_user
 
     student_ids =
       if assignment.grade_as_group?
@@ -475,41 +502,6 @@ class AssignmentsController < ApplicationController
         context.apply_enrollment_visibility(context.student_enrollments, current_user).pluck(:user_id)
       end
     student_ids.any? && assignment.submissions.where(user_id: student_ids, submission_type: types).exists?
-  end
-
-  def list_google_docs
-    assignment ||= @context.assignments.find(params[:id])
-    # prevent masquerading users from accessing google docs
-    if assignment.allow_google_docs_submission? && @real_current_user.blank?
-      docs = {}
-      status_code = :ok
-      begin
-        docs = google_drive_connection.list_with_extension_filter(assignment.allowed_extensions)
-      rescue GoogleDrive::NoTokenError,
-             Google::APIClient::AuthorizationError => e
-        Canvas::Errors.capture_exception(:oauth, e, :warn)
-        docs = { errors: { base: t("Auth failure in connecting to Google Drive.") } }
-        status_code = :unauthorized
-      rescue GoogleDrive::ConnectionException => e
-        Canvas::Errors.capture_exception(:oauth, e, :warn)
-        docs = { errors: { base: t("Unable to connect to Google Drive.") } }
-        status_code = :gateway_timeout
-      rescue ArgumentError => e
-        Canvas::Errors.capture_exception(:oauth, e)
-      rescue => e
-        Canvas::Errors.capture_exception(:oauth, e)
-        raise e
-      end
-      respond_to do |format|
-        format.json { render json: docs.to_hash, status: status_code }
-      end
-    else
-      error_object = { errors:
-        { base: t("errors.google_docs_masquerade_rejected", "Unable to connect to Google Docs as a masqueraded user.") } }
-      respond_to do |format|
-        format.json { render json: error_object, status: :bad_request }
-      end
-    end
   end
 
   def rubric
@@ -587,7 +579,9 @@ class AssignmentsController < ApplicationController
       visible_students = @context.students_visible_to(@current_user).not_fake_student
       visible_students_assigned_to_assignment = visible_students.joins(:submissions).where(submissions: { assignment: @assignment }).merge(Submission.active)
 
-      @students = visible_students_assigned_to_assignment.distinct.order_by_sortable_name
+      @students_dropdown_list = visible_students_assigned_to_assignment.distinct.order_by_sortable_name
+      @students = params[:search_term].present? ? @students_dropdown_list.name_like(params[:search_term], search_pseudonyms: false) : @students_dropdown_list
+      @students = @students.paginate(page: params[:page], per_page: 10)
       @submissions = @assignment.submissions.include_assessment_requests
     end
   end
@@ -670,7 +664,7 @@ class AssignmentsController < ApplicationController
     # if no due_at was given, set it to 11:59 pm in the creator's time zone
     @assignment.infer_times
     if authorized_action(@assignment, @current_user, :create)
-      DueDateCacher.with_executing_user(@current_user) do
+      SubmissionLifecycleManager.with_executing_user(@current_user) do
         respond_to do |format|
           if @assignment.save
             flash[:notice] = t "notices.created", "Assignment was successfully created."
@@ -763,7 +757,8 @@ class AssignmentsController < ApplicationController
         MODERATED_GRADING_MAX_GRADER_COUNT: @assignment.moderated_grading_max_grader_count,
         PERMISSIONS: {
           can_manage_groups: can_do(@context.groups.temp_record, @current_user, :create),
-          can_edit_grades: can_do(@context, @current_user, :manage_grades)
+          can_edit_grades: can_do(@context, @current_user, :manage_grades),
+          manage_grading_schemes: can_do(@context, @current_user, :manage_grades)
         },
         PLAGIARISM_DETECTION_PLATFORM: Lti::ToolProxy.capability_enabled_in_context?(
           @assignment.course,
@@ -777,7 +772,11 @@ class AssignmentsController < ApplicationController
         HIDE_ZERO_POINT_QUIZZES_OPTION_ENABLED:
           Account.site_admin.feature_enabled?(:hide_zero_point_quizzes_option),
         GRADING_SCHEME_UPDATES_ENABLED:
-          Account.site_admin.feature_enabled?(:grading_scheme_updates)
+          Account.site_admin.feature_enabled?(:grading_scheme_updates),
+        POINTS_BASED_GRADING_SCHEMES_ENABLED:
+          Account.site_admin.feature_enabled?(:points_based_grading_schemes),
+        OUTCOMES_NEW_DECAYING_AVERAGE_CALCULATION:
+          @context.root_account.feature_enabled?(:outcomes_new_decaying_average_calculation)
       }
 
       add_crumb(@assignment.title, polymorphic_url([@context, @assignment])) unless @assignment.new_record?
@@ -811,6 +810,7 @@ class AssignmentsController < ApplicationController
       hash[:ANONYMOUS_GRADING_ENABLED] = @context.feature_enabled?(:anonymous_marking)
       hash[:MODERATED_GRADING_ENABLED] = @context.feature_enabled?(:moderated_grading)
       hash[:ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED] = @context.feature_enabled?(:anonymous_instructor_annotations)
+      hash[:NEW_QUIZZES_ANONYMOUS_GRADING_ENABLED] = Account.site_admin.feature_enabled?(:anonymous_grading_with_new_quizzes)
       hash[:SUBMISSION_TYPE_SELECTION_TOOLS] = external_tools_display_hashes(:submission_type_selection,
                                                                              @context,
                                                                              %i[base_title external_url selection_width selection_height])
@@ -821,7 +821,7 @@ class AssignmentsController < ApplicationController
         hash[:group_user_type] = "student"
 
         if Account.site_admin.feature_enabled?(:grading_scheme_updates)
-          hash[:COURSE_DEFAULT_GRADING_SCHEME_ID] = context.grading_standard_id
+          hash[:COURSE_DEFAULT_GRADING_SCHEME_ID] = context.grading_standard_id || context.default_grading_standard&.id
         end
       end
 
@@ -878,7 +878,7 @@ class AssignmentsController < ApplicationController
     if authorized_action(@assignment, @current_user, :delete)
       return render_unauthorized_action if editing_restricted?(@assignment)
 
-      DueDateCacher.with_executing_user(@current_user) do
+      SubmissionLifecycleManager.with_executing_user(@current_user) do
         @assignment.destroy
       end
 

@@ -17,7 +17,6 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import $ from 'jquery'
 import fcUtil from '../fcUtil'
 import semanticDateRange from '@canvas/datetime/semanticDateRange'
 import CommonEvent from './CommonEvent'
@@ -25,6 +24,7 @@ import natcompare from '@canvas/util/natcompare'
 import {extend} from '@canvas/util/legacyCoffeesScriptHelpers'
 import '@canvas/datetime'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
+import replaceTags from '@canvas/util/replaceTags'
 
 const I18n = useI18nScope('calendar')
 
@@ -77,6 +77,7 @@ Object.assign(CalendarEvent.prototype, {
     }
     this.webConference = data.web_conference
     this.important_dates = data.important_dates
+    this.series_head = data.series_head
     this.series_natural_language = data.series_natural_language
     this.blackout_date = data.blackout_date
     return CalendarEvent.__super__.copyDataFromObject.apply(this, arguments)
@@ -102,7 +103,7 @@ Object.assign(CalendarEvent.prototype, {
     if (this.isAppointmentGroupEvent()) {
       return `/appointment_groups/${this.object.appointment_group_id}`
     } else {
-      return $.replaceTags(
+      return replaceTags(
         this.contextInfo.calendar_event_url,
         'id',
         this.calendarEvent.parent_event_id || this.calendarEvent.id

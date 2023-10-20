@@ -471,7 +471,7 @@ class Quizzes::QuizQuestionsController < ApplicationController
     answers = answers.values if answers.is_a?(Hash)
     answers&.each do |answer|
       %i[answer_html answer_comment_html].each do |key|
-        answer[key] = process_incoming_html_content(answer[key]) if answer[key]&.present?
+        answer[key] = process_incoming_html_content(answer[key]) if answer[key].present?
       end
     end
   end

@@ -20,7 +20,7 @@
 
 module Importers
   describe AttachmentImporter do
-    describe "#process_migration", no_retry: true do
+    describe "#process_migration", :no_retry do
       let(:course) { ::Course.new }
       let(:course_id) { 1 }
       let(:migration) { ContentMigration.new(context: course) }

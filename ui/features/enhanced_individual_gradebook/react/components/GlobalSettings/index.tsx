@@ -20,21 +20,23 @@ import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {
+  CustomColumn,
   GradebookOptions,
   GradebookSortOrder,
   HandleCheckboxChange,
   SectionConnection,
+  TeacherNotes,
 } from '../../../types'
 import {Link} from '@instructure/ui-link'
 import {Button} from '@instructure/ui-buttons'
 import GradebookScoreExport from './GradebookScoreExport'
-// @ts-expect-error -- TODO: remove once we're on InstUI 8
 import {IconUploadLine} from '@instructure/ui-icons'
 import IncludeUngradedAssignmentsCheckbox from './IncludeUngradedAssignmentsCheckbox'
 import HideStudentNamesCheckbox from './HideStudentNamesCheckbox'
 import ShowConcludedEnrollmentsCheckbox from './ShowConcludedEnrollmentsCheckbox'
 import ShowNotesColumnCheckbox from './ShowNotesColumnCheckbox'
 import ShowTotalGradesAsPointsCheckbox from './ShowTotalGradeAsPointsCheckbox'
+import AllowFinalGradeOverrideCheckbox from './AllowFinalGradeOverrideCheckbox'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
@@ -51,18 +53,24 @@ const assignmentSortOptions: DropDownOption<GradebookSortOrder>[] = [
 
 type Props = {
   sections: SectionConnection[]
+  customColumns?: CustomColumn[] | null
   gradebookOptions: GradebookOptions
   onSortChange: (sortType: GradebookSortOrder) => void
   onSectionChange: (sectionId?: string) => void
+  onGradingPeriodChange: (gradingPeriodId?: string) => void
   handleCheckboxChange: HandleCheckboxChange
+  onTeacherNotesCreation: (teacherNotes: TeacherNotes) => void
 }
 
 export default function GlobalSettings({
   sections,
+  customColumns,
   gradebookOptions,
+  onGradingPeriodChange,
   onSortChange,
   onSectionChange,
   handleCheckboxChange,
+  onTeacherNotesCreation,
 }: Props) {
   const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const sortType = event.target.value as GradebookSortOrder
@@ -75,6 +83,13 @@ export default function GlobalSettings({
     onSectionChange(sectionId)
   }
 
+  const handleGradePeriodChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const index = event.target.selectedIndex
+    const gradingPeriodId = index !== 0 ? event.target.value : undefined
+    onGradingPeriodChange(gradingPeriodId)
+  }
+
+  const {gradingPeriodSet, sortOrder: defaultSortOrder, selectedGradingPeriodId} = gradebookOptions
   return (
     <>
       <View as="div" className="row-fluid">
@@ -83,7 +98,7 @@ export default function GlobalSettings({
         </View>
       </View>
 
-      <View as="div" className="row-fluid">
+      <View as="div" className="row-fluid" data-testid="section-select">
         <View as="div" className="span4">
           <label htmlFor="section_select" style={{textAlign: 'right', display: 'block'}}>
             {I18n.t('Select a section')}
@@ -101,6 +116,32 @@ export default function GlobalSettings({
         </View>
       </View>
 
+      {gradingPeriodSet && (
+        <View as="div" className="row-fluid">
+          <View as="div" className="span4">
+            <label htmlFor="section_select" style={{textAlign: 'right', display: 'block'}}>
+              {I18n.t('Select a Grading Period')}
+            </label>
+          </View>
+          <View as="div" className="span8">
+            <select
+              id="grading_period_select"
+              data-testid="grading-period-select"
+              className="section_select"
+              onChange={handleGradePeriodChange}
+              defaultValue={selectedGradingPeriodId}
+            >
+              <option>{I18n.t('All Grading Periods')}</option>
+              {gradingPeriodSet.grading_periods.map(gradingPeriod => (
+                <option key={gradingPeriod.id} value={gradingPeriod.id}>
+                  {gradingPeriod.title}
+                </option>
+              ))}
+            </select>
+          </View>
+        </View>
+      )}
+
       <div className="row-fluid" style={{paddingBottom: 20}}>
         <View as="div" className="span4">
           <label htmlFor="sort_select" style={{textAlign: 'right', display: 'block'}}>
@@ -110,8 +151,9 @@ export default function GlobalSettings({
         <View as="div" className="span8">
           <select
             id="sort_select"
+            data-testid="sort-select"
             className="section_select"
-            defaultValue={gradebookOptions.sortOrder}
+            defaultValue={defaultSortOrder}
             onChange={handleSortChange}
           >
             {assignmentSortOptions.map(option => (
@@ -148,44 +190,30 @@ export default function GlobalSettings({
 
           <ShowNotesColumnCheckbox
             teacherNotes={gradebookOptions.teacherNotes}
+            customColumns={customColumns}
             customColumnUrl={gradebookOptions.customColumnUrl}
             customColumnsUrl={gradebookOptions.customColumnsUrl}
+            reorderCustomColumnsUrl={gradebookOptions.reorderCustomColumnsUrl}
             handleCheckboxChange={handleCheckboxChange}
             showNotesColumn={gradebookOptions.customOptions.showNotesColumn}
+            onTeacherNotesCreation={onTeacherNotesCreation}
           />
-          {/* {{#if finalGradeOverrideEnabled}}
-            <View as="div" className="checkbox">
-              <label className="checkbox">
-              {{
-                input
-                type="checkbox"
-                id="allow_final_grade_override"
-                name="allow_final_grade_override"
-                checked=allowFinalGradeOverride
-              }}
-              {{#t}}Allow Final Grade Override{{/t}}
-              </label>
-            </View>
-          {{/if}} */}
-          {/* {{#unless gradesAreWeighted}}
-            <View as="div" className="checkbox">
-              <label className="checkbox">
-              {{
-                input
-                type="checkbox"
-                id="show_total_as_points"
-                name="show_total_as_points"
-                checked=showTotalAsPoints
-              }}
-              {{#t "show_total_as_points"}}Show Totals as Points on Student Grade Page{{/t}}
-              </label>
-            </View>
-          {{/unless}} */}
-          <ShowTotalGradesAsPointsCheckbox
-            settingUpdateUrl={gradebookOptions.settingUpdateUrl}
-            showTotalGradeAsPoints={gradebookOptions.customOptions.showTotalGradeAsPoints}
-            handleCheckboxChange={handleCheckboxChange}
-          />
+
+          {gradebookOptions.finalGradeOverrideEnabled && (
+            <AllowFinalGradeOverrideCheckbox
+              contextId={gradebookOptions.contextId}
+              allowFinalGradeOverride={gradebookOptions.customOptions.allowFinalGradeOverride}
+              handleCheckboxChange={handleCheckboxChange}
+            />
+          )}
+
+          {!gradebookOptions.gradesAreWeighted && (
+            <ShowTotalGradesAsPointsCheckbox
+              settingUpdateUrl={gradebookOptions.settingUpdateUrl}
+              showTotalGradeAsPoints={gradebookOptions.customOptions.showTotalGradeAsPoints}
+              handleCheckboxChange={handleCheckboxChange}
+            />
+          )}
         </View>
       </View>
 
@@ -203,6 +231,7 @@ export default function GlobalSettings({
 
           <View as="div" className="pad-box bottom-only">
             <Button
+              data-testid="upload-button"
               href={`${gradebookOptions.contextUrl}/gradebook_upload/new`}
               color="secondary"
               renderIcon={IconUploadLine}
@@ -214,14 +243,19 @@ export default function GlobalSettings({
 
           <View as="div" className="pad-box bottom-only">
             <View as="div">
-              {/* {{#if publishToSisEnabled}}
-                <a href="{{ unbound publishToSisURL }}">
-                  {{#t}}Sync grades to SIS{{/t}}
-                </a>
-              {{/if}} */}
+              {gradebookOptions.publishToSisEnabled && gradebookOptions.publishToSisUrl && (
+                <Link href={gradebookOptions.publishToSisUrl} isWithinText={false}>
+                  {I18n.t('Sync grades to SIS')}
+                </Link>
+              )}
             </View>
+
             <View as="div">
-              <Link href={`${gradebookOptions.contextUrl}/gradebook/history`} isWithinText={false}>
+              <Link
+                href={`${gradebookOptions.contextUrl}/gradebook/history`}
+                isWithinText={false}
+                data-testid="gradebook-history-link"
+              >
                 {I18n.t('View Gradebook History')}
               </Link>
             </View>

@@ -53,22 +53,17 @@ export default function processEditorContentItems(
 
       if (parsedItem != null) {
         env.insertCode(parsedItem.toHtmlString())
-      } else {
-        // eslint-disable-next-line no-console
-        console.warn('Unsupported LTI 1.3 Content Item: ', inputItem)
+      } else if (!unsupportedItemWarningShown) {
+        showFlashAlert({
+          message: formatMessage(
+            'Could not insert content: "{itemType}" items are not currently supported in Canvas.',
+            {itemType: inputItem.type ?? 'unknown'}
+          ),
+          type: 'warning',
+          err: null,
+        })
 
-        if (!unsupportedItemWarningShown) {
-          showFlashAlert({
-            message: formatMessage(
-              'Could not insert content: "{itemType}" items are not currently supported in Canvas.',
-              {itemType: inputItem.type ?? 'unknown'}
-            ),
-            type: 'warning',
-            err: null,
-          })
-
-          unsupportedItemWarningShown = true
-        }
+        unsupportedItemWarningShown = true
       }
     }
 

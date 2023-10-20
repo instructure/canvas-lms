@@ -135,7 +135,7 @@ describe ActiveRecord::Base do
       include_examples "batches"
 
       it "raises an error when not in a transaction" do
-        expect { User.all.find_in_batches(strategy: :temp_table) { nil } }.to raise_error(ArgumentError)
+        expect { User.find_in_batches(strategy: :temp_table) { nil } }.to raise_error(ArgumentError)
       end
 
       it "finds all enrollments from course join" do

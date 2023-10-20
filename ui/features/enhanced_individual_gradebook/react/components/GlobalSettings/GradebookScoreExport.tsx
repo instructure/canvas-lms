@@ -17,13 +17,12 @@
  */
 
 import React, {useState, useRef, useEffect} from 'react'
+import type {ProgressData} from '@canvas/grading/grading.d'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {ApiCallStatus} from '../../../types'
 import {Link} from '@instructure/ui-link'
 import {Button} from '@instructure/ui-buttons'
-import {ProgressData} from '../../../../gradebook/react/default_gradebook/gradebook.d'
-// @ts-expect-error -- TODO: remove once we're on InstUI 8
 import {IconDownloadLine} from '@instructure/ui-icons'
 import DateHelper from '@canvas/datetime/dateHelper'
 import {useExportGradebook} from '../../hooks/useExportGradebook'
@@ -81,6 +80,7 @@ export default function GradebookScoreExport({
   return (
     <View as="div" className="pad-box bottom-only">
       <Button
+        data-testid="gradebook-export-button"
         color="secondary"
         renderIcon={IconDownloadLine}
         id="gradebook-export"
@@ -94,10 +94,15 @@ export default function GradebookScoreExport({
         lastGeneratedCsvLinkText &&
         gradebookCsvProgress && (
           <Link
-            elementRef={e => (linkRef.current = e)}
+            elementRef={e => {
+              if (e instanceof HTMLAnchorElement) {
+                linkRef.current = e
+              }
+            }}
             href={lastGeneratedCsvLink}
             isWithinText={false}
             margin="0 xx-small"
+            data-testid="gradebook-export-link"
           >
             {downloadText(lastGeneratedCsvLinkText)}
           </Link>

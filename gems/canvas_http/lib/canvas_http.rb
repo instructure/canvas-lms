@@ -54,28 +54,28 @@ module CanvasHttp
 
   class ResponseTooLargeError < CanvasHttp::Error; end
 
-  def self.put(*args, **kwargs, &)
-    CanvasHttp.request(Net::HTTP::Put, *args, **kwargs, &)
+  def self.put(...)
+    CanvasHttp.request(Net::HTTP::Put, ...)
   end
 
-  def self.delete(*args, **kwargs, &)
-    CanvasHttp.request(Net::HTTP::Delete, *args, **kwargs, &)
+  def self.delete(...)
+    CanvasHttp.request(Net::HTTP::Delete, ...)
   end
 
-  def self.head(*args, **kwargs, &)
-    CanvasHttp.request(Net::HTTP::Head, *args, **kwargs, &)
+  def self.head(...)
+    CanvasHttp.request(Net::HTTP::Head, ...)
   end
 
-  def self.get(*args, **kwargs, &)
-    CanvasHttp.request(Net::HTTP::Get, *args, **kwargs, &)
+  def self.get(...)
+    CanvasHttp.request(Net::HTTP::Get, ...)
   end
 
-  def self.post(*args, **kwargs, &)
-    CanvasHttp.request(Net::HTTP::Post, *args, **kwargs, &)
+  def self.post(...)
+    CanvasHttp.request(Net::HTTP::Post, ...)
   end
 
-  def self.patch(*args, **kwargs, &)
-    CanvasHttp.request(Net::HTTP::Patch, *args, **kwargs, &)
+  def self.patch(...)
+    CanvasHttp.request(Net::HTTP::Patch, ...)
   end
 
   # Use this helper method to do HTTP GET requests. It knows how to handle
@@ -186,10 +186,10 @@ module CanvasHttp
   def self.add_form_data(request, form_data, multipart:, streaming:)
     if multipart
       if streaming
-        request.body_stream, header = Multipart::Post.new.prepare_query_stream(form_data)
+        request.body_stream, header = LegacyMultipart::Post.prepare_query_stream(form_data)
         request.content_length = request.body_stream.size
       else
-        request.body, header = Multipart::Post.new.prepare_query(form_data)
+        request.body, header = LegacyMultipart::Post.prepare_query(form_data)
       end
       request.content_type = header["Content-type"]
     elsif form_data.is_a?(String)
@@ -235,7 +235,7 @@ module CanvasHttp
   end
 
   def self.insecure_host?(host)
-    return unless (filters = blocked_ip_filters)
+    return false unless (filters = blocked_ip_filters)
 
     resolved_addrs = Resolv.getaddresses(host)
     unless resolved_addrs.any?

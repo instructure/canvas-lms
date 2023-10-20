@@ -722,6 +722,8 @@ describe "Jobs V2 API", type: :request do
     end
 
     describe "unstuck" do
+      specs_require_sharding
+
       it "queues a job to run the unstucker" do
         json = api_call(:put,
                         "/api/v1/jobs2/unstuck",

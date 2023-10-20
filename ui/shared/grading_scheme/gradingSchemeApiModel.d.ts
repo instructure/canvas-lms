@@ -15,9 +15,14 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+import {GradingSchemeDataRow} from '@instructure/grading-utils'
+
 export interface GradingSchemeTemplate {
   title: string
   data: GradingSchemeDataRow[]
+  scaling_factor: number
+  points_based: boolean
 }
 
 export interface GradingScheme {
@@ -29,17 +34,16 @@ export interface GradingScheme {
   context_name: string
   permissions: {manage: boolean}
   assessed_assignment: boolean
+  scaling_factor: number
+  points_based: boolean
 }
 
 export interface GradingSchemeUpdateRequest {
   id: string
   title: string
   data: GradingSchemeDataRow[]
-}
-
-export interface GradingSchemeDataRow {
-  name: string
-  value: number
+  scaling_factor: number
+  points_based: boolean
 }
 
 export interface GradingSchemeSummary {

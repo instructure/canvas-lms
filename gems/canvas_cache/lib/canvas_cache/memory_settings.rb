@@ -30,8 +30,4 @@ class MemorySettings
   def set(key, value)
     @settings[key] = value
   end
-
-  def skip_cache
-    yield
-  end
 end

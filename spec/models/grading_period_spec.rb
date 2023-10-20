@@ -231,7 +231,7 @@ describe GradingPeriod do
       it "is invalid if the close date is before the end date" do
         period_params = params.merge(close_date: 1.day.ago(params[:end_date]))
         grading_period = grading_period_group.grading_periods.build(period_params)
-        expect(grading_period).to be_invalid
+        expect(grading_period).not_to be_valid
       end
 
       it "considers the grading period valid if the close date is equal to the end date" do
@@ -391,27 +391,27 @@ describe GradingPeriod do
       grading_period.destroy
     end
 
-    it "runs DueDateCacher for courses from the same enrollment term when the grading period is deleted" do
+    it "runs SubmissionLifecycleManager for courses from the same enrollment term when the grading period is deleted" do
       course2 = account.courses.create!
       course2.enrollment_term = account.enrollment_terms.create!
       course2.save!
       student_in_course(course: course2)
       a = course2.assignments.create!
       a.submissions.find_by(user_id: @student).update(grading_period_id: grading_period.id)
-      expect(DueDateCacher).to receive(:recompute_course).with(course, any_args)
-      expect(DueDateCacher).not_to receive(:recompute_course).with(course2, any_args)
+      expect(SubmissionLifecycleManager).to receive(:recompute_course).with(course, any_args)
+      expect(SubmissionLifecycleManager).not_to receive(:recompute_course).with(course2, any_args)
       grading_period.destroy
     end
 
-    it "runs DueDateCacher for courses from the same enrollment term when the grading period set is deleted" do
+    it "runs SubmissionLifecycleManager for courses from the same enrollment term when the grading period set is deleted" do
       course2 = account.courses.create!
       course2.enrollment_term = account.enrollment_terms.create!
       course2.save!
       student_in_course(course: course2)
       a = course2.assignments.create!
       a.submissions.find_by(user_id: @student).update(grading_period_id: grading_period.id)
-      expect(DueDateCacher).to receive(:recompute_course).with(course, any_args)
-      expect(DueDateCacher).not_to receive(:recompute_course).with(course2, any_args)
+      expect(SubmissionLifecycleManager).to receive(:recompute_course).with(course, any_args)
+      expect(SubmissionLifecycleManager).not_to receive(:recompute_course).with(course2, any_args)
       grading_period_group.destroy
     end
 

@@ -160,6 +160,7 @@ export const rceWrapperPropTypes = {
   features: PropTypes.objectOf(PropTypes.bool),
   flashAlertTimeout: PropTypes.number,
   timezone: PropTypes.string,
+  userCacheKey: PropTypes.string,
   externalToolsConfig: externalToolsConfigPropType,
 }
 

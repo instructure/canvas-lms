@@ -19,7 +19,7 @@
 
 require_relative "../common"
 require_relative "../helpers/assignment_overrides"
-require_relative "./page_objects/assignment_page"
+require_relative "page_objects/assignment_page"
 
 describe "assignment groups" do
   include AssignmentOverridesSeleniumHelper
@@ -88,8 +88,7 @@ describe "assignment groups" do
     end
 
     it "allows setting overrides", priority: "1" do
-      allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(true)
-      allow(ConditionalRelease::Service).to receive(:jwt_for).and_return(:jwt)
+      allow(ConditionalRelease::Service).to receive_messages(enabled_in_context?: true, jwt_for: :jwt)
 
       default_section = @course.course_sections.first
       other_section = @course.course_sections.create!(name: "other section")
@@ -223,6 +222,15 @@ describe "assignment groups" do
           expect(f("#content")).not_to contain_css("table.assignment_dates")
         end
 
+        it "does not show the course pacing notice when feature flag is off" do
+          @course.account.disable_feature!(:course_paces)
+          assignment = create_assignment!
+          assignment.context_module_tags.create! context_module: @context_module, context: @course, tag_type: "context_module"
+          get "/courses/#{@course.id}/assignments/#{assignment.id}"
+          expect(element_exists?(AssignmentPage.course_pacing_notice_selector)).to be_falsey
+          expect(f("#content")).to contain_css("table.assignment_dates")
+        end
+
         it "does not show the course pacing notice for a non-moduled assignment" do
           assignment = create_assignment!
           get "/courses/#{@course.id}/assignments/#{assignment.id}"
@@ -238,6 +246,15 @@ describe "assignment groups" do
           get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
           expect(AssignmentPage.course_pacing_notice).to be_displayed
           expect(f("#content")).not_to contain_css(".ContainerDueDate")
+        end
+
+        it "does not show the course pacing notice for a module item assignment when feature flag is off" do
+          @course.account.disable_feature!(:course_paces)
+          assignment = create_assignment!
+          assignment.context_module_tags.create! context_module: @context_module, context: @course, tag_type: "context_module"
+          get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
+          expect(element_exists?(AssignmentPage.course_pacing_notice_selector)).to be_falsey
+          expect(f("#content")).to contain_css(".ContainerDueDate")
         end
 
         it "does not show the course pacing notice for a non-moduled assignment" do

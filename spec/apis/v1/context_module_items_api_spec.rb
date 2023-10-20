@@ -664,6 +664,55 @@ describe "Module Items API", type: :request do
         expect(tags.map(&:position)).to eq [1, 4, 5, 6]
       end
 
+      it "inserts into correct position if created out of order" do
+        new_module = @course.context_modules.create!(name: "module1")
+        tags = new_module.content_tags
+
+        json3 = api_call(:post,
+                         "/api/v1/courses/#{@course.id}/modules/#{new_module.id}/items",
+                         { controller: "context_module_items_api",
+                           action: "create",
+                           format: "json",
+                           course_id: @course.id.to_s,
+                           module_id: new_module.id.to_s },
+                         { module_item: { title: "title",
+                                          type: "ExternalUrl",
+                                          url: "http://example.com",
+                                          position: 3 } })
+        api_call(:post,
+                 "/api/v1/courses/#{@course.id}/modules/#{new_module.id}/items",
+                 { controller: "context_module_items_api",
+                   action: "create",
+                   format: "json",
+                   course_id: @course.id.to_s,
+                   module_id: new_module.id.to_s },
+                 { module_item: { title: "title",
+                                  type: "ExternalUrl",
+                                  url: "http://example.com",
+                                  position: 1 } })
+
+        api_call(:post,
+                 "/api/v1/courses/#{@course.id}/modules/#{new_module.id}/items",
+                 { controller: "context_module_items_api",
+                   action: "create",
+                   format: "json",
+                   course_id: @course.id.to_s,
+                   module_id: new_module.id.to_s },
+                 { module_item: { title: "title",
+                                  type: "ExternalUrl",
+                                  url: "http://example.com",
+                                  position: 2 } })
+
+        expect(json3["position"]).to eq 3
+
+        tag = new_module.content_tags.where(id: json3["id"]).first
+        expect(tag).not_to be_nil
+        expect(tag.position).to eq 3
+
+        tags.each(&:reload)
+        expect(tags.map(&:position)).to eq [1, 2, 3]
+      end
+
       context "set_completion_requirement" do
         it "sets completion requirement on assignment to min_score" do
           assignment = @course.assignments.create!(name: "pls submit", submission_types: ["online_text_entry"])

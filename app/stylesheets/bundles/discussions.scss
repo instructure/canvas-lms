@@ -360,12 +360,6 @@ $discussion-dark-text: $ic-color-dark;
   padding-bottom: 1em;
 }
 
-.entry {
-  .cancel_button {
-  @include fontSize(11px);
-  }
-}
-
 .discussion-header-content {
   padding-top: 5px;
 

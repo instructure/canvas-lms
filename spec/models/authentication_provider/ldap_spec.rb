@@ -155,11 +155,11 @@ describe AuthenticationProvider::LDAP do
       before do
         @ldap = double
         allow(@ldap).to receive(:base)
-        allow(@aac).to receive(:ldap_connection).and_return(@ldap)
-        allow(@aac).to receive(:ldap_filter).and_return(nil)
-        allow(@aac).to receive(:account_id).and_return(1)
-        allow(@aac).to receive(:global_id).and_return(2)
-        allow(@aac).to receive(:should_send_to_statsd?).and_return(true)
+        allow(@aac).to receive_messages(ldap_connection: @ldap,
+                                        ldap_filter: nil,
+                                        account_id: 1,
+                                        global_id: 2,
+                                        should_send_to_statsd?: true)
         allow(InstStatsd::Statsd).to receive(:increment)
       end
 

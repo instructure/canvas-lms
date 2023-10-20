@@ -176,6 +176,30 @@ module Lti
 
         it { is_expected.to be false }
       end
+
+      context "when oidc_initiation_urls is not an hash" do
+        let(:settings) { super().tap { |s| s["oidc_initiation_urls"] = ["https://test.com"] } }
+
+        before { tool_configuration.developer_key = developer_key }
+
+        it { is_expected.to be false }
+      end
+
+      context "when oidc_initiation_urls values are not urls" do
+        let(:settings) { super().tap { |s| s["oidc_initiation_urls"] = { "us-east-1" => "@?!" } } }
+
+        before { tool_configuration.developer_key = developer_key }
+
+        it { is_expected.to be false }
+      end
+
+      context "when oidc_initiation_urls values are urls" do
+        let(:settings) { super().tap { |s| s["oidc_initiation_urls"] = { "us-east-1" => "http://example.com" } } }
+
+        before { tool_configuration.developer_key = developer_key }
+
+        it { is_expected.to be true }
+      end
     end
 
     describe "after_update" do
@@ -394,6 +418,26 @@ module Lti
             end
           end
         end
+
+        context "when the configuration has oidc_initiation_urls" do
+          let(:oidc_initiation_urls) do
+            {
+              "us-east-1" => "http://www.example.com/initiate",
+              "us-west-1" => "http://www.example.com/initiate2"
+            }
+          end
+
+          before do
+            tool_configuration.settings["oidc_initiation_urls"] = oidc_initiation_urls
+            tool_configuration.save!
+          end
+
+          subject { tool_configuration.new_external_tool(context) }
+
+          it "includes the oidc_initiation_urls in the new tool settings" do
+            expect(subject.settings["oidc_initiation_urls"]).to eq oidc_initiation_urls
+          end
+        end
       end
 
       context "when context is a course" do
@@ -511,8 +555,7 @@ module Lti
 
           context 'when the response is "not found"' do
             before do
-              allow(stubbed_response).to receive(:message).and_return("Not found")
-              allow(stubbed_response).to receive(:code).and_return("404")
+              allow(stubbed_response).to receive_messages(message: "Not found", code: "404")
             end
 
             it 'adds a "not found error to the model' do
@@ -522,8 +565,7 @@ module Lti
 
           context 'when the response is "unauthorized"' do
             before do
-              allow(stubbed_response).to receive(:message).and_return("Unauthorized")
-              allow(stubbed_response).to receive(:code).and_return("401")
+              allow(stubbed_response).to receive_messages(message: "Unauthorized", code: "401")
             end
 
             it 'adds a "unauthorized error to the model' do
@@ -533,8 +575,7 @@ module Lti
 
           context 'when the response is "internal server error"' do
             before do
-              allow(stubbed_response).to receive(:message).and_return("Internal server error")
-              allow(stubbed_response).to receive(:code).and_return("500")
+              allow(stubbed_response).to receive_messages(message: "Internal server error", code: "500")
             end
 
             it 'adds a "internal server error to the model' do

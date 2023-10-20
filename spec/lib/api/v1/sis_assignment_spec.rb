@@ -39,11 +39,9 @@ describe Api::V1::SisAssignment do
     end
 
     let(:assignment_overrides) do
-      allow(assignment_override_1).to receive(:set_type).and_return("CourseSection")
-      allow(assignment_override_1).to receive(:set_id).and_return(1)
+      allow(assignment_override_1).to receive_messages(set_type: "CourseSection", set_id: 1)
 
-      allow(assignment_override_2).to receive(:set_type).and_return("CourseSection")
-      allow(assignment_override_2).to receive(:set_id).and_return(2)
+      allow(assignment_override_2).to receive_messages(set_type: "CourseSection", set_id: 2)
 
       [
         assignment_override_1,
@@ -66,22 +64,26 @@ describe Api::V1::SisAssignment do
     before do
       allow(assignment_1).to receive(:locked_for?).and_return(false)
 
-      allow(assignment_overrides).to receive(:loaded?).and_return(true)
-      allow(assignment_overrides).to receive(:unlock_at).and_return(15.days.ago)
-      allow(assignment_overrides).to receive(:lock_at).and_return(2.days.from_now)
+      allow(assignment_overrides).to receive_messages(
+        loaded?: true,
+        unlock_at: 15.days.ago,
+        lock_at: 2.days.from_now
+      )
 
       allow(course_section_1).to receive(:id).and_return(1)
       allow(course_section_2).to receive(:id).and_return(2)
       allow(course_section_3).to receive(:id).and_return(3)
 
       course_sections.each do |course_section|
-        allow(course_section).to receive(:nonxlist_course).and_return(course_1)
-        allow(course_section).to receive(:crosslisted?).and_return(false)
+        allow(course_section).to receive_messages(nonxlist_course: course_1,
+                                                  crosslisted?: false)
       end
 
-      allow(course_sections).to receive(:loaded?).and_return(true)
-      allow(course_sections).to receive(:active_course_sections).and_return(course_sections)
-      allow(course_sections).to receive(:association).and_return(OpenStruct.new(loaded?: true))
+      allow(course_sections).to receive_messages(
+        loaded?: true,
+        active_course_sections: course_sections,
+        association: OpenStruct.new(loaded?: true)
+      )
     end
 
     it "creates assignment groups that have name and integration_data with proper data" do

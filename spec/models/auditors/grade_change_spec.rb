@@ -40,8 +40,8 @@ describe Auditors::GradeChange do
     @sub_account = Account.create!(parent_account: @account)
     @sub_sub_account = Account.create!(parent_account: @sub_account)
 
-    course_with_teacher(account: @sub_sub_account)
-    student_in_course
+    course_with_teacher(account: @sub_sub_account, active_all: true)
+    student_in_course(active_all: true)
 
     @assignment = @course.assignments.create!(title: "Assignment", points_possible: 10)
     @submission = @assignment.grade_student(@student, grade: 8, grader: @teacher).first
@@ -245,6 +245,40 @@ describe Auditors::GradeChange do
       expect(Auditors::ActiveRecord::GradeChangeRecord.third_to_last.score_after).to eq 8.0
       expect(Auditors::ActiveRecord::GradeChangeRecord.second_to_last.score_after).to eq 2.0
       expect(Auditors::ActiveRecord::GradeChangeRecord.last.score_after).to eq 3.0
+    end
+  end
+
+  describe "create_content_participations" do
+    it "does not create a content participation record if one already exists" do
+      plucked_submissions = [[@student.id, @submission.id, @course.id]]
+      expect(@submission.content_participations.count).to eq 1
+      cpc = ContentParticipationCount.where(context_id: @submission.course_id, user_id: @submission.user_id, content_type: "Submission")
+      expect(cpc.count).to eq 1
+      expect(cpc.first.unread_count).to eq 1
+      @assignment.grade_student(@student, grade: nil, grader: @teacher)
+      @submission.update_columns(score: nil, grade: nil, workflow_state: "unsubmitted")
+      Auditors::GradeChange.create_content_participations(plucked_submissions, @assignment, [@student.id])
+      expect(@submission.content_participations.count).to eq 1
+    end
+
+    it "does not create a duplicate content participation count record if one already exists for the course" do
+      ContentParticipation.mark_all_as_read_for_user(@student, @student.submissions, @course)
+      @submission.update_columns(score: nil, grade: nil, workflow_state: "unsubmitted")
+      plucked_submissions = [[@student.id, @submission.id, @course.id]]
+      Auditors::GradeChange.create_content_participations(plucked_submissions, @assignment, [@student.id])
+
+      cpc = ContentParticipationCount.where(context_id: @submission.course_id, user_id: @submission.user_id, content_type: "Submission")
+      expect(cpc.count).to eq 1
+
+      second_assignment = @course.assignments.create!(title: "Assignment 2", points_possible: 10)
+      second_submission = second_assignment.submissions.first
+      second_submission.update_columns(score: nil, grade: nil, workflow_state: "unsubmitted")
+      plucked_submissions = [[@student.id, second_assignment.submissions.first.id, @course.id]]
+      Auditors::GradeChange.create_content_participations(plucked_submissions, second_assignment, [@student.id])
+
+      expect(second_submission.content_participations.count).to eq 1
+      cpc = ContentParticipationCount.where(context_id: second_submission.course_id, user_id: second_submission.user_id, content_type: "Submission")
+      expect(cpc.count).to eq 1
     end
   end
 end

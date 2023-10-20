@@ -386,6 +386,15 @@ an opaque identifier that uniquely identifies the context of the tool launch.
 ```
 "cdca1fe2c392a208bd8a657f8865ddb9ca359534"
 ```
+## com.instructure.Context.globalId
+The Canvas global identifer for the launch context.
+
+**Availability**: *always*  
+
+
+```
+10000000000070
+```
 ## Context.sourcedId [duplicates Person.sourcedId]
 If the context is a Course, returns sourced Id of the context.
 
@@ -701,6 +710,15 @@ returns the current course's term start date.
 ```
 2018-01-12 00:00:00 -0700
 ```
+## Canvas.term.endAt
+returns the current course's term end date.
+
+**Availability**: **  
+
+
+```
+2018-01-12 00:00:00 -0700
+```
 ## Canvas.term.name
 returns the current course's term name.
 
@@ -738,6 +756,30 @@ enabled.
 
 ```
 true
+```
+## com.instructure.Assignment.restrict_quantitative_data
+returns true if the assignment restricts quantitative data.
+Assignment types: points, percentage, gpa_scale are all considered quantitative.
+
+**Availability**: *when launched as an assignment*  
+**Launch Parameter**: *com_instructure_assignment_restrict_quantitative_data*  
+
+```
+true
+```
+## com.instructure.Course.gradingScheme
+returns the grading scheme data for the course
+it is an array of objects of grade levels.
+
+**Availability**: *when launched in a course*  
+**Launch Parameter**: *com_instructure_course_grading_scheme*  
+
+```
+[
+  {name: "A", value: 94.0},
+  {name: "A-", value: 90.0},
+  {name: "B+", value: 87.0},
+]
 ```
 ## com.Instructure.membership.roles
 returns the current course membership roles
@@ -1003,6 +1045,24 @@ Returns true for root account admins and false for all other roles.
 ```
 true
 ```
+## Canvas.user.adminableAccounts
+Returns a string with a comma-separated list of the (local) account IDs
+that a user has admin rights in, which fall under the root account that
+the tool was launched under. This list includes the IDs of
+all subaccounts of these accounts (and their subaccounts, etc.), since
+the admin privileges carry from an account to all its subaccounts.
+
+Will show a limit of 40000 characters. If the account IDs list is too big
+to fit into 40000 characters, 'truncated' will show at the end of the
+list.
+
+**Availability**: *when launched by a logged in user*  
+
+
+```
+123,456,798
+123,456,789,1234,truncated
+```
 ## User.username [duplicates Canvas.user.loginId]
 Username/Login ID for the primary pseudonym for the user for the account.
 This may not be the pseudonym the user is actually logged in with.
@@ -1256,10 +1316,35 @@ Only available when launched as an assignment with a `lock_at` set.
 2018-02-20:00:00Z
 ```
 ## Canvas.assignment.dueAt.iso8601
-Returns the `due_at` date of the assignment that was launched.
-Only available when launched as an assignment with a `due_at` set.
+Returns the `due_at` date of the assignment that was launched. Only
+available when launched as an assignment with a `due_at` set. If the tool
+is launched as a student, this will be the date that assignment is due
+for that student (or unexpanded -- "$Canvas.assignment.dueAt.iso8601" --
+if there is no due date for the student). If the tool is launched as an
+instructor and there are multiple possible due dates (i.e., there are
+multiple sections and at least one has a due date override), this will be
+the LATEST effective due date of any section or student (or unexpanded if
+there is at least one section or student with no effective due date).
 
 **Availability**: *always*  
+
+
+```
+2018-02-19:00:00Z
+```
+## Canvas.assignment.earliestEnrollmentDueAt.iso8601
+Returns the `due_at` date of the assignment that was launched.
+If the tool is launched as a student, this will be the date that
+assignment is due for that student (or an empty string if there is no due
+date for the student). If the tool is launched as an instructor and different
+students are assigned multiple due dates (i.e., there are students in sections
+with overrides / different effective due dates), this will be the
+EARLIEST due date of any enrollment (or an empty string if there are no
+enrollments with due dates). Note than like allDueAts, but unlike the dueAt
+expansion, there must be at least one enrollment in a section for its due
+date to be considered.
+
+**Availability**: *when launched as an assignment*  
 
 
 ```
@@ -1273,7 +1358,7 @@ will be present in the list (hence the ",," in the example)
 
 Only available when launched as an assignment.
 
-**Availability**: *always*  
+**Availability**: *when launched as an assignment*  
 
 
 ```

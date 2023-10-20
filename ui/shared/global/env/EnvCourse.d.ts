@@ -140,7 +140,10 @@ export interface EnvCourseSettings {
    * Example: "https://school.instructure.com/api/lti/courses/119048/developer_keys/:developer_key_id/tool_configuration",
    */
   TOOL_CONFIGURATION_SHOW_URL: string
-  MEMBERSHIP_SERVICE_FEATURE_FLAG_ENABLED: false
+  MEMBERSHIP_SERVICE_FEATURE_FLAG_ENABLED: boolean
+  // This is a messy hack for the tool configuration forms. We have newer Typescript versions
+  // that also use InstUI, but decided to keep the old forms around to prevent confusion.
+  INSTUI_FOR_TOOL_CONFIGURATION_FORMS: boolean
   /**
    * Example: "/courses/119048"
    */
@@ -190,4 +193,7 @@ export interface EnvCourseSettings {
 
   USE_BLUEPRINT_RESTRICTIONS_BY_OBJECT_TYPE: boolean
   BLUEPRINT_RESTRICTIONS_BY_OBJECT_TYPE: Record<string, boolean>
+
+  SHOW_ANNOUNCEMENTS?: boolean | null
+  ANNOUNCEMENT_LIMIT?: number | null
 }

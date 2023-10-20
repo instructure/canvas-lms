@@ -7,18 +7,22 @@
       data-tooltip title="{{accessibleDateFormat 'date'}}"/>
     </div>
   </td>
-  <td class="start-time-column">
-    <input name="start_time" class="time_field start_time" value="{{fcMomentToString start "tiny"}}"
-      aria-label="{{t "start_time_label" "Start Time"}}{{datepickerScreenreaderPrompt 'time'}}"
-      {{#if locked}} disabled{{/if}} type="text"
-      data-tooltip title="{{accessibleDateFormat 'time'}}"/>
-  </td>
-  <td class="separator-column">-</td>
-  <td class="end-time-column">
-    <input name="end_time" class="time_field end_time" value="{{fcMomentToString end "tiny"}}"
-      aria-label="{{t "end_time_label" "End Time"}}{{datepickerScreenreaderPrompt 'time'}}"
-      {{#if locked}} disabled{{/if}} type="text"
-      data-tooltip title="{{accessibleDateFormat 'time'}}"/>
+  <td colspan="2">
+      <div role="radiogroup" aria-labelledby="time-range-column" style="display: flex">
+        <span class="start-time-column">
+          <input name="start_time" class="time_field start_time" value="{{fcMomentToString start "tiny"}}"
+            aria-label="{{t "start_time_label" "Start Time"}}{{datepickerScreenreaderPrompt 'time'}}"
+            {{#if locked}} disabled{{/if}} type="text"
+            data-tooltip title="{{accessibleDateFormat 'time'}}"/>
+        </span>
+        <span class="separator-column">-</span>
+        <span class="end-time-column">
+          <input name="end_time" class="time_field end_time" value="{{fcMomentToString end "tiny"}}"
+            aria-label="{{t "end_time_label" "End Time"}}{{datepickerScreenreaderPrompt 'time'}}"
+            {{#if locked}} disabled{{/if}} type="text"
+            data-tooltip title="{{accessibleDateFormat 'time'}}"/>
+        </span>
+      </div>
   </td>
   <td class="delete-column">
     {{#unless locked}}

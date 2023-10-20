@@ -1,34 +1,33 @@
 {{#if showBoxReplyLink}}
-  <div class="discussion-entry-reply-area reply-box-container hide-if-collapsed hide-if-replying">
-    <div class="notification" data-bind="notification"></div>
-    <a role="button" class="discussion-reply-action discussion-reply-box" data-event="addReply" href="#">
-      <i class="icon-replied"></i>
-      <span aria-hidden="true">{{#t "write_a_reply"}}Reply{{/t}}</span>
-      {{#if isForMainDiscussion}}
-        <span class="screenreader-only">{{#t}}Reply to {{title}}{{/t}}</span>
-      {{else}}
-        <span class="screenreader-only">{{#t}}Reply to Comment{{/t}}</span>
-      {{/if}}
-    </a>
-  </div>
+<div class="discussion-entry-reply-area reply-box-container hide-if-collapsed hide-if-replying">
+  <div class="notification" data-bind="notification"></div>
+  <a role="button" class="discussion-reply-action discussion-reply-box" data-event="addReply" href="#">
+    <i class="icon-replied"></i>
+    <span aria-hidden="true">{{#t "write_a_reply"}}Reply{{/t}}</span>
+    {{#if isForMainDiscussion}}
+    <span class="screenreader-only">{{#t}}Reply to {{title}}{{/t}}</span>
+    {{else}}
+    <span class="screenreader-only">{{#t}}Reply to Comment{{/t}}</span>
+    {{/if}}
+  </a>
+</div>
 {{/if}}
 <div class='discussion-entry-reply-area hide-if-collapsed show-if-replying'>
   <form class="discussion-reply-form">
     <div class="clearfix" aria-hidden="true">&nbsp;</div>
-    <textarea class="reply-textarea"
-              id="{{#if root}}root_{{/if}}reply_message_for_{{id}}"></textarea>
+    <textarea class="reply-textarea" id="{{#if root}}root_{{/if}}reply_message_for_{{id}}"></textarea>
 
     <div class="clearfix">
       <div class="discussion-reply-attachments-container">
         <ul class="discussion-reply-attachments"></ul>
         {{#if canAttach}}
-          <a href="#" class="discussion-reply-add-attachment discussion-reply-action icon-paperclip"
-             data-event="addReplyAttachment">{{#t "attach_file"}}Attach{{/t}}</a>
+        <a href="#" class="discussion-reply-add-attachment discussion-reply-action icon-paperclip"
+          data-event="addReplyAttachment">{{#t "attach_file"}}Attach{{/t}}</a>
         {{/if}}
       </div>
 
       <div class="discussion-reply-buttons">
-        <a href="javascript:" class="cancel_button btn btn-small">{{#t "cancel"}}Cancel{{/t}}</a>
+        <button class="cancel_button btn btn-small" type="button">{{#t "cancel"}}Cancel{{/t}}</button>
         <button class="btn btn-primary btn-small" type="submit">{{#t "post_reply"}}Post Reply{{/t}}</button>
       </div>
     </div>

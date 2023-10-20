@@ -178,4 +178,22 @@ describe SIS::CSV::ChangeSisIdImporter do
       expect(u1.pseudonym.sis_user_id).to eq("U002")
     end
   end
+
+  describe "caching" do
+    it "invalidates the association cache" do
+      enable_cache do
+        u = user_with_managed_pseudonym(account: @account)
+        a = Account.create!(parent_account: @account)
+        a.update(sis_source_id: "englilsh")
+        c = course_model(account: a)
+        e = c.enroll_student(u)
+        expect(e.course.account.sis_source_id).to eq "englilsh"
+        process_csv_data_cleanly(
+          "old_id,new_id,type",
+          "englilsh,englilsch,account"
+        )
+        expect(Enrollment.find(e.id).course.account.sis_source_id).to eq "englilsch"
+      end
+    end
+  end
 end

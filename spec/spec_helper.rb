@@ -25,7 +25,7 @@
 # from their use, making things harder to find
 
 begin
-  require "byebug"
+  require "debug"
 rescue LoadError
   nil
 end
@@ -550,15 +550,15 @@ RSpec.configure do |config|
       super
     end
   end
-  Canvas::Redis.singleton_class.prepend(TrackRedisUsage)
-  Canvas::Redis.redis_used = true
+  CanvasCache::Redis.singleton_class.prepend(TrackRedisUsage)
+  CanvasCache::Redis.redis_used = true
 
   config.before do
-    if Canvas::Redis.redis_enabled? && Canvas::Redis.redis_used
+    if CanvasCache::Redis.enabled? && CanvasCache::Redis.redis_used
       # yes, we really mean to run this dangerous redis command
-      GuardRail.activate(:deploy) { Canvas::Redis.redis.flushdb }
+      GuardRail.activate(:deploy) { CanvasCache::Redis.redis.flushdb(failsafe: nil) }
     end
-    Canvas::Redis.redis_used = false
+    CanvasCache::Redis.redis_used = false
   end
 
   if Canvas::Plugin.value_to_boolean(ENV["N_PLUS_ONE_DETECTION"])
@@ -663,8 +663,8 @@ RSpec.configure do |config|
   def set_cache(new_cache)
     cache_opts = {}
     if new_cache == :redis_cache_store
-      if Canvas::Redis.redis_enabled?
-        cache_opts[:redis] = Canvas::Redis.redis
+      if CanvasCache::Redis.enabled?
+        cache_opts[:redis] = CanvasCache::Redis.redis
       else
         skip "redis required"
       end
@@ -674,9 +674,8 @@ RSpec.configure do |config|
     new_cache ||= :null_store
     new_cache = ActiveSupport::Cache.lookup_store(new_cache, cache_opts)
     allow(Rails).to receive(:cache).and_return(new_cache)
-    allow(ActionController::Base).to receive(:cache_store).and_return(new_cache)
+    allow(ActionController::Base).to receive_messages(cache_store: new_cache, perform_caching: true)
     allow_any_instance_of(ActionController::Base).to receive(:cache_store).and_return(new_cache)
-    allow(ActionController::Base).to receive(:perform_caching).and_return(true)
     allow_any_instance_of(ActionController::Base).to receive(:perform_caching).and_return(true)
     allow(MultiCache).to receive(:cache).and_return(new_cache)
   end
@@ -697,9 +696,8 @@ RSpec.configure do |config|
         yield
       ensure
         allow(Rails).to receive(:cache).and_return(previous_cache)
-        allow(ActionController::Base).to receive(:cache_store).and_return(previous_cache)
+        allow(ActionController::Base).to receive_messages(cache_store: previous_cache, perform_caching: previous_perform_caching)
         allow_any_instance_of(ActionController::Base).to receive(:cache_store).and_return(previous_cache)
-        allow(ActionController::Base).to receive(:perform_caching).and_return(previous_perform_caching)
         allow_any_instance_of(ActionController::Base).to receive(:perform_caching).and_return(previous_perform_caching)
         allow(MultiCache).to receive(:cache).and_return(previous_multicache)
       end
@@ -761,8 +759,8 @@ RSpec.configure do |config|
         @ancestor = ancestor
       end
 
-      def method_missing(sym, *args, &)
-        @ancestor.instance_method(sym).bind_call(@subject, *args, &)
+      def method_missing(sym, ...)
+        @ancestor.instance_method(sym).bind_call(@subject, ...)
       end
     end
 
@@ -810,6 +808,7 @@ RSpec.configure do |config|
     AWS_CONFIG = {
       access_key_id: "stub_id",
       secret_access_key: "stub_key",
+      credentials: Aws::Credentials.new("stub_id", "stub_key"),
       region: "us-east-1",
       stub_responses: true,
       bucket_name: "no-bucket"
@@ -837,10 +836,9 @@ RSpec.configure do |config|
   def s3_storage!(opts = { stubs: true })
     [Attachment, Thumbnail].each do |model|
       model.include(AttachmentStorageSwitcher) unless model.ancestors.include?(AttachmentStorageSwitcher)
-      allow(model).to receive(:current_backend).and_return(AttachmentFu::Backends::S3Backend)
-
-      allow(model).to receive(:s3_storage?).and_return(true)
-      allow(model).to receive(:local_storage?).and_return(false)
+      allow(model).to receive_messages(current_backend: AttachmentFu::Backends::S3Backend,
+                                       s3_storage?: true,
+                                       local_storage?: false)
     end
 
     if opts[:stubs]
@@ -854,10 +852,9 @@ RSpec.configure do |config|
   def local_storage!
     [Attachment, Thumbnail].each do |model|
       model.include(AttachmentStorageSwitcher) unless model.ancestors.include?(AttachmentStorageSwitcher)
-      allow(model).to receive(:current_backend).and_return(AttachmentFu::Backends::FileSystemBackend)
-
-      allow(model).to receive(:s3_storage?).and_return(false)
-      allow(model).to receive(:local_storage?).and_return(true)
+      allow(model).to receive_messages(current_backend: AttachmentFu::Backends::FileSystemBackend,
+                                       s3_storage?: false,
+                                       local_storage?: true)
     end
   end
 

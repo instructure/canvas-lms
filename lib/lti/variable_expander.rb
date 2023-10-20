@@ -87,6 +87,10 @@ module Lti
       @context.is_a?(Course) && @context.enrollment_term &&
         @context.enrollment_term.start_at
     end
+    TERM_END_DATE_GUARD = lambda do
+      @context.is_a?(Course) && @context.enrollment_term &&
+        @context.enrollment_term.end_at
+    end
     TERM_NAME_GUARD = -> { @context.is_a?(Course) && @context.enrollment_term&.name }
     USER_GUARD = -> { @current_user }
     SIS_USER_GUARD = -> { sis_pseudonym&.sis_user_id }
@@ -173,7 +177,7 @@ module Lti
     end
 
     def resource_link_id
-      @resource_link_id ||= if @assignment&.submission_types == "external_tool" && @assignment&.line_items&.present?
+      @resource_link_id ||= if @assignment&.submission_types == "external_tool" && @assignment&.line_items.present?
                               if @root_account&.feature_enabled?(:resource_link_uuid_in_custom_substitution)
                                 @assignment.line_items.first&.resource_link&.resource_link_uuid
                               else
@@ -513,6 +517,15 @@ module Lti
                        [],
                        -> { Lti::Asset.opaque_identifier_for(@context) },
                        default_name: "context_id"
+
+    # The Canvas global identifer for the launch context
+    # @example
+    #   ```
+    #   10000000000070
+    #   ```
+    register_expansion "com.instructure.Context.globalId",
+                       [],
+                       -> { @context&.global_id }
 
     # If the context is a Course, returns sourced Id of the context
     # @example
@@ -900,6 +913,16 @@ module Lti
                        -> { @context.enrollment_term.start_at },
                        TERM_START_DATE_GUARD
 
+    # returns the current course's term end date.
+    # @example
+    #   ```
+    #   2018-01-12 00:00:00 -0700
+    #   ```
+    register_expansion "Canvas.term.endAt",
+                       [],
+                       -> { @context.enrollment_term.end_at },
+                       TERM_END_DATE_GUARD
+
     # returns the current course's term name.
     # @example
     #   ```
@@ -954,23 +977,23 @@ module Lti
     #   ```
     register_expansion "com.instructure.Assignment.restrict_quantitative_data",
                        [],
-                       -> { @assignment.restrict_quantitative_data?(@current_user) },
+                       -> { @assignment.restrict_quantitative_data?(@current_user)&.to_s },
                        ASSIGNMENT_GUARD,
                        default_name: "com_instructure_assignment_restrict_quantitative_data"
 
     # returns the grading scheme data for the course
-    # it is an array of arrays of grade levels
+    # it is an array of objects of grade levels
     # @example
     #  ```
     #  [
-    #    ["A", 94.0, 100.0],
-    #    ["A-", 90.0, 93.99],
-    #    ["B+", 87.0, 89.99],
+    #    {name: "A", value: 94.0},
+    #    {name: "A-", value: 90.0},
+    #    {name: "B+", value: 87.0},
     #  ]
     #  ```
     register_expansion "com.instructure.Course.gradingScheme",
                        [],
-                       -> { @context.grading_standard_or_default.data },
+                       -> { @context.grading_standard_or_default.data.map { |grading_standard_data_row| { name: grading_standard_data_row[0], value: grading_standard_data_row[1] } }.to_json },
                        COURSE_GUARD,
                        default_name: "com_instructure_course_grading_scheme"
 
@@ -1312,6 +1335,26 @@ module Lti
                        -> { @current_user.roles(@root_account).include? "root_admin" },
                        USER_GUARD
 
+    # Returns a string with a comma-separated list of the (local) account IDs
+    # that a user has admin rights in, which fall under the root account that
+    # the tool was launched under. This list includes the IDs of
+    # all subaccounts of these accounts (and their subaccounts, etc.), since
+    # the admin privileges carry from an account to all its subaccounts.
+    #
+    # Will show a limit of 40000 characters. If the account IDs list is too big
+    # to fit into 40000 characters, 'truncated' will show at the end of the
+    # list.
+    #
+    # @example
+    #   ```
+    #   123,456,798
+    #   123,456,789,1234,truncated
+    #   ```
+    register_expansion "Canvas.user.adminableAccounts",
+                       [],
+                       -> { lti_helper.adminable_account_ids_recursive_truncated },
+                       USER_GUARD
+
     # Username/Login ID for the primary pseudonym for the user for the account.
     # This may not be the pseudonym the user is actually logged in with.
     # @duplicates Canvas.user.loginId
@@ -1616,8 +1659,15 @@ module Lti
                        -> { @assignment.lock_at.utc.iso8601 },
                        -> { @assignment && @assignment.lock_at.present? }
 
-    # Returns the `due_at` date of the assignment that was launched.
-    # Only available when launched as an assignment with a `due_at` set.
+    # Returns the `due_at` date of the assignment that was launched. Only
+    # available when launched as an assignment with a `due_at` set. If the tool
+    # is launched as a student, this will be the date that assignment is due
+    # for that student (or unexpanded -- "$Canvas.assignment.dueAt.iso8601" --
+    # if there is no due date for the student). If the tool is launched as an
+    # instructor and there are multiple possible due dates (i.e., there are
+    # multiple sections and at least one has a due date override), this will be
+    # the LATEST effective due date of any section or student (or unexpanded if
+    # there is at least one section or student with no effective due date).
     #
     # @example
     #   ```
@@ -1627,6 +1677,26 @@ module Lti
                        [],
                        -> { @assignment.due_at.utc.iso8601 },
                        -> { @assignment && @assignment.due_at.present? }
+
+    # Returns the `due_at` date of the assignment that was launched.
+    # If the tool is launched as a student, this will be the date that
+    # assignment is due for that student (or an empty string if there is no due
+    # date for the student). If the tool is launched as an instructor and different
+    # students are assigned multiple due dates (i.e., there are students in sections
+    # with overrides / different effective due dates), this will be the
+    # EARLIEST due date of any enrollment (or an empty string if there are no
+    # enrollments with due dates). Note than like allDueAts, but unlike the dueAt
+    # expansion, there must be at least one enrollment in a section for its due
+    # date to be considered.
+    #
+    # @example
+    #   ```
+    #   2018-02-19:00:00Z
+    #   ```
+    register_expansion "Canvas.assignment.earliestEnrollmentDueAt.iso8601",
+                       [],
+                       -> { earliest_due_at&.utc&.iso8601.to_s },
+                       ASSIGNMENT_GUARD
 
     # In Canvas, users, sections and groups can have distinct due dates for the same assignment.
     # This returns all possible `due_at` dates of the assignment that was launched.
@@ -1642,7 +1712,7 @@ module Lti
     register_expansion "Canvas.assignment.allDueAts.iso8601",
                        [],
                        -> { unique_submission_dates.map { |d| d.present? ? d.utc.iso8601 : "" }.join(",") },
-                       -> { @assignment }
+                       ASSIGNMENT_GUARD
 
     # Returns true if the assignment that was launched is published.
     # Only available when launched as an assignment.
@@ -1913,6 +1983,19 @@ module Lti
 
     def unique_submission_dates
       @assignment.submissions.pluck(:cached_due_date).uniq
+    end
+
+    def earliest_due_at
+      context = @assignment.context
+      # Mirrors logic in AssignmentOverrideApplicator to determine if user is a student or teacher.
+      # If a user is a student, we return their due date. Otherwise, in our case here, we return
+      # the earliest of all due dates for the assignment.
+      if context.user_has_been_admin?(current_user) || (context.user_has_no_enrollments?(current_user) &&
+                                               context.grants_any_right?(current_user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS))
+        @assignment.submissions.minimum(:cached_due_date)
+      else
+        @assignment.due_at
+      end
     end
 
     def sis_pseudonym

@@ -345,7 +345,6 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
     let!(:notification) do
       Notification.create!(
         name: "Assignment Submitted",
-        workflow_state: "active",
         subject: "No Subject",
         category: "TestImmediately"
       )
@@ -354,7 +353,6 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
     let!(:resubmission_notification) do
       Notification.create!(
         name: "Assignment Resubmitted",
-        workflow_state: "active",
         subject: "No Subject",
         category: "TestImmediately"
       )
@@ -456,7 +454,6 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
     it "sends a 'Submission Graded' notification when a submission is regraded" do
       graded_notification = Notification.create!(
         name: "Submission Graded",
-        workflow_state: "active",
         subject: "No Subject",
         category: "TestImmediately"
       )

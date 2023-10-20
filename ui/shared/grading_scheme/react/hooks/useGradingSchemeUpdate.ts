@@ -47,7 +47,7 @@ export const useGradingSchemeUpdate = (): {
 
       try {
         setUpdateGradingSchemeStatus(ApiCallStatus.PENDING)
-        // @ts-ignore
+        // @ts-expect-error
         const result = await doFetchApi<GradingScheme>({
           path: `${contextPath}/grading_schemes/${gradingSchemeUpdateRequest.id}`,
           method: 'PUT',

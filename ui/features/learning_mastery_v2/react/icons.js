@@ -20,6 +20,12 @@ export const svgUrl = (points, masteryAt) => {
   return `/images/outcomes/${getTagIcon(points, masteryAt)}.svg`
 }
 
+/*
+ *  NOTE: This is only for Account Level Mastery Scales FF Enabled
+ *  This code block only works with the default scale for outcomes
+ *  After OUT-5226 (https://instructure.atlassian.net/browse/OUT-5226), support
+ *  for custom outcome scales will be included
+ */
 const getTagIcon = (points, masteryAt) => {
   if (points == null) {
     return 'unassessed'
@@ -27,12 +33,14 @@ const getTagIcon = (points, masteryAt) => {
   const score = points - masteryAt
   switch (true) {
     case score > 0:
-      return 'star'
+      return 'exceeds_mastery'
     case score === 0:
       return 'mastery'
-    case score > -1 * masteryAt:
+    case score === -1:
       return 'near_mastery'
+    case score === -2:
+      return 'remediation'
     default:
-      return 'below_mastery'
+      return 'no_evidence'
   }
 }

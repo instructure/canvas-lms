@@ -471,7 +471,7 @@ describe Submission do
 
     it "gets initialized during submission creation" do
       # create an invited user, so that the submission is not automatically
-      # created by the DueDateCacher
+      # created by the SubmissionLifecycleManager
       student_in_course(active_all: true)
       @assignment.update_attribute(:due_at, 1.day.ago)
 
@@ -761,16 +761,39 @@ describe Submission do
       submission
     end
 
+    let(:custom_grade_status) do
+      admin = account_admin_user(account: @assignment.root_account)
+      @assignment.root_account.custom_grade_statuses.create!(
+        color: "#ABC",
+        name: "yolo",
+        created_by: admin
+      )
+    end
+
     it "sets excused to false if the late_policy_status is being changed to a not-nil value" do
       submission.update!(late_policy_status: "missing")
       expect(submission).not_to be_excused
     end
 
-    it "does not set excused to false if the late_policy_status ie being changed to a nil value" do
+    it "does not set excused to false if the late_policy_status is being changed to a nil value" do
       # need to skip callbacks so excused does not get set to false
       submission.update_column(:late_policy_status, "missing")
       submission.update!(late_policy_status: nil)
       expect(submission).to be_excused
+    end
+
+    it "sets excused to false when a custom status is set" do
+      expect { submission.update!(custom_grade_status:) }.to change {
+        submission.excused?
+      }.from(true).to(false)
+    end
+
+    it "does not set excused to false when a custom status is removed" do
+      # need to skip callbacks so excused does not get set to false
+      submission.update_column(:custom_grade_status_id, custom_grade_status.id)
+      expect { submission.update!(custom_grade_status: nil) }.not_to change {
+        submission.excused?
+      }.from(true)
     end
   end
 
@@ -803,6 +826,41 @@ describe Submission do
       submission.update_column(:excused, true)
       submission.update!(excused: false)
       expect(submission.seconds_late_override).to be 60
+    end
+
+    context "custom statuses" do
+      let(:custom_grade_status) do
+        admin = account_admin_user(account: @assignment.root_account)
+        @assignment.root_account.custom_grade_statuses.create!(
+          color: "#ABC",
+          name: "yolo",
+          created_by: admin
+        )
+      end
+
+      it "sets late_policy_status to nil if the custom_grade_status_id is being changed to a not-nil value" do
+        submission.update!(custom_grade_status:)
+        expect(submission.late_policy_status).to be_nil
+      end
+
+      it "sets seconds_late_override to nil if the submission is updated to have a custom status" do
+        submission.update!(custom_grade_status:)
+        expect(submission.seconds_late_override).to be_nil
+      end
+
+      it "does not set late_policy_status to nil if the custom_grade_status_id is being changed to a nil value" do
+        # need to skip callbacks so excused does not get set to false
+        submission.update_column(:custom_grade_status_id, custom_grade_status.id)
+        submission.update!(custom_grade_status_id: nil)
+        expect(submission.late_policy_status).to eql "late"
+      end
+
+      it "does not set seconds_late_override to nil if the submission is updated to not have a custom status" do
+        # need to skip callbacks so seconds_late_override does not get set to nil
+        submission.update_column(:custom_grade_status_id, custom_grade_status.id)
+        submission.update!(custom_grade_status_id: nil)
+        expect(submission.seconds_late_override).to be 60
+      end
     end
   end
 
@@ -1534,6 +1592,45 @@ describe Submission do
       end
     end
 
+    context "custom grade statuses" do
+      let(:custom_grade_status) do
+        admin = account_admin_user(account: @assignment.root_account)
+        @assignment.root_account.custom_grade_statuses.create!(
+          name: "Custom Status",
+          color: "#ABC",
+          created_by: admin
+        )
+      end
+
+      it "does not apply the late policy when score changes if a custom status is applied" do
+        Timecop.freeze(2.days.ago(@date)) do
+          @assignment.submit_homework(@student, body: "a body")
+          submission.update!(custom_grade_status:)
+          expect { @assignment.grade_student(@student, grade: 600, grader: @teacher) }.not_to change {
+            submission.reload.points_deducted
+          }.from(nil)
+        end
+      end
+
+      it "applies the late policy for a late submission when a custom status is removed" do
+        Timecop.freeze(2.days.ago(@date)) do
+          submission.update!(custom_grade_status:)
+          @assignment.submit_homework(@student, body: "a body")
+          @assignment.grade_student(@student, grade: 600, grader: @teacher)
+          expect { submission.update!(custom_grade_status: nil) }.to change {
+            submission.reload.points_deducted
+          }.from(nil).to(100)
+        end
+      end
+
+      it "does not apply the missing policy when a custom status is applied" do
+        submission.update_columns(score: nil, grade: nil, posted_at: nil, workflow_state: "unsubmitted")
+        expect { submission.update!(custom_grade_status:) }.not_to change {
+          submission.reload.score
+        }.from(nil)
+      end
+    end
+
     it "does not apply the late policy when what-if score changes" do
       Timecop.freeze(2.days.ago(@date)) do
         @assignment.submit_homework(@student, body: "a body")
@@ -1553,7 +1650,7 @@ describe Submission do
         @assignment.submit_homework(@student, body: "a body")
         @assignment.update!(points_possible: 10)
         @assignment.grade_student(@student, grade: 10, grader: @teacher)
-        DueDateCacher.recompute(@assignment, update_grades: true)
+        SubmissionLifecycleManager.recompute(@assignment, update_grades: true)
         expect(submission.score).to be 9.76
       end
     end
@@ -2164,8 +2261,7 @@ describe Submission do
 
       it "creates a message when the score is changed and the grades were already published" do
         Notification.create(name: "Submission Grade Changed")
-        allow(@assignment).to receive(:score_to_grade).and_return("10.0")
-        allow(@assignment).to receive(:due_at).and_return(Time.zone.now - 100)
+        allow(@assignment).to receive_messages(score_to_grade: "10.0", due_at: Time.zone.now - 100)
         submission_spec_model
 
         communication_channel(@user, { username: "somewhere@test.com" })
@@ -2179,8 +2275,7 @@ describe Submission do
 
       it "does not create a grade changed message when theres a quiz attached" do
         Notification.create(name: "Submission Grade Changed")
-        allow(@assignment).to receive(:score_to_grade).and_return("10.0")
-        allow(@assignment).to receive(:due_at).and_return(Time.now - 100)
+        allow(@assignment).to receive_messages(score_to_grade: "10.0", due_at: Time.now - 100)
         submission_spec_model
 
         @quiz = Quizzes::Quiz.create!(context: @course)
@@ -2198,8 +2293,7 @@ describe Submission do
       it "does not create a message when grades were already published for an assignment with hidden grades" do
         @assignment.ensure_post_policy(post_manually: true)
         Notification.create(name: "Submission Grade Changed")
-        allow(@assignment).to receive(:score_to_grade).and_return("10.0")
-        allow(@assignment).to receive(:due_at).and_return(Time.zone.now - 100)
+        allow(@assignment).to receive_messages(score_to_grade: "10.0", due_at: Time.zone.now - 100)
         submission_spec_model
 
         communication_channel(@user, { username: "somewhere@test.com" })
@@ -2213,8 +2307,7 @@ describe Submission do
 
       it "does not create a message when the submission was recently graded" do
         Notification.create(name: "Submission Grade Changed")
-        allow(@assignment).to receive(:score_to_grade).and_return("10.0")
-        allow(@assignment).to receive(:due_at).and_return(Time.zone.now - 100)
+        allow(@assignment).to receive_messages(score_to_grade: "10.0", due_at: Time.zone.now - 100)
         submission_spec_model
 
         communication_channel(@user, { username: "somewhere@test.com" })
@@ -2828,7 +2921,7 @@ describe Submission do
 
       it "returns true for group reports" do
         user_two = test_student.dup
-        user_two.update!(lti_context_id: SecureRandom.uuid)
+        user_two.update!(lti_context_id: SecureRandom.uuid, lti_id: SecureRandom.uuid, uuid: CanvasSlug.generate_securish_uuid)
         assignment.course.enroll_student(user_two)
 
         group = group_model(context: assignment.course)
@@ -3674,8 +3767,7 @@ describe Submission do
       expect(@submission.unread?(@user)).to be_truthy
     end
 
-    it "is read after submission is commented on by teacher and then teacher deletes comment (ff on)" do
-      Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
+    it "is read after submission is commented on by teacher and then teacher deletes comment" do
       student = @user
       submission = @assignment.submission_for_student(@student)
 
@@ -3700,7 +3792,6 @@ describe Submission do
     end
 
     it "is read after submission is commented on twice by teacher and then teacher deletes the first comment" do
-      Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
       student = @user
       submission = @assignment.submission_for_student(student)
 
@@ -3730,7 +3821,6 @@ describe Submission do
     end
 
     it "is read after submission is commented on by teacher, student views comment, teacher comments again, and then teacher deletes the not viewed comment" do
-      Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
       student = @user
       submission = @assignment.submission_for_student(student)
 
@@ -3764,7 +3854,6 @@ describe Submission do
     end
 
     it "is unread after submission is commented on by teacher, student views comment, teacher comments again, and then teacher deletes the viewed comment" do
-      Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
       student = @user
       submission = @assignment.submission_for_student(student)
 
@@ -3817,77 +3906,95 @@ describe Submission do
       expect(@submission.read?(@user)).to be_truthy
     end
 
-    context "when feedback visibility ff on" do
-      before do
-        Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
-        @student = @user
-        @assignment.submit_homework(@student)
-        @submission = @assignment.grade_student(@student, grade: 3, grader: @teacher).first
-      end
+    it "is unread after submission is graded by teacher" do
+      @student = @user
+      @assignment.submit_homework(@student)
+      @submission = @assignment.grade_student(@student, grade: 3, grader: @teacher).first
+      expect(@submission.read?(@student)).to be_falsey
+    end
 
-      it "is unread after submission is graded by teacher" do
-        expect(@submission.read?(@student)).to be_falsey
-      end
+    it "is unread after submission is graded and commented on by teacher" do
+      @student = @user
+      @assignment.submit_homework(@student)
+      @submission = @assignment.grade_student(@student, grade: 3, grader: @teacher).first
+      @submission = @assignment.update_submission(@student, { commenter: @teacher, comment: "good!" }).first
 
-      it "is unread after submission is graded and commented on by teacher" do
-        @submission = @assignment.update_submission(@student, { commenter: @teacher, comment: "good!" }).first
+      expect(@submission.read?(@student)).to be_falsey
+    end
 
-        expect(@submission.read?(@student)).to be_falsey
-      end
+    it "is unread after grade is read and teacher posts a comment" do
+      @student = @user
+      @assignment.submit_homework(@student)
+      @submission = @assignment.grade_student(@student, grade: 3, grader: @teacher).first
+      @submission.mark_item_read("grade")
+      @submission = @assignment.update_submission(@student, { commenter: @teacher, comment: "good!" }).first
 
-      it "is unread after grade is read and teacher posts a comment" do
-        @submission.mark_item_read("grade")
-        @submission = @assignment.update_submission(@student, { commenter: @teacher, comment: "good!" }).first
+      expect(@submission.reload.read?(@student)).to be_falsey
+    end
 
-        expect(@submission.reload.read?(@student)).to be_falsey
-      end
+    it "is read after grade is read and student posts a comment" do
+      @student = @user
+      @assignment.submit_homework(@student)
+      @submission = @assignment.grade_student(@student, grade: 3, grader: @teacher).first
+      @submission.mark_item_read("grade")
+      @submission = @assignment.update_submission(@student, { commenter: @student, comment: "good!" }).first
 
-      it "is read after grade is read and student posts a comment" do
-        @submission.mark_item_read("grade")
-        @submission = @assignment.update_submission(@student, { commenter: @student, comment: "good!" }).first
+      expect(@submission.reload.read?(@student)).to be_truthy
+    end
 
-        expect(@submission.reload.read?(@student)).to be_truthy
-      end
+    it "is unread after student and teacher post a comment" do
+      @student = @user
+      @assignment.submit_homework(@student)
+      @submission = @assignment.grade_student(@student, grade: 3, grader: @teacher).first
+      @assignment.update_submission(@student, { commenter: @student, comment: "good!" })
+      @assignment.update_submission(@student, { commenter: @teacher, comment: "good!" })
 
-      it "is unread after student and teacher post a comment" do
-        @assignment.update_submission(@student, { commenter: @student, comment: "good!" })
-        @assignment.update_submission(@student, { commenter: @teacher, comment: "good!" })
+      expect(@submission.read?(@student)).to be_falsey
+    end
 
-        expect(@submission.read?(@student)).to be_falsey
-      end
+    it "is unread if there is any unread rubric" do
+      @student = @user
+      @assignment.submit_homework(@student)
+      @submission = @assignment.grade_student(@student, grade: 3, grader: @teacher).first
+      ContentParticipation.participate(content: @submission, user: @student, content_item: "rubric")
 
-      it "is unread if there is any unread rubric" do
-        ContentParticipation.participate(content: @submission, user: @student, content_item: "rubric")
+      expect(@submission.read?(@student)).to be_falsey
+    end
 
-        expect(@submission.read?(@student)).to be_falsey
-      end
+    it "is read if grade and rubric are read" do
+      @student = @user
+      @assignment.submit_homework(@student)
+      @submission = @assignment.grade_student(@student, grade: 3, grader: @teacher).first
+      ContentParticipation.participate(content: @submission, user: @student, content_item: "rubric")
 
-      it "is read if grade and rubric are read" do
-        ContentParticipation.participate(content: @submission, user: @student, content_item: "rubric")
+      @submission.mark_item_read("grade")
+      @submission.mark_item_read("rubric")
 
-        @submission.mark_item_read("grade")
-        @submission.mark_item_read("rubric")
+      expect(@submission.read?(@student)).to be_truthy
+    end
 
-        expect(@submission.read?(@student)).to be_truthy
-      end
+    it "changes the state from read to unread" do
+      @student = @user
+      @assignment.submit_homework(@student)
+      @submission = @assignment.grade_student(@student, grade: 3, grader: @teacher).first
+      @assignment.update_submission(@student, { commenter: @teacher, comment: "good!" })
 
-      it "changes the state from read to unread" do
-        @assignment.update_submission(@student, { commenter: @teacher, comment: "good!" })
+      @submission.mark_item_unread("comment")
 
-        @submission.mark_item_unread("comment")
+      expect(@submission.unread?(@student)).to be_truthy
+    end
 
-        expect(@submission.unread?(@student)).to be_truthy
-      end
+    it "marks submission comments as read" do
+      @student = @user
+      @assignment.submit_homework(@student)
+      @submission = @assignment.grade_student(@student, grade: 3, grader: @teacher).first
+      @assignment.update_submission(@student, { commenter: @teacher, comment: "good!" })
+      @submission.mark_submission_comments_read(@student)
 
-      it "marks submission comments as read" do
-        @assignment.update_submission(@student, { commenter: @teacher, comment: "good!" })
-        @submission.mark_submission_comments_read(@student)
-
-        visible_comment = @submission.visible_submission_comments[0]
-        viewed_comment = visible_comment.viewed_submission_comments[0]
-        expect(viewed_comment.user).to eql @student
-        expect(viewed_comment.submission_comment).to eql visible_comment
-      end
+      visible_comment = @submission.visible_submission_comments[0]
+      viewed_comment = visible_comment.viewed_submission_comments[0]
+      expect(viewed_comment.user).to eql @student
+      expect(viewed_comment.submission_comment).to eql visible_comment
     end
   end
 
@@ -3930,20 +4037,17 @@ describe Submission do
     let(:submission) { Submission.new }
 
     it "returns false if submission does not has_submission?" do
-      allow(submission).to receive(:has_submission?).and_return false
-      allow(submission).to receive(:graded?).and_return true
+      allow(submission).to receive_messages(has_submission?: false, graded?: true)
       expect(submission.without_graded_submission?).to be false
     end
 
     it "returns false if submission does is not graded" do
-      allow(submission).to receive(:has_submission?).and_return true
-      allow(submission).to receive(:graded?).and_return false
+      allow(submission).to receive_messages(has_submission?: true, graded?: false)
       expect(submission.without_graded_submission?).to be false
     end
 
     it "returns true if submission is not graded and has no submission" do
-      allow(submission).to receive(:has_submission?).and_return false
-      allow(submission).to receive(:graded?).and_return false
+      allow(submission).to receive_messages(has_submission?: false, graded?: false)
       expect(submission.without_graded_submission?).to be true
     end
   end
@@ -4231,6 +4335,20 @@ describe Submission do
         @submission.assignment.update!(submission_types: "online_upload")
       end
 
+      it "excludes an otherwise missing submission that has been marked with a custom status" do
+        @submission.update!(grader_id: nil)
+        admin = account_admin_user(account: @course.root_account)
+        custom_grade_status = @course.root_account.custom_grade_statuses.create!(
+          name: "Custom Status",
+          color: "#ABC",
+          created_by: admin
+        )
+
+        expect { @submission.update!(custom_grade_status:) }.to change {
+          Submission.missing.include?(@submission)
+        }.from(true).to(false)
+      end
+
       it "includes submission when due date has passed with no submission, late_policy_status is nil, excused is nil and grader is nil" do
         @submission.update(grader_id: nil)
         expect(Submission.missing).to include @submission
@@ -4448,11 +4566,11 @@ describe Submission do
 
   describe "#late?" do
     before(:once) do
-      course = Course.create!
+      @course = Course.create!
       student = User.create!
-      course.enroll_student(student, enrollment_state: "active")
+      @course.enroll_student(student, enrollment_state: "active")
       now = Time.zone.now
-      assignment = course.assignments.create!(submission_types: "online_text_entry", due_at: 10.days.ago(now))
+      assignment = @course.assignments.create!(submission_types: "online_text_entry", due_at: 10.days.ago(now))
       @submission = assignment.submit_homework(student, body: "Submitting late :(")
     end
 
@@ -4468,6 +4586,41 @@ describe Submission do
     it "returns false if the submission is past due but has its late_policy_status set to something other than 'late'" do
       @submission.late_policy_status = "missing"
       expect(@submission).not_to be_late
+    end
+
+    it "returns false when an otherwise late submission has a custom status" do
+      admin = account_admin_user(account: @course.root_account)
+      custom_grade_status = @course.root_account.custom_grade_statuses.create!(
+        name: "Custom Status",
+        color: "#ABC",
+        created_by: admin
+      )
+      expect { @submission.update!(custom_grade_status:) }.to change {
+        @submission.late?
+      }.from(true).to(false)
+    end
+  end
+
+  describe "#extended?" do
+    before(:once) do
+      @course = Course.create!
+      student = User.create!
+      @course.enroll_student(student, enrollment_state: "active")
+      assignment = @course.assignments.create!(submission_types: "online_text_entry")
+      @submission = assignment.submissions.find_by(user: student)
+    end
+
+    it "returns false when a custom status has been applied" do
+      @submission.update(late_policy_status: "extended")
+      admin = account_admin_user(account: @course.root_account)
+      custom_grade_status = @course.root_account.custom_grade_statuses.create!(
+        name: "Custom Status",
+        color: "#ABC",
+        created_by: admin
+      )
+      expect { @submission.update!(custom_grade_status:) }.to change {
+        @submission.extended?
+      }.from(true).to(false)
     end
   end
 
@@ -4501,6 +4654,19 @@ describe Submission do
           expect(@another_submission.reload).to be_missing
         end
       end
+    end
+
+    it "returns false when an otherwise missing submission has a custom status" do
+      @another_assignment.update!(submission_types: "online_upload")
+      admin = account_admin_user(account: @course.root_account)
+      custom_grade_status = @course.root_account.custom_grade_statuses.create!(
+        name: "Custom Status",
+        color: "#ABC",
+        created_by: admin
+      )
+      expect { @another_submission.update!(custom_grade_status:) }.to change {
+        @another_submission.missing?
+      }.from(true).to(false)
     end
 
     it "returns false when late_policy_status is nil standalone" do
@@ -5161,9 +5327,7 @@ describe Submission do
       end
 
       before do
-        allow(Canvadocs).to receive(:enabled?).and_return true
-        allow(Canvadocs).to receive(:annotations_supported?).and_return true
-        allow(Canvadocs).to receive(:config).and_return(nil)
+        allow(Canvadocs).to receive_messages(enabled?: true, annotations_supported?: true, config: nil)
       end
 
       it "ties submissions to canvadocs" do
@@ -7822,6 +7986,18 @@ describe Submission do
     end
 
     ### Homeworks
+    it "excludes an otherwise late submission that has been marked with a custom status" do
+      admin = account_admin_user(account: @course.root_account)
+      custom_grade_status = @course.root_account.custom_grade_statuses.create!(
+        name: "Custom Status",
+        color: "#ABC",
+        created_by: admin
+      )
+      expect { @late_hw1.update!(custom_grade_status:) }.to change {
+        Submission.late.include?(@late_hw1)
+      }.from(true).to(false)
+    end
+
     it "excludes unsubmitted homeworks" do
       expect(@late_submission_ids).not_to include(@unsubmitted_hw.id)
     end
@@ -7997,6 +8173,18 @@ describe Submission do
     end
 
     ### Homeworks
+    it "includes an otherwise late submission that has been marked with a custom status" do
+      admin = account_admin_user(account: @course.root_account)
+      custom_grade_status = @course.root_account.custom_grade_statuses.create!(
+        name: "Custom Status",
+        color: "#ABC",
+        created_by: admin
+      )
+      expect { @late_hw1.update!(custom_grade_status:) }.to change {
+        Submission.not_late.include?(@late_hw1)
+      }.from(false).to(true)
+    end
+
     it "includes unsubmitted homeworks" do
       expect(@not_late_submission_ids).to include(@unsubmitted_hw.id)
     end
@@ -8307,6 +8495,26 @@ describe Submission do
     end
   end
 
+  describe "sticker validations" do
+    it "allows a nil sticker" do
+      submission = @assignment.submissions.first
+      submission.sticker = nil
+      expect(submission).to be_valid
+    end
+
+    it "does not allow a sticker that is not in the approved list" do
+      submission = @assignment.submissions.first
+      submission.sticker = "my_custom_sticker"
+      expect(submission).not_to be_valid
+    end
+
+    it "allows a sticker that is in the approved list" do
+      submission = @assignment.submissions.first
+      submission.sticker = "basketball"
+      expect(submission).to be_valid
+    end
+  end
+
   describe "extra_attempts validations" do
     it { is_expected.to validate_numericality_of(:extra_attempts).is_greater_than_or_equal_to(0).allow_nil }
 
@@ -8467,6 +8675,36 @@ describe Submission do
       submission.update!(submitted_at: 2.hours.ago)
       submission.update!(submitted_at: 1.hour.ago)
       expect(submission.attempt).to eq 3
+    end
+  end
+
+  describe "sticker removal" do
+    before(:once) do
+      @submission = Submission.find_by(user: @student)
+    end
+
+    it "removes the sticker when a new attempt is submitted" do
+      @submission.update!(sticker: "basketball")
+      @assignment.submit_homework(@student, submission_type: "online_text_entry", body: "foo")
+      expect(@submission.reload.sticker).to be_nil
+    end
+
+    it "does not remove the sticker when the submission is updated but there's not a new attempt" do
+      @submission.update!(sticker: "basketball")
+      @assignment.grade_student(@student, score: 5, grader: @teacher)
+      expect(@submission.reload.sticker).to eq "basketball"
+    end
+
+    it "preserves previously awarded stickers in submission history" do
+      submission = @assignment.submit_homework(@student, submission_type: "online_text_entry", body: "foo")
+      submission.update!(sticker: "basketball")
+      Timecop.freeze(10.minutes.from_now) do
+        submission = @assignment.submit_homework(@student, submission_type: "online_text_entry", body: "bar")
+        submission.update!(sticker: "paintbrush")
+      end
+
+      sticker = submission.submission_history.find { |sub| sub.attempt == 1 }.sticker
+      expect(sticker).to eq "basketball"
     end
   end
 
@@ -8737,10 +8975,9 @@ describe Submission do
       student_in_course(active_all: true)
       submission_text = "Text based submission with some words"
       attachment1 = attachment_model(uploaded_data: stub_file_data("submission.txt", submission_text, "text/plain"), context: @student)
-      attachment1.update_word_count
       attachment2 = attachment_model(uploaded_data: stub_file_data("submission.txt", submission_text, "text/plain"), context: @student)
-      attachment2.update_word_count
       sub = @assignment.submit_homework(@student, attachments: [attachment1, attachment2])
+      run_jobs
       expect(sub.word_count).to eq 12
     end
   end
@@ -8909,8 +9146,7 @@ describe Submission do
         quiz_with_graded_submission([{ question_data: { :name => "question 1", :points_possible => 10, "question_type" => "essay_question" } }])
       end
 
-      allow(@quiz_submission.submission).to receive(:submission_type).and_return("basic_lti_launch")
-      allow(@quiz_submission.submission).to receive(:url).and_return("https://quiz-lti-iad-prod.instructure.com/lti/launch")
+      allow(@quiz_submission.submission).to receive_messages(submission_type: "basic_lti_launch", url: "https://quiz-lti-iad-prod.instructure.com/lti/launch")
       Timecop.freeze(5.minutes.from_now(now)) do
         @quiz_submission.set_final_score(7)
         @quiz_submission.save!

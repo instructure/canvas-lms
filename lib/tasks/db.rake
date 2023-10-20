@@ -35,6 +35,17 @@ namespace :db do
 
   desc "Set columns to be ignored for each model"
   task :set_ignored_columns, [:table_name, :columns] => :environment do |_t, args|
+    # ensure ActiveRecord::Base.descendants is populated
+    Zeitwerk::Loader.eager_load_all
+    model = ActiveRecord::Base.descendants.reject(&:abstract_class).find { |clazz| clazz.table_name == args[:table_name] }
+    # we will happily ignore any columns on tables that don't currently exist, since nothing can depend on them yet
+    unless model.nil?
+      real_columns = model.column_names & args[:columns].split(",")
+      if real_columns.size.positive?
+        raise "Cannot proactively ignore '#{real_columns.join(",")}' from '#{args[:table_name]}' since the column(s) already exist"
+      end
+    end
+
     Diplomat::Kv.put(
       "store/canvas/#{DynamicSettings.environment}/activerecord/ignored_columns/#{args[:table_name]}",
       args[:columns]

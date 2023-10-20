@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -20,7 +19,7 @@
 import {LtiMessageHandler} from '../lti_message_handler'
 
 const enableScrollEvents: LtiMessageHandler = ({responseMessages}) => {
-  let timeout
+  let timeout: number
   window.addEventListener(
     'scroll',
     () => {

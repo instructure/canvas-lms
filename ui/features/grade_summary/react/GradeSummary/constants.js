@@ -34,35 +34,48 @@ export const ASSIGNMENT_STATUS = {
     id: 'excused',
     label: I18n.t('Excused'),
     color: 'primary',
+    shouldConsiderAsGraded: false,
   },
   DROPPED: {
     id: 'dropped',
     label: I18n.t('Dropped'),
     color: 'primary',
+    shouldConsiderAsGraded: false,
   },
   MISSING: {
     id: 'missing',
     label: I18n.t('Missing'),
     color: 'danger',
+    shouldConsiderAsGraded: false,
   },
   NOT_SUBMITTED: {
     id: 'not_submitted',
     label: I18n.t('Not Submitted'),
     color: 'primary',
+    shouldConsiderAsGraded: false,
   },
-  LATE: {
-    id: 'late',
+  LATE_GRADED: {
+    id: 'late_graded',
     label: I18n.t('Late'),
     color: 'warning',
+    shouldConsiderAsGraded: true,
+  },
+  LATE_NOT_GRADED: {
+    id: 'late_not_graded',
+    label: I18n.t('Late'),
+    color: 'warning',
+    shouldConsiderAsGraded: false,
   },
   GRADED: {
     id: 'graded',
     label: I18n.t('Graded'),
     color: 'success',
+    shouldConsiderAsGraded: true,
   },
   NOT_GRADED: {
     id: 'not_graded',
     label: I18n.t('Not Graded'),
     color: 'primary',
+    shouldConsiderAsGraded: false,
   },
 }

@@ -197,6 +197,16 @@ const GradebookUploader = {
         this.addOverrideScoreChangeColumn(labelData, gridData, gradingPeriod)
       })
     }
+    if (uploadedGradebook.override_statuses != null) {
+      const overrideStatuses = uploadedGradebook.override_statuses
+      if (overrideStatuses.includes_course_score_status) {
+        this.addOverrideStatusChangeColumn(labelData, gridData)
+      }
+
+      overrideStatuses.grading_periods.forEach(gradingPeriod => {
+        this.addOverrideStatusChangeColumn(labelData, gridData, gradingPeriod)
+      })
+    }
 
     $.each(uploadedGradebook.students, function (index) {
       const row = {
@@ -233,6 +243,21 @@ const GradebookUploader = {
         }
         row[columnId] = overrideScore
         row[`${columnId}_conflicting`] = overrideScore
+      })
+
+      currentStudent.override_statuses?.forEach(overrideStatus => {
+        const id = overrideStatus.grading_period_id || 'course'
+        const columnId = `override_status_${id}`
+
+        if (
+          overrideStatus.current_grade_status !== null &&
+          overrideStatus.current_grade_status?.toLowerCase() !==
+            overrideStatus.new_grade_status?.toLowerCase()
+        ) {
+          rowsToHighlight.push({rowIndex: index, id: columnId})
+        }
+        row[columnId] = overrideStatus
+        row[`${columnId}_conflicting`] = overrideStatus
       })
 
       gridData.data.push(row)
@@ -524,6 +549,46 @@ const GradebookUploader = {
 
     const overrideScoreHeaderColumn = {
       id: `override_score_${id}`,
+      width: 250,
+      name: htmlEscape(title),
+      headerCssClass: 'assignment',
+    }
+    labelData.columns.push(overrideScoreHeaderColumn)
+  },
+
+  addOverrideStatusChangeColumn(labelData, gridData, gradingPeriod = null) {
+    // A null grading period means these changes are for override grades for the course
+    const id = gradingPeriod?.id || 'course'
+    const title = gradingPeriod?.title
+      ? I18n.t('Override Status (%{gradingPeriod})', {gradingPeriod: gradingPeriod.title})
+      : I18n.t('Override Status')
+
+    const newOverrideStatusColumn = {
+      id: `override_status_${id}`,
+      type: 'assignment',
+      name: htmlEscape(I18n.t('To')),
+      field: `override_status_${id}`,
+      width: 125,
+      editor: Slick.Editors.UploadGradeCellEditor,
+      editorFormatter: 'override_status',
+      editorParser: 'override_status',
+      formatter: GradebookUploader.createGeneralFormatter('new_grade_status'),
+      active: true,
+      cssClass: 'new-grade',
+    }
+
+    const conflictingOverrideScoreColumn = {
+      id: `override_status_${id}_conflicting`,
+      width: 125,
+      formatter: GradebookUploader.createGeneralFormatter('current_grade_status'),
+      field: `override_status_${id}_conflicting`,
+      name: htmlEscape(I18n.t('From')),
+      cssClass: 'conflicting-grade',
+    }
+    gridData.columns.push(conflictingOverrideScoreColumn, newOverrideStatusColumn)
+
+    const overrideScoreHeaderColumn = {
+      id: `override_status_${id}`,
       width: 250,
       name: htmlEscape(title),
       headerCssClass: 'assignment',

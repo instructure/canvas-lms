@@ -19,9 +19,9 @@
 
 import React from 'react'
 import fetchMock from 'fetch-mock'
+import {render, within} from '@testing-library/react'
 import {defaultGradebookProps} from '../../__tests__/GradebookSpecHelper'
 import {darken, defaultColors} from '../../constants/colors'
-import {render, within} from '@testing-library/react'
 import Gradebook from '../../Gradebook'
 import store from '../../stores/index'
 import {AssignmentGroup, Student} from '../../../../../../api.d'
@@ -334,5 +334,57 @@ describe('ProgressBar for loading data', () => {
       'aria-label',
       'Loading Gradebook submissions 0 / 60000'
     )
+  })
+})
+
+describe('TotalGradeOverrideTrayProvider tests', () => {
+  it('should render the total grade override tray with FF ON', async () => {
+    store.setState({
+      finalGradeOverrideTrayProps: {
+        isOpen: true,
+        studentInfo: {id: '1', name: 'Test Student'},
+      },
+    })
+    const gradeBookEnv = {
+      ...defaultGradebookProps.gradebookEnv,
+      custom_grade_statuses_enabled: true,
+    }
+    const {queryByTestId} = render(
+      <Gradebook
+        {...defaultGradebookProps}
+        isSubmissionDataLoaded={true}
+        totalSubmissionsLoaded={0}
+        totalStudentsToLoad={11}
+        gradebookEnv={gradeBookEnv}
+      />
+    )
+
+    await new Promise(resolve => setTimeout(resolve, 0))
+    expect(queryByTestId('total-grade-override-tray')).toBeInTheDocument()
+  })
+
+  it('should not render the total grade override tray with FF OFF', async () => {
+    store.setState({
+      finalGradeOverrideTrayProps: {
+        isTrayOpen: true,
+        studentInfo: {id: '1', name: 'Test Student'},
+      },
+    })
+    const gradeBookEnv = {
+      ...defaultGradebookProps.gradebookEnv,
+      custom_grade_statuses_enabled: false,
+    }
+    const {queryByTestId} = render(
+      <Gradebook
+        {...defaultGradebookProps}
+        isSubmissionDataLoaded={true}
+        totalSubmissionsLoaded={0}
+        totalStudentsToLoad={11}
+        gradebookEnv={gradeBookEnv}
+      />
+    )
+
+    await new Promise(resolve => setTimeout(resolve, 0))
+    expect(queryByTestId('total-grade-override-tray')).not.toBeInTheDocument()
   })
 })

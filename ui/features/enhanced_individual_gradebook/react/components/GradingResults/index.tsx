@@ -20,11 +20,9 @@ import React, {useCallback, useEffect, useState} from 'react'
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Button} from '@instructure/ui-buttons'
 import {Pill} from '@instructure/ui-pill'
 import {Text} from '@instructure/ui-text'
-import {TextInput} from '@instructure/ui-text-input'
 import {View} from '@instructure/ui-view'
 import {
   ApiCallStatus,
@@ -36,18 +34,27 @@ import {
 import {useSubmitScore} from '../../hooks/useSubmitScore'
 import {useGetComments} from '../../hooks/useComments'
 import SubmissionDetailModal, {GradeChangeApiUpdate} from './SubmissionDetailModal'
-import {studentDisplayName, outOfText, submitterPreviewText} from '../../../utils/gradebookUtils'
+import ProxyUploadModal from '@canvas/proxy-submission/react/ProxyUploadModal'
+import {
+  submitterPreviewText,
+  disableGrading,
+  passFailStatusOptions,
+} from '../../../utils/gradebookUtils'
+import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
+import DefaultGradeInput from './DefaultGradeInput'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
-type Props = {
+export type GradingResultsComponentProps = {
   currentStudent?: GradebookStudentDetails
   studentSubmissions?: GradebookUserSubmissionDetails[]
   assignment?: AssignmentConnection
   courseId: string
   gradebookOptions: GradebookOptions
   loadingStudent: boolean
+  currentStudentHiddenName: string
   onSubmissionSaved: (submission: GradebookUserSubmissionDetails) => void
+  dropped: boolean
 }
 
 export default function GradingResults({
@@ -57,13 +64,19 @@ export default function GradingResults({
   studentSubmissions,
   gradebookOptions,
   loadingStudent,
+  currentStudentHiddenName,
   onSubmissionSaved,
-}: Props) {
+  dropped,
+}: GradingResultsComponentProps) {
   const submission = studentSubmissions?.find(s => s.assignmentId === assignment?.id)
   const [gradeInput, setGradeInput] = useState<string>('')
+  const [excusedChecked, setExcusedChecked] = useState<boolean>(false)
   const [modalOpen, setModalOpen] = useState<boolean>(false)
+  const [proxyUploadModalOpen, setProxyUploadModalOpen] = useState<boolean>(false)
+  const [passFailStatusIndex, setPassFailStatusIndex] = useState<number>(0)
 
-  const {submit, submitScoreError, submitScoreStatus, savedSubmission} = useSubmitScore()
+  const {submit, submitExcused, submitScoreError, submitScoreStatus, savedSubmission} =
+    useSubmitScore()
   const {submissionComments, loadingComments, refetchComments} = useGetComments({
     courseId,
     submissionId: submission?.id,
@@ -71,9 +84,30 @@ export default function GradingResults({
 
   useEffect(() => {
     if (submission) {
-      setGradeInput(submission?.grade ?? '-')
+      if (assignment?.gradingType === 'pass_fail') {
+        const index = passFailStatusOptions.findIndex(
+          passFailStatusOption =>
+            passFailStatusOption.value === submission.grade ||
+            (passFailStatusOption.value === 'EX' && submission.excused)
+        )
+        if (index !== -1) {
+          setPassFailStatusIndex(index)
+        } else {
+          setPassFailStatusIndex(0)
+        }
+      }
+      setExcusedChecked(submission.excused)
+      if (submission.excused) {
+        setGradeInput(I18n.t('Excused'))
+      } else if (submission.enteredGrade == null) {
+        setGradeInput('-')
+      } else if (assignment?.gradingType === 'letter_grade') {
+        setGradeInput(GradeFormatHelper.replaceDashWithMinus(submission.enteredGrade))
+      } else {
+        setGradeInput(submission.enteredGrade)
+      }
     }
-  }, [submission])
+  }, [assignment, submission])
 
   const handleGradeChange = useCallback(
     (updateEvent: GradeChangeApiUpdate) => {
@@ -107,11 +141,10 @@ export default function GradingResults({
       error: submitScoreError,
     })
   }, [submitScoreStatus, savedSubmission, submitScoreError, handleGradeChange])
-
   if (!submission || !assignment || !currentStudent) {
     return (
       <>
-        <View as="div">
+        <View as="div" data-testid="grading-results-empty">
           <View as="div" className="row-fluid">
             <View as="div" className="span4">
               <View as="h2">{I18n.t('Grading')}</View>
@@ -127,50 +160,138 @@ export default function GradingResults({
     )
   }
 
+  const reloadSubmission = (proxyDetails: any) => {
+    proxyDetails = {
+      submissionType: proxyDetails.submission_type,
+      proxySubmitter: proxyDetails.proxy_submitter,
+      workflowState: proxyDetails.workflow_state,
+      submittedAt: proxyDetails.submitted_at,
+    }
+    onSubmissionSaved({...submission, ...proxyDetails})
+  }
+
   if (loadingStudent) {
     return <LoadingIndicator />
   }
 
-  const submitGrade = async () => {
-    await submit(assignment, submission, gradeInput)
+  const {
+    changeGradeUrl,
+    customOptions: {hideStudentNames},
+  } = gradebookOptions
+
+  const submitScoreUrl = (changeGradeUrl ?? '')
+    .replace(':assignment', assignment.id)
+    .replace(':submission', submission.userId)
+
+  const markExcused = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const {
+      target: {checked},
+    } = event
+    await submitExcused(checked, submitScoreUrl)
   }
-  const {hideStudentNames} = gradebookOptions.customOptions
+
+  const submitGrade = async () => {
+    await submit(assignment, submission, gradeInput, submitScoreUrl)
+  }
+
+  const handleSetGradeInput = (input: string) => {
+    setGradeInput(input)
+  }
+
+  const handleChangePassFailStatus = (
+    event: React.SyntheticEvent,
+    data: {value?: string | number | undefined}
+  ) => {
+    if (typeof data.value === 'string') {
+      setGradeInput(data.value)
+    }
+    setPassFailStatusIndex(passFailStatusOptions.findIndex(option => option.value === data.value))
+  }
+
+  const latePenaltyFinalGradeDisplay = (grade: string | null) => {
+    if (grade == null) {
+      return ' -'
+    }
+
+    const displayGrade = GradeFormatHelper.formatGrade(grade)
+    return GradeFormatHelper.replaceDashWithMinus(displayGrade)
+  }
+
   return (
     <>
-      <View as="div">
+      <View as="div" data-testid="grading-results">
         <View as="div" className="row-fluid">
           <View as="div" className="span4">
             <View as="h2">{I18n.t('Grading')}</View>
           </View>
           <View as="div" className="span8 pad-box top-only">
-            <View as="div">
+            <View as="div" data-testid="student_and_assignment_grade_label">
               <View as="span">
                 <Text size="small">
-                  <View as="strong">{`${I18n.t('Grade for')} ${studentDisplayName(
-                    currentStudent,
-                    hideStudentNames
-                  )} - ${assignment.name}`}</View>
+                  <View as="strong">{`${I18n.t('Grade for')} ${
+                    hideStudentNames ? currentStudentHiddenName : currentStudent.name
+                  } - ${assignment.name}`}</View>
                 </Text>
                 <SubmissionStatus submission={submission} />
               </View>
             </View>
             <View as="span">
-              <Text size="small">{submitterPreviewText(submission)}</Text>
+              <Text data-testid="submitter-name" size="small">
+                {submitterPreviewText(submission)}
+              </Text>
             </View>
-
-            <View as="div" className="grade">
-              <TextInput
-                display="inline-block"
-                width="14rem"
-                value={gradeInput}
-                disabled={submitScoreStatus === ApiCallStatus.PENDING}
-                renderLabel={<ScreenReaderContent>{I18n.t('Student Grade')}</ScreenReaderContent>}
-                onChange={e => setGradeInput(e.target.value)}
-                onBlur={() => submitGrade()}
-              />
-              <View as="span" margin="0 0 0 small">
-                {outOfText(assignment, submission)}
-              </View>
+            <DefaultGradeInput
+              assignment={assignment}
+              submission={submission}
+              passFailStatusIndex={passFailStatusIndex}
+              gradeInput={gradeInput}
+              submitScoreStatus={submitScoreStatus}
+              context="student_and_assignment_grade"
+              handleSetGradeInput={handleSetGradeInput}
+              handleSubmitGrade={submitGrade}
+              handleChangePassFailStatus={handleChangePassFailStatus}
+            />
+            <View as="div" margin="small 0 0 0">
+              {submission.late && (
+                <>
+                  <View display="inline-block">
+                    <View
+                      data-testid="submission_late_penalty_label"
+                      as="div"
+                      padding="0 0 0 small"
+                    >
+                      <Text color="danger">{I18n.t('Late Penalty')}</Text>
+                    </View>
+                    <View
+                      data-testid="late_penalty_final_grade_label"
+                      as="div"
+                      padding="0 0 0 small"
+                    >
+                      <Text>{I18n.t('Final Grade')}</Text>
+                    </View>
+                  </View>
+                  <View display="inline-block">
+                    <View
+                      data-testid="submission_late_penalty_value"
+                      as="div"
+                      padding="0 0 0 small"
+                    >
+                      <Text color="danger">
+                        {!Number.isNaN(Number(submission.deductedPoints))
+                          ? I18n.n(-Number(submission.deductedPoints)) || ' -'
+                          : ' -'}
+                      </Text>
+                    </View>
+                    <View
+                      data-testid="late_penalty_final_grade_value"
+                      as="div"
+                      padding="0 0 0 small"
+                    >
+                      <Text>{latePenaltyFinalGradeDisplay(submission.grade)}</Text>
+                    </View>
+                  </View>
+                </>
+              )}
             </View>
 
             {assignment.gradingType !== 'pass_fail' && (
@@ -179,14 +300,41 @@ export default function GradingResults({
                 style={{padding: 12, margin: '15px 0 0 0', background: '#eee', borderRadius: 5}}
               >
                 <label className="checkbox" htmlFor="excuse_assignment">
-                  <input type="checkbox" id="excuse_assignment" name="excuse_assignment" />
+                  <input
+                    type="checkbox"
+                    id="excuse_assignment"
+                    name="excuse_assignment"
+                    data-testid="excuse_assignment_checkbox"
+                    checked={excusedChecked}
+                    disabled={disableGrading(assignment, submitScoreStatus)}
+                    onChange={markExcused}
+                  />
                   {I18n.t('Excuse This Assignment for the Selected Student')}
                 </label>
               </div>
             )}
+            {dropped && (
+              <p className="dropped muted" data-testid="dropped-assignment-message">
+                This grade is currently dropped for this student.
+              </p>
+            )}
+            {submission.gradeMatchesCurrentSubmission !== null &&
+              !submission.gradeMatchesCurrentSubmission && (
+                <View
+                  as="div"
+                  margin="large 0 0 0"
+                  className="resubmitted_assignment_label"
+                  data-testid="resubmitted_assignment_label"
+                >
+                  <Text color="secondary">
+                    {I18n.t('This assignment has been resubmitted since it was graded last.')}
+                  </Text>
+                </View>
+              )}
 
-            <View as="div" className="span4" margin="medium 0 0 0" width="14.6rem">
+            <View as="div" className="span4" margin="small 0 0 0" width="14.6rem">
               <Button
+                data-testid="submission-details-button"
                 display="block"
                 onClick={() => {
                   setModalOpen(true)
@@ -194,6 +342,18 @@ export default function GradingResults({
               >
                 {I18n.t('Submission Details')}
               </Button>
+            </View>
+            <View as="div" className="span4" margin="medium" width="14.6rem">
+              {gradebookOptions.proxySubmissionEnabled &&
+                assignment.submissionTypes.includes('online_upload') && (
+                  <Button
+                    data-testid="proxy-submission-button"
+                    display="block"
+                    onClick={() => setProxyUploadModalOpen(true)}
+                  >
+                    {I18n.t('Submit for Student')}
+                  </Button>
+                )}
             </View>
           </View>
         </View>
@@ -206,9 +366,21 @@ export default function GradingResults({
         submission={submission}
         loadingComments={loadingComments}
         modalOpen={modalOpen}
+        submitScoreUrl={submitScoreUrl}
         handleClose={() => setModalOpen(false)}
         onGradeChange={handleGradeChange}
         onPostComment={handlePostComment}
+      />
+      <ProxyUploadModal
+        data-testid="proxy-upload-modal"
+        open={proxyUploadModalOpen}
+        onClose={() => {
+          setProxyUploadModalOpen(false)
+        }}
+        assignment={assignment}
+        student={currentStudent}
+        submission={submission}
+        reloadSubmission={reloadSubmission}
       />
     </>
   )
@@ -232,7 +404,7 @@ function SubmissionStatus({submission}: SubmissionStatusProps) {
 
   return (
     <View as="span">
-      <Pill margin="small" color="danger">
+      <Pill margin="small" color="danger" data-testid="submission-status-pill">
         <View as="strong" padding="x-small">
           {I18n.t('%{text}', {text})}
         </View>

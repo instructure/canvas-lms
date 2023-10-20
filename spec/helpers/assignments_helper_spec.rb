@@ -175,6 +175,12 @@ describe AssignmentsHelper do
     it "returns nil when passed a nil grade and a grading_type of pass_fail" do
       expect(i18n_grade(nil, "pass_fail")).to be_nil
     end
+
+    it "returns a grade with trailing en-dash replaced with minus when grading_type is letter_grade" do
+      en_dash = "-"
+      minus = "−"
+      expect(i18n_grade("B#{en_dash}", "letter_grade")).to eq "B#{minus}"
+    end
   end
 
   describe "#student_peer_review_link_for" do
@@ -188,8 +194,7 @@ describe AssignmentsHelper do
       assignment.assign_peer_review(reviewer, reviewee)
 
       # Avoid having to go down a rabbit hole of imports
-      allow(self).to receive(:submission_author_name_for).and_return("Nobody")
-      allow(self).to receive(:link_to).and_return("")
+      allow(self).to receive_messages(submission_author_name_for: "Nobody", link_to: "")
     end
 
     it "creates a URL containing the peer reviewee's user ID when peer reviewing is not anonymous" do

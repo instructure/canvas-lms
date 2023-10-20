@@ -45,6 +45,8 @@ class CoursePacing::PaceContextsPresenter
       return nil
     end
 
+    return nil unless applied_pace
+
     {
       name: applied_pace.effective_name,
       type: applied_pace.type,

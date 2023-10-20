@@ -92,6 +92,17 @@ describe Types::CourseType do
     end
   end
 
+  describe "relevantGradingPeriodGroup" do
+    let!(:grading_period_group) { Account.default.grading_period_groups.create!(title: "a test group") }
+
+    it "returns the grading period group for the course" do
+      enrollment_term = course.enrollment_term
+      enrollment_term.update(grading_period_group_id: grading_period_group.id)
+      expect(course.relevant_grading_period_group).to eq grading_period_group
+      expect(course_type.resolve("relevantGradingPeriodGroup { _id }")).to eq grading_period_group.id.to_s
+    end
+  end
+
   describe "assignmentsConnection" do
     let_once(:assignment) do
       course.assignments.create! name: "asdf", workflow_state: "unpublished"
@@ -736,6 +747,18 @@ describe Types::CourseType do
               current_user: @teacher
             )
           ).to eq [observer_enrollment.id.to_s]
+        end
+
+        it "returns only enrollments with the specified states if included" do
+          inactive_student = course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "inactive").user
+          deleted_student = course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "deleted").user
+          rejected_student = course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "rejected").user
+          expect(
+            course_type.resolve(
+              "enrollmentsConnection(filter: {states: [inactive, deleted, rejected]}) { nodes { _id } }",
+              current_user: @teacher
+            )
+          ).to eq [inactive_student.enrollments.first.id.to_s, deleted_student.enrollments.first.id.to_s, rejected_student.enrollments.first.id.to_s]
         end
       end
     end

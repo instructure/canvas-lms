@@ -255,9 +255,56 @@ describe CoursePacesController do
         js_env = controller.js_env
         expect(js_env[:PACES_PUBLISHING].length).to eq(1)
       end
+
+      it "removes the progress if the enrollment is no longer active" do
+        student_enrollment = @course1.enroll_student(@student, enrollment_state: "active", allow_multiple_enrollments: true)
+        # Stop other publishing progresses
+        Progress.where(tag: "course_pace_publish").destroy_all
+        student_enrollment_pace_model(student_enrollment:).create_publish_progress
+        expect(Progress.where(tag: "course_pace_publish").count).to eq(1)
+        student_pace_progress = Progress.find_by(tag: "course_pace_publish")
+        student_enrollment.destroy
+        # The enrollment destroy queues up the course pace
+        expect(Progress.where(tag: "course_pace_publish").count).to eq(2)
+        expect(Progress.all).to include(student_pace_progress)
+        user_session(@teacher1)
+
+        get :index, params: { course_id: @course1.id }
+        expect(response).to be_successful
+
+        js_env = controller.js_env
+        expect(js_env[:PACES_PUBLISHING].length).to eq(1)
+        expect(Progress.where(tag: "course_pace_publish").count).to eq(1)
+        expect(Progress.all).not_to include(student_pace_progress)
+      end
     end
 
     context "progress" do
+      it "queues up a new job using the same progress if the delayed_job_id is missing" do
+        progress = @course_pace.create_publish_progress
+        delayed_job = progress.delayed_job
+        progress.update!(delayed_job_id: nil)
+        delayed_job.destroy
+        get :index, params: { course_id: @course.id }
+        expect(response).to be_successful
+        expect(Progress.last.id).to eq(progress.id)
+        progress.reload
+        expect(progress.delayed_job_id).not_to be_nil
+        expect(progress.delayed_job).not_to be_nil
+      end
+
+      it "creates a new progress and job if the delayed_job is missing" do
+        progress = @course_pace.create_publish_progress
+        progress.delayed_job.destroy
+        get :index, params: { course_id: @course.id }
+        expect(response).to be_successful
+        expect(progress.reload.failed?).to be_truthy
+        new_progress = Progress.last
+        expect(new_progress.tag).to eq("course_pace_publish")
+        expect(new_progress.delayed_job_id).not_to be_nil
+        expect(new_progress.delayed_job).not_to be_nil
+      end
+
       it "starts the progress' delayed job if queued" do
         progress = @course_pace.create_publish_progress
         delayed_job = progress.delayed_job
@@ -305,13 +352,13 @@ describe CoursePacesController do
 
         get :api_show, params: { course_id: @course.id, id: @course_pace.id }
         pace = response.parsed_body["course_pace"]
-        expect(pace["modules"][0]["items"].select { |item| item["assignment_title"] == "Del this assn" }.present?).to be_truthy
+        expect(pace["modules"][0]["items"].any? { |item| item["assignment_title"] == "Del this assn" }).to be_truthy
 
         a.destroy!
 
         get :api_show, params: { course_id: @course.id, id: @course_pace.id }
         pace = response.parsed_body["course_pace"]
-        expect(pace["modules"][0]["items"].select { |item| item["assignment_title"] == "Del this assn" }.present?).to be_falsey
+        expect(pace["modules"][0]["items"].any? { |item| item["assignment_title"] == "Del this assn" }).to be_falsey
       end
 
       it "handles quizzes" do
@@ -322,13 +369,13 @@ describe CoursePacesController do
 
         get :api_show, params: { course_id: @course.id, id: @course_pace.id }
         pace = response.parsed_body["course_pace"]
-        expect(pace["modules"][0]["items"].select { |item| item["assignment_title"] == "Del this quiz" }.present?).to be_truthy
+        expect(pace["modules"][0]["items"].any? { |item| item["assignment_title"] == "Del this quiz" }).to be_truthy
 
         q.destroy!
 
         get :api_show, params: { course_id: @course.id, id: @course_pace.id }
         pace = response.parsed_body["course_pace"]
-        expect(pace["modules"][0]["items"].select { |item| item["assignment_title"] == "Del this quiz" }.present?).to be_falsey
+        expect(pace["modules"][0]["items"].any? { |item| item["assignment_title"] == "Del this quiz" }).to be_falsey
       end
 
       it "handles graded discussions" do
@@ -339,13 +386,13 @@ describe CoursePacesController do
 
         get :api_show, params: { course_id: @course.id, id: @course_pace.id }
         pace = response.parsed_body["course_pace"]
-        expect(pace["modules"][0]["items"].select { |item| item["assignment_title"] == "Del this disc" }.present?).to be_truthy
+        expect(pace["modules"][0]["items"].any? { |item| item["assignment_title"] == "Del this disc" }).to be_truthy
 
         d.destroy!
 
         get :api_show, params: { course_id: @course.id, id: @course_pace.id }
         pace = response.parsed_body["course_pace"]
-        expect(pace["modules"][0]["items"].select { |item| item["assignment_title"] == "Del this disc" }.present?).to be_falsey
+        expect(pace["modules"][0]["items"].any? { |item| item["assignment_title"] == "Del this disc" }).to be_falsey
       end
     end
   end
@@ -621,6 +668,16 @@ describe CoursePacesController do
       json_response = response.parsed_body
       expect(json_response["context_type"]).to eq("CoursePace")
       expect(json_response["workflow_state"]).to eq("queued")
+    end
+
+    it "emits course_pacing.publishing.count_exceeding_limit to statsd when pace publishing proccesses exceeded limit" do
+      allow(InstStatsd::Statsd).to receive(:count).and_call_original
+
+      Progress.destroy_all
+      50.times { @course_pace.create_publish_progress(run_at: Time.now) }
+
+      post :publish, params: { course_id: @course.id, id: @course_pace.id }
+      expect(InstStatsd::Statsd).to have_received(:count).with("course_pacing.publishing.count_exceeding_limit", 51)
     end
   end
 

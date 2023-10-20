@@ -57,7 +57,7 @@ const rubricHtml =
   ' <div class="rubric">' +
   '  <form id="edit_rubric_form">' +
   '   <input type="checkbox" id="hide_points" class="hide_points_checkbox" />' +
-  '   <div class="rubric_grading">' +
+  '   <div class="rubric_grading" style="">' +
   '    <input type="checkbox" id="grading_rubric" class="grading_rubric_checkbox" />' +
   '   </div>' +
   '   <div class="totalling_rubric">' +
@@ -66,6 +66,12 @@ const rubricHtml =
   '  </form>' +
   ' </div>' +
   '</div>'
+
+test('opening new rubric from assignment page displays "use this rubric for assignment editing" right away', () => {
+  $(document.body).append($(rubricHtml))
+  rubricEditing.init()
+  notOk($('.rubric_grading').attr('style').includes('display: none;'))
+})
 
 test('clicking hide_points checkbox hides grading_rubric checkbox', () => {
   $(document.body).append($(rubricHtml))

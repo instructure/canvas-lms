@@ -19,16 +19,18 @@
 #
 
 require_relative "../graphql_spec_helper"
-require_relative "./shared_examples/types_with_enumerable_workflow_states"
+require_relative "shared_examples/types_with_enumerable_workflow_states"
 
 describe Types::AssignmentType do
   let_once(:course) { course_factory(active_all: true) }
 
   let_once(:teacher) { teacher_in_course(active_all: true, course:).user }
   let_once(:student) { student_in_course(course:, active_all: true).user }
+  let_once(:admin_user) { account_admin_user_with_role_changes }
 
   let(:assignment) do
     course.assignments.create(title: "some assignment",
+                              points_possible: 10,
                               submission_types: ["online_text_entry"],
                               workflow_state: "published",
                               allowed_extensions: %w[doc xlt foo])
@@ -36,6 +38,7 @@ describe Types::AssignmentType do
 
   let(:assignment_type) { GraphQLTypeTester.new(assignment, current_user: student) }
   let(:teacher_assignment_type) { GraphQLTypeTester.new(assignment, current_user: teacher) }
+  let(:admin_user_assignment_type) { GraphQLTypeTester.new(assignment, current_user: admin_user) }
 
   it "works" do
     expect(assignment_type.resolve("_id")).to eq assignment.id.to_s
@@ -199,6 +202,58 @@ describe Types::AssignmentType do
     ).to eq "http://test.host/courses/#{assignment.context_id}/assignments/#{assignment.id}"
   end
 
+  context "scoreStatistic" do
+    it "returns null when there are no scores" do
+      assignment.submissions.destroy_all
+      expect(assignment_type.resolve("scoreStatistic { mean }")).to be_nil
+    end
+
+    context "when there are scores" do
+      before do
+        assignment.update!(grading_type: "points")
+        assignment.grade_student(student, grade: 5, grader: teacher)
+        student_2 = student_in_course(course:, active_all: true).user
+        assignment.grade_student(student_2, grade: 10, grader: teacher)
+        student_3 = student_in_course(course:, active_all: true).user
+        assignment.grade_student(student_3, grade: 15, grader: teacher)
+      end
+
+      it "returns the scoreStatistic always for teachers" do
+        expect(teacher_assignment_type.resolve("scoreStatistic { mean }")).to be 10.0
+        expect(teacher_assignment_type.resolve("scoreStatistic { maximum }")).to be 15.0
+        expect(teacher_assignment_type.resolve("scoreStatistic { minimum }")).to be 5.0
+        expect(teacher_assignment_type.resolve("scoreStatistic { count }")).to be 3
+
+        assignment.mute!
+
+        expect(teacher_assignment_type.resolve("scoreStatistic { mean }")).to be 10.0
+      end
+
+      it "returns null for students when there are fewer than 5 submissions" do
+        expect(assignment_type.resolve("scoreStatistic { mean }")).to be_nil
+      end
+
+      it "returns the scoreStatistic for students when there are 5 or more submissions" do
+        student_4 = student_in_course(course:, active_all: true).user
+        assignment.grade_student(student_4, grade: 10, grader: teacher)
+        student_5 = student_in_course(course:, active_all: true).user
+        assignment.grade_student(student_5, grade: 10, grader: teacher)
+
+        # students should see statistics if there are 5 or more submissions
+        expect(assignment_type.resolve("scoreStatistic { mean }")).to be 10.0
+      end
+
+      it "returns null for students when the assignment is muted" do
+        assignment.mute!
+        expect(assignment_type.resolve("scoreStatistic { mean }")).to be_nil
+      end
+
+      it "returns stats for admins" do
+        expect(admin_user_assignment_type.resolve("scoreStatistic { mean }")).to be 10.0
+      end
+    end
+  end
+
   context "description" do
     before do
       assignment.update description: %(Hi <img src="/courses/#{course.id}/files/12/download"<h1>Content</h1>)
@@ -252,6 +307,19 @@ describe Types::AssignmentType do
     expect(assignment_type.resolve("allowedAttempts")).to eq 7
   end
 
+  describe "gradingStandard" do
+    it "returns the grading standard" do
+      grading_standard = course.grading_standards.create!(title: "Win/Lose", data: [["Winner", 0.94], ["Loser", 0]])
+      assignment.update(grading_type: "letter_grade", grading_standard_id: grading_standard.id)
+      assignment.save!
+      expect(assignment_type.resolve("gradingStandard { title }")).to eq grading_standard.title
+    end
+
+    it "returns null if no grading standard is set" do
+      expect(assignment_type.resolve("gradingStandard { title }")).to be_nil
+    end
+  end
+
   describe "submissionsConnection" do
     let_once(:other_student) { student_in_course(course:, active_all: true).user }
 
@@ -289,6 +357,41 @@ describe Types::AssignmentType do
                                                                direction: "descending"
                                                              }]
                                                            })
+    end
+
+    context "include_unsubmitted" do
+      it "returns unsubmitted submission when include_unsubmitted is true" do
+        assignment_unsubmitted = course.assignments.create!
+        assignment_unsubmitted.update!(submission_types: "online_text_entry")
+        assignment_type_2 = GraphQLTypeTester.new(assignment_unsubmitted, current_user: student)
+
+        result = assignment_type_2.resolve(<<~GQL, current_user: student)
+          submissionsConnection(
+            filter: {
+              includeUnsubmitted: true
+            }
+          ) { nodes { state } }
+        GQL
+
+        expect(result.count).to eq 1
+        expect(result[0]).to eq "unsubmitted"
+      end
+
+      it "does not return unsubmitted submission when include_unsubmitted is false" do
+        assignment_unsubmitted = course.assignments.create!
+        assignment_unsubmitted.update!(submission_types: "online_text_entry")
+        assignment_type_2 = GraphQLTypeTester.new(assignment_unsubmitted, current_user: student)
+
+        result = assignment_type_2.resolve(<<~GQL, current_user: student)
+          submissionsConnection(
+            filter: {
+              includeUnsubmitted: false
+            }
+          ) { nodes { state } }
+        GQL
+
+        expect(result.count).to eq 0
+      end
     end
 
     it "returns 'real' submissions from with permissions" do
@@ -470,6 +573,10 @@ describe Types::AssignmentType do
     expect(assignment_type.resolve("assignmentGroup { _id }")).to eq assignment.assignment_group.to_param
   end
 
+  it "has an assignmentGroupID" do
+    expect(assignment_type.resolve("assignmentGroupId")).to eq assignment.assignment_group.id.to_s
+  end
+
   it "has modules" do
     module1 = assignment.course.context_modules.create!(name: "Module 1")
     module2 = assignment.course.context_modules.create!(name: "Module 2")
@@ -493,6 +600,16 @@ describe Types::AssignmentType do
 
     assignment.update_attribute :grading_type, "fakefakefake"
     expect(assignment_type.resolve("gradingType")).to be_nil
+  end
+
+  it "returns grading period id" do
+    grading_period_group = GradingPeriodGroup.create!(title: "foo", course_id: @course.id)
+    grading_period = GradingPeriod.create!(title: "foo", start_date: 1.day.ago, end_date: 1.day.from_now, grading_period_group_id: grading_period_group.id)
+    gp_assignment = @course.assignments.create! name: "asdf", points_possible: 10
+
+    grading_period_assignment_type = GraphQLTypeTester.new(gp_assignment, current_user: student)
+
+    expect(grading_period_assignment_type.resolve("gradingPeriodId")).to eq grading_period.id.to_s
   end
 
   context "overridden assignments" do
@@ -614,6 +731,21 @@ describe Types::AssignmentType do
           } } } }
         GQL
       ).to eq ["555"]
+    end
+
+    it "works for Course tags" do
+      Account.site_admin.enable_feature!(:differentiated_modules)
+      assignment.assignment_overrides.create!(set: course)
+
+      expect(
+        assignment_type.resolve(<<~GQL, current_user: teacher)
+          assignmentOverrides { edges { node { set {
+            ... on Course {
+              _id
+            }
+          } } } }
+        GQL
+      ).to eq [course.id.to_s]
     end
   end
 

@@ -50,6 +50,59 @@ describe "assignments" do
       end
     end
 
+    it "renders no students found text when search keyword does not match any students" do
+      course_with_teacher_logged_in
+      @student1 = student_in_course.user
+
+      @assignment = assignment_model({
+                                       course: @course,
+                                       peer_reviews: true,
+                                       automatic_peer_reviews: false,
+                                     })
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/peer_reviews"
+
+      form = driver.find_element(css: "form")
+      text_field = driver.find_element(class: "ic-Input")
+      text_field.send_keys("Hello World")
+      submit_button = form.find_element(css: 'input[type="submit"]')
+      submit_button.click
+
+      expect(f(".no_students_message").text).to match("No Students Found")
+    end
+
+    it "renders only 10 students on each peer review page" do
+      course_with_teacher_logged_in
+      create_users_in_course(@course, 11)
+
+      @assignment = assignment_model({
+                                       course: @course,
+                                       peer_reviews: true,
+                                       automatic_peer_reviews: false,
+                                     })
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/peer_reviews"
+
+      list_items = driver.find_elements(class: "student_reviews")
+      expect(list_items.count).to eq(10)
+    end
+
+    it "renders the remaining students on another page if total number of students exceeds the limit of 10 students per page" do
+      course_with_teacher_logged_in
+      create_users_in_course(@course, 11)
+
+      @assignment = assignment_model({
+                                       course: @course,
+                                       peer_reviews: true,
+                                       automatic_peer_reviews: false,
+                                     })
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/peer_reviews?page=2"
+
+      list_items = driver.find_elements(class: "student_reviews")
+      expect(list_items.count).to eq(1)
+    end
+
     it "displays the intra-group review toggle for group assignments" do
       course_with_teacher_logged_in
       student = student_in_course.user

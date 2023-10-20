@@ -1,0 +1,6 @@
+version: '2.3'
+services:
+  web:
+    environment:
+      REMOTE_DEBUGGING_ENABLED: 1
+      USER: docker

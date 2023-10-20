@@ -28,8 +28,6 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import ColumnHeader from './ColumnHeader'
 
-const {Item: MenuItem, Group: MenuGroup, Separator: MenuSeparator} = Menu as any
-
 const I18n = useI18nScope('gradebook')
 
 function AssignmentGroupDetail({assignmentGroup, viewUngradedAsZero, weightedGroups}) {
@@ -174,7 +172,7 @@ export default class AssignmentGroupColumnHeader extends ColumnHeader<Props, Sta
               <Grid.Col textAlign="center" width="auto">
                 <div className={classes}>
                   <Menu
-                    contentRef={this.bindOptionsMenuContent}
+                    menuRef={this.bindOptionsMenuContent}
                     shouldFocusTriggerOnClose={false}
                     trigger={renderTrigger(
                       this.props.assignmentGroup,
@@ -183,11 +181,11 @@ export default class AssignmentGroupColumnHeader extends ColumnHeader<Props, Sta
                     onToggle={this.onToggle}
                     onDismiss={this.props.onMenuDismiss}
                   >
-                    <Menu label={I18n.t('Sort by')} contentRef={this.bindSortByMenuContent}>
-                      <MenuGroup
+                    <Menu label={I18n.t('Sort by')} menuRef={this.bindSortByMenuContent}>
+                      <Menu.Group
                         label={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}
                       >
-                        <MenuItem
+                        <Menu.Item
                           selected={
                             selectedSortSetting === 'grade' &&
                             sortBySetting.direction === 'ascending'
@@ -196,9 +194,9 @@ export default class AssignmentGroupColumnHeader extends ColumnHeader<Props, Sta
                           onSelect={sortBySetting.onSortByGradeAscending}
                         >
                           <span>{I18n.t('Grade - Low to High')}</span>
-                        </MenuItem>
+                        </Menu.Item>
 
-                        <MenuItem
+                        <Menu.Item
                           selected={
                             selectedSortSetting === 'grade' &&
                             sortBySetting.direction === 'descending'
@@ -207,21 +205,21 @@ export default class AssignmentGroupColumnHeader extends ColumnHeader<Props, Sta
                           onSelect={sortBySetting.onSortByGradeDescending}
                         >
                           <span>{I18n.t('Grade - High to Low')}</span>
-                        </MenuItem>
-                      </MenuGroup>
+                        </Menu.Item>
+                      </Menu.Group>
                     </Menu>
 
-                    {this.props.onApplyScoreToUngraded != null && <MenuSeparator />}
+                    {this.props.onApplyScoreToUngraded != null && <Menu.Separator />}
 
                     {this.props.onApplyScoreToUngraded != null && (
-                      <MenuItem
+                      <Menu.Item
                         disabled={this.props.isRunningScoreToUngraded}
                         onSelect={this.props.onApplyScoreToUngraded}
                       >
                         {this.props.isRunningScoreToUngraded
                           ? I18n.t('Applying Score to Ungraded')
                           : I18n.t('Apply Score to Ungraded')}
-                      </MenuItem>
+                      </Menu.Item>
                     )}
                   </Menu>
                 </div>

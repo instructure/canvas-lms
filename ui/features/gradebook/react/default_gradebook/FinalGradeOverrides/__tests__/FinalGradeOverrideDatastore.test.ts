@@ -19,6 +19,7 @@
 
 import GradeOverrideInfo from '@canvas/grading/GradeEntry/GradeOverrideInfo'
 import FinalGradeOverrideDatastore from '../FinalGradeOverrideDatastore'
+import useStore from '../../stores'
 
 describe('Gradebook FinalGradeOverrideDatastore', () => {
   let datastore
@@ -106,6 +107,23 @@ describe('Gradebook FinalGradeOverrideDatastore', () => {
       }
 
       datastore.setGrades(grades)
+
+      useStore.setState({
+        finalGradeOverrides: {
+          1101: {
+            courseGrade: {
+              percentage: 90.12,
+            },
+          },
+          1102: {
+            gradingPeriodGrades: {
+              1501: {
+                percentage: 81.23,
+              },
+            },
+          },
+        },
+      })
     })
 
     it('updates the course grade when given a null grading period id', () => {
@@ -141,6 +159,30 @@ describe('Gradebook FinalGradeOverrideDatastore', () => {
     it('adds the grading period grade when the given user has no overrides', () => {
       datastore.updateGrade('1103', '1501', {percentage: 82})
       expect(datastore.getGrade('1103', '1501')).toEqual({percentage: 82})
+    })
+
+    it('updates store finalGradesOverride value for the student', () => {
+      datastore.updateGrade('1101', null, {percentage: 91})
+      expect(datastore.getGrade('1101', null)).toEqual({percentage: 91})
+      const updatedFinalGradeOverrides = useStore.getState().finalGradeOverrides
+      const studentOverrides = updatedFinalGradeOverrides['1101']
+      expect(studentOverrides.courseGrade?.percentage).toEqual(91)
+    })
+
+    it('updates store finalGradesOverride value for the student with grading period', () => {
+      datastore.updateGrade('1101', '1501', {percentage: 91})
+      expect(datastore.getGrade('1101', '1501')).toEqual({percentage: 91})
+      const updatedFinalGradeOverrides = useStore.getState().finalGradeOverrides
+      const studentOverrides = updatedFinalGradeOverrides['1101']
+      expect(studentOverrides.gradingPeriodGrades['1501']?.percentage).toEqual(91)
+    })
+
+    it('only updates store finalGradesOverride for the student changed', () => {
+      datastore.updateGrade('1101', '1501', {percentage: 91})
+      expect(datastore.getGrade('1101', '1501')).toEqual({percentage: 91})
+      const updatedFinalGradeOverrides = useStore.getState().finalGradeOverrides
+      const studentOverrides = updatedFinalGradeOverrides['1102']
+      expect(studentOverrides.gradingPeriodGrades['1501']?.percentage).toEqual(81.23)
     })
   })
 

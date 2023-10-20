@@ -313,7 +313,6 @@ describe PlannerController do
 
       describe "account calendars" do
         before do
-          Account.site_admin.enable_feature!(:account_calendars_planner_support)
           Account.default.account_calendar_visible = true
           Account.default.save!
           @sub_account1 = Account.default.sub_accounts.create!(name: "SA-1", account_calendar_visible: true)
@@ -335,13 +334,6 @@ describe PlannerController do
           expect(response_json.length).to eq 2
           expect(sub_account_event["plannable"]["title"]).to eq @sub_account_event.title
           expect(default_account_event["plannable"]["title"]).to eq @default_account_event.title
-        end
-
-        it "does not show account calendar events if the feature flag is disabledd" do
-          Account.site_admin.disable_feature!(:account_calendars_planner_support)
-          get :index
-          response_json = json_parse(response.body)
-          expect(response_json).to eq []
         end
 
         it "does not show calendar events for hidden account calendars" do
@@ -391,6 +383,18 @@ describe PlannerController do
           expect(sub_account_event["plannable"]["title"]).to eq @sub_account_event.title
           expect(default_account_event["plannable"]["title"]).to eq @default_account_event.title
           expect(course_event["plannable"]["title"]).to eq course_ac_event.title
+        end
+
+        context "with sharding" do
+          specs_require_sharding
+
+          it "allows user to request trusted accounts on another shard" do
+            @account = Account.default
+            @shard2.activate do
+              get :index, params: { context_codes: ["account_#{@account.global_id}"] }
+              expect(response).to be_successful
+            end
+          end
         end
       end
 
@@ -756,7 +760,7 @@ describe PlannerController do
           it "orders assignments with no overrides correctly" do
             assignment1 = assignment_model(course: @course, due_at: Time.zone.now)
             assignment2 = assignment_model(course: @course, due_at: 2.days.from_now)
-            DueDateCacher.recompute_course(@course, run_immediately: true)
+            SubmissionLifecycleManager.recompute_course(@course, run_immediately: true)
 
             get :index, params: { start_date: 2.weeks.ago.iso8601, end_date: 2.weeks.from_now.iso8601 }
             response_json = json_parse(response.body)
@@ -771,7 +775,7 @@ describe PlannerController do
             assignment2 = assignment_model(course: @course, due_at: 2.days.from_now)
             assign2_override_due_at = Time.zone.now
             create_adhoc_override_for_assignment(assignment2, @student, { due_at: assign2_override_due_at })
-            DueDateCacher.recompute_course(@course, run_immediately: true)
+            SubmissionLifecycleManager.recompute_course(@course, run_immediately: true)
 
             get :index, params: { start_date: 2.weeks.ago.iso8601, end_date: 2.weeks.from_now.iso8601 }
             response_json = json_parse(response.body)
@@ -801,7 +805,7 @@ describe PlannerController do
             topic2_assign = topic2.assignment
             topic2_assign.due_at = 2.days.ago
             topic2_assign.save!
-            DueDateCacher.recompute_course(@course, run_immediately: true)
+            SubmissionLifecycleManager.recompute_course(@course, run_immediately: true)
 
             get :index, params: { start_date: 2.weeks.ago.iso8601, end_date: 2.weeks.from_now.iso8601 }
             response_json = json_parse(response.body)
@@ -819,7 +823,7 @@ describe PlannerController do
             wiki_page_assignment_model(course: @course)
             @page.todo_date = Time.zone.now
             @page.save!
-            DueDateCacher.recompute_course(@course, run_immediately: true)
+            SubmissionLifecycleManager.recompute_course(@course, run_immediately: true)
 
             get :index, params: { start_date: 2.weeks.ago.iso8601, end_date: 2.weeks.from_now.iso8601 }
             response_json = json_parse(response.body)
@@ -1076,7 +1080,7 @@ describe PlannerController do
           assign_json = json_parse(response.body).find { |j| j["plannable_id"] == @assignment.id && j["plannable_type"] == "assignment" }
           expect(assign_json["new_activity"]).to be true
 
-          submission.mark_read(@student)
+          submission.mark_item_read("comment")
           get :index, params: { start_date: @start_date, end_date: @end_date }
           assign_json = json_parse(response.body).find { |j| j["plannable_id"] == @assignment.id && j["plannable_type"] == "assignment" }
           expect(assign_json["new_activity"]).to be false

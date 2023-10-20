@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 -%><!DOCTYPE html>
-<html class="scripts-not-loaded" dir="<%= I18n.rtl? ? 'rtl' : 'ltr' %>"   lang=<%= raw I18n.locale.to_json %>>
+<html dir="<%= I18n.rtl? ? 'rtl' : 'ltr' %>"   lang=<%= raw I18n.locale.to_json %>>
 <head>
   <meta charset="utf-8">
   <% if @sentry_trace.present? %>
@@ -42,27 +42,6 @@
   <% end %>
   <%= benchmark("include_css_bundles") { include_css_bundles } %>
   <%= include_account_css %>
-  <script>
-    <%#
-      listen for any clicks on links that have href="#" or data-method set and queue them to be fired on dom ready.
-      note: the events targeted for a[data-method] elems don't get properly replayed, but
-      at least we can gobble them up here to prevent errors.
-    %>
-    function _earlyClick(e){
-      var c = e.target
-      while (c && c.ownerDocument) {
-        if (c.getAttribute('href') == '#' || c.getAttribute('data-method')) {
-          if (!e.defaultPrevented) {
-            e.preventDefault()
-          }
-          (_earlyClick.clicks = _earlyClick.clicks || []).push(c)
-          break
-        }
-        c = c.parentNode
-      }
-    }
-    document.addEventListener('click', _earlyClick)
-  </script>
 
   <% js_bundle :navigation_header unless @headers == false %>
 
@@ -90,13 +69,25 @@
   <script src="https://www.google.com/recaptcha/api.js?render=explicit&hl=<%= I18n.locale %>" async defer></script>
   <% end %>
 
-  <% if load_heap? &&  %>
+  <% if load_heap? %>
     <script type="text/javascript">
       window.heap=window.heap||[],heap.load=function(e,t){window.heap.appid=e,window.heap.config=t=t||{};var r=document.createElement("script");r.type="text/javascript",r.async=!0,r.src="https://cdn.heapanalytics.com/js/heap-"+e+".js";var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(r,a);for(var n=function(e){return function(){heap.push([e].concat(Array.prototype.slice.call(arguments,0)))}},p=["addEventProperties","addUserProperties","clearEventProperties","identify","resetIdentity","removeEventProperty","setEventProperties","track","unsetEventProperty"],o=0;o<p.length;o++)heap[p[o]]=n(p[o])};
       heap.load("<%= find_heap_application_id%>");
+      if (ENV.current_user_heap_id) {
+        heap.identify(ENV.current_user_heap_id);
+      }
+      props = {}
       if (ENV.current_user_roles) {
-        const primary_role = ENV.current_user_roles[ENV.current_user_roles.length - 1];
-        heap.addUserProperties({id: ENV.current_user_heap_id, role: primary_role});
+        props['role'] = ENV.current_user_roles[ENV.current_user_roles.length - 1]
+      }
+      if (ENV.DOMAIN_ROOT_ACCOUNT_UUID) {
+        props['Canvas.accountId'] = ENV.DOMAIN_ROOT_ACCOUNT_UUID
+      }
+      if (ENV.DOMAIN_ROOT_ACCOUNT_SFID) {
+        props['Canvas.salesforceAccountId'] = ENV.DOMAIN_ROOT_ACCOUNT_SFID
+      }
+      if (Object.keys(props).length > 0) {
+        heap.addUserProperties(props);
       }
     </script>
   <% end %>

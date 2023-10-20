@@ -47,6 +47,26 @@ describe Account do
     end
   end
 
+  context "environment_specific_domain" do
+    let(:root_account) { Account.create! }
+
+    before do
+      allow(HostUrl).to receive(:context_host).and_call_original
+      allow(HostUrl).to receive(:context_host).with(root_account, "beta").and_return("canvas.beta.instructure.com")
+      AccountDomain.create!(host: "canvas.instructure.com", account: root_account)
+    end
+
+    it "retrieves correct beta domain" do
+      allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
+      expect(root_account.environment_specific_domain).to eq "canvas.beta.instructure.com"
+    end
+
+    it "retrieves correct prod domain" do
+      allow(ApplicationController).to receive(:test_cluster_name).and_return(nil)
+      expect(root_account.environment_specific_domain).to eq "canvas.instructure.com"
+    end
+  end
+
   context "resolved_outcome_proficiency_method" do
     before do
       @root_account = Account.create!
@@ -2172,12 +2192,12 @@ describe Account do
       @account = Account.create!
 
       @user1 = user_factory(active_all: true)
-      @account.account_users.create!(user: @user1)
+      @account.pseudonyms.create!(unique_id: "user1", user: @user1)
       @user1.dashboard_view = "activity"
       @user1.save
 
       @user2 = user_factory(active_all: true)
-      @account.account_users.create!(user: @user2)
+      @account.pseudonyms.create!(unique_id: "user2", user: @user2)
       @user2.dashboard_view = "cards"
       @user2.save
     end
@@ -2476,6 +2496,8 @@ describe Account do
     it "works for root accounts" do
       Account.default.name = "Something new"
       expect(Account).to receive(:invalidate_cache).with(Account.default.id).at_least(1)
+      allow(Rails.cache).to receive(:delete)
+      expect(Rails.cache).to receive(:delete).with(["account2", Account.default.id].cache_key)
       Account.default.save!
     end
 
@@ -2743,6 +2765,146 @@ describe Account do
       expect(@sub_account.restrict_quantitative_data?).to be true
 
       expect(InstStatsd::Statsd).not_to have_received(:increment).with("account.settings.restrict_quantitative_data.disabled")
+    end
+  end
+
+  describe "#enable_user_notes" do
+    let(:account) { account_model(enable_user_notes: true) }
+
+    context "when the deprecate_faculty_journal flag is enabled" do
+      before { Account.site_admin.enable_feature!(:deprecate_faculty_journal) }
+
+      it "returns false" do
+        expect(account.enable_user_notes).to be false
+      end
+    end
+
+    context "when the deprecate_faculty_journal flag is disabled" do
+      before { Account.site_admin.disable_feature!(:deprecate_faculty_journal) }
+
+      it "returns the value stored on the account model" do
+        expect(account.enable_user_notes).to be true
+        account.update_attribute(:enable_user_notes, false)
+        expect(account.enable_user_notes).to be false
+      end
+    end
+  end
+
+  describe ".having_user_notes_enabled" do
+    let!(:enabled_account) { account_model(enable_user_notes: true) }
+
+    before { account_model(enable_user_notes: false) }
+
+    context "when the deprecate_faculty_journal flag is disabled" do
+      before { Account.site_admin.disable_feature!(:deprecate_faculty_journal) }
+
+      it "only returns accounts having user notes enabled" do
+        expect(Account.having_user_notes_enabled).to match_array [enabled_account]
+      end
+    end
+
+    it "returns no accounts" do
+      expect(Account.having_user_notes_enabled).to be_empty
+    end
+  end
+
+  context "account grading standards" do
+    before do
+      account_model
+    end
+
+    def example_grading_standard(context)
+      gs = GradingStandard.new(context:, workflow_state: "active")
+      gs.data = [["A", 0.9], ["B", 0.8], ["C", -0.7]]
+      gs.save(validate: false)
+      gs
+    end
+
+    describe "#grading_standard_enabled" do
+      it "returns false by default" do
+        expect(@account.grading_standard_enabled?).to be false
+      end
+
+      it "returns true when grading_standard is set" do
+        @account.grading_standard = example_grading_standard(@account)
+        @account.save!
+        expect(@account.grading_standard_enabled?).to be true
+      end
+
+      it "returns true if a parent account has a grading_standard" do
+        @account.grading_standard_id = example_grading_standard(@account).id
+        @account.save
+        @sub_account = @account.sub_accounts.create!
+
+        expect(@sub_account.grading_standard_enabled?).to be true
+      end
+
+      it "returns false if no parent account has a grading standard" do
+        @sub_account1 = @account.sub_accounts.create!
+        @sub_account2 = @sub_account1.sub_accounts.create!
+        @sub_account3 = @sub_account2.sub_accounts.create!
+
+        expect(@sub_account3.grading_standard_enabled?).to be false
+      end
+
+      it "returns true if a deeply nested parent account has a grading_standard" do
+        @account.grading_standard = example_grading_standard(@account)
+        @account.save
+        @sub_account1 = @account.sub_accounts.create!
+        @sub_account2 = @sub_account1.sub_accounts.create!
+        @sub_account3 = @sub_account2.sub_accounts.create!
+
+        expect(@sub_account3.grading_standard_enabled?).to be true
+      end
+    end
+
+    describe "#default_grading_standard" do
+      it "returns nil by default" do
+        expect(@account.default_grading_standard).to be_nil
+      end
+
+      it "returns the grading_standard if set" do
+        @account.grading_standard = example_grading_standard(@account)
+        expect(@account.default_grading_standard).to eq @account.grading_standard
+      end
+
+      it "returns the parent account's grading_standard if set" do
+        @account.grading_standard = example_grading_standard(@account)
+        @account.save
+        @sub_account = @account.sub_accounts.create!
+
+        expect(@sub_account.default_grading_standard).to eq @account.grading_standard
+      end
+
+      it "returns nil if no parent account has a grading standard" do
+        @sub_account1 = @account.sub_accounts.create!
+        @sub_account2 = @sub_account1.sub_accounts.create!
+        @sub_account3 = @sub_account2.sub_accounts.create!
+
+        expect(@sub_account3.default_grading_standard).to be_nil
+      end
+
+      it "returns a deeply nested parent account's grading_standard if set" do
+        @account.grading_standard = example_grading_standard(@account)
+        @account.save
+        @sub_account1 = @account.sub_accounts.create!
+        @sub_account2 = @sub_account1.sub_accounts.create!
+        @sub_account3 = @sub_account2.sub_accounts.create!
+
+        expect(@sub_account3.default_grading_standard).to eq @account.grading_standard
+      end
+
+      it "returns correct parent's grading standard in deeply nested accounts" do
+        @account.grading_standard = example_grading_standard(@account)
+        @account.save
+        @sub_account1 = @account.sub_accounts.create!
+        @sub_account1.grading_standard = example_grading_standard(@sub_account1)
+        @sub_account1.save
+        @sub_account2 = @sub_account1.sub_accounts.create!
+        @sub_account3 = @sub_account2.sub_accounts.create!
+
+        expect(@sub_account3.default_grading_standard).to eq @sub_account1.grading_standard
+      end
     end
   end
 end

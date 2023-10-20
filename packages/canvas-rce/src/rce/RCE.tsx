@@ -36,7 +36,7 @@ import getTranslations from '../getTranslations'
 import '@instructure/canvas-theme'
 import {Editor} from 'tinymce'
 
-if (!process?.env?.BUILD_LOCALE) {
+if (!process || !process.env || !process.env.BUILD_LOCALE) {
   formatMessage.setup({
     locale: 'en',
     generateId: require('format-message-generate-id/underscored_crc32'),
@@ -263,6 +263,11 @@ export interface RCEPropTypes {
    * user's timezone
    */
   timezone?: string
+
+  /**
+   * user's cache key to be used to encrypt and decrypt autosaved content
+   */
+  userCacheKey?: string
 
   onFocus?: (rce: RCEWrapper) => void
   onBlur?: (event: Event) => void

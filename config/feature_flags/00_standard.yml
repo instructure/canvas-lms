@@ -35,12 +35,36 @@ admin_analytics:
   after_state_change_proc: analytics_2_after_state_change_hook
   root_opt_in: true
   beta: true
-admin_analytics_new_filter_ui:
+k20_course_readiness_alpha_testing:
   state: hidden
   applies_to: Account
-  display_name: Admin Analytics - New Filter UI
+  display_name: K20 - Course Readiness Alpha Testing
   description:
-    admin_analytics_new_filter_ui_description: Enables the new Admin Analytics Filter UI.
+    k20_course_readiness_alpha_testing_description: This flag is for institutions participating in Advanced Analytics Alpha testing. This flag enables the Course Readiness dashboard for these institutions.
+  root_opt_in: true
+  beta: true
+k20_course_readiness:
+  state: hidden
+  applies_to: Account
+  display_name: Admin Analytics - Course Readiness
+  description:
+    k20_course_readiness_description: Enables the new Admin Analytics Course Readiness Dashboard.
+  root_opt_in: true
+  beta: true
+k20_beta:
+  state: hidden
+  applies_to: Account
+  display_name: K20 - Beta
+  description:
+    k20_beta_description: Enables K20 Beta features in Admin Analytics APP.
+  root_opt_in: true
+  beta: true
+admin_analytics_view_permission:
+  state: hidden
+  applies_to: Account
+  display_name: Admin Analytics - View admin analytics permission
+  description:
+    admin_analytics_view_permission_description: Makes the new Admin Analytics permission visible.
   root_opt_in: true
   beta: true
 anonymous_instructor_annotations:
@@ -436,3 +460,10 @@ new_quiz_public_api:
       state: allowed_on
     development:
       state: allowed_on
+site_admin_service_auth:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Site admin service authentication
+  description: When enabled, site admin account UI will allow associating
+    a service User with a DeveloperKey and using that key/user with the
+    client_credentials grant type

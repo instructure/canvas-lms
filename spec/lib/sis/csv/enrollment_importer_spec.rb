@@ -383,10 +383,12 @@ describe SIS::CSV::EnrollmentImporter do
       "test_1,user_1,student,,deleted,"
     )
     # skipped enrollment update
-    importer = process_csv_data_cleanly(
+    importer = process_csv_data(
       "course_id,user_id,role,section_id,status,associated_user_id",
       "test_1,user_1,student,,active,"
     )
+    errors = importer.errors.map(&:last)
+    expect(errors).to include(/Attempted enrolling with deleted sis login/)
     expect(importer.batch.roll_back_data.count).to eq 0
   end
 
@@ -603,17 +605,17 @@ describe SIS::CSV::EnrollmentImporter do
     expect(e.completed_at).to be_present
   end
 
-  it "only queues up one DueDateCacher job per course" do
+  it "only queues up one SubmissionLifecycleManager job per course" do
     course1 = course_model(account: @account, sis_source_id: "C001")
     course2 = course_model(account: @account, sis_source_id: "C002")
     user1 = user_with_managed_pseudonym(account: @account, sis_user_id: "U001")
     user2 = user_with_managed_pseudonym(account: @account, sis_user_id: "U002")
     course1.enroll_user(user2)
-    expect(DueDateCacher).not_to receive(:recompute)
+    expect(SubmissionLifecycleManager).not_to receive(:recompute)
     # there are no assignments so this will just return, but we just want to see
     # that it gets called correctly and for the users that wre imported
-    expect(DueDateCacher).to receive(:recompute_users_for_course).with([user1.id], course1.id, nil, sis_import: true, update_grades: true)
-    expect(DueDateCacher).to receive(:recompute_users_for_course)
+    expect(SubmissionLifecycleManager).to receive(:recompute_users_for_course).with([user1.id], course1.id, nil, sis_import: true, update_grades: true)
+    expect(SubmissionLifecycleManager).to receive(:recompute_users_for_course)
       .with([user1.id, user2.id], course2.id, nil, sis_import: true, update_grades: true)
     process_csv_data_cleanly(
       "course_id,user_id,role,status",
@@ -966,7 +968,7 @@ describe SIS::CSV::EnrollmentImporter do
     expect(g.group_memberships.active.count).to eq 1
   end
 
-  it "does not create enrollments for deleted users" do
+  it "does not create active enrollments for deleted users" do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "test_1,TC 101,Test Course 101,,,active"
@@ -989,6 +991,32 @@ describe SIS::CSV::EnrollmentImporter do
     student = Pseudonym.where(sis_user_id: "student_user").first.user
     expect(student.enrollments.count).to eq 1
     expect(student.enrollments.first).to be_deleted
+  end
+
+  it "does not create new enrollments for an already deleted user and enrollment" do
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "test_1,TC 101,Test Course 101,,,active"
+    )
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "student_user,user1,User,Uno,user@example.com,active"
+    )
+    User.where(id: Pseudonym.find_by(sis_user_id: "student_user").user_id).update_all(workflow_state: "deleted")
+    process_csv_data(
+      "user_id,course_id,role,status",
+      "student_user,test_1,student,active"
+    )
+    importer = process_csv_data(
+      "user_id,course_id,role,status",
+      "student_user,test_1,student,active"
+    )
+    student = Pseudonym.where(sis_user_id: "student_user").first.user
+    expect(student.enrollments.count).to eq 1
+    expect(student.enrollments.first).to be_deleted
+    errors = importer.errors.map(&:last)
+    expect(errors).to include(/Attempted enrolling of deleted user/)
+    expect(importer.batch.roll_back_data.count).to eq 0
   end
 
   it "do not create enrollments for deleted pseudonyms except when they have an active pseudonym too" do
@@ -1233,5 +1261,56 @@ describe SIS::CSV::EnrollmentImporter do
     expect(@teacher.enrollments.size).to eq 1
     expect(@observer.enrollments.size).to eq 0
     expect(importer.errors.map(&:last)).to eq ["Observer enrollment for \"dee\" not allowed in blueprint course \"blue\""]
+  end
+
+  describe "temporary enrollments" do
+    before(:once) do
+      process_csv_data_cleanly(
+        "course_id,short_name,long_name,account_id,term_id,status",
+        "test_1,TC 101,Test Course 101,,,active"
+      )
+      process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status",
+        "provider,provider,Temp,Provider,provider@example.com,active",
+        "recipient,recipient,Temp,Recipient,recipient@example.com,active"
+      )
+      @course = Course.where(sis_source_id: "test_1").first
+      @recipient = Pseudonym.where(sis_user_id: "recipient").first.user
+      @provider = Pseudonym.where(sis_user_id: "provider").first.user
+    end
+
+    context "when feature flag is enabled" do
+      before(:once) do
+        @course.root_account.enable_feature!(:temporary_enrollments)
+        process_csv_data_cleanly(
+          "course_id,user_id,role,status,start_date,end_date,temporary_enrollment_source_user_id",
+          "test_1,provider,teacher,active,2023-09-10T23:08:51Z,2023-09-30T23:08:51Z,,",
+          "test_1,recipient,teacher,active,2023-09-10T23:08:51Z,2043-09-30T23:08:51Z,provider"
+        )
+      end
+
+      it "creates a new temporary enrollment association" do
+        expect(@course.enrollments.count).to eq 2
+        expect(@recipient.enrollments.map(&:type)).to eq ["TeacherEnrollment"]
+        expect(@recipient.enrollments.take.temporary_enrollment_source_user_id).to eq @provider.id
+      end
+    end
+
+    context "when feature flag is disabled" do
+      before(:once) do
+        @course.root_account.disable_feature!(:temporary_enrollments)
+        process_csv_data_cleanly(
+          "course_id,user_id,role,status,start_date,end_date,temporary_enrollment_source_user_id",
+          "test_1,provider,teacher,active,2023-09-10T23:08:51Z,2023-09-30T23:08:51Z,,",
+          "test_1,recipient,teacher,active,2023-09-10T23:08:51Z,2043-09-30T23:08:51Z,provider"
+        )
+      end
+
+      it "does not create a new temporary enrollment association" do
+        expect(@course.enrollments.count).to eq 2
+        expect(@recipient.enrollments.map(&:type)).to eq ["TeacherEnrollment"]
+        expect(@recipient.enrollments.take.temporary_enrollment_source_user_id).to be_nil
+      end
+    end
   end
 end

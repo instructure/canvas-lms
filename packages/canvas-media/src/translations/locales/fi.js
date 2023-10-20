@@ -25,6 +25,9 @@ const locale = {
   "armenian_12da6118": { "message": "Armenialainen" },
   "belarusian_b2f19c76": { "message": "valkovenäjä" },
   "bulgarian_feccab7e": { "message": "bulgaria" },
+  "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
+    "message": "Pääkurssilta perittyjä tekstityksiä ei voi poistaa."
+  },
   "catalan_16f6b78f": { "message": "katalaani" },
   "chinese_111d37f6": { "message": "kiina" },
   "chinese_simplified_7f0bd370": { "message": "kiina, yksinkertaistettu" },
@@ -89,7 +92,10 @@ const locale = {
   "ukrainian_945b00b7": { "message": "ukraina" },
   "vietnamese_e7a76583": { "message": "vietnam" },
   "welsh_42ab94b1": { "message": "kymri" },
-  "yiddish_f96986df": { "message": "jiddish" }
+  "yiddish_f96986df": { "message": "jiddish" },
+  "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
+    "message": "Voit korvata lataamalla uuden tekstitystiedoston."
+  }
 }
 
 

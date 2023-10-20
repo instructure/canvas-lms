@@ -17,8 +17,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require "spec_helper"
-require_relative "./shared_constants"
-require_relative "./shared_linter_examples"
+require_relative "shared_constants"
+require_relative "shared_linter_examples"
 # pp required for to make fakefs happy, see:
 # github.com/fakefs/fakefs#fakefs-----typeerror-superclass-mismatch-for-class-file
 require "fakefs/safe"

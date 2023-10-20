@@ -17,14 +17,12 @@
  */
 
 export default function populateCollection(collection, payload, replace) {
-  let setter, setterOptions
-
   if (arguments.length === 2) {
     replace = true
   }
 
-  setter = replace ? 'reset' : 'add'
-  setterOptions = replace ? {parse: true} : {parse: true, merge: true}
+  const setter = replace ? 'reset' : 'add'
+  const setterOptions = replace ? {parse: true} : {parse: true, merge: true}
 
   collection[setter].call(collection, payload, setterOptions)
 }

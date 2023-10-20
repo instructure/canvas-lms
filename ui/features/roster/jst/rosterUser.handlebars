@@ -25,7 +25,7 @@
 </td>
 {{/if}}
 {{#unless hideSectionsOnCourseUsersPage}}
-<td data-test-id="section-column-cell">
+<td data-testid="section-column-cell">
   {{#each sections}}
   <div class="section">{{name}}</div>
   {{/each}}
@@ -33,7 +33,12 @@
 {{/unless}}
 <td>
   {{#each enrollments}}
-  <div>{{enrollmentName role}}</div>
+  <div>
+    {{#if temporary_enrollment_source_user_id}}
+      {{#t}}Temporary:{{/t}}
+    {{/if}}
+    {{enrollmentName role}}
+  </div>
   {{/each}}
 </td>
 {{#if ENV.permissions.read_reports}}

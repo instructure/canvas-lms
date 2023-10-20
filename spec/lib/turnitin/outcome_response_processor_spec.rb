@@ -35,10 +35,7 @@ module Turnitin
 
       before do
         original_submission_response = double("original_submission_mock")
-        allow(original_submission_response).to receive(:headers).and_return(
-          { "content-disposition" => "attachment; filename=#{filename}", "content-type" => "plain/text" }
-        )
-        allow(original_submission_response).to receive(:body).and_return("1234")
+        allow(original_submission_response).to receive_messages(headers: { "content-disposition" => "attachment; filename=#{filename}", "content-type" => "plain/text" }, body: "1234")
         expect_any_instance_of(TurnitinApi::OutcomesResponseTransformer).to receive(:original_submission).and_yield(original_submission_response)
 
         response_response = double("response_mock")
@@ -101,8 +98,7 @@ module Turnitin
           time = Time.now.utc
           attempt_number = subject.class.max_attempts - 1
           original_submission_response = double("original_submission_mock")
-          allow(original_submission_response).to receive(:headers).and_return({})
-          allow(original_submission_response).to receive(:status).and_return(403)
+          allow(original_submission_response).to receive_messages(headers: {}, status: 403)
           expect_any_instance_of(TurnitinApi::OutcomesResponseTransformer).to receive(:original_submission).and_yield(original_submission_response)
           allow_any_instance_of(subject.class).to receive(:attempt_number).and_return(attempt_number)
           mock = double
@@ -169,8 +165,7 @@ module Turnitin
 
           before do
             original_submission_response = double("original_submission_mock")
-            allow(original_submission_response).to receive(:headers).and_return({})
-            allow(original_submission_response).to receive(:status).and_return(403)
+            allow(original_submission_response).to receive_messages(headers: {}, status: 403)
             allow(subject.turnitin_client).to receive(:original_submission).and_yield(original_submission_response)
           end
 

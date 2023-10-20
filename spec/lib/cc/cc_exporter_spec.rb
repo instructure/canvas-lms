@@ -96,10 +96,11 @@ describe "Common Cartridge exporting" do
       @q1 = @course.quizzes.create!(title: "quiz1")
       @q2 = @course.quizzes.create!(title: "quiz2")
       @log = @course.root_outcome_group
-      @lo = @course.created_learning_outcomes.create!(description: "outcome 2", short_description: "for testing 2", context: @course)
+      @orlo = @course.created_learning_outcomes.create!(description: "original outcome for course copy", short_description: "for testing cc", context: @course, copied_from_outcome_id: nil)
+      @lo = @course.created_learning_outcomes.create!(description: "outcome 2", short_description: "for testing 2", context: @course, copied_from_outcome_id: @orlo.id)
       @lo.data = { rubric_criterion: { mastery_points: 3, ratings: [{ description: "Exceeds Expectations", points: 5 }, { description: "Meets Expectations", points: 3 }, { description: "Does Not Meet Expectations", points: 0 }], description: "First outcome", points_possible: 5 } }
       @lo.save
-      @lo2 = @course.created_learning_outcomes.create!(description: "outcome 2", short_description: "for testing 2", context: @course)
+      @lo2 = @course.created_learning_outcomes.create!(description: "outcome 2", short_description: "for testing 2", context: @course, copied_from_outcome_id: nil)
       @lo2.data = { rubric_criterion: { mastery_points: 3, ratings: [{ description: "Exceeds Expectations", points: 5 }, { description: "Meets Expectations", points: 3 }, { description: "Does Not Meet Expectations", points: 0 }], description: "First outcome", points_possible: 5 } }
       @lo2.save
       @log2 = @course.learning_outcome_groups.create!(title: "groupage", context: @course)
@@ -219,9 +220,8 @@ describe "Common Cartridge exporting" do
     end
 
     it "uses instfs to host export files if it is enabled" do
-      allow(InstFS).to receive(:enabled?).and_return(true)
       uuid = "1234-abcd"
-      allow(InstFS).to receive(:direct_upload).and_return(uuid)
+      allow(InstFS).to receive_messages(enabled?: true, direct_upload: uuid)
       @ce.export(synchronous: true)
       expect(@ce.attachments.first.instfs_uuid).to eq(uuid)
     end
@@ -408,9 +408,8 @@ describe "Common Cartridge exporting" do
                                                                       asset: { id: "some-kaltura-id", size: 1234, status: "2" },
                                                                       path: "media_objects/some-kaltura-id"
                                                                     })
-      allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
+      allow(CanvasKaltura::ClientV3).to receive_messages(config: {}, flavorAssetGetPlaylistUrl: "some-url")
       allow(CanvasKaltura::ClientV3).to receive(:startSession)
-      allow(CanvasKaltura::ClientV3).to receive(:flavorAssetGetPlaylistUrl).and_return("some-url")
       mock_http_response = Struct.new(:code) do
         def read_body(stream)
           stream.puts("lalala")
@@ -621,6 +620,7 @@ describe "Common Cartridge exporting" do
 
     context "media_links_use_attachment_id feature enabled" do
       before do
+        allow(Account.site_admin).to receive(:feature_enabled?).and_return false
         allow(Account.site_admin).to receive(:feature_enabled?).with(:media_links_use_attachment_id).and_return true
       end
 
@@ -650,9 +650,11 @@ describe "Common Cartridge exporting" do
         stub_kaltura
         kaltura_session = double("kaltura_session")
         allow(CC::CCHelper).to receive(:kaltura_admin_session).and_return(kaltura_session)
-        allow(kaltura_session).to receive(:flavorAssetGetPlaylistUrl).and_return("http://www.example.com/blah.flv")
+        allow(kaltura_session).to receive_messages(
+          flavorAssetGetPlaylistUrl: "http://www.example.com/blah.flv",
+          flavorAssetGetOriginalAsset: { id: 1, status: "2", fileExt: "flv" }
+        )
         stub_request(:get, "http://www.example.com/blah.flv").to_return(body: "", status: 200)
-        allow(kaltura_session).to receive(:flavorAssetGetOriginalAsset).and_return({ id: 1, status: "2", fileExt: "flv" })
         stub_request(:get, "http://www.example.com/blah.flv").to_return(body: "", status: 200)
         expect_any_instance_of(MediaObject).to receive(:create_attachment).and_call_original
         obj = @course.media_objects.create! media_id: "0_deadbeef", user_entered_title: "blah.flv"
@@ -675,6 +677,7 @@ describe "Common Cartridge exporting" do
 
     context "media_links_use_attachment_id feature disabled" do
       before do
+        allow(Account.site_admin).to receive(:feature_enabled?).and_return false
         allow(Account.site_admin).to receive(:feature_enabled?).with(:media_links_use_attachment_id).and_return false
       end
 

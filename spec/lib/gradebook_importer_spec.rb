@@ -851,6 +851,42 @@ describe GradebookImporter do
       expect(column_datum["new_content"]).to eq "test 2"
     end
 
+    it "gradebook importer does not recognize any changes when the previous cell is empty and empty spaces are added to the cell" do
+      @student2 = User.create(name: "Jim", id: 2)
+      @course.enroll_student(@student2)
+      importer_with_rows(
+        "Student,ID,Section,Notes,Assignment 1,Assignment 2",
+        "#{@student.name},,,,,",
+        "Jim,,,   ,,"
+      )
+      expect(@gi.instance_variable_get(:@gradebook_importer_custom_columns)[2].empty?).to be true
+    end
+
+    it "gradebook importer recognizes any changes to custom column values when the first student has no value in the column" do
+      @student2 = User.create(name: "Jim", id: 2)
+      @course.enroll_student(@student2)
+      importer_with_rows(
+        "Student,ID,Section,CustomColumn1,CustomColumn2,Assignment 1",
+        "#{@student.name},,,,,",
+        "Jim,,,hello world,,"
+      )
+      expect(@gi.instance_variable_get(:@gradebook_importer_custom_columns)[2].empty?).to be false
+    end
+
+    it "gradebook importer will not mark the first student as changed if only empty spaces are added and there is a change to another student's value in the custom column" do
+      @student2 = User.create(name: "Jim", id: 2)
+      @course.enroll_student(@student2)
+      importer_with_rows(
+        "Student,ID,Section,CustomColumn1,CustomColumn2,Assignment 1",
+        "#{@student.name},,,   ,,",
+        "Jim,,,hello world,,"
+      )
+      column = @course.custom_gradebook_columns.find_by(title: "CustomColumn1")
+      column_datum = uploaded_student_custom_column_data.detect { |datum| datum["column_id"] == column.id }
+      expect(column_datum["new_content"]).to be_nil
+      expect(column_datum["current_content"]).to be_nil
+    end
+
     context "with a deleted custom column" do
       before do
         @course.custom_gradebook_columns.find_by(title: "CustomColumn1").destroy
@@ -938,11 +974,11 @@ describe GradebookImporter do
         end
 
         it "includes the override_scores key at the top level" do
-          expect(hash.keys).to match_array(top_level_keys + [:override_scores])
+          expect(hash.keys).to match_array(top_level_keys + [:override_scores] + [:override_statuses])
         end
 
         it "include the override_scores key for students" do
-          expect(student.keys).to match_array(student_keys + [:override_scores])
+          expect(student.keys).to match_array(student_keys + [:override_scores] + [:override_statuses])
         end
       end
 
@@ -1514,8 +1550,8 @@ describe GradebookImporter do
       before(:once) do
         Account.site_admin.enable_feature!(:gradebook_show_first_last_names)
         course_model
-        @course.root_account.settings[:allow_gradebook_show_first_last_names] = true
-        @course.root_account.save!
+        @course.account.settings[:allow_gradebook_show_first_last_names] = true
+        @course.account.save!
       end
 
       it "handles students which do not already exist" do
@@ -1878,6 +1914,215 @@ describe GradebookImporter do
           expect(output[:students].first.dig(:override_scores, 0, :current_score)).to eq "50.54"
           expect(output[:students].first.dig(:override_scores, 0, :new_score)).to eq "50"
           expect(output[:students].first.dig(:override_scores, 0, :grading_period_id)).to be_nil
+        end
+      end
+    end
+
+    context "when custom grading statuses exists" do
+      before do
+        Account.site_admin.enable_feature!(:custom_gradebook_statuses)
+        @custom_grade_status = CustomGradeStatus.create!(name: "old status", color: "#000000", root_account_id: @course.root_account_id, created_by: @teacher)
+        @student_score = student_with_override.enrollments.first.find_score({ course_score: true })
+
+        enrollment_term = @course.root_account.enrollment_terms.create!
+        @course.update!(enrollment_term:)
+        grading_period_group = @course.root_account.grading_period_groups.create!
+        grading_period_group.enrollment_terms << enrollment_term
+
+        now = Time.zone.now
+        grading_period_group.grading_periods.create!(
+          close_date: now,
+          end_date: now,
+          start_date: 1.week.ago(now),
+          title: "First GP"
+        )
+      end
+
+      let(:first_grading_period) { @course.root_account.grading_period_groups.first.grading_periods.first }
+
+      it "recognizes a new override statuses" do
+        importer = importer_with_rows(
+          "Student,ID,Section,Final Score,Override Status",
+          "Cyrus,#{student_with_override.id},My Course,0,POTATO"
+        )
+
+        output = importer.as_json
+
+        aggregate_failures do
+          expect(output[:students].length).to eq 1
+          expect(output[:students].first.dig(:override_statuses, 0, :current_grade_status)).to be_nil
+          expect(output[:students].first.dig(:override_statuses, 0, :new_grade_status)).to eq "POTATO"
+          expect(output[:students].first.dig(:override_statuses, 0, :grading_period_id)).to be_nil
+        end
+      end
+
+      it "recognizes a change to existing override statuses" do
+        @student_score.update!(final_score: 0, override_score: 100, custom_grade_status: @custom_grade_status)
+        importer = importer_with_rows(
+          "Student,ID,Section,Final Score,Override Status",
+          "Cyrus,#{student_with_override.id},My Course,0,POTATO"
+        )
+
+        output = importer.as_json
+
+        aggregate_failures do
+          expect(output[:students].length).to eq 1
+          expect(output[:students].first.dig(:override_statuses, 0, :current_grade_status)).to eq "old status"
+          expect(output[:students].first.dig(:override_statuses, 0, :new_grade_status)).to eq "POTATO"
+          expect(output[:students].first.dig(:override_statuses, 0, :grading_period_id)).to be_nil
+        end
+      end
+
+      it "recognizes a change to existing override statuses with grading period" do
+        first_grading_period_score = student_with_override.enrollments.first.find_score({ grading_period_id: first_grading_period.id })
+        first_grading_period_score.update!(final_score: 0, override_score: 100, custom_grade_status: @custom_grade_status)
+        importer = importer_with_rows(
+          "Student,ID,Section,Final Score,Override Status (#{first_grading_period.title})",
+          "Cyrus,#{student_with_override.id},My Course,0,POTATO"
+        )
+
+        output = importer.as_json
+
+        aggregate_failures do
+          expect(output[:override_statuses][:grading_periods].pluck(:id)).to contain_exactly(first_grading_period.id)
+          expect(output[:students].length).to eq 1
+          expect(output[:students].first.dig(:override_statuses, 0, :current_grade_status)).to eq "old status"
+          expect(output[:students].first.dig(:override_statuses, 0, :new_grade_status)).to eq "POTATO"
+          expect(output[:students].first.dig(:override_statuses, 0, :grading_period_id)).to eq first_grading_period.id
+        end
+      end
+
+      it "recognizes setting a custom status to nil" do
+        @student_score.update!(final_score: 0, override_score: 100, custom_grade_status: @custom_grade_status)
+        importer = importer_with_rows(
+          "Student,ID,Section,Final Score,Override Status",
+          "Cyrus,#{student_with_override.id},My Course,0,"
+        )
+
+        output = importer.as_json
+
+        aggregate_failures do
+          expect(output[:override_statuses][:includes_course_score_status]).to be true
+          expect(output[:students].length).to eq 1
+          expect(output[:students].first.dig(:override_statuses, 0, :current_grade_status)).to eq "old status"
+          expect(output[:students].first.dig(:override_statuses, 0, :new_grade_status)).to be_nil
+          expect(output[:students].first.dig(:override_statuses, 0, :grading_period_id)).to be_nil
+        end
+      end
+
+      it "does not output override statuses when custom statuses FF is OFF" do
+        Account.site_admin.disable_feature!(:custom_gradebook_statuses)
+        importer = importer_with_rows(
+          "Student,ID,Section,Final Score,Override Status",
+          "Cyrus,#{student_with_override.id},My Course,0,POTATO"
+        )
+
+        output = importer.as_json
+
+        aggregate_failures do
+          expect(output[:students].length).to eq 0
+        end
+      end
+
+      it "does not output override statuses when custom statuses FF is OFF and override status or grade columns not existing" do
+        Account.site_admin.disable_feature!(:custom_gradebook_statuses)
+        importer = importer_with_rows(
+          "Student,ID,Section,Final Score",
+          "Cyrus,#{student_with_override.id},My Course,0"
+        )
+
+        output = importer.as_json
+
+        aggregate_failures do
+          expect(output[:students].length).to eq 0
+        end
+      end
+
+      it "does not output override statuses when custom statuses FF is OFF and override status column not existing" do
+        Account.site_admin.disable_feature!(:custom_gradebook_statuses)
+        importer = importer_with_rows(
+          "Student,ID,Section,Final Score,Override Score (First GP)",
+          "Cyrus,#{student_with_override.id},My Course,0,70"
+        )
+
+        output = importer.as_json
+        overrides = output[:students].first[:override_scores]
+
+        aggregate_failures do
+          expect(overrides.length).to eq 1
+          expect(overrides.first[:grading_period_id]).to eq first_grading_period.id
+          expect(overrides.first[:new_score]).to eq "70"
+        end
+      end
+
+      it "does not output override statuses when allow_override_scores is false" do
+        @course.allow_final_grade_override = false
+        @course.save!
+        importer = importer_with_rows(
+          "Student,ID,Section,Final Score,Override Status",
+          "Cyrus,#{student_with_override.id},My Course,0,POTATO"
+        )
+
+        output = importer.as_json
+
+        aggregate_failures do
+          expect(output[:students].length).to eq 0
+        end
+      end
+
+      it "does not output override statuses when there is no change" do
+        @student_score.update!(final_score: 0, override_score: 100, custom_grade_status: @custom_grade_status)
+        importer = importer_with_rows(
+          "Student,ID,Section,Final Score,Override Status",
+          "Cyrus,#{student_with_override.id},My Course,0,old status"
+        )
+
+        output = importer.as_json
+
+        aggregate_failures do
+          expect(output[:students].length).to eq 0
+        end
+      end
+
+      it "does not output override statuses when there is no change and previous status was nil" do
+        @student_score.update!(final_score: 0, override_score: 100, custom_grade_status: nil)
+        importer = importer_with_rows(
+          "Student,ID,Section,Final Score,Override Status",
+          "Cyrus,#{student_with_override.id},My Course,0,"
+        )
+
+        output = importer.as_json
+
+        aggregate_failures do
+          expect(output[:students].length).to eq 0
+        end
+      end
+
+      it "does not output override statuses when there is no change with case insensitive match" do
+        @student_score.update!(final_score: 0, override_score: 100, custom_grade_status: @custom_grade_status)
+        importer = importer_with_rows(
+          "Student,ID,Section,Final Score,Override Status",
+          "Cyrus,#{student_with_override.id},My Course,0,Old Status"
+        )
+
+        output = importer.as_json
+
+        aggregate_failures do
+          expect(output[:students].length).to eq 0
+        end
+      end
+
+      it "does not output override statuses when there is only a change to override score" do
+        @student_score.update!(final_score: 0, override_score: 100, custom_grade_status: nil)
+        importer = importer_with_rows(
+          "Student,ID,Section,Final Score,Override Score,Override Status",
+          "Cyrus,#{student_with_override.id},My Course,0,90,"
+        )
+
+        output = importer.as_json
+
+        aggregate_failures do
+          expect(output[:students].first[:override_statuses].length).to eq 0
         end
       end
     end

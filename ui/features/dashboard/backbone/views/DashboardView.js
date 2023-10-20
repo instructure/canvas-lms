@@ -70,6 +70,7 @@ export default class DashboardView extends View {
     const assistiveText = this.getCategoryText(categoryName, count, !isExpanded)
     const $link = $category.find('.toggle-details')
     $link.html(showMoreTemplate({expanded: isExpanded, assistiveText}))
+    $link.attr('aria-expanded', isExpanded)
   }
 
   getCategoryText(category, count, forExpand) {

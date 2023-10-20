@@ -146,6 +146,22 @@ $(document).ready(function () {
       return false
     }
   })
+
+  $('#account_settings_suppress_notifications').click(event => {
+    if (event.target.checked) {
+      // eslint-disable-next-line no-alert
+      const result = window.confirm(
+        I18n.t(
+          'suppress_notifications_warning',
+          "You have 'Suppress notifications from being created and sent out' checked, are you sure you want to continue?"
+        )
+      )
+      if (!result) {
+        $('#account_settings_suppress_notifications').attr('checked', false)
+      }
+    }
+  })
+
   $('.datetime_field').datetime_field({
     addHiddenInput: true,
   })
@@ -288,6 +304,15 @@ $(document).ready(function () {
     .tabs({active: initialTab >= 0 ? initialTab : null})
     .show()
 
+  $('#account_settings_restrict_quantitative_data_value').click(event => {
+    const lockbox = $('#account_settings_restrict_quantitative_data_locked')
+    if (event.target.checked) {
+      lockbox.attr('disabled', false)
+    } else {
+      lockbox.attr('checked', false)
+      lockbox.attr('disabled', true)
+    }
+  })
   $('.add_ip_filter_link').click(event => {
     event.preventDefault()
     const $filter = $('.ip_filter.blank:first').clone(true).removeClass('blank')
@@ -485,7 +510,6 @@ $(document).ready(function () {
     const $customName = $('#account_settings_outgoing_email_default_name')
     if ($useCustom.attr('checked')) {
       $customName.removeAttr('disabled')
-      $customName.focus()
     } else {
       $customName.attr('disabled', 'disabled')
     }

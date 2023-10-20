@@ -41,7 +41,7 @@ export default class ResourceLinkContentItem extends BaseLinkContentItem<Resourc
 
   override buildUrl() {
     return addQueryParamsToUrl(this.context.ltiEndpoint, {
-      display: 'borderless',
+      display: 'in_rce',
       resource_link_lookup_uuid: this.lookup_uuid,
       [PARENT_FRAME_CONTEXT_PARAM]: this.context.containingCanvasLtiToolId,
     })

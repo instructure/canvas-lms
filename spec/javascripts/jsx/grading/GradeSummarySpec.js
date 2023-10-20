@@ -184,6 +184,10 @@ function setPageHtmlFixture() {
             </div>
           </td>
         </tr>
+        <tr class="student_assignment editable final_grade" data-muted="false">
+          <td class="status" scope="row"></td>
+          <td class="assignment_score" title="Click to test a different score"></td>
+        </tr>
       </table>
       <input type="text" id="grade_entry" style="display: none;" />
       <a id="revert_score_template" class="revert_score_link" >Revert Score</i></a>
@@ -479,6 +483,15 @@ QUnit.module('GradeSummary.calculateTotals', suiteHooks => {
       const $grade = $fixtures.find('.final_grade .grade').first()
       strictEqual($grade.text(), '72%')
     })
+
+    test('when there is a custom status in the ENV, renders a status pill span class', () => {
+      ENV.final_override_custom_grade_status_id = '42'
+      ENV.effective_final_score = 84
+      GradeSummary.calculateTotals(exampleGrades, 'current', 'percent')
+      const $status = $fixtures.find('.final_grade .status').first().children().first()
+      ok($status.length)
+      ok($status.hasClass('submission-custom-grade-status-pill-42'), 'has class for custom status')
+    })
   })
 })
 
@@ -695,7 +708,6 @@ QUnit.module('GradeSummary.setup', {
 })
 
 test('sends an axios request to mark unread submissions as read', function () {
-  ENV.visibility_feedback_enabled = true
   ENV.assignments_2_student_enabled = true
   const axiosSpy = sandbox.spy(axios, 'put')
   GradeSummary.setup()
@@ -705,16 +717,7 @@ test('sends an axios request to mark unread submissions as read', function () {
 })
 
 test('does not mark unread submissions as read if assignments_2_student_enabled feature flag off', function () {
-  ENV.visibility_feedback_enabled = true
   ENV.assignments_2_student_enabled = false
-  const axiosSpy = sandbox.spy(axios, 'put')
-  GradeSummary.setup()
-  equal(axiosSpy.callCount, 0)
-})
-
-test('does not mark unread submissions as read if visibility_feedback_enabled feature flag off', function () {
-  ENV.visibility_feedback_enabled = false
-  ENV.assignments_2_student_enabled = true
   const axiosSpy = sandbox.spy(axios, 'put')
   GradeSummary.setup()
   equal(axiosSpy.callCount, 0)
@@ -1592,7 +1595,34 @@ QUnit.module('GradeSummary', () => {
             },
             {
               id: '3',
-              attempt: null,
+              attempt: 0,
+              author_name: 'test user',
+              created_at: '2022-09-27T19:32:17Z',
+              edited_at: null,
+              comment: 'this is a test comment 2',
+              display_updated_at: 'Sep 27 at 1:32pm',
+            },
+            {
+              id: '4',
+              attempt: 1,
+              author_name: 'test user',
+              created_at: '2022-09-27T19:32:17Z',
+              edited_at: null,
+              comment: 'this is a test comment 2',
+              display_updated_at: 'Sep 27 at 1:32pm',
+            },
+            {
+              id: '5',
+              attempt: 2,
+              author_name: 'test user',
+              created_at: '2022-09-27T19:32:17Z',
+              edited_at: null,
+              comment: 'this is a test comment 2',
+              display_updated_at: 'Sep 27 at 1:32pm',
+            },
+            {
+              id: '6',
+              attempt: 3,
               author_name: 'test user',
               created_at: '2022-09-27T19:32:17Z',
               edited_at: null,
@@ -1647,6 +1677,14 @@ QUnit.module('GradeSummary', () => {
       test('gets props getSubmissionCommentsTrayProps for correct assignmentId', () => {
         const commentTrayProps = GradeSummary.getSubmissionCommentsTrayProps('17')
         deepEqual(commentTrayProps, expectedCommentTrayProps)
+      })
+
+      test('it sets attempts less than 1 or null to the value 1', () => {
+        const commentTrayProps = GradeSummary.getSubmissionCommentsTrayProps('22')
+        const {attempts} = commentTrayProps
+        equal(attempts[1].length, 3)
+        equal(attempts[2].length, 1)
+        equal(attempts[3].length, 1)
       })
     })
     QUnit.module('handleSubmissionsCommentTray', () => {

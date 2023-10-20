@@ -22,10 +22,13 @@ describe CanvasPartman::Concerns::Partitioned do
     subject { CanvasPartman::PartitionManager.create(Animal) }
 
     describe "creating records" do
-      it "fails if the target partition does not exist" do
-        expect do
-          Animal.create!
-        end.to raise_error ActiveRecord::StatementInvalid, /PG::UndefinedTable/
+      it "autocreates the target partition if it does not exist" do
+        a = Animal.create!
+
+        expect(Animal.count).to eq 1
+
+        expect(count_records("partman_animals")).to eq 1
+        expect(count_records("partman_animals_#{a.created_at.year}_#{a.created_at.month}")).to eq 1
       end
 
       it "creates multiple records in the proper partition tables" do
@@ -183,10 +186,11 @@ describe CanvasPartman::Concerns::Partitioned do
     let(:zoo) { Zoo.create! }
 
     describe "creating records" do
-      it "fails if the target partition does not exist" do
-        expect do
-          Trail.create!(zoo:)
-        end.to raise_error ActiveRecord::StatementInvalid, /PG::UndefinedTable/
+      it "autocreates the target partition if it does not exist" do
+        Trail.create!(zoo:)
+
+        expect(count_records("partman_trails")).to eq 1
+        expect(count_records("partman_trails_#{zoo.id / 5}")).to eq 1
       end
 
       it "creates records in the proper partition table" do

@@ -3,3 +3,4 @@
 /spec/javascripts/support/jquery.mockjax.js
 /spec/selenium/helpers/jquery.simulate.js
 node_modules
+**/*/.mocharc.js

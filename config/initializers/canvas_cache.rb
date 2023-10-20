@@ -21,12 +21,4 @@ Rails.configuration.to_prepare do
   # we may extract Setting into an engine or an abstract gem
   # or something, for now this pattern breaks the explicit dependency.
   CanvasCache.settings_store = Setting
-
-  # It would be great to pull out Canvas::Errors as a gem, and we should do so.
-  # The problem is it has a dependency on RequestContextGenerator, which
-  # has a dependency on Canvas::Security, which has a dependency on
-  # our caching, and so we have to break the chain somewhere.  We're starting
-  # with the caching.  TODO: Once canvas errors is out on it's own we can let
-  # CanvasCache take a dependency on it directly and forego this injection.
-  CanvasCache.on_captured_error = ->(e) { Canvas::Errors.capture_exception(:redis, e, :warn) }
 end

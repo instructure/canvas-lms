@@ -82,6 +82,7 @@
 #           "type": "string",
 #           "allowableValues": {
 #             "values": [
+#               "weighted_average",
 #               "decaying_average",
 #               "n_mastery",
 #               "latest",
@@ -225,8 +226,11 @@ class OutcomesApiController < ApplicationController
   #   The points corresponding to a new rating level for the embedded rubric
   #   criterion.
   #
-  # @argument calculation_method [String, "decaying_average"|"n_mastery"|"latest"|"highest"|"average"]
-  #   The new calculation method.
+  # @argument calculation_method [String, "weighted_average"|"decaying_average"|"n_mastery"|"latest"|"highest"|"average"]
+  #   The new calculation method. If the
+  #   Outcomes New Decaying Average Calculation Method FF is ENABLED
+  #   then "weighted_average" can be used and it is same as previous "decaying_average"
+  #   and new "decaying_average" will have improved version of calculation.
   #
   # @argument calculation_int [Integer]
   #   The new calculation int.  Only applies if the calculation_method is "decaying_average" or "n_mastery"

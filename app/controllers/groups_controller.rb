@@ -267,8 +267,11 @@ class GroupsController < ApplicationController
     return unless authorized_action(@context, @current_user, :read_roster)
 
     @groups = all_groups = @context.groups.active
-                                   .order(GroupCategory::Bookmarker.order_by, Group::Bookmarker.order_by)
-                                   .eager_load(:group_category).preload(:root_account)
+    unless params[:filter].nil?
+      @groups = all_groups = @groups.left_outer_joins(:users).where("groups.name ILIKE :query OR users.name ILIKE :query", query: "%#{ActiveRecord::Base.sanitize_sql_like(params[:filter])}%")
+    end
+    @groups = all_groups = @groups.order(GroupCategory::Bookmarker.order_by, Group::Bookmarker.order_by)
+                                  .eager_load(:group_category).preload(:root_account)
 
     # run this only for students
     if params[:section_restricted] && @context.is_a?(Course) && @context.user_is_student?(@current_user)
@@ -353,7 +356,6 @@ class GroupsController < ApplicationController
       end
 
       format.atom { render xml: @groups.map(&:to_atom).to_xml }
-
       format.json do
         path = send("api_v1_#{@context.class.to_s.downcase}_user_groups_url")
 
@@ -536,7 +538,7 @@ class GroupsController < ApplicationController
       end
       respond_to do |format|
         if @group.save
-          DueDateCacher.with_executing_user(@current_user) do
+          SubmissionLifecycleManager.with_executing_user(@current_user) do
             @group.add_user(@current_user, "accepted", true) if @group.should_add_creator?(@current_user)
           end
 
@@ -751,7 +753,7 @@ class GroupsController < ApplicationController
   def add_user
     @group = @context
     if authorized_action(@group, @current_user, :manage)
-      DueDateCacher.with_executing_user(@current_user) do
+      SubmissionLifecycleManager.with_executing_user(@current_user) do
         @membership = @group.add_user(User.find(params[:user_id]))
         if @membership.valid?
           @group.touch
@@ -871,6 +873,7 @@ class GroupsController < ApplicationController
       submit_assignment = value_to_boolean(params[:submit_assignment])
       opts = { check_quota: true, submit_assignment: }
       if submit_assignment && @context.respond_to?(:submissions_folder)
+        opts[:check_quota] = false
         opts[:folder] = @context.submissions_folder
       end
       api_attachment_preflight(@context, request, opts)

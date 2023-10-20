@@ -71,6 +71,7 @@ describe RruleHelper do
       "FREQ=YEARLY;INTERVAL=2;BYMONTH=07;BYMONTHDAY=5;COUNT=3" => "Every 2 years on Jul 5, 3 times",
       "FREQ=YEARLY;INTERVAL=1;BYMONTH=07;BYMONTHDAY=5;UNTIL=20220729T000000Z" => "Annually on Jul 5 until Jul 29, 2022",
       "FREQ=YEARLY;INTERVAL=2;BYMONTH=07;BYMONTHDAY=5;UNTIL=20220729T000000Z" => "Every 2 years on Jul 5 until Jul 29, 2022",
+      "FREQ=YEARLY;BYMONTH=2;BYMONTHDAY=29;INTERVAL=1;COUNT=3" => "Annually on Feb 29, 3 times",
       "FREQ=BOGUS;INTERVAL=1;COUNT=3" => nil # bogus frequency
     }
 

@@ -134,12 +134,13 @@ module.exports = {
   devtool: getDevtool(skipSourcemaps),
 
   // we don't yet use multiple entry points
-  entry: {main: resolve(canvasDir, 'ui/index.js')},
+  entry: {main: resolve(canvasDir, 'ui/index.ts')},
 
   watchOptions: {ignored: ['**/node_modules/']},
 
   output: {
-    publicPath: '',
+    publicPath:
+      process.env.NODE_ENV !== 'production' ? '/dist/webpack-dev/' : '/dist/webpack-production/',
     clean: true, // clean /dist folder before each build
     path: join(canvasDir, 'public', webpackPublicPath),
     hashFunction: 'xxhash64',
@@ -172,7 +173,7 @@ module.exports = {
 
     modules: [resolve(canvasDir, 'public/javascripts'), 'node_modules'],
 
-    extensions: ['.js', '.ts', '.tsx'],
+    extensions: ['.js', '.jsx', '.ts', '.tsx'],
   },
 
   module: {

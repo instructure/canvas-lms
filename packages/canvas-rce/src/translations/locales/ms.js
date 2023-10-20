@@ -32,6 +32,7 @@ const locale = {
   "add_another_f4e50d57": { "message": "Tambah yang lain" },
   "add_cc_subtitles_55f0394e": { "message": "Tambah CC/Sari Kata" },
   "add_image_60b2de07": { "message": "Tambah Imej" },
+  "add_one_9e34a6f8": { "message": "Tambah satu!" },
   "additional_considerations_f3801683": { "message": "Pertimbangan tambahan" },
   "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
     "message": "Pautan berhampiran dengan URL yang sama sepatutnya dijadikan pautan tunggal."
@@ -221,6 +222,7 @@ const locale = {
   "crop_image_807ebb08": { "message": "Pangkas Imej" },
   "cup_product_14174434": { "message": "Produk Cawan" },
   "current_image_f16c249c": { "message": "Imej Semasa" },
+  "current_link_945a47ee": { "message": "Pautan Semasa" },
   "current_volume_level_c55ab825": { "message": "Tahap Volum Semasa" },
   "custom_6979cd81": { "message": "Tersuai" },
   "custom_width_and_height_pixels_946eea7c": {
@@ -571,6 +573,9 @@ const locale = {
   "light_blue_5374f600": { "message": "Biru Muda" },
   "link_7262adec": { "message": "Pautan" },
   "link_options_a16b758b": { "message": "Pilihan Pautan" },
+  "link_type_linktypemessage_c6d26815": {
+    "message": "jenis pautan: { linkTypeMessage }"
+  },
   "link_with_text_starting_with_start_b3fcbe71": {
     "message": "Pautan dengan teks bermula dengan { start }"
   },
@@ -627,6 +632,7 @@ const locale = {
   "minus_plus_3461f637": { "message": "Tolak/Tambah" },
   "misc_3b692ea7": { "message": "Lain-lain" },
   "miscellaneous_e9818229": { "message": "Lain-lain" },
+  "module_90d9fd32": { "message": "Modul" },
   "modules_c4325335": { "message": "Modul" },
   "moving_image_to_crop_directionword_6f66cde2": {
     "message": "Mengalih imej untuk memangkas { directionWord }"
@@ -651,19 +657,39 @@ const locale = {
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navigasi melalui menu atau bar alat"
   },
+  "navigation_ee9af92d": { "message": "Navigasi" },
   "nested_greater_than_d852e60d": { "message": "Lebih Daripada Tersarang" },
   "nested_less_than_27d17e58": { "message": "Kurang Daripada Tersarang" },
+  "new_quiz_34aacba6": { "message": "Kuiz Baharu" },
   "next_40e12421": { "message": "Seterusnya" },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "Tiada isu kebolehcapaian dikesan."
   },
+  "no_announcements_created_yet_c44a94f4": {
+    "message": "Belum ada pengumuman dicipta."
+  },
+  "no_announcements_found_20185afc": { "message": "Tiada pengumuman ditemui." },
+  "no_assignments_created_yet_1b236d87": {
+    "message": "Belum ada tugasan dicipta."
+  },
+  "no_assignments_found_79e46d7f": { "message": "Tiada tugasan ditemui." },
   "no_changes_to_save_d29f6e91": { "message": "Tiada perubahan disimpan." },
+  "no_discussions_created_yet_ff99abe3": {
+    "message": "Belum ada perbincangan dicipta."
+  },
+  "no_discussions_found_9284063b": { "message": "Tiada perbincangan ditemui." },
   "no_e16d9132": { "message": "Tidak" },
   "no_file_chosen_9a880793": { "message": "Tiada fail dipilih" },
   "no_headers_9bc7dc7f": { "message": "Tiada pengepala" },
+  "no_modules_created_yet_c71b6d4d": { "message": "Belum ada modul dicipta." },
+  "no_modules_found_2df43a40": { "message": "Tiada modul ditemui." },
+  "no_pages_created_yet_c379fa6e": { "message": "Belum ada halaman dicipta." },
+  "no_pages_found_6799350": { "message": "Tiada halaman ditemui." },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "Tiada pratonton tersedia untuk fail ini."
   },
+  "no_quizzes_created_yet_1a2370b9": { "message": "Belum ada kuiz dicipta." },
+  "no_quizzes_found_c80c537a": { "message": "Tiada kuiz dicipta." },
   "no_results_940393cf": { "message": "Tiada hasil." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Tiada hasil ditemui untuk { filterTerm }"
@@ -854,6 +880,7 @@ const locale = {
   "select_crop_shape_d441feeb": { "message": "Pilih bentuk pangkasan" },
   "select_language_7c93a900": { "message": "Pilih Bahasa" },
   "select_video_source_1b5c9dbe": { "message": "Pilih sumber video" },
+  "selected_274ce24f": { "message": "Dipilih" },
   "selected_linkfilename_c093b1f2": { "message": "{ linkFileName } dipilih" },
   "selection_b52c4c5e": { "message": "Pilihan" },
   "set_header_scope_8c548f40": { "message": "Tetapkan skop pengepala" },
@@ -1066,6 +1093,7 @@ const locale = {
   "up_and_left_diagonal_arrow_e4a74a23": { "message": "Panah Barat Laut" },
   "up_and_right_diagonal_arrow_935b902e": { "message": "Panah Timur Laut" },
   "up_c553575d": { "message": "Ke atas" },
+  "updated_link_a827e441": { "message": "Pautan dikemas kini" },
   "upload_document_253f0478": { "message": "Muat Naik Dokumen" },
   "upload_file_fd2361b8": { "message": "Muat Naik Fail" },
   "upload_image_6120b609": { "message": "Muat Naik Imej" },

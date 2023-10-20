@@ -221,6 +221,34 @@ describe "Pages API", type: :request do
         verify_json_error(error, "search_term", "invalid", "2 or more characters is required")
       end
 
+      describe "page body" do
+        it "is not included by default" do
+          json = api_call(:get,
+                          "/api/v1/courses/#{@course.id}/pages",
+                          controller: "wiki_pages_api",
+                          action: "index",
+                          format: "json",
+                          course_id: @course.to_param)
+          json.each do |page|
+            expect(page.key?("body")).to be false
+          end
+        end
+
+        it "is included when include[]=body is specified" do
+          json = api_call(:get,
+                          "/api/v1/courses/#{@course.id}/pages?include[]=body",
+                          controller: "wiki_pages_api",
+                          action: "index",
+                          format: "json",
+                          course_id: @course.to_param,
+                          include: ["body"])
+          json.each do |page|
+            expect(page.key?("body")).to be true
+          end
+          expect(json.find { |page| page["title"] == "Hidden Page" }["body"]).to eq "Body of hidden page"
+        end
+      end
+
       describe "sorting" do
         it "sorts by title (case-insensitive)" do
           @course.wiki_pages.create! title: "gIntermediate Page"
@@ -719,7 +747,8 @@ describe "Pages API", type: :request do
         new_page = @course.wiki_pages.where(url: json["url"]).first!
 
         expect(@course.wiki.front_page).to eq original_page
-        expect(new_page.title).to eq "#{page_title}-2"
+        expect(new_page.title).to eq page_title
+        expect(new_page.url).to eq "#{original_page.url}-2"
       end
 
       it "processes body with process_incoming_html_content" do
@@ -1424,7 +1453,7 @@ describe "Pages API", type: :request do
       expect(page.todo_date).to eq todo_date
     end
 
-    it "paginate,s excluding hidden" do
+    it "paginates excluding hidden" do
       2.times { |i| @course.wiki_pages.create!(title: "New Page #{i}") }
       json = api_call(:get,
                       "/api/v1/courses/#{@course.id}/pages?per_page=2",

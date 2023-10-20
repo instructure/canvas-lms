@@ -395,7 +395,7 @@ describe EnrollmentTerm do
 
     it "re-caches due dates on submissions in courses in the enrollment term" do
       new_due_date = 2.weeks.from_now(@now)
-      # update_all to avoid triggering DueDateCacher#recompute
+      # update_all to avoid triggering SubmissionLifecycleManager#recompute
       Assignment.where(id: [@first_course_assignment, @second_course_assignment, @not_in_term_assignment])
                 .update_all(due_at: new_due_date)
       expect { @term.recompute_course_scores_later }.to change {
@@ -408,7 +408,7 @@ describe EnrollmentTerm do
 
     it "does not re-cache due dates for courses not in the enrollment term" do
       new_due_date = 2.weeks.from_now(@now)
-      # update_all to avoid triggering DueDateCacher#recompute
+      # update_all to avoid triggering SubmissionLifecycleManager#recompute
       Assignment.where(id: [@first_course_assignment, @second_course_assignment, @not_in_term_assignment])
                 .update_all(due_at: new_due_date)
       expect { @term.recompute_course_scores_later }.not_to change {
@@ -419,7 +419,7 @@ describe EnrollmentTerm do
 
     it "re-caches grading period IDs on submissions in courses in the enrollment term" do
       new_due_date = 2.weeks.from_now(@now)
-      # update_all to avoid triggering DueDateCacher#recompute
+      # update_all to avoid triggering SubmissionLifecycleManager#recompute
       Assignment.where(id: [@first_course_assignment, @second_course_assignment, @not_in_term_assignment])
                 .update_all(due_at: new_due_date)
       expect { @term.recompute_course_scores_later }.to change {
@@ -432,7 +432,7 @@ describe EnrollmentTerm do
 
     it "does not re-cache grading period IDs on submissions in courses not in the enrollment term" do
       new_due_date = 2.weeks.from_now(@now)
-      # update_all to avoid triggering DueDateCacher#recompute
+      # update_all to avoid triggering SubmissionLifecycleManager#recompute
       Assignment.where(id: [@first_course_assignment, @second_course_assignment, @not_in_term_assignment])
                 .update_all(due_at: new_due_date)
       expect { @term.recompute_course_scores_later }.not_to change {

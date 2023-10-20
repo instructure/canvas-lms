@@ -188,7 +188,7 @@ module CC::Exporter::WebZip
         quizzes: @quizzes,
         attachments: files
       }
-      return unless list.keys.any? { |type| tab_hidden?(type) }
+      return false unless list.keys.any? { |type| tab_hidden?(type) }
 
       list.each { |type, item_list| map_export_item_ids(type, item_list) }
     end
@@ -277,7 +277,8 @@ module CC::Exporter::WebZip
 
     def requirement_type(modul)
       return :one if modul.requirement_count == 1
-      return :all if modul.completion_requirements.count > 0
+
+      :all if modul.completion_requirements.count > 0
     end
 
     def mod_item_or_content_locked?(item)
@@ -310,16 +311,7 @@ module CC::Exporter::WebZip
       item_hash[:completed] = item_completed?(item)
       item_hash[:content] = parse_content(item.content) unless item_hash[:locked] || item.content_type == "ExternalUrl"
       item_hash[:content] = item.url if !item_hash[:locked] && item.content_type == "ExternalUrl"
-      item_hash[:exportId] = find_export_id(item) if CONTENT_TYPES.include?(item.content_type)
-    end
-
-    def find_export_id(item)
-      case item.content_type
-      when "Assignment", "DiscussionTopic", "Quizzes::Quiz"
-        create_key(item.content)
-      when "WikiPage"
-        item.content&.url
-      end
+      item_hash[:exportId] = create_key(item.content) if CONTENT_TYPES.include?(item.content_type)
     end
 
     def add_assignment_details(item_content, item_hash)
@@ -402,7 +394,7 @@ module CC::Exporter::WebZip
       type_export_hash = {}
       assignment_export_hash = {}
       course.send(type).each do |item|
-        tag = ((type == :wiki_pages) ? item.url : create_key(item))
+        tag = create_key(item)
         type_export_hash[tag] = item
         next unless (type == :discussion_topics || type == :quizzes) && item.assignment
 

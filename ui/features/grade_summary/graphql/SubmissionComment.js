@@ -22,6 +22,7 @@ import {string} from 'prop-types'
 export const SubmissionComment = {
   fragment: gql`
     fragment SubmissionComment on SubmissionComment {
+      _id
       comment
       createdAt
       author {
@@ -31,6 +32,7 @@ export const SubmissionComment = {
     }
   `,
   shape: {
+    _id: string,
     comment: string,
     createdAt: string,
     author: {
@@ -39,6 +41,7 @@ export const SubmissionComment = {
     },
   },
   mock: ({
+    _id = '1',
     comment = 'This is a comment',
     createdAt = '2019-01-01T00:00:00Z',
     author = {
@@ -46,6 +49,7 @@ export const SubmissionComment = {
       shortName: 'JD',
     },
   } = {}) => ({
+    _id,
     comment,
     createdAt,
     author,

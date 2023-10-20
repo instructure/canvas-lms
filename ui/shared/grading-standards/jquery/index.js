@@ -117,7 +117,7 @@ $(document).ready(() => {
     function removed() {
       $('#edit_assignment_form .grading_standard_id').val('')
       $('#assignment_grading_type').val('points').change()
-      $('#course_grading_standard_enabled').attr('checked', false).change()
+      $('#course_course_grading_standard_enabled').attr('checked', false).change()
       $('#course_form .grading_scheme_set').text(I18n.t('grading_scheme_not_set', 'Not Set'))
       $standard.addClass('editing')
       $standard

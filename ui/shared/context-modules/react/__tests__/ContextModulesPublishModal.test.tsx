@@ -32,6 +32,7 @@ const defaultProps = {
   progressId: null,
   publishItems: false,
   title: 'Test Title',
+  continueButtonId: 'continue_button',
   onCancel: () => {},
   isCanceling: false,
   isPublishing: false,

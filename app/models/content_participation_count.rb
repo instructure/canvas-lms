@@ -39,9 +39,7 @@ class ContentParticipationCount < ActiveRecord::Base
         participant = context.content_participation_counts.where(user_id: user, content_type: type).lock.first
         if participant.blank?
           unread_count = unread_count_for(type, context, user)
-          if Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
-            opts["unread_count"] = unread_count
-          end
+          opts["unread_count"] = unread_count
           participant ||= context.content_participation_counts.build({
                                                                        user:,
                                                                        content_type: type,
@@ -82,6 +80,39 @@ class ContentParticipationCount < ActiveRecord::Base
     end
   end
 
+  def self.potential_submissions_by_type(context, user)
+    submission_conditions = sanitize_sql_for_conditions([<<~SQL.squish, user.id, context.class.to_s, context.id])
+      submissions.user_id = ? AND
+      assignments.context_type = ? AND
+      assignments.context_id = ? AND
+      assignments.workflow_state NOT IN ('deleted', 'unpublished') AND
+      assignments.submission_types != 'not_graded' AND
+      (submissions.posted_at IS NOT NULL OR post_policies.post_manually IS FALSE)
+    SQL
+
+    subs_with_grades = Submission.active.graded
+                                 .joins(assignment: [:post_policy])
+                                 .where(submission_conditions)
+                                 .where.not(submissions: { score: nil })
+                                 .pluck(:id)
+    subs_with_comments = Submission.active
+                                   .joins(:submission_comments, assignment: [:post_policy])
+                                   .where(submission_conditions)
+                                   .where(<<~SQL.squish, user).pluck(:id)
+                                     (submission_comments.hidden IS NULL OR NOT submission_comments.hidden)
+                                     AND NOT submission_comments.draft
+                                     AND submission_comments.provisional_grade_id IS NULL
+                                     AND submission_comments.author_id <> ?
+                                   SQL
+    subs_with_assessments = Submission.active
+                                      .joins(:rubric_assessments, assignment: [:post_policy])
+                                      .where(submission_conditions)
+                                      .where.not(rubric_assessments: { data: nil })
+                                      .pluck(:id)
+
+    { subs_with_grades:, subs_with_comments:, subs_with_assessments: }
+  end
+
   def self.unread_submission_count_for(context, user)
     return 0 unless context.is_a?(Course) && context.user_is_student?(user)
 
@@ -89,38 +120,8 @@ class ContentParticipationCount < ActiveRecord::Base
       potential_ids = Rails.cache.fetch_with_batched_keys(["potential_unread_submission_ids", context.global_id].cache_key,
                                                           batch_object: user,
                                                           batched_keys: [:submissions, :potential_unread_submission_ids]) do
-        submission_conditions = sanitize_sql_for_conditions([<<~SQL.squish, user.id, context.class.to_s, context.id])
-          submissions.user_id = ? AND
-          assignments.context_type = ? AND
-          assignments.context_id = ? AND
-          assignments.workflow_state NOT IN ('deleted', 'unpublished') AND
-          assignments.submission_types != 'not_graded'
-        SQL
-
-        muted_condition = " AND (assignments.muted IS NULL OR NOT assignments.muted)"
-        posted_at_condition = " AND (submissions.posted_at IS NOT NULL OR post_policies.post_manually IS FALSE)"
-        visibility_feedback_enabled = Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
-        submission_conditions << (visibility_feedback_enabled ? posted_at_condition : muted_condition)
-
-        subs_with_grades = Submission.active.graded
-                                     .joins(assignment: [:post_policy])
-                                     .where(submission_conditions)
-                                     .where.not(submissions: { score: nil })
-                                     .pluck(:id)
-        subs_with_comments = Submission.active
-                                       .joins(:submission_comments, assignment: [:post_policy])
-                                       .where(submission_conditions)
-                                       .where(<<~SQL.squish, user).pluck(:id)
-                                         (submission_comments.hidden IS NULL OR NOT submission_comments.hidden)
-                                         AND NOT submission_comments.draft
-                                         AND submission_comments.provisional_grade_id IS NULL
-                                         AND submission_comments.author_id <> ?
-                                       SQL
-        subs_with_assessments = Submission.active
-                                          .joins(:rubric_assessments, assignment: [:post_policy])
-                                          .where(submission_conditions)
-                                          .where.not(rubric_assessments: { data: nil })
-                                          .pluck(:id)
+        potential_subs_by_type = potential_submissions_by_type(context, user)
+        subs_with_grades, subs_with_comments, subs_with_assessments = potential_subs_by_type.values
         (subs_with_grades + subs_with_comments + subs_with_assessments).uniq
       end
       potential_ids.size - already_read_count(potential_ids, user)
@@ -130,16 +131,7 @@ class ContentParticipationCount < ActiveRecord::Base
   def self.already_read_count(ids = [], user)
     return 0 if ids.empty?
 
-    if Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
-      ContentParticipation.already_read_count(ids, user)
-    else
-      ContentParticipation.where(
-        content_type: "Submission",
-        content_id: ids,
-        user_id: user,
-        workflow_state: "read"
-      ).count
-    end
+    ContentParticipation.already_read_count(ids, user)
   end
 
   def unread_count(refresh: true)

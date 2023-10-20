@@ -135,16 +135,16 @@
     <tbody>
       <% @all_roles.each do |base_role| %>
         <tr>
-          <td><%= base_role[:plural_label] %>:</td>
+          <th><%= base_role[:plural_label] %>:</th>
           <td><%= n(user_count(base_role[:count])) %></td>
         </tr>
         <% base_role[:custom_roles].each do |cr|
            next if skip_custom_role?(cr)
         %>
           <tr>
-            <td>
+            <th>
               <%= cr[:label] %><% if cr[:workflow_state] == 'inactive' %> (<%= t('role.inactive', 'inactive') %>)<% end %>:
-            </td>
+            </th>
             <td><%= n(user_count(cr[:count])) %></td>
           </tr>
         <% end %>

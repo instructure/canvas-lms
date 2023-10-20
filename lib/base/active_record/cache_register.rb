@@ -77,6 +77,8 @@ module ActiveRecord
                 node_base_keys.map { |k| key_types.map { |type| "#{k}/#{type}" } }.flatten.each_slice(1000) do |slice|
                   redis.del(*slice)
                 end
+              rescue Redis::BaseConnectionError
+                # ignore
               end
             end
             if multi_key_types.any?
@@ -111,6 +113,8 @@ module ActiveRecord
             # try to get the timestamp for the type, set it to now if it doesn't exist
             ts = Canvas::CacheRegister.lua.run(:get_key, [full_key], [now], redis)
             "#{model_name.cache_key}/#{global_id}-#{ts}"
+          rescue Redis::BaseConnectionError
+            nil
           end
         end
       end

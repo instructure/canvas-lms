@@ -141,6 +141,7 @@ module Lti
                                    name: tool.label_for(placements.first, I18n.locale),
                                    description: tool.description,
                                    domain: nil,
+                                   url: "http://www.example.com/basic_lti",
                                    placements: {
                                      link_selection: {
                                        message_type: "basic-lti-launch-request",
@@ -196,6 +197,7 @@ module Lti
                                    name: tool.name,
                                    description: tool.description,
                                    domain: nil,
+                                   url: "http://www.example.com/basic_lti",
                                    placements: {
                                      assignment_selection: {
                                        message_type: "basic-lti-launch-request",

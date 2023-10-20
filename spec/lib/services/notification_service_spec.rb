@@ -36,8 +36,7 @@ module Services
 
       before do
         @queue = double("notification queue")
-        allow(NotificationService).to receive(:notification_sqs).and_return(@queue)
-        allow(NotificationService).to receive(:choose_queue_url).and_return("default")
+        allow(NotificationService).to receive_messages(notification_sqs: @queue, choose_queue_url: "default")
       end
 
       it "processes email message type" do
@@ -90,6 +89,25 @@ module Services
         Message.where(id: @message.id).update_all(path_type: "push", notification_name: "Assignment Created")
         @message.deliver
         expect { @message.deliver }.not_to raise_error
+      end
+
+      def test_push_notification(notification_name)
+        expect(@queue).to receive(:send_message).once
+        sns_client = double
+        allow(sns_client).to receive(:create_platform_endpoint).and_return(endpoint_arn: "arn")
+        allow_any_instance_of(NotificationEndpoint).to receive(:sns_client).and_return(sns_client)
+        @at.notification_endpoints.create!(token: "token")
+        Message.where(id: @message.id).update_all(path_type: "push", notification_name:)
+        @message.reload
+        @message.deliver
+      end
+
+      it "processes push notification message type for New Topic" do
+        test_push_notification("New Topic")
+      end
+
+      it "processes push notification message type for New Reply" do
+        test_push_notification("New Reply")
       end
 
       it "throws error if cannot connect to queue" do

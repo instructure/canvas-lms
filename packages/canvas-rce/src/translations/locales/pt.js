@@ -35,6 +35,7 @@ const locale = {
   "add_another_f4e50d57": { "message": "Adicionar outro" },
   "add_cc_subtitles_55f0394e": { "message": "Adicionar Legenda/Legendas" },
   "add_image_60b2de07": { "message": "Adicionar imagem" },
+  "add_one_9e34a6f8": { "message": "Adicionar um!" },
   "additional_considerations_f3801683": {
     "message": "Considerações adicionais"
   },
@@ -230,6 +231,7 @@ const locale = {
   "crop_image_807ebb08": { "message": "Cortar Imagem" },
   "cup_product_14174434": { "message": "Taça Produto" },
   "current_image_f16c249c": { "message": "Imagem atual" },
+  "current_link_945a47ee": { "message": "Ligação atual" },
   "current_volume_level_c55ab825": { "message": "Nível volume corrente" },
   "custom_6979cd81": { "message": "Personalizadas" },
   "custom_width_and_height_pixels_946eea7c": {
@@ -584,6 +586,9 @@ const locale = {
   "light_blue_5374f600": { "message": "Azul claro" },
   "link_7262adec": { "message": "Ligação" },
   "link_options_a16b758b": { "message": "Opções de Ligação" },
+  "link_type_linktypemessage_c6d26815": {
+    "message": "tipo de ligação: { linkTypeMessage }"
+  },
   "link_with_text_starting_with_start_b3fcbe71": {
     "message": "Ligação com texto a começar com { start }"
   },
@@ -646,6 +651,7 @@ const locale = {
   "minus_plus_3461f637": { "message": "Menos/Menos" },
   "misc_3b692ea7": { "message": "Diversos" },
   "miscellaneous_e9818229": { "message": "Diversos" },
+  "module_90d9fd32": { "message": "Módulo" },
   "modules_c4325335": { "message": "Módulos" },
   "moving_image_to_crop_directionword_6f66cde2": {
     "message": "Mover imagem para cortar { directionWord }"
@@ -670,18 +676,52 @@ const locale = {
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navegue pelo menu ou barra de ferramentas"
   },
+  "navigation_ee9af92d": { "message": "Navegação" },
   "nested_greater_than_d852e60d": { "message": "Aninhado Maior do que" },
   "nested_less_than_27d17e58": { "message": "Aninhado Menos do que" },
+  "new_quiz_34aacba6": { "message": "Novo questionário" },
   "next_40e12421": { "message": "Próximo" },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "Não foram detectados problemas de acessibilidade."
   },
+  "no_announcements_created_yet_c44a94f4": {
+    "message": "Ainda não foram criados anúncios."
+  },
+  "no_announcements_found_20185afc": {
+    "message": "Não foram encontrados anúncios."
+  },
+  "no_assignments_created_yet_1b236d87": {
+    "message": "Ainda não foram criadas tarefas."
+  },
+  "no_assignments_found_79e46d7f": {
+    "message": "Não foram encontradas tarefas."
+  },
   "no_changes_to_save_d29f6e91": { "message": "Nenhuma alteração a guardar." },
+  "no_discussions_created_yet_ff99abe3": {
+    "message": "Ainda não foram criadas discussões."
+  },
+  "no_discussions_found_9284063b": {
+    "message": "Não foram encontradas discussões."
+  },
   "no_e16d9132": { "message": "Não" },
   "no_file_chosen_9a880793": { "message": "Nenhum ficheiro escolhido" },
   "no_headers_9bc7dc7f": { "message": "Sem cabeçalho" },
+  "no_modules_created_yet_c71b6d4d": {
+    "message": "Ainda não foram criados módulos."
+  },
+  "no_modules_found_2df43a40": { "message": "Nenhum módulo encontrado." },
+  "no_pages_created_yet_c379fa6e": {
+    "message": "Ainda não foram criadas páginas."
+  },
+  "no_pages_found_6799350": { "message": "Nenhuma página encontrada." },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "Não está disponível uma pré-visualização para este ficheiro."
+  },
+  "no_quizzes_created_yet_1a2370b9": {
+    "message": "Ainda não foram criados questionários."
+  },
+  "no_quizzes_found_c80c537a": {
+    "message": "Não foram encontrados questionários."
   },
   "no_results_940393cf": { "message": "Nenhum resultado." },
   "no_results_found_for_filterterm_ad1b04c8": {
@@ -877,6 +917,7 @@ const locale = {
   "select_crop_shape_d441feeb": { "message": "Seleccionar cortar forma" },
   "select_language_7c93a900": { "message": "Selecione o idioma" },
   "select_video_source_1b5c9dbe": { "message": "Selecionar fonte de vídeo" },
+  "selected_274ce24f": { "message": "Selecionado" },
   "selected_linkfilename_c093b1f2": {
     "message": "Selecionado { linkFileName }"
   },
@@ -1097,6 +1138,7 @@ const locale = {
     "message": "Seta diagonal para cima e direita"
   },
   "up_c553575d": { "message": "Para cima" },
+  "updated_link_a827e441": { "message": "Ligação atualizada" },
   "upload_document_253f0478": { "message": "Carregar documento" },
   "upload_file_fd2361b8": { "message": "Carregar ficheiro" },
   "upload_image_6120b609": { "message": "Carregar imagem" },

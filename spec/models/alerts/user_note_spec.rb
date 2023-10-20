@@ -64,13 +64,6 @@ module Alerts
         expect(user_note_alert.should_not_receive_message?(@student.id, 31)).to be true
       end
 
-      it "returns false when the student has not received a note less than threshold days ago" do
-        ::UserNote.create!(creator: @teacher, user: @user, root_account_id: @root_account.id) { |un| un.created_at = Time.now - 30.days }
-
-        user_note_alert = Alerts::UserNote.new(@course, [@student.id], [@teacher.id])
-        expect(user_note_alert.should_not_receive_message?(@student.id, 29)).to be false
-      end
-
       it "handles multiple user notes" do
         ::UserNote.create!(creator: @teacher, user: @user, root_account_id: @root_account.id) { |un| un.created_at = Time.now - 30.days }
         ::UserNote.create!(creator: @teacher, user: @user, root_account_id: @root_account.id) { |un| un.created_at = Time.now - 10.days }
@@ -79,15 +72,26 @@ module Alerts
         expect(user_note_alert.should_not_receive_message?(@student.id, 29)).to be true
       end
 
-      it "handles notes from multiple students" do
-        student_1 = @student
-        course_with_student({ course: @course })
-        student_2 = @student
-        ::UserNote.create!(creator: @teacher, user: student_1, root_account_id: @root_account.id) { |un| un.created_at = Time.now - 30.days }
-        ::UserNote.create!(creator: @teacher, user: student_2, root_account_id: @root_account.id) { |un| un.created_at = Time.now - 10.days }
+      context "when the deprecate_faculty_journal flag is disabled" do
+        before { Account.site_admin.disable_feature!(:deprecate_faculty_journal) }
 
-        ungraded_timespan = Alerts::UserNote.new(@course, [student_1.id, student_2.id], [@teacher.id])
-        expect(ungraded_timespan.should_not_receive_message?(student_1.id, 2)).to be false
+        it "returns false when the student has not received a note less than threshold days ago" do
+          ::UserNote.create!(creator: @teacher, user: @user, root_account_id: @root_account.id) { |un| un.created_at = Time.now - 30.days }
+
+          user_note_alert = Alerts::UserNote.new(@course, [@student.id], [@teacher.id])
+          expect(user_note_alert.should_not_receive_message?(@student.id, 29)).to be false
+        end
+
+        it "handles notes from multiple students" do
+          student_1 = @student
+          course_with_student({ course: @course })
+          student_2 = @student
+          ::UserNote.create!(creator: @teacher, user: student_1, root_account_id: @root_account.id) { |un| un.created_at = Time.now - 30.days }
+          ::UserNote.create!(creator: @teacher, user: student_2, root_account_id: @root_account.id) { |un| un.created_at = Time.now - 10.days }
+
+          ungraded_timespan = Alerts::UserNote.new(@course, [student_1.id, student_2.id], [@teacher.id])
+          expect(ungraded_timespan.should_not_receive_message?(student_1.id, 2)).to be false
+        end
       end
 
       context "when the student has not received any notes" do
@@ -100,12 +104,26 @@ module Alerts
             expect(user_note_alert.should_not_receive_message?(@student.id, 3)).to be true
           end
 
-          it "returns false when threshold days from course start are not exceeded" do
-            @course.start_at = Time.now - 7.days
-            @course.save!
+          context "when the deprecate_faculty_journal flag is disabled" do
+            before { Account.site_admin.disable_feature!(:deprecate_faculty_journal) }
 
-            user_note_alert = Alerts::UserNote.new(@course, [@student.id], [@teacher.id])
-            expect(user_note_alert.should_not_receive_message?(@student.id, 3)).to be false
+            it "returns false when threshold days from course start are not exceeded" do
+              @course.start_at = Time.now - 7.days
+              @course.save!
+
+              user_note_alert = Alerts::UserNote.new(@course, [@student.id], [@teacher.id])
+              expect(user_note_alert.should_not_receive_message?(@student.id, 3)).to be false
+            end
+          end
+
+          context "when the deprecated_faculty_journal flag is enabled" do
+            it "returns true when threshold days from course start are not exceeded" do
+              @course.start_at = Time.now - 7.days
+              @course.save!
+
+              user_note_alert = Alerts::UserNote.new(@course, [@student.id], [@teacher.id])
+              expect(user_note_alert.should_not_receive_message?(@student.id, 3)).to be true
+            end
           end
         end
 
@@ -119,13 +137,17 @@ module Alerts
             expect(user_note_alert.should_not_receive_message?(@student.id, 3)).to be true
           end
 
-          it "returns false when threshold days from course created at are not exceeded" do
-            @course.created_at = Time.now - 7.days
-            @course.start_at = nil
-            @course.save!
+          context "when the deprecate_faculty_journal flag is disabled" do
+            before { Account.site_admin.disable_feature!(:deprecate_faculty_journal) }
 
-            user_note_alert = Alerts::UserNote.new(@course, [@student.id], [@teacher.id])
-            expect(user_note_alert.should_not_receive_message?(@student.id, 3)).to be false
+            it "returns false when threshold days from course created at are not exceeded" do
+              @course.created_at = Time.now - 7.days
+              @course.start_at = nil
+              @course.save!
+
+              user_note_alert = Alerts::UserNote.new(@course, [@student.id], [@teacher.id])
+              expect(user_note_alert.should_not_receive_message?(@student.id, 3)).to be false
+            end
           end
         end
       end

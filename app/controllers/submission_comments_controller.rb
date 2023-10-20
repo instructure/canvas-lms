@@ -25,7 +25,7 @@ class SubmissionCommentsController < ApplicationController
     submission = Submission.preload(assignment: :context, all_submission_comments: :author).find(params[:submission_id])
     course = submission.assignment.context
     return render_unauthorized_action if submission.assignment.anonymize_students?
-    return render_unauthorized_action unless course.grants_any_right?(@current_user, :manage_grades, :view_all_grades)
+    return unless authorized_action(course, @current_user, [:manage_grades, :view_all_grades])
 
     render pdf: :index, locals: index_pdf_locals(submission)
   end

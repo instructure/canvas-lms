@@ -25,8 +25,7 @@ module Lti
     let(:tp_validator) { double("tp_validator") }
     let(:tool_proxy) do
       tp = double("tool_proxy")
-      allow(tp).to receive(:tool_profile).and_return(tool_profile)
-      allow(tp).to receive(:enabled_capabilities).and_return(enabled_capabilities)
+      allow(tp).to receive_messages(tool_profile:, enabled_capabilities:)
       tp
     end
     let(:tool_profile) do

@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-require_relative "./job_live_events_context"
+require_relative "job_live_events_context"
 Delayed::Job.include(JobLiveEventsContext)
 
 Delayed::Backend::Base.class_eval do
@@ -120,28 +120,11 @@ Delayed::Worker.on_max_failures = proc do |_job, err|
   err.is_a?(Delayed::Backend::RecordNotFound)
 end
 
-module DelayedJobConfig
-  class << self
-    def config
-      @config ||= YAML.safe_load(DynamicSettings.find(tree: :private)["delayed_jobs.yml"] || "{}")
-    end
-
-    def strands_to_send_to_statsd
-      @strands_to_send_to_statsd ||= (config["strands_to_send_to_statsd"] || []).to_set
-    end
-
-    def reload
-      @config = @strands_to_send_to_statsd = nil
-    end
-    Canvas::Reloader.on_reload { DelayedJobConfig.reload }
-  end
-end
-
 ### lifecycle callbacks
 
 Delayed::Worker.lifecycle.around(:perform) do |worker, job, &block|
   Canvas::Reloader.reload! if Canvas::Reloader.pending_reload
-  Canvas::Redis.clear_idle_connections
+  Canvas::RedisConnections.clear_idle!
   job.current_shard.activate do
     LoadAccount.check_schema_cache
   end

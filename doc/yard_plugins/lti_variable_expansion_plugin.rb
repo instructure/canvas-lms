@@ -76,7 +76,7 @@ class RegisterExpansionHandler < YARD::Handlers::Ruby::Base
 
   def launch_param_text
     m = /default_name: '?"?([^'"]+)/.match(statement.parameters[statement.parameters.length - 2].source.to_s)
-    return "**Launch Parameter**: *#{m[1]}*  " if m
+    "**Launch Parameter**: *#{m[1]}*  " if m
   end
 
   def all_guards

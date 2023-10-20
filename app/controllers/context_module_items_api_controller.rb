@@ -400,7 +400,7 @@ class ContextModuleItemsApiController < ApplicationController
     if authorized_action(@module, @current_user, :update)
       return render json: { message: "missing module item parameter" }, status: :bad_request unless params[:module_item]
 
-      item_params = params[:module_item].slice(:title, :type, :indent, :new_tab)
+      item_params = params[:module_item].slice(:title, :type, :indent, :new_tab, :position)
       item_params[:id] = params[:module_item][:content_id]
       if ["Page", "WikiPage"].include?(item_params[:type])
         if (page_url = params[:module_item][:page_url])
@@ -420,7 +420,7 @@ class ContextModuleItemsApiController < ApplicationController
         item_params[:link_settings] = { selection_width: iframe[:width], selection_height: iframe[:height] }
       end
 
-      if (@tag = @module.add_item(item_params)) && set_position && set_completion_requirement
+      if (@tag = @module.add_item(item_params, nil, position: item_params[:position].to_i)) && set_position && set_completion_requirement
         @module.touch
         render json: module_item_json(@tag, @current_user, session, @module, nil)
       elsif @tag

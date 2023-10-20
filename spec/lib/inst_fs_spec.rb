@@ -25,14 +25,12 @@ describe InstFS do
     let(:rotating_secret) { "anothersecret" }
     let(:secrets) { [secret, rotating_secret] }
     let(:encoded_secrets) { secrets.map { |sec| Base64.encode64(sec) }.join(" ") }
-    let(:settings_hash) { { "app-host" => app_host, "secret" => encoded_secrets } }
+    let(:settings_hash) { { "app_host" => app_host, "secret" => encoded_secrets } }
 
     before do
       allow(InstFS).to receive(:enabled?).and_return(true)
-      allow(DynamicSettings).to receive(:find).with(any_args).and_call_original
-      allow(DynamicSettings).to receive(:find)
-        .with(service: "inst-fs", default_ttl: 5.minutes)
-        .and_return(settings_hash)
+      allow(Rails.application.credentials).to receive(:inst_fs).and_call_original
+      allow(Rails.application.credentials).to receive(:inst_fs).and_return(settings_hash)
     end
 
     it "returns primary decoded base 64 secret" do
@@ -560,12 +558,11 @@ describe InstFS do
 
   context "settings not set" do
     before do
-      allow(DynamicSettings).to receive(:find).with(any_args).and_call_original
-      allow(DynamicSettings).to receive(:find).with(service: "inst-fs")
-                                              .and_return({
-                                                            "app-host" => nil,
-                                                            "secret" => nil
-                                                          })
+      allow(Rails.application.credentials).to receive(:inst_fs).and_call_original
+      allow(Rails.application.credentials).to receive(:inst_fs).and_return({
+                                                                             "app-host" => nil,
+                                                                             "secret" => nil
+                                                                           })
     end
 
     it "instfs is not enabled" do

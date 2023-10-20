@@ -24,7 +24,7 @@ describe ContentZipper do
   #
   # This really needs to get refactored at some point.
   def grab_zip(&)
-    expect(&).to change(Delayed::Job, :count).by(2) # "ContentZipper.process_attachment" and "Attachment#update_word_count"
+    expect(&).to change(Delayed::Job, :count).by(1) # "ContentZipper.process_attachment"
     expect(response).to be_successful
     attachment_id = json_parse["attachment"]["id"]
     expect(attachment_id).to be_present

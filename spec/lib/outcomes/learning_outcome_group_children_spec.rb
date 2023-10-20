@@ -242,9 +242,10 @@ describe Outcomes::LearningOutcomeGroupChildren do
   describe "#suboutcomes_by_group_id" do
     it "returns the outcomes ordered by parent group title then outcome short_description" do
       g_outcomes = subject.suboutcomes_by_group_id(global_group.id)
-                          .map(&:learning_outcome_content).map(&:short_description)
+                          .map { |o| o.learning_outcome_content.short_description }
       expect(g_outcomes).to match_array(["G Outcome 1", "G Outcome 2"])
-      r_outcomes = subject.suboutcomes_by_group_id(g0.id).map(&:learning_outcome_content).map(&:short_description)
+      r_outcomes = subject.suboutcomes_by_group_id(g0.id)
+                          .map { |o| o.learning_outcome_content.short_description }
       expect(r_outcomes).to match_array(
         [
           "Outcome 1",
@@ -265,7 +266,8 @@ describe Outcomes::LearningOutcomeGroupChildren do
 
     it "returns outcomes even if FF is off" do
       context.root_account.disable_feature! :improved_outcomes_management
-      outcomes = subject.suboutcomes_by_group_id(g1.id).map(&:learning_outcome_content).map(&:short_description)
+      outcomes = subject.suboutcomes_by_group_id(g1.id)
+                        .map { |o| o.learning_outcome_content.short_description }
       expect(outcomes).to match_array(
         [
           "Outcome 5",
@@ -285,7 +287,8 @@ describe Outcomes::LearningOutcomeGroupChildren do
       before { g2.update!(title: "A Group 3") }
 
       it "returns the g2s outcome (o3) first" do
-        outcomes = subject.suboutcomes_by_group_id(g0.id).map(&:learning_outcome_content).map(&:short_description)
+        outcomes = subject.suboutcomes_by_group_id(g0.id)
+                          .map { |o| o.learning_outcome_content.short_description }
         expect(outcomes).to match_array(
           [
             "Outcome 3",
@@ -311,7 +314,8 @@ describe Outcomes::LearningOutcomeGroupChildren do
       before { o5.update!(short_description: "A Outcome 4.2") }
 
       it "o5 should be returned before o4 but not o2 and o3" do
-        outcomes = subject.suboutcomes_by_group_id(g1.id).map(&:learning_outcome_content).map(&:short_description)
+        outcomes = subject.suboutcomes_by_group_id(g1.id)
+                          .map { |o| o.learning_outcome_content.short_description }
         expect(outcomes).to match_array(
           [
             "Outcome 2.1",
@@ -335,7 +339,8 @@ describe Outcomes::LearningOutcomeGroupChildren do
       end
 
       it "returns the g4s outcomes first and o6 should be first before other Outcomes 4.x" do
-        outcomes = subject.suboutcomes_by_group_id(g1.id).map(&:learning_outcome_content).map(&:short_description)
+        outcomes = subject.suboutcomes_by_group_id(g1.id)
+                          .map { |o| o.learning_outcome_content.short_description }
         expect(outcomes).to match_array(
           [
             "Outcome 5",
@@ -356,8 +361,8 @@ describe Outcomes::LearningOutcomeGroupChildren do
       subject { described_class.new }
 
       it "returns global outcomes" do
-        outcomes = subject.suboutcomes_by_group_id(global_group.id).map(&:learning_outcome_content)
-                          .map(&:short_description)
+        outcomes = subject.suboutcomes_by_group_id(global_group.id)
+                          .map { |o| o.learning_outcome_content.short_description }
         expect(outcomes).to match_array(["G Outcome 1", "G Outcome 2"])
       end
     end
@@ -409,7 +414,7 @@ describe Outcomes::LearningOutcomeGroupChildren do
 
       it "filters title with non-alphanumerical chars" do
         outcomes = subject.suboutcomes_by_group_id(g1.id, { search_query: "LA.1" })
-                          .map(&:learning_outcome_content).map(&:short_description)
+                          .map { |o| o.learning_outcome_content.short_description }
         expect(outcomes).to eql([
                                   "LA.1.1.1", "LA.1.1.1.1"
                                 ])
@@ -417,7 +422,7 @@ describe Outcomes::LearningOutcomeGroupChildren do
 
       it "filters description with text content" do
         outcomes = subject.suboutcomes_by_group_id(g1.id, { search_query: "knowledge" })
-                          .map(&:learning_outcome_content).map(&:short_description)
+                          .map { |o| o.learning_outcome_content.short_description }
         expect(outcomes).to eql([
                                   "FO.3", "LA.1.1.1"
                                 ])
@@ -425,7 +430,7 @@ describe Outcomes::LearningOutcomeGroupChildren do
 
       it "filters description with html content" do
         outcomes = subject.suboutcomes_by_group_id(g1.id, { search_query: "Pellentesque" })
-                          .map(&:learning_outcome_content).map(&:short_description)
+                          .map { |o| o.learning_outcome_content.short_description }
         expect(outcomes).to eql([
                                   "HT.ML.1.1"
                                 ])
@@ -433,7 +438,7 @@ describe Outcomes::LearningOutcomeGroupChildren do
 
       it "filters more than 1 word" do
         outcomes = subject.suboutcomes_by_group_id(g1.id, { search_query: "LA.1.1 Pellentesque" })
-                          .map(&:learning_outcome_content).map(&:short_description)
+                          .map { |o| o.learning_outcome_content.short_description }
         expect(outcomes).to eql([
                                   "HT.ML.1.1",
                                   "LA.1.1.1",
@@ -443,7 +448,7 @@ describe Outcomes::LearningOutcomeGroupChildren do
 
       it "filters when words aren't all completed" do
         outcomes = subject.suboutcomes_by_group_id(g1.id, { search_query: "recog awe" })
-                          .map(&:learning_outcome_content).map(&:short_description)
+                          .map { |o| o.learning_outcome_content.short_description }
         expect(outcomes).to eql([
                                   "LA.2.2.1.2",
                                   "HT.ML.1.2"
@@ -473,7 +478,7 @@ describe Outcomes::LearningOutcomeGroupChildren do
             g1.id, {
               search_query: "Um portugues"
             }
-          ).map(&:learning_outcome_content).map(&:short_description)
+          ).map { |o| o.learning_outcome_content.short_description }
 
           expect(outcomes).to eql([
                                     "will bring"
@@ -503,7 +508,7 @@ describe Outcomes::LearningOutcomeGroupChildren do
               LearningOutcomeGroup.find_or_create_root(nil, true).id, {
                 search_query: "Um portugues"
               }
-            ).map(&:learning_outcome_content).map(&:short_description)
+            ).map { |o| o.learning_outcome_content.short_description }
 
             expect(outcomes).to eql([
                                       "will bring"
@@ -535,7 +540,7 @@ describe Outcomes::LearningOutcomeGroupChildren do
 
           outcomes = subject.suboutcomes_by_group_id(
             g1.id, { search_query: "Um portugues" }
-          ).map(&:learning_outcome_content).map(&:short_description)
+          ).map { |o| o.learning_outcome_content.short_description }
 
           expect(outcomes).to eql([
                                     "will bring",
@@ -556,32 +561,32 @@ describe Outcomes::LearningOutcomeGroupChildren do
 
       it "filters outcomes without alignments in Canvas" do
         outcomes = subject.suboutcomes_by_group_id(cg1.id, { filter: "NO_ALIGNMENTS" })
-                          .map(&:learning_outcome_content).map(&:id)
+                          .map { |o| o.learning_outcome_content.id }
         expect(outcomes).to eql([o4.id, o8.id])
       end
 
       it "filters outcomes with alignments in Canvas" do
         outcomes = subject.suboutcomes_by_group_id(cg1.id, { filter: "WITH_ALIGNMENTS" })
-                          .map(&:learning_outcome_content).map(&:id)
+                          .map { |o| o.learning_outcome_content.id }
         expect(outcomes).to eql([o3.id])
       end
 
       it "filters outcomes without alignments in Canvas and with search" do
         outcomes = subject.suboutcomes_by_group_id(cg1.id, { search_query: "4.1", filter: "NO_ALIGNMENTS" })
-                          .map(&:learning_outcome_content).map(&:id)
+                          .map { |o| o.learning_outcome_content.id }
         expect(outcomes).to eql([o4.id])
       end
 
       it "doesn't filter when the FF is disabled" do
         course.account.disable_feature!(:improved_outcomes_management)
         outcomes = subject.suboutcomes_by_group_id(cg1.id, { filter: "WITH_ALIGNMENTS" })
-                          .map(&:learning_outcome_content).map(&:id)
+                          .map { |o| o.learning_outcome_content.id }
         expect(outcomes).to eql([o3.id, o4.id, o8.id])
       end
 
       it "doesn't filter if an invalid arg is passed" do
         outcomes = subject.suboutcomes_by_group_id(cg1.id, { filter: "INVALID" })
-                          .map(&:learning_outcome_content).map(&:id)
+                          .map { |o| o.learning_outcome_content.id }
         expect(outcomes).to eql([o3.id, o4.id, o8.id])
       end
 
@@ -598,19 +603,19 @@ describe Outcomes::LearningOutcomeGroupChildren do
 
         it "filters outcomes without alignments in Canvas or Outcomes-Service" do
           outcomes = subject.suboutcomes_by_group_id(cg1.id, { filter: "NO_ALIGNMENTS" })
-                            .map(&:learning_outcome_content).map(&:id)
+                            .map { |o| o.learning_outcome_content.id }
           expect(outcomes).to eql([o4.id, o5.id])
         end
 
         it "filters outcomes with alignments in Canvas or Outcomes-Service" do
           outcomes = subject.suboutcomes_by_group_id(cg1.id, { filter: "WITH_ALIGNMENTS" })
-                            .map(&:learning_outcome_content).map(&:id)
+                            .map { |o| o.learning_outcome_content.id }
           expect(outcomes).to eql([o3.id, o8.id])
         end
 
         it "filters outcomes without alignments in Canvas or Outcomes-Service and with search" do
           outcomes = subject.suboutcomes_by_group_id(cg1.id, { search_query: "4.1", filter: "NO_ALIGNMENTS" })
-                            .map(&:learning_outcome_content).map(&:id)
+                            .map { |o| o.learning_outcome_content.id }
           expect(outcomes).to eql([o4.id])
         end
       end

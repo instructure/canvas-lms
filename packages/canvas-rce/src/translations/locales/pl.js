@@ -33,6 +33,7 @@ const locale = {
   "add_another_f4e50d57": { "message": "Dodaj kolejne" },
   "add_cc_subtitles_55f0394e": { "message": "Dodaj CC/napisy" },
   "add_image_60b2de07": { "message": "Dodaj zdjęcie" },
+  "add_one_9e34a6f8": { "message": "Dodaj jedną!" },
   "additional_considerations_f3801683": { "message": "Dodatkowe kwestie" },
   "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
     "message": "Sąsiadujące łącza o tym samym adresie URL powinny stanowić pojedyncze łącze."
@@ -222,6 +223,7 @@ const locale = {
   "crop_image_807ebb08": { "message": "Przytnij obraz" },
   "cup_product_14174434": { "message": "Iloczyn kartezjański" },
   "current_image_f16c249c": { "message": "Bieżący obraz" },
+  "current_link_945a47ee": { "message": "Bieżące łącze" },
   "current_volume_level_c55ab825": { "message": "Bieżący poziom głośności" },
   "custom_6979cd81": { "message": "Niestandardowe" },
   "custom_width_and_height_pixels_946eea7c": {
@@ -570,6 +572,9 @@ const locale = {
   "light_blue_5374f600": { "message": "Jasny niebieski" },
   "link_7262adec": { "message": "Łącze" },
   "link_options_a16b758b": { "message": "Opcje łącza" },
+  "link_type_linktypemessage_c6d26815": {
+    "message": "typ łącza: { linkTypeMessage }"
+  },
   "link_with_text_starting_with_start_b3fcbe71": {
     "message": "Powiąż z tekstem, który się zaczyna od słów { start }"
   },
@@ -628,6 +633,7 @@ const locale = {
   "minus_plus_3461f637": { "message": "Minus/Plus" },
   "misc_3b692ea7": { "message": "Różne" },
   "miscellaneous_e9818229": { "message": "Różne" },
+  "module_90d9fd32": { "message": "Moduł" },
   "modules_c4325335": { "message": "Moduły" },
   "moving_image_to_crop_directionword_6f66cde2": {
     "message": "Przenoszenie obrazu do przycięcia { directionWord }"
@@ -652,19 +658,45 @@ const locale = {
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Przejdź w menu lub na pasku narzędzi"
   },
+  "navigation_ee9af92d": { "message": "Nawigacja" },
   "nested_greater_than_d852e60d": { "message": "Zagnieżdżone większe niż" },
   "nested_less_than_27d17e58": { "message": "Zagnieżdżone mniejsze niż" },
+  "new_quiz_34aacba6": { "message": "Nowy test" },
   "next_40e12421": { "message": "Następny" },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "Nie wykryto problemów z dostępnością."
   },
+  "no_announcements_created_yet_c44a94f4": {
+    "message": "Nie utworzono jeszcze żadnych ogłoszeń."
+  },
+  "no_announcements_found_20185afc": { "message": "Nie odnaleziono ogłoszeń." },
+  "no_assignments_created_yet_1b236d87": {
+    "message": "Nie utworzono jeszcze żadnych zadań."
+  },
+  "no_assignments_found_79e46d7f": { "message": "Nie odnaleziono zadań." },
   "no_changes_to_save_d29f6e91": { "message": "Brak zmian do zapisania" },
+  "no_discussions_created_yet_ff99abe3": {
+    "message": "Nie utworzono jeszcze żadnych dyskusji."
+  },
+  "no_discussions_found_9284063b": { "message": "Nie odnaleziono dyskusji." },
   "no_e16d9132": { "message": "Nie" },
   "no_file_chosen_9a880793": { "message": "Nie wybrano pliku" },
   "no_headers_9bc7dc7f": { "message": "Brak nagłówków" },
+  "no_modules_created_yet_c71b6d4d": {
+    "message": "Nie utworzono jeszcze żadnych modułów."
+  },
+  "no_modules_found_2df43a40": { "message": "Nie odnaleziono modułów." },
+  "no_pages_created_yet_c379fa6e": {
+    "message": "Nie utworzono jeszcze żadnych stron."
+  },
+  "no_pages_found_6799350": { "message": "Nie odnaleziono stron." },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "Nie ma możliwości podglądu tego pliku."
   },
+  "no_quizzes_created_yet_1a2370b9": {
+    "message": "Nie utworzono jeszcze żadnych testów."
+  },
+  "no_quizzes_found_c80c537a": { "message": "Nie odnaleziono testów." },
   "no_results_940393cf": { "message": "Brak wyników." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Nie znaleziono wyników dla { filterTerm }"
@@ -865,6 +897,7 @@ const locale = {
   "select_crop_shape_d441feeb": { "message": "Wybierz przycięty fragment" },
   "select_language_7c93a900": { "message": "Wybierz język" },
   "select_video_source_1b5c9dbe": { "message": "Wybierz źródło wideo" },
+  "selected_274ce24f": { "message": "Wybrano" },
   "selected_linkfilename_c093b1f2": { "message": "Wybrano { linkFileName }" },
   "selection_b52c4c5e": { "message": "Wybór" },
   "set_header_scope_8c548f40": { "message": "Ustaw zakres nagłówka" },
@@ -1089,6 +1122,7 @@ const locale = {
     "message": "Strzałka po przekątnej do góry i w prawo"
   },
   "up_c553575d": { "message": "Do góry" },
+  "updated_link_a827e441": { "message": "Zaktualizowane łącze" },
   "upload_document_253f0478": { "message": "Prześlij dokument" },
   "upload_file_fd2361b8": { "message": "Prześlij plik" },
   "upload_image_6120b609": { "message": "Prześlij obraz" },

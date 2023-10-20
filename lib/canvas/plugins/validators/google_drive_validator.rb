@@ -25,8 +25,6 @@ module Canvas::Plugins::Validators::GoogleDriveValidator
         client_id: "",
         client_secret: "",
         redirect_uri: "",
-        auth_uri: "",
-        token_uri: "",
         client_secret_json: ""
       }
     elsif (res = check_json(settings))
@@ -39,8 +37,6 @@ module Canvas::Plugins::Validators::GoogleDriveValidator
           client_id: parsed["client_id"],
           client_secret: parsed["client_secret"],
           redirect_uri: parsed["redirect_uris"][0], # we only care about the first one
-          auth_uri: parsed["auth_uri"],
-          token_uri: parsed["token_uri"],
           client_secret_json: ""
         }
       else
@@ -59,9 +55,8 @@ module Canvas::Plugins::Validators::GoogleDriveValidator
         return "Missing application type (Needs `web` somewhere in there)" unless jayson["web"]
         return "Missing `client_id`" unless jayson["web"]["client_id"]
         return "Missing `client_secret`" unless jayson["web"]["client_secret"]
-        return "Missing `redirect_uris` (need at least one)" unless jayson["web"]["redirect_uris"]
-        return "Missing `auth_uri`" unless jayson["web"]["auth_uri"]
-        return "Missing `token_uri`" unless jayson["web"]["token_uri"]
+
+        "Missing `redirect_uris` (need at least one)" unless jayson["web"]["redirect_uris"]
       end
     rescue TypeError, JSON::JSONError => e
       "Is not valid JSON \n (#{e.message}) \n (#{e.backtrace.inspect})"

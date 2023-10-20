@@ -212,6 +212,18 @@ module ConditionalRelease
         expect(details.dig(:trigger_assignment, :assignment, :course_id)).to eq @course.id
       end
 
+      it "does not crash if you try to get student details for a student who is not assigned to the trigger assignment" do
+        student1, student2 = @students.first(2)
+        set_assignments
+        @trigger.update!(only_visible_to_overrides: true)
+        override = @trigger.assignment_overrides.create!(set_type: "ADHOC")
+        override.assignment_override_students.create!(user: student1)
+        set_submissions [[@trigger, 50, 100]]
+
+        details = Stats.student_details(@rule, student2).with_indifferent_access
+        expect(details.dig(:trigger_assignment, :submission)).to be_nil
+      end
+
       context "trends per assignment" do
         before do
           @rule.scoring_ranges.destroy_all

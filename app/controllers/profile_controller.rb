@@ -260,7 +260,11 @@ class ProfileController < ApplicationController
     }
 
     js_bundle :account_notification_settings
-    render html: "", layout: true
+    respond_to do |format|
+      format.html do
+        render html: "", layout: true
+      end
+    end
   end
 
   def communication_update
@@ -507,7 +511,7 @@ class ProfileController < ApplicationController
   end
 
   def content_shares
-    raise not_found unless @current_user.can_view_content_shares?
+    return not_found unless @current_user.can_view_content_shares?
 
     @user ||= @current_user
     set_active_tab "content_shares"

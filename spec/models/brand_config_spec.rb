@@ -204,9 +204,7 @@ describe BrandConfig do
       @json_file = StringIO.new
       @js_file = StringIO.new
       @css_file = StringIO.new
-      allow(@subaccount_bc).to receive(:json_file).and_return(@json_file)
-      allow(@subaccount_bc).to receive(:js_file).and_return(@js_file)
-      allow(@subaccount_bc).to receive(:css_file).and_return(@css_file)
+      allow(@subaccount_bc).to receive_messages(json_file: @json_file, js_file: @js_file, css_file: @css_file)
     end
 
     describe "with cdn disabled" do

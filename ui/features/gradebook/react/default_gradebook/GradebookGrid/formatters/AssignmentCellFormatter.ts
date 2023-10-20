@@ -26,11 +26,8 @@ import {extractSimilarityInfo, isPostable, similarityIcon} from '@canvas/grading
 import {classNamesForAssignmentCell} from './CellStyles'
 import type Gradebook from '../../Gradebook'
 import type {PendingGradeInfo} from '../../gradebook.d'
-import type {
-  GradingStandard,
-  SubmissionData,
-  SubmissionWithOriginalityReport,
-} from '@canvas/grading/grading.d'
+import type {SubmissionData, SubmissionWithOriginalityReport} from '@canvas/grading/grading.d'
+import {GradingStandard} from '@instructure/grading-utils'
 import type {Assignment, Student, Submission} from '../../../../../../api.d'
 
 const I18n = useI18nScope('gradebook')
@@ -160,6 +157,8 @@ function renderTemplate(grade: string, options: Options = {}) {
 export default class AssignmentCellFormatter {
   options: Getters
 
+  customGradeStatusesEnabled: boolean
+
   constructor(gradebook: Gradebook) {
     this.options = {
       getAssignment(assignmentId: string) {
@@ -184,6 +183,7 @@ export default class AssignmentCellFormatter {
         return gradebook.options.show_similarity_score
       },
     }
+    this.customGradeStatusesEnabled = gradebook.options.custom_grade_statuses_enabled
   }
 
   render = (
@@ -225,6 +225,9 @@ export default class AssignmentCellFormatter {
       missing: submission.missing,
       resubmitted: submission.grade_matches_current_submission === false,
       score: submission.score,
+      customGradeStatusId: this.customGradeStatusesEnabled
+        ? submission.custom_grade_status_id
+        : null,
     }
 
     const pendingGradeInfo = this.options.getPendingGradeInfo({

@@ -158,7 +158,7 @@ describe Mutations::SetOverrideScore do
     describe "grade change audit events" do
       before do
         grading_standard = course.grading_standards.create!(data: GradingStandard.default_grading_standard)
-        course.update!(default_grading_standard: grading_standard)
+        course.update!(grading_standard:)
         score_for_grading_period.update!(override_score: 75.0)
       end
 

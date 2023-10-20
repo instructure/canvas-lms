@@ -218,7 +218,8 @@ module Types
       )
 
       context.scoped_merge!(course:)
-      scope = course.apply_enrollment_visibility(course.all_enrollments, current_user).active
+      scope = course.apply_enrollment_visibility(course.all_enrollments, current_user)
+      scope = filter[:states].present? ? scope.where(workflow_state: filter[:states]) : scope.active
       scope = scope.where(associated_user_id: filter[:associated_user_ids]) if filter[:associated_user_ids].present?
       scope = scope.where(type: filter[:types]) if filter[:types].present?
       scope
@@ -228,6 +229,9 @@ module Types
     def grading_periods_connection
       GradingPeriod.for(course).order(:start_date)
     end
+
+    field :relevant_grading_period_group, GradingPeriodGroupType, null: true
+    delegate :relevant_grading_period_group, to: :object
 
     field :grading_standard, GradingStandardType, null: true
     def grading_standard

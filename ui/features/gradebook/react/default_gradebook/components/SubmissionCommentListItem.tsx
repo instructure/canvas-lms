@@ -127,7 +127,7 @@ export default class SubmissionCommentListItem extends React.Component<Props> {
                 <Link
                   href={this.props.authorUrl}
                   isWithinText={false}
-                  theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
+                  themeOverride={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
                   margin="none none xxx-small"
                 >
                   {truncateText(this.props.author || '', {max: 18})}

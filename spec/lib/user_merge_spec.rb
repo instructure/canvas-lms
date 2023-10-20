@@ -37,6 +37,11 @@ describe UserMerge do
       expect { UserMerge.from(user2).into(fake_student) }.to raise_error("cannot merge a test student")
     end
 
+    it "fails if there is an existing active user merge data object for the same user pair" do
+      UserMerge.from(user2).into(user1)
+      expect { UserMerge.from(user2).into(user1) }.to raise_error(UserMerge::UnsafeMergeError)
+    end
+
     it "logs who did the user merge" do
       merger = user_model
       mergeme = UserMerge.from(user2)
@@ -1030,9 +1035,11 @@ describe UserMerge do
         group = account.groups.create!
         @fav = Favorite.create!(user: @user2, context: @shard_course)
         @fav2 = Favorite.create!(user: @user2, context: group)
+        Favorite.create!(user: @user2, context: course_model(account:)).update!(context: nil)
       end
       user1 = user_model
       UserMerge.from(@user2).into(user1)
+      expect(user1.favorites.size).to eq 2
       expect(user1.favorites.where(context_type: "Course").take.context).to eq @shard_course
       expect(user1.favorites.where(context_type: "Group").count).to eq 1
     end

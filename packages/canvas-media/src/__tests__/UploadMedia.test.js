@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {render, fireEvent, waitFor} from '@testing-library/react'
 import UploadMedia, {UploadMediaModal} from '../UploadMedia'
 import getTranslations from '../getTranslations'
 
@@ -38,6 +38,7 @@ const uploadMediaTranslations = {
     UPLOAD_MEDIA_LABEL: 'Upload Media',
     MEDIA_RECORD_NOT_AVAILABLE: 'Record not available',
     PROGRESS_LABEL: 'Making progress',
+    ADD_CLOSED_CAPTIONS_OR_SUBTITLES: 'Add CC/Subtitles',
   },
 }
 
@@ -67,9 +68,9 @@ function renderComponent(overrideProps = {}) {
 
 describe('Upload Media', () => {
   describe('default export', () => {
-    it('loads translations', () => {
+    it('loads translations', async () => {
       render(<UploadMedia {...makeProps({userLocale: 'es'})} />)
-      expect(getTranslations).toHaveBeenCalledWith('es')
+      await waitFor(() => expect(getTranslations).toHaveBeenCalledWith('es'))
     })
   })
 

@@ -95,7 +95,8 @@ describe "eportfolios" do
       expect(last_page).not_to contain_jqcss(".remove_page_link:visible")
     end
 
-    it "reorders a page", ignore_js_errors: true, priority: "1" do
+    it "reorders a page", :ignore_js_errors, priority: "1" do
+      skip "FOO-3814 (10/6/2023)"
       get "/eportfolios/#{@eportfolio.id}"
 
       # add 3 pages
@@ -134,7 +135,8 @@ describe "eportfolios" do
       expect(last_section).not_to contain_jqcss(".remove_section_link:visible")
     end
 
-    it "reorders a section", ignore_js_errors: true, priority: "1" do
+    it "reorders a section", :ignore_js_errors, priority: "1" do
+      skip "FOO-3814 (10/6/2023)"
       get "/eportfolios/#{@eportfolio.id}"
 
       # add a 3 sections

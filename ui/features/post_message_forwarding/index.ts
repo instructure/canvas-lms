@@ -21,12 +21,22 @@ import ready from '@instructure/ready'
 import {EnvPlatformStoragePostMessageForwarding} from '@canvas/global/env/EnvPlatformStorage'
 
 type Message = {
-  toolOrigin?: string
+  sourceToolInfo?: {
+    origin: string
+    windowId: number
+  }
   [key: string]: any
 }
 
+type WindowReferences = [Window]
+
 export const handler =
-  (PARENT_DOMAIN: string, windowReferences: object, parentWindow: Window | null) =>
+  (
+    parentOrigin: string,
+    windowReferences: WindowReferences,
+    parentWindow: Window | null,
+    includeRCESignal: false
+  ) =>
   (e: MessageEvent) => {
     let message: Message
     try {
@@ -36,27 +46,43 @@ export const handler =
       return false
     }
 
-    // eslint-disable-next-line eqeqeq
-    if (e.origin == PARENT_DOMAIN) {
-      const targetOrigin = message.toolOrigin
-      if (!targetOrigin) {
+    if (e.origin === parentOrigin) {
+      // message from canvas -> tool
+      const {sourceToolInfo, ...messageWithoutSourceToolInfo} = message
+      if (!sourceToolInfo) {
         return false
       }
-
-      const targetWindow = windowReferences[targetOrigin]
-      delete message.toolOrigin
-
-      targetWindow?.postMessage(message, targetOrigin)
+      const targetOrigin = sourceToolInfo?.origin
+      const targetWindow = windowReferences[sourceToolInfo?.windowId]
+      targetWindow?.postMessage(messageWithoutSourceToolInfo, targetOrigin)
     } else {
-      windowReferences[e.origin] = e.source
-      message.toolOrigin = e.origin
-
-      parentWindow?.postMessage(message, PARENT_DOMAIN)
+      // message from tool -> canvas
+      // We can't forward the whole `e.source` window in the postMessage,
+      // so we keep a list (`windowReferences`) of all windows we've received
+      // messages from, and include the index into that list as `windowId`
+      let windowId = windowReferences.indexOf(e.source)
+      if (windowId === -1) {
+        windowReferences.push(e.source)
+        windowId = windowReferences.length - 1
+      }
+      const newMessage = {...message, sourceToolInfo: {origin: e.origin, windowId}}
+      if (includeRCESignal) {
+        newMessage.in_rce = true
+      }
+      parentWindow?.postMessage(newMessage, parentOrigin)
     }
   }
 
 ready(() => {
-  const {PARENT_DOMAIN} = window.ENV as EnvPlatformStoragePostMessageForwarding
-  const windowReferences = {}
-  window.addEventListener('message', handler(PARENT_DOMAIN, windowReferences, window.top))
+  const {PARENT_ORIGIN, IN_RCE} = window.ENV as EnvPlatformStoragePostMessageForwarding
+  const windowReferences = [] as WindowReferences
+
+  if (IN_RCE) {
+    // Canvas renders the RCE/TinyMCE, which uses an iframe to enclose the content being edited
+    // tools inside the editor should send _all_ postMessages directly to Canvas
+    const canvasWindow = window.parent.parent
+    window.addEventListener('message', handler(window.origin, windowReferences, canvasWindow, true))
+  } else {
+    window.addEventListener('message', handler(PARENT_ORIGIN, windowReferences, window.top))
+  }
 })

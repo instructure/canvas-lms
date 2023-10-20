@@ -22,5 +22,7 @@ export type EnvPlatformStorage = Partial<EnvPlatformStoragePostMessageForwarding
  * From Lti::PlatformStorageController#post_message_forwarding
  */
 export interface EnvPlatformStoragePostMessageForwarding {
-  PARENT_DOMAIN: string
+  PARENT_ORIGIN: string
+  IN_RCE?: boolean
+  IGNORE_LTI_POST_MESSAGES?: boolean
 }

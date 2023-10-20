@@ -27,7 +27,7 @@ const {Option: CanvasMultiSelectOption} = CanvasMultiSelect as any
 type Props = {
   id: string
   label: string
-  'data-test-id'?: string
+  'data-testid'?: string
   customMatcher?: (option: {label: string; id: string}, query: string) => boolean
   disabled: boolean
   options: Array<{id: string; text: string}>
@@ -46,7 +46,7 @@ function MultiSelectSearchInput(props: Props) {
   return (
     <View as="div" textAlign="start" margin="0 0 small 0">
       <CanvasMultiSelect
-        data-testid={props['data-test-id']}
+        data-testid={props['data-testid']}
         id={props.id}
         label={props.label}
         selectedOptionIds={selectedOptionIds}

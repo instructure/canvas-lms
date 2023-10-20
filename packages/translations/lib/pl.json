@@ -1,10 +1,4 @@
 {
-    "a_great_discussion_6526a6d9": {
-        "message": "Bardzo udana dyskusja"
-    },
-    "a_wonderful_assignment_d3139d9b": {
-        "message": "Wspaniałe zadanie"
-    },
     "access_the_pretty_html_editor_37168efe": {
         "message": "Uzyskaj dostęp do ulepszonego edytora HTML"
     },
@@ -32,17 +26,11 @@
     "add_image_60b2de07": {
         "message": "Dodaj zdjęcie"
     },
-    "add_to_do_7537af64": {
-        "message": "Dodaj listę zadań"
-    },
-    "add_to_do_7def3c37": {
-        "message": "Dodaj do listy zadań"
+    "add_one_9e34a6f8": {
+        "message": "Dodaj jedną!"
     },
     "additional_considerations_f3801683": {
         "message": "Dodatkowe kwestie"
-    },
-    "address_3159962f": {
-        "message": "Adres:"
     },
     "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
         "message": "Sąsiadujące łącza o tym samym adresie URL powinny stanowić pojedyncze łącze."
@@ -68,9 +56,6 @@
     "all_apps_a50dea49": {
         "message": "Wszystkie aplikacje"
     },
-    "all_day_fb42c4fc": {
-        "message": "Cały dzień"
-    },
     "alpha_15d59033": {
         "message": "Alfa"
     },
@@ -86,14 +71,8 @@
     "amalg_coproduct_c589fb12": {
         "message": "Amalg (suma)"
     },
-    "an_amazing_discussion_assignment_e5c8bd6b": {
-        "message": "Cudowne zadanie dyskusji"
-    },
     "an_error_occured_reading_the_file_ff48558b": {
         "message": "Wystąpił błąd podczas odczytywania pliku"
-    },
-    "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
-        "message": "Podczas odrzucania okazji wystąpił błąd."
     },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "Wystąpił błąd podczas przesyłania żądania sieciowego"
@@ -137,9 +116,6 @@
     "are_you_sure_you_want_to_cancel_changes_you_made_m_c5210496": {
         "message": "Czy na pewno chcesz anulować? Zmiany mogą nie zostać zapisane."
     },
-    "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
-        "message": "Czy na pewno chcesz usunąć ten element planera?"
-    },
     "armenian_12da6118": {
         "message": "Armeński"
     },
@@ -157,36 +133,6 @@
     },
     "assignments_1e02582c": {
         "message": "Zadania"
-    },
-    "assignmenttype_title_6612d008": {
-        "message": "{ assignmentType } { title }."
-    },
-    "assignmenttype_title_all_day_on_datetime_9768903c": {
-        "message": "{ assignmentType } { title }, cały dzień w { datetime }."
-    },
-    "assignmenttype_title_at_datetime_478f0709": {
-        "message": "{ assignmentType } { title }, o { datetime }."
-    },
-    "assignmenttype_title_at_datetime_until_endtime_a5900e38": {
-        "message": "{ assignmentType } { title }, o godz. { datetime } do { endTime }"
-    },
-    "assignmenttype_title_due_datetime_a112d8ff": {
-        "message": "{ assignmentType } { title }, termin { datetime }."
-    },
-    "assignmenttype_title_has_a_to_do_time_at_datetime_e07310e8": {
-        "message": "{ assignmentType } { title } ma czas na zadanie o godz. { datetime }."
-    },
-    "assignmenttype_title_is_marked_as_done_a8dc46ef": {
-        "message": "{ assignmentType } { title } oznaczono jako gotowe."
-    },
-    "assignmenttype_title_is_not_marked_as_done_ba80ba66": {
-        "message": "{ assignmentType } { title } nie oznaczono jako gotowe."
-    },
-    "assignmenttype_title_posted_datetime_cab69444": {
-        "message": "{ assignmentType } { title } opublikował(a) { datetime }."
-    },
-    "assignmenttype_title_reminder_datetime_33fa66d5": {
-        "message": "{ assignmentType } { title }, przypomnienie { datetime }."
     },
     "asterisk_82255584": {
         "message": "Gwiazdka"
@@ -224,17 +170,11 @@
     "because_501841b": {
         "message": "Ponieważ"
     },
-    "beginning_of_your_to_do_history_61ef2dce": {
-        "message": "Początek historii listy zadań"
-    },
     "belarusian_b2f19c76": {
         "message": "Białoruski"
     },
     "below_81d4dceb": {
         "message": "Poniżej"
-    },
-    "below_is_an_example_of_how_students_will_see_their_8f7e7971": {
-        "message": "Poniżej znajduje się przykład tego, jak uczestnicy widź swój harmonogram"
     },
     "beta_cb5f307e": {
         "message": "Beta"
@@ -269,20 +209,14 @@
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
     },
-    "calendar_a8563bb2": {
-        "message": "Kalendarz:"
-    },
-    "calendar_event_89aadc1c": {
-        "message": "Wydarzenie w kalendarzu"
-    },
     "cancel_caeb1e68": {
         "message": "Anuluj"
     },
-    "canvas_planner_98ed106": {
-        "message": "Planer Canvas"
-    },
     "cap_product_3a5265a6": {
         "message": "G mnożenie"
+    },
+    "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
+        "message": "Napisów odziedziczonych z kursu nadrzędnego nie można usunąć."
     },
     "catalan_16f6b78f": {
         "message": "Kataloński"
@@ -383,9 +317,6 @@
     "close_d634289d": {
         "message": "Zamknij"
     },
-    "close_opportunity_center_popup_9907d981": {
-        "message": "Zamknij wyskakujące okienko Opportunity Center"
-    },
     "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
         "message": "Plik z napisami musi być mniejszy niż { maxKb } kb"
     },
@@ -452,23 +383,8 @@
     "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
         "message": "{ count, plural,\n     =0 {0 słów}\n    one {1 słowo}\n  other {# słowa}\n}"
     },
-    "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
-        "message": "{ count, plural,\n     =0 {# okazje}\n    one {# okazja}\n  other {# okazji}\n}"
-    },
-    "count_plural_one_hide_missing_item_other_hide_miss_4a2562f7": {
-        "message": "{ count, plural,\n    one {Ukryj # brakujący element}\n  other {Ukryj # brakujące elementy}\n}"
-    },
     "count_plural_one_item_loaded_other_items_loaded_857023b7": {
         "message": "{ count, plural,\n    one {# element przesłany}\n  other {# elementów przesłanych}\n}"
-    },
-    "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
-        "message": "{ count, plural,\n    one {Pokaż # ukończony element}\n  other {Pokaż # ukończone elementy }\n}"
-    },
-    "count_plural_one_show_missing_item_other_show_miss_509327ef": {
-        "message": "{ count, plural,\n    one {Pokaż # brakujący element}\n  other {Pokaż # brakujące elementy}\n}"
-    },
-    "course_8a63b4a3": {
-        "message": "Kurs"
     },
     "course_documents_104d76e0": {
         "message": "Dokumenty kursu"
@@ -494,9 +410,6 @@
     "course_navigation_dd035109": {
         "message": "Nawigowanie po kursie"
     },
-    "course_to_do_bcbbab54": {
-        "message": "{ course } LISTA ZADAŃ"
-    },
     "create_icon_110d6463": {
         "message": "Utwórz ikonę"
     },
@@ -521,6 +434,9 @@
     "current_image_f16c249c": {
         "message": "Bieżący obraz"
     },
+    "current_link_945a47ee": {
+        "message": "Bieżące łącze"
+    },
     "current_volume_level_c55ab825": {
         "message": "Bieżący poziom głośności"
     },
@@ -544,21 +460,6 @@
     },
     "date_added_ed5ad465": {
         "message": "Data dodania"
-    },
-    "date_at_time_dbdb1b99": {
-        "message": "{ date } o { time }"
-    },
-    "date_ee500367": {
-        "message": "Data"
-    },
-    "date_is_not_a_valid_date_4ef9f8ba": {
-        "message": "#{ date } nie jest prawidłową datą."
-    },
-    "date_is_required_8660ec22": {
-        "message": "Wymagana jest data."
-    },
-    "date_time_d9fbf2d7": {
-        "message": "Data i godzina:"
     },
     "decorative_icon_9a7f3fc3": {
         "message": "Ikona dekoracyjna"
@@ -587,9 +488,6 @@
     "degree_symbol_4a823d5f": {
         "message": "Symbol stopnia"
     },
-    "delete_a6efa79d": {
-        "message": "Usuń"
-    },
     "delimiters_4db4840d": {
         "message": "Ograniczniki"
     },
@@ -610,9 +508,6 @@
     },
     "details_98a31b68": {
         "message": "Szczegóły"
-    },
-    "details_a6f427c3": {
-        "message": "Informacje szczegółowe:"
     },
     "diagonal_dots_7d71b57e": {
         "message": "Kropki po przekątnej"
@@ -652,18 +547,6 @@
     },
     "disjoint_union_e74351a8": {
         "message": "Suma rozłączna"
-    },
-    "dismiss_itemtitle_a9fae1b3": {
-        "message": "Odrzuć { itemTitle }"
-    },
-    "dismiss_opportunityname_5995176f": {
-        "message": "Odrzuć { opportunityName }"
-    },
-    "dismissed_8b0b1fc9": {
-        "message": "Odrzucono"
-    },
-    "dismissed_opportunities_f0826640": {
-        "message": "Odrzucone okazje"
     },
     "display_options_315aba85": {
         "message": "Opcje wyświetlania"
@@ -713,12 +596,6 @@
     "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
         "message": "Przeciągnij uchwyt. Użyj strzałek w dół i w górę, aby zmienić rozmiar"
     },
-    "due_5d7267be": {
-        "message": "Termin:"
-    },
-    "due_date_124fdd99": {
-        "message": "Termin: { date }"
-    },
     "due_multiple_dates_cc0ee3f5": {
         "message": "Termin: Wiele dat"
     },
@@ -748,9 +625,6 @@
     },
     "edit_link_7f53bebb": {
         "message": "Edytuj łącze"
-    },
-    "edit_title_72e5a21e": {
-        "message": "Edytuj { title }"
     },
     "editor_statusbar_26ac81fc": {
         "message": "Pasek stanu edytora"
@@ -836,29 +710,11 @@
     "equivalent_identity_654b3ce5": {
         "message": "Równoważność (identyczność)"
     },
-    "error_loading_grades_e0b38f4d": {
-        "message": "Błąd podczas wczytywania ocen"
-    },
-    "error_loading_items_5218438e": {
-        "message": "Błąd podczas wczytywania elementów"
-    },
-    "error_loading_more_items_3f109d9f": {
-        "message": "Błąd podczas wczytywania dodatkowych elementów"
-    },
-    "error_loading_past_items_2881dbb1": {
-        "message": "Błąd podczas wczytywania wcześniejszych elementów"
-    },
     "estonian_5e8e2fa4": {
         "message": "Estoński"
     },
     "eta_b8828f99": {
         "message": "ETA"
-    },
-    "exciting_discussion_9f67bd0a": {
-        "message": "Ekscytująca dyskusja"
-    },
-    "excused_cf8792eb": {
-        "message": "Usprawiedliwiony"
     },
     "exists_2e62bdaa": {
         "message": "Istnieje"
@@ -871,9 +727,6 @@
     },
     "expand_to_see_types_f5d29352": {
         "message": "Rozszerz, aby zobaczyć { types }"
-    },
-    "extended_9a58dcb6": {
-        "message": "Rozszerzone"
     },
     "external_link_d3f9e62a": {
         "message": "Łącze zewnętrzne"
@@ -896,47 +749,11 @@
     "f_function_fe422d65": {
         "message": "F (funkcja)"
     },
-    "failed_getting_course_list_49846a93": {
-        "message": "Nie udało się pobrać listy kursów"
-    },
     "failed_getting_file_contents_e9ea19f4": {
         "message": "Nie udało się pobrać zawartości pliku"
     },
-    "failed_getting_to_do_list_10ce2833": {
-        "message": "Niepowodzenie pobierania listy do zrobienia"
-    },
-    "failed_peeking_into_your_future_e95b9306": {
-        "message": "Nie udało się zaglądnąć w Twoją przyszłość"
-    },
-    "failed_peeking_into_your_past_5bec2323": {
-        "message": "Nie udało się zaglądnąć w Twoją przeszłość"
-    },
-    "failed_saving_changes_on_name_1e100ad": {
-        "message": "Nie udało się zapisać zmian w { name }."
-    },
-    "failed_to_delete_name_bdd7b810": {
-        "message": "Nie udało się usunąć { name }."
-    },
-    "failed_to_delete_to_do_64edff49": {
-        "message": "Nie udało się usunąć zadań"
-    },
-    "failed_to_get_new_activity_17e7ec7c": {
-        "message": "Nie udało się pobrać nowej aktywności"
-    },
-    "failed_to_load_opportunities_52ab6404": {
-        "message": "Nie udało się wczytać okazji"
-    },
     "failed_to_retrieve_content_from_external_tool_5899c213": {
         "message": "Nie udało się pobrać zawartości z zewnętrznego narzędzia"
-    },
-    "failed_to_save_to_do_ddc7503b": {
-        "message": "Nie udało się zapisać do"
-    },
-    "failure_loading_the_to_do_list_c61895c8": {
-        "message": "Niepowodzenie wczytywania listy do zrobienia"
-    },
-    "feedback_6dcc1991": {
-        "message": "Informacje zwrotne"
     },
     "file_name_8fd421ff": {
         "message": "Nazwa pliku"
@@ -1016,9 +833,6 @@
     "fullscreen_873bf53f": {
         "message": "Pełny ekran"
     },
-    "fun_quiz_47ab0b0": {
-        "message": "Fajny test"
-    },
     "galician_7e4508b5": {
         "message": "Galicyjski"
     },
@@ -1034,26 +848,14 @@
     "gif_png_format_images_larger_than_size_kb_are_not__7af3bdbd": {
         "message": "Obrazy w formacie GIF/PNG większe niż { size } kB nie są obecnie obsługiwane."
     },
-    "go_to_card_view_dashboard_9d03970e": {
-        "message": "Przejdź do panelu nawigacyjnego widoku karty"
-    },
     "go_to_the_editor_s_menubar_e6674c81": {
         "message": "Przejdź do paska menu edytora"
     },
     "go_to_the_editor_s_toolbar_a5cb875f": {
         "message": "Przejdź do paska narzędzi edytora"
     },
-    "graded_25cd3fcd": {
-        "message": "Oceniono"
-    },
     "grades_a61eba0a": {
         "message": "Oceny"
-    },
-    "grades_are_loading_c899652d": {
-        "message": "Trwa wczytywanie ocen"
-    },
-    "grades_loaded_5056277c": {
-        "message": "Wczytano oceny"
     },
     "greater_than_e98af662": {
         "message": "Większe niż"
@@ -1307,26 +1109,8 @@
     "italian_bd3c792d": {
         "message": "Włoski"
     },
-    "items_completed_items_plural_1_item_other_items_717d579f": {
-        "message": "{ items } ukończył(a) { items, plural,\n     =1 {element}\n  other {elementy}\n}"
-    },
     "japanese_b5721ca7": {
         "message": "Japoński"
-    },
-    "join_6cafecca": {
-        "message": "Dołącz"
-    },
-    "join_active_online_meeting_d9d892b2": {
-        "message": "Dołącz do aktywnego spotkania online"
-    },
-    "join_online_meeting_b1725843": {
-        "message": "Dołącz do spotkania online"
-    },
-    "jump_to_navigation_toolbar_2952cd8b": {
-        "message": "Przeskocz do paska nawigacji"
-    },
-    "jump_to_today_254ccf41": {
-        "message": "Przejdź do dnia dzisiejszego"
     },
     "kappa_2f14c816": {
         "message": "Kappa"
@@ -1346,9 +1130,6 @@
     "lambda_4f602498": {
         "message": "Lambda"
     },
-    "language_arts_35b79a8b": {
-        "message": "Języki obce"
-    },
     "language_arts_icon_a798b0f8": {
         "message": "Ikona języków obcych"
     },
@@ -1357,9 +1138,6 @@
     },
     "large_9c5e80e7": {
         "message": "Duży"
-    },
-    "late_2be42b88": {
-        "message": "Późno"
     },
     "latvian_2bbb6aab": {
         "message": "Łotewski"
@@ -1454,6 +1232,9 @@
     "link_options_a16b758b": {
         "message": "Opcje łącza"
     },
+    "link_type_linktypemessage_c6d26815": {
+        "message": "typ łącza: { linkTypeMessage }"
+    },
     "link_with_text_starting_with_start_b3fcbe71": {
         "message": "Powiąż z tekstem, który się zaczyna od słów { start }"
     },
@@ -1472,20 +1253,8 @@
     "load_more_35d33c7": {
         "message": "Wczytaj więcej"
     },
-    "load_more_a36f9cf9": {
-        "message": "Załaduj więcej"
-    },
-    "load_prior_dates_f2b0f6f0": {
-        "message": "Wczytaj wcześniejsze daty"
-    },
-    "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
-        "message": "Wczytano { count, plural,\n     =0 {# elementy}\n    one {# element}\n  other {# elementów}\n}"
-    },
     "loading_25990131": {
         "message": "Wczytywanie..."
-    },
-    "loading_725811ca": {
-        "message": "wczytywanie"
     },
     "loading_bde52856": {
         "message": "Wczytywanie"
@@ -1505,26 +1274,14 @@
     "loading_folders_d8b5869e": {
         "message": "Wczytywanie folderów"
     },
-    "loading_grades_c842c887": {
-        "message": "Wczytywanie ocen"
-    },
-    "loading_past_items_ca499e75": {
-        "message": "Wczytywanie wcześniejszych elementów"
-    },
     "loading_placeholder_for_filename_792ef5e8": {
         "message": "Wczytywanie elementu zastępczego dla { fileName }"
-    },
-    "loading_planner_items_947a813d": {
-        "message": "Wczytywanie elementu planera"
     },
     "loading_please_wait_d276220a": {
         "message": "Ładowanie, proszę czekać"
     },
     "loading_preview_9f077aa1": {
         "message": "Wczytywanie podglądu"
-    },
-    "location_3b6ff307": {
-        "message": "Położenie:"
     },
     "locked_762f138b": {
         "message": "Zablokowany"
@@ -1540,9 +1297,6 @@
     },
     "logical_equivalence_thick_662dd3f2": {
         "message": "Równoważność logiczna (pogrubiony)"
-    },
-    "looks_like_there_isn_t_anything_here_d9bcef49": {
-        "message": "Wygląda na to, że nic tu nie ma"
     },
     "low_horizontal_dots_cc08498e": {
         "message": "Niskie kropki poziomo"
@@ -1564,9 +1318,6 @@
     },
     "maps_to_e5ef7382": {
         "message": "Mapy do"
-    },
-    "math_ede93050": {
-        "message": "Matematyka"
     },
     "math_icon_ad4e9d03": {
         "message": "Ikona matematyki"
@@ -1613,11 +1364,8 @@
     "miscellaneous_e9818229": {
         "message": "Różne"
     },
-    "missing_1a256b3b": {
-        "message": "Brak"
-    },
-    "missing_items_for_title_516511f8": {
-        "message": "Brak elementów dla { title }"
+    "module_90d9fd32": {
+        "message": "Moduł"
     },
     "modules_c4325335": {
         "message": "Moduły"
@@ -1646,9 +1394,6 @@
     "my_files_2f621040": {
         "message": "Moje pliki"
     },
-    "my_grades_98834476": {
-        "message": "Moje oceny"
-    },
     "n_th_root_9991a6e4": {
         "message": "Pierwiastek n-tego stopnia"
     },
@@ -1670,38 +1415,44 @@
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "Przejdź w menu lub na pasku narzędzi"
     },
+    "navigation_ee9af92d": {
+        "message": "Nawigacja"
+    },
     "nested_greater_than_d852e60d": {
         "message": "Zagnieżdżone większe niż"
     },
     "nested_less_than_27d17e58": {
         "message": "Zagnieżdżone mniejsze niż"
     },
-    "new_13daf639": {
-        "message": "Nowe"
-    },
-    "new_activity_8b84847d": {
-        "message": "Nowa aktywność"
-    },
-    "new_activity_for_title_14c9c3af": {
-        "message": "Nowa aktywność dla { title }"
-    },
-    "new_opportunities_7d349c4d": {
-        "message": "Nowe okazje"
+    "new_quiz_34aacba6": {
+        "message": "Nowy test"
     },
     "next_40e12421": {
         "message": "Następny"
     },
-    "next_month_749b1778": {
-        "message": "Następny miesiąc"
-    },
     "no_accessibility_issues_were_detected_f8d3c875": {
         "message": "Nie wykryto problemów z dostępnością."
+    },
+    "no_announcements_created_yet_c44a94f4": {
+        "message": "Nie utworzono jeszcze żadnych ogłoszeń."
+    },
+    "no_announcements_found_20185afc": {
+        "message": "Nie odnaleziono ogłoszeń."
+    },
+    "no_assignments_created_yet_1b236d87": {
+        "message": "Nie utworzono jeszcze żadnych zadań."
+    },
+    "no_assignments_found_79e46d7f": {
+        "message": "Nie odnaleziono zadań."
     },
     "no_changes_to_save_d29f6e91": {
         "message": "Brak zmian do zapisania"
     },
-    "no_due_dates_assigned_e8f5bac8": {
-        "message": "Brak ustawionych terminów"
+    "no_discussions_created_yet_ff99abe3": {
+        "message": "Nie utworzono jeszcze żadnych dyskusji."
+    },
+    "no_discussions_found_9284063b": {
+        "message": "Nie odnaleziono dyskusji."
     },
     "no_e16d9132": {
         "message": "Nie"
@@ -1709,17 +1460,29 @@
     "no_file_chosen_9a880793": {
         "message": "Nie wybrano pliku"
     },
-    "no_grade_3b4d7f3e": {
-        "message": "Brak oceny"
-    },
     "no_headers_9bc7dc7f": {
         "message": "Brak nagłówków"
     },
-    "no_more_items_to_show_6a1333c6": {
-        "message": "Brak pozycji do wyświetlenia"
+    "no_modules_created_yet_c71b6d4d": {
+        "message": "Nie utworzono jeszcze żadnych modułów."
+    },
+    "no_modules_found_2df43a40": {
+        "message": "Nie odnaleziono modułów."
+    },
+    "no_pages_created_yet_c379fa6e": {
+        "message": "Nie utworzono jeszcze żadnych stron."
+    },
+    "no_pages_found_6799350": {
+        "message": "Nie odnaleziono stron."
     },
     "no_preview_is_available_for_this_file_f940114a": {
         "message": "Nie ma możliwości podglądu tego pliku."
+    },
+    "no_quizzes_created_yet_1a2370b9": {
+        "message": "Nie utworzono jeszcze żadnych testów."
+    },
+    "no_quizzes_found_c80c537a": {
+        "message": "Nie odnaleziono testów."
     },
     "no_results_940393cf": {
         "message": "Brak wyników."
@@ -1766,35 +1529,8 @@
     "not_superset_strict_24e06f36": {
         "message": "Nie jest nadzbiorem (ścisłym)"
     },
-    "nothing_due_this_week_d45c9ef9": {
-        "message": "Brak terminów w tym tygodniu"
-    },
-    "nothing_for_now_e3e3ce2a": {
-        "message": "Brak bieżących elementów"
-    },
-    "nothing_here_needs_attention_c4eaded6": {
-        "message": "Nic nie wymaga uwagi."
-    },
-    "nothing_more_to_do_b665da42": {
-        "message": "Nic więcej do zrobienia"
-    },
-    "nothing_new_needs_attention_3ac548d4": {
-        "message": "Nic nie wymaga uwagi."
-    },
-    "nothing_planned_today_selecting_most_recent_item_ffd71bff": {
-        "message": "Nic na dziś nie zaplanowano. Wybór najnowszego elementu."
-    },
-    "nothing_planned_today_selecting_next_item_f6718aa": {
-        "message": "Nic na dziś nie zaplanowano. Wybór następnego elementu."
-    },
-    "nothing_planned_yet_8675ffe9": {
-        "message": "Nic jeszcze nie zaplanowano"
-    },
     "nu_1c0f6848": {
         "message": "Nu"
-    },
-    "numpoints_points_8621a43b": {
-        "message": "{ numPoints } punkty"
     },
     "octagon_e48be9f": {
         "message": "Ośmiobok"
@@ -1811,9 +1547,6 @@
     "one_or_more_files_failed_to_paste_please_try_uploa_7fa39dd3": {
         "message": "Nie udało się wkleić co najmniej jednego pliku. Spróbuj przesłać lub przeciągnąć i upuścić pliki."
     },
-    "only_most_recent_grading_period_shown_f1ad6458": {
-        "message": "*Pokazano tylko najnowszy okres oceniania."
-    },
     "open_circle_e9bd069": {
         "message": "Otwarty okrąg"
     },
@@ -1825,12 +1558,6 @@
     },
     "operators_a2ef9a93": {
         "message": "Operatory"
-    },
-    "opportunities_popup_f6703842": {
-        "message": "okienko wyskakujące z okazjami"
-    },
-    "optional_add_course_ef0d70fc": {
-        "message": "Opcjonalnie: Dodaj kurs"
     },
     "or_9b70ccaa": {
         "message": "Lub"
@@ -1876,12 +1603,6 @@
     },
     "pause_12af3bb4": {
         "message": "Pauza"
-    },
-    "peer_review_74f26a13": {
-        "message": "Recenzja drugiego uczestnika"
-    },
-    "peer_review_for_itemtitle_358cb413": {
-        "message": "Recenzja { itemTitle } innego uczestnika"
     },
     "pentagon_17d82ea3": {
         "message": "Pięciokąt"
@@ -1943,12 +1664,6 @@
     "plus_minus_f8be2e83": {
         "message": "Plus/Minus"
     },
-    "points_bceb5005": {
-        "message": "punkty"
-    },
-    "points_points_63e59cce": {
-        "message": "{ points } punkty"
-    },
     "polish_4cf2ecaf": {
         "message": "Polski"
     },
@@ -1985,9 +1700,6 @@
     "preview_inline_9787330": {
         "message": "Wbudowany pogląd"
     },
-    "previous_month_bb1e3c84": {
-        "message": "Poprzedni miesiąc"
-    },
     "prime_917ea60e": {
         "message": "Liczba pierwsza"
     },
@@ -2005,9 +1717,6 @@
     },
     "psi_e3f5f0f7": {
         "message": "Psi"
-    },
-    "pts_699bd9aa": {
-        "message": "pkt"
     },
     "published_c944a23d": {
         "message": "opublikowane"
@@ -2051,17 +1760,11 @@
     "red_8258edf3": {
         "message": "Czerwony"
     },
-    "redo_363c58b7": {
-        "message": "Cofnij"
-    },
     "relationships_6602af70": {
         "message": "Powiązania"
     },
     "religion_icon_246e0be1": {
         "message": "Ikona religii"
-    },
-    "reminder_date_4564d12d": {
-        "message": "Przypomnienie: { date }"
     },
     "remove_heading_style_5fdc8855": {
         "message": "Usuń styl nagłówka"
@@ -2071,9 +1774,6 @@
     },
     "replace_e61834a7": {
         "message": "Zastąp"
-    },
-    "replies_4a8577c8": {
-        "message": "Odpowiedzi"
     },
     "reset_95a81614": {
         "message": "Resetuj"
@@ -2174,12 +1874,6 @@
     "saved_icon_maker_icons_df86e2a1": {
         "message": "Zapisane ikony Icon Maker"
     },
-    "schedule_preview_3bcda153": {
-        "message": "Zaplanuj podgląd"
-    },
-    "science_8d92214a": {
-        "message": "Przyroda / Biologia"
-    },
     "screen_readers_cannot_determine_what_is_displayed__6a5842ab": {
         "message": "Czytniki ekranu nie mogą określić, co jest wyświetlone na obrazie bez alternatywnego tekstu, a nazwy plików są często pozbawionymi znaczenia ciągami cyfr i liter, które nie opisują kontekstu."
     },
@@ -2201,12 +1895,6 @@
     "script_l_42a7b254": {
         "message": "L ręczne"
     },
-    "scroll_up_to_see_your_history_19b14cad": {
-        "message": "Przewiń w górę, aby wyświetlić historię!"
-    },
-    "scrolls_up_to_the_previous_item_with_new_activity_99717459": {
-        "message": "Przewija w górę do poprzedniego elementu z nową aktywnością."
-    },
     "search_280d00bd": {
         "message": "Wyszukaj"
     },
@@ -2221,6 +1909,9 @@
     },
     "select_video_source_1b5c9dbe": {
         "message": "Wybierz źródło wideo"
+    },
+    "selected_274ce24f": {
+        "message": "Wybrano"
     },
     "selected_linkfilename_c093b1f2": {
         "message": "Wybrano { linkFileName }"
@@ -2252,9 +1943,6 @@
     "shortcut_911d6255": {
         "message": "Skrót"
     },
-    "show_all_ae37d610": {
-        "message": "Pokaż wszystko"
-    },
     "show_audio_options_b489926b": {
         "message": "Pokaż opcje audio"
     },
@@ -2263,9 +1951,6 @@
     },
     "show_link_options_545338fd": {
         "message": "Pokaż opcje łącza"
-    },
-    "show_my_grades_ebd08684": {
-        "message": "Pokaż moje oceny"
     },
     "show_studio_media_options_a0c748c6": {
         "message": "Pokaż opcje multimediów Studio"
@@ -2305,9 +1990,6 @@
     },
     "small_b070434a": {
         "message": "Mały"
-    },
-    "social_studies_13fa30c7": {
-        "message": "Nauki społeczne"
     },
     "solid_circle_9f061dfc": {
         "message": "Pełny okrąg"
@@ -2378,23 +2060,8 @@
     "start_recording_9a65141a": {
         "message": "Rozpocznij nagrywanie"
     },
-    "startdate_to_enddate_d245175b": {
-        "message": "{ startDate } do { endDate }"
-    },
-    "startdatetime_enddatetime_20abc10e": {
-        "message": "{ startDateTime } - { endDateTime }"
-    },
-    "startdatetime_endtime_49741bbe": {
-        "message": "{ startDateTime } - { endTime }"
-    },
-    "starttime_to_endtime_d7cc249d": {
-        "message": "{ startTime } do { endTime }"
-    },
     "steel_blue_14296f08": {
         "message": "Stalowy niebieski"
-    },
-    "student_to_do_c018c835": {
-        "message": "Lista zadań uczestnika"
     },
     "studio_media_options_ee504361": {
         "message": "Opcje multimediów Studio"
@@ -2407,9 +2074,6 @@
     },
     "submit_a3cc6859": {
         "message": "Prześlij"
-    },
-    "submitted_318fad53": {
-        "message": "Przesłano"
     },
     "subscript_59744f96": {
         "message": "Indeks dolny"
@@ -2425,9 +2089,6 @@
     },
     "succeeds_equal_158e8c3a": {
         "message": "Następuje po lub równa się"
-    },
-    "success_to_do_created_e34ed395": {
-        "message": "Zakończono powodzeniem: Utworzono zadanie"
     },
     "sum_b0842d31": {
         "message": "Suma"
@@ -2495,9 +2156,6 @@
     "tagalog_74906db7": {
         "message": "Tagalog"
     },
-    "task_16b0ef38": {
-        "message": "Zadanie"
-    },
     "tau_880974b7": {
         "message": "Tau"
     },
@@ -2534,12 +2192,6 @@
     "thai_8f9bc548": {
         "message": "Tajski"
     },
-    "the_best_assignment_15e98be1": {
-        "message": "Najlepsze zadanie"
-    },
-    "the_date_and_time_this_to_do_is_due_74c823d4": {
-        "message": "Minęły już termin i godzina na wykonanie tego zadania"
-    },
     "the_document_preview_is_currently_being_processed__7d9ea135": {
         "message": "Podgląd dokumentu jest teraz przetwarzany. Spróbuj ponownie później."
     },
@@ -2566,12 +2218,6 @@
     },
     "the_selected_file_exceeds_the_maxsize_byte_limit_f7e8c771": {
         "message": "Rozmiar wybranego pliku przekracza limit { maxSize } bajtów"
-    },
-    "there_are_no_points_associated_with_this_item_449c712a": {
-        "message": "Brak punktów powiązanych z tym elementem."
-    },
-    "there_is_nothing_planned_for_today_e09bfc8c": {
-        "message": "Nie ma planów na dzisiaj."
     },
     "therefore_d860e024": {
         "message": "Dlatego"
@@ -2612,50 +2258,23 @@
     "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
         "message": "Chociaż nagranie wideo będzie mieć prawidłowy tytuł w przeglądarce, nie udało się go zaktualizować w bazie danych."
     },
-    "time_2b5aac58": {
-        "message": "Czas"
-    },
     "timebar_a4d18443": {
         "message": "Oś czasu"
     },
     "title_ee03d132": {
         "message": "Tytuł"
     },
-    "title_is_required_6ddcab69": {
-        "message": "Wymagany jest tytuł"
-    },
     "to_be_posted_when_d24bf7dc": {
         "message": "Do opublikowania: { when }"
     },
-    "to_do_1d554f36": {
-        "message": "Lista zadań"
-    },
-    "to_do_date_4b211ad0": {
-        "message": "Lista zadań: { date }"
-    },
-    "to_do_items_loading_d1cdfcd5": {
-        "message": "Wczytywanie listy zadań"
-    },
     "to_do_when_2783d78f": {
         "message": "Lista zadań: { when }"
-    },
-    "today_76e10f9c": {
-        "message": "Dzisiaj"
-    },
-    "today_at_date_8ac30d6": {
-        "message": "Dziś o godz. { date }"
     },
     "toggle_summary_group_413df9ac": {
         "message": "Przełącz grupę { summary }"
     },
     "toggle_tooltip_d3b7cb86": {
         "message": "Etykieta przełącznika"
-    },
-    "tomorrow_9a6c9a00": {
-        "message": "Jutro"
-    },
-    "tomorrow_at_date_b53f2cf1": {
-        "message": "Jutro o godz. { date }"
     },
     "tools_2fcf772e": {
         "message": "Narzędzia"
@@ -2690,9 +2309,6 @@
     "unable_to_determine_resource_selection_url_7867e060": {
         "message": "Nie udało się określić adresu URL wyboru zasobów"
     },
-    "unable_to_mark_as_complete_8141856d": {
-        "message": "Nie można oznaczyć jako ukończone."
-    },
     "union_e6b57a53": {
         "message": "Suma zbiorów"
     },
@@ -2713,6 +2329,9 @@
     },
     "up_c553575d": {
         "message": "Do góry"
+    },
+    "updated_link_a827e441": {
+        "message": "Zaktualizowane łącze"
     },
     "upload_document_253f0478": {
         "message": "Prześlij dokument"
@@ -2873,12 +2492,6 @@
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "Wyświetl skróty klawiszowe"
     },
-    "view_next_week_7f61f755": {
-        "message": "Wyświetl kolejny tydzień"
-    },
-    "view_previous_week_6f83849f": {
-        "message": "Wyświetl poprzedni tydzień"
-    },
     "view_title_description_67940918": {
         "message": "Wyświetl opis { title }"
     },
@@ -2902,9 +2515,6 @@
     },
     "webpages_should_only_have_a_single_h1_which_is_aut_dc99189e": {
         "message": "Strony internetowe powinny mieć tylko jeden nagłówek H1, który jest automatycznie używany przez tytuł strony. Pierwszym nagłówkiem zawartości powinien być H2."
-    },
-    "weekly_schedule_navigation_6b042645": {
-        "message": "Nawigacja po harmonogramie tygodnia"
     },
     "welsh_42ab94b1": {
         "message": "Walijski"
@@ -2945,17 +2555,11 @@
     "yes_dde87d5": {
         "message": "Tak"
     },
-    "yesterday_at_date_1aa6d18e": {
-        "message": "Wczoraj o godz. { date }"
-    },
-    "yesterday_c6bd6abf": {
-        "message": "Wczoraj"
-    },
     "yiddish_f96986df": {
         "message": "Jidysz"
     },
-    "you_have_media_feedback_f5f9aba8": {
-        "message": "Masz informacje zwrotne dotyczące multimediów."
+    "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
+        "message": "Można je przywrócić, przesyłając nowy plik z napisami."
     },
     "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
         "message": "Masz niezapisane zmiany w panelu Icon Maker. Czy chcesz kontynuować bez zapisywania tych zmian?"
@@ -2965,12 +2569,6 @@
     },
     "you_may_not_upload_an_empty_file_11c31eb2": {
         "message": "Nie można przesłać pustego pliku."
-    },
-    "you_must_provide_a_date_and_time_a86839d2": {
-        "message": "Wymagane są data i godzina."
-    },
-    "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
-        "message": "Przewinięto do pierwszej listy zadań!"
     },
     "your_image_has_been_compressed_for_icon_maker_imag_2e45cd91": {
         "message": "Obraz został skompresowany dla programu Icon Maker. Obrazy mniejsze niż { size } kB nie zostaną skompresowane."

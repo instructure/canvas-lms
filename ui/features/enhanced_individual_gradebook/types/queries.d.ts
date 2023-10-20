@@ -35,10 +35,12 @@ export type UserConnection = {
 export type EnrollmentConnection = {
   user: UserConnection
   courseSectionId: string
+  state: string
 }
 
 export type AssignmentConnection = {
   id: string
+  assignmentGroupId: string
   name: string
   pointsPossible: number
   submissionTypes: string[]
@@ -57,6 +59,9 @@ export type AssignmentConnection = {
   moderatedGrading: boolean
   postManually: boolean
   published: boolean
+  gradingPeriodId?: string | null
+  hasSubmittedSubmissions: boolean
+  inClosedGradingPeriod: boolean | null
 }
 
 export type AssignmentGroupConnection = {
@@ -64,10 +69,11 @@ export type AssignmentGroupConnection = {
   name: string
   groupWeight: number
   rules: {
-    drop_lowest?: number
-    drop_highest?: number
-    never_drop?: string[]
+    dropLowest?: number
+    dropHighest?: number
+    neverDrop?: string[]
   }
+  sisId: string | null
   state: string
   position: number
   assignmentsConnection: {
@@ -88,6 +94,7 @@ export type SubmissionConnection = {
   redoRequest: boolean
   submittedAt: Date | null
   userId: string
+  gradingPeriodId?: string
 }
 
 export type Attachment = {
@@ -143,6 +150,7 @@ export type GradebookStudentDetails = {
   loginId: string
   name: string
   hiddenName: string
+  sortableName: string
 }
 
 export type GradebookUserSubmissionDetails = {
@@ -161,6 +169,11 @@ export type GradebookUserSubmissionDetails = {
   missing: boolean
   userId: string
   redoRequest: boolean
+  cachedDueDate: string | null
+  gradingPeriodId?: string
+  deductedPoints: null | string | number
+  enteredGrade: string | null
+  gradeMatchesCurrentSubmission: boolean | null
 }
 
 export type GradebookStudentQueryResponse = {

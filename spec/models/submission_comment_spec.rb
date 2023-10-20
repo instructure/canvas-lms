@@ -36,6 +36,108 @@ RSpec.describe SubmissionComment do
 
   let(:valid_attributes) { { comment: "some comment" } }
 
+  describe "permissions" do
+    describe "delete" do
+      context "as a student" do
+        it "can delete their own draft comments" do
+          comment = @submission.submission_comments.create!(comment: "hi", author: @student, draft: true)
+          expect(comment.grants_right?(@student, :delete)).to be true
+        end
+
+        it "cannot delete their own non-draft comments" do
+          comment = @submission.submission_comments.create!(comment: "hi", author: @student)
+          expect(comment.grants_right?(@student, :delete)).to be false
+        end
+
+        it "cannot delete their peers' draft comments" do
+          first_student = @student
+          student_in_course(active_all: true)
+          comment = @submission.submission_comments.create!(comment: "hi", author: first_student, draft: true)
+          expect(comment.grants_right?(@student, :delete)).to be false
+        end
+
+        it "cannot delete their peers' non-draft comments" do
+          first_student = @student
+          student_in_course(active_all: true)
+          comment = @submission.submission_comments.create!(comment: "hi", author: first_student)
+          expect(comment.grants_right?(@student, :delete)).to be false
+        end
+      end
+
+      context "as a teacher" do
+        it "can delete their own draft comments" do
+          comment = @submission.submission_comments.create!(comment: "hi", author: @teacher, draft: true)
+          expect(comment.grants_right?(@teacher, :delete)).to be true
+        end
+
+        it "can delete their own non-draft comments" do
+          comment = @submission.submission_comments.create!(comment: "hi", author: @teacher)
+          expect(comment.grants_right?(@teacher, :delete)).to be true
+        end
+
+        it "can delete students' draft comments" do
+          comment = @submission.submission_comments.create!(comment: "hi", author: @student, draft: true)
+          expect(comment.grants_right?(@teacher, :delete)).to be true
+        end
+
+        it "can delete students' non-draft comments" do
+          comment = @submission.submission_comments.create!(comment: "hi", author: @student)
+          expect(comment.grants_right?(@teacher, :delete)).to be true
+        end
+      end
+    end
+
+    describe "update" do
+      context "as a student" do
+        it "can update their own draft comments" do
+          comment = @submission.submission_comments.create!(comment: "hi", author: @student, draft: true)
+          expect(comment.grants_right?(@student, :update)).to be true
+        end
+
+        it "cannot update their own non-draft comments" do
+          comment = @submission.submission_comments.create!(comment: "hi", author: @student)
+          expect(comment.grants_right?(@student, :update)).to be false
+        end
+
+        it "cannot update their peers' draft comments" do
+          first_student = @student
+          student_in_course(active_all: true)
+          comment = @submission.submission_comments.create!(comment: "hi", author: first_student, draft: true)
+          expect(comment.grants_right?(@student, :update)).to be false
+        end
+
+        it "cannot update their peers' non-draft comments" do
+          first_student = @student
+          student_in_course(active_all: true)
+          comment = @submission.submission_comments.create!(comment: "hi", author: first_student)
+          expect(comment.grants_right?(@student, :update)).to be false
+        end
+      end
+
+      context "as a teacher" do
+        it "can update their own draft comments" do
+          comment = @submission.submission_comments.create!(comment: "hi", author: @teacher, draft: true)
+          expect(comment.grants_right?(@teacher, :update)).to be true
+        end
+
+        it "can update their own non-draft comments" do
+          comment = @submission.submission_comments.create!(comment: "hi", author: @teacher)
+          expect(comment.grants_right?(@teacher, :update)).to be true
+        end
+
+        it "cannot update students' draft comments" do
+          comment = @submission.submission_comments.create!(comment: "hi", author: @student, draft: true)
+          expect(comment.grants_right?(@teacher, :update)).to be false
+        end
+
+        it "cannot update students' non-draft comments" do
+          comment = @submission.submission_comments.create!(comment: "hi", author: @student)
+          expect(comment.grants_right?(@teacher, :update)).to be false
+        end
+      end
+    end
+  end
+
   it "creates a new instance given valid attributes" do
     expect(@submission.submission_comments.create!(valid_attributes)).to be_persisted
   end
@@ -70,7 +172,7 @@ RSpec.describe SubmissionComment do
   describe "viewed submission comments" do
     it "returns read if the submission is read" do
       comment = @submission.submission_comments.create!(valid_attributes)
-      @submission.mark_read(@user)
+      @submission.mark_item_read("comment")
       expect(comment).to be_read(@user)
     end
 
@@ -371,6 +473,7 @@ RSpec.describe SubmissionComment do
       expect do
         @comment = @submission.submission_comments.create!(valid_attributes.merge({ author: @teacher }))
       end.to change(ContentParticipation, :count).by(1)
+
       expect(ContentParticipation.where(user_id: @student).first).to be_unread
       expect(@submission.unread?(@student)).to be_truthy
     end
@@ -379,6 +482,7 @@ RSpec.describe SubmissionComment do
       expect do
         @comment = @submission.submission_comments.create!(valid_attributes.merge({ author: @student }))
       end.not_to change(ContentParticipation, :count)
+
       expect(@submission.read?(@student)).to be_truthy
     end
 
@@ -386,46 +490,17 @@ RSpec.describe SubmissionComment do
       expect do
         @submission.add_comment(author: @teacher, comment: "wat", provisional: true)
       end.not_to change(ContentParticipation, :count)
+
       expect(@submission.read?(@student)).to be true
     end
 
-    context "read state when feedback visibility ff is on" do
-      before do
-        Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
-      end
+    it "is unread when at least a comment is not commented by self" do
+      expect do
+        @submission.submission_comments.create!(valid_attributes.merge({ author: @student }))
+        @submission.submission_comments.create!(valid_attributes.merge({ author: @teacher }))
+      end.to change(ContentParticipation, :count).by(1)
 
-      it "is unread after submission is commented on by teacher" do
-        expect do
-          @comment = @submission.submission_comments.create!(valid_attributes.merge({ author: @teacher }))
-        end.to change(ContentParticipation, :count).by(1)
-
-        expect(@submission.unread?(@student)).to be_truthy
-      end
-
-      it "is read after submission is commented on by self" do
-        expect do
-          @comment = @submission.submission_comments.create!(valid_attributes.merge({ author: @student }))
-        end.not_to change(ContentParticipation, :count)
-
-        expect(@submission.read?(@student)).to be_truthy
-      end
-
-      it "is unread when at least a comment is not commented by self" do
-        expect do
-          @submission.submission_comments.create!(valid_attributes.merge({ author: @student }))
-          @submission.submission_comments.create!(valid_attributes.merge({ author: @teacher }))
-        end.to change(ContentParticipation, :count).by(1)
-
-        expect(@submission.unread?(@student)).to be_truthy
-      end
-
-      it "does not set unread state when a provisional comment is made" do
-        expect do
-          @submission.add_comment(author: @teacher, comment: "wat", provisional: true)
-        end.not_to change(ContentParticipation, :count)
-
-        expect(@submission.read?(@student)).to be_truthy
-      end
+      expect(@submission.unread?(@student)).to be_truthy
     end
   end
 
@@ -824,8 +899,8 @@ RSpec.describe SubmissionComment do
     end
 
     it "updates participation for an automatically posted assignment" do
-      expect(ContentParticipation).to receive(:create_or_update)
-        .with({ content: @submission, user: @submission.user, workflow_state: "unread" })
+      expect(ContentParticipation).to receive(:participate)
+        .with({ content: @submission, user: @student, content_item: "comment", workflow_state: "unread" })
       @comment = @submission.add_comment(author: @teacher, comment: "some comment")
     end
 

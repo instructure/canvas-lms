@@ -128,6 +128,7 @@ describe Mutations::SetFriendlyDescription do
       result = exec({ description: "" })
       expect(res_field(result, "_id")).to eql(friendly_description.id.to_s)
       expect(res_field(result, "workflowState")).to eql("deleted")
+      expect(res_field(result, "description")).to eql("")
       friendly_description.reload
       expect(friendly_description.workflow_state).to eql("deleted")
     end

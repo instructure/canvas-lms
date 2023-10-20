@@ -49,6 +49,10 @@ class Speedgrader
       f("#average_score")
     end
 
+    def proceed_draft_comment_modal
+      f("#unposted_comment_proceed").click
+    end
+
     def grade_input
       f("#grading-box-extended")
     end

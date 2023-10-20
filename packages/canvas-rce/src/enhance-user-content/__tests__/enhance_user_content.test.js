@@ -17,6 +17,7 @@
  */
 
 import {enhanceUserContent} from '../enhance_user_content'
+import Mathml from '../mathml'
 
 jest.useFakeTimers()
 
@@ -129,6 +130,22 @@ describe('enhanceUserContent()', () => {
 
       expect(document.getElementById('iframe').getAttribute('src')).toEqual(
         'https://canvas.is.not.here:3000/files/1?download_frd=1'
+      )
+    })
+  })
+
+  describe('when tool launch iframe has display=in_rce', () => {
+    const canvasOrigin = 'https://canvas.is.here:2000/'
+
+    it('replaces with display=borderless', () => {
+      subject(
+        `<iframe id="iframe" src="${canvasOrigin}courses/1/external_tools/retrieve?display=in_rce" />`
+      )
+
+      enhanceUserContent(document, {canvasOrigin})
+
+      expect(document.getElementById('iframe').getAttribute('src')).toEqual(
+        `${canvasOrigin}courses/1/external_tools/retrieve?display=borderless`
       )
     })
   })
@@ -298,6 +315,26 @@ describe('enhanceUserContent()', () => {
       const customFunc = jest.fn()
       enhanceUserContent(document, {customEnhanceFunc: customFunc})
       expect(customFunc).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('math rendering', () => {
+    beforeEach(() => {
+      jest.resetAllMocks()
+    })
+
+    it('processes math inside content when ELT is on', () => {
+      const processSpy = jest.spyOn(Mathml.prototype, 'processNewMathInElem')
+      subject('<p>anything</p>')
+      enhanceUserContent(document, {explicit_latex_typesetting: true})
+      expect(processSpy).toHaveBeenCalledWith(elem)
+    })
+
+    it('does not process math inside content when ELT is off', () => {
+      const processSpy = jest.spyOn(Mathml.prototype, 'processNewMathInElem')
+      subject('<p>anything</p>')
+      enhanceUserContent(document, {explicit_latex_typesetting: false})
+      expect(processSpy).not.toHaveBeenCalled()
     })
   })
 })

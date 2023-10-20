@@ -864,13 +864,13 @@ describe AssignmentOverridesController, type: :request do
         expect(e2.reload.computed_final_score).to eq 50
       end
 
-      it "runs DueDateCacher after changing overrides" do
+      it "runs SubmissionLifecycleManager after changing overrides" do
         always_override_student = @student
         remove_override_student = student_in_course(course: @course).user
         @override.assignment_override_students.create!(user: remove_override_student)
         @override.reload
 
-        expect(DueDateCacher).to receive(:recompute).with(@assignment, hash_including(update_grades: false))
+        expect(SubmissionLifecycleManager).to receive(:recompute).with(@assignment, hash_including(update_grades: false))
         api_update_override(@course,
                             @assignment,
                             @override,

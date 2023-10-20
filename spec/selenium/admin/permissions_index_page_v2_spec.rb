@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "../common"
-require_relative "./pages/permissions_page"
+require_relative "pages/permissions_page"
 
 describe "permissions index" do
   include_context "in-process server selenium tests"

@@ -20,8 +20,8 @@
 import React, {useEffect, useRef, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-import {ApplyTheme} from '@instructure/ui-themeable'
-import {Button, IconButton} from '@instructure/ui-buttons'
+import {InstUISettingsProvider} from '@instructure/emotion'
+import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {
@@ -37,17 +37,30 @@ import {View} from '@instructure/ui-view'
 
 import AssignmentRow from './assignment_row'
 import BlackoutDateRow from './blackout_date_row'
-import {ModuleWithDueDates, CoursePace, ResponsiveSizes} from '../../types'
+import {ModuleWithDueDates, ResponsiveSizes} from '../../types'
 
 const I18n = useI18nScope('course_paces_module')
 
-// Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
-const {Body, ColHeader, Head, Row} = Table as any
+const componentOverrides = {
+  Button: {
+    borderRadius: '0',
+    mediumPaddingTop: '1rem',
+    mediumPaddingBottom: '1rem',
+  },
+  'Table.ColHeader': {
+    padding: '0',
+  },
+  ToggleDetails: {
+    iconMargin: '0.5rem',
+    filledBorderRadius: '0',
+    filledPadding: '2rem',
+    togglePadding: '0',
+  },
+}
 
-interface PassedProps {
+type PassedProps = {
   readonly index: number
   readonly module: ModuleWithDueDates
-  readonly coursePace: CoursePace
   readonly responsiveSize: ResponsiveSizes
   readonly showProjections: boolean
   readonly compression: number
@@ -93,7 +106,7 @@ export const Module = (props: ComponentProps) => {
   const renderDateColHeader = () => {
     if (!props.showProjections && !actuallyExpanded && !datesVisible) return null
     return (
-      <ColHeader
+      <Table.ColHeader
         data-testid="pp-due-date-columnheader"
         width={actuallyExpanded ? 'auto' : '0'}
         id={`module-${props.module.id}-duration`}
@@ -131,7 +144,7 @@ export const Module = (props: ComponentProps) => {
             </IconButton>
           </Tooltip>
         </Flex>
-      </ColHeader>
+      </Table.ColHeader>
     )
   }
 
@@ -175,18 +188,7 @@ export const Module = (props: ComponentProps) => {
       className={`course-paces-module-table ${actuallyExpanded ? 'actually-expanded' : ''}`}
       margin="0 0 medium"
     >
-      <ApplyTheme
-        theme={{
-          [(Button as any).theme]: {
-            borderRadius: '0',
-            mediumPaddingTop: '1rem',
-            mediumPaddingBottom: '1rem',
-          },
-          [(ColHeader as any).theme]: {
-            padding: '0',
-          },
-        }}
-      >
+      <InstUISettingsProvider theme={{componentOverrides}}>
         <ToggleDetails
           summary={renderModuleHeader()}
           icon={() => <IconMiniArrowEndLine />}
@@ -194,26 +196,20 @@ export const Module = (props: ComponentProps) => {
           variant="filled"
           defaultExpanded={true}
           size="large"
-          theme={{
-            iconMargin: '0.5rem',
-            filledBorderRadius: '0',
-            filledPadding: '2rem',
-            togglePadding: '0',
-          }}
         >
           <View as="div" borderWidth="0 small">
             <Table
               caption={`${props.index}. ${props.module.name}`}
               layout={isTableStacked ? 'stacked' : 'auto'}
             >
-              <Head>
-                <Row>
-                  <ColHeader id={`module-${props.module.id}-assignments`} width="100%">
+              <Table.Head>
+                <Table.Row>
+                  <Table.ColHeader id={`module-${props.module.id}-assignments`} width="100%">
                     <View as="div" padding={headerPadding}>
                       {I18n.t('Item')}
                     </View>
-                  </ColHeader>
-                  <ColHeader
+                  </Table.ColHeader>
+                  <Table.ColHeader
                     id={`module-${props.module.id}-days`}
                     data-testid="pp-duration-columnheader"
                   >
@@ -238,9 +234,9 @@ export const Module = (props: ComponentProps) => {
                         </IconButton>
                       </Tooltip>
                     </Flex>
-                  </ColHeader>
+                  </Table.ColHeader>
                   {renderDateColHeader()}
-                  <ColHeader
+                  <Table.ColHeader
                     data-testid="pp-status-columnheader"
                     id={`module-${props.module.id}-status`}
                     textAlign="center"
@@ -248,14 +244,14 @@ export const Module = (props: ComponentProps) => {
                     <Flex as="div" alignItems="end" justifyItems="center" padding={headerPadding}>
                       {I18n.t('Status')}
                     </Flex>
-                  </ColHeader>
-                </Row>
-              </Head>
-              <Body>{renderRows()}</Body>
+                  </Table.ColHeader>
+                </Table.Row>
+              </Table.Head>
+              <Table.Body>{renderRows()}</Table.Body>
             </Table>
           </View>
         </ToggleDetails>
-      </ApplyTheme>
+      </InstUISettingsProvider>
     </View>
   )
 }

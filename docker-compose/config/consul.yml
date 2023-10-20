@@ -36,7 +36,7 @@
 #     live-events-subscription-service:
 #       app-host: http://les.docker
 #       sad-panda: null
-#     live-events:
+#     live_events.yml: |-
 #       aws_endpoint: http://kinesis.canvaslms.docker
 #       kinesis_stream_name: live-events
 #       aws_access_key_id: key

@@ -84,6 +84,10 @@ class ContextModulesController < ApplicationController
       @is_student = @context.grants_right?(@current_user, session, :participate_as_student)
       @can_view_unpublished = @context.grants_right?(@current_user, session, :read_as_admin)
 
+      if Account.site_admin.feature_enabled?(:differentiated_modules)
+        @module_ids_with_overrides = AssignmentOverride.where(context_module_id: @modules).active.distinct.pluck(:context_module_id)
+      end
+
       modules_cache_key
 
       @is_cyoe_on = @current_user && ConditionalRelease::Service.enabled_in_context?(@context)
@@ -130,7 +134,9 @@ class ContextModulesController < ApplicationController
                manage_files_edit: @context.grants_right?(@current_user, session, :manage_files_edit)
              },
              MODULE_TOOLS: module_tool_definitions,
-             DEFAULT_POST_TO_SIS: @context.account.sis_default_grade_export[:value] && !AssignmentUtil.due_date_required_for_account?(@context.account)
+             DEFAULT_POST_TO_SIS: @context.account.sis_default_grade_export[:value] && !AssignmentUtil.due_date_required_for_account?(@context.account),
+             PUBLISH_FINAL_GRADE: Canvas::Plugin.find!("grade_export").enabled?
+      set_js_module_data
 
       is_master_course = MasterCourses::MasterTemplate.is_master_course?(@context)
       is_child_course = MasterCourses::ChildSubscription.is_child_course?(@context)

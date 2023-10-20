@@ -708,192 +708,156 @@ describe "gradebooks/grade_summary" do
       assign(:presenter, presenter)
     end
 
-    context "when visibility feedback feature is enabled" do
-      before do
-        Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
-      end
-
-      it "out of value is shown in the score column" do
-        render "gradebooks/grade_summary"
-        expect(response).not_to have_tag("#grades_summary th.possible")
-      end
-
-      it "renders \"out of\" with new format" do
-        assignment1 = course.assignments.create!(points_possible: 10)
-        assignment1.submit_homework student, submission_type: "online_text_entry", body: "hey"
-        assignment1.grade_student(student, score: 10, grader: teacher)
-
-        render "gradebooks/grade_summary"
-        expect(response).to match(%r{10\s+</span>\s+<span>/ 10</span>})
-      end
-
-      it "renders letter for letter graded" do
-        assignment1 = course.assignments.create!(grading_type: "letter_grade", points_possible: 10)
-        assignment1.submit_homework student, submission_type: "online_text_entry", body: "hey 1"
-        assignment1.grade_student(student, grade: "A", grader: teacher)
-
-        render "gradebooks/grade_summary"
-        expect(response).to match(%r{<span class="score_value">\s+10 \(A\)\s+</span>}mi)
-      end
-
-      it "renders percentage for \"percent\" grade" do
-        assignment1 = course.assignments.create!(grading_type: "percent", points_possible: 10)
-        assignment1.submit_homework student, submission_type: "online_text_entry", body: "hey 2"
-        assignment1.grade_student(student, grade: "90%", grader: teacher)
-
-        render "gradebooks/grade_summary"
-        expect(response).to match(%r{</span>\s+90%\s+</span>}mi)
-      end
-
-      it "renders out of for assignment groups" do
-        assignment1 = course.assignments.create!(grading_type: "percent", points_possible: 10)
-        assignment1.submit_homework student, submission_type: "online_text_entry", body: "hey 2"
-        assignment1.grade_student(student, grade: "90%", grader: teacher)
-
-        group = course.assignment_groups.create!(name: "a group")
-        group_assignment = OpenObject.build("assignment",
-                                            id: "group-#{group.id}",
-                                            rules: group.rules,
-                                            title: group.name,
-                                            points_possible: 10,
-                                            hard_coded: true,
-                                            special_class: "group_total",
-                                            assignment_group_id: group.id,
-                                            group_weight: group.group_weight,
-                                            asset_string: "group_total_#{group.id}")
-        presenter.groups_assignments = [group_assignment]
-
-        render "gradebooks/grade_summary"
-        expect(response).to match(%r{</span>\s+90%\s+</span>}mi)
-        expect(response).to have_tag("span.points_possible")
-      end
+    it "out of value is shown in the score column" do
+      render "gradebooks/grade_summary"
+      expect(response).not_to have_tag("#grades_summary th.possible")
     end
 
-    context "when visibility feedback feature is disabled" do
-      it "out of value is shown in the 'out of' column" do
-        Account.site_admin.disable_feature!(:visibility_feedback_student_grades_page)
-        course.assignments.create!
-        render "gradebooks/grade_summary"
-        expect(response).to have_tag("#grades_summary th.possible")
-      end
+    it "renders \"out of\" with new format" do
+      assignment1 = course.assignments.create!(points_possible: 10)
+      assignment1.submit_homework student, submission_type: "online_text_entry", body: "hey"
+      assignment1.grade_student(student, score: 10, grader: teacher)
 
-      it "does not render out of for assignment groups" do
-        assignment1 = course.assignments.create!(grading_type: "percent", points_possible: 10)
-        assignment1.submit_homework student, submission_type: "online_text_entry", body: "hey 2"
-        assignment1.grade_student(student, grade: "90%", grader: teacher)
+      render "gradebooks/grade_summary"
+      expect(response).to match(%r{10\s+</span>\s+<span>/ 10</span>})
+    end
 
-        group = course.assignment_groups.create!(name: "a group")
-        group_assignment = OpenObject.build("assignment",
-                                            id: "group-#{group.id}",
-                                            rules: group.rules,
-                                            title: group.name,
-                                            points_possible: 10,
-                                            hard_coded: true,
-                                            special_class: "group_total",
-                                            assignment_group_id: group.id,
-                                            group_weight: group.group_weight,
-                                            asset_string: "group_total_#{group.id}")
-        presenter.groups_assignments = [group_assignment]
+    it "renders letter for letter graded" do
+      assignment1 = course.assignments.create!(grading_type: "letter_grade", points_possible: 10)
+      assignment1.submit_homework student, submission_type: "online_text_entry", body: "hey 1"
+      assignment1.grade_student(student, grade: "A", grader: teacher)
 
-        render "gradebooks/grade_summary"
-        expect(response).to match(%r{</span>\s+90%\s+</span>}mi)
-        expect(response).not_to have_tag("span.points_possible")
-      end
+      render "gradebooks/grade_summary"
+      expect(response).to match(%r{<span class="score_value">\s+10 \(A\)\s+</span>}mi)
+    end
+
+    it "renders percentage for \"percent\" grade" do
+      assignment1 = course.assignments.create!(grading_type: "percent", points_possible: 10)
+      assignment1.submit_homework student, submission_type: "online_text_entry", body: "hey 2"
+      assignment1.grade_student(student, grade: "90%", grader: teacher)
+
+      render "gradebooks/grade_summary"
+      expect(response).to match(%r{</span>\s+90%\s+</span>}mi)
+    end
+
+    it "renders out of for assignment groups" do
+      assignment1 = course.assignments.create!(grading_type: "percent", points_possible: 10)
+      assignment1.submit_homework student, submission_type: "online_text_entry", body: "hey 2"
+      assignment1.grade_student(student, grade: "90%", grader: teacher)
+
+      group = course.assignment_groups.create!(name: "a group")
+      group_assignment = OpenObject.build("assignment",
+                                          id: "group-#{group.id}",
+                                          rules: group.rules,
+                                          title: group.name,
+                                          points_possible: 10,
+                                          hard_coded: true,
+                                          special_class: "group_total",
+                                          assignment_group_id: group.id,
+                                          group_weight: group.group_weight,
+                                          asset_string: "group_total_#{group.id}")
+      presenter.groups_assignments = [group_assignment]
+
+      render "gradebooks/grade_summary"
+      expect(response).to match(%r{</span>\s+90%\s+</span>}mi)
+      expect(response).to have_tag("span.points_possible")
     end
   end
 
   describe "visibility feedback student grades page" do
-    context "with the feature flag on" do
-      before(:once) do
-        Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
+    before(:once) do
+      course_with_student({ active_all: true })
+      @a1 = @course.assignments.create!(submission_types: "online_text_entry")
+      @a2 = @course.assignments.create!(submission_types: "online_text_entry")
 
-        course_with_student({ active_all: true })
-        @a1 = @course.assignments.create!(submission_types: "online_text_entry")
-        @a2 = @course.assignments.create!(submission_types: "online_text_entry")
+      view_context(@course, @student)
+      assign(:presenter, GradeSummaryPresenter.new(@course, @student, nil))
 
-        view_context(@course, @student)
-        assign(:presenter, GradeSummaryPresenter.new(@course, @student, nil))
+      @a1.submit_homework(@student, body: "done!")
+      @a2.submit_homework(@student, body: "done!")
+    end
 
-        @a1.submit_homework(@student, body: "done!")
-        @a2.submit_homework(@student, body: "done!")
-      end
+    it "has no blue dot if no comment, grade or rubric" do
+      render "gradebooks/grade_summary"
 
-      it "has no blue dot if no comment, grade or rubric" do
-        render "gradebooks/grade_summary"
+      expect(response).not_to have_tag("#submission_#{@a1.id} td .grade_dot")
+      expect(response).not_to have_tag("#submission_#{@a1.id} td .comment_dot")
+      expect(response).not_to have_tag("#submission_#{@a1.id} td .rubric_dot")
+    end
 
-        expect(response).not_to have_tag("#submission_#{@a1.id} td .grade_dot")
-        expect(response).not_to have_tag("#submission_#{@a1.id} td .comment_dot")
-        expect(response).not_to have_tag("#submission_#{@a1.id} td .rubric_dot")
-      end
+    it "has a blue dot on unread grade" do
+      @a1.grade_student(@student, grader: @teacher, grade: 1)
 
-      it "has a blue dot on unread grade" do
-        @a1.grade_student(@student, grader: @teacher, grade: 1)
+      render "gradebooks/grade_summary"
 
-        render "gradebooks/grade_summary"
+      expect(response).to have_tag("#submission_#{@a1.id} td .grade_dot")
+    end
 
-        expect(response).to have_tag("#submission_#{@a1.id} td .grade_dot")
-      end
+    it "has a blue dot on unread grade and comments" do
+      @a1.grade_student(@student, grader: @teacher, grade: 1)
+      @a1.submissions.first.add_comment(author: @teacher, comment: "Good!")
 
-      it "has a blue dot on unread grade and comments" do
-        @a1.grade_student(@student, grader: @teacher, grade: 1)
-        @a1.submissions.first.add_comment(author: @teacher, comment: "Good!")
+      render "gradebooks/grade_summary"
 
-        render "gradebooks/grade_summary"
+      expect(response).to have_tag("#submission_#{@a1.id} td .grade_dot")
+      expect(response).to have_tag("#submission_#{@a1.id} td .comment_dot")
+    end
 
-        expect(response).to have_tag("#submission_#{@a1.id} td .grade_dot")
-        expect(response).to have_tag("#submission_#{@a1.id} td .comment_dot")
-      end
+    it "has a blue dot on unread grade, comments and rubric" do
+      submission = @a1.grade_student(@student, grader: @teacher, grade: 1).first
+      @a1.submissions.first.add_comment(author: @teacher, comment: "Good!")
 
-      it "has a blue dot on unread grade, comments and rubric" do
-        submission = @a1.grade_student(@student, grader: @teacher, grade: 1).first
-        @a1.submissions.first.add_comment(author: @teacher, comment: "Good!")
+      rubric_model
+      association = @rubric.associate_with(@a1, @course, purpose: "grading", use_for_grading: true)
+      association.assess({
+                           user: @student,
+                           assessor: @teacher,
+                           artifact: submission,
+                           assessment: {
+                             assessment_type: "grading",
+                             criterion_crit1: {
+                               points: 5,
+                               comments: "comments"
+                             }
+                           }
+                         })
 
-        rubric_model
-        association = @rubric.associate_with(@a1, @course, purpose: "grading", use_for_grading: true)
-        association.assess({
-                             user: @student,
-                             assessor: @teacher,
-                             artifact: submission,
-                             assessment: { assessment_type: "grading", criterion_crit1: { points: 5, comments: "comments" } }
-                           })
+      render "gradebooks/grade_summary"
 
-        render "gradebooks/grade_summary"
+      expect(response).to have_tag("#submission_#{@a1.id} td .grade_dot")
+      expect(response).to have_tag("#submission_#{@a1.id} td .comment_dot")
+      expect(response).to have_tag("#submission_#{@a1.id} td .rubric_dot")
+    end
 
-        expect(response).to have_tag("#submission_#{@a1.id} td .grade_dot")
-        expect(response).to have_tag("#submission_#{@a1.id} td .comment_dot")
-        expect(response).to have_tag("#submission_#{@a1.id} td .rubric_dot")
-      end
+    it "doesn't have blue dot on grade after it has been read" do
+      submission = @a1.grade_student(@student, grader: @teacher, grade: 1).first
 
-      it "doesn't have blue dot on grade after it has been read" do
-        submission = @a1.grade_student(@student, grader: @teacher, grade: 1).first
+      submission.mark_item_read("grade")
 
-        submission.mark_item_read("grade")
+      render "gradebooks/grade_summary"
 
-        render "gradebooks/grade_summary"
+      expect(response).not_to have_tag("#submission_#{@a1.id} td .grade_dot")
+    end
 
-        expect(response).not_to have_tag("#submission_#{@a1.id} td .grade_dot")
-      end
+    it "has a blue dot on comment if only grade is marked as read" do
+      submission = @a1.grade_student(@student, grader: @teacher, grade: 1).first
+      submission.add_comment(author: @teacher, comment: "Good!")
+      submission.mark_item_read("grade")
 
-      it "has a blue dot on comment if only grade is marked as read" do
-        submission = @a1.grade_student(@student, grader: @teacher, grade: 1).first
-        submission.add_comment(author: @teacher, comment: "Good!")
-        submission.mark_item_read("grade")
+      render "gradebooks/grade_summary"
 
-        render "gradebooks/grade_summary"
+      expect(response).not_to have_tag("#submission_#{@a1.id} td .grade_dot")
+      expect(response).to have_tag("#submission_#{@a1.id} td .comment_dot")
+    end
 
-        expect(response).not_to have_tag("#submission_#{@a1.id} td .grade_dot")
-        expect(response).to have_tag("#submission_#{@a1.id} td .comment_dot")
-      end
+    it "has a blue dot for unread grades on each submission" do
+      @a1.grade_student(@student, grader: @teacher, grade: 1)
+      @a2.grade_student(@student, grader: @teacher, grade: 1)
 
-      it "has a blue dot for unread grades on each submission" do
-        @a1.grade_student(@student, grader: @teacher, grade: 1)
-        @a2.grade_student(@student, grader: @teacher, grade: 1)
+      render "gradebooks/grade_summary"
 
-        render "gradebooks/grade_summary"
-
-        expect(response).to have_tag("#submission_#{@a1.id} td .grade_dot")
-        expect(response).to have_tag("#submission_#{@a2.id} td .grade_dot")
-      end
+      expect(response).to have_tag("#submission_#{@a1.id} td .grade_dot")
+      expect(response).to have_tag("#submission_#{@a2.id} td .grade_dot")
     end
 
     context "when the feature flag is disabled" do

@@ -81,7 +81,7 @@ describe "course settings" do
       expect(homeroom_selection).to be_displayed
 
       homeroom_selection.click
-      options = ff("#course_homeroom_course_id option").map(&:text).map(&:strip)
+      options = ff("#course_homeroom_course_id option").map { |e| e.text.strip }
       expect(options).to include "homeroom1"
       expect(options).to include "homeroom2"
     end
@@ -335,6 +335,8 @@ describe "course settings" do
         wait_for_ajaximations
         expect(f("body")).not_to contain_jqcss("#course_hide_distribution_graphs")
         expect(f("body")).not_to contain_jqcss("#course_hide_final_grades")
+        # Verify that other parts of the settings are not visilbe when they shouldn't be
+        expect(f("#tab-sections").css_value("display")).to eq "none"
       end
 
       it "is shown when only restrict_quantitative_data account locked setting and feature flags are ON" do
@@ -588,6 +590,69 @@ describe "course settings" do
     submit_form("#course_form")
 
     expect(@course.reload.enrollment_term).to eq term
+  end
+
+  context "restrict_quantitative_data setting" do
+    it "is not visible if the feature flag is off" do
+      @account.disable_feature!(:restrict_quantitative_data)
+      @account.save!
+      get "/courses/#{@course.id}/settings"
+      expect(f("body")).not_to contain_jqcss("input[data-testid='restrict-quantitative-data-checkbox']")
+    end
+
+    context "when the flag is on" do
+      before do
+        @account.enable_feature!(:restrict_quantitative_data)
+        @account.save!
+      end
+
+      it "The RQD setting is not visible if the course setting is off and the account setting is off" do
+        @account.settings[:restrict_quantitative_data] = { locked: false, value: false }
+        @course.settings = @course.settings.merge(restrict_quantitative_data: false)
+        @account.save
+        @course.save
+        get "/courses/#{@course.id}/settings"
+        expect(f("body")).not_to contain_jqcss("input[data-testid='restrict-quantitative-data-checkbox']")
+      end
+
+      it "the setting is not changeable if the account setting is on and locked and the course is on" do
+        @account.settings[:restrict_quantitative_data] = { locked: true, value: true }
+        @course.settings = @course.settings.merge(restrict_quantitative_data: true)
+        @account.save
+        @course.save
+        get "/courses/#{@course.id}/settings"
+        expect(f("input[data-testid='restrict-quantitative-data-checkbox']")).to be_disabled
+        expect(is_checked(f("input[data-testid='restrict-quantitative-data-checkbox']"))).to be_truthy
+      end
+
+      it "the setting is changeable if the account setting is on and locked but the course is off" do
+        @account.settings[:restrict_quantitative_data] = { locked: true, value: true }
+        @course.settings = @course.settings.merge(restrict_quantitative_data: false)
+        @account.save
+        @course.save
+        get "/courses/#{@course.id}/settings"
+        expect(f("input[data-testid='restrict-quantitative-data-checkbox']")).not_to be_disabled
+        expect(is_checked(f("input[data-testid='restrict-quantitative-data-checkbox']"))).to be_falsey
+      end
+
+      it "the setting is changeable if the account setting is on and unlocked" do
+        @account.settings[:restrict_quantitative_data] = { locked: false, value: true }
+        @account.save
+        get "/courses/#{@course.id}/settings"
+        expect(f("input[data-testid='restrict-quantitative-data-checkbox']")).not_to be_disabled
+        expect(is_checked(f("input[data-testid='restrict-quantitative-data-checkbox']"))).to be_falsey
+      end
+
+      it "the setting is changeable if the account setting is off but the course setting is on" do
+        @account.settings[:restrict_quantitative_data] = { locked: false, value: false }
+        @course.settings = @course.settings.merge(restrict_quantitative_data: true)
+        @account.save
+        @course.save
+        get "/courses/#{@course.id}/settings"
+        expect(f("input[data-testid='restrict-quantitative-data-checkbox']")).not_to be_disabled
+        expect(is_checked(f("input[data-testid='restrict-quantitative-data-checkbox']"))).to be_truthy
+      end
+    end
   end
 
   context "link validator" do

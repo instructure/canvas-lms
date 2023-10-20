@@ -1,10 +1,4 @@
 {
-    "a_great_discussion_6526a6d9": {
-        "message": "Harika bir tartışma"
-    },
-    "a_wonderful_assignment_d3139d9b": {
-        "message": "Harika bir ödev"
-    },
     "accessibility_checker_b3af1f6c": {
         "message": "Erişilebilirlik Kontrolü"
     },
@@ -20,14 +14,8 @@
     "add_image_60b2de07": {
         "message": "Görsel Ekle"
     },
-    "add_to_do_7537af64": {
-        "message": "Yapılacaklar listesi ekle"
-    },
-    "add_to_do_7def3c37": {
-        "message": "Yapılacaklar listesi ekle"
-    },
-    "address_3159962f": {
-        "message": "Adres:"
+    "add_one_9e34a6f8": {
+        "message": "Bir tane ekle!"
     },
     "aleph_f4ffd155": {
         "message": "Aleph"
@@ -44,9 +32,6 @@
     "all_apps_a50dea49": {
         "message": "Tüm Uygulamalar"
     },
-    "all_day_fb42c4fc": {
-        "message": "Tüm Gün"
-    },
     "alpha_15d59033": {
         "message": "Alfa"
     },
@@ -59,14 +44,8 @@
     "amalg_coproduct_c589fb12": {
         "message": "Amalg (Coproduct)"
     },
-    "an_amazing_discussion_assignment_e5c8bd6b": {
-        "message": "Harika bir tartışma ödevi"
-    },
     "an_error_occured_reading_the_file_ff48558b": {
         "message": "Dosya okunurken hata oluştu"
-    },
-    "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
-        "message": "Fırsatı gözardı etmeye çalışırken bir hata oluştu."
     },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "Ağ isteğinde bulunurken bir hata oluştu"
@@ -95,9 +74,6 @@
     "are_you_sure_you_want_to_cancel_changes_you_made_m_c5210496": {
         "message": "İptal etmek istediğinize emin misiniz? Yaptığınız değişiklikler kaydedilmeyebilir."
     },
-    "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
-        "message": "Bu planlayıcı öğesini silmek istediğinize emin misiniz?"
-    },
     "arrows_464a3e54": {
         "message": "Oklar"
     },
@@ -109,36 +85,6 @@
     },
     "assignments_1e02582c": {
         "message": "Ödevler"
-    },
-    "assignmenttype_title_6612d008": {
-        "message": "{ assignmentType } { title }."
-    },
-    "assignmenttype_title_all_day_on_datetime_9768903c": {
-        "message": "{ assignmentType } { title },  { datetime } da tüm gün."
-    },
-    "assignmenttype_title_at_datetime_478f0709": {
-        "message": "{ assignmentType } { title }, { datetime } da."
-    },
-    "assignmenttype_title_at_datetime_until_endtime_a5900e38": {
-        "message": "{ assignmentType } { title },  { datetime } ''da { endTime } ''a kadar"
-    },
-    "assignmenttype_title_due_datetime_a112d8ff": {
-        "message": "{ assignmentType } { title }, Teslim tarihi { datetime }."
-    },
-    "assignmenttype_title_has_a_to_do_time_at_datetime_e07310e8": {
-        "message": "{ assignmentType } { title } şu tarihe kadar yapılmalı { datetime }."
-    },
-    "assignmenttype_title_is_marked_as_done_a8dc46ef": {
-        "message": "{ assignmentType } { title } yapıldı olarak işaretlendi."
-    },
-    "assignmenttype_title_is_not_marked_as_done_ba80ba66": {
-        "message": "{ assignmentType } { title } yapıldı olarak işaretlenmedi."
-    },
-    "assignmenttype_title_posted_datetime_cab69444": {
-        "message": "{ assignmentType } { title } gönderildi { datetime }."
-    },
-    "assignmenttype_title_reminder_datetime_33fa66d5": {
-        "message": "{ assignmentType } { title }, hatırlatıcı { datetime }."
     },
     "attributes_963ba262": {
         "message": "Özellikler"
@@ -161,17 +107,8 @@
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
     },
-    "calendar_a8563bb2": {
-        "message": "Takvim:"
-    },
-    "calendar_event_89aadc1c": {
-        "message": "Takvim Olayı"
-    },
     "cancel_caeb1e68": {
         "message": "İptal"
-    },
-    "canvas_planner_98ed106": {
-        "message": "Canvas Planlayıcı"
     },
     "changes_you_made_may_not_be_saved_4e8db973": {
         "message": "Yaptığınız değişiklikler kaydedilmemiş olabilir."
@@ -227,20 +164,8 @@
     "copyright_holder_66ee111": {
         "message": "Telif Sahibi:"
     },
-    "count_plural_one_hide_missing_item_other_hide_miss_4a2562f7": {
-        "message": "{ count, plural,\n    one {}\n  other {}\n}"
-    },
     "count_plural_one_item_loaded_other_items_loaded_857023b7": {
         "message": "{ count, plural,\n    one {}\n  other {}\n}"
-    },
-    "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
-        "message": "{ count, plural,\n    one {}\n  other {}\n}"
-    },
-    "count_plural_one_show_missing_item_other_show_miss_509327ef": {
-        "message": "{ count, plural,\n    one {}\n  other {}\n}"
-    },
-    "course_8a63b4a3": {
-        "message": "Ders"
     },
     "course_documents_104d76e0": {
         "message": "Ders Belgeleri"
@@ -278,17 +203,11 @@
     "date_added_ed5ad465": {
         "message": "Eklendiği Tarih"
     },
-    "date_ee500367": {
-        "message": "Tarih"
-    },
     "decrease_indent_d9cf469d": {
         "message": "İçerden başlatma sınırını azalt"
     },
     "deep_purple_bb3e2907": {
         "message": "Koyu Mor"
-    },
-    "delete_a6efa79d": {
-        "message": "Sil"
     },
     "delimiters_4db4840d": {
         "message": "Ayıraçlar"
@@ -298,9 +217,6 @@
     },
     "details_98a31b68": {
         "message": "Ayrıntılar"
-    },
-    "details_a6f427c3": {
-        "message": "Ayrıntılar:"
     },
     "dimensions_45ddb7b7": {
         "message": "Tanımlamalar"
@@ -332,9 +248,6 @@
     "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
         "message": "Sürükleyip bırakın ya da bilgisayarınıza gözatın"
     },
-    "due_5d7267be": {
-        "message": "Bitiş:"
-    },
     "due_multiple_dates_cc0ee3f5": {
         "message": "Teslim Tarihi: Birden Çok Gün"
     },
@@ -356,29 +269,11 @@
     "english_c60612e2": {
         "message": "İngilizce"
     },
-    "excused_cf8792eb": {
-        "message": "Mazeretli"
-    },
     "external_tools_6e77821": {
         "message": "Harici Araçlar"
     },
     "extra_large_b6cdf1ff": {
         "message": "Ekstra Büyük"
-    },
-    "failed_to_delete_to_do_64edff49": {
-        "message": "Yapılacak öğesi silinemedi"
-    },
-    "failed_to_get_new_activity_17e7ec7c": {
-        "message": "Yeni etkinliği alma başarısız"
-    },
-    "failed_to_load_opportunities_52ab6404": {
-        "message": "Fırsatların yüklenmesi başarısız"
-    },
-    "failed_to_save_to_do_ddc7503b": {
-        "message": "Yapılacak öğesi kaydedilemedi"
-    },
-    "feedback_6dcc1991": {
-        "message": "Geribildirim"
     },
     "file_name_8fd421ff": {
         "message": "Dosya adı"
@@ -400,9 +295,6 @@
     },
     "generating_preview_45b53be0": {
         "message": "Oluşturma önizlemesi..."
-    },
-    "graded_25cd3fcd": {
-        "message": "Notlandırmalı"
     },
     "grades_a61eba0a": {
         "message": "Notlar"
@@ -482,20 +374,11 @@
     "invalid_url_cbde79f": {
         "message": "Geçersiz bağlantı"
     },
-    "join_6cafecca": {
-        "message": "Katıl"
-    },
-    "jump_to_today_254ccf41": {
-        "message": "Bugüne Git"
-    },
     "keyboard_shortcuts_ed1844bd": {
         "message": "Klavye Kısayolları"
     },
     "large_9c5e80e7": {
         "message": "Büyük"
-    },
-    "late_2be42b88": {
-        "message": "Geç"
     },
     "light_blue_5374f600": {
         "message": "Açık Mavi"
@@ -515,9 +398,6 @@
     "load_more_35d33c7": {
         "message": "Daha Fazla Yükle"
     },
-    "load_more_a36f9cf9": {
-        "message": "Daha fazla yükle"
-    },
     "loading_25990131": {
         "message": "Yükleniyor..."
     },
@@ -526,15 +406,6 @@
     },
     "loading_failed_b3524381": {
         "message": "Yükleme Başarısız..."
-    },
-    "loading_past_items_ca499e75": {
-        "message": "Önceki öğeler yükleniyor"
-    },
-    "loading_planner_items_947a813d": {
-        "message": "Planlayıcı öğeleri yükleniyor"
-    },
-    "location_3b6ff307": {
-        "message": "Konum:"
     },
     "locked_762f138b": {
         "message": "Kilitli"
@@ -551,9 +422,6 @@
     "misc_3b692ea7": {
         "message": "Çeşitli"
     },
-    "missing_1a256b3b": {
-        "message": "Eksik"
-    },
     "module_90d9fd32": {
         "message": "Modül"
     },
@@ -569,23 +437,17 @@
     "navigation_ee9af92d": {
         "message": "Gezinme"
     },
-    "new_13daf639": {
-        "message": "Yeni"
-    },
-    "new_activity_8b84847d": {
-        "message": "Yeni Etkinlik"
-    },
     "new_quiz_34aacba6": {
         "message": "Yeni Kısa Sınav"
     },
     "next_40e12421": {
         "message": "Sonraki"
     },
-    "next_month_749b1778": {
-        "message": "Sonraki Hafta"
-    },
     "no_e16d9132": {
         "message": "Hayır"
+    },
+    "no_pages_created_yet_c379fa6e": {
+        "message": "Sayfa henüz oluşturulmadı."
     },
     "no_preview_is_available_for_this_file_f940114a": {
         "message": "Bu dosya için ön izleme bulunmamaktadır."
@@ -596,14 +458,8 @@
     "none_3b5e34d2": {
         "message": "Yok"
     },
-    "nothing_for_now_e3e3ce2a": {
-        "message": "Şimdilik bir şey yok"
-    },
     "operators_a2ef9a93": {
         "message": "Operatörler"
-    },
-    "optional_add_course_ef0d70fc": {
-        "message": "Tercihen: Kurs Ekle"
     },
     "orange_81386a62": {
         "message": "Turuncu"
@@ -614,9 +470,6 @@
     "pages_e5414c2c": {
         "message": "Sayfalar"
     },
-    "peer_review_74f26a13": {
-        "message": "Akran Değerlendirme"
-    },
     "people_b4ebb13c": {
         "message": "Katılımcılar"
     },
@@ -626,23 +479,11 @@
     "pink_68ad45cb": {
         "message": "Pembe"
     },
-    "points_bceb5005": {
-        "message": "puanlar"
-    },
-    "points_points_63e59cce": {
-        "message": "{ points } puan"
-    },
     "prev_f82cbc48": {
         "message": "Önceki"
     },
     "preview_53003fd2": {
         "message": "Önizleme"
-    },
-    "previous_month_bb1e3c84": {
-        "message": "Önceki Hafta"
-    },
-    "pts_699bd9aa": {
-        "message": "not"
     },
     "published_c944a23d": {
         "message": "yayınlandı"
@@ -701,14 +542,8 @@
     "submit_a3cc6859": {
         "message": "Gönder"
     },
-    "submitted_318fad53": {
-        "message": "Gönderildi"
-    },
     "syllabus_f191f65b": {
         "message": "Ders Programı"
-    },
-    "task_16b0ef38": {
-        "message": "Görev"
     },
     "the_document_preview_is_currently_being_processed__7d9ea135": {
         "message": "Döküman ön izlemesi hala işleniyor. Lütfen daha sonra tekrar deneyin."
@@ -725,32 +560,11 @@
     "this_equation_cannot_be_rendered_in_basic_view_9b6c07ae": {
         "message": "Bu denklem Temel Görünümde işlenemez."
     },
-    "time_2b5aac58": {
-        "message": "Süre"
-    },
     "title_ee03d132": {
         "message": "Başlık"
     },
-    "title_is_required_6ddcab69": {
-        "message": "başlık gereklidir"
-    },
     "to_be_posted_when_d24bf7dc": {
         "message": "Gönderileceği zaman: { when }"
-    },
-    "to_do_1d554f36": {
-        "message": "Yapılacaklar"
-    },
-    "today_76e10f9c": {
-        "message": "Bugün"
-    },
-    "today_at_date_8ac30d6": {
-        "message": "Bugün { date }"
-    },
-    "tomorrow_9a6c9a00": {
-        "message": "Yarın"
-    },
-    "tomorrow_at_date_b53f2cf1": {
-        "message": "Yarın { date }"
     },
     "tray_839df38a": {
         "message": "Yan menü"
@@ -844,9 +658,6 @@
     },
     "yes_dde87d5": {
         "message": "Evet"
-    },
-    "yesterday_c6bd6abf": {
-        "message": "Dün"
     },
     "your_webcam_may_already_be_in_use_6cd64c25": {
         "message": "Web kameranız kullanılıyor olabilir."

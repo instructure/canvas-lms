@@ -108,11 +108,6 @@ module Lti::IMS::Concerns
         assignment = @context.assignments.active.find_by(id: assignment_id) if assignment_id
         assignment ||= @context.assignments.new(workflow_state: "unpublished")
 
-        post_to_sis = assignment.post_to_sis
-        if assignment_id.nil? && Assignment.sis_grade_export_enabled?(context)
-          post_to_sis = @context.account.sis_default_grade_export[:value]
-        end
-
         assignment.update!(
           {
             submission_types: "external_tool",
@@ -122,7 +117,6 @@ module Lti::IMS::Concerns
             unlock_at: content_item.dig(:available, :startDateTime),
             lock_at: content_item.dig(:available, :endDateTime),
             due_at: content_item.dig(:submission, :endDateTime),
-            post_to_sis:,
             external_tool_tag_attributes: {
               content_type: "ContextExternalTool",
               content_id: tool.id,

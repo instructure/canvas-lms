@@ -43,6 +43,7 @@ module BroadcastPolicy
 
       record.class.connection.after_transaction_commit do
         to_list = record.instance_eval(&to)
+        to_list = to_list.eager_load(:active_pseudonyms) if to_list.try(:reflections)&.key?("active_pseudonyms")
         to_list = Array(to_list).flatten
         next if to_list.empty?
 
@@ -74,4 +75,6 @@ module BroadcastPolicy
       end
     end
   end
+
+  require "active_support/core_ext/object/try"
 end

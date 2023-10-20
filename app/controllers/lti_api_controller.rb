@@ -211,6 +211,8 @@ class LtiApiController < ApplicationController
       outcome.description += "\nInvalid XML: #{e.message}"
     end
 
+    # Currently all outcome.code_major of types "unsupported" or "failure" are not sent to Sentry
+    # see config/initializers/sentry.rb:88
     capture_outputs = Canvas::Errors.capture("Grade pass back #{outcome.code_major}", error_info)
     outcome.description += "\n[EID_#{capture_outputs[:error_report]}]"
     [outcome, 422]

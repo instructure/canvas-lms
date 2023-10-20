@@ -20,21 +20,34 @@ import React from 'react'
 import {Outlet, useNavigate, useMatch} from 'react-router-dom'
 import {Tabs} from '@instructure/ui-tabs'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {Portal} from '@instructure/ui-portal'
+import {TabLayoutPanel} from '../types/tabLayout'
 
 const I18n = useI18nScope('gradingCourseTabContainer')
-const {Panel: TabsPanel} = Tabs as any
 
-export const TabLayout = () => {
+export const Component = () => {
   const navigate = useNavigate()
+  const isCustomGradebookStatusesEnabled = !!ENV.CUSTOM_GRADEBOOK_STATUSES_ENABLED
 
   const pathMatch = useMatch('/accounts/:accountId/grading_settings/:tabPath/*')
   const selectedTab = pathMatch?.params?.tabPath
 
+  const mountPoint: HTMLElement | null = document.querySelector('#content')
+  if (!mountPoint) {
+    return null
+  }
+
   const handleTabChange = (index: number) => {
-    if (index === 0) {
-      navigate('periods')
-    } else if (index === 1) {
-      navigate('schemes')
+    switch (index) {
+      case TabLayoutPanel.GRADING_PERIODS:
+        navigate('../periods', {relative: 'path'})
+        break
+      case TabLayoutPanel.GRADING_SCHEMES:
+        navigate('../schemes', {relative: 'path'})
+        break
+      case TabLayoutPanel.GRADING_STATUSES:
+        navigate('../statuses', {relative: 'path'})
+        break
     }
   }
   if (!selectedTab) {
@@ -44,40 +57,37 @@ export const TabLayout = () => {
     return <Outlet />
   }
   return (
-    <>
+    <Portal open={true} mountNode={mountPoint}>
       <h1>{I18n.t('Account Grading Settings')}</h1>
       <Tabs
         margin="large auto"
         padding="medium"
-        onRequestTabChange={(event, {index}) => handleTabChange(index)}
+        onRequestTabChange={(_event: any, {index}: {index: number}) => handleTabChange(index)}
       >
-        <TabsPanel
+        <Tabs.Panel
           id="gradingPeriodTab"
           renderTitle={I18n.t('Grading Periods')}
           selected={selectedTab === 'periods'}
         >
-          {selectedTab === 'periods' ? (
-            <>
-              <Outlet />
-            </>
-          ) : (
-            <></>
-          )}
-        </TabsPanel>
-        <TabsPanel
+          {selectedTab === 'periods' ? <Outlet /> : null}
+        </Tabs.Panel>
+        <Tabs.Panel
           id="gradingSchemeTab"
           renderTitle={I18n.t('Schemes')}
           isSelected={selectedTab === 'schemes'}
         >
-          {selectedTab === 'schemes' ? (
-            <>
-              <Outlet />
-            </>
-          ) : (
-            <></>
-          )}
-        </TabsPanel>
+          {selectedTab === 'schemes' ? <Outlet /> : null}
+        </Tabs.Panel>
+        {isCustomGradebookStatusesEnabled && (
+          <Tabs.Panel
+            id="gradingStatusTab"
+            renderTitle={I18n.t('Statuses')}
+            isSelected={selectedTab === 'statuses'}
+          >
+            {selectedTab === 'statuses' ? <Outlet /> : null}
+          </Tabs.Panel>
+        )}
       </Tabs>
-    </>
+    </Portal>
   )
 }

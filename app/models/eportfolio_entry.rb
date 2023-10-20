@@ -75,7 +75,9 @@ class EportfolioEntry < ActiveRecord::Base
   end
 
   def full_slug
-    (eportfolio_category.slug rescue "") + "_" + slug
+    fs = (eportfolio_category.slug rescue "") + "_" + slug
+    fs = Digest::SHA256.hexdigest(fs) if fs.length > 250 # ".html" will push this over the 255-char max filename
+    fs
   end
 
   def attachments
@@ -169,7 +171,7 @@ class EportfolioEntry < ActiveRecord::Base
 
   def content_contains_spam?
     content_regexp = Eportfolio.spam_criteria_regexp(type: :content)
-    return if content_regexp.blank?
+    return false if content_regexp.blank?
 
     content_bodies = content_sections.map do |section|
       case section

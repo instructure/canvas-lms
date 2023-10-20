@@ -694,9 +694,6 @@ describe "Canvas Cartridge importing" do
     att.content_type = "video/mp4"
     att.save!
 
-    media_id = "m_mystiry"
-    allow_any_instance_of(Attachment).to receive(:media_object).and_return(double(media_id:))
-
     path = CGI.escape(att.full_path)
     body_with_links = <<~HTML
       <p>Watup? <strong>eh?</strong>
@@ -710,6 +707,10 @@ describe "Canvas Cartridge importing" do
       title: "title",
       text: body_with_links
     }.with_indifferent_access
+
+    media_id = "m_mystiry"
+    @copy_to.attachments.find_by(filename: att.filename).update(media_entry_id: media_id)
+
     # import into new course
     @migration.attachment_path_id_lookup = { att.full_path => att.migration_id }
     Importers::WikiPageImporter.import_from_migration(hash, @copy_to, @migration)
@@ -731,9 +732,6 @@ describe "Canvas Cartridge importing" do
     att.content_type = "video/mp4"
     att.save!
 
-    media_id = "m_new-media-id"
-    allow_any_instance_of(Attachment).to receive(:media_object).and_return(double(media_id:))
-
     path = CGI.escape(att.full_path)
     body = %(<p>WHAT<iframe style="width: 400px; height: 225px; display: inline-block;" title="Video player for video.mp4" data-media-type="video" src="%24IMS-CC-FILEBASE%24/#{path}" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-old-mediaid"></iframe></p>)
 
@@ -742,6 +740,9 @@ describe "Canvas Cartridge importing" do
       title: "title",
       text: body
     }.with_indifferent_access
+
+    media_id = "m_new-media-id"
+    @copy_to.attachments.find_by(filename: att.filename).update(media_entry_id: media_id)
 
     @migration.attachment_path_id_lookup = { att.full_path => att.migration_id }
     Importers::WikiPageImporter.import_from_migration(hash, @copy_to, @migration)
@@ -762,9 +763,6 @@ describe "Canvas Cartridge importing" do
     att.content_type = "video/mp4"
     att.save!
 
-    media_id = "m_new-media-id"
-    allow_any_instance_of(Attachment).to receive(:media_object).and_return(double(media_id:))
-
     path = CGI.escape(att.full_path)
     body = %(<p>WHAT<video style="width: 400px; height: 225px; display: inline-block;" title="Video player for video.mp4" data-media-type="video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-old-mediaid"><source src="%24IMS-CC-FILEBASE%24/#{path}" data-media-type="video" data-media-id="m-old-mediaid"></video></p>)
 
@@ -773,6 +771,9 @@ describe "Canvas Cartridge importing" do
       title: "title",
       text: body
     }.with_indifferent_access
+
+    media_id = "m_new-media-id"
+    @copy_to.attachments.find_by(filename: att.filename).update(media_entry_id: media_id)
 
     @migration.attachment_path_id_lookup = { att.full_path => att.migration_id }
     Importers::WikiPageImporter.import_from_migration(hash, @copy_to, @migration)
@@ -786,7 +787,7 @@ describe "Canvas Cartridge importing" do
 
   it "imports wiki pages" do
     # make sure that the wiki page we're linking to in the test below exists
-    @copy_from.wiki_pages.create!(title: "assignments", body: "ohai")
+    page = @copy_from.wiki_pages.create!(title: "assignments", body: "ohai")
     @copy_to.wiki_pages.create!(title: "assignments", body: "ohai")
     mod = @copy_from.context_modules.create!(name: "some module")
     mod2 = @copy_to.context_modules.create(name: "some module")
@@ -808,7 +809,7 @@ describe "Canvas Cartridge importing" do
     body_with_link = %(<p>Watup? <strong>eh?</strong>
       <a href="/courses/%s/assignments">Assignments</a>
       <a href="/courses/%s/file_contents/course%%20files/tbe_banner.jpg">Some file</a>
-      <a href="/courses/%s/#{@copy_to.wiki.path}/assignments">Assignments wiki link</a>
+      <a href="/courses/%s/pages/#{CC::CCHelper.create_key(page)}">Assignments wiki link</a>
       <a href="/courses/%s/modules">Modules</a>
       <a href="/courses/%s/modules/%s">some module</a>
       <img src="/courses/%s/files/%s/preview" alt="picture.png" /></p>
@@ -1251,8 +1252,8 @@ describe "Canvas Cartridge importing" do
       </media_tracks>
     XML
     expect(@converter.convert_media_tracks(doc)).to eql({
-                                                          "xyz" => [{ "migration_id" => "abc", "kind" => "subtitles", "locale" => "en" },
-                                                                    { "migration_id" => "def", "kind" => "subtitles", "locale" => "tlh" }]
+                                                          "xyz" => [{ "content" => "", "migration_id" => "abc", "kind" => "subtitles", "locale" => "en" },
+                                                                    { "content" => "", "migration_id" => "def", "kind" => "subtitles", "locale" => "tlh" }]
                                                         })
   end
 
@@ -1292,7 +1293,7 @@ describe "Canvas Cartridge importing" do
     expect(mo.media_tracks.where(locale: "tlh").first.content).to eql("Qapla'")
     expect(mo.media_tracks.where(locale: "bad").first).to be_nil
 
-    expect(migration.migration_issues.map(&:description)).to include "Subtitles could not be imported from media.flv.bad.subtitles"
+    expect(migration.migration_issues.map(&:description)).to include "Subtitles (bad) could not be imported for media.flv"
 
     expect(@copy_to.attachments.where(migration_id: "abc").first).to be_deleted
     expect(@copy_to.attachments.where(migration_id: "def").first).to be_deleted

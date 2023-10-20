@@ -122,6 +122,34 @@ describe('ltiMessageHander', () => {
     })
   })
 
+  describe('when message is sent from tool in active RCE', () => {
+    it('processes message', async () => {
+      const event = postMessageEvent({subject: 'lti.showAlert', in_rce: true})
+      expect(await ltiMessageHandler(event)).toBe(true)
+    })
+
+    describe('when subject is not supported in active RCE', () => {
+      it('does not process message', async () => {
+        const event = postMessageEvent({subject: 'lti.scrollToTop', in_rce: true})
+        expect(await ltiMessageHandler(event)).toBe(false)
+      })
+
+      it('sends unsupported subject response with some context', async () => {
+        const event = postMessageEvent({subject: 'lti.scrollToTop', in_rce: true})
+        await ltiMessageHandler(event)
+        expect(event.source.postMessage).toHaveBeenCalledWith(
+          expect.objectContaining({
+            error: {
+              code: 'unsupported_subject',
+              message: 'Not supported inside Rich Content Editor',
+            },
+          }),
+          undefined
+        )
+      })
+    })
+  })
+
   describe('response messages', () => {
     describe('when message handler succeeds', () => {
       afterEach(() => {

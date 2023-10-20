@@ -148,8 +148,8 @@ class Loaders::OutcomeAlignmentLoader < GraphQL::Batch::Loader
       all_alignments_sorted = all_alignments.sort_by { |a| a[:alignment_type] }
 
       all_alignments_sorted.each do |a|
-        align = alignment_hash(a)
-        align[:quiz_items], align[:alignments_count] = get_quiz_items_and_alignments_count(a, outcome_os_alignments) if outcome_os_alignments.present? && a[:alignment_type] == "external"
+        quiz_items, alignments_count = get_quiz_items_and_alignments_count(a, outcome_os_alignments) if outcome_os_alignments.present? && a[:alignment_type] == "external"
+        align = alignment_hash(a, quiz_items, alignments_count)
         art_id = artifact_id(a)
         unless uniq_alignments.include?(art_id)
           alignments.push(align)
@@ -171,9 +171,9 @@ class Loaders::OutcomeAlignmentLoader < GraphQL::Batch::Loader
 
   private
 
-  def alignment_hash(alignment)
+  def alignment_hash(alignment, quiz_items = nil, alignments_count = nil)
     {
-      _id: id(alignment),
+      _id: id(alignment, quiz_items),
       title: alignment[:title],
       content_id: alignment[:content_id],
       content_type: alignment[:content_type],
@@ -187,21 +187,29 @@ class Loaders::OutcomeAlignmentLoader < GraphQL::Batch::Loader
       module_workflow_state: alignment[:module_workflow_state],
       assignment_content_type: assignment_content_type(alignment),
       assignment_workflow_state: alignment[:assignment_workflow_state],
-      quiz_items: nil,
-      alignments_count: 1,
+      quiz_items:,
+      alignments_count: alignments_count || 1,
       created_at: alignment[:created_at],
       updated_at: alignment[:updated_at]
     }
   end
 
-  def id(alignment)
-    # prepend id with alignment type to ensure unique alignment id
+  def id(alignment, quiz_items = nil)
+    # prepend id with alignment type to make it unique
     alignment_types = {
       "direct" => "D",
       "indirect" => "I",
       "external" => "E"
     }
-    base_id = [alignment_types[alignment[:alignment_type]], alignment[:id]].join("_")
+
+    alignment_id = alignment[:id]
+    # for new quizzes, append quiz id with the hash of quiz item ids to make it unique
+    if alignment[:alignment_type] == "external" && quiz_items.present?
+      item_ids_hash = quiz_items.pluck(:_id).join("_").hash
+      alignment_id = [alignment_id, "IH", item_ids_hash].join("_")
+    end
+
+    base_id = [alignment_types[alignment[:alignment_type]], alignment_id].join("_")
 
     # append id with module id to ensure unique alignment id when artifact is included in multiple modules
     return [base_id, alignment[:module_id]].join("_") if alignment[:module_id]
@@ -213,7 +221,8 @@ class Loaders::OutcomeAlignmentLoader < GraphQL::Batch::Loader
     return "quiz" unless alignment[:quiz_id].nil?
     return "discussion" unless alignment[:discussion_id].nil?
     return "new_quiz" if alignment[:assignment_id].present? && alignment[:assignment_submission_types] == "external_tool"
-    return "assignment" unless alignment[:assignment_id].nil?
+
+    "assignment" unless alignment[:assignment_id].nil?
   end
 
   def base_url(alignment)
@@ -246,7 +255,7 @@ class Loaders::OutcomeAlignmentLoader < GraphQL::Batch::Loader
       next unless a[:associated_asset_type] == "canvas.assignment.quizzes" && a[:associated_asset_id] == alignment[:content_id].to_s
 
       items << { _id: a[:artifact_id], title: a[:title] } if a[:artifact_type] == "quizzes.item"
-      count += 1  if SUPPORTED_OS_ALIGNMENTS.include?(a[:artifact_type])
+      count += 1 if SUPPORTED_OS_ALIGNMENTS.include?(a[:artifact_type])
     end
     [items, count]
   end

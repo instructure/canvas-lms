@@ -72,7 +72,14 @@ function postUploadFailed(err) {
  *   To get this off of an input element: `input.files[0]`
  *   To get this off of a drop event: `e.dataTransfer.files[0]`
  */
-export function uploadFile(preflightUrl, preflightData, file, ajaxLib = axios, onProgress, ignoreResult = false) {
+export function uploadFile(
+  preflightUrl,
+  preflightData,
+  file,
+  ajaxLib = axios,
+  onProgress,
+  ignoreResult = false
+) {
   if (!file && !preflightData.url) {
     throw new Error('expected either a file to upload or a url to clone', {file, preflightData})
   } else if (file && preflightData.url) {
@@ -226,7 +233,7 @@ export function submissionCommentAttachmentsUpload(files, courseId, assignmentId
  *
  * @returns an array of attachment objects.
  */
-export function uploadFiles(files, uploadUrl) {
+export function uploadFiles(files, uploadUrl, options = {}) {
   // We differentiate between a normal file and an lti content item
   // based on the existence of a url attribute on the object. Then we invoke
   // the uploadFile function with different parameters based on whether its a
@@ -234,7 +241,16 @@ export function uploadFiles(files, uploadUrl) {
   // providing are determined by the file uploads api whose documentation can
   // be found at /doc/api/file_uploads.md
   const uploadPromises = files.map(file => {
-    if (file.url) {
+    if (options.conversations) {
+      const attachmentInformation = {}
+      attachmentInformation['attachment[folder_id]'] = ENV.CONVERSATIONS.ATTACHMENTS_FOLDER_ID
+      attachmentInformation['attachment[intent]'] = 'message'
+      attachmentInformation['attachment[filename]'] = file.name
+      attachmentInformation['attachment[context_code]'] = `user_${ENV.current_user_id}`
+      attachmentInformation['attachment[on_duplicate]'] = `rename`
+
+      return uploadFile(uploadUrl, attachmentInformation, file)
+    } else if (file.url) {
       // I believe this code is dead now, everything calling it seems to be
       // using files from a file input (the LTI path now uses uploadFiles in
       // AttemptTab), should we remove it?

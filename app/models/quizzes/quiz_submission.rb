@@ -555,7 +555,8 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   def time_left(hard: false)
     return unless end_at
     return (end_at - Time.zone.now).round unless hard && quiz&.timer_autosubmit_disabled?
-    return (end_at_without_time_limit - Time.zone.now).round if end_at_without_time_limit
+
+    (end_at_without_time_limit - Time.zone.now).round if end_at_without_time_limit
   end
 
   def less_than_allotted_time?

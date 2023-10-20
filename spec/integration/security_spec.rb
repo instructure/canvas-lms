@@ -19,6 +19,7 @@
 #
 
 require "nokogiri"
+require "rotp"
 
 describe "security" do
   describe "session fixation" do
@@ -69,6 +70,8 @@ describe "security" do
       expect(c).not_to match(/expires=/)
       reset!
       https!
+      @pseudonym.update_attribute(:current_login_at, 5.minutes.ago)
+
       post "/login/canvas", params: { "pseudonym_session[unique_id]" => "nobody@example.com",
                                       "pseudonym_session[password]" => "asdfasdf",
                                       "pseudonym_session[remember_me]" => "1" }
@@ -127,6 +130,8 @@ describe "security" do
       get "/profile/settings"
       expect(response).to redirect_to login_url
       expect(flash[:warning]).not_to be_empty
+
+      @p.update_attribute(:current_login_at, 5.minutes.ago)
 
       post "/login/canvas", params: { pseudonym_session: { unique_id: @p.unique_id, password: "asdfasdf" } }
       expect(response).to redirect_to settings_profile_url
@@ -211,6 +216,8 @@ describe "security" do
                                          "pseudonym_session[password]" => "asdfasdf",
                                          "pseudonym_session[remember_me]" => "1" }
       c1 = s1.cookies["pseudonym_credentials"]
+      @p.update_attribute(:current_login_at, 5.minutes.ago)
+
       s2.post "/login/canvas", params: { "pseudonym_session[unique_id]" => "nobody@example.com",
                                          "pseudonym_session[password]" => "asdfasdf",
                                          "pseudonym_session[remember_me]" => "1" }
@@ -246,6 +253,27 @@ describe "security" do
       expect(pers1).not_to eq pers2
       get "/", headers: { "HTTP_COOKIE" => "pseudonym_credentials=#{creds}" }
       expect(response).to redirect_to("https://www.example.com/login")
+    end
+
+    it "clears pseudonym_credentials when pending otp check fails" do
+      Account.default.settings[:mfa_settings] = :required
+      Account.default.save!
+      @user.update!(otp_secret_key: ROTP::Base32.random)
+      https!
+
+      post "/login/canvas", params: { "pseudonym_session[unique_id]" => "nobody@example.com",
+                                      "pseudonym_session[password]" => "asdfasdf",
+                                      "pseudonym_session[remember_me]" => "1" }
+
+      expect(response).to redirect_to(otp_login_url)
+      expect(session[:pending_otp]).to be true
+      expect(cookies[:pseudonym_credentials]).to be_present
+
+      get "/"
+
+      expect(response).to redirect_to login_url
+      expect(session[:pending_otp]).not_to be_present
+      expect(cookies[:pseudonym_credentials]).not_to be_present
     end
 
     context "sharding" do
@@ -498,6 +526,8 @@ describe "security" do
       expect(response).to redirect_to login_url
       expect(flash[:warning]).not_to be_empty
 
+      @admin.pseudonyms.first.update_attribute(:current_login_at, 5.minutes.ago)
+
       post "/login/canvas", params: { pseudonym_session: { unique_id: @admin.pseudonyms.first.unique_id, password: "password" } }
       expect(response).to redirect_to user_masquerade_url(@student)
       expect(session[:used_remember_me_token]).not_to be_truthy
@@ -633,52 +663,102 @@ describe "security" do
         expect(response.body).to match(/Statistics/)
       end
 
-      it "manage_user_notes" do
-        Account.default.update_attribute(:enable_user_notes, true)
-        course_with_teacher
-        student_in_course
-        @student.update_account_associations
-        @user_note = UserNote.create!(creator: @teacher, user: @student, root_account_id: Account.default.id)
+      context "when the deprecate_faculty_journal feature flag is disabled" do
+        before { Account.site_admin.disable_feature!(:deprecate_faculty_journal) }
 
-        get "/accounts/#{Account.default.id}/user_notes"
-        assert_status(401)
+        it "manage_user_notes" do
+          Account.default.update_attribute(:enable_user_notes, true)
+          course_with_teacher
+          student_in_course
+          @student.update_account_associations
+          @user_note = UserNote.create!(creator: @teacher, user: @student, root_account_id: Account.default.id)
 
-        get "/accounts/#{Account.default.id}/settings"
-        expect(response).to be_successful
-        expect(response.body).not_to match(/Faculty Journal/)
+          get "/accounts/#{Account.default.id}/user_notes"
+          assert_status(401)
 
-        get "/users/#{@student.id}/user_notes"
-        assert_status(401)
+          get "/accounts/#{Account.default.id}/settings"
+          expect(response).to be_successful
+          expect(response.body).not_to match(/Faculty Journal/)
 
-        post "/users/#{@student.id}/user_notes"
-        assert_status(401)
+          get "/users/#{@student.id}/user_notes"
+          assert_status(401)
 
-        get "/users/#{@student.id}/user_notes/#{@user_note.id}"
-        assert_status(401)
+          post "/users/#{@student.id}/user_notes"
+          assert_status(401)
 
-        delete "/users/#{@student.id}/user_notes/#{@user_note.id}"
-        assert_status(401)
+          get "/users/#{@student.id}/user_notes/#{@user_note.id}"
+          assert_status(401)
 
-        add_permission :manage_user_notes
+          delete "/users/#{@student.id}/user_notes/#{@user_note.id}"
+          assert_status(401)
 
-        get "/accounts/#{Account.default.id}/user_notes"
-        expect(response).to be_successful
+          add_permission :manage_user_notes
 
-        get "/accounts/#{Account.default.id}/settings"
-        expect(response).to be_successful
-        expect(response.body).to match(/Faculty Journal/)
+          get "/accounts/#{Account.default.id}/user_notes"
+          expect(response).to be_successful
 
-        get "/users/#{@student.id}/user_notes"
-        expect(response).to be_successful
+          get "/accounts/#{Account.default.id}/settings"
+          expect(response).to be_successful
+          expect(response.body).to match(/Faculty Journal/)
 
-        post "/users/#{@student.id}/user_notes.json"
-        expect(response).to be_successful
+          get "/users/#{@student.id}/user_notes"
+          expect(response).to be_successful
 
-        get "/users/#{@student.id}/user_notes/#{@user_note.id}.json"
-        expect(response).to be_successful
+          post "/users/#{@student.id}/user_notes.json"
+          expect(response).to be_successful
 
-        delete "/users/#{@student.id}/user_notes/#{@user_note.id}.json"
-        expect(response).to be_successful
+          get "/users/#{@student.id}/user_notes/#{@user_note.id}.json"
+          expect(response).to be_successful
+
+          delete "/users/#{@student.id}/user_notes/#{@user_note.id}.json"
+          expect(response).to be_successful
+        end
+      end
+
+      context "when the deprecate_faculty_journal feature flag is enabled" do
+        it "manage_user_notes" do
+          Account.default.update_attribute(:enable_user_notes, true)
+          course_with_teacher
+          student_in_course
+          @student.update_account_associations
+          @user_note = UserNote.create!(creator: @teacher, user: @student, root_account_id: Account.default.id)
+
+          get "/accounts/#{Account.default.id}/user_notes"
+          assert_status(401)
+
+          get "/accounts/#{Account.default.id}/settings"
+          expect(response).to be_successful
+          expect(response.body).not_to match(/Faculty Journal/)
+
+          get "/users/#{@student.id}/user_notes"
+          assert_status(401)
+
+          post "/users/#{@student.id}/user_notes"
+          assert_status(401)
+
+          get "/users/#{@student.id}/user_notes/#{@user_note.id}"
+          assert_status(401)
+
+          delete "/users/#{@student.id}/user_notes/#{@user_note.id}"
+          assert_status(401)
+
+          add_permission :manage_user_notes
+
+          get "/accounts/#{Account.default.id}/user_notes"
+          assert_status(401)
+
+          get "/users/#{@student.id}/user_notes"
+          assert_status(401)
+
+          post "/users/#{@student.id}/user_notes.json"
+          assert_status(401)
+
+          get "/users/#{@student.id}/user_notes/#{@user_note.id}.json"
+          assert_status(401)
+
+          delete "/users/#{@student.id}/user_notes/#{@user_note.id}.json"
+          assert_status(401)
+        end
       end
 
       it "view_jobs" do

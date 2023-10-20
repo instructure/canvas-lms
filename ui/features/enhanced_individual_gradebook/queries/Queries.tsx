@@ -21,7 +21,12 @@ import gql from 'graphql-tag'
 export const GRADEBOOK_QUERY = gql`
   query GradebookQuery($courseId: ID!) {
     course(id: $courseId) {
-      enrollmentsConnection(filter: {types: [StudentEnrollment, StudentViewEnrollment]}) {
+      enrollmentsConnection(
+        filter: {
+          states: [active, invited, completed]
+          types: [StudentEnrollment, StudentViewEnrollment]
+        }
+      ) {
         nodes {
           user {
             id: _id
@@ -29,6 +34,7 @@ export const GRADEBOOK_QUERY = gql`
             sortableName
           }
           courseSectionId
+          state
         }
       }
       sectionsConnection {
@@ -49,6 +55,7 @@ export const GRADEBOOK_QUERY = gql`
           submittedAt
           userId
           state
+          gradingPeriodId
         }
       }
       assignmentGroupsConnection {
@@ -60,11 +67,13 @@ export const GRADEBOOK_QUERY = gql`
             dropHighest
             dropLowest
           }
+          sisId
           state
           position
-          assignmentsConnection {
+          assignmentsConnection(filter: {gradingPeriodId: null}) {
             nodes {
               anonymizeStudents
+              assignmentGroupId
               gradingType
               id: _id
               name
@@ -82,6 +91,8 @@ export const GRADEBOOK_QUERY = gql`
               moderatedGrading: moderatedGradingEnabled
               postManually
               published
+              hasSubmittedSubmissions
+              inClosedGradingPeriod
             }
           }
         }
@@ -96,12 +107,12 @@ export const GRADEBOOK_STUDENT_QUERY = gql`
       usersConnection(
         filter: {
           enrollmentTypes: [StudentEnrollment, StudentViewEnrollment]
-          enrollmentStates: [active, invited]
+          enrollmentStates: [active, invited, completed]
           userIds: $userIds
         }
       ) {
         nodes {
-          enrollments {
+          enrollments(courseId: $courseId) {
             id: _id
             grades {
               unpostedCurrentGrade
@@ -138,6 +149,11 @@ export const GRADEBOOK_STUDENT_QUERY = gql`
           latePolicyStatus
           missing
           userId
+          cachedDueDate
+          gradingPeriodId
+          deductedPoints
+          enteredGrade
+          gradeMatchesCurrentSubmission
         }
       }
     }

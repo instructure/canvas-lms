@@ -56,7 +56,7 @@ describe "master courses - child courses - quiz locking" do
 
     # open the questions tab
     hover_and_click('#quiz_tabs_tab_list li[aria-controls="questions_tab"]')
-    expect(f("#quiz_edit_wrapper #questions_tab").displayed?).to be  true
+    expect(f("#quiz_edit_wrapper #questions_tab").displayed?).to be true
 
     # hover the question description and the edit/pencil link should not appear
     hover(f(".question_text"))

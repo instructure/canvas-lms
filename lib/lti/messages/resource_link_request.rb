@@ -54,14 +54,6 @@ module Lti::Messages
 
     private
 
-    def tool_from_tag(tag, context)
-      ContextExternalTool.find_external_tool(
-        tag.url,
-        context,
-        tag.content_id
-      )
-    end
-
     def tag_from_resource_link
       ContentTag.find_by(associated_asset: resource_link) if resource_link
     end
@@ -111,7 +103,7 @@ module Lti::Messages
         unless @assignment.external_tool?
           raise launch_error.new(nil, api_message: "Assignment not configured for external tool launches")
         end
-        unless tool_from_tag(@assignment.external_tool_tag, @context) == @tool
+        unless ContextExternalTool.from_assignment(@assignment) == @tool
           raise launch_error.new(nil, api_message: "Assignment not configured for launches with specified tool")
         end
 
@@ -134,7 +126,7 @@ module Lti::Messages
       @message.assignment_and_grade_service.lineitem =
         if @context.root_account.feature_enabled?(:consistent_ags_ids_based_on_account_principal_domain)
           @expander.controller.lti_line_item_show_url(
-            host: @context.root_account.domain,
+            host: @context.root_account.environment_specific_domain,
             course_id: course_id_for_ags_url,
             id: line_item_for_assignment.id
           )

@@ -81,8 +81,7 @@ module Services
       end
 
       before do
-        allow(worker).to receive(:homework_service).and_return(service)
-        allow(worker).to receive(:attachment).and_return(attachment)
+        allow(worker).to receive_messages(homework_service: service, attachment:)
       end
 
       it "clones and submit the url when submit_assignment is true" do
@@ -95,8 +94,7 @@ module Services
 
       it "clones and not submit the url when submit_assignment is false" do
         worker = described_class.submit_job(attachment, progress, eula_agreement_timestamp, comment, executor, false)
-        allow(worker).to receive(:homework_service).and_return(service)
-        allow(worker).to receive(:attachment).and_return(attachment)
+        allow(worker).to receive_messages(homework_service: service, attachment:)
         expect(attachment).to receive(:clone_url).with(url, dup_handling, check_quota, opts)
         expect(service).not_to receive(:submit)
         worker.perform

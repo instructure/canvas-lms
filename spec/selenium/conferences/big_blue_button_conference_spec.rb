@@ -56,7 +56,7 @@ describe "BigBlueButton conferences" do
 
   after { close_extra_windows }
 
-  context "when bbb_modal_update is ON", ignore_js_errors: true do
+  context "when bbb_modal_update is ON", :ignore_js_errors do
     before(:once) do
       Account.site_admin.enable_feature! :bbb_modal_update
     end
@@ -347,6 +347,7 @@ describe "BigBlueButton conferences" do
     end
 
     it "sets start and end date on WebConference when created and edited from the calendar" do
+      skip "FOO-3804 (10/6/2023)"
       get "/calendar"
 
       # Create calendar event with conference
@@ -461,7 +462,7 @@ describe "BigBlueButton conferences" do
       end
     end
 
-    context "when a conference is open", ignore_js_errors: true do
+    context "when a conference is open", :ignore_js_errors do
       it "displays start and end dates by description" do
         conf = create_big_blue_button_conference
 

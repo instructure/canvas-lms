@@ -134,6 +134,7 @@ class Assignment < ActiveRecord::Base
   belongs_to :grader_section, class_name: "CourseSection", optional: true
   belongs_to :final_grader, class_name: "User", optional: true
   has_many :active_groups, -> { merge(GroupCategory.active).merge(Group.active) }, through: :group_category, source: :groups
+  has_many :assigned_students, through: :submissions, source: :user
 
   belongs_to :duplicate_of, class_name: "Assignment", optional: true, inverse_of: :duplicates
   has_many :duplicates, class_name: "Assignment", inverse_of: :duplicate_of, foreign_key: "duplicate_of_id"
@@ -161,6 +162,7 @@ class Assignment < ActiveRecord::Base
 
   has_many :conditional_release_rules, class_name: "ConditionalRelease::Rule", dependent: :destroy, foreign_key: "trigger_assignment_id", inverse_of: :trigger_assignment
   has_many :conditional_release_associations, class_name: "ConditionalRelease::AssignmentSetAssociation", dependent: :destroy, inverse_of: :assignment
+  has_one :master_content_tag, class_name: "MasterCourses::MasterContentTag", inverse_of: :assignment
 
   scope :assigned_to_student, ->(student_id) { joins(:submissions).where(submissions: { user_id: student_id }) }
   scope :anonymous, -> { where(anonymous_grading: true) }
@@ -207,6 +209,7 @@ class Assignment < ActiveRecord::Base
   validates :lti_context_id, presence: true, uniqueness: true
   validates :grader_count, numericality: true
   validates :allowed_attempts, numericality: { greater_than: 0 }, unless: proc { |a| a.allowed_attempts == -1 }, allow_nil: true
+  validates :sis_source_id, uniqueness: { scope: :root_account_id }, allow_nil: true
 
   with_options unless: :moderated_grading? do
     validates :graders_anonymous_to_graders, absence: true
@@ -257,8 +260,8 @@ class Assignment < ActiveRecord::Base
   end
 
   def positive_points_possible?
-    return if points_possible.to_i >= 0
-    return unless points_possible_changed?
+    return false if points_possible.to_i >= 0
+    return false unless points_possible_changed?
 
     errors.add(
       :points_possible,
@@ -270,8 +273,8 @@ class Assignment < ActiveRecord::Base
   end
 
   def reasonable_points_possible?
-    return if points_possible.to_i < 1_000_000_000
-    return unless points_possible_changed?
+    return false if points_possible.to_i < 1_000_000_000
+    return false unless points_possible_changed?
 
     errors.add(
       :points_possible,
@@ -328,12 +331,13 @@ class Assignment < ActiveRecord::Base
     result.ignores.clear
     result.moderated_grading_selections.clear
     result.grades_published_at = nil
-    %i[migration_id
-       lti_context_id
-       turnitin_id
-       discussion_topic
+    %i[discussion_topic
+       integration_data
        integration_id
-       integration_data].each do |attr|
+       lti_context_id
+       migration_id
+       sis_source_id
+       turnitin_id].each do |attr|
       result.send(:"#{attr}=", nil)
     end
     result.peer_review_count = 0
@@ -441,7 +445,7 @@ class Assignment < ActiveRecord::Base
   delegate :restrict_quantitative_data?, to: :course
 
   def group_category_changes_ok?
-    return unless group_category_id_changed?
+    return false unless group_category_id_changed?
 
     if has_submitted_submissions?
       errors.add :group_category_id,
@@ -455,7 +459,7 @@ class Assignment < ActiveRecord::Base
   private :group_category_changes_ok?
 
   def turnitin_changes_ok?
-    return unless turnitin_enabled_changed?
+    return false unless turnitin_enabled_changed?
 
     if has_submitted_submissions?
       errors.add :turnitin_enabled,
@@ -465,7 +469,7 @@ class Assignment < ActiveRecord::Base
   private :turnitin_changes_ok?
 
   def vericite_changes_ok?
-    return unless vericite_enabled_changed?
+    return false unless vericite_enabled_changed?
 
     if has_submitted_submissions?
       errors.add :vericite_enabled,
@@ -475,7 +479,7 @@ class Assignment < ActiveRecord::Base
   private :vericite_changes_ok?
 
   def anonymous_grading_changes_ok?
-    return unless anonymous_grading_changed?
+    return false unless anonymous_grading_changed?
 
     if group_category.present? && !group_category_id_changed?
       errors.add :anonymous_grading, I18n.t("Group assignments can't be anonymously graded")
@@ -504,16 +508,16 @@ class Assignment < ActiveRecord::Base
     Assignment.maximum_string_length
   end
 
-  def secure_params
+  def secure_params(include_description: true)
     body = {}
     body[:lti_assignment_id] = lti_context_id || SecureRandom.uuid
-    body[:lti_assignment_description] = lti_safe_description
+    body[:lti_assignment_description] = lti_safe_description if include_description
     Canvas::Security.create_jwt(body)
   end
 
   def discussion_group_ok?
-    return unless new_record? || group_category_id_changed?
-    return unless group_category_id && submission_types == "discussion_topic"
+    return false unless new_record? || group_category_id_changed?
+    return false unless group_category_id && submission_types == "discussion_topic"
 
     errors.add :group_category_id, I18n.t("discussion_group_category_locked",
                                           "Group categories cannot be set directly on a discussion assignment, but should be set on the discussion instead")
@@ -597,6 +601,11 @@ class Assignment < ActiveRecord::Base
     write_attribute(:allowed_extensions, new_value)
   end
 
+  # ensure a root_account_id is set before validation so that we can
+  # properly validate sis_source_id uniqueness by root_account_id
+  before_validation :set_root_account_id, on: :create
+  before_create :set_muted
+
   before_save :ensure_post_to_sis_valid,
               :process_if_quiz,
               :default_values,
@@ -610,8 +619,6 @@ class Assignment < ActiveRecord::Base
   def delete_observer_alerts
     observer_alerts.in_batches(of: 10_000).delete_all
   end
-
-  before_create :set_root_account_id, :set_muted
 
   after_save  :update_submissions_and_grades_if_details_changed,
               :update_grading_period_grades,
@@ -761,6 +768,11 @@ class Assignment < ActiveRecord::Base
     end
     AssignmentGroup.where(id: assignment_group_id).update_all(updated_at: Time.zone.now.utc) if assignment_group_id
     true
+  end
+
+  def ab_guid_through_rubric
+    # ab_guid is an academic benchmark guid - it can be saved on the assignmenmt itself, or accessed through this association
+    rubric&.learning_outcome_alignments&.map { |loa| loa.learning_outcome.vendor_guid }&.compact || []
   end
 
   def update_student_submissions(updating_user)
@@ -1209,14 +1221,15 @@ class Assignment < ActiveRecord::Base
           url: lti_resource_link_url
         )
 
-        li = line_items.create!(label: title, score_maximum: points_possible, resource_link: rl, coupled: true, resource_id: line_item_resource_id, tag: line_item_tag)
+        li = line_items.create!(label: title, score_maximum: points_possible, resource_link: rl, coupled: true, resource_id: line_item_resource_id, tag: line_item_tag, end_date_time: due_at)
         create_results_from_prior_grades(li)
-      elsif saved_change_to_title? || saved_change_to_points_possible?
+      elsif saved_change_to_title? || saved_change_to_points_possible? || saved_change_to_due_at?
         if (li = line_items.find(&:assignment_line_item?))
           li.label = title
           li.score_maximum = points_possible || 0
           li.tag = line_item_tag if line_item_tag
           li.resource_id = line_item_resource_id if line_item_resource_id
+          li.end_date_time = due_at
           li.save!
         end
       end
@@ -1678,7 +1691,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def include_description?(user, lock_info = nil)
-    return unless user
+    return false unless user
 
     lock_info = locked_for?(user, check_policies: true) if lock_info.nil?
     !lock_info || (lock_info[:can_view] && !lock_info[:context_module])
@@ -1872,8 +1885,7 @@ class Assignment < ActiveRecord::Base
     can :submit
 
     given do |user, session|
-      (submittable_type? || %w[discussion_topic online_quiz].include?(submission_types) ||
-      (a2_enabled? && submission_types == "none")) &&
+      (submittable_type? || %w[discussion_topic online_quiz none not_graded].include?(submission_types)) &&
         context.grants_right?(user, session, :participate_as_student) &&
         visible_to_user?(user)
     end
@@ -2559,8 +2571,8 @@ class Assignment < ActiveRecord::Base
   # for group assignments, returns a single "student" for each
   # group's submission.  the students name will be changed to the group's
   # name.  for non-group assignments this just returns all visible users
-  def representatives(user:, includes: [:inactive], group_id: nil, section_id: nil, &block)
-    return visible_students_for_speed_grader(user:, includes:, group_id:, section_id:) unless grade_as_group?
+  def representatives(user:, includes: [:inactive], group_id: nil, section_id: nil, ignore_student_visibility: false, &block)
+    return visible_students_for_speed_grader(user:, includes:, group_id:, section_id:, ignore_student_visibility:) unless grade_as_group?
 
     submissions = self.submissions.to_a
     user_ids_with_submissions = submissions.select(&:has_submission?).to_set(&:user_id)
@@ -2586,7 +2598,7 @@ class Assignment < ActiveRecord::Base
     enrollment_priority = { "active" => 1, "inactive" => 2 }
     enrollment_priority.default = 100
 
-    visible_student_ids = visible_students_for_speed_grader(user:, includes:).to_set(&:id)
+    visible_student_ids = visible_students_for_speed_grader(user:, includes:, ignore_student_visibility:).to_set(&:id)
 
     reps_and_others = groups_and_ungrouped(user, includes:).filter_map do |group_name, group_info|
       group_students = group_info[:users]
@@ -2635,7 +2647,7 @@ class Assignment < ActiveRecord::Base
   # using this method instead of students_with_visibility so we
   # can add the includes and students_visible_to/participating_students scopes.
   # group_id and section_id filters may optionally be supplied.
-  def visible_students_for_speed_grader(user:, includes: [:inactive], group_id: nil, section_id: nil)
+  def visible_students_for_speed_grader(user:, includes: [:inactive], group_id: nil, section_id: nil, ignore_student_visibility: false)
     @visible_students_for_speed_grader ||= {}
     @visible_students_for_speed_grader[[user.global_id, includes, group_id]] ||= begin
       student_scope = if user.present?
@@ -2643,7 +2655,15 @@ class Assignment < ActiveRecord::Base
                       else
                         context.participating_students
                       end
-      students = students_with_visibility(student_scope).order_by_sortable_name.distinct
+
+      student_scope = if ignore_student_visibility
+                        student_scope.where(id: assigned_students)
+                      else
+                        students_with_visibility(student_scope)
+                      end
+
+      students = student_scope.order_by_sortable_name.distinct
+
       if group_id.present?
         students = students.joins(:group_memberships)
                            .where(group_memberships: { group_id:, workflow_state: :accepted })
@@ -3165,7 +3185,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def annotated_document?
-    !!submission_types&.match?(/student_annotation/)
+    !!submission_types&.include?("student_annotation")
   end
 
   def readable_submission_type(submission_type)
@@ -3347,7 +3367,7 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  # Suspend any callbacks that could lead to DueDateCacher running.  This means, for now, the
+  # Suspend any callbacks that could lead to SubmissionLifecycleManager running.  This means, for now, the
   # update_cached_due_dates callbacks on:
   # * Assignment
   # * AssignmentOverride and
@@ -3376,7 +3396,7 @@ class Assignment < ActiveRecord::Base
     unless saved_by == :migration
       relevant_changes = saved_changes.slice(:due_at, :workflow_state, :only_visible_to_overrides, :anonymous_grading).inspect
       Rails.logger.debug "GRADES: recalculating because scope changed for Assignment #{global_id}: #{relevant_changes}"
-      DueDateCacher.recompute(self, update_grades: true)
+      SubmissionLifecycleManager.recompute(self, update_grades: true)
     end
   end
 
@@ -3407,7 +3427,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def apply_late_policy
-    return if update_cached_due_dates? # DueDateCacher already re-applies late policy so we shouldn't
+    return if update_cached_due_dates? # SubmissionLifecycleManager already re-applies late policy so we shouldn't
     return unless saved_change_to_grading_type?
 
     LatePolicyApplicator.for_assignment(self)
@@ -3610,7 +3630,7 @@ class Assignment < ActiveRecord::Base
                       false
                     end
 
-    DueDateCacher.recompute(self, update_grades:, executing_user: updating_user)
+    SubmissionLifecycleManager.recompute(self, update_grades:, executing_user: updating_user)
   end
 
   def run_if_overrides_changed_later!(student_ids: nil, updating_user: nil)
@@ -3875,7 +3895,8 @@ class Assignment < ActiveRecord::Base
     delay_if_production.recalculate_module_progressions(submission_ids)
 
     unless skip_content_participation_refresh
-      submission_ids.each_slice(1000) do |submission_id_slice|
+      previously_unposted_submission_ids = previously_unposted_submissions.map(&:id)
+      previously_unposted_submission_ids.each_slice(1000) do |submission_id_slice|
         ContentParticipation
           .where(content_type: "Submission", content_id: submission_id_slice, content_item: "grade", workflow_state: "read")
           .update_all(workflow_state: "unread")
@@ -3923,7 +3944,9 @@ class Assignment < ActiveRecord::Base
 
   def a2_enabled?
     return false unless course.feature_enabled?(:assignments_2_student)
-    return false if external_tool? || quiz? || discussion_topic? || wiki_page? || (peer_reviews? && !course.feature_enabled?(:peer_reviews_for_a2))
+    return false if quiz? || discussion_topic? || wiki_page?
+    return false if peer_reviews? && !course.feature_enabled?(:peer_reviews_for_a2)
+    return false if external_tool? && !Account.site_admin.feature_enabled?(:external_tools_for_a2)
 
     true
   end
@@ -4093,7 +4116,7 @@ class Assignment < ActiveRecord::Base
     # Due to the removal of the multiple `validates_length_of :title` validations we need this nil check
     # here to act as those validations so we can reduce the number of validations for this attribute
     # to just one single check
-    return if nil? || self.title.nil?
+    return false if nil? || self.title.nil?
 
     if self.title.to_s.length > name_length && self.grading_type != "not_graded"
       errors.add(:title, I18n.t("The title cannot be longer than %{length} characters", length: name_length))
@@ -4101,14 +4124,14 @@ class Assignment < ActiveRecord::Base
   end
 
   def annotatable_and_group_exclusivity_ok?
-    return unless has_group_category? && annotated_document?
+    return false unless has_group_category? && annotated_document?
 
     errors.add(:annotatable_attachment_id, "must be blank when group_category_id is present")
     errors.add(:group_category_id, "must be blank when annotatable_attachment_id is present")
   end
 
   def grader_section_ok?
-    return if grader_section.blank?
+    return false if grader_section.blank?
 
     if grader_section.workflow_state != "active" || grader_section.course_id != course.id
       errors.add(:grader_section, "must be active and in same course as assignment")
@@ -4116,8 +4139,8 @@ class Assignment < ActiveRecord::Base
   end
 
   def final_grader_ok?
-    return unless final_grader_id_changed?
-    return if final_grader_id.blank?
+    return false unless final_grader_id_changed?
+    return false if final_grader_id.blank?
 
     if grader_section_id.present? && grader_section.instructor_enrollments.where(user_id: final_grader_id, workflow_state: "active").empty?
       errors.add(:final_grader, "must be enrolled in selected section")

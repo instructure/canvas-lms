@@ -21,6 +21,11 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 export type ApiResponse<T> = {
   data: T
   status: number
+  link?: {
+    next?: {
+      url: string
+    }
+  }
 }
 
 export type ApiRequest = {
@@ -31,10 +36,19 @@ export type ApiRequest = {
 }
 
 export async function executeApiRequest<T>(request: ApiRequest): Promise<ApiResponse<T>> {
-  const {json, response} = await doFetchApi(request)
+  const {json, response, link} = await doFetchApi(request)
 
   return {
     data: json as T,
     status: (response as Response).status,
+    link,
   }
+}
+
+export enum ApiCallStatus {
+  NOT_STARTED = 'NOT_STARTED',
+  NO_CHANGE = 'NO_CHANGE',
+  PENDING = 'PENDING',
+  COMPLETED = 'COMPLETED',
+  FAILED = 'FAILED',
 }

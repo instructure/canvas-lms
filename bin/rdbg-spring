@@ -1,0 +1,20 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# This is a wrapper that works with the Spring after_fork hook in application.rb
+# so that any spring command can run under rdbg
+
+spring = File.expand_path("spring", __dir__)
+
+require "debug/config"
+config = DEBUGGER__::Config.parse_argv(ARGV)
+
+unless config[:command]
+  warn "--command is required for the rdbg-spring wrapper"
+  exit 1
+end
+
+ENV.merge!(DEBUGGER__::Config.config_to_env_hash(config))
+ENV["RUBY_DEBUG_START"] = "true"
+
+exec(spring, *ARGV)

@@ -27,6 +27,19 @@ require "rails/test_unit/railtie"
 
 Bundler.require(*Rails.groups)
 
+if defined?(Spring)
+  Spring.after_fork do
+    if ENV["RUBY_DEBUG_OPEN"]
+      require "debug/session"
+      next unless defined?(DEBUGGER__)
+
+      DEBUGGER__.open(nonstop: ENV["RUBY_DEBUG_NONSTOP"])
+    elsif ENV["RUBY_DEBUG_START"]
+      require "debug/start"
+    end
+  end
+end
+
 module CanvasRails
   class Application < Rails::Application
     config.autoloader = :zeitwerk
@@ -97,6 +110,7 @@ module CanvasRails
     config.active_record.observers = %i[cacher stream_item_cache live_events_observer]
 
     config.active_support.encode_big_decimal_as_string = false
+    config.active_support.remove_deprecated_time_with_zone_name = true
 
     config.paths["lib"].eager_load!
     config.paths.add("app/middleware", eager_load: true, autoload_once: true)

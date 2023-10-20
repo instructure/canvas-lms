@@ -25,7 +25,7 @@ class GradingSchemesJsonController < ApplicationController
   before_action :require_context
   before_action :require_user
   def detail_list
-    if authorized_action(@context, @current_user, :manage_grades)
+    if authorized_action(@context, @current_user, @context.grading_standard_read_permission)
       grading_standards = GradingStandard.for(@context).sorted.limit(GRADING_SCHEMES_LIMIT)
       respond_to do |format|
         format.json do
@@ -38,7 +38,7 @@ class GradingSchemesJsonController < ApplicationController
   end
 
   def summary_list
-    if authorized_action(@context, @current_user, :manage_grades)
+    if authorized_action(@context, @current_user, @context.grading_standard_read_permission)
       grading_standards = GradingStandard.for(@context).sorted.limit(GRADING_SCHEMES_LIMIT)
       respond_to do |format|
         format.json do
@@ -51,7 +51,7 @@ class GradingSchemesJsonController < ApplicationController
   end
 
   def show
-    if authorized_action(@context, @current_user, :manage_grades)
+    if authorized_action(@context, @current_user, @context.grading_standard_read_permission)
       grading_standard = GradingStandard.for(@context).find(params[:id])
       respond_to do |format|
         format.json { render json: GradingSchemesJsonController.to_grading_scheme_json(grading_standard, @current_user) }
@@ -60,17 +60,8 @@ class GradingSchemesJsonController < ApplicationController
   end
 
   def show_default_grading_scheme
-    grading_standard_data = GradingStandard.default_grading_standard
-    props = {}
-    props["title"] = I18n.t("Default Canvas Grading Scheme")
-    props["data"] = grading_standard_data
-    if Account.site_admin.feature_enabled?(:points_based_grading_schemes)
-      props["scaling_factor"] = 1.0
-      props["points_based"] = false
-    end
-    default_grading_standard = @context.grading_standards.build(props)
     respond_to do |format|
-      format.json { render json: GradingSchemesJsonController.to_grading_scheme_json(default_grading_standard, @current_user) }
+      format.json { render json: GradingSchemesJsonController.to_grading_scheme_json(GradingSchemesJsonController.default_canvas_grading_standard(@context), @current_user) }
     end
   end
 
@@ -80,6 +71,7 @@ class GradingSchemesJsonController < ApplicationController
 
       respond_to do |format|
         if grading_standard.save
+          track_create_metrics(grading_standard)
           format.json { render json: GradingSchemesJsonController.to_grading_scheme_json(grading_standard, @current_user) }
         else
           format.json { render json: grading_standard.errors, status: :bad_request }
@@ -95,6 +87,7 @@ class GradingSchemesJsonController < ApplicationController
 
       respond_to do |format|
         if grading_standard.update(grading_scheme_payload)
+          track_update_metrics(grading_standard)
           format.json { render json: GradingSchemesJsonController.to_grading_scheme_json(grading_standard, @current_user) }
         else
           format.json { render json: grading_standard.errors, status: :bad_request }
@@ -163,6 +156,18 @@ class GradingSchemesJsonController < ApplicationController
     end
   end
 
+  def self.default_canvas_grading_standard(context)
+    grading_standard_data = GradingStandard.default_grading_standard
+    props = {}
+    props["title"] = I18n.t("Default Canvas Grading Scheme")
+    props["data"] = grading_standard_data
+    if Account.site_admin.feature_enabled?(:points_based_grading_schemes)
+      props["scaling_factor"] = 1.0
+      props["points_based"] = false
+    end
+    context.grading_standards.build(props)
+  end
+
   private
 
   def grading_scheme_payload
@@ -175,5 +180,17 @@ class GradingSchemesJsonController < ApplicationController
       { title: params[:title],
         data: GradingSchemesJsonController.to_grading_standard_data(params[:data]) }
     end
+  end
+
+  def track_update_metrics(grading_standard)
+    if grading_standard.changed.include?("points_based")
+      InstStatsd::Statsd.increment("grading_scheme.update.points_based") if grading_standard.points_based
+      InstStatsd::Statsd.increment("grading_scheme.update.percentage_based") unless grading_standard.points_based
+    end
+  end
+
+  def track_create_metrics(grading_standard)
+    InstStatsd::Statsd.increment("grading_scheme.create.points_based") if grading_standard.points_based
+    InstStatsd::Statsd.increment("grading_scheme.create.percentage_based") unless grading_standard.points_based
   end
 end

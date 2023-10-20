@@ -178,5 +178,12 @@ describe CoursePacing::StudentEnrollmentPaceService do
         CoursePacing::StudentEnrollmentPaceService.valid_context?(@last_student_enrollment)
       ).to be true
     end
+
+    it "returns false if there is no active student enrollment for the given student enrollment" do
+      extra_enrollment = course.enroll_student(user_model, enrollment_state: "deleted")
+      expect(
+        CoursePacing::StudentEnrollmentPaceService.valid_context?(extra_enrollment)
+      ).to be false
+    end
   end
 end

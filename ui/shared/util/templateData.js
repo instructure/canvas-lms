@@ -19,6 +19,7 @@
 import $ from 'jquery'
 import htmlEscape from 'html-escape'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
+import replaceTags from './replaceTags'
 
 // Fills the selected object(s) with data values as specified.  Plaintext values should be specified in the
 //  data: data used to fill template.
@@ -100,7 +101,7 @@ $.fn.fillTemplateData = function (options) {
           }
           const name = options.hrefValues[i]
           if ((oldHref = $obj.attr('href'))) {
-            const newHref = $.replaceTags(oldHref, name, encodeURIComponent(options.data[name]))
+            const newHref = replaceTags(oldHref, name, encodeURIComponent(options.data[name]))
             const orig = $obj.text() === $obj.html() ? $obj.text() : null
             if (oldHref !== newHref) {
               $obj.attr('href', newHref)
@@ -110,10 +111,10 @@ $.fn.fillTemplateData = function (options) {
             }
           }
           if ((oldRel = $obj.attr('rel'))) {
-            $obj.attr('rel', $.replaceTags(oldRel, name, options.data[name]))
+            $obj.attr('rel', replaceTags(oldRel, name, options.data[name]))
           }
           if ((oldName = $obj.attr('name'))) {
-            $obj.attr('name', $.replaceTags(oldName, name, options.data[name]))
+            $obj.attr('name', replaceTags(oldName, name, options.data[name]))
           }
         }
       })

@@ -125,7 +125,8 @@ module ConditionalRelease
 
       def percent_from_points(points, points_possible)
         return points.to_f / points_possible.to_f if points.present? && points_possible.to_f.nonzero?
-        return points.to_f / 100 if points.present? # mirror Canvas rule
+
+        points.to_f / 100 if points.present? # mirror Canvas rule
       end
 
       private
@@ -134,9 +135,9 @@ module ConditionalRelease
         score = submission ? percent_from_points(submission.score, assignment.points_possible) : nil
         detail = {
           assignment: { id: assignment.id, course_id: assignment.context_id, name: assignment.title, submission_types: assignment.submission_types_array, grading_type: assignment.grading_type },
-          submission: { id: submission.id, score: submission.score, grade: submission.grade, submitted_at: submission.submitted_at },
           score:
         }
+        detail[:submission] = { id: submission.id, score: submission.score, grade: submission.grade, submitted_at: submission.submitted_at } if submission
         detail[:trend] = compute_trend(trend_score, score) if trend_score
         detail
       end

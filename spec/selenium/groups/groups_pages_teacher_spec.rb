@@ -241,7 +241,7 @@ describe "groups" do
         expect(f(".message.user_content")).to include_text(dt.message)
       end
 
-      it "allows teachers to delete their group discussions", ignore_js_errors: true, priority: "1" do
+      it "allows teachers to delete their group discussions", :ignore_js_errors, priority: "1" do
         skip_if_safari(:alert)
         dt = DiscussionTopic.create!(context: @testgroup.first,
                                      user: @teacher,

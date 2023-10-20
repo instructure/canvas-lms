@@ -18,6 +18,7 @@
 
 import actions from '../developerKeysActions'
 import axios from '@canvas/axios'
+import $ from 'jquery'
 
 const dispatch = jest.fn()
 
@@ -35,8 +36,8 @@ describe('saveLtiToolConfiguration', () => {
     axios.post.mockRestore()
   })
 
-  const save = (includeUrl = false) => {
-    actions.saveLtiToolConfiguration({
+  const save = async (includeUrl = false) => {
+    await actions.saveLtiToolConfiguration({
       account_id: '1',
       developer_key: {name: 'test'},
       settings: {test: 'config'},
@@ -58,6 +59,41 @@ describe('saveLtiToolConfiguration', () => {
           tool_configuration: {test: 'config'},
         })
       )
+    })
+  })
+
+  describe('on error response', () => {
+    const error = {
+      response: {
+        data: {
+          errors: [
+            {
+              message: '["Thats no moon...its a space station."]',
+            },
+            {
+              message: '["Its too big to be a space station!"]',
+            },
+          ],
+        },
+      },
+    }
+
+    beforeAll(() => {
+      axios.post = jest.fn().mockRejectedValue(error)
+      $.flashError = jest.fn()
+    })
+
+    afterAll(() => {
+      axios.post.mockRestore()
+    })
+
+    it('calls flashError for each message', () => {
+      return expect(
+        save().finally(() => {
+          expect($.flashError).toHaveBeenCalledTimes(2)
+          expect(dispatch).toHaveBeenCalledWith(actions.setEditingDeveloperKey(false))
+        })
+      ).rejects.toEqual(error)
     })
   })
 })

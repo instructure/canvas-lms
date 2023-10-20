@@ -94,7 +94,6 @@ describe('getRCSProps', () => {
       canUploadFiles: true,
       filesTabDisabled: false,
       themeUrl: 'http://the.theme.here/',
-      features: {},
     })
   })
 

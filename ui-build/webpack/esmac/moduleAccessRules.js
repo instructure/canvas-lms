@@ -19,7 +19,7 @@
 module.exports = [
   {
     rule: 'Let the initializer do what it needs to',
-    source: 'ui/index.js',
+    source: 'ui/index.ts',
     target: '**',
     specifier: 'any',
   },
@@ -141,11 +141,5 @@ module.exports = [
     target: 'gems/plugins/*/**',
     boundary: 0,
     specifier: 'relative',
-  },
-  {
-    rule: 'Let the react content router include routes from other ui features',
-    source: 'ui/features/react_content_router/routes/routes.tsx',
-    target: 'ui/features/**/routes/**/*Routes.tsx',
-    specifier: 'any',
   },
 ]

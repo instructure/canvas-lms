@@ -42,8 +42,7 @@ describe HealthChecks do
 
     it "passes the InstFS check" do
       allow(CanvasHttp).to receive(:get).with(any_args).and_return(success_response)
-      allow(InstFS).to receive(:app_host).and_return("https://www.example.com")
-      allow(InstFS).to receive(:enabled?).and_return(true)
+      allow(InstFS).to receive_messages(app_host: "https://www.example.com", enabled?: true)
 
       expect(described_class.process_deep_checks[:critical][:inst_fs][:status]).to be true
     end
@@ -61,8 +60,7 @@ describe HealthChecks do
 
     it "passes the mathman check" do
       allow(CanvasHttp).to receive(:get).with(any_args).and_return(success_response)
-      allow(MathMan).to receive(:url_for).and_return("www.example.com")
-      allow(MathMan).to receive(:use_for_svg?).and_return(true)
+      allow(MathMan).to receive_messages(url_for: "www.example.com", use_for_svg?: true)
 
       expect(described_class.process_deep_checks[:critical][:mathman][:status]).to be true
     end
@@ -98,16 +96,13 @@ describe HealthChecks do
 
     it "passes the canvadocs checks" do
       allow(CanvasHttp).to receive(:get).with(any_args).and_return(success_response)
-      allow(Canvadocs).to receive(:enabled?).and_return(true)
-      allow(Canvadocs).to receive(:config)
-        .and_return({ "base_url" => "https://canvadocs.instructure.com/" })
+      allow(Canvadocs).to receive_messages(enabled?: true, config: { "base_url" => "https://canvadocs.instructure.com/" })
 
       expect(described_class.process_deep_checks[:secondary][:canvadocs][:status]).to be true
     end
 
     it "passes the screencap check" do
-      allow(CutyCapt).to receive(:enabled?).and_return(true)
-      allow(CutyCapt).to receive(:screencap_service).and_return(Class.new do
+      allow(CutyCapt).to receive_messages(enabled?: true, screencap_service: Class.new do
         def snapshot_url_to_file(...)
           true
         end
@@ -131,8 +126,7 @@ describe HealthChecks do
     end
 
     it "passes the incoming_mail check" do
-      allow(IncomingMailProcessor::IncomingMessageProcessor).to receive(:run_periodically?).and_return(true)
-      allow(IncomingMailProcessor::IncomingMessageProcessor).to receive(:healthy?).and_return(true)
+      allow(IncomingMailProcessor::IncomingMessageProcessor).to receive_messages(run_periodically?: true, healthy?: true)
 
       expect(described_class.process_deep_checks[:secondary][:incoming_mail][:status]).to be true
     end
@@ -142,15 +136,12 @@ describe HealthChecks do
     allow(InstStatsd::Statsd).to receive(:gauge)
     allow(InstStatsd::Statsd).to receive(:timing)
 
-    allow(HealthChecks).to receive(:process_readiness_checks).and_return(
-      {
+    allow(HealthChecks).to receive_messages(
+      process_readiness_checks: {
         readiness_check_name_error: { time: 1, status: false },
         readiness_check_name_success: { time: 2, status: true },
-      }
-    )
-
-    allow(HealthChecks).to receive(:process_deep_checks).and_return(
-      {
+      },
+      process_deep_checks: {
         deep: {
           deep_check_name_error: { time: 3, status: false },
           deep_check_name_success: { time: 4, status: true },

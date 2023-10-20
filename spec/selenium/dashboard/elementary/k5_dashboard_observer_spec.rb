@@ -71,6 +71,7 @@ describe "observer k5 dashboard" do
     end
 
     it "show the grades progress bar with the appropriate progress" do
+      skip "FOO-3808 (10/6/2023)"
       subject_grade = "75"
 
       assignment = create_and_submit_assignment(@subject_course, "Assignment 1", "new assignment", 100)
@@ -171,7 +172,7 @@ describe "observer k5 dashboard" do
       expect(element_value_for_attr(observed_student_dropdown, "value")).to eq("K5Student")
     end
 
-    it "selects student from list on subject drop down menu", ignore_js_errors: true do
+    it "selects student from list on subject drop down menu", :ignore_js_errors do
       get "/courses/#{@subject_course.id}#home"
 
       click_observed_student_option("My2 Student")
@@ -179,7 +180,7 @@ describe "observer k5 dashboard" do
       expect(element_value_for_attr(observed_student_dropdown, "value")).to eq("My2 Student")
     end
 
-    it "allows for searching for a student in subject dropdown list", ignore_js_errors: true do
+    it "allows for searching for a student in subject dropdown list", :ignore_js_errors do
       get "/courses/#{@subject_course.id}#home"
 
       observed_student_dropdown.send_keys([:control, "a"], :backspace, "My2")

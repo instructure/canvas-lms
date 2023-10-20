@@ -203,7 +203,7 @@ module Lti
     end
 
     def current_canvas_roles
-      roles = (course_enrollments + account_enrollments).map(&:role).map(&:name).uniq
+      roles = (course_enrollments + account_enrollments).map { |e| e.role.name }.uniq
       roles = roles.map { |role| (role == "AccountAdmin") ? "Account Admin" : role } # to maintain backwards compatibility
       roles.join(",")
     end
@@ -257,6 +257,24 @@ module Lti
       e || @user.email
     end
 
+    def adminable_account_ids_recursive_truncated(limit_chars: 40_000)
+      full_list = @user.adminable_account_ids_recursive(starting_root_account: @root_account).join(",")
+
+      # Some browsers break when the POST param field value is too long, as
+      # seen in 95fad766f / INTEROP-6390. It's unclear what the limit is, but from
+      # that, 40000 (1000 * course.lti_context_id.length) seems to be safe.
+      if full_list.length <= limit_chars
+        full_list
+      else
+        warning_str = ",truncated"
+        # Get the index of the last "," before the limit (minus room for the warning string)
+        # The maximum possible for truncate_after would be (limit_chars - warning_str.length),
+        # in which case adding warning_str puts us exactly at limit_chars chars.
+        truncate_after = full_list.rindex(",", limit_chars - warning_str.length)
+        full_list[0...truncate_after] + warning_str
+      end
+    end
+
     def recursively_fetch_previous_lti_context_ids(limit: 1000)
       return "" unless @context.is_a?(Course)
 
@@ -264,15 +282,19 @@ module Lti
       last_migration_id = @context.content_migrations.where(workflow_state: :imported).order(id: :desc).limit(1).pluck(:id).first
       return "" unless last_migration_id
 
+      use_alternate_settings = @root_account.feature_enabled?(:tune_lti_context_id_history_query)
+
       # we can cache on the last migration because even if copies are done elsewhere they won't affect anything
       # until a new copy is made to _this_ course
-      Rails.cache.fetch(["recursive_copied_course_lti_context_ids", @context.global_id, last_migration_id].cache_key) do
+      Rails.cache.fetch(["recursive_copied_course_lti_context_ids", @context.global_id, last_migration_id, use_alternate_settings].cache_key) do
         # Finds content migrations for this course and recursively, all content
         # migrations for the source course of the migration -- that is, all
         # content migrations that directly or indirectly provided content to
         # this course. From there we get the unique list of courses, ordering by
         # which has the migration with the latest timestamp.
-        results = Course.connection.with_statement_timeout do
+        results = Course.transaction do
+          Course.connection.statement_timeout = 30 # seconds
+          Course.connection.set("cpu_tuple_cost", 0.2, local: true) if use_alternate_settings
           Course.from(<<~SQL.squish)
             (WITH RECURSIVE all_contexts AS (
               SELECT context_id, source_course_id

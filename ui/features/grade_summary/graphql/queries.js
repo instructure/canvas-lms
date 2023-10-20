@@ -22,17 +22,24 @@ import {AssignmentGroup} from './AssignmentGroup'
 import {Assignment} from './Assignment'
 import {GradingStandard} from './GradingStandard'
 import {GradingPeriod} from './GradingPeriod'
+import {GradingPeriodGroup} from './GradingPeriodGroup'
+import {Submission} from './Submission'
 
 export const ASSIGNMENTS = gql`
-  query GetAssignments($courseID: ID!, $gradingPeriodID: ID) {
+  query GetAssignments($courseID: ID!, $gradingPeriodID: ID, $studentId: ID) {
     legacyNode(_id: $courseID, type: Course) {
       ... on Course {
         id
         name
         applyGroupWeights
-        assignmentsConnection(filter: {gradingPeriodId: $gradingPeriodID}) {
+        assignmentsConnection(filter: {gradingPeriodId: $gradingPeriodID, userId: $studentId}) {
           nodes {
             ...Assignment
+            submissionsConnection(filter: {userId: $studentId, includeUnsubmitted: true}) {
+              nodes {
+                ...Submission
+              }
+            }
           }
         }
         assignmentGroupsConnection {
@@ -48,6 +55,9 @@ export const ASSIGNMENTS = gql`
             ...GradingPeriod
           }
         }
+        relevantGradingPeriodGroup {
+          ...GradingPeriodGroup
+        }
       }
     }
   }
@@ -55,4 +65,6 @@ export const ASSIGNMENTS = gql`
   ${Assignment.fragment}
   ${GradingStandard.fragment}
   ${GradingPeriod.fragment}
+  ${GradingPeriodGroup.fragment}
+  ${Submission.fragment}
 `

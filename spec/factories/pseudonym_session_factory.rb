@@ -39,9 +39,9 @@ module Factories
       # at least one thing cares about the id of the pseudonym... using the
       # object_id should make it unique (but obviously things will fail if
       # it tries to load it from the db.)
-      allow(pseudonym).to receive(:id).and_return(pseudonym.object_id)
-      allow(pseudonym).to receive(:unique_id).and_return("unique_id")
-      allow(pseudonym).to receive(:global_id).and_return(10_000_000_000_001)
+      allow(pseudonym).to receive_messages(id: pseudonym.object_id,
+                                           unique_id: "unique_id",
+                                           global_id: 10_000_000_000_001)
     end
 
     session = double("PseudonymSession",

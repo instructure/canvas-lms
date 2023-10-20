@@ -100,8 +100,8 @@ describe "grading standards" do
 
     get "/courses/#{@course.id}/settings"
     form = f("#course_form")
-    form.find_element(:css, "#course_grading_standard_enabled").click
-    expect(is_checked("#course_form #course_grading_standard_enabled")).to be_truthy
+    form.find_element(:css, "#course_course_grading_standard_enabled").click
+    expect(is_checked("#course_form #course_course_grading_standard_enabled")).to be_truthy
 
     expect(form.find_element(:css, ".edit_letter_grades_link")).to be_displayed
     form.find_element(:css, ".edit_letter_grades_link").click
@@ -135,7 +135,7 @@ describe "grading standards" do
     driver.switch_to.default_content
     expect(dialog).not_to be_displayed
 
-    expect(is_checked("#course_form #course_grading_standard_enabled")).to be_falsey
+    expect(is_checked("#course_form #course_course_grading_standard_enabled")).to be_falsey
   end
 
   it "extends ranges to fractional values at the boundary with the next range", priority: "1" do

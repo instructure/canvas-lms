@@ -81,8 +81,8 @@ describe User do
     allow(@cc1).to receive(:path).and_return("cc1")
     @cc2 = double("CommunicationChannel")
     allow(@cc2).to receive(:path).and_return("cc2")
-    allow(@user).to receive(:communication_channels).and_return([@cc1, @cc2])
-    allow(@user).to receive(:communication_channel).and_return(@cc1)
+    allow(@user).to receive_messages(communication_channels: [@cc1, @cc2],
+                                     communication_channel: @cc1)
     expect(@user.communication_channel).to eql(@cc1)
   end
 
@@ -244,6 +244,54 @@ describe User do
     @enrollment.save!
     @user = User.find(@user.id)
     expect(@user.recent_stream_items.size).to eq 0
+  end
+
+  describe "#adminable_accounts_scope" do
+    specs_require_sharding
+
+    subject { user.adminable_accounts_scope }
+
+    let(:shard_one_account) { @shard1.activate { Account.create!(name: "Shard One Account") } }
+    let(:shard_two_account) { @shard2.activate { Account.create!(name: "Shard Two Account") } }
+    let(:user) { user_model }
+
+    context "when the user has no account users" do
+      before do
+        user.account_users.map(&:destroy)
+        user.clear_adminable_accounts_cache!
+      end
+
+      it "returns an empty scope" do
+        expect(subject).to be_empty
+      end
+    end
+
+    context "when the user has account users on multiple shards" do
+      before do
+        user.associate_with_shard(shard_one_account.shard)
+        user.associate_with_shard(shard_two_account.shard)
+
+        shard_one_account.shard.activate do
+          AccountUser.create!(account: shard_one_account, user:)
+        end
+
+        shard_two_account.shard.activate do
+          AccountUser.create!(account: shard_two_account, user:)
+        end
+      end
+
+      it "returns the adminable accounts on all shards" do
+        expect(subject).to match_array [shard_one_account, shard_two_account]
+      end
+
+      context "and a shard scope is provided" do
+        subject { user.adminable_accounts_scope(shard_scope: [shard_one_account.shard]) }
+
+        it "limits results to the specified shard scope" do
+          expect(subject).to eq [shard_one_account]
+        end
+      end
+    end
   end
 
   describe "#recent_stream_items" do
@@ -772,6 +820,21 @@ describe User do
         @user = sub_sub_admin
         expect(@user).to receive(:account_users).and_return(double(active: [])).once
         2.times { @user.alternate_account_for_course_creation }
+      end
+    end
+  end
+
+  describe "enrollments for course creating" do
+    it "caches the accounts properly" do
+      user_factory
+      course_factory(course_name: "course_factory", active_course: true).enroll_user(@user, "StudentEnrollment", enrollment_state: "active")
+      enable_cache(:redis_cache_store) do
+        expect(Account).to receive(:where).with(id: nil).and_call_original.once # update_account_associations from enrollment deletion
+        expect(Account).to receive(:where).with(id: []).and_call_original.exactly(3).times
+        3.times { @user.course_creating_teacher_enrollment_accounts }
+        3.times { @user.course_creating_student_enrollment_accounts }
+        Enrollment.last.destroy
+        @user.course_creating_student_enrollment_accounts
       end
     end
   end
@@ -3382,9 +3445,9 @@ describe User do
       2.times { @course.assignments.create! }
     end
 
-    it "batches DueDateCacher jobs" do
-      expect(DueDateCacher).not_to receive(:recompute)
-      expect(DueDateCacher).to receive(:recompute_users_for_course).twice # sync_enrollments and destroy_enrollments
+    it "batches SubmissionLifecycleManager jobs" do
+      expect(SubmissionLifecycleManager).not_to receive(:recompute)
+      expect(SubmissionLifecycleManager).to receive(:recompute_users_for_course).twice # sync_enrollments and destroy_enrollments
       test_student = @course.student_view_student
       test_student.destroy
       test_student.reload.enrollments.each { |e| expect(e).to be_deleted }
@@ -4175,7 +4238,7 @@ describe User do
     end
 
     it "returns nil for AccountUsers without :manage_courses" do
-      account_admin_user_with_role_changes(user: @user, role_changes: { manage_courses: false })
+      account_admin_user_with_role_changes(user: @user, role_changes: { manage_courses_add: false })
       expect(@user.create_courses_right(@account)).to be_nil
     end
 
@@ -4390,17 +4453,6 @@ describe User do
         @associated_subaccount.save!
         expect(@user.enabled_account_calendars.pluck(:id)).to contain_exactly(@root_account.id, @associated_subaccount.id)
       end
-
-      it "returns subscribed account calendars only if the feature flag is off" do
-        Account.site_admin.disable_feature!(:auto_subscribe_account_calendars)
-        @root_account.account_calendar_visible = true
-        @root_account.save!
-        @user.set_preference(:enabled_account_calendars, [@root_account.id])
-
-        @associated_subaccount.account_calendar_subscription_type = "auto"
-        @associated_subaccount.save!
-        expect(@user.enabled_account_calendars.pluck(:id)).to contain_exactly(@root_account.id)
-      end
     end
   end
 
@@ -4456,6 +4508,50 @@ describe User do
 
     it "if there are no pseudonyms then the user is not suspended" do
       expect(@user.suspended?).to be_falsey
+    end
+  end
+
+  describe "#adminable_accounts_recursive and #adminable_account_ids_recursive" do
+    let(:root_account) { Account.create!(name: "Root Account") }
+    let(:account) { Account.create!(name: "Account", parent_account: root_account) }
+    let(:sub_account_a) { Account.create!(name: "Account", parent_account: account) }
+    let(:sub_account_b) { Account.create!(name: "Account", parent_account: account) }
+    let(:sub_account_b_1) { Account.create!(name: "Account", parent_account: sub_account_b) }
+    let(:sub_account_a_1) { Account.create!(name: "Account", parent_account: sub_account_a) }
+
+    let(:root_account2) { Account.create!(name: "Root Account 2") }
+    let(:ra2_subaccount) { Account.create!(name: "Account", parent_account: root_account2) }
+
+    let(:user) { User.create! }
+
+    let(:expected_adminable) { [sub_account_b_1, sub_account_a, sub_account_a_1] }
+
+    before do
+      # Create all accounts:
+      sub_account_b_1
+      sub_account_a_1
+      ra2_subaccount
+
+      AccountUser.create!(account: sub_account_b_1, user:)
+      AccountUser.create!(account: sub_account_a, user:)
+      AccountUser.create!(account: ra2_subaccount, user:)
+    end
+
+    describe "#adminable_accounts_recursive" do
+      subject { user.adminable_accounts_recursive(starting_root_account: root_account) }
+
+      it "returns a scope with all subaccounts" do
+        expect(subject).to be_an ActiveRecord::Relation
+        expect(subject.to_a).to contain_exactly(*expected_adminable)
+      end
+    end
+
+    describe "#adminable_accounts_ids_recursive" do
+      subject { user.adminable_account_ids_recursive(starting_root_account: root_account) }
+
+      it "returns all subaccount ids" do
+        expect(subject).to contain_exactly(*expected_adminable.map(&:id))
+      end
     end
   end
 end

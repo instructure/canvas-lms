@@ -34,7 +34,11 @@ module ConditionalRelease
         return render json: { message: "student_id required" }, status: :bad_request
       end
 
-      render json: Stats.student_details(rule, student_id)
+      if rule.trigger_assignment&.assigned_students&.find_by(id: student_id)
+        return render json: Stats.student_details(rule, student_id)
+      end
+
+      render json: { message: "student not assigned to assignment" }, status: :bad_request
     end
 
     private
@@ -44,7 +48,7 @@ module ConditionalRelease
     end
 
     def require_course_grade_view_permissions
-      return render_unauthorized_action unless @context.grants_right?(@current_user, :view_all_grades)
+      authorized_action(@context, @current_user, :view_all_grades)
     end
 
     def require_trigger_assignment

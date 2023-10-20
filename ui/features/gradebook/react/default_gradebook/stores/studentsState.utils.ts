@@ -54,6 +54,7 @@ export const submissionsParams = {
     'attachments',
     'attempt',
     'cached_due_date',
+    'custom_grade_status_id',
     'entered_grade',
     'entered_score',
     'excused',

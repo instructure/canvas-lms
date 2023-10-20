@@ -52,20 +52,6 @@ module Canvas
           @debounced_clear.run(redis, ["flush_debounce"], [30])
         end
       end
-
-      def write_set(hash, ttl: nil)
-        opts = { expires_in: ttl }
-        ms = 1000 * Benchmark.realtime do
-          redis.pipelined do # send more commands before awaiting answer
-            redis.multi do # make everything atomic in here
-              hash.each do |k, v|
-                write(k, v, opts)
-              end
-            end
-          end
-        end
-        Rails.logger.debug("  #{"LOCAL REDIS (%.2fms)" % [ms]}  write_set {#{hash.keys.join(",")}}")
-      end
     end
   end
 end

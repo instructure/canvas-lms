@@ -19,7 +19,7 @@
 
 require_relative "../common"
 require_relative "../helpers/announcements_common"
-require_relative "./pages/announcement_new_edit_page"
+require_relative "pages/announcement_new_edit_page"
 
 describe "announcements" do
   include_context "in-process server selenium tests"
@@ -34,6 +34,20 @@ describe "announcements" do
     before do
       user_session(@teacher)
       stub_rcs_config
+    end
+
+    it "shows the unpublished course warning when course is unpublished" do
+      @course.workflow_state = "unpublished"
+      @course.save!
+      AnnouncementNewEdit.visit_new(@course)
+      expect(fj("div:contains('Notifications will not be sent retroactively for announcements created before publishing your course or before the course start date. You may consider using the Delay Posting option and set to publish on a future date.')")).to be_present
+    end
+
+    # ignore RCE error since it has nothing to do with the test
+    it "shows the no notifications on edit info alert when editing an announcement", :ignore_js_errors do
+      @announcement = @course.announcements.create!(user: @teacher, message: "hello my favorite section!")
+      get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}/edit"
+      expect(fj("div:contains('Users do not receive updated notifications when editing an announcement. If you wish to have users notified of this update via their notification settings, you will need to create a new announcement.')")).to be_present
     end
 
     it "allows saving of section announcement", priority: "1" do
@@ -205,6 +219,16 @@ describe "announcements" do
 
       topic.reload
       expect(topic.delayed_post_at).to be_nil
+    end
+
+    it "changes the save button to publish when delayed_post_at is removed", :ignore_js_errors, priority: "1" do
+      topic = @course.announcements.create!(title: @topic_title, user: @user, delayed_post_at: 10.days.from_now, message: "message")
+
+      get "/courses/#{@course.id}/discussion_topics/#{topic.id}/edit"
+      expect(f(".submit_button").text).to eq("Save")
+
+      f('input[type=checkbox][name="delay_posting"]').click
+      expect(f(".submit_button").text).to eq("Publish")
     end
 
     it "lets a teacher add a new entry to its own announcement", priority: "1" do

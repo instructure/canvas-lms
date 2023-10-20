@@ -21,8 +21,7 @@ module BroadcastPolicies
   describe AssignmentPolicy do
     let(:context) do
       ctx = double
-      allow(ctx).to receive(:available?).and_return(true)
-      allow(ctx).to receive(:concluded?).and_return(false)
+      allow(ctx).to receive_messages(available?: true, concluded?: false)
       ctx
     end
     let(:assignment) do
@@ -54,9 +53,7 @@ module BroadcastPolicies
       end
 
       it "is true when the prior version was unpublished" do
-        allow(assignment).to receive(:just_created).and_return false
-        allow(assignment).to receive(:workflow_state_before_last_save).and_return "unpublished"
-        allow(assignment).to receive(:saved_change_to_workflow_state?).and_return true
+        allow(assignment).to receive_messages(just_created: false, workflow_state_before_last_save: "unpublished", saved_change_to_workflow_state?: true)
         expect(policy.should_dispatch_assignment_created?).to be_truthy
       end
 
@@ -67,9 +64,7 @@ module BroadcastPolicies
 
       specify do
         wont_send_when do
-          allow(assignment).to receive(:just_created).and_return false
-          allow(assignment).to receive(:workflow_state_before_last_save).and_return "published"
-          allow(assignment).to receive(:saved_change_to_workflow_state?).and_return false
+          allow(assignment).to receive_messages(just_created: false, workflow_state_before_last_save: "published", saved_change_to_workflow_state?: false)
         end
       end
 

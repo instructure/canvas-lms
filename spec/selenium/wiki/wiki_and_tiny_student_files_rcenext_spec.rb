@@ -21,7 +21,7 @@ require_relative "../helpers/wiki_and_tiny_common"
 require_relative "../rcs/pages/rcs_sidebar_page"
 require_relative "../rcs/pages/rce_next_page"
 
-describe "Wiki pages and Tiny WYSIWYG editor Files", ignore_js_errors: true do
+describe "Wiki pages and Tiny WYSIWYG editor Files", :ignore_js_errors do
   include_context "in-process server selenium tests"
   include WikiAndTinyCommon
   include RCSSidebarPage

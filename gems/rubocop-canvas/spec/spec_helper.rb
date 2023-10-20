@@ -20,7 +20,7 @@
 require "rubocop"
 require "rubocop/rspec/support"
 require "rubocop_canvas"
-require "byebug"
+require "debug"
 
 RSpec.configure do |config|
   config.order = :random

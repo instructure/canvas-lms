@@ -18,9 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "barby"
-require "barby/barcode/qr_code"
-require "barby/outputter/png_outputter"
+require "rqrcode"
 require "rotp"
 
 class Login::OtpController < ApplicationController
@@ -78,7 +76,7 @@ class Login::OtpController < ApplicationController
     # of a maxed out bucket.
     increment_request_cost(150)
 
-    verification_code = params[:otp_login][:verification_code]
+    verification_code = params[:otp_login][:verification_code].delete(" ")
     if Canvas.redis_enabled?
       key = "otp_used:#{@current_user.global_id}:#{verification_code}"
       if Canvas.redis.get(key)
@@ -149,7 +147,11 @@ class Login::OtpController < ApplicationController
 
   def send_otp(cc = nil)
     cc ||= @current_user.otp_communication_channel
-    cc&.send_otp!(ROTP::TOTP.new(secret_key).now, @domain_root_account)
+    key = ROTP::TOTP.new(secret_key).now
+    cc&.send_otp!(key, @domain_root_account)
+    if cc&.otp_impaired?
+      @current_user.email_channel&.send_otp!(key, @domain_root_account)
+    end
   end
 
   def secret_key

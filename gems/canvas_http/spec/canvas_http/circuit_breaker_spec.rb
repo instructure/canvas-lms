@@ -48,7 +48,7 @@ describe CanvasHttp::CircuitBreaker do
       end
 
       # Fake redis methods
-      def get(key)
+      def get(key, **)
         @state[key]
       end
 
@@ -67,6 +67,10 @@ describe CanvasHttp::CircuitBreaker do
 
       def expire(key, ttl)
         @timeouts[key] = ttl
+      end
+
+      def pipelined
+        [(yield self)]
       end
     end
   end

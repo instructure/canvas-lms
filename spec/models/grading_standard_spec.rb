@@ -278,6 +278,22 @@ describe GradingStandard do
       decimal_part = score.to_s.split(".")[1]
       expect(decimal_part.length).to be <= 3
     end
+
+    context "points-based scheme" do
+      before do
+        @gs = GradingStandard.new(context: @course)
+        @gs.data = [["Exceeds Mastery", 0.75], ["Mastery", 0.5], ["Near Mastery", 0.25], ["Below Mastery", 0]]
+        @gs.points_based = true
+        @gs.scaling_factor = 4.0
+        @gs.save!
+      end
+
+      it "returns a score that is 0.1 less than the next upper bound" do
+        score = @gs.grade_to_score("Near Mastery")
+        expect(score).to eq 47.5
+        expect(score / (100 / @gs.scaling_factor)).to eq 1.9
+      end
+    end
   end
 
   context "place in scheme" do
@@ -295,6 +311,49 @@ describe GradingStandard do
                    "1.0" => 0.64,
                    "0" => 0.01,
                    "M" => 0.0 }
+    end
+
+    let(:en_dash) { "-" }
+    let(:minus) { "−" }
+
+    it "matches trailing en-dash to trailing en-dash" do
+      @gs.data = {
+        "A" => 0.94,
+        "A#{en_dash}" => 0.90,
+        "B" => 0.88
+      }
+      idx = @gs.place_in_scheme("A#{en_dash}")
+      expect(idx).to eq 1
+    end
+
+    it "matches trailing minus to trailing en-dash" do
+      @gs.data = {
+        "A" => 0.94,
+        "A#{en_dash}" => 0.90,
+        "B" => 0.88
+      }
+      idx = @gs.place_in_scheme("A#{minus}")
+      expect(idx).to eq 1
+    end
+
+    it "does not match minus (with no preceding character) to en-dash" do
+      @gs.data = {
+        "A" => 0.94,
+        en_dash => 0.90,
+        "B" => 0.88
+      }
+      idx = @gs.place_in_scheme(minus)
+      expect(idx).to be_nil
+    end
+
+    it "does not match non-trailing minus to non-trailing en-dash" do
+      @gs.data = {
+        "A" => 0.94,
+        "A#{en_dash}B" => 0.90,
+        "B" => 0.88
+      }
+      idx = @gs.place_in_scheme("A#{minus}B")
+      expect(idx).to be_nil
     end
 
     it "matches alphabetical keys regardless of case" do
@@ -524,6 +583,24 @@ describe GradingStandard do
       it "is set to the account's root account ID if the account is not a root account" do
         grading_standard = root_account.grading_standards.create!(workflow_state: "active", data:)
         expect(grading_standard.root_account_id).to eq root_account.id
+      end
+    end
+  end
+
+  describe "accounts" do
+    let_once(:root_account) { Account.create! }
+    let_once(:subaccount) { Account.create(root_account:) }
+    let_once(:course) { Course.create!(account: root_account) }
+
+    let_once(:data) { [["A", 94], ["F", 0]] }
+
+    context "when deleted" do
+      it "removes association on account" do
+        grading_standard = GradingStandard.new(context: subaccount, workflow_state: "active", data:)
+        subaccount.grading_standard = grading_standard
+        subaccount.save!
+
+        expect { grading_standard.destroy }.to change { subaccount.reload.grading_standard_id }.from(grading_standard.id).to(nil)
       end
     end
   end

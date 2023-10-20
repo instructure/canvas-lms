@@ -144,7 +144,14 @@ describe "oauth2 flow" do
 
       it "shows a data residency message" do
         get "/login/oauth2/auth?response_type=code&client_id=#{@client_id}&redirect_uri=http%3A%2F%2Fwww.example.com&scopes=url%3AGET%7C%2Fapi%2Fv1%2Faccounts"
-        expect(f("#content")).to include_text("Instructure hosts Canvas Commons in the USA")
+        expect(f("#content")).to include_text("Instructure hosts Canvas Commons in the region chosen by your institution, which is the US")
+      end
+
+      it "shows a regional data residency message" do
+        @key.update!(redirect_uri: "http://commons.singapore.canvaslms.com")
+        get "/login/oauth2/auth?response_type=code&client_id=#{@client_id}&redirect_uri=http%3A%2F%2Fcommons.singapore.canvaslms.com&scopes=url%3AGET%7C%2Fapi%2Fv1%2Faccounts"
+        expect(f("#content")).to include_text("Instructure hosts Canvas Commons in the region chosen by your institution, which is Asia Pacific")
+        @key.update!(redirect_uri: "http://www.example.com")
       end
     end
 
@@ -155,7 +162,7 @@ describe "oauth2 flow" do
 
       it "does not show a data residency message" do
         get "/login/oauth2/auth?response_type=code&client_id=#{@client_id}&redirect_uri=http%3A%2F%2Fwww.example.com&scopes=url%3AGET%7C%2Fapi%2Fv1%2Faccounts"
-        expect(f("#content")).to_not include_text("Instructure hosts Canvas Commons in the USA")
+        expect(f("#content")).to_not include_text("Instructure hosts Canvas Commons in the region chosen by your institution")
       end
     end
   end

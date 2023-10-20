@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "../../helpers/k5_common"
-require_relative "./pages/course_index_page"
+require_relative "pages/course_index_page"
 
 describe "course index" do
   include_context "in-process server selenium tests"

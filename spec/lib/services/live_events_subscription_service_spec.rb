@@ -23,11 +23,9 @@ module Services
   describe LiveEventsSubscriptionService do
     include WebMock::API
 
-    around { |example| Setting.skip_cache(&example) }
-
     context "service unavailable" do
       before do
-        allow(DynamicSettings).to receive(:find).with(any_args).and_call_original
+        allow(DynamicSettings).to receive(:find).and_call_original
         allow(DynamicSettings).to receive(:find)
           .with("live-events-subscription-service", default_ttl: 5.minutes)
           .and_return(nil)
@@ -42,6 +40,7 @@ module Services
 
     context "service available" do
       before do
+        allow(DynamicSettings).to receive(:find).and_call_original
         allow(DynamicSettings).to receive(:find)
           .with("live-events-subscription-service", default_ttl: 5.minutes)
           .and_return({
@@ -67,8 +66,7 @@ module Services
 
       let(:root_account_context) do
         root_account = double
-        allow(root_account).to receive(:global_root_account_id).and_return(nil)
-        allow(root_account).to receive(:global_id).and_return(10_000_000_000_004)
+        allow(root_account).to receive_messages(global_root_account_id: nil, global_id: 10_000_000_000_004)
         root_account
       end
 
@@ -86,9 +84,7 @@ module Services
 
       let(:tool_proxy) do
         tool_proxy = double
-        allow(tool_proxy).to receive(:id).and_return("1")
-        allow(tool_proxy).to receive(:guid).and_return("151b52cd-d670-49fb-bf65-6a327e3aaca0")
-        allow(tool_proxy).to receive(:product_family).and_return(product_family)
+        allow(tool_proxy).to receive_messages(id: "1", guid: "151b52cd-d670-49fb-bf65-6a327e3aaca0", product_family:)
         tool_proxy
       end
 

@@ -20,7 +20,7 @@
 module Canvas::LiveEvents
   def self.post_event_stringified(event_name, payload, context = nil)
     ctx = LiveEvents.get_context || {}
-    payload.compact! if ctx[:compact_live_events]&.present?
+    payload.compact! if ctx[:compact_live_events].present?
 
     StringifyIds.recursively_stringify_ids(payload)
     StringifyIds.recursively_stringify_ids(context)
@@ -238,32 +238,34 @@ module Canvas::LiveEvents
       assignment.migration_id&.start_with?(MasterCourses::MIGRATION_ID_PREFIX)
 
     event = {
+      anonymous_grading: assignment.anonymous_grading,
+      assignment_group_id: assignment.global_assignment_group_id,
       assignment_id: assignment.global_id,
       assignment_id_duplicated_from: assignment.duplicate_of&.global_id&.to_s,
       context_id: assignment.global_context_id,
-      context_uuid: assignment.context.uuid,
       context_type: assignment.context_type,
-      assignment_group_id: assignment.global_assignment_group_id,
-      workflow_state: assignment.workflow_state,
-      title: LiveEvents.truncate(assignment.title),
+      context_uuid: assignment.context.uuid,
+      created_on_blueprint_sync: created_on_blueprint_sync || false,
       description: LiveEvents.truncate(assignment.description),
       due_at: assignment.due_at,
-      unlock_at: assignment.unlock_at,
-      lock_at: assignment.lock_at,
-      updated_at: assignment.updated_at,
-      points_possible: assignment.points_possible,
-      lti_assignment_id: assignment.lti_context_id,
       lti_assignment_description: LiveEvents.truncate(assignment.description),
+      lti_assignment_id: assignment.lti_context_id,
       lti_resource_link_id: assignment.lti_resource_link_id,
       lti_resource_link_id_duplicated_from: assignment.duplicate_of&.lti_resource_link_id,
+      lock_at: assignment.lock_at,
+      points_possible: assignment.points_possible,
+      resource_map: assignment.resource_map,
       submission_types: assignment.submission_types,
-      created_on_blueprint_sync: created_on_blueprint_sync || false,
-      resource_map: assignment.resource_map
+      title: LiveEvents.truncate(assignment.title),
+      unlock_at: assignment.unlock_at,
+      updated_at: assignment.updated_at,
+      workflow_state: assignment.workflow_state
     }
+
     actl = assignment.assignment_configuration_tool_lookups.take
-    domain = assignment.root_account&.domain(ApplicationController.test_cluster_name)
+    domain = assignment.root_account&.environment_specific_domain
     event[:domain] = domain if domain
-    original_domain = assignment.duplicate_of&.root_account&.domain(ApplicationController.test_cluster_name)
+    original_domain = assignment.duplicate_of&.root_account&.environment_specific_domain
     event[:domain_duplicated_from] = original_domain if original_domain
     if actl && (tool_proxy = Lti::ToolProxy.proxies_in_order_by_codes(
       context: assignment.course,
@@ -682,7 +684,9 @@ module Canvas::LiveEvents
     context = content_migration.context
     import_quizzes_next =
       content_migration.migration_settings&.[](:import_quizzes_next) == true
-    need_resource_map = content_migration.source_course&.has_new_quizzes?
+    link_migration_during_import = import_quizzes_next && content_migration.asset_map_v2?
+    need_resource_map = content_migration.source_course&.has_new_quizzes? || link_migration_during_import
+
     payload = {
       content_migration_id: content_migration.global_id,
       context_id: context.global_id,
@@ -828,6 +832,18 @@ module Canvas::LiveEvents
     post_event_stringified("learning_outcome_result_created", get_learning_outcome_result_data(result))
   end
 
+  # Since outcome service canvas learning_outcome global id record won't match outcomes service shard
+  # we are also sending the root_account_uuid for the original outcome, however we only send the uuid
+  # if the record is from another shard otherwise we send nil to indicate the id is for the current shard
+  def self.get_root_account_uuid(copied_from_outcome_id)
+    _, shard = Shard.local_id_for(copied_from_outcome_id)
+    return if shard.nil?
+
+    original_outcome = LearningOutcome.find(copied_from_outcome_id)
+
+    original_outcome&.context&.root_account&.uuid
+  end
+
   def self.get_learning_outcome_data(outcome)
     {
       learning_outcome_id: outcome.id,
@@ -842,7 +858,9 @@ module Canvas::LiveEvents
       calculation_int: outcome.calculation_int,
       rubric_criterion: outcome.rubric_criterion,
       title: outcome.title,
-      workflow_state: outcome.workflow_state
+      workflow_state: outcome.workflow_state,
+      copied_from_outcome_id: Shard.local_id_for(outcome.copied_from_outcome_id)&.first,
+      original_outcome_root_account_uuid: get_root_account_uuid(outcome.copied_from_outcome_id)
     }
   end
 

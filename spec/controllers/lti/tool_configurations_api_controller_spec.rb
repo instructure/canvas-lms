@@ -192,8 +192,7 @@ RSpec.describe Lti::ToolConfigurationsApiController do
 
       context 'when the response is "not found"' do
         before do
-          allow(stubbed_response).to receive(:message).and_return("Not found")
-          allow(stubbed_response).to receive(:code).and_return("404")
+          allow(stubbed_response).to receive_messages(message: "Not found", code: "404")
           make_request
         end
 
@@ -202,8 +201,7 @@ RSpec.describe Lti::ToolConfigurationsApiController do
 
       context 'when the response is "unauthorized"' do
         before do
-          allow(stubbed_response).to receive(:message).and_return("Unauthorized")
-          allow(stubbed_response).to receive(:code).and_return("401")
+          allow(stubbed_response).to receive_messages(message: "Unauthorized", code: "401")
           make_request
         end
 
@@ -212,8 +210,7 @@ RSpec.describe Lti::ToolConfigurationsApiController do
 
       context 'when the response is "internal server error"' do
         before do
-          allow(stubbed_response).to receive(:message).and_return("Internal server error")
-          allow(stubbed_response).to receive(:code).and_return("500")
+          allow(stubbed_response).to receive_messages(message: "Internal server error", code: "500")
           make_request
         end
 

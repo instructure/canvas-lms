@@ -50,11 +50,7 @@ type ComponentProps = {
   readonly subscriptionChanges: SubscriptionChange[]
   readonly onAccountToggled: (id: number, visible: boolean) => void
   readonly onAccountSubscriptionToggled: (id: number, autoSubscription: boolean) => void
-  readonly autoSubscriptionEnabled: boolean
 }
-
-// Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
-const {Item: FlexItem} = Flex as any
 
 export const AccountList = ({
   originAccountId,
@@ -63,7 +59,6 @@ export const AccountList = ({
   visibilityChanges,
   subscriptionChanges,
   onAccountToggled,
-  autoSubscriptionEnabled,
   onAccountSubscriptionToggled,
 }: ComponentProps) => {
   const [accounts, setAccounts] = useState<Account[]>([])
@@ -116,17 +111,17 @@ export const AccountList = ({
   if (accounts.length === 0) {
     return (
       <Flex direction="column" alignItems="center" justifyItems="center" padding="xx-large medium">
-        <FlexItem data-testid="empty-account-search" margin="0 0 medium">
+        <Flex.Item data-testid="empty-account-search" margin="0 0 medium">
           <Img src={SpacePandaUrl} />
-        </FlexItem>
-        <FlexItem>
+        </Flex.Item>
+        <Flex.Item>
           <Text size="x-large">{I18n.t('No results found')}</Text>
-        </FlexItem>
-        <FlexItem>
+        </Flex.Item>
+        <Flex.Item>
           <Text>
             {I18n.t('Please try another search term, filter, or search with fewer characters')}
           </Text>
-        </FlexItem>
+        </Flex.Item>
       </Flex>
     )
   }
@@ -143,7 +138,6 @@ export const AccountList = ({
           onAccountSubscriptionToggled={onAccountSubscriptionToggled}
           padding="medium"
           showTopSeparator={index > 0}
-          autoSubscriptionEnabled={autoSubscriptionEnabled}
         />
       ))}
     </>

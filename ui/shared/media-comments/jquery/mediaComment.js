@@ -24,6 +24,7 @@ import MediaElementKeyActionHandler from './MediaElementKeyActionHandler'
 import $ from 'jquery'
 import htmlEscape from 'html-escape'
 import sanitizeUrl from '@canvas/util/sanitizeUrl'
+import {contentMapping} from '@instructure/canvas-rce/src/common/mimeClass'
 
 const I18n = useI18nScope('jquery_media_comments')
 
@@ -76,9 +77,13 @@ $.extend(mejs.MediaElementDefaults, {
 })
 
 mejs.MepDefaults.success = function (mediaElement, _domObject) {
-  import('./kalturaAnalytics').then(({default: kalturaAnalytics}) => {
-    kalturaAnalytics(this.mediaCommentId, mediaElement, INST.kalturaSettings)
-  })
+  import('./kalturaAnalytics')
+    .then(({default: kalturaAnalytics}) => {
+      kalturaAnalytics(this.mediaCommentId, mediaElement, INST.kalturaSettings)
+    })
+    .catch(error => {
+      console.log('Error importing kalturaAnalytics:', error) // eslint-disable-line no-console
+    })
   return mediaElement.play()
 }
 
@@ -90,9 +95,10 @@ mejs.MepDefaults.features.splice(positionAfterSubtitleSelector, 0, 'sourcechoose
 // enable the playback speed selector
 mejs.MepDefaults.features.splice(positionAfterSubtitleSelector, 0, 'speed')
 
-function getSourcesAndTracks(id) {
+export function getSourcesAndTracks(id, attachmentId) {
   const dfd = new $.Deferred()
-  $.getJSON(`/media_objects/${id}/info`, data => {
+  const api = attachmentId ? 'media_attachments' : 'media_objects'
+  $.getJSON(`/${api}/${attachmentId || id}/info`, data => {
     // this 'when ...' is because right now in canvas, none of the mp3 urls actually work.
     // see: CNVS-12998
     const sources = data.media_sources
@@ -116,7 +122,8 @@ function getSourcesAndTracks(id) {
       const languageName = mejs.language.codes[track.locale] || track.locale
       return `<track kind='${htmlEscape(track.kind)}' label='${htmlEscape(
         languageName
-      )}' src='${htmlEscape(track.url)}' srclang='${htmlEscape(track.locale)}' />`
+      )}' src='${htmlEscape(track.url)}' srclang='${htmlEscape(track.locale)}'
+      data-inherited-track='${htmlEscape(track.inherited)}' />`
     })
 
     const types = _.map(data.media_sources, source => source.content_type)
@@ -188,14 +195,14 @@ const mediaCommentActions = {
     const $holder = $(this).closest('.instructure_file_link_holder').andSelf().first()
     $holder.text(I18n.t('loading', 'Loading media...'))
 
-    const showInline = function (id, holder) {
+    const showInline = function (mediaCommentId, holder) {
       const width = Math.min(holder.closest('div,p,table').width() || VIDEO_WIDTH, VIDEO_WIDTH)
       const height = Math.round((width / 336) * 240)
-      return getSourcesAndTracks(id).done(sourcesAndTracks => {
+      return getSourcesAndTracks(mediaCommentId, attachmentId).done(sourcesAndTracks => {
         if (sourcesAndTracks.sources.length) {
           const mediaPlayerOptions = {
             can_add_captions: sourcesAndTracks.can_add_captions,
-            mediaCommentId: id,
+            mediaCommentId,
             attachmentId,
             lockedMediaAttachment,
             menuTimeoutMouseLeave: 50,
@@ -218,6 +225,8 @@ const mediaCommentActions = {
               },
             ],
           }
+
+          mediaType = contentMapping(mediaType)
 
           const $mediaTag = createMediaTag({
             sourcesAndTracks,
@@ -263,6 +272,8 @@ const mediaCommentActions = {
   show(id, mediaType = 'video', openingElement = null) {
     // if a media comment is still open, close it.
     $('.play_media_comment').find('.ui-dialog-titlebar-close').click()
+
+    mediaType = contentMapping(mediaType)
 
     const $this = $(this)
 
@@ -345,7 +356,7 @@ const mediaCommentActions = {
 
 $.fn.mediaComment = function (command, ...restArgs) {
   if (!INST.kalturaSettings) {
-    return console.log('Kaltura has not been enabled for this account')
+    return console.log('Kaltura has not been enabled for this account') // eslint-disable-line no-console
   } else {
     mediaCommentActions[command].apply(this, restArgs)
   }

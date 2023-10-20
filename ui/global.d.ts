@@ -54,6 +54,10 @@ declare global {
     jsonData: any
     messageStudents: (options: ReturnType<typeof sendMessageStudentsWho>) => void
     updateGrades: () => void
+
+    bundles: Array<() => void>
+    deferredBundles: Array<() => void>
+    canvasReadyState?: 'loading' | 'complete'
   }
 
   /**
@@ -79,13 +83,10 @@ declare global {
 
   declare interface JQuery {
     scrollTo: (y: number, x?: number) => void
-    capitalize: (str: string) => string
     change: any
     confirmDelete: any
     datetime_field: () => JQuery<HTMLInputElement>
-    decodeFromHex: (str: string) => string
     disableWhileLoading: any
-    encodeToHex: (str: string) => string
     fileSize: (size: number) => string
     fillTemplateData: any
     fillWindowWithMe: (options?: {onResize: () => void}) => JQuery<HTMLElement>
@@ -108,12 +109,9 @@ declare global {
     }) => void
     mediaComment: any
     mediaCommentThumbnail: (size?: 'normal' | 'small') => void
-    queryParam: (name: string) => string
     raw: (str: string) => string
     showIf: ShowIf
-    titleize: (str: string) => string
     underscore: (str: string) => string
-    youTubeID: (path: string) => string
   }
 
   declare interface JQueryStatic {

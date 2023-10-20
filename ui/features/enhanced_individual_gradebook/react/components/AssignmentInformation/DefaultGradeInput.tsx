@@ -58,19 +58,24 @@ export default function DefaultGradeInput({disabled, gradingType, onGradeInputCh
     <>
       {showInputType() === 'text' ? (
         <TextInput
+          data-testid="default-grade-input"
           renderLabel={<ScreenReaderContent>{I18n.t('Default Grade')}</ScreenReaderContent>}
           display="inline-block"
           width="4rem"
           value={textInput}
           disabled={disabled}
-          onChange={e => setTextInput(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTextInput(e.target.value)}
         />
       ) : (
         <SimpleSelect
           value={selectInput}
           defaultValue={selectInput}
           renderLabel="Uncontrolled Select"
-          onChange={(e, {value}) => setSelectInput(value)}
+          onChange={(e, {value}) => {
+            if (typeof value === 'string') {
+              setSelectInput(value)
+            }
+          }}
         >
           <SimpleSelectOption id="emptyOption" value="">
             ---

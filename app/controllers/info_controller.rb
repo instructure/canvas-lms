@@ -28,7 +28,7 @@ class InfoController < ApplicationController
   end
 
   def message_redirect
-    m = AssetSignature.find_by(Message, params[:id])
+    m = AssetSignature.find_by_signature(Message, params[:id])
     if m&.url
       redirect_to m.url
     else

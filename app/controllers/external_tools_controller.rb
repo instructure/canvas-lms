@@ -166,7 +166,14 @@ class ExternalToolsController < ApplicationController
 
   def retrieve
     track_time_with_lti_version "lti.retrieve.request_time" do |timing_meta|
-      tool, url = find_tool_and_url(resource_link_lookup_uuid, params[:url], @context, params[:client_id], params[:resource_link_id])
+      tool, url = find_tool_and_url(
+        resource_link_lookup_uuid,
+        params[:url],
+        @context,
+        params[:client_id],
+        params[:resource_link_id],
+        prefer_1_1: !!params[:prefer_1_1]
+      )
       @tool = tool
       placement = placement_from_params
       add_crumb(@tool.name)
@@ -195,7 +202,7 @@ class ExternalToolsController < ApplicationController
   # Finds a tool for a given resource_link_id or url in a context
   # Prefers the resource_link_id, but defaults to the provided_url,
   #   if the resource_link does not provide a url
-  def find_tool_and_url(lookup_id, provided_url, context, client_id, resource_link_id = nil)
+  def find_tool_and_url(lookup_id, provided_url, context, client_id, resource_link_id = nil, prefer_1_1: false)
     resource_link = if resource_link_id
                       Lti::ResourceLink.where(
                         resource_link_uuid: resource_link_id,
@@ -209,7 +216,7 @@ class ExternalToolsController < ApplicationController
                     end
     if resource_link.nil? || resource_link.url.nil?
       # If the resource_link doesn't have a url, then use the provided url to look up the tool
-      tool = ContextExternalTool.find_external_tool(provided_url, context, nil, nil, client_id)
+      tool = ContextExternalTool.find_external_tool(provided_url, context, nil, nil, client_id, prefer_1_1:)
       unless tool
         invalid_settings_error
       end
@@ -647,11 +654,20 @@ class ExternalToolsController < ApplicationController
     # Verify the resource link was intended for the domain it's being
     # launched from
     if params[:url] && !resource_link&.current_external_tool(@context)
-      &.matches_host?(params[:url])
+                                     &.matches_host?(params[:url])
       nil
     else
       resource_link
     end
+  end
+
+  def assignment_from_assignment_id
+    return nil unless params[:assignment_id].present?
+
+    assignment = api_find(@context.assignments.active, params[:assignment_id])
+    raise Lti::Errors::UnauthorizedError unless assignment.grants_right?(@current_user, :read)
+
+    assignment
   end
 
   # This handles non-content item 1.1 launches, and 1.3 launches including deep linking requests.
@@ -669,15 +685,19 @@ class ExternalToolsController < ApplicationController
     opts = default_opts.merge(opts)
     opts[:launch_url] = tool.url_with_environment_overrides(opts[:launch_url])
 
-    assignment = api_find(@context.assignments.active, params[:assignment_id]) if params[:assignment_id]
+    assignment = assignment_from_assignment_id
 
     if assignment.present? && @current_user.present?
       assignment = AssignmentOverrideApplicator.assignment_overridden_for(assignment, @current_user)
     end
 
-    # from specs, seems this is only a fix for Quizzes Next
-    # resource_link_id in regular QN launches is assignment.lti_resource_link_id
-    opts[:link_code] = @tool.opaque_identifier_for(assignment.external_tool_tag) if assignment.present? && assignment.quiz_lti?
+    if assignment.present? && ((@current_user && assignment.quiz_lti?) || assignment.root_account.feature_enabled?(:lti_resource_link_id_speedgrader_launches_reference_assignment))
+      # Set assignment LTI launch parameters for this code path (e.g. launches
+      # from Speedgrader)
+      opts[:link_code] = @tool.opaque_identifier_for(assignment.external_tool_tag)
+      opts[:overrides] ||= {}
+      opts[:overrides]["resource_link_title"] = assignment.title
+    end
 
     # This is only for 1.3: editing collaborations for 1.1 goes thru content_item_selection_request()
     if selection_type == "collaboration"
@@ -807,7 +827,7 @@ class ExternalToolsController < ApplicationController
                                                              tool:,
                                                              secure_params: params[:secure_params])
 
-    assignment = api_find(@context.assignments.active, params[:assignment_id]) if params[:assignment_id].present?
+    assignment = assignment_from_assignment_id
 
     opts = {
       post_only: @tool.settings["post_only"].present?,
@@ -1462,11 +1482,7 @@ class ExternalToolsController < ApplicationController
     elsif launch_url && module_item.blank?
       @tool = ContextExternalTool.find_external_tool(launch_url, @context, tool_id)
     elsif module_item
-      @tool = ContextExternalTool.find_external_tool(
-        module_item.url,
-        @context,
-        module_item.content_id
-      )
+      @tool = ContextExternalTool.from_content_tag(module_item, @context)
     else
       return unless find_tool(tool_id, launch_type)
     end

@@ -17,7 +17,6 @@
 %>
 
 <%
-  add_body_class 'hide-content-while-scripts-not-loaded right-side-optional'
   provide :page_title, join_title(t('#titles.announcements', "Announcements"), @context.name)
   feed_code = @context_enrollment.try(:feed_code) || (@context.available? && @context.feed_code)
 %>

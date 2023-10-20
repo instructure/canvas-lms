@@ -617,6 +617,30 @@ describe FilesController do
         expect(@module.evaluate_for(@student).state).to be(:completed)
       end
 
+      it "marks previewable files as viewed when rendering html with file_preview" do
+        odp = attachment_model(context: @course, uploaded_data: stub_file_data("test.odp", "asdf", "application/vnd.oasis.opendocument.presentation"))
+        odt = attachment_model(context: @course, uploaded_data: stub_file_data("test.odt", "asdf", "application/vnd.oasis.opendocument.text"))
+        docx = attachment_model(context: @course, uploaded_data: stub_file_data("test.docx", "asdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
+        pptx = attachment_model(context: @course, uploaded_data: stub_file_data("test.pptx", "asdf", "application/vnd.openxmlformats-officedocument.presentationml.presentation"))
+        pdf = attachment_model(context: @course, uploaded_data: stub_file_data("test.pdf", "asdf", "application/pdf"))
+        rft = attachment_model(context: @course, uploaded_data: stub_file_data("test.rft", "asdf", "application/rtf"))
+        [odp, odt, docx, pptx, pdf, rft].each do |file|
+          @file = file
+          file_in_a_module
+          get "show", params: { course_id: @course.id, id: @file.id }, format: :html
+          @module.reload
+          expect(@module.evaluate_for(@student).state).to be(:completed)
+        end
+      end
+
+      it "does not mark as viewed not previewable files" do
+        @file = attachment_model(context: @course, uploaded_data: stub_file_data("test", "asdf", "application/unknown"))
+        file_in_a_module
+        get "show", params: { course_id: @course.id, id: @file.id }, format: :html
+        @module.reload
+        expect(@module.evaluate_for(@student).state).to be(:unlocked)
+      end
+
       it "redirects to the user's files URL when browsing to an attachment with the same path as a deleted attachment" do
         owned_file = course_file
         owned_file.display_name = "holla"
@@ -1494,8 +1518,7 @@ describe FilesController do
 
   describe "POST api_capture" do
     before do
-      allow(InstFS).to receive(:enabled?).and_return(true)
-      allow(InstFS).to receive(:jwt_secrets).and_return(["jwt signing key"])
+      allow(InstFS).to receive_messages(enabled?: true, jwt_secrets: ["jwt signing key"])
       @token = Canvas::Security.create_jwt({}, nil, InstFS.jwt_secret)
     end
 
@@ -1717,6 +1740,40 @@ describe FilesController do
             request
 
             expect(progress.reload.workflow_state).to eq "failed"
+          end
+        end
+      end
+
+      context "with precreated attachment" do
+        let(:attachment) do
+          folder.attachments.create!(
+            context: course,
+            user:,
+            file_state: "deleted"
+          )
+        end
+
+        let(:params) do
+          super().merge(
+            precreated_attachment_id: attachment.id
+          )
+        end
+
+        it "marks attachment available" do
+          post("api_capture", params:)
+          expect(attachment.reload.file_state).to eq "available"
+        end
+
+        context "when id is wrong" do
+          let(:params) do
+            super().merge(
+              precreated_attachment_id: attachment.id + 42
+            )
+          end
+
+          it "returns an error" do
+            post("api_capture", params:)
+            assert_status(422)
           end
         end
       end

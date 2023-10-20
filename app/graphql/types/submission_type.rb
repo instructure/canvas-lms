@@ -49,6 +49,13 @@ module Types
 
     global_id_field :id
 
+    field :cached_due_date, DateTimeType, null: true
+
+    field :custom_grade_status, String, null: true
+    def custom_grade_status
+      CustomGradeStatus.find(object.custom_grade_status_id).name if object.custom_grade_status_id
+    end
+
     field :read_state, String, null: true
     def read_state
       object.read_state(current_user)
@@ -60,6 +67,8 @@ module Types
     end
 
     field :grading_period_id, ID, null: true
+
+    field :student_entered_score, Float, null: true
 
     field :redo_request, Boolean, null: true
 

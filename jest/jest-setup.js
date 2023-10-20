@@ -19,9 +19,8 @@
 import CoreTranslations from '../public/javascripts/translations/en.json'
 import Enzyme from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
-import {filterUselessConsoleMessages} from '@instructure/js-utils'
-import rceFormatMessage from '@instructure/canvas-rce/lib/format-message'
-import plannerFormatMessage from '@instructure/canvas-planner/lib/format-message'
+import filterUselessConsoleMessages from '@instructure/filter-console-messages'
+import rceFormatMessage from '@instructure/canvas-rce/es/format-message'
 import {up as configureDateTime} from '../ui/boot/initializers/configureDateTime'
 import {up as configureDateTimeMomentParser} from '../ui/boot/initializers/configureDateTimeMomentParser'
 import {useTranslations} from '@canvas/i18n'
@@ -29,11 +28,6 @@ import {useTranslations} from '@canvas/i18n'
 useTranslations('en', CoreTranslations)
 
 rceFormatMessage.setup({
-  locale: 'en',
-  missingTranslation: 'ignore',
-})
-
-plannerFormatMessage.setup({
   locale: 'en',
   missingTranslation: 'ignore',
 })
@@ -47,10 +41,8 @@ plannerFormatMessage.setup({
 /* eslint-disable no-console */
 const globalError = global.console.error
 const ignoredErrors = [
-  /\[object Object\]/,
   /An update to %s inside a test was not wrapped in act/,
   /Can't perform a React state update on an unmounted component/,
-  /contextType was defined as an instance property on %s/,
   /Function components cannot be given refs/,
   /Invalid prop `children` supplied to `(Option)`/,
   /Invalid prop `heading` of type `object` supplied to `Billboard`/, // https://instructure.atlassian.net/browse/QUIZ-8870
@@ -201,6 +193,8 @@ if (!('matchMedia' in window)) {
   window.matchMedia._mocked = true
 }
 
+global.DataTransferItem = global.DataTransferItem || class DataTransferItem {}
+
 if (!('scrollIntoView' in window.HTMLElement.prototype)) {
   window.HTMLElement.prototype.scrollIntoView = () => {}
 }
@@ -240,3 +234,30 @@ if (!('structuredClone' in window)) {
     value: obj => JSON.parse(JSON.stringify(obj)),
   })
 }
+
+if (typeof window.URL.createObjectURL === 'undefined') {
+  Object.defineProperty(window.URL, 'createObjectURL', {value: () => 'http://example.com/whatever'})
+}
+
+if (typeof window.URL.revokeObjectURL === 'undefined') {
+  Object.defineProperty(window.URL, 'revokeObjectURL', {value: () => undefined})
+}
+
+Document.prototype.createRange =
+  Document.prototype.createRange ||
+  function () {
+    return {
+      setEnd() {},
+      setStart() {},
+      getBoundingClientRect() {
+        return {right: 0}
+      },
+      getClientRects() {
+        return {
+          length: 0,
+          left: 0,
+          right: 0,
+        }
+      },
+    }
+  }

@@ -67,6 +67,7 @@ import 'jqueryui/sortable'
 import 'jqueryui/tabs'
 import AssignmentExternalTools from '@canvas/assignments/react/AssignmentExternalTools'
 import {underscoreString} from '@canvas/convert-case'
+import replaceTags from '@canvas/util/replaceTags'
 
 const I18n = useI18nScope('quizzes_public')
 
@@ -3409,7 +3410,7 @@ ready(function () {
       const $bank = $findQuestionDialog.find('.bank.selected_side_tab')
       const bank = $bank.data('bank_data')
       let url = $findQuestionDialog.find('.question_bank_questions_url').attr('href')
-      url = $.replaceTags(url, 'question_bank_id', bank.id)
+      url = replaceTags(url, 'question_bank_id', bank.id)
       const page = ($findQuestionDialog.find('.page_link').data('page') || 0) + 1
       url += '&page=' + page
       $.ajaxJSON(

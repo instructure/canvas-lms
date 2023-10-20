@@ -18,7 +18,7 @@
  */
 
 import store from '../index'
-import {clearPrefetchedXHRs, getPrefetchedXHR, setPrefetchedXHR} from '@instructure/js-utils'
+import {clearPrefetchedXHRs, getPrefetchedXHR, setPrefetchedXHR} from '@canvas/util/xhr'
 import {RequestDispatch} from '@canvas/network'
 import PerformanceControls from '../../PerformanceControls'
 import FakeServer from '@canvas/network/NaiveRequestDispatch/__tests__/FakeServer'

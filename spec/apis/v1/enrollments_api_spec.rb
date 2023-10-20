@@ -224,6 +224,94 @@ describe EnrollmentsApiController, type: :request do
         expect(enrollment.limit_privileges_to_course_section).to be true
       end
 
+      describe "temporary enrollments" do
+        before(:once) do
+          teacher_in_course(active_all: true)
+          @account = Account.default
+          @account.enable_feature!(:temporary_enrollments)
+        end
+
+        context "when feature flag is enabled" do
+          it "creates a new temporary enrollment association" do
+            role_id = @teacher.enrollments.take.role_id
+            json = api_call_as_user @admin,
+                                    :post,
+                                    @path,
+                                    @path_options,
+                                    {
+                                      enrollment: {
+                                        start_at: 1.day.ago,
+                                        end_at: 1.day.from_now,
+                                        user_id: @unenrolled_user.id,
+                                        role_id:,
+                                        course_section_id: @section.id,
+                                        temporary_enrollment_source_user_id: @teacher.id
+                                      }
+                                    }
+            enrollment = Enrollment.find(json["id"])
+            expect(enrollment).to be_an_instance_of TeacherEnrollment
+            expect(enrollment.temporary_enrollment_source_user_id).to eq @teacher.id
+          end
+
+          it "creates a new temporary enrollment association in a sub account context" do
+            sub_account = @account.sub_accounts.create!
+            teacher_in_course(account: sub_account, active_all: true)
+            role_id = @teacher.enrollments.take.role_id
+            path = "/api/v1/courses/#{@course.id}/enrollments"
+            path_options = {
+              controller: "enrollments_api",
+              action: "create",
+              format: "json",
+              course_id: @course.id.to_s
+            }
+            json = api_call_as_user @admin,
+                                    :post,
+                                    path,
+                                    path_options,
+                                    {
+                                      enrollment: {
+                                        start_at: 1.day.ago,
+                                        end_at: 1.day.from_now,
+                                        user_id: @unenrolled_user.id,
+                                        role_id:,
+                                        course_section_id: @section.id,
+                                        temporary_enrollment_source_user_id: @teacher.id
+                                      }
+                                    }
+            enrollment = Enrollment.find(json["id"])
+            expect(enrollment).to be_an_instance_of TeacherEnrollment
+            expect(enrollment.temporary_enrollment_source_user_id).to eq @teacher.id
+          end
+        end
+
+        context "when feature flag is disabled" do
+          before(:once) do
+            @account.disable_feature!(:temporary_enrollments)
+          end
+
+          it "does not create a new temporary enrollment association" do
+            role_id = @teacher.enrollments.take.role_id
+            json = api_call_as_user @admin,
+                                    :post,
+                                    @path,
+                                    @path_options,
+                                    {
+                                      enrollment: {
+                                        start_at: 1.day.ago,
+                                        end_at: 1.day.from_now,
+                                        user_id: @unenrolled_user.id,
+                                        role_id:,
+                                        course_section_id: @section.id,
+                                        temporary_enrollment_source_user_id: @teacher.id
+                                      }
+                                    }
+            enrollment = Enrollment.find(json["id"])
+            expect(enrollment).to be_an_instance_of TeacherEnrollment
+            expect(enrollment.temporary_enrollment_source_user_id).to be_nil
+          end
+        end
+      end
+
       it "interprets 'false' correctly" do
         json = api_call :post,
                         @path,
@@ -1045,6 +1133,93 @@ describe EnrollmentsApiController, type: :request do
       end
     end
 
+    describe "temporary enrollments" do
+      before(:once) do
+        Account.default.enable_feature!(:temporary_enrollments)
+        @provider = user_factory(active_all: true)
+        @recipient = user_factory(active_all: true)
+        @course = course_with_teacher(active_all: true, user: @provider).course
+        @recipient_temp_enrollment = @course.enroll_user(
+          @recipient,
+          "TeacherEnrollment",
+          { role: teacher_role, temporary_enrollment_source_user_id: @provider.id }
+        )
+      end
+
+      context "when feature flag is enabled" do
+        it "returns only recipient temporary enrollments" do
+          user_path = "/api/v1/users/#{@provider.id}/enrollments"
+          json = api_call_as_user(account_admin_user,
+                                  :get,
+                                  user_path,
+                                  @user_params.merge(temporary_enrollment_recipients: true,
+                                                     user_id: @provider.id))
+          expect(json.length).to eq(1)
+          expect(json.first["user_id"]).to eq(@recipient.id)
+        end
+
+        it "returns only provider temporary enrollments" do
+          user_path = "/api/v1/users/#{@recipient.id}/enrollments"
+          json = api_call_as_user(account_admin_user,
+                                  :get,
+                                  user_path,
+                                  @user_params.merge(temporary_enrollment_providers: true,
+                                                     user_id: @recipient.id))
+          expect(json.length).to eq(1)
+          expect(json.first["user_id"]).to eq(@provider.id)
+        end
+
+        it "returns default behavior if temporary enrollment args are not provided" do
+          user_path = "/api/v1/users/#{@recipient.id}/enrollments"
+          json = api_call_as_user(account_admin_user,
+                                  :get,
+                                  user_path,
+                                  @user_params.merge(user_id: @recipient.id))
+          expect(json.length).to eq(1)
+          expect(json.first["user_id"]).to eq(@recipient.id)
+        end
+
+        it "renders unauthorized if user is not an account admin" do
+          user_path = "/api/v1/users/#{@recipient.id}/enrollments"
+          api_call_as_user(@provider,
+                           :get,
+                           user_path,
+                           @user_params.merge(temporary_enrollment_providers: true,
+                                              user_id: @recipient.id))
+          expect(response).to have_http_status(:unauthorized)
+        end
+      end
+
+      context "when feature flag is disabled" do
+        before(:once) do
+          Account.default.disable_feature!(:temporary_enrollments)
+        end
+
+        it "ignores temp enrollment params and returns default enrollment behavior" do
+          user_path = "/api/v1/users/#{@recipient.id}/enrollments"
+          json = api_call_as_user(account_admin_user,
+                                  :get,
+                                  user_path,
+                                  @user_params.merge(temporary_enrollment_providers: true,
+                                                     user_id: @recipient.id))
+          expect(json.length).to eq(1)
+          expect(json.first["user_id"]).to eq(@recipient.id)
+        end
+      end
+    end
+
+    it "supports course SIS IDs with slashes, question marks, and periods" do
+      @course.update! sis_source_id: "some_sis_id/with?slashes.andstuff"
+      @path = "/api/v1/courses/sis_course_id:some_sis_id%2Fwith%3Fslashes.andstuff/enrollments"
+      # Can't use api_call(), as that checks whether the course's (numeric) id matches
+      # up with the param (in this case, "sis_source:with...")
+      headers = { HTTP_AUTHORIZATION: "Bearer #{access_token_for_user(@user)}" }
+      get @path, headers:, params: @params
+      expect(response).to have_http_status(:ok)
+      results = JSON.parse(response.body)
+      expect(results.pluck("course_id").uniq).to eq([@course.id])
+    end
+
     context "filtering by SIS IDs" do
       it "returns an error message with insufficient permissions" do
         @params[:sis_user_id] = "12345"
@@ -1128,6 +1303,13 @@ describe EnrollmentsApiController, type: :request do
           @course.save!
           json = api_call_as_user @student, :get, @user_path, @user_params.merge(state: %w[invited active])
           expect(json.pluck("course_id")).to match_array [course0.id]
+        end
+
+        it "returns error when using an invalid state" do
+          course_with_student user: @student, enrollment_state: "invited", active_course: true
+          json = api_call_as_user @student, :get, @user_path, @user_params.merge(state: %w[invalid_state])
+
+          expect(json["error"]).to eq("Invalid state invalid_state")
         end
 
         describe "grade summary" do

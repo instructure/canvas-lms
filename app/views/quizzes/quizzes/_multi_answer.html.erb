@@ -23,7 +23,7 @@
   <% if question_type.entry_type == "radio" || question_type.entry_type == "select" || question_type.entry_type == "checkbox" %>
     <% answer_text = (hash_get(answer, :html).present? ? user_content(hash_get(answer, :html)) : hash_get(answer, :text)) || '' %>
     <% answer_label = html_to_text(answer_text + ' ' + (hash_get(question, 'question_text') || '')) %>
-    <label class="answer_row">
+    <label class="answer_row user_content">
       <span class="answer_input">
         <% if user_answer %>
           <%= "*" if hash_get(user_answer, :answer_id) == hash_get(answer, :id) %>

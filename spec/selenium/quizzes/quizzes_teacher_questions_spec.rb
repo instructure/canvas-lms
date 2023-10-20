@@ -72,6 +72,7 @@ describe "quizzes questions" do
     end
 
     it "sanitizes any html added to the quiz question description", priority: "1" do
+      skip "FOO-3813 (10/6/2023)"
       bad_html = '<div id="question_16740547_question_text" class="question_text user_content enhanced">
                     <p>For Mead, what is the "essence" of the self?</p>
                   </div>

@@ -18,7 +18,6 @@
 
 import React, {useCallback, useRef, useState, useEffect} from 'react'
 
-import {ApplyTheme} from '@instructure/ui-themeable'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
@@ -49,7 +48,6 @@ type ComponentProps = {
   readonly onAccountToggled: (id: number, visible: boolean) => void
   readonly onAccountSubscriptionToggled: (id: number, autoSubscription: boolean) => void
   readonly onAccountExpandedToggled: (id: number, expanded: boolean) => void
-  readonly autoSubscriptionEnabled: boolean
 }
 
 export const AccountTree = ({
@@ -60,7 +58,6 @@ export const AccountTree = ({
   onAccountToggled,
   onAccountSubscriptionToggled,
   onAccountExpandedToggled,
-  autoSubscriptionEnabled,
 }: ComponentProps) => {
   const [collections, setCollections] = useState<Collection>({})
   // ref because we need this to be updated syncronously so we can be sure
@@ -139,23 +136,20 @@ export const AccountTree = ({
 
   return (
     <View as="div" padding="small">
-      <ApplyTheme>
-        <div id="account-tree" data-testid="account-tree">
-          <AccountCalendarItemToggleGroup
-            parentId={null}
-            accountGroup={[originAccountId]}
-            expandedAccounts={expandedAccounts}
-            collections={collections}
-            loadingCollectionIds={loadingCollectionIdState}
-            handleToggle={handleToggle}
-            visibilityChanges={visibilityChanges}
-            subscriptionChanges={subscriptionChanges}
-            onAccountToggled={onAccountToggled}
-            onAccountSubscriptionToggled={onAccountSubscriptionToggled}
-            autoSubscriptionEnabled={autoSubscriptionEnabled}
-          />
-        </div>
-      </ApplyTheme>
+      <div id="account-tree" data-testid="account-tree">
+        <AccountCalendarItemToggleGroup
+          parentId={null}
+          accountGroup={[originAccountId]}
+          expandedAccounts={expandedAccounts}
+          collections={collections}
+          loadingCollectionIds={loadingCollectionIdState}
+          handleToggle={handleToggle}
+          visibilityChanges={visibilityChanges}
+          subscriptionChanges={subscriptionChanges}
+          onAccountToggled={onAccountToggled}
+          onAccountSubscriptionToggled={onAccountSubscriptionToggled}
+        />
+      </div>
     </View>
   )
 }

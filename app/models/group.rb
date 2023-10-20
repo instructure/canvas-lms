@@ -61,6 +61,7 @@ class Group < ActiveRecord::Base
   has_many :messages, as: :context, inverse_of: :context, dependent: :destroy
   belongs_to :wiki
   has_many :wiki_pages, as: :context, inverse_of: :context
+  has_many :wiki_page_lookups, as: :context, inverse_of: :context
   has_many :web_conferences, as: :context, inverse_of: :context, dependent: :destroy
   has_many :collaborations, -> { order(Arel.sql("collaborations.title, collaborations.created_at")) }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :media_objects, as: :context, inverse_of: :context
@@ -238,7 +239,7 @@ class Group < ActiveRecord::Base
   end
 
   def has_member?(user)
-    return nil unless user.present?
+    return false unless user.present?
 
     if group_memberships.loaded?
       group_memberships.to_a.find { |gm| gm.accepted? && gm.user_id == user.id }
@@ -248,7 +249,7 @@ class Group < ActiveRecord::Base
   end
 
   def has_moderator?(user)
-    return nil unless user.present?
+    return false unless user.present?
     if group_memberships.loaded?
       return group_memberships.to_a.find { |gm| gm.accepted? && gm.user_id == user.id && gm.moderator }
     end

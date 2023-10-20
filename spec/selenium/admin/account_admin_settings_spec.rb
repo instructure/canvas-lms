@@ -41,7 +41,7 @@ describe "root account basic settings" do
     expect(Account.default.reload.settings[:enable_gravatar]).to be false
   end
 
-  it "lets admins enable kill_joy on root account settings", ignore_js_errors: true do
+  it "lets admins enable kill_joy on root account settings", :ignore_js_errors do
     account.settings[:kill_joy] = false
     account.save!
 
@@ -58,7 +58,7 @@ describe "root account basic settings" do
       account.enable_feature!(:restrict_quantitative_data)
     end
 
-    it "lets admins enable restrict_quantitative_data on root account settings", ignore_js_errors: true do
+    it "lets admins enable restrict_quantitative_data on root account settings", :ignore_js_errors do
       account.settings[:restrict_quantitative_data] = { value: false, locked: false }
       account.save!
 
@@ -76,17 +76,49 @@ describe "root account basic settings" do
       expect(Account.default.reload.settings[:restrict_quantitative_data][:value]).to be true
     end
 
-    it "lets admins enable restrict_quantitative_data_lock on root account settings", ignore_js_errors: true do
-      account.settings[:restrict_quantitative_data] = { value: false, locked: false }
-      account.save!
+    context "restrict_quantitative_data enabled" do
+      it "lets admins enable restrict_quantitative_data_lock on root account settings", :ignore_js_errors do
+        account.settings[:restrict_quantitative_data] = { value: false, locked: false }
+        account.save!
 
-      user_session(@admin)
-      get account_settings_url
-      f("#account_settings_restrict_quantitative_data_locked").click
-      submit_form("#account_settings")
-      wait_for_ajaximations
-      expect(Account.default.reload.settings[:restrict_quantitative_data][:locked]).to be true
+        user_session(@admin)
+        get account_settings_url
+
+        # restrict_quantitative_data is initially false, then locked is disabled & unchecked
+        expect(is_checked("#account_settings_restrict_quantitative_data_value")).to be_falsey
+        expect(f("#account_settings_restrict_quantitative_data_locked")).to be_disabled
+        expect(is_checked("#account_settings_restrict_quantitative_data_locked")).to be_falsey
+
+        # restrict_quantitative_data true, then locked is enabled
+        f("#account_settings_restrict_quantitative_data_value").click
+        expect(f("#account_settings_restrict_quantitative_data_locked")).to be_enabled
+        f("#account_settings_restrict_quantitative_data_locked").click
+        expect(is_checked("#account_settings_restrict_quantitative_data_locked")).to be_truthy
+
+        # restrict_quantitative_data clicked false, then locked is disabled & unchecked
+        f("#account_settings_restrict_quantitative_data_value").click
+        expect(f("#account_settings_restrict_quantitative_data_locked")).to be_disabled
+        expect(is_checked("#account_settings_restrict_quantitative_data_locked")).to be_falsey
+
+        f("#account_settings_restrict_quantitative_data_value").click
+        f("#account_settings_restrict_quantitative_data_locked").click
+        submit_form("#account_settings")
+        wait_for_ajaximations
+        expect(Account.default.reload.settings[:restrict_quantitative_data][:locked]).to be true
+      end
     end
+  end
+
+  it "lets admins enable suppress_notifications on root account settings", :ignore_js_errors do
+    account.settings[:suppress_notifications] = false
+    account.save!
+
+    user_session(@admin)
+    get account_settings_url
+    f("#account_settings_suppress_notifications").click
+    driver.switch_to.alert.accept
+    submit_form("#account_settings")
+    expect(Account.default.reload.settings[:suppress_notifications]).to be true
   end
 
   context "editing slack API key" do
@@ -316,21 +348,6 @@ describe "root account basic settings" do
         expect(account.teachers_can_create_courses_anywhere?).to be_truthy
         expect(account.students_can_create_courses_anywhere?).to be_falsey
       end
-    end
-  end
-
-  context "Course with Faculty Journal not enabled" do
-    before do
-      site_admin_logged_in
-    end
-
-    it "allows a site admin to enable faculty journal", priority: "2" do
-      get account_settings_url
-      f("#account_enable_user_notes").click
-      f('.Button.Button--primary[type="submit"]').click
-      wait_for_ajaximations
-      expect(is_checked("#account_enable_user_notes")).to be_truthy
-      expect(@course.account[:enable_user_notes]).to be_truthy
     end
   end
 end

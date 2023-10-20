@@ -27,6 +27,7 @@ module SIS
                     :role,
                     :status,
                     :associated_user_id,
+                    :temporary_enrollment_source_user_id,
                     :root_account_id,
                     :role_id,
                     :start_date,
@@ -44,6 +45,7 @@ module SIS
                      role: nil,
                      status: nil,
                      associated_user_id: nil,
+                     temporary_enrollment_source_user_id: nil,
                      root_account_id: nil,
                      role_id: nil,
                      start_date: nil,
@@ -60,6 +62,7 @@ module SIS
         self.role = role
         self.status = status
         self.associated_user_id = associated_user_id
+        self.temporary_enrollment_source_user_id = temporary_enrollment_source_user_id
         self.root_account_id = root_account_id
         self.role_id = role_id
         self.limit_section_privileges = limit_section_privileges
@@ -93,6 +96,7 @@ module SIS
          role:,
          status:,
          associated_user_id:,
+         temporary_enrollment_source_user_id:,
          root_account_id:,
          role_id:,
          limit_section_privileges:,

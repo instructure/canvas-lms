@@ -21,6 +21,8 @@
 require_relative "../graphql_spec_helper"
 
 describe Types::GradingPeriodType do
+  let(:group_helper) { Factories::GradingPeriodGroupHelper.new }
+  let(:now) { Time.zone.now }
   let!(:account) { Account.create! }
   let!(:course) { account.courses.create!(grading_standard_enabled: true) }
   let!(:grading_period_group) { account.grading_period_groups.create!(title: "a test group") }
@@ -65,6 +67,36 @@ describe Types::GradingPeriodType do
         it "resolves to the grading period's weight" do
           expect(grading_period_type.resolve("weight")).to eq grading_period.weight
         end
+      end
+    end
+
+    describe "isLast" do
+      it "resolves to true when the grading period is the last in the group" do
+        group = group_helper.legacy_create_for_course(course)
+        period_a = group.grading_periods.create!(
+          start_date: 4.weeks.ago(now),
+          end_date: 3.weeks.ago(now),
+          title: "A"
+        )
+        period_b = group.grading_periods.create!(
+          start_date: 3.weeks.ago(now),
+          end_date: 2.weeks.ago(now),
+          title: "B"
+        )
+        period_c = group.grading_periods.create!(
+          start_date: 1.week.ago(now),
+          end_date: 2.weeks.from_now(now),
+          title: "C"
+        )
+
+        grading_period_type = GraphQLTypeTester.new(period_a, current_user: teacher)
+        expect(grading_period_type.resolve("isLast")).to be false
+
+        grading_period_type = GraphQLTypeTester.new(period_b, current_user: teacher)
+        expect(grading_period_type.resolve("isLast")).to be false
+
+        grading_period_type = GraphQLTypeTester.new(period_c, current_user: teacher)
+        expect(grading_period_type.resolve("isLast")).to be true
       end
     end
 

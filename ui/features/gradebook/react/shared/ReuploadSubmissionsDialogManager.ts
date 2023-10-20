@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -24,6 +23,7 @@ import re_upload_submissions_form from '@canvas/grading/jst/re_upload_submission
 import {setupSubmitHandler} from '@canvas/assignments/jquery/reuploadSubmissionsHelper'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
+import replaceTags from '@canvas/util/replaceTags'
 import type {Assignment} from '../../../../api.d'
 
 class ReuploadSubmissionsDialogManager {
@@ -41,13 +41,15 @@ class ReuploadSubmissionsDialogManager {
 
   constructor(
     assignment: Assignment,
-    reuploadUrlTemplate,
+    reuploadUrlTemplate: string,
     userAssetString: string,
-    downloadedSubmissionsMap
+    downloadedSubmissionsMap: {
+      [assignmentId: string]: boolean
+    }
   ) {
     this.assignment = assignment
     this.downloadedSubmissionsMap = downloadedSubmissionsMap
-    this.reuploadUrl = $.replaceTags(reuploadUrlTemplate, 'assignment_id', assignment.id)
+    this.reuploadUrl = replaceTags(reuploadUrlTemplate, 'assignment_id', assignment.id)
     this.showDialog = this.showDialog.bind(this)
     this.userAssetString = userAssetString
     this.reuploadForm = null
@@ -57,7 +59,7 @@ class ReuploadSubmissionsDialogManager {
     return this.downloadedSubmissionsMap[this.assignment.id]
   }
 
-  getReuploadForm(cb) {
+  getReuploadForm(cb: () => void) {
     if (this.reuploadForm) {
       return this.reuploadForm
     }
@@ -81,7 +83,7 @@ class ReuploadSubmissionsDialogManager {
     return this.reuploadForm
   }
 
-  showDialog(cb) {
+  showDialog(cb: () => void) {
     const form = this.getReuploadForm(cb)
     form.attr('action', this.reuploadUrl).dialog('open')
   }

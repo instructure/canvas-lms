@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-shadow */
+/* eslint-disable eqeqeq */
 /*
  * Copyright (C) 2011 - present Instructure, Inc.
  *
@@ -30,6 +32,7 @@ import '@canvas/jquery/jquery.instructure_misc_plugins' /* showIf */
 import '@canvas/rails-flash-notifications'
 import '@canvas/util/templateData' /* fillTemplateData */
 import 'date-js'
+import replaceTags from '@canvas/util/replaceTags'
 
 const I18n = useI18nScope('quizzes.moderate')
 /* Date.parse */
@@ -178,7 +181,7 @@ $(document).ready(function (_event) {
     const last_updated_at = moderation.lastUpdatedAt && moderation.lastUpdatedAt.toISOString()
 
     $.ajaxJSON(
-      $.replaceTags(moderate_url, 'update', last_updated_at),
+      replaceTags(moderate_url, 'update', last_updated_at),
       'GET',
       {},
       data => {
@@ -441,7 +444,7 @@ $(document).ready(function (_event) {
     }
     for (const idx in ids) {
       const id = ids[idx]
-      const url = $.replaceTags($('.extension_url').attr('href'), 'user_id', id)
+      const url = replaceTags($('.extension_url').attr('href'), 'user_id', id)
       $.ajaxJSON(
         url,
         'POST',
@@ -506,6 +509,7 @@ $(document).ready(function (_event) {
         data.time_type === 'extend_from_now' &&
         data.time < $dialog.data('row').data('minutes_left')
       ) {
+        // eslint-disable-next-line no-alert
         const result = window.confirm(
           I18n.t(
             'confirms.taking_time_away',
@@ -522,7 +526,7 @@ $(document).ready(function (_event) {
         .attr('disabled', true)
         .filter('.save_button')
         .text(I18n.t('buttons.extending_time', 'Extending Time...'))
-      const url = $.replaceTags(
+      const url = replaceTags(
         $('.extension_url').attr('href'),
         'user_id',
         $dialog.data('row').attr('data-user-id')

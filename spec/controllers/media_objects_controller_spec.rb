@@ -93,6 +93,16 @@ describe MediaObjectsController do
       )
     end
 
+    context "with media_links_use_attachment_id ON" do
+      it "uses the correct json helper" do
+        course_with_teacher_logged_in
+        mo = MediaObject.create! media_id: "_media_id", course: @course
+        expect(controller).to receive(:media_attachment_api_json).with(mo.attachment, mo, @teacher, anything).and_call_original
+        get "show", params: { attachment_id: mo.attachment.id, media_object_id: mo.id }
+        assert_status(200)
+      end
+    end
+
     context "adheres to attachment permissions" do
       before :once do
         attachment_model(context: @course)
@@ -669,10 +679,6 @@ describe MediaObjectsController do
   end
 
   describe "index_media_attachments" do
-    before :once do
-      Account.site_admin.enable_feature!(:media_links_use_attachment_id)
-    end
-
     before do
       # We don't actually want to ping kaltura during these tests
       allow(MediaObject).to receive(:media_id_exists?).and_return(true)
@@ -936,6 +942,26 @@ describe MediaObjectsController do
       get "iframe_media_player", params: { attachment_id: @media_object.attachment_id }
       assert_status(200)
     end
+
+    context "with the media_links_use_attachment_id feature flag disabled" do
+      before do
+        Account.site_admin.disable_feature!(:media_links_use_attachment_id)
+      end
+
+      it "redirects to media_objects_iframe" do
+        user_session(@student)
+        get "iframe_media_player", params: { attachment_id: @media_object.attachment_id }
+        expect(response).to be_redirect
+        expect(response.location).to eq "http://test.host/media_objects_iframe/0_deadbeef"
+      end
+
+      it "redirects to media_objects_iframe with query params" do
+        user_session(@student)
+        get "iframe_media_player", params: { attachment_id: @media_object.attachment_id, embed: true, foo: "bar" }
+        expect(response).to be_redirect
+        expect(response.location).to eq "http://test.host/media_objects_iframe/0_deadbeef?embed=true&foo=bar"
+      end
+    end
   end
 
   describe "#media_attachment_api_json" do
@@ -956,8 +982,10 @@ describe MediaObjectsController do
       user_session(@student)
       media_attachment_api_json = controller.media_attachment_api_json(other_attachment, @media_object, @student, session)
       expect(media_attachment_api_json["media_tracks"].pluck("locale")).to include("en", "fr")
+      expect(media_attachment_api_json["media_tracks"].pluck("inherited")).to eq([true, false])
       media_attachment_api_json = controller.media_attachment_api_json(original_attachment, @media_object, @student, session)
       expect(media_attachment_api_json["media_tracks"].pluck("locale")).to eq(["en"])
+      expect(media_attachment_api_json["media_tracks"].pluck("inherited")).to eq([false])
     end
 
     it "returns media_attachment_iframe_url for the embedded_iframe_url" do
@@ -976,7 +1004,7 @@ describe MediaObjectsController do
         expect(media_attachment_api_json["can_add_captions"]).to be(true)
       end
 
-      it "returns false if the user cannot add captions to the media object" do
+      it "returns true as long as user can update attachment" do
         teacher_role = Role.get_built_in_role("TeacherEnrollment", root_account_id: @course.root_account.id)
         RoleOverride.create!(
           permission: "manage_content",
@@ -985,11 +1013,11 @@ describe MediaObjectsController do
           account: @course.root_account
         )
         expect(@attachment.grants_right?(@teacher, :update)).to be(true)
-        expect(@media_object.grants_right?(@teacher, :add_captions)).to be(false)
+        expect(@media_object.grants_right?(@teacher, :add_captions)).to be(true)
 
         user_session(@teacher)
         media_attachment_api_json = controller.media_attachment_api_json(@attachment, @media_object, @teacher, session)
-        expect(media_attachment_api_json["can_add_captions"]).to be(false)
+        expect(media_attachment_api_json["can_add_captions"]).to be(true)
       end
 
       it "returns false if the user cannot update the attachment" do
@@ -1002,7 +1030,7 @@ describe MediaObjectsController do
         )
         user_session(@teacher)
         expect(@attachment.grants_right?(@teacher, :update)).to be(false)
-        expect(@media_object.grants_right?(@teacher, :add_captions)).to be(true)
+        expect(@media_object.grants_right?(@teacher, :add_captions)).to be(false)
 
         user_session(@teacher)
         media_attachment_api_json = controller.media_attachment_api_json(@attachment, @media_object, @teacher, session)
@@ -1098,6 +1126,8 @@ describe MediaObjectsController do
     end
 
     it "returns the embedded_iframe_url" do
+      Account.site_admin.disable_feature!(:media_links_use_attachment_id)
+
       post :create_media_object,
            params: {
              context_code: "user_#{@user.id}", id: "new_object", type: "audio", title: "title"
@@ -1106,6 +1136,157 @@ describe MediaObjectsController do
       expect(response.parsed_body["embedded_iframe_url"]).to eq media_object_iframe_url(
         @media_object.media_id
       )
+    end
+
+    context "with media_links_use_attachment_id feature flag enabled" do
+      before do
+        Account.site_admin.enable_feature!(:media_links_use_attachment_id)
+      end
+
+      it "returns the embedded_iframe_url" do
+        post :create_media_object,
+             params: {
+               context_code: "user_#{@user.id}", id: "new_object", type: "audio", title: "title"
+             }
+        @media_object = @user.reload.media_objects.last
+        expect(response.parsed_body["embedded_iframe_url"]).to eq media_attachment_iframe_url(
+          @media_object.attachment_id
+        )
+      end
+
+      it "returns the uuid" do
+        post :create_media_object,
+             params: {
+               context_code: "user_#{@user.id}", id: "new_object", type: "audio", title: "title"
+             }
+        @media_object = @user.reload.media_objects.last
+        expect(response.parsed_body["media_object"]["uuid"]).to eq @media_object.attachment.uuid
+      end
+    end
+  end
+
+  describe "#media_sources_json" do
+    before do
+      @media_object = @course.media_objects.create! media_id: "0_deadbeef", user_entered_title: "blah.flv"
+      allow_any_instance_of(MediaObject).to receive(:media_sources).and_return(
+        [{ url: "whatever man", bitrate: 12_345 }]
+      )
+    end
+
+    it "returns the media object url as the source" do
+      expect(controller.media_sources_json(@media_object)).to eq(
+        [
+          {
+            bitrate: 12_345,
+            label: "12 kbps",
+            src: "whatever man",
+            url: "whatever man"
+          }
+        ]
+      )
+    end
+
+    context "with authenticated_iframe_content feature flag enabled" do
+      before do
+        Account.site_admin.enable_feature!(:authenticated_iframe_content)
+      end
+
+      it "returns the redirect url as the source" do
+        expect(controller.media_sources_json(@media_object)).to eq(
+          [
+            {
+              bitrate: 12_345,
+              label: "12 kbps",
+              src: "http://test.host/media_objects/#{@media_object.id}/redirect?bitrate=12345",
+              url: "http://test.host/media_objects/#{@media_object.id}/redirect?bitrate=12345"
+            }
+          ]
+        )
+      end
+    end
+  end
+
+  describe "GET '/media_objects/:id/redirect'" do
+    before do
+      allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
+      allow_any_instance_of(CanvasKaltura::ClientV3).to receive(:assetSwfUrl).and_return(
+        "http://test.host/media_redirect"
+      )
+      @media_object = @course.media_objects.create! media_id: "0_deadbeef", user_entered_title: "blah.flv"
+      user_session(@teacher)
+    end
+
+    context "with authenticated_iframe_content feature flag enabled" do
+      before do
+        Account.site_admin.enable_feature!(:authenticated_iframe_content)
+        allow_any_instance_of(CanvasKaltura::ClientV3).to receive(:media_sources).and_return(
+          [
+            { bitrate: 1, url: "http://test.host/media_redirect" },
+            { bitrate: 2, url: "http://test.host/media_redirect_2" }
+          ]
+        )
+        @attachment = @media_object.attachment
+      end
+
+      it "returns the file" do
+        temp_file = Tempfile.new("foo")
+        expect(controller).to receive(:media_source_temp_file).with("http://test.host/media_redirect").and_return(temp_file)
+        expect(controller).to receive(:send_file).with(temp_file, filename: @attachment.filename, type: @attachment.content_type, stream: true).and_call_original
+        get :media_object_redirect, params: { id: @media_object.id }
+      end
+
+      it "does not return the file if the user does not have access" do
+        user_session(user_factory)
+        get :media_object_redirect, params: { id: @media_object.id }
+        assert_status(401)
+      end
+
+      context "with public files" do
+        it "returns the file if it is a public file and the user does not have access" do
+          user_session(user_factory)
+          @attachment.update(visibility_level: "public")
+          temp_file = Tempfile.new("foo")
+          expect(controller).to receive(:media_source_temp_file).with("http://test.host/media_redirect").and_return(temp_file)
+          expect(controller).to receive(:send_file).with(temp_file, filename: @attachment.filename, type: @attachment.content_type, stream: true).and_call_original
+          get :media_object_redirect, params: { id: @media_object.id }
+        end
+
+        it "returns the file if it is a public file and there is no user session" do
+          remove_user_session
+          @attachment.update(visibility_level: "public")
+          temp_file = Tempfile.new("foo")
+          expect(controller).to receive(:media_source_temp_file).with("http://test.host/media_redirect").and_return(temp_file)
+          expect(controller).to receive(:send_file).with(temp_file, filename: @attachment.filename, type: @attachment.content_type, stream: true).and_call_original
+          get :media_object_redirect, params: { id: @media_object.id }
+        end
+
+        it "does not return locked public files" do
+          remove_user_session
+          @attachment.update(locked: true, visibility_level: "public")
+          get :media_object_redirect, params: { id: @media_object.id }
+          assert_status(302)
+        end
+      end
+
+      it "returns the file by bitrate" do
+        temp_file = Tempfile.new("foo")
+        expect(controller).to receive(:media_source_temp_file).with("http://test.host/media_redirect_2").and_return(temp_file)
+        expect(controller).to receive(:send_file).with(temp_file, filename: @attachment.filename, type: @attachment.content_type, stream: true).and_call_original
+        get :media_object_redirect, params: { id: @media_object.id, bitrate: 2 }
+      end
+
+      it "returns the first file if the bitrate is invalid" do
+        temp_file = Tempfile.new("foo")
+        expect(controller).to receive(:media_source_temp_file).with("http://test.host/media_redirect").and_return(temp_file)
+        expect(controller).to receive(:send_file).with(temp_file, filename: @attachment.filename, type: @attachment.content_type, stream: true).and_call_original
+        get :media_object_redirect, params: { id: @media_object.id, bitrate: "not real" }
+      end
+
+      it "renders an error if there was a problem fetching the file" do
+        allow(controller).to receive(:media_source_temp_file).and_raise(CanvasHttp::InvalidResponseCodeError.new(400, "error fetching url"))
+        get :media_object_redirect, params: { id: @media_object.id }
+        assert_status(400)
+      end
     end
   end
 end

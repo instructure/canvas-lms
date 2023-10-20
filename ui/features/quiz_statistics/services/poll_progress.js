@@ -35,7 +35,7 @@ const fetchProgress = function (url) {
 
 export default function pollProgress(url, options) {
   return new Promise((resolve, reject) => {
-    let poll, poller
+    let poller
 
     options = options || {}
 
@@ -43,7 +43,7 @@ export default function pollProgress(url, options) {
       clearTimeout(poller)
     })
 
-    poll = function () {
+    const poll = function () {
       fetchProgress(url).then(function (data) {
         if (options.onTick) {
           options.onTick(data.completion, data)

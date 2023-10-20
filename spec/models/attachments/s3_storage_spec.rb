@@ -43,7 +43,8 @@ describe Attachments::S3Storage do
     let(:bucket) do
       config = double("config", {
                         secret_access_key:,
-                        region: "us-east-1"
+                        region: "us-east-1",
+                        credentials: double(credentials: double(access_key_id:, secret_access_key:)),
                       })
       client = double("client", config:)
       double("bucket", client:)

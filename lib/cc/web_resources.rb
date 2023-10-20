@@ -171,7 +171,8 @@ module CC
     def process_media_tracks
       attachments = attachments_for_export(Folder.root_folders(@course).first)
       attachments += Attachment.where(context: @course, media_entry_id: @html_exporter.used_media_objects.map(&:media_id))
-      attachments += @html_exporter.referenced_files.values
+      attachments += Attachment.where(context: @course, id: @html_exporter.referenced_files.keys).where.not(media_entry_id: nil)
+
       att_map = attachments.index_by(&:id)
       Attachment.media_tracks_include_originals(attachments).each_with_object({}) do |mt, tracks|
         file = att_map[mt.for_att_id]

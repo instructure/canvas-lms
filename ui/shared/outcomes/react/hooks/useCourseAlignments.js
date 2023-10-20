@@ -26,7 +26,7 @@ import useSearch from './useSearch'
 
 const I18n = useI18nScope('AlignmentSummary')
 
-const useCourseAlignments = () => {
+const useCourseAlignments = shouldWait => {
   const {contextType, contextId, rootOutcomeGroup} = useCanvasContext()
   const [searchFilter, setSearchFilter] = useState('ALL_OUTCOMES')
   const [lastSearch, setLastSearch] = useState(null)
@@ -52,6 +52,7 @@ const useCourseAlignments = () => {
   const {loading, error, data, fetchMore} = useQuery(SEARCH_OUTCOME_ALIGNMENTS, {
     variables,
     fetchPolicy: 'network-only',
+    skip: !!shouldWait,
   })
 
   useEffect(() => {

@@ -23,7 +23,7 @@ require "csv"
 require "net/http"
 require "uri"
 require "nokogiri"
-require "multipart"
+require "legacy_multipart"
 
 # Test Console and API Documentation at:
 # http://www.kaltura.com/api_v3/testmeDoc/index.php
@@ -276,6 +276,8 @@ module CanvasKaltura
                            ks: @ks,
                            conversionProfileId: -1,
                            csvFileData: KalturaStringIO.new(csv, "bulk_data.csv"))
+      raise "Failed to get bulkUpload result from Kaltura" if result.nil?
+
       unless result.css("logFileUrl").any?
         code = result.css("error > code").first.try(:content)
         message = result.css("error > message").first.try(:content)
@@ -332,7 +334,7 @@ module CanvasKaltura
                           :getDownloadUrl,
                           ks: @ks,
                           id: assetId)
-      return result.content if result
+      result&.content
     end
 
     # This is not a true Kaltura API call, but generates the url for a "playlist"
@@ -361,7 +363,7 @@ module CanvasKaltura
 
     def postRequest(service, action, params)
       requestParams = "service=#{service}&action=#{action}"
-      multipart_body, headers = Multipart::Post.new.prepare_query(params)
+      multipart_body, headers = LegacyMultipart::Post.prepare_query(params)
       response = sendRequest(
         Net::HTTP::Post.new("#{@endpoint}/?#{requestParams}", headers),
         multipart_body

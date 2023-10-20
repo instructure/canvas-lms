@@ -114,6 +114,7 @@ module Importers
         item.workflow_state = "active" if item.deleted?
         item.short_description = hash[:title]
         item.description = migration.convert_html(hash[:description], :learning_outcome, hash[:migration_id], :description) if hash[:description]
+        item.copied_from_outcome_id = migration.for_course_copy? ? hash[:copied_from_outcome_id] : nil
         assessed = item.assessed?
         unless assessed
           item.calculation_method = hash[:calculation_method] || item.calculation_method

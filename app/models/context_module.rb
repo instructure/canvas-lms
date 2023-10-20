@@ -32,6 +32,9 @@ class ContextModule < ActiveRecord::Base
   belongs_to :root_account, class_name: "Account"
   has_many :context_module_progressions, dependent: :destroy
   has_many :content_tags, -> { order("content_tags.position, content_tags.title") }, dependent: :destroy
+  has_many :assignment_overrides, dependent: :destroy, inverse_of: :context_module
+  has_many :assignment_override_students, dependent: :destroy
+  has_one :master_content_tag, class_name: "MasterCourses::MasterContentTag", inverse_of: :context_module
   acts_as_list scope: { context: self, workflow_state: ["active", "unpublished"] }
 
   serialize :prerequisites
@@ -661,8 +664,12 @@ class ContextModule < ActiveRecord::Base
 
   def add_item(params, added_item = nil, opts = {})
     params[:type] = params[:type].underscore if params[:type]
-    position = opts[:position] || ((content_tags.not_deleted.maximum(:position) || 0) + 1)
+    top_position = (content_tags.not_deleted.maximum(:position) || 0) + 1
+    position = opts[:position] || top_position
     position = [position, params[:position].to_i].max if params[:position]
+    if content_tags.not_deleted.where(position:).count != 0
+      position = top_position
+    end
     case params[:type]
     when "wiki_page", "page"
       item = opts[:wiki_page] || context.wiki_pages.where(id: params[:id]).first
@@ -887,16 +894,13 @@ class ContextModule < ActiveRecord::Base
   def find_or_create_progression(user)
     return nil unless user
 
-    progression = nil
     shard.activate do
       GuardRail.activate(:primary) do
         if context.enrollments.except(:preload).where(user_id: user).exists?
-          progression = ContextModuleProgression.create_and_ignore_on_duplicate(user:, context_module: self)
-          progression ||= context_module_progressions.where(user_id: user).first
+          ContextModuleProgression.create_and_ignore_on_duplicate(user:, context_module: self)
         end
       end
     end
-    progression
   end
 
   def evaluate_for(user_or_progression)
@@ -960,5 +964,9 @@ class ContextModule < ActiveRecord::Base
       callbacks << ->(user) { context.publish_final_grades(user, user.id) }
     end
     callbacks
+  end
+
+  def requirement_type
+    (completion_requirements.present? && requirement_count == 1) ? "one" : "all"
   end
 end

@@ -18,8 +18,7 @@
 
 import React, {useState} from 'react'
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
-import {Button, ButtonInteraction} from '@instructure/ui-buttons'
-// @ts-ignore
+import {Button} from '@instructure/ui-buttons'
 import {IconAlertsSolid} from '@instructure/ui-icons'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import axios from '@canvas/axios'
@@ -31,7 +30,9 @@ type ClearBadgeCountsButtonProps = {
 }
 
 function ClearBadgeCountsButton({courseId, userId}: ClearBadgeCountsButtonProps) {
-  const [interaction, setInteraction] = useState<ButtonInteraction>('enabled')
+  const [interaction, setInteraction] = useState<'enabled' | 'disabled' | 'readonly' | undefined>(
+    'enabled'
+  )
   const handleClick = async () => {
     setInteraction('disabled')
     const url = `/api/v1/courses/${courseId}/submissions/${userId}/clear_unread`
@@ -51,6 +52,7 @@ function ClearBadgeCountsButton({courseId, userId}: ClearBadgeCountsButtonProps)
 
   return (
     <Button
+      data-testid="clear-badge-counts-button"
       color="primary"
       margin="small"
       onClick={handleClick}

@@ -68,6 +68,13 @@ class StudentEnrollment < Enrollment
     score
   end
 
+  def update_override_status(custom_grade_status:, grading_period_id: nil)
+    score_params = { grading_period_id: } if grading_period_id.present?
+    score = find_score(score_params)
+
+    score.update!(custom_grade_status:)
+  end
+
   class << self
     def restore_submissions_and_scores_for_enrollments(enrollments)
       raise ArgumentError, "Cannot call with more than 1000 enrollments" if enrollments.count > 1_000
@@ -85,7 +92,7 @@ class StudentEnrollment < Enrollment
           .where(user_id: students.map(&:user_id), workflow_state: "deleted", assignments: { context_id: course_id })
           .merge(Assignment.active)
           .in_batches
-          .update_all("workflow_state = #{DueDateCacher.infer_submission_workflow_state_sql}")
+          .update_all("workflow_state = #{SubmissionLifecycleManager.infer_submission_workflow_state_sql}")
       end
     end
 

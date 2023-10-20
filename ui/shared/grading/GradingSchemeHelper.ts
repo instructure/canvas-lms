@@ -18,14 +18,25 @@
  */
 
 import round from '@canvas/round'
-import type {GradingScheme} from './grading.d'
+import type {DeprecatedGradingScheme} from './grading.d'
 
-export function indexOfGrade(grade: null | string | number, gradingSchemes: GradingScheme[]) {
+export function indexOfGrade(
+  grade: null | string | number,
+  gradingSchemes: DeprecatedGradingScheme[]
+) {
+  const matches = (entry, key) => entry[0].toLowerCase() === key
   const cleanGrade = `${grade}`.trim().toLowerCase()
-  return gradingSchemes.findIndex(entry => entry[0].toLowerCase() === cleanGrade)
+  let idx = gradingSchemes.findIndex(entry => matches(entry, cleanGrade))
+
+  if (idx < 0 && /.+−$/.test(cleanGrade)) {
+    const gradeWithTrailingDash = cleanGrade.replace(/−$/, '-')
+    idx = gradingSchemes.findIndex(entry => matches(entry, gradeWithTrailingDash))
+  }
+
+  return idx
 }
 
-export function gradeToScoreUpperBound(grade: number, gradingSchemes: GradingScheme[]) {
+export function gradeToScoreUpperBound(grade: number, gradingSchemes: DeprecatedGradingScheme[]) {
   const index = indexOfGrade(grade, gradingSchemes)
 
   if (index === -1) {
@@ -58,7 +69,10 @@ export function gradeToScoreUpperBound(grade: number, gradingSchemes: GradingSch
   return round(nextHigherSchemeValue * 100 - percentageOffset, 2)
 }
 
-export function gradeToScoreLowerBound(grade: null | number, gradingSchemes: GradingScheme[]) {
+export function gradeToScoreLowerBound(
+  grade: null | number,
+  gradingSchemes: DeprecatedGradingScheme[]
+) {
   const index = indexOfGrade(grade, gradingSchemes)
 
   if (index === -1) {
@@ -69,27 +83,4 @@ export function gradeToScoreLowerBound(grade: null | number, gradingSchemes: Gra
   const matchingSchemeValue = gradingSchemes[index][1]
 
   return round(matchingSchemeValue * 100, 2)
-}
-
-export function scoreToGrade(score: number, gradingSchemes: GradingScheme[]) {
-  // Because scoreToGrade is being used in a non typescript file, ui/features/grade_summary/jquery/index.js,
-  // score can be NaN despite its type being declared as a number
-  if (typeof score !== 'number' || Number.isNaN(score) || gradingSchemes == null) {
-    return null
-  }
-
-  const roundedScore = round(score, 4)
-  // does the following need .toPrecision(4) ?
-  const scoreWithLowerBound = Math.max(roundedScore, 0)
-  const letter = gradingSchemes.find((row, i) => {
-    const schemeScore: string = (row[1] * 100).toPrecision(4)
-    // The precision of the lower bound (* 100) must be limited to eliminate
-    // floating-point errors.
-    // e.g. 0.545 * 100 returns 54.50000000000001 in JavaScript.
-    return scoreWithLowerBound >= parseFloat(schemeScore) || i === gradingSchemes.length - 1
-  }) as GradingScheme
-  if (!letter) {
-    throw new Error('grading scheme not found')
-  }
-  return letter[0]
 }

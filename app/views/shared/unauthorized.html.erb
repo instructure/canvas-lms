@@ -32,7 +32,11 @@
       <h1><%= t('headings.unpublished', %{Not Yet Available}) %></h1>
     <% else %>
       <img class="ic-Error-img" role="presentation" alt="" aria-hidden="true" src="/images/401_permissions.svg">
-      <h1><%= t("Access Denied") %></h1>
+      <% if request.query_parameters[:embedded] %>
+        <h3><%= t("Access Denied") %></h3>
+      <% else %>
+        <h1><%= t("Access Denied") %></h1>
+      <% end %>
     <% end %>
     <% if @unauthorized_message %>
       <p><%= @unauthorized_message %></p>

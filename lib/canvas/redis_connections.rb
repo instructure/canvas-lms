@@ -34,24 +34,20 @@ module Canvas
       if Rails.cache &&
          defined?(ActiveSupport::Cache::RedisCacheStore) &&
          Rails.cache.is_a?(ActiveSupport::Cache::RedisCacheStore)
-        ::CanvasCache::Redis.handle_redis_failure(nil, "none") do
-          redis = Rails.cache.redis
-          if redis.respond_to?(:nodes)
-            redis.nodes.each(&:disconnect!)
-          else
-            redis.disconnect!
-          end
+        redis = Rails.cache.redis
+        if redis.respond_to?(:nodes)
+          redis.nodes.each(&:close)
+        else
+          redis.close
         end
       end
 
       if MultiCache.cache.is_a?(ActiveSupport::Cache::HaStore)
-        ::CanvasCache::Redis.handle_redis_failure(nil, "none") do
-          redis = MultiCache.cache.redis
-          if redis.respond_to?(:nodes)
-            redis.nodes.each(&:disconnect!)
-          else
-            redis.disconnect!
-          end
+        redis = MultiCache.cache.redis
+        if redis.respond_to?(:nodes)
+          redis.nodes.each(&:close)
+        else
+          redis.close
         end
       end
 

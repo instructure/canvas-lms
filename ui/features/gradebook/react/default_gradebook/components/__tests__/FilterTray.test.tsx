@@ -129,4 +129,30 @@ describe('FilterTray', () => {
     const {getByText} = render(<FilterTray {...defaultProps} />)
     expect(getByText('2 Filters', {selector: 'span'})).toBeInTheDocument()
   })
+
+  it('Pressing tab from the first date input field will allow the user to reach the delete filter preset button when all fields are empty', () => {
+    const {getByText, getByTestId} = render(<FilterTray {...defaultProps} />)
+    userEvent.click(getByText('Toggle Create Filter Preset'))
+    const startDate = getByTestId('start-date-input')
+    userEvent.click(startDate)
+    userEvent.tab()
+    const endDate = getByTestId('end-date-input')
+    expect(endDate).toHaveFocus()
+    userEvent.tab()
+    expect(getByTestId('delete-filter-preset-button')).toHaveFocus()
+  })
+
+  it('Pressing tab from the first date input field with a date will allow the user to reach the delete filter preset button', () => {
+    const {getByText, getAllByText, getByTestId} = render(<FilterTray {...defaultProps} />)
+    userEvent.click(getByText('Toggle Create Filter Preset'))
+    const startDate = getByTestId('start-date-input')
+    userEvent.click(startDate)
+    const button = getAllByText('1')[0]
+    userEvent.click(button)
+    userEvent.tab()
+    const endDate = getByTestId('end-date-input')
+    expect(endDate).toHaveFocus()
+    userEvent.tab()
+    expect(getByTestId('delete-filter-preset-button')).toHaveFocus()
+  })
 })

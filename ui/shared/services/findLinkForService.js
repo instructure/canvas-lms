@@ -23,8 +23,22 @@ import {truncateText} from '@canvas/util/TextHelper'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/forms/jquery/jquery.instructure_forms'
 import 'jqueryui/dialog'
+import replaceTags from '@canvas/util/replaceTags'
 
 const I18n = useI18nScope('findLinkForService')
+
+function titleize(inputString) {
+  const processedString = (inputString || '')
+    .replace(/([A-Z])/g, ' $1')
+    .replace(/_/g, ' ')
+    .replace(/\s+/, ' ')
+    .replace(/^\s/, '')
+
+  return processedString
+    .split(/\s/)
+    .map(word => (word.charAt(0) || '').toUpperCase() + word.substring(1))
+    .join(' ')
+}
 
 export function getUserServices(service_types, success, error) {
   if (!$.isArray(service_types)) {
@@ -101,6 +115,7 @@ export function findLinkForService(service_type, callback) {
           }
           for (const idx in data) {
             data[idx].short_title = data[idx].title
+            // eslint-disable-next-line eqeqeq
             if (data[idx].title == data[idx].description) {
               data[idx].short_title = truncateText(data[idx].description, {max: 30})
             }
@@ -143,12 +158,12 @@ export function findLinkForService(service_type, callback) {
   $dialog.find('.search_button').text(I18n.t('buttons.search', 'Search'))
   $dialog.find('form img').attr('src', `/images/${service_type}_small_icon.png`)
   let url = '/search/bookmarks?service_type=%7B%7B+service_type+%7D%7D'
-  url = $.replaceTags(url, 'service_type', service_type)
+  url = replaceTags(url, 'service_type', service_type)
   $dialog.data('reference_url', url)
   $dialog.find('.results').empty()
   $dialog.dialog({
     title: I18n.t('titles.bookmark_search', 'Bookmark Search: %{service_name}', {
-      service_name: $.titleize(service_type),
+      service_name: titleize(service_type),
     }),
     open() {
       $dialog.find('input:visible:first').focus().select()

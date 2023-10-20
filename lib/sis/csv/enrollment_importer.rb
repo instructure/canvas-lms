@@ -27,7 +27,14 @@ module SIS
       end
 
       def self.identifying_fields
-        %w[course_id section_id user_id user_integration_id role role_id associated_user_id].freeze
+        %w[course_id
+           section_id
+           user_id
+           user_integration_id
+           role
+           role_id
+           associated_user_id
+           temporary_enrollment_source_user_id].freeze
       end
 
       # expected columns
@@ -63,6 +70,7 @@ module SIS
           role: row["role"],
           status: row["status"],
           associated_user_id: row["associated_user_id"],
+          temporary_enrollment_source_user_id: row["temporary_enrollment_source_user_id"],
           root_account_id: row["root_account"],
           role_id: row["role_id"],
           limit_section_privileges: row["limit_section_privileges"],

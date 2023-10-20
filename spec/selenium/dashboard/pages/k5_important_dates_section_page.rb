@@ -66,7 +66,7 @@ module K5ImportantDatesSectionPageObject
   end
 
   def calendar_event_more_options_selector
-    "a:contains('More Options')"
+    "button[data-testid='edit-calendar-event-more-options-button']"
   end
 
   def calendar_event_submit_button_selector

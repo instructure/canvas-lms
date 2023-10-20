@@ -56,13 +56,6 @@ body {
   }
 }
 
-// so we don't get the non-interactionable content
-.scripts-not-loaded {
-  a:not([href]), a[href="#"], button:not([type]) {
-    visibility: hidden !important;
-  }
-}
-
 // **********************************************************************************
 // all of the following are classes that should be applied to 'body' when appropriate
 

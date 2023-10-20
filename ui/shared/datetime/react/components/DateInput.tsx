@@ -17,35 +17,37 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import React, {ReactNode, useRef, useState} from 'react'
+import React, {useRef, useCallback, useEffect, useState} from 'react'
 import moment, {Moment} from 'moment-timezone'
 import tz from '@canvas/timezone'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {Calendar} from '@instructure/ui-calendar'
-// @ts-ignore
 import {DateInput} from '@instructure/ui-date-input'
 import {IconButton} from '@instructure/ui-buttons'
-// @ts-ignore
 import {IconArrowOpenEndSolid, IconArrowOpenStartSolid} from '@instructure/ui-icons'
-import {nanoid} from 'nanoid'
-import {log} from '@canvas/datetime-natural-parsing-instrument'
-import {
-  DateInputInteraction,
-  DateInputLayout,
-  DateInputDisplay,
-  DateInputSize,
-} from '@instructure/ui-date-input/types'
+
+import type {ViewProps} from '@instructure/ui-view'
+import type {
+  ClipboardEvent,
+  ReactNode,
+  MouseEvent,
+  ChangeEvent,
+  FocusEvent,
+  KeyboardEvent,
+  SyntheticEvent,
+} from 'react'
+import type {DateInputProps} from '@instructure/ui-date-input'
+
+type Messages = DateInputProps['messages']
+
+// This is a little gross, but as written this component can return either the original
+// SyntheticEvent from the DateInput onBlur handler, -OR- a KeyboardEvent from the
+// DateInput onKeyUp handler. Rather than change this component's behavior, we will just
+// create this union type. It doesn't look like anything that uses this component and is
+// making use of the onBlur callback is paying any attention to the actual event anyway.
+type BlurReturn = SyntheticEvent<Element, Event> | KeyboardEvent<DateInputProps>
 
 const I18n = useI18nScope('app_shared_components_canvas_date_time')
-
-// can use INSTUI definition of the message type once
-// https://github.com/instructure/instructure-ui/issues/815 is closed
-// import {FormPropTypes} from '@instructure/ui-form-field'
-// export type CanvasDateInputMessageType = FormPropTypes.message
-export type CanvasDateInputMessageType = {
-  text: string | JSX.Element
-  type: 'error' | 'warning' | 'hint' | 'success' | 'screenreader-only'
-}
 
 export type CanvasDateInputProps = {
   /**
@@ -60,7 +62,7 @@ export type CanvasDateInputProps = {
    * Passed along to `DateInput`, can be used to describe messages and validation for the input. Note that this
    * component may display its own messages as well.
    */
-  messages?: CanvasDateInputMessageType[]
+  messages?: Messages
   /**
    * Specifies the time zone that the `DateInput` picker is operating in. Defaults to either `ENV.TIMEZONE` if present,
    * or the browser's timezone otherwise. It also depends on moment.js's default locale being set (always the case in
@@ -78,19 +80,19 @@ export type CanvasDateInputProps = {
    * field, or by clicking on a date in the calendar. It is called with one argument, a JS `Date` object. If the input
    * is a bad date (such as if the user types something unparseable) the value passed will evaluate to Boolean `false`.
    */
-  onSelectedDateChange: (date: Date | null) => void
+  onSelectedDateChange: (date: Date | null, dateInputType: 'pick' | 'other' | 'error') => void
   /**
    * focus and blur event handlers
    */
-  onBlur?: (event: React.FormEvent<HTMLInputElement>) => void
-  onFocus?: (event: React.FormEvent<HTMLInputElement>) => void
+  onBlur?: (event: BlurReturn) => void // see comment above the type definition for BlurReturn
+  onFocus?: (event: FocusEvent<DateInputProps>) => void
   /**
    * Passed along to `DateInput`. Specifies if interaction with the input is enabled, disabled, or read-only. Read-only
    * prevents interactions, but is styled as if it were enabled.
    */
-  interaction?: DateInputInteraction
+  interaction: DateInputProps['interaction']
   locale?: string
-  onRequestValidateDate?: (event: React.SyntheticEvent<EventTarget>) => boolean
+  onRequestValidateDate?: (event: SyntheticEvent<EventTarget>) => boolean
   placement?: any // passed through to `DateInput`, which accepts `any`
   /**
    * Controls whether or not a message continually appears at the bottom of the field showing what date WOULD be
@@ -107,7 +109,7 @@ export type CanvasDateInputProps = {
   /**
    * Passed along to `DateInput`. Controls whether the label is stacked on top of the input or placed next to the input.
    */
-  layout?: DateInputLayout
+  layout?: DateInputProps['layout']
   /**
    * Passed along to `DateInput`. Controls width of the input. Defaults to `null`, which leaves width setting up to
    * `size` prop.
@@ -124,15 +126,26 @@ export type CanvasDateInputProps = {
   /**
    * Specifies the input size. One of: small medium large
    */
-  size?: DateInputSize
+  size?: DateInputProps['size']
   /**
    * Specifies the display property of the container. One of: inline-block block
    */
-  display?: DateInputDisplay
+  display?: DateInputProps['display']
   /**
    * Passed on to `DateInput`. Text to show when input is empty.
    */
   placeholder?: string
+  /**
+   * Controls the what happens when the text input blurs.
+   * If false, the behavior is as it always has been:
+   *   - when the input is empty, leave it empty
+   *   - when there is an invalid date, clear the input
+   * If true:
+   *   - when the input is empty, set it to today
+   *   - when the input is an invalid date, leave what was entered in place
+   *     and call onSelectedDateChange(null, 'error')
+   */
+  defaultToToday?: boolean
 }
 
 /**
@@ -143,6 +156,7 @@ export type CanvasDateInputProps = {
 export default function CanvasDateInput({
   dataTestid,
   dateIsDisabled,
+  defaultToToday,
   display,
   formatDate,
   interaction = 'enabled',
@@ -154,9 +168,9 @@ export default function CanvasDateInput({
   onFocus,
   onRequestValidateDate,
   onSelectedDateChange,
-  placeholder,
+  placeholder = '',
   placement = 'bottom center',
-  renderLabel = I18n.t('Choose a date'),
+  renderLabel = <span>{I18n.t('Choose a date')}</span>,
   selectedDate,
   size,
   timezone = ENV?.TIMEZONE || Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -164,39 +178,61 @@ export default function CanvasDateInput({
   withRunningValue,
 }: CanvasDateInputProps) {
   const todayMoment = moment().tz(timezone)
-  const selectedMoment = selectedDate ? moment.tz(selectedDate, timezone) : null
 
+  const [selectedMoment, setSelectedMoment] = useState(
+    selectedDate ? moment.tz(selectedDate, timezone) : null
+  )
   const [inputValue, setInputValue] = useState('')
   const [isShowingCalendar, setIsShowingCalendar] = useState(false)
   const [renderedMoment, setRenderedMoment] = useState(selectedMoment || todayMoment)
   const [internalMessages, setInternalMessages] = useState<typeof messages>([])
-  const [widgetId] = useState(nanoid())
   const [inputDetails, setInputDetails] = useState<{
     method: 'paste' | 'pick'
     value: string
   } | null>(null)
 
   const priorSelectedMoment = useRef<Moment | null>(null)
-  function isDifferentMoment(firstMoment: Moment | null, secondMoment: Moment | null) {
-    const changedNull =
-      (firstMoment === null && secondMoment !== null) ||
-      (firstMoment !== null && secondMoment == null)
-    const changedValue = firstMoment && firstMoment.isValid() && !firstMoment.isSame(secondMoment)
-    return changedNull || changedValue
-  }
 
-  if (isDifferentMoment(selectedMoment, priorSelectedMoment.current)) {
-    syncInput(selectedMoment)
-  }
-  // now that we've done the check, we can update this value
-  priorSelectedMoment.current = selectedMoment
+  const isInError = useCallback(() => {
+    const inputEmpty = inputValue?.length === 0
+    return inputEmpty
+      ? false
+      : internalMessages.filter(m => m.type === 'error').length > 0 || tz.parse(inputValue) === null
+  }, [inputValue, internalMessages])
 
-  function syncInput(newMoment: Moment | null) {
-    const newInputValue = newMoment && newMoment.isValid() ? formatDate(newMoment.toDate()) : ''
-    setInputValue(newInputValue)
-    setInternalMessages([])
-    setRenderedMoment(newMoment || todayMoment)
-  }
+  const isDifferentMoment = useCallback(
+    (firstMoment: Moment | null, secondMoment: Moment | null) => {
+      const changedNull =
+        (firstMoment === null && secondMoment !== null) ||
+        (firstMoment !== null && secondMoment == null)
+      const changedValue = firstMoment && firstMoment.isValid() && !firstMoment.isSame(secondMoment)
+      return changedNull || changedValue
+    },
+    []
+  )
+
+  const syncInput = useCallback(
+    (newMoment: Moment | null) => {
+      const newInputValue = newMoment && newMoment.isValid() ? formatDate(newMoment.toDate()) : ''
+      setInputValue(newInputValue)
+      setInternalMessages([])
+      setRenderedMoment(newMoment || todayMoment)
+    },
+    [formatDate, todayMoment]
+  )
+
+  useEffect(() => {
+    setSelectedMoment(selectedDate ? moment.tz(selectedDate, timezone) : null)
+  }, [selectedDate, timezone])
+
+  useEffect(() => {
+    if (isDifferentMoment(selectedMoment, priorSelectedMoment.current)) {
+      if (defaultToToday && isInError()) return
+      syncInput(selectedMoment)
+      // now that we've done the check, we can update this value
+      priorSelectedMoment.current = selectedMoment
+    }
+  }, [selectedMoment, isInError, syncInput, isDifferentMoment, selectedDate, defaultToToday])
 
   function generateMonthMoments() {
     const firstMoment = moment.tz(renderedMoment, timezone).startOf('month').startOf('week')
@@ -208,7 +244,7 @@ export default function CanvasDateInput({
 
   function renderDays() {
     // This is expensive, so only do it if the calendar is open
-    if (!isShowingCalendar) return null
+    if (!isShowingCalendar) return undefined
 
     const locale = specifiedLocale || ENV?.LOCALE || navigator.language
 
@@ -246,15 +282,13 @@ export default function CanvasDateInput({
     return invalidDateMessage
   }
 
-  function handleChange(_event: Event, {value}: {value: string}) {
+  function handleChange(_event: ChangeEvent<HTMLInputElement>, {value}: {value: string}) {
     setInputValue(value)
     // If we have been asked to show the running value, hide the popup
     if (isShowingCalendar && withRunningValue) handleHideCalendar()
     const newDate = tz.parse(value, timezone)
     if (newDate) {
-      const msgs: CanvasDateInputMessageType[] = withRunningValue
-        ? [{type: 'success', text: formatDate(newDate)}]
-        : []
+      const msgs: Messages = withRunningValue ? [{type: 'success', text: formatDate(newDate)}] : []
       setRenderedMoment(moment.tz(newDate, timezone))
       setInternalMessages(msgs)
     } else if (value === '') {
@@ -265,61 +299,55 @@ export default function CanvasDateInput({
     }
   }
 
-  function handleDayClick(_event: Event, {date}: {date: string}) {
+  function handleDayClick(_event: MouseEvent<ViewProps>, {date}: {date: string}) {
     const parsedMoment = moment.tz(date, timezone)
-    syncInput(parsedMoment)
-    onSelectedDateChange(parsedMoment.toDate())
+    let input = parsedMoment
+    if (selectedDate) {
+      const selectedMoment_ = moment.tz(selectedDate, timezone)
+      if (selectedMoment_.isSame(parsedMoment, 'day')) {
+        input = selectedMoment_
+      }
+    }
+    syncInput(input)
+    onSelectedDateChange(parsedMoment.toDate(), 'pick')
     setInputDetails({method: 'pick', value: date})
   }
 
-  function handleBlur(event: React.FormEvent<HTMLInputElement>) {
-    const errorsExist = internalMessages.filter(m => m.type === 'error').length > 0
+  function handleBlur(event: BlurReturn) {
     const inputEmpty = inputValue.trim().length === 0
-    const newDate = errorsExist || inputEmpty ? null : renderedMoment.toDate()
+    const errorsExist = isInError()
+    let newDate = null
 
-    syncInput(newDate ? moment.tz(newDate, timezone) : priorSelectedMoment.current)
-    onSelectedDateChange(newDate)
+    if (defaultToToday) {
+      if (errorsExist) {
+        onSelectedDateChange(null, 'error')
+      } else {
+        newDate = inputEmpty ? new Date() : renderedMoment.toDate()
+        syncInput(newDate ? moment.tz(newDate, timezone) : priorSelectedMoment.current)
+        onSelectedDateChange(newDate, 'other')
+      }
+    } else {
+      newDate = errorsExist || inputEmpty ? null : renderedMoment.toDate()
+
+      syncInput(newDate ? moment.tz(newDate, timezone) : priorSelectedMoment.current)
+      onSelectedDateChange(newDate, 'other')
+    }
 
     if (inputDetails?.method === 'pick') {
-      const date = inputDetails.value
-
       setInputDetails(null)
-
-      log({
-        id: widgetId,
-        method: 'pick',
-        parsed: (newDate && newDate.toISOString()) || undefined,
-        value: date,
-      })
     } else if (inputDetails?.method === 'paste') {
-      const pastedValue = inputDetails.value
-
       setInputDetails(null)
-
-      log({
-        id: widgetId,
-        method: 'paste',
-        parsed: (newDate && newDate.toISOString()) || undefined,
-        value: pastedValue,
-      })
-    } else if (!inputEmpty) {
-      log({
-        id: widgetId,
-        method: 'type',
-        parsed: (newDate && newDate.toISOString()) || undefined,
-        value: inputValue.trim(),
-      })
     }
     onBlur?.(event)
   }
 
-  function handleKey(e: React.KeyboardEvent<HTMLInputElement>) {
+  function handleKey(e: KeyboardEvent<DateInputProps>) {
     if (e.key === 'Enter') {
       handleBlur(e)
     }
   }
 
-  function trackPasteEvent(e: ClipboardEvent) {
+  function trackPasteEvent(e: ClipboardEvent<DateInputProps>) {
     setInputDetails({
       method: 'paste',
       value: e.clipboardData?.getData('text') || '',
@@ -330,14 +358,15 @@ export default function CanvasDateInput({
     setIsShowingCalendar(false)
   }
 
-  function handleShowCalendar({nativeEvent: e}: {nativeEvent: KeyboardEvent}) {
+  function handleShowCalendar(e: SyntheticEvent) {
     // Do not re-show the calendar if input was typing and we have been asked to
     // show the running value. For some reason DateInput reflects an InputEvent for
     // all typing EXCEPT for spaces, which come in as KeyboardEvents, so we have to
     // deal with both. 🤷🏼‍♂️
+    const ne: unknown = e.nativeEvent
     if (withRunningValue) {
-      if (e.constructor.name === 'InputEvent') return
-      if (e?.key === ' ') {
+      if ((ne as InputEvent).constructor.name === 'InputEvent') return
+      if ((ne as KeyboardEvent)?.key === ' ') {
         setInputValue(v => v + ' ')
         return
       }
@@ -355,7 +384,7 @@ export default function CanvasDateInput({
       ? selectedMoment.clone().add(step, type).startOf('day')
       : renderedMoment.clone().startOf('month')
 
-    onSelectedDateChange(newMoment.toDate())
+    onSelectedDateChange(newMoment.toDate(), 'pick')
   }
 
   function modifyRenderedMoment(

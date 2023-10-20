@@ -98,7 +98,7 @@ describe "Final Grade Override" do
 
     it "saves overridden grade in Gradebook", priority: "1" do
       Gradebook.visit(@course)
-      expect(Gradebook::Cells.get_override_grade(@students.first)).to eql "A-"
+      expect(Gradebook::Cells.get_override_grade(@students.first)).to eql "A−"
     end
 
     it "displays overridden grade for student grades", priority: "1" do

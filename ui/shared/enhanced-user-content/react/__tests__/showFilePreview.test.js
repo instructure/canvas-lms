@@ -26,10 +26,7 @@ const fauxFile =
 
 describe('showFilePreview', () => {
   beforeEach(() => {
-    fetchMock.mock(
-      '/api/v1/files/2282?include[]=enhanced_preview_url&verifier=abc&use_verifiers=1',
-      fauxFile
-    )
+    fetchMock.mock('/api/v1/files/2282?include[]=enhanced_preview_url&verifier=abc', fauxFile)
   })
 
   afterEach(() => {
@@ -49,10 +46,7 @@ describe('showFilePreview', () => {
   })
 
   it('displays a flash error message if file is not found', async () => {
-    fetchMock.mock(
-      '/api/v1/files/2283?include[]=enhanced_preview_url&verifier=abc&use_verifiers=1',
-      404
-    )
+    fetchMock.mock('/api/v1/files/2283?include[]=enhanced_preview_url&verifier=abc', 404)
     await showFilePreview('2283', 'abc')
     // there are 2 because flash alerts are displayed onscreen and in the flash_screenreader_holder
     const err_msg = await findAllByText(document.body, 'Failed getting file to preview')

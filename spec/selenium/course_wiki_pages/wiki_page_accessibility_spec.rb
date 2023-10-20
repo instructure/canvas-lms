@@ -52,27 +52,6 @@ describe "Wiki Pages" do
       check_header_focus("updated_at")
     end
 
-    describe "Add Page Button" do
-      before do
-        visit_course_wiki_index_page(@course.id)
-
-        driver.execute_script("$('a.btn.new_page').focus()")
-        @active_element = driver.execute_script("return document.activeElement")
-      end
-
-      it "navigates to the add page view when enter is pressed" do
-        @active_element.send_keys(:enter)
-        wait_for_ajaximations
-        check_element_has_focus(edit_page_title_input)
-      end
-
-      it "navigates to the add page view when spacebar is pressed" do
-        @active_element.send_keys(:space)
-        wait_for_ajaximations
-        check_element_has_focus(edit_page_title_input)
-      end
-    end
-
     context "Publish Cloud" do
       it "sets focus back to the publish cloud after unpublish" do
         visit_course_wiki_index_page(@course.id)
@@ -264,7 +243,7 @@ describe "Wiki Pages" do
       end
     end
 
-    context "Edit Page", ignore_js_errors: true do
+    context "Edit Page", :ignore_js_errors do
       before do
         visit_wiki_edit_page(@course.id, "bar")
         wait_for_ajaximations
@@ -300,8 +279,8 @@ describe "Wiki Pages" do
       it "alerts user if navigating away from page after title change", priority: "1" do
         skip_if_safari(:alert)
         switch_editor_views
-        f(".title").clear
-        f(".title").send_keys("derpy-title")
+        edit_page_title_input.clear
+        edit_page_title_input.send_keys("derpy-title")
         fln("Home").click
         expect(driver.switch_to.alert).to be_present
         driver.switch_to.alert.accept

@@ -44,6 +44,48 @@ describe DeveloperKey do
     )
   end
 
+  describe "#site_admin_service_auth?" do
+    subject do
+      developer_key_not_saved.update!(key_attributes)
+      developer_key_not_saved.site_admin_service_auth?
+    end
+
+    let(:service_user) { user_model }
+    let(:root_account) { account_model }
+
+    context "when 'site_admin_service_auth' is enabled" do
+      before { Account.site_admin.enable_feature!(:site_admin_service_auth) }
+
+      context "and the service user association is not set" do
+        let(:key_attributes) { { service_user: nil } }
+
+        it { is_expected.to be false }
+      end
+
+      context "and the service user association is set" do
+        let(:key_attributes) { { service_user: } }
+
+        context "and the key is a site admin key" do
+          let(:key_attributes) { { service_user:, account: nil } }
+
+          it { is_expected.to be false }
+
+          context "and the key is an internal service" do
+            let(:key_attributes) { { service_user:, account: nil, internal_service: true } }
+
+            it { is_expected.to be true }
+          end
+        end
+
+        context "and the key is not a site admin key" do
+          let(:key_attributes) { super().merge(account: root_account) }
+
+          it { is_expected.to be false }
+        end
+      end
+    end
+  end
+
   describe "#find_cached" do
     it "raises error when not found, and caches that" do
       enable_cache do
@@ -824,6 +866,8 @@ describe DeveloperKey do
   describe "associations" do
     let(:developer_key_account_binding) { developer_key_saved.developer_key_account_bindings.first }
 
+    it { is_expected.to belong_to(:service_user) }
+
     it "destroys developer key account bindings when destroyed" do
       binding_id = developer_key_account_binding.id
       developer_key_saved.destroy_permanently!
@@ -1036,6 +1080,11 @@ describe DeveloperKey do
 
   it "doesn't allow redirect_uris over 4096 characters" do
     developer_key_not_saved.redirect_uris = ["https://test.example.com/" + ("a" * 4097), "https://example.com"]
+    expect(developer_key_not_saved).not_to be_valid
+  end
+
+  it "doesn't allow non-URIs" do
+    developer_key_not_saved.redirect_uris = ["@?!"]
     expect(developer_key_not_saved).not_to be_valid
   end
 

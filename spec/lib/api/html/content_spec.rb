@@ -117,10 +117,10 @@ module Api
         end
 
         it "re-writes root-relative urls to be absolute" do
-          string = "<p><a href=\"/blah\"></a></p>"
+          string = "<p><a href=\"/blah\"></a></p><source srcset=\"/img.src\">"
           url_helper = UrlProxy.new(double, double(shard: nil), "example.com", "https")
           html = Content.new(string).rewritten_html(url_helper)
-          expect(html).to eq("<p><a href=\"https://example.com/blah\"></a></p>")
+          expect(html).to eq("<p><a href=\"https://example.com/blah\"></a></p><source srcset=\"https://example.com/img.src\">")
         end
 
         it "does not re-write root-relative urls to be absolute if requested not to" do

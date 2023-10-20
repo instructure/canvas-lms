@@ -31,7 +31,8 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
         "tool_profiles" => [{ "title" => "a1", "migration_id" => "a1" }],
         "outcomes" => [{ "title" => "a1", "migration_id" => "a1" }],
         "file_map" => { "oi" => { "title" => "a1", "migration_id" => "a1" } },
-        "assignments" => [{ "title" => "a1", "migration_id" => "a1" }, { "title" => "a2", "migration_id" => "a2", "assignment_group_migration_id" => "a1" }],
+        "assignments" => [{ "title" => "a1", "migration_id" => "a1" },
+                          { "title" => "a2", "migration_id" => "a2", "assignment_group_migration_id" => "a1" }],
         "assignment_groups" => [{ "title" => "a1", "migration_id" => "a1" }],
         "calendar_events" => [],
         "course" => {
@@ -41,14 +42,16 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
         }
       }
       @migration = double
-      allow(@migration).to receive(:migration_type).and_return("common_cartridge_importer")
-      allow(@migration).to receive(:overview_attachment).and_return(@migration)
-      allow(@migration).to receive(:open).and_return(@migration)
-      allow(@migration).to receive(:shard).and_return("1")
-      allow(@migration).to receive(:cache_key).and_return("1")
+      allow(@migration).to receive_messages(
+        migration_type: "common_cartridge_importer",
+        overview_attachment: @migration,
+        open: @migration,
+        shard: "1",
+        cache_key: "1",
+        read: @overview.to_json,
+        context: course_model
+      )
       allow(@migration).to receive(:close)
-      allow(@migration).to receive(:read).and_return(@overview.to_json)
-      allow(@migration).to receive(:context).and_return(course_model)
       @formatter = Canvas::Migration::Helpers::SelectiveContentFormatter.new(@migration, "https://example.com", global_identifiers: true)
     end
 
@@ -246,10 +249,10 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
       @group = Group.create!(name: "group1", group_category: @category, context: @course)
       @announcement = announcement_model
       @migration = double
-      allow(@migration).to receive(:migration_type).and_return("course_copy_importer")
-      allow(@migration).to receive(:source_course).and_return(@course)
       export = @course.content_exports.create!(export_type: ContentExport::COURSE_COPY)
-      allow(@migration).to receive(:content_export).and_return(export)
+      allow(@migration).to receive_messages(migration_type: "course_copy_importer",
+                                            source_course: @course,
+                                            content_export: export)
       @course_outcome = outcome_model(title: "zebra")
       @account_outcome = outcome_model(outcome_context: @course.account, title: "alpaca")
       @out_group1 = outcome_group_model(title: "striker")

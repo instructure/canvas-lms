@@ -122,8 +122,13 @@ describe BrandableCSS do
         end
 
         it "uploads json file to s3 if cdn is enabled" do
-          allow(Canvas::Cdn).to receive(:enabled?).and_return(true)
-          allow(Canvas::Cdn).to receive(:config).and_return(ActiveSupport::OrderedOptions.new.merge(region: "us-east-1", aws_access_key_id: "id", aws_secret_access_key: "secret", bucket: "cdn"))
+          allow(Canvas::Cdn).to receive_messages(
+            enabled?: true,
+            config: ActiveSupport::OrderedOptions.new.merge(region: "us-east-1",
+                                                            aws_access_key_id: "id",
+                                                            aws_secret_access_key: "secret",
+                                                            bucket: "cdn")
+          )
 
           file = StringIO.new
           allow(BrandableCSS).to receive(:default_brand_file).with(type, high_contrast).and_return(file)
@@ -133,8 +138,13 @@ describe BrandableCSS do
         end
 
         it "deletes the local json file if cdn is enabled" do
-          allow(Canvas::Cdn).to receive(:enabled?).and_return(true)
-          allow(Canvas::Cdn).to receive(:config).and_return(ActiveSupport::OrderedOptions.new.merge(region: "us-east-1", aws_access_key_id: "id", aws_secret_access_key: "secret", bucket: "cdn"))
+          allow(Canvas::Cdn).to receive_messages(
+            enabled?: true,
+            config: ActiveSupport::OrderedOptions.new.merge(region: "us-east-1",
+                                                            aws_access_key_id: "id",
+                                                            aws_secret_access_key: "secret",
+                                                            bucket: "cdn")
+          )
           file = StringIO.new
           allow(BrandableCSS).to receive(:default_brand_file).with(type, high_contrast).and_return(file)
           expect(File).to receive(:delete).with(BrandableCSS.default_brand_file(type, high_contrast))

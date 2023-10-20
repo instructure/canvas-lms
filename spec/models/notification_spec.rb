@@ -43,15 +43,6 @@ describe Notification do
     expect(@notification.delay_for).to be >= 0
   end
 
-  it "has a decent state machine" do
-    notification_model
-    expect(@notification.state).to be(:active)
-    @notification.deactivate
-    expect(@notification.state).to be(:inactive)
-    @notification.reactivate
-    expect(@notification.state).to be(:active)
-  end
-
   it "always has some subject" do
     expect(Notification.create!(name: "Testing").subject).not_to be_nil
   end

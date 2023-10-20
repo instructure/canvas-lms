@@ -165,6 +165,34 @@ describe GraphQLController do
         create_discussion_entry("Post 2")
         expect(AssetUserAccess.last.participate_score).to eq 2.0
       end
+
+      it "correctly sets the course context for a Live event" do
+        allow(LiveEvents).to receive(:post_event)
+        course_with_teacher(active_all: true)
+        student_in_course(active_all: true)
+        discussion_topic_model({ context: @course, discussion_type: DiscussionTopic::DiscussionTypes::THREADED })
+
+        user_session(@teacher)
+
+        expect(LiveEvents).to receive(:post_event).with(hash_including({
+                                                                         event_name: "discussion_entry_created"
+                                                                       })) do |payload|
+          # Add an expectation to check the context within the payload
+          expect(payload[:text]).to eq("Post 1")
+          expect(payload[:user_id]).to eq(@teacher.id.to_s)
+
+          # The post_event method in the live_events.rb uses the materialized_context to set the liveEvent context before sending it
+          # This only gets run if the LiveEvents is configured, so tests like this are only able to capture the information that goes to that method
+          # This tests the context that the LiveEvent is set to right before it is sent out
+          # The context must be retrieved here because it will get set to nil after the event is sent
+          live_event_context = LiveEvents.get_context
+          expect(live_event_context[:context_type]).to eq "Course"
+          expect(live_event_context[:context_id]).to eq @course.id.to_s
+          expect(live_event_context[:context_account_id]).to eq @course.account.id.to_s
+        end
+
+        create_discussion_entry("Post 1")
+      end
     end
 
     context "datadog metrics" do

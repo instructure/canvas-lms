@@ -108,6 +108,10 @@ class SectionsController < ApplicationController
   #   - "permissions": Include whether section grants :manage_calendar permission
   #     to the caller
   #
+  # @argument search_term [Optional, String]
+  #   When included, searches course sections for the term. Returns only matching
+  #   results. Term must be at least 2 characters.
+  #
   # @returns [Section]
   def index
     if authorized_action(@context, @current_user, %i[read read_roster view_all_grades manage_grades])
@@ -116,8 +120,10 @@ class SectionsController < ApplicationController
       end
 
       includes = Array(params[:include])
+      search_term = params[:search_term]
 
       sections = @context.active_course_sections.order(CourseSection.best_unicode_collation_key("name"), :id)
+      sections = CourseSection.search_by_attribute(sections, :name, search_term) if search_term.present?
 
       unless params[:all].present?
         sections = Api.paginate(sections, self, api_v1_course_sections_url)
@@ -294,7 +300,7 @@ class SectionsController < ApplicationController
       integration_id = params[:course_section].delete(:integration_id)
       if sis_id || integration_id
         if @section.root_account.grants_right?(@current_user, :manage_sis)
-          @section.sis_source_id = (sis_id == "") ?  nil : sis_id if sis_id
+          @section.sis_source_id = (sis_id == "") ? nil : sis_id if sis_id
           @section.integration_id = (integration_id == "") ? nil : integration_id if integration_id
         elsif api_request?
           return render json: { message: "You must have manage_sis permission to update sis attributes" }, status: :unauthorized

@@ -41,7 +41,7 @@ module.exports = {
     noParse: [require.resolve('jquery'), require.resolve('tinymce')],
     rules: [
       {
-        test: /\.m?js$/,
+        test: /\.(mjs|js|jsx|ts|tsx)$/,
         type: 'javascript/auto',
         include: [
           path.resolve(canvasDir, 'node_modules/graphql'),
@@ -53,20 +53,19 @@ module.exports = {
         },
       },
       {
-        test: /\.js$/,
+        test: /\.(js|jsx|ts|tsx)$/,
         type: 'javascript/auto',
         include: [path.resolve(canvasDir, 'node_modules/@instructure')],
       },
       {
-        test: /\.(js|ts|tsx)$/,
+        test: /\.(js|jsx|ts|tsx)$/,
         include: [
           path.join(canvasDir, 'ui'),
           path.join(canvasDir, 'packages/jquery-kyle-menu'),
           path.join(canvasDir, 'packages/jquery-popover'),
+          path.resolve(canvasDir, 'packages/canvas-planner'),
           path.join(canvasDir, 'packages/jquery-selectmenu'),
-          path.join(canvasDir, 'packages/defer-promise'),
           path.resolve(canvasDir, 'packages/convert-case'),
-          path.resolve(canvasDir, 'packages/html-escape'),
           path.join(canvasDir, 'packages/slickgrid'),
           path.join(canvasDir, 'spec/javascripts/jsx'),
           path.join(canvasDir, 'spec/coffeescripts'),
@@ -81,7 +80,11 @@ module.exports = {
           options: {
             cacheDirectory: false,
             configFile: false,
-            presets: [['@babel/preset-react', {useBuiltIns: true}], ['@babel/preset-typescript']],
+            presets: [
+              ['@babel/preset-env'],
+              ['@babel/preset-react', {useBuiltIns: true}],
+              ['@babel/preset-typescript'],
+            ],
             plugins: [
               // we need to have babel transpile ESM to CJS and can't just let
               // Webpack do it because Sinon is evidently no longer compatible
@@ -131,7 +134,7 @@ module.exports = {
       // globals. We should get rid of this and just change our actual source to
       // s/test/qunit.test/ and s/module/qunit.module/
       {
-        test: /\.js$/,
+        test: /\.(js|jsx|ts|tsx)$/,
         include: [
           path.join(canvasDir, 'spec/coffeescripts'),
           path.join(canvasDir, 'spec/javascripts/jsx'),
@@ -170,8 +173,9 @@ module.exports = {
     },
     fallback: {
       path: false, // for minimatch
+      stream: require.resolve('stream-browserify'),
     },
-    extensions: ['.mjs', '.js', '.ts', '.tsx'],
+    extensions: ['.mjs', '.js', '.jsx', '.ts', '.tsx'],
     modules: [
       path.join(canvasDir, 'ui/shims'),
       path.join(canvasDir, 'public/javascripts'),
@@ -194,7 +198,7 @@ module.exports = {
       RESOURCE_EMBER_GRADEBOOK_SPEC,
       RESOURCE_JSX_SPEC,
       WEBPACK_PLUGIN_SPECS: JSON.stringify(WEBPACK_PLUGIN_SPECS),
-      process: {env: {}},
+      process: {browser: true, env: {}},
     }),
 
     new EnvironmentPlugin({

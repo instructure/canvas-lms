@@ -46,6 +46,7 @@ const unsubmittedSubmission: Submission = {
   assignment_id: '32',
   attempt: 1,
   cached_due_date: null,
+  custom_grade_status_id: null,
   drop: undefined,
   entered_grade: null,
   entered_score: null,

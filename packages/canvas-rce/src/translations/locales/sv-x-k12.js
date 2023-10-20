@@ -33,6 +33,7 @@ const locale = {
   "add_another_f4e50d57": { "message": "Lägg till en till" },
   "add_cc_subtitles_55f0394e": { "message": "Lägg till CC/undertext" },
   "add_image_60b2de07": { "message": "Lägg till bild" },
+  "add_one_9e34a6f8": { "message": "Lägg till en!" },
   "additional_considerations_f3801683": {
     "message": "Ytterliggare hänsynstaganden"
   },
@@ -226,6 +227,7 @@ const locale = {
   "crop_image_807ebb08": { "message": "Beskär bilden" },
   "cup_product_14174434": { "message": "Kopprodukt" },
   "current_image_f16c249c": { "message": "Aktuell bild" },
+  "current_link_945a47ee": { "message": "Aktuell länk" },
   "current_volume_level_c55ab825": { "message": "Aktuell volymnivå" },
   "custom_6979cd81": { "message": "Anpassa" },
   "custom_width_and_height_pixels_946eea7c": {
@@ -576,6 +578,9 @@ const locale = {
   "light_blue_5374f600": { "message": "Ljusblå" },
   "link_7262adec": { "message": "Länk" },
   "link_options_a16b758b": { "message": "Länkalternativ" },
+  "link_type_linktypemessage_c6d26815": {
+    "message": "länktyp { linkTypeMessage }"
+  },
   "link_with_text_starting_with_start_b3fcbe71": {
     "message": "Länk med text som börjar med { start }"
   },
@@ -634,6 +639,7 @@ const locale = {
   "minus_plus_3461f637": { "message": "Minus/plus" },
   "misc_3b692ea7": { "message": "Diverse" },
   "miscellaneous_e9818229": { "message": "Blandat" },
+  "module_90d9fd32": { "message": "Modul" },
   "modules_c4325335": { "message": "Moduler" },
   "moving_image_to_crop_directionword_6f66cde2": {
     "message": "Flyttar bild till beskärning { directionWord }"
@@ -658,19 +664,41 @@ const locale = {
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navigera via menyn eller verktygsfältet"
   },
+  "navigation_ee9af92d": { "message": "Navigering" },
   "nested_greater_than_d852e60d": { "message": "Kapslade större än" },
   "nested_less_than_27d17e58": { "message": "Kapslad mindre än" },
+  "new_quiz_34aacba6": { "message": "Ny quiz" },
   "next_40e12421": { "message": "Nästa" },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "Inga tillgänglighetsproblem upptäcktes."
   },
+  "no_announcements_created_yet_c44a94f4": {
+    "message": "Inga meddelanden har skapats än."
+  },
+  "no_announcements_found_20185afc": { "message": "Inga meddelande hittades." },
+  "no_assignments_created_yet_1b236d87": {
+    "message": "Inga uppgifter har skapats än."
+  },
+  "no_assignments_found_79e46d7f": { "message": "Inga uppgifter hittades." },
   "no_changes_to_save_d29f6e91": { "message": "Inga ändringar att spara." },
+  "no_discussions_created_yet_ff99abe3": {
+    "message": "Inga diskussioner har skapats än."
+  },
+  "no_discussions_found_9284063b": { "message": "Inga diskussioner hittades." },
   "no_e16d9132": { "message": "Nej" },
   "no_file_chosen_9a880793": { "message": "Ingen fil har valts" },
   "no_headers_9bc7dc7f": { "message": "Inga rubriker" },
+  "no_modules_created_yet_c71b6d4d": {
+    "message": "Inga moduler har skapats än."
+  },
+  "no_modules_found_2df43a40": { "message": "Inga moduler hittades." },
+  "no_pages_created_yet_c379fa6e": { "message": "Inga sidor har skapats än." },
+  "no_pages_found_6799350": { "message": "Inga sidor hittades." },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "Förhandsvisning är inte tillgänglig för den här filen."
   },
+  "no_quizzes_created_yet_1a2370b9": { "message": "Inga quiz har skapats än." },
+  "no_quizzes_found_c80c537a": { "message": "Inga quiz hittades." },
   "no_results_940393cf": { "message": "Inga resultat." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Inga resultat hittades för { filterTerm }"
@@ -865,6 +893,7 @@ const locale = {
   "select_crop_shape_d441feeb": { "message": "Välj beskärningsform" },
   "select_language_7c93a900": { "message": "Välj språk" },
   "select_video_source_1b5c9dbe": { "message": "Välj videokälla" },
+  "selected_274ce24f": { "message": "Markerade" },
   "selected_linkfilename_c093b1f2": { "message": "Markerade { linkFileName }" },
   "selection_b52c4c5e": { "message": "Val" },
   "set_header_scope_8c548f40": { "message": "Ange rubrikens omfattning" },
@@ -1083,6 +1112,7 @@ const locale = {
     "message": "Diagonal pil, uppåt och till höger"
   },
   "up_c553575d": { "message": "Upp" },
+  "updated_link_a827e441": { "message": "Uppdaterad länk" },
   "upload_document_253f0478": { "message": "Ladda upp dokument" },
   "upload_file_fd2361b8": { "message": "Ladda upp fil" },
   "upload_image_6120b609": { "message": "Ladda upp bild" },

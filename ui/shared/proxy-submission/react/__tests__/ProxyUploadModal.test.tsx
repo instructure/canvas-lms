@@ -44,6 +44,10 @@ function renderComponent(overrideProps = {}) {
 }
 
 describe('ProxyUploadModal', () => {
+  beforeAll(() => {
+    global.DataTransferItem = global.DataTransferItem || class DataTransferItem {}
+  })
+
   it('renders', () => {
     const {getByText} = renderComponent()
     expect(getByText('Upload File')).toBeInTheDocument()

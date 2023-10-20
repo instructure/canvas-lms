@@ -298,6 +298,51 @@ describe "Groups API", type: :request do
     expect(json.first["id"]).to eq @group_1.id
   end
 
+  describe "filters groups" do
+    before(:once) do
+      course_with_student(active_all: true)
+      @group_1 = @course.groups.create!(name: "Abras")
+      @group_2 = @course.groups.create!(name: "Squirtles")
+      @group_3 = @course.groups.create!(name: "Fabric")
+      @group_4 = @course.groups.create!(name: "Labyrinth")
+      @group_2.add_user(@user, "accepted", false)
+      @group_4.add_user(@user, "accepted", false)
+    end
+
+    it "returns all groups when the filter is present but empty" do
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.to_param}/groups.json?filter=",
+                      @category_path_options.merge(action: "context_index",
+                                                   course_id: @course.to_param,
+                                                   filter: ""))
+      expect(json.count).to eq(4)
+    end
+
+    it "matches group names" do
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.to_param}/groups.json?filter=abr",
+                      @category_path_options.merge(action: "context_index",
+                                                   course_id: @course.to_param,
+                                                   filter: "abr"))
+      ids = json.pluck("id")
+      expect(ids.count).to eq(2)
+      expect(ids).to include(@group_1.id)
+      expect(ids).to include(@group_3.id)
+    end
+
+    it "matches users' names in the group" do
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.to_param}/groups.json?filter=#{@user.name}",
+                      @category_path_options.merge(action: "context_index",
+                                                   course_id: @course.to_param,
+                                                   filter: @user.name))
+      ids = json.pluck("id")
+      expect(ids.count).to eq(2)
+      expect(ids).to include(@group_2.id)
+      expect(ids).to include(@group_4.id)
+    end
+  end
+
   it "allows a member to retrieve the group" do
     @user = @member
     json = api_call(:get, @community_path, @category_path_options.merge(group_id: @community.to_param, action: "show"))

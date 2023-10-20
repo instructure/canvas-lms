@@ -62,7 +62,7 @@ RSpec.shared_examples "displayable student grade" do
     StudentGradesPage.comment_buttons.first.click
     aggregate_failures("has grade and comment present") do
       expect(StudentGradesPage.fetch_assignment_score(@assignment)).to eq submission.grade
-      expect(StudentGradesPage.comments(@assignment).first).to include_text submission_comment.comment
+      expect(StudentGradesPage.submission_comments.first).to include_text submission_comment.comment
     end
   end
 end

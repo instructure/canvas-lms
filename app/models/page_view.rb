@@ -386,8 +386,10 @@ class PageView < ActiveRecord::Base
 
     exptime = Setting.get("page_views_active_user_exptime", 1.day.to_s).to_i
     bucket = PageView.user_count_bucket_for_time(self.created_at)
-    Canvas.redis.sadd(bucket, user.global_id)
-    Canvas.redis.expire(bucket, exptime)
+    Canvas.redis.pipelined(failsafe: nil) do |pipeline|
+      pipeline.sadd(bucket, user.global_id)
+      pipeline.expire(bucket, exptime)
+    end
   end
 
   # to_csv uses these methods, see lib/ext/array.rb

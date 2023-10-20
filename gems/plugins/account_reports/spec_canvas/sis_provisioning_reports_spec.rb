@@ -2449,8 +2449,7 @@ describe "Default Account Reports" do
                                                 username: "other_shard@example.com",
                                                 sis_user_id: "other_shard")
           end
-          allow(@account).to receive(:trusted_account_ids).and_return([@account.id, @root.id])
-          allow(@account).to receive(:trust_exists?).and_return(true)
+          allow(@account).to receive_messages(trusted_account_ids: [@account.id, @root.id], trust_exists?: true)
           @admin4 = @account.account_users.create(user: @user)
           @admin4.sis_batch_id = @sis.id
           @admin4.save!

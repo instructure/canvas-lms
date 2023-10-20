@@ -33,9 +33,6 @@ import PandaUsingPaces from '../../../images/PandaUsingPaces.svg'
 
 const I18n = useI18nScope('course_paces_empty_state')
 
-// Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
-const {Item: FlexItem} = Flex as any
-
 interface DispatchProps {
   readonly setSelectedPaceContext: typeof actions.setSelectedPaceContext
 }
@@ -56,7 +53,7 @@ export const CoursePaceEmpty = ({
         justifyItems={responsiveSize !== 'small' ? 'start' : 'center'}
         margin="0 0 medium 0"
       >
-        <FlexItem padding="medium 0 0 0" width="100%" maxWidth="362px" shouldShrink={true}>
+        <Flex.Item padding="medium 0 0 0" width="100%" maxWidth="362px" shouldShrink={true}>
           <View
             as="div"
             textAlign={responsiveSize !== 'small' ? 'start' : 'center'}
@@ -66,10 +63,10 @@ export const CoursePaceEmpty = ({
             <img src={PandaShowingPaces} alt="" />
           </View>
           <Flex alignItems="start">
-            <FlexItem padding="0 xx-small">
+            <Flex.Item padding="0 xx-small">
               <Text weight="bold">1.</Text>
-            </FlexItem>
-            <FlexItem>
+            </Flex.Item>
+            <Flex.Item>
               <Text as="div" weight="bold">
                 {I18n.t('Create a Course Pace')}
               </Text>
@@ -78,17 +75,17 @@ export const CoursePaceEmpty = ({
                   'Get started by creating a course pace that will serve as the default pace for all sections and students in the course.'
                 )}
               </Text>
-            </FlexItem>
+            </Flex.Item>
           </Flex>
-        </FlexItem>
+        </Flex.Item>
 
         {responsiveSize !== 'small' ? (
-          <FlexItem margin="0 large small large">
+          <Flex.Item margin="0 large small large">
             <IconArrowEndSolid size="small" />
-          </FlexItem>
+          </Flex.Item>
         ) : null}
 
-        <FlexItem padding="medium 0 0 0" width="100%" maxWidth="362px" shouldShrink={true}>
+        <Flex.Item padding="medium 0 0 0" width="100%" maxWidth="362px" shouldShrink={true}>
           <View
             as="div"
             textAlign={responsiveSize !== 'small' ? 'start' : 'center'}
@@ -97,10 +94,10 @@ export const CoursePaceEmpty = ({
             <img src={PandaUsingPaces} alt="" />
           </View>
           <Flex alignItems="start">
-            <FlexItem padding="0 xx-small">
+            <Flex.Item padding="0 xx-small">
               <Text weight="bold">2.</Text>
-            </FlexItem>
-            <FlexItem>
+            </Flex.Item>
+            <Flex.Item>
               <Text as="div" weight="bold">
                 {I18n.t('Customize Section and Student Paces')}
               </Text>
@@ -109,9 +106,9 @@ export const CoursePaceEmpty = ({
                   'Next, adjust the paces for individual sections and/or students to further customize based on your needs (this step is optional).'
                 )}
               </Text>
-            </FlexItem>
+            </Flex.Item>
           </Flex>
-        </FlexItem>
+        </Flex.Item>
       </Flex>
       <Button
         data-testid="get-started-button"

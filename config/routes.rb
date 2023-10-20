@@ -331,14 +331,12 @@ CanvasRails::Application.routes.draw do
         get :submissions
       end
 
-      member do
-        get :list_google_docs
-      end
-
       get "lti/resource/:resource_link_id",
           controller: "lti/message",
           action: "resource",
           as: :resource_link_id
+
+      get :tool_launch
     end
 
     resources :grading_standards, only: %i[index create update destroy]
@@ -673,7 +671,10 @@ CanvasRails::Application.routes.draw do
       end
     end
 
-    resources :terms, except: %i[show new edit]
+    resources :terms, except: %i[index new show edit]
+    # handle the index route using terms_api_controller
+    get "terms", controller: :terms_api, action: "index"
+
     resources :sub_accounts
     resources :calendar_events
 
@@ -1043,6 +1044,11 @@ CanvasRails::Application.routes.draw do
   get "terms_of_use" => "legal_information#terms_of_use", :as => "terms_of_use_redirect"
   get "privacy_policy" => "legal_information#privacy_policy", :as => "privacy_policy_redirect"
 
+  scope(controller: :smart_search) do
+    get "search", action: :show
+    get "smartsearch", action: :index, as: "smart_search_query"
+  end
+
   ### API routes ###
 
   # TODO: api routes can't yet take advantage of concerns for DRYness, because of
@@ -1258,6 +1264,8 @@ CanvasRails::Application.routes.draw do
       put "courses/:course_id/assignments/:id", action: :update
       post "courses/:course_id/assignments/:assignment_id/duplicate", action: :duplicate
       delete "courses/:course_id/assignments/:id", action: :destroy, controller: :assignments
+      get "courses/:course_id/assignments/:assignment_id/date_details", action: :date_details, as: "course_assignment_date_details"
+      get "courses/:course_id/quizzes/:quiz_id/date_details", action: :date_details, as: "course_quiz_date_details"
     end
 
     scope(controller: "assignment_extensions") do
@@ -1621,6 +1629,7 @@ CanvasRails::Application.routes.draw do
       get "accounts", action: :index, as: :accounts
       get "course_accounts", action: :course_accounts, as: :course_accounts
       get "manageable_accounts", action: :manageable_accounts, as: :manageable_accounts
+      get "course_creation_accounts", action: :course_creation_accounts, as: :course_creation_accounts
       get "accounts/:id", action: :show, as: :account
       put "accounts/:id", action: :update
       get "accounts/:account_id/terms_of_service", action: :terms_of_service
@@ -1911,6 +1920,8 @@ CanvasRails::Application.routes.draw do
       put "groups/:group_id/pages/:url_or_id", action: :update
       delete "courses/:course_id/pages/:url_or_id", action: :destroy
       delete "groups/:group_id/pages/:url_or_id", action: :destroy
+      get "courses/:course_id/page_title_availability", action: :check_title_availability, as: "course_page_title_availability"
+      get "groups/:group_id/page_title_availability", action: :check_title_availability, as: "group_page_title_availability"
     end
 
     scope(controller: :context_modules_api) do
@@ -1937,6 +1948,11 @@ CanvasRails::Application.routes.draw do
       post "courses/:course_id/modules/:module_id/items/:id/mark_read", action: :mark_item_read
       post "courses/:course_id/modules/:module_id/items/:id/select_mastery_path", action: :select_mastery_path
       post "courses/:course_id/modules/items/:id/duplicate", action: :duplicate, as: :course_context_module_item_duplicate
+    end
+
+    scope(controller: :module_assignment_overrides) do
+      get "courses/:course_id/modules/:context_module_id/assignment_overrides", action: :index, as: "module_assignment_overrides_index"
+      put "courses/:course_id/modules/:context_module_id/assignment_overrides", action: :bulk_update
     end
 
     scope(controller: "quizzes/quiz_assignment_overrides") do
@@ -2099,8 +2115,8 @@ CanvasRails::Application.routes.draw do
       get "support_helpers/crocodoc/submission", action: :submission
     end
 
-    scope(controller: "support_helpers/due_date_cache") do
-      get "support_helpers/due_date_cache/course", action: :course
+    scope(controller: "support_helpers/submission_lifecycle_manage") do
+      get "support_helpers/submission_lifecycle_manage/course", action: :course
     end
 
     scope(controller: :outcome_groups_api) do
@@ -2616,7 +2632,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: "lti/ims/authentication") do
       post "authorize_redirect", action: :authorize_redirect
-      get "authorize_redirect", action: :authorize_redirect
+      get "authorize_redirect", action: :authorize_redirect, as: "lti_authorize_redirect"
       get "authorize", action: :authorize, as: :lti_1_3_authorization
     end
 
@@ -2739,6 +2755,7 @@ CanvasRails::Application.routes.draw do
     # Security
     scope(controller: "security") do
       get "security/jwks", action: :jwks, as: :jwks_show
+      get "security/openid-configuration", action: :openid_configuration, as: :openid_configuration
     end
 
     # Feature Flags

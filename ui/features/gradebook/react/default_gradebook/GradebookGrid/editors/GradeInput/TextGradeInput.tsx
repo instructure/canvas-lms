@@ -80,7 +80,7 @@ export default class TextGradeInput extends PureComponent {
 
   handleTextChange(event) {
     this.setState({
-      gradeInfo: this.props.gradeEntry.parseValue(event.target.value),
+      gradeInfo: this.props.gradeEntry.parseValue(event.target.value, true),
       inputValue: event.target.value,
     })
   }

@@ -197,8 +197,7 @@ describe CanvasSecurity do
     end
 
     it "internally manages signing-secret rotation" do
-      allow(CanvasSecurity).to receive(:services_signing_secret).and_return("current_secret")
-      allow(CanvasSecurity).to receive(:services_previous_signing_secret).and_return("previous_secret")
+      allow(CanvasSecurity).to receive_messages(services_signing_secret: "current_secret", services_previous_signing_secret: "previous_secret")
       signature = CanvasSecurity.sign_hmac_sha512(message, "previous_secret")
       verification = CanvasSecurity.verify_hmac_sha512(message, signature, "current_secret")
       expect(verification).to be_truthy

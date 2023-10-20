@@ -102,7 +102,7 @@ module ApplicationHelper
     res = nil
     if opts.length > 1 || (opts[0].is_a? String) || (opts[0].is_a? Symbol)
       name = opts.shift.to_s
-      name = name.sub(/context/, context_name)
+      name = name.sub("context", context_name)
       opts.unshift context.id
       opts.push({}) unless opts[-1].is_a?(Hash)
       begin
@@ -412,6 +412,7 @@ module ApplicationHelper
     link_to(
       icon,
       "#",
+      role: "button",
       class: "license_help_link no-hover",
       title: I18n.t("Help with content licensing")
     )
@@ -423,6 +424,7 @@ module ApplicationHelper
     link_to(
       icon,
       "#",
+      role: "button",
       class: "visibility_help_link no-hover",
       title: I18n.t("Help with course visibilities")
     )
@@ -1407,7 +1409,7 @@ module ApplicationHelper
   end
 
   def find_heap_application_id
-    DynamicSettings.find(tree: :private)&.fetch(:heap_app_id)
+    DynamicSettings.find(tree: :private)[:heap_app_id, failsafe: nil]
   end
 
   def load_heap?

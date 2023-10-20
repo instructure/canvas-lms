@@ -653,6 +653,46 @@ describe Api::V1::User do
         end
       end
     end
+
+    describe "Temporary Enrollments" do
+      let_once(:source_user) { user_factory(active_all: true) }
+      let_once(:temporary_enrollment_recipient) { user_factory(active_all: true) }
+      let_once(:temp_course) { course_with_teacher(active_all: true, user: source_user).course }
+      let_once(:temp_enrollment) do
+        temp_course.enroll_user(
+          temporary_enrollment_recipient,
+          "TeacherEnrollment",
+          { role: teacher_role, temporary_enrollment_source_user_id: source_user.id }
+        )
+      end
+      let_once(:subject) { account_admin_user(account: temp_course.account) }
+
+      before do
+        temp_enrollment.update!(temporary_enrollment_source_user_id: source_user.id)
+      end
+
+      context "when feature flag is enabled" do
+        before(:once) do
+          temp_course.root_account.enable_feature!(:temporary_enrollments)
+        end
+
+        it "includes temporary_enrollment_source_user_id attribute" do
+          enrollment_json = @test_api.enrollment_json(temp_enrollment.reload, subject, nil)
+          expect(enrollment_json).to include("temporary_enrollment_source_user_id")
+        end
+      end
+
+      context "when feature flag is disabled" do
+        before(:once) do
+          temp_course.root_account.disable_feature!(:temporary_enrollments)
+        end
+
+        it "excludes temporary_enrollment_source_user_id attribute" do
+          enrollment_json = @test_api.enrollment_json(temp_enrollment.reload, subject, nil)
+          expect(enrollment_json).not_to include("temporary_enrollment_source_user_id")
+        end
+      end
+    end
   end
 
   context "user_json_is_admin?" do
@@ -839,6 +879,8 @@ describe "Users API", type: :request do
                              "sis_import_id" => nil,
                              "id" => @other_user.id,
                              "created_at" => @other_user.created_at.iso8601,
+                             "first_name" => @other_user.first_name,
+                             "last_name" => @other_user.last_name,
                              "short_name" => @other_user.short_name,
                              "sis_user_id" => @other_user.pseudonym.sis_user_id,
                              "integration_id" => nil,
@@ -863,6 +905,8 @@ describe "Users API", type: :request do
                              "sortable_name" => @other_user.sortable_name,
                              "id" => @other_user.id,
                              "created_at" => @other_user.created_at.iso8601,
+                             "first_name" => @other_user.first_name,
+                             "last_name" => @other_user.last_name,
                              "short_name" => @other_user.short_name,
                              "locale" => nil,
                              "effective_locale" => "en",
@@ -1234,8 +1278,7 @@ describe "Users API", type: :request do
           end
           @shard2.activate do
             account = Account.create!
-            allow(account).to receive(:trust_exists?).and_return(true)
-            allow(account).to receive(:trusted_account_ids).and_return([@account.id])
+            allow(account).to receive_messages(trust_exists?: true, trusted_account_ids: [@account.id])
             course = account.courses.create!
             course.enroll_student(@u)
             p2 = @u.pseudonyms.create!(account:, unique_id: "p2")
@@ -1266,6 +1309,83 @@ describe "Users API", type: :request do
               { include: ["last_login"] }
             )
           expect(json.fetch("last_login")).to eq @p.current_login_at.iso8601
+        end
+      end
+
+      describe "Temporary Enrollments" do
+        let_once(:temporary_enrollment_provider) { user_factory(name: "provider", active_all: true) }
+        let_once(:temporary_enrollment_recipient) { user_factory(name: "recipient", active_all: true) }
+        let_once(:temp_course) { course_with_teacher(active_all: true, user: temporary_enrollment_provider).course }
+        let_once(:temp_enrollment) do
+          temp_course.enroll_user(
+            temporary_enrollment_recipient,
+            "TeacherEnrollment",
+            { role: teacher_role, temporary_enrollment_source_user_id: temporary_enrollment_provider.id }
+          )
+        end
+        let_once(:subject) { account_admin_user(account: temp_course.account) }
+
+        before do
+          temp_enrollment.update!(temporary_enrollment_source_user_id: temporary_enrollment_provider.id)
+        end
+
+        context "when feature flag is enabled" do
+          before(:once) do
+            temp_course.root_account.enable_feature!(:temporary_enrollments)
+          end
+
+          it "returns a list of users filtered by recipients" do
+            json = api_call_as_user(
+              subject,
+              :get,
+              "/api/v1/accounts/#{@account.id}/users",
+              { controller: "users", action: "api_index", format: "json", account_id: @account.id.to_param },
+              { temporary_enrollment_recipients: true }
+            )
+            expect(json.count).to eq 1
+            expect(json.pluck("name")).to eq [temporary_enrollment_recipient.name]
+          end
+
+          it "returns a list of users filtered by providers" do
+            json = api_call_as_user(
+              subject,
+              :get,
+              "/api/v1/accounts/#{@account.id}/users",
+              { controller: "users", action: "api_index", format: "json", account_id: @account.id.to_param },
+              { temporary_enrollment_providers: true }
+            )
+            expect(json.count).to eq 1
+            expect(json.pluck("name")).to eq [temporary_enrollment_provider.name]
+          end
+
+          it "returns a list of users filtered by providers and recipients" do
+            json = api_call_as_user(
+              subject,
+              :get,
+              "/api/v1/accounts/#{@account.id}/users",
+              { controller: "users", action: "api_index", format: "json", account_id: @account.id.to_param },
+              { temporary_enrollment_recipients: true, temporary_enrollment_providers: true }
+            )
+            expect(json.count).to eq 2
+            expect(json.pluck("name").sort).to eq [temporary_enrollment_provider.name, temporary_enrollment_recipient.name].sort
+          end
+        end
+
+        context "when feature flag is disabled" do
+          before(:once) do
+            temp_course.root_account.disable_feature!(:temporary_enrollments)
+          end
+
+          it "does not filter by providers or recipients" do
+            json = api_call_as_user(
+              subject,
+              :get,
+              "/api/v1/accounts/#{@account.id}/users",
+              { controller: "users", action: "api_index", format: "json", account_id: @account.id.to_param },
+              { temporary_enrollment_recipients: true, temporary_enrollment_providers: true }
+            )
+            expect(json.size).to eq 7
+          end
         end
       end
     end
@@ -3111,7 +3231,7 @@ describe "Users API", type: :request do
     it "returns assignments in order of the submission time for the user" do
       assign = @course.assignments.create!(due_at: 5.days.ago, workflow_state: "published", submission_types: "online_text_entry")
       create_adhoc_override_for_assignment(assign, @student, due_at: 3.days.ago)
-      DueDateCacher.recompute(assign)
+      SubmissionLifecycleManager.recompute(assign)
 
       json = api_call(:get, @path, @params)
       expect(json[0]["id"]).to eq assign.id
@@ -3370,13 +3490,18 @@ describe "Users API", type: :request do
   end
 
   describe "POST pandata_events_token" do
-    let(:fake_secrets) do
+    let(:fake_settings) do
       {
         "url" => "https://example.com/pandata/events",
-        "ios-key" => "IOS_key",
-        "ios-secret" => "LS0tLS1CRUdJTiBFQyBQUklWQVRFIEtFWS0tLS0tCk1JSGJBZ0VCQkVFemZx\nZStiTjhEN2VRY0tKa3hHSlJpd0dqaHE0eXBsdFJ3aXNMUkx6ZXpBSmQ4QTlL\nRTdNY2YKbkorK0ptNGpwcjNUaFpybHRyN2dXQ2VJWWdvZDZPSmhzS0FIQmdV\ncmdRUUFJNkdCaVFPQmhnQUVBSmV5NCszeAp0UGlja2h1RFQ3QWFsTW1BWVdz\neU5IMnlEejRxRjhCamhHZzgwVkE2QWJPMHQ2YVE4TGQyaktMVEFrU1U5SFFW\nClkrMlVVeUp0Q3FTWEg4dVlBTEI0ZmFwbGhwVWNoQ1pSa3pMMXcrZzVDUUJY\nMlhFS25PdXJabU5ieEVSRzJneGoKb3hsbmxub0pwQjR5YUkvbWNpWkJOYlVz\nL0hTSGJtRzRFUFVxeVViQgotLS0tLUVORCBFQyBQUklWQVRFIEtFWS0tLS0t\nCg==\n",
-        "android-key" => "ANDROID_key",
-        "android-secret" => "surrendernoworpreparetofight"
+      }
+    end
+
+    let(:fake_secrets) do
+      {
+        "ios_key" => "IOS_key",
+        "ios_secret" => "LS0tLS1CRUdJTiBFQyBQUklWQVRFIEtFWS0tLS0tCk1JSGJBZ0VCQkVFemZx\nZStiTjhEN2VRY0tKa3hHSlJpd0dqaHE0eXBsdFJ3aXNMUkx6ZXpBSmQ4QTlL\nRTdNY2YKbkorK0ptNGpwcjNUaFpybHRyN2dXQ2VJWWdvZDZPSmhzS0FIQmdV\ncmdRUUFJNkdCaVFPQmhnQUVBSmV5NCszeAp0UGlja2h1RFQ3QWFsTW1BWVdz\neU5IMnlEejRxRjhCamhHZzgwVkE2QWJPMHQ2YVE4TGQyaktMVEFrU1U5SFFW\nClkrMlVVeUp0Q3FTWEg4dVlBTEI0ZmFwbGhwVWNoQ1pSa3pMMXcrZzVDUUJY\nMlhFS25PdXJabU5ieEVSRzJneGoKb3hsbmxub0pwQjR5YUkvbWNpWkJOYlVz\nL0hTSGJtRzRFUFVxeVViQgotLS0tLUVORCBFQyBQUklWQVRFIEtFWS0tLS0t\nCg==\n",
+        "android_key" => "ANDROID_key",
+        "android_secret" => "surrendernoworpreparetofight"
       }
     end
 
@@ -3384,7 +3509,9 @@ describe "Users API", type: :request do
       allow(DynamicSettings).to receive(:find)
         .with(any_args).and_call_original
       allow(DynamicSettings).to receive(:find)
-        .with("events", service: "pandata").and_return(fake_secrets)
+        .with("pandata/events", service: "canvas").and_return(fake_settings)
+
+      allow(Rails.application.credentials).to receive(:pandata_creds).and_return(fake_secrets)
     end
 
     it "returns token and expiration" do

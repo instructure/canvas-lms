@@ -18,6 +18,7 @@
 import $ from 'jquery'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
+import fileSize from '@canvas/util/fileSize'
 import 'jqueryui/progressbar'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 
@@ -82,7 +83,7 @@ export default class UploadViewManager {
     $('#media_upload_settings').css('visibility', 'hidden')
     $('#media_upload_title').val('')
     $('#media_upload_display_title').text('')
-    $('#media_upload_file_size').text($.fileSize(0))
+    $('#media_upload_file_size').text(fileSize(0))
     $('#media_upload_settings .icon').attr('src', '/images/file.png')
   }
 
@@ -95,7 +96,7 @@ export default class UploadViewManager {
     $('#media_upload_settings').css('visibility', 'visible')
     $('#media_upload_title').val(file.name)
     $('#media_upload_display_title').text(file.name)
-    $('#media_upload_file_size').text($.fileSize(file.size))
+    $('#media_upload_file_size').text(fileSize(file.size))
     $('#media_upload_settings .icon').attr('src', `/images/file-${this.allowedMedia[0]}.png`)
     $('#media_upload_submit')
       .attr('disabled', true)

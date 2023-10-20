@@ -358,7 +358,6 @@ class AccountReportsController < ApplicationController
     if authorized_action(@context, @current_user, :read_reports)
       report = type_scope.active.find(params[:id])
 
-      report.destroy
       if report.destroy
         render json: account_report_json(report, @current_user)
       else

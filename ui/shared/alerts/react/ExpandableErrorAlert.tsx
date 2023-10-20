@@ -23,12 +23,13 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {FocusRegionManager} from '@instructure/ui-a11y-utils'
+import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 
 const I18n = useI18nScope('app_shared_components_expandable_error_alert')
 
 export type ExpandableErrorAlertProps = Omit<
   AlertProps,
-  'variant' | 'liveRegion' | 'renderCloseButtonLabel'
+  'variant' | 'liveRegion' | 'renderCloseButtonLabel' | 'hasShadow'
 > & {
   /**
    * The raw details of the error.
@@ -52,8 +53,6 @@ export type ExpandableErrorAlertProps = Omit<
   focusRef?: RefObject<HTMLElement>
 }
 
-const locateLiveRegion = () => document.getElementById('flash_screenreader_holder')
-
 export const ExpandableErrorAlert = ({
   error,
   closeable,
@@ -74,7 +73,9 @@ export const ExpandableErrorAlert = ({
 
   useEffect(() => {
     if (transferFocus) {
-      FocusRegionManager.focusRegion((focusRef || childrenRef).current, {
+      const ref = (focusRef || childrenRef).current
+      if (ref === null) throw new Error('childrenRef did not appear as expected')
+      FocusRegionManager.focusRegion(ref, {
         onBlur: () => {},
         onDismiss: () => {},
       })
@@ -89,7 +90,7 @@ export const ExpandableErrorAlert = ({
       `props.children` for the content that is appended there, which is a problem if the children contain content that
        is interactive and not useful to be read aloud as part of the live region announcement (ex: a Retry button). */}
       {liveRegionText && (
-        <Alert liveRegion={locateLiveRegion} open={open} screenReaderOnly={true}>
+        <Alert liveRegion={getLiveRegion} open={open} screenReaderOnly={true}>
           {liveRegionText}
         </Alert>
       )}

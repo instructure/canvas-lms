@@ -38,7 +38,6 @@ class MediaObject < ActiveRecord::Base
   validates :media_id, :workflow_state, presence: true
   has_many :media_tracks, ->(media_object) { where(attachment_id: [nil, media_object.attachment_id]).order(:locale) }, dependent: :destroy, inverse_of: :media_object
   has_many :attachments_by_media_id, class_name: "Attachment", primary_key: :media_id, foreign_key: :media_entry_id, inverse_of: :media_object_by_media_id
-  has_many :active_attachments_by_media_id, -> { active }, class_name: "Attachment", primary_key: :media_id, foreign_key: :media_entry_id, inverse_of: :active_media_object_by_media_id
   before_create :create_attachment
   after_create :retrieve_details_later
   after_save :update_title_on_kaltura_later
@@ -86,17 +85,23 @@ class MediaObject < ActiveRecord::Base
         ((self.user && self.user == user) || context&.grants_right?(user, :manage_content))
     end
     can :add_captions and can :delete_captions
+
+    given do |user|
+      !context_root_account(user).feature_enabled?(:granular_permissions_manage_course_content) &&
+        Account.site_admin.feature_enabled?(:media_links_use_attachment_id) && attachment&.grants_right?(user, :update)
+    end
+    can :add_captions and can :delete_captions
     ##################### End legacy permission block ##########################
 
     given do |user|
       context_root_account(user).feature_enabled?(:granular_permissions_manage_course_content) &&
-        (attachment.present? ? attachment.grants_right?(user, :update) : context&.grants_right?(user, :manage_course_content_add))
+        (attachment.present? ? attachment.grants_right?(user, :update) : (context&.grants_right?(user, :manage_course_content_add) || (self.user && self.user == user)))
     end
     can :add_captions
 
     given do |user|
       context_root_account(user).feature_enabled?(:granular_permissions_manage_course_content) &&
-        (attachment.present? ? attachment.grants_right?(user, :update) : context&.grants_right?(user, :manage_course_content_delete))
+        (attachment.present? ? attachment.grants_right?(user, :update) : (context&.grants_right?(user, :manage_course_content_delete) || (self.user && self.user == user)))
     end
     can :delete_captions
   end
@@ -105,7 +110,8 @@ class MediaObject < ActiveRecord::Base
   # upload to complete. Wrap it in a timeout if you ever want it to give up
   # waiting.
   def self.add_media_files(attachments, wait_for_completion)
-    KalturaMediaFileHandler.new.add_media_files(attachments, wait_for_completion)
+    media_attachments = Array(attachments).reject { |att| att.media_object_by_media_id && att.media_entry_id != "maybe" }
+    KalturaMediaFileHandler.new.add_media_files(media_attachments, wait_for_completion) if media_attachments.present?
   end
 
   def self.bulk_migration(csv, root_account_id)
@@ -211,7 +217,7 @@ class MediaObject < ActiveRecord::Base
     client = CanvasKaltura::ClientV3.new
     client.startSession(CanvasKaltura::SessionType::ADMIN)
     res = client.mediaUpdate(media_id, name: user_entered_title)
-    unless res[:error]
+    unless res.nil? || res[:error]
       self.title = user_entered_title
       save
     end
@@ -259,7 +265,7 @@ class MediaObject < ActiveRecord::Base
       data[:download_url] = entry[:downloadUrl]
       tags = (entry[:tags] || "").split(",").map(&:strip)
       old_id = tags.detect { |t| t.include?("old_id_") }
-      self.old_media_id = old_id.sub(/old_id_/, "") if old_id
+      self.old_media_id = old_id.sub("old_id_", "") if old_id
     end
     data[:extensions] ||= {}
     assets.each do |asset|

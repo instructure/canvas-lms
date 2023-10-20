@@ -30,11 +30,11 @@ module Lti
 
       let(:tool_proxy) do
         tool_proxy_mock = double("tool_proxy")
-        allow(tool_proxy_mock).to receive(:guid).and_return("3b7f3b02-b481-4f63-a6b0-129dee85abee")
-        allow(tool_proxy_mock).to receive(:shared_secret).and_return("42")
-        allow(tool_proxy_mock).to receive(:raw_data).and_return({ "enabled_capability" => ["Security.splitSecret"] })
-        allow(tool_proxy_mock).to receive(:workflow_state).and_return("active")
-        allow(tool_proxy_mock).to receive(:product_family).and_return(product_family)
+        allow(tool_proxy_mock).to receive_messages(guid: "3b7f3b02-b481-4f63-a6b0-129dee85abee",
+                                                   shared_secret: "42",
+                                                   raw_data: { "enabled_capability" => ["Security.splitSecret"] },
+                                                   workflow_state: "active",
+                                                   product_family:)
         tool_proxy_mock
       end
 

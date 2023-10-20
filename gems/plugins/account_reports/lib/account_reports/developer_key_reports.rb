@@ -27,14 +27,14 @@ module AccountReports
     end
 
     DEV_KEY_REPORT_HEADERS = [
-      I18n.t("Global ID"),
-      I18n.t("Key Name"),
-      I18n.t("Inherited from Parent Account"),
-      I18n.t("Contact Info"),
-      I18n.t("Key Type"),
-      I18n.t("Placements"),
-      I18n.t("Status"),
-      I18n.t("Permitted API Endpoints")
+      "Global ID",
+      "Key Name",
+      "Inherited from Parent Account",
+      "Contact Info",
+      "Key Type",
+      "Placements",
+      "Status",
+      "Permitted API Endpoints"
     ].freeze
 
     def dev_key_report
@@ -61,7 +61,7 @@ module AccountReports
       row << key.email
       row << (key.is_lti_key ? "LTI Key" : "API Key")
       row << (key.tool_configuration&.placements&.pluck("placement").presence || "None")
-      row << (key.account_binding_for(account)&.workflow_state&.capitalize&.presence || "Allow")
+      row << (key.account_binding_for(account)&.workflow_state&.capitalize.presence || "Allow")
       row << (key.scopes.presence || "All")
       csv << row
     end

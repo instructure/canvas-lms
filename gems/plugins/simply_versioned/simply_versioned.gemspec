@@ -13,5 +13,5 @@ Gem::Specification.new do |s|
 
   s.files = Dir["{app,config,db,lib}/**/*"]
 
-  s.add_dependency "rails", ">= 3.2"
+  s.add_dependency "activerecord", ">= 3.2"
 end

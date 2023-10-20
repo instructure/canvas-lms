@@ -770,7 +770,7 @@ class OutcomeResultsController < ApplicationController
       @users = apply_sort_order(@section.all_students).to_a
     end
     @users ||= users_for_outcome_context.to_a
-    @users.sort! { |a, b| a.id <=> b.id } unless params[:sort_by]
+    @users.sort_by!(&:id) unless params[:sort_by]
     # cache all users, since pagination in #user_rollups_json may remove some
     # when we need all users when calculating rating percents
     @all_users = @users

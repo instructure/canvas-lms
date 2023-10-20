@@ -166,11 +166,29 @@ describe Types::ConversationType do
     end
   end
 
-  context "conversationPaticipants" do
+  context "conversationParticipants" do
     it "returns the conversation participants" do
       result = conversation_type.resolve("conversationParticipantsConnection { nodes { user { name } } }")
       expect(result).to include(@teacher.name)
       expect(result).to include(@student.name)
+    end
+  end
+
+  context "conversationMessagesCount" do
+    it "returns the correct count" do
+      result = conversation_type.resolve("conversationMessagesCount")
+      expect(result).to eq(2)
+    end
+
+    it "returns the correct count after user deleting a message" do
+      message = @conversation.conversation.add_message(@student, "delete me")
+
+      result_before = conversation_type.resolve("conversationMessagesCount")
+      expect(result_before).to eq(3)
+
+      message.conversation_message_participants.where(user_id: @teacher.id).first.update!(workflow_state: "deleted")
+      result_after = conversation_type.resolve("conversationMessagesCount")
+      expect(result_after).to eq(2)
     end
   end
 end

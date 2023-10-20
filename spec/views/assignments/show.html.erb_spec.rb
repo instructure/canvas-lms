@@ -39,6 +39,32 @@ describe "assignments/show" do
     expect(response).not_to be_nil # have_tag()
     # for an assignment with no content
     expect(rendered).to include "No additional details were added for this assignment."
+    expect(response).not_to have_tag(".assignment_header")
+  end
+
+  context "future locked assignments" do
+    it "renders locked future assignments" do
+      course_with_student(active_all: true)
+      view_context(@course, @user)
+      g = @course.assignment_groups.create!(name: "some group")
+      a = @course.assignments.create!(title: "some assignment")
+      a.assignment_group_id = g.id
+      a.save!
+      a.lock_at = 1.week.from_now
+      a.due_at = 3.weeks.from_now
+      a.unlock_at = 2.weeks.from_now
+      assign(:assignment, a)
+      assign(:assignment_groups, [g])
+      assign(:current_user_rubrics, [])
+      locked = a.locked_for?(@user, check_policies: true, deep_check_if_needed: true)
+      assign(:show_locked_page, locked)
+      allow(view).to receive_messages(show_moderation_link: true)
+
+      render "assignments/show"
+
+      expect(response).not_to be_nil # have_tag()
+      expect(response).to have_tag(".assignment_header")
+    end
   end
 
   it "renders webcam wrapper" do
@@ -52,9 +78,8 @@ describe "assignments/show" do
     assign(:assignment_groups, [g])
     assign(:current_user_rubrics, [])
     assign(:external_tools, [])
-    allow(view).to receive(:show_moderation_link).and_return(true)
+    allow(view).to receive_messages(show_moderation_link: true, show_confetti: false)
     allow(view).to receive(:eula_url) { eula_url }
-    allow(view).to receive(:show_confetti).and_return(false)
     render "assignments/show"
     expect(response).to have_tag(".attachment_wrapper")
   end
@@ -132,8 +157,7 @@ describe "assignments/show" do
     end
 
     it "is rendered when 'show_confetti' is true" do
-      allow(view).to receive(:show_confetti).and_return(true)
-      allow(view).to receive(:show_moderation_link).and_return(false)
+      allow(view).to receive_messages(show_confetti: true, show_moderation_link: false)
       render "assignments/show"
       expect(response).to render_template partial: "_confetti"
     end

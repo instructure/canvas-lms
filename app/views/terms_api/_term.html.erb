@@ -1,0 +1,131 @@
+<%
+# Copyright (C) 2023 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+
+<% term ||= nil %>
+<% default_term = @context.default_enrollment_term %>
+<tr class="term" id="term_<%= term ? term.id : "blank" %>" style="<%= hidden unless term %>">
+  <td class="header">
+    <div class="show_term">
+      <span class="name"><%= term.name rescue nbsp %></span>
+    </div>
+    <div class="show_term" style="font-size: 0.8em;">
+      <% if (term&.sis_source_id && can_do(@root_account, @current_user, :read_sis) || can_do(@root_account, @current_user, :manage_sis)) %>
+        <div style="font-size: 0.8em;">
+          <%= before_label :sis_id, "SIS ID" %> <span class="sis_source_id"><%= term&.sis_source_id %></span>
+        </div>
+      <% end %>
+      <% if term.try(:grading_period_group).try(:active?) %>
+        <div style="font-size: 0.8em;">
+          <%= before_label :grading_period_set_title, "Grading Period Set" %>
+          <span class="grading_period_set_title">
+            <%= link_to grading_period_set_title(term.grading_period_group, term.root_account.name),
+                        context_url(@context, :context_grading_standards_url) %>
+          </span>
+        </div>
+      <% end %>
+      <%= t(:course_count, "Course", :count => @course_counts_by_term[term&.id] || 0) %><br/>
+    </div>
+    <%= form_for (term || EnrollmentTerm.new), :url => (term ? context_url(@context, :context_term_url, term.id) : context_url(@context, :context_terms_url)), :html => {:class => "enrollment_term_form", :method => (term ? :put : :post)} do |f| %>
+        <div class="control-group edit_term">
+          <label class="control-label" for=<%= "enrollment_term_name_#{term&.id || 'new'}" %>><%= t :name, 'Term Name:' %></label>
+          <div class="controls">
+            <%= f.text_field :name, id: "enrollment_term_name_#{term&.id || 'new'}", class: "input-large", disabled: (term && term == default_term) %>
+          </div>
+        </div>
+      <% if can_do(@root_account, @current_user, :manage_sis) %>
+        <div class="control-group edit_term">
+          <label class="control-label" for=<%= "enrollment_term_sis_source_id_#{term&.id || 'new'}" %>><%= t :sis_source_id, 'SIS ID:' %></label>
+          <div class="controls">
+            <%= f.text_field :sis_source_id, id: "enrollment_term_sis_source_id_#{term&.id || 'new'}", :class => "input-large" %>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  </td>
+  <% types = [StudentEnrollment, TeacherEnrollment, TaEnrollment, DesignerEnrollment] %>
+  <td class="permissions">
+    <table>
+      <tr class="general_dates">
+        <td>
+          <%= mt :term_runs_from, "**Term Runs** from" %>&nbsp;
+        </td>
+        <%= render :partial => 'timespan', :locals => { object: term, key: '', idx: '1', start_tooltip: t('titles.term_starts', "Term starts"),
+                                                        end_tooltip: t('titles.term_ends', "Term ends"), whenever: [true, true] } %>
+      </tr>
+    <% types.each_with_index do |type, idx| %>
+      <% override = term.enrollment_dates_overrides.detect{|edo|
+           edo.context_type == @context.class.to_s &&
+             edo.context_id == @context.id &&
+             edo.enrollment_type == type.to_s
+         } if term %>
+      <% override ||= EnrollmentDatesOverride.new %>
+      <% type_string = type.to_s.underscore %>
+      <% start_whenever = true %>
+      <tr class="<%= "#{type_string}_dates"%>">
+        <td>
+          <% case type_string
+              when 'student_enrollment'
+                start_tooltip = t 'tooltips.term_starts_students', "For students the term starts"
+                end_tooltip = t 'tooltips.term_ends_students', "For students the term ends"
+                access_label = mt 'labels.students_can_access_from', "**Students** can access from"
+                start_whenever = false
+              when 'teacher_enrollment'
+                start_tooltip = t 'tooltips.term_starts_teachers', "For teachers the term starts"
+                end_tooltip = t 'tooltips.term_ends_teachers', "For teachers the term ends"
+                access_label = mt 'labels.teachers_can_access_from', "**Teachers** can access from"
+              when 'ta_enrollment'
+                start_tooltip = t 'tooltips.term_starts_tas', "For TAs the term starts"
+                end_tooltip = t 'tooltips.term_ends_tas', "For TAs the term ends"
+                access_label = mt 'labels.tas_can_access_from', "**TAs** can access from"
+              when 'designer_enrollment'
+                start_tooltip = t 'tooltips.term_starts_designers', "For designers the term starts"
+                end_tooltip = t 'tooltips.term_ends_designers', "For designers the term ends"
+                access_label = mt 'labels.designers_can_access_from', "**Designers** can access from"
+              end
+          %>
+          <%= access_label %>
+          &nbsp;
+        </td>
+        <%= render :partial => 'timespan', :locals => { object: override, key: "[overrides][#{type_string}]", idx: idx,
+                                                        start_tooltip: start_tooltip, end_tooltip: end_tooltip,
+                                                        date_class_prefix: "#{type_string}_", whenever: [start_whenever, false] } %>
+      </tr>
+    <% end %>
+    <tr class="edit-buttons">
+      <td></td>
+      <td></td>
+      <td></td>
+      <td class="edit_term edit_term_buttons">
+        <button class="btn button-secondary cancel_button" type="button"><%= t '#buttons.cancel', "Cancel" %></button>
+        <button class="btn btn-primary submit_button" type="button"><%= term ? t('buttons.update', "Update Term") : t('buttons.add', "Add Term") %></button>
+        <% if term && term.root_account.feature_enabled?(:course_paces) %>
+          <div><%= t("Changing the course participation will republish all course pacing with any new dates using term participation.") %></div>
+        <% end %>
+      </td>
+    </tr>
+    </table>
+  </td>
+  <td class="links">
+    <button class="edit_term_link Button--icon-action" title="<%= t 'Edit Term %{name}', name: term.try(:name) %>"><i class="icon-edit"></i></button>
+    <% if term && @course_counts_by_term[term.id].to_i > 0 %>
+      <button class="cant_delete_term_link Button--icon-action" title="<%= t 'Delete Term %{name}', name: term.try(:name) %>"><i class="icon-end"></i></button>
+    <% elsif term != default_term %>
+      <button class="delete_term_link Button--icon-action" title="<%= t 'Delete Term %{name}', name: term.try(:name) %>"><i class="icon-trash"></i></button>
+    <% end %>
+  </td>
+</tr>

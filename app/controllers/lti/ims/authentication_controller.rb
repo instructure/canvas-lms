@@ -51,7 +51,18 @@ module Lti
       # domain in the authentication requests rather than keeping
       # track of institution-specific domain.
       def authorize_redirect
-        redirect_to authorize_redirect_url
+        if Setting.get("interop_8200_session_token_redirect", nil) == "true" ||
+           Setting.get("interop_8200_session_token_redirect/#{canvas_domain}", nil) == "true"
+          csp_frame_ancestors << canvas_domain
+          render template: "shared/html_redirect",
+                 layout: false,
+                 formats: :html,
+                 locals: {
+                   url: authorize_redirect_url
+                 }
+        else
+          redirect_to authorize_redirect_url
+        end
       end
 
       # Handles the authentication response from an LTI tool. This
@@ -103,8 +114,31 @@ module Lti
         return if public_course? && @current_user.blank?
 
         if !@current_user || Lti::Asset.opaque_identifier_for(@current_user, context:) != oidc_params[:login_hint]
+          report_oidc_invalid_user_metric(@current_user)
           set_oidc_error!("login_required", "Must have an active user session")
         end
+      end
+
+      def report_oidc_invalid_user_metric(user)
+        dynamic_settings_tree = DynamicSettings.find(tree: :private)
+        if dynamic_settings_tree["frontend_data_collection_endpoint"]
+          data_collection_endpoint = dynamic_settings_tree["frontend_data_collection_endpoint"]
+          session_cookie_present = !request.cookies[Rails.application.config.session_options[:key]].nil?
+          current_user_is_nil = user.nil?
+          put_body = [{
+            id: SecureRandom.uuid,
+            type: "oidc_error_invalid_user",
+            session_cookie_present:,
+            current_user_is_nil:,
+            user_agent: request.user_agent,
+            host: request.host,
+            referer: request.referer,
+            request_id: Thread.current[:context].try(:[], :request_id)
+          }]
+          CanvasHttp.put(data_collection_endpoint, {}, body: put_body.to_json, content_type: "application/json")
+        end
+      rescue
+        Rails.logger.warn("Couldn't send OIDC invalid user metric")
       end
 
       def validate_oidc_params!

@@ -47,6 +47,7 @@ import {contentItemProcessorPrechecks} from '@canvas/deep-linking/ContentItemPro
 import {ResourceLinkContentItem} from '@canvas/deep-linking/models/ResourceLinkContentItem'
 import {EnvContextModules} from '@canvas/global/env/EnvContextModules'
 import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import replaceTags from '@canvas/util/replaceTags'
 
 // @ts-expect-error
 if (!('INST' in window)) window.INST = {}
@@ -79,6 +80,7 @@ type LtiLaunchDefinition = {
   definition_type: 'ContextExternalTool' | 'Lti::MessageHandler'
   definition_id: string
   name: string
+  url: string
   description: string
   domain: string
   // todo: the key here is actually a subset of string
@@ -250,8 +252,21 @@ export function handleContentItemResult(
   if (ENV.DEFAULT_ASSIGNMENT_TOOL_NAME && ENV.DEFAULT_ASSIGNMENT_TOOL_URL) {
     setDefaultToolValues(result, tool)
   }
-
-  $('#external_tool_create_url').val(result.url)
+  const populateUrl = (url: string) => {
+    if (url && url !== '') {
+      if (
+        $('#external_tool_create_url').val() === '' ||
+        window.ENV.FEATURES.lti_overwrite_user_url_input_select_content_dialog
+      ) {
+        $('#external_tool_create_url').val(url)
+      }
+    }
+  }
+  if (typeof result.url !== 'undefined' && result.url !== '') {
+    populateUrl(result.url)
+  } else if (tool.url !== '') {
+    populateUrl(tool.url)
+  }
   if (typeof result.title !== 'undefined') {
     $('#external_tool_create_title').val(result.title)
   } else if ($('#external_tool_create_title').is(':visible')) {
@@ -344,18 +359,6 @@ export const Events = {
             'data-lti-launch': 'true',
           })
         )
-        if (window.ENV && window.ENV.FEATURES && window.ENV.FEATURES.lti_platform_storage) {
-          $dialog.append(
-            $('<iframe/>', {
-              id: 'post_message_forwarding',
-              name: 'post_message_forwarding',
-              title: 'post_message_forwarding',
-              src: '/post_message_forwarding',
-              sandbox: 'allow-scripts allow-same-origin',
-              style: 'display: none;',
-            })
-          )
-        }
         $dialog.append(`<div class="after_external_content_info_alert screenreader-only" tabindex="0">
             <div class="ic-flash-info">
               <div class="ic-flash__icon" aria-hidden="true">
@@ -454,8 +457,8 @@ export const Events = {
         .dialog('option', 'height', height || frameHeight || 400)
         .dialog('open')
       $dialog.triggerHandler('dialogresize')
-      let url = $.replaceTags(
-        $('#select_content_resource_selection_url').attr('href'),
+      let url = replaceTags(
+        $('#select_content_resource_selection_url').attr('href') as string,
         'id',
         tool.definition_id
       )

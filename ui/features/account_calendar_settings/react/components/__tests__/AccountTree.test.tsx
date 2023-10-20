@@ -30,7 +30,6 @@ const defaultProps = {
   showSpinner: false,
   subscriptionChanges: [],
   onAccountSubscriptionToggled: jest.fn(),
-  autoSubscriptionEnabled: false,
   onAccountExpandedToggled: () => {},
   expandedAccounts: [1],
 }
@@ -46,13 +45,13 @@ afterEach(() => {
 
 describe('AccountTree', () => {
   it('loads and displays an account tree', async () => {
-    const {findByRole, getByRole, getByText} = render(<AccountTree {...defaultProps} />)
-    expect(await findByRole('button', {name: 'University, 5 accounts'})).toBeInTheDocument()
+    const {findByText, getByText} = render(<AccountTree {...defaultProps} />)
+    expect(await findByText('University, 5 accounts')).toBeInTheDocument()
     expect(getByText('University')).toBeInTheDocument()
     expect(getByText('Manually-Created Courses')).toBeInTheDocument()
-    expect(getByRole('button', {name: 'Big Account, 16 accounts'})).toBeInTheDocument()
-    expect(getByRole('button', {name: 'CPMS, 2 accounts'})).toBeInTheDocument()
-    expect(getByRole('button', {name: 'Elementary, 2 accounts'})).toBeInTheDocument()
+    expect(getByText('Big Account, 16 accounts')).toBeInTheDocument()
+    expect(getByText('CPMS, 2 accounts')).toBeInTheDocument()
+    expect(getByText('Elementary, 2 accounts')).toBeInTheDocument()
   })
 
   it('checks accounts only where calendar is visible', async () => {
@@ -125,11 +124,9 @@ describe('AccountTree', () => {
     expect(getByRole('button', {name: 'Elementary, 2 accounts'})).toBeInTheDocument()
   })
 
-  it('shows subscription dropdown if autoSubscription is Enabled', async () => {
-    const {findByRole, queryAllByTestId, rerender} = render(<AccountTree {...defaultProps} />)
+  it('shows subscription dropdown', async () => {
+    const {findByRole, queryAllByTestId} = render(<AccountTree {...defaultProps} />)
     expect(await findByRole('button', {name: 'University, 5 accounts'})).toBeInTheDocument()
-    expect(queryAllByTestId('subscription-dropdown')[0]).toBeUndefined()
-    rerender(<AccountTree {...defaultProps} autoSubscriptionEnabled={true} />)
     expect(queryAllByTestId('subscription-dropdown')[0]).toBeInTheDocument()
   })
 })

@@ -36,11 +36,6 @@ module Canvas
         super
       end
 
-      def write_set(hash, ttl: nil)
-        opts = { expires_in: ttl }
-        hash.each { |k, v| write(k, v, opts) }
-      end
-
       # lock is unique to this implementation, it's not a standard part of
       # rails caches.  Pass a key to lock and you'll get back a nonce if you
       # hold the lease.  You need to retain the nonce to unlock later, but the lock timeout

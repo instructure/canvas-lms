@@ -255,6 +255,15 @@ test('does not show todo date elements when grading is enabled', function () {
   equal(view.$el.find('#todo_options')[0].style.display, 'none')
 })
 
+test('does retain the assignment when user with assignment-edit permission edits discussion', function () {
+  const view = this.editView({
+    withAssignment: true,
+    permissions: {CAN_UPDATE_ASSIGNMENT: true, CAN_CREATE_ASSIGNMENT: false},
+  })
+  const formData = view.getFormData()
+  equal(formData.set_assignment, '1')
+})
+
 test('does save todo date if allow_todo_date is checked and discussion is not graded', function () {
   ENV.STUDENT_PLANNER_ENABLED = true
   const todo_date = new Date('2017-05-25T08:00:00-0800')

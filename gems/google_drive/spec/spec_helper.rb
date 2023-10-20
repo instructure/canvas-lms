@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require "google_drive"
-require "byebug"
+require "debug"
 require "timecop"
 require "webmock/rspec"
 
@@ -40,11 +40,5 @@ RSpec.configure do |config|
   end
   config.after do
     WebMock.allow_net_connect!
-  end
-end
-
-module Rails
-  def self.cache
-    @cache ||= ActiveSupport::Cache::MemoryStore.new
   end
 end

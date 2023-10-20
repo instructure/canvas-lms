@@ -42,7 +42,7 @@ describe GradebookGradingPeriodAssignments do
           @group, :past, :current, :future
         )
         [@assignment1_in_gp1, @assignment2_in_gp2, @assignment3_in_gp2, @assignment_not_in_gp].each do |assignment|
-          DueDateCacher.recompute(assignment)
+          SubmissionLifecycleManager.recompute(assignment)
         end
       end
 

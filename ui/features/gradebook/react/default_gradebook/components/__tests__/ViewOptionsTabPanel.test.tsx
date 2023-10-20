@@ -35,6 +35,7 @@ describe('ViewOptionsTabPanel', () => {
         modulesEnabled: true,
         onChange: jest.fn(),
       },
+      finalGradeOverrideEnabled: true,
       hideAssignmentGroupTotals: {
         checked: false,
         onChange: jest.fn(),
@@ -233,6 +234,17 @@ describe('ViewOptionsTabPanel', () => {
   })
 
   describe('.hideTotal', () => {
+    it('reads "Hide Total and Override Columns" when "Final Grade Override" is enabled', () => {
+      const {getByLabelText} = renderPanel()
+      expect(getByLabelText('Hide Total and Override Columns')).toBeInTheDocument()
+    })
+
+    it('reads "Hide Total Column" when "Final Grade Override" is disabled', () => {
+      props.finalGradeOverrideEnabled = false
+      const {getByLabelText} = renderPanel()
+      expect(getByLabelText('Hide Total Column')).toBeInTheDocument()
+    })
+
     it('is checked if .checked is true', () => {
       const {getByLabelText} = renderPanel({
         hideTotal: {checked: true, onChange: () => {}},

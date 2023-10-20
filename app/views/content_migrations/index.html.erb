@@ -26,11 +26,16 @@
   css_bundle :content_migrations
 %>
 
-<form id="migrationConverterContainer" class="form-horizontal"></form>
-<div id="migration_upload_progress_container" style="width: 100%; display: none;">
-  <div style="display: flex;">
-    <span><%= t("Uploading...") %>&ensp;</span>
-    <span id="migration_upload_progress_bar" style="flex-grow: 1;"></span>
+<% if Account.site_admin.feature_enabled?(:instui_for_import_page) %>
+  <div id="instui_content_migrations"></div>
+<% else %>
+  <form id="migrationConverterContainer" class="form-horizontal"></form>
+  <div id="migration_upload_progress_container" style="width: 100%; display: none;">
+    <div style="display: flex;">
+      <span><%= t("Uploading...") %>&ensp;</span>
+      <span id="migration_upload_progress_bar" style="flex-grow: 1;"></span>
+    </div>
   </div>
-</div>
-<div id="progress" class="span10"></div>
+  <div id="progress" class="span10"></div>
+<% end %>
+

@@ -99,5 +99,50 @@ const defaultTinymceConfig = {
   target_list: false, // don't show the target list when creating/editing links
   link_title: false, // don't show the title input when creating/editing links
   default_link_target: '_blank',
+
+  // Remove the ability to add h1 tags (since there will already be an h1 on the page)
+  // but preserve the default Formats menu config otherwise
+  style_formats: [
+    {
+      title: 'Headings',
+      items: [
+        {title: 'Heading 2', format: 'h2'},
+        {title: 'Heading 3', format: 'h3'},
+        {title: 'Heading 4', format: 'h4'},
+        {title: 'Heading 5', format: 'h5'},
+        {title: 'Heading 6', format: 'h6'},
+      ],
+    },
+    {
+      title: 'Inline',
+      items: [
+        {title: 'Bold', format: 'bold'},
+        {title: 'Italic', format: 'italic'},
+        {title: 'Underline', format: 'underline'},
+        {title: 'Strikethrough', format: 'strikethrough'},
+        {title: 'Superscript', format: 'superscript'},
+        {title: 'Subscript', format: 'subscript'},
+        {title: 'Code', format: 'code'},
+      ],
+    },
+    {
+      title: 'Blocks',
+      items: [
+        {title: 'Paragraph', format: 'p'},
+        {title: 'Blockquote', format: 'blockquote'},
+        {title: 'Div', format: 'div'},
+        {title: 'Pre', format: 'pre'},
+      ],
+    },
+    {
+      title: 'Align',
+      items: [
+        {title: 'Left', format: 'alignleft'},
+        {title: 'Center', format: 'aligncenter'},
+        {title: 'Right', format: 'alignright'},
+        {title: 'Justify', format: 'alignjustify'},
+      ],
+    },
+  ],
 }
 export default defaultTinymceConfig

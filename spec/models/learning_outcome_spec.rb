@@ -19,11 +19,21 @@
 #
 
 describe LearningOutcome do
+  let(:calc_method_no_int) { %w[highest latest average] }
+
+  describe "associations" do
+    it { is_expected.to belong_to(:copied_from).inverse_of(:cloned_outcomes) }
+
+    it do
+      expect(subject).to have_many(:cloned_outcomes).with_foreign_key("copied_from_outcome_id")
+                                                    .inverse_of(:copied_from)
+    end
+  end
+
   def outcome_errors(prop)
     @outcome.errors[prop].map(&:to_s)
   end
 
-  # rubocop:disable Lint/DuplicateBranch
   def generate_rubric_criterion(outcome, num_ratings)
     criterion = {}
     criterion[:description] = "default description"
@@ -67,9 +77,6 @@ describe LearningOutcome do
 
     outcome.rubric_criterion = criterion
   end
-  # rubocop:enable Lint/DuplicateBranch
-
-  let(:calc_method_no_int) { %w[highest latest average] }
 
   context "validations" do
     describe "lengths" do
@@ -619,6 +626,36 @@ describe LearningOutcome do
       end
     end
 
+    context "should set calculation_int to default if the calculation_method is changed and calculation_int isn't set when outcomes_new_decaying_average_calculation FF ON" do
+      before do
+        @outcome.context.root_account.enable_feature!(:outcomes_new_decaying_average_calculation)
+      end
+
+      method_to_int = {
+        "decaying_average" => { default: 65, testval: nil, altmeth: "latest" },
+        "standard_decaying_average" => { default: 65, testval: nil, altmeth: "latest" },
+        "n_mastery" => { default: 5, testval: nil, altmeth: "highest" },
+        "highest" => { default: nil, testval: 4, altmeth: "n_mastery" },
+        "latest" => { default: nil, testval: 72, altmeth: "decaying_average" },
+        "average" => { default: nil, testval: 3, altmeth: "n_mastery" },
+      }
+
+      method_to_int.each do |method, set|
+        it "sets calculation_int to #{set[:default].nil? ? "nil" : set[:default]} if the calculation_method is changed to #{method} and calculation_int isn't set" do
+          @outcome.calculation_method = set[:altmeth]
+          @outcome.calculation_int = set[:testval]
+          @outcome.save!
+          expect(@outcome.calculation_method).to eq(set[:altmeth])
+          expect(@outcome.calculation_int).to eq(set[:testval])
+          @outcome.calculation_method = method
+          @outcome.save!
+          @outcome.reload
+          expect(@outcome.calculation_method).to eq(method)
+          expect(@outcome.calculation_int).to eq(set[:default])
+        end
+      end
+    end
+
     it "destroys provided alignment" do
       @alignment = ContentTag.create({
                                        content: @outcome,
@@ -1109,6 +1146,34 @@ describe LearningOutcome do
         end
       end
     end
+
+    context "with the outcomes_new_decaying_average_calculation FF enabled" do
+      before do
+        LoadAccount.default_domain_root_account.enable_feature!(:outcomes_new_decaying_average_calculation)
+      end
+
+      it "defaults calculation_method to standard_decaying_average" do
+        @outcome = LearningOutcome.create!(title: "outcome")
+        expect(@outcome.calculation_method).to eql("standard_decaying_average")
+        expect(@outcome.calculation_int).to be 65
+      end
+
+      it "allows standard_decaying_average as a calculation_method" do
+        @outcome = LearningOutcome.create!(title: "outcome", calculation_method: "standard_decaying_average")
+        expect(@outcome.calculation_method).to eql("standard_decaying_average")
+        expect(@outcome.calculation_int).to be 65
+      end
+
+      it "rejects if calculation_int not with in the valid range for calculation_method standard_decaying_average" do
+        @outcome = LearningOutcome.create!(title: "outcome", calculation_method: "standard_decaying_average")
+        expect(@outcome.calculation_method).to eql("standard_decaying_average")
+        expect(@outcome.calculation_int).to be 65
+        @outcome.calculation_int = 49
+        @outcome.save
+        expect(@outcome).to have(1).error_on(:calculation_int)
+        expect(outcome_errors(:calculation_int).first).to include("The value must be between '50' and '99'")
+      end
+    end
   end
 
   context "root account ids" do
@@ -1193,7 +1258,7 @@ describe LearningOutcome do
       ->(*courses) { courses.each { |c| student_in_course(course: c) } }
     end
 
-    let(:account) { -> { Account.all.find { |a| !a.site_admin? && a.root_account? } } }
+    let(:account) { -> { Account.find { |a| !a.site_admin? && a.root_account? } } }
 
     let(:create_rubric) do
       lambda do |outcome|
@@ -1232,13 +1297,6 @@ describe LearningOutcome do
         Rubric.all.each { |r| return r if r.data.first[:learning_outcome_id] == outcome.id }
         nil
       end
-    end
-
-    def add_or_get_rubric(outcome)
-      @add_or_get_rubric_cache ||= Hash.new do |h, key|
-        h[key] = find_rubric.call(outcome) || create_rubric.call(outcome)
-      end
-      @add_or_get_rubric_cache[outcome.id]
     end
 
     let(:assess_with) do
@@ -1281,6 +1339,13 @@ describe LearningOutcome do
         rubric.reload
         { assignment:, assessment:, rubric:, result: }
       end
+    end
+
+    def add_or_get_rubric(outcome)
+      @add_or_get_rubric_cache ||= Hash.new do |h, key|
+        h[key] = find_rubric.call(outcome) || create_rubric.call(outcome)
+      end
+      @add_or_get_rubric_cache[outcome.id]
     end
 
     context "learning outcome results" do

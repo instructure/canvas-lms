@@ -168,9 +168,21 @@ describe('fileTypeUtils', () => {
         const file = {
           id: '123',
           type: 'video/mov',
+          uuid: 'abc',
         }
         const url = mediaPlayerURLFromFile(file)
         expect(url).toBe('/media_attachments_iframe/123?type=video&embedded=true')
+      })
+
+      it('uses adds the uuid if the context is User', () => {
+        const file = {
+          id: '123',
+          type: 'video/mov',
+          contextType: 'User',
+          uuid: 'abc',
+        }
+        const url = mediaPlayerURLFromFile(file)
+        expect(url).toBe('/media_attachments_iframe/123?type=video&embedded=true&verifier=abc')
       })
 
       it('uses the file verifier if present', () => {
@@ -181,7 +193,7 @@ describe('fileTypeUtils', () => {
         }
         const url = mediaPlayerURLFromFile(file)
         expect(url).toBe(
-          '/media_attachments_iframe/123?type=video&verifier=something&embedded=true'
+          '/media_attachments_iframe/123?type=video&embedded=true&verifier=something'
         )
       })
 

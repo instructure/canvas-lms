@@ -172,7 +172,7 @@ describe "Global Grades" do
       it "shows score as letter grade for students" do
         GlobalGrades.visit
         expect(GlobalGrades.get_score_for_course(@course_with_gp)).to be_nil
-        expect(GlobalGrades.get_raw_grade_for_course(@course_with_gp)).to eq "B-"
+        expect(GlobalGrades.get_raw_grade_for_course(@course_with_gp)).to eq "B−"
 
         expect(GlobalGrades.get_score_for_course(@course_no_gp)).to be_nil
         expect(GlobalGrades.get_raw_grade_for_course(@course_no_gp)).to eq "A"

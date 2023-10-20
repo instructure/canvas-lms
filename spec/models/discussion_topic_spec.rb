@@ -64,7 +64,7 @@ describe DiscussionTopic do
           a: { name: "Happy", value: 100 },
           b: { name: "Sad", value: 0 },
         }
-        @course.update!(default_grading_standard: @grading_standard)
+        @course.update!(grading_standard: @grading_standard)
         @course.update_attribute :grading_standard, @course_gs
         expect(@topic.grading_standard_or_default).to be @course_gs
       end
@@ -72,7 +72,7 @@ describe DiscussionTopic do
       it "returns the grading scheme used by the topic if the topic and course are using a grading scheme" do
         @assignment.update!(grading_standard: @grading_standard)
         course_standard = grading_standard_for(@course, title: "new scheme")
-        @course.update!(default_grading_standard: course_standard)
+        @course.update!(grading_standard: course_standard)
         expect(@topic.grading_standard_or_default).to be @grading_standard
       end
 
@@ -93,7 +93,7 @@ describe DiscussionTopic do
       end
 
       it "returns the grading scheme used by the course, if one exists" do
-        @course.update!(default_grading_standard: @grading_standard)
+        @course.update!(grading_standard: @grading_standard)
         expect(@topic.grading_standard_or_default).to be @grading_standard
       end
 
@@ -803,7 +803,7 @@ describe DiscussionTopic do
         expect(topic.locked?).to be_falsey
       end
 
-      it "is post_delayed when delayed_post_at is in the future" do
+      it "is post_delayed and remains like than even after publishing when delayed_post_at is in the future" do
         topic = delayed_discussion_topic(title: "title",
                                          message: "content here",
                                          delayed_post_at: Time.now + 1.day,
@@ -811,6 +811,8 @@ describe DiscussionTopic do
         topic.update_based_on_date
         expect(topic.workflow_state).to eql "post_delayed"
         expect(topic.locked?).to be_falsey
+        topic.publish!
+        expect(topic.workflow_state).to eql "post_delayed"
       end
 
       it "is locked when lock_at is in the past" do

@@ -81,7 +81,7 @@ describe Types::SubmissionCommentType do
   it "returns all the comments if allComments is true" do
     expect(
       submission_type.resolve("commentsConnection(filter: {allComments: true}) { nodes { _id }}")
-    ).to eq @submission_comments.map(&:id).map(&:to_s)
+    ).to eq(@submission_comments.map { |s| s.id.to_s })
   end
 
   it "author is only available if you have :read_author permission" do

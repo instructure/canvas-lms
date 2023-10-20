@@ -16,7 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {DISCUSSION_QUERY, DISCUSSION_SUBENTRIES_QUERY} from './Queries'
+import {
+  DISCUSSION_ENTRY_ALL_ROOT_ENTRIES_QUERY,
+  DISCUSSION_QUERY,
+  DISCUSSION_SUBENTRIES_QUERY,
+} from './Queries'
 import {
   DELETE_DISCUSSION_ENTRY,
   UPDATE_DISCUSSION_ENTRY_PARTICIPANT,
@@ -286,6 +290,41 @@ export const getDiscussionSubentriesQueryMock = ({
   },
 ]
 
+export const getDiscussionEntryAllRootEntriesQueryMock = ({
+  courseID = '1',
+  discussionEntryID = 'DiscussionEntry-default-mock',
+  rolePillTypes = ['TaEnrollment', 'TeacherEnrollment', 'DesignerEnrollment'],
+  shouldError = false,
+} = {}) => [
+  {
+    request: {
+      query: DISCUSSION_ENTRY_ALL_ROOT_ENTRIES_QUERY,
+      variables: {
+        courseID,
+        discussionEntryID,
+        ...(rolePillTypes !== null && {rolePillTypes}),
+      },
+    },
+    result: {
+      data: {
+        legacyNode: {
+          allRootEntries: [
+            DiscussionEntry.mock({
+              _id: '104',
+              id: 'RGlzY3Vzc2lvbkVudHJ5LTEwNAo=',
+              message: '<p>This is the child reply asc</p>',
+              rootEntryId: discussionEntryID,
+              parentId: 'DiscussionEntry-default-mock',
+            }),
+          ],
+          __typename: 'DiscussionEntry',
+        },
+      },
+    },
+    ...(shouldError && {error: new Error('graphql error')}),
+  },
+]
+
 /* Mutation Mocks */
 export const deleteDiscussionEntryMock = ({id = 'DiscussionEntry-default-mock'} = {}) => [
   {
@@ -417,7 +456,6 @@ export const createDiscussionEntryMock = ({
   message = '',
   parentEntryId = null,
   fileId = null,
-  includeReplyPreview = null,
   isAnonymousAuthor = false,
   courseID = '1',
   quotedEntryId = undefined,
@@ -431,7 +469,6 @@ export const createDiscussionEntryMock = ({
         isAnonymousAuthor,
         ...(parentEntryId !== null && {parentEntryId}),
         ...(fileId !== null && {fileId}),
-        ...(includeReplyPreview !== null && {includeReplyPreview}),
         ...(courseID !== null && {courseID}),
         ...(quotedEntryId !== undefined && {quotedEntryId}),
       },

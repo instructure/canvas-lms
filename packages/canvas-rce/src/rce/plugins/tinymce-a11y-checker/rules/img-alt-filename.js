@@ -18,7 +18,7 @@
 
 import formatMessage from '../../../../format-message'
 
-const FILENAMELIKE = /^(\S|\s)+\.\S+$/
+const FILENAMELIKE = /[^\s]+(.*?).(jpg|jpeg|png|gif|svg|bmp|webp)$/i
 
 export default {
   id: 'img-alt-filename',

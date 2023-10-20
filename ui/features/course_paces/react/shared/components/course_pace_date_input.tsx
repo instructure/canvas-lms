@@ -37,8 +37,6 @@ import * as DateHelpers from '../../utils/date_stuff/date_helpers'
 
 const I18n = useI18nScope('course_pace_date_input')
 
-const {Item: FlexItem} = Flex as any
-
 export type CoursePacesDateInputProps = {
   readonly id?: string
   readonly dateValue?: string
@@ -169,10 +167,10 @@ const CoursePaceDateInput = ({
     type: 'error' as const,
     text: (
       <Flex>
-        <FlexItem margin="0 x-small 0 0" align="start">
+        <Flex.Item margin="0 x-small 0 0" align="start">
           <IconWarningLine />
-        </FlexItem>
-        <FlexItem>{e}</FlexItem>
+        </Flex.Item>
+        <Flex.Item>{e}</Flex.Item>
       </Flex>
     ),
   }))
@@ -181,9 +179,9 @@ const CoursePaceDateInput = ({
       type: message.type === 'warning' ? 'hint' : message.type,
       text: (
         <Flex>
-          <FlexItem margin="0 x-small 0 0" align="start">
+          <Flex.Item margin="0 x-small 0 0" align="start">
             <IconWarningLine color={message.type} />
-          </FlexItem>
+          </Flex.Item>
           <Text color={message.type}>{message.text}</Text>
         </Flex>
       ),

@@ -20,6 +20,9 @@ import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import userSettings from '@canvas/user-settings'
 import {HandleCheckboxChange} from '../../../types'
+import {View} from '@instructure/ui-view'
+import {InstUISettingsProvider} from '@instructure/emotion'
+import {Checkbox, CheckboxFacade} from '@instructure/ui-checkbox'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
@@ -35,20 +38,37 @@ export default function HideStudentNamesCheckbox({handleCheckboxChange, hideStud
   }
 
   return (
-    <div
-      className="checkbox"
-      style={{padding: 12, margin: '10px 0px', background: '#eee', borderRadius: 5}}
+    <InstUISettingsProvider
+      theme={{
+        componentOverrides: {
+          [CheckboxFacade.componentId]: {
+            checkedBackground: '#0375ff',
+            borderColor: '#777777',
+            labelFontSizeSmall: '1rem',
+          },
+          [View.componentId]: {
+            paddingMedium: '16px',
+          },
+        },
+      }}
     >
-      <label className="checkbox" htmlFor="hide_names_checkbox">
-        <input
-          type="checkbox"
-          id="hide_names_checkbox"
-          name="hide_names_checkbox"
+      <View
+        as="div"
+        className="checkbox"
+        margin="x-small 0"
+        borderRadius="medium"
+        background="primary"
+        padding="medium"
+        themeOverride={{backgroundPrimary: '#eee'}}
+      >
+        <Checkbox
+          data-testid="hide-student-names-checkbox"
+          size="small"
+          label={I18n.t('Hide Student Names')}
           checked={hideStudentNames}
           onChange={handleHideStudentNamesChange}
         />
-        {I18n.t('Hide Student Names')}
-      </label>
-    </div>
+      </View>
+    </InstUISettingsProvider>
   )
 }

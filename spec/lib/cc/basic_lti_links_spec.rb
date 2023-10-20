@@ -97,8 +97,7 @@ describe CC::BasicLTILinks do
 
     context "with environment-specific overrides" do
       before do
-        allow(ApplicationController).to receive(:test_cluster?).and_return(true)
-        allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
+        allow(ApplicationController).to receive_messages(test_cluster?: true, test_cluster_name: "beta")
         tool.settings[:environments] = {
           domain: "example-beta.com"
         }

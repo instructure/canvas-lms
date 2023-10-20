@@ -25,14 +25,14 @@ import type {
   CamelizedAssignment,
   GradeEntryMode,
   GradeResult,
-  GradingStandard,
   SubmissionData,
 } from '@canvas/grading/grading.d'
+import {GradingStandard} from '@instructure/grading-utils'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import {parseTextValue} from '@canvas/grading/GradeInputHelper'
 import {isUnusuallyHigh} from '@canvas/grading/OutlierScoreHelper'
 import CompleteIncompleteGradeInput from './GradeInput/CompleteIncompleteGradeInput'
-import type {TextInputInteraction} from '@instructure/ui-text-input/types/index'
+import type {TextInputProps} from '@instructure/ui-text-input'
 
 const I18n = useI18nScope('gradebook')
 
@@ -193,7 +193,7 @@ export default class GradeInput extends Component<Props, State> {
     )
   }
 
-  handleTextChange(event: React.ChangeEvent<HTMLInputElement>) {
+  handleTextChange(event: any) {
     this.setState({
       formattedGrade: event.target.value,
       grade: event.target.value,
@@ -257,7 +257,7 @@ export default class GradeInput extends Component<Props, State> {
       )
     }
 
-    let interaction: TextInputInteraction = 'enabled'
+    let interaction: TextInputProps['interaction'] = 'enabled'
     if (!isDisabled && isBusy) {
       interaction = 'readonly'
     } else if (isDisabled || currentGradeInfo.excused) {
@@ -280,8 +280,8 @@ export default class GradeInput extends Component<Props, State> {
         id="grade-detail-tray--grade-input"
         interaction={interaction}
         messages={messages}
-        // @ts-expect-error
         onInput={this.handleTextChange}
+        onChange={this.handleTextChange}
         onBlur={this.handleTextBlur}
         placeholder="–"
         renderLabel={() => assignmentLabel(this.props.assignment, this.props.enterGradesAs)}

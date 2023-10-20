@@ -27,6 +27,8 @@ class GraphQLController < ApplicationController
 
   before_action :require_user, if: :require_auth?
   before_action :require_inst_access_token_auth, only: :subgraph_execute, unless: :sdl_query?
+  # This makes sure that the liveEvents context is set up for graphql requests
+  before_action :get_context
 
   # This action is for use only with the federated API Gateway. See
   # `app/graphql/README.md` for details.

@@ -404,6 +404,17 @@ describe CanvasKaltura::ClientV3 do
       expect(parsed_bulk_upload[:ready]).to be true
       expect(parsed_bulk_upload[:entries]).to eq [{ name: "aName", entryId: "anEntryId", originalId: "anOriginalId" }]
     end
+
+    it "raises an error when result is nil" do
+      stub_request(:post, "https://www.instructuremedia.com/api_v3/")
+        .with { |request| request.headers["Content-Type"].start_with?("multipart/form-data") }
+        .with(query: hash_including(service: "bulkUpload", action: "add"))
+        .to_return(body: nil)
+
+      expect do
+        @kaltura.bulkUploadCsv("csv,data,with,bulk,upload,info")
+      end.to raise_error(RuntimeError)
+    end
   end
 
   describe "bulkUploadAdd" do

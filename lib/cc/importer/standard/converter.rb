@@ -181,7 +181,7 @@ module CC::Importer::Standard
                   node.inner_html = HtmlTextHelper.escape_html(File.basename(val)) + (node.inner_html || "")
                 end
               end
-            elsif ImportedHtmlConverter.relative_url?(val) &&
+            elsif CanvasLinkMigrator.relative_url?(val) &&
                   (new_url = get_canvas_att_replacement_url(val))
               node[attr] = URI::DEFAULT_PARSER.escape(new_url)
             end

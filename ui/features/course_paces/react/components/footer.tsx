@@ -52,8 +52,6 @@ import {RemovePaceWarningModal} from './remove_pace_warning_modal'
 
 const I18n = useI18nScope('course_paces_footer')
 
-const {Item: FlexItem} = Flex as any
-
 interface StoreProps {
   readonly autoSaving: boolean
   readonly pacePublishing: boolean
@@ -227,10 +225,10 @@ export const Footer = ({
           contextType={studentPace ? 'Enrollment' : 'Section'}
           paceName={paceName}
         />
-        <FlexItem>
+        <Flex.Item>
           {showRemovePaceButton && (
             <Tooltip
-              renderTip={removeDisabled && removeTip}
+              renderTip={removeDisabled ? removeTip : ''}
               on={removeDisabled && !useRedesign ? ['hover', 'focus'] : []}
             >
               {showCondensedView ? (
@@ -250,11 +248,11 @@ export const Footer = ({
               )}
             </Tooltip>
           )}
-        </FlexItem>
-        <FlexItem>
+        </Flex.Item>
+        <Flex.Item>
           {!showCondensedView && renderChangesIndicator()}
           <Tooltip
-            renderTip={cancelDisabled && cancelTip}
+            renderTip={cancelDisabled ? cancelTip : ''}
             on={cancelDisabled && !useRedesign ? ['hover', 'focus'] : []}
           >
             <Button
@@ -267,7 +265,7 @@ export const Footer = ({
             </Button>
           </Tooltip>
           <Tooltip
-            renderTip={pubDisabled && pubTip}
+            renderTip={pubDisabled ? pubTip : ''}
             on={pubDisabled && !useRedesign ? ['hover', 'focus'] : []}
           >
             <Button
@@ -279,7 +277,7 @@ export const Footer = ({
               {publishLabel}
             </Button>
           </Tooltip>
-        </FlexItem>
+        </Flex.Item>
       </Flex>
     </View>
   )

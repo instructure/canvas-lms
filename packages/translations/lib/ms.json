@@ -1,10 +1,4 @@
 {
-    "a_great_discussion_6526a6d9": {
-        "message": "Perbincangan yang hebat"
-    },
-    "a_wonderful_assignment_d3139d9b": {
-        "message": "Tugasan yang luar biasa"
-    },
     "access_the_pretty_html_editor_37168efe": {
         "message": "Dapatkan akses kepada editor HTML yang menarik"
     },
@@ -32,17 +26,11 @@
     "add_image_60b2de07": {
         "message": "Tambah Imej"
     },
-    "add_to_do_7537af64": {
-        "message": "Tambah Untuk Dilakukan"
-    },
-    "add_to_do_7def3c37": {
-        "message": "Tambah Untuk Dilakukan"
+    "add_one_9e34a6f8": {
+        "message": "Tambah satu!"
     },
     "additional_considerations_f3801683": {
         "message": "Pertimbangan tambahan"
-    },
-    "address_3159962f": {
-        "message": "Alamat:"
     },
     "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
         "message": "Pautan berhampiran dengan URL yang sama sepatutnya dijadikan pautan tunggal."
@@ -68,9 +56,6 @@
     "all_apps_a50dea49": {
         "message": "Semua Apl"
     },
-    "all_day_fb42c4fc": {
-        "message": "Semua Hari"
-    },
     "alpha_15d59033": {
         "message": "Alfa"
     },
@@ -86,14 +71,8 @@
     "amalg_coproduct_c589fb12": {
         "message": "Amalg (Produk Bersama)"
     },
-    "an_amazing_discussion_assignment_e5c8bd6b": {
-        "message": "Tugasan perbincangan yang menakjubkan"
-    },
     "an_error_occured_reading_the_file_ff48558b": {
         "message": "Ralat berlaku semasa membaca fail"
-    },
-    "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
-        "message": "Ralat berlaku semasa cuba menolak peluang."
     },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "Ralat berlaku semasa membuat permintaan rangkaian"
@@ -137,9 +116,6 @@
     "are_you_sure_you_want_to_cancel_changes_you_made_m_c5210496": {
         "message": "Adakah anda pasti anda ingin membatalkan? Perubahan yang anda lakukan mungkin belum disimpan."
     },
-    "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
-        "message": "Adakah anda pasti anda ingin memadamkan item perancang ini?"
-    },
     "armenian_12da6118": {
         "message": "Bahasa Armenia"
     },
@@ -157,36 +133,6 @@
     },
     "assignments_1e02582c": {
         "message": "Tugasan"
-    },
-    "assignmenttype_title_6612d008": {
-        "message": "{ assignmentType } { title }."
-    },
-    "assignmenttype_title_all_day_on_datetime_9768903c": {
-        "message": "{ assignmentType } { title }, sepanjang hari pada { datetime }."
-    },
-    "assignmenttype_title_at_datetime_478f0709": {
-        "message": "{ assignmentType } { title }, pada { datetime }."
-    },
-    "assignmenttype_title_at_datetime_until_endtime_a5900e38": {
-        "message": "{ assignmentType } { title }, pada { datetime } hingga { endTime }"
-    },
-    "assignmenttype_title_due_datetime_a112d8ff": {
-        "message": "{ assignmentType } { title }, tarikh siap { datetime }."
-    },
-    "assignmenttype_title_has_a_to_do_time_at_datetime_e07310e8": {
-        "message": "{ assignmentType } { title } mempunyai masa untuk dilakukan pada { datetime }."
-    },
-    "assignmenttype_title_is_marked_as_done_a8dc46ef": {
-        "message": "{ assignmentType } { title } ditandakan sebagai siap."
-    },
-    "assignmenttype_title_is_not_marked_as_done_ba80ba66": {
-        "message": "{ assignmentType } { title } tidak ditandakan sebagai siap."
-    },
-    "assignmenttype_title_posted_datetime_cab69444": {
-        "message": "{ assignmentType } { title } disiarkan pada { datetime }."
-    },
-    "assignmenttype_title_reminder_datetime_33fa66d5": {
-        "message": "{ assignmentType } { title }, peringatan { datetime }."
     },
     "asterisk_82255584": {
         "message": "Simbol berbentuk bintang"
@@ -224,17 +170,11 @@
     "because_501841b": {
         "message": "Sebab"
     },
-    "beginning_of_your_to_do_history_61ef2dce": {
-        "message": "Permulaan Sejarah Senarai Untuk Dilakukan Anda"
-    },
     "belarusian_b2f19c76": {
         "message": "Bahasa Belarus"
     },
     "below_81d4dceb": {
         "message": "Di bawah"
-    },
-    "below_is_an_example_of_how_students_will_see_their_8f7e7971": {
-        "message": "Di bawah ialah contoh jadual yang akan dilihat oleh pelajar"
     },
     "beta_cb5f307e": {
         "message": "Beta"
@@ -269,20 +209,14 @@
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
     },
-    "calendar_a8563bb2": {
-        "message": "Kalendar:"
-    },
-    "calendar_event_89aadc1c": {
-        "message": "Acara Kalendar"
-    },
     "cancel_caeb1e68": {
         "message": "Batal"
     },
-    "canvas_planner_98ed106": {
-        "message": "Perancang Canvas"
-    },
     "cap_product_3a5265a6": {
         "message": "Hadkan Produk"
+    },
+    "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
+        "message": "Kapsyen yang diwarisi daripada kursus induk tidak boleh dialih keluar."
     },
     "catalan_16f6b78f": {
         "message": "Catalan"
@@ -383,9 +317,6 @@
     "close_d634289d": {
         "message": "Tutup"
     },
-    "close_opportunity_center_popup_9907d981": {
-        "message": "Tutup tetingkap timbul Pusat Peluang"
-    },
     "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
         "message": "Fail kapsyen tertutup mestilah kurang daripada { maxKb } kb"
     },
@@ -452,23 +383,8 @@
     "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
         "message": "{ count, plural,\n     =0 {0 perkataan}\n    one {1 perkataan}\n  other {# perkataan}\n}"
     },
-    "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
-        "message": "{ count, plural,\n     =0 {# peluang}\n    one {# peluang}\n  other {# peluang}\n}"
-    },
-    "count_plural_one_hide_missing_item_other_hide_miss_4a2562f7": {
-        "message": "{ count, plural,\n    one {Sembunyikan # item yang tiada}\n  other {Sembunyikan # item yang tiada}\n}"
-    },
     "count_plural_one_item_loaded_other_items_loaded_857023b7": {
         "message": "{ count, plural,\n    one {# item dimuat naik}\n  other {# item dimuat naik}\n}"
-    },
-    "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
-        "message": "{ count, plural,\n    one {Tunjukkan # item yang lengkap}\n  other {Tunjukkan # item yang lengkap}\n}"
-    },
-    "count_plural_one_show_missing_item_other_show_miss_509327ef": {
-        "message": "{ count, plural,\n    one {Tunjukkan # missing item yang tiada}\n  other {Tunjukkan # item yang tiada}\n}"
-    },
-    "course_8a63b4a3": {
-        "message": "Kursus"
     },
     "course_documents_104d76e0": {
         "message": "Dokumen Kursus"
@@ -494,9 +410,6 @@
     "course_navigation_dd035109": {
         "message": "Navigasi Kursus"
     },
-    "course_to_do_bcbbab54": {
-        "message": "{ course } UNTuK DILAKUKAN"
-    },
     "create_icon_110d6463": {
         "message": "Cipta Ikon"
     },
@@ -521,6 +434,9 @@
     "current_image_f16c249c": {
         "message": "Imej Semasa"
     },
+    "current_link_945a47ee": {
+        "message": "Pautan Semasa"
+    },
     "current_volume_level_c55ab825": {
         "message": "Tahap Volum Semasa"
     },
@@ -544,21 +460,6 @@
     },
     "date_added_ed5ad465": {
         "message": "Tarikh Ditambah"
-    },
-    "date_at_time_dbdb1b99": {
-        "message": "{ date } di { time }"
-    },
-    "date_ee500367": {
-        "message": "Tarikh"
-    },
-    "date_is_not_a_valid_date_4ef9f8ba": {
-        "message": "#{ date } bukan tarikh yang sah."
-    },
-    "date_is_required_8660ec22": {
-        "message": "Tarikh diperlukan"
-    },
-    "date_time_d9fbf2d7": {
-        "message": "Tarikh & Masa:"
     },
     "decorative_icon_9a7f3fc3": {
         "message": "Ikon Hiasan"
@@ -587,9 +488,6 @@
     "degree_symbol_4a823d5f": {
         "message": "Simbol Darjah"
     },
-    "delete_a6efa79d": {
-        "message": "Padam"
-    },
     "delimiters_4db4840d": {
         "message": "Pembatas"
     },
@@ -610,9 +508,6 @@
     },
     "details_98a31b68": {
         "message": "Butiran"
-    },
-    "details_a6f427c3": {
-        "message": "Butiran:"
     },
     "diagonal_dots_7d71b57e": {
         "message": "Titik Pepenjuru"
@@ -652,18 +547,6 @@
     },
     "disjoint_union_e74351a8": {
         "message": "Buka Cantuman Penyambung"
-    },
-    "dismiss_itemtitle_a9fae1b3": {
-        "message": "Tolak { itemTitle }"
-    },
-    "dismiss_opportunityname_5995176f": {
-        "message": "Tolak { opportunityName }"
-    },
-    "dismissed_8b0b1fc9": {
-        "message": "Ditolak..."
-    },
-    "dismissed_opportunities_f0826640": {
-        "message": "Peluang Ditolak..."
     },
     "display_options_315aba85": {
         "message": "Paparkan Pilihan"
@@ -713,12 +596,6 @@
     "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
         "message": "Seret kendali. Gunakan anak panah ke atas dan ke bawah untuk menukar saiz."
     },
-    "due_5d7267be": {
-        "message": "Cukup tempoh:"
-    },
-    "due_date_124fdd99": {
-        "message": "Cukup tempoh: { date }"
-    },
     "due_multiple_dates_cc0ee3f5": {
         "message": "Cukup tempoh: Berbilang Tarikh"
     },
@@ -748,9 +625,6 @@
     },
     "edit_link_7f53bebb": {
         "message": "Edit Pautan"
-    },
-    "edit_title_72e5a21e": {
-        "message": "Edit { title }"
     },
     "editor_statusbar_26ac81fc": {
         "message": "Bar Status Editor"
@@ -836,29 +710,11 @@
     "equivalent_identity_654b3ce5": {
         "message": "Kesetaraan (Identiti)"
     },
-    "error_loading_grades_e0b38f4d": {
-        "message": "Ralat memuatkan gred"
-    },
-    "error_loading_items_5218438e": {
-        "message": "Ralat memuatkan item"
-    },
-    "error_loading_more_items_3f109d9f": {
-        "message": "Ralat memuatkan lebih banyak item"
-    },
-    "error_loading_past_items_2881dbb1": {
-        "message": "Ralat memuatkan item yang lepas"
-    },
     "estonian_5e8e2fa4": {
         "message": "Bahasa Estonia"
     },
     "eta_b8828f99": {
         "message": "Eta"
-    },
-    "exciting_discussion_9f67bd0a": {
-        "message": "Perbincangan menarik"
-    },
-    "excused_cf8792eb": {
-        "message": "Dimaafkan"
     },
     "exists_2e62bdaa": {
         "message": "Wujud"
@@ -871,9 +727,6 @@
     },
     "expand_to_see_types_f5d29352": {
         "message": "Kembangkan untuk melihat { types }"
-    },
-    "extended_9a58dcb6": {
-        "message": "Dilanjutkan"
     },
     "external_link_d3f9e62a": {
         "message": "Pautan Luar"
@@ -896,47 +749,11 @@
     "f_function_fe422d65": {
         "message": "F (fungsi)"
     },
-    "failed_getting_course_list_49846a93": {
-        "message": "Gagal mendapatkan senarai kursus"
-    },
     "failed_getting_file_contents_e9ea19f4": {
         "message": "Gagal mendapatkan kandungan fail"
     },
-    "failed_getting_to_do_list_10ce2833": {
-        "message": "Gagal mendapatkan senarai Untuk Dilakukan"
-    },
-    "failed_peeking_into_your_future_e95b9306": {
-        "message": "Gagal melihat masa depan anda"
-    },
-    "failed_peeking_into_your_past_5bec2323": {
-        "message": "Gagal melihat masa lalu anda"
-    },
-    "failed_saving_changes_on_name_1e100ad": {
-        "message": "Gagal menyimpan perubahan pada { name }"
-    },
-    "failed_to_delete_name_bdd7b810": {
-        "message": "Gagal untuk memadamkan { name }."
-    },
-    "failed_to_delete_to_do_64edff49": {
-        "message": "Gagal memadamkan perkara untuk dilakukan"
-    },
-    "failed_to_get_new_activity_17e7ec7c": {
-        "message": "Gagal untuk mendapatkan aktiviti baharu"
-    },
-    "failed_to_load_opportunities_52ab6404": {
-        "message": "Gagal untuk memuatkan peluang"
-    },
     "failed_to_retrieve_content_from_external_tool_5899c213": {
         "message": "Gagal mengambil kandungan daripada alat luar"
-    },
-    "failed_to_save_to_do_ddc7503b": {
-        "message": "Gagal untuk menyimpan perkara untuk dilakukan"
-    },
-    "failure_loading_the_to_do_list_c61895c8": {
-        "message": "Kegagalan memuatkan senarai Untuk Dilakukan"
-    },
-    "feedback_6dcc1991": {
-        "message": "Maklum balas"
     },
     "file_name_8fd421ff": {
         "message": "Nama fail"
@@ -1016,9 +833,6 @@
     "fullscreen_873bf53f": {
         "message": "Skrin penuh"
     },
-    "fun_quiz_47ab0b0": {
-        "message": "Kuiz menyeronokkan"
-    },
     "galician_7e4508b5": {
         "message": "Bahasa Galicia"
     },
@@ -1034,26 +848,14 @@
     "gif_png_format_images_larger_than_size_kb_are_not__7af3bdbd": {
         "message": "Imej format GIF/PNG lebih besar daripada { size } KB tidak disokong pada masa ini."
     },
-    "go_to_card_view_dashboard_9d03970e": {
-        "message": "Terus ke Papan Pemuka Pandangan Kad"
-    },
     "go_to_the_editor_s_menubar_e6674c81": {
         "message": "Terus ke bar menu editor"
     },
     "go_to_the_editor_s_toolbar_a5cb875f": {
         "message": "Terus ke bar alat editor"
     },
-    "graded_25cd3fcd": {
-        "message": "Digredkan"
-    },
     "grades_a61eba0a": {
         "message": "Gred"
-    },
-    "grades_are_loading_c899652d": {
-        "message": "Gred sedang dimuatkan"
-    },
-    "grades_loaded_5056277c": {
-        "message": "Gred Dimuatkan"
     },
     "greater_than_e98af662": {
         "message": "Lebih Besar Daripada"
@@ -1307,26 +1109,8 @@
     "italian_bd3c792d": {
         "message": "Bahasa Itali"
     },
-    "items_completed_items_plural_1_item_other_items_717d579f": {
-        "message": "{ items } { items, plural,\n     =1 {item}\n  other {item}\n} dilengkapkan"
-    },
     "japanese_b5721ca7": {
         "message": "Bahasa Jepun"
-    },
-    "join_6cafecca": {
-        "message": "Sertai"
-    },
-    "join_active_online_meeting_d9d892b2": {
-        "message": "sertai mesyuarat dalam talian yang aktif"
-    },
-    "join_online_meeting_b1725843": {
-        "message": "sertai mesyuarat dalam talian"
-    },
-    "jump_to_navigation_toolbar_2952cd8b": {
-        "message": "Pintas ke bar alat navigasi"
-    },
-    "jump_to_today_254ccf41": {
-        "message": "Pintas ke Hari Ini"
     },
     "kappa_2f14c816": {
         "message": "Kappa"
@@ -1346,9 +1130,6 @@
     "lambda_4f602498": {
         "message": "Lambda"
     },
-    "language_arts_35b79a8b": {
-        "message": "Seni Bahasa"
-    },
     "language_arts_icon_a798b0f8": {
         "message": "Ikon Seni Bahasa"
     },
@@ -1357,9 +1138,6 @@
     },
     "large_9c5e80e7": {
         "message": "Besar"
-    },
-    "late_2be42b88": {
-        "message": "Lewat"
     },
     "latvian_2bbb6aab": {
         "message": "Bahasa Latvia"
@@ -1454,6 +1232,9 @@
     "link_options_a16b758b": {
         "message": "Pilihan Pautan"
     },
+    "link_type_linktypemessage_c6d26815": {
+        "message": "jenis pautan: { linkTypeMessage }"
+    },
     "link_with_text_starting_with_start_b3fcbe71": {
         "message": "Pautan dengan teks bermula dengan { start }"
     },
@@ -1472,20 +1253,8 @@
     "load_more_35d33c7": {
         "message": "Muatkan Lebih Banyak"
     },
-    "load_more_a36f9cf9": {
-        "message": "Muatkan lebih banyak"
-    },
-    "load_prior_dates_f2b0f6f0": {
-        "message": "Muatkan tarikh sebelumnya"
-    },
-    "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
-        "message": "{ count, plural,\n     =0 {# item}\n    one {# item}\n  other {# item}\n} dimuatkan"
-    },
     "loading_25990131": {
         "message": "Memuatkan..."
-    },
-    "loading_725811ca": {
-        "message": "memuatkan"
     },
     "loading_bde52856": {
         "message": "Memuatkan"
@@ -1505,26 +1274,14 @@
     "loading_folders_d8b5869e": {
         "message": "Memuatkan folder"
     },
-    "loading_grades_c842c887": {
-        "message": "Memuatkan Gred"
-    },
-    "loading_past_items_ca499e75": {
-        "message": "Memuatkan item yang lepas"
-    },
     "loading_placeholder_for_filename_792ef5e8": {
         "message": "Memuatkan ruang letak untuk { fileName }"
-    },
-    "loading_planner_items_947a813d": {
-        "message": "Memuatkan item perancang"
     },
     "loading_please_wait_d276220a": {
         "message": "Sedang memuatkan, sila tunggu"
     },
     "loading_preview_9f077aa1": {
         "message": "Memuatkan pratonton"
-    },
-    "location_3b6ff307": {
-        "message": "Lokasi:"
     },
     "locked_762f138b": {
         "message": "Berkunci"
@@ -1540,9 +1297,6 @@
     },
     "logical_equivalence_thick_662dd3f2": {
         "message": "Kesetaraan Logik (Tebal)"
-    },
-    "looks_like_there_isn_t_anything_here_d9bcef49": {
-        "message": "Nampaknya tidak ada apa-apa di sini"
     },
     "low_horizontal_dots_cc08498e": {
         "message": "Titik Melintang Rendah"
@@ -1564,9 +1318,6 @@
     },
     "maps_to_e5ef7382": {
         "message": "Peta Untuk"
-    },
-    "math_ede93050": {
-        "message": "Matematik"
     },
     "math_icon_ad4e9d03": {
         "message": "Ikon Matematik"
@@ -1613,11 +1364,8 @@
     "miscellaneous_e9818229": {
         "message": "Lain-lain"
     },
-    "missing_1a256b3b": {
-        "message": "Tiada"
-    },
-    "missing_items_for_title_516511f8": {
-        "message": "Tiada item untuk { title }"
+    "module_90d9fd32": {
+        "message": "Modul"
     },
     "modules_c4325335": {
         "message": "Modul"
@@ -1646,9 +1394,6 @@
     "my_files_2f621040": {
         "message": "Fail saya"
     },
-    "my_grades_98834476": {
-        "message": "Gred Saya"
-    },
     "n_th_root_9991a6e4": {
         "message": "Akar ke-n"
     },
@@ -1670,38 +1415,44 @@
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "Navigasi melalui menu atau bar alat"
     },
+    "navigation_ee9af92d": {
+        "message": "Navigasi"
+    },
     "nested_greater_than_d852e60d": {
         "message": "Lebih Daripada Tersarang"
     },
     "nested_less_than_27d17e58": {
         "message": "Kurang Daripada Tersarang"
     },
-    "new_13daf639": {
-        "message": "Baharu"
-    },
-    "new_activity_8b84847d": {
-        "message": "Aktiviti Baharu"
-    },
-    "new_activity_for_title_14c9c3af": {
-        "message": "Aktiviti baharu untuk { title }"
-    },
-    "new_opportunities_7d349c4d": {
-        "message": "Peluang Baharu"
+    "new_quiz_34aacba6": {
+        "message": "Kuiz Baharu"
     },
     "next_40e12421": {
         "message": "Seterusnya"
     },
-    "next_month_749b1778": {
-        "message": "Bulan Seterusnya"
-    },
     "no_accessibility_issues_were_detected_f8d3c875": {
         "message": "Tiada isu kebolehcapaian dikesan."
+    },
+    "no_announcements_created_yet_c44a94f4": {
+        "message": "Belum ada pengumuman dicipta."
+    },
+    "no_announcements_found_20185afc": {
+        "message": "Tiada pengumuman ditemui."
+    },
+    "no_assignments_created_yet_1b236d87": {
+        "message": "Belum ada tugasan dicipta."
+    },
+    "no_assignments_found_79e46d7f": {
+        "message": "Tiada tugasan ditemui."
     },
     "no_changes_to_save_d29f6e91": {
         "message": "Tiada perubahan disimpan."
     },
-    "no_due_dates_assigned_e8f5bac8": {
-        "message": "Tiada Tarikh Siap Ditetapkan"
+    "no_discussions_created_yet_ff99abe3": {
+        "message": "Belum ada perbincangan dicipta."
+    },
+    "no_discussions_found_9284063b": {
+        "message": "Tiada perbincangan ditemui."
     },
     "no_e16d9132": {
         "message": "Tidak"
@@ -1709,17 +1460,29 @@
     "no_file_chosen_9a880793": {
         "message": "Tiada fail dipilih"
     },
-    "no_grade_3b4d7f3e": {
-        "message": "Tiada gred"
-    },
     "no_headers_9bc7dc7f": {
         "message": "Tiada pengepala"
     },
-    "no_more_items_to_show_6a1333c6": {
-        "message": "Tiada lagi item untuk ditunjunkkan"
+    "no_modules_created_yet_c71b6d4d": {
+        "message": "Belum ada modul dicipta."
+    },
+    "no_modules_found_2df43a40": {
+        "message": "Tiada modul ditemui."
+    },
+    "no_pages_created_yet_c379fa6e": {
+        "message": "Belum ada halaman dicipta."
+    },
+    "no_pages_found_6799350": {
+        "message": "Tiada halaman ditemui."
     },
     "no_preview_is_available_for_this_file_f940114a": {
         "message": "Tiada pratonton tersedia untuk fail ini."
+    },
+    "no_quizzes_created_yet_1a2370b9": {
+        "message": "Belum ada kuiz dicipta."
+    },
+    "no_quizzes_found_c80c537a": {
+        "message": "Tiada kuiz dicipta."
     },
     "no_results_940393cf": {
         "message": "Tiada hasil."
@@ -1766,35 +1529,8 @@
     "not_superset_strict_24e06f36": {
         "message": "Bukan Superset (Wajar)"
     },
-    "nothing_due_this_week_d45c9ef9": {
-        "message": "Tiada Tarikh Siap Minggu Ini"
-    },
-    "nothing_for_now_e3e3ce2a": {
-        "message": "Tiada apa-apa pada masa ini"
-    },
-    "nothing_here_needs_attention_c4eaded6": {
-        "message": "Tiada apa-apa di sini memerlukan perhatian."
-    },
-    "nothing_more_to_do_b665da42": {
-        "message": "Tiada Apa-apa Lagi Untuk Dilakukan"
-    },
-    "nothing_new_needs_attention_3ac548d4": {
-        "message": "Tiada apa-apa yang baharu memerlukan perhatian."
-    },
-    "nothing_planned_today_selecting_most_recent_item_ffd71bff": {
-        "message": "Belum ada perancangan hari ini. Memilih item terkini."
-    },
-    "nothing_planned_today_selecting_next_item_f6718aa": {
-        "message": "Tiada apa-apa dirancang hari ini. Memilih item seterusnya."
-    },
-    "nothing_planned_yet_8675ffe9": {
-        "message": "Belum Ada Perancangan"
-    },
     "nu_1c0f6848": {
         "message": "Nu"
-    },
-    "numpoints_points_8621a43b": {
-        "message": "{ numPoints } mata"
     },
     "octagon_e48be9f": {
         "message": "Oktagon"
@@ -1811,9 +1547,6 @@
     "one_or_more_files_failed_to_paste_please_try_uploa_7fa39dd3": {
         "message": "Satu atau lebih fail gagal ditampalkan. Sila cuba muat naik atau seret dan lepas fail."
     },
-    "only_most_recent_grading_period_shown_f1ad6458": {
-        "message": "*Hanya tempoh penggredan terkini ditunjukkan."
-    },
     "open_circle_e9bd069": {
         "message": "Bulatan Terbuka"
     },
@@ -1825,12 +1558,6 @@
     },
     "operators_a2ef9a93": {
         "message": "Operator"
-    },
-    "opportunities_popup_f6703842": {
-        "message": "tetingkap timbul peluang"
-    },
-    "optional_add_course_ef0d70fc": {
-        "message": "Pilihan: Tambah Kursus"
     },
     "or_9b70ccaa": {
         "message": "Atau"
@@ -1876,12 +1603,6 @@
     },
     "pause_12af3bb4": {
         "message": "Jedakan"
-    },
-    "peer_review_74f26a13": {
-        "message": "Tinjauan Semula Setara"
-    },
-    "peer_review_for_itemtitle_358cb413": {
-        "message": "Tinjauan Semula Setara untuk { itemTitle }"
     },
     "pentagon_17d82ea3": {
         "message": "Pentagon"
@@ -1943,12 +1664,6 @@
     "plus_minus_f8be2e83": {
         "message": "Tambah/Tolak"
     },
-    "points_bceb5005": {
-        "message": "mata"
-    },
-    "points_points_63e59cce": {
-        "message": "{ points } mata"
-    },
     "polish_4cf2ecaf": {
         "message": "Bahasa Poland"
     },
@@ -1985,9 +1700,6 @@
     "preview_inline_9787330": {
         "message": "Pratonton dalam sebaris"
     },
-    "previous_month_bb1e3c84": {
-        "message": "Bulan sebelumnya"
-    },
     "prime_917ea60e": {
         "message": "Perdana"
     },
@@ -2005,9 +1717,6 @@
     },
     "psi_e3f5f0f7": {
         "message": "Psi"
-    },
-    "pts_699bd9aa": {
-        "message": "mata"
     },
     "published_c944a23d": {
         "message": "telah diterbitkan"
@@ -2051,17 +1760,11 @@
     "red_8258edf3": {
         "message": "Merah"
     },
-    "redo_363c58b7": {
-        "message": "Buat semula"
-    },
     "relationships_6602af70": {
         "message": "Hubungan"
     },
     "religion_icon_246e0be1": {
         "message": "Ikon Agama"
-    },
-    "reminder_date_4564d12d": {
-        "message": "Peringatan: { date }"
     },
     "remove_heading_style_5fdc8855": {
         "message": "Alih keluar gaya tajuk"
@@ -2071,9 +1774,6 @@
     },
     "replace_e61834a7": {
         "message": "Gantikan"
-    },
-    "replies_4a8577c8": {
-        "message": "Balasan"
     },
     "reset_95a81614": {
         "message": "Tetap Semula"
@@ -2174,12 +1874,6 @@
     "saved_icon_maker_icons_df86e2a1": {
         "message": "Ikon Pembuat Ikon Disimpan"
     },
-    "schedule_preview_3bcda153": {
-        "message": "Jadualkan Pratonton"
-    },
-    "science_8d92214a": {
-        "message": "Sains"
-    },
     "screen_readers_cannot_determine_what_is_displayed__6a5842ab": {
         "message": "Pembaca skrin tidak boleh menentukan apa yang dipaparkan dalam imej tanpa teks alternatif dan nama fail selalunya merupakan rentetan nombor dan huruf tidak bermakna yang tidak menerangkan konteks atau makna."
     },
@@ -2201,12 +1895,6 @@
     "script_l_42a7b254": {
         "message": "Skrip L"
     },
-    "scroll_up_to_see_your_history_19b14cad": {
-        "message": "Tatal ke atas untuk melihat sejarah anda!"
-    },
-    "scrolls_up_to_the_previous_item_with_new_activity_99717459": {
-        "message": "Tatal ke atas kepada item sebelumnya dengan aktiviti baharu."
-    },
     "search_280d00bd": {
         "message": "Cari"
     },
@@ -2221,6 +1909,9 @@
     },
     "select_video_source_1b5c9dbe": {
         "message": "Pilih sumber video"
+    },
+    "selected_274ce24f": {
+        "message": "Dipilih"
     },
     "selected_linkfilename_c093b1f2": {
         "message": "{ linkFileName } dipilih"
@@ -2252,9 +1943,6 @@
     "shortcut_911d6255": {
         "message": "Pintasan"
     },
-    "show_all_ae37d610": {
-        "message": "Tunjuk Semua"
-    },
     "show_audio_options_b489926b": {
         "message": "Tunjuk pilihan audio"
     },
@@ -2263,9 +1951,6 @@
     },
     "show_link_options_545338fd": {
         "message": "Tunjuk pilihan pautan"
-    },
-    "show_my_grades_ebd08684": {
-        "message": "Tunjuk Gred Saya"
     },
     "show_studio_media_options_a0c748c6": {
         "message": "Tunjuk pilihan media Studio"
@@ -2305,9 +1990,6 @@
     },
     "small_b070434a": {
         "message": "Kecil"
-    },
-    "social_studies_13fa30c7": {
-        "message": "Pengajian Sosial"
     },
     "solid_circle_9f061dfc": {
         "message": "Bulatan Satu Warna"
@@ -2378,23 +2060,8 @@
     "start_recording_9a65141a": {
         "message": "Mulakan Rakaman"
     },
-    "startdate_to_enddate_d245175b": {
-        "message": "{ startDate } kepada { endDate }"
-    },
-    "startdatetime_enddatetime_20abc10e": {
-        "message": "{ startDateTime } - { endDateTime }"
-    },
-    "startdatetime_endtime_49741bbe": {
-        "message": "{ startDateTime } - { endTime }"
-    },
-    "starttime_to_endtime_d7cc249d": {
-        "message": "{ startTime } kepada { endTime }"
-    },
     "steel_blue_14296f08": {
         "message": "Biru Keluli"
-    },
-    "student_to_do_c018c835": {
-        "message": "Untuk Dilakukan Pelajar"
     },
     "studio_media_options_ee504361": {
         "message": "Pilihan Media Studio"
@@ -2407,9 +2074,6 @@
     },
     "submit_a3cc6859": {
         "message": "Serahkan"
-    },
-    "submitted_318fad53": {
-        "message": "Diserahkan"
     },
     "subscript_59744f96": {
         "message": "Subskrip"
@@ -2425,9 +2089,6 @@
     },
     "succeeds_equal_158e8c3a": {
         "message": "Berjaya Sama Dengan"
-    },
-    "success_to_do_created_e34ed395": {
-        "message": "Berjaya: Untuk Dilakukan dicipta"
     },
     "sum_b0842d31": {
         "message": "Jumlah"
@@ -2495,9 +2156,6 @@
     "tagalog_74906db7": {
         "message": "Bahasa Tagalog"
     },
-    "task_16b0ef38": {
-        "message": "Tugas"
-    },
     "tau_880974b7": {
         "message": "Tau"
     },
@@ -2534,12 +2192,6 @@
     "thai_8f9bc548": {
         "message": "Bahasa Thai"
     },
-    "the_best_assignment_15e98be1": {
-        "message": "Tugasan terbaik"
-    },
-    "the_date_and_time_this_to_do_is_due_74c823d4": {
-        "message": "Tarikh dan Masa item untuk dilakukan ini akan cukup tempoh"
-    },
     "the_document_preview_is_currently_being_processed__7d9ea135": {
         "message": "Pratonton dokumen sedang diproses pada masa ini. Sila cuba semula kemudian."
     },
@@ -2566,12 +2218,6 @@
     },
     "the_selected_file_exceeds_the_maxsize_byte_limit_f7e8c771": {
         "message": "Fail yang dipilih melebihi had { maxSize } Bait"
-    },
-    "there_are_no_points_associated_with_this_item_449c712a": {
-        "message": "Tiada mata yang berkaitan dengan item ini"
-    },
-    "there_is_nothing_planned_for_today_e09bfc8c": {
-        "message": "Tiada perancangan untuk hari ini."
     },
     "therefore_d860e024": {
         "message": "Oleh itu"
@@ -2612,50 +2258,23 @@
     "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
         "message": "Walaupun video anda akan mempunyai tajuk yang betul dalam pelayar, kami gagal membuat kemas kini dalam pangkalan data."
     },
-    "time_2b5aac58": {
-        "message": "Masa"
-    },
     "timebar_a4d18443": {
         "message": "Bar Masa"
     },
     "title_ee03d132": {
         "message": "Tajuk"
     },
-    "title_is_required_6ddcab69": {
-        "message": "tajuk diperlukan"
-    },
     "to_be_posted_when_d24bf7dc": {
         "message": "Untuk Disiarkan: { when }"
     },
-    "to_do_1d554f36": {
-        "message": "Untuk Dilakukan"
-    },
-    "to_do_date_4b211ad0": {
-        "message": "Untuk Dilakukan: { date }"
-    },
-    "to_do_items_loading_d1cdfcd5": {
-        "message": "Item Untuk Dilakukan Sedang Dimuatkan"
-    },
     "to_do_when_2783d78f": {
         "message": "Untuk Dilakukan: { when }"
-    },
-    "today_76e10f9c": {
-        "message": "Hari Ini"
-    },
-    "today_at_date_8ac30d6": {
-        "message": "Hari ini pada { date }"
     },
     "toggle_summary_group_413df9ac": {
         "message": "Togol { summary } kumpulan"
     },
     "toggle_tooltip_d3b7cb86": {
         "message": "Togol petua alat"
-    },
-    "tomorrow_9a6c9a00": {
-        "message": "Esok"
-    },
-    "tomorrow_at_date_b53f2cf1": {
-        "message": "Esok pada { date }"
     },
     "tools_2fcf772e": {
         "message": "Alat"
@@ -2690,9 +2309,6 @@
     "unable_to_determine_resource_selection_url_7867e060": {
         "message": "Tidak dapat menentukan url pilihan sumber"
     },
-    "unable_to_mark_as_complete_8141856d": {
-        "message": "Tidak dapat ditandakan sebagai lengkap."
-    },
     "union_e6b57a53": {
         "message": "Kesatuan"
     },
@@ -2713,6 +2329,9 @@
     },
     "up_c553575d": {
         "message": "Ke atas"
+    },
+    "updated_link_a827e441": {
+        "message": "Pautan dikemas kini"
     },
     "upload_document_253f0478": {
         "message": "Muat Naik Dokumen"
@@ -2873,12 +2492,6 @@
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "Lihat pintasan papan kekunci"
     },
-    "view_next_week_7f61f755": {
-        "message": "Lihat minggu seterusnya"
-    },
-    "view_previous_week_6f83849f": {
-        "message": "Lihat minggu sebelumnya"
-    },
     "view_title_description_67940918": {
         "message": "Lihat penerangan { title }"
     },
@@ -2902,9 +2515,6 @@
     },
     "webpages_should_only_have_a_single_h1_which_is_aut_dc99189e": {
         "message": "Halaman web sepatutnya hanya mempunyai satu H1 yang digunakan oleh Tajuk halaman secara automatik. Pengepala pertama dalam kandungan anda sepatutnya H2."
-    },
-    "weekly_schedule_navigation_6b042645": {
-        "message": "Navigasi jadual mingguan"
     },
     "welsh_42ab94b1": {
         "message": "Bahasa Welsh"
@@ -2945,17 +2555,11 @@
     "yes_dde87d5": {
         "message": "Ya"
     },
-    "yesterday_at_date_1aa6d18e": {
-        "message": "Semalam pada { date }"
-    },
-    "yesterday_c6bd6abf": {
-        "message": "Semalam"
-    },
     "yiddish_f96986df": {
         "message": "Bahasa Yiddish"
     },
-    "you_have_media_feedback_f5f9aba8": {
-        "message": "Anda mempunyai maklum balas media."
+    "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
+        "message": "Anda boleh membuat gantian dengan memuat naik fail kapsyen baharu."
     },
     "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
         "message": "Anda mempunyai perubahan tidak disimpan dalam dulang Pembuat Ikon. Adakah anda ingin menerukan tanpa menyimpan perubahan ini?"
@@ -2965,12 +2569,6 @@
     },
     "you_may_not_upload_an_empty_file_11c31eb2": {
         "message": "Anda tidak boleh memuatkan fail kosong."
-    },
-    "you_must_provide_a_date_and_time_a86839d2": {
-        "message": "Anda mesti memberikan tarikh dan masa."
-    },
-    "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
-        "message": "Anda telah menatal kembali ke item Untuk Dilakukan anda yang pertama!"
     },
     "your_image_has_been_compressed_for_icon_maker_imag_2e45cd91": {
         "message": "Imej anda telah dimampatkan untuk Pembuat Ikon. Imej yang kurang daripada { size } KB tidak akan dimampatkan."

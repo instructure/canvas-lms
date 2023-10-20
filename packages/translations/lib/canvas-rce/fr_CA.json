@@ -14,6 +14,7 @@
   "add_another_f4e50d57": { "message": "Ajouter un autre" },
   "add_cc_subtitles_55f0394e": { "message": "Ajouter des sous-titres/CC" },
   "add_image_60b2de07": { "message": "Ajouter une image" },
+  "add_one_9e34a6f8": { "message": "Ajouter une page!" },
   "additional_considerations_f3801683": {
     "message": "Considérations supplémentaires"
   },
@@ -213,6 +214,7 @@
   "crop_image_807ebb08": { "message": "Recadrer l’image" },
   "cup_product_14174434": { "message": "Produit (UPC)" },
   "current_image_f16c249c": { "message": "Image actuelle" },
+  "current_link_945a47ee": { "message": "Lien actuel" },
   "current_volume_level_c55ab825": { "message": "Niveau de volume actuel" },
   "custom_6979cd81": { "message": "Personnalisé" },
   "custom_width_and_height_pixels_946eea7c": {
@@ -571,6 +573,9 @@
   "light_blue_5374f600": { "message": "Bleu clair" },
   "link_7262adec": { "message": "Lien" },
   "link_options_a16b758b": { "message": "Options de lien" },
+  "link_type_linktypemessage_c6d26815": {
+    "message": "Type de lien : { linkTypeMessage }"
+  },
   "link_with_text_starting_with_start_b3fcbe71": {
     "message": "Lien avec texte commençant par { start }"
   },
@@ -633,6 +638,7 @@
   "minus_plus_3461f637": { "message": "Moins/Plus" },
   "misc_3b692ea7": { "message": "Divers" },
   "miscellaneous_e9818229": { "message": "Divers" },
+  "module_90d9fd32": { "message": "Module" },
   "modules_c4325335": { "message": "Modules" },
   "moving_image_to_crop_directionword_6f66cde2": {
     "message": "Déplacer l’image à recadrer { directionWord }"
@@ -657,20 +663,54 @@
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Naviguer dans le menu ou la barre d''outils"
   },
+  "navigation_ee9af92d": { "message": "Navigation" },
   "nested_greater_than_d852e60d": { "message": "Supérieur à (groupé)" },
   "nested_less_than_27d17e58": { "message": "Inférieur à (groupé)" },
+  "new_quiz_34aacba6": { "message": "Nouveau questionnaire" },
   "next_40e12421": { "message": "Suivant" },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "Aucun problème d''accessibilité détecté."
   },
+  "no_announcements_created_yet_c44a94f4": {
+    "message": "Aucune annonce n’a encore été créée."
+  },
+  "no_announcements_found_20185afc": {
+    "message": "Aucune annonce n’a été trouvée."
+  },
+  "no_assignments_created_yet_1b236d87": {
+    "message": "Aucune tâche n’a encore été créée."
+  },
+  "no_assignments_found_79e46d7f": {
+    "message": "Aucune tâche n’a été trouvée."
+  },
   "no_changes_to_save_d29f6e91": {
     "message": "Aucun changement à enregister."
+  },
+  "no_discussions_created_yet_ff99abe3": {
+    "message": "Aucune discussion n’a encore été créée."
+  },
+  "no_discussions_found_9284063b": {
+    "message": "Aucune discussion n’a été trouvée."
   },
   "no_e16d9132": { "message": "Non" },
   "no_file_chosen_9a880793": { "message": "Aucun fichier choisi" },
   "no_headers_9bc7dc7f": { "message": "Aucun entête" },
+  "no_modules_created_yet_c71b6d4d": {
+    "message": "Aucun module n’a encore été créé."
+  },
+  "no_modules_found_2df43a40": { "message": "Aucun module n’a été trouvé." },
+  "no_pages_created_yet_c379fa6e": {
+    "message": "Aucune page créée à ce jour."
+  },
+  "no_pages_found_6799350": { "message": "Aucune page trouvée." },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "Aucun aperçu n’est disponible pour ce fichier."
+  },
+  "no_quizzes_created_yet_1a2370b9": {
+    "message": "Aucun questionnaire n’a encore été créé."
+  },
+  "no_quizzes_found_c80c537a": {
+    "message": "Aucun questionnaire n’a été trouvé."
   },
   "no_results_940393cf": { "message": "Pas de résultats" },
   "no_results_found_for_filterterm_ad1b04c8": {
@@ -878,6 +918,7 @@
   "select_video_source_1b5c9dbe": {
     "message": "Sélectionner une source vidéo"
   },
+  "selected_274ce24f": { "message": "Sélectionné" },
   "selected_linkfilename_c093b1f2": {
     "message": "{ linkFileName } sélectionné"
   },
@@ -1104,6 +1145,7 @@
     "message": "Flèche diagonale vers le haut et vers la droite"
   },
   "up_c553575d": { "message": "Haut" },
+  "updated_link_a827e441": { "message": "Lien actualisé" },
   "upload_document_253f0478": { "message": "Téléverser le document" },
   "upload_file_fd2361b8": { "message": "Téléverser le fichier" },
   "upload_image_6120b609": { "message": "Téléverser une image" },

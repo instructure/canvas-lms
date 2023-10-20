@@ -1,0 +1,20 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`The CommentButton component renders the root component as expected 1`] = `
+<div>
+  <IconButton
+    as="button"
+    color="secondary"
+    cursor="pointer"
+    margin="0 x-small 0 0"
+    onClick={[Function]}
+    renderIcon={<IconFeedbackLine />}
+    screenReaderLabel="Add Additional Comments"
+    shape="rectangle"
+    size="medium"
+    type="button"
+    withBackground={false}
+    withBorder={false}
+  />
+</div>
+`;

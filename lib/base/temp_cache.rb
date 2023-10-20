@@ -40,7 +40,16 @@ class TempCache
   end
 
   def self.create_key(*args)
-    args.map { |arg| arg.is_a?(ActiveRecord::Base) ? arg.global_asset_string : arg.to_s }.join("/")
+    args.map do |arg|
+      case arg
+      when Array
+        create_key(*arg)
+      when ActiveRecord::Base
+        arg.global_asset_string
+      else
+        arg.to_s
+      end
+    end.join("/")
   end
 
   def self.cache(*args)

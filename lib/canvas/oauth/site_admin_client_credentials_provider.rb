@@ -25,7 +25,7 @@ module Canvas::OAuth
   class SiteAdminClientCredentialsProvider < ClientCredentialsProvider
     def initialize(client_id, host, scopes, user, protocol = "https://")
       @user = user
-      super(client_id, host, scopes, protocol)
+      super(client_id, host, scopes:, protocol:)
     end
 
     def valid?

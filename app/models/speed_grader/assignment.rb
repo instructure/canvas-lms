@@ -67,6 +67,13 @@ module SpeedGrader
           end
         )
 
+      submission_json_fields <<
+        (
+          if Account.site_admin.feature_enabled?(:custom_gradebook_statuses)
+            :custom_grade_status_id
+          end
+        )
+
       attachment_json_fields = %i[
         id
         comment_id
@@ -112,7 +119,8 @@ module SpeedGrader
           user: current_user,
           includes:,
           group_id: group_id_filter,
-          section_id: section_id_filter
+          section_id: section_id_filter,
+          ignore_student_visibility: true
         ) { |rep, others| others.each { |s| res[:context][:rep_for_student][s.id] = rep.id } }
 
       unless assignment.anonymize_students?
@@ -597,7 +605,7 @@ module SpeedGrader
       group_id =
         current_user
         .get_preference(:gradebook_settings, course.global_id)
-          &.dig("filter_rows_by", "student_group_id")
+        &.dig("filter_rows_by", "student_group_id")
 
       # If we selected a group that is now deleted, don't use it
       Group.active.where(id: group_id).exists? ? group_id : nil

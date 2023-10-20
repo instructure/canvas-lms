@@ -2411,7 +2411,7 @@ describe Quizzes::Quiz do
 
         it "grants submit rights" do
           allow(@course).to receive(:grants_right?).with(@student1, nil, :participate_as_student).and_return(true)
-          allow(@course).to receive(:grants_right?).with(@student1, nil, :manage_assignments).and_return(false)
+          allow(@course).to receive(:grants_right?).with(@student1, nil, :manage_assignments_edit).and_return(false)
           allow(@course).to receive(:grants_right?).with(@student1, nil, :read_as_admin).and_return(false)
           allow(@course).to receive(:grants_right?).with(@student1, nil, :manage_grades).and_return(false)
           expect(@quiz.grants_right?(@student1, :submit)).to be true
@@ -2431,7 +2431,7 @@ describe Quizzes::Quiz do
 
         it "does not grant submit rights" do
           allow(@course).to receive(:grants_right?).with(@student2, nil, :participate_as_student).and_return(true)
-          allow(@course).to receive(:grants_right?).with(@student2, nil, :manage_assignments).and_return(false)
+          allow(@course).to receive(:grants_right?).with(@student2, nil, :manage_assignments_edit).and_return(false)
           allow(@course).to receive(:grants_right?).with(@student2, nil, :read_as_admin).and_return(false)
           allow(@course).to receive(:grants_right?).with(@student2, nil, :manage_grades).and_return(false)
           expect(@quiz.grants_right?(@student2, :submit)).to be false

@@ -16,4 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import './setup'
+// Eventually when the feature flag is retired
+// we can divorce from these shenanigans
+if (ENV.FEATURES.instui_for_import_page) {
+  import('./instui_setup')
+    .then(() => {})
+    .catch(() => {})
+} else {
+  import('./setup')
+    .then(() => {})
+    .catch(() => {})
+}

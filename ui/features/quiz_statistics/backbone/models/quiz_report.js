@@ -28,10 +28,8 @@ const isGenerating = function (report) {
 
 export default Backbone.Model.extend({
   parse(payload) {
-    let attrs
-
     payload = fromJSONAPI(payload, 'quiz_reports', true)
-    attrs = pickAndNormalize(payload, K.QUIZ_REPORT_ATTRS)
+    const attrs = pickAndNormalize(payload, K.QUIZ_REPORT_ATTRS)
 
     attrs.progress = pickAndNormalize(payload.progress, K.PROGRESS_ATTRS)
     attrs.file = pickAndNormalize(payload.file, K.ATTACHMENT_ATTRS)

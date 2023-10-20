@@ -11,58 +11,45 @@
 
 source "https://rubygems.org/"
 
-plugin "bundler_lockfile_extensions", path: "gems/bundler_lockfile_extensions"
+# cleanup local envs automatically from the old plugin
+Plugin.uninstall(["bundler_lockfile_extensions"], {}) if Plugin.installed?("bundler_lockfile_extensions")
 
-require File.expand_path("config/canvas_rails_switcher", __dir__)
+# vendored until https://github.com/rubygems/rubygems/pull/6957 is merged and released
+plugin "bundler-multilock", "1.2.0", path: "vendor/gems/bundler-multilock"
+# the extra check here is in case `bundle check` or `bundle exec` gets run before `bundle install`,
+# and is also fixed by the same PR
+raise GemNotFound, "bundler-multilock plugin is not installed" if !is_a?(Bundler::Plugin::DSL) && !Plugin.installed?("bundler-multilock")
+return unless Plugin.installed?("bundler-multilock")
 
-# Bundler evaluates this from a non-global context for plugins, so we have
-# to explicitly pop up to set global constants
-# rubocop:disable Style/RedundantConstantBase
+Plugin.send(:load_plugin, "bundler-multilock")
 
-# will already be defined during the second Gemfile evaluation
-::CANVAS_INCLUDE_PLUGINS = true unless defined?(::CANVAS_INCLUDE_PLUGINS)
+require_relative "config/canvas_rails_switcher"
 
-if Plugin.installed?("bundler_lockfile_extensions")
-  Plugin.send(:load_plugin, "bundler_lockfile_extensions") unless defined?(BundlerLockfileExtensions)
-
-  unless BundlerLockfileExtensions.enabled?
-    default = true
-    SUPPORTED_RAILS_VERSIONS.product([nil, true]).each do |rails_version, include_plugins|
-      prepare = lambda do
-        Object.send(:remove_const, :CANVAS_RAILS)
-        ::CANVAS_RAILS = rails_version
-        Object.send(:remove_const, :CANVAS_INCLUDE_PLUGINS)
-        ::CANVAS_INCLUDE_PLUGINS = include_plugins
-      end
-
-      lockfile = ["Gemfile", "rails#{rails_version.delete(".")}", include_plugins && "plugins", "lock"].compact.join(".")
-      lockfile = nil if default
-      # only the first lockfile is the default
-      default = false
-
-      current = rails_version == CANVAS_RAILS && include_plugins
-
-      add_lockfile(lockfile,
-                   current:,
-                   prepare:,
-                   allow_mismatched_dependencies: rails_version != SUPPORTED_RAILS_VERSIONS.first,
-                   enforce_pinned_additional_dependencies: include_plugins)
+if Bundler.default_gemfile == gemfile
+  SUPPORTED_RAILS_VERSIONS.product([nil, true]).each do |rails_version, include_plugins|
+    lockfile = ["rails#{rails_version.delete(".")}", include_plugins && "plugins"].compact.join(".")
+    if rails_version == SUPPORTED_RAILS_VERSIONS.first
+      lockfile = nil unless include_plugins
+    elsif include_plugins
+      parent = "rails#{rails_versions.delete(".")}"
     end
 
-    Dir["Gemfile.d/*.lock", "gems/*/Gemfile.lock", base: Bundler.root].each do |gem_lockfile_name|
-      return unless add_lockfile(gem_lockfile_name,
-                                 gemfile: gem_lockfile_name.sub(/\.lock$/, ""),
-                                 allow_mismatched_dependencies: false)
+    active = rails_version == $canvas_rails && !!include_plugins
+
+    lockfile(lockfile,
+             active:,
+             parent:,
+             enforce_pinned_additional_dependencies: include_plugins) do
+      $canvas_rails = rails_version
+      @include_plugins = include_plugins
     end
   end
-end
-# rubocop:enable Style/RedundantConstantBase
 
-# Bundler's first pass parses the entire Gemfile and calls to additional sources
-# makes it actually go and retrieve metadata from them even though the plugin will
-# never exist there. Short-circuit it here if we're in the plugin-specific DSL
-# phase to prevent that from happening.
-return if method(:source).owner == Bundler::Plugin::DSL
+  (gemfile_root.glob("Gemfile.d/*.lock") + gemfile_root.glob("gems/*/Gemfile.lock")).each do |gem_lockfile_name|
+    return unless lockfile(gem_lockfile_name,
+                           gemfile: gem_lockfile_name.to_s.sub(/\.lock$/, ""))
+  end
+end
 
 module PreferGlobalRubyGemsSource
   def rubygems_sources
@@ -88,12 +75,12 @@ module GemOverride
 end
 Bundler::Dsl.prepend(GemOverride)
 
-if CANVAS_INCLUDE_PLUGINS
-  Dir[File.join(File.dirname(__FILE__), "gems/plugins/*/Gemfile.d/_before.rb")].each do |file|
+if @include_plugins
+  gemfile_root.glob("gems/plugins/*/Gemfile.d/_before.rb") do |file|
     eval_gemfile(file)
   end
 end
 
-Dir.glob(File.join(File.dirname(__FILE__), "Gemfile.d", "*.rb")).each do |file|
+gemfile_root.glob("Gemfile.d/*.rb").each do |file|
   eval_gemfile(file)
 end

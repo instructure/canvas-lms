@@ -278,14 +278,14 @@ describe "context modules" do
         hover_and_click("#context_module_#{@mod[0].id} .edit_module_link")
         f(".add-item .add_completion_criterion_link").click
         expect(ff(".ic-Radio")[1]).to contain_css("input[type=radio][id = context_module_requirement_count_1]")
-        expect(ff(".ic-Radio .ic-Label")[1].text).to eq("Student must complete one of these requirements")
+        expect(ff(".ic-Radio .ic-Label")[1].text).to eq("Students must complete one of these requirements")
       end
 
       it "does not show the radio buttons for module with no items", priority: "1" do
         f("#context_module_#{@mod[1].id} .ig-header-admin .al-trigger").click
         hover_and_click("#context_module_#{@mod[1].id} .edit_module_link")
         expect(f(".ic-Radio .ic-Label").text).not_to include("Students must complete all of these requirements")
-        expect(f(".ic-Radio .ic-Label").text).not_to include("Student must complete one of these requirements")
+        expect(f(".ic-Radio .ic-Label").text).not_to include("Students must complete one of these requirements")
         expect(f(".completion_entry .no_items_message").text).to eq("No items in module")
       end
     end

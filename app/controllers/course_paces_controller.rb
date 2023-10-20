@@ -292,6 +292,8 @@ class CoursePacesController < ApplicationController
   include K5Mode
   include GranularPermissionEnforcement
 
+  COURSE_PACES_PUBLISHING_LIMIT = 50
+
   def index
     add_crumb(t("Course Pacing"))
     @course_pace = @context.course_paces.primary.first
@@ -338,8 +340,15 @@ class CoursePacesController < ApplicationController
     jobs_progress = Progress.where(tag: "course_pace_publish", context: @context.course_paces).is_pending.map do |progress|
       pace = progress.context
       if pace&.workflow_state == "active"
+        pace_context = context_for(pace)
+        # If the pace context is nil, then the context was deleted and we should destroy the progress
+        if pace_context.nil?
+          progress.destroy
+          next
+        end
+
         {
-          pace_context: CoursePacing::PaceContextsPresenter.as_json(context_for(pace)),
+          pace_context: CoursePacing::PaceContextsPresenter.as_json(pace_context),
           progress_context_id: progress.context_id
         }
       else
@@ -426,6 +435,7 @@ class CoursePacesController < ApplicationController
 
   def publish
     publish_course_pace
+    log_course_paces_publishing
     render json: progress_json(@progress, @current_user, session)
   end
 
@@ -620,12 +630,15 @@ class CoursePacesController < ApplicationController
   def load_and_run_progress
     @progress = latest_progress
     if @progress
-      # start delayed job if it's not already started
       if @progress.queued?
-        if @progress.delayed_job.present?
-          @progress.delayed_job.update(run_at: Time.now)
-        else
+        case [@progress.delayed_job_id.present?, @progress.delayed_job.present?]
+        in [false, _]
+          @course_pace.run_publish_progress(@progress)
+        in [true, false]
+          @progress.fail!
           @progress = publish_course_pace
+        in [true, true]
+          @progress.delayed_job.update(run_at: Time.now)
         end
       end
       @progress_json = progress_json(@progress, @current_user, session)
@@ -741,5 +754,10 @@ class CoursePacesController < ApplicationController
 
   def publish_course_pace
     @progress = @course_pace.create_publish_progress(run_at: Time.now)
+  end
+
+  def log_course_paces_publishing
+    count = paces_publishing.length
+    InstStatsd::Statsd.count("course_pacing.publishing.count_exceeding_limit", count) if count > COURSE_PACES_PUBLISHING_LIMIT
   end
 end

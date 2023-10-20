@@ -16,7 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {HTMLElement, KeyboardEventHandler, MouseEventHandler} from 'react'
+type HTMLElement = import('react').HTMLElement
+type FC = import('react').FC
+type KeyboardEventHandler = import('react').KeyboardEventHandler
+type MouseEventHandler = import('react').MouseEventHandler
+type ReactNode = import('react').ReactNode
+type ChangeEvent = import('react').ChangeEvent
 
 // These are special webpack-processed imports that Typescript doesn't understand
 // by default. Declaring them as wildcard modules allows TS to recognize them as
@@ -26,191 +31,9 @@ declare module '*.graphql'
 declare module '*.handlebars'
 declare module '*.svg'
 
-// InstUI v7 is missing type information for a lot of its props, so these suppress
-// TS errors on valid props until we upgrade to v8.
-interface MissingInputProps {
-  onClick?: MouseEventHandler<HTMLElement>
-  onKeyDown?: KeyboardEventHandler<HTMLElement>
-  role?: string
-  disabled?: boolean
-}
-
-interface MissingElementProps {
-  onMouseEnter?: MouseEventHandler<HTMLElement>
-  onMouseLeave?: MouseEventHandler<HTMLElement>
-}
-
-interface MissingThemeableProps {
-  theme?: Record<string, unknown>
-}
-
-declare module '@instructure/ui-buttons' {
-  export interface BaseButtonProps extends MissingInputProps, MissingThemeableProps {}
-  export interface ButtonProps extends MissingInputProps, MissingThemeableProps {}
-  export interface CloseButtonProps extends MissingInputProps, MissingThemeableProps {}
-  export interface CondensedButtonProps extends MissingInputProps, MissingThemeableProps {}
-  export interface IconButtonProps extends MissingInputProps, MissingThemeableProps {}
-  export interface ToggleButtonProps extends MissingInputProps, MissingThemeableProps {}
-  namespace IconButton {
-    export const theme: symbol
-  }
-  namespace Button {
-    export const theme: symbol
-  }
-  namespace CloseButton {
-    export const theme: symbol
-  }
-  namespace BaseButton {
-    export const theme: symbol
-  }
-}
-
-declare module '@instructure/ui-motion' {
-  export interface TransitionProps extends MissingThemeableProps {}
-}
-
-declare module '@instructure/ui-text-input' {
-  export interface TextInputProps extends MissingInputProps {}
-  export namespace TextInput {
-    export const theme: symbol
-  }
-}
-
-declare module '@instructure/ui-toggle-details' {
-  export interface ToggleDetailsProps extends MissingThemeableProps {}
-  export namespace ToggleDetails {
-    export const theme: symbol
-  }
-}
-
-declare module '@instructure/ui-view' {
-  export interface ViewProps extends MissingElementProps, MissingThemeableProps {
-    className?: string
-  }
-  export namespace View {
-    export const theme: symbol
-  }
-}
-
-declare module '@instructure/ui-buttons' {
-  export interface ButtonProps {
-    id?: string
-  }
-}
-
-declare module '@instructure/ui-menu' {
-  export interface Menu {
-    contentRef?: any
-  }
-  export namespace Menu {
-    export const theme: symbol
-  }
-}
-
-declare module '@instructure/ui-link' {
-  export interface Link {
-    size?: string
-    margin?: string
-    isWithinText?: boolean
-    as?: string
-  }
-  export namespace Link {
-    export const theme: symbol
-  }
-}
-
-declare module '@instructure/ui-text' {
-  export interface Text {
-    tag?: string
-  }
-
-  export interface TextProps {
-    dangerouslySetInnerHTML?: {__html: string} | undefined
-  }
-}
-
-declare module '@instructure/ui-select' {
-  export interface SelectProps {
-    renderLabel?: string
-  }
-}
-
-declare module '@instructure/ui-overlays' {
-  export namespace Mask {
-    export const theme: symbol
-  }
-}
-
-declare module '@instructure/ui-heading' {
-  export namespace Heading {
-    export const theme: symbol
-  }
-}
-
-declare module '@instructure/ui-checkbox' {
-  export namespace ToggleFacade {
-    export const theme: symbol
-  }
-  export namespace CheckboxFacade {
-    export const theme: symbol
-  }
-}
-
-declare module '@instructure/ui-table' {
-  export namespace Table {
-    export const theme: symbol
-    export namespace Cell {
-      export const theme: symbol
-    }
-    export namespace Row {
-      export const theme: symbol
-    }
-    export namespace ColHeader {
-      export const theme: symbol
-    }
-  }
-}
-
-declare module '@instructure/ui-tag' {
-  export namespace Tag {
-    export const theme: symbol
-  }
-}
-
-declare module '@instructure/ui-alerts' {
-  export namespace Alert {
-    export const theme: symbol
-  }
-}
-
-declare module '@instructure/ui-tree-browser' {
-  export namespace TreeBrowser {
-    export const theme: symbol
-    export namespace Node {
-      export const theme: symbol
-    }
-    export namespace Button {
-      export const theme: symbol
-    }
-  }
-}
-
-declare module '@instructure/ui-tabs' {
-  export namespace Tabs {
-    export const theme: symbol
-    export namespace Tab {
-      export const theme: symbol
-    }
-  }
-}
-
-declare module '@instructure/ui-badge' {
-  export namespace Tabs {
-    export const theme: symbol
-    export namespace Tab {
-      export const theme: symbol
-    }
-  }
+declare module 'convert-case' {
+  export function camelize<T>(props: {[key: string]: unknown}): T
+  export function underscore<T>(props: {[key: string]: unknown}): T
 }
 
 declare module 'html-escape' {
@@ -219,3 +42,7 @@ declare module 'html-escape' {
   export function htmlEscape(str: string): string
   export function unescape(str: string): string
 }
+
+// Global scope declarations are only allowed in module contexts, so we
+// need this to make Typescript think this is a module. 🙄
+export {}

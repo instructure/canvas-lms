@@ -72,8 +72,6 @@ module Types
         nil
       elsif object.quoted_entry_id
         load_association(:quoted_entry)
-      elsif object.include_reply_preview
-        load_association(:parent_entry)
       end
     end
 
@@ -174,6 +172,13 @@ module Types
         before_relative_entry:,
         include_relative_entry:
       ).load(object)
+    end
+
+    field :all_root_entries, [Types::DiscussionEntryType], null: true
+    def all_root_entries
+      return nil unless object.root_entry_id.nil?
+
+      load_association(:flattened_discussion_subentries)
     end
 
     field :entry_participant, Types::EntryParticipantType, null: true

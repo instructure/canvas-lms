@@ -341,7 +341,7 @@ describe "better_file_browsing" do
 
       Account.site_admin.enable_feature!(:media_links_use_attachment_id)
       @att = Attachment.create! filename: "file.mp4", context: @course, media_entry_id: "mediaentryid", uploaded_data: stub_file_data("test.m4v", "asdf", "video/mp4")
-      MediaObject.create! media_id: "mediaentryid", attachment: @att
+      @mo = MediaObject.create! media_id: "mediaentryid", attachment: @att
 
       @bp_course = Course.create!
       @bogus_parent_att = Attachment.create! filename: "file.mp4", context: @bp_course, uploaded_data: stub_file_data("test.m4v", "asdf", "video/mp4")
@@ -354,6 +354,14 @@ describe "better_file_browsing" do
       get "/courses/#{@course.id}/files/#{@att.id}/file_preview"
       wait_for_ajaximations
       expect(f('[title="Captions/Subtitles"]')).to be_present
+    end
+
+    it "shows caption inheritance tooltip" do
+      @mo.media_tracks.create!(kind: "subtitles", locale: "en", content: "subs")
+      @another_att = Attachment.create! filename: "file.mp4", context: @course, media_entry_id: "mediaentryid", uploaded_data: stub_file_data("test.m4v", "asdf", "video/mp4")
+      get "/courses/#{@course.id}/files/#{@another_att.id}/file_preview"
+      wait_for_ajaximations
+      expect(f(".mejs-captions-selector .track-tip-container")).to be_present
     end
 
     it "will hide CC options for locked attachments" do

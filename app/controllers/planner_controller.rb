@@ -160,7 +160,7 @@ class PlannerController < ApplicationController
   def set_user
     if params.key?(:user_id)
       @user = api_find(User, params[:user_id])
-      return render_unauthorized_action unless @user == @current_user || @user.grants_right?(@current_user, session, :read_as_parent)
+      @user == @current_user || authorized_action(@user, @current_user, :read_as_parent)
     elsif params.key?(:observed_user_id)
       return render_unauthorized_action if !params.key?(:context_codes) || params[:context_codes].empty?
 
@@ -168,7 +168,7 @@ class PlannerController < ApplicationController
       # observers can only specify course context_codes
       course_ids = Course.find_all_by_asset_string(params[:context_codes]).pluck(:id)
       valid_course_ids = @current_user.observer_enrollments.active.where(associated_user_id: params[:observed_user_id]).shard(@current_user).pluck(:course_id)
-      return render_unauthorized_action unless (course_ids - valid_course_ids).empty?
+      render_unauthorized_action unless (course_ids - valid_course_ids).empty?
     else
       @user = @current_user
     end
@@ -364,14 +364,7 @@ class PlannerController < ApplicationController
     @per_page = params[:per_page] || 50
     @page = params[:page] || "first"
     @include_concluded = includes.include? "concluded"
-    account_calendars_support_enabled = Account.site_admin.feature_enabled?(:account_calendars_planner_support)
-    if account_calendars_support_enabled
-      @include_account_calendars = includes.include? "account_calendars"
-      @enabled_account_calendars = @user&.enabled_account_calendars&.map(&:id) || []
-    else
-      @include_account_calendars = false
-      @enabled_account_calendars = []
-    end
+    @include_account_calendars = includes.include? "account_calendars"
 
     # for specs, that do multiple requests in a single spec, we have to reset these ivars
     @course_ids = @group_ids = @user_ids = @account_ids = nil
@@ -380,7 +373,7 @@ class PlannerController < ApplicationController
       @course_ids = context_ids["Course"] || []
       @group_ids = context_ids["Group"] || []
       @user_ids = context_ids["User"] || []
-      @account_ids = account_calendars_support_enabled ? context_ids["Account"] || [] : []
+      @account_ids = context_ids["Account"] || []
       # needed for all_ungraded_todo_items, but otherwise we don't need to load the actual
       # objects
       @contexts = Context.find_all_by_asset_string(context_ids) if public_access?
@@ -389,8 +382,10 @@ class PlannerController < ApplicationController
       @user_ids = [@user.id] if params.key?(:observed_user_id) && @user.grants_right?(@current_user, session, :read_as_parent)
     end
 
+    allowed_account_calendars = @user&.all_account_calendars&.map { |a| Shard.relative_id_for(a.id, Shard.current, @user.shard) } || []
+    enabled_account_calendars = @user&.enabled_account_calendars&.map { |a| Shard.relative_id_for(a.id, Shard.current, @user.shard) } || []
     if @include_account_calendars && context_ids["Account"].nil?
-      @account_ids = @enabled_account_calendars
+      @account_ids = enabled_account_calendars
     end
 
     # make IDs relative to the user's shard
@@ -404,8 +399,8 @@ class PlannerController < ApplicationController
       if @user
         @course_ids = @user.course_ids_for_todo_lists(:student, course_ids: @course_ids, include_concluded:)
         @group_ids = @user.group_ids_for_todo_lists(group_ids: @group_ids)
-        @account_ids ||= @enabled_account_calendars
-        @account_ids &= @enabled_account_calendars
+        @account_ids ||= enabled_account_calendars
+        @account_ids &= allowed_account_calendars
         @user_ids ||= [@user.id]
         @user_ids &= [@user.id]
       else
@@ -448,7 +443,7 @@ class PlannerController < ApplicationController
     @context_codes = @local_course_ids.map { |id| "course_#{id}" }
     @context_codes.concat(@local_group_ids.map { |id| "group_#{id}" })
     @context_codes.concat(@local_user_ids.map { |id| "user_#{id}" })
-    @context_codes.concat(@local_account_ids.map { |id| "account_#{id}" }) if account_calendars_support_enabled
+    @context_codes.concat(@local_account_ids.map { |id| "account_#{id}" })
   end
 
   def contexts_cache_key

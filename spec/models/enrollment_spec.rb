@@ -620,6 +620,19 @@ describe Enrollment do
         @enrollment.scores.find_by(grading_period: period).update!(override_score: 71.0)
         expect(@enrollment.override_grade(grading_period_id: period.id)).to eq "C-"
       end
+
+      it "optionally accepts a score to use" do
+        period_group = @course.grading_period_groups.create!
+        period = period_group.grading_periods.create!(
+          close_date: 1.day.from_now,
+          end_date: 1.day.from_now,
+          start_date: 1.day.ago,
+          title: "period"
+        )
+        score = @enrollment.scores.find_by(grading_period: period)
+        score.update!(override_score: 71.0)
+        expect(@enrollment.override_grade(score:)).to eq "C-"
+      end
     end
 
     describe "override_score" do
@@ -664,6 +677,19 @@ describe Enrollment do
         )
         @enrollment.scores.find_by(grading_period: period).update!(override_score: 71.0)
         expect(@enrollment.override_score(grading_period_id: period.id)).to be 71.0
+      end
+
+      it "optionally accepts a score to use" do
+        period_group = @course.grading_period_groups.create!
+        period = period_group.grading_periods.create!(
+          close_date: 1.day.from_now,
+          end_date: 1.day.from_now,
+          start_date: 1.day.ago,
+          title: "period"
+        )
+        score = @enrollment.scores.find_by(grading_period: period)
+        score.update!(override_score: 71.0)
+        expect(@enrollment.override_score(score:)).to eq 71.0
       end
     end
 
@@ -1028,7 +1054,7 @@ describe Enrollment do
           end
         end
 
-        # if a user is being restored to active, the DueDateCacher
+        # if a user is being restored to active, the SubmissionLifecycleManager
         # run will kick off a grade calculation, which will update
         # the score objects. To test we're not copying scores, we'll
         # restore to completed for these tests.
@@ -3024,50 +3050,44 @@ describe Enrollment do
     end
   end
 
-  describe "#can_be_deleted_by" do
-    describe "on a student enrollment without granular_permissions_manage_users" do
-      let(:user) { double(id: 42) }
-      let(:session) { double }
-
-      before do
-        course_with_student
-        @course.root_account.disable_feature!(:granular_permissions_manage_users)
-      end
-
-      it "is true for a user who has been granted :manage_students" do
-        allow(@course).to receive(:grants_right?).with(user, session, :manage_students).and_return(true)
-        allow(@course).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(false)
-        expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_truthy
-      end
-
-      it "is false for a user without :manage_students" do
-        allow(@course).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(false)
-        allow(@course).to receive(:grants_right?).with(user, session, :manage_students).and_return(false)
-        expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_falsey
-      end
-
-      it "is false for someone with :manage_admin_users but without :manage_students" do
-        allow(@course).to receive(:grants_right?).with(user, session, :manage_students).and_return(false)
-        allow(@course).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(true)
-        expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_falsey
-      end
-
-      it "is false for someone with :manage_admin_users in other context" do
-        context = CourseSection.new(id: 10)
-        allow(context).to receive(:grants_right?).with(user, session, :manage_students).and_return(true)
-        allow(context).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(true)
-        expect(enrollment.can_be_deleted_by(user, context, session)).to be_falsey
-      end
-
-      it "is false if a user is trying to remove their own enrollment" do
-        allow(@course).to receive(:grants_right?).with(user, session, :manage_students).and_return(true)
-        allow(@course).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(false)
-        allow(@course).to receive_messages(account: @course)
-        @enrollment.user_id = user.id
-        expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_falsey
-      end
+  describe "temporary enrollments" do
+    before(:once) do
+      Account.default.enable_feature!(:temporary_enrollments)
+      @source_user = user_factory(active_all: true)
+      @temporary_enrollment_recipient = user_factory(active_all: true)
+      temporary_enrollment_recipient2 = user_factory(active_all: true)
+      @course1 = course_with_teacher(active_all: true, user: @source_user).course
+      @recipient_temp_enrollment = @course1.enroll_user(
+        @temporary_enrollment_recipient,
+        "TeacherEnrollment",
+        { role: teacher_role, temporary_enrollment_source_user_id: @source_user.id }
+      )
+      course2 = course_with_teacher(active_all: true, user: @source_user).course
+      @recipient2_temp_enrollment = course2.enroll_user(
+        temporary_enrollment_recipient2,
+        "TeacherEnrollment",
+        { role: teacher_role, temporary_enrollment_source_user_id: @source_user.id }
+      )
     end
 
+    it "retrieves temporary enrollment recipients for provider" do
+      expect(Enrollment.temporary_enrollment_recipients_for_provider(@source_user).sort)
+        .to eq([@recipient_temp_enrollment, @recipient2_temp_enrollment].sort)
+    end
+
+    it "retrieves temporary enrollments for recipient" do
+      expect(Enrollment.temporary_enrollments_for_recipient(@temporary_enrollment_recipient).take)
+        .to eq(@recipient_temp_enrollment)
+    end
+
+    it "returns a boolean value if self is a temporary enrollment" do
+      @recipient2_temp_enrollment.update!(temporary_enrollment_source_user_id: nil)
+      expect(@recipient_temp_enrollment.temporary_enrollment?).to be_truthy
+      expect(@recipient2_temp_enrollment.temporary_enrollment?).to be_falsey
+    end
+  end
+
+  describe "#can_be_deleted_by" do
     describe "on a student enrollment with granular_permissions_manage_users" do
       let(:user) { double(id: 42) }
       let(:session) { double }
@@ -3101,34 +3121,6 @@ describe Enrollment do
         allow(@course).to receive(:grants_right?).with(user, session, :allow_course_admin_actions).and_return(false)
         allow(@course).to receive_messages(account: @course)
         @enrollment.user_id = user.id
-        expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_falsey
-      end
-    end
-
-    describe "on an observer enrollment without granular_permissions_manage_users" do
-      let(:user) { double(id: 42) }
-      let(:session) { double }
-
-      before do
-        course_with_observer
-        @course.root_account.disable_feature!(:granular_permissions_manage_users)
-      end
-
-      it "is true with :manage_students" do
-        allow(@course).to receive(:grants_right?).with(user, session, :manage_students).and_return(true)
-        allow(@course).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(false)
-        expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_truthy
-      end
-
-      it "is true with :manage_admin_users" do
-        allow(@course).to receive(:grants_right?).with(user, session, :manage_students).and_return(false)
-        allow(@course).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(true)
-        expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_truthy
-      end
-
-      it "is false otherwise" do
-        allow(@course).to receive(:grants_right?).with(user, session, :manage_students).and_return(false)
-        allow(@course).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(false)
         expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_falsey
       end
     end
@@ -3207,27 +3199,27 @@ describe Enrollment do
 
     it "triggers a batch when enrollment is created" do
       added_user = user_factory
-      expect(DueDateCacher).to receive(:recompute_users_for_course).with(added_user.id, @course, nil, { update_grades: true })
+      expect(SubmissionLifecycleManager).to receive(:recompute_users_for_course).with(added_user.id, @course, nil, { update_grades: true })
       @course.enroll_student(added_user)
     end
 
     it "does not trigger a batch when enrollment is not student" do
-      expect(DueDateCacher).not_to receive(:recompute_users_for_course)
+      expect(SubmissionLifecycleManager).not_to receive(:recompute_users_for_course)
       @course.enroll_teacher(user_factory)
     end
 
     it "triggers a batch when enrollment is deleted" do
-      expect(DueDateCacher).to receive(:recompute_users_for_course).with(@enrollment.user_id, @course, nil, { update_grades: false })
+      expect(SubmissionLifecycleManager).to receive(:recompute_users_for_course).with(@enrollment.user_id, @course, nil, { update_grades: false })
       @enrollment.destroy
     end
 
     it "does not trigger when nothing changed" do
-      expect(DueDateCacher).not_to receive(:recompute_users_for_course)
+      expect(SubmissionLifecycleManager).not_to receive(:recompute_users_for_course)
       @enrollment.save
     end
 
     it "does not trigger when set_update_cached_due_dates callback is suspended" do
-      expect(DueDateCacher).not_to receive(:recompute_users_for_course)
+      expect(SubmissionLifecycleManager).not_to receive(:recompute_users_for_course)
       Enrollment.suspend_callbacks(:set_update_cached_due_dates) do
         @course.enroll_student(user_factory)
       end
@@ -3236,8 +3228,8 @@ describe Enrollment do
     it "triggers once for enrollment.destroy" do
       override = assignment_override_model(assignment: @assignments.first)
       override.assignment_override_students.create(user: @student)
-      expect(DueDateCacher).to receive(:recompute_users_for_course).once
-      expect(DueDateCacher).not_to receive(:recompute)
+      expect(SubmissionLifecycleManager).to receive(:recompute_users_for_course).once
+      expect(SubmissionLifecycleManager).not_to receive(:recompute)
       @enrollment.destroy
     end
 
@@ -3282,15 +3274,13 @@ describe Enrollment do
 
   describe "#student_with_conditions?" do
     it "returns false if the enrollment is neither a student enrollment nor a fake student enrollment" do
-      allow(@enrollment).to receive(:student?).and_return(false)
-      allow(@enrollment).to receive(:fake_student?).and_return(false)
+      allow(@enrollment).to receive_messages(student?: false, fake_student?: false)
       expect(@enrollment.student_with_conditions?(include_future: true, include_fake_student: true)).to be(false)
     end
 
     context "the enrollment is a student enrollment" do
       before do
-        allow(@enrollment).to receive(:student?).and_return(true)
-        allow(@enrollment).to receive(:fake_student?).and_return(false)
+        allow(@enrollment).to receive_messages(student?: true, fake_student?: false)
       end
 
       it "returns true if include_future is true" do
@@ -3310,8 +3300,7 @@ describe Enrollment do
 
     context "the enrollment is a fake student enrollment" do
       before do
-        allow(@enrollment).to receive(:student?).and_return(false)
-        allow(@enrollment).to receive(:fake_student?).and_return(true)
+        allow(@enrollment).to receive_messages(student?: false, fake_student?: true)
       end
 
       it "returns false if include_fake_student is false" do

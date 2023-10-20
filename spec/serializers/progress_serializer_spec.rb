@@ -45,8 +45,7 @@ describe ProgressSerializer do
     }
 
     ActiveModel::FakeController.new(options).tap do |controller|
-      allow(controller).to receive(:session).and_return Object.new
-      allow(controller).to receive(:context).and_return Object.new
+      allow(controller).to receive_messages(session: Object.new, context: Object.new)
     end
   end
 

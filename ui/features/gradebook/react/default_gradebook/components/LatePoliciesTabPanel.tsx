@@ -39,18 +39,18 @@ const I18n = useI18nScope('gradebook')
 const MIN_PERCENTAGE_INPUT = 0
 const MAX_PERCENTAGE_INPUT = 100
 
-function isNumeric(input) {
+function isNumeric(input: unknown) {
   return NumberHelper.validate(input)
 }
 
-function validationError(input) {
+function validationError(input: unknown) {
   if (!isNumeric(input)) {
     return 'notNumeric'
   }
   return null
 }
 
-function bound(decimal) {
+function bound(decimal: number) {
   if (decimal < MIN_PERCENTAGE_INPUT) return MIN_PERCENTAGE_INPUT
   if (decimal > MAX_PERCENTAGE_INPUT) return MAX_PERCENTAGE_INPUT
   return decimal
@@ -119,13 +119,21 @@ type State = {
 }
 
 class LatePoliciesTabPanel extends React.Component<Props, State> {
-  missingSubmissionDeductionInput?: HTMLInputElement | null
+  missingSubmissionDeductionInput: HTMLInputElement | null
 
-  missingSubmissionCheckbox?: HTMLInputElement | null
+  missingSubmissionCheckbox: Checkbox | null
 
-  lateSubmissionMinimumPercentInput?: HTMLInputElement | null
+  lateSubmissionMinimumPercentInput: HTMLInputElement | null
 
-  lateSubmissionDeductionInput?: HTMLInputElement | null
+  lateSubmissionDeductionInput: HTMLInputElement | null
+
+  constructor(props) {
+    super(props)
+    this.missingSubmissionCheckbox = null
+    this.lateSubmissionMinimumPercentInput = null
+    this.lateSubmissionDeductionInput = null
+    this.missingSubmissionDeductionInput = null
+  }
 
   state = {
     showAlert: this.props.showAlert,

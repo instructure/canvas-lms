@@ -119,7 +119,7 @@ class AuthenticationProvider < ActiveRecord::Base
   end
 
   def self.recognized_params
-    [:mfa_required, :skip_internal_mfa].freeze
+    %i[mfa_required skip_internal_mfa].freeze
   end
 
   def self.site_admin_params
@@ -301,6 +301,8 @@ class AuthenticationProvider < ActiveRecord::Base
       when "display_name"
         user.short_name = value
       when "email"
+        next if value.empty?
+
         cc = user.communication_channels.email.by_path(value).first
         cc ||= user.communication_channels.email.new(path: value)
         cc.workflow_state = "active"
@@ -308,7 +310,7 @@ class AuthenticationProvider < ActiveRecord::Base
       when "locale"
         # convert _ to -, be lenient about case, and perform fallbacks
         value = value.tr("_", "-")
-        lowercase_locales = I18n.available_locales.map(&:to_s).map(&:downcase)
+        lowercase_locales = I18n.available_locales.map { |locale| locale.to_s.downcase }
         while value.include?("-")
           break if lowercase_locales.include?(value.downcase)
 

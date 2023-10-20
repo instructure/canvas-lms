@@ -1,0 +1,65 @@
+<div class="tool_content_wrapper
+  <%= 'custom_height' unless @lti_launch.tool_dimensions[:selection_height] == '100%' %>"
+  data-tool-wrapper-id="<%= @lti_launch.post_message_token %>"
+>
+    <form action="<%= @lti_launch.resource_url %>"
+        class="hide"
+        method="POST"
+        target="tool_content"
+        id="tool_form"
+        data-tool-launch-type="<%= @lti_launch.launch_type %>"
+        data-tool-id="<%= @lti_launch.analytics_id %>"
+        data-tool-path="<%= @lti_launch.resource_path %>"
+        data-message-type="<%= @lti_launch.analytics_message_type %>">
+    <% @lti_launch.params.each do |key, value| %>
+        <%= hidden_field_tag key, value.to_s %>
+    <% end %>
+    <div style="margin-bottom: 20px;">
+        <div class="load_tab">
+            <%= t :new_tab, "This tool needs to be loaded in a new browser window" %>
+            <div style="margin: 10px 0;">
+                <button class="btn" type="submit"
+                        data-expired_message="<%= t :new_tab_expired, "The session for this tool has expired. Please reload the page to access the tool again" %>">
+                    <%= t :load_tool_new_tab_button, "Load %{tool} in a new window", :tool => @lti_launch.link_text %>
+                </button>
+            </div>
+        </div>
+        <div class="tab_loaded" style="display: none;">
+            <%= t :new_tab_loaded, "This tool was successfully loaded in a new browser window. Reload the page to access the tool again." %>
+        </div>
+    </div>
+    </form>
+
+    <div class="before_external_content_info_alert screenreader-only-tool" tabindex="0">
+    <div class="ic-flash-info">
+      <div class="ic-flash__icon" aria-hidden="true">
+        <i class="icon-info"></i>
+      </div>
+      <%= t('The following content is partner provided') %>
+    </div>
+    </div>
+
+    <%= iframe(
+    "about:blank",
+    name: 'tool_content',
+    id: 'tool_content',
+    class: "tool_launch",
+    allowfullscreen: "true",
+    webkitallowfullscreen: "true",
+    mozallowfullscreen: "true",
+    tabindex:"0",
+    title: @lti_launch.link_text,
+    style: "height:#{@lti_launch.tool_dimensions[:selection_height]};width:#{@lti_launch.tool_dimensions[:selection_width]};",
+    allow: Lti::Launch.iframe_allowances.join('; '),
+    data: { 'lti-launch': true }
+    ) %>
+
+    <div class="after_external_content_info_alert screenreader-only-tool" tabindex="0">
+    <div class="ic-flash-info">
+      <div class="ic-flash__icon" aria-hidden="true">
+        <i class="icon-info"></i>
+      </div>
+      <%= t('The preceding content is partner provided') %>
+    </div>
+  </div>
+</div>

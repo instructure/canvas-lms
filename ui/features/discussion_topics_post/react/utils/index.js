@@ -17,7 +17,10 @@
  */
 
 import {CURRENT_USER} from './constants'
-import {DISCUSSION_SUBENTRIES_QUERY} from '../../graphql/Queries'
+import {
+  DISCUSSION_ENTRY_ALL_ROOT_ENTRIES_QUERY,
+  DISCUSSION_SUBENTRIES_QUERY,
+} from '../../graphql/Queries'
 import {Discussion} from '../../graphql/Discussion'
 import {DiscussionEntry} from '../../graphql/DiscussionEntry'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -148,6 +151,28 @@ export const addReplyToDiscussionEntry = (cache, variables, newDiscussionEntry) 
 
         cache.writeQuery({...subEntriesOptions, data: currentSubentriesQueryData})
       }
+
+      const parentQueryOptions = {
+        query: DISCUSSION_SUBENTRIES_QUERY,
+        variables: {
+          ...variables,
+          discussionEntryID:
+            parentEntryData.parentId || parentEntryData.rootEntryId || parentEntryData._id,
+        },
+      }
+
+      const parentQueryData = JSON.parse(JSON.stringify(cache.readQuery(parentQueryOptions)))
+
+      if (parentQueryData) {
+        const nodes = parentQueryData.legacyNode.discussionSubentriesConnection.nodes
+        const entryIndex = nodes.findIndex(entry => entry._id === newDiscussionEntry.parentId)
+        const currentEntry = nodes[entryIndex]
+
+        currentEntry.subentriesCount = (currentEntry.subentriesCount || 0) + 1
+
+        cache.writeQuery({...parentQueryOptions, data: parentQueryData})
+      }
+
       return true
     } else {
       return false
@@ -157,6 +182,65 @@ export const addReplyToDiscussionEntry = (cache, variables, newDiscussionEntry) 
     // This doesn't matter functionally because the expansion button will be visible and upon clicking it the
     // subentry query will be called, getting the new reply
     // Future new replies to the thread will not throw an exception because the subentry query is now in the cache
+  }
+}
+
+export const addReplyToAllRootEntries = (cache, newDiscussionEntry) => {
+  try {
+    const options = {
+      query: DISCUSSION_ENTRY_ALL_ROOT_ENTRIES_QUERY,
+      variables: {
+        discussionEntryID: newDiscussionEntry.rootEntryId,
+        courseID: window.ENV?.course_id,
+      },
+    }
+    const rootEntry = JSON.parse(JSON.stringify(cache.readQuery(options)))
+    if (rootEntry) {
+      if (
+        rootEntry.legacyNode.allRootEntries &&
+        Array.isArray(rootEntry.legacyNode.allRootEntries)
+      ) {
+        rootEntry.legacyNode.allRootEntries.push(newDiscussionEntry)
+      } else {
+        rootEntry.legacyNode.allRootEntries = [newDiscussionEntry]
+      }
+    }
+
+    cache.writeQuery({...options, data: rootEntry})
+  } catch (e) {
+    // do nothing for errors updating the cache on all root entries. This will happen when the thread hasn't been expanded.
+  }
+}
+
+export const addSubentriesCountToParentEntry = (cache, newDiscussionEntry) => {
+  // If the new discussion entry is a reply to a reply, update the subentries count on the parent entry.
+  // Otherwise, it already happens correctly in the root entry level.
+  if (newDiscussionEntry.parentId !== newDiscussionEntry.rootEntryId) {
+    const discussionEntryOptions = {
+      id: btoa('DiscussionEntry-' + newDiscussionEntry.parentId),
+      fragment: DiscussionEntry.fragment,
+      fragmentName: 'DiscussionEntry',
+    }
+    const data = JSON.parse(JSON.stringify(cache.readFragment(discussionEntryOptions)))
+    if (data) {
+      if (data.rootEntryParticipantCounts) {
+        data.lastReply = {
+          createdAt: newDiscussionEntry.createdAt,
+          __typename: 'DiscussionEntry',
+        }
+      }
+
+      if (data.subentriesCount) {
+        data.subentriesCount += 1
+      } else {
+        data.subentriesCount = 1
+      }
+
+      cache.writeFragment({
+        ...discussionEntryOptions,
+        data,
+      })
+    }
   }
 }
 
@@ -246,6 +330,7 @@ export const getOptimisticResponse = ({
               avatarUrl: ENV.current_user.avatar_image_url,
               displayName: ENV.current_user.display_name,
               courseRoles: [],
+              pronouns: null,
               __typename: 'User',
             }
           : null,
@@ -254,6 +339,7 @@ export const getOptimisticResponse = ({
               id: null,
               avatarUrl: null,
               shortName: CURRENT_USER,
+              pronouns: null,
               __typename: 'AnonymousUser',
             }
           : null,
@@ -306,7 +392,7 @@ export const buildQuotedReply = (nodes, previewId) => {
         id: previewId,
         author: {shortName: getDisplayName(reply)},
         createdAt: reply.createdAt,
-        previewMessage: reply.message.replace(/<[^>]*>?/gm, ''),
+        previewMessage: reply.message,
       }
       return false
     }

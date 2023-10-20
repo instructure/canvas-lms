@@ -129,9 +129,8 @@ describe "content migrations", :non_parallel do
     # non-root2 + non-root3
     expect(@course.created_learning_outcomes.count).to eq 2
     outcome_links = subgroup1.child_outcome_links
-    expect(outcome_links.map(&:learning_outcome_content).map(&:short_description)).to match_array([
-                                                                                                    "non-root2", "non-root3"
-                                                                                                  ])
+    expect(outcome_links.map { |l| l.learning_outcome_content.short_description })
+      .to match_array(["non-root2", "non-root3"])
   end
 
   context "canvas cartridge importing" do

@@ -43,12 +43,15 @@
 ---
 */
 
-import React, {ReactElement, ChangeEvent} from 'react'
+import React, {ReactElement, ChangeEvent, SyntheticEvent} from 'react'
 import {compact, castArray, isEqual} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Select} from '@instructure/ui-select'
 import {Alert} from '@instructure/ui-alerts'
 import {matchComponentTypes} from '@instructure/ui-react-utils'
+import getLiveRegion from './liveRegion'
+
+import type {SelectProps} from '@instructure/ui-select'
 
 const I18n = useI18nScope('app_shared_components')
 const {Option: SelectOption, Group: SelectGroup} = Select as any
@@ -68,18 +71,20 @@ type Props = {
 type State = {
   inputValue: string
   isShowingOptions: boolean
-  highlightedOptionId: string | null
-  selectedOptionId: string
+  highlightedOptionId: string | undefined
+  selectedOptionId: string | undefined
   announcement: string | null
 }
 
 type OptionProps = {
   id: string
   value: string
+  children?: string
 }
 
 type GroupProps = {
   label: string
+  children?: ReactElement | ReactElement[]
 }
 
 // CanvasSelectOption and CanvasSelectGroup are components our client can create thru CanvasSelect
@@ -106,7 +111,7 @@ class CanvasSelect extends React.Component<Props, State> {
     this.state = {
       inputValue: option ? option.props.children : '',
       isShowingOptions: false,
-      highlightedOptionId: null,
+      highlightedOptionId: undefined,
       selectedOptionId: option ? option.props.id : null,
       announcement: null,
     }
@@ -143,11 +148,7 @@ class CanvasSelect extends React.Component<Props, State> {
         >
           {this.renderChildren(children)}
         </Select>
-        <Alert
-          liveRegion={() => document.getElementById('flash_screenreader_holder')}
-          liveRegionPoliteness="assertive"
-          screenReaderOnly={true}
-        >
+        <Alert liveRegion={getLiveRegion} liveRegionPoliteness="assertive" screenReaderOnly={true}>
           {this.state.announcement}
         </Alert>
       </>
@@ -226,7 +227,7 @@ class CanvasSelect extends React.Component<Props, State> {
   }
 
   handleBlur = (_event: ChangeEvent): void => {
-    this.setState({highlightedOptionId: null})
+    this.setState({highlightedOptionId: undefined})
   }
 
   handleShowOptions = (): void => {
@@ -235,12 +236,12 @@ class CanvasSelect extends React.Component<Props, State> {
     })
   }
 
-  handleHideOptions = (_event: ChangeEvent): void => {
+  handleHideOptions = (_event: SyntheticEvent): void => {
     this.setState(state => {
       const text = this.getOptionLabelById(state.selectedOptionId)
       return {
         isShowingOptions: false,
-        highlightedOptionId: null,
+        highlightedOptionId: undefined,
         inputValue: text,
         announcement: I18n.t('List collapsed.'),
       }
@@ -253,7 +254,7 @@ class CanvasSelect extends React.Component<Props, State> {
   // by the time handleHighlightOption is called we miss the transition,
   // this.state still has the previous value as of the last render
   // which is what we need. This is why we use this version of setState.
-  handleHighlightOption = (event: ChangeEvent, {id}): void => {
+  handleHighlightOption: SelectProps['onRequestHighlightOption'] = (event, {id}) => {
     if (id === noOptionsOptionId) return
 
     const text = this.getOptionLabelById(id)
@@ -267,7 +268,7 @@ class CanvasSelect extends React.Component<Props, State> {
   }
   /* eslint-enable react/no-access-state-in-setstate */
 
-  handleSelectOption = (event: ChangeEvent, {id}): void => {
+  handleSelectOption: SelectProps['onRequestSelectOption'] = (event, {id}) => {
     if (id === noOptionsOptionId) {
       this.setState({
         isShowingOptions: false,
@@ -284,19 +285,20 @@ class CanvasSelect extends React.Component<Props, State> {
       })
       const option = this.getOptionByFieldValue('id', id)
       if (prevSelection !== id) {
-        this.props.onChange(event, option?.props.value)
+        const ne = event.nativeEvent as unknown
+        this.props.onChange(ne as ChangeEvent, option?.props.value)
       }
     }
   }
 
-  getOptionLabelById(oid: string): string {
+  getOptionLabelById(oid: string | undefined): string {
     const option = this.getOptionByFieldValue('id', oid)
     return option ? option.props.children : ''
   }
 
   getOptionByFieldValue(
     field: string,
-    value: string,
+    value: string | undefined,
     options = castArray<ReactElement>(this.props.children)
   ): ReactElement | null {
     if (!this.props.children) return null
@@ -311,6 +313,7 @@ class CanvasSelect extends React.Component<Props, State> {
           foundOpt = o
         }
       } else if (matchComponentTypes(o, [CanvasSelectGroup])) {
+        // @ts-ignore
         const groupOptions = castArray(o.props.children)
         for (let j = 0; j < groupOptions.length; ++j) {
           const o2 = groupOptions[j]

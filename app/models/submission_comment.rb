@@ -194,8 +194,11 @@ class SubmissionComment < ActiveRecord::Base
     given { |user, session| can_view_comment?(user, session) }
     can :read
 
-    given { |user| author == user }
-    can :read and can :delete and can :update
+    given { |user| author_id == user.id && draft? }
+    can :delete and can :update
+
+    given { |user, session| author_id == user.id && submission.grants_right?(user, session, :grade) }
+    can :update
 
     given { |user, session| submission.grants_right?(user, session, :grade) }
     can :delete
@@ -427,36 +430,12 @@ class SubmissionComment < ActiveRecord::Base
   def update_participation
     # id_changed? because new_record? is false in after_save callbacks
     if saved_change_to_id? || (saved_change_to_hidden? && !hidden?)
-      return if draft?
-
-      if Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
-        return update_participation_with_ff_on
-      end
-
-      return if submission.user_id == author_id
-      return if submission.assignment.deleted? || !submission.posted?
-      return if provisional_grade_id.present?
+      return if draft? || submission.user_id == author_id || submission.assignment.deleted? || provisional_grade_id.present?
 
       self.class.connection.after_transaction_commit do
-        submission.user.clear_cache_key(:submissions)
-
-        ContentParticipation.create_or_update({
-                                                content: submission,
-                                                user: submission.user,
-                                                workflow_state: "unread",
-                                              })
+        submission.user.clear_cache_key(:potential_unread_submission_ids)
+        submission.mark_item_unread("comment")
       end
-    end
-  end
-
-  def update_participation_with_ff_on
-    return if submission.user_id == author_id
-    return if submission.assignment.deleted?
-    return if provisional_grade_id.present?
-
-    self.class.connection.after_transaction_commit do
-      submission.user.clear_cache_key(:potential_unread_submission_ids)
-      submission.mark_item_unread("comment")
     end
   end
 

@@ -40,7 +40,7 @@ describe "Account Calendar Settings" do
     user_session(@admin_user)
   end
 
-  it "navigates to account calendar page when navigation link is clicked", ignore_js_errors: true do
+  it "navigates to account calendar page when navigation link is clicked", :ignore_js_errors do
     get("/accounts/#{account.id}")
 
     click_account_calendar_navigation

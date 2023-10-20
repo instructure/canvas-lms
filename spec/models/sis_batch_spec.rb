@@ -851,9 +851,8 @@ s2,test_1,section2,active),
 
   it "stores error file in instfs if instfs is enabled" do
     # enable instfs
-    allow(InstFS).to receive(:enabled?).and_return(true)
     uuid = "1234-abcd"
-    allow(InstFS).to receive(:direct_upload).and_return(uuid)
+    allow(InstFS).to receive_messages(enabled?: true, direct_upload: uuid)
 
     # generate some errors
     batch = @account.sis_batches.create!
@@ -926,6 +925,46 @@ s2,test_1,section2,active),
         zip = Zip::File.open(batch.generated_diff.open.path)
         csvs = zip.glob("*.csv")
         expect(csvs.first.get_input_stream.read).to eq("user_id,login_id,status\nuser_1,user_1,deleted\n")
+      end
+    end
+
+    describe "diffing_user_remove_status" do
+      before :once do
+        process_csv_data(
+          [
+            %(user_id,login_id,status
+              user_1,user_1,active,
+              user_2,user_2,active)
+          ],
+          diffing_data_set_identifier: "allotrope"
+        )
+      end
+
+      it "deletes removed users by default" do
+        batch = process_csv_data(
+          [
+            %(user_id,login_id,status,
+              user_2,user_2,active)
+          ],
+          diffing_data_set_identifier: "allotrope"
+        )
+        zip = Zip::File.open(batch.generated_diff.open.path)
+        csvs = zip.glob("*.csv")
+        expect(csvs.first.get_input_stream.read).to eq("user_id,login_id,status\nuser_1,user_1,deleted\n")
+      end
+
+      it "suspends removed users by request" do
+        batch = process_csv_data(
+          [
+            %(user_id,login_id,status,
+              user_2,user_2,active)
+          ],
+          diffing_data_set_identifier: "allotrope",
+          options: { diffing_user_remove_status: "suspended" }
+        )
+        zip = Zip::File.open(batch.generated_diff.open.path)
+        csvs = zip.glob("*.csv")
+        expect(csvs.first.get_input_stream.read).to eq("user_id,login_id,status\nuser_1,user_1,suspended\n")
       end
     end
 
@@ -1187,10 +1226,11 @@ test_1,test_a,course
 
       process_csv_data([
                          %(course_id,user_id,role,status
-        A042,U1,Student,active
-        A042,U2,Student,active
-        A042,U3,Student,active
-        A042,U4,Student,active)
+                           A042,U1,Student,active
+                           A042,U2,Student,active
+                           A042,U3,Student,active
+                           A042,U4,Student,active),
+                         %(term_id,name,status)
                        ],
                        diffing_data_set_identifier: "default")
 
@@ -1203,10 +1243,11 @@ test_1,test_a,course
 
       create_csv_data([
                         %(course_id,user_id,role,status
-        A042,U1,Padawan,active
-        A042,U2,Padawan,active
-        A042,U3,Padawan,active
-        A042,U4,Padawan,active)
+                          A042,U1,Padawan,active
+                          A042,U2,Padawan,active
+                          A042,U3,Padawan,active
+                          A042,U4,Padawan,active),
+                        %(term_id,name,status)
                       ]) do |batch|
         batch.update(diffing_data_set_identifier: "default")
         batch.process_without_send_later

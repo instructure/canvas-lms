@@ -75,6 +75,22 @@ class AssignmentCreateEditPage
       f("button svg[name='IconArrowOpenDown']")
     end
 
+    def due_date_picker_btn
+      f("#overrides-wrapper button.ui-datepicker-trigger.btn")
+    end
+
+    def due_date_picker_popup
+      f("#ui-datepicker-div")
+    end
+
+    def due_date_picker_done_btn
+      f("button.ui-datepicker-ok")
+    end
+
+    def due_date_input
+      f("input.datePickerDateField.DueDateInput")
+    end
+
     # Moderated Grading Options
     def select_grader_dropdown
       f("select[name='final_grader_id']")

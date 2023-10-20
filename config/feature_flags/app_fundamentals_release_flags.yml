@@ -6,27 +6,27 @@ default_recaptcha_registration_enable:
   description: Requires Recaptcha for self-registration by default
   applies_to: SiteAdmin
 granular_permissions_manage_course_content:
-  state: hidden
+  state: allowed_on
   applies_to: RootAccount
   display_name: Granular permissions for managing course content
   description: Add granularity to permissions around managing all other course content
 granular_permissions_manage_courses:
-  state: hidden
+  state: allowed_on
   applies_to: RootAccount
   display_name: Granular permissions for managing courses
   description: Add granularity to permissions around managing courses i.e. Add / Publish / Conclude / Delete
 granular_permissions_manage_users:
-  state: hidden
+  state: allowed_on
   applies_to: RootAccount
   display_name: Granular permissions for Add/Remove roles from Course
   description: Adds granular permissions for adding and removing each role, and a separate permission for other course admin actions
 granular_permissions_manage_groups:
-  state: hidden
+  state: allowed_on
   applies_to: RootAccount
   display_name: Granular permissions for managing groups in Account or Course contexts
   description: Add granularity to permissions around managing groups in Account or Course contexts
 granular_permissions_manage_lti:
-  state: hidden
+  state: allowed_on
   applies_to: RootAccount
   display_name: Granular permissions for managing LTI tools in Account or Course contexts
   description: Add granularity to permissions around managing LTI tools in Account or Course contexts
@@ -47,7 +47,7 @@ allow_unconfirmed_users_in_user_list:
   display_name: Allow Unconfirmed E-mail Addresses When Adding Users
   description: This is technicaly a security vulnerability, but some schools need to preserve their workflows for a while.
 granular_permissions_manage_assignments:
-  state: hidden
+  state: allowed_on
   applies_to: RootAccount
   display_name: Granular permissions for assignments and quizzes
   description: Separate out granular add and delete permissions for assignments and quizzes from the existing manage permission that controls all three.
@@ -56,3 +56,13 @@ course_admin_role_masquerade_permission_check:
   applies_to: RootAccount
   display_name: Check permissions when Masquerading as Course Admins
   description: When masquerading as Course Admin Roles (Teacher/TA/Designer base role), Canvas will ensure the masquerading user has all of the same (or more) permissions as the target user.
+temporary_enrollments:
+  state: hidden
+  display_name: Temporary Enrollments
+  description: Users can temporarily enroll another user in a course. The assigned user is removed from the course when the enrollment expires.
+  applies_to: RootAccount
+instui_nav:
+  state: hidden
+  applies_to: RootAccount
+  display_name: New InstUI navbar
+  description: This is a new navbar being implemented with react router in mind

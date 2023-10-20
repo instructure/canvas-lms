@@ -121,7 +121,7 @@ describe "gradebooks/show_submissions_upload" do
       end
 
       it "includes a row for each student" do
-        student_names = document.css("#student-files tbody tr th").map(&:text).map(&:strip)
+        student_names = document.css("#student-files tbody tr th").map { |e| e.text.strip }
         expect(student_names).to match_array ["Adam Jones", "Betty Ford", "Albert Breakfast"]
       end
 

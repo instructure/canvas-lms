@@ -69,6 +69,17 @@ describe SubmissionSearch do
     ]
   end
 
+  it "finds submissions with user id" do
+    results = SubmissionSearch.new(assignment,
+                                   teacher,
+                                   nil,
+                                   user_id: mandy.id,
+                                   order_by: [{ field: "username", direction: "descending" }]).search
+    expect(results).to eq [
+      Submission.find_by(user: mandy)
+    ]
+  end
+
   it "filters for the specified workflow state" do
     assignment.submit_homework(amanda, submission_type: "online_text_entry", body: "submission")
     results = SubmissionSearch.new(assignment, teacher, nil, states: ["submitted"]).search

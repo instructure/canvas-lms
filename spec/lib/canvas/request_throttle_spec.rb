@@ -67,8 +67,57 @@ describe RequestThrottle do
   describe "#client_identifier" do
     specs_require_sharding
 
+    before do
+      Account.site_admin.enable_feature! :site_admin_service_auth
+    end
+
+    context "with an inst_access service token" do
+      include_context "InstAccess setup"
+
+      let(:service_user) { user_model }
+      let(:root_account) { account_model }
+
+      let(:key) do
+        DeveloperKey.create!(
+          name: "key",
+          account: root_account,
+          internal_service: true,
+          service_user:
+        )
+      end
+
+      let(:token) do
+        InstAccess::Token.for_user(
+          user_uuid: service_user.uuid,
+          account_uuid: root_account.uuid,
+          canvas_domain: "test.host",
+          user_global_id: service_user.global_id,
+          region: ApplicationController.region,
+          client_id: key.global_id,
+          instructure_service: true
+        )
+      end
+
+      let(:request) do
+        req(
+          request_no_session.merge(
+            {
+              "USER_AGENT" => "inst-service-ninety-nine/1234567890ABCDEF",
+              "HTTP_AUTHORIZATION" => "Bearer #{token.to_unencrypted_token_string}",
+              "rack.input" => StringIO.new("")
+            }
+          )
+        )
+      end
+
+      it "uses the proper client identifier" do
+        expect(throttler.client_identifier(request)).to eq "service_user_key:#{key.global_id}"
+      end
+    end
+
     def req(hash)
       r = ActionDispatch::Request.new(hash).tap(&:fullpath)
+      throttler.inst_access_token_authentication = AuthenticationMethods::InstAccessToken::Authentication.new(r)
       allow(r).to receive(:user_agent).and_return(hash["USER_AGENT"]) if hash.key?("USER_AGENT")
       r
     end
@@ -153,8 +202,7 @@ describe RequestThrottle do
     end
 
     it "passes on other requests" do
-      allow(throttler).to receive(:approved?).and_return(false)
-      allow(throttler).to receive(:blocked?).and_return(false)
+      allow(throttler).to receive_messages(approved?: false, blocked?: false)
       expect(strip_variable_headers(throttler.call(request_user_1))).to eq response
     end
 
@@ -260,14 +308,13 @@ describe RequestThrottle do
     end
 
     before do
-      allow(throttler).to receive(:approved?).and_return(false)
-      allow(throttler).to receive(:blocked?).and_return(false)
+      allow(throttler).to receive_messages(approved?: false, blocked?: false)
     end
 
     it "skips without redis enabled" do
       if Canvas.redis_enabled?
         allow(Canvas).to receive(:redis_enabled?).and_return(false)
-        expect_any_instance_of(Redis::Scripting::Module).not_to receive(:run)
+        expect(Canvas).not_to receive(:redis)
       end
       expect(strip_variable_headers(throttler.call(request_user_1))).to eq response
     end
@@ -502,8 +549,7 @@ describe RequestThrottle do
         it "will always be allowed when disabled, even with full bucket" do
           allow(RequestThrottle).to receive(:enabled?).and_return(false)
           req = request_logged_out
-          allow(req).to receive(:fullpath).and_return("/")
-          allow(req).to receive(:env).and_return({ "canvas.request_throttle.user_id" => ["123"] })
+          allow(req).to receive_messages(fullpath: "/", env: { "canvas.request_throttle.user_id" => ["123"] })
           allow(@bucket).to receive(:full?).and_return(true)
           expect(throttler.allowed?(request_logged_out, @bucket)).to be_truthy
         end

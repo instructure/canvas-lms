@@ -87,12 +87,20 @@ class MediaObjectsController < ApplicationController
   # Returns the Details of the given Media Object.
   #
   # @example_request
-  #     curl https://<canvas>/media_objects/<media_object_id> \
+  #     curl https://<canvas>/media_objects/<media_object_id>/info \
+  #          -H 'Authorization: Bearer <token>'
+  #
+  # @example_request
+  #     curl https://<canvas>/media_attachments/<attachment_id>/info \
   #          -H 'Authorization: Bearer <token>'
   #
   # @returns MediaObject
   def show
-    render json: media_object_api_json(@media_object, @current_user, session)
+    if Account.site_admin.feature_enabled?(:media_links_use_attachment_id) && @attachment
+      render json: media_attachment_api_json(@attachment, @media_object, @current_user, session)
+    else
+      render json: media_object_api_json(@media_object, @current_user, session)
+    end
   end
 
   # @API List Media Objects
@@ -223,8 +231,14 @@ class MediaObjectsController < ApplicationController
         @media_object.user_entered_title = CanvasTextHelper.truncate_text(params[:user_entered_title], max_length: 255) if params[:user_entered_title].present?
         @media_object.save
       end
-      render json: @media_object.as_json.merge(embedded_iframe_url: media_object_iframe_url(@media_object.media_id))
-      # render :json => media_object_api_json(@media_object, @current_user, session, %w[sources tracks])
+      media_object_json = @media_object.as_json
+      if Account.site_admin.feature_enabled?(:media_links_use_attachment_id)
+        embedded_iframe_url = media_attachment_iframe_url(@media_object.attachment_id)
+        media_object_json["media_object"]["uuid"] = @media_object.attachment.uuid
+      else
+        embedded_iframe_url = media_object_iframe_url(@media_object.media_id)
+      end
+      render json: media_object_json.merge(embedded_iframe_url:)
     end
   end
 
@@ -241,7 +255,20 @@ class MediaObjectsController < ApplicationController
     @media_object&.viewed!
     config = CanvasKaltura::ClientV3.config
     if config
-      redirect_to CanvasKaltura::ClientV3.new.assetSwfUrl(params[:id])
+      if Account.site_admin.feature_enabled?(:authenticated_iframe_content)
+        media_sources = CanvasKaltura::ClientV3.new.media_sources(@attachment.media_entry_id)
+        # the bitrate query gives us a unique-enough key to use when querying for specific versions of the file
+        media_source = media_sources.find { |ms| ms[:bitrate].to_i == params[:bitrate].to_i } if params[:bitrate]
+        media_source ||= media_sources.first # if the bitrate is invalid or doesn't find anything
+        begin
+          temp_file = media_source_temp_file(media_source[:url])
+        rescue CanvasHttp::InvalidResponseCodeError => e
+          return(render(plain: e.message, status: e.code))
+        end
+        send_file(temp_file, filename: @attachment.filename, type: @attachment.content_type, stream: true)
+      else
+        redirect_to CanvasKaltura::ClientV3.new.assetSwfUrl(params[:id])
+      end
     else
       render plain: t(:media_objects_not_configured, "Media Objects not configured")
     end
@@ -264,6 +291,10 @@ class MediaObjectsController < ApplicationController
   end
 
   def iframe_media_player
+    if !Account.site_admin.feature_enabled?(:media_links_use_attachment_id) && @attachment
+      return redirect_to(media_object_iframe_path(@media_object.media_id, params: request.query_parameters))
+    end
+
     # Exclude all global includes from this page
     @exclude_account_js = true
     @embeddable = true
@@ -276,6 +307,7 @@ class MediaObjectsController < ApplicationController
 
     js_env media_object: media_api_json if media_api_json
     js_env attachment: !!@attachment
+    js_env attachment_id: @attachment.id if Account.site_admin.feature_enabled?(:media_links_use_attachment_id) && @attachment
     js_bundle :media_player_iframe_content
     css_bundle :media_player
     render html: "<div id='player_container'>#{I18n.t("Loading...")}</div>".html_safe,
@@ -298,5 +330,22 @@ class MediaObjectsController < ApplicationController
     end
 
     @media_object.viewed!
+  end
+
+  # Fetches the media source file from the given url and returns a tempfile
+  # This logic is similar to the logic in Attachment#clone_url_as_attachment to handle large files except
+  # that it doesn't store it in the database
+  def media_source_temp_file(url)
+    _, uri = CanvasHttp.validate_url(url, check_host: true)
+    tmpfile = CanvasHttp.tempfile_for_uri(uri)
+    CanvasHttp.get(url) do |http_response|
+      if http_response.code.to_i == 200
+        http_response.read_body(tmpfile)
+        tmpfile.rewind
+      else
+        raise CanvasHttp::InvalidResponseCodeError.new(http_response.code.to_i, "error fetching #{url}")
+      end
+    end
+    tmpfile
   end
 end

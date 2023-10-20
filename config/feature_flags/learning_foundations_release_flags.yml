@@ -9,25 +9,6 @@ buttons_and_icons_root_account:
     production:
       state: hidden
 
-rce_ux_improvements:
-  state: hidden
-  display_name: RCE UX Improvements
-  description: Improve and streamline the RCE button and tray UX
-  applies_to: SiteAdmin
-
-rce_new_external_tool_dialog_in_canvas:
-  state: hidden
-  display_name: RCE Use New External Tool Dialog in Canvas
-  description: Use the new external tool dialog when the RCE is running in Canvas. The new dialog is always used in new quizzes.
-  applies_to: SiteAdmin
-  environments:
-    development:
-      state: allowed_on
-    beta:
-      state: allowed_on
-    ci:
-      state: allowed_on
-
 explicit_latex_typesetting:
   state: hidden
   display_name: Explicit LaTeX Typesetting
@@ -58,6 +39,11 @@ media_links_use_attachment_id:
     Use attachment ids in media links so that users are always pointed to the correct instance of media
     instead of the original
   applies_to: SiteAdmin
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
 
 assignments_2_student:
   state: hidden
@@ -124,12 +110,23 @@ create_course_subaccount_picker:
     people who can manually create courses to put those courses into any sub-account
     where they have enrollments.
 
+enhanced_course_creation_account_fetching:
+  applies_to: SiteAdmin
+  state: hidden
+  display_name: 'Use a new endpoint for fetching course creation accounts'
+  description: Use new improved logic to fetch all accounts a user can create courses in.
+
 calendar_series:
   applies_to: SiteAdmin
   state: hidden
   display_name: Calendar Series
   description: |-
     This flag allows calendar event series to be created from the Canvas Calendar.
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
 
 account_level_blackout_dates:
   applies_to: SiteAdmin
@@ -174,25 +171,6 @@ module_publish_menu:
   description: Enable the module publish menus to make mass publishing and unpublishing easier.
   applies_to: SiteAdmin
 
-k5_font_selection:
-  state: hidden
-  display_name: 'Allow Font Selection in C4E Accounts'
-  description: |-
-    Adds an account setting to select the classic (Lato) or elementary (Balsamiq Sans) font in Canvas for Elementary
-    accounts.
-  applies_to: SiteAdmin
-
-auto_subscribe_account_calendars:
-  state: hidden
-  display_name: 'Allow auto-subscription to account calendars'
-  description: Allow admins to configure subscription preferences on account calendars.
-  applies_to: SiteAdmin
-  environments:
-    ci:
-      state: allowed_on
-    development:
-      state: allowed_on
-
 blueprint_line_item_support:
   state: hidden
   display_name: 'Blueprint Resource ID Support'
@@ -205,15 +183,41 @@ permanent_page_links:
   description: |-
     When the title to a page is changed, old links to that page will link to the correct page.
   applies_to: SiteAdmin
-
-account_calendars_planner_support:
-  state: hidden
-  display_name: 'Planner support for account calendars'
-  description: This flag allows events from account calendars to be displayed on the canvas planner.
-  applies_to: SiteAdmin
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
 
 authenticated_iframe_content:
   state: hidden
   display_name: 'Authenticated IFrame Content'
   description: This flag changes the way RCE content is loaded in iframes to proxy the request through canvas.
+  applies_to: SiteAdmin
+
+content_migration_asset_map_v2:
+  state: hidden
+  display_name: Content Migration Asset Map v2
+  description: Adds Additional Fields to the Content Migration Asset Map
+  applies_to: SiteAdmin
+
+gem_migration_links:
+  state: hidden
+  display_name: Course Import HTML Using Gem
+  description: Use gem during course import to update Canvas resource links
+  applies_to: SiteAdmin
+
+instui_for_import_page:
+  state: hidden
+  display_name: Use InstUI for the course import page
+  description: |-
+    If enabled, the course import page will use InstUI components
+  applies_to: SiteAdmin
+
+differentiated_modules:
+  state: hidden
+  display_name: Differentiated Modules
+  description: |-
+    If enabled, modules and module items become assignable to specific
+    individuals and groups.
   applies_to: SiteAdmin

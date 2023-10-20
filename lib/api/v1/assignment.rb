@@ -99,6 +99,14 @@ module Api::V1::Assignment
     grader_names_visible_to_final_grader
   ].freeze
 
+  ASSIGNMENT_DATE_DETAILS_FIELDS = %w[
+    id
+    due_at
+    unlock_at
+    lock_at
+    only_visible_to_overrides
+  ].freeze
+
   def assignments_json(assignments, user, session, opts = {})
     # check if all assignments being serialized belong to the same course
     contexts = assignments.map { |a| [a.context_id, a.context_type] }.uniq
@@ -143,7 +151,13 @@ module Api::V1::Assignment
     end
 
     hash = api_json(assignment, user, session, fields)
-    hash["secure_params"] = assignment.secure_params if assignment.has_attribute?(:lti_context_id)
+
+    description = api_user_content(hash["description"],
+                                   @context || assignment.context,
+                                   user,
+                                   opts[:preloaded_user_content_attachments] || {})
+
+    hash["secure_params"] = assignment.secure_params(include_description: description.present?) if assignment.has_attribute?(:lti_context_id)
     hash["lti_context_id"] = assignment.lti_context_id if assignment.has_attribute?(:lti_context_id)
     hash["course_id"] = assignment.context_id
     hash["name"] = assignment.title
@@ -152,7 +166,7 @@ module Api::V1::Assignment
     hash["due_date_required"] = assignment.due_date_required?
     hash["max_name_length"] = assignment.max_name_length
     hash["allowed_attempts"] = -1 if assignment.allowed_attempts.nil?
-    paced_course = Course.find_by(id: assignment.context_id)&.enable_course_paces?
+    paced_course = assignment.course.account.feature_enabled?(:course_paces) && Course.find_by(id: assignment.context_id)&.enable_course_paces?
     hash["in_paced_course"] = paced_course if paced_course
 
     unless opts[:exclude_response_fields].include?("in_closed_grading_period")
@@ -217,10 +231,7 @@ module Api::V1::Assignment
     # use already generated hash['description'] because it is filtered by
     # Assignment#filter_attributes_for_user when the assignment is locked
     unless opts[:exclude_response_fields].include?("description")
-      hash["description"] = api_user_content(hash["description"],
-                                             @context || assignment.context,
-                                             user,
-                                             opts[:preloaded_user_content_attachments] || {})
+      hash["description"] = description
     end
 
     can_manage = assignment.context.grants_any_right?(user, :manage, :manage_grades, :manage_assignments, :manage_assignments_edit)
@@ -455,9 +466,17 @@ module Api::V1::Assignment
                            (submission.nil? || submission.attempts_left.nil? || submission.attempts_left > 0)
     end
 
+    if opts[:include_ab_guid]
+      hash["ab_guid"] = assignment.ab_guid.presence || assignment.ab_guid_through_rubric
+    end
+
     hash["restrict_quantitative_data"] = assignment.restrict_quantitative_data?(user, true) || false
 
     hash
+  end
+
+  def assignment_date_details_json(assignment, user, session)
+    api_json(assignment, user, session, only: ASSIGNMENT_DATE_DETAILS_FIELDS)
   end
 
   def turnitin_settings_json(assignment)
@@ -564,7 +583,7 @@ module Api::V1::Assignment
     end
 
     calc_grades = calculate_grades ? value_to_boolean(calculate_grades) : true
-    DueDateCacher.recompute(prepared_create[:assignment], update_grades: calc_grades, executing_user: user)
+    SubmissionLifecycleManager.recompute(prepared_create[:assignment], update_grades: calc_grades, executing_user: user)
     response
   rescue ActiveRecord::RecordInvalid
     false
@@ -601,7 +620,7 @@ module Api::V1::Assignment
     if @overrides_affected.to_i > 0 || cached_due_dates_changed
       assignment.clear_cache_key(:availability)
       assignment.quiz.clear_cache_key(:availability) if assignment.quiz?
-      DueDateCacher.recompute(prepared_update[:assignment], update_grades: true, executing_user: user)
+      SubmissionLifecycleManager.recompute(prepared_update[:assignment], update_grades: true, executing_user: user)
     end
 
     response
@@ -729,6 +748,14 @@ module Api::V1::Assignment
     if update_params.key?("assignment_group_id")
       ag_id = update_params.delete("assignment_group_id").presence
       assignment.assignment_group = assignment.context.assignment_groups.where(id: ag_id).first
+    end
+
+    if update_params.key?("ab_guid")
+      assignment.ab_guid.clear
+      ab_guids = update_params.delete("ab_guid").presence
+      Array(ab_guids).each do |guid|
+        assignment.ab_guid << guid if guid.present?
+      end
     end
 
     if update_params.key?("group_category_id") && !assignment.group_category_deleted_with_submissions?
@@ -922,7 +949,7 @@ module Api::V1::Assignment
   # the current user is an observer
   def current_user_and_observed(opts = { include_observed: false })
     user_and_observees = Array(@current_user)
-    if opts[:include_observed] && @context_enrollment && @context_enrollment.observer?
+    if opts[:include_observed] && @current_user.enrollments.of_observer_type.active.where(course: @context).exists?
       user_and_observees.concat(ObserverEnrollment.observed_students(@context, @current_user).keys)
     end
     user_and_observees
@@ -1115,7 +1142,7 @@ module Api::V1::Assignment
 
   def clear_tool_settings_tools?(assignment, assignment_params)
     assignment.assignment_configuration_tool_lookups.present? &&
-      assignment_params["submission_types"]&.present? &&
+      assignment_params["submission_types"].present? &&
       (
         assignment.submission_types.split(",").none? { |t| assignment_params["submission_types"].include?(t) } ||
         assignment_params["submission_types"].blank?
@@ -1148,7 +1175,8 @@ module Api::V1::Assignment
       { "allowed_extensions" => strong_anything },
       { "integration_data" => strong_anything },
       { "external_tool_tag_attributes" => strong_anything },
-      ({ "submission_types" => strong_anything } if should_update_submission_types)
+      ({ "submission_types" => strong_anything } if should_update_submission_types),
+      { "ab_guid" => strong_anything },
     ].compact
   end
 

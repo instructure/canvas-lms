@@ -19,11 +19,13 @@
 #
 
 class GradingStandard < ActiveRecord::Base
-  include Workflow
+  include Canvas::SoftDeletable
 
   belongs_to :context, polymorphic: [:account, :course], required: true
   belongs_to :user
   has_many :assignments
+
+  has_many :accounts, inverse_of: :grading_standard, dependent: :nullify
 
   validates :workflow_state, presence: true
   validates :data, presence: true
@@ -93,13 +95,18 @@ class GradingStandard < ActiveRecord::Base
 
   def place_in_scheme(key_name)
     # look for keys with only digits and a single '.'
-    if key_name.to_s&.match?(/\A(\d*[.])?\d+\Z/)
+    key_name_str = key_name.to_s
+    if key_name_str&.match?(/\A(\d*[.])?\d+\Z/)
       # compare numbers
       # second condition to filter letters so zeros work properly ("A".to_d == 0)
       ordered_scheme.index { |g, _| g.to_d == key_name.to_d && g.to_s.match(/\A(\d*[.])?\d+\Z/) }
     else
-      # compare words
-      ordered_scheme.index { |g, _| g.to_s.casecmp?(key_name.to_s) }
+      idx = index_of_key(key_name_str)
+      if idx.nil? && minus_grade?(key_name_str)
+        idx = index_of_key(key_name_str.sub(/−$/, "-"))
+      end
+
+      idx
     end
   end
 
@@ -114,9 +121,17 @@ class GradingStandard < ActiveRecord::Base
     # otherwise, we step down just 1/10th of a point, which is the
     # granularity we support right now
     elsif idx && (ordered_scheme[idx].last - ordered_scheme[idx - 1].last).abs >= BigDecimal("0.01")
-      (ordered_scheme[idx - 1].last * BigDecimal("100.0")) - BigDecimal("1.0")
+      if points_based
+        (((ordered_scheme[idx - 1].last * scaling_factor) - BigDecimal("0.1")) / scaling_factor) * BigDecimal("100.0")
+      else
+        (ordered_scheme[idx - 1].last * BigDecimal("100.0")) - BigDecimal("1.0")
+      end
     elsif idx
-      (ordered_scheme[idx - 1].last * BigDecimal("100.0")) - BigDecimal("0.1")
+      if points_based
+        (((ordered_scheme[idx - 1].last * scaling_factor) - BigDecimal("0.1")) / scaling_factor) * BigDecimal("100.0")
+      else
+        (ordered_scheme[idx - 1].last * BigDecimal("100.0")) - BigDecimal("0.1")
+      end
     else
       nil
     end
@@ -200,7 +215,8 @@ class GradingStandard < ActiveRecord::Base
   alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = "deleted"
-    save
+
+    run_callbacks(:destroy) { save }
   end
 
   def grading_scheme
@@ -272,5 +288,15 @@ class GradingStandard < ActiveRecord::Base
 
   def set_root_account_id
     self.root_account_id ||= context.is_a?(Account) ? context.resolved_root_account_id : context.root_account_id
+  end
+
+  private
+
+  def minus_grade?(grade)
+    !!grade && /.+−$/.match?(grade)
+  end
+
+  def index_of_key(key)
+    ordered_scheme.index { |scheme_key, _| scheme_key.to_s.casecmp?(key) }
   end
 end

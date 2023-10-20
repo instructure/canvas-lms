@@ -287,8 +287,7 @@ describe ExternalToolsController do
         let(:domain) { "www.example-beta.com" }
 
         before do
-          allow(ApplicationController).to receive(:test_cluster?).and_return(true)
-          allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
+          allow(ApplicationController).to receive_messages(test_cluster?: true, test_cluster_name: "beta")
           Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
 
           tool.course_navigation = { enabled: true }
@@ -539,8 +538,7 @@ describe ExternalToolsController do
         let(:domain) { "www.example-beta.com" }
 
         before do
-          allow(ApplicationController).to receive(:test_cluster?).and_return(true)
-          allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
+          allow(ApplicationController).to receive_messages(test_cluster?: true, test_cluster_name: "beta")
           Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
 
           @tool.settings[:environments] = {
@@ -801,8 +799,7 @@ describe ExternalToolsController do
         let(:domain) { "www.example-beta.com" }
 
         before do
-          allow(ApplicationController).to receive(:test_cluster?).and_return(true)
-          allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
+          allow(ApplicationController).to receive_messages(test_cluster?: true, test_cluster_name: "beta")
           Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
 
           @tool.settings[:environments] = {
@@ -1134,16 +1131,20 @@ describe ExternalToolsController do
       assert_unauthorized
     end
 
-    it "finds tools matching by domain" do
+    it "passes prefer_1_1=false to find_external_tool by default when looking up by URL" do
       user_session(@teacher)
-      tool = @course.context_external_tools.new(
-        name: "bob", consumer_key: "bob", shared_secret: "bob", domain: "www.example.com"
+      expect(ContextExternalTool).to receive(:find_external_tool).with(
+        anything, anything, anything, anything, anything, prefer_1_1: false
       )
-      tool.save!
       get "retrieve", params: { course_id: @course.id, url: "http://www.example.com/basic_lti" }
-      expect(response).to be_successful
-      expect(assigns[:tool]).to eq tool
-      expect(assigns[:lti_launch].params).not_to be_nil
+    end
+
+    it "passes prefer_1_1=false to find_external_tool only when the prefer_1_1 param is set" do
+      user_session(@teacher)
+      expect(ContextExternalTool).to receive(:find_external_tool).with(
+        anything, anything, anything, anything, anything, prefer_1_1: true
+      )
+      get "retrieve", params: { course_id: @course.id, url: "http://www.example.com/basic_lti", prefer_1_1: true }
     end
 
     it "finds tools matching by exact url" do
@@ -1286,9 +1287,54 @@ describe ExternalToolsController do
       let(:pfc_tool_context) { @course }
     end
 
+    context "with display type 'in_rce'" do
+      render_views
+
+      subject do
+        get :retrieve, params: {
+          url: tool.url,
+          course_id: @course.id,
+          display: "in_rce"
+        }
+      end
+
+      before do
+        user_session(@student)
+        Account.site_admin.enable_feature!(:lti_rce_postmessage_support)
+      end
+
+      context "with platform storage flag enabled" do
+        before { Account.site_admin.enable_feature!(:lti_platform_storage) }
+
+        it "renders the sibling forwarder frame once" do
+          subject
+          expect(response.body.scan('id="post_message_forwarding').count).to eq 1
+        end
+      end
+
+      context "with platform storage flag disabled" do
+        before { Account.site_admin.disable_feature!(:lti_platform_storage) }
+
+        it "does not render the sibling forwarder frame" do
+          subject
+          expect(response.body.scan('id="post_message_forwarding').count).to eq 0
+        end
+      end
+
+      it "renders the tool launch iframe" do
+        subject
+        expect(response.body).to include("id=\"tool_content\"")
+      end
+
+      it "includes post_message_forwarding JS for main frame" do
+        subject
+        expect(response.body).to include(".push('post_message_forwarding')")
+      end
+    end
+
     context "for Quizzes Next launch" do
       let(:assignment) do
-        a = assignment_model(course: @course)
+        a = assignment_model(course: @course, title: "A Quizzes.Next Assignment")
         a.submission_types = "external_tool"
         a.external_tool_tag_attributes = { url: tool.url }
         a.save!
@@ -1306,30 +1352,35 @@ describe ExternalToolsController do
                                                })
       end
 
+      let(:retrieve_params) do
+        {
+          course_id: @course.id,
+          assignment_id: assignment.id,
+          url: "http://example.com/launch"
+        }
+      end
+
       before do
         u = user_factory(active_all: true)
         account.account_users.create!(user: u)
         user_session(@user)
       end
 
-      it "sets consistent resource_link_id with that in regular lti launch" do
-        get :retrieve, params: {
-          course_id: @course.id,
-          assignment_id: assignment.id,
-          url: "http://example.com/launch"
-        }
+      it "sets resource_link_id to that of the assignment's launch" do
+        get :retrieve, params: retrieve_params
 
         expect(assigns[:lti_launch].params["resource_link_id"]).to eq assignment.lti_resource_link_id
         expect(assigns[:lti_launch].params["context_id"]).to eq opaque_id(@course)
       end
 
+      it "sets resource_link_title to that of the title" do
+        get :retrieve, params: retrieve_params
+
+        expect(assigns[:lti_launch].params["resource_link_title"]).to eq assignment.title
+      end
+
       it "includes extra assignment info during relaunch" do
-        get :retrieve, params: {
-          course_id: @course.id,
-          assignment_id: assignment.id,
-          url: "http://example.com/launch",
-          placement: :assignment_selection
-        }
+        get :retrieve, params: retrieve_params.merge(placement: :assignment_selection)
 
         # this is a sampling of that extra assignment info, which is fully tested in
         # `lti_integration_spec.rb`. This is just enough to know that it exists.
@@ -1441,13 +1492,12 @@ describe ExternalToolsController do
 
       let(:tool) do
         account.context_external_tools.create!({
-                                                 name: "Quizzes.Next",
+                                                 name: "Some awesome LTI tool",
                                                  url: "http://example.com/launch",
                                                  domain: "example.com",
                                                  consumer_key: "test_key",
                                                  shared_secret: "test_secret",
                                                  privacy_level: "public",
-                                                 tool_id: "Quizzes 2",
                                                  settings: {
                                                    custom_fields: { "canvas_assignment_due_at" => "$Canvas.assignment.dueAt.iso8601" }
                                                  }
@@ -1455,8 +1505,19 @@ describe ExternalToolsController do
       end
 
       let(:due_at) { "2021-07-29 08:26:56.000000000 +0000".to_datetime }
-
       let(:due_at_diff) { "2021-07-30 08:26:56.000000000 +0000".to_datetime }
+
+      let(:retrieve_params) do
+        {
+          course_id: @course.id,
+          assignment_id: assignment.id,
+          url: "http://example.com/launch",
+          placement: :assignment_selection
+        }
+      end
+
+      let(:launch_resource_link_id) { assigns[:lti_launch].params["resource_link_id"] }
+      let(:launch_resource_link_title) { assigns[:lti_launch].params["resource_link_title"] }
 
       before do
         student_in_course
@@ -1474,12 +1535,7 @@ describe ExternalToolsController do
         expect(assignment.due_at).to eq due_at
 
         user_session(@student)
-        get :retrieve, params: {
-          course_id: @course.id,
-          assignment_id: assignment.id,
-          url: "http://example.com/launch",
-          placement: :assignment_selection
-        }
+        get :retrieve, params: retrieve_params
 
         expect(
           assigns[:lti_launch].params["custom_canvas_assignment_due_at"].to_datetime
@@ -1490,16 +1546,51 @@ describe ExternalToolsController do
         expect(assignment.due_at).to eq due_at
 
         user_session(@user)
-        get :retrieve, params: {
-          course_id: @course.id,
-          assignment_id: assignment.id,
-          url: "http://example.com/launch",
-          placement: :assignment_selection
-        }
+        get :retrieve, params: retrieve_params
 
         expect(
           assigns[:lti_launch].params["custom_canvas_assignment_due_at"].to_datetime
         ).to eq due_at_diff
+      end
+
+      context "with the lti_resource_link_id_speedgrader_launches_reference_assignment feature flag off" do
+        before { account.disable_feature!(:lti_resource_link_id_speedgrader_launches_reference_assignment) }
+
+        it "uses the resource_link_id of the course and title of the tool" do
+          user_session(@user)
+          get :retrieve, params: retrieve_params
+          expect(launch_resource_link_id).to eq opaque_id(@course)
+          expect(launch_resource_link_title).to eq tool.name
+        end
+      end
+
+      context "with the lti_resource_link_id_speedgrader_launches_reference_assignment feature flag on" do
+        before { account.enable_feature!(:lti_resource_link_id_speedgrader_launches_reference_assignment) }
+
+        it "uses the resource_link_id and resource_link_title of the assignment" do
+          user_session(@student)
+          get :retrieve, params: retrieve_params
+          expect(launch_resource_link_id).to eq assignment.lti_resource_link_id
+          expect(launch_resource_link_title).to eq assignment.title
+        end
+
+        context "when launching as a student" do
+          it "uses the resource_link_id and resource_link_title of the assignment" do
+            user_session(@student)
+            get :retrieve, params: retrieve_params
+            expect(launch_resource_link_id).to eq assignment.lti_resource_link_id
+            expect(launch_resource_link_title).to eq assignment.title
+          end
+        end
+      end
+
+      context "when launching as a student but the assigment is unpublished" do
+        it "returns a 401" do
+          user_session(@student)
+          assignment.update! workflow_state: "unpublished"
+          get :retrieve, params: retrieve_params
+          expect(response).to have_http_status(:unauthorized)
+        end
       end
     end
   end
@@ -1725,7 +1816,7 @@ describe ExternalToolsController do
               deep_link_return_url = launch_params["https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings"]["deep_link_return_url"]
               return_jwt = deep_link_return_url.match(/data=([^&]*)/)[1]
               jwt = JSON::JWT.decode(return_jwt, :skip_verification)
-              expect(jwt[:parent_frame_context]).to be == tool.id.to_s
+              expect(jwt[:parent_frame_context]).to eq tool.id.to_s
               expect(response).to be_successful
             end
 
@@ -2508,8 +2599,7 @@ describe ExternalToolsController do
       let(:domain) { "www.example-beta.com" }
 
       before do
-        allow(ApplicationController).to receive(:test_cluster?).and_return(true)
-        allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
+        allow(ApplicationController).to receive_messages(test_cluster?: true, test_cluster_name: "beta")
         Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
         user_session(account_admin_user)
 

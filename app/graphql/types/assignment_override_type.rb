@@ -50,12 +50,13 @@ module Types
 
     description "Objects that can be assigned overridden dates"
 
-    possible_types SectionType, GroupType, AdhocStudentsType, NoopType
+    possible_types SectionType, GroupType, AdhocStudentsType, NoopType, CourseType
 
     def self.resolve_type(obj, _)
       case obj
       when CourseSection then SectionType
       when Group then GroupType
+      when Course then CourseType
       when Noop then NoopType
       when AssignmentOverride then AdhocStudentsType
       end

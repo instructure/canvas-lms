@@ -21,6 +21,7 @@
 class AccountReport < ActiveRecord::Base
   include Workflow
   include LocaleSelection
+  include CaptureJobIds
 
   belongs_to :account, inverse_of: :account_reports
   belongs_to :user, inverse_of: :account_reports
@@ -69,7 +70,12 @@ class AccountReport < ActiveRecord::Base
   alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = "deleted"
-    save!
+    result = save!
+    if saved_change_to_workflow_state?
+      abort_incomplete_runners
+      delay.delete_account_report_rows
+    end
+    result
   end
 
   def self.delete_old_rows_and_runners
@@ -101,12 +107,12 @@ class AccountReport < ActiveRecord::Base
     created? || running?
   end
 
-  def run_report(type = nil)
+  def run_report(type = nil, attempt: 1)
     parameters["locale"] = infer_locale(user:, root_account: account)
     self.report_type ||= type
     if AccountReport.available_reports[self.report_type]
       begin
-        AccountReports.generate_report(self)
+        AccountReports.generate_report(self, attempt:)
       rescue
         mark_as_errored
       end
@@ -135,5 +141,9 @@ class AccountReport < ActiveRecord::Base
   def self.available_reports
     # check if there is a reports plugin for this account
     AccountReports.available_reports
+  end
+
+  def abort_incomplete_runners
+    account_report_runners.incomplete.in_batches.update_all(workflow_state: "aborted", updated_at: Time.now.utc)
   end
 end

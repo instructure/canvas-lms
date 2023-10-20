@@ -22,7 +22,7 @@ let el
 
 beforeEach(() => {
   el = document.createElement('img')
-  el.setAttribute('src', '/file.txt')
+  el.setAttribute('src', '/file.png')
 })
 
 describe('test', () => {
@@ -44,13 +44,24 @@ describe('test', () => {
     expect(rule.test(el)).toBeTruthy()
   })
 
-  test('returns false if alt text is filename', () => {
-    el.setAttribute('alt', 'file.txt')
-    expect(rule.test(el)).toBeFalsy()
+  test('returns false if alt text is an image filename', () => {
+    const imageFileExtensions = ['jpg', 'jpeg', 'png', 'gif', 'svg', 'bmp', 'webp']
+    imageFileExtensions.forEach(fileExtension => {
+      el.setAttribute('alt', `file.${fileExtension}`)
+      expect(rule.test(el)).toBeFalsy()
+
+      el.setAttribute('alt', `FILE.${fileExtension.toUpperCase()}`)
+      expect(rule.test(el)).toBeFalsy()
+    })
+  })
+
+  test('returns true if alt text is formatted as filename but has no image extension', () => {
+    el.setAttribute('alt', 'file.test')
+    expect(rule.test(el)).toBeTruthy()
   })
 
   test('returns false if alt text is filename with blank spaces', () => {
-    el.setAttribute('alt', 'file with blank.txt')
+    el.setAttribute('alt', 'file with blank.png')
     expect(rule.test(el)).toBeFalsy()
   })
 })
@@ -98,7 +109,7 @@ describe('update', () => {
 
   test('changes alt text if not decorative', () => {
     const text = 'this is my text'
-    el.setAttribute('alt', 'thisismy.txt')
+    el.setAttribute('alt', 'thisismy.png')
     expect(rule.update(el, {alt: text, decorative: false}).getAttribute('alt')).toBe(text)
   })
 

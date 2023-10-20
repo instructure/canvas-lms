@@ -59,9 +59,7 @@ RSpec.describe ApplicationController do
 
         expect(GoogleDrive::Connection).to receive(:new).with("real_current_user_token", "real_current_user_secret", 30)
 
-        Setting.skip_cache do
-          controller.send(:google_drive_connection)
-        end
+        controller.send(:google_drive_connection)
       end
 
       it "uses @current_user second" do
@@ -74,9 +72,7 @@ RSpec.describe ApplicationController do
         expect(Rails.cache).to receive(:fetch).with(["google_drive_tokens", mock_current_user].cache_key).and_return(["current_user_token", "current_user_secret"])
 
         expect(GoogleDrive::Connection).to receive(:new).with("current_user_token", "current_user_secret", 30)
-        Setting.skip_cache do
-          controller.send(:google_drive_connection)
-        end
+        controller.send(:google_drive_connection)
       end
 
       it "queries user services if token isn't in the cache" do
@@ -91,9 +87,7 @@ RSpec.describe ApplicationController do
         expect(mock_user_services).to receive(:where).with(service: "google_drive").and_return(double(first: double(token: "user_service_token", secret: "user_service_secret")))
 
         expect(GoogleDrive::Connection).to receive(:new).with("user_service_token", "user_service_secret", 30)
-        Setting.skip_cache do
-          controller.send(:google_drive_connection)
-        end
+        controller.send(:google_drive_connection)
       end
 
       it "uses the session values if no users are set" do
@@ -221,10 +215,10 @@ RSpec.describe ApplicationController do
           expect(controller.js_env[:DIRECT_SHARE_ENABLED]).to be_falsey
         end
 
-        describe "with manage_content permission disabled" do
+        describe "with manage_course_content_add permission disabled" do
           before do
             course_with_teacher(active_all: true, user: @teacher)
-            RoleOverride.create!(context: @course.account, permission: "manage_content", role: teacher_role, enabled: false)
+            RoleOverride.create!(context: @course.account, permission: "manage_course_content_add", role: teacher_role, enabled: false)
           end
 
           it "sets the env var to false if the course is active" do
@@ -323,7 +317,7 @@ RSpec.describe ApplicationController do
       end
 
       it "gets appropriate settings from the root account" do
-        root_account = double(global_id: 1, feature_enabled?: false, open_registration?: true, settings: {}, cache_key: "key")
+        root_account = double(global_id: 1, id: 1, feature_enabled?: false, open_registration?: true, settings: {}, cache_key: "key", uuid: "bleh", salesforce_id: "blah")
         allow(root_account).to receive(:kill_joy?).and_return(false)
         allow(HostUrl).to receive_messages(file_host: "files.example.com")
         controller.instance_variable_set(:@domain_root_account, root_account)
@@ -332,7 +326,7 @@ RSpec.describe ApplicationController do
       end
 
       it "disables fun when set" do
-        root_account = double(global_id: 1, feature_enabled?: false, open_registration?: true, settings: {}, cache_key: "key")
+        root_account = double(global_id: 1, id: 1, feature_enabled?: false, open_registration?: true, settings: {}, cache_key: "key", uuid: "blah", salesforce_id: "bleh")
         allow(root_account).to receive(:kill_joy?).and_return(true)
         allow(HostUrl).to receive_messages(file_host: "files.example.com")
         controller.instance_variable_set(:@domain_root_account, root_account)
@@ -478,21 +472,63 @@ RSpec.describe ApplicationController do
         end
 
         it "loads gateway uri from dynamic settings" do
-          allow(DynamicSettings).to receive(:find).and_return({
-                                                                "api_gateway_enabled" => "true",
-                                                                "api_gateway_uri" => "http://the-gateway/graphql"
-                                                              })
+          allow(DynamicSettings).to receive(:find).and_return(DynamicSettings::FallbackProxy.new(
+                                                                {
+                                                                  "api_gateway_enabled" => "true",
+                                                                  "api_gateway_uri" => "http://the-gateway/graphql"
+                                                                }
+                                                              ))
           jsenv = controller.js_env({})
           expect(jsenv[:API_GATEWAY_URI]).to eq("http://the-gateway/graphql")
         end
 
         it "will not expose gateway uri from dynamic settings if not enabled" do
-          allow(DynamicSettings).to receive(:find).and_return({
-                                                                "api_gateway_enabled" => "false",
-                                                                "api_gateway_uri" => "http://the-gateway/graphql"
-                                                              })
+          allow(DynamicSettings).to receive(:find).and_return(DynamicSettings::FallbackProxy.new(
+                                                                {
+                                                                  "api_gateway_enabled" => "false",
+                                                                  "api_gateway_uri" => "http://the-gateway/graphql"
+                                                                }
+                                                              ))
           jsenv = controller.js_env({})
           expect(jsenv[:API_GATEWAY_URI]).to be_nil
+        end
+      end
+
+      context "ACCOUNT_ID" do
+        before :once do
+          @subaccount = Account.default.sub_accounts.create!
+        end
+
+        it "is the account id in account context" do
+          controller.instance_variable_set :@context, @subaccount
+          expect(controller.js_env[:ACCOUNT_ID]).to eq @subaccount.id
+        end
+
+        it "is the course's subaccount id in course context" do
+          course_factory(account: @subaccount)
+          controller.instance_variable_set :@context, @course
+          allow(controller).to receive(:polymorphic_url).and_return("/dummy")
+          expect(controller.js_env[:ACCOUNT_ID]).to eq @subaccount.id
+        end
+
+        it "is the group's account id in account group context" do
+          group = @subaccount.groups.create!
+          controller.instance_variable_set :@context, group
+          expect(controller.js_env[:ACCOUNT_ID]).to eq @subaccount.id
+        end
+
+        it "is the group's course's subaccount id in course group context" do
+          course_factory(account: @subaccount)
+          group = @course.groups.create!
+          controller.instance_variable_set :@context, group
+          expect(controller.js_env[:ACCOUNT_ID]).to eq @subaccount.id
+        end
+
+        it "is the domain root account id in user context" do
+          user_factory
+          controller.instance_variable_set :@context, @user
+          controller.instance_variable_set :@domain_root_account, Account.default
+          expect(controller.js_env[:ACCOUNT_ID]).to eq Account.default.id
         end
       end
     end
@@ -628,8 +664,7 @@ RSpec.describe ApplicationController do
         @pseudonym.update_attribute(:sis_user_id, "test1")
         controller.instance_variable_set(:@domain_root_account, Account.default)
         allow(controller).to receive(:named_context_url).with(@user, :context_url).and_return("")
-        allow(controller).to receive(:params).and_return({ user_id: "sis_user_id:test1" })
-        allow(controller).to receive(:api_request?).and_return(true)
+        allow(controller).to receive_messages(params: { user_id: "sis_user_id:test1" }, api_request?: true)
         controller.send(:get_context)
         expect(controller.instance_variable_get(:@context)).to eq @user
       end
@@ -640,8 +675,7 @@ RSpec.describe ApplicationController do
         @section.update_attribute(:sis_source_id, "test1")
         controller.instance_variable_set(:@domain_root_account, Account.default)
         allow(controller).to receive(:named_context_url).with(@section, :context_url).and_return("")
-        allow(controller).to receive(:params).and_return({ course_section_id: "sis_section_id:test1" })
-        allow(controller).to receive(:api_request?).and_return(true)
+        allow(controller).to receive_messages(params: { course_section_id: "sis_section_id:test1" }, api_request?: true)
         controller.send(:get_context)
         expect(controller.instance_variable_get(:@context)).to eq @section
       end
@@ -660,10 +694,7 @@ RSpec.describe ApplicationController do
         expect(I18n.locale.to_s).to eq "es"
         course_model(locale: "ru")
         allow(controller).to receive(:named_context_url).with(@course, :context_url).and_return("")
-        allow(controller).to receive(:params).and_return({ course_id: @course.id })
-        allow(controller).to receive(:api_request?).and_return(false)
-        allow(controller).to receive(:session).and_return({})
-        allow(controller).to receive(:js_env).and_return({})
+        allow(controller).to receive_messages(params: { course_id: @course.id }, api_request?: false, session: {}, js_env: {})
         controller.send(:get_context)
         expect(controller.instance_variable_get(:@context)).to eq @course
         I18n.set_locale_with_localizer # this is what t() triggers
@@ -783,8 +814,7 @@ RSpec.describe ApplicationController do
       end
 
       it "updates for HTTP PUT requests that are not generated by hand" do
-        allow(controller.request).to receive(:xhr?).and_return(0)
-        allow(controller.request).to receive(:put?).and_return(true)
+        allow(controller.request).to receive_messages(xhr?: 0, put?: true)
         allow(RequestContextGenerator).to receive(:store_interaction_seconds_update).and_return(true)
         allow(CanvasSecurity::PageViewJwt).to receive(:decode).and_return(page_view_info)
         allow(PageView).to receive(:find_for_update).and_return(page_view)
@@ -806,14 +836,13 @@ RSpec.describe ApplicationController do
           allow(Canvas::Errors::Info).to receive(:useful_http_env_stuff_from_request).and_return({})
 
           req = double
-          allow(req).to receive(:url).and_return("url")
-          allow(req).to receive(:headers).and_return({})
-          allow(req).to receive(:authorization).and_return(nil)
-          allow(req).to receive(:request_method_symbol).and_return(:get)
-          allow(req).to receive(:format).and_return("format")
+          allow(req).to receive_messages(url: "url",
+                                         headers: {},
+                                         authorization: nil,
+                                         request_method_symbol: :get,
+                                         format: "format")
 
-          allow(controller).to receive(:request).and_return(req)
-          allow(controller).to receive(:api_request?).and_return(false)
+          allow(controller).to receive_messages(request: req, api_request?: false)
           allow(controller).to receive(:render_rescue_action)
 
           controller.instance_variable_set(:@domain_root_account, @account)
@@ -854,7 +883,7 @@ RSpec.describe ApplicationController do
 
         before do
           controller.instance_variable_set(:@context, course)
-          allow(course).to receive(:grants_right?).and_return true
+          allow(course).to receive(:grants_any_right?).and_return true
         end
 
         it "redirects for an assignment" do
@@ -1055,10 +1084,10 @@ RSpec.describe ApplicationController do
           let_once(:user) { user_model }
 
           before do
-            allow(controller).to receive(:named_context_url).and_return("wrong_url")
-            allow(controller).to receive(:lti_grade_passback_api_url).and_return("wrong_url")
-            allow(controller).to receive(:blti_legacy_grade_passback_api_url).and_return("wrong_url")
-            allow(controller).to receive(:lti_turnitin_outcomes_placement_url).and_return("wrong_url")
+            allow(controller).to receive_messages(named_context_url: "wrong_url",
+                                                  lti_grade_passback_api_url: "wrong_url",
+                                                  blti_legacy_grade_passback_api_url: "wrong_url",
+                                                  lti_turnitin_outcomes_placement_url: "wrong_url")
 
             allow(controller).to receive(:render)
             allow(controller).to receive_messages(js_env: [])
@@ -1224,9 +1253,9 @@ RSpec.describe ApplicationController do
             allow(content_tag.context).to receive(:quiz_lti?).and_return(true)
             allow(controller).to receive(:render)
             allow(controller).to receive(:lti_launch_params)
-            allow(controller).to receive(:require_user).and_return(true)
-            allow(controller).to receive(:named_context_url).and_return("named_context_url")
-            allow(controller).to receive(:polymorphic_url).and_return("host/quizzes")
+            allow(controller).to receive_messages(require_user: true,
+                                                  named_context_url: "named_context_url",
+                                                  polymorphic_url: "host/quizzes")
           end
 
           context "is set to homepage page when launched from homepage" do
@@ -1401,8 +1430,7 @@ RSpec.describe ApplicationController do
             controller.instance_variable_set(:@context, course)
             allow(content_tag).to receive(:id).and_return(42)
 
-            allow(ApplicationController).to receive(:test_cluster?).and_return(true)
-            allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
+            allow(ApplicationController).to receive_messages(test_cluster?: true, test_cluster_name: "beta")
             Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
 
             tool.settings[:environments] = {
@@ -1759,10 +1787,7 @@ RSpec.describe ApplicationController do
         # default setup is a protected non-GET non-API session-authenticated request with bogus tokens
         cookies = ActionDispatch::Cookies::CookieJar.new(controller.request)
         controller.allow_forgery_protection = true
-        allow(controller.request).to receive(:cookie_jar).and_return(cookies)
-        allow(controller.request).to receive(:get?).and_return(false)
-        allow(controller.request).to receive(:head?).and_return(false)
-        allow(controller.request).to receive(:path).and_return("/non-api/endpoint")
+        allow(controller.request).to receive_messages(cookie_jar: cookies, get?: false, head?: false, path: "/non-api/endpoint")
         controller.instance_variable_set(:@current_user, User.new)
         controller.instance_variable_set(:@pseudonym_session, "session-authenticated")
         controller.params[controller.request_forgery_protection_token] = "bogus"
@@ -2755,12 +2780,12 @@ describe CoursesController do
         user = user_model
         token = AccessToken.create!(user:, developer_key:, scopes: ["url:GET|/api/v1/accounts"])
         controller.instance_variable_set(:@access_token, token)
-        allow(controller).to receive(:request).and_return(double({
-                                                                   method: "GET",
-                                                                   path: "/api/v1/accounts"
-                                                                 }))
         params = { include: ["a"], includes: ["uuid", "b"] }
-        allow(controller).to receive(:params).and_return(params)
+        allow(controller).to receive_messages(request: double({
+                                                                method: "GET",
+                                                                path: "/api/v1/accounts"
+                                                              }),
+                                              params:)
         controller.send(:validate_scopes)
         expect(params).to eq(include: [], includes: ["uuid"])
       end
@@ -2773,12 +2798,12 @@ describe CoursesController do
         user = user_model
         token = AccessToken.create!(user:, developer_key:, scopes: ["url:GET|/api/v1/accounts"])
         controller.instance_variable_set(:@access_token, token)
-        allow(controller).to receive(:request).and_return(double({
-                                                                   method: "GET",
-                                                                   path: "/api/v1/accounts"
-                                                                 }))
         params = { include: ["a"], includes: ["uuid", "b"] }
-        allow(controller).to receive(:params).and_return(params)
+        allow(controller).to receive_messages(request: double({
+                                                                method: "GET",
+                                                                path: "/api/v1/accounts"
+                                                              }),
+                                              params:)
         controller.send(:validate_scopes)
         expect(params).to eq(include: ["a"], includes: ["uuid", "b"])
       end

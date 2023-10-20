@@ -17,6 +17,7 @@
  */
 
 import rule from '../small-text-contrast'
+import * as uid from '@instructure/uid'
 
 let el
 
@@ -54,6 +55,26 @@ describe('test', () => {
     expect(rule.test(elem)).toBe(true)
   })
 
+  test('returns true if the element has a background image', () => {
+    const elem = document.createElement('div')
+    elem.style.fontSize = '10px'
+    elem.style.backgroundColor = '#fff'
+    elem.style.color = '#000'
+    elem.textContent = 'hello'
+    elem.style.backgroundImage = 'url(http://example.com)'
+    expect(rule.test(elem)).toBe(true)
+  })
+
+  test('returns true if the element has a background gradient', () => {
+    const elem = document.createElement('div')
+    elem.style.fontSize = '10px'
+    elem.style.backgroundColor = '#fff'
+    elem.style.color = '#000'
+    elem.textContent = 'hello'
+    elem.style.background = 'linear-gradient(90deg, rgba(33,27,99,1) 70%, rgba(102,40,145,1) 100%)'
+    expect(rule.test(elem)).toBe(true)
+  })
+
   test('returns false if large text does not have high enough contrast', () => {
     const elem = document.createElement('div')
     elem.style.fontSize = '10px'
@@ -66,9 +87,11 @@ describe('test', () => {
 
 describe('data', () => {
   test('returns the color matching the elements existing color', () => {
-    el.style.color = 'blue'
+    uid.default = jest.fn(() => '123')
+    el.style.color = '#fff'
     expect(rule.data(el)).toEqual({
-      color: 'blue',
+      color: 'rgba(255, 255, 255, 1)',
+      id: '123',
     })
   })
 })

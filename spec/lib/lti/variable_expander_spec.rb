@@ -37,20 +37,20 @@ module Lti
     let(:substitution_helper) { double.as_null_object }
     let(:right_now) { DateTime.now }
     let(:tool) do
-      m = double("tool")
-      allow(m).to receive(:id).and_return(1)
-      allow(m).to receive(:context).and_return(root_account)
-      allow(m).to receive(:extension_setting).with(nil, :prefer_sis_email).and_return(nil)
-      allow(m).to receive(:extension_setting).with(:tool_configuration, :prefer_sis_email).and_return(nil)
-      allow(m).to receive(:include_email?).and_return(true)
-      allow(m).to receive(:include_name?).and_return(true)
-      allow(m).to receive(:public?).and_return(true)
       shard_mock = double("shard")
       allow(shard_mock).to receive(:settings).and_return({ encription_key: "abc" })
-      allow(m).to receive(:shard).and_return(shard_mock)
-      allow(m).to receive(:opaque_identifier_for).and_return("6cd2e0d65bd5aef3b5ee56a64bdcd595e447bc8f")
-      allow(m).to receive(:use_1_3?).and_return(false)
-      allow(m).to receive(:launch_url).and_return("http://example.com/launch")
+      m = double("tool")
+      allow(m).to receive_messages(id: 1,
+                                   context: root_account,
+                                   include_email?: true,
+                                   include_name?: true,
+                                   public?: true,
+                                   shard: shard_mock,
+                                   opaque_identifier_for: "6cd2e0d65bd5aef3b5ee56a64bdcd595e447bc8f",
+                                   use_1_3?: false,
+                                   launch_url: "http://example.com/launch")
+      allow(m).to receive(:extension_setting).with(nil, :prefer_sis_email).and_return(nil)
+      allow(m).to receive(:extension_setting).with(:tool_configuration, :prefer_sis_email).and_return(nil)
       m
     end
     let(:available_canvas_resources) do
@@ -62,31 +62,25 @@ module Lti
 
     let(:controller) do
       request_mock = double("request")
-      allow(request_mock).to receive(:url).and_return("https://localhost")
-      allow(request_mock).to receive(:host_with_port).and_return("https://localhost")
-      allow(request_mock).to receive(:host).and_return("/my/url")
-      allow(request_mock).to receive(:scheme).and_return("https")
-      allow(request_mock).to receive(:parameters).and_return(
-        {
-          com_instructure_course_accept_canvas_resource_types: ["page", "module"],
-          com_instructure_course_canvas_resource_type: "page",
-          com_instructure_course_allow_canvas_resource_selection: "true",
-          com_instructure_course_available_canvas_resources: available_canvas_resources
-        }.with_indifferent_access
-      )
+      allow(request_mock).to receive_messages(url: "https://localhost", host_with_port: "https://localhost", host: "/my/url", scheme: "https", parameters: {
+        com_instructure_course_accept_canvas_resource_types: ["page", "module"],
+        com_instructure_course_canvas_resource_type: "page",
+        com_instructure_course_allow_canvas_resource_selection: "true",
+        com_instructure_course_available_canvas_resources: available_canvas_resources
+      }.with_indifferent_access)
+      view_context_mock = double("view_context")
       m = double("controller")
       allow(m).to receive(:css_url_for).with(:common).and_return("/path/to/common.scss")
-      allow(m).to receive(:request).and_return(request_mock)
-      allow(m).to receive(:logged_in_user).and_return(user)
-      allow(m).to receive(:named_context_url).and_return("url")
-      allow(m).to receive(:active_brand_config_url).with("json").and_return("http://example.com/brand_config.json")
-      allow(m).to receive(:active_brand_config_url).with("js").and_return("http://example.com/brand_config.js")
-      allow(m).to receive(:active_brand_config).and_return(double(to_json: '{"ic-brand-primary-darkened-5":"#0087D7"}'))
-      allow(m).to receive(:polymorphic_url).and_return("url")
-      view_context_mock = double("view_context")
       allow(view_context_mock).to receive(:stylesheet_path)
         .and_return(URI.parse(request_mock.url).merge(m.css_url_for(:common)).to_s)
-      allow(m).to receive(:view_context).and_return(view_context_mock)
+      allow(m).to receive_messages(request: request_mock,
+                                   logged_in_user: user,
+                                   named_context_url: "url",
+                                   active_brand_config: double(to_json: '{"ic-brand-primary-darkened-5":"#0087D7"}'),
+                                   polymorphic_url: "url",
+                                   view_context: view_context_mock)
+      allow(m).to receive(:active_brand_config_url).with("json").and_return("http://example.com/brand_config.json")
+      allow(m).to receive(:active_brand_config_url).with("js").and_return("http://example.com/brand_config.js")
       m
     end
     let(:attachment) { attachment_model }
@@ -462,10 +456,24 @@ module Lti
         end
       end
 
+      describe "with 'com.instructure.Context.globalId'" do
+        let(:exp_hash) { { test: "$com.instructure.Context.globalId" } }
+
+        context "when the launch context is present" do
+          let(:course) { course_model }
+          let(:variable_expander_opts) { super().merge(context: course) }
+
+          it "yields the global ID of the context" do
+            variable_expander.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq course.global_id
+          end
+        end
+      end
+
       context "$com.instructure.Assignment.restrict_quantitative_data" do
         let(:exp_hash) { { test: "$com.instructure.Assignment.restrict_quantitative_data" } }
 
-        it "is false if restrict_quantitative_data is falsy for current user" do
+        it "is `false` if restrict_quantitative_data is falsy for current user" do
           course.save!
           managed_pseudonym(user, account: root_account, username: "login_id", sis_user_id: "sis id!")
           login = managed_pseudonym(user, account: root_account, username: "login_id2", sis_user_id: "sis id2!")
@@ -482,10 +490,30 @@ module Lti
           )
 
           variable_expander.expand_variables!(exp_hash)
-          expect(exp_hash[:test]).to be false
+          expect(exp_hash[:test]).to eq "false"
         end
 
-        it "is true if restrict_quantitative_data is truthy for current user" do
+        it "is the variable's default name if assignment is nil" do
+          course.save!
+          managed_pseudonym(user, account: root_account, username: "login_id", sis_user_id: "sis id!")
+          login = managed_pseudonym(user, account: root_account, username: "login_id2", sis_user_id: "sis id2!")
+          course.enroll_user(user, "StudentEnrollment", sis_pseudonym_id: login.id, enrollment_state: "active")
+          my_assignment = nil
+
+          variable_expander = VariableExpander.new(
+            root_account,
+            course,
+            controller,
+            current_user: user,
+            tool:,
+            assignment: my_assignment
+          )
+
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq "$com.instructure.Assignment.restrict_quantitative_data"
+        end
+
+        it "is `true` if restrict_quantitative_data is truthy for current user" do
           # truthy feature flag
           Account.default.enable_feature! :restrict_quantitative_data
 
@@ -509,7 +537,7 @@ module Lti
           )
 
           variable_expander.expand_variables!(exp_hash)
-          expect(exp_hash[:test]).to be true
+          expect(exp_hash[:test]).to eq "true"
         end
       end
 
@@ -531,7 +559,7 @@ module Lti
           )
 
           variable_expander.expand_variables!(exp_hash)
-          expect(exp_hash[:test]).to eq [["A", 90], ["B", 80], ["C", 70], ["D", 60], ["F", 0]]
+          expect(exp_hash[:test]).to eq "[{\"name\":\"A\",\"value\":90},{\"name\":\"B\",\"value\":80},{\"name\":\"C\",\"value\":70},{\"name\":\"D\",\"value\":60},{\"name\":\"F\",\"value\":0}]"
         end
 
         it "provides the default grading standard if no specific one is set" do
@@ -545,7 +573,7 @@ module Lti
           )
 
           variable_expander.expand_variables!(exp_hash)
-          expect(exp_hash[:test]).to eq [["A", 0.94], ["A-", 0.9], ["B+", 0.87], ["B", 0.84], ["B-", 0.8], ["C+", 0.77], ["C", 0.74], ["C-", 0.7], ["D+", 0.67], ["D", 0.64], ["D-", 0.61], ["F", 0.0]]
+          expect(exp_hash[:test]).to eq "[{\"name\":\"A\",\"value\":0.94},{\"name\":\"A-\",\"value\":0.9},{\"name\":\"B+\",\"value\":0.87},{\"name\":\"B\",\"value\":0.84},{\"name\":\"B-\",\"value\":0.8},{\"name\":\"C+\",\"value\":0.77},{\"name\":\"C\",\"value\":0.74},{\"name\":\"C-\",\"value\":0.7},{\"name\":\"D+\",\"value\":0.67},{\"name\":\"D\",\"value\":0.64},{\"name\":\"D-\",\"value\":0.61},{\"name\":\"F\",\"value\":0.0}]"
         end
       end
 
@@ -1551,6 +1579,27 @@ module Lti
           expect(exp_hash[:test]).to eq "2019-04-21 17:01:36"
         end
 
+        it "has a functioning guard for $Canvas.term.endAt when term.start_at is not set" do
+          term = course.enrollment_term
+          exp_hash = { test: "$Canvas.term.endAt" }
+          variable_expander.expand_variables!(exp_hash)
+
+          unless term&.end_at
+            expect(exp_hash[:test]).to eq "$Canvas.term.endAt"
+          end
+        end
+
+        it "has substitution for $Canvas.term.endAt when term.start_at is set" do
+          course.enrollment_term ||= EnrollmentTerm.new
+          term = course.enrollment_term
+
+          term.end_at = "2015-05-21 17:01:36"
+          term.save
+          exp_hash = { test: "$Canvas.term.endAt" }
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq "2015-05-21 17:01:36"
+        end
+
         it "has a functioning guard for $Canvas.term.name when term.name is not set" do
           term = course.enrollment_term
           exp_hash = { test: "$Canvas.term.name" }
@@ -2040,6 +2089,57 @@ module Lti
             expect(exp_hash[:test]).to eq "$Canvas.assignment.dueAt.iso8601"
           end
         end
+
+        describe "$Canvas.assignment.earliestEnrollmentDueAt.iso8601" do
+          before do
+            course.save!
+            user.save!
+            assignment.update!(course:)
+          end
+
+          context "student launch" do
+            before do
+              course.enroll_user(user, "StudentEnrollment")
+            end
+
+            it "expands to the due_at on the assignment (which will be the due date for the student)" do
+              exp_hash = { test: "$Canvas.assignment.earliestEnrollmentDueAt.iso8601" }
+              expect(assignment).to receive(:due_at).and_return(right_now)
+              variable_expander.expand_variables!(exp_hash)
+              expect(exp_hash[:test]).to eq right_now.utc.iso8601
+            end
+
+            it "expands to an empty string if there is no due date for the student" do
+              course.enroll_user(user, "StudentEnrollment")
+              exp_hash = { test: "$Canvas.assignment.earliestEnrollmentDueAt.iso8601" }
+              variable_expander.expand_variables!(exp_hash)
+              expect(exp_hash[:test]).to eq ""
+            end
+          end
+
+          context "teacher launch" do
+            before do
+              course.enroll_user(user, "TeacherEnrollment")
+              course.enroll_user(User.create!, "StudentEnrollment")
+              course.enroll_user(User.create!, "StudentEnrollment")
+            end
+
+            it "expands to earliest due date of many sections" do
+              subm1, subm2 = assignment.submissions.to_a
+              subm1.update! cached_due_date: "2090-01-01T00:00:00Z"
+              subm2.update! cached_due_date: "2090-01-02T00:00:00Z"
+              exp_hash = { test: "$Canvas.assignment.earliestEnrollmentDueAt.iso8601" }
+              variable_expander.expand_variables!(exp_hash)
+              expect(exp_hash[:test]).to eq "2090-01-01T00:00:00Z"
+            end
+
+            it "expands to an empty string if there are no due dates for any student" do
+              exp_hash = { test: "$Canvas.assignment.earliestEnrollmentDueAt.iso8601" }
+              variable_expander.expand_variables!(exp_hash)
+              expect(exp_hash[:test]).to eq ""
+            end
+          end
+        end
       end
 
       context "user is not logged in" do
@@ -2176,6 +2276,14 @@ module Lti
           exp_hash = { test: "$Canvas.user.isRootAccountAdmin" }
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to be true
+        end
+
+        it "has substitution for $Canvas.user.adminableAccounts" do
+          allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
+          allow(substitution_helper).to receive(:adminable_account_ids_recursive_truncated).and_return("123,456")
+          exp_hash = { test: "$Canvas.user.adminableAccounts" }
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq "123,456"
         end
 
         it "has substitution for $Canvas.xuser.allRoles" do

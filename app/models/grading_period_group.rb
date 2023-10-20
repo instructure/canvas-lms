@@ -99,8 +99,8 @@ class GradingPeriodGroup < ActiveRecord::Base
   end
 
   def recache_grading_period
-    DueDateCacher.recompute_course(course) if course
-    DueDateCacher.recompute_course(course_id_before_last_save) if course_id_before_last_save
+    SubmissionLifecycleManager.recompute_course(course) if course
+    SubmissionLifecycleManager.recompute_course(course_id_before_last_save) if course_id_before_last_save
   end
 
   def associated_with_course_or_root_account
@@ -136,7 +136,7 @@ class GradingPeriodGroup < ActiveRecord::Base
     # Legacy Grading Period support. Grading Periods can no longer have a course_id.
     if course_id.present?
       course.recompute_student_scores(update_all_grading_period_scores: true, run_immediately: true)
-      DueDateCacher.recompute_course(course, run_immediately: true, executing_user: updating_user)
+      SubmissionLifecycleManager.recompute_course(course, run_immediately: true, executing_user: updating_user)
     else
       term_ids = enrollment_terms.pluck(:id)
       update_in_batches(enrollment_terms, grading_period_group_id: nil)

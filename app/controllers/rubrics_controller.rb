@@ -35,7 +35,8 @@ class RubricsController < ApplicationController
              manage_outcomes: @context.grants_right?(@current_user, session, :manage_outcomes),
              manage_rubrics: @context.grants_right?(@current_user, session, :manage_rubrics)
            },
-           NON_SCORING_RUBRICS: @domain_root_account.feature_enabled?(:non_scoring_rubrics)
+           NON_SCORING_RUBRICS: @domain_root_account.feature_enabled?(:non_scoring_rubrics),
+           OUTCOMES_NEW_DECAYING_AVERAGE_CALCULATION: @domain_root_account.feature_enabled?(:outcomes_new_decaying_average_calculation)
 
     mastery_scales_js_env
     set_tutorial_js_env
@@ -54,7 +55,8 @@ class RubricsController < ApplicationController
       js_env ROOT_OUTCOME_GROUP: get_root_outcome,
              PERMISSIONS: {
                manage_rubrics: @context.grants_right?(@current_user, session, :manage_rubrics)
-             }
+             },
+             OUTCOMES_NEW_DECAYING_AVERAGE_CALCULATION: @domain_root_account.feature_enabled?(:outcomes_new_decaying_average_calculation)
       mastery_scales_js_env
       @rubric_association = @context.rubric_associations.bookmarked.find_by(rubric_id: params[:id])
       raise ActiveRecord::RecordNotFound unless @rubric_association

@@ -31,6 +31,7 @@ class GradebookExporter
     grading_standard: ["Current Grade", "Unposted Current Grade", "Final Grade", "Unposted Final Grade"].freeze,
     override_score: ["Override Score"].freeze,
     override_grade: ["Override Grade"].freeze,
+    override_status: ["Override Status"].freeze,
     points: ["Current Points", "Final Points"].freeze,
     total_scores: ["Current Score", "Unposted Current Score", "Final Score", "Unposted Final Score"].freeze
   }.freeze
@@ -164,6 +165,7 @@ class GradebookExporter
         if include_final_grade_override?
           header.concat(buffer_column_headers(:override_score))
           header.concat(buffer_column_headers(:override_grade)) if @course.grading_standard_enabled?
+          header.concat(buffer_column_headers(:override_status)) if custom_statuses_enabled?
         end
       end
       csv << header
@@ -193,12 +195,13 @@ class GradebookExporter
           row.concat([nil] * group_filler_length)
           row.concat(buffer_columns(:points)) if include_points?
           row.concat(buffer_columns(:total_scores))
-        end
 
-        row.concat(buffer_columns(:grading_standard)) if @course.grading_standard_enabled?
-        if include_final_grade_override?
-          row.concat(buffer_columns(:override_score))
-          row.concat(buffer_columns(:override_grade)) if @course.grading_standard_enabled?
+          row.concat(buffer_columns(:grading_standard)) if @course.grading_standard_enabled?
+          if include_final_grade_override?
+            row.concat(buffer_columns(:override_score))
+            row.concat(buffer_columns(:override_grade)) if @course.grading_standard_enabled?
+            row.concat(buffer_columns(:override_status)) if custom_statuses_enabled?
+          end
         end
 
         lengths_match = header.length == row.length
@@ -233,6 +236,7 @@ class GradebookExporter
 
           # Override Grade is always read-only
           row.concat(buffer_columns(:override_grade, read_only)) if @course.grading_standard_enabled?
+          row.concat(buffer_columns(:override_status)) if custom_statuses_enabled?
         end
       end
 
@@ -405,18 +409,24 @@ class GradebookExporter
     end
 
     if include_final_grade_override?
-      result << student_enrollment.override_score(score_opts)
-      result << student_enrollment.override_grade(score_opts) if @course.grading_standard_enabled?
+      score = student_enrollment.find_score(score_opts)
+      result << student_enrollment.override_score(score:)
+      result << student_enrollment.override_grade(score:) if @course.grading_standard_enabled?
+      result << custom_status(score) if custom_statuses_enabled?
     end
 
     result
   end
 
   def show_totals?
-    return false if !@options[:current_view] && @course.grading_periods?
+    # show totals if the course is not using grading periods
     return true unless @course.grading_periods?
-    return true if @options[:grading_period_id].try(:to_i) != 0
 
+    # show totals if we're exporting the gradebook for a specific grading period
+    return true if filter_by_grading_period?
+
+    # otherwise, show or hide totals based on the "Display Totals for All Grading
+    # Periods" option.
     @course.display_totals_for_all_grading_periods?
   end
 
@@ -435,9 +445,14 @@ class GradebookExporter
 
     @grading_period = nil
     # grading_period_id == 0 means no grading period selected
-    if @options[:grading_period_id].to_i != 0
+    if filter_by_grading_period?
       @grading_period = GradingPeriod.for(@course).find_by(id: @options[:grading_period_id])
     end
+  end
+
+  def filter_by_grading_period?
+    gp_id = @options[:grading_period_id]
+    @options[:current_view].present? && gp_id.present? && gp_id.to_i != 0
   end
 
   def custom_gradebook_columns
@@ -477,5 +492,19 @@ class GradebookExporter
     else
       "Manual Posting"
     end
+  end
+
+  def custom_status(score)
+    score&.custom_grade_status_id && custom_statuses[score.custom_grade_status_id]
+  end
+
+  def custom_statuses
+    @custom_statuses ||= @course.custom_grade_statuses.pluck(:id, :name).to_h
+  end
+
+  def custom_statuses_enabled?
+    return @custom_statuses_enabled if defined?(@custom_statuses_enabled)
+
+    @custom_statuses_enabled = Account.site_admin.feature_enabled?(:custom_gradebook_statuses)
   end
 end

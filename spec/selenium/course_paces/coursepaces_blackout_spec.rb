@@ -158,7 +158,7 @@ describe "course pace page" do
       expect(blackout_dates_modal_exists?).to be_falsey
     end
 
-    it "shows the blackout date in unpublished changes tray", ignore_js_errors: true do
+    it "shows the blackout date in unpublished changes tray", :ignore_js_errors do
       visit_course_paces_page
 
       click_settings_button

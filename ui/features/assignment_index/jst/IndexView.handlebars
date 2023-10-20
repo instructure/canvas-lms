@@ -31,11 +31,13 @@
       <label for="search_term" class="screenreader-only">
         {{#t "search_for_assignment"}}Search for Assignment{{/t}}
       </label>
+      <span id="search_input_container"></span>
       <input
         class="ic-Input"
         id="search_term"
+        type="hidden"
         name="search_term"
-        type="search"
+        data-view="inputFilter"
         value=""
         disabled
         placeholder="{{#t "search_for_assignment"}}Search for Assignment{{/t}}"

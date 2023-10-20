@@ -56,7 +56,7 @@ module CourseSyllabusPage
 
   #------------------------------ Elements ------------------------------
   def edit_syllabus_button
-    f("a.edit_syllabus_link")
+    f("button.edit_syllabus_link")
   end
 
   def show_course_summary_input

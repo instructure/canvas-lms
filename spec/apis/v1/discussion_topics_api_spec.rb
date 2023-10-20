@@ -1709,7 +1709,7 @@ describe DiscussionTopicsController, type: :request do
         @assignment = @topic.context.assignments.build(points_possible: 50)
         @topic.assignment = @assignment
         @topic.save!
-        account_admin_user_with_role_changes(role_changes: { manage_assignments: false })
+        account_admin_user_with_role_changes(role_changes: RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS.index_with(false))
         api_call(:put,
                  "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
                  { controller: "discussion_topics", action: "update", format: "json", course_id: @course.to_param, topic_id: @topic.to_param },
@@ -2057,6 +2057,16 @@ describe DiscussionTopicsController, type: :request do
     end
   end
 
+  it "paginates by the per_page" do
+    100.times { |i| @course.discussion_topics.create!(title: i.to_s, message: i.to_s) }
+    expect(@course.discussion_topics.count).to eq 100
+    json = api_call(:get,
+                    "/api/v1/courses/#{@course.id}/discussion_topics.json?per_page=90",
+                    { controller: "discussion_topics", action: "index", format: "json", course_id: @course.id.to_s, per_page: "90" })
+
+    expect(json.length).to eq 90
+  end
+
   it "paginates and return proper pagination headers for courses" do
     7.times { |i| @course.discussion_topics.create!(title: i.to_s, message: i.to_s) }
     expect(@course.discussion_topics.count).to eq 7
@@ -2162,6 +2172,89 @@ describe DiscussionTopicsController, type: :request do
       "anonymous_state" => nil
     }
     expect(json.sort.to_h).to eq expected.sort.to_h
+  end
+
+  it "works with account groups" do
+    @sub_account = Account.default.sub_accounts.create!
+    @group = @sub_account.groups.create! name: "Account group"
+    @group.add_user(@user)
+
+    announcement = @group.announcements.create!(
+      title: "Group Announcement",
+      message: "Group",
+      user: @user
+    )
+    json = api_call(
+      :get,
+      "/api/v1/groups/#{@group.id}/discussion_topics?only_announcements=true&per_page=40&page=1&filter_by=all&no_avatar_fallback=1",
+      {
+        controller: "discussion_topics",
+        action: "index",
+        format: "json",
+        group_id: @group.id.to_s,
+        only_announcements: "true",
+        per_page: 40,
+        page: 1,
+        filter_by: "all",
+        no_avatar_fallback: 1,
+      }
+    ).first
+
+    expected_response = {
+      "allow_rating" => false,
+      "anonymous_state" => nil,
+      "assignment_id" => nil,
+      "attachments" => [],
+      "author" => user_display_json(announcement.user, announcement.context).stringify_keys!,
+      "can_group" => false,
+      "can_lock" => true,
+      "can_unpublish" => false,
+      "comments_disabled" => false,
+      "created_at" => announcement.created_at.iso8601,
+      "delayed_post_at" => nil,
+      "discussion_subentry_count" => 0,
+      "discussion_type" => "side_comment",
+      "group_category_id" => nil,
+      "group_topic_children" => [],
+      "html_url" => "http://www.example.com/groups/#{@group.id}/discussion_topics/#{announcement.id}",
+      "id" => announcement.id,
+      "is_announcement" => true,
+      "is_section_specific" => false,
+      "last_reply_at" => announcement.last_reply_at.as_json,
+      "lock_at" => nil,
+      "locked" => false,
+      "locked_for_user" => false,
+      "message" => "Group",
+      "only_graders_can_rate" => false,
+      "permissions" => {
+        "attach" => false,
+        "update" => true,
+        "reply" => true,
+        "delete" => true
+      },
+      "pinned" => false,
+      "podcast_has_student_posts" => false,
+      "podcast_url" => nil,
+      "position" => 1,
+      "posted_at" => announcement.posted_at.as_json,
+      "published" => true,
+      "read_state" => "read",
+      "require_initial_post" => nil,
+      "root_topic_id" => nil,
+      "sort_by_rating" => false,
+      "subscribed" => false,
+      "subscription_hold" => "topic_is_announcement",
+      "title" => "Group Announcement",
+      "todo_date" => nil,
+      "topic_children" => [],
+      "unread_count" => 0,
+      "url" => "http://www.example.com/groups/#{@group.id}/discussion_topics/#{announcement.id}",
+      "user_can_see_posts" => true,
+      "user_name" => @user.name
+    }
+
+    expect(response).to have_http_status(:ok)
+    expect(json.sort.to_h).to eq(expected_response)
   end
 
   it "paginates and return proper pagination headers for groups" do

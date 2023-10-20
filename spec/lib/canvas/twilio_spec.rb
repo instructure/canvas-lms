@@ -32,30 +32,27 @@ describe "Canvas::Twilio" do
              phone_number: number)
     end
 
-    lookups = double("Canvas::Twilio.client.lookups")
+    v2 = double("Canvas::Twilio.client.lookups.v2")
     # Expectations are matched last to first, so add our catch-all expectation before the number specific ones
-    allow(lookups).to receive(:phone_numbers).with(anything).and_return(
+    allow(v2).to receive(:phone_numbers).with(anything).and_return(
       make_phone_number_stub("anything", Canvas::Twilio::DEFAULT_COUNTRY)
     )
+    lookups = double("Canvas::Twilio.client.lookups", v2:)
+
     # Now add one expectation for each number+country mapping
     phone_number_countries.each do |number, country_code|
-      allow(lookups).to receive(:phone_numbers).with(number).and_return(
+      allow(v2).to receive(:phone_numbers).with(number).and_return(
         make_phone_number_stub(number.inspect, country_code)
       )
     end
 
     account = double("Canvas::Twilio.client.account")
-    allow(account).to receive(:incoming_phone_numbers).and_return(
-      double("Canvas::Twilio.client.api.account.client.incoming_phone_numbers",
-             stream: phone_number_objects)
-    )
-    allow(account).to receive(:messages).and_return(double)
+    allow(account).to receive_messages(incoming_phone_numbers: double("Canvas::Twilio.client.api.account.client.incoming_phone_numbers",
+                                                                      stream: phone_number_objects),
+                                       messages: double)
 
     client = double("Canvas::Twilio.client")
-    allow(client).to receive(:lookups).and_return(lookups)
-    allow(client).to receive(:api).and_return(
-      double("Canvas::Twilio.client.api", account:)
-    )
+    allow(client).to receive_messages(lookups:, api: double("Canvas::Twilio.client.api", account:))
     allow(Canvas::Twilio).to receive(:client).and_return(client)
   end
 

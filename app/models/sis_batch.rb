@@ -732,6 +732,7 @@ class SisBatch < ActiveRecord::Base
       "diffing_remaster" => diffing_remaster,
       "diffed_against_import_id" => options[:diffed_against_sis_batch_id],
       "diffing_drop_status" => options[:diffing_drop_status],
+      "diffing_user_remove_status" => options[:diffing_user_remove_status],
       "skip_deletes" => options[:skip_deletes],
       "change_threshold" => change_threshold,
       "diff_row_count_threshold" => options[:diff_row_count_threshold]

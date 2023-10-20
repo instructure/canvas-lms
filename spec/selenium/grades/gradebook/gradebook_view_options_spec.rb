@@ -39,8 +39,8 @@ describe "Gradebook view options menu" do
     Account.site_admin.enable_feature!(:enhanced_gradebook_filters)
     Account.site_admin.enable_feature!(:view_ungraded_as_zero)
     Account.site_admin.enable_feature!(:gradebook_show_first_last_names)
-    @course.root_account.settings[:allow_gradebook_show_first_last_names] = true
-    @course.root_account.save!
+    @course.account.settings[:allow_gradebook_show_first_last_names] = true
+    @course.account.save!
   end
 
   before do

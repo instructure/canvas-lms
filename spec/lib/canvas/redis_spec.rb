@@ -18,15 +18,23 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-if Canvas.redis_enabled?
+describe "CanvasCache::Redis", if: Canvas.redis_enabled? do
+  subject(:store) { Canvas.lookup_cache_store({ cache_store: :redis_cache_store, url: "redis://doesntexist:9873/0" }, Rails.env) }
 
-  # TODO: When CanvasCache::Redis has replaced all callsites,
-  # we won't need this shim anymore, and can drop this test verifying it.
-  describe "Canvas::Redis" do
-    it "doesn't marshall" do
-      Canvas.redis.set("test", 1)
-      expect(Canvas.redis.get("test")).to eq "1"
-    end
+  it "skips setting cache on error" do
+    expect(Setting).to receive(:get).with(anything, anything, skip_cache: true).at_least(:once)
+    store.read("foo")
   end
 
+  it "logs an error on error" do
+    expect(Canvas::Errors).to receive(:capture)
+    store.read("foo")
+  end
+
+  it "logs to statsd on error" do
+    expect(InstStatsd::Statsd).to receive(:increment).with("redis.errors.all")
+    expect(InstStatsd::Statsd).to receive(:increment).with("redis.errors.redis://doesntexist:9873/0", anything)
+    expect(InstStatsd::Statsd).to receive(:increment).with("errors.warn", anything).at_least(:once)
+    store.read("foo")
+  end
 end

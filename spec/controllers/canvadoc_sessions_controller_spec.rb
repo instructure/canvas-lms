@@ -683,7 +683,7 @@ describe CanvadocSessionsController do
         get :show, params: { blob: blob.to_json, hmac: }
       end
 
-      it "passes user information based on the submission (if past submission / missing attachment assocation)" do
+      it "passes user information based on the submission (if past submission / missing attachment association)" do
         @submission.attachment_associations.destroy_all
         expect(@attachment.canvadoc).to receive(:session_url).with(hash_including(user_id: @student.global_id.to_s))
 

@@ -3271,6 +3271,7 @@ if (typeof Slick === 'undefined') {
       }
 
       currentEditor = new (editor || getEditor(activeRow, activeCell))({
+        activeRow,
         grid: self,
         gridPosition: absBox($outerContainer[0]),
         position: absBox(activeCellNode),

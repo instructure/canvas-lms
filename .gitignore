@@ -10,15 +10,16 @@
 #
 # That's what .git/info/exclude and core.excludesfile are for :)
 .bundle/
-.byebug_history
 .env
 .mutagen
 /.yardoc/
 /.ruby-version
 /app/views/info/styleguide.html.erb
 /config/*.yml
+/config/*.yml.cached
 /config/credentials.yml.enc
 !/config/brakeman.yml
+!/config/code_ownership.yml
 !/config/credentials.test.yml
 !/config/crystalball.yml
 /config/environments/*-local.rb

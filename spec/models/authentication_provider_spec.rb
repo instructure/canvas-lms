@@ -279,6 +279,11 @@ describe AuthenticationProvider do
       expect(@user.name).not_to be_blank
     end
 
+    it "doesn't asplode with an empty email" do
+      aac.apply_federated_attributes(@pseudonym, { "email" => "" })
+      expect(@user.name).not_to be_blank
+    end
+
     context "admin_roles" do
       it "ignores non-existent roles" do
         aac.apply_federated_attributes(@pseudonym, { "admin_roles" => "garbage" })

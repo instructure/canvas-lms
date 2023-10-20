@@ -21,6 +21,9 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import userSettings from '@canvas/user-settings'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {HandleCheckboxChange} from '../../../types'
+import {View} from '@instructure/ui-view'
+import {InstUISettingsProvider} from '@instructure/emotion'
+import {Checkbox, CheckboxFacade} from '@instructure/ui-checkbox'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
@@ -55,20 +58,37 @@ export default function IncludeUngradedAssignmentsCheckbox({
   }
 
   return (
-    <div
-      className="checkbox"
-      style={{padding: 12, margin: '10px 0px', background: '#eee', borderRadius: 5}}
+    <InstUISettingsProvider
+      theme={{
+        componentOverrides: {
+          [CheckboxFacade.componentId]: {
+            checkedBackground: '#0375ff',
+            borderColor: '#777777',
+            labelFontSizeSmall: '1rem',
+          },
+          [View.componentId]: {
+            paddingMedium: '16px',
+          },
+        },
+      }}
     >
-      <label className="checkbox" htmlFor="ungraded_checkbox">
-        <input
-          type="checkbox"
-          id="ungraded_checkbox"
-          name="ungraded_checkbox"
+      <View
+        as="div"
+        className="checkbox"
+        margin="x-small 0"
+        borderRadius="medium"
+        background="primary"
+        padding="medium"
+        themeOverride={{backgroundPrimary: '#eee'}}
+      >
+        <Checkbox
+          data-testid="include-ungraded-assignments-checkbox"
+          size="small"
+          label={I18n.t('View Ungraded as 0')}
           checked={includeUngradedAssignments}
           onChange={handleViewUngradedChange}
         />
-        {I18n.t('View Ungraded as 0')}
-      </label>
-    </div>
+      </View>
+    </InstUISettingsProvider>
   )
 }

@@ -132,26 +132,6 @@ function enhanceUserJQueryWidgetContent() {
     .end()
 }
 
-function retriggerEarlyClicks() {
-  // handle all of the click events that were triggered before the dom was ready (and thus weren't handled by jquery listeners)
-  if (window._earlyClick) {
-    // unset the onclick handler we were using to capture the events
-    document.removeEventListener('click', window._earlyClick)
-    if (window._earlyClick.clicks) {
-      // wait to fire the "click" events till after all of the event hanlders loaded at dom ready are initialized
-      setTimeout(function () {
-        $.each(_.uniq(window._earlyClick.clicks), function () {
-          // cant use .triggerHandler because it will not bubble,
-          // but we do want to preventDefault, so this is what we have to do
-          const event = $.Event('click')
-          event.preventDefault()
-          $(this).trigger(event)
-        })
-      }, 1)
-    }
-  }
-}
-
 function ellipsifyBreadcrumbs() {
   // this next block of code adds the ellipsis on the breadcrumb if it overflows one line
   const $breadcrumbs = $('#breadcrumbs')
@@ -345,6 +325,9 @@ function enhanceUserContentWhenAsked() {
         canvasOrigin: ENV?.DEEP_LINKING_POST_MESSAGE_ORIGIN || window.location?.origin,
         kalturaSettings: INST.kalturaSettings,
         disableGooglePreviews: !!INST.disableGooglePreviews,
+        new_math_equation_handling: !!ENV?.FEATURES?.new_math_equation_handling,
+        explicit_latex_typesetting: !!ENV?.FEATURES?.explicit_latex_typesetting,
+        locale: ENV?.LOCALE ?? 'en',
       }),
     50
   )
@@ -641,7 +624,6 @@ const setDialogCloseText = () => {
 
 export default function enhanceTheEntireUniverse() {
   ;[
-    retriggerEarlyClicks,
     ellipsifyBreadcrumbs,
     bindKeyboardShortcutsHelpPanel,
     warnAboutRolesBeingSwitched,

@@ -25,6 +25,7 @@ const locale = {
   "add_another_f4e50d57": { "message": "Başka bir tane ekle" },
   "add_cc_subtitles_55f0394e": { "message": "Alt yazı ekle" },
   "add_image_60b2de07": { "message": "Görsel Ekle" },
+  "add_one_9e34a6f8": { "message": "Bir tane ekle!" },
   "aleph_f4ffd155": { "message": "Aleph" },
   "align_11050992": { "message": "Hizala" },
   "alignment_and_lists_5cebcb69": { "message": "Eşleştirme ve Listeler" },
@@ -201,6 +202,7 @@ const locale = {
   "new_quiz_34aacba6": { "message": "Yeni Kısa Sınav" },
   "next_40e12421": { "message": "Sonraki" },
   "no_e16d9132": { "message": "Hayır" },
+  "no_pages_created_yet_c379fa6e": { "message": "Sayfa henüz oluşturulmadı." },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "Bu dosya için ön izleme bulunmamaktadır."
   },

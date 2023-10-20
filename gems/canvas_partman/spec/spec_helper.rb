@@ -19,7 +19,7 @@
 #
 
 begin
-  require "byebug"
+  require "debug"
 rescue LoadError
   # do nothing if its not available
 end

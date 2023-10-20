@@ -277,35 +277,31 @@ describe BigBlueButtonConference do
     end
 
     it "properly serializes a response with no recordings" do
-      allow(@bbb).to receive(:conference_key).and_return("12345")
       response = { returncode: "SUCCESS",
                    recordings: "\n  ",
                    messageKey: "noRecordings",
                    message: "There are no recordings for the meeting(s)." }
-      allow(@bbb).to receive(:send_request).and_return(response)
+      allow(@bbb).to receive_messages(conference_key: "12345", send_request: response)
       expect(@bbb.recordings).to eq []
     end
 
     it "properly serializes a response with recordings" do
-      allow(@bbb).to receive(:conference_key).and_return("12345")
       response = JSON.parse(get_recordings_fixture, { symbolize_names: true })
-      allow(@bbb).to receive(:send_request).and_return(response)
+      allow(@bbb).to receive_messages(conference_key: "12345", send_request: response)
       expect(@bbb.recordings).not_to eq []
     end
 
     it "does not have duration_minutes set to 0" do
-      allow(@bbb).to receive(:conference_key).and_return("12345")
       response = JSON.parse(get_recordings_fixture, { symbolize_names: true })
-      allow(@bbb).to receive(:send_request).and_return(response)
+      allow(@bbb).to receive_messages(conference_key: "12345", send_request: response)
       @bbb.recordings.each do |recording|
         expect(recording[:duration_minutes]).not_to eq(0)
       end
     end
 
     it "includes whether to show to students (and be true for everything but statistics)" do
-      allow(@bbb).to receive(:conference_key).and_return("12345")
       response = JSON.parse(get_recordings_fixture, { symbolize_names: true })
-      allow(@bbb).to receive(:send_request).and_return(response)
+      allow(@bbb).to receive_messages(conference_key: "12345", send_request: response)
       @bbb.recordings.each do |recording|
         recording[:playback_formats].each do |format|
           expect(format[:show_to_students]).to eq(format[:type] != "statistics")
@@ -314,9 +310,8 @@ describe BigBlueButtonConference do
     end
 
     it "includes translated type for playback format" do
-      allow(@bbb).to receive(:conference_key).and_return("12345")
       response = JSON.parse(get_recordings_fixture, { symbolize_names: true })
-      allow(@bbb).to receive(:send_request).and_return(response)
+      allow(@bbb).to receive_messages(conference_key: "12345", send_request: response)
       @bbb.recordings.each do |recording|
         recording[:playback_formats].each do |format|
           # turns video into Video, etc.

@@ -43,6 +43,7 @@ class CalendarsController < ApplicationController
                            unseen_auto_sub_cals = all_auto_sub_cals - viewed_auto_sub_cal_asset_strings
                            current_user_selected_cals = @current_user.get_preference(:selected_calendar_contexts)
                            unless current_user_selected_cals.nil?
+                             current_user_selected_cals = Array(current_user_selected_cals)
                              @current_user.set_preference(:selected_calendar_contexts, ((current_user_selected_cals || []) + unseen_auto_sub_cals).uniq)
                            end
                            @current_user.get_preference(:selected_calendar_contexts)
@@ -98,6 +99,9 @@ class CalendarsController < ApplicationController
         default_due_time: context.is_a?(Course) && context.default_due_time,
         can_view_context: context.grants_right?(@current_user, session, :read)
       }
+      if context.is_a?(Course)
+        info[:course_conclude_at] = context.restrict_enrollments_to_course_dates ? context.conclude_at : context.enrollment_term.end_at
+      end
       if context.respond_to?(:course_sections) && !context.is_a?(Account)
         info[:course_sections] = context.course_sections.active.pluck(:id, :name).map do |id, name|
           hash = { id:, asset_string: "course_section_#{id}", name: }
@@ -121,7 +125,7 @@ class CalendarsController < ApplicationController
           MAX_NAME_LENGTH: max_name_length,
           DUE_DATE_REQUIRED_FOR_ACCOUNT: due_date_required_for_account
         }
-      elsif (context.is_a? Account) && Account.site_admin.feature_enabled?(:auto_subscribe_account_calendars)
+      elsif context.is_a? Account
         info[:auto_subscribe] = context.account_calendar_subscription_type == "auto"
         info[:viewed_auto_subscribed_account_calendars] = @viewed_auto_subscribed_account_calendars.include?(context.global_id)
       end

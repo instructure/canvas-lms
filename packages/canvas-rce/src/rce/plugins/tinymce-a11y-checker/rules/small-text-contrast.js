@@ -20,6 +20,8 @@ import formatMessage from '../../../../format-message'
 import contrast from 'wcag-element-contrast'
 import {onlyContainsLink, createStyleString, splitStyleAttribute, hasTextNode} from '../utils/dom'
 import rgbHex from '../utils/rgb-hex'
+import {stringifyRGBA} from '../utils/colors'
+import uid from '@instructure/uid'
 
 export default {
   id: 'small-text-contrast',
@@ -30,13 +32,21 @@ export default {
     if (disabled || noText || onlyContainsLink(elem) || contrast.isLargeText(elem)) {
       return true
     }
+    for (let e = elem; e; e = e.parentElement) {
+      const bgimage = window.getComputedStyle(e).getPropertyValue('background-image')
+      if (bgimage !== 'none' && bgimage !== '') {
+        // ignore background images and gradients
+        return true
+      }
+    }
     return contrast(elem)
   },
 
   data: elem => {
     const styles = window.getComputedStyle(elem)
     return {
-      color: styles.color,
+      color: stringifyRGBA(contrast.parseRGBA(styles.color)),
+      id: uid(),
     }
   },
 

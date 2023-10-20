@@ -63,7 +63,7 @@ describe PageViewsController do
       get "index", params: { user_id: @user.id }, format: "csv"
       expect(response).to be_successful
       dates = CSV.parse(response.body, headers: true).pluck("created_at")
-      expect(dates).to eq [pv1, pv2, pv3].map(&:created_at).map(&:to_s)
+      expect(dates).to eq([pv1, pv2, pv3].map { |pv| pv.created_at.to_s })
     end
 
     it "errors if end_time is before start_time" do

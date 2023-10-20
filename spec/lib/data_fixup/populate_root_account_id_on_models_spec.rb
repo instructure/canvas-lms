@@ -837,7 +837,7 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       expect(DataFixup::PopulateRootAccountIdOnModels.clean_and_filter_tables).to eq({ ContextModule => { course: :root_account_id } })
     end
 
-    it "filters tables whose prereqs are not direct assocations and are not filled" do
+    it "filters tables whose prereqs are not direct associations and are not filled" do
       LearningOutcome.create!(context: @course, short_description: "test")
       expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:migration_tables)
         .and_return({ LearningOutcome => :content_tag, ContextModule => :course })

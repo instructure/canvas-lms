@@ -22,7 +22,6 @@ import React, {ReactElement} from 'react'
 
 import {CloseButton} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
-import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
 
@@ -31,8 +30,6 @@ import GenericErrorPage from '@canvas/generic-error-page'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 
 const I18n = useI18nScope('canvas_modal')
-
-const {Item: FlexItem} = Flex as any
 
 type Props = {
   children: ReactElement | ReactElement[]
@@ -67,18 +64,15 @@ function CanvasModal({
   return (
     <Modal label={label} onDismiss={onDismiss} {...otherModalProps}>
       <Modal.Header>
-        <Flex>
-          <FlexItem grow={true}>
-            <Heading>{title}</Heading>
-          </FlexItem>
-          <FlexItem>
-            <CloseButton
-              onClick={onDismiss}
-              size={closeButtonSize}
-              screenReaderLabel={I18n.t('Close')}
-            />
-          </FlexItem>
-        </Flex>
+        <Heading>{title}</Heading>
+        <CloseButton
+          data-instui-modal-close-button="true"
+          onClick={onDismiss}
+          size={closeButtonSize}
+          screenReaderLabel={I18n.t('Close')}
+          placement="end"
+          offset="medium"
+        />
       </Modal.Header>
       <Modal.Body padding={padding}>
         <View as="div" height="100%">

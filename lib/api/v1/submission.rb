@@ -199,6 +199,8 @@ module Api::V1::Submission
     extra_attempts
     posted_at
     redo_request
+    sticker
+    custom_grade_status_id
   ].freeze
   SUBMISSION_JSON_METHODS = %w[late missing seconds_late entered_grade entered_score].freeze
   SUBMISSION_OTHER_FIELDS = %w[attachments discussion_entries proxy_submitter].freeze
@@ -338,6 +340,7 @@ module Api::V1::Submission
 
     if other_fields.include?("proxy_submitter") && attempt.proxy_submission?
       hash["proxy_submitter"] = attempt.proxy_submitter.short_name
+      hash["proxy_submitter_id"] = attempt.proxy_submitter_id
     end
 
     if attempt.submission_type == "basic_lti_launch"

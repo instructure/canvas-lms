@@ -19,6 +19,7 @@
 
 class GradeSummaryAssignmentPresenter
   include TextHelper
+  include GradeDisplay
   attr_reader :assignment, :submission, :originality_reports
 
   def initialize(summary, current_user, assignment, submission)
@@ -99,6 +100,16 @@ class GradeSummaryAssignmentPresenter
     submission&.submission_type == "online_quiz" && submission&.workflow_state == "pending_review"
   end
 
+  def custom_grade_status?
+    return false unless Account.site_admin.feature_enabled?(:custom_gradebook_statuses)
+
+    submission&.custom_grade_status_id?
+  end
+
+  def custom_grade_status_id
+    submission&.custom_grade_status_id
+  end
+
   def original_points
     has_no_score_display? ? "" : submission.published_score
   end
@@ -153,7 +164,6 @@ class GradeSummaryAssignmentPresenter
     classes << special_class
     classes << "excused" if excused?
     classes << "extended" if extended?
-    classes << "feedback_visibility_ff" if Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
     classes.join(" ")
   end
 
@@ -195,7 +205,7 @@ class GradeSummaryAssignmentPresenter
 
   def published_grade
     if is_letter_graded_or_gpa_scaled? && !submission.published_grade.nil?
-      "(#{submission.published_grade})"
+      "(#{replace_dash_with_minus(submission.published_grade)})"
     else
       ""
     end

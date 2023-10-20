@@ -23,8 +23,6 @@ describe MicrosoftSync::LoginService do
   include WebMock::API
 
   describe ".new_token" do
-    around { |example| Setting.skip_cache(&example) }
-
     before { WebMock.disable_net_connect! }
 
     after { WebMock.enable_net_connect! }

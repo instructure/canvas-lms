@@ -31,8 +31,6 @@ import type {CamelizedGradingPeriod} from '@canvas/grading/grading.d'
 import type {FilterPreset, PartialFilterPreset} from '../gradebook.d'
 import type {AssignmentGroup, Module, Section, StudentGroupCategoryMap} from '../../../../../api.d'
 
-const {Item: FlexItem} = Flex as any
-
 const I18n = useI18nScope('gradebook')
 
 export type FilterTrayProps = {
@@ -63,6 +61,7 @@ export default function FilterTray({
   const applyFilters = useStore(state => state.applyFilters)
   const appliedFilters = useStore(state => state.appliedFilters)
   const [expandedFilterPresetId, setExpandedFilterPresetId] = useState<string | null>(null)
+  const closeRef = React.useRef<HTMLElement>()
 
   return (
     <Tray
@@ -78,24 +77,32 @@ export default function FilterTray({
     >
       <View as="div" padding="medium">
         <Flex margin="0 0 small 0">
-          <FlexItem shouldGrow={true} shouldShrink={true}>
+          <Flex.Item shouldGrow={true} shouldShrink={true}>
             <Heading level="h3" as="h3" margin="0 0 x-small">
               {I18n.t('Saved Filter Presets')}
             </Heading>
-          </FlexItem>
-          <FlexItem>
+          </Flex.Item>
+          <Flex.Item>
             <CloseButton
+              elementRef={ref => {
+                if (ref instanceof HTMLElement) {
+                  closeRef.current = ref
+                }
+              }}
               placement="end"
               offset="small"
               screenReaderLabel="Close"
-              onClick={() => setIsTrayOpen(false)}
+              onClick={() => {
+                setIsTrayOpen(false)
+                setExpandedFilterPresetId(null)
+              }}
             />
-          </FlexItem>
+          </Flex.Item>
         </Flex>
 
         {filterPresets.length === 0 && (
-          <Flex as="div" margin="small">
-            <FlexItem display="inline-block" width="100px" height="128px">
+          <Flex as="div" margin="small" display="inline-flex">
+            <Flex.Item width="100px" height="128px">
               <img
                 data-testid="friendly-panda"
                 src="/images/tutorial-tray-images/Panda_People.svg"
@@ -105,8 +112,8 @@ export default function FilterTray({
                   height: '128px',
                 }}
               />
-            </FlexItem>
-            <FlexItem shouldShrink={true}>
+            </Flex.Item>
+            <Flex.Item shouldShrink={true}>
               <ContextView
                 padding="x-small small"
                 margin="small"
@@ -117,7 +124,7 @@ export default function FilterTray({
                   'Did you know you can now create filter presets and save them for future use?'
                 )}
               </ContextView>
-            </FlexItem>
+            </Flex.Item>
           </Flex>
         )}
 
@@ -132,6 +139,7 @@ export default function FilterTray({
               updated_at: new Date().toISOString(),
             }}
             isActive={true}
+            closeRef={closeRef}
             gradingPeriods={gradingPeriods}
             modules={modules}
             onCreate={(filterPreset: PartialFilterPreset) => {
@@ -162,6 +170,7 @@ export default function FilterTray({
                 assignmentGroups={assignmentGroups}
                 filterPreset={filterPreset}
                 gradingPeriods={gradingPeriods}
+                closeRef={closeRef}
                 isActive={doFiltersMatch(appliedFilters, filterPreset.filters)}
                 isExpanded={expandedFilterPresetId === filterPreset.id}
                 modules={modules}

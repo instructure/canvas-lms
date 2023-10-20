@@ -27,10 +27,6 @@ module NewQuizzesFeaturesHelper
     @context.root_account.feature_allowed?(:quizzes_next) && @context.root_account.feature_enabled?(:new_quizzes_migration)
   end
 
-  def new_quizzes_import_third_party?
-    @context.root_account.feature_allowed?(:quizzes_next) && @context.root_account.feature_enabled?(:new_quizzes_third_party_imports)
-  end
-
   def new_quizzes_migration_default
     @context.root_account.feature_enabled?(:migrate_to_new_quizzes_by_default) || new_quizzes_require_migration?
   end

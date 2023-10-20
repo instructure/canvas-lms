@@ -48,8 +48,7 @@ module DynamicSettings
 
           options = { request: {} }
           options[:request][:open_timeout] = conf_hash["connect_timeout"] if conf_hash["connect_timeout"]
-          options[:request][:write_timeout] = conf_hash["send_timeout"] if conf_hash["send_timeout"]
-          options[:request][:read_timeout] = conf_hash["receive_timeout"] if conf_hash["receive_timeout"]
+          options[:request][:timeout] = conf_hash["timeout"] if conf_hash["timeout"]
           config.options = options
         end
 

@@ -651,7 +651,7 @@ describe ContentExportsApiController, type: :request do
         run_jobs
 
         to_assign = @course.assignments.first
-        to_outcomes = to_assign.rubric.learning_outcome_alignments.map(&:learning_outcome).map(&:migration_id)
+        to_outcomes = to_assign.rubric.learning_outcome_alignments.map { |a| a.learning_outcome.migration_id }
         expect(to_outcomes).to eql [export.create_key(@outcome)]
       end
     end

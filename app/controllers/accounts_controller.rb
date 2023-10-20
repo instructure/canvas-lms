@@ -357,6 +357,60 @@ class AccountsController < ApplicationController
     render json: @all_accounts.map { |a| account_json(a, @current_user, session, [], false) }
   end
 
+  # @API Get accounts that users can create courses in
+  # A paginated list of accounts where the current user has permission to create
+  # courses.
+  #
+  # @returns [Account]
+  def course_creation_accounts
+    return render json: [] unless @current_user
+
+    accounts = @current_user.adminable_accounts || []
+    accounts = accounts.select { |a| a.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin, :manage_courses_add) }
+    sub_accounts = []
+    # Load and handle ids from now on to avoid excessive memory usage
+    accounts.each { |a| sub_accounts.concat Account.active.sub_account_ids_recursive(a.id) }
+    accounts = accounts.pluck(:id)
+    accounts.push(sub_accounts).flatten!
+
+    @current_user.course_creating_student_enrollment_accounts.each do |a|
+      accounts << a.root_account.manually_created_courses_account.id if a.root_account.students_can_create_courses?
+
+      next unless a.root_account.students_can_create_courses_anywhere? ||
+                  @current_user.active_k5_enrollments?(root_account: a.root_account) ||
+                  a.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin, :create_courses)
+
+      accounts << a.id
+    end
+
+    @current_user.course_creating_teacher_enrollment_accounts.each do |a|
+      accounts << a.root_account.manually_created_courses_account.id if a.root_account.teachers_can_create_courses?
+
+      next unless a.root_account.teachers_can_create_courses_anywhere? ||
+                  @current_user.active_k5_enrollments?(root_account: a.root_account) ||
+                  a.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin, :create_courses)
+
+      accounts << a.id
+    end
+
+    user_enrollments = @current_user.enrollments.active.pluck(:root_account_id)
+    @current_user.root_account_ids.each do |id|
+      next if user_enrollments.include? id
+
+      a = Account.find(id)
+      accounts << a.manually_created_courses_account.id if a.no_enrollments_can_create_courses?
+    end
+
+    accounts = Api.paginate(accounts.uniq, self, api_v1_course_creation_accounts_url)
+    # Fetch actual accounts now, after pagination, in a single transaction
+    account_active_records = Account.where(id: accounts)
+    accounts_json = accounts.map do |a|
+      a = account_active_records.find { |ar| ar.id == a }
+      account_json(a, @current_user, session, [], false)
+    end
+    render json: accounts_json
+  end
+
   # @API List accounts for course admins
   # A paginated list of accounts that the current user can view through their
   # admin course enrollments. (Teacher, TA, or designer enrollments).
@@ -403,8 +457,9 @@ class AccountsController < ApplicationController
   end
 
   # @API Settings
-  # Returns settings for the specified account as a JSON object. The caller must be an Account
-  # admin with the manage_account_settings permission.
+  # Returns a JSON object containing a subset of settings for the specified account.
+  # It's possible an empty set will be returned if no settings are applicable.
+  # The caller must be an Account admin with the manage_account_settings permission.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/accounts/<account_id>/settings \
@@ -413,9 +468,14 @@ class AccountsController < ApplicationController
   # @example_response
   #   {"microsoft_sync_enabled": true, "microsoft_sync_login_attribute_suffix": false}
   def show_settings
-    return render_unauthorized_action unless @account.grants_right?(@current_user, session, :manage_account_settings)
+    return unless authorized_action(@account, @current_user, :manage_account_settings)
 
-    public_attrs = %i[microsoft_sync_enabled microsoft_sync_tenant microsoft_sync_login_attribute microsoft_sync_login_attribute_suffix microsoft_sync_remote_attribute]
+    public_attrs = %i[microsoft_sync_enabled
+                      microsoft_sync_tenant
+                      microsoft_sync_login_attribute
+                      microsoft_sync_login_attribute_suffix
+                      microsoft_sync_remote_attribute]
+
     render json: public_attrs.index_with { |key| @account.settings[key] }.compact
   end
 
@@ -1056,7 +1116,6 @@ class AccountsController < ApplicationController
         end
 
         params[:account][:turnitin_host] = validated_turnitin_host(params[:account][:turnitin_host])
-        enable_user_notes = params[:account].delete :enable_user_notes
         allow_sis_import = params[:account].delete :allow_sis_import
         params[:account].delete :default_user_storage_quota_mb unless @account.root_account? && !@account.site_admin?
         unless @account.grants_right? @current_user, :manage_storage_quotas
@@ -1097,7 +1156,6 @@ class AccountsController < ApplicationController
             @account.settings[:google_docs_domain] = google_docs_domain.presence
           end
 
-          @account.enable_user_notes = enable_user_notes if enable_user_notes
           @account.allow_sis_import = allow_sis_import if allow_sis_import && @account.root_account?
           if @account.site_admin? && params[:account][:settings]
             # these shouldn't get set for the site admin account
@@ -1312,7 +1370,6 @@ class AccountsController < ApplicationController
     end
     logging ||= false
 
-    js_env ACCOUNT_ID: @account.id
     js_env PERMISSIONS: {
       restore_course: @account.grants_right?(@current_user, session, :undelete_courses),
       # Permission caching issue makes explicitly checking the account setting
@@ -1555,6 +1612,7 @@ class AccountsController < ApplicationController
       can_create_courses: @account.grants_any_right?(@current_user, session, :manage_courses, :create_courses),
       can_create_users: @account.root_account.grants_right?(@current_user, session, :manage_user_logins),
       analytics: @account.service_enabled?(:analytics),
+      can_read_sis: @account.grants_right?(@current_user, session, :read_sis),
       can_masquerade: @account.grants_right?(@current_user, session, :become_user),
       can_message_users: @account.grants_right?(@current_user, session, :send_messages),
       can_edit_users: @account.grants_any_right?(@current_user, session, :manage_user_logins),
@@ -1567,14 +1625,24 @@ class AccountsController < ApplicationController
         ),
       can_create_enrollments: @account.grants_any_right?(@current_user, session, *add_enrollment_permissions(@account))
     }
+    if @account.root_account.feature_enabled?(:temporary_enrollments)
+      js_permissions[:can_add_temporary_enrollments] =
+        @account.grants_right?(@current_user, session, :temporary_enrollments_add)
+      js_permissions[:can_view_temporary_enrollments] =
+        @account.grants_any_right?(@current_user, session, *RoleOverride::MANAGE_TEMPORARY_ENROLLMENT_PERMISSIONS)
+    end
     if @account.root_account.feature_enabled?(:granular_permissions_manage_users)
       js_permissions[:can_allow_course_admin_actions] = @account.grants_right?(@current_user, session, :allow_course_admin_actions)
+      js_permissions[:can_add_ta] = @account.grants_right?(@current_user, session, :add_ta_to_course)
+      js_permissions[:can_add_student] = @account.grants_right?(@current_user, session, :add_student_to_course)
+      js_permissions[:can_add_teacher] = @account.grants_right?(@current_user, session, :add_teacher_to_course)
+      js_permissions[:can_add_designer] = @account.grants_right?(@current_user, session, :add_designer_to_course)
+      js_permissions[:can_add_observer] = @account.grants_right?(@current_user, session, :add_observer_to_course)
     else
       js_permissions[:can_manage_admin_users] = @account.grants_right?(@current_user, session, :manage_admin_users)
     end
     js_env({
              ROOT_ACCOUNT_NAME: @account.root_account.name, # used in AddPeopleApp modal
-             ACCOUNT_ID: @account.id,
              ROOT_ACCOUNT_ID: @account.root_account.id,
              customized_login_handle_name: @account.root_account.customized_login_handle_name,
              delegated_authentication: @account.root_account.delegated_authentication?,
@@ -1744,7 +1812,7 @@ class AccountsController < ApplicationController
     add_crumb(title)
     set_active_tab "account_calendars"
     @current_user.add_to_visited_tabs("account_calendars")
-    js_env ACCOUNT_ID: @account.id
+    js_env
     css_bundle :account_calendar_settings
     js_bundle :account_calendar_settings
     InstStatsd::Statsd.increment("account_calendars.settings.visit")
@@ -1797,7 +1865,7 @@ class AccountsController < ApplicationController
                                    :enable_eportfolios,
                                    :enable_course_catalog,
                                    :limit_parent_app_web_access,
-                                   :allow_gradebook_show_first_last_names,
+                                   { allow_gradebook_show_first_last_names: [:value] }.freeze,
                                    { enable_offline_web_export: [:value] }.freeze,
                                    { disable_rce_media_uploads: [:value] }.freeze,
                                    :enable_profiles,
@@ -1814,6 +1882,7 @@ class AccountsController < ApplicationController
                                    :include_students_in_global_survey,
                                    :kill_joy,
                                    :license_type,
+                                   :suppress_notifications,
                                    { lock_all_announcements: [:value, :locked] }.freeze,
                                    :login_handle_name,
                                    :mfa_settings,

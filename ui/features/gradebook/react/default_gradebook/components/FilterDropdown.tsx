@@ -17,7 +17,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {MouseEvent, useState, useRef} from 'react'
+import React, {MouseEvent, useState, useRef, useEffect} from 'react'
 import {Popover} from '@instructure/ui-popover'
 import {Button} from '@instructure/ui-buttons'
 import {Menu} from '@instructure/ui-menu'
@@ -32,13 +32,13 @@ import type {FilterDrilldownData, FilterDrilldownMenuItem} from '../gradebook.d'
 
 const I18n = useI18nScope('gradebook')
 
-const {Group: MenuGroup, Item: MenuItem, Separator: MenuSeparator} = Menu as any
-
 type Props = {
   rootId?: string
   onOpenTray: () => void
   dataMap: FilterDrilldownData
   filterItems: FilterDrilldownData
+  changeAnnouncement: (filterAnnouncement) => void
+  applyFiltersButtonRef: React.RefObject<HTMLButtonElement>
 }
 
 const TruncateWithTooltip = ({children}: {children: React.ReactNode}) => {
@@ -61,10 +61,12 @@ const FilterDropdown = ({
   onOpenTray,
   dataMap,
   filterItems,
+  changeAnnouncement,
+  applyFiltersButtonRef,
 }: Props) => {
   const [currentItemId, setTempItemId] = useState<string>(rootId)
   const [isOpen, setIsOpen] = useState(false)
-  const menuRef = useRef<HTMLElement>()
+  const menuRef = useRef<HTMLElement | null>(null)
   const currentObj = dataMap[currentItemId]
 
   const items = currentObj?.items?.concat() || []
@@ -90,6 +92,12 @@ const FilterDropdown = ({
 
   const isRoot = currentItemId === 'savedFilterPresets'
 
+  useEffect(() => {
+    if (menuRef.current) {
+      menuRef.current.focus()
+    }
+  }, [isRoot])
+
   const setItemId = id => {
     setTempItemId(id)
 
@@ -108,8 +116,9 @@ const FilterDropdown = ({
   }
 
   const backButton = (
-    <MenuItem
+    <Menu.Item
       as="div"
+      data-testid="back-button"
       onClick={() => {
         setItemId(currentObj.parentId)
       }}
@@ -120,19 +129,27 @@ const FilterDropdown = ({
         </View>
         {I18n.t('Back')}
       </Flex>
-    </MenuItem>
+    </Menu.Item>
   )
 
   return (
     <View as="div">
       <Popover
-        renderTrigger={<Button renderIcon={IconFilterLine}>{I18n.t('Apply Filters')}</Button>}
+        renderTrigger={
+          <Button
+            elementRef={ref => (applyFiltersButtonRef.current = ref)}
+            data-testid="apply-filters-button"
+            renderIcon={IconFilterLine}
+          >
+            {I18n.t('Apply Filters')}
+          </Button>
+        }
         shouldRenderOffscreen={false}
         on="click"
         placement="bottom start"
         constrain="window"
         offsetY={8}
-        isOpen={isOpen}
+        isShowingContent={isOpen}
         onShowContent={() => {
           setIsOpen(true)
         }}
@@ -149,7 +166,7 @@ const FilterDropdown = ({
             onKeyDown={handleTabbingOut}
           >
             {items.length > 0 && (
-              <MenuGroup
+              <Menu.Group
                 label={I18n.t('Saved Filter Presets')}
                 onSelect={(_event: MouseEvent, updated: [number, ...number[]]) => {
                   items[updated[0]].onToggle?.()
@@ -158,31 +175,37 @@ const FilterDropdown = ({
               >
                 {items.map(a => {
                   return (
-                    <MenuItem key={a.id} as="div">
-                      <TruncateText position="middle">{a.name}</TruncateText>
-                    </MenuItem>
+                    <Menu.Item key={a.id} as="div" data-testid={`${a.name}-enable-preset`}>
+                      <TruncateWithTooltip position="middle">{a.name}</TruncateWithTooltip>
+                    </Menu.Item>
                   )
                 })}
-              </MenuGroup>
+              </Menu.Group>
             )}
 
-            <MenuItem
+            <Menu.Item
               as="div"
-              test-id="manage-filter-presets-button"
+              data-testid="manage-filter-presets-button"
               onSelect={() => {
                 setIsOpen(false)
                 onOpenTray()
               }}
             >
               <TruncateText>{I18n.t('Create & Manage Filter Presets')}</TruncateText>
-            </MenuItem>
+            </Menu.Item>
 
-            <MenuSeparator />
+            <Menu.Separator />
 
-            <MenuGroup label={I18n.t('Filters')} selected={selectedFilterIndices}>
+            <Menu.Group
+              label={I18n.t('Filters')}
+              selected={selectedFilterIndices}
+              onSelect={() => {
+                // noop
+              }}
+            >
               {Object.values(filterItems).map((item: FilterDrilldownMenuItem) => {
                 return (
-                  <MenuItem
+                  <Menu.Item
                     key={item.id}
                     as="div"
                     onSelect={() => {
@@ -193,6 +216,7 @@ const FilterDropdown = ({
                       }
                     }}
                     selected={item.isSelected}
+                    data-testid={`${item.name}-filter-type`}
                   >
                     <Flex as="div" justifyItems="space-between">
                       <TruncateText position="middle">{item.name}</TruncateText>
@@ -202,10 +226,10 @@ const FilterDropdown = ({
                         </View>
                       )}
                     </Flex>
-                  </MenuItem>
+                  </Menu.Item>
                 )
               })}
-            </MenuGroup>
+            </Menu.Group>
           </Menu>
         )}
 
@@ -219,9 +243,9 @@ const FilterDropdown = ({
             {backButton}
 
             {sortedItemGroups.length > 0 && (
-              <MenuGroup label={currentObj.name}>
-                <MenuSeparator />
-              </MenuGroup>
+              <Menu.Group label={currentObj.name}>
+                <Menu.Separator />
+              </Menu.Group>
             )}
 
             {sortedItemGroups.length > 0 &&
@@ -234,7 +258,7 @@ const FilterDropdown = ({
                 }, [])
 
                 return (
-                  <MenuGroup
+                  <Menu.Group
                     key={itemGroup.id}
                     label={itemGroup.name}
                     selected={selectedIndices2}
@@ -247,34 +271,47 @@ const FilterDropdown = ({
                       // (-_-)
                       const unescapedName = unescape(item.name)
                       return (
-                        <MenuItem key={item.id} as="div">
+                        <Menu.Item
+                          data-testid={`${item.name}-sorted-filter`}
+                          key={item.id}
+                          as="div"
+                        >
                           <Flex as="div" justifyItems="space-between">
                             <TruncateText position="middle">{unescapedName}</TruncateText>
                           </Flex>
-                        </MenuItem>
+                        </Menu.Item>
                       )
                     })}
-                  </MenuGroup>
+                  </Menu.Group>
                 )
               })}
 
             {items.length > 0 && (
-              <MenuGroup
+              <Menu.Group
                 label={currentObj.name}
                 selected={selectedIndices}
-                onSelect={(_event: MouseEvent, updated: [number, ...number[]]) =>
+                onSelect={(_event: MouseEvent, updated: [number, ...number[]]) => {
+                  if (items[updated[0]].isSelected) {
+                    changeAnnouncement(
+                      I18n.t('Removed %{filterName} Filter', {filterName: items[updated[0]].name})
+                    )
+                  } else {
+                    changeAnnouncement(
+                      I18n.t('Added %{filterName} Filter', {filterName: items[updated[0]].name})
+                    )
+                  }
                   items[updated[0]].onToggle?.()
-                }
+                }}
               >
-                <MenuSeparator />
+                <Menu.Separator />
                 {items.map(a => {
                   return (
-                    <MenuItem key={a.id} as="div">
+                    <Menu.Item data-testid={`${a.name}-filter`} key={a.id} as="div">
                       <TruncateWithTooltip>{a.name}</TruncateWithTooltip>
-                    </MenuItem>
+                    </Menu.Item>
                   )
                 })}
-              </MenuGroup>
+              </Menu.Group>
             )}
           </Menu>
         )}

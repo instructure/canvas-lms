@@ -40,8 +40,7 @@
 # THE SOFTWARE.
 #
 
-require "rubygems"
-require "active_support"
+require "active_support/core_ext/module/delegation"
 require "ostruct"
 
 module Workflow

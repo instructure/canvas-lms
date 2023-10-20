@@ -22,6 +22,8 @@ module Types
   class SubmissionSearchFilterInputType < Types::BaseInputObject
     graphql_name "SubmissionSearchFilterInput"
 
+    argument :include_unsubmitted, Boolean, required: false
+
     argument :states, [SubmissionStateType], required: false, default_value: DEFAULT_SUBMISSION_STATES
     argument :section_ids, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("Section")
 
@@ -32,6 +34,11 @@ module Types
       results list. Must be at least 3 characters.
       Queries by administrative users will search on SIS ID, login ID, name, or email
       address; non-administrative queries will only be compared against name.
+    MD
+
+    argument :user_id, ID, <<~MD, required: false
+      Return only submissions related to the given user_id
+      There is no character restriction on this field
     MD
 
     argument :scored_less_than, Float, "Limit results to submissions that scored below the specified value", required: false

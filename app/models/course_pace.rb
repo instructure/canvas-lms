@@ -135,6 +135,11 @@ class CoursePace < ActiveRecord::Base
 
   def create_publish_progress(run_at: Setting.get("course_pace_publish_interval", "300").to_i.seconds.from_now, enrollment_ids: nil)
     progress = Progress.create!(context: self, tag: "course_pace_publish")
+    run_publish_progress(progress, run_at:, enrollment_ids:)
+    progress
+  end
+
+  def run_publish_progress(progress, run_at: Time.now, enrollment_ids: nil)
     progress.process_job(self,
                          :publish,
                          {
@@ -202,6 +207,7 @@ class CoursePace < ActiveRecord::Base
                 current_override.update(due_at:)
               else
                 assignment_override = assignment.assignment_overrides.create!(
+                  title: I18n.t("Course Pacing"),
                   set_type: "ADHOC",
                   due_at_overridden: true,
                   due_at:
@@ -219,10 +225,13 @@ class CoursePace < ActiveRecord::Base
 
       # Clear caches
       Assignment.clear_cache_keys(assignments_to_refresh, :availability)
-      DueDateCacher.recompute_course(course, assignments: assignments_to_refresh, update_grades: true)
+      SubmissionLifecycleManager.recompute_course(course, assignments: assignments_to_refresh, update_grades: true)
 
       # Maintain the weights of the module items
       course_pace_module_items.each(&:restore_attributes)
+
+      # Explicitly complete the progress so we aren't left with any hanging progresses
+      progress.complete! if progress&.running?
 
       # Mark as published
       log_module_items_count

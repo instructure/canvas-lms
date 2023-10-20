@@ -16,13 +16,13 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import $ from 'jquery'
 import _ from 'underscore'
 import axios from '@canvas/axios'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
+import replaceTags from '@canvas/util/replaceTags'
 import type {CamelizedGradingPeriod, SerializedGradingPeriod} from '../grading.d'
 
-const batchUpdateUrl = (id: string) => $.replaceTags(ENV.GRADING_PERIODS_UPDATE_URL, 'set_id', id)
+const batchUpdateUrl = (id: string) => replaceTags(ENV.GRADING_PERIODS_UPDATE_URL, 'set_id', id)
 
 const serializePeriods = (periods: CamelizedGradingPeriod[]) => {
   const serialized = _.map(periods, period => ({

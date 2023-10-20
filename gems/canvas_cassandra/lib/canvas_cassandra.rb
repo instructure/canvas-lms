@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "rails"
 require "cassandra-cql"
 require "benchmark"
 
@@ -27,7 +26,7 @@ module CanvasCassandra
 
   class UnconfiguredError < StandardError; end
 
-  mattr_accessor :logger, default: Rails.logger
+  mattr_accessor :logger
   mattr_writer :settings_store
 
   def self.consistency_level(name)

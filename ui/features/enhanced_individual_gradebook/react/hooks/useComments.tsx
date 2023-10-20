@@ -22,13 +22,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {executeApiRequest} from '@canvas/util/apiRequest'
 
 import {GRADEBOOK_SUBMISSION_COMMENTS} from '../../queries/Queries'
-import {
-  ApiCallStatus,
-  AssignmentConnection,
-  CommentConnection,
-  GradebookSubmissionCommentsResponse,
-  GradebookUserSubmissionDetails,
-} from '../../types'
+import {ApiCallStatus, CommentConnection, GradebookSubmissionCommentsResponse} from '../../types'
 import {Submission} from '../../../../api.d'
 
 const I18n = useI18nScope('enhanced_individual_gradebook_submit_score')
@@ -68,18 +62,13 @@ export const usePostComment = () => {
   )
   const [postCommentError, setpostCommentError] = useState<string>('')
 
-  const gradeChangeUrl = ENV.GRADEBOOK_OPTIONS?.change_grade_url || ''
-
   const submit = useCallback(
-    async (
-      assignment: AssignmentConnection,
-      submission: GradebookUserSubmissionDetails,
-      comment: string,
-      groupComment?: boolean
-    ) => {
-      const path = gradeChangeUrl
-        .replace(':assignment', assignment.id)
-        .replace(':submission', submission.userId)
+    async (comment: string, groupComment?: boolean, submitScoreUrl?: string | null) => {
+      if (!submitScoreUrl) {
+        setpostCommentError(I18n.t('Unable to post comment'))
+        setpostCommentStatus(ApiCallStatus.FAILED)
+        return
+      }
 
       setpostCommentStatus(ApiCallStatus.PENDING)
 
@@ -92,7 +81,7 @@ export const usePostComment = () => {
 
       try {
         const {status} = await executeApiRequest<Submission>({
-          path,
+          path: submitScoreUrl,
           body: requestBody,
           method: 'PUT',
         })
@@ -107,7 +96,7 @@ export const usePostComment = () => {
         setpostCommentStatus(ApiCallStatus.FAILED)
       }
     },
-    [gradeChangeUrl]
+    []
   )
 
   return {

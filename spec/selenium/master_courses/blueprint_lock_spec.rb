@@ -169,14 +169,14 @@ describe "master courses - locked items" do
       it "assignments show a working lock button on the index page", priority: "2" do
         get "/courses/#{@master.id}/assignments"
         element = blueprint_index_assignment_icon
-        escape = f("input#search_term.ic-Input")
+        escape = f("[data-testid='assignment-search-input']")
 
         element.find_element(:css, @unlocked_button_css).click
         escape.click # click away from the button due to firefox functionality
         refresh_page # refresh the page to retrieve info from backend
 
         element = blueprint_index_assignment_icon
-        escape = f("input#search_term.ic-Input")
+        escape = f("[data-testid='assignment-search-input']")
 
         verify_unlocked(element)
         element.find_element(:css, @locked_button_css).click

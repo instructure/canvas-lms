@@ -27,6 +27,7 @@ import {EnvGradingStandards} from '@canvas/global/env/EnvGradingStandards'
 import {EnvPlatformStorage} from '@canvas/global/env/EnvPlatformStorage'
 import {EnvAccounts} from '@canvas/global/env/EnvAccounts'
 import {EnvContextModules} from '@canvas/global/env/EnvContextModules'
+import {EnvWikiPages} from '@canvas/global/env/EnvWikiPages'
 
 /**
  * Top level ENV variable.
@@ -52,5 +53,6 @@ export type GlobalEnv =
         EnvGradingStandards &
         EnvPlatformStorage &
         EnvRce &
-        EnvContextModules
+        EnvContextModules &
+        EnvWikiPages
     >

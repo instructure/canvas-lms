@@ -32,7 +32,7 @@ module Lti::IMS::Concerns
     end
 
     def validate_return_url_data
-      return render_error({ errors: return_url_data.errors }) unless return_url_data.valid?
+      render_error({ errors: return_url_data.errors }) unless return_url_data.valid?
     end
 
     def validate_jwt

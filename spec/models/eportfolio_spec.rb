@@ -48,7 +48,7 @@ describe Eportfolio do
 
       it "is invalid when spam_status is not nil, 'marked_as_spam', 'marked_as_safe', or 'flagged_as_possible_spam'" do
         @eportfolio.spam_status = "a_new_status"
-        expect(@eportfolio).to be_invalid
+        expect(@eportfolio).not_to be_valid
       end
     end
   end

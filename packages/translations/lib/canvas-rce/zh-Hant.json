@@ -10,6 +10,7 @@
   "add_another_f4e50d57": { "message": "添加其他" },
   "add_cc_subtitles_55f0394e": { "message": "添加副本/字幕" },
   "add_image_60b2de07": { "message": "添加影像" },
+  "add_one_9e34a6f8": { "message": "添加一個！" },
   "additional_considerations_f3801683": { "message": "其他考慮因素" },
   "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
     "message": "URL 相同的相鄰連結應為單一連結。"
@@ -181,6 +182,7 @@
   "crop_image_807ebb08": { "message": "裁剪影像" },
   "cup_product_14174434": { "message": "杯子產品" },
   "current_image_f16c249c": { "message": "目前的圖像" },
+  "current_link_945a47ee": { "message": "目前的連結" },
   "current_volume_level_c55ab825": { "message": "目前音量" },
   "custom_6979cd81": { "message": "自訂" },
   "custom_width_and_height_pixels_946eea7c": {
@@ -491,6 +493,9 @@
   "light_blue_5374f600": { "message": "淺藍色" },
   "link_7262adec": { "message": "連結" },
   "link_options_a16b758b": { "message": "連結選項" },
+  "link_type_linktypemessage_c6d26815": {
+    "message": "連結類型：{ linkTypeMessage }"
+  },
   "link_with_text_starting_with_start_b3fcbe71": {
     "message": "文字以 { start } 開始的連結"
   },
@@ -541,6 +546,7 @@
   "minus_plus_3461f637": { "message": "+/-" },
   "misc_3b692ea7": { "message": "雜項" },
   "miscellaneous_e9818229": { "message": "雜項" },
+  "module_90d9fd32": { "message": "單元" },
   "modules_c4325335": { "message": "單元" },
   "moving_image_to_crop_directionword_6f66cde2": {
     "message": "移動影像以裁剪 { directionWord }"
@@ -565,19 +571,33 @@
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "導航整個選單或工具欄"
   },
+  "navigation_ee9af92d": { "message": "導航工具" },
   "nested_greater_than_d852e60d": { "message": "巢式大於" },
   "nested_less_than_27d17e58": { "message": "巢式小於" },
+  "new_quiz_34aacba6": { "message": "新測驗" },
   "next_40e12421": { "message": "下一個" },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "並無偵察任何可訪問性問題。"
   },
+  "no_announcements_created_yet_c44a94f4": { "message": "尚未建立通告。" },
+  "no_announcements_found_20185afc": { "message": "找不到通告。" },
+  "no_assignments_created_yet_1b236d87": { "message": "尚未建立作業列表。" },
+  "no_assignments_found_79e46d7f": { "message": "找不到作業列表。" },
   "no_changes_to_save_d29f6e91": { "message": "沒有要儲存的變更。" },
+  "no_discussions_created_yet_ff99abe3": { "message": "尚未建立討論區。" },
+  "no_discussions_found_9284063b": { "message": "找不到討論區。" },
   "no_e16d9132": { "message": "否" },
   "no_file_chosen_9a880793": { "message": "未選擇檔案" },
   "no_headers_9bc7dc7f": { "message": "無標題" },
+  "no_modules_created_yet_c71b6d4d": { "message": "尚未建立單元。" },
+  "no_modules_found_2df43a40": { "message": "找不到單元。" },
+  "no_pages_created_yet_c379fa6e": { "message": "尚未創建任何頁面。" },
+  "no_pages_found_6799350": { "message": "找不到頁面。" },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "本檔案不支援預覽。"
   },
+  "no_quizzes_created_yet_1a2370b9": { "message": "尚未建立測驗。" },
+  "no_quizzes_found_c80c537a": { "message": "找不到測驗。" },
   "no_results_940393cf": { "message": "無結果。" },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "找不到 { filterTerm } 的結果"
@@ -752,6 +772,7 @@
   "select_crop_shape_d441feeb": { "message": "選擇裁剪形狀" },
   "select_language_7c93a900": { "message": "選擇語言" },
   "select_video_source_1b5c9dbe": { "message": "選擇視訊資源" },
+  "selected_274ce24f": { "message": "已選擇" },
   "selected_linkfilename_c093b1f2": { "message": "已選定 { linkFileName }" },
   "selection_b52c4c5e": { "message": "選取" },
   "set_header_scope_8c548f40": { "message": "設定標題範圍" },
@@ -950,6 +971,7 @@
   "up_and_left_diagonal_arrow_e4a74a23": { "message": "向上和向左對角箭頭" },
   "up_and_right_diagonal_arrow_935b902e": { "message": "向上和向右對角箭頭" },
   "up_c553575d": { "message": "向上" },
+  "updated_link_a827e441": { "message": "更新的連結" },
   "upload_document_253f0478": { "message": "上傳文件" },
   "upload_file_fd2361b8": { "message": "上傳檔案" },
   "upload_image_6120b609": { "message": "上載影像" },

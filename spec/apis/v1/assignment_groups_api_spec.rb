@@ -229,6 +229,29 @@ describe AssignmentGroupsController, type: :request do
     expect(json.first["assignments"].first["submission"].pluck("user_id")).to eql [@observed_student.id]
   end
 
+  it "checks to see if submissions are found when a user is both a teacher and an observer" do
+    course_with_observer(active_all: true)
+    @observed_student = create_users(1, return_type: :record).first
+    @course.enroll_student(@observed_student, enrollment_state: "active")
+    @course.enroll_user(@teacher, "ObserverEnrollment", associated_user_id: @observed_student.id, enrollment_state: "active")
+
+    assignment = @course.assignments.create!(title: "title", submission_types: "online_url")
+    assignment.grade_student(@observed_student, grade: 10, grader: @teacher)
+
+    expect(@teacher.enrollments.count).to be 2
+
+    json = api_call_as_user(@teacher,
+                            :get,
+                            "/api/v1/courses/#{@course.id}/assignment_groups?include[]=assignments&include[]=observed_users&include[]=submission",
+                            { controller: "assignment_groups",
+                              action: "index",
+                              format: "json",
+                              course_id: @course.id,
+                              include: %w[assignments observed_users submission] })
+
+    expect(json.first["assignments"].first["submission"].length).to be 1
+  end
+
   it "optionally includes 'grades_published' for moderated assignments" do
     group = @course.assignment_groups.create!(name: "Homework")
     group.update_attribute(:position, 10)

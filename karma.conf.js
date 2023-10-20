@@ -118,6 +118,7 @@ const karmaConfig = {
   preprocessors: {
     'spec/javascripts/webpack_spec_index.js': ['webpack'],
     '**/*Spec.js': ['webpack'],
+    '**/*Spec.jsx': ['webpack'],
   },
 
   webpack: require('./ui-build/webpack-for-karma'),
@@ -132,7 +133,7 @@ if (process.env.COVERAGE === '1') {
     fixWebpackSourcePaths: true,
   }
   karmaConfig.webpack.module.rules.unshift({
-    test: /\.(js|coffee)$/,
+    test: /\.(js|jsx|ts|tsx|coffee)$/,
     use: {
       loader: 'coverage-istanbul-loader',
       options: {esModules: true, produceSourceMap: true},

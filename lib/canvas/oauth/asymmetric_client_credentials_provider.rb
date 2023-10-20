@@ -19,8 +19,8 @@
 
 module Canvas::OAuth
   class AsymmetricClientCredentialsProvider < ClientCredentialsProvider
-    def initialize(jwt, host, scopes = nil, protocol = "http://")
-      super(JSON::JWT.decode(jwt, :skip_verification)[:sub], host, scopes, protocol)
+    def initialize(jwt, host, scopes: nil, protocol: "http://")
+      super(JSON::JWT.decode(jwt, :skip_verification)[:sub], host, scopes:, protocol:)
       @errors = []
       if key.nil? || (key.public_jwk.nil? && key.public_jwk_url.nil?)
         @invalid_key = true
@@ -30,16 +30,26 @@ module Canvas::OAuth
     end
 
     def valid?
+      return false if @invalid_json
       return false if @invalid_key
 
       validator.valid?
     end
 
+    def assertion_method_permitted?
+      true
+    end
+
     def error_message
+      return "JWK Error: Invalid JSON" if @invalid_json
       return "JWS signature invalid." if @invalid_key
       return "JWK Error: #{errors.first.message}" if errors.present?
 
       validator.error_message
+    end
+
+    def secret
+      key&.api_key
     end
 
     private
@@ -67,9 +77,11 @@ module Canvas::OAuth
     end
 
     def get_jwk_from_url(jwt = nil)
-      pub_jwk_from_url = HTTParty.get(key.public_jwk_url)
-      JSON::JWT.decode(jwt, JSON::JWK::Set.new(pub_jwk_from_url.parsed_response))
-    rescue JSON::JWT::Exception => e
+      pub_jwk_from_url = CanvasHttp.get(key.public_jwk_url)
+      JSON::JWT.decode(jwt, JSON::JWK::Set.new(JSON.parse(pub_jwk_from_url.body)))
+    rescue JSON::ParserError
+      @invalid_json = true
+    rescue CanvasHttp::Error, EOFError, JSON::JWT::Exception => e
       errors << e
       raise JSON::JWS::VerificationFailed
     end

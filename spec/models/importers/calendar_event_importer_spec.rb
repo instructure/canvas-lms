@@ -71,6 +71,24 @@ describe Importers::CalendarEventImporter do
     expect(md[1]).to match %r{courses/\d+/#{type}/\d+} if type
   end
 
+  describe ".process_migration" do
+    it "keeps calendar series relations and rules" do
+      uuid = "8233ffdc-9067-4eaf-a726-19c3718dab29"
+      rrule = "FREQ=DAILY;INTERVAL=1;UNTIL=20241001T055959Z"
+      data = { "calendar_events" => [
+        { "migration_id" => "whatvs1", "series_uuid" => uuid, "series_head" => true, "rrule" => rrule },
+        { "migration_id" => "whatvs2", "series_uuid" => uuid, "series_head" => nil, "rrule" => rrule },
+        { "migration_id" => "whatvs3", "series_uuid" => uuid, "series_head" => nil, "rrule" => rrule }
+      ] }
+      Importers::CalendarEventImporter.process_migration(data, migration)
+      imported_events = migration_course.calendar_events
+      expect(imported_events.count).to eq 3
+      expect(imported_events.where.not(series_uuid: nil).where(rrule:, series_head: true).count).to eq 1
+      expect(imported_events.where.not(series_uuid: nil).where(rrule:, series_head: nil).count).to eq 2
+      expect(imported_events.pluck(:series_uuid)).not_to include(uuid)
+    end
+  end
+
   describe ".import_from_migration" do
     it "initializes a calendar event based on hash data" do
       event = migration_course.calendar_events.build

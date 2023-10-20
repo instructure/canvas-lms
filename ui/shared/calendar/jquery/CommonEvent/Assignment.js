@@ -17,13 +17,13 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import $ from 'jquery'
 import CommonEvent from './CommonEvent'
 import fcUtil from '../fcUtil'
 import {extend} from '@canvas/util/legacyCoffeesScriptHelpers'
 import {publish} from 'jquery-tinypubsub'
 import '@canvas/datetime'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
+import replaceTags from '@canvas/util/replaceTags'
 
 const I18n = useI18nScope('calendar')
 
@@ -100,7 +100,7 @@ Object.assign(Assignment.prototype, {
       url = this.contextInfo.create_assignment_url
     } else {
       method = 'PUT'
-      url = $.replaceTags(this.contextInfo.assignment_url, 'id', this.assignment.id)
+      url = replaceTags(this.contextInfo.assignment_url, 'id', this.assignment.id)
     }
     return [method, url]
   },

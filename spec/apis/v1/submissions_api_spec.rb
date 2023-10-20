@@ -1150,6 +1150,7 @@ describe "Submissions API", type: :request do
                           "url" => nil,
                           "submission_type" => "online_text_entry",
                           "user_id" => student1.id,
+                          "custom_grade_status_id" => nil,
                           "submission_comments" =>
          [{ "comment" => "Well here's the thing...",
             "attempt" => nil,
@@ -1180,6 +1181,7 @@ describe "Submissions API", type: :request do
                           "missing" => false,
                           "late_policy_status" => nil,
                           "seconds_late" => 0,
+                          "sticker" => nil,
                           "points_deducted" => nil,
                           "extra_attempts" => nil
                         })
@@ -1313,6 +1315,7 @@ describe "Submissions API", type: :request do
     media_object(media_id: "54321", context: student1, user: student1)
     submit_homework(a1, student1, media_comment_id: "54321", media_comment_type: "video")
     sub1 = submit_homework(a1, student1) { |s| s.attachments = [attachment_model(context: student1, folder: nil)] }
+    sub1.update!(sticker: "trophy")
 
     sub2a1 = attachment_model(context: student2, filename: "snapshot.png", content_type: "image/png")
     sub2 = submit_homework(a1, student2, url: "http://www.instructure.com") do |s|
@@ -1357,6 +1360,7 @@ describe "Submissions API", type: :request do
          "assignment_id" => a1.id,
          "submitted_at" => "1970-01-01T03:00:00Z",
          "cached_due_date" => nil,
+         "custom_grade_status_id" => nil,
          "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?preview=1&version=3",
          "redo_request" => false,
          "grade_matches_current_submission" => true,
@@ -1400,6 +1404,7 @@ describe "Submissions API", type: :request do
             "assignment_id" => a1.id,
             "submitted_at" => "1970-01-01T01:00:00Z",
             "cached_due_date" => nil,
+            "custom_grade_status_id" => nil,
             "attempt" => 1,
             "url" => nil,
             "submission_type" => "online_text_entry",
@@ -1414,6 +1419,7 @@ describe "Submissions API", type: :request do
             "missing" => false,
             "late_policy_status" => nil,
             "seconds_late" => 0,
+            "sticker" => nil,
             "points_deducted" => nil,
             "extra_attempts" => nil },
           { "id" => sub1.id,
@@ -1434,6 +1440,7 @@ describe "Submissions API", type: :request do
             "body" => "test!",
             "submitted_at" => "1970-01-01T02:00:00Z",
             "cached_due_date" => nil,
+            "custom_grade_status_id" => nil,
             "attempt" => 2,
             "url" => nil,
             "submission_type" => "online_text_entry",
@@ -1448,6 +1455,7 @@ describe "Submissions API", type: :request do
             "missing" => false,
             "late_policy_status" => nil,
             "seconds_late" => 0,
+            "sticker" => nil,
             "points_deducted" => nil,
             "extra_attempts" => nil },
           { "id" => sub1.id,
@@ -1494,6 +1502,7 @@ describe "Submissions API", type: :request do
             "body" => "test!",
             "submitted_at" => "1970-01-01T03:00:00Z",
             "cached_due_date" => nil,
+            "custom_grade_status_id" => nil,
             "attempt" => 3,
             "url" => nil,
             "submission_type" => "online_text_entry",
@@ -1508,6 +1517,7 @@ describe "Submissions API", type: :request do
             "missing" => false,
             "late_policy_status" => nil,
             "seconds_late" => 0,
+            "sticker" => "trophy",
             "points_deducted" => nil,
             "extra_attempts" => nil }],
          "attempt" => 3,
@@ -1550,6 +1560,7 @@ describe "Submissions API", type: :request do
          "missing" => false,
          "late_policy_status" => nil,
          "seconds_late" => 0,
+         "sticker" => "trophy",
          "points_deducted" => nil },
        { "id" => sub2.id,
          "grade" => "F",
@@ -1558,6 +1569,7 @@ describe "Submissions API", type: :request do
          "excused" => sub2.excused,
          "grader_id" => @teacher.id,
          "cached_due_date" => nil,
+         "custom_grade_status_id" => nil,
          "graded_at" => sub2.graded_at.as_json,
          "posted_at" => sub2.posted_at.as_json,
          "assignment_id" => a1.id,
@@ -1579,6 +1591,7 @@ describe "Submissions API", type: :request do
             "body" => nil,
             "submitted_at" => "1970-01-01T04:00:00Z",
             "cached_due_date" => nil,
+            "custom_grade_status_id" => nil,
             "attempt" => 1,
             "url" => "http://www.instructure.com",
             "submission_type" => "online_url",
@@ -1619,6 +1632,7 @@ describe "Submissions API", type: :request do
             "missing" => false,
             "late_policy_status" => nil,
             "seconds_late" => 0,
+            "sticker" => nil,
             "points_deducted" => nil,
             "extra_attempts" => nil }],
          "attempt" => 1,
@@ -1661,6 +1675,7 @@ describe "Submissions API", type: :request do
          "missing" => false,
          "late_policy_status" => nil,
          "seconds_late" => 0,
+         "sticker" => nil,
          "points_deducted" => nil }]
     expect(json.sort_by { |h| h["user_id"] }).to eql(res.sort_by { |h| h["user_id"] })
   end
@@ -3360,6 +3375,29 @@ describe "Submissions API", type: :request do
         expect(json.dig("submission_comments", 0, "author_name")).to eq "Anonymous User"
       end
     end
+
+    it "handles updating the submission sticker" do
+      submission = @assignment.submission_for_student(@student)
+      expect do
+        api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/anonymous_submissions/#{submission.anonymous_id}.json",
+          {
+            controller: "submissions_api",
+            action: "update_anonymous",
+            format: "json",
+            course_id: @course.id.to_s,
+            assignment_id: @assignment.id.to_s,
+            anonymous_id: submission.anonymous_id.to_s
+          },
+          {
+            submission: { sticker: "trophy" }
+          }
+        )
+      end.to change {
+        submission.reload.sticker
+      }.from(nil).to("trophy")
+    end
   end
 
   describe "#update" do
@@ -3550,6 +3588,72 @@ describe "Submissions API", type: :request do
       }.by(1)
     end
 
+    describe "stickers" do
+      let(:update_sticker_api_call) do
+        api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+          {
+            controller: "submissions_api",
+            action: "update",
+            format: "json",
+            course_id: @course.id.to_s,
+            assignment_id: @assignment.id.to_s,
+            user_id: @student.id.to_s
+          },
+          {
+            submission: { sticker: "trophy" }
+          }
+        )
+      end
+
+      it "handles updating the submission sticker" do
+        submission = @assignment.submission_for_student(@student)
+        expect { update_sticker_api_call }.to change {
+          submission.reload.sticker
+        }.from(nil).to("trophy")
+      end
+
+      it "does not update the grader when the sticker is set" do
+        submission = @assignment.submission_for_student(@student)
+        expect { update_sticker_api_call }.not_to change {
+          submission.reload.grader
+        }.from(nil)
+      end
+
+      context "group assignments" do
+        before do
+          @student2 = @course.enroll_student(User.create!, enrollment_state: :active).user
+          group_category = @course.group_categories.create!(name: "Category")
+          group = @course.groups.create!(name: "Group", group_category:)
+          group.add_user(@student, "accepted")
+          group.add_user(@student2, "accepted")
+          @assignment.update!(group_category:, grade_group_students_individually: false)
+        end
+
+        let(:student_submissions) do
+          @assignment.submissions.where(user: [@student, @student2])
+        end
+
+        it "assigns the sticker to all group members" do
+          expect { update_sticker_api_call }.to change {
+            student_submissions.pluck(:user_id, :sticker).to_h
+          }
+            .from({ @student.id => nil, @student2.id => nil })
+            .to({ @student.id => "trophy", @student2.id => "trophy" })
+        end
+
+        it "assigns the sticker to only one student if 'grade group students individually' is set" do
+          @assignment.update!(grade_group_students_individually: true)
+          expect { update_sticker_api_call }.to change {
+            student_submissions.pluck(:user_id, :sticker).to_h
+          }
+            .from({ @student.id => nil, @student2.id => nil })
+            .to({ @student.id => "trophy", @student2.id => nil })
+        end
+      end
+    end
+
     context "grading scheme with numerics in names" do
       before do
         @standard = @course.grading_standards.create!(title: "course standard", standard_data: { a: { name: "5", value: "90" }, b: { name: "4", value: "70" }, c: { name: "3", value: "50" }, d: { name: "Revision required/Komplettering", value: "25" }, e: { name: "U", value: "0" } })
@@ -3635,6 +3739,12 @@ describe "Submissions API", type: :request do
 
     context "group assignments" do
       before do
+        @admin = account_admin_user(account: @course.root_account)
+        @custom_status = @course.root_account.custom_grade_statuses.create!(
+          color: "#BBB",
+          created_by: @admin,
+          name: "yolo"
+        )
         @student2 = @course.enroll_student(User.create!, enrollment_state: :active).user
         group_category = @course.group_categories.create!(name: "Category")
         group = @course.groups.create!(name: "Group", group_category:)
@@ -3663,6 +3773,55 @@ describe "Submissions API", type: :request do
 
         submission = @assignment.submission_for_student(@student2)
         expect(submission.late_policy_status).to eq "missing"
+      end
+
+      it "can set a custom status on a group member's submission" do
+        api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+          {
+            controller: "submissions_api",
+            action: "update",
+            format: "json",
+            course_id: @course.id.to_s,
+            assignment_id: @assignment.id.to_s,
+            user_id: @student.id.to_s
+          },
+          {
+            submission: {
+              custom_grade_status_id: @custom_status.id.to_s
+            }
+          }
+        )
+
+        submission = @assignment.submission_for_student(@student2)
+        expect(submission.custom_grade_status_id).to eq @custom_status.id
+      end
+
+      it "does not set a custom status for the whole group when assignment is graded individually" do
+        @assignment.update!(grade_group_students_individually: true)
+        api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+          {
+            controller: "submissions_api",
+            action: "update",
+            format: "json",
+            course_id: @course.id.to_s,
+            assignment_id: @assignment.id.to_s,
+            user_id: @student.id.to_s
+          },
+          {
+            submission: {
+              custom_grade_status_id: @custom_status.id.to_s
+            }
+          }
+        )
+
+        first_submission = @assignment.submission_for_student(@student)
+        expect(first_submission.custom_grade_status_id).to eq @custom_status.id
+        second_submission = @assignment.submission_for_student(@student2)
+        expect(second_submission.custom_grade_status_id).to be_nil
       end
 
       it "can set seconds_late_override on a group member's submission" do
@@ -3761,6 +3920,38 @@ describe "Submissions API", type: :request do
       submission = @assignment.submission_for_student(@student)
       expect(submission.late_policy_status).to eq "missing"
       expect(json["late_policy_status"]).to eq "missing"
+    end
+
+    it "can set a custom status on a submission" do
+      admin = account_admin_user(account: @course.root_account)
+      custom_status = @course.root_account.custom_grade_statuses.create!(
+        color: "#BBB",
+        created_by: admin,
+        name: "yolo"
+      )
+      submission = @assignment.submission_for_student(@student)
+      submission.update!(late_policy_status: "missing")
+      api_call(
+        :put,
+        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+        {
+          controller: "submissions_api",
+          action: "update",
+          format: "json",
+          course_id: @course.id.to_s,
+          assignment_id: @assignment.id.to_s,
+          user_id: @student.id.to_s
+        },
+        {
+          submission: {
+            custom_grade_status_id: custom_status.id.to_s
+          }
+        }
+      )
+
+      submission.reload
+      expect(submission.late_policy_status).to be_nil
+      expect(submission.custom_grade_status_id).to eq custom_status.id
     end
 
     it "can set seconds_late_override on a submission along with the late_policy_status of late" do
@@ -5520,9 +5711,8 @@ describe "Submissions API", type: :request do
     expect(@submission.reload.read?(@teacher)).to be_falsey
   end
 
-  context "with feedback visibility on" do
+  context "submission feedback" do
     before :once do
-      Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
       course_with_student_and_submitted_homework
     end
 
@@ -5681,7 +5871,6 @@ describe "Submissions API", type: :request do
 
   context "clear unread submissions" do
     before :once do
-      Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
       course_with_teacher(active_all: true)
       student_in_course(active_all: true)
       assignment_model(course: @course)

@@ -25,9 +25,20 @@ export interface EnvCommon {
   ASSET_HOST: string
   active_brand_config_json_url: string
   active_brand_config: object
+  badge_counts?: {
+    discussions: number
+    assignments: number
+    conversations: number
+    grades: number
+    alerts: number
+    announcements: number
+    submissions: number
+    total: number
+  }
   confetti_branding_enabled: boolean
   url_to_what_gets_loaded_inside_the_tinymce_editor_css: string
   url_for_high_contrast_tinymce_editor_css: string
+  csp?: string
   current_user_id: string
   current_user_global_id: string
   current_user_roles: string[]
@@ -37,7 +48,10 @@ export interface EnvCommon {
   current_user_visited_tabs: null | unknown
   discussions_reporting: boolean
   files_domain: string
-  group_information: null | unknown
+  group_information: {
+    id: string
+    label: string
+  }[]
   DOMAIN_ROOT_ACCOUNT_ID: string
   k12: false
   help_link_name: string
@@ -50,6 +64,7 @@ export interface EnvCommon {
   DEEP_LINKING_POST_MESSAGE_ORIGIN: string
   DEEP_LINKING_LOGGING: null | unknown
   comment_library_suggestions_enabled: boolean
+  INCOMPLETE_REGISTRATION: boolean
   SETTINGS: {
     open_registration: boolean
     collapse_global_nav: boolean
@@ -162,17 +177,18 @@ export type SiteAdminFeatureId =
   | 'calendar_series'
   | 'account_level_blackout_dates'
   | 'account_calendar_events'
-  | 'rce_ux_improvements'
+  | 'instui_nav'
   | 'render_both_to_do_lists'
   | 'course_paces_redesign'
   | 'course_paces_for_students'
   | 'module_publish_menu'
   | 'explicit_latex_typesetting'
   | 'dev_key_oidc_alert'
-  | 'rce_new_external_tool_dialog_in_canvas'
   | 'media_links_use_attachment_id'
-  | 'auto_subscribe_account_calendars'
   | 'permanent_page_links'
+  | 'differentiated_modules'
+  | 'enhanced_course_creation_account_fetching'
+  | 'instui_for_import_page'
 
 /**
  * From ApplicationController#JS_ENV_ROOT_ACCOUNT_FEATURES
@@ -184,12 +200,14 @@ export type RootAccountFeatureId =
   | 'create_course_subaccount_picker'
   | 'lti_deep_linking_module_index_menu_modal'
   | 'lti_multiple_assignment_deep_linking'
+  | 'lti_overwrite_user_url_input_select_content_dialog'
   | 'buttons_and_icons_root_account'
   | 'extended_submission_state'
   | 'scheduled_page_publication'
   | 'send_usage_metrics'
   | 'rce_transform_loaded_content'
   | 'mobile_offline_mode'
+  | 'instui_nav'
 
 /**
  * From ApplicationController#JS_ENV_BRAND_ACCOUNT_FEATURES
@@ -200,7 +218,7 @@ export type BrandAccountFeatureId = 'embedded_release_notes'
  * Feature id exported in ApplicationController that aren't mentioned in
  * JS_ENV_SITE_ADMIN_FEATURES or JS_ENV_ROOT_ACCOUNT_FEATURES or JS_ENV_BRAND_ACCOUNT_FEATURES
  */
-export type OtherFeatureId = 'canvas_k6_theme'
+export type OtherFeatureId = 'canvas_k6_theme' | 'new_math_equation_handling'
 
 /**
  * From ApplicationHelper#set_tutorial_js_env

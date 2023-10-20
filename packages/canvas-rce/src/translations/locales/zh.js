@@ -31,6 +31,7 @@ const locale = {
   "add_another_f4e50d57": { "message": "新增" },
   "add_cc_subtitles_55f0394e": { "message": "添加抄送/副标题" },
   "add_image_60b2de07": { "message": "添加图像" },
+  "add_one_9e34a6f8": { "message": "添加一个!" },
   "additional_considerations_f3801683": { "message": "其他考虑事项" },
   "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
     "message": "具有相同 URL 的相邻链接应该为一个单链接。"
@@ -202,6 +203,7 @@ const locale = {
   "crop_image_807ebb08": { "message": "裁剪图像" },
   "cup_product_14174434": { "message": "上积" },
   "current_image_f16c249c": { "message": "当前图像" },
+  "current_link_945a47ee": { "message": "当前链接" },
   "current_volume_level_c55ab825": { "message": "当前音量" },
   "custom_6979cd81": { "message": "自定义" },
   "custom_width_and_height_pixels_946eea7c": {
@@ -504,6 +506,9 @@ const locale = {
   "light_blue_5374f600": { "message": "浅蓝色" },
   "link_7262adec": { "message": "链接" },
   "link_options_a16b758b": { "message": "链接选项" },
+  "link_type_linktypemessage_c6d26815": {
+    "message": "链接类型：{ linkTypeMessage }"
+  },
   "link_with_text_starting_with_start_b3fcbe71": {
     "message": "具有以{ start }开始的文本的链接"
   },
@@ -554,6 +559,7 @@ const locale = {
   "minus_plus_3461f637": { "message": "减号/加号" },
   "misc_3b692ea7": { "message": "其他" },
   "miscellaneous_e9818229": { "message": "其他" },
+  "module_90d9fd32": { "message": "单元" },
   "modules_c4325335": { "message": "单元" },
   "moving_image_to_crop_directionword_6f66cde2": {
     "message": "正在移动图片以剪裁 { directionWord }"
@@ -578,19 +584,33 @@ const locale = {
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "导航菜单或工具栏"
   },
+  "navigation_ee9af92d": { "message": "导航" },
   "nested_greater_than_d852e60d": { "message": "嵌套大于" },
   "nested_less_than_27d17e58": { "message": "嵌套小于" },
+  "new_quiz_34aacba6": { "message": "新测验" },
   "next_40e12421": { "message": "下一步" },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "没有发现辅助功能问题。"
   },
+  "no_announcements_created_yet_c44a94f4": { "message": "尚未创建公告。" },
+  "no_announcements_found_20185afc": { "message": "未找到公告。" },
+  "no_assignments_created_yet_1b236d87": { "message": "尚未创建作业。" },
+  "no_assignments_found_79e46d7f": { "message": "未找到作业。" },
   "no_changes_to_save_d29f6e91": { "message": "没有更改要保存。" },
+  "no_discussions_created_yet_ff99abe3": { "message": "尚未创建讨论。" },
+  "no_discussions_found_9284063b": { "message": "未找到讨论。" },
   "no_e16d9132": { "message": "否" },
   "no_file_chosen_9a880793": { "message": "没有选择文件" },
   "no_headers_9bc7dc7f": { "message": "无标题" },
+  "no_modules_created_yet_c71b6d4d": { "message": "尚未创建单元。" },
+  "no_modules_found_2df43a40": { "message": "未找到单元。" },
+  "no_pages_created_yet_c379fa6e": { "message": "尚未创建页面。" },
+  "no_pages_found_6799350": { "message": "未找到页面。" },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "没有预览可用于此文件。"
   },
+  "no_quizzes_created_yet_1a2370b9": { "message": "尚未创建测验。" },
+  "no_quizzes_found_c80c537a": { "message": "未找到测验。" },
   "no_results_940393cf": { "message": "无结果。" },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "未找到{ filterTerm }的结果"
@@ -763,6 +783,7 @@ const locale = {
   "select_crop_shape_d441feeb": { "message": "选择裁剪形状" },
   "select_language_7c93a900": { "message": "选择语言" },
   "select_video_source_1b5c9dbe": { "message": "选择视频来源" },
+  "selected_274ce24f": { "message": "选定的" },
   "selected_linkfilename_c093b1f2": { "message": "已选择 { linkFileName }" },
   "selection_b52c4c5e": { "message": "选择" },
   "set_header_scope_8c548f40": { "message": "设置标题范围" },
@@ -959,6 +980,7 @@ const locale = {
   "up_and_left_diagonal_arrow_e4a74a23": { "message": "左上斜箭头" },
   "up_and_right_diagonal_arrow_935b902e": { "message": "右上斜箭头" },
   "up_c553575d": { "message": "上" },
+  "updated_link_a827e441": { "message": "更新的链接" },
   "upload_document_253f0478": { "message": "上传文档" },
   "upload_file_fd2361b8": { "message": "上传文件" },
   "upload_image_6120b609": { "message": "上传图像" },

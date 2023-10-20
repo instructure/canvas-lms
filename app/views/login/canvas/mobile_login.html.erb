@@ -19,6 +19,13 @@
 <% js_bundle :mobile_login %>
 
 <% extend Api::V1::Account %>
+<%
+  unique_id = begin
+    params.dig(:pseudonym_session, :unique_id)&.to_s
+  rescue TypeError
+    nil
+  end
+%>
 
   <div class="mobileLogin-Header">
     <span class="screenreader-only">
@@ -51,7 +58,7 @@
       placeholder="<%= @login_handle_name%>"
       type="<%= @login_handle_is_email ? 'email' : 'text' %>"
       name="pseudonym_session[unique_id]"
-      value="<%= params[:pseudonym_session].try(:[], :unique_id) %>" />
+      value="<%= unique_id %>" />
   </div>
   <div class="ic-Form-control">
     <input
