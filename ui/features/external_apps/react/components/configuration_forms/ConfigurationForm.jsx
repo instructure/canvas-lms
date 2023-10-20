@@ -21,21 +21,11 @@ import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
 import ConfigurationFormLti13 from './ConfigurationFormLti13'
-import ConfigurationFormLti2New from './ConfigurationFormLti2'
-import ConfigurationFormManualNew from './ConfigurationFormManual'
-import ConfigurationFormUrlNew from './ConfigurationFormUrl'
-import ConfigurationFormXmlNew from './ConfigurationFormXml'
-import ConfigurationFormLti2Old from './old_forms/ConfigurationFormLti2'
-import ConfigurationFormXmlOld from './old_forms/ConfigurationFormXml'
-import ConfigurationFormUrlOld from './old_forms/ConfigurationFormUrl'
-import ConfigurationFormManualOld from './old_forms/ConfigurationFormManual'
+import ConfigurationFormLti2 from './ConfigurationFormLti2'
+import ConfigurationFormManual from './ConfigurationFormManual'
+import ConfigurationFormUrl from './ConfigurationFormUrl'
+import ConfigurationFormXml from './ConfigurationFormXml'
 import ConfigurationTypeSelector from './ConfigurationTypeSelector'
-
-// Remove this hack as soon as the instui_for_tool_configuration_forms feature flag is removed
-let ConfigurationFormLti2
-let ConfigurationFormXml
-let ConfigurationFormUrl
-let ConfigurationFormManual
 
 const I18n = useI18nScope('external_tools')
 
@@ -73,18 +63,6 @@ export default class ConfigurationForm extends React.Component {
     }
 
     this.state = _state
-
-    if (window.ENV.INSTUI_FOR_TOOL_CONFIGURATION_FORMS) {
-      ConfigurationFormLti2 = ConfigurationFormLti2New
-      ConfigurationFormXml = ConfigurationFormXmlNew
-      ConfigurationFormUrl = ConfigurationFormUrlNew
-      ConfigurationFormManual = ConfigurationFormManualNew
-    } else {
-      ConfigurationFormLti2 = ConfigurationFormLti2Old
-      ConfigurationFormXml = ConfigurationFormXmlOld
-      ConfigurationFormUrl = ConfigurationFormUrlOld
-      ConfigurationFormManual = ConfigurationFormManualOld
-    }
   }
 
   defaultState = () => ({

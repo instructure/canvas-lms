@@ -1535,7 +1535,6 @@ class CoursesController < ApplicationController
                EXTERNAL_TOOLS_CREATE_URL: url_for(controller: :external_tools, action: :create, course_id: @context.id),
                TOOL_CONFIGURATION_SHOW_URL: course_show_tool_configuration_url(course_id: @context.id, developer_key_id: ":developer_key_id"),
                MEMBERSHIP_SERVICE_FEATURE_FLAG_ENABLED: @context.root_account.feature_enabled?(:membership_service_for_lti_tools),
-               INSTUI_FOR_TOOL_CONFIGURATION_FORMS: Account.site_admin.feature_enabled?(:instui_for_tool_configuration_forms),
                CONTEXT_BASE_URL: "/courses/#{@context.id}",
                COURSE_COLOR: @context.elementary_enabled? && @context.course_color,
                PUBLISHING_ENABLED: @publishing_enabled,

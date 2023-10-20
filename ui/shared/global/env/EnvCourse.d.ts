@@ -141,9 +141,6 @@ export interface EnvCourseSettings {
    */
   TOOL_CONFIGURATION_SHOW_URL: string
   MEMBERSHIP_SERVICE_FEATURE_FLAG_ENABLED: boolean
-  // This is a messy hack for the tool configuration forms. We have newer Typescript versions
-  // that also use InstUI, but decided to keep the old forms around to prevent confusion.
-  INSTUI_FOR_TOOL_CONFIGURATION_FORMS: boolean
   /**
    * Example: "/courses/119048"
    */
