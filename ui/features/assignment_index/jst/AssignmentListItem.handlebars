@@ -14,10 +14,12 @@
         <span class="screenreader-only">{{#t}}Retry duplicating "{{originalAssignmentName}}"{{/t}}</span>
         <span aria-hidden="true">{{#t}}Retry{{/t}}</span>
       </button>
+      {{#unless is_master_course_child_content}}
       <button class="duplicate-failed-cancel btn">
         <span class="screenreader-only">{{#t}}Cancel duplicating "{{originalAssignmentName}}"{{/t}}</span>
         <span aria-hidden="true">{{#t}}Cancel{{/t}}</span>
       </button>
+      {{/unless}}
     </div>
   {{else}} {{#if isMigrating}}
     <div class="ig-row__layout">

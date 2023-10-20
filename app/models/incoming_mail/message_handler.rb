@@ -40,8 +40,12 @@ module IncomingMail
         from_channel = sent_from_channel(user, incoming_message)
         raise IncomingMail::Errors::UnknownSender unless from_channel
         raise IncomingMail::Errors::MessageTooLong if body.length > ActiveRecord::Base.maximum_text_length
-        raise IncomingMail::Errors::MessageTooLong if html_body.length > ActiveRecord::Base.maximum_text_length
         raise IncomingMail::Errors::BlankMessage if body.blank?
+
+        # Check if html_body is too long, if yes, set html_body to nil so that the plain text is used instead
+        if html_body.length > ActiveRecord::Base.maximum_text_length
+          html_body = nil
+        end
 
         Rails.cache.fetch(["incoming_mail_reply_from", context, incoming_message.message_id].cache_key, expires_in: 7.days) do
           context.reply_from({
@@ -139,9 +143,9 @@ module IncomingMail
                    TEXT
                  else # including IncomingMessageProcessor::UnknownAddressError
                    InstStatsd::Statsd.increment("incoming_mail_processor.message_processing_error.catch_all")
-                   error_info = { tags: { type: :message_processing_error_catch_all }, ref: get_ref_uuid }
+                   error_info = { tags: { type: :message_processing_error_catch_all }, extra: { ref: get_ref_uuid } }
                    Canvas::Errors.capture(error, error_info, :error)
-                   I18n.t("lib.incoming_message_processor.failure_message.body", <<~TEXT, subject:, ref: error_info[:ref]).gsub(/^ +/, "")
+                   I18n.t("lib.incoming_message_processor.failure_message.body", <<~TEXT, subject:, ref: error_info.dig(:extra, :ref)).to_s.gsub(/^ +/, "")
                      The message titled "%{subject}" could not be delivered.  The message was sent to an unknown mailbox address.  If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
 
                      Thank you,
@@ -171,7 +175,7 @@ module IncomingMail
 
     def parse_tag(tag)
       match = tag.match(/^(\h+)-([0-9~]+)(?:-([0-9]+))?$/)
-      return match[1], match[2], match[3] if match
+      [match[1], match[2], match[3]] if match
     end
 
     def get_original_message(original_message_id, timestamp)

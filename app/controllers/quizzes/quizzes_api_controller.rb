@@ -604,6 +604,6 @@ class Quizzes::QuizzesApiController < ApplicationController
   end
 
   def check_differentiated_assignments
-    return render_unauthorized_action if @current_user && !@quiz.visible_to_user?(@current_user)
+    render_unauthorized_action if @current_user && !@quiz.visible_to_user?(@current_user)
   end
 end

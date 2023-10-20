@@ -63,9 +63,7 @@ export const template = generateActionTemplates(
     },
     {
       title: I18n.t('Reports (Account Settings)'),
-      description: I18n.t(
-        'To view the Reports tab, Reports - manage must also be enabled.'
-      ),
+      description: I18n.t('To view the Reports tab, Reports - manage must also be enabled.'),
     },
     {
       title: I18n.t('Subaccount Navigation (Account Settings)'),

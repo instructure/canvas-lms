@@ -321,6 +321,29 @@ describe Canvas::LiveEvents do
       Canvas::LiveEvents.conversation_message_created(convo_message)
     end
 
+    it "triggers live event from Incoming Mail (via reply_from) method" do
+      # when a user replies to a conversation via email, the IncomingMailProcessor
+      # looks up the reply_from method of the object, in this case,
+      # reply_from creates a new ConversationMessage and adds it to the conversation
+      # this spec should prove that the live event is triggered from the "reply_from"
+      allow(LiveEvents).to receive(:post_event)
+      user1 = user_model
+      user2 = user_model
+      convo = Conversation.initiate([user1, user2], false)
+      convo_message = convo.reply_from({ user: user1, text: "this is an example incoming mail reply" })
+      expect(LiveEvents).to have_received(:post_event).with(
+        context: nil,
+        event_name: "conversation_message_created",
+        time: anything,
+        payload: {
+          author_id: convo_message.author_id.to_s,
+          conversation_id: convo_message.conversation_id.to_s,
+          message_id: convo_message.id.to_s,
+          created_at: convo_message.created_at
+        }
+      )
+    end
+
     it "doesnt include conversation_id" do
       user = user_model
       msg = Conversation.build_message(user, "lorem ipsum")
@@ -1147,6 +1170,7 @@ describe Canvas::LiveEvents do
     it "triggers a live event with assignment details" do
       expect_event("assignment_updated",
                    hash_including({
+                     anonymous_grading: @assignment.anonymous_grading,
                      assignment_id: @assignment.global_id.to_s,
                      context_id: @course.global_id.to_s,
                      context_uuid: @course.uuid,
@@ -1371,8 +1395,8 @@ describe Canvas::LiveEvents do
       migration.migration_settings[:import_quizzes_next] = true
       course.lti_context_id = "abc"
       source_course.lti_context_id = "def"
-      expect(source_course).to receive(:has_new_quizzes?).and_return(true)
-      expect(migration).to receive(:file_download_url).and_return("http://example.com/resource_map.json")
+      allow(source_course).to receive(:has_new_quizzes?).and_return(true)
+      allow(migration).to receive(:file_download_url).and_return("http://example.com/resource_map.json")
     end
 
     it "sent events with expected payload" do
@@ -1401,6 +1425,45 @@ describe Canvas::LiveEvents do
       ).once
 
       Canvas::LiveEvents.content_migration_completed(migration)
+    end
+
+    describe "resource map property" do
+      before do
+        allow(migration).to receive(:asset_map_v2?).and_return(true)
+        allow(source_course).to receive(:has_new_quizzes?).and_return(false)
+      end
+
+      describe "the resource map is not needed" do
+        before do
+          migration.migration_settings[:import_quizzes_next] = false
+        end
+
+        it "does not send the resource map" do
+          expect_event(
+            "content_migration_completed",
+            hash_not_including(:resource_map_url),
+            hash_including(context_id: course.global_id.to_s)
+          ).once
+
+          Canvas::LiveEvents.content_migration_completed(migration)
+        end
+      end
+
+      describe "importing new quizzes with link migration" do
+        before do
+          migration.migration_settings[:import_quizzes_next] = true
+        end
+
+        it "does not send the resource map" do
+          expect_event(
+            "content_migration_completed",
+            hash_including(resource_map_url: "http://example.com/resource_map.json"),
+            hash_including(context_id: course.global_id.to_s)
+          ).once
+
+          Canvas::LiveEvents.content_migration_completed(migration)
+        end
+      end
     end
   end
 
@@ -1892,6 +1955,7 @@ describe Canvas::LiveEvents do
   end
 
   describe "learning_outcomes" do
+    specs_require_sharding
     before do
       @context = course_model
     end
@@ -1913,7 +1977,9 @@ describe Canvas::LiveEvents do
           calculation_int: @outcome.calculation_int,
           rubric_criterion: @outcome.rubric_criterion,
           title: @outcome.title,
-          workflow_state: @outcome.workflow_state
+          workflow_state: @outcome.workflow_state,
+          copied_from_outcome_id: @outcome.copied_from_outcome_id,
+          original_outcome_root_account_uuid: nil
         }.compact).once
 
         Canvas::LiveEvents.learning_outcome_created(@outcome)
@@ -1935,10 +2001,38 @@ describe Canvas::LiveEvents do
           calculation_int: @global_outcome.calculation_int,
           rubric_criterion: @global_outcome.rubric_criterion,
           title: @global_outcome.title,
-          workflow_state: @global_outcome.workflow_state
+          workflow_state: @global_outcome.workflow_state,
+          copied_from_outcome_id: nil,
+          original_outcome_root_account_uuid: nil
         }.compact).once
 
         Canvas::LiveEvents.learning_outcome_created(@global_outcome)
+      end
+
+      it "triggers a learning_outcome_created live event for course copy" do
+        original_outcome = outcome_model(title: "original outcome")
+        copied_outcome = outcome_model(title: "copied outcome")
+        copied_outcome.update!(copied_from_outcome_id: original_outcome.global_id)
+
+        expect_event("learning_outcome_created", {
+          learning_outcome_id: copied_outcome.id.to_s,
+          context_type: copied_outcome.context_type,
+          context_id: copied_outcome.context_id.to_s,
+          context_uuid: @context.uuid.to_s,
+          display_name: copied_outcome.display_name,
+          short_description: copied_outcome.short_description,
+          description: copied_outcome.description,
+          vendor_guid: copied_outcome.vendor_guid,
+          calculation_method: copied_outcome.calculation_method,
+          calculation_int: copied_outcome.calculation_int,
+          rubric_criterion: copied_outcome.rubric_criterion,
+          title: copied_outcome.title,
+          workflow_state: copied_outcome.workflow_state,
+          copied_from_outcome_id: copied_outcome.copied_from_outcome_id.to_s,
+          original_outcome_root_account_uuid: nil
+        }.compact).once
+
+        Canvas::LiveEvents.learning_outcome_created(copied_outcome)
       end
     end
 
@@ -1962,7 +2056,9 @@ describe Canvas::LiveEvents do
           rubric_criterion: @outcome.rubric_criterion,
           title: @outcome.title,
           updated_at: @outcome.updated_at,
-          workflow_state: @outcome.workflow_state
+          workflow_state: @outcome.workflow_state,
+          copied_from_outcome_id: @outcome.copied_from_outcome_id,
+          original_outcome_root_account_uuid: nil
         }.compact).once
 
         Canvas::LiveEvents.learning_outcome_updated(@outcome)
@@ -1987,10 +2083,36 @@ describe Canvas::LiveEvents do
           rubric_criterion: @global_outcome.rubric_criterion,
           title: @global_outcome.title,
           updated_at: @global_outcome.updated_at,
-          workflow_state: @global_outcome.workflow_state
+          workflow_state: @global_outcome.workflow_state,
+          copied_from_outcome_id: nil,
+          original_outcome_root_account_uuid: nil
         }.compact).once
 
         Canvas::LiveEvents.learning_outcome_updated(@global_outcome)
+      end
+    end
+
+    context "root account uuid for course copy original outcome" do
+      before do
+        @copied_outcome = outcome_model(title: "test copied outcome 1")
+      end
+
+      it "returns nil when copied_from_outcome_id comes from an outcome within the current shard" do
+        original_outcome = outcome_model(title: "test outcome 1")
+        @copied_outcome.update!(copied_from_outcome_id: original_outcome.global_id)
+        response = Canvas::LiveEvents.get_root_account_uuid(@copied_outcome.copied_from_outcome_id)
+        expect(response).to be_nil
+      end
+
+      it "return an account uuid when copied_from_outcome_id comes from an outcome in a different shard" do
+        @shard1.activate do
+          @s1_account = Account.create
+          @s1_course = @s1_account.courses.create!
+          @s1_outcome = @s1_course.created_learning_outcomes.create!(title: "S1 outcome")
+        end
+        @copied_outcome.update!(copied_from_outcome_id: @s1_outcome.global_id)
+        response = Canvas::LiveEvents.get_root_account_uuid(@copied_outcome.copied_from_outcome_id)
+        expect(response).to eq @s1_account.uuid
       end
     end
   end
@@ -2595,8 +2717,7 @@ describe Canvas::LiveEvents do
       let(:region_code) { "prod-iad" }
 
       before do
-        allow(Canvas).to receive(:region).and_return(region)
-        allow(Canvas).to receive(:region_code).and_return(region_code)
+        allow(Canvas).to receive_messages(region:, region_code:)
       end
 
       it "sets region to Canvas.region" do
@@ -2623,8 +2744,7 @@ describe Canvas::LiveEvents do
         let(:environment) { "beta" }
 
         before do
-          allow(ApplicationController).to receive(:test_cluster?).and_return true
-          allow(ApplicationController).to receive(:test_cluster_name).and_return environment
+          allow(ApplicationController).to receive_messages(test_cluster?: true, test_cluster_name: environment)
         end
 
         it "sets environment to beta" do

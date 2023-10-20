@@ -24,6 +24,10 @@ describe "CSP Settings API", type: :request do
     context.context_external_tools.create!({ name: "a", consumer_key: "12345", shared_secret: "secret" }.merge(attrs))
   end
 
+  before do
+    allow(HostUrl).to receive(:context_host).with(Account.default, anything).and_return("example1.com")
+  end
+
   before :once do
     account_admin_user(active_all: true)
     @sub = Account.default.sub_accounts.create!

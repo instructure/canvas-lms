@@ -28,9 +28,9 @@ describe SubmissionList do
     expect { @sl = SubmissionList.new(-1) }.to raise_error(ArgumentError, "Must provide a course.")
   end
 
-  it "provides a dictionary in 'list'" do
+  it "provides a hash in 'list'" do
     course_model
-    expect(SubmissionList.new(@course).list).to be_is_a(Hashery::Dictionary)
+    expect(SubmissionList.new(@course).list).to be_a(Hash)
   end
 
   it "creates keys in the data when versions of submissions existed" do

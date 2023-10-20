@@ -169,7 +169,6 @@ class RoleOverridesController < ApplicationController
                ACCOUNT_PERMISSIONS: account_permissions(@context),
                COURSE_PERMISSIONS: course_permissions(@context),
                IS_SITE_ADMIN: @context.site_admin?,
-               ACCOUNT_ID: @context.id,
                ACCOUNT_ENABLE_ALERTS: @context.settings[:enable_alerts]
              })
 
@@ -247,6 +246,10 @@ class RoleOverridesController < ApplicationController
   #     manage_role_overrides            -- Permissions - manage
   #     manage_storage_quotas            -- Storage Quotas - manage
   #     manage_sis                       -- SIS data - manage
+  #     Manage Temporary Enrollments granular permissions
+  #         temporary_enrollments_add     -- Temporary Enrollments - add
+  #         temporary_enrollments_edit    -- Temporary Enrollments - edit
+  #         temporary_enrollments_delete  -- Temporary Enrollments - delete
   #     manage_user_logins               -- Users - manage login details
   #     manage_user_observers            -- Users - manage observers
   #     moderate_user_content            -- Users - moderate content

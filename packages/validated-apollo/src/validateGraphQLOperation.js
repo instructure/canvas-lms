@@ -23,7 +23,7 @@ export function validateGraphQLOperation(schema, query, variables = {}, extraRul
     ...specifiedRules,
     ValidateNoExtraVariables(variables),
     ValidateVariableValueMatchesType(variables),
-    ...extraRules
+    ...extraRules,
   ]
   const errors = validate(schema, query, validationRules)
   return errors
@@ -43,8 +43,8 @@ function ValidateNoExtraVariables(variables = {}) {
             new GraphQLError(`Extra variable passed to graphql operation: "${variableName}"`)
           )
         )
-      }
-    }
+      },
+    },
   })
 }
 
@@ -61,6 +61,6 @@ function ValidateVariableValueMatchesType(variables = {}) {
           new GraphQLError(`Unable to coerce variable: "${variableName}": ${err}`)
         )
       )
-    }
+    },
   })
 }

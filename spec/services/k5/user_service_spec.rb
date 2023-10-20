@@ -259,10 +259,6 @@ describe K5::UserService do
   end
 
   describe "use_classic_font?" do
-    before :once do
-      Account.site_admin.enable_feature! :k5_font_selection
-    end
-
     it "caches the result after computing" do
       enable_cache do
         service = K5::UserService.new(@student1, @root_account, nil)
@@ -279,14 +275,6 @@ describe K5::UserService do
         service.send(:use_classic_font?)
         service.send(:use_classic_font?)
       end
-    end
-
-    it "returns false if the k5_font_selection flag is disabled" do
-      toggle_k5_setting(@root_account)
-      toggle_classic_font_setting(@root_account)
-      Account.site_admin.disable_feature! :k5_font_selection
-      service = K5::UserService.new(@student1, @root_account, nil)
-      expect(service.send(:use_classic_font?)).to be false
     end
 
     it "returns false if no user is provided" do

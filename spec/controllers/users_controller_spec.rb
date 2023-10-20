@@ -92,8 +92,7 @@ describe UsersController do
       let(:override_url) { "http://www.example-beta.com/basic_lti" }
 
       before do
-        allow(ApplicationController).to receive(:test_cluster?).and_return(true)
-        allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
+        allow(ApplicationController).to receive_messages(test_cluster?: true, test_cluster_name: "beta")
         Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
 
         tool.settings[:environments] = {
@@ -170,8 +169,7 @@ describe UsersController do
     it "sets up oauth for google_drive" do
       state = nil
       settings_mock = double
-      allow(settings_mock).to receive(:settings).and_return({})
-      allow(settings_mock).to receive(:enabled?).and_return(true)
+      allow(settings_mock).to receive_messages(settings: {}, enabled?: true)
 
       user_factory(active_all: true)
       user_session(@user)
@@ -198,20 +196,30 @@ describe UsersController do
     it "handles google_drive oauth_success for a logged_in_user" do
       settings_mock = double
       allow(settings_mock).to receive(:settings).and_return({})
-      authorization_mock = double("authorization", :code= => nil, :fetch_access_token! => nil, :refresh_token => "refresh_token", :access_token => "access_token")
-      drive_mock = Google::APIClient::API.new("mock", {})
-      allow(drive_mock).to receive(:about).and_return(double(get: nil))
-      client_mock = double("client", discovered_api: drive_mock, execute!: double("result", status: 200, data: { "permissionId" => "permission_id", "user" => { "emailAddress" => "blah@blah.com" } }))
-      allow(client_mock).to receive(:authorization).and_return(authorization_mock)
+      authorization_mock = instance_double("Google::Auth::UserRefreshCredentials",
+                                           :code= => nil,
+                                           :fetch_access_token! => nil,
+                                           :refresh_token => "refresh_token",
+                                           :access_token => "access_token")
+      about_mock = instance_double("Google::Apis::DriveV3::About",
+                                   user: instance_double("Google::Apis::DriveV3::User",
+                                                         email_address: "blah@blah.com",
+                                                         permission_id: "permission_id"))
+      client_mock = instance_double("Google::Apis::DriveV3::DriveService",
+                                    get_about: about_mock,
+                                    authorization: authorization_mock)
       allow(GoogleDrive::Client).to receive(:create).and_return(client_mock)
 
       session[:oauth_gdrive_nonce] = "abc123"
-      state = Canvas::Security.create_jwt({ "return_to_url" => "http://localhost.com/return", "nonce" => "abc123" })
+      state = Canvas::Security.create_jwt({ "return_to_url" => "http://localhost.com/return",
+                                            "nonce" => "abc123" })
       course_with_student_logged_in
 
       get :oauth_success, params: { state:, service: "google_drive", code: "some_code" }
 
-      service = UserService.where(user_id: @user, service: "google_drive", service_domain: "drive.google.com").first
+      service = UserService.where(user_id: @user,
+                                  service: "google_drive",
+                                  service_domain: "drive.google.com").first
       expect(service.service_user_id).to eq "permission_id"
       expect(service.service_user_name).to eq "blah@blah.com"
       expect(service.token).to eq "refresh_token"
@@ -222,15 +230,19 @@ describe UsersController do
     it "handles google_drive oauth_success for a non logged in user" do
       settings_mock = double
       allow(settings_mock).to receive(:settings).and_return({})
-      authorization_mock = double("authorization", :code= => nil, :fetch_access_token! => nil, :refresh_token => "refresh_token", :access_token => "access_token")
-      drive_mock = Google::APIClient::API.new("mock", {})
-      allow(drive_mock).to receive(:about).and_return(double(get: nil))
-      client_mock = double("client", discovered_api: drive_mock, execute!: double("result", status: 200, data: { "permissionId" => "permission_id" }))
-      allow(client_mock).to receive(:authorization).and_return(authorization_mock)
+      authorization_mock = instance_double("Google::Auth::UserRefreshCredentials",
+                                           :code= => nil,
+                                           :fetch_access_token! => nil,
+                                           :refresh_token => "refresh_token",
+                                           :access_token => "access_token")
+      client_mock = instance_double("Google::Apis::DriveV3::DriveService",
+                                    get_about: nil,
+                                    authorization: authorization_mock)
       allow(GoogleDrive::Client).to receive(:create).and_return(client_mock)
 
       session[:oauth_gdrive_nonce] = "abc123"
-      state = Canvas::Security.create_jwt({ "return_to_url" => "http://localhost.com/return", "nonce" => "abc123" })
+      state = Canvas::Security.create_jwt({ "return_to_url" => "http://localhost.com/return",
+                                            "nonce" => "abc123" })
 
       get :oauth_success, params: { state:, service: "google_drive", code: "some_code" }
 
@@ -242,16 +254,18 @@ describe UsersController do
     it "rejects invalid state" do
       settings_mock = double
       allow(settings_mock).to receive(:settings).and_return({})
-      authorization_mock = double("authorization")
-      allow(authorization_mock).to receive_messages(:code= => nil, :fetch_access_token! => nil, :refresh_token => "refresh_token", :access_token => "access_token")
-      drive_mock = Google::APIClient::API.new("mock", {})
-      allow(drive_mock).to receive(:about).and_return(double(get: nil))
-      client_mock = double("client", discovered_api: drive_mock, execute!: double("result", status: 200, data: { "permissionId" => "permission_id" }))
-
-      allow(client_mock).to receive(:authorization).and_return(authorization_mock)
+      authorization_mock = instance_double("Google::Auth::UserRefreshCredentials")
+      allow(authorization_mock).to receive_messages(:code= => nil,
+                                                    :fetch_access_token! => nil,
+                                                    :refresh_token => "refresh_token",
+                                                    :access_token => "access_token")
+      client_mock = instance_double("Google::Apis::DriveV3::DriveService",
+                                    get_about: nil,
+                                    authorization: authorization_mock)
       allow(GoogleDrive::Client).to receive(:create).and_return(client_mock)
 
-      state = Canvas::Security.create_jwt({ "return_to_url" => "http://localhost.com/return", "nonce" => "abc123" })
+      state = Canvas::Security.create_jwt({ "return_to_url" => "http://localhost.com/return",
+                                            "nonce" => "abc123" })
       get :oauth_success, params: { state:, service: "google_drive", code: "some_code" }
 
       assert_unauthorized
@@ -260,17 +274,14 @@ describe UsersController do
     end
 
     it "handles auth failure gracefully" do
-      authorization_mock = double("authorization")
-      allow(authorization_mock).to receive_messages(:code= => nil)
+      authorization_mock = instance_double("Google::Auth::UserRefreshCredentials", :code= => nil)
       allow(authorization_mock).to receive(:fetch_access_token!) do
         raise Signet::AuthorizationError, "{\"error\": \"invalid_grant\", \"error_description\": \"Bad Request\"}"
       end
-      drive_mock = Google::APIClient::API.new("mock", {})
-      allow(drive_mock).to receive(:about).and_return(double(get: nil))
-      client_mock = double("client")
-      allow(client_mock).to receive(:authorization).and_return(authorization_mock)
+      client_mock = instance_double("Google::Apis::DriveV3::DriveService", authorization: authorization_mock)
       allow(GoogleDrive::Client).to receive(:create).and_return(client_mock)
-      state = Canvas::Security.create_jwt({ "return_to_url" => "http://localhost.com/return", "nonce" => "abc123" })
+      state = Canvas::Security.create_jwt({ "return_to_url" => "http://localhost.com/return",
+                                            "nonce" => "abc123" })
       get :oauth_success, params: { state:, service: "google_drive", code: "some_code" }
       expect(response).to be_redirect
       expect(flash[:error]).to eq "Google Drive failed authorization for current user!"
@@ -999,61 +1010,78 @@ describe UsersController do
         expect(p.user).to be_pre_registered
       end
 
-      it "notifies the user if a merge opportunity arises" do
-        account = Account.create!
-        user_with_pseudonym(account:)
-        account.account_users.create!(user: @user)
-        user_session(@user, @pseudonym)
-        @admin = @user
+      context "merge opportunity notifications" do
+        before do
+          @notification = Notification.create(name: "Merge Email Communication Channel", category: "Registration")
+          @account = Account.create!
+          user_with_pseudonym(account: @account)
+          @account.account_users.create!(user: @user)
+          user_session(@user, @pseudonym)
+          @admin = @user
 
-        u = User.create! { |user| user.workflow_state = "registered" }
-        communication_channel(u, { username: "jacob@instructure.com", active_cc: true })
-        u.pseudonyms.create!(unique_id: "jon@instructure.com")
-        notification = Notification.create(name: "Merge Email Communication Channel", category: "Registration")
+          @u = User.create! { |user| user.workflow_state = "registered" }
+          communication_channel(@u, { username: "jacob@instructure.com", active_cc: true })
+        end
 
-        post "create",
-             params: {
-               account_id: account.id,
-               pseudonym: {
-                 unique_id: "jacob@instructure.com",
-                 send_confirmation: "0"
+        it "notifies the user if a merge opportunity arises" do
+          @u.pseudonyms.create!(unique_id: "jon@instructure.com")
+
+          post "create",
+               params: {
+                 account_id: @account.id,
+                 pseudonym: {
+                   unique_id: "jacob@instructure.com",
+                   send_confirmation: "0"
+                 },
+                 user: {
+                   name: "Jacob Fugal"
+                 }
                },
-               user: {
-                 name: "Jacob Fugal"
-               }
-             },
-             format: "json"
-        expect(response).to be_successful
-        p = Pseudonym.where(unique_id: "jacob@instructure.com").first
-        expect(Message.where(communication_channel_id: p.user.email_channel, notification_id: notification).first).to be_present
-      end
+               format: "json"
+          expect(response).to be_successful
+          p = Pseudonym.where(unique_id: "jacob@instructure.com").first
+          expect(Message.where(communication_channel_id: p.user.email_channel, notification_id: @notification).first).to be_present
+        end
 
-      it "does not notify the user if the merge opportunity can't log in'" do
-        notification = Notification.create(name: "Merge Email Communication Channel", category: "Registration")
+        it "does not notify user of opportunity when suppress_notifications = true" do
+          initial_message_count = Message.count
+          @u.pseudonyms.create!(unique_id: "jon@instructure.com")
+          @account.settings[:suppress_notifications] = true
+          @account.save!
 
-        account = Account.create!
-        user_with_pseudonym(account:)
-        account.account_users.create!(user: @user)
-        user_session(@user, @pseudonym)
-        @admin = @user
-
-        u = User.create! { |user| user.workflow_state = "registered" }
-        communication_channel(u, { username: "jacob@instructure.com", active_cc: true })
-        post "create",
-             params: {
-               account_id: account.id,
-               pseudonym: {
-                 unique_id: "jacob@instructure.com",
-                 send_confirmation: "0"
+          post "create",
+               params: {
+                 account_id: @account.id,
+                 pseudonym: {
+                   unique_id: "jacob@instructure.com",
+                   send_confirmation: "0"
+                 },
+                 user: {
+                   name: "Jacob Fugal"
+                 }
                },
-               user: {
-                 name: "Jacob Fugal"
-               }
-             },
-             format: "json"
-        expect(response).to be_successful
-        p = Pseudonym.where(unique_id: "jacob@instructure.com").first
-        expect(Message.where(communication_channel_id: p.user.email_channel, notification_id: notification).first).to be_nil
+               format: "json"
+          expect(response).to be_successful
+          expect(Message.count).to eq initial_message_count
+        end
+
+        it "does not notify the user if the merge opportunity can't log in'" do
+          post "create",
+               params: {
+                 account_id: @account.id,
+                 pseudonym: {
+                   unique_id: "jacob@instructure.com",
+                   send_confirmation: "0"
+                 },
+                 user: {
+                   name: "Jacob Fugal"
+                 }
+               },
+               format: "json"
+          expect(response).to be_successful
+          p = Pseudonym.where(unique_id: "jacob@instructure.com").first
+          expect(Message.where(communication_channel_id: p.user.email_channel, notification_id: @notification).first).to be_nil
+        end
       end
     end
   end
@@ -1104,22 +1132,22 @@ describe UsersController do
     end
 
     it "returns nil if there is no token" do
-      allow(DynamicSettings).to receive(:find).with(tree: :private).and_return({ "recaptcha_server_key" => nil })
+      allow(DynamicSettings).to receive(:find).with(tree: :private).and_return(DynamicSettings::FallbackProxy.new({ "recaptcha_server_key" => nil }))
       expect(subject.send(:validate_recaptcha, nil)).to be_nil
     end
 
     it "returns nil for valid recaptcha submissions" do
-      allow(DynamicSettings).to receive(:find).with(tree: :private).and_return({ "recaptcha_server_key" => "test-token" })
+      allow(DynamicSettings).to receive(:find).with(tree: :private).and_return(DynamicSettings::FallbackProxy.new({ "recaptcha_server_key" => "test-token" }))
       expect(subject.send(:validate_recaptcha, "valid-submit-key")).to be_nil
     end
 
     it "returns an error for missing recaptcha submissions" do
-      allow(DynamicSettings).to receive(:find).with(tree: :private).and_return({ "recaptcha_server_key" => "test-token" })
+      allow(DynamicSettings).to receive(:find).with(tree: :private).and_return(DynamicSettings::FallbackProxy.new({ "recaptcha_server_key" => "test-token" }))
       expect(subject.send(:validate_recaptcha, nil)).not_to be_nil
     end
 
     it "returns an error for invalid recaptcha submissions" do
-      allow(DynamicSettings).to receive(:find).with(tree: :private).and_return({ "recaptcha_server_key" => "test-token" })
+      allow(DynamicSettings).to receive(:find).with(tree: :private).and_return(DynamicSettings::FallbackProxy.new({ "recaptcha_server_key" => "test-token" }))
       expect(subject.send(:validate_recaptcha, "invalid-submit-key")).not_to be_nil
     end
   end
@@ -1179,10 +1207,8 @@ describe UsersController do
           # truthy setting
           Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
           Account.default.save!
-
-          # truthy permission(since enabled is being "not"ed)
-          Account.default.role_overrides.create!(role: student_role, enabled: false, permission: "restrict_quantitative_data")
-          Account.default.reload
+          @course.restrict_quantitative_data = true
+          @course.save!
 
           get_grades!(all_grading_periods_id)
           expect(restrict_quantitative_data).to be true
@@ -1289,10 +1315,9 @@ describe UsersController do
         # truthy setting
         Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
         Account.default.save!
+        @course.restrict_quantitative_data = true
+        @course.save!
 
-        # truthy permission(since enabled is being "not"ed)
-        Account.default.role_overrides.create!(role: teacher_role, enabled: false, permission: "restrict_quantitative_data")
-        Account.default.reload
         user_session(teacher)
         get_grades!(grading_period.id)
         expect(restrict_quantitative_data).to be true
@@ -1407,10 +1432,9 @@ describe UsersController do
           # truthy setting
           Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
           Account.default.save!
+          @course.restrict_quantitative_data = true
+          @course.save!
 
-          # truthy permission(since enabled is being "not"ed)
-          Account.default.role_overrides.create!(role: observer_role, enabled: false, permission: "restrict_quantitative_data")
-          Account.default.reload
           get_grades!(grading_period.id)
           expect(restrict_quantitative_data).to be true
           expect(grading_scheme).to eq course.grading_standard_or_default.data
@@ -2248,7 +2272,7 @@ describe UsersController do
     end
 
     it "404s, but still shows, on a deleted user for site admins" do
-      course_with_teacher(active_all: 1)
+      course_with_teacher(active_all: 1, user: user_with_pseudonym)
 
       account_admin_user(account: Account.site_admin)
       user_session(@admin)

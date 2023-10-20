@@ -58,9 +58,10 @@ describe UserProfile do
 
     it "is i18n'd" do
       student_in_course(active_all: true)
-      I18n.locale = :es
-      tabs = @student.profile.tabs_available(@user, root_account: account)
-      expect(tabs.detect { |t| t[:id] == UserProfile::TAB_FILES }[:label]).to_not eq "Files"
+      I18n.with_locale(:es) do
+        tabs = @student.profile.tabs_available(@user, root_account: account)
+        expect(tabs.detect { |t| t[:id] == UserProfile::TAB_FILES }[:label]).to_not eq "Files"
+      end
     end
 
     context "with lti tabs" do

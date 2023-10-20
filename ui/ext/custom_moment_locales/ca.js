@@ -29,6 +29,24 @@ const apply = () => {
   // activate it...
   const origLocale = moment.locale()
 
+  const monthsRegex =
+    /^(Gen|Feb|Març|Abr|Maig|Juny|Jul|Ag|Set|Oct|Nov|Des|de Gen|de Febr|de Març|d[’']Abr|de Maig|de Juny|de Jul|d[’']Ag|de Set|d[’']Oct|de Nov|de Des)/i
+
+  const monthsParse = [
+    /^(de Gen|Gen)/i,
+    /^(de Febr|Febr)/i,
+    /^(de Març|Març)/i,
+    /^(d’Abr|d'Abr|Abr)/i,
+    /^(de Maig|Maig)/i,
+    /^(de Juny|Juny)/i,
+    /^(de Jul|Jul)/i,
+    /^(d’Ag|d'Ag|Ag)/i,
+    /^(de Set|Set)/i,
+    /^(d’Oct|d'Oct|Oct)/i,
+    /^(de Nov|Nov)/i,
+    /^(de Des|Des)/i,
+  ]
+
   // uses 'node_modules/moment/locale/ca.js' as a reference
   moment.defineLocale('ca', {
     months: {
@@ -49,8 +67,27 @@ const apply = () => {
       ],
       isFormat: /D[oD]?(\s)+MMMM/,
     },
-    monthsShort: lookupInCA('date.abbr_month_names').filter(withoutLeadingBlank),
-    monthsParseExact: true,
+    monthsShort: [
+      'Gen',
+      'Febr',
+      'Març',
+      'Abr',
+      'Maig',
+      'Juny',
+      'Juli',
+      'Ag',
+      'Set',
+      'Oct',
+      'Nov',
+      'Des',
+    ],
+    monthsRegex,
+    monthsShortRegex: monthsRegex,
+    monthsStrictRegex: monthsRegex,
+    monthsShortStrictRegex: monthsRegex,
+    monthsParse,
+    longMonthsParse: monthsParse,
+    shortMonthsParse: monthsParse,
     weekdays: lookupInCA('date.day_names'),
     weekdaysShort: lookupInCA('date.abbr_day_names'),
     weekdaysMin: lookupInCA('date.datepicker.column_headings'),

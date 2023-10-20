@@ -190,9 +190,9 @@ describe Pseudonym do
     end
 
     it "gracefully handles unreachable LDAP servers" do
-      expect_any_instance_of(Net::LDAP).to receive(:bind_as).and_raise(Net::LDAP::LdapError, "no connection to server")
+      expect_any_instance_of(Net::LDAP).to receive(:bind_as).and_raise(Net::LDAP::Error, "no connection to server")
       expect(Canvas::Errors).to receive(:capture) do |ex, data, level|
-        expect(ex.class).to eq(Net::LDAP::LdapError)
+        expect(ex.class).to eq(Net::LDAP::Error)
         expect(data[:account]).to eq(@pseudonym.account)
         expect(level).to eq(:warn)
       end.and_call_original
@@ -406,8 +406,7 @@ describe Pseudonym do
     end
 
     before do
-      allow(Canvas.redis).to receive(:redis_enabled?).and_return(true)
-      allow(Canvas.redis).to receive(:ttl).and_return(1.day)
+      allow(Canvas.redis).to receive_messages(redis_enabled?: true, ttl: 1.day)
     end
 
     it "checks cas ticket expiration" do

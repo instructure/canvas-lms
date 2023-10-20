@@ -27,18 +27,19 @@ describe Rails.root.join("app/jsx/shared/components/TimeZoneSelect/localized-tim
     subject.mkpath
 
     I18n.available_locales.each do |locale|
-      I18n.locale = locale
-      zones_for_this_locale = {
-        priority_zones: localized_timezones(I18nTimeZone.us_zones),
-        timezones: localized_timezones(I18nTimeZone.all)
-      }.as_json
-      file_for_this_locale = subject.join("#{locale}.json")
+      I18n.with_locale(locale) do
+        zones_for_this_locale = {
+          priority_zones: localized_timezones(I18nTimeZone.us_zones),
+          timezones: localized_timezones(I18nTimeZone.all)
+        }.as_json
+        file_for_this_locale = subject.join("#{locale}.json")
 
-      file_for_this_locale.write(zones_for_this_locale.to_json) # uncomment this line if you need to update json files with current data
-      expect(JSON.parse(file_for_this_locale.read)).to(
-        eq(zones_for_this_locale),
-        "you need to uncomment the line above and run this spec again to update #{file_for_this_locale}"
-      )
+        file_for_this_locale.write(zones_for_this_locale.to_json) # uncomment this line if you need to update json files with current data
+        expect(JSON.parse(file_for_this_locale.read)).to(
+          eq(zones_for_this_locale),
+          "you need to uncomment the line above and run this spec again to update #{file_for_this_locale}"
+        )
+      end
     end
   end
 end

@@ -51,6 +51,7 @@ test('sets focus to the edit button when hide_edit occurs', () => {
   SyllabusBehaviors.bindToEditSyllabus()
   $('#edit_course_syllabus_form').trigger('hide_edit')
   equal(document.activeElement, $('.edit_syllabus_link')[0])
+  equal($('.edit_syllabus_link').attr('aria-expanded'), 'false')
 })
 
 test('skips initializing sidebar when edit link absent', () => {
@@ -71,6 +72,7 @@ test('sets syllabus_body data value on fresh node when showing edit form', () =>
   $('#course_syllabus').data('syllabus_body', text)
   const $form = SyllabusBehaviors.bindToEditSyllabus()
   $form.triggerHandler('edit')
+  equal($('.edit_syllabus_link').attr('aria-expanded'), 'true')
   ok(RichContentEditor.freshNode.called)
   const body = document.getElementById('course_syllabus_body')
   equal(RichContentEditor.freshNode.firstCall.args[0][0], body)
@@ -92,7 +94,7 @@ test('sets course_syllabus_body after mce destruction', () => {
   $form.triggerHandler('hide_edit')
   ok(RichContentEditor.destroyRCE.called)
   const body = document.getElementById('course_syllabus_body')
-  ok(body !== null)
+  notStrictEqual(body, null)
 })
 
 test('hides student view button when editing syllabus', () => {

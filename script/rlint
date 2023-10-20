@@ -3,21 +3,19 @@
 
 exit 0 if ENV["DISABLE_RUBOCOP"] == "1"
 
-require "bundler/inline"
+ENV["BUNDLE_GEMFILE"] = File.expand_path("../Gemfile.d/rubocop.rb", __dir__)
 
-gemfile do
-  source "https://rubygems.org/"
+require "rubygems"
+require "bundler/setup"
 
-  gem "gergich", "2.1.1"
-  gem "colorize", "0.8.1"
-end
+Bundler.setup
 
-require_relative "./linter"
+require_relative "linter"
 require "optparse"
 
 linter_options = {
   linter_name: "Rubocop",
-  file_regex: %r{(?:\.rb|\.rake|\.gemspec|/[^./]+)$},
+  file_regex: %r{(?:\.rb|\.rake|\.gemspec|Gemfile|/[^./]+)$},
   format: "rubocop",
   command: +"bin/rubocop --force-exclusion",
   auto_correct: false,

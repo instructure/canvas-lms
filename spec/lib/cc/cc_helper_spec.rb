@@ -76,10 +76,60 @@ describe CC::CCHelper do
       allow(@kaltura).to receive(:flavorAssetGetOriginalAsset).and_return(@kaltura.flavorAssetGetByEntryId("abcde").first)
     end
 
+    context "media_attachments_iframes" do
+      it "are translated on export" do
+        att = @course.attachments.first
+        @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
+
+        html = %(<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_attachments_iframe/#{att.id}?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="abcde"></iframe>)
+        translated = @exporter.html_content(html)
+        mig_id = CC::CCHelper.create_key(att)
+        expect(translated).to include %(<source src="$CANVAS_OBJECT_REFERENCE$/media_attachments_iframe/#{mig_id}?type=video" data-media-id="abcde" data-media-type="video">)
+        expect(@exporter.media_object_infos.count).to eq 0
+      end
+
+      context "sharding" do
+        specs_require_sharding
+
+        it "are translated on export if they have a shortened global id" do
+          att = @course.media_objects.first.attachment
+          short_id = Shard.short_id_for(att.global_id)
+          @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
+
+          html = %(<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_attachments_iframe/#{short_id}?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="abcde"></iframe>)
+          translated = @exporter.html_content(html)
+          mig_id = CC::CCHelper.create_key(att)
+          expect(translated).to include %(<source src="$CANVAS_OBJECT_REFERENCE$/media_attachments_iframe/#{mig_id}?type=video" data-media-id="abcde" data-media-type="video">)
+          expect(@exporter.media_object_infos.count).to eq 0
+        end
+      end
+
+      it "are not translated on export when pointing at user media" do
+        att = attachment_model(display_name: "lolcats.mp4", context: @user, uploaded_data: stub_file_data("lolcats_.mp4", "...", "video/mp4"))
+        att.save!
+        @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
+        orig = %(<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_attachments_iframe/#{att.id}?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="zzzz"></iframe>)
+        translated = @exporter.html_content(orig)
+        expect(translated).to include %(<source src="/media_attachments_iframe/#{att.id}?type=video" data-media-id="zzzz" data-media-type="video">)
+        expect(@exporter.media_object_infos.count).to eq 0
+      end
+
+      it "are not translated on export when pointing at media in another course" do
+        other_course = course_with_teacher
+        att = attachment_model(display_name: "lolcats.mp4", context: other_course, uploaded_data: stub_file_data("lolcats_.mp4", "...", "video/mp4"))
+        att.save!
+        @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
+        orig = %(<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_attachments_iframe/#{att.id}?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="zzzz"></iframe>)
+        translated = @exporter.html_content(orig)
+        expect(translated).to include %(<source src="/media_attachments_iframe/#{att.id}?type=video" data-media-id="zzzz" data-media-type="video">)
+        expect(@exporter.media_object_infos.count).to eq 0
+      end
+    end
+
     it "translates media links using the original flavor" do
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
       @exporter.html_content(<<~HTML)
-        <p><a id='media_comment_abcde' class='instructure_inline_media_comment'>this is a media comment</a></p>
+        <p><a id="media_comment_abcde" class="instructure_inline_media_comment">this is a media comment</a></p>
       HTML
       expect(@exporter.media_object_infos[@obj.id]).not_to be_nil
       expect(@exporter.media_object_infos[@obj.id][:asset][:id]).to eq "one"
@@ -88,7 +138,7 @@ describe CC::CCHelper do
     it "does not touch media links on course copy" do
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, for_course_copy: true)
       orig = <<~HTML
-        <p><a id='media_comment_abcde' class='instructure_inline_media_comment'>this is a media comment</a></p>
+        <p><a id="media_comment_abcde" class="instructure_inline_media_comment">this is a media comment</a></p>
       HTML
       translated = @exporter.html_content(orig)
       expect(translated).to eq orig
@@ -126,15 +176,6 @@ describe CC::CCHelper do
       html = %(<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="http://example.com/media_objects_iframe/abcde?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="abcde"></iframe>)
       translated = @exporter.html_content(html)
       expect(translated).to include %(<source src="$IMS-CC-FILEBASE$/Uploaded Media/some_media.mp4" data-media-id="abcde" data-media-type="video">)
-      expect(@exporter.media_object_infos[@obj.id]).not_to be_nil
-      expect(@exporter.media_object_infos[@obj.id][:asset][:id]).to eq "one"
-    end
-
-    it "translates RCE media attachment iframes to relevant HTML tags" do
-      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
-      html = %(<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_attachments_iframe/135?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="abcde"></iframe>)
-      translated = @exporter.html_content(html)
-      expect(translated).to include %(<video style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="abcde" data-is-media-attachment="true">)
       expect(@exporter.media_object_infos[@obj.id]).not_to be_nil
       expect(@exporter.media_object_infos[@obj.id][:asset][:id]).to eq "one"
     end
@@ -243,8 +284,7 @@ describe CC::CCHelper do
     end
 
     it "prepends the domain to links outside the course" do
-      allow(HostUrl).to receive(:protocol).and_return("http")
-      allow(HostUrl).to receive(:context_host).and_return("www.example.com:8080")
+      allow(HostUrl).to receive_messages(protocol: "http", context_host: "www.example.com:8080")
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, for_course_copy: false)
       @othercourse = Course.create!
       html = <<~HTML
@@ -257,35 +297,30 @@ describe CC::CCHelper do
       expect(urls[1]).to eq "http://www.example.com:8080/courses/#{@othercourse.id}/wiki/front-page"
     end
 
-    it "copies pages correctly when the title starts with a number" do
-      allow(HostUrl).to receive(:protocol).and_return("http")
-      allow(HostUrl).to receive(:context_host).and_return("www.example.com:8080")
+    it "copies the correct page when the url is an old slug" do
+      Account.site_admin.enable_feature! :permanent_page_links
+      allow(HostUrl).to receive_messages(protocol: "http", context_host: "www.example.com:8080")
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, for_course_copy: false)
       page = @course.wiki_pages.create(title: "9000, the level is over")
-      html = <<~HTML
-        <a href="/courses/#{@course.id}/wiki/#{page.url}">This course's wiki page</a>
-      HTML
+      page.wiki_page_lookups.create!(slug: "old-url")
+      html = %(<a href="/courses/#{@course.id}/pages/old-url">This course's wiki page</a>)
       doc = Nokogiri::HTML5(@exporter.html_content(html))
       urls = doc.css("a").pluck(:href)
-      expect(urls[0]).to eq "$WIKI_REFERENCE$/wiki/#{page.url}"
+      expect(urls[0]).to eq "$WIKI_REFERENCE$/pages/#{CC::CCHelper.create_key(page)}"
     end
 
-    it "copies pages correctly when the title consists only of a number" do
-      allow(HostUrl).to receive(:protocol).and_return("http")
-      allow(HostUrl).to receive(:context_host).and_return("www.example.com:8080")
-      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, for_course_copy: false)
-      page = @course.wiki_pages.create(title: "9000")
-      html = <<~HTML
-        <a href="/courses/#{@course.id}/wiki/#{page.url}">This course's wiki page</a>
-      HTML
+    it "creates a page url with a migration id" do
+      allow(HostUrl).to receive_messages(protocol: "http", context_host: "www.example.com:8080")
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
+      page = @course.wiki_pages.create(title: "beautiful title")
+      html = %(<a href="/courses/#{@course.id}/pages/#{page.url}">This course's wiki page</a>)
       doc = Nokogiri::HTML5(@exporter.html_content(html))
       urls = doc.css("a").pluck(:href)
-      expect(urls[0]).to eq "$WIKI_REFERENCE$/wiki/#{page.url}"
+      expect(urls[0]).to eq "$WIKI_REFERENCE$/pages/#{CC::CCHelper.create_key(page)}"
     end
 
     it "uses the key_generator to translate links" do
-      allow(HostUrl).to receive(:protocol).and_return("http")
-      allow(HostUrl).to receive(:context_host).and_return("www.example.com:8080")
+      allow(HostUrl).to receive_messages(protocol: "http", context_host: "www.example.com:8080")
       @assignment = @course.assignments.create!(name: "Thing")
       html = <<~HTML
         <a href="/courses/#{@course.id}/assignments/#{@assignment.id}">Thing</a>
@@ -299,7 +334,7 @@ describe CC::CCHelper do
 
     it "preserves query parameters on links" do
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, for_course_copy: true)
-      @course.wiki_pages.create!(title: "something")
+      page = @course.wiki_pages.create!(title: "something")
       other_page = @course.wiki_pages.create!(title: "LinkByTitle")
       assignment = @course.assignments.create!(name: "Thing")
       mod = @course.context_modules.create!(name: "Stuff")
@@ -311,8 +346,8 @@ describe CC::CCHelper do
         <a href="/courses/#{@course.id}/modules/items/#{tag.id}?seriously=0">i-Tem</a>
       HTML
       translated = @exporter.html_content(html)
-      expect(translated).to include "$WIKI_REFERENCE$/pages/something?embedded=true"
-      expect(translated).to include "$WIKI_REFERENCE$/pages/#{other_page.url}?embedded=true"
+      expect(translated).to include "$WIKI_REFERENCE$/pages/#{CC::CCHelper.create_key(page)}?embedded=true"
+      expect(translated).to include "$WIKI_REFERENCE$/pages/#{CC::CCHelper.create_key(other_page)}?embedded=true"
       expect(translated).to include "$CANVAS_OBJECT_REFERENCE$/assignments/#{CC::CCHelper.create_key(assignment)}?bamboozled=true"
       expect(translated).to include "$CANVAS_COURSE_REFERENCE$/modules/items/#{CC::CCHelper.create_key(tag)}?seriously=0"
     end

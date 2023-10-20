@@ -37,6 +37,11 @@ describe UserMerge do
       expect { UserMerge.from(user2).into(fake_student) }.to raise_error("cannot merge a test student")
     end
 
+    it "fails if there is an existing active user merge data object for the same user pair" do
+      UserMerge.from(user2).into(user1)
+      expect { UserMerge.from(user2).into(user1) }.to raise_error(UserMerge::UnsafeMergeError)
+    end
+
     it "logs who did the user merge" do
       merger = user_model
       mergeme = UserMerge.from(user2)

@@ -21,12 +21,17 @@ import ready from '@instructure/ready'
 import {EnvPlatformStoragePostMessageForwarding} from '@canvas/global/env/EnvPlatformStorage'
 
 type Message = {
-  toolOrigin?: string
+  sourceToolInfo?: {
+    origin: string
+    windowId: number
+  }
   [key: string]: any
 }
 
+type WindowReferences = [Window]
+
 export const handler =
-  (PARENT_DOMAIN: string, windowReferences: object, parentWindow: Window | null) =>
+  (PARENT_ORIGIN: string, windowReferences: WindowReferences, parentWindow: Window | null) =>
   (e: MessageEvent) => {
     let message: Message
     try {
@@ -36,27 +41,33 @@ export const handler =
       return false
     }
 
-    // eslint-disable-next-line eqeqeq
-    if (e.origin == PARENT_DOMAIN) {
-      const targetOrigin = message.toolOrigin
-      if (!targetOrigin) {
+    // NOTE: the code to encode/decode `sourceToolInfo` is duplicated in
+    // the RCE code (packages/canvas-rce/src/rce/RCEWrapper.jsx), and
+    // cannot be DRY'd because RCE is in a package
+    if (e.origin === PARENT_ORIGIN) {
+      const {sourceToolInfo, ...messageWithoutSourceToolInfo} = message
+      if (!sourceToolInfo) {
         return false
       }
-
-      const targetWindow = windowReferences[targetOrigin]
-      delete message.toolOrigin
-
-      targetWindow?.postMessage(message, targetOrigin)
+      const targetOrigin = sourceToolInfo?.origin
+      const targetWindow = windowReferences[sourceToolInfo?.windowId]
+      targetWindow?.postMessage(messageWithoutSourceToolInfo, targetOrigin)
     } else {
-      windowReferences[e.origin] = e.source
-      message.toolOrigin = e.origin
-
-      parentWindow?.postMessage(message, PARENT_DOMAIN)
+      // We can't forward the whole `e.source` window in the postMessage,
+      // so we keep a list (`windowReferences`) of all windows we've received
+      // messages from, and include the index into that list as `windowId`
+      let windowId = windowReferences.indexOf(e.source)
+      if (windowId === -1) {
+        windowReferences.push(e.source)
+        windowId = windowReferences.length - 1
+      }
+      const newMessage = {...message, sourceToolInfo: {origin: e.origin, windowId}}
+      parentWindow?.postMessage(newMessage, PARENT_ORIGIN)
     }
   }
 
 ready(() => {
-  const {PARENT_DOMAIN} = window.ENV as EnvPlatformStoragePostMessageForwarding
-  const windowReferences = {}
-  window.addEventListener('message', handler(PARENT_DOMAIN, windowReferences, window.top))
+  const {PARENT_ORIGIN} = window.ENV as EnvPlatformStoragePostMessageForwarding
+  const windowReferences = [] as WindowReferences
+  window.addEventListener('message', handler(PARENT_ORIGIN, windowReferences, window.top))
 })

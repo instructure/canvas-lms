@@ -32,12 +32,12 @@ describe "conversations new" do
     cat = @course.group_categories.create(name: "the groups")
     @group = cat.groups.create(name: "the group", context: @course)
     @group.users = [@s1, @s2]
-    @t2 =  user_factory(name: "second teacher", active_user: true)
+    @t2 = user_factory(name: "second teacher", active_user: true)
     @course.enroll_teacher(@t2)
   end
 
   describe "message sending" do
-    context "when react_inbox feature flag is off", ignore_js_errors: true do
+    context "when react_inbox feature flag is off", :ignore_js_errors do
       before do
         Account.default.set_feature_flag! :react_inbox, "off"
       end
@@ -322,7 +322,7 @@ describe "conversations new" do
       end
     end
 
-    context "when react_inbox feature flag is on", ignore_js_errors: true do
+    context "when react_inbox feature flag is on", :ignore_js_errors do
       before do
         Account.default.enable_feature! :react_inbox
       end
@@ -418,6 +418,7 @@ describe "conversations new" do
             # all in course, Teachers, Students, Student Groups
             expect(ff("div[data-testid='address-book-item']").count).to eq(4)
             expect(fj("div[data-testid='address-book-item']:contains('All in #{@course.name}')")).to be_present
+            expect(fj("div[data-testid='address-book-item']:contains('People: #{@course.users.count}')")).to be_present
           end
 
           it "correctly shows Teachers option", priority: "1" do
@@ -429,6 +430,7 @@ describe "conversations new" do
             # back, all in Teachers, @Teacher name, @t2 name
             expect(ff("div[data-testid='address-book-item']").count).to eq(4)
             expect(fj("div[data-testid='address-book-item']:contains('All in Teachers')")).to be_present
+            expect(fj("div[data-testid='address-book-item']:contains('People: #{@course.teachers.count}')")).to be_present
           end
 
           it "correctly shows Observers option" do
@@ -462,6 +464,7 @@ describe "conversations new" do
             # back, all in Students, @s1 name, @s2 name, @s3 name
             expect(ff("div[data-testid='address-book-item']").count).to eq(5)
             expect(fj("div[data-testid='address-book-item']:contains('All in Students')")).to be_present
+            expect(fj("div[data-testid='address-book-item']:contains('People: #{@course.students.count}')")).to be_present
           end
 
           # There is no option to send a message to all groups
@@ -488,6 +491,7 @@ describe "conversations new" do
             # Back, all in the group, @s1, @s2
             expect(ff("div[data-testid='address-book-item']").count).to eq(4)
             expect(fj("div[data-testid='address-book-item']:contains('All in #{@group.name}')")).to be_present
+            expect(fj("div[data-testid='address-book-item']:contains('People: #{@group.users.count}')")).to be_present
           end
         end
 
@@ -513,6 +517,7 @@ describe "conversations new" do
             open_react_compose_modal_addressbook
             expect(ff("div[data-testid='address-book-item']").count).to eq(4)
             expect(fj("div[data-testid='address-book-item']:contains('All in #{@course.name}')")).to be_present
+            expect(fj("div[data-testid='address-book-item']:contains('People: #{@course.users.count}')")).to be_present
           end
         end
       end
@@ -762,7 +767,7 @@ describe "conversations new" do
       end
 
       context "sent scope" do
-        it "defaults to reply to recipients", ignore_js_errors: true do
+        it "defaults to reply to recipients", :ignore_js_errors do
           conversation(@teacher, @s1, @s2, body: "hi there", workflow_state: "unread")
           user_session(@teacher)
           get "/conversations#filter=type=sent"

@@ -25,7 +25,7 @@ module CC
         tool_proxy.define_singleton_method(:asset_string) do
           "tool_profile_#{id}"
         end
-        next unless export_object?(tool_proxy, "tool_profiles")
+        next unless export_object?(tool_proxy, asset_type: "tool_profiles")
 
         migration_id = create_key(tool_proxy)
 

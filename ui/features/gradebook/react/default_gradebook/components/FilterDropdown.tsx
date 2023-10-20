@@ -17,7 +17,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {MouseEvent, useState, useRef} from 'react'
+import React, {MouseEvent, useState, useRef, useEffect} from 'react'
 import {Popover} from '@instructure/ui-popover'
 import {Button} from '@instructure/ui-buttons'
 import {Menu} from '@instructure/ui-menu'
@@ -39,6 +39,8 @@ type Props = {
   onOpenTray: () => void
   dataMap: FilterDrilldownData
   filterItems: FilterDrilldownData
+  changeAnnouncement: (filterAnnouncement) => void
+  applyFiltersButtonRef: React.RefObject<HTMLButtonElement>
 }
 
 const TruncateWithTooltip = ({children}: {children: React.ReactNode}) => {
@@ -61,6 +63,8 @@ const FilterDropdown = ({
   onOpenTray,
   dataMap,
   filterItems,
+  changeAnnouncement,
+  applyFiltersButtonRef,
 }: Props) => {
   const [currentItemId, setTempItemId] = useState<string>(rootId)
   const [isOpen, setIsOpen] = useState(false)
@@ -90,6 +94,12 @@ const FilterDropdown = ({
 
   const isRoot = currentItemId === 'savedFilterPresets'
 
+  useEffect(() => {
+    if (menuRef.current) {
+      menuRef.current.focus()
+    }
+  }, [isRoot])
+
   const setItemId = id => {
     setTempItemId(id)
 
@@ -110,6 +120,7 @@ const FilterDropdown = ({
   const backButton = (
     <MenuItem
       as="div"
+      data-testid="back-button"
       onClick={() => {
         setItemId(currentObj.parentId)
       }}
@@ -126,13 +137,21 @@ const FilterDropdown = ({
   return (
     <View as="div">
       <Popover
-        renderTrigger={<Button renderIcon={IconFilterLine}>{I18n.t('Apply Filters')}</Button>}
+        renderTrigger={
+          <Button
+            elementRef={ref => (applyFiltersButtonRef.current = ref)}
+            data-testid="apply-filters-button"
+            renderIcon={IconFilterLine}
+          >
+            {I18n.t('Apply Filters')}
+          </Button>
+        }
         shouldRenderOffscreen={false}
         on="click"
         placement="bottom start"
         constrain="window"
         offsetY={8}
-        isOpen={isOpen}
+        isShowingContent={isOpen}
         onShowContent={() => {
           setIsOpen(true)
         }}
@@ -158,7 +177,7 @@ const FilterDropdown = ({
               >
                 {items.map(a => {
                   return (
-                    <MenuItem key={a.id} as="div">
+                    <MenuItem key={a.id} as="div" data-testid={`${a.name}-enable-preset`}>
                       <TruncateText position="middle">{a.name}</TruncateText>
                     </MenuItem>
                   )
@@ -168,7 +187,7 @@ const FilterDropdown = ({
 
             <MenuItem
               as="div"
-              test-id="manage-filter-presets-button"
+              data-testid="manage-filter-presets-button"
               onSelect={() => {
                 setIsOpen(false)
                 onOpenTray()
@@ -193,6 +212,7 @@ const FilterDropdown = ({
                       }
                     }}
                     selected={item.isSelected}
+                    data-testid={`${item.name}-filter-type`}
                   >
                     <Flex as="div" justifyItems="space-between">
                       <TruncateText position="middle">{item.name}</TruncateText>
@@ -247,7 +267,7 @@ const FilterDropdown = ({
                       // (-_-)
                       const unescapedName = unescape(item.name)
                       return (
-                        <MenuItem key={item.id} as="div">
+                        <MenuItem data-testid={`${item.name}-sorted-filter`} key={item.id} as="div">
                           <Flex as="div" justifyItems="space-between">
                             <TruncateText position="middle">{unescapedName}</TruncateText>
                           </Flex>
@@ -262,14 +282,23 @@ const FilterDropdown = ({
               <MenuGroup
                 label={currentObj.name}
                 selected={selectedIndices}
-                onSelect={(_event: MouseEvent, updated: [number, ...number[]]) =>
+                onSelect={(_event: MouseEvent, updated: [number, ...number[]]) => {
+                  if (items[updated[0]].isSelected) {
+                    changeAnnouncement(
+                      I18n.t('Removed %{filterName} Filter', {filterName: items[updated[0]].name})
+                    )
+                  } else {
+                    changeAnnouncement(
+                      I18n.t('Added %{filterName} Filter', {filterName: items[updated[0]].name})
+                    )
+                  }
                   items[updated[0]].onToggle?.()
-                }
+                }}
               >
                 <MenuSeparator />
                 {items.map(a => {
                   return (
-                    <MenuItem key={a.id} as="div">
+                    <MenuItem data-testid={`${a.name}-filter`} key={a.id} as="div">
                       <TruncateWithTooltip>{a.name}</TruncateWithTooltip>
                     </MenuItem>
                   )

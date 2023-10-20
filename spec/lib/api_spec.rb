@@ -860,8 +860,7 @@ describe Api do
       end
 
       it "does not prepend mobile css when coming from a web browser, even if it is a mobile browser" do
-        allow(@k).to receive(:in_app?).and_return(true)
-        allow(@k).to receive(:mobile_device?).and_return(true)
+        allow(@k).to receive_messages(in_app?: true, mobile_device?: true)
         res = @k.api_user_content(@html, @course, @student)
         expect(res).to eq "<p>a</p><p>b</p>"
       end
@@ -878,9 +877,11 @@ describe Api do
           proxy_instance.extend Rails.application.routes.url_helpers
           proxy_instance.extend ActionDispatch::Routing::UrlFor
 
-          allow(proxy_instance).to receive(:request).and_return(nil)
-          allow(proxy_instance).to receive(:get_host_and_protocol_from_request).and_return(["school.instructure.com", "https"])
-          allow(proxy_instance).to receive(:url_options).and_return({})
+          allow(proxy_instance).to receive_messages(
+            request: nil,
+            get_host_and_protocol_from_request: ["school.instructure.com", "https"],
+            url_options: {}
+          )
         end
 
         it "transposes ids in urls, leaving equation images alone" do

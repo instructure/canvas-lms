@@ -112,11 +112,15 @@ class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::OAuth2
     { scope: scope_for_options }
   end
 
+  def client_options
+    super.merge(auth_scheme: :request_body)
+  end
+
   private
 
   def claims(token)
     token.options[:claims] ||= begin
-      jwt_string = token.params["id_token"]
+      jwt_string = token.params["id_token"] || token.token
       debug_set(:id_token, jwt_string) if instance_debugging
       id_token = {} if jwt_string.blank?
 

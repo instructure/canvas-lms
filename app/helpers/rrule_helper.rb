@@ -26,7 +26,7 @@ end
 
 # rubocop:disable Style/IfInsideElse
 module RruleHelper
-  RECURRING_EVENT_LIMIT = 200
+  RECURRING_EVENT_LIMIT = 400
 
   def rrule_to_natural_language(rrule)
     rropts = rrule_parse(rrule)
@@ -154,7 +154,8 @@ module RruleHelper
   end
 
   def format_month_day(month, day)
-    I18n.l(Date.new(1970, month, day), format: :short)
+    # 2024 is a leap year, and can handle formatting 2/29
+    I18n.l(Date.new(2024, month, day), format: :short)
   end
 
   def parse_daily(rropts)
@@ -419,7 +420,7 @@ module RruleHelper
                })
       else
         I18n.t({
-                 one: "Annualy on the %{ord} %{days} of %{month}, %{times} times",
+                 one: "Annually on the %{ord} %{days} of %{month}, %{times} times",
                  other: "Every %{count} years on the %{ord} %{days} of %{month}, %{times} times"
                },
                {

@@ -275,7 +275,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
             blank_ids = question[:answers].pluck(:blank_id).uniq
             row << blank_ids.filter_map { |blank_id| answer["answer_for_#{blank_id}".to_sym].try(:gsub, /,/, "\\,") }.join(",")
           when "multiple_answers_question"
-            row << question[:answers].filter_map { |a| (answer["answer_#{a[:id]}".to_sym] == "1") ? a[:text].gsub(/,/, "\\,") : nil }.join(",")
+            row << question[:answers].filter_map { |a| (answer["answer_#{a[:id]}".to_sym] == "1") ? a[:text].gsub(",", "\\,") : nil }.join(",")
           when "multiple_dropdowns_question"
             blank_ids = question[:answers].pluck(:blank_id).uniq
             answer_ids = blank_ids.map { |blank_id| answer["answer_for_#{blank_id}".to_sym] }
@@ -283,11 +283,11 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
           when "calculated_question"
             list = question[:answers].take(1).flat_map do |ans|
               ans[:variables]&.map do |variable|
-                [variable[:name], variable[:value].to_s].map { |str| str.gsub(/=>/, "\\=>") }.join("=>")
+                [variable[:name], variable[:value].to_s].map { |str| str.gsub("=>", "\\=>") }.join("=>")
               end
             end
             list << answer[:text]
-            row << list.map { |str| (str || "").gsub(/,/, "\\,") }.join(",")
+            row << list.map { |str| (str || "").gsub(",", "\\,") }.join(",")
           when "matching_question"
             answer_ids = question[:answers].pluck(:id)
             answer_and_matches = answer_ids.map { |aid| [aid, answer["answer_#{aid}".to_sym].to_i] }
@@ -296,7 +296,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
               res << (question[:answers].detect { |a| a[:id] == answer_id } || {})[:text]
               match = question[:matches].detect { |m| m[:match_id] == match_id } || question[:answers].detect { |m| m[:match_id] == match_id } || {}
               res << (match[:right] || match[:text])
-              res.map { |s| (s || "").gsub(/=>/, "\\=>") }.join("=>").gsub(/,/, "\\,")
+              res.map { |s| (s || "").gsub("=>", "\\=>") }.join("=>").gsub(",", "\\,")
             end.join(",")
           when "numerical_question"
             row << (answer && answer[:text])

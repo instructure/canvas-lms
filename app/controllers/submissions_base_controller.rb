@@ -27,7 +27,7 @@ class SubmissionsBaseController < ApplicationController
   include Api::V1::SubmissionComment
 
   def show
-    return render_unauthorized_action unless @submission.context.grants_right?(@current_user, session, :read)
+    return unless authorized_action(@submission.context, @current_user, :read)
 
     @visible_rubric_assessments = @submission.visible_rubric_assessments_for(@current_user)
     @assessment_request = @submission.assessment_requests.where(assessor_id: @current_user).first
@@ -264,7 +264,14 @@ class SubmissionsBaseController < ApplicationController
     plag_data = (type == "vericite") ? submission.vericite_data : submission.turnitin_data
 
     if plag_data.dig(asset_string, :report_url).present?
-      polymorphic_url([:retrieve, @context, :external_tools], url: plag_data[asset_string][:report_url], display: "borderless")
+      polymorphic_url(
+        [:retrieve, @context, :external_tools],
+        url: plag_data[asset_string][:report_url],
+        # Hack because turnitin supports only 1.1 here, but they have 1.3 tools
+        # with the same domain that we will find because we prefer 1.3 tools:
+        prefer_1_1: type == "turnitin",
+        display: "borderless"
+      )
     elsif type == "vericite"
       # VeriCite URL
       submission.vericite_report_url(asset_string, @current_user, session)

@@ -23,9 +23,7 @@
     :RUBRIC_ASSESSMENT => {
       :assessor_id => @current_user.id.to_s,
       :assessment_type => can_do(@assignment, @current_user, :grade) ? "grading" : "peer_review"
-    },
-    restrict_quantitative_data: @assignment.restrict_quantitative_data?(@current_user),
-    grading_scheme: @context.grading_standard_or_default.data
+    }
   })
   @show_left_side = false
   @show_embedded_chat = false
@@ -33,6 +31,7 @@
   @can_edit_anything = !@context.completed?
   @emojis_enabled = @context.feature_enabled?(:submission_comment_emojis)
 %>
+
 
 <% provide :page_title, t(:page_title, "%{assignment_name}, SpeedGrader, %{course_name}", :assignment_name => @assignment.title, :course_name => @context.name) %>
 <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0;display: flex;flex-direction: column;">

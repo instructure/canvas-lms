@@ -15,10 +15,9 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "cassandra-cql", "~> 1.2.2"
   spec.add_dependency "config_file"
-  spec.add_dependency "rails", ">= 5.0"
 
   spec.add_development_dependency "bundler", "~> 2.2"
-  spec.add_development_dependency "byebug"
+  spec.add_development_dependency "debug"
   spec.add_development_dependency "rake"
   spec.add_development_dependency "rspec", "~> 3.12"
   spec.add_development_dependency "simplecov", "~> 0.22"

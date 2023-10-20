@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {scoreToGrade} from '@canvas/grading/GradingSchemeHelper'
+import {scoreToGrade} from '@instructure/grading-utils'
 import '@canvas/jquery/jquery.ajaxJSON'
 
 const I18n = useI18nScope('user_grades')

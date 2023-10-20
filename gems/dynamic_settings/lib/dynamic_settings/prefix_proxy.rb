@@ -77,16 +77,19 @@ module DynamicSettings
     # @param key [String, Symbol] The key to fetch
     # @param ttl [ActiveSupport::Duration] The TTL for the value in the cache,
     #   defaults to value supplied to the constructor.
+    # @param failsafe_cache [false, PathInfo] Location on disk to store a
+    #   failsafe cached for this value, in case Consul is down on a future boot.
+    #   Should be used sparingly, since it will load a file off disk.
     # @return [String]
     # @return [nil] When no value was found
-    def fetch(key, ttl: @default_ttl, **kwargs)
+    def fetch(key, ttl: @default_ttl, failsafe_cache: false, **kwargs)
       unknown_kwargs = kwargs.keys - [:failsafe]
       raise ArgumentError, "unknown keyword(s): #{unknown_kwargs.map(&:inspect).join(", ")}" unless unknown_kwargs.empty?
 
       # Within a given request, no reason to talk to redis/consul multiple times for the same key in the same tree
       # The TTL is only relevant for the underlying cache-within a request we don't exceed the ttl boundary
       DynamicSettings.request_cache.cache(CACHE_KEY_PREFIX + full_key(key)) do
-        fetch_without_request_cache(key, ttl:, **kwargs)
+        fetch_without_request_cache(key, ttl:, failsafe_cache:, **kwargs)
       end
     end
     alias_method :[], :fetch
@@ -132,8 +135,9 @@ module DynamicSettings
 
     private
 
-    def fetch_without_request_cache(key, ttl: @default_ttl, **kwargs)
+    def fetch_without_request_cache(key, ttl: @default_ttl, failsafe_cache: false, **kwargs)
       retry_count = 1
+      failsafe_cache_file = failsafe_cache.join("#{key}.cached") if failsafe_cache
 
       keys = [
         full_key(key),
@@ -153,6 +157,10 @@ module DynamicSettings
       end
 
       begin
+        if circuit_breaker&.tripped?
+          raise Diplomat::UnknownStatus, "Consul is unavailable because the circuit breaker has tripped"
+        end
+
         # okay now pre-cache an entire tree
         tree_key = [tree, service, environment].compact.join("/")
         # This longer TTL is important for race condition for now.
@@ -171,7 +179,7 @@ module DynamicSettings
             # when there's no tree
             nil
           else
-            populate_cache(values, subtree_ttl)
+            cache.write_multi(values.to_h { |kv| [CACHE_KEY_PREFIX + kv[:key], kv[:value]] }, ttl: subtree_ttl)
             values
           end
         end
@@ -180,7 +188,7 @@ module DynamicSettings
           # these keys will have been populated (or not!) above
           cache_result = cache.fetch(CACHE_KEY_PREFIX + full_key, expires_in: subtree_ttl) do
             # this should rarely happen.  If we JUST populated the parent tree,
-            # the value will already by in the cache.  If it's NOT in the tree, we'll cache
+            # the value will already be in the cache.  If it's NOT in the tree, we'll cache
             # a nil (intentionally) and not hit this fetch over and over.  This protects us
             # from the race condition where we just expired and filled out the whole tree,
             # then the cache gets cleared, then we try to fetch one of the things we "know"
@@ -189,14 +197,20 @@ module DynamicSettings
             # and they'll still go away eventually if we REMOVE a key from a subtree in consul.
             kv_fetch(full_key, stale: true)
           end
-          return cache_result if cache_result
+          if cache_result
+            check_cache(failsafe_cache_file, cache_result)
+            return cache_result
+          end
         end
 
         fallback_keys.each do |full_key|
           result = cache.fetch(CACHE_KEY_PREFIX + full_key, expires_in: ttl) do
             kv_fetch(full_key, stale: true)
           end
-          return result if result
+          if result
+            check_cache(failsafe_cache_file, result)
+            return result
+          end
         end
         nil
       rescue Diplomat::KeyNotFound, Diplomat::UnknownStatus, Diplomat::PathNotFound, Errno::ECONNREFUSED => e
@@ -208,8 +222,6 @@ module DynamicSettings
             end
           end
         end
-
-        return kwargs[:failsafe] if kwargs.key?(:failsafe)
 
         if retry_limit && retry_base && retry_count < retry_limit && !circuit_breaker&.tripped?
           # capture this to make sure that we have SOME
@@ -225,10 +237,22 @@ module DynamicSettings
         end
 
         # retries failed; trip the circuit breaker and avoid retries for some amount of time
-        circuit_breaker&.trip
+        circuit_breaker&.trip unless circuit_breaker&.tripped?
+
+        return failsafe_cache_file.read if failsafe_cache_file&.exist?
+        return kwargs[:failsafe] if kwargs.key?(:failsafe)
 
         raise
       end
+    end
+
+    def check_cache(failsafe_cache_file, value)
+      return unless failsafe_cache_file
+
+      cached_value = failsafe_cache_file.read if failsafe_cache_file.exist?
+      failsafe_cache_file.write(value) if cached_value != value
+    rescue Errno::EACCES
+      # ignore permission errors
     end
 
     # bit of helper indirection
@@ -270,10 +294,6 @@ module DynamicSettings
         key_array << cluster
       end
       key_array.push(prefix, key).compact.join("/")
-    end
-
-    def populate_cache(subtree, ttl)
-      cache.write_set(subtree.to_h { |st| [CACHE_KEY_PREFIX + st[:key], st[:value]] }, ttl:)
     end
   end
 end

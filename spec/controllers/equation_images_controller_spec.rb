@@ -40,12 +40,12 @@ describe EquationImagesController do
 
     it "redirects image requests to codecogs" do
       get "show", params: { id: "foo" }
-      expect(response).to redirect_to("http://latex.codecogs.com/gif.latex?foo")
+      expect(response).to redirect_to("http://latex.codecogs.com/svg.latex?foo")
     end
 
-    it "includes scale param if present" do
+    it "does not include scale param if present" do
       get "show", params: { id: "foo", scale: 2 }
-      expect(response).to redirect_to("http://latex.codecogs.com/gif.latex?foo&scale=2")
+      expect(response).to redirect_to("http://latex.codecogs.com/svg.latex?foo")
     end
 
     context "when using MathMan" do
@@ -56,6 +56,11 @@ describe EquationImagesController do
       it "redirects to service_url" do
         get :show, params: { id: "5" }
         expect(response).to redirect_to(/#{service_url}/)
+      end
+
+      it "includes the scale param if present" do
+        get :show, params: { id: "5", scale: 2 }
+        expect(MathMan).to have_received(:url_for).with(latex: "5", target: :svg, scale: "2")
       end
     end
   end

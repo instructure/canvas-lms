@@ -36,37 +36,6 @@ $.attrHooks.method = $.extend($.attrHooks.method, {
   },
 })
 
-$.fn.originalScrollTop = $.fn.scrollTop
-$.fn.scrollTop = function () {
-  if (this.selector === 'html,body' && arguments.length === 0) {
-    console.error(
-      "$('html,body').scrollTop() is not cross-browser compatible... use $.windowScrollTop() instead"
-    )
-  }
-  return $.fn.originalScrollTop.apply(this, arguments)
-}
-// Different browsers (and even different versions of the same browser) differ
-// on whether <body> or <html> is the scrolling element for a window. This is a
-// utility that returns the correct scroll y-position of the window in every
-// browser and version.
-//
-// see https://drafts.csswg.org/cssom-view/#dom-element-scrolltop for morbid
-// details of how the scrollTop attribute is calculated.
-$.windowScrollTop = function () {
-  // $.browser.safari is true for chrome.
-  // with chrome 61, we want the documentElement.scrollTop, so the
-  // original code (now the else block) always returns 0.
-  // if chrome > 60, force it to return documentElement.scrollTop
-  const chromeVer = window.navigator.userAgent.match(/Chrome\/(\d+)/)
-  // edge 42+ also reports as chrome 64+, so exclude it explicitly. yay user agent sniffing.
-  const edgeVer = window.navigator.userAgent.match(/Edge\/(\d+)/)
-  if (!edgeVer && chromeVer && parseInt(chromeVer[1], 10) > 60) {
-    return $('html').scrollTop()
-  } else {
-    return $('html').scrollTop()
-  }
-}
-
 // indicate we want stringified IDs for JSON responses
 $.ajaxPrefilter('json', (options, _originalOptions, _jqXHR) => {
   if (options.accepts.json) {

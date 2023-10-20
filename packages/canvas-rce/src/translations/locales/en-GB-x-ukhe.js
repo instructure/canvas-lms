@@ -33,6 +33,7 @@ const locale = {
   "add_another_f4e50d57": { "message": "Add another" },
   "add_cc_subtitles_55f0394e": { "message": "Add CC/Subtitles" },
   "add_image_60b2de07": { "message": "Add Image" },
+  "add_one_9e34a6f8": { "message": "Add one!" },
   "additional_considerations_f3801683": {
     "message": "Additional considerations"
   },
@@ -62,6 +63,7 @@ const locale = {
   },
   "and_7fcc2911": { "message": "And" },
   "angle_c5b4ec50": { "message": "Angle" },
+  "announcement_fb4cb645": { "message": "Announcement" },
   "announcement_list_da155734": { "message": "Announcement List" },
   "announcements_a4b8ed4a": { "message": "Announcements" },
   "apply_781a2546": { "message": "Apply" },
@@ -79,6 +81,7 @@ const locale = {
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Aspect ratio will be preserved"
   },
+  "assignment_976578a8": { "message": "Assignment" },
   "assignments_1e02582c": { "message": "Assignments" },
   "asterisk_82255584": { "message": "Asterisk" },
   "attributes_963ba262": { "message": "Attributes" },
@@ -214,8 +217,12 @@ const locale = {
   "crop_image_807ebb08": { "message": "Crop Image" },
   "cup_product_14174434": { "message": "Cup Product" },
   "current_image_f16c249c": { "message": "Current Image" },
+  "current_link_945a47ee": { "message": "Current Link" },
   "current_volume_level_c55ab825": { "message": "Current volume level" },
   "custom_6979cd81": { "message": "Custom" },
+  "custom_width_and_height_pixels_946eea7c": {
+    "message": "Custom width and height (Pixels)"
+  },
   "cyan_c1d5f68a": { "message": "Cyan" },
   "dagger_57e0f4e5": { "message": "Dagger" },
   "date_added_ed5ad465": { "message": "Date added" },
@@ -248,6 +255,7 @@ const locale = {
   "directionality_26ae9e08": { "message": "Directionality" },
   "directly_edit_latex_b7e9235b": { "message": "Directly Edit LaTeX" },
   "disable_preview_222bdf72": { "message": "Disable Preview" },
+  "discussion_6719c51d": { "message": "Discussion" },
   "discussions_a5f96392": { "message": "Discussions" },
   "discussions_index_6c36ced": { "message": "Discussions index" },
   "disjoint_union_e74351a8": { "message": "Disjoint Union" },
@@ -554,6 +562,9 @@ const locale = {
   "light_blue_5374f600": { "message": "Light blue" },
   "link_7262adec": { "message": "Link" },
   "link_options_a16b758b": { "message": "Link Options" },
+  "link_type_linktypemessage_c6d26815": {
+    "message": "link type: { linkTypeMessage }"
+  },
   "link_with_text_starting_with_start_b3fcbe71": {
     "message": "Link with text starting with { start }"
   },
@@ -610,6 +621,7 @@ const locale = {
   "minus_plus_3461f637": { "message": "Minus/Plus" },
   "misc_3b692ea7": { "message": "Misc" },
   "miscellaneous_e9818229": { "message": "Miscellaneous" },
+  "module_90d9fd32": { "message": "Unit" },
   "modules_c4325335": { "message": "Units" },
   "moving_image_to_crop_directionword_6f66cde2": {
     "message": "Moving image to crop { directionWord }"
@@ -634,19 +646,39 @@ const locale = {
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navigate through the menu or toolbar"
   },
+  "navigation_ee9af92d": { "message": "Navigation" },
   "nested_greater_than_d852e60d": { "message": "Nested Greater Than" },
   "nested_less_than_27d17e58": { "message": "Nested Less Than" },
+  "new_quiz_34aacba6": { "message": "New Quiz" },
   "next_40e12421": { "message": "Next" },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "No accessibility issues were detected."
   },
+  "no_announcements_created_yet_c44a94f4": {
+    "message": "No announcements created yet."
+  },
+  "no_announcements_found_20185afc": { "message": "No announcements found." },
+  "no_assignments_created_yet_1b236d87": {
+    "message": "No assignments created yet."
+  },
+  "no_assignments_found_79e46d7f": { "message": "No assignments found." },
   "no_changes_to_save_d29f6e91": { "message": "No changes to save." },
+  "no_discussions_created_yet_ff99abe3": {
+    "message": "No discussions created yet."
+  },
+  "no_discussions_found_9284063b": { "message": "No discussions found." },
   "no_e16d9132": { "message": "No" },
   "no_file_chosen_9a880793": { "message": "No file chosen" },
   "no_headers_9bc7dc7f": { "message": "No headers" },
+  "no_modules_created_yet_c71b6d4d": { "message": "No units created yet." },
+  "no_modules_found_2df43a40": { "message": "No units found." },
+  "no_pages_created_yet_c379fa6e": { "message": "No pages created yet." },
+  "no_pages_found_6799350": { "message": "No pages found." },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "No preview is available for this file."
   },
+  "no_quizzes_created_yet_1a2370b9": { "message": "No quizzes created yet." },
+  "no_quizzes_found_c80c537a": { "message": "No quizzes found." },
   "no_results_940393cf": { "message": "No results." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "No results found for { filterTerm }"
@@ -670,6 +702,9 @@ const locale = {
   "one_of_the_following_styles_must_be_added_to_save__1de769aa": {
     "message": "One of the following styles must be added to save an icon: Icon Colour, Outline Size, Icon Text, or Image"
   },
+  "one_or_more_files_failed_to_paste_please_try_uploa_7fa39dd3": {
+    "message": "One or more files failed to paste. Please try uploading or dragging and dropping files."
+  },
   "open_circle_e9bd069": { "message": "Open Circle" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "Open this keyboard shortcuts dialogue"
@@ -691,6 +726,7 @@ const locale = {
   "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
     "message": "{ p } is not a valid protocol which must be ftp, http, https, mailto, skype, tel or may be omitted"
   },
+  "page_50c4823d": { "message": "Page" },
   "pages_e5414c2c": { "message": "Pages" },
   "paragraph_5e5ad8eb": { "message": "Paragraph" },
   "paragraph_starting_with_start_a59923f8": {
@@ -748,6 +784,7 @@ const locale = {
   "pumpkin_904428d5": { "message": "Pumpkin" },
   "purple_7678a9fc": { "message": "Purple" },
   "quaternions_877024e0": { "message": "Quaternions" },
+  "quiz_e0dcce8f": { "message": "Quiz" },
   "quizzes_7e598f57": { "message": "Quizzes" },
   "rational_numbers_80ddaa4a": { "message": "Rational Numbers" },
   "real_numbers_7c99df94": { "message": "Real Numbers" },
@@ -830,6 +867,7 @@ const locale = {
   "select_crop_shape_d441feeb": { "message": "Select crop shape" },
   "select_language_7c93a900": { "message": "Select Language" },
   "select_video_source_1b5c9dbe": { "message": "Select video source" },
+  "selected_274ce24f": { "message": "Selected" },
   "selected_linkfilename_c093b1f2": { "message": "Selected { linkFileName }" },
   "selection_b52c4c5e": { "message": "Selection" },
   "set_header_scope_8c548f40": { "message": "Set header scope" },
@@ -1044,6 +1082,7 @@ const locale = {
     "message": "Up And Right Diagonal Arrow"
   },
   "up_c553575d": { "message": "Up" },
+  "updated_link_a827e441": { "message": "Updated link" },
   "upload_document_253f0478": { "message": "Upload Document" },
   "upload_file_fd2361b8": { "message": "Upload file" },
   "upload_image_6120b609": { "message": "Upload image" },

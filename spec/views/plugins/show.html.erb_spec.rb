@@ -31,8 +31,7 @@ describe "plugins/show" do
 
     assign(:plugin, plugin)
     assign(:plugin_setting, plugin_setting)
-    allow(view).to receive(:plugin_path).and_return("/some/path")
-    allow(view).to receive(:params).and_return(ActionController::Parameters.new({ id: "some_plugin" }))
+    allow(view).to receive_messages(plugin_path: "/some/path", params: ActionController::Parameters.new({ id: "some_plugin" }))
     render "plugins/show"
     expect(response.body).to match("Return to plugins list")
   end

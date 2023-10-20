@@ -56,9 +56,8 @@ describe "User data exports" do
   end
 
   it "uses inst-fs if enabled" do
-    allow(InstFS).to receive(:enabled?).and_return(true)
     uuid = "1234-abcd"
-    allow(InstFS).to receive(:direct_upload).and_return(uuid)
+    allow(InstFS).to receive_messages(enabled?: true, direct_upload: uuid)
 
     exported_attachment = Exporters::UserDataExporter.create_user_data_export(@student)
 

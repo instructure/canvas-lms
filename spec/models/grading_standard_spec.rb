@@ -74,7 +74,50 @@ describe GradingStandard do
 
         expect(standard).to be_valid
       end
+
+      it "is valid when scaling_factor other than 1 is set for a points based scheme" do
+        standard.data = [["A", 0.9], ["B", 0.8], ["C", 0.7], ["D", 0.0]]
+        standard.points_based = true
+        standard.scaling_factor = 4.0
+        expect(standard).to be_valid
+      end
+
+      it "is invalid when scaling_factor other than 1 is set for a non points based scheme" do
+        standard.data = [["A", 0.9], ["B", 0.8], ["C", 0.7], ["D", 0.0]]
+        standard.scaling_factor = 4.0
+        expect(standard).not_to be_valid
+      end
     end
+  end
+
+  it "defaults scaling_factor to 1.0" do
+    grading_standard = @course.grading_standards.build({ title: "My Scheme Title",
+                                                         data: GradingStandard.default_grading_standard })
+    grading_standard.save
+    expect(grading_standard.scaling_factor).to eq 1.0
+  end
+
+  it "scaling_factor persists and retrieves" do
+    grading_standard = @course.grading_standards.build({ title: "My Scheme Title",
+                                                         data: GradingStandard.default_grading_standard,
+                                                         scaling_factor: 4.0 })
+    grading_standard.save
+    expect(grading_standard.scaling_factor).to eq 4.0
+  end
+
+  it "defaults points_based properly" do
+    grading_standard = @course.grading_standards.build({ title: "My Scheme Title",
+                                                         data: GradingStandard.default_grading_standard })
+    grading_standard.save
+    expect(grading_standard.points_based).to be false
+  end
+
+  it "points_based persists and retrieves" do
+    grading_standard = @course.grading_standards.build({ title: "My Scheme Title",
+                                                         data: GradingStandard.default_grading_standard,
+                                                         points_based: true })
+    grading_standard.save
+    expect(grading_standard.points_based).to be true
   end
 
   it "strips trailing whitespaces from scheme names" do
@@ -234,6 +277,22 @@ describe GradingStandard do
       score = @gs.grade_to_score("A-")
       decimal_part = score.to_s.split(".")[1]
       expect(decimal_part.length).to be <= 3
+    end
+
+    context "points-based scheme" do
+      before do
+        @gs = GradingStandard.new(context: @course)
+        @gs.data = [["Exceeds Mastery", 0.75], ["Mastery", 0.5], ["Near Mastery", 0.25], ["Below Mastery", 0]]
+        @gs.points_based = true
+        @gs.scaling_factor = 4.0
+        @gs.save!
+      end
+
+      it "returns a score that is 0.1 less than the next upper bound" do
+        score = @gs.grade_to_score("Near Mastery")
+        expect(score).to eq 47.5
+        expect(score / (100 / @gs.scaling_factor)).to eq 1.9
+      end
     end
   end
 
@@ -481,6 +540,24 @@ describe GradingStandard do
       it "is set to the account's root account ID if the account is not a root account" do
         grading_standard = root_account.grading_standards.create!(workflow_state: "active", data:)
         expect(grading_standard.root_account_id).to eq root_account.id
+      end
+    end
+  end
+
+  describe "accounts" do
+    let_once(:root_account) { Account.create! }
+    let_once(:subaccount) { Account.create(root_account:) }
+    let_once(:course) { Course.create!(account: root_account) }
+
+    let_once(:data) { [["A", 94], ["F", 0]] }
+
+    context "when deleted" do
+      it "removes association on account" do
+        grading_standard = GradingStandard.new(context: subaccount, workflow_state: "active", data:)
+        subaccount.grading_standard = grading_standard
+        subaccount.save!
+
+        expect { grading_standard.destroy }.to change { subaccount.reload.grading_standard_id }.from(grading_standard.id).to(nil)
       end
     end
   end

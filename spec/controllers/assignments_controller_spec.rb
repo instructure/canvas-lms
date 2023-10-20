@@ -259,6 +259,54 @@ describe AssignmentsController do
       expect(assigns[:js_env][:MAX_NAME_LENGTH]).to eq(15)
     end
 
+    context "course grading scheme defaults" do
+      it "sets COURSE_DEFAULT_GRADING_SCHEME_ID to 0 in js_env if default canvas grading scheme is selected" do
+        Account.site_admin.enable_feature!(:grading_scheme_updates)
+
+        user_session @teacher
+        @course.update_attribute :grading_standard_id, 0
+        expect(@course.grading_standard_id).to eq 0
+
+        get "edit", params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:COURSE_DEFAULT_GRADING_SCHEME_ID]).to eq 0
+      end
+
+      it "sets COURSE_DEFAULT_GRADING_SCHEME_ID to grading scheme id in js_env if a grading scheme is selected" do
+        Account.site_admin.enable_feature!(:grading_scheme_updates)
+
+        user_session @teacher
+        @standard = @course.grading_standards.create!(title: "course standard", standard_data: { a: { name: "A", value: "95" }, b: { name: "B", value: "80" }, f: { name: "F", value: "" } })
+        @course.update_attribute :grading_standard, @standard
+        expect(@course.grading_standard_id).to eq @standard.id
+
+        get "edit", params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:COURSE_DEFAULT_GRADING_SCHEME_ID]).to eq @standard.id
+      end
+
+      it "sets COURSE_DEFAULT_GRADING_SCHEME_ID to nil in js_env if course grading schemes are not enabled" do
+        Account.site_admin.enable_feature!(:grading_scheme_updates)
+
+        user_session @teacher
+        expect(@course.grading_standard_id).to be_nil
+
+        get "edit", params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:COURSE_DEFAULT_GRADING_SCHEME_ID]).to be_nil
+      end
+
+      it "sets COURSE_DEFAULT_GRADING_SCHEME_ID to account value if course has none" do
+        Account.site_admin.enable_feature!(:grading_scheme_updates)
+        gs = GradingStandard.new(context: @course.account, title: "My Grading Standard", data: { "A" => 0.94, "B" => 0, })
+        gs.save!
+        @course.account.update_attribute :grading_standard_id, gs.id
+
+        user_session @teacher
+        get "edit", params: { course_id: @course.id, id: @assignment.id }
+
+        expect(@course.account.grading_standard_id).to eq gs.id
+        expect(assigns[:js_env][:COURSE_DEFAULT_GRADING_SCHEME_ID]).to eq gs.id
+      end
+    end
+
     context "draft state" do
       it "creates a default group if none exist" do
         user_session(@student)
@@ -270,7 +318,7 @@ describe AssignmentsController do
 
       it "separates manage_assignments and manage_grades permissions" do
         user_session(@teacher)
-        @course.account.role_overrides.create! role: teacher_role, permission: "manage_assignments", enabled: false
+        @course.account.role_overrides.create! role: teacher_role, permission: "manage_assignments_edit", enabled: false
         get "index", params: { course_id: @course.id }
         expect(assigns[:js_env][:PERMISSIONS][:manage_grades]).to be_truthy
         expect(assigns[:js_env][:PERMISSIONS][:manage_assignments]).to be_falsey
@@ -598,9 +646,9 @@ describe AssignmentsController do
         expect(assigns[:can_direct_share]).to be true
       end
 
-      describe "with manage_content permission disabled" do
+      describe "with manage_course_content_add permission disabled" do
         before do
-          RoleOverride.create!(context: @course.account, permission: "manage_content", role: teacher_role, enabled: false)
+          RoleOverride.create!(context: @course.account, permission: "manage_course_content_add", role: teacher_role, enabled: false)
         end
 
         it "does not show direct share options if the course is active" do
@@ -891,6 +939,12 @@ describe AssignmentsController do
 
           get "show", params: { course_id: @course.id, id: @assignment.id }
           expect(assigns[:js_env][:belongs_to_unpublished_module]).to be(true)
+        end
+
+        it "sets stickers_enabled in the ENV" do
+          @course.root_account.enable_feature!(:submission_stickers)
+          get :show, params: { course_id: @course.id, id: @assignment.id }
+          expect(assigns[:js_env][:stickers_enabled]).to be true
         end
 
         context "peer reviews" do
@@ -1190,20 +1244,14 @@ describe AssignmentsController do
       assert_require_login
     end
 
-    it "sets user_has_google_drive" do
-      user_session(@student)
-      a = @course.assignments.create(title: "some assignment")
-      plugin = Canvas::Plugin.find(:google_drive)
-      plugin_setting = PluginSetting.find_by_name(plugin.id) || PluginSetting.new(name: plugin.id, settings: plugin.default_settings)
-      plugin_setting.posted_settings = {}
-      plugin_setting.save!
-      google_drive_mock = double("google_drive")
-      allow(google_drive_mock).to receive(:authorized?).and_return(true)
-      allow(controller).to receive(:google_drive_connection).and_return(google_drive_mock)
-      get "show", params: { course_id: @course.id, id: a.id }
+    it "sets 'ROOT_OUTCOME_GROUP' for external tool assignments in the teacher view" do
+      user_session(@teacher)
+      @assignment.submission_types = "external_tool"
+      @assignment.build_external_tool_tag(url: "http://example.com/test")
+      @assignment.save!
 
-      expect(response).to be_successful
-      expect(assigns(:user_has_google_drive)).to be true
+      get "show", params: { course_id: @course.id, id: @assignment.id }
+      expect(assigns[:js_env][:ROOT_OUTCOME_GROUP]).not_to be_nil
     end
 
     it "sets first_annotation_submission to true if it's the first submission and the assignment is annotatable" do
@@ -1653,6 +1701,61 @@ describe AssignmentsController do
       it "does not sets can_edit_grades permissions in the ENV for students" do
         get :show, params: { course_id: @course.id, id: @assignment.id }
         expect(assigns[:js_env][:PERMISSIONS]).not_to include :can_edit_grades
+      end
+    end
+  end
+
+  describe "GET 'tool_launch'" do
+    subject { get "tool_launch", params: { course_id: @course.id, assignment_id: @assignment.id } }
+
+    context "with non-external_tool assignment" do
+      before do
+        @assignment.update(submission_types: "online_upload")
+      end
+
+      it "notifies user and redirects back to assignments page" do
+        subject
+        expect(response).to be_redirect
+        expect(flash[:error]).to match(/The assignment you requested is not associated with an LTI tool./)
+      end
+    end
+
+    context "with external_tool assignment" do
+      let(:url) { "http://example.com/test" }
+      let(:tool) { external_tool_model(context: @course, opts: { url:, assignment_selection: { enabled: true } }) }
+
+      before do
+        @assignment.update(submission_types: "external_tool")
+        @assignment.build_external_tool_tag(url:, content: tool)
+        @assignment.save!
+      end
+
+      context "with a2_enabled_tool feature flag enabled" do
+        before do
+          Account.site_admin.enable_feature!(:external_tools_for_a2)
+        end
+
+        it "renders the LTI tool launch associated with assignment" do
+          user_session(@student)
+          subject
+          expect(response).to be_successful
+          expect(assigns[:lti_launch]).to be_present
+          expect(assigns[:js_env][:LTI_TOOL]).to eq("true")
+        end
+      end
+
+      context "with a2_enabled_tool feature flag disabled" do
+        before do
+          Account.site_admin.disable_feature!(:external_tools_for_a2)
+        end
+
+        it "renders the LTI tool launch associated with assignment" do
+          user_session(@student)
+          subject
+          expect(response).to be_successful
+          expect(assigns[:lti_launch]).to be_present
+          expect(assigns[:js_env][:LTI_TOOL]).to be_nil
+        end
       end
     end
   end
@@ -2517,28 +2620,32 @@ describe AssignmentsController do
     end
   end
 
-  describe "GET list_google_docs" do
-    let(:connection) { double }
-    let(:params) { { course_id: @course.id, id: @assignment.id } }
-
+  describe "GET 'peer reviews'" do
     before do
       user_session(@teacher)
-      allow(controller).to receive(:google_drive_connection).and_return(connection)
-      allow_any_instance_of(Assignment).to receive(:allow_google_docs_submission?).and_return(true)
+      @assignment = @course.assignments.create(title: "Peer Review Assignment", workflow_state: "published")
+      @assignment.update!(peer_reviews: true, submission_types: "text_entry")
+      @student2 = User.create!(name: "Sam")
+      @student3 = User.create!(name: "Samantha")
+      @student4 = User.create!(name: "Jim")
+      @course.enroll_user(@student2, "StudentEnrollment", enrollment_state: "active")
+      @course.enroll_user(@student3, "StudentEnrollment", enrollment_state: "active")
+      @course.enroll_user(@student4, "StudentEnrollment", enrollment_state: "active")
     end
 
-    it "passes errors through to Canvas::Errors" do
-      allow(connection).to receive(:list_with_extension_filter).and_raise(ArgumentError)
-      expect(Canvas::Errors).to receive(:capture_exception)
-      get "list_google_docs", params:, format: "json"
-      expect(response).to have_http_status(:ok)
+    it "students instance variable contains students who match the search term parameter" do
+      get "peer_reviews", params: { course_id: @course.id, assignment_id: @assignment.id, search_term: "Sa" }
+      expect(assigns[:students]).to include(have_attributes(name: "Sam"), have_attributes(name: "Samantha"))
     end
 
-    it "gives appropriate error code to connection errors" do
-      allow(connection).to receive(:list_with_extension_filter).and_raise(GoogleDrive::ConnectionException)
-      get "list_google_docs", params:, format: "json"
-      expect(response).to have_http_status(:gateway_timeout)
-      expect(response.body).to include("Unable to connect to Google Drive")
+    it "students intance variable has no students when search term parameter does not match any student names" do
+      get "peer_reviews", params: { course_id: @course.id, assignment_id: @assignment.id, search_term: "Hello World" }
+      expect(assigns[:students].length).to eq(0)
+    end
+
+    it "all visible students are listed in the assign peer review dropdown" do
+      get "peer_reviews", params: { course_id: @course.id, assignment_id: @assignment.id, search_term: "Sa" }
+      expect(assigns[:students_dropdown_list].length).to eq(4)
     end
   end
 end

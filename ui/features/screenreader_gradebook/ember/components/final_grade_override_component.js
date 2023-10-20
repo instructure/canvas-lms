@@ -17,7 +17,7 @@
  */
 
 import Ember from 'ember'
-import {scoreToGrade} from '@canvas/grading/GradingSchemeHelper'
+import {scoreToGrade} from '@instructure/grading-utils'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 
 const FinalGradeOverrideComponent = Ember.Component.extend({
@@ -31,8 +31,21 @@ const FinalGradeOverrideComponent = Ember.Component.extend({
     if (percentage == null || !gradingStandard) {
       return null
     }
+    if (this.get('pointsBasedGradingSchemesFeatureEnabled')) {
+      if (gradingStandard) {
+        if (this.get('gradingStandardPointsBased')) {
+          // points based grading schemes never show percentages
+          return null
+        }
+      }
+    }
     return GradeFormatHelper.formatGrade(percentage, {gradingType: 'percent'})
-  }.property('finalGradeOverride', 'gradingStandard'),
+  }.property(
+    'finalGradeOverride',
+    'gradingStandard',
+    'gradingStandardPointsBased',
+    'pointsBasedGradingSchemesFeatureEnabled'
+  ),
 
   finalGradeOverrideChanged: function () {
     const percentage = this.get('finalGradeOverride.percentage')

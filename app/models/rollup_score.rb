@@ -56,11 +56,46 @@ class RollupScore
     latest_result unless @aggregate
   end
 
+  def new_decaying_average_calculation_ff_enabled?
+    return @outcome.context.root_account.feature_enabled?(:outcomes_new_decaying_average_calculation) if @outcome.context
+
+    LoadAccount.default_domain_root_account.feature_enabled?(:outcomes_new_decaying_average_calculation)
+  end
+
+  # TODO: This code should be removed once the FF is retire and DB is migrated
+  def adjust_calculation_method
+    if new_decaying_average_calculation_ff_enabled?
+      case @calculation_method
+      when "standard_decaying_average"
+        "decaying_average"
+      when "decaying_average", "weighted_average"
+        "weighted_average"
+      else
+        @calculation_method
+      end
+    else
+      case @calculation_method
+      when "standard_decaying_average", "decaying_average", "weighted_average"
+        "weighted_average"
+      else
+        @calculation_method
+      end
+    end
+  end
+
   # TODO: do send(@calculation_method) instead of the case to streamline this more
   def calculate_results
     # decaying average is default for new outcomes
-    case @calculation_method
+    # TODO: This line should be removed once the FF is retire and DB is migrated
+    # and use @calculation_method instead of method
+    method = adjust_calculation_method
+
+    case method
     when "decaying_average"
+      return nil if @outcome_results.empty?
+
+      standard_decaying_average
+    when "weighted_average"
       return nil if @outcome_results.empty?
 
       decaying_average_set
@@ -115,6 +150,32 @@ class RollupScore
     older_avg_weighted = (tmp_scores.sum / tmp_scores.length) * (0.01 * (100 - weight))
     decaying_avg_score = (latest_weighted + older_avg_weighted).round(PRECISION)
     { score: decaying_avg_score, results: tmp_score_sets.pluck(:result).push(latest[:result]) }
+  end
+
+  def standard_decaying_average
+    # default decay_rate is 65 if none selected.
+    decay_rate = @calculation_int || 65
+    remaining_weight = 100 - decay_rate
+    decay_avg = nil
+
+    tmp_scores = score_sets.pluck(:score)
+    results = score_sets.pluck(:result)
+
+    # return if single assignment score
+    if tmp_scores.size == 1
+      decay_avg = tmp_scores[0].round(PRECISION)
+      return { score: decay_avg, results: }
+    end
+
+    tmp_scores.each_cons(2) do |score|
+      decay_avg = if decay_avg.nil?
+                    (score[0] * (0.01 * remaining_weight)) + (score[1] * (0.01 * decay_rate))
+                  else
+                    (decay_avg * (0.01 * remaining_weight)) + (score[1] * (0.01 * decay_rate))
+                  end
+    end
+
+    { score: decay_avg.round(PRECISION), results: }
   end
 
   def average_set

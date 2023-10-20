@@ -19,16 +19,18 @@
 #
 
 require_relative "../graphql_spec_helper"
-require_relative "./shared_examples/types_with_enumerable_workflow_states"
+require_relative "shared_examples/types_with_enumerable_workflow_states"
 
 describe Types::AssignmentType do
   let_once(:course) { course_factory(active_all: true) }
 
   let_once(:teacher) { teacher_in_course(active_all: true, course:).user }
   let_once(:student) { student_in_course(course:, active_all: true).user }
+  let_once(:admin_user) { account_admin_user_with_role_changes }
 
   let(:assignment) do
     course.assignments.create(title: "some assignment",
+                              points_possible: 10,
                               submission_types: ["online_text_entry"],
                               workflow_state: "published",
                               allowed_extensions: %w[doc xlt foo])
@@ -36,6 +38,7 @@ describe Types::AssignmentType do
 
   let(:assignment_type) { GraphQLTypeTester.new(assignment, current_user: student) }
   let(:teacher_assignment_type) { GraphQLTypeTester.new(assignment, current_user: teacher) }
+  let(:admin_user_assignment_type) { GraphQLTypeTester.new(assignment, current_user: admin_user) }
 
   it "works" do
     expect(assignment_type.resolve("_id")).to eq assignment.id.to_s
@@ -53,6 +56,11 @@ describe Types::AssignmentType do
     expect(assignment_type.resolve("anonymousInstructorAnnotations")).to eq assignment.anonymous_instructor_annotations
     expect(assignment_type.resolve("postToSis")).to eq assignment.post_to_sis
     expect(assignment_type.resolve("canUnpublish")).to eq assignment.can_unpublish?
+    expect(assignment_type.resolve("courseId")).to eq assignment.context_id.to_s
+    expect(assignment_type.resolve("gradesPublished")).to eq assignment.grades_published?
+    expect(assignment_type.resolve("moderatedGradingEnabled")).to eq assignment.moderated_grading?
+    expect(assignment_type.resolve("postManually")).to eq assignment.post_manually?
+    expect(assignment_type.resolve("published")).to eq assignment.published?
   end
 
   it_behaves_like "types with enumerable workflow states" do
@@ -192,6 +200,58 @@ describe Types::AssignmentType do
     expect(
       assignment_type.resolve("htmlUrl", request: ActionDispatch::TestRequest.create)
     ).to eq "http://test.host/courses/#{assignment.context_id}/assignments/#{assignment.id}"
+  end
+
+  context "scoreStatistic" do
+    it "returns null when there are no scores" do
+      assignment.submissions.destroy_all
+      expect(assignment_type.resolve("scoreStatistic { mean }")).to be_nil
+    end
+
+    context "when there are scores" do
+      before do
+        assignment.update!(grading_type: "points")
+        assignment.grade_student(student, grade: 5, grader: teacher)
+        student_2 = student_in_course(course:, active_all: true).user
+        assignment.grade_student(student_2, grade: 10, grader: teacher)
+        student_3 = student_in_course(course:, active_all: true).user
+        assignment.grade_student(student_3, grade: 15, grader: teacher)
+      end
+
+      it "returns the scoreStatistic always for teachers" do
+        expect(teacher_assignment_type.resolve("scoreStatistic { mean }")).to be 10.0
+        expect(teacher_assignment_type.resolve("scoreStatistic { maximum }")).to be 15.0
+        expect(teacher_assignment_type.resolve("scoreStatistic { minimum }")).to be 5.0
+        expect(teacher_assignment_type.resolve("scoreStatistic { count }")).to be 3
+
+        assignment.mute!
+
+        expect(teacher_assignment_type.resolve("scoreStatistic { mean }")).to be 10.0
+      end
+
+      it "returns null for students when there are fewer than 5 submissions" do
+        expect(assignment_type.resolve("scoreStatistic { mean }")).to be_nil
+      end
+
+      it "returns the scoreStatistic for students when there are 5 or more submissions" do
+        student_4 = student_in_course(course:, active_all: true).user
+        assignment.grade_student(student_4, grade: 10, grader: teacher)
+        student_5 = student_in_course(course:, active_all: true).user
+        assignment.grade_student(student_5, grade: 10, grader: teacher)
+
+        # students should see statistics if there are 5 or more submissions
+        expect(assignment_type.resolve("scoreStatistic { mean }")).to be 10.0
+      end
+
+      it "returns null for students when the assignment is muted" do
+        assignment.mute!
+        expect(assignment_type.resolve("scoreStatistic { mean }")).to be_nil
+      end
+
+      it "returns stats for admins" do
+        expect(admin_user_assignment_type.resolve("scoreStatistic { mean }")).to be 10.0
+      end
+    end
   end
 
   context "description" do
@@ -465,6 +525,10 @@ describe Types::AssignmentType do
     expect(assignment_type.resolve("assignmentGroup { _id }")).to eq assignment.assignment_group.to_param
   end
 
+  it "has an assignmentGroupID" do
+    expect(assignment_type.resolve("assignmentGroupId")).to eq assignment.assignment_group.id.to_s
+  end
+
   it "has modules" do
     module1 = assignment.course.context_modules.create!(name: "Module 1")
     module2 = assignment.course.context_modules.create!(name: "Module 2")
@@ -488,6 +552,16 @@ describe Types::AssignmentType do
 
     assignment.update_attribute :grading_type, "fakefakefake"
     expect(assignment_type.resolve("gradingType")).to be_nil
+  end
+
+  it "returns grading period id" do
+    grading_period_group = GradingPeriodGroup.create!(title: "foo", course_id: @course.id)
+    grading_period = GradingPeriod.create!(title: "foo", start_date: 1.day.ago, end_date: 1.day.from_now, grading_period_group_id: grading_period_group.id)
+    gp_assignment = @course.assignments.create! name: "asdf", points_possible: 10
+
+    grading_period_assignment_type = GraphQLTypeTester.new(gp_assignment, current_user: student)
+
+    expect(grading_period_assignment_type.resolve("gradingPeriodId")).to eq grading_period.id.to_s
   end
 
   context "overridden assignments" do
@@ -610,6 +684,20 @@ describe Types::AssignmentType do
         GQL
       ).to eq ["555"]
     end
+
+    it "works for Course tags" do
+      assignment.assignment_overrides.create!(set: course)
+
+      expect(
+        assignment_type.resolve(<<~GQL, current_user: teacher)
+          assignmentOverrides { edges { node { set {
+            ... on Course {
+              _id
+            }
+          } } } }
+        GQL
+      ).to eq [course.id.to_s]
+    end
   end
 
   describe Types::LockInfoType do
@@ -671,10 +759,8 @@ describe Types::AssignmentType do
         # truthy setting
         Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
         Account.default.save!
-
-        # truthy permission(since enabled is being "not"ed)
-        Account.default.role_overrides.create!(role: student_role, enabled: false, permission: "restrict_quantitative_data")
-        Account.default.reload
+        course.restrict_quantitative_data = true
+        course.save!
       end
 
       context "default RQD state" do

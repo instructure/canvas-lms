@@ -626,6 +626,13 @@ describe Attachment do
       expect(@attachment.media_tracks_include_originals).to match [en_track, fra_track]
       expect(@attachment.media_tracks_include_originals).not_to include fr_track
     end
+
+    it "differentiates between inherited and non-inherited tracks" do
+      @media_object.media_tracks.create!(kind: "subtitles", locale: "en", content: "en subs", user_id: @teacher)
+      @attachment.media_tracks.create!(kind: "subtitles", locale: "fr", content: "fr subs", user_id: @teacher, media_object: @media_object)
+      expect(@attachment.media_tracks_include_originals.first.inherited).to be_truthy
+      expect(@attachment.media_tracks_include_originals.last.inherited).to be_falsey
+    end
   end
 
   context "destroy" do
@@ -797,8 +804,7 @@ describe Attachment do
 
     context "inst-fs" do
       before do
-        allow(InstFS).to receive(:enabled?).and_return(true)
-        allow(InstFS).to receive(:app_host).and_return("https://somehost.example")
+        allow(InstFS).to receive_messages(enabled?: true, app_host: "https://somehost.example")
         Attachment.class_variable_set :@@base_file_removed_uuids, nil if Attachment.class_variable_defined? :@@base_file_removed_uuids
       end
 
@@ -897,6 +903,25 @@ describe Attachment do
       expect(a).to be_deleted
       a.restore
       expect(a).to be_available
+    end
+
+    it "restores deleted parent folders" do
+      course_factory
+      parent_folder = folder_model
+      child_folder = folder_model(parent_folder_id: parent_folder.id)
+      attachment = attachment_model(folder: child_folder)
+      parent_folder.destroy
+
+      child_folder.reload
+      attachment.reload
+
+      attachment.restore
+      child_folder.reload
+      parent_folder.reload
+
+      expect(attachment).to be_available
+      expect(child_folder.workflow_state).to eq "visible"
+      expect(parent_folder.workflow_state).to eq "visible"
     end
   end
 
@@ -1284,6 +1309,101 @@ describe Attachment do
       expect(aq_att2.grants_right?(student, :download)).to be false
     end
 
+    context "attachments with assignment context" do
+      before :once do
+        assignment_model(course: @course, submission_types: "online_upload")
+        @submission = @assignment.submit_homework(student, attachments: [attachment_model(context: student)])
+        @course.enroll_student(user_model).accept
+        @student2 = @user
+        @course.enroll_teacher(user_model).accept
+        @teacher = @user
+      end
+
+      it "only allows graders to access the 'download all submissions' zip folder on an assignment" do
+        attachment = SubmissionsController.new.submission_zip(@assignment)
+        expect(attachment.grants_right?(@teacher, :download)).to be true
+        expect(attachment.grants_right?(student, :download)).to be false
+      end
+
+      it "allows graders to access attachments from students on submission comments" do
+        @submission.add_comment(author: student, comment: "comment", attachments: [attachment_model(context: @assignment)])
+        expect(@attachment.grants_right?(@teacher, :download)).to be true
+      end
+
+      it "allows students access to files they just created" do
+        attachment_model(context: @assignment, user: student)
+        expect(@attachment.grants_right?(student, :download)).to be true
+      end
+
+      it "allows students to access attachments on submission comments associated to their submissions" do
+        @submission.add_comment(author: @teacher, comment: "comment", attachments: [attachment_model(context: @assignment)])
+        expect(@attachment.grants_right?(student, :download)).to be true
+
+        @submission.add_comment(author: student, comment: "comment", attachments: [attachment_model(context: @assignment)])
+        expect(@attachment.grants_right?(student, :download)).to be true
+      end
+
+      it "does not allow students to access attachments on submission comments for other's submissions" do
+        @submission.add_comment(author: @teacher, comment: "comment", attachments: [attachment_model(context: @assignment)])
+        expect(@attachment.grants_right?(@student2, :download)).to be false
+
+        @submission.add_comment(author: student, comment: "comment", attachments: [attachment_model(context: @assignment)])
+        expect(@attachment.grants_right?(@student2, :download)).to be false
+      end
+
+      it "allows students to access attachments on submissions" do
+        attachment_model(context: @assignment)
+        @assignment.submit_homework(student, attachments: [@attachment])
+
+        expect(@attachment.grants_right?(student, :download)).to be true
+      end
+
+      it "doesn't crash when there is no user" do
+        attachment_model(context: @assignment)
+        @assignment.submit_homework(student, attachments: [@attachment])
+
+        expect(@attachment.grants_right?(nil, :download)).to be false
+      end
+
+      it "does not allow users to access attachments for deleted submissions" do
+        attachment_model(context: @assignment)
+        submission = @assignment.submit_homework(student, attachments: [@attachment])
+        submission.destroy
+
+        expect(@attachment.grants_right?(student, :download)).to be false
+      end
+
+      it "does not allow users to access attachments for deleted submission comments" do
+        attachment1 = attachment_model(context: @assignment)
+        attachment2 = attachment_model(context: @assignment)
+        comment1 = @submission.add_comment(author: @user, comment: "comment", attachments: [attachment1])
+        comment2 = @submission.add_comment(author: student, comment: "comment", attachments: [attachment2])
+        comment1.destroy
+        comment2.destroy
+
+        expect(attachment1.grants_right?(student, :download)).to be false
+        expect(attachment2.grants_right?(student, :download)).to be false
+      end
+
+      context "submission attachments with an attachment context (LTI submissions?)" do
+        before :once do
+          @submission = @assignment.submit_homework(student, attachments: [attachment_model(context: @assignment)])
+        end
+
+        it "allows graders to access attachments for submissions on an assignment" do
+          expect(@attachment.grants_right?(@teacher, :download)).to be true
+        end
+
+        it "allows students to access submission attachments for their submissions" do
+          expect(@attachment.grants_right?(student, :download)).to be true
+        end
+
+        it "does not allow students to access submission attachments for other's submissions" do
+          expect(@attachment.grants_right?(@student2, :download)).to be false
+        end
+      end
+    end
+
     context "group assignment" do
       before :once do
         group_category = @course.group_categories.create!(name: "Group Category")
@@ -1416,6 +1536,7 @@ describe Attachment do
       @a.reload
       expect(@a.could_be_locked).to be_truthy
 
+      tag2.update! workflow_state: "unpublished"
       @a2.destroy
       tag2.reload
       expect(tag2).to be_deleted
@@ -1952,9 +2073,7 @@ describe Attachment do
 
     context "instfs attachment" do
       before do
-        allow(InstFS).to receive(:enabled?).and_return true
-        allow(InstFS).to receive(:jwt_secret).and_return "secret"
-        allow(InstFS).to receive(:app_host).and_return "instfs"
+        allow(InstFS).to receive_messages(enabled?: true, jwt_secret: "secret", app_host: "instfs")
       end
 
       it "is false when not thumbnailable" do
@@ -2351,8 +2470,7 @@ describe Attachment do
       end
 
       before do
-        allow(@attachment).to receive(:instfs_hosted?).and_return true
-        allow(@attachment).to receive(:public_url).and_return @public_url
+        allow(@attachment).to receive_messages(instfs_hosted?: true, public_url: @public_url)
       end
 
       context "with good data" do
@@ -2496,8 +2614,7 @@ describe Attachment do
     end
 
     before do
-      allow(Attachment).to receive(:local_storage?).and_return(false)
-      allow(Attachment).to receive(:s3_storage?).and_return(true)
+      allow(Attachment).to receive_messages(local_storage?: false, s3_storage?: true)
       allow(@attachment).to receive(:s3object).and_return(double("s3object"))
       allow(@attachment).to receive(:after_attachment_saved)
     end
@@ -2962,7 +3079,7 @@ describe Attachment do
       it "updates the word count for a PDF" do
         attachment_model(filename: "test.pdf", uploaded_data: fixture_file_upload("example.pdf", "application/pdf"))
         @attachment.update_word_count
-        expect(@attachment.word_count).to eq 3320
+        expect(@attachment.word_count).to eq 3328
       end
 
       it "updates the word count for a DOCX file" do
@@ -3102,23 +3219,6 @@ describe Attachment do
     it "returns soft-deleted media objects" do
       @media_object.destroy
       expect(@attachment.media_object_by_media_id).to eq @media_object
-    end
-  end
-
-  describe "active_media_object_by_media_id" do
-    before(:once) do
-      course_with_teacher(active_all: true)
-      @media_object = @course.media_objects.create!(media_id: "0_feedbeef", attachment: attachment_model(context: @course))
-      @attachment = attachment_model(context: @course, media_entry_id: @media_object.media_id)
-    end
-
-    it "returns the media object with the given media id" do
-      expect(@attachment.active_media_object_by_media_id).to eq @media_object
-    end
-
-    it "does not return deleted media objects" do
-      @media_object.destroy
-      expect(@attachment.active_media_object_by_media_id).to be_nil
     end
   end
 end

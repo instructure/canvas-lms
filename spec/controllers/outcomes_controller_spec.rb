@@ -179,6 +179,22 @@ describe OutcomesController do
     end
   end
 
+  context "menu_option_for_outcome_details_page" do
+    it "returns true if menu_option_for_outcome_details_page feature flage is enabled" do
+      Account.site_admin.enable_feature!(:menu_option_for_outcome_details_page)
+      user_session(@admin)
+      get "index", params: { account_id: @account.id }
+      expect(assigns[:js_env][:MENU_OPTION_FOR_OUTCOME_DETAILS_PAGE]).to be true
+    end
+
+    it "returns false if menu_option_for_outcome_details_page feature flage is disabled" do
+      Account.site_admin.disable_feature!(:menu_option_for_outcome_details_page)
+      user_session(@admin)
+      get "index", params: { account_id: @account.id }
+      expect(assigns[:js_env][:MENU_OPTION_FOR_OUTCOME_DETAILS_PAGE]).to be false
+    end
+  end
+
   describe "GET 'show'" do
     it "requires authorization" do
       course_outcome

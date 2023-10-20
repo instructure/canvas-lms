@@ -89,7 +89,7 @@ module Quizzes
       end
     end
 
-    def serializable_object(**)
+    def serializable_object(...)
       super.tap do |hash|
         unless accepts_jsonapi?
           hash.delete("links")

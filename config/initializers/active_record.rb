@@ -707,17 +707,19 @@ class ActiveRecord::Base
       end
 
       insert_sql = <<~SQL.squish
-        INSERT INTO #{quoted_table_name}
-                    (#{attributes.join(",")})
-             VALUES (#{values.join(",")})
-        ON CONFLICT DO NOTHING
+        WITH new_row AS (
+          INSERT INTO #{quoted_table_name}
+                      (#{attributes.join(",")})
+              VALUES (#{values.join(",")})
+          ON CONFLICT DO NOTHING
+          RETURNING *
+        )
+        SELECT * FROM new_row
+        UNION
+        #{except(:select).where(*args).to_sql}
       SQL
 
-      result = connection.exec_insert(insert_sql)
-
-      return find(result.last["id"]) unless result.last.nil?
-
-      false
+      find_by_sql(insert_sql).first
     end
   end
 
@@ -1887,8 +1889,6 @@ module IgnoreOutOfSequenceMigrationDates
     end.max.to_i
   end
 end
-# Thor doesn't call `super` in its `inherited` method, so hook in so that we can hook in later :)
-Thor::Group.singleton_class.prepend(Autoextend::ClassMethods)
 Autoextend.hook(:"ActiveRecord::Generators::MigrationGenerator",
                 IgnoreOutOfSequenceMigrationDates,
                 singleton: true,
@@ -2092,7 +2092,7 @@ module ClearableAssociationCache
     @association_cache = {}
   end
 end
-# Ensure it makes it onto activerecord::base even if assocations are already attached to base
+# Ensure it makes it onto activerecord::base even if associations are already attached to base
 ActiveRecord::Associations.prepend(ClearableAssociationCache)
 ActiveRecord::Base.prepend(ClearableAssociationCache)
 
@@ -2112,43 +2112,6 @@ Rails.application.config.after_initialize do
     LoadAccount.schema_cache_loaded!
   end
 end
-
-# this can be removed if/when https://github.com/rails/rails/pull/43036 is merged
-# and we get up to date on that rails version
-module Serialization
-  # significant change: replace attributes.keys with attribute_names
-  def serializable_hash(options = nil)
-    # these lines are from ActiveRecord::Serialization
-    options = options.try(:dup) || {}
-
-    options[:except] = Array(options[:except]).map(&:to_s)
-    options[:except] |= Array(self.class.inheritance_column)
-
-    # the rest of this method is from ActiveModel::Serialization
-    attribute_names = self.attribute_names
-    if (only = options[:only])
-      attribute_names &= Array(only).map(&:to_s)
-    elsif (except = options[:except])
-      attribute_names -= Array(except).map(&:to_s)
-    end
-
-    hash = {}
-    attribute_names.each { |n| hash[n] = read_attribute_for_serialization(n) }
-
-    Array(options[:methods]).each { |m| hash[m.to_s] = send(m) }
-
-    serializable_add_includes(options) do |association, records, opts|
-      hash[association.to_s] = if records.respond_to?(:to_ary)
-                                 records.to_ary.map { |a| a.serializable_hash(opts) }
-                               else
-                                 records.serializable_hash(opts)
-                               end
-    end
-
-    hash
-  end
-end
-ActiveRecord::Base.include(Serialization)
 
 module UserContentSerialization
   def serializable_hash(options = nil)
@@ -2247,7 +2210,7 @@ module AdditionalIgnoredColumns
       cache_class = ActiveRecord::Base.singleton_class
       return super unless cache_class.columns_to_ignore_enabled
 
-      cache_class.columns_to_ignore_cache[table_name] ||= DynamicSettings.find("activerecord/ignored_columns", tree: :store)[table_name]&.split(",") || []
+      cache_class.columns_to_ignore_cache[table_name] ||= DynamicSettings.find("activerecord/ignored_columns", tree: :store)[table_name, failsafe: ""]&.split(",") || []
       super + cache_class.columns_to_ignore_cache[table_name]
     end
   end
@@ -2257,7 +2220,7 @@ module AdditionalIgnoredColumns
 
     def reset_ignored_columns!
       @columns_to_ignore_cache = {}
-      @columns_to_ignore_enabled = !DynamicSettings.find("activerecord", tree: :store)["ignored_columns_disabled"]
+      @columns_to_ignore_enabled = !ActiveModel::Type::Boolean.new.cast(DynamicSettings.find("activerecord", tree: :store)["ignored_columns_disabled", failsafe: false])
     end
   end
 end

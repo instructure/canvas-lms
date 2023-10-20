@@ -27,17 +27,17 @@ module AccountReports
       include_deleted_objects
     end
 
-    EPORTFOLIO_REPORT_HEADERS = [
-      I18n.t("eportfolio_name"),
-      I18n.t("eportfolio_id"),
-      I18n.t("author_name"),
-      I18n.t("author_id"),
-      I18n.t("author_sis_id"),
-      I18n.t("author_login_id"),
-      I18n.t("created_at"),
-      I18n.t("updated_at"),
-      I18n.t("is_public"),
-      I18n.t("workflow_state")
+    EPORTFOLIO_REPORT_HEADERS = %w[
+      eportfolio_name
+      eportfolio_id
+      author_name
+      author_id
+      author_sis_id
+      author_login_id
+      created_at
+      updated_at
+      is_public
+      workflow_state
     ].freeze
 
     def eportfolio_report

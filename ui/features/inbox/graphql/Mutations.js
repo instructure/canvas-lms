@@ -184,3 +184,25 @@ export const UPDATE_SUBMISSIONS_READ_STATE = gql`
   }
   ${Error.fragment}
 `
+
+export const CREATE_USER_INBOX_LABEL = gql`
+  mutation CreateUserInboxLabel($names: [String!]!) {
+    createUserInboxLabel(input: {names: $names}) {
+      errors {
+        message
+      }
+      inboxLabels
+    }
+  }
+`
+
+export const DELETE_USER_INBOX_LABEL = gql`
+  mutation DeleteUserInboxLabel($names: [String!]!) {
+    deleteUserInboxLabel(input: {names: $names}) {
+      errors {
+        message
+      }
+      inboxLabels
+    }
+  }
+`

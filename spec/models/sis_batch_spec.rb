@@ -851,9 +851,8 @@ s2,test_1,section2,active),
 
   it "stores error file in instfs if instfs is enabled" do
     # enable instfs
-    allow(InstFS).to receive(:enabled?).and_return(true)
     uuid = "1234-abcd"
-    allow(InstFS).to receive(:direct_upload).and_return(uuid)
+    allow(InstFS).to receive_messages(enabled?: true, direct_upload: uuid)
 
     # generate some errors
     batch = @account.sis_batches.create!
@@ -926,6 +925,46 @@ s2,test_1,section2,active),
         zip = Zip::File.open(batch.generated_diff.open.path)
         csvs = zip.glob("*.csv")
         expect(csvs.first.get_input_stream.read).to eq("user_id,login_id,status\nuser_1,user_1,deleted\n")
+      end
+    end
+
+    describe "diffing_user_remove_status" do
+      before :once do
+        process_csv_data(
+          [
+            %(user_id,login_id,status
+              user_1,user_1,active,
+              user_2,user_2,active)
+          ],
+          diffing_data_set_identifier: "allotrope"
+        )
+      end
+
+      it "deletes removed users by default" do
+        batch = process_csv_data(
+          [
+            %(user_id,login_id,status,
+              user_2,user_2,active)
+          ],
+          diffing_data_set_identifier: "allotrope"
+        )
+        zip = Zip::File.open(batch.generated_diff.open.path)
+        csvs = zip.glob("*.csv")
+        expect(csvs.first.get_input_stream.read).to eq("user_id,login_id,status\nuser_1,user_1,deleted\n")
+      end
+
+      it "suspends removed users by request" do
+        batch = process_csv_data(
+          [
+            %(user_id,login_id,status,
+              user_2,user_2,active)
+          ],
+          diffing_data_set_identifier: "allotrope",
+          options: { diffing_user_remove_status: "suspended" }
+        )
+        zip = Zip::File.open(batch.generated_diff.open.path)
+        csvs = zip.glob("*.csv")
+        expect(csvs.first.get_input_stream.read).to eq("user_id,login_id,status\nuser_1,user_1,suspended\n")
       end
     end
 
@@ -1168,6 +1207,66 @@ test_1,test_a,course
                             ])
       expect(course1.reload.sis_batch_id).to eq b1.id
       expect(b1.sis_batch_errors.exists?).to be false
+    end
+
+    it "retains group memberships when an enrollment role is changed" do
+      custom_student_role("Padawan")
+      Setting.set("sis_batch_rows_for_parallel", "99,2,1000")
+      Setting.set("sis_batch_parallelism_count_threshold", "2")
+
+      process_csv_data([
+                         %(course_id,short_name,long_name,status
+        A042,ART042,Life the Universe and Everything,active),
+                         %(user_id,login_id,status
+        U1,U1,active
+        U2,U2,active
+        U3,U3,active
+        U4,U4,active)
+                       ])
+
+      process_csv_data([
+                         %(course_id,user_id,role,status
+                           A042,U1,Student,active
+                           A042,U2,Student,active
+                           A042,U3,Student,active
+                           A042,U4,Student,active),
+                         %(term_id,name,status)
+                       ],
+                       diffing_data_set_identifier: "default")
+
+      course = @account.all_courses.where(sis_source_id: "A042").take
+      group = course.groups.create!(name: "Group")
+      4.times { |i| group.group_memberships.create!(user: Pseudonym.where(sis_user_id: "U#{i + 1}").take.user) }
+
+      expect(course.enrollments.active.count).to eq 4
+      expect(group.group_memberships.active.count).to eq 4
+
+      create_csv_data([
+                        %(course_id,user_id,role,status
+                          A042,U1,Padawan,active
+                          A042,U2,Padawan,active
+                          A042,U3,Padawan,active
+                          A042,U4,Padawan,active),
+                        %(term_id,name,status)
+                      ]) do |batch|
+        batch.update(diffing_data_set_identifier: "default")
+        batch.process_without_send_later
+
+        ir = SIS::CSV::ImportRefactored.new(@account, batch:)
+        ei = SIS::CSV::EnrollmentImporter.new(ir)
+
+        pis = batch.parallel_importers
+
+        # Simulate the condition where these are run in parallel and out of order.
+        ir.try_importing_segment(nil, pis[3], ei, skip_progress: true)
+        ir.try_importing_segment(nil, pis[0], ei, skip_progress: true)
+        ir.try_importing_segment(nil, pis[2], ei, skip_progress: true)
+        ir.try_importing_segment(nil, pis[1], ei, skip_progress: true)
+        ir.finish
+      end
+
+      expect(course.enrollments.active.count).to eq 4
+      expect(group.group_memberships.active.count).to eq 4
     end
 
     it "sets batch_ids on admins" do

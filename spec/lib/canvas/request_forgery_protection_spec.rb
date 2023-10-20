@@ -78,14 +78,12 @@ describe Canvas::RequestForgeryProtection do
     end
 
     it "does not verify token if api_request? is true and in_app? is false" do
-      allow(@controller).to receive(:api_request?).and_return(true)
-      allow(@controller).to receive(:in_app?).and_return(false)
+      allow(@controller).to receive_messages(api_request?: true, in_app?: false)
       expect(@controller.verified_request?).to be_truthy
     end
 
     it "verifies token if api_request? is true but in_app? is also true" do
-      allow(@controller).to receive(:api_request?).and_return(true)
-      allow(@controller).to receive(:in_app?).and_return(true)
+      allow(@controller).to receive_messages(api_request?: true, in_app?: true)
       expect(@controller.verified_request?).to be_falsey
     end
 

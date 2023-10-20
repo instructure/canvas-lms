@@ -24,6 +24,8 @@ describe Types::DiscussionEntryType do
   let_once(:discussion_entry) { create_valid_discussion_entry }
   let(:parent) { discussion_entry.discussion_topic.discussion_entries.create!(message: "parent_entry", parent_id: discussion_entry.id, user: @teacher) }
   let(:sub_entry) { discussion_entry.discussion_topic.discussion_entries.create!(message: "sub_entry", parent_id: parent.id, user: @teacher) }
+  # The parent id is set differently depeding on the discussion feature being used. The following entry is how an inline thread would create a reply to the sub_entry
+  let(:inline_reply_to_third_level_entry) { discussion_entry.discussion_topic.discussion_entries.create!(message: "reply to 3rd level sub_entry", parent_id: sub_entry.parent_entry.id, user: @teacher) }
   let(:discussion_entry_type) { GraphQLTypeTester.new(discussion_entry, current_user: @teacher) }
   let(:discussion_sub_entry_type) { GraphQLTypeTester.new(sub_entry, current_user: @teacher) }
   let(:permissions) do
@@ -114,41 +116,37 @@ describe Types::DiscussionEntryType do
   end
 
   describe "quoted entry" do
-    context "split screen view" do
-      before do
-        allow(Account.site_admin).to receive(:feature_enabled?).with(:split_screen_view).and_return(true)
-        allow(Account.site_admin).to receive(:feature_enabled?).with(:isolated_view).and_return(false)
-      end
+    it "returns the quoted_entry if reply_preview is false but quoted_entry is populated" do
+      message = "<p>Hey I am a pretty long message with <strong>bold text</strong>. </p>" # .length => 71
+      parent.message = message * 5 # something longer than the default 150 chars
+      parent.save
+      type = GraphQLTypeTester.new(sub_entry, current_user: @teacher)
+      sub_entry.update!(include_reply_preview: false)
+      sub_entry.quoted_entry = parent
+      sub_entry.save
 
-      it "returns the reply preview data" do
-        message = "<p>Hey I am a pretty long message with <strong>bold text</strong>. </p>" # .length => 71
-        parent.message = message * 5 # something longer than the default 150 chars
-        parent.save
-        type = GraphQLTypeTester.new(sub_entry, current_user: @teacher)
-        sub_entry.update!(include_reply_preview: true)
-        expect(type.resolve("quotedEntry { author { shortName } }")).to eq parent.user.short_name
-        expect(type.resolve("quotedEntry { createdAt }")).to eq parent.created_at.iso8601
-        expect(type.resolve("quotedEntry { previewMessage }")).to eq parent.summary(500) # longer than the message
-        expect(type.resolve("quotedEntry { previewMessage }").length).to eq 235
-      end
+      # Create a new subentry and set it as the quoted entry
+      expect(type.resolve("quotedEntry { author { shortName } }")).to eq parent.user.short_name
+      expect(type.resolve("quotedEntry { createdAt }")).to eq parent.created_at.iso8601
+      expect(type.resolve("quotedEntry { previewMessage }")).to eq parent.summary(500) # longer than the message
+      expect(type.resolve("quotedEntry { previewMessage }").length).to eq 235
     end
 
-    context "isolated view" do
-      before do
-        allow(Account.site_admin).to receive(:feature_enabled?).with(:isolated_view).and_return(true)
-      end
+    it "returns the quoted_entry over parent_entry if quoted_entry is populated and include_reply_preview is true" do
+      message = "<p>Hey I am a pretty long message with <strong>bold text</strong>. </p>" # .length => 71
+      parent.message = message * 5 # something longer than the default 150 chars
+      parent.save
+      type = GraphQLTypeTester.new(sub_entry, current_user: @teacher)
+      sub_entry.update!(include_reply_preview: true)
+      sub_entry.quoted_entry = inline_reply_to_third_level_entry
+      sub_entry.save
 
-      it "returns the reply preview data" do
-        message = "<p>Hey I am a pretty long message with <strong>bold text</strong>. </p>" # .length => 71
-        parent.message = message * 5 # something longer than the default 150 chars
-        parent.save
-        type = GraphQLTypeTester.new(sub_entry, current_user: @teacher)
-        sub_entry.update!(include_reply_preview: true)
-        expect(type.resolve("quotedEntry { author { shortName } }")).to eq parent.user.short_name
-        expect(type.resolve("quotedEntry { createdAt }")).to eq parent.created_at.iso8601
-        expect(type.resolve("quotedEntry { previewMessage }")).to eq parent.summary(500) # longer than the message
-        expect(type.resolve("quotedEntry { previewMessage }").length).to eq 235
-      end
+      # Create a new subentry and set it as the quoted entry
+      expect(inline_reply_to_third_level_entry.depth).to eq 3
+      expect(type.resolve("quotedEntry { author { shortName } }")).to eq inline_reply_to_third_level_entry.user.short_name
+      expect(type.resolve("quotedEntry { createdAt }")).to eq inline_reply_to_third_level_entry.created_at.iso8601
+      expect(type.resolve("quotedEntry { previewMessage }")).to eq inline_reply_to_third_level_entry.summary(500)
+      expect(type.resolve("quotedEntry { _id }")).to eq inline_reply_to_third_level_entry.id.to_s
     end
   end
 
@@ -247,6 +245,12 @@ describe Types::DiscussionEntryType do
       expect(GraphQLTypeTester.new(@anon_teacher_discussion_entry, current_user: @student).resolve("anonymousAuthor { shortName }")).to eq @anon_discussion.discussion_topic_participants.where(user_id: @teacher.id).first.id.to_s(36)
     end
 
+    it "returns nil if for anonymousAuthor when participant is nil" do
+      DiscussionTopicParticipant.where(discussion_topic_id: @anon_discussion.id, user_id: [@teacher.id]).delete_all
+      student_in_course(active_all: true)
+      expect(GraphQLTypeTester.new(@anon_teacher_discussion_entry, current_user: @student).resolve("anonymousAuthor { shortName }")).to be_nil
+    end
+
     it "returns the teacher author if a course id is provided" do
       expect(@anon_teacher_discussion_entry_type.resolve("author(courseId: \"#{@course.id}\") { shortName }")).to eq @teacher.short_name
     end
@@ -272,16 +276,16 @@ describe Types::DiscussionEntryType do
     end
 
     describe "quoted reply" do
-      let(:anon_discussion_teacher_quoted) { @anon_discussion.discussion_entries.create!(message: "quoting teacher", parent_id: @anon_teacher_discussion_entry.id, user: @student, include_reply_preview: true) }
+      let(:anon_discussion_teacher_quoted) { @anon_discussion.discussion_entries.create!(message: "quoting teacher", parent_id: @anon_teacher_discussion_entry.id, user: @student, quoted_entry_id: @anon_teacher_discussion_entry.id) }
       let(:anon_teacher_quoted_type) { GraphQLTypeTester.new(anon_discussion_teacher_quoted, current_user: @teacher) }
 
-      let(:anon_discussion_ta_quoted) { @anon_discussion.discussion_entries.create!(message: "quoting student", parent_id: @anon_ta_discussion_entry.id, user: @student, include_reply_preview: true) }
+      let(:anon_discussion_ta_quoted) { @anon_discussion.discussion_entries.create!(message: "quoting student", parent_id: @anon_ta_discussion_entry.id, user: @student, quoted_entry_id: @anon_ta_discussion_entry.id) }
       let(:anon_ta_quoted_type) { GraphQLTypeTester.new(anon_discussion_ta_quoted, current_user: @teacher) }
 
-      let(:anon_discussion_designer_quoted) { @anon_discussion.discussion_entries.create!(message: "quoting designer", parent_id: @anon_designer_discussion_entry.id, user: @student, include_reply_preview: true) }
+      let(:anon_discussion_designer_quoted) { @anon_discussion.discussion_entries.create!(message: "quoting designer", parent_id: @anon_designer_discussion_entry.id, user: @student, quoted_entry_id: @anon_designer_discussion_entry.id) }
       let(:anon_designer_quoted_type) { GraphQLTypeTester.new(anon_discussion_designer_quoted, current_user: @teacher) }
 
-      let(:anon_discussion_student_quoted) { @anon_discussion.discussion_entries.create!(message: "quoting student", parent_id: @anon_student_discussion_entry.id, user: @student, include_reply_preview: true) }
+      let(:anon_discussion_student_quoted) { @anon_discussion.discussion_entries.create!(message: "quoting student", parent_id: @anon_student_discussion_entry.id, user: @student, quoted_entry_id: @anon_student_discussion_entry.id) }
       let(:anon_student_quoted_type) { GraphQLTypeTester.new(anon_discussion_student_quoted, current_user: @teacher) }
 
       context "split screen view flag" do
@@ -366,15 +370,6 @@ describe Types::DiscussionEntryType do
   end
 
   context "isolated view" do
-    it "Allows querying for discussion subentries" do
-      Account.site_admin.enable_feature!(:isolated_view)
-      discussion_entry.discussion_topic.discussion_entries.create!(message: "sub entry", user: @teacher, parent_id: parent.id)
-      DiscussionEntry.where(id: parent).update_all(legacy: false)
-
-      result = GraphQLTypeTester.new(parent, current_user: @teacher).resolve("discussionSubentriesConnection { nodes { message } }")
-      expect(result).to be_empty
-    end
-
     it "returns nil for subentries count on non root entries" do
       Account.site_admin.enable_feature!(:isolated_view)
       sub_entry
@@ -384,15 +379,6 @@ describe Types::DiscussionEntryType do
   end
 
   context "split screen view" do
-    it "allows querying for discussion subentries" do
-      Account.site_admin.enable_feature!(:split_screen_view)
-      discussion_entry.discussion_topic.discussion_entries.create!(message: "sub entry", user: @teacher, parent_id: parent.id)
-      DiscussionEntry.where(id: parent).update_all(legacy: false)
-
-      result = GraphQLTypeTester.new(parent, current_user: @teacher).resolve("discussionSubentriesConnection { nodes { message } }")
-      expect(result).to be_empty
-    end
-
     it "returns count for subentries count on non root entries" do
       Account.site_admin.enable_feature!(:split_screen_view)
       sub_entry
@@ -402,18 +388,24 @@ describe Types::DiscussionEntryType do
   end
 
   context "inline view" do
-    it "allows querying for discussion subentries" do
-      discussion_entry.discussion_topic.discussion_entries.create!(message: "sub entry", user: @teacher, parent_id: parent.id)
-      DiscussionEntry.where(id: parent).update_all(legacy: false)
-
-      result = GraphQLTypeTester.new(parent, current_user: @teacher).resolve("discussionSubentriesConnection { nodes { message } }")
-      expect(result).to be_empty
-    end
-
     it "returns count for subentries count on non root entries" do
       sub_entry
       DiscussionEntry.where(id: parent).update_all(legacy: false)
       expect(GraphQLTypeTester.new(parent, current_user: @teacher).resolve("subentriesCount")).to be 1
+    end
+
+    it "returns the correct subentries that were created on the 3rd level using quote" do
+      first_level = discussion_entry.discussion_topic.discussion_entries.create!(message: "1st level", parent_id: discussion_entry.id, user: @teacher)
+      second_level = discussion_entry.discussion_topic.discussion_entries.create!(message: "2nd level", parent_id: first_level.id, user: @teacher)
+      third_level = discussion_entry.discussion_topic.discussion_entries.create!(message: "3rd level w/quote", parent_id: second_level.id, quoted_entry_id: second_level.id, user: @teacher)
+
+      first_level.update(legacy: false)
+      second_level.update(legacy: false)
+      third_level.update(legacy: false)
+
+      result = GraphQLTypeTester.new(second_level, current_user: @teacher).resolve("discussionSubentriesConnection { nodes { message } }")
+      expect(result.count).to be 1
+      expect(result[0]).to eq third_level.message
     end
   end
 
@@ -628,5 +620,19 @@ describe Types::DiscussionEntryType do
 
     discussion_entry_versions = discussion_entry_teacher_type.resolve("discussionEntryVersionsConnection { nodes { message } }")
     expect(discussion_entry_versions).to eq(["Hello! 3", "Hello! 2", "Hello!"])
+  end
+
+  context "all root entries" do
+    before do
+      @sub_entry2 = discussion_entry.discussion_topic.discussion_entries.create!(message: "sub_entry 2", user: @teacher, parent_id: sub_entry.id)
+    end
+
+    it "returns all root entries" do
+      expect(discussion_entry_type.resolve("allRootEntries { _id }")).to eq [parent.id.to_s, sub_entry.id.to_s, @sub_entry2.id.to_s]
+    end
+
+    it "returns nil if it is not a root entry" do
+      expect(discussion_sub_entry_type.resolve("allRootEntries { _id }")).to be_nil
+    end
   end
 end

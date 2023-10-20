@@ -180,16 +180,24 @@ module CanvasSecurity
   end
 
   def self.sign_hmac_sha512(string_to_sign, signing_secret = services_signing_secret)
-    OpenSSL::HMAC.digest("sha512", signing_secret, string_to_sign)
+    sign_hmac(string_to_sign, signing_secret, "sha512")
   end
 
   def self.verify_hmac_sha512(message, signature, signing_secret = services_signing_secret)
+    verify_hmac(message, signature, signing_secret, "sha512")
+  end
+
+  def self.sign_hmac(string_to_sign, signing_secret = services_signing_secret, hashing_alg = "sha512")
+    OpenSSL::HMAC.digest(hashing_alg, signing_secret, string_to_sign)
+  end
+
+  def self.verify_hmac(message, signature, signing_secret = services_signing_secret, hashing_alg = "sha512")
     secrets_to_check = [signing_secret]
     if signing_secret == services_signing_secret && services_previous_signing_secret
       secrets_to_check << services_previous_signing_secret
     end
     secrets_to_check.each do |cur_secret|
-      comparison = sign_hmac_sha512(message, cur_secret)
+      comparison = sign_hmac(message, cur_secret, hashing_alg)
       return true if ActiveSupport::SecurityUtils.secure_compare(signature, comparison)
     end
     false
@@ -273,7 +281,7 @@ module CanvasSecurity
   def self.decrypt_encrypted_jwt(token, signing_secret, encryption_secret, ignore_expiration: false)
     begin
       signed_coded_jwt = JSON::JWT.decode(token, encryption_secret)
-    rescue OpenSSL::Cipher::CipherError => e
+    rescue JSON::JWE::DecryptionFailed => e
       # this seems to happen if the token is of a valid shape,
       # but signed by some OTHER encryption secret?
       CanvasErrors.capture_exception(:security_auth, e, :warn)

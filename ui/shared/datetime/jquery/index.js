@@ -22,7 +22,7 @@ import tz from '@canvas/timezone'
 import htmlEscape from 'html-escape'
 import * as dateFunctions from '../date-functions'
 import {changeTimezone} from '../changeTimezone'
-import DatetimeField from './InstrumentedDatetimeField'
+import DatetimeField from './DatetimeField'
 import renderDatepickerTime from '../react/components/render-datepicker-time'
 import '@canvas/keycodes'
 import 'jqueryui/datepicker'
@@ -307,7 +307,7 @@ $.fn.timepicker = function () {
         $picker.data('attached_to', $(this)[0])
         const windowHeight = $(window).height()
         const windowWidth = $(window).width()
-        const scrollTop = $.windowScrollTop()
+        const scrollTop = window.scrollY
         if (offset.top + height - scrollTop + pickerHeight > windowHeight) {
           $picker.css({
             top: offset.top - pickerHeight,

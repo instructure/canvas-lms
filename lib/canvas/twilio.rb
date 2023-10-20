@@ -44,7 +44,7 @@ module Canvas::Twilio
   # Look up the ISO country code for the specified phone number. Twilio must be enabled in order for this to work.
   def self.lookup_country(phone_number)
     Rails.cache.fetch(["twilio_phone_number_country_2", phone_number].cache_key) do
-      client.lookups.phone_numbers(phone_number).fetch.country_code
+      client.lookups.v2.phone_numbers(phone_number).fetch.country_code
     end
   end
 

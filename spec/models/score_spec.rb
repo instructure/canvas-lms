@@ -76,7 +76,7 @@ describe Score do
 
     it "is invalid without an enrollment" do
       score.enrollment = nil
-      expect(score).to be_invalid
+      expect(score).not_to be_valid
     end
 
     it { is_expected.to validate_presence_of(:enrollment) }
@@ -127,6 +127,36 @@ describe Score do
           student.scores.create!(grading_period_id: @grading_periods.first.id, **assignment_group_score_params)
         end.to raise_error(ActiveRecord::RecordInvalid)
       end
+
+      it "is invalid when trying to set a custom status on a score without an override" do
+        account = score.course.root_account
+        custom_grade_status = account.custom_grade_statuses.create!(
+          color: "#ABC",
+          created_by: account_admin_user(account:),
+          name: "custom status"
+        )
+        expect { score.custom_grade_status = custom_grade_status }.to change {
+          score.validate
+          score.errors.full_messages.first
+        }.from(nil).to("Custom grade status cannot be set when the score is not overridden")
+      end
+
+      it "is valid when clearing an override on a score with a custom status (the status gets cleared)" do
+        account = score.course.root_account
+        custom_grade_status = account.custom_grade_statuses.create!(
+          color: "#ABC",
+          created_by: account_admin_user(account:),
+          name: "custom status"
+        )
+        score.update!(override_score: 88.0, custom_grade_status:)
+        expect { score.override_score = nil }.to change {
+          score.validate
+          {
+            errors: score.errors.full_messages.first,
+            custom_grade_status_id: score.custom_grade_status_id
+          }
+        }.from({ errors: nil, custom_grade_status_id: custom_grade_status.id }).to({ errors: nil, custom_grade_status_id: nil })
+      end
     end
   end
 
@@ -156,6 +186,34 @@ describe Score do
         score.update!(root_account_id: second_account.id)
         expect(score.root_account_id).to eq second_account.id
       end
+    end
+  end
+
+  describe "custom_grade_status_id" do
+    let(:custom_grade_status) do
+      account = score.course.root_account
+      account.custom_grade_statuses.create!(
+        color: "#ABC",
+        created_by: account_admin_user(account:),
+        name: "custom status"
+      )
+    end
+
+    let(:overridden_score) do
+      score.update!(override_score: 88.0, custom_grade_status:)
+      score
+    end
+
+    it "nils out the custom_grade_status_id when the override_score is removed" do
+      expect { overridden_score.update!(override_score: nil) }.to change {
+        overridden_score.custom_grade_status_id
+      }.from(custom_grade_status.id).to(nil)
+    end
+
+    it "keeps the custom_grade_status_id when the override_score is changed to a non-nil value" do
+      expect { overridden_score.update!(override_score: 94.0) }.not_to change {
+        overridden_score.custom_grade_status_id
+      }.from(custom_grade_status.id)
     end
   end
 
@@ -276,27 +334,47 @@ describe Score do
   end
 
   context "permissions" do
-    it "allows the proper people" do
-      expect(score.grants_right?(@enrollment.user, :read)).to be true
+    describe "read" do
+      it "allows the proper people" do
+        expect(score.grants_right?(@enrollment.user, :read)).to be true
 
-      teacher_in_course(active_all: true)
-      expect(score.grants_right?(@teacher, :read)).to be true
+        teacher_in_course(active_all: true)
+        expect(score.grants_right?(@teacher, :read)).to be true
+      end
+
+      it "doesn't work for nobody" do
+        expect(score.grants_right?(nil, :read)).to be false
+      end
+
+      it "doesn't allow random classmates to read" do
+        score
+        student_in_course(active_all: true)
+        expect(score.grants_right?(@student, :read)).to be false
+      end
+
+      it "doesn't work for yourself if the course is configured badly" do
+        @enrollment.course.hide_final_grade = true
+        @enrollment.course.save!
+        expect(score.grants_right?(@enrollment.user, :read)).to be false
+      end
     end
 
-    it "doesn't work for nobody" do
-      expect(score.grants_right?(nil, :read)).to be false
-    end
+    describe "update_custom_status" do
+      let(:teacher) { teacher_in_course(course: score.course, active_all: true).user }
 
-    it "doesn't allow random classmates to read" do
-      score
-      student_in_course(active_all: true)
-      expect(score.grants_right?(@student, :read)).to be false
-    end
+      it "is granted if the user can manage course grades" do
+        expect(score.grants_right?(teacher, :update_custom_status)).to be true
+      end
 
-    it "doesn't work for yourself if the course is configured badly" do
-      @enrollment.course.hide_final_grade = true
-      @enrollment.course.save!
-      expect(score.grants_right?(@enrollment.user, :read)).to be false
+      it "is not granted if the user cannot manage course grades" do
+        score.course.root_account.role_overrides.create!(
+          permission: "manage_grades",
+          enabled: false,
+          role: teacher_role
+        )
+
+        expect(score.grants_right?(teacher, :update_custom_status)).to be false
+      end
     end
   end
 

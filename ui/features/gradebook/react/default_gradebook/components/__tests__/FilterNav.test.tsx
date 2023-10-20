@@ -159,6 +159,18 @@ const defaultProps: FilterNavProps = {
       ],
     },
   },
+  customStatuses: [
+    {
+      id: '1',
+      name: 'Custom Status 1',
+      color: '#000000',
+    },
+    {
+      id: '2',
+      name: 'Custom Status 2',
+      color: '#000000',
+    },
+  ],
 }
 
 const defaultAppliedFilters: Filter[] = [
@@ -224,6 +236,14 @@ const mockPostResponse = {
 
 describe('FilterNav', () => {
   beforeEach(() => {
+    let liveRegion = null
+    if (!document.getElementById('flash_screenreader_holder')) {
+      liveRegion = document.createElement('div')
+      liveRegion.id = 'flash_screenreader_holder'
+      liveRegion.setAttribute('role', 'alert')
+      document.body.appendChild(liveRegion)
+    }
+
     store.setState({
       filterPresets: defaultFilterPresets,
       appliedFilters: defaultAppliedFilters,
@@ -257,11 +277,30 @@ describe('FilterNav', () => {
         },
       ],
     })
-    const {getAllByTestId} = render(<FilterNav {...defaultProps} />)
-    expect(await getAllByTestId('applied-filter-tag')[0]).toHaveTextContent('Module 1')
+    const {getByTestId} = render(<FilterNav {...defaultProps} />)
+    expect(await getByTestId(`applied-filter-${defaultProps.modules[0].name}`)).toHaveTextContent(
+      defaultProps.modules[0].name
+    )
   })
 
-  it('render All Grading Periods filter', async () => {
+  it('render custom status filter', () => {
+    store.setState({
+      appliedFilters: [
+        {
+          id: '1',
+          type: 'submissions',
+          value: 'custom-status-1',
+          created_at: new Date().toISOString(),
+        },
+      ],
+    })
+    const {getByTestId} = render(<FilterNav {...defaultProps} />)
+    expect(getByTestId(`applied-filter-${defaultProps.customStatuses[0].name}`)).toHaveTextContent(
+      defaultProps.customStatuses[0].name
+    )
+  })
+
+  it('render All Grading Periods filter', () => {
     store.setState({
       appliedFilters: [
         {
@@ -272,8 +311,10 @@ describe('FilterNav', () => {
         },
       ],
     })
-    const {getAllByTestId} = render(<FilterNav {...defaultProps} />)
-    expect(await getAllByTestId('applied-filter-tag')[0]).toHaveTextContent('All Grading Periods')
+    const {getByTestId} = render(<FilterNav {...defaultProps} />)
+    expect(getByTestId('applied-filter-All Grading Periods')).toHaveTextContent(
+      'All Grading Periods'
+    )
   })
 
   it('opens tray', () => {
@@ -285,17 +326,17 @@ describe('FilterNav', () => {
 
   it('shows friendly panda image when there are no filters', async () => {
     store.setState({filterPresets: [], stagedFilters: []})
-    const {getByAltText, getByText} = render(<FilterNav {...defaultProps} />)
+    const {getByTestId, getByText} = render(<FilterNav {...defaultProps} />)
     userEvent.click(getByText('Apply Filters'))
     userEvent.click(getByText('Create & Manage Filter Presets'))
-    expect(await getByAltText('Friendly panda')).toBeInTheDocument()
+    expect(await getByTestId('friendly-panda')).toBeInTheDocument()
   })
 
   it('hides friendly panda image when there are filters', async () => {
-    const {queryByAltText, getByText} = render(<FilterNav {...defaultProps} />)
+    const {queryByTestId, getByText} = render(<FilterNav {...defaultProps} />)
     userEvent.click(getByText('Apply Filters'))
     userEvent.click(getByText('Create & Manage Filter Presets'))
-    expect(await queryByAltText('Friendly panda')).toBeNull()
+    expect(await queryByTestId('friendly-panda')).toBeNull()
   })
 
   it('clicking Create New Filter Preset triggers onChange with filter', async () => {
@@ -332,26 +373,109 @@ describe('Filter dropdown', () => {
     expect(getByText('Grading Periods')).toBeVisible()
     expect(getByText('Assignment Groups')).toBeVisible()
     expect(getByText('Student Groups')).toBeVisible()
+    expect(getByText('Status')).toBeVisible()
+    expect(getByText('Submissions')).toBeVisible()
+    expect(getByText('Start & End Date')).toBeVisible()
+  })
+
+  it('Custom Statuses and regular statuses are shown in the status filter', async () => {
+    const {getByText} = render(<FilterNav {...defaultProps} />)
+    userEvent.click(getByText('Apply Filters'))
+    userEvent.click(getByText('Status'))
+    const customStatusNames = defaultProps.customStatuses.map(status => status.name)
+    const allStatusNames = [
+      'Late',
+      'Missing',
+      'Resubmitted',
+      'Dropped',
+      'Excused',
+      'Extended',
+      ...customStatusNames,
+    ]
+    allStatusNames.forEach(statusName => {
+      expect(getByText(statusName)).toBeVisible()
+    })
   })
 
   it('Clicking filter preset activates condition', async () => {
     const {getByText, getByTestId, queryByTestId} = render(<FilterNav {...defaultProps} />)
     userEvent.click(getByText('Apply Filters'))
     userEvent.click(getByText('Filter Preset 1'))
-    expect(getByTestId('applied-filter-tag')).toBeVisible()
+    expect(getByTestId(`applied-filter-${defaultProps.modules[0].name}`)).toBeVisible()
     userEvent.click(getByText('Filter Preset 1'))
-    expect(queryByTestId('applied-filter-tag')).toBeNull()
+    expect(queryByTestId(`applied-filter-${defaultProps.modules[0].name}`)).toBeNull()
   })
 
   it('Clicking filter activates condition', async () => {
     const {getByText, getByTestId, queryByTestId, getByRole} = render(
       <FilterNav {...defaultProps} />
     )
-    expect(queryByTestId('applied-filter-tag')).toBeNull()
+    expect(queryByTestId(`applied-filter-${defaultProps.sections[0].name}`)).toBeNull()
     userEvent.click(getByText('Apply Filters'))
     userEvent.click(getByRole('menuitemradio', {name: 'Sections'}))
     userEvent.click(getByRole('menuitemradio', {name: 'Section 7'}))
-    expect(getByTestId('applied-filter-tag')).toBeVisible()
+    expect(getByTestId(`applied-filter-${defaultProps.sections[0].name}`)).toBeVisible()
+  })
+
+  it('Clicking "Clear All Filters" removes all applied filters', async () => {
+    const {getByText, getByTestId, queryByTestId, getByRole} = render(
+      <FilterNav {...defaultProps} />
+    )
+    expect(queryByTestId(`applied-filter-${defaultProps.sections[0].name}`)).toBeNull()
+    userEvent.click(getByText('Apply Filters'))
+    userEvent.click(getByRole('menuitemradio', {name: 'Sections'}))
+    userEvent.click(getByRole('menuitemradio', {name: 'Section 7'}))
+    expect(getByTestId(`applied-filter-${defaultProps.sections[0].name}`)).toBeVisible()
+    userEvent.click(getByText('Clear All Filters'))
+    expect(queryByTestId(`applied-filter-${defaultProps.sections[0].name}`)).toBeNull()
+  })
+
+  it('Clicking "Clear All Filters" focuses apply filters button', async () => {
+    const {getByText, getByTestId, getByRole} = render(<FilterNav {...defaultProps} />)
+    userEvent.click(getByText('Apply Filters'))
+    userEvent.click(getByRole('menuitemradio', {name: 'Sections'}))
+    userEvent.click(getByRole('menuitemradio', {name: 'Section 7'}))
+    userEvent.click(getByText('Clear All Filters'))
+    expect(getByTestId('apply-filters-button')).toHaveFocus()
+  })
+
+  it('Check for accessbility text to remove filter', async () => {
+    const {getByText, getByTestId, getByRole} = render(<FilterNav {...defaultProps} />)
+    userEvent.click(getByText('Apply Filters'))
+    userEvent.click(getByRole('menuitemradio', {name: 'Sections'}))
+    userEvent.click(getByRole('menuitemradio', {name: 'Section 7'}))
+    expect(getByTestId(`applied-filter-${defaultProps.sections[0].name}`)).toHaveTextContent(
+      'Remove Section 7 Filter'
+    )
+  })
+
+  it('selecting a filter and deselecting the same filter from the filter dropdown triggers screenreader alerts', async () => {
+    const {getByText, getByRole} = render(<FilterNav {...defaultProps} />)
+    userEvent.click(getByText('Apply Filters'))
+    userEvent.click(getByRole('menuitemradio', {name: 'Sections'}))
+    userEvent.click(getByRole('menuitemradio', {name: 'Section 7'}))
+    expect(getByText('Added Section 7 Filter')).toBeInTheDocument()
+    userEvent.click(getByRole('menuitemradio', {name: 'Section 7'}))
+    expect(getByText('Removed Section 7 Filter')).toBeInTheDocument()
+  })
+
+  it('selecting a filter from the filter dropdown and pressing the filter pill will trigger remove filter screenreader alert', async () => {
+    const {getByText, getByTestId, getByRole} = render(<FilterNav {...defaultProps} />)
+    userEvent.click(getByText('Apply Filters'))
+    userEvent.click(getByRole('menuitemradio', {name: 'Sections'}))
+    userEvent.click(getByRole('menuitemradio', {name: 'Section 7'}))
+    userEvent.click(getByTestId(`applied-filter-${defaultProps.sections[0].name}`))
+    expect(getByText('Removed Section 7 Filter')).toBeInTheDocument()
+  })
+
+  it('pressing the Clear All Filters button will trigger the all filters have been cleared screenreader alert', async () => {
+    const {getByText, getByRole} = render(<FilterNav {...defaultProps} />)
+    userEvent.click(getByText('Apply Filters'))
+    userEvent.click(getByRole('menuitemradio', {name: 'Sections'}))
+    userEvent.click(getByRole('menuitemradio', {name: 'Section 7'}))
+    expect(getByRole('button', {name: 'Clear All Filters'})).toBeInTheDocument()
+    userEvent.click(getByRole('button', {name: 'Clear All Filters'}))
+    expect(getByText('All Filters Have Been Cleared')).toBeInTheDocument()
   })
 })
 

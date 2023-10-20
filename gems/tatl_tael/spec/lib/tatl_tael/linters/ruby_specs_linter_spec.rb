@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 require "spec_helper"
-require_relative "./shared_constants"
-require_relative "./shared_linter_examples"
+require_relative "shared_constants"
+require_relative "shared_linter_examples"
 
 describe TatlTael::Linters::RubySpecsLinter do
   let(:linter_class) { described_class }

@@ -26,7 +26,7 @@ class ProvisionalGradesBaseController < ApplicationController
   before_action :load_assignment
 
   def status
-    return render_unauthorized_action unless @context.grants_any_right?(@current_user, session, :manage_grades, :view_all_grades)
+    return unless authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
 
     unless @assignment.moderated_grading?
       return render json: { message: "Assignment does not use moderated grading" }, status: :bad_request

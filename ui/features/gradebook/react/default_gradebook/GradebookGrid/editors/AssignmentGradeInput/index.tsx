@@ -18,7 +18,6 @@
  */
 
 import React, {Component} from 'react'
-import {bool, instanceOf, oneOf, number, shape, string} from 'prop-types'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
@@ -33,42 +32,27 @@ const CLASSNAME_FOR_ENTER_GRADES_AS = {
   passFail: 'Grid__GradeCell__CompleteIncompleteInput',
   percent: 'Grid__GradeCell__PercentInput',
   points: 'Grid__GradeCell__PointsInput',
-}
+} as const
 
-function inputComponentFor(enterGradesAs) {
-  switch (enterGradesAs) {
-    case 'gradingScheme': {
-      return GradingSchemeGradeInput
-    }
-    case 'passFail': {
-      return CompleteIncompleteGradeInput
-    }
-    default: {
-      return TextGradeInput
-    }
+type Props = {
+  assignment: {
+    pointsPossible: number
+  }
+  disabled: boolean
+  enterGradesAs: 'gradingScheme' | 'passFail' | 'percent' | 'points'
+  gradingScheme: [name: string, value: number][]
+  pendingGradeInfo: {
+    excused: boolean
+    grade: string
+    valid: boolean
+  }
+  submission: {
+    enteredGrade: string
+    enteredScore: number
+    excused: boolean
   }
 }
-
-export default class AssignmentGradeInput extends Component {
-  static propTypes = {
-    assignment: shape({
-      pointsPossible: number,
-    }).isRequired,
-    disabled: bool,
-    enterGradesAs: oneOf(['gradingScheme', 'passFail', 'percent', 'points']).isRequired,
-    gradingScheme: instanceOf(Array),
-    pendingGradeInfo: shape({
-      excused: bool.isRequired,
-      grade: string,
-      valid: bool.isRequired,
-    }),
-    submission: shape({
-      enteredGrade: string,
-      enteredScore: number,
-      excused: bool.isRequired,
-    }).isRequired,
-  }
-
+export default class AssignmentGradeInput extends Component<Props> {
   static defaultProps = {
     disabled: false,
     gradingScheme: null,
@@ -109,16 +93,32 @@ export default class AssignmentGradeInput extends Component {
       messages.push({type: 'error', text: I18n.t('This grade is invalid')})
     }
 
-    const InputComponent = inputComponentFor(this.props.enterGradesAs)
-
     return (
       <div className={className}>
-        <InputComponent
-          {...this.props}
-          label={<ScreenReaderContent>{I18n.t('Grade')}</ScreenReaderContent>}
-          messages={messages}
-          ref={this.bindGradeInput}
-        />
+        {this.props.enterGradesAs === 'gradingScheme' && (
+          <GradingSchemeGradeInput
+            {...this.props}
+            label={<ScreenReaderContent>{I18n.t('Grade')}</ScreenReaderContent>}
+            messages={messages}
+            ref={this.bindGradeInput}
+          />
+        )}
+        {this.props.enterGradesAs === 'passFail' && (
+          <CompleteIncompleteGradeInput
+            {...this.props}
+            label={<ScreenReaderContent>{I18n.t('Grade')}</ScreenReaderContent>}
+            messages={messages}
+            ref={this.bindGradeInput}
+          />
+        )}
+        {!['gradingScheme', 'passFail'].includes(this.props.enterGradesAs) && (
+          <TextGradeInput
+            {...this.props}
+            label={<ScreenReaderContent>{I18n.t('Grade')}</ScreenReaderContent>}
+            messages={messages}
+            ref={this.bindGradeInput}
+          />
+        )}
       </div>
     )
   }

@@ -70,8 +70,8 @@ module Types
     def quoted_entry
       if object.deleted?
         nil
-      elsif object.include_reply_preview
-        load_association(:parent_entry)
+      elsif object.quoted_entry_id
+        load_association(:quoted_entry)
       end
     end
 
@@ -106,11 +106,15 @@ module Types
       load_association(:discussion_topic).then do |topic|
         if topic.anonymous_state == "full_anonymity" || (topic.anonymous_state == "partial_anonymity" && object.is_anonymous_author)
           Loaders::DiscussionTopicParticipantLoader.for(topic.id).load(object.user_id).then do |participant|
-            {
-              id: participant.id.to_s(36),
-              short_name: (object.user_id == current_user.id) ? "current_user" : participant.id.to_s(36),
-              avatar_url: nil
-            }
+            if participant.nil?
+              nil
+            else
+              {
+                id: participant.id.to_s(36),
+                short_name: (object.user_id == current_user.id) ? "current_user" : participant.id.to_s(36),
+                avatar_url: nil
+              }
+            end
           end
         end
       end
@@ -172,6 +176,13 @@ module Types
         before_relative_entry:,
         include_relative_entry:
       ).load(object)
+    end
+
+    field :all_root_entries, [Types::DiscussionEntryType], null: true
+    def all_root_entries
+      return nil unless object.root_entry_id.nil?
+
+      load_association(:flattened_discussion_subentries)
     end
 
     field :entry_participant, Types::EntryParticipantType, null: true

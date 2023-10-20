@@ -81,8 +81,7 @@ describe "Files API", type: :request do
 
     it "includes include capture param in inst_fs token" do
       secret = "secret"
-      allow(InstFS).to receive(:enabled?).and_return true
-      allow(InstFS).to receive(:jwt_secrets).and_return([secret])
+      allow(InstFS).to receive_messages(enabled?: true, jwt_secrets: [secret])
       json = call_course_create_file
       query = Rack::Utils.parse_nested_query(URI(json["upload_url"]).query)
       payload = Canvas::Security.decode_jwt(query["token"], [secret])
@@ -240,7 +239,7 @@ describe "Files API", type: :request do
                            "hidden" => false,
                            "lock_at" => nil,
                            "locked_for_user" => false,
-                           "preview_url" => context_url(@attachment.context, :context_file_file_preview_url, @attachment, annotate: 0, verifier: @attachment.uuid),
+                           "preview_url" => context_url(@attachment.context, :context_file_file_preview_url, @attachment, annotate: 0),
                            "hidden_for_user" => false,
                            "created_at" => @attachment.created_at.as_json,
                            "updated_at" => @attachment.updated_at.as_json,
@@ -281,7 +280,7 @@ describe "Files API", type: :request do
                            "hidden" => false,
                            "lock_at" => nil,
                            "locked_for_user" => false,
-                           "preview_url" => context_url(@attachment.context, :context_file_file_preview_url, @attachment, annotate: 0, verifier: @attachment.uuid),
+                           "preview_url" => context_url(@attachment.context, :context_file_file_preview_url, @attachment, annotate: 0),
                            "hidden_for_user" => false,
                            "created_at" => @attachment.created_at.as_json,
                            "updated_at" => @attachment.updated_at.as_json,
@@ -418,8 +417,7 @@ describe "Files API", type: :request do
     end
 
     before do
-      allow(InstFS).to receive(:enabled?).and_return true
-      allow(InstFS).to receive(:jwt_secrets).and_return([secret])
+      allow(InstFS).to receive_messages(enabled?: true, jwt_secrets: [secret])
     end
 
     it "is not available without the InstFS feature" do
@@ -1121,6 +1119,22 @@ describe "Files API", type: :request do
       expect(json["url"]).to eq file_download_url(@att, download: "1", download_frd: "1", verifier: @att.uuid)
     end
 
+    it "omits verifiers in the enhanced preview when using session auth" do
+      user_session(@user)
+      get @file_path + "?include[]=enhanced_preview_url"
+      expect(response).to be_successful
+      json = json_parse
+      expect(json["preview_url"]).to eq context_url(@att.context, :context_file_file_preview_url, @att, annotate: 0)
+    end
+
+    it "passes along given verifiers when creating the enhanced_preview_url" do
+      user_session(@user)
+      get @file_path + "?include[]=enhanced_preview_url&verifier=#{@att.uuid}"
+      expect(response).to be_successful
+      json = json_parse
+      expect(json["preview_url"]).to eq context_url(@att.context, :context_file_file_preview_url, @att, annotate: 0, verifier: @att.uuid)
+    end
+
     it "returns lock information" do
       one_month_ago, one_month_from_now = 1.month.ago, 1.month.from_now
       att2 = Attachment.create!(filename: "test.txt", display_name: "test.txt", uploaded_data: StringIO.new("file"), folder: @root, context: @course, locked: true)
@@ -1146,7 +1160,7 @@ describe "Files API", type: :request do
       expect(json["hidden"]).to be_truthy
       expect(json["hidden_for_user"]).to be_falsey
       expect(json["locked_for_user"]).to be_falsey
-      expect(json["preview_url"].include?("verifier")).to be_truthy
+      expect(json["preview_url"].include?("verifier")).to be_falsey
     end
 
     def should_be_locked(json)
@@ -1165,7 +1179,7 @@ describe "Files API", type: :request do
       expect(json.keys & prohibited_fields).to be_empty
     end
 
-    context "when the attachment is locked and replacement params are inlucded" do
+    context "when the attachment is locked and replacement params are included" do
       subject do
         api_call(
           :get,
@@ -1845,7 +1859,7 @@ describe "Files API", type: :request do
       expect(json).to eql({ "quota" => group.quota, "quota_used" => 13.megabytes })
     end
 
-    it "operates on users" do
+    it "operates on users if user == self" do
       course_with_student active_all: true
       json = api_call(:get,
                       "/api/v1/users/self/files/quota",
@@ -1854,6 +1868,31 @@ describe "Files API", type: :request do
                       format: "json",
                       user_id: "self")
       expect(json).to eql({ "quota" => @student.quota, "quota_used" => 0 })
+    end
+
+    it "operates on users for account admins" do
+      course_with_student active_all: true
+      account_admin_user
+      json = api_call_as_user(@admin,
+                              :get,
+                              "/api/v1/users/#{@student.id}/files/quota",
+                              controller: "files",
+                              action: "api_quota",
+                              format: "json",
+                              user_id: @student.id)
+      expect(json).to eql({ "quota" => @student.quota, "quota_used" => 0 })
+    end
+
+    it "does not operate on users for non admin roles" do
+      course_with_student active_all: true
+      api_call_as_user(@teacher,
+                       :get,
+                       "/api/v1/users/#{@student.id}/files/quota",
+                       controller: "files",
+                       action: "api_quota",
+                       format: "json",
+                       user_id: @student.id)
+      expect(response).to have_http_status(:unauthorized)
     end
   end
 end

@@ -245,7 +245,7 @@ class Mutations::AssignmentBase < Mutations::BaseMutation
     return if @working_assignment.workflow_state == "deleted"
 
     # actually destroy now.
-    DueDateCacher.with_executing_user(@current_user) do
+    SubmissionLifecycleManager.with_executing_user(@current_user) do
       @working_assignment.destroy
     end
   end

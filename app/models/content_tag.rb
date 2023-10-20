@@ -75,7 +75,7 @@ class ContentTag < ActiveRecord::Base
   before_save :update_could_be_locked
   after_save :touch_context_module_after_transaction
   after_save :touch_context_if_learning_outcome
-  after_save :run_due_date_cacher_for_quizzes_next
+  after_save :run_submission_lifecycle_manager_for_quizzes_next
   after_save :clear_discussion_stream_items
   after_save :send_items_to_stream
   after_save :clear_total_outcomes_cache
@@ -208,8 +208,10 @@ class ContentTag < ActiveRecord::Base
       klass = type.constantize
       next unless klass < ActiveRecord::Base
 
-      if klass.new.respond_to?(:could_be_locked=)
-        klass.where(id: ids).update_all_locked_in_order(could_be_locked: true)
+      next unless klass.new.respond_to?(:could_be_locked=)
+
+      ids.sort.each_slice(1000) do |slice|
+        klass.where(id: slice).update_all_locked_in_order(could_be_locked: true)
       end
     end
   end
@@ -421,7 +423,7 @@ class ContentTag < ActiveRecord::Base
     # for outcome links delete the associated friendly description
     delete_outcome_friendly_description if content_type == "LearningOutcome"
 
-    run_due_date_cacher_for_quizzes_next(force: true)
+    run_submission_lifecycle_manager_for_quizzes_next(force: true)
 
     # after deleting the last native link to an unaligned outcome, delete the
     # outcome. we do this here instead of in LearningOutcome#destroy because
@@ -435,7 +437,7 @@ class ContentTag < ActiveRecord::Base
   end
 
   def locked_for?(user, opts = {})
-    return unless context_module && !context_module.deleted?
+    return false unless context_module && !context_module.deleted?
 
     context_module.locked_for?(user, opts.merge({ tag: self }))
   end
@@ -676,7 +678,7 @@ class ContentTag < ActiveRecord::Base
   end
 
   def visible_to_user?(user, opts = nil, session = nil)
-    return unless context_module
+    return false unless context_module
 
     opts ||= context_module.visibility_for_user(user, session)
     return false unless opts[:can_read]
@@ -704,12 +706,12 @@ class ContentTag < ActiveRecord::Base
     end
   end
 
-  def run_due_date_cacher_for_quizzes_next(force: false)
+  def run_submission_lifecycle_manager_for_quizzes_next(force: false)
     # Quizzes next should ideally only ever be attached to an
     # assignment.  Let's ignore any other contexts.
     return unless context_type == "Assignment"
 
-    DueDateCacher.recompute(context) if content.try(:quiz_lti?) && (force || workflow_state != "deleted")
+    SubmissionLifecycleManager.recompute(context) if content.try(:quiz_lti?) && (force || workflow_state != "deleted")
   end
 
   def set_root_account

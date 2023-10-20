@@ -29,6 +29,10 @@ module Types
     global_id_field :id
 
     field :title, String, null: true
+    field :is_last, Boolean, null: false
+    def is_last
+      object.last?
+    end
 
     field :start_date, DateTimeType, null: true
     field :end_date, DateTimeType, null: true
@@ -42,6 +46,11 @@ module Types
     MD
     def weight
       object.grading_period_group.weighted ? object.weight.to_f : nil
+    end
+
+    field :display_totals, Boolean, null: false
+    def display_totals
+      object.grading_period_group.display_totals_for_all_grading_periods
     end
   end
 end

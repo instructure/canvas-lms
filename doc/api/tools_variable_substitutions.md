@@ -739,6 +739,30 @@ enabled.
 ```
 true
 ```
+## com.instructure.Assignment.restrict_quantitative_data
+returns true if the assignment restricts quantitative data.
+Assignment types: points, percentage, gpa_scale are all considered quantitative.
+
+**Availability**: *when launched as an assignment*  
+**Launch Parameter**: *com_instructure_assignment_restrict_quantitative_data*  
+
+```
+true
+```
+## com.instructure.Course.gradingScheme
+returns the grading scheme data for the course
+it is an array of objects of grade levels.
+
+**Availability**: *when launched in a course*  
+**Launch Parameter**: *com_instructure_course_grading_scheme*  
+
+```
+[
+  {name: "A", value: 94.0},
+  {name: "A-", value: 90.0},
+  {name: "B+", value: 87.0},
+]
+```
 ## com.Instructure.membership.roles
 returns the current course membership roles
 using the LIS v2 vocabulary.
@@ -1002,6 +1026,24 @@ Returns true for root account admins and false for all other roles.
 
 ```
 true
+```
+## Canvas.user.adminableAccounts
+Returns a string with a comma-separated list of the (local) account IDs
+that a user has admin rights in, which fall under the root account that
+the tool was launched under. This list includes the IDs of
+all subaccounts of these accounts (and their subaccounts, etc.), since
+the admin privileges carry from an account to all its subaccounts.
+
+Will show a limit of 40000 characters. If the account IDs list is too big
+to fit into 40000 characters, 'truncated' will show at the end of the
+list.
+
+**Availability**: *when launched by a logged in user*  
+
+
+```
+123,456,798
+123,456,789,1234,truncated
 ```
 ## User.username [duplicates Canvas.user.loginId]
 Username/Login ID for the primary pseudonym for the user for the account.

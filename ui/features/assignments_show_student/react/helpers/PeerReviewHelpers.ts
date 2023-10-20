@@ -31,6 +31,10 @@ export const getRedirectUrlToFirstPeerReview = (
   if (!assessment) {
     return
   }
+  return getPeerReviewUrl(assessment)
+}
+
+export const getPeerReviewUrl = (assessment: AssignedAssessments) => {
   let url = `/courses/${ENV.COURSE_ID}/assignments/${ENV.ASSIGNMENT_ID}`
   if (assessment.anonymizedUser) {
     url += `?reviewee_id=${assessment.anonymizedUser._id}`

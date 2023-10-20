@@ -25,4 +25,25 @@ class SubmissionDraftAttachment < ActiveRecord::Base
   validates :submission_draft, presence: true
   validates :attachment, presence: true
   validates :submission_draft, uniqueness: { scope: :attachment }
+
+  after_create :save_shadow_submission_draft_attachment, if: :cross_shard_attachment?
+  before_destroy :destroy_shadow_submission_draft_attachment, if: :cross_shard_attachment?
+
+  def attachment_shard
+    @attachment_shard ||= Shard.shard_for(attachment_id)
+  end
+
+  private
+
+  def cross_shard_attachment?
+    attachment_id.present? && attachment_shard != shard
+  end
+
+  def save_shadow_submission_draft_attachment
+    save_shadow_record(target_shard: attachment_shard)
+  end
+
+  def destroy_shadow_submission_draft_attachment
+    destroy_shadow_records(target_shards: attachment_shard)
+  end
 end

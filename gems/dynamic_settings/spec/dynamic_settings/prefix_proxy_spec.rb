@@ -115,8 +115,7 @@ module DynamicSettings
 
       context "with retries" do
         before do
-          allow(proxy).to receive(:retry_limit).and_return(2)
-          allow(proxy).to receive(:retry_base).and_return(1.4)
+          allow(proxy).to receive_messages(retry_limit: 2, retry_base: 1.4)
         end
 
         it "retries if there is an initial error" do
@@ -144,10 +143,10 @@ module DynamicSettings
 
           it "fails immediately if the circuit breaker is tripped" do
             allow(circuit_breaker).to receive(:tripped?).and_return(true)
-            expect(Diplomat::Kv).to receive(:get_all).and_raise(Diplomat::KeyNotFound)
+            expect(Diplomat::Kv).not_to receive(:get_all)
             expect(proxy).not_to receive(:sleep)
 
-            expect { proxy.fetch("baz") }.to raise_error(Diplomat::KeyNotFound)
+            expect { proxy.fetch("baz") }.to raise_error(Diplomat::UnknownStatus)
           end
 
           it "trips the circuit breaker" do

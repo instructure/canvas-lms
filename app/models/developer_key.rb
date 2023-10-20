@@ -33,6 +33,7 @@ class DeveloperKey < ActiveRecord::Base
   belongs_to :user
   belongs_to :account
   belongs_to :root_account, class_name: "Account"
+  belongs_to :service_user, class_name: "User"
 
   has_many :page_views
   has_many :access_tokens, -> { where(workflow_state: "active") }
@@ -368,6 +369,18 @@ class DeveloperKey < ActiveRecord::Base
   # or LTI 1.3 tools.
   def internal_service?
     internal_service
+  end
+
+  # If true, this key can be used for "service authentication" (a token request
+  # using a client_credentials grant type and a pre-determined service user).
+  #
+  # For now we will only allow this pattern for internal services in the
+  # site admin account.
+  def site_admin_service_auth?
+    Account.site_admin.feature_enabled?(:site_admin_service_auth) &&
+      service_user.present? &&
+      internal_service? &&
+      site_admin?
   end
 
   private

@@ -82,6 +82,7 @@ describe SisImportsApiController, type: :request do
                          "skip_deletes" => false,
                          "change_threshold" => nil,
                          "diffing_remaster" => nil,
+                         "diffing_user_remove_status" => nil,
                        })
     batch.process_without_send_later
     run_jobs
@@ -131,6 +132,7 @@ describe SisImportsApiController, type: :request do
                          "skip_deletes" => false,
                          "change_threshold" => nil,
                          "diffing_remaster" => nil,
+                         "diffing_user_remove_status" => nil,
                        })
 
     expect(SisBatch.count).to eq @batch_count + 1
@@ -214,6 +216,7 @@ describe SisImportsApiController, type: :request do
       "diffing_drop_status" => nil,
       "change_threshold" => nil,
       "diffing_remaster" => nil,
+      "diffing_user_remove_status" => nil,
     }
     expect(json).to eq expected_data
   end
@@ -931,6 +934,7 @@ describe SisImportsApiController, type: :request do
       "diffing_drop_status" => nil,
       "change_threshold" => nil,
       "diffing_remaster" => nil,
+      "diffing_user_remove_status" => nil,
     }] }
     expect(json).to eq expected_data
 

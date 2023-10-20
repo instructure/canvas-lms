@@ -25,6 +25,9 @@ const locale = {
   "armenian_12da6118": { "message": "Armenska" },
   "belarusian_b2f19c76": { "message": "Hvítrússneska" },
   "bulgarian_feccab7e": { "message": "Búlgarska" },
+  "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
+    "message": "Ekki er hægt að fjarlægja skjátexta sem erfðir eru frá foreldrisnámskeiði."
+  },
   "catalan_16f6b78f": { "message": "Katalónska" },
   "chinese_111d37f6": { "message": "Kínverska" },
   "chinese_simplified_7f0bd370": { "message": "Kínverska einfölduð" },
@@ -89,7 +92,10 @@ const locale = {
   "ukrainian_945b00b7": { "message": "Úkraínska" },
   "vietnamese_e7a76583": { "message": "Víetnamska" },
   "welsh_42ab94b1": { "message": "Velska" },
-  "yiddish_f96986df": { "message": "Jiddíska" }
+  "yiddish_f96986df": { "message": "Jiddíska" },
+  "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
+    "message": "Þú getur skipt út með því að hlaða upp nýrri skjátextaskrá."
+  }
 }
 
 

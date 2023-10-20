@@ -47,6 +47,26 @@ describe Account do
     end
   end
 
+  context "environment_specific_domain" do
+    let(:root_account) { Account.create! }
+
+    before do
+      allow(HostUrl).to receive(:context_host).and_call_original
+      allow(HostUrl).to receive(:context_host).with(root_account, "beta").and_return("canvas.beta.instructure.com")
+      AccountDomain.create!(host: "canvas.instructure.com", account: root_account)
+    end
+
+    it "retrieves correct beta domain" do
+      allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
+      expect(root_account.environment_specific_domain).to eq "canvas.beta.instructure.com"
+    end
+
+    it "retrieves correct prod domain" do
+      allow(ApplicationController).to receive(:test_cluster_name).and_return(nil)
+      expect(root_account.environment_specific_domain).to eq "canvas.instructure.com"
+    end
+  end
+
   context "resolved_outcome_proficiency_method" do
     before do
       @root_account = Account.create!
@@ -1521,9 +1541,9 @@ describe Account do
     it "does not create a duplicate manual courses account when locale changes" do
       acct = Account.default
       sub1 = acct.manually_created_courses_account
-      I18n.locale = "es"
-      sub2 = acct.manually_created_courses_account
-      I18n.locale = "en"
+      sub2 = I18n.with_locale(:es) do
+        acct.manually_created_courses_account
+      end
       expect(sub1.id).to eq sub2.id
     end
 
@@ -2172,12 +2192,12 @@ describe Account do
       @account = Account.create!
 
       @user1 = user_factory(active_all: true)
-      @account.account_users.create!(user: @user1)
+      @account.pseudonyms.create!(unique_id: "user1", user: @user1)
       @user1.dashboard_view = "activity"
       @user1.save
 
       @user2 = user_factory(active_all: true)
-      @account.account_users.create!(user: @user2)
+      @account.pseudonyms.create!(unique_id: "user2", user: @user2)
       @user2.dashboard_view = "cards"
       @user2.save
     end
@@ -2476,6 +2496,8 @@ describe Account do
     it "works for root accounts" do
       Account.default.name = "Something new"
       expect(Account).to receive(:invalidate_cache).with(Account.default.id).at_least(1)
+      allow(Rails.cache).to receive(:delete)
+      expect(Rails.cache).to receive(:delete).with(["account2", Account.default.id].cache_key)
       Account.default.save!
     end
 
@@ -2503,6 +2525,111 @@ describe Account do
       expect(account).to be_enable_as_k5_account
       expect(account.enable_as_k5_account[:value]).to be_truthy
       expect(account.enable_as_k5_account[:locked]).to be_truthy
+    end
+  end
+
+  describe "#multi_parent_sub_accounts_recursive" do
+    subject { Account.multi_parent_sub_accounts_recursive(parent_account_ids) }
+
+    let_once(:root_account) { Account.create! }
+
+    let_once(:level_one_sub_accounts) do
+      3.times do |i|
+        root_account.sub_accounts.create!(name: "Level 1 - Sub-account #{i}")
+      end
+
+      root_account.sub_accounts
+    end
+
+    let_once(:level_two_sub_accounts) do
+      level_two_sub_accounts = []
+
+      root_account.sub_accounts.each do |sa|
+        level_two_sub_accounts << sa.sub_accounts.create!(name: "Level 2 - Sub account")
+      end
+
+      level_two_sub_accounts
+    end
+
+    context "with empty parent account ids" do
+      let(:parent_account_ids) { [] }
+
+      it { is_expected.to match_array [] }
+    end
+
+    context "with a single root account id" do
+      let(:parent_account_ids) { [root_account.id] }
+
+      it "returns all sub-accounts" do
+        expect(subject).to match_array(
+          level_one_sub_accounts + level_two_sub_accounts + [root_account]
+        )
+      end
+    end
+
+    context "with a single sub-account parent account id" do
+      let(:parent_sub_account) { level_two_sub_accounts.first }
+      let(:parent_account_ids) { [parent_sub_account.id] }
+
+      it "returns all sub-accounts that belong to the parent account" do
+        expect(subject).to match_array(
+          parent_sub_account.sub_accounts + [parent_sub_account]
+        )
+      end
+    end
+
+    context "with multiple parent account ids" do
+      let(:parent_account_one) { level_one_sub_accounts.first }
+      let(:parent_account_two) { level_one_sub_accounts.second }
+      let(:parent_account_ids) { [parent_account_one.id, parent_account_two.id] }
+
+      it "returns all sub-accounts that belong to the parent accounts" do
+        expect(subject).to match_array(
+          parent_account_one.sub_accounts + parent_account_two.sub_accounts + [parent_account_one, parent_account_two]
+        )
+      end
+
+      context "and not all parent account IDs are on the same shard" do
+        specs_require_sharding
+
+        let(:cross_shard_parent_account) { @shard1.activate { Account.create! } }
+        let(:parent_account_ids) { [root_account.id, cross_shard_parent_account.id] }
+
+        it "raises an argument error" do
+          expect { subject }.to raise_error(
+            ArgumentError,
+            "all parent_account_ids must be in the same shard"
+          )
+        end
+      end
+
+      context "and another shard is active" do
+        specs_require_sharding
+
+        subject { @shard1.activate { Account.multi_parent_sub_accounts_recursive(parent_account_ids) } }
+
+        let(:parent_account_one) { level_one_sub_accounts.first }
+        let(:parent_account_two) { level_one_sub_accounts.second }
+        let(:parent_account_ids) { [parent_account_one.global_id, parent_account_two.global_id] }
+
+        it "returns all sub-accounts that belong to the parent accounts" do
+          expect(subject).to match_array(
+            parent_account_one.sub_accounts + parent_account_two.sub_accounts + [parent_account_one, parent_account_two]
+          )
+        end
+      end
+
+      context "and there is overlap in the sub accounts" do
+        let(:parent_account_one) { root_account }
+        let(:parent_account_two) { level_one_sub_accounts.first }
+        let(:parent_account_ids) { [parent_account_one.id, parent_account_two.id] }
+
+        it "Does not include duplicate accounts" do
+          expect(subject).to match_array(
+            level_one_sub_accounts + level_two_sub_accounts + [root_account]
+          )
+        end
+      end
     end
   end
 
@@ -2638,6 +2765,146 @@ describe Account do
       expect(@sub_account.restrict_quantitative_data?).to be true
 
       expect(InstStatsd::Statsd).not_to have_received(:increment).with("account.settings.restrict_quantitative_data.disabled")
+    end
+  end
+
+  describe "#enable_user_notes" do
+    let(:account) { account_model(enable_user_notes: true) }
+
+    context "when the deprecate_faculty_journal flag is enabled" do
+      before { Account.site_admin.enable_feature!(:deprecate_faculty_journal) }
+
+      it "returns false" do
+        expect(account.enable_user_notes).to be false
+      end
+    end
+
+    context "when the deprecate_faculty_journal flag is disabled" do
+      before { Account.site_admin.disable_feature!(:deprecate_faculty_journal) }
+
+      it "returns the value stored on the account model" do
+        expect(account.enable_user_notes).to be true
+        account.update_attribute(:enable_user_notes, false)
+        expect(account.enable_user_notes).to be false
+      end
+    end
+  end
+
+  describe ".having_user_notes_enabled" do
+    let!(:enabled_account) { account_model(enable_user_notes: true) }
+
+    before { account_model(enable_user_notes: false) }
+
+    context "when the deprecate_faculty_journal flag is disabled" do
+      before { Account.site_admin.disable_feature!(:deprecate_faculty_journal) }
+
+      it "only returns accounts having user notes enabled" do
+        expect(Account.having_user_notes_enabled).to match_array [enabled_account]
+      end
+    end
+
+    it "returns no accounts" do
+      expect(Account.having_user_notes_enabled).to be_empty
+    end
+  end
+
+  context "account grading standards" do
+    before do
+      account_model
+    end
+
+    def example_grading_standard(context)
+      gs = GradingStandard.new(context:, workflow_state: "active")
+      gs.data = [["A", 0.9], ["B", 0.8], ["C", -0.7]]
+      gs.save(validate: false)
+      gs
+    end
+
+    describe "#grading_standard_enabled" do
+      it "returns false by default" do
+        expect(@account.grading_standard_enabled?).to be false
+      end
+
+      it "returns true when grading_standard is set" do
+        @account.grading_standard = example_grading_standard(@account)
+        @account.save!
+        expect(@account.grading_standard_enabled?).to be true
+      end
+
+      it "returns true if a parent account has a grading_standard" do
+        @account.grading_standard_id = example_grading_standard(@account).id
+        @account.save
+        @sub_account = @account.sub_accounts.create!
+
+        expect(@sub_account.grading_standard_enabled?).to be true
+      end
+
+      it "returns false if no parent account has a grading standard" do
+        @sub_account1 = @account.sub_accounts.create!
+        @sub_account2 = @sub_account1.sub_accounts.create!
+        @sub_account3 = @sub_account2.sub_accounts.create!
+
+        expect(@sub_account3.grading_standard_enabled?).to be false
+      end
+
+      it "returns true if a deeply nested parent account has a grading_standard" do
+        @account.grading_standard = example_grading_standard(@account)
+        @account.save
+        @sub_account1 = @account.sub_accounts.create!
+        @sub_account2 = @sub_account1.sub_accounts.create!
+        @sub_account3 = @sub_account2.sub_accounts.create!
+
+        expect(@sub_account3.grading_standard_enabled?).to be true
+      end
+    end
+
+    describe "#default_grading_standard" do
+      it "returns nil by default" do
+        expect(@account.default_grading_standard).to be_nil
+      end
+
+      it "returns the grading_standard if set" do
+        @account.grading_standard = example_grading_standard(@account)
+        expect(@account.default_grading_standard).to eq @account.grading_standard
+      end
+
+      it "returns the parent account's grading_standard if set" do
+        @account.grading_standard = example_grading_standard(@account)
+        @account.save
+        @sub_account = @account.sub_accounts.create!
+
+        expect(@sub_account.default_grading_standard).to eq @account.grading_standard
+      end
+
+      it "returns nil if no parent account has a grading standard" do
+        @sub_account1 = @account.sub_accounts.create!
+        @sub_account2 = @sub_account1.sub_accounts.create!
+        @sub_account3 = @sub_account2.sub_accounts.create!
+
+        expect(@sub_account3.default_grading_standard).to be_nil
+      end
+
+      it "returns a deeply nested parent account's grading_standard if set" do
+        @account.grading_standard = example_grading_standard(@account)
+        @account.save
+        @sub_account1 = @account.sub_accounts.create!
+        @sub_account2 = @sub_account1.sub_accounts.create!
+        @sub_account3 = @sub_account2.sub_accounts.create!
+
+        expect(@sub_account3.default_grading_standard).to eq @account.grading_standard
+      end
+
+      it "returns correct parent's grading standard in deeply nested accounts" do
+        @account.grading_standard = example_grading_standard(@account)
+        @account.save
+        @sub_account1 = @account.sub_accounts.create!
+        @sub_account1.grading_standard = example_grading_standard(@sub_account1)
+        @sub_account1.save
+        @sub_account2 = @sub_account1.sub_accounts.create!
+        @sub_account3 = @sub_account2.sub_accounts.create!
+
+        expect(@sub_account3.default_grading_standard).to eq @sub_account1.grading_standard
+      end
     end
   end
 end

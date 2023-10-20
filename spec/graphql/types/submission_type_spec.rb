@@ -28,7 +28,7 @@ describe Types::SubmissionType do
   end
 
   let(:submission_type) { GraphQLTypeTester.new(@submission, current_user: @teacher) }
-  let(:submission_type_peer_review) { GraphQLTypeTester.new(@submission, current_user: @student) }
+  let(:submission_type_for_student) { GraphQLTypeTester.new(@submission, current_user: @student) }
 
   it "works" do
     expect(submission_type.resolve("user { _id }")).to eq @student.id.to_s
@@ -36,6 +36,8 @@ describe Types::SubmissionType do
     expect(submission_type.resolve("excused")).to be false
     expect(submission_type.resolve("assignment { _id }")).to eq @assignment.id.to_s
     expect(submission_type.resolve("assignmentId")).to eq @assignment.id.to_s
+    expect(submission_type.resolve("redoRequest")).to eq @submission.redo_request?
+    expect(submission_type.resolve("cachedDueDate")).to eq @submission.cached_due_date
   end
 
   it "requires read permission" do
@@ -73,6 +75,38 @@ describe Types::SubmissionType do
     end
   end
 
+  describe "sticker" do
+    let(:sticker) { type.resolve("sticker") }
+
+    before { @submission.update!(sticker: "trophy") }
+
+    context "as a student" do
+      let(:type) { submission_type_for_student }
+
+      it "returns the sticker for posted submissions" do
+        expect(sticker).to eq "trophy"
+      end
+
+      it "does not return the sticker for unposted submissions" do
+        @assignment.hide_submissions
+        expect(sticker).to be_nil
+      end
+    end
+
+    context "as a teacher" do
+      let(:type) { submission_type }
+
+      it "returns the sticker for posted submissions" do
+        expect(sticker).to eq "trophy"
+      end
+
+      it "returns the sticker for unposted submissions" do
+        @assignment.hide_submissions
+        expect(sticker).to eq "trophy"
+      end
+    end
+  end
+
   describe "hide_grade_from_student" do
     it "returns true for hide_grade_from_student" do
       @assignment.mute!
@@ -81,6 +115,17 @@ describe Types::SubmissionType do
 
     it "returns false for hide_grade_from_student" do
       expect(submission_type.resolve("hideGradeFromStudent")).to be false
+    end
+  end
+
+  describe "custom_grade_status" do
+    before do
+      custom_grade_status = CustomGradeStatus.create!(name: "foo", color: "#FFE8E5", root_account_id: Account.default.id, created_by_id: @teacher.id)
+      @submission.update!(custom_grade_status_id: custom_grade_status.id)
+    end
+
+    it "returns the custom grade status" do
+      expect(submission_type.resolve("customGradeStatus")).to eq "foo"
     end
   end
 
@@ -306,7 +351,7 @@ describe Types::SubmissionType do
     it "will only show comments written by the reviewer if peerReview is true" do
       comment3 = @submission.add_comment(author: @student, comment: "test3", attempt: 2)
       expect(
-        submission_type_peer_review.resolve("commentsConnection(filter: {peerReview: true}) { nodes { _id }}")
+        submission_type_for_student.resolve("commentsConnection(filter: {peerReview: true}) { nodes { _id }}")
       ).to eq [comment3.id.to_s]
     end
 

@@ -37,11 +37,11 @@ export const addAccountsToTree = (
   collections: Collection
 ): Collection => {
   const accounts = castIdsToInt(accountData)
-  const allAccounts = {...collections}
+  const allAccounts = JSON.parse(JSON.stringify(collections))
 
   accounts.forEach(account => {
     if (allAccounts.hasOwnProperty(account.id)) {
-      return
+      delete allAccounts[account.id]
     }
 
     allAccounts[account.id] = {
@@ -61,13 +61,29 @@ export const addAccountsToTree = (
     if (
       account.parent_account_id &&
       allAccounts[account.parent_account_id] &&
-      account.parent_account_id != account.id
+      account.parent_account_id !== account.id
     ) {
-      allAccounts[account.parent_account_id].children.push(account.id)
+      if (!allAccounts[account.parent_account_id].children.includes(account.id)) {
+        allAccounts[account.parent_account_id].children.push(account.id)
+      }
     }
 
-    account.children.push(account.id)
+    if (!account.children.includes(account.id)) {
+      account.children.push(account.id)
+    }
   })
+
+  // sometimes the children are fetched before the parent
+  // be sure to add these children to the parent's children array
+  for (const acctid in allAccounts) {
+    const account = allAccounts[acctid]
+    const parentid = account.parent_account_id
+    if (parentid && allAccounts[parentid]) {
+      if (!allAccounts[parentid].children.includes(account.id)) {
+        allAccounts[parentid].children.push(account.id)
+      }
+    }
+  }
 
   return allAccounts
 }

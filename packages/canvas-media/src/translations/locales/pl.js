@@ -25,6 +25,9 @@ const locale = {
   "armenian_12da6118": { "message": "Armeński" },
   "belarusian_b2f19c76": { "message": "Białoruski" },
   "bulgarian_feccab7e": { "message": "Bułgarski" },
+  "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
+    "message": "Napisów odziedziczonych z kursu nadrzędnego nie można usunąć."
+  },
   "catalan_16f6b78f": { "message": "Kataloński" },
   "chinese_111d37f6": { "message": "Chiński" },
   "chinese_simplified_7f0bd370": { "message": "Chiński (uproszczony)" },
@@ -91,7 +94,10 @@ const locale = {
   "ukrainian_945b00b7": { "message": "Ukraiński" },
   "vietnamese_e7a76583": { "message": "Wietnamski" },
   "welsh_42ab94b1": { "message": "Walijski" },
-  "yiddish_f96986df": { "message": "Jidysz" }
+  "yiddish_f96986df": { "message": "Jidysz" },
+  "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
+    "message": "Można je przywrócić, przesyłając nowy plik z napisami."
+  }
 }
 
 

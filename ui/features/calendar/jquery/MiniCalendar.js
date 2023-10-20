@@ -59,6 +59,7 @@ export default class MiniCalendar {
         'Calendar/currentDate': this.gotoDate,
         'CommonEvent/eventDeleted': this.eventSaved,
         'CommonEvent/eventSaved': this.eventSaved,
+        'CommonEvent/eventsSavedFromSeries': this.eventsSavedFromSeries,
       })
     )
   }
@@ -103,6 +104,10 @@ export default class MiniCalendar {
   visibleContextListChanged = _list => this.refetchEvents()
 
   eventSaved = () => this.refetchEvents()
+
+  eventsSavedFromSeries = () => {
+    this.refetchEvents()
+  }
 
   refetchEvents = () => {
     if (!this.calendar.is(':visible')) return

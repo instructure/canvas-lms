@@ -1,0 +1,6 @@
+{
+  "name": "@canvas/submission-sticker",
+  "private": true,
+  "version": "1.0.0",
+  "main": "./react/components/Sticker.tsx"
+}

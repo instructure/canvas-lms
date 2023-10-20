@@ -63,6 +63,13 @@ describe MarkDonePresenter do
       mdp = MarkDonePresenter.new(ctrl, context, tag.id, @user, nil)
       expect(mdp.item).to eq tag
     end
+
+    it "ignores invalid module item ids" do
+      ctrl = double("Controller", session: true)
+      context = double("Context", "grants_any_right?" => true)
+      mdp = MarkDonePresenter.new(ctrl, context, "string", @user, nil)
+      expect(mdp.item).to be_nil
+    end
   end
 
   describe "#has_requirement?" do

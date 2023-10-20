@@ -40,7 +40,7 @@ describe Types::OutcomeProficiencyType do
     it "proficiencyRatingsConnection" do
       expect(
         account_type.resolve("outcomeProficiency { proficiencyRatingsConnection { nodes { _id } } }").sort
-      ).to eq @outcome_proficiency.outcome_proficiency_ratings.map(&:id).map(&:to_s)
+      ).to eq(@outcome_proficiency.outcome_proficiency_ratings.map { |r| r.id.to_s })
     end
   end
 end

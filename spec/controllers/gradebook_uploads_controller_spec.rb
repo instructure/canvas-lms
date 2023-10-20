@@ -155,5 +155,33 @@ describe GradebookUploadsController do
       get "show", params: { course_id: @course.id }
       expect(assigns[:js_env]).to have_key(:bulk_update_override_scores_path)
     end
+
+    it "sets js_env.custom_grade_statuses to empty array if FF is off even if they exist" do
+      Account.site_admin.disable_feature!(:custom_gradebook_statuses)
+      CustomGradeStatus.create!(root_account: @course.root_account, name: "CARROT", color: "#000000", created_by: @teacher)
+      user_session(@teacher)
+      progress = Progress.create!(tag: "test", context: @teacher)
+
+      @gb_upload = GradebookUpload.new course: @course, user: @teacher, progress:, gradebook: { foo: "bar" }
+      @gb_upload.save
+
+      get "show", params: { course_id: @course.id }
+      expect(assigns[:js_env]).to have_key(:custom_grade_statuses)
+      expect(assigns[:js_env][:custom_grade_statuses].length).to eq(0)
+    end
+
+    it "sets js_env.custom_grade_statuses if the FF is on" do
+      Account.site_admin.enable_feature!(:custom_gradebook_statuses)
+      CustomGradeStatus.create!(root_account: @course.root_account, name: "CARROT", color: "#000000", created_by: @teacher)
+      user_session(@teacher)
+      progress = Progress.create!(tag: "test", context: @teacher)
+
+      @gb_upload = GradebookUpload.new course: @course, user: @teacher, progress:, gradebook: { foo: "bar" }
+      @gb_upload.save
+
+      get "show", params: { course_id: @course.id }
+      expect(assigns[:js_env]).to have_key(:custom_grade_statuses)
+      expect(assigns[:js_env][:custom_grade_statuses].length).to eq(1)
+    end
   end
 end

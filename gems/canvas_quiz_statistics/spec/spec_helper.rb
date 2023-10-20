@@ -24,7 +24,7 @@ rescue LoadError => e
   puts "Error: #{e} "
 end
 
-require "byebug"
+require "debug"
 require "canvas_quiz_statistics"
 
 Constants = CanvasQuizStatistics::Analyzers::Base::Constants

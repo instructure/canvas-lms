@@ -1,3 +1,5 @@
+/* eslint-disable no-alert */
+/* eslint-disable eqeqeq */
 /*
  * Copyright (C) 2011 - present Instructure, Inc.
  *
@@ -25,6 +27,7 @@ import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, showIf
 import '@canvas/keycodes'
 import '@canvas/loading-image'
 import '@canvas/util/templateData'
+import replaceTags from '@canvas/util/replaceTags'
 
 const I18n = useI18nScope('sub_accounts')
 
@@ -97,7 +100,7 @@ jQuery(function ($) {
         .parents('.account:first')
         .removeClass('editing_account')
 
-      const url = $.replaceTags(
+      const url = replaceTags(
         $('#sub_account_urls .sub_account_url').attr('href'),
         'id',
         account.id
@@ -109,7 +112,7 @@ jQuery(function ($) {
 
       const expand_link = $('#account_' + account.id + ' .expand_sub_accounts_link')
       expand_link.attr({
-        'data-link': $.replaceTags(expand_link.attr('data-link'), 'id', account.id),
+        'data-link': replaceTags(expand_link.attr('data-link'), 'id', account.id),
       })
 
       $('#account_' + account.id + ' > .header .name').focus()
@@ -238,7 +241,7 @@ jQuery(function ($) {
               .find('.expand_sub_accounts_link')
               .showIf(sub_account.sub_account_count > 0)
               .attr({
-                'data-link': $.replaceTags(
+                'data-link': replaceTags(
                   sub_account_node.find('.expand_sub_accounts_link').attr('data-link'),
                   'id',
                   sub_account.id
@@ -250,7 +253,7 @@ jQuery(function ($) {
               .end()
               .find('.edit_sub_account_form')
               .attr({
-                action: $.replaceTags(
+                action: replaceTags(
                   $('#sub_account_urls .sub_account_url').attr('href'),
                   'id',
                   sub_account.id

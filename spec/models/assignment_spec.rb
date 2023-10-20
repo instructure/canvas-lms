@@ -131,8 +131,7 @@ describe Assignment do
       it "invokes the LatePolicyApplicator for this assignment if grading type changes but due dates do not" do
         assignment = @course.assignments.new(assignment_valid_attributes)
 
-        allow(assignment).to receive(:update_cached_due_dates?).and_return(false)
-        allow(assignment).to receive(:saved_change_to_grading_type?).and_return(true)
+        allow(assignment).to receive_messages(update_cached_due_dates?: false, saved_change_to_grading_type?: true)
         expect(LatePolicyApplicator).to receive(:for_assignment).with(assignment)
 
         assignment.save!
@@ -141,8 +140,7 @@ describe Assignment do
       it "invokes the LatePolicyApplicator only once if grading type changes and due dates also change" do
         assignment = @course.assignments.new(assignment_valid_attributes)
 
-        allow(assignment).to receive(:update_cached_due_dates?).and_return(true)
-        allow(assignment).to receive(:saved_change_to_grading_type?).and_return(true)
+        allow(assignment).to receive_messages(update_cached_due_dates?: true, saved_change_to_grading_type?: true)
         expect(LatePolicyApplicator).to receive(:for_assignment).with(assignment).once
 
         assignment.save!
@@ -151,8 +149,7 @@ describe Assignment do
       it "does not invoke the LatePolicyApplicator if neither grading type nor due dates change" do
         assignment = @course.assignments.new(assignment_valid_attributes)
 
-        allow(assignment).to receive(:update_cached_due_dates?).and_return(false)
-        allow(assignment).to receive(:saved_change_to_grading_type?).and_return(false)
+        allow(assignment).to receive_messages(update_cached_due_dates?: false, saved_change_to_grading_type?: false)
         expect(LatePolicyApplicator).not_to receive(:for_assignment).with(assignment)
 
         assignment.save!
@@ -161,8 +158,7 @@ describe Assignment do
       it "invokes the LatePolicyApplicator only once if grading type does not change but due dates change" do
         assignment = @course.assignments.new(assignment_valid_attributes)
 
-        allow(assignment).to receive(:update_cached_due_dates?).and_return(true)
-        allow(assignment).to receive(:saved_change_to_grading_type?).and_return(false)
+        allow(assignment).to receive_messages(update_cached_due_dates?: true, saved_change_to_grading_type?: false)
         expect(LatePolicyApplicator).to receive(:for_assignment).with(assignment).once
 
         assignment.save!
@@ -170,47 +166,47 @@ describe Assignment do
     end
 
     describe "update_cached_due_dates" do
-      it "invokes DueDateCacher if anonymous_grading is changed" do
+      it "invokes SubmissionLifecycleManager if anonymous_grading is changed" do
         attrs = assignment_valid_attributes.merge(anonymous_grading: true)
         assignment = @course.assignments.create!(attrs)
-        expect(DueDateCacher).to receive(:recompute).with(assignment, update_grades: true)
+        expect(SubmissionLifecycleManager).to receive(:recompute).with(assignment, update_grades: true)
 
         assignment.update!(anonymous_grading: false)
       end
 
-      it "invokes DueDateCacher if due_at is changed" do
+      it "invokes SubmissionLifecycleManager if due_at is changed" do
         assignment = @course.assignments.new(assignment_valid_attributes)
-        expect(DueDateCacher).to receive(:recompute).with(assignment, update_grades: true)
+        expect(SubmissionLifecycleManager).to receive(:recompute).with(assignment, update_grades: true)
 
         assignment.update!(due_at: assignment.due_at + 1.day)
       end
 
-      it "invokes DueDateCacher if workflow_state is changed" do
+      it "invokes SubmissionLifecycleManager if workflow_state is changed" do
         assignment = @course.assignments.new(assignment_valid_attributes)
-        expect(DueDateCacher).to receive(:recompute).with(assignment, update_grades: true)
+        expect(SubmissionLifecycleManager).to receive(:recompute).with(assignment, update_grades: true)
 
         assignment.destroy
       end
 
-      it "invokes DueDateCacher if only_visible_to_overrides is changed" do
+      it "invokes SubmissionLifecycleManager if only_visible_to_overrides is changed" do
         assignment = @course.assignments.new(assignment_valid_attributes)
-        expect(DueDateCacher).to receive(:recompute).with(assignment, update_grades: true)
+        expect(SubmissionLifecycleManager).to receive(:recompute).with(assignment, update_grades: true)
 
         assignment.update!(only_visible_to_overrides: !assignment.only_visible_to_overrides?)
       end
 
-      it "invokes DueDateCacher if moderated_grading is changed" do
+      it "invokes SubmissionLifecycleManager if moderated_grading is changed" do
         assignment = @course.assignments.new(assignment_valid_attributes)
-        expect(DueDateCacher).to receive(:recompute).with(assignment, update_grades: true)
+        expect(SubmissionLifecycleManager).to receive(:recompute).with(assignment, update_grades: true)
 
         assignment.update!(moderated_grading: !assignment.moderated_grading, grader_count: 2)
       end
 
-      it "invokes DueDateCacher after save when moderated_grading becomes enabled" do
+      it "invokes SubmissionLifecycleManager after save when moderated_grading becomes enabled" do
         assignment = @course.assignments.create!(assignment_valid_attributes)
         assignment.reload
 
-        expect(DueDateCacher).to receive(:recompute).with(assignment, update_grades: true)
+        expect(SubmissionLifecycleManager).to receive(:recompute).with(assignment, update_grades: true)
 
         assignment.moderated_grading = true
         assignment.grader_count = 2
@@ -218,33 +214,33 @@ describe Assignment do
         assignment.update_cached_due_dates
       end
 
-      it "invokes DueDateCacher if called in a before_save context" do
+      it "invokes SubmissionLifecycleManager if called in a before_save context" do
         assignment = @course.assignments.new(assignment_valid_attributes)
         allow(assignment).to receive(:update_cached_due_dates?).and_return(true)
-        expect(DueDateCacher).to receive(:recompute).with(assignment, update_grades: true)
+        expect(SubmissionLifecycleManager).to receive(:recompute).with(assignment, update_grades: true)
 
         assignment.save!
       end
 
-      it "invokes DueDateCacher if called in an after_save context" do
+      it "invokes SubmissionLifecycleManager if called in an after_save context" do
         assignment = @course.assignments.new(assignment_valid_attributes)
 
         Assignment.suspend_callbacks(:update_cached_due_dates) do
           assignment.update!(due_at: assignment.due_at + 1.day)
         end
 
-        expect(DueDateCacher).to receive(:recompute).with(assignment, update_grades: true)
+        expect(SubmissionLifecycleManager).to receive(:recompute).with(assignment, update_grades: true)
 
         assignment.update_cached_due_dates
       end
 
-      it "does not invoke DueDateCacher on an unchanged assignment in a before_save context" do
+      it "does not invoke SubmissionLifecycleManager on an unchanged assignment in a before_save context" do
         assignment = Assignment.suspend_callbacks(:update_cached_due_dates) do
           @course.assignments.create(assignment_valid_attributes)
         end
         assignment.reload
 
-        expect(DueDateCacher).not_to receive(:recompute)
+        expect(SubmissionLifecycleManager).not_to receive(:recompute)
         assignment.update_cached_due_dates
       end
     end
@@ -1558,6 +1554,13 @@ describe Assignment do
       expect(new_assignment3.title).to eq "Wiki Assignment Copy 3"
     end
 
+    it "does not duplicate the sis_source_id" do
+      assignment = @course.assignments.create!(sis_source_id: "abc")
+      new_assignment = assignment.duplicate
+      expect(new_assignment).to be_valid
+      expect(new_assignment.sis_source_id).to be_nil
+    end
+
     it "does not duplicate grades_published_at" do
       assignment = @course.assignments.create!(title: "whee", points_possible: 10)
       assignment.grades_published_at = Time.zone.now
@@ -2107,6 +2110,30 @@ describe Assignment do
         expect(representatives[3].name).to eql(@initial_student.name)
       end
     end
+
+    context "differentiated assignments and deactivated students" do
+      before do
+        @student_enrollment = @enrollment
+        @assignment = @course.assignments.create!(assignment_valid_attributes.merge(only_visible_to_overrides: true))
+        create_adhoc_override_for_assignment(@assignment, @student_enrollment.user)
+        @student_enrollment.deactivate
+      end
+
+      it "excludes deactivated students by default" do
+        representatives = @assignment.representatives(user: @teacher)
+        expect(representatives).not_to include @initial_student
+      end
+
+      it "includes deactivated students if passed ignore_student_visibility" do
+        representatives = @assignment.representatives(user: @teacher, ignore_student_visibility: true)
+        expect(representatives).to include @initial_student
+      end
+
+      it "excludes deactivated students if the includes param does not have :inactive" do
+        representatives = @assignment.representatives(user: @teacher, includes: [:completed], ignore_student_visibility: true)
+        expect(representatives).not_to include @initial_student
+      end
+    end
   end
 
   context "group assignments with all students assigned to a group and grade_group_students_individually set to true" do
@@ -2194,6 +2221,20 @@ describe Assignment do
 
     it "returns a jwt" do
       expect(Canvas::Security.decode_jwt(@assignment.secure_params)).to be
+    end
+
+    it "contains the description when the assignment isn't locked" do
+      @assignment.update!(due_at: 2.days.from_now, lock_at: 3.days.from_now)
+      @assignment.reload
+      decoded = Canvas::Security.decode_jwt(@assignment.secure_params)
+      expect(decoded).to_not include(:description)
+    end
+
+    it "does not contain the description when the assignment is locked" do
+      @assignment.update!(due_at: 2.days.from_now, lock_at: 3.days.from_now, unlock_at: 1.day.from_now)
+      @assignment.reload
+      decoded = Canvas::Security.decode_jwt(@assignment.secure_params)
+      expect(decoded[:description]).to be_nil
     end
   end
 
@@ -3510,7 +3551,6 @@ describe Assignment do
       it "returns the assignment-specific grading standard if there is one, first and foremost" do
         @assignment.update_attribute :grading_standard, @gs1
         @course.update_attribute :grading_standard, @gs3
-        @course.update_attribute :default_grading_standard, @gs2
         expect(@assignment.grading_standard_or_default).to eql @gs1
       end
 
@@ -3520,7 +3560,7 @@ describe Assignment do
       end
 
       it "uses the course default if there is one" do
-        @course.update_attribute :default_grading_standard, @gs2
+        @course.update_attribute :grading_standard, @gs2
         expect(@assignment.grading_standard_or_default).to eql @gs2
       end
 
@@ -7312,29 +7352,29 @@ describe Assignment do
 
     it "triggers when assignment is created" do
       new_assignment = @course.assignments.build
-      expect(DueDateCacher).to receive(:recompute).with(new_assignment, hash_including(update_grades: true))
+      expect(SubmissionLifecycleManager).to receive(:recompute).with(new_assignment, hash_including(update_grades: true))
       new_assignment.save
     end
 
     it "triggers when due_at changes" do
-      expect(DueDateCacher).to receive(:recompute).with(@assignment, hash_including(update_grades: true))
+      expect(SubmissionLifecycleManager).to receive(:recompute).with(@assignment, hash_including(update_grades: true))
       @assignment.due_at = 1.week.from_now
       @assignment.save
     end
 
     it "triggers when due_at changes to nil" do
-      expect(DueDateCacher).to receive(:recompute).with(@assignment, hash_including(update_grades: true))
+      expect(SubmissionLifecycleManager).to receive(:recompute).with(@assignment, hash_including(update_grades: true))
       @assignment.due_at = nil
       @assignment.save
     end
 
     it "triggers when assignment deleted" do
-      expect(DueDateCacher).to receive(:recompute).with(@assignment, hash_including(update_grades: true))
+      expect(SubmissionLifecycleManager).to receive(:recompute).with(@assignment, hash_including(update_grades: true))
       @assignment.destroy
     end
 
     it "does not trigger when nothing changed" do
-      expect(DueDateCacher).not_to receive(:recompute)
+      expect(SubmissionLifecycleManager).not_to receive(:recompute)
       @assignment.save
     end
   end
@@ -8015,7 +8055,7 @@ describe Assignment do
           )
           inactive_enrollment.deactivate
 
-          DueDateCacher.recompute_course(course, run_immediately: true)
+          SubmissionLifecycleManager.recompute_course(course, run_immediately: true)
         end
 
         context "without preloaded submissions" do
@@ -8152,6 +8192,7 @@ describe Assignment do
     before do
       allow(@course).to receive(:feature_enabled?) { false }
       allow(@course).to receive(:feature_enabled?).with(:assignments_2_student) { true }
+      Account.site_admin.disable_feature!(:external_tools_for_a2)
     end
 
     let(:assignment) do
@@ -8194,6 +8235,17 @@ describe Assignment do
         assignment.submission_types = type
         expect(assignment).to be_a2_enabled
       end
+    end
+
+    it "returns true if when LTI external tool feature flag is enabled" do
+      Account.site_admin.enable_feature!(:external_tools_for_a2)
+
+      assignment.build_wiki_page
+      assignment.build_discussion_topic
+      assignment.build_quiz
+      assignment.submission_types = "external_tool"
+
+      expect(assignment).to be_a2_enabled
     end
 
     describe "peer reviews enabled" do
@@ -8279,9 +8331,8 @@ describe Assignment do
 
     before do
       assignment.post_to_sis = true
-      allow(assignment.context.account).to receive(:sis_syncing).and_return({ value: true })
+      allow(assignment.context.account).to receive_messages(sis_syncing: { value: true }, sis_require_assignment_due_date: { value: true })
       allow(assignment.context.account).to receive(:feature_enabled?).with("new_sis_integrations").and_return(true)
-      allow(assignment.context.account).to receive(:sis_require_assignment_due_date).and_return({ value: true })
     end
 
     it "raises an invalid record error if overrides are invalid" do
@@ -8321,9 +8372,7 @@ describe Assignment do
         overrides_to_delete: [],
         override_errors: []
       }
-      allow(AssignmentUtil).to receive(:due_date_required?).and_return(true)
-      allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(true)
-      allow(AssignmentUtil).to receive(:sis_integration_settings_enabled?).and_return(true)
+      allow(AssignmentUtil).to receive_messages(due_date_required?: true, due_date_required_for_account?: true, sis_integration_settings_enabled?: true)
     end
 
     it "can duplicate" do
@@ -8396,10 +8445,8 @@ describe Assignment do
 
     it "returns custom name length if sis_assignment_name_length_input is present" do
       assignment.post_to_sis = true
-      allow(assignment.context.account).to receive(:sis_syncing).and_return({ value: true })
-      allow(assignment.context.account).to receive(:sis_assignment_name_length).and_return({ value: true })
+      allow(assignment.context.account).to receive_messages(sis_syncing: { value: true }, sis_assignment_name_length: { value: true }, sis_assignment_name_length_input: { value: 15 })
       allow(assignment.context.account).to receive(:feature_enabled?).with("new_sis_integrations").and_return(true)
-      allow(assignment.context.account).to receive(:sis_assignment_name_length_input).and_return({ value: 15 })
       expect(assignment.max_name_length).to eq(15)
     end
 
@@ -9287,7 +9334,6 @@ describe Assignment do
 
         context "when posting submissions" do
           before do
-            Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
             assignment.ensure_post_policy(post_manually: true)
           end
 
@@ -9302,6 +9348,16 @@ describe Assignment do
             ContentParticipation.where(user_id: student1).update_all(workflow_state: "read")
             assignment.post_submissions(skip_content_participation_refresh: false)
             expect(student_unread_count_counts).to eq 1
+          end
+
+          it "does not update the unread_count for previously posted submissions" do
+            assignment.grade_student(student1, grade: 10, grader: teacher)
+            submission_id = assignment.submission_for_student(student1).id
+            assignment.post_submissions(submission_ids: [submission_id], skip_content_participation_refresh: false)
+            expect(student_unread_count_counts).to eq 1
+            ContentParticipation.where(user_id: student1).update_all(workflow_state: "read")
+            assignment.post_submissions(skip_content_participation_refresh: false)
+            expect(student_unread_count_counts).to eq 0
           end
 
           it "updates the unread_count if unread comment when posting" do
@@ -9337,7 +9393,6 @@ describe Assignment do
 
         context "when hiding submissions" do
           before do
-            Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
             assignment.ensure_post_policy(post_manually: true)
           end
 
@@ -9387,10 +9442,6 @@ describe Assignment do
         end
 
         context "when changing workflow_state for an assignment" do
-          before do
-            Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
-          end
-
           it "unread count changes between 0 and 1 when going to unpublished and published workflow_state" do
             assignment.grade_student(student1, grade: 10, grader: teacher)
             expect(student_unread_count_counts).to eq 1
@@ -9426,10 +9477,6 @@ describe Assignment do
         end
 
         context "when changing submission_types for an assignment" do
-          before do
-            Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
-          end
-
           it "unread count changes between 0 and 1 when going to not_graded and any other submission_type" do
             assignment.grade_student(student1, grade: 10, grader: teacher)
             expect(student_unread_count_counts).to eq 1
@@ -9885,7 +9932,7 @@ describe Assignment do
           it "does not allow changing final grader to an inactive user" do
             @section1_ta.enrollments.first.deactivate
             @assignment.final_grader = @section1_ta
-            expect(@assignment).to be_invalid
+            expect(@assignment).not_to be_valid
           end
 
           it "allows a non-active final grader if the final grader was set when the user was active" do
@@ -10302,6 +10349,7 @@ describe Assignment do
           expect(assignment.line_items.length).to eq 1
           expect(assignment.line_items.first.label).to eq assignment.title
           expect(assignment.line_items.first.score_maximum).to eq assignment.points_possible
+          expect(assignment.line_items.first.end_date_time).to eq assignment.due_at
           expect(assignment.line_items.first.coupled).to be true
           expect(assignment.line_items.first.resource_link).not_to be_nil
           expect(assignment.line_items.first.resource_link.resource_link_uuid).to eq assignment.lti_context_id
@@ -10315,26 +10363,31 @@ describe Assignment do
       end
 
       shared_examples "assignment to line item attribute sync check" do
-        it "synchronizes assignment title and points_possible changes to the primary line item" do
+        it "synchronizes assignment title, points_possible, and due_at changes to the primary line item" do
           # create a secondary line item (i.e. one that should not be synchronized)
           previous_title = assignment.title
           previous_points_possible = assignment.points_possible
+          previous_due_at = assignment.due_at
           first_line_item = assignment.line_items.first
           line_item_two = assignment.line_items.create!(
             label: previous_title,
             score_maximum: previous_points_possible,
-            resource_link: first_line_item.resource_link
+            resource_link: first_line_item.resource_link,
+            end_date_time: previous_due_at
           )
           line_item_two.update!(created_at: first_line_item.created_at + 1.minute)
           assignment.title += " edit"
           assignment.points_possible += 10
+          assignment.due_at += 3.days
           assignment.save!
           assignment.reload
           expect(assignment.line_items.length).to eq 2
           expect(assignment.line_items.find(&:assignment_line_item?).label).to eq assignment.title
           expect(assignment.line_items.find(&:assignment_line_item?).score_maximum).to eq assignment.points_possible
+          expect(assignment.line_items.find(&:assignment_line_item?).end_date_time).to eq assignment.due_at
           expect(assignment.line_items.find { |li| !li.assignment_line_item? }.label).to eq previous_title
           expect(assignment.line_items.find { |li| !li.assignment_line_item? }.score_maximum).to eq previous_points_possible
+          expect(assignment.line_items.find { |li| !li.assignment_line_item? }.end_date_time).to eq previous_due_at
         end
       end
 
@@ -10787,7 +10840,7 @@ describe Assignment do
       Assignment.create!(course: @course, name: "some assignment", sis_source_id: "BLAH")
       expect do
         Assignment.create!(course: @course, name: "some assignment", sis_source_id: "BLAH")
-      end.to raise_error(ActiveRecord::RecordNotUnique)
+      end.to raise_error(ActiveRecord::RecordInvalid)
     end
   end
 
@@ -11179,7 +11232,7 @@ describe Assignment do
 
     describe "with no user" do
       it "calls restrict_quantitative_data with no user" do
-        expect(@course_assignment.restrict_quantitative_data?).to be_nil
+        expect(@course_assignment.restrict_quantitative_data?).to be false
       end
     end
 
@@ -11198,16 +11251,23 @@ describe Assignment do
           expect(@sub_account.restrict_quantitative_data?).to be true
         end
 
-        it "inherits setting to course" do
-          expect(@sub_course.restrict_quantitative_data).to be true
+        it "does not inherit setting to course" do
+          expect(@sub_course.restrict_quantitative_data).to be false
         end
 
-        it "restricts quantitative data by default for students" do
-          expect(@course_assignment.restrict_quantitative_data?(@student_1)).to be true
-        end
+        context "with course setting on" do
+          before do
+            @sub_course.restrict_quantitative_data = true
+            @sub_course.save!
+          end
 
-        it "does not restrict quantitative data by default for admins" do
-          expect(@course_assignment.restrict_quantitative_data?(@admin)).to be false
+          it "restricts quantitative data by default for students" do
+            expect(@course_assignment.restrict_quantitative_data?(@student_1)).to be true
+          end
+
+          it "does not restrict quantitative data by default for admins" do
+            expect(@course_assignment.restrict_quantitative_data?(@admin)).to be false
+          end
         end
       end
 
@@ -11217,31 +11277,23 @@ describe Assignment do
           @sub_account.save!
         end
 
-        it "inherits setting to course" do
-          expect(@sub_course.restrict_quantitative_data).to be true
+        it "does not inherit setting to course" do
+          expect(@sub_course.restrict_quantitative_data).to be false
         end
 
-        it "restricts quantitative data by default for students" do
-          expect(@course_assignment.restrict_quantitative_data?(@student_1)).to be true
-        end
+        context "with course setting on" do
+          before do
+            @sub_course.restrict_quantitative_data = true
+            @sub_course.save!
+          end
 
-        it "does not restrict quantitative data by default for admins" do
-          expect(@course_assignment.restrict_quantitative_data?(@admin)).to be false
-        end
-      end
+          it "restricts quantitative data by default for students in subaccount setting" do
+            expect(@course_assignment.restrict_quantitative_data?(@student_1)).to be true
+          end
 
-      describe "with course setting on" do
-        before do
-          @sub_course.settings = @sub_course.settings.merge(restrict_quantitative_data: true)
-          @sub_course.save!
-        end
-
-        it "restricts quantitative data by default for students" do
-          expect(@course_assignment.restrict_quantitative_data?(@student_1)).to be true
-        end
-
-        it "does not restrict quantitative data by default for admins" do
-          expect(@course_assignment.restrict_quantitative_data?(@admin)).to be false
+          it "does not restrict quantitative data by default for admins in subaccount setting" do
+            expect(@course_assignment.restrict_quantitative_data?(@admin)).to be false
+          end
         end
       end
     end
@@ -11257,7 +11309,7 @@ describe Assignment do
           expect(@sub_account.restrict_quantitative_data?).to be false
         end
 
-        it "restricts quantitative data by default for students" do
+        it "does not set quantitative data by default for students" do
           expect(@course_assignment.restrict_quantitative_data?(@student_1)).to be false
         end
 

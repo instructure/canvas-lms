@@ -130,6 +130,7 @@ export default class SubmissionCommentForm extends React.Component<Props, State>
             }}
           >
             <Button
+              data-testid="comment-cancel-button"
               disabled={this.props.processing}
               label={cancelButtonLabel}
               margin="small small small 0"
@@ -139,6 +140,7 @@ export default class SubmissionCommentForm extends React.Component<Props, State>
             </Button>
 
             <Button
+              data-testid="comment-submit-button"
               disabled={this.props.processing || !this.commentIsValid()}
               label={submitButtonLabel}
               margin="small 0"

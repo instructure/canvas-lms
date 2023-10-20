@@ -180,7 +180,7 @@ class AccountCalendarsApiController < ApplicationController
     return unless authorized_action(account, @current_user, :manage_account_calendar_visibility)
 
     account.account_calendar_visible = value_to_boolean(params[:visible]) if params.include?(:visible)
-    if params.include?(:auto_subscribe) && Account.site_admin.feature_enabled?(:auto_subscribe_account_calendars)
+    if params.include?(:auto_subscribe)
       auto_subscribe = value_to_boolean(params[:auto_subscribe])
       account.account_calendar_subscription_type = auto_subscribe ? "auto" : "manual"
       if auto_subscribe
@@ -231,15 +231,13 @@ class AccountCalendarsApiController < ApplicationController
     account_scope.where(id: ids_to_enable_visible).update_all(account_calendar_visible: true)
     account_scope.where(id: ids_to_disable_visible).update_all(account_calendar_visible: false)
 
-    if Account.site_admin.feature_enabled?(:auto_subscribe_account_calendars)
-      ids_to_enable_auto_subscribe = data.select { |c| value_to_boolean(c["auto_subscribe"]) }.pluck("id")
-      ids_to_disable_auto_subscribe = data.select { |c| !value_to_boolean(c["auto_subscribe"]) && !c["auto_subscribe"].nil? }.pluck("id")
-      account_scope.where(id: ids_to_enable_auto_subscribe).update_all(account_calendar_subscription_type: "auto")
-      account_scope.where(id: ids_to_disable_auto_subscribe).update_all(account_calendar_subscription_type: "manual")
+    ids_to_enable_auto_subscribe = data.select { |c| value_to_boolean(c["auto_subscribe"]) }.pluck("id")
+    ids_to_disable_auto_subscribe = data.select { |c| !value_to_boolean(c["auto_subscribe"]) && !c["auto_subscribe"].nil? }.pluck("id")
+    account_scope.where(id: ids_to_enable_auto_subscribe).update_all(account_calendar_subscription_type: "auto")
+    account_scope.where(id: ids_to_disable_auto_subscribe).update_all(account_calendar_subscription_type: "manual")
 
-      InstStatsd::Statsd.gauge("account_calendars.auto_subscribing", ids_to_enable_auto_subscribe.length)
-      InstStatsd::Statsd.gauge("account_calendars.manual_subscribing", ids_to_disable_auto_subscribe.length)
-    end
+    InstStatsd::Statsd.gauge("account_calendars.auto_subscribing", ids_to_enable_auto_subscribe.length)
+    InstStatsd::Statsd.gauge("account_calendars.manual_subscribing", ids_to_disable_auto_subscribe.length)
 
     render json: { message: t({ one: "Updated 1 account", other: "Updated %{count} accounts" }, { count: account_ids.uniq.count }) }
   end

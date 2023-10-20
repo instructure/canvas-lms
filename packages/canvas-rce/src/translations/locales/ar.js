@@ -33,6 +33,7 @@ const locale = {
     "message": "إضافة شرح مكتوب لأحداث العرض/أشرطة الترجمة"
   },
   "add_image_60b2de07": { "message": "إضافة صورة" },
+  "add_one_9e34a6f8": { "message": "إضافة المزيد!" },
   "additional_considerations_f3801683": { "message": "الاعتبارات الإضافية" },
   "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
     "message": "يجب أن تكون الروابط المتجاورة بنفس عنوان URL رابطًا فرديًا."
@@ -60,6 +61,7 @@ const locale = {
   },
   "and_7fcc2911": { "message": "و" },
   "angle_c5b4ec50": { "message": "زاوية" },
+  "announcement_fb4cb645": { "message": "الإعلان" },
   "announcement_list_da155734": { "message": "قائمة الإعلانات" },
   "announcements_a4b8ed4a": { "message": "الإعلانات" },
   "apply_781a2546": { "message": "تطبيق" },
@@ -77,6 +79,7 @@ const locale = {
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "سيتم الاحتفاظ بنسبة العرض إلى الارتفاع"
   },
+  "assignment_976578a8": { "message": "المهمة" },
   "assignments_1e02582c": { "message": "المهام" },
   "asterisk_82255584": { "message": "نجمة" },
   "attributes_963ba262": { "message": "السمات" },
@@ -210,8 +213,12 @@ const locale = {
   "crop_image_807ebb08": { "message": "قص صورة" },
   "cup_product_14174434": { "message": "Cup Product" },
   "current_image_f16c249c": { "message": "الصورة الحالية" },
+  "current_link_945a47ee": { "message": "الارتباط الحالي" },
   "current_volume_level_c55ab825": { "message": "مستوى الصوت الحالي" },
   "custom_6979cd81": { "message": "مخصص" },
+  "custom_width_and_height_pixels_946eea7c": {
+    "message": "العرض والارتفاع المخصصان (بالبكسل)"
+  },
   "cyan_c1d5f68a": { "message": "سماوي" },
   "dagger_57e0f4e5": { "message": "Dagger" },
   "date_added_ed5ad465": { "message": "تاريخ الإضافة" },
@@ -244,6 +251,7 @@ const locale = {
   "directionality_26ae9e08": { "message": "الاتجاهية" },
   "directly_edit_latex_b7e9235b": { "message": "تحرير LaTeX مباشرةً" },
   "disable_preview_222bdf72": { "message": "تعطيل المعاينة" },
+  "discussion_6719c51d": { "message": "النقاش" },
   "discussions_a5f96392": { "message": "النقاشات" },
   "discussions_index_6c36ced": { "message": "فهرس المناقشات" },
   "disjoint_union_e74351a8": { "message": "Disjoint Union" },
@@ -548,6 +556,9 @@ const locale = {
   "light_blue_5374f600": { "message": "أزرق فاتح" },
   "link_7262adec": { "message": "ارتباط" },
   "link_options_a16b758b": { "message": "خيارات الارتباط" },
+  "link_type_linktypemessage_c6d26815": {
+    "message": "نوع الارتباط: { linkTypeMessage }"
+  },
   "link_with_text_starting_with_start_b3fcbe71": {
     "message": "رابط بنص يبدأ بـ { start }"
   },
@@ -600,6 +611,7 @@ const locale = {
   "minus_plus_3461f637": { "message": "سالب/موجب" },
   "misc_3b692ea7": { "message": "متنوع" },
   "miscellaneous_e9818229": { "message": "متنوعات" },
+  "module_90d9fd32": { "message": "الوحدة" },
   "modules_c4325335": { "message": "الوحدات النمطية" },
   "moving_image_to_crop_directionword_6f66cde2": {
     "message": "جارٍ نقل الصورة إلى القص { directionWord }"
@@ -624,18 +636,48 @@ const locale = {
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "تنقل من خلال القائمة أو شريط الأدوات"
   },
+  "navigation_ee9af92d": { "message": "التنقل" },
   "nested_greater_than_d852e60d": { "message": "Nested Greater Than" },
   "nested_less_than_27d17e58": { "message": "Nested Less Than" },
+  "new_quiz_34aacba6": { "message": "اختبار جديد" },
   "next_40e12421": { "message": "التالي" },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "لم يتم الكشف عن مشاكل إمكانية الوصول."
   },
+  "no_announcements_created_yet_c44a94f4": {
+    "message": "لم يتم إنشاء أي إعلانات حتى الآن."
+  },
+  "no_announcements_found_20185afc": {
+    "message": "لم يتم العثور على إعلانات."
+  },
+  "no_assignments_created_yet_1b236d87": {
+    "message": "لم يتم إنشاء مهام حتى الآن."
+  },
+  "no_assignments_found_79e46d7f": { "message": "لم يتم العثور على مهام." },
   "no_changes_to_save_d29f6e91": { "message": "لا توجد تغييرات للحفظ." },
+  "no_discussions_created_yet_ff99abe3": {
+    "message": "لم يتم إنشاء نقاشات حتى الآن."
+  },
+  "no_discussions_found_9284063b": { "message": "لم يتم العثور على نقاشات." },
   "no_e16d9132": { "message": "لا" },
   "no_file_chosen_9a880793": { "message": "لم يتم اختيار ملف" },
   "no_headers_9bc7dc7f": { "message": "بلا رؤوس" },
+  "no_modules_created_yet_c71b6d4d": {
+    "message": "لم يتم إنشاء وحدات حتى الآن."
+  },
+  "no_modules_found_2df43a40": { "message": "لم يتم العثور على وحدات." },
+  "no_pages_created_yet_c379fa6e": {
+    "message": "لم يتم إنشاء صفحات حتى الآن."
+  },
+  "no_pages_found_6799350": { "message": "لم يتم العثور على صفحات." },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "لا توجد معاينة متوفرة لهذا الملف."
+  },
+  "no_quizzes_created_yet_1a2370b9": {
+    "message": "لم يتم إنشاء اختبارات موجزة حتى الآن."
+  },
+  "no_quizzes_found_c80c537a": {
+    "message": "لم يتم العثور على اختبارات موجزة."
   },
   "no_results_940393cf": { "message": "لا توجد نتائج." },
   "no_results_found_for_filterterm_ad1b04c8": {
@@ -660,6 +702,9 @@ const locale = {
   "one_of_the_following_styles_must_be_added_to_save__1de769aa": {
     "message": "يجب إضافة أحد الأنماط التالية لحفظ الأيقونة: لون الأيقونة، حجم الإطار، نص الأيقونة، الصورة"
   },
+  "one_or_more_files_failed_to_paste_please_try_uploa_7fa39dd3": {
+    "message": "تعذر لصق ملف واحد أو أكثر يرجى تحميل الملفات أو سحبها وإفلاتها."
+  },
   "open_circle_e9bd069": { "message": "دائرة مفتوحة" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "افتح مربع حوار اختصارات لوحة المفاتيح هذا"
@@ -679,6 +724,7 @@ const locale = {
   "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
     "message": "{ p } ليس بروتوكولاً صالحًا الذي يجب أن يكون ftp وhttp وhttps وmailto وskype وإلا سيتم حذفه"
   },
+  "page_50c4823d": { "message": "صفحة" },
   "pages_e5414c2c": { "message": "الصفحات" },
   "paragraph_5e5ad8eb": { "message": "الفقرة" },
   "paragraph_starting_with_start_a59923f8": {
@@ -736,6 +782,7 @@ const locale = {
   "pumpkin_904428d5": { "message": "يقطين" },
   "purple_7678a9fc": { "message": "أرجواني" },
   "quaternions_877024e0": { "message": "الرباعيات" },
+  "quiz_e0dcce8f": { "message": "الاختبار الموجز" },
   "quizzes_7e598f57": { "message": "الاختبارات الموجزة" },
   "rational_numbers_80ddaa4a": { "message": "أعداد جذرية" },
   "real_numbers_7c99df94": { "message": "أعداد حقيقية" },
@@ -818,6 +865,7 @@ const locale = {
   "select_crop_shape_d441feeb": { "message": "حدد قص شكل" },
   "select_language_7c93a900": { "message": "اختر اللغة" },
   "select_video_source_1b5c9dbe": { "message": "حدد مصدر الفيديو" },
+  "selected_274ce24f": { "message": "تم التحديد" },
   "selected_linkfilename_c093b1f2": { "message": "{ linkFileName } المحدد" },
   "selection_b52c4c5e": { "message": "تحديد" },
   "set_header_scope_8c548f40": { "message": "تعيين نطاق الرأس" },
@@ -1026,6 +1074,7 @@ const locale = {
     "message": "Up And Right Diagonal Arrow"
   },
   "up_c553575d": { "message": "لأعلى" },
+  "updated_link_a827e441": { "message": "الارتباط المحدث" },
   "upload_document_253f0478": { "message": "تحميل المستند" },
   "upload_file_fd2361b8": { "message": "تحميل ملف" },
   "upload_image_6120b609": { "message": "تحميل صورة" },

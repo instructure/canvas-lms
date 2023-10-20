@@ -86,12 +86,11 @@ describe "discussions" do
           # truthy setting
           Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
           Account.default.save!
+          course.restrict_quantitative_data = true
+          course.save!
         end
 
         it "hides points possible" do
-          # truthy permission(since enabled is being "not"ed)
-          Account.default.role_overrides.create!(role: student_role, enabled: false, permission: "restrict_quantitative_data")
-          Account.default.reload
           get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/"
           wait_for_ajaximations
           expect(f("#discussion_container").text).to include("This is a graded discussion")
@@ -191,12 +190,11 @@ describe "discussions" do
           # truthy setting
           Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
           Account.default.save!
+          course.restrict_quantitative_data = true
+          course.save!
         end
 
         it "does not hide points possible" do
-          # truthy permission(since enabled is being "not"ed)
-          Account.default.role_overrides.create!(role: teacher_role, enabled: false, permission: "restrict_quantitative_data")
-          Account.default.reload
           get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/"
           wait_for_ajaximations
           expect(f("#discussion_container").text).to include("This is a graded discussion: 10 points possible")
@@ -210,7 +208,7 @@ describe "discussions" do
         f("#discussion-title").send_keys("New Discussion")
         type_in_tiny "textarea[name=message]", "Discussion topic message"
         f("#has_group_category").click
-        drop_down = get_options("#assignment_group_category_id").map(&:text).map(&:strip)
+        drop_down = get_options("#assignment_group_category_id").map { |e| e.text.strip }
         expect(drop_down).to include("category 1")
         click_option("#assignment_group_category_id", @category1.name)
         expect_new_page_load { submit_form(".form-actions") }
@@ -250,7 +248,7 @@ describe "discussions" do
         wait_for_ajaximations
         click_option("#assignment_group_id", assignment_group.name)
         f("#has_group_category").click
-        drop_down = get_options("#assignment_group_category_id").map(&:text).map(&:strip)
+        drop_down = get_options("#assignment_group_category_id").map { |e| e.text.strip }
         expect(drop_down).to include("category 1")
         click_option("#assignment_group_category_id", @category1.name)
         expect_new_page_load { submit_form(".form-actions") }

@@ -28,24 +28,23 @@ module GoogleDrive
     # @param [String] access_token
     #  Optional access_token
     def self.create(client_secrets, refresh_token = nil, access_token = nil)
-      name = "Instructure Google Drive"
-      version = "0.0.1"
-      # identical to the api default except for the .strip on OS_VERSION - ruby 2.5 doesn't like the \n
-      user_agent = "#{name}/#{version} google-api-ruby-client/#{Google::APIClient::VERSION::STRING} #{Google::APIClient::ENV::OS_VERSION.strip} (gzip)"
+      drive = Google::Apis::DriveV3::DriveService.new
+      scopes = [Google::Apis::DriveV3::AUTH_DRIVE_APPDATA, Google::Apis::DriveV3::AUTH_DRIVE_FILE]
+      authorizer = Google::Auth::UserRefreshCredentials.new(
+        client_id: client_secrets["client_id"],
+        client_secret: client_secrets["client_secret"],
+        redirect_uri: client_secrets["redirect_uri"],
+        scope: scopes
+      )
 
-      client = Google::APIClient.new(application_name: name, application_version: version, user_agent:)
-      client.authorization.client_id = client_secrets["client_id"]
-      client.authorization.client_secret = client_secrets["client_secret"]
-      client.authorization.redirect_uri = client_secrets["redirect_uri"]
-      client.authorization.refresh_token = refresh_token if refresh_token
-      client.authorization.access_token = access_token if access_token
-      client.authorization.scope = %w[https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/drive.file]
-      client
+      authorizer.refresh_token = refresh_token if refresh_token
+      authorizer.access_token = access_token if access_token
+      drive.authorization = authorizer
+      drive
     end
 
-    def self.auth_uri(client, state, login = nil)
-      auth_client = client.authorization
-      auth_client.update!
+    def self.auth_uri(drive, state, login = nil)
+      authorizer = drive.authorization
 
       request_data = {
         approval_prompt: :force,
@@ -54,7 +53,7 @@ module GoogleDrive
       }
 
       request_data[:login_hint] = login if login
-      auth_client.authorization_uri(request_data).to_s
+      authorizer.authorization_uri(request_data).to_s
     end
   end
 end

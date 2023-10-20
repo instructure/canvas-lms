@@ -62,6 +62,12 @@ improved_lmgb:
       state: disabled
     beta:
       state: disabled
+menu_option_for_outcome_details_page:
+  type: setting
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Menu Option for Outcome Details Page
+  description: Adds menu option for accessing alignments at the outcome level with Improved Outcomes Management
 outcomes_friendly_description:
   state: hidden
   applies_to: SiteAdmin
@@ -83,3 +89,8 @@ outcome_alignment_summary_with_new_quizzes:
   applies_to: Course
   display_name: New Quizzes included on Outcome Alignment Summary Tab
   description: New Quizzes outcome alignments are included on the Outcome Alignment Summary Tab, which provides a list of alignments for each outcome in a course.
+outcomes_new_decaying_average_calculation:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Outcomes New Decaying Average Calculation Method
+  description: Allows users to use new decaying average as a calulcation method for a given outcome.

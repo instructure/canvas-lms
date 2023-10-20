@@ -101,7 +101,7 @@ he:
       two: "%{count} תלמידים"
     user_count: 
       many: "%{count} משתמשים"
-      one: "%{count} משתמשים"
+      one: "משתמש %{count} "
       other: "%{count} משתמשים"
       two: "%{count} משתמשים"
   GroupUserCollection: 
@@ -5274,7 +5274,7 @@ he:
   count_items_on_page_page_961fc0c7: "%{count} פריטים בדף %{page}"
   count_items_selected_91814713: 
     many: "%{count} פריטים נבחרו"
-    one: "%{count} פריטים נבחרו"
+    one: "פריט אחד נבחר"
     other: "%{count} פריטים נבחרו"
     two: "%{count} פריטים נבחרו"
   count_max_students_2db76773: "%{count} / %{max} תלמידים"
@@ -6634,6 +6634,7 @@ he:
   delete_title_6c18eba5: "ביטול %{title}"
   delete_tool_90ca44da: "ביטול כלי "
   delete_tool_app_9c9f6d35: "האם לבטל את האפליקציה %{tool}  ?"
+  delete_toolname_app_85f9d4ee: "ביטול אפליקציה %{tool} "
   deleted_1be5ed1: נמחק/ה
   deleted_ce03674d: בוטל
   deleted_topic_notice: "הנושא בוטל"

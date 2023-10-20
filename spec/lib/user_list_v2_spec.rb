@@ -154,8 +154,7 @@ describe UserListV2 do
     it "shows duplicates for two results from the current account and the trusted account" do
       account1 = Account.create!
       account2 = Account.create!
-      allow(account1).to receive(:trusted_account_ids).and_return([account2.id])
-      allow(account1).to receive(:trust_exists?).and_return(true)
+      allow(account1).to receive_messages(trusted_account_ids: [account2.id], trust_exists?: true)
 
       user_with_managed_pseudonym(name: "JT", username: "jt@instructure.com", active_all: true, account: account1, sis_user_id: "SISID")
       @user1 = @user

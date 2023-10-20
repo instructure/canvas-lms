@@ -54,6 +54,7 @@ export const ADDRESS_BOOK_RECIPIENTS = gql`
               _id
               id
               name
+              shortName
               observerEnrollmentsConnection(contextCode: $courseContextCode) {
                 nodes {
                   associatedUser {
@@ -74,6 +75,7 @@ export const ADDRESS_BOOK_RECIPIENTS = gql`
   ${PageInfo.fragment}
 `
 
+// This query is used for the compose modal
 export const ADDRESS_BOOK_RECIPIENTS_WITH_COMMON_COURSES = gql`
   query GetAddressBookRecipients(
     $userID: ID!
@@ -92,6 +94,7 @@ export const ADDRESS_BOOK_RECIPIENTS_WITH_COMMON_COURSES = gql`
             nodes {
               id
               name
+              userCount
             }
             pageInfo {
               ...PageInfo
@@ -102,6 +105,7 @@ export const ADDRESS_BOOK_RECIPIENTS_WITH_COMMON_COURSES = gql`
               _id
               id
               name
+              shortName
               commonCoursesConnection {
                 nodes {
                   _id
@@ -146,6 +150,17 @@ export const TOTAL_RECIPIENTS = gql`
   }
 `
 
+export const USER_INBOX_LABELS_QUERY = gql`
+  query GetUserInboxLabels($userID: ID!) {
+    legacyNode(_id: $userID, type: User) {
+      ... on User {
+        id
+        inboxLabels
+      }
+    }
+  }
+`
+
 export const CONVERSATIONS_QUERY = gql`
   query GetConversationsQuery(
     $userID: ID!
@@ -172,6 +187,7 @@ export const CONVERSATIONS_QUERY = gql`
                   ...ConversationMessage
                 }
               }
+              conversationMessagesCount
             }
           }
           pageInfo {

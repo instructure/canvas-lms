@@ -59,6 +59,15 @@ export function scoreToPercentage(score: number, pointsPossible: number) {
   return toNumber(multiply(divide(score, pointsPossible), 100))
 }
 
+export function scoreToScaledPoints(score: number, pointsPossible: number, scalingFactor: number) {
+  const scoreAsScaledPoints = score / (pointsPossible / scalingFactor)
+  if (!Number.isFinite(scoreAsScaledPoints)) {
+    return scoreAsScaledPoints
+  }
+
+  return toNumber(divide(score, divide(pointsPossible, scalingFactor)))
+}
+
 export function weightedPercent({
   score,
   possible,

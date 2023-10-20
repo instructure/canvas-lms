@@ -315,7 +315,7 @@ module Quizzes
 
     delegate lockdown_browser_monitor_data: :quiz
 
-    def serializable_object(**)
+    def serializable_object(...)
       hash = super
       # legacy v1 api
       if accepts_jsonapi?
@@ -447,7 +447,7 @@ module Quizzes
     end
 
     def in_paced_course
-      context.try(:enable_course_paces)
+      context.account.feature_enabled?(:course_paces) && context.try(:enable_course_paces)
     end
   end
 end

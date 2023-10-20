@@ -42,6 +42,10 @@
       style="word-break: break-word">
       <%= Enrollment.workflow_readable_type(enrollment.readable_state_based_on_date) %>,
       <%= t("Enrolled as: %{enrollment_type}", enrollment_type: enrollment.readable_role_name) %>
+      <% if enrollment.temporary_enrollment? && enrollment.start_at && enrollment.end_at %>
+        <%= t("| %{start_at} - %{end_at}", start_at: datetime_string(enrollment.start_at), end_at: datetime_string(enrollment.end_at)) %>
+        <%= t("| %{provider}", provider: enrollment.temporary_enrollment_source_user.name) %>
+      <% end %>
       <% if enrollment.associated_user %>
         <%= t('linked_to_user', '(Linked to %{user_name})', :user_name => enrollment.associated_user.name) %>
       <% end %>
@@ -51,7 +55,7 @@
     <% if enrollment.can_be_deleted_by(@current_user, enrollment.course, session) %>
       <a href="#" rel="<%= api_v1_destroy_enrollment_url(enrollment.course_id, enrollment.id, {:task => "delete"}) %>" class="unenroll_link" role="button">
         <i class="icon-end standalone-icon"></i>
-        <span class="screenreader-only"><%= t(:unenrollr, "Unenroll") %></span>
+        <span class="screenreader-only"><%= t("Unenroll") %></span>
       </a>
     <% end %>
   </span>

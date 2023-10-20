@@ -76,7 +76,9 @@ Outcome.prototype.setMasteryScales = function () {
 Outcome.prototype.defaultCalculationInt = function () {
   return {
     n_mastery: 5,
+    weighted_average: 65,
     decaying_average: 65,
+    standard_decaying_average: 65,
   }[this.get('calculation_method')]
 }
 
@@ -105,8 +107,14 @@ Outcome.prototype.initialize = function () {
 }
 
 Outcome.prototype.setDefaultCalcSettings = function () {
+  let default_calculation_method = 'decaying_average'
+
+  if (ENV.OUTCOMES_NEW_DECAYING_AVERAGE_CALCULATION) {
+    default_calculation_method = 'weighted_average'
+  }
+
   return this.set({
-    calculation_method: 'decaying_average',
+    calculation_method: default_calculation_method,
     calculation_int: '65',
   })
 }

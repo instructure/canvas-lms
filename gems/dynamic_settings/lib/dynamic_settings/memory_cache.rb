@@ -26,11 +26,6 @@ module DynamicSettings
       clear
     end
 
-    def write_set(hash, ttl: nil)
-      opts = { expires_in: ttl }
-      hash.each { |k, v| write(k, v, opts) }
-    end
-
     # Everything from here down is actully a reimplementation
     # of some ideas that existed in the caching layer canvas proper.
     # That was a circular dependency, which we broke (kind of) by making this

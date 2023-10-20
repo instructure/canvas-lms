@@ -522,6 +522,18 @@ module RCENextPage
     fj('label:contains("Display Text Link (Opens in a new tab)")')
   end
 
+  def current_link_label
+    f('[data-testid="selected-link-name"]')
+  end
+
+  def click_replace_link_button
+    f('[data-testid="replace-link-button"]').click
+  end
+
+  def click_cancel_replace_button
+    f('[data-testid="cancel-replace-button"]').click
+  end
+
   def click_display_text_link_option
     display_text_link_option.click
   end
@@ -567,6 +579,23 @@ module RCENextPage
 
   def sidebar_link(title)
     fj("aside li:contains('#{title}')")
+  end
+
+  def create_wiki_page_link(title)
+    click_course_links_toolbar_menuitem
+    click_pages_accordion
+    click_course_item_link(title)
+  end
+
+  def open_edit_link_tray
+    click_link_for_options
+    click_link_options_button
+  end
+
+  def change_link_text_input(new_text)
+    input = f('[data-testid="link-text-input"]')
+    input.send_keys(:backspace) until input.property("value").empty?
+    input.send_keys(new_text)
   end
 
   #=====================================================================================================================

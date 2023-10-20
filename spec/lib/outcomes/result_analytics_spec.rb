@@ -237,6 +237,7 @@ describe Outcomes::ResultAnalytics do
     it "does not return rollup scores when all results are nil" do
       o = (1..3).map do |i|
         outcome_from_score(nil, { method: "decaying_average", calc_int: 75, submitted_time: time - i.days })
+        outcome_from_score(nil, { method: "standard_decaying_average", calc_int: 65, submitted_time: time - i.days })
         outcome_from_score(nil, { id: 81, method: "n_mastery", calc_int: 3, submitted_time: time - i.days })
         outcome_from_score(nil, { id: 82, method: "latest", calc_int: 3, submitted_time: time - i.days })
         outcome_from_score(nil, { id: 83, method: "highest", calc_int: 3, submitted_time: time - i.days })
@@ -329,6 +330,39 @@ describe Outcomes::ResultAnalytics do
       rollups = ra.rollup_user_results(results)
       expect(rollups.size).to eq 3
       expect(rollups.map(&:score)).to eq [2.65, 2.12, 3.33]
+    end
+
+    it "properly calculates results for New standard_decaying_average method when feature_flag is ON" do
+      LoadAccount.default_domain_root_account.enable_feature!(:outcomes_new_decaying_average_calculation)
+      o1 = outcome_from_score(3.0, { method: "standard_decaying_average", calc_int: 65, submitted_time: time })
+      o2 = [2.0, 3.0, 4.0].map.with_index do |result, i|
+        outcome_from_score(result, { id: 81, method: "standard_decaying_average", calc_int: 65, name: "name, o2", submitted_time: time + i.days })
+      end
+      results = [o1, o2].flatten
+      rollups = ra.rollup_user_results(results)
+      expect(rollups.size).to eq 2
+      expect(rollups.map(&:score)).to eq [3.0, 3.53]
+    end
+
+    it "properly calculates results for OLD decaying_average method when feature_flag is OFF" do
+      LoadAccount.default_domain_root_account.disable_feature!(:outcomes_new_decaying_average_calculation)
+      o1 = outcome_from_score(3.0, { method: "decaying_average", calc_int: 65, submitted_time: time })
+      o2 = [2.0, 3.0, 4.0].map.with_index do |result, i|
+        outcome_from_score(result, { id: 81, method: "decaying_average", calc_int: 65, name: "name, o2", submitted_time: time + i.days })
+      end
+      results = [o1, o2].flatten
+      rollups = ra.rollup_user_results(results)
+      expect(rollups.size).to eq 2
+      expect(rollups.map(&:score)).to eq [3.0, 3.48]
+    end
+
+    it "does not error out and correctly averages when a result has a score of nil when method is standard_decaying_average and feature_flag is ON" do
+      LoadAccount.default_domain_root_account.enable_feature!(:outcomes_new_decaying_average_calculation)
+      results = [2.0, 3.0, nil, 4.0].map do |result|
+        outcome_from_score(result, { method: "standard_decaying_average", calc_int: 65 })
+      end
+      rollups = ra.rollup_user_results(results)
+      expect(rollups.map(&:score)).to eq [3.53]
     end
   end
 

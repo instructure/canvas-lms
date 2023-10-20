@@ -131,7 +131,7 @@ module QuizzesNext
     end
 
     def in_paced_course
-      context.try(:enable_course_paces)
+      context.account.feature_enabled?(:course_paces) && context.try(:enable_course_paces)
     end
   end
 end

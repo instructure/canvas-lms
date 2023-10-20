@@ -60,14 +60,23 @@
   float: right;
 }
 
+/* inherited caption "?" icon for tooltip */
+.mejs-captions-selector .track-tip-container {
+  position: absolute;
+  top: 5px;
+}
+
 /* "x" button to remove a subtitle */
 .mejs-captions-selector a[data-remove] {
   position: absolute;
-  top: 0;
+  top: 5px;
   color: white;
 }
-[dir="ltr"] .mejs-captions-selector a[data-remove] { right: 0 }
-[dir="rtl"] .mejs-captions-selector a[data-remove] { left: 0 }
+[dir="ltr"] .mejs-captions-selector a[data-remove] { right: 5px }
+[dir="rtl"] .mejs-captions-selector a[data-remove] { left: 5px }
+
+[dir="ltr"] .mejs-captions-selector .track-tip-container { right: 6px }
+[dir="rtl"] .mejs-captions-selector .track-tip-container { left: 6px }
 
 
 /* style menu items without a radio button */
@@ -94,6 +103,18 @@
   width: 1px;
   height: 1px;
 }
+
+.mejs-button [role="menu"] ul li input[type="radio"]:not(:checked)+span {
+  display: none;
+}
+
+.mejs-button [role="menu"] ul li input[type="radio"]:checked+span {
+  display: inline;
+  position: absolute;
+  top: 5px;
+  left: 2px;
+}
+
 .mejs-button [role="menu"] ul li label {
   cursor: pointer;
 }

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -60,7 +59,9 @@ export const getDueDates = (
   blackoutDates: BlackoutDate[],
   startDate?: string
 ): CoursePaceItemDueDates => {
-  const dueDates = {}
+  const dueDates: {
+    [key: string]: string
+  } = {}
   if (!startDate) return dueDates
 
   let currentStart = DateHelpers.formatDate(moment(startDate))

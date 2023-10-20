@@ -21,6 +21,13 @@ import {Navigate} from 'react-router-dom'
 import {TabLayout} from '../pages/TabLayout'
 import {AccountGradingSchemes} from '../pages/AccountGradingSchemes'
 import {AccountGradingPeriods} from '../pages/AccountGradingPeriods'
+import {AccountGradingStatuses} from '../pages/AccountGradingStatuses'
+import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+
+declare const ENV: GlobalEnv & {
+  IS_ROOT_ACCOUNT: boolean
+  ROOT_ACCOUNT_ID: string
+}
 
 export const accountGradingSettingsRoutes = [
   {
@@ -30,6 +37,15 @@ export const accountGradingSettingsRoutes = [
       {path: '', element: <Navigate to="schemes" replace={true} />},
       {path: 'periods', element: <AccountGradingPeriods />},
       {path: 'schemes', element: <AccountGradingSchemes />},
+      {
+        path: 'statuses',
+        element: (
+          <AccountGradingStatuses
+            isRootAccount={ENV.IS_ROOT_ACCOUNT}
+            rootAccountId={ENV.ROOT_ACCOUNT_ID}
+          />
+        ),
+      },
     ],
   },
 ]

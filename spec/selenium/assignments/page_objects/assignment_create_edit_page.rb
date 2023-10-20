@@ -75,6 +75,22 @@ class AssignmentCreateEditPage
       f("button svg[name='IconArrowOpenDown']")
     end
 
+    def due_date_picker_btn
+      f("#overrides-wrapper button.ui-datepicker-trigger.btn")
+    end
+
+    def due_date_picker_popup
+      f("#ui-datepicker-div")
+    end
+
+    def due_date_picker_done_btn
+      f("button.ui-datepicker-ok")
+    end
+
+    def due_date_input
+      f("input.datePickerDateField.DueDateInput")
+    end
+
     # Moderated Grading Options
     def select_grader_dropdown
       f("select[name='final_grader_id']")
@@ -94,6 +110,14 @@ class AssignmentCreateEditPage
 
     def assignment_edit_permission_error_text
       f("#unauthorized_message")
+    end
+
+    def hide_from_gradebooks_checkbox
+      f("#assignment_hide_in_gradebook")
+    end
+
+    def omit_from_final_grade_checkbox
+      f("#assignment_omit_from_final_grade")
     end
 
     # Methods & Actions

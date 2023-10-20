@@ -19,7 +19,6 @@
 #
 
 require "oauth2"
-require "canvas/core_ext/oauth2"
 
 class AuthenticationProvider::OAuth < AuthenticationProvider::Delegated
   SENSITIVE_PARAMS = [:consumer_secret].freeze

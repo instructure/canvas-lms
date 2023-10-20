@@ -184,21 +184,44 @@ RSpec.describe Mutations::AddConversationMessage do
     expect(@conversation.reload.messages.count(:all)).to eq 2
   end
 
-  it "generates a user note when requested" do
-    Account.default.update_attribute(:enable_user_notes, true)
-    conversation(users: [@teacher])
+  context "when the deprecate_faculty_journal feature flag is disabled" do
+    before { Account.site_admin.disable_feature!(:deprecate_faculty_journal) }
 
-    result = run_mutation({ conversation_id: @conversation.conversation_id, body: "Have a note", recipients: [@student.id.to_s] }, @teacher)
-    expect(result["errors"]).to be_nil
-    cm = ConversationMessage.find(result.dig("data", "addConversationMessage", "conversationMessage", "_id"))
-    student = cm.recipients.first
-    expect(student.user_notes.size).to eq 0
+    it "generates a user note when requested" do
+      Account.default.update_attribute(:enable_user_notes, true)
+      conversation(users: [@teacher])
 
-    result = run_mutation({ conversation_id: @conversation.conversation_id, body: "Have a note", recipients: [@student.id.to_s], user_note: true }, @teacher)
-    expect(result["errors"]).to be_nil
-    cm = ConversationMessage.find(result.dig("data", "addConversationMessage", "conversationMessage", "_id"))
-    student = cm.recipients.first
-    expect(student.user_notes.size).to eq 1
+      result = run_mutation({ conversation_id: @conversation.conversation_id, body: "Have a note", recipients: [@student.id.to_s] }, @teacher)
+      expect(result["errors"]).to be_nil
+      cm = ConversationMessage.find(result.dig("data", "addConversationMessage", "conversationMessage", "_id"))
+      student = cm.recipients.first
+      expect(student.user_notes.size).to eq 0
+
+      result = run_mutation({ conversation_id: @conversation.conversation_id, body: "Have a note", recipients: [@student.id.to_s], user_note: true }, @teacher)
+      expect(result["errors"]).to be_nil
+      cm = ConversationMessage.find(result.dig("data", "addConversationMessage", "conversationMessage", "_id"))
+      student = cm.recipients.first
+      expect(student.user_notes.size).to eq 1
+    end
+  end
+
+  context "when the deprecated_faculty_journal feature flag is enabled" do
+    it "does not generate a user note when requested" do
+      Account.default.update_attribute(:enable_user_notes, true)
+      conversation(users: [@teacher])
+
+      result = run_mutation({ conversation_id: @conversation.conversation_id, body: "Have a note", recipients: [@student.id.to_s] }, @teacher)
+      expect(result["errors"]).to be_nil
+      cm = ConversationMessage.find(result.dig("data", "addConversationMessage", "conversationMessage", "_id"))
+      student = cm.recipients.first
+      expect(student.user_notes.size).to eq 0
+
+      result = run_mutation({ conversation_id: @conversation.conversation_id, body: "Have a note", recipients: [@student.id.to_s], user_note: true }, @teacher)
+      expect(result["errors"]).to be_nil
+      cm = ConversationMessage.find(result.dig("data", "addConversationMessage", "conversationMessage", "_id"))
+      student = cm.recipients.first
+      expect(student.user_notes.size).to eq 0
+    end
   end
 
   it "does not allow new messages in concluded courses for students" do

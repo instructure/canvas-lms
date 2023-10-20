@@ -19,9 +19,9 @@
 
 if $0 == "irb"
   TeeLogger = Struct.new(:loggers) do
-    def method_missing(method, *args, &)
+    def method_missing(...)
       loggers.each do |logger|
-        logger.send(method, *args, &)
+        logger.send(...)
       end
     end
   end

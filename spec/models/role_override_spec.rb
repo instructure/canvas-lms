@@ -566,13 +566,28 @@ describe RoleOverride do
         expect(RoleOverride.enabled_for?(Account.default, :manage_user_notes, @role)).to eq []
       end
 
-      it "allows with account_allows on" do
-        Account.default.tap do |a|
-          a.enable_user_notes = true
-          a.save!
+      context "when the deprecate_faculty_journal flag is disabled" do
+        before { Account.site_admin.disable_feature!(:deprecate_faculty_journal) }
+
+        it "allows with account_allows on" do
+          Account.default.tap do |a|
+            a.enable_user_notes = true
+            a.save!
+          end
+          expect(RoleOverride.enabled_for?(Account.default, :manage_user_notes, admin_role)).to_not eq []
+          expect(RoleOverride.enabled_for?(Account.default, :manage_user_notes, @role)).to_not eq []
         end
-        expect(RoleOverride.enabled_for?(Account.default, :manage_user_notes, admin_role)).to_not eq []
-        expect(RoleOverride.enabled_for?(Account.default, :manage_user_notes, @role)).to_not eq []
+      end
+
+      context "when the deprecated_faculty_journal flag is enabled" do
+        it "does not allow with account_allows on" do
+          Account.default.tap do |a|
+            a.enable_user_notes = true
+            a.save!
+          end
+          expect(RoleOverride.enabled_for?(Account.default, :manage_user_notes, admin_role)).to eq []
+          expect(RoleOverride.enabled_for?(Account.default, :manage_user_notes, @role)).to eq []
+        end
       end
     end
   end
@@ -610,6 +625,24 @@ describe RoleOverride do
   describe "specific permissions" do
     before(:once) do
       account_model
+    end
+
+    describe "manage_temp_enroll" do
+      let(:add_perm) { RoleOverride.permissions[:temporary_enrollments_add] }
+      let(:edit_perm) { RoleOverride.permissions[:temporary_enrollments_edit] }
+      let(:del_perm) { RoleOverride.permissions[:temporary_enrollments_delete] }
+
+      it "is true for AccountAdmin by default" do
+        expect(edit_perm[:true_for]).to match_array ["AccountAdmin"]
+        expect(del_perm[:true_for]).to match_array ["AccountAdmin"]
+        expect(add_perm[:true_for]).to match_array ["AccountAdmin"]
+      end
+
+      it "is available to admin role types" do
+        expect(edit_perm[:available_to]).to match_array %w[AccountAdmin AccountMembership]
+        expect(add_perm[:available_to]).to match_array %w[AccountAdmin AccountMembership]
+        expect(del_perm[:available_to]).to match_array %w[AccountAdmin AccountMembership]
+      end
     end
 
     describe "manage_proficiency_calculations" do
@@ -658,6 +691,19 @@ describe RoleOverride do
       it "is available to teachers, TAs, admins and account memberships" do
         expect(permission[:available_to]).to match_array %w[TeacherEnrollment AccountAdmin AccountMembership]
       end
+    end
+
+    it "view_course_changes" do
+      root_account = @account.root_account
+      sub_account = root_account.sub_accounts.create!
+      root_admin = User.create!
+      sub_admin = User.create!
+      root_account.account_users.create!(user: root_admin)
+      sub_account.account_users.create!(user: sub_admin)
+
+      expect(root_account.grants_right?(root_admin, :view_course_changes)).to be true
+      expect(root_account.grants_right?(sub_admin, :view_course_changes)).to be false
+      expect(sub_account.grants_right?(sub_admin, :view_course_changes)).to be false
     end
   end
 

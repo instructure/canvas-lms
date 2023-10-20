@@ -59,7 +59,7 @@ describe "student k5 dashboard schedule" do
       expect(todo_editor_modal).to be_displayed
     end
 
-    it "provide close without edit button", ignore_js_errors: true do
+    it "provide close without edit button", :ignore_js_errors do
       get "/#schedule"
 
       click_todo_edit_pencil
@@ -118,6 +118,7 @@ describe "student k5 dashboard schedule" do
     end
 
     it "does not display points possible if RQD is enabled" do
+      skip "VICE-3678 7/23/2023"
       assignment1 = create_dated_assignment(@subject_course, "missing assignment", 1.day.ago(@now))
       # truthy feature flag
       Account.default.enable_feature! :restrict_quantitative_data
@@ -132,6 +133,8 @@ describe "student k5 dashboard schedule" do
       # now truthy setting
       Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
       Account.default.save!
+      @subject_course.restrict_quantitative_data = true
+      @subject_course.save!
 
       get "/#schedule"
 
@@ -156,6 +159,7 @@ describe "student k5 dashboard schedule" do
     end
 
     it "clicking list twice hides missing assignments" do
+      skip "VICE-3678 7/23/2023"
       create_dated_assignment(@subject_course, "missing assignment1", 1.day.ago(@now))
 
       get "/#schedule"

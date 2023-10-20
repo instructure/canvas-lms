@@ -57,6 +57,22 @@ module Types
       account.associated_courses
     end
 
+    field :custom_grade_statuses_connection, CustomGradeStatusType.connection_type, null: true
+    def custom_grade_statuses_connection
+      return unless Account.site_admin.feature_enabled?(:custom_gradebook_statuses)
+      return unless account.root_account.grants_right?(current_user, session, :manage)
+
+      account.custom_grade_statuses.active.order(:id)
+    end
+
+    field :standard_grade_statuses_connection, StandardGradeStatusType.connection_type, null: true
+    def standard_grade_statuses_connection
+      return unless Account.site_admin.feature_enabled?(:custom_gradebook_statuses)
+      return unless account.root_account.grants_right?(current_user, session, :manage)
+
+      account.standard_grade_statuses.order(:id)
+    end
+
     field :sub_accounts_connection, AccountType.connection_type, null: true
     def sub_accounts_connection
       account.sub_accounts.order(:id)

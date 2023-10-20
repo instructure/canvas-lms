@@ -40,8 +40,7 @@
 # THE SOFTWARE.
 #
 
-require "rubygems"
-require "active_support"
+require "active_support/core_ext/module/delegation"
 require "ostruct"
 
 module Workflow
@@ -295,10 +294,10 @@ module Workflow
   end
 
   def self.included(klass)
-    klass.send :include, WorkflowInstanceMethods
+    klass.include WorkflowInstanceMethods
     klass.extend WorkflowClassMethods
     if klass < ActiveRecord::Base
-      klass.send :include, ActiveRecordInstanceMethods
+      klass.include ActiveRecordInstanceMethods
       klass.before_validation :write_initial_state
     end
   end

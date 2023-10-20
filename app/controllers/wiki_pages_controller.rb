@@ -109,6 +109,10 @@ class WikiPagesController < ApplicationController
 
       if authorized_action(@page, @current_user, :read) &&
          (!@context.conditional_release? || enforce_assignment_visible(@page))
+        if params[:id] != @page.url
+          InstStatsd::Statsd.increment("wikipage.show.page_url_resolved")
+          redirect_to polymorphic_url([@context, :wiki_page], id: @page, titleize: params[:titleize])
+        end
         add_crumb(@page.title)
         log_asset_access(@page, "wiki", @wiki)
         wiki_pages_js_env(@context)
@@ -169,9 +173,13 @@ class WikiPagesController < ApplicationController
     @wiki_pages_env ||= {
       wiki_page_menu_tools: external_tools_display_hashes(:wiki_page_menu),
       wiki_index_menu_tools: external_tools_display_hashes(:wiki_index_menu),
-      DISPLAY_SHOW_ALL_LINK: tab_enabled?(context.class::TAB_PAGES, { no_render: true }) && !@k5_details_view,
+      DISPLAY_SHOW_ALL_LINK: tab_enabled?(context.class::TAB_PAGES, no_render: true) && !@k5_details_view,
       CAN_SET_TODO_DATE: context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_edit)
     }
+    if Account.site_admin.feature_enabled?(:permanent_page_links)
+      title_availability_path = context.is_a?(Course) ? api_v1_course_page_title_availability_path : api_v1_group_page_title_availability_path
+      @wiki_pages_env[:TITLE_AVAILABILITY_PATH] = title_availability_path
+    end
     js_env(@wiki_pages_env)
     @wiki_pages_env
   end

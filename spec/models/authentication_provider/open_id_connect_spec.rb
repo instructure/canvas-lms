@@ -62,7 +62,7 @@ describe AuthenticationProvider::OpenIDConnect do
 
     it "returns nil if the id_token is missing" do
       connect = described_class.new
-      uid = connect.unique_id(double(params: { "id_token" => nil }, options: {}))
+      uid = connect.unique_id(instance_double(OAuth2::AccessToken, params: { "id_token" => nil }, token: nil, options: {}))
       expect(uid).to be_nil
     end
   end

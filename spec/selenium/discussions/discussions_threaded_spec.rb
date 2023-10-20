@@ -285,7 +285,7 @@ describe "threaded discussions" do
     end
   end
 
-  context "when discussions redesign feature flag is ON", ignore_js_errors: true do
+  context "when discussions redesign feature flag is ON", :ignore_js_errors do
     before :once do
       Account.site_admin.enable_feature! :react_discussions_post
     end
@@ -527,6 +527,7 @@ describe "threaded discussions" do
         it "replies correctly to second reply" do
           f("button[data-testid='expand-button']").click
           wait_for_ajaximations
+          wait_for(method: nil, timeout: 5) { ff("button[data-testid='threading-toolbar-reply']").length >= 3 }
           ff("button[data-testid='threading-toolbar-reply']")[2].click
           wait_for_ajaximations
           type_in_tiny("textarea", "replying to 2nd level reply")
@@ -548,6 +549,7 @@ describe "threaded discussions" do
         it "replies correctly to third reply" do
           f("button[data-testid='expand-button']").click
           wait_for_ajaximations
+          wait_for(method: nil, timeout: 5) { ff("button[data-testid='threading-toolbar-reply']").length >= 3 }
           ff("button[data-testid='threading-toolbar-reply']")[2].click
           wait_for_ajaximations
           type_in_tiny("textarea", "replying to 3rd level reply")
@@ -572,6 +574,7 @@ describe "threaded discussions" do
           f("button[data-testid='expand-button']").click
           wait_for_ajaximations
           wait_for_ajaximations
+          wait_for(method: nil, timeout: 5) { ff("button[data-testid='threading-toolbar-reply']").length >= 4 }
           ff("button[data-testid='threading-toolbar-reply']")[3].click
           wait_for_ajaximations
           type_in_tiny("textarea", "replying to 4th level reply")
@@ -618,6 +621,7 @@ describe "threaded discussions" do
           it "quotes second_reply correctly" do
             f("button[data-testid='expand-button']").click
             wait_for_ajaximations
+            wait_for(method: nil, timeout: 5) { ff("button[data-testid='thread-actions-menu']").length >= 2 }
             ff("button[data-testid='thread-actions-menu']")[1].click
             f("span[data-testid='quote']").click
             wait_for_ajaximations
@@ -637,13 +641,14 @@ describe "threaded discussions" do
             expect(new_reply.quoted_entry_id).to eq @second_reply.id
 
             # Verify that the correct quote is created after submission
+            wait_for(method: nil, timeout: 5) { fj("div[data-testid='reply-preview']:contains('#{@second_reply.summary}')").displayed? }
             expect(fj("div[data-testid='reply-preview']:contains('#{@second_reply.summary}')")).to be_present
           end
 
           it "quotes third_reply correctly" do
-            skip("Until VICE-3243")
             f("button[data-testid='expand-button']").click
             wait_for_ajaximations
+            wait_for(method: nil, timeout: 5) { ff("button[data-testid='thread-actions-menu']").length >= 3 }
             ff("button[data-testid='thread-actions-menu']")[2].click
             f("span[data-testid='quote']").click
             wait_for_ajaximations
@@ -664,15 +669,14 @@ describe "threaded discussions" do
 
             # Verify that the correct quote is created after submission
             expect(fj("div[data-testid='reply-preview']:contains('#{@third_reply.summary}')")).to be_present
-            expect(new_reply.message).to eq "<p><span class=\"mceNonEditable mention\" data-mention=\"1\" data-reactroot=\"\">@#{@third_reply.author_name}</span>replying to 3rd level reply</p>"
+            expect(new_reply.message).to eq "<p><span class=\"mceNonEditable mention\" data-mention=\"1\" data-reactroot=\"\">@#{@third_reply.author_name}</span>quoting 3rd level reply</p>"
           end
 
           it "quotes fourth_reply correctly" do
-            skip("Until VICE-3243")
-
             f("button[data-testid='expand-button']").click
             wait_for_ajaximations
             wait_for_ajaximations
+            wait_for(method: nil, timeout: 5) { ff("button[data-testid='thread-actions-menu']").length >= 4 }
             ff("button[data-testid='thread-actions-menu']")[3].click
             f("span[data-testid='quote']").click
             wait_for_ajaximations
@@ -869,10 +873,14 @@ describe "threaded discussions" do
           end
 
           it "quotes third_reply correctly" do
-            skip("until VICE-3243")
+            # Open split-screen view
             f("button[data-testid='expand-button']").click
             wait_for_ajaximations
-            ff("button[data-testid='thread-actions-menu']")[3].click
+            # Open second level replies
+            ff("button[data-testid='expand-button']").last.click
+            wait_for_ajaximations
+            # Quote the 3rd level reply
+            ff("button[data-testid='thread-actions-menu']").last.click
             f("span[data-testid='quote']").click
             wait_for_ajaximations
 
@@ -893,15 +901,21 @@ describe "threaded discussions" do
             # Verify that the correct quote is created after submission
             expect(fj("div[data-testid='reply-preview']:contains('#{@third_reply.summary}')")).to be_present
             # Verify that the correct @mentions is created
-            expect(new_reply.message).to eq "<p><span class=\"mceNonEditable mention\" data-mention=\"1\" data-reactroot=\"\">@#{@third_reply.author_name}</span>replying to 3rd level reply</p>"
+            expect(new_reply.message).to eq "<p><span class=\"mceNonEditable mention\" data-mention=\"1\" data-reactroot=\"\">@#{@third_reply.author_name}</span>quoting 3rd level reply</p>"
           end
 
           it "quotes fourth_reply correctly" do
-            skip("until VICE-3243")
+            # Open split-screen view
             f("button[data-testid='expand-button']").click
             wait_for_ajaximations
+            # Open second level replies
+            ff("button[data-testid='expand-button']").last.click
             wait_for_ajaximations
-            ff("button[data-testid='thread-actions-menu']")[3].click
+            # Open third level replies
+            ff("button[data-testid='expand-button']").last.click
+            wait_for_ajaximations
+            # Quotes the fourst level reply
+            ff("button[data-testid='thread-actions-menu']").last.click
             f("span[data-testid='quote']").click
             wait_for_ajaximations
 
@@ -1048,6 +1062,7 @@ describe "threaded discussions" do
       expect(f("body")).not_to contain_jqcss("div:contains('2nd level reply')")
       f("button[data-testid='expand-button']").click
       wait_for_ajaximations
+      wait_for(method: nil, timeout: 5) { ff("button[data-testid='threading-toolbar-reply']").length >= 3 }
       ff("button[data-testid='threading-toolbar-reply']")[2].click
       wait_for_ajaximations
       type_in_tiny("textarea", "replying to 3rd level reply")
@@ -1119,6 +1134,15 @@ describe "threaded discussions" do
           message: "this a student entry"
         )
 
+        # make sure nil_participant_entries do not cause the page to 500 and continues to
+        # load the good entries instead
+        nil_participant = student_in_course(course: @course, name: "Mr Nil", active_all: true).user
+        anon_topic.discussion_entries.create!(
+          user: nil_participant,
+          message: "this a nil participant entry"
+        )
+        DiscussionTopicParticipant.where(discussion_topic_id: anon_topic.id, user_id: [nil_participant.id]).delete_all
+
         user_session(@teacher)
         get "/courses/#{@course.id}/discussion_topics/#{anon_topic.id}"
         expect(fj("span[data-testid='non-graded-discussion-info'] span:contains('Anonymous Discussion')")).to be_present
@@ -1128,6 +1152,7 @@ describe "threaded discussions" do
         expect(student_entry.author_name).to include "Anonymous "
         expect(authors).to include("teacher", "TA", "Designer", student_entry.author_name)
         expect(authors).not_to include("student")
+        expect(authors).not_to include("Mr Nil")
       end
     end
 

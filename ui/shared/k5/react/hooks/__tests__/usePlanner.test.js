@@ -19,9 +19,9 @@
 import {renderHook} from '@testing-library/react-hooks'
 import usePlanner from '../usePlanner'
 
-jest.mock('@instructure/canvas-planner')
+jest.mock('@canvas/planner')
 // eslint-disable-next-line import/no-commonjs
-const plannerExports = require('@instructure/canvas-planner')
+const plannerExports = require('@canvas/planner')
 
 plannerExports.initializePlanner = jest.fn(options => Promise.resolve(options))
 

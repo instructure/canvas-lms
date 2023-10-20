@@ -92,6 +92,7 @@ class DiscussionTopic < ActiveRecord::Base
            dependent: :destroy
   has_many :course_sections, through: :discussion_topic_section_visibilities, dependent: :destroy
   belongs_to :user
+  has_one :master_content_tag, class_name: "MasterCourses::MasterContentTag", inverse_of: :discussion_topic
 
   validates_associated :discussion_topic_section_visibilities
   validates :context_id, :context_type, presence: true
@@ -892,7 +893,8 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def publish
-    self.workflow_state = "active"
+    # follows the logic of setting post_delayed in other places of this file
+    self.workflow_state = (delayed_post_at && delayed_post_at > Time.now) ? "post_delayed" : "active"
     self.last_reply_at = Time.now
     self.posted_at = Time.now
   end

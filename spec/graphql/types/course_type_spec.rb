@@ -92,9 +92,99 @@ describe Types::CourseType do
     end
   end
 
+  describe "relevantGradingPeriodGroup" do
+    let!(:grading_period_group) { Account.default.grading_period_groups.create!(title: "a test group") }
+
+    it "returns the grading period group for the course" do
+      enrollment_term = course.enrollment_term
+      enrollment_term.update(grading_period_group_id: grading_period_group.id)
+      expect(course.relevant_grading_period_group).to eq grading_period_group
+      expect(course_type.resolve("relevantGradingPeriodGroup { _id }")).to eq grading_period_group.id.to_s
+    end
+  end
+
   describe "assignmentsConnection" do
     let_once(:assignment) do
       course.assignments.create! name: "asdf", workflow_state: "unpublished"
+    end
+
+    context "user_id filter" do
+      let_once(:other_student) do
+        other_user = user_factory(active_all: true, active_state: "active")
+        @course.enroll_student(other_user, enrollment_state: "active").user
+      end
+
+      # Create an observer in the course that observes the other_student
+      let_once(:observer) do
+        course_with_observer(course: @course, associated_user_id: other_student.id)
+        @observer
+      end
+
+      # Create an assignment that is only visible to other_student
+      before(:once) do
+        # Set the assigment to active
+        assignment.workflow_state = "active"
+        assignment.save
+
+        @overridden_assignment = course.assignments.create!(title: "asdf",
+                                                            workflow_state: "published",
+                                                            only_visible_to_overrides: true)
+
+        override = assignment_override_model(assignment: @overridden_assignment)
+        override.assignment_override_students.build(user: other_student)
+        override.save!
+      end
+
+      it "filters assignments by userId correctly for students" do
+        expect(
+          course_type.resolve(<<~GQL, current_user: other_student)
+            assignmentsConnection(filter: {userId: "#{other_student.id}"}) { edges { node { _id } } }
+          GQL
+        ).to eq [assignment.id.to_s, @overridden_assignment.id.to_s]
+
+        # the other_student lacks permission to see @student's assignments
+        expect(
+          course_type.resolve(<<~GQL, current_user: other_student)
+            assignmentsConnection(filter: {userId: "#{@student.id}"}) { edges { node { _id } } }
+          GQL
+        ).to eq []
+      end
+
+      it "filters assignments by userId correctly for observers" do
+        expect(
+          course_type.resolve(<<~GQL, current_user: observer)
+            assignmentsConnection(filter: {userId: "#{other_student.id}"}) { edges { node { _id } } }
+          GQL
+        ).to eq [assignment.id.to_s, @overridden_assignment.id.to_s]
+
+        # the observer doesn't observer @student, so it can not see their assignments
+        expect(
+          course_type.resolve(<<~GQL, current_user: observer)
+            assignmentsConnection(filter: {userId: "#{@student.id}"}) { edges { node { _id } } }
+          GQL
+        ).to eq []
+      end
+
+      it "filters assignments by userId correctly for teachers" do
+        expect(
+          course_type.resolve(<<~GQL, current_user: @teacher)
+            assignmentsConnection(filter: {userId: "#{other_student.id}"}) { edges { node { _id } } }
+          GQL
+        ).to eq [assignment.id.to_s, @overridden_assignment.id.to_s]
+
+        # A teacher has permission to see all assignments
+        expect(
+          course_type.resolve(<<~GQL, current_user: @teacher)
+            assignmentsConnection(filter: {userId: "#{@student.id}"}) { edges { node { _id } } }
+          GQL
+        ).to eq [assignment.id.to_s]
+      end
+
+      it "returns visible assignments to current user" do
+        expect(course_type.resolve("assignmentsConnection { edges { node { _id } } }", current_user: @teacher).size).to eq 2
+        expect(course_type.resolve("assignmentsConnection { edges { node { _id } } }", current_user: @student).size).to eq 1
+        expect(course_type.resolve("assignmentsConnection { edges { node { _id } } }", current_user: other_student).size).to eq 2
+      end
     end
 
     it "only returns visible assignments" do
@@ -657,6 +747,18 @@ describe Types::CourseType do
               current_user: @teacher
             )
           ).to eq [observer_enrollment.id.to_s]
+        end
+
+        it "returns only enrollments with the specified states if included" do
+          inactive_student = course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "inactive").user
+          deleted_student = course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "deleted").user
+          rejected_student = course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "rejected").user
+          expect(
+            course_type.resolve(
+              "enrollmentsConnection(filter: {states: [inactive, deleted, rejected]}) { nodes { _id } }",
+              current_user: @teacher
+            )
+          ).to eq [inactive_student.enrollments.first.id.to_s, deleted_student.enrollments.first.id.to_s, rejected_student.enrollments.first.id.to_s]
         end
       end
     end

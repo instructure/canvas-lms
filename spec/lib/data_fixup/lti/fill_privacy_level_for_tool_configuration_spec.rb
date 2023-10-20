@@ -25,7 +25,7 @@ describe DataFixup::Lti::FillPrivacyLevelForToolConfiguration do
   include_context "lti_1_3_tool_configuration_spec_helper"
 
   let(:account) { account_model }
-  let(:developer_key) { DeveloperKey.create!(account: account) }
+  let(:developer_key) { DeveloperKey.create!(account:) }
 
   before do
     tool_configuration.update! privacy_level: nil

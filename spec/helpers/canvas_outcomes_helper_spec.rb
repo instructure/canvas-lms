@@ -231,7 +231,7 @@ describe CanvasOutcomesHelper do
           }
         end
         if alignments
-          response = response.map do |r|
+          response = response.each do |r|
             r[:alignments] = [
               {
                 id: 1,
@@ -269,10 +269,22 @@ describe CanvasOutcomesHelper do
         expect(subject.get_outcome_alignments(@course, "1,2")).to eq mock_alignment_response("1,2", false, false)
       end
 
+      it "outcome with no alignments" do
+        stub_get_alignments("context_uuid=#{@course.uuid}&external_outcome_id_list=1&includes=alignments")
+          .to_return(status: 200, body: mock_alignment_response("1", false, false).to_json)
+        expect(subject.get_outcome_alignments(@course, "1", { includes: "alignments" })).to eq mock_alignment_response("1", false, false)
+
+        outcome = LearningOutcome.new(id: 1)
+        expect(subject.outcome_has_alignments?(outcome, @course)).to be false
+      end
+
       it "outcome with alignments" do
         stub_get_alignments("context_uuid=#{@course.uuid}&external_outcome_id_list=1&includes=alignments")
           .to_return(status: 200, body: mock_alignment_response("1", false, true).to_json)
         expect(subject.get_outcome_alignments(@course, "1", { includes: "alignments" })).to eq mock_alignment_response("1", false, true)
+
+        outcome = LearningOutcome.new(id: 1)
+        expect(subject.outcome_has_alignments?(outcome, @course)).to be true
       end
 
       it "outcome with alignments and groups" do

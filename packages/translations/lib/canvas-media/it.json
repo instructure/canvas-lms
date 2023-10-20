@@ -5,6 +5,9 @@
   "armenian_12da6118": { "message": "Armeno" },
   "belarusian_b2f19c76": { "message": "Bielorusso" },
   "bulgarian_feccab7e": { "message": "Bulgaro" },
+  "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
+    "message": "Impossibile eliminare i sottotitoli ereditati da un corso principale."
+  },
   "catalan_16f6b78f": { "message": "Catalano" },
   "chinese_111d37f6": { "message": "Cinese" },
   "chinese_simplified_7f0bd370": { "message": "Cinese semplificato" },
@@ -69,5 +72,8 @@
   "ukrainian_945b00b7": { "message": "Ucraino" },
   "vietnamese_e7a76583": { "message": "Vietnamita" },
   "welsh_42ab94b1": { "message": "Gallese" },
-  "yiddish_f96986df": { "message": "Yiddish" }
+  "yiddish_f96986df": { "message": "Yiddish" },
+  "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
+    "message": "Puoi sostituirli caricando un nuovo file dei sottotitoli."
+  }
 }

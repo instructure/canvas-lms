@@ -97,6 +97,11 @@ Migration/SendLater:
   Include:
     - "**/db/migrate/*.rb"
 
+Migration/SetReplicaIdentityInSeparateTransaction:
+  Enabled: true
+  Include:
+    - "**/db/migrate/*.rb"
+
 Rails/SmartTimeZone:
   Enabled: true
 

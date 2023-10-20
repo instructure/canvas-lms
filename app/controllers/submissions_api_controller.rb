@@ -87,7 +87,7 @@
 #           "items": { "$ref": "SubmissionComment" }
 #         },
 #         "submission_type": {
-#           "description": "The types of submission ex: ('online_text_entry'|'online_url'|'online_upload'|'media_recording'|'student_annotation')",
+#           "description": "The types of submission ex: ('online_text_entry'|'online_url'|'online_upload'|'online_quiz'|'media_recording'|'student_annotation')",
 #           "example": "online_text_entry",
 #           "type": "string",
 #           "allowableValues": {
@@ -95,6 +95,7 @@
 #               "online_text_entry",
 #               "online_url",
 #               "online_upload",
+#               "online_quiz",
 #               "media_recording",
 #               "student_annotation"
 #             ]
@@ -777,6 +778,9 @@ class SubmissionsApiController < ApplicationController
   #   Sets the late policy status to either "late", "missing", "extended", "none", or null.
   #     NB: "extended" values can only be set in the UI when the "UI features for 'extended' Submissions" Account Feature is on
   #
+  # @argument submission[sticker] [String, "apple"|"basketball"|"bell"|"book"|"bookbag"|"briefcase"|"bus"|"calendar"|"chem"|"design"|"pencil"|"beaker"|"paintbrush"|"computer"|"column"|"pen"|"tablet"|"telescope"|"calculator"|"paperclip"|"composite_notebook"|"scissors"|"ruler"|"clock"|"globe"|"grad"|"gym"|"mail"|"microscope"|"mouse"|"music"|"notebook"|"page"|"panda1"|"panda2"|"panda3"|"panda4"|"panda5"|"panda6"|"panda7"|"panda8"|"panda9"|"presentation"|"science"|"science2"|"star"|"tag"|"tape"|"target"|"trophy"]
+  #   Sets the sticker for the submission.
+  #
   # @argument submission[seconds_late_override] [Integer]
   #   Sets the seconds late if late policy status is "late"
   #
@@ -850,12 +854,20 @@ class SubmissionsApiController < ApplicationController
       if params[:submission].is_a?(ActionController::Parameters)
         submission[:grade] = params[:submission].delete(:posted_grade)
         submission[:excuse] = params[:submission].delete(:excuse)
-        if params[:submission].key?(:late_policy_status)
-          submission[:late_policy_status] = params[:submission].delete(:late_policy_status)
+        [:late_policy_status, :custom_grade_status_id].each do |status_attr|
+          if params[:submission].key?(status_attr)
+            submission[status_attr] = params[:submission].delete(status_attr)
+          end
         end
+
         if params[:submission].key?(:seconds_late_override)
           submission[:seconds_late_override] = params[:submission].delete(:seconds_late_override)
         end
+
+        if params[:submission].key?(:sticker)
+          submission[:sticker] = params[:submission].delete(:sticker)
+        end
+
         submission[:provisional] = value_to_boolean(params[:submission][:provisional])
         submission[:final] = value_to_boolean(params[:submission][:final]) && @assignment.permits_moderation?(@current_user)
         if params[:submission][:submission_type] == "basic_lti_launch" && (!@submission.has_submission? || @submission.submission_type == "basic_lti_launch")
@@ -878,7 +890,12 @@ class SubmissionsApiController < ApplicationController
         @submission = @assignment.find_or_create_submission(@user) if @submission.new_record?
         @submissions ||= [@submission]
       end
-      if submission.key?(:late_policy_status) || submission.key?(:seconds_late_override)
+
+      submission_status_changed =
+        %i[late_policy_status seconds_late_override custom_grade_status_id]
+        .any? { |status_attr| submission.key?(status_attr) }
+
+      if submission_status_changed || submission.key?(:sticker)
         excused = Canvas::Plugin.value_to_boolean(submission[:excuse])
         grade_group_students = !(@assignment.grade_group_students_individually || excused)
 
@@ -887,12 +904,22 @@ class SubmissionsApiController < ApplicationController
           @submissions = @assignment.find_or_create_submissions(students, Submission.preload(:grading_period, :stream_item))
         end
 
+        if submission.key?(:custom_grade_status_id)
+          custom_status = @context.custom_grade_statuses.find(submission[:custom_grade_status_id])
+        end
+
         @submissions.each do |sub|
-          sub.late_policy_status = submission[:late_policy_status] if submission.key?(:late_policy_status)
+          if custom_status
+            sub.custom_grade_status = custom_status
+          elsif submission.key?(:late_policy_status)
+            sub.late_policy_status = submission[:late_policy_status]
+          end
+
           if sub.late_policy_status == "late" && submission[:seconds_late_override].present?
             sub.seconds_late_override = submission[:seconds_late_override]
           end
-          sub.grader = @current_user
+          sub.sticker = submission[:sticker] if submission.key?(:sticker)
+          sub.grader = @current_user if submission_status_changed
           # If we've called Assignment#grade_student, it has already created a
           # new submission version on this request.
           previously_graded = graded_just_now && (sub.grade.present? || sub.excused?)
@@ -1394,13 +1421,14 @@ class SubmissionsApiController < ApplicationController
   #        -H "Content-Length: 0"
   #
   def submissions_clear_unread
-    return render_unauthorized_action unless Account.site_admin.grants_right?(@current_user, :manage_students)
+    return unless authorized_action(Account.site_admin, @current_user, :manage_students)
 
     user_id = params[:user_id]
     course_id = params[:course_id]
     user = User.find(user_id)
     course = Course.find(course_id)
     submissions = course.submissions.where(user:)
+    ContentParticipation.add_missing_content_participation_items(course, user)
     ids = ContentParticipation.mark_all_as_read_for_user(user, submissions, course)
 
     opts = { type: :submissions_clear_unread }
@@ -1569,7 +1597,7 @@ class SubmissionsApiController < ApplicationController
   def change_topic_read_state(new_state)
     @assignment = api_find(@context.assignments.active, params[:assignment_id])
     @user = get_user_considering_section(params[:user_id])
-    @submission = @assignment.submissions.find_or_create_by!(user: @user)
+    @submission = @assignment.find_or_create_submission(@user, skip_grader_check: true)
 
     render_state_change_result @submission.change_read_state(new_state, @current_user)
   end

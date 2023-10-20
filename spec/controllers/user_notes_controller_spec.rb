@@ -28,21 +28,44 @@ describe UserNotesController do
   describe "create" do
     let_once(:target) { user_factory }
 
-    it "passes along the root_account_id when a note is created" do
-      course_with_teacher(active_all: true)
-      @course.enroll_user(target, "StudentEnrollment").accept!
+    context "when the deprecate_faculty_journal feature flag is disabled" do
+      before { Account.site_admin.disable_feature!(:deprecate_faculty_journal) }
 
-      user_session(@teacher)
-      post "create", params: {
-        user_id: target.id,
-        user_note: {
-          note: "this is a note",
-          title: "this is a title",
-          user_id: target.id
+      it "passes along the root_account_id when a note is created" do
+        course_with_teacher(active_all: true)
+        @course.enroll_user(target, "StudentEnrollment").accept!
+
+        user_session(@teacher)
+        post "create", params: {
+          user_id: target.id,
+          user_note: {
+            note: "this is a note",
+            title: "this is a title",
+            user_id: target.id
+          }
         }
-      }
-      note = UserNote.last
-      expect(note.root_account_id).to eql Account.default.id
+        note = UserNote.last
+        expect(note.root_account_id).to eql Account.default.id
+      end
+    end
+
+    context "when the deprecate_faculty_journal feature flag is enabled" do
+      it "does not create a user note" do
+        course_with_teacher(active_all: true)
+        @course.enroll_user(target, "StudentEnrollment").accept!
+
+        user_session(@teacher)
+        expect do
+          post "create", params: {
+            user_id: target.id,
+            user_note: {
+              note: "this is a note",
+              title: "this is a title",
+              user_id: target.id
+            }
+          }
+        end.to_not change { UserNote.count }
+      end
     end
   end
 end

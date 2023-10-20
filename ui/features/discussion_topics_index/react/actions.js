@@ -28,7 +28,9 @@ const I18n = useI18nScope('discussions_v2')
 const getDiscussionOpts = {
   fetchAll: true,
   totalCount: ENV.totalDiscussions,
+  perPage: ENV.PER_PAGE,
 }
+
 const discussionActions = createPaginationActions(
   'discussions',
   apiClient.getDiscussions,

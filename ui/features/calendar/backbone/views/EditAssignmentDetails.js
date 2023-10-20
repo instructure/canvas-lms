@@ -23,6 +23,7 @@ import natcompare from '@canvas/util/natcompare'
 import commonEventFactory from '@canvas/calendar/jquery/CommonEvent/index'
 import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView'
 import SisValidationHelper from '@canvas/sis/SisValidationHelper'
+import replaceTags from '@canvas/util/replaceTags'
 import editAssignmentTemplate from '../../jst/editAssignment.handlebars'
 import editAssignmentOverrideTemplate from '../../jst/editAssignmentOverride.handlebars'
 import wrapper from '@canvas/forms/jst/EmptyDialogFormWrapper.handlebars'
@@ -74,7 +75,7 @@ export default class EditAssignmentDetailsRewrite extends ValidatedFormView {
       this.$el.attr('method', 'PUT')
       return this.$el.attr(
         'action',
-        $.replaceTags(this.event.contextInfo.assignment_url, 'id', this.event.object.id)
+        replaceTags(this.event.contextInfo.assignment_url, 'id', this.event.object.id)
       )
     }
   }
@@ -250,10 +251,6 @@ export default class EditAssignmentDetailsRewrite extends ValidatedFormView {
   }
 
   onSaveFail(xhr) {
-    let resp
-    if ((resp = JSON.parse(xhr.responseText))) {
-      showFlashAlert({message: resp.error, err: null, type: 'error'})
-    }
     this.closeCB()
     this.disableWhileLoadingOpts = {}
     return super.onSaveFail(xhr)

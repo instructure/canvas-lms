@@ -31,6 +31,7 @@ class Types::LegacyNodeType < Types::BaseEnum
   value "Enrollment"
   value "File"
   value "GradingPeriod"
+  value "GradingPeriodGroup"
   value "Group"
   value "GroupSet"
   value "InternalSetting"

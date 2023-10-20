@@ -63,6 +63,58 @@ class Submission < ActiveRecord::Base
   }.freeze
 
   SUBMISSION_TYPES_GOVERNED_BY_ALLOWED_ATTEMPTS = %w[online_upload online_url online_text_entry].freeze
+  VALID_STICKERS = %w[
+    apple
+    basketball
+    bell
+    book
+    bookbag
+    briefcase
+    bus
+    calendar
+    chem
+    design
+    pencil
+    beaker
+    paintbrush
+    computer
+    column
+    pen
+    tablet
+    telescope
+    calculator
+    paperclip
+    composite_notebook
+    scissors
+    ruler
+    clock
+    globe
+    grad
+    gym
+    mail
+    microscope
+    mouse
+    music
+    notebook
+    page
+    panda1
+    panda2
+    panda3
+    panda4
+    panda5
+    panda6
+    panda7
+    panda8
+    panda9
+    presentation
+    science
+    science2
+    star
+    tag
+    tape
+    target
+    trophy
+  ].freeze
 
   attr_readonly :assignment_id
   attr_accessor :visible_to_user,
@@ -83,6 +135,7 @@ class Submission < ActiveRecord::Base
   belongs_to :attachment # this refers to the screenshot of the submission if it is a url submission
   belongs_to :assignment, inverse_of: :submissions
   belongs_to :course, inverse_of: :submissions
+  belongs_to :custom_grade_status, inverse_of: :submissions
   has_many :observer_alerts, as: :context, inverse_of: :context, dependent: :destroy
   belongs_to :user
   alias_method :student, :user
@@ -143,6 +196,7 @@ class Submission < ActiveRecord::Base
   validates :extra_attempts, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
   validates :late_policy_status, inclusion: %w[none missing late extended], allow_nil: true
   validates :cached_tardiness, inclusion: ["missing", "late"], allow_nil: true
+  validates :sticker, inclusion: { in: VALID_STICKERS }, allow_nil: true
   validate :ensure_grader_can_grade
   validate :extra_attempts_can_only_be_set_on_online_uploads
   validate :ensure_attempts_are_in_range, unless: :proxy_submission?
@@ -194,6 +248,7 @@ class Submission < ActiveRecord::Base
       .where(<<~SQL.squish)
         /* excused submissions cannot be missing */
         excused IS NOT TRUE
+        AND custom_grade_status_id IS NULL
         AND (late_policy_status IS DISTINCT FROM 'extended')
         AND NOT (
           /* teacher said it's missing, 'nuff said. */
@@ -224,6 +279,7 @@ class Submission < ActiveRecord::Base
   scope :late, lambda {
     left_joins(:quiz_submission).where(<<~SQL.squish)
       submissions.excused IS NOT TRUE
+      AND submissions.custom_grade_status_id IS NULL
       AND (
         submissions.late_policy_status = 'late' OR
         (submissions.late_policy_status IS NULL AND submissions.submitted_at >= submissions.cached_due_date +
@@ -236,6 +292,7 @@ class Submission < ActiveRecord::Base
   scope :not_late, lambda {
     left_joins(:quiz_submission).where(<<~SQL.squish)
       submissions.excused IS TRUE
+      OR submissions.custom_grade_status_id IS NOT NULL
       OR (late_policy_status IS NOT DISTINCT FROM 'extended')
       OR (
         submissions.late_policy_status is distinct from 'late' AND
@@ -358,7 +415,7 @@ class Submission < ActiveRecord::Base
   # validation. Otherwise if we place it in any earlier (e.g.
   # before/after_initialize), every Submission.new will make database calls.
   before_validation :set_anonymous_id, if: :new_record?
-  before_save :set_late_policy_attributes
+  before_save :set_status_attributes
   before_save :apply_late_policy, if: :late_policy_relevant_changes?
   before_save :update_if_pending
   before_save :validate_single_submission, :infer_values
@@ -367,6 +424,7 @@ class Submission < ActiveRecord::Base
   before_save :check_reset_graded_anonymously
   before_save :set_root_account_id
   before_save :reset_redo_request
+  before_save :remove_sticker, if: :will_save_change_to_attempt?
   after_save :touch_user
   after_save :clear_user_submissions_cache
   after_save :touch_graders
@@ -919,7 +977,7 @@ class Submission < ActiveRecord::Base
   end
 
   def retrieve_lti_tii_score
-    if (tool = ContextExternalTool.tool_for_assignment(assignment))
+    if (tool = ContextExternalTool.from_assignment(assignment))
       turnitin_data.select { |_, v| v.try(:key?, :outcome_response) }.each do |k, v|
         Turnitin::OutcomeResponseProcessor.new(tool, assignment, user, v[:outcome_response].as_json).resubmit(self, k)
       end
@@ -932,7 +990,7 @@ class Submission < ActiveRecord::Base
   end
 
   def turnitinable_by_lti?
-    turnitin_data.select { |_, v| v.is_a?(Hash) && v.key?(:outcome_response) }.any?
+    turnitin_data.any? { |_, v| v.is_a?(Hash) && v.key?(:outcome_response) }
   end
 
   # VeriCite
@@ -1651,7 +1709,7 @@ class Submission < ActiveRecord::Base
     return true if @regraded
     return false if grade_matches_current_submission == false # nil is treated as true
 
-    changes.slice(:score, :submitted_at, :seconds_late_override, :late_policy_status).any?
+    changes.slice(:score, :submitted_at, :seconds_late_override, :late_policy_status, :custom_grade_status_id).any?
   end
   private :late_policy_relevant_changes?
 
@@ -2431,6 +2489,7 @@ class Submission < ActiveRecord::Base
 
     def late?
       return false if excused?
+      return false if custom_grade_status_id
       return late_policy_status == "late" if late_policy_status.present?
 
       submitted_at.present? && past_due?
@@ -2439,6 +2498,7 @@ class Submission < ActiveRecord::Base
 
     def missing?
       return false if excused?
+      return false if custom_grade_status_id
       return false if grader_id && late_policy_status.nil?
       return late_policy_status == "missing" if late_policy_status.present?
       return false if submitted_at.present?
@@ -2454,6 +2514,7 @@ class Submission < ActiveRecord::Base
 
     def extended?
       return false if excused?
+      return false if custom_grade_status_id
       return late_policy_status == "extended" if late_policy_status.present?
 
       false
@@ -2598,19 +2659,13 @@ class Submission < ActiveRecord::Base
     # TODO: can we do this in bulk?
     return if assignment.deleted?
 
-    return if assignment.muted? && !Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
-
     return unless user_id
 
     return unless saved_change_to_score? || saved_change_to_grade? || saved_change_to_excused?
 
     return unless context.grants_right?(user, :participate_as_student)
 
-    if Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
-      mark_item_unread("grade")
-    else
-      ContentParticipation.create_or_update({ content: self, user:, workflow_state: "unread" })
-    end
+    mark_item_unread("grade")
   end
 
   def update_line_item_result
@@ -2647,17 +2702,7 @@ class Submission < ActiveRecord::Base
   def read_state(current_user)
     return "read" unless current_user # default for logged out user
 
-    if Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
-      state = ContentParticipation.submission_read_state(self, current_user)
-    else
-      uid = current_user.is_a?(User) ? current_user.id : current_user
-      state = if content_participations.loaded?
-                content_participations.detect { |cp2| cp2.user_id == uid }&.workflow_state
-              else
-                content_participations.where(user_id: uid).pick(:workflow_state)
-              end
-    end
-
+    state = ContentParticipation.submission_read_state(self, current_user)
     return state if state.present?
 
     return "read" if assignment.deleted? || !posted? || !user_id
@@ -2733,8 +2778,6 @@ class Submission < ActiveRecord::Base
   end
 
   def change_item_read_state(new_state, content_item)
-    return nil unless Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
-
     participant = ContentParticipation.participate(
       content: self,
       user:,
@@ -3021,15 +3064,23 @@ class Submission < ActiveRecord::Base
     cached_quiz_lti && autograded?
   end
 
-  def set_late_policy_attributes
-    self.seconds_late_override = nil unless late_policy_status == "late"
+  def remove_sticker
+    self.sticker = nil
+  end
 
+  def set_status_attributes
     if will_save_change_to_excused?(to: true)
       self.late_policy_status = nil
-      self.seconds_late_override = nil
+      self.custom_grade_status_id = nil
+    elsif will_save_change_to_custom_grade_status_id? && custom_grade_status_id.present?
+      self.excused = false
+      self.late_policy_status = nil
     elsif will_save_change_to_late_policy_status? && late_policy_status.present?
       self.excused = false
+      self.custom_grade_status_id = nil
     end
+
+    self.seconds_late_override = nil unless late_policy_status == "late"
   end
 
   def reset_redo_request

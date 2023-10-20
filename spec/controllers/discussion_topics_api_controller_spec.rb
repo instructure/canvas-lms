@@ -116,9 +116,8 @@ describe DiscussionTopicsApiController do
     end
 
     it "uses instfs to store attachment if instfs is enabled" do
-      allow(InstFS).to receive(:enabled?).and_return(true)
       uuid = "1234-abcd"
-      allow(InstFS).to receive(:direct_upload).and_return(uuid)
+      allow(InstFS).to receive_messages(enabled?: true, direct_upload: uuid)
       post "add_entry",
            params: { topic_id: @topic.id,
                      course_id: @course.id,

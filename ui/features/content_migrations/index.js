@@ -17,3 +17,4 @@
  */
 
 import './setup'
+import './react/app'

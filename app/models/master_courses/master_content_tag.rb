@@ -40,6 +40,13 @@ class MasterCourses::MasterContentTag < ActiveRecord::Base
                                      :rubric,
                                      :wiki_page,
                                      quiz: "Quizzes::Quiz"]
+  belongs_to :assignment, -> { where(master_courses_master_content_tags: { content_type: "Assignment" }) }, foreign_key: "content_id", inverse_of: :master_content_tag
+  belongs_to :attachment, -> { where(master_courses_master_content_tags: { content_type: "Attachment" }) }, foreign_key: "content_id", inverse_of: :master_content_tag
+  belongs_to :context_module, -> { where(master_courses_master_content_tags: { content_type: "ContextModule" }) }, foreign_key: "content_id", inverse_of: :master_content_tag
+  belongs_to :discussion_topic, -> { where(master_courses_master_content_tags: { content_type: "DiscussionTopic" }) }, foreign_key: "content_id", inverse_of: :master_content_tag
+  belongs_to :quiz, -> { where(master_courses_master_content_tags: { content_type: "Quizzes::Quiz" }) }, foreign_key: "content_id", class_name: "Quizzes::Quiz", inverse_of: :master_content_tag
+  belongs_to :wiki_page, -> { where(master_courses_master_content_tags: { content_type: "WikiPage" }) }, foreign_key: "content_id", inverse_of: :master_content_tag
+
   belongs_to :root_account, class_name: "Account"
   validates_with MasterCourses::TagValidator
 
@@ -113,5 +120,12 @@ class MasterCourses::MasterContentTag < ActiveRecord::Base
     return false if content_type != Assignment.to_s
 
     content.quiz_lti?
+  end
+
+  def self.polymorphic_assoc_for(klass)
+    return :quiz if klass == Quizzes::Quiz
+    return :discussion_topic if klass == Announcement
+
+    klass.name.underscore.to_sym
   end
 end

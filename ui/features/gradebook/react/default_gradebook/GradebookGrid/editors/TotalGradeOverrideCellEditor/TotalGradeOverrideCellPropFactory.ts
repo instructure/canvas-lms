@@ -19,6 +19,8 @@
 
 import GradeOverrideEntry from '@canvas/grading/GradeEntry/GradeOverrideEntry'
 import type Gradebook from '../../../Gradebook'
+import {htmlDecode} from '../../../Gradebook.utils'
+import useStore from '../../../stores'
 
 export default class TotalGradeOverrideCellPropFactory {
   _gradebook: Gradebook
@@ -29,22 +31,55 @@ export default class TotalGradeOverrideCellPropFactory {
 
   getProps(editorOptions) {
     const {finalGradeOverrides} = this._gradebook
-    const userId = editorOptions.item.id
+    const {item: student, activeRow} = editorOptions
+    const userId = student.id
 
     const grade = finalGradeOverrides?.getGradeForUser(userId)
     const pendingGradeInfo = finalGradeOverrides?.getPendingGradeInfoForUser(userId)
 
     const gradeEntry = new GradeOverrideEntry({
       gradingScheme: this._gradebook.getCourseGradingScheme(),
+      pointsBasedGradingSchemesFeatureEnabled:
+        this._gradebook.pointsBasedGradingSchemesFeatureEnabled(),
+    })
+
+    const gradeInfo = gradeEntry.gradeInfoFromGrade(grade, false)
+
+    const totalRows = this._gradebook.gridData.rows.length
+    const isFirstStudent = activeRow === 0
+    const isLastStudent = activeRow === totalRows - 1
+    const [enrollment] = student.enrollments
+    const studentInfo = {
+      id: userId,
+      avatarUrl: htmlDecode(student.avatar_url),
+      name: htmlDecode(student.name),
+      gradesUrl: `${enrollment.grades.html_url}#tab-assignments`,
+      enrollmentId: enrollment.id,
+    }
+
+    const {finalGradeOverrideTrayProps} = useStore.getState()
+    useStore.setState({
+      finalGradeOverrideTrayProps: {
+        ...finalGradeOverrideTrayProps,
+        gradeEntry,
+        isFirstStudent,
+        isLastStudent,
+        studentInfo,
+      },
     })
 
     return {
+      customGradeStatusesEnabled: this._gradebook.options.custom_grade_statuses_enabled,
       gradeEntry,
-      gradeInfo: gradeEntry.gradeInfoFromGrade(grade),
+      gradeInfo,
       gradeIsUpdating: pendingGradeInfo != null && pendingGradeInfo.valid,
 
-      onGradeUpdate: gradeInfo => {
-        finalGradeOverrides?.updateGrade(userId, gradeInfo)
+      onGradeUpdate: updatedGradeInfo => {
+        finalGradeOverrides?.updateGrade(userId, updatedGradeInfo)
+      },
+
+      onTrayOpen: () => {
+        this._gradebook.gradebookGrid?.gridSupport?.helper.commitCurrentEdit()
       },
 
       pendingGradeInfo,

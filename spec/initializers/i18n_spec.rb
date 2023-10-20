@@ -20,37 +20,43 @@
 describe I18n do
   describe ".bigeasy_locale" do
     it "does explicit overrides" do
-      I18n.locale = :fr
-      expect(I18n.bigeasy_locale).to eq "fr_FR"
+      I18n.with_locale(:fr) do
+        expect(I18n.bigeasy_locale).to eq "fr_FR"
+      end
     end
 
     it "does underscore conversion" do
-      I18n.locale = :"en-GB"
-      expect(I18n.bigeasy_locale).to eq "en_GB"
+      I18n.with_locale(:"en-GB") do
+        expect(I18n.bigeasy_locale).to eq "en_GB"
+      end
     end
   end
 
   describe ".moment_locale" do
     it "does explicit overrides" do
-      I18n.locale = :hy
-      expect(I18n.moment_locale).to eq "hy-am"
+      I18n.with_locale(:hy) do
+        expect(I18n.moment_locale).to eq "hy-am"
+      end
     end
 
     it "does lowercase conversion" do
-      I18n.locale = :"en-GB"
-      expect(I18n.moment_locale).to eq "en-gb"
+      I18n.with_locale(:"en-GB") do
+        expect(I18n.moment_locale).to eq "en-gb"
+      end
     end
   end
 
   describe ".fullcalendar_locale" do
     it "does explicit overrides" do
-      I18n.locale = :hy
-      expect(I18n.fullcalendar_locale).to eq "en"
+      I18n.with_locale(:hy) do
+        expect(I18n.fullcalendar_locale).to eq "en"
+      end
     end
 
     it "does lowercase conversion" do
-      I18n.locale = :"en-GB"
-      expect(I18n.fullcalendar_locale).to eq "en-gb"
+      I18n.with_locale(:"en-GB") do
+        expect(I18n.fullcalendar_locale).to eq "en-gb"
+      end
     end
   end
 

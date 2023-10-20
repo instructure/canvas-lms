@@ -26,5 +26,9 @@ module Canvas::OAuth
     def error_message
       valid? ? "" : "Unknown client_id"
     end
+
+    def assertion_method_permitted?
+      key&.client_credentials_audience == "external"
+    end
   end
 end

@@ -36,6 +36,7 @@ class WikiPage < ActiveRecord::Base
   include DuplicatingObjects
   include SearchTermHelper
   include LockedFor
+  include HtmlTextHelper
 
   include MasterCourses::Restrictor
   restrict_columns :content, [:body, :title]
@@ -52,7 +53,10 @@ class WikiPage < ActiveRecord::Base
   belongs_to :context, polymorphic: [:course, :group]
   belongs_to :root_account, class_name: "Account"
 
+  belongs_to :current_lookup, class_name: "WikiPageLookup"
   has_many :wiki_page_lookups, inverse_of: :wiki_page
+  has_many :wiki_page_embeddings, inverse_of: :wiki_page
+  has_one :master_content_tag, class_name: "MasterCourses::MasterContentTag", inverse_of: :wiki_page
 
   acts_as_url :title, sync_url: true
 
@@ -69,6 +73,10 @@ class WikiPage < ActiveRecord::Base
   after_save  :touch_context
   after_save  :update_assignment,
               if: proc { context.try(:conditional_release?) }
+  after_save :create_lookup, if: :should_create_lookup?
+  after_save :delete_lookups, if: -> { !Account.site_admin.feature_enabled?(:permanent_page_links) && saved_change_to_workflow_state? && deleted? }
+  after_save :generate_embeddings, if: :should_generate_embeddings?
+  after_save :delete_embeddings, if: -> { deleted? && saved_change_to_workflow_state? }
 
   scope :starting_with_title, lambda { |title|
     where("title ILIKE ?", "#{title}%")
@@ -98,6 +106,62 @@ class WikiPage < ActiveRecord::Base
     self.wiki_id ||= (context.wiki_id || context.wiki.id)
   end
 
+  def should_generate_embeddings?
+    return false if deleted?
+    return false unless OpenAi.smart_search_available?(root_account)
+
+    saved_change_to_body? ||
+      saved_change_to_title? ||
+      (saved_change_to_workflow_state? && workflow_state_before_last_save == "deleted")
+  end
+
+  def chunk_content(max_character_length = 4000)
+    if body_text.length > max_character_length
+      # Chunk
+      # Hard split on character length, back up to the nearest word boundary
+      remaining_text = body_text
+      while remaining_text
+        # Find the last space before the max length
+        last_space = remaining_text.rindex(/\b/, max_character_length)
+        if last_space.nil?
+          # No space found, just split at max length
+          last_space = max_character_length
+        end
+        yield title + "\n" + remaining_text[0..last_space]
+        remaining_text = remaining_text[(last_space + 1)..]
+      end
+    else
+      # No need for chunking
+      yield title + "\n" + body_text
+    end
+  end
+
+  def body_text
+    html_to_text(body)
+  end
+
+  def generate_embeddings
+    return unless OpenAi.smart_search_available?(root_account)
+
+    delete_embeddings
+    chunk_content do |chunk|
+      embedding = OpenAi.generate_embedding(chunk)
+      wiki_page_embeddings.create!(embedding:)
+    end
+  end
+  handle_asynchronously :generate_embeddings, priority: Delayed::LOW_PRIORITY
+
+  def delete_embeddings
+    return unless ActiveRecord::Base.connection.table_exists?("wiki_page_embeddings")
+
+    # TODO: delete via the association once pgvector is available everywhere
+    # (without :dependent, that would try to nullify the fk in violation of the constraint
+    #  but with :dependent, instances without pgvector would try to access the nonexistent table when a page is deleted)
+    shard.activate do
+      WikiPageEmbedding.where(wiki_page_id: self).delete_all
+    end
+  end
+
   def context
     if !association(:context).loaded? &&
        association(:wiki).loaded? &&
@@ -119,11 +183,38 @@ class WikiPage < ActiveRecord::Base
     end
   end
 
+  def url
+    return read_attribute(:url) unless Account.site_admin.feature_enabled?(:permanent_page_links)
+
+    current_lookup&.slug || read_attribute(:url)
+  end
+
+  def should_create_lookup?
+    # covers page creation and title changes, and undeletes
+    saved_change_to_title? || (saved_change_to_workflow_state? && workflow_state_before_last_save == "deleted")
+  end
+
+  def create_lookup
+    new_record = id_changed?
+    WikiPageLookup.unique_constraint_retry do
+      lookup = wiki_page_lookups.find_by(slug: read_attribute(:url)) unless new_record
+      lookup ||= wiki_page_lookups.build(slug: read_attribute(:url))
+      lookup.save
+      # this is kind of circular so we want to avoid triggering callbacks again
+      update_column(:current_lookup_id, lookup.id)
+    end
+  end
+
+  def delete_lookups
+    update_column(:current_lookup_id, nil)
+    wiki_page_lookups.delete_all(:delete_all)
+  end
+
   def ensure_unique_title
-    return if deleted?
+    return if deleted? || Account.site_admin.feature_enabled?(:permanent_page_links)
 
     to_cased_title = ->(string) { string.gsub(/[^\w]+/, " ").gsub(/\b('?[a-z])/) { $1.capitalize }.strip }
-    self.title ||= to_cased_title.call(url || "page")
+    self.title ||= to_cased_title.call(read_attribute(:url) || "page")
     # TODO: i18n (see wiki.rb)
 
     if self.title == "Front Page" && new_record?
@@ -170,13 +261,16 @@ class WikiPage < ActiveRecord::Base
       )
     end
 
-    conditions = [wildcard(url_attribute.to_s, base_url, type: :right)]
+    url_conditions = [wildcard(url_attribute.to_s, base_url, type: :right)]
     unless new_record?
-      conditions.first << " and id != ?"
-      conditions << id
+      url_conditions.first << " and id != ?"
+      url_conditions << id
     end
+    urls = context.wiki_pages.where(*url_conditions).not_deleted.pluck(:url)
 
-    urls = context.wiki_pages.where(*conditions).not_deleted.pluck(:url)
+    lookup_conditions = [wildcard("slug", base_url, type: :right)]
+    urls += context.wiki_page_lookups.where(*lookup_conditions).where.not(wiki_page_id: id).pluck(:slug)
+
     # This is the part in stringex that messed us up, since it will never allow
     # a url of "front-page" once "front-page-1" or "front-page-2" is created
     # We modify it to allow "front-page" and start the indexing at "front-page-2"
@@ -300,7 +394,7 @@ class WikiPage < ActiveRecord::Base
   end
 
   def context_module_tag_for(context)
-    @tag ||= context_module_tags.where(context_id: context, context_type: context.class.base_class.name).first
+    @context_module_tag_for ||= context_module_tags.where(context_id: context, context_type: context.class.base_class.name).first
   end
 
   def context_module_action(user, context, action)
@@ -485,7 +579,7 @@ class WikiPage < ActiveRecord::Base
     # Convert to ascii chars unless the string matches
     # a script we want to store in unicode
     return title.to_s.to_url unless title.match?(
-      /#{use_unicode_scripts.map { |s| "\\p{#{s}}" }.join('|')}/
+      /#{use_unicode_scripts.map { |s| "\\p{#{s}}" }.join("|")}/
     )
 
     # Return title with unicode chars, replacing chars like ? and &

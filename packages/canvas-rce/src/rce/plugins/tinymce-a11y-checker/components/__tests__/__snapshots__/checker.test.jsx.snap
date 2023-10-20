@@ -1,0 +1,28 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`checker render matches snapshot without errors 1`] = `
+<div>
+  <div>
+    <div
+      aria-live="assertive"
+      role="log"
+      style="border: 0px; height: 1px; margin: -1px; overflow: hidden; white-space: nowrap; padding: 0px; width: 1px; position: absolute;"
+    />
+    <div
+      aria-live="assertive"
+      role="log"
+      style="border: 0px; height: 1px; margin: -1px; overflow: hidden; white-space: nowrap; padding: 0px; width: 1px; position: absolute;"
+    />
+    <div
+      aria-live="polite"
+      role="log"
+      style="border: 0px; height: 1px; margin: -1px; overflow: hidden; white-space: nowrap; padding: 0px; width: 1px; position: absolute;"
+    />
+    <div
+      aria-live="polite"
+      role="log"
+      style="border: 0px; height: 1px; margin: -1px; overflow: hidden; white-space: nowrap; padding: 0px; width: 1px; position: absolute;"
+    />
+  </div>
+</div>
+`;

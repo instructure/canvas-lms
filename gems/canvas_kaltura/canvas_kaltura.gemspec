@@ -14,7 +14,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "canvas_http"
   spec.add_dependency "canvas_slug"
   spec.add_dependency "canvas_sort"
-  spec.add_dependency "multipart"
+  spec.add_dependency "legacy_multipart"
   spec.add_dependency "nokogiri"
 
   spec.add_development_dependency "bundler", "~> 2.2"

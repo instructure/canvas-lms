@@ -220,9 +220,9 @@ class EnrollmentTerm < ActiveRecord::Base
         update_all_grading_period_scores:,
         run_immediately: true
       )
-      # DueDateCacher handles updating the cached grading_period_id on submissions.
+      # SubmissionLifecycleManager handles updating the cached grading_period_id on submissions.
       # run_immediately: true because we're already in a delayed job
-      DueDateCacher.recompute_course(course, run_immediately: true) if update_all_grading_period_scores
+      SubmissionLifecycleManager.recompute_course(course, run_immediately: true) if update_all_grading_period_scores
     end
   end
 

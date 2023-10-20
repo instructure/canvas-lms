@@ -114,42 +114,23 @@ all be done with one command:
 Changes you're making are not showing up? See the Caveats section below.
 
 
-### With an IDE
-Canvas supports [ruby-debug-ide](https://github.com/ruby-debug/ruby-debug-ide) to establish
-communication between the debugger engine and IDE (RubyMine or VS Code)
-
-For full instructions on setting up RubyMine or VS Code to visually debug Canvas
-Please see [this page](https://instructure.atlassian.net/wiki/spaces/CE/pages/4287561732/Debugging+Dockerized+Canvas+with+RubyMine+or+Visual+Studio+Code).
+### With VS Code
+Canvas supports the [vscode-rdbg](https://github.com/ruby/vscode-rdbg) extension to establish
+communication between the debugger engine and VS Code.
 
 #### Example VS Code Configuration
-1. Add `docker-compose/rdebug-ide.override.yml` to the `COMPOSE_FILE` variable in the `.env` file. Example:
+1. Add `docker-compose/rdbg.override.yml` to the `COMPOSE_FILE` variable in the `.env` file. Example:
 ```
-COMPOSE_FILE=docker-compose.yml:docker-compose.override.yml:docker-compose/rdebug-ide.override.yml
+COMPOSE_FILE=docker-compose.yml:docker-compose.override.yml:docker-compose/rdbg.override.yml
 ```
-2. Install the Ruby extension from [the Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=rebornix.Ruby)
-3. Create a .vscode/launch.json file at the repo root, with the following contents:
-```json
-{
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "name": "Listen for rdebug-ide",
-      "type": "Ruby",
-      "request": "attach",
-      "remoteHost": "127.0.0.1",
-      "remotePort": "1234",
-      "remoteWorkspaceRoot": "/usr/src/app",
-      "cwd": "${workspaceRoot}"
-    }
-  ]
-}
-```
+2. Install the VS Code extension from [the Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=KoichiSasada.vscode-rdbg)
+3. Create a `.vscode/launch.json` file at the repo root, mirroring the contents of `.vscode/launch.json.example`.
 4. Press F5, set breakpoints, and start debugging!
 
-### Byebug
+### Debugging
 
-A byebug server is running in development mode on the web and job containers
-to allow you to remotely control any sessions where `byebug` has yielded
+A Ruby debug server is running in development mode on the web and job containers
+to allow you to remotely control any sessions where the debugger has yielded
 execution. To use it, you will need to enable `REMOTE_DEBUGGING_ENABLED` in your
 `docker-compose.<user>.override.yml` file in your app's root directory. If you don't have
 this file, you will need to create it and add the following:
@@ -164,23 +145,23 @@ services:
 
 Make sure you add this new file to your `COMPOSE_FILE` var in `.env`.
 
-You can attach to the byebug server once the container is started:
+You can attach to the server once the container is started:
 
 Debugging web:
 
 ```
-docker-compose exec web bin/byebug-remote
+docker-compose exec web bin/rdbg --attach
 ```
 
 Debugging jobs:
 
 ```
-docker-compose exec jobs bin/byebug-remote
+docker-compose exec jobs bin/rdbg --attach
 ```
 
 ### Prefer pry?
 
-Unfortunately, you can't start a pry session in a remote byebug session. What
+Unfortunately, you can't start a pry session in a remote debug session. What
 you can do instead is use `pry-remote`.
 
 1. Add `pry-remote` to your Gemfile

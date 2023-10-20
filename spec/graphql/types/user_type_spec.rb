@@ -111,6 +111,13 @@ describe Types::UserType do
     end
   end
 
+  context "htmlUrl" do
+    it "returns the user's profile url" do
+      html_url = user_type.resolve(%|htmlUrl(courseId: "#{@course.id}")|)
+      expect(html_url.end_with?("courses/#{@course.id}/users/#{@student.id}")).to be_truthy
+    end
+  end
+
   context "pronouns" do
     it "returns user pronouns" do
       @student.account.root_account.settings[:can_add_pronouns] = true
@@ -859,7 +866,7 @@ describe Types::UserType do
     end
 
     it "does not return duplicate observers if an observer is observing multiple students in the course" do
-      recipients = [@student, @other_student, @third_student].map(&:id).map(&:to_s)
+      recipients = [@student, @other_student, @third_student].map { |u| u.id.to_s }
       result = teacher_type.resolve("recipientsObservers(contextCode: \"course_#{@course.id}\", recipientIds: #{recipients}) { nodes { _id } } ", current_user: @teacher)
       expect(result).to eq [@observer.id.to_s]
     end
@@ -1162,12 +1169,30 @@ describe Types::UserType do
         expect(query_result[0].to_i).to eq @student_submission_1.id
       end
 
-      it "gets submissions with comments in order of last_comment_at || created_at DESC" do
+      it "gets submissions with comments in order of last_comment_at DESC" do
         student_submission_2 = @assignment2.submissions.find_by(user: @student)
         student_submission_2.add_comment(author: @student, comment: "Fourth comment")
         student_submission_2.add_comment(author: @teacher, comment: "Fifth comment")
 
+        student_submission_2.update_attribute(:last_comment_at, 1.day.ago)
+        @student_submission_1.update_attribute(:last_comment_at, 2.days.ago)
+
         query_result = teacher_type.resolve("viewableSubmissionsConnection { nodes { _id }  }")
+
+        expect(query_result.count).to eq 2
+        expect(query_result[0].to_i).to eq student_submission_2.id
+      end
+
+      it "gets submissions with comments in order of last submission comment if last_comment_at is nil" do
+        student_submission_2 = @assignment2.submissions.find_by(user: @student)
+        student_submission_2.add_comment(author: @student, comment: "Fourth comment")
+        student_submission_2.add_comment(author: @teacher, comment: "Fifth comment")
+
+        student_submission_2.update_attribute(:last_comment_at, nil)
+        @student_submission_1.update_attribute(:last_comment_at, nil)
+
+        query_result = teacher_type.resolve("viewableSubmissionsConnection { nodes { _id }  }")
+
         expect(query_result.count).to eq 2
         expect(query_result[0].to_i).to eq student_submission_2.id
       end
@@ -1218,6 +1243,27 @@ describe Types::UserType do
           expect(query_result[0].to_i).to eq @student_submission_3.id
         end
       end
+    end
+  end
+
+  context "with a user" do
+    before(:once) do
+      @user = user_factory
+    end
+
+    let(:user_type) do
+      GraphQLTypeTester.new(@user, current_user: @user, domain_root_account: @user.account, request: ActionDispatch::TestRequest.create)
+    end
+
+    it "returns the user's inbox labels" do
+      @user.preferences[:inbox_labels] = ["Test 1", "Test 2"]
+      @user.save!
+
+      expect(user_type.resolve("inboxLabels")).to eq @user.inbox_labels
+    end
+
+    it "returns an empty user's inbox labels" do
+      expect(user_type.resolve("inboxLabels")).to eq []
     end
   end
 end

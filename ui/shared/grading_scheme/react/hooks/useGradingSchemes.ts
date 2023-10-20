@@ -41,7 +41,7 @@ export const useGradingSchemes = (): {
       try {
         setLoadGradingSchemesStatus(ApiCallStatus.PENDING)
 
-        // @ts-ignore
+        // @ts-expect-error
         const result = await doFetchApi<GradingScheme[]>({
           path: `${contextPath}/grading_schemes`,
           method: 'GET',

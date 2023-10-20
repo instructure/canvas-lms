@@ -24,14 +24,21 @@ class OutcomeCalculationMethod < ApplicationRecord
 
   CALCULATION_METHODS = %w[
     decaying_average
+    weighted_average
+    standard_decaying_average
     n_mastery
     highest
     latest
     average
   ].freeze
 
+  # TODO: after outcomes_new_decaying_average_calculation feature turned on permanently
+  # and data migration we have to change VALID_CALCULATION_INTS for
+  # "decaying_average" to (50..99)
   VALID_CALCULATION_INTS = {
     "decaying_average" => (1..99),
+    "weighted_average" => (1..99),
+    "standard_decaying_average" => (50..99),
     "n_mastery" => (1..10),
     "highest" => [].freeze,
     "latest" => [].freeze,
@@ -57,6 +64,7 @@ class OutcomeCalculationMethod < ApplicationRecord
     message: -> { t("invalid calculation_int for this calculation_method") }
   }
 
+  before_validation :adjust_calculation_method
   after_save :clear_cached_methods
 
   def as_json(options = {})
@@ -81,6 +89,38 @@ class OutcomeCalculationMethod < ApplicationRecord
     raise unless e.record.errors[:context_id] == ["has already been taken"]
 
     retry
+  end
+
+  def new_decaying_average_calculation_ff_enabled?
+    return context.root_account.feature_enabled?(:outcomes_new_decaying_average_calculation) if context
+
+    LoadAccount.default_domain_root_account.feature_enabled?(:outcomes_new_decaying_average_calculation)
+  end
+
+  # We have redefined the calculation methods as follows:
+  # weighted_average - This is the preferred way to describe legacy decaying_average.
+  # decaying_average - This is the deprecated way to describe legacy decaying_average.
+  # standard_decaying_average - This is the preferred way to describe the new decaying_average.
+  # if this FF is ENABLED then on user facing side(Only UI)
+  # end-user will use "weighted_average" for old "decaying_average"
+  # and "decaying_average" for "standard_decaying_average"
+  # eg:
+  # |User Facing Name | DB Value                                                                           |
+  # |------------------------------------------------------------------------------------------------------|
+  # |decaying_average | standard_decaying_average [after data migration will be named as decaying_average] |
+  # |weighted_average | decaying_average [after data migration this old decaying_average                   |
+  # |                 | will be named as weighted_average]                                                 |
+  # |------------------------------------------------------------------------------------------------------|
+  def adjust_calculation_method(method = calculation_method)
+    if new_decaying_average_calculation_ff_enabled?
+      self.calculation_method = "decaying_average" if method == "weighted_average"
+    elsif method == "standard_decaying_average"
+      # If FF is disabled “decaying_average” and “standard_decaying_average”
+      # will all be treated the same and calculate using the legacy approach.
+      # Any time a learning outcome is updated / saved it will have the calculation_method
+      # updated back to being “decaying_average”.
+      self.calculation_method = "decaying_average"
+    end
   end
 
   def clear_cached_methods

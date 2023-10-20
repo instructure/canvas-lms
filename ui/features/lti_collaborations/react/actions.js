@@ -155,14 +155,17 @@ actions.deleteCollaboration = (context, contextId, collaborationId) => {
   }
 }
 
-actions.createCollaboration = (context, contextId, contentItems) => {
+actions.createCollaboration = (context, contextId, contentItems, tool_id) => {
   return dispatch => {
     dispatch(actions.createCollaborationStart())
     const url = `/${context}/${contextId}/collaborations`
     axios
       .post(
         url,
-        {contentItems: JSON.stringify(contentItems)},
+        {
+          contentItems: JSON.stringify(contentItems),
+          tool_id,
+        },
         {
           headers: {
             Accept: 'application/json',
@@ -179,14 +182,17 @@ actions.createCollaboration = (context, contextId, contentItems) => {
   }
 }
 
-actions.updateCollaboration = (context, contextId, contentItems, collaborationId) => {
+actions.updateCollaboration = (context, contextId, contentItems, tool_id, collaborationId) => {
   return dispatch => {
     dispatch(actions.updateCollaborationStart())
     const url = `/${context}/${contextId}/collaborations/${collaborationId}`
     axios
       .put(
         url,
-        {contentItems: JSON.stringify(contentItems)},
+        {
+          contentItems: JSON.stringify(contentItems),
+          tool_id,
+        },
         {
           headers: {
             Accept: 'application/json',
@@ -203,13 +209,13 @@ actions.updateCollaboration = (context, contextId, contentItems, collaborationId
   }
 }
 
-actions.externalContentReady = ({contentItems, service_id}) => {
+actions.externalContentReady = ({contentItems, service_id, tool_id}) => {
   return dispatch => {
     const [context, contextId] = splitAssetString(ENV.context_asset_string)
     if (service_id) {
-      dispatch(actions.updateCollaboration(context, contextId, contentItems, service_id))
+      dispatch(actions.updateCollaboration(context, contextId, contentItems, tool_id, service_id))
     } else {
-      dispatch(actions.createCollaboration(context, contextId, contentItems))
+      dispatch(actions.createCollaboration(context, contextId, contentItems, tool_id))
     }
   }
 }

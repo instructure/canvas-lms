@@ -121,6 +121,40 @@ module Types
       end
     end
 
+    class AssignmentScoreStatisticType < ApplicationObjectType
+      graphql_name "AssignmentScoreStatistic"
+      description "Statistics for an Assignment"
+
+      field :minimum,
+            Float,
+            "The minimum score for the assignment",
+            null: true
+      field :maximum,
+            Float,
+            "The maximum score for the assignment",
+            null: true
+      field :mean,
+            Float,
+            "The mean score for the assignment",
+            null: true
+      field :count,
+            Int,
+            "The number of scores for the assignment",
+            null: true
+      field :lower_q,
+            Float,
+            "The lower quartile score for the assignment",
+            null: true
+      field :median,
+            Float,
+            "The median score for the assignment",
+            null: true
+      field :upper_q,
+            Float,
+            "The upper quartile score for the assignment",
+            null: true
+    end
+
     global_id_field :id
     key_field_id
 
@@ -345,6 +379,13 @@ module Types
       GRADING_TYPES[assignment.grading_type]
     end
 
+    field :grading_period_id, String, null: true
+    def grading_period_id
+      load_association(:submissions).then do |submissions|
+        submissions.pluck(:grading_period_id).uniq.first
+      end
+    end
+
     field :submission_types,
           [Types::AssignmentSubmissionType],
           null: true
@@ -359,10 +400,37 @@ module Types
       load_association(:context)
     end
 
+    field :course_id, ID, null: true
+    def course_id
+      assignment.context_id
+    end
+
+    field :grades_published, Boolean, null: true
+    def grades_published
+      assignment.grades_published?
+    end
+
+    field :moderated_grading_enabled, Boolean, null: true
+    def moderated_grading_enabled
+      assignment.moderated_grading?
+    end
+
+    field :post_manually, Boolean, null: true
+    def post_manually
+      assignment.post_manually?
+    end
+
+    field :published, Boolean, null: true
+    def published
+      assignment.published?
+    end
+
     field :assignment_group, AssignmentGroupType, null: true
     def assignment_group
       load_association(:assignment_group)
     end
+
+    field :assignment_group_id, ID, null: true
 
     field :only_visible_to_overrides,
           Boolean,
@@ -426,6 +494,17 @@ module Types
       load_association(:context).then do |course|
         if course.grants_right?(current_user, :manage_grades)
           load_association(:post_policy)
+        end
+      end
+    end
+
+    field :score_statistic, AssignmentScoreStatisticType, null: true
+    def score_statistic
+      load_association(:context).then do |course|
+        if course.grants_right?(current_user, :read_as_admin)
+          object.score_statistic if object.can_view_score_statistics?(current_user)
+        elsif object.can_view_score_statistics?(current_user) && object.submissions.first.eligible_for_showing_score_statistics?
+          object.score_statistic
         end
       end
     end

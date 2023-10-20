@@ -244,6 +244,9 @@ module CC::Importer::Canvas
         event["end_at"] = get_time_val(node, "end_at")
         event["all_day_date"] = get_time_val(node, "all_day_date")
         event["all_day"] = get_bool_val(node, "all_day", false)
+        event["rrule"] = get_node_val(node, "rrule")
+        event["series_uuid"] = get_node_val(node, "series_uuid")
+        event["series_head"] = get_node_val(node, "series_head", nil)
         events << event
       end
 

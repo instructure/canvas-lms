@@ -24,6 +24,8 @@ import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
 import ready from '@instructure/ready'
 
 ready(() => {
+  const formSubmissionDelay = window.ENV.INTEROP_8200_DELAY_FORM_SUBMIT
+
   const $toolForm = $('#tool_form')
 
   const launchToolManually = function () {
@@ -39,9 +41,19 @@ ready(() => {
       $button.attr('disabled', true).text($button.data('expired_message'))
     }, 60 * 2.5 * 1000)
 
-    $toolForm.submit(function () {
-      $(this).find('.load_tab,.tab_loaded').toggle()
-    })
+    if (formSubmissionDelay) {
+      setTimeout(
+        () =>
+          $toolForm.submit(function () {
+            $(this).find('.load_tab,.tab_loaded').toggle()
+          }),
+        formSubmissionDelay
+      )
+    } else {
+      $toolForm.submit(function () {
+        $(this).find('.load_tab,.tab_loaded').toggle()
+      })
+    }
   }
 
   const launchToolInNewTab = function () {
@@ -56,17 +68,19 @@ ready(() => {
       break
     case 'self':
       $toolForm.removeAttr('target')
-      try {
+      if (formSubmissionDelay) {
+        setTimeout(() => $toolForm.submit(), formSubmissionDelay)
+      } else {
         $toolForm.submit()
-        // eslint-disable-next-line no-empty
-      } catch (e) {}
+      }
       break
     default:
       // Firefox throws an error when submitting insecure content
-      try {
+      if (formSubmissionDelay) {
+        setTimeout(() => $toolForm.submit(), formSubmissionDelay)
+      } else {
         $toolForm.submit()
-        // eslint-disable-next-line no-empty
-      } catch (e) {}
+      }
 
       $('#tool_content').bind('load', () => {
         if (

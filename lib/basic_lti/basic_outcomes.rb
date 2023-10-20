@@ -151,7 +151,7 @@ module BasicLTI
       def result_data_download_url
         url = @lti_request&.at_css("imsx_POXBody > replaceResultRequest > resultRecord > result > resultData > downloadUrl").try(:content)
         name = @lti_request&.at_css("imsx_POXBody > replaceResultRequest > resultRecord > result > resultData > documentName").try(:content)
-        return { url:, name: } if url && name
+        { url:, name: } if url && name
       end
 
       def result_data_launch_url

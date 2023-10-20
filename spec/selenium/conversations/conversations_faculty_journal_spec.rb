@@ -44,6 +44,7 @@ describe "conversations new" do
   context "Conversations Faculty Journal" do
     before do
       Account.default.update_attribute(:enable_user_notes, true)
+      Account.site_admin.disable_feature!(:deprecate_faculty_journal)
     end
 
     context "when react_inbox feature flag is OFF" do
@@ -140,7 +141,7 @@ describe "conversations new" do
       end
     end
 
-    context "when react_inbox feature flag is ON", ignore_js_errors: true do
+    context "when react_inbox feature flag is ON", :ignore_js_errors do
       before do
         Account.default.enable_feature! :react_inbox
       end

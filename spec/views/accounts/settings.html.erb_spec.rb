@@ -132,20 +132,20 @@ describe "accounts/settings" do
 
         assign(:announcements, [account_notification(account: @account)].paginate)
         render
-        expect(response).to have_text(text)
+        expect(response.body).to include(text)
       end
     end
 
     describe "Root Account Announcements" do
       let(:account) { Account.create!(name: "reading_rainbow") }
 
-      include_examples "account notifications", "This is a message from reading_rainbow"
+      include_examples "account notifications", "This is a message from <b>reading_rainbow</b>"
     end
 
     describe "Site Admin Announcements" do
       let(:account) { Account.site_admin }
 
-      include_examples "account notifications", "This is a message from Canvas Administration"
+      include_examples "account notifications", "This is a message from <b>Canvas Administration</b>"
     end
   end
 
@@ -195,20 +195,20 @@ describe "accounts/settings" do
         Account.site_admin.enable_feature!(:gradebook_show_first_last_names)
         render
 
-        expect(response).to have_tag("input#account_settings_allow_gradebook_show_first_last_names")
+        expect(response).to have_tag("input#account_settings_allow_gradebook_show_first_last_names_value")
       end
 
       it "does not show the setting by default" do
         render
 
-        expect(response).to_not have_tag("input#account_settings_allow_gradebook_show_first_last_names")
+        expect(response).to_not have_tag("input#account_settings_allow_gradebook_show_first_last_names_value")
       end
 
       it "does not show the setting when the gradebook_show_first_last_names feature is disabled" do
         Account.site_admin.disable_feature!(:gradebook_show_first_last_names)
         render
 
-        expect(response).to_not have_tag("input#account_settings_allow_gradebook_show_first_last_names")
+        expect(response).to_not have_tag("input#account_settings_allow_gradebook_show_first_last_names_value")
       end
     end
   end

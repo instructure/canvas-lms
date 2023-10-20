@@ -192,18 +192,19 @@ describe ReleaseNotesController do
     end
 
     it "returns english notes by default" do
-      I18n.locale = :ar
-      get "latest"
-      expect(response).to have_http_status(:ok)
-      res = response.parsed_body
-      expect(res.length).to eq(1)
+      I18n.with_locale(:ar) do
+        get "latest"
+        expect(response).to have_http_status(:ok)
+        res = response.parsed_body
+        expect(res.length).to eq(1)
 
-      json_note = res[0]
-      expect(json_note["id"]).to eq(note.id)
-      expect(json_note["title"]).to eq(note["en"][:title])
-      expect(json_note["description"]).to eq(note["en"][:description])
-      expect(json_note["url"]).to eq(note["en"][:url])
-      expect(Time.zone.parse(json_note["date"])).to eq(note.show_ats["test"])
+        json_note = res[0]
+        expect(json_note["id"]).to eq(note.id)
+        expect(json_note["title"]).to eq(note["en"][:title])
+        expect(json_note["description"]).to eq(note["en"][:description])
+        expect(json_note["url"]).to eq(note["en"][:url])
+        expect(Time.zone.parse(json_note["date"])).to eq(note.show_ats["test"])
+      end
     end
 
     it "returns localized notes when available" do

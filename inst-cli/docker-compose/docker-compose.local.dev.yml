@@ -12,12 +12,13 @@ x-base-service: &BASE-SERVICE
     context: .
   volumes:
       - .:/usr/src/app
+      # needed to prevent local .bundle/plugin/index file from being copied into the container
+      - /usr/src/app/.bundle/plugin
       - api_docs:/usr/src/app/public/doc/api
       - brandable_css_brands:/usr/src/app/app/stylesheets/brandable_css_brands
       - bundler:/home/docker/.bundle/
       - canvas-docker-gems:/home/docker/.gem/
       - canvas-planner_node_modules:/usr/src/app/packages/canvas-planner/node_modules
-      - canvas-planner_lib:/usr/src/app/packages/canvas-planner/lib
       - jest-moxios-utils_node_modules:/usr/src/app/packages/jest-moxios-utils/node_modules
       - js-utils_es:/usr/src/app/packages/js-utils/es
       - js-utils_lib:/usr/src/app/packages/js-utils/lib
@@ -64,6 +65,14 @@ services:
         aliases:
           - canvas-web
           - canvas-web.$INST_DOMAIN
+
+  web-dev-logs:
+    <<: *BASE-SERVICE
+    command: tail -f log/development.log
+    volumes:
+      - log:/usr/src/app/log:ro
+    labels:
+      - "traefik.enable=false"
 
   jobs:
     <<: *BASE-SERVICE
@@ -130,7 +139,6 @@ volumes:
   bundler: {}
   canvas-docker-gems: {}
   canvas-planner_node_modules: {}
-  canvas-planner_lib: {}
   i18nliner_node_modules: {}
   jest-moxios-utils_node_modules: {}
   js-utils_es: {}

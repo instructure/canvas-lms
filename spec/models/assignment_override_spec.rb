@@ -41,7 +41,7 @@ describe AssignmentOverride do
     override = assignment_override_model(course: @course)
     # make it invalid
     AssignmentOverride.where(id: override).update_all(set_type: "potato")
-    expect(override.reload).to be_invalid
+    expect(override.reload).not_to be_valid
     override.destroy
     expect { override.destroy }.not_to raise_error
   end
@@ -75,6 +75,13 @@ describe AssignmentOverride do
     @override.set_type = "Noop"
     expect(@override.set_id).to be_nil
     expect(@override.set).to be_nil
+  end
+
+  it "doesn't crash when calling polymorphic getters on an adhoc override" do
+    @override = assignment_override_model
+    expect(@override.course).to be_nil
+    expect(@override.course_section).to be_nil
+    expect(@override.group).to be_nil
   end
 
   it "removes adhoc associations when an adhoc override is deleted" do
@@ -331,6 +338,30 @@ describe AssignmentOverride do
       expect(@override).to be_valid
     end
 
+    it "accepts course sets" do
+      @override.set = @course
+      expect(@override).to be_valid
+      expect(@override.set_id).to eq @course.id
+    end
+
+    it "rejects course sets with an incorrect set_id" do
+      @override.set = @course
+      @override.set_id = 123
+      expect(@override).not_to be_valid
+    end
+
+    it "rejects course set if unassign_item is true" do
+      @override.set = @course
+      @override.unassign_item = true
+      expect(@override).not_to be_valid
+    end
+
+    it "accepts unassign_item is true if not everyone set_type" do
+      @override.set = @course.course_sections.create!
+      @override.unassign_item = true
+      expect(@override).to be_valid
+    end
+
     it "accepts noop with arbitrary set_id" do
       @override.set_type = "Noop"
       @override.set_id = 9000
@@ -382,11 +413,6 @@ describe AssignmentOverride do
       @override.set = @category.groups.create!(context: @assignment.context)
       @override.workflow_state = "deleted"
       expect(@override).to be_valid
-    end
-
-    it "rejects unrecognized sets" do
-      @override.set = @override.assignment.context
-      expect(@override).not_to be_valid
     end
 
     it "rejects duplicate sets" do
@@ -837,7 +863,7 @@ describe AssignmentOverride do
     end
 
     it "triggers when applicable override is created" do
-      expect(DueDateCacher).to receive(:recompute).with(@assignment)
+      expect(SubmissionLifecycleManager).to receive(:recompute).with(@assignment)
       new_override = @assignment.assignment_overrides.build
       new_override.title = "New Override"
       new_override.override_due_at(3.days.from_now)
@@ -845,38 +871,38 @@ describe AssignmentOverride do
     end
 
     it "triggers when overridden due_at changes" do
-      expect(DueDateCacher).to receive(:recompute).with(@assignment)
+      expect(SubmissionLifecycleManager).to receive(:recompute).with(@assignment)
       @override.override_due_at(5.days.from_now)
       @override.save
     end
 
     it "triggers when overridden due_at changes to nil" do
-      expect(DueDateCacher).to receive(:recompute).with(@assignment)
+      expect(SubmissionLifecycleManager).to receive(:recompute).with(@assignment)
       @override.override_due_at(nil)
       @override.save
     end
 
     it "triggers when due_at_overridden changes" do
-      expect(DueDateCacher).to receive(:recompute).with(@assignment)
+      expect(SubmissionLifecycleManager).to receive(:recompute).with(@assignment)
       @override.clear_due_at_override
       @override.save
     end
 
     it "triggers when applicable override deleted" do
-      expect(DueDateCacher).to receive(:recompute).with(@assignment)
+      expect(SubmissionLifecycleManager).to receive(:recompute).with(@assignment)
       @override.destroy
     end
 
     it "triggers when applicable override undeleted" do
       @override.destroy
 
-      expect(DueDateCacher).to receive(:recompute).with(@assignment)
+      expect(SubmissionLifecycleManager).to receive(:recompute).with(@assignment)
       @override.workflow_state = "active"
       @override.save
     end
 
     it "triggers when override without a due_date is created" do
-      expect(DueDateCacher).to receive(:recompute)
+      expect(SubmissionLifecycleManager).to receive(:recompute)
       @assignment.assignment_overrides.create
     end
 
@@ -884,7 +910,7 @@ describe AssignmentOverride do
       @override.clear_due_at_override
       @override.save
 
-      expect(DueDateCacher).to receive(:recompute)
+      expect(SubmissionLifecycleManager).to receive(:recompute)
       @override.destroy
     end
 
@@ -892,13 +918,13 @@ describe AssignmentOverride do
       @override.clear_due_at_override
       @override.destroy
 
-      expect(DueDateCacher).to receive(:recompute)
+      expect(SubmissionLifecycleManager).to receive(:recompute)
       @override.workflow_state = "active"
       @override.save
     end
 
     it "does not trigger when nothing changed" do
-      expect(DueDateCacher).not_to receive(:recompute)
+      expect(SubmissionLifecycleManager).not_to receive(:recompute)
       @override.save
     end
   end
@@ -965,16 +991,14 @@ describe AssignmentOverride do
     end
 
     it "does nothing if the set is not empty" do
-      allow(@override).to receive(:set_type).and_return "ADHOC"
-      allow(@override).to receive(:set).and_return [1, 2, 3]
+      allow(@override).to receive_messages(set_type: "ADHOC", set: [1, 2, 3])
       expect(@override).not_to receive(:destroy)
 
       @override.destroy_if_empty_set
     end
 
     it "destroys itself if the set is empty" do
-      allow(@override).to receive(:set_type).and_return "ADHOC"
-      allow(@override).to receive(:set).and_return []
+      allow(@override).to receive_messages(set_type: "ADHOC", set: [])
       expect(@override).to receive(:destroy).once
 
       @override.destroy_if_empty_set
@@ -1018,6 +1042,15 @@ describe AssignmentOverride do
 
       expect(@override.applies_to_students).to include(@active_student, @student)
     end
+
+    it "returns the right students for course sets" do
+      @override = assignment_override_model(course: @course)
+      @override.set = @course
+      @override.save!
+
+      expect(@override.applies_to_students).to include(@active_student)
+      expect(@override.applies_to_students).to eq @course.participating_students
+    end
   end
 
   describe "assignment_edits" do
@@ -1026,8 +1059,7 @@ describe AssignmentOverride do
     end
 
     it "returns false if no students who are active in course for ADHOC" do
-      allow(@override).to receive(:set_type).and_return "ADHOC"
-      allow(@override).to receive(:set).and_return []
+      allow(@override).to receive_messages(set_type: "ADHOC", set: [])
 
       expect(@override.set_not_empty?).to be false
     end

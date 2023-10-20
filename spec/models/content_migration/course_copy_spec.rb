@@ -68,6 +68,18 @@ describe ContentMigration do
       expect(@cm.reload.migration_settings[:job_ids]).to eq([123])
     end
 
+    it "migrates course home links in rich content on copy" do
+      course_model
+
+      page = @copy_from.wiki_pages.create!(title: "page 1", body: %(<p><a title="Home" href="/courses/#{@copy_from.id}?wrap=1">Home</a></p><p><a title="Home" href="/courses/#{@copy_from.id}">Home 2</a></p>))
+
+      run_course_copy
+
+      new_page = @copy_to.wiki_pages.where(migration_id: mig_id(page)).first
+      expect(new_page).not_to be_nil
+      expect(new_page.body).to match(%r{<p><a title="Home" href="/courses/#{@copy_to.id}/?\?wrap=1">Home</a></p><p><a title="Home" href="/courses/#{@copy_to.id}/?">Home 2</a></p>})
+    end
+
     it "migrates syllabus links on copy" do
       course_model
 
@@ -753,10 +765,68 @@ describe ContentMigration do
     context "kaltura media objects" do
       before do
         allow(Account.site_admin).to receive(:feature_enabled?).with(:media_links_use_attachment_id).and_return true
-        allow(CanvasKaltura::ClientV3).to receive(:config).and_return(true)
         kaltura_double = double("kaltura")
-        allow(CanvasKaltura::ClientV3).to receive(:new).and_return(kaltura_double)
         allow(kaltura_double).to receive(:startSession)
+        # rubocop:disable RSpec/ReceiveMessages
+        allow(kaltura_double).to receive(:flavorAssetGetByEntryId).and_return([
+                                                                                {
+                                                                                  isOriginal: 1,
+                                                                                  containerFormat: "mp4",
+                                                                                  fileExt: "mp4",
+                                                                                  id: "one",
+                                                                                  size: 15,
+                                                                                }
+                                                                              ])
+        allow(kaltura_double).to receive(:flavorAssetGetOriginalAsset).and_return(kaltura_double.flavorAssetGetByEntryId.first)
+        # rubocop:enable RSpec/ReceiveMessages
+        allow(CanvasKaltura::ClientV3).to receive_messages(config: true, new: kaltura_double)
+      end
+
+      it "updates media attachment links" do
+        media_id = "0_deadbeef"
+        @copy_from.media_objects.create!(media_id:)
+        att = @copy_from.attachments.where(media_entry_id: media_id).first
+        @copy_from.syllabus_body = %(<p><iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="#{media_id}" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_attachments_iframe/#{att.id}?type=video"></iframe></p>)
+        run_course_copy
+        new_att = @copy_to.attachments.where(migration_id: mig_id(att)).first
+        expect(@copy_to.syllabus_body).to eq @copy_from.syllabus_body.sub("/media_attachments_iframe/#{att.id}", "/media_attachments_iframe/#{new_att.id}")
+      end
+
+      context "sharding" do
+        specs_require_sharding
+
+        it "updates media attachment links with shortened global ids" do
+          media_id = "0_deadbeef"
+          @copy_from.media_objects.create!(media_id:)
+          att = @copy_from.attachments.where(media_entry_id: media_id).first
+          short_id = Shard.short_id_for(att.global_id)
+          @copy_from.syllabus_body = %(<p><iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="#{media_id}" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_attachments_iframe/#{short_id}?type=video"></iframe></p>)
+          run_course_copy
+          new_att = @copy_to.attachments.where(migration_id: mig_id(att)).first
+          expect(@copy_to.syllabus_body).to eq @copy_from.syllabus_body.sub("/media_attachments_iframe/#{short_id}", "/media_attachments_iframe/#{new_att.id}")
+        end
+      end
+
+      it "does not update media attachment links from a different course" do
+        media_id = "0_deadbeef"
+        course_with_teacher(course_name: "from course", active_all: true)
+        @course.media_objects.create!(media_id:)
+        att = @course.attachments.where(media_entry_id: media_id).first
+        @copy_from.syllabus_body = %(<p><iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="#{media_id}" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_attachments_iframe/#{att.id}?type=video"></iframe></p>)
+        run_course_copy
+        expect(@copy_to.attachments.count).to eq 0
+        expect(@copy_to.media_objects.count).to eq 0
+        expect(@copy_to.syllabus_body).to eq @copy_from.syllabus_body
+      end
+
+      it "does not update media attachment links from user media" do
+        media_id = "0_deadbeef"
+        att = attachment_model(display_name: "lolcats.mp4", context: @user, media_entry_id: media_id)
+        @copy_from.syllabus_body = %(<p><iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="#{media_id}" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_attachments_iframe/#{att.id}?type=video"></iframe></p>)
+        run_course_copy
+        expect(@copy_to.attachments.count).to eq 0
+        expect(@copy_to.media_objects.count).to eq 0
+        expect(@copy_to.syllabus_body).to eq @copy_from.syllabus_body
       end
 
       it "re-uses kaltura media objects" do
@@ -809,6 +879,25 @@ describe ContentMigration do
           expect(MediaObject.where(media_id:).count).to eq 1
         end.to change { MediaTrack.count }.by(1)
       end
+
+      it "doesn't crash when another type of file is linked in HTML" do
+        img_att = attachment_model(context: @copy_from, uploaded_data: stub_png_data, filename: "homework.png")
+        media_id = "0_deadbeef"
+        media_object = course_factory.media_objects.create!(media_id:)
+        att = Attachment.create!(filename: "video.mp4", uploaded_data: StringIO.new("pixels and frames and stuff"), folder: Folder.root_folders(@copy_from).first, context: @copy_from)
+        att.media_entry_id = media_id
+        att.content_type = "video/mp4"
+        att.save!
+        att.media_tracks.create!(content: "en subs", media_object_id: media_object, kind: "subtitles", locale: "en", user_id: att.user_id)
+
+        @copy_from.announcements.create!(title: "links", message: <<~HTML)
+          <p><img src="/courses/#{@copy_from.id}/files/#{img_att.id}/preview" alt="assoc_1.png" /></p>
+          <p><iframe data-media-type="video" src="/media_attachments_iframe/#{att}?type=video" data-media-id="#{media_id}"></iframe></p>
+        HTML
+        run_course_copy
+
+        expect(@copy_to.attachments.find_by(filename: "video.mp4").media_tracks.length).to eq 1
+      end
     end
 
     it "imports calendar events" do
@@ -829,9 +918,14 @@ describe ContentMigration do
       cal3 = @copy_from.calendar_events.create!(title: "deleted event")
       cal3.destroy
 
+      series_uuid = "8233ffdc-9067-4eaf-a726-19c3718dab29"
+      rrule = "FREQ=DAILY;INTERVAL=1;UNTIL=20241001T055959Z"
+      cal4 = @copy_from.calendar_events.create!(series_uuid:, rrule:, series_head: true)
+      cal5 = @copy_from.calendar_events.create!(series_uuid:, rrule:)
+
       run_course_copy
 
-      expect(@copy_to.calendar_events.count).to eq 2
+      expect(@copy_to.calendar_events.count).to eq 4
       cal_2 = @copy_to.calendar_events.where(migration_id: mig_id(cal)).first
       expect(cal_2.title).to eq cal.title
       expect(cal_2.start_at.to_i).to eq cal.start_at.to_i
@@ -845,6 +939,15 @@ describe ContentMigration do
       expect(cal2_2.start_at.to_i).to eq cal2.start_at.to_i
       expect(cal2_2.end_at.to_i).to eq cal2.end_at.to_i
       expect(cal2_2.description).to eq ""
+
+      cal_4 = @copy_to.calendar_events.where(migration_id: mig_id(cal4)).first
+      expect(cal_4.series_head).to be_truthy
+
+      cal_5 = @copy_to.calendar_events.where(migration_id: mig_id(cal5)).first
+      expect(cal_5.rrule).to eq rrule
+      expect(cal_5.series_head).to be_nil
+      expect(cal_5.series_uuid).to be_truthy
+      expect(cal_5.series_uuid).to eq cal_4.series_uuid
     end
 
     it "does not leave link placeholders on catastrophic failure" do

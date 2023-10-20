@@ -16,25 +16,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export type InputEvent = {
+export type DTNPIEvent = {
   // A unique ID for the widget that generated this event, which can be used
   // to group related events to get an idea of the whole interaction.
   id: string
-  locale?: string
+  type: string
+  locale?: string | null
   method: 'pick' | 'type' | 'paste'
   // Will be null if the value did not parse into a date.
-  parsed?: string
-  value: string
+  parsed?: string | null
+  value: string | null
 }
 
-let state = {events: [] as InputEvent[]}
+let state: {
+  events: DTNPIEvent[]
+} = {events: []}
 
-export function configure({events}: {events: Array<InputEvent>}) {
+export function configure({events}: {events: Array<DTNPIEvent>}) {
   const previousState = {...state}
   state = {events}
   return previousState
 }
 
-export const log = (event: InputEvent): void => {
+export const log = (event: DTNPIEvent): void => {
   state.events.push(event)
 }

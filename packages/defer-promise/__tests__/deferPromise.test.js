@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {deferPromise} from '../index'
+import deferPromise from '../index'
 
 describe('Shared > Async > .deferPromise()', () => {
   let deferred

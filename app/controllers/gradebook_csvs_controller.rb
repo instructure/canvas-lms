@@ -39,7 +39,7 @@ class GradebookCsvsController < ApplicationController
         csv_options[:assignment_order] = params[:assignment_order].map(&:to_i)
       end
 
-      if @context.root_account.allow_gradebook_show_first_last_names? &&
+      if @context.account.allow_gradebook_show_first_last_names? &&
          Account.site_admin.feature_enabled?(:gradebook_show_first_last_names) &&
          params[:show_student_first_last_name]
         csv_options[:show_student_first_last_name] = Canvas::Plugin.value_to_boolean(params[:show_student_first_last_name])

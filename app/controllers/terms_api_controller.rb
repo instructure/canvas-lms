@@ -93,6 +93,8 @@
 #     }
 #
 class TermsApiController < ApplicationController
+  PER_PAGE = 20
+
   before_action :require_context, :require_root_account, :require_account_access
 
   include Api::V1::EnrollmentTerm
@@ -110,6 +112,10 @@ class TermsApiController < ApplicationController
   #
   #   "overrides":: term start/end dates overridden for different enrollment types
   #   "course_count":: the number of courses in each term
+  #
+  # @argument term_name [String]
+  #  If set, only returns terms that match the given search keyword.
+  #  Search keyword is matched against term name.
   #
   # @example_request
   #   curl -H 'Authorization: Bearer <token>' \
@@ -143,15 +149,44 @@ class TermsApiController < ApplicationController
   #
   # @returns EnrollmentTermsList
   def index
-    terms = @context.enrollment_terms.order("start_at DESC, end_at DESC, id ASC")
+    @terms = @context.enrollment_terms
 
-    state = Array(params[:workflow_state]) & %w[all active deleted]
-    state = "active" if state == []
-    state = nil if Array(state).include?("all")
-    terms = terms.where(workflow_state: state) if state.present?
+    @term_name = params[:term_name]
+    if @term_name.present?
+      @terms = @terms.where(["name ILIKE ?", "%#{@term_name}%"])
+    end
 
-    terms = Api.paginate(terms, self, api_v1_enrollment_terms_url)
-    render json: { enrollment_terms: enrollment_terms_json(terms, @current_user, session, nil, Array(params[:include])) }
+    respond_to do |format|
+      format.html do
+        @root_account = @context.root_account
+
+        @terms = @terms.active.preload(:enrollment_dates_overrides)
+        @terms = @terms.order(Arel.sql("COALESCE(start_at, created_at) DESC"))
+        @terms = @terms.paginate(per_page: PER_PAGE, page: params[:page])
+
+        @course_counts_by_term = EnrollmentTerm.course_counts(@terms)
+      end
+      format.json do
+        state = Array(params[:workflow_state]) & %w[all active deleted]
+        state = "active" if state == []
+        state = nil if Array(state).include?("all")
+
+        @terms = @terms.where(workflow_state: state) if state.present?
+        @terms = @terms.order("start_at DESC, end_at DESC, id ASC")
+        @terms = Api.paginate(@terms,
+                              self,
+                              api_v1_enrollment_terms_url)
+
+        render json: { enrollment_terms:
+                         enrollment_terms_json(
+                           @terms,
+                           @current_user,
+                           session,
+                           nil,
+                           Array(params[:include])
+                         ) }
+      end
+    end
   end
 
   # @API Retrieve enrollment term
@@ -178,6 +213,6 @@ class TermsApiController < ApplicationController
   end
 
   def require_account_access
-    return false unless authorized_action(@context, @current_user, :read_terms)
+    authorized_action(@context, @current_user, :read_terms)
   end
 end

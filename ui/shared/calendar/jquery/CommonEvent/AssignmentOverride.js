@@ -17,12 +17,12 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import $ from 'jquery'
 import CommonEvent from './CommonEvent'
 import fcUtil from '../fcUtil'
 import {extend} from '@canvas/util/legacyCoffeesScriptHelpers'
 import '@canvas/datetime'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
+import replaceTags from '@canvas/util/replaceTags'
 
 const I18n = useI18nScope('calendar')
 
@@ -107,7 +107,7 @@ Object.assign(AssignmentOverride.prototype, {
   },
 
   methodAndURLForSave() {
-    const url = $.replaceTags(this.contextInfo.assignment_override_url, {
+    const url = replaceTags(this.contextInfo.assignment_override_url, {
       assignment_id: this.assignment.id,
       id: this.override.id,
     })

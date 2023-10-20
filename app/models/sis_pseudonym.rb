@@ -180,7 +180,7 @@ class SisPseudonym
         relation.order(Arel.sql("sis_user_id IS NULL"))
       end
     relation.primary_shard.activate do
-      relation = relation.order(Pseudonym.best_unicode_collation_key(:unique_id))
+      relation = relation.order(Pseudonym.best_unicode_collation_key(:unique_id), :position)
     end
 
     if type == :implicit
@@ -204,7 +204,9 @@ class SisPseudonym
         true
       end
     else
-      collection.sort_by { |p| [p.workflow_state, p.sis_user_id ? 0 : 1, Canvas::ICU.collation_key(p.unique_id)] }.detect do |p|
+      collection.sort_by do |p|
+        [p.workflow_state, p.sis_user_id ? 0 : 1, Canvas::ICU.collation_key(p.unique_id), p.position]
+      end.detect do |p|
         next if account_ids && !account_ids.include?(p.account_id)
         next if !account_ids && !p.works_for_account?(root_account, type == :implicit)
         next if require_sis && !p.sis_user_id

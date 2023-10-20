@@ -21,6 +21,11 @@ class AssignmentPage
   class << self
     include SeleniumDependencies
 
+    # Selectors
+    def course_pacing_notice_selector
+      "[data-testid='CoursePacingNotice']"
+    end
+
     def visit(course, assignment)
       get "/courses/#{course}/assignments/#{assignment}"
     end
@@ -79,7 +84,7 @@ class AssignmentPage
     end
 
     def course_pacing_notice
-      f("[data-testid='CoursePacingNotice']")
+      f(course_pacing_notice_selector)
     end
   end
 end

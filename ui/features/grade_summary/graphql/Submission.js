@@ -19,12 +19,14 @@
 import gql from 'graphql-tag'
 import {arrayOf, float, string, bool} from 'prop-types'
 
+import {RubricAssessment} from '@canvas/assignments/graphql/student/RubricAssessment'
 import {SubmissionComment} from './SubmissionComment'
 
 export const Submission = {
   fragment: gql`
     fragment Submission on Submission {
       _id
+      customGradeStatus
       gradingStatus
       grade
       score
@@ -33,16 +35,24 @@ export const Submission = {
       readState
       late
       updatedAt
+      excused
       commentsConnection {
         nodes {
           ...SubmissionComment
         }
       }
+      rubricAssessmentsConnection {
+        nodes {
+          ...RubricAssessment
+        }
+      }
     }
+    ${RubricAssessment.fragment}
     ${SubmissionComment.fragment}
   `,
   shape: {
     _id: string,
+    customGradeStatus: string,
     gradingStatus: string,
     grade: string,
     score: float,
@@ -51,6 +61,7 @@ export const Submission = {
     readState: string,
     late: bool,
     updatedAt: string,
+    excused: bool,
     commentsConnection: arrayOf({
       nodes: arrayOf({
         comment: string,
@@ -61,11 +72,12 @@ export const Submission = {
         },
       }),
     }),
+    rubricAssessmentsConnection: {nods: arrayOf(RubricAssessment.shape)},
   },
   mock: ({
     _id = '1',
+    customGradeStatus = null,
     gradingStatus = 'graded',
-
     grade = 'A-',
     score = 90,
     gradingPeriodId = '1',
@@ -73,6 +85,7 @@ export const Submission = {
     readState = 'read',
     late = false,
     updatedAt = '2019-01-01T00:00:00Z',
+    excused = false,
     commentsConnection = {
       nodes: [
         {
@@ -85,8 +98,12 @@ export const Submission = {
         },
       ],
     },
+    rubricAssessmentsConnection = {
+      nodes: [RubricAssessment.mock()],
+    },
   } = {}) => ({
     _id,
+    customGradeStatus,
     gradingStatus,
     grade,
     score,
@@ -95,7 +112,8 @@ export const Submission = {
     readState,
     late,
     updatedAt,
+    excused,
     commentsConnection,
-    __typename: 'Submission',
+    rubricAssessmentsConnection,
   }),
 }

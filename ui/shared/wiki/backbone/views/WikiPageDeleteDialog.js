@@ -17,9 +17,7 @@
 
 import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import DialogFormView, {
-  getResponsiveWidth,
-} from '@canvas/forms/backbone/views/DialogFormView'
+import DialogFormView, {getResponsiveWidth} from '@canvas/forms/backbone/views/DialogFormView'
 
 const I18n = useI18nScope('pages')
 

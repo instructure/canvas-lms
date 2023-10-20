@@ -27,6 +27,7 @@ module AdheresToPolicy
   require "adheres_to_policy/configuration"
   require "adheres_to_policy/instance_methods"
   require "adheres_to_policy/policy"
+  require "adheres_to_policy/results"
 
   @configuration = Configuration.new
   class << self

@@ -92,6 +92,7 @@ module Lti
         definition = {
           definition_type: tool.class.name,
           definition_id: tool.id,
+          url: tool.url,
           name: tool.label_for(placements.first, I18n.locale),
           description: tool.description,
           domain: tool.domain,

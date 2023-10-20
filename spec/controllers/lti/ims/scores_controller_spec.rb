@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require "apis/api_spec_helper"
-require_relative "./concerns/advantage_services_shared_context"
-require_relative "./concerns/advantage_services_shared_examples"
-require_relative "./concerns/lti_services_shared_examples"
+require_relative "concerns/advantage_services_shared_context"
+require_relative "concerns/advantage_services_shared_examples"
+require_relative "concerns/lti_services_shared_examples"
 
 module Lti::IMS
   RSpec.describe ScoresController do
@@ -68,6 +68,8 @@ module Lti::IMS
     let(:action) { :create }
     let(:scope_to_remove) { "https://purl.imsglobal.org/spec/lti-ags/scope/score" }
 
+    before { assignment }
+
     describe "#create" do
       let(:content_type) { "application/vnd.ims.lis.v1.score+json" }
 
@@ -91,7 +93,7 @@ module Lti::IMS
 
         context "when the consistent_ags_ids_based_on_account_principal_domain feature flag is on" do
           it "uses the Account#domain in the resultUrl" do
-            allow_any_instance_of(Account).to receive(:domain).and_return("canonical.host")
+            allow_any_instance_of(Account).to receive(:environment_specific_domain).and_return("canonical.host")
             course.root_account.enable_feature!(:consistent_ags_ids_based_on_account_principal_domain)
             send_request
             expect(json["resultUrl"]).to start_with(
@@ -103,7 +105,7 @@ module Lti::IMS
         context "when the consistent_ags_ids_based_on_account_principal_domain feature flag is off" do
           it "uses the host domain in the resultUrl" do
             course.root_account.disable_feature!(:consistent_ags_ids_based_on_account_principal_domain)
-            allow_any_instance_of(Account).to receive(:domain).and_return("canonical.host")
+            allow_any_instance_of(Account).to receive(:environment_specific_domain).and_return("canonical.host")
             send_request
             expect(json["resultUrl"]).to start_with(
               "http://test.host/api/lti/courses/#{course.id}/line_items/"
@@ -561,7 +563,7 @@ module Lti::IMS
               context "when the consistent_ags_ids_based_on_account_principal_domain feature flag is on" do
                 it "returns a progress URL with the Account#domain" do
                   course.root_account.enable_feature!(:consistent_ags_ids_based_on_account_principal_domain)
-                  allow_any_instance_of(Account).to receive(:domain).and_return("canonical.host")
+                  allow_any_instance_of(Account).to receive(:environment_specific_domain).and_return("canonical.host")
                   send_request
                   expect(actual_progress_url)
                     .to start_with("http://canonical.host/api/lti/courses/#{context_id}/progress/")
@@ -571,7 +573,7 @@ module Lti::IMS
               context "when the consistent_ags_ids_based_on_account_principal_domain feature flag is off" do
                 it "returns a progress URL with the Account#domain" do
                   course.root_account.disable_feature!(:consistent_ags_ids_based_on_account_principal_domain)
-                  allow_any_instance_of(Account).to receive(:domain).and_return("canonical.host")
+                  allow_any_instance_of(Account).to receive(:environment_specific_domain).and_return("canonical.host")
                   send_request
                   expect(actual_progress_url)
                     .to start_with("http://test.host/api/lti/courses/#{context_id}/progress/")
@@ -672,8 +674,7 @@ module Lti::IMS
 
             context "with InstFS enabled" do
               before do
-                allow(InstFS).to receive(:enabled?).and_return(true)
-                allow(InstFS).to receive(:jwt_secrets).and_return(["jwt signing key"])
+                allow(InstFS).to receive_messages(enabled?: true, jwt_secrets: ["jwt signing key"])
                 @token = Canvas::Security.create_jwt({}, nil, InstFS.jwt_secret)
                 allow(CanvasHttp).to receive(:post).and_return(
                   double(class: Net::HTTPCreated, code: 201, body: {})

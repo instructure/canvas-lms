@@ -39,6 +39,19 @@ describe MasterCourses::MasterMigration do
     @migration.reload
   end
 
+  def run_course_copy(copy_from, copy_to)
+    @cm = ContentMigration.new(context: copy_to,
+                               user: @user,
+                               source_course: copy_from,
+                               migration_type: "course_copy_importer",
+                               copy_options: { everything: "1" })
+    @cm.migration_settings[:import_immediately] = true
+    @cm.set_default_settings
+    @cm.save!
+    worker = Canvas::Migration::Worker::CourseCopyWorker.new
+    worker.perform(@cm)
+  end
+
   describe "start_new_migration!" do
     it "queues a migration" do
       expect_any_instance_of(MasterCourses::MasterMigration).to receive(:queue_export_job).once
@@ -223,7 +236,7 @@ describe MasterCourses::MasterMigration do
         @original_assignment.touch
         run_master_migration
 
-        # The one line item downstream change stops assignment synch as a whole
+        # The one line item downstream change stops assignment sync as a whole
         expect(@assignment_copy.reload.title).to eq("updated assignment title")
         expect(@line_item_copy.reload.label).to eq("updated assignment title")
         expect(@line_item_copy.reload.resource_id).to eq("downstream_resource_id")
@@ -235,10 +248,18 @@ describe MasterCourses::MasterMigration do
         expect(@line_item_copy.reload.label).to eq("updated assignment title AGAIN")
         expect(@line_item_copy.reload.resource_id).to eq("updated_resource_id AGAIN")
       end
+
+      it "does not cause errors for regular course copies" do
+        fresh_course = course_factory
+        Account.site_admin.enable_feature! :blueprint_line_item_support
+        run_course_copy(@copy_from, fresh_course)
+        expect(fresh_course.assignments.count).to eq(@copy_from.assignments.count)
+        expect(@cm.migration_issues).to be_empty
+      end
     end
 
     context "with blueprint_line_item_support OFF" do
-      it "respects line item downstream editing and assignment locking" do
+      it "ignores downstream editing" do
         Account.site_admin.disable_feature! :blueprint_line_item_support
 
         expect(@original_line_item.resource_id).to eq("some_resource_id")
@@ -252,11 +273,23 @@ describe MasterCourses::MasterMigration do
         @original_line_item.update!(resource_id: "updated_resource_id AGAIN")
         @original_assignment.update!(title: "updated assignment title AGAIN")
         @original_assignment.touch
-        run_master_migration
-
+        Timecop.freeze(1.minute.from_now) { run_master_migration }
         expect(@assignment_copy.reload.title).to eq("updated assignment title AGAIN")
         expect(@line_item_copy.reload.label).to eq("updated assignment title AGAIN")
         expect(@line_item_copy.reload.resource_id).to eq("updated_resource_id AGAIN")
+      end
+
+      it "ignores assignment locking" do
+        Account.site_admin.disable_feature! :blueprint_line_item_support
+        expect(@original_line_item.resource_id).to eq("some_resource_id")
+
+        @template.content_tag_for(@original_assignment).update_attribute(:restrictions, { content: true })
+        @original_line_item.update!(resource_id: "updated_resource_id")
+        @original_assignment.update!(title: "updated assignment title")
+
+        Timecop.freeze(1.minute.from_now) { run_master_migration }
+        expect(@line_item_copy.reload.label).to eq("updated assignment title")
+        expect(@line_item_copy.reload.resource_id).to eq("updated_resource_id")
       end
     end
   end
@@ -1297,6 +1330,10 @@ describe MasterCourses::MasterMigration do
     end
 
     context "media_links_use_attachment_id feature flag off" do
+      before do
+        Account.site_admin.disable_feature!(:media_links_use_attachment_id)
+      end
+
       it "does not copy media tracks" do
         @copy_to = course_factory
         @template.add_child_course!(@copy_to)
@@ -1313,83 +1350,131 @@ describe MasterCourses::MasterMigration do
       end
     end
 
-    context "media_links_use_attachment_id feature flag" do
-      before do
-        allow(Account.site_admin).to receive(:feature_enabled?).with(:media_links_use_attachment_id).and_return true
+    it "copies media tracks" do
+      @copy_to = course_factory
+      @template.add_child_course!(@copy_to)
+
+      media_id = "m-you_know_what_you_did"
+      media_object = @copy_from.media_objects.create!(title: "video.mp4", media_id:)
+      copy_from_track = media_object.media_tracks.create!(kind: "subtitles", locale: "en", content: "en subs")
+
+      run_master_migration
+
+      att_to = @copy_to.attachments.where(migration_id: mig_id(media_object.attachment)).first
+      expect(att_to.media_tracks.length).to eq 1
+      expect(att_to.media_entry_id).to eq media_id
+      copy_to_track = att_to.media_tracks.first
+      expect(copy_to_track.id).not_to eq copy_from_track.id
+      expect(copy_to_track.slice(:locale, :content)).to match({ locale: "en", content: "en subs" })
+    end
+
+    it "overwrites media tracks with new parent changes" do
+      @copy_to = course_factory
+      @template.add_child_course!(@copy_to)
+
+      media_id = "m-you_know_what_you_did"
+      media_object = @copy_from.media_objects.create!(title: "video.mp4", media_id:)
+      copy_from_track = media_object.media_tracks.create!(kind: "subtitles", locale: "en", content: "en subs")
+
+      run_master_migration
+
+      att_to = @copy_to.attachments.where(migration_id: mig_id(media_object.attachment)).first
+      copy_to_track = att_to.media_tracks.first
+      expect(copy_to_track).to be_present
+
+      Timecop.freeze(1.minute.from_now) do
+        copy_from_track.destroy
+        media_object.media_tracks.create!(kind: "subtitles", locale: "en", content: "orig subs")
+      end
+      run_master_migration
+
+      expect(att_to.reload.media_tracks.length).to eq 1
+      copy_to_track = att_to.media_tracks.first
+      expect(copy_to_track.content).to eq "orig subs"
+    end
+
+    it "doesn't overwrite media tracks with downstream changes" do
+      @copy_to = course_factory
+      @template.add_child_course!(@copy_to)
+
+      media_id = "m-you_know_what_you_did"
+      media_object = @copy_from.media_objects.create!(title: "video.mp4", media_id:)
+      copy_from_track = media_object.media_tracks.create!(kind: "subtitles", locale: "en", content: "en subs")
+
+      run_master_migration
+
+      att_to = @copy_to.attachments.where(migration_id: mig_id(media_object.attachment)).first
+      copy_to_track = att_to.media_tracks.first
+      expect(copy_to_track).to be_present
+
+      Timecop.freeze(1.minute.from_now) do
+        copy_to_track.destroy
+        att_to.media_tracks.create!(kind: "subtitles", locale: "en", content: "new subs")
+        copy_from_track.destroy
+        media_object.media_tracks.create!(kind: "subtitles", locale: "en", content: "orig subs")
+      end
+      run_master_migration
+
+      expect(att_to.media_tracks.length).to eq 1
+      copy_to_track = att_to.media_tracks.first
+      expect(copy_to_track.content).to eq "new subs"
+    end
+
+    it "overwrites media tracks with downstream changes if the attachment has been updated" do
+      @copy_to = course_factory
+      @template.add_child_course!(@copy_to)
+
+      media_id = "m-you_know_what_you_did"
+      media_object = @copy_from.media_objects.create!(title: "video.mp4", media_id:)
+      media_object.media_tracks.create!(kind: "subtitles", locale: "en", content: "en subs")
+
+      run_master_migration
+
+      att_to = @copy_to.attachments.where(migration_id: mig_id(media_object.attachment)).first
+      copy_to_track = att_to.media_tracks.first
+      expect(copy_to_track).to be_present
+
+      Timecop.freeze(1.minute.from_now) do
+        copy_to_track.destroy
+        att_to.media_tracks.create!(kind: "subtitles", locale: "en", content: "new subs")
+        @new_att = @copy_from.attachments.create!(filename: "video.mp4", uploaded_data: StringIO.new("ohai"), folder: media_object.attachment.folder, media_entry_id: media_id)
+        @new_att.handle_duplicates(:overwrite)
+        @new_att.media_tracks.create!(kind: "subtitles", locale: "en", content: "orig subs")
+      end
+      run_master_migration
+
+      expect(@new_att.media_tracks.length).to eq 1
+      copy_to_track = @new_att.media_tracks.first
+      expect(copy_to_track.content).to eq "orig subs"
+    end
+
+    it "overwrites media tracks when pushing a locked attachment" do
+      @copy_to = course_factory
+      @template.add_child_course!(@copy_to)
+
+      media_id = "m-you_know_what_you_did"
+      media_object = @copy_from.media_objects.create!(title: "video.mp4", media_id:)
+      media_object.media_tracks.create!(kind: "subtitles", locale: "en", content: "orig subs")
+      att_from = media_object.attachment
+
+      run_master_migration
+
+      att_to = @copy_to.attachments.where(migration_id: mig_id(media_object.attachment)).first
+      copy_to_track = att_to.media_tracks.first
+      expect(copy_to_track).to be_present
+
+      Timecop.freeze(1.minute.from_now) do
+        copy_to_track.destroy
+        att_to.media_tracks.create!(kind: "subtitles", locale: "en", content: "new subs")
+        att_to.media_tracks.create!(kind: "subtitles", locale: "fr", content: "fr subs")
       end
 
-      it "copies media tracks" do
-        @copy_to = course_factory
-        @template.add_child_course!(@copy_to)
+      @template.content_tag_for(att_from).update(restrictions: { content: true }) # should touch the content
+      run_master_migration
 
-        media_id = "m-you_know_what_you_did"
-        media_object = @copy_from.media_objects.create!(title: "video.mp4", media_id:)
-        copy_from_track = media_object.media_tracks.create!(kind: "subtitles", locale: "en", content: "en subs")
-
-        run_master_migration
-
-        att_to = @copy_to.attachments.where(migration_id: mig_id(media_object.attachment)).first
-        expect(att_to.media_tracks.length).to eq 1
-        expect(att_to.media_entry_id).to eq media_id
-        copy_to_track = att_to.media_tracks.first
-        expect(copy_to_track.id).not_to eq copy_from_track.id
-        expect(copy_to_track.slice(:locale, :content)).to match({ locale: "en", content: "en subs" })
-      end
-
-      it "doesn't overwrite media tracks with downstream changes" do
-        @copy_to = course_factory
-        @template.add_child_course!(@copy_to)
-
-        media_id = "m-you_know_what_you_did"
-        media_object = @copy_from.media_objects.create!(title: "video.mp4", media_id:)
-        copy_from_track = media_object.media_tracks.create!(kind: "subtitles", locale: "en", content: "en subs")
-
-        run_master_migration
-
-        att_to = @copy_to.attachments.where(migration_id: mig_id(media_object.attachment)).first
-        copy_to_track = att_to.media_tracks.first
-        expect(copy_to_track).to be_present
-
-        Timecop.freeze(1.minute.from_now) do
-          copy_to_track.destroy
-          att_to.media_tracks.create!(kind: "subtitles", locale: "en", content: "new subs")
-          copy_from_track.destroy
-          media_object.media_tracks.create!(kind: "subtitles", locale: "en", content: "orig subs")
-        end
-        run_master_migration
-
-        expect(att_to.media_tracks.length).to eq 1
-        copy_to_track = att_to.media_tracks.first
-        expect(copy_to_track.content).to eq "new subs"
-      end
-
-      it "does overwrite media tracks with downstream changes if the attachment has been updated" do
-        @copy_to = course_factory
-        @template.add_child_course!(@copy_to)
-
-        media_id = "m-you_know_what_you_did"
-        media_object = @copy_from.media_objects.create!(title: "video.mp4", media_id:)
-        media_object.media_tracks.create!(kind: "subtitles", locale: "en", content: "en subs")
-
-        run_master_migration
-
-        att_to = @copy_to.attachments.where(migration_id: mig_id(media_object.attachment)).first
-        copy_to_track = att_to.media_tracks.first
-        expect(copy_to_track).to be_present
-
-        Timecop.freeze(1.minute.from_now) do
-          copy_to_track.destroy
-          att_to.media_tracks.create!(kind: "subtitles", locale: "en", content: "new subs")
-          @new_att = Attachment.create!(filename: "video.mp4", uploaded_data: StringIO.new("ohai"), folder: media_object.attachment.folder, context: @copy_from, media_entry_id: media_id)
-          @new_att.handle_duplicates(:overwrite)
-          @new_att.media_tracks.create!(kind: "subtitles", locale: "en", content: "orig subs")
-        end
-        run_master_migration
-
-        expect(@new_att.media_tracks.length).to eq 1
-        copy_to_track = @new_att.media_tracks.first
-        expect(copy_to_track.content).to eq "orig subs"
-      end
+      expect(att_to.media_tracks.length).to eq 1
+      copy_to_track = att_to.media_tracks.first
+      expect(copy_to_track.content).to eq "orig subs"
     end
 
     it "limits the number of items to track" do
@@ -3163,19 +3248,6 @@ describe MasterCourses::MasterMigration do
     end
 
     context "attachment migration id preservation" do
-      def run_course_copy(copy_from, copy_to)
-        @cm = ContentMigration.new(context: copy_to,
-                                   user: @user,
-                                   source_course: copy_from,
-                                   migration_type: "course_copy_importer",
-                                   copy_options: { everything: "1" })
-        @cm.migration_settings[:import_immediately] = true
-        @cm.set_default_settings
-        @cm.save!
-        worker = Canvas::Migration::Worker::CourseCopyWorker.new
-        worker.perform(@cm)
-      end
-
       it "does not overwrite blueprint attachment migration ids from other course copies" do
         att = Attachment.create!(filename: "first.txt", uploaded_data: StringIO.new("ohai"), folder: Folder.unfiled_folder(@copy_from), context: @copy_from)
 
@@ -3343,9 +3415,6 @@ describe MasterCourses::MasterMigration do
         page = @copy_from.wiki_pages.create!(title: "wiki", body: "ohai")
         quiz = @copy_from.quizzes.create!
 
-        allow(klass).to receive(:applies_to_course?).and_return(true)
-        allow(klass).to receive(:begin_export).and_return(true)
-
         data = {
           "$canvas_assignment_id" => assmt.id,
           "$canvas_discussion_topic_id" => topic.id,
@@ -3356,8 +3425,11 @@ describe MasterCourses::MasterMigration do
           "$canvas_page_id" => page.id,
           "$canvas_quiz_id" => quiz.id
         }
-        allow(klass).to receive(:export_completed?).and_return(true)
-        allow(klass).to receive(:retrieve_export).and_return(data)
+
+        allow(klass).to receive_messages(applies_to_course?: true,
+                                         begin_export: true,
+                                         export_completed?: true,
+                                         retrieve_export: data)
 
         run_master_migration
 

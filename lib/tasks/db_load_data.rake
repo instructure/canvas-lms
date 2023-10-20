@@ -47,7 +47,7 @@ namespace :db do
       filename = File.split(filename)[1]
       name = filename.split(".")[0]
       unless name[0, 1] == "_"
-        titled = name.titleize.gsub(/Sms/, "SMS")
+        titled = name.titleize.gsub("Sms", "SMS")
         puts "No notification found in db for #{name}" unless Notification.where(name: titled).first
       end
     end
@@ -132,7 +132,7 @@ namespace :db do
 
         while true do
           email = ask("What email address will the site administrator account use? > ") { |q| q.echo = obfuscate_input_or_echo }
-          email_confirm = ask("Please confirm > ") { |q| q.echo =  obfuscate_input_or_echo }
+          email_confirm = ask("Please confirm > ") { |q| q.echo = obfuscate_input_or_echo }
           break if email == email_confirm
         end
 

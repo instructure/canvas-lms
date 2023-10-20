@@ -49,7 +49,7 @@ module LtiAdvantage::Models
             accept_types: [],
             accept_presentation_document_targets: ["bar"]
           )
-        ).to be_invalid
+        ).not_to be_valid
       end
 
       it 'is not valid if "accept_presentation_document_targets" is blank' do
@@ -58,7 +58,7 @@ module LtiAdvantage::Models
             accept_types: ["foo"],
             accept_presentation_document_targets: []
           )
-        ).to be_invalid
+        ).not_to be_valid
       end
 
       it 'verifies "accept_types" is an array' do

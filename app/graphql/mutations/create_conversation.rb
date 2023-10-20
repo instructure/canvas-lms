@@ -121,7 +121,7 @@ class Mutations::CreateConversation < Mutations::BaseMutation
         if message[:attachment_ids].present?
           InstStatsd::Statsd.increment("inbox.message.sent.attachment.react")
         end
-        if input[:user_note]
+        if !Account.site_admin.feature_enabled?(:deprecate_faculty_journal) && input[:user_note]
           InstStatsd::Statsd.increment("inbox.conversation.sent.faculty_journal.react")
         end
         if input[:bulk_message]
@@ -155,7 +155,7 @@ class Mutations::CreateConversation < Mutations::BaseMutation
         if context_type == "Account" || context_type.nil?
           InstStatsd::Statsd.increment("inbox.conversation.sent.account_context.react")
         end
-        if input[:user_note]
+        if !Account.site_admin.feature_enabled?(:deprecate_faculty_journal) && input[:user_note]
           InstStatsd::Statsd.increment("inbox.conversation.sent.faculty_journal.react")
         end
         if input[:bulk_message]

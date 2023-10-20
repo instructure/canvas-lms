@@ -34,9 +34,9 @@ const renderBody = (headers: Header[], rows: CountRow[]) => {
     <Table caption={formatMessage('Word Count')}>
       <Head>
         <Row>
-          {headers.map(({id, label}) => (
+          {headers.map(({id, getLabel}) => (
             <ColHeader key={id} id={id}>
-              {label}
+              {getLabel()}
             </ColHeader>
           ))}
         </Row>

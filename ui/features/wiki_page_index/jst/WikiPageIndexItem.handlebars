@@ -14,7 +14,9 @@
 {{/if}}
 <td role="gridcell">
   <div class="hide-overflow" role="text">
-    <a href="{{html_url}}" id="wiki_page_index_item_title_{{page_id}}" class="wiki-page-link{{#if CAN.PUBLISH}} {{#unless published}}un{{/unless}}published{{/if}}">{{title}}</a>
+    <div class="wiki-page-title">
+      <a href="{{html_url}}" id="wiki_page_index_item_title_{{page_id}}" class="wiki-page-link{{#if CAN.PUBLISH}} {{#unless published}}un{{/unless}}published{{/if}}">{{title}}</a>
+    </div>
     {{#if front_page}}
       <div><span class="front-page"></span></div>
     {{/if}}

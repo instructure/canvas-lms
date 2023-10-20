@@ -44,6 +44,16 @@ module Lti
           return
         end
 
+        # Collaboration -- resource link creation and updating is handled by
+        # CollaborationController. So we should
+        # * not create a resource link
+        # * not reload the page
+        # * pass the tool ID into the CollaborationController via the content item so the LRL can be properly created
+        if for_placement?(:collaboration)
+          render_content_items(reload_page: false, extra: { tool_id: tool.id })
+          return
+        end
+
         # to prepare for further UI processing, content items that don't need resources
         # like module items or assignments created now should:
         # * have resource links associated with them
@@ -130,7 +140,7 @@ module Lti
 
       private
 
-      def render_content_items(items: content_items, reload_page: true, module_created: false)
+      def render_content_items(items: content_items, reload_page: true, module_created: false, extra: {})
         js_env({
                  deep_link_response: {
                    placement: return_url_parameters[:placement],
@@ -143,6 +153,7 @@ module Lti
                    ltiEndpoint: polymorphic_url([:retrieve, @context, :external_tools]),
                    reloadpage: reload_page,
                    moduleCreated: module_created,
+                   **extra
                  }.compact
                })
         if parent_frame_origin

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "../helpers/calendar2_common"
-require_relative "./pages/calendar_other_calendars_page"
+require_relative "pages/calendar_other_calendars_page"
 
 describe "calendar2" do
   include_context "in-process server selenium tests"

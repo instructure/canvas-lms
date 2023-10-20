@@ -68,6 +68,19 @@ describe Loaders::OutcomeAlignmentLoader do
     [base_url, "modules", alignment[:module_id]].join("/") if alignment[:module_id]
   end
 
+  def new_quiz_alignment_id(quiz_id, quiz_items = nil, module_id = nil)
+    alignment_id = quiz_id
+    if quiz_items.present?
+      item_ids_hash = quiz_items.pluck(:_id).join("_").hash
+      alignment_id = [alignment_id, "IH", item_ids_hash].join("_")
+    end
+    base_id = ["E", alignment_id].join("_")
+
+    return [base_id, module_id].join("_") if module_id
+
+    base_id
+  end
+
   it "resolves to nil if context is invalid" do
     GraphQL::Batch.batch do
       Loaders::OutcomeAlignmentLoader.for(
@@ -240,7 +253,12 @@ describe Loaders::OutcomeAlignmentLoader do
             count += 1
             module_url = [base_url, "modules", alignment[:module_id]].join("/") if alignment[:module_id]
 
-            expect(alignment[:_id]).not_to be_nil
+            quiz_items = OutcomeAlignmentsSpecHelper
+                         .mock_os_aligned_outcomes([@outcome], @new_quiz.id, with_items: true)[@outcome.id.to_s]
+                         .filter { |a| a[:artifact_type] == "quizzes.item" }
+                         .map { |a| { _id: a[:artifact_id], title: a[:title] } }
+
+            expect(alignment[:_id]).to eq new_quiz_alignment_id(@new_quiz.id, quiz_items, alignment[:module_id])
             expect(alignment[:content_id]).to eq @new_quiz.id
             expect(alignment[:content_type]).to eq "Assignment"
             expect(alignment[:context_id]).to eq @course.id

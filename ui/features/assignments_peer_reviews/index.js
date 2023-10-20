@@ -25,6 +25,7 @@ import '@canvas/jquery/jquery.instructure_misc_helpers'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 import '@canvas/loading-image'
 import '@canvas/util/templateData'
+import replaceTags from '@canvas/util/replaceTags'
 
 const I18n = useI18nScope('assignments.peer_reviews')
 
@@ -88,7 +89,7 @@ $(document).ready(() => {
       let user_id = $(this)
         .parents('.student_reviews')
         .getTemplateData({textValues: ['student_review_id']}).student_review_id
-      url = $.replaceTags(url, 'reviewer_id', user_id)
+      url = replaceTags(url, 'reviewer_id', user_id)
       $form.find(`select option.student_${user_id}`).attr('disabled', true)
       $(this)
         .parents('.student_reviews')

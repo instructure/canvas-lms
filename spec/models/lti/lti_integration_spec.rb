@@ -60,11 +60,9 @@ describe "LTI integration tests" do
 
   let(:controller) do
     request_mock = double("request")
-    allow(request_mock).to receive(:host).and_return("/my/url")
-    allow(request_mock).to receive(:scheme).and_return("https")
+    allow(request_mock).to receive_messages(host: "/my/url", scheme: "https")
     m = double("controller")
-    allow(m).to receive(:request).and_return(request_mock)
-    allow(m).to receive(:logged_in_user).and_return(@user || user)
+    allow(m).to receive_messages(request: request_mock, logged_in_user: @user || user)
     m
   end
 
@@ -214,7 +212,10 @@ describe "LTI integration tests" do
       adapter.prepare_tool_launch("http://www.google.com", variable_expander, launch_url: "http://www.yahoo.com", link_code: "123456")
       hash = adapter.generate_post_payload
       expect(hash["launch_presentation_locale"]).to eq "es"
-      I18n.localizer = -> { :en }
+    ensure
+      I18n.localizer = nil
+      # undo the localizer's work
+      I18n.locale = I18n.default_locale # rubocop:disable Rails/I18nLocaleAssignment
     end
 
     it "adds account info in launch data for account navigation" do
@@ -457,7 +458,7 @@ describe "LTI integration tests" do
     specs_require_sharding
 
     # TODO: Replace this once we have LTIInbound
-    it "roundtrips source ids from mixed shards", skip: true do
+    it "roundtrips source ids from mixed shards", :skip do
       @shard1.activate do
         @account = Account.create!
         course_with_teacher(active_all: true, account: @account)

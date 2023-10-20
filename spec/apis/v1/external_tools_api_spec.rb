@@ -337,8 +337,7 @@ describe ExternalToolsController, type: :request do
       end
 
       before do
-        allow(ApplicationController).to receive(:test_cluster?).and_return(true)
-        allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
+        allow(ApplicationController).to receive_messages(test_cluster?: true, test_cluster_name: "beta")
         allow(Setting).to receive(:set).with("allow_tc_access_").and_return("true")
       end
 

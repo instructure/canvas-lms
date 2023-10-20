@@ -139,7 +139,7 @@ class GradingPeriodsController < ApplicationController
 
     if authorized_action(grading_period(inherit: false), @current_user, :update)
       respond_to do |format|
-        DueDateCacher.with_executing_user(@current_user) do
+        SubmissionLifecycleManager.with_executing_user(@current_user) do
           if grading_period(inherit: false).update(grading_period_params)
             format.json { render json: serialize_json_api(grading_period(inherit: false)) }
           else
@@ -158,7 +158,7 @@ class GradingPeriodsController < ApplicationController
   # successful.
   def destroy
     if authorized_action(grading_period(inherit: false), @current_user, :delete)
-      DueDateCacher.with_executing_user(@current_user) do
+      SubmissionLifecycleManager.with_executing_user(@current_user) do
         grading_period(inherit: false).destroy
       end
 
@@ -204,7 +204,7 @@ class GradingPeriodsController < ApplicationController
   #
   def batch_update
     if authorized_action(@context, @current_user, :manage_grades)
-      DueDateCacher.with_executing_user(@current_user) do
+      SubmissionLifecycleManager.with_executing_user(@current_user) do
         method("#{@context.class.to_s.downcase}_batch_update").call
       end
     end

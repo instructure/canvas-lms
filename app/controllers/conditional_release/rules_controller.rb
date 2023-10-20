@@ -103,7 +103,7 @@ module ConditionalRelease
     end
 
     def json_includes
-      return Rule.includes_for_json if include_param.include? "all"
+      Rule.includes_for_json if include_param.include? "all"
     end
 
     def add_ordering_to(attrs)
@@ -131,15 +131,15 @@ module ConditionalRelease
     end
 
     def require_course_view_permissions
-      return render_unauthorized_action unless @context.grants_right?(@current_user, :read)
+      authorized_action(@context, @current_user, :read)
     end
 
     def require_course_assignment_edit_permissions
-      return render_unauthorized_action unless @context.grants_any_right?(@current_user, :manage_assignments, :manage_assignments_edit)
+      authorized_action(@context, @current_user, %i[manage_assignments manage_assignments_edit])
     end
 
     def require_course_assignment_add_or_edit_permissions
-      return render_unauthorized_action unless @context.grants_any_right?(@current_user, :manage_assignments, :manage_assignments_add, :manage_assignments_edit)
+      authorized_action(@context, @current_user, %i[manage_assignments manage_assignments_add manage_assignments_edit])
     end
   end
 end

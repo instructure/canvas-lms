@@ -79,7 +79,7 @@ class GradeSummaryPresenter
   end
 
   def observed_students
-    @observed_students ||= ObserverEnrollment.observed_students(@context, @current_user, include_restricted_access: false)
+    @observed_students ||= ObserverEnrollment.observed_students(@context, @current_user, include_restricted_access: false, grade_summary: true)
   end
 
   def observed_student
@@ -208,13 +208,9 @@ class GradeSummaryPresenter
       :visible_submission_comments,
       { rubric_assessments: [:rubric, :rubric_association] },
       :content_participations,
-      { assignment: [:context, :post_policy] }
+      { assignment: [:context, :post_policy] },
+      { submission_comments: :viewed_submission_comments }
     ]
-
-    if Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
-      preload_params << { submission_comments: :viewed_submission_comments }
-    end
-
     @submissions ||= begin
       ss = @context.submissions
                    .preload(*preload_params)

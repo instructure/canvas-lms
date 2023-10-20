@@ -58,7 +58,7 @@ class UserPastLtiId < ActiveRecord::Base
       past_lti_id = past_lti_ids[user.id]
       association = user.association(:past_lti_ids)
       association.loaded!
-      past_lti_id = past_lti_id.nil? ? UserPastLtiId.none : past_lti_id
+      past_lti_id = UserPastLtiId.none if past_lti_id.nil?
       association.target.concat(past_lti_id)
       past_lti_id.each { |lti_id| association.set_inverse_instance(lti_id) }
     end

@@ -81,11 +81,15 @@ export const conference = {
   conference_type: 'BigBlueButton',
 }
 
+export const defaultEvent = event
+
 export const eventFormProps = () => {
+  const closeCB = jest.fn()
+  const eventSave = jest.fn(() => closeCB())
   return {
     formHolder,
-    event,
-    closeCB: jest.fn(),
+    event: {...event, save: eventSave},
+    closeCB,
     contextChangeCB: jest.fn(),
     setSetContextCB: jest.fn(),
     timezone: 'Etc/UTC',

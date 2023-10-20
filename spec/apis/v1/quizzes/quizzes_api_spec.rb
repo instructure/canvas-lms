@@ -138,7 +138,7 @@ describe Quizzes::QuizzesApiController, type: :request do
 
           quizzes_json = response["quizzes"]
           quiz_ids = quizzes_json.pluck("id")
-          expect(quiz_ids).to eq quizzes.map(&:id).map(&:to_s)
+          expect(quiz_ids).to eq(quizzes.map { |q| q.id.to_s })
         end
       end
     end

@@ -38,10 +38,12 @@ import {useGradingSchemeUpdate} from '../hooks/useGradingSchemeUpdate'
 import {GradingScheme, GradingSchemeTemplate} from '../../gradingSchemeApiModel'
 
 import {
-  GradingSchemeFormInput,
+  GradingSchemeEditableData,
   GradingSchemeInput,
   GradingSchemeInputHandle,
 } from './form/GradingSchemeInput'
+import {defaultPointsGradingScheme} from '../../defaultPointsGradingScheme'
+import {canManageAccountGradingSchemes} from '../helpers/gradingSchemePermissions'
 
 // Doing this to avoid TS2339 errors -- TODO: remove once we're on InstUI 8
 const {Item} = Flex as any
@@ -58,17 +60,19 @@ interface GradingSchemeTemplateCardData {
   gradingSchemeTemplate: GradingSchemeTemplate
 }
 
-interface ComponentProps {
+export interface GradingSchemesManagementProps {
   contextId: string
   contextType: 'Account' | 'Course'
   onGradingSchemesChanged?: () => any
+  pointsBasedGradingSchemesEnabled: boolean
 }
 
 export const GradingSchemesManagement = ({
   contextType,
   contextId,
   onGradingSchemesChanged,
-}: ComponentProps) => {
+  pointsBasedGradingSchemesEnabled,
+}: GradingSchemesManagementProps) => {
   const {createGradingScheme /* createGradingSchemeStatus */} = useGradingSchemeCreate()
   const {deleteGradingScheme /* deleteGradingSchemeStatus */} = useGradingSchemeDelete()
   const {updateGradingScheme /* deleteGradingSchemeStatus */} = useGradingSchemeUpdate()
@@ -154,17 +158,17 @@ export const GradingSchemesManagement = ({
     }
   }
 
-  const handleCreateScheme = async (gradingSchemeFormInput: GradingSchemeFormInput) => {
+  const handleCreateScheme = async (gradingSchemeFormInput: GradingSchemeEditableData) => {
     if (!gradingSchemeCards) {
       return
     }
     // TODO: if (!saving) {
     try {
-      const gradingScheme = await createGradingScheme(
-        contextType,
-        contextId,
-        gradingSchemeFormInput
-      )
+      const gradingScheme = await createGradingScheme(contextType, contextId, {
+        ...gradingSchemeFormInput,
+        points_based: gradingSchemeFormInput.pointsBased,
+        scaling_factor: gradingSchemeFormInput.scalingFactor,
+      })
       setGradingSchemeCreating(undefined)
       const updatedGradingSchemeCards = [{gradingScheme, editing: false}, ...gradingSchemeCards]
       setGradingSchemeCards(updatedGradingSchemeCards)
@@ -179,7 +183,7 @@ export const GradingSchemesManagement = ({
   }
 
   const handleUpdateScheme = async (
-    gradingSchemeFormInput: GradingSchemeFormInput,
+    gradingSchemeFormInput: GradingSchemeEditableData,
     gradingSchemeId: string
   ) => {
     if (!gradingSchemeCards) {
@@ -189,7 +193,10 @@ export const GradingSchemesManagement = ({
 
     try {
       const updatedGradingScheme = await updateGradingScheme(contextType, contextId, {
-        ...gradingSchemeFormInput,
+        title: gradingSchemeFormInput.title,
+        data: gradingSchemeFormInput.data,
+        points_based: gradingSchemeFormInput.pointsBased,
+        scaling_factor: gradingSchemeFormInput.scalingFactor,
         id: gradingSchemeId,
       })
 
@@ -261,6 +268,9 @@ export const GradingSchemesManagement = ({
     if (!gradingScheme.permissions.manage) {
       return false
     }
+    if (!canManageAccountGradingSchemes(contextType, gradingScheme.context_type)) {
+      return false
+    }
     return !gradingScheme.assessed_assignment
   }
 
@@ -282,8 +292,6 @@ export const GradingSchemesManagement = ({
       </View>
       {!gradingSchemeCards || !defaultGradingSchemeTemplate ? (
         <Spinner renderTitle="Loading" size="small" margin="0 0 0 medium" />
-      ) : gradingSchemeCards.length === 0 ? (
-        <h3>{I18n.t('No grading schemes to display')}</h3>
       ) : (
         <>
           {gradingSchemeCreating ? (
@@ -301,10 +309,22 @@ export const GradingSchemesManagement = ({
                 >
                   <GradingSchemeInput
                     ref={gradingSchemeCreateRef}
-                    initialFormData={{
-                      data: defaultGradingSchemeTemplate.data,
-                      title: '',
+                    schemeInputType="percentage"
+                    initialFormDataByInputType={{
+                      percentage: {
+                        data: defaultGradingSchemeTemplate.data,
+                        title: '',
+                        scalingFactor: 1.0,
+                        pointsBased: false,
+                      },
+                      points: {
+                        data: defaultPointsGradingScheme.data,
+                        title: '',
+                        scalingFactor: defaultPointsGradingScheme.scaling_factor,
+                        pointsBased: true,
+                      },
                     }}
+                    pointsBasedGradingSchemesFeatureEnabled={pointsBasedGradingSchemesEnabled}
                     onSave={handleCreateScheme}
                   />
                   <hr />
@@ -343,11 +363,31 @@ export const GradingSchemesManagement = ({
                 <Transition transitionOnMount={true} unmountOnExit={true} in={true} type="fade">
                   <>
                     <GradingSchemeInput
-                      ref={gradingSchemeUpdateRef}
-                      initialFormData={{
-                        data: gradingSchemeCard.gradingScheme.data,
-                        title: gradingSchemeCard.gradingScheme.title,
+                      schemeInputType={
+                        gradingSchemeCard.gradingScheme.points_based ? 'points' : 'percentage'
+                      }
+                      initialFormDataByInputType={{
+                        percentage: {
+                          data: gradingSchemeCard.gradingScheme.points_based
+                            ? defaultGradingSchemeTemplate.data
+                            : gradingSchemeCard.gradingScheme.data,
+                          title: gradingSchemeCard.gradingScheme.title,
+                          pointsBased: false,
+                          scalingFactor: 1.0,
+                        },
+                        points: {
+                          data: gradingSchemeCard.gradingScheme.points_based
+                            ? gradingSchemeCard.gradingScheme.data
+                            : defaultPointsGradingScheme.data,
+                          title: gradingSchemeCard.gradingScheme.title,
+                          pointsBased: true,
+                          scalingFactor: gradingSchemeCard.gradingScheme.points_based
+                            ? gradingSchemeCard.gradingScheme.scaling_factor
+                            : defaultPointsGradingScheme.scaling_factor,
+                        },
                       }}
+                      ref={gradingSchemeUpdateRef}
+                      pointsBasedGradingSchemesFeatureEnabled={pointsBasedGradingSchemesEnabled}
                       onSave={modifiedGradingScheme =>
                         handleUpdateScheme(
                           modifiedGradingScheme,
@@ -379,6 +419,7 @@ export const GradingSchemesManagement = ({
                   <View display="block">
                     <GradingSchemeView
                       gradingScheme={gradingSchemeCard.gradingScheme}
+                      pointsBasedGradingSchemesEnabled={pointsBasedGradingSchemesEnabled}
                       disableDelete={!canManageScheme(gradingSchemeCard.gradingScheme)}
                       disableEdit={!canManageScheme(gradingSchemeCard.gradingScheme)}
                       onDeleteRequested={() =>
@@ -394,7 +435,7 @@ export const GradingSchemesManagement = ({
           <View
             display="block"
             padding="small"
-            margin="0 0 small"
+            margin="medium none medium none"
             borderWidth="small"
             borderRadius="small"
           >

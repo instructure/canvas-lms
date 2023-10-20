@@ -26,6 +26,7 @@ import _ from 'underscore'
 import tz from '@canvas/timezone'
 import moment from 'moment'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import decodeFromHex from '@canvas/util/decodeFromHex'
 import withinMomentDates from '../momentDateHelper'
 import fcUtil from '@canvas/calendar/jquery/fcUtil'
 import userSettings from '@canvas/user-settings'
@@ -132,9 +133,9 @@ export default class Calendar {
     this.hasAppointmentGroups = $.Deferred()
     if (this.options.showScheduler) {
       // Pre-load the appointment group list, for the badge
-      this.dataSource.getAppointmentGroups(false, data => {
+      this.dataSource.getAppointmentGroups(false, appointmentGroupsData => {
         let required = 0
-        data.forEach(group => {
+        appointmentGroupsData.forEach(group => {
           if (group.requiring_action) {
             required += 1
           }
@@ -184,9 +185,13 @@ export default class Calendar {
       'CommonEvent/eventsDeletingFromSeries': this.eventsDeletingFromSeries,
       'CommonEvent/eventDeleted': this.eventDeleted,
       'CommonEvent/eventsDeletedFromSeries': this.eventsDeletedFromSeries,
+      'CommonEvent/eventsUpdatedFromSeries': this.eventsUpdatedFromSeries,
       'CommonEvent/eventSaving': this.eventSaving,
+      'CommonEvent/eventsSavingFromSeries': this.eventsSavingFromSeries,
       'CommonEvent/eventSaved': this.eventSaved,
+      'CommonEvent/eventsSavedFromSeries': this.eventsSavedFromSeries,
       'CommonEvent/eventSaveFailed': this.eventSaveFailed,
+      'CommonEvent/eventsSavedFromSeriesFailed': this.eventsSavedFromSeriesFailed,
       'Calendar/visibleContextListChanged': this.visibleContextListChanged,
       'EventDataSource/ajaxStarted': this.ajaxStarted,
       'EventDataSource/ajaxEnded': this.ajaxEnded,
@@ -715,7 +720,7 @@ export default class Calendar {
     }
     event.start = date
     event.addClass('event_pending')
-    const revertFunc = () => console.log('could not save date on undated event')
+    const revertFunc = () => console.log('could not save date on undated event') // eslint-disable-line no-console
 
     if (!this._eventDrop(event, 0, false, revertFunc)) {
       return
@@ -798,15 +803,7 @@ export default class Calendar {
     return this.calendar.fullCalendar('updateEvent', event)
   }
 
-  eventDeleting = event => {
-    event.addClass('event_pending')
-    return this.updateEvent(event)
-  }
-
-  // given the event selected by the user, and which
-  // events in the series are being deleted (one, following, all)
-  // find them all and handle it
-  eventsDeletingFromSeries = ({selectedEvent, which}) => {
+  filterEventsWithSeriesIdAndWhich = (selectedEvent, which) => {
     const seriesId = selectedEvent.calendarEvent.series_uuid
     const eventSeries = this.calendar
       .fullCalendar('getEventCache')
@@ -826,6 +823,19 @@ export default class Calendar {
         candidateEvents = eventSeries
         break
     }
+    return candidateEvents
+  }
+
+  eventDeleting = event => {
+    event.addClass('event_pending')
+    return this.updateEvent(event)
+  }
+
+  // given the event selected by the user, and which
+  // events in the series are being deleted (one, following, all)
+  // find them all and handle it
+  eventsDeletingFromSeries = ({selectedEvent, which}) => {
+    const candidateEvents = this.filterEventsWithSeriesIdAndWhich(selectedEvent, which)
     candidateEvents.forEach(e => {
       $.publish('CommonEvent/eventDeleting', e)
     })
@@ -888,6 +898,22 @@ export default class Calendar {
     }
   }
 
+  eventsSavingFromSeries = ({selectedEvent, which}) => {
+    const candidateEvents = this.filterEventsWithSeriesIdAndWhich(selectedEvent, which)
+    candidateEvents.forEach(e => {
+      // when changing one event in the calendar, its contextInfo gets changed
+      // in CalendarEventDetailsForm when the user submits. When updating
+      // events in a series we need to update the rest of the matching events
+      // from the series
+      if (which !== 'one' && e.id !== selectedEvent.id && e.can_change_context) {
+        e.old_context_code = e.calendarEvent.context_code
+        e.contextInfo = selectedEvent.contextInfo
+      }
+
+      $.publish('CommonEvent/eventSaving', e)
+    })
+  }
+
   eventSaved = event => {
     event.removeClass('event_pending')
 
@@ -896,6 +922,11 @@ export default class Calendar {
     // fullcalendar stores for itself because the id has changed.
     // This is another reason to do a refetchEvents instead of just an update.
     delete event._id
+    // If is array means that it returned an array of event series, so we apply
+    // the same approach when update/delete series
+    if (Array.isArray(event.calendarEvent)) {
+      this.dataSource.clearCache()
+    }
     this.calendar.fullCalendar('refetchEvents')
     if (event && event.object && event.object.duplicates && event.object.duplicates.length > 0)
       this.reloadClick()
@@ -906,6 +937,15 @@ export default class Calendar {
     this.closeEventPopups()
   }
 
+  eventsSavedFromSeries = ({seriesEvents}) => {
+    // do what eventSaved does
+    seriesEvents.forEach(event => {
+      event.removeClass('event_pending')
+      delete event._id
+    })
+    this.closeEventPopups()
+  }
+
   eventSaveFailed = event => {
     event.removeClass('event_pending')
     if (event.isNewEvent()) {
@@ -913,6 +953,58 @@ export default class Calendar {
     } else {
       return this.updateEvent(event)
     }
+  }
+
+  eventsSavedFromSeriesFailed = ({selectedEvent, which}) => {
+    const candidateEvents = this.filterEventsWithSeriesIdAndWhich(selectedEvent, which)
+    candidateEvents.forEach(e => {
+      $.publish('CommonEvent/eventSaveFailed', e)
+    })
+  }
+
+  // When we delete an event + all following from a series
+  // the remaining events get updated with a new rrule
+  eventsUpdatedFromSeries = ({updatedEvents}) => {
+    const candidateEventsInCalendar = this.calendar.fullCalendar('getEventCache').filter(c => {
+      if (c.eventType === 'calendar_event') {
+        const updatedEventIndex = updatedEvents.findIndex(e => c.calendarEvent.id === e.id)
+        if (updatedEventIndex >= 0) {
+          c.copyDataFromObject(updatedEvents[updatedEventIndex])
+          return true
+        }
+      }
+      return false
+    })
+
+    // events got created
+    if (candidateEventsInCalendar.length < updatedEvents.length) {
+      this.dataSource.clearCache()
+    }
+
+    // if you change the start time of an event+following, it will create a new
+    // series for those events plus update those to the left with a new rrule
+    const updatedEventIds = candidateEventsInCalendar.map(e => e.calendarEvent.id)
+    const otherEventsInSeries = this.calendar.fullCalendar('getEventCache').filter(c => {
+      return (
+        c.calendarEvent?.series_uuid === updatedEvents[0].series_uuid &&
+        !updatedEventIds.includes(c.calendarEvent.id)
+      )
+    })
+
+    if (otherEventsInSeries.length !== 0) {
+      this.dataSource.clearCache()
+    }
+
+    candidateEventsInCalendar.forEach(e => {
+      this.updateEvent(e)
+    })
+    $.publish('CommonEvent/eventsSavedFromSeries', {seriesEvents: candidateEventsInCalendar})
+
+    // I don't understand why, but it we don't take a beat the
+    // events' coloring doesn't get updated.
+    window.setTimeout(() => {
+      this.calendar.fullCalendar('refetchEvents')
+    }, 0)
   }
 
   // When an assignment event is updated, update its related overrides.
@@ -1185,7 +1277,7 @@ export default class Calendar {
         data = deparam(window.location.hash.substring(1)) || {}
       } else {
         // legacy
-        data = $.parseJSON($.decodeFromHex(window.location.hash.substring(1))) || {}
+        data = $.parseJSON(decodeFromHex(window.location.hash.substring(1))) || {}
       }
     } catch (e) {
       data = {}

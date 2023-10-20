@@ -19,16 +19,19 @@
 #
 
 class GradingStandard < ActiveRecord::Base
-  include Workflow
+  include Canvas::SoftDeletable
 
   belongs_to :context, polymorphic: [:account, :course], required: true
   belongs_to :user
   has_many :assignments
 
+  has_many :accounts, inverse_of: :grading_standard, dependent: :nullify
+
   validates :workflow_state, presence: true
   validates :data, presence: true
   validate :valid_grading_scheme_data
   validate :full_range_scheme
+  validate :scaling_factor_points_based
 
   # version 1 data is an array of [ letter, max_integer_value ]
   # we created a version 2 because this is ambiguous once we added support for
@@ -113,9 +116,17 @@ class GradingStandard < ActiveRecord::Base
     # otherwise, we step down just 1/10th of a point, which is the
     # granularity we support right now
     elsif idx && (ordered_scheme[idx].last - ordered_scheme[idx - 1].last).abs >= BigDecimal("0.01")
-      (ordered_scheme[idx - 1].last * BigDecimal("100.0")) - BigDecimal("1.0")
+      if points_based
+        (((ordered_scheme[idx - 1].last * scaling_factor) - BigDecimal("0.1")) / scaling_factor) * BigDecimal("100.0")
+      else
+        (ordered_scheme[idx - 1].last * BigDecimal("100.0")) - BigDecimal("1.0")
+      end
     elsif idx
-      (ordered_scheme[idx - 1].last * BigDecimal("100.0")) - BigDecimal("0.1")
+      if points_based
+        (((ordered_scheme[idx - 1].last * scaling_factor) - BigDecimal("0.1")) / scaling_factor) * BigDecimal("100.0")
+      else
+        (ordered_scheme[idx - 1].last * BigDecimal("100.0")) - BigDecimal("0.1")
+      end
     else
       nil
     end
@@ -199,7 +210,8 @@ class GradingStandard < ActiveRecord::Base
   alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = "deleted"
-    save
+
+    run_callbacks(:destroy) { save }
   end
 
   def grading_scheme
@@ -223,6 +235,10 @@ class GradingStandard < ActiveRecord::Base
     errors.add(:data, "grading scheme values cannot be negative") if data.present? && data.any? { |v| v[1] < 0 }
     errors.add(:data, "grading scheme cannot contain duplicate values") if data.present? && data.pluck(1) != data.pluck(1).uniq
     errors.add(:data, "a grading scheme name is too long") if data.present? && data.any? { |v| v[0].length > self.class.maximum_string_length }
+  end
+
+  def scaling_factor_points_based
+    errors.add(:scaling_factor, "must be 1 if scheme points_based is false") if !points_based && scaling_factor != 1
   end
 
   def full_range_scheme

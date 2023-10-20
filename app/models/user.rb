@@ -293,7 +293,7 @@ class User < ActiveRecord::Base
       where("enrollments.limit_privileges_to_course_section IS NULL OR enrollments.limit_privileges_to_course_section<>? OR enrollments.course_section_id IN (?)", true, sections)
     end
   }
-  scope :name_like, lambda { |name|
+  scope :name_like, lambda { |name, search_pseudonyms: true|
     next none if name.strip.empty?
 
     scopes = []
@@ -301,8 +301,10 @@ class User < ActiveRecord::Base
       base_scope = except(:select, :order, :group, :having)
       scopes << base_scope.where(wildcard("users.name", name))
       scopes << base_scope.where(wildcard("users.short_name", name))
-      scopes << base_scope.joins(:pseudonyms).where(wildcard("pseudonyms.sis_user_id", name)).where(pseudonyms: { workflow_state: "active" })
-      scopes << base_scope.joins(:pseudonyms).where(wildcard("pseudonyms.unique_id", name)).where(pseudonyms: { workflow_state: "active" })
+      if search_pseudonyms
+        scopes << base_scope.joins(:pseudonyms).where(wildcard("pseudonyms.sis_user_id", name)).where(pseudonyms: { workflow_state: "active" })
+        scopes << base_scope.joins(:pseudonyms).where(wildcard("pseudonyms.unique_id", name)).where(pseudonyms: { workflow_state: "active" })
+      end
     end
 
     scopes.map!(&:to_sql)
@@ -637,29 +639,6 @@ class User < ActiveRecord::Base
     results
   end
 
-  # Users are tied to accounts a couple ways:
-  #   Through enrollments:
-  #      User -> Enrollment -> Section -> Course -> Account
-  #      User -> Enrollment -> Section -> Non-Xlisted Course -> Account
-  #   Through pseudonyms:
-  #      User -> Pseudonym -> Account
-  #   Through account_users
-  #      User -> AccountUser -> Account
-  def self.calculate_account_associations(user, data, account_chain_cache)
-    return [] if %w[creation_pending deleted].include?(user.workflow_state) || user.fake_student?
-
-    enrollments = data[:enrollments][user.id] || []
-    sections = enrollments.map { |e| data[:sections][e.course_section_id] }
-    courses = sections.map { |s| data[:courses][s.course_id] }
-    courses += sections.select(&:nonxlist_course_id).map { |s| data[:courses][s.nonxlist_course_id] }
-    starting_account_ids = courses.map(&:account_id)
-    starting_account_ids += (data[:pseudonyms][user.id] || []).map(&:account_id)
-    starting_account_ids += (data[:account_users][user.id] || []).map(&:account_id)
-    starting_account_ids.uniq!
-
-    calculate_account_associations_from_accounts(starting_account_ids, account_chain_cache)
-  end
-
   def self.update_account_associations(users_or_user_ids, opts = {})
     return if users_or_user_ids.empty?
 
@@ -693,42 +672,42 @@ class User < ActiveRecord::Base
         shards = shards.to_a
       end
 
-      # basically we're going to do a huge preload here, but custom sql to only load the columns we need
-      data = { enrollments: [], sections: [], courses: [], pseudonyms: [], account_users: [] }
+      # Users are tied to accounts a couple ways:
+      #   Through enrollments:
+      #      User -> Enrollment -> Section -> Course -> Account
+      #      User -> Enrollment -> Section -> Non-Xlisted Course -> Account
+      #   Through pseudonyms:
+      #      User -> Pseudonym -> Account
+      #   Through account_users
+      #      User -> AccountUser -> Account
+      account_mappings = Hash.new { |h, k| h[k] = Set.new }
+      base_shard = Shard.current
       Shard.with_each_shard(shards) do
-        shard_user_ids = users.map(&:id)
+        courses_relation = Course.select("enrollments.user_id", :account_id).distinct
+                                 .joins(course_sections: :enrollments)
+                                 .where("enrollments.user_id": users)
+                                 .where.not("enrollments.workflow_state": [:deleted, :rejected])
+                                 .where.not("enrollments.type": "StudentViewEnrollment")
+        non_xlist_relation = Course.select("enrollments.user_id", :account_id).distinct
+                                   .joins("INNER JOIN #{CourseSection.quoted_table_name} on course_sections.nonxlist_course_id=courses.id")
+                                   .joins("INNER JOIN #{Enrollment.quoted_table_name} on enrollments.course_section_id=course_sections.id")
+                                   .where("enrollments.user_id": users)
+                                   .where.not("enrollments.workflow_state": [:deleted, :rejected])
+                                   .where.not("enrollments.type": "StudentViewEnrollment")
+        pseudonym_relation = Pseudonym.active.select(:user_id, :account_id).distinct.where(user: users)
+        account_user_relation = AccountUser.active.select(:user_id, :account_id).distinct.where(user: users)
 
-        data[:enrollments] += shard_enrollments =
-          Enrollment.where("workflow_state NOT IN ('deleted','rejected') AND type<>'StudentViewEnrollment'")
-                    .where(user_id: shard_user_ids)
-                    .select(%i[user_id course_id course_section_id])
-                    .distinct.to_a
+        results = connection.select_rows(<<~SQL.squish)
+          #{courses_relation.to_sql} UNION
+          #{non_xlist_relation.to_sql} UNION
+          #{pseudonym_relation.to_sql} UNION
+          #{account_user_relation.to_sql}
+        SQL
 
-        # probably a lot of dups, so more efficient to use a set than uniq an array
-        course_section_ids = Set.new
-        shard_enrollments.each { |e| course_section_ids << e.course_section_id }
-        unless course_section_ids.empty?
-          data[:sections] += shard_sections = CourseSection.select(%i[id course_id nonxlist_course_id])
-                                                           .where(id: course_section_ids.to_a).to_a
+        results.each do |row|
+          account_mappings[Shard.relative_id_for(row.first, Shard.current, base_shard)] << Shard.relative_id_for(row.second, Shard.current, base_shard)
         end
-        shard_sections ||= []
-        course_ids = Set.new
-        shard_sections.each do |s|
-          course_ids << s.course_id
-          course_ids << s.nonxlist_course_id if s.nonxlist_course_id
-        end
-
-        data[:courses] += Course.select([:id, :account_id]).where(id: course_ids.to_a).to_a unless course_ids.empty?
-
-        data[:pseudonyms] += Pseudonym.active.select([:user_id, :account_id]).distinct.where(user_id: shard_user_ids).to_a
-        data[:account_users] += AccountUser.active.select([:user_id, :account_id]).distinct.where(user_id: shard_user_ids).to_a
       end
-      # now make it easy to get the data by user id
-      data[:enrollments] = data[:enrollments].group_by(&:user_id)
-      data[:sections] = data[:sections].index_by(&:id)
-      data[:courses] = data[:courses].index_by(&:id)
-      data[:pseudonyms] = data[:pseudonyms].group_by(&:user_id)
-      data[:account_users] = data[:account_users].group_by(&:user_id)
     end
 
     # TODO: transaction on each shard?
@@ -742,12 +721,6 @@ class User < ActiveRecord::Base
         UserAccountAssociation.where(user_id: shard_user_ids).to_a
       end.each do |aa|
         key = [aa.user_id, aa.account_id]
-        # duplicates. the unique index prevents these now, but this code
-        # needs to hang around for the migration itself
-        if current_associations.key?(key)
-          to_delete << aa.id
-          next
-        end
         current_associations[key] = [aa.id, aa.depth]
       end
 
@@ -762,7 +735,11 @@ class User < ActiveRecord::Base
         account_ids_with_depth = precalculated_associations
         if account_ids_with_depth.nil?
           user ||= User.find(user_id)
-          account_ids_with_depth = calculate_account_associations(user, data, account_chain_cache)
+          account_ids_with_depth = if %w[creation_pending deleted].include?(user.workflow_state) || user.fake_student?
+                                     []
+                                   else
+                                     calculate_account_associations_from_accounts(account_mappings[user.id], account_chain_cache)
+                                   end
         end
 
         account_ids_with_depth.sort_by(&:first).each do |account_id, depth|
@@ -1147,7 +1124,7 @@ class User < ActiveRecord::Base
     end
     user_ids = enrollment_scope.pluck(:user_id).uniq
     courses_to_update.each do |course|
-      DueDateCacher.recompute_users_for_course(user_ids, course, nil, executing_user: updating_user)
+      SubmissionLifecycleManager.recompute_users_for_course(user_ids, course, nil, executing_user: updating_user)
     end
   end
 
@@ -1255,7 +1232,7 @@ class User < ActiveRecord::Base
   end
 
   def used_feature?(feature)
-    features_used&.split(/,/)&.include?(feature.to_s)
+    features_used&.split(",")&.include?(feature.to_s)
   end
 
   def available_courses
@@ -1281,16 +1258,28 @@ class User < ActiveRecord::Base
   def check_accounts_right?(user, sought_right)
     # check if the user we are given is an admin in one of this user's accounts
     return false unless user && sought_right
-    return true if Account.site_admin.grants_right?(user, sought_right)
     return account.grants_right?(user, sought_right) if fake_student? # doesn't have account association
+
+    # Intentionally include deleted pseudoymns when checking deleted users if the user has
+    # site-admin access (important for diagnosing deleted users)
+    accounts_to_search = if associated_accounts.empty? && Account.site_admin.grants_right?(user, :read)
+                           if merged_into_user
+                             # Early return from inside if to ensure we handle chains of merges correctly
+                             return merged_into_user.check_accounts_right?(user, sought_right)
+                           else
+                             Account.where(id: pseudonyms.pluck(:account_id))
+                           end
+                         else
+                           associated_accounts
+                         end
 
     common_shards = associated_shards & user.associated_shards
     search_method = lambda do |shard|
       # new users with creation pending enrollments don't have account associations
-      if associated_accounts.shard(shard).empty? && common_shards.length == 1 && !unavailable?
+      if accounts_to_search.shard(shard).empty? && common_shards.length == 1 && !unavailable?
         account.grants_right?(user, sought_right)
       else
-        associated_accounts.shard(shard).any? { |a| a.grants_right?(user, sought_right) }
+        accounts_to_search.shard(shard).any? { |a| a.grants_right?(user, sought_right) }
       end
     end
     # search shards the two users have in common first, since they're most likely
@@ -1623,7 +1612,7 @@ class User < ActiveRecord::Base
   end
 
   def self.user_id_from_avatar_key(key)
-    user_id, sig = key.to_s.split(/-/, 2)
+    user_id, sig = key.to_s.split("-", 2)
     Canvas::Security.verify_hmac_sha1(sig, user_id.to_s, truncate: 10) ? user_id : nil
   end
 
@@ -1942,12 +1931,18 @@ class User < ActiveRecord::Base
     read_attribute(:uuid)
   end
 
-  def heap_id
+  def heap_id(root_account: nil)
     # this is called in read-only contexts where we can't create a missing uuid
     # (uuid-less users should be rare in real life but they exist in specs and maybe unauthenticated requests)
     return nil unless read_attribute(:uuid)
 
-    "uu-1-#{Digest::SHA256.hexdigest(uuid)}"
+    # for an explanation of these, see
+    # https://instructure.atlassian.net/wiki/spaces/HEAP/pages/85854749165/RFC+Advanced+HEAP+installation
+    if root_account
+      "uu-2-#{Digest::SHA256.hexdigest(uuid)}-#{root_account.uuid}"
+    else
+      "uu-1-#{Digest::SHA256.hexdigest(uuid)}"
+    end
   end
 
   def self.serialization_excludes
@@ -1987,6 +1982,32 @@ class User < ActiveRecord::Base
     Rails.cache.fetch_with_batched_keys("alternate_account_for_course_creation", batch_object: self, batched_keys: :account_users) do
       account_users.active.detect do |au|
         break au.account if au.root_account_id == account.id && au.account.grants_any_right?(self, :manage_courses, :manage_courses_add)
+      end
+    end
+  end
+
+  def course_creating_teacher_enrollment_accounts
+    Rails.cache.fetch_with_batched_keys("course_creating_teacher_enrollment_accounts", batch_object: self, batched_keys: :enrollments) do
+      Shard.with_each_shard(in_region_associated_shards) do
+        Account.where(id: Course.where(id: enrollments.active.shard(Shard.current)
+                                .select(:course_id)
+                                .where(type: %w[TeacherEnrollment DesignerEnrollment])
+                                .joins(:root_account)
+                                .where("accounts.settings LIKE ?", "%teachers_can_create_courses: true%"))
+               .select(:account_id))
+      end
+    end
+  end
+
+  def course_creating_student_enrollment_accounts
+    Rails.cache.fetch_with_batched_keys("course_creating_student_enrollment_accounts", batch_object: self, batched_keys: :enrollments) do
+      Shard.with_each_shard(in_region_associated_shards) do
+        Account.where(id: Course.where(id: enrollments.active.shard(Shard.current)
+                                .select(:course_id)
+                                .where(type: %w[StudentEnrollment ObserverEnrollment])
+                                .joins(:root_account)
+                                .where("accounts.settings LIKE ?", "%students_can_create_courses: true%"))
+               .select(:account_id))
       end
     end
   end
@@ -2062,9 +2083,12 @@ class User < ActiveRecord::Base
     cached_active_emails.map { |email| Enrollment.cached_temporary_invitations(email).dup.reject { |e| e.user_id == id } }.flatten
   end
 
-  def active_k5_enrollments?
-    account_ids =
-      enrollments.shard(in_region_associated_shards).current.active_by_date.distinct.pluck(:account_id)
+  def active_k5_enrollments?(root_account: false)
+    account_ids = if  root_account
+                    enrollments.current.active_by_date.where(root_account:).distinct.pluck(:account_id)
+                  else
+                    enrollments.shard(in_region_associated_shards).current.active_by_date.distinct.pluck(:account_id)
+                  end
     Account.where(id: account_ids).any?(&:enable_as_k5_account?)
   end
 
@@ -2886,7 +2910,6 @@ class User < ActiveRecord::Base
   end
 
   def suspended?
-    active_pseudonyms = pseudonyms.shard(self).active
     active_pseudonyms.empty? ? false : active_pseudonyms.all?(&:suspended?)
   end
 
@@ -3166,9 +3189,9 @@ class User < ActiveRecord::Base
     Rails.cache.delete(adminable_accounts_cache_key)
   end
 
-  def adminable_accounts_scope
+  def adminable_accounts_scope(shard_scope: in_region_associated_shards)
     # i couldn't get EXISTS (?) to work multi-shard, so this is happening instead
-    account_ids = account_users.active.shard(in_region_associated_shards).distinct.pluck(:account_id)
+    account_ids = account_users.active.shard(shard_scope).distinct.pluck(:account_id)
     Account.active.where(id: account_ids)
   end
 
@@ -3386,7 +3409,7 @@ class User < ActiveRecord::Base
 
   def create_courses_right(account)
     return :admin if account.cached_account_users_for(self).any? do |au|
-                       au.has_permission_to?(account, :manage_courses) || au.has_permission_to?(account, :manage_courses_add)
+                       au.permission_check(account, :manage_courses).success? || au.permission_check(account, :manage_courses_add).success?
                      end
     return nil if fake_student? || account.root_account.site_admin?
 
@@ -3405,14 +3428,70 @@ class User < ActiveRecord::Base
   end
 
   def all_account_calendars
-    unordered_associated_accounts.shard(in_region_associated_shards).active.where(account_calendar_visible: true)
+    account_user_account_ids = []
+    active_account_users = account_users.active
+    if active_account_users.any?
+      active_accounts = Account.active.where(id: active_account_users.select(:account_id), account_calendar_visible: true)
+      account_user_account_ids = active_accounts.reduce([]) do |descendants, account|
+        descendants.concat(Account.sub_account_ids_recursive(account.id))
+      end
+    end
+    associated_accounts_ids = unordered_associated_accounts.shard(in_region_associated_shards).select(:id)
+    Account.active.where(id: [associated_accounts_ids + account_user_account_ids], account_calendar_visible: true)
   end
 
   def enabled_account_calendars
     acct_cals = all_account_calendars
-    auto_sub = {
-      account_calendar_subscription_type: Account.site_admin.feature_enabled?(:auto_subscribe_account_calendars) ? "auto" : nil
-    }
-    acct_cals.where(id: get_preference(:enabled_account_calendars) || []).or(acct_cals.where(auto_sub))
+    acct_cals.where(id: get_preference(:enabled_account_calendars) || []).or(acct_cals.where(account_calendar_subscription_type: "auto"))
   end
+
+  def inbox_labels
+    preferences[:inbox_labels] || []
+  end
+
+  # Returns all sub accounts that the user can administer
+  # On the shard the starting_root_account resides on.
+  #
+  # This method first plucks (and caches) the adminable account
+  # IDs and then makes a second query to fetch the accounts.
+  #
+  # This two-query approach was taken intentionally: We do have to store
+  # the plucked IDs in memory and make a second query, but it
+  # means we can return an ActiveRecord::Relation instead of an Array.
+  #
+  # This is important to prevent initializing _all_ adminable account
+  # models into memory, even if this scope is used in a controller processing
+  # a request with pagination params that require a single, small page.
+  def adminable_accounts_recursive(starting_root_account:)
+    starting_root_account.shard.activate do
+      Account.where(id: adminable_account_ids_recursive(starting_root_account:))
+    end
+  end
+
+  def adminable_account_ids_recursive(starting_root_account:)
+    starting_root_account.shard.activate do
+      Rails.cache.fetch(
+        adminable_account_ids_cache_key(starting_root_account:),
+        expires_in: 5.minutes
+      ) do
+        Account.select(:id, :parent_account_id, :workflow_state).active.multi_parent_sub_accounts_recursive(
+          adminable_accounts_scope(
+            shard_scope: starting_root_account.shard
+          ).where(
+            root_account: starting_root_account
+          )
+        ).pluck(:id)
+      end
+    end
+  end
+
+  def adminable_account_ids_cache_key(starting_root_account:)
+    [
+      "adminable_account_ids_recursive",
+      global_id,
+      "starting_root_account",
+      starting_root_account.global_id,
+    ].cache_key
+  end
+  private :adminable_account_ids_cache_key
 end

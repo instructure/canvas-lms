@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "./concerns/deep_linking_spec_helper"
+require_relative "concerns/deep_linking_spec_helper"
 require_relative "../concerns/parent_frame_shared_examples"
 
 module Lti
@@ -834,20 +834,6 @@ module Lti
               expect { subject }.not_to change { course.context_modules.count }
             end
 
-            context "when the `Default SIS Sync for assignments, quizzes, grade discussion` option is enabled" do
-              before do
-                course.root_account.enable_feature! :new_sis_integrations
-                course.root_account.enable_feature! :post_grades
-                course.root_account.settings[:sis_default_grade_export] = { value: true }
-                course.root_account.save!
-              end
-
-              it "creates assignments with 'Post to SIS' enabled" do
-                subject
-                expect(course.assignments.last.post_to_sis).to be true
-              end
-            end
-
             context "when content item includes available dates" do
               let(:content_item) do
                 super().merge({ available: { startDateTime: Time.zone.now.iso8601, endDateTime: Time.zone.now.iso8601 } })
@@ -1030,6 +1016,39 @@ module Lti
               it "adds assignment to given module" do
                 expect { subject }.to change { course.context_modules.last.content_tags.count }.by 1
               end
+            end
+          end
+
+          context "when a content item for a collaboration is received" do
+            before do
+              course
+              user_session(@user)
+              context_external_tool
+            end
+
+            let(:content_items) do
+              [
+                { type: "ltiResourceLink", url: launch_url, title: "Item 1" }
+              ]
+            end
+
+            let(:return_url_params) { super().merge(placement: "collaboration") }
+
+            it "does not create a resource link" do
+              expect do
+                subject
+              end.to_not change { Lti::ResourceLink.count }
+            end
+
+            it "includes tool_id in the js_env deep_link_response" do
+              allow(controller).to receive(:js_env)
+              subject
+              expected_js_env_attributes = {
+                tool_id: context_external_tool.id,
+                content_items:
+              }
+
+              expect(controller).to have_received(:js_env).with(deep_link_response: hash_including(expected_js_env_attributes))
             end
           end
         end

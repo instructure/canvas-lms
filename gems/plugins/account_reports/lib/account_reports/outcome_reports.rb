@@ -35,35 +35,37 @@ module AccountReports
     end
 
     def self.student_assignment_outcome_headers
-      {
-        "student name" => I18n.t("student name"),
-        "student id" => I18n.t("student id"),
-        "student sis id" => I18n.t("student sis id"),
-        "assignment title" => I18n.t("assignment title"),
-        "assignment id" => I18n.t("assignment id"),
-        "submission date" => I18n.t("submission date"),
-        "submission score" => I18n.t("submission score"),
-        "learning outcome name" => I18n.t("learning outcome name"),
-        "learning outcome id" => I18n.t("learning outcome id"),
-        "attempt" => I18n.t("attempt"),
-        "outcome score" => I18n.t("outcome score"),
-        "course name" => I18n.t("course name"),
-        "course id" => I18n.t("course id"),
-        "course sis id" => I18n.t("course sis id"),
-        "section name" => I18n.t("section name"),
-        "section id" => I18n.t("section id"),
-        "section sis id" => I18n.t("section sis id"),
-        "assignment url" => I18n.t("assignment url"),
-        "learning outcome friendly name" => I18n.t("learning outcome friendly name"),
-        "learning outcome points possible" => I18n.t("learning outcome points possible"),
-        "learning outcome mastery score" => I18n.t("learning outcome mastery score"),
-        "learning outcome mastered" => I18n.t("learning outcome mastered"),
-        "learning outcome rating" => I18n.t("learning outcome rating"),
-        "learning outcome rating points" => I18n.t("learning outcome rating points"),
-        "account id" => I18n.t("account id"),
-        "account name" => I18n.t("account name"),
-        "enrollment state" => I18n.t("enrollment state")
-      }
+      [
+        "student name",
+        "student id",
+        "student sis id",
+        "assignment title",
+        "assignment id",
+        "submission date",
+        "submission score",
+        "learning outcome name",
+        "learning outcome id",
+        "attempt",
+        "outcome score",
+        "course name",
+        "course id",
+        "course sis id",
+        "section name",
+        "section id",
+        "section sis id",
+        "assignment url",
+        "learning outcome friendly name",
+        "learning outcome points possible",
+        "learning outcome mastery score",
+        "learning outcome mastered",
+        "learning outcome rating",
+        "learning outcome rating points",
+        "learning outcome group title",
+        "learning outcome group id",
+        "account id",
+        "account name",
+        "enrollment state"
+      ]
     end
 
     # returns rows for each assignment that is linked to an outcome,
@@ -73,38 +75,40 @@ module AccountReports
     end
 
     def self.outcome_result_headers
-      {
-        "student name" => I18n.t("student name"),
-        "student id" => I18n.t("student id"),
-        "student sis id" => I18n.t("student sis id"),
-        "assessment title" => I18n.t("assessment title"),
-        "assessment id" => I18n.t("assessment id"),
-        "assessment type" => I18n.t("assessment type"),
-        "submission date" => I18n.t("submission date"),
-        "submission score" => I18n.t("submission score"),
-        "learning outcome name" => I18n.t("learning outcome name"),
-        "learning outcome id" => I18n.t("learning outcome id"),
-        "attempt" => I18n.t("attempt"),
-        "outcome score" => I18n.t("outcome score"),
-        "assessment question" => I18n.t("assessment question"),
-        "assessment question id" => I18n.t("assessment question id"),
-        "course name" => I18n.t("course name"),
-        "course id" => I18n.t("course id"),
-        "course sis id" => I18n.t("course sis id"),
-        "section name" => I18n.t("section name"),
-        "section id" => I18n.t("section id"),
-        "section sis id" => I18n.t("section sis id"),
-        "assignment url" => I18n.t("assignment url"),
-        "learning outcome friendly name" => I18n.t("learning outcome friendly name"),
-        "learning outcome points possible" => I18n.t("learning outcome points possible"),
-        "learning outcome mastery score" => I18n.t("learning outcome mastery score"),
-        "learning outcome mastered" => I18n.t("learning outcome mastered"),
-        "learning outcome rating" => I18n.t("learning outcome rating"),
-        "learning outcome rating points" => I18n.t("learning outcome rating points"),
-        "account id" => I18n.t("account id"),
-        "account name" => I18n.t("account name"),
-        "enrollment state" => I18n.t("enrollment state")
-      }
+      [
+        "student name",
+        "student id",
+        "student sis id",
+        "assessment title",
+        "assessment id",
+        "assessment type",
+        "submission date",
+        "submission score",
+        "learning outcome name",
+        "learning outcome id",
+        "attempt",
+        "outcome score",
+        "assessment question",
+        "assessment question id",
+        "course name",
+        "course id",
+        "course sis id",
+        "section name",
+        "section id",
+        "section sis id",
+        "assignment url",
+        "learning outcome friendly name",
+        "learning outcome points possible",
+        "learning outcome mastery score",
+        "learning outcome mastered",
+        "learning outcome rating",
+        "learning outcome rating points",
+        "learning outcome group title",
+        "learning outcome group id",
+        "account id",
+        "account name",
+        "enrollment state"
+      ]
     end
 
     # returns rows for each assessed outcome result (or question result)
@@ -136,6 +140,8 @@ module AccountReports
                                lo.id                  AS "learning outcome id",
                                lo.display_name        AS "learning outcome friendly name",
                                lo.data                AS "learning outcome data",
+                               g.title                AS "learning outcome group title",
+                               g.id                   AS "learning outcome group id",
                                r.attempt              AS "attempt",
                                r.hide_points          AS "learning outcome points hidden",
                                r.score                AS "outcome score",
@@ -177,6 +183,8 @@ module AccountReports
                                  AND lol.context_type = 'Account'
                                  AND lol.tag_type = 'learning_outcome_association'
                                  AND lol.workflow_state != 'deleted'
+                               INNER JOIN #{LearningOutcomeGroup.quoted_table_name} g ON g.id = lol.associated_asset_id
+                                 AND lol.associated_asset_type = 'LearningOutcomeGroup'
                                  LEFT JOIN #{LearningOutcomeResult.quoted_table_name} r ON (r.user_id=pseudonyms.user_id
                                    AND r.content_tag_id = ct.id)
                                  LEFT JOIN #{Submission.quoted_table_name} sub ON sub.assignment_id = a.id
@@ -206,6 +214,8 @@ module AccountReports
                                 learning_outcomes.id                        AS "learning outcome id",
                                 learning_outcomes.display_name              AS "learning outcome friendly name",
                                 learning_outcomes.data                      AS "learning outcome data",
+                                g.title                                     AS "learning outcome group title",
+                                g.id                                        AS "learning outcome group id",
                                 c.name                                      AS "course name",
                                 c.id                                        AS "course id",
                                 c.sis_source_id                             AS "course sis id",
@@ -218,6 +228,8 @@ module AccountReports
                               .joins(<<~SQL.squish)
                                 INNER JOIN #{LearningOutcome.quoted_table_name} ON learning_outcomes.id = content_tags.content_id
                                   AND content_tags.content_type = 'LearningOutcome'
+                                INNER JOIN #{LearningOutcomeGroup.quoted_table_name} g ON g.id = content_tags.associated_asset_id
+                                  AND content_tags.associated_asset_type = 'LearningOutcomeGroup'
                                 INNER JOIN #{ContentTag.quoted_table_name} cct ON cct.content_id = content_tags.content_id AND cct.context_type = 'Course'
                                 INNER JOIN #{Course.quoted_table_name} c ON cct.context_id = c.id
                                 INNER JOIN #{Account.quoted_table_name} acct ON acct.id = c.account_id
@@ -337,6 +349,8 @@ module AccountReports
         student["learning outcome id"] = outcome["learning outcome id"]
         student["learning outcome friendly name"] = outcome["learning outcome friendly name"]
         student["learning outcome data"] = outcome["learning outcome data"]
+        student["learning outcome group title"] = outcome["learning outcome group title"]
+        student["learning outcome group id"] = outcome["learning outcome group id"]
         student["course name"] = course.name
         student["course id"] = course.id
         student["course sis id"] = course.sis_source_id
@@ -445,6 +459,8 @@ module AccountReports
                           COALESCE(qr.possible, r.possible)           AS "learning outcome points possible",
                           COALESCE(qr.mastery, r.mastery)             AS "learning outcome mastered",
                           learning_outcomes.data                      AS "learning outcome data",
+                          g.title                                     AS "learning outcome group title",
+                          g.id                                        AS "learning outcome group id",
                           COALESCE(qr.attempt, r.attempt)             AS "attempt",
                           r.hide_points                               AS "learning outcome points hidden",
                           COALESCE(qr.score, r.score)                 AS "outcome score",
@@ -463,6 +479,8 @@ module AccountReports
                           acct.name                                   AS "account name"
                         SQL
                         .joins(<<~SQL.squish)
+                          INNER JOIN #{LearningOutcomeGroup.quoted_table_name} g ON g.id = content_tags.associated_asset_id
+                            AND content_tags.associated_asset_type = 'LearningOutcomeGroup'
                           INNER JOIN #{LearningOutcome.quoted_table_name} ON content_tags.content_id = learning_outcomes.id
                             AND content_tags.content_type = 'LearningOutcome'
                           INNER JOIN #{LearningOutcomeResult.quoted_table_name} r ON r.learning_outcome_id = learning_outcomes.id
@@ -562,14 +580,12 @@ module AccountReports
     def write_outcomes_report(headers, canvas_scope, config_options = {})
       config_options[:empty_scope_message] ||= "No outcomes found"
       config_options[:new_quizzes_scope] ||= []
-      header_keys = headers.keys
-      header_names = headers.values
       host = root_account.domain
       enable_i18n_features = true
 
       os_scope = config_options[:new_quizzes_scope]
 
-      write_report header_names, enable_i18n_features do |csv|
+      write_report headers, enable_i18n_features do |csv|
         total = canvas_scope.length + os_scope.length
         GuardRail.activate(:primary) { AccountReport.where(id: @account_report.id).update_all(total_lines: total) }
 
@@ -589,7 +605,7 @@ module AccountReports
                                   "/assignments/#{row["assignment id"]}"
           row["submission date"] = default_timezone_format(row["submission date"])
           add_outcomes_data(row)
-          csv << header_keys.map { |h| row[h] }
+          csv << headers.map { |h| row[h] }
         end
         csv << [config_options[:empty_scope_message]] if total == 0
       end

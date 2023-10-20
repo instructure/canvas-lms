@@ -305,14 +305,14 @@
                           </button>
                           <div id="rqd_dialog" style="display: none;">
                             <%= t(:rqd_help_message,
-                            "When selected, this setting will restrict user view of quantitative (numeric) grading data and limit assignment creation options for teachers. Users will only see qualitative data, which includes letter grades and comments. Admin can customize this setting further by adjusting permissions for user roles.") %>
+                            "When selected, this setting will limit the view of new courses' quantitative (numeric) grading data. Students and observers will only see qualitative data, which includes letter grades and comments.") %>
                           </div>
                       </td>
                     </tr>
                     <% unless disabled %>
                       <tr>
                         <td colspan="2" class="sub_checkbox">
-                          <%= r.check_box :locked, :checked => hash[:locked] %>
+                          <%= r.check_box :locked, :checked => hash[:locked] && hash[:value], :disabled => !hash[:value] %>
                           <%= r.label :locked, :en => "Lock this setting for sub-accounts and courses" %>
                         </td>
                       </tr>
@@ -397,12 +397,15 @@
                 <% end %>
 
                 <% if Account.site_admin.feature_enabled?(:gradebook_show_first_last_names) %>
-                  <tr>
-                    <td colspan="2">
-                      <%= settings.check_box :allow_gradebook_show_first_last_names, checked: @account.allow_gradebook_show_first_last_names? %>
-                      <%= settings.label :allow_gradebook_show_first_last_names, t("Allow gradebook users to view and export student first and last names in separate columns") %>
-                    </td>
-                  </tr>
+                  <%= settings.fields_for :allow_gradebook_show_first_last_names do |r| %>
+                    <% hash = @account.allow_gradebook_show_first_last_names %>
+                    <tr>
+                      <td colspan="2">
+                        <%= r.check_box :value, checked: hash[:value] %>
+                        <%= r.label :value, t("Allow gradebook users to view and export student first and last names in separate columns") %>
+                      </td>
+                    </tr>
+                  <% end %>
                 <% end %>
 
                 <% if !@account.site_admin? && @account.primary_settings_root_account? %>
@@ -563,18 +566,16 @@
                       To learn more about Canvas for Elementary, please refer to <a href="<%= t(:'#community.canvas_for_elementary') %>" target="_blank">our documentation</a>.
                     <% end %>
                   </p>
-                  <% if Account.site_admin.feature_enabled?(:k5_font_selection) %>
-                    <% font_settings = @account.use_classic_font_in_k5 %>
-                    <%= settings.fields_for :use_classic_font_in_k5 do |font| %>
-                      <div>
-                        <span class="screenreader-only"><%= t('Canvas for Elementary Font Selection') %></span>
-                        <%= font.radio_button :value, false, checked: !font_settings[:value], disabled: disabled, id: "k5_font_disabled_radio" %>
-                        <%= font.label :value, t("Large Balsamiq Font"), for: "k5_font_disabled_radio", style: "margin-bottom: 0;" %>
-                        <br />
-                        <%= font.radio_button :value, true, checked: font_settings[:value], disabled: disabled, id: "k5_font_enabled_radio" %>
-                        <%= font.label :value, t("Regular Lato Font"), for: "k5_font_enabled_radio" %>
-                      </div>
-                    <% end %>
+                  <% font_settings = @account.use_classic_font_in_k5 %>
+                  <%= settings.fields_for :use_classic_font_in_k5 do |font| %>
+                    <div>
+                      <span class="screenreader-only"><%= t('Canvas for Elementary Font Selection') %></span>
+                      <%= font.radio_button :value, false, checked: !font_settings[:value], disabled: disabled, id: "k5_font_disabled_radio" %>
+                      <%= font.label :value, t("Large Balsamiq Font"), for: "k5_font_disabled_radio", style: "margin-bottom: 0;" %>
+                      <br />
+                      <%= font.radio_button :value, true, checked: font_settings[:value], disabled: disabled, id: "k5_font_enabled_radio" %>
+                      <%= font.label :value, t("Regular Lato Font"), for: "k5_font_enabled_radio" %>
+                    </div>
                   <% end %>
                 </div>
               </div>
@@ -596,10 +597,6 @@
                   <%= settings.label :canvadocs_prefer_office_online, :en => "Prefer Office 365 file viewer" %>
                 </div> -->
                 <% unless @account.site_admin? %>
-                  <div>
-                    <%= f.check_box :enable_user_notes, :checked => @account.enable_user_notes %>
-                    <%= f.label :enable_user_notes, :en => "Faculty Journal" %>
-                  </div>
                   <div>
                     <%= settings.check_box :enable_eportfolios, :checked => @account.settings[:enable_eportfolios] != false %>
                     <%= settings.label :enable_eportfolios, :en => "ePortfolios" %>
@@ -722,6 +719,12 @@
                 <div>
                   <%= settings.check_box :kill_joy, :checked => @account.kill_joy? %>
                   <%= settings.label     :kill_joy, :en => "Remove hidden game from 404 page" %>
+                </div>
+              <% end %>
+              <% unless @account.site_admin? %>
+                <div>
+                  <%= settings.check_box :suppress_notifications, :checked => @account.suppress_notifications? %>
+                  <%= settings.label     :suppress_notifications, :en => "Suppress notifications from being created and sent out" %>
                 </div>
               <% end %>
             <% end %>

@@ -521,7 +521,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
                else
                  :updated
                end
-      asset = asset.is_a?(ContentTag) ? LearningOutcome.find(asset.content_id) : asset
+      asset = LearningOutcome.find(asset.content_id) if asset.is_a?(ContentTag)
       tag = @template.cached_content_tag_for(asset)
       locked = !!tag&.restrictions&.values&.any?
       changed_asset_json(asset, action, locked)

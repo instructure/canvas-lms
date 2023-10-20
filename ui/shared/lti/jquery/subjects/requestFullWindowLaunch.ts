@@ -30,6 +30,7 @@ const parseData = (
           height?: number
         }
         placement?: string
+        resource_link_id?: string
       }
     | string
 ): {
@@ -41,6 +42,7 @@ const parseData = (
     height?: number
   }
   placement?: string
+  resource_link_id?: string
 } => {
   const defaults = {
     display: 'borderless',
@@ -69,7 +71,12 @@ const parseData = (
   }
 }
 
-const buildLaunchUrl = (messageUrl: string, placement: string | undefined, display: string) => {
+const buildLaunchUrl = (
+  messageUrl: string,
+  placement: string | undefined,
+  display: string,
+  resource_link_id: string | undefined
+) => {
   let context = ENV.context_asset_string.replace('_', 's/')
   if (!(context.startsWith('account') || context.startsWith('course'))) {
     context = 'accounts/' + ENV.DOMAIN_ROOT_ACCOUNT_ID
@@ -80,6 +87,7 @@ const buildLaunchUrl = (messageUrl: string, placement: string | undefined, displ
   const clientId = toolLaunchUrl.searchParams.get('client_id')
   const clientIdParam = clientId ? `&client_id=${clientId}` : ''
   const placementParam = placement ? `&placement=${placement}` : ''
+  const resourceLinkIdParam = resource_link_id ? `&resource_link_id=${resource_link_id}` : ''
 
   const assignmentId = toolLaunchUrl.searchParams.get('assignment_id')
   const assignmentParam = assignmentId ? `&assignment_id=${assignmentId}` : ''
@@ -89,7 +97,7 @@ const buildLaunchUrl = (messageUrl: string, placement: string | undefined, displ
   toolLaunchUrl.searchParams.append('full_win_launch_requested', '1')
   const encodedToolLaunchUrl = encodeURIComponent(toolLaunchUrl.toString())
 
-  return `${baseUrl}&url=${encodedToolLaunchUrl}${clientIdParam}${placementParam}${assignmentParam}`
+  return `${baseUrl}&url=${encodedToolLaunchUrl}${clientIdParam}${placementParam}${assignmentParam}${resourceLinkIdParam}`
 }
 
 const handler: LtiMessageHandler<{
@@ -102,10 +110,14 @@ const handler: LtiMessageHandler<{
     }
     placement: string
     display: string
+    resource_link_id?: string
   }
 }> = ({message}) => {
-  const {url, launchType, launchOptions, placement, display} = parseData(message.data)
-  const launchUrl = buildLaunchUrl(url, placement, display)
+  const {url, launchType, launchOptions, placement, display, resource_link_id} = parseData(
+    message.data
+  )
+
+  const launchUrl = buildLaunchUrl(url, placement, display, resource_link_id)
 
   let proxy: Window | null = null
   switch (launchType) {

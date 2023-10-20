@@ -35,6 +35,8 @@
   blueprint_subscription = @context.master_course_subscriptions.active.first
   master_course = blueprint_subscription&.master_template&.course
 
+  can_see_restrict_quantitative_setting = ((@context&.restrict_quantitative_data || @context&.account&.restrict_quantitative_data[:value]) && @context&.root_account&.feature_enabled?(:restrict_quantitative_data))
+
   if @context.elementary_subject_course?
     navigation_help_text = t("help.edit_navigation_k5", "Drag and drop items to reorder them in the subject navigation.")
     disabled_tab_text = t("tab_hidden_if_disabled_k5", "Tab disabled, won't appear in subject navigation")
@@ -332,7 +334,7 @@
           <%= f.hidden_field :restrict_student_future_view %>
         </div>
       </div>
-      <% if @context.root_account.feature_enabled?(:restrict_quantitative_data) %>
+      <% if can_see_restrict_quantitative_setting %>
       <div class="form-row course-quantitative-data-row">
         <div class="form-label"><label for="restrict_quantitative_data_options"><%= f.blabel :restrict_quantitative_data, :en => "Quantitative Data Options" %></label></div>
         <div class="nobr">
@@ -345,8 +347,8 @@
       <div class="form-row language-row">
         <div class="form-label"><%= f.blabel :default_due_time, en: "Default due time" %></div>
         <div class="tall-row">
-          <%= f.select :default_due_time, options_for_select(default_due_time_options(@context), default_due_time_key(@context)) %>
-          <div class="aside palign">
+          <%= f.select :default_due_time, options_for_select(default_due_time_options(@context), default_due_time_key(@context)), {}, {'aria-describedby' => 'due-time-description'} %>
+          <div class="aside palign" id="due-time-description">
             <%= t("This influences the user interface for setting due dates. It does not change the time due for any existing assignments.") %>
           </div>
         </div>
@@ -361,10 +363,10 @@
             <div>
               <%= f.select :locale,
                            [[no_language, nil]] + available_locales.invert.sort_by { |desc, _| Canvas::ICU.collation_key(desc) },
-                           {:selected => @context.locale}, {:class => 'locale'} %>
+                           {:selected => @context.locale}, {:class => 'locale', 'aria-describedby' => 'language-description'} %>
               <%= render :partial => 'shared/locale_warning' %>
             </div>
-            <div class="aside palign">
+            <div class="aside palign" id="language-description">
               <%= t('language_overrides_preferences', "This will override any user/system language preferences. This is only recommended for foreign language courses") %>
             </div>
           <% else %>
@@ -409,8 +411,8 @@
         </div>
         <div id="course_grading_scheme">
           <div class="checkbox-flex-container">
-            <%= f.check_box :grading_standard_enabled, :class => "grading_standard_checkbox", :disabled => !can_manage %>
-            <%= f.label :grading_standard_enabled, :en => "Enable course grading scheme" %>
+            <%= f.check_box :course_grading_standard_enabled, :class => "grading_standard_checkbox", :disabled => !can_manage %>
+            <%= f.label :course_grading_standard_enabled, :en => "Enable course grading scheme" %>
           </div>
           <% if Account.site_admin.feature_enabled?(:grading_scheme_updates) %>
             <input type="hidden" name="course[grading_standard_id]" id="grading_standard_id" value="<%= @context.grading_standard_id %>" />
@@ -668,8 +670,8 @@
                 <div class="checkbox-flex-container">
                 <%= f.check_box :hide_final_grades, :disabled => !can_manage %>
                 <%= f.label :hide_final_grades, :en => "Hide totals in student grades summary" %><br/>
+                </div>
               <% end %>
-              </div>
               <% unless @context.elementary_subject_course? || (@context.restrict_quantitative_data && @context.root_account.feature_enabled?(:restrict_quantitative_data)) %>
                 <div class="checkbox-flex-container">
                 <%= f.check_box :hide_distribution_graphs, :disabled => !can_manage %>

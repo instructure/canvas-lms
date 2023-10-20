@@ -39,6 +39,7 @@ if Rails.env.test?
     def raise(*args)
       if defined?(SpecTimeLimit) && args.first == SpecTimeLimit::Error
         have_ever_run_a_debugger = (
+          defined?(::DEBUGGER__::Session) ||
           (defined?(Byebug) && Byebug.respond_to?(:started?)) ||
           (defined?(Pry) && Pry::InputLock.input_locks.any?)
         )

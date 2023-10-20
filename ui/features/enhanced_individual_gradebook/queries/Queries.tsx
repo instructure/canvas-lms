@@ -21,7 +21,12 @@ import gql from 'graphql-tag'
 export const GRADEBOOK_QUERY = gql`
   query GradebookQuery($courseId: ID!) {
     course(id: $courseId) {
-      enrollmentsConnection(filter: {types: [StudentEnrollment, StudentViewEnrollment]}) {
+      enrollmentsConnection(
+        filter: {
+          states: [active, invited, completed]
+          types: [StudentEnrollment, StudentViewEnrollment]
+        }
+      ) {
         nodes {
           user {
             id: _id
@@ -29,6 +34,7 @@ export const GRADEBOOK_QUERY = gql`
             sortableName
           }
           courseSectionId
+          state
         }
       }
       sectionsConnection {
@@ -37,12 +43,19 @@ export const GRADEBOOK_QUERY = gql`
           name
         }
       }
-      submissionsConnection {
+      submissionsConnection(
+        filter: {states: [graded, pending_review, submitted, ungraded, unsubmitted]}
+      ) {
         nodes {
           grade
           id: _id
           score
           assignmentId
+          redoRequest
+          submittedAt
+          userId
+          state
+          gradingPeriodId
         }
       }
       assignmentGroupsConnection {
@@ -54,11 +67,13 @@ export const GRADEBOOK_QUERY = gql`
             dropHighest
             dropLowest
           }
+          sisId
           state
           position
-          assignmentsConnection {
+          assignmentsConnection(filter: {gradingPeriodId: null}) {
             nodes {
               anonymizeStudents
+              assignmentGroupId
               gradingType
               id: _id
               name
@@ -66,6 +81,18 @@ export const GRADEBOOK_QUERY = gql`
               pointsPossible
               submissionTypes
               dueAt
+              groupCategoryId
+              gradeGroupStudentsIndividually
+              allowedAttempts
+              anonymousGrading
+              courseId
+              gradesPublished
+              htmlUrl
+              moderatedGrading: moderatedGradingEnabled
+              postManually
+              published
+              hasSubmittedSubmissions
+              inClosedGradingPeriod
             }
           }
         }
@@ -80,12 +107,12 @@ export const GRADEBOOK_STUDENT_QUERY = gql`
       usersConnection(
         filter: {
           enrollmentTypes: [StudentEnrollment, StudentViewEnrollment]
-          enrollmentStates: [active, invited]
+          enrollmentStates: [active, invited, completed]
           userIds: $userIds
         }
       ) {
         nodes {
-          enrollments {
+          enrollments(courseId: $courseId) {
             id: _id
             grades {
               unpostedCurrentGrade
@@ -98,6 +125,7 @@ export const GRADEBOOK_STUDENT_QUERY = gql`
               name
             }
           }
+          id: _id
           loginId
           name
         }
@@ -121,6 +149,40 @@ export const GRADEBOOK_STUDENT_QUERY = gql`
           latePolicyStatus
           missing
           userId
+          cachedDueDate
+          gradingPeriodId
+          deductedPoints
+          enteredGrade
+        }
+      }
+    }
+  }
+`
+
+export const GRADEBOOK_SUBMISSION_COMMENTS = gql`
+  query GradebookSubmissionCommentsQuery($courseId: ID!, $submissionId: ID!) {
+    submission(id: $submissionId) {
+      commentsConnection {
+        nodes {
+          id: _id
+          comment
+          mediaObject {
+            id: _id
+            mediaDownloadUrl
+          }
+          attachments {
+            id: _id
+            displayName
+            mimeClass
+            url
+          }
+          author {
+            name
+            id: _id
+            avatarUrl
+            htmlUrl(courseId: $courseId)
+          }
+          updatedAt
         }
       }
     }

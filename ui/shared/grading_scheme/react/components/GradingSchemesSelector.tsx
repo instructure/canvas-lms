@@ -42,16 +42,22 @@ const I18n = useI18nScope('assignments.grading_type_selector')
 const {Item} = Flex as any
 
 interface ComponentProps {
+  canManage: boolean
   contextType: 'Course' | 'Account'
   contextId: string
+  courseDefaultSchemeId?: string
   initiallySelectedGradingSchemeId?: string
+  pointsBasedGradingSchemesEnabled: boolean
   onChange: (gradingStandardId?: string) => any
 }
 export const GradingSchemesSelector = ({
   initiallySelectedGradingSchemeId,
   onChange,
+  canManage,
   contextType,
   contextId,
+  courseDefaultSchemeId,
+  pointsBasedGradingSchemesEnabled,
 }: ComponentProps) => {
   if (initiallySelectedGradingSchemeId === '0' || initiallySelectedGradingSchemeId === '') {
     initiallySelectedGradingSchemeId = undefined
@@ -175,7 +181,6 @@ export const GradingSchemesSelector = ({
         showFlashError(I18n.t('There was an error while refreshing grading schemes'))(error)
       })
   }
-
   if (!gradingSchemeSummaries || !defaultCanvasGradingScheme) {
     return (
       <>
@@ -183,6 +188,22 @@ export const GradingSchemesSelector = ({
       </>
     )
   } else {
+    let defaultSchemeLabel: string
+    if (courseDefaultSchemeId) {
+      // look for a matching grading scheme id to get the 'default' scheme title
+      const matchingSummaries = gradingSchemeSummaries.filter(
+        gradingSchemeSummary => gradingSchemeSummary.id === courseDefaultSchemeId
+      )
+      if (courseDefaultSchemeId === '0') {
+        defaultSchemeLabel = I18n.t('Canvas Grading Scheme (course default)')
+      } else if (matchingSummaries.length > 0) {
+        defaultSchemeLabel = `${matchingSummaries[0].title} ${I18n.t('(course default)')}`
+      } else {
+        defaultSchemeLabel = I18n.t('Course Default Grading Scheme')
+      }
+    } else {
+      defaultSchemeLabel = I18n.t('Default Canvas Grading Scheme')
+    }
     return (
       <>
         <Flex
@@ -200,7 +221,7 @@ export const GradingSchemesSelector = ({
                   value={selectedGradingSchemeId || undefined}
                   onChange={onChangeSelectedGradingScheme}
                 >
-                  <option value="">{I18n.t('Default Canvas Grading Scheme')}</option>
+                  <option value="">{defaultSchemeLabel}</option>
                   {gradingSchemeSummaries.map(gradingSchemeSummary => (
                     <option key={gradingSchemeSummary.id} value={gradingSchemeSummary.id}>
                       {gradingSchemeSummary.title}
@@ -212,16 +233,20 @@ export const GradingSchemesSelector = ({
           </Item>
           <Item>
             <View as="div" margin="none none none xx-small" withVisualDebug={false}>
-              <Button onClick={openGradingSchemeViewEditModal}>{I18n.t('View/Edit')}</Button>
+              <Button onClick={openGradingSchemeViewEditModal}>
+                {canManage ? I18n.t('View/Edit') : I18n.t('View')}
+              </Button>
             </View>
           </Item>
         </Flex>
 
-        <View as="div" margin="none none small none" withVisualDebug={false}>
-          <CondensedButton color="primary" onClick={openManageGradingSchemesModal}>
-            {I18n.t('Manage All Grading Schemes')}
-          </CondensedButton>
-        </View>
+        {canManage && (
+          <View as="div" margin="none none small none" withVisualDebug={false}>
+            <CondensedButton color="primary" onClick={openManageGradingSchemesModal}>
+              {I18n.t('Manage All Grading Schemes')}
+            </CondensedButton>
+          </View>
+        )}
 
         {showViewEditGradingSchemeModal ? (
           <>
@@ -233,14 +258,26 @@ export const GradingSchemesSelector = ({
                 onCancel={closeGradingSchemeViewEditModal}
                 onUpdate={handleUpdatedGradingScheme}
                 onDelete={() => handleDeletedGradingScheme(selectedGradingSchemeId)}
+                pointsBasedGradingSchemesEnabled={pointsBasedGradingSchemesEnabled}
+              />
+            ) : courseDefaultSchemeId && courseDefaultSchemeId !== '0' ? (
+              <GradingSchemeViewEditModal
+                contextType={contextType}
+                contextId={contextId}
+                gradingSchemeId={courseDefaultSchemeId}
+                onCancel={closeGradingSchemeViewEditModal}
+                onUpdate={handleUpdatedGradingScheme}
+                onDelete={() => handleDeletedGradingScheme(courseDefaultSchemeId)}
+                pointsBasedGradingSchemesEnabled={pointsBasedGradingSchemesEnabled}
               />
             ) : (
               <GradingSchemeViewCopyTemplateModal
-                allowDuplication={true}
+                allowDuplication={canManage}
                 contextId={contextId}
                 contextType={contextType}
                 onCancel={closeGradingSchemeViewEditModal}
                 onCreate={handleCreatedGradingScheme}
+                pointsBasedGradingSchemesEnabled={pointsBasedGradingSchemesEnabled}
               />
             )}
           </>
@@ -270,6 +307,7 @@ export const GradingSchemesSelector = ({
                   contextId={contextId}
                   contextType={contextType}
                   onGradingSchemesChanged={handleGradingSchemesChanged}
+                  pointsBasedGradingSchemesEnabled={pointsBasedGradingSchemesEnabled}
                 />
               </>
             </Modal.Body>

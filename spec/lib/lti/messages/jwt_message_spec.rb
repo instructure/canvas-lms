@@ -217,9 +217,9 @@ describe Lti::Messages::JwtMessage do
 
   describe "i18n claims" do
     it "sets the locale" do
-      expected_locale = "ca"
-      allow(I18n).to receive(:locale).and_return expected_locale
-      expect(decoded_jwt["locale"]).to eq expected_locale
+      I18n.with_locale(:ca) do
+        expect(decoded_jwt["locale"]).to eq "ca"
+      end
     end
 
     context "when i18n claim group disabled" do
@@ -312,9 +312,9 @@ describe Lti::Messages::JwtMessage do
       end
 
       it "sets the locale" do
-        expected_locale = "ca"
-        allow(I18n).to receive(:locale).and_return expected_locale
-        expect(message_launch_presentation["locale"]).to eq expected_locale
+        I18n.with_locale(:ca) do
+          expect(message_launch_presentation["locale"]).to eq "ca"
+        end
       end
     end
 
@@ -555,16 +555,13 @@ describe Lti::Messages::JwtMessage do
     end
     let(:controller) do
       controller = double("controller")
-      allow(controller).to receive(:polymorphic_url).and_return("polymorphic_url")
-      allow(controller).to receive(:request).and_return(request)
+      allow(controller).to receive_messages(polymorphic_url: "polymorphic_url", request:)
       controller
     end
     # All this setup just so we can stub out controller.polymorphic_url
     let(:request) do
       request = double("request")
-      allow(request).to receive(:url).and_return("https://localhost")
-      allow(request).to receive(:host).and_return("/my/url")
-      allow(request).to receive(:scheme).and_return("https")
+      allow(request).to receive_messages(url: "https://localhost", host: "/my/url", scheme: "https")
       request
     end
     # override b/c all the rest of the tests fail if a Controller is injected into the 'top-level' expander def
@@ -619,7 +616,7 @@ describe Lti::Messages::JwtMessage do
       context "when the consistent_ags_ids_based_on_account_principal_domain feature flag is on" do
         it "sets the NRPS url using the Account#domain" do
           context.root_account.enable_feature! :consistent_ags_ids_based_on_account_principal_domain
-          allow_any_instance_of(Account).to receive(:domain).and_return("account_host")
+          expect_any_instance_of(Account).to receive(:environment_specific_domain).and_return("account_host")
           expect(lti_advantage_service_claim["context_memberships_url"]).to eq "polymorphic_url"
           expect(controller).to have_received(:polymorphic_url).with(
             [anything, :names_and_roles], host: "account_host"
@@ -669,7 +666,7 @@ describe Lti::Messages::JwtMessage do
 
     before do
       course.account.enable_feature!(:consistent_ags_ids_based_on_account_principal_domain)
-      allow_any_instance_of(Account).to receive(:domain).and_return("canonical_domain")
+      allow_any_instance_of(Account).to receive(:environment_specific_domain).and_return("canonical_domain")
       allow(controller).to receive(:lti_line_item_index_url)
         .with({ host: "canonical_domain", course_id: course.id })
         .and_return("lti_line_item_index_url")
@@ -1011,23 +1008,66 @@ describe Lti::Messages::JwtMessage do
   end
 
   describe "lti1p1 claims" do
+    subject { decoded_jwt[lti1p1_claim] }
+
     let(:lti1p1_claim) { "https://purl.imsglobal.org/spec/lti/claim/lti1p1" }
 
     context "when user does not have lti_context_id" do
+      subject { decoded_jwt }
+
       before do
         allow(user).to receive(:lti_context_id).and_return(nil)
       end
 
-      it "does not include the claim" do
-        expect(decoded_jwt).to_not include lti1p1_claim
-      end
+      it { is_expected.not_to include lti1p1_claim }
     end
 
     context "when user has lti_context_id" do
-      let(:message_lti1p1) { decoded_jwt[lti1p1_claim] }
-
       it "adds user_id" do
-        expect(message_lti1p1["user_id"]).to eq user.lti_context_id
+        expect(subject["user_id"]).to eq user.lti_context_id
+      end
+    end
+
+    context "when there is an associated LTI 1.1 tool" do
+      let!(:associated_1_1_tool) { external_tool_model(context: course, opts: { url: "http://www.example.com/basic_lti" }) }
+
+      before do
+        allow(Lti::Helpers::JwtMessageHelper).to receive(:generate_oauth_consumer_key_sign).and_return("avalidsignature")
+      end
+
+      context "the include_oauth_consumer_key_in_lti_launch flag is enabled" do
+        before do
+          Account.site_admin.enable_feature!(:include_oauth_consumer_key_in_lti_launch)
+        end
+
+        it "includes the oauth_consumer_key related claims" do
+          expect(subject["oauth_consumer_key"]).to eq associated_1_1_tool.consumer_key
+          expect(subject["oauth_consumer_key_sign"]).to eq "avalidsignature"
+        end
+      end
+
+      context "the include_oauth_consumer_key_in_lti_launch flag is disabled" do
+        before do
+          Account.site_admin.disable_feature!(:include_oauth_consumer_key_in_lti_launch)
+        end
+
+        it "doesn't include the oauth_consumer_key related claims" do
+          expect(subject).not_to include "oauth_consumer_key"
+          expect(subject).not_to include "oauth_consumer_key_sign"
+        end
+
+        it "doesn't attempt to perform any lookups" do
+          expect_any_instance_of(ContextExternalTool).not_to receive(:associated_1_1_tool)
+          expect(subject).not_to include "oauth_consumer_key"
+          expect(subject).not_to include "oauth_consumer_key_sign"
+        end
+      end
+    end
+
+    context "when there isn't an associated LTI 1.1 tool" do
+      it "doesn't include the oauth_consumer_key related claims" do
+        expect(subject).not_to include "oauth_consumer_key"
+        expect(subject).not_to include "oauth_consumer_key_sign"
       end
     end
   end

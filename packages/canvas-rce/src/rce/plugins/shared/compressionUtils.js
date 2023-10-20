@@ -65,7 +65,7 @@ export function shouldCompressImage({type, size}) {
   )
 }
 
-export function compressImage(encodedImage, previewWidth, previewHeight) {
+export function compressImage({encodedImage, previewWidth, previewHeight}) {
   return new Promise((resolve, reject) => {
     const image = new Image()
     image.src = encodedImage

@@ -270,7 +270,7 @@ describe "admin_tools" do
         expect(select).not_to be_nil
         expect(select).to be_displayed
 
-        options = ffj("#loggingType > option").map(&:text).map(&:strip)
+        options = ffj("#loggingType > option").map { |e| e.text.strip }
         expect(options).to include("Select a Log type")
         expect(options).to include("Login / Logout Activity")
         expect(options).to include("Grade Change Activity")
@@ -322,6 +322,22 @@ describe "admin_tools" do
           click_view_tab "logging"
 
           options = ffj("#loggingType > option")
+          options.map!(&:text)
+          expect(options).not_to include("Course Activity")
+        end
+
+        it "does not include course change activity option for sub-account admins" do
+          sub_account = @account.sub_accounts.create!(name: "sub-account")
+          sub_admin = account_admin_user(account: sub_account)
+          user_with_pseudonym(user: sub_admin, account: sub_account)
+          user_session(sub_admin)
+
+          get "/accounts/#{sub_account.id}/admin_tools"
+          wait_for_ajaximations
+
+          click_view_tab "logging"
+
+          options = ff("#loggingType > option")
           options.map!(&:text)
           expect(options).not_to include("Course Activity")
         end

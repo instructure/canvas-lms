@@ -20,7 +20,7 @@
   <div class="form-dialog-content">
     <div class="ic-Form-control form-element">
       <div class="module_name form-element">
-        <label class="screenreader-only" for="context_module_name"><%= t('Module Name') %></label>
+        <label for="context_module_name"><%= t('Module Name') %></label>
         <%= f.text_field :name, :placeholder => t('Module Name'), :id => 'context_module_name', :class => 'ic-Input' %>
       </div>
 
@@ -32,10 +32,10 @@
           </label>
         </div>
         <div class="unlock_module_at_details form-element">
-        <label class='screenreader-only' id='unlock_at_date_label'>
-              <%= t("Unlock module on date") %>
-              <%= datepicker_screenreader_prompt %>
-            </label>
+          <label class='screenreader-only' id='unlock_at_date_label'>
+            <%= t("Unlock module on date") %>
+            <%= datepicker_screenreader_prompt %>
+          </label>
           <%= f.text_field :unlock_at,
                              class: "datetime_field",
                              'aria-labelledby' => 'unlock_at_date_label',
@@ -81,7 +81,7 @@
         </div>
         <div class="ic-Radio">
           <%= f.radio_button :requirement_count, 1  %>
-          <%= f.label :requirement_count, t("Student must complete one of these requirements"), class: "ic-Label", value: 1 %>
+          <%= f.label :requirement_count, t("Students must complete one of these requirements"), class: "ic-Label", value: 1 %>
         </div>
       </div>
       <div class="no_items_message form-element" style="display: none;">

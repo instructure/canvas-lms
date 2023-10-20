@@ -48,7 +48,8 @@ class Quizzes::QuizEligibility
 
   def declined_reason_renders
     return :access_code if need_access_code?
-    return :invalid_ip  if invalid_ip?
+
+    :invalid_ip  if invalid_ip?
   end
 
   def locked?

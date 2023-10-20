@@ -26,7 +26,11 @@ _.mixin({
   },
 })
 
-class DecayingAverage {
+const eachCons = (array, num) => {
+  return Array.from({length: array.length - num + 1}, (_, i) => array.slice(i, i + num))
+}
+
+class WeightedAverage {
   constructor(weight, range) {
     this.weight = weight
     this.range = range
@@ -47,6 +51,38 @@ class DecayingAverage {
 
   toPercentage(n) {
     return n / 100
+  }
+}
+
+class DecayingAverage {
+  constructor(weight, range) {
+    this.weight = weight
+    this.range = range
+  }
+
+  value() {
+    let n = null
+    const consArray = eachCons(this.range, 2)
+    consArray.forEach(score => {
+      n =
+        n == null
+          ? this.calculateDecayAverage(score[0], score[1])
+          : this.calculateDecayAverage(n, score[1])
+    })
+
+    return Math.round(n * 100) / 100
+  }
+
+  remainder() {
+    return 100 - this.weight
+  }
+
+  toPercentage(n) {
+    return n / 100
+  }
+
+  calculateDecayAverage(score1, score2) {
+    return score1 * this.toPercentage(this.remainder()) + score2 * this.toPercentage(this.weight)
   }
 }
 
@@ -93,8 +129,15 @@ export default class CalculationMethodContent {
     )
   }
 
+  weightedAverage() {
+    return new WeightedAverage(this.calculation_int, this.exampleScoreIntegers()).value()
+  }
+
   decayingAverage() {
-    return new DecayingAverage(this.calculation_int, this.exampleScoreIntegers()).value()
+    return new DecayingAverage(
+      this.calculation_int,
+      this.exampleScoreIntegers().slice(0, 7)
+    ).value()
   }
 
   exampleScoreIntegers() {
@@ -114,81 +157,200 @@ export default class CalculationMethodContent {
   }
 
   present() {
-    return this.toJSON()[this.calculation_method]
+    const newDecayingAverageFF = ENV.OUTCOMES_NEW_DECAYING_AVERAGE_CALCULATION
+    let calculation_method_name = this.calculation_method
+    if (newDecayingAverageFF) {
+      calculation_method_name =
+        this.calculation_method === 'decaying_average'
+          ? 'weighted_average'
+          : this.calculation_method
+    } else {
+      calculation_method_name =
+        this.calculation_method === 'standard_decaying_average'
+          ? 'decaying_average'
+          : this.calculation_method
+    }
+    return this.toJSON()[calculation_method_name]
+  }
+
+  calculationValuesForIndividualOutcomes(newDecayingAverageFF) {
+    let decayWeightAvgValues = {}
+    const otherCalculationValues = {
+      n_mastery: {
+        calculationIntLabel: I18n.t('# of times'),
+        calculationIntDescription: I18n.t('must be between 1 and 10'),
+      },
+      latest: {
+        method: I18n.t('Most Recent Score'),
+      },
+      highest: {
+        exampleScores: this.exampleScoreIntegers().join(', '),
+        exampleResult: numberFormat.outcomeScore(_.max(this.exampleScoreIntegers())),
+      },
+      average: {
+        method: I18n.t('Average'),
+      },
+    }
+
+    if (newDecayingAverageFF) {
+      decayWeightAvgValues = {
+        weighted_average: {
+          method: I18n.t('Weighted Average - %{recentInt}%/%{remainderInt}%', {
+            recentInt: this.calculation_int,
+            remainderInt: 100 - this.calculation_int,
+          }),
+          calculationIntLabel: I18n.t('% weighting for last item'),
+          calculationIntDescription: I18n.t('must be between 1 and 99'),
+        },
+        decaying_average: {
+          method: I18n.t('Decaying Average - %{recentInt}%/%{remainderInt}%', {
+            recentInt: this.calculation_int,
+            remainderInt: 100 - this.calculation_int,
+          }),
+          calculationIntLabel: I18n.t('% weighting of most recent item'),
+          calculationIntDescription: I18n.t('must be between 50 and 99'),
+        },
+      }
+    } else {
+      decayWeightAvgValues = {
+        decaying_average: {
+          method: I18n.t('Decaying Average - %{recentInt}%/%{remainderInt}%', {
+            recentInt: this.calculation_int,
+            remainderInt: 100 - this.calculation_int,
+          }),
+          calculationIntLabel: I18n.t('% weighting for last item'),
+          calculationIntDescription: I18n.t('must be between 1 and 99'),
+        },
+      }
+    }
+    return Object.assign(decayWeightAvgValues, otherCalculationValues)
+  }
+
+  calculationValuesForNonIndividualOutcomes(newDecayingAverageFF) {
+    let decayWeightAvgValues = {}
+    const otherCalculationValues = {
+      n_mastery: {
+        calculationIntLabel: I18n.t('Items: '),
+        calculationIntDescription: I18n.t('Between 1 and 10'),
+      },
+      latest: {
+        method: I18n.t('Latest Score'),
+      },
+      highest: {
+        exampleScores: this.exampleScoreIntegers().slice(0, 4).join(', '),
+        exampleResult: numberFormat.outcomeScore(_.max(this.exampleScoreIntegers().slice(0, 4))),
+      },
+      average: {
+        method: I18n.t('Average'),
+      },
+    }
+
+    if (newDecayingAverageFF) {
+      decayWeightAvgValues = {
+        weighted_average: {
+          method: I18n.t('%{recentInt}/%{remainderInt} Weighted Average', {
+            recentInt: this.calculation_int,
+            remainderInt: 100 - this.calculation_int,
+          }),
+          calculationIntLabel: I18n.t('Last Item: '),
+          calculationIntDescription: I18n.t('Between 1% and 99%'),
+        },
+        decaying_average: {
+          method: I18n.t('%{recentInt}/%{remainderInt} Decaying Average', {
+            recentInt: this.calculation_int,
+            remainderInt: 100 - this.calculation_int,
+          }),
+          calculationIntLabel: I18n.t('Most Recent Item: '),
+          calculationIntDescription: I18n.t('Between 50% and 99%'),
+        },
+      }
+    } else {
+      decayWeightAvgValues = {
+        decaying_average: {
+          method: I18n.t('%{recentInt}/%{remainderInt} Decaying Average', {
+            recentInt: this.calculation_int,
+            remainderInt: 100 - this.calculation_int,
+          }),
+          calculationIntLabel: I18n.t('Last Item: '),
+          calculationIntDescription: I18n.t('Between 1% and 99%'),
+        },
+      }
+    }
+    return Object.assign(decayWeightAvgValues, otherCalculationValues)
   }
 
   toJSON() {
+    const newDecayingAverageFF = ENV.OUTCOMES_NEW_DECAYING_AVERAGE_CALCULATION
     const alternativeCalculationValues = this.is_individual_outcome
-      ? {
-          decaying_average: {
-            method: I18n.t('Decaying Average - %{recentInt}%/%{remainderInt}%', {
-              recentInt: this.calculation_int,
-              remainderInt: 100 - this.calculation_int,
-            }),
-            calculationIntLabel: I18n.t('% weighting for last item'),
-            calculationIntDescription: I18n.t('must be between 1 and 99'),
-          },
-          n_mastery: {
-            calculationIntLabel: I18n.t('# of times'),
-            calculationIntDescription: I18n.t('must be between 1 and 10'),
-          },
-          latest: {
-            method: I18n.t('Most Recent Score'),
-          },
-          highest: {
-            exampleScores: this.exampleScoreIntegers().join(', '),
-            exampleResult: numberFormat.outcomeScore(_.max(this.exampleScoreIntegers())),
-          },
-          average: {
-            method: I18n.t('Average'),
-          },
-        }
-      : {
-          decaying_average: {
-            method: I18n.t('%{recentInt}/%{remainderInt} Decaying Average', {
-              recentInt: this.calculation_int,
-              remainderInt: 100 - this.calculation_int,
-            }),
-            calculationIntLabel: I18n.t('Last Item: '),
-            calculationIntDescription: I18n.t('Between 1% and 99%'),
-          },
-          n_mastery: {
-            calculationIntLabel: I18n.t('Items: '),
-            calculationIntDescription: I18n.t('Between 1 and 10'),
-          },
-          latest: {
-            method: I18n.t('Latest Score'),
-          },
-          highest: {
-            exampleScores: this.exampleScoreIntegers().slice(0, 4).join(', '),
-            exampleResult: numberFormat.outcomeScore(
-              _.max(this.exampleScoreIntegers().slice(0, 4))
-            ),
-          },
-          average: {
-            method: I18n.t('Average'),
-          },
-        }
+      ? this.calculationValuesForIndividualOutcomes(newDecayingAverageFF)
+      : this.calculationValuesForNonIndividualOutcomes(newDecayingAverageFF)
 
-    return {
-      decaying_average: {
-        method: alternativeCalculationValues.decaying_average.method,
-        friendlyCalculationMethod: I18n.t('Decaying Average'),
-        calculationIntLabel: alternativeCalculationValues.decaying_average.calculationIntLabel,
-        calculationIntDescription:
-          alternativeCalculationValues.decaying_average.calculationIntDescription,
-        exampleText: I18n.t(
-          'Most recent result counts as %{calculation_int} of mastery weight, average of all other results count as %{remainder} of weight. If there is only one result, the single score will be returned.',
-          {
-            calculation_int: I18n.n(this.calculation_int, {percentage: true}),
-            remainder: I18n.n(100 - this.calculation_int, {percentage: true}),
-          }
-        ),
-        exampleScores: this.exampleScoreIntegers().join(', '),
-        exampleResult: numberFormat.outcomeScore(this.decayingAverage()),
-        defaultInt: 65,
-        validRange: [1, 99],
-      },
+    let finalCalculationMethods = {}
+    const legacyDecayingAvgFormat = {
+      method: alternativeCalculationValues.decaying_average.method,
+      friendlyCalculationMethod: I18n.t('Decaying Average'),
+      calculationIntLabel: alternativeCalculationValues.decaying_average.calculationIntLabel,
+      calculationIntDescription:
+        alternativeCalculationValues.decaying_average.calculationIntDescription,
+      exampleText: I18n.t(
+        'Most recent result counts as %{calculation_int} of mastery weight, average of all other results count as %{remainder} of weight. If there is only one result, the single score will be returned.',
+        {
+          calculation_int: I18n.n(this.calculation_int, {percentage: true}),
+          remainder: I18n.n(100 - this.calculation_int, {percentage: true}),
+        }
+      ),
+      exampleScores: this.exampleScoreIntegers().join(', '),
+      exampleResult: numberFormat.outcomeScore(this.weightedAverage()),
+      defaultInt: 65,
+      validRange: [1, 99],
+    }
+
+    if (newDecayingAverageFF) {
+      finalCalculationMethods = {
+        weighted_average: {
+          method: alternativeCalculationValues.weighted_average.method,
+          friendlyCalculationMethod: I18n.t('Weighted Average'),
+          calculationIntLabel: alternativeCalculationValues.weighted_average.calculationIntLabel,
+          calculationIntDescription:
+            alternativeCalculationValues.weighted_average.calculationIntDescription,
+          exampleText: I18n.t(
+            'Most recent result counts as %{calculation_int} of mastery weight, average of all other results count as %{remainder} of weight. If there is only one result, the single score will be returned.',
+            {
+              calculation_int: I18n.n(this.calculation_int, {percentage: true}),
+              remainder: I18n.n(100 - this.calculation_int, {percentage: true}),
+            }
+          ),
+          exampleScores: this.exampleScoreIntegers().join(', '),
+          exampleResult: numberFormat.outcomeScore(this.weightedAverage()),
+          defaultInt: 65,
+          validRange: [1, 99],
+        },
+        standard_decaying_average: {
+          method: alternativeCalculationValues.decaying_average.method,
+          friendlyCalculationMethod: I18n.t('Decaying Average'),
+          calculationIntLabel: alternativeCalculationValues.decaying_average.calculationIntLabel,
+          calculationIntDescription:
+            alternativeCalculationValues.decaying_average.calculationIntDescription,
+          exampleText: I18n.t(
+            'Between two assessments, the most recent assessment gets %{calculation_int} weight, and the first gets %{remainder}. For each additional assessment, the sum of the previous score calculations decay by an additional %{remainder}. If there is only one result, the single score will be returned.',
+            {
+              calculation_int: I18n.n(this.calculation_int, {percentage: true}),
+              remainder: I18n.n(100 - this.calculation_int, {percentage: true}),
+            }
+          ),
+          exampleScores: this.exampleScoreIntegers().slice(0, 7).join(', '),
+          exampleResult: numberFormat.outcomeScore(this.decayingAverage()),
+          defaultInt: 65,
+          validRange: [50, 99],
+        },
+      }
+    } else {
+      finalCalculationMethods = {
+        decaying_average: legacyDecayingAvgFormat,
+      }
+    }
+
+    return Object.assign(finalCalculationMethods, {
       n_mastery: {
         method: I18n.t(
           {
@@ -247,6 +409,6 @@ export default class CalculationMethodContent {
           this.average(this.exampleScoreIntegers().slice(0, 7))
         ),
       },
-    }
+    })
   }
 }

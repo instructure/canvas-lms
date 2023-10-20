@@ -24,7 +24,7 @@ describe('post_message_forwarding', () => {
     let message: string | object
     let origin: string
     let parentDomain: string
-    let windowReferences: object
+    let windowReferences: Array<Window | undefined>
     // eslint-disable-next-line no-undef
     let source: MessageEventSource
     let parentWindow: Window
@@ -51,7 +51,7 @@ describe('post_message_forwarding', () => {
         message = {subject: 'hello_world', key: 'value'}
         origin = 'https://test.tool.com'
         parentDomain = 'https://parent.domain.com'
-        windowReferences = {}
+        windowReferences = []
         source = {
           postMessage: jest.fn(),
         } as unknown as Window
@@ -60,22 +60,40 @@ describe('post_message_forwarding', () => {
         } as unknown as Window
       })
 
-      it('stores source window keyed by origin', () => {
-        subject()
-        expect(windowReferences[origin]).toBe(source)
-      })
-
       it('posts message to top parent', () => {
         subject()
         expect(parentWindow.postMessage).toHaveBeenCalled()
       })
 
-      it('attaches origin to message', () => {
+      it('attaches origin and windowId to message', () => {
         subject()
         expect(parentWindow.postMessage).toHaveBeenCalledWith(
-          {...(message as object), toolOrigin: origin},
+          {...(message as object), sourceToolInfo: {origin, windowId: 0}},
           expect.anything()
         )
+      })
+
+      it('stores source window in an array', () => {
+        subject()
+        expect(windowReferences.length).toBe(1)
+        expect(windowReferences[0]).toBe(source)
+      })
+
+      it('reuses existing windowId for previously-seen source windows', () => {
+        subject()
+        const source2 = {postMessage: jest.fn()}
+        handler(
+          parentDomain,
+          windowReferences,
+          parentWindow
+        )({data: message, origin, source: source2} as MessageEvent)
+        subject()
+        expect(parentWindow.postMessage.mock.calls[0][0].sourceToolInfo.windowId).toBe(0)
+        expect(parentWindow.postMessage.mock.calls[1][0].sourceToolInfo.windowId).toBe(1)
+        expect(parentWindow.postMessage.mock.calls[2][0].sourceToolInfo.windowId).toBe(0)
+        expect(windowReferences.length).toBe(2)
+        expect(windowReferences[0]).toBe(source)
+        expect(windowReferences[1]).toBe(source2)
       })
 
       it('addresses message to parent domain', () => {
@@ -86,18 +104,21 @@ describe('post_message_forwarding', () => {
 
     describe('outgoing message', () => {
       beforeEach(() => {
-        message = {subject: 'hello_world', key: 'value', toolOrigin: 'https://test.tool.com'}
+        message = {
+          subject: 'hello_world',
+          key: 'value',
+          sourceToolInfo: {origin: 'https://test.tool.com', windowId: 1},
+        }
         origin = 'https://parent.domain.com'
         parentDomain = 'https://parent.domain.com'
         source = {
           postMessage: jest.fn(),
         } as unknown as Window
-        windowReferences = {
-          'https://test.tool.com': source,
-        }
+        // source is index 1 (above we're using windowId=1):
+        windowReferences = [undefined, source]
       })
 
-      describe('when message has no toolOrigin', () => {
+      describe('when message has no sourceToolInfo', () => {
         beforeEach(() => {
           message = {subject: 'hello_world', key: 'value'}
         })
@@ -112,12 +133,12 @@ describe('post_message_forwarding', () => {
         expect(source.postMessage).toHaveBeenCalled()
       })
 
-      it('addresses message to toolOrigin', () => {
+      it('addresses message to correct origin and source (from sourceToolInfo)', () => {
         subject()
         expect(source.postMessage).toHaveBeenCalledWith(expect.anything(), 'https://test.tool.com')
       })
 
-      it('removes toolOrigin from message', () => {
+      it('removes sourceToolInfo from message', () => {
         subject()
         expect(source.postMessage).toHaveBeenCalledWith(
           {subject: 'hello_world', key: 'value'},

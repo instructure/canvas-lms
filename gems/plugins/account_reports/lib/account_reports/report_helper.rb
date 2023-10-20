@@ -428,7 +428,7 @@ module AccountReports::ReportHelper
 
     @account_report = report_runner.account_report
     begin
-      if @account_report.workflow_state == "aborted"
+      if @account_report.aborted? || @account_report.deleted?
         report_runner.abort
         return
       end

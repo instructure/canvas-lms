@@ -90,9 +90,10 @@ mejs.MepDefaults.features.splice(positionAfterSubtitleSelector, 0, 'sourcechoose
 // enable the playback speed selector
 mejs.MepDefaults.features.splice(positionAfterSubtitleSelector, 0, 'speed')
 
-function getSourcesAndTracks(id) {
+export function getSourcesAndTracks(id, attachmentId) {
   const dfd = new $.Deferred()
-  $.getJSON(`/media_objects/${id}/info`, data => {
+  const api = attachmentId ? 'media_attachments' : 'media_objects'
+  $.getJSON(`/${api}/${attachmentId || id}/info`, data => {
     // this 'when ...' is because right now in canvas, none of the mp3 urls actually work.
     // see: CNVS-12998
     const sources = data.media_sources
@@ -116,7 +117,8 @@ function getSourcesAndTracks(id) {
       const languageName = mejs.language.codes[track.locale] || track.locale
       return `<track kind='${htmlEscape(track.kind)}' label='${htmlEscape(
         languageName
-      )}' src='${htmlEscape(track.url)}' srclang='${htmlEscape(track.locale)}' />`
+      )}' src='${htmlEscape(track.url)}' srclang='${htmlEscape(track.locale)}'
+      data-inherited-track='${htmlEscape(track.inherited)}' />`
     })
 
     const types = _.map(data.media_sources, source => source.content_type)
@@ -177,7 +179,13 @@ const mediaCommentActions = {
     return $.mediaComment.init(mediaType, initOpts)
   },
 
-  show_inline(id, mediaType = 'video', downloadUrl, attachmentId = null) {
+  show_inline(
+    id,
+    mediaType = 'video',
+    downloadUrl,
+    attachmentId = null,
+    lockedMediaAttachment = false
+  ) {
     // todo: replace .andSelf with .addBack when JQuery is upgraded.
     const $holder = $(this).closest('.instructure_file_link_holder').andSelf().first()
     $holder.text(I18n.t('loading', 'Loading media...'))
@@ -185,12 +193,13 @@ const mediaCommentActions = {
     const showInline = function (id, holder) {
       const width = Math.min(holder.closest('div,p,table').width() || VIDEO_WIDTH, VIDEO_WIDTH)
       const height = Math.round((width / 336) * 240)
-      return getSourcesAndTracks(id).done(sourcesAndTracks => {
+      return getSourcesAndTracks(id, attachmentId).done(sourcesAndTracks => {
         if (sourcesAndTracks.sources.length) {
           const mediaPlayerOptions = {
             can_add_captions: sourcesAndTracks.can_add_captions,
             mediaCommentId: id,
             attachmentId,
+            lockedMediaAttachment,
             menuTimeoutMouseLeave: 50,
             success(media) {
               holder.focus()

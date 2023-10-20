@@ -25,7 +25,6 @@ class Mutations::UpdateDiscussionEntry < Mutations::BaseMutation
   argument :message, String, required: false
   argument :remove_attachment, Boolean, required: false
   argument :file_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Attachment")
-  argument :include_reply_preview, Boolean, required: false
   argument :quoted_entry_id, ID, required: false
 
   field :discussion_entry, Types::DiscussionEntryType, null: true
@@ -33,6 +32,7 @@ class Mutations::UpdateDiscussionEntry < Mutations::BaseMutation
     entry = DiscussionEntry.find(input[:discussion_entry_id])
     raise ActiveRecord::RecordNotFound unless entry.grants_right?(current_user, session, :read)
     return validation_error(I18n.t("Insufficient Permissions")) unless entry.grants_right?(current_user, session, :update)
+    return validation_error(I18n.t("Insufficient attach permissions")) unless entry.grants_right?(current_user, session, :attach)
 
     unless input[:message].nil?
       entry.message = Api::Html::Content.process_incoming(input[:message], host: context[:request].host, port: context[:request].port)
@@ -40,10 +40,6 @@ class Mutations::UpdateDiscussionEntry < Mutations::BaseMutation
 
     if !input[:remove_attachment].nil? && input[:remove_attachment]
       entry.attachment_id = nil
-    end
-
-    if !input[:include_reply_preview].nil? && entry.parent_entry
-      entry.include_reply_preview = input[:include_reply_preview]
     end
 
     if entry.parent_entry

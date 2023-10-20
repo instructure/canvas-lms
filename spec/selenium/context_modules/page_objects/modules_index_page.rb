@@ -55,6 +55,10 @@ module ModulesIndexPage
     tool_dialog.find_element(:css, "iframe")
   end
 
+  def view_assign
+    f(".view_assign")
+  end
+
   def manage_module_button(context_module)
     f("#context_module_#{context_module.id} button[aria-label='Manage #{context_module.name}']")
   end

@@ -262,6 +262,7 @@ module Api::V1::User
                                 course_id
                                 course_section_id
                                 associated_user_id
+                                temporary_enrollment_source_user_id
                                 limit_privileges_to_course_section
                                 workflow_state
                                 updated_at
@@ -273,6 +274,9 @@ module Api::V1::User
   def enrollment_json(enrollment, user, session, includes: [], opts: {}, excludes: [])
     only = API_ENROLLMENT_JSON_OPTS.dup
     only = only.without(:course_section_id) if excludes.include?("course_section_id")
+    unless enrollment.course.root_account.feature_enabled?(:temporary_enrollments)
+      only = only.without(:temporary_enrollment_source_user_id)
+    end
     api_json(enrollment, user, session, only:).tap do |json|
       json[:enrollment_state] = json.delete("workflow_state")
       if enrollment.course.workflow_state == "deleted" || enrollment.course_section.workflow_state == "deleted"

@@ -26,6 +26,7 @@ import type {
   SubmissionType,
   WorkflowState,
 } from '../../api.d'
+import {GradingStandard} from '@instructure/grading-utils'
 
 export type OriginalityData = {
   reportUrl: string
@@ -80,6 +81,7 @@ export type SubmissionData = {
   pointsDeducted?: number | null
   resubmitted: boolean
   score: number | null
+  customGradeStatusId?: string | null
 }
 
 // TODO: remove the need for this
@@ -89,6 +91,7 @@ export type CamelizedSubmission = {
   assignmentVisible?: boolean
   attempt: number | null
   cachedDueDate: null | string
+  customGradeStatusId?: null | string
   drop?: boolean
   enteredGrade: null | string
   enteredScore: null | number
@@ -226,9 +229,17 @@ export type CamelizedSubmissionWithOriginalityReport = CamelizedSubmission & {
 }
 
 export type FinalGradeOverride = {
-  courseGrade?: string
+  courseGrade?: {
+    percentage?: number | null
+    schemeKey?: string | null
+    customGradeStatusId?: string | null
+  }
   gradingPeriodGrades?: {
-    [gradingPeriodId: string]: string
+    [gradingPeriodId: string]: {
+      percentage?: number | null
+      schemeKey?: string | null
+      customGradeStatusId?: string | null
+    }
   }
 }
 
@@ -314,15 +325,23 @@ export type FormatGradeOptions = {
   pointsPossible?: number
   score?: number
   restrict_quantitative_data?: boolean
-  grading_scheme?: GradingScheme[]
+  grading_scheme?: DeprecatedGradingScheme[]
 }
 
-export type GradingStandard = [string, number]
-
-export type GradingScheme = {
+/**
+ * @deprecated
+ */
+export type DeprecatedGradingScheme = {
   id?: string
   title?: string
+  pointsBased: boolean
+  scalingFactor: number
   data: GradingStandard[]
+}
+
+export type GradeEntryOptions = {
+  gradingScheme?: {data: GradingStandard[]; pointsBased: boolean; scalingFactor: number} | null
+  pointsBasedGradingSchemesFeatureEnabled: boolean
 }
 
 export type ProvisionalGrade = {
@@ -369,5 +388,18 @@ export type SubmissionGradeCriteria = Pick<
 export type AssignmentGroupCriteriaMap = {
   [id: string]: Omit<AssignmentGroup, 'assignments'> & {
     assignments: AssignmentGradeCriteria[]
+    invalid?: boolean
+    gradingPeriodsIds?: string[]
   }
+}
+
+export type Progress = {
+  id: string
+  workflow_state: string
+  message?: string
+  updated_at?: string
+}
+
+export type ProgressData = {
+  progress: Progress
 }

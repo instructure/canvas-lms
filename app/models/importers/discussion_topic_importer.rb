@@ -229,7 +229,8 @@ module Importers
 
       def message
         return options[:description] if options[:description].present?
-        return options[:text] if options[:text].present?
+
+        options[:text].presence
       end
 
       def delayed_post_at

@@ -36,7 +36,12 @@ class Account < ActiveRecord::Base
   belongs_to :root_account, class_name: "Account"
   belongs_to :parent_account, class_name: "Account"
 
+  # temporary scope to allow us to deprecate the faculty journal feature. should be removed (along with all references) upon deprecation completion
+  scope :having_user_notes_enabled, -> { Account.site_admin.feature_enabled?(:deprecate_faculty_journal) ? Account.none : where(enable_user_notes: true) }
+
   has_many :courses
+  has_many :custom_grade_statuses, inverse_of: :root_account, foreign_key: :root_account_id
+  has_many :standard_grade_statuses, inverse_of: :root_account, foreign_key: :root_account_id
   has_many :favorites, inverse_of: :root_account
   has_many :all_courses, class_name: "Course", foreign_key: "root_account_id"
   has_one :terms_of_service, dependent: :destroy
@@ -124,6 +129,7 @@ class Account < ActiveRecord::Base
            class_name: "Lti::ResourceLink",
            dependent: :destroy
   belongs_to :course_template, class_name: "Course", inverse_of: :templated_accounts
+  belongs_to :grading_standard
 
   def inherited_assessment_question_banks(include_self = false, *additional_contexts)
     sql, conds = [], []
@@ -153,6 +159,7 @@ class Account < ActiveRecord::Base
 
   before_validation :verify_unique_sis_source_id
   before_save :ensure_defaults
+  before_save :remove_template_id, if: ->(a) { a.workflow_state_changed? && a.deleted? }
   before_create :enable_sis_imports, if: :root_account?
   after_save :update_account_associations_if_changed
   after_save :check_downstream_caches
@@ -344,7 +351,7 @@ class Account < ActiveRecord::Base
   add_setting :app_center_access_token
   add_setting :enable_offline_web_export, boolean: true, default: false, inheritable: true
   add_setting :disable_rce_media_uploads, boolean: true, default: false, inheritable: true
-  add_setting :allow_gradebook_show_first_last_names, boolean: true, default: false
+  add_setting :allow_gradebook_show_first_last_names, boolean: true, default: false, inheritable: true
 
   add_setting :strict_sis_check, boolean: true, root_only: true, default: false
   add_setting :lock_all_announcements, default: false, boolean: true, inheritable: true
@@ -360,6 +367,7 @@ class Account < ActiveRecord::Base
   add_setting :usage_rights_required, boolean: true, default: false, inheritable: true
   add_setting :limit_parent_app_web_access, boolean: true, default: false, root_only: true
   add_setting :kill_joy, boolean: true, default: false, root_only: true
+  add_setting :suppress_notifications, boolean: true, default: false, root_only: true
   add_setting :smart_alerts_threshold, default: 36, root_only: true
 
   add_setting :disable_post_to_sis_when_grading_period_closed, boolean: true, root_only: true, default: false
@@ -383,6 +391,7 @@ class Account < ActiveRecord::Base
   add_setting :default_due_time, inheritable: true
   add_setting :conditional_release, default: false, boolean: true, inheritable: true
   add_setting :enable_search_indexing, boolean: true, root_only: true, default: false
+  add_setting :disable_login_search_indexing, boolean: true, root_only: true, default: false
   add_setting :allow_additional_email_at_registration, boolean: true, root_only: true, default: false
 
   # Allow enabling metrics like Heap for sandboxes and other accounts without Salesforce data
@@ -486,6 +495,10 @@ class Account < ActiveRecord::Base
     disable_rce_media_uploads[:value]
   end
 
+  def allow_gradebook_show_first_last_names?
+    allow_gradebook_show_first_last_names[:value]
+  end
+
   def enable_as_k5_account?
     enable_as_k5_account[:value]
   end
@@ -496,8 +509,6 @@ class Account < ActiveRecord::Base
   end
 
   def use_classic_font_in_k5?
-    return false unless Account.site_admin.feature_enabled? :k5_font_selection
-
     use_classic_font_in_k5[:value]
   end
 
@@ -690,6 +701,10 @@ class Account < ActiveRecord::Base
     HostUrl.context_host(self, current_host)
   end
 
+  def environment_specific_domain
+    domain(ApplicationController.test_cluster_name)
+  end
+
   def self.find_by_domain(domain)
     default if HostUrl.default_host == domain
   end
@@ -847,18 +862,17 @@ class Account < ActiveRecord::Base
     end
   end
 
-  def invalidate_caches_if_changed
-    if saved_changes?
-      shard.activate do
-        self.class.connection.after_transaction_commit do
-          if root_account?
-            Account.invalidate_cache(id)
-          else
-            Rails.cache.delete(["account2", id].cache_key)
-          end
-        end
+  def invalidate_association_cache
+    shard.activate do
+      self.class.connection.after_transaction_commit do
+        Account.invalidate_cache(id) if root_account?
+        Rails.cache.delete(["account2", id].cache_key)
       end
     end
+  end
+
+  def invalidate_caches_if_changed
+    invalidate_association_cache if saved_changes?
 
     @invalidations ||= []
     if saved_change_to_parent_account_id?
@@ -1141,8 +1155,8 @@ class Account < ActiveRecord::Base
     original_shard = Shard.current
     result = Shard.shard_for(parent_account_id).activate do
       parent_account_id = Shard.relative_id_for(parent_account_id, original_shard, Shard.current)
-      guard_rail_env = (Account.connection.open_transactions == 0) ? :secondary : GuardRail.environment
-      GuardRail.activate(guard_rail_env) do
+
+      with_secondary_role_if_possible do
         sql = Account.sub_accounts_recursive_sql(parent_account_id)
         if pluck
           Account.connection.select_all(sql).map do |row|
@@ -1167,6 +1181,32 @@ class Account < ActiveRecord::Base
     result
   end
 
+  def self.multi_parent_sub_accounts_recursive(parent_account_ids)
+    return [] if parent_account_ids.blank?
+
+    # Validate all parent_account_ids are on the same shard
+    account_shards = parent_account_ids.map do |parent_account_id|
+      Shard.shard_for(parent_account_id)
+    end.uniq
+    raise ArgumentError, "all parent_account_ids must be in the same shard" if account_shards.length > 1
+
+    account_shards.first.activate do
+      with_secondary_role_if_possible do
+        Account.find_by_sql(
+          # Switchman will make the IDs in parent_account_ids
+          # relative to the currently activated shard
+          Account.sub_accounts_recursive_sql(parent_account_ids, include_parents: true)
+        )
+      end
+    end
+  end
+
+  def self.with_secondary_role_if_possible(&)
+    guard_rail_env = (Account.connection.open_transactions == 0) ? :secondary : GuardRail.environment
+
+    GuardRail.activate(guard_rail_env, &)
+  end
+
   # a common helper
   def self.sub_account_ids_recursive(parent_account_id)
     active.select(:id).sub_accounts_recursive(parent_account_id, :pluck)
@@ -1179,7 +1219,7 @@ class Account < ActiveRecord::Base
 
   # the default ordering will have each tier in a group, followed by the next tier, etc.
   # if an order is set on the relation, that order is only applied within each group
-  def self.sub_accounts_recursive_sql(parent_account_id)
+  def self.sub_accounts_recursive_sql(parent_account_id, include_parents: false)
     relation = except(:group, :having, :limit, :offset).shard(Shard.current)
     relation_with_ids = if relation.select_values.empty? || (relation.select_values & [:id, :parent_account_id]).length == 2
                           relation
@@ -1190,8 +1230,11 @@ class Account < ActiveRecord::Base
     relation_with_select = all
     relation_with_select = relation_with_select.select("*") if relation_with_select.select_values.empty?
 
+    scope = relation_with_ids.where(parent_account_id:)
+    scope = relation_with_ids.where(id: parent_account_id) if include_parents
+
     "WITH RECURSIVE t AS (
-       #{relation_with_ids.where(parent_account_id:).to_sql}
+       #{scope.to_sql}
        UNION
        #{relation_with_ids.joins("INNER JOIN t ON accounts.parent_account_id=t.id").to_sql}
      )
@@ -1248,12 +1291,12 @@ class Account < ActiveRecord::Base
 
   def get_account_role_by_name(role_name)
     role = get_role_by_name(role_name)
-    return role if role&.account_role?
+    role if role&.account_role?
   end
 
   def get_course_role_by_name(role_name)
     role = get_role_by_name(role_name)
-    return role if role&.course_role?
+    role if role&.course_role?
   end
 
   def get_role_by_name(role_name)
@@ -1285,7 +1328,7 @@ class Account < ActiveRecord::Base
 
   def get_role_by_id(role_id)
     role = Role.get_role_by_id(role_id)
-    return role if valid_role?(role)
+    role if valid_role?(role)
   end
 
   def valid_role?(role)
@@ -1402,12 +1445,38 @@ class Account < ActiveRecord::Base
     ##################### End legacy permission block ##########################
 
     RoleOverride.permissions.each do |permission, _details|
-      given { |user| cached_account_users_for(user).any? { |au| au.has_permission_to?(self, permission) } }
+      given do |user|
+        results = cached_account_users_for(user).map do |au|
+          res = au.permission_check(self, permission)
+          if res.success?
+            break :success
+          else
+            res
+          end
+        end
+        next true if results == :success
+
+        # return the first result with a justification or nil, either of which will deny access
+        results.find { |r| r.is_a?(AdheresToPolicy::JustifiedFailure) }
+      end
       can permission
       can :create_courses if permission == :manage_courses_add
     end
 
-    given { |user| !cached_account_users_for(user).empty? }
+    given do |user|
+      results = cached_account_users_for(user).map do |au|
+        res = au.permitted_for_account?(self)
+        if res.success?
+          break :success
+        else
+          res
+        end
+      end
+      next true if results == :success
+
+      # return the first result with a justification or nil, either of which will deny access
+      results.find { |r| r.is_a?(AdheresToPolicy::JustifiedFailure) }
+    end
     can %i[
       read
       read_as_admin
@@ -1420,7 +1489,7 @@ class Account < ActiveRecord::Base
       launch_external_tool
     ]
 
-    given { |user| root_account? && cached_all_account_users_for(user).any? }
+    given { |user| root_account? && cached_all_account_users_for(user).any? { |au| au.permitted_for_account?(self).success? } }
     can :read_terms
 
     given { |user| user&.create_courses_right(self).present? }
@@ -2166,7 +2235,7 @@ class Account < ActiveRecord::Base
   end
 
   def trusted_referer?(referer_url)
-    return if !settings.key?(:trusted_referers) || settings[:trusted_referers].blank?
+    return false if !settings.key?(:trusted_referers) || settings[:trusted_referers].blank?
 
     if (referer_with_port = format_referer(referer_url))
       settings[:trusted_referers].split(",").include?(referer_with_port)
@@ -2253,14 +2322,15 @@ class Account < ActiveRecord::Base
 
   # Forces the default setting to overwrite each user's preference
   def update_user_dashboards
-    User.where(id: user_account_associations.select(:user_id))
-        .where("#{User.table_name}.preferences LIKE ?", "%:dashboard_view:%")
-        .find_in_batches do |batch|
+    User.where(id: root_account.pseudonyms.active.joins(:user).where("#{User.table_name}.preferences LIKE ?", "%:dashboard_view:%").select(:user_id)).find_in_batches do |batch|
       users = batch.reject do |user|
         user.preferences[:dashboard_view].nil? ||
           user.dashboard_view(self) == default_dashboard_view
       end
       users.each do |user|
+        # don't write to the shadow record
+        user = User.find(user.id) unless user.canonical?
+
         user.preferences.delete(:dashboard_view)
         user.save!
       end
@@ -2303,6 +2373,19 @@ class Account < ActiveRecord::Base
     return false unless root_account?
 
     feature_enabled?(:disable_post_to_sis_when_grading_period_closed) && feature_enabled?(:new_sis_integrations)
+  end
+
+  def grading_standard_read_permission
+    :read
+  end
+
+  def grading_standard_enabled
+    default_grading_standard.present?
+  end
+  alias_method :grading_standard_enabled?, :grading_standard_enabled
+
+  def default_grading_standard
+    account_chain.find(&:grading_standard_id)&.grading_standard
   end
 
   class << self
@@ -2390,5 +2473,17 @@ class Account < ActiveRecord::Base
     elsif old_rqd_setting == true && new_rqd_setting == false
       InstStatsd::Statsd.increment("account.settings.restrict_quantitative_data.disabled")
     end
+  end
+
+  def remove_template_id
+    if has_attribute?(:course_template_id)
+      self.course_template_id = nil
+    end
+  end
+
+  def enable_user_notes
+    return false if Account.site_admin.feature_enabled?(:deprecate_faculty_journal)
+
+    read_attribute(:enable_user_notes)
   end
 end

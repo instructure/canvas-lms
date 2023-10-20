@@ -21,12 +21,15 @@ module Canvas::OAuth
   CUSTOM_CLAIM_KEY = "canvas.instructure.com"
 
   class ClientCredentialsProvider < Provider
-    def initialize(client_id, host, scopes = nil, protocol = "http://")
-      super(client_id, nil, scopes || [])
+    def initialize(client_id, host, scopes: nil, protocol: "http://", key: nil, root_account: nil)
+      super(client_id, nil, scopes || [], nil, key:)
       @expected_aud = Rails.application.routes.url_helpers.oauth2_token_url(
         host:,
         protocol:
       )
+
+      @root_account = root_account
+      @host = host
     end
 
     def generate_token
@@ -48,6 +51,8 @@ module Canvas::OAuth
     end
 
     private
+
+    attr_reader :root_account, :host
 
     def allowed_scopes
       @allowed_scopes ||= @scopes.join(" ")

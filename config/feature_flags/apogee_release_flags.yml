@@ -108,12 +108,6 @@ updated_mastery_connect_icon:
       state: on # enable for local development
     test:
       state: on # enable for the deployed 'test' environment
-visibility_feedback_student_grades_page:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Improve Feedback on Students Grade Page
-  description: Students will be able to more easily recognize when
-    feedback has been provided by an instructor/grader ...
 peer_reviews_for_a2:
   state: hidden
   applies_to: Course
@@ -217,11 +211,9 @@ individual_gradebook_enhancements:
     to Individual Gradebook
   environments:
     ci:
-      state: on # enable for automated testings builds and local testing
+      state: allowed_on # enable for automated testings builds and local testing
     development:
-      state: on # enable for local development
-    test:
-      state: on # enable for the deployed 'test' environment
+      state: allowed_on # enable for local development
 hide_zero_point_quizzes_option:
   state: hidden
   applies_to: SiteAdmin
@@ -259,3 +251,58 @@ grading_scheme_updates:
   applies_to: SiteAdmin
   display_name: Improve Letter Grading Scheme Usability
   description: Teachers and Account Managers will be able to more easily manage letter grading schemes for accounts, courses, and assignments.
+points_based_grading_schemes:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Points Based Letter Grading Schemes
+  description: Teachers and Account Managers will be able to create letter grading schemes that use points instead of percentages for grade book entry and display.
+custom_gradebook_statuses:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Custom Status Labels for Submissions and Final Grades
+  description: Account administrators can create custom status labels that instructors will be able to use in their gradebooks. These custom status labels will not have any functionality associated with them like missing or late. Admins will also be able to disable default status labels and prevent them from being used in the entire instance.
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
+submission_stickers:
+  state: hidden
+  applies_to: Course
+  display_name: Submission Stickers
+  description: Allows teachers to attach stickers to student submissions.
+  environments:
+    ci:
+      state: allowed_on # enable for automated testing builds and local testing
+    development:
+      state: allowed_on # enable for local development
+anonymous_grading_with_new_quizzes:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Anonymous Grading with New Quizzes
+  description: Allows instructors to enable anonymous grading for New Quizzes.
+  environments:
+    ci:
+      state: allowed_on # enable for automated testing builds and local testing
+    development:
+      state: allowed_on # enable for local development
+default_account_grading_scheme:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Default Grading Scheme for Accounts
+  description: Allow administrators to set a default grading scheme for accounts. This grading scheme will be the default for all courses in the account, but individual courses can overwrite it with their own default.
+  environments:
+    ci:
+      state: allowed_on # enable for automated testing builds and local testing
+    development:
+      state: allowed_on # enable for local development
+external_tools_for_a2:
+  state: hidden
+  display_name: External tools in Assignment Enhancements
+  description: Allow for Assignment Enhancements to be used for external LTI tools
+  applies_to: SiteAdmin
+  environments:
+    ci:
+      state: allowed_on # enable for automated testing builds and local testing
+    development:
+      state: allowed_on # enable for local development

@@ -18,6 +18,8 @@
 
 import {EnvCommonNewUserTutorial} from '@canvas/global/env/EnvCommon'
 import {GradebookOptions} from '../../../features/gradebook/react/default_gradebook/gradebook.d'
+import {GradingScheme} from '@canvas/grading_scheme'
+import {GradeStatus} from '@canvas/grading/accountGradingStatus'
 
 /**
  * Generic Gradebook environment.
@@ -58,6 +60,11 @@ export interface EnvGradebookCommon {
   outcome_service_results_to_canvas?: unknown
 
   /**
+   * From GradebooksController#load_grade_summary_data
+   */
+  course_active_grading_scheme?: GradingScheme
+
+  /**
    * From ApplicationController#set_student_context_cards_js_env
    */
   STUDENT_CONTEXT_CARDS_ENABLED: boolean
@@ -92,6 +99,7 @@ export interface EnvGradebookSpeedGrader {
   course_id: string
   assignment_id: string
   assignment_title: string
+  custom_grade_statuses: GradeStatus[]
   rubric: null | unknown
   nonScoringRubrics: boolean
   outcome_extra_credit_enabled: boolean
@@ -119,7 +127,7 @@ export interface EnvGradebookSpeedGrader {
 
   new_gradebook_plagiarism_icons_enabled?: boolean
 
-  quiz_history_url?: string
+  quiz_history_url: string
 
   assignment_comment_library_feature_enabled: boolean
 

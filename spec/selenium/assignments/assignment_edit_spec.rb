@@ -89,4 +89,91 @@ describe "assignment" do
       expect(AssignmentPage.allowed_attempts_count.text).to include "2"
     end
   end
+
+  context "new quiz" do
+    before(:once) do
+      Account.site_admin.enable_feature!(:hide_zero_point_quizzes_option)
+      course_with_teacher(active_all: true)
+      @course.context_external_tools.create! tool_id: ContextExternalTool::QUIZ_LTI,
+                                             name: "Q.N",
+                                             consumer_key: "1",
+                                             shared_secret: "1",
+                                             domain: "quizzes.example.com",
+                                             url: "http://lti13testtool.docker/launch"
+      @new_quiz = @course.assignments.create!(points_possible: 0)
+      @new_quiz.quiz_lti!
+      @new_quiz.save!
+    end
+
+    before do
+      user_session(@teacher)
+    end
+
+    it "allows user to select option to hide from gradebooks" do
+      AssignmentCreateEditPage.visit_assignment_edit_page(@course.id, @new_quiz.id)
+
+      expect(AssignmentCreateEditPage.hide_from_gradebooks_checkbox).to be_displayed
+    end
+
+    it "when the hide_from_gradebook option is selected the omit from final grade option is automatically selected and disabled" do
+      AssignmentCreateEditPage.visit_assignment_edit_page(@course.id, @new_quiz.id)
+      AssignmentCreateEditPage.hide_from_gradebooks_checkbox.click
+
+      expect(AssignmentCreateEditPage.omit_from_final_grade_checkbox).to be_selected
+      expect(AssignmentCreateEditPage.omit_from_final_grade_checkbox).to be_disabled
+    end
+
+    it "when the hide_from_gradebook option is deselected the omit from final grade option is automatically enabled and remains selected" do
+      AssignmentCreateEditPage.visit_assignment_edit_page(@course.id, @new_quiz.id)
+      AssignmentCreateEditPage.hide_from_gradebooks_checkbox.click
+      AssignmentCreateEditPage.hide_from_gradebooks_checkbox.click
+
+      expect(AssignmentCreateEditPage.omit_from_final_grade_checkbox).to be_selected
+      expect(AssignmentCreateEditPage.omit_from_final_grade_checkbox).to be_enabled
+    end
+
+    it "when the points possible is edited to greater than 0 hide_from_gradebook option is hidden and the omit from final grade option is automatically enabled and remains selected" do
+      AssignmentCreateEditPage.visit_assignment_edit_page(@course.id, @new_quiz.id)
+      AssignmentCreateEditPage.hide_from_gradebooks_checkbox.click
+      AssignmentCreateEditPage.enter_points_possible(10)
+      AssignmentCreateEditPage.edit_assignment_name("test") # to get the cursor out of the points input field
+
+      expect(AssignmentCreateEditPage.omit_from_final_grade_checkbox).to be_selected
+      expect(AssignmentCreateEditPage.omit_from_final_grade_checkbox).to be_enabled
+    end
+
+    it "can be set to be hidden from gradebooks" do
+      AssignmentCreateEditPage.visit_assignment_edit_page(@course.id, @new_quiz.id)
+      AssignmentCreateEditPage.hide_from_gradebooks_checkbox.click
+      AssignmentCreateEditPage.save_assignment
+
+      expect(@new_quiz.reload.hide_in_gradebook).to be true
+      expect(@new_quiz.reload.omit_from_final_grade).to be true
+    end
+  end
+
+  context "due date" do
+    before do
+      course_with_teacher(active_all: true)
+      user_session(@teacher)
+    end
+
+    it "fills the due date field from a selection in the popup calendar" do
+      time = DateTime.new(2023, 8, 9, 12, 0, 0, 0, 0) # this is a Wednesday
+      Timecop.freeze(time) do
+        @assignment = @course.assignments.create!(due_at: time, points_possible: 10)
+
+        AssignmentCreateEditPage.visit_assignment_edit_page(@course.id, @assignment.id)
+        AssignmentCreateEditPage.due_date_picker_btn.click
+        expect(AssignmentCreateEditPage.due_date_picker_popup).to be_displayed
+
+        # click the next day (Thursday the 10th)
+        f("td.ui-datepicker-current-day + td").click
+        AssignmentCreateEditPage.due_date_picker_done_btn.click
+        expect(AssignmentCreateEditPage.due_date_input.attribute("value")).to eq(
+          format_time_for_datepicker(DateTime.new(2023, 8, 10, 12, 0, 0, 0, 0))
+        )
+      end
+    end
+  end
 end

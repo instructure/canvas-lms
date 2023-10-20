@@ -18,9 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 module DataFixup::PopulateQuotedEntry
-  def self.run(start_at, end_at)
-    DiscussionEntry.find_ids_in_ranges(start_at:, end_at:) do |min_id, max_id|
-      DiscussionEntry.where(id: min_id..max_id, include_reply_preview: true).update_all("quoted_entry_id = parent_id")
-    end
+  def self.run
+    DiscussionEntry.where(include_reply_preview: true, quoted_entry_id: nil).joins(:parent_entry).in_batches.update_all("quoted_entry_id = discussion_entries.parent_id")
   end
 end

@@ -48,14 +48,16 @@ describe CSVWithI18n do
 
       it "can automatically determine the column separator to use when asked to autodetect" do
         @admin.enable_feature!(:autodetect_field_separators_for_gradebook_exports)
-        I18n.locale = :is
-        expect(CSVWithI18n.csv_i18n_settings(@admin)).to include(col_sep: ";")
+        I18n.with_locale(:is) do
+          expect(CSVWithI18n.csv_i18n_settings(@admin)).to include(col_sep: ";")
+        end
       end
 
       it "uses comma as the column separator when not asked to autodetect" do
         @admin.disable_feature!(:autodetect_field_separators_for_gradebook_exports)
-        I18n.locale = :is
-        expect(CSVWithI18n.csv_i18n_settings(@admin)).to include(col_sep: ",")
+        I18n.with_locale(:is) do
+          expect(CSVWithI18n.csv_i18n_settings(@admin)).to include(col_sep: ",")
+        end
       end
     end
 

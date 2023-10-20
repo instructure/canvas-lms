@@ -52,8 +52,8 @@ type Props = {
   status: string
   isColorPickerShown: boolean
   colorPickerOnToggle: (status: boolean) => void
-  colorPickerButtonRef: (button: HTMLButtonElement) => void
-  colorPickerContentRef: (content: HTMLDivElement) => void
+  colorPickerButtonRef: (button: Element | null) => void
+  colorPickerContentRef: (content: Element | null) => void
   colorPickerAfterClose: () => void
   afterSetColor: (color: string, successFn: () => void, errorFn: () => void) => void
 }

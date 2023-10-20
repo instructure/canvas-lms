@@ -106,5 +106,15 @@ describe Types::MediaObjectType do
     it "checks permissions on canAddCaptions" do
       expect(resolve_media_object_field("canAddCaptions", current_user: User.new)).to be(false)
     end
+
+    it "returns media download url" do
+      opts = {
+        download: "1",
+        download_frd: "1",
+        only_path: true
+      }
+      expected_url = GraphQLHelpers::UrlHelpers.file_download_url(@media_object, opts)
+      expect(expected_url.end_with?("/download?download_frd=1")).to be_truthy
+    end
   end
 end

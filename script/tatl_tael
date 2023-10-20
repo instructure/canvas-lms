@@ -3,7 +3,7 @@
 
 require_relative "../gems/tatl_tael/lib/tatl_tael"
 require "yaml"
-require_relative "./linter"
+require_relative "linter"
 
 # # load personal config
 require "dotenv"

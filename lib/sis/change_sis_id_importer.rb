@@ -92,6 +92,7 @@ module SIS
       def update_record(column, data_change, details, old_item)
         updates = ids_to_change(column, data_change)
         details[:scope].where(id: old_item.id).update_all(updates)
+        old_item.invalidate_association_cache if old_item.is_a?(Account)
       end
 
       def ids_to_change(column, data_change)

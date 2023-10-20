@@ -159,7 +159,7 @@ module CC
     end
 
     def attachments_for_export(folder)
-      opts = { exporter: @manifest.exporter, referenced_files: @html_exporter.referenced_files }
+      opts = { exporter: @manifest.exporter, referenced_files: @html_exporter.referenced_files, ignore_updated_at: true }
       attachments_for_export = []
       attachments_for_export += content_zipper.folder_attachments_for_export(folder, opts)
       folder.active_sub_folders.each do |sub_folder|
@@ -171,7 +171,8 @@ module CC
     def process_media_tracks
       attachments = attachments_for_export(Folder.root_folders(@course).first)
       attachments += Attachment.where(context: @course, media_entry_id: @html_exporter.used_media_objects.map(&:media_id))
-      attachments += @html_exporter.referenced_files.values
+      attachments += Attachment.where(context: @course, id: @html_exporter.referenced_files.keys).where.not(media_entry_id: nil)
+
       att_map = attachments.index_by(&:id)
       Attachment.media_tracks_include_originals(attachments).each_with_object({}) do |mt, tracks|
         file = att_map[mt.for_att_id]

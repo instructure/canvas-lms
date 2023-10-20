@@ -91,7 +91,7 @@ class RubricAssociationsController < ApplicationController
     rubric_id = association_params.delete(:rubric_id)
     @rubric = @association ? @association.rubric : Rubric.find(rubric_id)
     # raise "User doesn't have access to this rubric" unless @rubric.grants_right?(@current_user, session, :read)
-    return unless can_manage_rubrics_or_association_object?(@assocation, @association_object)
+    return unless can_manage_rubrics_or_association_object?(@association, @association_object)
     return unless can_update_association?(@association)
 
     # create a new rubric if associating in a different course

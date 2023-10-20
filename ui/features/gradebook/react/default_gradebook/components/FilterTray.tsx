@@ -63,6 +63,7 @@ export default function FilterTray({
   const applyFilters = useStore(state => state.applyFilters)
   const appliedFilters = useStore(state => state.appliedFilters)
   const [expandedFilterPresetId, setExpandedFilterPresetId] = useState<string | null>(null)
+  const closeRef = React.useRef<HTMLElement>()
 
   return (
     <Tray
@@ -85,10 +86,14 @@ export default function FilterTray({
           </FlexItem>
           <FlexItem>
             <CloseButton
+              elementRef={(ref: HTMLElement) => (closeRef.current = ref)}
               placement="end"
               offset="small"
               screenReaderLabel="Close"
-              onClick={() => setIsTrayOpen(false)}
+              onClick={() => {
+                setIsTrayOpen(false)
+                setExpandedFilterPresetId(null)
+              }}
             />
           </FlexItem>
         </Flex>
@@ -97,8 +102,9 @@ export default function FilterTray({
           <Flex as="div" margin="small">
             <FlexItem display="inline-block" width="100px" height="128px">
               <img
+                data-testid="friendly-panda"
                 src="/images/tutorial-tray-images/Panda_People.svg"
-                alt={I18n.t('Friendly panda')}
+                alt=""
                 style={{
                   width: '100px',
                   height: '128px',
@@ -131,6 +137,7 @@ export default function FilterTray({
               updated_at: new Date().toISOString(),
             }}
             isActive={true}
+            closeRef={closeRef}
             gradingPeriods={gradingPeriods}
             modules={modules}
             onCreate={(filterPreset: PartialFilterPreset) => {
@@ -161,6 +168,7 @@ export default function FilterTray({
                 assignmentGroups={assignmentGroups}
                 filterPreset={filterPreset}
                 gradingPeriods={gradingPeriods}
+                closeRef={closeRef}
                 isActive={doFiltersMatch(appliedFilters, filterPreset.filters)}
                 isExpanded={expandedFilterPresetId === filterPreset.id}
                 modules={modules}

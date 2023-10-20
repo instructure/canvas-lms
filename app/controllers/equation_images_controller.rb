@@ -42,10 +42,9 @@ class EquationImagesController < ApplicationController
     if MathMan.use_for_svg?
       MathMan.url_for(latex: @latex, target: :svg, scale: @scale)
     else
-      scale_param = "&scale=#{@scale}" if @scale.present?
-      scale_param ||= ""
-      Setting.get("equation_image_url", "http://latex.codecogs.com/gif.latex?") + @latex +
-        scale_param
+      # The service we are using here for development does not support scaling,
+      # so we don't include the scale param (otherwise we get back invalid equation images)
+      Setting.get("equation_image_url", "http://latex.codecogs.com/svg.latex?") + @latex
     end
   end
 end

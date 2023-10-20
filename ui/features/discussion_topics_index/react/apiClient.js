@@ -17,7 +17,7 @@
  */
 
 import axios from '@canvas/axios'
-import {asAxios, getPrefetchedXHR} from '@instructure/js-utils'
+import {asAxios, getPrefetchedXHR} from '@canvas/util/xhr'
 
 export function getDiscussions({contextType: _contextType, contextId: _contextId}, {page}) {
   // In the the index.html.erb view for this page, we use prefetch_xhr to fire off

@@ -56,9 +56,9 @@ describe Quizzes::QuizQuestion::AnswerSerializers::Numerical do
   end
 
   context "Italian" do
-    before { I18n.locale = "it" }
-
-    after { I18n.locale = I18n.default_locale }
+    around do |example|
+      I18n.with_locale(:it, &example)
+    end
 
     let :inputs do
       [25.3, 25e-6, "0,12", "3", "17.000", "6.200.000,13"]
@@ -79,9 +79,9 @@ describe Quizzes::QuizQuestion::AnswerSerializers::Numerical do
   end
 
   context "French" do
-    before { I18n.locale = :fr }
-
-    after { I18n.locale = I18n.default_locale }
+    around do |example|
+      I18n.with_locale(:fr, &example)
+    end
 
     let :inputs do
       [25.3, 25e-6, "0,12", "3", "17 000", "6 200 000,13"]

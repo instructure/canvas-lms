@@ -51,6 +51,30 @@ export const RubricCriterion = {
     points: number,
     ratings: arrayOf(RubricRating.shape),
   }),
+
+  mock: ({
+    _id = '1',
+    criterion_use_range = false,
+    description = 'Criterion Description',
+    ignore_for_scoring = false,
+    learning_outcome_id = '1',
+    long_description = 'Criterion Long Description',
+    mastery_points = null,
+    outcome = null,
+    points = 6,
+    ratings = [RubricRating.mock()],
+  } = {}) => ({
+    _id,
+    criterion_use_range,
+    description,
+    ignore_for_scoring,
+    learning_outcome_id,
+    long_description,
+    mastery_points,
+    outcome,
+    points,
+    ratings,
+  }),
 }
 
 export const DefaultMocks = {

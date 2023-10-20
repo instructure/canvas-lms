@@ -21,8 +21,8 @@
 # plugins.
 
 if CANVAS_INCLUDE_PLUGINS
-  Dir[File.join(File.dirname(__FILE__), "../gems/plugins/*/Gemfile.d/*")].each do |g|
-    next if g.end_with?("/_before.rb")
+  gemfile_root.glob("../gems/plugins/*/Gemfile.d/*") do |g|
+    next if g.basename == "_before.rb"
 
     eval_gemfile(g)
   end

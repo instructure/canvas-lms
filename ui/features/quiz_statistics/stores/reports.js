@@ -172,7 +172,6 @@ export default new Store(
 
     /** @private */
     trackReportGeneration(quizReport, autoDownload) {
-      let emitChange, progressUrl, poll, reload
       const quizReportId = quizReport.get('id')
       let generationRequest = generationRequests.filter(function (request) {
         return request.quizReportId === quizReportId
@@ -190,10 +189,10 @@ export default new Store(
 
       generationRequests.push(generationRequest)
 
-      emitChange = this.emitChange.bind(this)
-      progressUrl = quizReport.get('progress').url
+      const emitChange = this.emitChange.bind(this)
+      const progressUrl = quizReport.get('progress').url
 
-      poll = function () {
+      const poll = function () {
         return pollProgress(progressUrl, {
           interval: 1000,
           onTick(completion, progress) {
@@ -203,7 +202,7 @@ export default new Store(
         })
       }
 
-      reload = function () {
+      const reload = function () {
         return quizReport.fetch({
           data: {
             include: ['progress', 'file'],

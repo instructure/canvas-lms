@@ -251,7 +251,7 @@ class ContentZipper
         folder.visible_file_attachments
       end
 
-    attachments = attachments.select { |a| opts[:exporter].export_object?(a) } if opts[:exporter]
+    attachments = attachments.select { |a| opts[:exporter].export_object?(a, ignore_updated_at: opts[:ignore_updated_at]) } if opts[:exporter]
     attachments = attachments.select { |a| !@check_user || a.grants_right?(@user, :download) }
     attachments.reject do |attachment|
       # exclude files in hidden folders unless they're referenced in rich content (or the user is an admin)

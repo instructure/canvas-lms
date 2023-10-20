@@ -1,4 +1,5 @@
 require:
+  - rubocop-factory_bot
   - rubocop-graphql
   - rubocop-rails
   - rubocop-rake
@@ -78,6 +79,7 @@ Naming/FileName:
     - "**/Gemfile.d/~after.rb"
     - "**/urn_*.rb"
     - "**/fixtures/**/*.rb"
+    - "config/environments/*-*.rb"
     - "config/locales/*.rb" # names must match locale names
     - "spec/selenium/a11y_and_i18n/localized-timezone-lists_spec.rb" # matches JS file it tests
 
@@ -92,6 +94,7 @@ Rails:
   Severity: error
   Exclude:
     - "bin/**/*"
+    - "gems/google_drive/**/*"
 Rails/ApplicationRecord:
   Enabled: false # we never bothered creating an ApplicationRecord
 Rails/Blank:
@@ -138,6 +141,8 @@ RSpec:
   Severity: error
 RSpec/AnyInstance:
   Enabled: false # while using an instance double would be preferable, it's a pain
+RSpec/FilePath:
+  Enabled: false # superceded by RSpec/SpecFilePathSuffix and RSpec/SpecFilePathFormat
 RSpec/IndexedLet:
   Enabled: false
 RSpec/InstanceVariable:
@@ -311,8 +316,6 @@ Rails/FindById:
 Rails/FindEach:
   Severity: convention
   AutoCorrect: false
-Rails/I18nLocaleAssignment:
-  Severity: convention
 Rails/InverseOf:
   Severity: convention
 Rails/LexicallyScopedActionFilter:
@@ -371,7 +374,7 @@ RSpec/ExpectActual:
 RSpec/ExpectChange:
   Enabled: false
   AutoCorrect: false
-RSpec/FilePath:
+RSpec/SpecFilePathFormat:
   Severity: convention
 RSpec/HooksBeforeExamples:
   Severity: convention

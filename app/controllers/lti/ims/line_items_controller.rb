@@ -266,7 +266,7 @@ module Lti
       def line_item_id(line_item)
         if line_item.root_account.feature_enabled?(:consistent_ags_ids_based_on_account_principal_domain)
           lti_line_item_show_url(
-            host: line_item.root_account.domain,
+            host: line_item.root_account.environment_specific_domain,
             course_id: params[:course_id],
             id: line_item.id
           )
@@ -290,8 +290,8 @@ module Lti
         return if line_item_params.values_at(*attr_mapping.keys).all?(&:blank?)
 
         a = line_item.assignment
-        attr_mapping.each do |param_name, assigment_attr_name|
-          a.send("#{assigment_attr_name}=", line_item_params[param_name]) if line_item_params.key?(param_name)
+        attr_mapping.each do |param_name, assignment_attr_name|
+          a.send("#{assignment_attr_name}=", line_item_params[param_name]) if line_item_params.key?(param_name)
         end
         a.save!
       end

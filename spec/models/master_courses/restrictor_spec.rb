@@ -187,7 +187,7 @@ describe MasterCourses::Restrictor do
       @copied_file.instance_variable_set(:@child_content_restrictions, nil)
 
       expect { caption.destroy }.to raise_error "cannot change column: captions - locked by Master Course"
-      expect { @copied_file.media_tracks.create!(kind: "subtitles", locale: "fr", content: "fr subs", media_object: media) }.to raise_error "cannot change column: captions - locked by Master Course"
+      expect { @copied_file.media_tracks.create!(kind: "subtitles", locale: "fr", content: "fr subs", media_object: media) }.to raise_error "Validation failed: cannot change column(s): media_object_id, locale, content, attachment_id - locked by Master Course"
     end
   end
 

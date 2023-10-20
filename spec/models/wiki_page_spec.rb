@@ -180,6 +180,25 @@ describe WikiPage do
     expect { @course.wiki_pages.create!(title: "MAT-1104") }.to raise_error(ActiveRecord::RecordInvalid)
   end
 
+  it "allows users to reuse titles if permanent_page_links is enabled" do
+    Account.site_admin.enable_feature! :permanent_page_links
+    course_factory(active_all: true)
+    title = "Doppelgänger"
+    p1 = @course.wiki_pages.create!(title:)
+    p2 = @course.wiki_pages.create!(title:)
+    expect(p1.title).to eq(title)
+    expect(p2.title).to eq(title)
+  end
+
+  it "creates a unique url if title is taken by an existing lookup" do
+    course_factory(active_all: true)
+    p1 = @course.wiki_pages.create!(title: "bananas")
+    p1.wiki_page_lookups.create!(slug: "apples")
+    p2 = @course.wiki_pages.create!(title: "apples")
+    expect(p2.title).to eq("apples")
+    expect(p2.url).to eq("apples-2")
+  end
+
   it "lets you reuse the title/url of a deleted page" do
     course_with_teacher(active_all: true)
     p1 = @course.wiki_pages.create(title: "Asdf")
@@ -200,6 +219,30 @@ describe WikiPage do
     expect(p1.save).to be_truthy
     expect(p1.title).to eql("Asdf-2")
     expect(p1.url).to eql("asdf-2")
+  end
+
+  it "lets you reuse the title but not the url of a deleted page when PPL is on" do
+    Account.site_admin.enable_feature!(:permanent_page_links)
+
+    course_with_teacher(active_all: true)
+    p1 = @course.wiki_pages.create(title: "Asdf")
+    p1.workflow_state = "deleted"
+    p1.save
+
+    # doesn't delete the lookups
+    expect(p1.current_lookup).to_not be_nil
+
+    # therefore we can't reuse the url
+    p2 = @course.wiki_pages.create(title: "Asdf")
+    p2.reload
+    expect(p2.title).to eql("Asdf")
+    expect(p2.url).to eql("asdf-2")
+
+    # p1's url does not mutate upon reinstating
+    p1.workflow_state = "active"
+    expect(p1.save).to be_truthy
+    expect(p1.title).to eql("Asdf")
+    expect(p1.url).to eql("asdf")
   end
 
   it "sets root_account_id on create" do
@@ -1014,6 +1057,98 @@ describe WikiPage do
       YAML
       good_yaml = WikiPage.reinterpret_version_yaml(bad_yaml)
       expect(good_yaml).to include("<a id=\\\"media_comment_m-52Qmsrg9rxySvtzA6e9VdzxrB9FHZBVx\\\"")
+    end
+  end
+
+  describe "url" do
+    before :once do
+      course_factory(active_all: true)
+      @page = @course.wiki_pages.create!(title: "original-name")
+      @lookup = @page.wiki_page_lookups.create!(slug: "new-name")
+      @page.current_lookup = @lookup
+      @page.save!
+    end
+
+    context "when permanent_page_links flag is disabled" do
+      before :once do
+        Account.site_admin.disable_feature!(:permanent_page_links)
+      end
+
+      it "returns the page's url attribute" do
+        expect(@page.url).to eq("original-name")
+      end
+    end
+
+    context "when permanent_page_links flag is enabled" do
+      before :once do
+        Account.site_admin.enable_feature!(:permanent_page_links)
+      end
+
+      it "returns the page's current lookup's slug" do
+        expect(@page.url).to eq("new-name")
+      end
+
+      it "returns the page's url attribute if current lookup is nil" do
+        @page.current_lookup = nil
+        @page.save!
+        expect(@page.url).to eq("original-name")
+      end
+    end
+  end
+
+  describe "#generate_embeddings" do
+    before do
+      skip "not available" unless ActiveRecord::Base.connection.table_exists?("wiki_page_embeddings")
+
+      expect(OpenAi).to receive(:smart_search_available?).at_least(:once).and_return(true)
+      allow(OpenAi).to receive(:generate_embedding).and_return([[1] * 1536])
+    end
+
+    before :once do
+      course_factory
+    end
+
+    it "generates an embedding when creating a page" do
+      wiki_page_model(title: "test", body: "foo")
+      run_jobs
+      expect(@page.reload.wiki_page_embeddings.count).to eq 1
+    end
+
+    it "replaces an embedding if it already exists" do
+      wiki_page_model(title: "test", body: "foo")
+      run_jobs
+      @page.update body: "bar"
+      run_jobs
+      expect(@page.reload.wiki_page_embeddings.count).to eq 1
+    end
+
+    it "strips HTML from the body before indexing" do
+      wiki_page_model(title: "test", body: "<ul><li>foo</li></ul>")
+      expect(OpenAi).to receive(:generate_embedding).with("* foo")
+      run_jobs
+    end
+
+    it "deletes embeddings when a page is deleted (and regenerates them when undeleted)" do
+      wiki_page_model(title: "test", body: "foo")
+      run_jobs
+      @page.destroy
+      expect(@page.reload.wiki_page_embeddings.count).to eq 0
+
+      @page.restore
+      run_jobs
+      expect(@page.reload.wiki_page_embeddings.count).to eq 1
+    end
+
+    it "generates multiple embeddings for a page with long content" do
+      wiki_page_model(title: "test", body: "foo" * 2000)
+      run_jobs
+      expect(@page.reload.wiki_page_embeddings.count).to eq 2
+    end
+
+    it "generates multiple embeddings and doesn't split words" do
+      wiki_page_model(title: "test", body: "supercalifragilisticexpialidocious " * 228)
+      run_jobs
+      expect(@page.reload.wiki_page_embeddings.count).to eq 3
     end
   end
 end

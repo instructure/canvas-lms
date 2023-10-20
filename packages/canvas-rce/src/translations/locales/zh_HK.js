@@ -31,6 +31,7 @@ const locale = {
   "add_another_f4e50d57": { "message": "添加其他" },
   "add_cc_subtitles_55f0394e": { "message": "添加副本/字幕" },
   "add_image_60b2de07": { "message": "添加影像" },
+  "add_one_9e34a6f8": { "message": "添加一個！" },
   "additional_considerations_f3801683": { "message": "其他考慮因素" },
   "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
     "message": "URL 相同的相鄰連結應為單一連結。"
@@ -58,6 +59,7 @@ const locale = {
   },
   "and_7fcc2911": { "message": "以及" },
   "angle_c5b4ec50": { "message": "角度" },
+  "announcement_fb4cb645": { "message": "通告" },
   "announcement_list_da155734": { "message": "通告清單" },
   "announcements_a4b8ed4a": { "message": "通告" },
   "apply_781a2546": { "message": "應用" },
@@ -73,6 +75,7 @@ const locale = {
   "arrows_464a3e54": { "message": "箭號" },
   "art_icon_8e1daad": { "message": "藝術圖示" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": { "message": "外觀比例將被保留" },
+  "assignment_976578a8": { "message": "作業" },
   "assignments_1e02582c": { "message": "作業列表" },
   "asterisk_82255584": { "message": "*" },
   "attributes_963ba262": { "message": "屬性" },
@@ -200,8 +203,12 @@ const locale = {
   "crop_image_807ebb08": { "message": "裁剪影像" },
   "cup_product_14174434": { "message": "杯子產品" },
   "current_image_f16c249c": { "message": "目前的圖像" },
+  "current_link_945a47ee": { "message": "目前的連結" },
   "current_volume_level_c55ab825": { "message": "目前音量" },
   "custom_6979cd81": { "message": "自訂" },
+  "custom_width_and_height_pixels_946eea7c": {
+    "message": "自訂寬度和高度（像素）"
+  },
   "cyan_c1d5f68a": { "message": "青色" },
   "dagger_57e0f4e5": { "message": "劍號" },
   "date_added_ed5ad465": { "message": "添加的日期" },
@@ -230,6 +237,7 @@ const locale = {
   "directionality_26ae9e08": { "message": "方向" },
   "directly_edit_latex_b7e9235b": { "message": "直接編輯 LaTeX" },
   "disable_preview_222bdf72": { "message": "停用預覽" },
+  "discussion_6719c51d": { "message": "討論" },
   "discussions_a5f96392": { "message": "討論區" },
   "discussions_index_6c36ced": { "message": "討論索引" },
   "disjoint_union_e74351a8": { "message": "互斥聯集" },
@@ -506,6 +514,9 @@ const locale = {
   "light_blue_5374f600": { "message": "淺藍色" },
   "link_7262adec": { "message": "連結" },
   "link_options_a16b758b": { "message": "連結選項" },
+  "link_type_linktypemessage_c6d26815": {
+    "message": "連結類型：{ linkTypeMessage }"
+  },
   "link_with_text_starting_with_start_b3fcbe71": {
     "message": "文字以 { start } 開始的連結"
   },
@@ -556,6 +567,7 @@ const locale = {
   "minus_plus_3461f637": { "message": "+/-" },
   "misc_3b692ea7": { "message": "雜項" },
   "miscellaneous_e9818229": { "message": "雜項" },
+  "module_90d9fd32": { "message": "單元" },
   "modules_c4325335": { "message": "單元" },
   "moving_image_to_crop_directionword_6f66cde2": {
     "message": "移動影像以裁剪 { directionWord }"
@@ -580,19 +592,33 @@ const locale = {
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "導航整個選單或工具欄"
   },
+  "navigation_ee9af92d": { "message": "導航工具" },
   "nested_greater_than_d852e60d": { "message": "巢式大於" },
   "nested_less_than_27d17e58": { "message": "巢式小於" },
+  "new_quiz_34aacba6": { "message": "新測驗" },
   "next_40e12421": { "message": "下一個" },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "並無偵察任何可訪問性問題。"
   },
+  "no_announcements_created_yet_c44a94f4": { "message": "尚未建立通告。" },
+  "no_announcements_found_20185afc": { "message": "找不到通告。" },
+  "no_assignments_created_yet_1b236d87": { "message": "尚未建立作業列表。" },
+  "no_assignments_found_79e46d7f": { "message": "找不到作業列表。" },
   "no_changes_to_save_d29f6e91": { "message": "沒有要儲存的變更。" },
+  "no_discussions_created_yet_ff99abe3": { "message": "尚未建立討論區。" },
+  "no_discussions_found_9284063b": { "message": "找不到討論區。" },
   "no_e16d9132": { "message": "否" },
   "no_file_chosen_9a880793": { "message": "未選擇檔案" },
   "no_headers_9bc7dc7f": { "message": "無標題" },
+  "no_modules_created_yet_c71b6d4d": { "message": "尚未建立單元。" },
+  "no_modules_found_2df43a40": { "message": "找不到單元。" },
+  "no_pages_created_yet_c379fa6e": { "message": "尚未創建任何頁面。" },
+  "no_pages_found_6799350": { "message": "找不到頁面。" },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "本檔案不支援預覽。"
   },
+  "no_quizzes_created_yet_1a2370b9": { "message": "尚未建立測驗。" },
+  "no_quizzes_found_c80c537a": { "message": "找不到測驗。" },
   "no_results_940393cf": { "message": "無結果。" },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "找不到 { filterTerm } 的結果"
@@ -614,6 +640,9 @@ const locale = {
   "one_of_the_following_styles_must_be_added_to_save__1de769aa": {
     "message": "必須添加以下其中一個樣式以儲存圖示：圖示色彩、輪廓大小、圖示文字或影像"
   },
+  "one_or_more_files_failed_to_paste_please_try_uploa_7fa39dd3": {
+    "message": "無法貼上一個或多個檔案。請嘗試上傳或拖放檔案。"
+  },
   "open_circle_e9bd069": { "message": "開圓" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "開啟此鍵盤快速鍵對話方塊"
@@ -631,6 +660,7 @@ const locale = {
   "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
     "message": "{ p }並非有效協議，必須使用 ftp、http、https、mailto、skype、tel 或忽略此項"
   },
+  "page_50c4823d": { "message": "頁面" },
   "pages_e5414c2c": { "message": "頁面" },
   "paragraph_5e5ad8eb": { "message": "段落" },
   "paragraph_starting_with_start_a59923f8": {
@@ -686,6 +716,7 @@ const locale = {
   "pumpkin_904428d5": { "message": "南瓜色" },
   "purple_7678a9fc": { "message": "紫色" },
   "quaternions_877024e0": { "message": "四合數" },
+  "quiz_e0dcce8f": { "message": "測驗" },
   "quizzes_7e598f57": { "message": "測驗" },
   "rational_numbers_80ddaa4a": { "message": "有理數" },
   "real_numbers_7c99df94": { "message": "實數" },
@@ -762,6 +793,7 @@ const locale = {
   "select_crop_shape_d441feeb": { "message": "選擇裁剪形狀" },
   "select_language_7c93a900": { "message": "選擇語言" },
   "select_video_source_1b5c9dbe": { "message": "選擇視訊資源" },
+  "selected_274ce24f": { "message": "已選擇" },
   "selected_linkfilename_c093b1f2": { "message": "已選定 { linkFileName }" },
   "selection_b52c4c5e": { "message": "選取" },
   "set_header_scope_8c548f40": { "message": "設定標題範圍" },
@@ -960,6 +992,7 @@ const locale = {
   "up_and_left_diagonal_arrow_e4a74a23": { "message": "向上和向左對角箭頭" },
   "up_and_right_diagonal_arrow_935b902e": { "message": "向上和向右對角箭頭" },
   "up_c553575d": { "message": "向上" },
+  "updated_link_a827e441": { "message": "更新的連結" },
   "upload_document_253f0478": { "message": "上傳文件" },
   "upload_file_fd2361b8": { "message": "上傳檔案" },
   "upload_image_6120b609": { "message": "上載影像" },

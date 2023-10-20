@@ -187,8 +187,7 @@ describe DiscussionTopicsController do
 
       it "redirects to correct mastery paths edit page" do
         user_session(@teacher)
-        allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(true)
-        allow(ConditionalRelease::Service).to receive(:env_for).and_return({ dummy: "value" })
+        allow(ConditionalRelease::Service).to receive_messages(enabled_in_context?: true, env_for: { dummy: "value" })
         get :edit, params: { group_id: @group.id, id: @child_topic.id }
         redirect_path = "/courses/#{@course.id}/discussion_topics/#{@topic.id}/edit"
         expect(response).to redirect_to(redirect_path)
@@ -300,9 +299,9 @@ describe DiscussionTopicsController do
         expect(assigns[:js_env][:DIRECT_SHARE_ENABLED]).to be(false)
       end
 
-      describe "with manage_content permission disabled" do
+      describe "with manage_course_content_add permission disabled" do
         before do
-          RoleOverride.create!(context: @course.account, permission: "manage_content", role: teacher_role, enabled: false)
+          RoleOverride.create!(context: @course.account, permission: "manage_course_content_add", role: teacher_role, enabled: false)
         end
 
         it "does not set DIRECT_SHARE_ENABLED if the course is active" do
@@ -808,7 +807,7 @@ describe DiscussionTopicsController do
       # this is essentially a unit test for ui/features/discussion_topic/backbone/models/Entry.js,
       # making sure that we get back the expected format for this url template
       template = assigns[:js_env][:DISCUSSION][:SPEEDGRADER_URL_TEMPLATE]
-      url = template.gsub(/%3Astudent_id/, "123")
+      url = template.gsub("%3Astudent_id", "123")
       expect(url).to match "student_id=123"
     end
 
@@ -1113,6 +1112,106 @@ describe DiscussionTopicsController do
       expect(ErrorReport.last).to be_nil
     end
 
+    context "attachment permissions" do
+      before :once do
+        @ann = @course.announcements.create!(message: "testing")
+      end
+
+      context "when react_discussions_post is disabled" do
+        before :once do
+          Account.default.disable_feature!(:react_discussions_post)
+        end
+
+        context "when allow_student_forum_attachments is false" do
+          before :once do
+            @course.allow_student_forum_attachments = false
+            @course.save!
+          end
+
+          it "does not allow students to add attachments" do
+            user_session(@student)
+            get "show", params: { course_id: @course.id, id: @ann.id }
+            # CAN_ATTACH_TOPIC is false because the the student has no create_forum permission
+            expect(assigns[:js_env][:DISCUSSION][:PERMISSIONS][:CAN_ATTACH_TOPIC]).to be_falsey
+            expect(assigns[:js_env][:DISCUSSION][:PERMISSIONS][:CAN_ATTACH_ENTRIES]).to be_falsey
+          end
+
+          it "allows teachers to add attachments" do
+            user_session(@teacher)
+            get "show", params: { course_id: @course.id, id: @ann.id }
+            expect(assigns[:js_env][:DISCUSSION][:PERMISSIONS][:CAN_ATTACH_TOPIC]).to be_truthy
+            expect(assigns[:js_env][:DISCUSSION][:PERMISSIONS][:CAN_ATTACH_ENTRIES]).to be_truthy
+          end
+        end
+
+        context "when allow_student_forum_attachments is true" do
+          before :once do
+            @course.allow_student_forum_attachments = true
+            @course.save!
+          end
+
+          it "allows students to add attachments" do
+            user_session(@student)
+            get "show", params: { course_id: @course.id, id: @ann.id }
+            # CAN_ATTACH_TOPIC is false because the the student has no create_forum permission
+            expect(assigns[:js_env][:DISCUSSION][:PERMISSIONS][:CAN_ATTACH_TOPIC]).to be_falsey
+            expect(assigns[:js_env][:DISCUSSION][:PERMISSIONS][:CAN_ATTACH_ENTRIES]).to be_truthy
+          end
+
+          it "allows teachers to add attachments" do
+            user_session(@teacher)
+            get "show", params: { course_id: @course.id, id: @ann.id }
+            expect(assigns[:js_env][:DISCUSSION][:PERMISSIONS][:CAN_ATTACH_TOPIC]).to be_truthy
+            expect(assigns[:js_env][:DISCUSSION][:PERMISSIONS][:CAN_ATTACH_ENTRIES]).to be_truthy
+          end
+        end
+      end
+
+      context "when react_discussions_post is enabled" do
+        before :once do
+          Account.default.enable_feature!(:react_discussions_post)
+        end
+
+        context "when allow_student_forum_attachments is false" do
+          before :once do
+            @course.allow_student_forum_attachments = false
+            @course.save!
+          end
+
+          it "does not allow students to add attachments" do
+            user_session(@student)
+            get "show", params: { course_id: @course.id, id: @ann.id }
+            expect(assigns[:js_env][:can_attach_entries]).to be_falsey
+          end
+
+          it "allows teachers to add attachments" do
+            user_session(@teacher)
+            get "show", params: { course_id: @course.id, id: @ann.id }
+            expect(assigns[:js_env][:can_attach_entries]).to be_truthy
+          end
+        end
+
+        context "when allow_student_forum_attachments is true" do
+          before :once do
+            @course.allow_student_forum_attachments = true
+            @course.save!
+          end
+
+          it "allows students to add attachments" do
+            user_session(@student)
+            get "show", params: { course_id: @course.id, id: @ann.id }
+            expect(assigns[:js_env][:can_attach_entries]).to be_truthy
+          end
+
+          it "allows teachers to add attachments" do
+            user_session(@teacher)
+            get "show", params: { course_id: @course.id, id: @ann.id }
+            expect(assigns[:js_env][:can_attach_entries]).to be_truthy
+          end
+        end
+      end
+    end
+
     context "in a homeroom course" do
       before do
         @course.account.enable_as_k5_account!
@@ -1207,6 +1306,42 @@ describe DiscussionTopicsController do
       @course.save!
       get :new, params: { course_id: @course.id, is_announcement: true }
       expect(assigns[:js_env][:CONTEXT_ID]).to eq(@course.id)
+    end
+
+    it "js_env DISCUSSION_TOPIC ATTRIBUTES course_published correctly for course context" do
+      @course.workflow_state = "unpublished"
+      @course.save!
+      user_session(@teacher)
+      get :new, params: { course_id: @course.id, is_announcement: true }
+      expect(assigns[:js_env][:DISCUSSION_TOPIC][:ATTRIBUTES][:course_published]).to be_falsy
+      @course.workflow_state = "available"
+      @course.save!
+      get :new, params: { course_id: @course.id, is_announcement: true }
+      expect(assigns[:js_env][:DISCUSSION_TOPIC][:ATTRIBUTES][:course_published]).to be_truthy
+    end
+
+    it "js_env DISCUSSION_TOPIC ATTRIBUTES course_published correctly for group in course context" do
+      @course.workflow_state = "unpublished"
+      @course.save!
+      @group_category = @course.group_categories.create(name: "gc")
+      @group = @course.groups.create!(group_category: @group_category)
+      user_session(@teacher)
+      get :new, params: { group_id: @group.id, is_announcement: true }
+      expect(assigns[:js_env][:DISCUSSION_TOPIC][:ATTRIBUTES][:course_published]).to be_falsy
+      @course.workflow_state = "available"
+      @course.save!
+      get :new, params: { group_id: @group.id, is_announcement: true }
+      expect(assigns[:js_env][:DISCUSSION_TOPIC][:ATTRIBUTES][:course_published]).to be_truthy
+    end
+
+    it "js_env DISCUSSION_TOPIC ATTRIBUTES course_published correctly for group in account context" do
+      @group_category = Account.default.group_categories.create(name: "gc")
+      @group = Account.default.groups.create!(group_category: @group_category)
+      user_session(account_admin_user(account: Account.default))
+
+      get :new, params: { group_id: @group.id, is_announcement: true }
+      # will be truthy since there is no such thing as unpublished account context
+      expect(assigns[:js_env][:DISCUSSION_TOPIC][:ATTRIBUTES][:course_published]).to be_truthy
     end
 
     it "js_bundles includes discussion_create when ff is on" do
@@ -1353,16 +1488,14 @@ describe DiscussionTopicsController do
       end
 
       it "includes environment variables if enabled" do
-        allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(true)
-        allow(ConditionalRelease::Service).to receive(:env_for).and_return({ dummy: "value" })
+        allow(ConditionalRelease::Service).to receive_messages(enabled_in_context?: true, env_for: { dummy: "value" })
         get :edit, params: { course_id: @course.id, id: @topic.id }
         expect(response).to be_successful
         expect(controller.js_env[:dummy]).to eq "value"
       end
 
       it "does not include environment variables when disabled" do
-        allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(false)
-        allow(ConditionalRelease::Service).to receive(:env_for).and_return({ dummy: "value" })
+        allow(ConditionalRelease::Service).to receive_messages(enabled_in_context?: false, env_for: { dummy: "value" })
         get :edit, params: { course_id: @course.id, id: @topic.id }
         expect(response).to be_successful
         expect(controller.js_env).not_to have_key :dummy
@@ -1727,6 +1860,34 @@ describe DiscussionTopicsController do
         expect(response).to be_successful
         expect(DiscussionTopic.last.anonymous_state).to eq "full_anonymity"
         expect(DiscussionTopic.last).to be_anonymous
+      end
+
+      it "returns an error for creating anonymous discussions in a Group" do
+        @course.enable_feature! :react_discussions_post
+        group_category = @course.group_categories.create(name: "gc")
+        group = @course.groups.create!(group_category:)
+        user_session @teacher
+        post "create", params: group_topic_params(group, { anonymous_state: "full_anonymity" }), format: :json
+        expect(response).to have_http_status :bad_request
+        expect(response.parsed_body["errors"]).to(include { "anonymous_state" => "Group discussions cannot be anonymous." })
+      end
+
+      it "returns an error for creating anonymous discussions assigned to a Group Category in a Course" do
+        @course.enable_feature! :react_discussions_post
+        group_category = @course.group_categories.create(name: "gc")
+        user_session @teacher
+        post "create", params: topic_params(@course, { anonymous_state: "full_anonymity", group_category_id: group_category.id }), format: :json
+        expect(response).to have_http_status :bad_request
+        expect(response.parsed_body["errors"]).to(include { "anonymous_state" => "Group discussions cannot be anonymous." })
+      end
+
+      it "returns an error for creating a graded anonymous discussion" do
+        @course.enable_feature! :react_discussions_post
+        obj_params = topic_params(@course, { anonymous_state: "full_anonymity" }).merge(assignment_params(@course))
+        user_session(@teacher)
+        post "create", params: obj_params, format: :json
+        expect(response).to have_http_status :bad_request
+        expect(response.parsed_body["errors"]).to(include { "anonymous_state" => "Anonymous discussions cannot be graded" })
       end
 
       it "allows partial_anonymity" do
@@ -2226,9 +2387,8 @@ describe DiscussionTopicsController do
     end
 
     it "uses inst-fs if it is enabled" do
-      allow(InstFS).to receive(:enabled?).and_return(true)
       uuid = "1234-abcd"
-      allow(InstFS).to receive(:direct_upload).and_return(uuid)
+      allow(InstFS).to receive_messages(enabled?: true, direct_upload: uuid)
 
       data = fixture_file_upload("docs/txt.txt", "text/plain", true)
       attachment_model context: @course, uploaded_data: data, folder: Folder.unfiled_folder(@course)

@@ -96,9 +96,14 @@ module SIS
           end
 
           course_account_stuck = course.stuck_sis_fields.include?(:account_id)
-          if !course_account_stuck && account
+          if !course_account_stuck && account&.active?
             course.account = account
           end
+
+          if course.account&.deleted?
+            raise ImportError, "Cannot restore course #{course_id} because the associated account #{course.account.sis_source_id} is deleted"
+          end
+
           course.account ||= @root_account
 
           update_account_associations = course.account_id_changed? || course.root_account_id_changed?

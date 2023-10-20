@@ -51,7 +51,7 @@ describe Profile do
 
       it "has the correct class when found" do
         Foo.new(name: "foo", workflow_state: "registered").profile.save!
-        expect(Profile.all.first.class).to eq FooProfile
+        expect(Profile.first.class).to eq FooProfile
       end
     end
 

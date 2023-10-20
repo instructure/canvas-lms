@@ -692,6 +692,63 @@ module Lti
       end
     end
 
+    describe "#adminable_account_ids_recursive_truncated" do
+      it "returns the correct string for a single subaccount" do
+        AccountUser.create!(user:, account:)
+        expect(subject.adminable_account_ids_recursive_truncated).to eq(account.id.to_s)
+      end
+
+      it "returns the correct string for a single subaccount sith its subaccounts" do
+        sub1 = Account.create!(parent_account: account)
+        sub2 = Account.create!(parent_account: account)
+        sub1sub = Account.create!(parent_account: sub1)
+        AccountUser.create!(user:, account:)
+        ids = subject.adminable_account_ids_recursive_truncated.split(",")
+        expected = [account.id.to_s, sub1.id.to_s, sub2.id.to_s, sub1sub.id.to_s]
+        expect(ids).to contain_exactly(*expected)
+      end
+
+      it "returns empty for root account (need to check isRootAccountAdmin)" do
+        AccountUser.create! user:, account: root_account
+        expect(subject.adminable_account_ids_recursive_truncated).to eq("")
+      end
+
+      it "correctly trims strings of various lengths to always end in ',truncated' and always return <= limit_chars characters" do
+        allow(user).to receive(:adminable_account_ids_recursive)
+          .with(starting_root_account: root_account)
+          .and_return([1, 2, 3, 4, 5, 11, 12, 13, 14, 15, 101, 102, 103, 104, 105])
+        # full_list: "1,2,3,4,5,11,12,13,14,15,101,102,103,104,105"
+        # indexes:    01234567890123456789012345678901234567890123
+        expectations = {
+          14 => "1,2,truncated",
+          15 => "1,2,3,truncated",
+          16 => "1,2,3,truncated",
+          17 => "1,2,3,4,truncated",
+          24 => "1,2,3,4,5,11,truncated",
+          25 => "1,2,3,4,5,11,12,truncated",
+          26 => "1,2,3,4,5,11,12,truncated",
+          27 => "1,2,3,4,5,11,12,truncated",
+          28 => "1,2,3,4,5,11,12,13,truncated",
+          38 => "1,2,3,4,5,11,12,13,14,15,101,truncated",
+          39 => "1,2,3,4,5,11,12,13,14,15,101,truncated",
+          41 => "1,2,3,4,5,11,12,13,14,15,101,truncated",
+          42 => "1,2,3,4,5,11,12,13,14,15,101,102,truncated",
+          43 => "1,2,3,4,5,11,12,13,14,15,101,102,truncated",
+          44 => "1,2,3,4,5,11,12,13,14,15,101,102,103,104,105"
+        }
+        expectations.each do |limit_chars, expectation|
+          expect(subject.adminable_account_ids_recursive_truncated(limit_chars:)).to eq expectation
+        end
+      end
+
+      it "defaults to max 40000 characters" do
+        allow(user).to receive(:adminable_account_ids_recursive)
+          .with(starting_root_account: root_account)
+          .and_return([123_456_789] * 4001)
+        expect(subject.adminable_account_ids_recursive_truncated).to eq ("123456789," * 3999) + "truncated"
+      end
+    end
+
     context "email" do
       let(:course) { Course.create!(root_account:, account:, workflow_state: "available") }
 

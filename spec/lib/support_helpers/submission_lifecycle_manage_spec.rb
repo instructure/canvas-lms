@@ -1,0 +1,38 @@
+# frozen_string_literal: true
+
+#
+# Copyright (C) 2018 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
+require_relative "../../spec_helper"
+
+describe SupportHelpers::SubmissionLifecycleManage do
+  describe "CourseFixer" do
+    let(:course) { Account.default.courses.create!(name: "ddc") }
+    let(:user) { User.create! }
+
+    it "calls SubmissionLifecycleManager recompute course for a given course" do
+      fixer = SupportHelpers::SubmissionLifecycleManage::CourseFixer.new("email", nil, course.id, user.id)
+      expect(SubmissionLifecycleManager).to receive(:recompute_course).with(course, update_grades: true, executing_user: user.id)
+      fixer.fix
+    end
+
+    it "raises record not found for a bad course id" do
+      fixer = SupportHelpers::SubmissionLifecycleManage::CourseFixer.new("email", nil, 1234, user.id)
+      expect { fixer.fix }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+  end
+end

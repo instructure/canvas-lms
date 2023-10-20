@@ -587,10 +587,10 @@ describe Mutations::ImportOutcomes do
       expect do
         exec(outcome_id: get_outcome_id("Root group outcome"))
       end.to not_change(LearningOutcomeGroup, :count)
-        .and change(ContentTag, :count).by(1)
-                                       .and change {
-                                              @course.root_outcome_group.child_outcome_links.map(&:content).map(&:title)
-                                            }.from([]).to(["Root group outcome"])
+        .and(change(ContentTag, :count).by(1))
+        .and change {
+               @course.root_outcome_group.child_outcome_links.map { |link| link.content.title }
+             }.from([]).to(["Root group outcome"])
     end
   end
 

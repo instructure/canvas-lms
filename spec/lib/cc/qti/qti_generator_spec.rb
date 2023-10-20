@@ -21,9 +21,7 @@ describe "QTI Generator" do
   def qti_generator
     quiz_with_question_group_pointing_to_question_bank
     @rn = Object.new
-    allow(@rn).to receive(:user).and_return({})
-    allow(@rn).to receive(:course).and_return(@course)
-    allow(@rn).to receive(:export_dir).and_return({})
+    allow(@rn).to receive_messages(user: {}, course: @course, export_dir: {})
     allow(@rn).to receive(:export_object?).with(anything).and_return(true)
     @qg = CC::Qti::QtiGenerator.new @rn, nil, nil
   end

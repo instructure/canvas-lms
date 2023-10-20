@@ -38,9 +38,9 @@ export const addDeepLinkingListener = () => {
 export function onExternalContentReady(e, data) {
   const contentItem = {contentItems: JSON.stringify(data.contentItems)}
   if (data.service_id) {
-    updateCollaboration(contentItem, data.service_id)
+    updateCollaboration(contentItem, data.service_id, data.tool_id)
   } else {
-    createCollaboration(contentItem)
+    createCollaboration(contentItem, data.tool_id)
   }
 }
 
@@ -57,6 +57,7 @@ export const handleDeepLinking = async event => {
     } else {
       onExternalContentReady(event, {
         service_id: event.data?.service_id,
+        tool_id: event.data?.tool_id,
         contentItems: [item],
       })
     }
@@ -69,15 +70,21 @@ export function collaborationUrl(id) {
   return window.location.toString() + '/' + id
 }
 
-function updateCollaboration(contentItem, collab_id) {
-  const url = document.querySelector('.collaboration_' + collab_id + ' a.title')?.href
+function updateCollaboration(contentItem, collab_id, tool_id) {
+  const url =
+    document.querySelector('.collaboration_' + collab_id + ' a.title')?.href +
+    '?tool_id=' +
+    (tool_id || '')
   $.ajaxJSON(url, 'PUT', contentItem, collaborationSuccess, _msg => {
     $.screenReaderFlashMessage(I18n.t('Collaboration update failed'))
   })
 }
 
-function createCollaboration(contentItem) {
-  const url = document.querySelector('#new_collaboration')?.getAttribute('action')
+function createCollaboration(contentItem, tool_id) {
+  const url =
+    document.querySelector('#new_collaboration')?.getAttribute('action') +
+    '?tool_id=' +
+    (tool_id || '')
   $.ajaxJSON(url, 'POST', contentItem, collaborationSuccess, _msg => {
     $.screenReaderFlashMessage(I18n.t('Collaboration creation failed'))
   })

@@ -24,6 +24,9 @@
             "name": "AdhocStudents"
           },
           {
+            "name": "Course"
+          },
+          {
             "name": "Group"
           },
           {
@@ -93,6 +96,9 @@
             "name": "Course"
           },
           {
+            "name": "CustomGradeStatus"
+          },
+          {
             "name": "Discussion"
           },
           {
@@ -118,6 +124,9 @@
           },
           {
             "name": "GradingPeriod"
+          },
+          {
+            "name": "GradingPeriodGroup"
           },
           {
             "name": "Group"
@@ -196,6 +205,9 @@
           },
           {
             "name": "Section"
+          },
+          {
+            "name": "StandardGradeStatus"
           },
           {
             "name": "Submission"
@@ -300,6 +312,9 @@
             "name": "Course"
           },
           {
+            "name": "CustomGradeStatus"
+          },
+          {
             "name": "Discussion"
           },
           {
@@ -313,6 +328,9 @@
           },
           {
             "name": "GradingPeriod"
+          },
+          {
+            "name": "GradingPeriodGroup"
           },
           {
             "name": "Group"
@@ -376,6 +394,9 @@
           },
           {
             "name": "Section"
+          },
+          {
+            "name": "StandardGradeStatus"
           },
           {
             "name": "Submission"
@@ -481,6 +502,9 @@
           },
           {
             "name": "GradingPeriod"
+          },
+          {
+            "name": "GradingPeriodGroup"
           },
           {
             "name": "Group"

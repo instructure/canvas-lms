@@ -5,6 +5,9 @@
   "armenian_12da6118": { "message": "Arménien" },
   "belarusian_b2f19c76": { "message": "Biélorusse" },
   "bulgarian_feccab7e": { "message": "Bulgare" },
+  "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
+    "message": "Impossible de supprimer des sous-titres hérités d’un cours parent."
+  },
   "catalan_16f6b78f": { "message": "Catalan" },
   "chinese_111d37f6": { "message": "Chinois" },
   "chinese_simplified_7f0bd370": { "message": "Chinois simplifié" },
@@ -69,5 +72,8 @@
   "ukrainian_945b00b7": { "message": "Ukrainien" },
   "vietnamese_e7a76583": { "message": "Vietnamien" },
   "welsh_42ab94b1": { "message": "Gallois" },
-  "yiddish_f96986df": { "message": "Yiddish" }
+  "yiddish_f96986df": { "message": "Yiddish" },
+  "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
+    "message": "Pour effectuer un remplacement, téléchargez un nouveau fichier de sous-titres."
+  }
 }

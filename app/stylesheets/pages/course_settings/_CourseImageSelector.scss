@@ -30,7 +30,7 @@
   width: 100%;
 }
 
-.CourseImageSelectorWrapper{
+.CourseImageSelectorWrapper {
   position: relative;
   margin-bottom: $ic-sp;
   &:not(.wide) {
@@ -39,7 +39,7 @@
   }
   &.wide {
     max-width: 562px;
-    & > .CourseImageSelectorContent{
+    & > .CourseImageSelectorContent {
       // this gives the element a height of 20% of the width of its parent
       padding-bottom: 20%;
     }
@@ -58,15 +58,18 @@
   position: absolute;
   top: 6px;
   #{direction(right)}: 6px;
+  button:focus {
+    outline: 4px solid #fff;
+    outline-offset: 2px;
+  }
 }
 
 .CourseImagePicker {
   height: 100%;
 }
 
-
 .CourseImagePicker__Content {
-  margin: $ic-sp*2 $ic-sp*8;
+  margin: $ic-sp * 2 $ic-sp * 8;
 }
 
 .CourseImagePicker__Overlay {
@@ -98,7 +101,7 @@
 .DraggingOverlay__Icon {
   text-align: center;
   color: var(--ic-brand-primary);
-  @include overwrite-default-icon-size($ic-sp*8);
+  @include overwrite-default-icon-size($ic-sp * 8);
 }
 
 .DraggingOverlay__Instructions {
@@ -121,11 +124,11 @@
 .UploadArea__Icon {
   text-align: center;
   color: var(--ic-brand-primary);
-  @include overwrite-default-icon-size($ic-sp*3.5);
+  @include overwrite-default-icon-size($ic-sp * 3.5);
 }
 
 .UploadArea__Instructions {
-  margin-top: $ic-sp*0.5;
+  margin-top: $ic-sp * 0.5;
   text-align: center;
 }
 

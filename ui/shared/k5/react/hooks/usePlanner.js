@@ -21,7 +21,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {dateString, datetimeString, timeString} from '@canvas/datetime/date-functions'
 
 import apiUserContent from '@canvas/util/jquery/apiUserContent'
-import {initializePlanner} from '@instructure/canvas-planner'
+import {initializePlanner} from '@canvas/planner'
 import {showFlashAlert, showFlashError} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = useI18nScope('k5_use_planner')

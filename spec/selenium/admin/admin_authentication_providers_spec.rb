@@ -51,6 +51,47 @@ describe "Authentication Providers" do
           get "/accounts/#{Account.default.id}/authentication_providers"
           expect(f("#verify_tls_cert_opt_in_ldap")).to be_enabled
         end
+
+        context "with the dated help text enabled" do
+          before do
+            Setting.set("ldap_validate_tls_cert_help_text_format", "dated")
+            Setting.set("ldap_validate_tls_cert_enforcement_date", 1.week.from_now.to_i)
+          end
+
+          it "shows the correct help text" do
+            get "/accounts/#{Account.default.id}/authentication_providers"
+            element = f(".ldap-verify-tls-cert-opt-in-help-text")
+            expect(element.text).to start_with("TLS certificate verification will be required on")
+            expect(element.text).to end_with(", but you may enable it early to ensure your LDAP server is compliant.")
+          end
+
+          context "with a date not specified" do
+            before { Setting.set("ldap_validate_tls_cert_enforcement_date", nil) }
+
+            it "does not show help text" do
+              get "/accounts/#{Account.default.id}/authentication_providers"
+              expect(element_exists?(".ldap-verify-tls-cert-opt-in-help-text")).to be_falsey
+            end
+          end
+        end
+
+        context "with the undated help text enabled" do
+          before { Setting.set("ldap_validate_tls_cert_help_text_format", "undated") }
+
+          it "shows the correct help text" do
+            get "/accounts/#{Account.default.id}/authentication_providers"
+            expect(f(".ldap-verify-tls-cert-opt-in-help-text").text).to eq("TLS certificate verification will be required soon, but you may enable it early to ensure your LDAP server is compliant.")
+          end
+        end
+
+        context "with no help text enabled" do
+          before { Setting.set("ldap_validate_tls_cert_help_text_format", nil) }
+
+          it "does not show the help text" do
+            get "/accounts/#{Account.default.id}/authentication_providers"
+            expect(element_exists?(".ldap-verify-tls-cert-opt-in-help-text")).to be_falsey
+          end
+        end
       end
 
       context "with the feature flag enabled" do
@@ -59,6 +100,36 @@ describe "Authentication Providers" do
         it "does not allow the opt-in checkbox to be toggled" do
           get "/accounts/#{Account.default.id}/authentication_providers"
           expect(f("#verify_tls_cert_opt_in_ldap")).not_to be_enabled
+        end
+
+        context "with the dated help text enabled" do
+          before do
+            Setting.set("ldap_validate_tls_cert_help_text_format", "dated")
+            Setting.set("ldap_validate_tls_cert_enforcement_date", 1.week.from_now.to_i)
+          end
+
+          it "does not show the help text" do
+            get "/accounts/#{Account.default.id}/authentication_providers"
+            expect(element_exists?(".ldap-verify-tls-cert-opt-in-help-text")).to be_falsey
+          end
+        end
+
+        context "with the undated help text enabled" do
+          before { Setting.set("ldap_validate_tls_cert_help_text_format", "undated") }
+
+          it "does not show the help text" do
+            get "/accounts/#{Account.default.id}/authentication_providers"
+            expect(element_exists?(".ldap-verify-tls-cert-opt-in-help-text")).to be_falsey
+          end
+        end
+
+        context "with no help text enabled" do
+          before { Setting.set("ldap_validate_tls_cert_help_text_format", nil) }
+
+          it "does not show the help text" do
+            get "/accounts/#{Account.default.id}/authentication_providers"
+            expect(element_exists?(".ldap-verify-tls-cert-opt-in-help-text")).to be_falsey
+          end
         end
       end
     end

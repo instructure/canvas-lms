@@ -1,0 +1,114 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+ENV["BUNDLE_GEMFILE"] ||= File.expand_path("../Gemfile", __dir__)
+
+require "bundler"
+require "set"
+require "yaml"
+
+# parse the Gemfile, but don't actual set anything up
+# this ensures "base_gems" is valid
+Bundler.definition
+
+base_gems = Gem.loaded_specs.keys.to_set
+
+require "shellwords"
+
+output = `git status --porcelain --untracked=no`.strip
+unless output.empty?
+  warn "git status is not clean; please commit or stash your changes first"
+  exit 1
+end
+
+config = YAML.safe_load_file(File.expand_path("bundle_update_config.yml", __dir__))
+ignored_gems = config["ignored_gems"].to_set
+cohort_gems = config["cohort_gems"]
+
+explicit_dependencies = Bundler.definition.dependencies.to_set(&:name)
+reverse_dependencies = {}
+
+# infer "cohort" gems from the lockfile automatically
+Bundler.definition.specs.each do |spec|
+  spec.dependencies.each do |dep|
+    (reverse_dependencies[dep.name] ||= []) << spec.name
+  end
+end
+
+Bundler.definition.specs.each do |spec| # rubocop:disable Style/CombinableLoops
+  next if explicit_dependencies.include?(spec.name)
+
+  parent = spec.name
+  until explicit_dependencies.include?(parent)
+    parents = reverse_dependencies[parent]
+    if parents.length > 1
+      parent = nil
+      break
+    end
+    parent = parents.first
+  end
+
+  next unless parent
+
+  (cohort_gems[parent] ||= []) << spec.name
+end
+
+cohort_gems_inverse = {}
+cohort_gems.each do |parent_gem, child_gems|
+  child_gems.each do |child_gem|
+    (cohort_gems_inverse[child_gem] ||= []) << parent_gem
+  end
+end
+
+output = Bundler.with_unbundled_env { `bundle outdated --parseable` }
+output = output.split("\n").map(&:strip)
+
+gems_to_update = Set.new
+output.each do |line|
+  next if line.empty?
+
+  gem, details = line.split(" ", 2)
+  next if details.include?("requested = ") # exact requirements can't be updated
+
+  gems_to_update << gem
+end
+
+# only update "rails" if "activesupport" _and_ "rails" need updated
+gems_to_update.reject! { |gem, _| (parent_gems = cohort_gems_inverse[gem]) && gems_to_update.intersect?(parent_gems) }
+
+gems_to_update = gems_to_update.to_a
+
+until gems_to_update.empty?
+  parent_gem = nil
+  gem = gems_to_update.shift
+  # if "aws-sdk-core" and "aws-sdk-s3" need updated, do them together
+  if (parent_gems = cohort_gems_inverse[gem])
+    parent_gem = parent_gems.min_by { |g| -(cohort_gems[g] & gems_to_update).length }
+    sibling_gems = cohort_gems[parent_gem] & gems_to_update
+    if sibling_gems.empty?
+      parent_gem = nil
+    else
+      gems_to_update -= sibling_gems
+      gem = ([gem] + sibling_gems).join(" ")
+    end
+  end
+  next if ignored_gems.include?(gem)
+
+  puts "Updating #{parent_gem || gem}..."
+
+  system("bundle update #{gem} --quiet")
+
+  unless $?.success?
+    system("git reset --hard HEAD > #{IO::NULL}")
+    next
+  end
+
+  output = `git status --porcelain --untracked=no`.strip
+  # couldn't update; should have warned anyway
+  next if output.empty?
+
+  message = "bundle update #{parent_gem || gem}"
+  message += "\n\n!! this commit needs hotfixed, since it is a base gem" if base_gems.include?(gem)
+
+  `git commit -am #{Shellwords.escape(message)} 2> #{IO::NULL}`
+end

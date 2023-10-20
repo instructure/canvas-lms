@@ -40,6 +40,8 @@ QUnit.module('GradebookGrid TotalGradeCellFormatter', hooks => {
         ['D', 0.6],
         ['<b>F</b>', 0.0],
       ],
+      grading_standard_points_based: false,
+      grading_standard_scaling_factor: 1.0,
       show_total_grade_as_points: true,
     })
     sinon.stub(gradebook, 'getTotalPointsPossible').returns(10)
@@ -200,8 +202,9 @@ QUnit.module('GradebookGrid TotalGradeCellFormatter', hooks => {
   })
 
   test('does not render a letter grade when not using a grading standard', () => {
-    gradebook.options.grading_standard = null
+    sinon.stub(gradebook, 'getCourseGradingScheme').returns(null)
     strictEqual(renderCell().querySelector('.letter-grade-points'), null)
+    gradebook.getCourseGradingScheme.restore()
   })
 
   test('does not render a letter grade when the grade has zero points possible', () => {

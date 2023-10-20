@@ -78,12 +78,12 @@ module Calendar2Common
     rr = RRule::Rule.new(rrule, dtstart: start_at, tzid: Time.zone.tzinfo.name)
     event_attributes = { title:, rrule:, series_uuid: SecureRandom.uuid }
     dtstart_list = rr.all
-
-    dtstart_list.map do |dtstart|
+    dtstart_list.each_with_index do |dtstart, i|
       event_attributes["start_at"] = dtstart.iso8601
       event_attributes["end_at"] = (dtstart + duration).iso8601
       event_attributes["context_code"] = context.asset_string
       event = context.calendar_events.build(event_attributes)
+      event.series_head = true if i == 0
       event.updating_user = @teacher
       event.save!
     end
@@ -270,6 +270,7 @@ module Calendar2Common
   end
 
   def test_timed_calendar_event_in_tz(time_zone, start_time = "6:30 AM", end_time = "6:30 PM")
+    puts ">>> TZ #{time_zone}, #{Time.zone}"
     @user.time_zone = time_zone
     @user.save!
     @date = @user.time_zone.now.beginning_of_day
@@ -306,7 +307,7 @@ module Calendar2Common
     input_timed_calendar_event_fields(new_date, start_time, end_time)
     expect_new_page_load { edit_calendar_event_form_more_options.click }
     expect(more_options_date_field.property("value")).to eq(
-      format_date_for_view(new_date, "%Y-%m-%d")
+      format_date_for_view(new_date, :medium)
     )
     expect(more_options_start_time_field.property("value")).to eq(start_time)
     expect(more_options_end_time_field.property("value")).to eq(end_time)
@@ -572,15 +573,19 @@ module Calendar2Common
   end
 
   def edit_calendar_event_form_more_options
-    f("a[data-testid='edit-calendar-event-more-options-button']")
+    f("button[data-testid='edit-calendar-event-more-options-button']")
   end
 
   def edit_calendar_event_form_submit_button
     f("button[type='submit']")
   end
 
+  def more_options_title_field
+    f("#calendar_event_title")
+  end
+
   def more_options_date_field
-    f("input[placeHolder='Date']")
+    f("#calendar_event_date")
   end
 
   def more_options_start_time_field
@@ -597,6 +602,10 @@ module Calendar2Common
 
   def more_options_submit_button
     f("button[type='submit']")
+  end
+
+  def more_options_error_box
+    f(".errorBox:not(#error_box_template)")
   end
 
   def event_content

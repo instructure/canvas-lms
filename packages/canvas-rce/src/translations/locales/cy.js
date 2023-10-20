@@ -33,6 +33,7 @@ const locale = {
   "add_another_f4e50d57": { "message": "Ychwanegu un arall" },
   "add_cc_subtitles_55f0394e": { "message": "Ychwanegu CC/Is-deitlau" },
   "add_image_60b2de07": { "message": "Ychwanegu Delwedd" },
+  "add_one_9e34a6f8": { "message": "Ychwanegu un!" },
   "additional_considerations_f3801683": {
     "message": "Ystyriaethau ychwanegol"
   },
@@ -62,6 +63,7 @@ const locale = {
   },
   "and_7fcc2911": { "message": "A" },
   "angle_c5b4ec50": { "message": "Ongl" },
+  "announcement_fb4cb645": { "message": "Cyhoeddiad" },
   "announcement_list_da155734": { "message": "Rhestr Cyhoeddiadau" },
   "announcements_a4b8ed4a": { "message": "Cyhoeddiadau" },
   "apply_781a2546": { "message": "Rhoi ar waith" },
@@ -79,6 +81,7 @@ const locale = {
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Bydd y gymhareb agwedd yn cael ei chadw"
   },
+  "assignment_976578a8": { "message": "Aseiniad" },
   "assignments_1e02582c": { "message": "Aseiniadau" },
   "asterisk_82255584": { "message": "Seren" },
   "attributes_963ba262": { "message": "Priodoleddau" },
@@ -226,8 +229,12 @@ const locale = {
   "crop_image_807ebb08": { "message": "Tocio Delwedd" },
   "cup_product_14174434": { "message": "Cynnyrch Cwpan" },
   "current_image_f16c249c": { "message": "Delwedd Bresennol" },
+  "current_link_945a47ee": { "message": "Dolen Gyfredol" },
   "current_volume_level_c55ab825": { "message": "Lefel Sain Bresennol" },
   "custom_6979cd81": { "message": "Personol" },
+  "custom_width_and_height_pixels_946eea7c": {
+    "message": "Lled ac uchder personol (Picseli)"
+  },
   "cyan_c1d5f68a": { "message": "Cyan" },
   "dagger_57e0f4e5": { "message": "Cyllell" },
   "date_added_ed5ad465": { "message": "Dyddiad Ychwanegu" },
@@ -260,6 +267,7 @@ const locale = {
   "directionality_26ae9e08": { "message": "Cyfeirioldeb" },
   "directly_edit_latex_b7e9235b": { "message": "Golygu LaTeX yn Uniongyrchol" },
   "disable_preview_222bdf72": { "message": "Analluogi Rhagolwg" },
+  "discussion_6719c51d": { "message": "Trafodaeth" },
   "discussions_a5f96392": { "message": "Trafodaethau" },
   "discussions_index_6c36ced": { "message": "Mynegai Trafodaethau" },
   "disjoint_union_e74351a8": { "message": "Uniad Arwahan" },
@@ -574,6 +582,9 @@ const locale = {
   "light_blue_5374f600": { "message": "Glas golau" },
   "link_7262adec": { "message": "Dolen" },
   "link_options_a16b758b": { "message": "Opsiynau Dolen" },
+  "link_type_linktypemessage_c6d26815": {
+    "message": "math o ddolen: { linkTypeMessage }"
+  },
   "link_with_text_starting_with_start_b3fcbe71": {
     "message": "Dolen â thestun yn dechrau gyda { start }"
   },
@@ -636,6 +647,7 @@ const locale = {
   "minus_plus_3461f637": { "message": "Minws/Plws" },
   "misc_3b692ea7": { "message": "Amrywiol" },
   "miscellaneous_e9818229": { "message": "Amrywiol" },
+  "module_90d9fd32": { "message": "Modiwl" },
   "modules_c4325335": { "message": "Modiwlau" },
   "moving_image_to_crop_directionword_6f66cde2": {
     "message": "Wrthi’n symud delwedd i docio { directionWord }"
@@ -660,19 +672,51 @@ const locale = {
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Llywiwch trwy''r ddewislen neu''r bar offer"
   },
+  "navigation_ee9af92d": { "message": "Crwydro" },
   "nested_greater_than_d852e60d": { "message": "Nythu’n Fwy Na" },
   "nested_less_than_27d17e58": { "message": "Nythu’n Llai Na" },
+  "new_quiz_34aacba6": { "message": "Cwis Newydd" },
   "next_40e12421": { "message": "Nesaf" },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "Heb ganfod problemau o ran hygyrchedd."
   },
+  "no_announcements_created_yet_c44a94f4": {
+    "message": "Does dim cyhoeddiadau wedi’u creu eto."
+  },
+  "no_announcements_found_20185afc": {
+    "message": "Heb ddod o hyd i gyhoeddiadau."
+  },
+  "no_assignments_created_yet_1b236d87": {
+    "message": "Does dim aseiniadau wedi’u creu eto."
+  },
+  "no_assignments_found_79e46d7f": {
+    "message": "Heb ddod o hyd i aseiniadau."
+  },
   "no_changes_to_save_d29f6e91": { "message": "Dim newidiadau i’w cadw." },
+  "no_discussions_created_yet_ff99abe3": {
+    "message": "Does dim trafodaethau wedi’u creu eto."
+  },
+  "no_discussions_found_9284063b": {
+    "message": "Heb ddod o hyd i drafodaethau."
+  },
   "no_e16d9132": { "message": "Na" },
   "no_file_chosen_9a880793": { "message": "Dim ffeil wedi’i dewis" },
   "no_headers_9bc7dc7f": { "message": "Dim pennawd" },
+  "no_modules_created_yet_c71b6d4d": {
+    "message": "Does dim modiwlau wedi’u creu eto."
+  },
+  "no_modules_found_2df43a40": { "message": "Heb ddod o hyd i fodiwlau." },
+  "no_pages_created_yet_c379fa6e": {
+    "message": "Does dim tudalennau wedi’u creu eto."
+  },
+  "no_pages_found_6799350": { "message": "Heb ddod o hyd i dudalennau." },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "Does dim rhagolwg ar gael ar gyfer y ffeil hon."
   },
+  "no_quizzes_created_yet_1a2370b9": {
+    "message": "Does dim cwisiau wedi’u creu eto."
+  },
+  "no_quizzes_found_c80c537a": { "message": "Heb ddod o hyd i gwisiau." },
   "no_results_940393cf": { "message": "Dim canlyniadau." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Heb ddod o hyd i ganlyniadau ar gyfer { filterTerm }"
@@ -696,6 +740,9 @@ const locale = {
   "one_of_the_following_styles_must_be_added_to_save__1de769aa": {
     "message": "Rhaid ychwanegu un o’r arddulliau canlynol i gadw eicon: Lliw Eicon, Maint Amlinell, Testun Eicon, neu Ddelwedd"
   },
+  "one_or_more_files_failed_to_paste_please_try_uploa_7fa39dd3": {
+    "message": "Wedi methu gludo un neu ragor o ffeiliau i fyny. Rhowch gynnig ar lwytho i fyny neu lusgo a gollwng ffeiliau."
+  },
   "open_circle_e9bd069": { "message": "Cylch Agored" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "Agor y ddeialog bysellau hwylus"
@@ -715,6 +762,7 @@ const locale = {
   "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
     "message": "Dydy { p } ddim yn brotocol dilys, rhaid iddo fod yn ftp, http, https, mailto, skype, tel neu gellir ei hepgor"
   },
+  "page_50c4823d": { "message": "Tudalen" },
   "pages_e5414c2c": { "message": "Tudalennau" },
   "paragraph_5e5ad8eb": { "message": "Paragraff" },
   "paragraph_starting_with_start_a59923f8": {
@@ -774,6 +822,7 @@ const locale = {
   "pumpkin_904428d5": { "message": "Pumpkin" },
   "purple_7678a9fc": { "message": "Porffor" },
   "quaternions_877024e0": { "message": "Cwaternion" },
+  "quiz_e0dcce8f": { "message": "Cwis" },
   "quizzes_7e598f57": { "message": "Cwisiau" },
   "rational_numbers_80ddaa4a": { "message": "Rhifau Rhesymegol" },
   "real_numbers_7c99df94": { "message": "Rhifau Go Iawn" },
@@ -860,6 +909,7 @@ const locale = {
   "select_crop_shape_d441feeb": { "message": "Dewis siâp tocio" },
   "select_language_7c93a900": { "message": "Dewis Iaith" },
   "select_video_source_1b5c9dbe": { "message": "Dewiswch ffynonellau fideo" },
+  "selected_274ce24f": { "message": "Wedi dewis" },
   "selected_linkfilename_c093b1f2": {
     "message": "Wedi dewis { linkFileName }"
   },
@@ -1078,6 +1128,7 @@ const locale = {
     "message": "Saeth Croeslinol i fyny ac i’r dde"
   },
   "up_c553575d": { "message": "I Fyny" },
+  "updated_link_a827e441": { "message": "Dolen wedi’i diweddaru" },
   "upload_document_253f0478": { "message": "Llwytho Dogfen i fyny" },
   "upload_file_fd2361b8": { "message": "Llwytho Ffeil i Fyny" },
   "upload_image_6120b609": { "message": "Llwytho Delwedd i Fyny" },

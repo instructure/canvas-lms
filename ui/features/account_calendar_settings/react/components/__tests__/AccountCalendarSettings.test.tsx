@@ -62,11 +62,11 @@ describe('AccountCalendarSettings', () => {
 
   it('saves changes when clicking apply', async () => {
     fetchMock.put(/\/api\/v1\/accounts\/1\/account_calendars/, {message: 'Updated 1 account'})
-    const {findByText, getByText, findAllByText, getByTestId, getByRole} = render(
+    const {findByText, getByText, findAllByText, getByTestId, findAllByTestId} = render(
       <AccountCalendarSettings {...defaultProps} />
     )
-    expect(await findByText('University (25)')).toBeInTheDocument()
-    const universityCheckbox = getByRole('checkbox', {name: 'Show account calendar for University'})
+    expect(await findByText('University (5)')).toBeInTheDocument()
+    const universityCheckbox = (await findAllByTestId('account-calendar-checkbox-University'))[0]
     const applyButton = getByTestId('save-button')
     expect(applyButton).toBeDisabled()
     act(() => universityCheckbox.click())
@@ -78,7 +78,7 @@ describe('AccountCalendarSettings', () => {
 
   it('renders account tree when no filters are applied', async () => {
     const {findByText, getByTestId} = render(<AccountCalendarSettings {...defaultProps} />)
-    await findByText('University (25)')
+    await findByText('University (5)')
     expect(getByTestId('account-tree')).toBeInTheDocument()
   })
 
@@ -86,7 +86,7 @@ describe('AccountCalendarSettings', () => {
     const {findByText, queryByTestId, getByPlaceholderText} = render(
       <AccountCalendarSettings {...defaultProps} />
     )
-    await findByText('University (25)')
+    await findByText('University (5)')
     fetchMock.restore()
     fetchMock.get('/api/v1/accounts/1/account_calendars?search_term=elemen&filter=&per_page=20', [
       {
@@ -105,11 +105,6 @@ describe('AccountCalendarSettings', () => {
   })
 
   describe('auto subscription settings', () => {
-    beforeAll(() => {
-      window.ENV.FEATURES ||= {}
-      window.ENV.FEATURES.auto_subscribe_account_calendars = true
-    })
-
     beforeEach(() => {
       fetchMock.restore()
       fetchMock.get(/\/api\/v1\/accounts\/1\/visible_calendars_count.*/, RESPONSE_ACCOUNT_5.length)
@@ -197,20 +192,22 @@ describe('AccountCalendarSettings', () => {
       })
 
       it('calendar visibility changes', async () => {
-        const {findByText, getByRole} = render(<AccountCalendarSettings {...defaultProps} />)
-        expect(await findByText('University (25)')).toBeInTheDocument()
-        const universityCheckbox = getByRole('checkbox', {
-          name: 'Show account calendar for University',
-        })
+        const getUniversityCheckbox = () =>
+          getByRole('checkbox', {
+            name: 'Show account calendar for University',
+          })
 
-        act(() => universityCheckbox.click())
+        const {findByText, getByRole} = render(<AccountCalendarSettings {...defaultProps} />)
+        expect(await findByText('University (5)')).toBeInTheDocument()
+
+        act(() => getUniversityCheckbox().click())
 
         const event = new Event('beforeunload')
         event.preventDefault = jest.fn()
         window.dispatchEvent(event)
         expect(event.preventDefault).toHaveBeenCalled()
 
-        act(() => universityCheckbox.click())
+        act(() => getUniversityCheckbox().click())
 
         event.preventDefault = jest.fn()
         window.dispatchEvent(event)
@@ -221,7 +218,7 @@ describe('AccountCalendarSettings', () => {
         const {findByText, getByText, getAllByTestId} = render(
           <AccountCalendarSettings {...defaultProps} />
         )
-        expect(await findByText('University (25)')).toBeInTheDocument()
+        expect(await findByText('University (5)')).toBeInTheDocument()
 
         act(() => getAllByTestId('subscription-dropdown')[0].click())
         act(() => getByText('Auto subscribe').click())

@@ -2,7 +2,7 @@ PATH
   remote: ../canvas_http
   specs:
     canvas_http (1.0.0)
-      multipart
+      legacy_multipart
 
 PATH
   remote: ../canvas_slug
@@ -11,9 +11,9 @@ PATH
       swearjar (~> 1.4)
 
 PATH
-  remote: ../multipart
+  remote: ../legacy_multipart
   specs:
-    multipart (0.0.1)
+    legacy_multipart (0.0.1)
       canvas_slug
       mime-types (~> 3.2)
 
@@ -27,50 +27,61 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    activesupport (7.0.4.3)
+    activesupport (7.0.8)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 1.6, < 2)
       minitest (>= 5.1)
       tzinfo (~> 2.0)
-    addressable (2.8.1)
+    addressable (2.8.5)
       public_suffix (>= 2.0.2, < 6.0)
     aes_key_wrap (1.1.0)
-    bindata (2.4.14)
+    base64 (0.1.1)
+    bindata (2.4.15)
     concurrent-ruby (1.2.2)
     crack (0.4.5)
       rexml
     diff-lcs (1.5.0)
+    faraday (2.7.11)
+      base64
+      faraday-net_http (>= 2.0, < 3.1)
+      ruby2_keywords (>= 0.0.4)
+    faraday-follow_redirects (0.3.0)
+      faraday (>= 1, < 3)
+    faraday-net_http (3.0.2)
     hashdiff (1.0.1)
     i18n (1.14.1)
       concurrent-ruby (~> 1.0)
-    json-jwt (1.13.0)
+    json-jwt (1.16.3)
       activesupport (>= 4.2)
       aes_key_wrap
       bindata
-    mime-types (3.3.1)
+      faraday (~> 2.0)
+      faraday-follow_redirects
+    mime-types (3.5.1)
       mime-types-data (~> 3.2015)
-    mime-types-data (3.2023.0218.1)
-    minitest (5.18.0)
-    public_suffix (5.0.1)
+    mime-types-data (3.2023.0808)
+    minitest (5.20.0)
+    public_suffix (5.0.3)
     rake (13.0.6)
-    rexml (3.2.5)
+    rexml (3.2.6)
     rspec (3.12.0)
       rspec-core (~> 3.12.0)
       rspec-expectations (~> 3.12.0)
       rspec-mocks (~> 3.12.0)
-    rspec-core (3.12.1)
+    rspec-core (3.12.2)
       rspec-support (~> 3.12.0)
-    rspec-expectations (3.12.2)
+    rspec-expectations (3.12.3)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.12.0)
-    rspec-mocks (3.12.5)
+    rspec-mocks (3.12.6)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.12.0)
-    rspec-support (3.12.0)
+    rspec-support (3.12.1)
+    ruby2_keywords (0.0.5)
     swearjar (1.4.0)
-    tzinfo (2.0.4)
+    tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
-    webmock (3.18.1)
+    webmock (3.19.1)
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)
@@ -78,6 +89,7 @@ GEM
 PLATFORMS
   aarch64-linux
   arm64-darwin
+  ruby
   x86_64-darwin
   x86_64-linux
 
@@ -86,10 +98,10 @@ DEPENDENCIES
   canvas_http!
   canvas_panda_pub!
   canvas_slug!
-  multipart!
+  legacy_multipart!
   rake
   rspec (~> 3.0)
   webmock (~> 3.0)
 
 BUNDLED WITH
-   2.3.26
+   2.4.19

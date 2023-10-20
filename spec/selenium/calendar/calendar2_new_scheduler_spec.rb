@@ -19,10 +19,12 @@
 
 require_relative "../common"
 require_relative "../helpers/scheduler_common"
+require_relative "pages/calendar_page"
 
 describe "scheduler" do
   include_context "in-process server selenium tests"
   include SchedulerCommon
+  include CalendarPage
 
   context "find appointment mode as a student" do
     before :once do
@@ -116,8 +118,8 @@ describe "scheduler" do
       f(".fc-event.scheduler-event").click
       wait_for_ajaximations
       f(".unreserve_event_link").click
-      expect(f("#delete_event_dialog")).to be_present
-      f(".ui-dialog-buttonset .btn-primary").click
+
+      click_delete_confirm_button
       # save the changes so the appointment object is updated
       @app1.save!
       expect(@app1.appointments.first.workflow_state).to eq("active")

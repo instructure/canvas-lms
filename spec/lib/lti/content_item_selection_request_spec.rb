@@ -72,8 +72,7 @@ describe Lti::ContentItemSelectionRequest do
       let(:domain) { "www.example-beta.com" }
 
       before do
-        allow(ApplicationController).to receive(:test_cluster?).and_return(true)
-        allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
+        allow(ApplicationController).to receive_messages(test_cluster?: true, test_cluster_name: "beta")
         Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
 
         tool.settings[:environments] = {
@@ -352,17 +351,18 @@ describe Lti::ContentItemSelectionRequest do
 
     it "generates default_lti_params" do
       root_account.lti_guid = "account_guid"
-      I18n.locale = :de
 
-      params = described_class.default_lti_params(course, root_account)
-      expect(params).to include({
-                                  context_id: "course_opaque_id",
-                                  tool_consumer_instance_guid: "account_guid",
-                                  roles: "urn:lti:sysrole:ims/lis/None",
-                                  launch_presentation_locale: "de",
-                                  launch_presentation_document_target: "iframe",
-                                  ext_roles: "urn:lti:sysrole:ims/lis/None"
-                                })
+      I18n.with_locale(:de) do
+        params = described_class.default_lti_params(course, root_account)
+        expect(params).to include({
+                                    context_id: "course_opaque_id",
+                                    tool_consumer_instance_guid: "account_guid",
+                                    roles: "urn:lti:sysrole:ims/lis/None",
+                                    launch_presentation_locale: "de",
+                                    launch_presentation_document_target: "iframe",
+                                    ext_roles: "urn:lti:sysrole:ims/lis/None"
+                                  })
+      end
     end
 
     it "adds user information when a user is provided" do

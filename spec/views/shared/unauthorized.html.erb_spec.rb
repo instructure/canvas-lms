@@ -26,5 +26,17 @@ describe "shared/unauthorized" do
     view_context
     render "shared/unauthorized"
     expect(response).not_to be_nil
+    page = Nokogiri(response.body)
+    expect(page.css("h1").first).not_to be_nil
+  end
+
+  it "renders embedded with proper headers" do
+    course_with_student
+    view_context
+    controller.request.query_parameters[:embedded] = true
+    render "shared/unauthorized"
+    page = Nokogiri(response.body)
+    expect(page.css("h3").first).not_to be_nil
+    expect(page.css("h1").first).to be_nil
   end
 end

@@ -198,12 +198,14 @@ RSpec.shared_examples "DiscussionType" do
   it "queries the attribute" do
     expect(discussion_type.resolve("title")).to eq discussion.title
     expect(discussion_type.resolve("anonymousState")).to eq discussion.anonymous_state
+    expect(discussion_type.resolve("podcastEnabled")).to eq discussion.podcast_enabled
     expect(discussion_type.resolve("podcastHasStudentPosts")).to eq discussion.podcast_has_student_posts
     expect(discussion_type.resolve("discussionType")).to eq discussion.discussion_type
     expect(discussion_type.resolve("position")).to eq discussion.position
     expect(discussion_type.resolve("allowRating")).to eq discussion.allow_rating
     expect(discussion_type.resolve("onlyGradersCanRate")).to eq discussion.only_graders_can_rate
     expect(discussion_type.resolve("sortByRating")).to eq discussion.sort_by_rating
+    expect(discussion_type.resolve("todoDate")).to eq discussion.todo_date
     expect(discussion_type.resolve("isSectionSpecific")).to eq discussion.is_section_specific
 
     expect(discussion_type.resolve("rootTopic { _id }")).to eq discussion.root_topic_id&.to_s
@@ -675,7 +677,7 @@ describe Types::DiscussionType do
 
     describe "mentionable users connection" do
       it "finds lists the user" do
-        expect(discussion_type.resolve("mentionableUsersConnection { nodes { _id } }")).to eq(discussion.context.users.map(&:id).map(&:to_s))
+        expect(discussion_type.resolve("mentionableUsersConnection { nodes { _id } }")).to eq(discussion.context.users.map { |u| u.id.to_s })
       end
     end
 
@@ -751,7 +753,7 @@ describe Types::DiscussionType do
 
     describe "mentionable users connection" do
       it "finds lists the user" do
-        expect(discussion_type.resolve("mentionableUsersConnection { nodes { _id } }")).to eq(discussion.context.participating_users_in_context.map(&:id).map(&:to_s))
+        expect(discussion_type.resolve("mentionableUsersConnection { nodes { _id } }")).to eq(discussion.context.participating_users_in_context.map { |u| u.id.to_s })
       end
     end
   end

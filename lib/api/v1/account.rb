@@ -62,12 +62,14 @@ module Api::V1::Account
           hash["terms_required"] = account.terms_required?
           hash["terms_of_use_url"] = terms_of_use_url
           hash["privacy_policy_url"] = privacy_policy_url
-          hash["recaptcha_key"] = account.self_registration_captcha? && DynamicSettings.find(tree: :private)["recaptcha_client_key"]
+          hash["recaptcha_key"] = account.self_registration_captcha? && DynamicSettings.find(tree: :private)["recaptcha_client_key", failsafe: nil]
         end
       end
       if includes.include?("services") && account.grants_right?(user, session, :manage_account_settings)
         hash["services"] = Account.services_exposed_to_ui_hash(nil, user, account).keys.index_with { |k| account.service_enabled?(k) }
       end
+
+      hash["global_id"] = account.global_id if includes.include?("global_id")
 
       Api::V1::Account.extensions.each do |extension|
         hash = extension.extend_account_json(hash, account, user, session, includes)

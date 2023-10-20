@@ -36,10 +36,12 @@
       <span class="screenreader-only">{{#t}}Retry duplicating "{{original_assignment_name}}"{{/t}}</span>
       <span aria-hidden="true">{{#t}}Retry{{/t}}</span>
     </button>
+    {{#unless isMasterCourseChildContent}}
     <button class="duplicate-failed-cancel btn">
       <span class="screenreader-only">{{#t}}Cancel duplicating "{{original_assignment_name}}"{{/t}}</span>
       <span aria-hidden="true">{{#t}}Cancel{{/t}}</span>
     </button>
+    {{/unless}}
   </div>
 {{else}} {{#if isImporting}}
   <div class="ig-row__layout">

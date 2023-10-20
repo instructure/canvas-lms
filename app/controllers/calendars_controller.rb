@@ -32,13 +32,23 @@ class CalendarsController < ApplicationController
       c.grants_right?(@current_user, session, :manage_calendar)
     end.map(&:asset_string)
     @feed_url = feeds_calendar_url((@context_enrollment || @context).feed_code)
+
+    @account_calendar_events_seen = @current_user.get_preference(:account_calendar_events_seen)
+    @viewed_auto_subscribed_account_calendars = @current_user.get_preference(:viewed_auto_subscribed_account_calendars) || []
     @selected_contexts = if params[:include_contexts]
                            params[:include_contexts].split(",")
                          else
+                           viewed_auto_sub_cal_asset_strings = @current_user.all_account_calendars.select { |c| @viewed_auto_subscribed_account_calendars.include? c.global_id }.pluck(:asset_string)
+                           all_auto_sub_cals = @current_user.all_account_calendars.select { |c| c[:account_calendar_subscription_type] == "auto" }.pluck(:asset_string)
+                           unseen_auto_sub_cals = all_auto_sub_cals - viewed_auto_sub_cal_asset_strings
+                           current_user_selected_cals = @current_user.get_preference(:selected_calendar_contexts)
+                           unless current_user_selected_cals.nil?
+                             current_user_selected_cals = Array(current_user_selected_cals)
+                             @current_user.set_preference(:selected_calendar_contexts, ((current_user_selected_cals || []) + unseen_auto_sub_cals).uniq)
+                           end
                            @current_user.get_preference(:selected_calendar_contexts)
                          end
-    @account_calendar_events_seen = @current_user.get_preference(:account_calendar_events_seen)
-    @viewed_auto_subscribed_account_calendars = @current_user.get_preference(:viewed_auto_subscribed_account_calendars) || []
+
     # somewhere there's a bad link that doesn't separate parameters properly.
     # make sure we don't do a find on a non-numeric id.
     if params[:event_id] && params[:event_id] =~ Api::ID_REGEX && (event = CalendarEvent.where(id: params[:event_id]).first) && event.start_at
@@ -89,6 +99,9 @@ class CalendarsController < ApplicationController
         default_due_time: context.is_a?(Course) && context.default_due_time,
         can_view_context: context.grants_right?(@current_user, session, :read)
       }
+      if context.is_a?(Course)
+        info[:course_conclude_at] = context.restrict_enrollments_to_course_dates ? context.conclude_at : context.enrollment_term.end_at
+      end
       if context.respond_to?(:course_sections) && !context.is_a?(Account)
         info[:course_sections] = context.course_sections.active.pluck(:id, :name).map do |id, name|
           hash = { id:, asset_string: "course_section_#{id}", name: }
@@ -112,7 +125,7 @@ class CalendarsController < ApplicationController
           MAX_NAME_LENGTH: max_name_length,
           DUE_DATE_REQUIRED_FOR_ACCOUNT: due_date_required_for_account
         }
-      elsif (context.is_a? Account) && Account.site_admin.feature_enabled?(:auto_subscribe_account_calendars)
+      elsif context.is_a? Account
         info[:auto_subscribe] = context.account_calendar_subscription_type == "auto"
         info[:viewed_auto_subscribed_account_calendars] = @viewed_auto_subscribed_account_calendars.include?(context.global_id)
       end
@@ -122,7 +135,7 @@ class CalendarsController < ApplicationController
       info
     end
     # NOTE: which account calendars the user will have now seen
-    @current_user.set_preference(:viewed_auto_subscribed_account_calendars, @contexts.select { |c| c.class.to_s.downcase == "account" }.map(&:global_id))
+    @current_user.set_preference(:viewed_auto_subscribed_account_calendars, @contexts.select { |c| c.class.to_s.downcase == "account" && c.account_calendar_subscription_type == "auto" }.map(&:global_id))
 
     StringifyIds.recursively_stringify_ids(@contexts_json)
     content_for_head helpers.auto_discovery_link_tag(:atom, @feed_url + ".atom", { title: t(:feed_title, "Course Calendar Atom Feed") })

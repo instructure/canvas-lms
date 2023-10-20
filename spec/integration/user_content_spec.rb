@@ -38,8 +38,7 @@ describe "User Content" do
     end
 
     it "allows object_snippet if there is no safefiles domain configured" do
-      allow(HostUrl).to receive(:default_host).and_return("canvas.example.com")
-      allow(HostUrl).to receive(:file_host).and_return("canvas.example.com")
+      allow(HostUrl).to receive_messages(default_host: "canvas.example.com", file_host: "canvas.example.com")
 
       obj_data = "<div>test</div>"
       snippet = Base64.encode64 obj_data

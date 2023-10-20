@@ -58,8 +58,17 @@ module UserSearch
     end
 
     def scope_for(context, searcher, options = {})
-      users_scope = context_scope(context, searcher, options.slice(:enrollment_state, :include_inactive_enrollments, :enrollment_role_id, :ui_invoked))
-      users_scope = roles_scope(users_scope, context, options.slice(:enrollment_role, :enrollment_role_id, :enrollment_type, :exclude_groups, :ui_invoked))
+      users_scope = context_scope(context, searcher, options.slice(:enrollment_state,
+                                                                   :include_inactive_enrollments,
+                                                                   :enrollment_role_id,
+                                                                   :ui_invoked))
+      users_scope = roles_scope(users_scope, context, options.slice(:enrollment_role,
+                                                                    :enrollment_role_id,
+                                                                    :enrollment_type,
+                                                                    :exclude_groups,
+                                                                    :ui_invoked,
+                                                                    :temporary_enrollment_recipients,
+                                                                    :temporary_enrollment_providers))
       order_scope(users_scope, context, options.slice(:order, :sort))
     end
 
@@ -162,6 +171,22 @@ module UserSearch
 
       if exclude_groups
         users_scope = users_scope.where(Group.not_in_group_sql_fragment(exclude_groups))
+      end
+
+      if context.is_a?(Account) && !enrollment_types && context.root_account&.feature_enabled?(:temporary_enrollments)
+        users_scope =
+          if options[:temporary_enrollment_recipients] && options[:temporary_enrollment_providers]
+            recipient_ids = Enrollment.temporary_enrollment_recipients_for_provider(users_scope).pluck(:user_id)
+            provider_ids = Enrollment.temporary_enrollments_for_recipient(users_scope).pluck(:temporary_enrollment_source_user_id)
+            users_scope.where(id: (recipient_ids + provider_ids))
+          elsif options[:temporary_enrollment_recipients]
+            users_scope.where(id: Enrollment.temporary_enrollment_recipients_for_provider(users_scope).select(:user_id))
+          elsif options[:temporary_enrollment_providers]
+            users_scope.where(id: Enrollment.temporary_enrollments_for_recipient(users_scope)
+                       .select(:temporary_enrollment_source_user_id))
+          else
+            users_scope
+          end
       end
 
       users_scope

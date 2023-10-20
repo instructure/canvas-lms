@@ -20,6 +20,9 @@
 import $ from 'jquery'
 import axios from '@canvas/axios'
 import parseLinkHeader from 'link-header-parsing/parseLinkHeader'
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('react_developer_keys')
 
 const actions: any = {}
 
@@ -502,10 +505,19 @@ actions.saveLtiToolConfiguration =
         dispatch(actions.listDeveloperKeysPrepend(newKey))
         return response.data
       })
-      .catch(error => {
+      .catch(err => {
+        const errors = err.response.data.errors
+        for (const error of errors) {
+          const {field, message} = error
+          if (field === 'configuration') {
+            const title = I18n.t('Configuration error')
+            $.flashError(`${title}: ${message}`)
+          } else {
+            $.flashError(error.message)
+          }
+        }
         dispatch(actions.setEditingDeveloperKey(false))
-        $.flashError(error.message)
-        throw error
+        throw err
       })
   }
 
@@ -535,8 +547,18 @@ actions.updateLtiKey = (
     .then(data => {
       return data.data
     })
-    .catch(error => {
-      $.flashError(error.message)
+    .catch(err => {
+      const errors = err.response.data.errors
+      for (const error of errors) {
+        const {field, message} = error
+        if (field === 'configuration') {
+          const title = I18n.t('Configuration error')
+          $.flashError(`${title}: ${message}`)
+        } else {
+          $.flashError(error.message)
+        }
+      }
+      throw err
     })
 }
 

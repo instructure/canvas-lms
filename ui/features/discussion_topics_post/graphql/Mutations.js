@@ -133,7 +133,6 @@ export const CREATE_DISCUSSION_ENTRY = gql`
     $message: String!
     $parentEntryId: ID
     $fileId: ID
-    $includeReplyPreview: Boolean
     $isAnonymousAuthor: Boolean
     $courseID: String
     $quotedEntryId: ID
@@ -144,7 +143,6 @@ export const CREATE_DISCUSSION_ENTRY = gql`
         message: $message
         parentEntryId: $parentEntryId
         fileId: $fileId
-        includeReplyPreview: $includeReplyPreview
         isAnonymousAuthor: $isAnonymousAuthor
         quotedEntryId: $quotedEntryId
       }

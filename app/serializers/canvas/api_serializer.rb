@@ -111,11 +111,9 @@ module Canvas
       @controller.send(:stringify_json_ids?)
     end
 
-    # Overriding to allow for "links" hash.
+    # Overriding to build the "links" hash how we want.
     # You should probably NOT override this method in your own serializer.
-    # This will be going away once ActiveModel::Serializer has support for
-    # the "links" style.
-    def associations
+    def associations(options = {})
       associations = self.class._associations
       included_associations = filter(associations.keys)
       associations.each_with_object({}) do |(name, association), hash|
@@ -124,10 +122,10 @@ module Canvas
             hash["links"] ||= {}
             hash["links"][association.name] = serialize_ids association
           elsif association.embed_objects? && association.embed_in_root?
-            hash[association.embedded_key] = build_serializer(association).serializable_object
+            hash[association.embedded_key] = serialize association, options
           elsif association.embed_objects?
             hash["links"] ||= {}
-            hash["links"][association.embedded_key] = serialize association
+            hash["links"][association.embedded_key] = serialize association, options
           end
         end
       end

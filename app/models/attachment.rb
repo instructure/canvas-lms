@@ -81,7 +81,7 @@ class Attachment < ActiveRecord::Base
   include ContextModuleItem
   include SearchTermHelper
   include MasterCourses::Restrictor
-  restrict_columns :content, [:display_name, :uploaded_data]
+  restrict_columns :content, %i[display_name uploaded_data media_track_content]
   restrict_columns :settings, %i[folder_id locked lock_at unlock_at usage_rights_id]
   restrict_columns :state, [:locked, :file_state]
 
@@ -118,7 +118,6 @@ class Attachment < ActiveRecord::Base
   has_one :group_and_membership_importer, inverse_of: :attachment
   has_one :media_object
   belongs_to :media_object_by_media_id, class_name: "MediaObject", primary_key: :media_id, foreign_key: :media_entry_id, inverse_of: :attachments_by_media_id
-  belongs_to :active_media_object_by_media_id, -> { where.not(workflow_state: "deleted") }, class_name: "MediaObject", primary_key: :media_id, foreign_key: :media_entry_id, inverse_of: :active_attachments_by_media_id
   has_many :media_tracks, dependent: :destroy
   has_many :submission_draft_attachments, inverse_of: :attachment
   has_many :submissions, -> { active }
@@ -136,14 +135,13 @@ class Attachment < ActiveRecord::Base
   belongs_to :usage_rights
   has_many :canvadocs_annotation_contexts, inverse_of: :attachment
   has_many :discussion_entry_drafts, inverse_of: :attachment
+  has_one :master_content_tag, class_name: "MasterCourses::MasterContentTag", inverse_of: :attachment
 
   before_save :set_root_account_id
   before_save :infer_display_name
   before_save :truncate_display_name
   before_save :default_values
   before_save :set_need_notify
-
-  after_save :set_word_count
 
   before_validation :assert_attachment
   acts_as_list scope: :folder
@@ -359,9 +357,9 @@ class Attachment < ActiveRecord::Base
       MediaTrack.select("*, ROW_NUMBER() OVER(PARTITION BY media_tracks_all.locale, media_tracks_all.media_object_id ORDER BY media_tracks_all.rank) AS row")
         .from(<<~SQL.squish),
           (
-            #{MediaTrack.select("*, 0 AS rank, attachment_id AS for_att_id").where(attachment_id: attachment_ids).to_sql}
+            #{MediaTrack.select("*, 0 AS rank, attachment_id AS for_att_id, false AS inherited").where(attachment_id: attachment_ids).to_sql}
             UNION
-            #{MediaTrack.select("media_tracks.*, 1 AS rank, attachments_by_media_ids_media_objects.id AS for_att_id")
+            #{MediaTrack.select("media_tracks.*, 1 AS rank, attachments_by_media_ids_media_objects.id AS for_att_id, true AS inherited")
               .joins(media_object: [:attachment, :attachments_by_media_id])
               .where("media_tracks.attachment_id = attachments.id")
               .where(media_objects: { attachments_by_media_ids_media_objects: { id: attachment_ids } }).to_sql}
@@ -607,7 +605,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def set_word_count
-    if word_count.nil? && !deleted? && file_state != "broken"
+    if word_count.nil? && !deleted? && file_state != "broken" && word_count_supported?
       delay(singleton: "attachment_set_word_count_#{global_id}").update_word_count
     end
   end
@@ -1424,11 +1422,36 @@ class Attachment < ActiveRecord::Base
     @associated_with_submission ||= attachment_associations.where(context_type: "Submission").exists?
   end
 
+  def can_read_through_assignment?(user, session)
+    return false unless assignment
+    return true if user && user.id == user_id
+
+    # grader
+    return true if assignment.grants_right?(user, session, :grade)
+
+    # submitter
+    assignment.shard.activate do
+      student_submission = assignment.submissions.active.where(user_id: user)
+      student_submission.where("#{id}=any(regexp_split_to_array(nullif(submissions.attachment_ids,''), ',')::INT8[])")
+                        .union(
+                          student_submission.joins(:versions)
+                            .where(%(#{id}=any(regexp_split_to_array((regexp_match(versions.yaml,'attachment_ids: [''"]([0-9,]+)[''"]'))[1], ',')::INT8[])))
+                        )
+                        .union(
+                          student_submission.joins(:submission_comments)
+                            .merge(SubmissionComment.published.visible)
+                            .where("#{id}=any(regexp_split_to_array(nullif(submission_comments.attachment_ids,''), ',')::INT8[])")
+                        ).exists?
+    end
+  end
+
   def user_can_read_through_context?(user, session, through_assessment: true)
     return true if through_assessment && context.is_a?(AssessmentQuestion) && context.user_can_see_through_quiz_question?(user, session)
 
     if supports_visibility?
       context&.grants_right?(user, session, :read_as_member) || context.try(:unenrolled_user_can_read?, user, computed_visibility_level)
+    elsif context.is_a?(Assignment)
+      can_read_through_assignment?(user, session)
     else
       context&.grants_right?(user, session, :read)
     end
@@ -1687,8 +1710,8 @@ class Attachment < ActiveRecord::Base
   end
 
   def self.batch_destroy(attachments)
-    ContentTag.active.where(content_type: "Attachment", content_id: attachments)
-              .union(ContentTag.active.where(context_type: "Attachment", context_id: attachments))
+    ContentTag.not_deleted.where(content_type: "Attachment", content_id: attachments)
+              .union(ContentTag.not_deleted.where(context_type: "Attachment", context_id: attachments))
               .find_each(&:destroy)
     while MediaObject.where(attachment_id: attachments).limit(1000).update_all(attachment_id: nil, updated_at: Time.now.utc) > 0 do end
     # if the attachment being deleted belongs to a user and the uuid (hash of file) matches the avatar_image_url
@@ -1933,6 +1956,7 @@ class Attachment < ActiveRecord::Base
     self.file_state = "available"
     if save
       handle_duplicates(:rename)
+      folder&.restore
     end
     true
   end
@@ -2218,11 +2242,12 @@ class Attachment < ActiveRecord::Base
 
   class << self
     def clone_url_strand_overrides
-      @clone_url_strand_overrides ||= YAML.safe_load(DynamicSettings.find(tree: :private)["clone_url_strand.yml"] || "{}")
+      @clone_url_strand_overrides ||= YAML.safe_load(DynamicSettings.find(tree: :private)["clone_url_strand.yml", failsafe_cache: Rails.root.join("config")] || "{}")
     end
 
     def reset_clone_url_strand_overrides
       @clone_url_strand_overrides = nil
+      clone_url_strand_overrides
     end
     Canvas::Reloader.on_reload { Attachment.reset_clone_url_strand_overrides }
 

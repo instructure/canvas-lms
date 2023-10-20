@@ -41,6 +41,8 @@ class Progress < ActiveRecord::Base
   serialize :results
   attr_reader :total
 
+  scope :is_pending, -> { where(workflow_state: ["queued", "running"]) }
+
   include Workflow
   workflow do
     state :queued do

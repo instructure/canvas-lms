@@ -31,8 +31,10 @@
 
 require "inst-jobs"
 require "canvas_errors/job_info"
+require "code_ownership"
 
 module CanvasErrors
+  DEFAULT_TEAM = "unknown"
   # register something to happen on every exception that occurs.
   #
   # The parameter is a unique key for this callback, which is
@@ -76,7 +78,7 @@ module CanvasErrors
     end
     job_info = check_for_job_context
     request_info = check_for_request_context
-    error_info = job_info.deep_merge(request_info).deep_merge(wrap_in_extra(data))
+    error_info = team_context(exception).deep_merge(job_info.deep_merge(request_info).deep_merge(wrap_in_extra(data)))
     run_callbacks(exception, error_info, level)
   end
 
@@ -104,6 +106,22 @@ module CanvasErrors
   def self.check_for_job_context
     job = Delayed::Worker.current_job
     job ? CanvasErrors::JobInfo.new(job, nil).to_h : {}
+  end
+
+  def self.find_team_for_exception(exception)
+    CodeOwnership.for_backtrace(exception.backtrace)&.name
+  rescue
+    # As a failsafe, return the unknown team
+    DEFAULT_TEAM
+  end
+
+  # Return the current team tag (or default 'unknown') to include in Canvas Errors
+  def self.team_context(exception)
+    {
+      tags: {
+        "inst.team" => find_team_for_exception(exception) || DEFAULT_TEAM
+      }
+    }
   end
 
   def self.run_callbacks(exception, extra, level = :error)

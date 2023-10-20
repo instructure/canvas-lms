@@ -33,6 +33,7 @@ const locale = {
   "add_another_f4e50d57": { "message": "Legg til en annen" },
   "add_cc_subtitles_55f0394e": { "message": "Legg til CC/Undertekst" },
   "add_image_60b2de07": { "message": "Legg til bilde" },
+  "add_one_9e34a6f8": { "message": "Legg til en!" },
   "additional_considerations_f3801683": { "message": "Ekstra hensyn" },
   "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
     "message": "Lenker ved siden av hverandre med samme URL bør være samme lenke."
@@ -60,6 +61,7 @@ const locale = {
   },
   "and_7fcc2911": { "message": "Og" },
   "angle_c5b4ec50": { "message": "Vinkel" },
+  "announcement_fb4cb645": { "message": "Beskjed" },
   "announcement_list_da155734": { "message": "Beskjedsliste" },
   "announcements_a4b8ed4a": { "message": "Beskjeder" },
   "apply_781a2546": { "message": "Bruk" },
@@ -77,6 +79,7 @@ const locale = {
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Dimensjonene vil bli bevart"
   },
+  "assignment_976578a8": { "message": "Oppgave" },
   "assignments_1e02582c": { "message": "Oppgaver" },
   "asterisk_82255584": { "message": "Stjerne" },
   "attributes_963ba262": { "message": "Attributter" },
@@ -216,8 +219,12 @@ const locale = {
   "crop_image_807ebb08": { "message": "Beskjær bilde" },
   "cup_product_14174434": { "message": "Kopp-produkt" },
   "current_image_f16c249c": { "message": "Nåværende bilde" },
+  "current_link_945a47ee": { "message": "Gjeldende lenke" },
   "current_volume_level_c55ab825": { "message": "Gjeldende volumnivå" },
   "custom_6979cd81": { "message": "Tilpasset" },
+  "custom_width_and_height_pixels_946eea7c": {
+    "message": "Egendefinert bredde og høyde (piksler)"
+  },
   "cyan_c1d5f68a": { "message": "Cyan" },
   "dagger_57e0f4e5": { "message": "Dolk" },
   "date_added_ed5ad465": { "message": "Lagt til dato" },
@@ -250,6 +257,7 @@ const locale = {
   "directionality_26ae9e08": { "message": "Retning" },
   "directly_edit_latex_b7e9235b": { "message": "Rediger LaTex direkte" },
   "disable_preview_222bdf72": { "message": "Deaktiver forhåndsvisning" },
+  "discussion_6719c51d": { "message": "Diskusjon" },
   "discussions_a5f96392": { "message": "Diskusjoner" },
   "discussions_index_6c36ced": { "message": "Diskusjonsindeks" },
   "disjoint_union_e74351a8": { "message": "Usammenhengende union" },
@@ -558,6 +566,9 @@ const locale = {
   "light_blue_5374f600": { "message": "Lyseblå" },
   "link_7262adec": { "message": "Lenke" },
   "link_options_a16b758b": { "message": "Lenkevalg" },
+  "link_type_linktypemessage_c6d26815": {
+    "message": "lenketype: { linkTypeMessage }"
+  },
   "link_with_text_starting_with_start_b3fcbe71": {
     "message": "Lenke med tekst som starter med { start }"
   },
@@ -618,6 +629,7 @@ const locale = {
   "minus_plus_3461f637": { "message": "Minus/pluss" },
   "misc_3b692ea7": { "message": "Diverse" },
   "miscellaneous_e9818229": { "message": "Diverse" },
+  "module_90d9fd32": { "message": "Modul" },
   "modules_c4325335": { "message": "Moduler" },
   "moving_image_to_crop_directionword_6f66cde2": {
     "message": "Flytter bilde for å beskjære { directionWord }"
@@ -642,19 +654,43 @@ const locale = {
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navigere gjennom menyen eller verktøylinjen"
   },
+  "navigation_ee9af92d": { "message": "Navigasjon" },
   "nested_greater_than_d852e60d": { "message": "Nested større enn" },
   "nested_less_than_27d17e58": { "message": "Nested mindre enn" },
+  "new_quiz_34aacba6": { "message": "Ny quiz" },
   "next_40e12421": { "message": "Neste" },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "Ingen tiljengelighetsproblemer ble oppdaget."
   },
+  "no_announcements_created_yet_c44a94f4": {
+    "message": "Ingen beskjeder opprettet ennå."
+  },
+  "no_announcements_found_20185afc": { "message": "Ingen beskjeder funnet." },
+  "no_assignments_created_yet_1b236d87": {
+    "message": "Ingen oppgave opprettet ennå."
+  },
+  "no_assignments_found_79e46d7f": { "message": "Ingen oppgaver funnet." },
   "no_changes_to_save_d29f6e91": { "message": "Ingen endringer å lagre." },
+  "no_discussions_created_yet_ff99abe3": {
+    "message": "Ingen diskusjoner opprettet ennå."
+  },
+  "no_discussions_found_9284063b": { "message": "Ingen diskusjoner funnet." },
   "no_e16d9132": { "message": "Nei" },
   "no_file_chosen_9a880793": { "message": "Ingen fil valgt" },
   "no_headers_9bc7dc7f": { "message": "Ingen titler" },
+  "no_modules_created_yet_c71b6d4d": {
+    "message": "Ingen moduler opprettet ennå."
+  },
+  "no_modules_found_2df43a40": { "message": "Ingen moduler funnet." },
+  "no_pages_created_yet_c379fa6e": { "message": "Ingen sider opprettet ennå." },
+  "no_pages_found_6799350": { "message": "Ingen sider funnet." },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "Ingen forhåndsvisning er tilgjengelig for denne filen."
   },
+  "no_quizzes_created_yet_1a2370b9": {
+    "message": "Ingen quizer opprettet ennå."
+  },
+  "no_quizzes_found_c80c537a": { "message": "Ingen quizer funnet." },
   "no_results_940393cf": { "message": "Ingen resultater." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Ingen resultat funnet for { filterTerm }"
@@ -678,6 +714,9 @@ const locale = {
   "one_of_the_following_styles_must_be_added_to_save__1de769aa": {
     "message": "En av følgende stiler må legges til for å lagre et ikon: Ikonfarge, konturstørrelse, ikontekst eller bilde"
   },
+  "one_or_more_files_failed_to_paste_please_try_uploa_7fa39dd3": {
+    "message": "Én eller flere filer kunne ikke limes inn. Prøv å laste opp eller dra og slippe filer."
+  },
   "open_circle_e9bd069": { "message": "Åpen sirkel" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "Åpne denne hurtigtastdialogen"
@@ -699,6 +738,7 @@ const locale = {
   "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
     "message": "{ p } er ikke en gyldig protokoll som må være ftp, http, https, mailto, skype, tel eller kan utelates"
   },
+  "page_50c4823d": { "message": "Side" },
   "pages_e5414c2c": { "message": "Sider" },
   "paragraph_5e5ad8eb": { "message": "Avsnitt" },
   "paragraph_starting_with_start_a59923f8": {
@@ -756,6 +796,7 @@ const locale = {
   "pumpkin_904428d5": { "message": "Gresskar" },
   "purple_7678a9fc": { "message": "Lilla" },
   "quaternions_877024e0": { "message": "Kvaternioner" },
+  "quiz_e0dcce8f": { "message": "Quiz" },
   "quizzes_7e598f57": { "message": "Quizer" },
   "rational_numbers_80ddaa4a": { "message": "Rasjonelle tall" },
   "real_numbers_7c99df94": { "message": "Reelle tall" },
@@ -840,6 +881,7 @@ const locale = {
   "select_crop_shape_d441feeb": { "message": "Velg beskjæringsform" },
   "select_language_7c93a900": { "message": "Velg språk" },
   "select_video_source_1b5c9dbe": { "message": "Velg videokilde" },
+  "selected_274ce24f": { "message": "Valgt" },
   "selected_linkfilename_c093b1f2": { "message": "Valgt { linkFileName }" },
   "selection_b52c4c5e": { "message": "Valg" },
   "set_header_scope_8c548f40": { "message": "Sett tittelomfang" },
@@ -1052,6 +1094,7 @@ const locale = {
     "message": "Diagonal pil opp mot høyre"
   },
   "up_c553575d": { "message": "Opp" },
+  "updated_link_a827e441": { "message": "Oppdatert lenke" },
   "upload_document_253f0478": { "message": "Last opp dokument" },
   "upload_file_fd2361b8": { "message": "Last opp fil" },
   "upload_image_6120b609": { "message": "Last opp bilde" },

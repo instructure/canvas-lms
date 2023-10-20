@@ -174,7 +174,7 @@ export const PRIMARY_PACE: CoursePace = {
   workflow_state: 'active',
   exclude_weekends: true,
   modules: [PACE_MODULE_1, PACE_MODULE_2],
-  // @ts-ignore
+  // @ts-expect-error
   course: undefined,
   compressed_due_dates: undefined,
   updated_at: '',
@@ -341,7 +341,7 @@ export const SECTION_PACE: CoursePace = {
   workflow_state: 'active',
   exclude_weekends: false,
   modules: [PACE_MODULE_1, PACE_MODULE_2],
-  // @ts-ignore
+  // @ts-expect-error
   course: undefined,
   compressed_due_dates: undefined,
   updated_at: '',
@@ -361,7 +361,7 @@ export const STUDENT_PACE: CoursePace = {
   workflow_state: 'active',
   exclude_weekends: true,
   modules: [PACE_MODULE_1, PACE_MODULE_2],
-  // @ts-ignore
+  // @ts-expect-error
   course: undefined,
   compressed_due_dates: undefined,
   updated_at: '',

@@ -57,6 +57,7 @@ export type Enrollment = Readonly<{
     unposted_final_score: null | number
     unposted_final_grade: null | number
   }
+  workflow_state: WorkflowState
 }>
 
 export type Student = Readonly<{
@@ -70,18 +71,19 @@ export type Student = Readonly<{
   short_name: string
   sis_import_id: null | string
   sis_user_id: null | string
-  section_ids: string[]
 }> & {
   enrollments: Enrollment[]
   first_name: string
   last_name: string
   name: string
+  index: number
+  section_ids: string[]
 } & Partial<{
+    anonymous_name: string
     computed_current_score: number
     computed_final_score: number
     cssClass: string
     displayName: string
-    index: number
     initialized: boolean
     isConcluded: boolean
     isInactive: boolean
@@ -278,12 +280,12 @@ export type AssessmentRequest = Readonly<{
 export type AssignedAssessments = {
   assetId: string
   workflowState: string
-  assetSubmissionType: string
+  assetSubmissionType: string | null
   anonymizedUser?: {
     displayName: string
     _id: string
-  }
-  anonymousId?: string
+  } | null
+  anonymousId?: string | null
 }
 
 export type AttachmentData = Readonly<{
@@ -306,7 +308,7 @@ export type Attachment = {
   submitted_to_crocodoc?: boolean
   submitter_id: string
   updated_at: string
-  upload_status: string
+  upload_status: 'pending' | 'failed' | 'success'
   url?: string
   view_inline_ping_url?: string
   viewed_at: string
@@ -366,7 +368,7 @@ export type SubmissionType =
 
 export type WorkflowState =
   | 'assigned'
-  | 'complete'
+  | 'completed'
   | 'deleted'
   | 'graded'
   | 'not_graded'
@@ -397,6 +399,7 @@ export type Submission = Readonly<{
   assignment_visible?: boolean
   attempt: number | null
   cached_due_date: null | string
+  custom_grade_status_id: null | string
   drop?: boolean
   entered_grade: null | string
   entered_score: null | number
@@ -437,7 +440,10 @@ export type Submission = Readonly<{
   rawGrade: string | null
   submission_comments: SubmissionComment[]
   submitted_at: null | Date
-  turnitin_data?: TurnitinAsset
+  turnitin_data?: TurnitinAsset & {
+    // TODO: refactor to separate out the dynamic object
+    [key: string]: any
+  }
   updated_at: string
   final_provisional_grade?: string
 }
@@ -533,7 +539,7 @@ export type GradingPeriod = Readonly<{
   id: string
   is_closed: boolean
   is_last: boolean
-  permission: {
+  permissions: {
     read: boolean
     update: boolean
     create: boolean
@@ -541,7 +547,7 @@ export type GradingPeriod = Readonly<{
   }
   start_date: string
   title: string
-  weight: number
+  weight: number | null
 }>
 
 export type SubmissionAttemptsComments = {
@@ -552,7 +558,7 @@ export type SubmissionAttemptsComments = {
 
 export type GradingPeriodSet = Readonly<{
   account_id: string
-  course_id: null | string
+  course_id: string | null
   created_at: string
   display_totals_for_all_grading_periods: boolean
   enrollment_term_ids: string[]

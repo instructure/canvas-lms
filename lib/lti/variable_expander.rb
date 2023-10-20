@@ -172,16 +172,44 @@ module Lti
       end
     end
 
+    def resource_link_id
+      @resource_link_id ||= if @assignment&.submission_types == "external_tool" && @assignment&.line_items.present?
+                              if @root_account&.feature_enabled?(:resource_link_uuid_in_custom_substitution)
+                                @assignment.line_items.first&.resource_link&.resource_link_uuid
+                              else
+                                @assignment.line_items.first&.resource_id
+                              end
+                            elsif @resource_link
+                              @resource_link.resource_link_uuid
+                            elsif @content_tag&.associated_asset.present?
+                              resource_link = @content_tag.associated_asset
+                              if resource_link.respond_to?(:resource_link_uuid)
+                                resource_link.resource_link_uuid
+                              end
+                            end
+    end
+
+    # This method should be removed when resource_link_uuid_in_custom_substitution is turned on for all
+    def resource_link_id_is_present
+      @resource_link_id_is_present ||=
+        if @assignment&.submission_types == "external_tool"
+          if @root_account&.feature_enabled?(:resource_link_uuid_in_custom_substitution)
+            resource_link_id.present?
+          else
+            @assignment&.line_items.present?
+          end
+        else
+          resource_link_id.present?
+        end
+    end
+
     # LTI - Custom parameter substitution: ResourceLink.id
     # Returns the LTI value for the resource_link.id property
     # Returns "$ResourceLink.id" otherwise
     register_expansion "ResourceLink.id",
                        [],
-                       lambda {
-                         line_item = @assignment.line_items.first
-                         line_item&.resource_id
-                       },
-                       -> { @assignment && @assignment.submission_types == "external_tool" && @assignment.line_items.present? },
+                       -> { resource_link_id },
+                       -> { resource_link_id_is_present },
                        default_name: "resourcelink_id"
 
     # LTI - Custom parameter substitution: ResourceLink.description
@@ -485,6 +513,15 @@ module Lti
                        [],
                        -> { Lti::Asset.opaque_identifier_for(@context) },
                        default_name: "context_id"
+
+    # The Canvas global identifer for the launch context
+    # @example
+    #   ```
+    #   10000000000070
+    #   ```
+    register_expansion "com.instructure.Context.globalId",
+                       [],
+                       -> { @context&.global_id }
 
     # If the context is a Course, returns sourced Id of the context
     # @example
@@ -918,6 +955,34 @@ module Lti
                        ASSIGNMENT_GUARD,
                        default_name: "com_instructure_assignment_anonymous_grading"
 
+    # returns true if the assignment restricts quantitative data.
+    # Assignment types: points, percentage, gpa_scale are all considered quantitative.
+    # @example
+    #   ```
+    #   true
+    #   ```
+    register_expansion "com.instructure.Assignment.restrict_quantitative_data",
+                       [],
+                       -> { @assignment.restrict_quantitative_data?(@current_user)&.to_s },
+                       ASSIGNMENT_GUARD,
+                       default_name: "com_instructure_assignment_restrict_quantitative_data"
+
+    # returns the grading scheme data for the course
+    # it is an array of objects of grade levels
+    # @example
+    #  ```
+    #  [
+    #    {name: "A", value: 94.0},
+    #    {name: "A-", value: 90.0},
+    #    {name: "B+", value: 87.0},
+    #  ]
+    #  ```
+    register_expansion "com.instructure.Course.gradingScheme",
+                       [],
+                       -> { @context.grading_standard_or_default.data.map { |grading_standard_data_row| { name: grading_standard_data_row[0], value: grading_standard_data_row[1] } }.to_json },
+                       COURSE_GUARD,
+                       default_name: "com_instructure_course_grading_scheme"
+
     # returns the current course membership roles
     # using the LIS v2 vocabulary.
     # @example
@@ -1254,6 +1319,26 @@ module Lti
     register_expansion "Canvas.user.isRootAccountAdmin",
                        [],
                        -> { @current_user.roles(@root_account).include? "root_admin" },
+                       USER_GUARD
+
+    # Returns a string with a comma-separated list of the (local) account IDs
+    # that a user has admin rights in, which fall under the root account that
+    # the tool was launched under. This list includes the IDs of
+    # all subaccounts of these accounts (and their subaccounts, etc.), since
+    # the admin privileges carry from an account to all its subaccounts.
+    #
+    # Will show a limit of 40000 characters. If the account IDs list is too big
+    # to fit into 40000 characters, 'truncated' will show at the end of the
+    # list.
+    #
+    # @example
+    #   ```
+    #   123,456,798
+    #   123,456,789,1234,truncated
+    #   ```
+    register_expansion "Canvas.user.adminableAccounts",
+                       [],
+                       -> { lti_helper.adminable_account_ids_recursive_truncated },
                        USER_GUARD
 
     # Username/Login ID for the primary pseudonym for the user for the account.

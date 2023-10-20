@@ -31,7 +31,7 @@ import {Table} from '@instructure/ui-table'
 import {IconButton} from '@instructure/ui-buttons'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 
-import {Day, Grouping, PlannerItem} from '@instructure/canvas-planner'
+import {Day, Grouping, PlannerItem} from '@canvas/planner'
 
 const baseTheme = ENV.use_high_contrast ? canvasHighContrast : canvas
 const {variables} = baseTheme

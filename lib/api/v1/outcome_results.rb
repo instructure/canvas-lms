@@ -259,6 +259,7 @@ module Api::V1::OutcomeResults
       row = []
       row << I18n.t(:student_name, "Student name")
       row << I18n.t(:student_id, "Student ID")
+      row << I18n.t(:student_sis_id, "Student SIS ID")
       outcomes.each do |outcome|
         pathParts = outcome_paths.find { |x| x[:id] == outcome.id }[:parts]
         path = pathParts.pluck(:name).join(" > ")
@@ -269,6 +270,8 @@ module Api::V1::OutcomeResults
       mastery_points = @context.root_account.feature_enabled?(:account_level_mastery_scales) && @context.resolved_outcome_proficiency&.mastery_points
       rollups.each do |rollup|
         row = [rollup.context.name, rollup.context.id]
+        sis_user_id = @context.root_account.pseudonyms.active.where("sis_user_id IS NOT NULL AND user_id = ?", rollup.context.id).pick(:sis_user_id) || "N/A"
+        row << sis_user_id
         outcomes.each do |outcome|
           score = rollup.scores.find { |x| x.outcome == outcome }
           row << (score ? score.score : nil)

@@ -239,9 +239,9 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
     master_template.last_export_started_at
   end
 
-  def export_object?(obj)
+  def export_object?(obj, ignore_updated_at: false)
     return false unless obj
-    return true if last_export_at.nil?
+    return true if last_export_at.nil? || ignore_updated_at
 
     if obj.is_a?(LearningOutcome) && obj.context_type == "Account"
       link = master_template.course.learning_outcome_links.where(content: obj).first

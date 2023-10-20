@@ -27,14 +27,14 @@ module AccountReports
     end
 
     DEV_KEY_REPORT_HEADERS = [
-      I18n.t("Global ID"),
-      I18n.t("Key Name"),
-      I18n.t("Inherited from Parent Account"),
-      I18n.t("Contact Info"),
-      I18n.t("Key Type"),
-      I18n.t("Placements"),
-      I18n.t("Status"),
-      I18n.t("Permitted API Endpoints")
+      "Global ID",
+      "Key Name",
+      "Inherited from Parent Account",
+      "Contact Info",
+      "Key Type",
+      "Placements",
+      "Status",
+      "Permitted API Endpoints"
     ].freeze
 
     def dev_key_report
@@ -61,26 +61,29 @@ module AccountReports
       row << key.email
       row << (key.is_lti_key ? "LTI Key" : "API Key")
       row << (key.tool_configuration&.placements&.pluck("placement").presence || "None")
-      row << (key.account_binding_for(account)&.workflow_state&.capitalize&.presence || "Allow")
+      row << (key.account_binding_for(account)&.workflow_state&.capitalize.presence || "Allow")
       row << (key.scopes.presence || "All")
       csv << row
     end
 
     def dev_key_scope
-      DeveloperKey.visible.nondeleted.eager_load(:tool_configuration)
+      DeveloperKey.nondeleted.eager_load(:tool_configuration)
     end
 
     def account
       @account ||= account_report.context
     end
 
+    # Some older account keys within prod Canvas can be marked as not visible. However,
+    # the API still shows these keys, as admins created them in the first place. The report should behave
+    # the same as the API.
     def account_dev_keys
       dev_key_scope.where(account:)
     end
 
     def visible_site_admin_keys
       Account.site_admin.shard.activate do
-        dev_key_scope.site_admin
+        dev_key_scope.visible.site_admin
       end
     end
 
@@ -88,7 +91,7 @@ module AccountReports
       return nil if account.primary_settings_root_account?
 
       federated_parent = account.account_chain(include_federated_parent: true).last
-      dev_key_scope.shard(federated_parent.shard).where(account: federated_parent)
+      dev_key_scope.visible.shard(federated_parent.shard).where(account: federated_parent)
     end
   end
 end

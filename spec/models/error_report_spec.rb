@@ -56,9 +56,8 @@ describe ErrorReport do
 
     it "plugs together with Canvas::Errors::Info to log the user" do
       req = instance_double("request", request_method_symbol: "GET", format: "html")
-      allow(Canvas::Errors::Info).to receive(:useful_http_env_stuff_from_request)
-        .and_return({})
-      allow(Canvas::Errors::Info).to receive(:useful_http_headers).and_return({})
+      allow(Canvas::Errors::Info).to receive_messages(useful_http_env_stuff_from_request: {},
+                                                      useful_http_headers: {})
       user = instance_double("User", global_id: 5)
       err = Exception.new("error")
       info = Canvas::Errors::Info.new(req, Account.default, user, {})

@@ -17,24 +17,60 @@
  */
 
 import gql from 'graphql-tag'
-import {float, string} from 'prop-types'
+import {bool, float, string} from 'prop-types'
 
 export const GradingPeriod = {
   fragment: gql`
     fragment GradingPeriod on GradingPeriod {
       _id
+      createdAt
+      displayTotals
+      closeDate
       title
       weight
+      isLast
+      id
+      startDate
+      updatedAt
+      endDate
     }
   `,
   shape: {
     _id: string,
+    createdAt: string,
+    displayTotals: bool,
+    closeDate: string,
     title: string,
     weight: float,
+    isLast: bool,
+    id: string,
+    startDate: string,
+    updatedAt: string,
+    endDate: string,
   },
-  mock: ({_id = '1', title = 'Grading Period 1', weight = 50} = {}) => ({
+  mock: ({
+    _id = '1',
+    createdAt = '2020-01-01',
+    closeDate = '2020-01-03',
+    title = 'Grading Period 1',
+    weight = 50,
+    isLast = false,
+    displayTotals = true,
+    id = '1',
+    startDate = '2020-01-01',
+    updatedAt = '2020-01-01',
+    endDate = '2020-01-02',
+  } = {}) => ({
     _id,
+    createdAt,
+    closeDate,
     title,
     weight,
+    isLast,
+    displayTotals,
+    id,
+    startDate,
+    updatedAt,
+    endDate,
   }),
 }

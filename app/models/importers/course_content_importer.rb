@@ -26,9 +26,6 @@ module Importers
       data["all_files_export"]["file_path"] ||= data["all_files_zip"]
       return unless data["all_files_export"]["file_path"] && File.exist?(data["all_files_export"]["file_path"])
 
-      migration.attachment_path_id_lookup ||= {}
-      migration.attachment_path_id_lookup_lower ||= {}
-
       params = migration.migration_settings[:migration_ids_to_import]
       valid_paths = []
       (data["file_map"] || {}).each_value do |file|
@@ -220,7 +217,7 @@ module Importers
         end
         migration.update_import_progress(97)
 
-        insert_into_module(course, migration)
+        insert_into_module(course, migration, data)
         migration.update_import_progress(98)
 
         move_to_assignment_group(course, migration)
@@ -234,6 +231,7 @@ module Importers
         imported_asset_hash = {}
         migration.imported_migration_items_hash.each { |k, assets| imported_asset_hash[k] = assets.values.map(&:id).join(",") if assets.present? }
         migration.migration_settings[:imported_assets] = imported_asset_hash
+        migration.migration_settings[:attachment_path_id_lookup] = migration.attachment_path_id_lookup
         migration.workflow_state = :imported unless post_processing?(migration)
         migration.save
 
@@ -266,12 +264,17 @@ module Importers
       ActiveRecord::Base.skip_touch_context(false)
     end
 
-    def self.insert_into_module(course, migration)
+    def self.insert_into_module(course, migration, data)
       module_id = migration.migration_settings[:insert_into_module_id]
       return unless module_id.present?
 
       mod = course.context_modules.find_by(id: module_id)
       return unless mod
+
+      items = (data[:modules] || []).pluck(:items).flatten! || []
+      items.each do |hash|
+        Importers::ContextModuleImporter.add_module_item_from_migration(mod, hash, 0, migration.context, {}, migration)
+      end
 
       imported_items = migration.imported_migration_items_for_insert_type
       return unless imported_items.any?
@@ -414,7 +417,7 @@ module Importers
       assignments = migration.imported_migration_items_by_class(Assignment).select(&:needs_update_cached_due_dates)
       if assignments.any?
         Assignment.clear_cache_keys(assignments, :availability)
-        DueDateCacher.recompute_course(migration.context, assignments:, update_grades: true, executing_user: migration.user, skip_late_policy_applicator: !!migration.date_shift_options)
+        SubmissionLifecycleManager.recompute_course(migration.context, assignments:, update_grades: true, executing_user: migration.user, skip_late_policy_applicator: !!migration.date_shift_options)
       end
       quizzes = migration.imported_migration_items_by_class(Quizzes::Quiz).select(&:should_clear_availability_cache)
       Quizzes::Quiz.clear_cache_keys(quizzes, :availability) if quizzes.any?

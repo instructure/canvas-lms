@@ -159,10 +159,6 @@ describe('ExternalToolDialog', () => {
   beforeEach(() => {
     editorMock.mockClear()
     rceMock.mockClear()
-
-    window.ENV = {}
-    window.INST = {}
-
     originalSubmit = HTMLFormElement.prototype.submit
     submit = jest.fn()
     HTMLFormElement.prototype.submit = submit

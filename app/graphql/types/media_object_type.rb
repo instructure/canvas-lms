@@ -53,5 +53,16 @@ module Types
 
     field :media_sources, [Types::MediaSourceType], null: true
     field :media_tracks, [Types::MediaTrackType], null: true
+
+    field :media_download_url, String, null: true
+    def media_download_url
+      opts = {
+        download: "1",
+        download_frd: "1",
+        host: context[:request].host_with_port,
+        protocol: context[:request].protocol
+      }
+      GraphQLHelpers::UrlHelpers.file_download_url(object, opts)
+    end
   end
 end

@@ -81,7 +81,7 @@ describe GradebookCsvsController do
       end
 
       filename = Attachment.find(json_parse(response.body)["attachment_id"]).filename
-      expect(/^#{now.strftime('%FT%H%M')}_Grades/).to match(filename)
+      expect(/^#{now.strftime("%FT%H%M")}_Grades/).to match(filename)
     end
   end
 end

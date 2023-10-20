@@ -210,7 +210,7 @@ module CC
         @media_object_flavor = opts[:media_object_flavor]
         @used_media_objects = Set.new
         @media_object_infos = {}
-        @rewriter = UserContent::HtmlRewriter.new(course, user, contextless_types: ["files"])
+        @rewriter = UserContent::HtmlRewriter.new(course, user, contextless_types: ["files", "media_attachments_iframe"])
         @course = course
         @user = user
         @track_referenced_files = opts[:track_referenced_files]
@@ -230,7 +230,7 @@ module CC
         end
         @rewriter.set_handler("courses") do |match|
           if match.obj_id == @course.id
-            "#{COURSE_TOKEN}/"
+            "#{COURSE_TOKEN}/#{match.rest}"
           end
         end
         @rewriter.set_handler("files") do |match|
@@ -271,13 +271,21 @@ module CC
           # WikiPagesController allows loosely-matching URLs; fix them before exporting
           if match.obj_id.present?
             url_or_title = match.obj_id
-            page = @course.wiki_pages.deleted_last.where(url: url_or_title).first ||
-                   @course.wiki_pages.deleted_last.where(url: url_or_title.to_url).first ||
-                   @course.wiki_pages.where(id: url_or_title.to_i).first
+            lookup = if Account.site_admin.feature_enabled?(:permanent_page_links)
+                       @course.wiki_page_lookups.where(slug: url_or_title.to_url).first
+                     end
+            page = if lookup
+                     @course.wiki_pages.deleted_last.where(id: lookup.wiki_page_id).first
+                   else
+                     @course.wiki_pages.deleted_last.where(url: url_or_title).first ||
+                       @course.wiki_pages.deleted_last.where(url: url_or_title.to_url).first ||
+                       @course.wiki_pages.where(id: url_or_title.to_i).first
+                   end
           end
           if page
             query = translate_module_item_query(match.query)
-            "#{WIKI_TOKEN}/#{match.type}/#{page.url}#{query}"
+            migration_id = @key_generator.create_key(page)
+            "#{WIKI_TOKEN}/#{match.type}/#{migration_id}#{query}"
           else
             "#{WIKI_TOKEN}/#{match.type}/#{match.obj_id}#{match.query}"
           end
@@ -288,6 +296,16 @@ module CC
           item = ContentTag.find(match.obj_id)
           migration_id = @key_generator.create_key(item)
           "#{COURSE_TOKEN}/modules/#{match.type}/#{migration_id}#{match.query}"
+        end
+        @rewriter.set_handler("media_attachments_iframe") do |match|
+          att = @course.attachments.find_by(id: match.obj_id) if match.obj_id
+          if att
+            migration_id = @key_generator.create_key(att)
+            query = translate_module_item_query(match.query)
+            "#{OBJECT_TOKEN}/#{match.type}/#{migration_id}#{query}"
+          else
+            match.url
+          end
         end
         @rewriter.set_default_handler do |match|
           new_url = match.url
@@ -375,6 +393,8 @@ module CC
 
         # process new RCE media iframes too
         doc.css("iframe[data-media-id]").each do |iframe|
+          next if iframe["src"].include?("/media_attachments_iframe/")
+
           media_id = iframe["data-media-id"]
           obj = MediaObject.active.by_media_id(media_id).take
           next unless obj && @key_generator.create_key(obj)
@@ -382,9 +402,7 @@ module CC
           @used_media_objects << obj
           info = CCHelper.media_object_info(obj, course: @course, flavor: media_object_flavor)
           @media_object_infos[obj.id] = info
-          if iframe["src"].match?(%r{/media_attachments_iframe/(\d+)})
-            iframe["data-is-media-attachment"] = true
-          end
+
           iframe["src"] = File.join(WEB_CONTENT_TOKEN, info[:path])
         end
 

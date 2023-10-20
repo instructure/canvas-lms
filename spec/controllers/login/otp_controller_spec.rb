@@ -62,7 +62,7 @@ describe Login::OtpController do
         Account.default.save!
 
         @user.otp_secret_key = ROTP::Base32.random
-        cc = @user.otp_communication_channel = @user.communication_channels.sms.create!(path: "bob")
+        cc = @user.otp_communication_channel = @user.communication_channels.sms.create!(path: "1234567890@txt.att.net")
         expect_any_instantiation_of(cc).to receive(:send_otp!)
         @user.save!
 
@@ -169,6 +169,15 @@ describe Login::OtpController do
       it "verifies a code" do
         code = ROTP::TOTP.new(@user.otp_secret_key).now
         post :create, params: { otp_login: { verification_code: code } }
+        expect(response).to redirect_to dashboard_url(login_success: 1)
+        expect(cookies["canvas_otp_remember_me"]).to be_nil
+        expect(Canvas.redis.get("otp_used:#{@user.global_id}:#{code}")).to eq "1" if Canvas.redis_enabled?
+        expect(request.env.fetch("extra-request-cost").to_f >= 150).to be_truthy
+      end
+
+      it "verifies a code entered with spaces" do
+        code = ROTP::TOTP.new(@user.otp_secret_key).now
+        post :create, params: { otp_login: { verification_code: "#{code[0..2]} #{code[3..]}" } }
         expect(response).to redirect_to dashboard_url(login_success: 1)
         expect(cookies["canvas_otp_remember_me"]).to be_nil
         expect(Canvas.redis.get("otp_used:#{@user.global_id}:#{code}")).to eq "1" if Canvas.redis_enabled?

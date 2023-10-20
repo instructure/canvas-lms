@@ -22,6 +22,7 @@ import {useSearchParams} from 'react-router-dom'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import userSettings from '@canvas/user-settings'
 import {View} from '@instructure/ui-view'
+import gradingHelpers from '@canvas/grading/AssignmentGroupGradeCalculator'
 
 import {AssignmentGroupCriteriaMap} from '../../../../shared/grading/grading.d'
 import AssignmentInformation from './AssignmentInformation'
@@ -30,22 +31,27 @@ import GlobalSettings from './GlobalSettings'
 import GradingResults from './GradingResults'
 import StudentInformation from './StudentInformation'
 import {
-  AssignmentSortContext,
+  AssignmentSubmissionsMap,
+  CustomOptions,
   GradebookOptions,
   GradebookQueryResponse,
-  GradebookSortOrder,
   GradebookUserSubmissionDetails,
   SectionConnection,
   SortableAssignment,
   SortableStudent,
-  SubmissionConnection,
+  SubmissionGradeChange,
+  TeacherNotes,
+  CustomColumn,
 } from '../../types'
 import {GRADEBOOK_QUERY} from '../../queries/Queries'
 import {
+  gradebookOptionsSetup,
   mapAssignmentGroupQueryResults,
+  mapAssignmentSubmissions,
   mapEnrollmentsToSortableStudents,
 } from '../../utils/gradebookUtils'
 import {useCurrentStudentInfo} from '../hooks/useCurrentStudentInfo'
+import {useCustomColumns} from '../hooks/useCustomColumns'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
@@ -54,20 +60,20 @@ const ASSIGNMENT_SEARCH_PARAM = 'assignment'
 
 export default function EnhancedIndividualGradebook() {
   const [sections, setSections] = useState<SectionConnection[]>([])
-  const [submissions, setSubmissions] = useState<SubmissionConnection[]>([])
+  const [assignmentSubmissionsMap, setAssignmentSubmissionsMap] =
+    useState<AssignmentSubmissionsMap>({})
   const [students, setStudents] = useState<SortableStudent[]>()
   const [assignments, setAssignments] = useState<SortableAssignment[]>()
+  const [assignmentDropped, setAssignmentDropped] = useState<boolean>(false)
 
-  const courseId = ENV.GRADEBOOK_OPTIONS?.context_id || '' // TODO: get from somewhere else?
+  const courseId = ENV.GRADEBOOK_OPTIONS?.context_id || ''
   const [searchParams, setSearchParams] = useSearchParams()
   const studentIdQueryParam = searchParams.get(STUDENT_SEARCH_PARAM)
   const [selectedStudentId, setSelectedStudentId] = useState<string | null | undefined>(
     studentIdQueryParam
   )
-  const {currentStudent, studentSubmissions, updateSubmissionDetails} = useCurrentStudentInfo(
-    courseId,
-    selectedStudentId
-  )
+  const {currentStudent, studentSubmissions, updateSubmissionDetails, loadingStudent} =
+    useCurrentStudentInfo(courseId, selectedStudentId)
 
   const [assignmentGroupMap, setAssignmentGroupMap] = useState<AssignmentGroupCriteriaMap>({})
 
@@ -75,30 +81,36 @@ export default function EnhancedIndividualGradebook() {
   const [selectedAssignmentId, setSelectedAssignmentId] = useState<string | null | undefined>(
     assignmentIdQueryParam
   )
-  const selectedAssignment = assignments?.find(assignment => assignment.id === selectedAssignmentId)
-  const submissionsForSelectedAssignment = submissions.filter(
-    submission => submission.assignmentId === selectedAssignmentId
-  )
 
-  const defaultAssignmentSort: GradebookSortOrder =
-    userSettings.contextGet<AssignmentSortContext>('sort_grade_columns_by')?.sortType ??
-    GradebookSortOrder.Alphabetical
-  const defaultGradebookOptions: GradebookOptions = {
-    sortOrder: defaultAssignmentSort,
-    exportGradebookCsvUrl: ENV.GRADEBOOK_OPTIONS?.export_gradebook_csv_url,
-    lastGeneratedCsvAttachmentUrl: ENV.GRADEBOOK_OPTIONS?.attachment_url,
-    gradebookCsvProgress: ENV.GRADEBOOK_OPTIONS?.gradebook_csv_progress,
-    contextUrl: ENV.GRADEBOOK_OPTIONS?.context_url,
-    userId: ENV.current_user_id,
-  }
-  const [gradebookOptions, setGradebookOptions] =
-    useState<GradebookOptions>(defaultGradebookOptions)
+  const selectedAssignment = assignments?.find(assignment => assignment.id === selectedAssignmentId)
+  const submissionsMap = selectedAssignment ? assignmentSubmissionsMap[selectedAssignment.id] : {}
+  const submissionsForSelectedAssignment = Object.values(submissionsMap ?? {})
+
+  const [gradebookOptions, setGradebookOptions] = useState<GradebookOptions>(
+    gradebookOptionsSetup(ENV)
+  )
 
   const {data, error} = useQuery<GradebookQueryResponse>(GRADEBOOK_QUERY, {
     variables: {courseId},
     fetchPolicy: 'no-cache',
     skip: !courseId,
   })
+
+  const {customColumnsUrl} = gradebookOptions
+
+  const {customColumns} = useCustomColumns(customColumnsUrl)
+  const studentNotesColumnId = customColumns?.find(
+    (column: CustomColumn) => column.teacher_notes
+  )?.id
+
+  const [currentStudentHiddenName, setCurrentStudentHiddenName] = useState<string>('')
+  useEffect(() => {
+    if (!currentStudent || !students) {
+      return
+    }
+    const hiddenName = students?.find(s => s.id === currentStudent.id)?.hiddenName
+    setCurrentStudentHiddenName(hiddenName ?? I18n.t('Student'))
+  }, [currentStudent, students])
 
   useEffect(() => {
     if (error) {
@@ -113,22 +125,89 @@ export default function EnhancedIndividualGradebook() {
         submissionsConnection,
       } = data.course
 
+      const {assignmentGradingPeriodMap, assignmentSubmissionsMap} = mapAssignmentSubmissions(
+        submissionsConnection.nodes
+      )
+      setAssignmentSubmissionsMap(assignmentSubmissionsMap)
+
       const {mappedAssignmentGroupMap, mappedAssignments} = mapAssignmentGroupQueryResults(
-        assignmentGroupsConnection.nodes
+        assignmentGroupsConnection.nodes,
+        assignmentGradingPeriodMap
       )
 
       setAssignmentGroupMap(mappedAssignmentGroupMap)
       setAssignments(mappedAssignments)
-      setSubmissions(submissionsConnection.nodes)
       setSections(sectionsConnection.nodes)
 
-      const mappedEnrollments = mapEnrollmentsToSortableStudents(enrollmentsConnection.nodes)
-      const sortableStudents = mappedEnrollments.sort((a, b) => {
+      const sortableStudents = mapEnrollmentsToSortableStudents(enrollmentsConnection.nodes)
+      const sortedStudents = sortableStudents.sort((a, b) => {
         return a.sortableName.localeCompare(b.sortableName)
       })
-      setStudents(sortableStudents)
+      sortedStudents.forEach(
+        (student, index) => (student.hiddenName = I18n.t('Student %{id}', {id: index + 1}))
+      )
+      setStudents(sortedStudents)
     }
   }, [data, error])
+
+  useEffect(() => {
+    if (!selectedAssignment || !assignments || !studentSubmissions || !assignmentGroupMap) {
+      return
+    }
+    const assignmentGroup = assignmentGroupMap[selectedAssignment?.assignmentGroupId ?? '']
+
+    const relevantSubmissions = studentSubmissions.filter(submission => {
+      const submissionAssignment = assignments?.find(a => a.id === submission.assignmentId)
+      if (
+        assignmentGroup?.assignments
+          .map(assignment => assignment.id)
+          .includes(submissionAssignment?.id || '') &&
+        !!submission.grade
+      ) {
+        return submission
+      }
+      return null
+    })
+
+    const droppableSubmissions = relevantSubmissions.map(submission => {
+      const submissionAssignment = assignments?.find(a => a.id === submission.assignmentId)
+      return {
+        score: submission.score,
+        grade: submission.grade,
+        total: submissionAssignment?.pointsPossible || 0,
+        assignment_id: submissionAssignment?.id,
+        workflow_state: submissionAssignment?.workflowState,
+        excused: submission.excused,
+        id: submission.id,
+        submission: {assignment_id: submissionAssignment?.id},
+      }
+    })
+
+    const assignmentIdsToKeep = gradingHelpers
+      .dropAssignments(droppableSubmissions, assignmentGroup?.rules)
+      .map(s => s.assignment_id)
+    const droppedAssignmentIds: (string | undefined)[] = droppableSubmissions
+      .filter(s => !assignmentIdsToKeep.includes(s.assignment_id))
+      .map(s => s.assignment_id)
+    setAssignmentDropped(droppedAssignmentIds.includes(selectedAssignment.id))
+  }, [selectedAssignment, assignments, studentSubmissions, assignmentGroupMap])
+
+  const invalidAssignmentGroups = Object.keys(assignmentGroupMap).reduce((invalidKeys, groupId) => {
+    const {invalid, name, gradingPeriodsIds} = assignmentGroupMap[groupId]
+    const {selectedGradingPeriodId} = gradebookOptions
+    if (
+      invalid ||
+      (selectedGradingPeriodId && !gradingPeriodsIds?.includes(selectedGradingPeriodId))
+    ) {
+      invalidKeys[groupId] = name
+    }
+
+    return invalidKeys
+  }, {} as Record<string, string>)
+
+  const selectedAssignmentGroupInvalid = selectedAssignment?.assignmentGroupId
+    ? !!invalidAssignmentGroups[selectedAssignment?.assignmentGroupId]
+    : false
 
   const handleStudentChange = (studentId?: string) => {
     setSelectedStudentId(studentId)
@@ -152,26 +231,47 @@ export default function EnhancedIndividualGradebook() {
 
   const handleSubmissionSaved = useCallback(
     (newSubmission: GradebookUserSubmissionDetails) => {
-      setSubmissions(prevSubmissions => {
-        const index = prevSubmissions.findIndex(s => s.id === newSubmission.id)
-        if (index > -1) {
-          prevSubmissions[index] = newSubmission
-        } else {
-          prevSubmissions.push(newSubmission)
-        }
-        return [...prevSubmissions]
+      setAssignmentSubmissionsMap(prevAssignmentSubmissions => {
+        const {assignmentId, id: submissionId} = newSubmission
+        prevAssignmentSubmissions[assignmentId][submissionId] = newSubmission
+        return {...prevAssignmentSubmissions}
       })
 
       updateSubmissionDetails(newSubmission)
     },
-    [updateSubmissionDetails]
+    [updateSubmissionDetails, setAssignmentSubmissionsMap]
+  )
+
+  const handleSetGrades = useCallback(
+    (updatedSubmissions: SubmissionGradeChange[]) => {
+      setAssignmentSubmissionsMap(prevAssignmentSubmissions => {
+        updatedSubmissions.forEach(submission => {
+          const {assignmentId, id: submissionId} = submission
+          const existingSubmission = prevAssignmentSubmissions[assignmentId][submissionId]
+          if (existingSubmission) {
+            prevAssignmentSubmissions[assignmentId][submissionId] = {
+              ...existingSubmission,
+              ...submission,
+            }
+          }
+        })
+        return {...prevAssignmentSubmissions}
+      })
+
+      const submissionForUser = updatedSubmissions.find(s => s.userId === selectedStudentId)
+
+      if (submissionForUser) {
+        updateSubmissionDetails(submissionForUser)
+      }
+    },
+    [selectedStudentId, updateSubmissionDetails]
   )
 
   return (
     <View as="div">
       <View as="div" className="row-fluid">
         <View as="div" className="span12">
-          <View as="h1">{I18n.t('Gradebook: Enhanced Individual View')}</View>
+          <View as="h1">{I18n.t('Gradebook: Individual View')}</View>
           {I18n.t(
             'Note: Grades and notes will be saved automatically after moving out of the field.'
           )}
@@ -181,6 +281,7 @@ export default function EnhancedIndividualGradebook() {
       <GlobalSettings
         sections={sections}
         gradebookOptions={gradebookOptions}
+        customColumns={customColumns}
         onSortChange={sortType => {
           userSettings.contextSet('sort_grade_columns_by', {sortType})
           const newGradebookOptions = {...gradebookOptions, sortOrder: sortType}
@@ -189,6 +290,25 @@ export default function EnhancedIndividualGradebook() {
         onSectionChange={sectionId => {
           const newGradebookOptions = {...gradebookOptions, selectedSection: sectionId}
           setGradebookOptions(newGradebookOptions)
+        }}
+        onGradingPeriodChange={gradingPeriodId => {
+          userSettings.contextSet('gradebook_current_grading_period', gradingPeriodId)
+          const newGradebookOptions = {
+            ...gradebookOptions,
+            selectedGradingPeriodId: gradingPeriodId,
+          }
+          setGradebookOptions(newGradebookOptions)
+        }}
+        handleCheckboxChange={(key: keyof CustomOptions, value: boolean) => {
+          setGradebookOptions(prevGradebookOptions => {
+            const newCustomOptions = {...prevGradebookOptions.customOptions, [key]: value}
+            return {...prevGradebookOptions, customOptions: newCustomOptions}
+          })
+        }}
+        onTeacherNotesCreation={(teacherNotes: TeacherNotes) => {
+          setGradebookOptions(prevGradebookOptions => {
+            return {...prevGradebookOptions, teacherNotes}
+          })
         }}
       />
 
@@ -210,26 +330,36 @@ export default function EnhancedIndividualGradebook() {
       <GradingResults
         assignment={selectedAssignment}
         courseId={courseId}
-        studentId={selectedStudentId}
+        currentStudent={currentStudent}
+        studentSubmissions={studentSubmissions}
         gradebookOptions={gradebookOptions}
+        loadingStudent={loadingStudent}
         onSubmissionSaved={handleSubmissionSaved}
+        currentStudentHiddenName={currentStudentHiddenName}
+        dropped={assignmentDropped}
       />
 
       <div className="hr" style={{margin: 10, padding: 10, borderBottom: '1px solid #eee'}} />
 
       <StudentInformation
-        student={currentStudent}
-        submissions={studentSubmissions}
         assignmentGroupMap={assignmentGroupMap}
         gradebookOptions={gradebookOptions}
+        invalidAssignmentGroups={invalidAssignmentGroups}
+        student={currentStudent}
+        studentNotesColumnId={studentNotesColumnId}
+        currentStudentHiddenName={currentStudentHiddenName}
+        submissions={studentSubmissions}
       />
 
       <div className="hr" style={{margin: 10, padding: 10, borderBottom: '1px solid #eee'}} />
 
       <AssignmentInformation
         assignment={selectedAssignment}
+        assignmentGroupInvalid={selectedAssignmentGroupInvalid}
         gradebookOptions={gradebookOptions}
+        students={students}
         submissions={submissionsForSelectedAssignment}
+        handleSetGrades={handleSetGrades}
       />
 
       <div className="hr" style={{margin: 10, padding: 10, borderBottom: '1px solid #eee'}} />

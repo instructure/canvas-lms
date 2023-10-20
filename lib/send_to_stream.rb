@@ -102,7 +102,7 @@ module SendToStream
   end
 
   def self.included(klass)
-    klass.send :include, SendToStreamInstanceMethods
+    klass.include SendToStreamInstanceMethods
     klass.extend SendToStreamClassMethods
   end
 end

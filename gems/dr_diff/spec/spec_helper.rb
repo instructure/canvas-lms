@@ -19,4 +19,4 @@
 
 require "dr_diff"
 
-require "byebug"
+require "debug"

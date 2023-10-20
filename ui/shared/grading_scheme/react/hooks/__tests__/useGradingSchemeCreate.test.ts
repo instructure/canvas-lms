@@ -55,6 +55,8 @@ describe('useGradingSchemeCreateHook', () => {
     const gradingSchemeTemplate: GradingSchemeTemplate = {
       data,
       title: 'My Course Grading Scheme',
+      points_based: false,
+      scaling_factor: 1.0,
     }
 
     doFetchApi.mockResolvedValue({
@@ -76,6 +78,8 @@ describe('useGradingSchemeCreateHook', () => {
     expect(createdGradingScheme).toEqual({
       title: 'My Course Grading Scheme',
       data,
+      points_based: false,
+      scaling_factor: 1.0,
     })
     expect(result.current.createGradingSchemeStatus).toEqual(ApiCallStatus.COMPLETED)
   })
@@ -89,6 +93,8 @@ describe('useGradingSchemeCreateHook', () => {
     const gradingSchemeTemplate: GradingSchemeTemplate = {
       data,
       title: 'My Account Grading Scheme',
+      points_based: false,
+      scaling_factor: 1.0,
     }
 
     doFetchApi.mockResolvedValue({
@@ -110,6 +116,8 @@ describe('useGradingSchemeCreateHook', () => {
     expect(createdGradingScheme).toEqual({
       title: 'My Account Grading Scheme',
       data,
+      points_based: false,
+      scaling_factor: 1.0,
     })
     expect(result.current.createGradingSchemeStatus).toEqual(ApiCallStatus.COMPLETED)
   })

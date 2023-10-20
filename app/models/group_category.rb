@@ -393,7 +393,7 @@ class GroupCategory < ActiveRecord::Base
     Group.where(id: groups).touch_all
     if context_type == "Course"
       opts = { assignments: Assignment.where(context_type:, context_id:, group_category_id: self).pluck(:id) }
-      DueDateCacher.recompute_course(context_id, **opts)
+      SubmissionLifecycleManager.recompute_course(context_id, **opts)
     end
   end
 
@@ -488,7 +488,7 @@ class GroupCategory < ActiveRecord::Base
 
   def assign_unassigned_members(by_section = false, updating_user: nil)
     Delayed::Batch.serial_batch do
-      DueDateCacher.with_executing_user(updating_user) do
+      SubmissionLifecycleManager.with_executing_user(updating_user) do
         if by_section
           distribute_members_among_groups_by_section
           finish_group_member_assignment

@@ -37,7 +37,7 @@ class GradingPeriodSetSerializer < Canvas::APISerializer
     end
   end
 
-  def serializable_object
+  def serializable_object(...)
     stringify!(super)
   end
 end

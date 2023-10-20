@@ -52,6 +52,9 @@ module CC
               event_node.all_day "true"
               event_node.all_day_date ims_date(event.all_day_date) if event.all_day_date
             end
+            event_node.rrule event.rrule if event.rrule
+            event_node.series_uuid event.series_uuid if event.series_uuid
+            event_node.series_head "true" if event.series_head
           end
         end
       end

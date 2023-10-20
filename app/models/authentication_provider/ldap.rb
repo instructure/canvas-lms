@@ -143,7 +143,7 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
 
   def ldap_filter(login = nil)
     filter = auth_filter
-    filter = filter.gsub(/\{\{login\}\}/, sanitized_ldap_login(login)) if login
+    filter = filter.gsub("{{login}}", sanitized_ldap_login(login)) if login
     filter
   end
 
@@ -227,7 +227,7 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
         :ldap_login_test,
         t(:test_login_auth_failed, "Authentication failed")
       )
-    rescue Net::LDAP::LdapError => e
+    rescue Net::LDAP::Error => e
       errors.add(
         :ldap_login_test,
         t(:test_login_auth_exception, "Exception on login: %{error}", error: e)

@@ -241,6 +241,16 @@ describe SubAccountsController do
       expect(response).to have_http_status(:conflict)
       expect(@sub_account.reload).not_to be_deleted
     end
+
+    it "removes assigned template course when deleting a sub-account" do
+      @course = @root_account.courses.create!(template: "true")
+      user_session(@user)
+      @sub_account.course_template_id = @course.id
+      @sub_account.save!
+      expect(@sub_account.reload.course_template_id).to eq(@course.id)
+      delete "destroy", params: { account_id: @root_account, id: @sub_account }
+      expect(@sub_account.reload.course_template_id).to be_nil
+    end
   end
 
   describe "GET 'show'" do

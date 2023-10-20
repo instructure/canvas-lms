@@ -165,11 +165,14 @@ describe "site-wide" do
     user_session(@user)
 
     post "/users/#{@fake_user.id}/masquerade"
+
+    allow(I18n).to receive(:locale=)
+
     get "/"
 
     expect(assigns[:real_current_user]).to eq @user
     expect(Time.zone.name).to eq "Hawaii"
-    expect(I18n.locale).to eq :es
+    expect(I18n).to have_received(:locale=).with("es")
   end
 
   it "uses the masqueree's timezone and locale setting when masquerading" do
@@ -183,11 +186,14 @@ describe "site-wide" do
     user_session(@user)
 
     post "/users/#{@other_user.id}/masquerade"
+
+    allow(I18n).to receive(:locale=)
+
     get "/"
 
     expect(assigns[:real_current_user]).to eq @user
     expect(Time.zone.name).to eq "Hawaii"
-    expect(I18n.locale).to eq :es
+    expect(I18n).to have_received(:locale=).with("es").at_least(:once)
   end
 
   context "csrf protection" do

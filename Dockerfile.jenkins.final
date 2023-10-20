@@ -7,6 +7,7 @@ COPY --chown=docker:docker . ${APP_HOME}
 RUN \
   --mount=type=bind,from=local/cache-helper,source=/tmp/dst,target=/cache-helper \
   tar --no-same-owner -xf /cache-helper/webpack-runner-vendor.tar -C ${APP_HOME} && \
+  if [ -n "$(tar tf /cache-helper/webpack-runner-vendor.tar)" ]; then bundle config --global frozen false ; fi && \
   cp -v docker-compose/config/redis.yml config && \
   cp -v docker-compose/config/selenium.yml config/ && \
   cp -vR docker-compose/config/new-jenkins/* config/ && \

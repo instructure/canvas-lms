@@ -18,20 +18,30 @@
 
 import React from 'react'
 import GradebookMenu from '@canvas/gradebook-menu'
+import {Link} from '@instructure/ui-link'
 import type {GradiantVariantName} from '@canvas/gradebook-menu'
 import {fireEvent, render} from '@testing-library/react'
 
 describe('GradebookMenu', () => {
-  const defaultProps = {
+  const defaultProps = (props = {}) => ({
     courseUrl: '/courseUrl',
     learningMasteryEnabled: true,
     enhancedIndividualGradebookEnabled: undefined,
     variant: 'DefaultGradebook' as GradiantVariantName,
-  }
+    ...props,
+  })
+
+  it('renders custom trigger if provided', () => {
+    const customTrigger = <Link as="button">Custom Trigger</Link>
+    const {getByText} = render(<GradebookMenu {...defaultProps({customTrigger})} />)
+
+    const item = getByText('Custom Trigger')
+    expect(item).toBeInTheDocument()
+  })
 
   describe('when variant is "DefaultGradebook"', () => {
     it('renders the expected options', () => {
-      const {getAllByRole, getByRole} = render(<GradebookMenu {...defaultProps} />)
+      const {getAllByRole, getByRole} = render(<GradebookMenu {...defaultProps()} />)
       const menu = getByRole('button')
 
       expect(menu).toHaveTextContent('Gradebook')
@@ -47,7 +57,7 @@ describe('GradebookMenu', () => {
 
     it('omits "Learning Mastery" when learningMasteryEnabled is false (1)', () => {
       const {getByRole, queryByTestId} = render(
-        <GradebookMenu {...defaultProps} learningMasteryEnabled={false} />
+        <GradebookMenu {...defaultProps()} learningMasteryEnabled={false} />
       )
       const menu = getByRole('button')
       fireEvent.click(menu)
@@ -59,7 +69,7 @@ describe('GradebookMenu', () => {
   describe('when variant is "DefaultGradebookLearningMastery"', () => {
     it('renders the expected options', () => {
       const {getAllByRole, getByRole} = render(
-        <GradebookMenu {...defaultProps} variant="DefaultGradebookLearningMastery" />
+        <GradebookMenu {...defaultProps()} variant="DefaultGradebookLearningMastery" />
       )
       const menu = getByRole('button')
       expect(menu).toHaveTextContent('Learning Mastery')
@@ -91,7 +101,7 @@ describe('GradebookMenu', () => {
   describe('when variant is "GradebookHistory"', () => {
     it('renders the expected options', () => {
       const {getAllByRole, getByRole} = render(
-        <GradebookMenu {...defaultProps} variant="GradebookHistory" />
+        <GradebookMenu {...defaultProps()} variant="GradebookHistory" />
       )
       const menu = getByRole('button')
 
@@ -123,7 +133,7 @@ describe('GradebookMenu', () => {
     it('omits "Learning Mastery" when learningMasteryEnabled is false (2)', () => {
       const {getAllByRole, getByRole} = render(
         <GradebookMenu
-          {...defaultProps}
+          {...defaultProps()}
           variant="GradebookHistory"
           learningMasteryEnabled={false}
         />

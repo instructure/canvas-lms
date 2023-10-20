@@ -68,12 +68,26 @@ describe UsersController do
       expect(response.body).not_to match(/studentname2/)
     end
 
-    it "shows user notes if enabled" do
-      get user_course_teacher_activity_url(@teacher, @course)
-      expect(response.body).not_to match(/journal entry/i)
-      @course.root_account.update_attribute(:enable_user_notes, true)
-      get user_course_teacher_activity_url(@teacher, @course)
-      expect(response.body).to match(/journal entry/i)
+    context "when the deprecate_faculty_journal flag is disabled" do
+      before { Account.site_admin.disable_feature!(:deprecate_faculty_journal) }
+
+      it "shows user notes if enabled" do
+        get user_course_teacher_activity_url(@teacher, @course)
+        expect(response.body).not_to match(/journal entry/i)
+        @course.root_account.update_attribute(:enable_user_notes, true)
+        get user_course_teacher_activity_url(@teacher, @course)
+        expect(response.body).to match(/journal entry/i)
+      end
+    end
+
+    context "when the deprecate_faculty_journal flag is enabled" do
+      it "does not show user notes if enabled" do
+        get user_course_teacher_activity_url(@teacher, @course)
+        expect(response.body).not_to match(/journal entry/i)
+        @course.root_account.update_attribute(:enable_user_notes, true)
+        get user_course_teacher_activity_url(@teacher, @course)
+        expect(response.body).to_not match(/journal entry/i)
+      end
     end
 
     it "shows individual user info across courses" do

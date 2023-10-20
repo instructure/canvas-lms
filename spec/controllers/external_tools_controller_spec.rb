@@ -287,8 +287,7 @@ describe ExternalToolsController do
         let(:domain) { "www.example-beta.com" }
 
         before do
-          allow(ApplicationController).to receive(:test_cluster?).and_return(true)
-          allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
+          allow(ApplicationController).to receive_messages(test_cluster?: true, test_cluster_name: "beta")
           Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
 
           tool.course_navigation = { enabled: true }
@@ -539,8 +538,7 @@ describe ExternalToolsController do
         let(:domain) { "www.example-beta.com" }
 
         before do
-          allow(ApplicationController).to receive(:test_cluster?).and_return(true)
-          allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
+          allow(ApplicationController).to receive_messages(test_cluster?: true, test_cluster_name: "beta")
           Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
 
           @tool.settings[:environments] = {
@@ -801,8 +799,7 @@ describe ExternalToolsController do
         let(:domain) { "www.example-beta.com" }
 
         before do
-          allow(ApplicationController).to receive(:test_cluster?).and_return(true)
-          allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
+          allow(ApplicationController).to receive_messages(test_cluster?: true, test_cluster_name: "beta")
           Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
 
           @tool.settings[:environments] = {
@@ -966,6 +963,27 @@ describe ExternalToolsController do
           expect(flash[:error]).to eq "Couldn't find valid settings for this link: Resource link not found"
         end
 
+        it "errors if the resource_link_id cannot be found" do
+          get "retrieve", params: {
+            course_id: @course.id,
+            url: "http://www.example.com/launch",
+            resource_link_id: "wrong_do_it_again"
+          }
+          expect(response).to be_redirect
+          expect(flash[:error]).to eq "Couldn't find valid settings for this link: Resource link not found"
+        end
+
+        it "errors if the resource_link_id is for the wrong context" do
+          rl.update(context: Course.create(course_valid_attributes))
+          get "retrieve", params: {
+            course_id: @course.id,
+            url: "http://www.example.com/launch",
+            resource_link_id: rl.resource_link_uuid
+          }
+          expect(response).to be_redirect
+          expect(flash[:error]).to eq "Couldn't find valid settings for this link: Resource link not found"
+        end
+
         it "errors if the resource_link is inactive" do
           rl.update(workflow_state: "deleted")
           get_page
@@ -1113,16 +1131,20 @@ describe ExternalToolsController do
       assert_unauthorized
     end
 
-    it "finds tools matching by domain" do
+    it "passes prefer_1_1=false to find_external_tool by default when looking up by URL" do
       user_session(@teacher)
-      tool = @course.context_external_tools.new(
-        name: "bob", consumer_key: "bob", shared_secret: "bob", domain: "www.example.com"
+      expect(ContextExternalTool).to receive(:find_external_tool).with(
+        anything, anything, anything, anything, anything, prefer_1_1: false
       )
-      tool.save!
       get "retrieve", params: { course_id: @course.id, url: "http://www.example.com/basic_lti" }
-      expect(response).to be_successful
-      expect(assigns[:tool]).to eq tool
-      expect(assigns[:lti_launch].params).not_to be_nil
+    end
+
+    it "passes prefer_1_1=false to find_external_tool only when the prefer_1_1 param is set" do
+      user_session(@teacher)
+      expect(ContextExternalTool).to receive(:find_external_tool).with(
+        anything, anything, anything, anything, anything, prefer_1_1: true
+      )
+      get "retrieve", params: { course_id: @course.id, url: "http://www.example.com/basic_lti", prefer_1_1: true }
     end
 
     it "finds tools matching by exact url" do
@@ -1134,7 +1156,7 @@ describe ExternalToolsController do
       expect(assigns[:lti_launch].params).not_to be_nil
     end
 
-    it "finds tools matching by resource_link_id" do
+    it "finds tools matching by resource_link_lookup_uuid" do
       user_session(@teacher)
 
       tool = new_valid_tool(@course) # this tool has a url and no domain
@@ -1148,7 +1170,21 @@ describe ExternalToolsController do
       expect(assigns[:lti_launch].resource_url).to eq "http://www.example.com/basiclti/url_from_resource_link"
     end
 
-    it "finds tools matching by resource_link_id, ignoring the url parameter" do
+    it "finds tools matching by resource_link_id" do
+      user_session(@teacher)
+
+      tool = new_valid_tool(@course) # this tool has a url and no domain
+      resource_link = Lti::ResourceLink.create_with(@course, tool, nil, "http://www.example.com/basiclti/url_from_resource_link")
+
+      # provide no url parameter
+      get "retrieve", params: { course_id: @course.id, resource_link_id: resource_link.resource_link_uuid }
+      expect(response).to be_successful
+      expect(assigns[:tool]).to eq tool
+
+      expect(assigns[:lti_launch].resource_url).to eq "http://www.example.com/basiclti/url_from_resource_link"
+    end
+
+    it "finds tools matching by resource_link_lookup_uuid, ignoring the url parameter" do
       user_session(@teacher)
       new_valid_tool(@course, {
                        url: "http://tool1.com"
@@ -1690,7 +1726,7 @@ describe ExternalToolsController do
               deep_link_return_url = launch_params["https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings"]["deep_link_return_url"]
               return_jwt = deep_link_return_url.match(/data=([^&]*)/)[1]
               jwt = JSON::JWT.decode(return_jwt, :skip_verification)
-              expect(jwt[:parent_frame_context]).to be == tool.id.to_s
+              expect(jwt[:parent_frame_context]).to eq tool.id.to_s
               expect(response).to be_successful
             end
 
@@ -2473,8 +2509,7 @@ describe ExternalToolsController do
       let(:domain) { "www.example-beta.com" }
 
       before do
-        allow(ApplicationController).to receive(:test_cluster?).and_return(true)
-        allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
+        allow(ApplicationController).to receive_messages(test_cluster?: true, test_cluster_name: "beta")
         Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
         user_session(account_admin_user)
 

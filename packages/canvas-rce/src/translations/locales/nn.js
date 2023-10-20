@@ -33,6 +33,7 @@ const locale = {
   "add_another_f4e50d57": { "message": "Legg til ei ny" },
   "add_cc_subtitles_55f0394e": { "message": "Legg til undertekstar" },
   "add_image_60b2de07": { "message": "Legg til bilde" },
+  "add_one_9e34a6f8": { "message": "Legg til ein." },
   "additional_considerations_f3801683": { "message": "Ekstra omsyn" },
   "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
     "message": "Nabolenker med samme URL bør være ei lenke."
@@ -57,6 +58,7 @@ const locale = {
   },
   "and_7fcc2911": { "message": "Og" },
   "angle_c5b4ec50": { "message": "Vinkel" },
+  "announcement_fb4cb645": { "message": "Kunngjering" },
   "announcement_list_da155734": { "message": "Kunngjeringsliste" },
   "announcements_a4b8ed4a": { "message": "Kunngjeringar" },
   "apply_781a2546": { "message": "Bruk" },
@@ -74,6 +76,7 @@ const locale = {
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Storleiksforhold vil bli behalden"
   },
+  "assignment_976578a8": { "message": "Oppgåve" },
   "assignments_1e02582c": { "message": "Oppgåver" },
   "asterisk_82255584": { "message": "Stjerne" },
   "attributes_963ba262": { "message": "Attributt" },
@@ -240,6 +243,7 @@ const locale = {
   "directionality_26ae9e08": { "message": "Retningsgivande" },
   "directly_edit_latex_b7e9235b": { "message": "Rediger LaTeX direkte" },
   "disable_preview_222bdf72": { "message": "Deaktiver førehandsvising" },
+  "discussion_6719c51d": { "message": "Diskusjon" },
   "discussions_a5f96392": { "message": "Diskusjonar" },
   "discussions_index_6c36ced": { "message": "Diskusjonsoversikt" },
   "disjoint_union_e74351a8": { "message": "Disjunkt union" },
@@ -582,6 +586,7 @@ const locale = {
   "minus_plus_3461f637": { "message": "Minus/Pluss" },
   "misc_3b692ea7": { "message": "Diverse" },
   "miscellaneous_e9818229": { "message": "Diverse" },
+  "module_90d9fd32": { "message": "Modul" },
   "modules_c4325335": { "message": "Modular" },
   "mu_37223b8b": { "message": "Mu" },
   "multi_color_image_63d7372f": { "message": "Fleirfargebilde" },
@@ -599,8 +604,10 @@ const locale = {
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Naviger gjennom menyen eller verktøylinja"
   },
+  "navigation_ee9af92d": { "message": "Navigasjon" },
   "nested_greater_than_d852e60d": { "message": "Nøsta større enn" },
   "nested_less_than_27d17e58": { "message": "Nøsta mindre enn" },
+  "new_quiz_34aacba6": { "message": "Ny quiz" },
   "next_40e12421": { "message": "Neste" },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "Ingen problem med tilgjengeligheit funne"
@@ -609,6 +616,7 @@ const locale = {
   "no_e16d9132": { "message": "Nei" },
   "no_file_chosen_9a880793": { "message": "Ingen filer er valde" },
   "no_headers_9bc7dc7f": { "message": "Ingen overskrifter" },
+  "no_pages_created_yet_c379fa6e": { "message": "Ingen sider er oppretta." },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "Førehandsvising er ikkje tilgjengeleg for denne fila."
   },
@@ -656,6 +664,7 @@ const locale = {
   "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
     "message": "{ p } er ikkje ein gyldig protokoll. Den må vere anten ftp, http, https, mailto, skype, tel, eller utelatast"
   },
+  "page_50c4823d": { "message": "Side" },
   "pages_e5414c2c": { "message": "Sider" },
   "paragraph_5e5ad8eb": { "message": "Avsnitt" },
   "paragraph_starting_with_start_a59923f8": {
@@ -710,6 +719,7 @@ const locale = {
   "pumpkin_904428d5": { "message": "Gresskar" },
   "purple_7678a9fc": { "message": "Lilla" },
   "quaternions_877024e0": { "message": "Kvaternion" },
+  "quiz_e0dcce8f": { "message": "Quiz" },
   "quizzes_7e598f57": { "message": "Quizar" },
   "rational_numbers_80ddaa4a": { "message": "Rasjonelle tal" },
   "real_numbers_7c99df94": { "message": "Reelle tal" },
@@ -787,6 +797,7 @@ const locale = {
   "select_crop_shape_d441feeb": { "message": "Vel skjæringsform" },
   "select_language_7c93a900": { "message": "Vel språk" },
   "select_video_source_1b5c9dbe": { "message": "Vel videokilde" },
+  "selected_274ce24f": { "message": "Valt" },
   "selected_linkfilename_c093b1f2": { "message": "Vald { linkFileName }" },
   "selection_b52c4c5e": { "message": "Utval" },
   "set_minus_b46e9b88": { "message": "Sett minus" },

@@ -160,6 +160,7 @@ module SeleniumExtensions
         execute_script
         execute_async_script
         browser
+        capabilities
       ]
   ).each do |method|
       define_method(method) do |*args|

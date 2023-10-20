@@ -59,8 +59,7 @@ module Turnitin
       let(:originality_report_url) { "http://example.com/report" }
 
       before do
-        allow(subject).to receive(:originality_data).and_return(originality_data)
-        allow(subject).to receive(:originality_report_url).and_return(originality_report_url)
+        allow(subject).to receive_messages(originality_data:, originality_report_url:)
       end
 
       it "sets the similarity_score" do

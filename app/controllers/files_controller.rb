@@ -165,7 +165,7 @@ class FilesController < ApplicationController
 
   before_action :check_file_access_flags, only: [:show_relative, :show]
 
-  skip_before_action :verify_authenticity_token # , only: [:api_create, :show]
+  skip_before_action :verify_authenticity_token, only: :api_create
   before_action :verify_api_id, only: %i[
     api_show api_create_success api_file_status api_update destroy icon_metadata reset_verifier
   ]
@@ -208,7 +208,13 @@ class FilesController < ApplicationController
   #  { "quota": 524288000, "quota_used": 402653184 }
   #
   def api_quota
-    if authorized_action(@context.attachments.build, @current_user, %i[create update delete])
+    # allow user quota info to be viewed by admins
+    permitted = true if @context.is_a?(User) &&
+                        @domain_root_account.grants_any_right?(
+                          @current_user,
+                          *RoleOverride::GRANULAR_FILE_PERMISSIONS
+                        )
+    if permitted || authorized_action(@context.attachments.build, @current_user, %i[create update delete])
       get_quota
       render json: { quota: @quota, quota_used: @quota_used }
     end
@@ -545,7 +551,7 @@ class FilesController < ApplicationController
 
     params[:include] = Array(params[:include])
     if access_allowed(@attachment, @current_user, :read)
-      json = attachment_json(@attachment, @current_user, {}, { include: params[:include], omit_verifier_in_app: !value_to_boolean(params[:use_verifiers]) })
+      json = attachment_json(@attachment, @current_user, {}, { include: params[:include], verifier: params[:verifier], omit_verifier_in_app: !value_to_boolean(params[:use_verifiers]) })
 
       # Add canvadoc session URL if the file is unlocked
       json.merge!(
@@ -707,7 +713,7 @@ class FilesController < ApplicationController
           @headers = false
           @show_left_side = false
         end
-        if attachment.content_type&.match(%r{\Avideo/|audio/})
+        if attachment.content_type&.match(%r{\Avideo/|audio/|application/pdf})
           attachment.context_module_action(@current_user, :read)
         end
         format.html do
@@ -756,7 +762,7 @@ class FilesController < ApplicationController
                          end
 
           json[:attachment].merge!(
-            attachment_json(attachment, @current_user, {}, json_include)
+            attachment_json(attachment, @current_user, {}, json_include.merge(verifier: params[:verifier]))
           )
 
           # Add canvadoc session URL if the file is unlocked
@@ -1035,10 +1041,11 @@ class FilesController < ApplicationController
     @context = model.where(id: params[:context_id]).first
 
     @attachment = if params.key?(:precreated_attachment_id)
-                    att = Attachment.find(params[:precreated_attachment_id])
+                    att = Attachment.where(id: params[:precreated_attachment_id]).take
                     if att.nil?
                       reject! "Requested to use precreated attachment, but attachment with id #{params[:precreated_attachment_id]} doesn't exist", 422
                     else
+                      att.file_state = "available"
                       att
                     end
                   else
@@ -1116,7 +1123,7 @@ class FilesController < ApplicationController
     end
 
     render status: :created,
-           json: attachment_json(@attachment, @attachment.user, {}, include: includes),
+           json: attachment_json(@attachment, @attachment.user, {}, { include: includes, verifier: params[:verifier] }),
            location: api_v1_attachment_url(@attachment, include: includes)
   end
 
@@ -1305,7 +1312,7 @@ class FilesController < ApplicationController
       end
       if @attachment.save
         @attachment.handle_duplicates(on_duplicate) if on_duplicate
-        render json: attachment_json(@attachment, @current_user, {}, { omit_verifier_in_app: true })
+        render json: attachment_json(@attachment, @current_user, {}, { omit_verifier_in_app: true, verifier: params[:verifier] })
       else
         render json: @attachment.errors, status: :bad_request
       end
@@ -1475,7 +1482,7 @@ class FilesController < ApplicationController
     @context = @attachment.context
     if can_replace_file?
       @attachment.reset_uuid!
-      render json: attachment_json(@attachment, @current_user, {}, { omit_verifier_in_app: true })
+      render json: attachment_json(@attachment, @current_user, {}, { omit_verifier_in_app: true, verifier: params[:verifier] })
     else
       render_unauthorized_action
     end

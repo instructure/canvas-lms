@@ -30,16 +30,8 @@ describe KalturaMediaFileHandler do
     let(:bulk_upload_add_response) { { id: "someBulkUploadId", ready: false } }
 
     before do
-      allow(CanvasKaltura::ClientV3).to receive(:config).and_return(kaltura_config)
-      allow(CanvasKaltura::ClientV3).to receive(:new).and_return(kaltura_client)
+      allow(CanvasKaltura::ClientV3).to receive_messages(config: kaltura_config, new: kaltura_client)
       allow(kaltura_client).to receive(:startSession)
-    end
-
-    it "returns without action when all attachments have media objects already" do
-      expect(kaltura_client).not_to receive(:bulkUploadAdd)
-      attachment.media_entry_id = media_object.media_id
-      res = KalturaMediaFileHandler.new.add_media_files(attachment, wait_for_completion)
-      expect(res).to be_nil
     end
 
     context "with successful upload" do

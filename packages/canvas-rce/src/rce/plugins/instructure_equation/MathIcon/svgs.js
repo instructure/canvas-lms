@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/** *** This is an auto-generated file. Please do not modify manually **** */
-/** ********** If you need to update, run 'yarn generate-svgs' *********** */
+/***** This is an auto-generated file. Please do not modify manually *****/
+/************ If you need to update, run 'yarn generate-svgs' ************/
 
 export default {
   '_{\\placeholder{}}':

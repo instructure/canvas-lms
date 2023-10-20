@@ -18,12 +18,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Mutations::UpdateDiscussionTopic < Mutations::BaseMutation
+class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
   graphql_name "UpdateDiscussionTopic"
 
   argument :discussion_topic_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("DiscussionTopic")
-  argument :published, Boolean, required: false
-  argument :locked, Boolean, required: false
 
   field :discussion_topic, Types::DiscussionType, null: false
   def resolve(input:)

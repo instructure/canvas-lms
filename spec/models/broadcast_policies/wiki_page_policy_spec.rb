@@ -21,8 +21,7 @@ module BroadcastPolicies
   describe WikiPagePolicy do
     let(:course) do
       double("Course").tap do |c|
-        allow(c).to receive(:unpublished?).and_return(false)
-        allow(c).to receive(:concluded?).and_return(false)
+        allow(c).to receive_messages(unpublished?: false, concluded?: false)
       end
     end
 
@@ -34,11 +33,11 @@ module BroadcastPolicies
 
     let(:wiki_page) do
       double("WikiPage").tap do |w|
-        allow(w).to receive(:created_at).and_return(1.hour.ago)
-        allow(w).to receive(:published?).and_return(true)
-        allow(w).to receive(:wiki).and_return(wiki)
-        allow(w).to receive(:context).and_return(course)
-        allow(w).to receive(:just_created).and_return(false)
+        allow(w).to receive_messages(created_at: 1.hour.ago,
+                                     published?: true,
+                                     wiki:,
+                                     context: course,
+                                     just_created: false)
       end
     end
     let(:policy) { WikiPagePolicy.new(wiki_page) }

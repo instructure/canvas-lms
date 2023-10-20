@@ -25,11 +25,15 @@ module FilesHelper
       return render_unauthorized_action unless @attachment&.media_entry_id
 
       @media_object = @attachment.media_object_by_media_id
-      @media_object.current_attachment = @attachment
+      @media_object.current_attachment = @attachment unless @media_object.nil?
       @media_id = @media_object&.id
     elsif params[:media_object_id].present?
       @media_id = params[:media_object_id]
       @media_object = MediaObject.by_media_id(@media_id).take
+    elsif Account.site_admin.feature_enabled?(:authenticated_iframe_content) && params[:id].present?
+      @media_id = params[:id]
+      @media_object = MediaObject.find_by(id: params[:id])
+      @attachment = @media_object&.attachment
     end
   end
 
@@ -51,7 +55,7 @@ module FilesHelper
     submissions = attachment.attachment_associations.where(context_type: "Submission").preload(:context)
                             .filter_map(&:context)
     return true if submissions.any? { |submission| submission.grants_right?(user, session, access_type) }
-    return render_unauthorized_action if attachment.editing_restricted?(:content)
+    return render_unauthorized_action if (access_type == :update) && attachment.editing_restricted?(:content)
 
     authorized_action(attachment, user, access_type)
   end

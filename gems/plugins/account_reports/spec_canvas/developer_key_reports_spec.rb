@@ -96,7 +96,17 @@ describe AccountReports::DeveloperKeyReports do
     expect(subject).to eq(expected_result)
   end
 
-  describe "the site_admin key is now visible" do
+  context "the first key isn't marked as visible" do
+    before do
+      first_key.update!(visible: false)
+    end
+
+    it "still returns the first key" do
+      expect(subject).to eq(expected_result)
+    end
+  end
+
+  context "the site_admin key is now visible" do
     let(:expected_result) do
       er = super()
       er.append(
@@ -121,7 +131,7 @@ describe AccountReports::DeveloperKeyReports do
       expect(subject).to eq(expected_result)
     end
 
-    describe "the site_admin key is set to allow" do
+    context "the site_admin key is set to on" do
       before do
         site_admin_key.developer_key_account_bindings.first.update!(account: Account.site_admin, workflow_state: "on")
       end

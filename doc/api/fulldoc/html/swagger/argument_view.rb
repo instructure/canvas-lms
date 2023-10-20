@@ -119,7 +119,8 @@ class ArgumentView < HashView
   def swagger_format
     type = (types.first || "string")
     return "int64" if swagger_type == "integer"
-    return "float" if type.casecmp?("float")
+
+    "float" if type.casecmp?("float")
   end
 
   def optional?

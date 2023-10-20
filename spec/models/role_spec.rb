@@ -152,7 +152,7 @@ describe Role do
     it "does not allow a duplicate active role to be created in the same account" do
       dup_role = @account.roles.new name: "1337 Student"
       dup_role.base_role_type = "StudentEnrollment"
-      expect(dup_role).to be_invalid
+      expect(dup_role).not_to be_valid
       @role.destroy
       expect(dup_role).to be_valid
     end

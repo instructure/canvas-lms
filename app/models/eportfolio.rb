@@ -159,7 +159,7 @@ class Eportfolio < ActiveRecord::Base
     return nil if spam_keywords.blank?
 
     escaped_keywords = spam_keywords.map { |token| Regexp.escape(token) }
-    /\b(#{escaped_keywords.join('|')})\b/i
+    /\b(#{escaped_keywords.join("|")})\b/i
   end
 
   private

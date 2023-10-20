@@ -84,15 +84,14 @@ exports.fonts = {
 }
 
 exports.babel = {
-  test: /\.(js|ts|tsx)$/,
+  test: /\.(js|ts|jsx|tsx)$/,
   include: [
     resolve(canvasDir, 'ui'),
     resolve(canvasDir, 'packages/jquery-kyle-menu'),
     resolve(canvasDir, 'packages/jquery-popover'),
+    resolve(canvasDir, 'packages/canvas-planner'),
     resolve(canvasDir, 'packages/jquery-selectmenu'),
-    resolve(canvasDir, 'packages/defer-promise'),
     resolve(canvasDir, 'packages/convert-case'),
-    resolve(canvasDir, 'packages/html-escape'),
     resolve(canvasDir, 'packages/slickgrid'),
     resolve(canvasDir, 'packages/with-breakpoints'),
     resolve(canvasDir, 'spec/javascripts/jsx'),
@@ -184,6 +183,7 @@ exports.istanbul = {
     resolve(canvasDir, 'ui'),
     resolve(canvasDir, 'packages/jquery-kyle-menu'),
     resolve(canvasDir, 'packages/jquery-popover'),
+    resolve(canvasDir, 'packages/canvas-planner'),
     resolve(canvasDir, 'packages/jquery-selectmenu'),
     resolve(canvasDir, 'packages/slickgrid'),
     resolve(canvasDir, 'packages/with-breakpoints'),

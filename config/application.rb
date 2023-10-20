@@ -97,6 +97,7 @@ module CanvasRails
     config.active_record.observers = %i[cacher stream_item_cache live_events_observer]
 
     config.active_support.encode_big_decimal_as_string = false
+    config.active_support.remove_deprecated_time_with_zone_name = true
 
     config.paths["lib"].eager_load!
     config.paths.add("app/middleware", eager_load: true, autoload_once: true)

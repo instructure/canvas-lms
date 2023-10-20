@@ -1090,6 +1090,11 @@ describe GroupsController do
         put "create_file", params: request_params
         expect(created_attachment.folder).to eq Folder.unfiled_folder(group)
       end
+
+      it "does not check quota if submit_assignment is true" do
+        put "create_file", params: request_params.merge(submit_assignment: true)
+        expect_any_instance_of(Attachment).not_to receive(:get_quota)
+      end
     end
   end
 end

@@ -16,22 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {getBrowser} from 'parse-browser-info'
 import ready from '@instructure/ready'
+
+function isSafariVersion13OrGreater() {
+  const match = /Version\/(\d+).+Safari/.exec(navigator.userAgent)
+  return match ? parseInt(match[1], 10) >= 13 : false
+}
 
 ready(() => {
   // See service worker definition for comments on purpose and why we only
   // install it for recent (13+) Safari.
-  const {name, version} = getBrowser()
-  if (name === 'Safari' && parseFloat(version) >= 13 && 'serviceWorker' in navigator) {
+  if (isSafariVersion13OrGreater() && 'serviceWorker' in navigator) {
     navigator.serviceWorker
       .register('/inst-fs-sw.js')
       .then(() => {
+        // eslint-disable-next-line no-console
         console.log(
           'Registration succeeded. Refresh page to proxy Inst-FS requests through ServiceWorker.'
         )
       })
       .catch(function (err) {
+        // eslint-disable-next-line no-console
         console.log('Inst-FS ServiceWorker registration failed. :(', err)
       })
   }

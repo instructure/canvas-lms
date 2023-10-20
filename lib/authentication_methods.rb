@@ -47,6 +47,8 @@ module AuthenticationMethods
 
     auth_context = ::AuthenticationMethods::InstAccessToken.load_user_and_pseudonym_context(token, @domain_root_account)
 
+    raise AccessTokenError unless ::AuthenticationMethods::InstAccessToken.usable_developer_key?(token, @domain_root_account)
+
     @current_user = auth_context[:current_user]
     @current_pseudonym = auth_context[:current_pseudonym]
     raise AccessTokenError unless @current_user && @current_pseudonym

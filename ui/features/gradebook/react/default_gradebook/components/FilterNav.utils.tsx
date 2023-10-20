@@ -23,13 +23,19 @@ import type {AssignmentGroup, Module, Section, StudentGroupCategoryMap} from '..
 import type {CamelizedGradingPeriod} from '@canvas/grading/grading.d'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import natcompare from '@canvas/util/natcompare'
-import {doFiltersMatch, isFilterNotEmpty} from '../Gradebook.utils'
+import {
+  doFiltersMatch,
+  getCustomStatusIdStrings,
+  isFilterNotEmpty,
+  mapCustomStatusToIdString,
+} from '../Gradebook.utils'
 import type {
   Filter,
   FilterDrilldownData,
   FilterDrilldownMenuItem,
   FilterPreset,
 } from '../gradebook.d'
+import {GradeStatus} from '@canvas/grading/accountGradingStatus'
 
 const I18n = useI18nScope('gradebook')
 
@@ -43,6 +49,7 @@ function useFilterDropdownData({
   studentGroupCategories,
   onToggleFilterPreset,
   onToggleDateModal,
+  customStatuses,
 }: {
   appliedFilters: Filter[]
   assignmentGroups: AssignmentGroup[]
@@ -53,6 +60,7 @@ function useFilterDropdownData({
   studentGroupCategories: StudentGroupCategoryMap
   onToggleFilterPreset: (filterPreset: FilterPreset) => void
   onToggleDateModal: () => void
+  customStatuses: GradeStatus[]
 }) {
   const assignments = assignmentGroups.flatMap(ag => ag.assignments)
   const modulesWithGradeableAssignments = useMemo(() => {
@@ -92,20 +100,22 @@ function useFilterDropdownData({
         name: I18n.t('Sections'),
         parentId: 'savedFilterPresets',
         isSelected: appliedFilters.some(c => c.type === 'section'),
-        items: sections.map(s => ({
-          id: s.id,
-          name: s.name,
-          isSelected: appliedFilters.some(c => c.type === 'section' && c.value === s.id),
-          onToggle: () => {
-            const filter: Filter = {
-              id: uuid.v4(),
-              type: 'section',
-              value: s.id,
-              created_at: new Date().toISOString(),
-            }
-            toggleFilter(filter)
-          },
-        })),
+        items: sections
+          .sort((s1, s2) => natcompare.strings(s1.name, s2.name))
+          .map(s => ({
+            id: s.id,
+            name: s.name,
+            isSelected: appliedFilters.some(c => c.type === 'section' && c.value === s.id),
+            onToggle: () => {
+              const filter: Filter = {
+                id: uuid.v4(),
+                type: 'section',
+                value: s.id,
+                created_at: new Date().toISOString(),
+              }
+              toggleFilter(filter)
+            },
+          })),
       }
       dataMap.sections = filterItems.sections
     }
@@ -233,7 +243,7 @@ function useFilterDropdownData({
       }
       dataMap['student-groups'] = filterItems['student-groups']
     }
-
+    const customStatusIdStrings = getCustomStatusIdStrings(customStatuses)
     filterItems.status = {
       id: 'status',
       name: I18n.t('Status'),
@@ -241,9 +251,15 @@ function useFilterDropdownData({
       isSelected: appliedFilters.some(
         c =>
           c.type === 'submissions' &&
-          ['late', 'missing', 'resubmitted', 'dropped', 'excused', 'extended'].includes(
-            c.value || ''
-          )
+          [
+            'late',
+            'missing',
+            'resubmitted',
+            'dropped',
+            'excused',
+            'extended',
+            ...customStatusIdStrings,
+          ].includes(c.value || '')
       ),
       items: [
         {
@@ -336,26 +352,46 @@ function useFilterDropdownData({
         },
       })
     }
+    customStatuses.forEach(status => {
+      filterItems.status.items!.push({
+        id: mapCustomStatusToIdString(status),
+        name: status.name,
+        isSelected: appliedFilters.some(
+          c => c.type === 'submissions' && c.value === mapCustomStatusToIdString(status)
+        ),
+        onToggle: () => {
+          const filter: Filter = {
+            id: uuid.v4(),
+            type: 'submissions',
+            value: mapCustomStatusToIdString(status),
+            created_at: new Date().toISOString(),
+          }
+          toggleFilter(filter)
+        },
+      })
+    })
     dataMap.status = filterItems.status
 
     filterItems.submissions = {
       id: 'submissions',
       name: I18n.t('Submissions'),
       parentId: 'savedFilterPresets',
-      isSelected: appliedFilters.some(c => c.type === 'submissions'),
+      isSelected: appliedFilters.some(
+        c =>
+          c.type === 'submissions' &&
+          [
+            'has-ungraded-submissions',
+            'has-submissions',
+            'has-no-submissions',
+            'has-unposted-grades',
+          ].includes(c.value || '')
+      ),
       items: [
         {
-          id: 'savedFilterPresets',
+          id: '1',
           name: I18n.t('Has Ungraded Submissions'),
           isSelected: appliedFilters.some(
-            c =>
-              c.type === 'submissions' &&
-              [
-                'has-ungraded-submissions',
-                'has-submissions',
-                'has-no-submissions',
-                'has-unposted-grades',
-              ].includes(c.value || '')
+            c => c.type === 'submissions' && c.value === 'has-ungraded-submissions'
           ),
           onToggle: () => {
             const filter: Filter = {
@@ -433,6 +469,7 @@ function useFilterDropdownData({
   }, [
     appliedFilters,
     assignmentGroups,
+    customStatuses,
     filterPresets,
     gradingPeriods,
     modulesWithGradeableAssignments,

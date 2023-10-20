@@ -186,8 +186,7 @@ describe Login::SamlController do
     @pseudonym.save!
 
     saml_response = SAML2::Response.new
-    allow(saml_response).to receive(:errors).and_return([])
-    allow(saml_response).to receive(:issuer).and_return(double(id: "such a lie"))
+    allow(saml_response).to receive_messages(errors: [], issuer: double(id: "such a lie"))
     allow(SAML2::Bindings::HTTP_POST).to receive(:decode).and_return(
       [saml_response, nil]
     )
@@ -235,9 +234,7 @@ describe Login::SamlController do
     @pseudonym.save!
 
     saml_response = SAML2::Response.new
-    allow(saml_response).to receive(:errors).and_return([])
-    allow(saml_response).to receive(:issuer).and_return(nil)
-    allow(saml_response).to receive(:assertions).and_return([double(issuer: double(id: "such a lie"))])
+    allow(saml_response).to receive_messages(errors: [], issuer: nil, assertions: [double(issuer: double(id: "such a lie"))])
     allow(SAML2::Bindings::HTTP_POST).to receive(:decode).and_return(
       [saml_response, nil]
     )
@@ -586,8 +583,7 @@ describe Login::SamlController do
 
       it "redirects to login screen with message if no AAC found" do
         saml_response = SAML2::Response.new
-        allow(saml_response).to receive(:errors).and_return([])
-        allow(saml_response).to receive(:issuer).and_return(double(id: "hahahahahahaha"))
+        allow(saml_response).to receive_messages(errors: [], issuer: double(id: "hahahahahahaha"))
         allow(SAML2::Bindings::HTTP_POST).to receive(:decode).and_return(
           [saml_response, nil]
         )

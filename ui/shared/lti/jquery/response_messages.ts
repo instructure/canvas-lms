@@ -29,7 +29,7 @@ export interface ResponseMessages {
   sendGenericError: (message?: string | undefined) => void
   sendBadRequestError: (message: any) => void
   sendWrongOriginError: () => void
-  sendUnsupportedSubjectError: () => void
+  sendUnsupportedSubjectError: (message?: string | undefined) => void
   isResponse: (message: any) => boolean
 }
 
@@ -38,25 +38,25 @@ const buildResponseMessages = ({
   origin,
   subject,
   message_id,
-  toolOrigin,
+  sourceToolInfo,
 }: {
   targetWindow: Window | null
   origin: string
   subject: unknown
   message_id: unknown
-  toolOrigin: unknown
+  sourceToolInfo: unknown
 }): ResponseMessages => {
   const sendResponse = (contents = {}) => {
     const message: {
       subject: string
       message_id?: unknown
-      toolOrigin?: unknown
+      sourceToolInfo?: unknown
     } = {subject: `${subject}.response`}
     if (message_id) {
       message.message_id = message_id
     }
-    if (toolOrigin) {
-      message.toolOrigin = toolOrigin
+    if (sourceToolInfo) {
+      message.sourceToolInfo = sourceToolInfo
     }
     if (targetWindow) {
       targetWindow.postMessage({...message, ...contents}, origin)
@@ -90,8 +90,8 @@ const buildResponseMessages = ({
     sendError(WRONG_ORIGIN_ERROR_CODE)
   }
 
-  const sendUnsupportedSubjectError = () => {
-    sendError(UNSUPPORTED_SUBJECT_ERROR_CODE)
+  const sendUnsupportedSubjectError = (message?: string) => {
+    sendError(UNSUPPORTED_SUBJECT_ERROR_CODE, message)
   }
 
   const isResponse = message => !!message.data?.subject?.endsWith('.response')

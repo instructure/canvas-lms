@@ -34,7 +34,7 @@ const fs = require('fs')
 const mathjax = require('mathjax')
 
 const buttons =
-  require('../lib/rce/plugins/instructure_equation/EquationEditorToolbar/buttons').default
+  require('../es/rce/plugins/instructure_equation/EquationEditorToolbar/buttons')
 
 const OUTPUT_PATH = 'src/rce/plugins/instructure_equation/MathIcon/svgs.js'
 const SVGS_TEMPLATE = `/*

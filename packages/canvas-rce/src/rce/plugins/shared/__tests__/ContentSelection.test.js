@@ -341,6 +341,10 @@ describe('RCE > Plugins > Shared > Content Selection', () => {
       const result = findMediaPlayerIframe(shim)
       expect(result).toEqual(mediaIframe)
     })
+    it('does not error if given null', () => {
+      const result = findMediaPlayerIframe(null)
+      expect(result).toEqual(null)
+    })
   })
 
   describe('predicates', () => {
@@ -391,6 +395,15 @@ describe('RCE > Plugins > Shared > Content Selection', () => {
     it('ignore some random markup', () => {
       const $selectedNode = document.createElement('div')
       $selectedNode.innerHTML = 'hello world'
+      editor.setSelectedNode($selectedNode)
+      expect(isFileLink($selectedNode, editor)).toBeFalsy()
+      expect(isImageEmbed($selectedNode)).toBeFalsy()
+      expect(isVideoElement($selectedNode)).toBeFalsy()
+      expect(isAudioElement($selectedNode)).toBeFalsy()
+    })
+
+    it('does not error on null', () => {
+      const $selectedNode = null
       editor.setSelectedNode($selectedNode)
       expect(isFileLink($selectedNode, editor)).toBeFalsy()
       expect(isImageEmbed($selectedNode)).toBeFalsy()

@@ -23,8 +23,6 @@ import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobal
 
 injectGlobalAlertContainers()
 
-global.URL.createObjectURL = jest.fn().mockReturnValue('')
-
 describe('ModelBody', () => {
   const defaultProps = {
     attachments: [],

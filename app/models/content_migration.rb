@@ -20,7 +20,7 @@
 
 class ContentMigration < ActiveRecord::Base
   include Workflow
-  include TextHelper
+  include HtmlTextHelper
   include Rails.application.routes.url_helpers
   include CanvasOutcomesHelper
 
@@ -49,7 +49,6 @@ class ContentMigration < ActiveRecord::Base
 
   attr_accessor :outcome_to_id_map,
                 :attachment_path_id_lookup,
-                :attachment_path_id_lookup_lower,
                 :last_module_position,
                 :skipped_master_course_items,
                 :copied_external_outcome_map
@@ -590,7 +589,7 @@ class ContentMigration < ActiveRecord::Base
 
         # handle deletions before files are copied
         deletions = data["deletions"].presence
-        process_master_deletions(deletions.except("AssignmentGroup")) if deletions # wait until after the import to do AssignmentGroups
+        process_master_deletions(deletions.except("LearningOutcome", "AssignmentGroup")) if deletions # wait until after the import to do LearningOutcomes and AssignmentGroups
 
         # copy the attachments
         source_export = ContentExport.find(migration_settings[:master_course_export_id])
@@ -631,7 +630,7 @@ class ContentMigration < ActiveRecord::Base
 
       import!(data)
 
-      process_master_deletions(deletions.slice("AssignmentGroup")) if deletions
+      process_master_deletions(deletions.slice("LearningOutcome", "AssignmentGroup")) if deletions
 
       unless import_immediately?
         update_import_progress(100)
@@ -749,6 +748,8 @@ class ContentMigration < ActiveRecord::Base
       item_scope.each do |content|
         child_tag = master_course_subscription.content_tag_for(content)
         skip_item = child_tag.downstream_changes.any? && !content.editing_restricted?(:any)
+        outcome, link = get_outcome_and_link(content, context)
+        content_is_outcome = !outcome.nil? && !link.nil?
         if content.is_a?(AssignmentGroup) && !skip_item && content.assignments.active.exists?
           skip_item = true # don't delete an assignment group if an assignment is left (either they added one or changed one so it was skipped)
         end
@@ -756,8 +757,11 @@ class ContentMigration < ActiveRecord::Base
         if skip_item
           Rails.logger.debug("skipping deletion sync for #{content.asset_string} due to downstream changes #{child_tag.downstream_changes}")
           add_skipped_item(child_tag)
-        elsif content_is_an_outcome_and_has_results?(content, context)
+        elsif content_is_outcome && outcome_has_results?(outcome, context)
           Rails.logger.debug { "skipping deletion sync for #{content.asset_string} due to there are Learning Outcomes Results" }
+          add_skipped_item(child_tag)
+        elsif content_is_outcome && outcome_has_active_alignments?(link, outcome, context)
+          Rails.logger.debug { "skipping deletion sync for #{content.asset_string} due to there are active Alignments to Content" }
           add_skipped_item(child_tag)
         else
           Rails.logger.debug("syncing deletion of #{content.asset_string} from master course")
@@ -768,14 +772,25 @@ class ContentMigration < ActiveRecord::Base
     end
   end
 
-  def content_is_an_outcome_and_has_results?(content, context)
+  def get_outcome_and_link(content, context)
     outcome = nil
+    link = nil
     if content.is_a?(LearningOutcome)
       outcome = content
+      context_type = context.is_a?(Course) ? "Course" : "Account"
+      link = ContentTag.find_by(content_id: outcome.id, content_type: "LearningOutcome", associated_asset_type: "LearningOutcomeGroup", context_id: context.id, context_type:)
     elsif content.is_a?(ContentTag) && content.content_type == "LearningOutcome"
+      link = content
       outcome = LearningOutcome.find_by(id: content.content_id, context_type: "Account")
     end
-    return false if outcome.nil?
+    [outcome, link]
+  end
+
+  def outcome_has_active_alignments?(link, outcome, context)
+    !link.can_destroy? || outcome_has_alignments?(outcome, context)
+  end
+
+  def outcome_has_results?(outcome, context)
     return true if outcome.learning_outcome_results.where("workflow_state <> 'deleted' AND context_type='Course' AND context_code='course_#{context.id}'").count > 0
 
     outcome_has_authoritative_results?(outcome, context)
@@ -925,15 +940,15 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def html_converter
-    @html_converter ||= ImportedHtmlConverter.new(self)
+    @html_converter ||= CanvasImportedHtmlConverter.new(self)
   end
 
-  def convert_html(*args)
-    html_converter.convert(*args)
+  def convert_html(*args, **keyword_args)
+    html_converter.convert(*args, **keyword_args)
   end
 
-  def convert_text(*args)
-    html_converter.convert_text(*args)
+  def convert_text(text)
+    format_message(text || "")[0]
   end
 
   delegate :resolve_content_links!, to: :html_converter
@@ -1087,9 +1102,7 @@ class ContentMigration < ActiveRecord::Base
 
   def add_attachment_path(path, migration_id)
     self.attachment_path_id_lookup ||= {}
-    self.attachment_path_id_lookup_lower ||= {}
     self.attachment_path_id_lookup[path] = migration_id
-    self.attachment_path_id_lookup_lower[path.downcase] = migration_id
   end
 
   def add_external_tool_translation(migration_id, target_tool, custom_fields)
@@ -1143,8 +1156,38 @@ class ContentMigration < ActiveRecord::Base
 
   ASSET_ID_MAP_TYPES = %w[Assignment Announcement Attachment ContentTag ContextModule DiscussionTopic Quizzes::Quiz WikiPage].freeze
 
+  MIGRATION_DATA_FIELDS = {
+    "WikiPage" => %i[url current_lookup_id],
+    "Attachment" => %i[media_entry_id]
+  }.freeze
+
+  def migration_data_fields_for(asset_type)
+    MIGRATION_DATA_FIELDS[asset_type] || []
+  end
+
+  def add_asset_pair_to_mapping(mapping, key, mig_id, src_asset_fields, dest_asset_fields)
+    # mig_ids are md5 hashes (eg they have 32 digits), so there should be zero overlap with
+    # the src_ids which are DB primary keys or global_ids and they can safely be stored on the same
+    # hash.
+    #
+    src_asset_fields[:id] = src_asset_fields[:id].to_s if src_asset_fields[:id]
+    dest_asset_fields[:id] = dest_asset_fields[:id].to_s
+
+    src_id = src_asset_fields[:id]
+    dest_id = dest_asset_fields[:id]
+
+    mapping[key][src_id] = dest_id if src_id.present?
+
+    return unless asset_map_v2?
+
+    mapping[key][mig_id] = {
+      source: src_asset_fields,
+      destination: dest_asset_fields
+    }
+  end
+
   def asset_id_mapping
-    return nil unless (imported? || importing?) && source_course
+    return nil unless imported? || importing?
 
     mapping = {}
     master_template = migration_type == "master_course_import" &&
@@ -1158,8 +1201,12 @@ class ContentMigration < ActiveRecord::Base
       next unless klass.column_names.include? "migration_id"
 
       key = Context.api_type_name(klass)
+
+      has_attached_assignment = klass.column_names.include?("assignment_id")
+      fields = [*migration_data_fields_for(asset_type)]
+      fields.push(:assignment_id) if has_attached_assignment
       context.shard.activate do
-        scope = klass.column_names.include?("assignment_id") ? klass.select(:id, :assignment_id, :migration_id) : klass.select(:id, :migration_id)
+        scope = klass.select(:id, :migration_id, *fields)
         scope = scope.where(context:).where.not(migration_id: nil)
         scope = scope.only_discussion_topics if asset_type == "DiscussionTopic"
       end
@@ -1167,12 +1214,23 @@ class ContentMigration < ActiveRecord::Base
       scope.each do |o|
         mig_id_to_dest_id[o.migration_id.to_s] = {}
         mig_id_to_dest_id[o.migration_id.to_s][:id] = o.id
-        mig_id_to_dest_id[o.migration_id.to_s][:shell_id] = o.assignment_id if (o.class.column_names.include? "assignment_id") && o.assignment_id
+        mig_id_to_dest_id[o.migration_id.to_s][:shell_id] = o.assignment_id if has_attached_assignment && o.assignment_id
+
+        migration_data_fields_for(asset_type).each do |field|
+          mig_id_to_dest_id[o.migration_id.to_s][field] = o.send(field)
+        end
       end
 
       next if mig_id_to_dest_id.empty?
 
       mapping[key] ||= {}
+      unless source_course.present?
+        mig_id_to_dest_id.each do |mig_id, mig_fields|
+          add_asset_pair_to_mapping(mapping, key, mig_id, {}, mig_fields)
+        end
+        next
+      end
+
       if master_template
         # migration_ids are complicated in blueprint courses; fortunately, we have a stored mapping
         # between source id and migration_id in the MasterContentTags (except for ContentTags, which
@@ -1182,29 +1240,43 @@ class ContentMigration < ActiveRecord::Base
           src_ids.each do |src_id|
             global_asset_string = klass.asset_string(Shard.global_id_for(src_id, source_course.shard))
             mig_id = master_template.migration_id_for(global_asset_string)
-            mapping[key][src_id.to_s] = mig_id_to_dest_id[mig_id][:id].to_s if mig_id_to_dest_id[mig_id]
+
+            add_asset_pair_to_mapping(mapping, key, mig_id, { id: src_id }, { id: mig_id_to_dest_id[mig_id][:id] }) if mig_id_to_dest_id[mig_id]
           end
         else
+          association_name = MasterCourses::MasterContentTag.polymorphic_assoc_for(klass)
+          src_fields = [:content_id, :migration_id, *fields]
+
           master_template.master_content_tags
-                         .where(content_type: (asset_type == "Announcement") ? "DiscussionTopic" : asset_type,
-                                migration_id: mig_id_to_dest_id.keys)
-                         .pluck(:content_id, :migration_id)
-                         .each do |src_id, mig_id|
-            if mig_id_to_dest_id[mig_id]
-              mapping[key][src_id.to_s] = mig_id_to_dest_id[mig_id][:id].to_s if mig_id_to_dest_id[mig_id][:id]
-              mapping["assignments"][klass.find(src_id.to_s).assignment_id] = mig_id_to_dest_id[mig_id][:shell_id].to_s if mig_id_to_dest_id[mig_id][:shell_id]
-            end
+                         .where(migration_id: mig_id_to_dest_id.keys)
+                         .joins(association_name)
+                         .pluck(*src_fields)
+                         .each do |src_results|
+            src = src_fields.zip(src_results).to_h
+            src[:id] = src[:content_id]
+            mig_id = src[:migration_id]
+            next unless mig_id_to_dest_id[mig_id]
+
+            add_asset_pair_to_mapping(mapping, key, mig_id, src, mig_id_to_dest_id[mig_id]) if mig_id_to_dest_id[mig_id][:id]
+            src_assignment_id = mig_id_to_dest_id[mig_id][:shell_id] && src[:assignment_id]
+            next unless src_assignment_id
+
+            add_asset_pair_to_mapping(mapping, "assignments", mig_id, { id: src_assignment_id }, { id: mig_id_to_dest_id[mig_id][:shell_id] })
           end
         end
       else
+        src_fields = [:id, *migration_data_fields_for(asset_type)]
         # with course copy, there is no stored mapping between source id and migration_id,
         # so we will need to recompute migration_ids to discover the mapping
         source_course.shard.activate do
-          src_ids = klass.where(context: source_course).pluck(:id)
-          src_ids.each do |src_id|
-            asset_string = klass.asset_string(src_id)
+          srcs = klass.where(context: source_course).pluck(*src_fields).map do |field_values|
+            src_fields.zip(Array.wrap(field_values)).to_h
+          end
+          srcs.each do |src|
+            asset_string = klass.asset_string(src[:id])
             mig_id = CC::CCHelper.create_key(asset_string, global: global_ids)
-            mapping[key][src_id.to_s] = mig_id_to_dest_id[mig_id][:id].to_s if mig_id_to_dest_id[mig_id]
+
+            add_asset_pair_to_mapping(mapping, key, mig_id, src, mig_id_to_dest_id[mig_id]) if mig_id_to_dest_id[mig_id]
           end
         end
       end
@@ -1226,20 +1298,39 @@ class ContentMigration < ActiveRecord::Base
     )
   end
 
+  def asset_map_v2?
+    Account.site_admin.feature_enabled?(:content_migration_asset_map_v2)
+  end
+
   def generate_asset_map
     data = asset_id_mapping
     return if data.nil?
 
     payload = {
-      "source_host" => source_course.root_account.domain(ApplicationController.test_cluster_name),
-      "source_course" => source_course_id.to_s,
+      "source_host" => source_course&.root_account&.domain(ApplicationController.test_cluster_name),
+      "source_course" => source_course_id&.to_s,
+      "contains_migration_ids" => Account.site_admin.feature_enabled?(:content_migration_asset_map_v2),
       "resource_mapping" => data
     }
+
+    if asset_map_v2?
+      payload["destination_course"] = context.id.to_s
+      payload["destination_hosts"] = destination_hosts
+      root_folder = Folder.root_folders(context).first
+      payload["destination_root_folder"] = root_folder.name + "/" if root_folder
+      payload["attachment_path_id_lookup"] = migration_settings[:attachment_path_id_lookup].presence || attachment_path_id_lookup
+    end
 
     self.asset_map_attachment = Attachment.new(context: self, filename: "asset_map.json")
     Attachments::Storage.store_for_attachment(asset_map_attachment, StringIO.new(payload.to_json))
     asset_map_attachment.save!
     save!
+  end
+
+  def destination_hosts
+    return [] unless context
+
+    HostUrl.context_hosts(context.root_account).map { |h| h.split(":").first }
   end
 
   set_broadcast_policy do |p|
@@ -1272,4 +1363,8 @@ class ContentMigration < ActiveRecord::Base
       none
     end
   }
+
+  def self.find_most_recent_by_course_ids(source_course_id, context_id)
+    ContentMigration.where(source_course_id:, context_id:).order(finished_at: :desc).first
+  end
 end

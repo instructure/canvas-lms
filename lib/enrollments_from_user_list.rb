@@ -62,7 +62,7 @@ class EnrollmentsFromUserList
     if @enrollments.present?
       @course.transaction do
         user_ids = @enrollments.map(&:user_id).uniq
-        DueDateCacher.recompute_users_for_course(
+        SubmissionLifecycleManager.recompute_users_for_course(
           user_ids,
           @course,
           nil,

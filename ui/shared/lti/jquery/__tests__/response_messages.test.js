@@ -61,16 +61,16 @@ describe('response_messages', () => {
       })
     })
 
-    describe('when toolOrigin is present', () => {
-      const toolOrigin = 'some_tool_origin'
+    describe('when sourceToolInfo is present', () => {
+      const sourceToolInfo = {opaque: 'some opaque object'}
 
       beforeEach(() => {
-        resetBuilder({toolOrigin})
+        resetBuilder({sourceToolInfo})
       })
 
-      it('includes toolOrigin in response', () => {
+      it('includes sourceToolInfo in response', () => {
         builder.sendResponse()
-        expectPostMessageContents({toolOrigin})
+        expectPostMessageContents({sourceToolInfo})
       })
     })
 
@@ -172,6 +172,15 @@ describe('response_messages', () => {
   describe('sendUnsupportedSubjectError', () => {
     expectCodeAndMessageInError({
       subject: builder => builder.sendUnsupportedSubjectError(),
+      code: 'unsupported_subject',
+    })
+  })
+
+  describe('sendUnsupportedSubjectError with message', () => {
+    const message = 'wrong context'
+
+    expectCodeAndMessageInError({
+      subject: builder => builder.sendUnsupportedSubjectError(message),
       code: 'unsupported_subject',
     })
   })

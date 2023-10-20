@@ -207,6 +207,7 @@ const bindToEditSyllabus = function (course_summary_enabled) {
   $edit_course_syllabus_form.on('edit', () => {
     $edit_course_syllabus_form.show()
     $edit_syllabus_link.hide()
+    $edit_syllabus_link.attr('aria-expanded', 'true')
     $course_syllabus.hide()
     $course_syllabus_details.hide()
     easy_student_view.hide()
@@ -227,6 +228,7 @@ const bindToEditSyllabus = function (course_summary_enabled) {
   $edit_course_syllabus_form.on('hide_edit', () => {
     $edit_course_syllabus_form.hide()
     $edit_syllabus_link.show()
+    $edit_syllabus_link.attr('aria-expanded', 'false')
     $course_syllabus.show()
     easy_student_view.show()
     const text = $.trim($course_syllabus.html())
@@ -279,6 +281,8 @@ const bindToEditSyllabus = function (course_summary_enabled) {
       /*
       xsslint safeString.property syllabus_body
       */
+      // removing the 'enhanced' class allows any math in the syllabus to re-render on save
+      $course_syllabus.removeClass('enhanced')
       $course_syllabus.loadingImage('remove').html(data.course.syllabus_body)
       $course_syllabus.data('syllabus_body', data.course.syllabus_body)
       $course_syllabus_details.hide()

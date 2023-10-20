@@ -496,10 +496,8 @@ describe "student planner" do
       # truthy setting
       Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
       Account.default.save!
-
-      # truthy permission(since enabled is being "not"ed)
-      Account.default.role_overrides.create!(role: student_role, enabled: false, permission: "restrict_quantitative_data")
-      Account.default.reload
+      @course.restrict_quantitative_data = true
+      @course.save!
 
       go_to_list_view
       open_opportunities_dropdown
@@ -637,10 +635,8 @@ describe "student planner" do
       # truthy setting
       Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
       Account.default.save!
-
-      # truthy permission(since enabled is being "not"ed)
-      Account.default.role_overrides.create!(role: student_role, enabled: false, permission: "restrict_quantitative_data")
-      Account.default.reload
+      @course2.restrict_quantitative_data = true
+      @course2.save!
 
       user_session(@student1)
       go_to_list_view

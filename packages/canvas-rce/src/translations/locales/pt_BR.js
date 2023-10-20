@@ -35,6 +35,7 @@ const locale = {
   "add_another_f4e50d57": { "message": "Adicionar outro" },
   "add_cc_subtitles_55f0394e": { "message": "Adicionar legenda" },
   "add_image_60b2de07": { "message": "Adicionar imagem" },
+  "add_one_9e34a6f8": { "message": "Adicionar uma!" },
   "additional_considerations_f3801683": {
     "message": "Considerações adicionais"
   },
@@ -64,6 +65,7 @@ const locale = {
   },
   "and_7fcc2911": { "message": "E" },
   "angle_c5b4ec50": { "message": "Ângulo" },
+  "announcement_fb4cb645": { "message": "Aviso" },
   "announcement_list_da155734": { "message": "Lista de aviso" },
   "announcements_a4b8ed4a": { "message": "Avisos" },
   "apply_781a2546": { "message": "Aplicar" },
@@ -81,6 +83,7 @@ const locale = {
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Proporção do aspecto será preservado"
   },
+  "assignment_976578a8": { "message": "Tarefa" },
   "assignments_1e02582c": { "message": "Tarefas" },
   "asterisk_82255584": { "message": "Asterisco" },
   "attributes_963ba262": { "message": "Atributos" },
@@ -226,8 +229,12 @@ const locale = {
   "crop_image_807ebb08": { "message": "Cortar imagem" },
   "cup_product_14174434": { "message": "Produto copo" },
   "current_image_f16c249c": { "message": "Imagem atual" },
+  "current_link_945a47ee": { "message": "Link atual" },
   "current_volume_level_c55ab825": { "message": "Nível do volume atual" },
   "custom_6979cd81": { "message": "Personalizar" },
+  "custom_width_and_height_pixels_946eea7c": {
+    "message": "Largura e altura personalizadas (Pixels)"
+  },
   "cyan_c1d5f68a": { "message": "Ciano" },
   "dagger_57e0f4e5": { "message": "Punhal" },
   "date_added_ed5ad465": { "message": "Data adicionada" },
@@ -260,6 +267,7 @@ const locale = {
   "directionality_26ae9e08": { "message": "Direcionalidade" },
   "directly_edit_latex_b7e9235b": { "message": "Editar diretamente LaTeX" },
   "disable_preview_222bdf72": { "message": "Desativar visualização" },
+  "discussion_6719c51d": { "message": "Fórum" },
   "discussions_a5f96392": { "message": "Fóruns" },
   "discussions_index_6c36ced": { "message": "Índice de fóruns" },
   "disjoint_union_e74351a8": { "message": "União disjunta" },
@@ -576,6 +584,9 @@ const locale = {
   "light_blue_5374f600": { "message": "Azul Claro" },
   "link_7262adec": { "message": "Link" },
   "link_options_a16b758b": { "message": "Opções de link" },
+  "link_type_linktypemessage_c6d26815": {
+    "message": "tipo de link: { linkTypeMessage }"
+  },
   "link_with_text_starting_with_start_b3fcbe71": {
     "message": "Link com texto começando com { start }"
   },
@@ -638,6 +649,7 @@ const locale = {
   "minus_plus_3461f637": { "message": "Menos/mais" },
   "misc_3b692ea7": { "message": "Diversos" },
   "miscellaneous_e9818229": { "message": "Diversos" },
+  "module_90d9fd32": { "message": "Módulo" },
   "modules_c4325335": { "message": "Módulos" },
   "moving_image_to_crop_directionword_6f66cde2": {
     "message": "Movendo a imagem para recortar { directionWord }"
@@ -662,21 +674,51 @@ const locale = {
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navegue no menu ou barra de ferramentas"
   },
+  "navigation_ee9af92d": { "message": "Navegação" },
   "nested_greater_than_d852e60d": { "message": "Aninhado maior que" },
   "nested_less_than_27d17e58": { "message": "Aninhado menos de" },
+  "new_quiz_34aacba6": { "message": "Novo teste" },
   "next_40e12421": { "message": "Próximo" },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "Sem problemas de acessibilidades detectados."
   },
+  "no_announcements_created_yet_c44a94f4": {
+    "message": "Nenhum anúncio criado ainda."
+  },
+  "no_announcements_found_20185afc": {
+    "message": "Nenhum anúncio encontrado."
+  },
+  "no_assignments_created_yet_1b236d87": {
+    "message": "Nenhuma tarefa criada ainda."
+  },
+  "no_assignments_found_79e46d7f": { "message": "Nenhuma tarefa encontrada." },
   "no_changes_to_save_d29f6e91": {
     "message": "Não há alterações para salvar."
+  },
+  "no_discussions_created_yet_ff99abe3": {
+    "message": "Nenhuma discussão criada ainda."
+  },
+  "no_discussions_found_9284063b": {
+    "message": "Nenhuma discussão encontrada."
   },
   "no_e16d9132": { "message": "Não" },
   "no_file_chosen_9a880793": { "message": "Nenhum arquivo escolhido" },
   "no_headers_9bc7dc7f": { "message": "Sem cabeçalhos" },
+  "no_modules_created_yet_c71b6d4d": {
+    "message": "Nenhum módulo criado ainda."
+  },
+  "no_modules_found_2df43a40": { "message": "Nenhum módulo encontrado." },
+  "no_pages_created_yet_c379fa6e": {
+    "message": "Nenhuma página criada ainda."
+  },
+  "no_pages_found_6799350": { "message": "Nenhuma página encontrada." },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "Nenhuma pré-visualização disponível para esse arquivo."
   },
+  "no_quizzes_created_yet_1a2370b9": {
+    "message": "Nenhum teste criado ainda."
+  },
+  "no_quizzes_found_c80c537a": { "message": "Nenhum teste encontrado." },
   "no_results_940393cf": { "message": "Sem resultados." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Nenhum resultado encontrado para { filterTerm }"
@@ -700,6 +742,9 @@ const locale = {
   "one_of_the_following_styles_must_be_added_to_save__1de769aa": {
     "message": "Um dos seguintes estilos deve ser adicionado para salvar um ícone: Cor do ícone, tamanho do contorno, texto do ícone ou imagem"
   },
+  "one_or_more_files_failed_to_paste_please_try_uploa_7fa39dd3": {
+    "message": "Falha ao colar um ou mais arquivos. Por favor, tente carregar ou arrastar e soltar arquivos."
+  },
   "open_circle_e9bd069": { "message": "Círculo aberto" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "Abrir esta caixa de atalhos do teclado"
@@ -721,6 +766,7 @@ const locale = {
   "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
     "message": "{ p } não é um protocolo válido que deve ser ftp, http, https, mailto, skype, tel ou pode ser omitido"
   },
+  "page_50c4823d": { "message": "Página" },
   "pages_e5414c2c": { "message": "Páginas" },
   "paragraph_5e5ad8eb": { "message": "Parágrafo" },
   "paragraph_starting_with_start_a59923f8": {
@@ -782,6 +828,7 @@ const locale = {
   "pumpkin_904428d5": { "message": "Abóbora" },
   "purple_7678a9fc": { "message": "Roxo" },
   "quaternions_877024e0": { "message": "Quaternions" },
+  "quiz_e0dcce8f": { "message": "Teste" },
   "quizzes_7e598f57": { "message": "Testes" },
   "rational_numbers_80ddaa4a": { "message": "Números racionais" },
   "real_numbers_7c99df94": { "message": "Numeros reais" },
@@ -870,6 +917,7 @@ const locale = {
   "select_crop_shape_d441feeb": { "message": "Selecionar a forma de corte" },
   "select_language_7c93a900": { "message": "Selecionar idioma" },
   "select_video_source_1b5c9dbe": { "message": "Selecionar a fonte de vídeo" },
+  "selected_274ce24f": { "message": "Selecionado" },
   "selected_linkfilename_c093b1f2": {
     "message": "Selecionado { linkFileName }"
   },
@@ -1094,6 +1142,7 @@ const locale = {
     "message": "Seta diagonal para cima e para a direita"
   },
   "up_c553575d": { "message": "Para Cima" },
+  "updated_link_a827e441": { "message": "Link atualizado" },
   "upload_document_253f0478": { "message": "Carregar documento" },
   "upload_file_fd2361b8": { "message": "Carregar arquivo" },
   "upload_image_6120b609": { "message": "Carregar imagem" },

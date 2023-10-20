@@ -20,19 +20,24 @@ import React from 'react'
 import {View} from '@instructure/ui-view'
 import {Alert} from '@instructure/ui-alerts'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {GradingSchemeFormDataWithUniqueRowIds} from './GradingSchemeInput'
 
 import {
   gradingSchemeIsValid,
   rowNamesAreValid,
   rowDataIsValid,
-  rowDataIsValidNumber,
+  rowDataIsValidNumbers,
 } from './validations/gradingSchemeValidations'
+import {GradingSchemeDataRow} from '@instructure/grading-utils'
 
 const I18n = useI18nScope('GradingSchemes')
 
 export interface ComponentProps {
-  formData: GradingSchemeFormDataWithUniqueRowIds
+  formData: {
+    title: string
+    data: GradingSchemeDataRow[]
+    scalingFactor: number
+    pointsBased: boolean
+  }
   onClose: () => any
 }
 
@@ -41,7 +46,7 @@ export const GradingSchemeValidationAlert: React.FC<ComponentProps> = ({onClose,
 
   return (
     <View
-      elementRef={current => {
+      elementRef={(current: HTMLDivElement) => {
         if (current) {
           current.scrollIntoView()
           current.focus()
@@ -58,10 +63,20 @@ export const GradingSchemeValidationAlert: React.FC<ComponentProps> = ({onClose,
         {gradingSchemeIsValid(formData) ? (
           // grading scheme did initially have validation error(s), but errors have since been corrected
           <>{I18n.t('Looks great!')}</>
-        ) : !rowDataIsValidNumber(formData) ? (
+        ) : !rowDataIsValidNumbers(formData) ? (
           <>
-            {I18n.t(
-              "Cannot have negative ranges or ranges that are greater than 100. Fix the ranges and try clicking 'Save' again."
+            {formData.pointsBased ? (
+              <>
+                {I18n.t(
+                  "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again."
+                )}
+              </>
+            ) : (
+              <>
+                {I18n.t(
+                  "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again."
+                )}
+              </>
             )}
           </>
         ) : !rowDataIsValid(formData) ? (

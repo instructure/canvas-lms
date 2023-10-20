@@ -23,7 +23,7 @@ module RubricContext
       klass.has_many :rubrics, as: :context, inverse_of: :context
       klass.has_many :rubric_associations_with_deleted, -> { preload(:rubric) }, as: :context, inverse_of: :context, class_name: "RubricAssociation"
       klass.has_many :rubric_associations, -> { where(workflow_state: "active").preload(:rubric) }, as: :context, inverse_of: :context, dependent: :destroy
-      klass.send :include, InstanceMethods
+      klass.include InstanceMethods
     end
   end
 

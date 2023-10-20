@@ -113,10 +113,9 @@ export class RceLti11ContentItem {
   }
 
   private generateCodePayloadIframe(): string {
-    const studioAttributes =
-      this.env?.studioMediaOptionsEnabled && isStudioContentItemCustomJson(this.contentItem.custom)
-        ? studioAttributesFrom(this.contentItem.custom)
-        : null
+    const studioAttributes = isStudioContentItemCustomJson(this.contentItem.custom)
+      ? studioAttributesFrom(this.contentItem.custom)
+      : null
 
     return $('<div/>')
       .append(

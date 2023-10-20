@@ -34,7 +34,7 @@ describe "courses/_settings_sidebar" do
 
   describe "End this course button" do
     it "does not display if the course or term end date has passed" do
-      allow(@course).to receive(:soft_concluded?).and_return(true)
+      @course.update conclude_at: 1.day.ago, restrict_enrollments_to_course_dates: true
       view_context(@course, @user)
       assign(:current_user, @user)
       render
@@ -42,7 +42,7 @@ describe "courses/_settings_sidebar" do
     end
 
     it "displays if the course and its term haven't ended" do
-      allow(@course).to receive(:soft_concluded?).and_return(false)
+      @course.update conclude_at: 1.day.from_now, restrict_enrollments_to_course_dates: true
       view_context(@course, @user)
       assign(:current_user, @user)
       render
@@ -51,15 +51,6 @@ describe "courses/_settings_sidebar" do
   end
 
   describe "Reset course content" do
-    it "does not display the dialog contents under the button" do
-      @course.account.disable_feature!(:granular_permissions_manage_courses)
-      view_context(@course, @user)
-      assign(:current_user, @user)
-      render
-      doc = Nokogiri::HTML5(response.body)
-      expect(doc.at_css("#reset_course_content_dialog")["style"]).to eq "display:none;"
-    end
-
     it "does not display the dialog contents under the button (granular permissions)" do
       @course.account.enable_feature!(:granular_permissions_manage_courses)
       @course.root_account.role_overrides.create!(

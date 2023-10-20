@@ -22,7 +22,7 @@ describe I18nTimeZone do
     it "provides an array of i18n tz instances" do
       tzs = I18nTimeZone.all
       expect(tzs.first.class).to eq I18nTimeZone
-      expect(tzs.count).to eq ActiveSupport::TimeZone.all.count
+      expect(tzs.count).to eq ActiveSupport::TimeZone.all.count # rubocop:disable Rails/RedundantActiveRecordAllMethod
     end
   end
 
@@ -34,20 +34,16 @@ describe I18nTimeZone do
   end
 
   context "localization" do
-    before { I18n.locale = I18n.default_locale }
-
-    after  { I18n.locale = I18n.default_locale }
-
     it "presents a localized name with offset when responding to #to_s" do
-      I18n.locale = :es
-      I18n.backend.stub({ es: { time_zones: { international_date_line_west: "Línea de fecha internacional del oeste" } } }) do
-        tz = I18nTimeZone["International Date Line West"]
-        expect(tz.to_s).to include "Línea de fecha internacional del oeste"
+      I18n.with_locale(:es) do
+        I18n.backend.stub({ es: { time_zones: { international_date_line_west: "Línea de fecha internacional del oeste" } } }) do
+          tz = I18nTimeZone["International Date Line West"]
+          expect(tz.to_s).to include "Línea de fecha internacional del oeste"
+        end
       end
     end
 
     it "has an entry in en locale for every time zone" do
-      I18n.locale = :en
       I18nTimeZone.all.each do |zone|
         expect(zone.to_s).to_not include("translation missing")
       end

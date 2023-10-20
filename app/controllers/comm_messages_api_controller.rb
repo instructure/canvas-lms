@@ -127,7 +127,7 @@ class CommMessagesApiController < ApplicationController
     query = user.messages.order("created_at DESC")
 
     # site admins see all, but if not a site admin...
-    unless Account.site_admin.grants_right?(@current_user, :read_messages)
+    unless Account.site_admin.grants_right?(@current_user, :read_messages) && @domain_root_account.grants_right?(@current_user, :read)
       # ensure they can see the domain root account
       unless @domain_root_account.settings[:admins_can_view_notifications] &&
              @domain_root_account.grants_right?(@current_user, :view_notifications)

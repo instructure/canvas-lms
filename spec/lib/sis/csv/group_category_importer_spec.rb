@@ -175,4 +175,106 @@ describe SIS::CSV::GroupCategoryImporter do
     batch3.restore_states_for_batch
     expect(@account.all_group_categories.where(sis_source_id: "Gc003").take.deleted_at).not_to be_nil
   end
+
+  context "group integration" do
+    it "ensures consistency of SIS-imported group categories within a course after a course reset and re-import" do
+      course_sis_id = "c001"
+      group_category_sis_id = "gc001"
+
+      # required fields: group_category_id (aka sis_source_id internally), category_name, status
+      group_categories_csv = [
+        "group_category_id,course_id,category_name,status",
+        "#{group_category_sis_id},#{course_sis_id},Group Category 1,active",
+      ]
+
+      # required fields: group_id (aka sis_source_id internally), name, status
+      groups_csv = [
+        "group_id,group_category_id,course_id,name,status",
+        # when adding a group to a sis-created group_category, Canvas will
+        # automatically create a default “Student Groups” group_category
+        "g001,#{group_category_sis_id},#{course_sis_id},Group 1,available",
+      ]
+
+      # create course (sis_source_id is required in order for the
+      # SIS-imported data to be associated with the course)
+      course = course_factory(account: @account,
+                              sis_source_id: course_sis_id)
+      expect(course.group_categories).to be_empty
+      expect(course.groups).to be_empty
+
+      # SIS import the group_categories and groups
+      process_csv_data(*group_categories_csv)
+      process_csv_data(*groups_csv)
+
+      expect(course.group_categories.count).to eq 1
+      expect(course.groups.count).to eq 1
+      expect(course.groups.count do |g|
+        g.category == "Group Category 1"
+      end).to eq 1
+
+      group_categories = GroupCategory.where(context_id: course_sis_id)
+      groups = Group.where(context_id: course_sis_id)
+
+      group_categories.each do |gc|
+        expect(gc.context).to eq course
+        # explicitly check the context_id for sanity’s sake
+        expect(gc.context_id).to eq course.id
+      end
+      groups.each do |g|
+        expect(g.context).to eq course
+        expect(g.context_id).to eq course.id
+      end
+
+      # do a course reset and reload potentially-updated objects
+      new_course = course.reset_content
+      [course, group_categories, groups].map!(&:reload)
+
+      expect(new_course.group_categories).to be_empty
+      expect(new_course.groups).to be_empty
+
+      # group_category and group should still be in the old course
+      expect(course.group_categories.count).to eq 1
+      expect(course.groups.count).to eq 1
+      expect(course.groups.count do |g|
+        g.category == "Group Category 1"
+      end).to eq 1
+
+      group_categories.each do |gc|
+        expect(gc.context).to eq course
+        expect(gc.context_id).to eq course.id
+      end
+      groups.each do |g|
+        expect(g.context).to eq course
+        expect(g.context_id).to eq course.id
+      end
+
+      # SIS import the group_categories and groups (again)
+      process_csv_data(*group_categories_csv)
+      process_csv_data(*groups_csv)
+
+      [course, new_course, group_categories, groups].map!(&:reload)
+
+      # sis-created group_category can’t be moved “because it has groups in it”
+      # the “SIS Import” UI will warn the user and the import will be skipped
+      expect(course.group_categories.count).to eq 1
+      expect(course.groups.count).to eq 1
+      expect(course.groups.count do |g|
+        g.category == "Group Category 1"
+      end).to eq 1
+
+      group_categories.each do |gc|
+        expect(gc.context).to eq course
+        expect(gc.context_id).to eq course.id
+      end
+      groups.each do |g|
+        expect(g.context).to eq course
+        expect(g.context_id).to eq course.id
+      end
+
+      # because group_category had groups, the new course
+      # shouldn’t have any group_categories or groups
+      expect(new_course.group_categories).to be_empty
+      expect(new_course.groups).to be_empty
+    end
+  end
 end

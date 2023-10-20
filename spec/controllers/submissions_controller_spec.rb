@@ -606,81 +606,6 @@ describe SubmissionsController do
       end
     end
 
-    context "google doc" do
-      before do
-        course_with_student_logged_in(active_all: true)
-        @course.account.enable_service(:avatars)
-        @assignment = @course.assignments.create!(title: "some assignment", submission_types: "online_upload")
-      end
-
-      it "does not save if domain restriction prevents it" do
-        allow(@student).to receive(:gmail).and_return("student@does-not-match.com")
-        account = Account.default
-        flag    = FeatureFlag.new
-        account.settings[:google_docs_domain] = "example.com"
-        account.save!
-        flag.context = account
-        flag.feature = "google_docs_domain_restriction"
-        flag.state = "on"
-        flag.save!
-        mock_user_service = double
-        allow(@user).to receive(:user_services).and_return(mock_user_service)
-        expect(mock_user_service).to receive(:where).with(service: "google_drive")
-                                                    .and_return(double(first: double(token: "token", secret: "secret")))
-        google_docs = double
-        expect(GoogleDrive::Connection).to receive(:new).and_return(google_docs)
-
-        expect(google_docs).to receive(:download).and_return([Net::HTTPOK.new(200, {}, ""), "title", "pdf"])
-        post(:create, params: { course_id: @course.id,
-                                assignment_id: @assignment.id,
-                                submission: { submission_type: "google_doc" },
-                                google_doc: { document_id: "12345" } })
-        expect(response).to be_redirect
-      end
-
-      it "uses instfs to save google doc if instfs is enabled" do
-        allow(InstFS).to receive(:enabled?).and_return(true)
-        uuid = "1234-abcd"
-        allow(InstFS).to receive(:direct_upload).and_return(uuid)
-
-        attachment = @assignment.submissions.first.attachments.new
-        SubmissionsController.new.store_google_doc_attachment(attachment, File.open("public/images/a.png"))
-        expect(attachment.instfs_uuid).to eq uuid
-      end
-
-      it "gracefully reports a gdrive timeout" do
-        mock_user_service = double
-        allow(@user).to receive(:user_services).and_return(mock_user_service)
-        expect(mock_user_service).to receive(:where).with(service: "google_drive")
-                                                    .and_return(double(first: double(token: "token", secret: "secret")))
-        google_docs = double
-        expect(GoogleDrive::Connection).to receive(:new).and_return(google_docs)
-        expect(google_docs).to receive(:download).and_raise(GoogleDrive::ConnectionException, "fake conn timeout")
-        post(:create, params: { course_id: @course.id,
-                                assignment_id: @assignment.id,
-                                submission: { submission_type: "google_doc" },
-                                google_doc: { document_id: "12345" } })
-        expect(response).to be_redirect
-        expect(flash[:error]).to eq("Timed out while talking to google drive")
-      end
-
-      it "gracefully reports an invalid entry" do
-        mock_user_service = double
-        allow(@user).to receive(:user_services).and_return(mock_user_service)
-        expect(mock_user_service).to receive(:where).with(service: "google_drive")
-                                                    .and_return(double(first: double(token: "token", secret: "secret")))
-        google_docs = double
-        expect(GoogleDrive::Connection).to receive(:new).and_return(google_docs)
-        expect(google_docs).to receive(:download).and_raise(GoogleDrive::WorkflowError, "fake bad entry")
-        post(:create, params: { course_id: @course.id,
-                                assignment_id: @assignment.id,
-                                submission: { submission_type: "google_doc" },
-                                google_doc: { document_id: "12345" } })
-        expect(response).to be_redirect
-        expect(flash[:error]).to eq("Google Drive entry was unable to be downloaded")
-      end
-    end
-
     describe "confetti celebrations" do
       before do
         Account.default.enable_feature!(:confetti_for_assignments)
@@ -1238,26 +1163,26 @@ describe SubmissionsController do
     context "when the submission's turnitin data contains a report URL" do
       before do
         submission.update!(turnitin_data: { asset_string => { report_url: "MY_GREAT_REPORT" } })
-      end
 
-      it "redirects to the course tool retrieval URL" do
         get "turnitin_report", params: {
           course_id: assignment.context_id,
           assignment_id: assignment.id,
           submission_id: student.id,
           asset_string:
         }
+      end
+
+      it "redirects to the course tool retrieval URL" do
         expect(response).to redirect_to(/#{retrieve_course_external_tools_url(course.id)}/)
       end
 
       it "includes the report URL in the redirect" do
-        get "turnitin_report", params: {
-          course_id: assignment.context_id,
-          assignment_id: assignment.id,
-          submission_id: student.id,
-          asset_string:
-        }
         expect(response).to redirect_to(/MY_GREAT_REPORT/)
+      end
+
+      it "includes prefer_1_1 in the redirect URI" do
+        redirect_uri = URI.parse(response.location)
+        expect(redirect_uri.query.split("&")).to include("prefer_1_1=true")
       end
     end
 

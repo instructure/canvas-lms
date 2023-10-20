@@ -74,7 +74,7 @@ module QuizMathDataFixup
 
         answer[key] = fixup_html(answer[key])
 
-        text_key = key.to_s.sub(/html/, "text")
+        text_key = key.to_s.sub("html", "text")
         answer[text_key] = "" if answer[text_key].present?
       end
       data[:answers][index] = answer

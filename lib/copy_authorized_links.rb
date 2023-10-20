@@ -77,7 +77,7 @@ module CopyAuthorizedLinks
   end
 
   def self.included(klass)
-    klass.send :include, CopyAuthorizedLinksInstanceMethods
+    klass.include CopyAuthorizedLinksInstanceMethods
     klass.extend CopyAuthorizedLinksClassMethods
   end
 end

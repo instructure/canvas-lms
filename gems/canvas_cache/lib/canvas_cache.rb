@@ -38,11 +38,7 @@ module CanvasCache
   mattr_writer :on_captured_error
 
   # Expected interface for this object is:
-  #   object.get(setting_name, 'default_value') # [ returning a string ]
-  #
-  #   object.skip_cache do  # [ returning an uncached read of the string value ]
-  #     object.get(setting_name, 'default_value')
-  #   end
+  #   object.get(setting_name, 'default_value', skip_cache: true) # [ returning a string ]
   #
   # In this instance, it's expected that canvas is going to inject
   # the Setting class, but we want to break depednencies that directly

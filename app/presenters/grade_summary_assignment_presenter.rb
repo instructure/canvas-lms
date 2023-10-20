@@ -99,6 +99,16 @@ class GradeSummaryAssignmentPresenter
     submission&.submission_type == "online_quiz" && submission&.workflow_state == "pending_review"
   end
 
+  def custom_grade_status?
+    return false unless Account.site_admin.feature_enabled?(:custom_gradebook_statuses)
+
+    submission&.custom_grade_status_id?
+  end
+
+  def custom_grade_status_id
+    submission&.custom_grade_status_id
+  end
+
   def original_points
     has_no_score_display? ? "" : submission.published_score
   end
@@ -153,7 +163,6 @@ class GradeSummaryAssignmentPresenter
     classes << special_class
     classes << "excused" if excused?
     classes << "extended" if extended?
-    classes << "feedback_visibility_ff" if Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
     classes.join(" ")
   end
 

@@ -93,7 +93,7 @@ describe "Gradebook frontend/backend calculators" do
         end
       )
 
-      DueDateCacher.recompute_course(course, update_grades: true)
+      SubmissionLifecycleManager.recompute_course(course, update_grades: true)
     end
   end
 

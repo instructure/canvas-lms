@@ -38,9 +38,6 @@ module.exports = {
       {test: /(\.css$)/, include: /node_modules/, loaders: ['style-loader', 'css-loader']},
       {test: /\.(png|woff|woff2|eot|ttf|svg)$/, loader: 'url-loader?limit=100000'},
     ],
-    noParse: [
-      /i18nliner\/dist\/lib\/i18nliner/, // i18nLiner has a `require('fs')` that it doesn't actually need, ignore it.
-    ],
   },
   resolve: {
     extensions: ['.ts', '.js', '.tsx', '.jsx'],

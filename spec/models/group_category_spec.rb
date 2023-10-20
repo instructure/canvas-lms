@@ -315,7 +315,7 @@ describe GroupCategory do
       group = category.groups.create(name: "Group 1", context: @course)
       student = @course.enroll_student(user_model).user
 
-      expect(DueDateCacher).to receive(:recompute_course).with(@course.id, assignments: [assignment2.id])
+      expect(SubmissionLifecycleManager).to receive(:recompute_course).with(@course.id, assignments: [assignment2.id])
       category.distribute_members_among_groups([student], [group])
     end
   end

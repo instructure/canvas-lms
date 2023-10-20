@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2023 - present Instructure, Inc.
  *
@@ -41,19 +40,39 @@ export type PersistentArrayParameters = {
   // transform parameter. This only applies to the saved value and not for the
   // one stored in memory.
   //
-  // Don't mutate it!!!
-  transform: <T>(array: Array<T>) => Array<T>
+  // Don't mutate it
+  transform: (array: NormalizedDTNPIEvent[]) => NormalizedDTNPIEvent[]
+}
+
+export type DateTimeInputMethod = 'pick' | 'type' | 'paste'
+
+export type DTNPIEvent = {
+  id: string
+  method: DateTimeInputMethod
+  parsed: string | null
+  value: string | null
+}
+export type NormalizedDTNPIEvent = {
+  id: string
+  type: string
+  locale: string | null
+  method: DateTimeInputMethod
+  parsed: string | null
+  value: string | null
 }
 
 // A special Array that persists its value to localStorage whenever you push to,
 // pop from, or splice it.
-export default function createPersistentArray({
+export function createPersistentArray({
   key,
   throttle = 1000,
   size = Infinity,
-  transform = x => x,
-}: PersistentArrayParameters) {
-  const value = JSON.parse(localStorage.getItem(key) || '[]')
+  transform = x => x as NormalizedDTNPIEvent[],
+}: PersistentArrayParameters): PersistentArray<NormalizedDTNPIEvent> {
+  const value = JSON.parse(localStorage.getItem(key) || '[]') as NormalizedDTNPIEvent[]
+  if (!Array.isArray(value)) {
+    throw new Error(`Expected ${key} to be an array`)
+  }
   const save = () => localStorage.setItem(key, JSON.stringify(transform(value)))
   const resize = () => {
     if (value.length >= size) {
@@ -76,16 +95,19 @@ export default function createPersistentArray({
     // nb: we only intend to cover the APIs we're using
   }
 
-  for (const [method, saveImpl] of Object.entries(saveBehaviors)) {
+  function entries<T extends Record<string, unknown>>(obj: T) {
+    return Object.entries(obj) as Array<[keyof T, T[keyof T]]>
+  }
+
+  for (const [method, saveImpl] of entries(saveBehaviors)) {
     // define them as properties so that they are not enumerable; we want this
     // to behave as much like a regular Array as possible
     Object.defineProperty(value, method, {
       enumerable: false,
       configurable: false,
-      value() {
-        // @ts-expect-error
+      value(...args: any[]) {
         saveImpl()
-        return Array.prototype[method].apply(this, arguments)
+        return Array.prototype[method].apply(this, args)
       },
     })
   }
@@ -101,6 +123,41 @@ export default function createPersistentArray({
 }
 
 const pipe =
-  (...f) =>
-  x =>
+  (...f: Array<(x: unknown) => void>) =>
+  (x?: unknown) =>
     f.reduce((acc, fx) => fx(acc), x)
+
+export function normalizeEvent(event: DTNPIEvent): NormalizedDTNPIEvent {
+  return {
+    id: event.id,
+    type: 'datepicker_usage',
+    locale: window.ENV?.LOCALE || null,
+    method: event.method,
+    parsed: event.parsed,
+    // don't store values that may be too long, 32 feels plenty for what people
+    // may actually type
+    value: event.value ? event.value.slice(0, 32) : null,
+  }
+}
+
+export function postToBackend({
+  endpoint,
+  events,
+}: {
+  endpoint: string
+  events: unknown
+}): Promise<Response> {
+  const url = endpoint || window.ENV.DATA_COLLECTION_ENDPOINT
+  if (!url) {
+    throw new Error('No endpoint provided')
+  }
+  return fetch(url, {
+    method: 'PUT',
+    mode: 'cors',
+    credentials: 'omit',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(events),
+  })
+}

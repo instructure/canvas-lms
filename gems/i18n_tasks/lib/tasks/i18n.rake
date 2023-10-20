@@ -220,7 +220,7 @@ namespace :i18n do
           if $?.exitstatus == 0
             if ret.include?(base_filename)
               `git checkout #{arg}`
-              if (previous = YAML.safe_load(File.read(base_filename)).flatten_keys rescue nil)
+              if (previous = YAML.safe_load_file(base_filename).flatten_keys rescue nil)
                 last_export = { type: :commit, data: previous }
               else
                 warn "Unable to load en.yml file"
@@ -235,7 +235,7 @@ namespace :i18n do
         else
           puts "Loading previous export..."
           if File.exist?(arg)
-            if (previous = YAML.safe_load(File.read(arg)).flatten_keys rescue nil)
+            if (previous = YAML.safe_load_file(arg).flatten_keys rescue nil)
               last_export = { type: :file, data: previous }
             else
               warn "Unable to load yml file"
@@ -259,7 +259,7 @@ namespace :i18n do
       Rake::Task["i18n:extract"].invoke
 
       puts "Exporting #{last_export[:data] ? "new/changed" : "all"} en translations..."
-      current_strings = YAML.safe_load(File.read(base_filename)).flatten_keys
+      current_strings = YAML.safe_load_file(base_filename).flatten_keys
       new_strings = if last_export[:data]
                       current_strings.each_with_object({}) do |(k, v), h|
                         h[k] = v unless last_export[:data][k] == v
@@ -304,22 +304,22 @@ namespace :i18n do
     Hash.include I18nTasks::HashExtensions unless {}.is_a?(I18nTasks::HashExtensions)
 
     if args[:source_file]
-      source_translations = YAML.safe_load(File.read(args[:source_file]))
+      source_translations = YAML.safe_load_file(args[:source_file])
     else
       loop do
         puts "Enter path to original en.yml file:"
         arg = $stdin.gets.strip
-        break if (source_translations = File.exist?(arg) && YAML.safe_load(File.read(arg)) rescue nil)
+        break if (source_translations = File.exist?(arg) && YAML.safe_load_file(arg) rescue nil)
       end
     end
 
     if args[:translated_file]
-      new_translations = YAML.safe_load(File.read(args[:translated_file]))
+      new_translations = YAML.safe_load_file(args[:translated_file])
     else
       loop do
         puts "Enter path to translated file:"
         arg = $stdin.gets.strip
-        break if (new_translations = File.exist?(arg) && YAML.safe_load(File.read(arg)) rescue nil)
+        break if (new_translations = File.exist?(arg) && YAML.safe_load_file(arg) rescue nil)
       end
     end
 
@@ -351,11 +351,11 @@ namespace :i18n do
     require "open-uri"
 
     source_translations = if args[:source_file].present?
-                            YAML.safe_load(File.read(args[:source_file]))
+                            YAML.safe_load_file(args[:source_file])
                           else
-                            YAML.safe_load(File.read(source_translations_file))
+                            YAML.safe_load_file(source_translations_file)
                           end
-    new_translations = YAML.safe_load(File.read(args[:translated_file]))
+    new_translations = YAML.safe_load_file(args[:translated_file])
     autoimport(source_translations, new_translations)
   end
 
@@ -431,7 +431,7 @@ namespace :i18n do
       locale = File.basename(filename, ".yml")
       next if options[:locales].present? && !options[:locales].include?(locale)
 
-      data = YAML.safe_load(File.read(filename))
+      data = YAML.safe_load_file(filename)
 
       options[:keys].each do |path|
         search = data[locale]

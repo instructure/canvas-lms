@@ -59,6 +59,27 @@ describe Quizzes::QuizOutcomeResultBuilder do
       expect(@quiz_result.mastery).to be(false)
     end
 
+    context "manually grading via speedgrader" do
+      it "updates score to lower score if scoring_policy is keep_highest" do
+        expect(@sub.quiz.scoring_policy).to eq "keep_highest"
+        expect(@outcome.learning_outcome_results.active.where(user_id: @user).first.score).to equal 1.0
+        # if grader_id is present then the score is being updated by speedgrader
+        @sub.update_scores({
+                             "grader_id" => @teacher.id,
+                             "context_id" => @course.id,
+                             "override_scores" => true,
+                             "context_type" => "Course",
+                             "submission_version_number" => "1",
+                             "question_score_#{@q1.id}" => "0"
+                           })
+        @sub.reload
+        expect(@sub.score).to be(0.0)
+        @outcome.reload
+        expect(@outcome.learning_outcome_results.active.where(user_id: @user).count).to equal 1
+        expect(@outcome.learning_outcome_results.active.where(user_id: @user).first.score).to equal 0.0
+      end
+    end
+
     context "with long quiz titles" do
       before :once do
         @user.update!(name: "a" * 255)
@@ -147,7 +168,7 @@ describe Quizzes::QuizOutcomeResultBuilder do
       sub
     end
 
-    def answer_and_grade(sub, correct = false)
+    def answer_and_grade(sub, correct: false)
       answer_a_question(@q1, sub)
       answer_a_question(@q2, sub, correct:)
       Quizzes::SubmissionGrader.new(sub).grade_submission
@@ -159,7 +180,7 @@ describe Quizzes::QuizOutcomeResultBuilder do
       @sub1 = submission
       @sub2 = submission
       # 2nd attempt: both questions answered correctly
-      answer_and_grade(@sub2, true)
+      answer_and_grade(@sub2, correct: true)
       # align a second outcome in-between attempts
       @outcome2 = @course.created_learning_outcomes.create!(short_description: "another outcome")
       @bank = @q1.assessment_question.assessment_question_bank
@@ -285,6 +306,51 @@ describe Quizzes::QuizOutcomeResultBuilder do
       expect(updated_at_times).to eql(@results.map(&:updated_at))
       expect(@results.first.mastery).to be(true)
       expect(@results.last.mastery).to be(false)
+    end
+
+    context "manually grading via speedgrader" do
+      it "updates to lower score if scoring_policy is keep_highest" do
+        build_course_quiz_questions_and_a_bank
+        expect(@quiz.scoring_policy).to eq "keep_highest"
+        expect(@bank.learning_outcome_alignments.length).to be(1)
+        expect(@q2.assessment_question.assessment_question_bank).to eql(@bank)
+        @quiz.generate_quiz_data(persist: true)
+        @sub = @quiz.generate_submission(@user)
+        @sub.submission_data = {}
+        answer_a_question(@q1, @sub)
+        answer_a_question(@q2, @sub, correct: false)
+        Quizzes::SubmissionGrader.new(@sub).grade_submission
+        expect(@sub.score).to be(1.0)
+        @outcome.reload
+        @quiz_result = @outcome.learning_outcome_results.active.where(user_id: @user).first
+        @results = @quiz_result.learning_outcome_question_results.sort_by(&:associated_asset_id)
+        expect(@results.length).to be(2)
+        expect(@results.first.associated_asset).to eql(@q1.assessment_question)
+        expect(@results.first.mastery).to be(true)
+        expect(@results.last.associated_asset).to eql(@q2.assessment_question)
+        expect(@results.last.mastery).to be(false)
+        expect(@outcome.learning_outcome_results.active.where(user_id: @user).first.score).to equal 1.0
+        # if grader_id is present then the score is being updated by speedgrader
+        @sub.update_scores({
+                             "grader_id" => @teacher.id,
+                             "context_id" => @course.id,
+                             "override_scores" => true,
+                             "context_type" => "Course",
+                             "submission_version_number" => "1",
+                             "question_score_#{@q1.id}" => "0"
+                           })
+        @sub.reload
+        expect(@sub.score).to be(0.0)
+        @outcome.reload
+        @quiz_result = @outcome.learning_outcome_results.active.where(user_id: @user)
+        expect(@quiz_result.count).to equal 1
+        expect(@quiz_result.first.score).to equal 0.0
+        @results = @quiz_result.first.learning_outcome_question_results.sort_by(&:associated_asset_id)
+        expect(@results.first.associated_asset).to eql(@q1.assessment_question)
+        expect(@results.first.mastery).to be(false)
+        expect(@results.last.associated_asset).to eql(@q2.assessment_question)
+        expect(@results.last.mastery).to be(false)
+      end
     end
   end
 

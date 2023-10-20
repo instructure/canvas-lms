@@ -84,6 +84,10 @@ class ContextModulesController < ApplicationController
       @is_student = @context.grants_right?(@current_user, session, :participate_as_student)
       @can_view_unpublished = @context.grants_right?(@current_user, session, :read_as_admin)
 
+      if Account.site_admin.feature_enabled?(:differentiated_modules)
+        @module_ids_with_overrides = AssignmentOverride.where(context_module_id: @modules).active.distinct.pluck(:context_module_id)
+      end
+
       modules_cache_key
 
       @is_cyoe_on = @current_user && ConditionalRelease::Service.enabled_in_context?(@context)

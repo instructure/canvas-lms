@@ -247,7 +247,7 @@ module NumberLocalizer
 end
 I18n.singleton_class.include(NumberLocalizer)
 
-I18n.send(:extend, Module.new do
+I18n.extend(Module.new do
   attr_accessor :localizer
 
   # Public: If a localizer has been set, use it to set the locale and then

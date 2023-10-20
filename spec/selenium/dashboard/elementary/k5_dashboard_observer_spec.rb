@@ -171,7 +171,7 @@ describe "observer k5 dashboard" do
       expect(element_value_for_attr(observed_student_dropdown, "value")).to eq("K5Student")
     end
 
-    it "selects student from list on subject drop down menu", ignore_js_errors: true do
+    it "selects student from list on subject drop down menu", :ignore_js_errors do
       get "/courses/#{@subject_course.id}#home"
 
       click_observed_student_option("My2 Student")
@@ -179,7 +179,7 @@ describe "observer k5 dashboard" do
       expect(element_value_for_attr(observed_student_dropdown, "value")).to eq("My2 Student")
     end
 
-    it "allows for searching for a student in subject dropdown list", ignore_js_errors: true do
+    it "allows for searching for a student in subject dropdown list", :ignore_js_errors do
       get "/courses/#{@subject_course.id}#home"
 
       observed_student_dropdown.send_keys([:control, "a"], :backspace, "My2")

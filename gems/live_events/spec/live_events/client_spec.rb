@@ -51,9 +51,8 @@ describe LiveEvents::Client do
 
   def prep_client_and_worker
     stub_config
-    allow(LiveEvents).to receive(:logger).and_return(double(info: nil, error: nil, warn: nil))
+    allow(LiveEvents).to receive_messages(logger: double(info: nil, error: nil, warn: nil), stream_client: fclient)
     LiveEvents.max_queue_size = -> { 100 }
-    allow(LiveEvents).to receive(:stream_client).and_return(fclient)
     LiveEvents.clear_context!
 
     @client = LiveEvents::Client.new nil, fclient, test_stream_name

@@ -28,6 +28,7 @@ describe "user outcome results page as a teacher" do
   before(:once) do
     course_with_teacher(active_all: true)
     student_in_course(active_all: true)
+    course_bulk_outcome_groups_course(1, 5)
   end
 
   before do
@@ -42,5 +43,19 @@ describe "user outcome results page as a teacher" do
     expect(btn.text).to eq "Hide All Artifacts"
     btn.click
     expect(btn.text).to eq "Show All Artifacts"
+  end
+
+  it "toggles hide unassessed outcomes after clicking button" do
+    btn = f("#hide_unassessed_outcomes_link")
+    expect(btn.text).to eq "Hide Unassessed Outcomes"
+    btn.click
+    expect(btn.text).to eq "Show Unassessed Outcomes"
+    btn.click
+    expect(btn.text).to eq "Hide Unassessed Outcomes"
+  end
+
+  it "assigns the html class to unassessed outcomes" do
+    el = ff("tr.js_unassessed_outcome")
+    expect(el.count).to eq 5
   end
 end

@@ -175,7 +175,6 @@ describe ConversationsController do
 
       get "index", params: { scope: "inbox" }, format: "json"
       expect(response).to be_successful
-      puts assigns[:conversations_json]
       expect(assigns[:conversations_json].size).to be 3
       expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.visit.scope.inbox.pages_loaded.legacy")
     end
@@ -678,22 +677,34 @@ describe ConversationsController do
         @students = create_users_in_course(@course, 2, account_associations: true, return_type: :record)
       end
 
-      it "creates user notes" do
-        post "create", params: { recipients: @students.map(&:id), body: "yo", subject: "greetings", user_note: "1" }
-        @students.each { |x| expect(x.user_notes.size).to be(1) }
-        expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.sent.faculty_journal.legacy")
+      context "when the deprecate_faculty_journal feature flag is disabled" do
+        before { Account.site_admin.disable_feature!(:deprecate_faculty_journal) }
+
+        it "creates user notes" do
+          post "create", params: { recipients: @students.map(&:id), body: "yo", subject: "greetings", user_note: "1" }
+          @students.each { |x| expect(x.user_notes.size).to be(1) }
+          expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.sent.faculty_journal.legacy")
+        end
+
+        it "_not_s create user notes if asked not to" do
+          post "create", params: { recipients: @students.map(&:id), body: "yolo", subject: "salutations", user_note: "0" }
+          @students.each { |x| expect(x.user_notes.size).to be(0) }
+          expect(InstStatsd::Statsd).not_to have_received(:increment).with("inbox.conversation.sent.faculty_journal.legacy")
+        end
+
+        it "includes the domain root account in the user note" do
+          post "create", params: { recipients: @students.map(&:id), body: "hi there", subject: "hi there", user_note: true }
+          note = UserNote.last
+          expect(note.root_account_id).to eql Account.default.id
+        end
       end
 
-      it "_not_s create user notes if asked not to" do
-        post "create", params: { recipients: @students.map(&:id), body: "yolo", subject: "salutations", user_note: "0" }
-        @students.each { |x| expect(x.user_notes.size).to be(0) }
-        expect(InstStatsd::Statsd).not_to have_received(:increment).with("inbox.conversation.sent.faculty_journal.legacy")
-      end
-
-      it "includes the domain root account in the user note" do
-        post "create", params: { recipients: @students.map(&:id), body: "hi there", subject: "hi there", user_note: true }
-        note = UserNote.last
-        expect(note.root_account_id).to eql Account.default.id
+      context "when the deprecate_faculty_journal feature flag is enabled" do
+        it "does not create user notes" do
+          post "create", params: { recipients: @students.map(&:id), body: "yo", subject: "greetings", user_note: "1" }
+          @students.each { |x| expect(x.user_notes.size).to be(0) }
+          expect(InstStatsd::Statsd).to_not have_received(:increment).with("inbox.conversation.sent.faculty_journal.legacy")
+        end
       end
     end
 
@@ -908,22 +919,40 @@ describe ConversationsController do
       expect(@conversation.reload.last_message_at).to eql expected_lma
     end
 
-    it "generates a user note when requested" do
-      Account.default.update_attribute :enable_user_notes, true
-      course_with_teacher_logged_in(active_all: true)
-      conversation
+    context "when the deprecate_faculty_journal feature flag is disabled" do
+      before { Account.site_admin.disable_feature!(:deprecate_faculty_journal) }
 
-      post "add_message", params: { conversation_id: @conversation.conversation_id, body: "hello world" }
-      expect(response).to be_successful
-      message = @conversation.messages.first # newest message is first
-      student = message.recipients.first
-      expect(student.user_notes.size).to eq 0
+      it "generates a user note when requested" do
+        Account.default.update_attribute :enable_user_notes, true
+        course_with_teacher_logged_in(active_all: true)
+        conversation
 
-      post "add_message", params: { conversation_id: @conversation.conversation_id, body: "make a note", user_note: 1 }
-      expect(response).to be_successful
-      message = @conversation.messages.first
-      student = message.recipients.first
-      expect(student.user_notes.size).to eq 1
+        post "add_message", params: { conversation_id: @conversation.conversation_id, body: "hello world" }
+        expect(response).to be_successful
+        message = @conversation.messages.first # newest message is first
+        student = message.recipients.first
+        expect(student.user_notes.size).to eq 0
+
+        post "add_message", params: { conversation_id: @conversation.conversation_id, body: "make a note", user_note: 1 }
+        expect(response).to be_successful
+        message = @conversation.messages.first
+        student = message.recipients.first
+        expect(student.user_notes.size).to eq 1
+      end
+    end
+
+    context "when the deprecate_faculty_journal feature flag is enabled" do
+      it "does not generate a user note when requested" do
+        Account.default.update_attribute :enable_user_notes, true
+        course_with_teacher_logged_in(active_all: true)
+        conversation
+
+        post "add_message", params: { conversation_id: @conversation.conversation_id, body: "make a note", user_note: 1 }
+        expect(response).to be_successful
+        message = @conversation.messages.first
+        student = message.recipients.first
+        expect(student.user_notes.size).to eq 0
+      end
     end
 
     it "does not allow new messages in concluded courses for students" do

@@ -260,17 +260,10 @@ describe Api::V1::Course do
       end
 
       it "includes computed_current_letter_grade for rqd enabled user who does not have instructor typical permissions" do
-        # truthy feature flag
-        Account.default.enable_feature! :restrict_quantitative_data
-
-        # truthy setting
-        Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
-        Account.default.save!
-
-        # truthy permission(since enabled is being "not"ed)
-        Account.default.role_overrides.create!(role: teacher_role, enabled: false, permission: "restrict_quantitative_data")
-        Account.default.reload
-
+        # truthy settings
+        @course1.root_account.enable_feature! :restrict_quantitative_data
+        @course1.restrict_quantitative_data = true
+        @course1.save!
         @course.root_account.role_overrides.create!(permission: "view_all_grades", role: teacher_role, enabled: false)
         @course.root_account.role_overrides.create!(permission: "manage_grades", role: teacher_role, enabled: false)
 
@@ -1948,8 +1941,11 @@ describe CoursesController, type: :request do
           @standard = @course.account.grading_standards.create!(title: "account standard", standard_data: { a: { name: "A", value: "95" }, b: { name: "B", value: "80" }, f: { name: "F", value: "" } })
         end
 
-        it "requires :manage_grades rights if the grading standard is changing" do
-          api_call_as_user(@designer, :put, @path, @params, { course: { grading_standard_id: @standard.id, apply_assignment_group_weights: true } }, {}, { expected_status: 401 })
+        it "does not require :manage_grades rights if the grading standard is changing" do
+          api_call_as_user(@designer, :put, @path, @params, course: { grading_standard_id: @standard.id, apply_assignment_group_weights: true })
+          @course.reload
+          expect(@course.apply_group_weights?).to be true
+          expect(@course.grading_standard).to eq @standard
         end
 
         it "does not require :manage_grades rights if the grading standard is not changing" do
@@ -2105,6 +2101,25 @@ describe CoursesController, type: :request do
         it "returns 401 unauthorized" do
           raw_api_call(:put, @path, @params, @new_values)
           expect(response).to have_http_status :unauthorized
+        end
+      end
+
+      context "a custom teacher role" do
+        before :once do
+          @role = custom_teacher_role("Lecturer", account: @course.account)
+          @user = user_factory(active_all: true, name: "Larry")
+          @course.enroll_teacher(@user, role: @role).accept!
+        end
+
+        it "cannot update the course without any manage_content permissions" do
+          RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS.each do |permission|
+            Account.default.role_overrides.create!(role: @role, permission:, enabled: false)
+          end
+          raw_api_call(:put, @path, @params, @new_values)
+          @course.reload
+
+          expect(@course.default_view).not_to eql(@new_values["course"]["default_view"])
+          expect(@course.default_view).to eql("assignments")
         end
       end
     end
@@ -3022,8 +3037,12 @@ describe CoursesController, type: :request do
         @student = user_factory(active_all: true)
         @student_enroll = @course1.enroll_user(@student, "StudentEnrollment")
         @student_enroll.accept!
+        @student2 = user_factory(active_all: true)
+        @student2_enroll = @course1.enroll_user(@student2, "StudentEnrollment")
+        @student2_enroll.accept!
         @observer = user_factory(active_all: true)
         @course1.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @student.id)
+        @course1.enroll_user(@observer, "ObserverEnrollment", { allow_multiple_enrollments: true, associated_user_id: @student2.id })
 
         json = api_call_as_user(@observer,
                                 :get,
@@ -3035,9 +3054,11 @@ describe CoursesController, type: :request do
                                   include: ["observed_users"],
                                   enrollment_state: "active" })
 
-        expect(json.first["enrollments"].count).to eq 2
-        student_enroll_json = json.first["enrollments"].detect { |e| e["type"] == "student" }
-        expect(student_enroll_json["user_id"]).to eq @student.id
+        expect(json.first["enrollments"].count).to eq 4
+        student_enroll_json = json.first["enrollments"].select { |e| e["type"] == "student" }
+        expect(student_enroll_json.count).to eq 2
+        expect(student_enroll_json.first["user_id"]).to eq @student.id
+        expect(student_enroll_json.second["user_id"]).to eq @student2.id
 
         @student_enroll.start_at = 3.days.ago
         @student_enroll.end_at = 2.days.ago
@@ -3053,7 +3074,35 @@ describe CoursesController, type: :request do
                                   include: ["observed_users"],
                                   enrollment_state: "active" })
 
-        expect(json.first["enrollments"].count).to eq 1
+        expect(json.first["enrollments"].count).to eq 3 # the 2 observer enrollments + the 1 active student
+      end
+
+      it "returns only specified observed student enrollments if requested" do
+        @student = user_factory(active_all: true)
+        @student_enroll = @course1.enroll_user(@student, "StudentEnrollment")
+        @student_enroll.accept!
+        @student2 = user_factory(active_all: true)
+        @student2_enroll = @course1.enroll_user(@student2, "StudentEnrollment")
+        @student2_enroll.accept!
+        @observer = user_factory(active_all: true)
+        @course1.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @student.id)
+        @course1.enroll_user(@observer, "ObserverEnrollment", { allow_multiple_enrollments: true, associated_user_id: @student2.id })
+
+        json = api_call_as_user(@observer,
+                                :get,
+                                "/api/v1/courses.json?include[]=observed_users&enrollment_state=active",
+                                { controller: "courses",
+                                  action: "index",
+                                  id: @observer_course.to_param,
+                                  format: "json",
+                                  include: ["observed_users"],
+                                  observed_user_id: @student2.id,
+                                  enrollment_state: "active" })
+
+        expect(json.first["enrollments"].count).to eq 3
+        student_enroll_json = json.first["enrollments"].select { |e| e["type"] == "student" }
+        expect(student_enroll_json.count).to eq 1
+        expect(student_enroll_json.first["user_id"]).to eq @student2.id
       end
     end
 
@@ -3825,7 +3874,7 @@ describe CoursesController, type: :request do
           links = response["Link"].split(",")
           expect(links).not_to be_empty
           expect(links.all? { |l| l.include?("enrollment_type=student") }).to be_truthy
-          expect(links.first.scan(/per_page/).length).to eq 1
+          expect(links.first.scan("per_page").length).to eq 1
         end
 
         it "does not include sis user id or login id for non-admins" do
@@ -4315,6 +4364,24 @@ describe CoursesController, type: :request do
                         "/api/v1/courses/#{@course1.id}.json",
                         { controller: "courses", action: "show", id: @course1.to_param, format: "json" })
         expect(json["template"]).to be false
+      end
+
+      context "include[]=global_id" do
+        it "includes global_id" do
+          json = api_call(
+            :get,
+            "/api/v1/courses/#{@course1.id}.json?include[]=global_id",
+            {
+              controller: "courses",
+              action: "show",
+              id: @course1.to_param,
+              format: "json",
+              include: ["global_id"]
+            }
+          )
+
+          expect(json["global_id"]).to eq @course1.global_id
+        end
       end
 
       context "include[]=sections" do

@@ -98,9 +98,9 @@ module Canvas::OAuth
           keys: [
             rsa_key_pair.public_jwk
           ]
-        }
+        }.to_json
       end
-      let(:stubbed_response) { double(success?: true, parsed_response: public_jwk_url_response) }
+      let(:stubbed_response) { instance_double(Net::HTTPOK, { body: public_jwk_url_response }) }
 
       context "when there is no public jwk" do
         before do
@@ -125,7 +125,7 @@ module Canvas::OAuth
       end
 
       context "when an empty object is returned" do
-        let(:public_jwk_url_response) { {} }
+        let(:public_jwk_url_response) { {}.to_json }
 
         before do
           dev_key.update!(public_jwk_url: url)
@@ -137,8 +137,22 @@ module Canvas::OAuth
         end
       end
 
+      context "when invalid json is returned" do
+        let(:public_jwk_url_response) { "<html></html>" }
+
+        before do
+          dev_key.update!(public_jwk_url: url)
+        end
+
+        it do
+          expected_url_called(url, :get, stubbed_response)
+          expect(subject).to be false
+          expect(provider.error_message).to be("JWK Error: Invalid JSON")
+        end
+      end
+
       context "when the url is not valid giving a 404" do
-        let(:stubbed_response) { double(success?: false, parsed_response: public_jwk_url_response.to_json) }
+        let(:stubbed_response) { instance_double(Net::HTTPNotFound, body: public_jwk_url_response) }
 
         before do
           dev_key.update!(public_jwk_url: url)
@@ -147,7 +161,7 @@ module Canvas::OAuth
         let(:public_jwk_url_response) do
           {
             success?: false, code: "404"
-          }
+          }.to_json
         end
 
         it do
@@ -157,7 +171,7 @@ module Canvas::OAuth
       end
 
       def expected_url_called(url, type, response)
-        expect(HTTParty).to receive(type).with(url).and_return(response)
+        expect(CanvasHttp).to receive(type).with(url).and_return(response)
       end
     end
 
@@ -228,7 +242,7 @@ module Canvas::OAuth
             provider.valid?
           end
 
-          it "returns an error message when #{assertion} missing", skip_before: true do
+          it "returns an error message when #{assertion} missing", :skip_before do
             expect(subject).not_to be_empty
           end
         end

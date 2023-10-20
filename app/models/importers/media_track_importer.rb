@@ -30,15 +30,20 @@ module Importers
         media_attachment = media_attachments.find { |ma| ma.migration_id == file_id }
         next unless (media_object = media_attachment&.media_object_by_media_id)
 
+        media_attachment.mark_as_importing!(migration)
         track_list.each do |track|
           import_from_migration(media_attachment, media_object, track, migration)
+        end
+
+        if media_attachment.editing_restricted?(:content)
+          media_attachment.media_tracks.where.not(locale: track_list.pluck("locale")).destroy_all
         end
       end
     end
 
     def self.import_from_migration(attachment, media_object, track, migration)
       content = track["content"]
-      unless content.present?
+      if content.blank?
         file = migration.context.attachments.where(migration_id: track[:migration_id]).first
         return unless file
 
@@ -46,18 +51,18 @@ module Importers
         file.open { |data| content << data }
       end
 
-      mt = media_object.media_tracks.find_or_initialize_by(attachment_id: attachment, locale: track["locale"])
-      return if migration.for_master_course_import? &&
-                migration.master_course_subscription.content_tag_for(mt)&.downstream_changes&.include?("content") &&
-                !attachment.editing_restricted?(:content)
+      mt = attachment.media_tracks.find_or_initialize_by(locale: track["locale"])
+      mt.mark_as_importing!(migration)
+      return if attachment.downstream_changes?(migration, "media_tracks_content") && !attachment.editing_restricted?(:content)
 
       mt.kind = track["kind"]
+      mt.media_object = media_object
       mt.content = content
       begin
         mt.save!
       rescue => e
         er = Canvas::Errors.capture_exception(:import_media_tracks, e)[:error_report]
-        error_message = t("Subtitles could not be imported from %{file}", file: file.display_name)
+        error_message = t("Subtitles (%{lang}) could not be imported for %{file}", lang: track["locale"], file: attachment.display_name)
         migration.add_warning(error_message, error_report_id: er)
       end
       # remove temporary file

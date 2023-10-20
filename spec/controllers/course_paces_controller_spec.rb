@@ -222,7 +222,89 @@ describe CoursePacesController do
       assert_unauthorized
     end
 
+    context "paces publishing" do
+      before :once do
+        @course1 = course_factory
+        @teacher1 = User.create!
+        course_with_teacher(course: @course1, user: @teacher1, active_all: true)
+        @course1.update(start_at: "2021-09-30", restrict_enrollments_to_course_dates: true)
+        @course1.root_account.enable_feature!(:course_paces)
+        @course1.enable_course_paces = true
+        @course1.save!
+        @course_pace1 = course_pace_model(course: @course1)
+
+        @course2 = course_factory
+        @teacher2 = User.create!
+        course_with_teacher(course: @course2, user: @teacher2, active_all: true)
+        @course2.update(start_at: "2021-09-30", restrict_enrollments_to_course_dates: true)
+        @course2.root_account.enable_feature!(:course_paces)
+        @course2.enable_course_paces = true
+        @course2.save!
+        @course_pace2 = course_pace_model(course: @course2)
+      end
+
+      it "only gets paces publishing for the current course" do
+        @course_pace1.create_publish_progress
+        @course_pace2.create_publish_progress
+
+        user_session(@teacher1)
+
+        get :index, params: { course_id: @course1.id }
+        expect(response).to be_successful
+
+        js_env = controller.js_env
+        expect(js_env[:PACES_PUBLISHING].length).to eq(1)
+      end
+
+      it "removes the progress if the enrollment is no longer active" do
+        student_enrollment = @course1.enroll_student(@student, enrollment_state: "active", allow_multiple_enrollments: true)
+        # Stop other publishing progresses
+        Progress.where(tag: "course_pace_publish").destroy_all
+        student_enrollment_pace_model(student_enrollment:).create_publish_progress
+        expect(Progress.where(tag: "course_pace_publish").count).to eq(1)
+        student_pace_progress = Progress.find_by(tag: "course_pace_publish")
+        student_enrollment.destroy
+        # The enrollment destroy queues up the course pace
+        expect(Progress.where(tag: "course_pace_publish").count).to eq(2)
+        expect(Progress.all).to include(student_pace_progress)
+        user_session(@teacher1)
+
+        get :index, params: { course_id: @course1.id }
+        expect(response).to be_successful
+
+        js_env = controller.js_env
+        expect(js_env[:PACES_PUBLISHING].length).to eq(1)
+        expect(Progress.where(tag: "course_pace_publish").count).to eq(1)
+        expect(Progress.all).not_to include(student_pace_progress)
+      end
+    end
+
     context "progress" do
+      it "queues up a new job using the same progress if the delayed_job_id is missing" do
+        progress = @course_pace.create_publish_progress
+        delayed_job = progress.delayed_job
+        progress.update!(delayed_job_id: nil)
+        delayed_job.destroy
+        get :index, params: { course_id: @course.id }
+        expect(response).to be_successful
+        expect(Progress.last.id).to eq(progress.id)
+        progress.reload
+        expect(progress.delayed_job_id).not_to be_nil
+        expect(progress.delayed_job).not_to be_nil
+      end
+
+      it "creates a new progress and job if the delayed_job is missing" do
+        progress = @course_pace.create_publish_progress
+        progress.delayed_job.destroy
+        get :index, params: { course_id: @course.id }
+        expect(response).to be_successful
+        expect(progress.reload.failed?).to be_truthy
+        new_progress = Progress.last
+        expect(new_progress.tag).to eq("course_pace_publish")
+        expect(new_progress.delayed_job_id).not_to be_nil
+        expect(new_progress.delayed_job).not_to be_nil
+      end
+
       it "starts the progress' delayed job if queued" do
         progress = @course_pace.create_publish_progress
         delayed_job = progress.delayed_job
@@ -586,6 +668,16 @@ describe CoursePacesController do
       json_response = response.parsed_body
       expect(json_response["context_type"]).to eq("CoursePace")
       expect(json_response["workflow_state"]).to eq("queued")
+    end
+
+    it "emits course_pacing.publishing.count_exceeding_limit to statsd when pace publishing proccesses exceeded limit" do
+      allow(InstStatsd::Statsd).to receive(:count).and_call_original
+
+      Progress.destroy_all
+      50.times { @course_pace.create_publish_progress(run_at: Time.now) }
+
+      post :publish, params: { course_id: @course.id, id: @course_pace.id }
+      expect(InstStatsd::Statsd).to have_received(:count).with("course_pacing.publishing.count_exceeding_limit", 51)
     end
   end
 

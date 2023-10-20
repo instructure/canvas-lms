@@ -2,8 +2,8 @@
     "add_8523c19b": {
         "message": "Ավելացնել"
     },
-    "address_3159962f": {
-        "message": "Հասցե"
+    "add_one_9e34a6f8": {
+        "message": "Մեկն ավելացնել"
     },
     "all_4321c3a1": {
         "message": "Բոլորը"
@@ -50,12 +50,6 @@
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001թ. Acme Inc."
     },
-    "calendar_a8563bb2": {
-        "message": "Օրացույց"
-    },
-    "calendar_event_89aadc1c": {
-        "message": "Օրացուցային միջոցառում"
-    },
     "cancel_caeb1e68": {
         "message": "Չեղյալ համարել"
     },
@@ -86,20 +80,8 @@
     "copyright_holder_66ee111": {
         "message": "Հեղինակային իրավունք ունեցող անձը՝"
     },
-    "count_plural_one_hide_missing_item_other_hide_miss_4a2562f7": {
-        "message": "{ count, plural,\n    one {}\n  other {}\n}"
-    },
     "count_plural_one_item_loaded_other_items_loaded_857023b7": {
         "message": "{ count, plural,\n    one {}\n  other {}\n}"
-    },
-    "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
-        "message": "{ count, plural,\n    one {}\n  other {}\n}"
-    },
-    "count_plural_one_show_missing_item_other_show_miss_509327ef": {
-        "message": "{ count, plural,\n    one {}\n  other {}\n}"
-    },
-    "course_8a63b4a3": {
-        "message": "Դասընթաց"
     },
     "course_files_62deb8f8": {
         "message": "Դասընթացի ֆայլեր"
@@ -116,17 +98,11 @@
     "cyan_c1d5f68a": {
         "message": "Cyan"
     },
-    "date_ee500367": {
-        "message": "Ամսաթիվ"
-    },
     "decrease_indent_d9cf469d": {
         "message": "Փոքրացնել Ներսի Տողագլուխը"
     },
     "deep_purple_bb3e2907": {
         "message": "Մուգ մանուշակագույն"
-    },
-    "delete_a6efa79d": {
-        "message": "Ջնջել"
     },
     "delimiters_4db4840d": {
         "message": "Բաժանիչներ"
@@ -135,9 +111,6 @@
         "message": "Նկարագրություն"
     },
     "details_98a31b68": {
-        "message": "Մանրամասներ"
-    },
-    "details_a6f427c3": {
         "message": "Մանրամասներ"
     },
     "dimensions_45ddb7b7": {
@@ -158,9 +131,6 @@
     "down_5831a426": {
         "message": "Ներքև"
     },
-    "due_5d7267be": {
-        "message": "Մինչև"
-    },
     "due_multiple_dates_cc0ee3f5": {
         "message": "Վերջնաժամկետ՝ մի քանի ամսաթիվ"
     },
@@ -169,9 +139,6 @@
     },
     "embed_image_1080badc": {
         "message": "Տեղադրել պատկերը"
-    },
-    "excused_cf8792eb": {
-        "message": "Ներված է"
     },
     "external_tools_6e77821": {
         "message": "Արտաքին գործիքներ"
@@ -187,9 +154,6 @@
     },
     "generating_preview_45b53be0": {
         "message": "Կարծիքը գեներացվում է ..."
-    },
-    "graded_25cd3fcd": {
-        "message": "Գնահատվող"
     },
     "grades_a61eba0a": {
         "message": "Գնահատականներ"
@@ -248,12 +212,6 @@
     "invalid_url_cbde79f": {
         "message": "Սխալ URL"
     },
-    "join_6cafecca": {
-        "message": "Միանալ"
-    },
-    "jump_to_today_254ccf41": {
-        "message": "Անցնել այսօրվան"
-    },
     "keyboard_shortcuts_ed1844bd": {
         "message": "Արագ հասանելիության ստեղներ"
     },
@@ -269,9 +227,6 @@
     "links_to_an_external_site_de74145d": {
         "message": "Արտաքին կայքին հղումներ"
     },
-    "load_more_a36f9cf9": {
-        "message": "Բեռնել լրացուցիչ"
-    },
     "loading_25990131": {
         "message": "Բեռնում է..."
     },
@@ -280,9 +235,6 @@
     },
     "loading_failed_b3524381": {
         "message": "Loading failed..."
-    },
-    "location_3b6ff307": {
-        "message": "Գտնվելու վայրը"
     },
     "locked_762f138b": {
         "message": "Արգելափակված է"
@@ -299,6 +251,9 @@
     "misc_3b692ea7": {
         "message": "Այլ"
     },
+    "module_90d9fd32": {
+        "message": "Մոդուլ"
+    },
     "modules_c4325335": {
         "message": "Մոդուլներ"
     },
@@ -308,14 +263,20 @@
     "name_1aed4a1b": {
         "message": "Անուն"
     },
-    "new_13daf639": {
-        "message": "Նոր"
+    "navigation_ee9af92d": {
+        "message": "Նավարկում"
+    },
+    "new_quiz_34aacba6": {
+        "message": "Նոր թեստ"
     },
     "next_40e12421": {
         "message": "Հաջորդը"
     },
     "no_e16d9132": {
         "message": "Ոչ"
+    },
+    "no_pages_created_yet_c379fa6e": {
+        "message": "Դեռևս ոչ մի էջ չի ստեղծվել:"
     },
     "no_preview_is_available_for_this_file_f940114a": {
         "message": "Այս ֆայլի նախնական դիտումը հասանելի չէ:"
@@ -325,9 +286,6 @@
     },
     "none_3b5e34d2": {
         "message": "Ոչինչ չկա"
-    },
-    "nothing_for_now_e3e3ce2a": {
-        "message": "Առայժմ ոչինչ"
     },
     "operators_a2ef9a93": {
         "message": "Օպերատորներ"
@@ -340,9 +298,6 @@
     },
     "pages_e5414c2c": {
         "message": "Էջեր"
-    },
-    "peer_review_74f26a13": {
-        "message": "Ունկնդիրների կողմից միմյանց աշխատանքների վերաբերյալ ներկայացված կարծիք"
     },
     "people_b4ebb13c": {
         "message": "Մարդիկ"
@@ -358,9 +313,6 @@
     },
     "preview_53003fd2": {
         "message": "Նախնական դիտում"
-    },
-    "pts_699bd9aa": {
-        "message": "միավորներ"
     },
     "published_c944a23d": {
         "message": "հրապարակված"
@@ -413,9 +365,6 @@
     "submit_a3cc6859": {
         "message": "Ուղարկել"
     },
-    "submitted_318fad53": {
-        "message": "Ներկայացված է "
-    },
     "syllabus_f191f65b": {
         "message": "Դասընթացի ծրագիր"
     },
@@ -437,20 +386,8 @@
     "this_equation_cannot_be_rendered_in_basic_view_9b6c07ae": {
         "message": "Այս հավասարումը հնարավոր չէ ցուցադրել Հիմնական տեսքով:"
     },
-    "time_2b5aac58": {
-        "message": "Ժամ"
-    },
     "title_ee03d132": {
         "message": "Վերնագիր"
-    },
-    "to_do_1d554f36": {
-        "message": "Անել"
-    },
-    "today_76e10f9c": {
-        "message": "Այսօր"
-    },
-    "tomorrow_9a6c9a00": {
-        "message": "Վաղը"
     },
     "unpublished_dfd8801": {
         "message": "չհրապարակված"
@@ -481,8 +418,5 @@
     },
     "yes_dde87d5": {
         "message": "Այո"
-    },
-    "yesterday_c6bd6abf": {
-        "message": "Երեկ"
     }
 }

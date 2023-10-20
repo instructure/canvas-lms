@@ -5,6 +5,9 @@
   "armenian_12da6118": { "message": "Armeni" },
   "belarusian_b2f19c76": { "message": "Bielorús" },
   "bulgarian_feccab7e": { "message": "Búlgar" },
+  "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
+    "message": "Els subtítols heretats d’una assignatura principal no es poden suprimir."
+  },
   "catalan_16f6b78f": { "message": "Català" },
   "chinese_111d37f6": { "message": "Xinès" },
   "chinese_simplified_7f0bd370": { "message": "Xinès simplificat" },
@@ -69,5 +72,8 @@
   "ukrainian_945b00b7": { "message": "Ucraïnès" },
   "vietnamese_e7a76583": { "message": "Vietnamita" },
   "welsh_42ab94b1": { "message": "Gal·lès" },
-  "yiddish_f96986df": { "message": "Jiddisch" }
+  "yiddish_f96986df": { "message": "Jiddisch" },
+  "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
+    "message": "Ho podeu substituir carregant un nou fitxer de subtítols."
+  }
 }

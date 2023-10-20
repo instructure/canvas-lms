@@ -20,15 +20,21 @@
 // if you want Backbone, import 'Backbone' (this file). It will give you
 // back a Backbone with all of our instructure specific patches to it.
 
-/* eslint-disable import/no-commonjs */
-
-// Get the unpatched Backbone
-const Backbone = require('backbone')
+import Backbone from 'backbone'
+import {patch as patch1} from './Backbone.syncWithMultipart'
+import {patch as patch2} from './Model'
+import {patch as patch3} from './View'
+import {patch as patch4} from './Collection'
 
 // Apply all of our patches
-require('./Backbone.syncWithMultipart')
-require('./Model')
-require('./View')
-require('./Collection')
+patch1(Backbone)
+patch2(Backbone)
+patch3(Backbone)
+patch4(Backbone)
 
-module.exports = Backbone
+export const syncWithMultipart = Backbone.syncWithMultipart
+export const Model = Backbone.Model
+export const Collection = Backbone.Collection
+export const View = Backbone.View
+
+export default Backbone
