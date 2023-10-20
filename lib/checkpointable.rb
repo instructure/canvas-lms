@@ -25,6 +25,8 @@ module Checkpointable
 
     klass.validates :parent_assignment_id, absence: true, if: :checkpointed?
     klass.validates :parent_assignment_id, comparison: { other_than: :id, message: -> { I18n.t("cannot reference self") } }, allow_nil: true
+
+    klass.after_commit :aggregate_checkpoint_assignments, if: :checkpoint_changes?
   end
 
   def checkpoint?
@@ -33,5 +35,21 @@ module Checkpointable
 
   def find_checkpoint(checkpoint_label)
     checkpoint_assignments.find_by(checkpoint_label:)
+  end
+
+  private
+
+  def aggregate_checkpoint_assignments
+    Checkpoints::AssignmentAggregatorService.call(assignment: parent_assignment)
+  end
+
+  def checkpoint_changes?
+    checkpoint? && !!root_account&.feature_enabled?(:discussion_checkpoints) && checkpoint_attributes_changed?
+  end
+
+  def checkpoint_attributes_changed?
+    tracked_attributes = Checkpoints::AssignmentAggregatorService::AggregateAssignment.members.map(&:to_s) - ["updated_at"]
+    relevant_changes = tracked_attributes & previous_changes.keys
+    relevant_changes.any?
   end
 end

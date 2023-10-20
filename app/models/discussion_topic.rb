@@ -1810,11 +1810,7 @@ class DiscussionTopic < ActiveRecord::Base
     return false if checkpoints?
     return false unless context.is_a?(Course)
 
-    parent = context.assignments.create!(
-      checkpointed: true,
-      checkpoint_label: CheckpointLabels::PARENT,
-      points_possible: reply_to_topic_points + reply_to_entry_points
-    )
+    parent = context.assignments.create!(checkpointed: true, checkpoint_label: CheckpointLabels::PARENT)
     parent.checkpoint_assignments.create!(context:, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC, points_possible: reply_to_topic_points)
     parent.checkpoint_assignments.create!(context:, checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY, points_possible: reply_to_entry_points)
     self.assignment = parent
