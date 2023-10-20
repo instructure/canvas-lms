@@ -179,7 +179,8 @@ class EffectiveDueDates
           o.set_type,
           o.set_id,
           FALSE,
-          a.due_at
+          a.due_at,
+          o.unassign_item
         FROM
           models a, modules m
         INNER JOIN #{AssignmentOverride.quoted_table_name} o on o.context_module_id = m.id
@@ -235,6 +236,7 @@ class EffectiveDueDates
           o.due_at,
           o.set_type AS override_type,
           o.due_at_overridden,
+          o.unassign_item,
           2 AS priority
         FROM
           overrides o
@@ -254,6 +256,15 @@ class EffectiveDueDates
     if Account.site_admin.feature_enabled?(:differentiated_modules)
       "SELECT * FROM override_course_students
         UNION ALL"
+    else
+      ""
+    end
+  end
+
+  def unassign_item
+    if Account.site_admin.feature_enabled?(:differentiated_modules)
+      "WHERE
+        overrides.unassign_item = FALSE"
     else
       ""
     end
@@ -317,7 +328,8 @@ class EffectiveDueDates
               o.set_type,
               o.set_id,
               o.due_at_overridden,
-              CASE WHEN o.due_at_overridden IS TRUE THEN o.due_at ELSE a.due_at END AS due_at
+              CASE WHEN o.due_at_overridden IS TRUE THEN o.due_at ELSE a.due_at END AS due_at,
+              o.unassign_item
             FROM
               models a
             INNER JOIN #{AssignmentOverride.quoted_table_name} o ON o.assignment_id = a.id
@@ -340,6 +352,7 @@ class EffectiveDueDates
               o.due_at,
               o.set_type AS override_type,
               o.due_at_overridden,
+              o.unassign_item,
               1 AS priority
             FROM
               overrides o
@@ -361,6 +374,7 @@ class EffectiveDueDates
               o.due_at,
               o.set_type AS override_type,
               o.due_at_overridden,
+              o.unassign_item,
               2 AS priority
             FROM
               overrides o
@@ -384,6 +398,7 @@ class EffectiveDueDates
               o.due_at,
               o.set_type AS override_type,
               o.due_at_overridden,
+              o.unassign_item,
               2 AS priority
             FROM
               overrides o
@@ -411,6 +426,7 @@ class EffectiveDueDates
               a.due_at,
               'Everyone Else'::varchar AS override_type,
               FALSE AS due_at_overridden,
+              FALSE AS unassign_item,
               3 AS priority
             FROM
               models a
@@ -516,6 +532,7 @@ class EffectiveDueDates
           /* match the effective due date with its grading period */
           LEFT OUTER JOIN applied_grading_periods periods ON
               periods.start_date < overrides.trunc_due_at AND overrides.trunc_due_at <= periods.end_date
+          #{unassign_item}
         SQL
       end
     end
