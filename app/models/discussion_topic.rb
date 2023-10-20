@@ -100,6 +100,10 @@ class DiscussionTopic < ActiveRecord::Base
   validates :discussion_type, inclusion: { in: DiscussionTypes::TYPES }
   validates :message, length: { maximum: maximum_long_text_length, allow_blank: true }
   validates :title, length: { maximum: maximum_string_length, allow_nil: true }
+  # For our users, when setting checkpoints, the value must be between 1 and 10.
+  # But we also allow 0 when there are no checkpoints.
+  validates :reply_to_entry_required_count, presence: true, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 10 }
+  validates :reply_to_entry_required_count, numericality: { greater_than: 0 }, if: :checkpoints?
   validate :validate_draft_state_change, if: :workflow_state_changed?
   validate :section_specific_topics_must_have_sections
   validate :only_course_topics_can_be_section_specific
@@ -1332,9 +1336,10 @@ class DiscussionTopic < ActiveRecord::Base
         submissions << reply_to_topic_submission if reply_to_topic_submission.present?
       end
 
-      reply_to_entry_submitted_at = topic.discussion_entries.non_top_level_for_user(user).minimum(:created_at)
+      reply_to_entries = topic.discussion_entries.non_top_level_for_user(user)
 
-      if reply_to_entry_submitted_at.present?
+      if reply_to_entries.any? && enough_replies_for_checkpoint?(reply_to_entries)
+        reply_to_entry_submitted_at = reply_to_entries.minimum(:created_at)
         reply_to_entry_submission = ensure_particular_submission(reply_to_entry_checkpoint, user, reply_to_entry_submitted_at, only_update:)
         submissions << reply_to_entry_submission if reply_to_entry_submission.present?
       end
@@ -1812,5 +1817,11 @@ class DiscussionTopic < ActiveRecord::Base
     self.reply_to_entry_required_count = reply_to_entry_required_count
 
     save
+  end
+
+  private
+
+  def enough_replies_for_checkpoint?(reply_to_entries)
+    reply_to_entries.count >= reply_to_entry_required_count
   end
 end
