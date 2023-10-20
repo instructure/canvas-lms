@@ -59,6 +59,7 @@ const modalProps = {
     {
       base_role_name: 'TeacherEnrollment',
       id: '234',
+      role: 'TeacherEnrollment',
       label: 'Teacher',
     },
   ],

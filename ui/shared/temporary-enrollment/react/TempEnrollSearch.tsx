@@ -43,7 +43,7 @@ interface Props {
   readonly searchSuccess: Function
   readonly canReadSIS?: boolean
   readonly accountId: string
-  readonly foundEnroll?: User
+  readonly foundEnroll?: User | null
 }
 
 export function TempEnrollSearch(props: Props) {
@@ -135,6 +135,7 @@ export function TempEnrollSearch(props: Props) {
   useEffect(() => {
     if (props.page === 1 && !props.foundEnroll) {
       setLoading(true)
+
       const findUser = async () => {
         try {
           const {json} = await doFetchApi({
@@ -142,14 +143,18 @@ export function TempEnrollSearch(props: Props) {
             method: 'POST',
             params: {user_list: search, v2: true, search_type: searchType},
           })
+
           processSearchApiResponse(json)
         } catch (error: any) {
           setMessage(error.message)
           setEnrollment(EMPTY_USER)
+
           props.searchFail()
+
           setLoading(false)
         }
       }
+
       findUser()
     } else if (props.foundEnroll) {
       setEnrollment({...props.foundEnroll})
