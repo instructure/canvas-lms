@@ -3594,7 +3594,7 @@ describe "Submissions API", type: :request do
         assignment = @course.assignments.create!(checkpointed: true, checkpoint_label: CheckpointLabels::PARENT)
         assignment.checkpoint_assignments.create!(context: @course, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC, due_at: 2.days.from_now)
         assignment.checkpoint_assignments.create!(context: @course, checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY, due_at: 3.days.from_now)
-        @topic = @course.discussion_topics.create!(assignment:)
+        @topic = @course.discussion_topics.create!(assignment:, reply_to_entry_required_count: 1)
       end
 
       let(:api_call_args) do
