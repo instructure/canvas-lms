@@ -22,10 +22,17 @@ import RequirementForm, {RequirementFormProps} from '../RequirementForm'
 
 describe('RequirementForm', () => {
   const props: RequirementFormProps = {
-    requirements: [],
+    requirements: [
+      {id: '1', name: 'Item 1', resource: 'page', type: 'view'},
+      {id: '2', name: 'Item 2', resource: 'page', type: 'view'},
+    ],
     requirementCount: 'all',
     requireSequentialProgress: false,
-    moduleItems: [{id: '1', name: 'Module 1', resource: 'page'}],
+    moduleItems: [
+      {id: '1', name: 'Item 1', resource: 'page'},
+      {id: '2', name: 'Item 2', resource: 'page'},
+      {id: '3', name: 'Item 3', resource: 'page'},
+    ],
     onChangeRequirementCount: () => {},
     onToggleSequentialProgress: () => {},
     onAddRequirement: jest.fn(),
@@ -46,31 +53,33 @@ describe('RequirementForm', () => {
   })
 
   it('does not render the requirement count input when there are no requirements', () => {
-    const {queryByText} = renderComponent()
+    const {queryByText} = renderComponent({requirements: []})
     expect(queryByText('Select Requirement Count')).not.toBeInTheDocument()
   })
 
   it('renders the requirement count input when there are requirements', () => {
-    const {getByText} = renderComponent({requirements: [{...props.moduleItems[0], type: 'view'}]})
+    const {getByText} = renderComponent()
     expect(getByText('Select Requirement Count')).toBeInTheDocument()
   })
 
   it('renders the correct number of requirement selectors', () => {
-    const {getAllByText} = renderComponent({
-      requirements: [
-        {...props.moduleItems[0], type: 'view'},
-        {...props.moduleItems[0], type: 'contribute'},
-      ],
-    })
-    expect(getAllByText('Select Module Item')).toHaveLength(2)
+    const {getAllByText} = renderComponent()
+    expect(getAllByText('Select Module Item')).toHaveLength(props.requirements.length)
   })
 
-  it('calls onAddRequirement when the add button is clicked', () => {
+  it('calls onAddRequirement with the first requirement free module item when the add button is clicked', () => {
     const {getByText} = renderComponent()
     getByText('Requirement').click()
     expect(props.onAddRequirement).toHaveBeenCalledWith({
-      ...props.moduleItems[0],
+      ...props.moduleItems[2],
       type: 'view',
     })
+  })
+
+  it('does not render the add button when all available module items have requirements', () => {
+    const {queryByText} = renderComponent({
+      requirements: props.moduleItems.map(moduleItem => ({...moduleItem, type: 'view'})),
+    })
+    expect(queryByText('Requirement')).not.toBeInTheDocument()
   })
 })
