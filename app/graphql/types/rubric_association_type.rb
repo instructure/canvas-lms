@@ -24,6 +24,11 @@ module Types
 
     implements Interfaces::LegacyIDInterface
 
+    field :hide_outcome_results, Boolean, null: false
+    def hide_outcome_results
+      !!object.hide_outcome_results
+    end
+
     field :hide_points, Boolean, null: false
     def hide_points
       !!object.hide_points(current_user)
