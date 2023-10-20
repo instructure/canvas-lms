@@ -24,36 +24,37 @@ import {NodeStructure} from '../EnrollmentTree'
 const checkCallback = jest.fn()
 const toggleCallback = jest.fn()
 
+interface TestableNodeStructure extends NodeStructure {
+  parent?: NodeStructure
+}
+
 const emptyNode = {
   id: '',
   label: '',
-  // eslint-disable-next-line no-array-constructor
-  children: new Array<NodeStructure>(),
+  children: [],
   isMixed: false,
   isCheck: false,
 }
 
-const section2Node: NodeStructure = {
+const section2Node: TestableNodeStructure = {
   id: 's2',
   label: 'Section 2',
-  // eslint-disable-next-line no-array-constructor
-  children: new Array<NodeStructure>(),
+  children: [],
   parent: emptyNode,
   isCheck: false,
   isMixed: false,
 }
 
-const section1Node: NodeStructure = {
+const section1Node: TestableNodeStructure = {
   id: 's1',
   label: 'Section 1',
-  // eslint-disable-next-line no-array-constructor
-  children: new Array<NodeStructure>(),
+  children: [],
   parent: emptyNode,
   isCheck: false,
   isMixed: false,
 }
 
-const courseNode: NodeStructure = {
+const courseNode: TestableNodeStructure = {
   id: 'c1',
   label: 'Course 1',
   children: [section1Node],
@@ -63,7 +64,7 @@ const courseNode: NodeStructure = {
   isMixed: false,
 }
 
-const roleNode: NodeStructure = {
+const roleNode: TestableNodeStructure = {
   enrollId: '1',
   id: 'r1',
   label: 'Role 1',

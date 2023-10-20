@@ -22,28 +22,28 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Course, Enrollment, Role, Section} from './types'
 
 interface RoleChoice {
-  id: string
-  name: string
+  readonly id: string
+  readonly name: string
 }
 
 interface Props {
-  enrollmentsByCourse: Course[] | any
-  roles: Role[] | any
-  selectedRole: RoleChoice
-  createEnroll?: Function
+  readonly enrollmentsByCourse: Course[] | any
+  readonly roles: Role[] | any
+  readonly selectedRole: RoleChoice
+  readonly createEnroll?: Function
 }
 
 export interface NodeStructure {
-  children: NodeStructure[]
-  enrollId?: string
-  id: string
+  readonly children: NodeStructure[]
+  readonly enrollId?: string
+  readonly id: string
   isCheck: boolean
   isMismatch?: boolean
   isMixed: boolean
   isToggle?: boolean
-  label: string
-  parent?: NodeStructure
-  workState?: string
+  readonly label: string
+  readonly parent?: NodeStructure
+  readonly workState?: string
 }
 
 export function EnrollmentTree(props: Props) {

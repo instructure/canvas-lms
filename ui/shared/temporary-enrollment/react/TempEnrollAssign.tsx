@@ -56,7 +56,7 @@ const I18n = useI18nScope('temporary_enrollment')
 // initialize analytics props
 const analyticProps = createAnalyticPropsGenerator(MODULE_NAME)
 
-interface Role {
+interface EnrollmentRole {
   readonly id: string
   readonly base_role_name: string
 }
@@ -144,15 +144,15 @@ function getStoredData(): StoredData {
   }
 }
 
-interface EnrollmentPropsFunctionProps {
-  contextType: EnrollmentType
-  enrollment: User
-  user: User
+interface EnrollmentAndUserProps {
+  readonly enrollmentProps: User
+  readonly userProps: User
 }
 
-interface EnrollmentAndUserProps {
-  enrollmentProps: User
-  userProps: User
+interface EnrollmentAndUserContextProps {
+  readonly contextType: EnrollmentType
+  readonly enrollment: User
+  readonly user: User
 }
 
 /**
@@ -166,7 +166,7 @@ interface EnrollmentAndUserProps {
  * @returns {Object} Enrollment and user props
  */
 export function getEnrollmentAndUserProps(
-  props: EnrollmentPropsFunctionProps
+  props: EnrollmentAndUserContextProps
 ): EnrollmentAndUserProps {
   const {contextType, enrollment, user} = props
   const enrollmentProps = contextType === RECIPIENT ? user : enrollment
@@ -268,7 +268,9 @@ export function TempEnrollAssign(props: Props) {
   }
 
   const handleRoleSearchChange = (event: ChangeEvent, selectedOption: {id: string}) => {
-    const foundRole: Role | undefined = props.roles.find(role => role.id === selectedOption.id)
+    const foundRole: EnrollmentRole | undefined = props.roles.find(
+      role => role.id === selectedOption.id
+    )
     const name = foundRole ? removeStringAffix(foundRole.base_role_name, 'Enrollment') : ''
 
     setRoleChoice({

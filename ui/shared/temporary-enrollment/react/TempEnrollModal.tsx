@@ -32,7 +32,7 @@ import {TempEnrollSearch} from './TempEnrollSearch'
 import {TempEnrollEdit} from './TempEnrollEdit'
 import {TempEnrollAssign} from './TempEnrollAssign'
 import {Flex} from '@instructure/ui-flex'
-import {Enrollment, EnrollmentType, MODULE_NAME, TempEnrollPermissions, User} from './types'
+import {Enrollment, EnrollmentType, MODULE_NAME, Role, TempEnrollPermissions, User} from './types'
 import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {createAnalyticPropsGenerator} from './util/analytics'
 
@@ -46,20 +46,20 @@ interface Props {
   readonly enrollmentType: EnrollmentType
   readonly children: ReactElement
   readonly user: {
-    id: string
-    name: string
-    avatar_url?: string
+    readonly id: string
+    readonly name: string
+    readonly avatar_url?: string
   }
   readonly canReadSIS?: boolean
   readonly permissions: {
-    teacher: boolean
-    ta: boolean
-    student: boolean
-    observer: boolean
-    designer: boolean
+    readonly teacher: boolean
+    readonly ta: boolean
+    readonly student: boolean
+    readonly observer: boolean
+    readonly designer: boolean
   }
   readonly accountId: string
-  readonly roles: {id: string; label: string; base_role_name: string}[]
+  readonly roles: Role[]
   readonly onOpen?: () => void
   readonly onClose?: () => void
   readonly defaultOpen?: boolean
@@ -90,8 +90,11 @@ export function TempEnrollModal(props: Props) {
     }
   }, [props.tempEnrollments])
 
-  function resetState(pg: number = 0) {
-    setPage(pg)
+  const resetState = () => {
+    setPage(0)
+    setEnrollment(null)
+    setIsViewingAssignFromEdit(false)
+    setEnrollmentData([])
 
     if (props.isEditMode && props.onToggleEditMode) {
       props.onToggleEditMode(false)
@@ -154,7 +157,7 @@ export function TempEnrollModal(props: Props) {
 
   const handleResetToBeginning = () => {
     resetState()
-    setPage((p: number) => p - 1)
+    setPage(0)
   }
 
   const handlePageTransition = () => {
@@ -172,7 +175,8 @@ export function TempEnrollModal(props: Props) {
 
   const handleGoToAssignPageWithEnrollment = (chosenEnrollment: any) => {
     setEnrollment(chosenEnrollment)
-    resetState(2)
+    setPage(2)
+    resetState()
     setIsViewingAssignFromEdit(true)
   }
 
@@ -231,7 +235,7 @@ export function TempEnrollModal(props: Props) {
           page={page}
           searchFail={handleSearchFailure}
           searchSuccess={handleSetEnrollmentFromSearch}
-          foundEnroll={enrollment !== null ? enrollment : undefined}
+          foundEnroll={enrollment}
         />
       )
     }
