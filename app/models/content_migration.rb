@@ -87,6 +87,18 @@ class ContentMigration < ActiveRecord::Base
     Canvas::LiveEventsCallbacks.after_update(context, context.saved_changes)
     Canvas::LiveEventsCallbacks.after_update(self, saved_changes)
 
+    # Trigger live event for new quizzes if needed
+    if initiated_source == :new_quizzes
+      Canvas::LiveEvents.quizzes_next_migration_urls_complete(
+        {
+          original_course_uuid: source_course.uuid,
+          new_course_uuid: context.uuid,
+          domain: context.root_account&.domain(ApplicationController.test_cluster_name),
+          resource_map_url: asset_map_url(generate_if_needed: true),
+        }
+      )
+    end
+
     # Trigger live events for all updated/created records
     imported_migration_items.each do |imported_item|
       next unless LiveEventsObserver.observed_classes.include? imported_item.class
