@@ -141,4 +141,33 @@ describe Assignment do
       end
     end
   end
+
+  describe "checkpointed discussions" do
+    before(:once) do
+      course = course_model
+      course.root_account.enable_feature!(:discussion_checkpoints)
+      @topic = @course.discussion_topics.create!(title: "graded topic")
+      @topic.create_checkpoints(reply_to_topic_points: 3, reply_to_entry_points: 7)
+      @checkpoint_assignment = @topic.reply_to_topic_checkpoint
+    end
+
+    it "updates the parent assignment when tracked attrs change on a checkpoint assignment" do
+      expect { @checkpoint_assignment.update!(points_possible: 4) }.to change {
+        @topic.assignment.reload.points_possible
+      }.from(10).to(11)
+    end
+
+    it "does not update the parent assignment when attrs that changed are not tracked" do
+      expect { @checkpoint_assignment.update!(title: "potato") }.not_to change {
+        @topic.assignment.reload.updated_at
+      }
+    end
+
+    it "does not update the parent assignment when the checkpoints flag is disabled" do
+      @topic.root_account.disable_feature!(:discussion_checkpoints)
+      expect { @checkpoint_assignment.update!(points_possible: 4) }.not_to change {
+        @topic.assignment.reload.points_possible
+      }
+    end
+  end
 end

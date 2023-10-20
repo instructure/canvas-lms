@@ -160,7 +160,7 @@ describe Checkpoints::SubmissionAggregatorService do
     end
 
     describe "updated_at" do
-      it "save the most recent checkpoint updated_at on the parent submission" do
+      it "saves the most recent checkpoint updated_at on the parent submission" do
         now = Time.zone.now
         Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
           Timecop.freeze(5.minutes.ago(now)) do
