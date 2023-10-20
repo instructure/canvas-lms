@@ -629,8 +629,8 @@ module Api::V1::Assignment
     # html is moved to the destination course. This code block gives New Quizzes the ability
     # to let canvas know what additional assets need to be copied.
     # Note: this is intended to be a short term solution to resolve an ongoing production issue.
-    if assignment_params.key?("migrated_urls_report_url")
-      url = assignment_params["migrated_urls_report_url"]
+    url = assignment_params.dig("migrated_urls_report_url")
+    if url.present?
       res = CanvasHttp.get(url)
       data = JSON.parse(res.body)
 
