@@ -75,6 +75,15 @@ describe Lti::IMS::DynamicRegistrationController do
         expect(oidc_url).to eq("https://canvas.instructure.com/api/lti/security/openid-configuration")
       end
 
+      it "supports multiple subdomains in the oidc url" do
+        @request.host = "sub.test.host"
+        allow(Canvas::Security).to receive(:config).and_return({ "lti_iss" => "https://sub.test.host" })
+        subject
+        parsed_redirect_uri = Addressable::URI.parse(response.headers["Location"])
+        oidc_url = parsed_redirect_uri.query_values["openid_configuration"]
+        expect(oidc_url).to eq("https://sub.test.host/api/lti/security/openid-configuration")
+      end
+
       it "sets user id, root account id, and date in the JWT" do
         subject
         parsed_redirect_uri = Addressable::URI.parse(response.headers["Location"])

@@ -42,8 +42,7 @@ module Lti
         current_time = DateTime.now.iso8601
         user_id = @current_user.id
         root_account_global_id = @domain_root_account.global_id
-        oidc_configuration_url = openid_configuration_url(protocol: issuer_protocol, port: issuer_port, domain: issuer_domain)
-
+        oidc_configuration_url = openid_configuration_url(protocol: issuer_protocol, port: issuer_port, host: issuer_domain)
         jwt = Canvas::Security.create_jwt({
                                             initiated_at: current_time,
                                             user_id:,
