@@ -102,6 +102,13 @@ RSpec.describe SecurityController, type: :request do
                                         },
                                         5.minutes.from_now)
 
+      messages = Lti::ResourcePlacement::PLACEMENTS_BY_MESSAGE_TYPE.keys.map(&:to_s).map do |message_type|
+        {
+          "type" => message_type,
+          "placements" => Lti::ResourcePlacement::PLACEMENTS_BY_MESSAGE_TYPE[message_type].map(&:to_s)
+        }
+      end
+
       get "/api/lti/security/openid-configuration", params: { registration_token: jwt }
       expect(response).to have_http_status :ok
       parsed_body = response.parsed_body
@@ -111,6 +118,7 @@ RSpec.describe SecurityController, type: :request do
       lti_platform_configuration = parsed_body["https://purl.imsglobal.org/spec/lti-platform-configuration"]
       expect(lti_platform_configuration["product_family_code"]).to eq "canvas"
       expect(lti_platform_configuration["https://canvas.instructure.com/lti/account_name"]).to eq "Default Account"
+      expect(lti_platform_configuration["messages_supported"]).to eq messages
     end
   end
 
