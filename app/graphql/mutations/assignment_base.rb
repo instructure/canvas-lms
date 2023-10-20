@@ -78,6 +78,7 @@ class Mutations::AssignmentBase < Mutations::BaseMutation
       @working_assignment = working_assignment
       @session = session
       @current_user = current_user
+      @context = working_assignment.context
     end
 
     attr_reader :session
