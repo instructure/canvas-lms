@@ -642,7 +642,7 @@ module Api::V1::Assignment
           user:,
           context:,
           migration_type:,
-          initiated_source: :api
+          initiated_source: :new_quizzes
         )
         content_migration.update_migration_settings({
                                                       import_quizzes_next: false,
