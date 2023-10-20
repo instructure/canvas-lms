@@ -52,6 +52,12 @@ describe Types::RubricAssociationType do
   end
 
   describe "works for the field" do
+    it "hide_outcome_results" do
+      expect(
+        submission_type.resolve("rubricAssessmentsConnection { nodes { rubricAssociation { hideOutcomeResults } } }")
+      ).to eq [rubric_association.hide_outcome_results]
+    end
+
     it "hide_points" do
       expect(
         submission_type.resolve("rubricAssessmentsConnection { nodes { rubricAssociation { hidePoints } } }")
