@@ -431,6 +431,38 @@ describe Course do
       expect(result).to eq expected
     end
 
+    it "does not include student with unassign_item ADHOC override" do
+      Account.site_admin.enable_feature!(:differentiated_modules)
+
+      override = @assignment1.assignment_overrides.create!(due_at: 3.days.from_now(@now), due_at_overridden: true)
+      override.assignment_override_students.create!(user: @student1)
+
+      override.unassign_item = true
+      override.save!
+
+      edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+      result = edd.to_hash
+      expected = {
+        @assignment1.id => {
+          @student2.id => {
+            due_at: @assignment1.due_at,
+            grading_period_id: nil,
+            in_closed_grading_period: false,
+            override_id: nil,
+            override_source: "Everyone Else"
+          },
+          @student3.id => {
+            due_at: @assignment1.due_at,
+            grading_period_id: nil,
+            in_closed_grading_period: false,
+            override_id: nil,
+            override_source: "Everyone Else"
+          }
+        }
+      }
+      expect(result).to eq expected
+    end
+
     context "when only visible to overrides" do
       before(:once) do
         @assignment1.only_visible_to_overrides = true
@@ -528,6 +560,81 @@ describe Course do
         it "applies adhoc overrides" do
           override = @assignment1.assignment_overrides.create!(due_at: 3.days.from_now(@now), due_at_overridden: true)
           override.assignment_override_students.create!(user: @student1)
+
+          edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+          result = edd.to_hash
+          expected = {
+            @assignment1.id => {
+              @student1.id => {
+                due_at: 3.days.from_now(@now),
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: override.id,
+                override_source: "ADHOC"
+              }
+            }
+          }
+          expect(result).to eq expected
+        end
+
+        it "doesn't apply adhoc overrides with unassign_item" do
+          Account.site_admin.enable_feature!(:differentiated_modules)
+          override = @assignment1.assignment_overrides.create!(due_at: 3.days.from_now(@now), due_at_overridden: true)
+          override.assignment_override_students.create!(user: @student1)
+
+          section = CourseSection.create!(name: "My Awesome Section", course: @test_course)
+          student_in_section(section, user: @student1)
+          @assignment1.assignment_overrides.create!(
+            due_at: 1.day.from_now(@now),
+            due_at_overridden: true,
+            set: section
+          )
+
+          override.unassign_item = true
+          override.save!
+
+          edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+          result = edd.to_hash
+          expected = {}
+          expect(result).to eq expected
+        end
+
+        it "applies adhoc overrides with section unassign_item override" do
+          Account.site_admin.enable_feature!(:differentiated_modules)
+          override = @assignment1.assignment_overrides.create!(due_at: 3.days.from_now(@now), due_at_overridden: true)
+          override.assignment_override_students.create!(user: @student1)
+
+          section = CourseSection.create!(name: "My Awesome Section", course: @test_course)
+          student_in_section(section, user: @student1)
+          @assignment1.assignment_overrides.create!(
+            due_at: 1.day.from_now(@now),
+            due_at_overridden: true,
+            set: section,
+            unassign_item: true
+          )
+
+          edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+          result = edd.to_hash
+          expected = {
+            @assignment1.id => {
+              @student1.id => {
+                due_at: 3.days.from_now(@now),
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: override.id,
+                override_source: "ADHOC"
+              }
+            }
+          }
+          expect(result).to eq expected
+        end
+
+        it "applies adhoc overrides with unassign_item if flag is off" do
+          override = @assignment1.assignment_overrides.create!(due_at: 3.days.from_now(@now), due_at_overridden: true)
+          override.assignment_override_students.create!(user: @student1)
+
+          override.unassign_item = true
+          override.save!
 
           edd = EffectiveDueDates.for_course(@test_course, @assignment1)
           result = edd.to_hash
@@ -958,6 +1065,24 @@ describe Course do
           expect(result).to eq expected
         end
 
+        it "doesn't assign group with overrides with unassign_item" do
+          Account.site_admin.enable_feature!(:differentiated_modules)
+
+          group_with_user(user: @student3, active_all: true)
+          @group.users << @student2
+          @assignment1.assignment_overrides.create!(
+            due_at: 4.days.from_now(@now),
+            due_at_overridden: true,
+            set: @group,
+            unassign_item: true
+          )
+
+          edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+          result = edd.to_hash
+          expected = {}
+          expect(result).to eq expected
+        end
+
         it "ignores overrides for soft-deleted groups" do
           group_with_user(user: @student3, active_all: true)
           @assignment1.assignment_overrides.create!(due_at: 4.days.from_now(@now), due_at_overridden: true, set: @group)
@@ -1133,6 +1258,24 @@ describe Course do
             edd = EffectiveDueDates.for_course(@test_course, @assignment1)
             expect(edd.to_hash).to eq({})
           end
+        end
+
+        it "doesn't assign section with overrides with unassign_item" do
+          Account.site_admin.enable_feature!(:differentiated_modules)
+
+          section = CourseSection.create!(name: "My Awesome Section", course: @test_course)
+          student_in_section(section, user: @student1)
+          @assignment1.assignment_overrides.create!(
+            due_at: 1.day.from_now(@now),
+            due_at_overridden: true,
+            set: section,
+            unassign_item: true
+          )
+
+          edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+          result = edd.to_hash
+          expected = {}
+          expect(result).to eq expected
         end
 
         it "ignores section overrides for TAs" do
