@@ -9615,7 +9615,7 @@ nn:
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: "Aktiverer ei redesigna Send melding til studenter som... menyen som gjer det mogeleg å sende melding til observatørar i tillegg til studentar"
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Aktiverer vising av plagieringsrapportar for likskapsresultat i innleveringsmenyen til ny vurderingsoversikt."
   enables_modal_to_warn_user_when_a_draft_comment_is_c5e9464b: "Gjer det mogeleg for modal å advare brukar når eit kommentarutkast blir ståande som upublisert i SpeedGrader."
-  enables_new_api_endpoints_for_the_course_and_user__2ba4afbf: "Aktiverer nye API-sluttpunkt for emne- og brukardata som kjem frå New Analytics."
+  enables_new_api_endpoints_for_the_course_and_user__2ba4afbf: "Aktiverer nye API-sluttpunkt for emne- og brukardata som kjem frå Nye analysar."
   enables_the_course_templates_feature_globally_79d5302f: "Aktiverer funksjonalitet for emnemalar globalt"
   enables_the_microsoft_immersive_reader_button_in_s_ab4af0cd: "Aktiverer Microsoft Immersive Reader-knappen i støtta områder på Canvas. Knappen kan fortsatt vere aktivert i eit emne uavhengig av denne innstillingen, dersom kontoadministratoren har aktivert det for alle brukarar."
   enabling_the_elementary_theme_will_change_the_font_c944b619: "Aktivering av Grunnskuletemaet endrar skrifttypen i Canvas-brukargrensesnittet og forenklar emnenavigeringsmenyen for alle brukarar i emnet ditt."
@@ -12418,8 +12418,8 @@ nn:
   how_do_i_reply_to_a_discussion_as_an_instructor_399fdaff: "Korleis kan eg som faglærar delta i ein diskusjon? "
   how_do_i_schedule_a_zoom_video_meeting_5986f068: "Korleis planlegg eg eit Zoom videomøte?"
   how_do_i_select_specific_content_as_part_of_a_cour_11fe2c8d: "Korleis vel eg innhald som skal importerast til emne?"
-  how_do_i_send_a_message_to_all_students_based_on_s_59d186d1: "Korleis sender eg meldingar til alle studentar baster på enkelte kriterier i New Analytics?"
-  how_do_i_send_a_message_to_an_individual_student_i_92c7fb: "Korleis sender eg ei melding til ein enkelt student i New Analytics?"
+  how_do_i_send_a_message_to_all_students_based_on_s_59d186d1: "Korleis sender eg meldingar til alle studentar baster på enkelte kriterier i Nye analysar?"
+  how_do_i_send_a_message_to_an_individual_student_i_92c7fb: "Korleis sender eg ei melding til ein enkelt student i Nye analysar?"
   how_do_i_set_a_front_page_in_a_course_a5f53cd5: "Korleis kan eg lage til ei forside i eit emne? "
   how_do_i_set_details_for_a_course_52cfbeff: "Korleis endrar eg emnedetaljar?"
   how_do_i_share_my_screen_c280e585: "Korleis deler eg skjerm?"
@@ -13663,7 +13663,7 @@ nn:
   loading_message_list_226a131e: "Lastar meldingsliste"
   loading_microsoft_sync_data_a5203d3b: "Lastar synkroniseringsdata frå Microsoft"
   loading_microsoft_teams_sync_settings_c2633e46: "Lastar innstillingar for synkroniseringsdata frå Microsoft"
-  loading_missing_assignments_link_d9a0d320: "Lastar manglande kunngjeringslenke"
+  loading_missing_assignments_link_d9a0d320: "Lastar manglande oppgåvelenke"
   loading_more_gradebook_history_results_810f6d2e: "Lastar fleire resultat frå vurderingshistorikken"
   loading_more_results_1d437202: "Lastar fleire resultat"
   loading_more_results_def6df65: "Lastar fleire resultat..."
@@ -16310,7 +16310,7 @@ nn:
   new_analytics_api_access_7eec1ead: "Nye analysar API-tilgang"
   new_analytics_f6147886: "Nye analysar"
   new_analytics_is_an_interactive_tool_that_helps_yo_9bd32611: |-
-      New Analytics er eit interaktivt verktøy som hjelper deg og studentane å følgje med på prestasjon og aktivitet i emnet. Sjå kven som har sett sider og ressursar og deltatt i oppgåver—og kven som treng
+      Nye analysar er eit interaktivt verktøy som hjelper deg og studentane å følgje med på prestasjon og aktivitet i emnet. Sjå kven som har sett sider og ressursar og deltatt i oppgåver—og kven som treng
       litt meir oppmuntring
   new_analytics_tutorial_tray_2511a34a: "Nye analysar opplæringsmeny"
   new_and_improved_jobs_control_panel_f8571c9a: "Ny og forbetra kontrollpanel for jobbar"
