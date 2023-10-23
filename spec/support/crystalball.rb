@@ -205,6 +205,7 @@ module Crystalball
       CONFIG_CHANGES = [%r{config/.*.rb$}, %r{config/feature_flags/.*yml}, /Dockerfile/, /Jenkinsfile/, %r{build/new-jenkins/}].freeze
       GEMFILE_CHANGES = [/Gemfile.lock/].freeze
       PLUGINS_GEMFILE_CHANGES = [%r{Gemfile.d/.*.rb}, /.*.gemspec/].freeze
+      PACKAGE_CHANGES = [/package.json/, /yarn.lock/].freeze
 
       # @param [Crystalball::SourceDiff] diff - the diff from which to predict
       #   which specs should run
@@ -237,6 +238,10 @@ module Crystalball
             ["."]
           elsif file_changes["modified"].find { |path| GEMFILE_CHANGES.any? { |gemfile_path| path =~ gemfile_path } }
             Crystalball.log :warn, "Crystalball detected Gemfile.lock changes!"
+            Crystalball.log :warn, "Crystalball requesting entire suite re-run"
+            ["."]
+          elsif file_changes["modified"].find { |path| PACKAGE_CHANGES.any? { |package_path| path =~ package_path } }
+            Crystalball.log :warn, "Crystalball detected package.json or yarn.lock changes!"
             Crystalball.log :warn, "Crystalball requesting entire suite re-run"
             ["."]
           elsif ENV["CRYSTALBALL_REPO_PATH"]&.include?("gems/plugins") && file_changes["modified"].find { |path| PLUGINS_GEMFILE_CHANGES.any? { |gemfile_path| path =~ gemfile_path } }
