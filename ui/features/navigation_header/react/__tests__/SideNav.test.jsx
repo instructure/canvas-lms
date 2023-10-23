@@ -28,7 +28,9 @@ describe('SideNav', () => {
       html_url: '',
       pronouns: '',
     }
+    window.ENV.K5_USER = false
   })
+
   it('renders', () => {
     const unreadComponent = jest.fn(() => <></>)
 
@@ -61,4 +63,19 @@ describe('SideNav', () => {
     expect(avatarComponent).toHaveAttribute('src', 'testSrc')
   })
 
+  describe( 'Tests K5 user features', () => {
+    beforeEach(() => {
+      window.ENV.K5_USER = true
+    })
+    afterAll(() => {
+      window.ENV.K5_USER = false
+    })
+    it('should render text and icons for a K5 User', () => {
+      const {getByText, getAllByText, getByTestId} = render(<SideNav />)
+
+      expect(getByText('Subjects')).toBeInTheDocument()
+      expect(getAllByText('Home')).toHaveLength(2)
+      expect(getByTestId('K5HomeIcon')).toBeInTheDocument()
+    })
+  })
 })

@@ -26,6 +26,7 @@ import {
   IconCanvasLogoSolid,
   IconCoursesLine,
   IconDashboardLine,
+  IconHomeLine,
   IconInboxLine,
   IconQuestionLine,
 } from '@instructure/ui-icons'
@@ -35,6 +36,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 const I18n = useI18nScope('new_user_tutorial')
 
 const SideNav = () => {
+  const isK5User = window.ENV.K5_USER
   return (
     <div style={{height: '100vh'}} data-testid="sidenav-container">
       <Navigation
@@ -78,10 +80,15 @@ const SideNav = () => {
             event.preventDefault()
           }}
         />
-        <Navigation.Item selected={true} icon={<IconDashboardLine />} label="Dashboard" href="/" />
+        <Navigation.Item
+          selected={true}
+          icon={isK5User ? <IconHomeLine data-testid="K5HomeIcon" /> : <IconDashboardLine />}
+          label={isK5User ? I18n.t('Home') : I18n.t('Dashboard')}
+          href="/"
+        />
         <Navigation.Item
           icon={<IconCoursesLine />}
-          label={I18n.t('Courses')}
+          label={isK5User ? I18n.t('Subjects') : I18n.t('Courses')}
           href="/courses"
           onClick={event => {
             event.preventDefault()
