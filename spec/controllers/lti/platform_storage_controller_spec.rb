@@ -52,5 +52,10 @@ describe Lti::PlatformStorageController do
       expect(response.headers["Content-Security-Policy"])
         .to match(/frame-ancestors [^;]*self[^;]*localhost/)
     end
+
+    it "caches the response" do
+      subject
+      expect(response.headers["Cache-Control"]).to match(/max-age=#{1.day.seconds}/)
+    end
   end
 end
