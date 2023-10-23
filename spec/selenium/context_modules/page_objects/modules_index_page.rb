@@ -21,6 +21,10 @@ require_relative "../../common"
 
 module ModulesIndexPage
   #------------------------------ Selectors -----------------------------
+  def context_module_selector(module_id)
+    "#context_module_#{module_id}"
+  end
+
   def manage_module_item_assign_to_selector
     ".module-item-assign-to-link"
   end
@@ -42,6 +46,10 @@ module ModulesIndexPage
   end
 
   #------------------------------ Elements ------------------------------
+  def context_module(module_id)
+    f(context_module_selector(module_id))
+  end
+
   def manage_module_item_assign_to
     f(manage_module_item_assign_to_selector)
   end
