@@ -55,6 +55,11 @@ module Lti
              })
       set_extra_csp_frame_ancestor!
 
+      # cache aggressively since this is rendered on every page
+      ttl = Setting.get("post_message_forwarding_ttl", 1.day.seconds.to_s).to_i
+      response.headers["Cache-Control"] = "max-age=#{ttl}"
+      cancel_cache_buster
+
       # this page has no UI and so doesn't need all the preloaded JS.
       # also, the preloaded JS ends up loading the canvas postMessage handler
       # (through the RCE), which results in duplicate responses to postMessages,
