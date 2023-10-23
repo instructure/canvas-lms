@@ -27,6 +27,7 @@ import {
 } from 'react-router-dom'
 import {Spinner} from '@instructure/ui-spinner'
 import accountGradingSettingsRoutes from '../../features/account_grading_settings/routes/accountGradingSettingsRoutes'
+import {RubricRoutes} from '../../features/rubrics/routes/rubricRoutes'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {QueryProvider} from '@canvas/query'
 import {localStorage} from '@canvas/storage'
@@ -53,6 +54,8 @@ const portalRouter = createBrowserRouter(
           lazy={() => import('../../features/navigation_header/react/NavigationHeaderRoute')}
         />
       )}
+
+      {window.ENV.FEATURES.enhanced_rubrics && RubricRoutes}
 
       <Route path="*" element={<></>} />
     </Route>

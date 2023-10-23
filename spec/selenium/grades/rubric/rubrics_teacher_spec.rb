@@ -27,6 +27,7 @@ describe "teacher shared rubric specs" do
   let(:who_to_login) { "teacher" }
 
   before do
+    Account.site_admin.disable_feature!(:enhanced_rubrics)
     course_with_teacher_logged_in
   end
 
@@ -57,6 +58,7 @@ describe "course rubrics" do
 
   context "as a teacher" do
     before do
+      Account.site_admin.disable_feature!(:enhanced_rubrics)
       course_with_teacher_logged_in
     end
 

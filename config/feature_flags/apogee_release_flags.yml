@@ -316,3 +316,13 @@ archived_grading_schemes:
       state: allowed_on
     development:
       state: allowed_on
+enhanced_rubrics:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Rubric Enhancements
+  description: This feature provides visual and functional enhancements to rubrics across Canvas.
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
