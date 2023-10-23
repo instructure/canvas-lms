@@ -75,7 +75,7 @@ PATH
   remote: gems/plugins/moodle_importer
   specs:
     moodle_importer (1.0.0)
-      moodle2cc (= 0.2.41)
+      moodle2cc (= 0.2.42)
       rails (>= 3.2)
 
 PATH
@@ -703,7 +703,7 @@ GEM
     mini_mime (1.1.5)
     mini_portile2 (2.8.4)
     minitest (5.20.0)
-    moodle2cc (0.2.41)
+    moodle2cc (0.2.42)
       builder
       instructure-happymapper (~> 0.5.10)
       nokogiri
