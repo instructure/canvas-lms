@@ -197,10 +197,10 @@ class SubmissionComment < ActiveRecord::Base
     given { |user| author_id == user.id && draft? }
     can :delete and can :update
 
-    given { |user, session| author_id == user.id && submission.grants_right?(user, session, :grade) }
+    given { |user, session| author_id == user.id && can_grader_modify_comment?(user, session) }
     can :update
 
-    given { |user, session| submission.grants_right?(user, session, :grade) }
+    given { |user, session| can_grader_modify_comment?(user, session) }
     can :delete
 
     given do |user, session|
@@ -243,6 +243,12 @@ class SubmissionComment < ActiveRecord::Base
         record.submission.user_id == record.author_id
     end
     p.data { course_broadcast_data }
+  end
+
+  def can_grader_modify_comment?(user, session)
+    return false unless submission.assignment.context.grants_right?(user, session, :manage_grades)
+
+    true
   end
 
   def can_view_comment?(user, session)
