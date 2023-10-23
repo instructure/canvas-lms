@@ -83,5 +83,22 @@ describe Lti::Asset do
       expect(described_class.opaque_identifier_for(new_user)).to eq context_id
       expect(old_user.reload.lti_context_id).to be_nil
     end
+
+    context "shadow records" do
+      specs_require_sharding
+
+      it "does not attempt to null out a clashing lti_context_id in a shadow record" do
+        old_user = @shard1.activate { user_model }
+        context_id = described_class.opaque_identifier_for(old_user)
+        old_user.destroy
+        old_user.save_shadow_record
+
+        new_user = user_model
+        allow(new_user).to receive(:global_asset_string).and_return(old_user.global_asset_string)
+        expect(described_class.opaque_identifier_for(new_user)).to be_present
+        expect(new_user.reload.lti_context_id).not_to eq context_id
+        expect(old_user.reload.lti_context_id).to eq context_id
+      end
+    end
   end
 end
