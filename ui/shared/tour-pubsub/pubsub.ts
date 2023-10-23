@@ -17,22 +17,23 @@
  */
 
 // A simple pubsub engine for sending messages between Canvas components
-import uuid from 'uuid'
+import {v4 as uuidv4} from 'uuid'
+
+type Callback = (args: unknown) => void | null
 
 export default class PubSub {
-  topics = {}
+  topics: Record<string, Record<string, Callback>> = {}
 
-  subscribe(topic, fn) {
+  subscribe(topic: string, fn: Callback): () => void {
     if (!this.topics[topic]) this.topics[topic] = {}
-    const id = uuid.v4()
+    const id = uuidv4()
     this.topics[topic][id] = fn
     return () => {
-      this.topics[topic][id] = null
       delete this.topics[topic][id]
     }
   }
 
-  publish(topic, args) {
+  publish(topic: string, args?: unknown): void {
     if (!this.topics[topic]) return
     Object.values(this.topics[topic]).forEach(fn => {
       if (fn) fn(args)

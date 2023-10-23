@@ -18,28 +18,27 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
-import {bool} from 'prop-types'
 import {Link} from '@instructure/ui-link'
 import {List} from '@instructure/ui-list'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
-import {HistoryShape} from './HistoryShape'
 import _ from 'lodash'
 import {formatTimeAgoDate, formatTimeAgoTitle} from '@canvas/enhanced-user-content'
+import type {HistoryEntry} from '../../../api.d'
 
 const I18n = useI18nScope('new_nav')
-
-HistoryList.propTypes = {
-  history: HistoryShape.isRequired,
-  hasLoaded: bool.isRequired,
-}
 
 HistoryList.defaultProps = {
   history: [],
 }
 
-export default function HistoryList({hasLoaded, history}) {
+type Props = {
+  history: HistoryEntry[]
+  hasLoaded: boolean
+}
+
+export default function HistoryList({hasLoaded, history}: Props) {
   return (
     <List isUnstyled={true} margin="small 0" itemSpacing="small">
       {hasLoaded ? (

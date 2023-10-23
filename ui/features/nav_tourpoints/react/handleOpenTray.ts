@@ -18,10 +18,10 @@
 
 import tourPubSub from '@canvas/tour-pubsub'
 
-export default async function handleOpenTray(trayType) {
-  await new Promise(resolve => {
+export default async function handleOpenTray(trayType: string) {
+  await new Promise<void>(resolve => {
     let resolved = false
-    let timeout
+    let timeout: number
     const unsubscribe = tourPubSub.subscribe('navigation-tray-opened', type => {
       if (resolved) return
       if (type === trayType) {
@@ -31,11 +31,11 @@ export default async function handleOpenTray(trayType) {
         // when the tour is done.
         const navElement = document.getElementById('nav-tray-portal')
         if (navElement) {
-          navElement.setAttribute('aria-hidden', true)
+          navElement.setAttribute('aria-hidden', 'true')
         }
         const tourElement = document.getElementById('___reactour')
         if (tourElement) {
-          tourElement.setAttribute('aria-hidden', false)
+          tourElement.setAttribute('aria-hidden', 'false')
         }
         clearTimeout(timeout)
         unsubscribe()
@@ -49,6 +49,6 @@ export default async function handleOpenTray(trayType) {
       resolved = true
       unsubscribe()
       resolve()
-    }, 5000)
+    }, 5000) as unknown as number
   })
 }

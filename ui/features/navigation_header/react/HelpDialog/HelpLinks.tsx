@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import {bool, arrayOf, shape, string, func} from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Link} from '@instructure/ui-link'
 import {Pill} from '@instructure/ui-pill'
@@ -29,16 +28,23 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
 import tourPubSub from '@canvas/tour-pubsub'
+import type {HelpLink} from '../../../../api.d'
 
 const I18n = useI18nScope('HelpLinks')
 
-export default function HelpLinks({links, hasLoaded, onClick}) {
+type Props = {
+  links: HelpLink[]
+  hasLoaded: boolean
+  onClick: (url: string) => void
+}
+
+export default function HelpLinks({links, hasLoaded, onClick}: Props) {
   const featuredLink = links.find(link => link.is_featured)
   const featuredLinksEnabled = window.ENV.FEATURES.featured_help_links
   const nonFeaturedLinks = featuredLinksEnabled ? links.filter(link => !link.is_featured) : links
   const showSeparator = featuredLink && !!nonFeaturedLinks.length && featuredLinksEnabled
 
-  const handleClick = link => event => {
+  const handleClick = (link: HelpLink) => (event: React.MouseEvent<unknown, MouseEvent>) => {
     if (link.url === '#create_ticket' || link.url === '#teacher_feedback') {
       event.preventDefault()
       onClick(link.url)
@@ -73,10 +79,11 @@ export default function HelpLinks({links, hasLoaded, onClick}) {
                     <span
                       role="presentation"
                       onClick={handleClick(link)}
+                      // @ts-expect-error
                       onKeyPress={handleClick(link)}
                     >
                       <Link isWithinText={false} href={link.url} target="_blank" rel="noopener">
-                        {link.text}
+                        {link.text || ''}
                       </Link>
                     </span>
                     {has_new_tag && <ScreenReaderContent>{I18n.t('New')}</ScreenReaderContent>}
@@ -100,6 +107,7 @@ export default function HelpLinks({links, hasLoaded, onClick}) {
           .concat(
             // if the current user is a teacher, show a link to
             // open up the welcome tour
+            // @ts-expect-error
             window.ENV.FEATURES?.product_tours &&
               (window.ENV.current_user_types?.includes('AccountAdmin') ||
                 window.ENV.current_user_roles?.includes('teacher') ||
@@ -116,6 +124,7 @@ export default function HelpLinks({links, hasLoaded, onClick}) {
           .concat(
             // if the current user is an admin, show the settings link to
             // customize this menu
+            // @ts-expect-error
             window.ENV.current_user_roles?.includes('root_admin') && [
               <List.Item key="hr">
                 <hr role="presentation" />
@@ -131,22 +140,6 @@ export default function HelpLinks({links, hasLoaded, onClick}) {
       </List>
     </View>
   )
-}
-
-HelpLinks.propTypes = {
-  links: arrayOf(
-    shape({
-      id: string.isRequired,
-      url: string.isRequired,
-      text: string.isRequired,
-      subtext: string,
-      feature_headline: string,
-      is_featured: bool,
-      is_new: bool,
-    })
-  ).isRequired,
-  hasLoaded: bool,
-  onClick: func,
 }
 
 HelpLinks.defaultProps = {

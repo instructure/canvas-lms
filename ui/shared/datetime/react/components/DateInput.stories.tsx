@@ -19,7 +19,7 @@
 import React, {useCallback, useEffect, useState} from 'react'
 // I don't know why, but this import creates a tsc error in jenkins
 // saying @storybook/react cannot be found, even though it's ok locally.
-// @ts-expect-error
+// @ts-ignore
 import {Story, Meta} from '@storybook/react'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
