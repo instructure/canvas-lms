@@ -641,6 +641,7 @@ class Assignment < ActiveRecord::Base
   after_save  :mark_module_progressions_outdated, if: :update_cached_due_dates?
   after_save  :workflow_change_refresh_content_partication_counts, if: :saved_change_to_workflow_state?
   after_save  :submission_types_change_refresh_content_participation_counts, if: :saved_change_to_submission_types?
+  after_save  :track_anonymously_graded_new_quizzes, if: :saved_change_to_anonymous_grading?
 
   after_commit :schedule_do_auto_peer_review_job_if_automatic_peer_review
 
@@ -769,6 +770,14 @@ class Assignment < ActiveRecord::Base
     end
     AssignmentGroup.where(id: assignment_group_id).update_all(updated_at: Time.zone.now.utc) if assignment_group_id
     true
+  end
+
+  def track_anonymously_graded_new_quizzes
+    return unless quiz_lti?
+
+    if anonymous_grading_changed?(to: true)
+      InstStatsd::Statsd.increment("assignment.new_quiz.anonymous.enabled")
+    end
   end
 
   def ab_guid_through_rubric
