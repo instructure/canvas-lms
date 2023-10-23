@@ -90,11 +90,8 @@ export function TempEnrollModal(props: Props) {
     }
   }, [props.tempEnrollments])
 
-  const resetState = () => {
-    setPage(0)
-    setEnrollment(null)
-    setIsViewingAssignFromEdit(false)
-    setEnrollmentData([])
+  const resetState = (pageNumber: number = 0) => {
+    setPage(pageNumber)
 
     if (props.isEditMode && props.onToggleEditMode) {
       props.onToggleEditMode(false)
@@ -157,7 +154,6 @@ export function TempEnrollModal(props: Props) {
 
   const handleResetToBeginning = () => {
     resetState()
-    setPage(0)
   }
 
   const handlePageTransition = () => {
@@ -175,8 +171,7 @@ export function TempEnrollModal(props: Props) {
 
   const handleGoToAssignPageWithEnrollment = (chosenEnrollment: any) => {
     setEnrollment(chosenEnrollment)
-    setPage(2)
-    resetState()
+    resetState(2)
     setIsViewingAssignFromEdit(true)
   }
 
