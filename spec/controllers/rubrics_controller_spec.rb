@@ -19,6 +19,10 @@
 #
 
 describe RubricsController do
+  before do
+    Account.site_admin.disable_feature!(:enhanced_rubrics)
+  end
+
   describe "GET 'index'" do
     it "requires authorization" do
       course_with_teacher(active_all: true)
@@ -32,6 +36,7 @@ describe RubricsController do
       it "is assigned with a course" do
         get "index", params: { course_id: @course.id }
         expect(response).to be_successful
+        expect(response).to render_template("rubrics/index")
       end
 
       it "is assigned with a user" do
@@ -63,12 +68,32 @@ describe RubricsController do
 
       it "can access rubrics" do
         get "index", params: { course_id: @course.id }
+
         expect(response).to be_successful
       end
 
       it "does not allow the teacher to manage_rubrics" do
         get "index", params: { course_id: @course.id }
         expect(assigns[:js_env][:PERMISSIONS][:manage_rubrics]).to be false
+      end
+
+      it "sets correct permissions with enhanced_rubrics enabled" do
+        Account.site_admin.enable_feature!(:enhanced_rubrics)
+        get "index", params: { course_id: @course.id }
+        expect(assigns[:js_env][:PERMISSIONS][:manage_rubrics]).to be false
+      end
+    end
+
+    describe "with enhanced_rubrics enabled" do
+      before do
+        Account.site_admin.enable_feature!(:enhanced_rubrics)
+        course_with_teacher_logged_in(active_all: true)
+      end
+
+      it "can access rubrics" do
+        get "index", params: { course_id: @course.id }
+
+        expect(response).to render_template("layouts/application")
       end
     end
   end
@@ -854,6 +879,7 @@ describe RubricsController do
       it "works" do
         get "show", params: { id: @r.id, course_id: @course.id }
         expect(response).to be_successful
+        expect(response).to render_template("rubrics/show")
       end
 
       it "allows the teacher to manage_rubrics" do
@@ -873,6 +899,25 @@ describe RubricsController do
           get "show", params: { id: @r.id, course_id: @course.id }
           expect(assigns[:js_env][:PERMISSIONS][:manage_rubrics]).to be false
         end
+
+        it "sets correct permissions with enhanced_rubrics enabled" do
+          Account.site_admin.enable_feature!(:enhanced_rubrics)
+          get "show", params: { id: @r.id, course_id: @course.id }
+          expect(assigns[:js_env][:PERMISSIONS][:manage_rubrics]).to be false
+        end
+      end
+    end
+
+    describe "with enhanced_rubrics enabled" do
+      before do
+        Account.site_admin.enable_feature!(:enhanced_rubrics)
+        course_with_teacher_logged_in(active_all: true)
+      end
+
+      it "can access rubrics" do
+        get "index", params: { course_id: @course.id }
+
+        expect(response).to render_template("layouts/application")
       end
     end
   end

@@ -197,6 +197,7 @@ export type SiteAdminFeatureId =
   | 'differentiated_modules'
   | 'enhanced_course_creation_account_fetching'
   | 'instui_for_import_page'
+  | 'enhanced_rubrics'
 
 /**
  * From ApplicationController#JS_ENV_ROOT_ACCOUNT_FEATURES
