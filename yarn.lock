@@ -2558,7 +2558,7 @@
     "@instructure/ui-testable" "8.33.2"
     prop-types "^15"
 
-"@instructure/ui-dialog@8.46.1":
+"@instructure/ui-dialog@8.46.1", "@instructure/ui-dialog@^8":
   version "8.46.1"
   resolved "https://registry.yarnpkg.com/@instructure/ui-dialog/-/ui-dialog-8.46.1.tgz#3e48faaa28a1f0cbaffaedbcb262db0f715f9a36"
   integrity sha512-F0tITR2kcgBXzFUL14djVg63CvYjDOkcTgvRxNwuPa2saBar00CKMPrVla8I6spNJXooelS4HjVDD90+h1CYOg==

@@ -40,6 +40,7 @@
     "@instructure/ui-date-input": "^8",
     "@instructure/ui-date-time-input": "^8",
     "@instructure/ui-decorator": "^8",
+    "@instructure/ui-dialog": "^8",
     "@instructure/ui-drawer-layout": "8",
     "@instructure/ui-editable": "^8",
     "@instructure/ui-file-drop": "^8",
