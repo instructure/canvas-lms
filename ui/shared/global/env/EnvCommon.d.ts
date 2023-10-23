@@ -21,6 +21,16 @@
  *
  * Optional variables are best-effort marked as such.
  */
+
+type Setting =
+  | 'manual_mark_as_read'
+  | 'release_notes_badge_disabled'
+  | 'collapse_global_nav'
+  | 'collapse_course_nav'
+  | 'hide_dashcard_color_overlays'
+  | 'comment_library_suggestions_enabled'
+  | 'elementary_dashboard_disabled'
+
 export interface EnvCommon {
   ASSET_HOST: string
   active_brand_config_json_url: string
@@ -65,11 +75,7 @@ export interface EnvCommon {
   DEEP_LINKING_LOGGING: null | unknown
   comment_library_suggestions_enabled: boolean
   INCOMPLETE_REGISTRATION: boolean
-  SETTINGS: {
-    open_registration: boolean
-    collapse_global_nav: boolean
-    release_notes_badge_disabled: boolean
-  }
+  SETTINGS: Record<Setting, boolean>
   FULL_STORY_ENABLED: boolean
   RAILS_ENVIRONMENT: 'development' | 'CD' | 'Beta' | 'Production' | string
   IN_PACED_COURSE: boolean
@@ -125,7 +131,9 @@ export interface EnvCommon {
     display_name: string
     avatar_image_url: string
     html_url: string
-    pronouns: null | unknown
+    pronouns: null | string
+    fake_student: boolean
+    avatar_is_fallback: boolean
   }
   page_view_update_url: string
   IS_LARGE_ROSTER: boolean

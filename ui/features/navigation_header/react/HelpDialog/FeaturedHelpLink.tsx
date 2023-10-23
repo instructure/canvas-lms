@@ -17,15 +17,21 @@
  */
 
 import React from 'react'
-import {bool, shape, string, func} from 'prop-types'
 import {Link} from '@instructure/ui-link'
 import {Img} from '@instructure/ui-img'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+// @ts-expect-error
 import PandaMapSVGURL from '../../images/panda-map.svg'
+import type {HelpLink} from '../../../../api.d'
 
-export default function FeaturedHelpLink({featuredLink, handleClick}) {
+type Props = {
+  featuredLink: HelpLink
+  handleClick: (link: HelpLink) => (event: React.MouseEvent<unknown, MouseEvent>) => void
+}
+
+export default function FeaturedHelpLink({featuredLink, handleClick}: Props) {
   if (featuredLink && window.ENV.FEATURES.featured_help_links) {
     return (
       <View textAlign="center" display="block">
@@ -53,18 +59,6 @@ export default function FeaturedHelpLink({featuredLink, handleClick}) {
     )
   }
   return null
-}
-
-FeaturedHelpLink.propTypes = {
-  featuredLink: shape({
-    url: string.isRequired,
-    text: string.isRequired,
-    subtext: string,
-    feature_headline: string,
-    is_featured: bool,
-    is_new: bool,
-  }),
-  handleClick: func,
 }
 
 FeaturedHelpLink.defaultProps = {

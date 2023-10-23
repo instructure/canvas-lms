@@ -23,6 +23,7 @@ import fetchMock from 'fetch-mock'
 import userEvent from '@testing-library/user-event'
 
 it('Searches for matching courses on searchbox value change', async () => {
+  // @ts-expect-error
   window.ENV.current_user = {
     id: '0',
     anonymous_id: '',

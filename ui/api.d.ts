@@ -16,10 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export type Course = Readonly<{
-  id: string
-}>
-
 export type Enrollment = Readonly<{
   associated_user_id: null | string
   course_id: string
@@ -577,3 +573,64 @@ export type GradingPeriodSetGroup = {
 }
 
 export type LatePolicyStatus = 'missing' | 'late' | 'extended'
+
+// /api/v1/users/self/history
+export type HistoryEntry = Readonly<{
+  asset_code: string
+  asset_name: string
+  asset_icon: string
+  asset_readable_category: string
+  visited_url: string
+  visited_at: string
+  context_name: string
+}>
+
+// '/api/v1/accounts'
+export type Account = Readonly<{
+  id: string
+  name: string
+}>
+
+// '/api/v1/users/self/favorites/courses?include[]=term&exclude[]=enrollments&sort=nickname',
+export type Course = Readonly<{
+  id: string
+  name: string
+  workflow_state: string
+  enrollment_term_id: number
+  term: {
+    name: string
+  }
+  homeroom_course: boolean
+}>
+
+// '/api/v1/users/self/tabs',
+type TabCountsObj = Readonly<{
+  [key: string]: number
+}>
+
+export type ProfileTab = Readonly<{
+  id: string
+  label: string
+  html_url: string
+  counts: TabCountsObj
+}>
+
+// '/api/v1/users/self/groups?include[]=can_access',
+export type AccessibleGroup = Readonly<{
+  id: string
+  name: string
+  can_access?: boolean
+  concluded: boolean
+}>
+
+// '/help_links',
+export type HelpLink = Readonly<{
+  id: string
+  url: string
+  text: string
+  subtext?: string
+  feature_headline?: string
+  is_featured?: boolean
+  is_new?: boolean
+  no_new_window?: boolean
+}>

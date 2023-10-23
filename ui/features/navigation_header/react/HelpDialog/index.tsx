@@ -17,18 +17,22 @@
  */
 
 import React from 'react'
-import PropTypes from 'prop-types'
 import CreateTicketForm from './CreateTicketForm'
 import TeacherFeedbackForm from './TeacherFeedbackForm'
 import HelpLinks from './HelpLinks'
+import type {HelpLink} from '../../../../api.d'
 
-class HelpDialog extends React.Component {
-  static propTypes = {
-    links: HelpLinks.propTypes.links,
-    hasLoaded: PropTypes.bool,
-    onFormSubmit: PropTypes.func,
-  }
+type Props = {
+  links: HelpLink[]
+  hasLoaded: boolean
+  onFormSubmit: (event: Event) => void
+}
 
+type State = {
+  view: string
+}
+
+class HelpDialog extends React.Component<Props, State> {
   static defaultProps = {
     hasLoaded: false,
     links: [],
@@ -39,7 +43,7 @@ class HelpDialog extends React.Component {
     view: 'links',
   }
 
-  handleLinkClick = url => {
+  handleLinkClick = (url: string) => {
     this.setState({view: url})
   }
 
