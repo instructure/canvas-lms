@@ -207,7 +207,7 @@ module Canvas
       Timeout.timeout(timeout, &)
     rescue Timeout::Error
       error_ttl = timeout_protection_error_ttl(service_name)
-      redis.pipelined(failsafe: nil) do |pipeline|
+      redis.pipelined(redis_key, failsafe: nil) do |pipeline|
         pipeline.incrby(redis_key, 1)
         pipeline.expire(redis_key, error_ttl)
       end
@@ -250,7 +250,7 @@ module Canvas
       # has the added benefit of making the error block below much
       # smaller.
       error_ttl = timeout_protection_error_ttl(service_name)
-      redis.pipelined(failsafe: nil) do |pipeline|
+      redis.pipelined(protection_activated_key, failsafe: nil) do |pipeline|
         pipeline.set(protection_activated_key, "true")
         pipeline.expire(protection_activated_key, error_ttl)
       end

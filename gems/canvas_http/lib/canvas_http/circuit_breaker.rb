@@ -55,7 +55,7 @@ module CanvasHttp
         return if redis_client.nil?
 
         key = threshold_key(domain)
-        current_count = redis_client.pipelined do |pipeline|
+        current_count = redis_client.pipelined(key) do |pipeline|
           pipeline.setnx(key, 0)
           pipeline.expire(key, window(domain))
           pipeline.incr(key)

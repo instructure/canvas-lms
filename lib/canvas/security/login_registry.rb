@@ -92,9 +92,7 @@ module Canvas::Security
 
       key = login_attempts_key(pseudonym)
       exptime = Setting.get("login_attempts_ttl", 5.minutes.to_s).to_i
-      node = Canvas.redis
-      node = node.node_for(key) if node.respond_to?(:node_for)
-      node.pipelined(failsafe: nil) do |pipeline|
+      Canvas.redis.pipelined(key, failsafe: nil) do |pipeline|
         pipeline.hset(key, "unique_id", pseudonym.unique_id)
         pipeline.hincrby(key, "total", 1)
         pipeline.hincrby(key, ip, 1) if ip.present?
