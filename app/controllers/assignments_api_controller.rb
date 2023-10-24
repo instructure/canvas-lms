@@ -1097,7 +1097,8 @@ class AssignmentsApiController < ApplicationController
                         include_can_edit: include_params.include?("can_edit"),
                         include_score_statistics: include_params.include?("score_statistics"),
                         include_ab_guid: include_params.include?("ab_guid"),
-                        master_course_status: mc_status)
+                        master_course_status: mc_status,
+                        include_checkpoints: include_params.include?("checkpoints"))
       end
     end
   end
@@ -1149,7 +1150,8 @@ class AssignmentsApiController < ApplicationController
         include_score_statistics: included_params.include?("score_statistics"),
         include_can_submit: included_params.include?("can_submit"),
         include_webhook_info: included_params.include?("webhook_info"),
-        include_ab_guid: included_params.include?("ab_guid")
+        include_ab_guid: included_params.include?("ab_guid"),
+        include_checkpoints: included_params.include?("checkpoints")
       }
 
       result_json = if use_quiz_json?

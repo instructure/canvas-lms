@@ -81,6 +81,31 @@ describe AssignmentsApiController, type: :request do
       course_with_teacher(active_all: true)
     end
 
+    describe "checkpoints in-place" do
+      before do
+        @course.root_account.enable_feature!(:discussion_checkpoints)
+
+        assignment = @course.assignments.create!(title: "Assignment 1", checkpointed: true, checkpoint_label: CheckpointLabels::PARENT)
+        @c1 = assignment.checkpoint_assignments.create!(context: assignment.context, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 3.days.from_now)
+        @c2 = assignment.checkpoint_assignments.create!(context: assignment.context, checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 10, due_at: 5.days.from_now)
+      end
+
+      it "returns the assignments list with API-formatted Checkpoint data" do
+        json = api_get_assignments_index_from_course(@course, include: ["checkpoints"])
+        assignment = json.first
+        checkpoints = assignment["checkpoints"]
+
+        expect(assignment["checkpointed"]).to be_truthy
+
+        expect(checkpoints.length).to eq 2
+        expect(checkpoints.pluck("name")).to match_array [@c1.name, @c2.name]
+        expect(checkpoints.pluck("label")).to match_array [@c1.checkpoint_label, @c2.checkpoint_label]
+        expect(checkpoints.pluck("points_possible")).to match_array [@c1.points_possible, @c2.points_possible]
+        expect(checkpoints.pluck("due_at")).to match_array [@c1.due_at.iso8601, @c2.due_at.iso8601]
+        expect(checkpoints.pluck("only_visible_to_overrides")).to match_array [@c1.only_visible_to_overrides, @c2.only_visible_to_overrides]
+      end
+    end
+
     it "returns unauthorized for users who cannot :read the course" do
       # unpublished course with invited student
       course_with_student
@@ -1550,6 +1575,32 @@ describe AssignmentsApiController, type: :request do
   end
 
   describe "GET /users/:user_id/courses/:course_id/assignments (#user_index)" do
+    describe "checkpoints in-place" do
+      before do
+        course_with_teacher(active_all: true)
+        @course.root_account.enable_feature!(:discussion_checkpoints)
+
+        assignment = @course.assignments.create!(title: "Assignment 1", checkpointed: true, checkpoint_label: CheckpointLabels::PARENT)
+        @c1 = assignment.checkpoint_assignments.create!(context: assignment.context, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 3.days.from_now)
+        @c2 = assignment.checkpoint_assignments.create!(context: assignment.context, checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 10, due_at: 5.days.from_now)
+      end
+
+      it "returns the assignments list with API-formatted Checkpoint data" do
+        json = api_get_assignments_user_index(@teacher, @course, @teacher, include: ["checkpoints"])
+        assignment = json.first
+        checkpoints = assignment["checkpoints"]
+
+        expect(assignment["checkpointed"]).to be_truthy
+
+        expect(checkpoints.length).to eq 2
+        expect(checkpoints.pluck("name")).to match_array [@c1.name, @c2.name]
+        expect(checkpoints.pluck("label")).to match_array [@c1.checkpoint_label, @c2.checkpoint_label]
+        expect(checkpoints.pluck("points_possible")).to match_array [@c1.points_possible, @c2.points_possible]
+        expect(checkpoints.pluck("due_at")).to match_array [@c1.due_at.iso8601, @c2.due_at.iso8601]
+        expect(checkpoints.pluck("only_visible_to_overrides")).to match_array [@c1.only_visible_to_overrides, @c2.only_visible_to_overrides]
+      end
+    end
+
     it "returns data for user calling on self" do
       course_with_student_submissions(active_all: true)
       json = api_get_assignments_user_index(@student, @course)
@@ -5734,6 +5785,30 @@ describe AssignmentsApiController, type: :request do
       course_with_student(active_all: true)
     end
 
+    describe "checkpoints in-place" do
+      before do
+        @course.root_account.enable_feature!(:discussion_checkpoints)
+
+        @assignment = @course.assignments.create!(title: "Assignment 1", checkpointed: true, checkpoint_label: CheckpointLabels::PARENT)
+        @c1 = @assignment.checkpoint_assignments.create!(context: @assignment.context, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 3.days.from_now)
+        @c2 = @assignment.checkpoint_assignments.create!(context: @assignment.context, checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 10, due_at: 5.days.from_now)
+      end
+
+      it "returns the assignment with API-formatted Checkpoint data" do
+        assignment = api_get_assignment_in_course(@assignment, @course, include: ["checkpoints"])
+        checkpoints = assignment["checkpoints"]
+
+        expect(assignment["checkpointed"]).to be_truthy
+
+        expect(checkpoints.length).to eq 2
+        expect(checkpoints.pluck("name")).to match_array [@c1.name, @c2.name]
+        expect(checkpoints.pluck("label")).to match_array [@c1.checkpoint_label, @c2.checkpoint_label]
+        expect(checkpoints.pluck("points_possible")).to match_array [@c1.points_possible, @c2.points_possible]
+        expect(checkpoints.pluck("due_at")).to match_array [@c1.due_at.iso8601, @c2.due_at.iso8601]
+        expect(checkpoints.pluck("only_visible_to_overrides")).to match_array [@c1.only_visible_to_overrides, @c2.only_visible_to_overrides]
+      end
+    end
+
     describe "with a normal assignment" do
       before :once do
         @assignment = @course.assignments.create!(
@@ -7606,14 +7681,15 @@ def raw_api_update_assignment(course, assignment, assignment_params)
   assignment.reload
 end
 
-def api_get_assignment_in_course(assignment, course)
+def api_get_assignment_in_course(assignment, course, params = {})
+  options = { controller: "assignments_api",
+              action: "show",
+              format: "json",
+              course_id: course.id.to_s,
+              id: assignment.id.to_s }.merge(params)
   json = api_call(:get,
                   "/api/v1/courses/#{course.id}/assignments/#{assignment.id}.json",
-                  { controller: "assignments_api",
-                    action: "show",
-                    format: "json",
-                    course_id: course.id.to_s,
-                    id: assignment.id.to_s })
+                  options)
   assignment.reload
   course.reload
   json
