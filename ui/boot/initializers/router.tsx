@@ -28,8 +28,28 @@ import {
 import {Spinner} from '@instructure/ui-spinner'
 import accountGradingSettingsRoutes from '../../features/account_grading_settings/routes/accountGradingSettingsRoutes'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {QueryClient} from '@tanstack/react-query'
+import {PersistQueryClientProvider} from '@tanstack/react-query-persist-client'
+import {createSyncStoragePersister} from '@tanstack/query-sync-storage-persister'
 
 const I18n = useI18nScope('main')
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+      refetchOnReconnect: false,
+      retry: false,
+      staleTime: 0,
+      cacheTime: 1000 * 60 * 60 * 24, // 24 hours
+    },
+  },
+})
+
+const persister = createSyncStoragePersister({
+  storage: window.sessionStorage,
+})
 
 const portalRouter = createBrowserRouter(
   createRoutesFromElements(
@@ -61,10 +81,12 @@ ready(() => {
   const mountNode = document.querySelector('#react-router-portals')
   if (mountNode) {
     ReactDOM.render(
-      <RouterProvider
-        router={portalRouter}
-        fallbackElement={<Spinner renderTitle={I18n.t('Loading page')} />}
-      />,
+      <PersistQueryClientProvider client={queryClient} persistOptions={{persister}}>
+        <RouterProvider
+          router={portalRouter}
+          fallbackElement={<Spinner renderTitle={I18n.t('Loading page')} />}
+        />
+      </PersistQueryClientProvider>,
       mountNode
     )
   }

@@ -30,13 +30,47 @@ import {
   IconInboxLine,
   IconQuestionLine,
 } from '@instructure/ui-icons'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {AccessibleContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {useQuery} from '@tanstack/react-query'
+import {getUnreadCount} from './queries/unreadCountQuery'
+import {getSetting} from './queries/settingsQuery'
 
 const I18n = useI18nScope('new_user_tutorial')
 
 const SideNav = () => {
   const isK5User = window.ENV.K5_USER
+  const countsEnabled = Boolean(
+    window.ENV.current_user_id && !window.ENV.current_user?.fake_student
+  )
+
+  const {data: unreadConversationsCount} = useQuery({
+    queryKey: ['unread_count', 'conversations'],
+    queryFn: getUnreadCount,
+    staleTime: 2 * 60 * 1000, // two minutes
+    enabled: countsEnabled && !ENV.current_user_disabled_inbox,
+  })
+
+  const {data: unreadContentSharesCount} = useQuery({
+    queryKey: ['unread_count', 'content_shares'],
+    queryFn: getUnreadCount,
+    staleTime: 5 * 60 * 1000, // two minutes
+    enabled: countsEnabled && ENV.CAN_VIEW_CONTENT_SHARES,
+  })
+
+  const {data: releaseNotesBadgeDisabled} = useQuery({
+    queryKey: ['settings', 'release_notes_badge_disabled'],
+    queryFn: getSetting,
+    enabled: countsEnabled && ENV.FEATURES.embedded_release_notes,
+  })
+
+  const {data: unreadReleaseNotesCount} = useQuery({
+    queryKey: ['unread_count', 'release_notes'],
+    queryFn: getUnreadCount,
+    staleTime: 24 * 60 * 60 * 1000, // one day
+    enabled: countsEnabled && ENV.FEATURES.embedded_release_notes && !releaseNotesBadgeDisabled,
+  })
+
   return (
     <div style={{height: '100vh'}} data-testid="sidenav-container">
       <Navigation
@@ -60,12 +94,33 @@ const SideNav = () => {
         />
         <Navigation.Item
           icon={
-            <Avatar
-              data-testid="avatar"
-              name={window.ENV.current_user.display_name}
-              size="x-small"
-              src={window.ENV.current_user.avatar_image_url}
-            />
+            <Badge
+              count={unreadContentSharesCount}
+              formatOutput={(count: string) =>
+                (unreadContentSharesCount || 0) > 0 ? (
+                  <AccessibleContent
+                    alt={I18n.t(
+                      {
+                        one: 'One unread share.',
+                        other: '%{count} unread shares.',
+                      },
+                      {count}
+                    )}
+                  >
+                    {count}
+                  </AccessibleContent>
+                ) : (
+                  ''
+                )
+              }
+            >
+              <Avatar
+                data-testid="avatar"
+                name={window.ENV.current_user.display_name}
+                size="x-small"
+                src={window.ENV.current_user.avatar_image_url}
+              />
+            </Badge>
           }
           label={I18n.t('Account')}
           onClick={() => {
@@ -101,7 +156,26 @@ const SideNav = () => {
         />
         <Navigation.Item
           icon={
-            <Badge count={99}>
+            <Badge
+              count={unreadConversationsCount}
+              formatOutput={(count: string) =>
+                (unreadConversationsCount || 0) > 0 ? (
+                  <AccessibleContent
+                    alt={I18n.t(
+                      {
+                        one: 'One unread message.',
+                        other: '%{count} unread messages.',
+                      },
+                      {count}
+                    )}
+                  >
+                    {count}
+                  </AccessibleContent>
+                ) : (
+                  ''
+                )
+              }
+            >
               <IconInboxLine />
             </Badge>
           }
@@ -109,7 +183,30 @@ const SideNav = () => {
           href="/conversations"
         />
         <Navigation.Item
-          icon={<IconQuestionLine />}
+          icon={
+            <Badge
+              count={unreadReleaseNotesCount}
+              formatOutput={(count: string) =>
+                (unreadReleaseNotesCount || 0) > 0 ? (
+                  <AccessibleContent
+                    alt={I18n.t(
+                      {
+                        one: 'One unread release note.',
+                        other: '%{count} unread release notes.',
+                      },
+                      {count}
+                    )}
+                  >
+                    {count}
+                  </AccessibleContent>
+                ) : (
+                  ''
+                )
+              }
+            >
+              <IconQuestionLine />
+            </Badge>
+          }
           label={I18n.t('Help')}
           href="/accounts/self/settings"
         />
