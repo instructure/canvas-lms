@@ -16,6 +16,9 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import SideNav from '../SideNav'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+
+const queryClient = new QueryClient()
 
 describe('SideNav', () => {
   // test that SideNav renders without errors
@@ -34,12 +37,22 @@ describe('SideNav', () => {
   it('renders', () => {
     const unreadComponent = jest.fn(() => <></>)
 
-    expect(() => render(<SideNav unreadComponent={unreadComponent} />)).not.toThrow()
+    expect(() =>
+      render(
+        <QueryClientProvider client={queryClient}>
+          <SideNav unreadComponent={unreadComponent} />
+        </QueryClientProvider>
+      )
+    ).not.toThrow()
   })
 
   // test that SideNav renders a full height container
   it('should render the sidenav div with full height', () => {
-    const {getByTestId} = render(<SideNav />)
+    const {getByTestId} = render(
+      <QueryClientProvider client={queryClient}>
+        <SideNav />
+      </QueryClientProvider>
+    )
 
     const sideNavContainer = getByTestId('sidenav-container')
     expect(sideNavContainer).toHaveStyle('height: 100vh;')
@@ -47,7 +60,11 @@ describe('SideNav', () => {
 
   // test that SideNav renders a header logo with Canvas icon logo as default
   it('should render the logo component with canvas logo as default', () => {
-    const {getByTestId} = render(<SideNav />)
+    const {getByTestId} = render(
+      <QueryClientProvider client={queryClient}>
+        <SideNav />
+      </QueryClientProvider>
+    )
 
     const sideNavHeaderLogo = getByTestId('sidenav-header-logo')
     expect(sideNavHeaderLogo).toBeInTheDocument()
@@ -57,13 +74,17 @@ describe('SideNav', () => {
   })
 
   it('should render the avatar component with the corresponding src from ENV', () => {
-    const {getByTestId} = render(<SideNav />)
+    const {getByTestId} = render(
+      <QueryClientProvider client={queryClient}>
+        <SideNav />
+      </QueryClientProvider>
+    )
 
     const avatarComponent = getByTestId('avatar')
     expect(avatarComponent).toHaveAttribute('src', 'testSrc')
   })
 
-  describe( 'Tests K5 user features', () => {
+  describe('Tests K5 user features', () => {
     beforeEach(() => {
       window.ENV.K5_USER = true
     })
@@ -71,7 +92,11 @@ describe('SideNav', () => {
       window.ENV.K5_USER = false
     })
     it('should render text and icons for a K5 User', () => {
-      const {getByText, getAllByText, getByTestId} = render(<SideNav />)
+      const {getByText, getAllByText, getByTestId} = render(
+        <QueryClientProvider client={queryClient}>
+          <SideNav />
+        </QueryClientProvider>
+      )
 
       expect(getByText('Subjects')).toBeInTheDocument()
       expect(getAllByText('Home')).toHaveLength(2)
