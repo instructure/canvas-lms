@@ -1063,7 +1063,7 @@ GEM
       rspec (~> 3.8)
     stringio (3.0.8)
     swearjar (1.4.0)
-    switchman (3.5.14)
+    switchman (3.5.16)
       activerecord (>= 6.1.4, < 7.2)
       guardrail (~> 3.0.1)
       parallel (~> 1.22)
