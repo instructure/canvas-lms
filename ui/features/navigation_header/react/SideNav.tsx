@@ -16,10 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {Navigation} from '@instructure/ui-navigation'
 import {Badge} from '@instructure/ui-badge'
 import {Avatar} from '@instructure/ui-avatar'
+import {Img} from '@instructure/ui-img'
 import {
   IconAdminLine,
   IconCalendarMonthLine,
@@ -39,11 +40,26 @@ import {getSetting} from './queries/settingsQuery'
 const I18n = useI18nScope('sidenav')
 
 const SideNav = () => {
+  let logoUrl = null
   const [isMinimized, setIsMinimized] = useState(false)
   const isK5User = window.ENV.K5_USER
   const countsEnabled = Boolean(
     window.ENV.current_user_id && !window.ENV.current_user?.fake_student
   )
+  const brandConfig =
+    (window.ENV.active_brand_config as {
+      variables: {'ic-brand-header-image': string}
+    }) ?? null
+
+  if (brandConfig) {
+    const variables = brandConfig.variables
+    logoUrl = variables['ic-brand-header-image']
+  }
+
+  useEffect(() => {
+    if (isMinimized) document.body.classList.remove('primary-nav-expanded')
+    else document.body.classList.add('primary-nav-expanded')
+  }, [isMinimized, setIsMinimized])
 
   const {data: unreadConversationsCount} = useQuery({
     queryKey: ['unread_count', 'conversations'],
@@ -87,10 +103,21 @@ const SideNav = () => {
       >
         <Navigation.Item
           icon={
-            <IconCanvasLogoSolid
-              size={!isMinimized ? 'medium' : 'small'}
-              data-testid="icon-canvas-logo"
-            />
+            !logoUrl ? (
+              <IconCanvasLogoSolid
+                size={!isMinimized ? 'medium' : 'small'}
+                data-testid="icon-canvas-logo"
+              />
+            ) : (
+              <Img
+                display="inline-block"
+                alt="sidenav-header-image"
+                margin="x-small 0 x-small 0"
+                width={100}
+                src={logoUrl}
+                data-testid="sidenav-header-image"
+              />
+            )
           }
           label={<ScreenReaderContent>{I18n.t('Home')}</ScreenReaderContent>}
           href="/"
@@ -125,10 +152,10 @@ const SideNav = () => {
               }
             >
               <Avatar
-                data-testid="avatar"
                 name={window.ENV.current_user.display_name}
                 size="x-small"
                 src={window.ENV.current_user.avatar_image_url}
+                data-testid="avatar"
               />
             </Badge>
           }

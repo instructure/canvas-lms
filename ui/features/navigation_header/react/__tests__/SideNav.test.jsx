@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 import React from 'react'
-import {render} from '@testing-library/react'
+import {fireEvent, render} from '@testing-library/react'
 import SideNav from '../SideNav'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 
@@ -84,13 +84,51 @@ describe('SideNav', () => {
     expect(avatarComponent).toHaveAttribute('src', 'testSrc')
   })
 
-  describe('Tests K5 user features', () => {
+  it('should sets primary-nav-expanded class in body when sidenav is expanded', () => {
+    const {getByTestId} = render(
+      <QueryClientProvider client={queryClient}>
+        <SideNav />
+      </QueryClientProvider>
+    )
+
+    const sideNavContainer = getByTestId('sidenav-container')
+
+    fireEvent.click(sideNavContainer)
+
+    expect(document.body).toHaveClass('primary-nav-expanded')
+  })
+
+  describe('tests custom logo', () => {
+    beforeEach(() => {
+      window.ENV.active_brand_config = {variables: {'ic-brand-header-image': 'some-url'}}
+    })
+
+    afterEach(() => {
+      window.ENV.active_brand_config = null
+    })
+
+    it('should render custom logo when theme has custom image', () => {
+      const {getByTestId} = render(
+        <QueryClientProvider client={queryClient}>
+          <SideNav />
+        </QueryClientProvider>
+      )
+
+      const sideNavHeaderImage = getByTestId('sidenav-header-image')
+
+      expect(sideNavHeaderImage).toBeInTheDocument()
+    })
+  })
+
+  describe('tests K5 user features', () => {
     beforeEach(() => {
       window.ENV.K5_USER = true
     })
+
     afterAll(() => {
       window.ENV.K5_USER = false
     })
+
     it('should render text and icons for a K5 User', () => {
       const {getByText, getAllByText, getByTestId} = render(
         <QueryClientProvider client={queryClient}>
