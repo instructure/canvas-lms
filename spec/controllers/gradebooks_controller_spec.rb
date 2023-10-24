@@ -22,6 +22,7 @@ describe GradebooksController do
   include TextHelper
 
   before :once do
+    Account.site_admin.disable_feature!(:archived_grading_schemes)
     course_with_teacher active_all: true
     @teacher_enrollment = @enrollment
     student_in_course active_all: true

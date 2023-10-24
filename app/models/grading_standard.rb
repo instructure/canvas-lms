@@ -24,6 +24,15 @@ class GradingStandard < ActiveRecord::Base
   belongs_to :context, polymorphic: [:account, :course], required: true
   belongs_to :user
   has_many :assignments
+  has_many :courses
+  has_many :assessed_course_assignments,
+           lambda {
+             where(grading_standard_id: nil, grading_type: ["letter_grade", "gpa_scale"])
+               .joins(:submissions)
+               .where("submissions.workflow_state='graded'")
+           },
+           through: :courses,
+           source: :assignments
 
   has_many :accounts, inverse_of: :grading_standard, dependent: :nullify
 
@@ -32,6 +41,7 @@ class GradingStandard < ActiveRecord::Base
   validate :valid_grading_scheme_data
   validate :full_range_scheme
   validate :scaling_factor_points_based
+  before_destroy :prevent_deletion_of_used_schemes
 
   # version 1 data is an array of [ letter, max_integer_value ]
   # we created a version 2 because this is ambiguous once we added support for
@@ -62,12 +72,23 @@ class GradingStandard < ActiveRecord::Base
   before_create :set_root_account_id
 
   workflow do
-    state :active
+    state :active do
+      event :archive!, transitions_to: :archived
+    end
     state :deleted
+    state :archived do
+      event :unarchive!, transitions_to: :active
+    end
   end
 
-  scope :active, -> { where("grading_standards.workflow_state<>'deleted'") }
+  scope :active, -> { where("grading_standards.workflow_state = 'active'") }
+  scope :archived, -> { where("grading_standards.workflow_state = 'archived'") }
   scope :sorted, -> { order(Arel.sql("usage_count >= 3 DESC")).order(nulls(:last, best_unicode_collation_key("title"))) }
+  scope :for_context, lambda { |context|
+    context_codes = [context.asset_string]
+    context_codes = context_codes.concat(Account.all_accounts_for(context).map(&:asset_string)).uniq
+    where(context_code: context_codes)
+  }
 
   VERSION = 2
 
@@ -77,9 +98,40 @@ class GradingStandard < ActiveRecord::Base
   end
 
   def self.for(context)
-    context_codes = [context.asset_string]
-    context_codes.concat Account.all_accounts_for(context).map(&:asset_string)
-    GradingStandard.active.where(context_code: context_codes.uniq)
+    unless Account.site_admin.feature_enabled?(:archived_grading_schemes)
+      return GradingStandard.active.for_context(context)
+    end
+
+    case context
+    when Account
+      for_account(context)
+    when Course
+      for_course(context)
+    else
+      for_assignment(context)
+    end
+  end
+
+  def self.for_assignment(assignment)
+    standards = GradingStandard.active.for_context(assignment.context)
+    standards = GradingStandard.where(id: standards)
+    course_scheme = assignment.context.grading_standard
+    standards = standards.union(GradingStandard.where(id: course_scheme)) if course_scheme&.archived?
+    if assignment.grading_standard&.archived?
+      standards = standards.union(GradingStandard.where(id: assignment.grading_standard))
+    end
+    standards
+  end
+
+  def self.for_course(course)
+    standards = GradingStandard.active.for_context(course)
+    standards = GradingStandard.where(id: standards)
+    standards = standards.union(GradingStandard.where(id: course.grading_standard)) if course.grading_standard&.archived?
+    standards
+  end
+
+  def self.for_account(account)
+    GradingStandard.active.union(GradingStandard.archived).for_context(account)
   end
 
   def version
@@ -194,8 +246,24 @@ class GradingStandard < ActiveRecord::Base
     self.context_code = "#{context_type.underscore}_#{context_id}" rescue nil
   end
 
+  def prevent_deletion_of_used_schemes
+    return unless assessed_assignment? && Account.site_admin.feature_enabled?(:archived_grading_schemes)
+
+    errors.add(:workflow_state, "You cannot delete a used scheme")
+    throw :error
+  end
+  private :prevent_deletion_of_used_schemes
+
   def assessed_assignment?
-    assignments.active.joins(:submissions).where("submissions.workflow_state='graded'").exists?
+    assessed_assignments.distinct(:id).count > 0
+  end
+
+  def assessed_assignments
+    assignments_with_graded_submissions = assignments
+                                          .except(:order).joins(:submissions)
+                                          .where("submissions.workflow_state='graded'")
+
+    assignments_with_graded_submissions.union(assessed_course_assignments)
   end
 
   delegate :name, to: :context, prefix: true

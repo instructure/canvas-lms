@@ -340,6 +340,7 @@ CanvasRails::Application.routes.draw do
     end
 
     resources :grading_standards, only: %i[index create update destroy]
+
     resources :assignment_groups do
       post "reorder" => "assignment_groups#reorder_assignments", :as => :reorder_assignments
       collection do
@@ -503,6 +504,8 @@ CanvasRails::Application.routes.draw do
     get "grading_schemes" => "grading_schemes_json#detail_list"
     get "grading_scheme_summaries" => "grading_schemes_json#summary_list"
     post "grading_schemes" => "grading_schemes_json#create"
+    post "grading_schemes/:id/archive" => "grading_schemes_json#archive"
+    post "grading_schemes/:id/unarchive" => "grading_schemes_json#unarchive"
     delete "grading_schemes/:id" => "grading_schemes_json#destroy"
     put "grading_schemes/:id" => "grading_schemes_json#update"
     get "grading_schemes/default" => "grading_schemes_json#show_default_grading_scheme"
@@ -785,6 +788,9 @@ CanvasRails::Application.routes.draw do
 
     get "grading_schemes" => "grading_schemes_json#detail_list"
     get "grading_scheme_summaries" => "grading_schemes_json#summary_list"
+    get "grading_scheme_grouped" => "grading_schemes_json#grouped_list"
+    post "grading_schemes/:id/archive" => "grading_schemes_json#archive"
+    post "grading_schemes/:id/unarchive" => "grading_schemes_json#unarchive"
     post "grading_schemes" => "grading_schemes_json#create"
     delete "grading_schemes/:id" => "grading_schemes_json#destroy"
     put "grading_schemes/:id" => "grading_schemes_json#update"
