@@ -176,6 +176,11 @@ module Api::V1::Assignment
     hash["grades_published"] = assignment.grades_published? if opts[:include_grades_published]
     hash["graded_submissions_exist"] = assignment.graded_submissions_exist?
 
+    if opts[:include_checkpoints] && assignment.root_account.feature_enabled?(:discussion_checkpoints)
+      hash["checkpointed"] = assignment.checkpointed?
+      hash["checkpoints"] = assignment.checkpoint_assignments.map { |checkpoint| Checkpoint.new(checkpoint).as_json }
+    end
+
     if opts[:overrides].present?
       hash["overrides"] = assignment_overrides_json(opts[:overrides], user)
     elsif opts[:include_overrides]
@@ -629,7 +634,7 @@ module Api::V1::Assignment
     # html is moved to the destination course. This code block gives New Quizzes the ability
     # to let canvas know what additional assets need to be copied.
     # Note: this is intended to be a short term solution to resolve an ongoing production issue.
-    url = assignment_params.dig("migrated_urls_report_url")
+    url = assignment_params["migrated_urls_report_url"]
     if url.present?
       res = CanvasHttp.get(url)
       data = JSON.parse(res.body)
