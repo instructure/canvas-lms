@@ -140,6 +140,7 @@ PATH
       digest-murmurhash (>= 1.1.0)
       guardrail (>= 2.0.0)
       redis (~> 5.0)
+      redis-clustering (~> 5.0)
       redis-scripting (>= 1.0.0)
     canvas_color (0.0.1)
     canvas_crummy (0.0.1)

@@ -69,7 +69,7 @@ describe CanvasHttp::CircuitBreaker do
         @timeouts[key] = ttl
       end
 
-      def pipelined
+      def pipelined(_key = nil)
         [(yield self)]
       end
     end

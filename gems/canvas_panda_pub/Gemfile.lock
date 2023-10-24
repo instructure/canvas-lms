@@ -7,6 +7,7 @@ PATH
       digest-murmurhash (>= 1.1.0)
       guardrail (>= 2.0.0)
       redis (~> 5.0)
+      redis-clustering (~> 5.0)
       redis-scripting (>= 1.0.0)
 
 PATH
@@ -145,6 +146,11 @@ GEM
       redis-client (>= 0.9.0)
     redis-client (0.17.0)
       connection_pool
+    redis-cluster-client (0.7.4)
+      redis-client (~> 0.12)
+    redis-clustering (5.0.7)
+      redis (= 5.0.7)
+      redis-cluster-client (>= 0.3.7)
     redis-scripting (1.0.1)
       redis (>= 3.0)
     rexml (3.2.6)
