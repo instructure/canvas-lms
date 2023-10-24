@@ -3053,13 +3053,14 @@ class Assignment < ActiveRecord::Base
     else
       user_ids = Array.wrap(user_ids).join(",")
       course_ids = Array.wrap(course_ids_that_have_da_enabled).join(",")
+      visibility_table = AssignmentStudentVisibility.table_name
       scope = joins(sanitize_sql([<<~SQL.squish, course_ids, user_ids]))
         LEFT OUTER JOIN #{AssignmentStudentVisibility.quoted_table_name} ON (
-         assignment_student_visibilities.assignment_id = assignments.id
-         AND assignment_student_visibilities.course_id IN (%s)
-         AND assignment_student_visibilities.user_id IN (%s))
+         #{visibility_table}.assignment_id = assignments.id
+         AND #{visibility_table}.course_id IN (%s)
+         AND #{visibility_table}.user_id IN (%s))
       SQL
-      scope.where("(assignments.context_id NOT IN (?) AND assignments.workflow_state<>'deleted') OR (assignment_student_visibilities.assignment_id IS NOT NULL)", course_ids_that_have_da_enabled)
+      scope.where("(assignments.context_id NOT IN (?) AND assignments.workflow_state<>'deleted') OR (#{visibility_table}.assignment_id IS NOT NULL)", course_ids_that_have_da_enabled)
     end
   }
 
