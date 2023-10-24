@@ -148,7 +148,7 @@ GEM
       net-smtp
     method_source (1.0.0)
     mini_mime (1.1.5)
-    mini_portile2 (2.8.4)
+    mini_portile2 (2.8.5)
     minitest (5.20.0)
     net-imap (0.4.1)
       date

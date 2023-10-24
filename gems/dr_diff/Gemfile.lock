@@ -22,7 +22,7 @@ GEM
       rdoc
       reline (>= 0.3.8)
     mini_mime (1.1.5)
-    mini_portile2 (2.8.4)
+    mini_portile2 (2.8.5)
     multi_xml (0.6.0)
     psych (5.1.1.1)
       stringio

@@ -51,7 +51,7 @@ GEM
       rdoc
       reline (>= 0.3.8)
     jmespath (1.6.2)
-    mini_portile2 (2.8.4)
+    mini_portile2 (2.8.5)
     minitest (5.20.0)
     nokogiri (1.15.4)
       mini_portile2 (~> 2.8.2)
