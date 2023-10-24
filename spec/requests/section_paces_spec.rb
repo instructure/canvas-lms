@@ -88,7 +88,7 @@ describe "Section Paces API" do
       end.to change {
         section.course_paces.reload.count
       }.by(1)
-        .and change { Progress.count }.by(1)
+       .and change { Progress.count }.by(1)
       expect(Progress.last.queued?).to be_truthy
       expect(response).to have_http_status :created
       json = response.parsed_body
