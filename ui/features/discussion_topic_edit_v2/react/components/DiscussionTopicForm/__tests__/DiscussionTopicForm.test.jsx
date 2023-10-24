@@ -20,6 +20,7 @@ import {render, waitFor, fireEvent} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import DiscussionTopicForm from '../DiscussionTopicForm'
+import {DiscussionTopic} from '../../../../graphql/DiscussionTopic'
 
 jest.mock('@canvas/rce/react/CanvasRce')
 
@@ -53,6 +54,57 @@ describe('DiscussionTopicForm', () => {
   it('renders', () => {
     const document = setup()
     expect(document.getByText('Topic Title')).toBeInTheDocument()
+  })
+
+  describe('publish indicator', () => {
+    it('does not show the publish indicator when editing an announcement', () => {
+      window.ENV = {
+        DISCUSSION_TOPIC: {
+          ATTRIBUTES: {
+            id: 88,
+            is_announcement: true,
+            course_published: false,
+          },
+        },
+      }
+
+      const {queryByText} = setup({
+        isEditing: true,
+        currentDiscussionTopic: DiscussionTopic.mock({published: false}),
+      })
+
+      // Verifies that the publish indicator is not in the document
+      expect(queryByText('Published')).not.toBeInTheDocument()
+      expect(queryByText('Not Published')).not.toBeInTheDocument()
+    })
+
+    it('does not show the publish indicator when not editing', () => {
+      const {queryByText} = setup({isEditing: false})
+
+      // Verifies that the publish indicator is not in the document
+      expect(queryByText('Published')).not.toBeInTheDocument()
+      expect(queryByText('Not Published')).not.toBeInTheDocument()
+    })
+
+    it('displays publish indicator correctly', () => {
+      const {getByText} = setup({
+        isEditing: true,
+        currentDiscussionTopic: DiscussionTopic.mock({published: true}),
+      })
+
+      // Verifies that the publish indicator displays "Published"
+      expect(getByText('Published')).toBeInTheDocument()
+    })
+
+    it('displays unpublished indicator correctly', () => {
+      const {getByText} = setup({
+        isEditing: true,
+        currentDiscussionTopic: DiscussionTopic.mock({published: false}),
+      })
+
+      // Verifies that the publish indicator displays "Not Published"
+      expect(getByText('Not Published')).toBeInTheDocument()
+    })
   })
 
   describe('Announcement Alerts', () => {

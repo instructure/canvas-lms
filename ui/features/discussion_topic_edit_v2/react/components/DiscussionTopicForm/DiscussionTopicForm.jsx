@@ -23,10 +23,12 @@ import {CreateOrEditSetModal} from '@canvas/groups/react/CreateOrEditSetModal'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {View} from '@instructure/ui-view'
+import {Flex} from '@instructure/ui-flex'
+
 import {TextInput} from '@instructure/ui-text-input'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {Button} from '@instructure/ui-buttons'
-import {IconAddLine} from '@instructure/ui-icons'
+import {IconAddLine, IconPublishSolid, IconUnpublishedLine} from '@instructure/ui-icons'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {Text} from '@instructure/ui-text'
 import {Checkbox} from '@instructure/ui-checkbox'
@@ -132,7 +134,7 @@ export default function DiscussionTopicForm({
   const [peerReviewDueDate, setPeerReviewDueDate] = useState('')
   // This contains the list of assignment due dates / overrides. This default should be set to everyone in VICE-3866
   const [assignedInfoList, setAssignedInfoList] = useState([{dueDateId: nanoid()}]) // Initialize with one object with a unique id
-  
+
   const assignmentDueDateContext = {
     assignedInfoList,
     setAssignedInfoList,
@@ -256,6 +258,25 @@ export default function DiscussionTopicForm({
     return false
   }
 
+  const renderLabelWithPublishStatus = () => {
+    const publishStatus = published ? (
+      <Text color="success" weight="normal">
+        <IconPublishSolid /> {I18n.t('Published')}
+      </Text>
+    ) : (
+      <Text color="secondary" weight="normal">
+        <IconUnpublishedLine /> {I18n.t('Not Published')}
+      </Text>
+    )
+
+    return (
+      <Flex justifyItems="space-between">
+        <Flex.Item>{I18n.t('Topic Title')}</Flex.Item>
+        {!isAnnouncement && isEditing && <Flex.Item>{publishStatus}</Flex.Item>}
+      </Flex>
+    )
+  }
+
   return (
     <>
       <FormFieldGroup description="" rowSpacing="small">
@@ -263,7 +284,7 @@ export default function DiscussionTopicForm({
           <Alert variant={announcementAlertProps().variant}>{announcementAlertProps().text}</Alert>
         )}
         <TextInput
-          renderLabel={I18n.t('Topic Title')}
+          renderLabel={renderLabelWithPublishStatus()}
           type={I18n.t('text')}
           placeholder={I18n.t('Topic Title')}
           value={title}
