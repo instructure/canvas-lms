@@ -23,9 +23,13 @@ import {IconXSolid} from '@instructure/ui-icons'
 import {IconButton} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 
-import {responsiveQuerySizes} from '../../utils'
-
-export const RemovableItem = ({onRemove, screenReaderLabel, childrenAriaLabel, children}) => {
+export const RemovableItem = ({
+  onRemove,
+  screenReaderLabel,
+  childrenAriaLabel,
+  children,
+  responsiveQuerySizes,
+}) => {
   const [showRemove, setShowRemove] = useState(false)
   let blurTimeout = null
   const handleInteraction = () => {
@@ -97,6 +101,10 @@ RemovableItem.propTypes = {
    * The item that is able to be removed
    */
   children: PropTypes.node.isRequired,
+  /**
+   * Used to set the responsive state
+   */
+  responsiveQuerySizes: PropTypes.func.isRequired,
 }
 
 export default RemovableItem

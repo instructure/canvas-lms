@@ -18,7 +18,7 @@
 
 import AnonymousResponseSelector from '@canvas/discussions/react/components/AnonymousResponseSelector/AnonymousResponseSelector'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import React, {useRef, useState, useEffect} from 'react'
+import React, {useRef, useState, useEffect, useContext} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Button} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
@@ -33,7 +33,8 @@ import {name as mentionsPluginName} from '@canvas/rce/plugins/canvas_mentions/pl
 import positionCursor from './PositionCursorHook'
 import {ReplyPreview} from '../ReplyPreview/ReplyPreview'
 import {Spinner} from '@instructure/ui-spinner'
-import {AttachmentDisplay} from '../AttachmentDisplay/AttachmentDisplay'
+import {AttachmentDisplay} from '@canvas/discussions/react/components/AttachmentDisplay/AttachmentDisplay'
+import {DiscussionManagerUtilityContext} from '../../utils/constants'
 
 const I18n = useI18nScope('discussion_posts')
 
@@ -50,6 +51,7 @@ export const DiscussionEdit = props => {
 
   const [attachment, setAttachment] = useState(null)
   const [attachmentToUpload, setAttachmentToUpload] = useState(false)
+  const {isGradedDiscussion} = useContext(DiscussionManagerUtilityContext)
 
   const rceMentionsIsEnabled = () => {
     return !!ENV.rce_mentions_in_discussions
@@ -245,6 +247,8 @@ export const DiscussionEdit = props => {
                     setAttachment={setAttachment}
                     setAttachmentToUpload={setAttachmentToUpload}
                     attachmentToUpload={attachmentToUpload}
+                    responsiveQuerySizes={responsiveQuerySizes}
+                    isGradedDiscussion={isGradedDiscussion}
                   />
                 </View>
                 {rceButtons.reverse()}
@@ -258,6 +262,8 @@ export const DiscussionEdit = props => {
                       setAttachment={setAttachment}
                       setAttachmentToUpload={setAttachmentToUpload}
                       attachmentToUpload={attachmentToUpload}
+                      responsiveQuerySizes={responsiveQuerySizes}
+                      isGradedDiscussion={isGradedDiscussion}
                     />
                   </View>
                 </Flex.Item>

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 - present Instructure, Inc.
+ * Copyright (C) 2023 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -34,6 +34,7 @@ export const AttachmentButton = props => {
       onRemove={props.onDeleteItem}
       screenReaderLabel={I18n.t('Remove Attachment')}
       childrenAriaLabel={I18n.t(`Replace filename.png button`)}
+      responsiveQuerySizes={props.responsiveQuerySizes}
     >
       <span className="discussions-attach-button">
         <Link
@@ -63,4 +64,9 @@ AttachmentButton.propTypes = {
    * Used to delete the attachment.
    */
   onDeleteItem: PropTypes.func.isRequired,
+  /**
+   * Used to set the responsive state
+   */
+  responsiveQuerySizes: PropTypes.func.isRequired,
+
 }
