@@ -325,6 +325,34 @@ describe "Announcements API", type: :request do
     end
   end
 
+  context "sharding" do
+    specs_require_sharding
+
+    before(:once) do
+      @shard2.activate do
+        course_with_teacher(active_course: true)
+        @announcement = @course.announcements.create!(user: @teacher, message: "hello from shard 2")
+      end
+    end
+
+    it "returns announcements across shards" do
+      @shard1.activate do
+        json = api_call_as_user(@teacher,
+                                :get,
+                                "/api/v1/announcements",
+                                {
+                                  controller: "announcements_api",
+                                  action: "index",
+                                  format: "json",
+                                  context_codes: ["course_#{@course.id}"]
+                                })
+        expect(json.count).to eq(1)
+        expect(json[0]["id"]).to eq(@announcement.id)
+        expect(json[0]["context_code"]).to eq("course_#{@course.id}")
+      end
+    end
+  end
+
   describe "section specific announcements" do
     before(:once) do
       course_with_teacher(active_course: true)
