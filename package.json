@@ -91,7 +91,7 @@
     "karma-sourcemap-loader": "^0.3.7",
     "karma-verbose-reporter": "^0.0.6",
     "karma-webpack": "^2.0.2",
-    "lodash": "^4.16.4",
+    "lodash": "^4.17.21",
     "md5": "^2.2.1",
     "merge-stream": "^1.0.1",
     "moment": "~2.29.4",
