@@ -34,7 +34,6 @@ const I18n = useI18nScope('differentiated_modules')
 interface Props {
   courseId: string
   onSelect: (options: AssigneeOption[]) => void
-  isLoadingDefaultValues?: boolean
   defaultValues: AssigneeOption[]
   selectedOptionIds: string[]
 }
@@ -46,13 +45,7 @@ export interface AssigneeOption {
   group?: string
 }
 
-const AssigneeSelector = ({
-  courseId,
-  onSelect,
-  isLoadingDefaultValues,
-  defaultValues,
-  selectedOptionIds,
-}: Props) => {
+const AssigneeSelector = ({courseId, onSelect, defaultValues, selectedOptionIds}: Props) => {
   const [searchTerm, setSearchTerm] = useState('')
   const [options, setOptions] = useState<AssigneeOption[]>(defaultValues)
   const [isLoading, setIsLoading] = useState(false)
@@ -60,8 +53,6 @@ const AssigneeSelector = ({
   const [isShowingOptions, setIsShowingOptions] = useState(false)
 
   useEffect(() => {
-    if (isLoadingDefaultValues) return
-
     const params: Record<string, string> = {}
     const shouldSearchTerm = searchTerm.length > 2
     if (shouldSearchTerm || searchTerm === '') {
@@ -134,7 +125,7 @@ const AssigneeSelector = ({
         .catch(e => showFlashError(I18n.t('Something went wrong while fetching data'))(e))
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [courseId, isLoadingDefaultValues, searchTerm])
+  }, [courseId, searchTerm])
 
   const handleSelectOption = () => {
     setIsShowingOptions(false)
