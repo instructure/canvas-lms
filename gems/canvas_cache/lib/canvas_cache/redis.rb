@@ -135,6 +135,11 @@ module CanvasCache
 
           def_failsafe_method(Distributed, m)
         end
+        # not command methods, so skipped by the above loop
+        # pipelined isn't technically allowed against Distributed,
+        # but we define this anyway so that we get a proper error
+        # about it not being supported, instead of an argument error
+        def_failsafe_method(Distributed, :pipelined)
 
         ::Redis::Scripting::Module.prepend(Scripting::Module) if defined?(::Redis::Scripting::Module)
         ::Redis.prepend(Redis)
