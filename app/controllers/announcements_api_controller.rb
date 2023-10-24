@@ -88,40 +88,43 @@ class AnnouncementsApiController < ApplicationController
   # @returns [DiscussionTopic]
   def index
     courses = api_find_all(Course, @course_ids)
+    shards = courses.map(&:shard).uniq
+    announcements = Shard.with_each_shard(shards) do
+      scope = Announcement.where(context_type: "Course", context_id: courses)
 
-    scope = Announcement.where(context_type: "Course", context_id: courses)
+      include_unpublished = courses.all? { |course| course.grants_right?(@current_user, :view_unpublished_items) }
+      scope = if include_unpublished && !value_to_boolean(params[:active_only])
+                scope.where.not(workflow_state: "deleted")
+              else
+                # workflow state should be 'post_delayed' if delayed_post_at is in the future, but check because other endpoints do
+                scope.where(workflow_state: "active").where("delayed_post_at IS NULL OR delayed_post_at<?", Time.now.utc)
+              end
 
-    include_unpublished = courses.all? { |course| course.grants_right?(@current_user, :view_unpublished_items) }
-    scope = if include_unpublished && !value_to_boolean(params[:active_only])
-              scope.where.not(workflow_state: "deleted")
-            else
-              # workflow state should be 'post_delayed' if delayed_post_at is in the future, but check because other endpoints do
-              scope.where(workflow_state: "active").where("delayed_post_at IS NULL OR delayed_post_at<?", Time.now.utc)
-            end
+      @start_date ||= 14.days.ago.beginning_of_day
+      @end_date ||= @start_date + 28.days
+      if value_to_boolean(params[:latest_only])
+        scope = scope.ordered_between_by_context(@start_date, @end_date)
+        scope = scope.select("DISTINCT ON (context_id) *")
+      else
+        scope = scope.ordered_between(@start_date, @end_date)
+      end
 
-    @start_date ||= 14.days.ago.beginning_of_day
-    @end_date ||= @start_date + 28.days
-    if value_to_boolean(params[:latest_only])
-      scope = scope.ordered_between_by_context(@start_date, @end_date)
-      scope = scope.select("DISTINCT ON (context_id) *")
-    else
-      scope = scope.ordered_between(@start_date, @end_date)
+      # only filter by section visibility if user has no course manage rights
+      skip_section_filtering = courses.all? do |course|
+        course.grants_any_right?(
+          @current_user,
+          :read_as_admin,
+          :manage_grades,
+          *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS,
+          :manage_content,
+          *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS
+        )
+      end
+      scope = scope.visible_to_student_sections(@current_user) unless skip_section_filtering
+      scope
     end
 
-    # only filter by section visibility if user has no course manage rights
-    skip_section_filtering = courses.all? do |course|
-      course.grants_any_right?(
-        @current_user,
-        :read_as_admin,
-        :manage_grades,
-        *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS,
-        :manage_content,
-        *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS
-      )
-    end
-    scope = scope.visible_to_student_sections(@current_user) unless skip_section_filtering
-
-    @topics = Api.paginate(scope, self, api_v1_announcements_url)
+    @topics = Api.paginate(announcements, self, api_v1_announcements_url)
 
     include_params = Array(params[:include])
     text_only = value_to_boolean(params[:text_only])
