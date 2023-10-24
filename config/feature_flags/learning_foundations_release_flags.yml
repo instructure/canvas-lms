@@ -220,4 +220,5 @@ differentiated_modules:
   description: |-
     If enabled, modules and module items become assignable to specific
     individuals and groups.
+  after_state_change_proc: differentiated_modules_setting_hook
   applies_to: SiteAdmin
