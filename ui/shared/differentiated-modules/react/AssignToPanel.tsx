@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useState} from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import Footer from './Footer'
 import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
@@ -26,9 +26,10 @@ import {View} from '@instructure/ui-view'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import ModuleAssignments, {AssigneeOption} from './ModuleAssignments'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {Spinner} from '@instructure/ui-spinner'
 import {generateAssignmentOverridesPayload} from '../utils/assignToHelper'
+import {AssignmentOverride} from './types'
 
 const I18n = useI18nScope('differentiated_modules')
 
@@ -66,6 +67,45 @@ export default function AssignToPanel({courseId, moduleId, height, onDismiss}: A
   const [selectedOption, setSelectedOption] = useState<string>(OPTIONS[0].value)
   const [selectedAssignees, setSelectedAssignees] = useState<AssigneeOption[]>([])
   const [isLoading, setIsLoading] = useState(false)
+  const [defaultValues, setDefaultValues] = useState<AssigneeOption[]>([])
+
+  useEffect(() => {
+    setIsLoading(true)
+    doFetchApi({
+      path: `/api/v1/courses/${courseId}/modules/${moduleId}/assignment_overrides`,
+    })
+      .then((data: any) => {
+        if (data.json === undefined) return
+        const json = data.json as AssignmentOverride[]
+        const parsedOptions = json.reduce((acc: AssigneeOption[], override: AssignmentOverride) => {
+          const overrideOptions =
+            override.students?.map(({id, name}: {id: string; name: string}) => ({
+              id: `student-${id}`,
+              overrideId: override.id,
+              value: name,
+              group: I18n.t('Students'),
+            })) ?? []
+          if (override.course_section !== undefined) {
+            const sectionId = `section-${override.course_section.id}`
+            overrideOptions.push({
+              id: sectionId,
+              overrideId: override.id,
+              value: override.course_section.name,
+              group: I18n.t('Sections'),
+            })
+          }
+          return [...acc, ...overrideOptions]
+        }, [])
+        setDefaultValues(parsedOptions)
+        if (parsedOptions.length > 0) {
+          setSelectedOption(OPTIONS[1].value)
+        }
+      })
+      .catch(showFlashError())
+      .finally(() => {
+        setIsLoading(false)
+      })
+  }, [courseId, moduleId])
 
   const handleSelect = useCallback((newSelectedAssignees: AssigneeOption[]) => {
     setSelectedAssignees(newSelectedAssignees)
@@ -139,8 +179,8 @@ export default function AssignToPanel({courseId, moduleId, height, onDismiss}: A
                   <View as="div" margin="small large none none">
                     <ModuleAssignments
                       courseId={courseId}
-                      moduleId={moduleId}
                       onSelect={handleSelect}
+                      defaultValues={defaultValues}
                     />
                   </View>
                 )}

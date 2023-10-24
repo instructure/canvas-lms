@@ -18,21 +18,20 @@
 
 import React from 'react'
 import {act, fireEvent, render} from '@testing-library/react'
-import ModuleAssignments from '../ModuleAssignments'
+import ModuleAssignments, {ModuleAssignmentsProps} from '../ModuleAssignments'
 import fetchMock from 'fetch-mock'
 import {FILTERED_SECTIONS_DATA, FILTERED_STUDENTS_DATA, SECTIONS_DATA, STUDENTS_DATA} from './mocks'
 
-const props = {
+const props: ModuleAssignmentsProps = {
   courseId: '1',
-  moduleId: '2',
   onSelect: jest.fn(),
+  defaultValues: [],
 }
 
 const SECTIONS_URL = `/api/v1/courses/${props.courseId}/sections`
 const STUDENTS_URL = `api/v1/courses/${props.courseId}/users?enrollment_type=student`
 const FILTERED_SECTIONS_URL = `/api/v1/courses/${props.courseId}/sections?search_term=sec`
 const FILTERED_STUDENTS_URL = `api/v1/courses/${props.courseId}/users?search_term=sec&enrollment_type=student`
-const ASSIGNMENT_OVERRIDES_URL = `/api/v1/courses/${props.courseId}/modules/${props.moduleId}/assignment_overrides`
 
 describe('ModuleAssignments', () => {
   beforeAll(() => {
@@ -49,7 +48,6 @@ describe('ModuleAssignments', () => {
     fetchMock.getOnce(STUDENTS_URL, STUDENTS_DATA)
     fetchMock.getOnce(FILTERED_SECTIONS_URL, FILTERED_SECTIONS_DATA)
     fetchMock.getOnce(FILTERED_STUDENTS_URL, FILTERED_STUDENTS_DATA)
-    fetchMock.getOnce(ASSIGNMENT_OVERRIDES_URL, [])
   })
 
   afterEach(() => {
@@ -96,5 +94,16 @@ describe('ModuleAssignments', () => {
     expect(onSelect).toHaveBeenCalledWith([
       {group: 'Sections', id: `section-${SECTIONS_DATA[0].id}`, value: SECTIONS_DATA[0].name},
     ])
+  })
+
+  it('shows defaultValues as default selection', async () => {
+    const defaultValues = [
+      {id: '1', value: 'section A'},
+      {id: '2', value: 'section B'},
+    ]
+    const {getAllByTestId, getByText} = renderComponent({defaultValues})
+    expect(getByText(defaultValues[0].value)).toBeInTheDocument()
+    expect(getByText(defaultValues[1].value)).toBeInTheDocument()
+    expect(getAllByTestId('assignee_selector_selected_option').length).toBe(defaultValues.length)
   })
 })

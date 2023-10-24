@@ -17,26 +17,21 @@
  */
 
 import React, {useCallback, useEffect, useState} from 'react'
-import doFetchApi from '@canvas/do-fetch-api-effect'
-import {useScope} from '@canvas/i18n'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-import {Spinner} from '@instructure/ui-spinner'
-import {AssignmentOverride} from './types'
 import AssigneeSelector, {AssigneeOption} from './AssigneeSelector'
 
-const I18n = useScope('differentiated_modules')
-
-interface ModuleAssignmentsProps {
+export interface ModuleAssignmentsProps {
   courseId: string
-  moduleId: string
   onSelect: (options: AssigneeOption[]) => void
+  defaultValues: AssigneeOption[]
 }
 
 export type {AssigneeOption} from './AssigneeSelector'
 
-export default function ModuleAssignments({courseId, moduleId, onSelect}: ModuleAssignmentsProps) {
-  const [isLoadingDefaultValues, setIsLoadingDefaultValues] = useState(true)
-  const [defaultValues, setDefaultValues] = useState<AssigneeOption[]>([])
+export default function ModuleAssignments({
+  courseId,
+  onSelect,
+  defaultValues,
+}: ModuleAssignmentsProps) {
   const [selectedOptions, setSelectedOptions] = useState<AssigneeOption[]>(defaultValues)
 
   const handleSelect = useCallback(
@@ -48,55 +43,15 @@ export default function ModuleAssignments({courseId, moduleId, onSelect}: Module
   )
 
   useEffect(() => {
-    setIsLoadingDefaultValues(true)
-    doFetchApi({
-      path: `/api/v1/courses/${courseId}/modules/${moduleId}/assignment_overrides`,
-    })
-      .then((data: any) => {
-        if (data.json === undefined) return
-        const json = data.json as AssignmentOverride[]
-        const parsedOptions = json.reduce((acc: AssigneeOption[], override: AssignmentOverride) => {
-          const overrideOptions =
-            override.students?.map(({id, name}: {id: string; name: string}) => ({
-              id: `student-${id}`,
-              overrideId: override.id,
-              value: name,
-              group: I18n.t('Students'),
-            })) ?? []
-          if (override.course_section !== undefined) {
-            const sectionId = `section-${override.course_section.id}`
-            overrideOptions.push({
-              id: sectionId,
-              overrideId: override.id,
-              value: override.course_section.name,
-              group: I18n.t('Sections'),
-            })
-          }
-          return [...acc, ...overrideOptions]
-        }, [])
-        setDefaultValues(parsedOptions)
-        setSelectedOptions(parsedOptions)
-        onSelect(parsedOptions)
-      })
-      .catch(showFlashError())
-      .finally(() => {
-        setIsLoadingDefaultValues(false)
-      })
-  }, [courseId, moduleId, onSelect])
+    handleSelect(defaultValues)
+  }, [defaultValues, handleSelect])
 
   return (
-    <>
-      {isLoadingDefaultValues ? (
-        <Spinner renderTitle={I18n.t('Loading')} />
-      ) : (
-        <AssigneeSelector
-          courseId={courseId}
-          onSelect={handleSelect}
-          isLoadingDefaultValues={isLoadingDefaultValues}
-          defaultValues={defaultValues}
-          selectedOptionIds={selectedOptions.map(({id}) => id)}
-        />
-      )}
-    </>
+    <AssigneeSelector
+      courseId={courseId}
+      onSelect={handleSelect}
+      defaultValues={defaultValues}
+      selectedOptionIds={selectedOptions.map(({id}) => id)}
+    />
   )
 }
