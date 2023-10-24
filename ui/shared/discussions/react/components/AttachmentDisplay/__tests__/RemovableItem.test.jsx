@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 - present Instructure, Inc.
+ * Copyright (C) 2023 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -15,10 +15,11 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {responsiveQuerySizes} from '../../../utils'
+
 import React from 'react'
 import {render} from '@testing-library/react'
 import {AttachmentDisplay} from '../AttachmentDisplay'
+import {responsiveQuerySizes} from '../../../utils'
 
 jest.mock('../../../utils')
 
@@ -36,7 +37,12 @@ beforeAll(() => {
 
 const setup = props => {
   return render(
-    <AttachmentDisplay setAttachment={() => {}} setAttachmentToUpload={() => {}} {...props} />
+    <AttachmentDisplay
+      setAttachment={() => {}}
+      setAttachmentToUpload={() => {}}
+      responsiveQuerySizes={responsiveQuerySizes}
+      {...props}
+    />
   )
 }
 

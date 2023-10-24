@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 - present Instructure, Inc.
+ * Copyright (C) 2023 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -21,16 +21,13 @@ import React, {useContext} from 'react'
 import {AttachmentButton} from './AttachmentButton'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Responsive} from '@instructure/ui-responsive'
-import {responsiveQuerySizes} from '../../utils'
 import {UploadButton} from './UploadButton'
 import {uploadFile} from '@canvas/upload-file'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {DiscussionManagerUtilityContext} from '../../utils/constants'
 
 const I18n = useI18nScope('discussion_topics_post')
 export function AttachmentDisplay(props) {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
-  const {isGradedDiscussion} = useContext(DiscussionManagerUtilityContext)
 
   const removeAttachment = () => {
     props.setAttachment(null)
@@ -41,7 +38,7 @@ export function AttachmentDisplay(props) {
   // Graded discussion attachments should not count against user quotas, so they use a different url/process and aren't affected by quotas
   const addAttachment = async e => {
     // URL destination changes based on the type of discussion
-    const fileUploadURL = isGradedDiscussion
+    const fileUploadURL = props.isGradedDiscussion
       ? '/files/pending'
       : `/api/v1/folders/${ENV.DISCUSSION?.ATTACHMENTS_FOLDER_ID}/files`
     const files = Array.from(e.currentTarget?.files)
@@ -60,7 +57,7 @@ export function AttachmentDisplay(props) {
     try {
       // attachmentInformation structure changes depending on the type of discussion
       let attachmentInformation = {}
-      if (isGradedDiscussion) {
+      if (props.isGradedDiscussion) {
         // If the file is submitted in a graded discussion, a different path is used that requires different information
         // This is required to get the file to be uploaded to the submissions folder and ignore the quota limits
 
@@ -96,7 +93,7 @@ export function AttachmentDisplay(props) {
   return (
     <Responsive
       match="media"
-      query={responsiveQuerySizes({mobile: true, desktop: true})}
+      query={props.responsiveQuerySizes({mobile: true, desktop: true})}
       props={{
         mobile: {
           itemSpacing: '0 small 0 0',
@@ -109,7 +106,11 @@ export function AttachmentDisplay(props) {
       }}
       render={(_responsiveProps, _matches) =>
         props.attachment?._id ? (
-          <AttachmentButton attachment={props.attachment} onDeleteItem={removeAttachment} />
+          <AttachmentButton
+            attachment={props.attachment}
+            onDeleteItem={removeAttachment}
+            responsiveQuerySizes={props.responsiveQuerySizes}
+          />
         ) : (
           ENV.can_attach_entries && (
             <UploadButton
@@ -141,6 +142,14 @@ AttachmentDisplay.propTypes = {
    * toggles loading state
    */
   attachmentToUpload: PropTypes.bool,
+  /**
+   * Used to set the responsive state
+   */
+  responsiveQuerySizes: PropTypes.func.isRequired,
+  /**
+   * toggles file uploadUrl
+   */
+  isGradedDiscussion: PropTypes.bool,
 }
 
 export default AttachmentDisplay

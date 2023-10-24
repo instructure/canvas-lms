@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 - present Instructure, Inc.
+ * Copyright (C) 2023 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -19,10 +19,16 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import {AttachmentDisplay} from '../AttachmentDisplay'
+import {responsiveQuerySizes} from '../../../utils'
 
 const setup = props => {
   return render(
-    <AttachmentDisplay setAttachment={() => {}} setAttachmentToUpload={() => {}} {...props} />
+    <AttachmentDisplay
+      setAttachment={() => {}}
+      setAttachmentToUpload={() => {}}
+      responsiveQuerySizes={responsiveQuerySizes}
+      {...props}
+    />
   )
 }
 
