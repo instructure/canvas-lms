@@ -826,7 +826,7 @@ GEM
       prawn (>= 1.3.0, < 3.0.0)
     promise.rb (0.7.4)
     prosopite (1.4.1)
-    psych (5.1.1)
+    psych (5.1.1.1)
       stringio
     public_suffix (5.0.3)
     puma (6.4.0)
