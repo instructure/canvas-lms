@@ -24,7 +24,7 @@ GEM
     mini_mime (1.1.5)
     mini_portile2 (2.8.4)
     multi_xml (0.6.0)
-    psych (5.1.1)
+    psych (5.1.1.1)
       stringio
     rdoc (6.5.0)
       psych (>= 4.0.0)
