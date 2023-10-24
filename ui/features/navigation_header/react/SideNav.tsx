@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useState} from 'react'
 import {Navigation} from '@instructure/ui-navigation'
 import {Badge} from '@instructure/ui-badge'
 import {Avatar} from '@instructure/ui-avatar'
@@ -36,9 +36,10 @@ import {useQuery} from '@tanstack/react-query'
 import {getUnreadCount} from './queries/unreadCountQuery'
 import {getSetting} from './queries/settingsQuery'
 
-const I18n = useI18nScope('new_user_tutorial')
+const I18n = useI18nScope('sidenav')
 
 const SideNav = () => {
+  const [isMinimized, setIsMinimized] = useState(false)
   const isK5User = window.ENV.K5_USER
   const countsEnabled = Boolean(
     window.ENV.current_user_id && !window.ENV.current_user?.fake_student
@@ -72,21 +73,30 @@ const SideNav = () => {
   })
 
   return (
-    <div style={{height: '100vh'}} data-testid="sidenav-container">
+    <div style={{width: '100%', height: '100vh'}} data-testid="sidenav-container">
       <Navigation
         label="Main navigation"
         toggleLabel={{
           expandedLabel: 'Minimize Navigation',
           minimizedLabel: 'Expand Navigation',
         }}
+        onMinimized={() => setIsMinimized(!isMinimized)}
+        themeOverride={{
+          minimizedWidth: '100%',
+        }}
       >
         <Navigation.Item
-          icon={<IconCanvasLogoSolid size="medium" data-testid="icon-canvas-logo" />}
+          icon={
+            <IconCanvasLogoSolid
+              size={!isMinimized ? 'medium' : 'small'}
+              data-testid="icon-canvas-logo"
+            />
+          }
           label={<ScreenReaderContent>{I18n.t('Home')}</ScreenReaderContent>}
           href="/"
           themeOverride={{
             iconColor: 'white',
-            contentPadding: '1rem',
+            contentPadding: !isMinimized ? '1rem' : '0',
             backgroundColor: 'transparent',
             hoverBackgroundColor: 'transparent',
           }}
