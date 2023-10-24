@@ -59,7 +59,7 @@ module Canvas
     if cache_store == :redis_cache_store
       store = nil
       config[:error_handler] = lambda do |method:, returning:, exception:| # rubocop:disable Lint/UnusedBlockArgument
-        redis_name = store.redis.id
+        redis_name = store.redis.respond_to?(:id) ? store.redis.id : cluster
         Rails.logger.error("  [REDIS] Query failure #{exception.inspect} (#{redis_name})")
         InstStatsd::Statsd.increment("redis.errors.all")
         InstStatsd::Statsd.increment("redis.errors.#{InstStatsd::Statsd.escape(redis_name)}",
