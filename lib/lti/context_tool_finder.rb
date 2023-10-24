@@ -92,7 +92,7 @@ module Lti
 
       return [] if contexts.empty?
 
-      Shard.partition_by_shard(contexts) do |contexts_by_shard|
+      Shard.partition_by_shard(contexts, ->(c) { c.shard }) do |contexts_by_shard|
         # Important to use .shard() here to get a scope on the current shard but translate any ids
         scope = options[:base_scope]&.shard(Shard.current) || ContextExternalTool
         scope = scope.where(context: contexts_by_shard).active
