@@ -27,9 +27,13 @@ import {
   IconCanvasLogoSolid,
   IconCoursesLine,
   IconDashboardLine,
+  IconFolderLine,
   IconHomeLine,
   IconInboxLine,
+  IconInfoLine,
+  IconLifePreserverLine,
   IconQuestionLine,
+  IconSettingsLine,
 } from '@instructure/ui-icons'
 import {AccessibleContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -39,10 +43,33 @@ import {getSetting} from './queries/settingsQuery'
 
 const I18n = useI18nScope('sidenav')
 
+export const InformationIconEnum = {
+  INFORMATION: 'information',
+  FOLDER: 'folder',
+  COG: 'cog',
+  LIFE_SAVER: 'lifepreserver',
+}
+
 const SideNav = () => {
   let logoUrl = null
   const [isMinimized, setIsMinimized] = useState(false)
   const isK5User = window.ENV.K5_USER
+  const helpIcon = window.ENV.help_link_icon
+
+  const getHelpIcon = (): JSX.Element => {
+    switch (helpIcon) {
+      case InformationIconEnum.INFORMATION:
+        return <IconInfoLine data-testid="HelpInfo" />
+      case InformationIconEnum.FOLDER:
+        return <IconFolderLine data-testid="HelpFolder" />
+      case InformationIconEnum.COG:
+        return <IconSettingsLine data-testid="HelpCog" />
+      case InformationIconEnum.LIFE_SAVER:
+        return <IconLifePreserverLine data-testid="HelpLifePreserver" />
+      default:
+        return <IconQuestionLine data-testid="HelpQuestion" />
+    }
+  }
   const countsEnabled = Boolean(
     window.ENV.current_user_id && !window.ENV.current_user?.fake_student
   )
@@ -241,7 +268,7 @@ const SideNav = () => {
                 )
               }
             >
-              <IconQuestionLine />
+              {getHelpIcon()}
             </Badge>
           }
           label={I18n.t('Help')}
