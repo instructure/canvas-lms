@@ -3057,16 +3057,25 @@ describe Enrollment do
       @temporary_enrollment_recipient = user_factory(active_all: true)
       temporary_enrollment_recipient2 = user_factory(active_all: true)
       @course1 = course_with_teacher(active_all: true, user: @source_user).course
+      temporary_enrollment_pairing = TemporaryEnrollmentPairing.create!(root_account: Account.default)
       @recipient_temp_enrollment = @course1.enroll_user(
         @temporary_enrollment_recipient,
         "TeacherEnrollment",
-        { role: teacher_role, temporary_enrollment_source_user_id: @source_user.id }
+        {
+          role: teacher_role,
+          temporary_enrollment_source_user_id: @source_user.id,
+          temporary_enrollment_pairing_id: temporary_enrollment_pairing.id
+        }
       )
       course2 = course_with_teacher(active_all: true, user: @source_user).course
       @recipient2_temp_enrollment = course2.enroll_user(
         temporary_enrollment_recipient2,
         "TeacherEnrollment",
-        { role: teacher_role, temporary_enrollment_source_user_id: @source_user.id }
+        {
+          role: teacher_role,
+          temporary_enrollment_source_user_id: @source_user.id,
+          temporary_enrollment_pairing_id: temporary_enrollment_pairing.id
+        }
       )
     end
 

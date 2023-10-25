@@ -2485,8 +2485,6 @@ class Course < ActiveRecord::Base
     section = opts[:section]
     limit_privileges_to_course_section = opts[:limit_privileges_to_course_section] || false
     associated_user_id = opts[:associated_user_id]
-    temporary_enrollment_source_user_id =
-      root_account.feature_enabled?(:temporary_enrollments) ? opts[:temporary_enrollment_source_user_id] : nil
 
     role = opts[:role] || shard.activate { Enrollment.get_built_in_role_for_type(type, root_account_id: self.root_account_id) }
 
@@ -2506,8 +2504,11 @@ class Course < ActiveRecord::Base
                                     type:,
                                     role_id: role,
                                     associated_user_id:)
-      if root_account.feature_enabled?(:temporary_enrollments)
-        scope = scope.where(temporary_enrollment_source_user_id:)
+      if root_account.feature_enabled?(:temporary_enrollments) && opts[:temporary_enrollment_source_user_id] &&
+         opts[:temporary_enrollment_pairing_id]
+        source_user_id = opts[:temporary_enrollment_source_user_id]
+        pairing_id = opts[:temporary_enrollment_pairing_id]
+        scope = scope.where(temporary_enrollment_source_user_id: source_user_id, temporary_enrollment_pairing_id: pairing_id)
       end
       e = if opts[:allow_multiple_enrollments]
             scope.where(course_section_id: section.id).first
@@ -2544,7 +2545,8 @@ class Course < ActiveRecord::Base
         )
       end
       e.associated_user_id = associated_user_id
-      e.temporary_enrollment_source_user_id = temporary_enrollment_source_user_id
+      e.temporary_enrollment_source_user_id = source_user_id
+      e.temporary_enrollment_pairing_id = pairing_id
       e.role = role
       e.self_enrolled = self_enrolled
       e.start_at = start_at
