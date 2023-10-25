@@ -477,6 +477,10 @@ module Api::V1::Assignment
 
     hash["restrict_quantitative_data"] = assignment.restrict_quantitative_data?(user, true) || false
 
+    if opts[:migrated_urls_content_migration_id]
+      hash["migrated_urls_content_migration_id"] = opts[:migrated_urls_content_migration_id]
+    end
+
     hash
   end
 
@@ -594,7 +598,7 @@ module Api::V1::Assignment
     false
   end
 
-  def update_api_assignment(assignment, assignment_params, user, context = assignment.context)
+  def update_api_assignment(assignment, assignment_params, user, context = assignment.context, opts = {})
     return :forbidden unless grading_periods_allow_submittable_update?(assignment, assignment_params)
 
     # Trying to change the "everyone" due date when the assignment is restricted to a specific section
@@ -680,6 +684,8 @@ module Api::V1::Assignment
         content_migration.shard.activate do
           content_migration.queue_migration(plugin)
         end
+
+        opts[:migrated_urls_content_migration_id] = content_migration.global_id
       end
     end
 

@@ -1573,7 +1573,7 @@ class AssignmentsApiController < ApplicationController
       track_update_metrics(@assignment, params[:assignment])
 
       @assignment.skip_downstream_changes! if params[:skip_downstream_changes].present?
-      result = update_api_assignment(@assignment, params.require(:assignment), @current_user, @context)
+      result = update_api_assignment(@assignment, params.require(:assignment), @current_user, @context, opts)
       render_create_or_update_result(result, opts)
     end
   end
