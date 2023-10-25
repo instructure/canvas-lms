@@ -77,9 +77,7 @@
                 </div>
               </div>
               <div class="ic-Form-control ic-Form-control--login">
-                <button type="<%= login_btn_type %>" class="Button Button--login">
-                  <%= t('log_in', 'Log In') %>
-                </button>
+                <%= submit_tag t('log_in', 'Log In'), type: login_btn_type, class: "Button Button--login" %>
               </div>
             </div> <!-- ic-Login__actions -->
             <%= render partial: "sso_buttons", locals: { aacs: @aacs_with_buttons } %>
