@@ -92,8 +92,8 @@ class Notification < Switchman::UnshardedRecord
     "Submission Needs Grading",
     "Upcoming Assignment Alert",
     "Web Conference Invitation",
-    "New Topic",
-    "New Reply"
+    "New Discussion Topic",
+    "New Discussion Entry"
   ].freeze
 
   NON_CONFIGURABLE_TYPES = %w[Migration Registration Summaries Alert].freeze
