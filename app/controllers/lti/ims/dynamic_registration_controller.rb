@@ -77,6 +77,8 @@ module Lti
           registration_params = params.permit(*expected_registration_params)
           registration_params["lti_tool_configuration"] = registration_params["https://purl.imsglobal.org/spec/lti-tool-configuration"]
           registration_params.delete("https://purl.imsglobal.org/spec/lti-tool-configuration")
+          scopes = registration_params["scope"].split(",")
+          registration_params.delete("scope")
 
           developer_key = DeveloperKey.new(
             name: registration_params["client_name"],
@@ -88,6 +90,7 @@ module Lti
           registration = Lti::IMS::Registration.new(
             developer_key:,
             root_account_id: root_account.id,
+            scopes:,
             **registration_params
           )
 
@@ -124,6 +127,7 @@ module Lti
           :initiate_login_uri,
           :client_name,
           :jwks_uri,
+          :scope,
           :token_endpoint_auth_method,
           { "https://purl.imsglobal.org/spec/lti-tool-configuration" => [
             :domain,
