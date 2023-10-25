@@ -30,10 +30,6 @@ module FilesHelper
     elsif params[:media_object_id].present?
       @media_id = params[:media_object_id]
       @media_object = MediaObject.by_media_id(@media_id).take
-    elsif Account.site_admin.feature_enabled?(:authenticated_iframe_content) && params[:id].present?
-      @media_id = params[:id]
-      @media_object = MediaObject.find_by(id: params[:id])
-      @attachment = @media_object&.attachment
     end
   end
 
