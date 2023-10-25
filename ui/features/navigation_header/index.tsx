@@ -61,7 +61,9 @@ ready(() => {
 
     ReactDOM.render(
       <Navigation
+        // @ts-expect-error
         ref={DesktopNavComponent}
+        // @ts-expect-error
         onDataReceived={() => mobileNavComponent.current?.forceUpdate()}
       />,
       globalNavTrayContainer,
@@ -70,6 +72,7 @@ ready(() => {
         if (mobileContextNavContainer) {
           ReactDOM.render(
             <MobileNavigation
+              // @ts-expect-error
               ref={mobileNavComponent}
               DesktopNavComponent={DesktopNavComponent.current}
             />,
@@ -81,12 +84,12 @@ ready(() => {
   }
 
   const newTabContainers = document.getElementsByClassName('new-tab-indicator')
-  if (newTabContainers) {
-    for (const newTabContainer of newTabContainers) {
+  Array.from(newTabContainers).forEach(newTabContainer => {
+    if (newTabContainer instanceof HTMLElement && newTabContainer.dataset.tabname) {
       ReactDOM.render(
         <NewTabIndicator tabName={newTabContainer.dataset.tabname} />,
         newTabContainer
       )
     }
-  }
+  })
 })
