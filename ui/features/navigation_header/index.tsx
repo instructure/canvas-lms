@@ -72,8 +72,8 @@ ready(() => {
         if (mobileContextNavContainer) {
           ReactDOM.render(
             <MobileNavigation
-              // @ts-expect-error
               ref={mobileNavComponent}
+              // @ts-expect-error
               DesktopNavComponent={DesktopNavComponent.current}
             />,
             mobileContextNavContainer
