@@ -221,8 +221,7 @@ shared_examples_for "selective_release module tray assign to" do |context|
 
     click_settings_tray_update_module_button
     expect(element_exists?(module_settings_tray_selector)).to be_falsey
-    # This will be uncommented when the modules page is updated to show the assign to
-    # expect(view_assign[0].text).to eq "View Assign To"
+    expect(view_assign[0].text).to eq "View Assign To"
   end
 end
 

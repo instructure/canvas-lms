@@ -18,6 +18,9 @@
 
 import {AssigneeOption} from '../react/AssigneeSelector'
 import {AssignmentOverridePayload, AssignmentOverridesPayload} from '../react/types'
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('differentiated_modules')
 
 export const setContainScrollBehavior = (element: HTMLElement | null) => {
   if (element !== null) {
@@ -57,4 +60,25 @@ export const generateAssignmentOverridesPayload = (
   }
 
   return {overrides}
+}
+
+export function updateModuleUI(moduleElement: HTMLDivElement, payload: AssignmentOverridesPayload) {
+  const assignToButtonContainer = moduleElement.querySelector('.view_assign')
+  if (assignToButtonContainer) {
+    if (payload.overrides.length > 0) {
+      const moduleId = moduleElement.getAttribute('data-module-id') ?? ''
+      assignToButtonContainer.innerHTML = `
+        <i aria-hidden="true" class="icon-group"></i>
+        <a
+          href="#${moduleId}"
+          class="view_assign_link"
+          title="${I18n.t('View Assign To')}"
+        >
+          ${I18n.t('View Assign To')}
+        </a>
+        `
+    } else {
+      assignToButtonContainer.innerHTML = ''
+    }
+  }
 }

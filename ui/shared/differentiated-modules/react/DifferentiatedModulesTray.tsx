@@ -139,6 +139,7 @@ export default function DifferentiatedModulesTray({
                 courseId={courseId}
                 moduleId={moduleId}
                 height={panelHeight}
+                moduleElement={moduleElement}
                 onDismiss={onDismiss}
               />
             </Tabs.Panel>
