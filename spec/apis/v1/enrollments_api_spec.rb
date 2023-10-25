@@ -3191,6 +3191,11 @@ describe EnrollmentsApiController, type: :request do
         end)
       end
 
+      it "400s when a bad role name is passed" do
+        api_call(:get, "#{@path}?role[]=garbage", @params.merge(role: %w[garbage]))
+        expect(response).to have_http_status :bad_request
+      end
+
       it "properly filters by multiple enrollment types" do
         # set up some enrollments that shouldn't be returned by the api
         request_user = @user

@@ -1049,7 +1049,9 @@ class EnrollmentsApiController < ApplicationController
     replacements = {}
 
     if role_ids.blank? && role_names.present?
-      role_ids = Array(role_names).map { |name| @context.account.get_course_role_by_name(name).id }
+      role_names = Array(role_names)
+      role_ids = role_names.filter_map { |name| @context.account.get_course_role_by_name(name)&.id }
+      raise ActionController::BadRequest, "role not found" if role_ids.length != role_names.length
     end
 
     if role_ids.present?
