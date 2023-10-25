@@ -33,6 +33,10 @@ module ModulesIndexPage
     "#context_module_item_#{module_item_id}"
   end
 
+  def new_module_link_selector
+    ".add_module_link"
+  end
+
   def pill_message_selector(module_id)
     "#context_module_#{module_id} .requirements_message li"
   end
@@ -76,6 +80,10 @@ module ModulesIndexPage
 
   def module_index_settings_menu
     f(".module_index_tools ul[role=menu]")
+  end
+
+  def new_module_link
+    f(new_module_link_selector)
   end
 
   def pill_message(module_id)
@@ -135,6 +143,10 @@ module ModulesIndexPage
 
   def click_manage_module_item_assign_to
     manage_module_item_assign_to.click
+  end
+
+  def click_new_module_link
+    new_module_link.click
   end
 
   def retrieve_assignment_content_tag(content_module, assignment)

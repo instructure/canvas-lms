@@ -173,6 +173,7 @@ export default function SettingsPanel({
       <Flex.Item shouldGrow={true} padding="small">
         <View as="div" padding="small">
           <TextInput
+            data-testid="module-name-input"
             renderLabel={I18n.t('Module Name')}
             value={state.moduleName}
             messages={state.nameInputMessages}
