@@ -77,5 +77,13 @@ $('#login_form').submit(function (_event) {
     })
     success = false
   }
+
+  if (success) {
+    // disable the button to avoid double-submit
+    const $btn = $(this).find('input[type="submit"]')
+    $btn.val($btn.data('disable-with'))
+    $btn.prop('disabled', true)
+  }
+
   return success
 })
