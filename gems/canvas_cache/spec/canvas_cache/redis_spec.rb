@@ -295,6 +295,15 @@ describe CanvasCache::Redis do
         allow(Process).to receive(:clock_gettime).and_return(now + 4)
         expect { redis_client.get("mykey") }.to raise_error(Redis::CannotConnectError)
       end
+
+      it "support failsafe with pipeline" do
+        expect(redis_client.pipelined(failsafe: 2) { raise Redis::CannotConnectError }).to eq(2)
+      end
+
+      it "support failsafe with pipeline on a distributed client" do
+        client = Redis::Distributed.new([redis_client.id])
+        expect(client.pipelined("key", failsafe: 2) { raise Redis::CannotConnectError }).to eq(2)
+      end
     end
   end
 end
