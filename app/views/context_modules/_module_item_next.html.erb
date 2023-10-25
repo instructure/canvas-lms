@@ -267,7 +267,7 @@
                     href="#<%= module_item ? module_item.id : "{{ id }}" %>"
                     data-item-id="<%= module_item ? module_item.id : '' %>"
                     data-item-name="<%= module_item ? module_item.title : '' %>"
-                    data-item-type="<%= module_item ? module_item[:content_type] : '' %>"
+                    data-item-type="<%= module_item ? module_item.content_type_class : '' %>"
                     data-item-context-id="<%= module_item ? module_item.context_id : '' %>"
                     title="<%= t('Assign this module') %>"
                   >

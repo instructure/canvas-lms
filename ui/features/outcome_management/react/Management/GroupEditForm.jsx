@@ -23,7 +23,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import {Form} from 'react-final-form'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
-import {ApplyTheme} from '@instructure/ui-themeable'
+import {InstUISettingsProvider} from '@instructure/emotion'
 import {Flex} from '@instructure/ui-flex'
 import {Mask} from '@instructure/ui-overlays'
 import {
@@ -38,6 +38,12 @@ const I18n = useI18nScope('FindOutcomesModal')
 
 const titleValidator = composeValidators(requiredValidator, maxLengthValidator(255))
 
+const componentOverrides = {
+  Mask: {
+    zIndex: '1000',
+  },
+}
+
 const GroupEditForm = ({initialValues, onSubmit, isOpen, onCloseHandler}) => {
   return (
     <Form
@@ -47,7 +53,7 @@ const GroupEditForm = ({initialValues, onSubmit, isOpen, onCloseHandler}) => {
         const {valid, dirty} = form.getState()
 
         return (
-          <ApplyTheme theme={{[Mask.theme]: {zIndex: '1000'}}}>
+          <InstUISettingsProvider theme={{componentOverrides}}>
             <Modal
               label={I18n.t('Edit Group')}
               open={isOpen}
@@ -62,7 +68,7 @@ const GroupEditForm = ({initialValues, onSubmit, isOpen, onCloseHandler}) => {
                   <Flex.Item size="50%" padding="0 xx-small 0 0">
                     <LabeledTextField
                       name="title"
-                      label={I18n.t('Group Name')}
+                      renderLabel={I18n.t('Group Name')}
                       type="text"
                       size="medium"
                       validate={titleValidator}
@@ -94,7 +100,7 @@ const GroupEditForm = ({initialValues, onSubmit, isOpen, onCloseHandler}) => {
                 </Button>
               </Modal.Footer>
             </Modal>
-          </ApplyTheme>
+          </InstUISettingsProvider>
         )
       }}
     />

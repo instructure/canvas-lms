@@ -175,6 +175,12 @@ describe AssignmentsHelper do
     it "returns nil when passed a nil grade and a grading_type of pass_fail" do
       expect(i18n_grade(nil, "pass_fail")).to be_nil
     end
+
+    it "returns a grade with trailing en-dash replaced with minus when grading_type is letter_grade" do
+      en_dash = "-"
+      minus = "−"
+      expect(i18n_grade("B#{en_dash}", "letter_grade")).to eq "B#{minus}"
+    end
   end
 
   describe "#student_peer_review_link_for" do

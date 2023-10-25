@@ -17,7 +17,6 @@
  */
 import React, {useEffect, useRef, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
-// @ts-expect-error -- TODO: remove once we're on InstUI 8
 import {Modal} from '@instructure/ui-modal'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'

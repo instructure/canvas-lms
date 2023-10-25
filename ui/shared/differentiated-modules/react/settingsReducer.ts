@@ -27,6 +27,7 @@ export type SettingsPanelState = {
   requirementCount: 'all' | 'one'
   requireSequentialProgress: boolean
   requirements: Requirement[]
+  publishFinalGrade: boolean
 }
 
 export const defaultState: SettingsPanelState = {
@@ -38,6 +39,7 @@ export const defaultState: SettingsPanelState = {
   requirementCount: 'all',
   requireSequentialProgress: false,
   requirements: [],
+  publishFinalGrade: false,
 }
 
 export const enum actions {
@@ -49,6 +51,7 @@ export const enum actions {
   SET_REQUIREMENT_COUNT = 'SET_REQUIREMENT_COUNT',
   SET_REQUIRE_SEQUENTIAL_PROGRESS = 'SET_REQUIRE_SEQUENTIAL_PROGRESS',
   SET_REQUIREMENTS = 'SET_REQUIREMENTS',
+  SET_PUBLISH_FINAL_GRADE = 'SET_PUBLISH_FINAL_GRADE',
 }
 
 export function reducer(
@@ -72,6 +75,8 @@ export function reducer(
       return {...state, requireSequentialProgress: action.payload}
     case actions.SET_REQUIREMENTS:
       return {...state, requirements: action.payload}
+    case actions.SET_PUBLISH_FINAL_GRADE:
+      return {...state, publishFinalGrade: action.payload}
     default:
       return state
   }

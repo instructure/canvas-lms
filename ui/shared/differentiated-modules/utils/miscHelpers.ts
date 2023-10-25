@@ -46,7 +46,6 @@ export function convertModuleSettingsForApi(moduleSettings: SettingsPanelState) 
       name: moduleSettings.moduleName,
       unlock_at: moduleSettings.lockUntilChecked ? moduleSettings.unlockAt : null,
       prerequisites: moduleSettings.prerequisites
-        .filter(prerequisite => prerequisite.id !== '-1')
         .map(prerequisite => `module_${prerequisite.id}`)
         .join(','),
       completion_requirements: moduleSettings.requirements.reduce((requirements, requirement) => {
@@ -59,6 +58,7 @@ export function convertModuleSettingsForApi(moduleSettings: SettingsPanelState) 
       requirement_count: moduleSettings.requirementCount === 'one' ? '1' : '',
       require_sequential_progress:
         moduleSettings.requirementCount === 'all' && moduleSettings.requireSequentialProgress,
+      publish_final_grade: moduleSettings.publishFinalGrade,
     },
   }
 }

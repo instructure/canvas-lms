@@ -163,6 +163,7 @@ const GRADEBOOK_STUDENT_QUERY_MOCK_RESPONSE = {
             gradingPeriodId: '1',
             deductedPoints: null,
             enteredGrade: '68%',
+            gradeMatchesCurrentSubmission: true,
           },
           {
             grade: '2',
@@ -183,6 +184,7 @@ const GRADEBOOK_STUDENT_QUERY_MOCK_RESPONSE = {
             gradingPeriodId: '1',
             deductedPoints: null,
             enteredGrade: '2%',
+            gradeMatchesCurrentSubmission: true,
           },
         ],
       },

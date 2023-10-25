@@ -72,6 +72,14 @@ export function transformRceContentForEditing(
       }
     })
 
+  // fixup LTI iframe launches to use the `in_rce` display type
+  container.querySelectorAll('iframe[src]').forEach(element => {
+    const src = element.getAttribute('src')
+    if (src?.includes('display=borderless')) {
+      element.setAttribute('src', src.replace('display=borderless', 'display=in_rce'))
+    }
+  })
+
   return container.innerHTML
 }
 

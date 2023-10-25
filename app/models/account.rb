@@ -2329,7 +2329,7 @@ class Account < ActiveRecord::Base
       end
       users.each do |user|
         # don't write to the shadow record
-        user = User.find(user.id) unless user.canonical?
+        user.reload unless user.canonical?
 
         user.preferences.delete(:dashboard_view)
         user.save!

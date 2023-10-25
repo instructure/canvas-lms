@@ -20,7 +20,7 @@ import React, {useEffect, useState} from 'react'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {EnrollmentTreeGroup} from './EnrollmentTreeGroup'
 import {Spinner} from '@instructure/ui-spinner'
-import {splitArrayByProperty} from './helpers'
+import {splitArrayByProperty} from './util/helpers'
 
 interface RoleChoice {
   id: string
@@ -282,7 +282,7 @@ export function EnrollmentTree(props: Props) {
     return {currNode, rId}
   }
 
-  const updateTreeCheck = (node: NodeStructure, newState: boolean) => {
+  const handleUpdateTreeCheck = (node: NodeStructure, newState: boolean) => {
     // change all children to match status of parent
     const {currNode, rId} = locateNode(node)
     const isRole = rId.slice(1) === props.selectedRole.id || props.selectedRole.id === ''
@@ -341,7 +341,7 @@ export function EnrollmentTree(props: Props) {
     }
   }
 
-  const updateTreeToggle = (node: NodeStructure, newState: boolean) => {
+  const handleUpdateTreeToggle = (node: NodeStructure, newState: boolean) => {
     const {currNode} = locateNode(node)
     currNode.isToggle = newState
     setTree([...tree])
@@ -356,12 +356,8 @@ export function EnrollmentTree(props: Props) {
           id={tree[role].id}
           label={tree[role].label}
           indent="0"
-          updateCheck={(node: NodeStructure, state: boolean) => {
-            updateTreeCheck(node, state)
-          }}
-          updateToggle={(node: NodeStructure, state: boolean) => {
-            updateTreeToggle(node, state)
-          }}
+          updateCheck={handleUpdateTreeCheck}
+          updateToggle={handleUpdateTreeToggle}
           isCheck={tree[role].isCheck}
           isToggle={tree[role].isToggle}
           isMixed={tree[role].isMixed}

@@ -20,7 +20,7 @@ import React from 'react'
 import {Portal} from '@instructure/ui-portal'
 import SideNav from './SideNav'
 
-export default function NavigationHeaderRoute() {
+export function Component() {
   const mountPoint: HTMLElement | null = document.getElementById('header')
   if (!mountPoint) {
     return null

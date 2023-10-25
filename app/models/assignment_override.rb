@@ -103,7 +103,7 @@ class AssignmentOverride < ActiveRecord::Base
   after_commit :update_cached_due_dates
 
   def set_not_empty?
-    overridable = assignment? ? assignment : quiz
+    overridable = assignment || quiz || context_module
     ["CourseSection", "Group", SET_TYPE_NOOP, "Course"].include?(set_type) ||
       (set.any? && overridable.context.current_enrollments.where(user_id: set).exists?)
   end

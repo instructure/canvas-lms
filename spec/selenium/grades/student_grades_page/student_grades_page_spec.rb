@@ -243,6 +243,7 @@ describe "gradebook - logged in as a student" do
 
         # Check the "calculate based only on graded assignments" option
         f("#only_consider_graded_assignments_wrapper").click
+        wait_for_ajaximations
 
         # Verify that the correct assignments are being dropped
         dropped_assignments = ffj("tr[data-testid='assignment-row']:contains('Dropped')")
@@ -293,6 +294,7 @@ describe "gradebook - logged in as a student" do
 
         # Check the "calculate based only on graded assignments" option
         f("#only_consider_graded_assignments_wrapper").click
+        wait_for_ajaximations
 
         # Verify that the correct assignments are being dropped
         dropped_assignments = ffj("tr[data-testid='assignment-row']::contains('Dropped')")
@@ -333,6 +335,7 @@ describe "gradebook - logged in as a student" do
 
         # Check the "calculate based only on graded assignments" option
         f("#only_consider_graded_assignments_wrapper").click
+        wait_for_ajaximations
 
         # Verify that the correct assignments are being dropped
         dropped_assignments = ffj("tr[data-testid='assignment-row']::contains('Dropped')")
@@ -401,6 +404,7 @@ describe "gradebook - logged in as a student" do
 
         # Check the "calculate based only on graded assignments" option
         f("#only_consider_graded_assignments_wrapper").click
+        wait_for_ajaximations
 
         # Verify that the correct assignments are being dropped
         dropped_assignments = ffj("tr[data-testid='assignment-row']:contains('Dropped')")
@@ -476,6 +480,7 @@ describe "gradebook - logged in as a student" do
 
         # Check the "calculate based only on graded assignments" option
         f("#only_consider_graded_assignments_wrapper").click
+        wait_for_ajaximations
 
         # Verify that the correct assignments are being dropped
         dropped_assignments = ffj("tr[data-testid='assignment-row']:contains('Dropped'), tr[data-testid='assignment-row']:contains('Excused')")
@@ -560,10 +565,10 @@ describe "gradebook - logged in as a student" do
 
       # the all the grades and grading period selected is based on current period
       expect(f("#grading_period_select_menu").attribute(:value)).to eq current_period_name
-      expect(f("div.final_grade").text).to eq "Total: B-"
-      expect(fj(current_assignment_selector).text).to include "GRADED\nB-\nYour grade has been updated"
-      expect(f("tr[data-testid='agtotal-Assignments']").text).to eq "Assignments B-"
-      expect(f("tr[data-testid='total_row']").text).to eq "Total B-"
+      expect(f("div.final_grade").text).to eq "Total: B−"
+      expect(fj(current_assignment_selector).text).to include "GRADED\nB−\nYour grade has been updated"
+      expect(f("tr[data-testid='agtotal-Assignments']").text).to eq "Assignments B−"
+      expect(f("tr[data-testid='total_row']").text).to eq "Total B−"
       expect(f("body")).not_to contain_jqcss(future_assignment_selector)
 
       # switch to future grading period and check that everything is based on the future period
@@ -584,11 +589,11 @@ describe "gradebook - logged in as a student" do
       wait_for_ajaximations
 
       expect(fj(future_assignment_selector).text).to include "GRADED\nA\nYour grade has been updated"
-      expect(fj(current_assignment_selector).text).to include "GRADED\nB-\nYour grade has been updated"
+      expect(fj(current_assignment_selector).text).to include "GRADED\nB−\nYour grade has been updated"
 
       # Make sure the grading period totals show because display_totals_for_all_grading_periods is true
       expect(fj("tr[data-testid='gradingPeriod-#{future_period.id}']").text).to eq "Future Grading Period A"
-      expect(fj("tr[data-testid='gradingPeriod-#{current_period.id}']").text).to eq "Current Grading Period B-"
+      expect(fj("tr[data-testid='gradingPeriod-#{current_period.id}']").text).to eq "Current Grading Period B−"
 
       group.update(display_totals_for_all_grading_periods: false)
       group.save!
@@ -633,6 +638,55 @@ describe "gradebook - logged in as a student" do
       get "/courses/#{@course.id}/grades/#{@student.id}"
 
       expect(f(".final_grade").text).to eq("Total: N/A")
+    end
+  end
+
+  context "assignment specific grading standard" do
+    before do
+      Account.site_admin.enable_feature! :student_grade_summary_upgrade
+      course_with_student({ active_course: true, active_enrollment: true })
+      @teacher = User.create!
+      @course.enroll_teacher(@teacher)
+      grading_standard = @course.grading_standards.create!(title: "Win/Lose", data: [["Winner", 0.94], ["Loser", 0]])
+      @assignment = @course.assignments.build(points_possible: 20, grading_type: "letter_grade", grading_standard_id: grading_standard.id)
+      @assignment.publish
+      @assignment.grade_student(@student, grade: 10, grader: @teacher)
+      @course.save!
+    end
+
+    it "shows the correct grading standard" do
+      user_session(@student)
+      get "/courses/#{@course.id}/grades/#{@student.id}"
+
+      expect(f("[data-testid='assignment-row']")).to include_text("Loser")
+    end
+  end
+
+  context "grade status" do
+    before do
+      course_with_student({ active_course: true, active_enrollment: true })
+      @teacher = User.create!
+      @course.enroll_teacher(@teacher)
+      @assignment = @course.assignments.create!(due_at: 1.week.from_now, title: "Current Assignment", grading_type: "points", points_possible: 10)
+    end
+
+    it "displays the standard grade status if one is applied" do
+      @submission = @assignment.grade_student(@student, grade: 10, grader: @teacher).first
+      @submission.update!(late_policy_status: "late")
+      user_session(@student)
+      StudentGradesPage.visit_as_student(@course)
+
+      expect(f(".submission-late-pill")).to be_displayed
+    end
+
+    it "displays the custom grade status if one is applied" do
+      @custom_status = CustomGradeStatus.create!(name: "Custom Status", color: "#000000", root_account_id: @course.root_account_id, created_by: @teacher)
+      @submission = @assignment.grade_student(@student, grade: 10, grader: @teacher).first
+      @submission.update!(custom_grade_status: @custom_status)
+      user_session(@student)
+      StudentGradesPage.visit_as_student(@course)
+
+      expect(f(".submission-custom-grade-status-pill-#{@custom_status.id}")).to be_displayed
     end
   end
 end

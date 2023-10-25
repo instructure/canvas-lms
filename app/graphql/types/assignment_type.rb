@@ -463,8 +463,14 @@ module Types
       filter = filter.to_h
       order_by ||= []
       filter[:states] ||= DEFAULT_SUBMISSION_STATES
+      filter[:states] = filter[:states] + ["unsubmitted"].freeze if filter[:include_unsubmitted]
       filter[:order_by] = order_by.map(&:to_h)
       SubmissionSearch.new(assignment, current_user, session, filter).search
+    end
+
+    field :grading_standard, GradingStandardType, null: true
+    def grading_standard
+      load_association(:grading_standard)
     end
 
     field :group_submissions_connection, SubmissionType.connection_type, null: true do

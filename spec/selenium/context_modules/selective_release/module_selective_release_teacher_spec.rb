@@ -20,12 +20,19 @@
 require_relative "../../helpers/context_modules_common"
 require_relative "../page_objects/modules_index_page"
 require_relative "../page_objects/modules_settings_tray"
+require_relative "../../dashboard/pages/k5_dashboard_page"
+require_relative "../../dashboard/pages/k5_dashboard_common_page"
+require_relative "../../../helpers/k5_common"
+require_relative "../shared_examples/module_selective_release_shared_examples"
 
 describe "selective_release module set up" do
   include_context "in-process server selenium tests"
   include ContextModulesCommon
   include ModulesIndexPage
   include ModulesSettingsTray
+  include K5DashboardPageObject
+  include K5DashboardCommonPageObject
+  include K5Common
 
   context "using tray to update settings" do
     before(:once) do
@@ -38,67 +45,7 @@ describe "selective_release module set up" do
       user_session(@teacher)
     end
 
-    it "accesses the modules tray for a module and closes" do
-      go_to_modules
-      manage_module_button(@module).click
-
-      # maybe should use a settings option when available
-      module_index_menu_tool_link("Assign To...").click
-
-      click_settings_tray_close_button
-
-      expect(settings_tray_exists?).to be_falsey
-    end
-
-    it "accesses the modules tray for a module and cancels" do
-      go_to_modules
-      manage_module_button(@module).click
-
-      # maybe should use a settings option when available
-      module_index_menu_tool_link("Assign To...").click
-
-      click_settings_tray_cancel_button
-
-      expect(settings_tray_exists?).to be_falsey
-    end
-
-    it "accesses the modules tray and click between settings and assign to" do
-      go_to_modules
-      manage_module_button(@module).click
-
-      # should use a settings option when available
-      module_index_menu_tool_link("Assign To...").click
-
-      expect(assign_to_panel).to be_displayed
-
-      click_settings_tab
-      expect(settings_panel).to be_displayed
-
-      click_assign_to_tab
-      expect(assign_to_tab).to be_displayed
-    end
-
-    it "shows 'View Assign To' when a module has an assignment override" do
-      @module.assignment_overrides.create!
-      go_to_modules
-
-      expect(view_assign.text).to eq "View Assign To"
-    end
-
-    it "doesn't show 'View Assign To' when a module has no assignment overrides" do
-      go_to_modules
-
-      expect(view_assign.text).to eq ""
-    end
-
-    it "accesses the modules tray for a module via the 'View Assign To' button" do
-      @module.assignment_overrides.create!
-      go_to_modules
-
-      view_assign.click
-
-      expect(settings_tray_exists?).to be true
-    end
+    it_behaves_like "selective_release module tray", :context_modules
   end
 
   context "uses tray to update prerequisites" do
@@ -117,8 +64,7 @@ describe "selective_release module set up" do
     it "has no add prerequisites button when first module" do
       go_to_modules
       manage_module_button(@module).click
-      module_index_menu_tool_link("Assign To...").click
-      click_settings_tab
+      module_index_menu_tool_link("Edit").click
 
       expect(add_prerequisites_button_exists?).to be_falsey
     end
@@ -126,8 +72,7 @@ describe "selective_release module set up" do
     it "accesses prerequisites dropdown for module and assigns prerequisites" do
       go_to_modules
       manage_module_button(@module3).click
-      module_index_menu_tool_link("Assign To...").click
-      click_settings_tab
+      module_index_menu_tool_link("Edit").click
 
       click_add_prerequisites_button
       expect(prerequisites_dropdown[0]).to be_displayed
@@ -141,44 +86,148 @@ describe "selective_release module set up" do
       expect(prerequisite_message(@module3).text).to eq("Prerequisites: module2")
     end
 
-    it "adds more than one prerequisite to a module" do
-      go_to_modules
-      manage_module_button(@module3).click
-      module_index_menu_tool_link("Assign To...").click
-      click_settings_tab
-
-      click_add_prerequisites_button
-
-      select_prerequisites_dropdown_option(0, "module2")
-      expect(prerequisites_dropdown_value(0)).to eq("module2")
-
-      click_add_prerequisites_button
-
-      select_prerequisites_dropdown_option(1, "module")
-      expect(prerequisites_dropdown_value(1)).to eq("module")
-
-      click_settings_tray_update_module_button
-
-      expect(prerequisite_message(@module3).text).to eq("Prerequisites: module2, module")
-    end
+    it_behaves_like "selective_release module tray prerequisites", :context_modules
 
     it "does not save prerequisites selected when update cancelled." do
       go_to_modules
       manage_module_button(@module2).click
-      module_index_menu_tool_link("Assign To...").click
-      click_settings_tab
+      module_index_menu_tool_link("Edit").click
 
       click_add_prerequisites_button
       expect(prerequisites_dropdown[0]).to be_displayed
 
-      select_prerequisites_dropdown_option(0, "module")
+      select_prerequisites_dropdown_option(0, @module.name)
 
-      expect(prerequisites_dropdown_value(0)).to eq("module")
+      expect(prerequisites_dropdown_value(0)).to eq(@module.name)
 
       click_settings_tray_cancel_button
 
       expect(prerequisite_message(@module2).text).not_to eq("Prerequisites: module2")
     end
+  end
+
+  context "uses tray to update module requirements" do
+    before(:once) do
+      Account.site_admin.enable_feature! :differentiated_modules
+      course_with_teacher(active_all: true)
+      module_setup
+      @module2 = @course.context_modules.create!(name: "module2")
+      @module2.add_item type: "assignment", id: @assignment2.id
+      @module3 = @course.context_modules.create!(name: "module3")
+    end
+
+    before do
+      user_session(@teacher)
+    end
+
+    it "selects complete all requirements shows one requirement card" do
+      go_to_modules
+
+      scroll_to_the_top_of_modules_page
+      manage_module_button(@module).click
+      module_index_menu_tool_link("Edit").click
+
+      click_add_requirement_button
+
+      expect(is_checked(complete_all_radio_checked)).to be true
+      expect(module_requirement_card.length).to eq(1)
+    end
+
+    it "selects complete all requirements and clicks sequential order" do
+      go_to_modules
+
+      scroll_to_the_top_of_modules_page
+      expect(require_sequential_progress(@module.id).attribute("textContent")).to eq("")
+      manage_module_button(@module).click
+      module_index_menu_tool_link("Edit").click
+      click_add_requirement_button
+      click_sequential_order_checkbox
+      click_settings_tray_update_module_button
+
+      expect(require_sequential_progress(@module.id).attribute("textContent")).to eq("true")
+    end
+
+    it "selects complete one requirement" do
+      go_to_modules
+
+      scroll_to_the_top_of_modules_page
+      manage_module_button(@module).click
+      module_index_menu_tool_link("Edit").click
+      click_add_requirement_button
+      click_complete_one_radio
+      expect(is_checked(complete_one_radio_checked)).to be true
+      expect(module_requirement_card.length).to eq(1)
+      expect(element_exists?(sequential_order_checkbox_selector, true)).to be false
+    end
+
+    it "does not show Requirements button for module with no items" do
+      go_to_modules
+
+      scroll_to_module(@module3.name)
+
+      manage_module_button(@module3).click
+      module_index_menu_tool_link("Edit").click
+      expect(element_exists?(module_requirement_card_selector)).to be false
+    end
+
+    it "deletes a requirement that was created" do
+      go_to_modules
+
+      scroll_to_the_top_of_modules_page
+      manage_module_button(@module).click
+      module_index_menu_tool_link("Edit").click
+
+      click_add_requirement_button
+      select_requirement_item_option(0, @assignment2.title)
+      expect(element_value_for_attr(requirement_item[0], "title")).to eq(@assignment2.title)
+
+      click_add_requirement_button
+      select_requirement_item_option(1, @assignment3.title)
+      expect(element_value_for_attr(requirement_item[1], "title")).to eq(@assignment3.title)
+      expect(module_requirement_card.length).to eq(2)
+      click_remove_requirement_button(1)
+      expect(module_requirement_card.length).to eq(1)
+    end
+
+    it "update complete all with no sequential order for several requirements" do
+      go_to_modules
+
+      scroll_to_the_top_of_modules_page
+      manage_module_button(@module).click
+      module_index_menu_tool_link("Edit").click
+      click_add_requirement_button
+      click_sequential_order_checkbox
+      select_requirement_item_option(0, @assignment2.title)
+      select_requirement_type_option(0, "Mark as done")
+      click_add_requirement_button
+      select_requirement_item_option(1, @assignment3.title)
+      select_requirement_type_option(1, "Submit the assignment")
+
+      click_settings_tray_update_module_button
+      validate_correct_pill_message(@module.id, "Complete All Items")
+    end
+
+    it "updates requirement type and shows on modules page" do
+      go_to_modules
+
+      scroll_to_the_top_of_modules_page
+      manage_module_button(@module).click
+      module_index_menu_tool_link("Edit").click
+      click_add_requirement_button
+      select_requirement_item_option(0, @assignment2.title)
+      select_requirement_type_option(0, "Mark as done")
+      click_settings_tray_update_module_button
+      assignment_tag = retrieve_assignment_content_tag(@module, @assignment2)
+      expect(f("#{module_item_selector(assignment_tag.ids[0])} .requirement_type")).to have_class "must_mark_done_requirement"
+
+      manage_module_button(@module).click
+      module_index_menu_tool_link("Edit").click
+      select_requirement_type_option(0, "Submit the assignment")
+      click_settings_tray_update_module_button
+      expect(f("#{module_item_selector(assignment_tag.ids[0])} .requirement_type")).to have_class "must_submit_requirement"
+    end
+
+    it_behaves_like "selective release module tray requirements", :context_modules
   end
 
   context "uses tray to update assign to settings" do
@@ -193,6 +242,9 @@ describe "selective_release module set up" do
       @course.enroll_user(@student2, "StudentEnrollment", enrollment_state: "active")
 
       module_setup
+      @module2 = @course.context_modules.create!(name: "module2")
+      @module2.add_item type: "assignment", id: @assignment2.id
+      @module3 = @course.context_modules.create!(name: "module3")
     end
 
     before do
@@ -267,20 +319,7 @@ describe "selective_release module set up" do
       expect(assignee_selection_item[0].text).to eq("section1")
     end
 
-    it "adds both user and section to assignee list" do
-      go_to_modules
-      manage_module_button(@module).click
-      module_index_menu_tool_link("Assign To...").click
-      click_custom_access_radio
-
-      assignee_selection.send_keys("user")
-      click_option(assignee_selection, "user1")
-      assignee_selection.send_keys("section")
-      click_option(assignee_selection, "section1")
-
-      assignee_list = assignee_selection_item.map(&:text)
-      expect(assignee_list.sort).to eq(%w[section1 user1])
-    end
+    it_behaves_like "selective_release module tray assign to", :context_modules
 
     it "deletes added assignee by clicking on it" do
       go_to_modules
@@ -307,5 +346,29 @@ describe "selective_release module set up" do
       click_clear_all
       expect(element_exists?(assignee_selection_item_selector)).to be false
     end
+  end
+
+  context "Canvas for Elementary Modules Selective Release" do
+    before :once do
+      Account.site_admin.enable_feature! :differentiated_modules
+      teacher_setup
+      module_setup(@subject_course)
+      @section1 = @subject_course.course_sections.create!(name: "section1")
+      @section2 = @subject_course.course_sections.create!(name: "section2")
+      @student1 = student_in_course(course: @subject_course, active_all: true, name: "user1").user
+      @student2 = student_in_course(coure: @subject_course, active_all: true, name: "Student 4", section: @section2).user
+      @module2 = @subject_course.context_modules.create!(name: "module2")
+      @module2.add_item type: "assignment", id: @assignment2.id
+      @module3 = @subject_course.context_modules.create!(name: "module3")
+    end
+
+    before do
+      user_session(@homeroom_teacher)
+    end
+
+    it_behaves_like "selective_release module tray", :canvas_for_elementary
+    it_behaves_like "selective_release module tray prerequisites", :canvas_for_elementary
+    it_behaves_like "selective_release module tray assign to", :canvas_for_elementary
+    it_behaves_like "selective release module tray requirements", :canvas_for_elementary
   end
 end

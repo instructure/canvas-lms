@@ -584,13 +584,16 @@ describe Mutations::ImportOutcomes do
       # force the creation of root outcome group in the course
       @course.root_outcome_group
 
+      # rubocop:disable Layout/MultilineMethodCallIndentation
+      # see https://github.com/rubocop/rubocop/issues/12261
       expect do
         exec(outcome_id: get_outcome_id("Root group outcome"))
       end.to not_change(LearningOutcomeGroup, :count)
         .and(change(ContentTag, :count).by(1))
-        .and change {
+        .and(change do
                @course.root_outcome_group.child_outcome_links.map { |link| link.content.title }
-             }.from([]).to(["Root group outcome"])
+             end.from([]).to(["Root group outcome"]))
+      # rubocop:enable Layout/MultilineMethodCallIndentation
     end
   end
 

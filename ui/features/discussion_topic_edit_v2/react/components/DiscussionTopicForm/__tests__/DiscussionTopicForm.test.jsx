@@ -26,6 +26,7 @@ jest.mock('@canvas/rce/react/CanvasRce')
 const setup = ({
   isEditing = false,
   currentDiscussionTopic = {},
+  assignmentGroups = [],
   isStudent = false,
   sections = [],
   groupCategories = [],
@@ -33,6 +34,7 @@ const setup = ({
 } = {}) => {
   return render(
     <DiscussionTopicForm
+      assignmentGroups={assignmentGroups}
       isEditing={isEditing}
       currentDiscussionTopic={currentDiscussionTopic}
       isStudent={isStudent}
@@ -44,9 +46,71 @@ const setup = ({
 }
 
 describe('DiscussionTopicForm', () => {
+  afterEach(() => {
+    window.ENV = {}
+  })
+
   it('renders', () => {
     const document = setup()
     expect(document.getByText('Topic Title')).toBeInTheDocument()
+  })
+
+  describe('Announcement Alerts', () => {
+    it('shows an alert when creating an announcement in an unpublished course', () => {
+      window.ENV = {
+        DISCUSSION_TOPIC: {
+          ATTRIBUTES: {
+            is_announcement: true,
+            course_published: false,
+          },
+        },
+      }
+
+      const document = setup()
+      expect(
+        document.getByText(
+          'Notifications will not be sent retroactively for announcements created before publishing your course or before the course start date. You may consider using the Delay Posting option and set to publish on a future date.'
+        )
+      ).toBeInTheDocument()
+    })
+
+    it('shows an alert when editing an announcement in an published course', () => {
+      window.ENV = {
+        DISCUSSION_TOPIC: {
+          ATTRIBUTES: {
+            id: 5000,
+            is_announcement: true,
+            course_published: true,
+          },
+        },
+      }
+
+      const document = setup()
+      expect(
+        document.getByText(
+          'Users do not receive updated notifications when editing an announcement. If you wish to have users notified of this update via their notification settings, you will need to create a new announcement.'
+        )
+      ).toBeInTheDocument()
+    })
+
+    it('shows the unpublished alert when editing an announcement in an unpublished course', () => {
+      window.ENV = {
+        DISCUSSION_TOPIC: {
+          ATTRIBUTES: {
+            id: 88,
+            is_announcement: true,
+            course_published: false,
+          },
+        },
+      }
+
+      const document = setup()
+      expect(
+        document.getByText(
+          'Notifications will not be sent retroactively for announcements created before publishing your course or before the course start date. You may consider using the Delay Posting option and set to publish on a future date.'
+        )
+      ).toBeInTheDocument()
+    })
   })
 
   describe('Title entry', () => {
@@ -109,14 +173,14 @@ describe('DiscussionTopicForm', () => {
         },
       }
 
-      const {queryByText, getByLabelText, queryByLabelText} = setup()
+      const {queryByText, queryByTestId, getByLabelText, queryByLabelText} = setup()
       expect(queryByLabelText('Add to student to-do')).toBeInTheDocument()
       expect(queryByText('All Sections')).toBeInTheDocument()
-      expect(queryByText('Graded options here')).not.toBeInTheDocument() // TODO: Update in Phase 2
+      expect(queryByTestId('assignment-settings-section')).not.toBeInTheDocument()
       getByLabelText('Graded').click()
       expect(queryByLabelText('Add to student to-do')).not.toBeInTheDocument()
       expect(queryByLabelText('Post to')).not.toBeInTheDocument()
-      expect(queryByText('Graded options here')).toBeInTheDocument() // TODO: Update in Phase 2
+      expect(queryByTestId('assignment-settings-section')).toBeInTheDocument()
     })
   })
 })

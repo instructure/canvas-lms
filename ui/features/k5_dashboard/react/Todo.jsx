@@ -88,7 +88,7 @@ const Todo = ({
             {formattedCount}
           </AccessibleContent>
         )}
-        theme={{
+        themeOverride={{
           fontSize: '1rem',
           fontWeight: '700',
           size: '1.5rem',
@@ -99,7 +99,7 @@ const Todo = ({
           href={html_url}
           target={openInNewTab ? '_blank' : undefined}
           isWithinText={false}
-          theme={{
+          themeOverride={{
             fontWeight: '700',
           }}
         >
@@ -114,7 +114,7 @@ const Todo = ({
           </View>
           {/* The dot is tiny in Balsamiq Sans, which is why we're forcing Lato here */}
           <PresentationContent>
-            <View margin="0 small" theme={{fontFamily: 'Lato, Arial, sans-serif'}}>
+            <View margin="0 small" themeOverride={{fontFamily: 'Lato, Arial, sans-serif'}}>
               •
             </View>
           </PresentationContent>

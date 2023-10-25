@@ -19,7 +19,7 @@
 import React, {useState, useRef, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import AnonymousResponseSelector from '@canvas/discussions/react/components/AnonymousResponseSelector/AnonymousResponseSelector'
-import GroupCategoryModalContainer from '../../containers/GroupCategoryModalContainer/GroupCategoryModalContainer'
+import {CreateOrEditSetModal} from '@canvas/groups/react/CreateOrEditSetModal'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {View} from '@instructure/ui-view'
@@ -34,6 +34,10 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 import {DateTimeInput} from '@instructure/ui-date-time-input'
 import CanvasMultiSelect from '@canvas/multi-select'
 import CanvasRce from '@canvas/rce/react/CanvasRce'
+import {Alert} from '@instructure/ui-alerts'
+import {GradedDiscussionOptions} from '../GradedDiscussionOptions/GradedDiscussionOptions'
+
+import {addNewGroupCategoryToCache} from '../../utils'
 
 const I18n = useI18nScope('discussion_create')
 
@@ -41,15 +45,47 @@ export default function DiscussionTopicForm({
   isEditing,
   currentDiscussionTopic,
   isStudent,
+  assignmentGroups,
   sections,
   groupCategories,
   onSubmit,
+  isGroupContext,
+  apolloClient,
 }) {
   const rceRef = useRef()
 
-  const allSectionsOption = {_id: 'all-sections', name: 'All Sections'}
+  const isAnnouncement = ENV.DISCUSSION_TOPIC?.ATTRIBUTES?.is_announcement ?? false
+  const isUnpublishedAnnouncement =
+    isAnnouncement && !ENV.DISCUSSION_TOPIC?.ATTRIBUTES.course_published
+  const isEditingAnnouncement = isAnnouncement && ENV.DISCUSSION_TOPIC?.ATTRIBUTES.id
 
-  const inputWidth = '50%'
+  const announcementAlertProps = () => {
+    if (isUnpublishedAnnouncement) {
+      return {
+        id: 'announcement-course-unpublished-alert',
+        key: 'announcement-course-unpublished-alert',
+        variant: 'warning',
+        text: I18n.t(
+          'Notifications will not be sent retroactively for announcements created before publishing your course or before the course start date. You may consider using the Delay Posting option and set to publish on a future date.'
+        ),
+      }
+    } else if (isEditingAnnouncement) {
+      return {
+        id: 'announcement-no-notification-on-edit',
+        key: 'announcement-no-notification-on-edit',
+        variant: 'info',
+        text: I18n.t(
+          'Users do not receive updated notifications when editing an announcement. If you wish to have users notified of this update via their notification settings, you will need to create a new announcement.'
+        ),
+      }
+    } else {
+      return null
+    }
+  }
+
+  const allSectionsOption = {_id: 'all', name: 'All Sections'}
+
+  const inputWidth = '100%'
 
   const [title, setTitle] = useState('')
   const [titleValidationMessages, setTitleValidationMessages] = useState([
@@ -58,7 +94,7 @@ export default function DiscussionTopicForm({
 
   const [rceContent, setRceContent] = useState('')
 
-  const [sectionIdsToPostTo, setSectionIdsToPostTo] = useState(['all-sections'])
+  const [sectionIdsToPostTo, setSectionIdsToPostTo] = useState(['all'])
 
   const [discussionAnonymousState, setDiscussionAnonymousState] = useState('off')
   // default anonymousAuthorState to true, since it is the default selection for partial anonymity
@@ -74,6 +110,9 @@ export default function DiscussionTopicForm({
   const [todoDate, setTodoDate] = useState(null)
   const [isGroupDiscussion, setIsGroupDiscussion] = useState(false)
   const [groupCategoryId, setGroupCategoryId] = useState(null)
+  const [groupCategorySelectError, setGroupCategorySelectError] = useState([])
+  const [delayPosting, setDelayPosting] = useState(false)
+  const [locked, setLocked] = useState(false)
 
   const [availableFrom, setAvailableFrom] = useState(null)
   const [availableUntil, setAvailableUntil] = useState(null)
@@ -85,12 +124,14 @@ export default function DiscussionTopicForm({
   const [published, setPublished] = useState(false)
 
   // To be implemented in phase 2, kept as a reminder
-  // const [pointsPossible, setPointsPossible] = useState(0)
-  // const [displayGradeAs, setDisplayGradeAs] = useState('letter')
-  // const [assignmentGroup, setAssignmentGroup] = useState('')
-  // const [peerReviewAssignment, setPeerReviewAssignment] = useState('off')
-  // const [assignTo, setAssignTo] = useState('')
-  // const [dueDate, setDueDate] = useState(0)
+  const [pointsPossible, setPointsPossible] = useState(0)
+  const [displayGradeAs, setDisplayGradeAs] = useState('points')
+  const [assignmentGroup, setAssignmentGroup] = useState('')
+  const [peerReviewAssignment, setPeerReviewAssignment] = useState('off')
+  const [peerReviewsPerStudent, setPeerReviewsPerStudent] = useState(1)
+  const [peerReviewDueDate, setPeerReviewDueDate] = useState('')
+  const [assignTo, setAssignTo] = useState('')
+  const [dueDate, setDueDate] = useState('')
 
   const [showGroupCategoryModal, setShowGroupCategoryModal] = useState(false)
 
@@ -99,8 +140,11 @@ export default function DiscussionTopicForm({
 
     setTitle(currentDiscussionTopic.title)
     setRceContent(currentDiscussionTopic.message)
-
-    setSectionIdsToPostTo(currentDiscussionTopic.courseSections.map(section => section._id))
+    const sectionIds =
+      currentDiscussionTopic.courseSections && currentDiscussionTopic.courseSections.length > 0
+        ? currentDiscussionTopic.courseSections.map(section => section._id)
+        : ['all']
+    setSectionIdsToPostTo(sectionIds)
     setDiscussionAnonymousState(currentDiscussionTopic.anonymousState || 'off')
     setAnonymousAuthorState(currentDiscussionTopic.isAnonymousAuthor)
     setRequireInitialPost(currentDiscussionTopic.requireInitialPost)
@@ -116,9 +160,11 @@ export default function DiscussionTopicForm({
 
     setAvailableFrom(currentDiscussionTopic.delayedPostAt)
     setAvailableUntil(currentDiscussionTopic.lockAt)
+    setDelayPosting(!!currentDiscussionTopic.delayedPostAt && isAnnouncement)
+    setLocked(currentDiscussionTopic.locked && isAnnouncement)
 
     setPublished(currentDiscussionTopic.published)
-  }, [isEditing, currentDiscussionTopic, discussionAnonymousState])
+  }, [isEditing, currentDiscussionTopic, discussionAnonymousState, isAnnouncement])
 
   const validateTitle = newTitle => {
     if (newTitle.length > 255) {
@@ -150,8 +196,23 @@ export default function DiscussionTopicForm({
     }
   }
 
+  const validateSelectGroup = () => {
+    if (!isGroupDiscussion) return true // if not a group discussion, no need to validate
+    if (groupCategoryId) return true // if a group category is selected, validated
+
+    // if not a group discussion and no group category is selected, show error
+    setGroupCategorySelectError([{text: I18n.t('Please select a group category.'), type: 'error'}])
+    return false
+  }
+
   const validateFormFields = () => {
-    return validateTitle(title) && validateAvailability(availableFrom, availableUntil)
+    let isValid = true
+
+    if (!validateTitle(title)) isValid = false
+    if (!validateAvailability(availableFrom, availableUntil)) isValid = false
+    if (!validateSelectGroup()) isValid = false
+
+    return isValid
   }
 
   const submitForm = shouldPublish => {
@@ -171,10 +232,12 @@ export default function DiscussionTopicForm({
         addToTodo,
         todoDate,
         isGroupDiscussion,
-        groupCategoryId,
+        groupCategoryId: isGroupDiscussion ? groupCategoryId : null,
         availableFrom,
         availableUntil,
         shouldPublish: isEditing ? published : shouldPublish,
+        locked,
+        isAnnouncement,
       })
       return true
     }
@@ -184,6 +247,9 @@ export default function DiscussionTopicForm({
   return (
     <>
       <FormFieldGroup description="" rowSpacing="small">
+        {(isUnpublishedAnnouncement || isEditingAnnouncement) && (
+          <Alert variant={announcementAlertProps().variant}>{announcementAlertProps().text}</Alert>
+        )}
         <TextInput
           renderLabel={I18n.t('Topic Title')}
           type={I18n.t('text')}
@@ -213,7 +279,7 @@ export default function DiscussionTopicForm({
           defaultContent={isEditing ? currentDiscussionTopic?.message : ''}
           autosave={false}
         />
-        {!isGraded && !isGroupDiscussion && (
+        {!isGraded && !isGroupDiscussion && !isGroupContext && (
           <View display="block" padding="medium none">
             <CanvasMultiSelect
               data-testid="section-select"
@@ -256,7 +322,8 @@ export default function DiscussionTopicForm({
           </View>
         )}
         <Text size="large">{I18n.t('Options')}</Text>
-        {ENV.context_is_not_group &&
+        {!isGroupContext &&
+          !isAnnouncement &&
           (ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MODERATE ||
             ENV.allow_student_anonymous_discussion_topics) && (
             <View display="block" margin="medium 0">
@@ -272,7 +339,7 @@ export default function DiscussionTopicForm({
                   }
                   setDiscussionAnonymousState(value)
                 }}
-                disabled={isEditing}
+                disabled={isEditing || isGraded}
               >
                 <RadioInput
                   key="off"
@@ -306,13 +373,53 @@ export default function DiscussionTopicForm({
             </View>
           )}
         <FormFieldGroup description="" rowSpacing="small">
-          <Checkbox
-            data-testid="require-initial-post-checkbox"
-            label={I18n.t('Participants must respond to the topic before viewing other replies')}
-            value="must-respond-before-viewing-replies"
-            checked={requireInitialPost}
-            onChange={() => setRequireInitialPost(!requireInitialPost)}
-          />
+          {isAnnouncement && !isGroupContext && (
+            <Checkbox
+              label={I18n.t('Delay Posting')}
+              value="enable-delay-posting"
+              checked={delayPosting}
+              onChange={() => {
+                setDelayPosting(!delayPosting)
+                setAvailableFrom(null)
+              }}
+            />
+          )}
+          {delayPosting && !isGroupContext && (
+            <DateTimeInput
+              description={I18n.t('Post At')}
+              prevMonthLabel={I18n.t('previous')}
+              nextMonthLabel={I18n.t('next')}
+              onChange={(_event, newDate) => setAvailableFrom(newDate)}
+              value={availableFrom}
+              invalidDateTimeMessage={I18n.t('Invalid date and time')}
+              layout="columns"
+              datePlaceholder={I18n.t('Select Date')}
+              dateRenderLabel=""
+              timeRenderLabel=""
+            />
+          )}
+          {isAnnouncement && !isGroupContext && (
+            <Checkbox
+              label={I18n.t('Allow Participants to Comment')}
+              value="enable-participants-commenting"
+              checked={!locked}
+              onChange={() => {
+                setLocked(!locked)
+                setRequireInitialPost(false)
+              }}
+            />
+          )}
+          {!isGroupContext && (
+            <Checkbox
+              data-testid="require-initial-post-checkbox"
+              label={I18n.t('Participants must respond to the topic before viewing other replies')}
+              value="must-respond-before-viewing-replies"
+              checked={requireInitialPost}
+              onChange={() => setRequireInitialPost(!requireInitialPost)}
+              disabled={!(isAnnouncement === false || (isAnnouncement && !locked))}
+            />
+          )}
+
           <Checkbox
             label={I18n.t('Enable podcast feed')}
             value="enable-podcast-feed"
@@ -322,7 +429,7 @@ export default function DiscussionTopicForm({
               setEnablePodcastFeed(!enablePodcastFeed)
             }}
           />
-          {enablePodcastFeed && (
+          {enablePodcastFeed && !isGroupContext && (
             <View display="block" padding="none none none large">
               <Checkbox
                 label={I18n.t('Include student replies in podcast feed')}
@@ -332,7 +439,7 @@ export default function DiscussionTopicForm({
               />
             </View>
           )}
-          {discussionAnonymousState === 'off' && (
+          {discussionAnonymousState === 'off' && !isAnnouncement && !isGroupContext && (
             <Checkbox
               label={I18n.t('Graded')}
               value="graded"
@@ -366,8 +473,8 @@ export default function DiscussionTopicForm({
               )}
             </>
           )}
-          {/* TODO: for the checkbox to show, this should not be an announcement */}
           {!isGraded &&
+            !isAnnouncement &&
             ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MANAGE_CONTENT &&
             ENV.STUDENT_PLANNER_ENABLED && (
               <Checkbox
@@ -395,7 +502,7 @@ export default function DiscussionTopicForm({
               />
             </View>
           )}
-          {discussionAnonymousState === 'off' && (
+          {discussionAnonymousState === 'off' && !isAnnouncement && !isGroupContext && (
             <Checkbox
               data-testid="group-discussion-checkbox"
               label={I18n.t('This is a Group Discussion')}
@@ -407,7 +514,7 @@ export default function DiscussionTopicForm({
               }}
             />
           )}
-          {discussionAnonymousState === 'off' && isGroupDiscussion && (
+          {discussionAnonymousState === 'off' && isGroupDiscussion && !isGroupContext && (
             <View display="block" padding="none none none large">
               <SimpleSelect
                 renderLabel={I18n.t('Group Set')}
@@ -420,9 +527,11 @@ export default function DiscussionTopicForm({
                     setShowGroupCategoryModal(true)
                   } else {
                     setGroupCategoryId(value)
+                    setGroupCategorySelectError([])
                   }
                 }}
-                placeholder={I18n.t('Select Group')}
+                messages={groupCategorySelectError}
+                placeholder={I18n.t('Select a group category')}
                 width={inputWidth}
               >
                 {groupCategories.map(({_id: id, name: label}) => (
@@ -440,56 +549,89 @@ export default function DiscussionTopicForm({
                   id="opt-new-group-category"
                   value="new-group-category"
                   renderBeforeLabel={IconAddLine}
+                  data-testid="group-category-opt-new-group-category"
                 >
                   {I18n.t('New Group Category')}
                 </SimpleSelect.Option>
               </SimpleSelect>
 
-              <GroupCategoryModalContainer
-                show={showGroupCategoryModal}
-                setShow={setShowGroupCategoryModal}
-                afterCreate={setGroupCategoryId}
-              />
+              {showGroupCategoryModal && (
+                <CreateOrEditSetModal
+                  closed={!showGroupCategoryModal}
+                  onDismiss={newGroupCategory => {
+                    setShowGroupCategoryModal(false)
+                    if (!newGroupCategory) return
+                    addNewGroupCategoryToCache(apolloClient.cache, newGroupCategory)
+                    setGroupCategoryId(newGroupCategory.id)
+                  }}
+                  studentSectionCount={sections.length}
+                  context={ENV.context_type.toLocaleLowerCase()}
+                  contextId={ENV.context_id}
+                  allowSelfSignup={ENV.allow_self_signup}
+                />
+              )}
             </View>
           )}
         </FormFieldGroup>
-        {isGraded ? (
-          <div>Graded options here</div>
-        ) : (
-          <FormFieldGroup description="" width={inputWidth}>
-            <DateTimeInput
-              description={I18n.t('Available from')}
-              dateRenderLabel=""
-              timeRenderLabel=""
-              prevMonthLabel={I18n.t('previous')}
-              nextMonthLabel={I18n.t('next')}
-              value={availableFrom}
-              onChange={(_event, newAvailableFrom) => {
-                validateAvailability(newAvailableFrom, availableUntil)
-                setAvailableFrom(newAvailableFrom)
-              }}
-              datePlaceholder={I18n.t('Select Date')}
-              invalidDateTimeMessage={I18n.t('Invalid date and time')}
-              layout="columns"
-            />
-            <DateTimeInput
-              description={I18n.t('Until')}
-              dateRenderLabel=""
-              timeRenderLabel=""
-              prevMonthLabel={I18n.t('previous')}
-              nextMonthLabel={I18n.t('next')}
-              value={availableUntil}
-              onChange={(_event, newAvailableUntil) => {
-                validateAvailability(availableFrom, newAvailableUntil)
-                setAvailableUntil(newAvailableUntil)
-              }}
-              datePlaceholder={I18n.t('Select Date')}
-              invalidDateTimeMessage={I18n.t('Invalid date and time')}
-              messages={availabiltyValidationMessages}
-              layout="columns"
-            />
-          </FormFieldGroup>
-        )}
+        {!isAnnouncement &&
+          !isGroupContext &&
+          (isGraded ? (
+            <View as="div" data-testid="assignment-settings-section">
+              <GradedDiscussionOptions
+                assignmentGroups={assignmentGroups}
+                pointsPossible={pointsPossible}
+                setPointsPossible={setPointsPossible}
+                displayGradeAs={displayGradeAs}
+                setDisplayGradeAs={setDisplayGradeAs}
+                assignmentGroup={assignmentGroup}
+                setAssignmentGroup={setAssignmentGroup}
+                peerReviewAssignment={peerReviewAssignment}
+                setPeerReviewAssignment={setPeerReviewAssignment}
+                peerReviewsPerStudent={peerReviewsPerStudent}
+                setPeerReviewsPerStudent={setPeerReviewsPerStudent}
+                peerReviewDueDate={peerReviewDueDate}
+                setPeerReviewDueDate={setPeerReviewDueDate}
+                assignTo={assignTo}
+                setAssignTo={setAssignTo}
+                dueDate={dueDate}
+                setDueDate={setDueDate}
+              />
+            </View>
+          ) : (
+            <FormFieldGroup description="" width={inputWidth}>
+              <DateTimeInput
+                description={I18n.t('Available from')}
+                dateRenderLabel=""
+                timeRenderLabel=""
+                prevMonthLabel={I18n.t('previous')}
+                nextMonthLabel={I18n.t('next')}
+                value={availableFrom}
+                onChange={(_event, newAvailableFrom) => {
+                  validateAvailability(newAvailableFrom, availableUntil)
+                  setAvailableFrom(newAvailableFrom)
+                }}
+                datePlaceholder={I18n.t('Select Date')}
+                invalidDateTimeMessage={I18n.t('Invalid date and time')}
+                layout="columns"
+              />
+              <DateTimeInput
+                description={I18n.t('Until')}
+                dateRenderLabel=""
+                timeRenderLabel=""
+                prevMonthLabel={I18n.t('previous')}
+                nextMonthLabel={I18n.t('next')}
+                value={availableUntil}
+                onChange={(_event, newAvailableUntil) => {
+                  validateAvailability(availableFrom, newAvailableUntil)
+                  setAvailableUntil(newAvailableUntil)
+                }}
+                datePlaceholder={I18n.t('Select Date')}
+                invalidDateTimeMessage={I18n.t('Invalid date and time')}
+                messages={availabiltyValidationMessages}
+                layout="columns"
+              />
+            </FormFieldGroup>
+          ))}
         <View
           display="block"
           textAlign="end"
@@ -524,12 +666,15 @@ export default function DiscussionTopicForm({
 }
 
 DiscussionTopicForm.propTypes = {
+  assignmentGroups: PropTypes.arrayOf(PropTypes.object),
   isEditing: PropTypes.bool,
   currentDiscussionTopic: PropTypes.object,
   isStudent: PropTypes.bool,
   sections: PropTypes.arrayOf(PropTypes.object),
   groupCategories: PropTypes.arrayOf(PropTypes.object),
   onSubmit: PropTypes.func,
+  isGroupContext: PropTypes.bool,
+  apolloClient: PropTypes.object,
 }
 
 DiscussionTopicForm.defaultProps = {

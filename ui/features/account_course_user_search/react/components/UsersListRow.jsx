@@ -16,24 +16,88 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {string, func, object, shape, arrayOf} from 'prop-types'
+import React, {useEffect, useState} from 'react'
+import {arrayOf, func, object, shape, string} from 'prop-types'
 import {IconButton} from '@instructure/ui-buttons'
 import {Table} from '@instructure/ui-table'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {
+  IconCalendarClockLine,
+  IconCalendarClockSolid,
+  IconCalendarReservedSolid,
+  IconEditLine,
   IconMasqueradeLine,
   IconMessageLine,
-  IconEditLine,
-  IconCalendarClockLine,
 } from '@instructure/ui-icons'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import CreateOrUpdateUserModal from './CreateOrUpdateUserModal'
 import UserLink from './UserLink'
 import {TempEnrollModal} from '@canvas/temporary-enrollment/react/TempEnrollModal'
+import {fetchTemporaryEnrollments} from '@canvas/temporary-enrollment/react/api/enrollment'
+import {PROVIDER, RECIPIENT} from '@canvas/temporary-enrollment/react/types'
 
 const I18n = useI18nScope('account_course_user_search')
+
+/**
+ * Generate an appropriate icon based on the user’s role
+ *
+ * @param {string} role Role of the user (provider, recipient, or null)
+ * @returns {ReactElement} SVG icon element representing the user’s role
+ */
+export function generateIcon(role) {
+  let Icon
+  let color
+  let title
+
+  switch (role) {
+    case PROVIDER:
+      Icon = IconCalendarClockSolid
+      title = I18n.t('Provider of temporary enrollment, click to edit')
+      color = 'success'
+      break
+    case RECIPIENT:
+      Icon = IconCalendarReservedSolid
+      title = I18n.t('Recipient of temporary enrollment, click to edit')
+      color = 'success'
+      break
+    default:
+      Icon = IconCalendarClockLine
+      title = I18n.t('No temporary enrollment, click to create one')
+      break
+  }
+
+  return <Icon color={color} title={title} />
+}
+
+/**
+ * Generate title for a temporary enrollment modal based on the enrollment type
+ *
+ * @param {string} enrollmentType Type of enrollment (provider, recipient, or null)
+ * @param {string} name User name for display in enrollment title
+ * @returns {string} Title for the temporary enrollment modal
+ */
+export function generateTitle(enrollmentType, name) {
+  switch (enrollmentType) {
+    case PROVIDER:
+      return I18n.t('%{name}’s Temporary Enrollment Recipients', {name})
+    case RECIPIENT:
+      return I18n.t('%{name}’s Temporary Enrollment Providers', {name})
+    default:
+      return I18n.t('Assign temporary enrollments to %{name}', {name})
+  }
+}
+
+/**
+ * Determine the appropriate toggle function based on the context
+ *
+ * @param {Function|null} toggleFunction Toggle function to be used in the current context
+ * @param {Function|null} setEditModeFunction Edit function to be used in the current context
+ * @returns {Function|null} The appropriate toggle function based on the context
+ */
+export function determineToggleFunction(toggleFunction, setEditModeFunction) {
+  return toggleFunction || setEditModeFunction
+}
 
 export default function UsersListRow({
   accountId,
@@ -42,7 +106,11 @@ export default function UsersListRow({
   handleSubmitEditUserForm,
   roles,
 }) {
-  // don't show tempEnroll if permission to create enrollments are missing
+  const [editMode, setEditMode] = useState(false)
+  const [enrollmentsAsProvider, setEnrollmentsAsProvider] = useState([])
+  const [enrollmentsAsRecipient, setEnrollmentsAsRecipient] = useState([])
+
+  // check if user has permissions to enable the temporary enrollment feature
   const canTempEnroll =
     permissions.can_add_temporary_enrollments &&
     (permissions.can_manage_admin_users ||
@@ -52,12 +120,149 @@ export default function UsersListRow({
         permissions.can_add_ta &&
         permissions.can_add_observer))
 
+  // map role-specific and admin-level permissions to consolidated booleans
   const enrollPerm = {
     teacher: permissions.can_add_teacher || permissions.can_manage_admin_users,
     ta: permissions.can_add_ta || permissions.can_manage_admin_users,
     student: permissions.can_add_student || permissions.can_manage_admin_users,
     observer: permissions.can_add_observer || permissions.can_manage_admin_users,
     designer: permissions.can_add_observer || permissions.can_manage_admin_users,
+  }
+
+  useEffect(() => {
+    const fetchAllEnrollments = async () => {
+      try {
+        const [recipientData, providerData] = await Promise.all([
+          // provider-related enrollments
+          fetchTemporaryEnrollments(user.id, false),
+          // recipient-related enrollments
+          fetchTemporaryEnrollments(user.id, true),
+        ])
+
+        setEnrollmentsAsProvider(providerData)
+        setEnrollmentsAsRecipient(recipientData)
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('Failed to fetch enrollments: ', error)
+      }
+    }
+
+    fetchAllEnrollments()
+  }, [user.id])
+
+  // render temporary enrollment modal, tooltip, and icon
+  function renderTempEnrollModal(
+    enrollmentType,
+    tempEnrollments,
+    icon,
+    editModeStatus,
+    toggleOrSetEditModeFunction
+  ) {
+    const tooltipText = generateTitle(enrollmentType, user.name)
+
+    return (
+      <TempEnrollModal
+        title={generateTitle}
+        enrollmentType={enrollmentType}
+        user={user}
+        canReadSIS={permissions.can_read_sis}
+        permissions={enrollPerm}
+        accountId={accountId}
+        roles={roles}
+        tempEnrollments={tempEnrollments}
+        isEditMode={editModeStatus}
+        onToggleEditMode={toggleOrSetEditModeFunction}
+      >
+        <Tooltip data-testid="user-list-row-tooltip" renderTip={tooltipText}>
+          <IconButton
+            withBorder={false}
+            withBackground={false}
+            size="small"
+            screenReaderLabel={tooltipText}
+            onClick={toggleOrSetEditModeFunction}
+          >
+            {icon}
+          </IconButton>
+        </Tooltip>
+      </TempEnrollModal>
+    )
+  }
+
+  // toggle current edit mode state
+  function toggleEditMode() {
+    setEditMode(prev => !prev)
+  }
+
+  // set edit mode state explicitly using provided value
+  function setEditModeExplicitly(value) {
+    setEditMode(value)
+  }
+
+  // render appropriate icon(s) based on the user’s roles
+  function renderTempEnrollIcon() {
+    // checks for user not being a provider or recipient
+    if (enrollmentsAsProvider.length === 0 && enrollmentsAsRecipient.length === 0) {
+      return renderTempEnrollModal(null, null, generateIcon(), false, null, () =>
+        setEditModeExplicitly(false)
+      )
+    }
+
+    // checks for user being a provider but not a recipient
+    if (enrollmentsAsProvider.length > 0 && enrollmentsAsRecipient.length === 0) {
+      return renderTempEnrollModal(
+        PROVIDER,
+        enrollmentsAsProvider,
+        generateIcon(PROVIDER),
+        editMode,
+        determineToggleFunction(toggleEditMode, null)
+      )
+    }
+
+    // checks for user being a recipient but not a provider
+    if (enrollmentsAsProvider.length === 0 && enrollmentsAsRecipient.length > 0) {
+      return (
+        <>
+          {renderTempEnrollModal(
+            RECIPIENT,
+            enrollmentsAsRecipient,
+            generateIcon(RECIPIENT),
+            editMode,
+            determineToggleFunction(toggleEditMode, null)
+          )}
+
+          {renderTempEnrollModal(
+            null,
+            null,
+            generateIcon(),
+            false,
+            determineToggleFunction(null, () => setEditModeExplicitly(false))
+          )}
+        </>
+      )
+    }
+
+    // checks for user being both a provider and a recipient
+    if (enrollmentsAsProvider.length > 0 && enrollmentsAsRecipient.length > 0) {
+      return (
+        <>
+          {renderTempEnrollModal(
+            RECIPIENT,
+            enrollmentsAsRecipient,
+            generateIcon(RECIPIENT),
+            editMode,
+            determineToggleFunction(toggleEditMode, null)
+          )}
+
+          {renderTempEnrollModal(
+            PROVIDER,
+            enrollmentsAsProvider,
+            generateIcon(PROVIDER),
+            editMode,
+            determineToggleFunction(toggleEditMode, null)
+          )}
+        </>
+      )
+    }
   }
 
   return (
@@ -75,37 +280,8 @@ export default function UsersListRow({
       <Table.Cell data-heap-redact-text="">{user.sis_user_id}</Table.Cell>
       <Table.Cell>{user.last_login && <FriendlyDatetime dateTime={user.last_login} />}</Table.Cell>
       <Table.Cell>
-        {canTempEnroll && (
-          <TempEnrollModal
-            user={user}
-            canReadSIS={permissions.can_read_sis}
-            permissions={enrollPerm}
-            accountId={accountId}
-            roles={roles}
-          >
-            <Tooltip
-              data-testid="user-list-row-tooltip"
-              renderTip={I18n.t('Create temporary enrollment based on %{name}', {
-                name: user.name,
-              })}
-            >
-              <IconButton
-                withBorder={false}
-                withBackground={false}
-                size="small"
-                screenReaderLabel={I18n.t('Create temporary enrollment based on %{name}', {
-                  name: user.name,
-                })}
-              >
-                <IconCalendarClockLine
-                  title={I18n.t('Create temporary enrollment based on %{name}', {
-                    name: user.name,
-                  })}
-                />
-              </IconButton>
-            </Tooltip>
-          </TempEnrollModal>
-        )}
+        {canTempEnroll && renderTempEnrollIcon()}
+
         {permissions.can_masquerade && (
           <Tooltip
             data-testid="user-list-row-tooltip"

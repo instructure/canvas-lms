@@ -62,6 +62,26 @@ describe Lti::AppUtil do
       end
     end
 
+    context "display_type in_rce with FF disabled" do
+      let(:type) { "in_rce" }
+
+      before { Account.site_admin.disable_feature!(:lti_rce_postmessage_support) }
+
+      it "falls back to borderless" do
+        expect(Lti::AppUtil.display_template(type)).to eq(Lti::AppUtil::TOOL_DISPLAY_TEMPLATES["borderless"])
+      end
+    end
+
+    context "display_type in_rce with FF enabled" do
+      let(:type) { "in_rce" }
+
+      before { Account.site_admin.enable_feature!(:lti_rce_postmessage_support) }
+
+      it "renders the specified display type" do
+        expect(Lti::AppUtil.display_template(type)).to eq(Lti::AppUtil::TOOL_DISPLAY_TEMPLATES[type])
+      end
+    end
+
     it "renders the display_override if provided" do
       expect(Lti::AppUtil.display_template("default", display_override: "full_width")).to eq(Lti::AppUtil::TOOL_DISPLAY_TEMPLATES["full_width"])
     end

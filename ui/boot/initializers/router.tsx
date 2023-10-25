@@ -19,29 +19,53 @@
 import ReactDOM from 'react-dom'
 import React from 'react'
 import ready from '@instructure/ready'
-import {BrowserRouter, Routes, Route} from 'react-router-dom'
-import GroupNavigationSelectorRoute from '@canvas/group-navigation-selector/GroupNavigationSelectorRoute'
-import ActAsModalRoute from '../../features/act_as_modal/react/ActAsModalRoute'
-import NavigationHeaderRoute from '../../features/navigation_header/react/NavigationHeaderRoute'
+import {
+  createBrowserRouter,
+  createRoutesFromElements,
+  Route,
+  RouterProvider,
+} from 'react-router-dom'
+import {Spinner} from '@instructure/ui-spinner'
+import accountGradingSettingsRoutes from '../../features/account_grading_settings/routes/accountGradingSettingsRoutes'
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const App = () => {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/groups/:groupId/*" element={<GroupNavigationSelectorRoute />} />
-        <Route path="/users/:userId/masquerade" element={<ActAsModalRoute />} />
+const I18n = useI18nScope('main')
 
-        {(window.ENV.FEATURES.instui_nav || localStorage.instui_nav_dev) && (
-          <Route path="/accounts/:accountId/*" element={<NavigationHeaderRoute />} />
-        )}
-      </Routes>
-    </BrowserRouter>
+const portalRouter = createBrowserRouter(
+  createRoutesFromElements(
+    <Route>
+      <Route
+        path="/groups/:groupId/*"
+        lazy={() => import('@canvas/group-navigation-selector/GroupNavigationSelectorRoute')}
+      />
+      <Route
+        path="/users/:userId/masquerade"
+        lazy={() => import('../../features/act_as_modal/react/ActAsModalRoute')}
+      />
+
+      {accountGradingSettingsRoutes}
+
+      {(window.ENV.FEATURES.instui_nav || localStorage.instui_nav_dev) && (
+        <Route
+          path="/accounts/:accountId/*"
+          lazy={() => import('../../features/navigation_header/react/NavigationHeaderRoute')}
+        />
+      )}
+
+      <Route path="*" element={<></>} />
+    </Route>
   )
-}
+)
 
 ready(() => {
-  const mountNode = document.querySelector('#react-router')
+  const mountNode = document.querySelector('#react-router-portals')
   if (mountNode) {
-    ReactDOM.render(<App />, mountNode)
+    ReactDOM.render(
+      <RouterProvider
+        router={portalRouter}
+        fallbackElement={<Spinner renderTitle={I18n.t('Loading page')} />}
+      />,
+      mountNode
+    )
   }
 })

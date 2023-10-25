@@ -81,6 +81,19 @@ shared_examples_for "an object whose dates are overridable" do
         override.save!
       end
 
+      it "works with an ADHOC context module override" do
+        Account.site_admin.enable_feature!(:differentiated_modules)
+        module1 = @course.context_modules.create!(name: "Module 1")
+        overridable.context_module_tags.create! context_module: module1, context: @course, tag_type: "context_module"
+
+        module_override = module1.assignment_overrides.create!
+        override_student = module_override.assignment_override_students.build
+        override_student.user = @student
+        override_student.save!
+
+        expect(overridable.overrides_for(@student, ensure_set_not_empty: true).size).to eq 1
+      end
+
       it "returns adhoc overrides when active students enrolled in adhoc set" do
         override_student = override.assignment_override_students.build
         override_student.user = @student
@@ -370,6 +383,32 @@ shared_examples_for "an object whose dates are overridable" do
   describe "without_overrides" do
     it "returns an object with no overrides applied" do
       expect(overridable.without_overrides.overridden).to be_falsey
+    end
+  end
+
+  describe "all_assignment_overrides" do
+    before do
+      student_in_course(course:)
+      override.override_due_at(7.days.from_now)
+      override.set_type = "ADHOC"
+      override.save!
+
+      module1 = @course.context_modules.create!(name: "Module 1")
+      overridable.context_module_tags.create! context_module: module1, context: @course, tag_type: "context_module"
+
+      @module_override = module1.assignment_overrides.create!
+      override_student = @module_override.assignment_override_students.build
+      override_student.user = @student
+      override_student.save!
+    end
+
+    it "includes context module overrides" do
+      Account.site_admin.enable_feature!(:differentiated_modules)
+      expect(overridable.all_assignment_overrides).to include(@module_override)
+    end
+
+    it "does not include context module overrides without the flag" do
+      expect(overridable.all_assignment_overrides).not_to include(@module_override)
     end
   end
 

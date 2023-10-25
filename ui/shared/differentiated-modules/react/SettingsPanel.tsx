@@ -20,7 +20,6 @@ import React, {useReducer, useMemo} from 'react'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {TextInput} from '@instructure/ui-text-input'
-// @ts-expect-error -- remove once on InstUI 8
 import {Checkbox} from '@instructure/ui-checkbox'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import PrerequisiteForm from './PrerequisiteForm'
@@ -37,9 +36,6 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('differentiated_modules')
 
-// Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
-const {Item: FlexItem} = Flex as any
-
 export interface SettingsPanelProps {
   height: string
   onDismiss: () => void
@@ -53,6 +49,8 @@ export interface SettingsPanelProps {
   requireSequentialProgress?: boolean
   requirements?: Requirement[]
   moduleItems?: ModuleItem[]
+  publishFinalGrade?: boolean
+  enablePublishFinalGrade?: boolean
 }
 
 export default function SettingsPanel({
@@ -66,6 +64,8 @@ export default function SettingsPanel({
   requirementCount,
   requireSequentialProgress,
   requirements,
+  publishFinalGrade,
+  enablePublishFinalGrade = false,
   moduleList = [],
   moduleItems = [],
 }: SettingsPanelProps) {
@@ -78,6 +78,7 @@ export default function SettingsPanel({
     requirements: requirements ?? [],
     requirementCount: requirementCount ?? 'all',
     requireSequentialProgress: requireSequentialProgress ?? false,
+    publishFinalGrade: publishFinalGrade ?? false,
   })
 
   const availableModules = useMemo(() => {
@@ -119,13 +120,13 @@ export default function SettingsPanel({
 
   return (
     <Flex direction="column" justifyItems="space-between" height={height}>
-      <FlexItem shouldGrow={true} padding="small">
+      <Flex.Item shouldGrow={true} padding="small">
         <View as="div" padding="small">
           <TextInput
             renderLabel={I18n.t('Module Name')}
             value={state.moduleName}
             messages={state.nameInputMessages}
-            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               const {value} = e.target
               dispatch({type: actions.SET_MODULE_NAME, payload: value})
               if (value.trim().length > 0) {
@@ -136,6 +137,7 @@ export default function SettingsPanel({
         </View>
         <View as="div" padding="x-small small">
           <Checkbox
+            data-testid="lock-until-checkbox"
             label={I18n.t('Lock Until')}
             checked={state.lockUntilChecked}
             onChange={() =>
@@ -144,7 +146,7 @@ export default function SettingsPanel({
           />
         </View>
         {state.lockUntilChecked && (
-          <View as="div" padding="small">
+          <View data-testid="lock-until-input" as="div" padding="small">
             <DateTimeInput
               value={state.unlockAt}
               layout="columns"
@@ -241,15 +243,26 @@ export default function SettingsPanel({
             />
           </View>
         )}
-      </FlexItem>
-      <FlexItem>
+        {enablePublishFinalGrade && (
+          <View as="div" padding="small">
+            <Checkbox
+              label={I18n.t('Publish final grade for the student when this module is completed')}
+              checked={state.publishFinalGrade}
+              onChange={() =>
+                dispatch({type: actions.SET_PUBLISH_FINAL_GRADE, payload: !state.publishFinalGrade})
+              }
+            />
+          </View>
+        )}
+      </Flex.Item>
+      <Flex.Item>
         <Footer
           updateButtonLabel={I18n.t('Update Module')}
           onDismiss={onDismiss}
           onUpdate={handleUpdate}
           disableUpdate={state.nameInputMessages.length > 0}
         />
-      </FlexItem>
+      </Flex.Item>
     </Flex>
   )
 }

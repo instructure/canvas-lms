@@ -49,6 +49,22 @@ export interface AssignmentOverride {
   }
 }
 
+interface SectionOverride {
+  id?: string
+  course_section_id: string
+}
+
+interface StudentsOverride {
+  id?: string
+  student_ids: string[]
+}
+
+export type AssignmentOverridePayload = SectionOverride | StudentsOverride
+
+export type AssignmentOverridesPayload = {
+  overrides: AssignmentOverridePayload[]
+}
+
 interface BaseRequirement extends ModuleItem {
   type: RequirementType
 }

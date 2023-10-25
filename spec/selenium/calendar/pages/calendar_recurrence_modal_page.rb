@@ -54,7 +54,7 @@ module CalendarRecurrenceModalPage
   end
 
   def recurrence_end_date_selector
-    "//*[@aria-label='Custom Repeating Event']//input[@aria-haspopup = 'listbox' and @role = 'combobox']"
+    "[data-testid='recurrence-ends-on-input']"
   end
 
   def repeat_month_mode_selector
@@ -108,7 +108,7 @@ module CalendarRecurrenceModalPage
   end
 
   def recurrence_end_date
-    fxpath(recurrence_end_date_selector)
+    f(recurrence_end_date_selector)
   end
 
   def repeat_month_mode

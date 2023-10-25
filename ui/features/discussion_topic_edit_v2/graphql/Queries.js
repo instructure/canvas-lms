@@ -17,6 +17,7 @@
  */
 
 import {Course} from './Course'
+import {Group} from './Group'
 import {DiscussionTopic} from './DiscussionTopic'
 import gql from 'graphql-tag'
 
@@ -36,4 +37,13 @@ export const COURSE_QUERY = gql`
     }
   }
   ${Course.fragment}
+`
+
+export const GROUP_QUERY = gql`
+  query GetGroupQuery($groupId: ID!) {
+    legacyNode(_id: $groupId, type: Group) {
+      ...Group
+    }
+  }
+  ${Group.fragment}
 `

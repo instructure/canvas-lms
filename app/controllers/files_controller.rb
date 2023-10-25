@@ -713,7 +713,8 @@ class FilesController < ApplicationController
           @headers = false
           @show_left_side = false
         end
-        if attachment.content_type&.match(%r{\Avideo/|audio/|application/pdf})
+        if attachment.content_type&.match(%r{\Avideo/|audio/}) || (attachment.canvadocable? ||
+          GoogleDocsPreview.previewable?(@domain_root_account, attachment))
           attachment.context_module_action(@current_user, :read)
         end
         format.html do

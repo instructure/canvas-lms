@@ -22,17 +22,12 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextInput} from '@instructure/ui-text-input'
 import numberHelper from '@canvas/i18n/numberHelper'
-// @ts-expect-error -- TODO: remove once we're on InstUI 8
 import {IconPlusLine, IconTrashLine} from '@instructure/ui-icons'
 import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
-// @ts-expect-error -- TODO: remove once we're on InstUI 8
 import {Tooltip} from '@instructure/ui-tooltip'
 
 const I18n = useI18nScope('GradingSchemeManagement')
-
-// Doing this to avoid TS2339 errors -- TODO: remove once we're on InstUI 8
-const {Item} = Flex as any
 
 interface ComponentProps {
   letterGrade: string
@@ -121,12 +116,12 @@ export const GradingSchemeDataRowInput = ({
     }
   }, [highRangeDefaultDisplay, validateHighRange])
 
-  // @ts-expect-error -- TODO: remove once we're on InstUI 8
+  // @ts-expect-error
   const handleLetterGradeChange = event => {
     onRowLetterGradeChange(event.target.value)
   }
 
-  // @ts-expect-error -- TODO: remove once we're on InstUI 8
+  // @ts-expect-error
   const handleRowLowRangeChange = event => {
     const lowRangeInputAsString = event.target.value
     const lowRange = numberHelper._parseNumber(lowRangeInputAsString)
@@ -134,7 +129,7 @@ export const GradingSchemeDataRowInput = ({
     onLowRangeChange(lowRangeInputAsString)
   }
 
-  // @ts-expect-error -- TODO: remove once we're on InstUI 8
+  // @ts-expect-error
   const handleLowRangeBlur = event => {
     const lowRangeInputAsString = event.target.value
     const lowRange = numberHelper._parseNumber(lowRangeInputAsString)
@@ -142,7 +137,7 @@ export const GradingSchemeDataRowInput = ({
     onLowRangeBlur(lowRangeInputAsString)
   }
 
-  // @ts-expect-error -- TODO: remove once we're on InstUI 8
+  // @ts-expect-error
   const handleRowHighRangeChange = event => {
     if (!isFirstRow) {
       throw Error('Only first row can set the (scheme) high range')
@@ -156,7 +151,7 @@ export const GradingSchemeDataRowInput = ({
     onHighRangeChange(highRangeInputAsString)
   }
 
-  // @ts-expect-error -- TODO: remove once we're on InstUI 8
+  // @ts-expect-error
   const handleHighRangeBlur = event => {
     const highRangeInputAsString = event.target.value
     const highRange = numberHelper._parseNumber(highRangeInputAsString)
@@ -176,9 +171,11 @@ export const GradingSchemeDataRowInput = ({
                 'Add new row for a letter grade to grading scheme after this row'
               )}
               onClick={onRowAddRequested}
-              elementRef={(buttonRef: HTMLButtonElement) => {
+              elementRef={buttonRef => {
                 if (!buttonRef) return
+                // @ts-expect-error
                 buttonRef.onmouseover = () => setAddButtonHovering(true)
+                // @ts-expect-error
                 buttonRef.onmouseout = () => setAddButtonHovering(false)
               }}
             >
@@ -202,7 +199,11 @@ export const GradingSchemeDataRowInput = ({
             {isFirstRow && pointsBased ? (
               <>
                 <TextInput
-                  inputRef={(ref: HTMLInputElement) => (highRangeInputRef.current = ref)}
+                  elementRef={ref => {
+                    if (ref instanceof HTMLInputElement) {
+                      highRangeInputRef.current = ref
+                    }
+                  }}
                   isRequired={true}
                   renderLabel={
                     <ScreenReaderContent>{I18n.t('Upper limit of range')}</ScreenReaderContent>
@@ -227,15 +228,19 @@ export const GradingSchemeDataRowInput = ({
         </td>
         <td style={{width: '25%'}}>
           <Flex display="inline-flex">
-            <Item padding="x-small">{I18n.t('to')} </Item>
-            <Item>
+            <Flex.Item padding="x-small">{I18n.t('to')} </Flex.Item>
+            <Flex.Item>
               <span aria-label={I18n.t('Lower limit of range')}>
                 {isLastRow ? (
                   <>0{pointsBased ? <></> : <>%</>}</>
                 ) : (
                   <>
                     <TextInput
-                      inputRef={(ref: HTMLInputElement) => (lowRangeInputRef.current = ref)}
+                      inputRef={ref => {
+                        if (ref instanceof HTMLInputElement) {
+                          lowRangeInputRef.current = ref
+                        }
+                      }}
                       isRequired={true}
                       renderLabel={
                         <ScreenReaderContent>{I18n.t('Lower limit of range')}</ScreenReaderContent>
@@ -252,12 +257,12 @@ export const GradingSchemeDataRowInput = ({
                   </>
                 )}
               </span>
-            </Item>
+            </Flex.Item>
           </Flex>
         </td>
         <td>
           <Flex justifyItems="end">
-            <Item>
+            <Flex.Item>
               <IconButton
                 withBackground={false}
                 withBorder={false}
@@ -266,7 +271,7 @@ export const GradingSchemeDataRowInput = ({
               >
                 <IconTrashLine />
               </IconButton>
-            </Item>
+            </Flex.Item>
           </Flex>
         </td>
       </tr>

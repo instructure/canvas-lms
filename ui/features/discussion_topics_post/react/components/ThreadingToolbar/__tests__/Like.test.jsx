@@ -107,10 +107,9 @@ describe('Like', () => {
 
     it('uses mobile prop values', () => {
       const container = setup()
-      const outerHTML = container.getByTestId('like-button').outerHTML
-
-      const expectedMargin = `margin: 0px 1rem 0px 0px`
-      expect(outerHTML.includes(expectedMargin)).toBeTruthy()
+      expect(container.getByTestId('like-button').parentNode).toHaveStyle(
+        'margin: 0px 0.75rem 0px 0px'
+      )
     })
   })
 })

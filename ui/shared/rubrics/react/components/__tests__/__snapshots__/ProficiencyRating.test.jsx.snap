@@ -25,7 +25,6 @@ exports[`renders the ProficiencyRating component 1`] = `
           </ScreenReaderContent>
         }
         onChange={[Function]}
-        onClick={[Function]}
         readOnly={false}
         size="medium"
         variant="simple"
@@ -38,13 +37,9 @@ exports[`renders the ProficiencyRating component 1`] = `
     <TextInput
       defaultValue="Stellar"
       display="block"
-      inputContainerRef={[Function]}
-      inputRef={[Function]}
       isRequired={false}
       messages={null}
-      onBlur={[Function]}
       onChange={[Function]}
-      onFocus={[Function]}
       renderLabel={
         <ScreenReaderContent
           as="span"
@@ -64,13 +59,9 @@ exports[`renders the ProficiencyRating component 1`] = `
     <TextInput
       defaultValue="10"
       display="block"
-      inputContainerRef={[Function]}
-      inputRef={[Function]}
       isRequired={false}
       messages={null}
-      onBlur={[Function]}
       onChange={[Function]}
-      onFocus={[Function]}
       renderLabel={
         <ScreenReaderContent
           as="span"
@@ -98,23 +89,13 @@ exports[`renders the ProficiencyRating component 1`] = `
       <Popover
         color="primary"
         constrain="window"
-        contentRef={[Function]}
         defaultIsShowingContent={false}
         insertAt="bottom"
         isShowingContent={false}
         offsetX={0}
         offsetY={0}
         on="click"
-        onBlur={[Function]}
-        onClick={[Function]}
-        onFocus={[Function]}
         onHideContent={[Function]}
-        onKeyDown={[Function]}
-        onKeyUp={[Function]}
-        onMouseOut={[Function]}
-        onMouseOver={[Function]}
-        onPositionChanged={[Function]}
-        onPositioned={[Function]}
         onShowContent={[Function]}
         placement="bottom center"
         renderTrigger={
@@ -122,6 +103,7 @@ exports[`renders the ProficiencyRating component 1`] = `
             as="button"
             color="link"
             elementRef={[Function]}
+            forceButtonRole={true}
             iconPlacement="start"
             isWithinText={false}
           >

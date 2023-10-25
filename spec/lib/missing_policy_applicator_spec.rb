@@ -118,6 +118,21 @@ describe MissingPolicyApplicator do
       expect(submission.grade).to eql "F"
     end
 
+    describe "content participation" do
+      it "creates a content participation record after applying deductions" do
+        late_policy_missing_enabled
+        create_recent_assignment
+        submission = @course.submissions.first
+        submission.update_columns(score: nil, grade: nil, workflow_state: "unsubmitted")
+        applicator.apply_missing_deductions
+
+        expect(submission.content_participations.count).to eq 1
+        cpc = ContentParticipationCount.where(context_id: submission.course_id, user_id: submission.user_id, content_type: "Submission")
+        expect(cpc.count).to eq 1
+        expect(cpc.first.unread_count).to eq 1
+      end
+    end
+
     it 'sets the submission workflow state to "graded"' do
       late_policy_missing_enabled
       create_recent_assignment
@@ -431,19 +446,6 @@ describe MissingPolicyApplicator do
 
         it "does not queue a delayed job if the applicator marks no submissions as missing" do
           expect(Auditors::GradeChange).not_to receive(:bulk_record_submission_events)
-
-          applicator.apply_missing_deductions
-        end
-      end
-
-      context "when the fix_missing_policy_applicator_gradebook_history flag is not enabled" do
-        before do
-          Account.site_admin.disable_feature!(:fix_missing_policy_applicator_gradebook_history)
-        end
-
-        it "does not queue a delayed job when the applicator marks submissions as missing" do
-          assignment.submissions.update_all(score: nil, grade: nil)
-          expect(Auditors::GradeChange).not_to receive(:delay)
 
           applicator.apply_missing_deductions
         end

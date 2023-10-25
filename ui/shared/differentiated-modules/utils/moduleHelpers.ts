@@ -26,13 +26,13 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 const I18n = useI18nScope('differentiated_modules')
 
 const resourceTypeMap: Record<string, Requirement['resource']> = {
-  Assignment: 'assignment',
-  Quiz: 'quiz',
-  Attachment: 'file',
-  Page: 'page',
-  'Discussion Topic': 'discussion',
-  'External Url': 'externalUrl',
-  'External Tool': 'externalTool',
+  assignment: 'assignment',
+  quiz: 'quiz',
+  attachment: 'file',
+  wiki_page: 'page',
+  discussion_topic: 'discussion',
+  external_url: 'externalUrl',
+  context_external_tool: 'externalTool',
 }
 
 const requirementTypeMap: Record<string, Requirement['type']> = {
@@ -84,7 +84,7 @@ export function parseModule(element: HTMLDivElement) {
     element.querySelector('.requirements_message')?.getAttribute('data-requirement-type') ?? 'all'
   const requireSequentialProgress =
     element.querySelector('.require_sequential_progress')?.textContent === 'true'
-  const publishFinalGrade = !!element.querySelector('.publish_final_grade')?.textContent
+  const publishFinalGrade = element.querySelector('.publish_final_grade')?.textContent === 'true'
   const prerequisites = parsePrerequisites(element)
   const moduleList = parseModuleList()
   const requirements = parseRequirements(element)
@@ -133,16 +133,10 @@ function parseRequirements(element: HTMLDivElement) {
     element.querySelectorAll('.ig-row.with-completion-requirements')
   )
   return requirementElements.map((requirementNode: Element) => {
-    const id = requirementNode
-      .querySelector('[data-module-item-id]')
-      ?.getAttribute('data-module-item-id')
-    const name = requirementNode.querySelector('.item_name a')?.textContent?.trim() || ''
+    const id = requirementNode.querySelector('.id')?.textContent
+    const name = requirementNode.querySelector('.item_name a')?.getAttribute('title')?.trim() || ''
     const resource =
-      resourceTypeMap[
-        requirementNode
-          .querySelector('.type_icon')
-          ?.getAttribute('title') as Requirement['resource']
-      ]
+      resourceTypeMap[requirementNode.querySelector('.type')?.textContent || 'external_url']
     // One of these (the active one) has "display: block;" and the others are hidden
     const activeRequirementNode = Array.from(
       requirementNode.querySelectorAll('.requirement_type')
@@ -164,25 +158,47 @@ function parseRequirements(element: HTMLDivElement) {
 function parseModuleItems(element: HTMLDivElement) {
   const moduleItemElements = Array.from(element.querySelectorAll('.ig-row'))
   return moduleItemElements.map(moduleItem => {
-    const id = moduleItem
-      .querySelector('[data-module-item-id]')
-      ?.getAttribute('data-module-item-id')
-    const name = moduleItem.querySelector('.item_name a')?.textContent?.trim() || ''
+    const id = moduleItem.querySelector('.id')?.textContent
+    const name = moduleItem.querySelector('.item_name a')?.getAttribute('title')?.trim() || ''
     const resource =
-      resourceTypeMap[
-        moduleItem.querySelector('.type_icon')?.getAttribute('title') as Requirement['resource']
-      ]
+      resourceTypeMap[moduleItem.querySelector('.type')?.textContent || 'external_url']
     return {id, name, resource}
   })
 }
 
 export function updateModuleUI(moduleElement: HTMLDivElement, moduleSettings: SettingsPanelState) {
-  ;[updateName, updateUnlockTime, updatePrerequisites, updateRequirements].forEach(fn =>
-    fn(moduleElement, moduleSettings)
-  )
+  ;[
+    updateName,
+    updateUnlockTime,
+    updatePrerequisites,
+    updateRequirements,
+    updatePublishFinalGrade,
+  ].forEach(fn => fn(moduleElement, moduleSettings))
 }
 
 function updateName(moduleElement: HTMLDivElement, moduleSettings: SettingsPanelState) {
+  // Update other modules' prerequisites if they refer to this module
+  // Must be done before we update the old name to the new name below
+  const oldModuleName = moduleElement.getAttribute('aria-label')
+  if (oldModuleName && oldModuleName !== moduleSettings.moduleName) {
+    // Update the visible pieces that users see
+    document.querySelectorAll('.prerequisites_message').forEach(messageElement => {
+      if (messageElement.textContent?.includes(oldModuleName)) {
+        messageElement.textContent = messageElement.textContent.replace(
+          oldModuleName,
+          moduleSettings.moduleName
+        )
+      }
+    })
+
+    // Update the hidden piece that is used for parsing when opening the tray
+    document.querySelectorAll('.prerequisite_criterion > .name').forEach(nameElement => {
+      if (nameElement.textContent === oldModuleName) {
+        nameElement.textContent = moduleSettings.moduleName
+      }
+    })
+  }
+
   moduleElement.setAttribute('aria-label', moduleSettings.moduleName)
 
   const screenreaderOnlyElement = moduleElement.querySelector('.screenreader-only')
@@ -270,16 +286,11 @@ function updatePrerequisites(moduleElement: HTMLDivElement, moduleSettings: Sett
     // Clear everything out so we can start fresh
     prerequisiteElement.innerHTML = ''
 
-    // Remove any "[ Select Module ]" options
-    const actualPrerequisites = moduleSettings.prerequisites.filter(prereq => prereq.id !== '-1')
-
-    if (actualPrerequisites.length === 0) {
-      return
-    }
+    if (moduleSettings.prerequisites.length === 0) return
 
     // For parsing when opening the tray
     // Would love to simplify this, but we need backwards compatitibility
-    actualPrerequisites.forEach(prerequisite => {
+    moduleSettings.prerequisites.forEach(prerequisite => {
       const div = document.createElement('div')
       div.classList.add(...['prerequisite_criterion', 'context_module_criterion'])
       div.style.float = 'left'
@@ -295,7 +306,7 @@ function updatePrerequisites(moduleElement: HTMLDivElement, moduleSettings: Sett
       moduleElement.querySelector('.prerequisites_message') || document.createElement('div')
     prereqMessageElement.classList.add('prerequisites_message')
     prereqMessageElement.textContent = I18n.t('Prerequisites: %{names}', {
-      names: actualPrerequisites.map(prerequisite => prerequisite.name).join(', '),
+      names: moduleSettings.prerequisites.map(prerequisite => prerequisite.name).join(', '),
     })
     prerequisiteElement.appendChild(prereqMessageElement)
   }
@@ -369,4 +380,14 @@ function updateRequirements(moduleElement: HTMLDivElement, moduleSettings: Setti
       }
     }
   })
+}
+
+function updatePublishFinalGrade(
+  moduleElement: HTMLDivElement,
+  moduleSettings: SettingsPanelState
+) {
+  const publishFinalGradeElement = moduleElement.querySelector('.publish_final_grade')
+  if (publishFinalGradeElement) {
+    publishFinalGradeElement.textContent = moduleSettings.publishFinalGrade.toString()
+  }
 }

@@ -27,6 +27,19 @@ require "rails/test_unit/railtie"
 
 Bundler.require(*Rails.groups)
 
+if defined?(Spring)
+  Spring.after_fork do
+    if ENV["RUBY_DEBUG_OPEN"]
+      require "debug/session"
+      next unless defined?(DEBUGGER__)
+
+      DEBUGGER__.open(nonstop: ENV["RUBY_DEBUG_NONSTOP"])
+    elsif ENV["RUBY_DEBUG_START"]
+      require "debug/start"
+    end
+  end
+end
+
 module CanvasRails
   class Application < Rails::Application
     config.autoloader = :zeitwerk

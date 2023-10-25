@@ -18,10 +18,8 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
-// @ts-expect-error
 import {Tooltip} from '@instructure/ui-tooltip'
 import {IconButton} from '@instructure/ui-buttons'
-// @ts-expect-error
 import {IconWarningLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 

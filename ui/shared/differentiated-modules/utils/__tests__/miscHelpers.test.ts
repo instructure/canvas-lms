@@ -87,6 +87,7 @@ describe('convertModuleSettingsForApi', () => {
     ] as Requirement[],
     requirementCount: 'all' as const,
     requireSequentialProgress: false,
+    publishFinalGrade: true,
   }
 
   it('converts the module settings to the format expected by the API', () => {
@@ -104,6 +105,7 @@ describe('convertModuleSettingsForApi', () => {
         },
         requirement_count: '',
         require_sequential_progress: false,
+        publish_final_grade: true,
       },
     })
   })
@@ -133,7 +135,7 @@ describe('convertModuleSettingsForApi', () => {
     expect(formattedSettings.context_module.require_sequential_progress).toBe(true)
   })
 
-  it('has requirem_sequential_progress of false if count is one and RSP is true', () => {
+  it('has require_sequential_progress of false if count is one and RSP is true', () => {
     const formattedSettings = convertModuleSettingsForApi({
       ...moduleSettings,
       requirementCount: 'one',

@@ -24,6 +24,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Tag} from '@instructure/ui-tag'
 import {Alert} from '@instructure/ui-alerts'
+import {Tooltip} from '@instructure/ui-tooltip'
 import type {CamelizedGradingPeriod} from '@canvas/grading/grading.d'
 import type {Filter, FilterPreset} from '../gradebook.d'
 import type {AssignmentGroup, Module, Section, StudentGroupCategoryMap} from '../../../../../api.d'
@@ -36,8 +37,6 @@ import {useFilterDropdownData} from './FilterNav.utils'
 import {GradeStatus} from '@canvas/grading/accountGradingStatus'
 
 const I18n = useI18nScope('gradebook')
-
-const {Item: FlexItem} = Flex as any
 
 export type FilterNavProps = {
   modules: Module[]
@@ -64,6 +63,7 @@ export default function FilterNav({
   const addFilters = useStore(state => state.addFilters)
   const appliedFilters = useStore(state => state.appliedFilters)
   const applyFiltersButtonRef = useRef<HTMLButtonElement>(null)
+  const filterTagRef = useRef<(HTMLElement | null)[]>([])
 
   const handleClearFilters = () => {
     setAnnouncement(I18n.t('All Filters Have Been Cleared'))
@@ -71,7 +71,7 @@ export default function FilterNav({
     applyFiltersButtonRef.current?.focus()
   }
 
-  const activeFilterComponents = appliedFilters.filter(isFilterNotEmpty).map(filter => {
+  const activeFilterComponents = appliedFilters.filter(isFilterNotEmpty).map((filter, i) => {
     const label = getLabelForFilter(
       filter,
       assignmentGroups,
@@ -93,9 +93,14 @@ export default function FilterNav({
       <Tag
         data-testid={`applied-filter-${label}`}
         key={`staged-filter-${filter.id}`}
+        elementRef={(e: Element | null) => {
+          filterTagRef.current[i] = e as HTMLElement
+        }}
         text={
           <AccessibleContent alt={I18n.t('Remove %{filterName} Filter', {filterName: label})}>
-            {label}
+            <Tooltip renderTip={label} positionTarget={filterTagRef.current[i]}>
+              {label}
+            </Tooltip>
           </AccessibleContent>
         }
         dismissible={true}
@@ -146,9 +151,9 @@ export default function FilterNav({
       >
         {announcement}
       </Alert>
-      <FlexItem>
+      <Flex.Item>
         <Flex>
-          <FlexItem padding="0 small 0 0">
+          <Flex.Item padding="0 small 0 0">
             <FilterDropdown
               onOpenTray={() => setIsTrayOpen(true)}
               dataMap={dataMap}
@@ -156,14 +161,14 @@ export default function FilterNav({
               changeAnnouncement={changeAnnouncement}
               applyFiltersButtonRef={applyFiltersButtonRef}
             />
-          </FlexItem>
-          <FlexItem data-testid="filter-tags">
+          </Flex.Item>
+          <Flex.Item data-testid="filter-tags">
             {activeFilterComponents.length > 0 && activeFilterComponents}
-          </FlexItem>
+          </Flex.Item>
         </Flex>
-      </FlexItem>
+      </Flex.Item>
 
-      <FlexItem>
+      <Flex.Item>
         {activeFilterComponents.length > 0 && (
           <Link
             isWithinText={false}
@@ -175,7 +180,7 @@ export default function FilterNav({
             {I18n.t('Clear All Filters')}
           </Link>
         )}
-      </FlexItem>
+      </Flex.Item>
 
       <FilterTray
         isTrayOpen={isTrayOpen}

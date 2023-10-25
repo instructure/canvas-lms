@@ -61,5 +61,10 @@ module OpenAi
       response = Net::HTTP.post(URI(url), data.to_json, headers)
       JSON.parse(response.body)["choices"][0]["text"].strip
     end
+
+    def with_pgvector(&)
+      vector_schema = ActiveRecord::Base.connection.extension("vector").schema
+      ActiveRecord::Base.connection.add_schema_to_search_path(vector_schema, &)
+    end
   end
 end

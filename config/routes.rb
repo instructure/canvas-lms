@@ -1264,6 +1264,8 @@ CanvasRails::Application.routes.draw do
       put "courses/:course_id/assignments/:id", action: :update
       post "courses/:course_id/assignments/:assignment_id/duplicate", action: :duplicate
       delete "courses/:course_id/assignments/:id", action: :destroy, controller: :assignments
+      get "courses/:course_id/assignments/:assignment_id/date_details", action: :date_details, as: "course_assignment_date_details"
+      get "courses/:course_id/quizzes/:quiz_id/date_details", action: :date_details, as: "course_quiz_date_details"
     end
 
     scope(controller: "assignment_extensions") do

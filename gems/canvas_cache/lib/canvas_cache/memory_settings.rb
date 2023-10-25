@@ -23,7 +23,7 @@ class MemorySettings
     @settings = data || {}
   end
 
-  def get(key, default, skip_cache: false)
+  def get(key, default)
     @settings.fetch(key, default)
   end
 

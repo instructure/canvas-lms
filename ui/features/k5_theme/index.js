@@ -15,6 +15,6 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import k5Theme from '@canvas/k5/react/k5-theme'
+import {useK5Theme} from '@canvas/k5/react/k5-theme'
 
-k5Theme.use({fontOnly: true})
+useK5Theme({fontOnly: true})

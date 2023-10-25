@@ -64,7 +64,8 @@ export function FinalGradeOverrideTextBox({
       setFinalGradeOverridePercentage('')
       setInputValue('')
     } else if (gradingScheme && gradingScheme.data.length > 0) {
-      const inputVal = scoreToGrade(percentage, gradingScheme.data)
+      const grade = scoreToGrade(percentage, gradingScheme.data)
+      const inputVal = GradeFormatHelper.replaceDashWithMinus(grade)
       setInputValue(inputVal || '')
       if (!gradingScheme.pointsBased) {
         // hide all percentages if this scheme is points based

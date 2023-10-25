@@ -314,7 +314,7 @@ describe RequestThrottle do
     it "skips without redis enabled" do
       if Canvas.redis_enabled?
         allow(Canvas).to receive(:redis_enabled?).and_return(false)
-        expect_any_instance_of(Redis::Scripting::Module).not_to receive(:run)
+        expect(Canvas).not_to receive(:redis)
       end
       expect(strip_variable_headers(throttler.call(request_user_1))).to eq response
     end

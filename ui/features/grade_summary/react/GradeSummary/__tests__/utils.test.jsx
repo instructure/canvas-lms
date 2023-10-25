@@ -566,10 +566,10 @@ describe('util', () => {
       expect(getDisplayStatus(assignment)).toStrictEqual(expectedOutput)
     })
 
-    it('should return "Not Submission" status when no submissions exist', () => {
+    it('should return "Not Submitted" status when no submissions exist', () => {
       const assignment = {
         submissionsConnection: {
-          nodes: [],
+          nodes: [Submission.mock({state: 'unsubmitted'})],
         },
         dueAt: getTime(false),
       }
@@ -605,9 +605,11 @@ describe('util', () => {
       expect(getDisplayStatus(assignment)).toStrictEqual(expectedOutput)
     })
 
-    it('should return "Not Graded" status for other cases', () => {
-      const assignment = {}
-      const expectedOutput = <Pill>Not Graded</Pill>
+    it('should return "Not Submitted" status for other cases', () => {
+      const assignment = Assignment.mock({
+        submissionsConnection: {nodes: [Submission.mock({gradingStatus: null})]},
+      })
+      const expectedOutput = <Pill>Not Submitted</Pill>
       expect(getDisplayStatus(assignment)).toStrictEqual(expectedOutput)
     })
 
@@ -615,7 +617,7 @@ describe('util', () => {
       const assignment = {
         dueAt: getTime(true),
         submissionsConnection: {
-          nodes: [],
+          nodes: [Submission.mock({state: 'unsubmitted'})],
         },
       }
 
@@ -627,7 +629,7 @@ describe('util', () => {
       const assignment = {
         dueAt: getTime(false),
         submissionsConnection: {
-          nodes: [],
+          nodes: [Submission.mock({state: 'unsubmitted'})],
         },
       }
 
@@ -673,7 +675,7 @@ describe('util', () => {
 
       ENV.restrict_quantitative_data = true
 
-      expect(getDisplayScore(assignment, gradingStandard)).toEqual('A-')
+      expect(getDisplayScore(assignment, gradingStandard)).toEqual('A−')
     })
 
     it('calls getAssignmentLetterGrade when assignment uses letter grade or GPA scale grading types', () => {
@@ -683,7 +685,7 @@ describe('util', () => {
 
       const gradingStandard = GradingStandard.mock()
 
-      expect(getDisplayScore(assignment, gradingStandard)).toEqual('A-')
+      expect(getDisplayScore(assignment, gradingStandard)).toEqual('A−')
     })
 
     it('returns assignment percentage followed by "%" when assignment uses percentage grading type', () => {
@@ -822,19 +824,19 @@ describe('util', () => {
   describe('scorePercentageToLetterGrade', () => {
     const gradingStandard = GradingStandard.mock()
 
-    it('should return the correct letter grade for a given score', () => {
+    it('should return the correct letter grade for a given score, with trailing dash replaced with minus', () => {
       expect(scorePercentageToLetterGrade(1000, gradingStandard)).toBe('A')
       expect(scorePercentageToLetterGrade(95, gradingStandard)).toBe('A')
-      expect(scorePercentageToLetterGrade(90, gradingStandard)).toBe('A-')
+      expect(scorePercentageToLetterGrade(90, gradingStandard)).toBe('A−')
       expect(scorePercentageToLetterGrade(88, gradingStandard)).toBe('B+')
       expect(scorePercentageToLetterGrade(84, gradingStandard)).toBe('B')
-      expect(scorePercentageToLetterGrade(80, gradingStandard)).toBe('B-')
+      expect(scorePercentageToLetterGrade(80, gradingStandard)).toBe('B−')
       expect(scorePercentageToLetterGrade(77, gradingStandard)).toBe('C+')
       expect(scorePercentageToLetterGrade(74, gradingStandard)).toBe('C')
-      expect(scorePercentageToLetterGrade(70, gradingStandard)).toBe('C-')
+      expect(scorePercentageToLetterGrade(70, gradingStandard)).toBe('C−')
       expect(scorePercentageToLetterGrade(67, gradingStandard)).toBe('D+')
       expect(scorePercentageToLetterGrade(64, gradingStandard)).toBe('D')
-      expect(scorePercentageToLetterGrade(61, gradingStandard)).toBe('D-')
+      expect(scorePercentageToLetterGrade(61, gradingStandard)).toBe('D−')
       expect(scorePercentageToLetterGrade(0, gradingStandard)).toBe('F')
     })
 

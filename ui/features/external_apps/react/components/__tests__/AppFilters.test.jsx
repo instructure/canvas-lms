@@ -119,12 +119,26 @@ it('changes the filter to not_installed on Not Installed tab click', () => {
   wrapper = mount(<AppFilters />)
 
   wrapper.find('a[children="Not Installed"]').simulate('click')
-  expect(store.getState().filter).toEqual('not_installed')
+  const state = store.getState()
+  expect(state.filter).toEqual('not_installed')
+  expect(state.filterText).toEqual('')
 })
 
 it('changes the filter to installed on Installed tab click', () => {
   wrapper = mount(<AppFilters />)
 
   wrapper.find('a[children="Installed"]').simulate('click')
-  expect(store.getState().filter).toEqual('installed')
+  const state = store.getState()
+  expect(state.filter).toEqual('installed')
+  expect(state.filterText).toEqual('')
+})
+
+it('changes the filter based on the search input when provided', () => {
+  const searched = 'acclaim'
+  wrapper = mount(<AppFilters />)
+
+  wrapper.find('input').simulate('change', {target: {value: searched}})
+  const state = store.getState()
+  expect(state.filterText).toEqual(searched)
+  expect(state.filter).toEqual('all')
 })

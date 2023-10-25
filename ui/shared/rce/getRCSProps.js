@@ -46,8 +46,5 @@ export default function getRCSProps() {
     jwt: ENV.JWT,
     refreshToken: refreshToken(ENV.JWT),
     themeUrl: ENV.active_brand_config_json_url,
-    features: {
-      rce_ux_improvements: ENV.FEATURES?.rce_ux_improvements,
-    },
   }
 }

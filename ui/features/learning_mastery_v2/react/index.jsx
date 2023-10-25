@@ -20,7 +20,6 @@ import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
-import {Link} from '@instructure/ui-link'
 import {IconArrowOpenDownSolid} from '@instructure/ui-icons'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -29,7 +28,7 @@ import Gradebook from './Gradebook'
 import useRollups from './hooks/useRollups'
 import GradebookMenu from '@canvas/gradebook-menu/react/GradebookMenu'
 import {Flex} from '@instructure/ui-flex'
-import {ApplyTheme} from '@instructure/ui-themeable'
+import {InstUISettingsProvider} from '@instructure/emotion'
 import {IconButton} from '@instructure/ui-buttons'
 import LMGBContext, {getLMGBContext} from '@canvas/outcomes/react/contexts/LMGBContext'
 
@@ -48,8 +47,8 @@ const getRatings = ratings => {
   ]
 }
 
-const gradebookMenuOverride = {
-  [Link.theme]: {
+const componentOverrides = {
+  Link: {
     color: 'licorice',
   },
 }
@@ -78,7 +77,7 @@ const LearningMastery = ({courseId}) => {
 
   return (
     <LMGBContext.Provider value={contextValues}>
-      <ApplyTheme theme={gradebookMenuOverride}>
+      <InstUISettingsProvider theme={{componentOverrides}}>
         <Flex
           height="100%"
           display="flex"
@@ -107,7 +106,7 @@ const LearningMastery = ({courseId}) => {
             />
           </View>
         </Flex>
-      </ApplyTheme>
+      </InstUISettingsProvider>
       {accountLevelMasteryScalesFF && (
         <Flex.Item as="div" width="100%" padding="small 0 0 0">
           <ProficiencyFilter

@@ -5,6 +5,8 @@ require "set"
 module Bundler
   module Multilock
     class Check
+      attr_reader :lockfiles, :lockfile_contents, :lockfile_specs
+
       class << self
         def run
           new.run
@@ -12,23 +14,32 @@ module Bundler
       end
 
       def initialize
-        default_lockfile_contents = Bundler.default_lockfile.read
-        @default_lockfile = LockfileParser.new(default_lockfile_contents)
-        @default_specs = @default_lockfile.specs.to_h do |spec|
+        @lockfiles = {}
+        @lockfile_contents = {}
+        @lockfile_specs = {}
+      end
+
+      def load_lockfile(lockfile)
+        return if lockfile_contents.key?(lockfile)
+
+        contents = lockfile_contents[lockfile] = lockfile.read.freeze
+        parser = lockfiles[lockfile] = LockfileParser.new(contents)
+        lockfile_specs[lockfile] = parser.specs.to_h do |spec|
           [[spec.name, spec.platform], spec]
         end
       end
 
       def run(skip_base_checks: false)
-        return true unless Bundler.default_lockfile.exist?
+        return true unless Bundler.default_lockfile(force_original: true).exist?
 
         success = true
         unless skip_base_checks
-          missing_specs = base_check({ gemfile: Bundler.default_gemfile, lockfile: Bundler.default_lockfile },
+          missing_specs = base_check({ gemfile: Bundler.default_gemfile,
+                                       lockfile: Bundler.default_lockfile(force_original: true) },
                                      return_missing: true).to_set
         end
         Multilock.lockfile_definitions.each do |lockfile_definition|
-          next if lockfile_definition[:lockfile] == Bundler.default_lockfile
+          next if lockfile_definition[:lockfile] == Bundler.default_lockfile(force_original: true)
 
           unless lockfile_definition[:lockfile].exist?
             Bundler.ui.error("Lockfile #{lockfile_definition[:lockfile]} does not exist.")
@@ -47,7 +58,7 @@ module Bundler
 
       # this is mostly equivalent to the built in checks in `bundle check`, but even
       # more conservative, and returns false instead of exiting on failure
-      def base_check(lockfile_definition, log_missing: false, return_missing: false)
+      def base_check(lockfile_definition, log_missing: false, return_missing: false, check_missing_deps: false)
         return return_missing ? [] : false unless lockfile_definition[:lockfile].file?
 
         Multilock.prepare_block = lockfile_definition[:prepare]
@@ -72,59 +83,37 @@ module Bundler
 
         return not_installed if return_missing
 
-        not_installed.empty? && definition.no_resolve_needed?
+        return false unless not_installed.empty? && definition.no_resolve_needed?
+        return true unless check_missing_deps
+
+        (definition.locked_gems.dependencies.values - definition.dependencies).empty?
       ensure
         Multilock.prepare_block = nil
       end
 
-      # this checks for mismatches between the default lockfile and the given lockfile,
+      # this checks for mismatches between the parent lockfile and the given lockfile,
       # and for pinned dependencies in lockfiles requiring them
-      def check(lockfile_definition, allow_mismatched_dependencies: true)
+      def check(lockfile_definition)
         success = true
         proven_pinned = Set.new
         needs_pin_check = []
         lockfile = LockfileParser.new(lockfile_definition[:lockfile].read)
         lockfile_path = lockfile_definition[:lockfile].relative_path_from(Dir.pwd)
-        unless lockfile.platforms == @default_lockfile.platforms
-          Bundler.ui.error("The platforms in #{lockfile_path} do not match the default lockfile.")
+        parent = lockfile_definition[:parent]
+        load_lockfile(parent)
+        parent_lockfile = lockfiles[parent]
+        unless lockfile.platforms == parent_lockfile.platforms
+          Bundler.ui.error("The platforms in #{lockfile_path} do not match the parent lockfile.")
           success = false
         end
-        unless lockfile.bundler_version == @default_lockfile.bundler_version
+        unless lockfile.bundler_version == parent_lockfile.bundler_version
           Bundler.ui.error("bundler (#{lockfile.bundler_version}) in #{lockfile_path} " \
-                           "does not match the default lockfile's version (@#{@default_lockfile.bundler_version}).")
+                           "does not match the parent lockfile's version (@#{parent_lockfile.bundler_version}).")
           success = false
         end
 
-        specs = lockfile.specs.group_by(&:name)
-        if allow_mismatched_dependencies
-          allow_mismatched_dependencies = lockfile_definition[:allow_mismatched_dependencies]
-        end
-
-        # build list of top-level dependencies that differ from the default lockfile,
-        # and all _their_ transitive dependencies
-        if allow_mismatched_dependencies
-          transitive_dependencies = Set.new
-          # only dependencies that differ from the default lockfile
-          pending_transitive_dependencies = lockfile.dependencies.reject do |name, dep|
-            @default_lockfile.dependencies[name] == dep
-          end.map(&:first)
-
-          until pending_transitive_dependencies.empty?
-            dep = pending_transitive_dependencies.shift
-            next if transitive_dependencies.include?(dep)
-
-            transitive_dependencies << dep
-            platform_specs = specs[dep]
-            unless platform_specs
-              # should only be bundler that's missing a spec
-              raise "Could not find spec for dependency #{dep}" unless dep == "bundler"
-
-              next
-            end
-
-            pending_transitive_dependencies.concat(platform_specs.flat_map(&:dependencies).map(&:name).uniq)
-          end
-        end
+        reverse_dependencies = cache_reverse_dependencies(lockfile)
+        parent_reverse_dependencies = cache_reverse_dependencies(parent_lockfile)
 
         # look through top-level explicit dependencies for pinned requirements
         if lockfile_definition[:enforce_pinned_additional_dependencies]
@@ -132,41 +121,49 @@ module Bundler
         end
 
         # check for conflicting requirements (and build list of pins, in the same loop)
-        specs.values.flatten.each do |spec|
-          default_spec = @default_specs[[spec.name, spec.platform]]
+        lockfile.specs.each do |spec|
+          parent_spec = lockfile_specs[parent][[spec.name, spec.platform]]
 
           if lockfile_definition[:enforce_pinned_additional_dependencies]
             # look through what this spec depends on, and keep track of all pinned requirements
             find_pinned_dependencies(proven_pinned, spec.dependencies)
 
-            needs_pin_check << spec unless default_spec
+            needs_pin_check << spec unless parent_spec
           end
 
-          next unless default_spec
+          next unless parent_spec
 
           # have to ensure Path sources are relative to their lockfile before comparing
-          same_source = if [default_spec.source, spec.source].grep(Source::Path).length == 2
+          same_source = if [parent_spec.source, spec.source].grep(Source::Path).length == 2
                           lockfile_definition[:lockfile]
                             .dirname
                             .join(spec.source.path)
                             .ascend
-                            .any?(Bundler.default_lockfile.dirname.join(default_spec.source.path))
+                            .any?(parent.dirname.join(parent_spec.source.path))
                         else
-                          default_spec.source == spec.source
+                          parent_spec.source == spec.source
                         end
 
-          next if default_spec.version == spec.version && same_source
-          next if allow_mismatched_dependencies && transitive_dependencies.include?(spec.name)
+          next if parent_spec.version == spec.version && same_source
+
+          # the version in the parent lockfile cannot possibly satisfy the requirements
+          # in this lockfile, and vice versa, so we assume it's intentional and allow it
+          unless reverse_dependencies[spec.name].satisfied_by?(parent_spec.version) ||
+                 parent_reverse_dependencies[spec.name].satisfied_by?(spec.version)
+            # we're allowing it to differ from the parent, so pin check requirement comes into play
+            needs_pin_check << spec if lockfile_definition[:enforce_pinned_additional_dependencies]
+            next
+          end
 
           Bundler.ui.error("#{spec}#{spec.git_version} in #{lockfile_path} " \
-                           "does not match the default lockfile's version " \
-                           "(@#{default_spec.version}#{default_spec.git_version}); " \
+                           "does not match the parent lockfile's version " \
+                           "(@#{parent_spec.version}#{parent_spec.git_version}); " \
                            "this may be due to a conflicting requirement, which would require manual resolution.")
           success = false
         end
 
         # now that we have built a list of every gem that is pinned, go through
-        # the gems that were in this lockfile, but not the default lockfile, and
+        # the gems that were in this lockfile, but not the parent lockfile, and
         # ensure it's pinned _somehow_
         needs_pin_check.each do |spec|
           pinned = case spec.source
@@ -183,7 +180,7 @@ module Bundler
           next if pinned
 
           Bundler.ui.error("#{spec} in #{lockfile_path} has not been pinned to a specific version,  " \
-                           "which is required since it is not part of the default lockfile.")
+                           "which is required since it is not part of the parent lockfile.")
           success = false
         end
 
@@ -191,6 +188,21 @@ module Bundler
       end
 
       private
+
+      def cache_reverse_dependencies(lockfile)
+        reverse_dependencies = Hash.new { |h, k| h[k] = Gem::Requirement.default_prerelease }
+
+        lockfile.dependencies.each_value do |spec|
+          reverse_dependencies[spec.name].requirements.concat(spec.requirement.requirements)
+        end
+        lockfile.specs.each do |spec|
+          spec.dependencies.each do |dependency|
+            reverse_dependencies[dependency.name].requirements.concat(dependency.requirement.requirements)
+          end
+        end
+
+        reverse_dependencies
+      end
 
       def find_pinned_dependencies(proven_pinned, dependencies)
         dependencies.each do |dependency|

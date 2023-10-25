@@ -45,13 +45,13 @@ describe WikiPageLookup do
       expect { @page.reload }.not_to raise_error
     end
 
-    it "is deleted when page is soft-deleted" do
+    it "is not deleted when page is soft-deleted" do
       @page.destroy
       expect { @page.reload }.not_to raise_error
       expect(@page.workflow_state).to eq "deleted"
-      expect(@page.wiki_page_lookups.pluck(:id)).to be_empty
+      expect(@page.wiki_page_lookups.count).to be 3
       [@lookup1, @lookup2, @lookup3].each do |record|
-        expect { record.reload }.to raise_error(ActiveRecord::RecordNotFound)
+        expect { record.reload }.not_to raise_error
       end
     end
 
@@ -67,7 +67,7 @@ describe WikiPageLookup do
       @page.restore
       @page.reload
       expect(@page.workflow_state).to eq "unpublished"
-      expect(@page.wiki_page_lookups.count).to be 1
+      expect(@page.wiki_page_lookups.count).to be 3
       expect(@page.current_lookup.slug).to eq "cool-page"
     end
   end

@@ -68,7 +68,6 @@ import bridge from '../../../bridge'
 import {getAnchorElement, isOKToLink} from '../../contentInsertionUtils'
 import LinkOptionsTrayController from './components/LinkOptionsTray/LinkOptionsTrayController'
 import {CREATE_LINK, EDIT_LINK} from './components/LinkOptionsDialog/LinkOptionsDialogController'
-import RCEGlobals from '../../RCEGlobals'
 import tinymce, {Editor} from 'tinymce'
 import {TsMigrationAny} from '../../../types/ts-migration'
 
@@ -78,13 +77,8 @@ const COURSE_PLUGIN_KEY = 'course_links'
 const GROUP_PLUGIN_KEY = 'group_links'
 
 function getCommandName(selectedNode: Element) {
-  // show the Course Tray if it's a course link and the ux improvement flag is on,
-  // otherwise show the default Link Tray
-  const showCourseLinkTray = !!RCEGlobals.getFeatures()?.rce_ux_improvements
   const isCourseLink = selectedNode.getAttribute('data-course-type')
-  return showCourseLinkTray && isCourseLink
-    ? 'instructureTrayForCourseLinks'
-    : 'instructureTrayToEditLink'
+  return isCourseLink ? 'instructureTrayForCourseLinks' : 'instructureTrayToEditLink'
 }
 
 function selectedAnchorCount(ed: Editor) {

@@ -40,7 +40,7 @@ jest.mock('../../../../shared/fileUtils', () => {
 
 function selectOption(button, option) {
   userEvent.click(
-    screen.getByRole('button', {
+    screen.getByRole('combobox', {
       name: button,
     })
   )

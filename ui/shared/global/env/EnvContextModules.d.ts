@@ -44,4 +44,11 @@ export interface EnvContextModules {
     IS_CHILD_COURSE: boolean
     MASTER_COURSE_DATA_URL: string
   }
+  PUBLISH_FINAL_GRADE: boolean
+  HAS_GRADING_PERIODS?: boolean
+  VALID_DATE_RANGE: {
+    start_at: {date: string; date_context: string}
+    end_at?: {date: string; date_context: string}
+  }
+  POST_TO_SIS: boolean
 }

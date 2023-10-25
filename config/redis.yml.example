@@ -1,25 +1,28 @@
 # # Canvas currently works without Redis, however some features require Redis and will be disabled.
 # # Redis can also be used as a replacement for memcache, for both session store and caching.
 #
-# # The recommended setup is to define your redis server(s) in this file, and
-# # then in cache_store.yml specify cache_store: redis_cache_store without any servers
-# # listed, which will tell Canvas to use this same server list. You can also
-# # reverse this by configuring servers in cache_store.yml, and referencing them
-# # here with servers: cache_store
+# # The recommended setup is to define your redis url(s) in this file, and
+# # then in cache_store.yml specify cache_store: redis_cache_store without any
+# # other config, which will tell Canvas to use the same redis instance. You
+# # can also reverse this by configuring servers in cache_store.yml, and
+# # referencing them here with servers: cache_store
+
 #
 # production:
-#   servers:
+#   url:
 #   # list of redis servers to use in the ring
 #   - redis://redis01
 #   - redis://redis02
 #   # off, compact, or json
 #   # log_style: compact
+#   connect_timeout: 0.5
+#   circuit_breaker:
+#     error_threshold: 1
+#     error_timeout: 2
 
 test:
   # only tests that are exercising the integration with redis require redis to run.
-  servers:
-    - redis://localhost
   # warning: the redis database will get cleared before each test, so if you
   # use this server for anything else, make sure to set aside a database id for
   # these tests to use.
-  db: 1
+  url: redis://localhost/1

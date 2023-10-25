@@ -163,7 +163,7 @@ class ApplicationController < ActionController::Base
   end
 
   def set_sentry_trace
-    @sentry_trace = Sentry&.get_current_scope&.get_transaction&.to_sentry_trace
+    @sentry_trace = Sentry.get_current_scope&.get_transaction&.to_sentry_trace
   end
 
   ##
@@ -233,6 +233,7 @@ class ApplicationController < ActionController::Base
           files_domain: HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
           group_information:,
           DOMAIN_ROOT_ACCOUNT_ID: @domain_root_account&.global_id,
+          DOMAIN_ROOT_ACCOUNT_UUID: @domain_root_account&.uuid,
           k12: k12?,
           help_link_name:,
           help_link_icon:,
@@ -253,7 +254,6 @@ class ApplicationController < ActionController::Base
           RAILS_ENVIRONMENT: Canvas.environment
         }
         @js_env[:IN_PACED_COURSE] = @context.account.feature_enabled?(:course_paces) && @context.enable_course_paces? if @context.is_a?(Course)
-
         unless SentryExtensions::Settings.settings.blank?
           @js_env[:SENTRY_FRONTEND] = {
             dsn: SentryExtensions::Settings.settings[:frontend_dsn],
@@ -283,7 +283,7 @@ class ApplicationController < ActionController::Base
         @js_env[:KILL_JOY] = @domain_root_account.kill_joy? if @domain_root_account&.kill_joy?
 
         cached_features = cached_js_env_account_features
-
+        @js_env[:DOMAIN_ROOT_ACCOUNT_SFID] = Rails.cache.fetch(["sfid", @domain_root_account].cache_key) { @domain_root_account.salesforce_id } if @domain_root_account.respond_to?(:salesforce_id)
         @js_env[:DIRECT_SHARE_ENABLED] = @context.respond_to?(:grants_right?) && @context.grants_right?(@current_user, session, :direct_share)
         @js_env[:CAN_VIEW_CONTENT_SHARES] = @current_user&.can_view_content_shares?
         @js_env[:FEATURES] = cached_features.merge(
@@ -348,7 +348,6 @@ class ApplicationController < ActionController::Base
     lti_platform_storage
     calendar_series
     account_level_blackout_dates
-    rce_ux_improvements
     render_both_to_do_lists
     course_paces_redesign
     course_paces_for_students
@@ -357,7 +356,6 @@ class ApplicationController < ActionController::Base
     dev_key_oidc_alert
     media_links_use_attachment_id
     permanent_page_links
-    improved_no_results_messaging
     differentiated_modules
     enhanced_course_creation_account_fetching
     instui_for_import_page
@@ -378,6 +376,7 @@ class ApplicationController < ActionController::Base
     lti_assignment_page_line_items
     mobile_offline_mode
     react_discussions_post
+    instui_nav
   ].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = [
     :embedded_release_notes
@@ -2949,6 +2948,24 @@ class ApplicationController < ActionController::Base
     if @context.grading_periods?
       js_env(active_grading_periods: GradingPeriod.json_for(@context, @current_user))
     end
+  end
+
+  def set_js_module_data
+    js_env({
+             HAS_GRADING_PERIODS: @context.grading_periods?,
+             VALID_DATE_RANGE: CourseDateRange.new(@context),
+             POST_TO_SIS: Assignment.sis_grade_export_enabled?(@context),
+             SECTION_LIST: @context.course_sections.active.map do |section|
+                             {
+                               id: section.id,
+                               start_at: section.start_at,
+                               end_at: section.end_at,
+                               override_course_and_term_dates: section.restrict_enrollments_to_section_dates
+                             }
+                           end,
+             DUE_DATE_REQUIRED_FOR_ACCOUNT: AssignmentUtil.due_date_required_for_account?(@context),
+           })
+    js_env(active_grading_periods: GradingPeriod.json_for(@context, @current_user)) if @context.grading_periods?
   end
 
   def google_drive_connection

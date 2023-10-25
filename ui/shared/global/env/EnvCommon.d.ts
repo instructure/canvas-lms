@@ -177,7 +177,6 @@ export type SiteAdminFeatureId =
   | 'calendar_series'
   | 'account_level_blackout_dates'
   | 'account_calendar_events'
-  | 'rce_ux_improvements'
   | 'instui_nav'
   | 'render_both_to_do_lists'
   | 'course_paces_redesign'
@@ -187,7 +186,6 @@ export type SiteAdminFeatureId =
   | 'dev_key_oidc_alert'
   | 'media_links_use_attachment_id'
   | 'permanent_page_links'
-  | 'improved_no_results_messaging'
   | 'differentiated_modules'
   | 'enhanced_course_creation_account_fetching'
   | 'instui_for_import_page'
@@ -209,6 +207,7 @@ export type RootAccountFeatureId =
   | 'send_usage_metrics'
   | 'rce_transform_loaded_content'
   | 'mobile_offline_mode'
+  | 'instui_nav'
 
 /**
  * From ApplicationController#JS_ENV_BRAND_ACCOUNT_FEATURES

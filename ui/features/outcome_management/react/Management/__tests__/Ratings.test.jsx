@@ -140,12 +140,9 @@ describe('Ratings', () => {
 
     it('When adding a rating, focusField should be set on the description of the new rating', () => {
       const threeRatings = [...defaultProps().ratings, createRating('Almost Mastery', 2, false)]
-      console.log("ratings")
-      console.log(threeRatings)
       const {getByText} = render(<Ratings {...defaultProps({ratings: threeRatings})} />)
       fireEvent.click(getByText('Add Mastery Level'))
       const newRatingsAfterAdd = onChangeRatingsMock.mock.calls[0][0]
-      console.log(newRatingsAfterAdd)
       expect(newRatingsAfterAdd[0].focusField).toBeNull()
       expect(newRatingsAfterAdd[1].focusField).toBeNull()
       expect(newRatingsAfterAdd[2].focusField).toBeNull()

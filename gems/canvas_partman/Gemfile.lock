@@ -27,9 +27,9 @@ GEM
     activerecord (7.0.8)
       activemodel (= 7.0.8)
       activesupport (= 7.0.8)
-    activerecord-pg-extensions (0.5.3)
-      activerecord (~> 7.0.0)
-      railties (~> 7.0.0)
+    activerecord-pg-extensions (0.5.4)
+      activerecord (>= 7.0, < 7.2)
+      railties (>= 7.0, < 7.2)
     activesupport (7.0.8)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 1.6, < 2)
@@ -43,7 +43,7 @@ GEM
     erubi (1.12.0)
     i18n (1.14.1)
       concurrent-ruby (~> 1.0)
-    loofah (2.21.3)
+    loofah (2.21.4)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
     method_source (1.0.0)
@@ -118,4 +118,4 @@ DEPENDENCIES
   simplecov (~> 0.22)
 
 BUNDLED WITH
-   2.4.19
+   2.4.20

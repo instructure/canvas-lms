@@ -16,18 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useMemo} from 'react'
 import {FormFieldGroup} from '@instructure/ui-form-field'
-import {Link} from '@instructure/ui-link'
-// @ts-expect-error -- remove once on InstUI 8
+import {Button} from '@instructure/ui-buttons'
 import {IconAddLine} from '@instructure/ui-icons'
 import type {Module} from './types'
 import PrerequisiteSelector from './PrerequisiteSelector'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('differentiated_modules')
-
-const DEFAULT_OPTION = {id: '-1', name: `[ ${I18n.t('Select Module')} ]`}
 
 export interface PrerequisiteFormProps {
   prerequisites: Module[]
@@ -44,6 +41,11 @@ export default function PrerequisiteForm({
   onDropPrerequisite,
   onUpdatePrerequisite,
 }: PrerequisiteFormProps) {
+  const options = useMemo(() => {
+    const prerequisiteIds = new Set(prerequisites.map(prereq => prereq.id))
+    return availableModules.filter(module => !prerequisiteIds.has(module.id))
+  }, [availableModules, prerequisites])
+
   return (
     <FormFieldGroup
       description={I18n.t('Prerequisites')}
@@ -54,20 +56,17 @@ export default function PrerequisiteForm({
         <PrerequisiteSelector
           key={module.name}
           selection={module.name}
-          options={[DEFAULT_OPTION, ...availableModules]}
+          options={[module, ...options]}
           onDropPrerequisite={onDropPrerequisite}
           onUpdatePrerequisite={onUpdatePrerequisite}
           index={index}
         />
       ))}
-      <Link
-        role="button"
-        onClick={() => onAddPrerequisite(DEFAULT_OPTION)}
-        isWithinText={false}
-        renderIcon={<IconAddLine />}
-      >
-        {I18n.t('Add Prerequisite')}
-      </Link>
+      {options.length > 0 && (
+        <Button onClick={() => onAddPrerequisite(options[0])} renderIcon={<IconAddLine />}>
+          {I18n.t('Prerequisite')}
+        </Button>
+      )}
     </FormFieldGroup>
   )
 }

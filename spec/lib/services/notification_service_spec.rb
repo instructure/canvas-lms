@@ -91,6 +91,25 @@ module Services
         expect { @message.deliver }.not_to raise_error
       end
 
+      def test_push_notification(notification_name)
+        expect(@queue).to receive(:send_message).once
+        sns_client = double
+        allow(sns_client).to receive(:create_platform_endpoint).and_return(endpoint_arn: "arn")
+        allow_any_instance_of(NotificationEndpoint).to receive(:sns_client).and_return(sns_client)
+        @at.notification_endpoints.create!(token: "token")
+        Message.where(id: @message.id).update_all(path_type: "push", notification_name:)
+        @message.reload
+        @message.deliver
+      end
+
+      it "processes push notification message type for New Topic" do
+        test_push_notification("New Topic")
+      end
+
+      it "processes push notification message type for New Reply" do
+        test_push_notification("New Reply")
+      end
+
       it "throws error if cannot connect to queue" do
         allow(@queue).to receive(:send_message).and_raise(Aws::SQS::Errors::ServiceError.new("a", "b"))
         expect { @message.deliver }.to raise_error(Aws::SQS::Errors::ServiceError)

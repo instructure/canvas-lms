@@ -323,10 +323,6 @@ describe('RCE "Links" Plugin > Link', () => {
       },
     }
 
-    beforeAll(() => {
-      RCEGlobals.getFeatures = jest.fn().mockReturnValue({rce_ux_improvements: true})
-    })
-
     afterAll(() => {
       jest.resetAllMocks()
     })

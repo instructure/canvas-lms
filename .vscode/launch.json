@@ -1,0 +1,25 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "rdbg",
+      "request": "launch",
+      "name": "Launch Rails Server",
+      "command": "bin/rails",
+      "script": "server"
+    },
+    {
+      "type": "rdbg",
+      "name": "Attach to web server",
+      "request": "attach",
+    },
+    {
+      "type": "rdbg",
+      "request": "launch",
+      "name": "Run Current Spec File",
+      "rdbgPath": "bin/rdbg-spring",
+      "command": "rspec",
+      "script": "${file}"
+    }
+  ]
+}

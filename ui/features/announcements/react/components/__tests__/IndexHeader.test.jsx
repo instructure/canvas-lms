@@ -54,7 +54,7 @@ test('lets me add an announcement when I have the permission', () => {
     <IndexHeader {...defaultProps()} permissions={{...defaultPermissions(), create: true}} />
   )
 
-  expect(tree.findWhere(hasText('Add announcement'))).toHaveLength(1)
+  expect(tree.findWhere(hasText('Add announcement'))).toHaveLength(2)
 })
 
 test('lets me delete an announcement when I have the permission', () => {
@@ -65,5 +65,5 @@ test('lets me delete an announcement when I have the permission', () => {
     />
   )
 
-  expect(tree.findWhere(hasText('Delete Selected Announcements'))).toHaveLength(1)
+  expect(tree.findWhere(hasText('Delete Selected Announcements'))).toHaveLength(2)
 })

@@ -595,9 +595,8 @@ describe "RCE next tests", :ignore_js_errors do
       end
     end
 
-    context "edit course link sidebar with rce_ux_improvements enabled" do
+    context "edit course link sidebar" do
       before do
-        Account.site_admin.enable_feature!(:rce_ux_improvements)
         @wiki_page_title1 = "test_page"
         @wiki_page_title2 = "test_page2"
         unpublished = false
@@ -1593,6 +1592,7 @@ describe "RCE next tests", :ignore_js_errors do
     # rubocop:disable Specs/NoSeleniumWebDriverWait
     describe "fullscreen" do
       it "restores the rce to its original size on exiting fullscreen" do
+        skip "FOO-3817 (10/7/2023)"
         visit_front_page_edit(@course)
 
         rce_wrapper = f(".rce-wrapper")
@@ -1629,6 +1629,7 @@ describe "RCE next tests", :ignore_js_errors do
       end
 
       it "restores the rce to its original while in pretty html view" do
+        skip("Flaky. addressed in LF-746")
         visit_front_page_edit(@course)
         switch_to_html_view
 

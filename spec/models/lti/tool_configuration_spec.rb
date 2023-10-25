@@ -176,6 +176,30 @@ module Lti
 
         it { is_expected.to be false }
       end
+
+      context "when oidc_initiation_urls is not an hash" do
+        let(:settings) { super().tap { |s| s["oidc_initiation_urls"] = ["https://test.com"] } }
+
+        before { tool_configuration.developer_key = developer_key }
+
+        it { is_expected.to be false }
+      end
+
+      context "when oidc_initiation_urls values are not urls" do
+        let(:settings) { super().tap { |s| s["oidc_initiation_urls"] = { "us-east-1" => "@?!" } } }
+
+        before { tool_configuration.developer_key = developer_key }
+
+        it { is_expected.to be false }
+      end
+
+      context "when oidc_initiation_urls values are urls" do
+        let(:settings) { super().tap { |s| s["oidc_initiation_urls"] = { "us-east-1" => "http://example.com" } } }
+
+        before { tool_configuration.developer_key = developer_key }
+
+        it { is_expected.to be true }
+      end
     end
 
     describe "after_update" do
@@ -392,6 +416,26 @@ module Lti
             Lti::ResourcePlacement::PLACEMENTS.each do |p|
               expect(subject.settings[p]).to be_blank
             end
+          end
+        end
+
+        context "when the configuration has oidc_initiation_urls" do
+          let(:oidc_initiation_urls) do
+            {
+              "us-east-1" => "http://www.example.com/initiate",
+              "us-west-1" => "http://www.example.com/initiate2"
+            }
+          end
+
+          before do
+            tool_configuration.settings["oidc_initiation_urls"] = oidc_initiation_urls
+            tool_configuration.save!
+          end
+
+          subject { tool_configuration.new_external_tool(context) }
+
+          it "includes the oidc_initiation_urls in the new tool settings" do
+            expect(subject.settings["oidc_initiation_urls"]).to eq oidc_initiation_urls
           end
         end
       end

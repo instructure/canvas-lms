@@ -21,6 +21,68 @@ describe GradesPresenter do
   let(:presenter) { GradesPresenter.new(enrollments) }
   let(:shard) { FakeShard.new }
 
+  describe "#grade" do
+    before do
+      @course = course_factory(active_course: true)
+      @teacher = teacher_in_course(active_all: true, course: @course).user
+      @student = student_in_course(active_all: true, course: @course).user
+      @grades = { student_enrollments: { @course.id => 85.0 } }
+      @grading_periods = {}
+    end
+
+    let(:presenter) { GradesPresenter.new(@course.enrollments.where(user: @student).to_a) }
+
+    it "returns '--' when the course is hiding final grades" do
+      expect { @course.hide_final_grades = true }.to change {
+        presenter.grade(course: @course, user: @student, grades: @grades, grading_periods: @grading_periods)
+      }.from("85%").to("--")
+    end
+
+    it "returns '--' when grades are being hidden for 'All Grading Periods'" do
+      group = @course.root_account.grading_period_groups.create!(title: "Example Group", display_totals_for_all_grading_periods: true)
+      group.enrollment_terms << @course.enrollment_term
+      @course.enrollment_term.save!
+      @grading_periods[@course.id] = { selected_period_id: 0 }
+      expect { group.update!(display_totals_for_all_grading_periods: false) }.to change {
+        # i know this looks silly. re-fetching to clear memoized values that we'll check before/after
+        course = Course.find(@course.id)
+        presenter.grade(course:, user: @student, grades: @grades, grading_periods: @grading_periods)
+      }.from("85%").to("--")
+    end
+
+    it "returns 'no grade' when the student does not have a grade" do
+      expect { @grades[:student_enrollments][@course.id] = nil }.to change {
+        presenter.grade(course: @course, user: @student, grades: @grades, grading_periods: @grading_periods)
+      }.from("85%").to("no grade")
+    end
+
+    it "converts the score to a letter grade when restricting quantitative data" do
+      @course.root_account.enable_feature!(:restrict_quantitative_data)
+      expect { @course.restrict_quantitative_data = true }.to change {
+        presenter.grade(course: @course, user: @student, grades: @grades, grading_periods: @grading_periods)
+      }.from("85%").to("B")
+    end
+
+    it "replaces trailing en-dashes with the minus character (so screenreaders properly read the grade as minus)" do
+      en_dash = "-"
+      minus = "−"
+      @course.root_account.enable_feature!(:restrict_quantitative_data)
+      @course.restrict_quantitative_data = true
+      @grades[:student_enrollments][@course.id] = 80.0
+      actual_grade = @course.score_to_grade(@grades.dig(:student_enrollments, @course.id), user: @student)
+      presenter_grade = presenter.grade(course: @course, user: @student, grades: @grades, grading_periods: @grading_periods)
+      aggregate_failures do
+        expect(actual_grade).to eq "B#{en_dash}"
+        expect(presenter_grade).to eq "B#{minus}"
+      end
+    end
+
+    it "returns the percentage grade if not restricting quantitative data" do
+      presenter_grade = presenter.grade(course: @course, user: @student, grades: @grades, grading_periods: @grading_periods)
+      expect(presenter_grade).to eq "85%"
+    end
+  end
+
   describe "#course_grade_summaries" do
     before(:once) do
       account = Account.create!

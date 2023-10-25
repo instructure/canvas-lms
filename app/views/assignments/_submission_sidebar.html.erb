@@ -101,7 +101,7 @@
           } %></div>
         <% else %>
           <div><%= t 'labels.rqd_grade', "Grade: %{grade}", {
-            :grade => @assignment.score_to_grade(@current_user_submission.score, @current_user_submission.grade, true),
+            :grade => replace_dash_with_minus(@assignment.score_to_grade(@current_user_submission.score, @current_user_submission.grade, true)),
             :wrapper => '<span style="font-size: 0.8em;">\1</span>'
           } %></div>
         <% end %>

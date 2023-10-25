@@ -19,6 +19,7 @@
 import React, {useEffect, useMemo, useState} from 'react'
 import {View} from '@instructure/ui-view'
 import {getFinalGradeOverrides} from '@canvas/grading/FinalGradeOverrideApi'
+import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import {
   AssignmentGroupCriteriaMap,
   FinalGradeOverrideMap,
@@ -27,7 +28,6 @@ import {
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {Text} from '@instructure/ui-text'
-// @ts-expect-error
 import {IconWarningLine} from '@instructure/ui-icons'
 import {
   GradebookOptions,
@@ -212,7 +212,9 @@ export default function StudentInformation({
       : ''
 
     const letterGradeText = gradingStandard
-      ? ` - ${getLetterGrade(possible, score, gradingStandard)}`
+      ? ` - ${GradeFormatHelper.replaceDashWithMinus(
+          getLetterGrade(possible, score, gradingStandard)
+        )}`
       : ''
 
     return `${finalGradeText}${pointsText}${letterGradeText}`

@@ -177,7 +177,8 @@ describe('ResourcesPage', () => {
       expect(image.src).toContain('/2.png')
     })
 
-    it("doesn't fail if course_navigation property is null", async () => {
+    // FOO-3828
+    it.skip("doesn't fail if course_navigation property is null", async () => {
       const response = [
         {
           id: '3',

@@ -313,6 +313,49 @@ describe GradingStandard do
                    "M" => 0.0 }
     end
 
+    let(:en_dash) { "-" }
+    let(:minus) { "−" }
+
+    it "matches trailing en-dash to trailing en-dash" do
+      @gs.data = {
+        "A" => 0.94,
+        "A#{en_dash}" => 0.90,
+        "B" => 0.88
+      }
+      idx = @gs.place_in_scheme("A#{en_dash}")
+      expect(idx).to eq 1
+    end
+
+    it "matches trailing minus to trailing en-dash" do
+      @gs.data = {
+        "A" => 0.94,
+        "A#{en_dash}" => 0.90,
+        "B" => 0.88
+      }
+      idx = @gs.place_in_scheme("A#{minus}")
+      expect(idx).to eq 1
+    end
+
+    it "does not match minus (with no preceding character) to en-dash" do
+      @gs.data = {
+        "A" => 0.94,
+        en_dash => 0.90,
+        "B" => 0.88
+      }
+      idx = @gs.place_in_scheme(minus)
+      expect(idx).to be_nil
+    end
+
+    it "does not match non-trailing minus to non-trailing en-dash" do
+      @gs.data = {
+        "A" => 0.94,
+        "A#{en_dash}B" => 0.90,
+        "B" => 0.88
+      }
+      idx = @gs.place_in_scheme("A#{minus}B")
+      expect(idx).to be_nil
+    end
+
     it "matches alphabetical keys regardless of case" do
       idx = @gs.place_in_scheme("m")
       expect(idx).to be(11)

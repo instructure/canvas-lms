@@ -181,7 +181,10 @@ module Schemas::Lti
           "type" => "string"
         }.freeze,
         "oidc_initiation_url" => {
-          "type" => "string"
+          "type" => "string",
+        }.freeze,
+        "oidc_initiation_urls" => {
+          "type" => "object"
         }.freeze,
         "custom_fields" => {
           "anyOf" => [

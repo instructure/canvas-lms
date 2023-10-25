@@ -94,7 +94,7 @@ it('warns the user when deleting a LTI key', () => {
   )
 
   window.confirm = jest.fn()
-  wrapper.find('IconButton').at(2).simulate('click')
+  wrapper.find('IconButton').at(4).simulate('click')
   expect(window.confirm).toHaveBeenCalledWith(
     'Are you sure you want to delete this developer key? This action will also delete all tools associated with the developer key in this context.'
   )

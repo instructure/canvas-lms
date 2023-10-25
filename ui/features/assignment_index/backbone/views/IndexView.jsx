@@ -56,6 +56,10 @@ import '@canvas/rails-flash-notifications'
 
 import easy_student_view from '@canvas/easy-student-view'
 
+import {TextInput} from '@instructure/ui-text-input'
+import {IconSearchLine} from '@instructure/ui-icons'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+
 const I18n = useI18nScope('assignmentsIndexView')
 
 extend(IndexView, Backbone.View)
@@ -179,6 +183,29 @@ IndexView.prototype.afterRender = function () {
     )
     window.onkeydown = this.focusOnAssignments
   }
+  ReactDOM.render(
+    <TextInput
+      onChange={e => {
+        // Sends events to hidden input to utilize backbone
+        const hiddenInput = $('[data-view=inputFilter]')
+        hiddenInput[0].value = e.target?.value
+        hiddenInput.keyup()
+      }}
+      display="inline-block"
+      type="text"
+      data-testid="assignment-search-input"
+      placeholder={I18n.t('Search for Assignment')}
+      renderLabel={
+        <ScreenReaderContent>
+          {I18n.t(
+            'Search assignments. As you type in this field, the list of assignments will be automatically filtered to only include those whose names match your input.'
+          )}
+        </ScreenReaderContent>
+      }
+      renderBeforeInput={() => <IconSearchLine />}
+    />,
+    this.$el.find('#search_input_container')[0]
+  )
   return this.selectGradingPeriod()
 }
 

@@ -61,6 +61,22 @@ describe('Grading Results Tests', () => {
   beforeEach(() => {
     $.subscribe = jest.fn()
   })
+  describe('the assignment grading type is points', () => {
+    it('renders the grade input with the screen reader message', () => {
+      const props = {
+        ...gradingResultsDefaultProps,
+        assignment: {
+          ...defaultAssignment,
+        },
+      }
+
+      const {getByTestId, getByText} = renderGradingResults(props)
+      expect(getByTestId('student_and_assignment_grade_input')).toBeInTheDocument()
+      expect(
+        getByText('Student Grade Text Input: (out of 10)', {selector: 'span'})
+      ).toBeInTheDocument()
+    })
+  })
   describe('the submission is late', () => {
     it('renders the correct final grade and late penalty labels when late is true', () => {
       const props = {
@@ -94,6 +110,26 @@ describe('Grading Results Tests', () => {
       const {getByTestId} = renderGradingResults(props)
       expect(getByTestId('submission_late_penalty_value')).toHaveTextContent('0')
       expect(getByTestId('late_penalty_final_grade_value')).toHaveTextContent('-')
+    })
+
+    it('displays minus grades using the minus character (so screenreaders properly announce the value)', () => {
+      const dash = '-'
+      const minus = '−'
+      const props = {
+        ...gradingResultsDefaultProps,
+        studentSubmissions: [
+          {
+            ...defaultStudentSubmissions,
+            late: true,
+            enteredGrade: `B${dash}`,
+            enteredScore: 8,
+            grade: `B${dash}`,
+            score: 8,
+          },
+        ],
+      }
+      const {getByTestId} = renderGradingResults(props)
+      expect(getByTestId('late_penalty_final_grade_value')).toHaveTextContent(`B${minus}`)
     })
 
     it('renders the correct final grade and late penalty values when submission has been graded and late', () => {
@@ -266,6 +302,40 @@ describe('Grading Results Tests', () => {
       expect(queryByTestId('dropped-assignment-message')).not.toBeInTheDocument()
     })
   })
+
+  describe('the assignment grading type is letter grade', () => {
+    let modifiedDefaultStudentSubmission: GradebookUserSubmissionDetails
+    let modifiedDefaultAssignment: AssignmentConnection
+
+    beforeEach(() => {
+      modifiedDefaultStudentSubmission = {
+        ...defaultStudentSubmissions,
+        enteredGrade: 'A-',
+        enteredScore: 9.0,
+        score: 9.0,
+        grade: 'A-',
+      }
+
+      modifiedDefaultAssignment = {
+        ...defaultAssignment,
+        gradingType: 'letter_grade',
+      }
+    })
+
+    it('renders minus grades with the en-dash character replaced with the minus character', () => {
+      const props = {
+        ...gradingResultsDefaultProps,
+        studentSubmissions: [modifiedDefaultStudentSubmission],
+        assignment: modifiedDefaultAssignment,
+      }
+      const {getByTestId} = renderGradingResults(props)
+      expect(getByTestId('student_and_assignment_grade_input')).toHaveValue('A−')
+
+      userEvent.click(getByTestId('submission-details-button'))
+      expect(getByTestId('submission_details_grade_input')).toHaveValue('A−')
+    })
+  })
+
   describe('the assignment grading type is pass fail', () => {
     let modifiedDefaultStudentSubmissions: GradebookUserSubmissionDetails
     let modifiedDefaultAssignments: AssignmentConnection
@@ -374,6 +444,7 @@ describe('Grading Results Tests', () => {
       userEvent.tab()
       expect(executeApiRequest).toHaveBeenCalledWith({
         body: {
+          originator: 'individual_gradebook',
           submission: {
             posted_grade: 'complete',
           },
@@ -395,6 +466,7 @@ describe('Grading Results Tests', () => {
       userEvent.click(getByTestId('submission-details-submit-button'))
       expect(executeApiRequest).toHaveBeenCalledWith({
         body: {
+          originator: 'individual_gradebook',
           submission: {
             posted_grade: 'complete',
           },
@@ -402,6 +474,20 @@ describe('Grading Results Tests', () => {
         method: 'PUT',
         path: 'testUrl',
       })
+    })
+    it('renders the grade select with the screen reader message', () => {
+      const props = {
+        ...gradingResultsDefaultProps,
+        studentSubmissions: [modifiedDefaultStudentSubmissions],
+        assignment: modifiedDefaultAssignments,
+      }
+
+      const {getByTestId, getByText} = renderGradingResults(props)
+
+      expect(getByTestId('student_and_assignment_grade_select')).toBeInTheDocument()
+      expect(
+        getByText('Student Grade Pass-Fail Grade Options: ( - out of 10)', {selector: 'span'})
+      ).toBeInTheDocument()
     })
   })
   describe('the assignment is in a closed grading period', () => {
@@ -440,6 +526,49 @@ describe('Grading Results Tests', () => {
       userEvent.click(getByTestId('submission-details-button'))
       expect(getByTestId('submission-details-submit-button')).toBeEnabled()
       expect(getByTestId('submission_details_grade_input')).not.toBeDisabled()
+    })
+  })
+  describe('the submission is resubmitted', () => {
+    let props: GradingResultsComponentProps
+    beforeEach(() => {
+      props = {
+        ...gradingResultsDefaultProps,
+        studentSubmissions:
+          gradingResultsDefaultProps.studentSubmissions?.map(submission => ({
+            ...submission,
+            gradeMatchesCurrentSubmission: false,
+          })) ?? undefined,
+      }
+    })
+    it('renders the assignment has been resubmitted text', () => {
+      const {getByTestId} = renderGradingResults(props)
+      expect(getByTestId('resubmitted_assignment_label')).toHaveTextContent(
+        'This assignment has been resubmitted since it was graded last.'
+      )
+    })
+    it('does not render the assignment has been resubmitted text', () => {
+      const modifiedProps = {
+        ...props,
+        studentSubmissions:
+          props.studentSubmissions?.map(submission => ({
+            ...submission,
+            gradeMatchesCurrentSubmission: true,
+          })) ?? undefined,
+      }
+      const {queryByTestId} = renderGradingResults(modifiedProps)
+      expect(queryByTestId('resubmitted_assignment_label')).toBeNull()
+    })
+    it('does not render the assignment has been resubmitted text when assignment has not been graded', () => {
+      const modifiedProps = {
+        ...props,
+        studentSubmissions:
+          props.studentSubmissions?.map(submission => ({
+            ...submission,
+            gradeMatchesCurrentSubmission: null,
+          })) ?? undefined,
+      }
+      const {queryByTestId} = renderGradingResults(modifiedProps)
+      expect(queryByTestId('resubmitted_assignment_label')).toBeNull()
     })
   })
 })

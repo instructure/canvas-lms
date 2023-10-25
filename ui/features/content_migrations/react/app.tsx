@@ -16,13 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import ReactDOM from 'react-dom'
-import ready from '@instructure/ready'
+import React, {useState} from 'react'
+import ContentMigrationsForm from './components/migrations_form'
 import ContentMigrationsTable from './components/migrations_table'
+import {ContentMigrationItem} from './components/types'
 
-ready(() => {
-  if (document.getElementById('content_migration_table')) {
-    ReactDOM.render(<ContentMigrationsTable />, document.getElementById('content_migration_table'))
-  }
-})
+export const App = () => {
+  const [migrations, setMigrations] = useState<ContentMigrationItem[]>([])
+
+  return (
+    <>
+      <ContentMigrationsForm migrations={migrations} setMigrations={setMigrations} />
+      <ContentMigrationsTable migrations={migrations} setMigrations={setMigrations} />
+    </>
+  )
+}
+
+export default App

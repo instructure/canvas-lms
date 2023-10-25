@@ -18,15 +18,15 @@
 
 import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
-
 import {Table} from '@instructure/ui-table'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import {IconCheckDarkSolid, IconXSolid} from '@instructure/ui-icons'
 import {AccessibleContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Badge} from '@instructure/ui-badge'
+import {getK5ThemeVars} from '@canvas/k5/react/k5-theme'
 
-import k5Theme from '@canvas/k5/react/k5-theme'
+const k5ThemeVariables = getK5ThemeVars()
 
 const I18n = useI18nScope('grade_row')
 
@@ -158,9 +158,9 @@ export const GradeRow = ({
       <Link
         href={url}
         isWithinText={false}
-        theme={{
-          color: k5Theme.variables.colors.textDarkest,
-          hoverColor: k5Theme.variables.colors.textDarkest,
+        themeOverride={{
+          color: k5ThemeVariables.colors.textDarkest,
+          hoverColor: k5ThemeVariables.colors.textDarkest,
         }}
       >
         {assignmentName}
@@ -173,7 +173,7 @@ export const GradeRow = ({
 
   return (
     <Table.Row data-testid="grades-table-row" key={id}>
-      <Table.Cell theme={cellTheme}>
+      <Table.Cell themeOverride={cellTheme}>
         {unread ? (
           <Badge
             type="notification"
@@ -184,7 +184,7 @@ export const GradeRow = ({
                 {I18n.t('New grade for %{assignmentName}', {assignmentName})}
               </ScreenReaderContent>
             )}
-            theme={{
+            themeOverride={{
               sizeNotification: '0.45rem',
             }}
           >
@@ -194,11 +194,11 @@ export const GradeRow = ({
           renderTitleCell()
         )}
       </Table.Cell>
-      <Table.Cell theme={cellTheme}>{dueDate && <Text>{dateFormatter(dueDate)}</Text>}</Table.Cell>
-      <Table.Cell theme={cellTheme}>
+      <Table.Cell themeOverride={cellTheme}>{dueDate && <Text>{dateFormatter(dueDate)}</Text>}</Table.Cell>
+      <Table.Cell themeOverride={cellTheme}>
         <Text>{assignmentGroupName}</Text>
       </Table.Cell>
-      <Table.Cell theme={cellTheme}>
+      <Table.Cell themeOverride={cellTheme}>
         <div className="grade-details__score">
           {renderScore()}
           {shouldShowPoints && (

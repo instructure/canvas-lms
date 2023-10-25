@@ -199,7 +199,7 @@ module CoursePacesPageObject
   end
 
   def show_hide_course_paces_selector
-    "[data-test-id='projections-text-button']"
+    "[data-testid='projections-text-button']"
   end
 
   def skip_weekends_checkbox_xpath_selector

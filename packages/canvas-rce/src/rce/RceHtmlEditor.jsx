@@ -25,6 +25,26 @@ const RceHtmlEditor = React.forwardRef(({onFocus, ...props}, editorRef) => {
   const [code, setCode] = useState(props.code)
   const label = formatMessage('html code editor')
   const [dir, setDir] = useState(getComputedStyle(document.body, null).direction)
+  const [codeMirrorEditorDiv, setCodeMirrorEditorDiv] = useState(null)
+
+  useEffect(() => {
+    ;(async () => {
+      const p = new Promise(resolve => {
+        const timerid = setInterval(() => {
+          // scoping querySelector to the container div makes sure we're targeting this CodeEditor
+          // The CodeMirror docs (https://codemirror.net/doc/manual.html#styling)
+          // say this is the element we use to set the editor's height
+          const editor = editorRef.current.querySelector('.CodeMirror')
+          if (editor) {
+            clearInterval(timerid)
+            setCodeMirrorEditorDiv(editor)
+            resolve()
+          }
+        }, 60)
+      })
+      await p
+    })()
+  }, [editorRef])
 
   useEffect(() => {
     setCode(beautify.html(props.code))
@@ -57,14 +77,12 @@ const RceHtmlEditor = React.forwardRef(({onFocus, ...props}, editorRef) => {
   }, [dir, editorRef])
 
   useEffect(() => {
-    // scoping querySelector to the container div makes sure we're targeting this CodeEditor
-    // The CodeMirror docs (https://codemirror.net/doc/manual.html#styling)
-    // say this is the element we use to set the editor's height
-    const editor = editorRef.current.querySelector('.CodeMirror')
-    editor.CodeMirror.setSize(null, props.height)
-    editor.style.margin = '0'
-    editor.style.border = '0'
-  }, [props.height, editorRef])
+    if (codeMirrorEditorDiv) {
+      codeMirrorEditorDiv.CodeMirror.setSize(null, props.height)
+      codeMirrorEditorDiv.style.margin = '0'
+      codeMirrorEditorDiv.style.border = '0'
+    }
+  }, [codeMirrorEditorDiv, props.height])
 
   const isFocused = useRef(false)
 

@@ -32,6 +32,12 @@ describe Types::RubricRatingType do
     ).to eq(rubric.criteria.map { |c| c[:ratings].pluck(:id).map(&:to_s) })
   end
 
+  it "rubric id" do
+    expect(
+      rubric_type.resolve("criteria { ratings { rubricId } }").first.uniq.first
+    ).to eq(rubric.id.to_s)
+  end
+
   describe "works for the field" do
     it "description" do
       expect(

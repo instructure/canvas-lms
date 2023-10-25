@@ -19,7 +19,7 @@
 import React, {useContext} from 'react'
 
 import {useQuery, useMutation} from 'react-apollo'
-import {COURSE_QUERY, DISCUSSION_TOPIC_QUERY} from '../../../graphql/Queries'
+import {DISCUSSION_TOPIC_QUERY} from '../../../graphql/Queries'
 import {CREATE_DISCUSSION_TOPIC} from '../../../graphql/Mutations'
 
 import LoadingIndicator from '@canvas/loading-indicator'
@@ -27,24 +27,30 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import DiscussionTopicForm from '../../components/DiscussionTopicForm/DiscussionTopicForm'
 
+import {getContextQuery} from '../../utils'
+
 const I18n = useI18nScope('discussion_create')
 
-export default function DiscussionTopicFormContainer() {
+export default function DiscussionTopicFormContainer({apolloClient}) {
   const {setOnFailure} = useContext(AlertManagerContext)
-  const {data: courseData, loading: courseIsLoading} = useQuery(COURSE_QUERY, {
-    variables: {
-      courseId: ENV.context_id, // TODO: what if it's a group?
-    },
-  })
-  const currentCourse = courseData?.legacyNode
-  const sections = currentCourse?.sectionsConnection?.nodes
-  const groupCategories = currentCourse?.groupSetsConnection?.nodes
+  const contextType = ENV.context_is_not_group ? 'Course' : 'Group'
+  const {contextQueryToUse, contextQueryVariables} = getContextQuery(contextType)
 
-  const isEditing = !!ENV.discussion_topic_id
+  const {data: contextData, loading: courseIsLoading} = useQuery(contextQueryToUse, {
+    variables: contextQueryVariables,
+  })
+  const currentContext = contextData?.legacyNode
+  const currentDiscussionTopicId = ENV.DISCUSSION_TOPIC?.ATTRIBUTES?.id
+  const isEditing = !!currentDiscussionTopicId
+
+  // sections and groupCategories are only available for Course and not group
+  const sections = currentContext?.sectionsConnection?.nodes
+  const groupCategories = currentContext?.groupSetsConnection?.nodes
+
   const {data: topicData, loading: topicIsLoading} = useQuery(DISCUSSION_TOPIC_QUERY, {
     skip: !isEditing,
     variables: {
-      discussionTopicId: ENV.discussion_topic_id,
+      discussionTopicId: currentDiscussionTopicId,
     },
   })
   const currentDiscussionTopic = topicData?.legacyNode
@@ -81,14 +87,18 @@ export default function DiscussionTopicFormContainer() {
 
   return (
     <DiscussionTopicForm
+      isGroupContext={contextType === 'Group'}
       isEditing={isEditing}
       currentDiscussionTopic={currentDiscussionTopic}
       isStudent={ENV.current_user_is_student}
+      assignmentGroups={currentContext?.assignmentGroupsConnection?.nodes}
       sections={sections}
       groupCategories={groupCategories}
+      apolloClient={apolloClient}
       onSubmit={({
         title,
         message,
+        sectionIdsToPostTo,
         shouldPublish,
         requireInitialPost,
         discussionAnonymousState,
@@ -99,6 +109,10 @@ export default function DiscussionTopicFormContainer() {
         onlyGradersCanLike,
         addToTodo,
         todoDate,
+        enablePodcastFeed,
+        includeRepliesInFeed,
+        locked,
+        isAnnouncement,
       }) => {
         if (isEditing) {
           console.log('call updateDiscussion')
@@ -106,9 +120,10 @@ export default function DiscussionTopicFormContainer() {
           createDiscussionTopic({
             variables: {
               contextId: ENV.context_id,
-              contextType: 'Course',
+              contextType: ENV.context_is_not_group ? 'Course' : 'Group',
               title,
               message,
+              specificSections: sectionIdsToPostTo.join(),
               published: shouldPublish,
               requireInitialPost,
               anonymousState: discussionAnonymousState,
@@ -118,6 +133,10 @@ export default function DiscussionTopicFormContainer() {
               allowRating: allowLiking,
               onlyGradersCanRate: onlyGradersCanLike,
               todoDate: addToTodo ? todoDate : null,
+              podcastEnabled: enablePodcastFeed,
+              podcastHasStudentPosts: includeRepliesInFeed,
+              locked,
+              isAnnouncement,
             },
           })
         }

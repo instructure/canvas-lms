@@ -43,17 +43,7 @@ import {generateModalLauncherId} from '../../utils/utils'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Table} from '@instructure/ui-table'
 
-const {
-  Body: TableBody,
-  Head: TableHead,
-  Row: TableRow,
-  Cell: TableCell,
-  ColHeader: TableColHeader,
-} = Table as any
-
 const I18n = useI18nScope('course_paces_header')
-
-const {Item: FlexItem} = Flex as any
 
 interface DispatchProps {
   readonly fetchDefaultPaceContext: () => void
@@ -135,7 +125,7 @@ export const Header = (props: HeaderProps) => {
         {props.defaultPaceContext?.name ? (
           <Heading
             level="h1"
-            theme={{h1FontWeight: 700, h1FontSize: '1.75rem'}}
+            themeOverride={{h1FontWeight: 700, h1FontSize: '1.75rem'}}
             margin="0 0 small 0"
           >
             {props.defaultPaceContext?.name}
@@ -151,14 +141,14 @@ export const Header = (props: HeaderProps) => {
             justifyItems="space-between"
             direction={props.responsiveSize !== 'small' ? 'row' : 'column'}
           >
-            <FlexItem>
+            <Flex.Item>
               <Flex justifyItems={props.responsiveSize !== 'small' ? 'start' : 'center'}>
                 {props.responsiveSize !== 'small' ? (
-                  <FlexItem padding="0 medium 0 0">
+                  <Flex.Item padding="0 medium 0 0">
                     <IconCoursesLine size="small" />
-                  </FlexItem>
+                  </Flex.Item>
                 ) : null}
-                <FlexItem>
+                <Flex.Item>
                   <span className="course-paces-metrics-heading">
                     <Table
                       elementRef={e => {
@@ -167,31 +157,31 @@ export const Header = (props: HeaderProps) => {
                       caption={I18n.t('Metrics')}
                       layout="auto"
                     >
-                      <TableHead>
-                        <TableRow theme={{borderColor: 'transparent'}}>
-                          <TableColHeader
+                      <Table.Head>
+                        <Table.Row themeOverride={{borderColor: 'transparent'}}>
+                          <Table.ColHeader
                             id="students-col-header"
-                            theme={{padding: '0rem 0.75rem'}}
+                            themeOverride={{padding: '0rem 0.75rem'}}
                           >
                             <Text size="small">{I18n.t('Students')}</Text>
-                          </TableColHeader>
-                          <TableColHeader
+                          </Table.ColHeader>
+                          <Table.ColHeader
                             id="sections-col-header"
-                            theme={{padding: '0rem  0.75rem'}}
+                            themeOverride={{padding: '0rem  0.75rem'}}
                           >
                             <Text size="small">{I18n.t('Sections')}</Text>
-                          </TableColHeader>
-                          <TableColHeader
+                          </Table.ColHeader>
+                          <Table.ColHeader
                             id="duration-col-header"
                             data-testid="duration-col-header"
-                            theme={{padding: '0rem  0.75rem'}}
+                            themeOverride={{padding: '0rem  0.75rem'}}
                           >
                             <View
                               as="div"
                               aria-label={I18n.t('Pace Duration')}
                               display="inline-flex"
                               margin="x-small none none none"
-                              theme={{
+                              themeOverride={{
                                 marginXSmall: '0.475rem',
                               }}
                             >
@@ -211,44 +201,56 @@ export const Header = (props: HeaderProps) => {
                                 </View>
                               </Tooltip>
                             </View>
-                          </TableColHeader>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        <TableRow theme={{borderColor: 'transparent'}}>
-                          <TableCell
+                          </Table.ColHeader>
+                        </Table.Row>
+                      </Table.Head>
+                      <Table.Body>
+                        <Table.Row themeOverride={{borderColor: 'transparent'}}>
+                          <Table.Cell
                             data-testid="number-of-students"
-                            theme={{padding: '0rem  0.75rem'}}
+                            themeOverride={{padding: '0rem  0.75rem'}}
                           >
-                            <Text size="medium" weight="bold" theme={{fontSizeMedium: '1.125rem'}}>
+                            <Text
+                              size="medium"
+                              weight="bold"
+                              themeOverride={{fontSizeMedium: '1.125rem'}}
+                            >
                               {props.defaultPaceContext?.associated_student_count}
                             </Text>
-                          </TableCell>
-                          <TableCell
+                          </Table.Cell>
+                          <Table.Cell
                             data-testid="number-of-sections"
-                            theme={{padding: '0rem  0.75rem'}}
+                            themeOverride={{padding: '0rem  0.75rem'}}
                           >
-                            <Text size="medium" weight="bold" theme={{fontSizeMedium: '1.125rem'}}>
+                            <Text
+                              size="medium"
+                              weight="bold"
+                              themeOverride={{fontSizeMedium: '1.125rem'}}
+                            >
                               {props.defaultPaceContext?.associated_section_count}
                             </Text>
-                          </TableCell>
-                          <TableCell
+                          </Table.Cell>
+                          <Table.Cell
                             data-testid="default-pace-duration"
-                            theme={{padding: '0rem  0.75rem'}}
+                            themeOverride={{padding: '0rem  0.75rem'}}
                           >
-                            <Text size="medium" weight="bold" theme={{fontSizeMedium: '1.125rem'}}>
+                            <Text
+                              size="medium"
+                              weight="bold"
+                              themeOverride={{fontSizeMedium: '1.125rem'}}
+                            >
                               {getDurationLabel(props.defaultPaceContext?.applied_pace?.duration) ||
                                 '--'}
                             </Text>
-                          </TableCell>
-                        </TableRow>
-                      </TableBody>
+                          </Table.Cell>
+                        </Table.Row>
+                      </Table.Body>
                     </Table>
                   </span>
-                </FlexItem>
+                </Flex.Item>
               </Flex>
-            </FlexItem>
-            <FlexItem
+            </Flex.Item>
+            <Flex.Item
               fontSize="0.875rem"
               textAlign="center"
               margin={props.responsiveSize !== 'small' ? '0' : 'small 0 0'}
@@ -269,7 +271,7 @@ export const Header = (props: HeaderProps) => {
                   ? I18n.t('Create Course Pace')
                   : I18n.t('Edit Default Course Pace')}
               </Link>
-            </FlexItem>
+            </Flex.Item>
           </Flex>
         </View>
       </View>
@@ -293,14 +295,14 @@ export const Header = (props: HeaderProps) => {
           </Alert>
         )}
         <Flex as="section" alignItems="end" wrap="wrap">
-          <FlexItem margin="0 0 small">
+          <Flex.Item margin="0 0 small">
             <PacePicker />
-          </FlexItem>
-          <FlexItem margin="0 0 small" shouldGrow={true}>
+          </Flex.Item>
+          <Flex.Item margin="0 0 small" shouldGrow={true}>
             <Settings isBlueprintLocked={props.blueprintLocked} margin="0 0 0 small" />
             <BlueprintLock newPace={props.newPace} />
-          </FlexItem>
-          <FlexItem textAlign="end" margin="0 0 small small">
+          </Flex.Item>
+          <Flex.Item textAlign="end" margin="0 0 small small">
             {(props.context_type !== 'Enrollment' ||
               window.ENV.FEATURES.course_paces_for_students) && (
               <UnpublishedChangesIndicator
@@ -308,7 +310,7 @@ export const Header = (props: HeaderProps) => {
                 onClick={props.handleDrawerToggle}
               />
             )}
-          </FlexItem>
+          </Flex.Item>
         </Flex>
       </View>
       <ProjectedDates key={`${props.context_type}-${props.context_id}`} />

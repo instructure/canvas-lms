@@ -21,9 +21,8 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {CustomColumn, HandleCheckboxChange, TeacherNotes} from '../../../types'
 import {executeApiRequest} from '@canvas/util/apiRequest'
 import {View} from '@instructure/ui-view'
-import {ApplyTheme} from '@instructure/ui-themeable'
-// @ts-expect-error TODO: fix in instui 8
-import {Checkbox, CheckboxFacade} from '@instructure/ui-checkbox'
+import {InstUISettingsProvider} from '@instructure/emotion'
+import {Checkbox} from '@instructure/ui-checkbox'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 type Props = {
@@ -36,6 +35,18 @@ type Props = {
   showNotesColumn: boolean
   onTeacherNotesCreation: (teacherNotes: TeacherNotes) => void
 }
+
+const componentOverrides = {
+  CheckboxFacade: {
+    checkedBackground: '#0375ff',
+    borderColor: '#777777',
+    labelFontSizeSmall: '1rem',
+  },
+  View: {
+    paddingMedium: '16px',
+  },
+}
+
 export default function ShowNotesColumnCheckbox({
   teacherNotes,
   customColumns,
@@ -86,18 +97,7 @@ export default function ShowNotesColumnCheckbox({
   }
 
   return (
-    <ApplyTheme
-      theme={{
-        [CheckboxFacade.theme]: {
-          checkedBackground: '#0375ff',
-          borderColor: '#777777',
-          labelFontSizeSmall: '1rem',
-        },
-        [View.theme]: {
-          paddingMedium: '16px',
-        },
-      }}
-    >
+    <InstUISettingsProvider theme={{componentOverrides}}>
       <View
         as="div"
         className="checkbox"
@@ -105,7 +105,7 @@ export default function ShowNotesColumnCheckbox({
         borderRadius="medium"
         background="primary"
         padding="medium"
-        theme={{backgroundPrimary: '#eee'}}
+        themeOverride={{backgroundPrimary: '#eee'}}
       >
         <Checkbox
           data-testid="show-notes-column-checkbox"
@@ -115,6 +115,6 @@ export default function ShowNotesColumnCheckbox({
           onChange={handleShowNotesColumnChange}
         />
       </View>
-    </ApplyTheme>
+    </InstUISettingsProvider>
   )
 }

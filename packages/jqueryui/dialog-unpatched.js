@@ -16,6 +16,11 @@
  *	jquery.ui.position.js
  *	jquery.ui.resizable.js
  */
+
+/* eslint-disable eslint-comments/no-unlimited-disable */
+/* eslint-disable */
+/* tslint:disable */
+
 import $ from 'jquery'
 import './core'
 import './widget'
@@ -798,7 +803,9 @@ $.extend( $.ui.dialog.overlay, {
 						// INSTRUCTURE - make sure that the element isn't in the dialog
 						// before stopping all events
 						if ( $( event.target ).zIndex() < $.ui.dialog.overlay.maxZ &&
-								!(dialog.element.has(event.target).length ) ) {
+								!(dialog.element.has(event.target).length ) &&
+								!event.target.parentElement?.getAttribute('data-instui-modal-close-button')
+						) {
 							return false;
 						}
 					});

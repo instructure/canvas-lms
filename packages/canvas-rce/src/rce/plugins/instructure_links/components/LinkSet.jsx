@@ -106,7 +106,7 @@ class LinkSet extends Component {
           {formatMessage('Click to insert a link into the editor.')}
         </ScreenReaderContent>
 
-        <List variant="unstyled" as="ul" margin="0">
+        <List isUnstyled={true} as="ul" margin="0">
           {this.props.collection.links.map((link, index, array) => (
             <List.Item key={link.href} spacing="none" padding="0">
               <Link
@@ -127,19 +127,13 @@ class LinkSet extends Component {
   }
 
   renderEmptyIndicator() {
-    return RCEGlobals.getFeatures()?.improved_no_results_messaging ?
-    (
+    return (
       <NoResults
         contextType={this.props.contextType}
         contextId={this.props.contextId}
         collectionType={this.props.type}
         isSearchResult={this.props.searchString?.length >= 3}
       />
-    )
-    : (
-      <View as="div" role="alert" padding="medium">
-        {formatMessage('No results.')}
-      </View>
     )
   }
 

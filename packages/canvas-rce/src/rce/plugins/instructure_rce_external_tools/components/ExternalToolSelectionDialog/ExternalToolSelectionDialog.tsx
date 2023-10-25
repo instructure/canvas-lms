@@ -76,14 +76,14 @@ export function ExternalToolSelectionDialog(props: ExternalToolSelectionDialogPr
       data-mce-component={true}
       liveRegion={getLiveRegion}
       size="medium"
-      theme={{mediumMaxWidth: '42rem'}}
+      themeOverride={{mediumMaxWidth: '42rem'}}
       label={formatMessage('Apps')}
       mountNode={instuiPopupMountNode}
       onDismiss={props.onDismiss}
       open={true}
       shouldCloseOnDocumentClick={false}
     >
-      <Modal.Header theme={{padding: '0.5rem'}}>
+      <Modal.Header themeOverride={{padding: '0.5rem'}}>
         <CloseButton
           placement="end"
           offset="medium"

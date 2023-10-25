@@ -2,9 +2,11 @@
 
 source "https://rubygems.org"
 
+gem "canvas_cache", path: "../canvas_cache"
 gem "canvas_http", path: "../canvas_http"
 gem "canvas_slug", path: "../canvas_slug"
 gem "canvas_sort", path: "../canvas_sort"
+gem "config_file", path: "../config_file"
 gem "legacy_multipart", path: "../legacy_multipart"
 
 gemspec

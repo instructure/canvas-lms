@@ -2091,24 +2091,22 @@ class Course < ActiveRecord::Base
     return false unless user
 
     @membership_allows ||= {}
-    @membership_allows[[user.id, permission]] ||= if permission.nil?
-                                                    cached_account_users_for(user).any? { |au| au.permitted_for_account?(root_account).success? }
-                                                  else
-                                                    results = cached_account_users_for(user).map do |au|
-                                                      res = au.permission_check(self, permission)
-                                                      if res.success?
-                                                        break :success
-                                                      else
-                                                        res
-                                                      end
-                                                    end
-                                                    if results == :success
-                                                      true
-                                                    else
-                                                      # return the first result with a justification or false, either of which will deny access
-                                                      results.find { |r| r.is_a?(AdheresToPolicy::JustifiedFailure) } || false
-                                                    end
-                                                  end
+    @membership_allows[[user.id, permission]] ||= begin
+      results = cached_account_users_for(user).map do |au|
+        res = permission.nil? ? au.permitted_for_account?(root_account) : au.permission_check(self, permission)
+        if res.success?
+          break :success
+        else
+          res
+        end
+      end
+      if results == :success
+        true
+      else
+        # return the first result with a justification or false, either of which will deny access
+        results.find { |r| r.is_a?(AdheresToPolicy::JustifiedFailure) } || false
+      end
+    end
   end
 
   def grade_publishing_status_translation(status, message)

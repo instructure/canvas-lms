@@ -24,18 +24,18 @@ import {TruncateText} from '@instructure/ui-truncate-text'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Menu} from '@instructure/ui-menu'
 import {Popover} from '@instructure/ui-popover'
-import {ApplyTheme} from '@instructure/ui-themeable'
+import {InstUISettingsProvider} from '@instructure/emotion'
 
 const I18n = useI18nScope('CommentLibrary')
 
-const themeOverride = {
-  [Menu.theme]: {
+const componentOverrides = {
+  [Menu.componentId]: {
     maxWidth: '340px',
     minWidth: '280px',
     maxHeight: '200px',
     minHeight: '140px',
   },
-  [Menu.Item.theme]: {
+  [Menu.Item.componentId]: {
     labelPadding: '8px',
     padding: '8px',
   },
@@ -86,8 +86,8 @@ const Suggestions = ({
         onHideContent={() => showResults && closeSuggestions()}
       >
         {showResults && (
-          <ApplyTheme theme={themeOverride}>
-            <Menu show={showResults} label={I18n.t('Comment suggestions')}>
+          <InstUISettingsProvider theme={{componentOverrides}}>
+            <Menu show={showResults} label={I18n.t('Comment suggestions')} onToggle={() => {}}>
               <Menu.Group label={header()}>
                 {searchResults.map(result => (
                   <Menu.Item
@@ -104,7 +104,7 @@ const Suggestions = ({
                 ))}
               </Menu.Group>
             </Menu>
-          </ApplyTheme>
+          </InstUISettingsProvider>
         )}
       </Popover>
       <div ref={onSetMountRef} />

@@ -35,7 +35,7 @@ export const ASSIGNMENTS = gql`
         assignmentsConnection(filter: {gradingPeriodId: $gradingPeriodID, userId: $studentId}) {
           nodes {
             ...Assignment
-            submissionsConnection(filter: {userId: $studentId}) {
+            submissionsConnection(filter: {userId: $studentId, includeUnsubmitted: true}) {
               nodes {
                 ...Submission
               }

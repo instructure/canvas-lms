@@ -61,3 +61,8 @@ temporary_enrollments:
   display_name: Temporary Enrollments
   description: Users can temporarily enroll another user in a course. The assigned user is removed from the course when the enrollment expires.
   applies_to: RootAccount
+instui_nav:
+  state: hidden
+  applies_to: RootAccount
+  display_name: New InstUI navbar
+  description: This is a new navbar being implemented with react router in mind

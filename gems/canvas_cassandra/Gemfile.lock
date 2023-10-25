@@ -64,7 +64,7 @@ GEM
     irb (1.8.1)
       rdoc
       reline (>= 0.3.8)
-    loofah (2.21.3)
+    loofah (2.21.4)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
     method_source (1.0.0)
@@ -104,7 +104,7 @@ GEM
     rake (13.0.6)
     rdoc (6.5.0)
       psych (>= 4.0.0)
-    reline (0.3.8)
+    reline (0.3.9)
       io-console (~> 0.5)
     rspec (3.12.0)
       rspec-core (~> 3.12.0)
@@ -152,4 +152,4 @@ DEPENDENCIES
   thrift_client (= 0.9.3)!
 
 BUNDLED WITH
-   2.4.19
+   2.4.20

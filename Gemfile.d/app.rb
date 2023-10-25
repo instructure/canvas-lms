@@ -22,11 +22,11 @@
 gem "bootsnap", "~> 1.16", require: false
 gem "rails", "~> 7.0.4"
 gem "switchman", "~> 3.5"
-gem "guardrail", "3.0.2"
+gem "guardrail", "~> 3.0"
 gem "switchman-inst-jobs", "~> 4.0"
 gem "irb", "~> 1.7"
 
-gem "academic_benchmarks", "1.1.2", require: false
+gem "academic_benchmarks", "~> 1.1", require: false
 gem "active_model-better_errors", "1.6.7", require: "active_model/better_errors"
 gem "active_model_serializers", "~> 0.9.9"
 gem "addressable", "~> 2.8", require: false
@@ -48,7 +48,7 @@ gem "crocodoc-ruby", "0.0.1", require: false
 gem "code_ownership", "~> 1.33"
 gem "ddtrace", "~> 1.13", require: false
 gem "docx", "~> 0.8"
-gem "encrypted_cookie_store-instructure", "1.2.12", require: "encrypted_cookie_store"
+gem "encrypted_cookie_store-instructure", "~> 1.2", require: "encrypted_cookie_store"
 gem "gepub", "1.0.15"
 gem "apollo-federation", "~> 3.8"
 gem "graphql", "~> 1.12.7"
@@ -79,7 +79,7 @@ gem "net-ldap", "~> 0.18", require: false
 gem "oauth", "~> 1.1", require: false
 gem "oauth2", "~> 2.0", require: false
 gem "oj", "~> 3.16"
-gem "outrigger", "3.0.1"
+gem "outrigger", "~> 3.0"
 gem "parallel", "~> 1.23", require: false
 gem "pdf-reader", "~> 2.11"
 gem "pg_query", "~> 4.2", require: false
@@ -99,7 +99,7 @@ gem "ruby-duration", "3.2.3", require: false
 gem "rubycas-client", "2.3.9", require: false
 gem "ruby-rtf", "0.0.5"
 gem "rubyzip", "~> 2.3", require: "zip"
-gem "saml2", "3.1.2"
+gem "saml2", "~> 3.1"
 gem "sanitize", "~> 6.0", require: false
 gem "sentry-rails", "~> 5.10"
 gem "sentry-inst_jobs", "~> 5.10"

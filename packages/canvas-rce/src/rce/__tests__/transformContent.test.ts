@@ -34,7 +34,7 @@ describe('transformRceContentForEditing', () => {
 
   it('should handle a real-world LTI URL', () => {
     const url =
-      '/courses/961/external_tools/retrieve?display=borderless&amp;url=https%3A%2F%2Faware.instructuremedia.com%2Flti%2Flaunch%3Fcustom_arc_launch_type%3Dembed%26custom_arc_media_id%3D41c61c58-4182-458c-84b4-d0cdc98d331e-21'
+      '/courses/961/external_tools/retrieve?display=in_rce&amp;url=https%3A%2F%2Faware.instructuremedia.com%2Flti%2Flaunch%3Fcustom_arc_launch_type%3Dembed%26custom_arc_media_id%3D41c61c58-4182-458c-84b4-d0cdc98d331e-21'
 
     expect(
       transformRceContentForEditing(
@@ -42,6 +42,15 @@ describe('transformRceContentForEditing', () => {
         defaultOptions
       )
     ).toEqual(`<iframe src="${url}"></iframe>`)
+  })
+
+  it('replaces `borderless` with `in_rce` for LTI launch URLs', () => {
+    const url =
+      '/courses/961/external_tools/retrieve?display=borderless&amp;url=https%3A%2F%2Faware.instructuremedia.com%2Flti%2Flaunch%3Fcustom_arc_launch_type%3Dembed%26custom_arc_media_id%3D41c61c58-4182-458c-84b4-d0cdc98d331e-21'
+
+    expect(transformRceContentForEditing(`<iframe src="${url}"></iframe>`, defaultOptions)).toEqual(
+      `<iframe src="${url.replace('borderless', 'in_rce')}"></iframe>`
+    )
   })
 
   it('should handle content with extraneous <html> and <body> elements', () => {

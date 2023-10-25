@@ -44,6 +44,13 @@ describe Mutations::CreateDiscussionTopic do
             allowRating
             onlyGradersCanRate
             todoDate
+            podcastEnabled
+            podcastHasStudentPosts
+            isSectionSpecific
+            courseSections{
+              _id
+              name
+            }
           }
           errors {
             attribute
@@ -88,7 +95,82 @@ describe Mutations::CreateDiscussionTopic do
     expect(created_discussion_topic["allowRating"]).to be false
     expect(created_discussion_topic["onlyGradersCanRate"]).to be false
     expect(created_discussion_topic["todoDate"]).to be_nil
+    expect(created_discussion_topic["podcastEnabled"]).to be false
+    expect(created_discussion_topic["podcastHasStudentPosts"]).to be false
+    expect(created_discussion_topic["isSectionSpecific"]).to be false
     expect(DiscussionTopic.where("id = #{created_discussion_topic["_id"]}").count).to eq 1
+  end
+
+  it "successfully creates an announcement" do
+    is_announcement = true
+    context_type = "Course"
+    title = "Test Title"
+    message = "A message"
+    published = true
+    require_initial_post = true
+
+    query = <<~GQL
+      isAnnouncement: #{is_announcement}
+      contextId: "#{@course.id}"
+      contextType: "#{context_type}"
+      title: "#{title}"
+      message: "#{message}"
+      published: #{published}
+      requireInitialPost: #{require_initial_post}
+      anonymousState: "off"
+    GQL
+
+    result = execute_with_input(query)
+    created_announcement = result.dig("data", "createDiscussionTopic", "discussionTopic")
+
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "discussionTopic", "errors")).to be_nil
+
+    expect(created_announcement["contextType"]).to eq context_type
+    expect(created_announcement["title"]).to eq title
+    expect(created_announcement["message"]).to eq message
+    expect(created_announcement["published"]).to eq published
+    expect(created_announcement["requireInitialPost"]).to be true
+    expect(created_announcement["anonymousState"]).to be_nil
+    expect(created_announcement["allowRating"]).to be false
+    expect(created_announcement["onlyGradersCanRate"]).to be false
+    expect(created_announcement["todoDate"]).to be_nil
+    expect(created_announcement["podcastEnabled"]).to be false
+    expect(created_announcement["podcastHasStudentPosts"]).to be false
+    expect(Announcement.where("id = #{created_announcement["_id"]}").count).to eq 1
+  end
+
+  it "successfully creates a locked announcement" do
+    is_announcement = true
+    context_type = "Course"
+    title = "Test Title"
+    message = "A message"
+    published = true
+    require_initial_post = false
+    locked = true
+
+    query = <<~GQL
+      isAnnouncement: #{is_announcement}
+      contextId: "#{@course.id}"
+      contextType: "#{context_type}"
+      title: "#{title}"
+      message: "#{message}"
+      published: #{published}
+      requireInitialPost: #{require_initial_post}
+      anonymousState: "off"
+      locked: #{locked}
+    GQL
+
+    result = execute_with_input(query)
+    created_announcement = result.dig("data", "createDiscussionTopic", "discussionTopic")
+
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "discussionTopic", "errors")).to be_nil
+
+    announcement = Announcement.find(created_announcement["_id"])
+
+    expect(announcement.locked_announcement?).to be true
+    expect(announcement.workflow_state).to eq "active"
   end
 
   it "creates an allow_rating discussion topic" do
@@ -293,6 +375,37 @@ describe Mutations::CreateDiscussionTopic do
     expect(created_discussion_topic["todoDate"]).to eq todo_date
   end
 
+  it "successfully creates the discussion topic with podcast_enabled and podcast_has_student_posts" do
+    context_type = "Course"
+    title = "Test Title"
+    message = "A message"
+    published = false
+    require_initial_post = true
+    podcast_enabled = true
+    podcast_has_student_posts = true
+
+    query = <<~GQL
+      contextId: "#{@course.id}"
+      contextType: "#{context_type}"
+      title: "#{title}"
+      message: "#{message}"
+      published: #{published}
+      requireInitialPost: #{require_initial_post}
+      anonymousState: "off"
+      podcastEnabled: #{podcast_enabled}
+      podcastHasStudentPosts: #{podcast_has_student_posts}
+    GQL
+
+    result = execute_with_input(query)
+    created_discussion_topic = result.dig("data", "createDiscussionTopic", "discussionTopic")
+
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "discussionTopic", "errors")).to be_nil
+
+    expect(created_discussion_topic["podcastEnabled"]).to be true
+    expect(created_discussion_topic["podcastHasStudentPosts"]).to be true
+  end
+
   context "errors" do
     def expect_error(result, message)
       errors = result["errors"] || result.dig("data", "createDiscussionTopic", "errors")
@@ -316,7 +429,7 @@ describe Mutations::CreateDiscussionTopic do
           contextType: "NotAContextType"
         GQL
         result = execute_with_input(query)
-        expect_error(result, "Invalid context type")
+        expect_error(result, "Invalid context")
       end
     end
 
@@ -374,6 +487,103 @@ describe Mutations::CreateDiscussionTopic do
         result = execute_with_input(query, @student)
         expect_error(result, "You do not have permission to add this topic to the student to-do list.")
       end
+    end
+  end
+
+  context "sections" do
+    it "successfully creates the discussion topic is_section_specific false" do
+      context_type = "Course"
+      title = "Test Title"
+      message = "A message"
+      published = false
+      require_initial_post = true
+      query = <<~GQL
+        contextId: "#{@course.id}"
+        contextType: "#{context_type}"
+        title: "#{title}"
+        message: "#{message}"
+        published: #{published}
+        requireInitialPost: #{require_initial_post}
+        anonymousState: "off"
+        specificSections: "all"
+      GQL
+
+      result = execute_with_input(query)
+      created_discussion_topic = result.dig("data", "createDiscussionTopic", "discussionTopic")
+
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "discussionTopic", "errors")).to be_nil
+      expect(created_discussion_topic["contextType"]).to eq context_type
+      expect(created_discussion_topic["title"]).to eq title
+      expect(created_discussion_topic["isSectionSpecific"]).to be false
+      expect(DiscussionTopic.where("id = #{created_discussion_topic["_id"]}").count).to eq 1
+    end
+
+    it "successfully creates the discussion topic is_section_specific true" do
+      context_type = "Course"
+      title = "Test Title"
+      message = "A message"
+      published = false
+      require_initial_post = true
+
+      section = add_section("Dope Section")
+      section2 = add_section("Dope Section 2")
+
+      query = <<~GQL
+        contextId: "#{@course.id}"
+        contextType: "#{context_type}"
+        title: "#{title}"
+        message: "#{message}"
+        published: #{published}
+        requireInitialPost: #{require_initial_post}
+        anonymousState: "off"
+        specificSections: "#{section.id},#{section2.id}"
+      GQL
+
+      result = execute_with_input(query)
+      created_discussion_topic = result.dig("data", "createDiscussionTopic", "discussionTopic")
+
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "discussionTopic", "errors")).to be_nil
+      expect(created_discussion_topic["contextType"]).to eq context_type
+      expect(created_discussion_topic["title"]).to eq title
+      expect(created_discussion_topic["isSectionSpecific"]).to be true
+      expect(created_discussion_topic["courseSections"][0]["name"]).to eq("Dope Section")
+      expect(created_discussion_topic["courseSections"][1]["name"]).to eq("Dope Section 2")
+      expect(DiscussionTopic.where("id = #{created_discussion_topic["_id"]}").count).to eq 1
+    end
+
+    it "does not allow creation of disuccions to sections that are not visible to the user" do
+      # This teacher does not have permission for section 2
+      course2 =  course_factory(active_course: true)
+      section1 = @course.course_sections.create!(name: "Section 1")
+      section2 = course2.course_sections.create!(name: "Section 2")
+
+      @course.enroll_teacher(@teacher, section: section1, allow_multiple_enrollments: true).accept!
+      Enrollment.limit_privileges_to_course_section!(@course, @teacher, true)
+
+      sections = [section1.id, section2.id].join(",")
+      context_type = "Course"
+      title = "Test Title"
+      message = "A message"
+      published = false
+      require_initial_post = true
+
+      query = <<~GQL
+        contextId: "#{@course.id}"
+        contextType: "#{context_type}"
+        title: "#{title}"
+        message: "#{message}"
+        published: #{published}
+        requireInitialPost: #{require_initial_post}
+        anonymousState: "off"
+        specificSections: "#{sections}"
+      GQL
+
+      result = execute_with_input(query)
+
+      expect(result.dig("data", "createDiscussionTopic", "discussionTopic")).to be_nil
+      expect(result.dig("data", "createDiscussionTopic", "errors")[0]["message"]).to eq("You do not have permissions to modify discussion for section(s) #{section2.id}")
     end
   end
 

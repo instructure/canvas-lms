@@ -573,8 +573,21 @@ window.modules = (function () {
       }
       $item.addClass('indent_' + (data.indent || 0))
       $item.addClass(modules.itemClass(data))
-      if (isAssignmentOrQuiz) {
-        $item.find('.assign-to-option').removeClass('hidden')
+      // The Assign To menu option is currently valid for assignments and quizzes only.
+      // This function is called twice, once with the data the user just entered
+      // and again after the api request returns. The second time we have
+      // all the real data, including the module item's id. Wait until then
+      // to add the option.
+      if (isAssignmentOrQuiz && 'id' in data) {
+        const $assignToMenuItem = $item.find('.assign-to-option')
+        if ($assignToMenuItem.length) {
+          $assignToMenuItem.removeClass('hidden')
+          const $a = $assignToMenuItem.find('a')
+          $a.attr('data-item-id', data.id)
+          $a.attr('data-item-name', data.title)
+          $a.attr('data-item-type', data.quiz_lti ? 'lti-quiz' : data.type)
+          $a.attr('data-item-context-id', data.context_id)
+        }
       }
 
       // don't just tack onto the bottom, put it in its correct position
@@ -1688,11 +1701,6 @@ modules.initModuleManagement = function (duplicate) {
     $(event.currentTarget).addClass('screenreader-only')
   })
 
-  $(document).on('click', '.edit_module_link', function (event) {
-    event.preventDefault()
-    modules.editModule($(this).parents('.context_module'))
-  })
-
   $(document).on('click', '.add_module_link', event => {
     event.preventDefault()
     modules.addModule()
@@ -2524,21 +2532,26 @@ $(document).ready(function () {
     )
   }
 
-  function renderDifferentiatedModulesTray(open, returnFocusTo, moduleElement, settingsProps) {
+  function renderDifferentiatedModulesTray(
+    returnFocusTo,
+    moduleElement,
+    settingsProps,
+    options = {}
+  ) {
+    const container = document.getElementById('differentiated-modules-mount-point')
     ReactDOM.render(
       <DifferentiatedModulesTray
-        open={open}
         onDismiss={() => {
-          renderDifferentiatedModulesTray(false, returnFocusTo)
+          ReactDOM.unmountComponentAtNode(container)
           returnFocusTo.focus()
         }}
-        initialTab="assign-to"
+        initialTab={options.initialTab}
         assignOnly={false}
         moduleElement={moduleElement}
         courseId={ENV.COURSE_ID}
         {...settingsProps}
       />,
-      document.getElementById('differentiated-modules-mount-point')
+      container
     )
   }
 
@@ -2581,7 +2594,9 @@ $(document).ready(function () {
     const returnFocusTo = $(event.target).closest('ul').prev('.al-trigger')
     const moduleElement = $(event.target).parents('.context_module')[0]
     const settingsProps = parseModule(moduleElement)
-    renderDifferentiatedModulesTray(true, returnFocusTo, moduleElement, settingsProps)
+    renderDifferentiatedModulesTray(returnFocusTo, moduleElement, settingsProps, {
+      initialTab: 'assign-to',
+    })
   })
 
   $('.view_assign_link').on('click keyclick', function (event) {
@@ -2589,7 +2604,23 @@ $(document).ready(function () {
     const returnFocusTo = $(event.target).closest('ul').prev('.al-trigger')
     const moduleElement = $(event.target).parents('.context_module')[0]
     const settingsProps = parseModule(moduleElement)
-    renderDifferentiatedModulesTray(true, returnFocusTo, moduleElement, settingsProps)
+    renderDifferentiatedModulesTray(returnFocusTo, moduleElement, settingsProps, {
+      initialTab: 'assign-to',
+    })
+  })
+
+  $(document).on('click', '.edit_module_link', function (event) {
+    event.preventDefault()
+    if (ENV.FEATURES.differentiated_modules) {
+      const returnFocusTo = $(event.target).closest('ul').prev('.al-trigger')
+      const moduleElement = $(event.target).parents('.context_module')[0]
+      const settingsProps = parseModule(moduleElement)
+      renderDifferentiatedModulesTray(returnFocusTo, moduleElement, settingsProps, {
+        initialTab: 'settings',
+      })
+    } else {
+      modules.editModule($(this).parents('.context_module'))
+    }
   })
 
   function renderItemAssignToTray(open, returnFocusTo, itemProps) {

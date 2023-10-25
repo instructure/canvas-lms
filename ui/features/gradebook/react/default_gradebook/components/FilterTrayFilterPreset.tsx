@@ -34,8 +34,6 @@ import {isFilterNotEmpty} from '../Gradebook.utils'
 
 const I18n = useI18nScope('gradebook')
 
-const {Item: FlexItem} = Flex as any
-
 export type FilterTrayPresetProps = {
   applyFilters: (filters: PartialFilterPreset['filters']) => void
   assignmentGroups: AssignmentGroup[]
@@ -219,7 +217,11 @@ export default function FilterTrayPreset({
         <View as="div" padding="xx-small 0 xx-small xx-small">
           <Flex margin="0 0 small 0" padding="0 xx-small 0 0">
             <TextInput
-              inputRef={(ref: HTMLInputElement) => (inputRef.current = ref)}
+              inputRef={ref => {
+                if (ref instanceof HTMLInputElement) {
+                  inputRef.current = ref
+                }
+              }}
               width="100%"
               data-testid="filter-preset-name-input"
               renderLabel={I18n.t('Filter preset name')}
@@ -236,7 +238,7 @@ export default function FilterTrayPreset({
             // eslint-disable-next-line react/no-array-index-key
             <Flex key={`chunk-${index}`} margin="small 0">
               {filters.map(filter => (
-                <FlexItem key={filter.id} size="50%" padding="0 xx-small 0 0">
+                <Flex.Item key={filter.id} size="50%" padding="0 xx-small 0 0">
                   <FilterComponent
                     assignmentGroups={assignmentGroups}
                     filter={filter}
@@ -246,7 +248,7 @@ export default function FilterTrayPreset({
                     sections={sections}
                     studentGroupCategories={studentGroupCategories}
                   />
-                </FlexItem>
+                </Flex.Item>
               ))}
             </Flex>
           ))}
@@ -255,7 +257,7 @@ export default function FilterTrayPreset({
             // eslint-disable-next-line react/no-array-index-key
             <Flex key={`always-shown-${index}`} margin="small 0">
               {filters.map(filter => (
-                <FlexItem key={filter.id} size="50%" padding="0 xx-small 0 0">
+                <Flex.Item key={filter.id} size="50%" padding="0 xx-small 0 0">
                   <FilterComponent
                     assignmentGroups={assignmentGroups}
                     filter={filter}
@@ -265,13 +267,13 @@ export default function FilterTrayPreset({
                     sections={sections}
                     studentGroupCategories={studentGroupCategories}
                   />
-                </FlexItem>
+                </Flex.Item>
               ))}
             </Flex>
           ))}
 
           <Flex justifyItems="end" margin="0 xx-small">
-            <FlexItem margin="0 0 0 small">
+            <Flex.Item margin="0 0 0 small">
               <Button
                 color="secondary"
                 data-testid="delete-filter-preset-button"
@@ -286,9 +288,9 @@ export default function FilterTrayPreset({
               >
                 {filterPreset.id ? I18n.t('Delete Preset') : I18n.t('Clear')}
               </Button>
-            </FlexItem>
+            </Flex.Item>
 
-            <FlexItem margin="0 0 0 small">
+            <Flex.Item margin="0 0 0 small">
               <Button
                 color="primary"
                 data-testid="save-filter-button"
@@ -298,7 +300,7 @@ export default function FilterTrayPreset({
               >
                 {I18n.t('Save Filter Preset')}
               </Button>
-            </FlexItem>
+            </Flex.Item>
           </Flex>
         </View>
       </View>

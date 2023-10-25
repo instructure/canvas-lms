@@ -61,8 +61,6 @@ const GradeSummaryContainer = () => {
 
   const assignmentQuery = useQuery(ASSIGNMENTS, {
     variables,
-    // disabling cache because ratings don't have unique cache keys causing collisions
-    fetchPolicy: 'no-cache',
   })
 
   const [readStateChangeSubmission] = useMutation(UPDATE_SUBMISSIONS_READ_STATE, {

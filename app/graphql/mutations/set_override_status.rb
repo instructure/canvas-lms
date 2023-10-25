@@ -33,6 +33,7 @@ module Mutations
       end
 
       if score.update(custom_grade_status: custom_grade_status(input:))
+        InstStatsd::Statsd.increment("custom_grade_status.applied_to.final_grade")
         { grades: score }
       else
         errors_for(score)

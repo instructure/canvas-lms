@@ -165,7 +165,7 @@ export default class StudentTray extends React.Component {
             elementRef={b => (this.messageStudentsButton = b)}
             onClick={this.handleMessageButtonClick}
             isWithinText={false}
-            theme={{
+            themeOverride={{
               iconSize: '1.25rem',
               mediumPaddingHorizontal: '0',
               mediumHeight: '1',
@@ -180,7 +180,7 @@ export default class StudentTray extends React.Component {
             onClick={this.handleSubmitForStudent}
             isWithinText={false}
             margin="small auto auto auto"
-            theme={{
+            themeOverride={{
               iconSize: '1.25rem',
               mediumPaddingHorizontal: '0',
               mediumHeight: '1.5rem',
@@ -278,7 +278,7 @@ export default class StudentTray extends React.Component {
                     isWithinText={false}
                     aria-label={I18n.t("Go to %{name}'s profile", {name: student.shortName})}
                     target="_blank"
-                    theme={{largePadding: '0.75rem', largeHeight: 'normal'}}
+                    themeOverride={{largePadding: '0.75rem', largeHeight: 'normal'}}
                   >
                     {student.shortName}
                   </Link>

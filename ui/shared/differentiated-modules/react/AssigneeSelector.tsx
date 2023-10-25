@@ -36,22 +36,25 @@ const I18n = useI18nScope('differentiated_modules')
 interface Props {
   courseId: string
   moduleId: string
+  onSelect: (options: AssigneeOption[]) => void
+  selectedOptionIds: string[]
 }
 
-interface Option {
+export interface AssigneeOption {
   id: string
   value: string
+  overrideId?: string
   group?: string
 }
 
-const AssigneeSelector = ({courseId, moduleId}: Props) => {
-  const [selectedAssignees, setSelectedAssignees] = useState<Option[]>([])
+const AssigneeSelector = ({courseId, moduleId, onSelect, selectedOptionIds}: Props) => {
   const [searchTerm, setSearchTerm] = useState('')
-  const [options, setOptions] = useState<Option[]>([])
+  const [options, setOptions] = useState<AssigneeOption[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [isLoadingDefaultValues, setIsLoadingDefaultValues] = useState(false)
   const listElementRef = useRef<HTMLElement | null>(null)
   const [isShowingOptions, setIsShowingOptions] = useState(false)
+  const mountedRef = useRef(false)
 
   useEffect(() => {
     setIsLoadingDefaultValues(true)
@@ -61,10 +64,11 @@ const AssigneeSelector = ({courseId, moduleId}: Props) => {
       .then((data: any) => {
         if (data.json === undefined) return
         const json = data.json as AssignmentOverride[]
-        const parsedOptions = json.reduce((acc: Option[], override: AssignmentOverride) => {
+        const parsedOptions = json.reduce((acc: AssigneeOption[], override: AssignmentOverride) => {
           const overrideOptions =
             override.students?.map(({id, name}: {id: string; name: string}) => ({
               id: `student-${id}`,
+              overrideId: override.id,
               value: name,
               group: I18n.t('Students'),
             })) ?? []
@@ -72,6 +76,7 @@ const AssigneeSelector = ({courseId, moduleId}: Props) => {
             const sectionId = `section-${override.course_section.id}`
             overrideOptions.push({
               id: sectionId,
+              overrideId: override.id,
               value: override.course_section.name,
               group: I18n.t('Sections'),
             })
@@ -79,13 +84,19 @@ const AssigneeSelector = ({courseId, moduleId}: Props) => {
           return [...acc, ...overrideOptions]
         }, [])
         setOptions(parsedOptions)
-        setSelectedAssignees(parsedOptions)
+        onSelect(parsedOptions)
       })
       .catch((e: Error) => showFlashError(I18n.t('Something went wrong while fetching data'))(e))
-      .finally(() => setIsLoadingDefaultValues(false))
+      .finally(() => {
+        setIsLoadingDefaultValues(false)
+        mountedRef.current = true
+      })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [courseId, moduleId])
 
   useEffect(() => {
+    if (!mountedRef.current) return
+
     const params: Record<string, string> = {}
     const shouldSearchTerm = searchTerm.length > 2
     if (shouldSearchTerm || searchTerm === '') {
@@ -106,16 +117,23 @@ const AssigneeSelector = ({courseId, moduleId}: Props) => {
         .then(results => {
           const sectionsResult = results[0]
           const studentsResult = results[1]
-          let sectionsParsedResult: Option[] = []
-          let studentsParsedResult: Option[] = []
+          let sectionsParsedResult: AssigneeOption[] = []
+          let studentsParsedResult: AssigneeOption[] = []
           if (sectionsResult.status === 'fulfilled') {
             const sectionsJSON = sectionsResult.value.json as Record<string, string>[]
             sectionsParsedResult =
-              sectionsJSON?.map(({id, name}: any) => ({
-                id: `section-${id}`,
-                value: name,
-                group: I18n.t('Sections'),
-              })) ?? []
+              sectionsJSON?.map(({id, name}: any) => {
+                const parsedId = `section-${id}`
+                const existing = options.find(option => option.id === parsedId)
+                if (existing !== undefined) {
+                  return existing
+                }
+                return {
+                  id: parsedId,
+                  value: name,
+                  group: I18n.t('Sections'),
+                }
+              }) ?? []
           } else {
             showFlashError(I18n.t('Failed to load sections data'))(sectionsResult.reason)
           }
@@ -123,11 +141,18 @@ const AssigneeSelector = ({courseId, moduleId}: Props) => {
           if (studentsResult.status === 'fulfilled') {
             const studentsJSON = studentsResult.value.json as Record<string, string>[]
             studentsParsedResult =
-              studentsJSON?.map(({id, name}: any) => ({
-                id: `student-${id}`,
-                value: name,
-                group: I18n.t('Students'),
-              })) ?? []
+              studentsJSON?.map(({id, name}: any) => {
+                const parsedId = `student-${id}`
+                const existing = options.find(option => option.id === parsedId)
+                if (existing !== undefined) {
+                  return existing
+                }
+                return {
+                  id: parsedId,
+                  value: name,
+                  group: I18n.t('Students'),
+                }
+              }) ?? []
           } else {
             showFlashError(I18n.t('Failed to load students data'))(studentsResult.reason)
           }
@@ -142,7 +167,7 @@ const AssigneeSelector = ({courseId, moduleId}: Props) => {
         .catch(e => showFlashError(I18n.t('Something went wrong while fetching data'))(e))
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [courseId, searchTerm])
+  }, [courseId, searchTerm, mountedRef.current])
 
   const handleSelectOption = () => {
     setIsShowingOptions(false)
@@ -151,7 +176,7 @@ const AssigneeSelector = ({courseId, moduleId}: Props) => {
   const handleChange = (newSelected: string[]) => {
     const newSelectedSet = new Set(newSelected)
     const selected = options.filter(option => newSelectedSet.has(option.id))
-    setSelectedAssignees(selected)
+    onSelect(selected)
   }
 
   const handleInputChange = (value: string) => {
@@ -173,7 +198,7 @@ const AssigneeSelector = ({courseId, moduleId}: Props) => {
         data-testid="assignee_selector"
         label={I18n.t('Assign To')}
         size="large"
-        selectedOptionIds={selectedAssignees.map(val => val.id)}
+        selectedOptionIds={selectedOptionIds}
         onChange={handleChange}
         renderAfterInput={<></>}
         customOnInputChange={handleInputChange}
@@ -214,7 +239,7 @@ const AssigneeSelector = ({courseId, moduleId}: Props) => {
       <View as="div" textAlign="end" margin="small none">
         <Link
           data-testid="clear_selection_button"
-          onClick={() => setSelectedAssignees([])}
+          onClick={() => onSelect([])}
           isWithinText={false}
         >
           <span aria-hidden={true}>{I18n.t('Clear All')}</span>

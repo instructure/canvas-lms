@@ -36,6 +36,8 @@ const defaultProps = {
   submissionAssignmentId: '',
   setOpenRubricDetailIds: () => {},
   openRubricDetailIds: [],
+  setActiveWhatIfScores: () => {},
+  activeWhatIfScores: [],
 }
 
 const setup = (props = defaultProps) => {
@@ -52,7 +54,9 @@ const setup = (props = defaultProps) => {
           props.setSubmissionAssignmentId,
           props.submissionAssignmentId,
           props.setOpenRubricDetailIds,
-          props.openRubricDetailIds
+          props.openRubricDetailIds,
+          props.setActiveWhatIfScores,
+          props.activeWhatIfScores
         )}
       </Table.Body>
     </Table>

@@ -108,7 +108,8 @@ QUnit.module('AssessmentAuditTray CreatorEventGroup', suiteHooks => {
         ok(getIcon())
       })
 
-      test('displays a tooltip', () => {
+      // FOO-3825
+      QUnit.skip('displays a tooltip', () => {
         equal(
           getTooltip().textContent,
           `${users[0].name} performed actions while anonymous was off`

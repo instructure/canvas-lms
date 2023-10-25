@@ -1,4 +1,14 @@
 GIT
+  remote: https://github.com/instructure/rspecq.git
+  revision: d7fa5536da01cccb5109ba05c9e236d6660da593
+  specs:
+    rspecq (0.7.1)
+      redis (>= 4.0, < 6.0)
+      rspec-core
+      rspec_junit_formatter
+      sentry-ruby
+
+GIT
   remote: https://github.com/kreynolds/cassandra-cql.git
   revision: 02b5abbe441a345c051a180327932566fd66bb36
   ref: 02b5abbe441a345c051a180327932566fd66bb36
@@ -6,17 +16,6 @@ GIT
     cassandra-cql (1.2.3)
       simple_uuid (>= 0.2.0)
       thrift_client (>= 0.7.1, < 0.10)
-
-GIT
-  remote: https://github.com/kyler-instructure/rspecq.git
-  revision: 8cea6a3225cf0856a26c6c6b93a5ea5605082aa0
-  ref: 8cea6a3225cf0856a26c6c6b93a5ea5605082aa0
-  specs:
-    rspecq (0.7.1)
-      redis
-      rspec-core
-      rspec_junit_formatter
-      sentry-ruby
 
 GIT
   remote: https://github.com/twitter/thrift_client.git
@@ -140,10 +139,9 @@ PATH
       config_file
       digest-murmurhash (>= 1.1.0)
       guardrail (>= 2.0.0)
-      inst_statsd (>= 2.1.0)
-      redis (>= 4.1.0)
+      redis (~> 5.0)
+      redis-clustering (~> 5.0)
       redis-scripting (>= 1.0.0)
-      sentry-ruby (~> 5.10)
     canvas_color (0.0.1)
     canvas_crummy (0.0.1)
     canvas_dynamodb (0.0.1)
@@ -157,6 +155,7 @@ PATH
       activesupport (>= 3.2)
       tzinfo
     canvas_http (1.0.0)
+      canvas_cache
       legacy_multipart
     canvas_kaltura (1.0.0)
       canvas_http
@@ -276,8 +275,8 @@ GEM
   remote: https://rubygems.org/
   specs:
     Ascii85 (1.1.0)
-    academic_benchmarks (1.1.2)
-      activesupport (>= 3.2.22, < 7.1)
+    academic_benchmarks (1.1.3)
+      activesupport (>= 3.2.22)
       httparty (~> 0.13)
     actioncable (7.0.8)
       actionpack (= 7.0.8)
@@ -339,9 +338,9 @@ GEM
     activerecord (7.0.8)
       activemodel (= 7.0.8)
       activesupport (= 7.0.8)
-    activerecord-pg-extensions (0.5.3)
-      activerecord (~> 7.0.0)
-      railties (~> 7.0.0)
+    activerecord-pg-extensions (0.5.4)
+      activerecord (>= 7.0, < 7.2)
+      railties (>= 7.0, < 7.2)
     activestorage (7.0.8)
       actionpack (= 7.0.8)
       activejob (= 7.0.8)
@@ -378,47 +377,47 @@ GEM
       request_store (~> 1.0)
     awesome_print (1.9.2)
     aws-eventstream (1.2.0)
-    aws-partitions (1.828.0)
-    aws-sdk-applicationautoscaling (1.75.0)
-      aws-sdk-core (~> 3, >= 3.177.0)
+    aws-partitions (1.834.0)
+    aws-sdk-applicationautoscaling (1.76.0)
+      aws-sdk-core (~> 3, >= 3.184.0)
       aws-sigv4 (~> 1.1)
-    aws-sdk-autoscaling (1.97.0)
-      aws-sdk-core (~> 3, >= 3.177.0)
+    aws-sdk-autoscaling (1.98.0)
+      aws-sdk-core (~> 3, >= 3.184.0)
       aws-sigv4 (~> 1.1)
-    aws-sdk-core (3.183.1)
+    aws-sdk-core (3.185.1)
       aws-eventstream (~> 1, >= 1.0.2)
       aws-partitions (~> 1, >= 1.651.0)
       aws-sigv4 (~> 1.5)
       jmespath (~> 1, >= 1.6.1)
-    aws-sdk-dynamodb (1.93.1)
-      aws-sdk-core (~> 3, >= 3.177.0)
+    aws-sdk-dynamodb (1.95.0)
+      aws-sdk-core (~> 3, >= 3.184.0)
       aws-sigv4 (~> 1.1)
-    aws-sdk-kinesis (1.51.0)
-      aws-sdk-core (~> 3, >= 3.177.0)
+    aws-sdk-kinesis (1.52.0)
+      aws-sdk-core (~> 3, >= 3.184.0)
       aws-sigv4 (~> 1.1)
-    aws-sdk-kms (1.71.0)
-      aws-sdk-core (~> 3, >= 3.177.0)
+    aws-sdk-kms (1.72.0)
+      aws-sdk-core (~> 3, >= 3.184.0)
       aws-sigv4 (~> 1.1)
-    aws-sdk-s3 (1.135.0)
+    aws-sdk-s3 (1.136.0)
       aws-sdk-core (~> 3, >= 3.181.0)
       aws-sdk-kms (~> 1)
       aws-sigv4 (~> 1.6)
-    aws-sdk-sns (1.66.0)
-      aws-sdk-core (~> 3, >= 3.177.0)
+    aws-sdk-sns (1.67.0)
+      aws-sdk-core (~> 3, >= 3.184.0)
       aws-sigv4 (~> 1.1)
-    aws-sdk-sqs (1.62.0)
-      aws-sdk-core (~> 3, >= 3.177.0)
+    aws-sdk-sqs (1.64.0)
+      aws-sdk-core (~> 3, >= 3.184.0)
       aws-sigv4 (~> 1.1)
     aws-sigv4 (1.6.0)
       aws-eventstream (~> 1, >= 1.0.2)
-    axe-core-api (4.7.0)
+    axe-core-api (4.8.0)
       dumb_delegator
       virtus
-    axe-core-rspec (4.7.0)
+    axe-core-rspec (4.8.0)
       axe-core-api
       dumb_delegator
       virtus
-    axe-core-selenium (4.7.0)
+    axe-core-selenium (4.8.0)
       axe-core-api
       dumb_delegator
     axiom-types (0.1.1)
@@ -460,6 +459,7 @@ GEM
     colored (1.2)
     colorize (1.1.0)
     concurrent-ruby (1.2.2)
+    connection_pool (2.4.1)
     crack (0.4.5)
       rexml
     crass (1.0.6)
@@ -471,16 +471,19 @@ GEM
       activerecord (>= 5.a)
       database_cleaner-core (~> 2.0.0)
     database_cleaner-core (2.0.1)
+    datadog-ci (0.2.0)
+      msgpack
     date (3.3.3)
     db-query-matchers (0.11.0)
       activesupport (>= 4.0, < 7.1)
       rspec (>= 3.0)
-    ddtrace (1.14.0)
-      debase-ruby_core_source (= 3.2.1)
-      libdatadog (~> 3.0.0.1.0)
-      libddwaf (~> 1.9.0.0.0)
+    ddtrace (1.15.0)
+      datadog-ci (~> 0.2.0)
+      debase-ruby_core_source (= 3.2.2)
+      libdatadog (~> 5.0.0.1.0)
+      libddwaf (~> 1.14.0.0.0)
       msgpack
-    debase-ruby_core_source (3.2.1)
+    debase-ruby_core_source (3.2.2)
     debug (1.8.0)
       irb (>= 1.5.0)
       reline (>= 0.3.1)
@@ -507,8 +510,8 @@ GEM
       pygments.rb
       redcarpet
     dumb_delegator (1.0.0)
-    encrypted_cookie_store-instructure (1.2.12)
-      actionpack (>= 4.2, < 7.1)
+    encrypted_cookie_store-instructure (1.2.13)
+      actionpack (>= 4.2, < 7.2)
     erubi (1.12.0)
     escape_code (0.2)
     et-orbi (1.2.7)
@@ -526,7 +529,7 @@ GEM
     faraday-multipart (1.0.4)
       multipart-post (~> 2)
     faraday-net_http (3.0.2)
-    ffi (1.16.2)
+    ffi (1.16.3)
     ffi-compiler (1.0.1)
       ffi (>= 1.0.0)
       rake
@@ -563,11 +566,11 @@ GEM
       webrick
     google-apis-drive_v3 (0.44.0)
       google-apis-core (>= 0.11.0, < 2.a)
-    google-protobuf (3.24.3)
-    google-protobuf (3.24.3-aarch64-linux)
-    google-protobuf (3.24.3-arm64-darwin)
-    google-protobuf (3.24.3-x86_64-darwin)
-    google-protobuf (3.24.3-x86_64-linux)
+    google-protobuf (3.24.4)
+    google-protobuf (3.24.4-aarch64-linux)
+    google-protobuf (3.24.4-arm64-darwin)
+    google-protobuf (3.24.4-x86_64-darwin)
+    google-protobuf (3.24.4-x86_64-linux)
     googleauth (1.8.1)
       faraday (>= 0.17.3, < 3.a)
       jwt (>= 1.4, < 3.0)
@@ -578,9 +581,9 @@ GEM
     graphql-batch (0.5.3)
       graphql (>= 1.12.18, < 3)
       promise.rb (~> 0.7.2)
-    guardrail (3.0.2)
-      activerecord (>= 6.1, < 7.1)
-      railties (>= 6.1, < 7.1)
+    guardrail (3.0.3)
+      activerecord (>= 6.1, < 7.2)
+      railties (>= 6.1, < 7.2)
     hana (1.3.7)
     hashdiff (1.0.1)
     hashery (2.1.2)
@@ -626,7 +629,7 @@ GEM
     inst-jobs-autoscaling (2.1.1)
       aws-sdk-autoscaling
       inst-jobs (> 1.0, < 4.0)
-    inst-jobs-statsd (3.0.0)
+    inst-jobs-statsd (3.0.2)
       inst-jobs (>= 3.1.1, < 4.0)
       inst_statsd (~> 3.0)
     inst_access (0.4.1)
@@ -664,21 +667,21 @@ GEM
       addressable (~> 2.8)
     letter_opener (1.8.1)
       launchy (>= 2.2, < 3)
-    libdatadog (3.0.0.1.0)
-    libdatadog (3.0.0.1.0-aarch64-linux)
-    libdatadog (3.0.0.1.0-x86_64-linux)
-    libddwaf (1.9.0.0.1)
+    libdatadog (5.0.0.1.0)
+    libdatadog (5.0.0.1.0-aarch64-linux)
+    libdatadog (5.0.0.1.0-x86_64-linux)
+    libddwaf (1.14.0.0.0)
       ffi (~> 1.0)
-    libddwaf (1.9.0.0.1-aarch64-linux)
+    libddwaf (1.14.0.0.0-aarch64-linux)
       ffi (~> 1.0)
-    libddwaf (1.9.0.0.1-arm64-darwin)
+    libddwaf (1.14.0.0.0-arm64-darwin)
       ffi (~> 1.0)
-    libddwaf (1.9.0.0.1-x86_64-darwin)
+    libddwaf (1.14.0.0.0-x86_64-darwin)
       ffi (~> 1.0)
-    libddwaf (1.9.0.0.1-x86_64-linux)
+    libddwaf (1.14.0.0.0-x86_64-linux)
       ffi (~> 1.0)
     link_header (0.0.8)
-    loofah (2.21.3)
+    loofah (2.21.4)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
     luminosity_contrast (0.2.1)
@@ -695,7 +698,7 @@ GEM
     method_source (1.0.0)
     mime-types (3.5.1)
       mime-types-data (~> 3.2015)
-    mime-types-data (3.2023.0808)
+    mime-types-data (3.2023.1003)
     mini_magick (4.12.0)
     mini_mime (1.1.5)
     mini_portile2 (2.8.4)
@@ -716,7 +719,7 @@ GEM
       activerecord (>= 6.1)
     net-http (0.3.2)
       uri
-    net-imap (0.3.7)
+    net-imap (0.4.1)
       date
       net-protocol
     net-ldap (0.18.0)
@@ -754,14 +757,14 @@ GEM
       snaky_hash (~> 2.0)
       version_gem (~> 1.1)
     oj (3.16.1)
-    once-ler (2.0.1)
-      activerecord (>= 6.0, < 7.1)
+    once-ler (2.0.2)
+      activerecord (>= 6.0, < 7.2)
       rspec (>= 3.6)
       rspec-rails (>= 4.0)
     os (1.1.4)
-    outrigger (3.0.1)
-      activerecord (>= 6.0, < 7.1)
-      railties (>= 6.0, < 7.1)
+    outrigger (3.0.2)
+      activerecord (>= 6.0, < 7.2)
+      railties (>= 6.0, < 7.2)
     packs-specification (0.0.10)
       sorbet-runtime
     pact (1.63.0)
@@ -795,7 +798,7 @@ GEM
       term-ansicolor (~> 1.7)
       thor (>= 0.20, < 2.0)
     parallel (1.23.0)
-    parser (3.2.2.3)
+    parser (3.2.2.4)
       ast (~> 2.4.1)
       racc
     parslet (2.0.0)
@@ -822,7 +825,7 @@ GEM
     prawn-table (0.2.2)
       prawn (>= 1.3.0, < 3.0.0)
     promise.rb (0.7.4)
-    prosopite (1.4.0)
+    prosopite (1.4.1)
     psych (5.1.1)
       stringio
     public_suffix (5.0.3)
@@ -880,11 +883,19 @@ GEM
     rdoc (6.5.0)
       psych (>= 4.0.0)
     redcarpet (3.6.0)
-    redis (4.1.4)
+    redis (5.0.7)
+      redis-client (>= 0.9.0)
+    redis-client (0.17.0)
+      connection_pool
+    redis-cluster-client (0.7.4)
+      redis-client (~> 0.12)
+    redis-clustering (5.0.7)
+      redis (= 5.0.7)
+      redis-cluster-client (>= 0.3.7)
     redis-scripting (1.0.1)
       redis (>= 3.0)
-    regexp_parser (2.8.1)
-    reline (0.3.8)
+    regexp_parser (2.8.2)
+    reline (0.3.9)
       io-console (~> 0.5)
     representable (3.2.0)
       declarative (< 0.1.0)
@@ -906,7 +917,7 @@ GEM
       rspec-core (~> 3.12.0)
       rspec-expectations (~> 3.12.0)
       rspec-mocks (~> 3.12.0)
-    rspec-collection_matchers (1.2.0)
+    rspec-collection_matchers (1.2.1)
       rspec-expectations (>= 2.99.0.beta1)
     rspec-core (3.12.2)
       rspec-support (~> 3.12.0)
@@ -931,12 +942,12 @@ GEM
       rspec-core (>= 2, < 4, != 2.12.0)
     rss (0.3.0)
       rexml
-    rubocop (1.56.4)
+    rubocop (1.57.0)
       base64 (~> 0.1.1)
       json (~> 2.3)
       language_server-protocol (>= 3.17.0)
       parallel (~> 1.10)
-      parser (>= 3.2.2.3)
+      parser (>= 3.2.2.4)
       rainbow (>= 2.2.2, < 4.0)
       regexp_parser (>= 1.8, < 3.0)
       rexml (>= 3.2.5, < 4.0)
@@ -957,7 +968,7 @@ GEM
     rubocop-performance (1.19.1)
       rubocop (>= 1.7.0, < 2.0)
       rubocop-ast (>= 0.4.0)
-    rubocop-rails (2.21.1)
+    rubocop-rails (2.21.2)
       activesupport (>= 4.2.0)
       rack (>= 1.1)
       rubocop (>= 1.33.0, < 2.0)
@@ -983,8 +994,8 @@ GEM
     rubycas-client (2.3.9)
       activesupport
     rubyzip (2.3.2)
-    saml2 (3.1.2)
-      activesupport (>= 3.2, < 7.1)
+    saml2 (3.1.4)
+      activesupport (>= 3.2, < 7.2)
       nokogiri (>= 1.5.8, < 2.0)
       nokogiri-xmlsec-instructure (~> 0.9, >= 0.9.5)
     sanitize (6.1.0)
@@ -992,17 +1003,17 @@ GEM
       nokogiri (>= 1.12.0)
     scrypt (3.0.7)
       ffi-compiler (>= 1.0, < 2.0)
-    selenium-webdriver (4.13.1)
+    selenium-webdriver (4.14.0)
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2, < 3.0)
       websocket (~> 1.0)
     sentry-inst_jobs (5.10.0)
       inst-jobs (~> 3.0)
       sentry-ruby (~> 5.10)
-    sentry-rails (5.11.0)
+    sentry-rails (5.12.0)
       railties (>= 5.0)
-      sentry-ruby (~> 5.11.0)
-    sentry-ruby (5.11.0)
+      sentry-ruby (~> 5.12.0)
+    sentry-ruby (5.12.0)
       concurrent-ruby (~> 1.0, >= 1.0.2)
     sexp_processor (4.17.0)
     shoulda-matchers (5.3.0)
@@ -1038,12 +1049,12 @@ GEM
       spring (>= 0.9.1)
     spring-commands-rubocop (0.4.0)
       spring (>= 1.0)
-    sqlite3 (1.6.6)
+    sqlite3 (1.6.7)
       mini_portile2 (~> 2.8.0)
-    sqlite3 (1.6.6-aarch64-linux)
-    sqlite3 (1.6.6-arm64-darwin)
-    sqlite3 (1.6.6-x86_64-darwin)
-    sqlite3 (1.6.6-x86_64-linux)
+    sqlite3 (1.6.7-aarch64-linux)
+    sqlite3 (1.6.7-arm64-darwin)
+    sqlite3 (1.6.7-x86_64-darwin)
+    sqlite3 (1.6.7-x86_64-linux)
     stackprof (0.2.25)
     statsd-ruby (1.5.0)
     stormbreaker (1.0.0)
@@ -1053,15 +1064,15 @@ GEM
       rspec (~> 3.8)
     stringio (3.0.8)
     swearjar (1.4.0)
-    switchman (3.5.9)
+    switchman (3.5.12)
       activerecord (>= 6.1.4, < 7.1)
       guardrail (~> 3.0.1)
       parallel (~> 1.22)
       railties (>= 6.1, < 7.1)
-    switchman-inst-jobs (4.0.14)
+    switchman-inst-jobs (4.0.15)
       inst-jobs (>= 2.4.9, < 4.0)
       parallel (>= 1.19)
-      railties (>= 6.1, < 7.1)
+      railties (>= 6.1, < 7.2)
       switchman (~> 3.1)
     sync (0.5.0)
     table_print (1.5.7)
@@ -1081,7 +1092,7 @@ GEM
       sync
     trailblazer-option (0.1.2)
     ttfunk (1.7.0)
-    twilio-ruby (6.7.0)
+    twilio-ruby (6.7.1)
       faraday (>= 0.9, < 3.0)
       jwt (>= 1.5, < 3.0)
       nokogiri (>= 1.6, < 2.0)
@@ -1094,8 +1105,8 @@ GEM
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.8.2)
-    unicode-display_width (2.4.2)
-    unicode-emoji (3.3.2)
+    unicode-display_width (2.5.0)
+    unicode-emoji (3.4.0)
       unicode-version (~> 1.0)
     unicode-version (1.3.0)
     uri (0.12.2)
@@ -1134,7 +1145,7 @@ PLATFORMS
 
 DEPENDENCIES
   academic_benchmark!
-  academic_benchmarks (= 1.1.2)
+  academic_benchmarks (~> 1.1)
   account_reports!
   active_model-better_errors (= 1.6.7)
   active_model_serializers (~> 0.9.9)
@@ -1203,7 +1214,7 @@ DEPENDENCIES
   dotenv (~> 2.8)
   dress_code (= 1.2.1)
   dynamic_settings!
-  encrypted_cookie_store-instructure (= 1.2.12)
+  encrypted_cookie_store-instructure (~> 1.2)
   escape_code (= 0.2)
   event_stream!
   factory_bot (~> 6.3)
@@ -1214,7 +1225,7 @@ DEPENDENCIES
   google_drive!
   graphql (~> 1.12.7)
   graphql-batch (~> 0.5)
-  guardrail (= 3.0.2)
+  guardrail (~> 3.0)
   headless (= 2.3.1)
   highline (~> 2.0)
   html_text_helper!
@@ -1254,8 +1265,8 @@ DEPENDENCIES
   oauth (~> 1.1)
   oauth2 (~> 2.0)
   oj (~> 3.16)
-  once-ler (= 2.0.1)
-  outrigger (= 3.0.1)
+  once-ler (~> 2.0)
+  outrigger (~> 3.0)
   pact (~> 1.57)
   pact-messages (= 0.2.0)
   pact_broker-client (~> 1.66)
@@ -1275,7 +1286,7 @@ DEPENDENCIES
   rails-observers (= 0.1.5)
   ratom-nokogiri (= 0.10.11)
   redcarpet (~> 3.6)
-  redis (= 4.1.4)
+  redis-clustering (~> 5.0)
   redis-scripting (= 1.0.1)
   request_context!
   respondus_soap_endpoint!
@@ -1285,7 +1296,7 @@ DEPENDENCIES
   rqrcode (~> 2.2)
   rrule (~> 0.5)
   rspec (~> 3.12)
-  rspec-collection_matchers (= 1.2.0)
+  rspec-collection_matchers (~> 1.2)
   rspec-rails (~> 6.0)
   rspec_around_all (= 0.2.0)
   rspecq!
@@ -1300,7 +1311,7 @@ DEPENDENCIES
   ruby-rtf (= 0.0.5)
   rubycas-client (= 2.3.9)
   rubyzip (~> 2.3)
-  saml2 (= 3.1.2)
+  saml2 (~> 3.1)
   sanitize (~> 6.0)
   scrypt (= 3.0.7)
   selenium-webdriver (~> 4.12)
@@ -1336,4 +1347,4 @@ RUBY VERSION
    ruby 3.1.2p20
 
 BUNDLED WITH
-   2.4.19
+   2.4.20

@@ -1,0 +1,31 @@
+<%
+# Copyright (C) 2023 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+
+<% provide :head, include_common_stylesheets %>
+<%= render :partial => "layouts/head" %>
+
+<% css_bundle :external_tool_full_width %>
+
+<% js_env({ IN_RCE: true, IGNORE_LTI_POST_MESSAGES: true }) %>
+<% js_bundle :post_message_forwarding %>
+<% js_bundle :external_tools_show %>
+
+<body class="ic-full-screen-lti-tool" style="height: 100vh; overflow: hidden;">
+  <%= render partial: "lti/launch_iframe" %>
+  <%= render :partial => 'layouts/foot', :locals => { :include_common_bundle => true } %>
+</body>

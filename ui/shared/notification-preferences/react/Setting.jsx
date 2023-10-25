@@ -102,13 +102,14 @@ const NotificationPreferencesSetting = ({
 
   const preferenceConfig = preferenceConfigs[selection]
   return (
-    <Menu
-      trigger={renderPreferenceButton(preferenceConfig)}
-      disabled={selection === 'disabled'}
-      onSelect={(e, value) => handleUpdate(value)}
-    >
+    <Menu trigger={renderPreferenceButton(preferenceConfig)} disabled={selection === 'disabled'}>
       {preferenceOptions.map(option => (
-        <Menu.Item key={option} value={option} selected={option === selection}>
+        <Menu.Item
+          key={option}
+          value={option}
+          selected={option === selection}
+          onSelect={(e, value) => handleUpdate(value)}
+        >
           {renderPreferenceMenuItem(preferenceConfigs[option])}
         </Menu.Item>
       ))}

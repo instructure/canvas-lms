@@ -155,15 +155,16 @@ describe WikiPage do
     expect(page.url).to eq "ae-very-sspecial-namae-1-slash-4"
   end
 
-  it "makes the title/url unique" do
+  it "makes the url unique" do
     course_with_teacher(active_all: true)
     @course.wiki_pages.create(title: "Asdf")
     p2 = @course.wiki_pages.create(title: "Asdf")
-    expect(p2.title).to eql("Asdf-2")
+    expect(p2.title).to eql("Asdf")
     expect(p2.url).to eql("asdf-2")
   end
 
-  it "makes the title unique and truncate to proper length" do
+  it "makes the title unique and truncate to proper length when permanent_page_links is disabled" do
+    Account.site_admin.disable_feature! :permanent_page_links
     course_with_teacher(active_all: true)
     p1 = @course.wiki_pages.create!(title: "a" * WikiPage::TITLE_LENGTH)
     p2 = @course.wiki_pages.create!(title: p1.title)
@@ -174,7 +175,8 @@ describe WikiPage do
     expect(p3.title.end_with?("-3")).to be_truthy
   end
 
-  it "won't allow you to create a duplicate title that ends in -<number>" do
+  it "won't allow you to create a duplicate title that ends in -<number> when permanent_page_links is disabled" do
+    Account.site_admin.disable_feature! :permanent_page_links
     course_with_teacher(active_all: true)
     @course.wiki_pages.create!(title: "MAT-1104")
     expect { @course.wiki_pages.create!(title: "MAT-1104") }.to raise_error(ActiveRecord::RecordInvalid)
@@ -199,7 +201,8 @@ describe WikiPage do
     expect(p2.url).to eq("apples-2")
   end
 
-  it "lets you reuse the title/url of a deleted page" do
+  it "lets you reuse the title/url of a deleted page when permanent_page_links is disabled" do
+    Account.site_admin.disable_feature! :permanent_page_links
     course_with_teacher(active_all: true)
     p1 = @course.wiki_pages.create(title: "Asdf")
     p1.workflow_state = "deleted"

@@ -74,6 +74,8 @@ function createCache() {
 
       if (object.id) {
         cacheKey = object.id
+      } else if (object.__typename === 'RubricRating') {
+        cacheKey = object.__typename + object._id + object.rubricId
       } else if (object._id && object.__typename) {
         cacheKey = object.__typename + object._id
       } else {

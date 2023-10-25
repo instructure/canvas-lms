@@ -55,18 +55,27 @@ export const convertAssignmentGroupRules = assignmentGroup => {
   return rules
 }
 
-export const convertToSubmissionCriteria = (submission, assignmentId, state) => {
+export const convertToSubmissionCriteria = (
+  submission,
+  assignmentId,
+  assignment_state,
+  activeWhatIfScores
+) => {
+  const score = activeWhatIfScores.includes(assignmentId)
+    ? submission?.studentEnteredScore || 0
+    : submission?.score || 0
+
   return {
-    score: submission?.score || 0,
-    grade: submission?.grade || 0,
+    score,
+    grade: activeWhatIfScores.includes(assignmentId) ? `${score}` : submission?.grade || 0,
     assignment_id: assignmentId,
-    workflow_state: state,
+    workflow_state: assignment_state,
     excused: submission?.excused || false,
     id: submission?._id || 'unsubmitted',
   }
 }
 
-export const convertAssignment = assignment => {
+export const convertAssignment = (assignment, activeWhatIfScores) => {
   return {
     id: assignment._id,
     allowed_attempts: assignment.allowedAttempts,
@@ -76,7 +85,8 @@ export const convertAssignment = assignment => {
     grades_published: assignment.gradesPublished,
     grading_type: assignment.gradingType,
     group_category_id: assignment.groupCategoryId,
-    has_submitted_submissions: assignment.hasSubmittedSubmissions,
+    has_submitted_submissions:
+      activeWhatIfScores.includes(assignment._id) || assignment.hasSubmittedSubmissions,
     lock_at: assignment.lockAt,
     name: assignment.name,
     omit_from_final_grade: assignment.omitFromFinalGrade,
@@ -170,14 +180,18 @@ export const calculateAssignmentGroupGrade = (
   )
 }
 
-export const convertAssignmentGroupCriteriaMap = (assignmentGroups, assignments) => {
+export const convertAssignmentGroupCriteriaMap = (
+  assignmentGroups,
+  assignments,
+  activeWhatIfScores
+) => {
   const assignmentGroupCriteriaMap = {}
   assignmentGroups.forEach(assignmentGroup => {
     assignmentGroupCriteriaMap[assignmentGroup._id] = {
       ...convertAssignmentGroup(assignmentGroup),
       assignments: assignments
         .filter(assignment => assignment.assignmentGroupId === assignmentGroup._id)
-        .map(assignment => convertAssignment(assignment)),
+        .map(assignment => convertAssignment(assignment, activeWhatIfScores)),
       invalid: false,
       gradingPeriodsIds: [],
     }
@@ -217,13 +231,15 @@ export const calculateCourseGrade = (
   assignmentGroups,
   assignments,
   calculateOnlyGradedAssignments,
-  applyGroupWeights
+  applyGroupWeights,
+  activeWhatIfScores
 ) => {
   const convertedSubmissions = assignments.map(assignment => {
     return convertToSubmissionCriteria(
       assignment.submissionsConnection.nodes[0],
       assignment._id,
-      assignment.state
+      assignment.state,
+      activeWhatIfScores
     )
   })
 
@@ -233,7 +249,7 @@ export const calculateCourseGrade = (
 
   return CourseGradeCalculator.calculate(
     convertedSubmissions,
-    convertAssignmentGroupCriteriaMap(assignmentGroups, assignments),
+    convertAssignmentGroupCriteriaMap(assignmentGroups, assignments, activeWhatIfScores),
     applyGroupWeights ? 'percent' : 'points',
     calculateOnlyGradedAssignments,
     convertedGradingPeriods,

@@ -173,6 +173,7 @@ export type GradebookUserSubmissionDetails = {
   gradingPeriodId?: string
   deductedPoints: null | string | number
   enteredGrade: string | null
+  gradeMatchesCurrentSubmission: boolean | null
 }
 
 export type GradebookStudentQueryResponse = {

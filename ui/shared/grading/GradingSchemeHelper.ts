@@ -24,8 +24,16 @@ export function indexOfGrade(
   grade: null | string | number,
   gradingSchemes: DeprecatedGradingScheme[]
 ) {
+  const matches = (entry, key) => entry[0].toLowerCase() === key
   const cleanGrade = `${grade}`.trim().toLowerCase()
-  return gradingSchemes.findIndex(entry => entry[0].toLowerCase() === cleanGrade)
+  let idx = gradingSchemes.findIndex(entry => matches(entry, cleanGrade))
+
+  if (idx < 0 && /.+−$/.test(cleanGrade)) {
+    const gradeWithTrailingDash = cleanGrade.replace(/−$/, '-')
+    idx = gradingSchemes.findIndex(entry => matches(entry, gradeWithTrailingDash))
+  }
+
+  return idx
 }
 
 export function gradeToScoreUpperBound(grade: number, gradingSchemes: DeprecatedGradingScheme[]) {

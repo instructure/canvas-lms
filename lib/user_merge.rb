@@ -212,6 +212,9 @@ class UserMerge
 
   def copy_favorites
     from_user.favorites.preload(:context).find_each do |f|
+      # don't attempt to create a favorite if the context is missing
+      next unless f.context.present?
+
       target_user.favorites.find_or_create_by(context: f.context)
     end
   end

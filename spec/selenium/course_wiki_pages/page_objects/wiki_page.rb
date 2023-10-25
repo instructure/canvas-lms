@@ -103,7 +103,7 @@ module CourseWikiPage
   end
 
   def edit_page_title_input
-    f("input#title")
+    f("input[data-testid='wikipage-title-input']")
   end
 
   def tiny_mce_input

@@ -406,7 +406,7 @@ describe "quizzes question creation" do
     end
 
     it "shows an error when the quiz question exceeds character limit", priority: "2" do
-      skip "FOO-3869 - 9/21/2023 Flaky after the InstUI 8 -> 7 revert"
+      skip "FOO-3869 - 9/21/2023 Flaky after the InstUI 8 -> 7 revert (also FOO-3811)"
       start_quiz_question
       chars = [*("a".."z")]
       value = (0..16_385).map { chars.sample }.join

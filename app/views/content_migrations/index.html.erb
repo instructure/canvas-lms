@@ -26,11 +26,10 @@
   css_bundle :content_migrations
 %>
 
-<form id="migrationConverterContainer" class="form-horizontal"></form>
-
 <% if Account.site_admin.feature_enabled?(:instui_for_import_page) %>
-  <div id="content_migration_table"></div>
+  <div id="instui_content_migrations"></div>
 <% else %>
+  <form id="migrationConverterContainer" class="form-horizontal"></form>
   <div id="migration_upload_progress_container" style="width: 100%; display: none;">
     <div style="display: flex;">
       <span><%= t("Uploading...") %>&ensp;</span>

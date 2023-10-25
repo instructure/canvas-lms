@@ -26,7 +26,7 @@ import {View} from '@instructure/ui-view'
 import {Avatar} from '@instructure/ui-avatar'
 import {CloseButton} from '@instructure/ui-buttons'
 import Carousel from './Carousel'
-import {ApplyTheme} from '@instructure/ui-themeable'
+import {InstUISettingsProvider} from '@instructure/emotion'
 import {Link} from '@instructure/ui-link'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
@@ -40,6 +40,13 @@ import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {ApiCallStatus} from '@canvas/util/apiRequest'
 
 const I18n = useI18nScope('gradebook')
+
+const componentOverrides = {
+  Link: {
+    mediumPaddingHorizontal: 0,
+    mediumHeight: 'normal',
+  },
+}
 
 export type TotalGradeOverrideTrayProps = {
   customGradeStatuses: GradeStatus[]
@@ -172,11 +179,11 @@ export function TotalGradeOverrideTray({
             onRightArrowClick={() => navigateDown()}
             rightArrowDescription={I18n.t('Next student')}
           >
-            <ApplyTheme theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}>
+            <InstUISettingsProvider theme={{componentOverrides}}>
               <Link href={gradesUrl} isWithinText={false}>
                 {name}
               </Link>
-            </ApplyTheme>
+            </InstUISettingsProvider>
           </Carousel>
 
           <View as="div" margin="small 0" className="hr" />

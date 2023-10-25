@@ -22,8 +22,7 @@ import userSettings from '@canvas/user-settings'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {HandleCheckboxChange} from '../../../types'
 import {View} from '@instructure/ui-view'
-import {ApplyTheme} from '@instructure/ui-themeable'
-// @ts-expect-error TODO: fix in instui 8
+import {InstUISettingsProvider} from '@instructure/emotion'
 import {Checkbox, CheckboxFacade} from '@instructure/ui-checkbox'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
@@ -59,15 +58,17 @@ export default function IncludeUngradedAssignmentsCheckbox({
   }
 
   return (
-    <ApplyTheme
+    <InstUISettingsProvider
       theme={{
-        [CheckboxFacade.theme]: {
-          checkedBackground: '#0375ff',
-          borderColor: '#777777',
-          labelFontSizeSmall: '1rem',
-        },
-        [View.theme]: {
-          paddingMedium: '16px',
+        componentOverrides: {
+          [CheckboxFacade.componentId]: {
+            checkedBackground: '#0375ff',
+            borderColor: '#777777',
+            labelFontSizeSmall: '1rem',
+          },
+          [View.componentId]: {
+            paddingMedium: '16px',
+          },
         },
       }}
     >
@@ -78,7 +79,7 @@ export default function IncludeUngradedAssignmentsCheckbox({
         borderRadius="medium"
         background="primary"
         padding="medium"
-        theme={{backgroundPrimary: '#eee'}}
+        themeOverride={{backgroundPrimary: '#eee'}}
       >
         <Checkbox
           data-testid="include-ungraded-assignments-checkbox"
@@ -88,6 +89,6 @@ export default function IncludeUngradedAssignmentsCheckbox({
           onChange={handleViewUngradedChange}
         />
       </View>
-    </ApplyTheme>
+    </InstUISettingsProvider>
   )
 }

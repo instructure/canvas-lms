@@ -51,7 +51,8 @@ export const mapCustomStatusQueryResults = (
 }
 
 export const mapStandardStatusQueryResults = (
-  standardStatuses: GradingStatusQueryResult[]
+  standardStatuses: GradingStatusQueryResult[],
+  isExtendedStatusEnabled?: boolean
 ): GradeStatus[] => {
   const defaultStandardStatuses = {...DefaultStandardStatusesMap}
 
@@ -63,6 +64,10 @@ export const mapStandardStatusQueryResults = (
       name: defaultName,
       color,
     }
+  }
+
+  if (!isExtendedStatusEnabled) {
+    delete defaultStandardStatuses.extended
   }
 
   return Object.values(defaultStandardStatuses)

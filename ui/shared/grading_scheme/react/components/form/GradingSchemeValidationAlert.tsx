@@ -46,8 +46,8 @@ export const GradingSchemeValidationAlert: React.FC<ComponentProps> = ({onClose,
 
   return (
     <View
-      elementRef={(current: HTMLDivElement) => {
-        if (current) {
+      elementRef={current => {
+        if (current instanceof HTMLDivElement) {
           current.scrollIntoView()
           current.focus()
         }

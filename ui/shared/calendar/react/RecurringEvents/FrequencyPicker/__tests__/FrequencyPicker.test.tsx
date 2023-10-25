@@ -43,7 +43,7 @@ const defaultProps = (overrides: UnknownSubset<FrequencyPickerProps> = {}) => {
 
 const selectOption = (buttonName: RegExp, optionName: RegExp) => {
   userEvent.click(
-    screen.getByRole('button', {
+    screen.getByRole('combobox', {
       name: buttonName,
     })
   )
@@ -143,7 +143,7 @@ describe('FrequencyPicker', () => {
       const modal = getByText('Custom Repeating Event')
       expect(modal).toBeInTheDocument()
       userEvent.click(getByRole('button', {name: /cancel/i}))
-      expect(getByRole('button', {name: /frequency/i})).toHaveFocus()
+      expect(getByRole('combobox', {name: /frequency/i})).toHaveFocus()
     })
 
     it('sets width to auto', () => {

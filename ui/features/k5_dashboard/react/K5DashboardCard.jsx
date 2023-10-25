@@ -30,12 +30,12 @@ import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
 import LoadingSkeleton from '@canvas/k5/react/LoadingSkeleton'
 import LoadingWrapper from '@canvas/k5/react/LoadingWrapper'
-
-import k5Theme from '@canvas/k5/react/k5-theme'
+import {getK5ThemeVars} from '@canvas/k5/react/k5-theme'
 import K5DashboardContext from '@canvas/k5/react/K5DashboardContext'
 import {DEFAULT_COURSE_COLOR, FOCUS_TARGETS} from '@canvas/k5/react/utils'
-
 import instFSOptimizedImageUrl from '@canvas/dashboard-card/util/instFSOptimizedImageUrl'
+
+const k5ThemeVariables = getK5ThemeVars()
 
 const I18n = useI18nScope('k5_dashboard_card')
 
@@ -155,9 +155,9 @@ export const AssignmentLinks = ({
             href={`/courses/${id}?focusTarget=${FOCUS_TARGETS.TODAY}#schedule`}
             display="block"
             isWithinText={false}
-            theme={{
-              color: k5Theme.variables.colors.textDarkest,
-              hoverColor: k5Theme.variables.colors.textDarkest,
+            themeOverride={{
+              color: k5ThemeVariables.colors.textDarkest,
+              hoverColor: k5ThemeVariables.colors.textDarkest,
             }}
           >
             <AccessibleContent
@@ -186,9 +186,9 @@ export const AssignmentLinks = ({
               href={`/courses/${id}?focusTarget=${FOCUS_TARGETS.MISSING_ITEMS}#schedule`}
               display="block"
               isWithinText={false}
-              theme={{
-                color: k5Theme.variables.colors.textDanger,
-                hoverColor: k5Theme.variables.colors.textDanger,
+              themeOverride={{
+                color: k5ThemeVariables.colors.textDanger,
+                hoverColor: k5ThemeVariables.colors.textDanger,
               }}
             >
               <AccessibleContent
@@ -301,15 +301,15 @@ const K5DashboardCard = ({
           margin="small"
           color="inherit"
           border="bottom"
-          theme={{borderColor: backgroundColor, borderPadding: '0.5rem'}}
+          themeOverride={{borderColor: backgroundColor, borderPadding: '0.5rem'}}
         >
           <Link
             href={href}
             display="block"
             isWithinText={false}
-            theme={{
-              color: k5Theme.variables.colors.textDarkest,
-              hoverColor: k5Theme.variables.colors.textDarkest,
+            themeOverride={{
+              color: k5ThemeVariables.colors.textDarkest,
+              hoverColor: k5ThemeVariables.colors.textDarkest,
               fontWeight: 700,
             }}
           >

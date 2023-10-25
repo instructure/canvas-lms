@@ -97,7 +97,7 @@ function BaseUploadTool({children, hideFooter, icon, label, renderFooter, title}
       onClick={() => {
         setShowModal(true)
       }}
-      theme={{borderWidth: '0'}}
+      themeOverride={{borderWidth: '0'}}
       withBackground={false}
     >
       <Flex direction="row" justifyItems="center" padding="xxx-small 0">

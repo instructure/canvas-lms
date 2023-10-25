@@ -40,12 +40,10 @@ export default function Link(props) {
     props.type === 'quizzes' && props.link.quiz_type === 'quizzes.next'
       ? 'quizzes.next'
       : props.type
-  if (RCEGlobals.getFeatures()?.rce_ux_improvements) {
-    internalLink['data-course-type'] = type
-    // Only included published attr if it makes sense for the link type
-    const publishable = !['navigation', 'announcements'].includes(type)
-    internalLink['data-published'] = publishable ? published : null
-  }
+  internalLink['data-course-type'] = type
+  // Only included published attr if it makes sense for the link type
+  const publishable = !['navigation', 'announcements'].includes(type)
+  internalLink['data-published'] = publishable ? published : null
   const Icon = getIcon(type)
   const color = published ? 'success' : 'primary'
   let dateString = null

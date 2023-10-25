@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
+import {render} from '@testing-library/react'
 import {shallow, mount} from 'enzyme'
 import moment from 'moment-timezone'
 import MockDate from 'mockdate'
@@ -695,10 +696,10 @@ it('shows the "Join" button for zoom calendar events', () => {
 describe('with simplifiedControls', () => {
   const props = defaultProps({simplifiedControls: true})
 
-  it('renders the title link in licorice', () => {
-    const wrapper = shallow(<PlannerItem {...props} />)
-    const titleLink = wrapper.find('Link')
-    expect(titleLink.prop('theme').linkColor).toBe('#2D3B45')
+  it('renders the title link in turquoise', () => {
+    const {getByRole} = render(<PlannerItem {...props} deregisterAnimatable={jest.fn()} />)
+    const titleLink = getByRole('link')
+    expect(titleLink).toHaveStyle('color: rgb(3, 116, 181)')
   })
 
   it('does not render the details sub-heading', () => {
@@ -851,11 +852,11 @@ describe('with isMissingItem', () => {
   })
 
   it('renders a course name in course color', () => {
-    const wrapper = shallow(<PlannerItem {...props} />)
-    const courseNameText = wrapper.find('Text[data-testid="MissingAssignments-CourseName"]')
-    expect(courseNameText.exists()).toBeTruthy()
-    expect(courseNameText.prop('children')).toBe('A Course about being Diffrient')
-    expect(courseNameText.prop('theme')).toMatchObject({primaryColor: '#d71f85'})
+    const {getByTestId} = render(<PlannerItem {...props} deregisterAnimatable={jest.fn()} />)
+    const courseNameText = getByTestId('MissingAssignments-CourseName')
+    expect(courseNameText).toBeInTheDocument()
+    expect(courseNameText).toHaveTextContent('A Course about being Diffrient')
+    expect(courseNameText).toHaveStyle('color: rgb(215, 31, 133);')
   })
 
   it('renders dates with both date and time', () => {

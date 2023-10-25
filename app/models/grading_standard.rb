@@ -95,13 +95,18 @@ class GradingStandard < ActiveRecord::Base
 
   def place_in_scheme(key_name)
     # look for keys with only digits and a single '.'
-    if key_name.to_s&.match?(/\A(\d*[.])?\d+\Z/)
+    key_name_str = key_name.to_s
+    if key_name_str&.match?(/\A(\d*[.])?\d+\Z/)
       # compare numbers
       # second condition to filter letters so zeros work properly ("A".to_d == 0)
       ordered_scheme.index { |g, _| g.to_d == key_name.to_d && g.to_s.match(/\A(\d*[.])?\d+\Z/) }
     else
-      # compare words
-      ordered_scheme.index { |g, _| g.to_s.casecmp?(key_name.to_s) }
+      idx = index_of_key(key_name_str)
+      if idx.nil? && minus_grade?(key_name_str)
+        idx = index_of_key(key_name_str.sub(/−$/, "-"))
+      end
+
+      idx
     end
   end
 
@@ -283,5 +288,15 @@ class GradingStandard < ActiveRecord::Base
 
   def set_root_account_id
     self.root_account_id ||= context.is_a?(Account) ? context.resolved_root_account_id : context.root_account_id
+  end
+
+  private
+
+  def minus_grade?(grade)
+    !!grade && /.+−$/.match?(grade)
+  end
+
+  def index_of_key(key)
+    ordered_scheme.index { |scheme_key, _| scheme_key.to_s.casecmp?(key) }
   end
 end

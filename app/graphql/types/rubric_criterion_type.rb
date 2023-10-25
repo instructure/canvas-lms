@@ -22,6 +22,11 @@ module Types
   class RubricCriterionType < ApplicationObjectType
     description "Individual criteria for a rubric"
 
+    def initialize(object, context)
+      @rubric_id = context[:rubric_id]
+      super(object, context)
+    end
+
     implements Interfaces::LegacyIDInterface
 
     field :criterion_use_range, Boolean, null: false
@@ -49,5 +54,9 @@ module Types
     field :ratings, [RubricRatingType], <<~MD, null: true
       The possible ratings available for this criterion
     MD
+    def ratings
+      context[:rubric_id] = @rubric_id
+      object[:ratings]
+    end
   end
 end

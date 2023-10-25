@@ -315,20 +315,16 @@ class RCEWrapper extends React.Component {
   getRequiredFeatureStatuses() {
     const {
       new_math_equation_handling = false,
-      rce_ux_improvements = false,
       explicit_latex_typesetting = false,
       rce_transform_loaded_content = false,
       media_links_use_attachment_id = false,
-      improved_no_results_messaging = false,
     } = this.props.features
 
     return {
       new_math_equation_handling,
-      rce_ux_improvements,
       explicit_latex_typesetting,
       rce_transform_loaded_content,
       media_links_use_attachment_id,
-      improved_no_results_messaging,
     }
   }
 
@@ -1010,83 +1006,7 @@ class RCEWrapper extends React.Component {
 
     this.fixToolbarKeyboardNavigation()
 
-    this.forwardPostMessages()
-
     this.props.onInitted?.(editor)
-  }
-
-  static editorFrameName = 'active_rce_frame'
-
-  /**
-   * Forwards postMessages from child frames, like LTI tools
-   * embedded in the editor, to the parent frame.
-   * Also forwards response postMessages from the parent
-   * back to the child frame that sent it.
-   *
-   * Initializes message listener.
-   */
-  forwardPostMessages = () => {
-    const windowReferences = []
-    const rceWindow = this.editor.getWin()
-    // explicitly assign name for reference by parent window
-    rceWindow.name = `${RCEWrapper.editorFrameName}_${this.id}`
-
-    rceWindow.addEventListener(
-      'message',
-      this.forwardPostMessagesHandler(rceWindow, windowReferences)
-    )
-  }
-
-  /**
-   * Forwards postMessages from child frames, like LTI tools
-   * embedded in the editor, to the parent frame.
-   * Also forwards response postMessages from the parent
-   * back to the child frame that sent it.
-   * Requires that the message data is an object, since it attaches
-   * `sourceToolInfo` to it. Uses `sourceToolInfo` on response messages
-   * to determine which child frame should get the message.
-   *
-   * Actual handler function with parameters passed for testing.
-   */
-  forwardPostMessagesHandler = (rceWindow, windowReferences) => e => {
-    let message
-    try {
-      message = typeof e.data === 'string' ? JSON.parse(e.data) : e.data
-    } catch (err) {
-      // unparseable message may not be meant for our handlers
-      return false
-    }
-
-    // NOTE: the code to encode/decode `sourceToolInfo` is duplicated in
-    // the ui/features/post_message_forwarding/index.ts, and
-    // cannot be DRY'd because RCE is in a package
-    if (e.origin === rceWindow.origin) {
-      const {sourceToolInfo, ...messageWithoutSourceToolInfo} = message
-      const targetOrigin = sourceToolInfo?.origin
-      const targetWindow = windowReferences[sourceToolInfo?.windowId]
-      if (!targetOrigin || !targetWindow) {
-        return false
-      }
-      targetWindow?.postMessage(messageWithoutSourceToolInfo, targetOrigin)
-    } else {
-      // message is from tool, forward to Canvas window
-
-      // We can't forward the whole `e.source` window in the postMessage,
-      // so we keep a list (`windowReferences`) of all windows we've received
-      // messages from, and include the index into that list as `windowId`
-      let windowId = windowReferences.indexOf(e.source)
-      if (windowId === -1) {
-        windowReferences.push(e.source)
-        windowId = windowReferences.length - 1
-      }
-
-      const newMessage = {
-        ...message,
-        sourceToolInfo: {origin: e.origin, windowId},
-        frameName: rceWindow.name,
-      }
-      rceWindow.parent.postMessage(newMessage, rceWindow.origin)
-    }
   }
 
   /**

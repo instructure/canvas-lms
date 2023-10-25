@@ -23,11 +23,11 @@ class SmartSearchController < ApplicationController
   MIN_DISTANCE = 0.70
 
   def index
+    # TODO: permission check?
     return render_unauthorized_action unless OpenAi.smart_search_available?(@domain_root_account)
     return render json: { error: "missing 'q' param" }, status: :bad_request unless params.key?(:q)
 
-    # TODO: Add feature flag check / other "authorized_action" check here.
-    if true # rubocop:disable Lint/LiteralAsCondition
+    OpenAi.with_pgvector do
       response = {
         results: []
       }
@@ -42,7 +42,7 @@ class SmartSearchController < ApplicationController
         # Wiki Pages
         # TODO: Enforce enrollment types
         scope = WikiPage
-                .select(WikiPage.send(:sanitize_sql, ["wiki_pages.*, MIN(wpe.embedding #{quoted_operator_name("<=>")} ?) AS distance", embedding.to_s]))
+                .select(WikiPage.send(:sanitize_sql, ["wiki_pages.*, MIN(wpe.embedding <=> ?) AS distance", embedding.to_s]))
                 .joins("INNER JOIN #{Enrollment.quoted_table_name} e ON wiki_pages.context_type = 'Course' AND wiki_pages.context_id = e.course_id")
                 .joins("INNER JOIN #{EnrollmentState.quoted_table_name} es ON e.id = es.enrollment_id")
                 .joins("INNER JOIN #{WikiPageEmbedding.quoted_table_name} wpe ON wiki_pages.id = wpe.wiki_page_id")
@@ -68,11 +68,5 @@ class SmartSearchController < ApplicationController
   def show
     render_unauthorized_action unless OpenAi.smart_search_available?(@domain_root_account)
     # TODO: Add state required for new page render
-  end
-
-  protected
-
-  def quoted_operator_name(operator)
-    "operator(#{PG::Connection.quote_ident(ActiveRecord::Base.connection.extension("vector").schema)}.#{operator})"
   end
 end

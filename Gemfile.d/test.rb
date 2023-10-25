@@ -29,10 +29,10 @@ group :test do
   gem "rspec", "~> 3.12"
   gem "rspec_around_all", "0.2.0"
   gem "rspec-rails", "~> 6.0"
-  gem "rspec-collection_matchers", "1.2.0"
+  gem "rspec-collection_matchers", "~> 1.2"
   gem "shoulda-matchers", "~> 5.3"
 
-  gem "once-ler", "2.0.1"
+  gem "once-ler", "~> 2.0"
 
   gem "selenium-webdriver", "~> 4.12", require: false
   gem "testrailtagging", "0.3.8.7", require: false
@@ -48,7 +48,7 @@ group :test do
   gem "database_cleaner", "~> 2.0"
   gem "json-schema", "~> 4.0"
 
-  gem "rspecq", github: "kyler-instructure/rspecq", ref: "8cea6a3225cf0856a26c6c6b93a5ea5605082aa0"
+  gem "rspecq", github: "instructure/rspecq"
   gem "flakey_spec_catcher", "~> 0.12", require: false
   gem "factory_bot", "~> 6.3", require: false
   gem "stormbreaker", "~> 1.0", require: false

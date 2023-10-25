@@ -32,7 +32,9 @@ import {Link} from '@instructure/ui-link'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {TruncateText} from '@instructure/ui-truncate-text'
 
-import k5Theme from '@canvas/k5/react/k5-theme'
+import {getK5ThemeVars} from '@canvas/k5/react/k5-theme'
+
+const k5ThemeVariables = getK5ThemeVars()
 
 const I18n = useI18nScope('important_date_item')
 
@@ -93,9 +95,9 @@ const ImportantDateItem = ({title, context, color, type, url}) => (
           data-testid="important-date-link"
           href={url}
           isWithinText={false}
-          theme={{
-            color: k5Theme.variables.colors.textDarkest,
-            hoverColor: k5Theme.variables.colors.textDarkest,
+          themeOverride={{
+            color: k5ThemeVariables.colors.textDarkest,
+            hoverColor: k5ThemeVariables.colors.textDarkest,
             fontWeight: 700,
           }}
         >

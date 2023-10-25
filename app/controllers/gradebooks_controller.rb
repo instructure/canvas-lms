@@ -886,6 +886,7 @@ class GradebooksController < ApplicationController
           end
         end
         begin
+          track_update_metrics(params, submission_record)
           dont_overwrite_grade = value_to_boolean(params[:dont_overwrite_grades])
           if %i[grade score excuse excused].any? { |k| submission.key? k }
             # if it's a percentage graded assignment, we need to ensure there's a
@@ -1722,5 +1723,11 @@ class GradebooksController < ApplicationController
 
   def outcome_service_results_to_canvas_enabled?
     @context.feature_enabled?(:outcome_service_results_to_canvas)
+  end
+
+  def track_update_metrics(params, submission)
+    if params.dig(:submission, :grade) && params["submission"]["grade"].to_s != submission.grade.to_s && params["originator"] == "speed_grader"
+      InstStatsd::Statsd.increment("speedgrader.submission.posted_grade")
+    end
   end
 end

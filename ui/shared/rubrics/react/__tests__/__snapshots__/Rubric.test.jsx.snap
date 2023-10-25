@@ -1031,7 +1031,7 @@ exports[`the Rubric component points column does not have a points column in sum
             as="span"
             direction="row"
             display="flex"
-            elementRef={[Function]}
+            gap="none"
             justifyItems="end"
             withVisualDebug={false}
             wrap="no-wrap"
@@ -1039,7 +1039,6 @@ exports[`the Rubric component points column does not have a points column in sum
             <Item
               as="span"
               data-selenium="rubric_total"
-              elementRef={[Function]}
               shouldGrow={false}
               shouldShrink={false}
             >
@@ -1274,7 +1273,7 @@ exports[`the Rubric component points column has a points column if points visibl
             as="span"
             direction="row"
             display="flex"
-            elementRef={[Function]}
+            gap="none"
             justifyItems="end"
             withVisualDebug={false}
             wrap="no-wrap"
@@ -1282,7 +1281,6 @@ exports[`the Rubric component points column has a points column if points visibl
             <Item
               as="span"
               data-selenium="rubric_total"
-              elementRef={[Function]}
               shouldGrow={false}
               shouldShrink={false}
             >
@@ -1517,7 +1515,7 @@ exports[`the Rubric component renders as expected 1`] = `
             as="span"
             direction="row"
             display="flex"
-            elementRef={[Function]}
+            gap="none"
             justifyItems="end"
             withVisualDebug={false}
             wrap="no-wrap"
@@ -1525,7 +1523,6 @@ exports[`the Rubric component renders as expected 1`] = `
             <Item
               as="span"
               data-selenium="rubric_total"
-              elementRef={[Function]}
               shouldGrow={false}
               shouldShrink={false}
             >
@@ -1729,7 +1726,7 @@ exports[`the Rubric component renders properly with no assessment 1`] = `
             as="span"
             direction="row"
             display="flex"
-            elementRef={[Function]}
+            gap="none"
             justifyItems="end"
             withVisualDebug={false}
             wrap="no-wrap"
@@ -1737,7 +1734,6 @@ exports[`the Rubric component renders properly with no assessment 1`] = `
             <Item
               as="span"
               data-selenium="rubric_total"
-              elementRef={[Function]}
               shouldGrow={false}
               shouldShrink={false}
             >
@@ -1971,7 +1967,7 @@ exports[`the Rubric component updates the total score when an individual criteri
             as="span"
             direction="row"
             display="flex"
-            elementRef={[Function]}
+            gap="none"
             justifyItems="end"
             withVisualDebug={false}
             wrap="no-wrap"
@@ -1979,7 +1975,6 @@ exports[`the Rubric component updates the total score when an individual criteri
             <Item
               as="span"
               data-selenium="rubric_total"
-              elementRef={[Function]}
               shouldGrow={false}
               shouldShrink={false}
             >

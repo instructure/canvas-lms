@@ -64,10 +64,10 @@ describe "submissions" do
       first_period_assignment.grade_student(@student, grade: 8, grader: @teacher)
 
       get "/courses/#{@course.id}/assignments/#{first_period_assignment.id}"
-      expect(f(".module")).to include_text "Grade: B-"
+      expect(f(".module")).to include_text "Grade: B−"
 
       get "/courses/#{@course.id}/assignments/#{first_period_assignment.id}/submissions/#{@student.id}"
-      expect(f(".entered_grade")).to include_text "B-"
+      expect(f(".entered_grade")).to include_text "B−"
     end
 
     it "show score if not RDQ" do

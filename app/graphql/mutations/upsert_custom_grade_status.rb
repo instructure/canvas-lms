@@ -35,6 +35,12 @@ module Mutations
         raise GraphQL::ExecutionError, I18n.t("Insufficient permissions")
       end
 
+      if custom_grade_status.new_record?
+        InstStatsd::Statsd.increment("custom_grade_status.graphql.create")
+      else
+        InstStatsd::Statsd.increment("custom_grade_status.graphql.update")
+      end
+
       if custom_grade_status.update(name: input[:name], color: input[:color])
         { custom_grade_status: }
       else

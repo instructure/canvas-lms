@@ -34,6 +34,11 @@ export const CREATE_DISCUSSION_TOPIC = gql`
     $allowRating: Boolean
     $onlyGradersCanRate: Boolean
     $todoDate: DateTime
+    $podcastEnabled: Boolean
+    $podcastHasStudentPosts: Boolean
+    $locked: Boolean
+    $isAnnouncement: Boolean
+    $specificSections: String
   ) {
     createDiscussionTopic(
       input: {
@@ -50,6 +55,11 @@ export const CREATE_DISCUSSION_TOPIC = gql`
         allowRating: $allowRating
         onlyGradersCanRate: $onlyGradersCanRate
         todoDate: $todoDate
+        podcastEnabled: $podcastEnabled
+        podcastHasStudentPosts: $podcastHasStudentPosts
+        locked: $locked
+        isAnnouncement: $isAnnouncement
+        specificSections: $specificSections
       }
     ) {
       discussionTopic {
@@ -66,6 +76,9 @@ export const CREATE_DISCUSSION_TOPIC = gql`
         allowRating
         onlyGradersCanRate
         todoDate
+        podcastEnabled
+        podcastHasStudentPosts
+        isAnnouncement
       }
       errors {
         ...Error

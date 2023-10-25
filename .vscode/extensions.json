@@ -1,5 +1,6 @@
 {
     "recommendations": [
-        "koichisasada.vscode-rdbg"
+        "github.copilot",
+        "ms-vscode-remote.remote-containers"
     ]
 }

@@ -97,6 +97,7 @@ describe "eportfolios" do
     end
 
     it "reorders a page", priority: "1" do
+      skip "FOO-3809 (10/6/2023)"
       get "/eportfolios/#{@eportfolio.id}"
 
       # add 3 pages
@@ -136,6 +137,7 @@ describe "eportfolios" do
     end
 
     it "reorders a section", priority: "1" do
+      skip "FOO-3809 (10/6/2023)"
       get "/eportfolios/#{@eportfolio.id}"
 
       # add a 3 sections

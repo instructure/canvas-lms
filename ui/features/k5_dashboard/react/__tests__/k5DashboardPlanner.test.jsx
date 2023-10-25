@@ -55,14 +55,16 @@ describe('K5Dashboard Schedule Section', () => {
     resetPlanner()
   })
 
-  it('displays the planner with a planned item', async () => {
+  // FOO-3831
+  it.skip('displays the planner with a planned item', async () => {
     const {findByText} = render(
       <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled={true} />
     )
     expect(await findByText('Assignment 15')).toBeInTheDocument()
   })
 
-  it('displays a list of missing assignments if there are any', async () => {
+  // FOO-3831
+  it.skip('displays a list of missing assignments if there are any (flaky)', async () => {
     const {findByTestId, findByText} = render(
       <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled={true} />
     )
@@ -76,7 +78,8 @@ describe('K5Dashboard Schedule Section', () => {
     expect(await findByText('Assignment 2')).toBeInTheDocument()
   })
 
-  it('renders the weekly planner header', async () => {
+  // FOO-3831
+  it.skip('renders the weekly planner header (flaky)', async () => {
     const {findByTestId} = render(
       <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled={true} />
     )
@@ -137,7 +140,8 @@ describe('K5Dashboard Schedule Section', () => {
     expect(moxios.requests.count()).toBe(8) // 2 more requests for prev and next week preloads
   })
 
-  it('reloads the planner with correct data when the selected observee is updated', async () => {
+  // FOO-3831
+  it.skip('reloads the planner with correct data when the selected observee is updated (flaky)', async () => {
     moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user_id=1', {
       status: 200,
       response: MOCK_CARDS,

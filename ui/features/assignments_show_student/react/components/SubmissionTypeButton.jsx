@@ -65,7 +65,7 @@ export default function SubmissionTypeButton({displayName, icon, selected, onSel
             display="block"
             interaction={selected || !context.allowChangesToSubmission ? 'readonly' : 'enabled'}
             onClick={onSelected}
-            theme={{borderWidth: '0'}}
+            themeOverride={{borderWidth: '0'}}
             withBackground={false}
           >
             {iconElement}
@@ -96,7 +96,7 @@ SubmissionTypeButton.defaultProps = {
 
 const MoreOptionsButton = ({selected}) => (
   <ButtonContainer selected={selected}>
-    <Button as="span" display="block" theme={{borderWidth: '0'}} withBackground={false}>
+    <Button as="span" display="block" themeOverride={{borderWidth: '0'}} withBackground={false}>
       <IconMoreLine size="small" color={foregroundColor(selected)} />
 
       <View as="div" margin="small 0 0">
