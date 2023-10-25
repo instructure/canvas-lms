@@ -95,6 +95,7 @@ class ContentMigration < ActiveRecord::Base
           new_course_uuid: context.uuid,
           domain: context.root_account&.domain(ApplicationController.test_cluster_name),
           resource_map_url: asset_map_url(generate_if_needed: true),
+          migrated_urls_content_migration_id: global_id
         }
       )
     end
