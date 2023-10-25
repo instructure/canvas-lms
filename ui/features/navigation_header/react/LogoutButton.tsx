@@ -17,13 +17,13 @@
  */
 
 import React from 'react'
-import {Button} from '@instructure/ui-buttons'
+import {Button, ButtonProps} from '@instructure/ui-buttons'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import getCookie from '@instructure/get-cookie'
 
 const I18n = useI18nScope('LogoutButton')
 
-export default function LogoutButton(props) {
+export default function LogoutButton(props: ButtonProps) {
   return (
     <form action="/logout" method="post">
       <input name="utf8" value="✓" type="hidden" />
@@ -35,9 +35,3 @@ export default function LogoutButton(props) {
     </form>
   )
 }
-
-LogoutButton.propTypes = (() => {
-  // we pass on all the same propTypes as instUI Button except for 'children'
-  const {children, ...buttonpropTypes} = Button.propTypes
-  return buttonpropTypes
-})()

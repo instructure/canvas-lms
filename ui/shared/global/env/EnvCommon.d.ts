@@ -55,7 +55,7 @@ export interface EnvCommon {
   current_user_is_student: boolean
   current_user_types: string[]
   current_user_disabled_inbox: boolean
-  current_user_visited_tabs: null | unknown
+  current_user_visited_tabs: null | string[]
   discussions_reporting: boolean
   files_domain: string
   group_information: {
