@@ -85,6 +85,7 @@ module ActiveSupport
             frd_key, cached_entry = failsafe :read_entry do
               Canvas::CacheRegister.lua.run(:get_with_batched_keys, keys, [now], redis)
             end
+
             cached_entry = Marshal.load(cached_entry) if cached_entry # rubocop:disable Security/MarshalLoad
 
             entry = handle_expired_entry(cached_entry, frd_key, options)
@@ -98,6 +99,8 @@ module ActiveSupport
             get_entry_value(entry, name, **options)
           else
             result = instrument(:generate, name, **options, &)
+            return result unless frd_key # we must have hit the failsafe above; we have no idea where to write to
+
             instrument(:write, name, **options) do
               entry = ::ActiveSupport::Cache::Entry.new(result, **options)
               failsafe :write_entry, returning: false do
