@@ -102,12 +102,12 @@ module Services
         @message.deliver
       end
 
-      it "processes push notification message type for New Topic" do
-        test_push_notification("New Topic")
+      it "processes push notification message type for New Discussion Topic" do
+        test_push_notification("New Discussion Topic")
       end
 
-      it "processes push notification message type for New Reply" do
-        test_push_notification("New Reply")
+      it "processes push notification message type for New Discussion Entry" do
+        test_push_notification("New Discussion Entry")
       end
 
       it "throws error if cannot connect to queue" do
