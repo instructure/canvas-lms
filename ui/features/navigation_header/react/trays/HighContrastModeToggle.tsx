@@ -50,12 +50,19 @@ const checkboxThemeOverrides = {
   focusOutlineColor: brand,
 }
 
-const HighContrastLabel = ({loading, isMobile}) => {
+type HighContrastLabelProps = {
+  loading: boolean
+  isMobile: boolean
+}
+
+type TipTrigger = 'click' | 'hover' | 'focus'
+
+const HighContrastLabel = ({loading, isMobile}: HighContrastLabelProps) => {
   const labelText = isMobile ? I18n.t('Hi-contrast') : I18n.t('Use High Contrast UI')
   const mobileTipText = I18n.t('Enhance color contrast of content')
   const dekstopTipText = I18n.t('Enhances the color contrast of text, buttons, etc.')
   const tipText = isMobile ? mobileTipText : dekstopTipText
-  const tipTriggers = ['click']
+  const tipTriggers: TipTrigger[] = ['click']
 
   if (!isMobile) {
     tipTriggers.push('hover')
@@ -112,7 +119,11 @@ HighContrastLabel.propTypes = {
   isMobile: bool.isRequired,
 }
 
-export default function HighContrastModeToggle({isMobile}) {
+type HighContrastModeToggleProps = {
+  isMobile: boolean
+}
+
+export default function HighContrastModeToggle({isMobile}: HighContrastModeToggleProps) {
   const originalSetting = useRef(ENV.use_high_contrast)
   const [enabled, setEnabled] = useState(ENV.use_high_contrast)
   const [loading, setLoading] = useState(false)
@@ -139,10 +150,12 @@ export default function HighContrastModeToggle({isMobile}) {
       setEnabled(json.state === 'on')
       ENV.use_high_contrast = json.state === 'on'
     } catch (err) {
-      showFlashAlert({
-        message: I18n.t('An error occurred while trying to change the UI'),
-        err,
-      })
+      if (err instanceof Error) {
+        showFlashAlert({
+          message: I18n.t('An error occurred while trying to change the UI'),
+          err,
+        })
+      }
     } finally {
       setLoading(false)
     }
@@ -168,10 +181,6 @@ export default function HighContrastModeToggle({isMobile}) {
       )}
     </View>
   )
-}
-
-HighContrastModeToggle.propTypes = {
-  isMobile: bool,
 }
 
 HighContrastModeToggle.defaultProps = {
