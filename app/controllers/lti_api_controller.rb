@@ -197,7 +197,6 @@ class LtiApiController < ApplicationController
       outcome.description += "\n[EID_#{capture_outputs[:error_report]}]"
     end
 
-    Sentry.capture("Grade pass back #{outcome.code_major}", error_info)
     [outcome, 422]
   end
 end
