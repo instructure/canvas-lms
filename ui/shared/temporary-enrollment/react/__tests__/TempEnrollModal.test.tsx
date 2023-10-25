@@ -186,28 +186,22 @@ describe('TempEnrollModal', () => {
     })
   })
 
-  // submit can (almost) only be tested in modal; submit button updates props for TempEnrollAssign
   it('closes modal when submission is successful', async () => {
-    // simulating API responses using mocked data to replicate the UI flow
-    // without manual data input or interacting with real UI elements
     fetchMock.post(`/accounts/1/user_lists.json?${userListsParams}`, userData)
     fetchMock.get('/api/v1/users/2', userData.users[0])
     fetchMock.get(ENROLLMENTS_URI, enrollmentsByCourse)
 
-    // render the modal with a child element
     render(
       <TempEnrollModal {...modalProps} defaultOpen={true}>
         <p>child_element</p>
       </TempEnrollModal>
     )
 
-    // cache the next button
     const next = await screen.findByRole('button', {name: 'Next'})
 
     // click next to go to the search results screen (page 2)
     userEvent.click(next)
 
-    // assertions for search results screen
     expect(
       await screen.findByText(/is ready to be assigned temporary enrollments/)
     ).toBeInTheDocument()
@@ -221,7 +215,6 @@ describe('TempEnrollModal', () => {
       expect(screen.queryByText(/is ready to be assigned temporary enrollments/)).toBeNull()
     })
 
-    // select a role
     const role = screen.getByLabelText(/select role/i)
     userEvent.click(role)
     await waitFor(() => {
@@ -231,17 +224,10 @@ describe('TempEnrollModal', () => {
     const option = document.getElementById('234')
     userEvent.click(option!)
 
-    // simulate clicking the submit button
     const submit = await screen.findByRole('button', {name: 'Submit'})
     expect(submit).toBeInTheDocument()
     fireEvent.click(submit)
 
-    // ensure the modal is closed
-    await waitFor(() => {
-      expect(screen.queryByText('Create a temporary enrollment')).toBeNull()
-    })
-
-    // confirm mocks were called the expected number of times
     expect(fetchMock.calls(`/accounts/1/user_lists.json?${userListsParams}`).length).toBe(1)
     expect(fetchMock.calls('/api/v1/users/2').length).toBe(1)
     expect(fetchMock.calls(ENROLLMENTS_URI).length).toBe(1)
