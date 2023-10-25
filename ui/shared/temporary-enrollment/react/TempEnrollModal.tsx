@@ -60,10 +60,7 @@ interface Props {
   }
   readonly accountId: string
   readonly roles: Role[]
-  readonly onOpen?: () => void
-  readonly onClose?: () => void
   readonly defaultOpen?: boolean
-  readonly isOpen?: boolean
   readonly tempEnrollments?: Enrollment[]
   readonly isEditMode: boolean
   readonly onToggleEditMode?: (mode?: boolean) => void
@@ -90,12 +87,30 @@ export function TempEnrollModal(props: Props) {
     }
   }, [props.tempEnrollments])
 
-  const resetState = (pageNumber: number = 0) => {
-    setPage(pageNumber)
-
+  const resetCommonState = () => {
     if (props.isEditMode && props.onToggleEditMode) {
       props.onToggleEditMode(false)
     }
+
+    if (props.tempEnrollments) {
+      setEnrollmentData(props.tempEnrollments)
+    }
+  }
+
+  const resetState = () => {
+    setPage(0)
+    setEnrollment(null)
+    setIsViewingAssignFromEdit(false)
+
+    resetCommonState()
+  }
+
+  const handleGoToAssignPageWithEnrollment = (enrollmentUser: User) => {
+    setEnrollment(enrollmentUser)
+    setPage(2)
+    setIsViewingAssignFromEdit(true)
+
+    resetCommonState()
   }
 
   const handleEnrollmentSubmission = (isSuccess: boolean) => {
@@ -119,17 +134,13 @@ export function TempEnrollModal(props: Props) {
   }
 
   const handleOpenModal = () => {
-    if (props.isOpen !== undefined) {
-      props.onOpen && props.onOpen()
-    } else if (!open) {
+    if (!open) {
       setOpen(true)
     }
   }
 
   const handleCloseModal = () => {
-    if (props.isOpen !== undefined) {
-      props.onClose && props.onClose()
-    } else if (open) {
+    if (open) {
       setOpen(false)
       resetState()
     }
@@ -139,17 +150,12 @@ export function TempEnrollModal(props: Props) {
     resetState()
   }
 
-  const handleSetEnrollmentFromSearch = (e: any) => {
-    setEnrollment(e)
-  }
-
-  const handleCancel = () => {
-    setOpen(false)
-    resetState()
+  const handleSetEnrollmentFromSearch = (enrollmentUser: User) => {
+    setEnrollment(enrollmentUser)
   }
 
   const handleGoBack = () => {
-    setPage((p: number) => p - 1)
+    setPage((currentPage: number) => currentPage - 1)
   }
 
   const handleResetToBeginning = () => {
@@ -157,7 +163,7 @@ export function TempEnrollModal(props: Props) {
   }
 
   const handlePageTransition = () => {
-    setPage(p => p + 1)
+    setPage(currentPage => currentPage + 1)
   }
 
   const handleOpenForNewEnrollment = () => {
@@ -167,12 +173,6 @@ export function TempEnrollModal(props: Props) {
 
   const isSubmissionPage = () => {
     return page === 3
-  }
-
-  const handleGoToAssignPageWithEnrollment = (chosenEnrollment: any) => {
-    setEnrollment(chosenEnrollment)
-    resetState(2)
-    setIsViewingAssignFromEdit(true)
   }
 
   const handleChildClick =
@@ -240,7 +240,7 @@ export function TempEnrollModal(props: Props) {
     if (props.isEditMode) {
       return (
         <Flex.Item margin="0 small 0 0">
-          <Button onClick={handleCancel} {...analyticProps('Done')}>
+          <Button onClick={handleCloseModal} {...analyticProps('Done')}>
             {I18n.t('Done')}
           </Button>
         </Flex.Item>
@@ -248,7 +248,7 @@ export function TempEnrollModal(props: Props) {
     } else {
       return [
         <Flex.Item key="cancel" margin="0 small 0 0">
-          <Button onClick={handleCancel} {...analyticProps('Cancel')}>
+          <Button onClick={handleCloseModal} {...analyticProps('Cancel')}>
             {I18n.t('Cancel')}
           </Button>
         </Flex.Item>,
@@ -280,7 +280,7 @@ export function TempEnrollModal(props: Props) {
     <>
       <Modal
         overflow="scroll"
-        open={props.isOpen ?? open}
+        open={open}
         onDismiss={handleCloseModal}
         size="large"
         label={I18n.t('Create a Temporary Enrollment')}
