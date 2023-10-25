@@ -351,7 +351,7 @@ class AuthenticationProvider < ActiveRecord::Base
   end
 
   def debug_get(key)
-    ::Canvas.redis.get(debug_key(key))
+    ::Canvas.redis.get(debug_key(key), failsafe: nil)
   end
 
   def debug_set(key, value, overwrite: true)
