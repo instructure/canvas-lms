@@ -35,8 +35,8 @@ class LtiApiController < ApplicationController
     @xml = Nokogiri::XML.parse(request.body)
     puts "grade_passback triggered: body: #{request.body}"
 
-    lti_response = check_outcome BasicLTI::BasicOutcomes.process_request(@tool, @xml)
-    render :body => lti_response.to_xml, :content_type => 'application/xml'
+    lti_response, status = check_outcome BasicLTI::BasicOutcomes.process_request(@tool, @xml)
+    render :body => lti_response.to_xml, :content_type => 'application/xml', :status => status
   end
 
   # this similar API implements the older work-in-process BLTI 0.0.4 outcome
@@ -45,8 +45,8 @@ class LtiApiController < ApplicationController
   def legacy_grade_passback
     verify_oauth
 
-    lti_response = check_outcome BasicLTI::BasicOutcomes.process_legacy_request(@tool, params)
-    render :body => lti_response.to_xml, :content_type => 'application/xml'
+    lti_response, status = check_outcome BasicLTI::BasicOutcomes.process_legacy_request(@tool, params)
+    render :body => lti_response.to_xml, :content_type => 'application/xml', :status => status
   end
 
   # examples: https://github.com/adlnet/xAPI-Spec/blob/master/xAPI.md#AppendixA
@@ -184,17 +184,19 @@ class LtiApiController < ApplicationController
   end
 
   def check_outcome(outcome)
-    if ['unsupported', 'failure'].include? outcome.code_major
-      opts = {type: :grade_passback}
-      error_info = Canvas::Errors::Info.new(request, @domain_root_account, @current_user, opts).to_h
+    return outcome, 200 unless ["unsupported", "failure"].include? outcome.code_major
+
+    opts = { type: :grade_passback }
+    error_info = Canvas::Errors::Info.new(request, @domain_root_account, @current_user, opts).to_h
+    error_info[:extra][:description] = outcome.description
+    error_info[:extra][:message] = outcome.code_major
+
+    begin
       error_info[:extra][:xml] = @xml.to_s if @xml
-      error_info[:extra][:outcome] = outcome.to_h
-      capture_outputs = Canvas::Errors.capture("Grade pass back #{outcome.code_major}", error_info)
-      puts "ERROR INFO for grade pass back: #{error_info}"
-      Sentry.capture("Grade pass back #{outcome.code_major}", error_info)
+    rescue => e
       outcome.description += "\n[EID_#{capture_outputs[:error_report]}]"
     end
 
-    outcome
+    [outcome, 422]
   end
 end
