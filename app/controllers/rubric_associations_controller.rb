@@ -96,13 +96,16 @@ class RubricAssociationsController < ApplicationController
 
     # create a new rubric if associating in a different course
     rubric_context = @rubric.context
+    from_different_shard = rubric_context.shard != @context.shard
     if rubric_context != @context && rubric_context.is_a?(Course)
       @rubric = @rubric.dup
       @rubric.rubric_id = rubric_id
+      @rubric.rubric_id = nil if from_different_shard
       @rubric.update_criteria(params[:rubric]) if params[:rubric]
       @rubric.user = @current_user
       @rubric.context = @context
       @rubric.update_mastery_scales(false)
+      @rubric.shard = @context.shard if from_different_shard
       @rubric.save!
     elsif params[:rubric] && @rubric.grants_right?(@current_user, session, :update)
       @rubric.update_criteria(params[:rubric])
