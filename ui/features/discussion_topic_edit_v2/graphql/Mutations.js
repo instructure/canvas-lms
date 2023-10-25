@@ -40,6 +40,7 @@ export const CREATE_DISCUSSION_TOPIC = gql`
     $isAnnouncement: Boolean
     $specificSections: String
     $groupCategoryId: ID
+    $assignment: AssignmentCreateOrUpdate
   ) {
     createDiscussionTopic(
       input: {
@@ -62,6 +63,7 @@ export const CREATE_DISCUSSION_TOPIC = gql`
         isAnnouncement: $isAnnouncement
         specificSections: $specificSections
         groupCategoryId: $groupCategoryId
+        assignment: $assignment
       }
     ) {
       discussionTopic {
@@ -81,6 +83,30 @@ export const CREATE_DISCUSSION_TOPIC = gql`
         podcastEnabled
         podcastHasStudentPosts
         isAnnouncement
+        assignment {
+          _id
+          name
+          pointsPossible
+          gradingType
+          assignmentGroupId
+          canDuplicate
+          canUnpublish
+          courseId
+          description
+          dueAt
+          groupCategoryId
+          id
+          published
+          restrictQuantitativeData
+          sisId
+          state
+          peerReviews {
+            automaticReviews
+            count
+            dueAt
+            enabled
+          }
+        }
       }
       errors {
         ...Error
