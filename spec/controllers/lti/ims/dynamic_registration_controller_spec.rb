@@ -177,6 +177,7 @@ describe Lti::IMS::DynamicRegistrationController do
           expect(dk.redirect_uris).to eq(registration_params["redirect_uris"])
           expect(dk.public_jwk_url).to eq(registration_params["jwks_uri"])
           expect(dk.is_lti_key).to be(true)
+          expect(dk.oidc_initiation_url).to eq(registration_params["initiate_login_uri"])
         end
       end
 

@@ -98,6 +98,9 @@ class DeveloperKey < ActiveRecord::Base
 
   self.ignored_columns += %i[oidc_login_uri tool_id]
 
+  # https://stackoverflow.com/a/2500819
+  alias_method :referenced_tool_configuration, :tool_configuration
+
   alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = "deleted"
@@ -381,6 +384,10 @@ class DeveloperKey < ActiveRecord::Base
       service_user.present? &&
       internal_service? &&
       site_admin?
+  end
+
+  def tool_configuration
+    (lti_registration.presence || referenced_tool_configuration)
   end
 
   private
