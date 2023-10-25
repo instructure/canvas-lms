@@ -1319,7 +1319,7 @@ describe Attachment do
         @teacher = @user
       end
 
-      it "only allows graders to access the 'download all submissions' zip folder on an assignment" do
+      it "only allows graders to access the 'download all submissions' zip file on an assignment" do
         attachment = SubmissionsController.new.submission_zip(@assignment)
         expect(attachment.grants_right?(@teacher, :download)).to be true
         expect(attachment.grants_right?(student, :download)).to be false
@@ -1401,6 +1401,20 @@ describe Attachment do
         it "does not allow students to access submission attachments for other's submissions" do
           expect(@attachment.grants_right?(@student2, :download)).to be false
         end
+      end
+    end
+
+    context "attachments with quiz context" do
+      before :once do
+        quiz_with_submission(true)
+        @course.enroll_teacher(user_model).accept
+        @teacher = @user
+      end
+
+      it "only allows graders to access the 'download all submissions' zip file on an assignment" do
+        attachment = SubmissionsController.new.submission_zip(@quiz)
+        expect(attachment.grants_right?(@teacher, :download)).to be true
+        expect(attachment.grants_right?(@student, :download)).to be false
       end
     end
 
