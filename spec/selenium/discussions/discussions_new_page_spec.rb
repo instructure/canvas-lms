@@ -761,6 +761,38 @@ describe "discussions" do
       end
     end
 
+    context "assignment creation" do
+      before do
+        user_session(teacher)
+      end
+
+      it "creates a discussion topic with an assignment with peer reviews" do
+        get "/courses/#{course.id}/discussion_topics/new"
+
+        title = "Graded Discussion Topic with Peer Reviews"
+        message = "replying to topic"
+
+        f("input[placeholder='Topic Title']").send_keys title
+        type_in_tiny("textarea", message)
+
+        force_click('input[type=checkbox][value="graded"]')
+        wait_for_ajaximations
+
+        f("input[data-testid='points-possible-input']").send_keys "12"
+        force_click("input[data-testid='peer_review_auto']")
+
+        f("button[data-testid='save-and-publish-button']").click
+        wait_for_ajaximations
+
+        dt = DiscussionTopic.last
+        expect(dt.title).to eq title
+        expect(dt.assignment.name).to eq title
+        expect(dt.assignment.peer_review_count).to be 1
+        expect(dt.assignment.peer_reviews).to be true
+        expect(dt.assignment.automatic_peer_reviews).to be true
+      end
+    end
+
     context "editing" do
       before do
         user_session(teacher)
