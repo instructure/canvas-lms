@@ -348,6 +348,74 @@ describe "selective_release module set up" do
     end
   end
 
+  context "uses tray to create modules" do
+    before(:once) do
+      Account.site_admin.enable_feature! :differentiated_modules
+      course_with_teacher(active_all: true)
+    end
+
+    before do
+      user_session(@teacher)
+    end
+
+    it "brings up the add module tray when +Module clicked" do
+      go_to_modules
+      click_new_module_link
+      expect(add_module_tray_exists?).to be true
+      expect(header_label.text).to eq("Add Module")
+    end
+
+    it "adds module with module tray after +Module clicked" do
+      go_to_modules
+      click_new_module_link
+      update_module_name("New Module")
+      click_add_tray_add_module_button
+      new_module = @course.context_modules.last
+      expect(new_module.name).to eq("New Module")
+      expect(element_exists?(context_module_selector(new_module.id))).to be_truthy
+    end
+
+    it "adds module with a prerequisite module in same transaction" do
+      first_module = @course.context_modules.create!(name: "First Module")
+      go_to_modules
+      click_new_module_link
+      update_module_name("Second Module")
+      click_add_prerequisites_button
+
+      select_prerequisites_dropdown_option(0, first_module.name)
+      expect(prerequisites_dropdown_value(0)).to eq(first_module.name)
+
+      click_add_tray_add_module_button
+
+      new_module = @course.context_modules.last
+      expect(element_exists?(context_module_selector(new_module.id))).to be_truthy
+      expect(prerequisite_message(new_module).text).to eq("Prerequisites: #{first_module.name}")
+    end
+
+    it "can cancel creation of module" do
+      go_to_modules
+      click_new_module_link
+      update_module_name("New Module")
+      click_add_tray_cancel_button
+      expect(@course.context_modules.count).to eq 0
+    end
+
+    it "can close creation of module" do
+      go_to_modules
+      click_new_module_link
+      update_module_name("New Module")
+      click_add_tray_close_button
+      expect(@course.context_modules.count).to eq 0
+    end
+
+    it "give error in add module tray if module name is not provided" do
+      go_to_modules
+      click_new_module_link
+      click_add_tray_add_module_button
+      expect(add_module_tray.text).to include("Module Name is required.")
+    end
+  end
+
   context "Canvas for Elementary Modules Selective Release" do
     before :once do
       Account.site_admin.enable_feature! :differentiated_modules

@@ -21,8 +21,12 @@ require_relative "../../common"
 
 module ModulesSettingsTray
   #------------------------------ Selectors -----------------------------
+  def add_module_tray_selector
+    "[aria-label='Add Module']"
+  end
+
   def add_prerequisites_button_selector
-    "//*[@data-testid = 'settings-panel']//button[.//*[.='Prerequisite']]"
+    "//*[@data-testid = 'prerequisite-form']//button[.//*[.='Prerequisite']]"
   end
 
   def add_requirement_button_selector
@@ -85,8 +89,16 @@ module ModulesSettingsTray
     "//label[../input[@data-testid = 'everyone-option']]"
   end
 
+  def header_label_selector
+    "[data-testid='header-label']"
+  end
+
   def lock_until_checkbox_selector
     "//label[../input[@data-testid='lock-until-checkbox']]"
+  end
+
+  def module_name_input_selector
+    "[data-testid='module-name-input']"
   end
 
   def module_requirement_card_selector
@@ -133,19 +145,14 @@ module ModulesSettingsTray
     "#tab-settings"
   end
 
-  def settings_tray_cancel_button_selector
-    "//*[@aria-label='Edit Module Settings']//button[.//*[. = 'Cancel']]"
-  end
-
-  def settings_tray_close_button_selector
-    "//*[@aria-label='Edit Module Settings']//button[.//*[. = 'Close']]"
-  end
-
-  def settings_tray_update_module_button_selector
-    "//*[@aria-label='Edit Module Settings']//button[.//*[. = 'Update Module']]"
+  def settings_tray_button_selector(tray_label, button_label)
+    "//*[@aria-label='#{tray_label}']//button[.//*[. = '#{button_label}']]"
   end
 
   #------------------------------ Elements ------------------------------
+  def add_module_tray
+    f(add_module_tray_selector)
+  end
 
   def add_prerequisites_button
     fxpath(add_prerequisites_button_selector)
@@ -153,6 +160,18 @@ module ModulesSettingsTray
 
   def add_requirement_button
     fxpath(add_requirement_button_selector)
+  end
+
+  def add_tray_add_module_button
+    fxpath(settings_tray_button_selector("Add Module", "Add Module"))
+  end
+
+  def add_tray_cancel_button
+    fxpath(settings_tray_button_selector("Add Module", "Cancel"))
+  end
+
+  def add_tray_close_button
+    fxpath(settings_tray_button_selector("Add Module", "Close"))
   end
 
   def assign_to_panel
@@ -211,8 +230,16 @@ module ModulesSettingsTray
     fxpath(everyone_radio_click_selector)
   end
 
+  def header_label
+    f(header_label_selector)
+  end
+
   def lock_until_checkbox
     fxpath(lock_until_checkbox_selector)
+  end
+
+  def module_name_input
+    f(module_name_input_selector)
   end
 
   def module_requirement_card
@@ -259,19 +286,22 @@ module ModulesSettingsTray
     f(settings_tab_selector)
   end
 
-  def settings_tray_cancel_button
-    fxpath(settings_tray_cancel_button_selector)
+  def settings_tray_update_module_button
+    fxpath(settings_tray_button_selector("Edit Module Settings", "Update Module"))
   end
 
   def settings_tray_close_button
-    fxpath(settings_tray_close_button_selector)
+    fxpath(settings_tray_button_selector("Edit Module Settings", "Close"))
   end
 
-  def settings_tray_update_module_button
-    fxpath(settings_tray_update_module_button_selector)
+  def settings_tray_cancel_button
+    fxpath(settings_tray_button_selector("Edit Module Settings", "Cancel"))
   end
 
   #------------------------------ Actions ------------------------------
+  def add_module_tray_exists?
+    element_exists?(add_module_tray_selector)
+  end
 
   def add_prerequisites_button_exists?
     element_exists?(add_prerequisites_button_selector, true)
@@ -283,6 +313,18 @@ module ModulesSettingsTray
 
   def click_add_requirement_button
     add_requirement_button.click
+  end
+
+  def click_add_tray_add_module_button
+    add_tray_add_module_button.click
+  end
+
+  def click_add_tray_cancel_button
+    add_tray_cancel_button.click
+  end
+
+  def click_add_tray_close_button
+    add_tray_close_button.click
   end
 
   def click_assign_to_tab
@@ -359,5 +401,9 @@ module ModulesSettingsTray
 
   def settings_tray_exists?
     element_exists?(module_settings_tray_selector)
+  end
+
+  def update_module_name(new_name)
+    replace_content(module_name_input, new_name)
   end
 end
