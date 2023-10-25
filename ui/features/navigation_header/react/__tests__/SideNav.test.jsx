@@ -70,7 +70,7 @@ describe('SideNav', () => {
     const sideNavHeaderLogo = getByTestId('sidenav-header-logo')
     expect(sideNavHeaderLogo).toBeInTheDocument()
 
-    const iconCanvasLogo = getByTestId('icon-canvas-logo')
+    const iconCanvasLogo = getByTestId('sidenav-canvas-logo')
     expect(iconCanvasLogo).toBeInTheDocument()
   })
 
@@ -81,7 +81,7 @@ describe('SideNav', () => {
       </QueryClientProvider>
     )
 
-    const avatarComponent = getByTestId('avatar')
+    const avatarComponent = getByTestId('sidenav-user-avatar')
     expect(avatarComponent).toHaveAttribute('src', 'testSrc')
   })
 
@@ -99,7 +99,7 @@ describe('SideNav', () => {
     expect(document.body).toHaveClass('primary-nav-expanded')
   })
 
-  describe('tests custom logo', () => {
+  describe('Tests Custom Logo', () => {
     beforeEach(() => {
       window.ENV.active_brand_config = {variables: {'ic-brand-header-image': 'some-url'}}
     })
@@ -115,13 +115,13 @@ describe('SideNav', () => {
         </QueryClientProvider>
       )
 
-      const sideNavHeaderImage = getByTestId('sidenav-header-image')
+      const sideNavHeaderImage = getByTestId('sidenav-brand-logomark')
 
       expect(sideNavHeaderImage).toBeInTheDocument()
     })
   })
 
-  describe('tests K5 user features', () => {
+  describe('Tests K5 User Features', () => {
     beforeEach(() => {
       window.ENV.K5_USER = true
     })

@@ -56,6 +56,13 @@ const SideNav = () => {
   const isK5User = window.ENV.K5_USER
   const helpIcon = window.ENV.help_link_icon
 
+  const navItemThemeOverride = {
+    iconColor: 'white',
+    contentPadding: '0.1rem',
+    backgroundColor: 'transparent',
+    hoverBackgroundColor: 'transparent',
+  }
+
   const getHelpIcon = (): JSX.Element => {
     switch (helpIcon) {
       case InformationIconEnum.INFORMATION:
@@ -131,28 +138,27 @@ const SideNav = () => {
         <Navigation.Item
           icon={
             !logoUrl ? (
-              <IconCanvasLogoSolid
-                size={!isMinimized ? 'medium' : 'small'}
-                data-testid="icon-canvas-logo"
-              />
+              <div style={{margin: '0.5rem 0 0.5rem 0'}}>
+                <IconCanvasLogoSolid
+                  size={!isMinimized ? 'medium' : 'small'}
+                  data-testid="sidenav-canvas-logo"
+                />
+              </div>
             ) : (
               <Img
                 display="inline-block"
-                alt="sidenav-header-image"
-                margin="x-small 0 x-small 0"
-                width={100}
+                alt="sidenav-brand-logomark"
+                margin={`${!isMinimized ? 'xxx-small' : 'x-small'} 0 small 0`}
                 src={logoUrl}
-                data-testid="sidenav-header-image"
+                data-testid="sidenav-brand-logomark"
               />
             )
           }
           label={<ScreenReaderContent>{I18n.t('Home')}</ScreenReaderContent>}
           href="/"
           themeOverride={{
-            iconColor: 'white',
-            contentPadding: !isMinimized ? '1rem' : '0',
-            backgroundColor: 'transparent',
-            hoverBackgroundColor: 'transparent',
+            ...navItemThemeOverride,
+            contentPadding: '0',
           }}
           data-testid="sidenav-header-logo"
         />
@@ -182,7 +188,7 @@ const SideNav = () => {
                 name={window.ENV.current_user.display_name}
                 size="x-small"
                 src={window.ENV.current_user.avatar_image_url}
-                data-testid="avatar"
+                data-testid="sidenav-user-avatar"
               />
             </Badge>
           }
@@ -190,6 +196,7 @@ const SideNav = () => {
           onClick={() => {
             // this.loadSubNav('account')
           }}
+          themeOverride={navItemThemeOverride}
         />
         <Navigation.Item
           icon={<IconAdminLine />}
@@ -198,12 +205,14 @@ const SideNav = () => {
           onClick={event => {
             event.preventDefault()
           }}
+          themeOverride={navItemThemeOverride}
         />
         <Navigation.Item
           selected={true}
           icon={isK5User ? <IconHomeLine data-testid="K5HomeIcon" /> : <IconDashboardLine />}
           label={isK5User ? I18n.t('Home') : I18n.t('Dashboard')}
           href="/"
+          themeOverride={navItemThemeOverride}
         />
         <Navigation.Item
           icon={<IconCoursesLine />}
@@ -212,11 +221,13 @@ const SideNav = () => {
           onClick={event => {
             event.preventDefault()
           }}
+          themeOverride={navItemThemeOverride}
         />
         <Navigation.Item
           icon={<IconCalendarMonthLine />}
           label={I18n.t('Calendar')}
           href="/calendar"
+          themeOverride={navItemThemeOverride}
         />
         <Navigation.Item
           icon={
@@ -245,6 +256,7 @@ const SideNav = () => {
           }
           label={I18n.t('Inbox')}
           href="/conversations"
+          themeOverride={navItemThemeOverride}
         />
         <Navigation.Item
           icon={
@@ -273,6 +285,7 @@ const SideNav = () => {
           }
           label={I18n.t('Help')}
           href="/accounts/self/settings"
+          themeOverride={navItemThemeOverride}
         />
       </Navigation>
     </div>
