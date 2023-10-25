@@ -255,20 +255,7 @@ class MediaObjectsController < ApplicationController
     @media_object&.viewed!
     config = CanvasKaltura::ClientV3.config
     if config
-      if Account.site_admin.feature_enabled?(:authenticated_iframe_content)
-        media_sources = CanvasKaltura::ClientV3.new.media_sources(@attachment.media_entry_id)
-        # the bitrate query gives us a unique-enough key to use when querying for specific versions of the file
-        media_source = media_sources.find { |ms| ms[:bitrate].to_i == params[:bitrate].to_i } if params[:bitrate]
-        media_source ||= media_sources.first # if the bitrate is invalid or doesn't find anything
-        begin
-          temp_file = media_source_temp_file(media_source[:url])
-        rescue CanvasHttp::InvalidResponseCodeError => e
-          return(render(plain: e.message, status: e.code))
-        end
-        send_file(temp_file, filename: @attachment.filename, type: @attachment.content_type, stream: true)
-      else
-        redirect_to CanvasKaltura::ClientV3.new.assetSwfUrl(params[:id])
-      end
+      redirect_to CanvasKaltura::ClientV3.new.assetSwfUrl(params[:id])
     else
       render plain: t(:media_objects_not_configured, "Media Objects not configured")
     end
@@ -330,22 +317,5 @@ class MediaObjectsController < ApplicationController
     end
 
     @media_object.viewed!
-  end
-
-  # Fetches the media source file from the given url and returns a tempfile
-  # This logic is similar to the logic in Attachment#clone_url_as_attachment to handle large files except
-  # that it doesn't store it in the database
-  def media_source_temp_file(url)
-    _, uri = CanvasHttp.validate_url(url, check_host: true)
-    tmpfile = CanvasHttp.tempfile_for_uri(uri)
-    CanvasHttp.get(url) do |http_response|
-      if http_response.code.to_i == 200
-        http_response.read_body(tmpfile)
-        tmpfile.rewind
-      else
-        raise CanvasHttp::InvalidResponseCodeError.new(http_response.code.to_i, "error fetching #{url}")
-      end
-    end
-    tmpfile
   end
 end
