@@ -17,16 +17,17 @@
  */
 
 import React from 'react'
-import PropTypes from 'prop-types'
-
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {Pill} from '@instructure/ui-pill'
-
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('NewTabIndicator')
 
-const NewTabIndicator = ({tabName}) => {
+type Props = {
+  tabName: string
+}
+
+const NewTabIndicator = ({tabName}: Props) => {
   const currentUserId = window.ENV.current_user_id
   const visitedTabs = window.ENV.current_user_visited_tabs || []
   return currentUserId != null && !visitedTabs.includes(tabName) ? (
@@ -36,10 +37,6 @@ const NewTabIndicator = ({tabName}) => {
       </Pill>
     </AccessibleContent>
   ) : null
-}
-
-NewTabIndicator.propTypes = {
-  tabName: PropTypes.string.isRequired,
 }
 
 export default NewTabIndicator
