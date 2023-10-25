@@ -98,6 +98,13 @@ describe Lti::IMS::DynamicRegistrationController do
   end
 
   describe "#create" do
+    let(:scopes) do
+      [
+        "https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly",
+        "https://purl.imsglobal.org/spec/lti-ags/scope/score"
+      ]
+    end
+
     let(:registration_params) do
       {
         "application_type" => "web",
@@ -108,6 +115,7 @@ describe Lti::IMS::DynamicRegistrationController do
         "client_name" => "the client name",
         "jwks_uri" => "https://example.com/api/jwks",
         "token_endpoint_auth_method" => "private_key_jwt",
+        "scope" => scopes.join(","),
         "https://purl.imsglobal.org/spec/lti-tool-configuration" => {
           "domain" => "example.com",
           "messages" => [{
@@ -141,11 +149,14 @@ describe Lti::IMS::DynamicRegistrationController do
           expected_response_keys = registration_params
           expected_response_keys["lti_tool_configuration"] = registration_params["https://purl.imsglobal.org/spec/lti-tool-configuration"]
           expected_response_keys.delete("https://purl.imsglobal.org/spec/lti-tool-configuration")
+          expected_response_keys["scopes"] = scopes
+          expected_response_keys.delete("scope")
 
           expect(parsed_body["registration"]).to include(expected_response_keys)
           created_registration = Lti::IMS::Registration.last
           expect(created_registration).not_to be_nil
           expect(parsed_body["registration"]["id"]).to eq(created_registration.id)
+          expect(created_registration["scopes"]).to eq(scopes)
         end
 
         it "fills in values on the developer key" do
