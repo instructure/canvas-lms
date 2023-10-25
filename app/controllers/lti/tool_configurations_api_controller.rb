@@ -143,7 +143,15 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   #
   # @returns ToolConfiguration
   def show
-    render json: Lti::ToolConfigurationSerializer.new(developer_key.tool_configuration)
+    if developer_key.lti_registration.present?
+      render json: ({
+        tool_configuration: {
+          settings: developer_key.lti_registration.canvas_configuration
+        }
+      })
+    else
+      render json: Lti::ToolConfigurationSerializer.new(developer_key.tool_configuration)
+    end
   end
 
   # @API Show Tool configuration

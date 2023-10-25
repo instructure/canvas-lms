@@ -238,5 +238,188 @@ module Lti::IMS
         end
       end
     end
+
+    describe "canvas_configuration" do
+      subject { registration.canvas_configuration }
+
+      context "should return a correct configuration" do
+        it do
+          expect(subject).to eq({
+                                  "custom_parameters" => nil,
+                                  "description" => nil,
+                                  "extensions" => [{
+                                    "domain" => "example.com",
+                                    "platform" => "canvas.instructure.com",
+                                    "privacy_level" => "public",
+                                    "settings" => {
+                                      "icon_url" => nil,
+                                      "placements" => [],
+                                      "platform" => "canvas.instructure.com",
+                                      "text" => "Example Tool",
+                                    },
+                                    "tool_id" => "Example Tool"
+                                  }],
+                                  "oidc_initiation_url" => "http://example.com/login",
+                                  "public_jwk_url" => "http://example.com/jwks",
+                                  "scopes" => [],
+                                  "target_link_uri" => nil,
+                                  "title" => "Example Tool",
+                                  "url" => nil,
+                                })
+        end
+      end
+    end
+
+    describe "placements" do
+      let(:lti_tool_configuration) do
+        {
+          domain: "example.com",
+          messages: [{
+            type: "LtiResourceLinkRequest",
+            target_link_uri: "http://example.com/launch",
+            custom_parameters: {
+              "foo" => "bar"
+            },
+            icon_uri: "http://example.com/icon.png",
+            placements: ["global_navigation", "course_navigation"],
+          }],
+          claims: []
+        }
+      end
+
+      subject { registration.placements }
+
+      context "convert messages to placements" do
+        it do
+          expect(subject).to eq [
+            {
+              custom_fields: { "foo" => "bar" },
+              enabled: true,
+              icon_url: "http://example.com/icon.png",
+              message_type: "LtiResourceLinkRequest",
+              placement: "global_navigation",
+              target_link_uri: "http://example.com/launch"
+            },
+            {
+              custom_fields: { "foo" => "bar" },
+              enabled: true,
+              icon_url: "http://example.com/icon.png",
+              message_type: "LtiResourceLinkRequest",
+              placement: "course_navigation",
+              target_link_uri: "http://example.com/launch"
+            }
+          ]
+        end
+      end
+    end
+
+    describe "importable_configuration" do
+      subject { registration.importable_configuration }
+      let(:lti_tool_configuration) do
+        {
+          domain: "example.com",
+          messages: [{
+            type: "LtiResourceLinkRequest",
+            target_link_uri: "http://example.com/launch",
+            custom_parameters: {
+              "foo" => "bar"
+            },
+            icon_uri: "http://example.com/icon.png",
+            placements: ["global_navigation", "course_navigation"],
+          }],
+          claims: []
+        }
+      end
+
+      context "should return a correct configuration" do
+        it do
+          expect(subject).to eq(
+            {
+              "custom_parameters" => nil,
+              "description" => nil,
+              "domain" => "example.com",
+              "extensions" => [{
+                "domain" => "example.com",
+                "platform" => "canvas.instructure.com",
+                "privacy_level" => "public",
+                "settings" => {
+                  "icon_url" => nil,
+                  "placements" => [
+                    {
+                      "custom_fields" => { "foo" => "bar" },
+                      "enabled" => true,
+                      "icon_url" => "http://example.com/icon.png",
+                      "message_type" => "LtiResourceLinkRequest",
+                      "placement" => "global_navigation",
+                      "target_link_uri" => "http://example.com/launch"
+                    },
+                    {
+                      "custom_fields" => { "foo" => "bar" },
+                      "enabled" => true,
+                      "icon_url" => "http://example.com/icon.png",
+                      "message_type" => "LtiResourceLinkRequest",
+                      "placement" => "course_navigation",
+                      "target_link_uri" => "http://example.com/launch"
+                    }
+                  ],
+                  "platform" => "canvas.instructure.com",
+                  "text" => "Example Tool"
+                },
+                "tool_id" => "Example Tool"
+              }],
+              "lti_version" => "1.3",
+              "oidc_initiation_url" => "http://example.com/login",
+              "platform" => "canvas.instructure.com",
+              "privacy_level" => "public",
+              "public_jwk_url" => "http://example.com/jwks",
+              "scopes" => [],
+              "target_link_uri" => nil,
+              "title" => "Example Tool",
+              "tool_id" => "Example Tool",
+              "url" => nil,
+              "settings" => {
+                "course_navigation" => {
+                  "custom_fields" => { "foo" => "bar" },
+                  "enabled" => true,
+                  "icon_url" => "http://example.com/icon.png",
+                  "message_type" => "LtiResourceLinkRequest",
+                  "placement" => "course_navigation",
+                  "target_link_uri" => "http://example.com/launch"
+                },
+                "global_navigation" => {
+                  "custom_fields" => { "foo" => "bar" },
+                  "enabled" => true,
+                  "icon_url" => "http://example.com/icon.png",
+                  "message_type" => "LtiResourceLinkRequest",
+                  "placement" => "global_navigation",
+                  "target_link_uri" => "http://example.com/launch"
+                },
+                "icon_url" => nil,
+                "placements" => [
+                  {
+                    "custom_fields" => { "foo" => "bar" },
+                    "enabled" => true,
+                    "icon_url" => "http://example.com/icon.png",
+                    "message_type" => "LtiResourceLinkRequest",
+                    "placement" => "global_navigation",
+                    "target_link_uri" => "http://example.com/launch"
+                  },
+                  {
+                    "custom_fields" => { "foo" => "bar" },
+                    "enabled" => true,
+                    "icon_url" => "http://example.com/icon.png",
+                    "message_type" => "LtiResourceLinkRequest",
+                    "placement" => "course_navigation",
+                    "target_link_uri" => "http://example.com/launch"
+                  }
+                ],
+                "platform" => "canvas.instructure.com",
+                "text" => "Example Tool"
+              },
+            }
+          )
+        end
+      end
+    end
   end
 end
