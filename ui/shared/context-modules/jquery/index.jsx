@@ -2515,17 +2515,7 @@ $(document).ready(function () {
     renderSendToTray(true, selection, returnFocusTo)
   })
 
-  $('.assign_module_link').on('click keyclick', function (event) {
-    event.preventDefault()
-    const returnFocusTo = $(event.target).closest('ul').prev('.al-trigger')
-    const moduleElement = $(event.target).parents('.context_module')[0]
-    const settingsProps = parseModule(moduleElement)
-    renderDifferentiatedModulesTray(returnFocusTo, moduleElement, settingsProps, {
-      initialTab: 'assign-to',
-    })
-  })
-
-  $('.view_assign_link').on('click keyclick', function (event) {
+  $(document).on('click', '.assign_module_link, .view_assign_link', function (event) {
     event.preventDefault()
     const returnFocusTo = $(event.target).closest('ul').prev('.al-trigger')
     const moduleElement = $(event.target).parents('.context_module')[0]
