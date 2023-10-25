@@ -44,9 +44,9 @@ module CanvasCache
     end
 
     module IgnorePipelinedKey
-      def pipelined(_key = nil, ...)
+      def pipelined(_key = nil, **kwargs, &)
         # ignore key; only useful for distributed
-        super(...)
+        super(**kwargs, &)
       end
     end
 
