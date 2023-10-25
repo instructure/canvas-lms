@@ -55,6 +55,7 @@ class HelpDialog extends React.Component<Props, State> {
     switch (this.state.view) {
       case '#create_ticket':
         return (
+          // @ts-expect-error
           <CreateTicketForm onCancel={this.handleCancelClick} onSubmit={this.props.onFormSubmit} />
         )
       case '#teacher_feedback':
