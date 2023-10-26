@@ -215,4 +215,28 @@ describe('FilePreview', () => {
 
     expect(getByText('Preview Unavailable')).toBeInTheDocument()
   })
+
+  it('displays the first file upload in the preview when switching between attempts', async () => {
+    // file[0] = image, file[1] = zip, file[2] = zip
+    const propsAttempt1 = {
+      submission: await mockSubmission({
+        Submission: {attachments: [files[0], files[1]], attempt: 1},
+      }),
+    }
+
+    const propsAttempt2 = {
+      submission: await mockSubmission({
+        Submission: {attachments: files, attempt: 2},
+      }),
+    }
+
+    const {container, rerender} = render(<FilePreview {...propsAttempt2} />)
+    const thirdFileIcon = container.querySelectorAll('svg[name="IconPaperclip"]')[1]
+    fireEvent.click(thirdFileIcon)
+
+    rerender(<FilePreview {...propsAttempt1} />)
+
+    const iframe = container.querySelector('iframe')
+    expect(iframe).toHaveAttribute('src', '/preview_url')
+  })
 })
