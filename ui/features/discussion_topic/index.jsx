@@ -125,8 +125,12 @@ ready(() => {
     filterModel,
   })
 
+  // for cases where users have html id's this page listens for,
+  // use this so they do not trigger related code
+  const excludeUserContentCss = 'div:not(.user_content)'
+
   const entriesView = new EntriesView({
-    el: '#discussion_subentries',
+    el: `${excludeUserContentCss} #discussion_subentries`,
     collection: entries,
     descendants,
     children,
@@ -135,12 +139,12 @@ ready(() => {
   })
 
   const toolbarView = new DiscussionToolbarView({
-    el: '#discussion-toolbar',
+    el: `${excludeUserContentCss} #discussion-toolbar`,
     model: filterModel,
   })
 
   const filterView = new DiscussionFilterResultsView({
-    el: '#filterResults',
+    el: `${excludeUserContentCss} #filterResults`,
     allData: data,
     model: filterModel,
   })
