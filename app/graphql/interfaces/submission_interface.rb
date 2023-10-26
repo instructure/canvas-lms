@@ -285,6 +285,11 @@ module Interfaces::SubmissionInterface
       end
   end
 
+  field :custom_grade_status, String, null: true
+  def custom_grade_status
+    submission.custom_grade_status&.name.to_s
+  end
+
   field :media_object, Types::MediaObjectType, null: true
   def media_object
     Loaders::MediaObjectLoader.load(object.media_comment_id)

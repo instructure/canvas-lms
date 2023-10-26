@@ -17,8 +17,8 @@
  */
 
 import React, {useRef} from 'react'
-import {arrayOf, bool, func, shape, string, objectOf, oneOf} from 'prop-types'
-import {fileShape} from '../../shared/fileShape'
+import {func, shape, string, oneOf} from 'prop-types'
+import {contentTrayDocumentShape} from '../../shared/fileShape'
 import formatMessage from '../../../../format-message'
 
 import {Text} from '@instructure/ui-text'
@@ -105,15 +105,7 @@ DocumentsPanel.propTypes = {
   fetchInitialDocs: func.isRequired,
   fetchNextDocs: func.isRequired,
   onLinkClick: func.isRequired,
-  documents: objectOf(
-    shape({
-      files: arrayOf(shape(fileShape)).isRequired,
-      bookmark: string,
-      hasMore: bool,
-      isLoading: bool,
-      error: string,
-    })
-  ).isRequired,
+  documents: contentTrayDocumentShape.isRequired,
   sortBy: shape({
     sort: oneOf(['date_added', 'alphabetical']).isRequired,
     order: oneOf(['asc', 'desc']).isRequired,

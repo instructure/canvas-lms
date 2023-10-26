@@ -44,6 +44,7 @@ describe('ScoresGrid', () => {
           id: '1',
           name: 'Student Name',
           display_name: 'Student Name',
+          status: 'active',
         },
       ],
       outcomes: [

@@ -177,7 +177,7 @@ describe "context_modules/index" do
       render "context_modules/index"
       expect(response).not_to be_nil
       page = Nokogiri("<document>" + response.body + "</document>")
-      expect(page.css("#context_module_item_#{@module_item.id}_#{@assessment.id}").length).to eq 1
+      expect(page.css("#module_student_view_peer_reviews_#{@module_item.content_id}_#{@module_item.id}").length).to eq 1
     end
 
     it "does not show the list of assessment requests when peer_reviews_for_a2 FF is OFF" do
@@ -189,7 +189,7 @@ describe "context_modules/index" do
       render "context_modules/index"
       expect(response).not_to be_nil
       page = Nokogiri("<document>" + response.body + "</document>")
-      expect(page.css("#context_module_item_#{@module_item.id}_#{@assessment.id}").length).to eq 0
+      expect(page.css("#module_student_view_peer_reviews_#{@module_item.content_id}_#{@module_item.id}").length).to eq 0
     end
   end
 end

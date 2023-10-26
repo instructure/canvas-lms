@@ -24,8 +24,13 @@ import {Spinner} from '@instructure/ui-spinner'
 import {uid} from '@instructure/uid'
 import {string} from 'prop-types'
 import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
+import {createAnalyticPropsGenerator} from './util/analytics'
+import {MODULE_NAME} from './types'
 
 const I18n = useI18nScope('managed_course_selector')
+
+// initialize analytics props
+const analyticProps = createAnalyticPropsGenerator(MODULE_NAME)
 
 const NO_OPTIONS_OPTION_ID = '___noOptionsOption__'
 
@@ -43,6 +48,18 @@ SearchableSelectOption.propTypes = {
 }
 /* eslint-enable react/no-unused-prop-types */
 SearchableSelectOption.displayName = 'Option'
+
+interface Props {
+  id: string
+  isLoading: boolean
+  value: string
+  onChange: Function
+  label: string
+  placeholder: string
+  noResultsLabel: string
+  noSearchMatchLabel: string
+  children: any
+}
 
 function flattenOptions(nodes: any) {
   const options: any[][] = []
@@ -227,6 +244,7 @@ export default function RoleSearchSelect(props: Props) {
         onRequestHideOptions={handleRequestHideOptions}
         onRequestHighlightOption={handleRequestHighlightOption}
         onRequestSelectOption={handleRequestSelectOption}
+        {...analyticProps('Role')}
       >
         {renderChildren()}
       </Select>
@@ -241,18 +259,6 @@ export default function RoleSearchSelect(props: Props) {
       </Alert>
     </>
   )
-}
-
-interface Props {
-  id: string
-  isLoading: boolean
-  value: string
-  onChange: Function
-  label: string
-  placeholder: string
-  noResultsLabel: string
-  noSearchMatchLabel: string
-  children: any
 }
 
 RoleSearchSelect.Option = SearchableSelectOption

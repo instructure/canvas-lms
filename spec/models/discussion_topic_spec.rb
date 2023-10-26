@@ -2957,4 +2957,93 @@ describe DiscussionTopic do
       end
     end
   end
+
+  describe "checkpoints" do
+    before do
+      @topic = @course.discussion_topics.create!(title: "Discussion Topic Title", user: @teacher)
+    end
+
+    it "not in place in the topic" do
+      expect(@topic.checkpoints?).to be false
+      expect(@topic.checkpoint_assignments.length).to eq 0
+      expect(@topic.reply_to_topic_checkpoint).to be_nil
+      expect(@topic.reply_to_entry_checkpoint).to be_nil
+      expect(@topic.reply_to_entry_required_count).to eq 0
+    end
+
+    it "does not allow setting the reply_to_entry_required_count to more than 10" do
+      @topic.create_checkpoints(reply_to_topic_points: 10, reply_to_entry_points: 15, reply_to_entry_required_count: 11)
+
+      expect(@topic).to_not be_valid
+    end
+
+    it "does not allow setting the reply_to_entry_required_count to 0 when checkpoints are there" do
+      @topic.create_checkpoints(reply_to_topic_points: 10, reply_to_entry_points: 15, reply_to_entry_required_count: 0)
+
+      expect(@topic).to_not be_valid
+    end
+
+    describe "in place" do
+      before do
+        @course.root_account.enable_feature!(:discussion_checkpoints)
+        @topic.reload
+        @topic.create_checkpoints(reply_to_topic_points: 10, reply_to_entry_points: 15, reply_to_entry_required_count: 5)
+      end
+
+      it "in the topic" do
+        expect(@topic.checkpoints?).to be true
+        expect(@topic.checkpoint_assignments.length).to eq 2
+        expect(@topic.assignment.checkpoint_label).to eq CheckpointLabels::PARENT
+        expect(@topic.reply_to_topic_checkpoint.checkpoint_label).to eq CheckpointLabels::REPLY_TO_TOPIC
+        expect(@topic.reply_to_entry_checkpoint.checkpoint_label).to eq CheckpointLabels::REPLY_TO_ENTRY
+      end
+
+      it "correctly marks the reply to topic checkpoint submission as submitted when the student replies to topic" do
+        @topic.discussion_entries.create!(user: @student, message: "reply to topic")
+
+        expect(@topic.assignment.submissions.find_by(user: @student).workflow_state).to eq "unsubmitted"
+        expect(@topic.reply_to_topic_checkpoint.submissions.find_by(user: @student).workflow_state).to eq "submitted"
+        expect(@topic.reply_to_entry_checkpoint.submissions.find_by(user: @student).workflow_state).to eq "unsubmitted"
+      end
+
+      it "correctly marks the reply to entry checkpoint submission as submitted when the student replies to an entry 5 times" do
+        entry = @topic.discussion_entries.create!(user: @teacher, message: "reply to topic")
+        5.times do
+          @topic.discussion_entries.create!(user: @student, message: "reply to entry", root_entry_id: entry.id, parent_id: entry.id)
+        end
+
+        expect(@topic.assignment.submissions.find_by(user: @student).workflow_state).to eq "unsubmitted"
+        expect(@topic.reply_to_topic_checkpoint.submissions.find_by(user: @student).workflow_state).to eq "unsubmitted"
+        expect(@topic.reply_to_entry_checkpoint.submissions.find_by(user: @student).workflow_state).to eq "submitted"
+      end
+
+      it "correctly leaves the reply to entry checkpoint submission as unsubmitted when the student has not replied to an entry 5 times" do
+        entry = @topic.discussion_entries.create!(user: @teacher, message: "reply to topic")
+        @topic.discussion_entries.create!(user: @student, message: "reply to entry", root_entry_id: entry.id, parent_id: entry.id)
+
+        expect(@topic.assignment.submissions.find_by(user: @student).workflow_state).to eq "unsubmitted"
+        expect(@topic.reply_to_topic_checkpoint.submissions.find_by(user: @student).workflow_state).to eq "unsubmitted"
+        expect(@topic.reply_to_entry_checkpoint.submissions.find_by(user: @student).workflow_state).to eq "unsubmitted"
+      end
+
+      it "correctly marks both checkpoint submissions when the user replies to both topic and entry 5 times" do
+        entry_by_teacher = @topic.discussion_entries.create!(user: @teacher, message: "reply to topic by teacher")
+        @topic.discussion_entries.create!(user: @student, message: "reply to topic by student")
+        5.times do
+          @topic.discussion_entries.create!(user: @student, message: "reply to entry by student", root_entry_id: entry_by_teacher.id, parent_id: entry_by_teacher.id)
+        end
+
+        # TODO: When all the children submissions are marked as submitted, the parent submission should be marked as submitted too.
+        # This will be done in a subsequent ticket.
+        expect(@topic.assignment.submissions.find_by(user: @student).workflow_state).to eq "unsubmitted"
+        expect(@topic.reply_to_topic_checkpoint.submissions.find_by(user: @student).workflow_state).to eq "submitted"
+        expect(@topic.reply_to_entry_checkpoint.submissions.find_by(user: @student).workflow_state).to eq "submitted"
+      end
+
+      it "has the correct reply_to_entry_required_count and is valid" do
+        expect(@topic.reply_to_entry_required_count).to eq 5
+        expect(@topic).to be_valid
+      end
+    end
+  end
 end

@@ -1369,6 +1369,18 @@ describe "Users API", type: :request do
             expect(json.count).to eq 2
             expect(json.pluck("name").sort).to eq [temporary_enrollment_provider.name, temporary_enrollment_recipient.name].sort
           end
+
+          it "returns only current and future enrollments" do
+            temp_enrollment.update!(workflow_state: "deleted")
+            json = api_call_as_user(
+              subject,
+              :get,
+              "/api/v1/accounts/#{@account.id}/users",
+              { controller: "users", action: "api_index", format: "json", account_id: @account.id.to_param },
+              { temporary_enrollment_recipients: true }
+            )
+            expect(json.count).to eq 0
+          end
         end
 
         context "when feature flag is disabled" do

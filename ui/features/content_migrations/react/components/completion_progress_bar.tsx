@@ -16,12 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useState, useRef} from 'react'
+import React, {useCallback, useEffect, useState, useRef, ReactElement} from 'react'
 import {ProgressBar} from '@instructure/ui-progress'
 import {Text} from '@instructure/ui-text'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {ContentMigrationWorkflowState} from './types'
+import {ContentMigrationItem} from './types'
+import {ContentSelectionModal} from './content_selection_modal'
 
 const I18n = useI18nScope('content_migrations_redesign')
 
@@ -41,9 +42,15 @@ type CompletionProgressResponse = {
   url: string
 }
 
-type CompletionProgressBarProps = {progress_url: string}
+type CompletionProgressBarProps = {
+  progress_url: string
+  onProgressFinish?: () => void
+}
 
-export const CompletionProgressBar = ({progress_url}: CompletionProgressBarProps) => {
+export const CompletionProgressBar = ({
+  progress_url,
+  onProgressFinish,
+}: CompletionProgressBarProps) => {
   const [response, setResponse] = useState<CompletionProgressResponse | null>(null)
   const fetchIntervalRef = useRef<any>(null)
 
@@ -69,9 +76,10 @@ export const CompletionProgressBar = ({progress_url}: CompletionProgressBarProps
   useEffect(() => {
     // Stop fetching when response returned completed or failed
     if (response && ['completed', 'failed'].includes(response.workflow_state)) {
+      onProgressFinish?.()
       clearInterval(fetchIntervalRef.current)
     }
-  }, [response])
+  }, [response, onProgressFinish])
 
   // Renders null the first time until we get the response
   if (
@@ -95,12 +103,25 @@ export const CompletionProgressBar = ({progress_url}: CompletionProgressBarProps
 }
 
 export const buildProgressCellContent = (
-  workflow_state: ContentMigrationWorkflowState,
-  migration_issues_count: number,
-  progress_url: string
+  {id, workflow_state, migration_issues_count, progress_url}: ContentMigrationItem,
+  onReloadMigrationItem: () => void
 ) => {
+  const courseId = ENV.COURSE_ID
   if (['failed', 'completed'].includes(workflow_state) && migration_issues_count > 0) {
     return <Text>{I18n.t('%{count} issues', {count: migration_issues_count})}</Text>
+  } else if (workflow_state === 'running') {
+    return (
+      <CompletionProgressBar progress_url={progress_url} onProgressFinish={onReloadMigrationItem} />
+    )
+  } else if (courseId && workflow_state === 'waiting_for_select') {
+    return (
+      <ContentSelectionModal
+        courseId={courseId}
+        migrationId={id}
+        onSubmit={onReloadMigrationItem}
+      />
+    )
   }
-  return <CompletionProgressBar progress_url={progress_url} />
+  // Return null for pre_processing
+  return null
 }

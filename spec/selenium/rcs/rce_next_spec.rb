@@ -1158,7 +1158,6 @@ describe "RCE next tests", :ignore_js_errors do
       visit_new_assignment_page(@course)
 
       click_user_images_toolbar_menuitem
-
       expect(user_image_links.count).to eq 1
       expect(tray_container).to include_text("myimage")
 

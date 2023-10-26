@@ -2715,7 +2715,8 @@ CanvasRails::Application.routes.draw do
 
     # Dynamic Registration Service
     scope(controller: "lti/ims/dynamic_registration") do
-      get "register", action: :create
+      get "register", action: :redirect_to_tool_registration
+      post "registrations", action: :create
     end
 
     # Public JWK Service

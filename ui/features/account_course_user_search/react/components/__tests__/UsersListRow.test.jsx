@@ -38,6 +38,8 @@ function makeProps() {
     handleCloseEditUserDialog: jest.fn(),
     permissions: {
       can_add_temporary_enrollments: false,
+      can_edit_temporary_enrollments: false,
+      can_delete_temporary_enrollments: false,
       can_edit_users: true,
       can_manage_admin_users: true,
       can_masquerade: true,
@@ -140,6 +142,8 @@ describe('UsersListRow', () => {
         permissions: {
           ...defaultProps.permissions,
           can_add_temporary_enrollments: true,
+          can_edit_temporary_enrollments: true,
+          can_delete_temporary_enrollments: true,
         },
       }
 

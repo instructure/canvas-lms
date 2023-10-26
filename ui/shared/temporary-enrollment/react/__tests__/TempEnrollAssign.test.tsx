@@ -18,8 +18,13 @@
 
 import React from 'react'
 import {fireEvent, render, waitFor, within} from '@testing-library/react'
-import {TempEnrollAssign, tempEnrollAssignData} from '../TempEnrollAssign'
+import {
+  getEnrollmentAndUserProps,
+  TempEnrollAssign,
+  tempEnrollAssignData,
+} from '../TempEnrollAssign'
 import fetchMock from 'fetch-mock'
+import {PROVIDER, RECIPIENT} from '../types'
 
 const backCall = jest.fn()
 
@@ -39,8 +44,34 @@ const truePermissions = {
   designer: true,
 }
 
+const enrollmentsByCourse = [
+  {
+    id: '1',
+    name: 'Apple Music',
+    workflow_state: 'available',
+    enrollments: [
+      {
+        role_id: '1',
+      },
+    ],
+    sections: [
+      {
+        id: '1',
+        name: 'Section 1',
+        enrollment_role: 'TeacherEnrollment',
+      },
+    ],
+  },
+]
+
 const props = {
-  enrollment: {login_id: 'mel123', email: 'mel@email.com', name: 'Melvin', sis_user_id: '5'},
+  enrollment: {
+    email: 'mel@email.com',
+    id: '2',
+    login_id: 'mel123',
+    name: 'Melvin',
+    sis_user_id: '5',
+  },
   user: {
     name: 'John Smith',
     avatar_url: '',
@@ -54,14 +85,13 @@ const props = {
   goBack: backCall,
   setEnrollmentStatus: jest.fn(),
   doSubmit: () => false,
+  isInAssignEditMode: false,
+  contextType: PROVIDER,
 }
 
-const johnEnrollments = [
-  // student enrollment
-  {course_id: '1', course_section_id: '11', id: '1', role_id: '91'},
-]
-
-const ENROLLMENTS_URL = `/api/v1/users/1/enrollments?state%5B%5D=active&state%5B%5D=completed&state%5B%5D=invited`
+const ENROLLMENTS_URI = encodeURI(
+  `/api/v1/users/${props.user.id}/courses?enrollment_state=active&include[]=sections`
+)
 
 // converts local time to UTC time based on a given date and time
 // returns UTC time in 'HH:mm' format
@@ -71,16 +101,6 @@ function localToUTCTime(date: string, time: string): string {
   const utcMinutes = localDate.getUTCMinutes()
 
   return `${String(utcHours).padStart(2, '0')}:${String(utcMinutes).padStart(2, '0')}`
-}
-
-const setupMocksForSuccess = () => {
-  fetchMock.get(ENROLLMENTS_URL, johnEnrollments)
-  fetchMock.get(`/api/v1/courses/1`, {name: 'coures1', workflow_state: 'available'})
-  fetchMock.get('/api/v1/courses/1/sections/11', {name: 'section1'})
-}
-
-const setupMocksForFailure = () => {
-  fetchMock.get(ENROLLMENTS_URL, 500)
 }
 
 describe('TempEnrollAssign', () => {
@@ -93,7 +113,9 @@ describe('TempEnrollAssign', () => {
   })
 
   describe('With Successful API calls', () => {
-    beforeEach(setupMocksForSuccess)
+    beforeEach(() => {
+      fetchMock.get(ENROLLMENTS_URI, enrollmentsByCourse)
+    })
 
     it('initializes with ROLE as the default role in the summary', async () => {
       const {findByText} = render(<TempEnrollAssign {...props} />)
@@ -111,6 +133,17 @@ describe('TempEnrollAssign', () => {
       fireEvent.click(backButton)
 
       expect(backCall).toHaveBeenCalled()
+    })
+
+    it('does not render Back button when isEditMode is true', async () => {
+      const modifiedProps = {
+        ...props,
+        isInAssignEditMode: true,
+      }
+      const {queryByText} = render(<TempEnrollAssign {...modifiedProps} />)
+      const backButton = queryByText('Back')
+
+      expect(backButton).toBeNull()
     })
 
     it('changes summary when role is selected', async () => {
@@ -280,15 +313,51 @@ describe('TempEnrollAssign', () => {
       // mock console.error
       jest.spyOn(console, 'error').mockImplementation(() => {})
 
-      setupMocksForFailure()
+      fetchMock.get(ENROLLMENTS_URI, 500)
     })
 
     it('shows error for failed enrollments fetch', async () => {
-      const {findByText} = render(<TempEnrollAssign {...props} />)
-      const errorMessage = await findByText(
+      const {findAllByText} = render(<TempEnrollAssign {...props} />)
+      const errorMessage = await findAllByText(
         /There was an error while requesting user enrollments, please try again/i
       )
-      expect(errorMessage).toBeInTheDocument()
+      expect(errorMessage).toBeTruthy()
+    })
+  })
+
+  describe('getEnrollmentAndUserProps', () => {
+    it('should return unchanged values when contextType is null', () => {
+      const {enrollmentProps, userProps} = getEnrollmentAndUserProps({
+        contextType: null,
+        enrollment: props.enrollment,
+        user: props.user,
+      })
+
+      expect(enrollmentProps).toEqual(props.enrollment)
+      expect(userProps).toEqual(props.user)
+    })
+
+    it('should return enrollmentProps and userProps correctly when contextType is RECIPIENT', () => {
+      const {enrollmentProps, userProps} = getEnrollmentAndUserProps({
+        contextType: RECIPIENT,
+        enrollment: props.enrollment,
+        user: props.user,
+      })
+
+      // Assert
+      expect(enrollmentProps).toEqual(props.user)
+      expect(userProps).toEqual(props.enrollment)
+    })
+
+    it('should return enrollmentProps and userProps correctly when contextType is PROVIDER', () => {
+      const {enrollmentProps, userProps} = getEnrollmentAndUserProps({
+        contextType: PROVIDER,
+        enrollment: props.enrollment,
+        user: props.user,
+      })
+
+      expect(enrollmentProps).toEqual(props.enrollment)
+      expect(userProps).toEqual(props.user)
     })
   })
 })

@@ -124,8 +124,6 @@ export function prepEmbedSrc(url, canvasOrigin = window.location.origin) {
 
 // when the user opens a link to a resource, we want its view
 // logged, so remove /preview
-// Add wrap=1 to indicate clicking on the link should open a preview
-// and not download the file (this doesn't work if the original link is a download link)
 export function prepLinkedSrc(url) {
   const parsed = parseCanvasUrl(url)
   if (!parsed) {
@@ -133,6 +131,5 @@ export function prepLinkedSrc(url) {
   }
   delete parsed.search
   parsed.pathname = parsed.pathname.replace(/\/preview(\?|$)/, '$1')
-  parsed.query.wrap = '1'
   return format(parsed)
 }

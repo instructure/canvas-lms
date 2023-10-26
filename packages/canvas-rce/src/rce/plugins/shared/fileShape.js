@@ -15,12 +15,12 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {bool, number, oneOfType, string} from 'prop-types'
+import {arrayOf, bool, number, oneOfType, shape, string, checkPropTypes} from 'prop-types'
 
 export const fileShape = {
   content_type: string.isRequired,
   date: string.isRequired,
-  display_name: string,
+  display_name: string.isRequired,
   filename: string.isRequired,
   href: string.isRequired,
   id: oneOfType([number, string]).isRequired,
@@ -33,13 +33,12 @@ export const fileShape = {
   published: bool,
 }
 
+export const imageShape = {...fileShape, thumbnail_url: string}
 export const mediaObjectShape = {
-  content_type: string.isRequired,
-  date: string.isRequired,
-  embedded_iframe_url: string,
-  id: oneOfType([number, string]).isRequired,
+  ...imageShape,
   title: string.isRequired,
-  published: bool,
+  embedded_iframe_url: string,
+  media_entry_id: string,
 }
 
 export const fileOrMediaObjectShape = {
@@ -58,3 +57,83 @@ export const fileOrMediaObjectShape = {
   locked_for_user: bool,
   published: bool,
 }
+
+export const documentQueryReturnShape = {
+  files: arrayOf(shape(fileShape)).isRequired,
+  bookmark: string,
+  hasMore: bool,
+  isLoading: bool,
+  error: string,
+}
+
+export const imageQueryReturnShape = {
+  files: arrayOf(shape(imageShape)).isRequired,
+  bookmark: string,
+  hasMore: bool,
+  isLoading: bool,
+  error: string,
+}
+
+export const mediaQueryReturnShape = {
+  files: arrayOf(shape(mediaObjectShape)).isRequired,
+  bookmark: string,
+  hasMore: bool,
+  isLoading: bool,
+  error: string,
+}
+
+function createContentTrayDocumentShape(isRequired) {
+  return function validateContentTrayDocuments(props, propName, componentName) {
+    const p = props[propName]
+
+    if (!p) {
+      if (isRequired) {
+        if (!p) {
+          return new Error(
+            `Required prop \`${propName}\` not supplied to \`${componentName}\`. Validation failed.`
+          )
+        }
+      }
+      return undefined
+    } else {
+      const files = p.user || p.course || p.group || p.User || p.Course || p.Group
+      if (!files) {
+        return new Error(
+          `Invalid prop \`${propName}\` supplied to \`${componentName}\`. Missing "user"|"course"|"group" key.`
+        )
+      }
+      if ('searchString' in p) {
+        if (!(typeof p.searchString === 'string')) {
+          return new Error(
+            `Invalid prop \`${propName}\` supplied to \`${componentName}\`. "searchString" must be a string.`
+          )
+        }
+      }
+      if (propName === 'documents') {
+        checkPropTypes(
+          {docs: shape(documentQueryReturnShape)},
+          {docs: files},
+          componentName,
+          componentName
+        )
+      } else if (propName === 'images') {
+        checkPropTypes(
+          {images: shape(imageQueryReturnShape)},
+          {images: files},
+          componentName,
+          componentName
+        )
+      } else if (propName === 'media') {
+        checkPropTypes(
+          {media: shape(mediaQueryReturnShape)},
+          {media: files},
+          componentName,
+          componentName
+        )
+      }
+    }
+  }
+}
+
+export const contentTrayDocumentShape = createContentTrayDocumentShape(false)
+contentTrayDocumentShape.isRequired = createContentTrayDocumentShape(true)

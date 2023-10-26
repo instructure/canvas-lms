@@ -88,4 +88,86 @@ describe Assignment do
       expect(assignment.hide_on_modules_view?).to be false
     end
   end
+
+  describe "#grade_student" do
+    describe "checkpointed discussions" do
+      before do
+        course_with_teacher(active_all: true)
+        @student = student_in_course(active_all: true).user
+        @course.root_account.enable_feature!(:discussion_checkpoints)
+        assignment = @course.assignments.create!(checkpointed: true, checkpoint_label: CheckpointLabels::PARENT)
+        assignment.checkpoint_assignments.create!(context: @course, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC, due_at: 2.days.from_now)
+        assignment.checkpoint_assignments.create!(context: @course, checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY, due_at: 3.days.from_now)
+        @topic = @course.discussion_topics.create!(assignment:, reply_to_entry_required_count: 1)
+      end
+
+      let(:reply_to_topic_submission) do
+        @topic.reply_to_topic_checkpoint.submissions.find_by(user: @student)
+      end
+
+      let(:reply_to_entry_submission) do
+        @topic.reply_to_entry_checkpoint.submissions.find_by(user: @student)
+      end
+
+      it "supports grading checkpoints" do
+        @topic.assignment.grade_student(@student, grader: @teacher, score: 5, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC)
+        @topic.assignment.grade_student(@student, grader: @teacher, score: 2, checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY)
+        expect(reply_to_topic_submission.score).to eq 5
+        expect(reply_to_entry_submission.score).to eq 2
+      end
+
+      it "raises an error if no checkpoint label is provided" do
+        expect do
+          @topic.assignment.grade_student(@student, grader: @teacher, score: 5)
+        end.to raise_error(Assignment::GradeError, "Must provide a valid checkpoint label when grading checkpointed discussions")
+      end
+
+      it "raises an error if an invalid checkpoint label is provided" do
+        expect do
+          @topic.assignment.grade_student(@student, grader: @teacher, score: 5, checkpoint_label: "potato")
+        end.to raise_error(Assignment::GradeError, "Must provide a valid checkpoint label when grading checkpointed discussions")
+      end
+
+      it "returns the submissions for the 'parent' assignment" do
+        submissions = @topic.assignment.grade_student(@student, grader: @teacher, score: 5, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC)
+        expect(submissions.map(&:assignment_id).uniq).to eq [@topic.assignment.id]
+      end
+
+      it "ignores checkpoints when the feature flag is disabled" do
+        @course.root_account.disable_feature!(:discussion_checkpoints)
+        @topic.assignment.grade_student(@student, grader: @teacher, score: 5, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC)
+        expect(reply_to_topic_submission.score).to be_nil
+        expect(@topic.assignment.submissions.find_by(user: @student).score).to eq 5
+      end
+    end
+  end
+
+  describe "checkpointed discussions" do
+    before(:once) do
+      course = course_model
+      course.root_account.enable_feature!(:discussion_checkpoints)
+      @topic = @course.discussion_topics.create!(title: "graded topic")
+      @topic.create_checkpoints(reply_to_topic_points: 3, reply_to_entry_points: 7)
+      @checkpoint_assignment = @topic.reply_to_topic_checkpoint
+    end
+
+    it "updates the parent assignment when tracked attrs change on a checkpoint assignment" do
+      expect { @checkpoint_assignment.update!(points_possible: 4) }.to change {
+        @topic.assignment.reload.points_possible
+      }.from(10).to(11)
+    end
+
+    it "does not update the parent assignment when attrs that changed are not tracked" do
+      expect { @checkpoint_assignment.update!(title: "potato") }.not_to change {
+        @topic.assignment.reload.updated_at
+      }
+    end
+
+    it "does not update the parent assignment when the checkpoints flag is disabled" do
+      @topic.root_account.disable_feature!(:discussion_checkpoints)
+      expect { @checkpoint_assignment.update!(points_possible: 4) }.not_to change {
+        @topic.assignment.reload.points_possible
+      }
+    end
+  end
 end

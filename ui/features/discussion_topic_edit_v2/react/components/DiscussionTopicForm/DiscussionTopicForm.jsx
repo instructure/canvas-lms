@@ -23,10 +23,12 @@ import {CreateOrEditSetModal} from '@canvas/groups/react/CreateOrEditSetModal'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {View} from '@instructure/ui-view'
+import {Flex} from '@instructure/ui-flex'
+
 import {TextInput} from '@instructure/ui-text-input'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {Button} from '@instructure/ui-buttons'
-import {IconAddLine} from '@instructure/ui-icons'
+import {IconAddLine, IconPublishSolid, IconUnpublishedLine} from '@instructure/ui-icons'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {Text} from '@instructure/ui-text'
 import {Checkbox} from '@instructure/ui-checkbox'
@@ -36,8 +38,10 @@ import CanvasMultiSelect from '@canvas/multi-select'
 import CanvasRce from '@canvas/rce/react/CanvasRce'
 import {Alert} from '@instructure/ui-alerts'
 import {GradedDiscussionOptions} from '../GradedDiscussionOptions/GradedDiscussionOptions'
+import {GradedDiscussionDueDatesContext} from '../../util/constants'
+import {nanoid} from 'nanoid'
 
-import {addNewGroupCategoryToCache} from '../../utils'
+import {addNewGroupCategoryToCache} from '../../util/utils'
 
 const I18n = useI18nScope('discussion_create')
 
@@ -58,7 +62,7 @@ export default function DiscussionTopicForm({
   const isUnpublishedAnnouncement =
     isAnnouncement && !ENV.DISCUSSION_TOPIC?.ATTRIBUTES.course_published
   const isEditingAnnouncement = isAnnouncement && ENV.DISCUSSION_TOPIC?.ATTRIBUTES.id
-
+  const published = currentDiscussionTopic?.published ?? false
   const announcementAlertProps = () => {
     if (isUnpublishedAnnouncement) {
       return {
@@ -116,12 +120,10 @@ export default function DiscussionTopicForm({
 
   const [availableFrom, setAvailableFrom] = useState(null)
   const [availableUntil, setAvailableUntil] = useState(null)
+  const [willAnnouncementPostRightAway, setWillAnnouncementPostRightAway] = useState(true)
   const [availabiltyValidationMessages, setAvailabilityValidationMessages] = useState([
     {text: '', type: 'success'},
   ])
-
-  // only for discussions being edited
-  const [published, setPublished] = useState(false)
 
   // To be implemented in phase 2, kept as a reminder
   const [pointsPossible, setPointsPossible] = useState(0)
@@ -130,9 +132,13 @@ export default function DiscussionTopicForm({
   const [peerReviewAssignment, setPeerReviewAssignment] = useState('off')
   const [peerReviewsPerStudent, setPeerReviewsPerStudent] = useState(1)
   const [peerReviewDueDate, setPeerReviewDueDate] = useState('')
-  const [assignTo, setAssignTo] = useState('')
-  const [dueDate, setDueDate] = useState('')
+  // This contains the list of assignment due dates / overrides. This default should be set to everyone in VICE-3866
+  const [assignedInfoList, setAssignedInfoList] = useState([{dueDateId: nanoid()}]) // Initialize with one object with a unique id
 
+  const assignmentDueDateContext = {
+    assignedInfoList,
+    setAssignedInfoList,
+  }
   const [showGroupCategoryModal, setShowGroupCategoryModal] = useState(false)
 
   useEffect(() => {
@@ -162,9 +168,17 @@ export default function DiscussionTopicForm({
     setAvailableUntil(currentDiscussionTopic.lockAt)
     setDelayPosting(!!currentDiscussionTopic.delayedPostAt && isAnnouncement)
     setLocked(currentDiscussionTopic.locked && isAnnouncement)
-
-    setPublished(currentDiscussionTopic.published)
   }, [isEditing, currentDiscussionTopic, discussionAnonymousState, isAnnouncement])
+
+  useEffect(() => {
+    if (delayPosting) {
+      const rightNow = new Date()
+      const availableFromIntoDate = new Date(availableFrom)
+      setWillAnnouncementPostRightAway(availableFromIntoDate <= rightNow)
+    } else {
+      setWillAnnouncementPostRightAway(true)
+    }
+  }, [availableFrom, delayPosting])
 
   const validateTitle = newTitle => {
     if (newTitle.length > 255) {
@@ -235,13 +249,32 @@ export default function DiscussionTopicForm({
         groupCategoryId: isGroupDiscussion ? groupCategoryId : null,
         availableFrom,
         availableUntil,
-        shouldPublish: isEditing ? published : shouldPublish,
+        shouldPublish,
         locked,
         isAnnouncement,
       })
       return true
     }
     return false
+  }
+
+  const renderLabelWithPublishStatus = () => {
+    const publishStatus = published ? (
+      <Text color="success" weight="normal">
+        <IconPublishSolid /> {I18n.t('Published')}
+      </Text>
+    ) : (
+      <Text color="secondary" weight="normal">
+        <IconUnpublishedLine /> {I18n.t('Not Published')}
+      </Text>
+    )
+
+    return (
+      <Flex justifyItems="space-between">
+        <Flex.Item>{I18n.t('Topic Title')}</Flex.Item>
+        {!isAnnouncement && isEditing && <Flex.Item>{publishStatus}</Flex.Item>}
+      </Flex>
+    )
   }
 
   return (
@@ -251,7 +284,7 @@ export default function DiscussionTopicForm({
           <Alert variant={announcementAlertProps().variant}>{announcementAlertProps().text}</Alert>
         )}
         <TextInput
-          renderLabel={I18n.t('Topic Title')}
+          renderLabel={renderLabelWithPublishStatus()}
           type={I18n.t('text')}
           placeholder={I18n.t('Topic Title')}
           value={title}
@@ -577,25 +610,23 @@ export default function DiscussionTopicForm({
           !isGroupContext &&
           (isGraded ? (
             <View as="div" data-testid="assignment-settings-section">
-              <GradedDiscussionOptions
-                assignmentGroups={assignmentGroups}
-                pointsPossible={pointsPossible}
-                setPointsPossible={setPointsPossible}
-                displayGradeAs={displayGradeAs}
-                setDisplayGradeAs={setDisplayGradeAs}
-                assignmentGroup={assignmentGroup}
-                setAssignmentGroup={setAssignmentGroup}
-                peerReviewAssignment={peerReviewAssignment}
-                setPeerReviewAssignment={setPeerReviewAssignment}
-                peerReviewsPerStudent={peerReviewsPerStudent}
-                setPeerReviewsPerStudent={setPeerReviewsPerStudent}
-                peerReviewDueDate={peerReviewDueDate}
-                setPeerReviewDueDate={setPeerReviewDueDate}
-                assignTo={assignTo}
-                setAssignTo={setAssignTo}
-                dueDate={dueDate}
-                setDueDate={setDueDate}
-              />
+              <GradedDiscussionDueDatesContext.Provider value={assignmentDueDateContext}>
+                <GradedDiscussionOptions
+                  assignmentGroups={assignmentGroups}
+                  pointsPossible={pointsPossible}
+                  setPointsPossible={setPointsPossible}
+                  displayGradeAs={displayGradeAs}
+                  setDisplayGradeAs={setDisplayGradeAs}
+                  assignmentGroup={assignmentGroup}
+                  setAssignmentGroup={setAssignmentGroup}
+                  peerReviewAssignment={peerReviewAssignment}
+                  setPeerReviewAssignment={setPeerReviewAssignment}
+                  peerReviewsPerStudent={peerReviewsPerStudent}
+                  setPeerReviewsPerStudent={setPeerReviewsPerStudent}
+                  peerReviewDueDate={peerReviewDueDate}
+                  setPeerReviewDueDate={setPeerReviewDueDate}
+                />
+              </GradedDiscussionDueDatesContext.Provider>
             </View>
           ) : (
             <FormFieldGroup description="" width={inputWidth}>
@@ -639,26 +670,54 @@ export default function DiscussionTopicForm({
           margin="xx-large none"
           padding="large none"
         >
-          <Button type="button" color="secondary">
+          <Button
+            type="button"
+            color="secondary"
+            onClick={() => {
+              window.location.assign(ENV.CANCEL_TO)
+            }}
+          >
             {I18n.t('Cancel')}
           </Button>
-          <Button
-            type="submit"
-            onClick={() => submitForm(true)}
-            color="secondary"
-            margin="xxx-small"
-            data-testid="save-and-publish-button"
-          >
-            {I18n.t('Save and Publish')}
-          </Button>
-          <Button
-            type="submit"
-            data-testid="save-button"
-            onClick={() => submitForm(false)}
-            color="primary"
-          >
-            {I18n.t('Save')}
-          </Button>
+          {/* discussion moderators viewing a new or still unpublished discussion */}
+          {!isAnnouncement && ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MODERATE && !published && (
+            <Button
+              type="submit"
+              onClick={() => submitForm(true)}
+              color="secondary"
+              margin="xxx-small"
+              data-testid="save-and-publish-button"
+            >
+              {I18n.t('Save and Publish')}
+            </Button>
+          )}
+          {/* for announcements, show publish when the available until da */}
+          {isAnnouncement ? (
+            <Button
+              type="submit"
+              // we always process announcements as published.
+              onClick={() => submitForm(true)}
+              color="primary"
+              margin="xxx-small"
+              data-testid="announcement-submit-button"
+            >
+              {willAnnouncementPostRightAway ? I18n.t('Publish') : I18n.t('Save')}
+            </Button>
+          ) : (
+            <Button
+              type="submit"
+              data-testid="save-button"
+              // when editing, use the current published state, otherwise:
+              // students will always save as published while for moderators in this case they
+              // can save as unpublished
+              onClick={() =>
+                submitForm(isEditing ? published : !ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MODERATE)
+              }
+              color="primary"
+            >
+              {I18n.t('Save')}
+            </Button>
+          )}
         </View>
       </FormFieldGroup>
     </>

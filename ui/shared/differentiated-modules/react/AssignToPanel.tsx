@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import Footer from './Footer'
 import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
@@ -24,11 +24,12 @@ import {Text} from '@instructure/ui-text'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import AssigneeSelector, {AssigneeOption} from './AssigneeSelector'
+import ModuleAssignments, {AssigneeOption} from './ModuleAssignments'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {Spinner} from '@instructure/ui-spinner'
 import {generateAssignmentOverridesPayload} from '../utils/assignToHelper'
+import {AssignmentOverride} from './types'
 
 const I18n = useI18nScope('differentiated_modules')
 
@@ -66,11 +67,51 @@ export default function AssignToPanel({courseId, moduleId, height, onDismiss}: A
   const [selectedOption, setSelectedOption] = useState<string>(OPTIONS[0].value)
   const [selectedAssignees, setSelectedAssignees] = useState<AssigneeOption[]>([])
   const [isLoading, setIsLoading] = useState(false)
+  const [defaultValues, setDefaultValues] = useState<AssigneeOption[]>([])
 
-  const handleSelect = (newSelectedAssignees: AssigneeOption[]) =>
+  useEffect(() => {
+    setIsLoading(true)
+    doFetchApi({
+      path: `/api/v1/courses/${courseId}/modules/${moduleId}/assignment_overrides`,
+    })
+      .then((data: any) => {
+        if (data.json === undefined) return
+        const json = data.json as AssignmentOverride[]
+        const parsedOptions = json.reduce((acc: AssigneeOption[], override: AssignmentOverride) => {
+          const overrideOptions =
+            override.students?.map(({id, name}: {id: string; name: string}) => ({
+              id: `student-${id}`,
+              overrideId: override.id,
+              value: name,
+              group: I18n.t('Students'),
+            })) ?? []
+          if (override.course_section !== undefined) {
+            const sectionId = `section-${override.course_section.id}`
+            overrideOptions.push({
+              id: sectionId,
+              overrideId: override.id,
+              value: override.course_section.name,
+              group: I18n.t('Sections'),
+            })
+          }
+          return [...acc, ...overrideOptions]
+        }, [])
+        setDefaultValues(parsedOptions)
+        if (parsedOptions.length > 0) {
+          setSelectedOption(OPTIONS[1].value)
+        }
+      })
+      .catch(showFlashError())
+      .finally(() => {
+        setIsLoading(false)
+      })
+  }, [courseId, moduleId])
+
+  const handleSelect = useCallback((newSelectedAssignees: AssigneeOption[]) => {
     setSelectedAssignees(newSelectedAssignees)
+  }, [])
 
-  const handleSave = () => {
+  const handleSave = useCallback(() => {
     setIsLoading(true)
     doFetchApi({
       path: `/api/v1/courses/${courseId}/modules/${moduleId}/assignment_overrides`,
@@ -85,22 +126,21 @@ export default function AssignToPanel({courseId, moduleId, height, onDismiss}: A
         onDismiss()
       })
       .catch((err: Error) => {
+        setIsLoading(false)
         showFlashAlert({
           err,
           message: I18n.t('Error updating module access.'),
         })
       })
-      .finally(() => {
-        setIsLoading(false)
-      })
-  }
+  }, [courseId, moduleId, onDismiss, selectedAssignees])
 
-  const handleClick = (option: Option) => {
-    if (option.value === OPTIONS[0].value) {
+  const handleClick = useCallback((event: React.MouseEvent<HTMLInputElement>) => {
+    const value = (event.target as HTMLInputElement).value
+    if (value === OPTIONS[0].value) {
       setSelectedAssignees([])
     }
-    setSelectedOption(option.value)
-  }
+    setSelectedOption(value)
+  }, [])
 
   if (isLoading) return <Spinner renderTitle="Loading" size="small" />
 
@@ -121,7 +161,7 @@ export default function AssignToPanel({courseId, moduleId, height, onDismiss}: A
                     data-testid={`${option.value}-option`}
                     value={option.value}
                     checked={selectedOption === option.value}
-                    onClick={() => handleClick(option)}
+                    onClick={handleClick}
                     label={<ScreenReaderContent>{option.getLabel()}</ScreenReaderContent>}
                   />
                 </View>
@@ -137,11 +177,10 @@ export default function AssignToPanel({courseId, moduleId, height, onDismiss}: A
                 </View>
                 {option.value === OPTIONS[1].value && selectedOption === OPTIONS[1].value && (
                   <View as="div" margin="small large none none">
-                    <AssigneeSelector
+                    <ModuleAssignments
                       courseId={courseId}
-                      moduleId={moduleId}
                       onSelect={handleSelect}
-                      selectedOptionIds={selectedAssignees.map(val => val.id)}
+                      defaultValues={defaultValues}
                     />
                   </View>
                 )}
@@ -152,7 +191,7 @@ export default function AssignToPanel({courseId, moduleId, height, onDismiss}: A
       </FlexItem>
       <FlexItem margin="auto none none none">
         <Footer
-          updateButtonLabel={I18n.t('Update Module')}
+          saveButtonLabel={moduleId ? I18n.t('Update Module') : I18n.t('Add Module')}
           onDismiss={onDismiss}
           onUpdate={handleSave}
         />

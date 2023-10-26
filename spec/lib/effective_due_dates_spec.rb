@@ -399,6 +399,70 @@ describe Course do
       expect(student_ids).not_to include @student1.id
     end
 
+    it "includes everyone else if there no modules and no overrides" do
+      Account.site_admin.enable_feature!(:differentiated_modules)
+      edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+      result = edd.to_hash
+      expected = {
+        @assignment1.id => {
+          @student1.id => {
+            due_at: @assignment1.due_at,
+            grading_period_id: nil,
+            in_closed_grading_period: false,
+            override_id: nil,
+            override_source: "Everyone Else"
+          },
+          @student2.id => {
+            due_at: @assignment1.due_at,
+            grading_period_id: nil,
+            in_closed_grading_period: false,
+            override_id: nil,
+            override_source: "Everyone Else"
+          },
+          @student3.id => {
+            due_at: @assignment1.due_at,
+            grading_period_id: nil,
+            in_closed_grading_period: false,
+            override_id: nil,
+            override_source: "Everyone Else"
+          }
+        }
+      }
+      expect(result).to eq expected
+    end
+
+    it "does not include student with unassign_item ADHOC override" do
+      Account.site_admin.enable_feature!(:differentiated_modules)
+
+      override = @assignment1.assignment_overrides.create!(due_at: 3.days.from_now(@now), due_at_overridden: true)
+      override.assignment_override_students.create!(user: @student1)
+
+      override.unassign_item = true
+      override.save!
+
+      edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+      result = edd.to_hash
+      expected = {
+        @assignment1.id => {
+          @student2.id => {
+            due_at: @assignment1.due_at,
+            grading_period_id: nil,
+            in_closed_grading_period: false,
+            override_id: nil,
+            override_source: "Everyone Else"
+          },
+          @student3.id => {
+            due_at: @assignment1.due_at,
+            grading_period_id: nil,
+            in_closed_grading_period: false,
+            override_id: nil,
+            override_source: "Everyone Else"
+          }
+        }
+      }
+      expect(result).to eq expected
+    end
+
     context "when only visible to overrides" do
       before(:once) do
         @assignment1.only_visible_to_overrides = true
@@ -511,6 +575,233 @@ describe Course do
             }
           }
           expect(result).to eq expected
+        end
+
+        it "doesn't apply adhoc overrides with unassign_item" do
+          Account.site_admin.enable_feature!(:differentiated_modules)
+          override = @assignment1.assignment_overrides.create!(due_at: 3.days.from_now(@now), due_at_overridden: true)
+          override.assignment_override_students.create!(user: @student1)
+
+          section = CourseSection.create!(name: "My Awesome Section", course: @test_course)
+          student_in_section(section, user: @student1)
+          @assignment1.assignment_overrides.create!(
+            due_at: 1.day.from_now(@now),
+            due_at_overridden: true,
+            set: section
+          )
+
+          override.unassign_item = true
+          override.save!
+
+          edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+          result = edd.to_hash
+          expected = {}
+          expect(result).to eq expected
+        end
+
+        it "applies adhoc overrides with section unassign_item override" do
+          Account.site_admin.enable_feature!(:differentiated_modules)
+          override = @assignment1.assignment_overrides.create!(due_at: 3.days.from_now(@now), due_at_overridden: true)
+          override.assignment_override_students.create!(user: @student1)
+
+          section = CourseSection.create!(name: "My Awesome Section", course: @test_course)
+          student_in_section(section, user: @student1)
+          @assignment1.assignment_overrides.create!(
+            due_at: 1.day.from_now(@now),
+            due_at_overridden: true,
+            set: section,
+            unassign_item: true
+          )
+
+          edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+          result = edd.to_hash
+          expected = {
+            @assignment1.id => {
+              @student1.id => {
+                due_at: 3.days.from_now(@now),
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: override.id,
+                override_source: "ADHOC"
+              }
+            }
+          }
+          expect(result).to eq expected
+        end
+
+        it "applies adhoc overrides with unassign_item if flag is off" do
+          override = @assignment1.assignment_overrides.create!(due_at: 3.days.from_now(@now), due_at_overridden: true)
+          override.assignment_override_students.create!(user: @student1)
+
+          override.unassign_item = true
+          override.save!
+
+          edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+          result = edd.to_hash
+          expected = {
+            @assignment1.id => {
+              @student1.id => {
+                due_at: 3.days.from_now(@now),
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: override.id,
+                override_source: "ADHOC"
+              }
+            }
+          }
+          expect(result).to eq expected
+        end
+
+        context "with context module overrides" do
+          before(:once) do
+            Account.site_admin.enable_feature!(:differentiated_modules)
+            @assignment1.only_visible_to_overrides = false
+            @assignment1.save!
+            @module = @test_course.context_modules.create!(name: "Module 1")
+            @assignment1.context_module_tags.create! context_module: @module, context: @test_course, tag_type: "context_module"
+
+            @module_override = @module.assignment_overrides.create!
+            @module_override.assignment_override_students.create!(user: @student1)
+          end
+
+          it "applies context module adhoc overrides" do
+            @assignment2.only_visible_to_overrides = false
+            @assignment2.save!
+            @assignment2.context_module_tags.create! context_module: @module, context: @test_course, tag_type: "context_module"
+
+            edd = EffectiveDueDates.for_course(@test_course, @assignment1, @assignment2)
+            result = edd.to_hash
+            expected = {
+              @assignment1.id => {
+                @student1.id => {
+                  due_at: @assignment1.due_at,
+                  grading_period_id: nil,
+                  in_closed_grading_period: false,
+                  override_id: @module_override.id,
+                  override_source: "ADHOC"
+                }
+              },
+              @assignment2.id => {
+                @student1.id => {
+                  due_at: @assignment2.due_at,
+                  grading_period_id: nil,
+                  in_closed_grading_period: false,
+                  override_id: @module_override.id,
+                  override_source: "ADHOC"
+                }
+              }
+            }
+            expect(result).to eq expected
+          end
+
+          it "ignores soft-deleted context module adhoc overrides" do
+            @module_override.update!(workflow_state: "deleted")
+
+            edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+            result = edd.to_hash
+            expected = {
+              @assignment1.id => {
+                @student1.id => {
+                  due_at: @assignment1.due_at,
+                  grading_period_id: nil,
+                  in_closed_grading_period: false,
+                  override_id: nil,
+                  override_source: "Everyone Else"
+                },
+                @student2.id => {
+                  due_at: @assignment1.due_at,
+                  grading_period_id: nil,
+                  in_closed_grading_period: false,
+                  override_id: nil,
+                  override_source: "Everyone Else"
+                },
+                @student3.id => {
+                  due_at: @assignment1.due_at,
+                  grading_period_id: nil,
+                  in_closed_grading_period: false,
+                  override_id: nil,
+                  override_source: "Everyone Else"
+                }
+              }
+            }
+            expect(result).to eq expected
+          end
+
+          it "includes everyone else if there are modules without overrides" do
+            module2 = @test_course.context_modules.create!(name: "Module 2")
+            @assignment1.context_module_tags.create! context_module: module2, context: @test_course, tag_type: "context_module"
+
+            edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+            result = edd.to_hash
+            expected = {
+              @assignment1.id => {
+                @student1.id => {
+                  due_at: @assignment1.due_at,
+                  grading_period_id: nil,
+                  in_closed_grading_period: false,
+                  override_id: @module_override.id,
+                  override_source: "ADHOC"
+                },
+                @student2.id => {
+                  due_at: @assignment1.due_at,
+                  grading_period_id: nil,
+                  in_closed_grading_period: false,
+                  override_id: nil,
+                  override_source: "Everyone Else"
+                },
+                @student3.id => {
+                  due_at: @assignment1.due_at,
+                  grading_period_id: nil,
+                  in_closed_grading_period: false,
+                  override_id: nil,
+                  override_source: "Everyone Else"
+                }
+              }
+            }
+            expect(result).to eq expected
+          end
+
+          it "does not unassign students with module adhoc overrides when they are deactivated" do
+            @student1_enrollment.deactivate
+
+            edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+            expect(edd.to_hash).to eq({
+                                        @assignment1.id => {
+                                          @student1.id => {
+                                            due_at: @assignment1.due_at,
+                                            grading_period_id: nil,
+                                            in_closed_grading_period: false,
+                                            override_id: @module_override.id,
+                                            override_source: "ADHOC"
+                                          }
+                                        }
+                                      })
+          end
+
+          it "does not unassign students with context module adhoc overrides when they are concluded" do
+            @student1_enrollment.conclude
+
+            edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+            expect(edd.to_hash).to eq({
+                                        @assignment1.id => {
+                                          @student1.id => {
+                                            due_at: @assignment1.due_at,
+                                            grading_period_id: nil,
+                                            in_closed_grading_period: false,
+                                            override_id: @module_override.id,
+                                            override_source: "ADHOC"
+                                          }
+                                        }
+                                      })
+          end
+
+          it "does not include context module overrides with the flag off" do
+            Account.site_admin.disable_feature!(:differentiated_modules)
+            @assignment1.only_visible_to_overrides = true
+            @assignment1.save!
+            edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+            expect(edd.to_hash).to eq({})
+          end
         end
 
         it "does not unassign students with adhoc overrides when they are deactivated" do
@@ -774,6 +1065,24 @@ describe Course do
           expect(result).to eq expected
         end
 
+        it "doesn't assign group with overrides with unassign_item" do
+          Account.site_admin.enable_feature!(:differentiated_modules)
+
+          group_with_user(user: @student3, active_all: true)
+          @group.users << @student2
+          @assignment1.assignment_overrides.create!(
+            due_at: 4.days.from_now(@now),
+            due_at_overridden: true,
+            set: @group,
+            unassign_item: true
+          )
+
+          edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+          result = edd.to_hash
+          expected = {}
+          expect(result).to eq expected
+        end
+
         it "ignores overrides for soft-deleted groups" do
           group_with_user(user: @student3, active_all: true)
           @assignment1.assignment_overrides.create!(due_at: 4.days.from_now(@now), due_at_overridden: true, set: @group)
@@ -870,6 +1179,102 @@ describe Course do
               }
             }
           }
+          expect(result).to eq expected
+        end
+
+        context "with context module section overrides" do
+          before :once do
+            Account.site_admin.enable_feature!(:differentiated_modules)
+            section = CourseSection.create!(name: "Section 1", course: @test_course)
+            student_in_section(section, user: @student1)
+            @module = @test_course.context_modules.create!(name: "Module 1")
+            @assignment1.context_module_tags.create! context_module: @module, context: @test_course, tag_type: "context_module"
+
+            @assignment1.only_visible_to_overrides = false
+            @assignment1.save!
+
+            @module_override = @module.assignment_overrides.create!
+            @module_override.set_type = "CourseSection"
+            @module_override.set_id = section
+            @module_override.save!
+          end
+
+          it "applies context module section overrides" do
+            edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+            result = edd.to_hash
+            expected = {
+              @assignment1.id => {
+                @student1.id => {
+                  due_at: @assignment1.due_at,
+                  grading_period_id: nil,
+                  in_closed_grading_period: false,
+                  override_id: @module_override.id,
+                  override_source: "CourseSection"
+                }
+              }
+            }
+            expect(result).to eq expected
+          end
+
+          it "does not unassign students in the assigned section when they are deactivated" do
+            @student1_enrollment.deactivate
+
+            edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+            expect(edd.to_hash).to eq({
+                                        @assignment1.id => {
+                                          @student1.id => {
+                                            due_at: @assignment1.due_at,
+                                            grading_period_id: nil,
+                                            in_closed_grading_period: false,
+                                            override_id: @module_override.id,
+                                            override_source: "CourseSection"
+                                          }
+                                        }
+                                      })
+          end
+
+          it "does not unassign students in the assigned section when they are concluded" do
+            @student1_enrollment.conclude
+
+            edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+            expect(edd.to_hash).to eq({
+                                        @assignment1.id => {
+                                          @student1.id => {
+                                            due_at: @assignment1.due_at,
+                                            grading_period_id: nil,
+                                            in_closed_grading_period: false,
+                                            override_id: @module_override.id,
+                                            override_source: "CourseSection"
+                                          }
+                                        }
+                                      })
+          end
+
+          it "does not include context module overrides with the flag off" do
+            Account.site_admin.disable_feature!(:differentiated_modules)
+            @assignment1.only_visible_to_overrides = true
+            @assignment1.save!
+
+            edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+            expect(edd.to_hash).to eq({})
+          end
+        end
+
+        it "doesn't assign section with overrides with unassign_item" do
+          Account.site_admin.enable_feature!(:differentiated_modules)
+
+          section = CourseSection.create!(name: "My Awesome Section", course: @test_course)
+          student_in_section(section, user: @student1)
+          @assignment1.assignment_overrides.create!(
+            due_at: 1.day.from_now(@now),
+            due_at_overridden: true,
+            set: section,
+            unassign_item: true
+          )
+
+          edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+          result = edd.to_hash
+          expected = {}
           expect(result).to eq expected
         end
 
@@ -997,6 +1402,46 @@ describe Course do
           edd = EffectiveDueDates.for_course(@test_course, @assignment1)
           result = edd.to_hash
           expect(result).to eq({})
+        end
+
+        it "includes context module course overrides" do
+          @module = @test_course.context_modules.create!(name: "Module 1")
+          @assignment1.context_module_tags.create! context_module: @module, context: @test_course, tag_type: "context_module"
+
+          @override.destroy!
+          @module_override = @module.assignment_overrides.create!(
+            set_type: "Course",
+            set_id: @test_course.id
+          )
+
+          edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+          result = edd.to_hash
+          expected = {
+            @assignment1.id => {
+              @student1.id => {
+                due_at: @assignment1.due_at,
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: @module_override.id,
+                override_source: "Course"
+              },
+              @student2.id => {
+                due_at: @assignment1.due_at,
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: @module_override.id,
+                override_source: "Course"
+              },
+              @student3.id => {
+                due_at: @assignment1.due_at,
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: @module_override.id,
+                override_source: "Course"
+              }
+            }
+          }
+          expect(result).to eq expected
         end
       end
 

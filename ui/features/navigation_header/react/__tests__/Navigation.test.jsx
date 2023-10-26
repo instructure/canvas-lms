@@ -17,7 +17,7 @@ import $ from 'jquery'
 import React from 'react'
 import {render} from '@testing-library/react'
 import {OBSERVER_COOKIE_PREFIX} from '@canvas/observer-picker/ObserverGetObservee'
-import Navigation from '../Navigation'
+import Navigation from '../OldSideNav'
 
 const unreadComponent = jest.fn(() => <></>)
 

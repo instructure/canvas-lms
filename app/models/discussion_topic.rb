@@ -81,6 +81,7 @@ class DiscussionTopic < ActiveRecord::Base
   belongs_to :editor, class_name: "User"
   belongs_to :root_topic, class_name: "DiscussionTopic"
   belongs_to :group_category
+  has_many :checkpoint_assignments, through: :assignment
   has_many :child_topics, class_name: "DiscussionTopic", foreign_key: :root_topic_id, dependent: :destroy
   has_many :discussion_topic_participants, dependent: :destroy
   has_many :discussion_entry_participants, through: :discussion_entries
@@ -99,6 +100,10 @@ class DiscussionTopic < ActiveRecord::Base
   validates :discussion_type, inclusion: { in: DiscussionTypes::TYPES }
   validates :message, length: { maximum: maximum_long_text_length, allow_blank: true }
   validates :title, length: { maximum: maximum_string_length, allow_nil: true }
+  # For our users, when setting checkpoints, the value must be between 1 and 10.
+  # But we also allow 0 when there are no checkpoints.
+  validates :reply_to_entry_required_count, presence: true, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 10 }
+  validates :reply_to_entry_required_count, numericality: { greater_than: 0 }, if: :checkpoints?
   validate :validate_draft_state_change, if: :workflow_state_changed?
   validate :section_specific_topics_must_have_sections
   validate :only_course_topics_can_be_section_specific
@@ -344,6 +349,40 @@ class DiscussionTopic < ActiveRecord::Base
         topic
       end
     end
+  end
+
+  def build_assignment(assignment_input = {})
+    return if deleted?
+
+    working_assignment = course.assignments.build
+
+    working_assignment.context = context
+    working_assignment.title = title
+    working_assignment.description = message
+    working_assignment.submission_types = "discussion_topic"
+    working_assignment.workflow_state = (workflow_state == "active") ? "published" : "unpublished"
+
+    %i[assignment_group_id assignment_overrides due_at grading_type grading_standard_id lock_at name points_possible unlock_at].each do |field|
+      working_assignment.send("#{field}=", assignment_input[field]) if assignment_input[field]
+    end
+
+    working_peer_reviews = assignment_input[:peer_reviews].to_h if assignment_input[:peer_reviews]
+    if working_peer_reviews
+      peer_review_mappings = {
+        enabled: :peer_reviews,
+        count: :peer_review_count,
+        due_at: :peer_reviews_due_at,
+        intra_reviews: :intra_group_peer_reviews,
+        anonymous_reviews: :anonymous_peer_reviews,
+        automatic_reviews: :automatic_peer_reviews
+      }
+
+      peer_review_mappings.each do |field_from_peer_reviews, attribute_on_assignment|
+        working_assignment.send("#{attribute_on_assignment}=", working_peer_reviews[field_from_peer_reviews]) if working_peer_reviews[field_from_peer_reviews]
+      end
+    end
+
+    working_assignment
   end
 
   def update_assignment
@@ -1320,19 +1359,50 @@ class DiscussionTopic < ActiveRecord::Base
   def ensure_submission(user, only_update = false)
     topic = (root_topic? && child_topic_for(user)) || self
 
-    submission = Submission.active.where(assignment_id:, user_id: user).first
+    submissions = []
+    all_entries_for_user = topic.discussion_entries.all_for_user(user)
+
+    if topic.root_account&.feature_enabled?(:discussion_checkpoints) && checkpoints?
+      reply_to_topic_submitted_at = topic.discussion_entries.top_level_for_user(user).minimum(:created_at)
+
+      if reply_to_topic_submitted_at.present?
+        reply_to_topic_submission = ensure_particular_submission(reply_to_topic_checkpoint, user, reply_to_topic_submitted_at, only_update:)
+        submissions << reply_to_topic_submission if reply_to_topic_submission.present?
+      end
+
+      reply_to_entries = topic.discussion_entries.non_top_level_for_user(user)
+
+      if reply_to_entries.any? && enough_replies_for_checkpoint?(reply_to_entries)
+        reply_to_entry_submitted_at = reply_to_entries.minimum(:created_at)
+        reply_to_entry_submission = ensure_particular_submission(reply_to_entry_checkpoint, user, reply_to_entry_submitted_at, only_update:)
+        submissions << reply_to_entry_submission if reply_to_entry_submission.present?
+      end
+    else
+      submitted_at = all_entries_for_user.minimum(:created_at)
+
+      submission = ensure_particular_submission(assignment, user, submitted_at, only_update:)
+      submissions << submission if submission.present?
+    end
+
+    return unless submissions.any?
+
+    attachment_ids = all_entries_for_user.where.not(attachment_id: nil).pluck(:attachment_id).sort.map(&:to_s).join(",")
+
+    submissions.each do |s|
+      s.attachment_ids = attachment_ids
+      s.save! if s.changed?
+    end
+  end
+
+  def ensure_particular_submission(assignment, user, submitted_at, only_update: false)
+    submission = Submission.active.where(assignment_id: assignment.id, user_id: user).first
     unless only_update || (submission && submission.submission_type == "discussion_topic" && submission.workflow_state != "unsubmitted")
       submission = assignment.submit_homework(user,
                                               submission_type: "discussion_topic",
-                                              submitted_at: topic && topic.discussion_entries.active.where(user_id: user).minimum(:created_at))
+                                              submitted_at:)
     end
-    return unless submission
 
-    if topic
-      attachment_ids = topic.discussion_entries.active.where(user_id: user).where.not(attachment_id: nil).pluck(:attachment_id)
-      submission.attachment_ids = attachment_ids.sort.map(&:to_s).join(",")
-      submission.save! if submission.changed?
-    end
+    submission
   end
 
   def send_notification_for_context?
@@ -1756,5 +1826,36 @@ class DiscussionTopic < ActiveRecord::Base
 
   def anonymous?
     !anonymous_state.nil?
+  end
+
+  def checkpoints?
+    checkpoint_assignments.any?
+  end
+
+  def reply_to_topic_checkpoint
+    checkpoint_assignments.find_by(checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC)
+  end
+
+  def reply_to_entry_checkpoint
+    checkpoint_assignments.find_by(checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY)
+  end
+
+  def create_checkpoints(reply_to_topic_points:, reply_to_entry_points:, reply_to_entry_required_count: 0)
+    return false if checkpoints?
+    return false unless context.is_a?(Course)
+
+    parent = context.assignments.create!(checkpointed: true, checkpoint_label: CheckpointLabels::PARENT)
+    parent.checkpoint_assignments.create!(context:, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC, points_possible: reply_to_topic_points)
+    parent.checkpoint_assignments.create!(context:, checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY, points_possible: reply_to_entry_points)
+    self.assignment = parent
+    self.reply_to_entry_required_count = reply_to_entry_required_count
+
+    save
+  end
+
+  private
+
+  def enough_replies_for_checkpoint?(reply_to_entries)
+    reply_to_entries.count >= reply_to_entry_required_count
   end
 end

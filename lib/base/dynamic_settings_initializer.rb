@@ -43,7 +43,6 @@ module DynamicSettingsInitializer
       # (will reload if still present on disk)
       ::DynamicSettings.on_reload!
     end
-    reloader.call
     Canvas::Reloader.on_reload(&reloader)
     # dependency injection stuff from when
     # this got pulled out into a local gem
@@ -52,5 +51,6 @@ module DynamicSettingsInitializer
     ::DynamicSettings.fallback_recovery_lambda = ->(e) { Canvas::Errors.capture_exception(:consul, e, :warn) if defined?(Canvas::Errors) }
     ::DynamicSettings.retry_lambda = ->(e) { Canvas::Errors.capture_exception(:consul, e, :warn) if defined?(Canvas::Errors) }
     ::DynamicSettings.logger = Rails.logger
+    reloader.call
   end
 end

@@ -46,9 +46,9 @@ k20_course_readiness_alpha_testing:
 k20_course_readiness:
   state: hidden
   applies_to: Account
-  display_name: Admin Analytics - Course Readiness
+  display_name: Advanced Analytics - Course Readiness Closed Alpha 
   description:
-    k20_course_readiness_description: Enables the new Admin Analytics Course Readiness Dashboard.
+    k20_course_readiness_description: Enables the Advanced Analytics Course Readiness Dashboard for Alpha testers.
   root_opt_in: true
   beta: true
 k20_beta:

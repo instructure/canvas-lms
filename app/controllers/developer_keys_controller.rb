@@ -113,11 +113,7 @@ class DeveloperKeysController < ApplicationController
               end
             elsif @context.site_admin?
               # Return all siteadmin keys
-              if Account.site_admin.feature_enabled?(:site_admin_keys_only)
-                DeveloperKey.site_admin
-              else
-                DeveloperKey
-              end
+              DeveloperKey.site_admin
             else
               # Only return keys that belong to the current account
               DeveloperKey.where(account_id: @context.id)

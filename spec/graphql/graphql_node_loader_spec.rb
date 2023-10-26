@@ -97,5 +97,15 @@ describe GraphQLNodeLoader do
         end
       end
     end
+
+    describe "EnrollmentTerm" do
+      it "returns nil if invalid sis id" do
+        GraphQL::Batch.batch do
+          GraphQLNodeLoader.load("TermBySis", "garbage", context).then do |result|
+            expect(result).to be_nil
+          end
+        end
+      end
+    end
   end
 end

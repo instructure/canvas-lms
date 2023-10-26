@@ -19,103 +19,126 @@
 import React from 'react'
 import {fireEvent, render, waitFor} from '@testing-library/react'
 import {EnrollmentTree} from '../EnrollmentTree'
-import fetchMock from 'fetch-mock'
 
-const simpleProps = {
+const props = {
   roles: [
-    {id: '92', base_role_name: 'StudentEnrollment', label: 'StudentRole'},
-    {id: '93', base_role_name: 'TeacherEnrollment', label: 'SubTeacherRole'},
+    {
+      id: '1',
+      role: 'StudentEnrollment',
+      label: 'StudentRole',
+      base_role_name: 'StudentEnrollment',
+    },
+    {
+      id: '2',
+      role: 'TeacherEnrollment',
+      label: 'SubTeacherRole',
+      base_role_name: 'TeacherEnrollment',
+    },
+    {
+      id: '3',
+      role: 'DesignerEnrollment',
+      label: 'DesignRole',
+      base_role_name: 'DesignerEnrollment',
+    },
   ],
   selectedRole: {
     id: '',
     name: '',
   },
-  list: [
-    {id: '1', course_id: '11', course_section_id: '111', role_id: '93'},
-    {id: '2', course_id: '11', course_section_id: '111', role_id: '92'},
-    {id: '3', course_id: '11', course_section_id: '112', role_id: '93'},
-  ],
-}
-
-const complexProps = {
-  roles: [
-    {id: '92', base_role_name: 'StudentEnrollment', label: 'StudentRole'},
-    {id: '93', base_role_name: 'TeacherEnrollment', label: 'SubTeacherRole'}, // Custom role
-    {id: '94', base_role_name: 'DesignerEnrollment', label: 'DesignRole'},
-  ],
-  selectedRole: {
-    id: '',
-    name: '',
-  },
-  list: [
-    {id: '1', course_id: '11', course_section_id: '111', role_id: '93'},
-    {id: '2', course_id: '11', course_section_id: '111', role_id: '92'},
-    {id: '3', course_id: '11', course_section_id: '112', role_id: '92'},
-    {id: '4', course_id: '11', course_section_id: '112', role_id: '94'},
-  ],
-}
-
-const submitProps = {
-  roles: [
-    {id: '92', base_role_name: 'StudentEnrollment', label: 'StudentRole'},
-    {id: '93', base_role_name: 'TeacherEnrollment', label: 'SubTeacherRole'},
-    {id: '94', base_role_name: 'DesignerEnrollment', label: 'DesignRole'},
-  ],
-  selectedRole: {
-    id: '',
-    name: '',
-  },
-  list: [
-    {id: '1', course_id: '11', course_section_id: '111', role_id: '93'},
-    {id: '2', course_id: '11', course_section_id: '111', role_id: '92'},
-    {id: '3', course_id: '11', course_section_id: '112', role_id: '92'},
-    {id: '4', course_id: '11', course_section_id: '112', role_id: '94'},
+  enrollmentsByCourse: [
+    {
+      id: '1',
+      name: 'Apple Music',
+      workflow_state: 'available',
+      enrollments: [
+        {
+          role_id: '1',
+        },
+      ],
+      sections: [
+        {
+          id: '1',
+          name: 'Section 1',
+          enrollment_role: 'StudentEnrollment',
+        },
+      ],
+    },
+    {
+      id: '1',
+      name: 'Apple Music',
+      workflow_state: 'available',
+      enrollments: [
+        {
+          role_id: '2',
+        },
+      ],
+      sections: [
+        {
+          id: '1',
+          name: 'Section 1',
+          enrollment_role: 'TeacherEnrollment',
+        },
+      ],
+    },
+    {
+      id: '1',
+      name: 'Apple Music',
+      workflow_state: 'available',
+      enrollments: [
+        {
+          role_id: '3',
+        },
+      ],
+      sections: [
+        {
+          id: '2',
+          name: 'Section 2',
+          enrollment_role: 'DesignerEnrollment',
+        },
+      ],
+    },
   ],
   createEnroll: jest.fn(),
 }
 
 describe('EnrollmentTree', () => {
-  beforeEach(() => {
-    fetchMock.get(`/api/v1/courses/11`, {name: 'course1', workflow_state: 'available'})
-    fetchMock.get('/api/v1/courses/11/sections/111', {name: 'section1'})
-    fetchMock.get('/api/v1/courses/11/sections/112', {name: 'section2'})
-  })
-
   afterEach(() => {
-    fetchMock.restore()
+    jest.clearAllMocks()
   })
 
   it('renders role groups', async () => {
-    const {getByText} = render(<EnrollmentTree {...simpleProps} />)
+    const {getByText} = render(<EnrollmentTree {...props} />)
     await waitFor(() => expect(getByText('StudentRole')).toBeInTheDocument())
     await waitFor(() => expect(getByText('SubTeacherRole')).toBeInTheDocument())
   })
 
   it('renders children after clicking toggle', async () => {
-    const screen = render(<EnrollmentTree {...simpleProps} />)
+    const screen = render(<EnrollmentTree {...props} />)
     await waitFor(() => {
       expect(screen.getByText('Toggle group SubTeacherRole')).toBeInTheDocument()
     })
-    const roleGroup = screen.getByText('Toggle group StudentRole')
+    const roleGroup = await screen.findByText('Toggle group StudentRole')
     fireEvent.click(roleGroup)
-    expect(await screen.findByText('course1 - section1')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByText('Apple Music - Section 1')).toBeInTheDocument()
+    })
   })
 
   it('hides children after clicking toggle', async () => {
-    const screen = render(<EnrollmentTree {...simpleProps} />)
+    const screen = render(<EnrollmentTree {...props} />)
     await waitFor(() => {
       expect(screen.getByText('Toggle group SubTeacherRole')).toBeInTheDocument()
     })
     const roleGroup = screen.getByText('Toggle group StudentRole')
     fireEvent.click(roleGroup)
-    expect(await screen.findByText('course1 - section1')).toBeInTheDocument()
+    expect(await screen.findByText('Apple Music - Section 1')).toBeInTheDocument()
 
     fireEvent.click(roleGroup)
-    expect(await screen.queryByText('course1 - section1')).not.toBeInTheDocument()
+    expect(await screen.queryByText('Apple Music - Section 1')).not.toBeInTheDocument()
   })
 
   it('renders enrollments in order of base role', async () => {
-    const {getByText} = render(<EnrollmentTree {...complexProps} />)
+    const {getByText} = render(<EnrollmentTree {...props} />)
     await waitFor(() => expect(getByText('SubTeacherRole')).toBeInTheDocument())
     const student = getByText('StudentRole')
     const sub = getByText('SubTeacherRole')
@@ -127,31 +150,34 @@ describe('EnrollmentTree', () => {
   })
 
   it('selects teacher base roles by default', async () => {
-    const {getByText, getByRole} = render(<EnrollmentTree {...complexProps} />)
+    const {getByText, getByRole} = render(<EnrollmentTree {...props} />)
     await waitFor(() => expect(getByText('SubTeacherRole')).toBeInTheDocument())
 
     const checkedBox = getByRole('checkbox', {checked: true})
-    expect(checkedBox.getAttribute('data-testid')).toMatch('check r93')
+    expect(checkedBox.getAttribute('data-testid')).toMatch('check r2')
   })
 
   it('shows enrollments in one section with different roles under respective role groups', async () => {
-    const screen = render(<EnrollmentTree {...complexProps} />)
+    const screen = render(<EnrollmentTree {...props} />)
     await waitFor(() => {
       expect(screen.getByText('Toggle group StudentRole')).toBeInTheDocument()
     })
-    const stuGroup = screen.getByText('Toggle group StudentRole')
-    fireEvent.click(stuGroup)
-    expect(await screen.findByText('course1')).toBeInTheDocument()
-
-    const desGroup = screen.getByText('Toggle group DesignRole')
-    fireEvent.click(desGroup)
-    expect(await screen.findByText('course1 - section2')).toBeInTheDocument()
+    const studentGroup = screen.getByText('Toggle group StudentRole')
+    fireEvent.click(studentGroup)
+    await waitFor(() => {
+      expect(screen.getByText('Apple Music - Section 1')).toBeInTheDocument()
+    })
+    const designerGroup = screen.getByText('Toggle group DesignRole')
+    fireEvent.click(designerGroup)
+    await waitFor(() => {
+      expect(screen.getByText('Apple Music - Section 2')).toBeInTheDocument()
+    })
   })
 
   it('checks children when group is checked', async () => {
-    const {getByText, getAllByRole, getByTestId} = render(<EnrollmentTree {...complexProps} />)
+    const {getByText, getAllByRole, getByTestId} = render(<EnrollmentTree {...props} />)
     await waitFor(() => expect(getByText('SubTeacherRole')).toBeInTheDocument())
-    const parentBox = getByTestId('check r92')
+    const parentBox = getByTestId('check r1')
     fireEvent.click(parentBox)
 
     // includes default teacher check
@@ -163,8 +189,8 @@ describe('EnrollmentTree', () => {
   })
 
   it('calls createEnroll when available', async () => {
-    const {getByText} = render(<EnrollmentTree {...submitProps} />)
+    const {getByText} = render(<EnrollmentTree {...props} />)
     await waitFor(() => expect(getByText('SubTeacherRole')).toBeInTheDocument())
-    expect(submitProps.createEnroll).toHaveBeenCalledTimes(1)
+    expect(props.createEnroll).toHaveBeenCalledTimes(1)
   })
 })

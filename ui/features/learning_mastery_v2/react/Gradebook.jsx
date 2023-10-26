@@ -32,7 +32,7 @@ import {
   CELL_HEIGHT,
 } from './constants'
 
-const Gradebook = ({courseId, students, outcomes, rollups, visibleRatings}) => {
+const Gradebook = ({courseId, students, outcomes, rollups, visibleRatings, gradebookFilters, gradebookFilterHandler}) => {
   const headerRow = useRef(null)
   const gridRef = useRef(null)
 
@@ -48,7 +48,7 @@ const Gradebook = ({courseId, students, outcomes, rollups, visibleRatings}) => {
     <>
       <Flex padding="medium 0 0 0">
         <Flex.Item borderWidth="large 0 medium 0">
-          <StudentHeader />
+          <StudentHeader gradebookFilters={gradebookFilters} gradebookFilterHandler={gradebookFilterHandler} />
         </Flex.Item>
         <Flex.Item size={`${STUDENT_COLUMN_RIGHT_PADDING}px`} />
         <View
@@ -107,6 +107,8 @@ Gradebook.propTypes = {
   outcomes: PropTypes.arrayOf(PropTypes.shape(outcomeShape)).isRequired,
   rollups: PropTypes.arrayOf(PropTypes.shape(studentRollupsShape)).isRequired,
   visibleRatings: PropTypes.arrayOf(PropTypes.bool).isRequired,
+  gradebookFilters: PropTypes.arrayOf(PropTypes.string).isRequired,
+  gradebookFilterHandler: PropTypes.func.isRequired,
 }
 
 export default Gradebook

@@ -24,8 +24,13 @@ import {Flex} from '@instructure/ui-flex'
 import {NodeStructure} from './EnrollmentTree'
 import {translateState} from './EnrollmentTreeGroup'
 import RoleMismatchToolTip from './RoleMismatchToolTip'
+import {createAnalyticPropsGenerator} from './util/analytics'
+import {MODULE_NAME} from './types'
 
 const I18n = useI18nScope('temporary_enrollment')
+
+// initialize analytics props
+const analyticProps = createAnalyticPropsGenerator(MODULE_NAME)
 
 interface Props extends NodeStructure {
   indent: any
@@ -52,14 +57,15 @@ export function EnrollmentTreeItem(props: Props) {
 
   const renderRow = () => {
     return (
-      <Flex key={props.id} padding="x-small" as="div" alignItems="center">
+      <Flex key={props.id} padding="xxx-small" as="div" alignItems="center">
         <Flex.Item margin={props.indent}>
           <Checkbox
             data-testid={'check ' + props.id}
             label=""
-            size="large"
+            size="medium"
             checked={checked}
             onChange={handleCheckboxChange}
+            {...analyticProps('Course')}
           />
         </Flex.Item>
         <Flex.Item margin="0 0 0 x-small">

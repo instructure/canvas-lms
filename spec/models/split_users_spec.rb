@@ -505,7 +505,7 @@ describe SplitUsers do
       expect(submission2.reload.user).to eq source_user
     end
 
-    it "clears out unsubmitted/deleted submissions conflicting with existing assignments" do
+    it "swaps back unsubmitted/deleted submissions conflicting with existing assignments" do
       assignment = course1.assignments.create!(title: "some assignment",
                                                submission_types: "online_text_entry",
                                                points_possible: 10,
@@ -518,7 +518,7 @@ describe SplitUsers do
       SplitUsers.split_db_users(source_user)
 
       expect(real_submission.reload.user).to eq restored_user
-      expect { unsubmitted_submission.reload }.to raise_error(ActiveRecord::RecordNotFound)
+      expect(unsubmitted_submission.reload.user).to eq source_user
     end
 
     it "does not blow up on deleted courses" do
@@ -636,7 +636,7 @@ describe SplitUsers do
         expect(submission2.reload.user).to eq shard1_source_user
       end
 
-      it "clears out conflicting unsubmitted/deleted submissions across shards" do
+      it "swaps out conflicting unsubmitted/deleted submissions across shards" do
         assignment = shard1_course.assignments.create!(title: "some assignment",
                                                        submission_types: "online_text_entry",
                                                        points_possible: 10,
@@ -649,7 +649,7 @@ describe SplitUsers do
         SplitUsers.split_db_users(shard1_source_user)
 
         expect(real_submission.reload.user).to eq restored_user
-        expect { unsubmitted_submission.reload }.to raise_error(ActiveRecord::RecordNotFound)
+        expect(unsubmitted_submission.reload.user).to eq shard1_source_user
       end
 
       it "restores admins to the original state" do

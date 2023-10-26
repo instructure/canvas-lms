@@ -304,6 +304,44 @@ describe Mutations::CreateAssignment do
     expect(section_override.due_at).to eq due3
   end
 
+  it "sets lock_at_overridden" do
+    due1 = 1.day.from_now.round.change(min: 1)
+
+    result = execute_with_input <<~GQL
+      name: "assignment with overrides"
+      courseId: "#{@course.to_param}"
+      onlyVisibleToOverrides: true
+      assignmentOverrides: [
+        {
+          studentIds: [#{@student.to_param}]
+          dueAt: "#{due1.iso8601}"
+          lockAt: "#{due1.iso8601}"
+          unlockAt: "#{due1.iso8601}"
+        }
+      ]
+    GQL
+
+    assignment = Assignment.find(result.dig("data", "createAssignment", "assignment", "_id"))
+    expect(assignment).to be_only_visible_to_overrides
+
+    student_override = assignment.assignment_overrides.where(set_type: "ADHOC").first
+    expect(student_override.due_at_overridden).to be true
+    expect(student_override.lock_at_overridden).to be true
+    expect(student_override.unlock_at_overridden).to be true
+  end
+
+  it "sets grade_standard_id" do
+    @standard = @course.account.grading_standards.create!(title: "account standard", standard_data: { a: { name: "A", value: "95" }, b: { name: "B", value: "80" }, f: { name: "F", value: "" } })
+    result = execute_with_input <<~GQL
+      name: "assignment with overrides"
+      courseId: "#{@course.to_param}"
+      gradingStandardId: "#{@standard.id}"
+    GQL
+
+    assignment = Assignment.find(result.dig("data", "createAssignment", "assignment", "_id"))
+    expect(assignment.grading_standard_id).to eq @standard.id
+  end
+
   it "requires a name" do
     result = execute_with_input <<~GQL
       courseId: "#{@course.to_param}"

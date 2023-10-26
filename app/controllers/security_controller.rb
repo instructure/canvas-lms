@@ -104,6 +104,7 @@ class SecurityController < ApplicationController
       messages_supported: Lti::ResourcePlacement::PLACEMENTS_BY_MESSAGE_TYPE.keys.map do |message_type|
         {
           type: message_type,
+          placements: Lti::ResourcePlacement::PLACEMENTS_BY_MESSAGE_TYPE[message_type]
         }
       end,
       variables: Lti::VariableExpander.expansion_keys,

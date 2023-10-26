@@ -208,7 +208,7 @@ describe "context modules" do
       @course.context_modules.create!(name: "Quiz")
       get "/courses/#{@course.id}/modules"
 
-      add_new_module_item("#quizs_select", "Quiz", "[ Create Quiz ]", "New Quiz") do
+      add_new_module_item_and_yield("#quizs_select", "Quiz", "[ Create Quiz ]", "New Quiz") do
         click_option("select[name='quiz[assignment_group_id]']", @ag2.name)
       end
       expect(@ag2.assignments.length).to eq 1
@@ -536,7 +536,7 @@ describe "context modules" do
     it "adds a discussion item to a module", priority: "1" do
       @course.context_modules.create!(name: "New Module")
       get "/courses/#{@course.id}/modules"
-      add_new_module_item("#discussion_topics_select", "Discussion", "[ Create Topic ]", "New Discussion Title")
+      add_new_module_item_and_yield("#discussion_topics_select", "Discussion", "[ Create Topic ]", "New Discussion Title")
       verify_persistence("New Discussion Title")
     end
 
@@ -712,7 +712,7 @@ describe "context modules" do
         @course.disable_feature! :new_quizzes_by_default
         get "/courses/#{@course.id}/modules"
 
-        add_new_module_item("#quizs_select", "Quiz", "[ Create Quiz ]", "A Classic Quiz") do
+        add_new_module_item_and_yield("#quizs_select", "Quiz", "[ Create Quiz ]", "A Classic Quiz") do
           expect(f("#quizs_select")).to contain_css("input[name=quiz_engine_selection]")
           expect(f("#quizs_select .new")).to include_text("New Quizzes")
           expect(f("#quizs_select .new")).to include_text("Classic Quizzes")
@@ -725,7 +725,7 @@ describe "context modules" do
         @course.enable_feature! :new_quizzes_by_default
         get "/courses/#{@course.id}/modules"
 
-        add_new_module_item("#quizs_select", "Quiz", "[ Create Quiz ]", "A New Quiz") do
+        add_new_module_item_and_yield("#quizs_select", "Quiz", "[ Create Quiz ]", "A New Quiz") do
           expect(f("#quizs_select")).not_to contain_css("input[name=quiz_engine_selection]")
           expect(f("#quizs_select .new")).not_to include_text("New Quizzes")
           expect(f("#quizs_select .new")).not_to include_text("Classic Quizzes")

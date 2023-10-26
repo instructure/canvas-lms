@@ -419,10 +419,26 @@ class DeveloperKey < ActiveRecord::Base
     end
   end
 
-  def manage_external_tools_multi_shard(enqueue_args, method, affected_account, start_time)
-    Shard.with_each_shard do
+  def manage_external_tools_multi_shard_in_region(enqueue_args, method, affected_account, start_time)
+    Shard.with_each_shard(Shard.in_current_region) do
       delay(**enqueue_args).manage_external_tools_on_shard(method, affected_account, start_time)
+    rescue
+      raise Delayed::RetriableError
     end
+  end
+
+  def manage_external_tools_multi_shard(enqueue_args, method, affected_account, start_time)
+    DatabaseServer.send_in_each_region(
+      self,
+      :manage_external_tools_multi_shard_in_region,
+      enqueue_args, # args passed to delay() this time when creating job in each region
+      enqueue_args, # first argument to manage_external_tools_multi_shard_in_region
+      method,
+      affected_account,
+      start_time
+    )
+  rescue
+    raise Delayed::RetriableError
   end
 
   def manage_external_tools_on_shard(method, account, start_time)
@@ -451,7 +467,8 @@ class DeveloperKey < ActiveRecord::Base
   def tool_management_enqueue_args
     {
       n_strand: ["developer_key_tool_management", account&.global_id || "site_admin"],
-      priority: Delayed::LOW_PRIORITY
+      priority: Delayed::LOW_PRIORITY,
+      max_attempts: 4
     }
   end
 
@@ -496,7 +513,11 @@ class DeveloperKey < ActiveRecord::Base
 
     base_scope = ContextExternalTool.where.not(workflow_state: "deleted")
     tool_management_scope(base_scope, account).select(:id).find_in_batches do |tool_ids|
+      # There appear to be broken tools with no context, which break later on in the process.
+      # Skip them.
       ContextExternalTool.where(id: tool_ids).preload(:context).each do |tool|
+        next unless tool.context
+
         tool_configuration.new_external_tool(
           tool.context,
           existing_tool: tool

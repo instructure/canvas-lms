@@ -20,14 +20,13 @@ import React, {useContext} from 'react'
 
 import {useQuery, useMutation} from 'react-apollo'
 import {DISCUSSION_TOPIC_QUERY} from '../../../graphql/Queries'
-import {CREATE_DISCUSSION_TOPIC} from '../../../graphql/Mutations'
-
+import {CREATE_DISCUSSION_TOPIC, UPDATE_DISCUSSION_TOPIC} from '../../../graphql/Mutations'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import DiscussionTopicForm from '../../components/DiscussionTopicForm/DiscussionTopicForm'
 
-import {getContextQuery} from '../../utils'
+import {getContextQuery} from '../../util/utils'
 
 const I18n = useI18nScope('discussion_create')
 
@@ -81,6 +80,32 @@ export default function DiscussionTopicFormContainer({apolloClient}) {
     },
   })
 
+  const [updateDiscussionTopic] = useMutation(UPDATE_DISCUSSION_TOPIC, {
+    onCompleted: completionData => {
+      const new_discussion_topic = completionData?.updateDiscussionTopic?.discussionTopic
+      const discussion_topic_id = new_discussion_topic?._id
+      const context_type = new_discussion_topic?.contextType
+      if (discussion_topic_id && context_type) {
+        if (context_type === 'Course') {
+          window.location.assign(
+            `/courses/${ENV.context_id}/discussion_topics/${discussion_topic_id}`
+          )
+        } else if (context_type === 'Group') {
+          window.location.assign(
+            `/groups/${ENV.context_id}/discussion_topics/${discussion_topic_id}`
+          )
+        } else {
+          setOnFailure(I18n.t('Invalid context type'))
+        }
+      } else {
+        setOnFailure(I18n.t('Error Updating discussion topic'))
+      }
+    },
+    onError: () => {
+      setOnFailure(I18n.t('Error creating discussion topic'))
+    },
+  })
+
   if (courseIsLoading || topicIsLoading) {
     return <LoadingIndicator />
   }
@@ -113,9 +138,27 @@ export default function DiscussionTopicFormContainer({apolloClient}) {
         includeRepliesInFeed,
         locked,
         isAnnouncement,
+        groupCategoryId,
       }) => {
         if (isEditing) {
-          console.log('call updateDiscussion')
+          updateDiscussionTopic({
+            variables: {
+              discussionTopicId: currentDiscussionTopicId,
+              title,
+              message,
+              specificSections: sectionIdsToPostTo.join(),
+              published: shouldPublish,
+              requireInitialPost,
+              delayedPostAt: availableFrom,
+              lockAt: availableUntil,
+              allowRating: allowLiking,
+              onlyGradersCanRate: onlyGradersCanLike,
+              todoDate: addToTodo ? todoDate : null,
+              podcastEnabled: enablePodcastFeed,
+              podcastHasStudentPosts: includeRepliesInFeed,
+              locked,
+            },
+          })
         } else {
           createDiscussionTopic({
             variables: {
@@ -137,6 +180,7 @@ export default function DiscussionTopicFormContainer({apolloClient}) {
               podcastHasStudentPosts: includeRepliesInFeed,
               locked,
               isAnnouncement,
+              groupCategoryId: groupCategoryId || null,
             },
           })
         }

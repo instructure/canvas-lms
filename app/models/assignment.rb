@@ -35,6 +35,7 @@ class Assignment < ActiveRecord::Base
   include Plannable
   include DuplicatingObjects
   include LockedFor
+  include Checkpointable
 
   self.ignored_columns += %i[context_code]
 
@@ -1426,6 +1427,7 @@ class Assignment < ActiveRecord::Base
     each_submission_type { |submission| submission.destroy if submission && !submission.deleted? }
     conditional_release_rules.destroy_all
     conditional_release_associations.destroy_all
+    checkpoint_assignments.destroy_all
     refresh_course_content_participation_counts
 
     ScheduledSmartAlert.where(context_type: "Assignment", context_id: id).destroy_all
@@ -2061,6 +2063,18 @@ class Assignment < ActiveRecord::Base
     group, students = group_students(original_student)
     submissions = []
     grade_group_students = !(grade_group_students_individually || opts[:excused])
+
+    if checkpointed? && root_account&.feature_enabled?(:discussion_checkpoints)
+      checkpoint_label = opts.delete(:checkpoint_label)
+      checkpoint_assignment = find_checkpoint(checkpoint_label)
+      if checkpoint_label.blank? || checkpoint_assignment.nil?
+        raise GradeError, "Must provide a valid checkpoint label when grading checkpointed discussions"
+      end
+
+      checkpoint_submissions = checkpoint_assignment.grade_student(original_student, opts)
+      parent_submissions = all_submissions.where(user_id: checkpoint_submissions.map(&:user_id))
+      return parent_submissions.preload(:grading_period, :stream_item).to_a
+    end
 
     # grading a student results in a teacher occupying a grader slot for that assignment if it is moderated.
     ensure_grader_can_adjudicate(grader: opts[:grader], provisional: opts[:provisional], occupy_slot: true) do
@@ -3266,7 +3280,10 @@ class Assignment < ActiveRecord::Base
     # last value and strip off everything after the first period.
 
     # remove group name from file name
-    student_group_names.each { |group_name| filename.sub!("#{group_name}_", "") }
+    matched_group_name = student_group_names.find { |group_name| filename.match?(/^#{Regexp.quote(group_name)}_/) }
+    if matched_group_name
+      filename.sub!(/^#{Regexp.quote(matched_group_name)}_/, "")
+    end
 
     split_filename = filename.split("_") - ["LATE"]
 
@@ -4194,6 +4211,7 @@ class Assignment < ActiveRecord::Base
     # ids when teachers upload graded submissions
     user_name.gsub!(/_(\d+)_/, '\1')
     user_name.gsub!(/^(\d+)$/, '\1')
+    user_name.gsub!(/[^[[:word:]]]/, "")
     user_name.downcase
   end
 

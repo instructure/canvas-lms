@@ -6427,15 +6427,6 @@ describe Submission do
         ).to be_empty
       end
 
-      it "returns a list if rubric assessments exist for the desired attempt and was graded and there is data" do
-        @submission2.rubric_assessments.each do |rubric_assesment|
-          rubric_assesment.score = 5
-        end
-        expect(
-          @submission2.visible_rubric_assessments_for(@viewing_user, attempt: @submission2.attempt)
-        ).to eql(@submission2.rubric_assessments.to_a)
-      end
-
       it "can find historic rubric assessments of older attempts" do
         expect(
           @submission2.visible_rubric_assessments_for(@viewing_user, attempt: @submission.attempt)
@@ -9186,6 +9177,31 @@ describe Submission do
         @quiz_submission.set_final_score(7)
         @quiz_submission.save!
       end
+    end
+  end
+
+  describe "checkpoint submissions" do
+    before(:once) do
+      course = course_model
+      course.root_account.enable_feature!(:discussion_checkpoints)
+      student = student_in_course(course: @course, active_all: true).user
+      topic = @course.discussion_topics.create!(title: "graded topic")
+      topic.create_checkpoints(reply_to_topic_points: 3, reply_to_entry_points: 7)
+      @checkpoint_submission = topic.reply_to_topic_checkpoint.submissions.find_by(user: student)
+      @parent_submission = topic.assignment.submissions.find_by(user: student)
+    end
+
+    it "updates the parent submission when tracked attrs change on a checkpoint submission" do
+      expect { @checkpoint_submission.update!(score: 3) }.to change { @parent_submission.reload.score }.from(nil).to(3)
+    end
+
+    it "does not update the parent submission when attrs that changed are not tracked" do
+      expect { @checkpoint_submission.update!(lti_user_id: "some-id") }.not_to change { @parent_submission.reload.updated_at }
+    end
+
+    it "does not update the parent submission when the checkpoints flag is disabled" do
+      @checkpoint_submission.root_account.disable_feature!(:discussion_checkpoints)
+      expect { @checkpoint_submission.update!(score: 3) }.not_to change { @parent_submission.reload.score }
     end
   end
 end

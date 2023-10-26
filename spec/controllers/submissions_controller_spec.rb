@@ -839,6 +839,14 @@ describe SubmissionsController do
       expect(body["published_score"]).to eq 10
     end
 
+    it "renders a submission status pill if the submission has a custom status" do
+      @submission.update!(workflow_state: "submitted")
+      status = CustomGradeStatus.create!(root_account: @course.root_account, name: "CARROT", color: "#000000", created_by: @teacher)
+      @submission.update!(custom_grade_status: status)
+      get :show, params: { course_id: @context.id, assignment_id: @assignment.id, id: @student.id }, format: :json
+      expect(body["custom_grade_status_id"]).to eq status.id
+    end
+
     it "renders json without scores for students for unposted submissions" do
       user_session(@student)
       @assignment.ensure_post_policy(post_manually: true)

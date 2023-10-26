@@ -35,10 +35,8 @@ const defaultProps = {
   setPeerReviewsPerStudent: () => {},
   peerReviewDueDate: '',
   setPeerReviewDueDate: () => {},
-  assignTo: '',
-  setAssignTo: () => {},
-  dueDate: '',
-  setDueDate: () => {},
+  assignedInfoList: [],
+  setAssignedInfoList: () => {},
 }
 
 const renderGradedDiscussionOptions = () => {

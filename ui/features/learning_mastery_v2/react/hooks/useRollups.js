@@ -47,6 +47,19 @@ const findRating = (ratings, score) => {
   return rating || ratings[ratings.length - 1]
 }
 
+const getStudents = (rollups, users) => {
+  const students = users.map(user => {
+    const rollup = rollups.find(r => r.links.user === user.id)
+    const status = rollup.links.status === 'completed' ? 'concluded' : rollup.links.status
+    return {
+      ...user,
+      status,
+    }
+  })
+
+  return students
+}
+
 const rollupsByUser = (rollups, outcomes) => {
   const rollupsByUserId = groupBy(rollups, rollup => rollup.links.user)
   return Object.entries(rollupsByUserId).map(([studentId, studentRollups]) => ({
@@ -57,6 +70,7 @@ const rollupsByUser = (rollups, outcomes) => {
 
 export default function useRollups({courseId, accountMasteryScalesEnabled}) {
   const [isLoading, setIsLoading] = useState(true)
+  const [gradebookFilters, setGradebookFilters] = useState([])
   const [students, setStudents] = useState([])
   const [outcomes, setOutcomes] = useState([])
   const [rollups, setRollups] = useState([])
@@ -66,11 +80,12 @@ export default function useRollups({courseId, accountMasteryScalesEnabled}) {
   useEffect(() => {
     ;(async () => {
       try {
-        const {data} = await loadRollups(courseId, needMasteryAndColorDefaults)
+        setIsLoading(true)
+        const {data} = await loadRollups(courseId, gradebookFilters, needMasteryAndColorDefaults)
         const {users: fetchedUsers, outcomes: fetchedOutcomes} = data.linked
-        setStudents(fetchedUsers)
-        setOutcomes(fetchedOutcomes)
+        setStudents(getStudents(data.rollups, fetchedUsers))
         setRollups(rollupsByUser(data.rollups, fetchedOutcomes))
+        setOutcomes(fetchedOutcomes)
         setIsLoading(false)
       } catch (_e) {
         showFlashAlert({
@@ -79,12 +94,14 @@ export default function useRollups({courseId, accountMasteryScalesEnabled}) {
         })
       }
     })()
-  }, [courseId, needMasteryAndColorDefaults])
+  }, [courseId, needMasteryAndColorDefaults, gradebookFilters])
 
   return {
     isLoading,
     students,
     outcomes,
     rollups,
+    gradebookFilters,
+    setGradebookFilters,
   }
 }

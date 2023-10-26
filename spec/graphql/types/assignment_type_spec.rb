@@ -841,4 +841,52 @@ describe Types::AssignmentType do
       end
     end
   end
+
+  describe "checkpoints" do
+    describe "when feature flag is disabled" do
+      it "checkpoints is nil and checkpointed is false" do
+        expect(assignment_type.resolve("checkpoints {label}")).to be_nil
+        expect(assignment_type.resolve("checkpointed")).to be_falsey
+      end
+    end
+
+    describe "when feature flag is enabled" do
+      before do
+        course.root_account.enable_feature!(:discussion_checkpoints)
+      end
+
+      it "checkpoints is [] and checkpointed is false" do
+        expect(assignment_type.resolve("checkpoints {label}")).to eq []
+        expect(assignment_type.resolve("checkpointed")).to be_falsey
+      end
+
+      describe "when assignment has checkpoint assignments" do
+        before do
+          assignment.update!(checkpointed: true, checkpoint_label: CheckpointLabels::PARENT)
+          @c1 = assignment.checkpoint_assignments.create!(context: course, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 3.days.from_now)
+          @c2 = assignment.checkpoint_assignments.create!(context: course, checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 10, due_at: 5.days.from_now)
+        end
+
+        it "checkpoints returns the correct labels" do
+          expect(assignment_type.resolve("checkpoints {label}")).to match_array [CheckpointLabels::REPLY_TO_TOPIC, CheckpointLabels::REPLY_TO_ENTRY]
+        end
+
+        it "checkpointed is true" do
+          expect(assignment_type.resolve("checkpointed")).to be_truthy
+        end
+
+        it "checkpoints returns the points possible" do
+          expect(assignment_type.resolve("checkpoints {pointsPossible}")).to match_array [@c1.points_possible, @c2.points_possible]
+        end
+
+        it "checkpoints returns the due at" do
+          expect(assignment_type.resolve("checkpoints {dueAt}")).to match_array [@c1.due_at.iso8601, @c2.due_at.iso8601]
+        end
+
+        it "checkpoints returns the onlyVisibleToOverrides as false" do
+          expect(assignment_type.resolve("checkpoints {onlyVisibleToOverrides}")).to match_array [@c1.only_visible_to_overrides, @c2.only_visible_to_overrides]
+        end
+      end
+    end
+  end
 end

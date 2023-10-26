@@ -1151,6 +1151,30 @@ describe "Files API", type: :request do
       expect(json["lock_at"]).to eq one_month_from_now.as_json
     end
 
+    it "returns blueprint course restriction information when requested" do
+      copy_from = course_factory(active_all: true)
+      template = MasterCourses::MasterTemplate.set_as_master_course(copy_from)
+      original_file = copy_from.attachments.create!(
+        display_name: "cat_hugs.mp4", filename: "cat_hugs.mp4", content_type: "video/mp4", media_entry_id: "m-123456"
+      )
+      tag = template.create_content_tag_for!(original_file)
+      tag.update(restrictions: { content: true })
+
+      course_with_teacher(active_all: true)
+      copy_to = @course
+      template.add_child_course!(copy_to)
+
+      # just create a copy directly instead of doing a real migration
+      file_copy = copy_to.attachments.new(
+        display_name: "cat_hugs.mp4", filename: "cat_hugs.mp4", content_type: "video/mp4", media_entry_id: "m-123456"
+      )
+      file_copy.migration_id = tag.migration_id
+      file_copy.save!
+
+      json = api_call(:get, "/api/v1/files/#{file_copy.id}", { controller: "files", action: "api_show", format: "json", id: file_copy.id.to_param }, { include: ["blueprint_course_status"] })
+      expect(json["restricted_by_master_course"]).to be true
+    end
+
     it "is not locked/hidden for a teacher" do
       att2 = Attachment.create!(filename: "test.txt", display_name: "test.txt", uploaded_data: StringIO.new("file"), folder: @root, context: @course, locked: true)
       att2.hidden = true

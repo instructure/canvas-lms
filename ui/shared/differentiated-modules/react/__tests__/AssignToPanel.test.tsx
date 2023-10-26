@@ -55,29 +55,38 @@ describe('AssignToPanel', () => {
 
   const renderComponent = (overrides = {}) => render(<AssignToPanel {...props} {...overrides} />)
 
-  it('renders', () => {
-    const {getByText} = renderComponent()
+  it('renders', async () => {
+    const {findByText} = renderComponent()
     expect(
-      getByText('By default everyone in this course has assigned access to this module.')
+      await findByText('By default everyone in this course has assigned access to this module.')
     ).toBeInTheDocument()
   })
 
-  it('renders options', () => {
-    const {getByTestId} = renderComponent()
-    expect(getByTestId('everyone-option')).toBeInTheDocument()
-    expect(getByTestId('custom-option')).toBeInTheDocument()
+  it('renders options', async () => {
+    const {findByTestId} = renderComponent()
+    expect(await findByTestId('everyone-option')).toBeInTheDocument()
+    expect(await findByTestId('custom-option')).toBeInTheDocument()
   })
 
-  it('renders everyone as the default option', () => {
-    const {getByTestId} = renderComponent()
-    expect(getByTestId('everyone-option')).toBeChecked()
-    expect(getByTestId('custom-option')).not.toBeChecked()
+  it('renders everyone as the default option', async () => {
+    const {findByTestId} = renderComponent()
+    expect(await findByTestId('everyone-option')).toBeChecked()
+    expect(await findByTestId('custom-option')).not.toBeChecked()
+  })
+
+  it('renders custom access as the default option if there are assignmentOverrides', async () => {
+    fetchMock.getOnce(ASSIGNMENT_OVERRIDES_URL, ASSIGNMENT_OVERRIDES_DATA, {
+      overwriteRoutes: true,
+    })
+    const {findByTestId} = renderComponent()
+    expect(await findByTestId('custom-option')).toHaveProperty('checked', true)
   })
 
   describe('AssigneeSelector', () => {
     it('selects multiple options', async () => {
-      const {findByTestId, findByText, getAllByTestId, getByTestId} = renderComponent()
-      act(() => getByTestId('custom-option').click())
+      const {findByTestId, findByText, getAllByTestId} = renderComponent()
+      const customOption = await findByTestId('custom-option')
+      act(() => customOption.click())
       const assigneeSelector = await findByTestId('assignee_selector')
       act(() => assigneeSelector.click())
       const option1 = await findByText(SECTIONS_DATA[0].name)
@@ -90,7 +99,8 @@ describe('AssignToPanel', () => {
 
     it('clears selection', async () => {
       const {findByTestId, getByTestId, queryAllByTestId, findByText} = renderComponent()
-      act(() => getByTestId('custom-option').click())
+      const customOption = await findByTestId('custom-option')
+      act(() => customOption.click())
       const assigneeSelector = await findByTestId('assignee_selector')
       act(() => assigneeSelector.click())
       const option = await findByText(STUDENTS_DATA[0].name)
@@ -107,8 +117,7 @@ describe('AssignToPanel', () => {
       const assignedSections = ASSIGNMENT_OVERRIDES_DATA.filter(
         override => override.course_section !== undefined
       )
-      const {getAllByTestId, findByText, getByTestId} = renderComponent()
-      act(() => getByTestId('custom-option').click())
+      const {getAllByTestId, findByText} = renderComponent()
       expect(await findByText(ASSIGNMENT_OVERRIDES_DATA[0].students![0].name)).toBeInTheDocument()
       expect(getAllByTestId('assignee_selector_selected_option').length).toBe(
         ASSIGNMENT_OVERRIDES_DATA[0].students!.length + assignedSections.length
@@ -119,8 +128,9 @@ describe('AssignToPanel', () => {
   describe('on update', () => {
     it('creates new assignment overrides', async () => {
       fetchMock.put(ASSIGNMENT_OVERRIDES_URL, {})
-      const {findByTestId, findByText, getByTestId, getByRole, findAllByText} = renderComponent()
-      act(() => getByTestId('custom-option').click())
+      const {findByTestId, findByText, getByRole, findAllByText} = renderComponent()
+      const customOption = await findByTestId('custom-option')
+      act(() => customOption.click())
       const assigneeSelector = await findByTestId('assignee_selector')
       act(() => assigneeSelector.click())
       const option1 = await findByText(SECTIONS_DATA[0].name)
@@ -142,8 +152,9 @@ describe('AssignToPanel', () => {
       fetchMock.put(ASSIGNMENT_OVERRIDES_URL, {})
       const studentsOverride = ASSIGNMENT_OVERRIDES_DATA[0]
       const existingOverride = ASSIGNMENT_OVERRIDES_DATA[1]
-      const {findByTestId, findByText, getByTestId, getByRole, findAllByText} = renderComponent()
-      act(() => getByTestId('custom-option').click())
+      const {findByTestId, findByText, getByRole, findAllByText} = renderComponent()
+      const customOption = await findByTestId('custom-option')
+      act(() => customOption.click())
       const assigneeSelector = await findByTestId('assignee_selector')
       act(() => assigneeSelector.click())
       const option1 = await findByText(existingOverride.course_section?.name!)

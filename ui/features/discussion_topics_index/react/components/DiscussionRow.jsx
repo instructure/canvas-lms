@@ -760,20 +760,13 @@ class DiscussionRow extends Component {
   }
 
   renderIcon = () => {
+    const accessibleGradedIcon = (isSuccessColor = true) => (
+      <Text color={isSuccessColor ? 'success' : 'secondary'} size="large">
+        <IconAssignmentLine title={I18n.t('Graded Discussion')} />
+      </Text>
+    )
     if (this.props.discussion.assignment) {
-      if (this.props.discussion.published) {
-        return (
-          <Text color="success" size="large">
-            <IconAssignmentLine />
-          </Text>
-        )
-      } else {
-        return (
-          <Text color="secondary" size="large">
-            <IconAssignmentLine />
-          </Text>
-        )
-      }
+      return accessibleGradedIcon(!!this.props.discussion.published)
     }
     return null
   }

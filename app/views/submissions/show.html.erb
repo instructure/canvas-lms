@@ -60,7 +60,9 @@
         {}
       end,
       **submission_owner_param
-    }
+    },
+
+    :CUSTOM_GRADE_STATUSES => @assignment.course.custom_grade_statuses.as_json(include_root: false)
   })
   provide :page_title, join_title(@assignment.title, submission_author_name_for(@assessment_request))
   provide_blank :right_side
@@ -209,7 +211,9 @@
             <span><%= I18n.t("Submitted by: %{name}", name: @submission.proxy_submitter.short_name) %></span>
           <% end %>
           </div>
-          <% if @submission.late? %>
+          <% if @submission.custom_grade_status %>
+            <span class="submission-custom-grade-status-pill-<%= @submission.custom_grade_status_id %>" %>
+          <% elsif @submission.late? %>
             <span class="submission-late-pill"></span>
           <% elsif @submission.missing? %>
             <span class="submission-missing-pill"></span>

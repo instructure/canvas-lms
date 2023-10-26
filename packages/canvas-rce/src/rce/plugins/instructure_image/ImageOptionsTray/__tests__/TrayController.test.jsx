@@ -18,6 +18,7 @@
 
 import ReactDOM from 'react-dom'
 
+import {waitFor} from '@testing-library/dom'
 import TrayController, {CONTAINER_ID} from '../TrayController'
 import FakeEditor from '../../../../__tests__/FakeEditor'
 import ImageOptionsTrayDriver from './ImageOptionsTrayDriver'
@@ -122,10 +123,10 @@ describe('RCE "Images" Plugin > ImageOptionsTray > TrayController', () => {
   })
 
   describe('#hideTrayForEditor()', () => {
-    it('closes the tray when open for the given editor', () => {
+    it('closes the tray when open for the given editor', async () => {
       trayController.showTrayForEditor(editors[0])
       trayController.hideTrayForEditor(editors[0])
-      expect(getTray()).toBeNull()
+      await waitFor(() => expect(getTray()).toBeNull()) // tray is closed after a transition
     })
 
     it('does not close the tray when open for a different editor', () => {

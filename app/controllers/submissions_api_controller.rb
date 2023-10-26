@@ -870,6 +870,10 @@ class SubmissionsApiController < ApplicationController
           submission[:sticker] = params[:submission].delete(:sticker)
         end
 
+        if params.key?(:checkpoint_label) && @domain_root_account&.feature_enabled?(:discussion_checkpoints)
+          submission[:checkpoint_label] = params.delete(:checkpoint_label)
+        end
+
         submission[:provisional] = value_to_boolean(params[:submission][:provisional])
         submission[:final] = value_to_boolean(params[:submission][:final]) && @assignment.permits_moderation?(@current_user)
         if params[:submission][:submission_type] == "basic_lti_launch" && (!@submission.has_submission? || @submission.submission_type == "basic_lti_launch")

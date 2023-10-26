@@ -551,7 +551,12 @@ class FilesController < ApplicationController
 
     params[:include] = Array(params[:include])
     if access_allowed(@attachment, @current_user, :read)
-      json = attachment_json(@attachment, @current_user, {}, { include: params[:include], verifier: params[:verifier], omit_verifier_in_app: !value_to_boolean(params[:use_verifiers]) })
+      options = { include: params[:include], verifier: params[:verifier], omit_verifier_in_app: !value_to_boolean(params[:use_verifiers]) }
+      if options[:include].include?("blueprint_course_status")
+        options[:context] = @context || @folder&.context || @attachment.context
+        options[:can_view_hidden_files] = can_view_hidden_files?(options[:context], @current_user, session)
+      end
+      json = attachment_json(@attachment, @current_user, {}, options)
 
       # Add canvadoc session URL if the file is unlocked
       json.merge!(

@@ -32,6 +32,8 @@ module Types
       object[:artifact_attempt] || 0
     end
 
+    field :rubric_assessment_id, ID, null: false
+
     field :criterion, RubricCriterionType, <<~MD, null: true
       The rubric criteria that this assessment is for
     MD

@@ -490,6 +490,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       exportState: undefined,
       exportManager: undefined,
     }
+    // @ts-expect-error
     this.course = getCourseFromOptions(this.options)
     this.courseFeatures = getCourseFeaturesFromOptions(this.options)
     this.courseSettings = new CourseSettings(this, {

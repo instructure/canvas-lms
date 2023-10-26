@@ -704,6 +704,24 @@ describe ContextModulesController do
       expect(@external_tool_item.reload.url).to eq new_url
     end
 
+    it "removes the content_id for an external tool item if the external url is changed to a tool that doesn't exist" do
+      expect(@external_tool_item.content_id).not_to be_nil
+      new_url = "http://example.org/new_tool"
+      put "update_item", params: { course_id: @course.id, id: @external_tool_item.id, content_tag: { url: new_url } }
+      @external_tool_item.reload
+      expect(@external_tool_item.url).to eq new_url
+      expect(@external_tool_item.content_id).to be_nil
+    end
+
+    it "sets the content_id for an external tool item if the url is changed to another tool" do
+      new_url = "http://example.org/new_tool"
+      tool = @course.context_external_tools.create!(name: "a", url: new_url, consumer_key: "12345", shared_secret: "secret")
+      put "update_item", params: { course_id: @course.id, id: @external_tool_item.id, content_tag: { url: new_url } }
+      @external_tool_item.reload
+      expect(@external_tool_item.url).to eq new_url
+      expect(@external_tool_item.content_id).to eq tool.id
+    end
+
     it "ignores the url for a non-applicable type" do
       put "update_item", params: { course_id: @course.id, id: @assignment_item.id, content_tag: { url: "http://example.org/new_tool" } }
       expect(@assignment_item.reload.url).to be_nil

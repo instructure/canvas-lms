@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import ReactDOM from 'react-dom'
+import {waitFor} from '@testing-library/dom'
 import LinkOptionsTrayController, {CONTAINER_ID} from '../LinkOptionsTrayController'
 import FakeEditor from '../../../../../__tests__/FakeEditor'
 import LinkOptionsTrayDriver from './LinkOptionsTrayDriver'
@@ -78,10 +79,10 @@ describe('RCE "Links" Plugin > LinkOptionsTray > LinkOptionsTrayController', () 
   })
 
   describe('#hideTrayForEditor()', () => {
-    it('closes the tray when open for the given editor', () => {
+    it('closes the tray when open for the given editor', async () => {
       trayController.showTrayForEditor(editors[0])
       trayController.hideTrayForEditor(editors[0])
-      expect(getTray()).toBeNull()
+      await waitFor(() => expect(getTray()).toBeNull()) // tray is closed after a transition
     })
 
     it('does not close the tray when open for a different editor', () => {

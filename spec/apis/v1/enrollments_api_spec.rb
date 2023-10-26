@@ -229,6 +229,7 @@ describe EnrollmentsApiController, type: :request do
           teacher_in_course(active_all: true)
           @account = Account.default
           @account.enable_feature!(:temporary_enrollments)
+          @temporary_enrollment_pairing = TemporaryEnrollmentPairing.create!(root_account: @account)
         end
 
         context "when feature flag is enabled" do
@@ -245,12 +246,14 @@ describe EnrollmentsApiController, type: :request do
                                         user_id: @unenrolled_user.id,
                                         role_id:,
                                         course_section_id: @section.id,
-                                        temporary_enrollment_source_user_id: @teacher.id
+                                        temporary_enrollment_source_user_id: @teacher.id,
+                                        temporary_enrollment_pairing_id: @temporary_enrollment_pairing.id
                                       }
                                     }
             enrollment = Enrollment.find(json["id"])
             expect(enrollment).to be_an_instance_of TeacherEnrollment
             expect(enrollment.temporary_enrollment_source_user_id).to eq @teacher.id
+            expect(enrollment.temporary_enrollment_pairing_id).to be_present
           end
 
           it "creates a new temporary enrollment association in a sub account context" do
@@ -275,12 +278,14 @@ describe EnrollmentsApiController, type: :request do
                                         user_id: @unenrolled_user.id,
                                         role_id:,
                                         course_section_id: @section.id,
-                                        temporary_enrollment_source_user_id: @teacher.id
+                                        temporary_enrollment_source_user_id: @teacher.id,
+                                        temporary_enrollment_pairing_id: @temporary_enrollment_pairing.id
                                       }
                                     }
             enrollment = Enrollment.find(json["id"])
             expect(enrollment).to be_an_instance_of TeacherEnrollment
             expect(enrollment.temporary_enrollment_source_user_id).to eq @teacher.id
+            expect(enrollment.temporary_enrollment_pairing_id).to be_present
           end
         end
 
@@ -302,12 +307,14 @@ describe EnrollmentsApiController, type: :request do
                                         user_id: @unenrolled_user.id,
                                         role_id:,
                                         course_section_id: @section.id,
-                                        temporary_enrollment_source_user_id: @teacher.id
+                                        temporary_enrollment_source_user_id: @teacher.id,
+                                        temporary_enrollment_pairing_id: @temporary_enrollment_pairing.id
                                       }
                                     }
             enrollment = Enrollment.find(json["id"])
             expect(enrollment).to be_an_instance_of TeacherEnrollment
             expect(enrollment.temporary_enrollment_source_user_id).to be_nil
+            expect(enrollment.temporary_enrollment_pairing_id).to be_nil
           end
         end
       end
@@ -1139,10 +1146,15 @@ describe EnrollmentsApiController, type: :request do
         @provider = user_factory(active_all: true)
         @recipient = user_factory(active_all: true)
         @course = course_with_teacher(active_all: true, user: @provider).course
+        temporary_enrollment_pairing = TemporaryEnrollmentPairing.create!(root_account: Account.default)
         @recipient_temp_enrollment = @course.enroll_user(
           @recipient,
           "TeacherEnrollment",
-          { role: teacher_role, temporary_enrollment_source_user_id: @provider.id }
+          {
+            role: teacher_role,
+            temporary_enrollment_source_user_id: @provider.id,
+            temporary_enrollment_pairing_id: temporary_enrollment_pairing.id
+          }
         )
       end
 

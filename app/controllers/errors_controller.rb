@@ -141,6 +141,11 @@ class ErrorsController < ApplicationController
     # this is a honeypot field to catch spambots. it's hidden via css and should always be empty.
     return render(nothing: true, status: :bad_request) if error.delete(:username).present?
 
+    unless Shard.current.in_current_region?
+      logger.debug("Out of region error report received")
+      return render(nothing: true, status: :bad_request)
+    end
+
     error[:user_agent] = request.headers["User-Agent"]
     begin
       report_id = error.delete(:id)

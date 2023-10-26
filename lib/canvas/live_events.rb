@@ -720,6 +720,10 @@ module Canvas::LiveEvents
     post_event_stringified("quizzes_next_quiz_duplicated", payload)
   end
 
+  def self.quizzes_next_migration_urls_complete(payload)
+    post_event_stringified("quizzes_next_migration_urls_complete", payload)
+  end
+
   def self.get_course_section_data(section)
     {
       course_section_id: section.id,

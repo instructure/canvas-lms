@@ -39,6 +39,7 @@ export const CREATE_DISCUSSION_TOPIC = gql`
     $locked: Boolean
     $isAnnouncement: Boolean
     $specificSections: String
+    $groupCategoryId: ID
   ) {
     createDiscussionTopic(
       input: {
@@ -59,6 +60,68 @@ export const CREATE_DISCUSSION_TOPIC = gql`
         podcastHasStudentPosts: $podcastHasStudentPosts
         locked: $locked
         isAnnouncement: $isAnnouncement
+        specificSections: $specificSections
+        groupCategoryId: $groupCategoryId
+      }
+    ) {
+      discussionTopic {
+        _id
+        contextType
+        title
+        message
+        published
+        requireInitialPost
+        anonymousState
+        delayedPostAt
+        lockAt
+        isAnonymousAuthor
+        allowRating
+        onlyGradersCanRate
+        todoDate
+        podcastEnabled
+        podcastHasStudentPosts
+        isAnnouncement
+      }
+      errors {
+        ...Error
+      }
+    }
+  }
+  ${Error.fragment}
+`
+
+export const UPDATE_DISCUSSION_TOPIC = gql`
+  mutation UpdateDiscussionTopic(
+    $discussionTopicId: ID!
+    $title: String
+    $message: String
+    $published: Boolean
+    $requireInitialPost: Boolean
+    $delayedPostAt: DateTime
+    $lockAt: DateTime
+    $allowRating: Boolean
+    $onlyGradersCanRate: Boolean
+    $todoDate: DateTime
+    $podcastEnabled: Boolean
+    $podcastHasStudentPosts: Boolean
+    $locked: Boolean
+    $specificSections: String
+  ) {
+    updateDiscussionTopic(
+      input: {
+        discussionTopicId: $discussionTopicId
+        title: $title
+        message: $message
+        published: $published
+        requireInitialPost: $requireInitialPost
+        delayedPostAt: $delayedPostAt
+        lockAt: $lockAt
+        allowRating: $allowRating
+        onlyGradersCanRate: $onlyGradersCanRate
+        todoDate: $todoDate
+        podcastEnabled: $podcastEnabled
+        podcastHasStudentPosts: $podcastHasStudentPosts
+        locked: $locked
         specificSections: $specificSections
       }
     ) {

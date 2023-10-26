@@ -379,7 +379,7 @@ class GradeSummaryPresenter
     # if module position above is the same, compare by assignment
     # position within the module
     if module_position_comparison.zero?
-      module_tag1.position <=> module_tag2.position
+      module_tag1.position.to_i <=> module_tag2.position.to_i
     else
       module_position_comparison
     end

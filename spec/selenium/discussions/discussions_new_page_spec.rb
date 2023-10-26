@@ -443,7 +443,7 @@ describe "discussions" do
         get "/courses/#{course.id}/discussion_topics/new"
         f("input[placeholder='Topic Title']").send_keys "This is fully anonymous"
         force_click("input[value='full_anonymity']")
-        f("button[data-testid='save-and-publish-button']").click
+        f("button[data-testid='save-button']").click
         wait_for_ajaximations
         expect(f("span[data-testid='anon-conversation']").text).to eq "This is an anonymous Discussion, Your name and profile picture will be hidden from other course members."
         expect(f("span[data-testid='author_name']").text).to include "Anonymous"
@@ -455,7 +455,7 @@ describe "discussions" do
         get "/courses/#{course.id}/discussion_topics/new"
         f("input[placeholder='Topic Title']").send_keys "This is partially anonymous"
         force_click("input[value='partial_anonymity']")
-        f("button[data-testid='save-and-publish-button']").click
+        f("button[data-testid='save-button']").click
         wait_for_ajaximations
         expect(f("span[data-testid='anon-conversation']").text).to eq "When creating a reply, you will have the option to show your name and profile picture to other course members or remain anonymous."
         expect(f("span[data-testid='author_name']").text).to include "Anonymous"
@@ -473,7 +473,7 @@ describe "discussions" do
         force_click("input[value='Anonymous']")
         fj("li:contains('student')").click
 
-        f("button[data-testid='save-and-publish-button']").click
+        f("button[data-testid='save-button']").click
         wait_for_ajaximations
         expect(f("span[data-testid='anon-conversation']").text).to eq "When creating a reply, you will have the option to show your name and profile picture to other course members or remain anonymous."
         expect(f("span[data-testid='author_name']").text).to include "student"
@@ -494,7 +494,7 @@ describe "discussions" do
         force_click("input[value='student']")
         fj("li:contains('Anonymous')").click
 
-        f("button[data-testid='save-and-publish-button']").click
+        f("button[data-testid='save-button']").click
         wait_for_ajaximations
         expect(f("span[data-testid='anon-conversation']").text).to eq "When creating a reply, you will have the option to show your name and profile picture to other course members or remain anonymous."
         expect(f("span[data-testid='author_name']").text).to include "Anonymous"

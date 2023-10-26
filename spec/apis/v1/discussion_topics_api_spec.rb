@@ -609,7 +609,6 @@ describe DiscussionTopicsController, type: :request do
                      exclude_small_matches_value: 0,
                      submit_papers_to: true
                    },
-                   publishable: true,
                    hidden: false,
                    unpublishable: true,
                    only_visible_to_overrides: false,

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {fetchTemporaryEnrollments, deleteEnrollment} from '../../api/enrollment'
+import {deleteEnrollment, fetchTemporaryEnrollments} from '../../api/enrollment'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
 // Mock the API call
@@ -115,6 +115,22 @@ describe('enrollment api', () => {
         console.log('mockConsoleError calls:', mockConsoleError.mock.calls.length)
 
         expect(mockConsoleError).toHaveBeenCalled()
+      })
+
+      it.skip('handles deletion without onDelete gracefully', async () => {
+        ;(doFetchApi as jest.Mock).mockResolvedValue({response: {status: 200}})
+
+        await expect(deleteEnrollment(1, 2)).resolves.not.toThrow()
+      })
+
+      it.skip('handles non-200 status code gracefully', async () => {
+        ;(doFetchApi as jest.Mock).mockResolvedValue({response: {status: 404}})
+
+        try {
+          await deleteEnrollment(1, 2)
+        } catch (e: any) {
+          expect(e.message).toBe('Failed to delete enrollment: HTTP status code 404')
+        }
       })
     })
   })

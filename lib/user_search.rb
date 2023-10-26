@@ -174,16 +174,19 @@ module UserSearch
       end
 
       if context.is_a?(Account) && !enrollment_types && context.root_account&.feature_enabled?(:temporary_enrollments)
+        recipients = options[:temporary_enrollment_recipients]
+        providers = options[:temporary_enrollment_providers]
+
+        recipient_scope = Enrollment.current_and_future.temporary_enrollment_recipients_for_provider(users_scope) if recipients
+        provider_scope = Enrollment.current_and_future.temporary_enrollments_for_recipient(users_scope) if providers
+
         users_scope =
-          if options[:temporary_enrollment_recipients] && options[:temporary_enrollment_providers]
-            recipient_ids = Enrollment.temporary_enrollment_recipients_for_provider(users_scope).pluck(:user_id)
-            provider_ids = Enrollment.temporary_enrollments_for_recipient(users_scope).pluck(:temporary_enrollment_source_user_id)
-            users_scope.where(id: (recipient_ids + provider_ids))
-          elsif options[:temporary_enrollment_recipients]
-            users_scope.where(id: Enrollment.temporary_enrollment_recipients_for_provider(users_scope).select(:user_id))
-          elsif options[:temporary_enrollment_providers]
-            users_scope.where(id: Enrollment.temporary_enrollments_for_recipient(users_scope)
-                       .select(:temporary_enrollment_source_user_id))
+          if recipients && providers
+            users_scope.where(id: (recipient_scope.pluck(:user_id) + provider_scope.pluck(:temporary_enrollment_source_user_id)))
+          elsif recipients
+            users_scope.where(id: recipient_scope.select(:user_id))
+          elsif providers
+            users_scope.where(id: provider_scope.select(:temporary_enrollment_source_user_id))
           else
             users_scope
           end

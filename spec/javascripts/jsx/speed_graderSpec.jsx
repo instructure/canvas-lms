@@ -335,7 +335,7 @@ QUnit.module('SpeedGrader', rootHooks => {
         grading_role: 'moderator',
         help_url: 'example.com/support',
         show_help_menu_item: false,
-        custom_grade_statuses: [{id: '1', name: 'Custom Status'}],
+        custom_grade_statuses: [{id: '1', name: 'Custom Status'}, {id: '2', name: 'Custom Status 2'}],
       })
       setupFixtures('<span id="multiple_submissions"></span>')
       sandbox.stub($, 'ajaxJSON')
@@ -459,6 +459,19 @@ QUnit.module('SpeedGrader', rootHooks => {
     const submissionDropdown = document.getElementById('multiple_submissions')
     strictEqual(submissionDropdown.innerHTML, '')
     SpeedGrader.teardown()
+  })
+
+  test('submission with custom status displays pill when there are no submissions', () => {
+    SpeedGrader.setup()
+    SpeedGrader.EG.currentStudent.submission.custom_grade_status_id = '1'
+    SpeedGrader.EG.currentStudent.submission.attempt = null
+    SpeedGrader.EG.currentStudent.submission.submission_history = [SpeedGrader.EG.currentStudent.submission.submission_history[0]]
+    SpeedGrader.EG.currentStudent.submission.submission_history[0].custom_grade_status_id = '1'
+    SpeedGrader.EG.currentStudent.submission.submission_history[0].attempt = null
+    SpeedGrader.EG.refreshSubmissionsToView()
+    const submissionPill = document.querySelector('.submission-custom-grade-status-pill-1')
+    ok(submissionPill)
+    strictEqual(submissionPill.innerText, 'CUSTOM STATUS')
   })
 
   test('first submission that is not late is not tagged as late in the SpeedGrader submission view dropdown', () => {
@@ -1777,6 +1790,7 @@ QUnit.module('SpeedGrader', rootHooks => {
         grading_role: 'grader',
         help_url: 'helpUrl',
         show_help_menu_item: false,
+        custom_grade_statuses: [{id: '1', name: 'Custom Status One'}, {id: '2', name: 'Custom Status Two'}],
       })
       originalWindowJSONData = window.jsonData
       originalStudent = SpeedGrader.EG.currentStudent
@@ -1961,9 +1975,7 @@ QUnit.module('SpeedGrader', rootHooks => {
     })
 
     function selectStatusMenuOption(index) {
-      const button = document.querySelector(
-        '#speed_grader_edit_status_secondary_mount_point button'
-      )
+      const button = document.querySelector('[data-testid="speedGraderStatusMenu-editButton"]')
       button.click()
 
       const $menuContent = document.querySelector(`[aria-labelledby="${button.id}"]`)
@@ -2403,6 +2415,85 @@ QUnit.module('SpeedGrader', rootHooks => {
         getJsonStub.restore()
         const pill = $('.submission-excused-pill')
         ok(pill.is(':visible'))
+      })
+    })
+
+    test('displays the custom status pill after the status has changed through the status menu from another custom status', assert => {
+      const done = assert.async()
+      finishSetup()
+      SpeedGrader.EG.currentStudent.submission_state = 'not_submitted'
+      SpeedGrader.EG.currentStudent.submission = {
+        workflow_state: 'unsubmitted',
+        submission_history: [{excused: false, late: false, missing: false, custom_grade_status_id: '1'}],
+        submission_type: 'online_text_entry',
+        user_id: '4',
+        assignment_id: '1',
+        custom_grade_status_id: '1',
+      }
+      window.jsonData.context.students[0] = SpeedGrader.EG.currentStudent
+      window.jsonData.studentMap[4] = SpeedGrader.EG.currentStudent
+      SpeedGrader.EG.showSubmissionDetails()
+      const pill = $('.submission-custom-grade-status-pill-1')
+      ok(pill.is(':visible'))
+      ok(pill.text().includes('Custom Status One'))
+      moxios.install()
+      const url = `/api/v1/courses/${ENV.course_id}/assignments/${SpeedGrader.EG.currentStudent.submission.assignment_id}/submissions/${SpeedGrader.EG.currentStudent.submission.user_id}`
+      moxios.stubRequest(url, {status: 200, response: {}})
+      moxios.wait(() => done())
+
+      const responseRefreshRequest = {
+        assignment_id: '1',
+        id: '1',
+        user_id: '4',
+        workflow_state: 'graded',
+        grade_matches_current_submission: true,
+        graded_at: '2021-09-23T14:41:15Z',
+        grader_id: '1',
+        excused: false,
+        points_deducted: 0.0,
+        late: false,
+        missing: false,
+        seconds_late: 0,
+        preview_url: '',
+        custom_grade_status_id: '2',
+        submission_history: [
+          {
+            id: '1',
+            assignment_id: '1',
+            user_id: '4',
+            workflow_state: 'graded',
+            grade_matches_current_submission: true,
+            graded_at: '2021-09-23T14:41:15Z',
+            grader_id: 1,
+            excused: false,
+            late: false,
+            missing: false,
+            seconds_late: 0,
+            preview_url: '',
+            custom_grade_status_id: '2',
+          },
+        ],
+        anonymous_id: 'yvqp3',
+      }
+
+      const optionsIndexes = {
+        Late: 1,
+        Missing: 2,
+        Excused: 3,
+        CustomOne: 4,
+        CustomTwo: 5,
+        None: 6,
+      }
+      selectStatusMenuOption(optionsIndexes.CustomTwo)
+
+      const getJsonStub = sinon.stub($, 'getJSON').callsFake((_url, _data, successCallback) => {
+        successCallback(responseRefreshRequest)
+
+        moxios.uninstall()
+        getJsonStub.restore()
+        const pill = $('.submission-custom-grade-status-pill-2')
+        ok(pill.is(':visible'))
+        ok(pill.text().includes('Custom Status Two'))
       })
     })
 

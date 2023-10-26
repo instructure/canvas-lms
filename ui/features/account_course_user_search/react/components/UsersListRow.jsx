@@ -35,9 +35,13 @@ import CreateOrUpdateUserModal from './CreateOrUpdateUserModal'
 import UserLink from './UserLink'
 import {TempEnrollModal} from '@canvas/temporary-enrollment/react/TempEnrollModal'
 import {fetchTemporaryEnrollments} from '@canvas/temporary-enrollment/react/api/enrollment'
-import {PROVIDER, RECIPIENT} from '@canvas/temporary-enrollment/react/types'
+import {MODULE_NAME, PROVIDER, RECIPIENT} from '@canvas/temporary-enrollment/react/types'
+import {createAnalyticPropsGenerator} from '@canvas/temporary-enrollment/react/util/analytics'
 
 const I18n = useI18nScope('account_course_user_search')
+
+// initialize analytics props
+const analyticProps = createAnalyticPropsGenerator(MODULE_NAME)
 
 /**
  * Generate an appropriate icon based on the user’s role
@@ -129,6 +133,12 @@ export default function UsersListRow({
     designer: permissions.can_add_observer || permissions.can_manage_admin_users,
   }
 
+  const tempEnrollPermissions = {
+    canEdit: permissions.can_edit_temporary_enrollments,
+    canAdd: permissions.can_add_temporary_enrollments,
+    canDelete: permissions.can_delete_temporary_enrollments,
+  }
+
   useEffect(() => {
     const fetchAllEnrollments = async () => {
       try {
@@ -147,8 +157,10 @@ export default function UsersListRow({
       }
     }
 
-    fetchAllEnrollments()
-  }, [user.id])
+    if (canTempEnroll) {
+      fetchAllEnrollments()
+    }
+  }, [user.id, canTempEnroll])
 
   // render temporary enrollment modal, tooltip, and icon
   function renderTempEnrollModal(
@@ -172,9 +184,11 @@ export default function UsersListRow({
         tempEnrollments={tempEnrollments}
         isEditMode={editModeStatus}
         onToggleEditMode={toggleOrSetEditModeFunction}
+        tempEnrollPermissions={tempEnrollPermissions}
       >
         <Tooltip data-testid="user-list-row-tooltip" renderTip={tooltipText}>
           <IconButton
+            {...analyticProps(icon.type.displayName)}
             withBorder={false}
             withBackground={false}
             size="small"
