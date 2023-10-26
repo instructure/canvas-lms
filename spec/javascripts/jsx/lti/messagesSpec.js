@@ -114,6 +114,36 @@ QUnit.module('Messages', suiteHooks => {
     equal(iframe.height(), finalHeight)
   })
 
+  test('finds and resizes an iframe in embedded RCE iframes', async () => {
+    ltiToolWrapperFixture.append(`
+      <div>
+        <h1 class="page-title">LTI resize test</h1>
+        <div class="tox-tinymce">
+          <iframe src="about:blank" />
+        </div>
+      </div>
+    `)
+    const iframeDoc = $('iframe')[0].contentWindow.document;
+    iframeDoc.open();
+    iframeDoc.write(`
+      <html>
+        <body>
+          <div>
+            <iframe style="width: 100%; height: ${intialHeight}px;" src="https://canvas.example.com/courses/4/external_tools/retrieve?display=borderless" width="100%" height="${intialHeight}px" allowfullscreen="allowfullscreen" webkitallowfullscreen="webkitallowfullscreen" mozallowfullscreen="mozallowfullscreen"></iframe>
+          </div>
+        </body>
+      </html>
+    `)
+    iframeDoc.close();
+    const innerIframe = $('iframe', iframeDoc)
+
+    equal(innerIframe.height(), 100)
+    await ltiMessageHandler(postMessageEvent(resizeMessage, innerIframe[0].contentWindow))
+    equal(innerIframe.height(), finalHeight)
+  })
+
+
+
   test('returns the height and width of the page along with the iframe offset', async () => {
     ltiToolWrapperFixture.append(`
       <div>

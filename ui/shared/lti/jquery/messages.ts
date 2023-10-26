@@ -80,11 +80,7 @@ const SUBJECT_IGNORE_LIST = [
   'defaultToolContentReady',
 ] as const
 
-const UNSUPPORTED_IN_RCE = [
-  'lti.frameResize',
-  'lti.enableScrollEvents',
-  'lti.scrollToTop'
-] as const
+const UNSUPPORTED_IN_RCE = ['lti.enableScrollEvents', 'lti.scrollToTop'] as const
 
 const isObject = (u: unknown): u is object => {
   return typeof u === 'object'
