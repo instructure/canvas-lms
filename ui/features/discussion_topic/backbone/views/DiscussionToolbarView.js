@@ -64,25 +64,27 @@ export default class DiscussionToolbarView extends View {
   }
 
   afterRender() {
-    ReactDOM.render(
-      // eslint-disable-next-line react/jsx-filename-extension
-      <TextInput
-        onChange={e => {
-          // Sends events to hidden input to utilize backbone
-          const hiddenInput = $('#discussion-search')
-          hiddenInput[0].value = e.target?.value
-          hiddenInput.keyup()
-        }}
-        display="inline-block"
-        type="text"
-        placeholder={I18n.t('Search entries or author')}
-        aria-label={I18n.t(
-          'Search entries or author. As you type in this field, the list of discussion entries be automatically filtered to only include those whose message or author match your input.'
-        )}
-        renderBeforeInput={() => <IconSearchLine />}
-      />,
-      this.$el.find('#search_entries_container')[0]
-    )
+    if (this.$el.find('#search_entries_container')[0]) {
+      ReactDOM.render(
+        // eslint-disable-next-line react/jsx-filename-extension
+        <TextInput
+          onChange={e => {
+            // Sends events to hidden input to utilize backbone
+            const hiddenInput = $('#discussion-search')
+            hiddenInput[0].value = e.target?.value
+            hiddenInput.keyup()
+          }}
+          display="inline-block"
+          type="text"
+          placeholder={I18n.t('Search entries or author')}
+          aria-label={I18n.t(
+            'Search entries or author. As you type in this field, the list of discussion entries be automatically filtered to only include those whose message or author match your input.'
+          )}
+          renderBeforeInput={() => <IconSearchLine />}
+        />,
+        this.$el.find('#search_entries_container')[0]
+      )
+    }
     this.$unread.button()
     return this.$deleted.button()
   }
