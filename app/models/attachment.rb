@@ -1452,6 +1452,8 @@ class Attachment < ActiveRecord::Base
       context&.grants_right?(user, session, :read_as_member) || context.try(:unenrolled_user_can_read?, user, computed_visibility_level)
     elsif context.is_a?(Assignment)
       can_read_through_assignment?(user, session)
+    elsif context.is_a?(Quizzes::Quiz)
+      (user && user.id == user_id) || quiz&.grants_right?(user, session, :grade)
     else
       context&.grants_right?(user, session, :read)
     end
