@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import ReleaseNotesList from '../ReleaseNotesList'
+import ReleaseNotesList from '../lists/ReleaseNotesList'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 import useFetchApi from '@canvas/use-fetch-api-hook'
 import doFetchApi from '@canvas/do-fetch-api-effect'

@@ -17,7 +17,6 @@
  */
 
 import React, {useState} from 'react'
-import {bool, func} from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import useFetchApi from '@canvas/use-fetch-api-hook'
 import doFetchApi from '@canvas/do-fetch-api-effect'
@@ -35,7 +34,7 @@ import {IconWarningSolid} from '@instructure/ui-icons'
 
 const I18n = useI18nScope('Navigation')
 
-function persistBadgeDisabled(state) {
+function persistBadgeDisabled(state: boolean) {
   doFetchApi({
     path: '/api/v1/users/self/settings',
     method: 'PUT',
@@ -43,12 +42,28 @@ function persistBadgeDisabled(state) {
   })
 }
 
-function ReleaseNotesList({badgeDisabled, setBadgeDisabled, forceUnreadPoll}) {
+type Props = {
+  badgeDisabled: boolean
+  setBadgeDisabled: (state: boolean) => void
+  forceUnreadPoll: (state: number) => void
+}
+
+type ReleaseNote = {
+  id: number
+  title: string
+  description: string
+  date: string
+  url: string
+  new: boolean
+}
+
+function ReleaseNotesList({badgeDisabled, setBadgeDisabled, forceUnreadPoll}: Props) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
-  const [releaseNotes, setReleaseNotes] = useState([])
+  const [releaseNotes, setReleaseNotes] = useState<ReleaseNote[]>([])
   const dateFormatter = useDateTimeFormat('date.formats.short')
 
+  // @ts-expect-error
   useFetchApi({
     success: setReleaseNotes,
     loading: setLoading,
@@ -71,7 +86,7 @@ function ReleaseNotesList({badgeDisabled, setBadgeDisabled, forceUnreadPoll}) {
     return null
   }
 
-  function updateBadgeDisabled(state) {
+  function updateBadgeDisabled(state: boolean) {
     persistBadgeDisabled(state)
     setBadgeDisabled(state)
   }
@@ -136,12 +151,6 @@ function ReleaseNotesList({badgeDisabled, setBadgeDisabled, forceUnreadPoll}) {
       />
     </View>
   )
-}
-
-ReleaseNotesList.propTypes = {
-  badgeDisabled: bool,
-  setBadgeDisabled: func,
-  forceUnreadPoll: func,
 }
 
 export default ReleaseNotesList

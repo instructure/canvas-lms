@@ -15,43 +15,25 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react'
-import {render, waitFor} from '@testing-library/react'
+import {render as testingLibraryRender, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import MobileNavigation from '../MobileNavigation'
+import {QueryProvider, queryClient} from '@canvas/query'
+
+const render = children => testingLibraryRender(<QueryProvider>{children}</QueryProvider>)
 
 describe('MobileNavigation', () => {
-  function navComponent() {
-    return {
-      ensureLoaded: () => {},
-      state: {
-        unreadInboxCount: 4242,
-        unreadSharesCount: 1234,
-        accountsAreLoaded: true,
-        accounts: [{id: '1', name: 'account'}],
-        coursesAreLoaded: true,
-        courses: [{id: '1', name: 'course', enrollment_term_id: 2, term: {name: 'term'}}],
-        groupsAreLoaded: true,
-        groups: [{id: '1', name: 'group'}],
-        profileAreLoaded: true,
-        profile: [{id: '1', html_url: '/foo', label: 'foo'}],
-        helpAreLoaded: false,
-        help: [],
-        historyAreLoaded: false,
-      },
-    }
-  }
-
   it('renders the inbox badge based on incoming state', async () => {
-    const nav = navComponent()
+    queryClient.setQueryData(['unread_count', 'conversations'], 123)
     const hamburgerMenu = document.createElement('div')
     hamburgerMenu.setAttribute('class', 'mobile-header-hamburger')
     document.body.appendChild(hamburgerMenu)
-    const {findByText, queryByText} = render(<MobileNavigation DesktopNavComponent={nav} />)
+    const {findByText, queryByText} = render(<MobileNavigation />)
     userEvent.click(hamburgerMenu)
     await waitFor(() => {
       expect(queryByText('Loading ...')).not.toBeInTheDocument()
     })
-    const count = await findByText(nav.state.unreadInboxCount.toString())
+    const count = await findByText('123')
     expect(count).toBeInTheDocument()
   })
 })

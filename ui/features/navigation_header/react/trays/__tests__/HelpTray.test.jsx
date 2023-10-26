@@ -17,11 +17,13 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render as testingLibraryRender} from '@testing-library/react'
 import HelpTray from '../HelpTray'
+import {QueryProvider, queryClient} from '@canvas/query'
+
+const render = children => testingLibraryRender(<QueryProvider>{children}</QueryProvider>)
 
 describe('HelpTray', () => {
-  const trayTitle = 'Halp'
   const links = [
     {
       text: 'Search the Canvas Guides',
@@ -40,9 +42,6 @@ describe('HelpTray', () => {
   ]
 
   const props = {
-    trayTitle,
-    links,
-    hasLoaded: true,
     closeTray: jest.fn(),
   }
 
@@ -54,19 +53,14 @@ describe('HelpTray', () => {
     window.ENV = {}
   })
 
-  it('renders loading spinner', () => {
-    const {getByTitle, queryByText} = render(<HelpTray {...props} hasLoaded={false} />)
-    getByTitle('Loading')
-    expect(queryByText('Search the Canvas Guides')).toBeNull()
-    expect(queryByText('Report a Problem')).toBeNull()
-  })
-
   it('renders title header', () => {
+    window.ENV.help_link_name = 'Halp'
     const {getByText} = render(<HelpTray {...props} />)
     expect(getByText('Halp')).toBeVisible()
   })
 
   it('renders help dialog links', () => {
+    queryClient.setQueryData(['helpLinks'], links)
     const {getByText} = render(<HelpTray {...props} />)
     getByText('Search the Canvas Guides')
     getByText('Report a Problem')

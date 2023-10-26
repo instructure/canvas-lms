@@ -29,6 +29,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import accountGradingSettingsRoutes from '../../features/account_grading_settings/routes/accountGradingSettingsRoutes'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {QueryProvider} from '@canvas/query'
+import {localStorage} from '@canvas/storage'
 
 const I18n = useI18nScope('main')
 

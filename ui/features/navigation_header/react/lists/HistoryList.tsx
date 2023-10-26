@@ -25,24 +25,28 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import _ from 'lodash'
 import {formatTimeAgoDate, formatTimeAgoTitle} from '@canvas/enhanced-user-content'
-import type {HistoryEntry} from '../../../api.d'
+import {useQuery} from '@tanstack/react-query'
+import historyQuery from '../queries/historyQuery'
 
 const I18n = useI18nScope('new_nav')
 
-HistoryList.defaultProps = {
-  history: [],
-}
+export default function HistoryList() {
+  const {data, isLoading, isSuccess} = useQuery({
+    queryKey: ['history'],
+    queryFn: historyQuery,
+  })
 
-type Props = {
-  history: HistoryEntry[]
-  hasLoaded: boolean
-}
+  const uniqueHistoryEntries = _.uniqBy(data, entry => entry.asset_code)
 
-export default function HistoryList({hasLoaded, history}: Props) {
   return (
     <List isUnstyled={true} margin="small 0" itemSpacing="small">
-      {hasLoaded ? (
-        _.uniqBy(history, entry => entry.asset_code).map(entry => (
+      {isLoading && (
+        <List.Item>
+          <Spinner size="small" renderTitle={I18n.t('Loading')} />
+        </List.Item>
+      )}
+      {isSuccess &&
+        uniqueHistoryEntries.map(entry => (
           <List.Item key={entry.asset_code}>
             <Flex>
               <Flex.Item align="start" padding="none x-small none none">
@@ -72,12 +76,7 @@ export default function HistoryList({hasLoaded, history}: Props) {
               </Flex.Item>
             </Flex>
           </List.Item>
-        ))
-      ) : (
-        <List.Item>
-          <Spinner size="small" renderTitle={I18n.t('Loading')} />
-        </List.Item>
-      )}
+        ))}
     </List>
   )
 }

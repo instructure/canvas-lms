@@ -34,16 +34,7 @@ const I18n = useI18nScope('MobileNavigation')
 const MobileContextMenu = React.lazy(() => import('./MobileContextMenu'))
 const MobileGlobalMenu = React.lazy(() => import('./MobileGlobalMenu'))
 
-interface DesktopNavComponentProp {
-  ensureLoaded: () => void
-  state: object
-}
-
-type MobileNavigationProps = {
-  DesktopNavComponent: DesktopNavComponentProp
-}
-
-const MobileNavigation: React.FC<MobileNavigationProps> = ({DesktopNavComponent}) => {
+const MobileNavigation = () => {
   const [globalNavIsOpen, setGlobalNavIsOpen] = useState(false)
   const contextNavIsOpen = useRef(false)
 
@@ -93,11 +84,7 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({DesktopNavComponent}
         >
           {globalNavIsOpen && (
             <React.Suspense fallback={spinner}>
-              <MobileGlobalMenu
-                // @ts-expect-error
-                DesktopNavComponent={DesktopNavComponent}
-                onDismiss={() => setGlobalNavIsOpen(false)}
-              />
+              <MobileGlobalMenu onDismiss={() => setGlobalNavIsOpen(false)} />
             </React.Suspense>
           )}
         </Tray>

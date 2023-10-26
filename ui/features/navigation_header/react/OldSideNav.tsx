@@ -200,9 +200,11 @@ export default class Navigation extends React.Component<Props, State> {
       groups: [],
       groupsAreLoaded: false,
       groupsLoading: false,
+      // eslint-disable-next-line react/no-unused-state
       help: [],
       helpAreLoaded: false,
       helpLoading: false,
+      // eslint-disable-next-line react/no-unused-state
       history: [],
       historyAreLoaded: false,
       historyLoading: false,
@@ -406,26 +408,6 @@ export default class Navigation extends React.Component<Props, State> {
             this.props.onDataReceived
           )
           break
-        case 'history':
-          this.setState(
-            {
-              history: newData,
-              historyLoading: false,
-              historyAreLoaded: true,
-            },
-            this.props.onDataReceived
-          )
-          break
-        case 'help':
-          this.setState(
-            {
-              help: newData,
-              helpLoading: false,
-              helpAreLoaded: true,
-            },
-            this.props.onDataReceived
-          )
-          break
       }
     })
   }
@@ -517,13 +499,10 @@ export default class Navigation extends React.Component<Props, State> {
           />
         )
       case 'history':
-        return <HistoryTray history={this.state.history} hasLoaded={this.state.historyAreLoaded} />
+        return <HistoryTray />
       case 'help':
         return (
           <HelpTray
-            trayTitle={window.ENV.help_link_name}
-            links={this.state.help}
-            hasLoaded={this.state.helpAreLoaded}
             closeTray={this.closeTray}
             showNotes={ENV.FEATURES.embedded_release_notes}
             badgeDisabled={this.state.releaseNotesBadgeDisabled}

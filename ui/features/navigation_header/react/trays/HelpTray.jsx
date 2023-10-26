@@ -18,19 +18,16 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
-import {bool, array, func, string} from 'prop-types'
+import {bool, func} from 'prop-types'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import HelpDialog from '../HelpDialog/index'
-import ReleaseNotesList from '../ReleaseNotesList'
+import ReleaseNotesList from '../lists/ReleaseNotesList'
 
 const I18n = useI18nScope('HelpTray')
 
 export default function HelpTray({
-  trayTitle,
   closeTray,
-  links,
-  hasLoaded,
   showNotes,
   badgeDisabled,
   setBadgeDisabled,
@@ -39,10 +36,10 @@ export default function HelpTray({
   return (
     <View as="div" padding="medium" id="help_tray">
       <Heading level="h3" as="h2">
-        {trayTitle}
+        {window.ENV.help_link_name || I18n.t('Help')}
       </Heading>
       <hr role="presentation" />
-      <HelpDialog links={links} hasLoaded={hasLoaded} onFormSubmit={closeTray} />
+      <HelpDialog onFormSubmit={closeTray} />
       {showNotes ? (
         <ReleaseNotesList
           badgeDisabled={badgeDisabled}
@@ -55,20 +52,9 @@ export default function HelpTray({
 }
 
 HelpTray.propTypes = {
-  trayTitle: string,
   closeTray: func.isRequired,
-  links: array,
-  hasLoaded: bool,
   showNotes: bool,
   badgeDisabled: bool,
   setBadgeDisabled: func,
   forceUnreadPoll: func,
-}
-
-HelpTray.defaultProps = {
-  get trayTitle() {
-    return I18n.t('Help')
-  },
-  hasLoaded: false,
-  links: [],
 }
