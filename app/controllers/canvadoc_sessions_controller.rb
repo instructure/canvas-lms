@@ -138,6 +138,18 @@ class CanvadocSessionsController < ApplicationController
         opts[:preferred_plugins].unshift Canvadocs::RENDER_O365
       end
 
+      if blob["annotation_context"]
+        annotation_context_id = if ApplicationController.test_cluster?
+                                  # since Canvas test environments are often configured to point at production
+                                  # DocViewer environments, this prevents making an annotation on Canavs beta and
+                                  # having it show up on Canvas prod.  See CAS-1551
+                                  # TODO: a proper Canvas/DocViewer environment pairing and beta refresh from prod on DocViewer
+                                  blob["annotation_context"] + "-#{ApplicationController.test_cluster_name}"
+                                else
+                                  blob["annotation_context"]
+                                end
+        opts[:annotation_context] = annotation_context_id
+      end
       attachment.submit_to_canvadocs(1, **opts) unless attachment.canvadoc_available?
 
       url = attachment.canvadoc.session_url(opts.merge(user_session_params))
