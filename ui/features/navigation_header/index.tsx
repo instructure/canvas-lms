@@ -24,6 +24,7 @@ import Navigation from './react/OldSideNav'
 import MobileNavigation from './react/MobileNavigation'
 import ready from '@instructure/ready'
 import NewTabIndicator from './react/NewTabIndicator'
+import {QueryProvider} from '@canvas/query'
 
 const I18n = useI18nScope('common')
 
@@ -60,22 +61,22 @@ ready(() => {
     const mobileNavComponent = React.createRef()
 
     ReactDOM.render(
-      <Navigation
-        // @ts-expect-error
-        ref={DesktopNavComponent}
-        // @ts-expect-error
-        onDataReceived={() => mobileNavComponent.current?.forceUpdate()}
-      />,
+      <QueryProvider>
+        <Navigation
+          // @ts-expect-error
+          ref={DesktopNavComponent}
+          // @ts-expect-error
+          onDataReceived={() => mobileNavComponent.current?.forceUpdate()}
+        />
+      </QueryProvider>,
       globalNavTrayContainer,
       () => {
         const mobileContextNavContainer = document.getElementById('mobileContextNavContainer')
         if (mobileContextNavContainer) {
           ReactDOM.render(
-            <MobileNavigation
-              ref={mobileNavComponent}
-              // @ts-expect-error
-              DesktopNavComponent={DesktopNavComponent.current}
-            />,
+            <QueryProvider>
+              <MobileNavigation />
+            </QueryProvider>,
             mobileContextNavContainer
           )
         }

@@ -28,17 +28,24 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
 import tourPubSub from '@canvas/tour-pubsub'
+import {useQuery} from '@tanstack/react-query'
+import helpLinksQuery from '../queries/helpLinksQuery'
 import type {HelpLink} from '../../../../api.d'
 
 const I18n = useI18nScope('HelpLinks')
 
 type Props = {
-  links: HelpLink[]
-  hasLoaded: boolean
   onClick: (url: string) => void
 }
 
-export default function HelpLinks({links, hasLoaded, onClick}: Props) {
+export default function HelpLinks({onClick}: Props) {
+  const {data, isLoading, isSuccess} = useQuery<HelpLink[]>({
+    queryKey: ['helpLinks'],
+    queryFn: helpLinksQuery,
+  })
+
+  const links = data || []
+
   const featuredLink = links.find(link => link.is_featured)
   const featuredLinksEnabled = window.ENV.FEATURES.featured_help_links
   const nonFeaturedLinks = featuredLinksEnabled ? links.filter(link => !link.is_featured) : links
@@ -55,95 +62,98 @@ export default function HelpLinks({links, hasLoaded, onClick}: Props) {
     }
   }
 
-  return !hasLoaded ? (
-    <Spinner size="small" renderTitle={I18n.t('Loading')} />
-  ) : (
-    <View>
-      <FeaturedHelpLink featuredLink={featuredLink} handleClick={handleClick} />
-      {showSeparator && (
-        <View display="block" margin="medium 0 0">
-          <Text weight="bold" transform="uppercase" size="small" lineHeight="double">
-            {I18n.t('OTHER RESOURCES')}
-          </Text>
-          <hr role="presentation" style={{marginTop: '0'}} />
-        </View>
-      )}
-      <List isUnstyled={true} margin="small 0" itemSpacing="small">
-        {nonFeaturedLinks
-          .map(link => {
-            const has_new_tag = link.is_new && featuredLinksEnabled
-            return (
-              <List.Item key={`link-${link.id}`}>
-                <Flex justifyItems="space-between" alignItems="center">
-                  <Flex.Item size={has_new_tag ? '80%' : '100%'}>
-                    <span
-                      role="presentation"
-                      onClick={handleClick(link)}
-                      // @ts-expect-error
-                      onKeyPress={handleClick(link)}
-                    >
-                      <Link isWithinText={false} href={link.url} target="_blank" rel="noopener">
-                        {link.text || ''}
+  if (isSuccess) {
+    return (
+      <View>
+        <FeaturedHelpLink featuredLink={featuredLink} handleClick={handleClick} />
+        {showSeparator && (
+          <View display="block" margin="medium 0 0">
+            <Text weight="bold" transform="uppercase" size="small" lineHeight="double">
+              {I18n.t('OTHER RESOURCES')}
+            </Text>
+            <hr role="presentation" style={{marginTop: '0'}} />
+          </View>
+        )}
+        <List isUnstyled={true} margin="small 0" itemSpacing="small">
+          {nonFeaturedLinks
+            .map(link => {
+              const has_new_tag = link.is_new && featuredLinksEnabled
+              return (
+                <List.Item key={`link-${link.id}`}>
+                  <Flex justifyItems="space-between" alignItems="center">
+                    <Flex.Item size={has_new_tag ? '80%' : '100%'}>
+                      <span
+                        role="presentation"
+                        onClick={handleClick(link)}
+                        // @ts-expect-error
+                        onKeyPress={handleClick(link)}
+                      >
+                        <Link isWithinText={false} href={link.url} target="_blank" rel="noopener">
+                          {link.text || ''}
+                        </Link>
+                      </span>
+                      {has_new_tag && <ScreenReaderContent>{I18n.t('New')}</ScreenReaderContent>}
+                      {link.subtext && (
+                        <Text as="div" size="small">
+                          {link.subtext}
+                        </Text>
+                      )}
+                    </Flex.Item>
+                    <Flex.Item>
+                      {has_new_tag && (
+                        <PresentationContent>
+                          <Pill color="success">{I18n.t('NEW')}</Pill>
+                        </PresentationContent>
+                      )}
+                    </Flex.Item>
+                  </Flex>
+                </List.Item>
+              )
+            })
+            .concat(
+              // if the current user is a teacher, show a link to
+              // open up the welcome tour
+              // @ts-expect-error
+              window.ENV.FEATURES?.product_tours &&
+                (window.ENV.current_user_types?.includes('AccountAdmin') ||
+                  window.ENV.current_user_roles?.includes('teacher') ||
+                  window.ENV.current_user_roles?.includes('student')) && [
+                  <List.Item key="welcome_tour">
+                    <View className="welcome-tour-link">
+                      <Link isWithinText={false} onClick={() => tourPubSub.publish('tour-open')}>
+                        {I18n.t('Show Welcome Tour')}
                       </Link>
-                    </span>
-                    {has_new_tag && <ScreenReaderContent>{I18n.t('New')}</ScreenReaderContent>}
-                    {link.subtext && (
-                      <Text as="div" size="small">
-                        {link.subtext}
-                      </Text>
-                    )}
-                  </Flex.Item>
-                  <Flex.Item>
-                    {has_new_tag && (
-                      <PresentationContent>
-                        <Pill color="success">{I18n.t('NEW')}</Pill>
-                      </PresentationContent>
-                    )}
-                  </Flex.Item>
-                </Flex>
-              </List.Item>
+                    </View>
+                  </List.Item>,
+                ]
             )
-          })
-          .concat(
-            // if the current user is a teacher, show a link to
-            // open up the welcome tour
-            // @ts-expect-error
-            window.ENV.FEATURES?.product_tours &&
-              (window.ENV.current_user_types?.includes('AccountAdmin') ||
-                window.ENV.current_user_roles?.includes('teacher') ||
-                window.ENV.current_user_roles?.includes('student')) && [
-                <List.Item key="welcome_tour">
-                  <View className="welcome-tour-link">
-                    <Link isWithinText={false} onClick={() => tourPubSub.publish('tour-open')}>
-                      {I18n.t('Show Welcome Tour')}
-                    </Link>
-                  </View>
+            .concat(
+              // if the current user is an admin, show the settings link to
+              // customize this menu
+              // @ts-expect-error
+              window.ENV.current_user_roles?.includes('root_admin') && [
+                <List.Item key="hr">
+                  <hr role="presentation" />
+                </List.Item>,
+                <List.Item key="customize">
+                  <Link
+                    isWithinText={false}
+                    href="/accounts/self/settings#custom_help_link_settings"
+                  >
+                    {I18n.t('Customize this menu')}
+                  </Link>
                 </List.Item>,
               ]
-          )
-          .concat(
-            // if the current user is an admin, show the settings link to
-            // customize this menu
-            // @ts-expect-error
-            window.ENV.current_user_roles?.includes('root_admin') && [
-              <List.Item key="hr">
-                <hr role="presentation" />
-              </List.Item>,
-              <List.Item key="customize">
-                <Link isWithinText={false} href="/accounts/self/settings#custom_help_link_settings">
-                  {I18n.t('Customize this menu')}
-                </Link>
-              </List.Item>,
-            ]
-          )
-          .filter(Boolean)}
-      </List>
-    </View>
-  )
-}
+            )
+            .filter(Boolean)}
+        </List>
+      </View>
+    )
+  }
 
-HelpLinks.defaultProps = {
-  hasLoaded: false,
-  links: [],
-  onClick: () => {},
+  if (isLoading) {
+    return <Spinner size="small" renderTitle={I18n.t('Loading')} />
+  }
+
+  return null
 }

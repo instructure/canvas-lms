@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useEffect} from 'react'
+import React, {useMemo} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Badge} from '@instructure/ui-badge'
@@ -24,7 +24,6 @@ import {Avatar} from '@instructure/ui-avatar'
 import {Text} from '@instructure/ui-text'
 import {List} from '@instructure/ui-list'
 import {Heading} from '@instructure/ui-heading'
-import {Spinner} from '@instructure/ui-spinner'
 import {IconButton} from '@instructure/ui-buttons'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {
@@ -42,93 +41,42 @@ import {
 } from '@instructure/ui-icons'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import HelpDialog from './HelpDialog/index'
-import LogoutButton from './LogoutButton'
-import HighContrastModeToggle from './trays/HighContrastModeToggle'
-import HistoryList from './HistoryList'
 import {Link} from '@instructure/ui-link'
-import type {AccessibleGroup, Course, HelpLink, HistoryEntry, ProfileTab} from '../../../api.d'
+import CoursesList from './lists/CoursesList'
+import GroupsList from './lists/GroupsList'
+import AccountsList from './lists/AccountsList'
+import ProfileTabsList from './lists/ProfileTabsList'
+import HistoryList from './lists/HistoryList'
+import {useQuery} from '@tanstack/react-query'
+import {getUnreadCount} from './queries/unreadCountQuery'
+import {getExternalTools} from './utils'
+import type {ExternalTool} from './utils'
 
 const I18n = useI18nScope('MobileGlobalMenu')
 
-type ActiveTextProps = {
-  url: string
-  children: React.ReactNode
-}
-
-const ActiveText: React.FC<ActiveTextProps> = ({children, url}) => {
-  return window.location.pathname.startsWith(url) ? (
-    <Text weight="bold">{children}</Text>
-  ) : (
-    <>{children}</>
-  )
-}
-
-type CommonProperties = {
-  href: string | null | undefined
-  isActive: boolean
-  label: string
-}
-
-type SvgTool = CommonProperties & {svgPath: string}
-type ImgTool = CommonProperties & {imgSrc: string}
-
-type ExternalTool = SvgTool | ImgTool
-
 type Props = {
-  current_user: {
-    display_name: string
-    avatar_image_url: string
-  }
-  DesktopNavComponent: {
-    ensureLoaded: (type: string) => void
-    state: {
-      courses: Course[]
-      profileAreLoaded: boolean
-      profile: ProfileTab[]
-      accountsAreLoaded: boolean
-      accounts: {id: string; name: string}[]
-      coursesAreLoaded: boolean
-      groupsAreLoaded: boolean
-      groups: AccessibleGroup[]
-      historyAreLoaded: boolean
-      history: HistoryEntry[]
-      helpAreLoaded: boolean
-      help: HelpLink[]
-      unreadInboxCount: number
-    }
-  }
   onDismiss: () => void
-  k5User: boolean
-  isStudent: boolean
 }
 
 export default function MobileGlobalMenu(props: Props) {
-  const [externalTools, setExternalTools] = useState<ExternalTool[]>([])
-  const [showGroups, setShowGroups] = useState(false)
+  const externalTools = useMemo<ExternalTool[]>(() => getExternalTools(), [])
+  const showGroups = useMemo(() => Boolean(document.getElementById('global_nav_groups_link')), [])
+  const countsEnabled = Boolean(
+    window.ENV.current_user_id && !window.ENV.current_user?.fake_student
+  )
+  const k5User = window.ENV.K5_USER
+  const showAdmin = window.ENV.current_user_roles && window.ENV.current_user_roles.includes('admin')
+  const current_user: {
+    display_name: string
+    avatar_image_url: string
+  } = window.ENV.current_user
 
-  useEffect(() => {
-    // this is all the stuff that relies on the DOM of the desktop global nav
-    const newExternalTools: ExternalTool[] = Array.from(
-      document.querySelectorAll('.globalNavExternalTool')
-    ).map(el => {
-      const svg = el.querySelector('svg')
-      return {
-        href: el.querySelector('a')?.getAttribute('href'),
-        isActive: el.classList.contains('ic-app-header__menu-list-item--active'),
-        label: (el.querySelector('.menu-item__text') as HTMLDivElement)?.innerText || '',
-        ...(svg
-          ? {svgPath: svg.innerHTML}
-          : {imgSrc: (el.querySelector('img') as HTMLImageElement)?.getAttribute('src') || ''}),
-      }
-    })
-    setExternalTools(newExternalTools)
-    setShowGroups(Boolean(document.getElementById('global_nav_groups_link')))
-  }, [])
-
-  const courses =
-    props.k5User && props.isStudent
-      ? props.DesktopNavComponent.state.courses.filter((c: Course) => !c.homeroom_course)
-      : props.DesktopNavComponent.state.courses
+  const {data: unreadConversationsCount, isSuccess: unreadConversationsCountHasLoaded} = useQuery({
+    queryKey: ['unread_count', 'conversations'],
+    queryFn: getUnreadCount,
+    staleTime: 2 * 60 * 1000, // two minutes
+    enabled: countsEnabled && !ENV.current_user_disabled_inbox,
+  })
 
   return (
     <View
@@ -152,7 +100,7 @@ export default function MobileGlobalMenu(props: Props) {
           <Heading>
             <a className="ic-brand-mobile-global-nav-logo" href="/">
               <span className="screenreader-only">
-                {props.k5User ? I18n.t('Home') : I18n.t('My Dashboard')}
+                {k5User ? I18n.t('Home') : I18n.t('My Dashboard')}
               </span>
             </a>
           </Heading>
@@ -163,34 +111,30 @@ export default function MobileGlobalMenu(props: Props) {
           <Link href="/" isWithinText={false} display="block">
             <Flex>
               <Flex.Item width="3rem">
-                {props.k5User ? (
+                {k5User ? (
                   <IconHomeLine inline={false} size="small" />
                 ) : (
                   <IconDashboardLine inline={false} size="small" />
                 )}
               </Flex.Item>
               <Flex.Item>
-                <Text size="medium">{props.k5User ? I18n.t('Home') : I18n.t('Dashboard')}</Text>
+                <Text size="medium">{k5User ? I18n.t('Home') : I18n.t('Dashboard')}</Text>
               </Flex.Item>
             </Flex>
           </Link>
         </List.Item>
+
         <List.Item>
-          {props.current_user && Object.keys(props.current_user).length > 0 ? (
+          {current_user && Object.keys(current_user).length > 0 ? (
             <ToggleDetails
               iconPosition="end"
               fluidWidth={true}
-              onToggle={(_e, isExpanded: boolean) => {
-                if (isExpanded) {
-                  props.DesktopNavComponent.ensureLoaded('profile')
-                }
-              }}
               summary={
                 <Flex padding="xx-small small">
                   <Flex.Item width="3rem">
                     <Avatar
-                      name={props.current_user.display_name}
-                      src={props.current_user.avatar_image_url}
+                      name={current_user.display_name}
+                      src={current_user.avatar_image_url}
                       size="x-small"
                       data-fs-exclude={true}
                     />
@@ -201,27 +145,7 @@ export default function MobileGlobalMenu(props: Props) {
                 </Flex>
               }
             >
-              <List isUnstyled={true} itemSpacing="small" margin="0 0 0 x-large">
-                {props.DesktopNavComponent.state.profileAreLoaded ? (
-                  props.DesktopNavComponent.state.profile.map(tab => (
-                    <List.Item key={tab.id}>
-                      <Link href={tab.html_url} isWithinText={false} display="block">
-                        <ActiveText url={tab.html_url}>{tab.label}</ActiveText>
-                      </Link>
-                    </List.Item>
-                  ))
-                ) : (
-                  <List.Item>
-                    <Spinner margin="auto" size="small" renderTitle={I18n.t('Loading')} />
-                  </List.Item>
-                )}
-                <List.Item>
-                  <LogoutButton />
-                </List.Item>
-                <List.Item>
-                  <HighContrastModeToggle isMobile={true} />
-                </List.Item>
-              </List>
+              <ProfileTabsList />
             </ToggleDetails>
           ) : (
             <Link href="/login" isWithinText={false} display="block">
@@ -237,16 +161,11 @@ export default function MobileGlobalMenu(props: Props) {
           )}
         </List.Item>
 
-        {window.ENV.current_user_roles && window.ENV.current_user_roles.includes('admin') && (
+        {showAdmin && (
           <List.Item>
             <ToggleDetails
               iconPosition="end"
               fluidWidth={true}
-              onToggle={(_e, isExpanded: boolean) => {
-                if (isExpanded) {
-                  props.DesktopNavComponent.ensureLoaded('accounts')
-                }
-              }}
               summary={
                 <Flex padding="xx-small small">
                   <Flex.Item width="3rem">
@@ -258,100 +177,35 @@ export default function MobileGlobalMenu(props: Props) {
                 </Flex>
               }
             >
-              <List isUnstyled={true} itemSpacing="small" margin="0 0 0 x-large">
-                {props.DesktopNavComponent.state.accountsAreLoaded ? (
-                  props.DesktopNavComponent.state.accounts
-                    .map(account => (
-                      <List.Item key={account.id}>
-                        <Link href={`/accounts/${account.id}`} isWithinText={false} display="block">
-                          <ActiveText url={`/accounts/${account.id}`}>{account.name}</ActiveText>
-                        </Link>
-                      </List.Item>
-                    ))
-                    .concat([
-                      <List.Item key="all">
-                        <Link href="/accounts" isWithinText={false} display="block">
-                          {I18n.t('All Accounts')}
-                        </Link>
-                      </List.Item>,
-                    ])
-                ) : (
-                  <List.Item>
-                    <Spinner size="small" renderTitle={I18n.t('Loading')} />
-                  </List.Item>
-                )}
-              </List>
+              <AccountsList />
             </ToggleDetails>
           </List.Item>
         )}
+
         <List.Item>
           <ToggleDetails
             iconPosition="end"
             fluidWidth={true}
-            onToggle={(_e, isExpanded: boolean) => {
-              if (isExpanded) {
-                props.DesktopNavComponent.ensureLoaded('courses')
-              }
-            }}
             summary={
               <Flex padding="xx-small small">
                 <Flex.Item width="3rem">
                   <IconCoursesLine inline={false} size="small" color="brand" />
                 </Flex.Item>
                 <Flex.Item>
-                  <Text color="brand">{props.k5User ? I18n.t('Subjects') : I18n.t('Courses')}</Text>
+                  <Text color="brand">{k5User ? I18n.t('Subjects') : I18n.t('Courses')}</Text>
                 </Flex.Item>
               </Flex>
             }
           >
-            <List isUnstyled={true} itemSpacing="small" margin="0 0 0 x-large">
-              {props.DesktopNavComponent.state.coursesAreLoaded ? (
-                courses
-                  .map(course => (
-                    <List.Item key={course.id}>
-                      <Link href={`/courses/${course.id}`} isWithinText={false} display="block">
-                        <ActiveText url={`/courses/${course.id}`}>
-                          {course.name}
-                          {course.enrollment_term_id > 1 && (
-                            <Text as="div" size="x-small" weight="light">
-                              {course.term.name}
-                            </Text>
-                          )}
-                        </ActiveText>
-                      </Link>
-                    </List.Item>
-                  ))
-                  .concat([
-                    <List.Item key="all">
-                      <Link
-                        href="/courses"
-                        isWithinText={false}
-                        display="block"
-                        // @ts-expect-error
-                        textAlign="start"
-                      >
-                        {props.k5User ? I18n.t('All Subjects') : I18n.t('All Courses')}
-                      </Link>
-                    </List.Item>,
-                  ])
-              ) : (
-                <List.Item>
-                  <Spinner size="small" renderTitle={I18n.t('Loading')} />
-                </List.Item>
-              )}
-            </List>
+            <CoursesList />
           </ToggleDetails>
         </List.Item>
+
         {showGroups && (
           <List.Item>
             <ToggleDetails
               iconPosition="end"
               fluidWidth={true}
-              onToggle={(_e, isExpanded: boolean) => {
-                if (isExpanded) {
-                  props.DesktopNavComponent.ensureLoaded('groups')
-                }
-              }}
               summary={
                 <Flex padding="xx-small small">
                   <Flex.Item width="3rem">
@@ -363,42 +217,11 @@ export default function MobileGlobalMenu(props: Props) {
                 </Flex>
               }
             >
-              <List isUnstyled={true} itemSpacing="small" margin="0 0 0 x-large">
-                {props.DesktopNavComponent.state.groupsAreLoaded ? (
-                  props.DesktopNavComponent.state.groups
-                    .map(group => (
-                      <List.Item key={group.id}>
-                        <Link
-                          margin="0 0 0 xx-small"
-                          href={`/groups/${group.id}`}
-                          isWithinText={false}
-                          display="block"
-                        >
-                          <ActiveText url={`/groups/${group.id}`}>{group.name}</ActiveText>
-                        </Link>
-                      </List.Item>
-                    ))
-                    .concat([
-                      <List.Item key="all">
-                        <Link
-                          margin="0 0 0 xx-small"
-                          href="/groups"
-                          isWithinText={false}
-                          display="block"
-                        >
-                          {I18n.t('All Groups')}
-                        </Link>
-                      </List.Item>,
-                    ])
-                ) : (
-                  <List.Item>
-                    <Spinner size="small" renderTitle={I18n.t('Loading')} />
-                  </List.Item>
-                )}
-              </List>
+              <GroupsList />
             </ToggleDetails>
           </List.Item>
         )}
+
         <List.Item>
           <Link href="/calendar" isWithinText={false} display="block">
             <Flex>
@@ -411,6 +234,7 @@ export default function MobileGlobalMenu(props: Props) {
             </Flex>
           </Link>
         </List.Item>
+
         <List.Item>
           <Link href="/inbox" isWithinText={false} display="block">
             <Flex>
@@ -419,17 +243,14 @@ export default function MobileGlobalMenu(props: Props) {
               </Flex.Item>
               <Flex.Item>
                 <Text size="medium">{I18n.t('Inbox')}</Text>
-                {!!props.DesktopNavComponent.state.unreadInboxCount && (
-                  <Badge
-                    standalone={true}
-                    margin="0 small"
-                    count={props.DesktopNavComponent.state.unreadInboxCount}
-                  />
+                {unreadConversationsCountHasLoaded && unreadConversationsCount > 0 && (
+                  <Badge standalone={true} margin="0 small" count={unreadConversationsCount} />
                 )}
               </Flex.Item>
             </Flex>
           </Link>
         </List.Item>
+
         {externalTools.map(tool => (
           <List.Item key={tool.href}>
             <Link href={tool.href || ''} isWithinText={false} display="block">
@@ -465,11 +286,6 @@ export default function MobileGlobalMenu(props: Props) {
           <ToggleDetails
             iconPosition="end"
             fluidWidth={true}
-            onToggle={(_e, isExpanded: boolean) => {
-              if (isExpanded) {
-                props.DesktopNavComponent.ensureLoaded('history')
-              }
-            }}
             summary={
               <Flex padding="xx-small small">
                 <Flex.Item width="3rem">
@@ -482,52 +298,32 @@ export default function MobileGlobalMenu(props: Props) {
             }
           >
             <View as="div" margin="0 0 0 xx-large">
-              <HistoryList
-                history={props.DesktopNavComponent.state.history}
-                hasLoaded={props.DesktopNavComponent.state.historyAreLoaded}
-              />
+              <HistoryList />
             </View>
           </ToggleDetails>
         </List.Item>
 
-        {true /* TODO: put a check for if we should show help */ && (
-          <List.Item>
-            <ToggleDetails
-              iconPosition="end"
-              fluidWidth={true}
-              onToggle={(_e, isExpanded: boolean) => {
-                if (isExpanded) {
-                  props.DesktopNavComponent.ensureLoaded('help')
-                }
-              }}
-              summary={
-                <Flex padding="xx-small small">
-                  <Flex.Item width="3rem">
-                    <IconQuestionLine inline={false} size="small" color="brand" />
-                  </Flex.Item>
-                  <Flex.Item>
-                    <Text color="brand">{window.ENV.help_link_name || I18n.t('Help')}</Text>
-                  </Flex.Item>
-                </Flex>
-              }
-            >
-              <View as="div" margin="0 0 0 xx-large">
-                <HelpDialog
-                  links={props.DesktopNavComponent.state.help}
-                  hasLoaded={props.DesktopNavComponent.state.helpAreLoaded}
-                  onFormSubmit={props.onDismiss}
-                />
-              </View>
-            </ToggleDetails>
-          </List.Item>
-        )}
+        <List.Item>
+          <ToggleDetails
+            iconPosition="end"
+            fluidWidth={true}
+            summary={
+              <Flex padding="xx-small small">
+                <Flex.Item width="3rem">
+                  <IconQuestionLine inline={false} size="small" color="brand" />
+                </Flex.Item>
+                <Flex.Item>
+                  <Text color="brand">{window.ENV.help_link_name || I18n.t('Help')}</Text>
+                </Flex.Item>
+              </Flex>
+            }
+          >
+            <View as="div" margin="0 0 0 xx-large">
+              <HelpDialog onFormSubmit={props.onDismiss} />
+            </View>
+          </ToggleDetails>
+        </List.Item>
       </List>
     </View>
   )
-}
-
-MobileGlobalMenu.defaultProps = {
-  current_user: window.ENV.current_user,
-  k5User: window.ENV.K5_USER,
-  isStudent: window.ENV.current_user_roles?.every(role => role === 'student' || role === 'user'),
 }

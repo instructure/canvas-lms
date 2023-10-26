@@ -20,8 +20,9 @@ import React from 'react'
 import {QueryClient} from '@tanstack/react-query'
 import {PersistQueryClientProvider} from '@tanstack/react-query-persist-client'
 import {createSyncStoragePersister} from '@tanstack/query-sync-storage-persister'
+import {sessionStorage} from '@canvas/storage'
 
-const queryClient = new QueryClient({
+export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
@@ -34,16 +35,14 @@ const queryClient = new QueryClient({
   },
 })
 
-const persister = createSyncStoragePersister({
-  storage: window.sessionStorage,
+export const persister = createSyncStoragePersister({
+  storage: sessionStorage,
 })
 
-function QueryProvider({children}: {children: React.ReactNode}) {
+export function QueryProvider({children}: {children: React.ReactNode}) {
   return (
     <PersistQueryClientProvider client={queryClient} persistOptions={{persister}}>
       {children}
     </PersistQueryClientProvider>
   )
 }
-
-export {queryClient, PersistQueryClientProvider, persister, QueryProvider}
