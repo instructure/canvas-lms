@@ -29,6 +29,14 @@ import preventDefault from '@canvas/util/preventDefault'
 import parseLinkHeader from 'link-header-parsing/parseLinkHeaderFromXHR'
 import tourPubSub from '@canvas/tour-pubsub'
 import {savedObservedId} from '@canvas/observer-picker/ObserverGetObservee'
+import type {
+  AccessibleGroup,
+  Account,
+  Course,
+  HelpLink,
+  HistoryEntry,
+  ProfileTab,
+} from '../../../api.d'
 
 const I18n = useI18nScope('Navigation')
 
@@ -37,45 +45,57 @@ const I18n = useI18nScope('Navigation')
 // the badge at the time of viewing.
 const RELEASE_NOTES_POLL_INTERVAL = 60 * 60 * 1000 // one hour
 
-const CoursesTray = React.lazy(() =>
-  import(
-    /* webpackChunkName: "[request]" */
-    './trays/CoursesTray'
-  )
+const CoursesTray = React.lazy(
+  () =>
+    import(
+      /* webpackChunkName: "[request]" */
+      './trays/CoursesTray'
+    )
 )
-const GroupsTray = React.lazy(() =>
-  import(/* webpackChunkName: "[request]" */ './trays/GroupsTray')
+const GroupsTray = React.lazy(
+  () => import(/* webpackChunkName: "[request]" */ './trays/GroupsTray')
 )
 
-const AccountsTray = React.lazy(() =>
-  import(
-    /* webpackChunkName: "[request]" */
-    './trays/AccountsTray'
-  )
+const AccountsTray = React.lazy(
+  () =>
+    import(
+      /* webpackChunkName: "[request]" */
+      './trays/AccountsTray'
+    )
 )
-const ProfileTray = React.lazy(() =>
-  import(
-    /* webpackChunkName: "[request]" */
-    './trays/ProfileTray'
-  )
+const ProfileTray = React.lazy(
+  () =>
+    import(
+      /* webpackChunkName: "[request]" */
+      './trays/ProfileTray'
+    )
 )
-const HistoryTray = React.lazy(() =>
-  import(
-    /* webpackChunkName: "[request]" */
-    './trays/HistoryTray'
-  )
+const HistoryTray = React.lazy(
+  () =>
+    import(
+      /* webpackChunkName: "[request]" */
+      './trays/HistoryTray'
+    )
 )
-const HelpTray = React.lazy(() =>
-  import(
-    /* webpackChunkName: "[request]" */
-    './trays/HelpTray'
-  )
+const HelpTray = React.lazy(
+  () =>
+    import(
+      /* webpackChunkName: "[request]" */
+      './trays/HelpTray'
+    )
 )
 
 const EXTERNAL_TOOLS_REGEX = /^\/accounts\/[^\/]*\/(external_tools)/
 const ACTIVE_ROUTE_REGEX =
   /^\/(courses|groups|accounts|grades|calendar|conversations|profile)|^#history/
 const ACTIVE_CLASS = 'ic-app-header__menu-list-item--active'
+
+const groupFilter = (group: AccessibleGroup) => group.can_access && !group.concluded
+
+type ActiveItem = 'dashboard' | 'accounts' | 'courses' | 'groups' | 'profile' | 'history' | 'help'
+
+const itemsWithResources = ['courses', 'groups', 'accounts', 'profile', 'history', 'help'] as const
+type ItemWithResources = (typeof itemsWithResources)[number]
 
 const TYPE_URL_MAP = {
   courses:
@@ -85,18 +105,14 @@ const TYPE_URL_MAP = {
   profile: '/api/v1/users/self/tabs',
   history: '/api/v1/users/self/history',
   help: '/help_links',
-}
-
-const TYPE_FILTER_MAP = {
-  groups: group => group.can_access && !group.concluded,
-}
+} as const
 
 const RESOURCE_COUNT = 10
 
 // give the trays that slide out from the the nav bar
 // a place to mount. It has to be outside the <div id=application>
 // to aria-hide everything but the tray when open.
-let portal
+let portal: HTMLDivElement | undefined
 function getPortal() {
   if (!portal) {
     portal = document.createElement('div')
@@ -110,7 +126,56 @@ function getPortal() {
 
 function noop() {}
 
-export default class Navigation extends React.Component {
+type Props = {
+  unreadComponent: any
+  onDataReceived: () => void
+}
+
+type State = {
+  accounts: Account[]
+  accountsAreLoaded: boolean
+  accountsLoading: boolean
+  activeItem: ActiveItem
+  courses: Course[]
+  coursesAreLoaded: boolean
+  coursesLoading: boolean
+  groups: AccessibleGroup[]
+  groupsAreLoaded: boolean
+  groupsLoading: boolean
+  help: HelpLink[]
+  helpAreLoaded: boolean
+  helpLoading: boolean
+  history: HistoryEntry[]
+  historyAreLoaded: boolean
+  historyLoading: boolean
+  isTrayOpen: boolean
+  noFocus: boolean
+  observedUserId: string
+  overrideDismiss: boolean
+  profile: ProfileTab[]
+  profileAreLoaded: boolean
+  profileAreLoading: boolean
+  releaseNotesBadgeDisabled: boolean
+  type: string | null
+  unreadInboxCount: number
+  unreadSharesCount: number
+}
+
+export default class Navigation extends React.Component<Props, State> {
+  forceUnreadReleaseNotesPoll: (() => void) | undefined
+
+  openPublishUnsubscribe: () => void = noop
+
+  overrideDismissUnsubscribe: () => void = noop
+
+  closePublishUnsubscribe: () => void = noop
+
+  unreadReleaseNotesCountElement: HTMLElement | null = null
+
+  unreadInboxCountElement: HTMLElement | null = null
+
+  unreadSharesCountElement: HTMLElement | null = null
+
   static propTypes = {
     unreadComponent: func, // for testing only
     onDataReceived: func,
@@ -120,32 +185,37 @@ export default class Navigation extends React.Component {
     unreadComponent: UnreadCounts,
   }
 
-  constructor(props) {
+  constructor(props: Props) {
     super(props)
     this.forceUnreadReleaseNotesPoll = undefined
     this.setReleaseNotesUnreadPollNow = this.setReleaseNotesUnreadPollNow.bind(this)
     this.state = {
-      groups: [],
       accounts: [],
-      courses: [],
-      help: [],
-      profile: [],
-      unreadSharesCount: 0,
-      isTrayOpen: false,
-      type: null,
-      coursesLoading: false,
-      coursesAreLoaded: false,
-      observedUserId: '',
-      accountsLoading: false,
       accountsAreLoaded: false,
-      groupsLoading: false,
+      accountsLoading: false,
+      activeItem: 'dashboard',
+      courses: [],
+      coursesAreLoaded: false,
+      coursesLoading: false,
+      groups: [],
       groupsAreLoaded: false,
-      helpLoading: false,
+      groupsLoading: false,
+      help: [],
       helpAreLoaded: false,
-      profileAreLoading: false,
-      profileAreLoaded: false,
-      historyLoading: false,
+      helpLoading: false,
+      history: [],
       historyAreLoaded: false,
+      historyLoading: false,
+      isTrayOpen: false,
+      noFocus: false,
+      observedUserId: '',
+      overrideDismiss: false,
+      profile: [],
+      profileAreLoaded: false,
+      profileAreLoading: false,
+      type: null,
+      unreadInboxCount: 0,
+      unreadSharesCount: 0,
       releaseNotesBadgeDisabled:
         !ENV.FEATURES.embedded_release_notes || ENV.SETTINGS.release_notes_badge_disabled,
     }
@@ -161,32 +231,34 @@ export default class Navigation extends React.Component {
     // ////////////////////////////////
     // / Click Events
     // ////////////////////////////////
-    Object.keys(TYPE_URL_MAP).forEach(type => {
+    itemsWithResources.forEach(type => {
       $(`#global_nav_${type}_link`).on(
         'click',
         preventDefault(this.handleMenuClick.bind(this, type))
       )
     })
-    this.openPublishUnsubscribe = tourPubSub.subscribe(
-      'navigation-tray-open',
-      ({type, noFocus}) => {
-        this.ensureLoaded(type)
-        this.openTray(type, noFocus)
-
-        // If we're already open for the specified type
-        // send a message that we are open.
-        if (this.state.isTrayOpen && this.state.type === type) {
-          tourPubSub.publish('navigation-tray-opened', type)
-        }
+    this.openPublishUnsubscribe = tourPubSub.subscribe<{
+      type: ActiveItem
+      noFocus: boolean
+    }>('navigation-tray-open', ({type, noFocus}) => {
+      if (itemsWithResources.includes(type as ItemWithResources)) {
+        this.ensureLoaded(type as ItemWithResources)
       }
-    )
+      this.openTray(type, noFocus)
+
+      // If we're already open for the specified type
+      // send a message that we are open.
+      if (this.state.isTrayOpen && this.state.type === type) {
+        tourPubSub.publish('navigation-tray-opened', type)
+      }
+    })
     this.closePublishUnsubscribe = tourPubSub.subscribe('navigation-tray-close', () => {
       this.closeTray()
     })
     this.overrideDismissUnsubscribe = tourPubSub.subscribe(
       'navigation-tray-override-dismiss',
       tf => {
-        this.setState({overrideDismiss: tf})
+        this.setState({overrideDismiss: Boolean(tf)})
       }
     )
   }
@@ -197,7 +269,7 @@ export default class Navigation extends React.Component {
     this.closePublishUnsubscribe && this.closePublishUnsubscribe()
   }
 
-  componentDidUpdate(_prevProps, prevState) {
+  componentDidUpdate(_prevProps: Props, prevState: State) {
     if (prevState.activeItem !== this.state.activeItem) {
       $(`.${ACTIVE_CLASS}`).removeClass(ACTIVE_CLASS).removeAttr('aria-current')
       $(`#global_nav_${this.state.activeItem}_link`)
@@ -210,15 +282,49 @@ export default class Navigation extends React.Component {
   /**
    * Given a URL and a type value, it gets the data and updates state.
    */
-  getResource(url, type) {
-    this.setState({[`${type}Loading`]: true})
+  getResource(url: string, type: ActiveItem) {
+    switch (type) {
+      case 'courses':
+        this.setState({coursesLoading: true})
+        break
+      case 'groups':
+        this.setState({groupsLoading: true})
+        break
+      case 'accounts':
+        this.setState({accountsLoading: true})
+        break
+      case 'profile':
+        this.setState({profileAreLoading: true})
+        break
+      case 'history':
+        this.setState({historyLoading: true})
+        break
+      case 'help':
+        this.setState({helpLoading: true})
+        break
+    }
     this.loadResourcePage(url, type)
   }
 
-  _isLoadedOrLoading = type => this.state[`${type}AreLoaded`] || this.state[`${type}Loading`]
+  _isLoadedOrLoading = (type: string) => {
+    switch (type) {
+      case 'courses':
+        return this.state.coursesAreLoaded || this.state.coursesLoading
+      case 'groups':
+        return this.state.groupsAreLoaded || this.state.groupsLoading
+      case 'accounts':
+        return this.state.accountsAreLoaded || this.state.accountsLoading
+      case 'profile':
+        return this.state.profileAreLoaded || this.state.profileAreLoading
+      case 'history':
+        return this.state.historyAreLoaded || this.state.historyLoading
+      case 'help':
+        return this.state.helpAreLoaded || this.state.helpLoading
+    }
+  }
 
-  ensureLoaded(type) {
-    let url = TYPE_URL_MAP[type]
+  ensureLoaded(type: ItemWithResources) {
+    let url: string = TYPE_URL_MAP[type]
     if (!url) return
 
     // if going after courses and I'm an observer,
@@ -231,8 +337,8 @@ export default class Navigation extends React.Component {
         if (k5_observed_user_id !== this.state.observedUserId) {
           this.setState({
             observedUserId: k5_observed_user_id,
-            [`${type}AreLoaded}`]: false,
-            [`${type}Loading`]: false,
+            coursesAreLoaded: false,
+            coursesLoading: false,
           })
           forceLoad = true
         }
@@ -245,7 +351,7 @@ export default class Navigation extends React.Component {
     }
   }
 
-  loadResourcePage(url, type, previousData = []) {
+  loadResourcePage(url: string, type: ActiveItem, previousData = []) {
     $.getJSON(url, (data, __, xhr) => {
       const newData = previousData.concat(this.filterDataForType(data, type))
 
@@ -259,21 +365,74 @@ export default class Navigation extends React.Component {
       }
 
       // finished
-      this.setState(
-        {
-          [type]: newData,
-          [`${type}Loading`]: false,
-          [`${type}AreLoaded`]: true,
-        },
-        this.props.onDataReceived
-      )
+      switch (type) {
+        case 'courses':
+          this.setState(
+            {
+              courses: newData,
+              coursesLoading: false,
+              coursesAreLoaded: true,
+            },
+            this.props.onDataReceived
+          )
+          break
+        case 'groups':
+          this.setState(
+            {
+              groups: newData,
+              groupsLoading: false,
+              groupsAreLoaded: true,
+            },
+            this.props.onDataReceived
+          )
+          break
+        case 'accounts':
+          this.setState(
+            {
+              accounts: newData,
+              accountsLoading: false,
+              accountsAreLoaded: true,
+            },
+            this.props.onDataReceived
+          )
+          break
+        case 'profile':
+          this.setState(
+            {
+              profile: newData,
+              profileAreLoading: false,
+              profileAreLoaded: true,
+            },
+            this.props.onDataReceived
+          )
+          break
+        case 'history':
+          this.setState(
+            {
+              history: newData,
+              historyLoading: false,
+              historyAreLoaded: true,
+            },
+            this.props.onDataReceived
+          )
+          break
+        case 'help':
+          this.setState(
+            {
+              help: newData,
+              helpLoading: false,
+              helpAreLoaded: true,
+            },
+            this.props.onDataReceived
+          )
+          break
+      }
     })
   }
 
-  filterDataForType(data, type) {
-    const filterFunc = TYPE_FILTER_MAP[type]
-    if (typeof filterFunc === 'function') {
-      return data.filter(filterFunc)
+  filterDataForType(data: any, type: ActiveItem) {
+    if (type === 'groups') {
+      return data.filter(groupFilter)
     }
     return data
   }
@@ -281,7 +440,7 @@ export default class Navigation extends React.Component {
   determineActiveLink() {
     const path = window.location.pathname
     const matchData = path.match(EXTERNAL_TOOLS_REGEX) || path.match(ACTIVE_ROUTE_REGEX)
-    const activeItem = matchData && matchData[1]
+    const activeItem = (matchData && matchData[1]) as ActiveItem | null
     if (!activeItem) {
       this.setState({activeItem: 'dashboard'})
     } else {
@@ -289,9 +448,11 @@ export default class Navigation extends React.Component {
     }
   }
 
-  handleMenuClick(type) {
+  handleMenuClick(type: ActiveItem) {
     // Make sure data is loaded up
-    this.ensureLoaded(type)
+    if (itemsWithResources.includes(type as ItemWithResources)) {
+      this.ensureLoaded(type as ItemWithResources)
+    }
 
     if (this.state.isTrayOpen && this.state.activeItem === type) {
       this.closeTray()
@@ -302,7 +463,7 @@ export default class Navigation extends React.Component {
     }
   }
 
-  openTray(type, noFocus) {
+  openTray(type: ActiveItem, noFocus: boolean = false) {
     // Sometimes we don't want the tray to capture focus,
     // so we specify that here.
     this.setState({type, noFocus, isTrayOpen: true, activeItem: type})
@@ -331,25 +492,14 @@ export default class Navigation extends React.Component {
                 : this.state.courses
             }
             hasLoaded={this.state.coursesAreLoaded}
-            closeTray={this.closeTray}
             k5User={window.ENV.K5_USER}
           />
         )
       case 'groups':
-        return (
-          <GroupsTray
-            groups={this.state.groups}
-            hasLoaded={this.state.groupsAreLoaded}
-            closeTray={this.closeTray}
-          />
-        )
+        return <GroupsTray groups={this.state.groups} hasLoaded={this.state.groupsAreLoaded} />
       case 'accounts':
         return (
-          <AccountsTray
-            accounts={this.state.accounts}
-            hasLoaded={this.state.accountsAreLoaded}
-            closeTray={this.closeTray}
-          />
+          <AccountsTray accounts={this.state.accounts} hasLoaded={this.state.accountsAreLoaded} />
         )
       case 'profile':
         return (
@@ -358,7 +508,7 @@ export default class Navigation extends React.Component {
             userPronouns={window.ENV.current_user.pronouns}
             userAvatarURL={
               window.ENV.current_user.avatar_is_fallback
-                ? null
+                ? ''
                 : window.ENV.current_user.avatar_image_url
             }
             loaded={this.state.profileAreLoaded}
@@ -367,13 +517,7 @@ export default class Navigation extends React.Component {
           />
         )
       case 'history':
-        return (
-          <HistoryTray
-            history={this.state.history}
-            hasLoaded={this.state.historyAreLoaded}
-            closeTray={this.closeTray}
-          />
-        )
+        return <HistoryTray history={this.state.history} hasLoaded={this.state.historyAreLoaded} />
       case 'help':
         return (
           <HelpTray
@@ -412,19 +556,19 @@ export default class Navigation extends React.Component {
   }
 
   // Also have to attend to the unread dot on the mobile view inbox
-  onInboxUnreadUpdate(unreadCount) {
+  onInboxUnreadUpdate(unreadCount: number) {
     if (this.state.unreadInboxCount !== unreadCount) this.setState({unreadInboxCount: unreadCount})
     const el = document.getElementById('mobileHeaderInboxUnreadBadge')
     if (el) el.style.display = unreadCount > 0 ? '' : 'none'
     if (typeof this.props.onDataReceived === 'function') this.props.onDataReceived()
   }
 
-  onSharesUnreadUpdate(unreadCount) {
+  onSharesUnreadUpdate(unreadCount: number) {
     if (this.state.unreadSharesCount !== unreadCount)
       this.setState({unreadSharesCount: unreadCount})
   }
 
-  inboxUnreadSRText(count) {
+  inboxUnreadSRText(count: number) {
     return I18n.t(
       {
         one: 'One unread message.',
@@ -434,7 +578,7 @@ export default class Navigation extends React.Component {
     )
   }
 
-  sharesUnreadSRText(count) {
+  sharesUnreadSRText(count: number) {
     return I18n.t(
       {
         one: 'One unread share.',
@@ -444,7 +588,7 @@ export default class Navigation extends React.Component {
     )
   }
 
-  releaseNotesBadgeText(count) {
+  releaseNotesBadgeText(count: number) {
     return I18n.t(
       {
         one: 'One unread release note.',
@@ -454,7 +598,7 @@ export default class Navigation extends React.Component {
     )
   }
 
-  setReleaseNotesUnreadPollNow(callback) {
+  setReleaseNotesUnreadPollNow(callback: () => void) {
     if (typeof this.forceUnreadReleaseNotesPoll === 'undefined')
       this.forceUnreadReleaseNotesPoll = callback
   }
@@ -513,7 +657,7 @@ export default class Navigation extends React.Component {
               ))
             }
             dataUrl="/api/v1/users/self/content_shares/unread_count"
-            onUpdate={unreadCount => this.onSharesUnreadUpdate(unreadCount)}
+            onUpdate={(unreadCount: number) => this.onSharesUnreadUpdate(unreadCount)}
             srText={this.sharesUnreadSRText}
           />
         )}
@@ -526,7 +670,7 @@ export default class Navigation extends React.Component {
               ))
             }
             dataUrl="/api/v1/conversations/unread_count"
-            onUpdate={unreadCount => this.onInboxUnreadUpdate(unreadCount)}
+            onUpdate={(unreadCount: number) => this.onInboxUnreadUpdate(unreadCount)}
             srText={this.inboxUnreadSRText}
             useSessionStorage={false}
           />
