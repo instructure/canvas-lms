@@ -38,6 +38,11 @@ const dialog = $('<div id="edit_event"><div /></div>')
     width: 'auto',
     resizable: false,
     title: I18n.t('titles.edit_event', 'Edit Event'),
+    closeOnEscape: false,
+    open: () =>
+      document.addEventListener('keydown', EditEventDetailsDialog.prototype.handleKeyDown),
+    close: () =>
+      document.removeEventListener('keydown', EditEventDetailsDialog.prototype.handleKeyDown),
   })
 
 export default class EditEventDetailsDialog {
@@ -132,6 +137,16 @@ export default class EditEventDetailsDialog {
 
   closeCB() {
     dialog.dialog('close')
+  }
+
+  handleKeyDown(e) {
+    if (e.key !== 'Escape') return
+
+    if (e.target.getAttribute('aria-expanded') === 'true') {
+      e.preventDefault()
+    } else {
+      dialog.dialog('close')
+    }
   }
 
   dialogClose = () => {

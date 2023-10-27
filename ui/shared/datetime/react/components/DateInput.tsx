@@ -344,6 +344,8 @@ export default function CanvasDateInput({
   function handleKey(e: KeyboardEvent<DateInputProps>) {
     if (e.key === 'Enter') {
       handleBlur(e)
+    } else if (e.key === 'Escape') {
+      setIsShowingCalendar(false)
     }
   }
 
