@@ -40,6 +40,8 @@ import {Alert} from '@instructure/ui-alerts'
 import {GradedDiscussionOptions} from '../GradedDiscussionOptions/GradedDiscussionOptions'
 import {GradedDiscussionDueDatesContext} from '../../util/constants'
 import {nanoid} from 'nanoid'
+import {AttachmentDisplay} from '@canvas/discussions/react/components/AttachmentDisplay/AttachmentDisplay'
+import {responsiveQuerySizes} from '@canvas/discussions/react/utils'
 
 import {addNewGroupCategoryToCache} from '../../util/utils'
 
@@ -135,7 +137,6 @@ export default function DiscussionTopicForm({
   const [peerReviewDueDate, setPeerReviewDueDate] = useState('')
   // This contains the list of assignment due dates / overrides. This default should be set to everyone in VICE-3866
   const [assignedInfoList, setAssignedInfoList] = useState([{dueDateId: nanoid()}]) // Initialize with one object with a unique id
-
   const assignmentDueDateContext = {
     assignedInfoList,
     setAssignedInfoList,
@@ -143,6 +144,10 @@ export default function DiscussionTopicForm({
     sections,
   }
   const [showGroupCategoryModal, setShowGroupCategoryModal] = useState(false)
+
+  const [attachment, setAttachment] = useState(null)
+  const [attachmentToUpload, setAttachmentToUpload] = useState(false)
+  const affectUserFileQuota = false
 
   useEffect(() => {
     if (!isEditing || !currentDiscussionTopic) return
@@ -171,6 +176,7 @@ export default function DiscussionTopicForm({
     setAvailableUntil(currentDiscussionTopic.lockAt)
     setDelayPosting(!!currentDiscussionTopic.delayedPostAt && isAnnouncement)
     setLocked(currentDiscussionTopic.locked && isAnnouncement)
+    setAttachment(currentDiscussionTopic.attachment)
   }, [isEditing, currentDiscussionTopic, discussionAnonymousState, isAnnouncement])
 
   useEffect(() => {
@@ -280,6 +286,7 @@ export default function DiscussionTopicForm({
         locked,
         isAnnouncement,
         assignment: prepareAssignmentPayload(),
+        attachment,
       })
       return true
     }
@@ -339,6 +346,15 @@ export default function DiscussionTopicForm({
           height={300}
           defaultContent={isEditing ? currentDiscussionTopic?.message : ''}
           autosave={false}
+        />
+        <AttachmentDisplay
+          attachment={attachment}
+          setAttachment={setAttachment}
+          setAttachmentToUpload={setAttachmentToUpload}
+          attachmentToUpload={attachmentToUpload}
+          responsiveQuerySizes={responsiveQuerySizes}
+          isGradedDiscussion={!affectUserFileQuota}
+          canAttach={ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_ATTACH}
         />
         {!isGraded && !isGroupDiscussion && !isGroupContext && (
           <View display="block" padding="medium none">

@@ -39,19 +39,19 @@ describe('AttachmentDisplay', () => {
 
   it('displays AttachButton when there is no attachment', () => {
     window.ENV.can_attach_entries = true
-    const {queryByText} = setup()
+    const {queryByText} = setup({canAttach: window.ENV.can_attach_entries})
     expect(queryByText('Attach')).toBeTruthy()
   })
 
   it('does not display AttachButton when can_attach_entries is false', () => {
     window.ENV.can_attach_entries = false
-    const {queryByText} = setup()
+    const {queryByText} = setup({canAttach: window.ENV.can_attach_entries})
     expect(queryByText('Attach')).toBeFalsy()
   })
 
   it('only allows one attachment at a time', () => {
     window.ENV.can_attach_entries = true
-    const {queryByTestId} = setup()
+    const {queryByTestId} = setup({canAttach: window.ENV.can_attach_entries})
     expect(queryByTestId('attachment-input')).toHaveAttribute('type', 'file')
     expect(queryByTestId('attachment-input')).not.toHaveAttribute('multiple')
   })

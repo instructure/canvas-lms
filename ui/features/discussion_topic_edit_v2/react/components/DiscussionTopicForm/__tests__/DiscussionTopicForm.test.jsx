@@ -50,25 +50,44 @@ const setup = ({
 }
 
 describe('DiscussionTopicForm', () => {
+  beforeEach(() => {
+    window.ENV = {
+      DISCUSSION_TOPIC: {
+        PERMISSIONS: {
+          CAN_ATTACH: true,
+        },
+      },
+    }
+  })
   afterEach(() => {
-    window.ENV = {}
+    window.ENV = {
+      DISCUSSION_TOPIC: {
+        PERMISSIONS: {
+          CAN_ATTACH: true,
+        },
+      },
+    }
   })
 
   it('renders', () => {
     const document = setup()
     expect(document.getByText('Topic Title')).toBeInTheDocument()
+    expect(document.queryByText('Attach')).toBeTruthy()
+  })
+
+  it('does not display AttachButton when CAN_ATTACH is false', () => {
+    window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_ATTACH = false
+    const document = setup()
+
+    expect(document.queryByText('Attach')).toBeFalsy()
   })
 
   describe('publish indicator', () => {
     it('does not show the publish indicator when editing an announcement', () => {
-      window.ENV = {
-        DISCUSSION_TOPIC: {
-          ATTRIBUTES: {
-            id: 88,
-            is_announcement: true,
-            course_published: false,
-          },
-        },
+      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES = {
+        id: 88,
+        is_announcement: true,
+        course_published: false,
       }
 
       const {queryByText} = setup({
@@ -112,13 +131,9 @@ describe('DiscussionTopicForm', () => {
 
   describe('Announcement Alerts', () => {
     it('shows an alert when creating an announcement in an unpublished course', () => {
-      window.ENV = {
-        DISCUSSION_TOPIC: {
-          ATTRIBUTES: {
-            is_announcement: true,
-            course_published: false,
-          },
-        },
+      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES = {
+        is_announcement: true,
+        course_published: false,
       }
 
       const document = setup()
@@ -130,14 +145,10 @@ describe('DiscussionTopicForm', () => {
     })
 
     it('shows an alert when editing an announcement in an published course', () => {
-      window.ENV = {
-        DISCUSSION_TOPIC: {
-          ATTRIBUTES: {
-            id: 5000,
-            is_announcement: true,
-            course_published: true,
-          },
-        },
+      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES = {
+        id: 5000,
+        is_announcement: true,
+        course_published: true,
       }
 
       const document = setup()
@@ -149,14 +160,10 @@ describe('DiscussionTopicForm', () => {
     })
 
     it('shows the unpublished alert when editing an announcement in an unpublished course', () => {
-      window.ENV = {
-        DISCUSSION_TOPIC: {
-          ATTRIBUTES: {
-            id: 88,
-            is_announcement: true,
-            course_published: false,
-          },
-        },
+      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES = {
+        id: 88,
+        is_announcement: true,
+        course_published: false,
       }
 
       const document = setup()
@@ -219,7 +226,7 @@ describe('DiscussionTopicForm', () => {
     // })
 
     it('hides post to section, student ToDo, and ungraded options when Graded', () => {
-      window.ENV = {
+      ENV = {
         STUDENT_PLANNER_ENABLED: true,
         DISCUSSION_TOPIC: {
           PERMISSIONS: {
@@ -227,6 +234,7 @@ describe('DiscussionTopicForm', () => {
           },
         },
       }
+      Object.assign(window.ENV, ENV)
 
       const {queryByText, queryByTestId, getByLabelText, queryByLabelText} = setup()
       expect(queryByLabelText('Add to student to-do')).toBeInTheDocument()

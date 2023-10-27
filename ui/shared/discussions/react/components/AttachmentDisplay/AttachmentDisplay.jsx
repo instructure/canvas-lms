@@ -65,7 +65,7 @@ export function AttachmentDisplay(props) {
         attachmentInformation['attachment[content_type]'] = fileToUpload.type
         attachmentInformation['attachment[intent]'] = 'submit' // directs the logic in the files_controller to skip quota checks
         attachmentInformation['attachment[context_code]'] = `${ENV?.context_asset_string}` // used to find the correct course folder
-        attachmentInformation['attachment[asset_string]'] = `${ENV?.DISCUSSION.ASSIGNMENT}` // required for downloads to go to submission folder
+        attachmentInformation['attachment[asset_string]'] = `${ENV?.DISCUSSION?.ASSIGNMENT}` // required for downloads to go to submission folder; Doesn't Apply to Topic attachments, but Legacy Topic Attachments don't apply to user quota.
       } else {
         // If uploading file to the attachment folder, only name and type are required
         attachmentInformation = {
@@ -112,7 +112,7 @@ export function AttachmentDisplay(props) {
             responsiveQuerySizes={props.responsiveQuerySizes}
           />
         ) : (
-          ENV.can_attach_entries && (
+          props.canAttach && (
             <UploadButton
               attachmentToUpload={props.attachmentToUpload}
               onAttachmentUpload={addAttachment}
@@ -150,6 +150,11 @@ AttachmentDisplay.propTypes = {
    * toggles file uploadUrl
    */
   isGradedDiscussion: PropTypes.bool,
+  /**
+   * Toggles when UploadButton (add attachment) renders
+   * Discussion Entry and Discussion topic have different canAttach permissions.
+   */
+  canAttach: PropTypes.bool,
 }
 
 export default AttachmentDisplay

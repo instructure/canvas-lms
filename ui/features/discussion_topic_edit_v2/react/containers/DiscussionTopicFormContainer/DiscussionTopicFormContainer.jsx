@@ -137,6 +137,7 @@ export default function DiscussionTopicFormContainer({apolloClient}) {
         isAnnouncement,
         groupCategoryId,
         assignment,
+        attachment,
       }) => {
         if (isEditing) {
           updateDiscussionTopic({
@@ -155,6 +156,8 @@ export default function DiscussionTopicFormContainer({apolloClient}) {
               podcastEnabled: enablePodcastFeed,
               podcastHasStudentPosts: includeRepliesInFeed,
               locked,
+              fileId: attachment?._id,
+              removeAttachment: !attachment?._id,
             },
           })
         } else {
@@ -180,6 +183,7 @@ export default function DiscussionTopicFormContainer({apolloClient}) {
               isAnnouncement,
               groupCategoryId: groupCategoryId || null,
               assignment,
+              fileId: attachment?._id,
             },
           })
         }

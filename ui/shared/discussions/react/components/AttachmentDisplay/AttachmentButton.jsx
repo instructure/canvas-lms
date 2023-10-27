@@ -20,7 +20,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React from 'react'
 import {RemovableItem} from './RemovableItem'
-
+import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {IconPaperclipLine} from '@instructure/ui-icons'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
@@ -29,6 +29,32 @@ const I18n = useI18nScope('discussion_posts')
 
 export const AttachmentButton = props => {
   const TRUNCATE_TO = 30
+
+  const displayFilename = () => {
+    if (props.attachment?.displayName?.length > TRUNCATE_TO) {
+      return (
+        <AccessibleContent
+          alt={I18n.t('Download %{fileName}', {
+            fileName: props.attachment?.displayName?.slice(0, TRUNCATE_TO)?.concat('...'),
+          })}
+        >
+          <Text weight="bold">
+            {props.attachment?.displayName?.slice(0, TRUNCATE_TO)?.concat('...')}
+          </Text>
+        </AccessibleContent>
+      )
+    }
+    return (
+      <AccessibleContent
+        alt={I18n.t('Download %{fileName}', {
+          fileName: props.attachment?.displayName,
+        })}
+      >
+        <Text weight="bold">{props.attachment?.displayName}</Text>
+      </AccessibleContent>
+    )
+  }
+
   return (
     <RemovableItem
       onRemove={props.onDeleteItem}
@@ -42,11 +68,7 @@ export const AttachmentButton = props => {
           href={props.attachment?.url}
           isWithinText={false}
         >
-          <Text weight="bold">
-            {props.attachment?.displayName?.length > TRUNCATE_TO
-              ? props.attachment?.displayName?.slice(0, TRUNCATE_TO)?.concat('...')
-              : props.attachment?.displayName}
-          </Text>
+          <Text weight="bold">{displayFilename()}</Text>
         </Link>
       </span>
     </RemovableItem>

@@ -54,6 +54,9 @@ describe Mutations::CreateDiscussionTopic do
               _id
               name
             }
+            attachment{
+              _id
+            }
           }
           errors {
             attribute
@@ -289,6 +292,32 @@ describe Mutations::CreateDiscussionTopic do
     expect(result["errors"]).to be_nil
     expect(result.dig("data", "discussionTopic", "errors")).to be_nil
     expect(created_discussion_topic["published"]).to be true
+  end
+
+  it "creates a topic with an attachment" do
+    attachment = attachment_with_context(@teacher)
+    attachment.update!(user: @teacher)
+
+    context_type = "Course"
+    title = "Test Title"
+    message = "A message"
+    published = true
+    file_id = attachment.id
+    query = <<~GQL
+      contextId: "#{@course.id}"
+      contextType: "#{context_type}"
+      title: "#{title}"
+      message: "#{message}"
+      published: #{published}
+      anonymousState: "off"
+      fileId: "#{file_id}"
+    GQL
+
+    result = execute_with_input(query)
+    created_discussion_topic = result.dig("data", "createDiscussionTopic", "discussionTopic")
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "discussionTopic", "errors")).to be_nil
+    expect(created_discussion_topic["attachment"]["_id"]).to eq(attachment.id.to_s)
   end
 
   it "creates a full_anonymity discussion topic" do
