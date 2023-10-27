@@ -19,30 +19,75 @@
 import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
 import CourseCopyImporter from '../course_copy'
-import fetchMock from 'fetch-mock'
 import userEvent from '@testing-library/user-event'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 
-it('Searches for matching courses on searchbox value change', async () => {
-  // @ts-expect-error
-  window.ENV.current_user = {
-    id: '0',
-    anonymous_id: '',
-    display_name: '',
-    avatar_image_url: '',
-    html_url: '',
-    pronouns: '',
-  }
-  fetchMock.mock('/users/0/manageable_courses?term=math', [
-    {
+jest.mock('@canvas/do-fetch-api-effect')
+
+const onSubmit = jest.fn()
+const onCancel = jest.fn()
+
+const renderComponent = (overrideProps?: any) =>
+  render(<CourseCopyImporter onSubmit={onSubmit} onCancel={onCancel} {...overrideProps} />)
+
+describe('CourseCopyImporter', () => {
+  beforeAll(() => {
+    // @ts-expect-error
+    window.ENV.current_user = {
       id: '0',
-      label: 'Mathmatics',
-    },
-  ])
-  render(<CourseCopyImporter setSourceCourse={jest.fn()} />)
-  expect(screen.getByText('Search for a course')).toBeInTheDocument()
-  userEvent.type(screen.getByRole('combobox', {name: 'Search for a course'}), 'math')
-  await waitFor(() => {
-    expect(fetchMock.calls(`/users/0/manageable_courses?term=math`).length).toBe(1)
+    }
+    doFetchApi.mockReturnValue(
+      Promise.resolve({
+        json: [
+          {
+            id: '0',
+            label: 'Mathmatics',
+          },
+        ],
+      })
+    )
   })
-  expect(screen.getByText('Mathmatics')).toBeInTheDocument()
+
+  afterEach(() => jest.clearAllMocks())
+
+  it('searches for matching courses', async () => {
+    renderComponent()
+    userEvent.type(screen.getByRole('combobox', {name: 'Search for a course'}), 'math')
+    await waitFor(() => {
+      expect(doFetchApi).toHaveBeenCalledWith({path: '/users/0/manageable_courses?term=math'})
+    })
+    expect(screen.getByText('Mathmatics')).toBeInTheDocument()
+  })
+
+  it('searches for matching courses including concluded', async () => {
+    renderComponent()
+    userEvent.click(screen.getByRole('checkbox', {name: 'Include completed courses'}))
+    userEvent.type(screen.getByRole('combobox', {name: 'Search for a course'}), 'math')
+    await waitFor(() => {
+      expect(doFetchApi).toHaveBeenCalledWith({
+        path: '/users/0/manageable_courses?term=math&include=concluded',
+      })
+    })
+    expect(screen.getByText('Mathmatics')).toBeInTheDocument()
+  })
+
+  it('calls onSubmit', async () => {
+    renderComponent()
+    userEvent.type(screen.getByRole('combobox', {name: 'Search for a course'}), 'math')
+    userEvent.click(await screen.findByText('Mathmatics'))
+    userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
+    expect(onSubmit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        settings: expect.objectContaining({
+          source_course_id: '0',
+        }),
+      })
+    )
+  })
+
+  it('calls onCancel', () => {
+    renderComponent()
+    userEvent.click(screen.getByRole('button', {name: 'Cancel'}))
+    expect(onCancel).toHaveBeenCalled()
+  })
 })

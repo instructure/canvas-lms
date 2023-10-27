@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useRef, useState} from 'react'
+import React, {useRef, useState, useCallback} from 'react'
 import {throttle} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
@@ -25,6 +25,8 @@ import {View} from '@instructure/ui-view'
 import {IconSearchLine} from '@instructure/ui-icons'
 import {Select} from '@instructure/ui-select'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import CommonMigratorControls from '../common_migrator_controls'
+import {onSubmitMigrationFormCallback} from '../types'
 
 const I18n = useI18nScope('content_migrations_redesign')
 
@@ -34,10 +36,11 @@ type CourseOption = {
 }
 
 type CourseCopyImporterProps = {
-  setSourceCourse: (sourceCodeId: string) => void
+  onSubmit: onSubmitMigrationFormCallback
+  onCancel: () => void
 }
 
-export const CourseCopyImporter = ({setSourceCourse}: CourseCopyImporterProps) => {
+export const CourseCopyImporter = ({onSubmit, onCancel}: CourseCopyImporterProps) => {
   const [searchParam, setSearchParam] = useState<string>('')
   const [courseOptions, setCourseOptions] = useState<any>([])
   const [selectedCourse, setSelectedCourse] = useState<any>(false)
@@ -70,23 +73,36 @@ export const CourseCopyImporter = ({setSourceCourse}: CourseCopyImporterProps) =
     )
   )
 
-  const getCourseOptions = (e: React.SyntheticEvent<Element, Event>) => {
-    const target = e.target as HTMLInputElement
-    setSelectedCourse(false)
-    setSearchParam(target.value)
-    throttledCourseFetch.current(target.value, includeCompletedCourses)
-  }
+  const getCourseOptions = useCallback(
+    (e: React.SyntheticEvent<Element, Event>) => {
+      const target = e.target as HTMLInputElement
+      setSelectedCourse(false)
+      setSearchParam(target.value)
+      throttledCourseFetch.current(target.value, includeCompletedCourses)
+    },
+    [includeCompletedCourses]
+  )
 
-  const selectCourse = (course_id: string) => {
-    setSourceCourse(course_id)
-    setSelectedCourse(
-      courseOptions.filter((c: CourseOption) => {
-        return c.id === course_id
-      })[0]
-    )
-    setCourseOptions([])
-    setSearchParam(selectedCourse.label)
-  }
+  const selectCourse = useCallback(
+    (course_id: string) => {
+      setSelectedCourse(
+        courseOptions.filter((c: CourseOption) => {
+          return c.id === course_id
+        })[0]
+      )
+      setCourseOptions([])
+      setSearchParam(selectedCourse.label)
+    },
+    [courseOptions, selectedCourse]
+  )
+
+  const handleSubmit: onSubmitMigrationFormCallback = useCallback(
+    formData => {
+      formData.settings.source_course_id = selectedCourse.id
+      onSubmit(formData)
+    },
+    [selectedCourse, onSubmit]
+  )
 
   return (
     <>
@@ -122,7 +138,6 @@ export const CourseCopyImporter = ({setSourceCourse}: CourseCopyImporterProps) =
       <View as="div" margin="small none none none">
         <Checkbox
           name="include_completed_courses"
-          value={1}
           label={I18n.t('Include completed courses')}
           onChange={(e: React.SyntheticEvent<Element, Event>) => {
             const target = e.target as HTMLInputElement
@@ -130,6 +145,7 @@ export const CourseCopyImporter = ({setSourceCourse}: CourseCopyImporterProps) =
           }}
         />
       </View>
+      <CommonMigratorControls onSubmit={handleSubmit} onCancel={onCancel} />
     </>
   )
 }

@@ -23,24 +23,18 @@ import {Text} from '@instructure/ui-text'
 import {Button} from '@instructure/ui-buttons'
 import {IconUploadLine} from '@instructure/ui-icons'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import CommonMigratorControls from '../common_migrator_controls'
+import {onSubmitMigrationFormCallback} from '../types'
+import {humanReadableSize} from '../utils'
 
 const I18n = useI18nScope('content_migrations_redesign')
 
 type CanvasCartridgeImporterProps = {
-  onSelectPreAttachmentFile: (preAttachmentFile: File | null) => void
+  onSubmit: onSubmitMigrationFormCallback
+  onCancel: () => void
 }
 
-function humanReadableSize(size: number) {
-  const units = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
-  let i = 0
-  while (size >= 1024) {
-    size /= 1024
-    ++i
-  }
-  return size.toFixed(1) + ' ' + units[i]
-}
-
-const CanvasCartridgeImporter = ({onSelectPreAttachmentFile}: CanvasCartridgeImporterProps) => {
+const CanvasCartridgeImporter = ({onSubmit, onCancel}: CanvasCartridgeImporterProps) => {
   const fileInput = createRef<HTMLInputElement>()
   const [file, setFile] = useState<File | null>(null)
 
@@ -51,19 +45,31 @@ const CanvasCartridgeImporter = ({onSelectPreAttachmentFile}: CanvasCartridgeImp
     }
     const selectedFile = files[0]
 
-    if (ENV.UPLOAD_LIMIT && selectedFile.size > ENV.UPLOAD_LIMIT) {
+    if (selectedFile && ENV.UPLOAD_LIMIT && selectedFile.size > ENV.UPLOAD_LIMIT) {
       setFile(null)
-      onSelectPreAttachmentFile(null)
       showFlashError(
         I18n.t('Your migration can not exceed %{file_size}', {
           file_size: humanReadableSize(ENV.UPLOAD_LIMIT),
         })
-      )
+      )()
     } else {
       setFile(selectedFile)
-      onSelectPreAttachmentFile(selectedFile)
     }
-  }, [fileInput, onSelectPreAttachmentFile])
+  }, [fileInput])
+
+  const handleSubmit: onSubmitMigrationFormCallback = useCallback(
+    formData => {
+      if (file) {
+        formData.pre_attachment = {
+          name: file.name,
+          size: file.size,
+          no_redirect: true,
+        }
+        onSubmit(formData, file)
+      }
+    },
+    [file, onSubmit]
+  )
 
   return (
     <>
@@ -89,6 +95,7 @@ const CanvasCartridgeImporter = ({onSelectPreAttachmentFile}: CanvasCartridgeImp
       <View margin="none none none medium">
         <Text>{file ? file.name : I18n.t('No file chosen')}</Text>
       </View>
+      <CommonMigratorControls onSubmit={handleSubmit} onCancel={onCancel} />
     </>
   )
 }

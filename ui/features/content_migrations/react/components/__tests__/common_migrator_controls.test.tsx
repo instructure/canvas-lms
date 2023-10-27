@@ -20,13 +20,13 @@ import React from 'react'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import fetchMock from 'fetch-mock'
-import GeneralMigrationControls from '../general_migration_controls'
+import CommonMigratorControls from '../common_migrator_controls'
 
-describe('GeneralMigrationControls', () => {
-  let submitMigrationMock: () => void
+const onSubmit = jest.fn()
+const onCancel = jest.fn()
 
+describe('CommonMigratorControls', () => {
   beforeAll(() => {
-    submitMigrationMock = jest.fn(() => {})
     fetchMock.mock('/api/v1/courses/0/content_migrations/migrators', [
       {
         name: 'Mock Migrator',
@@ -35,13 +35,21 @@ describe('GeneralMigrationControls', () => {
     ])
   })
 
-  it('Runs proper callback on CTA click', async () => {
-    render(<GeneralMigrationControls submitMigration={submitMigrationMock} />)
-    userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue', hidden: false}))
-    expect(submitMigrationMock).toHaveBeenCalledWith({
-      adjustDates: false,
-      importAsNewQuizzes: false,
-      selectiveImport: false,
+  afterEach(() => jest.clearAllMocks())
+
+  it('calls onSubmit', async () => {
+    render(<CommonMigratorControls onSubmit={onSubmit} onCancel={onCancel} />)
+    userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
+    expect(onSubmit).toHaveBeenCalledWith({
+      date_shift_options: false,
+      selective_import: false,
+      settings: {import_quizzes_next: false},
     })
+  })
+
+  it('calls onCancel', async () => {
+    render(<CommonMigratorControls onSubmit={onSubmit} onCancel={onCancel} />)
+    userEvent.click(screen.getByRole('button', {name: 'Cancel'}))
+    expect(onCancel).toHaveBeenCalled()
   })
 })

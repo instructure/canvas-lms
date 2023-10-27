@@ -82,7 +82,7 @@ describe ContentMigrationsController do
           Account.site_admin.enable_feature!(:instui_for_import_page)
           get :index, params: { course_id: @course.id }
           expect(assigns[:js_env][:EXTERNAL_TOOLS]).to be_nil
-          expect(assigns[:js_env][:UPLOAD_LIMIT]).to be_nil
+          expect(assigns[:js_env][:UPLOAD_LIMIT]).not_to be_nil
           expect(assigns[:js_env][:SELECT_OPTIONS]).to be_nil
           expect(assigns[:js_env][:QUESTION_BANKS]).to be_nil
           expect(assigns[:js_env][:COURSE_ID]).not_to be_nil
