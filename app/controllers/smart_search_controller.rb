@@ -108,7 +108,14 @@ class SmartSearchController < ApplicationController
   end
 
   def show
+    # TODO: remove course specific stuff once we have account level search
     render_unauthorized_action unless OpenAi.smart_search_available?(@domain_root_account)
-    # TODO: Add state required for new page render
+    set_active_tab("search")
+    @show_left_side = true
+    @context = Course.find(params[:course_id])
+    add_crumb(t("#crumbs.search", "Search"), named_context_url(@context, :course_search_url)) unless @skip_crumb
+    js_env({
+             COURSE_ID: @context.id.to_s
+           })
   end
 end

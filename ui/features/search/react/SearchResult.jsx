@@ -18,6 +18,7 @@
 
 import React, { useState } from 'react'
 import {Text} from '@instructure/ui-text'
+import {TextArea} from '@instructure/ui-text-area'
 import {View} from '@instructure/ui-view'
 import {Rating} from '@instructure/ui-rating'
 import {Tooltip} from '@instructure/ui-tooltip'
@@ -54,9 +55,9 @@ export default function SearchResult(props) {
     )
   }
 
-  if (props.searchResult.wiki_page) {
+  if (props.searchResult.content_type === 'WikiPage') {
     // id, wiki_id, title, body, etc.
-    const wiki_page = props.searchResult.wiki_page
+    const wiki_page = props.searchResult;
     return (
       <View
         as="div"
@@ -73,13 +74,13 @@ export default function SearchResult(props) {
           size="medium"
           color="secondary"
         >
-          {ellipsize(wiki_page.body_text, 1000)}
+          {ellipsize(wiki_page.body, 1000)}
         </Text>
         <View as="div">
           {getRelevance(wiki_page)}
         </View>
         <View as="div">
-          <a href={wiki_page.url} target="_blank">{I18n.t('View Full Page')}</a>
+          <a href={wiki_page.html_url} target="_blank">{I18n.t('View Full Page')}</a>
         </View>
       </View>
     )
