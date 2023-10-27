@@ -33,6 +33,7 @@ const resourceTypeMap: Record<string, Requirement['resource']> = {
   discussion_topic: 'discussion',
   external_url: 'externalUrl',
   context_external_tool: 'externalTool',
+  'lti-quiz': 'quiz',
 }
 
 const requirementTypeMap: Record<string, Requirement['type']> = {
