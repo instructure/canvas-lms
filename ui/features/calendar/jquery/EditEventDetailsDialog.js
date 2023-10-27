@@ -142,7 +142,10 @@ export default class EditEventDetailsDialog {
   handleKeyDown(e) {
     if (e.key !== 'Escape') return
 
-    if (e.target.getAttribute('aria-expanded') === 'true') {
+    if (
+      e.target.getAttribute('aria-expanded') === 'true' ||
+      $('#custom-repeating-event-modal').length > 0
+    ) {
       e.preventDefault()
     } else {
       dialog.dialog('close')
