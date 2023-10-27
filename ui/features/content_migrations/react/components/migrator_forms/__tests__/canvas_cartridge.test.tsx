@@ -22,14 +22,15 @@ import userEvent from '@testing-library/user-event'
 import CanvasCartridgeImporter from '../canvas_cartridge'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
-const setPreAttachmentMock = jest.fn()
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashError: jest.fn().mockReturnValue(jest.fn()),
+}))
 
-jest.mock('@canvas/alerts/react/FlashAlert')
+const onSubmit = jest.fn()
+const onCancel = jest.fn()
 
 const renderComponent = (overrideProps?: any) =>
-  render(
-    <CanvasCartridgeImporter onSelectPreAttachmentFile={setPreAttachmentMock} {...overrideProps} />
-  )
+  render(<CanvasCartridgeImporter onSubmit={onSubmit} onCancel={onCancel} {...overrideProps} />)
 
 describe('CanvasCartridgeImporter', () => {
   beforeAll(() => (window.ENV.UPLOAD_LIMIT = 1024))
@@ -38,21 +39,25 @@ describe('CanvasCartridgeImporter', () => {
 
   it('renders hidden input', () => {
     renderComponent()
+
     expect(screen.getByTestId('migrationFileUpload')).toBeInTheDocument()
   })
 
   it('renders button input', () => {
     renderComponent()
+
     expect(screen.getByRole('button', {name: 'Choose File'})).toBeInTheDocument()
   })
 
   it('renders text if no file is chosen', () => {
     renderComponent()
+
     expect(screen.getByText('No file chosen')).toBeInTheDocument()
   })
 
   it('renders file name if file is chosen', () => {
     renderComponent()
+
     const file = new File(['blah, blah, blah'], 'my_file.zip', {type: 'application/zip'})
     const input = screen.getByTestId('migrationFileUpload')
     userEvent.upload(input, file)
@@ -61,6 +66,7 @@ describe('CanvasCartridgeImporter', () => {
 
   it('does not render file name when large file is chosen', async () => {
     renderComponent()
+
     const file = new File(['blah, blah, blah'], 'my_file.zip', {type: 'application/zip'})
     Object.defineProperty(file, 'size', {value: 1024 + 1})
     const input = screen.getByTestId('migrationFileUpload')
@@ -68,29 +74,39 @@ describe('CanvasCartridgeImporter', () => {
     expect(screen.getByText('No file chosen')).toBeInTheDocument()
   })
 
-  it('calls setPreAttachment when file is chosen', () => {
-    renderComponent()
-    const file = new File(['blah, blah, blah'], 'my_file.zip', {type: 'application/zip'})
-    const input = screen.getByTestId('migrationFileUpload')
-    userEvent.upload(input, file)
-    expect(setPreAttachmentMock).toHaveBeenCalledWith(file)
-  })
-
-  it('does not call setPreAttachment when large file is chosen', () => {
-    renderComponent()
-    const file = new File(['blah, blah, blah'], 'my_file.zip', {type: 'application/zip'})
-    Object.defineProperty(file, 'size', {value: 1024 + 1})
-    const input = screen.getByTestId('migrationFileUpload')
-    userEvent.upload(input, file)
-    expect(setPreAttachmentMock).toHaveBeenCalledWith(null)
-  })
-
   it('renders alert when large file is chosen', async () => {
     renderComponent()
+
     const file = new File(['blah, blah, blah'], 'my_file.zip', {type: 'application/zip'})
     Object.defineProperty(file, 'size', {value: 1024 + 1})
     const input = screen.getByTestId('migrationFileUpload')
     userEvent.upload(input, file)
     expect(showFlashError).toHaveBeenCalledWith('Your migration can not exceed 1.0 KB')
+  })
+
+  it('calls onSubmit', () => {
+    renderComponent()
+
+    const file = new File(['blah, blah, blah'], 'my_file.zip', {type: 'application/zip'})
+    const input = screen.getByTestId('migrationFileUpload')
+    userEvent.upload(input, file)
+    userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
+    expect(onSubmit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        pre_attachment: {
+          name: 'my_file.zip',
+          no_redirect: true,
+          size: 16,
+        },
+      }),
+      expect.any(Object)
+    )
+  })
+
+  it('calls onCancel', () => {
+    renderComponent()
+
+    userEvent.click(screen.getByRole('button', {name: 'Cancel'}))
+    expect(onCancel).toHaveBeenCalled()
   })
 })

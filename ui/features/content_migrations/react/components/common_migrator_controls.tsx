@@ -24,15 +24,16 @@ import {Checkbox, CheckboxGroup} from '@instructure/ui-checkbox'
 import {Button} from '@instructure/ui-buttons'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {DateAdjustment} from './date_adjustment'
-import {submitMigrationCallbackType} from './types'
+import {onSubmitMigrationFormCallback} from './types'
 
 const I18n = useI18nScope('content_migrations_redesign')
 
-export const GeneralMigrationControls = ({
-  submitMigration,
-}: {
-  submitMigration: submitMigrationCallbackType
-}) => {
+type CommonMigratorControlsProps = {
+  onSubmit: onSubmitMigrationFormCallback
+  onCancel: () => void
+}
+
+export const CommonMigratorControls = ({onSubmit, onCancel}: CommonMigratorControlsProps) => {
   const [selectiveImport, setSelectiveImport] = useState<boolean>(false)
   const [importAsNewQuizzes, setImportAsNewQuizzes] = useState<boolean>(false)
   const [adjustDates, setAdjustDates] = useState<boolean>(false)
@@ -90,16 +91,16 @@ export const GeneralMigrationControls = ({
         {adjustDates ? <DateAdjustment /> : null}
       </View>
       <View as="div" margin="medium none none none">
-        <Button>{I18n.t('Cancel')}</Button>
+        <Button onClick={onCancel}>{I18n.t('Cancel')}</Button>
         <Button
           data-testid="submitMigration"
-          onClick={() => {
-            submitMigration({
-              selectiveImport,
-              importAsNewQuizzes,
-              adjustDates,
+          onClick={() =>
+            onSubmit({
+              selective_import: selectiveImport,
+              date_shift_options: adjustDates,
+              settings: {import_quizzes_next: importAsNewQuizzes},
             })
-          }}
+          }
           margin="small"
           color="primary"
         >
@@ -107,9 +108,8 @@ export const GeneralMigrationControls = ({
           {I18n.t('Add to Import Queue')}
         </Button>
       </View>
-      <hr role="presentation" aria-hidden="true" />
     </>
   )
 }
 
-export default GeneralMigrationControls
+export default CommonMigratorControls

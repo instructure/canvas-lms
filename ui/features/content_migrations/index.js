@@ -20,10 +20,6 @@
 // we can divorce from these shenanigans
 if (document.getElementById('instui_content_migrations')) {
   import('./instui_setup')
-    .then(() => {})
-    .catch(() => {})
 } else {
   import('./setup')
-    .then(() => {})
-    .catch(() => {})
 }

@@ -16,13 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import ReactDOM from 'react-dom'
-import App from './react/app'
-
-if (document.getElementById('instui_content_migrations')) {
-  ReactDOM.render(<App />, document.getElementById('instui_content_migrations'))
+export const humanReadableSize = (size: number): string => {
+  const units = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+  let i = 0
+  while (size >= 1024) {
+    size /= 1024
+    ++i
+  }
+  return size.toFixed(1) + ' ' + units[i]
 }
-
-// package.json's source-file-extension needs a default export
-export default null

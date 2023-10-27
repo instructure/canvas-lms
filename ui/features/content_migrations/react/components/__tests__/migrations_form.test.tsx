@@ -17,10 +17,15 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {render, screen, waitFor, waitForElementToBeRemoved} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ContentMigrationsForm from '../migrations_form'
 import fetchMock from 'fetch-mock'
+import {completeUpload} from '@canvas/upload-file'
+
+jest.mock('@canvas/upload-file', () => ({
+  completeUpload: jest.fn(),
+}))
 
 const setMigrationsMock = jest.fn()
 
@@ -44,16 +49,29 @@ describe('ContentMigrationForm', () => {
         type: 'canvas_cartridge_importer',
       },
     ])
-    fetchMock.mock('/api/v1/courses/0/content_migrations', {
-      id: '4',
-      migration_type: 'course_copy_importer',
-      migration_type_title: 'Test',
-    })
+    fetchMock.mock(
+      '/api/v1/courses/0/content_migrations',
+      {
+        id: '4',
+        migration_type: 'course_copy_importer',
+        migration_type_title: 'Test',
+      },
+      {
+        overwriteRoutes: true,
+      }
+    )
     fetchMock.mock('/users/1/manageable_courses?term=MyCourse', [{id: '3', label: 'MyCourse'}])
   })
 
   afterEach(() => {
     fetchMock.restore()
+  })
+
+  it('does not show any form by default', () => {
+    renderComponent()
+
+    expect(screen.queryByRole('button', {name: 'Add to Import Queue'})).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', {name: 'Cancel'})).not.toBeInTheDocument()
   })
 
   it('Waits for loading of migrator options', () => {
@@ -69,7 +87,7 @@ describe('ContentMigrationForm', () => {
     expect(screen.getByText('Canvas Course Export Package')).toBeInTheDocument()
   })
 
-  it('does POST request with course_copy_importer when submit', async () => {
+  it('performs POST when submitting', async () => {
     renderComponent()
 
     userEvent.click(await screen.findByTitle('Select one'))
@@ -94,7 +112,22 @@ describe('ContentMigrationForm', () => {
     })
   })
 
-  it('does POST request with canvas_cartridge_importer when submit', async () => {
+  it('performs file upload request when submitting', async () => {
+    fetchMock.mock(
+      '/api/v1/courses/0/content_migrations',
+      {
+        id: '4',
+        migration_type: 'course_copy_importer',
+        migration_type_title: 'Test',
+        pre_attachment: {
+          name: 'my_file.zip',
+          size: 1024,
+          no_redirect: false,
+        },
+      },
+      {overwriteRoutes: true}
+    )
+
     renderComponent()
 
     userEvent.click(await screen.findByTitle('Select one'))
@@ -109,15 +142,50 @@ describe('ContentMigrationForm', () => {
 
     userEvent.click(screen.getByTestId('submitMigration'))
 
-    const [url, response] = fetchMock.lastCall()
-    expect(url).toBe('/api/v1/courses/0/content_migrations')
-    expect(JSON.parse(response.body)).toStrictEqual({
-      course_id: '0',
-      migration_type: 'canvas_cartridge_importer',
-      settings: {import_quizzes_next: false},
-      selective_import: false,
-      date_shift_options: false,
-      pre_attachment: {size: 1024, name: 'my_file.zip', no_redirect: true},
+    await waitFor(() => {
+      expect(completeUpload).toHaveBeenCalledWith(
+        {
+          name: 'my_file.zip',
+          size: 1024,
+          no_redirect: false,
+        },
+        expect.any(File),
+        {
+          ignoreResult: true,
+          onProgress: expect.any(Function),
+        }
+      )
     })
+  })
+
+  it('calls setMigrations when submitting', async () => {
+    renderComponent()
+
+    userEvent.click(await screen.findByTitle('Select one'))
+    userEvent.click(screen.getByText('Copy a Canvas Course'))
+
+    userEvent.type(screen.getByPlaceholderText('Search...'), 'MyCourse')
+    userEvent.click(await screen.findByRole('option', {name: 'MyCourse'}))
+
+    userEvent.click(screen.getByText('All content'))
+
+    userEvent.click(screen.getByTestId('submitMigration'))
+
+    expect(setMigrationsMock).toHaveBeenCalled()
+  })
+
+  it('resets form after submitting', async () => {
+    renderComponent()
+
+    userEvent.click(await screen.findByTitle('Select one'))
+    userEvent.click(screen.getByText('Copy a Canvas Course'))
+
+    userEvent.type(screen.getByPlaceholderText('Search...'), 'MyCourse')
+    userEvent.click(await screen.findByRole('option', {name: 'MyCourse'}))
+
+    userEvent.click(screen.getByText('All content'))
+
+    userEvent.click(screen.getByTestId('submitMigration'))
+    await waitForElementToBeRemoved(() => screen.getByTestId('submitMigration'))
   })
 })
