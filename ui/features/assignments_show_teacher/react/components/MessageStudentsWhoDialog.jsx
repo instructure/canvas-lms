@@ -22,7 +22,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {sendMessageStudentsWho} from '../api'
 
-import {hasSubmitted, hasSubmission} from '@canvas/grading/messageStudentsWhoHelper'
+import {hasSubmitted, hasSubmission, hasGraded} from '@canvas/grading/messageStudentsWhoHelper'
 
 import {TeacherAssignmentShape} from '../assignmentData'
 
@@ -106,7 +106,7 @@ export default class MessageStudentsWhoDialog extends React.Component {
       subject: I18n.t('No grade for %{assignmentTitle}', {
         assignmentTitle: this.props.assignment.name,
       }),
-      selectedStudents: this.findStudentsWith(submission => submission.score == null),
+      selectedStudents: this.findStudentsWith(submission => !hasGraded(submission)),
     })
   }
 

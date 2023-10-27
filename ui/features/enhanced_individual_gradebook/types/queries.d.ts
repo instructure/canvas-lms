@@ -95,6 +95,7 @@ export type SubmissionConnection = {
   submittedAt: Date | null
   userId: string
   gradingPeriodId?: string
+  excused?: boolean
 }
 
 export type Attachment = {
