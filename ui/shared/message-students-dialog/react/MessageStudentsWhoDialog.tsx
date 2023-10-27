@@ -82,6 +82,7 @@ export type Student = {
   score?: number | null
   sortableName: string
   submittedAt: null | Date
+  excused?: boolean
 }
 
 export type Props = {
@@ -178,12 +179,12 @@ function filterStudents(criterion, students, cutoff) {
   for (const student of students) {
     switch (criterion?.value) {
       case 'unsubmitted':
-        if (!student.submittedAt) {
+        if (!student.submittedAt && !student.excused) {
           newfilteredStudents.push(student)
         }
         break
       case 'ungraded':
-        if (!student.grade) {
+        if (!student.grade && !student.excused) {
           newfilteredStudents.push(student)
         }
         break
@@ -659,7 +660,7 @@ const MessageStudentsWhoDialog = ({
           <br />
           <TextArea
             data-testid="message-input"
-            isRequired={true}
+            required={true}
             height="200px"
             label={I18n.t('Message')}
             placeholder={I18n.t('Type your message here…')}
