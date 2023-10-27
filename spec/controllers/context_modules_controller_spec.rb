@@ -635,6 +635,15 @@ describe ContextModulesController do
       expect(last_item_module.link_settings).to eq({ "selection_width" => "123", "selection_height" => "456" })
     end
 
+    it "allows a user with only manage_course_content_add permissions to add a module item" do
+      RoleOverride.create!(context: @course.account, permission: "manage_course_content_edit", role: teacher_role, enabled: false)
+      assignment = @course.assignments.create! title: "An Assignment"
+      post "add_item", params: { course_id: @course.id, context_module_id: @module.id, item: { type: "assignment", title: "Assignment", id: assignment.id } }
+      expect(response).to be_successful
+      assignment_item = ContentTag.last
+      expect(assignment_item.content_id).to eq(assignment.id)
+    end
+
     describe "update_module_link_default_tab" do
       it "updates the user preference value to true when external_url is added" do
         @teacher.set_preference(:module_links_default_new_tab, false)
