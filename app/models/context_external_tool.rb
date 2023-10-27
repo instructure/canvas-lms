@@ -88,6 +88,8 @@ class ContextExternalTool < ActiveRecord::Base
     :message_type,
     :prefer_sis_email,
     :required_permissions,
+    :launch_height,
+    :launch_width,
     :selection_height,
     :selection_width,
     :text,
@@ -325,7 +327,7 @@ class ContextExternalTool < ActiveRecord::Base
     { enabled: true }.with_indifferent_access.merge(settings[type])
   end
 
-  # Returns array of either <symbol tope> or array [<symbol type>, <validator block>]
+  # Returns array of either <symbol type> or array [<symbol type>, <validator block>]
   def self.extension_keys_for_placement(type)
     extension_keys = STANDARD_EXTENSION_KEYS
 
