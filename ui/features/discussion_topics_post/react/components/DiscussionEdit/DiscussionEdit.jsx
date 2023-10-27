@@ -249,6 +249,7 @@ export const DiscussionEdit = props => {
                     attachmentToUpload={attachmentToUpload}
                     responsiveQuerySizes={responsiveQuerySizes}
                     isGradedDiscussion={isGradedDiscussion}
+                    canAttach={ENV.can_attach_entries}
                   />
                 </View>
                 {rceButtons.reverse()}
@@ -264,6 +265,7 @@ export const DiscussionEdit = props => {
                       attachmentToUpload={attachmentToUpload}
                       responsiveQuerySizes={responsiveQuerySizes}
                       isGradedDiscussion={isGradedDiscussion}
+                      canAttach={ENV.can_attach_entries}
                     />
                   </View>
                 </Flex.Item>

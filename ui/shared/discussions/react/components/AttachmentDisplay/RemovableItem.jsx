@@ -53,7 +53,6 @@ export const RemovableItem = ({
               onMouseLeave={handleExit}
               onFocus={handleInteraction}
               onBlur={handleExit}
-              tabIndex={0}
               role="button"
               aria-label={childrenAriaLabel}
               data-testid="removable-item"
