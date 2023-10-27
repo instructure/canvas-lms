@@ -18,62 +18,57 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
-import {bool, arrayOf, shape, string} from 'prop-types'
 import {View} from '@instructure/ui-view'
 import {List} from '@instructure/ui-list'
 import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
 import {Link} from '@instructure/ui-link'
+import {useQuery} from '@canvas/query'
+import groupsQuery from '../queries/groupsQuery'
+import type {AccessibleGroup} from '../../../../api.d'
 
 const I18n = useI18nScope('GroupsTray')
 
-export default function GroupsTray({groups, hasLoaded}) {
+export default function GroupsTray() {
+  const {data, isLoading, isSuccess} = useQuery<AccessibleGroup[], Error>({
+    queryKey: ['groups', 'self', 'can_access'],
+    queryFn: groupsQuery,
+    fetchAtLeastOnce: true,
+  })
+
   return (
     <View as="div" padding="medium">
       <Heading level="h3" as="h2">
         {I18n.t('Groups')}
       </Heading>
       <hr role="presentation" />
-      <List isUnstyled={true} margin="small 0" itemSpacing="small">
-        {hasLoaded ? (
-          groups
-            .map(group => (
-              <List.Item key={group.id}>
-                <Link isWithinText={false} href={`/groups/${group.id}`}>
-                  {group.name}
-                </Link>
-              </List.Item>
-            ))
-            .concat([
-              <List.Item key="hr">
-                <hr role="presentation" />
-              </List.Item>,
-              <List.Item key="all">
-                <Link isWithinText={false} href="/groups">
-                  {I18n.t('All Groups')}
-                </Link>
-              </List.Item>,
-            ])
-        ) : (
+      {isLoading && (
+        <List isUnstyled={true} margin="small 0" itemSpacing="small">
           <List.Item>
             <Spinner size="small" renderTitle={I18n.t('Loading')} />
           </List.Item>
-        )}
-      </List>
+        </List>
+      )}
+
+      {isSuccess && (
+        <List isUnstyled={true} margin="small 0" itemSpacing="small">
+          {data.map(group => (
+            <List.Item key={group.id}>
+              <Link isWithinText={false} href={`/groups/${group.id}`}>
+                {group.name}
+              </Link>
+            </List.Item>
+          ))}
+          <List.Item key="hr">
+            <hr role="presentation" />
+          </List.Item>
+          <List.Item key="all">
+            <Link isWithinText={false} href="/groups">
+              {I18n.t('All Groups')}
+            </Link>
+          </List.Item>
+        </List>
+      )}
     </View>
   )
-}
-
-GroupsTray.propTypes = {
-  groups: arrayOf(
-    shape({
-      id: string.isRequired,
-      name: string.isRequired,
-    })
-  ).isRequired,
-  hasLoaded: bool.isRequired,
-}
-
-GroupsTray.defaultProps = {
-  groups: [],
 }

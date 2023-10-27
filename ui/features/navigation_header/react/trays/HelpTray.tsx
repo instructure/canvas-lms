@@ -18,7 +18,6 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
-import {bool, func} from 'prop-types'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import HelpDialog from '../HelpDialog/index'
@@ -26,13 +25,21 @@ import ReleaseNotesList from '../lists/ReleaseNotesList'
 
 const I18n = useI18nScope('HelpTray')
 
+type Props = {
+  closeTray: () => void
+  badgeDisabled: boolean
+  setBadgeDisabled: (state: boolean) => void
+  forceUnreadPoll?: () => void
+}
+
 export default function HelpTray({
   closeTray,
-  showNotes,
   badgeDisabled,
   setBadgeDisabled,
   forceUnreadPoll,
-}) {
+}: Props) {
+  const showNotes = Boolean(ENV.FEATURES?.embedded_release_notes)
+
   return (
     <View as="div" padding="medium" id="help_tray">
       <Heading level="h3" as="h2">
@@ -49,12 +56,4 @@ export default function HelpTray({
       ) : null}
     </View>
   )
-}
-
-HelpTray.propTypes = {
-  closeTray: func.isRequired,
-  showNotes: bool,
-  badgeDisabled: bool,
-  setBadgeDisabled: func,
-  forceUnreadPoll: func,
 }

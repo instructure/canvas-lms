@@ -21,7 +21,8 @@ import {render as testingLibraryRender} from '@testing-library/react'
 import HelpTray from '../HelpTray'
 import {QueryProvider, queryClient} from '@canvas/query'
 
-const render = children => testingLibraryRender(<QueryProvider>{children}</QueryProvider>)
+const render = (children: unknown) =>
+  testingLibraryRender(<QueryProvider>{children}</QueryProvider>)
 
 describe('HelpTray', () => {
   const links = [
@@ -43,14 +44,20 @@ describe('HelpTray', () => {
 
   const props = {
     closeTray: jest.fn(),
+    badgeDisabled: false,
+    setBadgeDisabled: jest.fn(),
+    forceUnreadPoll: jest.fn(),
   }
 
   beforeEach(() => {
+    // @ts-expect-error
     window.ENV = {FEATURES: {featured_help_links: true}}
   })
 
   afterEach(() => {
+    // @ts-expect-error
     window.ENV = {}
+    queryClient.removeQueries()
   })
 
   it('renders title header', () => {

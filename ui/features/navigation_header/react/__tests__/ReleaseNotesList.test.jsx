@@ -50,18 +50,6 @@ describe('ReleaseNotesList', () => {
     },
   ]
 
-  it('renders spinner while loading', () => {
-    useFetchApi.mockImplementationOnce(({loading}) => loading(true))
-    const {getByText} = render(<ReleaseNotesList />)
-    expect(getByText(/loading release notes/i)).toBeInTheDocument()
-  })
-
-  it('hides spinner when not loading', () => {
-    useFetchApi.mockImplementationOnce(({loading}) => loading(false))
-    const {queryByText} = render(<ReleaseNotesList />)
-    expect(queryByText(/loading release notes/i)).not.toBeInTheDocument()
-  })
-
   it('renders the notes', () => {
     useFetchApi.mockImplementationOnce(({loading, success}) => {
       loading(false)

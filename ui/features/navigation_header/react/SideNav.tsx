@@ -17,7 +17,7 @@
  */
 
 import React, {useEffect} from 'react'
-import {Navigation} from '@instructure/ui-navigation'
+import {Navigation as SideNavBar} from '@instructure/ui-navigation'
 import {Badge} from '@instructure/ui-badge'
 import {Avatar} from '@instructure/ui-avatar'
 import {Img} from '@instructure/ui-img'
@@ -37,7 +37,8 @@ import {
 } from '@instructure/ui-icons'
 import {AccessibleContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
+import {useQuery} from '@canvas/query'
+import {useMutation, useQueryClient} from '@tanstack/react-query'
 import {getUnreadCount} from './queries/unreadCountQuery'
 import {getSetting, setSetting} from './queries/settingsQuery'
 
@@ -108,6 +109,7 @@ const SideNav = () => {
     queryKey: ['settings', 'release_notes_badge_disabled'],
     queryFn: getSetting,
     enabled: countsEnabled && ENV.FEATURES.embedded_release_notes,
+    fetchAtLeastOnce: true,
   })
 
   const {data: unreadReleaseNotesCount} = useQuery({
@@ -121,6 +123,7 @@ const SideNav = () => {
     queryKey: ['settings', 'collapse_global_nav'],
     queryFn: getSetting,
     enabled: true,
+    fetchAtLeastOnce: true,
   })
 
   const setCollapseGlobalNav = useMutation({
@@ -145,7 +148,7 @@ const SideNav = () => {
 
   return (
     <div style={{width: '100%', height: '100vh'}} data-testid="sidenav-container">
-      <Navigation
+      <SideNavBar
         label="Main navigation"
         toggleLabel={{
           expandedLabel: 'Minimize Navigation',
@@ -157,7 +160,7 @@ const SideNav = () => {
           minimizedWidth: '100%',
         }}
       >
-        <Navigation.Item
+        <SideNavBar.Item
           icon={
             !logoUrl ? (
               <div style={{margin: '0.5rem 0 0.5rem 0'}}>
@@ -184,7 +187,7 @@ const SideNav = () => {
           }}
           data-testid="sidenav-header-logo"
         />
-        <Navigation.Item
+        <SideNavBar.Item
           icon={
             <Badge
               count={unreadContentSharesCount}
@@ -220,7 +223,7 @@ const SideNav = () => {
           }}
           themeOverride={navItemThemeOverride}
         />
-        <Navigation.Item
+        <SideNavBar.Item
           icon={<IconAdminLine />}
           label={I18n.t('Admin')}
           href="/accounts"
@@ -229,14 +232,14 @@ const SideNav = () => {
           }}
           themeOverride={navItemThemeOverride}
         />
-        <Navigation.Item
+        <SideNavBar.Item
           selected={true}
           icon={isK5User ? <IconHomeLine data-testid="K5HomeIcon" /> : <IconDashboardLine />}
           label={isK5User ? I18n.t('Home') : I18n.t('Dashboard')}
           href="/"
           themeOverride={navItemThemeOverride}
         />
-        <Navigation.Item
+        <SideNavBar.Item
           icon={<IconCoursesLine />}
           label={isK5User ? I18n.t('Subjects') : I18n.t('Courses')}
           href="/courses"
@@ -245,13 +248,13 @@ const SideNav = () => {
           }}
           themeOverride={navItemThemeOverride}
         />
-        <Navigation.Item
+        <SideNavBar.Item
           icon={<IconCalendarMonthLine />}
           label={I18n.t('Calendar')}
           href="/calendar"
           themeOverride={navItemThemeOverride}
         />
-        <Navigation.Item
+        <SideNavBar.Item
           icon={
             <Badge
               count={unreadConversationsCount}
@@ -280,7 +283,7 @@ const SideNav = () => {
           href="/conversations"
           themeOverride={navItemThemeOverride}
         />
-        <Navigation.Item
+        <SideNavBar.Item
           icon={
             <Badge
               count={unreadReleaseNotesCount}
@@ -309,7 +312,7 @@ const SideNav = () => {
           href="/accounts/self/settings"
           themeOverride={navItemThemeOverride}
         />
-      </Navigation>
+      </SideNavBar>
     </div>
   )
 }

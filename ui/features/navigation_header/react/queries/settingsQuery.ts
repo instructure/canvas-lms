@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import type {QueryKey} from '@tanstack/react-query'
 import type {Setting} from '@canvas/global/env/EnvCommon'
 
 const settings = [
@@ -28,8 +29,8 @@ const settings = [
   'elementary_dashboard_disabled',
 ] as const
 
-export function getSetting({queryKey}: {queryKey: ['settings', Setting]}) {
-  const setting = queryKey[1]
+export function getSetting({queryKey}: {queryKey: QueryKey}) {
+  const setting = queryKey[1] as Setting
   if (!settings.includes(setting)) {
     throw new Error('Invalid setting')
   }

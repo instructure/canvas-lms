@@ -20,8 +20,6 @@ import $ from 'jquery'
 import parseLinkHeader from 'link-header-parsing/parseLinkHeaderFromXHR'
 import type {HistoryEntry} from '../../../../api.d'
 
-const RESOURCE_COUNT = 10
-
 export default function historyQuery(): Promise<HistoryEntry[]> {
   return new Promise((resolve, reject) => {
     const data: HistoryEntry[] = []
@@ -33,7 +31,7 @@ export default function historyQuery(): Promise<HistoryEntry[]> {
         (newData: HistoryEntry[], _: any, xhr: XMLHttpRequest) => {
           data.push(...newData)
           const link = parseLinkHeader(xhr)
-          if (newData.length >= RESOURCE_COUNT && link.next) {
+          if (link.next) {
             load(link.next)
           } else {
             resolve(data)

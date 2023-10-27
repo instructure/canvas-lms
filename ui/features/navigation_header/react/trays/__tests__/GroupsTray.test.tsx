@@ -17,46 +17,48 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render as testingLibraryRender} from '@testing-library/react'
 import GroupsTray from '../GroupsTray'
+import {QueryProvider, queryClient} from '@canvas/query'
+
+const render = (children: unknown) =>
+  testingLibraryRender(<QueryProvider>{children}</QueryProvider>)
 
 describe('GroupsTray', () => {
   const groups = [
     {
       id: '1',
       name: 'Group1',
+      can_access: true,
     },
     {
       id: '2',
       name: 'Group2',
+      can_access: true,
     },
   ]
 
-  const props = {
-    groups,
-    hasLoaded: true,
-  }
+  beforeEach(() => {
+    queryClient.setQueryData(['groups', 'self', 'can_access'], groups)
+  })
 
-  it('renders loading spinner', () => {
-    const {getByTitle, queryByText} = render(<GroupsTray {...props} hasLoaded={false} />)
-    getByTitle('Loading')
-    expect(queryByText('Group1')).toBeNull()
-    expect(queryByText('Group2')).toBeNull()
+  afterEach(() => {
+    queryClient.removeQueries()
   })
 
   it('renders the header', () => {
-    const {getByText} = render(<GroupsTray {...props} />)
+    const {getByText} = render(<GroupsTray />)
     expect(getByText('Groups')).toBeVisible()
   })
 
   it('renders a link for each group', () => {
-    const {getByText} = render(<GroupsTray {...props} />)
+    const {getByText} = render(<GroupsTray />)
     getByText('Group1')
     getByText('Group2')
   })
 
   it('renders all groups link', () => {
-    const {getByText} = render(<GroupsTray {...props} />)
+    const {getByText} = render(<GroupsTray />)
     getByText('All Groups')
   })
 })

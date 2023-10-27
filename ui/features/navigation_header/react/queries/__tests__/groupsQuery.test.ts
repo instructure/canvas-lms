@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 - present Instructure, Inc.
+ * Copyright (C) 2023 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,16 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {arrayOf, shape, string} from 'prop-types'
+import {groupFilter} from '../groupsQuery'
 
-export const HistoryShape = arrayOf(
-  shape({
-    asset_code: string.isRequired,
-    asset_name: string.isRequired,
-    asset_icon: string,
-    asset_readable_category: string,
-    visited_url: string.isRequired,
-    visited_at: string.isRequired,
-    context_name: string,
+describe('groupsQuery', () => {
+  describe('groupFilter', () => {
+    it('returns true when group.can_access is true and group.concluded is false', () => {
+      expect(groupFilter({can_access: true, concluded: false})).toBe(true)
+    })
+
+    it('returns false when group.can_access is false', () => {
+      expect(groupFilter({can_access: false, concluded: false})).toBe(false)
+    })
+
+    it('returns false when group.concluded is true', () => {
+      expect(groupFilter({can_access: true, concluded: true})).toBe(false)
+    })
   })
-)
+})

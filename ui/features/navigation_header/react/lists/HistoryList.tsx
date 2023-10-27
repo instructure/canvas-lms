@@ -25,7 +25,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import _ from 'lodash'
 import {formatTimeAgoDate, formatTimeAgoTitle} from '@canvas/enhanced-user-content'
-import {useQuery} from '@tanstack/react-query'
+import {useQuery} from '@canvas/query'
 import historyQuery from '../queries/historyQuery'
 
 const I18n = useI18nScope('new_nav')
@@ -34,6 +34,7 @@ export default function HistoryList() {
   const {data, isLoading, isSuccess} = useQuery({
     queryKey: ['history'],
     queryFn: historyQuery,
+    fetchAtLeastOnce: true,
   })
 
   const uniqueHistoryEntries = _.uniqBy(data, entry => entry.asset_code)

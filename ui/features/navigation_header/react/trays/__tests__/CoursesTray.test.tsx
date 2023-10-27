@@ -17,8 +17,12 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render as testingLibraryRender} from '@testing-library/react'
 import CoursesTray from '../CoursesTray'
+import {QueryProvider, queryClient} from '@canvas/query'
+
+const render = (children: unknown) =>
+  testingLibraryRender(<QueryProvider>{children}</QueryProvider>)
 
 describe('CoursesTray', () => {
   const courses = [
@@ -39,53 +43,48 @@ describe('CoursesTray', () => {
     },
   ]
 
-  function makeProps(overrides = {}) {
-    return {
-      courses,
-      hasLoaded: true,
-      k5User: false,
-      ...overrides,
-    }
-  }
+  beforeEach(() => {
+    queryClient.setQueryData(['courses'], courses)
+    window.ENV.K5_USER = false
+    ENV.current_user_roles = []
+  })
 
-  it('renders loading spinner', () => {
-    const {getByTitle, queryByText} = render(<CoursesTray {...makeProps({hasLoaded: false})} />)
-    getByTitle('Loading')
-    expect(queryByText('Course1')).toBeNull()
-    expect(queryByText('Course2')).toBeNull()
+  afterEach(() => {
+    queryClient.removeQueries()
   })
 
   it('renders the header', () => {
-    const {getByText} = render(<CoursesTray {...makeProps()} />)
+    const {getByText} = render(<CoursesTray />)
     expect(getByText('Courses')).toBeVisible()
   })
 
   it('renders a link for each course', () => {
-    const {getByText} = render(<CoursesTray {...makeProps()} />)
+    const {getByText} = render(<CoursesTray />)
     getByText('Course1')
     getByText('Course2')
   })
 
   it('renders all courses link', () => {
-    const {getByText} = render(<CoursesTray {...makeProps()} />)
+    const {getByText} = render(<CoursesTray />)
     getByText('All Courses')
   })
 
   it('does not render a split dashboard for non teachers', () => {
-    const {queryByText} = render(<CoursesTray {...makeProps()} />)
+    const {queryByText} = render(<CoursesTray />)
     expect(queryByText('Published Courses')).not.toBeInTheDocument()
     expect(queryByText('Unpublished Courses')).not.toBeInTheDocument()
   })
 
   it('does render a split dashboard for teachers with appropriate headers', () => {
     window.ENV = {...window.ENV, current_user_roles: ['teacher']}
-    const {getByText} = render(<CoursesTray {...makeProps()} />)
+    const {getByText} = render(<CoursesTray />)
     getByText('Published Courses')
     getByText('Unpublished Courses')
   })
 
   it('changes `Courses` to `Subjects` if k5User is set', () => {
-    const {getByText, queryByText} = render(<CoursesTray {...makeProps({k5User: true})} />)
+    window.ENV.K5_USER = true
+    const {getByText, queryByText} = render(<CoursesTray />)
     expect(getByText('Subjects')).toBeInTheDocument()
     expect(getByText('All Subjects')).toBeInTheDocument()
     expect(queryByText('Courses')).not.toBeInTheDocument()

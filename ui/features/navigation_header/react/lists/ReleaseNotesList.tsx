@@ -45,7 +45,7 @@ function persistBadgeDisabled(state: boolean) {
 type Props = {
   badgeDisabled: boolean
   setBadgeDisabled: (state: boolean) => void
-  forceUnreadPoll: (state: number) => void
+  forceUnreadPoll?: (state: number) => void
 }
 
 type ReleaseNote = {

@@ -28,7 +28,7 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
 import tourPubSub from '@canvas/tour-pubsub'
-import {useQuery} from '@tanstack/react-query'
+import {useQuery} from '@canvas/query'
 import helpLinksQuery from '../queries/helpLinksQuery'
 import type {HelpLink} from '../../../../api.d'
 
@@ -42,6 +42,7 @@ export default function HelpLinks({onClick}: Props) {
   const {data, isLoading, isSuccess} = useQuery<HelpLink[]>({
     queryKey: ['helpLinks'],
     queryFn: helpLinksQuery,
+    fetchAtLeastOnce: true,
   })
 
   const links = data || []

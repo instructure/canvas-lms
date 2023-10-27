@@ -13,10 +13,8 @@
 //
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
-import $ from 'jquery'
 import React from 'react'
 import {render} from '@testing-library/react'
-import {OBSERVER_COOKIE_PREFIX} from '@canvas/observer-picker/ObserverGetObservee'
 import Navigation from '../OldSideNav'
 
 const unreadComponent = jest.fn(() => <></>)
@@ -83,74 +81,6 @@ describe('GlobalNavigation', () => {
       expect(unreadComponent).toHaveBeenCalledTimes(2)
       const urls = unreadComponent.mock.calls.map(parms => parms[0].dataUrl)
       expect(urls).not.toEqual(expect.arrayContaining(['/api/v1/release_notes/unread_count']))
-    })
-  })
-
-  describe('Subjects/Course list', () => {
-    const originalGetJSON = $.getJSON
-    beforeEach(() => {
-      $.getJSON = jest.fn()
-    })
-    afterEach(() => {
-      $.getJSON = originalGetJSON
-      document.cookie = ''
-    })
-
-    describe('for a student', () => {
-      beforeAll(() => {
-        window.ENV.current_user_roles = ['user', 'student']
-      })
-      it("requests the user's courses", () => {
-        const navRef = React.createRef()
-        render(<Navigation ref={navRef} unreadComponent={unreadComponent} />)
-        navRef.current.ensureLoaded('courses')
-        expect($.getJSON).toHaveBeenCalledWith(
-          '/api/v1/users/self/favorites/courses?include[]=term&exclude[]=enrollments&sort=nickname',
-          expect.anything()
-        )
-      })
-
-      it("doesn't request the user's courses twice", () => {
-        const navRef = React.createRef()
-        render(<Navigation ref={navRef} unreadComponent={unreadComponent} />)
-        navRef.current.ensureLoaded('courses')
-        navRef.current.ensureLoaded('courses')
-        expect($.getJSON).toHaveBeenCalledTimes(1)
-      })
-    })
-
-    describe('for an observer', () => {
-      beforeAll(() => {
-        window.ENV.current_user_roles = ['user', 'observer']
-        document.cookie = `${OBSERVER_COOKIE_PREFIX}${ENV.current_user_id}=17`
-      })
-
-      it("requests the user's observee's courses", () => {
-        const navRef = React.createRef()
-        render(<Navigation ref={navRef} unreadComponent={unreadComponent} />)
-        navRef.current.ensureLoaded('courses')
-        expect($.getJSON).toHaveBeenCalledWith(
-          '/api/v1/users/self/favorites/courses?include[]=term&exclude[]=enrollments&sort=nickname&observed_user_id=17',
-          expect.anything()
-        )
-      })
-
-      it("doesn't request the same observee's courses twice", () => {
-        const navRef = React.createRef()
-        render(<Navigation ref={navRef} unreadComponent={unreadComponent} />)
-        navRef.current.ensureLoaded('courses')
-        navRef.current.ensureLoaded('courses')
-        expect($.getJSON).toHaveBeenCalledTimes(1)
-      })
-
-      it('makes a new request is the observee changes', () => {
-        const navRef = React.createRef()
-        render(<Navigation ref={navRef} unreadComponent={unreadComponent} />)
-        navRef.current.ensureLoaded('courses')
-        document.cookie = `${OBSERVER_COOKIE_PREFIX}${ENV.current_user_id}=27`
-        navRef.current.ensureLoaded('courses')
-        expect($.getJSON).toHaveBeenCalledTimes(2)
-      })
     })
   })
 })
