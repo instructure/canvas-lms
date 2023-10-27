@@ -1045,7 +1045,9 @@ CanvasRails::Application.routes.draw do
   get "privacy_policy" => "legal_information#privacy_policy", :as => "privacy_policy_redirect"
 
   scope(controller: :smart_search) do
-    get "search", action: :show
+    get "courses/:course_id/search", action: :show, as: :course_search
+    # TODO: Add back global search once we have a good way to handle it
+    # get "search", action: :show
   end
 
   ### API routes ###
@@ -2548,6 +2550,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: "smart_search") do
       get "courses/:course_id/smartsearch", action: :search, as: :course_smart_search_query
+      # TODO: add account level search
     end
   end
 

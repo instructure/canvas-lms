@@ -172,18 +172,7 @@
         </a>
       </li>
       <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('/conversations') %>">
-      <% if OpenAi.smart_search_available?(@domain_root_account) %>
-        <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('/search') %>">
-          <a id="global_nav_search_link" href="/search" class="ic-app-header__menu-list-link">
-            <div class="menu-item-icon-container" aria-hidden="true">
-              <%= render(partial: "shared/svg/svg_icon_magnify", formats: [:svg]) %>
-            </div>
-            <div class="menu-item__text">
-              <%= t('Search') %>
-            </div>
-          </a>
-        </li>
-      <% end %>
+      <!-- TODO: Add back global search when available -->
         <a id="global_nav_conversations_link" href="/conversations" class="ic-app-header__menu-list-link">
           <div class="menu-item-icon-container">
             <span aria-hidden="true"><%= render(partial: "shared/svg/#{'k12/' if k12?}svg_icon_inbox", formats: [:svg]) %></span>
