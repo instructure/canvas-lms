@@ -50,8 +50,7 @@ describe('TempEnrollEdit component', () => {
       onEdit: jest.fn(),
       onDelete: jest.fn(),
       onAddNew: jest.fn(),
-      // flag that helps us determine that we are in the context of a provider
-      contextType: PROVIDER,
+      enrollmentType: PROVIDER,
       tempEnrollPermissions: {
         canAdd: true,
         canDelete: true,
@@ -78,16 +77,25 @@ describe('TempEnrollEdit component', () => {
   })
 
   describe('table headers', () => {
-    it('displays table headers', () => {
+    it('displays the provider’s table headers', () => {
       render(<TempEnrollEdit {...props} />)
 
-      expect(screen.getByText('Name')).toBeInTheDocument()
-      expect(screen.getByText('Enrollment Period')).toBeInTheDocument()
-      expect(screen.getByText('Enrollment Type')).toBeInTheDocument()
+      expect(screen.getByText('Recipient Name')).toBeInTheDocument()
+      expect(screen.getByText('Recipient Enrollment Period')).toBeInTheDocument()
+      expect(screen.getByText('Recipient Enrollment Type')).toBeInTheDocument()
       expect(screen.getByText('Temporary enrollment option links')).toBeInTheDocument()
     })
 
-    it('does not display opitons links if permissions are not set', () => {
+    it('displays the recipient’s table headers', () => {
+      render(<TempEnrollEdit {...props} enrollmentType={RECIPIENT} />)
+
+      expect(screen.getByText('Provider Name')).toBeInTheDocument()
+      expect(screen.getByText('Recipient Enrollment Period')).toBeInTheDocument()
+      expect(screen.getByText('Recipient Enrollment Type')).toBeInTheDocument()
+      expect(screen.getByText('Temporary enrollment option links')).toBeInTheDocument()
+    })
+
+    it('does not display options links if permissions are not set', () => {
       const newProps = {
         ...props,
         tempEnrollPermissions: {
@@ -99,9 +107,6 @@ describe('TempEnrollEdit component', () => {
 
       render(<TempEnrollEdit {...newProps} />)
 
-      expect(screen.getByText('Name')).toBeInTheDocument()
-      expect(screen.getByText('Enrollment Period')).toBeInTheDocument()
-      expect(screen.getByText('Enrollment Type')).toBeInTheDocument()
       expect(screen.queryByText('Temporary enrollment option links')).not.toBeInTheDocument()
     })
   })
@@ -144,16 +149,16 @@ describe('TempEnrollEdit component', () => {
       expect(screen.queryByTestId('delete-button')).not.toBeInTheDocument()
     })
 
-    it('shows "Add New" button based on canAdd and contextType', () => {
+    it('shows "Add New" button based on canAdd and enrollmentType', () => {
       render(<TempEnrollEdit {...props} />)
 
       expect(screen.getByTestId('add-button')).toBeInTheDocument()
     })
 
-    it('does not show "Add New" button based on recipient contextType', () => {
+    it('does not show "Add New" button based on recipient enrollmentType', () => {
       const newProps = {
         ...props,
-        contextType: RECIPIENT,
+        enrollmentType: RECIPIENT,
       }
 
       render(<TempEnrollEdit {...newProps} />)

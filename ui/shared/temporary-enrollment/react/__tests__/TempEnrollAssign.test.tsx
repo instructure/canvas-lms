@@ -86,7 +86,7 @@ const props = {
   setEnrollmentStatus: jest.fn(),
   doSubmit: () => false,
   isInAssignEditMode: false,
-  contextType: PROVIDER,
+  enrollmentType: PROVIDER,
 }
 
 const ENROLLMENTS_URI = encodeURI(
@@ -326,9 +326,9 @@ describe('TempEnrollAssign', () => {
   })
 
   describe('getEnrollmentAndUserProps', () => {
-    it('should return unchanged values when contextType is null', () => {
+    it('should return unchanged values when enrollmentType is null', () => {
       const {enrollmentProps, userProps} = getEnrollmentAndUserProps({
-        contextType: null,
+        enrollmentType: null,
         enrollment: props.enrollment,
         user: props.user,
       })
@@ -337,9 +337,9 @@ describe('TempEnrollAssign', () => {
       expect(userProps).toEqual(props.user)
     })
 
-    it('should return enrollmentProps and userProps correctly when contextType is RECIPIENT', () => {
+    it('should return enrollmentProps and userProps correctly when enrollmentType is RECIPIENT', () => {
       const {enrollmentProps, userProps} = getEnrollmentAndUserProps({
-        contextType: RECIPIENT,
+        enrollmentType: RECIPIENT,
         enrollment: props.enrollment,
         user: props.user,
       })
@@ -349,9 +349,9 @@ describe('TempEnrollAssign', () => {
       expect(userProps).toEqual(props.enrollment)
     })
 
-    it('should return enrollmentProps and userProps correctly when contextType is PROVIDER', () => {
+    it('should return enrollmentProps and userProps correctly when enrollmentType is PROVIDER', () => {
       const {enrollmentProps, userProps} = getEnrollmentAndUserProps({
-        contextType: PROVIDER,
+        enrollmentType: PROVIDER,
         enrollment: props.enrollment,
         user: props.user,
       })
