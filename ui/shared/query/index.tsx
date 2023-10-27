@@ -20,7 +20,6 @@ import React from 'react'
 import {QueryClient} from '@tanstack/react-query'
 import {PersistQueryClientProvider} from '@tanstack/react-query-persist-client'
 import {createSyncStoragePersister} from '@tanstack/query-sync-storage-persister'
-import {sessionStorage} from '@canvas/storage'
 
 export const queryClient = new QueryClient({
   defaultOptions: {
