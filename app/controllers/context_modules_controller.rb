@@ -676,7 +676,8 @@ class ContextModulesController < ApplicationController
   include ContextModulesHelper
   def add_item
     @module = @context.context_modules.not_deleted.find(params[:context_module_id])
-    if authorized_action(@module, @current_user, :update)
+
+    if authorized_action(@context, @current_user, %i[manage_content manage_course_content_add manage_course_content_edit])
       params[:item][:link_settings] = launch_dimensions
       @tag = @module.add_item(params[:item])
       unless @tag&.valid?
