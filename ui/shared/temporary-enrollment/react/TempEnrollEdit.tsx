@@ -50,7 +50,7 @@ interface Props {
   readonly onEdit?: (enrollment: User) => void
   readonly onDelete?: (enrollmentId: number) => void
   readonly onAddNew?: () => void
-  readonly contextType: EnrollmentType
+  readonly enrollmentType: EnrollmentType
   readonly tempEnrollPermissions: TempEnrollPermissions
 }
 
@@ -93,6 +93,9 @@ export function TempEnrollEdit(props: Props) {
 
   // destructure and cache permission checks (for use in eager and lazy evaluations)
   const {canEdit, canDelete, canAdd} = props.tempEnrollPermissions
+
+  const enrollmentTypeLabel =
+    props.enrollmentType === PROVIDER ? I18n.t('Recipient') : I18n.t('Provider')
 
   const handleEditClick = (enrollment: Enrollment) => {
     if (canEdit) {
@@ -189,7 +192,7 @@ export function TempEnrollEdit(props: Props) {
       <Flex wrap="wrap" margin="0 small 0 0">
         <Flex.Item>{renderAvatar()}</Flex.Item>
 
-        {canAdd && props.contextType === PROVIDER && (
+        {canAdd && props.enrollmentType === PROVIDER && (
           <Flex.Item margin="0 0 0 auto">
             <Button
               data-testid="add-button"
@@ -208,9 +211,15 @@ export function TempEnrollEdit(props: Props) {
       <Table caption={<ScreenReaderContent>{I18n.t('User information')}</ScreenReaderContent>}>
         <Table.Head>
           <Table.Row>
-            <Table.ColHeader id="usertable-name">{I18n.t('Name')}</Table.ColHeader>
-            <Table.ColHeader id="usertable-email">{I18n.t('Enrollment Period')}</Table.ColHeader>
-            <Table.ColHeader id="usertable-loginid">{I18n.t('Enrollment Type')}</Table.ColHeader>
+            <Table.ColHeader id="usertable-name">
+              {enrollmentTypeLabel} {I18n.t('Name')}
+            </Table.ColHeader>
+            <Table.ColHeader id="usertable-email">
+              {I18n.t('Recipient Enrollment Period')}
+            </Table.ColHeader>
+            <Table.ColHeader id="usertable-loginid">
+              {I18n.t('Recipient Enrollment Type')}
+            </Table.ColHeader>
             {(canEdit || canDelete) && (
               <Table.ColHeader id="header-user-option-links" width="1">
                 <ScreenReaderContent>

@@ -199,7 +199,7 @@ export function TempEnrollModal(props: Props) {
           onAddNew={handleOpenForNewEnrollment}
           onEdit={handleGoToAssignPageWithEnrollment}
           onDelete={handleEnrollmentDeletion}
-          contextType={props.enrollmentType}
+          enrollmentType={props.enrollmentType}
           tempEnrollPermissions={props.tempEnrollPermissions}
         />
       )
@@ -216,7 +216,7 @@ export function TempEnrollModal(props: Props) {
             doSubmit={isSubmissionPage}
             setEnrollmentStatus={handleEnrollmentSubmission}
             isInAssignEditMode={isViewingAssignFromEdit}
-            contextType={props.enrollmentType}
+            enrollmentType={props.enrollmentType}
           />
         )
       }

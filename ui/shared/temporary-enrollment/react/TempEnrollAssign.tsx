@@ -83,7 +83,7 @@ interface Props {
   readonly doSubmit: () => boolean
   readonly setEnrollmentStatus: Function
   readonly isInAssignEditMode: boolean
-  readonly contextType: EnrollmentType
+  readonly enrollmentType: EnrollmentType
 }
 
 interface RoleChoice {
@@ -150,7 +150,7 @@ interface EnrollmentAndUserProps {
 }
 
 interface EnrollmentAndUserContextProps {
-  readonly contextType: EnrollmentType
+  readonly enrollmentType: EnrollmentType
   readonly enrollment: User
   readonly user: User
 }
@@ -168,9 +168,9 @@ interface EnrollmentAndUserContextProps {
 export function getEnrollmentAndUserProps(
   props: EnrollmentAndUserContextProps
 ): EnrollmentAndUserProps {
-  const {contextType, enrollment, user} = props
-  const enrollmentProps = contextType === RECIPIENT ? user : enrollment
-  const userProps = contextType === RECIPIENT ? enrollment : user
+  const {enrollmentType, enrollment, user} = props
+  const enrollmentProps = enrollmentType === RECIPIENT ? user : enrollment
+  const userProps = enrollmentType === RECIPIENT ? enrollment : user
 
   return {enrollmentProps, userProps}
 }
