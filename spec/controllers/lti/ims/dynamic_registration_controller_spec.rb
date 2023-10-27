@@ -121,6 +121,16 @@ describe Lti::IMS::DynamicRegistrationController do
           "messages" => [{
             "type" => "LtiResourceLinkRequest",
             "label" => "deep link label",
+            "placements" => ["course_navigation"],
+            "target_link_uri" => "https://example.com/launch",
+            "custom_parameters" => {
+              "foo" => "bar"
+            },
+            "roles" => [
+              "http://purl.imsglobal.org/vocab/lis/v2/membership#ContentDeveloper",
+              "http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor"
+            ],
+            "icon_uri" => "https://example.com/icon.jpg"
           }],
           "claims" => ["iss", "sub"],
           "target_link_uri" => "https://example.com/launch",

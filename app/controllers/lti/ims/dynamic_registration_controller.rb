@@ -131,7 +131,7 @@ module Lti
           :token_endpoint_auth_method,
           { "https://purl.imsglobal.org/spec/lti-tool-configuration" => [
             :domain,
-            { messages: %i[type target_link_uri label] },
+            { messages: [:type, :target_link_uri, :label, :icon_uri, { custom_parameters: ArbitraryStrongishParams::ANYTHING }, { roles: [] }, { placements: [] }] },
             { claims: [] },
             :target_link_uri,
           ] },
