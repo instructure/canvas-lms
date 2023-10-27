@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - present Instructure, Inc.
+ * Copyright (C) 2019 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,23 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
-import LoginFormSwitcher from './jquery/LoginFormSwitcher'
-import ready from '@instructure/ready'
-import './jquery/index'
+import {useScope as useI18nScope} from '@canvas/i18n'
+import React from 'react'
+import HistoryList from '../lists/HistoryList'
+import {View} from '@instructure/ui-view'
+import {Heading} from '@instructure/ui-heading'
 
-ready(() => {
-  const switcher = new LoginFormSwitcher($('#login_form'), $('#forgot_password_form'))
+const I18n = useI18nScope('new_nav')
 
-  $('.forgot_password_link').click(event => {
-    event.preventDefault()
-    return switcher.switchToForgotPassword()
-  })
-
-  $('.login_link').click(event => {
-    event.preventDefault()
-    return switcher.switchToLogin()
-  })
-
-  sessionStorage.clear()
-})
+export default function HistoryTray() {
+  return (
+    <View as="div" padding="medium">
+      <Heading level="h3" as="h2">
+        {I18n.t('Recent History')}
+      </Heading>
+      <hr role="presentation" />
+      <HistoryList />
+    </View>
+  )
+}

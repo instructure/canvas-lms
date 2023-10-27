@@ -20,8 +20,6 @@ import $ from 'jquery'
 import parseLinkHeader from 'link-header-parsing/parseLinkHeaderFromXHR'
 import type {HelpLink} from '../../../../api.d'
 
-const RESOURCE_COUNT = 10
-
 export default function helpLinksQuery(): Promise<HelpLink[]> {
   return new Promise((resolve, reject) => {
     const data: HelpLink[] = []
@@ -33,7 +31,7 @@ export default function helpLinksQuery(): Promise<HelpLink[]> {
         (newData: HelpLink[], _: any, xhr: XMLHttpRequest) => {
           data.push(...newData)
           const link = parseLinkHeader(xhr)
-          if (newData.length >= RESOURCE_COUNT && link.next) {
+          if (link.next) {
             load(link.next)
           } else {
             resolve(data)

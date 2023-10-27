@@ -17,8 +17,12 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render as testingLibraryRender} from '@testing-library/react'
 import AccountsTray from '../AccountsTray'
+import {QueryProvider, queryClient} from '@canvas/query'
+
+const render = (children: unknown) =>
+  testingLibraryRender(<QueryProvider>{children}</QueryProvider>)
 
 describe('AccountsTray', () => {
   const accounts = [
@@ -32,31 +36,27 @@ describe('AccountsTray', () => {
     },
   ]
 
-  const props = {
-    accounts,
-    hasLoaded: true,
-  }
+  beforeEach(() => {
+    queryClient.setQueryData(['accounts'], accounts)
+  })
 
-  it('renders loading spinner', () => {
-    const {getByTitle, queryByText} = render(<AccountsTray {...props} hasLoaded={false} />)
-    getByTitle('Loading')
-    expect(queryByText('Account1')).toBeNull()
-    expect(queryByText('Account2')).toBeNull()
+  afterEach(() => {
+    queryClient.removeQueries()
   })
 
   it('renders the header', () => {
-    const {getByText} = render(<AccountsTray {...props} />)
+    const {getByText} = render(<AccountsTray />)
     expect(getByText('Admin')).toBeVisible()
   })
 
   it('renders a link for each account', () => {
-    const {getByText} = render(<AccountsTray {...props} />)
+    const {getByText} = render(<AccountsTray />)
     getByText('Account1')
     getByText('Account2')
   })
 
   it('renders all accounts link', () => {
-    const {getByText} = render(<AccountsTray {...props} />)
+    const {getByText} = render(<AccountsTray />)
     getByText('All Accounts')
   })
 })

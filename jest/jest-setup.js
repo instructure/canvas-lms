@@ -193,6 +193,9 @@ if (!('matchMedia' in window)) {
 
 global.DataTransferItem = global.DataTransferItem || class DataTransferItem {}
 
+global.performance = global.performance || {}
+global.performance.getEntriesByType = global.performance.getEntriesByType || (() => [])
+
 if (!('scrollIntoView' in window.HTMLElement.prototype)) {
   window.HTMLElement.prototype.scrollIntoView = () => {}
 }

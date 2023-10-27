@@ -18,62 +18,56 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
-import {bool, arrayOf, shape, string} from 'prop-types'
 import {View} from '@instructure/ui-view'
 import {List} from '@instructure/ui-list'
 import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
 import {Link} from '@instructure/ui-link'
+import {useQuery} from '@canvas/query'
+import accountsQuery from '../queries/accountsQuery'
+import type {Account} from '../../../../api.d'
 
-const I18n = useI18nScope('AccounntsTray')
+const I18n = useI18nScope('AccountsTray')
+export default function AccountsTray() {
+  const {data, isLoading, isSuccess} = useQuery<Account[], Error>({
+    queryKey: ['accounts'],
+    queryFn: accountsQuery,
+    fetchAtLeastOnce: true,
+  })
 
-export default function AccountsTray({accounts, hasLoaded}) {
   return (
     <View as="div" padding="medium">
       <Heading level="h3" as="h2">
         {I18n.t('Admin')}
       </Heading>
       <hr role="presentation" />
+
       <List isUnstyled={true} margin="small 0" itemSpacing="small">
-        {hasLoaded ? (
-          accounts
-            .map(account => (
-              <List.Item key={account.id}>
-                <Link isWithinText={false} href={`/accounts/${account.id}`}>
-                  {account.name}
-                </Link>
-              </List.Item>
-            ))
-            .concat([
-              <List.Item key="hr">
-                <hr role="presentation" />
-              </List.Item>,
-              <List.Item key="all">
-                <Link isWithinText={false} href="/accounts">
-                  {I18n.t('All Accounts')}
-                </Link>
-              </List.Item>,
-            ])
-        ) : (
+        {isLoading && (
           <List.Item>
             <Spinner size="small" renderTitle={I18n.t('Loading')} />
           </List.Item>
         )}
       </List>
+      {isSuccess && (
+        <List isUnstyled={true} margin="small 0" itemSpacing="small">
+          {data.map(account => (
+            <List.Item key={account.id}>
+              <Link isWithinText={false} href={`/accounts/${account.id}`}>
+                {account.name}
+              </Link>
+            </List.Item>
+          ))}
+          <List.Item key="hr">
+            <hr role="presentation" />
+          </List.Item>
+          <List.Item key="all">
+            <Link isWithinText={false} href="/accounts">
+              {I18n.t('All Accounts')}
+            </Link>
+          </List.Item>
+        </List>
+      )}
     </View>
   )
-}
-
-AccountsTray.propTypes = {
-  accounts: arrayOf(
-    shape({
-      id: string.isRequired,
-      name: string.isRequired,
-    })
-  ).isRequired,
-  hasLoaded: bool.isRequired,
-}
-
-AccountsTray.defaultProps = {
-  accounts: [],
 }

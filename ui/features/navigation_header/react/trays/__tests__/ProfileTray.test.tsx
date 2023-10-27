@@ -17,39 +17,55 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render as testingLibraryRender} from '@testing-library/react'
 import {getByText as domGetByText} from '@testing-library/dom'
 import ProfileTray from '../ProfileTray'
+import {QueryProvider, queryClient} from '@canvas/query'
+import type {TabCountsObj} from '../../../../../api.d'
+
+const render = (children: unknown) =>
+  testingLibraryRender(<QueryProvider>{children}</QueryProvider>)
 
 const imageUrl = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
 
+const profileTabs = [
+  {
+    id: 'foo',
+    label: 'Foo',
+    html_url: '/foo',
+  },
+  {
+    id: 'bar',
+    label: 'Bar',
+    html_url: '/bar',
+  },
+  {
+    id: 'content_shares',
+    label: 'Shared Content',
+    html_url: '/shared',
+  },
+]
+
 describe('ProfileTray', () => {
-  let props
+  let props: {counts: TabCountsObj}
 
   beforeEach(() => {
-    props = {
-      userDisplayName: 'Sample Student',
-      userAvatarURL: imageUrl,
-      counts: {unreadShares: 12},
-      tabs: [
-        {
-          id: 'foo',
-          label: 'Foo',
-          html_url: '/foo',
-        },
-        {
-          id: 'bar',
-          label: 'Bar',
-          html_url: '/bar',
-        },
-        {
-          id: 'content_shares',
-          label: 'Shared Content',
-          html_url: '/shared',
-        },
-      ],
-      loaded: true,
+    window.ENV = {
+      // @ts-expect-error
+      current_user: {
+        display_name: 'Sample Student',
+        avatar_is_fallback: true,
+      },
+      current_user_roles: [],
     }
+
+    props = {
+      counts: {unreadShares: 12},
+    }
+  })
+
+  afterEach(() => {
+    queryClient.removeQueries()
   })
 
   it('renders the component', () => {
@@ -58,25 +74,25 @@ describe('ProfileTray', () => {
   })
 
   it('renders the avatar', () => {
+    window.ENV.current_user.avatar_is_fallback = false
+    window.ENV.current_user.avatar_image_url = imageUrl
     const {getByAltText} = render(<ProfileTray {...props} />)
     const avatar = getByAltText('User profile picture')
+    // @ts-expect-error
     expect(avatar.src).toBe(imageUrl)
   })
 
-  it('renders loading spinner', () => {
-    const {getByTitle, queryByText} = render(<ProfileTray {...props} loaded={false} />)
-    getByTitle('Loading')
-    expect(queryByText('Foo')).toBeFalsy()
-  })
-
   it('renders the tabs', () => {
+    queryClient.setQueryData(['profile'], profileTabs)
     const {getByText} = render(<ProfileTray {...props} />)
     getByText('Foo')
     getByText('Bar')
   })
 
   it('renders the unread count badge on Shared Content', () => {
+    queryClient.setQueryData(['profile'], profileTabs)
     const {container} = render(<ProfileTray {...props} />)
+    // @ts-expect-error
     const elt = container.firstChild.querySelector('a[href="/shared"]')
     domGetByText(elt, '12 unread.')
   })

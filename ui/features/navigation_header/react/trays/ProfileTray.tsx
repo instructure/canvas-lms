@@ -18,7 +18,6 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
-import {arrayOf, bool, object, shape, string} from 'prop-types'
 import {Text} from '@instructure/ui-text'
 import {List} from '@instructure/ui-list'
 import {Heading} from '@instructure/ui-heading'
@@ -30,6 +29,9 @@ import {View} from '@instructure/ui-view'
 import LogoutButton from '../LogoutButton'
 import HighContrastModeToggle from './HighContrastModeToggle'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
+import {useQuery} from '@canvas/query'
+import profileQuery from '../queries/profileQuery'
+import type {ProfileTab, TabCountsObj} from '../../../../api.d'
 
 const I18n = useI18nScope('ProfileTray')
 
@@ -37,45 +39,43 @@ const I18n = useI18nScope('ProfileTray')
 // gross matching on the id of the tray tabs given to us by Rails
 const idsToCounts = [{id: 'content_shares', countName: 'unreadShares'}]
 
-const a11yCount = count => (
+const a11yCount = (count: string) => (
   <AccessibleContent alt={I18n.t('%{count} unread.', {count})}>{count}</AccessibleContent>
 )
 
-function ProfileTab({id, html_url, label, counts}) {
-  function renderCountBadge() {
-    const found = idsToCounts.filter(x => x.id === id)
-    if (found.length === 0) return null // no count defined for this label
-    const count = counts[found[0].countName]
-    if (count === 0) return null // zero count is not displayed
-    return (
-      <Badge
-        count={count}
-        standalone={true}
-        margin="0 0 xxx-small small"
-        formatOutput={a11yCount}
-      />
-    )
-  }
+function CountBadge({counts, id}: {counts: TabCountsObj; id: string}) {
+  const found = idsToCounts.filter(x => x.id === id)
+  if (found.length === 0) return null // no count defined for this label
+  const count = counts[found[0].countName]
+  if (count === 0) return null // zero count is not displayed
+  return (
+    <Badge count={count} standalone={true} margin="0 0 xxx-small small" formatOutput={a11yCount} />
+  )
+}
 
+function ProfileTabLink({id, html_url, label, counts}: ProfileTab) {
   return (
     <View className={`profile-tab-${id}`} as="div" margin="small 0">
       <Link isWithinText={false} href={html_url}>
         {label}
-        {renderCountBadge()}
+        <CountBadge counts={counts} id={id} />
       </Link>
     </View>
   )
 }
 
-ProfileTab.propTypes = {
-  id: string.isRequired,
-  label: string.isRequired,
-  html_url: string.isRequired,
-  counts: object,
-}
+export default function ProfileTray({counts}: {counts: TabCountsObj}) {
+  const {data, isLoading, isSuccess} = useQuery<ProfileTab[], Error>({
+    queryKey: ['profile'],
+    queryFn: profileQuery,
+    fetchAtLeastOnce: true,
+  })
 
-export default function ProfileTray(props) {
-  const {userDisplayName, userAvatarURL, loaded, userPronouns, tabs, counts} = props
+  const userDisplayName = window.ENV.current_user.display_name
+  const userPronouns = window.ENV.current_user.pronouns
+  const userAvatarURL = window.ENV.current_user.avatar_is_fallback
+    ? ''
+    : window.ENV.current_user.avatar_image_url
 
   return (
     <View as="div" padding="medium">
@@ -103,31 +103,22 @@ export default function ProfileTray(props) {
       </View>
       <hr role="presentation" />
       <List isUnstyled={true} margin="none" itemSpacing="small">
-        {loaded ? (
-          tabs.map(tab => (
-            <List.Item key={tab.id}>
-              <ProfileTab {...tab} counts={counts} />
-            </List.Item>
-          ))
-        ) : (
+        {isLoading && (
           <List.Item key="loading">
             <div style={{textAlign: 'center'}}>
               <Spinner margin="medium" renderTitle="Loading" />
             </div>
           </List.Item>
         )}
+        {isSuccess &&
+          data.map(tab => (
+            <List.Item key={tab.id}>
+              <ProfileTabLink {...tab} counts={counts} />
+            </List.Item>
+          ))}
       </List>
       <hr role="presentation" />
       <HighContrastModeToggle />
     </View>
   )
-}
-
-ProfileTray.propTypes = {
-  userDisplayName: string.isRequired,
-  userAvatarURL: string.isRequired,
-  loaded: bool.isRequired,
-  userPronouns: string,
-  tabs: arrayOf(shape(ProfileTab.propTypes)).isRequired,
-  counts: object.isRequired,
 }
