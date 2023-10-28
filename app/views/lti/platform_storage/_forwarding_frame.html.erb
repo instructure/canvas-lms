@@ -27,7 +27,7 @@
     oidc_auth_domain = oidc_authorization_domain(current_domain)
   %>
   <%= iframe(
-    lti_post_message_forwarding_url(host: oidc_auth_domain),
+    lti_post_message_forwarding_url(host: oidc_auth_domain, target: current_domain),
     name: Lti::PlatformStorage::FORWARDING_TARGET,
     title: Lti::PlatformStorage::FORWARDING_TARGET,
     id: Lti::PlatformStorage::FORWARDING_TARGET,
