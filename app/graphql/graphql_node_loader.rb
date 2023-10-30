@@ -219,7 +219,7 @@ module GraphQLNodeLoader
       end
     when "Conversation"
       Loaders::IDLoader.for(Conversation).load(id).then do |conversation|
-        next nil unless conversation.conversation_participants.where(user: ctx[:current_user]).first
+        next nil unless conversation&.conversation_participants&.where(user: ctx[:current_user])&.first
 
         conversation
       end
