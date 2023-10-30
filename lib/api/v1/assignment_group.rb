@@ -98,7 +98,8 @@ module Api::V1::AssignmentGroup
                                needs_grading_course_proxy:,
                                submission: includes.include?("submission") ? opts[:submissions][assignment.id] : nil,
                                master_course_status: opts[:master_course_status],
-                               include_assessment_requests: includes.include?("assessment_requests"))
+                               include_assessment_requests: includes.include?("assessment_requests"),
+                               include_checkpoints: includes.include?("checkpoints"))
 
         unless opts[:exclude_response_fields].include?("in_closed_grading_period")
           assignment_closed_grading_period_hash = closed_grading_period_hash[json[:id]] || {}
