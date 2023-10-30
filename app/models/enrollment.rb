@@ -55,6 +55,7 @@ class Enrollment < ActiveRecord::Base
                                               unless: ->(enrollment) { enrollment.type == "ObserverEnrollment" },
                                               message: -> { t("only ObserverEnrollments may have an associated_user_id") } }
   validate :cant_observe_self, if: ->(enrollment) { enrollment.type == "ObserverEnrollment" }
+  validate :cant_observe_observer, if: ->(enrollment) { enrollment.type == "ObserverEnrollment" }
 
   validate :valid_role?
   validate :valid_course?
@@ -102,6 +103,14 @@ class Enrollment < ActiveRecord::Base
 
   def cant_observe_self
     errors.add(:associated_user_id, "Cannot observe yourself") if user_id == associated_user_id
+  end
+
+  def cant_observe_observer
+    if course.enrollments.where(type: "ObserverEnrollment",
+                                user_id: associated_user_id,
+                                associated_user_id: user_id).exists?
+      errors.add(:associated_user_id, "Cannot observe user with another user that is being observed by the current user")
+    end
   end
 
   def valid_course?

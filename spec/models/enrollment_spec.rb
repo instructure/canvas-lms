@@ -3029,6 +3029,28 @@ describe Enrollment do
       expect(pe.reload).to be_deleted
     end
 
+    it "does not allow an observer to be observed by a user they are observing" do
+      @observed = User.create!
+      @observer = User.create!
+      @course = Course.create!
+
+      @enrollment = StudentEnrollment.create!(user: @observed, course: @course)
+      @enrollment2 = StudentEnrollment.create!(user: @observer, course: @course)
+
+      add_linked_observer(@observed, @observer)
+      add_linked_observer(@observer, @observed)
+
+      @enrollment.type = "ObserverEnrollment"
+      @enrollment.associated_user_id = @enrollment2.user_id
+      @enrollment.save!
+
+      @enrollment2.type = "ObserverEnrollment"
+      @enrollment2.associated_user_id = @enrollment.user_id
+
+      expect(@enrollment).to be_valid
+      expect { @enrollment2.save! }.to raise_error("Validation failed: Associated user Cannot observe user with another user that is being observed by the current user")
+    end
+
     context "sharding" do
       specs_require_sharding
 
