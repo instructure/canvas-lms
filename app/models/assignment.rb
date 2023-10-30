@@ -120,8 +120,8 @@ class Assignment < ActiveRecord::Base
   has_many :assignment_student_visibilities
   has_one :quiz, class_name: "Quizzes::Quiz"
   belongs_to :assignment_group
-  has_one :discussion_topic, -> { where(root_topic_id: nil).order(:created_at) }
-  has_one :wiki_page
+  has_one :discussion_topic, -> { where(root_topic_id: nil).order(:created_at) }, inverse_of: :assignment
+  has_one :wiki_page, inverse_of: :assignment
   has_many :learning_outcome_alignments, -> { where("content_tags.tag_type='learning_outcome' AND content_tags.workflow_state<>'deleted'").preload(:learning_outcome) }, as: :content, inverse_of: :content, class_name: "ContentTag"
   has_one :rubric_association, -> { where(purpose: "grading").order(:created_at).preload(:rubric) }, as: :association, inverse_of: :association_object
   has_one :rubric, -> { merge(RubricAssociation.active) }, through: :rubric_association
