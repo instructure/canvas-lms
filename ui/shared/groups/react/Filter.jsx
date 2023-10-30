@@ -19,21 +19,28 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 
+import {IconSearchLine} from '@instructure/ui-icons'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {TextInput} from '@instructure/ui-text-input'
+import {View} from '@instructure/ui-view'
+
 const I18n = useI18nScope('student_groups')
 
 export default function Filter(props) {
   return (
-    <div className="form-inline clearfix content-box">
-      <input
+    <View as="div" className="form-inline clearfix content-box" width="30%" minWidth="230px">
+      <TextInput
         id="search_field"
+        renderLabel={<ScreenReaderContent>{I18n.t('Search Groups')}</ScreenReaderContent>}
         placeholder={I18n.t('Search Groups or People')}
         type="search"
         onChange={props.onChange}
+        renderBeforeInput={<IconSearchLine />}
         aria-label={I18n.t(
           'As you type in this field, the list of groups will be automatically filtered to only include those whose names match your input.'
         )}
         data-testid="group-search-input"
       />
-    </div>
+    </View>
   )
 }
