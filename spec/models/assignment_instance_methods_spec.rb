@@ -170,4 +170,60 @@ describe Assignment do
       }
     end
   end
+
+  describe "#destroy" do
+    subject { assignment.destroy! }
+
+    context "with external tool assignment" do
+      let(:course) { course_model }
+      let(:tool) { external_tool_1_3_model(context: course) }
+      let(:assignment) do
+        course.assignments.create!(
+          submission_types: "external_tool",
+          external_tool_tag_attributes: {
+            url: tool.url,
+            content_type: "ContextExternalTool",
+            content_id: tool.id
+          },
+          points_possible: 42
+        )
+      end
+
+      it "destroys resource links and keeps them associated" do
+        expect(assignment.lti_resource_links.first).to be_active
+        subject
+        expect(assignment.lti_resource_links.first).to be_deleted
+      end
+    end
+  end
+
+  describe "#restore" do
+    subject { assignment.restore }
+
+    context "with external tool assignment" do
+      let(:course) { course_model }
+      let(:tool) { external_tool_1_3_model(context: course) }
+      let(:assignment) do
+        course.assignments.create!(
+          submission_types: "external_tool",
+          external_tool_tag_attributes: {
+            url: tool.url,
+            content_type: "ContextExternalTool",
+            content_id: tool.id
+          },
+          points_possible: 42
+        )
+      end
+
+      before do
+        assignment.destroy!
+      end
+
+      it "restores resource links" do
+        expect(assignment.lti_resource_links.first).to be_deleted
+        subject
+        expect(assignment.lti_resource_links.first).to be_active
+      end
+    end
+  end
 end
