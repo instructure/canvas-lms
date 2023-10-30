@@ -186,8 +186,13 @@ export function TempEnrollSearch(props: Props) {
   }
 
   if (loading) {
-    return <Spinner renderTitle="Retrieving user information" size="large" />
+    return (
+      <Flex justifyItems="center" alignItems="center">
+        <Spinner renderTitle={I18n.t('Retrieving user information')} />
+      </Flex>
+    )
   }
+
   if (props.page === 1 && enrollment.name !== '') {
     // user confirmation page
     return (

@@ -19,7 +19,7 @@
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
-import UsersListRow, {determineToggleFunction, generateIcon, generateTitle} from '../UsersListRow'
+import UsersListRow, {generateIcon, generateTitle} from '../UsersListRow'
 import {PROVIDER, RECIPIENT} from '@canvas/temporary-enrollment/react/types'
 
 function makeProps() {
@@ -172,29 +172,6 @@ describe('UsersListRow', () => {
         const title = generateTitle('some_other_role', 'User Name')
 
         expect(title).toEqual('Assign temporary enrollments to User Name')
-      })
-    })
-
-    describe('determineToggleFunction', () => {
-      it('returns toggleFunction if defined', () => {
-        const toggleFunction = () => {}
-        const setEditModeFunction = () => {}
-        const result = determineToggleFunction(toggleFunction, setEditModeFunction)
-
-        expect(result).toBe(toggleFunction)
-      })
-
-      it('returns setEditModeFunction if toggleFunction is undefined', () => {
-        const setEditModeFunction = () => {}
-        const result = determineToggleFunction(undefined, setEditModeFunction)
-
-        expect(result).toBe(setEditModeFunction)
-      })
-
-      it('returns undefined if both functions are undefined', () => {
-        const result = determineToggleFunction(undefined, undefined)
-
-        expect(result).toBeUndefined()
       })
     })
 
