@@ -30,7 +30,7 @@ export const getContext = isMobileView => {
   const friendlyDescriptionFF = ENV.OUTCOMES_FRIENDLY_DESCRIPTION
   const canManage = ENV.PERMISSIONS?.manage_outcomes
   const canImport = ENV.PERMISSIONS?.import_outcomes
-  const isAdmin = ENV.current_user_roles?.includes('admin')
+  const isAdmin = ENV.current_user_is_admin
   const isStudent = ENV.current_user_is_student
   const globalRootId = ENV.GLOBAL_ROOT_OUTCOME_GROUP_ID?.toString()
   const treeBrowserRootGroupId = ROOT_GROUP_ID

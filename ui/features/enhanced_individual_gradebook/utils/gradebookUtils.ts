@@ -508,7 +508,7 @@ function mapToSortableAssignment(
 }
 
 export function isInPastGradingPeriodAndNotAdmin(assignment: AssignmentConnection): boolean {
-  return (assignment.inClosedGradingPeriod ?? false) && !ENV.current_user_roles?.includes('admin')
+  return (assignment.inClosedGradingPeriod ?? false) && !ENV.current_user_is_admin
 }
 
 export function disableGrading(

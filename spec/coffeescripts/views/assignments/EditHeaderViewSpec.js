@@ -46,7 +46,7 @@ const editHeaderView = function (
 
 QUnit.module('EditHeaderView', {
   setup() {
-    fakeENV.setup({current_user_roles: ['teacher']})
+    fakeENV.setup({current_user_roles: ['teacher'], current_user_is_admin: false})
     return $(document).on('submit', () => false)
   },
   teardown() {

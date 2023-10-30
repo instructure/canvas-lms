@@ -66,6 +66,7 @@ export interface EnvCommon {
   COURSE_ROLES: Role[]
   current_user_roles: string[]
   current_user_is_student: boolean
+  current_user_is_admin: boolean
   current_user_types: string[]
   current_user_disabled_inbox: boolean
   current_user_visited_tabs: null | string[]

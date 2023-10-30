@@ -65,7 +65,7 @@ export default function MobileGlobalMenu(props: Props) {
     window.ENV.current_user_id && !window.ENV.current_user?.fake_student
   )
   const k5User = window.ENV.K5_USER
-  const showAdmin = window.ENV.current_user_roles && window.ENV.current_user_roles.includes('admin')
+  const showAdmin = window.ENV.current_user_is_admin
   const current_user: {
     display_name: string
     avatar_image_url: string

@@ -17,7 +17,6 @@
 
 import $ from 'jquery'
 import Ember from 'ember'
-import _ from 'underscore'
 import GradebookHeaderMenu from '../../jquery/GradebookHeaderMenu'
 import SubmissionDetailsDialog from '../../jquery/SubmissionDetailsDialog'
 
@@ -40,7 +39,7 @@ const AssignmentsView = Ember.View.extend({
         context_url: ENV.GRADEBOOK_OPTIONS.context_url,
         speed_grader_enabled: ENV.GRADEBOOK_OPTIONS.speed_grader_enabled,
         change_grade_url: ENV.GRADEBOOK_OPTIONS.change_grade_url,
-        isAdmin: _.includes(ENV.current_user_roles, 'admin'),
+        isAdmin: ENV.current_user_is_admin,
         show_message_students_with_observers_dialog:
           ENV.GRADEBOOK_OPTIONS.show_message_students_with_observers_dialog,
         messageAttachmentUploadFolderId: ENV.GRADEBOOK_OPTIONS.message_attachment_upload_folder_id,
