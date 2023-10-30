@@ -26,7 +26,13 @@ import ready from '@instructure/ready'
 ready(() => {
   const formSubmissionDelay = window.ENV.INTEROP_8200_DELAY_FORM_SUBMIT
 
-  const $toolForm = $('#tool_form')
+  let toolFormId = '#tool_form'
+  let toolIframeId = '#tool_content'
+  if (typeof ENV.LTI_TOOL_FORM_ID === 'string') {
+    toolFormId = `#tool_form_${ENV.LTI_TOOL_FORM_ID}`
+    toolIframeId = `#tool_content_${ENV.LTI_TOOL_FORM_ID}`
+  }
+  const $toolForm = $(toolFormId)
 
   const launchToolManually = function () {
     const $button = $toolForm.find('button')
@@ -82,11 +88,8 @@ ready(() => {
         $toolForm.submit()
       }
 
-      $('#tool_content').bind('load', () => {
-        if (
-          document.location.protocol !== 'https:' ||
-          $('#tool_form')[0].action.indexOf('https:') > -1
-        ) {
+      $(toolIframeId).bind('load', () => {
+        if (document.location.protocol !== 'https:' || $toolForm[0].action.indexOf('https:') > -1) {
           $('#insecure_content_msg').hide()
           $toolForm.hide()
         }
