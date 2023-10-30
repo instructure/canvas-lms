@@ -83,7 +83,9 @@ module Api::V1::DiscussionTopics
     if opts[:include_sections_user_count] && context
       opts[:context_user_count] = GuardRail.activate(:secondary) { context.enrollments.not_fake.active_or_pending_by_date_ignoring_access.distinct.count(:user_id) }
     end
-    ActiveRecord::Associations.preload(topics, %i[user attachment root_topic context])
+
+    ActiveRecord::Associations.preload(topics, %i[assignment user attachment root_topic context discussion_topic_participants])
+    opts[:use_preload] = true
     topics.each_with_object([]) do |topic, result|
       if topic.visible_for?(user)
         result << discussion_topic_api_json(topic, context || topic.context, user, session, opts, root_topics)

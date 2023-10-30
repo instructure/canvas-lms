@@ -5853,14 +5853,8 @@ describe AssignmentsApiController, type: :request do
       it "returns the discussion topic url" do
         @user = @teacher
         @context = @course
-        @assignment = factory_with_protected_attributes(
-          @course.assignments,
-          {
-            title: "assignment1",
-            submission_types: "discussion_topic",
-            discussion_topic: discussion_topic_model
-          }
-        )
+        @assignment = @course.assignments.create!(title: "assignment1", submission_types: "discussion_topic")
+        @topic = @assignment.discussion_topic
         json = api_get_assignment_in_course(@assignment, @course)
         expect(json["discussion_topic"]).to eq({
                                                  "author" => {},
