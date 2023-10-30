@@ -392,8 +392,13 @@ export function TempEnrollAssign(props: Props) {
   }
 
   if (loading) {
-    return <Spinner renderTitle="Retrieving user enrollments" size="large" />
+    return (
+      <Flex justifyItems="center" alignItems="center">
+        <Spinner renderTitle={I18n.t('Retrieving user enrollments')} />
+      </Flex>
+    )
   }
+
   return (
     <>
       <Grid>

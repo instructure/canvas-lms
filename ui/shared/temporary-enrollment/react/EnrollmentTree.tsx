@@ -20,6 +20,10 @@ import React, {useEffect, useState} from 'react'
 import {EnrollmentTreeGroup} from './EnrollmentTreeGroup'
 import {Spinner} from '@instructure/ui-spinner'
 import {Course, Enrollment, Role, Section} from './types'
+import {Flex} from '@instructure/ui-flex'
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('temporary_enrollment')
 
 interface RoleChoice {
   readonly id: string
@@ -311,7 +315,11 @@ export function EnrollmentTree(props: Props) {
   }
 
   if (loading) {
-    return <Spinner size="medium" renderTitle="Loading enrollments" margin="auto" />
+    return (
+      <Flex justifyItems="center" alignItems="center">
+        <Spinner renderTitle={I18n.t('Loading enrollments')} />
+      </Flex>
+    )
   } else {
     return renderTree()
   }

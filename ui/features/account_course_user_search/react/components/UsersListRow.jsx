@@ -46,10 +46,10 @@ const analyticProps = createAnalyticPropsGenerator(MODULE_NAME)
 /**
  * Generate an appropriate icon based on the user’s role
  *
- * @param {string} role Role of the user (provider, recipient, or null)
+ * @param {string | null} role Role of the user (provider, recipient, or null)
  * @returns {ReactElement} SVG icon element representing the user’s role
  */
-export function generateIcon(role) {
+export function generateIcon(role = null) {
   let Icon
   let color
   let title
@@ -90,17 +90,6 @@ export function generateTitle(enrollmentType, name) {
     default:
       return I18n.t('Assign temporary enrollments to %{name}', {name})
   }
-}
-
-/**
- * Determine the appropriate toggle function based on the context
- *
- * @param {Function|null} toggleFunction Toggle function to be used in the current context
- * @param {Function|null} setEditModeFunction Edit function to be used in the current context
- * @returns {Function|null} The appropriate toggle function based on the context
- */
-export function determineToggleFunction(toggleFunction, setEditModeFunction) {
-  return toggleFunction || setEditModeFunction
 }
 
 export default function UsersListRow({
@@ -207,18 +196,11 @@ export default function UsersListRow({
     setEditMode(prev => !prev)
   }
 
-  // set edit mode state explicitly using provided value
-  function setEditModeExplicitly(value) {
-    setEditMode(value)
-  }
-
   // render appropriate icon(s) based on the user’s roles
   function renderTempEnrollIcon() {
     // checks for user not being a provider or recipient
     if (enrollmentsAsProvider.length === 0 && enrollmentsAsRecipient.length === 0) {
-      return renderTempEnrollModal(null, null, generateIcon(), false, null, () =>
-        setEditModeExplicitly(false)
-      )
+      return renderTempEnrollModal(null, null, generateIcon(), false, null)
     }
 
     // checks for user being a provider but not a recipient
@@ -228,7 +210,7 @@ export default function UsersListRow({
         enrollmentsAsProvider,
         generateIcon(PROVIDER),
         editMode,
-        determineToggleFunction(toggleEditMode, null)
+        toggleEditMode
       )
     }
 
@@ -241,16 +223,10 @@ export default function UsersListRow({
             enrollmentsAsRecipient,
             generateIcon(RECIPIENT),
             editMode,
-            determineToggleFunction(toggleEditMode, null)
+            toggleEditMode
           )}
 
-          {renderTempEnrollModal(
-            null,
-            null,
-            generateIcon(),
-            false,
-            determineToggleFunction(null, () => setEditModeExplicitly(false))
-          )}
+          {renderTempEnrollModal(null, null, generateIcon(), false, () => setEditMode(false))}
         </>
       )
     }
@@ -264,7 +240,7 @@ export default function UsersListRow({
             enrollmentsAsRecipient,
             generateIcon(RECIPIENT),
             editMode,
-            determineToggleFunction(toggleEditMode, null)
+            toggleEditMode
           )}
 
           {renderTempEnrollModal(
@@ -272,7 +248,7 @@ export default function UsersListRow({
             enrollmentsAsProvider,
             generateIcon(PROVIDER),
             editMode,
-            determineToggleFunction(toggleEditMode, null)
+            toggleEditMode
           )}
         </>
       )
