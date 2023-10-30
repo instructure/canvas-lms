@@ -163,7 +163,13 @@ function parseModuleItems(element: HTMLDivElement) {
     const name = moduleItem.querySelector('.item_name a')?.getAttribute('title')?.trim() || ''
     const resource =
       resourceTypeMap[moduleItem.querySelector('.type')?.textContent || 'external_url']
-    return {id, name, resource}
+    if (resource === 'assignment' || resource === 'quiz') {
+      const pointsPossibleString = moduleItem.querySelector('.points_possible_display')?.textContent
+      const pointsPossible = pointsPossibleString ? pointsPossibleString.split(/\s/)[0] : null
+      return {id, name, resource, pointsPossible}
+    } else {
+      return {id, name, resource}
+    }
   })
 }
 
