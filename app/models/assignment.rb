@@ -1439,6 +1439,10 @@ class Assignment < ActiveRecord::Base
     checkpoint_assignments.destroy_all
     refresh_course_content_participation_counts
 
+    # Assignment owns deletion of Lti::LineItem, Lti::ResourceLink
+    # destroy_all removes associations, so avoid that
+    lti_resource_links.find_each(&:destroy)
+
     ScheduledSmartAlert.where(context_type: "Assignment", context_id: id).destroy_all
     ScheduledSmartAlert.where(context_type: "AssignmentOverride", context_id: assignment_override_ids).destroy_all
   end
@@ -1474,6 +1478,7 @@ class Assignment < ActiveRecord::Base
     each_submission_type do |submission, _, short_type|
       submission.restore(:assignment) if from != short_type && submission
     end
+    lti_resource_links.find_each(&:undestroy)
   end
 
   def participants_with_overridden_due_at
