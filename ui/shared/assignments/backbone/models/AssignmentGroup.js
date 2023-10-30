@@ -23,7 +23,7 @@ import DefaultUrlMixin from '@canvas/backbone/DefaultUrlMixin'
 import AssignmentCollection from '../collections/AssignmentCollection'
 
 const isAdmin = function () {
-  return _.includes(ENV.current_user_roles, 'admin')
+  return ENV.current_user_is_admin
 }
 
 extend(AssignmentGroup, Backbone.Model)

@@ -380,7 +380,7 @@ export default class DueDates extends React.Component {
       object: this.state.noops,
       keysToOmit: this.chosenNoops(),
     })
-    if (this.props.hasGradingPeriods && !_.includes(ENV.current_user_roles, 'admin')) {
+    if (this.props.hasGradingPeriods && !ENV.current_user_is_admin) {
       ;({validStudents, validGroups, validSections} =
         this.filterDropdownOptionsForMultipleGradingPeriods(
           validStudents,
@@ -450,7 +450,7 @@ export default class DueDates extends React.Component {
   valuesWithOmission = args => _.chain(args.object).omit(args.keysToOmit).values().value()
 
   disableInputs = row => {
-    const rowIsNewOrUserIsAdmin = !row.persisted || _.includes(ENV.current_user_roles, 'admin')
+    const rowIsNewOrUserIsAdmin = !row.persisted || ENV.current_user_is_admin
     if (!this.props.hasGradingPeriods || rowIsNewOrUserIsAdmin) {
       return false
     }

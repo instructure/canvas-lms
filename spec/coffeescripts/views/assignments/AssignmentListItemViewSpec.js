@@ -153,6 +153,7 @@ const genModules = function (count) {
 const genSetup = function (model = assignment1()) {
   fakeENV.setup({
     current_user_roles: ['teacher'],
+    current_user_is_admin: false,
     PERMISSIONS: {manage: false},
     URLS: {assignment_sort_base_url: 'test'},
   })
@@ -174,6 +175,7 @@ QUnit.module('AssignmentListItemViewSpec', {
     fakeENV.setup({
       current_user_roles: ['teacher'],
       URLS: {assignment_sort_base_url: 'test'},
+      current_user_is_admin: false,
     })
     genSetup.call(this)
     return I18nStubber.pushFrame()
@@ -822,7 +824,7 @@ test('does not display cancel button when assignment failed to duplicate is blue
     title: 'Foo Copy',
     original_assignment_name: 'Foo',
     workflow_state: 'failed_to_duplicate',
-    is_master_course_child_content: true
+    is_master_course_child_content: true,
   })
   const view = createView(model)
   strictEqual(view.$('button.duplicate-failed-cancel.btn').length, 0)
@@ -833,7 +835,7 @@ test('displays cancel button when assignment failed to duplicate is not blueprin
     id: 2,
     title: 'Foo Copy',
     original_assignment_name: 'Foo',
-    workflow_state: 'failed_to_duplicate'
+    workflow_state: 'failed_to_duplicate',
   })
   const view = createView(model)
   ok(view.$('button.duplicate-failed-cancel.btn').text().includes('Cancel'))
@@ -908,6 +910,7 @@ QUnit.module('AssignmentListItemViewSpec - editing assignments', function (hooks
     fakeENV.setup({
       current_user_roles: ['teacher'],
       URLS: {assignment_sort_base_url: 'test'},
+      current_user__is_admin: false,
     })
 
     genSetup.call(this)

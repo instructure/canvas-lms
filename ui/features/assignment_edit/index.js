@@ -41,7 +41,7 @@ ready(() => {
 
   ENV.ASSIGNMENT.assignment_overrides = ENV.ASSIGNMENT_OVERRIDES
 
-  const userIsAdmin = ENV.current_user_roles.includes('admin')
+  const userIsAdmin = ENV.current_user_is_admin
 
   const assignment = new Assignment(ENV.ASSIGNMENT)
   assignment.urlRoot = ENV.URL_ROOT

@@ -44,7 +44,7 @@ import replaceTags from '@canvas/util/replaceTags'
 const I18n = useI18nScope('gradebookHeaderMenu')
 
 const isAdmin = function () {
-  return ENV.current_user_roles.includes('admin')
+  return ENV.current_user_is_admin
 }
 
 export default class GradebookHeaderMenu {

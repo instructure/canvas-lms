@@ -209,6 +209,7 @@ QUnit.module('AssignmentGroupListItemView as a teacher', {
     fakeENV.setup({
       current_user_roles: ['teacher'],
       URLS: {sort_url: 'test'},
+      current_user_is_admin: false,
     })
 
     this.model = createAssignmentGroup()

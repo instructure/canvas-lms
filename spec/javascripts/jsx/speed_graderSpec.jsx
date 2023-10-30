@@ -408,7 +408,7 @@ QUnit.module('SpeedGrader', rootHooks => {
   })
 
   test('includes submission time for submissions when the user is an admin', () => {
-    ENV.current_user_roles = ['admin']
+    ENV.current_user_is_admin = true
     window.jsonData.anonymize_students = true
     SpeedGrader.setup()
 
@@ -420,7 +420,7 @@ QUnit.module('SpeedGrader', rootHooks => {
   })
 
   test('omits submission time for submissions when anonymizing and not an admin', () => {
-    ENV.current_user_roles = ['teacher']
+    ENV.current_user_is_admin = false
     SpeedGrader.setup()
 
     window.jsonData.anonymize_students = true
@@ -2519,7 +2519,7 @@ QUnit.module('SpeedGrader', rootHooks => {
     })
 
     test('includes last-viewed date for attachments if viewing as an admin', () => {
-      ENV.current_user_roles = ['admin']
+      ENV.current_user_is_admin = true
       finishSetup()
       window.jsonData.anonymize_students = true
       SpeedGrader.EG.handleSubmissionSelectionChange()
@@ -2532,6 +2532,7 @@ QUnit.module('SpeedGrader', rootHooks => {
     })
 
     test('omits last-viewed date and relevant text if anonymizing students and not viewing as an admin', () => {
+      ENV.current_user_is_admin = false
       finishSetup()
       window.jsonData.anonymize_students = true
       SpeedGrader.EG.handleSubmissionSelectionChange()

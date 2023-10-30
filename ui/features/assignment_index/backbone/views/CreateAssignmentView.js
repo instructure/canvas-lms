@@ -194,7 +194,7 @@ CreateAssignmentView.prototype.toJSON = function () {
 }
 
 CreateAssignmentView.prototype.currentUserIsAdmin = function () {
-  return _.includes(ENV.current_user_roles, 'admin')
+  return ENV.current_user_is_admin
 }
 
 CreateAssignmentView.prototype.disableDueAt = function () {

@@ -86,7 +86,7 @@ export default function ItemAssignToCard({
       date_range: {...ENV.VALID_DATE_RANGE},
       hasGradingPeriods: ENV.HAS_GRADING_PERIODS,
       gradingPeriods: ENV.active_grading_periods,
-      userIsAdmin: (ENV.current_user_roles || []).includes('admin'),
+      userIsAdmin: ENV.current_user_is_admin,
       postToSIS: ENV.POST_TO_SIS && ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT,
     })
   )

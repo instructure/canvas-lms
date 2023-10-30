@@ -4172,7 +4172,7 @@ function setupSelectors() {
   fileIndex = 1
   gradeeLabel = studentLabel
   groupLabel = I18n.t('group', 'Group')
-  isAdmin = _.includes(ENV.current_user_roles, 'admin')
+  isAdmin = ENV.current_user_is_admin
   snapshotCache = {}
   studentLabel = I18n.t('student', 'Student')
   header = setupHeader()

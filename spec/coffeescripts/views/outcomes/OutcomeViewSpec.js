@@ -215,6 +215,7 @@ function commonTests() {
   test('move and delete buttons are not available for an account outcome if a user is a teacher', () => {
     ENV.ROOT_OUTCOME_GROUP = {context_type: 'Course'}
     ENV.current_user_roles = ['teacher']
+    ENV.current_user_is_admin = false
     const view = createView({
       model: newOutcome(
         {

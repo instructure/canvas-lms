@@ -188,6 +188,38 @@ RSpec.describe ApplicationController do
             expect(controller.js_env[:current_user_is_student]).to be_truthy
           end
         end
+
+        context "current_user_is_admin" do
+          before do
+            @sub_account = Account.create(name: "sub account from default account", parent_account: Account.default)
+            @teacher_sub_account_admin = user_with_pseudonym(username: "nobody@example.com")
+            @root_account_course = Course.create!(name: "course in root account", account: Account.default)
+            @root_account_course.enroll_user(@teacher_sub_account_admin, "TeacherEnrollment", enrollment_state: "active")
+            @sub_account_course = Course.create!(name: "course in sub account", account: @sub_account)
+            @sub_account.account_users.create!(user: @teacher_sub_account_admin)
+            @admin = user_with_pseudonym(username: "nobody2@example.com")
+            Account.default.account_users.create!(user: @admin)
+            allow(controller).to receive("api_v1_course_ping_url").and_return({})
+          end
+
+          it "is set to false when the user is an account admin of a different account that is not the parent account of the course" do
+            controller.instance_variable_set(:@current_user, @teacher_sub_account_admin)
+            controller.instance_variable_set(:@context, @root_account_course)
+            expect(controller.js_env[:current_user_is_admin]).to be_falsey
+          end
+
+          it "is set to true when the user is an account admin of the account that is the parent account of the course" do
+            controller.instance_variable_set(:@current_user, @teacher_sub_account_admin)
+            controller.instance_variable_set(:@context, @sub_account_course)
+            expect(controller.js_env[:current_user_is_admin]).to be_truthy
+          end
+
+          it "is set to true when the user is an account admin of the root account" do
+            controller.instance_variable_set(:@current_user, @admin)
+            controller.instance_variable_set(:@context, @root_account_course)
+            expect(controller.js_env[:current_user_is_admin]).to be_truthy
+          end
+        end
       end
 
       describe "ENV.DIRECT_SHARE_ENABLED" do
