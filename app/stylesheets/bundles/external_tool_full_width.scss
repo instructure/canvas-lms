@@ -28,6 +28,6 @@ body.ic-full-screen-lti-tool .tool_content_wrapper {
   display: none;
 }
 
-iframe#tool_content {
+.tool_content_wrapper > iframe {
   margin-bottom: -10px;
 }

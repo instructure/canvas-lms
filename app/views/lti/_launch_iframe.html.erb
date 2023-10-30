@@ -5,8 +5,8 @@
     <form action="<%= @lti_launch.resource_url %>"
         class="hide"
         method="POST"
-        target="tool_content"
-        id="tool_form"
+        target="<%= @tool_form_id ? "tool_content_#{@tool_form_id}" : "tool_content" %>"
+        id="<%= @tool_form_id ? "tool_form_#{@tool_form_id}" : "tool_form" %>"
         data-tool-launch-type="<%= @lti_launch.launch_type %>"
         data-tool-id="<%= @lti_launch.analytics_id %>"
         data-tool-path="<%= @lti_launch.resource_path %>"
@@ -41,8 +41,8 @@
 
     <%= iframe(
     "about:blank",
-    name: 'tool_content',
-    id: 'tool_content',
+    name: @tool_form_id ? "tool_content_#{@tool_form_id}" : "tool_content",
+    id: @tool_form_id ? "tool_content_#{@tool_form_id}" : "tool_content",
     class: "tool_launch",
     allowfullscreen: "true",
     webkitallowfullscreen: "true",
