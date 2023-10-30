@@ -44,7 +44,8 @@ group :test do
   gem "luminosity_contrast", "0.2.1"
   gem "pact", "~> 1.57", require: false
   gem "pact-messages", "0.2.0"
-  gem "pact_broker-client", "~> 1.66"
+  # pinned to 1.72 due to contract tests breaking with the following versions
+  gem "pact_broker-client", "1.72"
   gem "database_cleaner", "~> 2.0"
   gem "json-schema", "~> 4.0"
 
