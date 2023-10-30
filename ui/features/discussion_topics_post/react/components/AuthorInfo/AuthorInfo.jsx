@@ -47,7 +47,9 @@ export const AuthorInfo = props => {
   const avatarUrl = isAnonymous(props) ? null : props.author?.avatarUrl
 
   const getUnreadBadgeOffset = avatarSize => {
-    return avatarSize === 'medium' ? '11px' : '7px'
+    if (avatarSize === 'medium') return '11px'
+    if (avatarSize === 'x-small') return '3px'
+    return '7px'
   }
 
   // author is not a role found in courseroles,
@@ -61,11 +63,11 @@ export const AuthorInfo = props => {
       query={responsiveQuerySizes({tablet: true, desktop: true})}
       props={{
         tablet: {
-          authorNameTextSize: 'small',
+          authorNameTextSize: 'x-small',
           timestampTextSize: 'x-small',
           nameAndRoleDirection: 'column',
           badgeMarginLeft: '-16px',
-          avatarSize: props.threadMode ? 'small' : 'medium',
+          avatarSize: props.threadMode ? 'x-small' : 'small',
         },
         desktop: {
           authorNameTextSize: props.threadMode ? 'small' : 'medium',
@@ -134,6 +136,7 @@ export const AuthorInfo = props => {
                         size={responsiveProps.authorNameTextSize}
                         lineHeight="condensed"
                         data-testid="author_name"
+                        wrap="break-word"
                       >
                         {isAnonymous(props) ? (
                           getDisplayName(props)
