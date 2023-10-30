@@ -61,6 +61,22 @@ describe UsersController do
       user_session(user)
     end
 
+    context "ENV.LTI_TOOL_FORM_ID" do
+      it "with the lti_unique_tool_form_ids flag on, sets a random id" do
+        account.enable_feature!(:lti_unique_tool_form_ids)
+        expect(controller).to receive(:random_lti_tool_form_id).and_return("1")
+        allow(controller).to receive(:js_env).with(anything).and_call_original
+        expect(controller).to receive(:js_env).with(LTI_TOOL_FORM_ID: "1")
+        get :external_tool, params: { id: tool.id, user_id: user.id }
+      end
+
+      it "with the lti_unique_tool_form_ids flag off, does not set a random it" do
+        account.disable_feature!(:lti_unique_tool_form_ids)
+        expect(controller).not_to receive(:js_env).with(LTI_TOOL_FORM_ID: anything)
+        get :external_tool, params: { id: tool.id, user_id: user.id }
+      end
+    end
+
     it "removes query string when post_only = true" do
       tool.user_navigation = { text: "example" }
       tool.settings["post_only"] = "true"

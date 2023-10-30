@@ -29,7 +29,7 @@ describe "lti full width launch view" do
     let(:tool) do
       dev_key = DeveloperKey.create
       tool_id = ContextExternalTool::QUIZ_LTI
-      ContextExternalTool.create(developer_key: dev_key, context: course, tool_id:)
+      ContextExternalTool.create(developer_key: dev_key, context: course, tool_id:, root_account: course.root_account)
     end
     let(:tag) { LtiLayoutSpecHelper.create_tag(tool) }
     let(:current_user) { user_with_pseudonym }

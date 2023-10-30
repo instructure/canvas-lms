@@ -1479,6 +1479,12 @@ class UsersController < ApplicationController
       link_code: @opaque_id,
       domain: HostUrl.context_host(@domain_root_account, request.host)
     }
+
+    if @tool.root_account.feature_enabled?(:lti_unique_tool_form_ids)
+      @tool_form_id = random_lti_tool_form_id
+      js_env(LTI_TOOL_FORM_ID: @tool_form_id)
+    end
+
     variable_expander = Lti::VariableExpander.new(@domain_root_account, @context, self, {
                                                     current_user: @current_user,
                                                     current_pseudonym: @current_pseudonym,

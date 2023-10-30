@@ -369,6 +369,7 @@ class ApplicationController < ActionController::Base
     lti_deep_linking_module_index_menu_modal
     lti_multiple_assignment_deep_linking
     lti_overwrite_user_url_input_select_content_dialog
+    lti_unique_tool_form_ids
     buttons_and_icons_root_account
     extended_submission_state
     scheduled_page_publication
@@ -2112,6 +2113,12 @@ class ApplicationController < ActionController::Base
           domain: HostUrl.context_host(@domain_root_account, request.host),
           include_module_context: true
         }
+
+        if @tool.root_account.feature_enabled?(:lti_unique_tool_form_ids)
+          @tool_form_id = random_lti_tool_form_id
+          js_env(LTI_TOOL_FORM_ID: @tool_form_id)
+        end
+
         variable_expander = Lti::VariableExpander.new(@domain_root_account, @context, self, {
                                                         current_user: @current_user,
                                                         current_pseudonym: @current_pseudonym,
@@ -2395,6 +2402,11 @@ class ApplicationController < ActionController::Base
     feature_enabled?(feature) && service_enabled?(feature)
   end
   helper_method :feature_and_service_enabled?
+
+  def random_lti_tool_form_id
+    rand(0..999).to_s
+  end
+  helper_method :random_lti_tool_form_id
 
   def temporary_user_code(generate = true)
     if generate
