@@ -27,6 +27,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import UnreadCounts from './UnreadCounts'
 import preventDefault from '@canvas/util/preventDefault'
 import tourPubSub from '@canvas/tour-pubsub'
+import {getTrayLabel} from './utils'
 
 const I18n = useI18nScope('Navigation')
 
@@ -67,16 +68,6 @@ function getPortal() {
 }
 
 function noop() {}
-
-const trayLabels: Record<ActiveItem, string> = {
-  dashboard: '',
-  courses: I18n.t('Courses tray'),
-  groups: I18n.t('Groups tray'),
-  accounts: I18n.t('Admin tray'),
-  profile: I18n.t('Profile tray'),
-  help: I18n.t('%{title} tray', {title: window.ENV.help_link_name}),
-  history: I18n.t('Recent History tray'),
-}
 
 type Props = {
   unreadComponent: any
@@ -253,9 +244,7 @@ export default class Navigation extends React.Component<Props, State> {
       <>
         <Tray
           key={this.state.type}
-          label={
-            (this.state.type && trayLabels[this.state.type]) || I18n.t('Global navigation tray')
-          }
+          label={getTrayLabel(this.state.type)}
           size="small"
           open={this.state.isTrayOpen}
           // We need to override closing trays
