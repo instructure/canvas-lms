@@ -19,6 +19,16 @@
 
 class Attachments::GarbageCollector
   class ByContextType
+    class << self
+      def delete_content(...)
+        new(...).delete_content
+      end
+
+      def delete_rows(...)
+        new(...).delete_rows
+      end
+    end
+
     attr_reader :context_type, :older_than, :restore_state, :stats
 
     def initialize(context_type:, older_than:, restore_state: "processed")
