@@ -85,6 +85,7 @@ module Api::V1::DiscussionTopics
     end
 
     ActiveRecord::Associations.preload(topics, %i[assignment user attachment root_topic context discussion_topic_participants])
+    DiscussionTopic.preload_subentry_counts(topics)
     opts[:use_preload] = true
     topics.each_with_object([]) do |topic, result|
       if topic.visible_for?(user)
