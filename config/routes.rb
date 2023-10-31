@@ -1190,6 +1190,14 @@ CanvasRails::Application.routes.draw do
       delete "courses/:course_id/enrollments/:id", action: :destroy, as: "destroy_enrollment"
     end
 
+    scope(controller: :temporary_enrollment_pairings_api) do
+      get "accounts/:account_id/temporary_enrollment_pairings", action: :index
+      get "accounts/:account_id/temporary_enrollment_pairings/:id", action: :show
+      get "accounts/:account_id/temporary_enrollment_pairings/new", action: :new
+      post "accounts/:account_id/temporary_enrollment_pairings", action: :create
+      delete "accounts/:account_id/temporary_enrollment_pairings/:id", action: :destroy
+    end
+
     scope(controller: :terms_api) do
       get "accounts/:account_id/terms", action: :index, as: "enrollment_terms"
       get "accounts/:account_id/terms/:id", action: :show, as: "enrollment_term"
