@@ -363,7 +363,7 @@ GEM
     afm (0.2.2)
     after_transaction_commit (2.2.2)
       activerecord (>= 5.2)
-    apollo-federation (3.8.3)
+    apollo-federation (3.8.4)
       google-protobuf (~> 3.22)
       graphql (>= 1.10.14)
     aroi (1.0.0)
