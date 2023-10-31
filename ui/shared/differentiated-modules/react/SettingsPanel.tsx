@@ -32,6 +32,7 @@ import {convertModuleSettingsForApi} from '../utils/miscHelpers'
 import {updateModuleUI} from '../utils/moduleHelpers'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import type {Module, ModuleItem, Requirement} from './types'
+import RelockModulesDialog from '@canvas/context-modules/backbone/views/RelockModulesDialog'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('differentiated_modules')
@@ -91,7 +92,7 @@ export default function SettingsPanel({
   function doRequest(
     path: string,
     method: string,
-    onSucces: (res: Record<string, any>) => void,
+    onSuccess: (res: Record<string, any>) => void,
     successMessage: string,
     errorMessage: string
   ) {
@@ -102,7 +103,7 @@ export default function SettingsPanel({
     })
       .then((data: {json: Record<string, any>}) => {
         onDismiss()
-        onSucces(data.json)
+        onSuccess(data.json)
         showFlashAlert({
           type: 'success',
           message: successMessage,
@@ -122,7 +123,14 @@ export default function SettingsPanel({
     doRequest(
       `/courses/${ENV.COURSE_ID}/modules/${moduleId}`,
       'PUT',
-      () => updateModuleUI(moduleElement, state),
+      responseData => {
+        updateModuleUI(moduleElement, state)
+        const dialog = new RelockModulesDialog()
+        dialog.renderIfNeeded({
+          relock_warning: responseData?.context_module?.relock_warning ?? false,
+          id: moduleId,
+        })
+      },
       I18n.t('%{moduleName} settings updated successfully.', {
         moduleName: state.moduleName,
       }),

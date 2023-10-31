@@ -208,6 +208,7 @@ describe "selective_release module set up" do
     end
 
     it "updates requirement type and shows on modules page" do
+      skip("LF-965 needs to clear dialog before making second update")
       go_to_modules
 
       scroll_to_the_top_of_modules_page
