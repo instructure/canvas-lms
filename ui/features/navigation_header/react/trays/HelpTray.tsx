@@ -27,18 +27,10 @@ const I18n = useI18nScope('HelpTray')
 
 type Props = {
   closeTray: () => void
-  badgeDisabled: boolean
-  setBadgeDisabled: (state: boolean) => void
-  forceUnreadPoll?: () => void
 }
 
-export default function HelpTray({
-  closeTray,
-  badgeDisabled,
-  setBadgeDisabled,
-  forceUnreadPoll,
-}: Props) {
-  const showNotes = Boolean(ENV.FEATURES?.embedded_release_notes)
+export default function HelpTray({closeTray}: Props) {
+  const showNotes = Boolean(ENV.FEATURES.embedded_release_notes)
 
   return (
     <View as="div" padding="medium" id="help_tray">
@@ -47,13 +39,7 @@ export default function HelpTray({
       </Heading>
       <hr role="presentation" />
       <HelpDialog onFormSubmit={closeTray} />
-      {showNotes ? (
-        <ReleaseNotesList
-          badgeDisabled={badgeDisabled}
-          setBadgeDisabled={setBadgeDisabled}
-          forceUnreadPoll={forceUnreadPoll}
-        />
-      ) : null}
+      {showNotes ? <ReleaseNotesList /> : null}
     </View>
   )
 }

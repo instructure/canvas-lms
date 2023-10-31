@@ -16,10 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import useFetchApi from '@canvas/use-fetch-api-hook'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Link} from '@instructure/ui-link'
@@ -29,128 +27,132 @@ import {List} from '@instructure/ui-list'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
+import {useQuery} from '@canvas/query'
+import {useMutation, useQueryClient} from '@tanstack/react-query'
+import {getSetting, setSetting} from '../queries/settingsQuery'
+import releaseNotesQuery from '../queries/releaseNotesQuery'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
 import {IconWarningSolid} from '@instructure/ui-icons'
 
 const I18n = useI18nScope('Navigation')
 
-function persistBadgeDisabled(state: boolean) {
-  doFetchApi({
-    path: '/api/v1/users/self/settings',
-    method: 'PUT',
-    body: {release_notes_badge_disabled: state},
-  })
-}
-
-type Props = {
-  badgeDisabled: boolean
-  setBadgeDisabled: (state: boolean) => void
-  forceUnreadPoll?: (state: number) => void
-}
-
-type ReleaseNote = {
-  id: number
-  title: string
-  description: string
-  date: string
-  url: string
-  new: boolean
-}
-
-function ReleaseNotesList({badgeDisabled, setBadgeDisabled, forceUnreadPoll}: Props) {
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
-  const [releaseNotes, setReleaseNotes] = useState<ReleaseNote[]>([])
+export default function ReleaseNotesList() {
+  const queryClient = useQueryClient()
   const dateFormatter = useDateTimeFormat('date.formats.short')
 
-  // @ts-expect-error
-  useFetchApi({
-    success: setReleaseNotes,
-    loading: setLoading,
-    error: setError,
-    path: '/api/v1/release_notes/latest',
+  const countsEnabled = Boolean(
+    window.ENV.current_user_id && !window.ENV.current_user?.fake_student
+  )
+
+  const {data: releaseNotesBadgeDisabled} = useQuery({
+    queryKey: ['settings', 'release_notes_badge_disabled'],
+    queryFn: getSetting,
+    enabled: countsEnabled && ENV.FEATURES.embedded_release_notes,
+    fetchAtLeastOnce: true,
   })
 
-  if (loading) {
+  const mutation = useMutation({
+    mutationFn: setSetting,
+    onSuccess: () =>
+      queryClient.setQueryData(
+        ['settings', 'release_notes_badge_disabled'],
+        !releaseNotesBadgeDisabled
+      ),
+  })
+
+  const {
+    data: releaseNotes,
+    isLoading,
+    isError,
+    isSuccess,
+  } = useQuery({
+    queryKey: ['releaseNotes'],
+    queryFn: releaseNotesQuery,
+    enabled: countsEnabled && ENV.FEATURES.embedded_release_notes,
+    fetchAtLeastOnce: true,
+  })
+
+  function updateBadgeDisabled(newState: boolean) {
+    mutation.mutate({
+      setting: 'release_notes_badge_disabled',
+      newState,
+    })
+  }
+
+  if (isLoading) {
     return (
-      <Spinner size="small" margin="x-small" renderTitle={() => I18n.t('Loading release notes')} />
+      <Spinner
+        size="small"
+        delay={200}
+        margin="x-small"
+        renderTitle={() => I18n.t('Loading release notes')}
+      />
     )
-  } else if (error) {
+  }
+  if (isError) {
     return (
       <Text color="danger">
         <IconWarningSolid size="x-small" color="error" />{' '}
         {I18n.t('Release notes could not be loaded.')}
       </Text>
     )
-  } else if (releaseNotes.length === 0) {
-    return null
   }
+  if (isSuccess && releaseNotes.length > 0) {
+    return (
+      <View>
+        <View display="block" margin="medium 0 0">
+          <Flex justifyItems="space-between" alignItems="start">
+            <Text weight="bold" transform="uppercase" size="small" lineHeight="double">
+              {I18n.t('Release Notes')}
+            </Text>
+          </Flex>
+          <hr role="presentation" style={{marginTop: '0'}} />
+        </View>
+        <List isUnstyled={true} margin="small 0" itemSpacing="small">
+          {releaseNotes.map(note => {
+            const has_new_tag = note.new
+            return (
+              <List.Item key={note.id}>
+                <Flex justifyItems="space-between" alignItems="start">
+                  <Link isWithinText={false} href={note.url} target="_blank" rel="noopener">
+                    {note.title}
+                  </Link>
+                  <Text color="secondary">
+                    <span style={{whiteSpace: 'nowrap'}}>{dateFormatter(note.date)}</span>
+                  </Text>
+                </Flex>
+                {has_new_tag && <ScreenReaderContent>{I18n.t('New')}</ScreenReaderContent>}
+                <Flex justifyItems="space-between" alignItems="start">
+                  <Flex.Item size={has_new_tag ? '80%' : '100%'}>
+                    {note.description && (
+                      <Text as="div" size="small">
+                        {note.description}
+                      </Text>
+                    )}
+                  </Flex.Item>
+                  <Flex.Item>
+                    {has_new_tag && (
+                      <PresentationContent>
+                        <Pill color="success">{I18n.t('NEW')}</Pill>
+                      </PresentationContent>
+                    )}
+                  </Flex.Item>
+                </Flex>
+              </List.Item>
+            )
+          })}
+        </List>
 
-  function updateBadgeDisabled(state: boolean) {
-    persistBadgeDisabled(state)
-    setBadgeDisabled(state)
-  }
-
-  if (forceUnreadPoll && releaseNotes.filter(n => n.new).length > 0) {
-    // We do this next time through the event loop to avoid upsetting React by updating two
-    // components at the same time
-    setTimeout(forceUnreadPoll, 0, 0)
-  }
-
-  return (
-    <View>
-      <View display="block" margin="medium 0 0">
-        <Flex justifyItems="space-between" alignItems="start">
-          <Text weight="bold" transform="uppercase" size="small" lineHeight="double">
-            {I18n.t('Release Notes')}
-          </Text>
-        </Flex>
-        <hr role="presentation" style={{marginTop: '0'}} />
+        <Checkbox
+          label={I18n.t('Show badges for new release notes')}
+          checked={!releaseNotesBadgeDisabled}
+          onChange={() => updateBadgeDisabled(!releaseNotesBadgeDisabled)}
+          variant="toggle"
+          size="small"
+        />
       </View>
-      <List isUnstyled={true} margin="small 0" itemSpacing="small">
-        {releaseNotes.map(note => {
-          const has_new_tag = note.new
-          return (
-            <List.Item key={note.id}>
-              <Flex justifyItems="space-between" alignItems="start">
-                <Link isWithinText={false} href={note.url} target="_blank" rel="noopener">
-                  {note.title}
-                </Link>
-                <Text color="secondary">
-                  <span style={{whiteSpace: 'nowrap'}}>{dateFormatter(note.date)}</span>
-                </Text>
-              </Flex>
-              {has_new_tag && <ScreenReaderContent>{I18n.t('New')}</ScreenReaderContent>}
-              <Flex justifyItems="space-between" alignItems="start">
-                <Flex.Item size={has_new_tag ? '80%' : '100%'}>
-                  {note.description && (
-                    <Text as="div" size="small">
-                      {note.description}
-                    </Text>
-                  )}
-                </Flex.Item>
-                <Flex.Item>
-                  {has_new_tag && (
-                    <PresentationContent>
-                      <Pill color="success">{I18n.t('NEW')}</Pill>
-                    </PresentationContent>
-                  )}
-                </Flex.Item>
-              </Flex>
-            </List.Item>
-          )
-        })}
-      </List>
+    )
+  }
 
-      <Checkbox
-        label={I18n.t('Show badges for new release notes')}
-        checked={!badgeDisabled}
-        onChange={() => updateBadgeDisabled(!badgeDisabled)}
-        variant="toggle"
-        size="small"
-      />
-    </View>
-  )
+  return null
 }
-
-export default ReleaseNotesList
