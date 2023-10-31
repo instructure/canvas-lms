@@ -16,9 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect} from 'react'
+import React, {useEffect, useState} from 'react'
 import {Navigation as SideNavBar} from '@instructure/ui-navigation'
 import {Badge} from '@instructure/ui-badge'
+import {CloseButton} from '@instructure/ui-buttons'
+import {Spinner} from '@instructure/ui-spinner'
+import {Tray} from '@instructure/ui-tray'
+import {View} from '@instructure/ui-view'
 import {Avatar} from '@instructure/ui-avatar'
 import {Img} from '@instructure/ui-img'
 import {
@@ -41,8 +45,22 @@ import {useQuery} from '@canvas/query'
 import {useMutation, useQueryClient} from '@tanstack/react-query'
 import {getUnreadCount} from './queries/unreadCountQuery'
 import {getSetting, setSetting} from './queries/settingsQuery'
+import {getActiveItem, getTrayLabel} from './utils'
+import type {ActiveTray} from './utils'
 
 const I18n = useI18nScope('sidenav')
+
+const CoursesTray = React.lazy(() => import('./trays/CoursesTray'))
+const GroupsTray = React.lazy(() => import('./trays/GroupsTray'))
+const AccountsTray = React.lazy(() => import('./trays/AccountsTray'))
+// const ProfileTray = React.lazy(() => import('./trays/ProfileTray'))
+const HistoryTray = React.lazy(() => import('./trays/HistoryTray'))
+// const HelpTray = React.lazy(() => import('./trays/HelpTray'))
+
+const portal = document.createElement('div')
+portal.id = 'nav-tray-portal'
+portal.setAttribute('style', 'position: relative; z-index: 99;')
+document.body.appendChild(portal)
 
 export const InformationIconEnum = {
   INFORMATION: 'information',
@@ -51,7 +69,35 @@ export const InformationIconEnum = {
   LIFE_SAVER: 'lifepreserver',
 }
 
+const defaultActiveItem = getActiveItem()
+
 const SideNav = () => {
+  const [isTrayOpen, setIsTrayOpen] = useState(false)
+  const [activeTray, setActiveTray] = useState<ActiveTray | null>(null)
+  const [selectedNavItem, setSelectedNavItem] = useState<ActiveTray | ''>(defaultActiveItem)
+
+  // after tray is closed, eventually set activeTray to null
+  // we don't do this immediately in order to maintain animation of closing tray
+  useEffect(() => {
+    if (!isTrayOpen) {
+      setTimeout(() => setActiveTray(null), 150)
+    }
+  }, [isTrayOpen])
+
+  useEffect(() => {
+    // when an active tray is set, we infer that the tray is opened
+    if (activeTray) {
+      setIsTrayOpen(true)
+    }
+
+    // if the active tray is set to null, the active nav item should be
+    // determined by page location
+    setSelectedNavItem(activeTray ?? defaultActiveItem)
+  }, [activeTray])
+
+  const [trayShouldContainFocus, setTrayShouldContainFocus] = useState(false)
+  const [overrideDismiss] = useState(false)
+
   let logoUrl = null
   const queryClient = useQueryClient()
   const isK5User = window.ENV.K5_USER
@@ -218,9 +264,12 @@ const SideNav = () => {
             </Badge>
           }
           label={I18n.t('Account')}
-          onClick={() => {
-            // this.loadSubNav('account')
+          href="/profile/settings"
+          onClick={event => {
+            event.preventDefault()
+            setActiveTray('profile')
           }}
+          selected={selectedNavItem === 'profile'}
           themeOverride={navItemThemeOverride}
         />
         <SideNavBar.Item
@@ -229,15 +278,17 @@ const SideNav = () => {
           href="/accounts"
           onClick={event => {
             event.preventDefault()
+            setActiveTray('accounts')
           }}
+          selected={selectedNavItem === 'accounts'}
           themeOverride={navItemThemeOverride}
         />
         <SideNavBar.Item
-          selected={true}
           icon={isK5User ? <IconHomeLine data-testid="K5HomeIcon" /> : <IconDashboardLine />}
           label={isK5User ? I18n.t('Home') : I18n.t('Dashboard')}
           href="/"
           themeOverride={navItemThemeOverride}
+          selected={selectedNavItem === 'dashboard'}
         />
         <SideNavBar.Item
           icon={<IconCoursesLine />}
@@ -245,7 +296,9 @@ const SideNav = () => {
           href="/courses"
           onClick={event => {
             event.preventDefault()
+            setActiveTray('courses')
           }}
+          selected={selectedNavItem === 'courses'}
           themeOverride={navItemThemeOverride}
         />
         <SideNavBar.Item
@@ -253,6 +306,7 @@ const SideNav = () => {
           label={I18n.t('Calendar')}
           href="/calendar"
           themeOverride={navItemThemeOverride}
+          selected={selectedNavItem === 'calendar'}
         />
         <SideNavBar.Item
           icon={
@@ -281,6 +335,7 @@ const SideNav = () => {
           }
           label={I18n.t('Inbox')}
           href="/conversations"
+          selected={selectedNavItem === 'conversations'}
           themeOverride={navItemThemeOverride}
         />
         <SideNavBar.Item
@@ -309,10 +364,68 @@ const SideNav = () => {
             </Badge>
           }
           label={I18n.t('Help')}
-          href="/accounts/self/settings"
+          href="https://help.instructure.com/"
+          onClick={event => {
+            event.preventDefault()
+            setActiveTray('help')
+          }}
+          selected={selectedNavItem === 'help'}
           themeOverride={navItemThemeOverride}
         />
       </SideNavBar>
+      <Tray
+        key={activeTray}
+        label={getTrayLabel(activeTray)}
+        size="small"
+        open={isTrayOpen}
+        // We need to override closing trays
+        // so the tour can properly go through them
+        // without them unexpectedly closing.
+        onDismiss={
+          overrideDismiss
+            ? () => {}
+            : () => {
+                setIsTrayOpen(false)
+                setTrayShouldContainFocus(false)
+              }
+        }
+        shouldCloseOnDocumentClick={true}
+        shouldContainFocus={trayShouldContainFocus}
+        mountNode={portal}
+        themeOverride={{smallWidth: '28em'}}
+      >
+        <div className={`navigation-tray-container ${activeTray}-tray`}>
+          <CloseButton
+            placement="end"
+            onClick={() => {
+              setIsTrayOpen(false)
+              setTrayShouldContainFocus(false)
+            }}
+            screenReaderLabel={I18n.t('Close')}
+          />
+          <div className="tray-with-space-for-global-nav">
+            <React.Suspense
+              fallback={
+                <View display="block" textAlign="center">
+                  <Spinner
+                    size="large"
+                    delay={500}
+                    margin="large auto"
+                    renderTitle={() => I18n.t('Loading')}
+                  />
+                </View>
+              }
+            >
+              {activeTray === 'accounts' && <AccountsTray />}
+              {activeTray === 'courses' && <CoursesTray />}
+              {activeTray === 'groups' && <GroupsTray />}
+              {/* {activeTray === 'profile' && <ProfileTray />} */}
+              {activeTray === 'history' && <HistoryTray />}
+              {/* {activeTray === 'help' && <HelpTray closeTray={() => setIsTrayOpen(false)} />} */}
+            </React.Suspense>
+          </div>
+        </div>
+      </Tray>
     </div>
   )
 }
