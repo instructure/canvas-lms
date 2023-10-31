@@ -284,14 +284,7 @@ export default class Navigation extends React.Component<Props, State> {
                   <ProfileTray counts={{unreadShares: this.state.unreadSharesCount}} />
                 )}
                 {this.state.type === 'history' && <HistoryTray />}
-                {this.state.type === 'help' && (
-                  <HelpTray
-                    closeTray={this.closeTray}
-                    badgeDisabled={this.state.releaseNotesBadgeDisabled}
-                    setBadgeDisabled={val => this.setState({releaseNotesBadgeDisabled: val})}
-                    forceUnreadPoll={this.forceUnreadReleaseNotesPoll}
-                  />
-                )}
+                {this.state.type === 'help' && <HelpTray closeTray={this.closeTray} />}
               </React.Suspense>
             </div>
           </div>

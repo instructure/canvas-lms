@@ -634,3 +634,13 @@ export type HelpLink = Readonly<{
   is_new?: boolean
   no_new_window?: boolean
 }>
+
+// '/api/v1/release_notes/latest'
+export type ReleaseNote = {
+  id: string
+  title: string
+  description: string
+  url: string
+  date: string
+  new: boolean
+}

@@ -55,7 +55,7 @@ const GroupsTray = React.lazy(() => import('./trays/GroupsTray'))
 const AccountsTray = React.lazy(() => import('./trays/AccountsTray'))
 // const ProfileTray = React.lazy(() => import('./trays/ProfileTray'))
 const HistoryTray = React.lazy(() => import('./trays/HistoryTray'))
-// const HelpTray = React.lazy(() => import('./trays/HelpTray'))
+const HelpTray = React.lazy(() => import('./trays/HelpTray'))
 
 const portal = document.createElement('div')
 portal.id = 'nav-tray-portal'
@@ -409,7 +409,7 @@ const SideNav = () => {
                 <View display="block" textAlign="center">
                   <Spinner
                     size="large"
-                    delay={500}
+                    delay={200}
                     margin="large auto"
                     renderTitle={() => I18n.t('Loading')}
                   />
@@ -421,7 +421,7 @@ const SideNav = () => {
               {activeTray === 'groups' && <GroupsTray />}
               {/* {activeTray === 'profile' && <ProfileTray />} */}
               {activeTray === 'history' && <HistoryTray />}
-              {/* {activeTray === 'help' && <HelpTray closeTray={() => setIsTrayOpen(false)} />} */}
+              {activeTray === 'help' && <HelpTray closeTray={() => setIsTrayOpen(false)} />}
             </React.Suspense>
           </div>
         </div>
