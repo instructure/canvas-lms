@@ -15,13 +15,23 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React from 'react'
+import React, {MutableRefObject} from 'react'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {CloseButton, Button} from '@instructure/ui-buttons'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('TourPoints')
+
+interface ITourContainer {
+  current: number
+  totalSteps: number
+  gotoStep: (step: number) => void
+  close: (obj: any) => void
+  firstLabel: string
+  softClose: (obj: any) => void
+  content: any
+}
 
 const TourContainer = ({
   current,
@@ -31,14 +41,14 @@ const TourContainer = ({
   firstLabel,
   softClose = close,
   content,
-}) => {
-  const closeButtonRef = React.useRef()
-  const focusRef = React.useRef()
+}: ITourContainer) => {
+  const closeButtonRef: MutableRefObject<any> = React.useRef()
+  const focusRef: MutableRefObject<any> = React.useRef()
   React.useEffect(() => {
     // Make sure this is visible to screen readers
     const tourElement = document.getElementById('___reactour')
     if (tourElement) {
-      tourElement.setAttribute('aria-hidden', false)
+      tourElement.setAttribute('aria-hidden', 'false')
     }
     // Focus the close button by default
     if (closeButtonRef.current) {
