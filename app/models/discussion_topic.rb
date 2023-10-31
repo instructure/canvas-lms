@@ -48,6 +48,7 @@ class DiscussionTopic < ActiveRecord::Base
   restrict_columns :availability_dates, [:delayed_post_at, :lock_at]
   restrict_assignment_columns
 
+  attr_writer :can_unpublish, :preloaded_subentry_count, :sections_changed
   attr_accessor :user_has_posted, :saved_by, :total_root_discussion_entries
 
   module DiscussionTypes
@@ -270,8 +271,6 @@ class DiscussionTopic < ActiveRecord::Base
     end
   end
 
-  attr_writer :sections_changed
-
   def recalculate_progressions_if_sections_changed
     # either changed sections or undid section specificness
     return unless is_section_specific? ? @sections_changed : is_section_specific_before_last_save
@@ -452,7 +451,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   # count of all active discussion_entries
   def discussion_subentry_count
-    discussion_entries.active.count
+    @preloaded_subentry_count || discussion_entries.active.count
   end
 
   def for_group_discussion?
@@ -1000,7 +999,6 @@ class DiscussionTopic < ActiveRecord::Base
                        end
                      end
   end
-  attr_writer :can_unpublish
 
   def self.preload_can_unpublish(context, topics, assmnt_ids_with_subs = nil)
     return unless topics.any?
@@ -1020,6 +1018,16 @@ class DiscussionTopic < ActiveRecord::Base
                               !topic_ids_with_entries.include?(topic.id)
                             end
     end
+  end
+
+  def self.preload_subentry_counts(topics)
+    counts_by_topic_id = DiscussionEntry
+                         .active
+                         .where(discussion_topic_id: topics.pluck(:id))
+                         .group(:discussion_topic_id)
+                         .count
+
+    topics.each { |topic| topic.preloaded_subentry_count = counts_by_topic_id.fetch(topic.id, 0) }
   end
 
   def can_group?(opts = {})
