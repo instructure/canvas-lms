@@ -513,7 +513,7 @@ CanvasRails::Application.routes.draw do
   resources :page_views, only: :update
   post "media_objects" => "media_objects#create_media_object", :as => :create_media_object
   get "media_objects/:id" => "media_objects#media_object_inline", :as => :media_object
-  get "media_objects/:id/redirect" => "media_objects#media_object_redirect", :as => :media_object_redirect
+  get "media_objects/:media_object_id/redirect" => "media_objects#media_object_redirect", :as => :media_object_redirect
   get "media_objects/:media_object_id/thumbnail" => "media_objects#media_object_thumbnail", :as => :media_object_thumbnail
   get "media_objects/:media_object_id/info" => "media_objects#show", :as => :media_object_info
   get "media_objects_iframe/:media_object_id" => "media_objects#iframe_media_player", :as => :media_object_iframe
@@ -526,6 +526,7 @@ CanvasRails::Application.routes.draw do
   get "media_attachments/:attachment_id/thumbnail" => "media_objects#media_object_thumbnail", :as => :media_attachment_thumbnail
   get "media_attachments/:attachment_id/info" => "media_objects#show", :as => :media_attachment_info
   get "media_attachments_iframe/:attachment_id" => "media_objects#iframe_media_player", :as => :media_attachment_iframe
+  get "media_attachments/:attachment_id/redirect" => "media_objects#media_object_redirect", :as => :media_attachment_redirect
   get "media_attachments/:attachment_id/media_tracks/:id" => "media_tracks#show", :as => :show_media_attachment_tracks
   post "media_attachments/:attachment_id/media_tracks" => "media_tracks#create", :as => :create_media_attachment_tracks
   delete "media_attachments/:attachment_id/media_tracks/:id" => "media_tracks#destroy", :as => :delete_media_attachment_tracks

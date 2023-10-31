@@ -255,7 +255,26 @@ class MediaObjectsController < ApplicationController
     @media_object&.viewed!
     config = CanvasKaltura::ClientV3.config
     if config
-      redirect_to CanvasKaltura::ClientV3.new.assetSwfUrl(params[:id])
+      if Account.site_admin.feature_enabled?(:authenticated_iframe_content)
+        begin
+          media_source = @media_object.media_sources.find { |ms| ms[:bitrate].to_s == params[:bitrate].to_s } || @media_object.media_sources.min_by { |ms| ms[:bitrate]&.to_i }
+          url = media_source[:url]
+          # keep track of the redirects and use the last one
+          redirect_spy = ->(res) { url = res.header["location"] }
+          CanvasHttp.get(url, redirect_spy:) do |res|
+            raise CanvasHttp::InvalidResponseCodeError, res.code.to_i unless /^2/.match?(res.code.to_s)
+
+            # don't load body
+          end
+          redirect_to url
+        rescue CanvasHttp::InvalidResponseCodeError => e
+          render plain: e.message, status: e.code
+        rescue Errno::ECONNREFUSED, CanvasHttp::Error => e
+          render plain: e.message, status: :bad_request
+        end
+      else
+        redirect_to CanvasKaltura::ClientV3.new.assetSwfUrl(params[:id])
+      end
     else
       render plain: t(:media_objects_not_configured, "Media Objects not configured")
     end
@@ -287,7 +306,7 @@ class MediaObjectsController < ApplicationController
     @embeddable = true
 
     media_api_json = if @attachment && @media_object
-                       media_attachment_api_json(@attachment, @media_object, @current_user, session)
+                       media_attachment_api_json(@attachment, @media_object, @current_user, session, verifier: params[:verifier])
                      elsif @media_object
                        media_object_api_json(@media_object, @current_user, session)
                      end
