@@ -135,6 +135,7 @@
     "graphiql": "^0.14.2",
     "graphiql-explorer": "^0.4.2",
     "graphql": "^14",
+    "graphql-request": "^6.1.0",
     "graphql-tag": "^2.8.0",
     "i18n-js": "^3",
     "ic-ajax": "~2.0.1",

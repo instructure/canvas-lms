@@ -924,4 +924,25 @@ describe Types::CourseType do
       expect(result).to eq @course.allow_final_grade_override
     end
   end
+
+  describe "RubricsConnection" do
+    before(:once) do
+      rubric_for_course
+      rubric_association_model(context: course, rubric: @rubric, association_object: course, purpose: "bookmark")
+    end
+
+    it "returns rubrics" do
+      expect(
+        course_type.resolve("rubricsConnection { edges { node { _id } } }")
+      ).to eq [course.rubrics.first.to_param]
+
+      expect(
+        course_type.resolve("rubricsConnection { edges { node { criteriaCount } } }")
+      ).to eq [1]
+
+      expect(
+        course_type.resolve("rubricsConnection { edges { node { workflowState } } }")
+      ).to eq ["active"]
+    end
+  end
 end
