@@ -361,6 +361,8 @@ class DiscussionTopic < ActiveRecord::Base
     working_assignment.description = message
     working_assignment.submission_types = "discussion_topic"
     working_assignment.workflow_state = (workflow_state == "active") ? "published" : "unpublished"
+    # setting this ensures the assignment won't create a new discussion_topic when it gets created
+    working_assignment.saved_by = :discussion_topic
 
     %i[assignment_group_id assignment_overrides due_at grading_type grading_standard_id lock_at name points_possible unlock_at].each do |field|
       working_assignment.send("#{field}=", assignment_input[field]) if assignment_input[field]
