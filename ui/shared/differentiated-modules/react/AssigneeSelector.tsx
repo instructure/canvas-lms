@@ -137,9 +137,7 @@ const AssigneeSelector = ({courseId, onSelect, defaultValues, selectedOptionIds}
     onSelect(selected)
   }
 
-  const handleInputChange = (value: string) => {
-    debounce(() => setSearchTerm(value), 300)()
-  }
+  const handleInputChange = debounce(value => setSearchTerm(value), 500)
 
   const handleShowOptions = () => {
     setIsShowingOptions(true)
