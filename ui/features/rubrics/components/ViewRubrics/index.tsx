@@ -17,7 +17,9 @@
  */
 
 import React from 'react'
-import {useNavigate} from 'react-router-dom'
+import {useNavigate, useParams} from 'react-router-dom'
+import {useQuery} from '@canvas/query'
+import LoadingIndicator from '@canvas/loading-indicator'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -26,6 +28,12 @@ import {IconAddLine, IconSearchLine} from '@instructure/ui-icons'
 import {TextInput} from '@instructure/ui-text-input'
 import {View} from '@instructure/ui-view'
 import {RubricTable} from './RubricTable'
+import {RubricQueryResponse} from '../../types/Rubric'
+import {
+  FetchRubricVariables,
+  fetchAccountRubrics,
+  fetchCourseRubrics,
+} from '../../queries/ViewRubricQueries'
 
 const {Item: FlexItem} = Flex
 
@@ -39,28 +47,54 @@ type Rubric = {
 
 export const ViewRubrics = () => {
   const navigate = useNavigate()
+  const {accountId, courseId} = useParams()
+  const isAccount = !!accountId
+  const isCourse = !!courseId
 
-  // Temporary setup data
-  const mainRubricProps: Rubric[] = [
-    {
-      id: '1',
-      criterion: 3,
-      name: 'Quizzes Rubric',
-      points: 30,
-      locations: ['GD101', 'ART220', 'CS220', 'MS230'],
+  let queryVariables: FetchRubricVariables
+  let fetchQuery: (queryVariables: FetchRubricVariables) => Promise<RubricQueryResponse>
+  let queryKey: string = ''
+
+  if (isAccount) {
+    queryVariables = {accountId}
+    fetchQuery = fetchAccountRubrics
+    queryKey = `accountRubrics-${accountId}`
+  } else if (isCourse) {
+    queryVariables = {courseId}
+    fetchQuery = fetchCourseRubrics
+    queryKey = `courseRubrics-${courseId}`
+  }
+
+  const {data, isLoading} = useQuery({
+    queryKey: [queryKey],
+    queryFn: async () => fetchQuery(queryVariables),
+  })
+
+  if (isLoading) {
+    return <LoadingIndicator />
+  }
+
+  if (!data) {
+    return null
+  }
+
+  const {activeRubrics, archivedRubrics} = data.rubricsConnection.nodes.reduce(
+    (prev, curr) => {
+      const rubric = {
+        id: curr.id,
+        name: curr.title,
+        points: curr.pointsPossible,
+        criterion: curr.criteriaCount,
+        locations: [], // TODO: add locations once we have them
+      }
+
+      curr.workflowState === 'active'
+        ? prev.activeRubrics.push(rubric)
+        : prev.archivedRubrics.push(rubric)
+      return prev
     },
-    {id: '2', criterion: 5, name: 'ART 101 Rubric', points: 100, locations: []},
-    {id: '3', criterion: 1, name: 'Test 1', points: 0, locations: []},
-  ]
-  const archivedRubricProps: Rubric[] = [
-    {
-      id: '4',
-      criterion: 3,
-      name: 'Old Rubric 1',
-      points: 30,
-      locations: ['GD101', 'ART220', 'CS220', 'MS230'],
-    },
-  ]
+    {activeRubrics: [] as Rubric[], archivedRubrics: [] as Rubric[]}
+  )
 
   return (
     <View as="div">
@@ -97,7 +131,7 @@ export const ViewRubrics = () => {
         </Heading>
       </View>
       <View as="div" margin="medium 0">
-        <RubricTable rubrics={mainRubricProps} />
+        <RubricTable rubrics={activeRubrics} />
       </View>
 
       <View as="div" margin="large 0 0 0">
@@ -106,7 +140,7 @@ export const ViewRubrics = () => {
         </Heading>
       </View>
       <View as="div" margin="medium 0">
-        <RubricTable rubrics={archivedRubricProps} />
+        <RubricTable rubrics={archivedRubrics} />
       </View>
     </View>
   )

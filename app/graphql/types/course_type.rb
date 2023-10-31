@@ -163,6 +163,13 @@ module Types
             .order("name")
     end
 
+    field :rubrics_connection, RubricType.connection_type, null: true
+    def rubrics_connection
+      rubric_associations = course.rubric_associations.bookmarked.include_rubric.to_a
+      rubric_associations = Canvas::ICU.collate_by(rubric_associations.select(&:rubric_id).uniq(&:rubric_id)) { |r| r.rubric.title }
+      rubric_associations.map(&:rubric)
+    end
+
     field :users_connection, UserType.connection_type, null: true do
       argument :user_ids,
                [ID],
