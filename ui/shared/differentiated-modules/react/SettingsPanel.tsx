@@ -25,7 +25,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import PrerequisiteForm from './PrerequisiteForm'
 import RequirementForm from './RequirementForm'
 import Footer from './Footer'
-import DateTimeInput from '@canvas/datetime/react/components/DateTimeInput'
+import {DateTimeInput} from '@instructure/ui-date-time-input'
 import {defaultState, actions, reducer} from './settingsReducer'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {convertModuleSettingsForApi} from '../utils/miscHelpers'
@@ -208,9 +208,15 @@ export default function SettingsPanel({
           <View data-testid="lock-until-input" as="div" padding="small">
             <DateTimeInput
               value={state.unlockAt}
+              dateRenderLabel={I18n.t('Date')}
+              timeRenderLabel={I18n.t('Time')}
+              invalidDateTimeMessage={I18n.t('Invalid date!')}
               layout="columns"
               colSpacing="small"
-              onChange={dateTimeString =>
+              prevMonthLabel={I18n.t('Previous month')}
+              nextMonthLabel={I18n.t('Next month')}
+              allowNonStepInput={true}
+              onChange={(e, dateTimeString) =>
                 dispatch({type: actions.SET_UNLOCK_AT, payload: dateTimeString})
               }
               description={
