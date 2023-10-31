@@ -19,13 +19,14 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import ready from '@instructure/ready'
+import {Role} from './react/tour'
 
 const Tour = React.lazy(() => import('./react/tour'))
 
 ready(() => {
   const current_roles = window.ENV.current_user_roles || []
   const current_types = window.ENV.current_user_types || []
-  const roles = []
+  const roles: Role[] = []
 
   // Decide which tour to show based on the role
   if (current_types.includes('AccountAdmin')) {

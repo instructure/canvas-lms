@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+// @ts-expect-error
 import Reactour from '@instructure/reactour/dist/reactour.cjs'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import tourPubSub from '@canvas/tour-pubsub'
@@ -29,6 +30,12 @@ import studentTour from './tours/studentTour'
 import handleOpenTray from './handleOpenTray'
 
 const I18n = useI18nScope('TourPoints')
+
+export type Role = 'student' | 'teacher' | 'admin'
+
+interface ITour {
+  roles: Role[]
+}
 
 const allSteps = {
   admin: adminTour,
@@ -48,8 +55,8 @@ const softCloseSteps = [
   },
 ]
 
-const Tour = ({roles}) => {
-  const [currentRole, setCurrentRole] = React.useState(() => {
+const Tour = ({roles}: ITour) => {
+  const [currentRole, setCurrentRole] = React.useState<Role>(() => {
     if (
       window.ENV?.COURSE?.is_student &&
       roles.includes('student') &&
@@ -102,7 +109,7 @@ const Tour = ({roles}) => {
         setSoftClose(true)
         const tourElement = document.getElementById('___reactour')
         if (tourElement) {
-          tourElement.setAttribute('aria-hidden', false)
+          tourElement.setAttribute('aria-hidden', 'false')
         }
       }
     },
@@ -110,7 +117,7 @@ const Tour = ({roles}) => {
   )
 
   React.useEffect(() => {
-    const escapeClose = e => {
+    const escapeClose = (e: any) => {
       if (e.keyCode === 27) {
         // Escape Key
         handleSoftClose()
@@ -124,22 +131,22 @@ const Tour = ({roles}) => {
     // Restore the nav tray's screen reader visibility
     const navElement = document.getElementById('nav-tray-portal')
     if (navElement) {
-      navElement.setAttribute('aria-hidden', false)
+      navElement.setAttribute('aria-hidden', 'false')
     }
     const appElement = document.getElementById('application')
     if (appElement) {
-      appElement.setAttribute('aria-hidden', false)
+      appElement.setAttribute('aria-hidden', 'false')
     }
   }
 
   const blockApplicationScreenReader = () => {
     const navElement = document.getElementById('nav-tray-portal')
     if (navElement) {
-      navElement.setAttribute('aria-hidden', true)
+      navElement.setAttribute('aria-hidden', 'true')
     }
     const appElement = document.getElementById('application')
     if (appElement) {
-      appElement.setAttribute('aria-hidden', true)
+      appElement.setAttribute('aria-hidden', 'true')
     }
   }
 
@@ -200,7 +207,7 @@ const Tour = ({roles}) => {
   return (
     <Reactour
       key={`${softClose}-${open}-${currentRole}`}
-      CustomHelper={props => (
+      CustomHelper={(props: any) => (
         <TourContainer
           softClose={handleSoftClose}
           close={() => {
