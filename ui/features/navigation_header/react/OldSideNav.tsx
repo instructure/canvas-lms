@@ -19,22 +19,16 @@
 import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
-import {func} from 'prop-types'
 import {Tray} from '@instructure/ui-tray'
 import {CloseButton} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
-import UnreadCounts from './UnreadCounts'
 import preventDefault from '@canvas/util/preventDefault'
 import tourPubSub from '@canvas/tour-pubsub'
 import {getTrayLabel} from './utils'
+import NavigationBadges from './NavigationBadges'
 
 const I18n = useI18nScope('Navigation')
-
-// We don't need to poll for new release notes very often since we expect
-// new ones to appear only infrequently. The act of viewing them will reset
-// the badge at the time of viewing.
-const RELEASE_NOTES_POLL_INTERVAL = 60 * 60 * 1000 // one hour
 
 const CoursesTray = React.lazy(() => import('./trays/CoursesTray'))
 const GroupsTray = React.lazy(() => import('./trays/GroupsTray'))
@@ -69,60 +63,31 @@ function getPortal() {
 
 function noop() {}
 
-type Props = {
-  unreadComponent: any
-  onDataReceived: () => void
-}
+type Props = {}
 
 type State = {
   activeItem: ActiveItem
   isTrayOpen: boolean
   noFocus: boolean
   overrideDismiss: boolean
-  releaseNotesBadgeDisabled: boolean
   type: ActiveItem | null
-  unreadInboxCount: number
-  unreadSharesCount: number
 }
 
 export default class Navigation extends React.Component<Props, State> {
-  forceUnreadReleaseNotesPoll: (() => void) | undefined
-
   openPublishUnsubscribe: () => void = noop
 
   overrideDismissUnsubscribe: () => void = noop
 
   closePublishUnsubscribe: () => void = noop
 
-  unreadReleaseNotesCountElement: HTMLElement | null = null
-
-  unreadInboxCountElement: HTMLElement | null = null
-
-  unreadSharesCountElement: HTMLElement | null = null
-
-  static propTypes = {
-    unreadComponent: func, // for testing only
-    onDataReceived: func,
-  }
-
-  static defaultProps = {
-    unreadComponent: UnreadCounts,
-  }
-
   constructor(props: Props) {
     super(props)
-    this.forceUnreadReleaseNotesPoll = undefined
-    this.setReleaseNotesUnreadPollNow = this.setReleaseNotesUnreadPollNow.bind(this)
     this.state = {
       activeItem: 'dashboard',
       isTrayOpen: false,
       noFocus: false,
       overrideDismiss: false,
       type: null,
-      unreadInboxCount: 0,
-      unreadSharesCount: 0,
-      releaseNotesBadgeDisabled:
-        !ENV.FEATURES.embedded_release_notes || ENV.SETTINGS.release_notes_badge_disabled,
     }
   }
 
@@ -219,27 +184,7 @@ export default class Navigation extends React.Component<Props, State> {
     })
   }
 
-  // Also have to attend to the unread dot on the mobile view inbox
-  onInboxUnreadUpdate(unreadCount: number) {
-    if (this.state.unreadInboxCount !== unreadCount) this.setState({unreadInboxCount: unreadCount})
-    const el = document.getElementById('mobileHeaderInboxUnreadBadge')
-    if (el) el.style.display = unreadCount > 0 ? '' : 'none'
-    if (typeof this.props.onDataReceived === 'function') this.props.onDataReceived()
-  }
-
-  onSharesUnreadUpdate(unreadCount: number) {
-    if (this.state.unreadSharesCount !== unreadCount)
-      this.setState({unreadSharesCount: unreadCount})
-  }
-
-  setReleaseNotesUnreadPollNow(callback: () => void) {
-    if (typeof this.forceUnreadReleaseNotesPoll === 'undefined')
-      this.forceUnreadReleaseNotesPoll = callback
-  }
-
   render() {
-    const UnreadComponent = this.props.unreadComponent
-
     return (
       <>
         <Tray
@@ -280,80 +225,14 @@ export default class Navigation extends React.Component<Props, State> {
                 {this.state.type === 'courses' && <CoursesTray />}
                 {this.state.type === 'groups' && <GroupsTray />}
                 {this.state.type === 'accounts' && <AccountsTray />}
-                {this.state.type === 'profile' && (
-                  <ProfileTray counts={{unreadShares: this.state.unreadSharesCount}} />
-                )}
+                {this.state.type === 'profile' && <ProfileTray />}
                 {this.state.type === 'history' && <HistoryTray />}
                 {this.state.type === 'help' && <HelpTray closeTray={this.closeTray} />}
               </React.Suspense>
             </div>
           </div>
         </Tray>
-        {ENV.CAN_VIEW_CONTENT_SHARES && ENV.current_user_id && (
-          <UnreadComponent
-            targetEl={
-              this.unreadSharesCountElement ||
-              (this.unreadSharesCountElement = document.querySelector(
-                '#global_nav_profile_link .menu-item__badge'
-              ))
-            }
-            dataUrl="/api/v1/users/self/content_shares/unread_count"
-            onUpdate={(unreadCount: number) => this.onSharesUnreadUpdate(unreadCount)}
-            srText={(count: number) =>
-              I18n.t(
-                {
-                  one: 'One unread share.',
-                  other: '%{count} unread shares.',
-                },
-                {count}
-              )
-            }
-          />
-        )}
-        {!ENV.current_user_disabled_inbox && (
-          <UnreadComponent
-            targetEl={
-              this.unreadInboxCountElement ||
-              (this.unreadInboxCountElement = document.querySelector(
-                '#global_nav_conversations_link .menu-item__badge'
-              ))
-            }
-            dataUrl="/api/v1/conversations/unread_count"
-            onUpdate={(unreadCount: number) => this.onInboxUnreadUpdate(unreadCount)}
-            srText={(count: number) =>
-              I18n.t(
-                {
-                  one: 'One unread message.',
-                  other: '%{count} unread messages.',
-                },
-                {count}
-              )
-            }
-            useSessionStorage={false}
-          />
-        )}
-        {!this.state.releaseNotesBadgeDisabled && (
-          <UnreadComponent
-            targetEl={
-              this.unreadReleaseNotesCountElement ||
-              (this.unreadReleaseNotesCountElement = document.querySelector(
-                '#global_nav_help_link .menu-item__badge'
-              ))
-            }
-            dataUrl="/api/v1/release_notes/unread_count"
-            srText={(count: number) =>
-              I18n.t(
-                {
-                  one: 'One unread release note.',
-                  other: '%{count} unread release notes.',
-                },
-                {count}
-              )
-            }
-            pollIntervalMs={RELEASE_NOTES_POLL_INTERVAL}
-            pollNowPassback={this.setReleaseNotesUnreadPollNow}
-          />
-        )}
+        <NavigationBadges />
       </>
     )
   }

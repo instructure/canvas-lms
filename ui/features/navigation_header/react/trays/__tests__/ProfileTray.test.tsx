@@ -21,7 +21,6 @@ import {render as testingLibraryRender} from '@testing-library/react'
 import {getByText as domGetByText} from '@testing-library/dom'
 import ProfileTray from '../ProfileTray'
 import {QueryProvider, queryClient} from '@canvas/query'
-import type {TabCountsObj} from '../../../../../api.d'
 
 const render = (children: unknown) =>
   testingLibraryRender(<QueryProvider>{children}</QueryProvider>)
@@ -47,8 +46,6 @@ const profileTabs = [
 ]
 
 describe('ProfileTray', () => {
-  let props: {counts: TabCountsObj}
-
   beforeEach(() => {
     window.ENV = {
       // @ts-expect-error
@@ -58,10 +55,6 @@ describe('ProfileTray', () => {
       },
       current_user_roles: [],
     }
-
-    props = {
-      counts: {unreadShares: 12},
-    }
   })
 
   afterEach(() => {
@@ -69,14 +62,14 @@ describe('ProfileTray', () => {
   })
 
   it('renders the component', () => {
-    const {getByText} = render(<ProfileTray {...props} />)
+    const {getByText} = render(<ProfileTray />)
     getByText('Sample Student')
   })
 
   it('renders the avatar', () => {
     window.ENV.current_user.avatar_is_fallback = false
     window.ENV.current_user.avatar_image_url = imageUrl
-    const {getByAltText} = render(<ProfileTray {...props} />)
+    const {getByAltText} = render(<ProfileTray />)
     const avatar = getByAltText('User profile picture')
     // @ts-expect-error
     expect(avatar.src).toBe(imageUrl)
@@ -84,14 +77,15 @@ describe('ProfileTray', () => {
 
   it('renders the tabs', () => {
     queryClient.setQueryData(['profile'], profileTabs)
-    const {getByText} = render(<ProfileTray {...props} />)
+    const {getByText} = render(<ProfileTray />)
     getByText('Foo')
     getByText('Bar')
   })
 
   it('renders the unread count badge on Shared Content', () => {
     queryClient.setQueryData(['profile'], profileTabs)
-    const {container} = render(<ProfileTray {...props} />)
+    queryClient.setQueryData(['unread_count', 'content_shares'], 12)
+    const {container} = render(<ProfileTray />)
     // @ts-expect-error
     const elt = container.firstChild.querySelector('a[href="/shared"]')
     domGetByText(elt, '12 unread.')

@@ -20,8 +20,10 @@ import React, {useState, useEffect, useRef} from 'react'
 import $ from 'jquery'
 import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
+import {useQuery} from '@tanstack/react-query'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {getUnreadCount} from './queries/unreadCountQuery'
 
 declare global {
   interface Window {
@@ -31,12 +33,31 @@ declare global {
 
 const I18n = useI18nScope('MobileNavigation')
 
+const mobileHeaderInboxUnreadBadge = document.getElementById('mobileHeaderInboxUnreadBadge')
+
 const MobileContextMenu = React.lazy(() => import('./MobileContextMenu'))
 const MobileGlobalMenu = React.lazy(() => import('./MobileGlobalMenu'))
 
 const MobileNavigation = () => {
   const [globalNavIsOpen, setGlobalNavIsOpen] = useState(false)
   const contextNavIsOpen = useRef(false)
+
+  const countsEnabled = Boolean(
+    window.ENV.current_user_id && !window.ENV.current_user?.fake_student
+  )
+
+  const {data: unreadConversationsCount, isSuccess: hasUnreadConversationsCount} = useQuery({
+    queryKey: ['unread_count', 'conversations'],
+    queryFn: getUnreadCount,
+    staleTime: 2 * 60 * 1000, // two minutes
+    enabled: countsEnabled && !ENV.current_user_disabled_inbox,
+  })
+
+  useEffect(() => {
+    if (hasUnreadConversationsCount && mobileHeaderInboxUnreadBadge) {
+      mobileHeaderInboxUnreadBadge.style.display = unreadConversationsCount > 0 ? '' : 'none'
+    }
+  }, [hasUnreadConversationsCount, unreadConversationsCount])
 
   useEffect(() => {
     $('.mobile-header-hamburger').on('touchstart click', event => {

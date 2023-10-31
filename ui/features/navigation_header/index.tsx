@@ -57,17 +57,9 @@ $('body').on('click', '#primaryNavToggle', function () {
 ready(() => {
   const globalNavTrayContainer = document.getElementById('global_nav_tray_container')
   if (globalNavTrayContainer) {
-    const DesktopNavComponent = React.createRef()
-    const mobileNavComponent = React.createRef()
-
     ReactDOM.render(
       <QueryProvider>
-        <Navigation
-          // @ts-expect-error
-          ref={DesktopNavComponent}
-          // @ts-expect-error
-          onDataReceived={() => mobileNavComponent.current?.forceUpdate()}
-        />
+        <Navigation />
       </QueryProvider>,
       globalNavTrayContainer,
       () => {

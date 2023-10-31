@@ -819,7 +819,7 @@ function renderCommentTextArea() {
     <CommentArea
       getTextAreaRef={getTextAreaRef}
       courseId={ENV.course_id}
-      userId={ENV.current_user_id}
+      userId={ENV.current_user_id!}
     />,
     document.getElementById(SPEED_GRADER_COMMENT_TEXTAREA_MOUNT_POINT)
   )

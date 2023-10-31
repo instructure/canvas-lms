@@ -53,7 +53,7 @@ const I18n = useI18nScope('sidenav')
 const CoursesTray = React.lazy(() => import('./trays/CoursesTray'))
 const GroupsTray = React.lazy(() => import('./trays/GroupsTray'))
 const AccountsTray = React.lazy(() => import('./trays/AccountsTray'))
-// const ProfileTray = React.lazy(() => import('./trays/ProfileTray'))
+const ProfileTray = React.lazy(() => import('./trays/ProfileTray'))
 const HistoryTray = React.lazy(() => import('./trays/HistoryTray'))
 const HelpTray = React.lazy(() => import('./trays/HelpTray'))
 
@@ -137,20 +137,6 @@ const SideNav = () => {
     logoUrl = variables['ic-brand-header-image']
   }
 
-  const {data: unreadConversationsCount} = useQuery({
-    queryKey: ['unread_count', 'conversations'],
-    queryFn: getUnreadCount,
-    staleTime: 2 * 60 * 1000, // two minutes
-    enabled: countsEnabled && !ENV.current_user_disabled_inbox,
-  })
-
-  const {data: unreadContentSharesCount} = useQuery({
-    queryKey: ['unread_count', 'content_shares'],
-    queryFn: getUnreadCount,
-    staleTime: 5 * 60 * 1000, // two minutes
-    enabled: countsEnabled && ENV.CAN_VIEW_CONTENT_SHARES,
-  })
-
   const {data: releaseNotesBadgeDisabled} = useQuery({
     queryKey: ['settings', 'release_notes_badge_disabled'],
     queryFn: getSetting,
@@ -158,11 +144,28 @@ const SideNav = () => {
     fetchAtLeastOnce: true,
   })
 
+  const {data: unreadConversationsCount} = useQuery({
+    queryKey: ['unread_count', 'conversations'],
+    queryFn: getUnreadCount,
+    staleTime: 2 * 60 * 1000, // two minutes
+    enabled: countsEnabled && !ENV.current_user_disabled_inbox,
+    refetchOnWindowFocus: true,
+  })
+
+  const {data: unreadContentSharesCount} = useQuery({
+    queryKey: ['unread_count', 'content_shares'],
+    queryFn: getUnreadCount,
+    staleTime: 60 * 60 * 1000, // 1 hour
+    enabled: countsEnabled && ENV.CAN_VIEW_CONTENT_SHARES,
+    refetchOnWindowFocus: true,
+  })
+
   const {data: unreadReleaseNotesCount} = useQuery({
     queryKey: ['unread_count', 'release_notes'],
     queryFn: getUnreadCount,
     staleTime: 24 * 60 * 60 * 1000, // one day
     enabled: countsEnabled && ENV.FEATURES.embedded_release_notes && !releaseNotesBadgeDisabled,
+    refetchOnWindowFocus: true,
   })
 
   const {data: collapseGlobalNav} = useQuery({
@@ -419,7 +422,7 @@ const SideNav = () => {
               {activeTray === 'accounts' && <AccountsTray />}
               {activeTray === 'courses' && <CoursesTray />}
               {activeTray === 'groups' && <GroupsTray />}
-              {/* {activeTray === 'profile' && <ProfileTray />} */}
+              {activeTray === 'profile' && <ProfileTray />}
               {activeTray === 'history' && <HistoryTray />}
               {activeTray === 'help' && <HelpTray closeTray={() => setIsTrayOpen(false)} />}
             </React.Suspense>

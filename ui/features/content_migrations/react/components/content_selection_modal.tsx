@@ -179,7 +179,7 @@ export const ContentSelectionModal = ({
     doFetchApi({
       path: `/api/v1/courses/${courseId}/content_migrations/${migrationId}`,
       method: 'PUT',
-      body: generateSelectiveDataResponse(migrationId, ENV.current_user_id, selectedProperties),
+      body: generateSelectiveDataResponse(migrationId, ENV.current_user_id!, selectedProperties),
     })
       .then(() => {
         onSubmit?.()
