@@ -605,7 +605,7 @@ export type Course = Readonly<{
 
 // '/api/v1/users/self/tabs',
 type TabCountsObj = Readonly<{
-  [key: string]: number
+  [key: string]: number | undefined
 }>
 
 export type ProfileTab = Readonly<{

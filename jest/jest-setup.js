@@ -51,9 +51,7 @@ const ignoredErrors = [
   /You seem to have overlapping act\(\) calls/,
 ]
 const globalWarn = global.console.warn
-const ignoredWarnings = [
-  /value provided is not in a recognized RFC2822 or ISO format/,
-]
+const ignoredWarnings = [/value provided is not in a recognized RFC2822 or ISO format/]
 global.console = {
   log: console.log,
   error: error => {

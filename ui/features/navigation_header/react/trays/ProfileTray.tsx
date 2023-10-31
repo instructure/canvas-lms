@@ -31,6 +31,7 @@ import HighContrastModeToggle from './HighContrastModeToggle'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {useQuery} from '@canvas/query'
 import profileQuery from '../queries/profileQuery'
+import {getUnreadCount} from '../queries/unreadCountQuery'
 import type {ProfileTab, TabCountsObj} from '../../../../api.d'
 
 const I18n = useI18nScope('ProfileTray')
@@ -39,17 +40,22 @@ const I18n = useI18nScope('ProfileTray')
 // gross matching on the id of the tray tabs given to us by Rails
 const idsToCounts = [{id: 'content_shares', countName: 'unreadShares'}]
 
-const a11yCount = (count: string) => (
-  <AccessibleContent alt={I18n.t('%{count} unread.', {count})}>{count}</AccessibleContent>
-)
-
 function CountBadge({counts, id}: {counts: TabCountsObj; id: string}) {
   const found = idsToCounts.filter(x => x.id === id)
   if (found.length === 0) return null // no count defined for this label
   const count = counts[found[0].countName]
   if (count === 0) return null // zero count is not displayed
   return (
-    <Badge count={count} standalone={true} margin="0 0 xxx-small small" formatOutput={a11yCount} />
+    <Badge
+      count={count}
+      standalone={true}
+      margin="0 0 xxx-small small"
+      formatOutput={(count_: string) => (
+        <AccessibleContent alt={I18n.t('%{count} unread.', {count: count_})}>
+          {count_}
+        </AccessibleContent>
+      )}
+    />
   )
 }
 
@@ -64,12 +70,32 @@ function ProfileTabLink({id, html_url, label, counts}: ProfileTab) {
   )
 }
 
-export default function ProfileTray({counts}: {counts: TabCountsObj}) {
-  const {data, isLoading, isSuccess} = useQuery<ProfileTab[], Error>({
+export default function ProfileTray() {
+  const {
+    data: profileTabs,
+    isLoading,
+    isSuccess,
+  } = useQuery<ProfileTab[], Error>({
     queryKey: ['profile'],
     queryFn: profileQuery,
     fetchAtLeastOnce: true,
   })
+
+  const countsEnabled = Boolean(
+    window.ENV.current_user_id && !window.ENV.current_user?.fake_student
+  )
+
+  const {data: unreadContentSharesCount} = useQuery({
+    queryKey: ['unread_count', 'content_shares'],
+    queryFn: getUnreadCount,
+    staleTime: 60 * 60 * 1000, // 1 hour
+    enabled: countsEnabled && ENV.CAN_VIEW_CONTENT_SHARES,
+    fetchAtLeastOnce: true,
+  })
+
+  const counts: TabCountsObj = {
+    unreadShares: unreadContentSharesCount,
+  }
 
   const userDisplayName = window.ENV.current_user.display_name
   const userPronouns = window.ENV.current_user.pronouns
@@ -111,7 +137,7 @@ export default function ProfileTray({counts}: {counts: TabCountsObj}) {
           </List.Item>
         )}
         {isSuccess &&
-          data.map(tab => (
+          profileTabs.map(tab => (
             <List.Item key={tab.id}>
               <ProfileTabLink {...tab} counts={counts} />
             </List.Item>

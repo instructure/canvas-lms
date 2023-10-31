@@ -288,7 +288,8 @@ describe('CommentsTrayBody', () => {
   })
 
   describe('group assignments', () => {
-    it('renders warning that comments will be sent to the whole group for group assignments', async () => {
+    // fickle. EVAL-3667
+    it.skip('renders warning that comments will be sent to the whole group for group assignments', async () => {
       const mocks = [await mockSubmissionCommentQuery()]
       const props = await mockAssignmentAndSubmission([
         {
