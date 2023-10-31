@@ -73,6 +73,11 @@ module Lti::IMS
     describe "#create" do
       let(:content_type) { "application/vnd.ims.lis.v1.score+json" }
 
+      before do
+        # instantiate this so they get enrolled before anything else
+        user
+      end
+
       it_behaves_like "advantage services"
       it_behaves_like "lti services"
 
