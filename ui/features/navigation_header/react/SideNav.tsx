@@ -213,6 +213,10 @@ const SideNav = () => {
         .sidenav-container a > div:nth-child(2) {
           margin: 3px 0 0;
         }
+        .canvas-logo {
+          width: 43px ${!collapseGlobalNav ? '!important' : ''};
+          height: 43px ${!collapseGlobalNav ? '!important' : ''};
+        }
       `}</style>
       <SideNavBar
         label="Main navigation"
@@ -230,10 +234,7 @@ const SideNav = () => {
           icon={
             !logoUrl ? (
               <div style={{margin: '1rem 0 1rem 0'}}>
-                <IconCanvasLogoSolid
-                  size={!collapseGlobalNav ? 'medium' : 'small'}
-                  data-testid="sidenav-canvas-logo"
-                />
+                <IconCanvasLogoSolid className="canvas-logo" data-testid="sidenav-canvas-logo" />
               </div>
             ) : (
               <Img
