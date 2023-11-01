@@ -199,9 +199,11 @@ const SideNav = () => {
       <style>{`
         .sidenav-container a {
           font-weight: 400;
+          transition: background-color 0.3s, padding 0.3s;
         }
         .sidenav-container a:hover {
           text-decoration: inherit;
+          background-color: rgba(0, 0, 0, 0.2);
         }
       `}</style>
       <SideNavBar
