@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import {Navigation as SideNavBar} from '@instructure/ui-navigation'
 import {Badge} from '@instructure/ui-badge'
 import {CloseButton} from '@instructure/ui-buttons'
@@ -70,6 +70,14 @@ const SideNav = () => {
   const [isTrayOpen, setIsTrayOpen] = useState(false)
   const [activeTray, setActiveTray] = useState<ActiveTray | null>(null)
   const [selectedNavItem, setSelectedNavItem] = useState<ActiveTray | ''>(defaultActiveItem)
+  const sideNavRef = useRef<HTMLDivElement | null>(null)
+  const accountRef = useRef<Element | null>(null)
+  const dashboardRef = useRef<Element | null>(null)
+  const coursesRef = useRef<Element | null>(null)
+  const adminRef = useRef<Element | null>(null)
+  const calendarRef = useRef<Element | null>(null)
+  const inboxRef = useRef<Element | null>(null)
+  const helpRef = useRef<Element | null>(null)
 
   // after tray is closed, eventually set activeTray to null
   // we don't do this immediately in order to maintain animation of closing tray
@@ -89,6 +97,50 @@ const SideNav = () => {
     // determined by page location
     setSelectedNavItem(activeTray ?? defaultActiveItem)
   }, [activeTray])
+
+  useEffect(() => {
+    if (sideNavRef.current instanceof HTMLElement) {
+      const active = sideNavRef.current.querySelector('[data-selected="true"]')
+      if (active instanceof HTMLAnchorElement) {
+        active.dataset.selected = ''
+      }
+    }
+
+    switch (selectedNavItem) {
+      case 'profile':
+        if (accountRef.current instanceof HTMLElement) {
+          accountRef.current.dataset.selected = 'true'
+        }
+        break
+
+      case 'accounts':
+        if (adminRef.current instanceof HTMLElement) {
+          adminRef.current.dataset.selected = 'true'
+        }
+        break
+
+      case 'dashboard':
+        if (dashboardRef.current instanceof HTMLElement) {
+          dashboardRef.current.dataset.selected = 'true'
+        }
+        break
+      case 'conversations':
+        if (adminRef.current instanceof HTMLElement) {
+          adminRef.current.dataset.selected = 'true'
+        }
+        break
+      case 'courses':
+        if (coursesRef.current instanceof HTMLElement) {
+          coursesRef.current.dataset.selected = 'true'
+        }
+        break
+      case 'help':
+        if (helpRef.current instanceof HTMLElement) {
+          helpRef.current.dataset.selected = 'true'
+        }
+        break
+    }
+  }, [selectedNavItem])
 
   const [trayShouldContainFocus, setTrayShouldContainFocus] = useState(false)
   const [overrideDismiss] = useState(false)
@@ -192,6 +244,7 @@ const SideNav = () => {
 
   return (
     <div
+      ref={sideNavRef}
       style={{width: '100%', height: '100vh'}}
       className="sidenav-container"
       data-testid="sidenav-container"
@@ -216,6 +269,10 @@ const SideNav = () => {
         .canvas-logo {
           width: 43px ${!collapseGlobalNav ? '!important' : ''};
           height: 43px ${!collapseGlobalNav ? '!important' : ''};
+        }
+        .sidenav-container a[data-selected="true"]:hover {
+          color: var(--ic-brand-primary);
+          background-color: var(--ic-brand-global-nav-menu-item__text-color);
         }
       `}</style>
       <SideNavBar
@@ -287,6 +344,7 @@ const SideNav = () => {
               />
             </Badge>
           }
+          elementRef={el => (accountRef.current = el)}
           label={I18n.t('Account')}
           href="/profile/settings"
           onClick={event => {
@@ -297,6 +355,7 @@ const SideNav = () => {
           themeOverride={navItemThemeOverride}
         />
         <SideNavBar.Item
+          elementRef={el => (adminRef.current = el)}
           icon={<IconAdminLine />}
           label={I18n.t('Admin')}
           href="/accounts"
@@ -308,6 +367,7 @@ const SideNav = () => {
           themeOverride={navItemThemeOverride}
         />
         <SideNavBar.Item
+          elementRef={el => (dashboardRef.current = el)}
           icon={isK5User ? <IconHomeLine data-testid="K5HomeIcon" /> : <IconDashboardLine />}
           label={isK5User ? I18n.t('Home') : I18n.t('Dashboard')}
           href="/"
@@ -315,6 +375,8 @@ const SideNav = () => {
           selected={selectedNavItem === 'dashboard'}
         />
         <SideNavBar.Item
+          elementRef={el => (coursesRef.current = el)}
+          id={selectedNavItem === 'courses' ? 'active-courses' : ''}
           icon={<IconCoursesLine />}
           label={isK5User ? I18n.t('Subjects') : I18n.t('Courses')}
           href="/courses"
@@ -326,6 +388,7 @@ const SideNav = () => {
           themeOverride={navItemThemeOverride}
         />
         <SideNavBar.Item
+          elementRef={el => (calendarRef.current = el)}
           icon={<IconCalendarMonthLine />}
           label={I18n.t('Calendar')}
           href="/calendar"
@@ -357,6 +420,7 @@ const SideNav = () => {
               <IconInboxLine />
             </Badge>
           }
+          elementRef={el => (inboxRef.current = el)}
           label={I18n.t('Inbox')}
           href="/conversations"
           selected={selectedNavItem === 'conversations'}
@@ -387,6 +451,7 @@ const SideNav = () => {
               {getHelpIcon()}
             </Badge>
           }
+          elementRef={el => (helpRef.current = el)}
           label={I18n.t('Help')}
           href="https://help.instructure.com/"
           onClick={event => {
