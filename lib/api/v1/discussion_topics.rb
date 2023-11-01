@@ -84,7 +84,18 @@ module Api::V1::DiscussionTopics
       opts[:context_user_count] = GuardRail.activate(:secondary) { context.enrollments.not_fake.active_or_pending_by_date_ignoring_access.distinct.count(:user_id) }
     end
 
-    ActiveRecord::Associations.preload(topics, %i[assignment user attachment root_topic context discussion_topic_participants])
+    ActiveRecord::Associations.preload(
+      topics,
+      [
+        { assignment: %i[external_tool_tag post_policy rubric_association] },
+        :attachment,
+        :discussion_topic_participants,
+        :context,
+        :root_topic,
+        :user
+      ]
+    )
+
     DiscussionTopic.preload_subentry_counts(topics)
     opts[:use_preload] = true
     topics.each_with_object([]) do |topic, result|
