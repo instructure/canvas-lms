@@ -19,6 +19,7 @@ import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
+import {BlockEditor} from '@canvas/block-editor'
 import template from '../../jst/WikiPageEdit.handlebars'
 import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView'
 import WikiPageDeleteDialog from './WikiPageDeleteDialog'
@@ -185,7 +186,11 @@ export default class WikiPageEditView extends ValidatedFormView {
       })
     }
 
-    RichContentEditor.loadNewEditor(this.$wikiPageBody, {focus: true, manageParent: true})
+    if (window.ENV.BLOCK_EDITOR) {
+      ReactDOM.render(<BlockEditor />, document.getElementById('block_editor'))
+    } else {
+      RichContentEditor.loadNewEditor(this.$wikiPageBody, {focus: true, manageParent: true})
+    }
 
     this.checkUnsavedOnLeave = true
     $(window).on('beforeunload', this.onUnload.bind(this))
@@ -291,7 +296,7 @@ export default class WikiPageEditView extends ValidatedFormView {
     )
   }
 
-  submit(event) {
+  async submit(event) {
     this.checkUnsavedOnLeave = false
     if (this.reloadPending) {
       if (
@@ -308,6 +313,13 @@ export default class WikiPageEditView extends ValidatedFormView {
         }
         return
       }
+    }
+    if (window.block_editor) {
+      let blockEditorData
+      await window.block_editor.save().then((outputData) => {
+        blockEditorData = outputData
+      })
+      this.blockEditorData = blockEditorData
     }
 
     if (this.reloadView != null) {
@@ -349,7 +361,9 @@ export default class WikiPageEditView extends ValidatedFormView {
     if (page_data.publish_at) {
       page_data.publish_at = $.unfudgeDateForProfileTimezone(page_data.publish_at)
     }
-
+    if (this.blockEditorData) {
+      page_data.block_editor_attributes = this.blockEditorData
+    }
     if (this.shouldPublish) page_data.published = true
     return page_data
   }
