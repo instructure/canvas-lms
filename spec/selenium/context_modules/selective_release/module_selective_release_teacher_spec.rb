@@ -208,7 +208,6 @@ describe "selective_release module set up" do
     end
 
     it "updates requirement type and shows on modules page" do
-      skip("LF-965 needs to clear dialog before making second update")
       go_to_modules
 
       scroll_to_the_top_of_modules_page
@@ -218,6 +217,8 @@ describe "selective_release module set up" do
       select_requirement_item_option(0, @assignment2.title)
       select_requirement_type_option(0, "Mark as done")
       click_settings_tray_update_module_button
+      ignore_relock
+
       assignment_tag = retrieve_assignment_content_tag(@module, @assignment2)
       expect(f("#{module_item_selector(assignment_tag.ids[0])} .requirement_type")).to have_class "must_mark_done_requirement"
 
@@ -225,6 +226,7 @@ describe "selective_release module set up" do
       module_index_menu_tool_link("Edit").click
       select_requirement_type_option(0, "Submit the assignment")
       click_settings_tray_update_module_button
+      ignore_relock
       expect(f("#{module_item_selector(assignment_tag.ids[0])} .requirement_type")).to have_class "must_submit_requirement"
     end
 
