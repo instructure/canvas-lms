@@ -198,12 +198,20 @@ const SideNav = () => {
     >
       <style>{`
         .sidenav-container a {
+          padding: 0.4375rem 0;
           font-weight: 400;
           transition: background-color 0.3s, padding 0.3s;
         }
         .sidenav-container a:hover {
           text-decoration: inherit;
           background-color: rgba(0, 0, 0, 0.2);
+        }
+        .sidenav-container a > div:first-child {
+          display: flex;
+          justify-content: center;
+        }
+        .sidenav-container a > div:nth-child(2) {
+          margin: 3px 0 0;
         }
       `}</style>
       <SideNavBar
