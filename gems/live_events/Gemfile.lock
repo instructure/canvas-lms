@@ -66,7 +66,7 @@ GEM
       racc (~> 1.4)
     psych (5.1.1.1)
       stringio
-    racc (1.7.1)
+    racc (1.7.2)
     rake (13.0.6)
     rdoc (6.5.0)
       psych (>= 4.0.0)
