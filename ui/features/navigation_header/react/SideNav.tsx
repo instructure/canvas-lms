@@ -272,6 +272,9 @@ const SideNav = () => {
                 size="x-small"
                 src={window.ENV.current_user.avatar_image_url}
                 data-testid="sidenav-user-avatar"
+                themeOverride={{
+                  background: 'transparent',
+                }}
               />
             </Badge>
           }
