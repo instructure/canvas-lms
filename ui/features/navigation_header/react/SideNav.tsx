@@ -78,6 +78,7 @@ const SideNav = () => {
   const calendarRef = useRef<Element | null>(null)
   const inboxRef = useRef<Element | null>(null)
   const helpRef = useRef<Element | null>(null)
+  const avatarRef = useRef<Element | null>(null)
 
   // after tray is closed, eventually set activeTray to null
   // we don't do this immediately in order to maintain animation of closing tray
@@ -240,6 +241,9 @@ const SideNav = () => {
   useEffect(() => {
     if (collapseGlobalNav) document.body.classList.remove('primary-nav-expanded')
     else document.body.classList.add('primary-nav-expanded')
+
+    if (avatarRef.current instanceof HTMLElement)
+      avatarRef.current.setAttribute('user-avatar', 'true')
   }, [collapseGlobalNav])
 
   return (
@@ -267,8 +271,13 @@ const SideNav = () => {
           margin: 3px 0 0;
         }
         .canvas-logo {
-          width: 43px ${!collapseGlobalNav ? '!important' : ''};
-          height: 43px ${!collapseGlobalNav ? '!important' : ''};
+          width: ${!collapseGlobalNav ? '2.63rem' : '1.695rem'} !important;
+          height: ${!collapseGlobalNav ? '2.63rem' : '1.695rem'} !important;
+        }
+        .sidenav-container span[user-avatar="true"] {
+          width: ${!collapseGlobalNav ? '36px' : '30px'};
+          height: ${!collapseGlobalNav ? '36px' : '30px'};
+          border: 2px solid var(--ic-brand-global-nav-avatar-border) !important;
         }
         .sidenav-container a[data-selected="true"]:hover {
           color: var(--ic-brand-primary);
@@ -290,17 +299,30 @@ const SideNav = () => {
         <SideNavBar.Item
           icon={
             !logoUrl ? (
-              <div style={{margin: '1rem 0 1rem 0'}}>
+              <div
+                style={{
+                  margin: `${!collapseGlobalNav ? '0.825rem' : '0.5395rem'} 0 ${
+                    !collapseGlobalNav ? '0.435rem' : '0.4rem'
+                  } 0`,
+                }}
+              >
                 <IconCanvasLogoSolid className="canvas-logo" data-testid="sidenav-canvas-logo" />
               </div>
             ) : (
-              <Img
-                display="inline-block"
-                alt="sidenav-brand-logomark"
-                margin={`${!collapseGlobalNav ? 'xxx-small' : 'x-small'} 0`}
-                src={logoUrl}
-                data-testid="sidenav-brand-logomark"
-              />
+              <div
+                style={{
+                  margin: `${!collapseGlobalNav ? '-0.4rem' : '0.275rem'} 0 ${
+                    !collapseGlobalNav ? '-0.905rem' : '-0.275rem'
+                  } 0`,
+                }}
+              >
+                <Img
+                  display="inline-block"
+                  alt="sidenav-brand-logomark"
+                  src={logoUrl}
+                  data-testid="sidenav-brand-logomark"
+                />
+              </div>
             )
           }
           label={<ScreenReaderContent>{I18n.t('Home')}</ScreenReaderContent>}
@@ -334,6 +356,7 @@ const SideNav = () => {
               }
             >
               <Avatar
+                elementRef={el => (avatarRef.current = el)}
                 name={window.ENV.current_user.display_name}
                 size="x-small"
                 src={window.ENV.current_user.avatar_image_url}
