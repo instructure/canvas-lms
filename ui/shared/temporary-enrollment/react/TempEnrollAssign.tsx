@@ -50,6 +50,10 @@ import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 import {createAnalyticPropsGenerator, setAnalyticPropsOnRef} from './util/analytics'
 import {EnrollmentType, MODULE_NAME, RECIPIENT, User} from './types'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import {EnvCommon} from '@canvas/global/env/EnvCommon'
+
+declare const ENV: GlobalEnv & EnvCommon
 
 const I18n = useI18nScope('temporary_enrollment')
 
@@ -64,6 +68,10 @@ interface EnrollmentRole {
 interface SelectedEnrollment {
   readonly course: string
   readonly section: string
+}
+
+interface TemporaryEnrollmentPairing {
+  readonly id: string
 }
 
 interface Permissions {
@@ -318,7 +326,13 @@ export function TempEnrollAssign(props: Props) {
 
     try {
       setErrorMsg('')
-      const fetchPromises = submitEnrolls.map(enroll => createEnrollmentForSection(enroll))
+      const {json} = await doFetchApi({
+        path: `/api/v1/accounts/${ENV.ROOT_ACCOUNT_ID}/temporary_enrollment_pairings`,
+        method: 'POST',
+      })
+      const fetchPromises = submitEnrolls.map(enroll =>
+        createEnrollment(enroll, json.temporary_enrollment_pairing)
+      )
       await Promise.all(fetchPromises)
     } catch (error) {
       setErrorMsg(I18n.t('Failed to create temporary enrollment, please try again'))
@@ -333,13 +347,14 @@ export function TempEnrollAssign(props: Props) {
     }
   }
 
-  async function createEnrollmentForSection(enroll: SelectedEnrollment) {
+  async function createEnrollment(enroll: SelectedEnrollment, pairing: TemporaryEnrollmentPairing) {
     return doFetchApi({
       path: `/api/v1/sections/${enroll.section}/enrollments`,
       params: {
         enrollment: {
           user_id: enrollmentProps.id,
           temporary_enrollment_source_user_id: userProps.id,
+          temporary_enrollment_pairing_id: pairing.id,
           start_at: startDate.toISOString(),
           end_at: endDate.toISOString(),
           role_id: roleChoice.id,
