@@ -196,7 +196,19 @@ const SideNav = () => {
   }, [collapseGlobalNav])
 
   return (
-    <div style={{width: '100%', height: '100vh'}} data-testid="sidenav-container">
+    <div
+      style={{width: '100%', height: '100vh'}}
+      className="sidenav-container"
+      data-testid="sidenav-container"
+    >
+      <style>{`
+        .sidenav-container a {
+          font-weight: 400;
+        }
+        .sidenav-container a:hover {
+          text-decoration: inherit;
+        }
+      `}</style>
       <SideNavBar
         label="Main navigation"
         toggleLabel={{
