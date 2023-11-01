@@ -20,7 +20,7 @@
 
 # @API Learning Object Dates
 #
-# API for accessing date-related attributes on assignments and quizzes.
+# API for accessing date-related attributes on assignments, quizzes, and modules.
 #
 # @model LearningObjectDates
 #     {
@@ -100,6 +100,8 @@ class LearningObjectDatesController < ApplicationController
                  @context.active_assignments.find(params[:assignment_id])
                elsif params[:quiz_id]
                  @context.active_quizzes.find(params[:quiz_id])
+               elsif params[:context_module_id]
+                 @context.context_modules.not_deleted.find(params[:context_module_id])
                end
   end
 end

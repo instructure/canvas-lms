@@ -86,6 +86,29 @@ describe LearningObjectDatesController do
                                })
     end
 
+    it "returns date details for a module" do
+      context_module = @course.context_modules.create!(name: "module")
+      @override.assignment_id = nil
+      @override.context_module_id = context_module.id
+      @override.save!
+
+      get :show, params: { course_id: @course.id, context_module_id: context_module.id }
+      expect(response).to be_successful
+      expect(json_parse).to eq({
+                                 "id" => context_module.id,
+                                 "unlock_at" => nil,
+                                 "overrides" => [{
+                                   "id" => @override.id,
+                                   "assignment_id" => nil,
+                                   "title" => "Unnamed Course",
+                                   "course_section_id" => @course.default_section.id,
+                                   "due_at" => "2022-02-01T01:00:00Z",
+                                   "all_day" => false,
+                                   "all_day_date" => "2022-02-01"
+                                 }]
+                               })
+    end
+
     it "paginates overrides" do
       override2 = @assignment.assignment_overrides.create!
       get :show, params: { course_id: @course.id, assignment_id: @assignment.id, per_page: 1 }
