@@ -605,25 +605,40 @@ describe Quizzes::QuizSubmission do
         expect(@essay_quiz_submission2.submission.grade_matches_current_submission).to be_falsey
       end
 
-      def grade_question(score)
-        @quiz_submission.update_scores({
-                                         "context_id" => @course.id,
-                                         "override_scores" => true,
-                                         "context_type" => "Course",
-                                         "submission_version_number" => "1",
-                                         "question_score_#{@questions[0].id}" => score.to_s
-                                       })
+      def grade_question(score, quiz_submission)
+        quiz_submission.update_scores({
+                                        "context_id" => @course.id,
+                                        "override_scores" => true,
+                                        "context_type" => "Course",
+                                        "submission_version_number" => "1",
+                                        "question_score_#{@questions[0].id}" => score.to_s
+                                      })
+      end
+
+      it "applies the late policy when there is a multiple attempt quiz with essay questions that have not been graded" do
+        @essay_quiz = assignment_quiz([{ question_data: { :name => "question 1", :points_possible => 1, "question_type" => "essay_question" } },
+                                       { question_data: { :name => "question 2", :points_possible => 1, "question_type" => "essay_question" } },],
+                                      late: true)
+        @essay_quiz.update!(
+          due_at: 2.days.ago
+        )
+        @essay_quiz_submission1 = graded_submission(@essay_quiz, @user)
+        grade_question(1, @essay_quiz_submission1)
+        @essay_quiz_submission2 = graded_submission(@essay_quiz, @user)
+        grade_question(1, @essay_quiz_submission2)
+        expect(@essay_quiz_submission1.submission.score).to eq(0.6)
+        expect(@essay_quiz_submission2.submission.score).to eq(0.6)
       end
 
       it "marks a submission as complete once an essay question has been graded" do
-        grade_question(1)
+        grade_question(1, @quiz_submission)
         expect(@quiz_submission.submission.workflow_state).to eql "graded"
       end
 
       it "recomputes grades when a quiz submission is graded (even if the score doesn't change)" do
         enrollment = @quiz_submission.user.enrollments.first
         expect(enrollment.computed_current_score).to be_nil
-        grade_question(0)
+        grade_question(0, @quiz_submission)
         enrollment.reload
         expect(enrollment.computed_current_score).to eq 0
       end
