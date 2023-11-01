@@ -212,7 +212,7 @@ const SideNav = () => {
         <SideNavBar.Item
           icon={
             !logoUrl ? (
-              <div style={{margin: '0.5rem 0 0.5rem 0'}}>
+              <div style={{margin: '1rem 0 1rem 0'}}>
                 <IconCanvasLogoSolid
                   size={!collapseGlobalNav ? 'medium' : 'small'}
                   data-testid="sidenav-canvas-logo"
@@ -222,7 +222,7 @@ const SideNav = () => {
               <Img
                 display="inline-block"
                 alt="sidenav-brand-logomark"
-                margin={`${!collapseGlobalNav ? 'xxx-small' : 'x-small'} 0 small 0`}
+                margin={`${!collapseGlobalNav ? 'xxx-small' : 'x-small'} 0`}
                 src={logoUrl}
                 data-testid="sidenav-brand-logomark"
               />
