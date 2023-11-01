@@ -51,7 +51,7 @@ class Mutations::CreateDiscussionEntry < Mutations::BaseMutation
       raise ActiveRecord::RecordNotFound unless attachment.user == current_user
 
       topic_context = topic.context
-      unless topic.grants_right?(@current_user, session, :attach) ||
+      unless topic.grants_right?(current_user, session, :attach) ||
              (topic_context.respond_to?(:allow_student_forum_attachments) &&
                topic_context.allow_student_forum_attachments &&
                topic_context.grants_right?(current_user, session, :post_to_forum) &&
