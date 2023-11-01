@@ -32,7 +32,10 @@ class Mutations::UpdateDiscussionEntry < Mutations::BaseMutation
     entry = DiscussionEntry.find(input[:discussion_entry_id])
     raise ActiveRecord::RecordNotFound unless entry.grants_right?(current_user, session, :read)
     return validation_error(I18n.t("Insufficient Permissions")) unless entry.grants_right?(current_user, session, :update)
-    return validation_error(I18n.t("Insufficient attach permissions")) unless entry.grants_right?(current_user, session, :attach)
+
+    if input[:file_id].present? && !entry.grants_right?(current_user, session, :attach)
+      return validation_error(I18n.t("Insufficient attach permissions"))
+    end
 
     unless input[:message].nil?
       entry.message = Api::Html::Content.process_incoming(input[:message], host: context[:request].host, port: context[:request].port)
