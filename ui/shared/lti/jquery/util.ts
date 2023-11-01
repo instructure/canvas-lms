@@ -22,7 +22,7 @@ export function setUnloadMessage(msg: string) {
   removeUnloadMessage()
 
   beforeUnloadHandler = function (e: BeforeUnloadEvent) {
-    return (e.returnValue = msg || '')
+    return (e.returnValue = msg || true)
   }
   window.addEventListener('beforeunload', beforeUnloadHandler)
 }
