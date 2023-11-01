@@ -45,7 +45,7 @@ import {useQuery} from '@canvas/query'
 import {useMutation, useQueryClient} from '@tanstack/react-query'
 import {getUnreadCount} from './queries/unreadCountQuery'
 import {getSetting, setSetting} from './queries/settingsQuery'
-import {getActiveItem, getTrayLabel} from './utils'
+import {getActiveItem, getTrayLabel, getTrayPortal} from './utils'
 import type {ActiveTray} from './utils'
 
 const I18n = useI18nScope('sidenav')
@@ -56,11 +56,6 @@ const AccountsTray = React.lazy(() => import('./trays/AccountsTray'))
 const ProfileTray = React.lazy(() => import('./trays/ProfileTray'))
 const HistoryTray = React.lazy(() => import('./trays/HistoryTray'))
 const HelpTray = React.lazy(() => import('./trays/HelpTray'))
-
-const portal = document.createElement('div')
-portal.id = 'nav-tray-portal'
-portal.setAttribute('style', 'position: relative; z-index: 99;')
-document.body.appendChild(portal)
 
 export const InformationIconEnum = {
   INFORMATION: 'information',
@@ -406,7 +401,7 @@ const SideNav = () => {
         }
         shouldCloseOnDocumentClick={true}
         shouldContainFocus={trayShouldContainFocus}
-        mountNode={portal}
+        mountNode={getTrayPortal()}
         themeOverride={{smallWidth: '28em'}}
       >
         <div className={`navigation-tray-container ${activeTray}-tray`}>

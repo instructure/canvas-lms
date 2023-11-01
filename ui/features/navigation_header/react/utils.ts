@@ -82,7 +82,7 @@ export function getActiveItem(): ActiveTray | '' {
   return (matchData && (matchData[1] as ActiveTray)) || ''
 }
 
-export function getTrayLabel(type: ActiveTray | null) {
+export function getTrayLabel(type: string | null) {
   switch (type) {
     case 'courses':
       return I18n.t('Courses tray')
@@ -99,4 +99,19 @@ export function getTrayLabel(type: ActiveTray | null) {
     default:
       return I18n.t('Global navigation tray')
   }
+}
+
+// give the trays that slide out from the the nav bar
+// a place to mount. It has to be outside the <div id=application>
+// to aria-hide everything but the tray when open.
+let portal: HTMLDivElement | undefined
+export function getTrayPortal() {
+  if (!portal) {
+    portal = document.createElement('div')
+    portal.id = 'nav-tray-portal'
+    // the <header> has z-index: 100. This has to be behind it,
+    portal.setAttribute('style', 'position: relative; z-index: 99;')
+    document.body.appendChild(portal)
+  }
+  return portal
 }
