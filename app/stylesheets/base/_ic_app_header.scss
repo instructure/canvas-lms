@@ -66,6 +66,10 @@ $ic-tooltip-arrow-size: 0.375rem;
   flex: 1 0 auto;
 }
 
+.ic-app-header__main-navigation a {
+  text-decoration: inherit;
+}
+
 .ic-app-header__secondary-navigation {
   box-sizing: border-box;
   position: absolute;
