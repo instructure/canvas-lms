@@ -20,10 +20,12 @@
 
 require "lti_1_3_spec_helper"
 require_relative "lti/concerns/parent_frame_shared_examples"
+require_relative "../support/request_helper"
 
 describe ExternalToolsController do
   include ExternalToolsSpecHelper
   include Lti::RedisMessageClient
+  include RequestHelper
 
   before :once do
     course_with_teacher(active_all: true)
@@ -1344,6 +1346,13 @@ describe ExternalToolsController do
       it "includes post_message_forwarding JS for main frame" do
         subject
         expect(response.body).to include(".push('post_message_forwarding')")
+      end
+
+      it "includes IN_RCE and IGNORE_LTI_POST_MESSAGES in the JS ENV" do
+        subject
+        env = js_env_from_response(response)
+        expect(env["IN_RCE"]).to be(true)
+        expect(env["IGNORE_LTI_POST_MESSAGES"]).to be(true)
       end
     end
 

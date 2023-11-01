@@ -17,11 +17,11 @@
 %>
 
 <% provide :head, include_common_stylesheets %>
+<% js_env({ IN_RCE: true, IGNORE_LTI_POST_MESSAGES: true }) %>
 <%= render :partial => "layouts/head" %>
 
 <% css_bundle :external_tool_full_width %>
 
-<% js_env({ IN_RCE: true, IGNORE_LTI_POST_MESSAGES: true }) %>
 <% js_bundle :post_message_forwarding %>
 <% js_bundle :external_tools_show %>
 
