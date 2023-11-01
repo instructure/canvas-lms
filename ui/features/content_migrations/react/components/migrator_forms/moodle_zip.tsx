@@ -19,17 +19,19 @@
 import React, {useCallback, useState} from 'react'
 import CommonMigratorControls from './common_migrator_controls'
 import {onSubmitMigrationFormCallback} from '../types'
+import QuestionBankSelector, {QuestionBankSettings} from './question_bank_selector'
 import MigrationFileInput from './file_input'
 
-type CanvasCartridgeImporterProps = {
+type MoodleZipImporterProps = {
   onSubmit: onSubmitMigrationFormCallback
   onCancel: () => void
 }
 
-const CanvasCartridgeImporter = ({onSubmit, onCancel}: CanvasCartridgeImporterProps) => {
+const MoodleZipImporter = ({onSubmit, onCancel}: MoodleZipImporterProps) => {
   const [file, setFile] = useState<File | null>(null)
+  const [questionBankSettings, setQuestionBankSettings] = useState<QuestionBankSettings | null>()
 
-  const handleSubmit: onSubmitMigrationFormCallback = useCallback(
+  const handleSubmit = useCallback(
     formData => {
       if (file) {
         formData.pre_attachment = {
@@ -37,24 +39,22 @@ const CanvasCartridgeImporter = ({onSubmit, onCancel}: CanvasCartridgeImporterPr
           size: file.size,
           no_redirect: true,
         }
+        if (questionBankSettings) {
+          formData.settings = {...formData.settings, ...questionBankSettings}
+        }
         onSubmit(formData, file)
       }
     },
-    [file, onSubmit]
+    [onSubmit, file, questionBankSettings]
   )
 
   return (
     <>
       <MigrationFileInput onChange={setFile} />
-      <CommonMigratorControls
-        canSelectContent={true}
-        canImportAsNewQuizzes={true}
-        canAdjustDates={true}
-        onSubmit={handleSubmit}
-        onCancel={onCancel}
-      />
+      <QuestionBankSelector onChange={setQuestionBankSettings} />
+      <CommonMigratorControls canAdjustDates={true} onSubmit={handleSubmit} onCancel={onCancel} />
     </>
   )
 }
 
-export default CanvasCartridgeImporter
+export default MoodleZipImporter

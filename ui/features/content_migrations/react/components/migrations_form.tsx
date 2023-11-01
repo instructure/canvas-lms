@@ -36,7 +36,10 @@ import {
   Migrator,
   onSubmitMigrationFormCallback,
 } from './types'
-import CommonMigratorControls from './common_migrator_controls'
+import CommonCartridgeImporter from './migrator_forms/common_cartridge'
+import MoodleZipImporter from './migrator_forms/moodle_zip'
+import QTIZipImporter from './migrator_forms/qti_zip'
+import CommonMigratorControls from './migrator_forms/common_migrator_controls'
 
 const I18n = useI18nScope('content_migrations_redesign')
 
@@ -53,21 +56,34 @@ type RequestBody = {
   }
 }
 
-type RenderMigratorArgs = {
-  migrator: string
+type MigratorProps = {
+  value: string
   onSubmit: onSubmitMigrationFormCallback
   onCancel: () => void
 }
 
-const renderMigrator = ({migrator, onSubmit, onCancel}: RenderMigratorArgs) => {
-  if (migrator === 'course_copy_importer') {
-    return <CourseCopyImporter onSubmit={onSubmit} onCancel={onCancel} />
-  } else if (migrator === 'canvas_cartridge_importer') {
-    return <CanvasCartridgeImporter onSubmit={onSubmit} onCancel={onCancel} />
-  } else if (['angel_exporter', 'blackboard_exporter', 'd2l_exporter'].includes(migrator)) {
-    return <LegacyMigratorWrapper value={migrator} onSubmit={onSubmit} onCancel={onCancel} />
+const renderMigrator = (props: MigratorProps) => {
+  switch (props.value) {
+    case 'zip_file_importer':
+      // TODO: Replace this with the zip importer component
+      return <CommonMigratorControls {...props} />
+    case 'course_copy_importer':
+      return <CourseCopyImporter {...props} />
+    case 'moodle_converter':
+      return <MoodleZipImporter {...props} />
+    case 'canvas_cartridge_importer':
+      return <CanvasCartridgeImporter {...props} />
+    case 'common_cartridge_importer':
+      return <CommonCartridgeImporter {...props} />
+    case 'qti_converter':
+      return <QTIZipImporter {...props} />
+    case 'angel_exporter':
+    case 'blackboard_exporter':
+    case 'd2l_exporter':
+      return <LegacyMigratorWrapper {...props} />
+    default:
+      return null
   }
-  return <CommonMigratorControls onSubmit={onSubmit} onCancel={onCancel} />
 }
 
 export const ContentMigrationsForm = ({
@@ -172,7 +188,7 @@ export const ContentMigrationsForm = ({
       {chosenMigrator && (
         <>
           {renderMigrator({
-            migrator: chosenMigrator,
+            value: chosenMigrator,
             onSubmit: onSubmitForm,
             onCancel: onResetForm,
           })}

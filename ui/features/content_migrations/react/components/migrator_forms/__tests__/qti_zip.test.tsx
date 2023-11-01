@@ -19,13 +19,13 @@
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import CanvasCartridgeImporter from '../canvas_cartridge'
+import QTIZipImporter from '../qti_zip'
 
 const onSubmit = jest.fn()
 const onCancel = jest.fn()
 
 const renderComponent = (overrideProps?: any) =>
-  render(<CanvasCartridgeImporter onSubmit={onSubmit} onCancel={onCancel} {...overrideProps} />)
+  render(<QTIZipImporter onSubmit={onSubmit} onCancel={onCancel} {...overrideProps} />)
 
 describe('CanvasCartridgeImporter', () => {
   beforeAll(() => (window.ENV.UPLOAD_LIMIT = 1024))

@@ -25,7 +25,7 @@ import {View} from '@instructure/ui-view'
 import {IconSearchLine} from '@instructure/ui-icons'
 import {Select} from '@instructure/ui-select'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import CommonMigratorControls from '../common_migrator_controls'
+import CommonMigratorControls from './common_migrator_controls'
 import {onSubmitMigrationFormCallback} from '../types'
 
 const I18n = useI18nScope('content_migrations_redesign')
@@ -145,7 +145,13 @@ export const CourseCopyImporter = ({onSubmit, onCancel}: CourseCopyImporterProps
           }}
         />
       </View>
-      <CommonMigratorControls onSubmit={handleSubmit} onCancel={onCancel} />
+      <CommonMigratorControls
+        canSelectContent={true}
+        canImportAsNewQuizzes={true}
+        canAdjustDates={true}
+        onSubmit={handleSubmit}
+        onCancel={onCancel}
+      />
     </>
   )
 }
