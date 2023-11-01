@@ -140,7 +140,7 @@ h3, .h3 {
 /// Links
 ///////==============
 
-a {
+.ic-Layout-wrapper a {
   color: var(--ic-link-color);
   &:focus, &:hover {
     color: var(--ic-link-color-darkened-10);
