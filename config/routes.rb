@@ -1273,8 +1273,6 @@ CanvasRails::Application.routes.draw do
       put "courses/:course_id/assignments/:id", action: :update
       post "courses/:course_id/assignments/:assignment_id/duplicate", action: :duplicate
       delete "courses/:course_id/assignments/:id", action: :destroy, controller: :assignments
-      get "courses/:course_id/assignments/:assignment_id/date_details", action: :date_details, as: "course_assignment_date_details"
-      get "courses/:course_id/quizzes/:quiz_id/date_details", action: :date_details, as: "course_quiz_date_details"
     end
 
     scope(controller: "assignment_extensions") do
@@ -1593,6 +1591,11 @@ CanvasRails::Application.routes.draw do
         get    "users/:user_id/observers/:observer_id", action: :show_observer, as: "user_observer"
         put    "users/:user_id/observees/:observee_id", action: :update
         delete "users/:user_id/observees/:observee_id", action: :destroy
+      end
+
+      scope(controller: :learning_object_dates) do
+        get "courses/:course_id/assignments/:assignment_id/date_details", action: :show, as: "course_assignment_date_details"
+        get "courses/:course_id/quizzes/:quiz_id/date_details", action: :show, as: "course_quizzes_quiz_date_details"
       end
 
       scope(controller: :login) do
