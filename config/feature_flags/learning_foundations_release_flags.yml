@@ -240,3 +240,11 @@ observer_appointment_groups:
       state: allowed_on
     development:
       state: allowed_on
+
+block_editor:
+  applies_to: Account
+  state: hidden
+  display_name: Block Editor
+  description: |-
+    Enable the new block editor for the rich content editor.
+  beta: true

@@ -45,6 +45,7 @@ const featureBundles: {
   available_pronouns_list: () => import('./features/available_pronouns_list/index'),
   blueprint_course_child: () => import('./features/blueprint_course_child/index'),
   blueprint_course_master: () => import('./features/blueprint_course_master/index'),
+  block_editor: () => import('./features/block_editor/index'),
   brand_configs: () => import('./features/brand_configs/index'),
   calendar_appointment_group_edit: () => import('./features/calendar_appointment_group_edit/index'),
   calendar: () => import('./features/calendar/index'),
