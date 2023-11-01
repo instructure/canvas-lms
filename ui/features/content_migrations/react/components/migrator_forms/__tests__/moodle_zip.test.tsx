@@ -19,13 +19,13 @@
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import CanvasCartridgeImporter from '../canvas_cartridge'
+import MoodleZipImporter from '../moodle_zip'
 
 const onSubmit = jest.fn()
 const onCancel = jest.fn()
 
 const renderComponent = (overrideProps?: any) =>
-  render(<CanvasCartridgeImporter onSubmit={onSubmit} onCancel={onCancel} {...overrideProps} />)
+  render(<MoodleZipImporter onSubmit={onSubmit} onCancel={onCancel} {...overrideProps} />)
 
 describe('CanvasCartridgeImporter', () => {
   beforeAll(() => (window.ENV.UPLOAD_LIMIT = 1024))

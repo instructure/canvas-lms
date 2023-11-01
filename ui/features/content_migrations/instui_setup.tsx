@@ -18,11 +18,14 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
+import ready from '@instructure/ready'
 import App from './react/app'
 
-if (document.getElementById('instui_content_migrations')) {
-  ReactDOM.render(<App />, document.getElementById('instui_content_migrations'))
-}
+ready(() => {
+  if (document.getElementById('instui_content_migrations')) {
+    ReactDOM.render(<App />, document.getElementById('instui_content_migrations'))
+  }
+})
 
 // package.json's source-file-extension needs a default export
 export default null

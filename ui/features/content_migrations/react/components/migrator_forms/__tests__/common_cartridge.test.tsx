@@ -19,37 +19,31 @@
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import fetchMock from 'fetch-mock'
-import CommonMigratorControls from '../common_migrator_controls'
+import CommonCartridgeImporter from '../common_cartridge'
 
 const onSubmit = jest.fn()
 const onCancel = jest.fn()
 
-describe('CommonMigratorControls', () => {
-  beforeAll(() => {
-    fetchMock.mock('/api/v1/courses/0/content_migrations/migrators', [
-      {
-        name: 'Mock Migrator',
-        type: 'mock_migrator',
-      },
-    ])
-  })
+const renderComponent = (overrideProps?: any) =>
+  render(<CommonCartridgeImporter onSubmit={onSubmit} onCancel={onCancel} {...overrideProps} />)
 
-  afterEach(() => jest.clearAllMocks())
+describe('CommonCartridgeImporter', () => {
+  it('calls onSubmit', () => {
+    renderComponent()
 
-  it('calls onSubmit', async () => {
-    render(<CommonMigratorControls onSubmit={onSubmit} onCancel={onCancel} />)
+    const file = new File(['blah, blah, blah'], 'my_file.zip', {type: 'application/zip'})
+    const input = screen.getByTestId('migrationFileUpload')
+    userEvent.upload(input, file)
     userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
-    expect(onSubmit).toHaveBeenCalledWith({
-      date_shift_options: false,
-      selective_import: false,
-      settings: {import_quizzes_next: false},
-    })
-  })
-
-  it('calls onCancel', async () => {
-    render(<CommonMigratorControls onSubmit={onSubmit} onCancel={onCancel} />)
-    userEvent.click(screen.getByRole('button', {name: 'Cancel'}))
-    expect(onCancel).toHaveBeenCalled()
+    expect(onSubmit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        pre_attachment: {
+          name: 'my_file.zip',
+          no_redirect: true,
+          size: 16,
+        },
+      }),
+      expect.any(Object)
+    )
   })
 })
