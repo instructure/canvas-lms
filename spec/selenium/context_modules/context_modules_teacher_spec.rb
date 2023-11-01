@@ -19,10 +19,14 @@
 
 require_relative "../helpers/context_modules_common"
 require_relative "../helpers/public_courses_context"
+require_relative "page_objects/modules_index_page"
+require_relative "page_objects/modules_settings_tray"
 
 describe "context modules" do
   include_context "in-process server selenium tests"
   include ContextModulesCommon
+  include ModulesIndexPage
+  include ModulesSettingsTray
 
   context "as a teacher", priority: "1" do
     before(:once) do
@@ -307,7 +311,9 @@ describe "context modules" do
       expect(m2.position).to eq 1
     end
 
-    it "validates locking a module item display functionality" do
+    it "validates locking a module item display functionality without differentiated modules" do
+      Account.site_admin.disable_feature! :differentiated_modules
+
       get "/courses/#{@course.id}/modules"
       add_form = new_module_form
       lock_check_click
@@ -317,6 +323,23 @@ describe "context modules" do
       lock_check_click
       wait_for_ajaximations
       expect(add_form.find_element(:css, ".unlock_module_at_details")).not_to be_displayed
+    end
+
+    it "validates locking a module item display functionality with differentiated modules" do
+      Account.site_admin.enable_feature! :differentiated_modules
+      m1 = @course.context_modules.create!(name: "module 1")
+
+      go_to_modules
+      manage_module_button(m1).click
+      module_index_menu_tool_link("Edit").click
+
+      click_lock_until_checkbox
+      expect(element_exists?(lock_until_input_selector)).to be_truthy
+
+      # verify unlock
+      click_lock_until_checkbox
+      wait_for_ajaximations
+      expect(element_exists?(lock_until_input_selector)).to be_falsey
     end
 
     it "properly changes indent of an item with arrows" do

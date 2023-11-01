@@ -97,6 +97,18 @@ module ModulesSettingsTray
     "//label[../input[@data-testid='lock-until-checkbox']]"
   end
 
+  def lock_until_date_selector
+    "[data-testid='lock-until-input'] #Selectable_0"
+  end
+
+  def lock_until_input_selector
+    "[data-testid='lock-until-input']"
+  end
+
+  def lock_until_time_selector
+    "[data-testid='lock-until-input'] #Select_0"
+  end
+
   def module_name_input_selector
     "[data-testid='module-name-input']"
   end
@@ -109,6 +121,10 @@ module ModulesSettingsTray
     "[aria-label='Edit Module Settings']"
   end
 
+  def number_input_selector(requirement_number)
+    "#NumberInput_#{requirement_number}"
+  end
+
   def prerequisites_dropdown_selector
     "#prerequisite"
   end
@@ -118,7 +134,7 @@ module ModulesSettingsTray
   end
 
   def remove_prerequisite_button_selector
-    "//button[contains(text(), 'Remove Prerequisite')]"
+    "//button[.//*[contains(text(), 'Remove Prerequisite')]]"
   end
 
   def remove_requirement_button_selector
@@ -238,6 +254,18 @@ module ModulesSettingsTray
     fxpath(lock_until_checkbox_selector)
   end
 
+  def lock_until_date
+    f(lock_until_date_selector)
+  end
+
+  def lock_until_input
+    f(lock_until_input_selector)
+  end
+
+  def lock_until_time
+    f(lock_until_time_selector)
+  end
+
   def module_name_input
     f(module_name_input_selector)
   end
@@ -250,6 +278,10 @@ module ModulesSettingsTray
     f(module_settings_tray_selector)
   end
 
+  def number_input(requirement_number)
+    f(number_input_selector(requirement_number))
+  end
+
   def prerequisites_dropdown
     ff(prerequisites_dropdown_selector)
   end
@@ -259,7 +291,7 @@ module ModulesSettingsTray
   end
 
   def remove_prerequisite_button
-    fxpath(remove_prerequisite_button_selector)
+    ffxpath(remove_prerequisite_button_selector)
   end
 
   def remove_requirement_button
@@ -355,8 +387,8 @@ module ModulesSettingsTray
     lock_until_checkbox.click
   end
 
-  def click_remove_prerequisite_button
-    remove_prerequisite_button.click
+  def click_remove_prerequisite_button(item_number)
+    remove_prerequisite_button[item_number].click
   end
 
   def click_remove_requirement_button(item_number)
@@ -401,6 +433,14 @@ module ModulesSettingsTray
 
   def settings_tray_exists?
     element_exists?(module_settings_tray_selector)
+  end
+
+  def update_lock_until_date(date)
+    replace_content(lock_until_date, date, tab_out: true)
+  end
+
+  def update_lock_until_time(time)
+    replace_content(lock_until_time, time, tab_out: true)
   end
 
   def update_module_name(new_name)

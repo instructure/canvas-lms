@@ -19,10 +19,14 @@
 
 require_relative "../helpers/context_modules_common"
 require_relative "../helpers/public_courses_context"
+require_relative "page_objects/modules_index_page"
+require_relative "page_objects/modules_settings_tray"
 
 describe "context modules" do
   include_context "in-process server selenium tests"
   include ContextModulesCommon
+  include ModulesIndexPage
+  include ModulesSettingsTray
 
   context "adds existing items to modules" do
     before(:once) do
@@ -565,7 +569,9 @@ describe "context modules" do
         expect(find_with_jquery('.module_dnd input[type="file"]')).to be_nil
       end
 
-      it "creating a new module should display a drag and drop area" do
+      it "creating a new module should display a drag and drop area without differentiated modules" do
+        Account.site_admin.disable_feature! :differentiated_modules
+
         get "/courses/#{@course.id}/modules"
         wait_for_ajaximations
 
@@ -578,11 +584,32 @@ describe "context modules" do
 
         expect(ff('.module_dnd input[type="file"]')).to have_size(2)
       end
+
+      it "creating a new module should display a drag and drop area with differentiated modules" do
+        Account.site_admin.enable_feature! :differentiated_modules
+        get "/courses/#{@course.id}/modules"
+
+        click_new_module_link
+        update_module_name("New Module")
+        click_add_tray_add_module_button
+
+        expect(ff('.module_dnd input[type="file"]')).to have_size(2)
+      end
     end
 
-    it "adds a file item to a module", priority: "1" do
+    it "adds a file item to a module when differentiated modules is disabled", priority: "1" do
+      Account.site_admin.disable_feature! :differentiated_modules
       get "/courses/#{@course.id}/modules"
       manually_add_module_item("#attachments_select", "File", file_name)
+      expect(f(".context_module_item")).to include_text(file_name)
+    end
+
+    it "adds a file item to a module when differentiated modules is enabled", priority: "1" do
+      Account.site_admin.enable_feature! :differentiated_modules
+
+      get "/courses/#{@course.id}/modules"
+      manually_add_module_item("#attachments_select", "File", file_name)
+      expect(f(".context_module_item")).to include_text(file_name)
     end
 
     it "does not remove the file link in a module when file is overwritten" do
