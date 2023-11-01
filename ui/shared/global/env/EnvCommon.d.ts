@@ -63,6 +63,7 @@ export interface EnvCommon {
     label: string
   }[]
   DOMAIN_ROOT_ACCOUNT_ID: string
+  ROOT_ACCOUNT_ID: string
   k12: false
   help_link_name: string
   help_link_icon: string
