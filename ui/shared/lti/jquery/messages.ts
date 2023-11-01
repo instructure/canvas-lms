@@ -83,9 +83,7 @@ const SUBJECT_IGNORE_LIST = [
 const UNSUPPORTED_IN_RCE = [
   'lti.frameResize',
   'lti.enableScrollEvents',
-  'lti.scrollToTop',
-  'lti.setUnloadMessage',
-  'lti.removeUnloadMessage',
+  'lti.scrollToTop'
 ] as const
 
 const isObject = (u: unknown): u is object => {

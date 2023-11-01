@@ -57,7 +57,7 @@ function alertMessage(message = 'Alert message') {
   }
 }
 
-function unloadMessage(message = 'unload message') {
+function unloadMessage(message = undefined) {
   return {
     subject: 'lti.setUnloadMessage',
     message,
@@ -143,8 +143,20 @@ QUnit.module('Messages', suiteHooks => {
   test('sets the unload message', async () => {
     sinon.spy(window, 'addEventListener')
     notOk(window.addEventListener.calledOnce)
+    await ltiMessageHandler(postMessageEvent(unloadMessage("unload message")))
+    ok(window.addEventListener.calledOnce)
+  })
+
+  test('sets the unload message event if no "message" is given', async () => {
+    sinon.spy(window, 'addEventListener')
+    notOk(window.addEventListener.calledOnce)
     await ltiMessageHandler(postMessageEvent(unloadMessage()))
     ok(window.addEventListener.calledOnce)
+    // handler needs to set the returnValue to a truthy value to work
+    const handler = window.addEventListener.getCall(0).args[1]
+    const event = {}
+    handler(event)
+    ok(event.returnValue);
   })
 
   test('hide the right side wrapper', async () => {
