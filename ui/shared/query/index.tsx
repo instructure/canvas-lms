@@ -60,7 +60,6 @@ const broadcastChannel = new BroadcastChannel(CHANNEL_KEY)
 interface CustomUseQueryOptions<TData, TError> extends UseQueryOptions<TData, TError> {
   fetchAtLeastOnce?: boolean
   broadcast?: boolean
-  queryKey?: QueryKey
 }
 
 export function useQuery<TData = unknown, TError = unknown>(
