@@ -21,12 +21,38 @@ import React from 'react'
 import {AssignmentDueDatesManager} from '../AssignmentDueDatesManager'
 import {GradedDiscussionDueDatesContext} from '../../../util/constants'
 
+const DEFAULT_LIST_OPTIONS = {
+  'Master Paths': [
+    {assetCode: 'mastery_paths', label: 'Mastery Paths'},
+    {assetCode: 'everyone', label: 'Everyone'},
+  ],
+  'Course Sections': [
+    {_id: '1', name: 'Section 1'},
+    {_id: '2', name: 'Section 2'},
+  ],
+  Students: [
+    {user: {_id: 'u_1', name: 'Jason'}},
+    {user: {_id: 'u_2', name: 'Drake'}},
+    {user: {_id: 'u_3', name: 'Caleb'}},
+    {user: {_id: 'u_4', name: 'Aaron'}},
+    {user: {_id: 'u_5', name: 'Chawn'}},
+    {user: {_id: 'u_6', name: 'Omar'}},
+  ],
+}
+
 const setup = ({
   assignedInfoList = [{dueDateId: 'uniqueID'}],
   setAssignedInfoList = () => {},
 } = {}) => {
   return render(
-    <GradedDiscussionDueDatesContext.Provider value={{assignedInfoList, setAssignedInfoList}}>
+    <GradedDiscussionDueDatesContext.Provider
+      value={{
+        assignedInfoList,
+        setAssignedInfoList,
+        studentEnrollments: DEFAULT_LIST_OPTIONS.Students,
+        sections: DEFAULT_LIST_OPTIONS['Course Sections'],
+      }}
+    >
       <AssignmentDueDatesManager />
     </GradedDiscussionDueDatesContext.Provider>
   )
@@ -82,17 +108,18 @@ describe('AssignmentDueDatesManager', () => {
 
   // currently this will use options from the DEFAULT_LIST_OPTIONS, will get replaced in the future.
   it('correctly manages available assignTo options', () => {
+    window.ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
     const testAssignedTo = [
       {
         dueDateId: 'C2mULLRUV9e8p7zVJNPfr',
-        assignedList: ['sec_1', 'sec_2'],
+        assignedList: ['course_section_1', 'course_section_2'],
         dueDate: '',
         availableFrom: '',
         availableUntil: '',
       },
       {
         dueDateId: 'Wd7eOGpYc-KFouW-ePdpm',
-        assignedList: ['mp_option1'],
+        assignedList: ['mastery_paths'],
         dueDate: '',
         availableFrom: '',
         availableUntil: '',
