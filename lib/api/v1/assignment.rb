@@ -632,8 +632,22 @@ module Api::V1::Assignment
       data = JSON.parse(res.body)
 
       unless data.empty?
+        copy_values = {}
+        source_course = nil
+        data.each do |key, _|
+          import_object = Context.find_asset_by_url(key)
+          if import_object.is_a?(WikiPage)
+            copy_values[:wiki_pages] ||= []
+            copy_values[:wiki_pages] << CC::CCHelper.create_key(import_object, global: use_global_identifiers)
+            source_course ||= import_object.context
+          elsif import_object.is_a?(Attachment)
+            copy_values[:attachments] ||= []
+            copy_values[:attachments] << CC::CCHelper.create_key(import_object, global: use_global_identifiers)
+            source_course ||= import_object.context
+          end
+        end
+
         migration_type = "course_copy_importer"
-        source_course = assignment.duplicate_of.context
         plugin = Canvas::Plugin.find(migration_type)
         content_migration = context.content_migrations.build(
           user:,
@@ -650,18 +664,7 @@ module Api::V1::Assignment
         content_migration.migration_settings[:import_immediately] = false
         content_migration.save
 
-        copy_values = {}
         use_global_identifiers = content_migration.use_global_identifiers?
-        data.each do |key, _|
-          import_object = Context.find_asset_by_url(key)
-          if import_object.is_a?(WikiPage)
-            copy_values[:wiki_pages] ||= []
-            copy_values[:wiki_pages] << CC::CCHelper.create_key(import_object, global: use_global_identifiers)
-          elsif import_object.is_a?(Attachment)
-            copy_values[:attachments] ||= []
-            copy_values[:attachments] << CC::CCHelper.create_key(import_object, global: use_global_identifiers)
-          end
-        end
 
         copy_options = ContentMigration.process_copy_params(copy_values, global_identifiers: use_global_identifiers)
         content_migration.migration_settings[:migration_ids_to_import] ||= {}
