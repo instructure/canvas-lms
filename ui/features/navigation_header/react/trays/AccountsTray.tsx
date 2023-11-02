@@ -41,33 +41,29 @@ export default function AccountsTray() {
         {I18n.t('Admin')}
       </Heading>
       <hr role="presentation" />
-
       <List isUnstyled={true} margin="small 0" itemSpacing="small">
+        <List.Item key="all">
+          <Link isWithinText={false} href="/accounts">
+            {I18n.t('All Accounts')}
+          </Link>
+        </List.Item>
+        <List.Item key="hr">
+          <hr role="presentation" />
+        </List.Item>
         {isLoading && (
           <List.Item>
             <Spinner delay={500} size="small" renderTitle={I18n.t('Loading')} />
           </List.Item>
         )}
-      </List>
-      {isSuccess && (
-        <List isUnstyled={true} margin="small 0" itemSpacing="small">
-          {data.map(account => (
+        {isSuccess &&
+          data.map(account => (
             <List.Item key={account.id}>
               <Link isWithinText={false} href={`/accounts/${account.id}`}>
                 {account.name}
               </Link>
             </List.Item>
           ))}
-          <List.Item key="hr">
-            <hr role="presentation" />
-          </List.Item>
-          <List.Item key="all">
-            <Link isWithinText={false} href="/accounts">
-              {I18n.t('All Accounts')}
-            </Link>
-          </List.Item>
-        </List>
-      )}
+      </List>
     </View>
   )
 }
