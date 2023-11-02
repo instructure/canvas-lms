@@ -33,9 +33,10 @@ export const Course = {
           ...AssignmentGroup
         }
       }
-      enrollmentsConnection {
+      enrollmentsConnection(filter: {states: active, types: StudentEnrollment}) {
         nodes {
           user {
+            _id
             name
             courseRoles(roleTypes: "StudentEnrollment")
           }

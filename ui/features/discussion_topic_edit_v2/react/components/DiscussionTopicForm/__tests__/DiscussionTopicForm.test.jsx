@@ -42,6 +42,9 @@ const setup = ({
       sections={sections}
       groupCategories={groupCategories}
       onSubmit={onSubmit}
+      apolloClient={null}
+      studentEnrollments={[]}
+      isGroupContext={false}
     />
   )
 }

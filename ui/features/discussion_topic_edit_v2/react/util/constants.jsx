@@ -20,6 +20,8 @@ import React from 'react'
 const GradedDiscussionDueDateDefaultValues = {
   assignedInfoList: [],
   setAssignedInfoList: () => {},
+  studentEnrollments: [],
+  sections: [],
 }
 
 export const GradedDiscussionDueDatesContext = React.createContext(GradedDiscussionDueDateDefaultValues)

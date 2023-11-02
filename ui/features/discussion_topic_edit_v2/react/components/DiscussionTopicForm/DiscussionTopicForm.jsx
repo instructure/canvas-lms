@@ -52,6 +52,7 @@ export default function DiscussionTopicForm({
   assignmentGroups,
   sections,
   groupCategories,
+  studentEnrollments,
   onSubmit,
   isGroupContext,
   apolloClient,
@@ -138,6 +139,8 @@ export default function DiscussionTopicForm({
   const assignmentDueDateContext = {
     assignedInfoList,
     setAssignedInfoList,
+    studentEnrollments,
+    sections,
   }
   const [showGroupCategoryModal, setShowGroupCategoryModal] = useState(false)
 
@@ -756,6 +759,7 @@ DiscussionTopicForm.propTypes = {
   isStudent: PropTypes.bool,
   sections: PropTypes.arrayOf(PropTypes.object),
   groupCategories: PropTypes.arrayOf(PropTypes.object),
+  studentEnrollments: PropTypes.arrayOf(PropTypes.object),
   onSubmit: PropTypes.func,
   isGroupContext: PropTypes.bool,
   apolloClient: PropTypes.object,
