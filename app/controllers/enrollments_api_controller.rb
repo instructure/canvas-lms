@@ -953,11 +953,17 @@ class EnrollmentsApiController < ApplicationController
     user = api_find(User, params[:user_id])
 
     if user && @domain_root_account&.feature_enabled?(:temporary_enrollments)
-      temp_enroll_params = params.slice(:temporary_enrollment_recipients, :temporary_enrollment_providers)
+      temp_enroll_params =
+        params.slice(:temporary_enrollment_recipients, :temporary_enrollment_providers, :temporary_enrollments)
 
       if temp_enroll_params.present?
         if user.account.grants_right?(@current_user, session, :read_roster)
-          return temporary_enrollment_conditions(user, temp_enroll_params)
+          enrollments = temporary_enrollment_conditions(user, temp_enroll_params)
+          if params[:state].present?
+            enrollments = enrollments.joins(:enrollment_state)
+                                     .where(enrollment_states: { state: enrollment_states_for_state_param })
+          end
+          return enrollments
         else
           render_unauthorized_action and return false
         end
@@ -1099,6 +1105,8 @@ class EnrollmentsApiController < ApplicationController
         course_id: recipient_enrollments.select(:course_id),
         user_id: recipient_enrollments.select(:temporary_enrollment_source_user_id)
       )
+    elsif value_to_boolean(params[:temporary_enrollments])
+      enrollments = Enrollment.temporary_enrollments_for_recipient(user)
     end
     return false unless enrollments.present?
 

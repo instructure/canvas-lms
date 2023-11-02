@@ -321,6 +321,10 @@ module Api::V1::User
         json[:can_be_removed] = (!enrollment.defined_by_sis? || context.grants_any_right?(@current_user, session, :manage_account_settings, :manage_sis)) &&
                                 enrollment.can_be_deleted_by(@current_user, @context, session)
       end
+      if includes.include?("temporary_enrollment_providers") && enrollment.temporary_enrollment_source_user_id
+        provider = api_find(User, enrollment.temporary_enrollment_source_user_id)
+        json[:temporary_enrollment_provider] = user_json(provider, user, session) unless provider.deleted?
+      end
     end
   end
 
