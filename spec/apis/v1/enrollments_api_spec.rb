@@ -1141,19 +1141,36 @@ describe EnrollmentsApiController, type: :request do
     end
 
     describe "temporary enrollments" do
+      let_once(:start_at) { 1.day.ago }
+      let_once(:end_at) { 1.day.from_now }
+
       before(:once) do
         Account.default.enable_feature!(:temporary_enrollments)
         @provider = user_factory(active_all: true)
         @recipient = user_factory(active_all: true)
-        @course = course_with_teacher(active_all: true, user: @provider).course
+        course1 = course_with_teacher(active_all: true, user: @provider).course
+        course2 = course_with_teacher(active_all: true, user: @provider).course
         temporary_enrollment_pairing = TemporaryEnrollmentPairing.create!(root_account: Account.default)
-        @recipient_temp_enrollment = @course.enroll_user(
+        course1.enroll_user(
           @recipient,
           "TeacherEnrollment",
           {
             role: teacher_role,
             temporary_enrollment_source_user_id: @provider.id,
-            temporary_enrollment_pairing_id: temporary_enrollment_pairing.id
+            temporary_enrollment_pairing_id: temporary_enrollment_pairing.id,
+            start_at:,
+            end_at:
+          }
+        )
+        course2.enroll_user(
+          @recipient,
+          "TeacherEnrollment",
+          {
+            role: teacher_role,
+            temporary_enrollment_source_user_id: @provider.id,
+            temporary_enrollment_pairing_id: temporary_enrollment_pairing.id,
+            start_at:,
+            end_at:
           }
         )
       end
@@ -1166,7 +1183,7 @@ describe EnrollmentsApiController, type: :request do
                                   user_path,
                                   @user_params.merge(temporary_enrollment_recipients: true,
                                                      user_id: @provider.id))
-          expect(json.length).to eq(1)
+          expect(json.length).to eq(2)
           expect(json.first["user_id"]).to eq(@recipient.id)
         end
 
@@ -1177,8 +1194,36 @@ describe EnrollmentsApiController, type: :request do
                                   user_path,
                                   @user_params.merge(temporary_enrollment_providers: true,
                                                      user_id: @recipient.id))
-          expect(json.length).to eq(1)
+          expect(json.length).to eq(2)
           expect(json.first["user_id"]).to eq(@provider.id)
+        end
+
+        it "returns temporary enrollments with included providers" do
+          user_path = "/api/v1/users/#{@recipient.id}/enrollments"
+          json = api_call_as_user(account_admin_user,
+                                  :get,
+                                  user_path,
+                                  @user_params.merge(temporary_enrollments: true,
+                                                     user_id: @recipient.id,
+                                                     include: ["temporary_enrollment_providers"]))
+          expect(json.length).to eq(2)
+          expect(json.first["user_id"]).to eq(@recipient.id)
+          expect(json.first["temporary_enrollment_provider"]["id"]).to eq(@provider.id)
+        end
+
+        it "respects enrollment state when a state arg is provided" do
+          start_at, end_at = "2023-10-01T18:53:53Z", "2023-10-31T18:53:53Z"
+          @recipient.enrollments.last.update!(start_at:, end_at:)
+          user_path = "/api/v1/users/#{@recipient.id}/enrollments"
+          json = api_call_as_user(account_admin_user,
+                                  :get,
+                                  user_path,
+                                  @user_params.merge(temporary_enrollments: true,
+                                                     user_id: @recipient.id,
+                                                     state: "current_and_future",
+                                                     include: ["temporary_enrollment_providers"]))
+          expect(json.length).to eq(1)
+          expect(json.first["user_id"]).to eq(@recipient.id)
         end
 
         it "returns default behavior if temporary enrollment args are not provided" do
@@ -1187,7 +1232,7 @@ describe EnrollmentsApiController, type: :request do
                                   :get,
                                   user_path,
                                   @user_params.merge(user_id: @recipient.id))
-          expect(json.length).to eq(1)
+          expect(json.length).to eq(2)
           expect(json.first["user_id"]).to eq(@recipient.id)
         end
 
@@ -1214,7 +1259,7 @@ describe EnrollmentsApiController, type: :request do
                                   user_path,
                                   @user_params.merge(temporary_enrollment_providers: true,
                                                      user_id: @recipient.id))
-          expect(json.length).to eq(1)
+          expect(json.length).to eq(2)
           expect(json.first["user_id"]).to eq(@recipient.id)
         end
       end
