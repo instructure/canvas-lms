@@ -70,8 +70,7 @@ describe('ProfileTray', () => {
     window.ENV.current_user.avatar_is_fallback = false
     window.ENV.current_user.avatar_image_url = imageUrl
     const {getByAltText} = render(<ProfileTray />)
-    const avatar = getByAltText('User profile picture')
-    // @ts-expect-error
+    const avatar = getByAltText('User profile picture') as HTMLImageElement
     expect(avatar.src).toBe(imageUrl)
   })
 

@@ -81,8 +81,10 @@ const MobileNavigation = () => {
       }
 
       if (mobileContextNavContainer) {
-        // @ts-expect-error
-        mobileContextNavContainer.setAttribute('aria-expanded', contextNavIsOpen.current)
+        mobileContextNavContainer.setAttribute(
+          'aria-expanded',
+          contextNavIsOpen.current ? 'true' : 'false'
+        )
       }
     })
   }, [])
