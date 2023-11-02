@@ -3338,7 +3338,7 @@ class User < ActiveRecord::Base
     user_attachments = attachments.active
     group_attachments = Attachment.active.where(
       context_type: "Group",
-      context_id: current_group_memberships.active.select(:group_id)
+      context_id: GroupMembership.where(workflow_state: "accepted", user_id: [id, global_id]).select(:group_id)
     )
 
     if block_given?
@@ -3346,7 +3346,7 @@ class User < ActiveRecord::Base
       group_attachments = yield(group_attachments)
     end
 
-    user_attachments.or(group_attachments)
+    group_attachments.or(user_attachments)
   end
 
   def authenticate_one_time_password(code)
