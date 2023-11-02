@@ -192,14 +192,6 @@ const SideNav = () => {
     fetchAtLeastOnce: true,
   })
 
-  const {data: unreadConversationsCount} = useQuery({
-    queryKey: ['unread_count', 'conversations'],
-    queryFn: getUnreadCount,
-    staleTime: 2 * 60 * 1000, // two minutes
-    enabled: countsEnabled && !ENV.current_user_disabled_inbox,
-    refetchOnWindowFocus: true,
-  })
-
   const {data: unreadContentSharesCount} = useQuery({
     queryKey: ['unread_count', 'content_shares'],
     queryFn: getUnreadCount,
@@ -208,12 +200,19 @@ const SideNav = () => {
     refetchOnWindowFocus: true,
   })
 
+  const {data: unreadConversationsCount} = useQuery({
+    queryKey: ['unread_count', 'conversations'],
+    queryFn: getUnreadCount,
+    staleTime: 2 * 60 * 1000, // two minutes
+    enabled: countsEnabled && !ENV.current_user_disabled_inbox,
+    broadcast: true,
+    refetchOnWindowFocus: true,
+  })
+
   const {data: unreadReleaseNotesCount} = useQuery({
     queryKey: ['unread_count', 'release_notes'],
     queryFn: getUnreadCount,
-    staleTime: 24 * 60 * 60 * 1000, // one day
     enabled: countsEnabled && ENV.FEATURES.embedded_release_notes && !releaseNotesBadgeDisabled,
-    refetchOnWindowFocus: true,
   })
 
   const {data: collapseGlobalNav} = useQuery({
