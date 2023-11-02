@@ -67,7 +67,10 @@ function toggleRegion($region, showRegion, $trigger) {
   if (showRegion == null) {
     showRegion = $region.is(':ui-dialog:hidden') || $region.attr('aria-expanded') !== 'true'
   }
-  const $allElementsControllingRegion = $(`[aria-controls*=${$region.attr('id')}]`)
+  const id = $region.attr('id')
+  if (/[^A-Za-z0-9_-]/.test(id)) return
+
+  const $allElementsControllingRegion = $(`[aria-controls*=${id}]`)
 
   // hide/un-hide .element_toggler's that point to this $region that were hidden because they have
   // the data-hide-while-target-shown attribute
