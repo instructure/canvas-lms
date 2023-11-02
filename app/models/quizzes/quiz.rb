@@ -85,8 +85,6 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   simply_versioned
 
-  has_many :context_module_tags, -> { where("content_tags.tag_type='context_module' AND content_tags.workflow_state<>'deleted'") }, as: :content, inverse_of: :content, class_name: "ContentTag"
-
   # This callback is listed here in order for the :link_assignment_overrides
   # method to be called after the simply_versioned callbacks. We want the
   # overrides to reflect the most recent version of the quiz.
