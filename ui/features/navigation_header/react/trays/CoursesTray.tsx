@@ -25,60 +25,11 @@ import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
 import {Link} from '@instructure/ui-link'
 import {useQuery} from '@canvas/query'
+import {SplitCoursesList, CourseListItemContent} from '../lists/SplitCoursesList'
 import coursesQuery, {hideHomeroomCourseIfK5Student} from '../queries/coursesQuery'
 import type {Course} from '../../../../api.d'
 
 const I18n = useI18nScope('CoursesTray')
-
-const UNPUBLISHED = 'unpublished'
-
-function CourseListItemContent({course}: {course: Course}) {
-  return (
-    <>
-      <Link isWithinText={false} href={`/courses/${course.id}`}>
-        {course.name}
-      </Link>
-      {course.enrollment_term_id > 1 && (
-        <Text as="div" size="x-small" weight="light">
-          {course.term.name}
-        </Text>
-      )}
-    </>
-  )
-}
-
-function SplitCourseList({courses, k5User}: {courses: Course[]; k5User: boolean}) {
-  const publishedCourses = courses.filter(course => course.workflow_state !== UNPUBLISHED)
-  const unpublishedCourses = courses.filter(course => course.workflow_state === UNPUBLISHED)
-  return (
-    <>
-      {publishedCourses.length > 0 && (
-        <Heading level="h4" as="h3" key="published_courses">
-          {k5User ? I18n.t('Published Subjects') : I18n.t('Published Courses')}
-        </Heading>
-      )}
-      <List key="published" isUnstyled={true} margin="small small" itemSpacing="small">
-        {publishedCourses.map(course => (
-          <List.Item key={course.id}>
-            <CourseListItemContent course={course} />
-          </List.Item>
-        ))}
-      </List>
-      {unpublishedCourses.length > 0 && (
-        <Heading level="h4" as="h3" key="unpublished_courses">
-          {k5User ? I18n.t('Unpublished Subjects') : I18n.t('Unpublished Courses')}
-        </Heading>
-      )}
-      <List key="unpublished" isUnstyled={true} margin="small small" itemSpacing="small">
-        {unpublishedCourses.map(course => (
-          <List.Item key={course.id}>
-            <CourseListItemContent course={course} />
-          </List.Item>
-        ))}
-      </List>
-    </>
-  )
-}
 
 export default function CoursesTray() {
   const showSplitList = (window.ENV.current_user_roles || []).includes('teacher')
@@ -97,18 +48,27 @@ export default function CoursesTray() {
         {k5User ? I18n.t('Subjects') : I18n.t('Courses')}
       </Heading>
       <hr role="presentation" />
-      {isLoading && (
-        <List isUnstyled={true} margin="small 0" itemSpacing="small">
+      <List isUnstyled={true} margin="small 0" itemSpacing="small">
+        <List.Item key="all">
+          <Link isWithinText={false} href="/courses">
+            {k5User ? I18n.t('All Subjects') : I18n.t('All Courses')}
+          </Link>
+        </List.Item>
+        <List.Item key="hr">
+          <hr role="presentation" />
+        </List.Item>
+        {isLoading && (
           <List.Item>
-            <Spinner size="small" renderTitle={I18n.t('Loading')} />
+            <Spinner delay={500} size="small" renderTitle={I18n.t('Loading')} />
           </List.Item>
-        </List>
-      )}
-      {isSuccess && (
-        <>
-          {showSplitList ? (
-            <SplitCourseList courses={data} k5User={k5User} />
-          ) : (
+        )}
+        {isSuccess && showSplitList && (
+          <List.Item>
+            <SplitCoursesList courses={data} k5User={k5User} />
+          </List.Item>
+        )}
+        {isSuccess && !showSplitList && (
+          <List.Item>
             <List isUnstyled={true} margin="small 0" itemSpacing="small">
               {data.map(course => (
                 <List.Item key={course.id}>
@@ -116,19 +76,9 @@ export default function CoursesTray() {
                 </List.Item>
               ))}
             </List>
-          )}
-          <List isUnstyled={true} margin="small 0" itemSpacing="small">
-            <List.Item key="hr">
-              <hr role="presentation" />
-            </List.Item>
-            <List.Item key="all">
-              <Link isWithinText={false} href="/courses">
-                {k5User ? I18n.t('All Subjects') : I18n.t('All Courses')}
-              </Link>
-            </List.Item>
-          </List>
-        </>
-      )}
+          </List.Item>
+        )}
+      </List>
       <br />
       <Text as="div">
         {k5User
