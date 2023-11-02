@@ -61,15 +61,14 @@ export default function NavigationBadges() {
     queryFn: getUnreadCount,
     staleTime: 2 * 60 * 1000, // two minutes
     enabled: countsEnabled && !ENV.current_user_disabled_inbox,
+    broadcast: true,
     refetchOnWindowFocus: true,
   })
 
   const {data: unreadReleaseNotesCount, isSuccess: hasUnreadReleaseNotesCount} = useQuery({
     queryKey: ['unread_count', 'release_notes'],
     queryFn: getUnreadCount,
-    staleTime: 24 * 60 * 60 * 1000, // one day
     enabled: countsEnabled && ENV.FEATURES.embedded_release_notes && !releaseNotesBadgeDisabled,
-    refetchOnWindowFocus: true,
   })
 
   return (

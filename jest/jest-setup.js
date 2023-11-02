@@ -24,6 +24,7 @@ import rceFormatMessage from '@instructure/canvas-rce/es/format-message'
 import {up as configureDateTime} from '../ui/boot/initializers/configureDateTime'
 import {up as configureDateTimeMomentParser} from '../ui/boot/initializers/configureDateTimeMomentParser'
 import {useTranslations} from '@canvas/i18n'
+import MockBroadcastChannel from './MockBroadcastChannel'
 
 useTranslations('en', CoreTranslations)
 
@@ -188,6 +189,8 @@ if (!('matchMedia' in window)) {
   })
   window.matchMedia._mocked = true
 }
+
+global.BroadcastChannel = global.BroadcastChannel || MockBroadcastChannel
 
 global.DataTransferItem = global.DataTransferItem || class DataTransferItem {}
 
