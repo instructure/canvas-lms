@@ -254,6 +254,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   scope :active, -> { where("enrollments.workflow_state<>'deleted'") }
+  scope :deleted, -> { where(workflow_state: "deleted") }
 
   scope :admin, lambda {
                   select(:course_id)

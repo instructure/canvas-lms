@@ -23,6 +23,17 @@ require "atom"
 class User < ActiveRecord::Base
   GRAVATAR_PATTERN = %r{^https?://[a-zA-Z0-9.-]+\.gravatar\.com/}
   MAX_ROOT_ACCOUNT_ID_SYNC_ATTEMPTS = 5
+  MINIMAL_COLUMNS_TO_SAVE = %i[avatar_image_source
+                               avatar_image_url
+                               created_at
+                               id
+                               initial_enrollment_type
+                               lti_id
+                               name
+                               reminder_time_for_due_dates
+                               reminder_time_for_grading
+                               short_name
+                               sortable_name].freeze
 
   include ManyRootAccounts
   include TurnitinID
@@ -542,21 +553,26 @@ class User < ActiveRecord::Base
   # Update the root_account_ids column on the user
   # and all the users CommunicationChannels
   def update_root_account_ids
-    # See User#associated_shards in MRA for an explanation of
-    # shard association levels
-    shards = associated_shards(:strong) + associated_shards(:weak)
-
     refreshed_root_account_ids = Set.new
-
-    Shard.with_each_shard(shards) do
-      UserAccountAssociation.for_root_accounts.for_user_id(id).each do |uaa|
-        refreshed_root_account_ids << Shard.relative_id_for(uaa.account_id, Shard.current, shard)
-      end
-    end
 
     if fake_student?
       # We don't need to worry about relative ids here because test students are never cross-shard
       refreshed_root_account_ids << enrollments.where(type: "StudentViewEnrollment").pick(:root_account_id)
+    else
+      # See User#associated_shards in MRA for an explanation of
+      # shard association levels
+      shards = associated_shards(:strong) + associated_shards(:weak)
+
+      Shard.with_each_shard(shards) do
+        (user_account_associations.for_root_accounts.shard(Shard.current).distinct.pluck(:account_id) +
+        # need to add back in deleted associations
+        pseudonyms.deleted.shard(Shard.current).except(:order).distinct.pluck(:account_id) +
+        enrollments.deleted.shard(Shard.current).distinct.pluck(:root_account_id) +
+        account_users.deleted.shard(Shard.current).distinct.pluck(:root_account_id))
+          .each do |account_id|
+          refreshed_root_account_ids << Shard.relative_id_for(account_id, Shard.current, shard)
+        end
+      end
     end
 
     # Update the user
