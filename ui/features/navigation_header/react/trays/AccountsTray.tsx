@@ -45,7 +45,7 @@ export default function AccountsTray() {
       <List isUnstyled={true} margin="small 0" itemSpacing="small">
         {isLoading && (
           <List.Item>
-            <Spinner size="small" renderTitle={I18n.t('Loading')} />
+            <Spinner delay={500} size="small" renderTitle={I18n.t('Loading')} />
           </List.Item>
         )}
       </List>

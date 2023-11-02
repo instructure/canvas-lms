@@ -86,6 +86,7 @@ export default function CoursesTray() {
     queryKey: ['courses'],
     queryFn: coursesQuery,
     fetchAtLeastOnce: true,
+    refetchOnMount: false,
     select: courses => courses.filter(hideHomeroomCourseIfK5Student),
   })
   const k5User = window.ENV.K5_USER

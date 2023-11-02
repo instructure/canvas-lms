@@ -25,7 +25,13 @@ import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
 import tourPubSub from '@canvas/tour-pubsub'
 import {getTrayLabel, getTrayPortal} from './utils'
+import useHoverIntent from './hooks/useHoverIntent'
+import coursesQuery from './queries/coursesQuery'
+import accountsQuery from './queries/accountsQuery'
+import groupsQuery from './queries/groupsQuery'
 import NavigationBadges from './NavigationBadges'
+import {prefetchQuery} from '@canvas/query'
+import profileQuery from './queries/profileQuery'
 
 const I18n = useI18nScope('Navigation')
 
@@ -35,6 +41,12 @@ const AccountsTray = React.lazy(() => import('./trays/AccountsTray'))
 const ProfileTray = React.lazy(() => import('./trays/ProfileTray'))
 const HistoryTray = React.lazy(() => import('./trays/HistoryTray'))
 const HelpTray = React.lazy(() => import('./trays/HelpTray'))
+
+const accountsNavLink = document.querySelector(`#global_nav_accounts_link`)
+const coursesNavLink = document.querySelector(`#global_nav_courses_link`)
+const groupsNavLink = document.querySelector(`#global_nav_groups_link`)
+const profileNavLink = document.querySelector(`#global_nav_profile_link`)
+// const helpNavLink = document.querySelector(`#global_nav_help_link`)
 
 const EXTERNAL_TOOLS_REGEX = /^\/accounts\/[^\/]*\/(external_tools)/
 const ACTIVE_ROUTE_REGEX =
@@ -63,6 +75,26 @@ const Navigation = () => {
       setActiveItem(item || 'dashboard')
     }
   }, [isTrayOpen])
+
+  useHoverIntent(profileNavLink, () => {
+    import('./trays/ProfileTray')
+    prefetchQuery(['profile'], profileQuery)
+  })
+
+  useHoverIntent(coursesNavLink, () => {
+    import('./trays/CoursesTray')
+    prefetchQuery(['courses'], coursesQuery)
+  })
+
+  useHoverIntent(accountsNavLink, () => {
+    import('./trays/AccountsTray')
+    prefetchQuery(['accounts'], accountsQuery)
+  })
+
+  useHoverIntent(groupsNavLink, () => {
+    import('./trays/GroupsTray')
+    prefetchQuery(['groups'], groupsQuery)
+  })
 
   useEffect(() => {
     $(`.${ACTIVE_CLASS}`).removeClass(ACTIVE_CLASS).removeAttr('aria-current')
