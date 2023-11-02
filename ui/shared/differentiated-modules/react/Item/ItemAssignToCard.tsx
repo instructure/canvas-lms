@@ -18,12 +18,11 @@
 
 import React, {useCallback, useEffect, useState} from 'react'
 import {View} from '@instructure/ui-view'
-import {DateTimeInput} from '@instructure/ui-date-time-input'
 import {IconButton} from '@instructure/ui-buttons'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {IconTrashLine} from '@instructure/ui-icons'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import DateValidator from '@canvas/datetime/DateValidator'
+import ClearableDateTimeInput from './ClearableDateTimeInput'
 // import AssigneeSelector from '../AssigneeSelector'
 
 const I18n = useI18nScope('differentiated_modules')
@@ -131,6 +130,33 @@ export default function ItemAssignToCard({
     validationErrors,
   ])
 
+  const dateTimeInputs = [
+    {
+      key: 'due_at',
+      description: I18n.t('Choose a due date and time'),
+      dateRenderLabel: I18n.t('Due Date'),
+      value: dueDate,
+      onChange: handleDueDateChange,
+      onClear: () => setDueDate(null),
+    },
+    {
+      key: 'unlock_at',
+      description: I18n.t('Choose an available from date and time'),
+      dateRenderLabel: I18n.t('Available from'),
+      value: availableFromDate,
+      onChange: handleAvailableFromDateChange,
+      onClear: () => setAvailableFromDate(null),
+    },
+    {
+      key: 'lock_at',
+      description: I18n.t('Choose an available to date and time'),
+      dateRenderLabel: I18n.t('Until'),
+      value: availableToDate,
+      onChange: handleAvailableToDateChange,
+      onClear: () => setAvailableToDate(null),
+    },
+  ]
+
   return (
     <View
       data-testid="item-assign-to-card"
@@ -139,6 +165,7 @@ export default function ItemAssignToCard({
       padding="medium small small small"
       borderWidth="small"
       borderColor="primary"
+      borderRadius="medium"
     >
       {typeof onDelete === 'function' && (
         <div
@@ -162,69 +189,14 @@ export default function ItemAssignToCard({
         </div>
       )}
       <AssigneeSelector cardId={cardId} />
-
-      <View as="div" margin="small none">
-        <DateTimeInput
-          allowNonStepInput={true}
-          dateFormat="MMM D, YYYY"
-          description={
-            <ScreenReaderContent>{I18n.t('Choose a due date and time')}</ScreenReaderContent>
-          }
-          dateRenderLabel={I18n.t('Due Date')}
-          timeRenderLabel={I18n.t('Time')}
-          invalidDateTimeMessage={I18n.t('Invalid date')}
-          prevMonthLabel={I18n.t('Previous month')}
-          nextMonthLabel={I18n.t('Next month')}
-          value={dueDate || undefined}
-          layout="columns"
-          messages={validationErrors.due_at ? [{type: 'error', text: validationErrors.due_at}] : []}
-          onChange={handleDueDateChange}
-        />
-      </View>
-      <View as="div" margin="small none">
-        <DateTimeInput
-          allowNonStepInput={true}
-          dateFormat="MMM D, YYYY"
-          description={
-            <ScreenReaderContent>
-              {I18n.t('Choose an available from date and time')}
-            </ScreenReaderContent>
-          }
-          dateRenderLabel={I18n.t('Available from')}
-          timeRenderLabel={I18n.t('Time')}
-          invalidDateTimeMessage={I18n.t('Invalid date')}
-          prevMonthLabel={I18n.t('Previous month')}
-          nextMonthLabel={I18n.t('Next month')}
-          value={availableFromDate || undefined}
-          layout="columns"
+      {dateTimeInputs.map(props => (
+        <ClearableDateTimeInput
+          {...props}
           messages={
-            validationErrors.unlock_at ? [{type: 'error', text: validationErrors.unlock_at}] : []
+            validationErrors[props.key] ? [{type: 'error', text: validationErrors[props.key]}] : []
           }
-          onChange={handleAvailableFromDateChange}
         />
-      </View>
-      <View as="div" margin="small none">
-        <DateTimeInput
-          allowNonStepInput={true}
-          dateFormat="MMM D, YYYY"
-          description={
-            <ScreenReaderContent>
-              {I18n.t('Choose an available to date and time')}
-            </ScreenReaderContent>
-          }
-          dateRenderLabel={I18n.t('Until')}
-          timeRenderLabel={I18n.t('Time')}
-          invalidDateTimeMessage={I18n.t('Invalid date')}
-          prevMonthLabel={I18n.t('Previous month')}
-          nextMonthLabel={I18n.t('Next month')}
-          value={availableToDate || undefined}
-          layout="columns"
-          messages={
-            validationErrors.lock_at ? [{type: 'error', text: validationErrors.lock_at}] : []
-          }
-          onChange={handleAvailableToDateChange}
-        />
-      </View>
+      ))}
     </View>
   )
 }
