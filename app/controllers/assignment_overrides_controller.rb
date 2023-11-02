@@ -32,7 +32,17 @@
 #           "type": "integer"
 #         },
 #         "assignment_id": {
-#           "description": "the ID of the assignment the override applies to",
+#           "description": "the ID of the assignment the override applies to (Note: effective 03/01/2024, this attribute will only be included when the override targets an assignment)",
+#           "example": 123,
+#           "type": "integer"
+#         },
+#         "quiz_id": {
+#           "description": "the ID of the quiz the override applies to (present if the override applies to a quiz)",
+#           "example": 123,
+#           "type": "integer"
+#         },
+#         "context_module_id": {
+#           "description": "the ID of the module the override applies to (present if the override applies to a module)",
 #           "example": 123,
 #           "type": "integer"
 #         },

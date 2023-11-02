@@ -78,10 +78,10 @@ class LearningObjectDatesController < ApplicationController
   # @returns LearningObjectDates
   def show
     route = polymorphic_url([:api_v1, @context, asset, :date_details])
-    overrides = Api.paginate(asset.assignment_overrides.active, self, route)
+    overrides = Api.paginate(asset.all_assignment_overrides.active, self, route)
     render json: {
       **learning_object_dates_json(asset, @current_user, session),
-      overrides: assignment_overrides_json(overrides, @current_user, include_student_names: true)
+      overrides: assignment_overrides_json(overrides, @current_user, include_names: true)
     }
   end
 

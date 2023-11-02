@@ -77,6 +77,7 @@ describe LearningObjectDatesController do
                                  "overrides" => [{
                                    "id" => @override.id,
                                    "assignment_id" => nil,
+                                   "quiz_id" => @quiz.id,
                                    "title" => "Unnamed Course",
                                    "course_section_id" => @course.default_section.id,
                                    "due_at" => "2022-02-01T01:00:00Z",
@@ -100,6 +101,8 @@ describe LearningObjectDatesController do
                                  "overrides" => [{
                                    "id" => @override.id,
                                    "assignment_id" => nil,
+                                   "context_module_id" => context_module.id,
+                                   "context_module_name" => "module",
                                    "title" => "Unnamed Course",
                                    "course_section_id" => @course.default_section.id,
                                    "due_at" => "2022-02-01T01:00:00Z",
@@ -107,6 +110,25 @@ describe LearningObjectDatesController do
                                    "all_day_date" => "2022-02-01"
                                  }]
                                })
+    end
+
+    it "includes an assignment's modules' overrides" do
+      module1 = @course.context_modules.create!(name: "module 1")
+      module1_override = module1.assignment_overrides.create!
+      module1.content_tags.create!(content: @assignment, context: @course, tag_type: "context_module")
+      module1.content_tags.create!(content: @assignment, context: @course, tag_type: "context_module") # make sure we don't duplicate
+
+      module2 = @course.context_modules.create!(name: "module 2")
+      module2_override = module2.assignment_overrides.create!
+      module2.content_tags.create!(content: @assignment, context: @course, tag_type: "context_module")
+
+      module3 = @course.context_modules.create!(name: "module 3") # make sure we don't count unrelated modules
+      module3.assignment_overrides.create!
+
+      get :show, params: { course_id: @course.id, assignment_id: @assignment.id }
+      expect(response).to be_successful
+      overrides = json_parse["overrides"]
+      expect(overrides.pluck("id")).to contain_exactly(@override.id, module1_override.id, module2_override.id)
     end
 
     it "paginates overrides" do
