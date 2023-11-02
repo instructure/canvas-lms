@@ -83,13 +83,14 @@ export default function HelpLinks({onClick}: Props) {
                 <List.Item key={`link-${link.id}`}>
                   <Flex justifyItems="space-between" alignItems="center">
                     <Flex.Item size={has_new_tag ? '80%' : '100%'}>
-                      <span
-                        role="presentation"
-                        onClick={handleClick(link)}
-                        // @ts-expect-error
-                        onKeyPress={handleClick(link)}
-                      >
-                        <Link isWithinText={false} href={link.url} target="_blank" rel="noopener">
+                      <span role="presentation">
+                        <Link
+                          isWithinText={false}
+                          href={link.url}
+                          onClick={handleClick(link)}
+                          target="_blank"
+                          rel="noopener"
+                        >
                           {link.text || ''}
                         </Link>
                       </span>
@@ -114,37 +115,39 @@ export default function HelpLinks({onClick}: Props) {
             .concat(
               // if the current user is a teacher, show a link to
               // open up the welcome tour
-              // @ts-expect-error
               window.ENV.FEATURES?.product_tours &&
                 (window.ENV.current_user_types?.includes('AccountAdmin') ||
                   window.ENV.current_user_roles?.includes('teacher') ||
-                  window.ENV.current_user_roles?.includes('student')) && [
-                  <List.Item key="welcome_tour">
-                    <View className="welcome-tour-link">
-                      <Link isWithinText={false} onClick={() => tourPubSub.publish('tour-open')}>
-                        {I18n.t('Show Welcome Tour')}
-                      </Link>
-                    </View>
-                  </List.Item>,
-                ]
+                  window.ENV.current_user_roles?.includes('student'))
+                ? [
+                    <List.Item key="welcome_tour">
+                      <View className="welcome-tour-link">
+                        <Link isWithinText={false} onClick={() => tourPubSub.publish('tour-open')}>
+                          {I18n.t('Show Welcome Tour')}
+                        </Link>
+                      </View>
+                    </List.Item>,
+                  ]
+                : []
             )
             .concat(
               // if the current user is an admin, show the settings link to
               // customize this menu
-              // @ts-expect-error
-              window.ENV.current_user_roles?.includes('root_admin') && [
-                <List.Item key="hr">
-                  <hr role="presentation" />
-                </List.Item>,
-                <List.Item key="customize">
-                  <Link
-                    isWithinText={false}
-                    href="/accounts/self/settings#custom_help_link_settings"
-                  >
-                    {I18n.t('Customize this menu')}
-                  </Link>
-                </List.Item>,
-              ]
+              window.ENV.current_user_roles?.includes('root_admin')
+                ? [
+                    <List.Item key="hr">
+                      <hr role="presentation" />
+                    </List.Item>,
+                    <List.Item key="customize">
+                      <Link
+                        isWithinText={false}
+                        href="/accounts/self/settings#custom_help_link_settings"
+                      >
+                        {I18n.t('Customize this menu')}
+                      </Link>
+                    </List.Item>,
+                  ]
+                : []
             )
             .filter(Boolean)}
         </List>

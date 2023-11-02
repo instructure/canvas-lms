@@ -63,13 +63,7 @@ export default function CoursesList() {
           ))
           .concat([
             <List.Item key="all">
-              <Link
-                href="/courses"
-                isWithinText={false}
-                display="block"
-                // @ts-expect-error
-                textAlign="start"
-              >
+              <Link href="/courses" isWithinText={false} display="block">
                 {k5User ? I18n.t('All Subjects') : I18n.t('All Courses')}
               </Link>
             </List.Item>,
