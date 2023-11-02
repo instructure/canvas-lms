@@ -37,7 +37,10 @@ import saveMediaRecording, {
 } from './saveMediaRecording'
 import translationShape from './translationShape'
 import getTranslations from './getTranslations'
-import {CC_FILE_MAX_BYTES} from './shared/constants'
+import {CC_FILE_MAX_BYTES, mediaExtension} from './shared/constants'
+
+const fileExtensionRegex = /\.\S/
+const DEFAULT_EXTENSION = 'webm'
 
 // This component will guarantee formatMessage is initialized with the user
 // locale's translations before rendering the actual UploadMedia component.
@@ -182,6 +185,11 @@ export class UploadMediaModal extends React.Component {
     this.setState({uploading: true}, () => {
       this.props.onStartUpload && this.props.onStartUpload(file)
       file.userEnteredTitle = file.title
+      file.userEnteredTitle ||= file.name
+      if (!fileExtensionRegex.test(file.userEnteredTitle)) {
+        const extension = mediaExtension(file.type) || DEFAULT_EXTENSION
+        file.userEnteredTitle +=  file.userEnteredTitle.endsWith('.') ? `${extension}` : `.${extension}`
+      }
       saveMediaRecording(
         file,
         this.props.rcsConfig,
@@ -251,7 +259,6 @@ export class UploadMediaModal extends React.Component {
       // ** This is an eslint error which I don't have the context
       // ** to address working my current ticket. Ignore for now
       // ** since it's been working for a while now.
-      // eslint-disable-next-line react/no-did-update-set-state
       this.setState({selectedPanel: this.inferSelectedPanel(this.props.tabs)})
     }
   }
