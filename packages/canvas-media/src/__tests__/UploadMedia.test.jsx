@@ -17,11 +17,13 @@
  */
 
 import React from 'react'
-import {render, fireEvent, waitFor} from '@testing-library/react'
+import {render, fireEvent, waitFor, screen} from '@testing-library/react'
 import UploadMedia, {UploadMediaModal} from '../UploadMedia'
 import getTranslations from '../getTranslations'
 
 jest.mock('../getTranslations', () => jest.fn(locale => Promise.resolve({[locale]: {}})))
+const actual = jest.requireActual('../saveMediaRecording')
+const saveMediaRecordingSpy = jest.spyOn(actual, 'default')
 
 const uploadMediaTranslations = {
   UploadMediaStrings: {
@@ -76,26 +78,26 @@ describe('Upload Media', () => {
 
   describe('renders the selected tabs', () => {
     it('renders Computer', () => {
-      const {getByText} = renderComponent({tabs: {record: false, upload: true}})
-      expect(getByText('Computer')).toBeInTheDocument()
+      renderComponent({tabs: {record: false, upload: true}})
+      expect(screen.getByText('Computer')).toBeInTheDocument()
     })
 
     it('renders Computer without RCS info', () => {
-      const {getByText} = renderComponent({tabs: {record: false, upload: true}, rcsConfig: {}})
-      expect(getByText('Computer')).toBeInTheDocument()
+      renderComponent({tabs: {record: false, upload: true}, rcsConfig: {}})
+      expect(screen.getByText('Computer')).toBeInTheDocument()
     })
 
     it('renders Computer and Record', () => {
-      const {getByText} = renderComponent({tabs: {record: true, upload: true}})
-      expect(getByText('Computer')).toBeInTheDocument()
-      expect(getByText('Record')).toBeInTheDocument()
+      renderComponent({tabs: {record: true, upload: true}})
+      expect(screen.getByText('Computer')).toBeInTheDocument()
+      expect(screen.getByText('Record')).toBeInTheDocument()
     })
   })
 
   describe('when a tab is clicked', () => {
     it('does not change selectedPanel if there is only one tab visible', () => {
-      const {getByRole} = renderComponent({tabs: {record: false, upload: true}})
-      const tab = getByRole('tab', {name: 'Computer'})
+      renderComponent({tabs: {record: false, upload: true}})
+      const tab = screen.getByRole('tab', {name: 'Computer'})
       const setStateSpy = jest.spyOn(UploadMediaModal.prototype, 'setState')
       fireEvent.click(tab)
       expect(setStateSpy).not.toHaveBeenCalledWith(expect.objectContaining({selectedPanel: 0}))
@@ -103,8 +105,8 @@ describe('Upload Media', () => {
     })
 
     it('changes selectedPanel if there are multiple tabs visible', () => {
-      const {getByRole} = renderComponent({tabs: {record: true, upload: true}})
-      const tab = getByRole('tab', {name: 'Computer'})
+      renderComponent({tabs: {record: true, upload: true}})
+      const tab = screen.getByRole('tab', {name: 'Computer'})
       const setStateSpy = jest.spyOn(UploadMediaModal.prototype, 'setState')
       fireEvent.click(tab)
       expect(setStateSpy).toHaveBeenCalledWith(expect.objectContaining({selectedPanel: 0}))
@@ -116,8 +118,8 @@ describe('Upload Media', () => {
     const computerPanel = 0
 
     it('sets the selectedPanel to "Computer" when "Computer" is the only visible tab', () => {
-      const {getAllByRole} = renderComponent({tabs: {record: false, upload: true}})
-      const closeButton = getAllByRole('button', {name: 'Close'})[0]
+      renderComponent({tabs: {record: false, upload: true}})
+      const closeButton = screen.getAllByRole('button', {name: 'Close'})[0]
       const setStateSpy = jest.spyOn(UploadMediaModal.prototype, 'setState')
       fireEvent.click(closeButton)
       expect(setStateSpy).toHaveBeenCalledWith(
@@ -127,8 +129,8 @@ describe('Upload Media', () => {
     })
 
     it('sets the selectedPanel to "Computer" when both tabs are visible', () => {
-      const {getAllByRole} = renderComponent({tabs: {record: true, upload: true}})
-      const closeButton = getAllByRole('button', {name: 'Close'})[0]
+      renderComponent({tabs: {record: true, upload: true}})
+      const closeButton = screen.getAllByRole('button', {name: 'Close'})[0]
       const setStateSpy = jest.spyOn(UploadMediaModal.prototype, 'setState')
       fireEvent.click(closeButton)
       expect(setStateSpy).toHaveBeenCalledWith(
@@ -247,37 +249,37 @@ describe('Upload Media', () => {
     })
 
     it('is disabled before ComputerPanel gets a file', () => {
-      const {getByText} = renderComponent({tabs: {upload: true}})
-      expect(getByText('Submit').closest('button')).toHaveAttribute('disabled')
+      renderComponent({tabs: {upload: true}})
+      expect(screen.getByText('Submit').closest('button')).toHaveAttribute('disabled')
     })
 
     it('is enabled once ComputerPanel has a file', () => {
-      const {getByText} = renderComponent({tabs: {upload: true}, computerFile})
-      expect(getByText('Submit').closest('button')).not.toHaveAttribute('disabled')
+      renderComponent({tabs: {upload: true}, computerFile})
+      expect(screen.getByText('Submit').closest('button')).not.toHaveAttribute('disabled')
     })
 
     it('is enabled while uploading if disableSubmitWhileUploading is false', () => {
-      const {getByText} = renderComponent({
+      renderComponent({
         disableSubmitWhileUploading: false,
         onStartUpload: jest.fn(),
         tabs: {upload: true},
         computerFile,
       })
 
-      fireEvent.click(getByText('Submit'))
-      expect(getByText('Submit').closest('button')).not.toBeDisabled()
+      fireEvent.click(screen.getByText('Submit'))
+      expect(screen.getByText('Submit').closest('button')).not.toBeDisabled()
     })
 
     it('is disabled while uploading if disableSubmitWhileUploading is true', () => {
-      const {getByText} = renderComponent({
+      renderComponent({
         disableSubmitWhileUploading: true,
         onStartUpload: jest.fn(),
         tabs: {upload: true},
         computerFile,
       })
 
-      fireEvent.click(getByText('Submit'))
-      expect(getByText('Submit').closest('button')).toBeDisabled()
+      fireEvent.click(screen.getByText('Submit'))
+      expect(screen.getByText('Submit').closest('button')).toBeDisabled()
     })
 
     it('is disabled while uploading if file title is empty', () => {
@@ -285,14 +287,14 @@ describe('Upload Media', () => {
         lastModifiedDate: 1568991600840,
         type: 'video/mp4',
       })
-      const {getByPlaceholderText, getByText} = renderComponent({
+      renderComponent({
         disableSubmitWhileUploading: false,
         onStartUpload: jest.fn(),
         tabs: {upload: true},
         computerFile,
       })
-      const submitButton = getByText('Submit').closest('button')
-      const titleInput = getByPlaceholderText('File name')
+      const submitButton = screen.getByText('Submit').closest('button')
+      const titleInput = screen.getByPlaceholderText('File name')
       fireEvent.change(titleInput, {target: {value: ''}})
       expect(submitButton).toBeDisabled()
       fireEvent.change(titleInput, {target: {value: 'Awesome video'}})
@@ -302,9 +304,13 @@ describe('Upload Media', () => {
   })
 
   describe('on submitting results', () => {
+    beforeEach(() => {
+      saveMediaRecordingSpy.mockClear()
+    })
+
     it('calls onStartUpload when uploading', async () => {
       const onStartUpload = jest.fn()
-      const {getByText} = renderComponent({
+      renderComponent({
         onStartUpload,
         tabs: {upload: true},
         computerFile: new File(['bits'], 'dummy-video.mp4', {
@@ -312,11 +318,66 @@ describe('Upload Media', () => {
           type: 'video/mp4',
         }),
       })
-
-      fireEvent.click(getByText('Submit'))
+      fireEvent.click(screen.getByText('Submit'))
       expect(onStartUpload).toHaveBeenCalled()
     })
 
+    it('adds file extension by mime type', () => {
+      renderComponent({
+        tabs: {upload: true},
+        computerFile: new File(['bits'], 'dummy-video', {
+          lastModifiedDate: 1568991600840,
+          type: 'video/mp4',
+        }),
+      })
+      fireEvent.click(screen.getByText('Submit'))
+      expect(saveMediaRecordingSpy.mock.calls[0][0].userEnteredTitle).toBe('dummy-video.mp4')
+    })
+
+    it('adds default file extension when no mime type', () => {
+      renderComponent({
+        tabs: {upload: true},
+        computerFile: new File(['bits'], 'dummy-video', {
+          lastModifiedDate: 1568991600840,
+        }),
+      })
+      fireEvent.click(screen.getByText('Submit'))
+      expect(saveMediaRecordingSpy.mock.calls[0][0].userEnteredTitle).toBe('dummy-video.webm')
+    })
+
+    it('does not add file extension if period in name', () => {
+      renderComponent({
+        tabs: {upload: true},
+        computerFile: new File(['bits'], 'dummy.video', {
+          lastModifiedDate: 1568991600840,
+        }),
+      })
+      fireEvent.click(screen.getByText('Submit'))
+      expect(saveMediaRecordingSpy.mock.calls[0][0].userEnteredTitle).toBe('dummy.video')
+    })
+
+    it('handles files that end with a period', () => {
+      renderComponent({
+        tabs: {upload: true},
+        computerFile: new File(['bits'], 'dummyvideo.', {
+          lastModifiedDate: 1568991600840,
+        }),
+      })
+      fireEvent.click(screen.getByText('Submit'))
+      expect(saveMediaRecordingSpy.mock.calls[0][0].userEnteredTitle).toBe('dummyvideo.webm')
+    })
+
+    it('converts mime type to extension', () => {
+      renderComponent({
+        tabs: {upload: true},
+        computerFile: new File(['bits'], 'dummyvideo.', {
+          lastModifiedDate: 1568991600840,
+          type: 'video/quicktime'
+        }),
+      })
+      fireEvent.click(screen.getByText('Submit'))
+      expect(saveMediaRecordingSpy.mock.calls[0][0].userEnteredTitle).toBe('dummyvideo.mov')
+    })
     // the rest is tested via saveMediaRecording.test.js
   })
 })

@@ -20,8 +20,10 @@ import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {MediaCapture, canUseMediaCapture} from '@instructure/media-capture'
 import {func} from 'prop-types'
-
+import { mediaExtension } from '../../mimetypes'
 const I18n = useI18nScope('media_recorder')
+const DEFAULT_EXTENSION = 'webm'
+const fileExtensionRegex = /\.\S/
 
 const translations = {
   ARIA_VIDEO_LABEL: I18n.t('Video Player'),
@@ -44,6 +46,18 @@ const translations = {
   START_OVER: I18n.t('Start Over'),
 }
 
+export function fileWithExtension(file) {
+  if (fileExtensionRegex.test(file.name)) {
+    return file
+  }
+  const extension = mediaExtension(file.type) || DEFAULT_EXTENSION
+  const name = file.name?.endsWith('.') ? `${file.name}${extension}` : `${file.name}.${extension}`
+  return new File([file], name, {
+    type: file.type,
+    lastModified: file.lastModified
+  })
+}
+
 export default class CanvasMediaRecorder extends React.Component {
   static propTypes = {
     onSaveFile: func,
@@ -53,7 +67,8 @@ export default class CanvasMediaRecorder extends React.Component {
     onSaveFile: () => {},
   }
 
-  saveFile = file => {
+  saveFile = _file => {
+    const file = fileWithExtension(_file)
     this.props.onSaveFile(file)
   }
 
