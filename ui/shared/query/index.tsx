@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {useQuery as baseUseQuery, hashQueryKey, QueryClient} from '@tanstack/react-query'
-import type {UseQueryOptions, QueryKey} from '@tanstack/react-query'
+import type {UseQueryOptions, QueryKey, QueryFunction} from '@tanstack/react-query'
 import {PersistQueryClientProvider} from '@tanstack/react-query-persist-client'
 import {createSyncStoragePersister} from '@tanstack/query-sync-storage-persister'
 import wasPageReloaded from '@canvas/util/wasPageReloaded'
@@ -69,7 +69,6 @@ export function useQuery<TData = unknown, TError = unknown>(
   const ensureFetch = options.fetchAtLeastOnce || wasPageReloaded
   const hashedKey = hashQueryKey(options.queryKey || [])
   const wasAlreadyFetched = queriesFetched.has(hashedKey)
-
   queriesFetched.add(hashQueryKey(options.queryKey || []))
 
   const refetchOnMount = ensureFetch && !wasAlreadyFetched ? 'always' : options.refetchOnMount
@@ -84,8 +83,8 @@ export function useQuery<TData = unknown, TError = unknown>(
   })
 
   const mergedOptions: CustomUseQueryOptions<TData, TError> = {
-    refetchOnMount,
     ...options,
+    refetchOnMount,
   }
   const queryResult = baseUseQuery<TData, TError>(mergedOptions)
 
@@ -97,4 +96,21 @@ export function useQuery<TData = unknown, TError = unknown>(
   })
 
   return queryResult
+}
+
+export function prefetchQuery(queryKey: QueryKey, queryFn: QueryFunction) {
+  const hashedKey = hashQueryKey(queryKey || [])
+  const wasAlreadyFetched = queriesFetched.has(hashedKey)
+
+  if (
+    !wasAlreadyFetched &&
+    !queryClient.getQueryData(queryKey) &&
+    !queryClient.isFetching(queryKey)
+  ) {
+    queriesFetched.add(hashQueryKey(queryKey || []))
+    queryClient.prefetchQuery({
+      queryKey,
+      queryFn,
+    })
+  }
 }

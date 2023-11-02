@@ -83,7 +83,7 @@ export default function ReleaseNotesList() {
     return (
       <Spinner
         size="small"
-        delay={200}
+        delay={500}
         margin="x-small"
         renderTitle={() => I18n.t('Loading release notes')}
       />
