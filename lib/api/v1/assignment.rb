@@ -634,6 +634,17 @@ module Api::V1::Assignment
       unless data.empty?
         copy_values = {}
         source_course = nil
+
+        migration_type = "course_copy_importer"
+        plugin = Canvas::Plugin.find(migration_type)
+        content_migration = context.content_migrations.build(
+          user:,
+          context:,
+          migration_type:,
+          initiated_source: :new_quizzes
+        )
+        use_global_identifiers = content_migration.use_global_identifiers?
+
         data.each do |key, _|
           import_object = Context.find_asset_by_url(key)
           if import_object.is_a?(WikiPage)
@@ -647,14 +658,6 @@ module Api::V1::Assignment
           end
         end
 
-        migration_type = "course_copy_importer"
-        plugin = Canvas::Plugin.find(migration_type)
-        content_migration = context.content_migrations.build(
-          user:,
-          context:,
-          migration_type:,
-          initiated_source: :new_quizzes
-        )
         content_migration.update_migration_settings({
                                                       import_quizzes_next: false,
                                                       source_course_id: source_course.id
@@ -663,8 +666,6 @@ module Api::V1::Assignment
         content_migration.source_course = source_course
         content_migration.migration_settings[:import_immediately] = false
         content_migration.save
-
-        use_global_identifiers = content_migration.use_global_identifiers?
 
         copy_options = ContentMigration.process_copy_params(copy_values, global_identifiers: use_global_identifiers)
         content_migration.migration_settings[:migration_ids_to_import] ||= {}
