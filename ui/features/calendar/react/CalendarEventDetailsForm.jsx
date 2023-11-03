@@ -52,7 +52,7 @@ import FrequencyPicker from '@canvas/calendar/react/RecurringEvents/FrequencyPic
 const I18n = useI18nScope('calendar.edit_calendar_event')
 
 const screenReaderMessageCallback = msg => {
-  return () => showFlashAlert({message: msg, type: 'info', srOnly: true})
+  showFlashAlert({message: msg, type: 'info', srOnly: true})
 }
 
 const hasFormErrors = errors => Object.keys(errors).some(key => errors[key])
