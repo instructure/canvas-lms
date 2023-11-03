@@ -88,7 +88,7 @@ export function generateTitle(enrollmentType, name) {
     case RECIPIENT:
       return I18n.t('%{name}’s Temporary Enrollment Providers', {name})
     default:
-      return I18n.t('Assign temporary enrollments to %{name}', {name})
+      return I18n.t('Find a recipient of Temporary Enrollments', {name})
   }
 }
 

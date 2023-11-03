@@ -171,7 +171,7 @@ describe('UsersListRow', () => {
       it('returns default title for unknown role', () => {
         const title = generateTitle('some_other_role', 'User Name')
 
-        expect(title).toEqual('Assign temporary enrollments to User Name')
+        expect(title).toEqual('Find a recipient of Temporary Enrollments')
       })
     })
 

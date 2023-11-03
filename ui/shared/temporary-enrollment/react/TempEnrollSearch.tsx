@@ -106,28 +106,14 @@ export function TempEnrollSearch(props: Props) {
   const renderAvatar = () => {
     return (
       <>
-        <Text weight="bold">
-          {I18n.t('Find a recipient of temporary enrollments from %{name}', {
-            name: props.user.name,
-          })}
-        </Text>
-
-        <Flex margin="small 0 small 0">
-          <Flex.Item>
-            <Avatar
-              size="large"
-              margin="0 small 0 0"
-              name={props.user.name}
-              src={props.user.avatar_url}
-              data-fs-exclude={true}
-              data-heap-redact-attributes="name"
-            />
-          </Flex.Item>
-
-          <Flex.Item shouldShrink={true}>
-            <Text size="large">{props.user.name}</Text>
-          </Flex.Item>
-        </Flex>
+        <Avatar
+          size="medium"
+          margin="0 small 0 0"
+          name={props.user.name}
+          src={props.user.avatar_url}
+          data-fs-exclude={true}
+          data-heap-redact-attributes="name"
+        />
       </>
     )
   }
@@ -228,12 +214,26 @@ export function TempEnrollSearch(props: Props) {
   } else {
     return (
       <>
-        {renderAvatar()}
+        <Flex margin="0 0 small 0">
+          <Flex.Item>{renderAvatar()}</Flex.Item>
+          <Flex.Item shouldShrink={true}>
+            <Text size="large">{props.user.name}</Text>
+          </Flex.Item>
+        </Flex>
+        <Flex margin="0 0 large 0">
+          <Flex.Item shouldShrink={true}>
+            <Text weight="bold">
+              {I18n.t('Find a recipient of temporary enrollments from %{name}', {
+                name: props.user.name,
+              })}
+            </Text>
+          </Flex.Item>
+        </Flex>
         {message === '' ? <></> : <Alert variant="error">{message}</Alert>}
         <RadioInputGroup
           name="search_type"
           defaultValue={searchType}
-          description={I18n.t('Find user by')}
+          description={I18n.t('Add recipient by')}
           onChange={handleSearchTypeChange}
           layout="columns"
         >
@@ -261,20 +261,22 @@ export function TempEnrollSearch(props: Props) {
             />
           ) : null}
         </RadioInputGroup>
-        <fieldset style={{margin: '1rem 0'}}>
-          <TextInput
-            renderLabel={
-              <>
-                {labelText}
-                <ScreenReaderContent>{descText}</ScreenReaderContent>
-              </>
-            }
-            value={search}
-            placeholder={exampleText}
-            onChange={handleSearchChange}
-            {...analyticProps('TextInput')}
-          />
-        </fieldset>
+        <Flex margin="medium 0 0 0">
+          <Flex.Item shouldGrow={true}>
+            <TextInput
+              renderLabel={
+                <>
+                  {labelText}
+                  <ScreenReaderContent>{descText}</ScreenReaderContent>
+                </>
+              }
+              value={search}
+              placeholder={exampleText}
+              onChange={handleSearchChange}
+              {...analyticProps('TextInput')}
+            />
+          </Flex.Item>
+        </Flex>
       </>
     )
   }
