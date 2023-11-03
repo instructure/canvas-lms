@@ -910,6 +910,11 @@ CanvasRails::Application.routes.draw do
     end
   end
 
+  resources :users, only: [:passport] do
+    get "passport" => "learner_passport#index"
+    get "passport/*path" => "learner_passport#index"
+  end
+
   get "show_message_template" => "messages#show_message_template"
   get "message_templates" => "messages#templates"
   resource :profile, controller: :profile, only: [:show, :update] do
