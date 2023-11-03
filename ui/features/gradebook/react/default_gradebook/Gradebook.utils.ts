@@ -707,6 +707,21 @@ export const filterStudentBySubmissionFn = (
   }
 }
 
+export const filterStudentBySectionFn = (appliedFilters: Filter[]) => {
+  const sectionFilters = findFilterValuesOfType(
+    'section',
+    appliedFilters
+  ) as SubmissionFilterValue[]
+
+  return (student: Student) => {
+    if (sectionFilters.length === 0) {
+      return true
+    }
+
+    return student.sections ? student.sections.includes(sectionFilters[0]) : false
+  }
+}
+
 export const filterAssignmentsBySubmissionsFn = (
   appliedFilters: Filter[],
   submissionStateMap: SubmissionStateMap,

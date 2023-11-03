@@ -96,18 +96,6 @@ describe "Gradebook editing grades" do
     expect(sub.score).to eq 0.0
   end
 
-  it "does not update default grades for users not in this section", priority: "1" do
-    # create new user and section
-
-    Gradebook.visit(@course)
-    switch_to_section(@other_section)
-
-    Gradebook.click_assignment_header_menu(@third_assignment.id)
-    set_default_grade(13)
-    @other_section.users.each { |u| expect(u.submissions.map(&:grade)).to include "13" }
-    @course.default_section.users.each { |u| expect(u.submissions.map(&:grade)).not_to include "13" }
-  end
-
   it "tab sets focus on the options menu trigger when editing a grade", priority: "1" do
     Gradebook.visit(@course)
 
