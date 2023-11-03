@@ -49,7 +49,7 @@ describe "Gradebook Controls" do
       Account.default.set_feature_flag!("outcome_gradebook", "on")
       Gradebook.visit(@course)
       Gradebook.gradebook_dropdown_item_click("Learning Mastery")
-      expect(fj('button:contains("Learning Mastery")')).to be_displayed
+      expect(fj('span:contains("Learning Mastery")')).to be_displayed
     end
   end
 
