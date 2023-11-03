@@ -17,9 +17,24 @@
  */
 
 import ACTION_NAMES from '../actions/developerKeysActions'
+import {DeveloperKey} from '../../model/DeveloperKey'
 import _ from 'lodash'
+import {makeReducer} from './makeReducer'
 
-const initialState = {
+export interface ListDeveloperKeysState {
+  listDeveloperKeysPending: boolean
+  listDeveloperKeysSuccessful: boolean
+  listDeveloperKeysError: unknown
+  listInheritedDeveloperKeysPending: boolean
+  listInheritedDeveloperKeysSuccessful: boolean
+  listInheritedDeveloperKeysError: unknown
+  list: Array<DeveloperKey>
+  inheritedList: Array<DeveloperKey>
+  nextPage: string | null | undefined
+  inheritedNextPage: string | null | undefined
+}
+
+const initialState: ListDeveloperKeysState = {
   listDeveloperKeysPending: false,
   listDeveloperKeysSuccessful: false,
   listDeveloperKeysError: null,
@@ -32,7 +47,7 @@ const initialState = {
   inheritedNextPage: null,
 }
 
-const developerKeysHandlers = {
+export default makeReducer(initialState, {
   [ACTION_NAMES.LIST_DEVELOPER_KEYS_START]: (state, action) => ({
     ...state,
     list: action.payload ? [] : state.list,
@@ -194,12 +209,4 @@ const developerKeysHandlers = {
     listInheritedDeveloperKeysPending: false,
     listInheritedDeveloperKeysError: action.payload,
   }),
-}
-
-export default (state = initialState, action) => {
-  if (developerKeysHandlers[action.type]) {
-    return developerKeysHandlers[action.type](state, action)
-  } else {
-    return state
-  }
-}
+})

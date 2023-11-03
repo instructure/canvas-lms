@@ -17,8 +17,27 @@
  */
 
 import ACTION_NAMES from '../actions/developerKeysActions'
+import {makeReducer} from './makeReducer'
 
-const initialState = {
+export interface AvailableScope {
+  controller: string
+  action: string
+  verb: string
+  path: string
+  scope: string
+  resource: string
+  resource_name: string
+}
+
+export interface ListScopesState {
+  availableScopes: Record<string, AvailableScope>
+  listDeveloperKeyScopesPending: boolean
+  listDeveloperKeyScopesSuccessful: boolean
+  listDeveloperKeyScopesError: unknown
+  selectedScopes: string[]
+}
+
+const initialState: ListScopesState = {
   availableScopes: {},
   listDeveloperKeyScopesPending: false,
   listDeveloperKeyScopesSuccessful: false,
@@ -26,7 +45,7 @@ const initialState = {
   selectedScopes: [],
 }
 
-const developerKeysHandlers = {
+export default makeReducer(initialState, {
   [ACTION_NAMES.LIST_DEVELOPER_KEY_SCOPES_START]: state => ({
     ...state,
     listDeveloperKeyScopesPending: true,
@@ -52,12 +71,4 @@ const developerKeysHandlers = {
       selectedScopes: action.payload,
     }
   },
-}
-
-export default (state = initialState, action) => {
-  if (developerKeysHandlers[action.type]) {
-    return developerKeysHandlers[action.type](state, action)
-  } else {
-    return state
-  }
-}
+})

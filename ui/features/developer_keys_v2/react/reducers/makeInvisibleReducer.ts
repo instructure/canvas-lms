@@ -17,14 +17,21 @@
  */
 
 import ACTION_NAMES from '../actions/developerKeysActions'
+import {makeReducer} from './makeReducer'
 
-const initialState = {
+export interface MakeInvisibleDeveloperKeyState {
+  makeInvisibleDeveloperKeyPending: boolean
+  makeInvisibleDeveloperKeySuccessful: boolean
+  makeInvisibleDeveloperKeyError: unknown
+}
+
+const initialState: MakeInvisibleDeveloperKeyState = {
   makeInvisibleDeveloperKeyPending: false,
   makeInvisibleDeveloperKeySuccessful: false,
   makeInvisibleDeveloperKeyError: null,
 }
 
-const developerKeysHandlers = {
+export default makeReducer(initialState, {
   [ACTION_NAMES.MAKE_INVISIBLE_DEVELOPER_KEY_START]: (state, _action) => ({
     ...state,
     makeInvisibleDeveloperKeyPending: true,
@@ -41,12 +48,4 @@ const developerKeysHandlers = {
     makeInvisibleDeveloperKeyPending: false,
     makeInvisibleDeveloperKeyError: action.payload,
   }),
-}
-
-export default (state = initialState, action) => {
-  if (developerKeysHandlers[action.type]) {
-    return developerKeysHandlers[action.type](state, action)
-  } else {
-    return state
-  }
-}
+})

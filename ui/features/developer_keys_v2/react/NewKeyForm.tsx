@@ -33,44 +33,23 @@ import React from 'react'
 
 import Scopes from './Scopes'
 import ToolConfigurationForm from './ToolConfigurationForm'
-
-export type DeveloperKey = {
-  notes: string | null
-  icon_url: string | null
-  vendor_code: string | null
-  redirect_uri: string | null
-  redirect_uris?: string
-  public_jwk_url?: string
-  public_jwk?: string
-  email: string | null
-  name: string | null
-  require_scopes: boolean | null
-  tool_configuration: {
-    oidc_initiation_url: string
-  } | null
-  test_cluster_only?: boolean
-  client_credentials_audience: string | null
-}
+import {AvailableScope} from './reducers/listScopesReducer'
+import {DeveloperKey} from '../model/DeveloperKey'
 
 type Props = {
   dispatch: Function
   listDeveloperKeyScopesSet: Function
-  isLtiKey: boolean
-  isRedirectUriRequired: boolean
+  isLtiKey: boolean | undefined
+  isRedirectUriRequired: boolean | undefined
   developerKey: DeveloperKey
-  availableScopes: {
-    [key: string]: Array<{
-      resource: string
-      scope: string
-    }>
-  }
+  availableScopes: Record<string, AvailableScope>
   availableScopesPending: boolean
   editing: boolean
   tool_configuration: {
     oidc_initiation_url?: string
   }
   showRequiredMessages: boolean
-  showMissingRedirectUrisMessage: boolean
+  showMissingRedirectUrisMessage: boolean | undefined
   updateToolConfiguration: (update: any, field?: string | null, sync?: boolean) => void
   updateToolConfigurationUrl: Function
   updateDeveloperKey: Function

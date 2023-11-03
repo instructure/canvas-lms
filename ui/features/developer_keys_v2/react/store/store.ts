@@ -52,8 +52,10 @@ const developerKeysReducer = combineReducers({
 })
 
 export default (initialStateOverrides = {}) => {
-  let defaultState = developerKeysReducer({}, {})
+  let defaultState = developerKeysReducer({} as any, {} as any)
   defaultState = _.merge(defaultState, initialStateOverrides)
 
   return createStoreWithMiddleware(developerKeysReducer, defaultState)
 }
+
+export type DeveloperKeysAppState = ReturnType<typeof developerKeysReducer>
