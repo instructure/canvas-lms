@@ -472,6 +472,10 @@ module Api::V1::Assignment
 
     hash["restrict_quantitative_data"] = assignment.restrict_quantitative_data?(user, true) || false
 
+    if opts[:migrated_urls_content_migration_id]
+      hash["migrated_urls_content_migration_id"] = opts[:migrated_urls_content_migration_id]
+    end
+
     hash
   end
 
@@ -589,7 +593,7 @@ module Api::V1::Assignment
     false
   end
 
-  def update_api_assignment(assignment, assignment_params, user, context = assignment.context)
+  def update_api_assignment(assignment, assignment_params, user, context = assignment.context, opts = {})
     return :forbidden unless grading_periods_allow_submittable_update?(assignment, assignment_params)
 
     # Trying to change the "everyone" due date when the assignment is restricted to a specific section
@@ -621,6 +625,66 @@ module Api::V1::Assignment
       assignment.clear_cache_key(:availability)
       assignment.quiz.clear_cache_key(:availability) if assignment.quiz?
       SubmissionLifecycleManager.recompute(prepared_update[:assignment], update_grades: true, executing_user: user)
+    end
+
+    # At present, when an assignment linked to a LTI tool is copied, there is no way for canvas
+    # to know what resouces the LTI tool needs copied as well. New Quizzes has a problem
+    # when an assignment linked to a New Quiz is copied, none of the content referenced in the RCE
+    # html is moved to the destination course. This code block gives New Quizzes the ability
+    # to let canvas know what additional assets need to be copied.
+    # Note: this is intended to be a short term solution to resolve an ongoing production issue.
+    url = assignment_params.dig("migrated_urls_report_url")
+    if url.present?
+      res = CanvasHttp.get(url)
+      data = JSON.parse(res.body)
+
+      unless data.empty?
+        copy_values = {}
+        source_course = nil
+        data.each do |key, _|
+          import_object = Context.find_asset_by_url(key)
+          if import_object.is_a?(WikiPage)
+            copy_values[:wiki_pages] ||= []
+            copy_values[:wiki_pages] << CC::CCHelper.create_key(import_object, global: use_global_identifiers)
+            source_course ||= import_object.context
+          elsif import_object.is_a?(Attachment)
+            copy_values[:attachments] ||= []
+            copy_values[:attachments] << CC::CCHelper.create_key(import_object, global: use_global_identifiers)
+            source_course ||= import_object.context
+          end
+        end
+
+        migration_type = "course_copy_importer"
+        plugin = Canvas::Plugin.find(migration_type)
+        content_migration = context.content_migrations.build(
+          user:,
+          context:,
+          migration_type:,
+          initiated_source: :new_quizzes
+        )
+        content_migration.update_migration_settings({
+                                                      import_quizzes_next: false,
+                                                      source_course_id: source_course.id
+                                                    })
+        content_migration.workflow_state = "created"
+        content_migration.source_course = source_course
+        content_migration.migration_settings[:import_immediately] = false
+        content_migration.save
+
+        use_global_identifiers = content_migration.use_global_identifiers?
+
+        copy_options = ContentMigration.process_copy_params(copy_values, global_identifiers: use_global_identifiers)
+        content_migration.migration_settings[:migration_ids_to_import] ||= {}
+        content_migration.migration_settings[:migration_ids_to_import][:copy] = copy_options
+        content_migration.copy_options = copy_options
+        content_migration.save
+
+        content_migration.shard.activate do
+          content_migration.queue_migration(plugin)
+        end
+
+        opts[:migrated_urls_content_migration_id] = content_migration.global_id
+      end
     end
 
     response

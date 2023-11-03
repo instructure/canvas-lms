@@ -2819,7 +2819,9 @@ class Course < ActiveRecord::Base
           cm.add_imported_item(new_file)
           cm.add_imported_item(new_file.folder, key: new_file.folder.id)
           map_merge(file, new_file)
-        rescue
+        rescue => e
+          Canvas::Errors.capture(e)
+          Rails.logger.error "Couldn't copy file: #{e}"
           cm.add_warning(t(:file_copy_error, "Couldn't copy file \"%{name}\"", name: file.display_name || file.path_name), $!)
         end
       end
