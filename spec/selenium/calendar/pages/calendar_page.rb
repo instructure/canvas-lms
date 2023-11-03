@@ -133,6 +133,10 @@ module CalendarPage
     ".event-details .popover_close"
   end
 
+  def screenreader_message_holder_selector
+    "#flash_screenreader_holder"
+  end
+
   #------------------------- Elements ---------------------------
 
   def agenda_events(event_title)
@@ -225,6 +229,10 @@ module CalendarPage
 
   def event_details_modal_close_button
     f(event_details_modal_close_button_selector)
+  end
+
+  def screenreader_message_holder
+    f(screenreader_message_holder_selector)
   end
 
   #----------------------- Actions/Methods ----------------------
