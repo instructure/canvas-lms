@@ -848,15 +848,20 @@ describe Mutations::CreateDiscussionTopic do
       GQL
 
       result = execute_with_input_with_assignment(query)
+      assignment = Assignment.last
       discussion_topic = result.dig("data", "createDiscussionTopic", "discussionTopic")
-      expect(result.dig("data", "discussionTopic", "errors")).to be_nil
-      expect(discussion_topic["assignment"]["name"]).to eq title
-      expect(discussion_topic["assignment"]["pointsPossible"]).to eq 15
-      expect(discussion_topic["assignment"]["gradingType"]).to eq "percent"
-      expect(discussion_topic["assignment"]["peerReviews"]["anonymousReviews"]).to be true
-      expect(discussion_topic["assignment"]["peerReviews"]["automaticReviews"]).to be true
-      expect(discussion_topic["assignment"]["peerReviews"]["count"]).to eq 2
-      expect(discussion_topic["assignment"]["_id"]).to eq Assignment.last.id.to_s
+      aggregate_failures do
+        expect(result.dig("data", "discussionTopic", "errors")).to be_nil
+        expect(discussion_topic["assignment"]["name"]).to eq title
+        expect(discussion_topic["assignment"]["pointsPossible"]).to eq 15
+        expect(discussion_topic["assignment"]["gradingType"]).to eq "percent"
+        expect(discussion_topic["assignment"]["peerReviews"]["anonymousReviews"]).to be true
+        expect(discussion_topic["assignment"]["peerReviews"]["automaticReviews"]).to be true
+        expect(discussion_topic["assignment"]["peerReviews"]["count"]).to eq 2
+        expect(discussion_topic["assignment"]["_id"]).to eq assignment.id.to_s
+        expect(discussion_topic["_id"]).to eq assignment.discussion_topic.id.to_s
+        expect(DiscussionTopic.count).to eq 1
+      end
     end
 
     it "student fails to create graded discussion topic" do

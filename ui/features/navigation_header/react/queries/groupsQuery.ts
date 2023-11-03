@@ -20,10 +20,8 @@ import $ from 'jquery'
 import parseLinkHeader from 'link-header-parsing/parseLinkHeaderFromXHR'
 import type {AccessibleGroup} from '../../../../api.d'
 
-const groupFilter = (group: {can_access?: boolean; concluded: boolean}) =>
+export const groupFilter = (group: {can_access?: boolean; concluded: boolean}) =>
   group.can_access && !group.concluded
-
-const RESOURCE_COUNT = 10
 
 export default function groupsQuery(): Promise<AccessibleGroup[]> {
   return new Promise((resolve, reject) => {
@@ -36,7 +34,7 @@ export default function groupsQuery(): Promise<AccessibleGroup[]> {
         (newData: AccessibleGroup[], _: any, xhr: XMLHttpRequest) => {
           data.push(...newData.filter(groupFilter))
           const link = parseLinkHeader(xhr)
-          if (newData.length >= RESOURCE_COUNT && link.next) {
+          if (link.next) {
             load(link.next)
           } else {
             resolve(data)

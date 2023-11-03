@@ -56,6 +56,9 @@ const consoleMessagesToIgnore = {
     /Please update the following components:[ (BaseTransition|Billboard|Button|Checkbox|CloseButton|Dialog|Expandable|FileDrop|Flex|FlexItem|FormFieldGroup|FormFieldLabel|FormFieldLayout|FormFieldMessage|FormFieldMessages|Grid|GridCol|GridRow|Heading|InlineSVG|Mask|ModalBody|ModalFooter|ModalHeader|NumberInput|Portal|Query|Responsive|SVGIcon|ScreenReaderContent|SelectOptionsList|SelectField|SelectMultiple|SelectOptionsList|SelectSingle|Spinner|Tab|Text|TextArea|TextInput|TinyMCE|ToggleDetails|ToggleFacade|Transition|TruncateText|View),?]+$/,
     // output of Pagination component substitutes the component name for the placeholder %s
     /Please update the following components: %s,Pagination/,
+
+    // https://github.com/reactwg/react-18/discussions/82
+    /Can't perform a React state update on an unmounted component/,
   ],
 }
 

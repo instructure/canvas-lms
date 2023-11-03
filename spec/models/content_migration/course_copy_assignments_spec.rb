@@ -692,6 +692,18 @@ describe ContentMigration do
         expect(@copy_to.grading_standard).to eq gs
       end
 
+      it "retains reference to points based account grading standard" do
+        Account.site_admin.enable_feature!(:points_based_grading_schemes)
+        gs = make_grading_standard(@copy_from.root_account, { points_based: true, scaling_factor: 4.0 })
+        @copy_from.grading_standard = gs
+        @copy_from.grading_standard_enabled = true
+        @copy_from.save!
+
+        run_course_copy
+
+        expect(@copy_to.grading_standard).to eq gs
+      end
+
       it "copies a course grading standard not owned by the copy_from course" do
         @other_course = course_model
         gs = make_grading_standard(@other_course)

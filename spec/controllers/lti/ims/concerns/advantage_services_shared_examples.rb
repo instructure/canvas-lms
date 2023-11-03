@@ -87,6 +87,20 @@ shared_examples_for "advantage services" do
       end
     end
 
+    context "with deleted context" do
+      let(:before_send_request) do
+        lambda do
+          context.destroy
+        end
+      end
+
+      it_behaves_like "mime_type check"
+
+      it "returns 404 not found" do
+        expect(response).to have_http_status :not_found
+      end
+    end
+
     context "with unbound developer key" do
       let(:before_send_request) do
         lambda do

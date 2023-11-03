@@ -54,17 +54,20 @@ export type ContentMigrationItem = {
   created_at: string
 }
 
-export type submitMigrationProps = {
-  selectiveImport: boolean
-  importAsNewQuizzes: boolean
-  adjustDates: boolean
-}
-
-export type submitMigrationCallbackType = ({
-  selectiveImport,
-  importAsNewQuizzes,
-  adjustDates,
-}: submitMigrationProps) => void
+export type onSubmitMigrationFormCallback = (
+  formData: {
+    selective_import: boolean
+    date_shift_options: boolean
+    settings: {[key: string]: any}
+    daySubCollection?: object
+    pre_attachment?: {
+      name: string
+      size: number
+      no_redirect: boolean
+    }
+  },
+  preAttachmentFile?: File
+) => void
 
 export type ContentMigrationResponse = ContentMigrationItem & {
   pre_attachment?: {

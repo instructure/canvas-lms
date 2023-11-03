@@ -3411,7 +3411,7 @@ describe "Submissions API", type: :request do
       )
     end
 
-    it "allows grading an uncreated submission" do
+    it "allows grading a student that has not submitted" do
       json = api_call(
         :put,
         "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
@@ -3431,6 +3431,32 @@ describe "Submissions API", type: :request do
       )
 
       expect(Submission.count).to eq 1
+      expect(json["grade"]).to eq "B"
+      expect(json["score"]).to eq 12.9
+    end
+
+    it "allows grading an assigned student whose placeholder submission object has not yet been created" do
+      # This simulates a scenario where the delayed job to create the
+      # assigned student's submission has not yet completed
+      @assignment.submissions.find_by(user: @student).destroy
+      json = api_call(
+        :put,
+        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+        {
+          controller: "submissions_api",
+          action: "update",
+          format: "json",
+          course_id: @course.id.to_s,
+          assignment_id: @assignment.id.to_s,
+          user_id: @student.id.to_s
+        },
+        {
+          submission: {
+            posted_grade: "B"
+          },
+        }
+      )
+      expect(@assignment.reload.submissions.where(user: @student).exists?).to be true
       expect(json["grade"]).to eq "B"
       expect(json["score"]).to eq 12.9
     end

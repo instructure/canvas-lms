@@ -147,7 +147,9 @@ class ContentMigrationsController < ApplicationController
     Folder.root_folders(@context) # ensure course root folder exists so file imports can run
 
     if Account.site_admin.feature_enabled?(:instui_for_import_page) && !api_request?
-      js_env COURSE_ID: @context.id # Only js_env used for the redesign code
+      # Only js_env used for the redesign code
+      js_env COURSE_ID: @context.id
+      js_env UPLOAD_LIMIT: Attachment.quota_available(@context)
     else
       scope = @context.content_migrations.where(child_subscription_id: nil).order("id DESC")
       @migrations = Api.paginate(scope, self, api_v1_course_content_migration_list_url(@context))

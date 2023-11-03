@@ -231,3 +231,11 @@ lti_resource_link_id_speedgrader_launches_reference_assignment:
     title. With the feature flag off, in SpeedGrader launches, resource_link_id
     and resource_link_title reference the tool (not the assignment) for
     non-NewQuizzes LTI 1.1 tools.
+lti_unique_tool_form_ids:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Use a unique HTML ID for each tool launch form
+  description: |-
+    When enabled, the hidden HTML forms that are used to trigger an LTI launch
+    will each have a random number appended to their id. When disabled, each
+    one has the same id of tool_form.

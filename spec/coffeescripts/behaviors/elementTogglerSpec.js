@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import elementToggler from '../../../ui/boot/initializers/activateElementToggler'
+import '../../../ui/boot/initializers/activateElementToggler'
 
 QUnit.module('elementToggler', {
   teardown() {
@@ -181,4 +181,14 @@ test('toggles multiple elements separated by spaces', function () {
   this.$trigger.prop('checked', true).trigger('change')
   ok(this.$target1.is(':visible'), 'first target is shown')
   ok(this.$target2.is(':visible'), 'second target is shown')
+})
+
+test('ignores attempts to trick jquery into creating HTML instead of selecting elements', function () {
+  this.$trigger = $(
+    '<a href="#" class="element_toggler" aria-controls="fake,.one">tricky</a>'
+  ).appendTo('#fixtures')
+  this.$target = $(`<div id="]<sneaky/>" class="one"/>`).appendTo('#fixtures')
+  const spy = sandbox.spy($.fn, 'init')
+  this.$trigger.click()
+  notOk(spy.calledWithMatch(/sneaky/), 'sneaky selectors are discarded')
 })

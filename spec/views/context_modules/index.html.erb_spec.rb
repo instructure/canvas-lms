@@ -164,8 +164,12 @@ describe "context_modules/index" do
       @assessment = @assignment.submission_for_student(@reviewer).assigned_assessments.first
 
       context_module = @course.context_modules.create!
+      context_module_two = @course.context_modules.create!
+
       @module_item = context_module.add_item type: "assignment", id: @assignment.id
+      @module_item_two = context_module_two.add_item type: "assignment", id: @assignment.id
       @module_item.publish! if @module_item.unpublished?
+      @module_item_two.publish! if @module_item_two.unpublished?
     end
 
     it "shows the list of assessment requests when peer_reviews_for_a2 FF is ON" do
@@ -177,7 +181,22 @@ describe "context_modules/index" do
       render "context_modules/index"
       expect(response).not_to be_nil
       page = Nokogiri("<document>" + response.body + "</document>")
-      expect(page.css("#module_student_view_peer_reviews_#{@module_item.content_id}_#{@module_item.id}").length).to eq 1
+      expect(page.css("#module_student_view_peer_reviews_#{@module_item.content_id}_#{@module_item.context_module_id}").length).to eq 1
+    end
+
+    it "shows the same assignment in two differenct context_modules" do
+      @course.enable_feature! :peer_reviews_for_a2
+
+      view_context(@course, @reviewer)
+      assign(:modules, @course.context_modules.active)
+      assign(:is_student, true)
+      render "context_modules/index"
+      expect(response).not_to be_nil
+
+      page = response.body
+
+      expect(page.include?("module_student_view_peer_reviews_#{@module_item.content_id}_#{@module_item.context_module_id}")).to be true
+      expect(page.include?("module_student_view_peer_reviews_#{@module_item_two.content_id}_#{@module_item_two.context_module_id}")).to be true
     end
 
     it "does not show the list of assessment requests when peer_reviews_for_a2 FF is OFF" do
@@ -189,7 +208,7 @@ describe "context_modules/index" do
       render "context_modules/index"
       expect(response).not_to be_nil
       page = Nokogiri("<document>" + response.body + "</document>")
-      expect(page.css("#module_student_view_peer_reviews_#{@module_item.content_id}_#{@module_item.id}").length).to eq 0
+      expect(page.css("#module_student_view_peer_reviews_#{@module_item.content_id}_#{@module_item.context_module_id}").length).to eq 0
     end
   end
 end

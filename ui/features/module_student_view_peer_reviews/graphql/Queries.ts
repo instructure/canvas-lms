@@ -16,15 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {gql} from '@canvas/apollo'
+import gql from 'graphql-tag'
 
 const ASSIGNMENT_QUERY = gql`
   query GetCourseModules($courseId: ID!) {
     course(id: $courseId) {
       modulesConnection {
         nodes {
+          id: _id
           moduleItems {
-            _id
             content {
               ... on Assignment {
                 name
@@ -33,17 +33,17 @@ const ASSIGNMENT_QUERY = gql`
                   anonymousReviews
                 }
                 assessmentRequestsForCurrentUser {
-                  _id
+                  id: _id
                   anonymousId
                   available
                   createdAt
                   workflowState
                   user {
-                    _id
+                    id: _id
                     name
                   }
                   anonymizedUser {
-                    _id
+                    id: _id
                     name
                   }
                 }

@@ -98,9 +98,9 @@ describe Mutations::SetOverrideStatus do
       expect(score_for_enrollment.reload.custom_grade_status).to be_nil
     end
 
-    it "does not allow setting a custom status on a score without an override" do
+    it "does allow setting a custom status on a score without an override" do
       result = CanvasSchema.execute(mutation_str(custom_grade_status_id: custom_grade_status.id), context:)
-      expect(result.dig("data", "setOverrideStatus", "errors", 0, "message")).to eq "cannot be set when the score is not overridden"
+      expect(result.dig("data", "setOverrideStatus", "grades", "customGradeStatusId")).to eq custom_grade_status.id.to_s
     end
 
     it "returns an error when trying to set a custom status from another account" do

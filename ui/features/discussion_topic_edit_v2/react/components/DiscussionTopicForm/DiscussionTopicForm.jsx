@@ -156,7 +156,7 @@ export default function DiscussionTopicForm({
     setRequireInitialPost(currentDiscussionTopic.requireInitialPost)
     setEnablePodcastFeed(currentDiscussionTopic.podcastEnabled)
     setIncludeRepliesInFeed(currentDiscussionTopic.podcastHasStudentPosts)
-    // setIsGraded TODO: phase 2
+
     setAllowLiking(currentDiscussionTopic.allowRating)
     setOnlyGradersCanLike(currentDiscussionTopic.onlyGradersCanRate)
     setAddToTodo(!!currentDiscussionTopic.todoDate)
@@ -229,6 +229,30 @@ export default function DiscussionTopicForm({
     return isValid
   }
 
+  const preparePeerReviewPayload = () => {
+    return peerReviewAssignment === 'off'
+      ? null
+      : {
+          automaticReviews: peerReviewAssignment === 'automatically',
+          count: peerReviewsPerStudent,
+          enabled: true,
+          dueAt: peerReviewDueDate || null,
+        }
+  }
+
+  const prepareAssignmentPayload = () => {
+    return isGraded
+      ? {
+          courseId: ENV.context_id,
+          name: title,
+          pointsPossible,
+          gradingType: displayGradeAs,
+          assignmentGroupId: assignmentGroup,
+          peerReviews: preparePeerReviewPayload(),
+        }
+      : null
+  }
+
   const submitForm = shouldPublish => {
     if (validateFormFields()) {
       onSubmit({
@@ -252,6 +276,7 @@ export default function DiscussionTopicForm({
         shouldPublish,
         locked,
         isAnnouncement,
+        assignment: prepareAssignmentPayload(),
       })
       return true
     }

@@ -16,4 +16,56 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
+<script>
+  // shim a Storage object so that localStorage etc
+  // can work without errors in a cross-origin iframe
+  const getStorage = () => {
+    let _data = {}
+    const storage = {
+      getItem(key) {
+        return key in _data ? _data[key] : null
+      },
+      setItem(key, value) {
+        _data[key] = String(value)
+      },
+      removeItem(key) {
+        delete _data[key]
+      },
+      clear() {
+        _data = {}
+      },
+      get length() {
+        return Object.keys(_data).length
+      },
+      key(index) {
+        const keys = Object.keys(_data)
+        return keys[index] || null
+      },
+    }
+  
+    const proxy = {
+      get(target, key) {
+        // allow standard getItem/etc usage
+        if (Object.keys(target).includes(key)) {
+          return Reflect.get(target, key)
+        }
+        // allow using dot notation
+        return target.getItem(key)
+      },
+      set(target, key, value) {
+        target.setItem(key, value)
+        return true
+      },
+      deleteProperty: (target, key) => {
+        target.removeItem(key)
+        return true
+      },
+    }
+
+    return new Proxy(storage, proxy)
+  }
+
+  Object.defineProperty(window, 'localStorage', {value: getStorage()})
+  Object.defineProperty(window, 'sessionStorage', {value: getStorage()})
+</script>
 <% js_bundle(:post_message_forwarding) %>

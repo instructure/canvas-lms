@@ -153,7 +153,7 @@ describe "conversations new" do
         # must drill down
         f("input[placeholder='Select Course']").click
         fj("li:contains('#{@course.name}')").click
-        ff("input[aria-label='Address Book']")[1].click
+        ff("input[aria-label='Search']")[1].click
         fj("li:contains('Students')").click
         fj("li:contains('third student')").click
         fj("label:contains('Add as a Faculty Journal entry')").click
@@ -169,7 +169,7 @@ describe "conversations new" do
         f("button[data-testid='compose']").click
         f("input[placeholder='Select Course']").click
         fj("li:contains('#{@course.name}')").click
-        ff("input[aria-label='Address Book']")[1].click
+        ff("input[aria-label='Search']")[1].click
         fj("li:contains('Student Groups')").click
         wait_for_ajaximations
         fj("li:contains('#{@group.name}')").click
@@ -187,7 +187,7 @@ describe "conversations new" do
         f("button[data-testid='compose']").click
         f("input[placeholder='Select Course']").click
         fj("li:contains('#{@course.name}')").click
-        ff("input[aria-label='Address Book']")[1].click
+        ff("input[aria-label='Search']")[1].click
         fj("li:contains('Students')").click
         wait_for_ajaximations
         fj("li:contains('#{@s2.name}')").click
@@ -203,7 +203,7 @@ describe "conversations new" do
         f("button[data-testid='compose']").click
         f("input[placeholder='Select Course']").click
         fj("li:contains('#{@course.name}')").click
-        ff("input[aria-label='Address Book']")[1].click
+        ff("input[aria-label='Search']")[1].click
         fj("li:contains('Students')").click
         wait_for_ajaximations
         fj("li:contains('#{@s2.name}')").click
@@ -217,7 +217,7 @@ describe "conversations new" do
         f("button[data-testid='compose']").click
         f("input[placeholder='Select Course']").click
         fj("li:contains('#{@course.name}')").click
-        ff("input[aria-label='Address Book']")[1].click
+        ff("input[aria-label='Search']")[1].click
         fj("li:contains('Teachers')").click
         wait_for_ajaximations
         fj("li:contains('#{@teacher.name}')").click

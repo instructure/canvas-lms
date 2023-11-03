@@ -23,8 +23,10 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import * as miscUtils from '../../utils/miscHelpers'
 import * as moduleUtils from '../../utils/moduleHelpers'
 import * as alerts from '@canvas/alerts/react/FlashAlert'
+import RelockModulesDialog from '@canvas/context-modules/backbone/views/RelockModulesDialog'
 
 jest.mock('@canvas/do-fetch-api-effect')
+jest.mock('@canvas/context-modules/backbone/views/RelockModulesDialog')
 
 describe('SettingsPanel', () => {
   const props: SettingsPanelProps = {
@@ -103,6 +105,7 @@ describe('SettingsPanel', () => {
     })
 
     beforeEach(() => {
+      jest.clearAllMocks()
       doFetchApi.mockReset()
     })
 
@@ -172,6 +175,13 @@ describe('SettingsPanel', () => {
           message: 'Error updating Week 1 settings.',
         })
       })
+    })
+
+    it('calls the render function on the re-lock dialog', async () => {
+      doFetchApi.mockResolvedValue({response: {ok: true}, json: {}})
+      const {getByRole} = renderComponent()
+      getByRole('button', {name: 'Update Module'}).click()
+      await waitFor(() => expect(RelockModulesDialog.prototype.renderIfNeeded).toHaveBeenCalled())
     })
   })
 

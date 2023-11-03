@@ -139,6 +139,7 @@ export default function DiscussionTopicFormContainer({apolloClient}) {
         locked,
         isAnnouncement,
         groupCategoryId,
+        assignment,
       }) => {
         if (isEditing) {
           updateDiscussionTopic({
@@ -181,6 +182,7 @@ export default function DiscussionTopicFormContainer({apolloClient}) {
               locked,
               isAnnouncement,
               groupCategoryId: groupCategoryId || null,
+              assignment,
             },
           })
         }

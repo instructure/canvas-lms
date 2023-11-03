@@ -27,7 +27,7 @@ module Gradebook
     def to_h
       scores = Score
                .where(enrollment_id: enrollment_ids_to_user_ids.keys)
-               .where.not(override_score: nil)
+               .where.not(override_score: nil, custom_grade_status_id: nil)
                .to_a
 
       scores.each_with_object({}) do |score, map|

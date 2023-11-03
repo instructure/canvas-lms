@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import type {QueryKey} from '@tanstack/react-query'
+
 const urls = {
   content_shares: '/api/v1/users/self/content_shares/unread_count',
   conversations: '/api/v1/conversations/unread_count',
@@ -26,12 +28,10 @@ const unreadCountTypes = Object.keys(urls) as (keyof typeof urls)[]
 
 type UnreadCountType = (typeof unreadCountTypes)[number]
 
-export function getUnreadCount({
-  queryKey,
-}: {
-  queryKey: ['unread_count', UnreadCountType]
-}): Promise<number> {
-  const unreadCountType = queryKey[1]
+// e.g. ['unread_count', 'conversations']
+export function getUnreadCount({queryKey}: {queryKey: QueryKey}): Promise<number> {
+  const unreadCountType = queryKey[1] as UnreadCountType
+
   if (!unreadCountTypes.includes(unreadCountType)) {
     throw new Error('Invalid unread count key')
   }

@@ -20,9 +20,9 @@ import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {List} from '@instructure/ui-list'
 import {Link} from '@instructure/ui-link'
-import {useQuery} from '@tanstack/react-query'
+import {useQuery} from '@canvas/query'
 import {Spinner} from '@instructure/ui-spinner'
-import coursesQuery from '../queries/coursesQuery'
+import coursesQuery, {hideHomeroomCourseIfK5Student} from '../queries/coursesQuery'
 import {Text} from '@instructure/ui-text'
 import {ActiveText} from './utils'
 
@@ -32,6 +32,8 @@ export default function CoursesList() {
   const {data, isLoading, isSuccess} = useQuery({
     queryKey: ['courses'],
     queryFn: coursesQuery,
+    fetchAtLeastOnce: true,
+    select: courses => courses.filter(hideHomeroomCourseIfK5Student),
   })
 
   const k5User = window.ENV.K5_USER
@@ -61,13 +63,7 @@ export default function CoursesList() {
           ))
           .concat([
             <List.Item key="all">
-              <Link
-                href="/courses"
-                isWithinText={false}
-                display="block"
-                // @ts-expect-error
-                textAlign="start"
-              >
+              <Link href="/courses" isWithinText={false} display="block">
                 {k5User ? I18n.t('All Subjects') : I18n.t('All Courses')}
               </Link>
             </List.Item>,

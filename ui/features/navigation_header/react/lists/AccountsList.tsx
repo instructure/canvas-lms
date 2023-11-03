@@ -20,7 +20,7 @@ import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {List} from '@instructure/ui-list'
 import {Link} from '@instructure/ui-link'
-import {useQuery} from '@tanstack/react-query'
+import {useQuery} from '@canvas/query'
 import {Spinner} from '@instructure/ui-spinner'
 import {ActiveText} from './utils'
 import accountsQuery from '../queries/accountsQuery'
@@ -31,6 +31,7 @@ export default function CoursesList() {
   const {data, isLoading, isSuccess} = useQuery({
     queryKey: ['accounts'],
     queryFn: accountsQuery,
+    fetchAtLeastOnce: true,
   })
 
   return (

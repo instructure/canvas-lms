@@ -99,14 +99,6 @@ module Api::V1::Assignment
     grader_names_visible_to_final_grader
   ].freeze
 
-  ASSIGNMENT_DATE_DETAILS_FIELDS = %w[
-    id
-    due_at
-    unlock_at
-    lock_at
-    only_visible_to_overrides
-  ].freeze
-
   def assignments_json(assignments, user, session, opts = {})
     # check if all assignments being serialized belong to the same course
     contexts = assignments.map { |a| [a.context_id, a.context_type] }.uniq
@@ -484,10 +476,6 @@ module Api::V1::Assignment
     hash
   end
 
-  def assignment_date_details_json(assignment, user, session)
-    api_json(assignment, user, session, only: ASSIGNMENT_DATE_DETAILS_FIELDS)
-  end
-
   def turnitin_settings_json(assignment)
     settings = assignment.turnitin_settings.with_indifferent_access
     %i[s_paper_check internet_check journal_check exclude_biblio exclude_quoted submit_papers_to].each do |key|
@@ -644,8 +632,22 @@ module Api::V1::Assignment
       data = JSON.parse(res.body)
 
       unless data.empty?
+        copy_values = {}
+        source_course = nil
+        data.each do |key, _|
+          import_object = Context.find_asset_by_url(key)
+          if import_object.is_a?(WikiPage)
+            copy_values[:wiki_pages] ||= []
+            copy_values[:wiki_pages] << CC::CCHelper.create_key(import_object, global: use_global_identifiers)
+            source_course ||= import_object.context
+          elsif import_object.is_a?(Attachment)
+            copy_values[:attachments] ||= []
+            copy_values[:attachments] << CC::CCHelper.create_key(import_object, global: use_global_identifiers)
+            source_course ||= import_object.context
+          end
+        end
+
         migration_type = "course_copy_importer"
-        source_course = assignment.duplicate_of.context
         plugin = Canvas::Plugin.find(migration_type)
         content_migration = context.content_migrations.build(
           user:,
@@ -662,18 +664,7 @@ module Api::V1::Assignment
         content_migration.migration_settings[:import_immediately] = false
         content_migration.save
 
-        copy_values = {}
         use_global_identifiers = content_migration.use_global_identifiers?
-        data.each do |key, _|
-          import_object = Context.find_asset_by_url(key)
-          if import_object.is_a?(WikiPage)
-            copy_values[:wiki_pages] ||= []
-            copy_values[:wiki_pages] << CC::CCHelper.create_key(import_object, global: use_global_identifiers)
-          elsif import_object.is_a?(Attachment)
-            copy_values[:attachments] ||= []
-            copy_values[:attachments] << CC::CCHelper.create_key(import_object, global: use_global_identifiers)
-          end
-        end
 
         copy_options = ContentMigration.process_copy_params(copy_values, global_identifiers: use_global_identifiers)
         content_migration.migration_settings[:migration_ids_to_import] ||= {}

@@ -85,7 +85,7 @@ module Lti
           end
         end
 
-        context "whith a message type that does not allow content selection" do
+        context "with a message type that does not allow content selection" do
           it "does not set selection properties" do
             expect(subject.dig(:placements, :assignment_selection, :selection_width)).to be_nil
           end
@@ -258,6 +258,34 @@ module Lti
           expect(page1.count).to eq 3
           expect(page2.count).to eq 3
           expect(page1.first).to_not eq page2.first
+        end
+      end
+    end
+
+    describe "#launch definitions with a launch placement type" do
+      subject do
+        Lti::AppLaunchCollator.launch_definitions(
+          [tool],
+          [placement]
+        ).first
+      end
+
+      context "with assignment_edit placement" do
+        let(:placement) { :assignment_edit }
+        let(:tool) do
+          new_valid_external_tool(account)
+        end
+
+        it "retains the launch_height property" do
+          tool.assignment_edit = {
+            enabled: true,
+            url: "https://www.test.tool.com",
+            message_type: "LtiResourceLinkRequest",
+            launch_width: 300,
+            launch_height: 300
+          }
+          tool.save!
+          expect(subject.dig(:placements, :assignment_edit, :launch_height)).to eq 300
         end
       end
     end

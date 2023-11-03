@@ -66,5 +66,29 @@ module OpenAi
       vector_schema = ActiveRecord::Base.connection.extension("vector").schema
       ActiveRecord::Base.connection.add_schema_to_search_path(vector_schema, &)
     end
+
+    def index_account(root_account)
+      return unless smart_search_available?(root_account)
+
+      # by default, index all courses updated in the last year
+      date_cutoff = Setting.get("smart_search_index_days_ago", "365").to_i.days.ago
+      root_account.all_courses.active.where(updated_at: date_cutoff..).find_each do |course|
+        delay(priority: Delayed::LOW_PRIORITY,
+              singleton: "smart_search_index_course:#{course.global_id}",
+              n_strand: "smart_search_index_course").index_course(course)
+      end
+    end
+    handle_asynchronously :index_account, priority: Delayed::LOW_PRIORITY
+
+    def index_course(course)
+      return unless smart_search_available?(course.root_account)
+
+      # index non-deleted pages (that have not already been indexed)
+      course.wiki_pages.not_deleted
+            .where.missing(:wiki_page_embeddings)
+            .find_each do |page|
+        page.generate_embeddings(synchronous: true)
+      end
+    end
   end
 end

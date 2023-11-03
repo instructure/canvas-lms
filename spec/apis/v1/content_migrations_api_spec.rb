@@ -907,9 +907,8 @@ describe ContentMigrationsController, type: :request do
       @src = course_factory active_all: true
       @ann = @src.announcements.create! title: "ann", message: "ohai"
       @assign = @src.assignments.create! name: "assign"
-      @shell_assign = @src.assignments.create!
-      @assign_topic = @src.discussion_topics.create! message: "assigned", assignment_id: @shell_assign.id
-      @shell_assign.update!(submission_types: "discussion_topic")
+      @shell_assign = @src.assignments.create! submission_types: "discussion_topic", description: "assigned"
+      @assign_topic = @shell_assign.discussion_topic
       @mod = @src.context_modules.create! name: "mod"
       @tag = @mod.add_item type: "sub_header", title: "blah"
       @page = @src.wiki_pages.create! title: "der page"

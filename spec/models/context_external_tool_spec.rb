@@ -62,7 +62,7 @@ describe ContextExternalTool do
         name: "Requires Permission",
         consumer_key: "key",
         shared_secret: "secret",
-        domain: "requires.permision.com",
+        domain: "requires.permission.com",
         settings: {
           global_navigation: {
             "required_permissions" => required_permission,
@@ -149,7 +149,7 @@ describe ContextExternalTool do
         name: "Requires Permission",
         consumer_key: "key",
         shared_secret: "secret",
-        domain: "requires.permision.com",
+        domain: "requires.permission.com",
         settings: {
           global_navigation: {
             "required_permissions" => required_permission,
@@ -165,7 +165,7 @@ describe ContextExternalTool do
         name: "No Requires Permission",
         consumer_key: "key",
         shared_secret: "secret",
-        domain: "no.requires.permision.com",
+        domain: "no.requires.permission.com",
         settings: {
           global_navigation: {
             text: "Global Navigation (no permission)",
@@ -1349,7 +1349,7 @@ describe ContextExternalTool do
       end
 
       context "and an LTI 1.1 tool has a conflicting URL" do
-        before { tool } # intitialized already, but included for clarity
+        before { tool } # initialized already, but included for clarity
 
         it { is_expected.to eq lti_1_3_tool }
 
@@ -2360,7 +2360,7 @@ describe ContextExternalTool do
       expect(ContextExternalTool.where(context: @course).placements("resource_selection").to_a).to eql([tool3])
     end
 
-    it "doesn't return not selectable tools placements for moudle_item" do
+    it "doesn't return not selectable tools placements for module_item" do
       tool1 = @course.context_external_tools.create!(name: "First Tool", url: "http://www.example.com", consumer_key: "key", shared_secret: "secret")
       tool2 = @course.context_external_tools.new(name: "Another Tool", consumer_key: "key", shared_secret: "secret")
       tool2.settings[:editor_button] = { url: "http://www.example.com", icon_url: "http://www.example.com", selection_width: 100, selection_height: 100 }.with_indifferent_access
@@ -2688,6 +2688,12 @@ describe ContextExternalTool do
       expect(tool.editor_button).not_to be_nil
     end
 
+    it "gets and keeps launch_height setting from extension" do
+      tool.course_navigation = { enabled: true, launch_height: 200 }
+      tool.save
+      expect(tool.course_navigation[:launch_height]).to be 200
+    end
+
     context "placement enabled setting" do
       context "when placement has enabled defined" do
         before do
@@ -2834,7 +2840,7 @@ describe ContextExternalTool do
   end
 
   describe "#extension_default_value" do
-    it "returns resource_selection when the type is 'resource_slection'" do
+    it "returns resource_selection when the type is 'resource_selection'" do
       expect(subject.extension_default_value(:resource_selection, :message_type)).to eq "resource_selection"
     end
   end

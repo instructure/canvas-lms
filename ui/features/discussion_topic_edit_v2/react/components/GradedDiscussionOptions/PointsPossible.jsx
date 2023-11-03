@@ -26,6 +26,7 @@ const I18n = useI18nScope('discussion_create')
 export const PointsPossible = ({pointsPossible, setPointsPossible}) => {
   return (
     <NumberInput
+      data-testid="points-possible-input"
       renderLabel={I18n.t('Points Possible')}
       onIncrement={() => setPointsPossible(pointsPossible + 1)}
       onDecrement={() => setPointsPossible(pointsPossible - 1)}

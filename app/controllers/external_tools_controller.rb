@@ -580,6 +580,12 @@ class ExternalToolsController < ApplicationController
     @return_url ||= url_for(@context)
     message_type = tool.extension_setting(selection_type, "message_type") if selection_type
     log_asset_access(@tool, "external_tools", "external_tools") if post_live_event
+
+    if tool.root_account.feature_enabled?(:lti_unique_tool_form_ids)
+      @tool_form_id = random_lti_tool_form_id
+      js_env(LTI_TOOL_FORM_ID: @tool_form_id)
+    end
+
     case message_type
     when "ContentItemSelectionResponse", "ContentItemSelection"
       # ContentItemSelectionResponse is deprecated, use ContentItemSelection instead
@@ -1466,6 +1472,10 @@ class ExternalToolsController < ApplicationController
     module_item = options[:module_item]
     assignment = options[:assignment]
     resource_link_lookup_uuid = options[:resource_link_lookup_uuid]
+
+    if assignment.present? && @current_user.present?
+      assignment = AssignmentOverrideApplicator.assignment_overridden_for(assignment, @current_user)
+    end
 
     unless tool_id || launch_url || module_item || resource_link_lookup_uuid
       message = "A tool id, tool url, module item id, or resource link lookup uuid must be provided"

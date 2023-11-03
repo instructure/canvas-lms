@@ -120,32 +120,36 @@ export function TotalGradeOverrideTray({
     const gradingPeriodId = getNullableSelectedGradingPeriodId()
     await saveFinalOverrideCustomStatus(newCustomStatusId, enrollmentId, gradingPeriodId)
 
-    const finalGradeOverrideToUpdate = {...finalGradeOverrides[studentInfo.id]}
-    if (!gradingPeriodId && finalGradeOverrideToUpdate.courseGrade) {
-      finalGradeOverrideToUpdate.courseGrade.customGradeStatusId = newCustomStatusId
-    } else if (
-      gradingPeriodId &&
-      finalGradeOverrideToUpdate.gradingPeriodGrades?.[gradingPeriodId]
-    ) {
+    const {id: studentId} = studentInfo
+    const finalGradeOverrideToUpdate = finalGradeOverrides[studentId] ?? {}
+
+    if (gradingPeriodId) {
+      if (!finalGradeOverrideToUpdate.gradingPeriodGrades?.[gradingPeriodId]) {
+        finalGradeOverrideToUpdate.gradingPeriodGrades = {
+          [gradingPeriodId]: {},
+        }
+      }
+
       finalGradeOverrideToUpdate.gradingPeriodGrades[gradingPeriodId].customGradeStatusId =
         newCustomStatusId
+    } else {
+      if (!finalGradeOverrideToUpdate.courseGrade) {
+        finalGradeOverrideToUpdate.courseGrade = {}
+      }
+
+      finalGradeOverrideToUpdate.courseGrade.customGradeStatusId = newCustomStatusId
     }
 
     useStore.setState({
       finalGradeOverrides: {
         ...finalGradeOverrides,
-        finalGradeOverrideToUpdate,
+        [studentId]: finalGradeOverrideToUpdate,
       },
     })
   }
 
   const studentFinalGradeOverrides = finalGradeOverrides[studentId]
   const gradingPeriodId = getNullableSelectedGradingPeriodId()
-  const percentage = gradingPeriodId
-    ? studentFinalGradeOverrides?.gradingPeriodGrades?.[gradingPeriodId]?.percentage
-    : studentFinalGradeOverrides?.courseGrade?.percentage
-
-  const radioInputDisabled = percentage == null || saveCallStatus === ApiCallStatus.PENDING
 
   return (
     <Tray
@@ -214,7 +218,7 @@ export function TotalGradeOverrideTray({
 
               <View as="div" margin="medium 0">
                 <GradeOverrideTrayRadioInputGroup
-                  disabled={radioInputDisabled}
+                  disabled={saveCallStatus === ApiCallStatus.PENDING}
                   handleRadioInputChanged={handleRadioInputChanged}
                   customGradeStatuses={customGradeStatuses}
                   selectedCustomStatusId={selectedCustomStatusId}

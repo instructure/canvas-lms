@@ -29,11 +29,11 @@ const gradedDiscussionOptions = [
     label: I18n.t('Points'),
   },
   {
-    id: 'percentage',
+    id: 'percent',
     label: I18n.t('Percentage'),
   },
   {
-    id: 'complete_incomplete',
+    id: 'pass_fail',
     label: I18n.t('Complete/Incomplete'),
   },
   {

@@ -24,6 +24,7 @@ import rceFormatMessage from '@instructure/canvas-rce/es/format-message'
 import {up as configureDateTime} from '../ui/boot/initializers/configureDateTime'
 import {up as configureDateTimeMomentParser} from '../ui/boot/initializers/configureDateTimeMomentParser'
 import {useTranslations} from '@canvas/i18n'
+import MockBroadcastChannel from './MockBroadcastChannel'
 
 useTranslations('en', CoreTranslations)
 
@@ -51,9 +52,7 @@ const ignoredErrors = [
   /You seem to have overlapping act\(\) calls/,
 ]
 const globalWarn = global.console.warn
-const ignoredWarnings = [
-  /value provided is not in a recognized RFC2822 or ISO format/,
-]
+const ignoredWarnings = [/value provided is not in a recognized RFC2822 or ISO format/]
 global.console = {
   log: console.log,
   error: error => {
@@ -191,7 +190,12 @@ if (!('matchMedia' in window)) {
   window.matchMedia._mocked = true
 }
 
+global.BroadcastChannel = global.BroadcastChannel || MockBroadcastChannel
+
 global.DataTransferItem = global.DataTransferItem || class DataTransferItem {}
+
+global.performance = global.performance || {}
+global.performance.getEntriesByType = global.performance.getEntriesByType || (() => [])
 
 if (!('scrollIntoView' in window.HTMLElement.prototype)) {
   window.HTMLElement.prototype.scrollIntoView = () => {}

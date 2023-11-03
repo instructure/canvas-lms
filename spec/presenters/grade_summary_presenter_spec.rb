@@ -591,11 +591,8 @@ describe GradeSummaryPresenter do
 
           let(:assignment_owning_discussion_topic) do
             assignment = @course.assignments.create!(submission_types: "discussion_topic")
-            discussion = @course.discussion_topics.create!
-            assignment.discussion_topic = discussion
-            assignment.save!
             discussion_context_module_tag =
-              discussion.context_module_tags.build(context: @course, position: 5, tag_type: "context_module")
+              assignment.discussion_topic.context_module_tags.build(context: @course, position: 5, tag_type: "context_module")
             discussion_context_module_tag.context_module = first_context_module
             discussion_context_module_tag.save!
             assignment

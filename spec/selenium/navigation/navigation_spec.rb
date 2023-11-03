@@ -87,7 +87,7 @@ describe "Global Navigation" do
         f("#global_nav_groups_link").click
         wait_for_ajaximations
         links = ff('[aria-label="Groups tray"] li a')
-        expect(links.map(&:text)).to eq(["Z Current Group", "All Groups"])
+        expect(links.map(&:text)).to eq(["All Groups", "Z Current Group"])
       end
     end
 

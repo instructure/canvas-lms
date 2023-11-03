@@ -46,6 +46,22 @@ describe DiscussionTopic do
       )
   end
 
+  describe ".preload_subentry_counts" do
+    it "preloads the discussion subentry count" do
+      topic1 = @course.discussion_topics.create!
+      topic1.discussion_entries.create!(user: @teacher)
+      topic2 = @course.discussion_topics.create!
+
+      DiscussionTopic.preload_subentry_counts([topic1, topic2])
+      aggregate_failures do
+        expect(topic1.instance_variable_get(:@preloaded_subentry_count)).to eq 1
+        expect(topic1.discussion_subentry_count).to eq 1
+        expect(topic2.instance_variable_get(:@preloaded_subentry_count)).to eq 0
+        expect(topic2.discussion_subentry_count).to eq 0
+      end
+    end
+  end
+
   describe "#grading_standard_or_default" do
     context "when the DiscussionTopic belongs to a Course" do
       before(:once) do

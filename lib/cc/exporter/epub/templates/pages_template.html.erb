@@ -1,2 +1,2 @@
 <h2 id="<%="#{item[:identifier]}"%>"><%= HtmlTextHelper.escape_html(item[:title]) %></h2>
-<p><%= convert_placeholder_paths_from_string!(item[:text]) %></p>
+<%= convert_placeholder_paths_from_string!(item[:text]) %>
