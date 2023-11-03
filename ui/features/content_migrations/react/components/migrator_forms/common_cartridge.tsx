@@ -54,7 +54,7 @@ const CommonCartridgeImporter = ({onSubmit, onCancel}: CommonCartridgeImporterPr
       <QuestionBankSelector onChange={setQuestionBankSettings} />
       <CommonMigratorControls
         canSelectContent={true}
-        canImportAsNewQuizzes={true}
+        canImportAsNewQuizzes={ENV.NEW_QUIZZES_IMPORT}
         canOverwriteAssessmentContent={true}
         canAdjustDates={true}
         onSubmit={handleSubmit}

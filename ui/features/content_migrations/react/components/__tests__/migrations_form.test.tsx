@@ -37,8 +37,10 @@ const renderComponent = (overrideProps?: any) =>
 describe('ContentMigrationForm', () => {
   beforeEach(() => {
     window.ENV.COURSE_ID = '0'
+    window.ENV.NEW_QUIZZES_MIGRATION = true
     // @ts-expect-error
     window.ENV.current_user = {id: '1'}
+
     fetchMock.mock('/api/v1/courses/0/content_migrations/migrators', [
       {
         name: 'Copy a Canvas Course',
@@ -60,7 +62,7 @@ describe('ContentMigrationForm', () => {
         overwriteRoutes: true,
       }
     )
-    fetchMock.mock('/users/1/manageable_courses?term=MyCourse', [{id: '3', label: 'MyCourse'}])
+    fetchMock.mock(/users\/1\/manageable_courses\?term=(.*)/, [{id: '3', label: 'MyCourse'}])
   })
 
   afterEach(() => {

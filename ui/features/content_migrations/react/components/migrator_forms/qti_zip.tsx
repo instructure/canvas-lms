@@ -53,7 +53,7 @@ const QTIZipImporter = ({onSubmit, onCancel}: QTIZipImporterProps) => {
       <MigrationFileInput onChange={setFile} />
       <QuestionBankSelector onChange={setQuestionBankSettings} />
       <CommonMigratorControls
-        canImportAsNewQuizzes={true}
+        canImportAsNewQuizzes={ENV.NEW_QUIZZES_IMPORT}
         canOverwriteAssessmentContent={true}
         onSubmit={handleSubmit}
         onCancel={onCancel}

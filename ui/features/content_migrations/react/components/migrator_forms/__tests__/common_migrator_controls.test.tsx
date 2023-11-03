@@ -28,10 +28,15 @@ const renderComponent = (overrideProps?: any) =>
   render(<CommonMigratorControls onSubmit={onSubmit} onCancel={onCancel} {...overrideProps} />)
 
 describe('CommonMigratorControls', () => {
+  beforeAll(() => {
+    window.ENV.QUIZZES_NEXT_ENABLED = true
+    window.ENV.NEW_QUIZZES_MIGRATION_DEFAULT = false
+  })
+
   it('calls onSubmit with import_quizzes_next', () => {
     renderComponent({canImportAsNewQuizzes: true})
 
-    userEvent.click(screen.getByRole('checkbox', {name: 'Import existing quizzes as New Quizzes'}))
+    userEvent.click(screen.getByRole('checkbox', {name: /Import existing quizzes as New Quizzes/}))
     userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
 
     expect(onSubmit).toHaveBeenCalledWith(
@@ -45,7 +50,7 @@ describe('CommonMigratorControls', () => {
     renderComponent({canOverwriteAssessmentContent: true})
 
     userEvent.click(
-      screen.getByRole('checkbox', {name: 'Overwrite assessment content with matching IDs'})
+      screen.getByRole('checkbox', {name: /Overwrite assessment content with matching IDs/})
     )
     userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
 

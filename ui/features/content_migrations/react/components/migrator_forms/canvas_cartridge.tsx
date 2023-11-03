@@ -48,7 +48,7 @@ const CanvasCartridgeImporter = ({onSubmit, onCancel}: CanvasCartridgeImporterPr
       <MigrationFileInput onChange={setFile} />
       <CommonMigratorControls
         canSelectContent={true}
-        canImportAsNewQuizzes={true}
+        canImportAsNewQuizzes={ENV.NEW_QUIZZES_MIGRATION}
         canAdjustDates={true}
         onSubmit={handleSubmit}
         onCancel={onCancel}
