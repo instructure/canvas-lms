@@ -16,15 +16,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ACTION_NAMES from '../actions/developerKeysActions'
+import ACTION_NAMES, {
+  DeveloperKeyActionNames,
+  ToActionCreatorName,
+  actions,
+} from '../actions/developerKeysActions'
+import {makeReducer} from './makeReducer'
+
+interface MakeVisibleReducerState {
+  makeVisibleDeveloperKeyPending: boolean
+  makeVisibleDeveloperKeySuccessful: boolean
+  makeVisibleDeveloperKeyError: unknown
+}
 
 const initialState = {
   makeVisibleDeveloperKeyPending: false,
   makeVisibleDeveloperKeySuccessful: false,
-  makeVisibleDeveloperKeyError: null,
+  makeVisibleDeveloperKeyError: null as unknown,
 }
 
-const developerKeysHandlers = {
+export default makeReducer(initialState, {
   [ACTION_NAMES.MAKE_VISIBLE_DEVELOPER_KEY_START]: (state, _action) => ({
     ...state,
     makeVisibleDeveloperKeyPending: true,
@@ -41,12 +52,4 @@ const developerKeysHandlers = {
     makeVisibleDeveloperKeyPending: false,
     makeVisibleDeveloperKeyError: action.payload,
   }),
-}
-
-export default (state = initialState, action) => {
-  if (developerKeysHandlers[action.type]) {
-    return developerKeysHandlers[action.type](state, action)
-  } else {
-    return state
-  }
-}
+})

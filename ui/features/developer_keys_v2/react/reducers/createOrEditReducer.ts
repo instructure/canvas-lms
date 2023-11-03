@@ -16,9 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {DeveloperKey} from '../../model/DeveloperKey'
 import ACTION_NAMES from '../actions/developerKeysActions'
+import {makeReducer} from './makeReducer'
 
-const initialState = {
+export interface DeveloperKeyCreateOrEditState {
+  developerKeyModalOpen: boolean
+  developerKeyCreateOrEditSuccessful: boolean
+  developerKeyCreateOrEditFailed: boolean
+  developerKeyCreateOrEditPending: boolean
+  developerKey?: DeveloperKey
+  editing: boolean
+  isLtiKey?: boolean
+}
+
+const initialState: DeveloperKeyCreateOrEditState = {
   developerKeyModalOpen: false,
   developerKeyCreateOrEditSuccessful: false,
   developerKeyCreateOrEditFailed: false,
@@ -27,7 +39,7 @@ const initialState = {
   editing: false,
 }
 
-const developerKeysHandlers = {
+export default makeReducer(initialState, {
   [ACTION_NAMES.DEVELOPER_KEYS_MODAL_OPEN]: state => ({
     ...state,
     developerKeyModalOpen: true,
@@ -67,12 +79,4 @@ const developerKeysHandlers = {
     ...state,
     isLtiKey: action.payload,
   }),
-}
-
-export default (state = initialState, action) => {
-  if (developerKeysHandlers[action.type]) {
-    return developerKeysHandlers[action.type](state, action)
-  } else {
-    return state
-  }
-}
+})

@@ -17,14 +17,21 @@
  */
 
 import ACTION_NAMES from '../actions/developerKeysActions'
+import {makeReducer} from './makeReducer'
 
-const initialState = {
+export interface DeleteDeveloperKeyState {
+  deleteDeveloperKeyPending: boolean
+  deleteDeveloperKeySuccessful: boolean
+  deleteDeveloperKeyError: unknown
+}
+
+const initialState: DeleteDeveloperKeyState = {
   deleteDeveloperKeyPending: false,
   deleteDeveloperKeySuccessful: false,
   deleteDeveloperKeyError: null,
 }
 
-const developerKeysHandlers = {
+export default makeReducer(initialState, {
   [ACTION_NAMES.DELETE_DEVELOPER_KEY_START]: (state, _action) => ({
     ...state,
     deleteDeveloperKeyPending: true,
@@ -41,12 +48,4 @@ const developerKeysHandlers = {
     deleteDeveloperKeyPending: false,
     deleteDeveloperKeyError: action.payload,
   }),
-}
-
-export default (state = initialState, action) => {
-  if (developerKeysHandlers[action.type]) {
-    return developerKeysHandlers[action.type](state, action)
-  } else {
-    return state
-  }
-}
+})
