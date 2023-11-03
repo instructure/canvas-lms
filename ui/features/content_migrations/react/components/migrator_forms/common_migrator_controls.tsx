@@ -18,11 +18,14 @@
 
 import React, {useCallback, useMemo, useState} from 'react'
 import {View} from '@instructure/ui-view'
+import {Text} from '@instructure/ui-text'
+import {Link} from '@instructure/ui-link'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {IconAddSolid} from '@instructure/ui-icons'
 import {Checkbox, CheckboxGroup} from '@instructure/ui-checkbox'
 import {Button} from '@instructure/ui-buttons'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
+import {InfoButton} from './info_button'
 import {DateAdjustment} from '../date_adjustment'
 import {onSubmitMigrationFormCallback} from '../types'
 
@@ -36,6 +39,56 @@ type CommonMigratorControlsProps = {
   onSubmit: onSubmitMigrationFormCallback
   onCancel: () => void
 }
+
+const generateNewQuizzesLabel = () => (
+  <>
+    <Text>
+      {I18n.t('Import existing quizzes as ')}
+      <Text weight="bold">{I18n.t('New Quizzes')}</Text>
+    </Text>
+    <span style={{position: 'absolute', marginTop: '-0.55em'}}>
+      <InfoButton
+        heading={I18n.t('New Quizzes')}
+        body={
+          <>
+            <Text>{I18n.t('New Quizzes is the new assessment engine for Canvas.')}</Text>
+            <br />
+            <Text>
+              {I18n.t('To learn more, please contact your system administrator or visit ')}
+            </Text>
+            <Link href={I18n.t('#community.instructor_guide')}>
+              {I18n.t('Canvas Instructor Guide')}
+            </Link>
+            <Text>.</Text>
+          </>
+        }
+        buttonLabel={I18n.t('Import assessment as New Quizzes Help Icon')}
+        modalLabel={I18n.t('Import assessment as New Quizzes Help Modal')}
+      />
+    </span>
+  </>
+)
+
+const generateOverwriteLabel = () => (
+  <>
+    <Text>{I18n.t('Overwrite assessment content with matching IDs')}</Text>
+
+    <span style={{position: 'absolute', marginTop: '-0.55em'}}>
+      <InfoButton
+        heading={I18n.t('Overwrite')}
+        body={
+          <Text>
+            {I18n.t(
+              'Some systems recycle their IDs for each new export. As a result, if you export two separate question banks they will have the same IDs. To prevent losing assessment data we treat these objects as different despite the IDs. Choosing this option will disable this safety feature and allow assessment data to overwrite existing data with the same IDs.'
+            )}
+          </Text>
+        }
+        buttonLabel={I18n.t('Overwrite Assessment Help Icon')}
+        modalLabel={I18n.t('Overwrite Assessment Help Modal')}
+      />
+    </span>
+  </>
+)
 
 export const CommonMigratorControls = ({
   canSelectContent = false,
@@ -77,7 +130,9 @@ export const CommonMigratorControls = ({
           key="existing_quizzes_as_new_quizzes"
           name="existing_quizzes_as_new_quizzes"
           value="existing_quizzes_as_new_quizzes"
-          label={I18n.t('Import existing quizzes as New Quizzes')}
+          label={generateNewQuizzesLabel()}
+          disabled={!ENV.QUIZZES_NEXT_ENABLED}
+          defaultChecked={ENV.NEW_QUIZZES_MIGRATION_DEFAULT}
           onChange={(e: React.SyntheticEvent<Element, Event>) => {
             const target = e.target as HTMLInputElement
             setImportAsNewQuizzes(target.checked)
@@ -90,7 +145,7 @@ export const CommonMigratorControls = ({
           key="overwrite_assessment_content"
           name="overwrite_assessment_content"
           value="overwrite_assessment_content"
-          label={I18n.t('Overwrite assessment content with matching IDs')}
+          label={generateOverwriteLabel()}
           onChange={(e: React.SyntheticEvent<Element, Event>) => {
             const target = e.target as HTMLInputElement
             setOverwriteAssessmentContent(target.checked)

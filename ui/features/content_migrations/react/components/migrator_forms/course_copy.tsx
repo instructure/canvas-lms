@@ -147,7 +147,7 @@ export const CourseCopyImporter = ({onSubmit, onCancel}: CourseCopyImporterProps
       </View>
       <CommonMigratorControls
         canSelectContent={true}
-        canImportAsNewQuizzes={true}
+        canImportAsNewQuizzes={ENV.NEW_QUIZZES_MIGRATION}
         canAdjustDates={true}
         onSubmit={handleSubmit}
         onCancel={onCancel}
