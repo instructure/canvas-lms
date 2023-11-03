@@ -222,3 +222,10 @@ differentiated_modules:
     individuals and groups.
   after_state_change_proc: differentiated_modules_setting_hook
   applies_to: SiteAdmin
+
+learner_passport:
+  state: hidden
+  applies_to: RootAccount
+  root_opt_in: true
+  display_name: Learner Passport Prototype
+  description: An in-progress working prototype of the Learner Passport feature.
