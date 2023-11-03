@@ -119,19 +119,6 @@ describe GradebookUserIds do
 
   let(:gradebook_user_ids) { GradebookUserIds.new(@course, @teacher) }
 
-  it "only returns users belonging to the selected section" do
-    section = @course.course_sections.create!
-    student_in_course(
-      course: @course,
-      user: @student1,
-      section:,
-      active_all: true,
-      allow_multiple_enrollments: true
-    )
-    @teacher.preferences[:gradebook_settings][@course.id][:filter_rows_by][:section_id] = section.id.to_s
-    expect(gradebook_user_ids.user_ids).to eq([@student1.id])
-  end
-
   context "with viewing user's privileges limited" do
     let!(:viewable_section) { @course.course_sections.create! }
 

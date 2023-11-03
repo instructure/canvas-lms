@@ -188,6 +188,7 @@ import {
   escapeStudentContent,
   filterAssignmentsBySubmissionsFn,
   filterStudentBySubmissionFn,
+  filterStudentBySectionFn,
   findFilterValuesOfType,
   findSubmissionFilterValue,
   forEachSubmission,
@@ -1220,16 +1221,16 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       return students.filter(student => this.searchFilteredStudentIds.includes(student.id))
     }
 
-    const filteredStudents = students.filter(
-      filterStudentBySubmissionFn(
-        this.props.appliedFilters,
-        this.submissionStateMap,
-        this.filteredAssignmentIds,
-        this.options.custom_grade_statuses_enabled ? this.options.custom_grade_statuses : []
+    return students
+      .filter(
+        filterStudentBySubmissionFn(
+          this.props.appliedFilters,
+          this.submissionStateMap,
+          this.filteredAssignmentIds,
+          this.options.custom_grade_statuses_enabled ? this.options.custom_grade_statuses : []
+        )
       )
-    )
-
-    return filteredStudents
+      .filter(filterStudentBySectionFn(this.props.appliedFilters))
   }
 
   updateFilteredStudentIds = () => {
@@ -1578,10 +1579,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     if (currentSection !== sectionId) {
       this.setFilterRowsBySetting('sectionId', sectionId)
       this.props.postGradesStore.setSelectedSection(sectionId)
-      return this.saveSettings({}).then(() => {
-        this.updateSectionFilterVisibility()
-        return this.props.reloadStudentData()
-      })
+      this.saveSettings()
     }
   }
 
