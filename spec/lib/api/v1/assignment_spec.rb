@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "../../../spec_helper"
+require "webmock/rspec"
 
 class AssignmentApiHarness
   include Api::V1::Assignment
@@ -913,8 +914,9 @@ describe "Api::V1::Assignment" do
   end
 
   describe "#update_api_assignment" do
-    subject { api.update_api_assignment(assignment, assignment_update_params, user) }
+    subject { api.update_api_assignment(assignment, assignment_update_params, user, assignment.context, opts) }
 
+    let(:opts) { {} }
     let(:user) { user_model }
 
     context "when param[force_updated_at] is true" do
@@ -951,6 +953,37 @@ describe "Api::V1::Assignment" do
 
         it "sets updated_at" do
           expect { subject }.to change { assignment.updated_at }
+        end
+      end
+    end
+
+    context "when param[migrated_urls_report_url] is set" do
+      let(:report_url) { "http://example.com/some-report.json" }
+      let(:session) { Object.new }
+
+      let(:assignment_update_params) do
+        ActionController::Parameters.new(
+          migrated_urls_report_url: report_url
+        )
+      end
+
+      context "and no assignment changes are made" do
+        it "does create migration" do
+          wiki_page = assignment.context.wiki_pages.build(title: "title")
+          wiki_page.body = "body"
+          wiki_page.workflow_state = "active"
+          wiki_page.save!
+
+          response_body = { "courses/#{assignment.context.id}/pages/#{wiki_page.url}" => "" }.to_json
+          stub_request(:get, report_url).to_return(status: 200, body: response_body, headers: {})
+
+          expect { subject }.not_to change { assignment.updated_at }
+
+          expect(subject).to eq :ok
+
+          json = api.assignment_json(assignment, user, session, opts)
+          expect(json).to be_a(Hash)
+          expect(json).to have_key "migrated_urls_content_migration_id"
         end
       end
     end
