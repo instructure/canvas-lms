@@ -658,6 +658,8 @@ module Api::V1::Assignment
           end
         end
 
+        return response if source_course.nil?
+
         content_migration.update_migration_settings({
                                                       import_quizzes_next: false,
                                                       source_course_id: source_course.id
