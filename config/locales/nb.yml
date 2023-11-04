@@ -2221,6 +2221,7 @@ nb:
   add_app_baf540f: "Legg til app"
   add_as_a_faculty_journal_entry_55a38a30: "Legg til som lærerloggoppføring"
   add_as_allowed_e95540be: "Legg til som Tillatt"
+  add_assignment_da1c1529: "Legg til oppgave"
   add_assignment_to_name_caf173b0: "Legg oppgave til %{name}"
   add_assignments_and_quizzes_1085d2af: "Legg til oppgaver og quizer"
   add_attachment_93868828: "Legg til vedlegg"
@@ -2302,6 +2303,7 @@ nb:
   add_moderator_review_copy_1st_a484c813: "Legg til vurdering fra moderator (1. kopi)"
   add_moderator_review_copy_2nd_e80d458f: "Legg til vurdering fra moderator (2. kopi) "
   add_moderator_review_new_3c183cea: "Legg til vurdering fra moderator (ny)"
+  add_module_5ad6fee2: "Legg til modul"
   add_module_item: 
     add_assignment_to: "Legge et oppdrag til %{module}"
     add_file_to: "Legg filer til  %{module}"
@@ -2463,6 +2465,7 @@ nb:
   admins_3e1dce15: Administratorer
   admins_add_remove_26811ce5: "Admin - legg til / fjern"
   advanced_36b35b8: Avanserte
+  advanced_analytics_course_readiness_closed_alpha_13c8aaf: "Avansert analyse – Emnetilgjengelighet lukket alfa"
   advertise_release_notes_via_the_ui_9254bc6c: "Annonser versjonsmerkander via brukergrensesnittet"
   affects_viewing_the_conclude_course_and_permanentl_8216fcc2: "Påvirker visningen av knappene “Fullfør emne” og “Slett dette emnet permanent”. Slett dette emnet permanent-knappen vises kun for manuelt opprettede emner."
   affects_viewing_the_conclude_course_and_permanentl_d943656e: "Påvirker visningen av knappene “Fullfør emne” og “Slett dette emnet permanent”. “Slett dette emnet permanent”-knappen vises kun for manuelt opprettede emner.\n\
@@ -3891,6 +3894,7 @@ nb:
   archive_operation_failed_5504706: "Arkivering mislyktes"
   archive_selected_d64506ca: "Arkiv valgt"
   archived_de543437: Arkivert
+  archived_grading_schemes_6d698d0: "Arkiverte vurderingsskalaer"
   are_you_sure_26795d3c: "Er du sikker?"
   are_you_sure_that_you_want_to_remove_these_count_o_67ef2d6c: 
     one: "Er du sikker på at du vil fjerne dette læringsmålet fra denne kontoen?"
@@ -4248,6 +4252,7 @@ nb:
   assignment_score_summary_f1dc9708: "Poenggiving for oppgave"
   assignment_selection_6bff05c4: Oppgave-utvalg
   assignment_set_set_index_28b1f973: "Oppgavesett %{set_index}"
+  assignment_settings_5ee5ee77: Oppgaveinnstillinger
   assignment_submissions_uploaded_ba0dbc84: "%{assignment}: Innleveringer lastet opp"
   assignment_title_82b4422e: "Oppgavetittel:"
   assignment_title_8a707dd2: oppgavenavn
@@ -6209,6 +6214,7 @@ nb:
   cannot_move_assignments_due_to_closed_grading_peri_59fc3c4: "Kan ikke flytte oppgaver på grunn av stengt vurderingsperioder"
   cannot_move_events_with_section_specific_times_bet_3fe871fc: "Kan ikke flytte hendelser med seksjonsspesifikke tidspunkter mellom kalendere"
   cannot_move_scheduler_appointments_between_calenda_253e5ea3: "Kan ikke flytte Planlegger-avtaler mellom kalendere"
+  cannot_reference_self_16dfcd49: "kan ikke henvise til deg selv"
   cannot_relink_unsaved_paces_3ed42012: "Kan ikke legge til ny kobling til tempoer som ikke er lagret"
   cannot_relink_unsaved_plans_2ccef56a: "Kan ikke legge til ny kobling til planer som ikke er lagret"
   cannot_remove_c0fd581d: "Kan ikke fjerne:"
@@ -8153,6 +8159,7 @@ nb:
   couldn_t_load_previous_content_migrations_a0ef5d7a: "Kunne ikke laset inn tidligere emnemigreringer"
   couldn_t_save_account_calendar_visibilities_343459d1: "Kunne ikke lagre kalendersynlighet"
   couldn_t_track_assigning_students_to_groups_but_it_b6510770: "Kunne ikke spore tilordning av studenter til grupper, men det skjer fortsatt! Sjekk resultatet manuelt senere. (%{errorMessage})"
+  couldn_t_update_content_migrations_68777765: "Kunne ikke oppdatere emnemigreringer"
   couldn_t_update_standards_for_authority_auth_81206187: "Klarte ikke å oppdatere standarder for autoriteten %{auth}"
   count_40eced3b: Antall
   count_account_calendars_found_b1eed2e3: 
@@ -12012,6 +12019,7 @@ nb:
   error_creating_conversation_1d814618: "Feil ved opprettelse av samtale"
   error_creating_course_ae61c2bd: "Feil ved opprettelse av emne"
   error_creating_discussion_topic_a5f809ec: "Feil ved opprettelse av diskusjonsemne"
+  error_creating_modulename_cd0f5c2e: "Feil ved oppretting av %{moduleName}."
   error_creating_new_course_9d3903bc: "Feil ved opprettelse av nytt emne"
   error_creating_new_subject_89f16abe: "Feil ved opprettelse av nytt tema"
   error_creating_submission_comment_a5374fcf: "Feil ved oppretting av innleveringskommentar"
@@ -12073,6 +12081,7 @@ nb:
   error_the_tool_returned_an_invalid_content_type_co_10a11c07: "Feil: Verktøyet returnerte en ugyldig innholdstype «%{contentType}\""
   error_updating_cluster_error_674e5f2e: "Feil ved oppdatering av %{cluster}: %{error}"
   error_updating_comment_4b80c76d: "Feil ved opplasting av kommentar"
+  error_updating_discussion_topic_64522a23: "Feil ved oppdatering av diskusjonsemne"
   error_updating_module_access_f0970f4c: "Kunne ikke oppdatere modultilgang."
   error_updating_modulename_settings_da982acf: "Feil ved oppdatering av %{moduleName}-innstillinger."
   error_updating_notes_31b24785: "Feil ved opplasting av merknader"
@@ -12542,6 +12551,7 @@ nb:
   failed_to_export_course_paces_e17583ba: "Eksport av tempoer for emne mislyktes"
   failed_to_export_pace_plans_9832daac: "Kunne ikke eksportere tempoplaner"
   failed_to_export_some_tool_settings_c992fc56: "Klarte ikke å eksportere noen verktøyinnstillinger"
+  failed_to_fetch_content_for_import_a042cc27: "Kunne ikke hente innhold for import."
   failed_to_fetch_migration_issues_data_a896da98: "Kunne ikke hente migrasjonsfeildata."
   failed_to_get_new_activity_17e7ec7c: "Kunne ikke få ny aktivitet"
   failed_to_ignore_assignment_46565fa3: "Kunne ikke ignorere oppgave"
@@ -13891,6 +13901,7 @@ nb:
       total: Total
   graded_25cd3fcd: Vurdert
   graded_date_by_grader_e8e1ff75: "%{graded_date} av %{grader}"
+  graded_discussion_17cc8eaf: "Vurdert diskusjon"
   graded_discussion_a873bb3e: "Karaktersatt diskusjon:"
   graded_on_submission_60ac3010: "Karaktersatt ved innlevering"
   graded_quiz_7fabdf1f: "Vurdert quiz"
@@ -15227,7 +15238,7 @@ nb:
       Hvis aktivert, vil verktøyets installasjons- og konfigurasjonsskjemaer på sidene for Konto- og Emneinnstillinger bruke
       InstUI-komponenter i stedet for de eldre, mindre tilgjengelige egenutviklede komponentene.
   if_enabled_the_user_s_lti_url_input_on_the_select__fa539830: |-
-      Hvis aktivert, vil brukerens LTI URL-inndata i dialogen for å velge innhold bli overskrevet 
+      Hvis aktivert, vil brukerens LTI URL-inndata i dialogen for å velge innhold bli overskrevet
       hvis verktøyet svarer med en gyldig LTI URL.
   if_enabled_the_user_will_see_a_warning_alert_box_n_d85c7b1f: |-
       Hvis aktivert, vil brukeren se enadvarselsboks øverst på
@@ -16109,7 +16120,7 @@ nb:
   k20_beta_description: "Aktiver K20 Beta-funksjoner i Administratoranalyser-appen."
   k20_course_readiness_alpha_testing_description: "Dette flagget er for institusjoner som deltar i alfa-testing av Avansert analyse. Dette flagget aktiverer dashbordet Emneklarhet for disse institusjonene."
   k20_course_readiness_alpha_testing_f45597b6: "K20 – alfa-testing av Emneklarhet"
-  k20_course_readiness_description: "Aktiverer det nye dashbordet for emneberedskap for administratoranalyser."
+  k20_course_readiness_description: "Aktiverer dashbordet Emnetilgjengelighet for avansert analyse for alfa-testere."
   k_2521301c: k
   kazakhstan_7_8fe892c: "Kazakhstan (+7)"
   keep_8f3e7c16: Behold
@@ -16579,6 +16590,7 @@ nb:
   loading_comments_32366acf: "Laster inn kommentarer"
   loading_completion_b62ca82f: "Laster inn fullføring"
   loading_compose_modal_f6da0e8b: "Laster inn skrivemodus"
+  loading_content_for_import_4ed89a17: "Laster inn innhold for import."
   loading_conversation_messages_71e9050e: "Laster inn samtalebeskjeder"
   loading_courses_409a3641: "Laster inn emner"
   loading_courses_bd1bffe: "Laster emner …"
@@ -16626,6 +16638,7 @@ nb:
   loading_missing_assignments_link_d9a0d320: "Laster inn manglende oppgaver-lenker"
   loading_more_grade_history_results_b235de5: "Laster flere resultater over karakterhistorie."
   loading_more_gradebook_history_results_810f6d2e: "Laster inn flere historikk resultater fra vurderingsoversikten."
+  loading_more_issues_b14f8f7d: "Laster inn flere problemer"
   loading_more_replies_22e0f13c: "Laster inn flere svar"
   loading_more_results_1d437202: "Laster flere resultater"
   loading_more_results_def6df65: "Laster inn flere resultater…"
@@ -19329,6 +19342,7 @@ nb:
   module_publish_menu_30b638dd: "Modulenes publiseringsmeny"
   module_publish_menu_88b54c1b: "Modulenes publiseringsmeny"
   module_published_80f0b9b8: "Modul publisert"
+  modulename_created_successfully_6c273e09: "%{moduleName} ble opprettet."
   modulename_module_publish_options_69ef1ece: "%{moduleName} Modulens publiseringsalternativer"
   modulename_module_publish_options_publishedstatus_94ea7f49: "%{moduleName} publiseringsalternativer for modul, %{publishedStatus}"
   modulename_settings_updated_successfully_a09bfef6: "%{moduleName}-Innstillinger ble oppdatert."
@@ -19991,6 +20005,7 @@ nb:
   no_existing_user_provided_for_login_with_sis_id_us_6bcde71f: "Ingen eksisterende bruker har blitt gitt innloggingstilgang med SIS ID %{user_id}"
   no_explainer_text_available_9d9a2f3c: "Ingen forklaringstekst tilgjengelig"
   no_exports_to_display_7f1b630b: "Ingen eksporteringer å vise"
+  no_file_chosen_9a880793: "Ingen fil valgt"
   no_file_selected_92d2ac30: "Ingen fil valgt"
   no_file_submitted_a879fa53: "Ingen filer sendt inn"
   no_final_grade_selected_3595c9c: "Ingen sluttkarakter valgt"
@@ -20792,6 +20807,9 @@ nb:
   optional_filters_9dc03f5e: "Alternative filtre"
   optionally_include_a_byte_order_mark_in_compatible_f3d0d243: "Inkluder valgfritt byte-order mark (BOM) i eksporter av regneark, slik at de kan bli importert til Excel for brukere i andre lokaliteter."
   optionally_include_a_byte_order_mark_in_gradebook__555cc605: "Inkludere valgfritt byte-order mark (BOM) i eksportering av karakteroversikter slik at de kan bli importert til Excel for brukere i andre lokaliteter."
+  optioncount_options_available_5a34688e: "%{optionCount} valg tilgjengelig."
+  optionname_selected_list_collapsed_9e69b18a: "%{optionName} valgt. Liste sammenfoldet."
+  optionname_selection_has_been_removed_ff1afe6a: "%{optionName}-valget er fjernet"
   options: 
     ? "false"
     : Nei
@@ -21409,6 +21427,7 @@ nb:
   please_enter_a_valid_url_protocol_is_required_e_g__c6ccfeca: "Skriv inn en gyldig URL. Protokoll er påkrevd (f.eks. http://, https://, ftp://)."
   please_enter_your_label_name_7745272d: "Vennligst skriv inn %{label_name}:"
   please_enter_your_label_name_and_password_5c56be80: "Vennligst oppgi %{label_name} og passord:"
+  please_fix_errors_before_continuing_b1c13e7d: "Fiks feilene før du fortsetter"
   please_have_the_student_submit_the_file_again_dba514b7: "Be studenten sende inn filen på nytt"
   please_insert_a_message_body_bc85cbff: "Sett inn en meldingstekst."
   please_let_them_know_which_page_you_were_viewing_a_6039f59a: "Vennligst la dem få vite hvilken side du så på og koble du klikket på."
@@ -24506,6 +24525,7 @@ nb:
   remove_name_calendar_bdc329d9: "Fjern %{name}-kalender"
   remove_null_values_from_live_event_payloads_3c826f: "Sletter nullverdier fra live arrangementers datalast"
   remove_observers_from_courses_703edc34: "Fjern observatører fra emner"
+  remove_optionname_8a67379b: "Fjern %{optionName}"
   remove_outcome_20e16da7: "Fjerne læringsmål?"
   remove_outcome_2feaf5fd: "Fjern læringsmål"
   remove_outcomes_5f8b601c: 
@@ -25550,6 +25570,7 @@ nb:
   select_conference_provider_58c7f7fe: "Velg videomøteleverandør"
   select_content: "Velg innhold"
   select_content_7faa4195: "Velg innhold"
+  select_content_b0177809: "Velg innhold"
   select_content_checkbox: 
     select_content_error: "Du må velge relevant innhold"
   select_content_dialog: 
@@ -25565,6 +25586,7 @@ nb:
     titles: 
       add_item_to_module: "Legg til element i modul"
       find_links_using_service: "Finner lenker med %{service}"
+  select_content_for_import_9406720: "Velg innhold for import"
   select_content_type_e49c5bf6: "Velg innholdstype"
   select_conversation_subject_3f36074a: "Velg samtale %{subject}"
   select_country_d21cb85a: "Velg land"
@@ -26106,6 +26128,7 @@ nb:
     flash_notices: 
       close: Lukk
     footer_links: 
+      cookie_notice: "Varsel om informasjonskapsel"
       facebook: Facebook
       privacy_policy: "Retningslinjer for personvern"
       terms_of_service: Bruksvilkår
@@ -27011,6 +27034,7 @@ nb:
   sorted_descending_84ec84c8: "sortert avtagende."
   sorted_descending_d9aa3cf8: "Sortere synkende"
   sorted_direction_by_columnname_d049ac44: "Sortert  %{direction} på %{columnName}"
+  source_c377a469: Kilde
   source_code_2395ca74: "kilde kode"
   source_context_does_not_match_group_context_4b55cee4: "kildekontekst samsvarer ikke med gruppekontekst"
   source_link_c21ecc23: Kildelenke
@@ -29339,6 +29363,7 @@ nb:
     new_topic: "Nytt diskusjonstema"
   title_52b8638d: "Tittel:"
   title_appointment_group_you_can_sign_up_for_this_1c254712: "*%{title} møtetid* Du kan **registrere deg** for dette."
+  title_count_c8e20865: "%{title} (%{count})"
   title_current_750a3c65: "%{title} (Gjeldende)"
   title_due_date_d3f46bfb: "%{title}: Forfall: %{date}"
   title_eb77c512: "%{title}"
@@ -30620,6 +30645,7 @@ nb:
   use_semicolons_instead_of_commas_to_separate_field_f50945f2: "Bruk semikolon i stedet for komma til å separere felt i eksport av Karakteroversikten, slik at de kan importeres til Excel for brukere i enkelte lokaler."
   use_semicolons_to_separate_fields_in_compatible_sp_56e0bdd2: "Bruk semikolon til å separere felt i kompatible eksporter av regneark"
   use_semicolons_to_separate_fields_in_gradebook_exp_5fb3b39d: "Bruk semikolon til å separere felt i eksporter av Karakteroversikten"
+  use_the_import_content_tool_to_migrate_course_mate_41716290: "Bruk verktøyet Importer innhold for å migrere emnemateriell fra andre kilder til dette emnet."
   use_the_new_assignments_page_dd292b9d: "Bruk siden for nye oppgaver"
   use_the_new_assignments_student_page_944262af: "Bruk den nye oppgaver studentside"
   use_the_new_assignments_teacher_page_8add7e46: "Bruk den nye oppgaver lærerside"
@@ -31147,6 +31173,7 @@ nb:
   users_can_access_and_create_but_not_edit_individua_c8a62c74: "Brukere kan bruke og opprette (men ikke redigere) individuelle oppgaverubrikker via oppgaver når “Oppgaver og tester - legg til / rediger / slett” er aktivert."
   users_can_access_the_manage_question_banks_link_on_e411d01: "Brukere kan bruke administrer spørsmålsbank-lenken på innholdsfortegnelsen til tester når 'Emneinnhold - vis' og 'Oppgaver og tester - legg til / rediger / slett' er aktiverte."
   users_can_add_this_calendar_to_their_other_calenda_69daaa69: "Brukere kan legge til denne kalenderen til deres ”Andre kalendere”-liste."
+  users_can_now_archive_grading_schemes_preventing_t_48605092: "Brukere kan nå arkiverte vurderingsskalaer, slik at de ikke blir lagt til i emner/oppgaver. Vurderingsskalaer som brukes i gamle sammenhenger, vil fortsatt bli brukt. Arkiverte vurderingsskalaer er tilgjengelig på innstillinger-siden for vurderingsskalaer på kontonivå, men kan ikke redigeres eller slettes."
   users_can_temporarily_enroll_another_user_in_a_cou_ce9b48ed: "Brukere kan midlertidig melde på en annen bruker i et emne. Den tildelte brukeren fjernes fra emnet når påmeldingen utløper."
   users_d1b60cb0: Brukere
   users_designers_22195c6f: "Brukere - Designere"
@@ -31944,6 +31971,7 @@ nb:
   you_do_not_have_permission_to_publish_this_course_ff361c82: "Du har ikke tillatelse til å publisere dette emnet."
   you_do_not_have_permission_to_view_announcements_i_6b2e31a2: "Du har ikke tillatelse til å vise kunngjøringene i dette emnet."
   you_do_not_have_permissions_to_build_this_moderate_bd5d350a: "Du har ikke tillatelse til å bygge denne modererte oppgaven"
+  you_do_not_have_permissions_to_create_assignments__f554cd6a: "Du har ikke tillatelse til å opprette oppgaver i det angitte emnet."
   you_do_not_have_permissions_to_edit_this_moderated_3195294f: "Har du tillatelse til å redigere denne modererte oppgaven?"
   you_do_not_have_permissions_to_modify_discussion_f_a163d8be: "Du har ikke tillatelse til å modifisere diskusjoner for seksjon(er) %{section_ids}"
   you_don_t_have_access_to_view_this_resource_8378e0e8: "Du har ikke tilgang til å se denne ressursen."
@@ -32173,6 +32201,7 @@ nb:
   your_media_has_been_uploaded_and_will_appear_here__8546af57: "Ditt media er lastet opp og vil vises her etter behandling."
   your_message_has_been_sent_thank_you_e0284316: "Din melding er sendt. Takk!"
   your_message_was_sent_977f6583: "Meldingen ble sendt!"
+  your_migration_can_not_exceed_file_size_b0dda25f: "Migreringen din kan ikke overstige %{file_size}"
   your_modules_will_appear_here_after_they_re_assemb_bfd5abe8: "Modulene dine vises her etter at de er satt sammen."
   your_name_7665e1d8: "Ditt navn"
   your_outcomes_were_successfully_imported_c5de884: "Resultatene dine ble importert."
