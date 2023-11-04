@@ -2222,6 +2222,7 @@ pt:
   add_app_baf540f: "Adicionar aplicação"
   add_as_a_faculty_journal_entry_55a38a30: "Adicionar como uma entrada do Diário da Faculdade"
   add_as_allowed_e95540be: "Adicionar como permitido"
+  add_assignment_da1c1529: "Adicionar tarefa"
   add_assignment_to_name_caf173b0: "Adicionar tarefa a %{name}"
   add_assignments_and_quizzes_1085d2af: "Adicionar tarefas e questionários"
   add_attachment_93868828: "Adicionar anexo"
@@ -2303,6 +2304,7 @@ pt:
   add_moderator_review_copy_1st_a484c813: "Adicionar a Revisão do Moderador (Copiar 1º)"
   add_moderator_review_copy_2nd_e80d458f: "Adicionar a Revisão do Moderador (Copiar 2ª)"
   add_moderator_review_new_3c183cea: "Adicionar a Revisão do Moderador (Novo)"
+  add_module_5ad6fee2: "Adicionar módulo"
   add_module_item: 
     add_assignment_to: "Adicionar uma tarefa a %{module}"
     add_file_to: "Adicionar ficheiros a %{module}"
@@ -2464,6 +2466,7 @@ pt:
   admins_3e1dce15: Administradores
   admins_add_remove_26811ce5: "Administradores - adicionar/remover"
   advanced_36b35b8: Avançado
+  advanced_analytics_course_readiness_closed_alpha_13c8aaf: "Análise Avançada - Preparação do Disciplina Alfa Fechado"
   advertise_release_notes_via_the_ui_9254bc6c: "Anunciar notas de lançamento através da IU"
   affects_viewing_the_conclude_course_and_permanentl_8216fcc2: "Afeta a visualização dos botões Concluir Disciplina e Eliminar Permanentemente esta Disciplina. O botão Eliminar permanentemente este disciplina é exibido apenas para disciplinas criados manualmente."
   affects_viewing_the_conclude_course_and_permanentl_d943656e: |-
@@ -3894,6 +3897,7 @@ pt:
   archive_operation_failed_5504706: "A operação de arquivo falhou"
   archive_selected_d64506ca: "Arquivo Selecionado"
   archived_de543437: Arquivada
+  archived_grading_schemes_6d698d0: "Esquemas de classificação arquivados"
   are_you_sure_26795d3c: "Tem a certeza?"
   are_you_sure_that_you_want_to_remove_these_count_o_67ef2d6c: 
     one: "Tem a certeza de que deseja remover este resultado desta conta?"
@@ -4252,6 +4256,7 @@ pt:
   assignment_score_summary_f1dc9708: "Resumo da Pontuação da Tarefa"
   assignment_selection_6bff05c4: "Seleção de Tarefas"
   assignment_set_set_index_28b1f973: "Conjunto de afectação %{set_index}"
+  assignment_settings_5ee5ee77: "Definições de atribuição"
   assignment_submissions_uploaded_ba0dbc84: "%{assignment}: Envios enviados"
   assignment_title_82b4422e: "Título da tarefa:"
   assignment_title_8a707dd2: "título da tarefa"
@@ -6219,6 +6224,7 @@ pt:
   cannot_move_assignments_due_to_closed_grading_peri_59fc3c4: "Não é possível transferir tarefas devido a períodos de classificação fechados"
   cannot_move_events_with_section_specific_times_bet_3fe871fc: "Não é possível mover eventos com tempos específicos de seção entre calendários"
   cannot_move_scheduler_appointments_between_calenda_253e5ea3: "Não é possível mover agendamentos de agenda entre calendários"
+  cannot_reference_self_16dfcd49: "não pode fazer referência a si próprio"
   cannot_relink_unsaved_paces_3ed42012: "Não é possível relançar os passos não salvos"
   cannot_relink_unsaved_plans_2ccef56a: "Não é possível religar planos não guardados"
   cannot_remove_c0fd581d: "Não é possível remover:"
@@ -8161,6 +8167,7 @@ pt:
   couldn_t_load_previous_content_migrations_a0ef5d7a: "Não foi possível carregar migrações de conteúdo anteriores"
   couldn_t_save_account_calendar_visibilities_343459d1: "Não foi possível salvar as visibilidades do calendário de contas"
   couldn_t_track_assigning_students_to_groups_but_it_b6510770: "Não foi possível acompanhar a atribuição de estudantes a grupos, mas ainda assim está a acontecer! Verifique o resultado manualmente mais tarde. (%{errorMessage})"
+  couldn_t_update_content_migrations_68777765: "Não foi possível atualizar as migrações de conteúdos"
   couldn_t_update_standards_for_authority_auth_81206187: "Não foi possível atualizar as normas para a autoridade %{auth}."
   count_40eced3b: Contagem
   count_account_calendars_found_b1eed2e3: 
@@ -12020,6 +12027,7 @@ pt:
   error_creating_conversation_1d814618: "Conversa criadora de erros"
   error_creating_course_ae61c2bd: "Curso de criação de erros"
   error_creating_discussion_topic_a5f809ec: "Erro ao criar tópico de discussão"
+  error_creating_modulename_cd0f5c2e: "Erro ao criar %{moduleName}."
   error_creating_new_course_9d3903bc: "Erro ao criar nova disciplina"
   error_creating_new_subject_89f16abe: "Erro ao criar novo assunto"
   error_creating_submission_comment_a5374fcf: "Erro ao criar Comentário de Submissão"
@@ -12081,6 +12089,7 @@ pt:
   error_the_tool_returned_an_invalid_content_type_co_10a11c07: "Erro: A ferramenta devolveu um tipo de conteúdo inválido \"%{contentType}\""
   error_updating_cluster_error_674e5f2e: "Atualização de erros %{cluster}: %{error}"
   error_updating_comment_4b80c76d: "Comentário de atualização de erro"
+  error_updating_discussion_topic_64522a23: "Erro ao atualizar tópico de discussão"
   error_updating_module_access_f0970f4c: "Erro ao atualizar o acesso ao módulo."
   error_updating_modulename_settings_da982acf: "Erro ao atualizar as %{moduleName} definições."
   error_updating_notes_31b24785: "Erro na atualização das notas"
@@ -12550,6 +12559,7 @@ pt:
   failed_to_export_course_paces_e17583ba: "Falha ao exportar ritmos das disciplinas"
   failed_to_export_pace_plans_9832daac: "Falha nos planos de pausa de exportação"
   failed_to_export_some_tool_settings_c992fc56: "Falha ao exportar algumas configurações da ferramenta"
+  failed_to_fetch_content_for_import_a042cc27: "Falha ao obter conteúdo para importação."
   failed_to_fetch_migration_issues_data_a896da98: "Falha ao obter dados de problemas de migração."
   failed_to_get_new_activity_17e7ec7c: "Falha ao obter nova atividade"
   failed_to_ignore_assignment_46565fa3: "Falha em ignorar a missão"
@@ -13897,6 +13907,7 @@ pt:
       total: Total
   graded_25cd3fcd: Avaliada
   graded_date_by_grader_e8e1ff75: "%{graded_date} de %{grader}"
+  graded_discussion_17cc8eaf: "Discussão classificada"
   graded_discussion_a873bb3e: "Discussão avaliada:"
   graded_quiz_7fabdf1f: "Teste avaliado"
   graded_submissions_9c7068a2: "Envios avaliados:"
@@ -15229,8 +15240,8 @@ pt:
       Se ativado, os formulários de instalação e configuração da ferramenta localizados nas páginas Configurações da conta e da disciplina usarão
       componentes InstUI, em vez dos componentes internos mais antigos e menos acessíveis.
   if_enabled_the_user_s_lti_url_input_on_the_select__fa539830: |-
-      Se ativado, a entrada do URL LTI do utilizador na caixa de diálogo de seleção de conteúdos será substituída 
-      se a ferramenta responder com um URL LTI válido.
+      Se estiver ativada, a entrada do URL de LTI do utilizador na caixa de diálogo de seleção de conteúdo será substituída
+      se a ferramenta responder com um URL de LTI válido.
   if_enabled_the_user_will_see_a_warning_alert_box_n_d85c7b1f: |-
       Se ativado, o utilizador verá uma caixa de alerta perto do topo da página
       Chaves do Desenvolvedor informando-os das alterações de pontos finais OIDC Auth que se aproximam ou estão concluídas.
@@ -16117,7 +16128,7 @@ pt:
   k20_beta_description: "Ativa recursos K20 Beta no Admin Analytics APP."
   k20_course_readiness_alpha_testing_description: "Este sinalizador destina-se às instituições que participam no teste Alfa da Análise Avançada. Este sinalizador ativa o painel de preparação da disciplina para estas instituições."
   k20_course_readiness_alpha_testing_f45597b6: "K20 - Teste alfa de preparação da disciplina"
-  k20_course_readiness_description: "Ativa o novo Painel de preparação da disciplina da Análise de administração."
+  k20_course_readiness_description: "Ativa o Painel de Preparação do Disciplina da Análise avançada para testadores alfa."
   k_2521301c: k
   kazakhstan_7_8fe892c: "Cazaquistão (+7)"
   keep_8f3e7c16: Manter
@@ -16587,6 +16598,7 @@ pt:
   loading_comments_32366acf: "A carregar comentários"
   loading_completion_b62ca82f: "Conclusão do carregamento"
   loading_compose_modal_f6da0e8b: "Carregamento Composto Modal"
+  loading_content_for_import_4ed89a17: "A carregar conteúdo para importação."
   loading_conversation_messages_71e9050e: "Carregamento de mensagens de conversação"
   loading_courses_409a3641: "A carregar Disciplinas"
   loading_courses_bd1bffe: "Carregando disciplinas..."
@@ -16634,6 +16646,7 @@ pt:
   loading_missing_assignments_link_d9a0d320: "A carregar ligação de tarefas em falta"
   loading_more_grade_history_results_b235de5: "A carregar mais resultados do histórico de notas."
   loading_more_gradebook_history_results_810f6d2e: "A carregar mais resultados do histórico do livro de avaliação."
+  loading_more_issues_b14f8f7d: "A carregar mais problemas"
   loading_more_replies_22e0f13c: "A carregar mais respostas"
   loading_more_results_1d437202: "Carregando mais resultados"
   loading_more_results_def6df65: "A carregar mais resultados..."
@@ -19338,6 +19351,7 @@ pt:
   module_publish_menu_30b638dd: "Menu de Publicação do Módulo"
   module_publish_menu_88b54c1b: "Menu de publicação do módulo"
   module_published_80f0b9b8: "Módulo publicado"
+  modulename_created_successfully_6c273e09: "%{moduleName} criado com êxito."
   modulename_module_publish_options_69ef1ece: "%{moduleName} Opções de publicação do módulo"
   modulename_module_publish_options_publishedstatus_94ea7f49: "%{moduleName} opções de publicação do módulo, %{publishedStatus}"
   modulename_settings_updated_successfully_a09bfef6: "%{moduleName} definições atualizadas com sucesso."
@@ -20003,6 +20017,7 @@ pt:
   no_existing_user_provided_for_login_with_sis_id_us_6bcde71f: "Nenhum utilizador existente fornecido para login com o ID do SIS %{user_id}"
   no_explainer_text_available_9d9a2f3c: "Sem texto explicador disponível"
   no_exports_to_display_7f1b630b: "Nenhuma exportação para exibir"
+  no_file_chosen_9a880793: "Nenhum ficheiro escolhido"
   no_file_selected_92d2ac30: "Sem ficheiros selecionados"
   no_file_submitted_a879fa53: "Nenhum ficheiro enviado"
   no_final_grade_selected_3595c9c: "Sem nota final selecionada"
@@ -20806,6 +20821,9 @@ pt:
   optional_filters_9dc03f5e: "Filtros opcionais"
   optionally_include_a_byte_order_mark_in_compatible_f3d0d243: "Opcionalmente, inclua uma marca de ordem de byte nas exportações de planilhas compatíveis, para que possam ser importadas para o Excel para utilizadores em alguns locais."
   optionally_include_a_byte_order_mark_in_gradebook__555cc605: "Opcionalmente, inclua uma marca de ordem de byte nas exportações do Quadro de Notas para que elas possam ser importadas para o Excel para utilizadores em algumas localidades."
+  optioncount_options_available_5a34688e: "%{optionCount} opções disponíveis."
+  optionname_selected_list_collapsed_9e69b18a: "%{optionName} selecionado. Lista recolhida."
+  optionname_selection_has_been_removed_ff1afe6a: "%{optionName} a seleção foi removida"
   options: 
     ? "false"
     : Não
@@ -21426,6 +21444,7 @@ pt:
   please_enter_a_valid_url_protocol_is_required_e_g__c6ccfeca: "Por favor insira um URL válido. O protocolo é necessário (e.g. http://, https://, ftp://)."
   please_enter_your_label_name_7745272d: "Por favor insira o seu %{label_name}:"
   please_enter_your_label_name_and_password_5c56be80: "Por favor insira o seu %{label_name} e palavra chave:"
+  please_fix_errors_before_continuing_b1c13e7d: "Corrija os erros antes de continuar"
   please_have_the_student_submit_the_file_again_dba514b7: "Por favor, peça ao aluno para enviar o ficheiro novamente"
   please_insert_a_message_body_bc85cbff: "Por favor insira um corpo de mensagem."
   please_let_them_know_which_page_you_were_viewing_a_6039f59a: "Diga-lhes que página estava a ver e em que ligação clicou."
@@ -24525,6 +24544,7 @@ pt:
   remove_name_calendar_bdc329d9: "Remover %{name} Calendário"
   remove_null_values_from_live_event_payloads_3c826f: "Remover valores nulos das cargas úteis do evento em direto"
   remove_observers_from_courses_703edc34: "Retirar Observadores das disciplinas"
+  remove_optionname_8a67379b: "Remover %{optionName}"
   remove_outcome_20e16da7: "Retirar o resultado?"
   remove_outcome_2feaf5fd: "Remover Resultado"
   remove_outcomes_5f8b601c: 
@@ -25569,6 +25589,7 @@ pt:
   select_conference_provider_58c7f7fe: "Selecionar o Provedor da Conferência"
   select_content: "Selecionar conteúdo"
   select_content_7faa4195: "Selecionar conteúdo"
+  select_content_b0177809: "Selecionar conteúdo"
   select_content_checkbox: 
     select_content_error: "É necessário escolher uma opção de conteúdo"
   select_content_dialog: 
@@ -25584,6 +25605,7 @@ pt:
     titles: 
       add_item_to_module: "Adicionar item ao módulo"
       find_links_using_service: "Localizar link usando %{service}"
+  select_content_for_import_9406720: "Selecionar conteúdo para importação"
   select_content_type_e49c5bf6: "Selecionar tipo de conteúdo"
   select_conversation_subject_3f36074a: "Selecionar conversa %{subject}"
   select_country_d21cb85a: "Selecionar País"
@@ -26125,6 +26147,7 @@ pt:
     flash_notices: 
       close: Fechar
     footer_links: 
+      cookie_notice: "Aviso de cookie"
       facebook: Facebook
       privacy_policy: "Política de Privacidade"
       terms_of_service: "Termos de serviço"
@@ -27031,6 +27054,7 @@ pt:
   sorted_descending_84ec84c8: "classificado decrescente."
   sorted_descending_d9aa3cf8: "Ordenar descendente"
   sorted_direction_by_columnname_d049ac44: "Classificar %{direction} por %{columnName}"
+  source_c377a469: Origem
   source_code_2395ca74: Código-fonte
   source_context_does_not_match_group_context_4b55cee4: "o contexto da fonte não corresponde ao contexto do grupo"
   source_link_c21ecc23: "Ligação de origem"
@@ -29365,6 +29389,7 @@ pt:
     new_topic: "Novo tópico de discussão"
   title_52b8638d: "Título:"
   title_appointment_group_you_can_sign_up_for_this_1c254712: "*%{title} grupo de compromisso* Pode **inscrever-se** nisto."
+  title_count_c8e20865: "%{title} (%{count})"
   title_current_750a3c65: "%{title} (Atual)"
   title_due_date_d3f46bfb: "%{title}: Vencimento %{date}"
   title_eb77c512: "%{title}"
@@ -30650,6 +30675,7 @@ pt:
   use_semicolons_instead_of_commas_to_separate_field_f50945f2: "Use pontos-e-vírgulas em vez de vírgulas para separar os campos nas exportações do Livro de Notas para que eles possam ser importados para o Excel para usuários em algumas localidades."
   use_semicolons_to_separate_fields_in_compatible_sp_56e0bdd2: "Use ponto e vírgula para separar campos nas exportações de planilhas compatíveis"
   use_semicolons_to_separate_fields_in_gradebook_exp_5fb3b39d: "Use ponto-e-vírgula para separar campos em Exportações do Livro de notas."
+  use_the_import_content_tool_to_migrate_course_mate_41716290: "Utilizar a ferramenta Importar conteúdo para migrar materiais da disciplina de outras fontes para esta disciplina."
   use_the_new_assignments_page_dd292b9d: "Use a nova página de atribuições"
   use_the_new_assignments_student_page_944262af: "Use a página do novo aluno das tarefas"
   use_the_new_assignments_teacher_page_8add7e46: "Use a nova página do professor de tarefas"
@@ -31177,6 +31203,7 @@ pt:
   users_can_access_and_create_but_not_edit_individua_c8a62c74: "Os usuários podem aceder e criar (mas não editar) rubricas de atribuições individuais através de Atribuições quando Atribuições e Testes - adicionar / editar / eliminar está habilitado."
   users_can_access_the_manage_question_banks_link_on_e411d01: "Os utilizadores podem acessar a ligação Gerenciar Bancos de Perguntas na Página de Índice de Questionários quando o conteúdo da disciplina - ver e Atribuições e Testes - adicionar / editar / eliminar estiverem ativados."
   users_can_add_this_calendar_to_their_other_calenda_69daaa69: "Os utilizadores podem adicionar este calendário à sua lista \"Outros calendários\"."
+  users_can_now_archive_grading_schemes_preventing_t_48605092: "Os utilizadores podem agora arquivar esquemas de avaliação, impedindo-os de serem adicionados a disciplinas/atribuições. Os esquemas de avaliação em contextos antigos onde estão a ser utilizados continuarão a ser utilizados. Os esquemas de avaliação arquivados podem ser acedidos na página de definições do esquema de avaliação ao nível da conta, mas não podem ser editados ou eliminados."
   users_can_temporarily_enroll_another_user_in_a_cou_ce9b48ed: "Os utilizadores podem inscrever temporariamente outro utilizador numa disciplina. O utilizador atribuído é removido da disciplina quando a inscrição expira."
   users_d1b60cb0: Utilizadores
   users_designers_22195c6f: "Utilizadores - Designers"
@@ -31982,6 +32009,7 @@ pt:
   you_do_not_have_permission_to_publish_this_course_ff361c82: "Não tem autorização para publicar esta disciplina."
   you_do_not_have_permission_to_view_announcements_i_6b2e31a2: "Não tem permissão para ver os anúncios neste Disciplina."
   you_do_not_have_permissions_to_build_this_moderate_bd5d350a: "Não tem permissões para construir esta tarefa moderada"
+  you_do_not_have_permissions_to_create_assignments__f554cd6a: "Não tem permissões para criar trabalhos na disciplina fornecida"
   you_do_not_have_permissions_to_edit_this_moderated_3195294f: "Você não tem permissão para editar esta tarefa moderada"
   you_do_not_have_permissions_to_modify_discussion_f_a163d8be: "Não tem permissões para modificar a discussão da(s) secção(ões) %{section_ids}"
   you_don_t_have_access_to_view_this_resource_8378e0e8: "Você não tem acesso para ver este recurso."
@@ -32208,6 +32236,7 @@ pt:
   your_media_has_been_uploaded_and_will_appear_here__8546af57: "Os seus meios de comunicação foram carregados e aparecerão aqui após processamento."
   your_message_has_been_sent_thank_you_e0284316: "A sua mensagem foi enviada. Obrigado!"
   your_message_was_sent_977f6583: "Sua mensagem foi enviada!"
+  your_migration_can_not_exceed_file_size_b0dda25f: "A sua migração não pode exceder %{file_size}"
   your_modules_will_appear_here_after_they_re_assemb_bfd5abe8: "Os seus módulos aparecerão aqui após a sua atribuição."
   your_name_7665e1d8: "O seu nome"
   your_outcomes_were_successfully_imported_c5de884: "Seus resultados foram importados com sucesso."
