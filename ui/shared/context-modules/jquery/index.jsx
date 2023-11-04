@@ -99,18 +99,36 @@ window.modules = (function () {
       return indent
     },
 
-    addModule() {
-      const $module = $('#context_module_blank').clone(true).attr('id', 'context_module_new')
-      $('#context_modules').append($module)
-      const opts = modules.sortable_module_options
-      opts.update = modules.updateModuleItemPositions
-      $module.find('.context_module_items').sortable(opts)
-      $('#context_modules.ui-sortable').sortable('refresh')
-      $('#context_modules .context_module .context_module_items.ui-sortable').each(function () {
-        $(this).sortable('refresh')
-        $(this).sortable('option', 'connectWith', '.context_module_items')
-      })
-      modules.editModule($module)
+    addModule(callback = () => { }) {
+      if (ENV.FEATURES.differentiated_modules) {
+        const options = { initialTab: 'settings' };
+        const settings = {
+          moduleList: parseModuleList(),
+          addModuleUI: (data, $moduleElement) => {
+            if (typeof callback === 'function') {
+              callback(data, $moduleElement)
+            } else {
+              addModuleElement(data, $moduleElement, updatePublishMenuDisabledState, new RelockModulesDialog(), {})
+            }
+            $moduleElement.css('display', 'block');
+          }
+        }
+        const $module = $('#context_module_blank').clone(true).attr('id', 'context_module_new')
+        $('#context_modules').append($module)
+        renderDifferentiatedModulesTray(event.target, $module, settings, options)
+      } else {
+        const $module = $('#context_module_blank').clone(true).attr('id', 'context_module_new')
+        $('#context_modules').append($module)
+        const opts = modules.sortable_module_options
+        opts.update = modules.updateModuleItemPositions
+        $module.find('.context_module_items').sortable(opts)
+        $('#context_modules.ui-sortable').sortable('refresh')
+        $('#context_modules .context_module .context_module_items.ui-sortable').each(function () {
+          $(this).sortable('refresh')
+          $(this).sortable('option', 'connectWith', '.context_module_items')
+        })
+        modules.editModule($module)
+      }
     },
 
     updateModulePositions() {
@@ -1638,21 +1656,8 @@ modules.initModuleManagement = function (duplicate) {
 
   $(document).on('click', '.add_module_link', event => {
     event.preventDefault()
-    if (ENV.FEATURES.differentiated_modules) {
-      const options = {initialTab: 'settings'};
-      const settings = {
-        moduleList: parseModuleList(),
-        addModuleUI: (data, $moduleElement) =>
-        {
-          addModuleElement(data, $moduleElement, updatePublishMenuDisabledState, relock_modules_dialog, moduleItems);
-          $moduleElement.css('display', 'block');
-        }}
-      const $module = $('#context_module_blank').clone(true).attr('id', 'context_module_new')
-      $('#context_modules').append($module)
-      renderDifferentiatedModulesTray(event.target, $module, settings, options)
-    }else{
-      modules.addModule()
-    }
+    const addModuleCallback =  (data, $moduleElement) => addModuleElement(data, $moduleElement, updatePublishMenuDisabledState, relock_modules_dialog, moduleItems);
+    modules.addModule(addModuleCallback)
   })
 
   // This allows ModuleFileDrop to create module items
