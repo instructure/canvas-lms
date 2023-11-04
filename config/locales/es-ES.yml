@@ -1805,6 +1805,7 @@ es-ES:
   add_app_baf540f: "Añadir aplicación"
   add_as_a_faculty_journal_entry_55a38a30: "Añadir como entrada del historial para profesores"
   add_as_allowed_e95540be: "Añadir como permitido"
+  add_assignment_da1c1529: "Añadir actividad"
   add_assignment_to_name_caf173b0: "Añadir actividad a %{name}"
   add_assignments_and_quizzes_1085d2af: "Añadir actividades y pruebas"
   add_attachment_93868828: "Añadir adjunto"
@@ -1870,6 +1871,7 @@ es-ES:
   add_manage_conclude_delete_publish_reset_8a5aa902: añadir/gestionar/concluir/eliminar/publicar/restablecer
   add_mastery_level_76469d98: "Añadir nivel de dominio"
   add_media_cfa37b54: "Añadir contenido multimedia"
+  add_module_5ad6fee2: "Añadir contenido"
   add_more_e1ffaa65: "Añadir más"
   add_name_db699e72: "Añadir %{name}"
   add_new_announcement_ddacd624: "Añadir un anuncio nuevo"
@@ -1999,6 +2001,7 @@ es-ES:
   admins_3e1dce15: Administradores
   admins_add_remove_26811ce5: "Administradores: añadir/eliminar"
   advanced_36b35b8: Avanzada
+  advanced_analytics_course_readiness_closed_alpha_13c8aaf: "Analíticas avanzadas: alfa cerrado para preparación del curso"
   afghanistan_93_ab06805: "Afganistán (+93)"
   afrikaans_da0fe6ee: Afrikáans
   after_48b9d69: Después...
@@ -2974,6 +2977,7 @@ es-ES:
   archive_operation_failed_5504706: "No se ha podido completar la operación de archivar"
   archive_selected_d64506ca: "Archivo seleccionado"
   archived_de543437: Archivado
+  archived_grading_schemes_6d698d0: "Esquemas de evaluación guardados"
   are_you_sure_26795d3c: "¿Estás seguro?"
   are_you_sure_that_you_want_to_remove_these_count_o_67ef2d6c: 
     one: "¿Estás seguro de que quieres eliminar esta competencia de esta cuenta?"
@@ -3017,6 +3021,7 @@ es-ES:
   are_you_sure_you_want_to_delete_this_rubric_this_a_d4ff43c7: "¿Estás seguro de que quieres eliminar esta rúbrica? Esta acción eliminará la relación con esta rúbrica de todas las actividades en la asignatura actual y eliminará todas las actividades relacionadas existentes."
   are_you_sure_you_want_to_delete_this_setting_be350e82: "¿Estás seguro de que quieres eliminar esta configuración?"
   are_you_sure_you_want_to_delete_this_to_do_item_497016ea: "¿Estás seguro de que quieres eliminar esta tarea pendiente?"
+  are_you_sure_you_want_to_delete_this_topic_403a0f40: "¿Estás seguro de que quieres eliminar este tema?"
   are_you_sure_you_want_to_delete_this_topic_c0466e91: "¿Estás seguro de que quieres eliminar este tema?"
   are_you_sure_you_want_to_delete_this_track_f5a16357: "¿Estás seguro de que quieres eliminar este rastreo?"
   are_you_sure_you_want_to_delete_your_copy_of_these_f04442ed: 
@@ -3261,6 +3266,7 @@ es-ES:
   assignment_score_summary_f1dc9708: "Resumen de la puntuación de la actividad"
   assignment_selection_6bff05c4: "Selección de la actividad"
   assignment_set_set_index_28b1f973: "Conjunto de actividad %{set_index}"
+  assignment_settings_5ee5ee77: "Configuración de la actividad"
   assignment_submissions_uploaded_ba0dbc84: "%{assignment}: Entregas cargadas"
   assignment_title_82b4422e: "Título de la actividad:"
   assignment_title_8a707dd2: "título de la actividad"
@@ -4686,6 +4692,7 @@ es-ES:
   cannot_move_assignments_due_to_closed_grading_peri_59fc3c4: "No se pueden mover actividades debido a períodos de evaluación cerrados"
   cannot_move_events_with_section_specific_times_bet_3fe871fc: "No se pueden mover eventos con horas específicas por sección entre calendarios"
   cannot_move_scheduler_appointments_between_calenda_253e5ea3: "No se pueden mover las citas del planificador entre calendarios"
+  cannot_reference_self_16dfcd49: "no se puede hacer referencia a uno mismo"
   cannot_relink_unsaved_paces_3ed42012: "No se pueden volver a enlazar los ritmos no guardados"
   cannot_relink_unsaved_plans_2ccef56a: "No se pueden volver a enlazar planes no guardados"
   cannot_remove_c0fd581d: "No se puede eliminar:"
@@ -6281,6 +6288,7 @@ es-ES:
   couldn_t_load_previous_content_migrations_a0ef5d7a: "No se ha podido cargar el contenido de migraciones anteriores"
   couldn_t_save_account_calendar_visibilities_343459d1: "No se ha podido guardar la visibilidad del calendario de la cuenta"
   couldn_t_track_assigning_students_to_groups_but_it_b6510770: "No se ha podido realizar el seguimiento de la asignación de los estudiantes a los grupos, pero la acción sigue realizándose. Comprobar los resultados manualmente más adelante. (%{errorMessage})"
+  couldn_t_update_content_migrations_68777765: "No se ha podido actualizar el contenido de migraciones"
   count_40eced3b: Recuento
   count_account_calendars_found_b1eed2e3: 
     one: "Se ha encontrado 1 calendario de la cuenta."
@@ -9219,6 +9227,7 @@ es-ES:
   error_creating_comment_cbbfc0f0: "Ha habido un error al crear el comentario"
   error_creating_conversation_1d814618: "Ha habido un error al crear la conversación"
   error_creating_discussion_topic_a5f809ec: "Ha habido un error al crear el tema del foro de discusión"
+  error_creating_modulename_cd0f5c2e: "Ha habido un error al crear %{moduleName}"
   error_creating_new_course_9d3903bc: "Ha habido un error al crear una nueva asignatura"
   error_creating_new_subject_89f16abe: "Ha habido un error al crear un nuevo tema"
   error_creating_submission_comment_a5374fcf: "Ha habido un error al crear el comentario de la entrega"
@@ -9274,6 +9283,7 @@ es-ES:
   error_the_tool_returned_an_invalid_content_type_co_10a11c07: "Error: La herramienta ha devuelto un tipo de contenido incorrecto \"%{contentType}\""
   error_updating_cluster_error_674e5f2e: "Ha habido un error al actualizar %{cluster}: %{error}"
   error_updating_comment_4b80c76d: "Error al actualizar el comentario"
+  error_updating_discussion_topic_64522a23: "Ha habido un error al cargar el tema del foro de discusión"
   error_updating_module_access_f0970f4c: "Ha habido un error al actualizar el acceso al módulo."
   error_updating_modulename_settings_da982acf: "Ha habido un error al actualizar las configuraciones %{moduleName}."
   error_updating_notes_31b24785: "Error al actualizar las notas"
@@ -9611,6 +9621,7 @@ es-ES:
   failed_to_export_context_info_acb07497: "Ha habido un error al exportar la información de contexto"
   failed_to_export_course_paces_e17583ba: "Ha habido un error al exportar el ritmo de avance de la asignatura"
   failed_to_export_pace_plans_9832daac: "No se ha podido exportar Pace Plans"
+  failed_to_fetch_content_for_import_a042cc27: "Ha habido un error al obtener el contenido para importar."
   failed_to_fetch_migration_issues_data_a896da98: "Ha habido un error al obtener los datos de incidencias de migración."
   failed_to_get_new_activity_17e7ec7c: "No se ha podido obtener nueva actividad"
   failed_to_ignore_assignment_46565fa3: "Ha habido un error al ignorar la actividad"
@@ -10378,6 +10389,7 @@ es-ES:
       submissions_upload: "Carga de entregas de %{assignment}"
   graded_25cd3fcd: Evaluado
   graded_date_by_grader_e8e1ff75: "%{graded_date} por %{grader}"
+  graded_discussion_17cc8eaf: "Foro de discusión evaluado"
   graded_quiz_7fabdf1f: "Prueba evaluada"
   graded_submissions_9c7068a2: "Presentaciones evaluadas:"
   graded_survey_c0f0c395: "Encuesta evaluada"
@@ -11313,7 +11325,7 @@ es-ES:
       Si se habilita esta opción, los formularios de instalación y configuración de la instalación ubicados en las páginas de configuración de la cuenta y el curso emplearán
       componentes InstUI, al contrario de los componentes anteriores de desarrollo propio, que eran menos accesibles.
   if_enabled_the_user_s_lti_url_input_on_the_select__fa539830: |-
-      Si se habilita esta opción, los datos introducidos por el usuario en la URL de la LTI en el diálogo de selección de contenido se sobrescribirá 
+      Si se habilita esta opción, los datos introducidos por el usuario en la URL de la LTI en el diálogo de selección de contenido se sobrescribirán
       si la herramienta responde con una URL de LTI válida.
   if_enabled_the_user_will_see_a_warning_alert_box_n_d85c7b1f: |-
       Si se habilita esta opción, el usuario verá un cuadro de alerta en la parte superior de la
@@ -11960,7 +11972,7 @@ es-ES:
   k20_beta_description: "Esta opción habilita las funciones beta de K20 en la aplicación de analíticas de administrador."
   k20_course_readiness_alpha_testing_description: "Esta marca se utiliza para las instituciones que participan en las pruebas alfa de Advanced Analytics. Esta marca habilita el cuadro de mando de preparación del curso para estas instituciones."
   k20_course_readiness_alpha_testing_f45597b6: "K20: pruebas alfa de preparación del curso"
-  k20_course_readiness_description: "Habilita el nuevo cuadro de mando de preparación de curso para el administrador de Analytics."
+  k20_course_readiness_description: "Habilita el cuadro de mando de preparación del curso en analíticas avanzadas para los evaluadores de la versión alfa."
   k_2521301c: k
   kazakhstan_7_8fe892c: "Kazajistán (+7)"
   keep_8f3e7c16: Mantener
@@ -12380,6 +12392,7 @@ es-ES:
   loading_comments_32366acf: "Cargando comentarios"
   loading_completion_b62ca82f: "Finalización de la carga"
   loading_compose_modal_f6da0e8b: "Cargando componer modal"
+  loading_content_for_import_4ed89a17: "Cargando contenido para importar."
   loading_conversation_messages_71e9050e: "Cargando mensajes de conversación"
   loading_courses_409a3641: "Cargando asignaturas"
   loading_courses_bd1bffe: "Cargando asignaturas..."
@@ -12422,6 +12435,7 @@ es-ES:
   loading_microsoft_teams_sync_settings_c2633e46: "Cargando configuraciones de la sincronización de Microsoft Teams"
   loading_missing_assignments_link_d9a0d320: "Cargando enlace de actividades no presentadas"
   loading_more_gradebook_history_results_810f6d2e: "Cargando más resultados del historial del libro de notas."
+  loading_more_issues_b14f8f7d: "Cargando más incidencias"
   loading_more_replies_22e0f13c: "Cargando más respuestas"
   loading_more_results_1d437202: "Cargando más resultados"
   loading_more_results_def6df65: "Cargando más resultados..."
@@ -14702,6 +14716,7 @@ es-ES:
   module_publish_menu_30b638dd: "Menú de publicación de módulos"
   module_publish_menu_88b54c1b: "Menú de publicación de módulos"
   module_published_80f0b9b8: "Módulo publicado"
+  modulename_created_successfully_6c273e09: "%{moduleName} creado correctamente."
   modulename_module_publish_options_69ef1ece: "%{moduleName} Opciones de publicación de módulos"
   modulename_module_publish_options_publishedstatus_94ea7f49: "%{moduleName} opciones de publicación de contenido, %{publishedStatus}"
   modulename_settings_updated_successfully_a09bfef6: "%{moduleName} configuración actualizada correctamente."
@@ -15179,6 +15194,7 @@ es-ES:
   no_existing_user_provided_for_login_with_sis_id_us_6bcde71f: "No hay ningún usuario existente a quien se le haya proporcionado la identificación de SIS %{user_id}"
   no_explainer_text_available_9d9a2f3c: "No hay explicación para el texto disponible"
   no_exports_to_display_7f1b630b: "No hay exportaciones para mostrar"
+  no_file_chosen_9a880793: "No se ha seleccionado ningún archivo"
   no_file_selected_92d2ac30: "No se ha seleccionado el archivo"
   no_file_submitted_a879fa53: "No se ha entregado ningún archivo"
   no_first_name_4b772708: "<Sin nombre>"
@@ -15853,6 +15869,9 @@ es-ES:
   optional_add_course_ef0d70fc: "Opcional: Añadir curso"
   optional_filters_9dc03f5e: "Filtros opcionales"
   optionally_include_a_byte_order_mark_in_compatible_f3d0d243: "De manera opcional, se puede incluir la marca de orden de bytes en exportaciones de hojas de cálculo compatibles para que puedan importarse a Excel en el caso de usuarios de algunas configuraciones regionales."
+  optioncount_options_available_5a34688e: "%{optionCount} opciones disponibles."
+  optionname_selected_list_collapsed_9e69b18a: "%{optionName} seleccionado. Lista colapsada."
+  optionname_selection_has_been_removed_ff1afe6a: "Se ha eliminado la selección %{optionName}"
   options: 
     ? "false"
     : "No"
@@ -16344,6 +16363,7 @@ es-ES:
   please_enter_a_valid_url_protocol_is_required_e_g__4bc49ab1: "Introducir una URL correcta. Se requiere un protocolo (por ejemplo: http://, https://, ftp://, tel:, mailto:)."
   please_enter_your_label_name_7745272d: "Introducir tu %{label_name}:"
   please_enter_your_label_name_and_password_5c56be80: "Introducir tu %{label_name} y contraseña:"
+  please_fix_errors_before_continuing_b1c13e7d: "Soluciona los errores antes de continuar"
   please_insert_a_message_body_bc85cbff: "Introduce un cuerpo del mensaje."
   please_let_them_know_which_page_you_were_viewing_a_c9816406: "Infórmarles qué página estabas viendo y en qué enlace has hecho clic."
   please_log_in_to_view_this_content_eec6cd0: "Iniciar sesión para ver este contenido"
@@ -18810,6 +18830,7 @@ es-ES:
   remove_name_calendar_bdc329d9: "Eliminar %{name} calendario"
   remove_null_values_from_live_event_payloads_3c826f: "Eliminar valores nulos de las cargas de eventos en vivo"
   remove_observers_from_courses_703edc34: "Eliminar observadores de las asignaturas"
+  remove_optionname_8a67379b: "Eliminar %{optionName}"
   remove_outcomes_5f8b601c: 
     one: "Eliminar competencia"
     other: "Eliminar competencias"
@@ -19677,6 +19698,7 @@ es-ES:
   select_conference_provider_58c7f7fe: "Seleccionar proveedor de conferencia"
   select_content: "Seleccionar contenido"
   select_content_7faa4195: "Seleccionar contenido"
+  select_content_b0177809: "Seleccionar contenido"
   select_content_checkbox: 
     select_content_error: "Debes elegir una opción de contenido"
   select_content_dialog: 
@@ -19691,6 +19713,7 @@ es-ES:
     titles: 
       add_item_to_module: "Añadir ítem al contenido"
       find_links_using_service: "Buscar enlaces usando %{service}"
+  select_content_for_import_9406720: "Seleccionar contenido para importar"
   select_content_type_e49c5bf6: "Seleccionar tipo de contenido"
   select_conversation_subject_3f36074a: "Seleccionar conversación %{subject}"
   select_country_or_region_4e9fb08e: "Seleccionar país o región"
@@ -20084,6 +20107,7 @@ es-ES:
         mastery_level: "porcentaje sobre el cual establecer el dominio del tema"
         select_and_add_criterion: "Seleccionar y añadir criterio"
     footer_links: 
+      cookie_notice: "Aviso de cookies"
       facebook: Facebook
       privacy_policy: "Política de privacidad"
       twitter: Twitter
@@ -20678,6 +20702,7 @@ es-ES:
   sorted_by_sortby_in_ordertype_order_55c8cf9a: "Ordenado por %{sortBy} en orden %{orderType}"
   sorted_descending_84ec84c8: "ordenado de forma descendente."
   sorted_direction_by_columnname_d049ac44: "Se ha ordenado %{direction} por %{columnName}"
+  source_c377a469: Original
   source_code_2395ca74: "Código fuente"
   source_context_does_not_match_group_context_4b55cee4: "el contexto de origen no coincide con el contexto del grupo"
   source_link_c21ecc23: "Enlace del recurso"
@@ -22671,6 +22696,7 @@ es-ES:
     new_announcement: "Nuevo anuncio"
     new_topic: "Nuevo tema de foro de discusión"
   title_52b8638d: "Título:"
+  title_count_c8e20865: "%{title} (%{count})"
   title_current_750a3c65: "%{title} (actual)"
   title_due_date_d3f46bfb: "%{title}: Fecha de entrega %{date}"
   title_eb77c512: "%{title}"
@@ -23536,6 +23562,7 @@ es-ES:
   use_remote_service_for_notifications_9fe667c6: "Usar servicio remoto para las notificaciones"
   use_semicolons_instead_of_commas_to_separate_field_62d24565: "Utilizar punto y coma en lugar de coma para separar los campos en exportaciones de hojas de cálculo compatibles para que puedan ser importadas a Excel en el caso de usuarios de algunas configuraciones regionales."
   use_semicolons_to_separate_fields_in_compatible_sp_56e0bdd2: "Utilizar punto y coma para separar los campos en las exportaciones de hojas de cálculo compatibles"
+  use_the_import_content_tool_to_migrate_course_mate_41716290: "Utilizar la herramienta de importar contenido para migrar los materiales del curso a otros recursos de este curso."
   use_the_new_assignments_student_page_944262af: "Usar la nueva página de actividades para alumnos"
   use_the_new_assignments_teacher_page_8add7e46: "Usar la nueva página de actividades para profesores"
   use_the_new_collaborations_external_tool_enabling__5f0ed73: "Utilizar la nueva herramienta externa de Colaboraciones permite más opciones de herramientas para utilizar para colaborar"
@@ -23963,6 +23990,7 @@ es-ES:
   users_can_access_and_create_but_not_edit_individua_a0b26adf: "Los usuarios pueden acceder y crear (pero no editar) rúbricas de actividades individuales a través de Actividades cuando Contenido de la Asignatura: ver y Actividades y pruebas: añadir están habilitados."
   users_can_access_and_create_but_not_edit_individua_c8a62c74: "Los usuarios pueden acceder y crear (pero no editar) rúbricas de actividades individuales mediante Actividades cuando Actividades y evaluaciones: añadir/editar/eliminar está habilitado."
   users_can_add_this_calendar_to_their_other_calenda_69daaa69: "Los usuarios pueden añadir este calendario a su lista de «Otros Calendarios»."
+  users_can_now_archive_grading_schemes_preventing_t_48605092: "Ahora los usuarios pueden archivar esquemas de evaluaciones y evitar que se añadan a cursos o actividades. Se seguirán utilizando los esquemas de evaluaciones en entornos antiguos en los que se esté utilizando. Se puede acceder a los esquemas de evaluaciones archivados en la página de configuración a nivel de cuenta en esquemas de evaluaciones, pero no se pueden editar ni eliminar."
   users_can_temporarily_enroll_another_user_in_a_cou_ce9b48ed: "Los usuarios pueden inscribir temporalmente a otro usuario en un curso. El usuario asignado se eliminará del curso cuando la inscripción caduque."
   users_d1b60cb0: Usuarios
   users_designers_22195c6f: "Usuarios: diseñadores"
@@ -24633,6 +24661,7 @@ es-ES:
   you_do_not_have_permission_to_publish_this_course_ff361c82: "No tienes permiso para publicar esta asignatura."
   you_do_not_have_permission_to_view_announcements_i_6b2e31a2: "No tienes permiso para ver los anuncios en esta asignatura."
   you_do_not_have_permissions_to_build_this_moderate_bd5d350a: "No tienes permiso para crear esta actividad moderada"
+  you_do_not_have_permissions_to_create_assignments__f554cd6a: "No tienes permiso para crear las actividades en este curso"
   you_do_not_have_permissions_to_edit_this_moderated_3195294f: "No tienes permiso para editar esta actividad moderada"
   you_do_not_have_permissions_to_modify_discussion_f_a163d8be: "No tienes permiso para editar foros de discusión de las secciones %{section_ids}"
   you_don_t_have_access_to_view_this_resource_8378e0e8: "No tienes acceso para ver este recurso."
@@ -24831,6 +24860,7 @@ es-ES:
   your_media_has_been_uploaded_and_will_appear_here__8546af57: "Tu contenido multimedia se ha actualizado y aparecerá aquí después de tu proceso."
   your_message_has_been_sent_thank_you_e0284316: "Tu mensaje ha sido enviado. ¡Gracias!"
   your_message_was_sent_977f6583: "¡Tu mensaje ha sido enviado!"
+  your_migration_can_not_exceed_file_size_b0dda25f: "La migración no puede superar %{file_size}"
   your_modules_will_appear_here_after_they_re_assemb_bfd5abe8: "Tus contenidos aparecerán aquí después de que se hayan montado."
   your_name_7665e1d8: "Tu nombre"
   your_outcomes_were_successfully_imported_c5de884: "Se han importado las competencias."
