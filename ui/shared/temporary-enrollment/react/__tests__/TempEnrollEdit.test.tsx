@@ -16,10 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {TempEnrollEdit} from '../TempEnrollEdit'
+import {
+  getEnrollmentUserDisplayName,
+  getRelevantUserFromEnrollment,
+  groupEnrollmentsByPairingId,
+  TempEnrollEdit,
+} from '../TempEnrollEdit'
 import React from 'react'
 import {fireEvent, render, screen} from '@testing-library/react'
-import {PROVIDER, RECIPIENT} from '../types'
+import {Enrollment, PROVIDER, RECIPIENT, User} from '../types'
 
 describe('TempEnrollEdit component', () => {
   let props: any
@@ -214,6 +219,73 @@ describe('TempEnrollEdit component', () => {
         fireEvent.click(screen.getByTestId('add-button'))
 
         expect(props.onAddNew).toHaveBeenCalled()
+      })
+    })
+  })
+
+  describe('utility functions', () => {
+    const mockProviderUser: User = {
+      id: '1',
+      name: 'Provider User',
+    }
+    const mockRecipientUser: User = {
+      id: '2',
+      name: 'Recipient User',
+    }
+    const mockTempEnrollment: Enrollment = {
+      course_id: 0,
+      end_at: '',
+      id: 0,
+      role_id: '',
+      start_at: '',
+      temporary_enrollment_source_user_id: 0,
+      type: '',
+      user: mockRecipientUser,
+      temporary_enrollment_provider: mockProviderUser,
+      temporary_enrollment_pairing_id: 1,
+    }
+
+    describe('getRelevantUserFromEnrollment', () => {
+      it('returns temporary_enrollment_provider when present', () => {
+        const enrollmentUser: User = getRelevantUserFromEnrollment(mockTempEnrollment)
+        expect(enrollmentUser).toBe(mockTempEnrollment.temporary_enrollment_provider)
+      })
+
+      it('returns user when temporary_enrollment_provider is absent', () => {
+        const tempEnrollment: Enrollment = {
+          ...mockTempEnrollment,
+          temporary_enrollment_provider: undefined,
+        }
+        const enrollmentUser = getRelevantUserFromEnrollment(tempEnrollment)
+        expect(enrollmentUser).toBe(tempEnrollment.user)
+      })
+    })
+
+    describe('getEnrollmentUserDisplayName', () => {
+      it('returns the name of the relevant user', () => {
+        const displayName = getEnrollmentUserDisplayName(mockTempEnrollment)
+        expect(displayName).toBe(mockTempEnrollment.temporary_enrollment_provider!.name)
+      })
+    })
+
+    describe('groupEnrollmentsByPairingId', () => {
+      it('groups enrollments by temporary_enrollment_pairing_id', () => {
+        const tempEnrollment2: Enrollment = {
+          ...mockTempEnrollment,
+          temporary_enrollment_pairing_id: 2,
+        }
+        const tempEnrollment3: Enrollment = {
+          ...mockTempEnrollment,
+          temporary_enrollment_pairing_id: 2,
+        }
+        const tempEnrollments = [mockTempEnrollment, tempEnrollment2, tempEnrollment3]
+        const grouped = groupEnrollmentsByPairingId(tempEnrollments)
+        expect(Object.keys(grouped)).toHaveLength(2)
+        expect(grouped[1]).toHaveLength(1)
+        expect(grouped[1][0]).toBe(tempEnrollments[0])
+        expect(grouped[2]).toHaveLength(2)
+        expect(grouped[2][0]).toBe(tempEnrollments[1])
+        expect(grouped[2][1]).toBe(tempEnrollments[2])
       })
     })
   })

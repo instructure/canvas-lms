@@ -102,7 +102,7 @@ describe('UsersListRow', () => {
     beforeEach(() => {
       // enrollment providers
       fetchMock.get(
-        '/api/v1/users/1/enrollments?state%5B%5D=active&state%5B%5D=invited&temporary_enrollment_providers=true',
+        '/api/v1/users/1/enrollments?temporary_enrollments=true&state%5B%5D=current_and_future&per_page=100&temporary_enrollment_recipients=true',
         [
           {
             id: '47',
@@ -120,7 +120,7 @@ describe('UsersListRow', () => {
 
       // enrollment recipients
       fetchMock.get(
-        '/api/v1/users/1/enrollments?state%5B%5D=active&state%5B%5D=invited&temporary_enrollment_recipients=true',
+        '/api/v1/users/1/enrollments?temporary_enrollments=true&state%5B%5D=current_and_future&per_page=100&include=temporary_enrollment_providers',
         [
           {
             id: '48',
@@ -128,6 +128,9 @@ describe('UsersListRow', () => {
             user: {
               id: '2',
               name: 'Recipient Person',
+            },
+            temporary_enrollment_provider: {
+              id: '47',
             },
             start_at: '2019-09-26T00:00:00Z',
             end_at: '2019-09-27T23:59:59Z',

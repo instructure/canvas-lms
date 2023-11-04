@@ -100,7 +100,7 @@ export function TempEnrollModal(props: Props) {
     }
   }
 
-  const resetState = () => {
+  const handleModalReset = () => {
     setPage(0)
     setEnrollment(null)
     setIsViewingAssignFromEdit(false)
@@ -159,10 +159,6 @@ export function TempEnrollModal(props: Props) {
     setPage(currentPage => currentPage + 1)
   }
 
-  const handleResetToBeginning = () => {
-    resetState()
-  }
-
   const isSubmissionPage = () => {
     return page === 3
   }
@@ -197,7 +193,7 @@ export function TempEnrollModal(props: Props) {
         <TempEnrollEdit
           user={props.user}
           enrollments={enrollmentData}
-          onAddNew={handleResetToBeginning}
+          onAddNew={handleModalReset}
           onEdit={handleGoToAssignPageWithEnrollment}
           onDelete={handleEnrollmentDeletion}
           enrollmentType={props.enrollmentType}
@@ -227,7 +223,7 @@ export function TempEnrollModal(props: Props) {
           canReadSIS={props.canReadSIS}
           user={props.user}
           page={page}
-          searchFail={handleResetToBeginning}
+          searchFail={handleModalReset}
           searchSuccess={handleSetEnrollmentFromSearch}
           foundEnroll={enrollment}
         />
@@ -260,7 +256,7 @@ export function TempEnrollModal(props: Props) {
           <Flex.Item key="startOver" margin="0 small 0 0">
             <Button
               disabled={buttonsDisabled}
-              onClick={handleResetToBeginning}
+              onClick={handleModalReset}
               {...analyticProps('StartOver')}
             >
               {I18n.t('Start Over')}
@@ -304,7 +300,7 @@ export function TempEnrollModal(props: Props) {
         onEntered={handleModalEntered}
         onExit={handleModalExit}
         onDismiss={handleCloseModal}
-        onExited={resetState}
+        onExited={handleModalReset}
       >
         <Modal.Header>
           <Heading tabIndex={-1} level="h2">

@@ -131,7 +131,7 @@ export default function UsersListRow({
   useEffect(() => {
     const fetchAllEnrollments = async () => {
       try {
-        const [recipientData, providerData] = await Promise.all([
+        const [providerData, recipientData] = await Promise.all([
           // provider-related enrollments
           fetchTemporaryEnrollments(user.id, false),
           // recipient-related enrollments

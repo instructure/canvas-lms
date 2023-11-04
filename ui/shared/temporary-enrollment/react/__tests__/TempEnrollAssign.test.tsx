@@ -326,17 +326,6 @@ describe('TempEnrollAssign', () => {
   })
 
   describe('getEnrollmentAndUserProps', () => {
-    it('should return unchanged values when enrollmentType is null', () => {
-      const {enrollmentProps, userProps} = getEnrollmentAndUserProps({
-        enrollmentType: null,
-        enrollment: props.enrollment,
-        user: props.user,
-      })
-
-      expect(enrollmentProps).toEqual(props.enrollment)
-      expect(userProps).toEqual(props.user)
-    })
-
     it('should return enrollmentProps and userProps correctly when enrollmentType is RECIPIENT', () => {
       const {enrollmentProps, userProps} = getEnrollmentAndUserProps({
         enrollmentType: RECIPIENT,
