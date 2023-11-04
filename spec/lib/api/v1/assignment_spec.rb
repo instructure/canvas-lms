@@ -986,6 +986,19 @@ describe "Api::V1::Assignment" do
           expect(json).to have_key "migrated_urls_content_migration_id"
         end
       end
+
+      context "and no migration urls are present" do
+        it "does not create migration" do
+          response_body = { "" => "" }.to_json
+          stub_request(:get, report_url).to_return(status: 200, body: response_body, headers: {})
+
+          expect(subject).to eq :ok
+
+          json = api.assignment_json(assignment, user, session, opts)
+          expect(json).to be_a(Hash)
+          expect(json).to_not have_key "migrated_urls_content_migration_id"
+        end
+      end
     end
   end
 end
