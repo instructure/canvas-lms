@@ -2250,6 +2250,7 @@ ru:
   add_app_baf540f: "Добавить приложение"
   add_as_a_faculty_journal_entry_55a38a30: "Добавить как запись журнала преподавателей"
   add_as_allowed_e95540be: "Добавить как Разрешенный"
+  add_assignment_da1c1529: "Добавить задание"
   add_assignment_to_name_caf173b0: "Добавить задание для %{name}"
   add_assignments_and_quizzes_1085d2af: "Добавить задания и контрольные тесты"
   add_attachment_93868828: "Добавить вложение"
@@ -2331,6 +2332,7 @@ ru:
   add_moderator_review_copy_1st_a484c813: "Добавить отзыв модератора (1-й экземпляр)"
   add_moderator_review_copy_2nd_e80d458f: "Добавить отзыв модератора (2-й экземпляр)"
   add_moderator_review_new_3c183cea: "Добавить отзыв модератора (Новый)"
+  add_module_5ad6fee2: "Добавить модуль"
   add_module_item: 
     add_assignment_to: "Добавить задание к %{module}"
     add_file_to: "Добавить файлы к %{module}"
@@ -2492,6 +2494,7 @@ ru:
   admins_3e1dce15: Админы
   admins_add_remove_26811ce5: "Админы - добавить / удалить"
   advanced_36b35b8: Продвинутый
+  advanced_analytics_course_readiness_closed_alpha_13c8aaf: "Advanced Analytics — Готовность курса, закрытая Альфа"
   advertise_release_notes_via_the_ui_9254bc6c: "Показывать примечания к выпуску через пользовательский интерфейс"
   affects_viewing_the_conclude_course_and_permanentl_8216fcc2: "Влияет на представление кнопок «Включить курс» и «Навсегда удалить этот курс». Кнопка «Навсегда удалить этот курс» появляется только для созданных вручную курсов."
   affects_viewing_the_conclude_course_and_permanentl_d943656e: "Влияет на представление кнопок «Включить курс» и «Навсегда удалить этот курс». Кнопка «Навсегда удалить этот курс» появляется только для созданных вручную курсов.\n\
@@ -3939,6 +3942,7 @@ ru:
   archive_operation_failed_5504706: "Сбой операции архивирования"
   archive_selected_d64506ca: "Архив выбран"
   archived_de543437: "Помещено в архив"
+  archived_grading_schemes_6d698d0: "Архивированные схемы оценивания"
   are_you_sure_26795d3c: "Вы уверены?"
   are_you_sure_that_you_want_to_remove_these_count_o_67ef2d6c: 
     few: "Вы действительно хотите удалить эти %{count} результата(-ов) из этой учетной записи?"
@@ -4317,6 +4321,7 @@ ru:
   assignment_score_summary_f1dc9708: "Сводка оценок по заданиям"
   assignment_selection_6bff05c4: "Выбор заданий"
   assignment_set_set_index_28b1f973: "Задание установлено %{set_index}"
+  assignment_settings_5ee5ee77: "Настройки задания"
   assignment_submissions_uploaded_ba0dbc84: "%{assignment}: Отправки загружены"
   assignment_title_82b4422e: "Заголовок задания:"
   assignment_title_8a707dd2: "заголовок задания"
@@ -6310,6 +6315,7 @@ ru:
   cannot_move_assignments_due_to_closed_grading_peri_59fc3c4: "Невозможно отправить задание из-за того, что академические периоды закрыты"
   cannot_move_events_with_section_specific_times_bet_3fe871fc: "Невозможно переместить события со специфическим для разделов времени между календарями"
   cannot_move_scheduler_appointments_between_calenda_253e5ea3: "Невозможно переместить назначения между календарями"
+  cannot_reference_self_16dfcd49: "не может ссылаться на себя"
   cannot_relink_unsaved_paces_3ed42012: "Не удается заново привязать несохраненные планы"
   cannot_relink_unsaved_plans_2ccef56a: "Невозможно повторно связать несохраненные планы"
   cannot_remove_c0fd581d: "Невозможно удалить:"
@@ -8259,6 +8265,7 @@ ru:
   couldn_t_load_previous_content_migrations_a0ef5d7a: "Не удалось загрузить предыдущие миграции содержимого"
   couldn_t_save_account_calendar_visibilities_343459d1: "Не удается сохранить параметры отображения календаря учетной записи"
   couldn_t_track_assigning_students_to_groups_but_it_b6510770: "Невозможно отследить привязку студентов к группам, но она все еще происходит! Проверьте результат позднее вручную. (%{errorMessage})"
+  couldn_t_update_content_migrations_68777765: "Не удалось обновить миграции содержимого"
   couldn_t_update_standards_for_authority_auth_81206187: "Не удалось обновить стандарты для полномочий %{auth}"
   count_40eced3b: Счет
   count_account_calendars_found_b1eed2e3: 
@@ -12327,6 +12334,7 @@ ru:
   error_creating_conversation_1d814618: "Ошибка при создании обсуждения"
   error_creating_course_ae61c2bd: "Ошибка при создании курса"
   error_creating_discussion_topic_a5f809ec: "Ошибка при создании темы обсуждения"
+  error_creating_modulename_cd0f5c2e: "Ошибка при создании %{moduleName}."
   error_creating_new_course_9d3903bc: "Ошибка при создании нового курса"
   error_creating_new_subject_89f16abe: "Ошибка при создании новой темы"
   error_creating_submission_comment_a5374fcf: "Ошибка создания комментария к отправке"
@@ -12388,6 +12396,7 @@ ru:
   error_the_tool_returned_an_invalid_content_type_co_10a11c07: "Ошибка: Инструмент вернул недопустимый тип содержимого %{contentType}"
   error_updating_cluster_error_674e5f2e: "Ошибка при обновлении %{cluster}: %{error}"
   error_updating_comment_4b80c76d: "Ошибка обновления комментария"
+  error_updating_discussion_topic_64522a23: "Ошибка при обновлении темы обсуждения"
   error_updating_module_access_f0970f4c: "Ошибка обновления доступа к модулю."
   error_updating_modulename_settings_da982acf: "Ошибка при обновлении настроек %{moduleName}."
   error_updating_notes_31b24785: "Ошибка обновления заметок"
@@ -12907,6 +12916,7 @@ ru:
   failed_to_export_course_paces_e17583ba: "Не удалось экспортировать планы прохождения курсов"
   failed_to_export_pace_plans_9832daac: "Не удалось экспортировать планы темпов"
   failed_to_export_some_tool_settings_c992fc56: "Не удалось экспортировать некоторые настройки инструментов"
+  failed_to_fetch_content_for_import_a042cc27: "Не удалось получить содержимое для импорта."
   failed_to_fetch_migration_issues_data_a896da98: "Не удалось получить данные о проблемах миграции."
   failed_to_get_new_activity_17e7ec7c: "Не удалось получить новую активность"
   failed_to_ignore_assignment_46565fa3: "Не удалось игнорировать задание"
@@ -14286,6 +14296,7 @@ ru:
       total: Всего
   graded_25cd3fcd: "С оценкой"
   graded_date_by_grader_e8e1ff75: "%{graded_date} по %{grader}"
+  graded_discussion_17cc8eaf: "Оцениваемая дискуссия"
   graded_discussion_a873bb3e: "Оцененное обсуждение:"
   graded_on_submission_60ac3010: "Оценка по отправке"
   graded_quiz_7fabdf1f: "Оцененное тестирование"
@@ -15638,7 +15649,7 @@ ru:
       Если эта опция включена, то в формах установки и настройки инструмента, расположенных на страницах настроек учетной записи и курса, будут использоваться
       компоненты InstUI, а не старые, менее доступные собственные компоненты.
   if_enabled_the_user_s_lti_url_input_on_the_select__fa539830: |-
-      Если эта опция включена, то введенный пользователем LTI URL в диалоговом окне выбора содержимого будет перезаписан, 
+      Если эта опция включена, то введенный пользователем LTI URL в диалоговом окне выбора содержимого будет перезаписан,
       если инструмент ответит с правильным LTI URL.
   if_enabled_the_user_will_see_a_warning_alert_box_n_d85c7b1f: |-
       Если эта функция включена, пользователь увидит предупреждающее окно Alert в верхней части
@@ -16538,7 +16549,7 @@ ru:
   k20_beta_description: "Включение функций K20 Beta в приложении Admin Analytics."
   k20_course_readiness_alpha_testing_description: "Этот флажок предназначен для учреждений, участвующих в тестировании Alpha расширенной аналитики. Этот флажок включает панель готовности курсов для этих учебных заведений."
   k20_course_readiness_alpha_testing_f45597b6: "K20 - Тестирование Alpha готовности курса"
-  k20_course_readiness_description: "Активирует новую панель Admin Analytics Course Readiness Dashboard."
+  k20_course_readiness_description: "Включение панели готовности курса Advanced Analytics для альфа-тестеров."
   k_2521301c: k
   kazakhstan_7_8fe892c: "Казахстан (+7)"
   keep_8f3e7c16: Оставить
@@ -17016,6 +17027,7 @@ ru:
   loading_comments_32366acf: "Загрузка комментариев"
   loading_completion_b62ca82f: "Завершение загрузки"
   loading_compose_modal_f6da0e8b: "Загрузка модальности составления"
+  loading_content_for_import_4ed89a17: "Загрузка содержимого для импорта."
   loading_conversation_messages_71e9050e: "Выполняется загрузка сообщений беседы"
   loading_courses_409a3641: "Загрузка курсов"
   loading_courses_bd1bffe: "Загрузка курсов..."
@@ -17065,6 +17077,7 @@ ru:
   loading_missing_assignments_link_d9a0d320: "Загрузка ссылки на отсутствующие задания"
   loading_more_grade_history_results_b235de5: "Загрузка дополнительных результатов истории выставления оценок."
   loading_more_gradebook_history_results_810f6d2e: "Загрузка большего числа результатов истории журнала оценок."
+  loading_more_issues_b14f8f7d: "Загрузка дополнительных проблем"
   loading_more_replies_22e0f13c: "Загрузка дополнительных ответов"
   loading_more_results_1d437202: "Загрузка других результатов"
   loading_more_results_def6df65: "Загрузка большего количества результатов..."
@@ -19805,6 +19818,7 @@ ru:
   module_publish_menu_30b638dd: "Меню публикации модулей"
   module_publish_menu_88b54c1b: "Меню публикации модулей"
   module_published_80f0b9b8: "Модуль опубликована"
+  modulename_created_successfully_6c273e09: "%{moduleName} успешно создан(-а)."
   modulename_module_publish_options_69ef1ece: "%{moduleName} Варианты публикации модулей"
   modulename_module_publish_options_publishedstatus_94ea7f49: "Варианты публикации модуля %{moduleName}, %{publishedStatus}"
   modulename_settings_updated_successfully_a09bfef6: "Настройки %{moduleName} успешно обновлены."
@@ -20478,6 +20492,7 @@ ru:
   no_existing_user_provided_for_login_with_sis_id_us_6bcde71f: "Нет существующего пользователя для входа в систему с идентификатором SIS %{user_id}"
   no_explainer_text_available_9d9a2f3c: "Нет доступного объяснительного текста"
   no_exports_to_display_7f1b630b: "Экспортированных элементов для отображения нет"
+  no_file_chosen_9a880793: "Не выбран ни один файл"
   no_file_selected_92d2ac30: "Не выбран файл"
   no_file_submitted_a879fa53: "Нет переданных файлов"
   no_final_grade_selected_3595c9c: "Отсутствует выбранная итоговая оценка"
@@ -21288,6 +21303,9 @@ ru:
   optional_filters_9dc03f5e: "Опциональные фильтры"
   optionally_include_a_byte_order_mark_in_compatible_f3d0d243: "Опционально включить метку порядка байтов в совместимый экспорт бухучета, чтобы их можно было импортировать в Excel для пользователей в некоторых местах."
   optionally_include_a_byte_order_mark_in_gradebook__555cc605: "Опционально включите метку порядка байтов в экспорт журналов оценок, чтобы их можно было импортировать в Excel для пользователей в некоторых местах."
+  optioncount_options_available_5a34688e: "Доступно %{optionCount} варианта(-ов)."
+  optionname_selected_list_collapsed_9e69b18a: "%{optionName} выбрано. Список свернут."
+  optionname_selection_has_been_removed_ff1afe6a: "Выбор %{optionName} был удален"
   options: 
     ? "false"
     : Нет
@@ -21911,6 +21929,7 @@ ru:
   please_enter_a_valid_url_protocol_is_required_e_g__c6ccfeca: "Пожалуйста, введите корректный адрес. Требуется протокол (например, http://, https://, ftp://)."
   please_enter_your_label_name_7745272d: "Пожалуйста, введите ваше %{label_name}:"
   please_enter_your_label_name_and_password_5c56be80: "Пожалуйста, введите ваше %{label_name} и пароль:"
+  please_fix_errors_before_continuing_b1c13e7d: "Устраните ошибки, прежде чем продолжить"
   please_have_the_student_submit_the_file_again_dba514b7: "Попросите студентов отправить файл еще раз"
   please_insert_a_message_body_bc85cbff: "Вставьте тело сообщения."
   please_let_them_know_which_page_you_were_viewing_a_6039f59a: "Сообщите им, какую страницу вы просматривали и по какой ссылке перешли."
@@ -25107,6 +25126,7 @@ ru:
   remove_name_calendar_bdc329d9: "Удалить календарь %{name}"
   remove_null_values_from_live_event_payloads_3c826f: "Удалить нулевые значения из интерактивных событий"
   remove_observers_from_courses_703edc34: "Удалить наблюдателей из курсов"
+  remove_optionname_8a67379b: "Удалить %{optionName}"
   remove_outcome_20e16da7: "Удалить результаты?"
   remove_outcome_2feaf5fd: "Удалить результаты"
   remove_outcomes_5f8b601c: 
@@ -26186,6 +26206,7 @@ ru:
   select_conference_provider_58c7f7fe: "Выбрать организатора конференции"
   select_content: "Выбрать содержимое"
   select_content_7faa4195: "Выбрать содержимое"
+  select_content_b0177809: "Выбрать содержимое"
   select_content_checkbox: 
     select_content_error: "Вы должны выбрать опции содержимого"
   select_content_dialog: 
@@ -26201,6 +26222,7 @@ ru:
     titles: 
       add_item_to_module: "Добавить элемент в модуль"
       find_links_using_service: "Поиск ссылок с помощью %{service}"
+  select_content_for_import_9406720: "Выбрать содержимое для импорта"
   select_content_type_e49c5bf6: "Выбрать тип содержимого"
   select_conversation_subject_3f36074a: "Выбрать дискуссию %{subject}"
   select_country_d21cb85a: "Выбрать страну"
@@ -26742,6 +26764,7 @@ ru:
     flash_notices: 
       close: Закрыть
     footer_links: 
+      cookie_notice: "Уведомление об использовании файлов cookie"
       facebook: Facebook
       privacy_policy: "Политика конфиденциальности"
       terms_of_service: "Условия предоставления услуг"
@@ -27664,6 +27687,7 @@ ru:
   sorted_descending_84ec84c8: "отсортировано в нисходящем порядке."
   sorted_descending_d9aa3cf8: "Отсортировано по убыванию"
   sorted_direction_by_columnname_d049ac44: "Отсортировано %{direction} по %{columnName}"
+  source_c377a469: Источник
   source_code_2395ca74: "Код источника"
   source_context_does_not_match_group_context_4b55cee4: "исходный контекст не соответствует групповому контексту"
   source_link_c21ecc23: "Ссылка на источник"
@@ -30045,6 +30069,7 @@ ru:
     new_topic: "Новая тема обсуждения"
   title_52b8638d: "Название:"
   title_appointment_group_you_can_sign_up_for_this_1c254712: "*%{title} группа назначений* Вы можете **подписаться** на"
+  title_count_c8e20865: "%{title} (%{count})"
   title_current_750a3c65: "%{title} (текущий)"
   title_due_date_d3f46bfb: "%{title}: Срок %{date}"
   title_eb77c512: "%{title}"
@@ -31336,6 +31361,7 @@ ru:
   use_semicolons_instead_of_commas_to_separate_field_f50945f2: "Используйте точки с запятой вместо запятых для разделения полей в экспорте журналов оценок, чтобы их можно было импортировать в Excel для пользователей в некоторых местах."
   use_semicolons_to_separate_fields_in_compatible_sp_56e0bdd2: "Используйте точки с запятыми для разделения полей в совместимом экспорте бухучета"
   use_semicolons_to_separate_fields_in_gradebook_exp_5fb3b39d: "Используйте точки с запятыми для разделения полей в экспорте журналов оценок"
+  use_the_import_content_tool_to_migrate_course_mate_41716290: "Для переноса материалов курса из других источников в данный курс используйте инструмент Импорт содержимого."
   use_the_new_assignments_page_dd292b9d: "Используйте новую страницу заданий"
   use_the_new_assignments_student_page_944262af: "Используйте новую страницу заданий для студентов"
   use_the_new_assignments_teacher_page_8add7e46: "Используйте новую страницу заданий для преподавателей"
@@ -31879,6 +31905,7 @@ ru:
   users_can_access_and_create_but_not_edit_individua_c8a62c74: "У пользователей есть доступ к отдельным рубрикам заданий и возможность их создания (но не редактирования) через «Задания», когда включен параметр «Задания и тесты - добавить / редактировать / удалить»."
   users_can_access_the_manage_question_banks_link_on_e411d01: "Пользователи могут получать доступ к ссылке управления банками вопросов на странице-указателе «Тесты», когда включены параметры «Содержание курса - просмотреть» и «Задания и тесты - добавить / редактировать / удалить»."
   users_can_add_this_calendar_to_their_other_calenda_69daaa69: "Пользователи могут добавить этот календарь в свой список «Другие календари»."
+  users_can_now_archive_grading_schemes_preventing_t_48605092: "Пользователи теперь могут архивировать схемы оценивания, предотвращая их добавление в курсы/задания. Схемы оценивания в старых контекстах, где они используются, будут использоваться и дальше. Архивные схемы оценивания доступны на странице настроек схем оценивания на уровне учетной записи, при этом они не могут быть отредактированы или удалены."
   users_can_temporarily_enroll_another_user_in_a_cou_ce9b48ed: "Пользователи могут временно регистрировать другого пользователя в курсе. Назначенный пользователь удаляется из курса по истечении срока регистрации."
   users_d1b60cb0: Пользователи
   users_designers_22195c6f: "Пользователи - Дизайнеры"
@@ -32706,6 +32733,7 @@ ru:
   you_do_not_have_permission_to_publish_this_course_ff361c82: "У вас нет разрешения на публикацию этого курса."
   you_do_not_have_permission_to_view_announcements_i_6b2e31a2: "У вас нет разрешения просматривать объявления в этом курсе."
   you_do_not_have_permissions_to_build_this_moderate_bd5d350a: "У вас нет разрешения для создания этого модерированного задания"
+  you_do_not_have_permissions_to_create_assignments__f554cd6a: "У вас нет разрешения на создание заданий в предоставленном курсе"
   you_do_not_have_permissions_to_edit_this_moderated_3195294f: "У вас нет разрешения для редактирования этого модерированного задания"
   you_do_not_have_permissions_to_modify_discussion_f_a163d8be: "У вас нет прав для изменения дискуссии для раздела(-ов) %{section_ids}"
   you_don_t_have_access_to_view_this_resource_8378e0e8: "У вас нет доступа к просмотру этого ресурса."
@@ -32938,6 +32966,7 @@ ru:
   your_media_has_been_uploaded_and_will_appear_here__8546af57: "Ваше мультимедиа было загружено и отобразится здесь после обработки."
   your_message_has_been_sent_thank_you_e0284316: "Ваше сообщение было отправлено. Спасибо!"
   your_message_was_sent_977f6583: "Ваше сообщение отправлено!"
+  your_migration_can_not_exceed_file_size_b0dda25f: "Объем вашей миграции не должен превышать %{file_size}"
   your_modules_will_appear_here_after_they_re_assemb_bfd5abe8: "Модули появятся здесь после их сборки."
   your_name_7665e1d8: "Ваше Имя"
   your_outcomes_were_successfully_imported_c5de884: "Ваши результаты были успешно импортированы."
