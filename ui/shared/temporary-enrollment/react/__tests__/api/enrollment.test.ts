@@ -18,9 +18,36 @@
 
 import {deleteEnrollment, fetchTemporaryEnrollments} from '../../api/enrollment'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import {Enrollment, ITEMS_PER_PAGE, User} from '../../types'
 
 // Mock the API call
 jest.mock('@canvas/do-fetch-api-effect')
+
+const mockRecipientUser: User = {
+  id: '123',
+  name: 'Mark Rogers',
+}
+
+const mockProviderUser: User = {
+  id: '789',
+  name: 'Michelle Gonalez',
+}
+
+const mockEnrollment: Enrollment = {
+  id: 1,
+  course_id: 101,
+  start_at: '2023-01-01T00:00:00Z',
+  end_at: '2023-06-01T00:00:00Z',
+  role_id: '5',
+  user: {
+    name: 'Some User',
+    avatar_url: 'https://someurl.com/avatar.png',
+    id: '6789',
+  },
+  temporary_enrollment_pairing_id: 2,
+  temporary_enrollment_source_user_id: 3,
+  type: 'TeacherEnrollment',
+}
 
 describe('enrollment api', () => {
   describe('Enrollment functions', () => {
@@ -46,7 +73,13 @@ describe('enrollment api', () => {
       })
 
       it('fetches enrollments where the user is a recipient', async () => {
-        const mockJson = Promise.resolve([{id: 1}])
+        const mockJson = Promise.resolve([
+          {
+            ...mockEnrollment,
+            user: mockRecipientUser,
+            temporary_enrollment_provider: mockProviderUser,
+          },
+        ])
         ;(doFetchApi as jest.Mock).mockResolvedValue({
           response: {status: 200, ok: true},
           json: mockJson,
@@ -57,7 +90,12 @@ describe('enrollment api', () => {
       })
 
       it('fetches enrollments where the user is a provider', async () => {
-        const mockJson = Promise.resolve([{id: 2}])
+        const mockJson = Promise.resolve([
+          {
+            ...mockEnrollment,
+            user: mockRecipientUser,
+          },
+        ])
         ;(doFetchApi as jest.Mock).mockResolvedValue({
           response: {status: 200, ok: true},
           json: mockJson,
@@ -70,6 +108,7 @@ describe('enrollment api', () => {
       it('returns empty array when no enrollments are found', async () => {
         ;(doFetchApi as jest.Mock).mockResolvedValue({
           response: {status: 204, ok: true},
+          json: [],
         })
 
         const result = await fetchTemporaryEnrollments(1, true)
@@ -83,6 +122,46 @@ describe('enrollment api', () => {
 
         expect(result).toEqual([])
         expect(mockConsoleError).toHaveBeenCalled()
+      })
+
+      it('should return enrollment data with the correct type for a provider', async () => {
+        ;(doFetchApi as jest.Mock).mockResolvedValue({
+          response: {status: 200, ok: true},
+          json: Promise.resolve([{}]),
+          link: null,
+        })
+        await fetchTemporaryEnrollments(1, false)
+        expect(doFetchApi).toHaveBeenCalledWith(
+          expect.objectContaining({
+            path: '/api/v1/users/1/enrollments',
+            params: expect.objectContaining({
+              temporary_enrollments: true,
+              state: ['current_and_future'],
+              per_page: ITEMS_PER_PAGE,
+              temporary_enrollment_recipients: true,
+            }),
+          })
+        )
+      })
+
+      it('should return enrollment data with the correct type for a recipient', async () => {
+        ;(doFetchApi as jest.Mock).mockResolvedValueOnce({
+          response: {status: 200, ok: true},
+          json: Promise.resolve([{}]),
+          link: null,
+        })
+        await fetchTemporaryEnrollments(1, true)
+        expect(doFetchApi).toHaveBeenCalledWith(
+          expect.objectContaining({
+            path: '/api/v1/users/1/enrollments',
+            params: expect.objectContaining({
+              temporary_enrollments: true,
+              state: ['current_and_future'],
+              per_page: ITEMS_PER_PAGE,
+              include: 'temporary_enrollment_providers',
+            }),
+          })
+        )
       })
     })
 

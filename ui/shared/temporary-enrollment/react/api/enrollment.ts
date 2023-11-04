@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Enrollment} from '@canvas/temporary-enrollment/react/types'
+import {Enrollment, ITEMS_PER_PAGE} from '../types'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
 /**
@@ -24,13 +24,9 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
  *
  * If isRecipient is true:
  *  - Fetches enrollments where the user is a recipient
- *  - These are enrollments that the user has permission to read and that are
- *    active or pending
  *
  * If isRecipient is false:
  *  - Fetches enrollments where the user is a provider
- *  - Looks for temporary enrollments for the recipient and returns
- *    corresponding provider enrollments that are active or pending by date
  *
  * @param {number} userId ID of the user to fetch data for
  * @param {boolean} isRecipient Whether to fetch recipients or providers
@@ -43,20 +39,27 @@ export async function fetchTemporaryEnrollments(
   let responseStatus = -1
   const entityType = isRecipient ? 'recipients' : 'providers'
 
+  const params: Record<string, any> = {
+    temporary_enrollments: true,
+    state: ['current_and_future'],
+    per_page: ITEMS_PER_PAGE,
+  }
+
+  if (isRecipient) {
+    params.include = 'temporary_enrollment_providers'
+  } else {
+    params.temporary_enrollment_recipients = true
+  }
+
   try {
-    // destructuring for clarity
     const {response, json} = await doFetchApi({
       path: `/api/v1/users/${userId}/enrollments`,
-      params: {
-        state: ['active', 'invited'],
-        [`temporary_enrollment_${entityType}`]: true,
-      },
+      params,
     })
 
     responseStatus = response.status
 
     if (responseStatus === 204) {
-      // No enrollments found
       return []
     } else if (!response.ok) {
       throw new Error(`Failed to fetch ${entityType} data. Status: ${responseStatus}`)

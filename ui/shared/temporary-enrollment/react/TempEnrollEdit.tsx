@@ -53,6 +53,25 @@ interface Props {
   readonly tempEnrollPermissions: TempEnrollPermissions
 }
 
+export function getRelevantUserFromEnrollment(enrollment: Enrollment) {
+  return enrollment.temporary_enrollment_provider ?? enrollment.user
+}
+
+export function getEnrollmentUserDisplayName(enrollment: Enrollment) {
+  return getRelevantUserFromEnrollment(enrollment).name
+}
+
+export function groupEnrollmentsByPairingId(enrollments: Enrollment[]) {
+  return enrollments.reduce((groupedById, enrollment) => {
+    const groupId = enrollment.temporary_enrollment_pairing_id
+    if (!groupedById[groupId]) {
+      groupedById[groupId] = []
+    }
+    groupedById[groupId].push(enrollment)
+    return groupedById
+  }, {} as Record<number, Enrollment[]>)
+}
+
 /**
  * Confirms and deletes an enrollment
  *
@@ -93,12 +112,16 @@ export function TempEnrollEdit(props: Props) {
   // destructure and cache permission checks (for use in eager and lazy evaluations)
   const {canEdit, canDelete, canAdd} = props.tempEnrollPermissions
 
+  const canEditOrDelete = canEdit || canDelete
+
   const enrollmentTypeLabel =
     props.enrollmentType === PROVIDER ? I18n.t('Recipient') : I18n.t('Provider')
 
+  const enrollmentGroups = groupEnrollmentsByPairingId(props.enrollments)
+
   const handleEditClick = (enrollment: Enrollment) => {
     if (canEdit) {
-      props.onEdit?.(enrollment.user)
+      props.onEdit?.(getRelevantUserFromEnrollment(enrollment))
     } else {
       // eslint-disable-next-line no-console
       console.error('User does not have permission to edit enrollment')
@@ -124,43 +147,39 @@ export function TempEnrollEdit(props: Props) {
   }
 
   const renderActionIcons = (enrollment: Enrollment) => (
-    <Flex margin="0 small 0 0">
+    <>
       {canEdit && (
-        <Flex.Item>
-          <Tooltip renderTip={I18n.t('Edit')}>
-            <IconButton
-              data-testid="edit-button"
-              withBorder={false}
-              withBackground={false}
-              size="small"
-              screenReaderLabel={I18n.t('Edit')}
-              onClick={() => handleEditClick(enrollment)}
-              {...analyticProps('Edit')}
-            >
-              <IconEditLine title={I18n.t('Edit')} />
-            </IconButton>
-          </Tooltip>
-        </Flex.Item>
+        <Tooltip renderTip={I18n.t('Edit')}>
+          <IconButton
+            data-testid="edit-button"
+            withBorder={false}
+            withBackground={false}
+            size="small"
+            screenReaderLabel={I18n.t('Edit')}
+            onClick={() => handleEditClick(enrollment)}
+            {...analyticProps('Edit')}
+          >
+            <IconEditLine title={I18n.t('Edit')} />
+          </IconButton>
+        </Tooltip>
       )}
 
       {canDelete && (
-        <Flex.Item>
-          <Tooltip renderTip={I18n.t('Delete')}>
-            <IconButton
-              data-testid="delete-button"
-              withBorder={false}
-              withBackground={false}
-              size="small"
-              screenReaderLabel={I18n.t('Delete')}
-              onClick={() => handleDeleteClick(enrollment)}
-              {...analyticProps('Delete')}
-            >
-              <IconTrashLine title={I18n.t('Delete')} />
-            </IconButton>
-          </Tooltip>
-        </Flex.Item>
+        <Tooltip renderTip={I18n.t('Delete')}>
+          <IconButton
+            data-testid="delete-button"
+            withBorder={false}
+            withBackground={false}
+            size="small"
+            screenReaderLabel={I18n.t('Delete')}
+            onClick={() => handleDeleteClick(enrollment)}
+            {...analyticProps('Delete')}
+          >
+            <IconTrashLine title={I18n.t('Delete')} />
+          </IconButton>
+        </Tooltip>
       )}
-    </Flex>
+    </>
   )
 
   return (
@@ -212,16 +231,23 @@ export function TempEnrollEdit(props: Props) {
             </Table.Row>
           </Table.Head>
           <Table.Body>
-            {props.enrollments.map(enrollment => (
-              <Table.Row key={enrollment.id}>
-                <Table.RowHeader>{enrollment.user.name}</Table.RowHeader>
-                <Table.Cell>
-                  {formatDateTime(enrollment.start_at)} - {formatDateTime(enrollment.end_at)}
-                </Table.Cell>
-                <Table.Cell>{enrollment.type}</Table.Cell>
-                {(canEdit || canDelete) && <Table.Cell>{renderActionIcons(enrollment)}</Table.Cell>}
-              </Table.Row>
-            ))}
+            {Object.entries(enrollmentGroups).map(([pairingId, enrollmentGroup]) => {
+              const firstEnrollment = enrollmentGroup[0]
+              return (
+                <Table.Row key={pairingId}>
+                  <Table.RowHeader>{getEnrollmentUserDisplayName(firstEnrollment)}</Table.RowHeader>
+                  <Table.Cell>
+                    {`${formatDateTime(firstEnrollment.start_at)} - ${formatDateTime(
+                      firstEnrollment.end_at
+                    )}`}
+                  </Table.Cell>
+                  <Table.Cell>{firstEnrollment.type}</Table.Cell>
+                  {canEditOrDelete && (
+                    <Table.Cell textAlign="end">{renderActionIcons(firstEnrollment)}</Table.Cell>
+                  )}
+                </Table.Row>
+              )
+            })}
           </Table.Body>
         </Table>
       </Flex.Item>

@@ -18,6 +18,8 @@
 
 export const MODULE_NAME = 'TempEnroll'
 
+export const ITEMS_PER_PAGE = 100
+
 export interface Course {
   readonly id: string
   readonly name: string
@@ -49,12 +51,15 @@ export interface Enrollment {
   readonly end_at: string | null
   readonly role_id: string
   readonly type: string
+  readonly temporary_enrollment_provider?: User
+  readonly temporary_enrollment_pairing_id: number
+  readonly temporary_enrollment_source_user_id: number
 }
 
 export const PROVIDER = 'provider' as const
 export const RECIPIENT = 'recipient' as const
 
-export type EnrollmentType = typeof PROVIDER | typeof RECIPIENT | null
+export type EnrollmentType = typeof PROVIDER | typeof RECIPIENT
 
 export interface User {
   readonly email?: string | null
