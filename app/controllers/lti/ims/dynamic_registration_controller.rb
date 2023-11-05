@@ -77,7 +77,7 @@ module Lti
           registration_params = params.permit(*expected_registration_params)
           registration_params["lti_tool_configuration"] = registration_params["https://purl.imsglobal.org/spec/lti-tool-configuration"]
           registration_params.delete("https://purl.imsglobal.org/spec/lti-tool-configuration")
-          scopes = registration_params["scope"].split(",")
+          scopes = registration_params["scope"].split
           registration_params.delete("scope")
 
           developer_key = DeveloperKey.new(
@@ -100,11 +100,27 @@ module Lti
             registration.save!
           end
 
-          render json: registration if registration.persisted?
+          render_registration(registration, developer_key) if registration.persisted?
         end
       end
 
       private
+
+      def render_registration(registration, developer_key)
+        render json: {
+          client_id: developer_key.global_id.to_s,
+          application_type: registration.application_type,
+          grant_types: registration.grant_types,
+          initiate_login_uri: registration.initiate_login_uri,
+          redirect_uris: registration.redirect_uris,
+          response_types: registration.response_types,
+          client_name: registration.client_name,
+          jwks_uri: registration.jwks_uri,
+          token_endpoint_auth_method: registration.token_endpoint_auth_method,
+          scope: registration.scopes.join(" "),
+          "https://purl.imsglobal.org/spec/lti-tool-configuration": registration.lti_tool_configuration
+        }
+      end
 
       def respond_with_error(status_code, message)
         head status_code
