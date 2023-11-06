@@ -612,11 +612,14 @@ class DiscussionTopicsController < ApplicationController
       USAGE_RIGHTS_REQUIRED: usage_rights_required,
       IS_MODULE_ITEM: !@topic.context_module_tags.empty?,
       PERMISSIONS: {
-        manage_files: @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_FILE_PERMISSIONS)
+        manage_files: @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_FILE_PERMISSIONS),
+        manage_grading_schemes: can_do(@context, @current_user, :manage_grades)
       },
       REACT_DISCUSSIONS_POST: @context.feature_enabled?(:react_discussions_post),
       allow_student_anonymous_discussion_topics: @context.allow_student_anonymous_discussion_topics,
-      context_is_not_group: !@context.is_a?(Group)
+      context_is_not_group: !@context.is_a?(Group),
+      GRADING_SCHEME_UPDATES_ENABLED: Account.site_admin.feature_enabled?(:grading_scheme_updates),
+      POINTS_BASED_GRADING_SCHEMES_ENABLED: Account.site_admin.feature_enabled?(:points_based_grading_schemes),
     }
 
     post_to_sis = Assignment.sis_grade_export_enabled?(@context)
@@ -666,6 +669,10 @@ class DiscussionTopicsController < ApplicationController
       js_hash[:allow_self_signup] = true # for group creation
       js_hash[:group_user_type] = "student"
       append_default_due_time_js_env(@context, js_hash)
+      js_hash[:COURSE_ID] = @context.id
+      if Account.site_admin.feature_enabled?(:grading_scheme_updates)
+        js_hash[:COURSE_DEFAULT_GRADING_SCHEME_ID] = @context.grading_standard_id || @context.default_grading_standard&.id
+      end
     end
 
     if @context.root_account.feature_enabled?(:discussion_create) && @context.feature_enabled?(:react_discussions_post) && @context.grants_right?(@current_user, session, :read)
