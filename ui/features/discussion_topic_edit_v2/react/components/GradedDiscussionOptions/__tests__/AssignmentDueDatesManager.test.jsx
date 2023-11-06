@@ -22,10 +22,6 @@ import {AssignmentDueDatesManager} from '../AssignmentDueDatesManager'
 import {GradedDiscussionDueDatesContext} from '../../../util/constants'
 
 const DEFAULT_LIST_OPTIONS = {
-  'Master Paths': [
-    {assetCode: 'mastery_paths', label: 'Mastery Paths'},
-    {assetCode: 'everyone', label: 'Everyone'},
-  ],
   'Course Sections': [
     {_id: '1', name: 'Section 1'},
     {_id: '2', name: 'Section 2'},
@@ -137,11 +133,6 @@ describe('AssignmentDueDatesManager', () => {
 
     let availableOptions = screen.getAllByTestId('assign-to-select-option')
 
-    // Currently there are 10 DEFAULT_OPTIONS defined in AssignmentDueDatesManager.jsx.
-    // All the checks below rely on this.
-    // When VICE-3865 is complete, the default data will be replaced with real data that will
-    // Need to be mocked. and the data below will need to be updated
-
     // Since 1 option is selected in the other menu, there will only be 9 options available
     expect(availableOptions.length).toBe(9)
 
@@ -181,5 +172,28 @@ describe('AssignmentDueDatesManager', () => {
 
     expect(errorMessageComponent1).toBeInTheDocument()
     expect(errorMessageComponent2).toBeInTheDocument()
+  })
+
+  describe('everyone option', () => {
+    it('when another option is selected, displays as "Everyone Else"', () => {
+      setup({
+        assignedInfoList: [
+          {
+            dueDateId: 'C2mULLRUV9e8p7zVJNPfr',
+            assignedList: ['course_section_1', 'course_section_2'],
+            dueDate: '',
+            availableFrom: '',
+            availableUntil: '',
+          },
+        ],
+      })
+      const selectOptions = screen.getAllByTestId('assign-to-select')
+      const assignToOptionOne = selectOptions[0]
+
+      fireEvent.click(assignToOptionOne)
+
+      const availableOptions = screen.getAllByTestId('assign-to-select-option')
+      expect(availableOptions.map(o => o.textContent).includes('Everyone else')).toBe(true)
+    })
   })
 })

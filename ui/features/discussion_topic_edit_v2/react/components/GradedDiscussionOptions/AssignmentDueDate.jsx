@@ -123,7 +123,7 @@ AssignmentDueDate.propTypes = {
     )
   ).isRequired,
   initialAssignedInformation: PropTypes.shape({
-    assignedList: PropTypes.arrayOf(PropTypes.object),
+    assignedList: PropTypes.arrayOf(PropTypes.string),
     dueDate: PropTypes.string,
     availableFrom: PropTypes.string,
     availableUntil: PropTypes.string,

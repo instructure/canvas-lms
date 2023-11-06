@@ -129,16 +129,22 @@ export default function DiscussionTopicForm({
     {text: '', type: 'success'},
   ])
 
-  // To be implemented in phase 2, kept as a reminder
   const [pointsPossible, setPointsPossible] = useState(0)
   const [displayGradeAs, setDisplayGradeAs] = useState('points')
   const [assignmentGroup, setAssignmentGroup] = useState('')
   const [peerReviewAssignment, setPeerReviewAssignment] = useState('off')
   const [peerReviewsPerStudent, setPeerReviewsPerStudent] = useState(1)
   const [peerReviewDueDate, setPeerReviewDueDate] = useState('')
-  // This contains the list of assignment due dates / overrides. This default should be set to everyone in VICE-3866
-  const [assignedInfoList, setAssignedInfoList] = useState([{dueDateId: nanoid()}]) // Initialize with one object with a unique id
   const [dueDateErrorMessages, setDueDateErrorMessages] = useState([])
+  const [assignedInfoList, setAssignedInfoList] = useState([
+    {
+      dueDateId: nanoid(),
+      assignedList: ['everyone'],
+      dueDate: '',
+      availableFrom: '',
+      availableUntil: '',
+    },
+  ]) // Initialize with one object with a unique id
 
   const assignmentDueDateContext = {
     assignedInfoList,
@@ -408,7 +414,7 @@ export default function DiscussionTopicForm({
           attachmentToUpload={attachmentToUpload}
           responsiveQuerySizes={responsiveQuerySizes}
           isGradedDiscussion={!affectUserFileQuota}
-          canAttach={ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_ATTACH}
+          canAttach={ENV.DISCUSSION_TOPIC?.PERMISSIONS.CAN_ATTACH}
         />
         {!isGraded && !isGroupDiscussion && !isGroupContext && (
           <View display="block" padding="medium none">
