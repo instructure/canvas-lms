@@ -368,16 +368,6 @@ describe "selective_release module set up" do
       expect(header_label.text).to eq("Add Module")
     end
 
-    it "adds module with module tray after +Module clicked" do
-      go_to_modules
-      click_new_module_link
-      update_module_name("New Module")
-      click_add_tray_add_module_button
-      new_module = @course.context_modules.last
-      expect(new_module.name).to eq("New Module")
-      expect(element_exists?(context_module_selector(new_module.id))).to be_truthy
-    end
-
     it "adds module with a prerequisite module in same transaction" do
       first_module = @course.context_modules.create!(name: "First Module")
       go_to_modules
@@ -417,6 +407,9 @@ describe "selective_release module set up" do
       click_add_tray_add_module_button
       expect(add_module_tray.text).to include("Module Name is required.")
     end
+
+    it_behaves_like "selective_release add module tray", :context_modules
+    it_behaves_like "selective_release add module tray", :course_homepage
   end
 
   context "Canvas for Elementary Modules Selective Release" do
@@ -441,5 +434,18 @@ describe "selective_release module set up" do
     it_behaves_like "selective_release module tray prerequisites", :canvas_for_elementary
     it_behaves_like "selective_release module tray assign to", :canvas_for_elementary
     it_behaves_like "selective release module tray requirements", :canvas_for_elementary
+  end
+
+  context "Canvas for Elementary Modules Selective Release Limited Set Up" do
+    before :once do
+      Account.site_admin.enable_feature! :differentiated_modules
+      teacher_setup
+    end
+
+    before do
+      user_session(@homeroom_teacher)
+    end
+
+    it_behaves_like "selective_release add module tray", :canvas_for_elementary
   end
 end
