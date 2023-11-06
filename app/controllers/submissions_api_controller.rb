@@ -837,7 +837,7 @@ class SubmissionsApiController < ApplicationController
     end
 
     @user ||= get_user_considering_section(params[:user_id])
-    unless @assignment.students_with_visibility.include?(@user)
+    unless @assignment.assigned?(@user) || @assignment.students_with_visibility.include?(@user)
       render_unauthorized_action
       return
     end
