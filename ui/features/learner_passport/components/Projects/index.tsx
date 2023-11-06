@@ -22,7 +22,7 @@ import {Heading} from '@instructure/ui-heading'
 export const Projects = () => {
   return (
     <div>
-      <Heading level="h2">Projects</Heading>
+      <Heading level="h1">Projects</Heading>
     </div>
   )
 }

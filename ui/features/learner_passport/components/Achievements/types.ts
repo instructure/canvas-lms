@@ -16,13 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {Heading} from '@instructure/ui-heading'
-
-export const Portfolios = () => {
-  return (
-    <div>
-      <Heading level="h1">Portfolios</Heading>
-    </div>
-  )
+export interface AchievementData {
+  id: string
+  isNew: boolean
+  title: string
+  type: string | null
+  criteria: string | null
+  issuer: {
+    name: string
+    url?: string
+    iconUrl?: string
+  }
+  issuedOn: string
+  expiresOn: string | null
+  imageUrl: string | null
+  skills: string[]
+  verifiedBy: string | null
 }

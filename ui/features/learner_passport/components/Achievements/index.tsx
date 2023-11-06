@@ -16,13 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {Heading} from '@instructure/ui-heading'
+import AchievementsLayout from './AchievementsLayout'
+import AchivementCard from './AchievementCard'
 
-export const Achievements = () => {
-  return (
-    <div>
-      <Heading level="h2">Achievments</Heading>
-    </div>
-  )
-}
+export {AchievementsLayout, AchivementCard}
