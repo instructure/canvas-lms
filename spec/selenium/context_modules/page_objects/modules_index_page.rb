@@ -29,6 +29,10 @@ module ModulesIndexPage
     ".module-item-assign-to-link"
   end
 
+  def module_create_button_selector
+    "//button[.//*[contains(text(), 'Create a new Module')]]"
+  end
+
   def module_item_selector(module_item_id)
     "#context_module_item_#{module_item_id}"
   end
@@ -64,6 +68,10 @@ module ModulesIndexPage
 
   def module_index_menu_tool_link(tool_text)
     fj("[role=menuitem]:contains('#{tool_text}')")
+  end
+
+  def module_create_button
+    fxpath(module_create_button_selector)
   end
 
   def module_item(module_item_id)
@@ -143,6 +151,10 @@ module ModulesIndexPage
 
   def click_manage_module_item_assign_to
     manage_module_item_assign_to.click
+  end
+
+  def click_module_create_button
+    module_create_button.click
   end
 
   def click_new_module_link
