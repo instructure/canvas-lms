@@ -53,26 +53,37 @@ const ACTIVE_ROUTE_REGEX =
   /^\/(courses|groups|accounts|grades|calendar|conversations|profile)|^#history/
 const ACTIVE_CLASS = 'ic-app-header__menu-list-item--active'
 
-type ActiveItem = 'dashboard' | 'accounts' | 'courses' | 'groups' | 'profile' | 'history' | 'help'
+type ActiveItem =
+  | 'dashboard'
+  | 'accounts'
+  | 'courses'
+  | 'groups'
+  | 'profile'
+  | 'history'
+  | 'help'
+  | null
 
 const itemsWithResources = ['courses', 'groups', 'accounts', 'profile', 'history', 'help'] as const
 
 function noop() {}
 
+function handleActiveItem() {
+  const path = window.location.pathname
+  const matchData = path.match(EXTERNAL_TOOLS_REGEX) || path.match(ACTIVE_ROUTE_REGEX)
+  return path === '/' && !matchData ? 'dashboard' : ((matchData && matchData[1]) as ActiveItem)
+}
+
 const Navigation = () => {
-  const [activeItem, setActiveItem] = useState<ActiveItem>('dashboard')
+  const [activeItem, setActiveItem] = useState<ActiveItem | null>(handleActiveItem)
   const [isTrayOpen, setIsTrayOpen] = useState(false)
   const [noFocus, setNoFocus] = useState(false)
   const [overrideDismiss, setOverrideDismiss] = useState(false)
-  const [type, setType] = useState<ActiveItem | null>(null)
+  const [type, setType] = useState<ActiveItem | null>(activeItem)
 
   useEffect(() => {
     if (!isTrayOpen) {
       // when tray is closed, set active item based on current path
-      const path = window.location.pathname
-      const matchData = path.match(EXTERNAL_TOOLS_REGEX) || path.match(ACTIVE_ROUTE_REGEX)
-      const item = (matchData && matchData[1]) as ActiveItem | null
-      setActiveItem(item || 'dashboard')
+      setActiveItem(handleActiveItem())
     }
   }, [isTrayOpen])
 
