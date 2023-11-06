@@ -256,6 +256,14 @@ class Course < ActiveRecord::Base
     end
   end
 
+  def perform
+    redis = Redis.new(url: ENV['REDIS_SERVER'])
+    redis.smembers("courses_to_touch").each do |member|
+      Course.find_by_id(member).touch
+      redis.srem("courses_to_touch", member)
+    end
+  end
+
   def self.skip_updating_account_associations(&block)
     if @skip_updating_account_associations
       block.call
