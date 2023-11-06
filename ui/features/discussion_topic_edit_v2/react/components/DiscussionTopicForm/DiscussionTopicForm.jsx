@@ -42,6 +42,7 @@ import {GradedDiscussionDueDatesContext} from '../../util/constants'
 import {nanoid} from 'nanoid'
 import {AttachmentDisplay} from '@canvas/discussions/react/components/AttachmentDisplay/AttachmentDisplay'
 import {responsiveQuerySizes} from '@canvas/discussions/react/utils'
+import {UsageRights} from '../GradedDiscussionOptions/UsageRights'
 
 import {addNewGroupCategoryToCache} from '../../util/utils'
 
@@ -149,6 +150,7 @@ export default function DiscussionTopicForm({
   const [attachmentToUpload, setAttachmentToUpload] = useState(false)
   const affectUserFileQuota = false
 
+  const [usageRightsData, setUsageRightsData] = useState({})
   useEffect(() => {
     if (!isEditing || !currentDiscussionTopic) return
 
@@ -228,12 +230,23 @@ export default function DiscussionTopicForm({
     return false
   }
 
+  const validateUsageRights = () => {
+    const isFileAttached = false // this is a place holder. will get replaced after VICE-3851 is completed
+    if (!ENV?.FEATURES?.usage_rights_discussion_topics || !ENV?.USAGE_RIGHTS_REQUIRED) return true // if usage rights is not enabled, no need to validate
+    if (usageRightsData?.selectedUsageRightsOption || !isFileAttached) return true
+    console.log('REPLACE WITH ERROR MESSAGE, NEED TO SELECT USAGE RIGHT')
+    // if usage rights is not selected, show error
+    return false
+  }
+
   const validateFormFields = () => {
     let isValid = true
 
     if (!validateTitle(title)) isValid = false
     if (!validateAvailability(availableFrom, availableUntil)) isValid = false
     if (!validateSelectGroup()) isValid = false
+
+    if (!validateUsageRights()) isValid = false
 
     return isValid
   }
@@ -398,6 +411,22 @@ export default function DiscussionTopicForm({
             </CanvasMultiSelect>
           </View>
         )}
+        {ENV?.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_ATTACH &&
+          ENV?.FEATURES?.usage_rights_discussion_topics &&
+          ENV?.USAGE_RIGHTS_REQUIRED &&
+          ENV?.PERMISSIONS?.manage_files && (
+            <Flex justifyItems="start" gap="small">
+              <Flex.Item>{I18n.t('Set usage rights')}</Flex.Item>
+              <Flex.Item>
+                <UsageRights
+                  contextType={(ENV?.context_type ?? '').toLocaleLowerCase()}
+                  contextId={ENV?.context_id}
+                  onSaveUsageRights={setUsageRightsData}
+                  currentUsageRights={usageRightsData}
+                />
+              </Flex.Item>
+            </Flex>
+          )}
         <Text size="large">{I18n.t('Options')}</Text>
         {!isGroupContext &&
           !isAnnouncement &&
