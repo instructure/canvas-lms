@@ -47,6 +47,7 @@ class GradeCalculator
     @final_updates = {}
     @ignore_muted = opts[:ignore_muted]
     @effective_due_dates = opts[:effective_due_dates]
+    @redis = Redis.new(url: ENV['REDIS_SERVER'])
   end
 
   # recomputes the scores and saves them to each user's Enrollment
@@ -277,7 +278,8 @@ class GradeCalculator
     return if joined_enrollment_ids.blank?
     return if @grading_period && @grading_period.deleted?
 
-    @course.touch
+    @redis.sadd("courses_to_touch", @course.id)
+
     updated_at = Score.connection.quote(Time.now.utc)
 
     Score.transaction do
