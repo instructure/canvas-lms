@@ -17,9 +17,37 @@
  */
 
 import type {Rubric} from '@canvas/rubrics/react/types/rubric'
+import {RubricQueryResponse} from 'features/rubrics/types/Rubric'
 
-export type RubricQueryResponse = {
+export const RUBRICS_DATA: Rubric[] = [
+  {
+    id: '1',
+    title: 'Rubric 1',
+    criteriaCount: 5,
+    locations: [],
+    pointsPossible: 10,
+    workflowState: 'active',
+  },
+  {
+    id: '2',
+    title: 'Rubric 2',
+    criteriaCount: 3,
+    locations: [],
+    pointsPossible: 30,
+    workflowState: 'archived',
+  },
+  {
+    id: '3',
+    title: 'Rubric 3',
+    criteriaCount: 5,
+    locations: [],
+    pointsPossible: 20,
+    workflowState: 'active',
+  },
+]
+
+export const RUBRICS_QUERY_RESPONSE: RubricQueryResponse = {
   rubricsConnection: {
-    nodes: Rubric[]
-  }
+    nodes: RUBRICS_DATA,
+  },
 }

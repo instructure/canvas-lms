@@ -19,7 +19,9 @@
 import React from 'react'
 import {useNavigate, useParams} from 'react-router-dom'
 import {useQuery} from '@canvas/query'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
+import type {Rubric} from '@canvas/rubrics/react/types/rubric'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -37,13 +39,7 @@ import {
 
 const {Item: FlexItem} = Flex
 
-type Rubric = {
-  id: string
-  name: string
-  points: number
-  criterion: number
-  locations: string[]
-}
+const I18n = useI18nScope('rubrics-list-view')
 
 export const ViewRubrics = () => {
   const navigate = useNavigate()
@@ -80,11 +76,11 @@ export const ViewRubrics = () => {
 
   const {activeRubrics, archivedRubrics} = data.rubricsConnection.nodes.reduce(
     (prev, curr) => {
-      const rubric = {
+      const rubric: Rubric = {
         id: curr.id,
-        name: curr.title,
-        points: curr.pointsPossible,
-        criterion: curr.criteriaCount,
+        title: curr.title,
+        pointsPossible: curr.pointsPossible,
+        criteriaCount: curr.criteriaCount,
         locations: [], // TODO: add locations once we have them
       }
 
@@ -101,13 +97,13 @@ export const ViewRubrics = () => {
       <Flex>
         <FlexItem shouldShrink={true} shouldGrow={true}>
           <Heading level="h1" themeOverride={{h1FontWeight: 700}} margin="medium 0 0 0">
-            Rubrics
+            {I18n.t('Rubrics')}
           </Heading>
         </FlexItem>
         <FlexItem>
           <TextInput
-            renderLabel={<ScreenReaderContent>Search Rubrics</ScreenReaderContent>}
-            placeholder="Search..."
+            renderLabel={<ScreenReaderContent>{I18n.t('Search Rubrics')}</ScreenReaderContent>}
+            placeholder={I18n.t('Search...')}
             value=""
             width="17"
             renderBeforeInput={<IconSearchLine inline={false} />}
@@ -120,26 +116,26 @@ export const ViewRubrics = () => {
             margin="small"
             onClick={() => navigate('./create')}
           >
-            Create New Rubric
+            {I18n.t('Create New Rubric')}
           </Button>
         </FlexItem>
       </Flex>
 
       <View as="div" margin="large 0 0 0">
         <Heading level="h2" themeOverride={{h1FontWeight: 700}}>
-          Saved
+          {I18n.t('Saved')}
         </Heading>
       </View>
-      <View as="div" margin="medium 0">
+      <View as="div" margin="medium 0" data-testid="saved-rubrics-table">
         <RubricTable rubrics={activeRubrics} />
       </View>
 
       <View as="div" margin="large 0 0 0">
         <Heading level="h2" themeOverride={{h1FontWeight: 700}}>
-          Archived
+          {I18n.t('Archived')}
         </Heading>
       </View>
-      <View as="div" margin="medium 0">
+      <View as="div" margin="medium 0" data-testid="archived-rubrics-table">
         <RubricTable rubrics={archivedRubrics} />
       </View>
     </View>
