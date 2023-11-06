@@ -18,22 +18,21 @@
 
 import React from 'react'
 import {useNavigate} from 'react-router-dom'
+import {useScope as useI18nScope} from '@canvas/i18n'
+import type {Rubric} from '@canvas/rubrics/react/types/rubric'
 import {Table} from '@instructure/ui-table'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconMoreLine} from '@instructure/ui-icons'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {Link} from '@instructure/ui-link'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+
+const I18n = useI18nScope('rubrics-list-table')
 
 const {Head, Row, Cell, ColHeader, Body} = Table
 
 export type RubricTableProps = {
-  rubrics: {
-    id: string
-    name: string
-    points: number
-    criterion: number
-    locations: string[]
-  }[]
+  rubrics: Rubric[]
 }
 
 export const RubricTable = ({rubrics}: RubricTableProps) => {
@@ -41,39 +40,39 @@ export const RubricTable = ({rubrics}: RubricTableProps) => {
 
   return (
     <Table caption="Set text-align for columns">
-      <Head>
+      <Head renderSortLabel={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}>
         <Row>
           <ColHeader
             id="Rank"
-            stackedSortByLabel="Rubric Name"
+            stackedSortByLabel={I18n.t('Rubric Name')}
             onRequestSort={() => {}}
             sortDirection="none"
           >
-            Rubric Name
+            {I18n.t('Rubric Name')}
           </ColHeader>
           <ColHeader
             id="Title"
-            stackedSortByLabel="Total Points"
+            stackedSortByLabel={I18n.t('Total Points')}
             onRequestSort={() => {}}
             sortDirection="none"
           >
-            Total Points
+            {I18n.t('Total Points')}
           </ColHeader>
           <ColHeader
             id="Year"
-            stackedSortByLabel="Criterion"
+            stackedSortByLabel={I18n.t('Criterion')}
             onRequestSort={() => {}}
             sortDirection="none"
           >
-            Criterion
+            {I18n.t('Criterion')}
           </ColHeader>
           <ColHeader
             id="Rating"
-            stackedSortByLabel="Location Used"
+            stackedSortByLabel={I18n.t('Location Used')}
             onRequestSort={() => {}}
             sortDirection="none"
           >
-            Location Used
+            {I18n.t('Location Used')}
           </ColHeader>
           <ColHeader id="Rating" />
         </Row>
@@ -81,18 +80,18 @@ export const RubricTable = ({rubrics}: RubricTableProps) => {
       <Body>
         {rubrics.map(rubric => (
           <Row key={rubric.id}>
-            <Cell>
+            <Cell data-testid={`rubric-title-${rubric.id}`}>
               <Link
                 forceButtonRole={true}
                 isWithinText={false}
                 onClick={() => navigate(`./${rubric.id}`)}
               >
-                {rubric.name}
+                {rubric.title}
               </Link>
             </Cell>
-            <Cell>{rubric.points}</Cell>
-            <Cell>{rubric.criterion}</Cell>
-            <Cell>
+            <Cell data-testid={`rubric-points-${rubric.id}`}>{rubric.pointsPossible}</Cell>
+            <Cell data-testid={`rubric-criterion-count-${rubric.id}`}>{rubric.criteriaCount}</Cell>
+            <Cell data-testid={`rubric-locations-${rubric.id}`}>
               {rubric.locations.length > 0 ? (
                 <Link forceButtonRole={true} isWithinText={false} onClick={() => {}}>
                   <TruncateText>{rubric.locations.join(', ')}...</TruncateText>
@@ -101,8 +100,12 @@ export const RubricTable = ({rubrics}: RubricTableProps) => {
                 '-'
               )}
             </Cell>
-            <Cell>
-              <IconButton withBackground={false} withBorder={false} screenReaderLabel="">
+            <Cell data-testid={`rubric-options-${rubric.id}`}>
+              <IconButton
+                withBackground={false}
+                withBorder={false}
+                screenReaderLabel={I18n.t('Rubric Options')}
+              >
                 <IconMoreLine />
               </IconButton>
             </Cell>

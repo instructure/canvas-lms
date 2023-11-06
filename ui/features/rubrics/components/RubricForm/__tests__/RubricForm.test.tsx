@@ -16,10 +16,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {Rubric} from '@canvas/rubrics/react/types/rubric'
+import React from 'react'
+import {BrowserRouter} from 'react-router-dom'
+import {render} from '@testing-library/react'
+import {QueryProvider} from '@canvas/query'
+import {RubricForm} from '../index'
 
-export type RubricQueryResponse = {
-  rubricsConnection: {
-    nodes: Rubric[]
+describe('RubricForm Tests', () => {
+  const renderComponent = () => {
+    return render(
+      <QueryProvider>
+        <BrowserRouter>
+          <RubricForm />
+        </BrowserRouter>
+      </QueryProvider>
+    )
   }
-}
+
+  it('renders component', () => {
+    const {getByText} = renderComponent()
+
+    expect(getByText('Create Rubric')).toBeInTheDocument()
+  })
+})
