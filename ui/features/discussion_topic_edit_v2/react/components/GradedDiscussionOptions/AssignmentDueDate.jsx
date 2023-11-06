@@ -29,6 +29,7 @@ export const AssignmentDueDate = ({
   initialAssignedInformation,
   availableAssignToOptions,
   onAssignedInfoChange,
+  assignToErrorMessages,
 }) => {
   const [assignedInformation, setAssignedInformation] = useState(initialAssignedInformation)
 
@@ -57,6 +58,7 @@ export const AssignmentDueDate = ({
             setAssignedInformation(newInfo)
             onAssignedInfoChange(newInfo)
           }}
+          errorMessage={assignToErrorMessages}
         />
         <DateTimeInput
           description={I18n.t('Due')}
@@ -127,6 +129,7 @@ AssignmentDueDate.propTypes = {
     availableUntil: PropTypes.string,
   }),
   onAssignedInfoChange: PropTypes.func,
+  assignToErrorMessages: PropTypes.arrayOf(PropTypes.object),
 }
 
 AssignmentDueDate.defaultProps = {

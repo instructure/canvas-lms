@@ -43,6 +43,7 @@ const DEFAULT_LIST_OPTIONS = {
 const setup = ({
   assignedInfoList = [{dueDateId: 'uniqueID'}],
   setAssignedInfoList = () => {},
+  dueDateErrorMessages = [],
 } = {}) => {
   return render(
     <GradedDiscussionDueDatesContext.Provider
@@ -51,6 +52,7 @@ const setup = ({
         setAssignedInfoList,
         studentEnrollments: DEFAULT_LIST_OPTIONS.Students,
         sections: DEFAULT_LIST_OPTIONS['Course Sections'],
+        dueDateErrorMessages,
       }}
     >
       <AssignmentDueDatesManager />
@@ -147,5 +149,37 @@ describe('AssignmentDueDatesManager', () => {
     fireEvent.click(assignToOptionTwo)
     availableOptions = screen.getAllByTestId('assign-to-select-option')
     expect(availableOptions.length).toBe(8)
+  })
+
+  it('displays dueDateErrorMessages for the assignmentDueDate component', () => {
+    // Define the error messages
+    const dueDateErrorMessages = [
+      {
+        dueDateId: 'uniqueID',
+        message: {
+          text: 'Error for uniqueID',
+          type: 'error',
+        },
+      },
+      {
+        dueDateId: 'uniqueID2',
+        message: {
+          text: 'Error for uniqueID2',
+          type: 'error',
+        },
+      },
+    ]
+
+    // Setup the component with the error messages in the context
+    const {getByText} = setup({
+      assignedInfoList: [{dueDateId: 'uniqueID'}, {dueDateId: 'uniqueID2'}],
+      dueDateErrorMessages,
+    })
+
+    const errorMessageComponent1 = getByText('Error for uniqueID')
+    const errorMessageComponent2 = getByText('Error for uniqueID2')
+
+    expect(errorMessageComponent1).toBeInTheDocument()
+    expect(errorMessageComponent2).toBeInTheDocument()
   })
 })
