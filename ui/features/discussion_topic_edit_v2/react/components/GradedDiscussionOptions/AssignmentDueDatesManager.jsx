@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useContext, useState} from 'react'
+import React, {useContext, useEffect, useState} from 'react'
 import {AssignmentDueDate} from './AssignmentDueDate'
 import {Text} from '@instructure/ui-text'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -101,6 +101,29 @@ export const AssignmentDueDatesManager = () => {
     return filteredOptions
   }
 
+  useEffect(() => {
+    const assignedList = assignedInfoList
+      .map(info => {
+        return info.assignedList || []
+      })
+      .flat()
+
+    const showEveryoneElseOption = assignedList.filter(item => item !== 'everyone').length > 0
+
+    setListOptions({
+      '': getDefaultBaseOptions(
+        ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED,
+        showEveryoneElseOption ? defaultEveryoneElseOption : defaultEveryoneOption
+      ),
+      'Course Sections': sections.map(section => {
+        return {assetCode: `course_section_${section?._id}`, label: section?.name}
+      }),
+      Students: studentEnrollments.map(enrollment => {
+        return {assetCode: `user_${enrollment?.user?._id}`, label: enrollment?.user?.name}
+      }),
+    })
+  }, [assignedInfoList, sections, studentEnrollments])
+
   return (
     <>
       <Text size="large">{I18n.t('Assignment Settings')}</Text>
@@ -132,6 +155,7 @@ export const AssignmentDueDatesManager = () => {
               </View>
             )}
             <AssignmentDueDate
+              initialAssignedInformation={info}
               availableAssignToOptions={getAvailableOptionsFor(info.dueDateId)}
               onAssignedInfoChange={newInfo => handleAssignedInfoChange(newInfo, info.dueDateId)}
               assignToErrorMessages={dueDateErrorMessages
