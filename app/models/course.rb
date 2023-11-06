@@ -256,7 +256,7 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def perform
+  def self.touch_courses
     redis = Redis.new(url: ENV['REDIS_SERVER'])
     redis.smembers("courses_to_touch").each do |member|
       Course.find_by_id(member).touch
