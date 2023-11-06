@@ -912,6 +912,7 @@ CanvasRails::Application.routes.draw do
 
   resources :users, only: [:passport] do
     get "passport" => "learner_passport#index"
+    get "passport/data/achievements" => "learner_passport#achievements"
     get "passport/*path" => "learner_passport#index"
   end
 

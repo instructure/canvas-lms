@@ -22,7 +22,13 @@ import {Navigate, Route} from 'react-router-dom'
 export const LearnerPassportRoutes = (
   <Route path="/users/:userId/passport" lazy={() => import('../pages/LearnerPassportLayout')}>
     <Route path="" element={<Navigate to="achievements" replace={true} />} />
-    <Route path="achievements" lazy={() => import('../pages/Achievements')} />
+    <Route
+      path="achievements"
+      lazy={() => import('../pages/Achievements')}
+      loader={({params}) => {
+        return fetch(`/users/${params.userId}/passport/data/achievements`)
+      }}
+    />
     <Route path="portfolios" lazy={() => import('../pages/Portfolios')} />
     <Route path="projects" lazy={() => import('../pages/Projects')} />
   </Route>

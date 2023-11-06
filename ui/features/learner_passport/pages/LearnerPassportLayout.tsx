@@ -74,62 +74,66 @@ export const Component = () => {
 
   return (
     <Portal open={true} mountNode={mountPoint}>
-      <View as="div" background="secondary" padding="small">
-        <Flex>
-          <SVGIcon src={passportSvg} inline={true} size="small" title="Learner Passport" />
-          <Flex.Item shouldGrow={true}>
-            <div style={{display: 'inline-block', marginInlineStart: '1.5rem'}} role="tablist">
-              <div
-                role="tab"
-                data-tabid="achievements"
-                style={selectedTab === 'achievements' ? activeStyle : inactiveStyle}
-                tabIndex={0}
-                onClick={handleTabClick}
-                onKeyDown={handleTabKey}
-              >
-                Achievements
-              </div>
-              <div
-                role="tab"
-                data-tabid="portfolios"
-                style={selectedTab === 'portfolios' ? activeStyle : inactiveStyle}
-                tabIndex={0}
-                onClick={handleTabClick}
-                onKeyDown={handleTabKey}
-              >
-                Portfolios
-              </div>
-              <div
-                role="tab"
-                data-tabid="projects"
-                style={selectedTab === 'projects' ? activeStyle : inactiveStyle}
-                tabIndex={0}
-                onClick={handleTabClick}
-                onKeyDown={handleTabKey}
-              >
-                Projects
-              </div>
+      <div style={{marginInlineStart: '-24px'}}>
+        <View as="div" background="secondary" padding="small medium">
+          <Flex>
+            <div style={{color: 'var(--ic-brand-primary)'}}>
+              <SVGIcon src={passportSvg} inline={true} size="small" title="Learner Passport" />
             </div>
-          </Flex.Item>
-          <Flex.Item>
-            <IconAlertsLine size="x-small" />
-          </Flex.Item>
-          <Flex.Item>
-            <div
-              style={{
-                margin: '0 0 0 .75rem',
-                padding: '0 0 0 .75rem',
-                borderWidth: '0 0 0 1px',
-                borderStyle: 'solid',
-                borderColor: 'var(--ic-brand-border)',
-              }}
-            >
-              {window.ENV.current_user.display_name}
-            </div>
-          </Flex.Item>
-        </Flex>
-      </View>
-      <View as="div" padding="small">
+            <Flex.Item shouldGrow={true} margin="0 medium 0 0">
+              <div style={{display: 'inline-block', marginInlineStart: '1.5rem'}} role="tablist">
+                <div
+                  role="tab"
+                  data-tabid="achievements"
+                  style={selectedTab === 'achievements' ? activeStyle : inactiveStyle}
+                  tabIndex={0}
+                  onClick={handleTabClick}
+                  onKeyDown={handleTabKey}
+                >
+                  Achievements
+                </div>
+                <div
+                  role="tab"
+                  data-tabid="portfolios"
+                  style={selectedTab === 'portfolios' ? activeStyle : inactiveStyle}
+                  tabIndex={0}
+                  onClick={handleTabClick}
+                  onKeyDown={handleTabKey}
+                >
+                  Portfolios
+                </div>
+                <div
+                  role="tab"
+                  data-tabid="projects"
+                  style={selectedTab === 'projects' ? activeStyle : inactiveStyle}
+                  tabIndex={0}
+                  onClick={handleTabClick}
+                  onKeyDown={handleTabKey}
+                >
+                  Projects
+                </div>
+              </div>
+            </Flex.Item>
+            <Flex.Item>
+              <IconAlertsLine size="x-small" />
+            </Flex.Item>
+            <Flex.Item>
+              <div
+                style={{
+                  margin: '0 0 0 .75rem',
+                  padding: '0 0 0 .75rem',
+                  borderWidth: '0 0 0 1px',
+                  borderStyle: 'solid',
+                  borderColor: 'var(--ic-brand-border)',
+                }}
+              >
+                {window.ENV.current_user.display_name}
+              </div>
+            </Flex.Item>
+          </Flex>
+        </View>
+      </div>
+      <View as="div" margin="medium x-large 0">
         <Outlet />
       </View>
     </Portal>
