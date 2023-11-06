@@ -781,6 +781,9 @@ describe "discussions" do
         f("input[data-testid='points-possible-input']").send_keys "12"
         force_click("input[data-testid='peer_review_auto']")
 
+        f("input[data-testid='assign-to-select']").click
+        ff("span[data-testid='assign-to-select-option']")[0].click
+
         f("button[data-testid='save-and-publish-button']").click
         wait_for_ajaximations
 

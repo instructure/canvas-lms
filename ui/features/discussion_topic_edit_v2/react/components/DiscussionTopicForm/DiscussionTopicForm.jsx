@@ -138,9 +138,13 @@ export default function DiscussionTopicForm({
   const [peerReviewDueDate, setPeerReviewDueDate] = useState('')
   // This contains the list of assignment due dates / overrides. This default should be set to everyone in VICE-3866
   const [assignedInfoList, setAssignedInfoList] = useState([{dueDateId: nanoid()}]) // Initialize with one object with a unique id
+  const [dueDateErrorMessages, setDueDateErrorMessages] = useState([])
+
   const assignmentDueDateContext = {
     assignedInfoList,
     setAssignedInfoList,
+    dueDateErrorMessages,
+    setDueDateErrorMessages,
     studentEnrollments,
     sections,
   }
@@ -245,10 +249,47 @@ export default function DiscussionTopicForm({
     if (!validateTitle(title)) isValid = false
     if (!validateAvailability(availableFrom, availableUntil)) isValid = false
     if (!validateSelectGroup()) isValid = false
+    if (!validateAssignToFields()) isValid = false
 
     if (!validateUsageRights()) isValid = false
 
     return isValid
+  }
+
+  const validateAssignToFields = () => {
+    // as validation is not required if not graded.
+    if (!isGraded) return true
+
+    const missingAssignToOptionError = {
+      text: I18n.t('Please select at least one option.'),
+      type: 'error',
+    }
+
+    // Validate each assignedInfo and collect errors.
+    const errors = assignedInfoList.reduce((foundErrors, currentAssignedInfo) => {
+      const isAssignedListInvalid =
+        !currentAssignedInfo.assignedList ||
+        !Array.isArray(currentAssignedInfo.assignedList) ||
+        currentAssignedInfo.assignedList.length === 0
+
+      if (isAssignedListInvalid) {
+        foundErrors.push({
+          dueDateId: currentAssignedInfo.dueDateId,
+          message: missingAssignToOptionError,
+        })
+      }
+
+      return foundErrors
+    }, [])
+
+    // If there are errors, set the error state and return false.
+    if (errors.length > 0) {
+      setDueDateErrorMessages(errors)
+      return false
+    }
+
+    // All assignedLists are valid if no errors were found.
+    return true
   }
 
   const preparePeerReviewPayload = () => {
