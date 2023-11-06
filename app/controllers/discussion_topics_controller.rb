@@ -668,7 +668,7 @@ class DiscussionTopicsController < ApplicationController
       append_default_due_time_js_env(@context, js_hash)
     end
 
-    if @context.root_account.feature_enabled?(:discussion_create) && @context.grants_right?(@current_user, session, :read)
+    if @context.root_account.feature_enabled?(:discussion_create) && @context.feature_enabled?(:react_discussions_post) && @context.grants_right?(@current_user, session, :read)
       js_hash[:context_id] = @context.id
       if @context.is_a?(Course)
         js_hash[:context_type] = "Course"
@@ -682,7 +682,7 @@ class DiscussionTopicsController < ApplicationController
     set_master_course_js_env_data(@topic, @context)
     conditional_release_js_env(@topic.assignment)
 
-    if @context.root_account.feature_enabled?(:discussion_create)
+    if @context.root_account.feature_enabled?(:discussion_create) && @context.feature_enabled?(:react_discussions_post)
       @page_title = topic_page_title(@topic)
 
       js_bundle :discussion_topic_edit_v2
