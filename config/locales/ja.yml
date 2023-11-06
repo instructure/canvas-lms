@@ -2221,6 +2221,7 @@ ja:
   add_app_baf540f: アプリの追加
   add_as_a_faculty_journal_entry_55a38a30: 講師日誌へのエントリとして追加
   add_as_allowed_e95540be: 許可して追加
+  add_assignment_da1c1529: 課題の追加
   add_assignment_to_name_caf173b0: "課題を %{name} に追加"
   add_assignments_and_quizzes_1085d2af: 課題や小テストを追加
   add_attachment_93868828: 添付ファイルの追加
@@ -2302,6 +2303,7 @@ ja:
   add_moderator_review_copy_1st_a484c813: "管理者の評価を追加 (1番目をコピー)"
   add_moderator_review_copy_2nd_e80d458f: "管理者の評価を追加 (2番目をコピー)"
   add_moderator_review_new_3c183cea: "管理者を追加 (新規)"
+  add_module_5ad6fee2: モジュールの追加
   add_module_item: 
     add_assignment_to: "課題を %{module} に追加"
     add_file_to: "ファイルを %{module} に追加"
@@ -2463,6 +2465,7 @@ ja:
   admins_3e1dce15: 管理者
   admins_add_remove_26811ce5: "管理者 - 追加/削除"
   advanced_36b35b8: アドバンスト
+  advanced_analytics_course_readiness_closed_alpha_13c8aaf: "Advanced Analytics - コース準備クローズド・アルファ"
   advertise_release_notes_via_the_ui_9254bc6c: UIを介してリリースノートを広告します
   affects_viewing_the_conclude_course_and_permanentl_8216fcc2: "[コースを終了]および[このコースを完全に削除]ボタンの表示に影響します。このコースを完全に削除するボタンは、手動で作成したコースにのみ表示されます。"
   affects_viewing_the_conclude_course_and_permanentl_d943656e: "[コースを終了]および[このコースを完全に削除]ボタンの表示に影響します。[このコースを完全に削除]ボタンは、手動で作成したコースにのみ表示されます。\n\
@@ -3891,6 +3894,7 @@ ja:
   archive_operation_failed_5504706: アーカイブ操作に失敗しました
   archive_selected_d64506ca: 選択されたアーカイブ
   archived_de543437: アーカイブ済み
+  archived_grading_schemes_6d698d0: 評定スキームをアーカイブ
   are_you_sure_26795d3c: よろしいですか？
   are_you_sure_that_you_want_to_remove_these_count_o_67ef2d6c: 
     one: "これらの%{count}結果をこのアカウントから削除してもよろしいですか？"
@@ -4246,6 +4250,7 @@ ja:
   assignment_score_summary_f1dc9708: 課題スコアサマリー
   assignment_selection_6bff05c4: 課題の選択
   assignment_set_set_index_28b1f973: "課題セット%{set_index}"
+  assignment_settings_5ee5ee77: 割り当て設定
   assignment_submissions_uploaded_ba0dbc84: "%{assignment}:提出をアップロードしました"
   assignment_title_82b4422e: "課題タイトル:"
   assignment_title_8a707dd2: 課題のタイトル
@@ -6216,6 +6221,7 @@ ja:
   cannot_move_assignments_due_to_closed_grading_peri_59fc3c4: 採点期間終了のため、割り当てを移動できません
   cannot_move_events_with_section_specific_times_bet_3fe871fc: カレンダー間でセクション固有の時間を持つイベントを移動することができない
   cannot_move_scheduler_appointments_between_calenda_253e5ea3: "カレンダー間で Scheduler の予定を移動できない"
+  cannot_reference_self_16dfcd49: 自己参照できない
   cannot_relink_unsaved_paces_3ed42012: 未保存のペースは再リンクできません
   cannot_relink_unsaved_plans_2ccef56a: 未保存のプランは再リンクできません
   cannot_remove_c0fd581d: 削除できません：
@@ -8149,6 +8155,7 @@ ja:
   couldn_t_load_previous_content_migrations_a0ef5d7a: 以前のコンテンツ移行を読み込めませんでした
   couldn_t_save_account_calendar_visibilities_343459d1: アカウントカレンダーの表示/非表示を保存できませんでした
   couldn_t_track_assigning_students_to_groups_but_it_b6510770: "受講者のグループへの割り当てを追跡できませんでしたが、まだ起こっています！後ほど手動で結果を確認してください。(%{errorMessage})"
+  couldn_t_update_content_migrations_68777765: 更新コンテンツ移行を更新できませんでした
   couldn_t_update_standards_for_authority_auth_81206187: "受講生を権限 %{auth} に更新できませんでした。"
   count_40eced3b: 数
   count_account_calendars_found_b1eed2e3: 
@@ -12008,6 +12015,7 @@ ja:
   error_creating_conversation_1d814618: 会話作成中にエラー
   error_creating_course_ae61c2bd: コースの作成中にエラーが起こりました
   error_creating_discussion_topic_a5f809ec: ディスカッション・トピックの作成エラー
+  error_creating_modulename_cd0f5c2e: "%{moduleName}トピックの作成中にエラー"
   error_creating_new_course_9d3903bc: 新しいコースの作成中にエラーが発生しました
   error_creating_new_subject_89f16abe: 新しい課題の作成中にエラーが発生しました
   error_creating_submission_comment_a5374fcf: 提出コメントの提出中にエラーが起こりました
@@ -12069,6 +12077,7 @@ ja:
   error_the_tool_returned_an_invalid_content_type_co_10a11c07: "エラー:ツールが無効なコンテンツタイプ \"%{contentType}を返しました\""
   error_updating_cluster_error_674e5f2e: "%{cluster}更新時のエラー：%{error}"
   error_updating_comment_4b80c76d: コメントの更新中にエラーが発生しました
+  error_updating_discussion_topic_64522a23: ディスカッショントピックの更新中にエラー
   error_updating_module_access_f0970f4c: モジュール・アクセスの更新エラー。
   error_updating_modulename_settings_da982acf: "%{moduleName}設定更新中にエラー。"
   error_updating_notes_31b24785: ノートの更新エラー
@@ -12538,6 +12547,7 @@ ja:
   failed_to_export_course_paces_e17583ba: コースペースのエクスポートに失敗しました
   failed_to_export_pace_plans_9832daac: ペースプランのエクスポートに失敗しました。
   failed_to_export_some_tool_settings_c992fc56: 一部のツール設定のエクスポートに失敗しました
+  failed_to_fetch_content_for_import_a042cc27: インポートするコンテンツの取得に失敗しました。
   failed_to_fetch_migration_issues_data_a896da98: 移行問題データのフェッチに失敗しました。
   failed_to_get_new_activity_17e7ec7c: 新規アクティビティ取得に失敗しました
   failed_to_ignore_assignment_46565fa3: 「課題を無視」に失敗する
@@ -13883,6 +13893,7 @@ ja:
       total: 合計
   graded_25cd3fcd: 採点済み
   graded_date_by_grader_e8e1ff75: "%{graded_date} 〜によって%{grader}"
+  graded_discussion_17cc8eaf: 採点されたディスカッション
   graded_discussion_a873bb3e: "課題用ディスカッション:"
   graded_on_submission_60ac3010: 提出時に採点済み
   graded_quiz_7fabdf1f: 採点対象の小テスト
@@ -15211,7 +15222,7 @@ ja:
       有効化された場合、アカウントおよびコース設定ページにあるツールのインストールおよび設定フォームは、
       古くアクセスしにくいホームグロウンコンポーネントではなく、InstUIコンポーネントを使用します。
   if_enabled_the_user_s_lti_url_input_on_the_select__fa539830: |-
-      有効にすると、ツールから有効なLTI URLが返信された場合、
+      有効にすると、ツールが有効なLTI URLで応答した場合、
       コンテンツ選択ダイアログのユーザーのLTI URL入力は上書きされます。
   if_enabled_the_user_will_see_a_warning_alert_box_n_d85c7b1f: |-
       この機能を有効にすると、
@@ -16096,7 +16107,7 @@ ja:
   k20_beta_description: "Admin Analytics APPのK20ベータ機能を有効にします。"
   k20_course_readiness_alpha_testing_description: "このフラグは、Advanced Analytics Alphaテストに参加している教育機関を対象としています。このフラグは、これらの教育機関のコース準備状況ダッシュボードを有効にします。"
   k20_course_readiness_alpha_testing_f45597b6: "K20 - コース準備状況アルファテスト"
-  k20_course_readiness_description: 新しい管理者分析コース準備ダッシュボードが有効になります。
+  k20_course_readiness_description: "アルファ版テスターのAdvanced Analyticsコース準備ダッシュボードを有効にします。"
   k_2521301c: k
   kazakhstan_7_8fe892c: "カザフスタン (+7)"
   keep_8f3e7c16: 保存する
@@ -16566,6 +16577,7 @@ ja:
   loading_comments_32366acf: コメントを読み込む
   loading_completion_b62ca82f: 読み込み完了
   loading_compose_modal_f6da0e8b: 作成モーダルの読み込み中
+  loading_content_for_import_4ed89a17: インポート用のコンテンツを読み込み中。
   loading_conversation_messages_71e9050e: 会話メッセージの読み込み
   loading_courses_409a3641: コース読み込み中
   loading_courses_bd1bffe: コースの読み込み中...
@@ -16613,6 +16625,7 @@ ja:
   loading_missing_assignments_link_d9a0d320: 不足している課題のリンクを読み込み中
   loading_more_grade_history_results_b235de5: 成績履歴結果をさらに読み込み中。
   loading_more_gradebook_history_results_810f6d2e: 評定表履歴結果をさらに読み込み中。
+  loading_more_issues_b14f8f7d: より多くの課題を読み込み中
   loading_more_replies_22e0f13c: さらに返信を読み込み中
   loading_more_results_1d437202: より多くの結果を読み込んでいます
   loading_more_results_def6df65: より多くの結果を読み込んでいます...
@@ -19318,6 +19331,7 @@ ja:
   module_publish_menu_30b638dd: モジュール公開メニュー
   module_publish_menu_88b54c1b: モジュール公開メニュー
   module_published_80f0b9b8: モジュールは公開
+  modulename_created_successfully_6c273e09: "%{moduleName}が正常に作成されました。"
   modulename_module_publish_options_69ef1ece: "%{moduleName}モジュール公開オプション"
   modulename_module_publish_options_publishedstatus_94ea7f49: "%{moduleName}モジュール公開オプション、%{publishedStatus}"
   modulename_settings_updated_successfully_a09bfef6: "%{moduleName}設定の更新に成功しました。"
@@ -19983,6 +19997,7 @@ ja:
   no_existing_user_provided_for_login_with_sis_id_us_6bcde71f: "SIS ID %{user_id}でログイン用の既存ユーザーがありません"
   no_explainer_text_available_9d9a2f3c: 説明文はありません
   no_exports_to_display_7f1b630b: 表示するエクスポートがありません
+  no_file_chosen_9a880793: ファイルが選択されていません
   no_file_selected_92d2ac30: ファイルが選択されていません
   no_file_submitted_a879fa53: 提出されたファイルがありません
   no_final_grade_selected_3595c9c: 最終の成績が選択されていません
@@ -20784,6 +20799,9 @@ ja:
   optional_filters_9dc03f5e: 任意のフィルター
   optionally_include_a_byte_order_mark_in_compatible_f3d0d243: "オプションとして、いくつかのローカルでユーザーが Excel にインポートできるように、対応するスプレッドシートのエクスポートに、バイトオーダーマークを含めます。"
   optionally_include_a_byte_order_mark_in_gradebook__555cc605: オプションとして、成績表エクスポートにバイトオーダーマークを含めて、一部のロケールのユーザー用にExcelにインポートできるようにします。
+  optioncount_options_available_5a34688e: "%{optionCount}のオプションが利用できます。"
+  optionname_selected_list_collapsed_9e69b18a: "%{optionName} が選択されました。リストが破損しています。"
+  optionname_selection_has_been_removed_ff1afe6a: "%{optionName}の選択が削除されました"
   options: 
     ? "false"
     : いいえ
@@ -21401,6 +21419,7 @@ ja:
   please_enter_a_valid_url_protocol_is_required_e_g__c6ccfeca: "有効なURLを入力してください。その際には、プロトコルが必要です(例： http://, https://, ftp:// )。"
   please_enter_your_label_name_7745272d: "%{label_name}を入力してください:"
   please_enter_your_label_name_and_password_5c56be80: "%{label_name}とパスワードを入力してください:"
+  please_fix_errors_before_continuing_b1c13e7d: 続行する前にエラーを解決してください
   please_have_the_student_submit_the_file_again_dba514b7: 受講生にファイルを再度提出させてください
   please_insert_a_message_body_bc85cbff: メッセージ本体を挿入してください。
   please_let_them_know_which_page_you_were_viewing_a_6039f59a: 表示しているページとクリックしたリンクをお知らせください。
@@ -24496,6 +24515,7 @@ ja:
   remove_name_calendar_bdc329d9: "%{name}カレンダーを削除する"
   remove_null_values_from_live_event_payloads_3c826f: ライブイベントペイロードからゼロ値を削除する
   remove_observers_from_courses_703edc34: オブザーバーをコースから削除
+  remove_optionname_8a67379b: "%{optionName}を削除する"
   remove_outcome_20e16da7: 結果を削除しますか？
   remove_outcome_2feaf5fd: 結果を削除する
   remove_outcomes_5f8b601c: 
@@ -25539,6 +25559,7 @@ ja:
   select_conference_provider_58c7f7fe: 会議プロバイダーを選択する
   select_content: コンテンツの選択
   select_content_7faa4195: コンテンツの選択
+  select_content_b0177809: コンテンツを選択する
   select_content_checkbox: 
     select_content_error: "コンテンツ オプションを選択する必要があります"
   select_content_dialog: 
@@ -25554,6 +25575,7 @@ ja:
     titles: 
       add_item_to_module: モジュールにアイテムを追加
       find_links_using_service: "%{service} を使用してリンクを検索"
+  select_content_for_import_9406720: インポートするコンテンツを選択する
   select_content_type_e49c5bf6: コンテンツタイプを選択
   select_conversation_subject_3f36074a: "会話を選択%{subject}"
   select_country_d21cb85a: 国を選択
@@ -26093,6 +26115,7 @@ ja:
     flash_notices: 
       close: 閉じる
     footer_links: 
+      cookie_notice: クッキー通知
       facebook: Facebook
       privacy_policy: 個人情報保護方針
       terms_of_service: サービス規約
@@ -26991,6 +27014,7 @@ ja:
   sorted_descending_84ec84c8: 降順に並べ替えました。
   sorted_descending_d9aa3cf8: 降順に並べ替え
   sorted_direction_by_columnname_d049ac44: "%{direction} で %{columnName}別に分類"
+  source_c377a469: ソース
   source_code_2395ca74: "ソース コード"
   source_context_does_not_match_group_context_4b55cee4: ソースコンテキストがグループコンテキストと一致しません
   source_link_c21ecc23: ソースリンク
@@ -29320,6 +29344,7 @@ ja:
     new_topic: "新しいディスカッション トピック"
   title_52b8638d: "タイトル:"
   title_appointment_group_you_can_sign_up_for_this_1c254712: "これに**サインアップ** することができる*%{title} 予定グループ* 。"
+  title_count_c8e20865: "%{title} (%{count})"
   title_current_750a3c65: "%{title} (現在)"
   title_due_date_d3f46bfb: "%{title}:%{date}期限"
   title_eb77c512: "%{title}"
@@ -30605,6 +30630,7 @@ ja:
   use_semicolons_instead_of_commas_to_separate_field_f50945f2: 成績表エクスポートのフィールドをカンマの代わりにセミコロンで区切って、一部のロケールのユーザー用にExcelにインポートできるようにします。
   use_semicolons_to_separate_fields_in_compatible_sp_56e0bdd2: 対応するスプレッドシートでは、セミコロンでフィールドを区切る
   use_semicolons_to_separate_fields_in_gradebook_exp_5fb3b39d: 成績表エクスポートのフィールドをセミコロンで区切ります
+  use_the_import_content_tool_to_migrate_course_mate_41716290: コンテンツのインポートツールを使用して、他のソースからこのコースに教材を移行します。
   use_the_new_assignments_page_dd292b9d: 新しい課題ページを使用する
   use_the_new_assignments_student_page_944262af: 新しい課題の受講生ページを使用する
   use_the_new_assignments_teacher_page_8add7e46: 新しい課題の教員ページを使用する
@@ -31132,6 +31158,7 @@ ja:
   users_can_access_and_create_but_not_edit_individua_c8a62c74: "ユーザーは、課題とクイズ - 追加/編集/削除が有効になっているときには、課題を介して個々の課題の規定にアクセス・作成することはできますが、編集することはできません。"
   users_can_access_the_manage_question_banks_link_on_e411d01: "ユーザーは、コース内容 - 表示、課題とクイズ - 追加/編集/削除が有効になっているときに、クイズインデックスページの問題バンクの管理リンクにアクセスできます。"
   users_can_add_this_calendar_to_their_other_calenda_69daaa69: ユーザーはこのカレンダーを「その他のカレンダー」リストに追加することができます。
+  users_can_now_archive_grading_schemes_preventing_t_48605092: これで、ユーザは評定スキームをアーカイブし、コース/課題に追加されないようにすることができるようになりました。評定スキームが使用されている古いコンテキストの評定スキームは、引き続き使用されます。アーカイブされた評定スキームはアカウントレベルの評定スキーム設定ページでアクセスすることができますが、編集や削除をすることはできません。
   users_can_temporarily_enroll_another_user_in_a_cou_ce9b48ed: ユーザーは、コースに他のユーザーを一時登録することができます。登録期間が終了すると、割り当てられたユーザはコースから削除されます。
   users_d1b60cb0: ユーザー
   users_designers_22195c6f: "ユーザー - デザイナー"
@@ -31924,6 +31951,7 @@ ja:
   you_do_not_have_permission_to_publish_this_course_ff361c82: このコースを公開する権限がありません。
   you_do_not_have_permission_to_view_announcements_i_6b2e31a2: お知らせを表示する許可がありません。
   you_do_not_have_permissions_to_build_this_moderate_bd5d350a: このモデレートされた課題を作成する権限がありません。
+  you_do_not_have_permissions_to_create_assignments__f554cd6a: 提供されたコースで課題を作成する権限がありません。
   you_do_not_have_permissions_to_edit_this_moderated_3195294f: この修正された課題を編集する権限がありません
   you_do_not_have_permissions_to_modify_discussion_f_a163d8be: "あなたには、%{section_ids} セクションのディスカッションを変更する権限はありません"
   you_don_t_have_access_to_view_this_resource_8378e0e8: このリソースを閲覧するにアクセス権がありません。
@@ -32150,6 +32178,7 @@ ja:
   your_media_has_been_uploaded_and_will_appear_here__8546af57: メディアがアップロードされ、処理後にここに表示されます。
   your_message_has_been_sent_thank_you_e0284316: メッセージが送信されました。ありがとうございます!
   your_message_was_sent_977f6583: メッセージが送信されました！
+  your_migration_can_not_exceed_file_size_b0dda25f: "あなたは%{file_size}を超えて移行ことができません"
   your_modules_will_appear_here_after_they_re_assemb_bfd5abe8: モジュールが組み立てられると、ここにモジュールが表示されます。
   your_name_7665e1d8: お名前
   your_outcomes_were_successfully_imported_c5de884: アウトカムは正常にインポートされました。

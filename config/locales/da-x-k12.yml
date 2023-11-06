@@ -2059,6 +2059,7 @@ da-x-k12:
   add_app_baf540f: "Tilføj app"
   add_as_a_faculty_journal_entry_55a38a30: "Opret som postering i undervisernotater"
   add_as_allowed_e95540be: "Tilføj som Tilladt"
+  add_assignment_da1c1529: "Tilføj opgave"
   add_assignment_to_name_caf173b0: "Tilføj opgave til %{name}"
   add_assignments_and_quizzes_1085d2af: "Tilføj opgaver og quizzer"
   add_attachment_93868828: "Tilføj vedhæftet fil"
@@ -2140,6 +2141,7 @@ da-x-k12:
   add_moderator_review_copy_1st_a484c813: "Tilføj censorbedømmelse (kopier først)"
   add_moderator_review_copy_2nd_e80d458f: "Tilføj censorbedømmelse (kopier anden)"
   add_moderator_review_new_3c183cea: "Tilføj censorbedømmelse (Ny)"
+  add_module_5ad6fee2: "Tilføj forløb"
   add_more_e1ffaa65: "Tilføj flere"
   add_name_db699e72: "Tilføj %{name}"
   add_new_announcement_ddacd624: "Tilføj ny besked"
@@ -2293,6 +2295,7 @@ da-x-k12:
   admins_3e1dce15: Administratorer
   admins_add_remove_26811ce5: "Admins - tilføj / fjern"
   advanced_36b35b8: Avanceret
+  advanced_analytics_course_readiness_closed_alpha_13c8aaf: "Avanceret analyse – fagparathed lukket alfa"
   advertise_release_notes_via_the_ui_9254bc6c: "Annoncer udgivelsesnoter via brugergrænsefladen"
   affects_viewing_the_conclude_course_and_permanentl_8216fcc2: "Påvirker visning af knapperne Afslut fag og Slet dette fag permanent. Knappen Slet dette fag permanent vises for manuelt oprettede fag."
   affects_viewing_the_conclude_course_and_permanentl_d943656e: "Påvirker visning af knapperne Afslut fag og Slet dette fag permanent. Knappen Slet dette fag permanent vises kun for manuelt oprettede fag.\n\
@@ -3673,6 +3676,7 @@ da-x-k12:
   archive_operation_failed_5504706: "Arkivering mislykkedes"
   archive_selected_d64506ca: "Valgt arkiv"
   archived_de543437: Arkiveret
+  archived_grading_schemes_6d698d0: "Arkiverede vurderingssystemer"
   are_you_sure_26795d3c: "Er du sikker?"
   are_you_sure_that_you_want_to_remove_these_count_o_67ef2d6c: 
     one: "Er du sikker på, at du vil fjerne dette læringsudbytte fra denne konto?"
@@ -4008,6 +4012,7 @@ da-x-k12:
   assignment_score_summary_f1dc9708: Opgaveresultatoversigt
   assignment_selection_6bff05c4: Opgavevalg
   assignment_set_set_index_28b1f973: "Opgave indstillet %{set_index}"
+  assignment_settings_5ee5ee77: Opgaveindstillinger
   assignment_submissions_uploaded_ba0dbc84: "%{assignment}: Afleveringer uploadet"
   assignment_title_82b4422e: "Opgavetitel:"
   assignment_title_8a707dd2: opgavetitel
@@ -5743,6 +5748,7 @@ da-x-k12:
   cannot_move_assignments_due_to_closed_grading_peri_59fc3c4: "Kan ikke flytte opgaver på grund af lukkede vurderingsperioder"
   cannot_move_events_with_section_specific_times_bet_3fe871fc: "Kan ikke flytte begivenheder med sektionsspecifikke tidspunkter mellem kalendere"
   cannot_move_scheduler_appointments_between_calenda_253e5ea3: "Kan ikke flytte planlægningsværktøjets aftaler mellem kalendere"
+  cannot_reference_self_16dfcd49: "kan ikke referere til sig selv"
   cannot_relink_unsaved_paces_3ed42012: "Kan ikke linke ikke-gemte tempoer igen"
   cannot_relink_unsaved_plans_2ccef56a: "Kan ikke genlinke ikke-gemte planer"
   cannot_remove_c0fd581d: "Kan ikke fjerne:"
@@ -7487,6 +7493,7 @@ da-x-k12:
   couldn_t_load_previous_content_migrations_a0ef5d7a: "Kunne ikke indlæse tidligere indholdsoverførsler"
   couldn_t_save_account_calendar_visibilities_343459d1: "Kontoens kalendersynligheder kunne ikke gemmes"
   couldn_t_track_assigning_students_to_groups_but_it_b6510770: "Kunne ikke spore tildeling af elever til grupper, men det sker stadig! Kontroller resultatet manuelt senere. (%{errorMessage})"
+  couldn_t_update_content_migrations_68777765: "Kunne ikke opdatere indholdsoverførsler"
   couldn_t_update_standards_for_authority_auth_81206187: "Kunne ikke opdatere standarder til autoritet %{auth}"
   count_40eced3b: Tæl
   count_account_calendars_found_b1eed2e3: 
@@ -10956,6 +10963,7 @@ da-x-k12:
   error_creating_conversation_1d814618: "Fejl ved oprettelse af diskussion"
   error_creating_course_ae61c2bd: "Fejl ved oprettelse af fag"
   error_creating_discussion_topic_a5f809ec: "Fejl ved oprettelse af diskussionsemne"
+  error_creating_modulename_cd0f5c2e: "Fejl ved oprettelse af %{moduleName}."
   error_creating_new_course_9d3903bc: "Fejl ved oprettelse af nyt fag"
   error_creating_new_subject_89f16abe: "Fejl ved oprettelse af nyt emne"
   error_creating_submission_comment_a5374fcf: "Fejl ved oprettelse af indsendelseskommentar"
@@ -11015,6 +11023,7 @@ da-x-k12:
   error_the_tool_returned_an_invalid_content_type_co_10a11c07: "Fejl: Værktøjet returnerede en ugyldig indholdstype \"%{contentType}\""
   error_updating_cluster_error_674e5f2e: "Fejl ved opdatering af %{cluster}: %{error}"
   error_updating_comment_4b80c76d: "Fejl ved opdatering af kommentar"
+  error_updating_discussion_topic_64522a23: "Fejl under opdatering af diskussionsemne"
   error_updating_module_access_f0970f4c: "Fejl ved opdatering af adgang til forløb."
   error_updating_modulename_settings_da982acf: "Fejl ved opdatering af indstillinger for %{moduleName}."
   error_updating_notes_31b24785: "Fejl ved opdatering af bemærkninger"
@@ -11390,6 +11399,7 @@ da-x-k12:
   failed_to_export_context_info_acb07497: "Kontekstoplysningerne kunne ikke eksporteres"
   failed_to_export_course_paces_e17583ba: "Eksport af fagtempoer mislykkedes"
   failed_to_export_pace_plans_9832daac: "Kunne ikke eksportere tempoplaner"
+  failed_to_fetch_content_for_import_a042cc27: "Kunne ikke hente indhold til import."
   failed_to_fetch_migration_issues_data_a896da98: "Kunne ikke hente data om problemer ved overførsel."
   failed_to_get_new_activity_17e7ec7c: "Kunne ikke hente ny aktivitet"
   failed_to_ignore_assignment_46565fa3: "Kunne ikke ignorere opgaven"
@@ -12366,6 +12376,7 @@ da-x-k12:
       submissions_upload: "%{assignment} upload af afleveringer"
   graded_25cd3fcd: Bedømt
   graded_date_by_grader_e8e1ff75: "%{graded_date} af %{grader}"
+  graded_discussion_17cc8eaf: "Bedømt diskussion"
   graded_discussion_a873bb3e: "Bedømt diskussion:"
   graded_quiz_7fabdf1f: "Bedømt quiz"
   graded_submissions_9c7068a2: "Bedømte opgaver:"
@@ -13445,7 +13456,7 @@ da-x-k12:
       Hvis aktiveret, vil værktøjsinstallations- og konfigurationsformularerne, som findes på siderne med konto- og fagindstillinger, bruge
       InstUI-komponenter, i modsætning til de ældre, mindre tilgængelige hjemmelavede komponenter.
   if_enabled_the_user_s_lti_url_input_on_the_select__fa539830: |-
-      Hvis aktiveret, vil brugerens LTI URL-input i dialogboksen for valg af indhold blive overskrevet, 
+      Hvis aktiveret, vil brugerens LTI URL-input i dialogboksen for valg af indhold blive overskrevet,
       hvis værktøjet svarer med en gyldig LTI URL.
   if_enabled_the_user_will_see_a_warning_alert_box_n_d85c7b1f: |-
       Hvis aktiveret, vil brugere se en varsling nær toppen af
@@ -14278,7 +14289,7 @@ da-x-k12:
   k20_beta_description: "Aktiverer K20 Beta-funktioner i Admin Analytics APP."
   k20_course_readiness_alpha_testing_description: "Dette flag er til institutioner, der deltager i Alfatestning af avanceret analyse. Dette flag aktiverer oversigten over fagparathed for disse institutioner."
   k20_course_readiness_alpha_testing_f45597b6: "K20 – Fagparathed alfatestning"
-  k20_course_readiness_description: "Aktiverer den nye oversigt for Admin analyse – fagparathed."
+  k20_course_readiness_description: "Aktiverer oversigten Avanceret analyse over fagparathed for alfa-testere."
   k_2521301c: k
   kazakhstan_7_8fe892c: "Kasakhstan (+7)"
   keep_8f3e7c16: Behold
@@ -14719,6 +14730,7 @@ da-x-k12:
   loading_comments_32366acf: "Indlæser kommentarer"
   loading_completion_b62ca82f: "Indlæser færdiggørelse"
   loading_compose_modal_f6da0e8b: "Indlæser modal til at komponere"
+  loading_content_for_import_4ed89a17: "Indlæser indhold til import."
   loading_conversation_messages_71e9050e: "Indlæser diskussionsbeskeder"
   loading_courses_409a3641: "Indlæser fag"
   loading_courses_bd1bffe: "Indlæser fag ..."
@@ -14764,6 +14776,7 @@ da-x-k12:
   loading_microsoft_teams_sync_settings_c2633e46: "Indlæser Microsoft Teams-synkroniseringsindstillinger"
   loading_missing_assignments_link_d9a0d320: "Indlæser link til manglende opgaver"
   loading_more_gradebook_history_results_810f6d2e: "Indlæser flere Vurderingsoversigt-historikresultater."
+  loading_more_issues_b14f8f7d: "Indlæser flere problemer"
   loading_more_replies_22e0f13c: "Indlæser flere svar"
   loading_more_results_1d437202: "Indlæser flere resultater"
   loading_more_results_def6df65: "Indlæser flere resultater ..."
@@ -17234,6 +17247,7 @@ da-x-k12:
   module_publish_menu_30b638dd: "Forløb offentliggørelsesmenu"
   module_publish_menu_88b54c1b: "Forløb offentliggørelsesmenu"
   module_published_80f0b9b8: "Forløb offentliggjort"
+  modulename_created_successfully_6c273e09: "%{moduleName} blev oprettet."
   modulename_module_publish_options_69ef1ece: "%{moduleName} Muligheder for offentliggørelse af forløb"
   modulename_module_publish_options_publishedstatus_94ea7f49: "%{moduleName} muligheder for offentliggørelse af forløb, %{publishedStatus}"
   modulename_settings_updated_successfully_a09bfef6: "Indstillinger for %{moduleName} blev opdateret."
@@ -17744,6 +17758,7 @@ da-x-k12:
   no_existing_user_provided_for_login_with_sis_id_us_6bcde71f: "Ingen eksisterende bruger tilmeldt med SIS-ID %{user_id}"
   no_explainer_text_available_9d9a2f3c: "Ingen forklarende tekst tilgængelig"
   no_exports_to_display_7f1b630b: "Ingen eksporter at vise"
+  no_file_chosen_9a880793: "Ingen fil valgt"
   no_file_selected_92d2ac30: "Ingen fil valgt"
   no_file_submitted_a879fa53: "Ingen fil afleveret"
   no_first_name_4b772708: "<Intet fornavn>"
@@ -18488,6 +18503,9 @@ da-x-k12:
   optional_filters_9dc03f5e: "Valgfri filtre"
   optionally_include_a_byte_order_mark_in_compatible_f3d0d243: "Inkluder eventuelt et byteordre-mærke i kompatible regnearkseksporter, så de kan importeres til Excel for brugere i nogle lokaliteter."
   optionally_include_a_byte_order_mark_in_gradebook__555cc605: "Indsæt eventuelt et byterækkefølgemærke i vurderingsoversigt-eksporter, så de kan importeres til Excel for brugere i nogle lokaliteter."
+  optioncount_options_available_5a34688e: "%{optionCount} tilgængelige muligheder."
+  optionname_selected_list_collapsed_9e69b18a: "%{optionName} valgt. Listen skjult."
+  optionname_selection_has_been_removed_ff1afe6a: "%{optionName} markeringen er blevet fjernet"
   options: 
     ? "false"
     : Nej
@@ -19070,6 +19088,7 @@ da-x-k12:
   please_enter_a_valid_url_protocol_is_required_e_g__4bc49ab1: "Indtast en gyldig URL. Protokol er påkrævet (f.eks. http://, https://, ftp://, tel:, mailto:)."
   please_enter_your_label_name_7745272d: "Indtast dit %{label_name}:"
   please_enter_your_label_name_and_password_5c56be80: "Indtast dit %{label_name} og adgangskode:"
+  please_fix_errors_before_continuing_b1c13e7d: "Ret fejl, før du fortsætter"
   please_insert_a_message_body_bc85cbff: "Indsæt en tekst til beskeden."
   please_let_them_know_which_page_you_were_viewing_a_c9816406: "Fortæl dem, hvilken side du kiggede på og det link du klikkede på."
   please_log_in_to_view_this_content_eec6cd0: "Log venligst ind for at se dette indhold"
@@ -21788,6 +21807,7 @@ da-x-k12:
   remove_name_calendar_bdc329d9: "Fjern %{name} kalenderen"
   remove_null_values_from_live_event_payloads_3c826f: "Fjern nulværdier fra livebegivenheders nyttedata"
   remove_observers_from_courses_703edc34: "Fjern observatører fra fag"
+  remove_optionname_8a67379b: "Fjern %{optionName}"
   remove_outcome_20e16da7: "Fjern læringsudbytte?"
   remove_outcome_2feaf5fd: "Fjern læringsudbytte"
   remove_outcomes_5f8b601c: 
@@ -22767,6 +22787,7 @@ da-x-k12:
   select_conference_provider_58c7f7fe: "Vælg konferenceudbyder"
   select_content: "Vælg indhold"
   select_content_7faa4195: "Vælg indhold"
+  select_content_b0177809: "Vælg indhold"
   select_content_checkbox: 
     select_content_error: "Du skal vælge en indholdsmulighed"
   select_content_dialog: 
@@ -22782,6 +22803,7 @@ da-x-k12:
     titles: 
       add_item_to_module: "Føj element til forløb"
       find_links_using_service: "Find links, som bruger %{service}"
+  select_content_for_import_9406720: "Vælg indhold til import"
   select_content_type_e49c5bf6: "Vælg indholdstype"
   select_conversation_subject_3f36074a: "Vælg diskussion %{subject}"
   select_country_d21cb85a: "Vælg land"
@@ -23223,6 +23245,7 @@ da-x-k12:
         mastery_level: "procentdel over, hvilken opfyldelse af læringsmål, der indstilles"
         select_and_add_criterion: "Vælg og tilføj kriterie"
     footer_links: 
+      cookie_notice: Cookie-meddelelse
       facebook: Facebook
       privacy_policy: Datapolitik
       twitter: Twitter
@@ -23986,6 +24009,7 @@ da-x-k12:
   sorted_descending_1e30f0d5: "sorteret faldende"
   sorted_descending_84ec84c8: "sorteret i faldende rækkefølge"
   sorted_direction_by_columnname_d049ac44: "Sorteret %{direction} efter %{columnName}"
+  source_c377a469: Kilde
   source_code_2395ca74: Kildekode
   source_context_does_not_match_group_context_4b55cee4: "kildekontekst matcher ikke gruppekontekst"
   source_link_c21ecc23: Kilde-link
@@ -26192,6 +26216,7 @@ da-x-k12:
     new_topic: "Nyt diskussionsemne"
   title_52b8638d: "Overskrift:"
   title_appointment_group_you_can_sign_up_for_this_1c254712: "*%{title} aftalegruppe* Du kan **melde dig** til denne."
+  title_count_c8e20865: "%{title} (%{count})"
   title_current_750a3c65: "%{title} (nuværende)"
   title_due_date_d3f46bfb: "%{title}: Forfalder %{date}"
   title_eb77c512: "%{title}"
@@ -27407,6 +27432,7 @@ da-x-k12:
   use_semicolons_instead_of_commas_to_separate_field_f50945f2: "Brug semikolon i stedet for komma til at adskille felter i vurderingsoversigt-eksporter, så de kan importeres til Excel for brugere i nogle lokaliteter."
   use_semicolons_to_separate_fields_in_compatible_sp_56e0bdd2: "Brug semikoloner til at adskille felter i kompatible regnearkseksporter"
   use_semicolons_to_separate_fields_in_gradebook_exp_5fb3b39d: "Brug semikolon til at adskille felter i vurderingsoversigt-eksporter"
+  use_the_import_content_tool_to_migrate_course_mate_41716290: "Brug værktøjet Importer indhold til at overføre fagmateriale fra andre kilder til dette fag."
   use_the_new_assignments_student_page_944262af: "Brug den nye opgaveside for elev"
   use_the_new_assignments_teacher_page_8add7e46: "Brug den nye opgaveside for lærer"
   use_the_new_collaborations_external_tool_enabling__5f0ed73: "Benyttelse af det nye eksterne samarbejdsværktøj aktiverer flere muligheder for værktøjer til brug for samarbejder"
@@ -27875,6 +27901,7 @@ da-x-k12:
   users_can_access_and_create_but_not_edit_individua_c8a62c74: "Brugere kan få adgang til og oprette (men ikke redigere) enkelte vurderingskriterier for opgaver via Opgaver, når Opgaver og quizzer - tilføj/rediger/slet er aktiveret."
   users_can_access_the_manage_question_banks_link_on_e411d01: "Brugere kan få adgang til linket Administrér spørgsmålsbanker på indekssiden Quizzer, når Fagindhold - vis og Opgaver og quizzer - tilføj/redigér/slet er aktiveret."
   users_can_add_this_calendar_to_their_other_calenda_69daaa69: "Brugere kan tilføje denne kalender til deres liste \"Andre kalendere\"."
+  users_can_now_archive_grading_schemes_preventing_t_48605092: "Brugere kan nu arkivere vurderingssystemer, hvilket forhindrer dem i at blive tilføjet til fag/opgaver. Vurderingssystemer i gamle sammenhænge, hvor det bliver brugt, vil fortsat blive anvendt. Arkiverede vurderingssystemer kan tilgås på siden med indstillinger for vurderingssystemer på kontoniveau, men de kan ikke redigeres eller slettes."
   users_can_temporarily_enroll_another_user_in_a_cou_ce9b48ed: "Brugere kan midlertidigt tilmelde en anden bruger i et fag. Den tildelte bruger fjernes fra faget, når tilmeldingen udløber."
   users_d1b60cb0: Brugere
   users_designers_22195c6f: "Brugere - designere"
@@ -28629,6 +28656,7 @@ da-x-k12:
   you_do_not_have_permission_to_publish_this_course_ff361c82: "Du har ikke tilladelse til at offentliggøre dette fag."
   you_do_not_have_permission_to_view_announcements_i_6b2e31a2: "Du har ikke tilladelse til at se beskeder i dette fag."
   you_do_not_have_permissions_to_build_this_moderate_bd5d350a: "Du har ikke tilladelser til at oprette denne bedømte opgave"
+  you_do_not_have_permissions_to_create_assignments__f554cd6a: "Du har ikke tilladelse til at oprette opgaver i det angivne fag"
   you_do_not_have_permissions_to_edit_this_moderated_3195294f: "Du har ikke tilladelser til at redigere denne bedømte opgave"
   you_do_not_have_permissions_to_modify_discussion_f_a163d8be: "Du har ikke tilladelse til at ændre diskussion for sektion (-er) %{section_ids}"
   you_don_t_have_access_to_view_this_resource_8378e0e8: "Du har ikke adgang til at se denne ressource."
@@ -28840,6 +28868,7 @@ da-x-k12:
   your_media_has_been_uploaded_and_will_appear_here__8546af57: "Dit medie er blevet uploadet og vises her efter behandling."
   your_message_has_been_sent_thank_you_e0284316: "Din besked er blevet sendt. Tak!"
   your_message_was_sent_977f6583: "Din besked blev sendt!"
+  your_migration_can_not_exceed_file_size_b0dda25f: "Din overførsel må ikke overstige %{file_size}"
   your_modules_will_appear_here_after_they_re_assemb_bfd5abe8: "Dine forløb vises her, når de er samlet."
   your_name_7665e1d8: "Dit navn"
   your_outcomes_were_successfully_imported_c5de884: "Dine læringsudbytter blev importeret."
