@@ -59,9 +59,15 @@ const DeleteCalendarEventDialog = ({
   const [which, setWhich] = useState<Which>('one')
   const [isDeleting, setIsDeleting] = useState<boolean>(false)
 
-  const handleCancel = useCallback(() => {
-    onCancel()
-  }, [onCancel])
+  const handleCancel = useCallback(
+    (e = null) => {
+      if (e?.code !== 'Escape' && e?.target.type === 'radio') {
+        return
+      }
+      onCancel()
+    },
+    [onCancel]
+  )
 
   const handleDelete = useCallback(() => {
     setIsDeleting(true)
