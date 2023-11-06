@@ -1345,6 +1345,7 @@ describe DiscussionTopicsController do
     end
 
     it "js_bundles includes discussion_create when ff is on" do
+      Account.site_admin.enable_feature! :react_discussions_post
       user_session(@teacher)
       @course.root_account.enable_feature!(:discussion_create)
       get :new, params: { course_id: @course.id }
