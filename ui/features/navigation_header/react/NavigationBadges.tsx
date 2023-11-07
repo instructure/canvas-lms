@@ -68,6 +68,7 @@ export default function NavigationBadges() {
   const {data: unreadReleaseNotesCount, isSuccess: hasUnreadReleaseNotesCount} = useQuery({
     queryKey: ['unread_count', 'release_notes'],
     queryFn: getUnreadCount,
+    staleTime: 24 * 60 * 60 * 1000, // 24 hours
     enabled: countsEnabled && ENV.FEATURES.embedded_release_notes && !releaseNotesBadgeDisabled,
   })
 

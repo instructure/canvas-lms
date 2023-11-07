@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useState, useEffect} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 import {Checkbox} from '@instructure/ui-checkbox'
@@ -65,12 +65,22 @@ export default function ReleaseNotesList() {
     isLoading,
     isError,
     isSuccess,
+    isFetching,
   } = useQuery({
     queryKey: ['releaseNotes'],
     queryFn: releaseNotesQuery,
     enabled: countsEnabled && ENV.FEATURES.embedded_release_notes,
     fetchAtLeastOnce: true,
   })
+
+  const [wasFetchingReleaseNotes, setWasFetchingReleaseNotes] = useState(isFetching)
+  useEffect(() => {
+    // when release notes are fetched, reset badget count to zero
+    if (isSuccess && wasFetchingReleaseNotes) {
+      setWasFetchingReleaseNotes(false)
+      queryClient.setQueryData(['unread_count', 'release_notes'], 0)
+    }
+  }, [isSuccess, wasFetchingReleaseNotes, queryClient])
 
   function updateBadgeDisabled(newState: boolean) {
     mutation.mutate({
