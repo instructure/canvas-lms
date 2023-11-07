@@ -245,6 +245,12 @@ module GraphQLNodeLoader
 
         record
       end
+    when "UsageRights"
+      Loaders::IDLoader.for(UsageRights).load(id).then do |usage_rights|
+        next unless usage_rights.context.grants_right?(ctx[:current_user], :read)
+
+        usage_rights
+      end
     else
       raise UnsupportedTypeError, "don't know how to load #{type}"
     end
