@@ -57,6 +57,9 @@ module Types
       authenticated_thumbnail_url(object)
     end
 
+    field :usage_rights, UsageRightsType, null: true
+    delegate :usage_rights, to: :object
+
     field :url, Types::UrlType, null: true
     def url
       return if object.locked_for?(current_user, check_policies: true)
