@@ -24,6 +24,7 @@ const GradedDiscussionDueDateDefaultValues = {
   sections: [],
   dueDateErrorMessages: [],
   setDueDateErrorMessages: () => {},
+  groups: [],
 }
 
 export const GradedDiscussionDueDatesContext = React.createContext(

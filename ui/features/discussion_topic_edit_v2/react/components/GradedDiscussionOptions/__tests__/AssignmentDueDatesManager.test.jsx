@@ -34,21 +34,30 @@ const DEFAULT_LIST_OPTIONS = {
     {user: {_id: 'u_5', name: 'Chawn'}},
     {user: {_id: 'u_6', name: 'Omar'}},
   ],
+  Groups: [
+    {_id: '1', name: 'Group 1'},
+    {_id: '2', name: 'Group 2'},
+    {_id: '3', name: 'Group 3'},
+  ],
 }
 
 const setup = ({
-  assignedInfoList = [{dueDateId: 'uniqueID'}],
+  assignedInfoList = [{assignedList: ['everyone'], dueDateId: 'uniqueID'}],
   setAssignedInfoList = () => {},
   dueDateErrorMessages = [],
+  students = DEFAULT_LIST_OPTIONS.Students,
+  courseSections = DEFAULT_LIST_OPTIONS['Course Sections'],
+  courseGroups = DEFAULT_LIST_OPTIONS.Groups,
 } = {}) => {
   return render(
     <GradedDiscussionDueDatesContext.Provider
       value={{
         assignedInfoList,
         setAssignedInfoList,
-        studentEnrollments: DEFAULT_LIST_OPTIONS.Students,
-        sections: DEFAULT_LIST_OPTIONS['Course Sections'],
+        studentEnrollments: students,
+        sections: courseSections,
         dueDateErrorMessages,
+        groups: courseGroups,
       }}
     >
       <AssignmentDueDatesManager />
@@ -124,7 +133,9 @@ describe('AssignmentDueDatesManager', () => {
       },
     ]
     setup({assignedInfoList: testAssignedTo})
-    // There should be 2 menus
+    // This is getting all the select menus
+    // on a UI this would be showing two assignment
+    // override menus
     const selectOptions = screen.getAllByTestId('assign-to-select')
     const assignToOptionOne = selectOptions[0]
     const assignToOptionTwo = selectOptions[1]
@@ -133,13 +144,16 @@ describe('AssignmentDueDatesManager', () => {
 
     let availableOptions = screen.getAllByTestId('assign-to-select-option')
 
-    // Since 1 option is selected in the other menu, there will only be 9 options available
-    expect(availableOptions.length).toBe(9)
+    // There are 13 options by default
+    // 1 option is selected in the other menu
+    // therefore, there will only be 12 options available
+    expect(availableOptions.length).toBe(12)
 
-    // Since there are 2 options selected in the first menu, there will only be 8 options available
+    // 2 options are selected in the other menu
+    // therefore, there will only be 11 options available
     fireEvent.click(assignToOptionTwo)
     availableOptions = screen.getAllByTestId('assign-to-select-option')
-    expect(availableOptions.length).toBe(8)
+    expect(availableOptions.length).toBe(11)
   })
 
   it('displays dueDateErrorMessages for the assignmentDueDate component', () => {
@@ -194,6 +208,32 @@ describe('AssignmentDueDatesManager', () => {
 
       const availableOptions = screen.getAllByTestId('assign-to-select-option')
       expect(availableOptions.map(o => o.textContent).includes('Everyone else')).toBe(true)
+    })
+  })
+
+  describe('group options', () => {
+    it('with defaults data defined above, group options should show', () => {
+      setup()
+      const selectOptions = screen.getAllByTestId('assign-to-select')
+      const assignToOptionOne = selectOptions[0]
+      fireEvent.click(assignToOptionOne)
+
+      const availableOptions = screen.getAllByTestId('assign-to-select-option')
+      expect(availableOptions.length).toBe(13)
+      expect(availableOptions.map(o => o.textContent).includes('Group 1')).toBe(true)
+      expect(availableOptions.map(o => o.textContent).includes('Group 2')).toBe(true)
+      expect(availableOptions.map(o => o.textContent).includes('Group 3')).toBe(true)
+    })
+
+    it('when groups is set to [] no group options should show', () => {
+      setup({courseGroups: []})
+      const selectOptions = screen.getAllByTestId('assign-to-select')
+      const assignToOptionOne = selectOptions[0]
+      fireEvent.click(assignToOptionOne)
+
+      const availableOptions = screen.getAllByTestId('assign-to-select-option')
+      expect(availableOptions.length).toBe(10)
+      expect(availableOptions.map(o => o.textContent).includes('Group 1')).toBe(false)
     })
   })
 })
