@@ -1012,6 +1012,27 @@ describe Attachment do
           expect { subject }.not_to raise_exception
         end
       end
+
+      context "across shards" do
+        specs_require_sharding
+
+        let(:shard1_account) { @shard1.activate { account_model } }
+
+        it "duplicates the file via S3" do
+          expect_any_instance_of(Aws::S3::Object).to receive(:copy_to).once
+          att = attachment_model(context: Account.default)
+          dup = nil
+          @shard1.activate do
+            dup = Attachment.new
+            expect(dup).to receive(:s3object).at_least(:once).and_return(double("Aws::S3::Object", exists?: false))
+            att.clone_for(shard1_account, dup)
+          end
+          expect(dup.content_type).to eq att.content_type
+          expect(dup.size).to eq att.size
+          expect(dup.md5).to eq att.md5
+          expect(dup.workflow_state).to eq "processed"
+        end
+      end
     end
 
     context "with instfs enabled" do
@@ -1024,14 +1045,14 @@ describe Attachment do
       end
 
       it "creates an attachment with workflow_state of processed" do
-        expect(CanvasHttp).to receive(:get)
-        expect(InstFS).to receive(:direct_upload).and_return("more_uuid")
+        expect(InstFS).to receive(:duplicate_file).with("instfs_uuid").and_return("more_uuid")
         @shard1.activate do
           account_model
           course_model(account: @account)
           attachment = @attachment.clone_for(@course, nil, { force_copy: true })
           attachment.save!
           expect(attachment.workflow_state).to eq "processed"
+          expect(attachment.instfs_uuid).to eq "more_uuid"
         end
       end
     end
@@ -1062,8 +1083,8 @@ describe Attachment do
       a = attachment_model(filename: "blech.jpg", context: c, content_type: "image/jpg")
       new_account = Account.create
       c2 = course_factory(account: new_account)
-      allow(Attachment).to receive(:s3_storage?).and_return(true)
-      expect_any_instance_of(Attachment).to receive(:copy_attachment_content).once
+      s3_storage!
+      expect_any_instance_of(Attachment).to receive(:copy_attachment_content).once.and_call_original
       expect_any_instance_of(Attachment).to receive(:change_namespace).once
       expect_any_instance_of(Attachment).to receive(:create_thumbnail_size).once
       a.clone_for(c2)
