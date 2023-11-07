@@ -1684,6 +1684,7 @@ CanvasRails::Application.routes.draw do
       post "accounts/:account_id/admins", action: :create
       delete "accounts/:account_id/admins/:user_id", action: :destroy
       get "accounts/:account_id/admins", action: :index, as: "account_admins"
+      get "accounts/:account_id/admins/self", action: :self_roles, as: "account_self_roles"
     end
 
     scope(controller: :authentication_providers) do
