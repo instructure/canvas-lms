@@ -72,7 +72,9 @@ export const ConferenceAddressBook = ({menuItemList, onChange, selectedItems, is
     groupIDs?.forEach(id => {
       const groupUsers = groupUserMap[id]
       const intersectionArray = intersection(groupUsers, selectedUserIDs)
-      if (intersectionArray.length === groupUsers.length) {
+      // guarding against empty arrays, these lead to pre-selecting groups
+      // that have no members
+      if (intersectionArray.length > 0 && intersectionArray.length === groupUsers.length) {
         selectedGroups.push(id)
       }
     })

@@ -90,6 +90,7 @@ describe "BigBlueButton conferences" do
         @group_category = @course.group_categories.create!(name: "Group Category")
         @group = @course.groups.create!(group_category: @group_category, name: "Group 1")
         @group.add_user(@student, "accepted")
+        @empty_group = @course.groups.create!(group_category: @group_category, name: "Empty Group")
       end
 
       context "on create" do
@@ -99,6 +100,10 @@ describe "BigBlueButton conferences" do
           wait_for_ajaximations
           f("div#tab-attendees").click
           fj("label:contains('Invite all course members')").click
+
+          # side test: make sure no empty groups are pre-selected
+          expect(f("body")).not_to contain_jqcss("button[title='Remove Empty Group: Unnamed']")
+
           f("[data-testid='address-input']").click
           f("[data-testid='section-#{@section.id}']").click
           expect(@section.participants.count).to eq ff("[data-testid='address-tag']").count
