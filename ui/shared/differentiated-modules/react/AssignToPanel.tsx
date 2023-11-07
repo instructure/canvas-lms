@@ -34,9 +34,10 @@ import {AssignmentOverride} from './types'
 const I18n = useI18nScope('differentiated_modules')
 
 export interface AssignToPanelProps {
+  bodyHeight: string
+  footerHeight: string
   courseId: string
   moduleId: string
-  height: string
   moduleElement: HTMLDivElement
   onDismiss: () => void
 }
@@ -62,9 +63,10 @@ const OPTIONS: Option[] = [
 ]
 
 export default function AssignToPanel({
+  bodyHeight,
+  footerHeight,
   courseId,
   moduleId,
-  height,
   moduleElement,
   onDismiss,
 }: AssignToPanelProps) {
@@ -151,51 +153,55 @@ export default function AssignToPanel({
   if (isLoading) return <Spinner renderTitle={I18n.t('Loading')} size="small" />
 
   return (
-    <Flex direction="column" justifyItems="start" height={height}>
-      <Flex.Item padding="medium medium small">
-        <Text>
-          {I18n.t('By default everyone in this course has assigned access to this module.')}
-        </Text>
+    <Flex direction="column" justifyItems="start">
+      <Flex.Item padding="medium medium small" size={bodyHeight}>
+        <Flex direction="column" justifyItems="start">
+          <Flex.Item>
+            <Text>
+              {I18n.t('By default everyone in this course has assigned access to this module.')}
+            </Text>
+          </Flex.Item>
+          <Flex.Item overflowX="hidden">
+            <RadioInputGroup description={I18n.t('Select Access Type')} name="access_type">
+              {OPTIONS.map(option => (
+                <Flex key={option.value}>
+                  <Flex.Item align="start">
+                    <View as="div" margin="none">
+                      <RadioInput
+                        data-testid={`${option.value}-option`}
+                        value={option.value}
+                        checked={selectedOption === option.value}
+                        onClick={handleClick}
+                        label={<ScreenReaderContent>{option.getLabel()}</ScreenReaderContent>}
+                      />
+                    </View>
+                  </Flex.Item>
+                  <Flex.Item>
+                    <View as="div" margin="none">
+                      <Text>{option.getLabel()}</Text>
+                    </View>
+                    <View as="div" margin="none">
+                      <Text color="secondary" size="small">
+                        {option.getDescription()}
+                      </Text>
+                    </View>
+                    {option.value === OPTIONS[1].value && selectedOption === OPTIONS[1].value && (
+                      <View as="div" margin="small large none none">
+                        <ModuleAssignments
+                          courseId={courseId}
+                          onSelect={handleSelect}
+                          defaultValues={defaultValues}
+                        />
+                      </View>
+                    )}
+                  </Flex.Item>
+                </Flex>
+              ))}
+            </RadioInputGroup>
+          </Flex.Item>
+        </Flex>
       </Flex.Item>
-      <Flex.Item padding="x-small medium" overflowX="hidden">
-        <RadioInputGroup description={I18n.t('Select Access Type')} name="access_type">
-          {OPTIONS.map(option => (
-            <Flex key={option.value}>
-              <Flex.Item align="start">
-                <View as="div" margin="none">
-                  <RadioInput
-                    data-testid={`${option.value}-option`}
-                    value={option.value}
-                    checked={selectedOption === option.value}
-                    onClick={handleClick}
-                    label={<ScreenReaderContent>{option.getLabel()}</ScreenReaderContent>}
-                  />
-                </View>
-              </Flex.Item>
-              <Flex.Item>
-                <View as="div" margin="none">
-                  <Text>{option.getLabel()}</Text>
-                </View>
-                <View as="div" margin="none">
-                  <Text color="secondary" size="small">
-                    {option.getDescription()}
-                  </Text>
-                </View>
-                {option.value === OPTIONS[1].value && selectedOption === OPTIONS[1].value && (
-                  <View as="div" margin="small large none none">
-                    <ModuleAssignments
-                      courseId={courseId}
-                      onSelect={handleSelect}
-                      defaultValues={defaultValues}
-                    />
-                  </View>
-                )}
-              </Flex.Item>
-            </Flex>
-          ))}
-        </RadioInputGroup>
-      </Flex.Item>
-      <Flex.Item margin="auto none none none">
+      <Flex.Item margin="auto none none none" size={footerHeight}>
         <Footer
           saveButtonLabel={moduleId ? I18n.t('Update Module') : I18n.t('Add Module')}
           onDismiss={onDismiss}

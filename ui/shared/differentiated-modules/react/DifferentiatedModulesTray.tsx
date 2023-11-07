@@ -57,8 +57,15 @@ export default function DifferentiatedModulesTray({
 }: DifferentiatedModulesTrayProps) {
   const [selectedTab, setSelectedTab] = useState<string | undefined>(initialTab)
   const headerLabel = moduleId ? I18n.t('Edit Module Settings') : I18n.t('Add Module')
-  const panelHeight = useMemo(() => calculatePanelHeight(moduleId !== undefined), [moduleId])
-
+  const footerHeight = '63'
+  const panelHeight = useMemo(
+    (): string => calculatePanelHeight(moduleId !== undefined),
+    [moduleId]
+  )
+  const bodyHeight = useMemo(
+    (): string => `calc(${panelHeight} - ${footerHeight}px)`,
+    [panelHeight]
+  )
   function customOnDismiss() {
     if (!moduleId) {
       // remove the temp module element on cancel
@@ -104,7 +111,8 @@ export default function DifferentiatedModulesTray({
       <React.Suspense fallback={<Fallback />}>
         {moduleId === undefined ? (
           <SettingsPanel
-            height={panelHeight}
+            bodyHeight={bodyHeight}
+            footerHeight={footerHeight}
             onDismiss={onDismiss}
             moduleElement={moduleElement}
             enablePublishFinalGrade={ENV?.PUBLISH_FINAL_GRADE}
@@ -120,7 +128,8 @@ export default function DifferentiatedModulesTray({
               padding="none"
             >
               <SettingsPanel
-                height={panelHeight}
+                bodyHeight={bodyHeight}
+                footerHeight={footerHeight}
                 onDismiss={onDismiss}
                 moduleElement={moduleElement}
                 moduleId={moduleId}
@@ -136,9 +145,10 @@ export default function DifferentiatedModulesTray({
               padding="none"
             >
               <AssignToPanel
+                bodyHeight={bodyHeight}
+                footerHeight={footerHeight}
                 courseId={courseId}
                 moduleId={moduleId}
-                height={panelHeight}
                 moduleElement={moduleElement}
                 onDismiss={onDismiss}
               />

@@ -34,7 +34,8 @@ describe('SettingsPanel', () => {
     moduleId: '1',
     moduleName: 'Week 1',
     unlockAt: '',
-    height: '500px',
+    bodyHeight: '400px',
+    footerHeight: '100px',
     onDismiss: () => {},
     addModuleUI: () => {},
   }
