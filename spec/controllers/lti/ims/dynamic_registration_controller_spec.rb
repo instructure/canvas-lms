@@ -178,6 +178,7 @@ describe Lti::IMS::DynamicRegistrationController do
           subject
           dk = DeveloperKey.last
           expect(dk.name).to eq(registration_params["client_name"])
+          expect(dk.scopes).to eq(scopes)
           expect(dk.account.id).to eq(token_hash[:root_account_global_id])
           expect(dk.redirect_uris).to eq(registration_params["redirect_uris"])
           expect(dk.public_jwk_url).to eq(registration_params["jwks_uri"])

@@ -86,7 +86,8 @@ module Lti
             redirect_uris: registration_params["redirect_uris"],
             public_jwk_url: registration_params["jwks_uri"],
             oidc_initiation_url: registration_params["initiate_login_uri"],
-            is_lti_key: true
+            is_lti_key: true,
+            scopes:
           )
           registration = Lti::IMS::Registration.new(
             developer_key:,
