@@ -281,6 +281,7 @@ describe "context modules" do
     end
 
     it "does not have a prerequisites section when creating the first module" do
+      Account.site_admin.disable_feature! :differentiated_modules
       get "/courses/#{@course.id}/modules"
 
       form = new_module_form

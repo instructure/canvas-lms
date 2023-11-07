@@ -630,6 +630,7 @@ describe Course do
         end
 
         it "applies adhoc overrides with unassign_item if flag is off" do
+          Account.site_admin.disable_feature!(:differentiated_modules)
           override = @assignment1.assignment_overrides.create!(due_at: 3.days.from_now(@now), due_at_overridden: true)
           override.assignment_override_students.create!(user: @student1)
 

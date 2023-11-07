@@ -255,6 +255,7 @@ describe AssignmentOverrideApplicator do
       end
 
       it "applies unassigned overrides if flag is off" do
+        Account.site_admin.disable_feature!(:differentiated_modules)
         @adhoc_override.unassign_item = true
         @adhoc_override.save!
 
@@ -876,6 +877,7 @@ describe AssignmentOverrideApplicator do
         end
 
         it "doesn't include course overrides if flag is off" do
+          Account.site_admin.disable_feature!(:differentiated_modules)
           result = AssignmentOverrideApplicator.course_overrides(@assignment, @student)
           expect(result).to be_nil
         end
@@ -898,6 +900,7 @@ describe AssignmentOverrideApplicator do
         end
 
         it "doesn't include course overrides if flag is off" do
+          Account.site_admin.disable_feature!(:differentiated_modules)
           teacher_in_course
           result = AssignmentOverrideApplicator.course_overrides(@assignment, @teacher)
           expect(result).to be_nil
@@ -914,6 +917,7 @@ describe AssignmentOverrideApplicator do
         end
 
         it "doesn't include course overrides if flag is off" do
+          Account.site_admin.disable_feature!(:differentiated_modules)
           course_with_observer({ course: @course, active_all: true })
           @course.enroll_user(@observer, "ObserverEnrollment", { associated_user_id: @student.id })
           overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @observer)
@@ -930,6 +934,7 @@ describe AssignmentOverrideApplicator do
         end
 
         it "doesn't include course overrides if flag is off" do
+          Account.site_admin.disable_feature!(:differentiated_modules)
           account_admin_user
           overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @admin)
           expect(overrides).to eq []

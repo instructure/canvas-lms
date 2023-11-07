@@ -143,6 +143,7 @@ describe "teacher k5 course dashboard" do
     end
 
     it "shows add module modal when +Module button is clicked" do
+      Account.site_admin.disable_feature! :differentiated_modules
       get "/courses/#{@subject_course.id}#modules"
 
       click_add_module_button
