@@ -454,7 +454,8 @@ class Course < ActiveRecord::Base
       state_settings = [:restrict_student_future_view, :restrict_student_past_view]
       changed_keys = saved_change_to_account_id? ? state_settings : (@changed_settings & state_settings)
       if changed_keys.any?
-        EnrollmentState.delay_if_production.invalidate_access_for_course(self, changed_keys)
+        EnrollmentState.delay_if_production(n_strand: ["invalidate_access_for_course", global_root_account_id])
+                       .invalidate_access_for_course(self, changed_keys)
       end
     end
 
