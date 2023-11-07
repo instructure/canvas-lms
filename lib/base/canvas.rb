@@ -287,7 +287,7 @@ module Canvas
     nil
   end
 
-  def self.region_code
+  def self.region_code(_region = nil)
     nil
   end
 
