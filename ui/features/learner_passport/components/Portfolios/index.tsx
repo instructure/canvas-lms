@@ -16,13 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {Heading} from '@instructure/ui-heading'
+import PortfolioLayout from './PortfolioLayout'
+import PortfolioEdit from './PortfolioEdit'
+import PortfolioDashboard from './PortfolioDashboard'
+import PortfolioCreate from './PortfolioCreate'
+import PortfolioView from './PortfolioView'
 
-export const Portfolios = () => {
-  return (
-    <div>
-      <Heading level="h1">Portfolios</Heading>
-    </div>
-  )
-}
+export {PortfolioLayout, PortfolioEdit, PortfolioDashboard, PortfolioCreate, PortfolioView}
