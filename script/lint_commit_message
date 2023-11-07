@@ -122,6 +122,12 @@ if touches_db_migrate_file
   comment "info", nil, "Your commit modifies migration files. Please review and follow the instructions in https://instructure.atlassian.net/wiki/spaces/CE/pages/49643724/Rails+Migrations, including completing an additional migration review."
 end
 
+touches_lti_variable_expander_file = commit_files.any? { |f| f.start_with?("lib/lti/variable_expander") }
+touches_lti_variable_expander_docs = commit_files.any? { |f| f.start_with?("doc/api/tools_variable_substitutions") }
+if touches_lti_variable_expander_file && !touches_lti_variable_expander_docs
+  comment "info", nil, "Changes were made to the variable expander file, do you need to update the docs? If so, run `rake doc:api` and commit the changes."
+end
+
 gh_issue = (commit_message =~ /(?:refs|fixes|closes|resolves|references) gh-\d+/i)
 SAFE_PARTS_REGEX = /UTF-8/
 TICKET_REGEX = /([A-Z]+-[0-9]+)/
