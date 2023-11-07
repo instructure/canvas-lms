@@ -32,9 +32,12 @@ export const Group = {
     id: string,
     name: string,
   }),
-  mock: {
-    _id: '5',
-    id: 'J2n9F08vw6',
-    name: 'Super Group',
-  },
+  mock:
+    () =>
+    ({_id = '5', id = 'J2n9F08vw6', name = 'Super Group'}) => ({
+      _id,
+      id,
+      name,
+      __typename: 'Group',
+    }),
 }

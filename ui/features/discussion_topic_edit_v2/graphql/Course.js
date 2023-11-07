@@ -44,8 +44,7 @@ export const Course = {
       }
       groupSetsConnection {
         nodes {
-          _id
-          name
+          ...GroupSet
         }
       }
       sectionsConnection {
@@ -56,6 +55,7 @@ export const Course = {
       }
     }
     ${AssignmentGroup.fragment}
+    ${GroupSet.fragment}
   `,
   shape: shape({
     _id: string,

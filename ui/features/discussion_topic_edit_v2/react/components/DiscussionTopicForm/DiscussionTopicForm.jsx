@@ -155,6 +155,10 @@ export default function DiscussionTopicForm({
     setDueDateErrorMessages,
     studentEnrollments,
     sections,
+    groups:
+      groupCategories.find(groupCategory => groupCategory._id === groupCategoryId)?.groupsConnection
+        ?.nodes || [],
+    groupCategoryId,
   }
   const [showGroupCategoryModal, setShowGroupCategoryModal] = useState(false)
 

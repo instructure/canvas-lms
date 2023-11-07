@@ -51,6 +51,7 @@ export const AssignmentDueDatesManager = () => {
     setAssignedInfoList,
     studentEnrollments,
     sections,
+    groups,
     dueDateErrorMessages,
     setDueDateErrorMessages,
   } = useContext(GradedDiscussionDueDatesContext)
@@ -61,6 +62,9 @@ export const AssignmentDueDatesManager = () => {
     }),
     Students: studentEnrollments.map(enrollment => {
       return {assetCode: `user_${enrollment?.user?._id}`, label: enrollment?.user?.name}
+    }),
+    Groups: groups?.map(group => {
+      return {assetCode: `group_${group?._id}`, label: group?.name}
     }),
   })
 
@@ -75,7 +79,16 @@ export const AssignmentDueDatesManager = () => {
   }
 
   const handleAddAssignment = () => {
-    setAssignedInfoList([...assignedInfoList, {dueDateId: nanoid()}]) // Add a new object with a unique id
+    setAssignedInfoList([
+      ...assignedInfoList,
+      {
+        dueDateId: nanoid(),
+        assignedList: [],
+        dueDate: '',
+        availableFrom: '',
+        availableUntil: '',
+      },
+    ]) // Add a new object with a unique id
   }
 
   const handleCloseAssignmentDueDate = dueDateId => () => {
@@ -121,8 +134,11 @@ export const AssignmentDueDatesManager = () => {
       Students: studentEnrollments.map(enrollment => {
         return {assetCode: `user_${enrollment?.user?._id}`, label: enrollment?.user?.name}
       }),
+      Groups: groups?.map(group => {
+        return {assetCode: `group_${group?._id}`, label: group?.name}
+      }),
     })
-  }, [assignedInfoList, sections, studentEnrollments])
+  }, [assignedInfoList, groups, sections, studentEnrollments])
 
   return (
     <>
