@@ -38,7 +38,8 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 const I18n = useI18nScope('differentiated_modules')
 
 export interface SettingsPanelProps {
-  height: string
+  bodyHeight: string
+  footerHeight: string
   onDismiss: () => void
   moduleElement: HTMLDivElement
   moduleId?: string
@@ -57,7 +58,8 @@ export interface SettingsPanelProps {
 
 export default function SettingsPanel({
   moduleElement,
-  height,
+  bodyHeight,
+  footerHeight,
   onDismiss,
   moduleId,
   moduleName,
@@ -177,8 +179,8 @@ export default function SettingsPanel({
   }
 
   return (
-    <Flex direction="column" justifyItems="space-between" height={height}>
-      <Flex.Item shouldGrow={true} padding="small">
+    <Flex direction="column" justifyItems="space-between">
+      <Flex.Item shouldGrow={true} padding="small" size={bodyHeight}>
         <View as="div" padding="small">
           <TextInput
             data-testid="module-name-input"
@@ -320,7 +322,7 @@ export default function SettingsPanel({
           </View>
         )}
       </Flex.Item>
-      <Flex.Item>
+      <Flex.Item size={footerHeight}>
         <Footer
           saveButtonLabel={moduleId ? I18n.t('Update Module') : I18n.t('Add Module')}
           onDismiss={customOnDismiss}

@@ -27,7 +27,8 @@ describe('AssignToPanel', () => {
   const props: AssignToPanelProps = {
     courseId: '1',
     moduleId: '2',
-    height: '500px',
+    bodyHeight: '400px',
+    footerHeight: '100px',
     moduleElement: document.createElement('div'),
     onDismiss: () => {},
   }
