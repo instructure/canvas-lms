@@ -48,6 +48,11 @@ describe "discussions" do
     stub_rcs_config
   end
 
+  def set_react_topic_title_and_message(title, message)
+    f("input[placeholder='Topic Title']").send_keys title
+    type_in_tiny("textarea", message)
+  end
+
   context "when discussion_create feature flag is OFF" do
     let(:url) { "/courses/#{course.id}/discussion_topics/new" }
 
@@ -699,6 +704,91 @@ describe "discussions" do
         new_group_category = GroupCategory.last
         expect(new_group_category.name).to eq("Onyx 1")
         expect(f("input[placeholder='Select a group category']")["value"]).to eq(new_group_category.name)
+      end
+
+      context "usage rights" do
+        before do
+          course.root_account.enable_feature!(:usage_rights_discussion_topics)
+          course.update!(usage_rights_required: true)
+        end
+
+        it "sets an error if no usage rights is selected" do
+          get "/courses/#{course.id}/discussion_topics/new"
+
+          set_react_topic_title_and_message("My Test Topic", "replying to topic")
+
+          # Verify that the usage-rights-icon appears
+          expect(f("button[data-testid='usage-rights-icon']")).to be_truthy
+          icon_color_before = f("button[data-testid='usage-rights-icon']").find_element(css: "span").style("color")
+
+          # Attach a file
+          _filename, fullpath, _data = get_file("graded.png")
+          f("[data-testid='attachment-input']").send_keys(fullpath)
+
+          # Save and publish
+          f("button[data-testid='save-and-publish-button']").click
+          wait_for_ajaximations
+
+          icon_color_after = f("button[data-testid='usage-rights-icon']").find_element(css: "span").style("color")
+
+          # Expect the color of the icon to change to indicate an error
+          expect(icon_color_before == icon_color_after).to be false
+          # Verify that the page did not redirect when the error occured
+          expect(driver.current_url).to end_with("/courses/#{course.id}/discussion_topics/new")
+        end
+
+        it "does not set an error if there is no attachment" do
+          get "/courses/#{course.id}/discussion_topics/new"
+
+          set_react_topic_title_and_message("My Test Topic", "replying to topic")
+
+          # Verify that the usage-rights-icon appears
+          expect(f("button[data-testid='usage-rights-icon']")).to be_truthy
+
+          # Save and publish
+          f("button[data-testid='save-and-publish-button']").click
+          wait_for_ajaximations
+
+          dt = DiscussionTopic.last
+          expect(dt.title).to eq "My Test Topic"
+
+          # Verify that the discussion topic redirected the page to the new discussion topic
+          expect(driver.current_url).to end_with("/courses/#{course.id}/discussion_topics/#{dt.id}")
+        end
+
+        it "correctly sets usage rights" do
+          get "/courses/#{course.id}/discussion_topics/new"
+
+          set_react_topic_title_and_message("My Test Topic", "replying to topic")
+
+          # Attach a file
+          _filename, fullpath, _data = get_file("graded.png")
+          f("[data-testid='attachment-input']").send_keys(fullpath)
+
+          # Verify that the usage-rights-icon appears
+          expect(f("button[data-testid='usage-rights-icon']")).to be_truthy
+
+          f("button[data-testid='usage-rights-icon']").click
+          wait_for_ajaximations
+          f("input[data-testid='usage-select']").click
+          ff("span[data-testid='usage-rights-option']")[1].click
+          f("button[data-testid='save-usage-rights']").click
+
+          # Save and publish
+          f("button[data-testid='save-and-publish-button']").click
+          wait_for_ajaximations
+
+          dt = DiscussionTopic.last
+          usage_rights = DiscussionTopic.last.attachment.usage_rights
+
+          # Verify that the usage_rights were correctly set
+          expect(dt.title).to eq "My Test Topic"
+          expect(usage_rights.use_justification).to eq "own_copyright"
+          expect(usage_rights.legal_copyright).to eq ""
+
+          # Verify that the discussion topic redirected the page to the new discussion topic
+          expect(driver.current_url).to end_with("/courses/#{course.id}/discussion_topics/#{dt.id}")
+        end
       end
     end
 
