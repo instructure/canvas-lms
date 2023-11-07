@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import {Navigate, Route} from 'react-router-dom'
+import {Navigate, Route, redirect} from 'react-router-dom'
+import getCookie from '@instructure/get-cookie'
 
 export const LearnerPassportRoutes = (
   <Route path="/users/:userId/passport" lazy={() => import('../pages/LearnerPassportLayout')}>
@@ -29,7 +30,69 @@ export const LearnerPassportRoutes = (
         return fetch(`/users/${params.userId}/passport/data/achievements`)
       }}
     />
-    <Route path="portfolios" lazy={() => import('../pages/Portfolios')} />
+    <Route path="portfolios" lazy={() => import('../pages/Portfolios')}>
+      <Route
+        path="dashboard"
+        lazy={() => import('../pages/PortfolioDashboard')}
+        loader={async ({params}) => {
+          return fetch(`/users/${params.userId}/passport/data/portfolios`)
+        }}
+      >
+        <Route
+          path="duplicate/:portfolioId"
+          loader={async ({params}) => {
+            await fetch(`/users/${params.userId}/passport/data/portfolios/duplicate`, {
+              method: 'PUT',
+              cache: 'no-cache',
+              headers: {
+                'X-CSRF-Token': getCookie('_csrf_token'),
+                'Content-type': 'application/json',
+              },
+              body: JSON.stringify({portfolio_id: params.portfolioId}),
+            })
+            return redirect('..')
+          }}
+        />
+        <Route
+          path="create"
+          action={async ({request}) => {
+            const formData = await request.formData()
+            const response = await fetch(
+              `/users/${formData.get('userId')}/passport/data/portfolios/create`,
+              {
+                method: 'PUT',
+                cache: 'no-cache',
+                headers: {
+                  'X-CSRF-Token': getCookie('_csrf_token'),
+                  'Content-type': 'application/json',
+                },
+                body: JSON.stringify({title: formData.get('title')}),
+              }
+            )
+            const json = await response.json()
+            return redirect(`../../edit/${json.id}`)
+          }}
+        />
+      </Route>
+      <Route
+        path="view/:portfolioId"
+        loader={async ({params}) => {
+          return fetch(
+            `/users/${params.userId}/passport/data/portfolios/show/${params.portfolioId}`
+          )
+        }}
+        lazy={() => import('../pages/PortfolioView')}
+      />
+      <Route
+        path="edit/:portfolioId"
+        loader={async ({params}) => {
+          return fetch(
+            `/users/${params.userId}/passport/data/portfolios/show/${params.portfolioId}`
+          )
+        }}
+        lazy={() => import('../pages/PortfolioEdit')}
+      />
+    </Route>
     <Route path="projects" lazy={() => import('../pages/Projects')} />
   </Route>
 )

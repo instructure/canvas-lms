@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useEffect} from 'react'
 import {Outlet, useMatch, useNavigate} from 'react-router-dom'
 import {SVGIcon} from '@instructure/ui-svg-images'
 import {IconAlertsLine} from '@instructure/ui-icons'
@@ -49,15 +49,23 @@ const inactiveStyle = {
 export const Component = () => {
   const navigate = useNavigate()
   const pathMatch = useMatch('/users/:userId/:tabPath/*')
-  const selectedTab = pathMatch?.params?.['*']
+  const selectedTab = pathMatch?.params?.['*']?.split('/')[0] || 'achievements'
 
-  const mountPoint: HTMLElement | null = document.querySelector('#content')
-  if (!mountPoint) {
-    return null
-  }
+  useEffect(() => {
+    // canvas limits the width of the content area. For learner passport, let's not.
+    document.body.classList.add('learner-passport')
+    const s = document.createElement('style')
+    s.textContent = `
+      body:not(.full-width):not(.outcomes):not(.body--login-confirmation).learner-passport .ic-Layout-wrapper {
+        max-width: 100%;
+      }
+    `
+    document.head.appendChild(s)
+  }, [])
 
   const handleTabChange = (tabname: string) => {
-    navigate(`../${tabname}`, {relative: 'path'})
+    const route = tabname === 'portfolios' ? 'portfolios/dashboard' : tabname
+    navigate(`${route}`)
   }
 
   const handleTabClick = (event: React.MouseEvent) => {
@@ -70,6 +78,11 @@ export const Component = () => {
       // @ts-expect-error
       handleTabChange(event.target.getAttribute('data-tabid'))
     }
+  }
+
+  const mountPoint: HTMLElement | null = document.querySelector('#content')
+  if (!mountPoint) {
+    return null
   }
 
   return (
@@ -133,7 +146,7 @@ export const Component = () => {
           </Flex>
         </View>
       </div>
-      <View as="div" margin="medium x-large 0">
+      <View as="div" margin="large x-large 0">
         <Outlet />
       </View>
     </Portal>

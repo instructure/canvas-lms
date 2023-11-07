@@ -16,19 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect} from 'react'
-import {useMatch} from 'react-router-dom'
-import {PortfolioLayout} from '../components/Portfolios'
+import {useActionData, useNavigate} from 'react-router-dom'
+import type {PortfolioData} from './types'
 
-export function Component() {
-  const pathMatch = useMatch('/users/:userId/*')
-  if (!pathMatch || !pathMatch.params || !pathMatch.params.userId) {
-    throw new Error('user id is not present on path')
+const PortfolioCreate = () => {
+  const navigate = useNavigate()
+  const portfolio = useActionData() as PortfolioData
+  if (portfolio) {
+    navigate(`../edit/${portfolio.id}`)
+  } else {
+    navigate('..')
   }
-
-  useEffect(() => {
-    document.title = 'Learner Passport: Portfolios'
-  }, [])
-
-  return <PortfolioLayout />
+  return null
 }
+
+export default PortfolioCreate
