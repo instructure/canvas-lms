@@ -75,6 +75,7 @@ export const UsageRights = ({
   onSaveUsageRights,
   isOpen,
   currentUsageRights,
+  errorState,
 }) => {
   const [open, setOpen] = useState(isOpen)
   // The value of the Copyright Holder input
@@ -218,8 +219,8 @@ export const UsageRights = ({
         <IconButton
           onClick={toggleModal}
           withBackground={false}
-          withBorder={false}
-          color="primary"
+          withBorder={errorState}
+          color={errorState ? 'danger' : 'primary'}
           screenReaderLabel={I18n.t('Manage Usage Rights')}
           data-testid="usage-rights-icon"
         >
@@ -288,7 +289,12 @@ export const UsageRights = ({
           <Button onClick={handleCancelClick} margin="0 x-small 0 0">
             {I18n.t('Cancel')}
           </Button>
-          <Button color="primary" type="button" onClick={handleSaveClick}>
+          <Button
+            color="primary"
+            type="button"
+            onClick={handleSaveClick}
+            data-testid="save-usage-rights"
+          >
             {I18n.t('Save')}
           </Button>
         </Modal.Footer>
@@ -304,6 +310,7 @@ UsageRights.propTypes = {
   onSaveUsageRights: PropTypes.func, // When the user clicks save, this function is called with the new usage rights object
   currentUsageRights: PropTypes.object, // passes in the initial usage rights modal state
   isOpen: PropTypes.bool, // can be used to open the modal
+  errorState: PropTypes.bool, // can be used to show an error state
 }
 
 UsageRights.defaultProps = {
@@ -312,4 +319,5 @@ UsageRights.defaultProps = {
   basicFileSystemData: [],
   onSaveUsageRights: () => {},
   isOpen: false,
+  errorState: false,
 }

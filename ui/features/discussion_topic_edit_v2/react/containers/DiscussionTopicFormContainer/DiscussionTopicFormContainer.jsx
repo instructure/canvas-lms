@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useContext} from 'react'
+import React, {useContext, useState} from 'react'
 
 import {useQuery, useMutation} from 'react-apollo'
 import {DISCUSSION_TOPIC_QUERY} from '../../../graphql/Queries'
@@ -25,6 +25,7 @@ import LoadingIndicator from '@canvas/loading-indicator'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import DiscussionTopicForm from '../../components/DiscussionTopicForm/DiscussionTopicForm'
+import {setUsageRights} from '../../util/setUsageRights'
 
 import {getContextQuery} from '../../util/utils'
 
@@ -32,6 +33,7 @@ const I18n = useI18nScope('discussion_create')
 
 export default function DiscussionTopicFormContainer({apolloClient}) {
   const {setOnFailure} = useContext(AlertManagerContext)
+  const [usageRightData, setUsageRightData] = useState()
   const contextType = ENV.context_is_not_group ? 'Course' : 'Group'
   const {contextQueryToUse, contextQueryVariables} = getContextQuery(contextType)
 
@@ -50,26 +52,138 @@ export default function DiscussionTopicFormContainer({apolloClient}) {
   })
   const currentDiscussionTopic = topicData?.legacyNode
 
+  // Use setUsageRights to save new usageRightsData
+  const saveUsageRights = async (usageData, attachmentData) => {
+    try {
+      const basicFileSystemData = attachmentData ? [{id: attachmentData._id, type: 'File'}] : []
+      const usageRights = {
+        use_justification: usageData?.selectedUsageRightsOption?.value,
+        legal_copyright: usageData.copyrightHolder || '',
+      }
+
+      if (usageData.selectedCreativeLicense) {
+        usageRights.license = usageData?.selectedCreativeLicense?.id
+      }
+      // Run API if a usageRight option is provided and there is a file/folder to update
+      if (basicFileSystemData.length !== 0 && usageData?.selectedUsageRightsOption?.value) {
+        await setUsageRights(basicFileSystemData, usageRights, ENV.context_id, contextType)
+      }
+    } catch (error) {
+      setOnFailure(error)
+    }
+  }
+
+  function navigateToDiscussionTopic(context_type, discussion_topic_id) {
+    if (context_type === 'Course') {
+      window.location.assign(`/courses/${ENV.context_id}/discussion_topics/${discussion_topic_id}`)
+    } else if (context_type === 'Group') {
+      window.location.assign(`/groups/${ENV.context_id}/discussion_topics/${discussion_topic_id}`)
+    } else {
+      setOnFailure(I18n.t('Invalid context type'))
+    }
+  }
+
+  const handleFormSubmit = formData => {
+    const {
+      title,
+      message,
+      sectionIdsToPostTo,
+      shouldPublish,
+      requireInitialPost,
+      discussionAnonymousState,
+      availableFrom,
+      availableUntil,
+      anonymousAuthorState,
+      allowLiking,
+      onlyGradersCanLike,
+      addToTodo,
+      todoDate,
+      enablePodcastFeed,
+      includeRepliesInFeed,
+      locked,
+      isAnnouncement,
+      groupCategoryId,
+      assignment,
+      attachment,
+      usageRightsData,
+    } = formData
+
+    setUsageRightData(usageRightsData)
+    if (isEditing) {
+      updateDiscussionTopic({
+        variables: {
+          discussionTopicId: currentDiscussionTopicId,
+          title,
+          message,
+          specificSections: sectionIdsToPostTo.join(),
+          published: shouldPublish,
+          requireInitialPost,
+          delayedPostAt: availableFrom,
+          lockAt: availableUntil,
+          allowRating: allowLiking,
+          onlyGradersCanRate: onlyGradersCanLike,
+          todoDate: addToTodo ? todoDate : null,
+          podcastEnabled: enablePodcastFeed,
+          podcastHasStudentPosts: includeRepliesInFeed,
+          locked,
+          fileId: attachment?._id,
+          removeAttachment: !attachment?._id,
+        },
+      })
+    } else {
+      createDiscussionTopic({
+        variables: {
+          contextId: ENV.context_id,
+          contextType: ENV.context_is_not_group ? 'Course' : 'Group',
+          title,
+          message,
+          specificSections: sectionIdsToPostTo.join(),
+          published: shouldPublish,
+          requireInitialPost,
+          anonymousState: discussionAnonymousState,
+          delayedPostAt: availableFrom,
+          lockAt: availableUntil,
+          isAnonymousAuthor: anonymousAuthorState,
+          allowRating: allowLiking,
+          onlyGradersCanRate: onlyGradersCanLike,
+          todoDate: addToTodo ? todoDate : null,
+          podcastEnabled: enablePodcastFeed,
+          podcastHasStudentPosts: includeRepliesInFeed,
+          locked,
+          isAnnouncement,
+          groupCategoryId: groupCategoryId || null,
+          assignment,
+          fileId: attachment?._id,
+        },
+      })
+    }
+  }
+
+  const handleDiscussionTopicMutationCompletion = async discussionTopic => {
+    const {_id: discussionTopicId, contextType: discussionContextType, attachment} = discussionTopic
+
+    if (discussionTopicId && discussionContextType) {
+      try {
+        await saveUsageRights(usageRightData, attachment)
+      } catch (error) {
+        // Handle error on saving usage rights
+        setOnFailure(error)
+      } finally {
+        // Always navigate to the discussion topic on a successful mutation
+        navigateToDiscussionTopic(discussionContextType, discussionTopicId)
+      }
+    } else {
+      setOnFailure(I18n.t('Error with discussion topic'))
+    }
+  }
+
   const [createDiscussionTopic] = useMutation(CREATE_DISCUSSION_TOPIC, {
     onCompleted: completionData => {
       const new_discussion_topic = completionData?.createDiscussionTopic?.discussionTopic
-      const discussion_topic_id = new_discussion_topic?._id
-      const context_type = new_discussion_topic?.contextType
-      if (discussion_topic_id && context_type) {
-        if (context_type === 'Course') {
-          window.location.assign(
-            `/courses/${ENV.context_id}/discussion_topics/${discussion_topic_id}`
-          )
-        } else if (context_type === 'Group') {
-          window.location.assign(
-            `/groups/${ENV.context_id}/discussion_topics/${discussion_topic_id}`
-          )
-        } else {
-          setOnFailure(I18n.t('Invalid context type'))
-        }
-      } else {
-        setOnFailure(I18n.t('Error creating discussion topic'))
-      }
+
+      handleDiscussionTopicMutationCompletion(new_discussion_topic).catch(() => {
+        setOnFailure(I18n.t('Error updating file usage rights'))
+      })
     },
     onError: () => {
       setOnFailure(I18n.t('Error creating discussion topic'))
@@ -78,27 +192,14 @@ export default function DiscussionTopicFormContainer({apolloClient}) {
 
   const [updateDiscussionTopic] = useMutation(UPDATE_DISCUSSION_TOPIC, {
     onCompleted: completionData => {
-      const new_discussion_topic = completionData?.updateDiscussionTopic?.discussionTopic
-      const discussion_topic_id = new_discussion_topic?._id
-      const context_type = new_discussion_topic?.contextType
-      if (discussion_topic_id && context_type) {
-        if (context_type === 'Course') {
-          window.location.assign(
-            `/courses/${ENV.context_id}/discussion_topics/${discussion_topic_id}`
-          )
-        } else if (context_type === 'Group') {
-          window.location.assign(
-            `/groups/${ENV.context_id}/discussion_topics/${discussion_topic_id}`
-          )
-        } else {
-          setOnFailure(I18n.t('Invalid context type'))
-        }
-      } else {
-        setOnFailure(I18n.t('Error Updating discussion topic'))
-      }
+      const updatedDiscussionTopic = completionData?.updateDiscussionTopic?.discussionTopic
+
+      handleDiscussionTopicMutationCompletion(updatedDiscussionTopic).catch(() => {
+        setOnFailure(I18n.t('Error updating file usage rights'))
+      })
     },
     onError: () => {
-      setOnFailure(I18n.t('Error creating discussion topic'))
+      setOnFailure(I18n.t('Error updating discussion topic'))
     },
   })
 
@@ -117,77 +218,7 @@ export default function DiscussionTopicFormContainer({apolloClient}) {
       groupCategories={currentContext?.groupSetsConnection?.nodes}
       studentEnrollments={currentContext?.enrollmentsConnection?.nodes}
       apolloClient={apolloClient}
-      onSubmit={({
-        title,
-        message,
-        sectionIdsToPostTo,
-        shouldPublish,
-        requireInitialPost,
-        discussionAnonymousState,
-        availableFrom,
-        availableUntil,
-        anonymousAuthorState,
-        allowLiking,
-        onlyGradersCanLike,
-        addToTodo,
-        todoDate,
-        enablePodcastFeed,
-        includeRepliesInFeed,
-        locked,
-        isAnnouncement,
-        groupCategoryId,
-        assignment,
-        attachment,
-      }) => {
-        if (isEditing) {
-          updateDiscussionTopic({
-            variables: {
-              discussionTopicId: currentDiscussionTopicId,
-              title,
-              message,
-              specificSections: sectionIdsToPostTo.join(),
-              published: shouldPublish,
-              requireInitialPost,
-              delayedPostAt: availableFrom,
-              lockAt: availableUntil,
-              allowRating: allowLiking,
-              onlyGradersCanRate: onlyGradersCanLike,
-              todoDate: addToTodo ? todoDate : null,
-              podcastEnabled: enablePodcastFeed,
-              podcastHasStudentPosts: includeRepliesInFeed,
-              locked,
-              fileId: attachment?._id,
-              removeAttachment: !attachment?._id,
-            },
-          })
-        } else {
-          createDiscussionTopic({
-            variables: {
-              contextId: ENV.context_id,
-              contextType: ENV.context_is_not_group ? 'Course' : 'Group',
-              title,
-              message,
-              specificSections: sectionIdsToPostTo.join(),
-              published: shouldPublish,
-              requireInitialPost,
-              anonymousState: discussionAnonymousState,
-              delayedPostAt: availableFrom,
-              lockAt: availableUntil,
-              isAnonymousAuthor: anonymousAuthorState,
-              allowRating: allowLiking,
-              onlyGradersCanRate: onlyGradersCanLike,
-              todoDate: addToTodo ? todoDate : null,
-              podcastEnabled: enablePodcastFeed,
-              podcastHasStudentPosts: includeRepliesInFeed,
-              locked,
-              isAnnouncement,
-              groupCategoryId: groupCategoryId || null,
-              assignment,
-              fileId: attachment?._id,
-            },
-          })
-        }
-      }}
+      onSubmit={handleFormSubmit}
     />
   )
 }

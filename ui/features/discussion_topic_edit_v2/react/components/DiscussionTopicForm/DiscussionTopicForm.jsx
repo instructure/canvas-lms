@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useRef, useEffect} from 'react'
+import React, {useState, useRef, useEffect, useContext} from 'react'
 import PropTypes from 'prop-types'
 import AnonymousResponseSelector from '@canvas/discussions/react/components/AnonymousResponseSelector/AnonymousResponseSelector'
 import {CreateOrEditSetModal} from '@canvas/groups/react/CreateOrEditSetModal'
@@ -43,6 +43,7 @@ import {nanoid} from 'nanoid'
 import {AttachmentDisplay} from '@canvas/discussions/react/components/AttachmentDisplay/AttachmentDisplay'
 import {responsiveQuerySizes} from '@canvas/discussions/react/utils'
 import {UsageRights} from '../GradedDiscussionOptions/UsageRights'
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 
 import {addNewGroupCategoryToCache} from '../../util/utils'
 
@@ -61,6 +62,7 @@ export default function DiscussionTopicForm({
   apolloClient,
 }) {
   const rceRef = useRef()
+  const {setOnFailure} = useContext(AlertManagerContext)
 
   const isAnnouncement = ENV.DISCUSSION_TOPIC?.ATTRIBUTES?.is_announcement ?? false
   const isUnpublishedAnnouncement =
@@ -161,6 +163,12 @@ export default function DiscussionTopicForm({
   const affectUserFileQuota = false
 
   const [usageRightsData, setUsageRightsData] = useState({})
+  const [usageRightsErrorState, setUsageRightsErrorState] = useState(false)
+
+  const handleSettingUsageRightsData = data => {
+    setUsageRightsErrorState(false)
+    setUsageRightsData(data)
+  }
   useEffect(() => {
     if (!isEditing || !currentDiscussionTopic) return
 
@@ -241,11 +249,18 @@ export default function DiscussionTopicForm({
   }
 
   const validateUsageRights = () => {
-    const isFileAttached = false // this is a place holder. will get replaced after VICE-3851 is completed
-    if (!ENV?.FEATURES?.usage_rights_discussion_topics || !ENV?.USAGE_RIGHTS_REQUIRED) return true // if usage rights is not enabled, no need to validate
-    if (usageRightsData?.selectedUsageRightsOption || !isFileAttached) return true
-    console.log('REPLACE WITH ERROR MESSAGE, NEED TO SELECT USAGE RIGHT')
-    // if usage rights is not selected, show error
+    // if usage rights is not enabled or there are no attachments, there is no need to validate
+    if (
+      !ENV?.FEATURES?.usage_rights_discussion_topics ||
+      !ENV?.USAGE_RIGHTS_REQUIRED ||
+      !attachment
+    ) {
+      return true
+    }
+
+    if (usageRightsData?.selectedUsageRightsOption) return true
+    setOnFailure(I18n.t('You must set usage rights'))
+    setUsageRightsErrorState(true)
     return false
   }
 
@@ -256,7 +271,6 @@ export default function DiscussionTopicForm({
     if (!validateAvailability(availableFrom, availableUntil)) isValid = false
     if (!validateSelectGroup()) isValid = false
     if (!validateAssignToFields()) isValid = false
-
     if (!validateUsageRights()) isValid = false
 
     return isValid
@@ -347,6 +361,7 @@ export default function DiscussionTopicForm({
         isAnnouncement,
         assignment: prepareAssignmentPayload(),
         attachment,
+        usageRightsData,
       })
       return true
     }
@@ -468,8 +483,9 @@ export default function DiscussionTopicForm({
                 <UsageRights
                   contextType={(ENV?.context_type ?? '').toLocaleLowerCase()}
                   contextId={ENV?.context_id}
-                  onSaveUsageRights={setUsageRightsData}
+                  onSaveUsageRights={handleSettingUsageRightsData}
                   currentUsageRights={usageRightsData}
+                  errorState={usageRightsErrorState}
                 />
               </Flex.Item>
             </Flex>
