@@ -23,6 +23,7 @@ import {IconTrashLine} from '@instructure/ui-icons'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import DateValidator from '@canvas/datetime/DateValidator'
 import ClearableDateTimeInput from './ClearableDateTimeInput'
+import moment from 'moment'
 // import AssigneeSelector from '../AssigneeSelector'
 
 const I18n = useI18nScope('differentiated_modules')
@@ -86,9 +87,18 @@ export default function ItemAssignToCard({
 
   const handleDueDateChange = useCallback(
     (_event: React.SyntheticEvent, value: string | undefined) => {
-      setDueDate(value || null)
+      const defaultDueTime = ENV.DEFAULT_DUE_TIME ?? '23:59:00'
+      if (dueDate === null) {
+        const [hour, minute, second] = defaultDueTime.split(':').map(Number)
+        const chosenDate = moment(value)
+        chosenDate.set({hour, minute, second})
+        const newDueDate = chosenDate.isValid() ? chosenDate.toISOString() : value
+        setDueDate(newDueDate || null)
+      } else {
+        setDueDate(value || null)
+      }
     },
-    []
+    [dueDate]
   )
 
   const handleAvailableFromDateChange = useCallback(
@@ -100,9 +110,16 @@ export default function ItemAssignToCard({
 
   const handleAvailableToDateChange = useCallback(
     (_event: React.SyntheticEvent, value: string | undefined) => {
-      setAvailableToDate(value || null)
+      if (availableToDate === null) {
+        const chosenDate = moment(value)
+        chosenDate.set({hour: 23, minute: 59, second: 0})
+        const newAvailableToDate = chosenDate.isValid() ? chosenDate.toISOString() : value
+        setAvailableToDate(newAvailableToDate || null)
+      } else {
+        setAvailableToDate(value || null)
+      }
     },
-    []
+    [availableToDate]
   )
 
   useEffect(() => {

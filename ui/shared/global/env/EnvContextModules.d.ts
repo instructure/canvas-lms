@@ -51,4 +51,5 @@ export interface EnvContextModules {
     end_at?: {date: string; date_context: string}
   }
   POST_TO_SIS: boolean
+  DEFAULT_DUE_TIME?: string
 }
