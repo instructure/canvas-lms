@@ -19,7 +19,6 @@
 import React, {ChangeEvent, useEffect, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
-import {Avatar} from '@instructure/ui-avatar'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Alert} from '@instructure/ui-alerts'
@@ -29,6 +28,7 @@ import {TextInput} from '@instructure/ui-text-input'
 import {Table} from '@instructure/ui-table'
 import {Flex} from '@instructure/ui-flex'
 import {createAnalyticPropsGenerator} from './util/analytics'
+import {TempEnrollAvatar} from './TempEnrollAvatar'
 import {EMPTY_USER, MODULE_NAME, User} from './types'
 
 const I18n = useI18nScope('temporary_enrollment')
@@ -103,21 +103,6 @@ export function TempEnrollSearch(props: Props) {
     }
   }
 
-  const renderAvatar = () => {
-    return (
-      <>
-        <Avatar
-          size="medium"
-          margin="0 small 0 0"
-          name={props.user.name}
-          src={props.user.avatar_url}
-          data-fs-exclude={true}
-          data-heap-redact-attributes="name"
-        />
-      </>
-    )
-  }
-
   useEffect(() => {
     if (props.page === 1 && !props.foundEnroll) {
       setLoading(true)
@@ -174,7 +159,9 @@ export function TempEnrollSearch(props: Props) {
   if (loading) {
     return (
       <Flex justifyItems="center" alignItems="center">
-        <Spinner renderTitle={I18n.t('Retrieving user information')} />
+        <Flex.Item shouldGrow={true}>
+          <Spinner renderTitle={I18n.t('Retrieving user information')} />
+        </Flex.Item>
       </Flex>
     )
   }
@@ -182,102 +169,124 @@ export function TempEnrollSearch(props: Props) {
   if (props.page === 1 && enrollment.name !== '') {
     // user confirmation page
     return (
-      <>
-        {renderAvatar()}
-        <Alert variant="success">
-          {I18n.t('%{name} is ready to be assigned temporary enrollments.', {
-            name: enrollment.name,
-          })}
-        </Alert>
-        <Table caption={<ScreenReaderContent>{I18n.t('User information')}</ScreenReaderContent>}>
-          <Table.Head>
-            <Table.Row>
-              <Table.ColHeader id="usertable-name">{I18n.t('Name')}</Table.ColHeader>
-              <Table.ColHeader id="usertable-email">{I18n.t('Email Address')}</Table.ColHeader>
-              <Table.ColHeader id="usertable-loginid">{I18n.t('Login ID')}</Table.ColHeader>
-              {props.canReadSIS ? (
-                <Table.ColHeader id="usertable-sisid">{I18n.t('SIS ID')}</Table.ColHeader>
-              ) : null}
-            </Table.Row>
-          </Table.Head>
-          <Table.Body>
-            <Table.Row>
-              <Table.RowHeader>{enrollment.name}</Table.RowHeader>
-              <Table.Cell>{enrollment.email}</Table.Cell>
-              <Table.Cell>{enrollment.login_id}</Table.Cell>
-              {props.canReadSIS ? <Table.Cell>{enrollment.sis_user_id}</Table.Cell> : null}
-            </Table.Row>
-          </Table.Body>
-        </Table>
-      </>
+      <Flex gap="medium" direction="column">
+        <Flex.Item padding="xx-small">
+          <Flex gap="x-small" direction="column">
+            <Flex.Item>
+              <TempEnrollAvatar user={props.user} />
+            </Flex.Item>
+            <Flex.Item shouldGrow={true}>
+              <Text weight="bold">
+                {I18n.t('Find a recipient of temporary enrollments from %{name}', {
+                  name: props.user.name,
+                })}
+              </Text>
+            </Flex.Item>
+          </Flex>
+        </Flex.Item>
+        <Flex.Item shouldGrow={true} padding="xx-small">
+          <Alert variant="success" margin="0">
+            {I18n.t('%{name} is ready to be assigned temporary enrollments.', {
+              name: enrollment.name,
+            })}
+          </Alert>
+        </Flex.Item>
+        <Flex.Item shouldGrow={true} padding="xx-small">
+          <Table caption={<ScreenReaderContent>{I18n.t('User information')}</ScreenReaderContent>}>
+            <Table.Head>
+              <Table.Row>
+                <Table.ColHeader id="usertable-name">{I18n.t('Name')}</Table.ColHeader>
+                <Table.ColHeader id="usertable-email">{I18n.t('Email Address')}</Table.ColHeader>
+                <Table.ColHeader id="usertable-loginid">{I18n.t('Login ID')}</Table.ColHeader>
+                {props.canReadSIS ? (
+                  <Table.ColHeader id="usertable-sisid">{I18n.t('SIS ID')}</Table.ColHeader>
+                ) : null}
+              </Table.Row>
+            </Table.Head>
+            <Table.Body>
+              <Table.Row>
+                <Table.RowHeader>{enrollment.name}</Table.RowHeader>
+                <Table.Cell>{enrollment.email}</Table.Cell>
+                <Table.Cell>{enrollment.login_id}</Table.Cell>
+                {props.canReadSIS ? <Table.Cell>{enrollment.sis_user_id}</Table.Cell> : null}
+              </Table.Row>
+            </Table.Body>
+          </Table>
+        </Flex.Item>
+      </Flex>
     )
   } else {
     return (
-      <>
-        <Flex margin="0 0 small 0">
-          <Flex.Item>{renderAvatar()}</Flex.Item>
-          <Flex.Item shouldShrink={true}>
-            <Text size="large">{props.user.name}</Text>
+      <Flex gap="medium" direction="column">
+        <Flex.Item padding="xx-small">
+          <Flex gap="x-small" direction="column">
+            <Flex.Item>
+              <TempEnrollAvatar user={props.user} />
+            </Flex.Item>
+            <Flex.Item shouldGrow={true}>
+              <Text weight="bold">
+                {I18n.t('Find a recipient of temporary enrollments from %{name}', {
+                  name: props.user.name,
+                })}
+              </Text>
+            </Flex.Item>
+          </Flex>
+        </Flex.Item>
+        {message && (
+          <Flex.Item shouldGrow={true} padding="xx-small">
+            <Alert variant="error" margin="0">
+              {message}
+            </Alert>
           </Flex.Item>
-        </Flex>
-        <Flex margin="0 0 large 0">
-          <Flex.Item shouldShrink={true}>
-            <Text weight="bold">
-              {I18n.t('Find a recipient of temporary enrollments from %{name}', {
-                name: props.user.name,
-              })}
-            </Text>
-          </Flex.Item>
-        </Flex>
-        {message === '' ? <></> : <Alert variant="error">{message}</Alert>}
-        <RadioInputGroup
-          name="search_type"
-          defaultValue={searchType}
-          description={I18n.t('Add recipient by')}
-          onChange={handleSearchTypeChange}
-          layout="columns"
-        >
-          <RadioInput
-            id="peoplesearch_radio_cc_path"
-            key="cc_path"
-            value="cc_path"
-            label={I18n.t('Email Address')}
-            {...analyticProps('EmailAddress')}
-          />
-          <RadioInput
-            id="peoplesearch_radio_unique_id"
-            key="unique_id"
-            value="unique_id"
-            label={I18n.t('Login ID')}
-            {...analyticProps('LoginID')}
-          />
-          {props.canReadSIS ? (
+        )}
+        <Flex.Item shouldGrow={true} padding="xx-small">
+          <RadioInputGroup
+            name="search_type"
+            defaultValue={searchType}
+            description={I18n.t('Add recipient by')}
+            onChange={handleSearchTypeChange}
+            layout="columns"
+          >
             <RadioInput
-              id="peoplesearch_radio_sis_user_id"
-              key="sis_user_id"
-              value="sis_user_id"
-              label={I18n.t('SIS ID')}
-              {...analyticProps('SISID')}
+              id="peoplesearch_radio_cc_path"
+              key="cc_path"
+              value="cc_path"
+              label={I18n.t('Email Address')}
+              {...analyticProps('EmailAddress')}
             />
-          ) : null}
-        </RadioInputGroup>
-        <Flex margin="medium 0 0 0">
-          <Flex.Item shouldGrow={true}>
-            <TextInput
-              renderLabel={
-                <>
-                  {labelText}
-                  <ScreenReaderContent>{descText}</ScreenReaderContent>
-                </>
-              }
-              value={search}
-              placeholder={exampleText}
-              onChange={handleSearchChange}
-              {...analyticProps('TextInput')}
+            <RadioInput
+              id="peoplesearch_radio_unique_id"
+              key="unique_id"
+              value="unique_id"
+              label={I18n.t('Login ID')}
+              {...analyticProps('LoginID')}
             />
-          </Flex.Item>
-        </Flex>
-      </>
+            {props.canReadSIS ? (
+              <RadioInput
+                id="peoplesearch_radio_sis_user_id"
+                key="sis_user_id"
+                value="sis_user_id"
+                label={I18n.t('SIS ID')}
+                {...analyticProps('SISID')}
+              />
+            ) : null}
+          </RadioInputGroup>
+        </Flex.Item>
+        <Flex.Item padding="xx-small">
+          <TextInput
+            renderLabel={
+              <>
+                {labelText}
+                <ScreenReaderContent>{descText}</ScreenReaderContent>
+              </>
+            }
+            value={search}
+            placeholder={exampleText}
+            onChange={handleSearchChange}
+            {...analyticProps('TextInput')}
+          />
+        </Flex.Item>
+      </Flex>
     )
   }
 }

@@ -24,8 +24,6 @@ import {IconEditLine, IconPlusLine, IconTrashLine} from '@instructure/ui-icons'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Table} from '@instructure/ui-table'
-import {Text} from '@instructure/ui-text'
-import {Avatar} from '@instructure/ui-avatar'
 import {
   Enrollment,
   EnrollmentType,
@@ -38,6 +36,7 @@ import {deleteEnrollment} from './api/enrollment'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {createAnalyticPropsGenerator} from './util/analytics'
+import {TempEnrollAvatar} from './TempEnrollAvatar'
 
 const I18n = useI18nScope('temporary_enrollment')
 
@@ -164,84 +163,68 @@ export function TempEnrollEdit(props: Props) {
     </Flex>
   )
 
-  const renderAvatar = () => {
-    return (
-      <Flex>
-        <Flex.Item>
-          <Avatar
-            size="large"
-            margin="0 small 0 0"
-            name={props.user.name}
-            src={props.user.avatar_url}
-            data-fs-exclude={true}
-            data-heap-redact-attributes="name"
-          />
-        </Flex.Item>
-
-        <Flex.Item>
-          <div>
-            <Text size="large">{props.user.name}</Text>
-          </div>
-        </Flex.Item>
-      </Flex>
-    )
-  }
-
   return (
-    <>
-      <Flex wrap="wrap" margin="0 small 0 0">
-        <Flex.Item>{renderAvatar()}</Flex.Item>
-
-        {canAdd && props.enrollmentType === PROVIDER && (
-          <Flex.Item margin="0 0 0 auto">
-            <Button
-              data-testid="add-button"
-              onClick={handleAddNewClick}
-              aria-label={I18n.t('Create temporary enrollment')}
-              {...analyticProps('Create')}
-            >
-              <IconPlusLine />
-
-              {I18n.t('Recipient')}
-            </Button>
+    <Flex gap="medium" direction="column">
+      <Flex.Item padding="xx-small">
+        <Flex wrap="wrap" gap="x-small" justifyItems="space-between">
+          <Flex.Item>
+            <TempEnrollAvatar user={props.user} />
           </Flex.Item>
-        )}
-      </Flex>
-
-      <Table caption={<ScreenReaderContent>{I18n.t('User information')}</ScreenReaderContent>}>
-        <Table.Head>
-          <Table.Row>
-            <Table.ColHeader id="usertable-name">
-              {enrollmentTypeLabel} {I18n.t('Name')}
-            </Table.ColHeader>
-            <Table.ColHeader id="usertable-email">
-              {I18n.t('Recipient Enrollment Period')}
-            </Table.ColHeader>
-            <Table.ColHeader id="usertable-loginid">
-              {I18n.t('Recipient Enrollment Type')}
-            </Table.ColHeader>
-            {(canEdit || canDelete) && (
-              <Table.ColHeader id="header-user-option-links" width="1">
-                <ScreenReaderContent>
-                  {I18n.t('Temporary enrollment option links')}
-                </ScreenReaderContent>
+          {canAdd && props.enrollmentType === PROVIDER && (
+            <Flex.Item>
+              <Button
+                data-testid="add-button"
+                onClick={handleAddNewClick}
+                aria-label={I18n.t('Create temporary enrollment')}
+                {...analyticProps('Create')}
+              >
+                <Flex alignItems="center" justifyItems="center" gap="xx-small">
+                  <Flex.Item>
+                    <IconPlusLine />
+                  </Flex.Item>
+                  <Flex.Item shouldGrow={true}>{I18n.t('Recipient')}</Flex.Item>
+                </Flex>
+              </Button>
+            </Flex.Item>
+          )}
+        </Flex>
+      </Flex.Item>
+      <Flex.Item shouldGrow={true} padding="xx-small">
+        <Table caption={<ScreenReaderContent>{I18n.t('User information')}</ScreenReaderContent>}>
+          <Table.Head>
+            <Table.Row>
+              <Table.ColHeader id="usertable-name">
+                {enrollmentTypeLabel} {I18n.t('Name')}
               </Table.ColHeader>
-            )}
-          </Table.Row>
-        </Table.Head>
-        <Table.Body>
-          {props.enrollments.map(enrollment => (
-            <Table.Row key={enrollment.id}>
-              <Table.RowHeader>{enrollment.user.name}</Table.RowHeader>
-              <Table.Cell>
-                {formatDateTime(enrollment.start_at)} - {formatDateTime(enrollment.end_at)}
-              </Table.Cell>
-              <Table.Cell>{enrollment.type}</Table.Cell>
-              {(canEdit || canDelete) && <Table.Cell>{renderActionIcons(enrollment)}</Table.Cell>}
+              <Table.ColHeader id="usertable-email">
+                {I18n.t('Recipient Enrollment Period')}
+              </Table.ColHeader>
+              <Table.ColHeader id="usertable-loginid">
+                {I18n.t('Recipient Enrollment Type')}
+              </Table.ColHeader>
+              {(canEdit || canDelete) && (
+                <Table.ColHeader id="header-user-option-links" width="1">
+                  <ScreenReaderContent>
+                    {I18n.t('Temporary enrollment option links')}
+                  </ScreenReaderContent>
+                </Table.ColHeader>
+              )}
             </Table.Row>
-          ))}
-        </Table.Body>
-      </Table>
-    </>
+          </Table.Head>
+          <Table.Body>
+            {props.enrollments.map(enrollment => (
+              <Table.Row key={enrollment.id}>
+                <Table.RowHeader>{enrollment.user.name}</Table.RowHeader>
+                <Table.Cell>
+                  {formatDateTime(enrollment.start_at)} - {formatDateTime(enrollment.end_at)}
+                </Table.Cell>
+                <Table.Cell>{enrollment.type}</Table.Cell>
+                {(canEdit || canDelete) && <Table.Cell>{renderActionIcons(enrollment)}</Table.Cell>}
+              </Table.Row>
+            ))}
+          </Table.Body>
+        </Table>
+      </Flex.Item>
+    </Flex>
   )
 }

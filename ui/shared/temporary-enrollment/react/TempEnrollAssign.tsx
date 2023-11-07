@@ -26,7 +26,6 @@ import React, {
   useState,
 } from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {Avatar} from '@instructure/ui-avatar'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Grid} from '@instructure/ui-grid'
 import {Text} from '@instructure/ui-text'
@@ -52,6 +51,7 @@ import {EnrollmentType, MODULE_NAME, RECIPIENT, User} from './types'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 import {EnvCommon} from '@canvas/global/env/EnvCommon'
+import {TempEnrollAvatar} from './TempEnrollAvatar'
 
 declare const ENV: GlobalEnv & EnvCommon
 
@@ -386,6 +386,10 @@ export function TempEnrollAssign(props: Props) {
     await handleProcessEnrollments(submitEnrolls)
   }
 
+  const handleGoBack = () => {
+    props.goBack()
+  }
+
   for (const role of props.roles) {
     const permissionName = rolePermissionMapping[role.base_role_name as RoleName]
 
@@ -409,121 +413,104 @@ export function TempEnrollAssign(props: Props) {
   if (loading) {
     return (
       <Flex justifyItems="center" alignItems="center">
-        <Spinner renderTitle={I18n.t('Retrieving user enrollments')} />
+        <Flex.Item shouldGrow={true}>
+          <Spinner renderTitle={I18n.t('Retrieving user enrollments')} />
+        </Flex.Item>
       </Flex>
     )
   }
 
   return (
-    <>
-      <Grid>
-        {!props.isInAssignEditMode && (
-          <Grid.Row>
+    <Flex gap="medium" direction="column">
+      {!props.isInAssignEditMode && (
+        <Flex.Item padding="xx-small">
+          <Button onClick={handleGoBack} {...analyticProps('Back')}>
+            {I18n.t('Back')}
+          </Button>
+        </Flex.Item>
+      )}
+      <Flex.Item padding="xx-small">
+        <TempEnrollAvatar user={enrollmentProps}>
+          {I18n.t('%{enroll} will receive temporary enrollments from %{user}', {
+            enroll: enrollmentProps.name,
+            user: userProps.name,
+          })}
+        </TempEnrollAvatar>
+      </Flex.Item>
+      {errorMsg && (
+        <Flex.Item shouldGrow={true} padding="xx-small">
+          <Alert variant="error" margin="0">
+            {errorMsg}
+          </Alert>
+        </Flex.Item>
+      )}
+      <Flex.Item shouldGrow={true} padding="xx-small">
+        <Grid>
+          <Grid.Row vAlign="top">
+            <Grid.Col width={8}>
+              <DateTimeInput
+                data-testid="start-date-input"
+                layout="columns"
+                isRequired={true}
+                description={
+                  <ScreenReaderContent>
+                    {I18n.t('Start Date for %{enroll}', {enroll: enrollmentProps.name})}
+                  </ScreenReaderContent>
+                }
+                dateRenderLabel={I18n.t('Begins On')}
+                timeRenderLabel={I18n.t('Time')}
+                prevMonthLabel={I18n.t('Prev')}
+                nextMonthLabel={I18n.t('Next')}
+                value={startDate.toISOString()}
+                onChange={handleStartDateChange}
+                invalidDateTimeMessage={I18n.t('The chosen date and time is invalid.')}
+                dateInputRef={ref => setAnalyticPropsOnRef(ref, analyticProps('StartDate'))}
+                timeInputRef={ref => setAnalyticPropsOnRef(ref, analyticProps('StartTime'))}
+              />
+            </Grid.Col>
             <Grid.Col>
-              <Button
-                onClick={() => {
-                  props.goBack()
-                }}
-                {...analyticProps('Back')}
+              <RoleSearchSelect
+                noResultsLabel={I18n.t('No roles available')}
+                noSearchMatchLabel={I18n.t('')}
+                id="termFilter"
+                placeholder={I18n.t('Select a Role')}
+                isLoading={false}
+                label={I18n.t('Select role')}
+                value={roleChoice.id}
+                onChange={handleRoleSearchChange}
               >
-                {I18n.t('Back')}
-              </Button>
+                {roleOptions}
+              </RoleSearchSelect>
             </Grid.Col>
           </Grid.Row>
-        )}
-        <Grid.Row vAlign="middle">
-          <Grid.Col>
-            <Flex margin="small 0 small 0">
-              <Flex.Item>
-                <Avatar
-                  size="small"
-                  margin="0 small 0 0"
-                  name={enrollmentProps.name}
-                  src={enrollmentProps.avatar_url}
-                  data-fs-exclude={true}
-                  data-heap-redact-attributes="name"
-                />
-              </Flex.Item>
-              <Flex.Item shouldShrink={true}>
-                <Text>
-                  {I18n.t('%{enroll} will receive temporary enrollments from %{user}', {
-                    enroll: enrollmentProps.name,
-                    user: userProps.name,
-                  })}
-                </Text>
-              </Flex.Item>
-            </Flex>
-          </Grid.Col>
-        </Grid.Row>
-        {errorMsg && (
           <Grid.Row>
-            <Grid.Col width={10}>
-              <Alert variant="error">{errorMsg}</Alert>
+            <Grid.Col width={8}>
+              <DateTimeInput
+                data-testid="end-date-input"
+                layout="columns"
+                isRequired={true}
+                description={
+                  <ScreenReaderContent>
+                    {I18n.t('End Date for %{enroll}', {enroll: enrollmentProps.name})}
+                  </ScreenReaderContent>
+                }
+                dateRenderLabel={I18n.t('Until')}
+                timeRenderLabel={I18n.t('Time')}
+                prevMonthLabel={I18n.t('Prev')}
+                nextMonthLabel={I18n.t('Next')}
+                value={endDate.toISOString()}
+                onChange={handleEndDateChange}
+                invalidDateTimeMessage={I18n.t('The chosen date and time is invalid.')}
+                dateInputRef={ref => setAnalyticPropsOnRef(ref, analyticProps('EndDate'))}
+                timeInputRef={ref => setAnalyticPropsOnRef(ref, analyticProps('EndTime'))}
+              />
             </Grid.Col>
           </Grid.Row>
-        )}
-        <Grid.Row vAlign="top">
-          <Grid.Col width={8}>
-            <DateTimeInput
-              data-testid="start-date-input"
-              layout="columns"
-              isRequired={true}
-              description={
-                <ScreenReaderContent>
-                  {I18n.t('Start Date for %{enroll}', {enroll: enrollmentProps.name})}
-                </ScreenReaderContent>
-              }
-              dateRenderLabel={I18n.t('Begins On')}
-              timeRenderLabel={I18n.t('Time')}
-              prevMonthLabel={I18n.t('Prev')}
-              nextMonthLabel={I18n.t('Next')}
-              value={startDate.toISOString()}
-              onChange={handleStartDateChange}
-              invalidDateTimeMessage={I18n.t('The chosen date and time is invalid.')}
-              dateInputRef={ref => setAnalyticPropsOnRef(ref, analyticProps('StartDate'))}
-              timeInputRef={ref => setAnalyticPropsOnRef(ref, analyticProps('StartTime'))}
-            />
-          </Grid.Col>
-          <Grid.Col>
-            <RoleSearchSelect
-              noResultsLabel={I18n.t('No roles available')}
-              noSearchMatchLabel={I18n.t('')}
-              id="termFilter"
-              placeholder={I18n.t('Select a Role')}
-              isLoading={false}
-              label={I18n.t('Select role')}
-              value={roleChoice.id}
-              onChange={handleRoleSearchChange}
-            >
-              {roleOptions}
-            </RoleSearchSelect>
-          </Grid.Col>
-        </Grid.Row>
-        <Grid.Row>
-          <Grid.Col width={8}>
-            <DateTimeInput
-              data-testid="end-date-input"
-              layout="columns"
-              isRequired={true}
-              description={
-                <ScreenReaderContent>
-                  {I18n.t('End Date for %{enroll}', {enroll: enrollmentProps.name})}
-                </ScreenReaderContent>
-              }
-              dateRenderLabel={I18n.t('Until')}
-              timeRenderLabel={I18n.t('Time')}
-              prevMonthLabel={I18n.t('Prev')}
-              nextMonthLabel={I18n.t('Next')}
-              value={endDate.toISOString()}
-              onChange={handleEndDateChange}
-              invalidDateTimeMessage={I18n.t('The chosen date and time is invalid.')}
-              dateInputRef={ref => setAnalyticPropsOnRef(ref, analyticProps('EndDate'))}
-              timeInputRef={ref => setAnalyticPropsOnRef(ref, analyticProps('EndTime'))}
-            />
-          </Grid.Col>
-        </Grid.Row>
-        <Grid.Row>
-          <Grid.Col>
+        </Grid>
+      </Flex.Item>
+      <Flex.Item shouldGrow={true} padding="xx-small">
+        <Flex gap="x-small" direction="column">
+          <Flex.Item shouldGrow={true}>
             <Text as="p" data-testid="temp-enroll-summary">
               {I18n.t(
                 'Canvas will enroll %{recipient} as a %{role} in %{source}’s selected courses from %{start} - %{end}',
@@ -536,23 +523,25 @@ export function TempEnrollAssign(props: Props) {
                 }
               )}
             </Text>
-          </Grid.Col>
-        </Grid.Row>
-      </Grid>
-      {props.doSubmit() ? (
-        <EnrollmentTree
-          enrollmentsByCourse={enrollmentsByCourse}
-          roles={props.roles}
-          selectedRole={roleChoice}
-          createEnroll={handleCreateTempEnroll}
-        />
-      ) : (
-        <EnrollmentTree
-          enrollmentsByCourse={enrollmentsByCourse}
-          roles={props.roles}
-          selectedRole={roleChoice}
-        />
-      )}
-    </>
+          </Flex.Item>
+          <Flex.Item shouldGrow={true}>
+            {props.doSubmit() ? (
+              <EnrollmentTree
+                enrollmentsByCourse={enrollmentsByCourse}
+                roles={props.roles}
+                selectedRole={roleChoice}
+                createEnroll={handleCreateTempEnroll}
+              />
+            ) : (
+              <EnrollmentTree
+                enrollmentsByCourse={enrollmentsByCourse}
+                roles={props.roles}
+                selectedRole={roleChoice}
+              />
+            )}
+          </Flex.Item>
+        </Flex>
+      </Flex.Item>
+    </Flex>
   )
 }
