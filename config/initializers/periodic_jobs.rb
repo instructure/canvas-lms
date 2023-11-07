@@ -95,7 +95,7 @@ Rails.configuration.after_initialize do
     with_each_shard_by_database(StreamItem, :destroy_stream_items_using_setting)
   end
 
-  Delayed::Periodic.cron "Hourly course touch", "10 * * * *" do
+  Delayed::Periodic.cron "Ten minute course touch", "/10 * * * *" do
     Course.touch_courses
   end
 
