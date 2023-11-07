@@ -25,7 +25,6 @@ import {DiscussionPermissions} from './DiscussionPermissions'
 import gql from 'graphql-tag'
 import {User} from './User'
 import {DiscussionEntry} from './DiscussionEntry'
-import {DiscussionEntryDraft} from './DiscussionEntryDraft'
 import {PageInfo} from './PageInfo'
 import {ChildTopic} from './ChildTopic'
 import {RootTopic} from './RootTopic'
@@ -181,11 +180,6 @@ export const Discussion = {
       pageInfo: PageInfo.mock(),
       __typename: 'DiscussionEntriesConnection',
     },
-    discussionEntryDraftsConnection = {
-      nodes: [DiscussionEntryDraft.mock()],
-      pageInfo: PageInfo.mock(),
-      __typename: 'DiscussionEntryDraftsConnection',
-    },
   } = {}) => ({
     id,
     _id,
@@ -224,7 +218,6 @@ export const Discussion = {
     searchEntryCount,
     entriesTotalPages,
     discussionEntriesConnection,
-    discussionEntryDraftsConnection,
     __typename: 'Discussion',
   }),
 }

@@ -112,7 +112,6 @@ const DiscussionTopicManager = props => {
   const [isGradedDiscussion, setIsGradedDiscussion] = useState(false)
 
   // The DrawTray will cause the DiscussionEdit to mount first when it starts transitioning open, then un-mount and remount when it finishes opening
-  // With RCE Draft enabled, this causes the draft message to appear twice each time the RCE is mounted.
   const [isTrayFinishedOpening, setIsTrayFinishedOpening] = useState(false)
 
   const discussionManagerUtilities = {
@@ -227,52 +226,6 @@ const DiscussionTopicManager = props => {
     setIsGradedDiscussion(!!discussionTopicQuery?.data?.legacyNode?.assignment)
   }, [discussionTopicQuery])
 
-  const updateDraftCache = (cache, result) => {
-    try {
-      const options = {
-        query: DISCUSSION_QUERY,
-        variables: {...variables},
-      }
-      const newDiscussionEntryDraft = result.data.createDiscussionEntryDraft.discussionEntryDraft
-      const currentDiscussion = JSON.parse(JSON.stringify(cache.readQuery(options)))
-
-      if (currentDiscussion && newDiscussionEntryDraft) {
-        currentDiscussion.legacyNode.discussionEntryDraftsConnection.nodes =
-          currentDiscussion.legacyNode.discussionEntryDraftsConnection.nodes.filter(
-            draft => draft.id !== newDiscussionEntryDraft.id
-          )
-        currentDiscussion.legacyNode.discussionEntryDraftsConnection.nodes.push(
-          newDiscussionEntryDraft
-        )
-
-        cache.writeQuery({...options, data: currentDiscussion})
-      }
-    } catch (e) {
-      // do nothing for errors updating the cache on a draft
-    }
-  }
-
-  const removeDraftFromDiscussionCache = (cache, result) => {
-    try {
-      const options = {
-        query: DISCUSSION_QUERY,
-        variables: {...variables},
-      }
-      const newDiscussionEntry = result.data.createDiscussionEntry.discussionEntry
-      const currentDiscussion = JSON.parse(JSON.stringify(cache.readQuery(options)))
-
-      currentDiscussion.legacyNode.discussionEntryDraftsConnection.nodes =
-        currentDiscussion.legacyNode.discussionEntryDraftsConnection.nodes.filter(
-          draft =>
-            draft.rootEntryId !== newDiscussionEntry.rootEntryId &&
-            draft.discussionTopicID !== newDiscussionEntry.discussionTopicID
-        )
-      cache.writeQuery({...options, data: currentDiscussion})
-    } catch (e) {
-      // do nothing for errors updating the cache on a draft
-    }
-  }
-
   const updateCache = (cache, result) => {
     try {
       const options = {
@@ -292,7 +245,6 @@ const DiscussionTopicManager = props => {
       } else if (currentDiscussion && newDiscussionEntry) {
         // if we have a new entry update the counts, because we are about to add to the cache (something useMutation dont do, that useQuery does)
         currentDiscussion.legacyNode.entryCounts.repliesCount += 1
-        removeDraftFromDiscussionCache(cache, result)
         // add the new entry to the current entries in the cache
         if (variables.sort === 'desc') {
           currentDiscussion.legacyNode.discussionEntriesConnection.nodes.unshift(newDiscussionEntry)
@@ -378,7 +330,6 @@ const DiscussionTopicManager = props => {
                       closeView={closeView}
                     />
                     <DiscussionTopicContainer
-                      updateDraftCache={updateDraftCache}
                       discussionTopic={discussionTopicQuery.data.legacyNode}
                       createDiscussionEntry={(message, file, isAnonymousAuthor) => {
                         createDiscussionEntry({
@@ -410,8 +361,6 @@ const DiscussionTopicManager = props => {
                       discussionTopicQuery.data.legacyNode.availableForUser && (
                         <DiscussionTopicRepliesContainer
                           discussionTopic={discussionTopicQuery.data.legacyNode}
-                          updateDraftCache={updateDraftCache}
-                          removeDraftFromDiscussionCache={removeDraftFromDiscussionCache}
                           onOpenIsolatedView={(
                             discussionEntryId,
                             isolatedId,
@@ -433,8 +382,6 @@ const DiscussionTopicManager = props => {
                     {ENV.isolated_view && threadParentEntryId && (
                       <IsolatedViewContainer
                         relativeEntryId={relativeEntryId}
-                        removeDraftFromDiscussionCache={removeDraftFromDiscussionCache}
-                        updateDraftCache={updateDraftCache}
                         discussionTopic={discussionTopicQuery.data.legacyNode}
                         discussionEntryId={threadParentEntryId}
                         replyFromId={replyFromId}
@@ -464,8 +411,6 @@ const DiscussionTopicManager = props => {
                     <View as="div" maxWidth={responsiveProps.viewPortWidth}>
                       <SplitScreenViewContainer
                         relativeEntryId={relativeEntryId}
-                        removeDraftFromDiscussionCache={removeDraftFromDiscussionCache}
-                        updateDraftCache={updateDraftCache}
                         discussionTopic={discussionTopicQuery.data.legacyNode}
                         discussionEntryId={threadParentEntryId}
                         open={isSplitScreenViewOpen}

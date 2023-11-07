@@ -106,7 +106,6 @@ export const DiscussionThreadContainer = props => {
     }
 
     updateDiscussionTopicEntryCounts(cache, props.discussionTopic.id, {repliesCountChange: 1})
-    if (props.removeDraftFromDiscussionCache) props.removeDraftFromDiscussionCache(cache, result)
     const foundParentEntryQuery = addReplyToDiscussionEntry(cache, variables, newDiscussionEntry)
     if (props.refetchDiscussionEntries && !foundParentEntryQuery) props.refetchDiscussionEntries()
     addReplyToAllRootEntries(cache, newDiscussionEntry)
@@ -234,18 +233,6 @@ export const DiscussionThreadContainer = props => {
     return `calc(${theme.variables.spacing.xxLarge} * ${props.depth} + ${discussionEntryContainerLeftPadding} + ${discussionEditLeftPadding})`
   }
 
-  const findDraftMessage = () => {
-    let rootEntryDraftMessage = ''
-    props.discussionTopic?.discussionEntryDraftsConnection?.nodes.every(draftEntry => {
-      if (draftEntry.rootEntryId === props.discussionEntry._id && !draftEntry.discussionEntryId) {
-        rootEntryDraftMessage = draftEntry.message
-        return false
-      }
-      return true
-    })
-    return rootEntryDraftMessage
-  }
-
   const client = useApolloClient()
   const resetDiscussionCache = () => {
     client.resetStore()
@@ -266,7 +253,6 @@ export const DiscussionThreadContainer = props => {
         key={`reply-${props.discussionEntry._id}`}
         authorName={getDisplayName(props.discussionEntry)}
         delimiterKey={`reply-delimiter-${props.discussionEntry._id}`}
-        hasDraftEntry={!!findDraftMessage()}
         onClick={() => {
           const newEditorExpanded = !editorExpanded
           setEditorExpanded(newEditorExpanded)
@@ -468,7 +454,7 @@ export const DiscussionThreadContainer = props => {
                     discussionEntry={props.discussionEntry}
                     isTopic={false}
                     postUtilities={
-                      filter !== 'drafts' && !props.discussionEntry.deleted ? (
+                      !props.discussionEntry.deleted ? (
                         <ThreadActions
                           moreOptionsButtonRef={moreOptionsButtonRef}
                           id={props.discussionEntry._id}
@@ -565,7 +551,6 @@ export const DiscussionThreadContainer = props => {
                       props.discussionTopic.author,
                       props.discussionEntry.author
                     )}
-                    updateDraftCache={props.updateDraftCache}
                     attachment={props.discussionEntry.attachment}
                     quotedEntry={props.discussionEntry.quotedEntry}
                   >
@@ -668,8 +653,6 @@ DiscussionThreadContainer.propTypes = {
   onOpenIsolatedView: PropTypes.func,
   goToTopic: PropTypes.func,
   highlightEntryId: PropTypes.string,
-  removeDraftFromDiscussionCache: PropTypes.func,
-  updateDraftCache: PropTypes.func,
   setHighlightEntryId: PropTypes.func,
   userSplitScreenPreference: PropTypes.bool,
   allRootEntries: PropTypes.array,
@@ -734,8 +717,6 @@ const DiscussionSubentries = props => {
           discussionTopic={props.discussionTopic}
           markAsRead={props.markAsRead}
           parentRefCurrent={props.parentRefCurrent}
-          removeDraftFromDiscussionCache={props.removeDraftFromDiscussionCache}
-          updateDraftCache={props.updateDraftCache}
           highlightEntryId={props.highlightEntryId}
           setHighlightEntryId={props.setHighlightEntryId}
           allRootEntries={allRootEntries}
@@ -752,8 +733,6 @@ DiscussionSubentries.propTypes = {
   depth: PropTypes.number,
   markAsRead: PropTypes.func,
   parentRefCurrent: PropTypes.object,
-  removeDraftFromDiscussionCache: PropTypes.func,
-  updateDraftCache: PropTypes.func,
   highlightEntryId: PropTypes.string,
   setHighlightEntryId: PropTypes.func,
   allRootEntries: PropTypes.array,
@@ -768,8 +747,6 @@ const DiscussionSubentriesMemo = props => {
         discussionTopic={props.discussionTopic}
         markAsRead={props.markAsRead}
         parentRefCurrent={props.parentRefCurrent}
-        removeDraftFromDiscussionCache={props.removeDraftFromDiscussionCache}
-        updateDraftCache={props.updateDraftCache}
         highlightEntryId={props.highlightEntryId}
         setHighlightEntryId={props.setHighlightEntryId}
         allRootEntries={props.allRootEntries}
@@ -781,8 +758,6 @@ const DiscussionSubentriesMemo = props => {
     props.discussionTopic,
     props.markAsRead,
     props.parentRefCurrent,
-    props.removeDraftFromDiscussionCache,
-    props.updateDraftCache,
     props.highlightEntryId,
     props.setHighlightEntryId,
     props.allRootEntries,
@@ -794,8 +769,6 @@ DiscussionSubentries.propTypes = {
   depth: PropTypes.number,
   markAsRead: PropTypes.func,
   parentRefCurrent: PropTypes.object,
-  removeDraftFromDiscussionCache: PropTypes.func,
-  updateDraftCache: PropTypes.func,
   highlightEntryId: PropTypes.string,
   setHighlightEntryId: PropTypes.func,
   allRootEntries: PropTypes.array,

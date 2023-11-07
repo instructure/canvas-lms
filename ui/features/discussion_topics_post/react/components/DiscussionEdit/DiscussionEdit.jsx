@@ -22,7 +22,6 @@ import React, {useRef, useState, useEffect, useContext} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Button} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
-import {IconCheckMarkLine} from '@instructure/ui-icons'
 import {Responsive} from '@instructure/ui-responsive'
 import {Text} from '@instructure/ui-text'
 import {responsiveQuerySizes, showErrorWhenMessageTooLong} from '../../utils'
@@ -32,7 +31,6 @@ import CanvasRce from '@canvas/rce/react/CanvasRce'
 import {name as mentionsPluginName} from '@canvas/rce/plugins/canvas_mentions/plugin'
 import positionCursor from './PositionCursorHook'
 import {ReplyPreview} from '../ReplyPreview/ReplyPreview'
-import {Spinner} from '@instructure/ui-spinner'
 import {AttachmentDisplay} from '@canvas/discussions/react/components/AttachmentDisplay/AttachmentDisplay'
 import {DiscussionManagerUtilityContext} from '../../utils/constants'
 
@@ -43,8 +41,6 @@ export const DiscussionEdit = props => {
   const [rceContent, setRceContent] = useState(false)
   const [includeQuotedReply, setIncludeQuotedReply] = useState(!!props.quotedEntry?.previewMessage)
   const textAreaId = useRef(`message-body-${props.rceIdentifier}`)
-  const [draftTimeout, setDraftTimeout] = useState(null)
-  const [awaitingChanges, setAwaitingChanges] = useState(false)
   const [anonymousAuthorState, setAnonymousAuthorState] = useState(
     !!props.discussionAnonymousState && props.canReplyAnonymously
   )
@@ -75,31 +71,6 @@ export const DiscussionEdit = props => {
     setRceContent(props.value)
     setAttachment(props.attachment)
   }, [props.value, setRceContent, props.attachment])
-
-  const handleDraftResponse = nextDraft => {
-    if (!ENV.draft_discussions) return
-    if (!nextDraft) return
-
-    setAwaitingChanges(true)
-    if (draftTimeout) {
-      clearTimeout(draftTimeout)
-      setDraftTimeout(
-        setTimeout(() => {
-          setAwaitingChanges(false)
-          props.onSetDraftSaved(false)
-          props.updateDraft(nextDraft)
-        }, 1000)
-      )
-    } else {
-      setDraftTimeout(
-        setTimeout(() => {
-          setAwaitingChanges(false)
-          props.onSetDraftSaved(false)
-          props.updateDraft(nextDraft)
-        }, 1000)
-      )
-    }
-  }
 
   return (
     <div
@@ -150,7 +121,6 @@ export const DiscussionEdit = props => {
             ref={rceRef}
             onContentChange={content => {
               setRceContent(content)
-              handleDraftResponse(content)
             }}
             editorOptions={{
               focus: true,
@@ -269,29 +239,6 @@ export const DiscussionEdit = props => {
                     />
                   </View>
                 </Flex.Item>
-                {ENV.draft_discussions && (
-                  <Flex.Item shouldGrow={true} textAlign="start">
-                    {props.draftSaved ? (
-                      !awaitingChanges && (
-                        <span>
-                          <Text size="small">{I18n.t('Saved')}</Text>
-                          <View as="span" margin="0 0 0 small">
-                            <IconCheckMarkLine color="success" />
-                          </View>
-                        </span>
-                      )
-                    ) : (
-                      <span>
-                        <Text size="small">{I18n.t('Saving')}</Text>
-                        <Spinner
-                          renderTitle="Saving draft in progress"
-                          margin="0 0 0 small"
-                          size="x-small"
-                        />
-                      </span>
-                    )}
-                  </Flex.Item>
-                )}
                 <Flex.Item shouldGrow={true} textAlign="end">
                   {rceButtons}
                 </Flex.Item>
@@ -309,15 +256,12 @@ DiscussionEdit.propTypes = {
   rceIdentifier: PropTypes.string,
   discussionAnonymousState: PropTypes.string,
   canReplyAnonymously: PropTypes.bool,
-  draftSaved: PropTypes.bool,
   value: PropTypes.string,
   attachment: PropTypes.object,
   onCancel: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
-  onSetDraftSaved: PropTypes.func,
   isEdit: PropTypes.bool,
   quotedEntry: PropTypes.object,
-  updateDraft: PropTypes.func,
   onInit: PropTypes.func,
 }
 
@@ -326,7 +270,6 @@ DiscussionEdit.defaultProps = {
   isEdit: false,
   quotedEntry: null,
   value: '',
-  updateDraft: () => {},
   onInit: () => {},
 }
 

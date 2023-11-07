@@ -29,7 +29,6 @@ import {DiscussionManagerUtilityContext} from '../../utils/constants'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {CloseButton} from '@instructure/ui-buttons'
 import {
-  CREATE_DISCUSSION_ENTRY_DRAFT,
   DELETE_DISCUSSION_ENTRY,
   UPDATE_DISCUSSION_ENTRY_PARTICIPANT,
   UPDATE_DISCUSSION_ENTRY,
@@ -59,7 +58,6 @@ export const SplitScreenViewContainer = props => {
   const {replyFromId, setReplyFromId} = useContext(DiscussionManagerUtilityContext)
   const [fetchingMoreOlderReplies, setFetchingMoreOlderReplies] = useState(false)
   const [fetchingMoreNewerReplies, setFetchingMoreNewerReplies] = useState(false)
-  const [draftSaved, setDraftSaved] = useState(true)
   const closeButtonRef = useRef()
 
   const replyButtonRef = useRef()
@@ -76,7 +74,6 @@ export const SplitScreenViewContainer = props => {
     }
 
     updateDiscussionTopicEntryCounts(cache, props.discussionTopic.id, {repliesCountChange: 1})
-    props.removeDraftFromDiscussionCache(cache, result)
     addReplyToDiscussionEntry(cache, variables, newDiscussionEntry)
 
     props.setHighlightEntryId(newDiscussionEntry._id)
@@ -241,41 +238,7 @@ export const SplitScreenViewContainer = props => {
     props.setHighlightEntryId('DISCUSSION_ENTRY_PLACEHOLDER')
   }
 
-  const [createDiscussionEntryDraft] = useMutation(CREATE_DISCUSSION_ENTRY_DRAFT, {
-    update: props.updateDraftCache,
-    onCompleted: () => {
-      setOnSuccess('Draft message saved.')
-      setDraftSaved(true)
-    },
-    onError: () => {
-      setOnFailure(I18n.t('Unable to save draft message.'))
-    },
-  })
-
-  const findDraftMessage = rootId => {
-    let rootEntryDraftMessage = ''
-    props.discussionTopic?.discussionEntryDraftsConnection?.nodes.every(draftEntry => {
-      if (
-        draftEntry.rootEntryId &&
-        draftEntry.rootEntryId === rootId &&
-        !draftEntry.discussionEntryId
-      ) {
-        rootEntryDraftMessage = draftEntry.message
-        return false
-      }
-      return true
-    })
-    return rootEntryDraftMessage
-  }
-
   const getRCEStartingValue = () => {
-    let draftValue = ''
-    if (ENV.draft_discussions) {
-      draftValue = findDraftMessage(
-        splitScreenEntryOlderDirection.data.legacyNode.root_entry_id ||
-          splitScreenEntryOlderDirection.data.legacyNode._id
-      )
-    }
     const mentionsValue =
       splitScreenEntryOlderDirection.data.legacyNode.depth >= 3
         ? ReactDOMServer.renderToString(
@@ -285,7 +248,7 @@ export const SplitScreenViewContainer = props => {
           )
         : ''
 
-    return mentionsValue + draftValue
+    return mentionsValue
   }
 
   const splitScreenEntryOlderDirection = useQuery(DISCUSSION_SUBENTRIES_QUERY, {
@@ -490,17 +453,6 @@ export const SplitScreenViewContainer = props => {
                   replyFromId
                 )}
                 value={getRCEStartingValue()}
-                onSetDraftSaved={setDraftSaved}
-                draftSaved={draftSaved}
-                updateDraft={newDraftMessage => {
-                  createDiscussionEntryDraft({
-                    variables: {
-                      discussionTopicId: props.discussionTopic._id,
-                      message: newDraftMessage,
-                      parentId: replyFromId,
-                    },
-                  })
-                }}
                 onInit={() => {
                   // TinyMCE popup menus' z-index should be greater than tray.
                   const menus = document.querySelector('.tox.tox-tinymce-aux')
@@ -542,7 +494,6 @@ export const SplitScreenViewContainer = props => {
               }
               fetchingMoreOlderReplies={fetchingMoreOlderReplies}
               fetchingMoreNewerReplies={fetchingMoreNewerReplies}
-              updateDraftCache={props.updateDraftCache}
               moreOptionsButtonRef={moreOptionsButtonRef}
             />
           </View>
@@ -600,8 +551,6 @@ SplitScreenViewContainer.propTypes = {
   highlightEntryId: PropTypes.string,
   setHighlightEntryId: PropTypes.func,
   relativeEntryId: PropTypes.string,
-  removeDraftFromDiscussionCache: PropTypes.func,
-  updateDraftCache: PropTypes.func,
   isTrayFinishedOpening: PropTypes.bool,
 }
 

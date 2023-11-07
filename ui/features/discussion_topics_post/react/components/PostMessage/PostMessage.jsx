@@ -92,15 +92,10 @@ export function PostMessage({...props}) {
                 discussionAnonymousState={props.discussionAnonymousState}
                 canReplyAnonymously={props.canReplyAnonymously}
                 onCancel={props.onCancel}
-                value={props.draftMessage || props.message}
+                value={props.message}
                 attachment={props.attachment}
                 onSubmit={props.onSave}
                 isEdit={true}
-                onSetDraftSaved={props.onSetDraftSaved}
-                draftSaved={props.draftSaved}
-                updateDraft={newDraftMessage => {
-                  props.onCreateDiscussionEntryDraft(newDraftMessage)
-                }}
               />
             </View>
           ) : (
@@ -159,12 +154,8 @@ PostMessage.propTypes = {
    */
   onCancel: PropTypes.func,
   isIsolatedView: PropTypes.bool,
-  onCreateDiscussionEntryDraft: PropTypes.func,
-  draftMessage: PropTypes.string,
-  onSetDraftSaved: PropTypes.func,
   discussionAnonymousState: PropTypes.string,
   canReplyAnonymously: PropTypes.bool,
-  draftSaved: PropTypes.bool,
   threadMode: PropTypes.bool,
   isTopic: PropTypes.bool,
 }

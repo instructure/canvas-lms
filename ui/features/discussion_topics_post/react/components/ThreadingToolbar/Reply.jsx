@@ -23,7 +23,6 @@ import {responsiveQuerySizes} from '../../utils'
 
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {Link} from '@instructure/ui-link'
-import {IconEditLine} from '@instructure/ui-icons'
 import {Responsive} from '@instructure/ui-responsive'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
@@ -61,11 +60,6 @@ export function Reply({...props}) {
               alt={I18n.t('Reply to post from %{author}', {author: props.authorName})}
             >
               <Text weight="bold" size={responsiveProps.textSize}>
-                {props.hasDraftEntry && (
-                  <View margin="0 small 0 0">
-                    <IconEditLine size="x-small" />
-                  </View>
-                )}
                 {replyButtonText}
               </Text>
             </AccessibleContent>
@@ -107,6 +101,5 @@ Reply.propTypes = {
    * True if rendered in isolated view
    */
   isIsolatedView: PropTypes.bool,
-  hasDraftEntry: PropTypes.bool,
   replyButtonRef: PropTypes.any,
 }

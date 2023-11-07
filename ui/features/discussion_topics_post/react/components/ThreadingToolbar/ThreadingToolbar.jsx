@@ -62,26 +62,17 @@ export function ThreadingToolbar({...props}) {
                 : null
 
               props.onOpenIsolatedView(
-                props.filter === 'drafts' ? props.discussionEntry.isolatedEntryId : isolatedId,
+                isolatedId,
                 props.discussionEntry.isolatedEntryId,
-                props.filter === 'drafts',
-                props.filter === 'drafts' ? null : relativeId,
-                props.filter === 'drafts' ? undefined : props.discussionEntry._id
+                false,
+                relativeId,
+                props.discussionEntry._id
               )
             }}
           >
-            {props.filter === 'drafts' ? (
-              <Text weight="bold" size={responsiveProps.textSize}>
-                <View as="span" margin="0 small 0 0">
-                  <IconEditLine color="primary" size="x-small" />
-                </View>
-                {I18n.t('Continue draft')}
-              </Text>
-            ) : (
-              <Text weight="bold" size={responsiveProps.textSize}>
-                {I18n.t('Go to Reply')}
-              </Text>
-            )}
+            <Text weight="bold" size={responsiveProps.textSize}>
+              {I18n.t('Go to Reply')}
+            </Text>
           </Link>
         ) : (
           <InlineList delimiter="pipe" display="inline-flex">

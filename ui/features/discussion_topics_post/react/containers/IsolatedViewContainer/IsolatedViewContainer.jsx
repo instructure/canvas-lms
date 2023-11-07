@@ -27,7 +27,6 @@ import {
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {CloseButton} from '@instructure/ui-buttons'
 import {
-  CREATE_DISCUSSION_ENTRY_DRAFT,
   DELETE_DISCUSSION_ENTRY,
   UPDATE_DISCUSSION_ENTRY_PARTICIPANT,
   UPDATE_DISCUSSION_ENTRY,
@@ -56,7 +55,6 @@ export const IsolatedViewContainer = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const [fetchingMoreOlderReplies, setFetchingMoreOlderReplies] = useState(false)
   const [fetchingMoreNewerReplies, setFetchingMoreNewerReplies] = useState(false)
-  const [draftSaved, setDraftSaved] = useState(true)
 
   const updateCache = (cache, result) => {
     const newDiscussionEntry = result.data.createDiscussionEntry.discussionEntry
@@ -69,7 +67,6 @@ export const IsolatedViewContainer = props => {
     }
 
     updateDiscussionTopicEntryCounts(cache, props.discussionTopic.id, {repliesCountChange: 1})
-    props.removeDraftFromDiscussionCache(cache, result)
     addReplyToDiscussionEntry(cache, variables, newDiscussionEntry)
 
     props.setHighlightEntryId(newDiscussionEntry._id)
@@ -218,33 +215,6 @@ export const IsolatedViewContainer = props => {
         !!props.discussionTopic.anonymousState && props.discussionTopic.canReplyAnonymously,
     })
     createDiscussionEntry({variables, optimisticResponse})
-  }
-
-  const [createDiscussionEntryDraft] = useMutation(CREATE_DISCUSSION_ENTRY_DRAFT, {
-    update: props.updateDraftCache,
-    onCompleted: () => {
-      setOnSuccess('Draft message saved.')
-      setDraftSaved(true)
-    },
-    onError: () => {
-      setOnFailure(I18n.t('Unable to save draft message.'))
-    },
-  })
-
-  const findDraftMessage = rootId => {
-    let rootEntryDraftMessage = ''
-    props.discussionTopic?.discussionEntryDraftsConnection?.nodes.every(draftEntry => {
-      if (
-        draftEntry.rootEntryId &&
-        draftEntry.rootEntryId === rootId &&
-        !draftEntry.discussionEntryId
-      ) {
-        rootEntryDraftMessage = draftEntry.message
-        return false
-      }
-      return true
-    })
-    return rootEntryDraftMessage
   }
 
   const isolatedEntryOlderDirection = useQuery(DISCUSSION_SUBENTRIES_QUERY, {
@@ -436,21 +406,6 @@ export const IsolatedViewContainer = props => {
                     .nodes,
                   props.replyFromId
                 )}
-                value={findDraftMessage(
-                  isolatedEntryOlderDirection.data.legacyNode.root_entry_id ||
-                    isolatedEntryOlderDirection.data.legacyNode._id
-                )}
-                onSetDraftSaved={setDraftSaved}
-                draftSaved={draftSaved}
-                updateDraft={newDraftMessage => {
-                  createDiscussionEntryDraft({
-                    variables: {
-                      discussionTopicId: props.discussionTopic._id,
-                      message: newDraftMessage,
-                      parentId: props.replyFromId,
-                    },
-                  })
-                }}
                 onInit={() => {
                   // TinyMCE popup menus' z-index should be greater than tray.
                   const menus = document.querySelector('.tox.tox-tinymce-aux')
@@ -492,7 +447,6 @@ export const IsolatedViewContainer = props => {
               }
               fetchingMoreOlderReplies={fetchingMoreOlderReplies}
               fetchingMoreNewerReplies={fetchingMoreNewerReplies}
-              updateDraftCache={props.updateDraftCache}
             />
           </View>
         )}
@@ -572,8 +526,6 @@ IsolatedViewContainer.propTypes = {
   replyFromId: PropTypes.string,
   setHighlightEntryId: PropTypes.func,
   relativeEntryId: PropTypes.string,
-  removeDraftFromDiscussionCache: PropTypes.func,
-  updateDraftCache: PropTypes.func,
 }
 
 export default IsolatedViewContainer

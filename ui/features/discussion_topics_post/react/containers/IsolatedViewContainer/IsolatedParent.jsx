@@ -267,7 +267,6 @@ export const IsolatedParent = props => {
                       props.discussionTopic.author,
                       props.discussionEntry.author
                     )}
-                    updateDraftCache={props.updateDraftCache}
                     attachment={props.discussionEntry.attachment}
                   >
                     {threadActions.length > 0 && (
@@ -323,5 +322,4 @@ IsolatedParent.propTypes = {
   setRCEOpen: PropTypes.func,
   isHighlighted: PropTypes.bool,
   goToTopic: PropTypes.func,
-  updateDraftCache: PropTypes.func,
 }
