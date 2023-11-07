@@ -24,6 +24,6 @@ class AddCheckpointedAndParentAssignmentIdToAssignments < ActiveRecord::Migratio
   def change
     add_column :assignments, :checkpointed, :boolean, default: false, null: false, if_not_exists: true
     add_column :assignments, :checkpoint_label, :string, limit: 255, if_not_exists: true
-    add_reference :assignments, :parent_assignment, foreign_key: { to_table: :assignments }, index: { algorithm: :concurrently }, if_not_exists: true
+    add_reference :assignments, :parent_assignment, foreign_key: { to_table: :assignments }, index: { algorithm: :concurrently, if_not_exists: true }, if_not_exists: true
   end
 end
