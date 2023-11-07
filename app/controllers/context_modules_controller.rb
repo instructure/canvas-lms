@@ -125,29 +125,34 @@ class ContextModulesController < ApplicationController
       if @context.grants_any_right?(@current_user, session, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
         module_file_details = load_module_file_details
       end
-      js_env course_id: @context.id,
-             CONTEXT_URL_ROOT: polymorphic_path([@context]),
-             FILES_CONTEXTS: [{ asset_string: @context.asset_string }],
-             MODULE_FILE_DETAILS: module_file_details,
-             MODULE_FILE_PERMISSIONS: {
-               usage_rights_required: @context.usage_rights_required?,
-               manage_files_edit: @context.grants_right?(@current_user, session, :manage_files_edit)
-             },
-             MODULE_TOOLS: module_tool_definitions,
-             DEFAULT_POST_TO_SIS: @context.account.sis_default_grade_export[:value] && !AssignmentUtil.due_date_required_for_account?(@context.account),
-             PUBLISH_FINAL_GRADE: Canvas::Plugin.find!("grade_export").enabled?
-      set_js_module_data
+
+      hash = {
+        course_id: @context.id,
+        CONTEXT_URL_ROOT: polymorphic_path([@context]),
+        FILES_CONTEXTS: [{ asset_string: @context.asset_string }],
+        MODULE_FILE_DETAILS: module_file_details,
+        MODULE_FILE_PERMISSIONS: {
+          usage_rights_required: @context.usage_rights_required?,
+          manage_files_edit: @context.grants_right?(@current_user, session, :manage_files_edit)
+        },
+        MODULE_TOOLS: module_tool_definitions,
+        DEFAULT_POST_TO_SIS: @context.account.sis_default_grade_export[:value] && !AssignmentUtil.due_date_required_for_account?(@context.account),
+        PUBLISH_FINAL_GRADE: Canvas::Plugin.find!("grade_export").enabled?
+      }
 
       is_master_course = MasterCourses::MasterTemplate.is_master_course?(@context)
       is_child_course = MasterCourses::ChildSubscription.is_child_course?(@context)
       if is_master_course || is_child_course
-        js_env(MASTER_COURSE_SETTINGS: {
-                 IS_MASTER_COURSE: is_master_course,
-                 IS_CHILD_COURSE: is_child_course,
-                 MASTER_COURSE_DATA_URL: context_url(@context, :context_context_modules_master_course_info_url)
-               })
+        hash[:MASTER_COURSE_SETTINGS] = {
+          IS_MASTER_COURSE: is_master_course,
+          IS_CHILD_COURSE: is_child_course,
+          MASTER_COURSE_DATA_URL: context_url(@context, :context_context_modules_master_course_info_url)
+        }
       end
 
+      append_default_due_time_js_env(@context, hash)
+      js_env(hash)
+      set_js_module_data
       conditional_release_js_env(includes: :active_rules)
     end
 
