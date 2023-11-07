@@ -41,7 +41,7 @@ import {ReportsSummaryBadge} from '../ReportsSummaryBadge/ReportsSummaryBadge'
 const I18n = useI18nScope('discussion_posts')
 
 export const AuthorInfo = props => {
-  const {searchTerm, filter} = useContext(SearchContext)
+  const {searchTerm} = useContext(SearchContext)
 
   const hasAuthor = Boolean(props.author || props.anonymousAuthor)
   const avatarUrl = isAnonymous(props) ? null : props.author?.avatarUrl
@@ -87,7 +87,7 @@ export const AuthorInfo = props => {
       render={responsiveProps => (
         <Flex>
           <Flex.Item align="start">
-            {props.isUnread && filter !== 'drafts' && (
+            {props.isUnread && (
               <div
                 style={{
                   float: 'left',

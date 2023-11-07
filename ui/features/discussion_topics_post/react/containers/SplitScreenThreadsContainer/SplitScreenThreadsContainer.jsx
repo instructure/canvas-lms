@@ -142,7 +142,6 @@ export const SplitScreenThreadsContainer = props => {
           setToBeMarkedAsRead={setToBeMarkedAsRead}
           goToTopic={props.goToTopic}
           isHighlighted={entry._id === props.highlightEntryId}
-          updateDraftCache={props.updateDraftCache}
           moreOptionsButtonRef={props.moreOptionsButtonRef}
         />
       ))}
@@ -183,7 +182,6 @@ SplitScreenThreadsContainer.propTypes = {
   hasMoreNewerReplies: PropTypes.bool,
   fetchingMoreOlderReplies: PropTypes.bool,
   fetchingMoreNewerReplies: PropTypes.bool,
-  updateDraftCache: PropTypes.func,
   moreOptionsButtonRef: PropTypes.any,
 }
 
@@ -210,8 +208,7 @@ const SplitScreenThreadContainer = props => {
     if (
       !ENV.manual_mark_as_read &&
       !props.discussionEntry.entryParticipant?.read &&
-      !props.discussionEntry?.entryParticipant?.forcedReadState &&
-      filter !== 'drafts'
+      !props.discussionEntry?.entryParticipant?.forcedReadState
     ) {
       const observer = new IntersectionObserver(
         ([entry]) => entry.isIntersecting && props.setToBeMarkedAsRead(props.discussionEntry._id),
@@ -421,7 +418,6 @@ const SplitScreenThreadContainer = props => {
                       props.discussionTopic.author,
                       props.discussionEntry.author
                     )}
-                    updateDraftCache={props.updateDraftCache}
                     quotedEntry={props.discussionEntry.quotedEntry}
                     attachment={props.discussionEntry.attachment}
                   >
@@ -472,6 +468,5 @@ SplitScreenThreadContainer.propTypes = {
   onOpenSplitScreenView: PropTypes.func,
   goToTopic: PropTypes.func,
   isHighlighted: PropTypes.bool,
-  updateDraftCache: PropTypes.func,
   moreOptionsButtonRef: PropTypes.any,
 }

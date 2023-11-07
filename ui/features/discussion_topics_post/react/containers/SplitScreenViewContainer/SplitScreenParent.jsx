@@ -278,7 +278,6 @@ export const SplitScreenParent = props => {
                       props.discussionTopic.author,
                       props.discussionEntry.author
                     )}
-                    updateDraftCache={props.updateDraftCache}
                     quotedEntry={props.discussionEntry.quotedEntry}
                     attachment={props.discussionEntry.attachment}
                   >
@@ -335,7 +334,6 @@ SplitScreenParent.propTypes = {
   setRCEOpen: PropTypes.func,
   isHighlighted: PropTypes.bool,
   goToTopic: PropTypes.func,
-  updateDraftCache: PropTypes.func,
   replyButtonRef: PropTypes.any,
   moreOptionsButtonRef: PropTypes.any,
 }

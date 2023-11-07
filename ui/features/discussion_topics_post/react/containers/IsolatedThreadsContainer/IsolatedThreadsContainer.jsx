@@ -138,7 +138,6 @@ export const IsolatedThreadsContainer = props => {
           setToBeMarkedAsRead={setToBeMarkedAsRead}
           goToTopic={props.goToTopic}
           isHighlighted={entry._id === props.highlightEntryId}
-          updateDraftCache={props.updateDraftCache}
         />
       ))}
       {props.hasMoreNewerReplies && (
@@ -178,7 +177,6 @@ IsolatedThreadsContainer.propTypes = {
   hasMoreNewerReplies: PropTypes.bool,
   fetchingMoreOlderReplies: PropTypes.bool,
   fetchingMoreNewerReplies: PropTypes.bool,
-  updateDraftCache: PropTypes.func,
 }
 
 export default IsolatedThreadsContainer
@@ -203,8 +201,7 @@ const IsolatedThreadContainer = props => {
     if (
       !ENV.manual_mark_as_read &&
       !props.discussionEntry.entryParticipant?.read &&
-      !props.discussionEntry?.entryParticipant?.forcedReadState &&
-      filter !== 'drafts'
+      !props.discussionEntry?.entryParticipant?.forcedReadState
     ) {
       const observer = new IntersectionObserver(
         ([entry]) => entry.isIntersecting && props.setToBeMarkedAsRead(props.discussionEntry._id),
@@ -413,7 +410,6 @@ const IsolatedThreadContainer = props => {
                       props.discussionTopic.author,
                       props.discussionEntry.author
                     )}
-                    updateDraftCache={props.updateDraftCache}
                     quotedEntry={props.discussionEntry.quotedEntry}
                     attachment={props.discussionEntry.attachment}
                   >
@@ -464,5 +460,4 @@ IsolatedThreadContainer.propTypes = {
   onOpenIsolatedView: PropTypes.func,
   goToTopic: PropTypes.func,
   isHighlighted: PropTypes.bool,
-  updateDraftCache: PropTypes.func,
 }

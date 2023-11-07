@@ -147,16 +147,6 @@ describe('DiscussionPostToolbar', () => {
       expect(onViewFilterMock.mock.calls.length).toBe(1)
       expect(onViewFilterMock.mock.calls[0][1].id).toBe('unread')
     })
-
-    it('"My Drafts" filter should be visible', () => {
-      window.ENV.draft_discussions = true
-
-      const onViewFilterMock = jest.fn()
-      const {getByText, getByLabelText} = setup({onViewFilter: onViewFilterMock})
-      const simpleSelect = getByLabelText('Filter by')
-      fireEvent.click(simpleSelect)
-      expect(getByText('My Drafts')).toBeTruthy()
-    })
   })
 
   describe('Sort control', () => {

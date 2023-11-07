@@ -16,20 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {AnonymousUser} from '../../../graphql/AnonymousUser'
 import {AuthorInfo} from '../../components/AuthorInfo/AuthorInfo'
-import {CREATE_DISCUSSION_ENTRY_DRAFT} from '../../../graphql/Mutations'
 import {DeletedPostMessage} from '../../components/DeletedPostMessage/DeletedPostMessage'
-import {useScope as useI18nScope} from '@canvas/i18n'
 import {PostMessage} from '../../components/PostMessage/PostMessage'
 import PropTypes from 'prop-types'
-import React, {useContext, useState} from 'react'
+import React, {useContext} from 'react'
 import {responsiveQuerySizes} from '../../utils'
 import {SearchContext} from '../../utils/constants'
 import {Attachment} from '../../../graphql/Attachment'
 import {User} from '../../../graphql/User'
-import {useMutation} from 'react-apollo'
 
 import {Flex} from '@instructure/ui-flex'
 import {Responsive} from '@instructure/ui-responsive'
@@ -37,35 +33,8 @@ import {Link} from '@instructure/ui-link'
 import {View} from '@instructure/ui-view'
 import {ReplyPreview} from '../../components/ReplyPreview/ReplyPreview'
 
-const I18n = useI18nScope('discussion_posts')
-
 export const DiscussionEntryContainer = props => {
-  const [draftSaved, setDraftSaved] = useState(true)
-  const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const {searchTerm} = useContext(SearchContext)
-
-  const [createDiscussionEntryDraft] = useMutation(CREATE_DISCUSSION_ENTRY_DRAFT, {
-    update: props.updateDraftCache,
-    onCompleted: () => {
-      setOnSuccess('Draft message saved.')
-      setDraftSaved(true)
-    },
-    onError: () => {
-      setOnFailure(I18n.t('Unable to save draft message.'))
-    },
-  })
-
-  const findDraftMessage = () => {
-    let rootEntryDraftMessage = ''
-    props.discussionTopic?.discussionEntryDraftsConnection?.nodes.every(draftEntry => {
-      if (draftEntry.discussionEntryId === props.discussionEntry._id) {
-        rootEntryDraftMessage = draftEntry.message
-        return false
-      }
-      return true
-    })
-    return rootEntryDraftMessage
-  }
 
   if (props.deleted) {
     return (
@@ -205,18 +174,6 @@ export const DiscussionEntryContainer = props => {
               onSave={props.onSave}
               onCancel={props.onCancel}
               isIsolatedView={props.isIsolatedView}
-              draftMessage={findDraftMessage()}
-              onSetDraftSaved={setDraftSaved}
-              draftSaved={draftSaved}
-              onCreateDiscussionEntryDraft={newDraftMessage =>
-                createDiscussionEntryDraft({
-                  variables: {
-                    discussionTopicId: ENV.discussion_topic_id,
-                    message: newDraftMessage,
-                    discussionEntryId: props.isEditing ? props.discussionEntry._id : null,
-                  },
-                })
-              }
             >
               {props.attachment && (
                 <View as="div" padding="small none none">
@@ -255,7 +212,6 @@ DiscussionEntryContainer.propTypes = {
   deleted: PropTypes.bool,
   isTopicAuthor: PropTypes.bool,
   threadParent: PropTypes.bool,
-  updateDraftCache: PropTypes.func,
   quotedEntry: PropTypes.object,
   attachment: Attachment.shape,
 }

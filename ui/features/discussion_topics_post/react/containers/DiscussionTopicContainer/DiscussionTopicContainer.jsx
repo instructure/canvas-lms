@@ -28,7 +28,6 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {PeerReview} from '../../components/PeerReview/PeerReview'
 import {DiscussionEntryContainer} from '../DiscussionEntryContainer/DiscussionEntryContainer'
 import {
-  CREATE_DISCUSSION_ENTRY_DRAFT,
   DELETE_DISCUSSION_TOPIC,
   UPDATE_DISCUSSION_TOPIC,
   SUBSCRIBE_TO_DISCUSSION_TOPIC,
@@ -46,7 +45,6 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {DiscussionTopicAlertManager} from '../../components/DiscussionTopicAlertManager/DiscussionTopicAlertManager'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
-import {IconEditLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {Responsive} from '@instructure/ui-responsive/lib/Responsive'
@@ -64,7 +62,6 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
   const [copyToOpen, setCopyToOpen] = useState(false)
   const [expandedReply, setExpandedReply] = useState(false)
   const [lastMarkAllAction, setLastMarkAllAction] = useState('')
-  const [draftSaved, setDraftSaved] = useState(true)
 
   const {searchTerm, filter} = useContext(SearchContext)
   const isSearch = searchTerm || filter === 'unread'
@@ -137,17 +134,6 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     },
   })
 
-  const [createDiscussionEntryDraft] = useMutation(CREATE_DISCUSSION_ENTRY_DRAFT, {
-    update: props.updateDraftCache,
-    onCompleted: () => {
-      setOnSuccess('Draft message saved.')
-      setDraftSaved(true)
-    },
-    onError: () => {
-      setOnFailure(I18n.t('Unable to save draft message.'))
-    },
-  })
-
   const onDelete = () => {
     // eslint-disable-next-line no-alert
     if (window.confirm(I18n.t('Are you sure you want to delete this topic?'))) {
@@ -204,18 +190,6 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
         subscribed: !props.discussionTopic.subscribed,
       },
     })
-  }
-
-  const findRootEntryDraftMessage = () => {
-    let rootEntryDraftMessage = ''
-    props.discussionTopic?.discussionEntryDraftsConnection?.nodes.every(draftEntry => {
-      if (!draftEntry.rootEntryId && !draftEntry.discussionEntryId) {
-        rootEntryDraftMessage = draftEntry.message
-        return false
-      }
-      return true
-    })
-    return rootEntryDraftMessage
   }
 
   const podcast_url =
@@ -285,7 +259,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
       render={responsiveProps => (
         <>
           <DiscussionTopicAlertManager discussionTopic={props.discussionTopic} />
-          {!isSearch && filter !== 'drafts' && (
+          {!isSearch && (
             <Highlight isHighlighted={props.isHighlighted} data-testid="highlight-container">
               <Flex as="div" direction="column" data-testid="discussion-topic-container">
                 <Flex.Item>
@@ -350,7 +324,6 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                                 }
                                 repliesCount={props.discussionTopic.entryCounts?.repliesCount}
                                 unreadCount={props.discussionTopic.entryCounts?.unreadCount}
-                                updateDraftCache={props.updateDraftCache}
                                 onSend={
                                   props.discussionTopic.permissions?.copyAndSendTo
                                     ? () => setSendToOpen(true)
@@ -449,18 +422,9 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                                       }}
                                       data-testid="discussion-topic-reply"
                                     >
-                                      {findRootEntryDraftMessage() ? (
-                                        <Text weight="bold" size={responsiveProps.textSize}>
-                                          <View as="span" margin="0 small 0 0">
-                                            <IconEditLine size="x-small" />
-                                          </View>
-                                          {I18n.t('Continue draft')}
-                                        </Text>
-                                      ) : (
-                                        <Text weight="bold" size={responsiveProps.textSize}>
-                                          {I18n.t('Reply')}
-                                        </Text>
-                                      )}
+                                      <Text weight="bold" size={responsiveProps.textSize}>
+                                        {I18n.t('Reply')}
+                                      </Text>
                                     </Button>
                                   </span>
                                 </View>
@@ -510,18 +474,6 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                                     .querySelector('.discussion-topic-reply-button button')
                                     ?.focus()
                                 }, 0)
-                              }}
-                              value={findRootEntryDraftMessage()}
-                              onSetDraftSaved={setDraftSaved}
-                              draftSaved={draftSaved}
-                              updateDraft={newDraftMessage => {
-                                createDiscussionEntryDraft({
-                                  variables: {
-                                    discussionTopicId: props.discussionTopic._id,
-                                    message: newDraftMessage,
-                                    parentId: null,
-                                  },
-                                })
                               }}
                             />
                           )}
@@ -579,10 +531,6 @@ DiscussionTopicContainer.propTypes = {
    * Function to be executed to create a Discussion Entry.
    */
   createDiscussionEntry: PropTypes.func,
-  /**
-   * Function to be executed to update the cache for new DiscussionEntryDraft.
-   */
-  updateDraftCache: PropTypes.func,
   /**
    * useState Boolean to toggle highlight
    */
