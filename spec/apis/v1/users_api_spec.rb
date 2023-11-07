@@ -1519,7 +1519,8 @@ describe "Users API", type: :request do
                                "sis_import_id" => nil,
                                "sis_user_id" => nil,
                                "login_id" => "bademail@",
-                               "locale" => nil
+                               "locale" => nil,
+                               "uuid" => user.uuid
                              })
         end
       end
@@ -1571,7 +1572,8 @@ describe "Users API", type: :request do
                                                   "login_id" => "test@example.com",
                                                   "integration_id" => nil,
                                                   "locale" => "en",
-                                                  "confirmation_url" => user.communication_channels.email.first.confirmation_url
+                                                  "confirmation_url" => user.communication_channels.email.first.confirmation_url,
+                                                  "uuid" => user.uuid
                                                 })
       end
 
