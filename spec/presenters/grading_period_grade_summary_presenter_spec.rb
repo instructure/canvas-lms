@@ -75,6 +75,17 @@ describe GradingPeriodGradeSummaryPresenter do
   end
 
   describe "#assignments_for_student" do
+    it "doesn't blow up when provided with a bogus grading period id" do
+      presenter = GradingPeriodGradeSummaryPresenter.new(
+        @course,
+        @student,
+        nil,
+        grading_period_id: 12_345_678
+      )
+
+      expect { presenter.assignments_for_student }.not_to raise_error
+    end
+
     it "excludes assignments that are not due for the student in the given grading period" do
       expect(presenter.assignments_for_student).not_to include(@assignment_not_due_in_period)
     end
