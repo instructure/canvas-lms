@@ -521,5 +521,16 @@ module Types
         assignment.sis_source_id if course.grants_any_right?(current_user, :read_sis, :manage_sis)
       end
     end
+
+    field :checkpointed, Boolean, null: false
+
+    field :checkpoints, [CheckpointType], null: true
+    def checkpoints
+      load_association(:context).then do |course|
+        return nil unless course.root_account&.feature_enabled?(:discussion_checkpoints)
+
+        load_association(:checkpoint_assignments)
+      end
+    end
   end
 end

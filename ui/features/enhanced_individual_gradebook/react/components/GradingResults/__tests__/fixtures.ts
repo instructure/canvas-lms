@@ -45,6 +45,7 @@ export const defaultStudentSubmissions: GradebookUserSubmissionDetails = {
   deductedPoints: 0,
   enteredGrade: '95',
   gradeMatchesCurrentSubmission: true,
+  customGradeStatus: '',
 }
 
 export const defaultAssignment: AssignmentConnection = {

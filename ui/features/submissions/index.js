@@ -22,5 +22,5 @@ import ready from '@instructure/ready'
 
 ready(() => {
   setup()
-  StatusPill.renderPills()
+  StatusPill.renderPills(ENV.CUSTOM_GRADE_STATUSES)
 })

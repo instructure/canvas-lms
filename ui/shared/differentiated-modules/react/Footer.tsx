@@ -16,10 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useCallback} from 'react'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Button} from '@instructure/ui-buttons'
+import {Tooltip} from '@instructure/ui-tooltip'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('differentiated_modules')
@@ -28,18 +29,24 @@ const I18n = useI18nScope('differentiated_modules')
 const {Item: FlexItem} = Flex as any
 
 export interface FooterProps {
-  updateButtonLabel: string
+  saveButtonLabel: string
   onDismiss: () => void
   onUpdate: () => void
-  disableUpdate?: boolean
+  updateInteraction?: 'enabled' | 'inerror'
 }
 
 export default function Footer({
-  updateButtonLabel,
+  saveButtonLabel,
   onDismiss,
   onUpdate,
-  disableUpdate = false,
+  updateInteraction = 'enabled',
 }: FooterProps) {
+  const handleUpdate = useCallback(() => {
+    if (updateInteraction === 'enabled') {
+      onUpdate()
+    }
+  }, [onUpdate, updateInteraction])
+
   return (
     <View as="div" padding="small" background="secondary" borderWidth="small none none none">
       <Flex as="div" justifyItems="end">
@@ -47,9 +54,14 @@ export default function Footer({
           <Button onClick={onDismiss}>{I18n.t('Cancel')}</Button>
         </FlexItem>
         <FlexItem margin="0 0 0 small">
-          <Button color="primary" disabled={disableUpdate} onClick={onUpdate}>
-            {updateButtonLabel}
-          </Button>
+          <Tooltip
+            renderTip={I18n.t('Please fix errors before continuing')}
+            on={updateInteraction === 'inerror' ? ['click', 'hover'] : undefined}
+          >
+            <Button color="primary" onClick={handleUpdate}>
+              {saveButtonLabel}
+            </Button>
+          </Tooltip>
         </FlexItem>
       </Flex>
     </View>

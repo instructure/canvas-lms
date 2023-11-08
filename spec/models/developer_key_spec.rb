@@ -429,6 +429,44 @@ describe DeveloperKey do
           expect(shard_1_tool.reload.workflow_state).to eq "disabled"
         end
       end
+
+      describe "when there are broken tools with no context" do
+        it "does not raise an error" do
+          tool = developer_key.context_external_tools.first
+          tool.save!
+          ContextExternalTool
+            .where(id: tool.id)
+            .update_all(context_id: Course.last&.id.to_i + 1, context_type: "Course")
+          developer_key.tool_configuration.configuration["oidc_initiation_url"] = "example.com"
+          developer_key.tool_configuration.save!
+          subject
+          run_jobs
+          failed_jobs = Delayed::Job.where("tag LIKE ?", "DeveloperKey%").where.not(last_error: nil)
+          expect(failed_jobs.to_a).to eq([])
+        end
+      end
+    end
+
+    describe "#manage_external_tools_multi_shard" do
+      context "when there is an intermittent Postgres error" do
+        it "retries the job" do
+          expect(subject).to receive(:delay).and_raise(PG::ConnectionBad)
+          expect do
+            subject.send(:manage_external_tools_multi_shard, {}, :update_tools_on_active_shard, account_model, Time.now)
+          end.to raise_error(Delayed::RetriableError)
+        end
+      end
+    end
+
+    describe "#manage_external_tools_multi_shard_in_region" do
+      context "when there is an intermittent Postgres error" do
+        it "retries the job" do
+          expect(subject).to receive(:delay).and_raise(PG::ConnectionBad)
+          expect do
+            subject.send(:manage_external_tools_multi_shard_in_region, {}, :update_tools_on_active_shard, account_model, Time.now)
+          end.to raise_error(Delayed::RetriableError)
+        end
+      end
     end
   end
 

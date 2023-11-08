@@ -28,6 +28,7 @@ import {EnvPlatformStorage} from '@canvas/global/env/EnvPlatformStorage'
 import {EnvAccounts} from '@canvas/global/env/EnvAccounts'
 import {EnvContextModules} from '@canvas/global/env/EnvContextModules'
 import {EnvWikiPages} from '@canvas/global/env/EnvWikiPages'
+import {EnvContentMigrations} from '@canvas/global/env/ContentMigrations'
 
 /**
  * Top level ENV variable.
@@ -54,5 +55,6 @@ export type GlobalEnv =
         EnvPlatformStorage &
         EnvRce &
         EnvContextModules &
-        EnvWikiPages
+        EnvWikiPages &
+        EnvContentMigrations
     >

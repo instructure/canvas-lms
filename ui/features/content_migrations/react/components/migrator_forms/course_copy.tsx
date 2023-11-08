@@ -20,14 +20,11 @@ import React, {useRef, useState} from 'react'
 import {throttle} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-// @ts-ignore
 import {Checkbox} from '@instructure/ui-checkbox'
 import {View} from '@instructure/ui-view'
-// @ts-ignore
 import {IconSearchLine} from '@instructure/ui-icons'
 import {Select} from '@instructure/ui-select'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {setSourceCourseType} from '../types'
 
 const I18n = useI18nScope('content_migrations_redesign')
 
@@ -36,7 +33,11 @@ type CourseOption = {
   label: string
 }
 
-export const CourseCopyImporter = ({setSourceCourse}: {setSourceCourse: setSourceCourseType}) => {
+type CourseCopyImporterProps = {
+  setSourceCourse: (sourceCodeId: string) => void
+}
+
+export const CourseCopyImporter = ({setSourceCourse}: CourseCopyImporterProps) => {
   const [searchParam, setSearchParam] = useState<string>('')
   const [courseOptions, setCourseOptions] = useState<any>([])
   const [selectedCourse, setSelectedCourse] = useState<any>(false)
@@ -89,7 +90,7 @@ export const CourseCopyImporter = ({setSourceCourse}: {setSourceCourse: setSourc
 
   return (
     <>
-      <View as="div" margin="large none none none" width="100%" maxWidth="22.5rem">
+      <View as="div" margin="medium none none none" width="100%" maxWidth="22.5rem">
         <Select
           inputValue={selectedCourse ? selectedCourse.label : searchParam}
           onInputChange={getCourseOptions}
@@ -97,6 +98,7 @@ export const CourseCopyImporter = ({setSourceCourse}: {setSourceCourse: setSourc
             const course_id = data.id as string
             selectCourse(course_id)
           }}
+          placeholder={I18n.t('Search...')}
           isShowingOptions={courseOptions.length > 0}
           renderLabel={I18n.t('Search for a course')}
           renderBeforeInput={<IconSearchLine inline={false} />}
@@ -113,9 +115,7 @@ export const CourseCopyImporter = ({setSourceCourse}: {setSourceCourse: setSourc
               )
             })
           ) : (
-            <Select.Option id="empty-option" key="empty-option" value="">
-              ---
-            </Select.Option>
+            <Select.Option id="empty-option" key="empty-option" value="" />
           )}
         </Select>
       </View>

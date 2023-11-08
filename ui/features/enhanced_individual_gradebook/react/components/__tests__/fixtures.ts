@@ -164,6 +164,7 @@ const GRADEBOOK_STUDENT_QUERY_MOCK_RESPONSE = {
             deductedPoints: null,
             enteredGrade: '68%',
             gradeMatchesCurrentSubmission: true,
+            customGradeStatus: null,
           },
           {
             grade: '2',
@@ -185,6 +186,7 @@ const GRADEBOOK_STUDENT_QUERY_MOCK_RESPONSE = {
             deductedPoints: null,
             enteredGrade: '2%',
             gradeMatchesCurrentSubmission: true,
+            customGradeStatus: null,
           },
         ],
       },

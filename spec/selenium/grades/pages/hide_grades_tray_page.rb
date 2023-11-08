@@ -71,5 +71,7 @@ module HideGradesTray
       spinner
     end
     # rubocop:enable Specs/NoWaitForNoSuchElement
+
+    wait_for_animations
   end
 end

@@ -837,7 +837,7 @@ class SubmissionsApiController < ApplicationController
     end
 
     @user ||= get_user_considering_section(params[:user_id])
-    unless @assignment.assigned?(@user)
+    unless @assignment.assigned?(@user) || @assignment.students_with_visibility.include?(@user)
       render_unauthorized_action
       return
     end
@@ -868,6 +868,10 @@ class SubmissionsApiController < ApplicationController
 
         if params[:submission].key?(:sticker)
           submission[:sticker] = params[:submission].delete(:sticker)
+        end
+
+        if params.key?(:checkpoint_label) && @domain_root_account&.feature_enabled?(:discussion_checkpoints)
+          submission[:checkpoint_label] = params.delete(:checkpoint_label)
         end
 
         submission[:provisional] = value_to_boolean(params[:submission][:provisional])

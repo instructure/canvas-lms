@@ -34,6 +34,7 @@ describe('SettingsPanel', () => {
     unlockAt: '',
     height: '500px',
     onDismiss: () => {},
+    addModuleUI: () => {},
   }
 
   const renderComponent = (overrides = {}) => render(<SettingsPanel {...props} {...overrides} />)
@@ -108,9 +109,11 @@ describe('SettingsPanel', () => {
     it('validates the module name', () => {
       const {getByRole, getByText} = renderComponent({moduleName: ''})
       const updateButton = getByRole('button', {name: 'Update Module'})
+
       updateButton.click()
+      updateButton.focus()
+      expect(getByText('Please fix errors before continuing')).toBeInTheDocument()
       expect(getByText('Module Name is required.')).toBeInTheDocument()
-      expect(updateButton).toBeDisabled()
     })
 
     it('makes a request to the modules update endpoint', () => {
@@ -168,6 +171,23 @@ describe('SettingsPanel', () => {
           err: e,
           message: 'Error updating Week 1 settings.',
         })
+      })
+    })
+  })
+
+  describe('on create', () => {
+    it('calls addModuleUI when module is created', async () => {
+      jest.spyOn(alerts, 'showFlashAlert')
+      const addModuleUI = jest.fn()
+      doFetchApi.mockResolvedValue({response: {ok: true}, json: {}})
+      const {getByRole} = renderComponent({moduleId: undefined, addModuleUI})
+      getByRole('button', {name: 'Add Module'}).click()
+      await waitFor(() => {
+        expect(alerts.showFlashAlert).toHaveBeenCalledWith({
+          type: 'success',
+          message: 'Week 1 created successfully.',
+        })
+        expect(addModuleUI).toHaveBeenCalled()
       })
     })
   })

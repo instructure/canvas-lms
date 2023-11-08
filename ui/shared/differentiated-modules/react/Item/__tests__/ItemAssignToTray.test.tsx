@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, waitFor} from '@testing-library/react'
+import fetchMock from 'fetch-mock'
 import ItemAssignToTray, {ItemAssignToTrayProps} from '../ItemAssignToTray'
 
 export type UnknownSubset<T> = {
@@ -29,25 +30,87 @@ describe('ItemAssignToTray', () => {
     // @ts-expect-error
     window.ENV ||= {}
     ENV.VALID_DATE_RANGE = {
-      start_at: {date: '2023-08-20T22:00:00Z', date_context: 'course'},
-      end_at: {date: '2023-12-30T23:00:00Z', date_context: 'course'},
+      start_at: {date: '2023-08-20T12:00:00Z', date_context: 'course'},
+      end_at: {date: '2023-12-30T12:00:00Z', date_context: 'course'},
     }
     ENV.HAS_GRADING_PERIODS = false
     // @ts-expect-error
     ENV.SECTION_LIST = [{id: '4'}, {id: '5'}]
     ENV.POST_TO_SIS = false
     ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT = false
+
+    fetchMock
+      // an assignment with valid dates and overrides
+      .get('/api/v1/courses/1/assignments/23/date_details', {
+        id: '23',
+        due_at: '2023-10-05T12:00:00Z',
+        unlock_at: '2023-10-01T12:00:00Z',
+        lock_at: '2023-11-01T12:00:00Z',
+        only_visible_to_overrides: false,
+        overrides: [
+          {
+            id: '2',
+            assignment_id: '23',
+            title: 'Sally and Wally',
+            due_at: '2023-10-02T12:00:00Z',
+            all_day: false,
+            all_day_date: '2023-10-02',
+            unlock_at: null,
+            lock_at: null,
+            course_section_id: '4',
+          },
+          {
+            id: '3',
+            assignment_id: '23',
+            title: 'Neal and John',
+            due_at: '2023-10-03T12:00:00Z',
+            all_day: false,
+            all_day_date: '2023-10-03',
+            unlock_at: null,
+            lock_at: null,
+            course_section_id: '5',
+          },
+        ],
+      })
+      // an assignment with invalid dates
+      .get('/api/v1/courses/1/assignments/24/date_details', {
+        id: '24',
+        due_at: '2023-09-30T12:00:00Z',
+        unlock_at: '2023-10-01T12:00:00Z',
+        lock_at: '2023-11-01T12:00:00Z',
+        only_visible_to_overrides: false,
+        overrides: [],
+      })
+      // an assignment with valid dates and no overrides
+      .get('/api/v1/courses/1/assignments/25/date_details', {
+        id: '25',
+        due_at: '2023-10-05T12:01:00Z',
+        unlock_at: null,
+        lock_at: null,
+        only_visible_to_overrides: false,
+        overrides: [],
+      })
+      .get('/api/v1/courses/1/quizzes/23/date_details', {})
+  })
+
+  afterEach(() => {
+    fetchMock.resetHistory()
   })
 
   const props: ItemAssignToTrayProps = {
     open: true,
+    onClose: () => {},
     onDismiss: () => {},
     onSave: () => {},
     courseId: '1',
     moduleItemId: '2',
     moduleItemName: 'Item Name',
     moduleItemType: 'assignment',
+    moduleItemContentType: 'assignment',
+    moduleItemContentId: '23',
     pointsPossible: '10 pts',
+    locale: 'en',
+    timezone: 'UTC',
   }
 
   const renderComponent = (overrides: UnknownSubset<ItemAssignToTrayProps> = {}) =>
@@ -64,7 +127,7 @@ describe('ItemAssignToTray', () => {
   })
 
   it('renders a quiz', () => {
-    const {getByText} = renderComponent({moduleItemType: 'quiz'})
+    const {getByText} = renderComponent({moduleItemType: 'quiz', moduleItemContentType: 'quiz'})
     expect(getByText('Quiz | 10 pts')).toBeInTheDocument()
   })
 
@@ -79,6 +142,23 @@ describe('ItemAssignToTray', () => {
     expect(getByText('Assignment')).toBeInTheDocument()
     expect(queryByText('pts')).not.toBeInTheDocument()
     expect(getByLabelText('Edit assignment Item Name')).toBeInTheDocument()
+  })
+
+  it('renders times in the given timezone', async () => {
+    const {findAllByText} = renderComponent({moduleItemContentId: '25', timezone: 'America/Denver'})
+
+    const times = await findAllByText('Thursday, October 5, 2023 6:01 AM')
+    expect(times).toHaveLength(2) // screenreader + visible message
+  })
+
+  it('renders times in the given locale', async () => {
+    const {findAllByText} = renderComponent({
+      moduleItemContentId: '25',
+      locale: 'en-GB',
+      timezone: 'America/Denver',
+    })
+    const times = await findAllByText('Thursday, 5 October 2023 06:01')
+    expect(times).toHaveLength(2) // screenreader + visible message
   })
 
   it('calls onDismiss when close button is clicked', () => {
@@ -111,13 +191,34 @@ describe('ItemAssignToTray', () => {
     expect(getAllByTestId('item-assign-to-card')).toHaveLength(2)
   })
 
-  it('disables the save button when no cards are invalid', () => {
-    // it's ridiculous to implement this  now.
-    // eventually the tray will get data from the api, pass the data
-    // to the cards, which will call onValidityChange.
-    // then it will be straight forward to write tests
-    expect(true).toBe(true)
-    // const {getByRole} = renderComponent()
-    // expect(getByRole('button', {name: 'Save'})).toBeDisabled()
+  it('calls onDismiss when the cancel button is clicked', () => {
+    const onDismiss = jest.fn()
+    const {getByRole} = renderComponent({onDismiss})
+    getByRole('button', {name: 'Cancel'}).click()
+    expect(onDismiss).toHaveBeenCalled()
+  })
+
+  it('calls onSave when the Save buton is clicked', () => {
+    const onSave = jest.fn()
+    const {getByRole} = renderComponent({onSave})
+    getByRole('button', {name: 'Save'}).click()
+    expect(onSave).toHaveBeenCalled()
+  })
+
+  it('Save does not call onSave when a card is invalid', async () => {
+    const onSave = jest.fn()
+    const {getAllByTestId, getByRole, getByText} = renderComponent({
+      onSave,
+      moduleItemContentId: '24',
+    })
+    await waitFor(() => {
+      expect(getAllByTestId('item-assign-to-card')).toHaveLength(1)
+    })
+    const savebtn = getByRole('button', {name: 'Save'})
+
+    savebtn.click()
+    expect(onSave).not.toHaveBeenCalled()
+    savebtn.focus()
+    expect(getByText('Please fix errors before continuing')).toBeInTheDocument()
   })
 })

@@ -380,15 +380,17 @@ class SplitUsers
     source_user_submissions = source_user.submissions.shard(Shard.current).where(course_id: enrollments.map(&:course_id))
     restored_user_submissions = restored_user.all_submissions.shard(Shard.current)
 
-    # delete unsubmitted/deleted submissions that would otherwise clash with real ones we want to move
-    restored_user_submissions.where(workflow_state: %w[deleted unsubmitted],
-                                    assignment_id: source_user_submissions.select(:assignment_id))
-                             .delete_all
-
-    # move over submissions that don't clash with existing ones
-    source_user_submissions
-      .where.not(assignment_id: restored_user_submissions.select(:assignment_id))
-      .update_all(user_id: restored_user.id)
+    # move submissions to the restored user, swapping any conflicting deleted/unsubmitted submissions
+    # back to the source user to satisfy unique constraints and foreign keys
+    # and leaving other submissions alone
+    ids_to_swap = restored_user_submissions
+                  .where(assignment_id: source_user_submissions.select(:assignment_id),
+                         workflow_state: %w[deleted unsubmitted])
+                  .pluck(:id)
+    ids_to_move = source_user_submissions
+                  .where.not(assignment_id: restored_user_submissions.where.not(id: ids_to_swap).select(:assignment_id))
+                  .pluck(:id)
+    swap_records(Submission, ids_to_move, ids_to_swap)
 
     # since unsubmitted quiz submissions aren't a thing, just move over everything that doesn't clash
     source_user.quiz_submissions.shard(Shard.current).where(quiz_id: Quizzes::Quiz.where(context_id: enrollments.map(&:course_id)))
@@ -397,10 +399,7 @@ class SplitUsers
   end
 
   def handle_submissions(records)
-    [[:submissions, "fk_rails_8d85741475"],
-     [:"quizzes/quiz_submissions", "fk_rails_04850db4b4"]].each do |table, foreign_key|
-      model = table.to_s.classify.constantize
-
+    [Submission, Quizzes::QuizSubmission].each do |model|
       ids_by_shard = records.where(context_type: model.to_s, previous_user_id: restored_user).pluck(:context_id).group_by { |id| Shard.shard_for(id) }
       other_ids_by_shard = records.where(context_type: model.to_s, previous_user_id: source_user).pluck(:context_id).group_by { |id| Shard.shard_for(id) }
 
@@ -408,26 +407,36 @@ class SplitUsers
         ids = ids_by_shard[shard] || []
         other_ids = other_ids_by_shard[shard] || []
         shard.activate do
-          model.transaction do
-            # there is a unique index on assignment_id and user_id or quiz_id
-            # and user_id. Unique indexes are checked after every row during
-            # an update statement to get around this and to allow us to swap
-            # we are setting the user_id to the negative user_id and then back
-            # to the user_id after the conflicting rows have been updated.
-            model.connection.execute("SET CONSTRAINTS #{model.connection.quote_table_name(foreign_key)} DEFERRED")
-            if model == Submission
-              model.where(user_id: restored_user,
-                          workflow_state: %w[deleted unsubmitted],
-                          assignment_id: Submission.where(id: ids).select(:assignment_id))
-                   .where.not(id: other_ids)
-                   .delete_all
-            end
-            model.where(id: ids).update_all(user_id: -restored_user.id)
-            model.where(id: other_ids).update_all(user_id: source_user.id)
-            model.where(id: ids).update_all(user_id: restored_user.id)
+          if model == Submission
+            # also swap restored user's deleted/unsubmitted submissions that need to be moved out of the way
+            other_ids += model.where(user_id: restored_user,
+                                     workflow_state: %w[deleted unsubmitted],
+                                     assignment_id: Submission.where(id: ids).select(:assignment_id))
+                              .where.not(id: other_ids)
+                              .pluck(:id)
           end
+          swap_records(model, ids, other_ids)
         end
       end
+    end
+  end
+
+  def swap_records(model, ids_to_restored_user, ids_to_source_user)
+    if ids_to_source_user.any?
+      foreign_key = case model.to_s
+                    when "Submission" then "fk_rails_8d85741475"
+                    when "Quizzes::QuizSubmission" then "fk_rails_04850db4b4"
+                    end
+      model.transaction(requires_new: true) do
+        # defer foreign key checks so we can swap the user_ids (which are themselves subject to unique constraint)
+        model.connection.execute("SET CONSTRAINTS #{model.connection.quote_table_name(foreign_key)} DEFERRED") if foreign_key
+        model.where(id: ids_to_restored_user).update_all(user_id: -restored_user.id)
+        model.where(id: ids_to_source_user).update_all(user_id: source_user.id)
+        model.where(id: ids_to_restored_user).update_all(user_id: restored_user.id)
+      end
+    else
+      # don't go through the swap rigamarole if we don't have to
+      model.where(id: ids_to_restored_user).update_all(user_id: restored_user.id)
     end
   end
 

@@ -85,7 +85,8 @@ export default class EditCalendarEventView extends Backbone.View {
         'context_type',
         'course_pacing_enabled',
         'course_sections',
-        'rrule'
+        'rrule',
+        'calendar_event_context_code'
       )
       if (picked_params.start_date) {
         // this comes from the calendar via url params when editing an event
@@ -161,12 +162,24 @@ export default class EditCalendarEventView extends Backbone.View {
             .find('#calendar_event_blackout_date')
             .prop('checked', picked_params[key] === 'true')
         }
+        if(key === 'calendar_event_context_code' && picked_params['course_sections'].length > 0){
+          const active_section_id = picked_params[key].split('_')[2]
+          const eventDateKeys = ['start_date', 'start_time', 'end_time']
+          eventDateKeys.forEach((dateKey) => {
+            const $element = this.$el.find(`input[name='child_event_data[${active_section_id}][${dateKey}]']`)
+            $element.val(picked_params[dateKey])
+          })
+        }
         if (key === 'course_sections') {
           const sections = picked_params[key]
           sections.forEach(section => {
             if (section.event) {
-              this.$el.find(`input[name='child_event_data[${section.id}][start_time]']`).change()
-              this.$el.find(`input[name='child_event_data[${section.id}][end_time]']`).change()
+              ['start_time', 'end_time'].forEach((timeKey) => {
+                const $element = this.$el.find(`input[name='child_event_data[${section.id}][${timeKey}]']`)
+                const value = $element.val();
+                $element.val(value.toUpperCase())
+                $element.change()
+              })
             }
           })
         }

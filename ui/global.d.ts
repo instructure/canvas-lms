@@ -112,6 +112,13 @@ declare global {
     raw: (str: string) => string
     showIf: ShowIf
     underscore: (str: string) => string
+    formSubmit: (options: {
+      formErrors: boolean
+      disableWhileLoading: boolean
+      required: string[]
+      success: (data: any) => void
+      error: (response: JQuery.JQueryXHR) => void
+    }) => void
   }
 
   declare interface JQueryStatic {

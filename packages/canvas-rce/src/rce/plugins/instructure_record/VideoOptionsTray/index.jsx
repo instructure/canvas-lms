@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import {arrayOf, bool, func, number, shape, string} from 'prop-types'
 import {Button, CloseButton, IconButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
@@ -27,6 +27,7 @@ import {IconQuestionLine} from '@instructure/ui-icons'
 import {Flex} from '@instructure/ui-flex'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {View} from '@instructure/ui-view'
+import {Spinner} from '@instructure/ui-spinner'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Tray} from '@instructure/ui-tray'
 import {StoreProvider} from '../../shared/StoreContext'
@@ -40,6 +41,7 @@ import {
   scaleToSize,
 } from '../../instructure_image/ImageEmbedOptions'
 import Bridge from '../../../../bridge'
+import RceApiSource from '../../../../rcs/api'
 import formatMessage from '../../../../format-message'
 import DimensionsInput, {useDimensionsState} from '../../shared/DimensionsInput'
 import {getTrayHeight} from '../../shared/trayUtils'
@@ -71,19 +73,38 @@ export default function VideoOptionsTray({
   const [minWidth] = useState(MIN_WIDTH_VIDEO)
   const [minHeight] = useState(Math.round((videoHeight / videoWidth) * MIN_WIDTH_VIDEO))
   const [minPercentage] = useState(MIN_PERCENTAGE)
+  const [editLocked, setEditLocked] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   const isStudio = !!studioOptions
   const showDisplayOptions = !isStudio || studioOptions.convertibleToLink
   const showSizeControls = !isStudio || studioOptions.resizable
 
   const dimensionsState = useDimensionsState(videoOptions, {minHeight, minWidth, minPercentage})
+  const api = new RceApiSource(trayProps)
+
+  useEffect(() => {
+    if(videoOptions.attachmentId) {
+      api.getFile(videoOptions.attachmentId, {include: ['blueprint_course_status']})
+        .then((response) => {
+          setEditLocked(response?.restricted_by_master_course && response?.is_master_course_child_content)
+          setLoading(false)
+        })
+        .catch((error) => {
+          setLoading(false)
+        })
+    }
+  }, [videoOptions.attachmentId])
+
   function handleTitleTextChange(event) {
     setTitleText(event.target.value)
   }
+
   function handleDisplayAsChange(event) {
     event.target.focus()
     setDisplayAs(event.target.value)
   }
+
   function handleVideoSizeChange(event, selectedOption) {
     setVideoSize(selectedOption.value)
     if (selectedOption.value === CUSTOM) {
@@ -95,9 +116,11 @@ export default function VideoOptionsTray({
       setVideoWidth(width)
     }
   }
+
   function handleUpdateSubtitles(new_subtitles) {
     setSubtitles(new_subtitles)
   }
+
   function handleSave(event, updateMediaObject) {
     event.preventDefault()
     let appliedHeight = videoHeight
@@ -115,8 +138,10 @@ export default function VideoOptionsTray({
       displayAs,
       subtitles,
       updateMediaObject,
+      editLocked,
     })
   }
+
   const tooltipText = formatMessage('Used by screen readers to describe the video')
   const textAreaLabel = (
     <Flex alignItems="center">
@@ -194,121 +219,129 @@ export default function VideoOptionsTray({
                 </Flex.Item>
               </Flex>
             </Flex.Item>
-            <Flex.Item as="form" shouldGrow={true} margin="none" shouldShrink={true}>
-              <Flex justifyItems="space-between" direction="column" height="100%">
-                <Flex.Item shouldGrow={true} padding="small" shouldShrink={true}>
-                  <Flex direction="column">
-                    <Flex.Item padding="small">
-                      {isStudio ? (
-                        <Flex direction="column">
-                          <Flex.Item>
-                            <Text weight="bold">{formatMessage('Media Title')}</Text>
-                          </Flex.Item>
-                          <Flex.Item padding="small none none small">{titleText}</Flex.Item>
-                        </Flex>
-                      ) : (
-                        <TextArea
-                          aria-describedby="alt-text-label-tooltip"
-                          disabled={displayAs === 'link'}
-                          height="4rem"
-                          label={textAreaLabel}
-                          onChange={handleTitleTextChange}
-                          placeholder={formatMessage('(Describe the video)')}
-                          resize="vertical"
-                          value={titleText}
-                        />
-                      )}
-                    </Flex.Item>
-                    {showDisplayOptions && (
-                      <Flex.Item margin="small none none none" padding="small">
-                        <RadioInputGroup
-                          description={formatMessage('Display Options')}
-                          name="display-video-as"
-                          onChange={handleDisplayAsChange}
-                          value={displayAs}
-                        >
-                          <RadioInput label={formatMessage('Embed Video')} value="embed" />
-                          <RadioInput
-                            label={formatMessage('Display Text Link (Opens in a new tab)')}
-                            value="link"
-                          />
-                        </RadioInputGroup>
-                      </Flex.Item>
-                    )}
-                    {showSizeControls && (
-                      <Flex.Item margin="small none xx-small none">
-                        <View as="div" padding="small small xx-small small">
-                          <SimpleSelect
-                            id={`${id}-size`}
-                            mountNode={instuiPopupMountNode}
-                            disabled={displayAs !== 'embed'}
-                            renderLabel={formatMessage('Size')}
-                            messages={messagesForSize}
-                            assistiveText={formatMessage('Use arrow keys to navigate options.')}
-                            onChange={handleVideoSizeChange}
-                            value={videoSize}
-                          >
-                            {videoSizes.map(size => (
-                              <SimpleSelect.Option
-                                id={`${id}-size-${size}`}
-                                key={size}
-                                value={size}
-                              >
-                                {labelForImageSize(size)}
-                              </SimpleSelect.Option>
-                            ))}
-                          </SimpleSelect>
-                        </View>
-                        {videoSize === CUSTOM && (
-                          <View as="div" padding="xx-small small">
-                            <DimensionsInput
-                              dimensionsState={dimensionsState}
-                              disabled={displayAs !== 'embed'}
-                              minHeight={minHeight}
-                              minWidth={minWidth}
-                              minPercentage={minPercentage}
-                              hidePercentage={true}
+            {loading && videoOptions.attachmentId ? (
+              <Flex.Item textAlign="center" margin="xx-large" padding="xx-large">
+                <Spinner renderTitle={formatMessage("Loading")} />
+              </Flex.Item>
+            ) : (
+              <Flex.Item as="form" shouldGrow={true} margin="none" shouldShrink={true}>
+                <Flex justifyItems="space-between" direction="column" height="100%">
+                  <Flex.Item shouldGrow={true} padding="small" shouldShrink={true}>
+                    <Flex direction="column">
+                      {!editLocked && (
+                        <Flex.Item padding="small">
+                          {isStudio ? (
+                            <Flex direction="column">
+                              <Flex.Item>
+                                <Text weight="bold">{formatMessage('Media Title')}</Text>
+                              </Flex.Item>
+                              <Flex.Item padding="small none none small">{titleText}</Flex.Item>
+                            </Flex>
+                          ) : (
+                            <TextArea
+                              aria-describedby="alt-text-label-tooltip"
+                              disabled={displayAs === 'link'}
+                              height="4rem"
+                              label={textAreaLabel}
+                              onChange={handleTitleTextChange}
+                              placeholder={formatMessage('(Describe the video)')}
+                              resize="vertical"
+                              value={titleText}
                             />
+                          )}
+                        </Flex.Item>
+                      )}
+                      {showDisplayOptions && (
+                        <Flex.Item margin="small none none none" padding="small">
+                          <RadioInputGroup
+                            description={formatMessage('Display Options')}
+                            name="display-video-as"
+                            onChange={handleDisplayAsChange}
+                            value={displayAs}
+                          >
+                            <RadioInput label={formatMessage('Embed Video')} value="embed" />
+                            <RadioInput
+                              label={formatMessage('Display Text Link (Opens in a new tab)')}
+                              value="link"
+                            />
+                          </RadioInputGroup>
+                        </Flex.Item>
+                      )}
+                      {showSizeControls && (
+                        <Flex.Item margin="small none xx-small none">
+                          <View as="div" padding="small small xx-small small">
+                            <SimpleSelect
+                              id={`${id}-size`}
+                              mountNode={instuiPopupMountNode}
+                              disabled={displayAs !== 'embed'}
+                              renderLabel={formatMessage('Size')}
+                              messages={messagesForSize}
+                              assistiveText={formatMessage('Use arrow keys to navigate options.')}
+                              onChange={handleVideoSizeChange}
+                              value={videoSize}
+                            >
+                              {videoSizes.map(size => (
+                                <SimpleSelect.Option
+                                  id={`${id}-size-${size}`}
+                                  key={size}
+                                  value={size}
+                                >
+                                  {labelForImageSize(size)}
+                                </SimpleSelect.Option>
+                              ))}
+                            </SimpleSelect>
                           </View>
-                        )}
-                      </Flex.Item>
-                    )}
-                    {!isStudio && (
-                      <Flex.Item padding="small">
-                        <FormFieldGroup description={formatMessage('Closed Captions/Subtitles')}>
-                          <ClosedCaptionPanel
-                            subtitles={subtitles.map(st => ({
-                              locale: st.locale,
-                              inherited: st.inherited,
-                              file: {name: st.language || st.locale}, // this is an artifact of ClosedCaptionCreatorRow's inards
-                            }))}
-                            uploadMediaTranslations={Bridge.uploadMediaTranslations}
-                            userLocale={Bridge.userLocale}
-                            updateSubtitles={handleUpdateSubtitles}
-                            liveRegion={getLiveRegion}
-                            mountNode={instuiPopupMountNode}
-                          />
-                        </FormFieldGroup>
-                      </Flex.Item>
-                    )}
-                  </Flex>
-                </Flex.Item>
-                <Flex.Item
-                  background="secondary"
-                  borderWidth="small none none none"
-                  padding="small medium"
-                  textAlign="end"
-                >
-                  <Button
-                    disabled={saveDisabled}
-                    onClick={event => handleSave(event, contentProps.updateMediaObject)}
-                    color="primary"
+                          {videoSize === CUSTOM && (
+                            <View as="div" padding="xx-small small">
+                              <DimensionsInput
+                                dimensionsState={dimensionsState}
+                                disabled={displayAs !== 'embed'}
+                                minHeight={minHeight}
+                                minWidth={minWidth}
+                                minPercentage={minPercentage}
+                                hidePercentage={true}
+                              />
+                            </View>
+                          )}
+                        </Flex.Item>
+                      )}
+                      {!isStudio && !editLocked && (
+                        <Flex.Item padding="small">
+                          <FormFieldGroup description={formatMessage('Closed Captions/Subtitles')}>
+                            <ClosedCaptionPanel
+                              subtitles={subtitles.map(st => ({
+                                locale: st.locale,
+                                inherited: st.inherited,
+                                file: {name: st.language || st.locale}, // this is an artifact of ClosedCaptionCreatorRow's inards
+                              }))}
+                              uploadMediaTranslations={Bridge.uploadMediaTranslations}
+                              userLocale={Bridge.userLocale}
+                              updateSubtitles={handleUpdateSubtitles}
+                              liveRegion={getLiveRegion}
+                              mountNode={instuiPopupMountNode}
+                            />
+                          </FormFieldGroup>
+                        </Flex.Item>
+                      )}
+                    </Flex>
+                  </Flex.Item>
+                  <Flex.Item
+                    background="secondary"
+                    borderWidth="small none none none"
+                    padding="small medium"
+                    textAlign="end"
                   >
-                    {formatMessage('Done')}
-                  </Button>
-                </Flex.Item>
-              </Flex>
-            </Flex.Item>
+                    <Button
+                      disabled={saveDisabled}
+                      onClick={event => handleSave(event, contentProps.updateMediaObject)}
+                      color="primary"
+                    >
+                      {formatMessage('Done')}
+                    </Button>
+                  </Flex.Item>
+                </Flex>
+              </Flex.Item>
+            )}
           </Flex>
         </Tray>
       )}

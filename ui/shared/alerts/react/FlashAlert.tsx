@@ -99,7 +99,7 @@ const isLoadingChunkError = (a?: string): boolean => {
 // more info about the error when pressed.
 // Is displayed at the top of the document, and will close itself after a while
 
-type FlashAlertProps = typeof FlashAlert.defaultProps & {
+type FlashAlertProps = {
   onClose: () => void
   message: HTMLElement | string
   error?: Error | null

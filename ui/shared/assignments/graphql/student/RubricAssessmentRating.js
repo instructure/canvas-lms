@@ -33,6 +33,7 @@ export const RubricAssessmentRating = {
       }
       points
       artifactAttempt
+      rubricAssessmentId
     }
   `,
 
@@ -48,6 +49,7 @@ export const RubricAssessmentRating = {
     learning_outcome_id: string,
     points: number,
     artifactAttempt: number,
+    rubricAssessmentId: string,
   }),
 
   mock: ({
@@ -59,6 +61,7 @@ export const RubricAssessmentRating = {
     description = 'Rating Description',
     points = 1,
     artifactAttempt = 1,
+    rubricAssessmentId = 'Rubric Assessment ID',
   } = {}) => ({
     _id,
     comments,
@@ -68,6 +71,7 @@ export const RubricAssessmentRating = {
     description,
     points,
     artifactAttempt,
+    rubricAssessmentId,
   }),
 }
 

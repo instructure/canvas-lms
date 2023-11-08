@@ -48,7 +48,7 @@ module Lti
               conflicting_asset = asset.class.where(lti_context_id: asset.lti_context_id).first
               raise e unless conflicting_asset.present?
 
-              if conflicting_asset.workflow_state == "deleted"
+              if conflicting_asset.workflow_state == "deleted" && conflicting_asset.canonical?
                 conflicting_asset.update_attribute(:lti_context_id, nil)
               else
                 asset.lti_context_id = SecureRandom.uuid

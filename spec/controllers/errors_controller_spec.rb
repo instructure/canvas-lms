@@ -110,5 +110,12 @@ describe ErrorsController do
       post "create", params: { eerror: { message: "test message" } }
       expect(ErrorReport.order(:id).last.user_id).to eq other_user.id
     end
+
+    it "doesn't create a report if we're out of region" do
+      expect(Shard.current).to receive(:in_current_region?).and_return(false)
+      expect do
+        post "create", params: { error: { id: "garbage" } }
+      end.not_to change { ErrorReport.count }
+    end
   end
 end

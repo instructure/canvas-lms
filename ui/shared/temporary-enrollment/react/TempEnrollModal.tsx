@@ -32,81 +32,85 @@ import {TempEnrollSearch} from './TempEnrollSearch'
 import {TempEnrollEdit} from './TempEnrollEdit'
 import {TempEnrollAssign} from './TempEnrollAssign'
 import {Flex} from '@instructure/ui-flex'
-import {Enrollment, EnrollmentType} from './types'
+import {Enrollment, EnrollmentType, MODULE_NAME, Role, TempEnrollPermissions, User} from './types'
 import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {createAnalyticPropsGenerator} from './util/analytics'
 
 const I18n = useI18nScope('temporary_enrollment')
+
+// initialize analytics props
+const analyticProps = createAnalyticPropsGenerator(MODULE_NAME)
 
 interface Props {
   readonly title: string | ((enrollmentType: EnrollmentType, name: string) => string)
   readonly enrollmentType: EnrollmentType
   readonly children: ReactElement
   readonly user: {
-    id: string
-    name: string
-    avatar_url?: string
+    readonly id: string
+    readonly name: string
+    readonly avatar_url?: string
   }
   readonly canReadSIS?: boolean
   readonly permissions: {
-    teacher: boolean
-    ta: boolean
-    student: boolean
-    observer: boolean
-    designer: boolean
+    readonly teacher: boolean
+    readonly ta: boolean
+    readonly student: boolean
+    readonly observer: boolean
+    readonly designer: boolean
   }
   readonly accountId: string
-  readonly roles: {id: string; label: string; base_role_name: string}[]
-  readonly onOpen?: () => void
-  readonly onClose?: () => void
+  readonly roles: Role[]
   readonly defaultOpen?: boolean
-  readonly isOpen?: boolean
   readonly tempEnrollments?: Enrollment[]
   readonly isEditMode: boolean
-  readonly onToggleEditMode: (mode?: boolean) => void
+  readonly onToggleEditMode?: (mode?: boolean) => void
   // TODO add onDeleteEnrollment prop to parent component and update user list
   readonly onDeleteEnrollment?: (enrollmentId: number) => void
+  readonly tempEnrollPermissions: TempEnrollPermissions
 }
 
 export function TempEnrollModal(props: Props) {
-  // destructuring the props
-  const {
-    title,
-    enrollmentType,
-    isOpen,
-    defaultOpen,
-    tempEnrollments,
-    isEditMode,
-    onToggleEditMode,
-    children,
-    user,
-    canReadSIS,
-    permissions,
-    accountId,
-    roles,
-    onOpen,
-    onClose,
-  } = props
-
-  const [open, setOpen] = useState(defaultOpen || false)
+  const [open, setOpen] = useState(props.defaultOpen || false)
   const [page, setPage] = useState(0)
-  const [enrollment, setEnrollment] = useState(null)
+  const [enrollment, setEnrollment] = useState<User | null>(null)
   const [enrollmentData, setEnrollmentData] = useState<Enrollment[]>([])
+  const [isViewingAssignFromEdit, setIsViewingAssignFromEdit] = useState(false)
 
-  const isEditModeLocal = isEditMode
-  const dynamicTitle = typeof title === 'function' ? title(enrollmentType, user.name) : title
+  const dynamicTitle =
+    typeof props.title === 'function'
+      ? props.title(props.enrollmentType, props.user.name)
+      : props.title
 
   useEffect(() => {
-    if (tempEnrollments) {
-      setEnrollmentData(tempEnrollments)
+    if (props.tempEnrollments) {
+      setEnrollmentData(props.tempEnrollments)
     }
-  }, [tempEnrollments])
+  }, [props.tempEnrollments])
 
-  function resetState(pg: number = 0) {
-    setPage(pg)
-
-    if (isEditModeLocal) {
-      onToggleEditMode(false)
+  const resetCommonState = () => {
+    if (props.isEditMode && props.onToggleEditMode) {
+      props.onToggleEditMode(false)
     }
+
+    if (props.tempEnrollments) {
+      setEnrollmentData(props.tempEnrollments)
+    }
+  }
+
+  const resetState = () => {
+    setPage(0)
+    setEnrollment(null)
+    setIsViewingAssignFromEdit(false)
+
+    resetCommonState()
+  }
+
+  const handleGoToAssignPageWithEnrollment = (enrollmentUser: User) => {
+    setEnrollment(enrollmentUser)
+    setPage(2)
+    setIsViewingAssignFromEdit(true)
+
+    resetCommonState()
   }
 
   const handleEnrollmentSubmission = (isSuccess: boolean) => {
@@ -130,17 +134,13 @@ export function TempEnrollModal(props: Props) {
   }
 
   const handleOpenModal = () => {
-    if (isOpen !== undefined) {
-      onOpen && onOpen()
-    } else if (!open) {
+    if (!open) {
       setOpen(true)
     }
   }
 
   const handleCloseModal = () => {
-    if (isOpen !== undefined) {
-      onClose && onClose()
-    } else if (open) {
+    if (open) {
       setOpen(false)
       resetState()
     }
@@ -150,26 +150,20 @@ export function TempEnrollModal(props: Props) {
     resetState()
   }
 
-  const handleSetEnrollmentFromSearch = (e: any) => {
-    setEnrollment(e)
-  }
-
-  const handleCancel = () => {
-    setOpen(false)
-    resetState()
+  const handleSetEnrollmentFromSearch = (enrollmentUser: User) => {
+    setEnrollment(enrollmentUser)
   }
 
   const handleGoBack = () => {
-    setPage((p: number) => p - 1)
+    setPage((currentPage: number) => currentPage - 1)
   }
 
   const handleResetToBeginning = () => {
     resetState()
-    setPage((p: number) => p - 1)
   }
 
   const handlePageTransition = () => {
-    setPage(p => p + 1)
+    setPage(currentPage => currentPage + 1)
   }
 
   const handleOpenForNewEnrollment = () => {
@@ -179,11 +173,6 @@ export function TempEnrollModal(props: Props) {
 
   const isSubmissionPage = () => {
     return page === 3
-  }
-
-  const handleGoToAssignPageWithEnrollment = (chosenEnrollment: any) => {
-    setEnrollment(chosenEnrollment)
-    resetState(2)
   }
 
   const handleChildClick =
@@ -201,29 +190,33 @@ export function TempEnrollModal(props: Props) {
     }
 
   const renderScreen = () => {
-    if (isEditModeLocal) {
+    if (props.isEditMode) {
       // edit enrollments screen
       return (
         <TempEnrollEdit
-          user={user}
+          user={props.user}
           enrollments={enrollmentData}
           onAddNew={handleOpenForNewEnrollment}
           onEdit={handleGoToAssignPageWithEnrollment}
           onDelete={handleEnrollmentDeletion}
+          contextType={props.enrollmentType}
+          tempEnrollPermissions={props.tempEnrollPermissions}
         />
       )
     } else {
-      // assign screen
       if (page >= 2) {
+        // assign screen
         return (
           <TempEnrollAssign
-            user={user}
+            user={props.user}
             enrollment={enrollment}
-            roles={roles}
+            roles={props.roles}
             goBack={handleGoBack}
-            permissions={permissions}
+            permissions={props.permissions}
             doSubmit={isSubmissionPage}
             setEnrollmentStatus={handleEnrollmentSubmission}
+            isInAssignEditMode={isViewingAssignFromEdit}
+            contextType={props.enrollmentType}
           />
         )
       }
@@ -231,53 +224,55 @@ export function TempEnrollModal(props: Props) {
       // search screen
       return (
         <TempEnrollSearch
-          accountId={accountId}
-          canReadSIS={canReadSIS}
-          user={user}
+          accountId={props.accountId}
+          canReadSIS={props.canReadSIS}
+          user={props.user}
           page={page}
           searchFail={handleSearchFailure}
           searchSuccess={handleSetEnrollmentFromSearch}
-          foundEnroll={enrollment !== null ? enrollment : undefined}
+          foundEnroll={enrollment}
         />
       )
     }
   }
 
   const renderButtons = () => {
-    if (isEditModeLocal) {
+    if (props.isEditMode) {
       return (
         <Flex.Item margin="0 small 0 0">
-          <Button onClick={handleCancel}>{I18n.t('Done')}</Button>
+          <Button onClick={handleCloseModal} {...analyticProps('Done')}>
+            {I18n.t('Done')}
+          </Button>
         </Flex.Item>
       )
     } else {
-      const buttons = []
-
-      buttons.push(
+      return [
         <Flex.Item key="cancel" margin="0 small 0 0">
-          <Button onClick={handleCancel}>{I18n.t('Cancel')}</Button>
-        </Flex.Item>
-      )
+          <Button onClick={handleCloseModal} {...analyticProps('Cancel')}>
+            {I18n.t('Cancel')}
+          </Button>
+        </Flex.Item>,
 
-      if (page === 1) {
-        buttons.push(
+        page === 1 && (
           <Flex.Item key="startOver" margin="0 small 0 0">
-            <Button onClick={handleResetToBeginning}>{I18n.t('Start Over')}</Button>
+            <Button onClick={handleResetToBeginning} {...analyticProps('StartOver')}>
+              {I18n.t('Start Over')}
+            </Button>
           </Flex.Item>
-        )
-      }
+        ),
 
-      if (!isEditModeLocal) {
-        buttons.push(
+        !props.isEditMode && (
           <Flex.Item key="nextOrSubmit" margin="0 small 0 0">
-            <Button color="primary" onClick={handlePageTransition}>
+            <Button
+              color="primary"
+              onClick={handlePageTransition}
+              {...analyticProps(page === 2 ? 'Submit' : 'Next')}
+            >
               {page === 2 ? I18n.t('Submit') : I18n.t('Next')}
             </Button>
           </Flex.Item>
-        )
-      }
-
-      return buttons
+        ),
+      ]
     }
   }
 
@@ -285,7 +280,7 @@ export function TempEnrollModal(props: Props) {
     <>
       <Modal
         overflow="scroll"
-        open={isOpen ?? open}
+        open={open}
         onDismiss={handleCloseModal}
         size="large"
         label={I18n.t('Create a Temporary Enrollment')}
@@ -305,8 +300,8 @@ export function TempEnrollModal(props: Props) {
         </Modal.Footer>
       </Modal>
 
-      {cloneElement(children, {
-        onClick: handleChildClick(children.props.onClick),
+      {cloneElement(props.children, {
+        onClick: handleChildClick(props.children.props.onClick),
       })}
     </>
   )

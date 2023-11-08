@@ -16,9 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState, useCallback} from 'react'
+import React, {useEffect, useState, useCallback, useRef} from 'react'
 import {CloseButton, Button} from '@instructure/ui-buttons'
-// @ts-ignore
 import {Modal} from '@instructure/ui-modal'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
@@ -46,7 +45,7 @@ export type MigrationIssue = {
   error_message: string | null
 }
 
-type MigrationIssuesResponse = [MigrationIssue]
+type MigrationIssuesResponse = MigrationIssue[]
 
 type ActionButtonProps = {
   migration_type_title: string
@@ -58,6 +57,7 @@ type MigrationIssuesModalProps = {
   open: boolean
   migration_type_title: string
   migration_issues_url: string
+  migration_issues_count: number
   onClose: () => void
 }
 
@@ -72,42 +72,84 @@ const buildButton = (migration_issues_count: number, onClose: () => void) => {
   return null
 }
 
+const ISSUES_PAGE_SIZE = 10
+
 const MigrationIssuesModal = ({
   open,
   migration_type_title,
   migration_issues_url,
+  migration_issues_count,
   onClose,
 }: MigrationIssuesModalProps) => {
-  const [response, setResponse] = useState<MigrationIssuesResponse | null>(null)
+  const currentPage = useRef(1)
+  const [haveNextPage, setHaveNextPage] = useState(false)
+  const [issues, setIssues] = useState<MigrationIssuesResponse | null>(null)
   const [hasErrors, setHasErrors] = useState(false)
+  const [isLoadingMoreIssues, setIsLoadingMoreIssues] = useState(false)
 
-  const fetchIssue = useCallback(
+  const handleShowMore = useCallback(() => {
+    setIsLoadingMoreIssues(true)
+    const url = new URL(migration_issues_url)
+    currentPage.current += 1
+    url.searchParams.set('page', currentPage.current.toString())
+    url.searchParams.set('per_page', ISSUES_PAGE_SIZE.toString())
+    doFetchApi({path: url.toString(), method: 'GET'})
+      .then(({json}: {json: MigrationIssuesResponse}) => {
+        if (issues) {
+          const newIssues = issues.concat(json)
+          setIssues(newIssues)
+          setHaveNextPage(newIssues.length < migration_issues_count)
+        }
+      })
+      .catch(() => setHasErrors(true))
+      .finally(() => setIsLoadingMoreIssues(false))
+  }, [migration_issues_url, migration_issues_count, issues])
+
+  const fetchIssues = useCallback(
     () =>
       migration_issues_url &&
       doFetchApi({path: migration_issues_url, method: 'GET'})
-        .then(({json}: {json: MigrationIssuesResponse}) => setResponse(json))
+        .then(({json}: {json: MigrationIssuesResponse}) => {
+          setIssues(json)
+          setHaveNextPage(json.length < migration_issues_count)
+        })
         .catch(() => setHasErrors(true)),
-    [migration_issues_url]
+    [migration_issues_url, migration_issues_count]
   )
 
   useEffect(() => {
-    if (open && !response) fetchIssue()
-  }, [open, response, fetchIssue])
+    if (open && !issues) fetchIssues()
+  }, [open, issues, fetchIssues])
 
   let content
-  if (response) {
+  if (issues && !hasErrors) {
     content = (
-      <List as="ol" isUnstyled={true}>
-        {response.map(({id, description, fix_issue_html_url}) => (
-          <ListItem key={id}>
-            {fix_issue_html_url ? (
-              <Link href={fix_issue_html_url}>{description}</Link>
+      <>
+        <List as="ol" isUnstyled={true}>
+          {issues.map(({id, description, fix_issue_html_url}) => (
+            <ListItem key={id}>
+              {fix_issue_html_url ? (
+                <Link href={fix_issue_html_url}>{description}</Link>
+              ) : (
+                <Text>{description}</Text>
+              )}
+            </ListItem>
+          ))}
+        </List>
+        {haveNextPage && (
+          <View as="div" textAlign="center">
+            {isLoadingMoreIssues ? (
+              <Spinner renderTitle={() => I18n.t('Loading more issues')} size="x-small" />
             ) : (
-              <Text>{description}</Text>
+              <View as="div" textAlign="center">
+                <Link onClick={handleShowMore} isWithinText={false}>
+                  <Text weight="bold">{I18n.t('Show More')}</Text>
+                </Link>
+              </View>
             )}
-          </ListItem>
-        ))}
-      </List>
+          </View>
+        )}
+      </>
     )
   } else if (hasErrors) {
     content = (
@@ -142,9 +184,6 @@ const MigrationIssuesModal = ({
       </Modal.Header>
       <Modal.Body>{content}</Modal.Body>
       <Modal.Footer>
-        <Button onClick={onClose} margin="0 x-small 0 0">
-          {I18n.t('Cancel')}
-        </Button>
         <Button onClick={onClose} color="primary">
           {I18n.t('Close')}
         </Button>
@@ -168,6 +207,7 @@ export const ActionButton = ({
         open={modalOpen}
         migration_type_title={migration_type_title}
         migration_issues_url={migration_issues_url}
+        migration_issues_count={migration_issues_count}
         onClose={() => setModalOpen(false)}
       />
     </>

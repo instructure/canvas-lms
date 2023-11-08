@@ -19,21 +19,25 @@
 
 require_relative "../common"
 require_relative "../helpers/calendar2_common"
-
+require_relative "page_objects/course_copy_page"
+require_relative "page_objects/content_migration_page"
 describe "course copy" do
   include_context "in-process server selenium tests"
   include Calendar2Common
 
   def validate_course_main_page
-    header = f("#breadcrumbs .home + li a")
-    expect(header).to be_displayed
-    expect(header.text).to eq @course.course_code
+    expect(CourseCopyPage.header).to be_displayed
+    expect(CourseCopyPage.header.text).to eq @course.course_code
   end
 
   def wait_for_migration_to_complete
     keep_trying_for_attempt_times(attempts: 10, sleep_interval: 1) do
-      disable_implicit_wait { f("div.progressStatus").text == "Completed" }
+      disable_implicit_wait { ContentMigrationPage.progress_status_label.text == "Completed" }
     end
+  end
+
+  before(:once) do
+    Account.site_admin.disable_feature! :instui_for_import_page
   end
 
   it "copies the course" do
@@ -44,8 +48,8 @@ describe "course copy" do
     @course.wiki_pages.create!(title: "hi", body: "Whatever")
     @course.save!
     get "/courses/#{@course.id}/copy"
-    expect_new_page_load { f('button[type="submit"]').click }
-    expect(f("div.progressStatus").text.include?("Queued")).to be(true)
+    expect_new_page_load { CourseCopyPage.create_course_button.click }
+    expect(ContentMigrationPage.progress_status_label.text.include?("Queued")).to be(true)
     run_jobs
     wait_for_ajaximations
     wait_for_migration_to_complete
@@ -63,8 +67,8 @@ describe "course copy" do
     past_term_id = EnrollmentTerm.create(end_at: 1.day.ago, root_account: @teacher.account).id
     @course.update! enrollment_term_id: past_term_id, conclude_at: 5.days.from_now, restrict_enrollments_to_course_dates: true
     get "/courses/#{@course.id}/copy"
-    expect_new_page_load { f('button[type="submit"]').click }
-    expect(f("body")).not_to contain_css("#unauthorized_message")
+    expect_new_page_load { CourseCopyPage.create_course_button.click }
+    expect(CourseCopyPage.body).not_to contain_css("#unauthorized_message")
   end
 
   it "sets the course name and code correctly" do
@@ -72,12 +76,10 @@ describe "course copy" do
 
     get "/courses/#{@course.id}/copy"
 
-    name = f("#course_name")
-    replace_content(name, "course name of testing")
-    name = f("#course_course_code")
-    replace_content(name, "course code of testing")
+    replace_content(CourseCopyPage.course_name_input, "course name of testing")
+    replace_content(CourseCopyPage.course_code_input, "course code of testing")
 
-    expect_new_page_load { f('button[type="submit"]').click }
+    expect_new_page_load { CourseCopyPage.create_course_button.click }
 
     new_course = Course.last
     expect(new_course.name).to eq "course name of testing"
@@ -89,18 +91,18 @@ describe "course copy" do
 
     get "/courses/#{@course.id}/copy"
 
-    f("#dateAdjustCheckbox").click
+    CourseCopyPage.date_adjust_checkbox.click
 
-    replace_and_proceed(f("#oldStartDate"), "7/1/2012")
-    replace_and_proceed(f("#oldEndDate"), "Jul 11, 2012")
-    replace_and_proceed(f("#newStartDate"), "8-5-2012")
-    replace_and_proceed(f("#newEndDate"), "Aug 15, 2012")
+    replace_and_proceed(CourseCopyPage.old_start_date_input, "7/1/2012")
+    replace_and_proceed(CourseCopyPage.old_end_date_input, "Jul 11, 2012")
+    replace_and_proceed(CourseCopyPage.new_start_date_input, "8-5-2012")
+    replace_and_proceed(CourseCopyPage.new_end_date_input, "Aug 15, 2012")
 
-    f("#addDaySubstitution").click
+    CourseCopyPage.add_day_substitution_button.click
     click_option("#daySubstitution ul > div:nth-child(1) .currentDay", "1", :value)
     click_option("#daySubstitution ul > div:nth-child(1) .subDay", "2", :value)
 
-    expect_new_page_load { f('button[type="submit"]').click }
+    expect_new_page_load { CourseCopyPage.create_course_button.click }
 
     opts = ContentMigration.last.migration_settings["date_shift_options"]
     expect(opts["shift_dates"]).to eq "1"
@@ -121,9 +123,9 @@ describe "course copy" do
 
     get "/courses/#{@course.id}/copy"
 
-    f("#dateAdjustCheckbox").click
-    f("#dateRemoveOption").click
-    expect_new_page_load { f('button[type="submit"]').click }
+    CourseCopyPage.date_adjust_checkbox.click
+    CourseCopyPage.date_remove_option.click
+    expect_new_page_load { CourseCopyPage.create_course_button.click }
 
     opts = ContentMigration.last.migration_settings["date_shift_options"]
     expect(opts["remove_dates"]).to eq "1"
@@ -137,10 +139,10 @@ describe "course copy" do
     @course.save!
 
     get "/courses/#{@course.id}/settings"
-    link = f(".copy_course_link")
+    link = CourseCopyPage.course_copy_link
     expect(link).to be_displayed
     expect_new_page_load { link.click }
-    expect_new_page_load { f('button[type="submit"]').click }
+    expect_new_page_load { CourseCopyPage.create_course_button.click }
     run_jobs
     wait_for_ajaximations
     wait_for_migration_to_complete
@@ -154,15 +156,14 @@ describe "course copy" do
 
     get "/courses/#{@course.id}/copy"
 
-    replace_content(f("#course_start_at"), "Aug 15, 2012")
-    replace_and_proceed(f("#course_conclude_at"), "Jul 11, 2012")
+    replace_content(CourseCopyPage.course_start_at_input, "Aug 15, 2012")
+    replace_and_proceed(CourseCopyPage.course_conclude_at_input, "Jul 11, 2012")
 
-    button = f("button.btn-primary")
-    expect(button).to be_disabled
+    expect(CourseCopyPage.create_course_button).to be_disabled
 
-    replace_and_proceed(f("#course_conclude_at"), "Aug 30, 2012")
+    replace_and_proceed(CourseCopyPage.course_conclude_at_input, "Aug 30, 2012")
 
-    expect(button).not_to be_disabled
+    expect(CourseCopyPage.create_course_button).not_to be_disabled
   end
 
   context "with calendar events" do
@@ -187,11 +188,11 @@ describe "course copy" do
 
       get "/courses/#{@course.id}/copy"
       new_course_name = "copied course"
-      replace_content(f("input[type=text][id=course_name]"), new_course_name)
-      replace_content(f("input[type=text][id=course_course_code]"), "copied")
-      f("input[type=checkbox][id=dateAdjustCheckbox]").click
+      replace_content(CourseCopyPage.course_name_input, new_course_name)
+      replace_content(CourseCopyPage.course_code_input, "copied")
+      CourseCopyPage.date_adjust_checkbox.click
       date = 1.week.from_now.strftime("%Y-%m-%d")
-      replace_content(f("input[type=text][id=newStartDate]"), date, tab_out: true)
+      replace_content(CourseCopyPage.new_start_date_input, date, tab_out: true)
       expect_new_page_load { submit_form("#copy_course_form") }
       run_jobs
 

@@ -37,6 +37,7 @@ class Enrollment < ActiveRecord::Base
   belongs_to :user, inverse_of: :enrollments
   belongs_to :sis_pseudonym, class_name: "Pseudonym", inverse_of: :sis_enrollments
   belongs_to :associated_user, class_name: "User"
+  belongs_to :temporary_enrollment_pairing, inverse_of: :enrollments
 
   belongs_to :role
   include Role::AssociationHelper

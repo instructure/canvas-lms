@@ -16,13 +16,39 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+export const MODULE_NAME = 'TempEnroll'
+
+export interface Course {
+  readonly id: string
+  readonly name: string
+  readonly workflow_state: string
+  readonly enrollments: Enrollment[]
+  readonly sections: Section[]
+}
+
+export interface Section {
+  readonly course_section_id: string
+  readonly course_id: string
+  readonly id: string
+  readonly name: string
+  readonly enrollment_role: string
+}
+
+export interface Role {
+  readonly id: string
+  readonly role: string
+  readonly label: string
+  readonly base_role_name: string
+}
+
 export interface Enrollment {
-  id: number
-  course_id: number
-  user: User
-  start_at: string | null
-  end_at: string | null
-  type: string
+  readonly id: number
+  readonly course_id: number
+  readonly user: User
+  readonly start_at: string | null
+  readonly end_at: string | null
+  readonly role_id: string
+  readonly type: string
 }
 
 export const PROVIDER = 'provider' as const
@@ -31,6 +57,25 @@ export const RECIPIENT = 'recipient' as const
 export type EnrollmentType = typeof PROVIDER | typeof RECIPIENT | null
 
 export interface User {
-  id: number
-  name: string
+  readonly email?: string | null
+  readonly login_id?: string | null
+  readonly avatar_url?: string
+  readonly id: string
+  readonly name: string
+  readonly sis_user_id?: string | null
+}
+
+export const EMPTY_USER: User = {
+  email: null,
+  login_id: null,
+  avatar_url: '',
+  id: '',
+  name: '',
+  sis_user_id: null,
+}
+
+export interface TempEnrollPermissions {
+  readonly canEdit: boolean
+  readonly canAdd: boolean
+  readonly canDelete: boolean
 }

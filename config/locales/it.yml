@@ -2084,6 +2084,7 @@ it:
   add_app_baf540f: "Aggiungi app"
   add_as_a_faculty_journal_entry_55a38a30: "Aggiungi una voce del registro note"
   add_as_allowed_e95540be: "Aggiungi come Permesso"
+  add_assignment_da1c1529: "Aggiungi compito"
   add_assignment_to_name_caf173b0: "Aggiungi compito a %{name}"
   add_assignments_and_quizzes_1085d2af: "Aggiungi compiti e quiz"
   add_attachment_93868828: "Aggiungi allegato"
@@ -2165,6 +2166,7 @@ it:
   add_moderator_review_copy_1st_a484c813: "Aggiungi revisione moderatore (1ª copia)"
   add_moderator_review_copy_2nd_e80d458f: "Aggiungi revisione moderatore (2ª copia)"
   add_moderator_review_new_3c183cea: "Aggiungi revisione moderatore (nuova)"
+  add_module_5ad6fee2: "Aggiungi modulo"
   add_more_e1ffaa65: "Aggiungi altro"
   add_name_db699e72: "Aggiungi %{name}"
   add_new_announcement_ddacd624: "Aggiungi nuovo annuncio"
@@ -2318,6 +2320,7 @@ it:
   admins_3e1dce15: Amministratori
   admins_add_remove_26811ce5: "Amministratori - aggiungi/rimuovi"
   advanced_36b35b8: Avanzate
+  advanced_analytics_course_readiness_closed_alpha_13c8aaf: "Advanced Analytics - Alfa disponibilità corso chiusa"
   advertise_release_notes_via_the_ui_9254bc6c: "Annunciare le note sulla versione tramite l'interfaccia utente"
   affects_viewing_the_conclude_course_and_permanentl_8216fcc2: "Influisce sulla visualizzazione dei pulsanti Conclusi corso ed Elimina definitivamente questo corso. Il pulsante Elimina definitivamente questo corso viene visualizzato solo per i corsi creati manualmente."
   affects_viewing_the_conclude_course_and_permanentl_d943656e: "Influisce sulla visualizzazione dei pulsanti Conclusi corso ed Elimina definitivamente questo corso. Il pulsante Elimina definitivamente questo corso viene visualizzato solo per i corsi creati manualmente.\n\
@@ -3727,6 +3730,7 @@ it:
   archive_operation_failed_5504706: "Archiviazione non riuscita"
   archive_selected_d64506ca: "Archivia elemento selezionato"
   archived_de543437: Archiviato
+  archived_grading_schemes_6d698d0: "Schemi di valutazione archiviati"
   are_you_sure_26795d3c: Continuare?
   are_you_sure_that_you_want_to_remove_these_count_o_67ef2d6c: 
     one: "Sicuri di voler rimuovere questo risultato da questo account?"
@@ -3775,7 +3779,7 @@ it:
   are_you_sure_you_want_to_delete_this_rubric_this_a_d4ff43c7: "Vuoi eliminare questa rubrica? Questa azione rimuoverà questa associazione della rubrica da tutti i compiti nel corso corrente ed eliminerà tutte le valutazioni associate esistenti."
   are_you_sure_you_want_to_delete_this_setting_be350e82: "Eliminare questa impostazione?"
   are_you_sure_you_want_to_delete_this_to_do_item_497016ea: "Vuoi eliminare questo elemento dell'elenco di attività?"
-  are_you_sure_you_want_to_delete_this_topic_403a0f40: "Sicuro di voler eliminare questo argomento?"
+  are_you_sure_you_want_to_delete_this_topic_403a0f40: "Eliminare questo argomento?"
   are_you_sure_you_want_to_delete_this_topic_c0466e91: "Eliminare questo argomento?"
   are_you_sure_you_want_to_delete_this_track_f5a16357: "Vuoi eliminare questa traccia?"
   are_you_sure_you_want_to_delete_your_copy_of_these_f04442ed: 
@@ -4067,6 +4071,7 @@ it:
   assignment_score_summary_f1dc9708: "Riepilogo punteggio compito"
   assignment_selection_6bff05c4: "Selezione compiti"
   assignment_set_set_index_28b1f973: "Set compiti %{set_index}"
+  assignment_settings_5ee5ee77: "Impostazioni compiti"
   assignment_submissions_uploaded_ba0dbc84: "%{assignment}: Consegne caricate"
   assignment_title_82b4422e: "Titolo compito:"
   assignment_title_8a707dd2: "titolo compito"
@@ -5832,6 +5837,7 @@ it:
   cannot_move_assignments_due_to_closed_grading_peri_59fc3c4: "Impossibile spostare i compiti perché i periodi di valutazione sono chiusi"
   cannot_move_events_with_section_specific_times_bet_3fe871fc: "Impossibile spostare eventi con tempi specifici di sezione compresi tra i calendari"
   cannot_move_scheduler_appointments_between_calenda_253e5ea3: "Impossibile spostare appuntamenti Unità di pianificazione tra i calendari"
+  cannot_reference_self_16dfcd49: "impossibile eseguire auto-riferimento"
   cannot_relink_unsaved_paces_3ed42012: "Impossibile ricollegare velocità non salvate"
   cannot_relink_unsaved_plans_2ccef56a: "Impossibile ricollegare piani non salvati"
   cannot_remove_c0fd581d: "Impossibile rimuovere:"
@@ -7622,6 +7628,7 @@ it:
   couldn_t_load_previous_content_migrations_a0ef5d7a: "Impossibile caricare migrazione contenuti precedenti"
   couldn_t_save_account_calendar_visibilities_343459d1: "Impossibile salvare le visibilità del calendario account"
   couldn_t_track_assigning_students_to_groups_but_it_b6510770: "Impossibile monitorare l’assegnazione di studenti ai gruppi, ma è ancora in corso! Controlla manualmente il risultato in un secondo tempo. (%{errorMessage})"
+  couldn_t_update_content_migrations_68777765: "Impossibile aggiornare migrazione contenuti"
   couldn_t_update_standards_for_authority_auth_81206187: "Impossibile aggiornare gli standard per l'autorità %{auth}"
   count_40eced3b: Conteggio
   count_account_calendars_found_b1eed2e3: 
@@ -11139,6 +11146,7 @@ it:
   error_creating_conversation_1d814618: "Errore di creazione conversazione"
   error_creating_course_ae61c2bd: "Errore di creazione corso"
   error_creating_discussion_topic_a5f809ec: "Errore durante la creazione di argomenti di discussione"
+  error_creating_modulename_cd0f5c2e: "Errore creazione %{moduleName}"
   error_creating_new_course_9d3903bc: "Errore di creazione nuovo corso"
   error_creating_new_subject_89f16abe: "Errore di creazione nuovo oggetto"
   error_creating_submission_comment_a5374fcf: "Errore di creazione commento consegna"
@@ -11199,6 +11207,7 @@ it:
   error_the_tool_returned_an_invalid_content_type_co_10a11c07: "Errore: Lo strumento ha restituito un tipo di contenuto non valido \"%{contentType}\""
   error_updating_cluster_error_674e5f2e: "Errore durante l’aggiornamento di %{cluster}: %{error}"
   error_updating_comment_4b80c76d: "Errore durante l’aggiornamento del commento"
+  error_updating_discussion_topic_64522a23: "Errore aggiornamento argomento di discussione"
   error_updating_module_access_f0970f4c: "Errore di aggiornamento accesso al modulo."
   error_updating_modulename_settings_da982acf: "Errore durante il caricamento delle impostazioni %{moduleName}."
   error_updating_notes_31b24785: "Errore durante l'aggiornamento delle note"
@@ -11579,6 +11588,7 @@ it:
   failed_to_export_course_paces_e17583ba: "Esportazione velocità corso non riuscita"
   failed_to_export_pace_plans_9832daac: "Impossibile esportare programmi di velocità"
   failed_to_export_some_tool_settings_c992fc56: "Esportazione di alcune impostazioni dello strumento non riuscita"
+  failed_to_fetch_content_for_import_a042cc27: "Impossibile recuperare contenuto per l’importazione."
   failed_to_fetch_migration_issues_data_a896da98: "Impossibile recuperare i dati dei problemi di migrazione."
   failed_to_get_new_activity_17e7ec7c: "Impossibile trovare la nuova attività"
   failed_to_ignore_assignment_46565fa3: "Impossibile ignorare compito"
@@ -12571,6 +12581,7 @@ it:
       submissions_upload: "%{assignment} Caricamento consegne"
   graded_25cd3fcd: Valutato
   graded_date_by_grader_e8e1ff75: "%{graded_date} di %{grader}"
+  graded_discussion_17cc8eaf: "Discussione con valutazione"
   graded_discussion_a873bb3e: "Discussione con valutazione:"
   graded_quiz_7fabdf1f: "Quiz con valutazione"
   graded_submissions_9c7068a2: "Consegne valutate:"
@@ -13683,7 +13694,7 @@ it:
       Se abilitati, i moduli di installazione e configurazione strumento che si trovano nelle pagine delle impostazioni Account e Corso utilizzeranno
       i componenti InstUI, invece dei componenti locali più vecchi meno accessibili.
   if_enabled_the_user_s_lti_url_input_on_the_select__fa539830: |-
-      Se abilitato, l’inserimento dell’URL LTI dell’utente nella finestra di dialogo selezionata sarà sovrascritto 
+      Se abilitato, l’inserimento dell’URL LTI dell’utente nella finestra di dialogo selezionata sarà sovrascritto
       se lo strumento risponde con un URL LTI valido.
   if_enabled_the_user_will_see_a_warning_alert_box_n_d85c7b1f: |-
       Se abilitato, l’utente vedrà una casella di avviso vicino alla parte superiore della pagina
@@ -14523,7 +14534,7 @@ it:
   k20_beta_description: "Attiva le funzioni K20 Beta nell’app Admin Analytics."
   k20_course_readiness_alpha_testing_description: "Questo flag è per i partecipanti di un istituto nel test Alpha Advanced Analytics. Questo flag abilita la dashboard Disponibilità corso per questi istituti."
   k20_course_readiness_alpha_testing_f45597b6: "K20 - Test Alpha Disponibilità corso"
-  k20_course_readiness_description: "Abilita la nuova Dashboard Admin Analytics Disponibilità corso."
+  k20_course_readiness_description: "Abilita la dashboard disponibilità corso Advanced Analytics per i tester Alpha."
   k_2521301c: k
   kazakhstan_7_8fe892c: "Kazakistan (+7)"
   keep_8f3e7c16: Mantieni
@@ -14971,6 +14982,7 @@ it:
   loading_comments_32366acf: "Caricamento commenti"
   loading_completion_b62ca82f: "Caricamento completato"
   loading_compose_modal_f6da0e8b: "Caricamento di Componi modale"
+  loading_content_for_import_4ed89a17: "Caricamento contenuto per l’importazione."
   loading_conversation_messages_71e9050e: "Caricamento messaggi conversazione"
   loading_courses_409a3641: "Caricamento corsi"
   loading_courses_bd1bffe: "Caricamento dei corsi in corso..."
@@ -15017,6 +15029,7 @@ it:
   loading_missing_assignments_link_d9a0d320: "Collegamento compiti mancanti in corso"
   loading_more_grade_history_results_b235de5: "Caricamento di ulteriori risultati della cronologia dei voti."
   loading_more_gradebook_history_results_810f6d2e: "Caricamento di ulteriori risultati della cronologia del registro dei voti."
+  loading_more_issues_b14f8f7d: "Caricamento di ulteriori problemi"
   loading_more_replies_22e0f13c: "Caricamento di altre risposte"
   loading_more_results_1d437202: "Caricamento di ulteriori risultati"
   loading_more_results_def6df65: "Caricamento di ulteriori risultati in corso..."
@@ -17499,6 +17512,7 @@ it:
   module_publish_menu_30b638dd: "Menu pubblicazione modulo"
   module_publish_menu_88b54c1b: "Menu pubblicazione modulo"
   module_published_80f0b9b8: "Modulo pubblicato"
+  modulename_created_successfully_6c273e09: "%{moduleName} creato correttamente."
   modulename_module_publish_options_69ef1ece: "Opzioni pubblicazione modulo %{moduleName}"
   modulename_module_publish_options_publishedstatus_94ea7f49: "Opzioni pubblicazione modulo %{moduleName}, %{publishedStatus}"
   modulename_settings_updated_successfully_a09bfef6: "Impostazioni %{moduleName} aggiornate correttamente."
@@ -18025,6 +18039,7 @@ it:
   no_existing_user_provided_for_login_with_sis_id_us_6bcde71f: "Non c’è alcun utente con login con l’ID SIS %{user_id}"
   no_explainer_text_available_9d9a2f3c: "Nessun testo di spiegazione disponibile"
   no_exports_to_display_7f1b630b: "Nessuna esportazione da visualizzare"
+  no_file_chosen_9a880793: "Nessun file scelto"
   no_file_selected_92d2ac30: "Nessun file selezionato"
   no_file_submitted_a879fa53: "Nessun file inviato"
   no_first_name_4b772708: "<Nessun nome>"
@@ -18781,6 +18796,9 @@ it:
   optional_filters_9dc03f5e: "Filtri opzionali"
   optionally_include_a_byte_order_mark_in_compatible_f3d0d243: "In alternativa, includi un voto in ordine di byte nelle esportazioni dei fogli di calcolo, in modo da poterli importare in Excel per gli utenti in alcune lingue."
   optionally_include_a_byte_order_mark_in_gradebook__555cc605: "Includi facoltativamente un byte-order mark nelle esportazioni dei registri dei voti in modo che possa essere importato in Excel per gli utenti in alcune impostazioni locali."
+  optioncount_options_available_5a34688e: "%{optionCount} opzioni disponibili."
+  optionname_selected_list_collapsed_9e69b18a: "%{optionName} selezionato. L’elenco si è compresso."
+  optionname_selection_has_been_removed_ff1afe6a: "La selezione %{optionName} è stata rimossa"
   options: 
     ? "false"
     : "No"
@@ -19378,6 +19396,7 @@ it:
   please_enter_a_valid_url_protocol_is_required_e_g__4bc49ab1: "Inserisci un URL valido. Il protocollo (es.. http://, https://, ftp://, tel:, mailto:) è obbligatorio."
   please_enter_your_label_name_7745272d: "Inserisci il tuo %{label_name}:"
   please_enter_your_label_name_and_password_5c56be80: "Inserisci il tuo %{label_name} e la tua password:"
+  please_fix_errors_before_continuing_b1c13e7d: "Risolvere gli errori prima di continuare"
   please_have_the_student_submit_the_file_again_dba514b7: "Lo studente deve inviare nuovamente il file"
   please_insert_a_message_body_bc85cbff: "Inserire un corpo messaggio."
   please_let_them_know_which_page_you_were_viewing_a_c9816406: "Indica la pagina che stavi visualizzando e il link su cui hai fatto clic."
@@ -22124,6 +22143,7 @@ it:
   remove_name_calendar_bdc329d9: "Rimuovi calendario %{name}"
   remove_null_values_from_live_event_payloads_3c826f: "Rimuovi i valori nulli dai payload di eventi live."
   remove_observers_from_courses_703edc34: "Rimuovi osservatori dai corsi"
+  remove_optionname_8a67379b: "Rimuovi %{optionName}"
   remove_outcome_20e16da7: "Rimuovere il risultato?"
   remove_outcome_2feaf5fd: "Rimuovi risultato"
   remove_outcomes_5f8b601c: 
@@ -23116,6 +23136,7 @@ it:
   select_conference_provider_58c7f7fe: "Seleziona provider conferenza"
   select_content: "Seleziona contenuto"
   select_content_7faa4195: "Seleziona contenuto"
+  select_content_b0177809: "Seleziona contenuto"
   select_content_checkbox: 
     select_content_error: "Devi scegliere un'opzione di contenuto"
   select_content_dialog: 
@@ -23131,6 +23152,7 @@ it:
     titles: 
       add_item_to_module: "Aggiungi voce al modulo"
       find_links_using_service: "Trova link utilizzando %{service}"
+  select_content_for_import_9406720: "Seleziona contenuto per l’importazione"
   select_content_type_e49c5bf6: "Seleziona tipo di contenuto"
   select_conversation_subject_3f36074a: "Seleziona conversazione %{subject}"
   select_country_d21cb85a: "Seleziona paese"
@@ -23582,6 +23604,7 @@ it:
         mastery_level: "percentuale al di sopra della quale impostare il livello di padronanza"
         select_and_add_criterion: "Seleziona e aggiungi criterio"
     footer_links: 
+      cookie_notice: "Avviso Cookie"
       facebook: Facebook
       privacy_policy: "Informativa sulla privacy"
       terms_of_service: "Termini di servizio"
@@ -24375,6 +24398,7 @@ it:
   sorted_descending_1e30f0d5: "ordine decrescente"
   sorted_descending_84ec84c8: "in ordine decrescente."
   sorted_direction_by_columnname_d049ac44: "Ordinati %{direction} da %{columnName}"
+  source_c377a469: Origine
   source_code_2395ca74: "Codice sorgente"
   source_context_does_not_match_group_context_4b55cee4: "contesto origine non corrisponde a contesto gruppo"
   source_link_c21ecc23: "Link della fonte"
@@ -26621,6 +26645,7 @@ it:
     new_topic: "Nuovo argomento di discussione"
   title_52b8638d: "Titolo:"
   title_appointment_group_you_can_sign_up_for_this_1c254712: "*%{title} gruppo di appuntamenti* Puoi **registrarti** per questo."
+  title_count_c8e20865: "%{title} (%{count})"
   title_current_750a3c65: "%{title} (Attuale)"
   title_due_date_d3f46bfb: "%{title}: Scadenza %{date}"
   title_eb77c512: "%{title}"
@@ -27862,6 +27887,7 @@ it:
   use_semicolons_instead_of_commas_to_separate_field_f50945f2: "Utilizza i punti e virgola anziché le virgole per separare i campi nelle esportazioni del registro dei voti in modo da poterle importare in Excel per gli utenti in alcune impostazioni locali."
   use_semicolons_to_separate_fields_in_compatible_sp_56e0bdd2: "Utilizza il punto e virgola per separare i campi nelle esportazioni dei fogli di calcolo"
   use_semicolons_to_separate_fields_in_gradebook_exp_5fb3b39d: "Utilizza i punti e virgola per separare i campi nelle esportazioni del registro dei voti"
+  use_the_import_content_tool_to_migrate_course_mate_41716290: "Usa lo strumento Importa contenuto per migrare i materiali del corso da altre sorgenti in questo corso."
   use_the_new_assignments_page_dd292b9d: "Usa la pagina del nuovo compito"
   use_the_new_assignments_student_page_944262af: "Utilizza la pagina dello studenti dei nuovi compiti"
   use_the_new_assignments_teacher_page_8add7e46: "Utilizza la pagina dei nuovi compiti dell'insegnante"
@@ -28334,6 +28360,7 @@ it:
   users_can_access_and_create_but_not_edit_individua_c8a62c74: "Gli utenti possono accedere e creare (ma non modificare) singole rubriche di compiti tramite Compiti quando l’autorizzazione Compiti e quiz - Aggiungi/Modifica/Elimina è abilitata."
   users_can_access_the_manage_question_banks_link_on_e411d01: "Gli utenti possono accedere al link Gestisci banche di domande nella pagina Indice quiz quando le autorizzazioni Contenuto corso - Visualizza e Compiti e quiz - Aggiungi/Modifica/Elimina sono abilitate."
   users_can_add_this_calendar_to_their_other_calenda_69daaa69: "Gli utenti possono aggiungere questo calendario al loro elenco \"Altri calendari\"."
+  users_can_now_archive_grading_schemes_preventing_t_48605092: "Ora gli studenti possono archiviare schemi di valutazione, evitando che siano aggiunti ai corsi/compiti. Gli schemi di valutazione utilizzati in contesti precedenti continueranno ad essere utilizzati. È possibile accedere agli schemi di valutazione archiviati nella pagina delle impostazioni dello schema di valutazione a livello di account, ma non possono essere modificati o eliminati."
   users_can_temporarily_enroll_another_user_in_a_cou_ce9b48ed: "Gli utenti possono iscrivere temporaneamente un altro utente in un corso. L’utente assegnato viene rimosso dal corso quando l’iscrizione scade."
   users_d1b60cb0: Utenti
   users_designers_22195c6f: "Utenti - Progettisti"
@@ -29098,6 +29125,7 @@ it:
   you_do_not_have_permission_to_publish_this_course_ff361c82: "Non disponi dell'autorizzazione per pubblicare questo corso."
   you_do_not_have_permission_to_view_announcements_i_6b2e31a2: "Non hai l’autorizzazione per visualizzare gli annunci in questo corso."
   you_do_not_have_permissions_to_build_this_moderate_bd5d350a: "Non disponi dell'autorizzazione per creare questo compito moderato"
+  you_do_not_have_permissions_to_create_assignments__f554cd6a: "Non disponi delle autorizzazioni per creare compiti nel corso fornito"
   you_do_not_have_permissions_to_edit_this_moderated_3195294f: "Non si dispone dei permessi per modificare questo compito moderato"
   you_do_not_have_permissions_to_modify_discussion_f_a163d8be: "Non possiedi le autorizzazioni per modificare la discussione per le sezioni %{section_ids}"
   you_don_t_have_access_to_view_this_resource_8378e0e8: "Non hai l’accesso per visualizzare questa risorsa."
@@ -29310,6 +29338,7 @@ it:
   your_media_has_been_uploaded_and_will_appear_here__8546af57: "I tuoi supporti multimediali sono stati caricati e saranno visualizzati qui dopo l’elaborazione."
   your_message_has_been_sent_thank_you_e0284316: "Il tuo messaggio è stato inviato. Grazie."
   your_message_was_sent_977f6583: "Il tuo messaggio è stato inviato."
+  your_migration_can_not_exceed_file_size_b0dda25f: "La tua migrazione non può superare i %{file_size}"
   your_modules_will_appear_here_after_they_re_assemb_bfd5abe8: "I tuoi moduli compariranno qui dopo essere stati assemblati."
   your_name_7665e1d8: "Il tuo nome"
   your_outcomes_were_successfully_imported_c5de884: "I tuoi esiti sono stati importati."

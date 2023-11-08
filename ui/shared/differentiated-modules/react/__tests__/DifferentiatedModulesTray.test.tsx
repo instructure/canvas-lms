@@ -26,8 +26,8 @@ describe('DifferentiatedModulesTray', () => {
   const props: DifferentiatedModulesTrayProps = {
     onDismiss: () => {},
     moduleElement: document.createElement('div'),
+    moduleId: '1',
     initialTab: 'assign-to',
-    assignOnly: true,
     courseId: '1',
   }
 
@@ -46,27 +46,36 @@ describe('DifferentiatedModulesTray', () => {
     expect(onDismiss).toHaveBeenCalled()
   })
 
-  it('does not render tabs when assignOnly is true', () => {
-    const {queryByTestId} = renderComponent()
-    expect(queryByTestId('assign-to-panel')).not.toBeInTheDocument()
-    expect(queryByTestId('settings-panel')).not.toBeInTheDocument()
-  })
-
-  it('renders tabs when assignOnly is false', () => {
-    const {getByTestId} = renderComponent({assignOnly: false})
+  it('renders tabs when moduleId is set', () => {
+    const {getByTestId} = renderComponent({moduleId: '1'})
     expect(getByTestId('assign-to-panel')).toBeInTheDocument()
     expect(getByTestId('settings-panel')).toBeInTheDocument()
   })
 
-  it('opens to assign to when initialTab is "assign-to"', () => {
-    const {getByRole} = renderComponent({assignOnly: false})
-    expect(getByRole('tab', {name: /Assign To/})).toHaveAttribute('aria-selected', 'true')
+  it('does not render tabs when moduleId is not set"', () => {
+    const {queryByTestId} = renderComponent({moduleId: undefined})
+    expect(queryByTestId('assign-to-panel')).not.toBeInTheDocument()
+    expect(queryByTestId('settings-panel')).not.toBeInTheDocument()
   })
 
   it('opens to settings when initialTab is "settings"', async () => {
-    const {getByRole} = renderComponent({assignOnly: false, initialTab: 'settings'})
+    const {getByRole} = renderComponent({initialTab: 'settings'})
     await waitFor(() =>
       expect(getByRole('tab', {name: /Settings/})).toHaveAttribute('aria-selected', 'true')
     )
+  })
+
+  describe('Module creation', () => {
+    it('renders module creation variant when moduleId is not passed', async () => {
+      const {getByTestId, getByRole, queryByText} = renderComponent({moduleId: undefined})
+      expect(getByTestId('header-label').textContent).toBe('Add Module')
+      expect(queryByText('Edit Module Settings')).not.toBeInTheDocument()
+      expect(getByRole('button', {name: /Add Module/})).toBeInTheDocument()
+    })
+
+    it('does not render the "Assign To" tab', async () => {
+      const {queryByRole} = renderComponent({moduleId: undefined})
+      expect(queryByRole('tab', {name: /Assign To/})).not.toBeInTheDocument()
+    })
   })
 })

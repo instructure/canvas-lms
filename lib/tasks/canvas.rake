@@ -218,22 +218,6 @@ unless $canvas_tasks_loaded
     end
   end
 
-  Switchman::Rake.filter_database_servers do |servers, block|
-    ENV["REGION"]&.split(",")&.each do |region|
-      method = :select!
-      if region[0] == "-"
-        method = :reject!
-        region = region[1..]
-      end
-      if region == "self"
-        servers.send(method, &:in_current_region?)
-      else
-        servers.send(method) { |server| server.in_region?(region) }
-      end
-    end
-    block.call(servers)
-  end
-
   %w[db:pending_migrations db:skipped_migrations db:migrate:predeploy db:migrate:tagged].each do |task_name|
     Switchman::Rake.shardify_task(task_name)
   end

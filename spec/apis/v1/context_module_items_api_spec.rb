@@ -852,6 +852,52 @@ describe "Module Items API", type: :request do
         expect(@external_url_tag.reload.url).to eq new_url
       end
 
+      context "with external tool tags" do
+        before do
+          @external_tool_tag = @module1.add_item(type: "context_external_tool",
+                                                 title: "Example Tool",
+                                                 url: "http://example.com/tool")
+        end
+
+        it "removes the content_id if the external url is changed to a tool that doesn't exist" do
+          expect(@external_tool_tag.content_id).not_to be_nil
+          new_url = "http://example.org/new_tool"
+          json = api_call(:put,
+                          "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@external_tool_tag.id}",
+                          { controller: "context_module_items_api",
+                            action: "update",
+                            format: "json",
+                            course_id: @course.id.to_s,
+                            module_id: @module1.id.to_s,
+                            id: @external_tool_tag.id.to_s },
+                          { module_item: { external_url: new_url } })
+
+          expect(json["external_url"]).to eq new_url
+          @external_tool_tag.reload
+          expect(@external_tool_tag.url).to eq new_url
+          expect(@external_tool_tag.content_id).to be_nil
+        end
+
+        it "sets the content_id for an external tool item if the url is changed to another tool" do
+          new_url = "http://example.org/new_tool"
+          tool = @course.context_external_tools.create!(name: "a", url: new_url, consumer_key: "12345", shared_secret: "secret")
+          json = api_call(:put,
+                          "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@external_tool_tag.id}",
+                          { controller: "context_module_items_api",
+                            action: "update",
+                            format: "json",
+                            course_id: @course.id.to_s,
+                            module_id: @module1.id.to_s,
+                            id: @external_tool_tag.id.to_s },
+                          { module_item: { external_url: new_url } })
+
+          expect(json["external_url"]).to eq new_url
+          @external_tool_tag.reload
+          expect(@external_tool_tag.url).to eq new_url
+          expect(@external_tool_tag.content_id).to eq tool.id
+        end
+      end
+
       it "ignores the url for a non-applicable type" do
         new_url = "http://example.org/new_tool"
         json = api_call(:put,

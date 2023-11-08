@@ -18,4 +18,47 @@ paths:
           headers:
             location:
               type: string
-
+  /api/lti/registrations:
+    post:
+      summary: TBD
+      responses:
+        '200':
+          description: "The tool registration was created."
+        '401':
+          description: "The provided token was invalid."
+        '422':
+          description: "The lti tool registration configuration was invalid."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                application_type:
+                  type: string
+                grant_types:
+                  type: array
+                response_types:
+                  type: array
+                redirect_uris:
+                  type: array
+                initiate_login_uri:
+                  type: string
+                client_name:
+                  type: string
+                jwks_uri:
+                  type: string
+                token_endpoint_auth_method:
+                  type: string
+                lti_tool_configuration:
+                  type: object
+                  properties:
+                    domain:
+                      type: string
+                    messages:
+                      type: array
+                    claims:
+                      type: array
+                    target_link_uri:
+                      type: string

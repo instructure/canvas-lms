@@ -17,25 +17,30 @@
  */
 
 import React from 'react'
-import {render, act, waitFor} from '@testing-library/react'
+import {render, screen} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {ActionButton, MigrationIssue} from '../action_button'
+import {ActionButton} from '../action_button'
 
 jest.mock('@canvas/do-fetch-api-effect')
 
-const migrationIssues: [MigrationIssue] = [
-  {
-    id: 1,
-    description: 'My description',
-    workflow_state: 'active',
-    fix_issue_html_url: 'https://mock.fix.url',
-    issue_type: 'error',
-    created_at: '1997-04-15T00:00:00Z',
-    updated_at: '1997-04-15T00:00:00Z',
-    content_migration_url: 'https://mock.migration.url',
-    error_message: 'My error message',
-  },
-]
+const generateMigrationIssues = (length: number) => {
+  const data = []
+  for (let i = 1; i <= length; i++) {
+    data.push({
+      id: i,
+      description: `My description ${i}`,
+      workflow_state: 'active',
+      fix_issue_html_url: 'https://mock.fix.url',
+      issue_type: 'error',
+      created_at: '1997-04-15T00:00:00Z',
+      updated_at: '1997-04-15T00:00:00Z',
+      content_migration_url: 'https://mock.migration.url',
+      error_message: `My error message${i}`,
+    })
+  }
+  return data
+}
 
 const renderComponent = (overrideProps?: any) =>
   render(
@@ -50,98 +55,157 @@ const renderComponent = (overrideProps?: any) =>
 describe('ActionButton', () => {
   afterEach(() => jest.clearAllMocks())
 
-  it('renders button when issues count is greater than zero', async () => {
-    const component = renderComponent()
-    expect(component.getByRole('button', {name: 'View Issues'})).toBeInTheDocument()
+  it('renders button when issues count is greater than zero', () => {
+    renderComponent()
+    expect(screen.getByRole('button', {name: 'View Issues'})).toBeInTheDocument()
   })
 
-  it('does not render button when issues count is zero', async () => {
-    const component = renderComponent({migration_issues_count: 0})
-    expect(component.queryByRole('button', {name: 'View Issues'})).not.toBeInTheDocument()
+  it('does not render button when issues count is zero', () => {
+    renderComponent({migration_issues_count: 0})
+    expect(screen.queryByRole('button', {name: 'View Issues'})).not.toBeInTheDocument()
   })
 
   describe('modal', () => {
-    beforeEach(() => doFetchApi.mockImplementation(() => Promise.resolve({json: migrationIssues})))
+    beforeEach(() =>
+      doFetchApi.mockReturnValue(Promise.resolve({json: generateMigrationIssues(1)}))
+    )
 
-    afterEach(() => jest.clearAllMocks())
+    afterEach(() => {
+      jest.clearAllMocks()
+      jest.resetAllMocks()
+    })
 
     it('opens on click', () => {
-      const component = renderComponent()
-      const button = component.getByRole('button', {name: 'View Issues'})
-      act(() => button.click())
+      renderComponent()
+      userEvent.click(screen.getByRole('button', {name: 'View Issues'}))
       expect(
-        component.getByRole('heading', {name: 'Canvas Cartridge Importer Issues'})
+        screen.getByRole('heading', {name: 'Canvas Cartridge Importer Issues'})
       ).toBeInTheDocument()
     })
 
-    it('fetch issues info', () => {
-      const component = renderComponent()
-      const button = component.getByRole('button', {name: 'View Issues'})
-      act(() => button.click())
+    it('fetch issues list', () => {
+      renderComponent()
+      userEvent.click(screen.getByRole('button', {name: 'View Issues'}))
       expect(doFetchApi).toHaveBeenCalled()
     })
 
-    it('shows issues info', async () => {
-      const component = renderComponent()
-      const button = component.getByRole('button', {name: 'View Issues'})
-      act(() => button.click())
-      await waitFor(() => expect(component.getByRole('link')).toBeInTheDocument())
-      const link = component.getByRole('link')
+    it('shows issues list', async () => {
+      renderComponent()
+      userEvent.click(screen.getByRole('button', {name: 'View Issues'}))
+      const link = await screen.findByRole('link')
       expect(link).toHaveAttribute('href', 'https://mock.fix.url')
-      expect(link).toHaveTextContent('My description')
+      expect(link).toHaveTextContent('My description 1')
+    })
+
+    describe('has more issues', () => {
+      beforeEach(() => {
+        const issues = generateMigrationIssues(15)
+        const page1 = issues.slice(0, 10)
+        const page2 = issues.slice(10, 15)
+        doFetchApi
+          .mockReturnValueOnce(Promise.resolve({json: page1}))
+          .mockReturnValueOnce(Promise.resolve({json: page2}))
+      })
+
+      it('shows "Show More" button', async () => {
+        renderComponent({migration_issues_count: 15})
+        userEvent.click(screen.getByRole('button', {name: 'View Issues'}))
+        expect(await screen.findByRole('button', {name: 'Show More'})).toBeInTheDocument()
+      })
+
+      it('"Show More" button calls fetch', async () => {
+        renderComponent({migration_issues_count: 15})
+        userEvent.click(screen.getByRole('button', {name: 'View Issues'}))
+        userEvent.click(await screen.findByRole('button', {name: 'Show More'}))
+
+        expect(doFetchApi).toHaveBeenCalledWith({
+          path: 'https://mock.issues.url/?page=2&per_page=10',
+          method: 'GET',
+        })
+      })
+
+      it('"Show More" updates issues list', async () => {
+        renderComponent({migration_issues_count: 15})
+        userEvent.click(screen.getByRole('button', {name: 'View Issues'}))
+        userEvent.click(await screen.findByRole('button', {name: 'Show More'}))
+
+        expect(await screen.findByRole('link', {name: 'My description 1'})).toBeInTheDocument()
+        expect(await screen.findByRole('link', {name: 'My description 2'})).toBeInTheDocument()
+        expect(await screen.findByRole('link', {name: 'My description 3'})).toBeInTheDocument()
+        expect(await screen.findByRole('link', {name: 'My description 4'})).toBeInTheDocument()
+        expect(await screen.findByRole('link', {name: 'My description 5'})).toBeInTheDocument()
+        expect(await screen.findByRole('link', {name: 'My description 6'})).toBeInTheDocument()
+        expect(await screen.findByRole('link', {name: 'My description 7'})).toBeInTheDocument()
+        expect(await screen.findByRole('link', {name: 'My description 8'})).toBeInTheDocument()
+        expect(await screen.findByRole('link', {name: 'My description 9'})).toBeInTheDocument()
+        expect(await screen.findByRole('link', {name: 'My description 10'})).toBeInTheDocument()
+        expect(await screen.findByRole('link', {name: 'My description 11'})).toBeInTheDocument()
+        expect(await screen.findByRole('link', {name: 'My description 12'})).toBeInTheDocument()
+        expect(await screen.findByRole('link', {name: 'My description 13'})).toBeInTheDocument()
+        expect(await screen.findByRole('link', {name: 'My description 14'})).toBeInTheDocument()
+        expect(await screen.findByRole('link', {name: 'My description 15'})).toBeInTheDocument()
+      })
+
+      it('shows alert if fetch fails', async () => {
+        doFetchApi.mockReset()
+        doFetchApi
+          .mockReturnValueOnce(Promise.resolve({json: generateMigrationIssues(10)}))
+          .mockImplementationOnce(() => Promise.reject())
+        renderComponent({migration_issues_count: 15})
+        userEvent.click(screen.getByRole('button', {name: 'View Issues'}))
+        userEvent.click(await screen.findByRole('button', {name: 'Show More'}))
+
+        expect(
+          await screen.findByText('Failed to fetch migration issues data.')
+        ).toBeInTheDocument()
+      })
+
+      it('shows spinner when loading more issues', async () => {
+        doFetchApi
+          .mockReturnValueOnce(Promise.resolve({json: generateMigrationIssues(10)}))
+          .mockReturnValueOnce(new Promise(resolve => setTimeout(resolve, 5000)))
+        renderComponent({migration_issues_count: 15})
+        userEvent.click(screen.getByRole('button', {name: 'View Issues'}))
+        userEvent.click(await screen.findByRole('button', {name: 'Show More'}))
+        expect(screen.getByText('Loading more issues')).toBeInTheDocument()
+      })
     })
 
     it('shows alert if fetch fails', async () => {
       doFetchApi.mockImplementation(() => Promise.reject())
-      const component = renderComponent()
-      const button = component.getByRole('button', {name: 'View Issues'})
-      act(() => button.click())
-      await waitFor(() =>
-        expect(component.getByText('Failed to fetch migration issues data.')).toBeInTheDocument()
-      )
+      renderComponent()
+      userEvent.click(screen.getByRole('button', {name: 'View Issues'}))
+
+      expect(await screen.findByText('Failed to fetch migration issues data.')).toBeInTheDocument()
     })
 
     it('shows spinner when loading', () => {
-      doFetchApi.mockImplementation(() => new Promise(resolve => setTimeout(resolve, 5000)))
-      const component = renderComponent()
-      const button = component.getByRole('button', {name: 'View Issues'})
-      act(() => button.click())
-      expect(component.getByText('Loading issues')).toBeInTheDocument()
+      doFetchApi.mockReturnValue(new Promise(resolve => setTimeout(resolve, 5000)))
+      renderComponent()
+      userEvent.click(screen.getByRole('button', {name: 'View Issues'}))
+
+      expect(screen.getByText('Loading issues')).toBeInTheDocument()
     })
 
     it('closes with x button', () => {
-      const component = renderComponent()
-      const button = component.getByRole('button', {name: 'View Issues'})
-      act(() => button.click())
-      const xButton = component.queryAllByText('Close')[0]
-      act(() => xButton.click())
+      renderComponent()
+      userEvent.click(screen.getByRole('button', {name: 'View Issues'}))
+      const xButton = screen.queryAllByText('Close')[0]
+      userEvent.click(xButton)
 
       expect(
-        component.queryByRole('heading', {name: 'Canvas Cartridge Importer Issues'})
-      ).not.toBeInTheDocument()
-    })
-
-    it('closes with cancel button', () => {
-      const component = renderComponent()
-      const button = component.getByRole('button', {name: 'View Issues'})
-      act(() => button.click())
-      const cancelButton = component.getByText('Cancel')
-      act(() => cancelButton.click())
-
-      expect(
-        component.queryByRole('heading', {name: 'Canvas Cartridge Importer Issues'})
+        screen.queryByRole('heading', {name: 'Canvas Cartridge Importer Issues'})
       ).not.toBeInTheDocument()
     })
 
     it('closes with close button', () => {
-      const component = renderComponent()
-      const button = component.getByRole('button', {name: 'View Issues'})
-      act(() => button.click())
-      const closeButton = component.queryAllByText('Close')[1]
-      act(() => closeButton.click())
+      renderComponent()
+      userEvent.click(screen.getByRole('button', {name: 'View Issues'}))
+      const closeButton = screen.queryAllByText('Close')[1]
+      userEvent.click(closeButton)
 
       expect(
-        component.queryByRole('heading', {name: 'Canvas Cartridge Importer Issues'})
+        screen.queryByRole('heading', {name: 'Canvas Cartridge Importer Issues'})
       ).not.toBeInTheDocument()
     })
   })

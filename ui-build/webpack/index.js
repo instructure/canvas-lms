@@ -211,7 +211,7 @@ module.exports = {
     webpackHooks,
     controlAccessBetweenModules,
     setMoreEnvVars,
-    retryChunkLoading,
+    process.env.NODE_ENV !== 'development' && retryChunkLoading,
 
     !shouldWriteCache && readOnlyCache,
 

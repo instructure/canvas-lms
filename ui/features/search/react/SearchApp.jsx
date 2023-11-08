@@ -16,13 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { useState } from 'react'
+import React, {useCallback, useState} from 'react'
 import {TextInput} from '@instructure/ui-text-input'
 import {View} from '@instructure/ui-view'
 import {IconSearchLine} from '@instructure/ui-icons'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as useI18nScope} from '@canvas/i18n'
-
+import useFetchApi from '@canvas/use-fetch-api-hook'
+import Paginator from '@canvas/instui-bindings/react/Paginator'
 import SearchResults from './SearchResults'
 
 const I18n = useI18nScope('SmartSearch')
@@ -32,28 +33,46 @@ export default function SearchApp() {
   const [searchString, setSearchString] = useState('');
   const [searching, setSearching] = useState(false);
   const [textInput, setTextInput] = useState(null);
+  const [textInputValue, setTextInputValue] = useState('');
+  const [page, setPage] = useState(1);
+  const [pageCount, setPageCount] = useState(1);
 
-  async function handleKey(event) {
+  function handleChange(e, value) {
+    setTextInputValue(value)
+  }
+
+  function handleKey(event) {
     if (event.key === 'Enter' && event.type === 'keydown') {
-      setSearching(true)
-      await runSearch(searchString)
-      setSearching(false)
-      textInput.focus()
+      setPage(1)
+      setPageCount(1)
+      setSearchString(textInputValue)
     }
   }
 
-  function handleChange(e, value) {
-    setSearchString(value)
-  }
-
-  async function runSearch(searchString) {
-    const res = await fetch(`/smartsearch?q=${searchString}`)
-    const json = await res.json()
-
-    const searchResults = json.results
-
-    setSearchResults(searchResults)
-  }
+  useFetchApi(
+    {
+      path: '/smartsearch',
+      params: {
+        q: searchString,
+        page: page
+      },
+      forceResult: searchString ? undefined : { results: [] },
+      loading: useCallback(isLoading => {
+        setSearching(isLoading)
+        if (isLoading) {
+          setSearchResults([])
+        }
+      }, []),
+      meta: useCallback(({link}) => {
+        setPageCount(parseInt(link.last?.page, 10) || 1)
+      }, []),
+      success: useCallback(json => {
+        setSearchResults(json.results)
+        textInput?.focus()
+      }, [textInput]),
+    },
+    [searchString, page]
+  )
 
   return (
     <View>
@@ -63,13 +82,24 @@ export default function SearchApp() {
           interaction={searching ? 'disabled' : 'enabled'}
           ref={e => (setTextInput(e))}
           onChange={handleChange}
-          value={searchString}
+          value={textInputValue}
           renderAfterInput={() => <IconSearchLine />}
         />
       </div>
-      {searching ? <Spinner renderTitle={I18n.t('Searching')} /> : null}
 
-      <SearchResults searchResults={searchResults} />
+      {searching ?
+        <Spinner renderTitle={I18n.t('Searching')} /> :
+        <SearchResults searchResults={searchResults} />
+      }
+
+      {pageCount > 1 ? (
+        <Paginator
+          pageCount={pageCount}
+          page={page}
+          loadPage={p => setPage(p)}
+          margin="small"
+        />
+      ) : null}
     </View>
   )
 }

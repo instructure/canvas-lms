@@ -26,8 +26,13 @@ import {NodeStructure} from './EnrollmentTree'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
 import RoleMismatchToolTip from './RoleMismatchToolTip'
+import {createAnalyticPropsGenerator} from './util/analytics'
+import {MODULE_NAME} from './types'
 
 const I18n = useI18nScope('temporary_enrollment')
+
+// initialize analytics props
+const analyticProps = createAnalyticPropsGenerator(MODULE_NAME)
 
 interface Props extends NodeStructure {
   indent: any
@@ -69,6 +74,7 @@ export function EnrollmentTreeGroup(props: Props) {
       // if parent is a role
       if (props.id.startsWith('r')) {
         for (const course of props.children) {
+          if (course.children.length === 0) return
           if (course.children.length > 1) {
             childRows.push(
               <EnrollmentTreeGroup
@@ -136,15 +142,16 @@ export function EnrollmentTreeGroup(props: Props) {
 
     return (
       <>
-        <Flex key={props.id} padding="x-small" as="div" alignItems="center">
+        <Flex key={props.id} padding="xx-small" as="div" alignItems="center">
           <Flex.Item margin={props.indent}>
             <Checkbox
               data-testid={'check ' + props.id}
               label=""
-              size="large"
+              size="medium"
               checked={props.isCheck}
               indeterminate={props.isMixed}
               onChange={handleCheckboxChange}
+              {...analyticProps('Enrollment')}
             />
           </Flex.Item>
           <Flex.Item margin="0 0 0 x-small">
@@ -152,8 +159,9 @@ export function EnrollmentTreeGroup(props: Props) {
               withBorder={false}
               withBackground={false}
               onClick={handleIconButtonClick}
-              // value={props.isToggle}  <--- this is an invalid prop to IconButton. FIXME
+              size="small"
               screenReaderLabel={I18n.t('Toggle group %{group}', {group: props.label})}
+              {...analyticProps('Group')}
             >
               {toggleIcon}
             </IconButton>

@@ -47,9 +47,66 @@ describe Mutations::CreateDiscussionTopic do
             podcastEnabled
             podcastHasStudentPosts
             isSectionSpecific
+            groupSet {
+              _id
+            }
             courseSections{
               _id
               name
+            }
+          }
+          errors {
+            attribute
+            message
+          }
+        }
+      }
+    GQL
+    context = { current_user:, request: ActionDispatch::TestRequest.create }
+    CanvasSchema.execute(mutation_command, context:)
+  end
+
+  def execute_with_input_with_assignment(create_input, current_user = @teacher)
+    mutation_command = <<~GQL
+      mutation {
+        createDiscussionTopic(input: {
+          #{create_input}
+        }){
+          discussionTopic {
+            _id
+            contextType
+            title
+            message
+            published
+            requireInitialPost
+            anonymousState
+            isAnonymousAuthor
+            delayedPostAt
+            lockAt
+            allowRating
+            onlyGradersCanRate
+            todoDate
+            podcastEnabled
+            podcastHasStudentPosts
+            isSectionSpecific
+            groupSet {
+              _id
+            }
+            courseSections{
+              _id
+              name
+            }
+            assignment {
+              _id
+              name
+              pointsPossible
+              gradingType
+              peerReviews {
+                anonymousReviews
+                automaticReviews
+                count
+                enabled
+              }
             }
           }
           errors {
@@ -433,6 +490,57 @@ describe Mutations::CreateDiscussionTopic do
       end
     end
 
+    context "group category id" do
+      it "creates parent and child dicussion topics" do
+        gc = @course.group_categories.create! name: "foo"
+        gc.groups.create! context: @course, name: "baz"
+        context_type = "Course"
+        title = "Test Title"
+        message = "A message"
+        published = true
+
+        query = <<~GQL
+          contextId: "#{@course.id}"
+          contextType: "#{context_type}"
+          title: "#{title}"
+          message: "#{message}"
+          published: #{published}
+          groupCategoryId: "#{gc.id}"
+        GQL
+
+        result = execute_with_input(query)
+        returned_discussion_topic = result.dig("data", "createDiscussionTopic", "discussionTopic")
+        expect(result["errors"]).to be_nil
+        expect(returned_discussion_topic["groupSet"]["_id"]).to eq gc.id.to_s
+        discussion_topics = DiscussionTopic.last(2)
+        expect(discussion_topics[0].group_category_id).to eq gc.id
+        expect(discussion_topics[1].group_category_id).to eq gc.id
+      end
+
+      it "does not create when id is invalid" do
+        context_type = "Course"
+        title = "Test Title"
+        message = "A message"
+        published = true
+
+        query = <<~GQL
+          contextId: "#{@course.id}"
+          contextType: "#{context_type}"
+          title: "#{title}"
+          message: "#{message}"
+          published: #{published}
+          groupCategoryId: "foo"
+        GQL
+
+        result = execute_with_input(query)
+        returned_discussion_topic = result.dig("data", "createDiscussionTopic", "discussionTopic")
+        expect(result["errors"]).to be_nil
+        expect(returned_discussion_topic["groupSet"]).to be_nil
+        discussion_topics = DiscussionTopic.last
+        expect(discussion_topics.group_category_id).to be_nil
+      end
+    end
+
     context "anonymous_state" do
       it "returns error for anonymous discussions when context is a Group" do
         gc = @course.group_categories.create! name: "foo"
@@ -588,11 +696,42 @@ describe Mutations::CreateDiscussionTopic do
   end
 
   context "delayed_post_at and lock_at" do
-    it "successfully creates a discussion topic with delayed_post_at and lock_at" do
+    it "successfully creates an unpublished discussion topic with delayed_post_at and lock_at" do
       context_type = "Course"
       title = "Delayed Topic"
       message = "Lorem ipsum..."
       published = false
+      require_initial_post = true
+      delayed_post_at = 5.days.from_now.iso8601
+      lock_at = 10.days.from_now.iso8601
+
+      query = <<~GQL
+        contextId: "#{@course.id}"
+        contextType: "#{context_type}"
+        title: "#{title}"
+        message: "#{message}"
+        published: #{published}
+        requireInitialPost: #{require_initial_post}
+        anonymousState: "off"
+        delayedPostAt: "#{delayed_post_at}"
+        lockAt: "#{lock_at}"
+      GQL
+
+      result = execute_with_input(query)
+      discussion_topic = result.dig("data", "createDiscussionTopic", "discussionTopic")
+
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "discussionTopic", "errors")).to be_nil
+      expect(discussion_topic["delayedPostAt"]).to eq delayed_post_at
+      expect(discussion_topic["lockAt"]).to eq lock_at
+      expect(DiscussionTopic.last.workflow_state).to eq "unpublished"
+    end
+
+    it "coerces a created published discussion into post_delayed if delayed_post_at is in the future" do
+      context_type = "Course"
+      title = "Delayed Topic"
+      message = "Lorem ipsum..."
+      published = true
       require_initial_post = true
       delayed_post_at = 5.days.from_now.iso8601
       lock_at = 10.days.from_now.iso8601
@@ -676,6 +815,83 @@ describe Mutations::CreateDiscussionTopic do
       expect(result.dig("data", "discussionTopic", "errors")).to be_nil
       expect(discussion_topic["delayedPostAt"]).to be_nil
       expect(discussion_topic["lockAt"]).to be_nil
+    end
+  end
+
+  context "graded discussion topics" do
+    it "successfully creates a graded discussion topic" do
+      context_type = "Course"
+      title = "Graded Discussion"
+      message = "Lorem ipsum..."
+      published = true
+
+      query = <<~GQL
+        contextId: "#{@course.id}"
+        contextType: "#{context_type}"
+        title: "#{title}"
+        message: "#{message}"
+        published: #{published}
+        assignment: {
+          courseId: "1",
+            name: "#{title}",
+            pointsPossible: 15,
+            gradingType: percent,
+            peerReviews: {
+              anonymousReviews: true,
+              automaticReviews: true,
+              count: 2,
+              enabled: true,
+              intraReviews: true,
+              dueAt: "#{5.days.from_now.iso8601}",
+            }
+          }
+      GQL
+
+      result = execute_with_input_with_assignment(query)
+      discussion_topic = result.dig("data", "createDiscussionTopic", "discussionTopic")
+      expect(result.dig("data", "discussionTopic", "errors")).to be_nil
+      expect(discussion_topic["assignment"]["name"]).to eq title
+      expect(discussion_topic["assignment"]["pointsPossible"]).to eq 15
+      expect(discussion_topic["assignment"]["gradingType"]).to eq "percent"
+      expect(discussion_topic["assignment"]["peerReviews"]["anonymousReviews"]).to be true
+      expect(discussion_topic["assignment"]["peerReviews"]["automaticReviews"]).to be true
+      expect(discussion_topic["assignment"]["peerReviews"]["count"]).to eq 2
+      expect(discussion_topic["assignment"]["_id"]).to eq Assignment.last.id.to_s
+    end
+
+    it "student fails to create graded discussion topic" do
+      context_type = "Course"
+      title = "Graded Discussion"
+      message = "Lorem ipsum..."
+      published = true
+
+      query = <<~GQL
+        contextId: "#{@course.id}"
+        contextType: "#{context_type}"
+        title: "#{title}"
+        message: "#{message}"
+        published: #{published}
+        assignment: {
+          courseId: "1",
+            name: "#{title}",
+            pointsPossible: 15,
+            gradingType: percent,
+            peerReviews: {
+              anonymousReviews: true,
+              automaticReviews: true,
+              count: 2,
+              enabled: true,
+              intraReviews: true,
+              dueAt: "#{5.days.from_now.iso8601}",
+            }
+          }
+      GQL
+
+      student = @course.enroll_student(User.create!, enrollment_state: "active").user
+      result = execute_with_input_with_assignment(query, student)
+      discussion_topic = result.dig("data", "createDiscussionTopic", "discussionTopic")
+      expect(discussion_topic).to be_nil
+      expect(result["data"]["createDiscussionTopic"]["errors"][0]["message"]).to eq "You do not have permissions to create assignments in the provided course"
     end
   end
 end

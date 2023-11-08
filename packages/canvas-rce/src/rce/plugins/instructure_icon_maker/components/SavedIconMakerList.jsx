@@ -19,7 +19,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {View} from '@instructure/ui-view'
-import Images, {RCSImageCollectionType} from '../../instructure_image/Images'
+import Images from '../../instructure_image/Images'
+import {contentTrayDocumentShape} from '../../shared/fileShape'
 import {ICON_MAKER_ICONS} from '../svg/constants'
 
 const SavedIconMakerList = props => {
@@ -66,7 +67,7 @@ SavedIconMakerList.propTypes = {
     sort: PropTypes.oneOf(['date_added', 'alphabetical']).isRequired,
     order: PropTypes.oneOf(['asc', 'desc']).isRequired,
   }),
-  images: RCSImageCollectionType.isRequired,
+  images: contentTrayDocumentShape.isRequired,
   contextType: PropTypes.string.isRequired,
   searchString: PropTypes.string,
   onImageEmbed: PropTypes.func,

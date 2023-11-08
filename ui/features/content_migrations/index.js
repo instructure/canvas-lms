@@ -18,7 +18,7 @@
 
 // Eventually when the feature flag is retired
 // we can divorce from these shenanigans
-if (ENV.FEATURES.instui_for_import_page) {
+if (document.getElementById('instui_content_migrations')) {
   import('./instui_setup')
     .then(() => {})
     .catch(() => {})

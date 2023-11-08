@@ -7667,7 +7667,7 @@ describe Assignment do
       expect(submission_user_ids.sort).to eq [s1.id, s2.id]
     end
 
-    it "works with groups that has number more than 2 strings separeted by underscore" do
+    it "works with groups that has number more than 2 strings separated by underscore" do
       s1, s2 = @students
 
       gc = @course.group_categories.create! name: "12345 Groups"
@@ -7696,6 +7696,47 @@ describe Assignment do
                          grade_group_students_individually: false
       g1, _g2 = Array.new(2) { |i| gc.groups.create! name: "eval123group_12345#{i}", context: @course }
 
+      g1.add_user(s1)
+      g1.add_user(s2)
+
+      submit_homework(s1)
+
+      generate_comments(@teacher)
+      results = @assignment.submission_reupload_progress.results
+      submission_user_ids = results[:comments].map { |c| c[:submission][:user_id] }
+
+      expect(submission_user_ids.sort).to eq [s1.id, s2.id]
+    end
+
+    it "works when the group name is numbers only with one or more spaces" do
+      s1, s2 = @students
+
+      gc = @course.group_categories.create! name: "12345 Groups"
+      @assignment.update group_category_id: gc.id,
+                         grade_group_students_individually: false
+
+      g1 = gc.groups.create!(name: "1 2", context: @course)
+      g1.add_user(s1)
+      g1.add_user(s2)
+
+      submit_homework(s1)
+
+      generate_comments(@teacher)
+      results = @assignment.submission_reupload_progress.results
+      submission_user_ids = results[:comments].map { |c| c[:submission][:user_id] }
+
+      expect(submission_user_ids.sort).to eq [s1.id, s2.id]
+    end
+
+    it "works when there's a group name that matches the end of a student's ID" do
+      s1, s2 = @students
+
+      gc = @course.group_categories.create! name: "12345 Groups"
+      @assignment.update group_category_id: gc.id,
+                         grade_group_students_individually: false
+
+      g1 = gc.groups.create!(name: "012345", context: @course)
+      gc.groups.create!(name: s1.id.to_s.last, context: @course)
       g1.add_user(s1)
       g1.add_user(s2)
 
@@ -11156,11 +11197,11 @@ describe Assignment do
     @assignment.reload
   end
 
-  def submit_homework(student)
+  def submit_homework(student, filename: "homework.pdf")
     file_context = @assignment.group_category.group_for(student) if @assignment.has_group_category?
     file_context ||= student
     a = Attachment.create! context: file_context,
-                           filename: "homework.pdf",
+                           filename:,
                            uploaded_data: StringIO.new("blah blah blah")
     @assignment.submit_homework(student,
                                 attachments: [a],
@@ -11347,6 +11388,40 @@ describe Assignment do
           expect(@course_assignment.restrict_quantitative_data?(@admin)).to be false
         end
       end
+    end
+  end
+
+  describe "checkpointed assignments" do
+    before do
+      @parent = @course.assignments.create!(checkpointed: true, checkpoint_label: CheckpointLabels::PARENT)
+      @child = @parent.checkpoint_assignments.create!(context: @course, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC)
+    end
+
+    it "does not allow parent assignments to have their own parent assignments" do
+      assignment = @course.assignments.create!
+      @parent.parent_assignment = assignment
+      expect(@parent).not_to be_valid
+      expect(@parent.errors.full_messages).to include "Parent assignment must be blank"
+    end
+
+    it "does not allow child assignments to be marked as checkpointed" do
+      @child.checkpointed = true
+      expect(@child).not_to be_valid
+      expect(@child.errors.full_messages).to include "Parent assignment must be blank"
+    end
+
+    it "does not allow child assignments to reference themselves as a parent assignment" do
+      @child.parent_assignment = @child
+      expect(@child).not_to be_valid
+      expect(@child.errors.full_messages).to include "Parent assignment cannot reference self"
+    end
+
+    it "excludes soft-deleted child assignments from the checkpoint_assignments association" do
+      expect { @child.destroy }.to change { @parent.checkpoint_assignments.exists? }.from(true).to(false)
+    end
+
+    it "soft-deletes child assignments when the parent assignment is soft-deleted" do
+      expect { @parent.destroy }.to change { @child.reload.deleted? }.from(false).to(true)
     end
   end
 end

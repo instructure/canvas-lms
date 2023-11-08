@@ -20,6 +20,7 @@
 require_relative "../common"
 require_relative "page_objects/content_migration_page"
 require_relative "page_objects/select_content_page"
+require_relative "page_objects/course_copy_page"
 
 def visit_page
   @course.reload
@@ -28,14 +29,14 @@ end
 
 def select_migration_type(type = nil)
   type ||= @type
-  click_option("#chooseMigrationConverter", type, :value)
+  click_option(CourseCopyPage.migration_type_dropdown_id, type, :value)
 end
 
 def select_migration_file(opts = {})
   filename = opts[:filename] || @filename
 
   new_filename, fullpath, _data = get_file(filename, opts[:data])
-  f("#migrationFileUpload").send_keys(fullpath)
+  ContentMigrationPage.migration_file_upload_input.send_keys(fullpath)
   new_filename
 end
 
@@ -76,25 +77,29 @@ def test_selective_content(source_course = nil)
   visit_page
 
   # Open selective dialog
-  expect(f(".migrationProgressItem .progressStatus")).to include_text("Waiting for Selection")
-  f(".migrationProgressItem .selectContentBtn").click
+  expect(ContentMigrationPage.progress_status_label).to include_text("Waiting for Selection")
+  ContentMigrationPage.select_content_button.click
   wait_for_ajaximations
 
-  f('input[name="copy[all_assignments]"]').click
+  ContentMigrationPage.all_assignments_checkbox.click
 
   # Submit selection
-  f(".selectContentDialog input[type=submit]").click
+  ContentMigrationPage.select_content_submit_button.click
   wait_for_ajaximations
 
   source_course ? run_migration : import
 
   visit_page
 
-  expect(f(".migrationProgressItem .progressStatus")).to include_text("Completed")
+  expect(ContentMigrationPage.progress_status_label).to include_text("Completed")
   expect(@course.assignments.count).to eq(source_course ? source_course.assignments.count : 1)
 end
 
 describe "content migrations", :non_parallel do
+  before(:once) do
+    Account.site_admin.disable_feature! :instui_for_import_page
+  end
+
   include_context "in-process server selenium tests"
 
   def test_selective_outcome(source_course = nil)
@@ -151,7 +156,7 @@ describe "content migrations", :non_parallel do
         fill_migration_form
         wait_for_ajaximations
 
-        ContentMigrationPage.selective_imports(1)
+        ContentMigrationPage.selective_imports(1).click
         submit
         run_migration
 
@@ -173,41 +178,41 @@ describe "content migrations", :non_parallel do
     it "shows each form" do
       visit_page
 
-      migration_types = ff("#chooseMigrationConverter option").pluck("value") - ["none"]
+      migration_types = CourseCopyPage.migration_type_options.pluck("value") - ["none"]
       migration_types.each do |type|
         select_migration_type(type)
 
-        expect(f("#content")).to contain_jqcss("input[type=\"submit\"]:visible")
+        expect(ContentMigrationPage.content).to contain_jqcss("input[type=\"submit\"]:visible")
 
         select_migration_type("none")
-        expect(f("#content")).not_to contain_jqcss("input[type=\"submit\"]:visible")
+        expect(ContentMigrationPage.content).not_to contain_jqcss("input[type=\"submit\"]:visible")
       end
 
       select_migration_type
-      cancel_btn = f("#migrationConverterContainer .cancelBtn")
+      cancel_btn = CourseCopyPage.cancel_copy_button
       expect(cancel_btn).to be_displayed
       cancel_btn.click
 
-      expect(f("#content")).not_to contain_css("#migrationFileUpload")
+      expect(ContentMigrationPage.content).not_to contain_css(ContentMigrationPage.migration_file_upload_input_id)
     end
 
-    it "submit,s queue and list migrations" do
+    it "submit's queue and list migrations" do
       visit_page
       fill_migration_form
-      ff("[name=selective_import]")[0].click
+      ContentMigrationPage.selective_imports(0).click
       submit
 
-      expect(ff(".migrationProgressItem").count).to eq 1
+      expect(ContentMigrationPage.migration_progress_items.count).to eq 1
 
       fill_migration_form(filename: "cc_ark_test.zip")
 
-      ff("[name=selective_import]")[0].click
+      ContentMigrationPage.selective_imports(0).click
       submit
 
       visit_page
       expect(@course.content_migrations.count).to eq 2
 
-      progress_items = ff(".migrationProgressItem")
+      progress_items = ContentMigrationPage.migration_progress_items
       expect(progress_items.count).to eq 2
 
       source_links = []
@@ -234,13 +239,13 @@ describe "content migrations", :non_parallel do
     it "shifts dates" do
       visit_page
       fill_migration_form
-      f("#dateAdjustCheckbox").click
-      ff("[name=selective_import]")[0].click
-      replace_and_proceed(f("#oldStartDate"), "7/1/2014")
-      replace_and_proceed(f("#oldEndDate"), "Jul 11, 2014")
-      replace_and_proceed(f("#newStartDate"), "8-5-2014")
-      replace_and_proceed(f("#newEndDate"), "Aug 15, 2014")
-      2.times { f("#addDaySubstitution").click }
+      CourseCopyPage.date_adjust_checkbox.click
+      ContentMigrationPage.selective_imports(0).click
+      replace_and_proceed(CourseCopyPage.old_start_date_input, "7/1/2014")
+      replace_and_proceed(CourseCopyPage.old_end_date_input, "Jul 11, 2014")
+      replace_and_proceed(CourseCopyPage.new_start_date_input, "8-5-2014")
+      replace_and_proceed(CourseCopyPage.new_end_date_input, "Aug 15, 2014")
+      2.times { CourseCopyPage.add_day_substitution_button.click }
       click_option("#daySubstitution ul > div:nth-child(1) .currentDay", "1", :value)
       click_option("#daySubstitution ul > div:nth-child(1) .subDay", "2", :value)
       click_option("#daySubstitution ul > div:nth-child(2) .currentDay", "5", :value)
@@ -315,12 +320,12 @@ describe "content migrations", :non_parallel do
       click_option("#courseSelect", @course.id.to_s, :value)
       wait_for_ajaximations
 
-      expect(f("#courseSelectWarning")).to be_displayed
+      expect(ContentMigrationPage.course_select_warning).to be_displayed
 
       click_option("#courseSelect", @copy_from.id.to_s, :value)
       wait_for_ajaximations
 
-      expect(f("#courseSelectWarning")).to_not be_displayed
+      expect(ContentMigrationPage.course_select_warning).to_not be_displayed
     end
 
     it "selects by drop-down or by search box", priority: "2" do
@@ -332,17 +337,14 @@ describe "content migrations", :non_parallel do
       expect(f("option[value=\"#{@copy_from.id}\"]")).not_to be_nil
 
       # search bar
-      f("#courseSearchField").send_keys("cop")
-      ui_auto_complete = f(".ui-autocomplete")
-      expect(ui_auto_complete).to be_displayed
+      ContentMigrationPage.course_search_input.send_keys("cop")
+      expect(ContentMigrationPage.ui_auto_complete).to be_displayed
 
-      el = f(".ui-autocomplete li a")
-      divs = ff("div", el)
-      expect(divs[0].text).to eq @copy_from.name
-      expect(divs[1].text).to eq @copy_from.enrollment_term.name
-      el.click
+      expect(ContentMigrationPage.course_search_results[0].text).to eq @copy_from.name
+      expect(ContentMigrationPage.course_search_results[1].text).to eq @copy_from.enrollment_term.name
+      ContentMigrationPage.course_search_link.click
 
-      ff("[name=selective_import]")[0].click
+      ContentMigrationPage.selective_imports(0).click
       submit
 
       cm = @course.content_migrations.last
@@ -350,9 +352,8 @@ describe "content migrations", :non_parallel do
       expect(cm.source_course).to eq @copy_from
       expect(cm.initiated_source).to eq :api_in_app
 
-      source_link = f(".migrationProgressItem .sourceLink a")
-      expect(source_link.text).to eq @copy_from.name
-      expect(source_link["href"]).to include("/courses/#{@copy_from.id}")
+      expect(ContentMigrationPage.source_link.text).to eq @copy_from.name
+      expect(ContentMigrationPage.source_link["href"]).to include("/courses/#{@copy_from.id}")
     end
 
     it "only shows courses the user is authorized to see", priority: "1" do
@@ -362,7 +363,7 @@ describe "content migrations", :non_parallel do
       wait_for_ajaximations
 
       expect(f("option[value=\"#{@copy_from.id}\"]")).not_to be_nil
-      expect(f("#content")).not_to contain_css("option[value=\"#{new_course.id}\"]")
+      expect(ContentMigrationPage.content).not_to contain_css("option[value=\"#{new_course.id}\"]")
 
       user_logged_in(active_all: true)
       @course.enroll_teacher(@user, enrollment_state: "active")
@@ -384,11 +385,11 @@ describe "content migrations", :non_parallel do
 
       select_migration_type
       wait_for_ajaximations
-      expect(f("#content")).to contain_css("option[value=\"#{new_course.id}\"]")
+      expect(ContentMigrationPage.content).to contain_css("option[value=\"#{new_course.id}\"]")
 
-      f("#include_completed_courses").click
+      ContentMigrationPage.include_completed_courses_checkbox.click
       wait_for_ajaximations
-      expect(f("#content")).not_to contain_css("option[value=\"#{new_course.id}\"]")
+      expect(ContentMigrationPage.content).not_to contain_css("option[value=\"#{new_course.id}\"]")
     end
 
     it "finds courses in other accounts", priority: "1" do
@@ -405,17 +406,15 @@ describe "content migrations", :non_parallel do
       select_migration_type
       wait_for_ajaximations
 
-      search = f("#courseSearchField")
+      search = ContentMigrationPage.course_search_input
       search.send_keys("another")
       wait_for_ajaximations
-      divs = ff("div", fj(".ui-autocomplete li a:visible"))
-      expect(divs[0].text).to eq admin_course.name
+      expect(ContentMigrationPage.course_search_results_visible[0].text).to eq admin_course.name
 
       search.clear
       search.send_keys("faraway")
       wait_for_ajaximations
-      divs = ff("div", fj(".ui-autocomplete li a:visible"))
-      expect(divs[0].text).to eq enrolled_course.name
+      expect(ContentMigrationPage.course_search_results_visible[0].text).to eq enrolled_course.name
     end
 
     context "Qti Enabled" do
@@ -446,7 +445,7 @@ describe "content migrations", :non_parallel do
         wait_for_ajaximations
 
         click_option("#courseSelect", @copy_from.id.to_s, :value)
-        ff("[name=selective_import]")[0].click
+        ContentMigrationPage.selective_imports(0).click
         submit
 
         run_migration
@@ -467,7 +466,7 @@ describe "content migrations", :non_parallel do
         wait_for_ajaximations
 
         click_option("#courseSelect", @copy_from.id.to_s, :value)
-        ff("[name=selective_import]")[1].click
+        ContentMigrationPage.selective_imports(1).click
         submit
 
         test_selective_content(@copy_from)
@@ -499,7 +498,7 @@ describe "content migrations", :non_parallel do
         wait_for_ajaximations
 
         click_option("#courseSelect", @copy_from.id.to_s, :value)
-        ContentMigrationPage.selective_imports(1)
+        ContentMigrationPage.selective_imports(1).click
         submit
 
         test_selective_outcome(@copy_from)
@@ -515,14 +514,14 @@ describe "content migrations", :non_parallel do
       wait_for_ajaximations
       click_option("#courseSelect", new_course.id.to_s, :value)
 
-      f("#dateAdjustCheckbox").click
+      CourseCopyPage.date_adjust_checkbox.click
       3.times do
-        f("#addDaySubstitution").click
+        CourseCopyPage.add_day_substitution_button.click
       end
 
-      expect(ff("#daySubstitution ul > div").count).to eq 3
-      f("#daySubstitution ul > div a").click # Remove day substitution
-      expect(ff("#daySubstitution ul > div").count).to eq 2
+      expect(CourseCopyPage.day_substitution_containers.count).to eq 3
+      CourseCopyPage.day_substitution_delete_button.click # Remove day substitution
+      expect(CourseCopyPage.day_substitution_containers.count).to eq 2
 
       click_option("#daySubstitution ul > div:nth-child(1) .currentDay", "1", :value)
       click_option("#daySubstitution ul > div:nth-child(1) .subDay", "2", :value)
@@ -530,13 +529,13 @@ describe "content migrations", :non_parallel do
       click_option("#daySubstitution ul > div:nth-child(2) .currentDay", "2", :value)
       click_option("#daySubstitution ul > div:nth-child(2) .subDay", "3", :value)
 
-      f("#oldStartDate").send_keys("7/1/2012")
-      f("#oldEndDate").send_keys("Jul 11, 2012")
-      f("#newStartDate").clear
-      f("#newStartDate").send_keys("8-5-2012")
-      f("#newEndDate").send_keys("Aug 15, 2012")
+      CourseCopyPage.old_start_date_input.send_keys("7/1/2012")
+      CourseCopyPage.old_end_date_input.send_keys("Jul 11, 2012")
+      CourseCopyPage.new_start_date_input.clear
+      CourseCopyPage.new_start_date_input.send_keys("8-5-2012")
+      CourseCopyPage.new_end_date_input.send_keys("Aug 15, 2012")
 
-      ff("[name=selective_import]")[0].click
+      ContentMigrationPage.selective_imports(0).click
       submit
 
       opts = @course.content_migrations.last.migration_settings["date_shift_options"]
@@ -566,8 +565,8 @@ describe "content migrations", :non_parallel do
       wait_for_ajaximations
       click_option("#courseSelect", new_course.id.to_s, :value)
 
-      f("#dateAdjustCheckbox").click
-      ff("[name=selective_import]")[0].click
+      CourseCopyPage.date_adjust_checkbox.click
+      ContentMigrationPage.selective_imports(0).click
 
       submit
 
@@ -594,9 +593,9 @@ describe "content migrations", :non_parallel do
       wait_for_ajaximations
       click_option("#courseSelect", new_course.id.to_s, :value)
 
-      f("#dateAdjustCheckbox").click
-      f("#dateRemoveOption").click
-      ff("[name=selective_import]")[0].click
+      CourseCopyPage.date_adjust_checkbox.click
+      CourseCopyPage.date_remove_option.click
+      ContentMigrationPage.selective_imports(0).click
 
       submit
 
@@ -613,7 +612,7 @@ describe "content migrations", :non_parallel do
       select_migration_type
       wait_for_ajaximations
       click_option("#courseSelect", @copy_from.id.to_s, :value)
-      ff("[name=selective_import]")[0].click
+      ContentMigrationPage.selective_imports(0).click
       submit
       run_jobs
       # Wait until the item is imported on the back-end, otherwise the selenium tools will fail the test due to runtime
@@ -634,7 +633,7 @@ describe "content migrations", :non_parallel do
       select_migration_type
       wait_for_ajaximations
       click_option("#courseSelect", @copy_from.id.to_s, :value)
-      ff("[name=selective_import]")[0].click
+      ContentMigrationPage.selective_imports(0).click
       submit
       run_jobs
       # Wait until the item is imported on the back-end, otherwise the selenium tools will fail the test due to runtime
@@ -688,7 +687,7 @@ describe "content migrations", :non_parallel do
       import_tool
       other_tool
       visit_page
-      migration_type_options = ff("#chooseMigrationConverter option")
+      migration_type_options = CourseCopyPage.migration_type_options
       migration_type_values = migration_type_options.pluck("value")
       migration_type_texts = migration_type_options.map(&:text)
       expect(migration_type_values).to include(import_tool.asset_string)
@@ -701,30 +700,30 @@ describe "content migrations", :non_parallel do
       import_tool
       visit_page
       select_migration_type(import_tool.asset_string)
-      expect(f("#converter .externalToolLaunch")).to be_displayed
-      expect(f("#converter .selectContent")).to be_displayed
+      expect(ContentMigrationPage.external_tool_launch).to be_displayed
+      expect(ContentMigrationPage.lti_select_content).to be_displayed
     end
 
     it "launches LTI tool on browse and get content link" do
       import_tool
       visit_page
       select_migration_type(import_tool.asset_string)
-      f("button#externalToolLaunch").click
-      tool_iframe = f(".tool_launch")
-      expect(f(".ui-dialog-title").text).to eq import_tool.label_for(:migration_selection)
+      ContentMigrationPage.external_tool_launch_button.click
+      tool_iframe = ContentMigrationPage.lti_iframe
+      expect(ContentMigrationPage.lti_title.text).to eq import_tool.label_for(:migration_selection)
 
       in_frame(tool_iframe, "#basic_lti_link") do
-        f("#basic_lti_link").click
+        ContentMigrationPage.basic_lti_link.click
       end
 
-      expect(f("#converter .file_name")).to include_text "lti embedded link"
+      expect(ContentMigrationPage.file_name_label).to include_text "lti embedded link"
     end
 
     it "has content selection option" do
       import_tool
       visit_page
       select_migration_type(import_tool.asset_string)
-      expect(ff("input[name=selective_import]").size).to eq 2
+      expect(ContentMigrationPage.selective_import_dropdown.size).to eq 2
     end
   end
 
@@ -749,12 +748,12 @@ describe "content migrations", :non_parallel do
 
     visit_page
 
-    f(".migrationProgressItem .selectContentBtn").click
+    ContentMigrationPage.select_content_button.click
     wait_for_ajaximations
-    f('li.top-level-treeitem[data-type="context_modules"] a.checkbox-caret').click
+    ContentMigrationPage.module.click
     wait_for_ajaximations
 
-    submod = f('li.top-level-treeitem[data-type="context_modules"] li.normal-treeitem')
+    submod = ContentMigrationPage.submodule
     expect(submod).to include_text("1 sub-module")
     submod.find_element(:css, "a.checkbox-caret").click
     wait_for_ajaximations
@@ -772,7 +771,7 @@ describe "content migrations", :non_parallel do
     radio_to_click = submod.find_element(:css, 'input[type="radio"][value="separate"]')
     move_to_click("label[for=#{radio_to_click["id"]}]")
 
-    f(".selectContentDialog input[type=submit]").click
+    ContentMigrationPage.select_content_submit_button.click
     wait_for_ajaximations
 
     run_jobs

@@ -34,10 +34,11 @@ import EncryptedForage from '../encrypted-forage'
 function createConsoleErrorReportLink() {
   return onError(({graphQLErrors, networkError}) => {
     if (graphQLErrors)
-      graphQLErrors.map(({message, locations, path}) =>
-        console.log(`[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`)
+      graphQLErrors.map(
+        ({message, locations, path}) =>
+          console.log(`[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`) // eslint-disable-line no-console
       )
-    if (networkError) console.log(`[Network error]: ${networkError}`)
+    if (networkError) console.log(`[Network error]: ${networkError}`) // eslint-disable-line no-console
   })
 }
 
@@ -71,9 +72,10 @@ function createCache() {
     addTypename: true,
     dataIdFromObject: object => {
       let cacheKey
-
       if (object.id) {
         cacheKey = object.id
+      } else if (object._id && object.__typename === 'RubricAssessmentRating') {
+        cacheKey = object.__typename + object._id + object.rubricAssessmentId
       } else if (object.__typename === 'RubricRating') {
         cacheKey = object.__typename + object._id + object.rubricId
       } else if (object._id && object.__typename) {

@@ -81,27 +81,14 @@ describe CC::CCHelper do
         att = @course.attachments.first
         @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
 
-        html = %(<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_attachments_iframe/#{att.id}?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="abcde"></iframe>)
+        html = %(
+          <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_attachments_iframe/#{att.id}?type=video&amp;embedded=true" allow="fullscreen" data-media-id="#{att.media_entry_id}"></iframe>
+          <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_objects_iframe/#{att.media_entry_id}?type=video&amp;embedded=true" allow="fullscreen" data-media-id="#{att.media_entry_id}"></iframe>
+          <a id="media_comment_abcde" class="instructure_inline_media_comment video_comment" data-media_comment_type="video" data-alt=""></a>
+        )
         translated = @exporter.html_content(html)
-        mig_id = CC::CCHelper.create_key(att)
-        expect(translated).to include %(<source src="$CANVAS_OBJECT_REFERENCE$/media_attachments_iframe/#{mig_id}?type=video" data-media-id="abcde" data-media-type="video">)
-        expect(@exporter.media_object_infos.count).to eq 0
-      end
-
-      context "sharding" do
-        specs_require_sharding
-
-        it "are translated on export if they have a shortened global id" do
-          att = @course.media_objects.first.attachment
-          short_id = Shard.short_id_for(att.global_id)
-          @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
-
-          html = %(<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_attachments_iframe/#{short_id}?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="abcde"></iframe>)
-          translated = @exporter.html_content(html)
-          mig_id = CC::CCHelper.create_key(att)
-          expect(translated).to include %(<source src="$CANVAS_OBJECT_REFERENCE$/media_attachments_iframe/#{mig_id}?type=video" data-media-id="abcde" data-media-type="video">)
-          expect(@exporter.media_object_infos.count).to eq 0
-        end
+        expect(translated).to include %(<source src="$IMS-CC-FILEBASE$/Uploaded%20Media/some_media.mp4?canvas_=1&amp;canvas_qs_amp=&amp;canvas_qs_embedded=true&amp;canvas_qs_type=video&amp;media_attachment=true" data-media-id="abcde" data-media-type="video">)
+        expect(translated).to include %(<source src="$IMS-CC-FILEBASE$/Uploaded Media/some_media.mp4" data-media-id="abcde" data-media-type="video">)
       end
 
       it "are not translated on export when pointing at user media" do

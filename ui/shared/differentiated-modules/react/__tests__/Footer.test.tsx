@@ -22,7 +22,8 @@ import Footer, {FooterProps} from '../Footer'
 
 describe('Footer', () => {
   const props: FooterProps = {
-    updateButtonLabel: 'Update Module',
+    saveButtonLabel: 'Update Module',
+    updateInteraction: 'enabled',
     onDismiss: jest.fn(),
     onUpdate: jest.fn(),
   }
@@ -40,7 +41,7 @@ describe('Footer', () => {
   })
 
   it('labels the update button from the prop', () => {
-    const {getByRole} = renderComponent({updateButtonLabel: 'Save'})
+    const {getByRole} = renderComponent({saveButtonLabel: 'Save'})
     expect(getByRole('button', {name: 'Save'})).toBeInTheDocument()
   })
 
@@ -56,8 +57,12 @@ describe('Footer', () => {
     expect(props.onUpdate).toHaveBeenCalled()
   })
 
-  it('disables the update button when disableUpdate is true', () => {
-    const {getByRole} = renderComponent({disableUpdate: true})
-    expect(getByRole('button', {name: /update module/i})).toBeDisabled()
+  it('does not call onUpdate when in-error', () => {
+    const {getByRole, getByText} = renderComponent({updateInteraction: 'inerror'})
+    const savebtn = getByRole('button', {name: /update module/i})
+    savebtn.click()
+    expect(props.onUpdate).not.toHaveBeenCalled()
+    savebtn.focus()
+    expect(getByText('Please fix errors before continuing')).toBeInTheDocument()
   })
 })

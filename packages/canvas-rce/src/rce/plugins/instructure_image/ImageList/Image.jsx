@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {func, instanceOf, number, shape, string, bool} from 'prop-types'
+import {func, instanceOf, number, oneOfType, shape, string, bool} from 'prop-types'
 import {Img} from '@instructure/ui-img'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
@@ -96,7 +96,7 @@ Image.propTypes = {
     display_name: string.isRequired,
     filename: string,
     href: string.isRequired,
-    id: number,
+    id: oneOfType([number, string]),
     preview_url: string,
     thumbnail_url: string.isRequired,
   }).isRequired,

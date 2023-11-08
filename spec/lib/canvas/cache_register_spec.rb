@@ -280,6 +280,13 @@ describe Canvas::CacheRegister do
       check_cache
     end
 
+    it "regenerates when fetch_with_cache_register can't generate a key" do
+      expect(Canvas::CacheRegister.lua).to receive(:run).with(:get_with_batched_keys, anything, anything, anything).and_raise(Redis::ConnectionError.new)
+      expect(Rails.cache.redis).not_to receive(:set)
+
+      expect(Rails.cache.fetch_with_batched_keys("some_base_key/withstuff", batch_object: @user, batched_keys: [:enrollments, :groups]) { "some value" }).to eq "some value"
+    end
+
     it "still works with expiration" do
       some_key = "some_base_key/withstuff"
       some_value = "some value"

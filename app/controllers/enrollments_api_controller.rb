@@ -705,25 +705,19 @@ class EnrollmentsApiController < ApplicationController
         value_to_boolean(params[:enrollment][:limit_privileges_to_course_section])
     end
 
-    if params[:enrollment][:temporary_enrollment_source_user_id].present?
-      temporary_enrollment_source_user_id = params[:enrollment][:temporary_enrollment_source_user_id]
-    end
-
     params[:enrollment].slice!(
       :enrollment_state,
       :section,
       :limit_privileges_to_course_section,
       :associated_user_id,
+      :temporary_enrollment_source_user_id,
+      :temporary_enrollment_pairing_id,
       :role,
       :start_at,
       :end_at,
       :self_enrolled,
       :no_notify
     )
-
-    if @domain_root_account&.feature_enabled?(:temporary_enrollments)
-      params[:enrollment][:temporary_enrollment_source_user_id] = temporary_enrollment_source_user_id
-    end
 
     SubmissionLifecycleManager.with_executing_user(@current_user) do
       @enrollment = @context.enroll_user(user, type, params[:enrollment].merge(allow_multiple_enrollments: true))
@@ -1055,9 +1049,7 @@ class EnrollmentsApiController < ApplicationController
     replacements = {}
 
     if role_ids.blank? && role_names.present?
-      role_names = Array(role_names)
-      role_ids = role_names.filter_map { |name| @context.account.get_course_role_by_name(name)&.id }
-      raise ActionController::BadRequest, "role not found" if role_ids.length != role_names.length
+      role_ids = Array(role_names).map { |name| @context.account.get_course_role_by_name(name).id }
     end
 
     if role_ids.present?

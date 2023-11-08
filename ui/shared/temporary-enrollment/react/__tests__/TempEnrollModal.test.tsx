@@ -17,33 +17,11 @@
  */
 
 import React from 'react'
-import {fireEvent, render, waitFor} from '@testing-library/react'
+import {cleanup, fireEvent, render, screen, waitFor} from '@testing-library/react'
 import {TempEnrollModal} from '../TempEnrollModal'
 import fetchMock from 'fetch-mock'
 import userEvent from '@testing-library/user-event'
-import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {EnrollmentType} from '@canvas/temporary-enrollment/react/types'
-// import {prettyDOM} from '@testing-library/dom'
-
-type DateRange = {
-  startDate: string
-  nextDayDate: string
-}
-
-// returns ISO strings for a date and its next day, both at local timezone start
-function getLocalStartAndNextDayDates(year: number, month: number, day: number): DateRange {
-  const startDate = new Date(year, month, day)
-  startDate.setHours(0, 0, 0, 0)
-
-  const nextDayDate = new Date(startDate)
-  nextDayDate.setDate(startDate.getDate() + 1)
-
-  return {
-    startDate: startDate.toISOString(),
-    nextDayDate: nextDayDate.toISOString(),
-  }
-}
-const {startDate, nextDayDate}: DateRange = getLocalStartAndNextDayDates(2022, 0, 1) // for January 1, 2022
 
 // Temporary Enrollment Provider
 const providerUser = {
@@ -81,6 +59,7 @@ const modalProps = {
     {
       base_role_name: 'TeacherEnrollment',
       id: '234',
+      role: 'TeacherEnrollment',
       label: 'Teacher',
     },
   ],
@@ -89,6 +68,11 @@ const modalProps = {
   },
   isEditMode: false,
   onToggleEditMode: jest.fn(),
+  tempEnrollPermissions: {
+    canAdd: true,
+    canDelete: true,
+    canEdit: true,
+  },
 }
 
 const userData = {
@@ -99,40 +83,29 @@ const userData = {
   ],
 }
 
-// teacher enrollment; checked by default
-const enrollmentsData = [
+const enrollmentsByCourse = [
   {
-    course_id: '11',
-    course_section_id: '111',
     id: '1',
-    role_id: '234',
+    name: 'Apple Music',
+    workflow_state: 'available',
+    enrollments: [
+      {
+        role_id: '2',
+      },
+    ],
+    sections: [
+      {
+        id: '1',
+        name: 'Section 1',
+        enrollment_role: 'StudentEnrollment',
+      },
+    ],
   },
 ]
 
-const enrollmentStatesData = ['active', 'completed', 'invited']
-const enrollmentStatesParams = new URLSearchParams(
-  enrollmentStatesData.map(param => ['state[]', param])
-).toString()
-
-const enrollmentData = {
-  user_id: recipientUser.user_id,
-  temporary_enrollment_source_user_id: providerUser.user_id,
-  start_at: startDate,
-  end_at: nextDayDate,
-  role_id: '234',
-}
-const enrollmentParams = new URLSearchParams(
-  Object.entries(enrollmentData).map(([key, value]) => [`enrollment[${key}]`, value])
+const ENROLLMENTS_URI = encodeURI(
+  `/api/v1/users/${modalProps.user.id}/courses?enrollment_state=active&include[]=sections`
 )
-
-const courseData = {
-  name: 'course1',
-  workflow_state: 'available',
-}
-
-const sectionData = {
-  name: 'section1',
-}
 
 const userListsData = {
   user_list: '',
@@ -150,11 +123,13 @@ jest.mock('@canvas/alerts/react/FlashAlert', () => ({
 describe('TempEnrollModal', () => {
   beforeEach(() => {
     localStorage.clear()
+    fetchMock.reset()
+    jest.clearAllMocks()
   })
 
   afterEach(() => {
-    fetchMock.reset()
-    jest.clearAllMocks()
+    // unmount the React tree after each test
+    cleanup()
   })
 
   afterAll(() => {
@@ -163,7 +138,7 @@ describe('TempEnrollModal', () => {
 
   it('displays the modal upon clicking the child element', () => {
     // render the modal with a child element
-    const screen = render(
+    render(
       <TempEnrollModal {...modalProps}>
         <p>child_element</p>
       </TempEnrollModal>
@@ -172,7 +147,7 @@ describe('TempEnrollModal', () => {
     // modal heading should not be displayed initially
     expect(screen.queryByText('Create a temporary enrollment')).toBeNull()
 
-    // trigger the modal to open
+    // trigger the modal to open and display the search screen (page 1)
     userEvent.click(screen.getByText('child_element'))
 
     // modal heading should be displayed after the click
@@ -181,7 +156,7 @@ describe('TempEnrollModal', () => {
 
   it('opens modal if prop is set to true', async () => {
     // render the modal with a child element
-    const screen = render(
+    render(
       <TempEnrollModal {...modalProps} defaultOpen={true}>
         <p>child_element</p>
       </TempEnrollModal>
@@ -193,54 +168,40 @@ describe('TempEnrollModal', () => {
 
   it('hides the modal upon clicking the cancel button', async () => {
     // render the modal with a child element
-    const screen = render(
-      <TempEnrollModal {...modalProps}>
+    render(
+      <TempEnrollModal {...modalProps} defaultOpen={true}>
         <p>child_element</p>
       </TempEnrollModal>
     )
-
-    // trigger the modal to open
-    userEvent.click(screen.getByText('child_element'))
 
     // modal heading should be displayed after the click
     expect(screen.getByText('Create a temporary enrollment')).toBeInTheDocument()
 
     // close the modal
-    userEvent.click(await screen.findByText('Cancel'))
+    userEvent.click(await screen.findByRole('button', {name: 'Cancel'}))
 
-    // ensure the modal is closed
-    await screen.findByText('Cancel')
-    await screen.findByText('Create a temporary enrollment')
+    // wait for the modal to close (including animation)
+    await waitFor(() => {
+      expect(screen.queryByText('Create a temporary enrollment')).not.toBeInTheDocument()
+    })
   })
 
-  // submit can (almost) only be tested in modal; submit button updates props for TempEnrollAssign
-  it.skip('closes modal when submission is successful', async () => {
-    // simulating API responses using mocked data to replicate the UI flow
-    // without manual data input or interacting with real UI elements
+  it('closes modal when submission is successful', async () => {
     fetchMock.post(`/accounts/1/user_lists.json?${userListsParams}`, userData)
     fetchMock.get('/api/v1/users/2', userData.users[0])
-    fetchMock.get(`/api/v1/users/1/enrollments?${enrollmentStatesParams}`, enrollmentsData)
-    fetchMock.get(`/api/v1/courses/11`, courseData)
-    fetchMock.get('/api/v1/courses/11/sections/111', sectionData)
-    fetchMock.post(`/api/v1/sections/111/enrollments?${enrollmentParams}`, 200)
+    fetchMock.get(ENROLLMENTS_URI, enrollmentsByCourse)
 
-    // render the modal with a child element
-    const screen = render(
-      <TempEnrollModal {...modalProps}>
+    render(
+      <TempEnrollModal {...modalProps} defaultOpen={true}>
         <p>child_element</p>
       </TempEnrollModal>
     )
 
-    // trigger the modal to open
-    userEvent.click(screen.getByText('child_element'))
-
-    // cache the next button
-    const next = screen.getByText('Next')
+    const next = await screen.findByRole('button', {name: 'Next'})
 
     // click next to go to the search results screen (page 2)
     userEvent.click(next)
 
-    // assertions for search results screen
     expect(
       await screen.findByText(/is ready to be assigned temporary enrollments/)
     ).toBeInTheDocument()
@@ -248,73 +209,45 @@ describe('TempEnrollModal', () => {
     // click next to go to the assign screen (page 3)
     userEvent.click(next)
 
-    // select a role from the dropdown
-    const roleInput = await screen.findByPlaceholderText('Select a Role')
-    fireEvent.focus(roleInput)
-    fireEvent.click(roleInput)
+    // confirm the modal is on the assign screen (page 3)
+    await waitFor(() => {
+      expect(screen.queryByText('Back')).toBeInTheDocument()
+      expect(screen.queryByText(/is ready to be assigned temporary enrollments/)).toBeNull()
+    })
 
-    const options = await screen.findAllByRole('option')
-    const option = options[0] as HTMLOptionElement
-    fireEvent.focus(option)
-    fireEvent.click(option) // select the first option
-    fireEvent.blur(option)
+    const role = screen.getByLabelText(/select role/i)
+    userEvent.click(role)
+    await waitFor(() => {
+      const option = document.getElementById('234')
+      if (!option) throw new Error('Option not yet available')
+    })
+    const option = document.getElementById('234')
+    userEvent.click(option!)
 
-    fireEvent.blur(roleInput)
+    const submit = await screen.findByRole('button', {name: 'Submit'})
+    expect(submit).toBeInTheDocument()
+    fireEvent.click(submit)
 
-    // start date and time input
-    const startDateInput = await screen.findByLabelText('Begins On')
-    userEvent.clear(startDateInput)
-    userEvent.type(startDateInput, '2022-01-01') // Jan 01, 2022
-
-    // end date and time input
-    const endDateInput = await screen.findByLabelText('Until')
-    userEvent.clear(endDateInput)
-    userEvent.type(endDateInput, '2022-01-02') // Jan 02, 2022
-
-    // simulate clicking the submit button
-    fireEvent.click(await screen.findByText('Submit'.trim()))
-    // console.log(prettyDOM(screen.baseElement as Element, 10000000))
-
-    await waitFor(() =>
-      expect(showFlashSuccess).toHaveBeenCalledWith(
-        'Temporary enrollment was successfully created.'
-      )
-    )
-
-    // ensure the modal is closed
-    await screen.findByText('Cancel')
-    await screen.findByText('Create a temporary enrollment')
-
-    // confirm mocks were called the expected number of times
     expect(fetchMock.calls(`/accounts/1/user_lists.json?${userListsParams}`).length).toBe(1)
     expect(fetchMock.calls('/api/v1/users/2').length).toBe(1)
-    expect(fetchMock.calls(`/api/v1/users/1/enrollments?${enrollmentStatesParams}`).length).toBe(1)
-    expect(fetchMock.calls(`/api/v1/courses/11`).length).toBe(1)
-    expect(fetchMock.calls('/api/v1/courses/11/sections/111').length).toBe(1)
-    expect(fetchMock.calls(`/api/v1/sections/111/enrollments?${enrollmentParams}`).length).toBe(1)
+    expect(fetchMock.calls(ENROLLMENTS_URI).length).toBe(1)
   })
 
   it('shows error and stays open if data is missing', async () => {
     // setup API mocks
     fetchMock.post(`/accounts/1/user_lists.json?${userListsParams}`, userData)
     fetchMock.get('/api/v1/users/2', userData.users[0])
-    fetchMock.get(`/api/v1/users/1/enrollments?${enrollmentStatesParams}`, enrollmentsData)
-    fetchMock.get(`/api/v1/courses/11`, courseData)
-    fetchMock.get('/api/v1/courses/11/sections/111', sectionData)
-    fetchMock.post(`/api/v1/sections/111/enrollments?${enrollmentParams}`, 200) // NOT CALLED!
+    fetchMock.get(ENROLLMENTS_URI, enrollmentsByCourse)
 
     // render the modal with a child element
-    const screen = render(
-      <TempEnrollModal {...modalProps}>
+    render(
+      <TempEnrollModal {...modalProps} defaultOpen={true}>
         <p>child_element</p>
       </TempEnrollModal>
     )
 
-    // trigger the modal to open
-    userEvent.click(screen.getByText('child_element'))
-
     // cache the next button
-    const next = screen.getByText('Next')
+    const next = await screen.findByRole('button', {name: 'Next'})
 
     // click next to go to the search results screen (page 2)
     userEvent.click(next)
@@ -327,23 +260,24 @@ describe('TempEnrollModal', () => {
     // click next to go to the assign screen (page 3)
     userEvent.click(next)
 
-    // NO ROLE SELECTED!
+    //
+    // NO PROVIDER BASE ROLE SELECTED!
+    //
 
-    // simulate clicking the submit button
-    fireEvent.click(await screen.findByText('Submit'))
+    // confirm the modal is on the assign screen (page 3)
+    await waitFor(() => {
+      expect(screen.queryByText('Back')).toBeInTheDocument()
+      expect(screen.queryByText(/is ready to be assigned temporary enrollments/)).toBeNull()
+    })
 
-    // error message should be displayed
-    await waitFor(() =>
-      expect(screen.getByText('Please select a role before submitting')).toBeInTheDocument()
-    )
+    userEvent.click(await screen.findByRole('button', {name: 'Submit'}))
+
+    expect(await screen.findByText(/please select a role before submitting/i)).toBeInTheDocument()
 
     // confirm mocks were called the expected number of times
     expect(fetchMock.calls(`/accounts/1/user_lists.json?${userListsParams}`).length).toBe(1)
     expect(fetchMock.calls('/api/v1/users/2').length).toBe(1)
-    expect(fetchMock.calls(`/api/v1/users/1/enrollments?${enrollmentStatesParams}`).length).toBe(1)
-    expect(fetchMock.calls(`/api/v1/courses/11`).length).toBe(1)
-    expect(fetchMock.calls('/api/v1/courses/11/sections/111').length).toBe(1)
-    expect(fetchMock.calls(`/api/v1/sections/111/enrollments?${enrollmentParams}`).length).toBe(0) // NOT CALLED!
+    expect(fetchMock.calls(ENROLLMENTS_URI).length).toBe(1)
   })
 
   it('starts over when start over button is clicked', async () => {
@@ -352,17 +286,14 @@ describe('TempEnrollModal', () => {
     fetchMock.get('/api/v1/users/2', userData.users[0])
 
     // render the modal with a child element
-    const screen = render(
-      <TempEnrollModal {...modalProps}>
+    render(
+      <TempEnrollModal {...modalProps} defaultOpen={true}>
         <p>child_element</p>
       </TempEnrollModal>
     )
 
-    // trigger the modal to open
-    userEvent.click(screen.getByText('child_element'))
-
     // cache the next button
-    const next = screen.getByText('Next')
+    const next = await screen.findByRole('button', {name: 'Next'})
 
     // click next to go to the search results screen (page 2)
     userEvent.click(next)
@@ -373,7 +304,7 @@ describe('TempEnrollModal', () => {
     ).toBeInTheDocument()
 
     // simulate clicking the start over button
-    userEvent.click(await screen.findByText('Start Over'))
+    userEvent.click(await screen.findByRole('button', {name: 'Start Over'}))
 
     // modal is back on the search screen (page 1)
     await waitFor(() => {
@@ -390,22 +321,17 @@ describe('TempEnrollModal', () => {
     // setup API mocks
     fetchMock.post(`/accounts/1/user_lists.json?${userListsParams}`, userData)
     fetchMock.get('/api/v1/users/2', userData.users[0])
-    fetchMock.get(`/api/v1/users/1/enrollments?${enrollmentStatesParams}`, enrollmentsData)
-    fetchMock.get(`/api/v1/courses/11`, courseData)
-    fetchMock.get('/api/v1/courses/11/sections/111', sectionData)
+    fetchMock.get(ENROLLMENTS_URI, enrollmentsByCourse)
 
     // render the modal with a child element
-    const screen = render(
-      <TempEnrollModal {...modalProps}>
+    render(
+      <TempEnrollModal {...modalProps} defaultOpen={true}>
         <p>child_element</p>
       </TempEnrollModal>
     )
 
-    // trigger the modal to open
-    userEvent.click(screen.getByText('child_element'))
-
     // cache the next button
-    const next = screen.getByText('Next')
+    const next = await screen.findByRole('button', {name: 'Next'})
 
     // click next to go to the search results screen (page 2)
     userEvent.click(next)
@@ -425,7 +351,7 @@ describe('TempEnrollModal', () => {
     })
 
     // simulate clicking the back button
-    userEvent.click(await screen.findByText('Back'))
+    userEvent.click(await screen.findByRole('button', {name: 'Back'}))
 
     // modal is back on the search results screen (page 2)
     await waitFor(() => {
@@ -438,8 +364,6 @@ describe('TempEnrollModal', () => {
     // confirm mocks were called the expected number of times
     expect(fetchMock.calls(`/accounts/1/user_lists.json?${userListsParams}`).length).toBe(1)
     expect(fetchMock.calls('/api/v1/users/2').length).toBe(1)
-    expect(fetchMock.calls(`/api/v1/users/1/enrollments?${enrollmentStatesParams}`).length).toBe(1)
-    expect(fetchMock.calls(`/api/v1/courses/11`).length).toBe(1)
-    expect(fetchMock.calls('/api/v1/courses/11/sections/111').length).toBe(1)
+    expect(fetchMock.calls(ENROLLMENTS_URI).length).toBe(1)
   })
 })

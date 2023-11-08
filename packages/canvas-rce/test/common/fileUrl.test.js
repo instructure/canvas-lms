@@ -202,12 +202,12 @@ describe('Common file url utils', () => {
 
     it('removes /preview', () => {
       const url = '/users/2/files/17/preview?verifier=xyzzy'
-      strictEqual(prepLinkedSrc(url), '/users/2/files/17?verifier=xyzzy&wrap=1')
+      strictEqual(prepLinkedSrc(url), '/users/2/files/17?verifier=xyzzy')
     })
 
     it('does not indiscriminately replace /download in a url', () => {
       const url = '/please/download/me'
-      strictEqual(prepLinkedSrc(url), `${url}?wrap=1`)
+      strictEqual(prepLinkedSrc(url), url)
     })
   })
 })

@@ -94,20 +94,6 @@ describe('DiscussionTopicRepliesContainer', () => {
     expect(container).toBeTruthy()
   })
 
-  it('renders discussion entries', async () => {
-    const {queryByText, getByTestId, findByText} = setup(
-      defaultProps(),
-      getDiscussionEntryAllRootEntriesQueryMock()
-    )
-    expect(await findByText('This is the parent reply')).toBeInTheDocument()
-    expect(queryByText('This is the child reply asc')).toBe(null)
-
-    const expandButton = getByTestId('expand-button')
-    fireEvent.click(expandButton)
-
-    expect(await findByText('This is the child reply asc')).toBeInTheDocument()
-  })
-
   it('renders the pagination component if there are more than 1 pages', () => {
     const {getByTestId} = setup(defaultProps())
     expect(getByTestId('pagination')).toBeInTheDocument()

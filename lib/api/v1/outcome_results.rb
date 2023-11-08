@@ -199,9 +199,9 @@ module Api::V1::OutcomeResults
     # is in multiple sections, they will have multiple rollup results. pagination is
     # still by user, so the counts won't match up. again, this is a very rare thing
     section_func = if @section
-                     ->(user) { [[@section.id, @context.all_accepted_student_enrollments.where(user_id: user.id, course_section_id: @section.id).first.workflow_state]] }
+                     ->(user) { [[@section.id, @context.all_student_enrollments.where(user_id: user.id, course_section_id: @section.id).first.workflow_state]] }
                    else
-                     enrollments = @context.all_accepted_student_enrollments.where(user_id: serialized_rollup_pairs.map { |pair| pair.first.context.id }).to_a
+                     enrollments = @context.all_student_enrollments.where(user_id: serialized_rollup_pairs.map { |pair| pair.first.context.id }).to_a
                      ->(user) { enrollments.select { |e| e.user_id == user.id }.map { |e| [e&.course_section_id, e.workflow_state] } }
                    end
 

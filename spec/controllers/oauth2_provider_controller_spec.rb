@@ -497,7 +497,7 @@ describe OAuth2ProviderController do
         let(:success_token_keys) { %w[access_token refresh_token user expires_in token_type canvas_region] }
       end
 
-      it "renders a 302 if a code is not provided for an authorization_code grant" do
+      it "renders a 400 if a code is not provided for an authorization_code grant" do
         post :token, params: base_params
 
         assert_status(400)

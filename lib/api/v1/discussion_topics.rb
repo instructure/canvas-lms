@@ -217,7 +217,7 @@ module Api::V1::DiscussionTopics
     fields[:topic_children] = child_topic_data.map(&:first)
     fields[:group_topic_children] = child_topic_data.map { |id, group_id| { id:, group_id: } }
 
-    fields[:context_code] = topic.context_code if opts[:include_context_code]
+    fields[:context_code] = Context.context_code_for(topic) if opts[:include_context_code]
 
     topic_course = nil
     if context.is_a?(Course)

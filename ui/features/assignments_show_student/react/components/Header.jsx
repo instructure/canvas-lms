@@ -354,6 +354,7 @@ class Header extends React.Component {
                   <Flex.Item margin="0 x-small 0 0">
                     <SubmissionStatusPill
                       submissionStatus={this.props.submission.submissionStatus}
+                      customGradeStatus={this.props.submission.customGradeStatus}
                     />
                   </Flex.Item>
                   {topRightComponent}

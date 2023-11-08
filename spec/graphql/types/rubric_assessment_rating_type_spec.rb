@@ -88,6 +88,12 @@ describe Types::RubricAssessmentRatingType do
         submission_type.resolve("rubricAssessmentsConnection { nodes { assessmentRatings { points } } }")
       ).to eq [rubric_assessment.data.pluck(:points)]
     end
+
+    it "rubricAssessmentId" do
+      expect(
+        submission_type.resolve("rubricAssessmentsConnection { nodes { assessmentRatings { rubricAssessmentId } } }")
+      ).to eq [[rubric_assessment.id.to_s]]
+    end
   end
 
   describe "artifact_attempt" do

@@ -157,6 +157,14 @@ describe CanvasImportedHtmlConverter do
       expect(convert_exported_html(test_string)).to eq %(<img src="#{@path}files/#{att.id}/preview" alt="nope">)
     end
 
+    it "adds links with media_attachment query value as a media_attachment" do
+      att = make_test_att
+      att.update!(media_entry_id: "m-yodawg")
+      @migration.attachment_path_id_lookup = { "Uploaded Media 2/yodawg.mp4" => att.migration_id }
+      test_string = %(<video data-media-type="video" data-media-id="m-yodawg"><source src="$IMS-CC-FILEBASE$/Uploaded%20Media%202/yodawg.mp4?canvas_=1&amp;canvas_qs_amp=&amp;canvas_qs_embedded=true&amp;canvas_qs_type=video&amp;media_attachment=true" data-media-id="m-yodawg" data-media-type="video"></video>)
+      expect(convert_exported_html(test_string)).to eq %(<iframe data-media-type="video" data-media-id="m-yodawg" src="/media_attachments_iframe/#{att.id}?type=video"></iframe>)
+    end
+
     it "converts course section urls" do
       test_string = %(<a href="%24CANVAS_COURSE_REFERENCE%24/discussion_topics">discussions</a>)
       expect(convert_exported_html(test_string)).to eq %(<a href="#{@path}discussion_topics">discussions</a>)

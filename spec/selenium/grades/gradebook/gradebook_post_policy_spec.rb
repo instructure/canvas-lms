@@ -27,6 +27,9 @@ require_relative "../pages/gradebook_grade_detail_tray_page"
 describe "Gradebook Post Policy" do
   include_context "in-process server selenium tests"
 
+  # all tests skipped due to flakiness; see the referenced ticket
+  before { skip } # EVAL-3613
+
   before :once do
     # course
     @course_with_manual_post = course_with_teacher(

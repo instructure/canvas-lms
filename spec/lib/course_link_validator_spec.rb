@@ -448,6 +448,14 @@ describe CourseLinkValidator do
       attachment_model(context: @course).destroy
       expect(@course_link_validator.check_object_status("/courses/#{@course.id}/files/#{@attachment.id}/download")).to eq :deleted
     end
+
+    it "returns nil for syllabus links with query params and fragments" do
+      expect(@course_link_validator.check_object_status("/courses/#{@course.id}/assignments/syllabus?foo=bar")).to be_nil
+
+      expect(@course_link_validator.check_object_status("/courses/#{@course.id}/assignments/syllabus#grading")).to be_nil
+
+      expect(@course_link_validator.check_object_status("/courses/#{@course.id}/assignments/syllabus?foo=bar#grading")).to be_nil
+    end
   end
 
   describe "#valid_route?" do

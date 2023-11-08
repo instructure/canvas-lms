@@ -2221,6 +2221,7 @@ zh-Hant:
   add_app_baf540f: 添加應用程式
   add_as_a_faculty_journal_entry_55a38a30: 作為教職員日誌條目添加
   add_as_allowed_e95540be: 添加為獲允許
+  add_assignment_da1c1529: 添加作業
   add_assignment_to_name_caf173b0: "添加作業至 %{name}"
   add_assignments_and_quizzes_1085d2af: 添加作業列表和測驗
   add_attachment_93868828: 添加附件
@@ -2302,6 +2303,7 @@ zh-Hant:
   add_moderator_review_copy_1st_a484c813: "添加核分人檢閱 (複製第 1 位)"
   add_moderator_review_copy_2nd_e80d458f: "添加核分人檢閱 (複製第 2 位)"
   add_moderator_review_new_3c183cea: "添加核分人檢閱 (新檢閱)"
+  add_module_5ad6fee2: 添加單元
   add_module_item: 
     add_assignment_to: "新增任務至 %{module}"
     add_file_to: "新增檔案至 %{module}"
@@ -2463,6 +2465,7 @@ zh-Hant:
   admins_3e1dce15: 管理員
   admins_add_remove_26811ce5: "管理員 - 添加 / 移除"
   advanced_36b35b8: 進階
+  advanced_analytics_course_readiness_closed_alpha_13c8aaf: "進階分析工具 - 課程就緒隱藏係數"
   advertise_release_notes_via_the_ui_9254bc6c: 透過使用者介面廣告發佈說明
   affects_viewing_the_conclude_course_and_permanentl_8216fcc2: 影響檢視「結束課程」及「永久刪除此課程」按鈕。只有手動建立的課程方會顯示「永久刪除此課程」按鈕。
   affects_viewing_the_conclude_course_and_permanentl_d943656e: "影響檢視「結束課程」及「永久刪除此課程」按鈕。「永久刪除此課程」按鈕僅在手動創建課程中顯示。\n\
@@ -3891,6 +3894,7 @@ zh-Hant:
   archive_operation_failed_5504706: 存檔操作失敗
   archive_selected_d64506ca: 已選存檔
   archived_de543437: 已存檔
+  archived_grading_schemes_6d698d0: 存檔的等級評分方式
   are_you_sure_26795d3c: 您是否確定？
   are_you_sure_that_you_want_to_remove_these_count_o_67ef2d6c: 
     one: "是否確定要從此帳戶移除這 %{count} 個成果？"
@@ -4247,6 +4251,7 @@ zh-Hant:
   assignment_score_summary_f1dc9708: 作業分數摘要
   assignment_selection_6bff05c4: 作業選擇
   assignment_set_set_index_28b1f973: "作業組 %{set_index}"
+  assignment_settings_5ee5ee77: 作業設定
   assignment_submissions_uploaded_ba0dbc84: "%{assignment}：提交項目已上傳"
   assignment_title_82b4422e: 作業標題：
   assignment_title_8a707dd2: 作業標題
@@ -6213,6 +6218,7 @@ zh-Hant:
   cannot_move_assignments_due_to_closed_grading_peri_59fc3c4: 由於評分期結束，無法移動作業列表
   cannot_move_events_with_section_specific_times_bet_3fe871fc: 無法在行事曆之間以特定的分班次數移動活動
   cannot_move_scheduler_appointments_between_calenda_253e5ea3: 無法在行事曆之間移動排程工具預約見面
+  cannot_reference_self_16dfcd49: 無法引用自身
   cannot_relink_unsaved_paces_3ed42012: 無法重新連結未儲存的進度
   cannot_relink_unsaved_plans_2ccef56a: 無法重新連結未儲存的計畫
   cannot_remove_c0fd581d: 無法移除：
@@ -8153,6 +8159,7 @@ zh-Hant:
   couldn_t_load_previous_content_migrations_a0ef5d7a: 無法載入之前的內容遷移
   couldn_t_save_account_calendar_visibilities_343459d1: 無法儲存帳戶行事曆可見度
   couldn_t_track_assigning_students_to_groups_but_it_b6510770: "無法追蹤指派學生到群組，但仍在發生中！稍後手動檢查結果。(%{errorMessage})"
+  couldn_t_update_content_migrations_68777765: 無法更新內容遷移
   couldn_t_update_standards_for_authority_auth_81206187: "無法更新 %{auth} 授權標準"
   count_40eced3b: 計數
   count_account_calendars_found_b1eed2e3: 
@@ -12009,6 +12016,7 @@ zh-Hant:
   error_creating_conversation_1d814618: 建立交談時發生錯誤
   error_creating_course_ae61c2bd: 建立課程時發生錯誤
   error_creating_discussion_topic_a5f809ec: 建立討論區主題時發生錯誤
+  error_creating_modulename_cd0f5c2e: "建立 %{moduleName} 時發生錯誤。"
   error_creating_new_course_9d3903bc: 建立新課程時發生錯誤
   error_creating_new_subject_89f16abe: 建立新主題時發生錯誤
   error_creating_submission_comment_a5374fcf: 建立提交項目評論時發生錯誤
@@ -12070,6 +12078,7 @@ zh-Hant:
   error_the_tool_returned_an_invalid_content_type_co_10a11c07: "錯誤：工具傳回無效的內容類型「%{contentType}」"
   error_updating_cluster_error_674e5f2e: "更新 %{cluster} 時發生錯誤：%{error}"
   error_updating_comment_4b80c76d: 更新評論時發生錯誤
+  error_updating_discussion_topic_64522a23: 更新討論區主題時發生錯誤
   error_updating_module_access_f0970f4c: 更新單元存取時發生錯誤。
   error_updating_modulename_settings_da982acf: "更新 %{moduleName} 設定時發生錯誤。"
   error_updating_notes_31b24785: 更新說明時發生錯誤
@@ -12539,6 +12548,7 @@ zh-Hant:
   failed_to_export_course_paces_e17583ba: 無法匯出課程進度
   failed_to_export_pace_plans_9832daac: 無法匯出進度計畫
   failed_to_export_some_tool_settings_c992fc56: 無法匯出某些工具設定
+  failed_to_fetch_content_for_import_a042cc27: 無法取得要匯入的內容。
   failed_to_fetch_migration_issues_data_a896da98: 無法取得遷移問題資料。
   failed_to_get_new_activity_17e7ec7c: 未能取得最新活動
   failed_to_ignore_assignment_46565fa3: 無法忽略作業
@@ -13883,6 +13893,7 @@ zh-Hant:
       total: 總計
   graded_25cd3fcd: 已評分
   graded_date_by_grader_e8e1ff75: "%{graded_date} 由%{grader}"
+  graded_discussion_17cc8eaf: 已評分的討論
   graded_discussion_a873bb3e: 已評分的討論：
   graded_on_submission_60ac3010: 提交件評分
   graded_quiz_7fabdf1f: 已評分的測驗
@@ -15207,8 +15218,8 @@ zh-Hant:
       如果啟用，位於「帳戶設定」和「課程設定」頁面上的工具安裝和配置表格將使用
       InstUI components 元件，跟舊版的不同的是較少存取的本機元件。
   if_enabled_the_user_s_lti_url_input_on_the_select__fa539830: |-
-      如果啟用，使用者在選取內容對話上的 LTI URL 輸入將遭到重寫
-      如果以有效的 LTI URL 回應工具。
+      如果啟用，使用者在選取內容對話上的 LTI URL 輸入將遭到覆寫
+      如果工具使用有效的 LTI URL 進行回應。
   if_enabled_the_user_will_see_a_warning_alert_box_n_d85c7b1f: |-
       如果啟用，使用者將看到
       通知他們「開發人員金鑰」頁面即將到來或完成 OIDC 授權端點變更的頂端附近的警告「提醒」方塊。
@@ -16092,7 +16103,7 @@ zh-Hant:
   k20_beta_description: "在管理員分析工具 Analytics APP 中啟用 K20 測試版功能。"
   k20_course_readiness_alpha_testing_description: "此標記適用於進階分析工具 Alpha 測試中的機構參與。此標記啟用這些機構的「課程就緒」控制面板。"
   k20_course_readiness_alpha_testing_f45597b6: "K20 - 課程就緒 Alpha 測試"
-  k20_course_readiness_description: 啟用新的管理員分析工具課程就緒控制面板。
+  k20_course_readiness_description: 為係數測試人員啟用進階分析工具課程就緒控制面板。
   k_2521301c: k
   kazakhstan_7_8fe892c: "哈薩克斯坦 (+7)"
   keep_8f3e7c16: 保存
@@ -16562,6 +16573,7 @@ zh-Hant:
   loading_comments_32366acf: 正在載入評論
   loading_completion_b62ca82f: 完成載入
   loading_compose_modal_f6da0e8b: 載入撰寫模態
+  loading_content_for_import_4ed89a17: 載入要匯入的內容。
   loading_conversation_messages_71e9050e: 載入交談訊息
   loading_courses_409a3641: 正在載入課程
   loading_courses_bd1bffe: 正在載入課程…
@@ -16609,6 +16621,7 @@ zh-Hant:
   loading_missing_assignments_link_d9a0d320: 載入缺少的作業連結
   loading_more_grade_history_results_b235de5: 載入更多評分紀錄結果。
   loading_more_gradebook_history_results_810f6d2e: 載入更多成績單紀錄結果。
+  loading_more_issues_b14f8f7d: 載入更多問題
   loading_more_replies_22e0f13c: 載入更多回覆
   loading_more_results_1d437202: 載入更多結果
   loading_more_results_def6df65: 正在載入更多結果...
@@ -19314,6 +19327,7 @@ zh-Hant:
   module_publish_menu_30b638dd: 單元發佈選單
   module_publish_menu_88b54c1b: 單元發佈選單
   module_published_80f0b9b8: 單元已發佈
+  modulename_created_successfully_6c273e09: "成功建立 %{moduleName}。"
   modulename_module_publish_options_69ef1ece: "%{moduleName} 單元發佈選項"
   modulename_module_publish_options_publishedstatus_94ea7f49: "%{moduleName} 單元發佈選項，%{publishedStatus}"
   modulename_settings_updated_successfully_a09bfef6: "成功更新 %{moduleName} 設定。"
@@ -19979,6 +19993,7 @@ zh-Hant:
   no_existing_user_provided_for_login_with_sis_id_us_6bcde71f: "SIS ID %{user_id} 無可供登入的現有使用者"
   no_explainer_text_available_9d9a2f3c: 沒有可用的解釋器文字
   no_exports_to_display_7f1b630b: 沒有匯出可顯示
+  no_file_chosen_9a880793: 未選擇檔案
   no_file_selected_92d2ac30: 沒有選擇檔案
   no_file_submitted_a879fa53: 未提交檔案
   no_final_grade_selected_3595c9c: 未選擇最終評分
@@ -20780,6 +20795,9 @@ zh-Hant:
   optional_filters_9dc03f5e: 可選的篩選器
   optionally_include_a_byte_order_mark_in_compatible_f3d0d243: "可以在成績單匯出中加入位元組順序標記，因此可以將它們匯入到某些語言環境中的使用者 Excel 中。"
   optionally_include_a_byte_order_mark_in_gradebook__555cc605: "可以在成績單匯出中包括位元組順序標記，使它們可以匯入到某些語言環境中的使用者 Excel 中。"
+  optioncount_options_available_5a34688e: "%{optionCount} 個可用選項。"
+  optionname_selected_list_collapsed_9e69b18a: "已選擇 %{optionName}。名單收起。"
+  optionname_selection_has_been_removed_ff1afe6a: "%{optionName} 選擇已移除"
   options: 
     ? "false"
     : 否
@@ -21400,6 +21418,7 @@ zh-Hant:
   please_enter_a_valid_url_protocol_is_required_e_g__c6ccfeca: "請輸入一個有效的 URL. 協議為必填 (例如 http://, https://, ftp://)。"
   please_enter_your_label_name_7745272d: "請輸入您的 %{label_name}："
   please_enter_your_label_name_and_password_5c56be80: "請輸入您的 %{label_name} 和密碼："
+  please_fix_errors_before_continuing_b1c13e7d: 請先修復錯誤，然後再繼續
   please_have_the_student_submit_the_file_again_dba514b7: 請要求學生重新提交檔案。
   please_insert_a_message_body_bc85cbff: 請插入訊息正文。
   please_let_them_know_which_page_you_were_viewing_a_6039f59a: 請讓他們知道您正在瀏覽哪一頁以及您已點開的連結。
@@ -24497,6 +24516,7 @@ zh-Hant:
   remove_name_calendar_bdc329d9: "移除 %{name} 行事曆"
   remove_null_values_from_live_event_payloads_3c826f: 從現場活動負荷中移除空值
   remove_observers_from_courses_703edc34: 從課程移除觀察者
+  remove_optionname_8a67379b: "移除 %{optionName}"
   remove_outcome_20e16da7: 移除成果？
   remove_outcome_2feaf5fd: 移除成果
   remove_outcomes_5f8b601c: 
@@ -25540,6 +25560,7 @@ zh-Hant:
   select_conference_provider_58c7f7fe: 選擇會議服務供應商
   select_content: 選擇內容
   select_content_7faa4195: 選擇內容
+  select_content_b0177809: 選取內容
   select_content_checkbox: 
     select_content_error: 必須選擇內容選項
   select_content_dialog: 
@@ -25555,6 +25576,7 @@ zh-Hant:
     titles: 
       add_item_to_module: 添加項目至單元
       find_links_using_service: "尋找使用 %{service} 的連結"
+  select_content_for_import_9406720: 選取要匯入的內容
   select_content_type_e49c5bf6: 選取內容類型
   select_conversation_subject_3f36074a: "選擇交談%{subject}"
   select_country_d21cb85a: 選擇國家
@@ -26090,6 +26112,7 @@ zh-Hant:
     flash_notices: 
       close: 關閉
     footer_links: 
+      cookie_notice: "Cookie 注意事項"
       facebook: Facebook
       privacy_policy: 隱私政策
       terms_of_service: 服務條款
@@ -26988,6 +27011,7 @@ zh-Hant:
   sorted_descending_84ec84c8: 降序排列。
   sorted_descending_d9aa3cf8: 降序排列。
   sorted_direction_by_columnname_d049ac44: "依 %{columnName} 將 %{direction} 排序"
+  source_c377a469: 來源
   source_code_2395ca74: 源代碼
   source_context_does_not_match_group_context_4b55cee4: 來源內容與群組內容不符
   source_link_c21ecc23: 來源連結
@@ -29315,6 +29339,7 @@ zh-Hant:
     new_topic: 新討論主題
   title_52b8638d: 標題：
   title_appointment_group_you_can_sign_up_for_this_1c254712: "*%{title} 預約群組* 您可以 **報名** 加入其中。"
+  title_count_c8e20865: "%{title} (%{count})"
   title_current_750a3c65: "%{title}（目前）"
   title_due_date_d3f46bfb: "%{title}：截止於 %{date}"
   title_eb77c512: "%{title}"
@@ -30600,6 +30625,7 @@ zh-Hant:
   use_semicolons_instead_of_commas_to_separate_field_f50945f2: "可以在成績單匯出中使用分號而不使用逗號以分隔欄位，使它們可以匯入到某些語言環境中的使用者 Excel 中。"
   use_semicolons_to_separate_fields_in_compatible_sp_56e0bdd2: 在成績單匯出中使用分號分隔欄位
   use_semicolons_to_separate_fields_in_gradebook_exp_5fb3b39d: 在成績單匯出中使用分號以分隔欄位
+  use_the_import_content_tool_to_migrate_course_mate_41716290: 使用「匯入內容」工具將課程材料從其他來源遷移到本課程。
   use_the_new_assignments_page_dd292b9d: 使用新的作業列表頁面
   use_the_new_assignments_student_page_944262af: 使用新的作業學生頁面
   use_the_new_assignments_teacher_page_8add7e46: 使用新的作業教師頁面
@@ -31126,6 +31152,7 @@ zh-Hant:
   users_can_access_and_create_but_not_edit_individua_c8a62c74: "啟用「作業及測驗 - 添加/編輯/刪除」後，使用者可以透過作業清單存取及建立（但不能編輯）個別作業評分標準。"
   users_can_access_the_manage_question_banks_link_on_e411d01: "啟用「課程內容 - 查看」及「作業及測驗 - 添加 / 編輯 / 刪除」後，使用者可以存取測驗索引頁的「管理題庫」連結。"
   users_can_add_this_calendar_to_their_other_calenda_69daaa69: 使用者可以將此行事曆添加到他們的「其他行事曆」清單中。
+  users_can_now_archive_grading_schemes_preventing_t_48605092: 使用者現在可以存檔等級評分方式，防止將其添加至課程/作業列表。舊內容中使用的等級評分方式將繼續使用。存檔的等級評分方式可以在帳戶級別等級評分方式設定頁面上存取，但無法編輯或刪除。
   users_can_temporarily_enroll_another_user_in_a_cou_ce9b48ed: 使用者可以在課程中暫時註冊另一個使用者。註冊學生到期時，從課程中移除指派的使用者。
   users_d1b60cb0: 使用者
   users_designers_22195c6f: "使用者 - 設計者"
@@ -31918,6 +31945,7 @@ zh-Hant:
   you_do_not_have_permission_to_publish_this_course_ff361c82: 您沒有發佈此課程的許可。
   you_do_not_have_permission_to_view_announcements_i_6b2e31a2: 您沒有檢視此課程中的通告的權限。
   you_do_not_have_permissions_to_build_this_moderate_bd5d350a: 您沒有建立此調整分數作業的權限"
+  you_do_not_have_permissions_to_create_assignments__f554cd6a: 您無權在提供的課程中建立作業列表
   you_do_not_have_permissions_to_edit_this_moderated_3195294f: 您沒有編輯此調整分數作業的權限
   you_do_not_have_permissions_to_modify_discussion_f_a163d8be: "您沒有修改分班 %{section_ids} 的討論區的權限"
   you_don_t_have_access_to_view_this_resource_8378e0e8: 您無權查看此資源。
@@ -32144,6 +32172,7 @@ zh-Hant:
   your_media_has_been_uploaded_and_will_appear_here__8546af57: 您的媒體已上載，並會在完成處理後顯示於此處。
   your_message_has_been_sent_thank_you_e0284316: 您的訊息已發送。謝謝您！
   your_message_was_sent_977f6583: 您的訊息已經發出。
+  your_migration_can_not_exceed_file_size_b0dda25f: "您的遷移不可超出 %{file_size}"
   your_modules_will_appear_here_after_they_re_assemb_bfd5abe8: 組合後您的單元將出現在此處。
   your_name_7665e1d8: 您的名稱
   your_outcomes_were_successfully_imported_c5de884: 您的學習成果已經成功匯入。

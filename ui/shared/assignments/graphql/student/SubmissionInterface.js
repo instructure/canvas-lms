@@ -41,6 +41,7 @@ export const SubmissionInterface = {
       grade
       gradeHidden
       gradingStatus
+      customGradeStatus
       latePolicyStatus
       mediaObject {
         ...MediaObject
@@ -79,6 +80,7 @@ export const SubmissionInterface = {
     attachments: arrayOf(SubmissionFile.shape),
     attempt: number.isRequired,
     body: string,
+    customGradeStatus: string,
     deductedPoints: number,
     enteredGrade: string,
     extraAttempts: number,
@@ -119,6 +121,7 @@ export const DefaultMocks = {
     originalityData: null,
     resourceLinkLookupUuid: null,
     state: 'unsubmitted',
+    customGradeStatus: null,
     sticker: null,
     submissionDraft: null,
     submissionStatus: 'unsubmitted',

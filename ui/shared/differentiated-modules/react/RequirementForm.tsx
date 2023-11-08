@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useMemo} from 'react'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {Button} from '@instructure/ui-buttons'
 import {IconAddLine} from '@instructure/ui-icons'
@@ -50,6 +50,11 @@ export default function RequirementForm({
   onDropRequirement,
   onUpdateRequirement,
 }: RequirementFormProps) {
+  const availableModuleItems = useMemo(() => {
+    const requirementIds = new Set(requirements.map(requirement => requirement.id))
+    return moduleItems.filter(module => !requirementIds.has(module.id))
+  }, [moduleItems, requirements])
+
   return (
     <FormFieldGroup
       description={I18n.t('Requirements')}
@@ -68,23 +73,25 @@ export default function RequirementForm({
         <RequirementSelector
           key={requirement.name}
           requirement={requirement}
-          moduleItems={moduleItems}
+          moduleItems={[requirement, ...availableModuleItems]}
           onDropRequirement={onDropRequirement}
           onUpdateRequirement={onUpdateRequirement}
           index={index}
         />
       ))}
-      <Button
-        onClick={() => {
-          onAddRequirement({
-            ...moduleItems[0],
-            type: 'view',
-          } as Requirement)
-        }}
-        renderIcon={<IconAddLine />}
-      >
-        {I18n.t('Requirement')}
-      </Button>
+      {availableModuleItems.length > 0 && (
+        <Button
+          onClick={() => {
+            onAddRequirement({
+              ...availableModuleItems[0],
+              type: 'view',
+            } as Requirement)
+          }}
+          renderIcon={<IconAddLine />}
+        >
+          {I18n.t('Requirement')}
+        </Button>
+      )}
     </FormFieldGroup>
   )
 }

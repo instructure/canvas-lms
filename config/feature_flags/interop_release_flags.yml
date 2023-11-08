@@ -5,16 +5,6 @@ developer_key_support_includes:
   description: |-
     Provides a flag on the Developer Key to support Include Parameters on API requests
   applies_to: SiteAdmin
-site_admin_keys_only:
-  state: hidden
-  display_name: Only show site admin keys in the site admin UI
-  description: |-
-    If enabled, the site admin developer key UI will only show
-    site admin developer keys. Note that this only affects
-    Canvas instances where root accounts are on the same shard
-    as the site admin account. Behavior in other instances
-    already behaved in this way.
-  applies_to: SiteAdmin
 disable_graphql_authentication:
   state: hidden
   display_name: Disable authentication for GraphQL
@@ -76,18 +66,6 @@ api_auth_error_updates:
     the "status" field will not be localized; it will always be given in
     English.
   applies_to: SiteAdmin
-no_redirect_on_oauth_token_method:
-  state: hidden
-  display_name: Updates to OAuth 2.0 flow to stop redirecting in the 'token' authentication
-  description: |-
-    If enabled, the OAuth 2.0 will now correctly return 4xx status codes to the
-    requesting client instead of redirecting them to themselves
-  applies_to: SiteAdmin
-  environments:
-    development:
-      state: on
-    ci:
-      state: on
 variable_substitution_numeric_to_string:
   state: hidden
   display_name: Returns string values instead of numeric values in variable substitutions
@@ -227,7 +205,7 @@ lti_overwrite_user_url_input_select_content_dialog:
   applies_to: RootAccount
   display_name: Overwrite user LTI URL input on select content dialog
   description: |-
-    If enabled, the user's LTI URL input on the select content dialog will be overwritten 
+    If enabled, the user's LTI URL input on the select content dialog will be overwritten
     if the tool responds with a valid LTI URL.
 lti_find_external_tool_prefer_original_client_id:
   state: hidden

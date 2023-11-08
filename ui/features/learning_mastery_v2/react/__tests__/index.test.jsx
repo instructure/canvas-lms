@@ -95,7 +95,7 @@ describe('LearningMastery', () => {
 
   let oldEnv
   beforeEach(() => {
-    useRollups.mockReturnValue({isLoading: false, students: users, outcomes, rollups})
+    useRollups.mockReturnValue({isLoading: false, students: users, gradebookFilters: [], setGradebookFilters: () => {}, outcomes, rollups})
     oldEnv = {...window.ENV}
     window.ENV = {
       GRADEBOOK_OPTIONS: {outcome_proficiency: {ratings}, ACCOUNT_LEVEL_MASTERY_SCALES: true},
@@ -126,7 +126,6 @@ describe('LearningMastery', () => {
   })
 
   it('renders each student, outcome, rollup from the response', async () => {
-    useRollups.mockReturnValue({isLoading: false, students: users, outcomes, rollups})
     const {getByText} = render(<LearningMastery {...defaultProps()} />)
     await act(async () => jest.runAllTimers())
     expect(getByText('Student 1')).toBeInTheDocument()

@@ -154,6 +154,7 @@ export const GRADEBOOK_STUDENT_QUERY = gql`
           deductedPoints
           enteredGrade
           gradeMatchesCurrentSubmission
+          customGradeStatus
         }
       }
     }

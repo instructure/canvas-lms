@@ -69,6 +69,7 @@ export default function SpeedGraderStatusMenu(props) {
     <Menu.Item
       key={status}
       value={status}
+      data-testid={`speedGraderStatusMenu-${status}`}
       selected={props.selection === status}
       onSelect={handleSelection}
     >
@@ -88,12 +89,13 @@ export default function SpeedGraderStatusMenu(props) {
                 size="small"
                 screenReaderLabel={I18n.t('Edit status')}
                 margin="none none small"
+                data-testid="speedGraderStatusMenu-editButton"
               >
                 <IconEditLine />
               </IconButton>
             }
           >
-            <Menu.Group label={<ScreenReaderContent>{I18n.t('Menu options')}</ScreenReaderContent>}>
+            <Menu.Group  label={<ScreenReaderContent>{I18n.t('Menu options')}</ScreenReaderContent>}>
               {menuOptions}
             </Menu.Group>
           </Menu>

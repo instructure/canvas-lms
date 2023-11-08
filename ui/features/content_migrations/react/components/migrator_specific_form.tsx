@@ -18,20 +18,25 @@
 
 import React from 'react'
 import CourseCopyImporter from './migrator_forms/course_copy'
-import {setSourceCourseType} from './types'
+import CanvasCartridgeImporter from './migrator_forms/canvas_cartridge'
+
+type MigratorSpecificFormProps = {
+  migrator: string
+  setSourceCourse: (sourceCourseId: string) => void
+  onSelectPreAttachmentFile: (preAttachmentFile: File | null) => void
+}
 
 export const MigratorSpecificForm = ({
   migrator,
   setSourceCourse,
-}: {
-  migrator: string
-  setSourceCourse: setSourceCourseType
-}) => {
+  onSelectPreAttachmentFile,
+}: MigratorSpecificFormProps) => {
   if (migrator === 'course_copy_importer') {
     return <CourseCopyImporter setSourceCourse={setSourceCourse} />
-  } else {
-    return null
+  } else if (migrator === 'canvas_cartridge_importer') {
+    return <CanvasCartridgeImporter onSelectPreAttachmentFile={onSelectPreAttachmentFile} />
   }
+  return null
 }
 
 export default MigratorSpecificForm

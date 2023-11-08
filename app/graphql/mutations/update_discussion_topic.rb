@@ -36,6 +36,18 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
       input[:locked] ? discussion_topic.lock! : discussion_topic.unlock!
     end
 
+    set_sections(input[:specific_sections], discussion_topic)
+    invalid_sections = verify_specific_section_visibilities(discussion_topic) || []
+
+    unless invalid_sections.empty?
+      return validation_error(I18n.t("You do not have permissions to modify discussion for section(s) %{section_ids}", section_ids: invalid_sections.join(", ")))
+    end
+
+    process_common_inputs(input, discussion_topic.is_announcement, discussion_topic)
+    process_future_date_inputs(input[:delayed_post_at], input[:lock_at], discussion_topic)
+
+    return errors_for(discussion_topic) unless discussion_topic.save
+
     {
       discussion_topic:
     }

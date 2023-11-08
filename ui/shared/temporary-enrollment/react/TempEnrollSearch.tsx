@@ -18,7 +18,7 @@
 
 import React, {ChangeEvent, useEffect, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
+import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {Avatar} from '@instructure/ui-avatar'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import doFetchApi from '@canvas/do-fetch-api-effect'
@@ -28,30 +28,23 @@ import {Spinner} from '@instructure/ui-spinner'
 import {TextInput} from '@instructure/ui-text-input'
 import {Table} from '@instructure/ui-table'
 import {Flex} from '@instructure/ui-flex'
+import {createAnalyticPropsGenerator} from './util/analytics'
+import {EMPTY_USER, MODULE_NAME, User} from './types'
 
 const I18n = useI18nScope('temporary_enrollment')
 
-interface AssignUser {
-  name: string
-  sis_user_id: string | null
-  email: string
-  login_id: string
-}
+// initialize analytics props
+const analyticProps = createAnalyticPropsGenerator(MODULE_NAME)
+
 interface Props {
-  readonly user: {
-    name: string
-    avatar_url?: string
-    id: string
-  }
-  page: number
-  searchFail: Function
-  searchSuccess: Function
+  readonly user: User
+  readonly page: number
+  readonly searchFail: Function
+  readonly searchSuccess: Function
   readonly canReadSIS?: boolean
   readonly accountId: string
-  readonly foundEnroll?: AssignUser
+  readonly foundEnroll?: User | null
 }
-
-const emptyEnroll = {name: '', sis_user_id: '', email: '', login_id: ''}
 
 export function TempEnrollSearch(props: Props) {
   // 'cc_path' | 'unique_id' | 'sis_user_id'
@@ -59,7 +52,7 @@ export function TempEnrollSearch(props: Props) {
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
   const [search, setSearch] = useState('')
-  const [enrollment, setEnrollment] = useState<AssignUser>(emptyEnroll)
+  const [enrollment, setEnrollment] = useState<User>(EMPTY_USER)
 
   const handleSearchTypeChange = (event: ChangeEvent<HTMLInputElement>, value: string) => {
     setSearchType(value)
@@ -83,7 +76,7 @@ export function TempEnrollSearch(props: Props) {
       props.searchSuccess(json)
     } catch (error: any) {
       setMessage(error)
-      setEnrollment(emptyEnroll)
+      setEnrollment(EMPTY_USER)
       props.searchFail()
     } finally {
       setLoading(false)
@@ -94,7 +87,7 @@ export function TempEnrollSearch(props: Props) {
     const foundUser = response.users[0]
     if (typeof foundUser === 'undefined') {
       setMessage(I18n.t('User could not be found.'))
-      setEnrollment(emptyEnroll)
+      setEnrollment(EMPTY_USER)
       props.searchFail()
       setLoading(false)
     } else if (response.users.length === 1 && foundUser.user_id !== props.user.id) {
@@ -104,7 +97,7 @@ export function TempEnrollSearch(props: Props) {
       setMessage(
         I18n.t('The user found matches the source user. Please search for a different user.')
       )
-      setEnrollment(emptyEnroll)
+      setEnrollment(EMPTY_USER)
       props.searchFail()
       setLoading(false)
     }
@@ -142,6 +135,7 @@ export function TempEnrollSearch(props: Props) {
   useEffect(() => {
     if (props.page === 1 && !props.foundEnroll) {
       setLoading(true)
+
       const findUser = async () => {
         try {
           const {json} = await doFetchApi({
@@ -149,14 +143,18 @@ export function TempEnrollSearch(props: Props) {
             method: 'POST',
             params: {user_list: search, v2: true, search_type: searchType},
           })
+
           processSearchApiResponse(json)
         } catch (error: any) {
           setMessage(error.message)
-          setEnrollment(emptyEnroll)
+          setEnrollment(EMPTY_USER)
+
           props.searchFail()
+
           setLoading(false)
         }
       }
+
       findUser()
     } else if (props.foundEnroll) {
       setEnrollment({...props.foundEnroll})
@@ -239,12 +237,14 @@ export function TempEnrollSearch(props: Props) {
             key="cc_path"
             value="cc_path"
             label={I18n.t('Email Address')}
+            {...analyticProps('EmailAddress')}
           />
           <RadioInput
             id="peoplesearch_radio_unique_id"
             key="unique_id"
             value="unique_id"
             label={I18n.t('Login ID')}
+            {...analyticProps('LoginID')}
           />
           {props.canReadSIS ? (
             <RadioInput
@@ -252,6 +252,7 @@ export function TempEnrollSearch(props: Props) {
               key="sis_user_id"
               value="sis_user_id"
               label={I18n.t('SIS ID')}
+              {...analyticProps('SISID')}
             />
           ) : null}
         </RadioInputGroup>
@@ -266,6 +267,7 @@ export function TempEnrollSearch(props: Props) {
             value={search}
             placeholder={exampleText}
             onChange={handleSearchChange}
+            {...analyticProps('TextInput')}
           />
         </fieldset>
       </>
