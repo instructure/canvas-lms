@@ -341,20 +341,6 @@ export const CourseHeaderOptions = forwardRef(
       }
     }
 
-    const ObserverOptionsContainer = () => (
-      <View as="div" display="inline-block" width={showingMobileNav ? '100%' : '16em'}>
-        <ScreenReaderContent>
-          <Heading as="h1">{courseContext}</Heading>
-        </ScreenReaderContent>
-        <ObserverOptions
-          observedUsersList={observedUsersList}
-          currentUser={currentUser}
-          handleChangeObservedUser={handleChangeObservedUser}
-          canAddObservee={false}
-        />
-      </View>
-    )
-
     const StudentViewButton = () => (
       <Button
         id="student-view-btn"
@@ -391,7 +377,19 @@ export const CourseHeaderOptions = forwardRef(
           <Flex alignItems="center" justifyItems="space-between">
             <Flex.Item>{showManageButton && <ManageButton />}</Flex.Item>
             <Flex.Item textAlign="end" shouldGrow={true} margin={`0 ${rightOptionsMargin} 0 0`}>
-              {showObserverOptions && <ObserverOptionsContainer />}
+              {showObserverOptions && (
+                <View as="div" display="inline-block" width={showingMobileNav ? '100%' : '16em'}>
+                  <ScreenReaderContent>
+                    <Heading as="h1">{courseContext}</Heading>
+                  </ScreenReaderContent>
+                  <ObserverOptions
+                    observedUsersList={observedUsersList}
+                    currentUser={currentUser}
+                    handleChangeObservedUser={handleChangeObservedUser}
+                    canAddObservee={false}
+                  />
+                </View>
+              )}
               {showStudentViewButton && <StudentViewButton />}
             </Flex.Item>
           </Flex>
