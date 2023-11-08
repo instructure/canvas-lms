@@ -42,7 +42,7 @@ import {GradedDiscussionDueDatesContext} from '../../util/constants'
 import {nanoid} from 'nanoid'
 import {AttachmentDisplay} from '@canvas/discussions/react/components/AttachmentDisplay/AttachmentDisplay'
 import {responsiveQuerySizes} from '@canvas/discussions/react/utils'
-import {UsageRights} from '../GradedDiscussionOptions/UsageRights'
+import {UsageRightsContainer} from '../../containers/usageRights/UsageRightsContainer'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 
 import {addNewGroupCategoryToCache} from '../../util/utils'
@@ -173,6 +173,7 @@ export default function DiscussionTopicForm({
     setUsageRightsErrorState(false)
     setUsageRightsData(data)
   }
+
   useEffect(() => {
     if (!isEditing || !currentDiscussionTopic) return
 
@@ -201,6 +202,7 @@ export default function DiscussionTopicForm({
     setDelayPosting(!!currentDiscussionTopic.delayedPostAt && isAnnouncement)
     setLocked(currentDiscussionTopic.locked && isAnnouncement)
     setAttachment(currentDiscussionTopic.attachment)
+    setUsageRightsData(currentDiscussionTopic?.attachment?.usageRights)
   }, [isEditing, currentDiscussionTopic, discussionAnonymousState, isAnnouncement])
 
   useEffect(() => {
@@ -262,7 +264,7 @@ export default function DiscussionTopicForm({
       return true
     }
 
-    if (usageRightsData?.selectedUsageRightsOption) return true
+    if (usageRightsData?.useJustification) return true
     setOnFailure(I18n.t('You must set usage rights'))
     setUsageRightsErrorState(true)
     return false
@@ -484,11 +486,11 @@ export default function DiscussionTopicForm({
             <Flex justifyItems="start" gap="small">
               <Flex.Item>{I18n.t('Set usage rights')}</Flex.Item>
               <Flex.Item>
-                <UsageRights
+                <UsageRightsContainer
                   contextType={(ENV?.context_type ?? '').toLocaleLowerCase()}
                   contextId={ENV?.context_id}
                   onSaveUsageRights={handleSettingUsageRightsData}
-                  currentUsageRights={usageRightsData}
+                  initialUsageRights={usageRightsData}
                   errorState={usageRightsErrorState}
                 />
               </Flex.Item>
