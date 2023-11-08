@@ -26,7 +26,6 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import DiscussionTopicForm from '../../components/DiscussionTopicForm/DiscussionTopicForm'
 import {setUsageRights} from '../../util/setUsageRights'
-
 import {getContextQuery} from '../../util/utils'
 
 const I18n = useI18nScope('discussion_create')
@@ -57,15 +56,15 @@ export default function DiscussionTopicFormContainer({apolloClient}) {
     try {
       const basicFileSystemData = attachmentData ? [{id: attachmentData._id, type: 'File'}] : []
       const usageRights = {
-        use_justification: usageData?.selectedUsageRightsOption?.value,
-        legal_copyright: usageData.copyrightHolder || '',
+        use_justification: usageData?.useJustification,
+        legal_copyright: usageData?.legalCopyright || '',
       }
 
-      if (usageData.selectedCreativeLicense) {
-        usageRights.license = usageData?.selectedCreativeLicense?.id
+      if (usageData.license) {
+        usageRights.license = usageData?.license
       }
       // Run API if a usageRight option is provided and there is a file/folder to update
-      if (basicFileSystemData.length !== 0 && usageData?.selectedUsageRightsOption?.value) {
+      if (basicFileSystemData.length !== 0 && usageData?.useJustification) {
         await setUsageRights(basicFileSystemData, usageRights, ENV.context_id, contextType)
       }
     } catch (error) {

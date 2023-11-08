@@ -893,6 +893,7 @@ describe "discussions" do
 
       context "discussion" do
         before do
+          attachment_model
           # TODO: Update to cover: graded, group discussions, file attachment, any other options later implemented
           all_discussion_options_enabled = {
             title: "value for title",
@@ -909,6 +910,7 @@ describe "discussions" do
             delayed_post_at: "Tue, 10 Oct 2023 16:00:00.000000000 UTC +00:00",
             lock_at: "Wed, 11 Nov 2023 15:59:59.999999000 UTC +00:00",
             is_section_specific: false,
+            attachment: @attachment
           }
 
           @topic_all_options = course.discussion_topics.create!(all_discussion_options_enabled)
@@ -950,6 +952,32 @@ describe "discussions" do
           # makes an exact comparison too fragile.
           expect(ff("input[placeholder='Select Date']")[0].attribute("value")).to eq("")
           expect(ff("input[placeholder='Select Date']")[1].attribute("value")).to eq("")
+        end
+
+        context "usage rights" do
+          before do
+            course.root_account.enable_feature!(:usage_rights_discussion_topics)
+            course.update!(usage_rights_required: true)
+
+            usage_rights = @course.usage_rights.create! use_justification: "creative_commons", legal_copyright: "(C) 2014 XYZ Corp", license: "cc_by_nd"
+            @attachment.usage_rights = usage_rights
+            @attachment.save!
+          end
+
+          it "displays correct usage rights" do
+            get "/courses/#{course.id}/discussion_topics/#{@topic_all_options.id}/edit"
+
+            expect(f("button[data-testid='usage-rights-icon']")).to be_truthy
+            f("button[data-testid='usage-rights-icon']").find_element(css: "svg")
+            # Verify that the correct icon appears
+            expect(f("button[data-testid='usage-rights-icon']").find_element(css: "svg").attribute("name")).to eq "IconFilesCreativeCommons"
+
+            f("button[data-testid='usage-rights-icon']").click
+
+            expect(f("input[data-testid='usage-select']").attribute("value")).to eq "The material is licensed under Creative Commons"
+            expect(f("input[data-testid='cc-license-select']").attribute("value")).to eq "CC Attribution No Derivatives"
+            expect(f("input[data-testid='legal-copyright']").attribute("value")).to eq "(C) 2014 XYZ Corp"
+          end
         end
       end
 

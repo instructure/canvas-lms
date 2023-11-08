@@ -21,21 +21,16 @@ import {render, fireEvent} from '@testing-library/react'
 import React from 'react'
 
 import {UsageRights} from '../UsageRights'
+import {defaultUsageRights, defaultCreativeOptions} from '../../../util/usageRightsConstants'
 
-const setup = ({
-  contextType = 'course',
-  contextId = '2',
-  onSaveUsageRights = () => {},
-  isOpen = true,
-  currentUsageRights = {},
-} = {}) => {
+const setup = ({onSaveUsageRights = () => {}, isOpen = true, currentUsageRights = {}} = {}) => {
   return render(
     <UsageRights
-      contextType={contextType}
-      contextId={contextId}
       onSaveUsageRights={onSaveUsageRights}
       isOpen={isOpen}
-      currentUsageRights={currentUsageRights}
+      initialUsageRights={currentUsageRights}
+      creativeCommonsOptions={defaultCreativeOptions}
+      usageRightsOptions={defaultUsageRights}
     />
   )
 }
@@ -53,11 +48,8 @@ describe('UsageRights', () => {
 
   it('initializes state from currentUsageRights', () => {
     const currentUsageRights = {
-      copyrightHolder: 'John Doe',
-      selectedUsageRightsOption: {
-        display: 'I hold the copyright',
-        value: 'own_copyright',
-      },
+      legalCopyright: 'John Doe',
+      useJustification: 'own_copyright',
     }
 
     const {getByLabelText} = setup({currentUsageRights, isOpen: true})
@@ -69,7 +61,7 @@ describe('UsageRights', () => {
   it('reverts to initial state on cancel', () => {
     const {getByText, getByLabelText, getByTestId} = setup({
       currentUsageRights: {
-        copyrightHolder: '',
+        legalCopyright: '',
       },
       isOpen: true,
     })
@@ -85,27 +77,6 @@ describe('UsageRights', () => {
 
     // Check the state has reverted
     expect(getByLabelText('Copyright Holder').value).toBe('')
-  })
-
-  it('saves initial state on save', () => {
-    const {getByText, getByLabelText, getByTestId} = setup({
-      currentUsageRights: {
-        copyrightHolder: '',
-      },
-      isOpen: true,
-    })
-
-    fireEvent.change(getByLabelText('Copyright Holder'), {
-      target: {value: 'Jane Smith'},
-    })
-
-    fireEvent.click(getByText('Save'))
-
-    // re-open the modal
-    fireEvent.click(getByTestId('usage-rights-icon'))
-
-    // Check the state has reverted
-    expect(getByLabelText('Copyright Holder').value).toBe('Jane Smith')
   })
 
   it('passes the correct values to onSaveUsageRights', async () => {
@@ -127,12 +98,8 @@ describe('UsageRights', () => {
     fireEvent.click(getByText('Save'))
 
     expect(onSaveUsageRightsMock).toHaveBeenCalledWith({
-      copyrightHolder: 'John Doe',
-      basicFileSystemData: [],
-      selectedUsageRightsOption: {
-        display: 'I hold the copyright',
-        value: 'own_copyright',
-      },
+      legalCopyright: 'John Doe',
+      useJustification: 'own_copyright',
     })
   })
 })
