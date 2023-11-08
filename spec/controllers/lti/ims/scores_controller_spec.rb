@@ -497,12 +497,12 @@ module Lti::IMS
               [
                 {
                   type: "file",
-                  url: "https://filesamples.com/samples/document/txt/sample1.txt",
+                  url: "https://getsamplefiles.com/download/txt/sample-1.txt",
                   title: "sample1.txt"
                 },
                 {
                   type: "not",
-                  url: "https://filesamples.com/samples/document/txt/sample1.txt",
+                  url: "https://getsamplefiles.com/download/txt/sample-1.txt",
                   title: "notAFile.txt"
                 }
               ]
@@ -631,12 +631,12 @@ module Lti::IMS
                     super().merge(Lti::Result::AGS_EXT_SUBMISSION => { content_items: [
                                                                          {
                                                                            type: "file",
-                                                                           url: "https://filesamples.com/samples/document/txt/sample1.txt",
+                                                                           url: "https://getsamplefiles.com/download/txt/sample-1.txt",
                                                                            title: "sample1.txt"
                                                                          },
                                                                          {
                                                                            type: "file",
-                                                                           url: "https://filesamples.com/samples/document/txt/sample2.txt",
+                                                                           url: "https://getsamplefiles.com/download/txt/sample-2.txt",
                                                                            title: "sample2.txt"
                                                                          },
                                                                        ],
