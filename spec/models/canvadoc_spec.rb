@@ -65,7 +65,7 @@ describe "Canvadoc" do
     it "doesn't upload again" do
       @doc.update_attribute :document_id, 999_999
       @doc.upload
-      expect(@doc.document_id.to_s).to eq "999999"  # not 123456
+      expect(@doc.document_id.to_s).to eq "999999" # not 123456
     end
 
     it "doesn't upload when canvadocs isn't configured" do
@@ -143,6 +143,34 @@ describe "Canvadoc" do
     it "... unless canvadocs isn't configured" do
       disable_canvadocs
       expect(@doc).not_to be_available
+    end
+  end
+
+  describe "#document_id" do
+    before { @doc.upload }
+
+    describe "when not on test cluster" do
+      it "returns document_id" do
+        expect(@doc.document_id.to_s).to eq "123456"
+      end
+    end
+
+    describe "when on test cluster" do
+      before do
+        allow(ApplicationController).to receive_messages(test_cluster?: true, region: "foo")
+      end
+
+      it "returns nil if last updated before last data refresh timestamp setting" do
+        last_data_refresh_time = @doc.updated_at + 10 # document was updated 10 seconds before the last data refresh
+        allow(Setting).to receive(:get).with("last_data_refresh_time_foo", nil).and_return last_data_refresh_time.to_s
+        expect(@doc.document_id).to be_nil
+      end
+
+      it "returns document_id if last updated after last data refresh timestamp setting" do
+        last_data_refresh_time = @doc.updated_at - 10 # document was updated 10 seconds after the last data refresh
+        allow(Setting).to receive(:get).with("last_data_refresh_time_foo", nil).and_return last_data_refresh_time.to_s
+        expect(@doc.document_id.to_s).to eq "123456"
+      end
     end
   end
 
