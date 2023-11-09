@@ -117,14 +117,17 @@ const ConversationListContainer = ({
 
   const inboxItemData = useMemo(() => {
     if (
-      (conversationsQuery.loading && !conversationsQuery.data) ||
-      (submissionCommentsQuery.loading && !submissionCommentsQuery.data)
+      (conversationsQuery.loading && !conversationsQuery?.data?.legacyNode) ||
+      (submissionCommentsQuery.loading && !submissionCommentsQuery?.data?.legacyNode)
     ) {
       return []
     }
+
     const data = isSubmissionCommentsType
       ? submissionCommentsQuery.data?.legacyNode?.viewableSubmissionsConnection?.nodes
-      : conversationsQuery.data?.legacyNode?.conversationsConnection?.nodes
+      : conversationsQuery.data?.legacyNode?.conversationsConnection?.nodes?.filter(
+          ({conversation}) => conversation
+        )
     const inboxData = inboxConversationsWrapper(data, isSubmissionCommentsType)
 
     if (inboxData.length > 0 && !conversationsQuery.loading && !submissionCommentsQuery.loading) {
