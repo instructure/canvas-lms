@@ -123,12 +123,14 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
   it "publishes the discussion topic" do
     @topic.unpublish!
     expect(@topic.published?).to be false
+    expected_title = @topic.title
 
     result = run_mutation({ id: @topic.id, published: true })
     expect(result["errors"]).to be_nil
     expect(result.dig("data", "updateDiscussionTopic", "discussionTopic", "published")).to be true
     @topic.reload
     expect(@topic.published?).to be true
+    expect(@topic.title).to eq expected_title
   end
 
   it "unpublishes the discussion topic" do
