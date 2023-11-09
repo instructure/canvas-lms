@@ -32,10 +32,20 @@ import {TempEnrollSearch} from './TempEnrollSearch'
 import {TempEnrollEdit} from './TempEnrollEdit'
 import {TempEnrollAssign} from './TempEnrollAssign'
 import {Flex} from '@instructure/ui-flex'
-import {Enrollment, EnrollmentType, MODULE_NAME, Role, TempEnrollPermissions, User} from './types'
+import {
+  Enrollment,
+  EnrollmentType,
+  MODULE_NAME,
+  RECIPIENT,
+  Role,
+  TempEnrollPermissions,
+  User,
+} from './types'
 import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {createAnalyticPropsGenerator} from './util/analytics'
 import {Spinner} from '@instructure/ui-spinner'
+import {fetchTemporaryEnrollments} from './api/enrollment'
+import {Alert} from '@instructure/ui-alerts'
 
 const I18n = useI18nScope('temporary_enrollment')
 
@@ -46,11 +56,7 @@ interface Props {
   readonly title: string | ((enrollmentType: EnrollmentType, name: string) => string)
   readonly enrollmentType: EnrollmentType
   readonly children: ReactElement
-  readonly user: {
-    readonly id: string
-    readonly name: string
-    readonly avatar_url?: string
-  }
+  readonly user: User
   readonly canReadSIS?: boolean
   readonly permissions: {
     readonly teacher: boolean
@@ -75,20 +81,35 @@ export function TempEnrollModal(props: Props) {
   const [page, setPage] = useState(0)
   const [enrollment, setEnrollment] = useState<User | null>(null)
   const [enrollmentData, setEnrollmentData] = useState<Enrollment[]>([])
+  const [isFetchEnrollmentDataComplete, setIsFetchEnrollmentDataComplete] = useState(false)
   const [isViewingAssignFromEdit, setIsViewingAssignFromEdit] = useState(false)
   const [buttonsDisabled, setButtonsDisabled] = useState(true)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [isModalOpenAnimationComplete, setIsModalOpenAnimationComplete] = useState(false)
+
+  useEffect(() => {
+    if (isFetchEnrollmentDataComplete && isModalOpenAnimationComplete) {
+      setLoading(false)
+      setButtonsDisabled(false)
+    }
+  }, [isFetchEnrollmentDataComplete, isModalOpenAnimationComplete])
+
+  const fetchAndSetEnrollments = async (userId: string, isRecipient: boolean) => {
+    try {
+      const fetchedEnrollments = await fetchTemporaryEnrollments(userId, isRecipient)
+      setEnrollmentData(fetchedEnrollments)
+    } catch (error) {
+      setErrorMessage('An unexpected error occurred, please try again later.')
+      // eslint-disable-next-line no-console
+      console.error(`Failed to fetch enrollments for user ${userId}:`, error)
+    }
+  }
 
   const dynamicTitle =
     typeof props.title === 'function'
       ? props.title(props.enrollmentType, props.user.name)
       : props.title
-
-  useEffect(() => {
-    if (props.tempEnrollments) {
-      setEnrollmentData(props.tempEnrollments)
-    }
-  }, [props.tempEnrollments])
 
   const resetCommonState = () => {
     if (props.isEditMode && props.onToggleEditMode) {
@@ -104,7 +125,8 @@ export function TempEnrollModal(props: Props) {
     setPage(0)
     setEnrollment(null)
     setIsViewingAssignFromEdit(false)
-
+    setIsFetchEnrollmentDataComplete(false)
+    setIsModalOpenAnimationComplete(false)
     resetCommonState()
   }
 
@@ -112,7 +134,6 @@ export function TempEnrollModal(props: Props) {
     setEnrollment(enrollmentUser)
     setPage(2)
     setIsViewingAssignFromEdit(true)
-
     resetCommonState()
   }
 
@@ -128,8 +149,6 @@ export function TempEnrollModal(props: Props) {
   const handleEnrollmentDeletion = (enrollmentId: number) => {
     // remove/update enrollment from internal state
     setEnrollmentData(prevData => prevData.filter(item => item.id !== enrollmentId))
-
-    // notify parent of deletion
     if (props.onDeleteEnrollment) {
       props.onDeleteEnrollment(enrollmentId)
     }
@@ -164,8 +183,21 @@ export function TempEnrollModal(props: Props) {
   }
 
   const handleModalEntered = () => {
-    setButtonsDisabled(false)
-    setLoading(false)
+    setIsModalOpenAnimationComplete(true)
+  }
+
+  const handleModalEnter = async () => {
+    setLoading(true)
+    setButtonsDisabled(true)
+
+    if (!props.user || !props.isEditMode) {
+      setIsFetchEnrollmentDataComplete(true)
+      return
+    }
+
+    const isRecipientEnrollment = props.enrollmentType === RECIPIENT
+    await fetchAndSetEnrollments(props.user.id, isRecipientEnrollment)
+    setIsFetchEnrollmentDataComplete(true)
   }
 
   const handleModalExit = () => {
@@ -175,12 +207,8 @@ export function TempEnrollModal(props: Props) {
 
   const handleChildClick =
     (originalOnClick?: MouseEventHandler<HTMLElement>) => (event: MouseEvent<HTMLElement>) => {
-      // stop the event from propagating up
       event.stopPropagation()
-
-      // trigger the modal open function
       handleOpenModal()
-
       // call the original onClick (if it exists)
       if (typeof originalOnClick === 'function') {
         originalOnClick(event)
@@ -288,6 +316,14 @@ export function TempEnrollModal(props: Props) {
     )
   }
 
+  const renderError = () => {
+    return (
+      <Alert variant="error" margin="0">
+        {errorMessage}
+      </Alert>
+    )
+  }
+
   return (
     <>
       <Modal
@@ -297,6 +333,7 @@ export function TempEnrollModal(props: Props) {
         label={I18n.t('Create a Temporary Enrollment')}
         shouldCloseOnDocumentClick={true}
         themeOverride={{smallMaxWidth: '30em'}}
+        onEnter={handleModalEnter}
         onEntered={handleModalEntered}
         onExit={handleModalExit}
         onDismiss={handleCloseModal}
@@ -308,7 +345,9 @@ export function TempEnrollModal(props: Props) {
           </Heading>
         </Modal.Header>
 
-        <Modal.Body>{loading ? renderLoader() : renderBody()}</Modal.Body>
+        <Modal.Body>
+          {errorMessage ? renderError() : loading ? renderLoader() : renderBody()}
+        </Modal.Body>
 
         <Modal.Footer>
           <Flex>{renderButtons()}</Flex>

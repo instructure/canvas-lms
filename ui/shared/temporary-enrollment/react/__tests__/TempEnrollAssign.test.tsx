@@ -24,7 +24,7 @@ import {
   tempEnrollAssignData,
 } from '../TempEnrollAssign'
 import fetchMock from 'fetch-mock'
-import {PROVIDER, RECIPIENT} from '../types'
+import {PROVIDER, RECIPIENT, User} from '../types'
 
 const backCall = jest.fn()
 
@@ -71,12 +71,12 @@ const props = {
     login_id: 'mel123',
     name: 'Melvin',
     sis_user_id: '5',
-  },
+  } as User,
   user: {
+    id: '1',
     name: 'John Smith',
     avatar_url: '',
-    id: '1',
-  },
+  } as User,
   permissions: truePermissions,
   roles: [
     {id: '91', label: 'Student', base_role_name: 'StudentEnrollment'},

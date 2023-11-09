@@ -20,13 +20,14 @@ import React from 'react'
 import {render, waitFor} from '@testing-library/react'
 import {TempEnrollSearch} from '../TempEnrollSearch'
 import fetchMock from 'fetch-mock'
+import {User} from '../types'
 
 describe('TempEnrollSearch', () => {
   const props = {
     user: {
       name: 'user1',
       id: '1',
-    },
+    } as User,
     accountId: '1',
     searchFail: jest.fn(),
     searchSuccess: jest.fn(),
@@ -70,6 +71,7 @@ describe('TempEnrollSearch', () => {
 
   it('displays error message when user is same as original user', async () => {
     fetchMock.post(`/accounts/1/user_lists.json?user_list=&v2=true&search_type=cc_path`, mockSame)
+    fetchMock.get('/api/v1/users/1', {})
     const {queryAllByText} = render(<TempEnrollSearch page={1} {...props} />)
     await waitFor(() =>
       expect(
@@ -91,7 +93,7 @@ describe('TempEnrollSearch', () => {
       `/accounts/1/user_lists.json?user_list=&v2=true&search_type=cc_path`,
       mockFindUser
     )
-    fetchMock.get('/api/v1/users/2', mockFindUser.users[0])
+    fetchMock.get('/api/v1/users/2', {})
     const {queryByText} = render(<TempEnrollSearch page={1} {...props} />)
     await waitFor(() =>
       expect(queryByText(/is ready to be assigned temporary enrollments/)).toBeTruthy()
