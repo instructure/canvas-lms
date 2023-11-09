@@ -1176,26 +1176,22 @@ describe EnrollmentsApiController, type: :request do
       end
 
       context "when feature flag is enabled" do
-        it "returns only recipient temporary enrollments" do
-          user_path = "/api/v1/users/#{@provider.id}/enrollments"
-          json = api_call_as_user(account_admin_user,
-                                  :get,
-                                  user_path,
-                                  @user_params.merge(temporary_enrollment_recipients: true,
-                                                     user_id: @provider.id))
+        it "returns appropriate status for a provider" do
+          user_path = "/api/v1/users/#{@provider.id}/temporary_enrollments"
+          user_params = { controller: "enrollments_api", action: "temporary_enrollments", user_id: @provider.id, format: "json" }
+          json = api_call_as_user(account_admin_user, :get, user_path, user_params)
           expect(json.length).to eq(2)
-          expect(json.first["user_id"]).to eq(@recipient.id)
+          expect(json["is_provider"]).to be_truthy
+          expect(json["is_recipient"]).to be_falsey
         end
 
-        it "returns only provider temporary enrollments" do
-          user_path = "/api/v1/users/#{@recipient.id}/enrollments"
-          json = api_call_as_user(account_admin_user,
-                                  :get,
-                                  user_path,
-                                  @user_params.merge(temporary_enrollment_providers: true,
-                                                     user_id: @recipient.id))
+        it "returns appropriate status for a recipient" do
+          user_path = "/api/v1/users/#{@recipient.id}/temporary_enrollments"
+          user_params = { controller: "enrollments_api", action: "temporary_enrollments", user_id: @recipient.id, format: "json" }
+          json = api_call_as_user(account_admin_user, :get, user_path, user_params)
           expect(json.length).to eq(2)
-          expect(json.first["user_id"]).to eq(@provider.id)
+          expect(json["is_provider"]).to be_falsey
+          expect(json["is_recipient"]).to be_truthy
         end
 
         it "returns temporary enrollments with included providers" do
@@ -1223,16 +1219,6 @@ describe EnrollmentsApiController, type: :request do
                                                      state: "current_and_future",
                                                      include: ["temporary_enrollment_providers"]))
           expect(json.length).to eq(1)
-          expect(json.first["user_id"]).to eq(@recipient.id)
-        end
-
-        it "returns default behavior if temporary enrollment args are not provided" do
-          user_path = "/api/v1/users/#{@recipient.id}/enrollments"
-          json = api_call_as_user(account_admin_user,
-                                  :get,
-                                  user_path,
-                                  @user_params.merge(user_id: @recipient.id))
-          expect(json.length).to eq(2)
           expect(json.first["user_id"]).to eq(@recipient.id)
         end
 
