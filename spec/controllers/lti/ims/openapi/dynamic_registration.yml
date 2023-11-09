@@ -10,20 +10,26 @@ paths:
       parameters:
         - in: path
           name: registration_url
+          required: true
           schema:
             type: string
       responses:
         302:
           description: TBD
           headers:
-            location:
-              type: string
+            Location:
+              schema:
+                type: string
   /api/lti/registrations:
     post:
       summary: TBD
       responses:
         '200':
           description: "The tool registration was created."
+          content:
+            application/json:
+              schema:
+                type: object
         '401':
           description: "The provided token was invalid."
         '422':
@@ -31,7 +37,7 @@ paths:
       requestBody:
         required: true
         content:
-          application/json:
+          application/x-www-form-urlencoded:
             schema:
               type: object
               properties:

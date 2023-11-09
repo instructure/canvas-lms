@@ -17,12 +17,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require "yaml"
+require_relative "openapi/openapi_spec_helper"
 
 describe Lti::IMS::DynamicRegistrationController do
-  before do
-    Account.default.root_account.enable_feature! :lti_dynamic_registration
-  end
-
   let(:controller_routes) do
     dynamic_registration_routes = []
     CanvasRails::Application.routes.routes.each do |route|
@@ -32,9 +29,19 @@ describe Lti::IMS::DynamicRegistrationController do
     dynamic_registration_routes
   end
 
-  let(:openapi_spec) do
-    openapi_location = File.join(File.dirname(__FILE__), "openapi", "dynamic_registration.yml")
-    YAML.load_file(openapi_location)
+  openapi_location = File.join(File.dirname(__FILE__), "openapi", "dynamic_registration.yml")
+  openapi_spec = YAML.load_file(openapi_location)
+
+  verifier = OpenApiSpecHelper::SchemaVerifier.new(openapi_spec)
+
+  before do
+    Account.default.root_account.enable_feature! :lti_dynamic_registration
+  end
+
+  after do
+    return unless request && response
+
+    verifier.verify(request, response)
   end
 
   it "has openapi documentation for each of our controller routes" do
