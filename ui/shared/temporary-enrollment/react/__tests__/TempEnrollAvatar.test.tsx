@@ -22,32 +22,48 @@ import '@testing-library/jest-dom'
 import {TempEnrollAvatar} from '../TempEnrollAvatar'
 import {User} from '../types'
 
-describe('<TempEnrollAvatar />', () => {
-  const user: User = {
-    id: '1',
-    name: 'John Doe',
-    avatar_url: 'http://example.com/avatar.jpg',
-  }
+const mockUser: User = {
+  id: '1',
+  name: 'John Doe',
+  avatar_url: 'http://example.com/avatar.jpg',
+}
 
+const props = {
+  user: mockUser,
+}
+
+describe('TempEnrollAvatar', () => {
   it('renders the user name', () => {
-    render(<TempEnrollAvatar user={user} />)
-    const nameElement = screen.getByText(user.name)
+    render(<TempEnrollAvatar {...props} />)
+    const nameElement = screen.getByText(props.user.name)
+    expect(nameElement).toBeInTheDocument()
+  })
+
+  it('renders the user name without an avatar url', () => {
+    const newProps = {
+      user: {
+        ...props.user,
+        avatar_url: undefined,
+      },
+    }
+    render(<TempEnrollAvatar {...newProps} />)
+    const nameElement = screen.getByText(props.user.name)
     expect(nameElement).toBeInTheDocument()
   })
 
   it('renders the avatar with correct attributes', () => {
-    render(<TempEnrollAvatar user={user} />)
+    render(<TempEnrollAvatar {...props} />)
     const avatarElement = screen.getByAltText('Avatar for John Doe')
     expect(avatarElement).toBeInTheDocument()
-    expect(avatarElement).toHaveAttribute('src', user.avatar_url)
+    expect(avatarElement).toHaveAttribute('src', props.user.avatar_url)
   })
 
   it('renders the children instead of the user name when provided', () => {
     const childText = 'Custom child text'
-    render(<TempEnrollAvatar user={user}>{childText}</TempEnrollAvatar>)
+    render(<TempEnrollAvatar {...props}>{childText}</TempEnrollAvatar>)
     const childElement = screen.getByText(childText)
     expect(childElement).toBeInTheDocument()
-    const nameElement = screen.queryByText(user.name)
+    const nameElement = screen.queryByText(props.user.name)
     expect(nameElement).not.toBeInTheDocument()
   })
 })

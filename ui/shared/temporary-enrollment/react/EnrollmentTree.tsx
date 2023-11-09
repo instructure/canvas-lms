@@ -317,9 +317,7 @@ export function EnrollmentTree(props: Props) {
   if (loading) {
     return (
       <Flex justifyItems="center" alignItems="center">
-        <Flex.Item shouldGrow={true}>
-          <Spinner renderTitle={I18n.t('Loading enrollments')} />
-        </Flex.Item>
+        <Spinner renderTitle={I18n.t('Loading enrollments')} />
       </Flex>
     )
   } else {

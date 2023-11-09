@@ -29,16 +29,14 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
  *  - Fetches enrollments where the user is a provider
  *
  * @param {number} userId ID of the user to fetch data for
- * @param {boolean} isRecipient Whether to fetch recipients or providers
- * @returns {Promise} Resolves to an array of enrollment data
+ * @param {boolean} isRecipient Fetch enrollments for recipients or providers
+ * @returns {Promise<Enrollment[]>} Resolves to an array of enrollment data
  */
 export async function fetchTemporaryEnrollments(
-  userId: number,
+  userId: string,
   isRecipient: boolean
 ): Promise<Enrollment[]> {
-  let responseStatus = -1
   const entityType = isRecipient ? 'recipients' : 'providers'
-
   const params: Record<string, any> = {
     temporary_enrollments: true,
     state: ['current_and_future'],
@@ -51,30 +49,18 @@ export async function fetchTemporaryEnrollments(
     params.temporary_enrollment_recipients = true
   }
 
-  try {
-    const {response, json} = await doFetchApi({
-      path: `/api/v1/users/${userId}/enrollments`,
-      params,
-    })
+  const {response, json} = await doFetchApi({
+    path: `/api/v1/users/${userId}/enrollments`,
+    params,
+  })
 
-    responseStatus = response.status
-
-    if (responseStatus === 204) {
-      return []
-    } else if (!response.ok) {
-      throw new Error(`Failed to fetch ${entityType} data. Status: ${responseStatus}`)
-    } else {
-      return await json
-    }
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error(
-      `Failed to fetch ${entityType} data for user ${userId}. Status: ${responseStatus}`,
-      error
-    )
-
+  if (response.status === 204) {
     return []
+  } else if (!response.ok) {
+    throw new Error(`Failed to fetch ${entityType} data. Status: ${response.status}`)
   }
+
+  return json
 }
 
 /**

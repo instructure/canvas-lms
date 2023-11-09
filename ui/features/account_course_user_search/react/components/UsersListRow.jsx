@@ -129,23 +129,25 @@ export default function UsersListRow({
   }
 
   useEffect(() => {
-    const fetchAllEnrollments = async () => {
-      try {
-        const [providerData, recipientData] = await Promise.all([
-          // provider-related enrollments
-          fetchTemporaryEnrollments(user.id, false),
-          // recipient-related enrollments
-          fetchTemporaryEnrollments(user.id, true),
-        ])
+    const fetchAllEnrollments = () => {
+      fetchTemporaryEnrollments(user.id, false)
+        .then(enrollments => {
+          setEnrollmentsAsProvider(enrollments)
+        })
+        .catch(error => {
+          // eslint-disable-next-line no-console
+          console.error('Failed to fetch enrollments as provider: ', error)
+        })
 
-        setEnrollmentsAsProvider(providerData)
-        setEnrollmentsAsRecipient(recipientData)
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error('Failed to fetch enrollments: ', error)
-      }
+      fetchTemporaryEnrollments(user.id, true)
+        .then(enrollments => {
+          setEnrollmentsAsRecipient(enrollments)
+        })
+        .catch(error => {
+          // eslint-disable-next-line no-console
+          console.error('Failed to fetch enrollments as recipient: ', error)
+        })
     }
-
     if (canTempEnroll) {
       fetchAllEnrollments()
     }
@@ -154,7 +156,6 @@ export default function UsersListRow({
   // render temporary enrollment modal, tooltip, and icon
   function renderTempEnrollModal(
     enrollmentType,
-    tempEnrollments,
     icon,
     editModeStatus,
     toggleOrSetEditModeFunction
@@ -170,7 +171,6 @@ export default function UsersListRow({
         permissions={enrollPerm}
         accountId={accountId}
         roles={roles}
-        tempEnrollments={tempEnrollments}
         isEditMode={editModeStatus}
         onToggleEditMode={toggleOrSetEditModeFunction}
         tempEnrollPermissions={tempEnrollPermissions}
@@ -200,33 +200,21 @@ export default function UsersListRow({
   function renderTempEnrollIcon() {
     // checks for user not being a provider or recipient
     if (enrollmentsAsProvider.length === 0 && enrollmentsAsRecipient.length === 0) {
-      return renderTempEnrollModal(null, null, generateIcon(), false, null)
+      return renderTempEnrollModal(null, generateIcon(), false, null)
     }
 
     // checks for user being a provider but not a recipient
     if (enrollmentsAsProvider.length > 0 && enrollmentsAsRecipient.length === 0) {
-      return renderTempEnrollModal(
-        PROVIDER,
-        enrollmentsAsProvider,
-        generateIcon(PROVIDER),
-        editMode,
-        toggleEditMode
-      )
+      return renderTempEnrollModal(PROVIDER, generateIcon(PROVIDER), editMode, toggleEditMode)
     }
 
     // checks for user being a recipient but not a provider
     if (enrollmentsAsProvider.length === 0 && enrollmentsAsRecipient.length > 0) {
       return (
         <>
-          {renderTempEnrollModal(
-            RECIPIENT,
-            enrollmentsAsRecipient,
-            generateIcon(RECIPIENT),
-            editMode,
-            toggleEditMode
-          )}
+          {renderTempEnrollModal(RECIPIENT, generateIcon(RECIPIENT), editMode, toggleEditMode)}
 
-          {renderTempEnrollModal(null, null, generateIcon(), false, () => setEditMode(false))}
+          {renderTempEnrollModal(null, generateIcon(), false, () => setEditMode(false))}
         </>
       )
     }
@@ -235,21 +223,9 @@ export default function UsersListRow({
     if (enrollmentsAsProvider.length > 0 && enrollmentsAsRecipient.length > 0) {
       return (
         <>
-          {renderTempEnrollModal(
-            RECIPIENT,
-            enrollmentsAsRecipient,
-            generateIcon(RECIPIENT),
-            editMode,
-            toggleEditMode
-          )}
+          {renderTempEnrollModal(RECIPIENT, generateIcon(RECIPIENT), editMode, toggleEditMode)}
 
-          {renderTempEnrollModal(
-            PROVIDER,
-            enrollmentsAsProvider,
-            generateIcon(PROVIDER),
-            editMode,
-            toggleEditMode
-          )}
+          {renderTempEnrollModal(PROVIDER, generateIcon(PROVIDER), editMode, toggleEditMode)}
         </>
       )
     }

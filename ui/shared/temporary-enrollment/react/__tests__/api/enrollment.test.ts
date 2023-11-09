@@ -33,17 +33,19 @@ const mockProviderUser: User = {
   name: 'Michelle Gonalez',
 }
 
+const mockSomeUser: User = {
+  id: '6789',
+  name: 'Some User',
+  avatar_url: 'https://someurl.com/avatar.png',
+}
+
 const mockEnrollment: Enrollment = {
   id: 1,
   course_id: 101,
   start_at: '2023-01-01T00:00:00Z',
   end_at: '2023-06-01T00:00:00Z',
   role_id: '5',
-  user: {
-    name: 'Some User',
-    avatar_url: 'https://someurl.com/avatar.png',
-    id: '6789',
-  },
+  user: mockSomeUser,
   temporary_enrollment_pairing_id: 2,
   temporary_enrollment_source_user_id: 3,
   type: 'TeacherEnrollment',
@@ -85,7 +87,7 @@ describe('enrollment api', () => {
           json: mockJson,
         })
 
-        const result = await fetchTemporaryEnrollments(1, true)
+        const result = await fetchTemporaryEnrollments('1', true)
         expect(result).toEqual(await mockJson)
       })
 
@@ -101,7 +103,7 @@ describe('enrollment api', () => {
           json: mockJson,
         })
 
-        const result = await fetchTemporaryEnrollments(1, false)
+        const result = await fetchTemporaryEnrollments('1', false)
         expect(result).toEqual(await mockJson)
       })
 
@@ -111,17 +113,29 @@ describe('enrollment api', () => {
           json: [],
         })
 
-        const result = await fetchTemporaryEnrollments(1, true)
+        const result = await fetchTemporaryEnrollments('1', true)
         expect(result).toEqual([])
       })
 
-      it('handles errors gracefully', async () => {
+      it('should throw an error when doFetchApi fails', async () => {
         ;(doFetchApi as jest.Mock).mockRejectedValue(new Error('An error occurred'))
+        await expect(fetchTemporaryEnrollments('1', true)).rejects.toThrow('An error occurred')
+      })
 
-        const result = await fetchTemporaryEnrollments(1, true)
-
-        expect(result).toEqual([])
-        expect(mockConsoleError).toHaveBeenCalled()
+      it.each([
+        [400, 'Bad Request'],
+        [401, 'Unauthorized'],
+        [403, 'Forbidden'],
+        [404, 'Not Found'],
+        [500, 'Internal Server Error'],
+      ])('should throw an error when doFetchApi returns status %i', async (status, statusText) => {
+        ;(doFetchApi as jest.Mock).mockResolvedValue({
+          response: {status, statusText, ok: false},
+          json: Promise.resolve({error: statusText}),
+        })
+        await expect(fetchTemporaryEnrollments('1', true)).rejects.toThrow(
+          new Error(`Failed to fetch recipients data. Status: ${status}`)
+        )
       })
 
       it('should return enrollment data with the correct type for a provider', async () => {
@@ -130,7 +144,7 @@ describe('enrollment api', () => {
           json: Promise.resolve([{}]),
           link: null,
         })
-        await fetchTemporaryEnrollments(1, false)
+        await fetchTemporaryEnrollments('1', false)
         expect(doFetchApi).toHaveBeenCalledWith(
           expect.objectContaining({
             path: '/api/v1/users/1/enrollments',
@@ -150,7 +164,7 @@ describe('enrollment api', () => {
           json: Promise.resolve([{}]),
           link: null,
         })
-        await fetchTemporaryEnrollments(1, true)
+        await fetchTemporaryEnrollments('1', true)
         expect(doFetchApi).toHaveBeenCalledWith(
           expect.objectContaining({
             path: '/api/v1/users/1/enrollments',
