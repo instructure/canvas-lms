@@ -95,6 +95,10 @@ Rails.configuration.after_initialize do
     with_each_shard_by_database(StreamItem, :destroy_stream_items_using_setting)
   end
 
+  Delayed::Periodic.cron "Ten minute course touch", "/10 * * * *" do
+    Course.touch_courses
+  end
+
   if IncomingMailProcessor::IncomingMessageProcessor.run_periodically?
     Delayed::Periodic.cron 'IncomingMailProcessor::IncomingMessageProcessor#process', '*/1 * * * *' do
       imp = IncomingMailProcessor::IncomingMessageProcessor.new(IncomingMail::MessageHandler.new, ErrorReport::Reporter.new)
