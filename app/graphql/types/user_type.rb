@@ -240,10 +240,7 @@ module Types
         filter = filter.presence || []
         filters = filter.select(&:presence)
         conversations_scope = conversations_scope.tagged(*filters, mode: filter_mode) if filters.present?
-
-        # This line removes any orphaned participants
-        conversations_scope.joins(:conversation)
-
+        conversations_scope
       end
     end
 
