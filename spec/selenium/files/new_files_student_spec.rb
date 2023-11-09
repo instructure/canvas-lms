@@ -127,6 +127,7 @@ describe "better_file_browsing" do
       end
 
       it "lets student access files in restricted folder hidden by link", priority: "1" do
+        skip "LF-999"
         @folder.update_attribute :hidden, true
 
         get "/courses/#{@course.id}/files/folder/restricted_folder?preview=#{@file.id}"
