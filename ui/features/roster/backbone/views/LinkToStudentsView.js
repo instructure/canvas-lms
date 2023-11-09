@@ -106,6 +106,7 @@ export default class LinkToStudentsView extends DialogBaseView {
     const newLinks = _.difference(this.students, currentLinks)
     const removeLinks = _.difference(currentLinks, this.students)
     const newEnrollments = []
+    let observerObservingObserver = false
 
     if (newLinks.length) {
       newDfd = $.Deferred()
@@ -133,12 +134,35 @@ export default class LinkToStudentsView extends DialogBaseView {
             data.enrollment.role_id = enrollment.role_id
           }
           udfds.push(
-            $.ajaxJSON(url, 'POST', data, newEnrollment => {
-              newEnrollment.observed_user = user
-              return newEnrollments.push(newEnrollment)
-            })
+            $.ajaxJSON(
+              url,
+              'POST',
+              data,
+              newEnrollment => {
+                newEnrollment.observed_user = user
+                return newEnrollments.push(newEnrollment)
+              },
+              // eslint-disable-next-line no-loop-func
+              response => {
+                const messages = Object.keys(response.errors)
+
+                if (messages.length > 0 && messages.includes('associated_user_id')) {
+                  const responseMessage = response.errors.associated_user_id[0].message
+                  if (responseMessage === 'Cannot observe observer observing self') {
+                    observerObservingObserver = true
+                  }
+                }
+              }
+            )
           )
         }
+
+        $.when(...Array.from(udfds || [])).fail(() => {
+          if (observerObservingObserver) {
+            newDfd.reject()
+          }
+        })
+
         return $.when(...Array.from(udfds || [])).done(() => {
           dfdsDone += 1
           if (dfdsDone === newLinks.length) {
@@ -163,14 +187,23 @@ export default class LinkToStudentsView extends DialogBaseView {
           this.updateEnrollments(newEnrollments, enrollmentsToRemove)
           return $.flashMessage(I18n.t('flash.links', 'Student links successfully updated'))
         })
-        .fail(() =>
-          $.flashError(
-            I18n.t(
-              'flash.linkError',
-              "Something went wrong updating the user's student links. Please try again later."
+        .fail(() => {
+          if (observerObservingObserver) {
+            $.flashError(
+              I18n.t(
+                'flash.observerObservingObserverError',
+                'Cannot observe user with another user that is being observed by the current user.'
+              )
             )
-          )
-        )
+          } else {
+            $.flashError(
+              I18n.t(
+                'flash.linkError',
+                "Something went wrong updating the user's student links. Please try again later."
+              )
+            )
+          }
+        })
         .always(() => this.close())
     )
   }
