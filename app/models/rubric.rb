@@ -95,8 +95,23 @@ class Rubric < ActiveRecord::Base
   end
 
   workflow do
-    state :active
+    state :active do
+      event :archive, transitions_to: :archived
+    end
+    state :archived do
+      event :unarchive, transitions_to: :active
+    end
     state :deleted
+  end
+
+  def archive
+    # overrides 'archive' event in workflow to make sure the feature flag is enabled
+    # remove this and 'unarchive' method when feature flag is removed
+    super if enhanced_rubrics_enabled?
+  end
+
+  def unarchive
+    super if enhanced_rubrics_enabled?
   end
 
   def self.aligned_to_outcomes
@@ -467,5 +482,9 @@ class Rubric < ActiveRecord::Base
       else
         context&.root_account_id
       end
+  end
+
+  def enhanced_rubrics_enabled?
+    Account.site_admin.feature_enabled?(:enhanced_rubrics)
   end
 end
