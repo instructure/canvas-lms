@@ -38,25 +38,25 @@ class Mutations::DiscussionBase < Mutations::BaseMutation
 
   field :discussion_topic, Types::DiscussionType, null: true
 
-  def process_common_inputs(input, is_announcement, discussion_topic)
-    discussion_topic.user = current_user
-    discussion_topic.title = input[:title]
-    discussion_topic.message = input[:message]
-    discussion_topic.workflow_state = (input[:published] || is_announcement) ? "active" : "unpublished"
-    discussion_topic.require_initial_post = input[:require_initial_post] || false
+  def process_common_inputs(input, is_announcement, discussion_topic, is_create = false)
+    discussion_topic.user = current_user if is_create
+    discussion_topic.title = input[:title] if input.key?(:title)
+    discussion_topic.message = input[:message] if input.key?(:message)
+    discussion_topic.workflow_state = (input[:published] || is_announcement) ? "active" : "unpublished" if is_create || input.key?(:published)
+    discussion_topic.require_initial_post = input[:require_initial_post] || false if is_create || input.key?(:require_initial_post)
 
-    discussion_topic.allow_rating = input[:allow_rating] || false
-    discussion_topic.only_graders_can_rate = input[:only_graders_can_rate] || false
+    discussion_topic.allow_rating = input[:allow_rating] || false if is_create || input.key?(:allow_rating)
+    discussion_topic.only_graders_can_rate = input[:only_graders_can_rate] || false if is_create || input.key?(:only_graders_can_rate)
 
     unless is_announcement
-      discussion_topic.todo_date = input[:todo_date]
-      discussion_topic.group_category_id = input[:group_category_id] if input[:group_category_id]
+      discussion_topic.todo_date = input[:todo_date] if input.key?(:todo_date)
+      discussion_topic.group_category_id = input[:group_category_id] if input.key?(:group_category_id)
     end
 
-    discussion_topic.podcast_enabled = input[:podcast_enabled] || false
-    discussion_topic.podcast_has_student_posts = input[:podcast_has_student_posts] || false
+    discussion_topic.podcast_enabled = input[:podcast_enabled] || false if is_create || input.key?(:podcast_enabled)
+    discussion_topic.podcast_has_student_posts = input[:podcast_has_student_posts] || false if is_create || input.key?(:podcast_has_student_posts)
 
-    if input[:file_id]
+    if input.key?(:file_id)
       attachment = Attachment.find(input[:file_id])
       raise ActiveRecord::RecordNotFound unless attachment.user == current_user
 
