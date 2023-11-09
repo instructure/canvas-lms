@@ -910,6 +910,34 @@ class EnrollmentsApiController < ApplicationController
     end
   end
 
+  # @API Fetch Temporary Enrollment recipient and provider status
+  # @beta
+  #
+  # Returns a JSON Object containing the temporary enrollment status for a user.
+  #
+  # @example_response
+  #   {
+  #     "is_provider": false, "is_recipient": true
+  #   }
+  def temporary_enrollments
+    GuardRail.activate(:secondary) do
+      user = api_find(User, params[:user_id])
+      if user&.account&.grants_right?(@current_user, session, :read_roster) &&
+         @domain_root_account&.feature_enabled?(:temporary_enrollments)
+
+        current_and_future = %w[active invited creation_pending pending_active pending_invited]
+        enrollment_scope = Enrollment.joins(:enrollment_state).where(enrollment_states: { state: current_and_future })
+
+        is_provider = enrollment_scope.temporary_enrollment_recipients_for_provider(user).exists?
+        is_recipient = enrollment_scope.temporary_enrollments_for_recipient(user).exists?
+
+        render json: { is_provider:, is_recipient: }
+      else
+        render_unauthorized_action and return false
+      end
+    end
+  end
+
   protected
 
   # Internal: Collect course enrollments that @current_user has permissions to
@@ -953,20 +981,17 @@ class EnrollmentsApiController < ApplicationController
     user = api_find(User, params[:user_id])
 
     if user && @domain_root_account&.feature_enabled?(:temporary_enrollments)
-      temp_enroll_params =
-        params.slice(:temporary_enrollment_recipients, :temporary_enrollment_providers, :temporary_enrollments)
+      if value_to_boolean(params[:temporary_enrollments]) && user.account.grants_right?(@current_user, session, :read_roster)
+        enrollments = Enrollment.temporary_enrollments_for_recipient(user)
+        return false unless enrollments.present?
 
-      if temp_enroll_params.present?
-        if user.account.grants_right?(@current_user, session, :read_roster)
-          enrollments = temporary_enrollment_conditions(user, temp_enroll_params)
-          if params[:state].present?
-            enrollments = enrollments.joins(:enrollment_state)
-                                     .where(enrollment_states: { state: enrollment_states_for_state_param })
-          end
-          return enrollments
-        else
-          render_unauthorized_action and return false
+        if params[:state].present?
+          enrollments = enrollments.joins(:enrollment_state)
+                                   .where(enrollment_states: { state: enrollment_states_for_state_param })
         end
+        return enrollments
+      else
+        render_unauthorized_action and return false
       end
     end
 
@@ -1090,27 +1115,6 @@ class EnrollmentsApiController < ApplicationController
     end
 
     [clauses.join(" AND "), replacements]
-  end
-
-  # Internal: Collect provider and recipient enrollments that @current_user
-  # has permissions to read.
-  #
-  # Returns an ActiveRecord scope of enrollments if present, otherwise false.
-  def temporary_enrollment_conditions(user, params)
-    if value_to_boolean(params[:temporary_enrollment_recipients])
-      enrollments = Enrollment.active_or_pending_by_date.temporary_enrollment_recipients_for_provider(user)
-    elsif value_to_boolean(params[:temporary_enrollment_providers])
-      recipient_enrollments = Enrollment.temporary_enrollments_for_recipient(user)
-      enrollments = Enrollment.active_or_pending_by_date.where(
-        course_id: recipient_enrollments.select(:course_id),
-        user_id: recipient_enrollments.select(:temporary_enrollment_source_user_id)
-      )
-    elsif value_to_boolean(params[:temporary_enrollments])
-      enrollments = Enrollment.temporary_enrollments_for_recipient(user)
-    end
-    return false unless enrollments.present?
-
-    enrollments
   end
 
   def enrollment_states_for_state_param
