@@ -3048,7 +3048,7 @@ describe Enrollment do
       @enrollment2.associated_user_id = @enrollment.user_id
 
       expect(@enrollment).to be_valid
-      expect { @enrollment2.save! }.to raise_error("Validation failed: Associated user Cannot observe user with another user that is being observed by the current user")
+      expect { @enrollment2.save! }.to raise_error("Validation failed: Associated user Cannot observe observer observing self")
     end
 
     context "sharding" do
