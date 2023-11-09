@@ -18,7 +18,6 @@
 
 import ReactDOM from 'react-dom'
 import React from 'react'
-import ready from '@instructure/ready'
 import {
   createBrowserRouter,
   createRoutesFromElements,
@@ -31,8 +30,6 @@ import {RubricRoutes} from '../../features/rubrics/routes/rubricRoutes'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {QueryProvider} from '@canvas/query'
 import {LearnerPassportRoutes} from '../../features/learner_passport/routes/LearnerPassportRoutes'
-
-const I18n = useI18nScope('main')
 
 const portalRouter = createBrowserRouter(
   createRoutesFromElements(
@@ -65,8 +62,10 @@ const portalRouter = createBrowserRouter(
   )
 )
 
-ready(() => {
+export function loadReactRouter() {
   const mountNode = document.querySelector('#react-router-portals')
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const I18n = useI18nScope('main')
   if (mountNode) {
     ReactDOM.render(
       <QueryProvider>
@@ -78,4 +77,4 @@ ready(() => {
       mountNode
     )
   }
-})
+}
