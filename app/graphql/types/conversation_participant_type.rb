@@ -45,10 +45,7 @@ module Types
       end
     end
 
-    # A paricipant shouldn't be able to exist without a conversation
-    # However there are some cases where orphaned participants exist
-    # We don't want to throw a graphql error in these cases
-    field :conversation, ConversationType, null: true
+    field :conversation, ConversationType, null: false
     def conversation
       load_association(:conversation)
     end
