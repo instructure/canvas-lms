@@ -81,7 +81,7 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
       return validation_error(I18n.t("You do not have permissions to modify discussion for section(s) %{section_ids}", section_ids: invalid_sections.join(", ")))
     end
 
-    process_common_inputs(input, is_announcement, discussion_topic)
+    process_common_inputs(input, is_announcement, discussion_topic, true)
     process_future_date_inputs(input[:delayed_post_at], input[:lock_at], discussion_topic)
     process_locked_parameter(input[:locked], discussion_topic)
 
