@@ -109,7 +109,7 @@ class Enrollment < ActiveRecord::Base
     if course.enrollments.where(type: "ObserverEnrollment",
                                 user_id: associated_user_id,
                                 associated_user_id: user_id).exists?
-      errors.add(:associated_user_id, "Cannot observe user with another user that is being observed by the current user")
+      errors.add(:associated_user_id, "Cannot observe observer observing self")
     end
   end
 
