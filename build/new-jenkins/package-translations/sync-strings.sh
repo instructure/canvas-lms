@@ -13,9 +13,11 @@ if [ ! -z "${SSH_USERNAME-}" ]; then
   export AWS_ROLE_ARN="arn:aws:iam::307761260553:role/translations-jenkins"
   export GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no -i /usr/src/sshkeyfile -l $SSH_USERNAME"
 
-  "$(yarn bin)/sync-translations" --ignore-jira --config ./package-translations/sync-config.json
-
+  # Sync crowdsourced translations, then professional translations. The order is important because the
+  # second will overwrite the first if both sources have translations for a single locale. Professional
+  # translations should take precedence.
   "$(yarn bin)/sync-translations" --ignore-jira --config ./package-translations/sync-config-crowd.json
+  "$(yarn bin)/sync-translations" --ignore-jira --config ./package-translations/sync-config.json
 fi
 
 # Remove empty/missing strings from catalogs.
