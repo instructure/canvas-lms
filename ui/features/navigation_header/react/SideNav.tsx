@@ -16,9 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState} from 'react'
-import {Navigation} from '@instructure/ui-navigation'
+import React, {useEffect, useRef, useState} from 'react'
+import {Navigation as SideNavBar} from '@instructure/ui-navigation'
 import {Badge} from '@instructure/ui-badge'
+import {CloseButton} from '@instructure/ui-buttons'
+import {Spinner} from '@instructure/ui-spinner'
+import {Tray} from '@instructure/ui-tray'
+import {View} from '@instructure/ui-view'
 import {Avatar} from '@instructure/ui-avatar'
 import {Img} from '@instructure/ui-img'
 import {
@@ -37,11 +41,21 @@ import {
 } from '@instructure/ui-icons'
 import {AccessibleContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {useQuery} from '@tanstack/react-query'
+import {useQuery} from '@canvas/query'
+import {useMutation, useQueryClient} from '@tanstack/react-query'
 import {getUnreadCount} from './queries/unreadCountQuery'
-import {getSetting} from './queries/settingsQuery'
+import {getSetting, setSetting} from './queries/settingsQuery'
+import {getActiveItem, getTrayLabel, getTrayPortal} from './utils'
+import type {ActiveTray} from './utils'
 
 const I18n = useI18nScope('sidenav')
+
+const CoursesTray = React.lazy(() => import('./trays/CoursesTray'))
+const GroupsTray = React.lazy(() => import('./trays/GroupsTray'))
+const AccountsTray = React.lazy(() => import('./trays/AccountsTray'))
+const ProfileTray = React.lazy(() => import('./trays/ProfileTray'))
+const HistoryTray = React.lazy(() => import('./trays/HistoryTray'))
+const HelpTray = React.lazy(() => import('./trays/HelpTray'))
 
 export const InformationIconEnum = {
   INFORMATION: 'information',
@@ -50,13 +64,95 @@ export const InformationIconEnum = {
   LIFE_SAVER: 'lifepreserver',
 }
 
+const defaultActiveItem = getActiveItem()
+
 const SideNav = () => {
+  const [isTrayOpen, setIsTrayOpen] = useState(false)
+  const [activeTray, setActiveTray] = useState<ActiveTray | null>(null)
+  const [selectedNavItem, setSelectedNavItem] = useState<ActiveTray | ''>(defaultActiveItem)
+  const sideNavRef = useRef<HTMLDivElement | null>(null)
+  const accountRef = useRef<Element | null>(null)
+  const dashboardRef = useRef<Element | null>(null)
+  const coursesRef = useRef<Element | null>(null)
+  const adminRef = useRef<Element | null>(null)
+  const calendarRef = useRef<Element | null>(null)
+  const inboxRef = useRef<Element | null>(null)
+  const helpRef = useRef<Element | null>(null)
+  const avatarRef = useRef<Element | null>(null)
+
+  // after tray is closed, eventually set activeTray to null
+  // we don't do this immediately in order to maintain animation of closing tray
+  useEffect(() => {
+    if (!isTrayOpen) {
+      setTimeout(() => setActiveTray(null), 150)
+    }
+  }, [isTrayOpen])
+
+  useEffect(() => {
+    // when an active tray is set, we infer that the tray is opened
+    if (activeTray) {
+      setIsTrayOpen(true)
+    }
+
+    // if the active tray is set to null, the active nav item should be
+    // determined by page location
+    setSelectedNavItem(activeTray ?? defaultActiveItem)
+  }, [activeTray])
+
+  useEffect(() => {
+    if (sideNavRef.current instanceof HTMLElement) {
+      const active = sideNavRef.current.querySelector('[data-selected="true"]')
+      if (active instanceof HTMLAnchorElement) {
+        active.dataset.selected = ''
+      }
+    }
+
+    switch (selectedNavItem) {
+      case 'profile':
+        if (accountRef.current instanceof HTMLElement) {
+          accountRef.current.dataset.selected = 'true'
+        }
+        break
+
+      case 'accounts':
+        if (adminRef.current instanceof HTMLElement) {
+          adminRef.current.dataset.selected = 'true'
+        }
+        break
+
+      case 'dashboard':
+        if (dashboardRef.current instanceof HTMLElement) {
+          dashboardRef.current.dataset.selected = 'true'
+        }
+        break
+      case 'conversations':
+        if (adminRef.current instanceof HTMLElement) {
+          adminRef.current.dataset.selected = 'true'
+        }
+        break
+      case 'courses':
+        if (coursesRef.current instanceof HTMLElement) {
+          coursesRef.current.dataset.selected = 'true'
+        }
+        break
+      case 'help':
+        if (helpRef.current instanceof HTMLElement) {
+          helpRef.current.dataset.selected = 'true'
+        }
+        break
+    }
+  }, [selectedNavItem])
+
+  const [trayShouldContainFocus, setTrayShouldContainFocus] = useState(false)
+  const [overrideDismiss] = useState(false)
+
   let logoUrl = null
-  const [isMinimized, setIsMinimized] = useState(false)
+  const queryClient = useQueryClient()
   const isK5User = window.ENV.K5_USER
   const helpIcon = window.ENV.help_link_icon
 
   const navItemThemeOverride = {
+    iconSize: '1.5675rem',
     iconColor: 'white',
     contentPadding: '0.1rem',
     backgroundColor: 'transparent',
@@ -90,68 +186,161 @@ const SideNav = () => {
     logoUrl = variables['ic-brand-header-image']
   }
 
-  useEffect(() => {
-    if (isMinimized) document.body.classList.remove('primary-nav-expanded')
-    else document.body.classList.add('primary-nav-expanded')
-  }, [isMinimized, setIsMinimized])
+  const {data: releaseNotesBadgeDisabled} = useQuery({
+    queryKey: ['settings', 'release_notes_badge_disabled'],
+    queryFn: getSetting,
+    enabled: countsEnabled && ENV.FEATURES.embedded_release_notes,
+    fetchAtLeastOnce: true,
+  })
+
+  const {data: unreadContentSharesCount} = useQuery({
+    queryKey: ['unread_count', 'content_shares'],
+    queryFn: getUnreadCount,
+    staleTime: 60 * 60 * 1000, // 1 hour
+    enabled: countsEnabled && ENV.CAN_VIEW_CONTENT_SHARES,
+    refetchOnWindowFocus: true,
+  })
 
   const {data: unreadConversationsCount} = useQuery({
     queryKey: ['unread_count', 'conversations'],
     queryFn: getUnreadCount,
     staleTime: 2 * 60 * 1000, // two minutes
     enabled: countsEnabled && !ENV.current_user_disabled_inbox,
-  })
-
-  const {data: unreadContentSharesCount} = useQuery({
-    queryKey: ['unread_count', 'content_shares'],
-    queryFn: getUnreadCount,
-    staleTime: 5 * 60 * 1000, // two minutes
-    enabled: countsEnabled && ENV.CAN_VIEW_CONTENT_SHARES,
-  })
-
-  const {data: releaseNotesBadgeDisabled} = useQuery({
-    queryKey: ['settings', 'release_notes_badge_disabled'],
-    queryFn: getSetting,
-    enabled: countsEnabled && ENV.FEATURES.embedded_release_notes,
+    broadcast: true,
+    refetchOnWindowFocus: true,
   })
 
   const {data: unreadReleaseNotesCount} = useQuery({
     queryKey: ['unread_count', 'release_notes'],
     queryFn: getUnreadCount,
-    staleTime: 24 * 60 * 60 * 1000, // one day
     enabled: countsEnabled && ENV.FEATURES.embedded_release_notes && !releaseNotesBadgeDisabled,
   })
 
+  const {data: collapseGlobalNav} = useQuery({
+    queryKey: ['settings', 'collapse_global_nav'],
+    queryFn: getSetting,
+    enabled: true,
+    fetchAtLeastOnce: true,
+  })
+
+  const setCollapseGlobalNav = useMutation({
+    mutationFn: setSetting,
+    onSuccess: () =>
+      queryClient.invalidateQueries({
+        queryKey: ['settings', 'collapse_global_nav'],
+      }),
+  })
+
+  function updateCollapseGlobalNav(newState: boolean) {
+    setCollapseGlobalNav.mutate({
+      setting: 'collapse_global_nav',
+      newState,
+    })
+  }
+
+  useEffect(() => {
+    const collapseDiv = document.querySelectorAll('[aria-label="Main navigation"]')[0]
+      .childNodes[1] as HTMLElement
+    collapseDiv.setAttribute('collapse-div', 'true')
+
+    const collapseButton = collapseDiv.childNodes[0] as HTMLElement
+    collapseButton.setAttribute('collapse-button', 'true')
+
+    if (collapseGlobalNav) document.body.classList.remove('primary-nav-expanded')
+    else document.body.classList.add('primary-nav-expanded')
+
+    if (avatarRef.current instanceof HTMLElement)
+      avatarRef.current.setAttribute('user-avatar', 'true')
+  }, [collapseGlobalNav])
+
   return (
-    <div style={{width: '100%', height: '100vh'}} data-testid="sidenav-container">
-      <Navigation
+    <div
+      ref={sideNavRef}
+      style={{width: '100%', height: '100vh'}}
+      className="sidenav-container"
+      data-testid="sidenav-container"
+    >
+      <style>{`
+        .sidenav-container a {
+          padding: 0.4375rem 0;
+          font-weight: 400;
+          transition: background-color 0.3s, padding 0.3s;
+        }
+        .sidenav-container a:hover {
+          text-decoration: inherit;
+          background-color: rgba(0, 0, 0, 0.2);
+        }
+        .sidenav-container a > div:first-child {
+          display: flex;
+          justify-content: center;
+        }
+        .sidenav-container a > div:nth-child(2) {
+          margin: 3px 0 0;
+        }
+        .canvas-logo {
+          width: ${!collapseGlobalNav ? '2.63rem' : '1.695rem'} !important;
+          height: ${!collapseGlobalNav ? '2.63rem' : '1.695rem'} !important;
+        }
+        .sidenav-container span[user-avatar="true"] {
+          width: ${!collapseGlobalNav ? '2.25rem' : '1.875rem'};
+          height: ${!collapseGlobalNav ? '2.25rem' : '1.875rem'};
+          border: 2px solid var(--ic-brand-global-nav-avatar-border) !important;
+        }
+        .sidenav-container a[data-selected="true"]:hover {
+          color: var(--ic-brand-primary);
+          background-color: var(--ic-brand-global-nav-menu-item__text-color);
+        }
+        .sidenav-container div[collapse-div="true"] {
+          display: flex;
+          align-items: end;
+          overflow: auto;
+          width: 100%;
+          height: 100%;
+        }
+        .sidenav-container button[collapse-button="true"] {
+          width: 100%;
+          padding: 0.75rem !important;
+        }
+      `}</style>
+      <SideNavBar
         label="Main navigation"
         toggleLabel={{
           expandedLabel: 'Minimize Navigation',
           minimizedLabel: 'Expand Navigation',
         }}
-        onMinimized={() => setIsMinimized(!isMinimized)}
+        defaultMinimized={collapseGlobalNav}
+        onMinimized={() => updateCollapseGlobalNav(!collapseGlobalNav)}
         themeOverride={{
           minimizedWidth: '100%',
         }}
       >
-        <Navigation.Item
+        <SideNavBar.Item
           icon={
             !logoUrl ? (
-              <div style={{margin: '0.5rem 0 0.5rem 0'}}>
-                <IconCanvasLogoSolid
-                  size={!isMinimized ? 'medium' : 'small'}
-                  data-testid="sidenav-canvas-logo"
-                />
+              <div
+                style={{
+                  margin: `${!collapseGlobalNav ? '0.825rem' : '0.5395rem'} 0 ${
+                    !collapseGlobalNav ? '0.435rem' : '0.4rem'
+                  } 0`,
+                }}
+              >
+                <IconCanvasLogoSolid className="canvas-logo" data-testid="sidenav-canvas-logo" />
               </div>
             ) : (
-              <Img
-                display="inline-block"
-                alt="sidenav-brand-logomark"
-                margin={`${!isMinimized ? 'xxx-small' : 'x-small'} 0 small 0`}
-                src={logoUrl}
-                data-testid="sidenav-brand-logomark"
-              />
+              <div
+                style={{
+                  margin: `${!collapseGlobalNav ? '-0.4rem' : '0.275rem'} 0 ${
+                    !collapseGlobalNav ? '-0.905rem' : '-0.275rem'
+                  } 0`,
+                }}
+              >
+                <Img
+                  display="inline-block"
+                  alt="sidenav-brand-logomark"
+                  src={logoUrl}
+                  data-testid="sidenav-brand-logomark"
+                />
+              </div>
             )
           }
           label={<ScreenReaderContent>{I18n.t('Home')}</ScreenReaderContent>}
@@ -162,7 +351,7 @@ const SideNav = () => {
           }}
           data-testid="sidenav-header-logo"
         />
-        <Navigation.Item
+        <SideNavBar.Item
           icon={
             <Badge
               count={unreadContentSharesCount}
@@ -185,51 +374,69 @@ const SideNav = () => {
               }
             >
               <Avatar
+                elementRef={el => (avatarRef.current = el)}
                 name={window.ENV.current_user.display_name}
                 size="x-small"
                 src={window.ENV.current_user.avatar_image_url}
                 data-testid="sidenav-user-avatar"
+                themeOverride={{
+                  background: 'transparent',
+                }}
               />
             </Badge>
           }
+          elementRef={el => (accountRef.current = el)}
           label={I18n.t('Account')}
-          onClick={() => {
-            // this.loadSubNav('account')
+          href="/profile/settings"
+          onClick={event => {
+            event.preventDefault()
+            setActiveTray('profile')
           }}
+          selected={selectedNavItem === 'profile'}
           themeOverride={navItemThemeOverride}
         />
-        <Navigation.Item
+        <SideNavBar.Item
+          elementRef={el => (adminRef.current = el)}
           icon={<IconAdminLine />}
           label={I18n.t('Admin')}
           href="/accounts"
           onClick={event => {
             event.preventDefault()
+            setActiveTray('accounts')
           }}
+          selected={selectedNavItem === 'accounts'}
           themeOverride={navItemThemeOverride}
         />
-        <Navigation.Item
-          selected={true}
+        <SideNavBar.Item
+          elementRef={el => (dashboardRef.current = el)}
           icon={isK5User ? <IconHomeLine data-testid="K5HomeIcon" /> : <IconDashboardLine />}
           label={isK5User ? I18n.t('Home') : I18n.t('Dashboard')}
           href="/"
           themeOverride={navItemThemeOverride}
+          selected={selectedNavItem === 'dashboard'}
         />
-        <Navigation.Item
+        <SideNavBar.Item
+          elementRef={el => (coursesRef.current = el)}
+          id={selectedNavItem === 'courses' ? 'active-courses' : ''}
           icon={<IconCoursesLine />}
           label={isK5User ? I18n.t('Subjects') : I18n.t('Courses')}
           href="/courses"
           onClick={event => {
             event.preventDefault()
+            setActiveTray('courses')
           }}
+          selected={selectedNavItem === 'courses'}
           themeOverride={navItemThemeOverride}
         />
-        <Navigation.Item
+        <SideNavBar.Item
+          elementRef={el => (calendarRef.current = el)}
           icon={<IconCalendarMonthLine />}
           label={I18n.t('Calendar')}
           href="/calendar"
           themeOverride={navItemThemeOverride}
+          selected={selectedNavItem === 'calendar'}
         />
-        <Navigation.Item
+        <SideNavBar.Item
           icon={
             <Badge
               count={unreadConversationsCount}
@@ -254,11 +461,13 @@ const SideNav = () => {
               <IconInboxLine />
             </Badge>
           }
+          elementRef={el => (inboxRef.current = el)}
           label={I18n.t('Inbox')}
           href="/conversations"
+          selected={selectedNavItem === 'conversations'}
           themeOverride={navItemThemeOverride}
         />
-        <Navigation.Item
+        <SideNavBar.Item
           icon={
             <Badge
               count={unreadReleaseNotesCount}
@@ -283,11 +492,70 @@ const SideNav = () => {
               {getHelpIcon()}
             </Badge>
           }
+          elementRef={el => (helpRef.current = el)}
           label={I18n.t('Help')}
-          href="/accounts/self/settings"
+          href="https://help.instructure.com/"
+          onClick={event => {
+            event.preventDefault()
+            setActiveTray('help')
+          }}
+          selected={selectedNavItem === 'help'}
           themeOverride={navItemThemeOverride}
         />
-      </Navigation>
+      </SideNavBar>
+      <Tray
+        key={activeTray}
+        label={getTrayLabel(activeTray)}
+        size="small"
+        open={isTrayOpen}
+        // We need to override closing trays
+        // so the tour can properly go through them
+        // without them unexpectedly closing.
+        onDismiss={
+          overrideDismiss
+            ? () => {}
+            : () => {
+                setIsTrayOpen(false)
+                setTrayShouldContainFocus(false)
+              }
+        }
+        shouldCloseOnDocumentClick={true}
+        shouldContainFocus={trayShouldContainFocus}
+        mountNode={getTrayPortal()}
+        themeOverride={{smallWidth: '28em'}}
+      >
+        <div className={`navigation-tray-container ${activeTray}-tray`}>
+          <CloseButton
+            placement="end"
+            onClick={() => {
+              setIsTrayOpen(false)
+              setTrayShouldContainFocus(false)
+            }}
+            screenReaderLabel={I18n.t('Close')}
+          />
+          <div className="tray-with-space-for-global-nav">
+            <React.Suspense
+              fallback={
+                <View display="block" textAlign="center">
+                  <Spinner
+                    size="large"
+                    delay={200}
+                    margin="large auto"
+                    renderTitle={() => I18n.t('Loading')}
+                  />
+                </View>
+              }
+            >
+              {activeTray === 'accounts' && <AccountsTray />}
+              {activeTray === 'courses' && <CoursesTray />}
+              {activeTray === 'groups' && <GroupsTray />}
+              {activeTray === 'profile' && <ProfileTray />}
+              {activeTray === 'history' && <HistoryTray />}
+              {activeTray === 'help' && <HelpTray closeTray={() => setIsTrayOpen(false)} />}
+            </React.Suspense>
+          </div>
+        </div>
+      </Tray>
     </div>
   )
 }

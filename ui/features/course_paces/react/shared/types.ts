@@ -54,6 +54,8 @@ export interface Course {
   readonly created_at: string
   readonly time_zone?: string
   readonly default_view?: 'feed' | 'wiki' | 'modules' | 'assignments' | 'syllabus' | null
+  readonly is_student?: boolean
+  readonly is_instructor?: boolean
 }
 
 /* Redux action types */

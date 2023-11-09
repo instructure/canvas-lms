@@ -51,7 +51,7 @@ export default function SearchApp() {
 
   useFetchApi(
     {
-      path: '/smartsearch',
+      path: `/api/v1/courses/${ENV.COURSE_ID}/smartsearch`,
       params: {
         q: searchString,
         page: page

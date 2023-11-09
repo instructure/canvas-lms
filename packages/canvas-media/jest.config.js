@@ -25,20 +25,23 @@ module.exports = {
       {
         suiteName: 'Canvas Media Jest Tests',
         outputDirectory: process.env.TEST_RESULT_OUTPUT_DIR || './coverage',
-        outputName: 'canvas-media-junit.xml'
-      }
-    ]
+        outputName: 'canvas-media-junit.xml',
+      },
+    ],
   ],
   setupFiles: ['jest-canvas-mock', '<rootDir>/jest/jest-setup.js'],
   setupFilesAfterEnv: ['@testing-library/jest-dom/extend-expect'],
   testEnvironment: '<rootDir>../../jest/strictTimeLimitEnvironment.js',
-  testMatch: ['**/__tests__/**/?(*.)(spec|test).js'],
+  testMatch: ['**/__tests__/**/?(*.)(spec|test).[jt]s?(x)'],
   testPathIgnorePatterns: ['<rootDir>/node_modules', '<rootDir>/lib', '<rootDir>/es'],
   transform: {
-    '\\.jsx?$': ['babel-jest', {
-      // use the CJS config until we're on Jest 27 and can look into loading
-      // ESMs natively; https://jestjs.io/docs/ecmascript-modules
-      configFile: require.resolve('./babel.config.cjs.js')
-    }]
-  }
+    '\\.jsx?$': [
+      'babel-jest',
+      {
+        // use the CJS config until we're on Jest 27 and can look into loading
+        // ESMs natively; https://jestjs.io/docs/ecmascript-modules
+        configFile: require.resolve('./babel.config.cjs.js'),
+      },
+    ],
+  },
 }

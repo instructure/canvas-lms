@@ -18,6 +18,7 @@
 
 import {Error} from '../../../shared/graphql/Error'
 import gql from 'graphql-tag'
+import {Attachment} from './Attachment'
 
 export const CREATE_DISCUSSION_TOPIC = gql`
   mutation CreateDiscussionTopic(
@@ -40,6 +41,8 @@ export const CREATE_DISCUSSION_TOPIC = gql`
     $isAnnouncement: Boolean
     $specificSections: String
     $groupCategoryId: ID
+    $assignment: AssignmentCreateOrUpdate
+    $fileId: ID
   ) {
     createDiscussionTopic(
       input: {
@@ -62,6 +65,8 @@ export const CREATE_DISCUSSION_TOPIC = gql`
         isAnnouncement: $isAnnouncement
         specificSections: $specificSections
         groupCategoryId: $groupCategoryId
+        assignment: $assignment
+        fileId: $fileId
       }
     ) {
       discussionTopic {
@@ -81,12 +86,40 @@ export const CREATE_DISCUSSION_TOPIC = gql`
         podcastEnabled
         podcastHasStudentPosts
         isAnnouncement
+        assignment {
+          _id
+          name
+          pointsPossible
+          gradingType
+          assignmentGroupId
+          canDuplicate
+          canUnpublish
+          courseId
+          description
+          dueAt
+          groupCategoryId
+          id
+          published
+          restrictQuantitativeData
+          sisId
+          state
+          peerReviews {
+            automaticReviews
+            count
+            dueAt
+            enabled
+          }
+        }
+        attachment {
+          ...Attachment
+        }
       }
       errors {
         ...Error
       }
     }
   }
+  ${Attachment.fragment}
   ${Error.fragment}
 `
 
@@ -106,6 +139,8 @@ export const UPDATE_DISCUSSION_TOPIC = gql`
     $podcastHasStudentPosts: Boolean
     $locked: Boolean
     $specificSections: String
+    $fileId: ID
+    $removeAttachment: Boolean
   ) {
     updateDiscussionTopic(
       input: {
@@ -123,6 +158,8 @@ export const UPDATE_DISCUSSION_TOPIC = gql`
         podcastHasStudentPosts: $podcastHasStudentPosts
         locked: $locked
         specificSections: $specificSections
+        fileId: $fileId
+        removeAttachment: $removeAttachment
       }
     ) {
       discussionTopic {
@@ -142,12 +179,16 @@ export const UPDATE_DISCUSSION_TOPIC = gql`
         podcastEnabled
         podcastHasStudentPosts
         isAnnouncement
+        attachment {
+          ...Attachment
+        }
       }
       errors {
         ...Error
       }
     }
   }
+  ${Attachment.fragment}
   ${Error.fragment}
 `
 

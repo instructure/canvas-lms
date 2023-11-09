@@ -67,7 +67,7 @@ describe "conversations new" do
         expect(messages[0].text).to include "#{@teacher.name}, #{@s[0].name}, #{@s[1].name}"
         f("span[data-testid='desktop-message-action-header'] button[data-testid='settings']").click
         fj("li:contains('Forward')").click
-        ff("input[aria-label='Address Book']")[1].click
+        ff("input[aria-label='Search']")[1].click
         fj("div[data-testid='address-book-item']:contains('Users')").click
         fj("div[data-testid='address-book-item']:contains('#{@s[2].name}')").click
         f("textarea[data-testid='message-body']").send_keys "forwarding to you"
@@ -94,7 +94,7 @@ describe "conversations new" do
         expect(fj("span:contains('second Message')")).to be_present
         expect(fj("span:contains('hi there')")).to be_present
 
-        ff("input[aria-label='Address Book']")[1].click
+        ff("input[aria-label='Search']")[1].click
         fj("div[data-testid='address-book-item']:contains('Users')").click
         fj("div[data-testid='address-book-item']:contains('#{@s[2].name}')").click
         f("textarea[data-testid='message-body']").send_keys "forwarding to you"
@@ -132,7 +132,7 @@ describe "conversations new" do
         expect(fj("span:contains('second Message')")).to be_present
         expect(f("span[data-testid='compose-modal-desktop']")).not_to contain_jqcss("span:contains('hi there')")
 
-        ff("input[aria-label='Address Book']")[1].click
+        ff("input[aria-label='Search']")[1].click
         fj("div[data-testid='address-book-item']:contains('Users')").click
         fj("div[data-testid='address-book-item']:contains('#{@s[2].name}')").click
         f("textarea[data-testid='message-body']").send_keys "forwarding to you"

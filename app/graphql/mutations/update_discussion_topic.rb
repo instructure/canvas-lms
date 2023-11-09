@@ -22,6 +22,7 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
   graphql_name "UpdateDiscussionTopic"
 
   argument :discussion_topic_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("DiscussionTopic")
+  argument :remove_attachment, Boolean, required: false
 
   field :discussion_topic, Types::DiscussionType, null: false
   def resolve(input:)
@@ -41,6 +42,10 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
 
     unless invalid_sections.empty?
       return validation_error(I18n.t("You do not have permissions to modify discussion for section(s) %{section_ids}", section_ids: invalid_sections.join(", ")))
+    end
+
+    if !input[:remove_attachment].nil? && input[:remove_attachment]
+      discussion_topic.attachment_id = nil
     end
 
     process_common_inputs(input, discussion_topic.is_announcement, discussion_topic)

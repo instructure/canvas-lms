@@ -16,30 +16,55 @@
 //  * with this program. If not, see <http://www.gnu.org/licenses/>.
 //  */
 
-// import '@instructure/canvas-theme'
-// import React from 'react'
-// import {shallow} from 'enzyme'
-// import MediaRecorder from '../MediaRecorder'
+import { fileWithExtension } from "../MediaRecorder";
 
-// const defaultProps = () => ({
-//   onSaveFile: () => {}
-// })
+describe('fileWithExtension', () => {
+    it('returns same file if it already has extension', () => {
+        const file = new File(['bits'], 'dummy-video.mp4')
+        const newFile = fileWithExtension(file);
+        expect(newFile).toBe(file)
+    })
 
-test('placeholder test', () => {})
+    it('adds extension by mime type', () => {
+        const file = new File(['bits'], 'dummy-video', {
+            type: 'video/mp4'
+        })
+        const newFile = fileWithExtension(file)
+        expect(newFile.name).toBe('dummy-video.mp4')
+    })
 
-// test.skip('renders the MediaRecorder component', () => {
-//   const tree = shallow(<MediaRecorder {...defaultProps()} />)
-//   expect(tree.exists()).toBe(true)
-// })
+    it('adds default extension if no mime type', () => {
+        const file = new File(['bits'], 'dummy-video')
+        const newFile = fileWithExtension(file)
+        expect(newFile.name).toBe('dummy-video.webm')
+    })
 
-// test.skip('onSaveFile calls the correct prop', () => {
-//   const props = defaultProps()
-//   const onSaveSpy = jest.fn()
-//   props.onSaveFile = onSaveSpy
-//   const tree = shallow(<MediaRecorder {...props} />)
+    it('retains properties', () => {
+        const file = new File(['bits'], 'dummy-audio', {
+            type: 'audio/mpeg',
+            lastModified: 123456
+        })
+        const newFile = fileWithExtension(file)
+        expect(newFile.name).toBe('dummy-audio.mp3')
+        expect(newFile.lastModified).toBe(123456)
+        expect(newFile.type).toBe('audio/mpeg')
+    })
 
-//   const FILE_NAME = 'Blah blah blah file'
-//   tree.instance().saveFile(FILE_NAME)
+    it('handles files that end with a period', () => {
+        const file = new File(['bits'], 'dummy-audio.', {
+            type: 'audio/mpeg',
+            lastModified: 123456
+        })
+        const newFile = fileWithExtension(file)
+        expect(newFile.name).toBe('dummy-audio.mp3')
+    })
 
-//   expect(onSaveSpy.mock.calls[0][0]).toMatch(FILE_NAME)
-// })
+    it('converts mime type to extension', () => {
+        const file = new File(['bits'], 'dummy-media.', {
+            type: 'video/quicktime',
+            lastModified: 123456
+        })
+        const newFile = fileWithExtension(file)
+        expect(newFile.name).toBe('dummy-media.mov')
+      })
+})

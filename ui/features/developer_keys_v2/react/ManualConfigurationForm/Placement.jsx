@@ -61,6 +61,15 @@ export default class Placement extends React.Component {
     'module_menu_modal',
   ]
 
+  // Placements that use launch_height/width instead of selection_height/width
+  launchPlacements = [
+    'assignment_edit',
+  ]
+
+  isLaunchPlacementType(placementName) {
+    return this.launchPlacements.includes(placementName)
+  }
+
   isAlwaysDeeplinking(placementName) {
     return this.alwaysDeeplinking.includes(placementName)
   }
@@ -133,16 +142,18 @@ export default class Placement extends React.Component {
     this.setState(state => ({placement: {...state.placement, text: value}}))
   }
 
-  handleSelectionHeightChange = e => {
+  handleHeightChange = e => {
     const value = e.target.value
     const numVal = parseInt(value, 10)
-    this.setOrDeletePlacementField('selection_height', !Number.isNaN(numVal) ? numVal : '')
+    const fieldName = e.target.name.includes('launch') ? 'launch_height' : 'selection_height'
+    this.setOrDeletePlacementField(fieldName, !Number.isNaN(numVal) ? numVal : '')
   }
 
-  handleSelectionWidthChange = e => {
+  handleWidthChange = e => {
     const value = e.target.value
     const numVal = parseInt(value, 10)
-    this.setOrDeletePlacementField('selection_width', !Number.isNaN(numVal) ? numVal : '')
+    const fieldName = e.target.name.includes('launch') ? 'launch_width' : 'selection_width'
+    this.setOrDeletePlacementField(fieldName, !Number.isNaN(numVal) ? numVal : '')
   }
 
   render() {
@@ -207,18 +218,36 @@ export default class Placement extends React.Component {
                 description={<ScreenReaderContent>{I18n.t('Display Values')}</ScreenReaderContent>}
                 layout="columns"
               >
-                <TextInput
-                  name={`${placementName}_selection_height`}
-                  value={placement.selection_height && placement.selection_height.toString()}
-                  renderLabel={I18n.t('Selection Height')}
-                  onChange={this.handleSelectionHeightChange}
-                />
-                <TextInput
-                  name={`${placementName}_selection_width`}
-                  value={placement.selection_width && placement.selection_width.toString()}
-                  renderLabel={I18n.t('Selection Width')}
-                  onChange={this.handleSelectionWidthChange}
-                />
+                {this.isLaunchPlacementType(placementName) ? (
+                  <TextInput
+                    name={`${placementName}_launch_height`}
+                    value={placement.launch_height && placement.launch_height.toString()}
+                    renderLabel={I18n.t('Launch Height')}
+                    onChange={this.handleHeightChange}
+                  />
+                ) : (
+                  <TextInput
+                    name={`${placementName}_selection_height`}
+                    value={placement.selection_height && placement.selection_height.toString()}
+                    renderLabel={I18n.t('Selection Height')}
+                    onChange={this.handleHeightChange}
+                  />
+                )}
+                {this.isLaunchPlacementType(placementName) ? (
+                  <TextInput
+                    name={`${placementName}_launch_width`}
+                    value={placement.launch_width && placement.launch_width.toString()}
+                    renderLabel={I18n.t('Launch Width')}
+                    onChange={this.handleWidthChange}
+                  />
+                ) : (
+                  <TextInput
+                    name={`${placementName}_selection_width`}
+                    value={placement.selection_width && placement.selection_width.toString()}
+                    renderLabel={I18n.t('Selection Width')}
+                    onChange={this.handleWidthChange}
+                  />
+                )}
               </FormFieldGroup>
             </FormFieldGroup>
           </View>

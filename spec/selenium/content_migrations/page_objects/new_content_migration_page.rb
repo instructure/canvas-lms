@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2020 - present Instructure, Inc.
+# Copyright (C) 2023 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -26,22 +26,37 @@ class ContentMigrationPage
       "#migrationFileUpload"
     end
 
+    def add_import_queue_button_selector
+      '[data-cid="BaseButton Button"]'
+    end
+
     # Selectors
+    def migration_type_dropdown
+      f("#Select_0")
+    end
+
+    def migration_type_option_by_id(id)
+      f("#" + id)
+    end
+
+    def add_import_queue_button
+      f('[data-testid="submitMigration"]')
+    end
+
     def selective_import_dropdown
       ff("input[name=selective_import]")
     end
 
-    def selective_imports(index)
-      ff("[name=selective_import]")[index]
+    def all_content_radio
+      f('[for="RadioInput_0"]')
     end
 
-    def selective_content
-      f(".migrationProgressItem .selectContentBtn").click
-      wait_for_ajax_requests
+    def specific_content_radio
+      f('[for="RadioInput_1"]')
     end
 
     def progress_status_label
-      f("div.progressStatus")
+      f('[data-testid="migrationStatus"]')
     end
 
     def migration_file_upload_input
@@ -49,11 +64,11 @@ class ContentMigrationPage
     end
 
     def select_content_button
-      f(".migrationProgressItem .selectContentBtn")
+      f('td [data-cid="BaseButton Button"]')
     end
 
     def all_assignments_checkbox
-      f('input[name="copy[all_assignments]"]')
+      f('input[data-testid="checkbox-copy[all_assignments]]"]')
     end
 
     def select_content_submit_button
@@ -65,7 +80,11 @@ class ContentMigrationPage
     end
 
     def course_search_input
-      f("#courseSearchField")
+      f("#Select_1")
+    end
+
+    def course_search_result(id)
+      f('#Selectable_1-list > li > [id="' + id + '"]')
     end
 
     def ui_auto_complete
@@ -77,7 +96,7 @@ class ContentMigrationPage
     end
 
     def course_search_results
-      ff("div", course_search_link)
+      ff("Selectable_1-list > li")
     end
 
     def course_search_results_visible

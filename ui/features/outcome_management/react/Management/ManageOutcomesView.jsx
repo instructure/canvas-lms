@@ -118,7 +118,7 @@ const ManageOutcomesView = ({
               />
             </Flex.Item>
             <Flex.Item as="div" padding="xx-small 0">
-              <Text size="medium">
+              <Text size="medium" weight="bold">
                 {I18n.t(
                   {
                     one: '%{count} Outcome',

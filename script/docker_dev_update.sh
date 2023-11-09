@@ -107,3 +107,8 @@ bundle_install
 install_node_packages
 compile_assets
 rake_db_migrate_dev_and_test
+
+if [[ ${stop:-n} == 'y' ]]; then
+  message "Restarting stopped docker containers..."
+  $DOCKER_COMMAND start
+fi

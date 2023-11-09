@@ -26,6 +26,7 @@ describe "assignment rubrics" do
 
   context "assignment rubrics as a teacher" do
     before do
+      Account.site_admin.disable_feature!(:enhanced_rubrics)
       course_with_teacher_logged_in
     end
 
@@ -710,6 +711,7 @@ describe "assignment rubrics" do
 
   context "assignment rubrics as an designer" do
     before do
+      Account.site_admin.disable_feature!(:enhanced_rubrics)
       course_with_designer_logged_in
     end
 

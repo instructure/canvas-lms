@@ -217,6 +217,8 @@ describe "selective_release module set up" do
       select_requirement_item_option(0, @assignment2.title)
       select_requirement_type_option(0, "Mark as done")
       click_settings_tray_update_module_button
+      ignore_relock
+
       assignment_tag = retrieve_assignment_content_tag(@module, @assignment2)
       expect(f("#{module_item_selector(assignment_tag.ids[0])} .requirement_type")).to have_class "must_mark_done_requirement"
 
@@ -224,6 +226,7 @@ describe "selective_release module set up" do
       module_index_menu_tool_link("Edit").click
       select_requirement_type_option(0, "Submit the assignment")
       click_settings_tray_update_module_button
+      ignore_relock
       expect(f("#{module_item_selector(assignment_tag.ids[0])} .requirement_type")).to have_class "must_submit_requirement"
     end
 
@@ -348,6 +351,67 @@ describe "selective_release module set up" do
     end
   end
 
+  context "uses tray to create modules" do
+    before(:once) do
+      Account.site_admin.enable_feature! :differentiated_modules
+      course_with_teacher(active_all: true)
+    end
+
+    before do
+      user_session(@teacher)
+    end
+
+    it "brings up the add module tray when +Module clicked" do
+      go_to_modules
+      click_new_module_link
+      expect(add_module_tray_exists?).to be true
+      expect(header_label.text).to eq("Add Module")
+    end
+
+    it "adds module with a prerequisite module in same transaction" do
+      first_module = @course.context_modules.create!(name: "First Module")
+      go_to_modules
+      click_new_module_link
+      update_module_name("Second Module")
+      click_add_prerequisites_button
+
+      select_prerequisites_dropdown_option(0, first_module.name)
+      expect(prerequisites_dropdown_value(0)).to eq(first_module.name)
+
+      click_add_tray_add_module_button
+
+      new_module = @course.context_modules.last
+      expect(element_exists?(context_module_selector(new_module.id))).to be_truthy
+      expect(prerequisite_message(new_module).text).to eq("Prerequisites: #{first_module.name}")
+    end
+
+    it "can cancel creation of module" do
+      go_to_modules
+      click_new_module_link
+      update_module_name("New Module")
+      click_add_tray_cancel_button
+      expect(@course.context_modules.count).to eq 0
+    end
+
+    it "can close creation of module" do
+      go_to_modules
+      click_new_module_link
+      update_module_name("New Module")
+      click_add_tray_close_button
+      expect(@course.context_modules.count).to eq 0
+    end
+
+    it "give error in add module tray if module name is not provided" do
+      go_to_modules
+      click_new_module_link
+      click_add_tray_add_module_button
+      expect(add_module_tray.text).to include("Module Name is required.")
+    end
+
+    it_behaves_like "selective_release add module tray", :context_modules
+    it_behaves_like "selective_release add module tray", :course_homepage
+  end
+
   context "Canvas for Elementary Modules Selective Release" do
     before :once do
       Account.site_admin.enable_feature! :differentiated_modules
@@ -370,5 +434,18 @@ describe "selective_release module set up" do
     it_behaves_like "selective_release module tray prerequisites", :canvas_for_elementary
     it_behaves_like "selective_release module tray assign to", :canvas_for_elementary
     it_behaves_like "selective release module tray requirements", :canvas_for_elementary
+  end
+
+  context "Canvas for Elementary Modules Selective Release Limited Set Up" do
+    before :once do
+      Account.site_admin.enable_feature! :differentiated_modules
+      teacher_setup
+    end
+
+    before do
+      user_session(@homeroom_teacher)
+    end
+
+    it_behaves_like "selective_release add module tray", :canvas_for_elementary
   end
 end

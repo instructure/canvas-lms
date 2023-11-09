@@ -137,48 +137,45 @@ describe('TempEnrollModal', () => {
   })
 
   it('displays the modal upon clicking the child element', () => {
-    // render the modal with a child element
     render(
       <TempEnrollModal {...modalProps}>
         <p>child_element</p>
       </TempEnrollModal>
     )
 
-    // modal heading should not be displayed initially
     expect(screen.queryByText('Create a temporary enrollment')).toBeNull()
 
     // trigger the modal to open and display the search screen (page 1)
     userEvent.click(screen.getByText('child_element'))
 
-    // modal heading should be displayed after the click
     expect(screen.getByText('Create a temporary enrollment')).toBeInTheDocument()
   })
 
   it('opens modal if prop is set to true', async () => {
-    // render the modal with a child element
     render(
       <TempEnrollModal {...modalProps} defaultOpen={true}>
         <p>child_element</p>
       </TempEnrollModal>
     )
 
-    // modal heading should be displayed
     expect(screen.getByText('Create a temporary enrollment')).toBeInTheDocument()
   })
 
   it('hides the modal upon clicking the cancel button', async () => {
-    // render the modal with a child element
     render(
       <TempEnrollModal {...modalProps} defaultOpen={true}>
         <p>child_element</p>
       </TempEnrollModal>
     )
 
-    // modal heading should be displayed after the click
     expect(screen.getByText('Create a temporary enrollment')).toBeInTheDocument()
 
-    // close the modal
-    userEvent.click(await screen.findByRole('button', {name: 'Cancel'}))
+    const cancel = await screen.findByRole('button', {name: 'Cancel'})
+    await waitFor(() => {
+      expect(cancel).not.toBeDisabled()
+    })
+
+    userEvent.click(cancel)
 
     // wait for the modal to close (including animation)
     await waitFor(() => {
@@ -198,18 +195,18 @@ describe('TempEnrollModal', () => {
     )
 
     const next = await screen.findByRole('button', {name: 'Next'})
+    await waitFor(() => {
+      expect(next).not.toBeDisabled()
+    })
 
     // click next to go to the search results screen (page 2)
     userEvent.click(next)
-
     expect(
       await screen.findByText(/is ready to be assigned temporary enrollments/)
     ).toBeInTheDocument()
 
     // click next to go to the assign screen (page 3)
     userEvent.click(next)
-
-    // confirm the modal is on the assign screen (page 3)
     await waitFor(() => {
       expect(screen.queryByText('Back')).toBeInTheDocument()
       expect(screen.queryByText(/is ready to be assigned temporary enrollments/)).toBeNull()
@@ -234,125 +231,105 @@ describe('TempEnrollModal', () => {
   })
 
   it('shows error and stays open if data is missing', async () => {
-    // setup API mocks
     fetchMock.post(`/accounts/1/user_lists.json?${userListsParams}`, userData)
     fetchMock.get('/api/v1/users/2', userData.users[0])
     fetchMock.get(ENROLLMENTS_URI, enrollmentsByCourse)
 
-    // render the modal with a child element
     render(
       <TempEnrollModal {...modalProps} defaultOpen={true}>
         <p>child_element</p>
       </TempEnrollModal>
     )
 
-    // cache the next button
     const next = await screen.findByRole('button', {name: 'Next'})
+    await waitFor(() => {
+      expect(next).not.toBeDisabled()
+    })
 
     // click next to go to the search results screen (page 2)
     userEvent.click(next)
-
-    // assertions for search results screen
     expect(
       await screen.findByText(/is ready to be assigned temporary enrollments/)
     ).toBeInTheDocument()
 
     // click next to go to the assign screen (page 3)
     userEvent.click(next)
-
-    //
     // NO PROVIDER BASE ROLE SELECTED!
-    //
-
-    // confirm the modal is on the assign screen (page 3)
     await waitFor(() => {
       expect(screen.queryByText('Back')).toBeInTheDocument()
       expect(screen.queryByText(/is ready to be assigned temporary enrollments/)).toBeNull()
     })
 
     userEvent.click(await screen.findByRole('button', {name: 'Submit'}))
-
     expect(await screen.findByText(/please select a role before submitting/i)).toBeInTheDocument()
 
-    // confirm mocks were called the expected number of times
     expect(fetchMock.calls(`/accounts/1/user_lists.json?${userListsParams}`).length).toBe(1)
     expect(fetchMock.calls('/api/v1/users/2').length).toBe(1)
     expect(fetchMock.calls(ENROLLMENTS_URI).length).toBe(1)
   })
 
   it('starts over when start over button is clicked', async () => {
-    // setup API mocks
     fetchMock.post(`/accounts/1/user_lists.json?${userListsParams}`, userData)
     fetchMock.get('/api/v1/users/2', userData.users[0])
 
-    // render the modal with a child element
     render(
       <TempEnrollModal {...modalProps} defaultOpen={true}>
         <p>child_element</p>
       </TempEnrollModal>
     )
 
-    // cache the next button
     const next = await screen.findByRole('button', {name: 'Next'})
+    await waitFor(() => {
+      expect(next).not.toBeDisabled()
+    })
 
     // click next to go to the search results screen (page 2)
     userEvent.click(next)
-
-    // assertions for search results screen
     expect(
       await screen.findByText(/is ready to be assigned temporary enrollments/)
     ).toBeInTheDocument()
 
-    // simulate clicking the start over button
     userEvent.click(await screen.findByRole('button', {name: 'Start Over'}))
-
     // modal is back on the search screen (page 1)
     await waitFor(() => {
       expect(screen.queryByText('Start Over')).toBeNull()
       expect(screen.queryByText(/is ready to be assigned temporary enrollments/)).toBeNull()
     })
 
-    // confirm mocks were called the expected number of times
     expect(fetchMock.calls(`/accounts/1/user_lists.json?${userListsParams}`).length).toBe(1)
     expect(fetchMock.calls('/api/v1/users/2').length).toBe(1)
   })
 
   it('goes back when the assign screen (page 3) back button is clicked', async () => {
-    // setup API mocks
     fetchMock.post(`/accounts/1/user_lists.json?${userListsParams}`, userData)
     fetchMock.get('/api/v1/users/2', userData.users[0])
     fetchMock.get(ENROLLMENTS_URI, enrollmentsByCourse)
 
-    // render the modal with a child element
     render(
       <TempEnrollModal {...modalProps} defaultOpen={true}>
         <p>child_element</p>
       </TempEnrollModal>
     )
 
-    // cache the next button
     const next = await screen.findByRole('button', {name: 'Next'})
+    await waitFor(() => {
+      expect(next).not.toBeDisabled()
+    })
 
     // click next to go to the search results screen (page 2)
     userEvent.click(next)
-
-    // assertions for search results screen
     expect(
       await screen.findByText(/is ready to be assigned temporary enrollments/)
     ).toBeInTheDocument()
 
     // click next to go to the assign screen (page 3)
     userEvent.click(next)
-
-    // confirm the modal is on the assign screen (page 3)
     await waitFor(() => {
       expect(screen.queryByText('Back')).toBeInTheDocument()
       expect(screen.queryByText(/is ready to be assigned temporary enrollments/)).toBeNull()
     })
 
-    // simulate clicking the back button
     userEvent.click(await screen.findByRole('button', {name: 'Back'}))
-
     // modal is back on the search results screen (page 2)
     await waitFor(() => {
       expect(screen.queryByText('Back')).toBeNull()
@@ -361,9 +338,39 @@ describe('TempEnrollModal', () => {
       ).toBeInTheDocument()
     })
 
-    // confirm mocks were called the expected number of times
     expect(fetchMock.calls(`/accounts/1/user_lists.json?${userListsParams}`).length).toBe(1)
     expect(fetchMock.calls('/api/v1/users/2').length).toBe(1)
     expect(fetchMock.calls(ENROLLMENTS_URI).length).toBe(1)
+  })
+
+  describe('disabled buttons', () => {
+    it('confirms cancel and next buttons are disabled at the appropriate times', async () => {
+      render(
+        <TempEnrollModal {...modalProps} defaultOpen={true}>
+          <p>child_element</p>
+        </TempEnrollModal>
+      )
+
+      let cancel = await screen.findByRole('button', {name: 'Cancel'})
+      let next = await screen.findByRole('button', {name: 'Next'})
+
+      expect(cancel).toBeDisabled()
+      expect(next).toBeDisabled()
+
+      await waitFor(() => {
+        expect(cancel).not.toBeDisabled()
+        expect(next).not.toBeDisabled()
+      })
+
+      userEvent.click(cancel)
+      // we need to re-select the buttons as they were updated/replaced in DOM
+      cancel = await screen.findByRole('button', {name: 'Cancel'})
+      next = await screen.findByRole('button', {name: 'Next'})
+
+      await waitFor(() => {
+        expect(cancel).toBeDisabled()
+        expect(next).toBeDisabled()
+      })
+    })
   })
 })

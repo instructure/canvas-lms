@@ -24,6 +24,7 @@ RSpec.describe Mutations::CreateDiscussionEntry do
   before(:once) do
     course_with_teacher(active_all: true)
     student_in_course(active_all: true)
+    teacher_in_course(active_all: true)
     discussion_topic_model({ context: @course, discussion_type: DiscussionTopic::DiscussionTypes::THREADED })
   end
 
@@ -139,6 +140,19 @@ RSpec.describe Mutations::CreateDiscussionEntry do
     attachment = attachment_with_context(@student)
     attachment.update!(user: @student)
     result = run_mutation(discussion_topic_id: @topic.id, message: "howdy", file_id: attachment.id)
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "createDiscussionEntry", "errors")).to be_nil
+
+    entry = @topic.discussion_entries.last
+    expect(result.dig("data", "createDiscussionEntry", "discussionEntry", "attachment", "_id")).to eq attachment.id.to_s
+    expect(entry.reload.attachment_id).to eq attachment.id
+  end
+
+  it "allows teachers to attach even with allow_student_forum_attachments set to false" do
+    @course.update!(allow_student_forum_attachments: false)
+    attachment = attachment_with_context(@teacher)
+    attachment.update!(user: @teacher)
+    result = run_mutation({ discussion_topic_id: @topic.id, message: "howdy", file_id: attachment.id }, @teacher)
     expect(result["errors"]).to be_nil
     expect(result.dig("data", "createDiscussionEntry", "errors")).to be_nil
 

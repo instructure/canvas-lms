@@ -27,29 +27,12 @@ import {
 } from 'react-router-dom'
 import {Spinner} from '@instructure/ui-spinner'
 import accountGradingSettingsRoutes from '../../features/account_grading_settings/routes/accountGradingSettingsRoutes'
+import {RubricRoutes} from '../../features/rubrics/routes/rubricRoutes'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {QueryClient} from '@tanstack/react-query'
-import {PersistQueryClientProvider} from '@tanstack/react-query-persist-client'
-import {createSyncStoragePersister} from '@tanstack/query-sync-storage-persister'
+import {QueryProvider} from '@canvas/query'
+import {LearnerPassportRoutes} from '../../features/learner_passport/routes/LearnerPassportRoutes'
 
 const I18n = useI18nScope('main')
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
-      retry: false,
-      staleTime: 0,
-      cacheTime: 1000 * 60 * 60 * 24, // 24 hours
-    },
-  },
-})
-
-const persister = createSyncStoragePersister({
-  storage: window.sessionStorage,
-})
 
 const portalRouter = createBrowserRouter(
   createRoutesFromElements(
@@ -72,6 +55,11 @@ const portalRouter = createBrowserRouter(
         />
       )}
 
+      {window.ENV.FEATURES.enhanced_rubrics && RubricRoutes}
+
+      {/* @ts-expect-error */}
+      {window.ENV.FEATURES.learner_passport && LearnerPassportRoutes}
+
       <Route path="*" element={<></>} />
     </Route>
   )
@@ -81,12 +69,12 @@ ready(() => {
   const mountNode = document.querySelector('#react-router-portals')
   if (mountNode) {
     ReactDOM.render(
-      <PersistQueryClientProvider client={queryClient} persistOptions={{persister}}>
+      <QueryProvider>
         <RouterProvider
           router={portalRouter}
           fallbackElement={<Spinner renderTitle={I18n.t('Loading page')} />}
         />
-      </PersistQueryClientProvider>,
+      </QueryProvider>,
       mountNode
     )
   }

@@ -34,7 +34,7 @@ module Lti::IMS::Concerns
       end
 
       def verify_context
-        render_error("Context not found", :not_found) if context.blank?
+        render_error("Context is deleted or not found", :not_found) if context.blank? || context.deleted?
       end
 
       def verify_tool

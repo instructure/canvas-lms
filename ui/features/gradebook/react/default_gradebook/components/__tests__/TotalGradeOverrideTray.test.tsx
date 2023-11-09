@@ -198,22 +198,6 @@ describe('TotalGradeOverrideTray Tests', () => {
       expect(radio).toBeChecked()
     })
 
-    it('renders radio inputs disabled when student does not have final grade override', () => {
-      useStore.setState({
-        finalGradeOverrides: {},
-      })
-      const {getByLabelText} = getComponent()
-      const noneRadio = getByLabelText('None')
-      const radio1 = getByLabelText('Custom Status 1')
-      const radio2 = getByLabelText('Custom Status 2')
-      const radio3 = getByLabelText('Custom Status 3')
-
-      expect(noneRadio).toBeDisabled()
-      expect(radio1).toBeDisabled()
-      expect(radio2).toBeDisabled()
-      expect(radio3).toBeDisabled()
-    })
-
     it('calls setFinalGradeOverride when a radio input is clicked', async () => {
       const saveFinalOverrideCustomStatusMock = jest.fn()
       jest.spyOn(FinalGradeOverrideHooks, 'useFinalGradeOverrideCustomStatus').mockReturnValue({
@@ -233,7 +217,87 @@ describe('TotalGradeOverrideTray Tests', () => {
       expect(updatedFinalGradeOverrides['1'].courseGrade?.customGradeStatusId).toEqual('3')
     })
 
+    it('calls setFinalGradeOverride when a radio input is clicked with null finalGradeOverride', async () => {
+      useStore.setState({
+        finalGradeOverrides: {},
+      })
+
+      const saveFinalOverrideCustomStatusMock = jest.fn()
+      jest.spyOn(FinalGradeOverrideHooks, 'useFinalGradeOverrideCustomStatus').mockReturnValue({
+        saveFinalOverrideCustomStatus: saveFinalOverrideCustomStatusMock,
+        saveCallStatus: ApiCallStatus.COMPLETED,
+      })
+
+      const {getByLabelText} = getComponent()
+      const radio = getByLabelText('Custom Status 3')
+
+      fireEvent.click(radio)
+
+      expect(saveFinalOverrideCustomStatusMock).toHaveBeenCalledWith('3', '1111', null)
+
+      await new Promise(resolve => setTimeout(resolve, 0))
+      const updatedFinalGradeOverrides = useStore.getState().finalGradeOverrides
+      expect(updatedFinalGradeOverrides['1'].courseGrade?.customGradeStatusId).toEqual('3')
+    })
+
     it('calls setFinalGradeOverride when a radio input is clicked with selectedGradingPeriodId', async () => {
+      const saveFinalOverrideCustomStatusMock = jest.fn()
+      jest.spyOn(FinalGradeOverrideHooks, 'useFinalGradeOverrideCustomStatus').mockReturnValue({
+        saveFinalOverrideCustomStatus: saveFinalOverrideCustomStatusMock,
+        saveCallStatus: ApiCallStatus.COMPLETED,
+      })
+
+      const {getByLabelText} = getComponent({selectedGradingPeriodId: '2'})
+      const radio = getByLabelText('Custom Status 1')
+
+      fireEvent.click(radio)
+
+      expect(saveFinalOverrideCustomStatusMock).toHaveBeenCalledWith('1', '1111', '2')
+
+      await new Promise(resolve => setTimeout(resolve, 0))
+      const updatedFinalGradeOverrides = useStore.getState().finalGradeOverrides
+      expect(
+        updatedFinalGradeOverrides['1'].gradingPeriodGrades?.['2']?.customGradeStatusId
+      ).toEqual('1')
+    })
+
+    it('calls setFinalGradeOverride when a radio input is clicked with selectedGradingPeriodId and null finalGradeOverride', async () => {
+      useStore.setState({
+        finalGradeOverrides: {},
+      })
+
+      const saveFinalOverrideCustomStatusMock = jest.fn()
+      jest.spyOn(FinalGradeOverrideHooks, 'useFinalGradeOverrideCustomStatus').mockReturnValue({
+        saveFinalOverrideCustomStatus: saveFinalOverrideCustomStatusMock,
+        saveCallStatus: ApiCallStatus.COMPLETED,
+      })
+
+      const {getByLabelText} = getComponent({selectedGradingPeriodId: '2'})
+      const radio = getByLabelText('Custom Status 1')
+
+      fireEvent.click(radio)
+
+      expect(saveFinalOverrideCustomStatusMock).toHaveBeenCalledWith('1', '1111', '2')
+
+      await new Promise(resolve => setTimeout(resolve, 0))
+      const updatedFinalGradeOverrides = useStore.getState().finalGradeOverrides
+      expect(
+        updatedFinalGradeOverrides['1'].gradingPeriodGrades?.['2']?.customGradeStatusId
+      ).toEqual('1')
+    })
+
+    it('calls setFinalGradeOverride when a radio input is clicked with selectedGradingPeriodId and null finalGradeOverride but valid course override', async () => {
+      useStore.setState({
+        finalGradeOverrides: {
+          '1': {
+            courseGrade: {
+              percentage: 0.5,
+              customGradeStatusId: '1',
+            },
+          },
+        },
+      })
+
       const saveFinalOverrideCustomStatusMock = jest.fn()
       jest.spyOn(FinalGradeOverrideHooks, 'useFinalGradeOverrideCustomStatus').mockReturnValue({
         saveFinalOverrideCustomStatus: saveFinalOverrideCustomStatusMock,

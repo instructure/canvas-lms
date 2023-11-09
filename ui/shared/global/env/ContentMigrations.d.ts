@@ -22,4 +22,14 @@
 export interface EnvContentMigrations {
   SHOW_SELECTABLE_OUTCOMES_IN_IMPORT?: boolean
   UPLOAD_LIMIT?: number
+  QUESTION_BANKS?: {
+    assessment_question_bank: {
+      id: number
+      title: string
+    }
+  }[]
+  NEW_QUIZZES_IMPORT?: boolean
+  NEW_QUIZZES_MIGRATION?: boolean
+  QUIZZES_NEXT_ENABLED?: boolean
+  NEW_QUIZZES_MIGRATION_DEFAULT?: boolean
 }

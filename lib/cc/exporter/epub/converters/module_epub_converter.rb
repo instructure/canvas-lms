@@ -20,6 +20,8 @@
 module CC::Exporter::Epub::Converters
   module ModuleEpubConverter
     include CC::Exporter
+    include CC::CCHelper
+    include Canvas::Migration::XMLHelper
 
     def settings_doc(html = false)
       path = @package_root.item_path("course_settings", "module_meta.xml")
@@ -29,6 +31,16 @@ module CC::Exporter::Epub::Converters
         open_file path
       else
         open_file_xml path
+      end
+    end
+
+    def page_content
+      @page_content ||= {}.tap do |pages|
+        Dir["#{@package_root.item_path("wiki_content")}/**/**"].each do |path|
+          doc = open_file_xml(path)
+          _title, body, meta = get_html_title_and_body_and_meta_fields(doc)
+          pages[meta["identifier"]] = body
+        end
       end
     end
 
@@ -72,6 +84,7 @@ module CC::Exporter::Epub::Converters
                                       else
                                         get_node_val(item_node, "identifierref")
                                       end
+          item[:text] = page_content[get_node_val(item_node, "identifierref")] if item.value?("WikiPage")
           item[:for_syllabus] = item.value?("Assignment") || item.value?("Quizzes::Quiz")
           item[:href] = "#{mod[:identifier]}.xhtml##{item[:linked_resource_id]}"
           item

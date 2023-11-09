@@ -24,12 +24,13 @@ import Navigation from './react/OldSideNav'
 import MobileNavigation from './react/MobileNavigation'
 import ready from '@instructure/ready'
 import NewTabIndicator from './react/NewTabIndicator'
+import {QueryProvider} from '@canvas/query'
 
 const I18n = useI18nScope('common')
 
 // #
 // Handle user toggling of nav width
-let navCollapsed = window.ENV.SETTINGS && window.ENV.SETTINGS.collapse_global_nav
+let navCollapsed = Boolean(window.ENV.SETTINGS?.collapse_global_nav)
 
 $('body').on('click', '#primaryNavToggle', function () {
   let primaryNavToggleText
@@ -56,26 +57,18 @@ $('body').on('click', '#primaryNavToggle', function () {
 ready(() => {
   const globalNavTrayContainer = document.getElementById('global_nav_tray_container')
   if (globalNavTrayContainer) {
-    const DesktopNavComponent = React.createRef()
-    const mobileNavComponent = React.createRef()
-
     ReactDOM.render(
-      <Navigation
-        // @ts-expect-error
-        ref={DesktopNavComponent}
-        // @ts-expect-error
-        onDataReceived={() => mobileNavComponent.current?.forceUpdate()}
-      />,
+      <QueryProvider>
+        <Navigation />
+      </QueryProvider>,
       globalNavTrayContainer,
       () => {
         const mobileContextNavContainer = document.getElementById('mobileContextNavContainer')
         if (mobileContextNavContainer) {
           ReactDOM.render(
-            <MobileNavigation
-              // @ts-expect-error
-              ref={mobileNavComponent}
-              DesktopNavComponent={DesktopNavComponent.current}
-            />,
+            <QueryProvider>
+              <MobileNavigation />
+            </QueryProvider>,
             mobileContextNavContainer
           )
         }

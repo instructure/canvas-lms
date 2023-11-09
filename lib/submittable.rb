@@ -19,7 +19,7 @@
 
 module Submittable
   def self.included(klass)
-    klass.belongs_to :assignment
+    klass.belongs_to :assignment, inverse_of: klass.table_name.singularize
     klass.belongs_to :old_assignment, class_name: "Assignment"
     klass.has_many :assignment_student_visibilities, through: :assignment
 

@@ -51,7 +51,7 @@ export function PostMessage({...props}) {
           titleMargin: '0',
           titleTextSize: 'small',
           titleTextWeight: 'bold',
-          messageTextSize: 'fontSizeSmall',
+          messageTextSize: 'fontSizeXSmall',
         },
         desktop: {
           titleMargin: props.threadMode ? '0' : '0 0 small 0',

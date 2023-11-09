@@ -364,7 +364,12 @@ Sets a message to be shown in a browser dialog before page closes (ie
 **Required properties:**
 
 - subject: "lti.setUnloadMessage"
-- message: The message to be shown in the dialog
+
+**Optional properties:**
+
+- message: The message to be shown in the dialog. Most browser no longer
+  support a custom message here, so a generic (built-in to the browser) message
+  will be shown.
 
 ```js
 window.parent.postMessage(

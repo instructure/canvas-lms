@@ -84,6 +84,14 @@ RSpec.describe SubmissionComment do
           comment = @submission.submission_comments.create!(comment: "hi", author: @student)
           expect(comment.grants_right?(@teacher, :delete)).to be true
         end
+
+        it "can delete comments in a moderated assignment and the grader is not the final grader" do
+          @assignment.update!(moderated_grading: true, grades_published_at: nil, grader_count: 1)
+          expect(@teacher.id).not_to eq(@assignment.final_grader_id)
+          @submission.grade_posting_in_progress = false
+          comment = @submission.submission_comments.create!(comment: "hi", author: @student)
+          expect(comment.grants_right?(@teacher, :delete)).to be true
+        end
       end
     end
 
@@ -133,6 +141,14 @@ RSpec.describe SubmissionComment do
         it "cannot update students' non-draft comments" do
           comment = @submission.submission_comments.create!(comment: "hi", author: @student)
           expect(comment.grants_right?(@teacher, :update)).to be false
+        end
+
+        it "can update their own comments in a moderated assignment when the grader is not the final grader" do
+          @assignment.update!(moderated_grading: true, grades_published_at: nil, grader_count: 1)
+          expect(@teacher.id).not_to eq(@assignment.final_grader_id)
+          @submission.grade_posting_in_progress = false
+          comment = @submission.submission_comments.create!(comment: "hi", author: @teacher)
+          expect(comment.grants_right?(@teacher, :update)).to be true
         end
       end
     end

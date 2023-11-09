@@ -222,6 +222,9 @@
             "name": "Term"
           },
           {
+            "name": "UsageRights"
+          },
+          {
             "name": "User"
           }
         ]
@@ -403,6 +406,9 @@
           },
           {
             "name": "Term"
+          },
+          {
+            "name": "UsageRights"
           },
           {
             "name": "User"

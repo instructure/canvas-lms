@@ -34,6 +34,7 @@ class Mutations::DiscussionBase < Mutations::BaseMutation
   argument :podcast_enabled, Boolean, required: false
   argument :podcast_has_student_posts, Boolean, required: false
   argument :specific_sections, String, required: false
+  argument :file_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Attachment")
 
   field :discussion_topic, Types::DiscussionType, null: true
 
@@ -54,6 +55,17 @@ class Mutations::DiscussionBase < Mutations::BaseMutation
 
     discussion_topic.podcast_enabled = input[:podcast_enabled] || false
     discussion_topic.podcast_has_student_posts = input[:podcast_has_student_posts] || false
+
+    if input[:file_id]
+      attachment = Attachment.find(input[:file_id])
+      raise ActiveRecord::RecordNotFound unless attachment.user == current_user
+
+      unless discussion_topic.grants_right?(current_user, session, :attach)
+        return validation_error(I18n.t("Insufficient attach permissions"))
+      end
+
+      discussion_topic.attachment = attachment
+    end
   end
 
   def process_future_date_inputs(delayed_post_at, lock_at, discussion_topic)

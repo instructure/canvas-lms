@@ -67,10 +67,10 @@ describe "conversations new" do
         f("button[data-testid='message-reply']").click
 
         # The second compose modal addressbook should appear
-        expect(ff("input[aria-label='Address Book']").count).to eq(2)
+        expect(ff("input[aria-label='Search']").count).to eq(2)
 
         f("textarea[data-testid='message-body']").send_keys("new recipient")
-        ff("input[aria-label='Address Book']")[1].click
+        ff("input[aria-label='Search']")[1].click
         fj("div[data-testid='address-book-item']:contains('Users')").click
         fj("div[data-testid='address-book-item']:contains('first student')").click
         f("button[data-testid='send-button']").click
@@ -88,7 +88,7 @@ describe "conversations new" do
         wait_for_ajaximations
         f("button[data-testid='message-reply']").click
         # There should only be one addressbook, which controls the inbox filter
-        expect(ff("input[aria-label='Address Book']").count).to eq(1)
+        expect(ff("input[aria-label='Search']").count).to eq(1)
       end
 
       it "replies to most recent author using the individual message reply button", :ignore_js_errors do

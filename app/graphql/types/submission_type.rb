@@ -61,11 +61,6 @@ module Types
       object.read_state(current_user)
     end
 
-    field :hide_grade_from_student, Boolean, null: true
-    def hide_grade_from_student
-      object.hide_grade_from_student?
-    end
-
     field :grading_period_id, ID, null: true
 
     field :student_entered_score, Float, null: true

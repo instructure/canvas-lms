@@ -73,6 +73,11 @@ module Lti::IMS
     describe "#create" do
       let(:content_type) { "application/vnd.ims.lis.v1.score+json" }
 
+      before do
+        # instantiate this so they get enrolled before anything else
+        user
+      end
+
       it_behaves_like "advantage services"
       it_behaves_like "lti services"
 
@@ -492,12 +497,12 @@ module Lti::IMS
               [
                 {
                   type: "file",
-                  url: "https://filesamples.com/samples/document/txt/sample1.txt",
+                  url: "https://getsamplefiles.com/download/txt/sample-1.txt",
                   title: "sample1.txt"
                 },
                 {
                   type: "not",
-                  url: "https://filesamples.com/samples/document/txt/sample1.txt",
+                  url: "https://getsamplefiles.com/download/txt/sample-1.txt",
                   title: "notAFile.txt"
                 }
               ]
@@ -626,12 +631,12 @@ module Lti::IMS
                     super().merge(Lti::Result::AGS_EXT_SUBMISSION => { content_items: [
                                                                          {
                                                                            type: "file",
-                                                                           url: "https://filesamples.com/samples/document/txt/sample1.txt",
+                                                                           url: "https://getsamplefiles.com/download/txt/sample-1.txt",
                                                                            title: "sample1.txt"
                                                                          },
                                                                          {
                                                                            type: "file",
-                                                                           url: "https://filesamples.com/samples/document/txt/sample2.txt",
+                                                                           url: "https://getsamplefiles.com/download/txt/sample-2.txt",
                                                                            title: "sample2.txt"
                                                                          },
                                                                        ],

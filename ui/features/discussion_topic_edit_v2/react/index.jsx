@@ -18,7 +18,7 @@
 
 import React, {useState, useEffect} from 'react'
 import {ApolloProvider, createClient} from '@canvas/apollo'
-
+import AlertManager from '@canvas/alerts/react/AlertManager'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
 import ErrorBoundary from '@canvas/error-boundary'
@@ -51,7 +51,9 @@ export const DiscussionTopicEdit = _props => {
           />
         }
       >
-        <DiscussionTopicFormContainer apolloClient={client} />
+        <AlertManager>
+          <DiscussionTopicFormContainer apolloClient={client} />
+        </AlertManager>
       </ErrorBoundary>
     </ApolloProvider>
   )

@@ -21,13 +21,11 @@ import parseLinkHeader from 'link-header-parsing/parseLinkHeaderFromXHR'
 import {savedObservedId} from '@canvas/observer-picker/ObserverGetObservee'
 import type {Course} from '../../../../api.d'
 
-const RESOURCE_COUNT = 10
-
-function getFirstPageUrl() {
+export function getFirstPageUrl() {
   const defaultFirstPageUrl =
     '/api/v1/users/self/favorites/courses?include[]=term&exclude[]=enrollments&sort=nickname'
 
-  const isObserver = ENV.current_user_roles.includes('observer')
+  const isObserver = window.ENV.current_user_roles?.includes('observer')
 
   // if user is an observer, only retrieve the courses for the observee
   if (isObserver) {
@@ -39,11 +37,11 @@ function getFirstPageUrl() {
   return defaultFirstPageUrl
 }
 
-const filterCourses = (courses: Course[]): Course[] => {
-  return window.ENV.K5_USER &&
+export const hideHomeroomCourseIfK5Student = (course: Pick<Course, 'homeroom_course'>): boolean => {
+  const isK5Student =
+    window.ENV.K5_USER &&
     window.ENV.current_user_roles?.every(role => role === 'student' || role === 'user')
-    ? courses.filter(c => !c.homeroom_course)
-    : courses
+  return !isK5Student || !course.homeroom_course
 }
 
 export default function coursesQuery(): Promise<Course[]> {
@@ -58,10 +56,10 @@ export default function coursesQuery(): Promise<Course[]> {
         (newData: Course[], _: any, xhr: XMLHttpRequest) => {
           data.push(...newData)
           const link = parseLinkHeader(xhr)
-          if (newData.length >= RESOURCE_COUNT && link.next) {
+          if (link.next) {
             load(link.next)
           } else {
-            resolve(filterCourses(data || []))
+            resolve(data)
           }
         },
         reject

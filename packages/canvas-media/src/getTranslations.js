@@ -101,6 +101,9 @@ export default function getTranslations(locale) {
     case 'hy':
       p = import('./translations/locales/hy')
       break
+    case 'id':
+      p = import('./translations/locales/id')
+      break
     case 'is':
       p = import('./translations/locales/is')
       break
@@ -224,6 +227,7 @@ export function getLocaleList() {
     'ht',
     'hu',
     'hy',
+    'id',
     'is',
     'it',
     'ja',

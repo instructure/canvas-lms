@@ -3,6 +3,13 @@
 .management-header {
   display: flex;
   justify-content: space-between;
+  margin: 0.315rem 0 1.7rem 0;
+}
+
+.outcomes-management-title{
+  font-size: 2.375rem;
+  font-weight: 700;
+  line-height: 40px;
 }
 
 #outcome_management{

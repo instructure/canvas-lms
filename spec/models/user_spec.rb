@@ -474,19 +474,9 @@ describe User do
 
     let(:user) { user_model }
 
-    let(:root_account_association) do
-      user.user_account_associations.create!(account: root_account)
-      user.user_account_associations.find_by(account: root_account)
-    end
-
-    let(:sub_account_association) do
-      user.user_account_associations.create!(account: sub_account)
-      user.user_account_associations.find_by(account: sub_account)
-    end
-
     before do
-      root_account_association
-      sub_account_association
+      user.user_account_associations.create!(account: root_account)
+      user.user_account_associations.create!(account: sub_account)
     end
 
     context "when there is a single root account association" do
@@ -496,6 +486,15 @@ describe User do
         end.to change {
           user.root_account_ids
         }.from([]).to([root_account.global_id])
+      end
+
+      it "includes soft deleted associations" do
+        user.user_account_associations.scope.delete_all
+        p = user.pseudonyms.create!(account: root_account, unique_id: "p")
+        p.destroy
+        user.update_root_account_ids
+        expect(user.user_account_associations).not_to exist
+        expect(user.root_account_ids).to eq [root_account.global_id]
       end
 
       context "and communication channels for the user exist" do

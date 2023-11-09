@@ -221,8 +221,7 @@ shared_examples_for "selective_release module tray assign to" do |context|
 
     click_settings_tray_update_module_button
     expect(element_exists?(module_settings_tray_selector)).to be_falsey
-    # This will be uncommented when the modules page is updated to show the assign to
-    # expect(view_assign[0].text).to eq "View Assign To"
+    expect(view_assign[0].text).to eq "View Assign To"
   end
 end
 
@@ -296,5 +295,48 @@ shared_examples_for "selective release module tray requirements" do |context|
 
     click_settings_tray_cancel_button
     expect(element_exists?(pill_message_selector(@module.id))).to be_falsey
+  end
+end
+
+shared_examples_for "selective_release add module tray" do |context|
+  include ContextModulesCommon
+  include ModulesIndexPage
+  include ModulesSettingsTray
+  include K5DashboardPageObject
+  include K5DashboardCommonPageObject
+  include K5Common
+
+  before do
+    case context
+    when :context_modules
+      @mod_course = @course
+      @mod_url = "/courses/#{@mod_course.id}/modules"
+    when :canvas_for_elementary
+      @mod_course = @subject_course
+      @mod_url = "/courses/#{@mod_course.id}#modules"
+    when :course_homepage
+      @mod_course = @course
+      @mod_url = "/courses/#{@mod_course.id}"
+    end
+  end
+
+  it "adds module with module tray after +Module is clicked" do
+    get @mod_url
+    click_new_module_link
+    update_module_name("New Module")
+    click_add_tray_add_module_button
+    new_module = @course.context_modules.last
+    expect(new_module.name).to eq("New Module")
+    expect(element_exists?(context_module_selector(new_module.id))).to be_truthy
+  end
+
+  it "adds module with module tray after module image is clicked" do
+    get @mod_url
+    click_module_create_button
+    update_module_name("New Module")
+    click_add_tray_add_module_button
+    new_module = @course.context_modules.last
+    expect(new_module.name).to eq("New Module")
+    expect(element_exists?(context_module_selector(new_module.id))).to be_truthy
   end
 end

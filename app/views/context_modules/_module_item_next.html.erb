@@ -406,5 +406,5 @@
 
 
 <% if @is_student && @context.feature_enabled?(:peer_reviews_for_a2) && module_item && module_item.content_type == 'Assignment' %>
-  <div id="module_student_view_peer_reviews_<%= module_item.content_id %>_<%= module_item.id %>"></div>
+  <div id="module_student_view_peer_reviews_<%= module_item.content_id %>_<%= module_item.context_module_id %>"></div>
 <% end %>

@@ -1928,8 +1928,6 @@ class Attachment < ActiveRecord::Base
         s3object.copy_to(destination.s3object)
       end
     else
-      return if destination.store.exists? && open == destination.open
-
       old_content_type = self.content_type
       scope = Attachment.where(md5:, namespace:, root_attachment_id: nil)
       scope.update_all(content_type: "invalid/invalid") # prevents find_existing_attachment_for_md5 from reattaching the child to the old root

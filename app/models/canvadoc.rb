@@ -59,6 +59,27 @@ class Canvadoc < ActiveRecord::Base
       .map(&:submission)
   end
 
+  def document_id
+    if ApplicationController.test_cluster?
+      # since PDF documents created in production DocViewer environments are not available in
+      # DocViewer beta environments, this treats as nil any document_id from any canvadoc record
+      # that was last updated before the last test cluster data refresh.  Put another way, we
+      # pretend here that any document_ids that came from prod data as part of the last data
+      # refresh are nil.  Nilling a document_id will cause canvas to request a new document
+      # conversion (and save the resulting document_id) if/when the document is next interacted
+      # with by a user on this test cluster.  This will create the document on the configured
+      # DocViewer test cluster for this region.
+      region = ApplicationController.region
+      if (refresh_timestamp = Setting.get("last_data_refresh_time_#{region}", nil)) && updated_at < Time.parse(refresh_timestamp)
+        nil
+      else
+        self[:document_id]
+      end
+    else
+      self[:document_id]
+    end
+  end
+
   def available?
     !!(document_id && process_state != "error" && Canvadocs.enabled?)
   end

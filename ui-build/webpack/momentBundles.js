@@ -34,6 +34,8 @@ const customMomentLocales = [
   'mi-nz',
   'pl',
   'sl',
+  'ja',
+  'zh-cn',
 ]
 
 const momentLocaleBundles = glob

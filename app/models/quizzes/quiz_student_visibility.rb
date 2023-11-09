@@ -22,6 +22,14 @@ class Quizzes::QuizStudentVisibility < ActiveRecord::Base
 
   include VisibilityPluckingHelper
 
+  # we are temporarily using a setting here because the feature flag
+  # is not able to be directly checked when canvas boots
+  def self.reset_table_name
+    return super unless Setting.get("differentiated_modules_setting", "false") == "true"
+
+    self.table_name = "quiz_student_visibilities_v2"
+  end
+
   # create_or_update checks for !readonly? before persisting
   def readonly?
     true

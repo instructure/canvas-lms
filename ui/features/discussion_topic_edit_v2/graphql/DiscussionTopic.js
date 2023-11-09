@@ -19,6 +19,7 @@
 import {arrayOf, bool, shape, string} from 'prop-types'
 import {Section} from './Section'
 import gql from 'graphql-tag'
+import {Attachment} from './Attachment'
 import {GroupSet} from './GroupSet'
 
 export const DiscussionTopic = {
@@ -47,7 +48,11 @@ export const DiscussionTopic = {
       groupSet {
         ...GroupSet
       }
+      attachment {
+        ...Attachment
+      }
     }
+    ${Attachment.fragment}
     ${Section.fragment}
     ${GroupSet.fragment}
   `,
@@ -71,6 +76,7 @@ export const DiscussionTopic = {
     published: bool,
     courseSections: arrayOf(Section.shape),
     groupSet: GroupSet.shape,
+    attachment: Attachment.shape,
   }),
 
   mock: ({
@@ -92,6 +98,7 @@ export const DiscussionTopic = {
     published = true,
     courseSections = [Section.mock()],
     groupSet = GroupSet.mock(),
+    attachment = Attachment.mock(),
   } = {}) => ({
     _id,
     id,
@@ -111,6 +118,7 @@ export const DiscussionTopic = {
     published,
     courseSections,
     groupSet,
+    attachment,
     __typename: 'Discussion',
   }),
 }

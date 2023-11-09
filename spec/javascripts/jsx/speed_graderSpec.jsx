@@ -7015,10 +7015,17 @@ QUnit.module('SpeedGrader', rootHooks => {
               {
                 id: 4,
                 name: 'Guy B. Studying',
+                fake_student: false,
               },
               {
                 id: 5,
                 name: 'Fella B. Indolent',
+                fake_student: false,
+              },
+              {
+                id: 6,
+                name: 'Test Student',
+                fake_student: true,
               },
             ],
             enrollments: [

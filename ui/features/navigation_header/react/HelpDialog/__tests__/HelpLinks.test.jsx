@@ -15,8 +15,11 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react'
-import {fireEvent, render, waitFor} from '@testing-library/react'
+import {fireEvent, render as testingLibraryRender, waitFor} from '@testing-library/react'
 import HelpLinks from '../HelpLinks'
+import {QueryProvider, queryClient} from '@canvas/query'
+
+const render = children => testingLibraryRender(<QueryProvider>{children}</QueryProvider>)
 
 describe('HelpLinks', () => {
   const featuredLink = {
@@ -62,8 +65,6 @@ describe('HelpLinks', () => {
     is_new: false,
   }
   const props = {
-    links: [featuredLink, newLink, regularLink],
-    hasLoaded: true,
     onClick() {},
   }
 
@@ -76,6 +77,7 @@ describe('HelpLinks', () => {
     delete global.window.location
     global.window = Object.create(window)
     global.window.location = {replace: mockedReplace}
+    queryClient.setQueryData(['helpLinks'], [featuredLink, newLink, regularLink])
   })
 
   afterEach(() => {
@@ -104,7 +106,8 @@ describe('HelpLinks', () => {
   })
 
   it('does not render the separator if there is no featured link', () => {
-    const {queryByText} = render(<HelpLinks {...props} links={[newLink, regularLink]} />)
+    queryClient.setQueryData(['helpLinks'], [newLink, regularLink])
+    const {queryByText} = render(<HelpLinks {...props} />)
     expect(queryByText('OTHER RESOURCES')).not.toBeInTheDocument()
   })
 
@@ -115,25 +118,28 @@ describe('HelpLinks', () => {
   })
 
   it('does not render the separator if there is only a featured link', () => {
+    queryClient.setQueryData(['helpLinks'], [featuredLink])
     const {queryByText} = render(<HelpLinks {...props} links={[featuredLink]} />)
     expect(queryByText('OTHER RESOURCES')).not.toBeInTheDocument()
   })
 
   it('tries to load a new URL in place if the no_new_window flag is set', async () => {
-    const links = [...props.links, noWindowLink]
-    const {getByText} = render(<HelpLinks {...props} links={links} />)
+    queryClient.setQueryData(['helpLinks'], [featuredLink, newLink, regularLink, noWindowLink])
+    const {getByText} = render(<HelpLinks {...props} />)
     const link = getByText('Support Centre')
     fireEvent.click(link)
     await waitFor(() => expect(mockedReplace).toHaveBeenCalledWith('?enjoy=this'))
   })
 
   it('renders a "NEW" pill when a link is tagged with is_new', () => {
-    const {queryByText} = render(<HelpLinks {...props} links={[newLink]} />)
+    queryClient.setQueryData(['helpLinks'], [newLink])
+    const {queryByText} = render(<HelpLinks {...props} />)
     expect(queryByText('NEW')).toBeInTheDocument()
   })
 
   it('does not render a "NEW" pill if there is no link tagged with is_new', () => {
-    const {queryByText} = render(<HelpLinks {...props} links={[featuredLink, regularLink]} />)
+    queryClient.setQueryData(['helpLinks'], [featuredLink, regularLink])
+    const {queryByText} = render(<HelpLinks {...props} />)
     expect(queryByText('NEW')).not.toBeInTheDocument()
   })
 

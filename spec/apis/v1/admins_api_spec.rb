@@ -396,4 +396,57 @@ describe "Admins API", type: :request do
       end
     end
   end
+
+  describe "self_roles" do
+    before :once do
+      @account = Account.default
+      @path = "/api/v1/accounts/#{@account.id}/admins/self"
+      @path_opts = { controller: "admins", action: "self_roles", format: "json", account_id: @account.to_param }
+    end
+
+    context "with user lacking any account roles" do
+      before :once do
+        @user = user_factory(account: @account)
+      end
+
+      it "returns unauthorized" do
+        api_call(:get, @path, @path_opts, {}, {}, expected_status: 401)
+      end
+    end
+
+    context "with user having account roles" do
+      before :once do
+        @user = user_factory(account: @account, name: "Bob")
+        @role1 = custom_account_role("role1", account: @account)
+        @role2 = custom_account_role("role2", account: @account)
+        @account.account_users.create!(user: @user, role: @role1)
+        @account.account_users.create!(user: @user, role: @role2)
+      end
+
+      it "returns a paginated list of the caller's account roles" do
+        json = api_call(:get, @path + "?per_page=1", @path_opts.merge(per_page: "1"))
+        json = json.map { |row| row.merge("user" => { "id" => row["user"]["id"] }) }
+        expect(json).to eq([{
+                             "id" => @user.account_users.first.id,
+                             "role" => "role1",
+                             "role_id" => @role1.id,
+                             "workflow_state" => "active",
+                             "user" => {
+                               "id" => @user.id
+                             }
+                           }])
+        json = api_call(:get, @path + "?per_page=1&page=2", @path_opts.merge(per_page: "1", page: "2"))
+        json = json.map { |row| row.merge("user" => { "id" => row["user"]["id"] }) }
+        expect(json).to eq([{
+                             "id" => @user.account_users.last.id,
+                             "role" => "role2",
+                             "role_id" => @role2.id,
+                             "workflow_state" => "active",
+                             "user" => {
+                               "id" => @user.id
+                             }
+                           }])
+      end
+    end
+  end
 end

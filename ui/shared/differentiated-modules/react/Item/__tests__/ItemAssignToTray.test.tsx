@@ -21,10 +21,6 @@ import {render, waitFor} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
 import ItemAssignToTray, {ItemAssignToTrayProps} from '../ItemAssignToTray'
 
-export type UnknownSubset<T> = {
-  [K in keyof T]?: T[K]
-}
-
 describe('ItemAssignToTray', () => {
   beforeAll(() => {
     // @ts-expect-error
@@ -113,7 +109,7 @@ describe('ItemAssignToTray', () => {
     timezone: 'UTC',
   }
 
-  const renderComponent = (overrides: UnknownSubset<ItemAssignToTrayProps> = {}) =>
+  const renderComponent = (overrides: Partial<ItemAssignToTrayProps> = {}) =>
     render(<ItemAssignToTray {...props} {...overrides} />)
 
   it('renders', async () => {

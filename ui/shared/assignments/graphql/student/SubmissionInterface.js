@@ -37,6 +37,8 @@ export const SubmissionInterface = {
       body
       deductedPoints
       enteredGrade
+      gradedAnonymously
+      hideGradeFromStudent
       extraAttempts
       grade
       gradeHidden
@@ -87,6 +89,8 @@ export const SubmissionInterface = {
     grade: string,
     gradeHidden: bool.isRequired,
     gradingStatus: oneOf(['needs_grading', 'excused', 'needs_review', 'graded']),
+    gradedAnonymously: bool,
+    hideGradeFromStudent: bool,
     latePolicyStatus: string,
     mediaObject: MediaObject.shape,
     originalityData: object.shape,
@@ -116,6 +120,8 @@ export const DefaultMocks = {
     gradeHidden: false,
     grade: null,
     gradingStatus: null,
+    gradedAnonymously: false,
+    hideGradeFromStudent: false,
     latePolicyStatus: null,
     mediaObject: null,
     originalityData: null,

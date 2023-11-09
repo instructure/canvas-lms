@@ -207,6 +207,11 @@ class ContextController < ApplicationController
         @accesses = AssetUserAccess.for_user(@user).where(context: contexts).most_recent
         respond_to do |format|
           format.html do
+            add_crumb(t("#crumbs.people", "People"), context_url(@context, :context_users_url))
+            add_crumb(@user.short_name, context_url(@context, :context_user_url, @user))
+            add_crumb(t("#crumbs.access_report", "Access Report"))
+            set_active_tab "people"
+
             @accesses = @accesses.paginate(page: params[:page], per_page: 50)
             @last_activity_at = @context.enrollments.where(user_id: @user).maximum(:last_activity_at)
             @aua_expiration_date = AssetUserAccess.expiration_date
@@ -278,7 +283,6 @@ class ContextController < ApplicationController
 
         add_crumb(t("#crumbs.people", "People"), context_url(@context, :context_users_url))
         add_crumb(@user.short_name, context_url(@context, :context_user_url, @user))
-        add_crumb(t("#crumbs.access_report", "Access Report"))
         set_active_tab "people"
 
         render :new_roster_user, stream: can_stream_template?

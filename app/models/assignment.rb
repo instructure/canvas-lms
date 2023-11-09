@@ -120,8 +120,8 @@ class Assignment < ActiveRecord::Base
   has_many :assignment_student_visibilities
   has_one :quiz, class_name: "Quizzes::Quiz"
   belongs_to :assignment_group
-  has_one :discussion_topic, -> { where(root_topic_id: nil).order(:created_at) }
-  has_one :wiki_page
+  has_one :discussion_topic, -> { where(root_topic_id: nil).order(:created_at) }, inverse_of: :assignment
+  has_one :wiki_page, inverse_of: :assignment
   has_many :learning_outcome_alignments, -> { where("content_tags.tag_type='learning_outcome' AND content_tags.workflow_state<>'deleted'").preload(:learning_outcome) }, as: :content, inverse_of: :content, class_name: "ContentTag"
   has_one :rubric_association, -> { where(purpose: "grading").order(:created_at).preload(:rubric) }, as: :association, inverse_of: :association_object
   has_one :rubric, -> { merge(RubricAssociation.active) }, through: :rubric_association
@@ -641,6 +641,7 @@ class Assignment < ActiveRecord::Base
   after_save  :mark_module_progressions_outdated, if: :update_cached_due_dates?
   after_save  :workflow_change_refresh_content_partication_counts, if: :saved_change_to_workflow_state?
   after_save  :submission_types_change_refresh_content_participation_counts, if: :saved_change_to_submission_types?
+  after_save  :track_anonymously_graded_new_quizzes, if: :saved_change_to_anonymous_grading?
 
   after_commit :schedule_do_auto_peer_review_job_if_automatic_peer_review
 
@@ -769,6 +770,14 @@ class Assignment < ActiveRecord::Base
     end
     AssignmentGroup.where(id: assignment_group_id).update_all(updated_at: Time.zone.now.utc) if assignment_group_id
     true
+  end
+
+  def track_anonymously_graded_new_quizzes
+    return unless quiz_lti?
+
+    if anonymous_grading_changed?(to: true)
+      InstStatsd::Statsd.increment("assignment.new_quiz.anonymous.enabled")
+    end
   end
 
   def ab_guid_through_rubric
@@ -3044,13 +3053,14 @@ class Assignment < ActiveRecord::Base
     else
       user_ids = Array.wrap(user_ids).join(",")
       course_ids = Array.wrap(course_ids_that_have_da_enabled).join(",")
+      visibility_table = AssignmentStudentVisibility.table_name
       scope = joins(sanitize_sql([<<~SQL.squish, course_ids, user_ids]))
         LEFT OUTER JOIN #{AssignmentStudentVisibility.quoted_table_name} ON (
-         assignment_student_visibilities.assignment_id = assignments.id
-         AND assignment_student_visibilities.course_id IN (%s)
-         AND assignment_student_visibilities.user_id IN (%s))
+         #{visibility_table}.assignment_id = assignments.id
+         AND #{visibility_table}.course_id IN (%s)
+         AND #{visibility_table}.user_id IN (%s))
       SQL
-      scope.where("(assignments.context_id NOT IN (?) AND assignments.workflow_state<>'deleted') OR (assignment_student_visibilities.assignment_id IS NOT NULL)", course_ids_that_have_da_enabled)
+      scope.where("(assignments.context_id NOT IN (?) AND assignments.workflow_state<>'deleted') OR (#{visibility_table}.assignment_id IS NOT NULL)", course_ids_that_have_da_enabled)
     end
   }
 

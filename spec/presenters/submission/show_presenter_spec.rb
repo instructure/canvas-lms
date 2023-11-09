@@ -265,6 +265,14 @@ describe Submission::ShowPresenter do
       expect(presenter.entered_grade).to eq "B#{minus}"
     end
 
+    it "returns complete/incomplete if the assignment type is pass/fail with 'Restrict Quantitative Data' enabled" do
+      course.root_account.enable_feature!(:restrict_quantitative_data)
+      course.update!(restrict_quantitative_data: true)
+      @assignment.update!(grading_type: "pass_fail")
+      @assignment.grade_student(@student, grader: @teacher, grade: "complete")
+      expect(presenter.entered_grade).to eq "complete"
+    end
+
     it "returns a letter grade with trailing en-dash replaced with minus if the assignment type is letter grade" do
       @assignment.update!(grading_type: "letter_grade")
       @assignment.grade_student(@student, grader: @teacher, grade: "B#{en_dash}")

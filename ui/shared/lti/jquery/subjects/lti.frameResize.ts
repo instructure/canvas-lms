@@ -17,7 +17,7 @@
  */
 
 import ToolLaunchResizer from '../tool_launch_resizer'
-import {findDomForWindow} from '../util'
+import {findDomForWindow, findDomForWindowInRCEIframe} from '../util'
 import {LtiMessageHandler} from '../lti_message_handler'
 
 const frameResize: LtiMessageHandler<{height: number | string; token: string}> = ({
@@ -36,7 +36,7 @@ const frameResize: LtiMessageHandler<{height: number | string; token: string}> =
     toolResizer.resize_tool_content_wrapper(height, container)
   } else {
     // Attempt to find an embedded iframe that matches the event source.
-    const iframe = findDomForWindow(event.source)
+    const iframe = findDomForWindow(event.source) || findDomForWindowInRCEIframe(event.source)
     if (iframe) {
       const strHeight = typeof height === 'number' ? `${height}px` : height
       iframe.height = strHeight

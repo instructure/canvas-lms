@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useRef, useEffect} from 'react'
+import React, {useState, useRef, useEffect, useContext} from 'react'
 import PropTypes from 'prop-types'
 import AnonymousResponseSelector from '@canvas/discussions/react/components/AnonymousResponseSelector/AnonymousResponseSelector'
 import {CreateOrEditSetModal} from '@canvas/groups/react/CreateOrEditSetModal'
@@ -40,6 +40,10 @@ import {Alert} from '@instructure/ui-alerts'
 import {GradedDiscussionOptions} from '../GradedDiscussionOptions/GradedDiscussionOptions'
 import {GradedDiscussionDueDatesContext} from '../../util/constants'
 import {nanoid} from 'nanoid'
+import {AttachmentDisplay} from '@canvas/discussions/react/components/AttachmentDisplay/AttachmentDisplay'
+import {responsiveQuerySizes} from '@canvas/discussions/react/utils'
+import {UsageRights} from '../GradedDiscussionOptions/UsageRights'
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 
 import {addNewGroupCategoryToCache} from '../../util/utils'
 
@@ -52,11 +56,13 @@ export default function DiscussionTopicForm({
   assignmentGroups,
   sections,
   groupCategories,
+  studentEnrollments,
   onSubmit,
   isGroupContext,
   apolloClient,
 }) {
   const rceRef = useRef()
+  const {setOnFailure} = useContext(AlertManagerContext)
 
   const isAnnouncement = ENV.DISCUSSION_TOPIC?.ATTRIBUTES?.is_announcement ?? false
   const isUnpublishedAnnouncement =
@@ -125,22 +131,48 @@ export default function DiscussionTopicForm({
     {text: '', type: 'success'},
   ])
 
-  // To be implemented in phase 2, kept as a reminder
   const [pointsPossible, setPointsPossible] = useState(0)
   const [displayGradeAs, setDisplayGradeAs] = useState('points')
   const [assignmentGroup, setAssignmentGroup] = useState('')
   const [peerReviewAssignment, setPeerReviewAssignment] = useState('off')
   const [peerReviewsPerStudent, setPeerReviewsPerStudent] = useState(1)
   const [peerReviewDueDate, setPeerReviewDueDate] = useState('')
-  // This contains the list of assignment due dates / overrides. This default should be set to everyone in VICE-3866
-  const [assignedInfoList, setAssignedInfoList] = useState([{dueDateId: nanoid()}]) // Initialize with one object with a unique id
+  const [dueDateErrorMessages, setDueDateErrorMessages] = useState([])
+  const [assignedInfoList, setAssignedInfoList] = useState([
+    {
+      dueDateId: nanoid(),
+      assignedList: ['everyone'],
+      dueDate: '',
+      availableFrom: '',
+      availableUntil: '',
+    },
+  ]) // Initialize with one object with a unique id
 
   const assignmentDueDateContext = {
     assignedInfoList,
     setAssignedInfoList,
+    dueDateErrorMessages,
+    setDueDateErrorMessages,
+    studentEnrollments,
+    sections,
+    groups:
+      groupCategories.find(groupCategory => groupCategory._id === groupCategoryId)?.groupsConnection
+        ?.nodes || [],
+    groupCategoryId,
   }
   const [showGroupCategoryModal, setShowGroupCategoryModal] = useState(false)
 
+  const [attachment, setAttachment] = useState(null)
+  const [attachmentToUpload, setAttachmentToUpload] = useState(false)
+  const affectUserFileQuota = false
+
+  const [usageRightsData, setUsageRightsData] = useState({})
+  const [usageRightsErrorState, setUsageRightsErrorState] = useState(false)
+
+  const handleSettingUsageRightsData = data => {
+    setUsageRightsErrorState(false)
+    setUsageRightsData(data)
+  }
   useEffect(() => {
     if (!isEditing || !currentDiscussionTopic) return
 
@@ -156,7 +188,7 @@ export default function DiscussionTopicForm({
     setRequireInitialPost(currentDiscussionTopic.requireInitialPost)
     setEnablePodcastFeed(currentDiscussionTopic.podcastEnabled)
     setIncludeRepliesInFeed(currentDiscussionTopic.podcastHasStudentPosts)
-    // setIsGraded TODO: phase 2
+
     setAllowLiking(currentDiscussionTopic.allowRating)
     setOnlyGradersCanLike(currentDiscussionTopic.onlyGradersCanRate)
     setAddToTodo(!!currentDiscussionTopic.todoDate)
@@ -168,6 +200,7 @@ export default function DiscussionTopicForm({
     setAvailableUntil(currentDiscussionTopic.lockAt)
     setDelayPosting(!!currentDiscussionTopic.delayedPostAt && isAnnouncement)
     setLocked(currentDiscussionTopic.locked && isAnnouncement)
+    setAttachment(currentDiscussionTopic.attachment)
   }, [isEditing, currentDiscussionTopic, discussionAnonymousState, isAnnouncement])
 
   useEffect(() => {
@@ -219,14 +252,92 @@ export default function DiscussionTopicForm({
     return false
   }
 
+  const validateUsageRights = () => {
+    // if usage rights is not enabled or there are no attachments, there is no need to validate
+    if (
+      !ENV?.FEATURES?.usage_rights_discussion_topics ||
+      !ENV?.USAGE_RIGHTS_REQUIRED ||
+      !attachment
+    ) {
+      return true
+    }
+
+    if (usageRightsData?.selectedUsageRightsOption) return true
+    setOnFailure(I18n.t('You must set usage rights'))
+    setUsageRightsErrorState(true)
+    return false
+  }
+
   const validateFormFields = () => {
     let isValid = true
 
     if (!validateTitle(title)) isValid = false
     if (!validateAvailability(availableFrom, availableUntil)) isValid = false
     if (!validateSelectGroup()) isValid = false
+    if (!validateAssignToFields()) isValid = false
+    if (!validateUsageRights()) isValid = false
 
     return isValid
+  }
+
+  const validateAssignToFields = () => {
+    // as validation is not required if not graded.
+    if (!isGraded) return true
+
+    const missingAssignToOptionError = {
+      text: I18n.t('Please select at least one option.'),
+      type: 'error',
+    }
+
+    // Validate each assignedInfo and collect errors.
+    const errors = assignedInfoList.reduce((foundErrors, currentAssignedInfo) => {
+      const isAssignedListInvalid =
+        !currentAssignedInfo.assignedList ||
+        !Array.isArray(currentAssignedInfo.assignedList) ||
+        currentAssignedInfo.assignedList.length === 0
+
+      if (isAssignedListInvalid) {
+        foundErrors.push({
+          dueDateId: currentAssignedInfo.dueDateId,
+          message: missingAssignToOptionError,
+        })
+      }
+
+      return foundErrors
+    }, [])
+
+    // If there are errors, set the error state and return false.
+    if (errors.length > 0) {
+      setDueDateErrorMessages(errors)
+      return false
+    }
+
+    // All assignedLists are valid if no errors were found.
+    return true
+  }
+
+  const preparePeerReviewPayload = () => {
+    return peerReviewAssignment === 'off'
+      ? null
+      : {
+          automaticReviews: peerReviewAssignment === 'automatically',
+          count: peerReviewsPerStudent,
+          enabled: true,
+          dueAt: peerReviewDueDate || null,
+        }
+  }
+
+  const prepareAssignmentPayload = () => {
+    return isGraded
+      ? {
+          courseId: ENV.context_id,
+          name: title,
+          pointsPossible,
+          gradingType: displayGradeAs,
+          assignmentGroupId: assignmentGroup,
+          peerReviews: preparePeerReviewPayload(),
+        }
+      : null
   }
 
   const submitForm = shouldPublish => {
@@ -252,6 +363,9 @@ export default function DiscussionTopicForm({
         shouldPublish,
         locked,
         isAnnouncement,
+        assignment: prepareAssignmentPayload(),
+        attachment,
+        usageRightsData,
       })
       return true
     }
@@ -312,6 +426,15 @@ export default function DiscussionTopicForm({
           defaultContent={isEditing ? currentDiscussionTopic?.message : ''}
           autosave={false}
         />
+        <AttachmentDisplay
+          attachment={attachment}
+          setAttachment={setAttachment}
+          setAttachmentToUpload={setAttachmentToUpload}
+          attachmentToUpload={attachmentToUpload}
+          responsiveQuerySizes={responsiveQuerySizes}
+          isGradedDiscussion={!affectUserFileQuota}
+          canAttach={ENV.DISCUSSION_TOPIC?.PERMISSIONS.CAN_ATTACH}
+        />
         {!isGraded && !isGroupDiscussion && !isGroupContext && (
           <View display="block" padding="medium none">
             <CanvasMultiSelect
@@ -354,6 +477,23 @@ export default function DiscussionTopicForm({
             </CanvasMultiSelect>
           </View>
         )}
+        {ENV?.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_ATTACH &&
+          ENV?.FEATURES?.usage_rights_discussion_topics &&
+          ENV?.USAGE_RIGHTS_REQUIRED &&
+          ENV?.PERMISSIONS?.manage_files && (
+            <Flex justifyItems="start" gap="small">
+              <Flex.Item>{I18n.t('Set usage rights')}</Flex.Item>
+              <Flex.Item>
+                <UsageRights
+                  contextType={(ENV?.context_type ?? '').toLocaleLowerCase()}
+                  contextId={ENV?.context_id}
+                  onSaveUsageRights={handleSettingUsageRightsData}
+                  currentUsageRights={usageRightsData}
+                  errorState={usageRightsErrorState}
+                />
+              </Flex.Item>
+            </Flex>
+          )}
         <Text size="large">{I18n.t('Options')}</Text>
         {!isGroupContext &&
           !isAnnouncement &&
@@ -731,6 +871,7 @@ DiscussionTopicForm.propTypes = {
   isStudent: PropTypes.bool,
   sections: PropTypes.arrayOf(PropTypes.object),
   groupCategories: PropTypes.arrayOf(PropTypes.object),
+  studentEnrollments: PropTypes.arrayOf(PropTypes.object),
   onSubmit: PropTypes.func,
   isGroupContext: PropTypes.bool,
   apolloClient: PropTypes.object,

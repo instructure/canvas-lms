@@ -33,9 +33,10 @@ export const Course = {
           ...AssignmentGroup
         }
       }
-      enrollmentsConnection {
+      enrollmentsConnection(filter: {states: active, types: StudentEnrollment}) {
         nodes {
           user {
+            _id
             name
             courseRoles(roleTypes: "StudentEnrollment")
           }
@@ -43,8 +44,7 @@ export const Course = {
       }
       groupSetsConnection {
         nodes {
-          _id
-          name
+          ...GroupSet
         }
       }
       sectionsConnection {
@@ -55,6 +55,7 @@ export const Course = {
       }
     }
     ${AssignmentGroup.fragment}
+    ${GroupSet.fragment}
   `,
   shape: shape({
     _id: string,

@@ -24,8 +24,6 @@ import {IconEditLine, IconPlusLine, IconTrashLine} from '@instructure/ui-icons'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Table} from '@instructure/ui-table'
-import {Text} from '@instructure/ui-text'
-import {Avatar} from '@instructure/ui-avatar'
 import {
   Enrollment,
   EnrollmentType,
@@ -38,6 +36,7 @@ import {deleteEnrollment} from './api/enrollment'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {createAnalyticPropsGenerator} from './util/analytics'
+import {TempEnrollAvatar} from './TempEnrollAvatar'
 
 const I18n = useI18nScope('temporary_enrollment')
 
@@ -50,8 +49,27 @@ interface Props {
   readonly onEdit?: (enrollment: User) => void
   readonly onDelete?: (enrollmentId: number) => void
   readonly onAddNew?: () => void
-  readonly contextType: EnrollmentType
+  readonly enrollmentType: EnrollmentType
   readonly tempEnrollPermissions: TempEnrollPermissions
+}
+
+export function getRelevantUserFromEnrollment(enrollment: Enrollment) {
+  return enrollment.temporary_enrollment_provider ?? enrollment.user
+}
+
+export function getEnrollmentUserDisplayName(enrollment: Enrollment) {
+  return getRelevantUserFromEnrollment(enrollment).name
+}
+
+export function groupEnrollmentsByPairingId(enrollments: Enrollment[]) {
+  return enrollments.reduce((groupedById, enrollment) => {
+    const groupId = enrollment.temporary_enrollment_pairing_id
+    if (!groupedById[groupId]) {
+      groupedById[groupId] = []
+    }
+    groupedById[groupId].push(enrollment)
+    return groupedById
+  }, {} as Record<number, Enrollment[]>)
 }
 
 /**
@@ -94,9 +112,16 @@ export function TempEnrollEdit(props: Props) {
   // destructure and cache permission checks (for use in eager and lazy evaluations)
   const {canEdit, canDelete, canAdd} = props.tempEnrollPermissions
 
+  const canEditOrDelete = canEdit || canDelete
+
+  const enrollmentTypeLabel =
+    props.enrollmentType === PROVIDER ? I18n.t('Recipient') : I18n.t('Provider')
+
+  const enrollmentGroups = groupEnrollmentsByPairingId(props.enrollments)
+
   const handleEditClick = (enrollment: Enrollment) => {
     if (canEdit) {
-      props.onEdit?.(enrollment.user)
+      props.onEdit?.(getRelevantUserFromEnrollment(enrollment))
     } else {
       // eslint-disable-next-line no-console
       console.error('User does not have permission to edit enrollment')
@@ -122,117 +147,110 @@ export function TempEnrollEdit(props: Props) {
   }
 
   const renderActionIcons = (enrollment: Enrollment) => (
-    <Flex margin="0 small 0 0">
+    <>
       {canEdit && (
-        <Flex.Item>
-          <Tooltip renderTip={I18n.t('Edit')}>
-            <IconButton
-              data-testid="edit-button"
-              withBorder={false}
-              withBackground={false}
-              size="small"
-              screenReaderLabel={I18n.t('Edit')}
-              onClick={() => handleEditClick(enrollment)}
-              {...analyticProps('Edit')}
-            >
-              <IconEditLine title={I18n.t('Edit')} />
-            </IconButton>
-          </Tooltip>
-        </Flex.Item>
+        <Tooltip renderTip={I18n.t('Edit')}>
+          <IconButton
+            data-testid="edit-button"
+            withBorder={false}
+            withBackground={false}
+            size="small"
+            screenReaderLabel={I18n.t('Edit')}
+            onClick={() => handleEditClick(enrollment)}
+            {...analyticProps('Edit')}
+          >
+            <IconEditLine title={I18n.t('Edit')} />
+          </IconButton>
+        </Tooltip>
       )}
 
       {canDelete && (
-        <Flex.Item>
-          <Tooltip renderTip={I18n.t('Delete')}>
-            <IconButton
-              data-testid="delete-button"
-              withBorder={false}
-              withBackground={false}
-              size="small"
-              screenReaderLabel={I18n.t('Delete')}
-              onClick={() => handleDeleteClick(enrollment)}
-              {...analyticProps('Delete')}
-            >
-              <IconTrashLine title={I18n.t('Delete')} />
-            </IconButton>
-          </Tooltip>
-        </Flex.Item>
+        <Tooltip renderTip={I18n.t('Delete')}>
+          <IconButton
+            data-testid="delete-button"
+            withBorder={false}
+            withBackground={false}
+            size="small"
+            screenReaderLabel={I18n.t('Delete')}
+            onClick={() => handleDeleteClick(enrollment)}
+            {...analyticProps('Delete')}
+          >
+            <IconTrashLine title={I18n.t('Delete')} />
+          </IconButton>
+        </Tooltip>
       )}
-    </Flex>
+    </>
   )
 
-  const renderAvatar = () => {
-    return (
-      <Flex>
-        <Flex.Item>
-          <Avatar
-            size="large"
-            margin="0 small 0 0"
-            name={props.user.name}
-            src={props.user.avatar_url}
-            data-fs-exclude={true}
-            data-heap-redact-attributes="name"
-          />
-        </Flex.Item>
-
-        <Flex.Item>
-          <div>
-            <Text size="large">{props.user.name}</Text>
-          </div>
-        </Flex.Item>
-      </Flex>
-    )
-  }
-
   return (
-    <>
-      <Flex wrap="wrap" margin="0 small 0 0">
-        <Flex.Item>{renderAvatar()}</Flex.Item>
-
-        {canAdd && props.contextType === PROVIDER && (
-          <Flex.Item margin="0 0 0 auto">
-            <Button
-              data-testid="add-button"
-              onClick={handleAddNewClick}
-              aria-label={I18n.t('Create temporary enrollment')}
-              {...analyticProps('Create')}
-            >
-              <IconPlusLine />
-
-              {I18n.t('Recipient')}
-            </Button>
+    <Flex gap="medium" direction="column">
+      <Flex.Item padding="xx-small">
+        <Flex wrap="wrap" gap="x-small" justifyItems="space-between">
+          <Flex.Item>
+            <TempEnrollAvatar user={props.user} />
           </Flex.Item>
-        )}
-      </Flex>
-
-      <Table caption={<ScreenReaderContent>{I18n.t('User information')}</ScreenReaderContent>}>
-        <Table.Head>
-          <Table.Row>
-            <Table.ColHeader id="usertable-name">{I18n.t('Name')}</Table.ColHeader>
-            <Table.ColHeader id="usertable-email">{I18n.t('Enrollment Period')}</Table.ColHeader>
-            <Table.ColHeader id="usertable-loginid">{I18n.t('Enrollment Type')}</Table.ColHeader>
-            {(canEdit || canDelete) && (
-              <Table.ColHeader id="header-user-option-links" width="1">
-                <ScreenReaderContent>
-                  {I18n.t('Temporary enrollment option links')}
-                </ScreenReaderContent>
+          {canAdd && props.enrollmentType === PROVIDER && (
+            <Flex.Item>
+              <Button
+                data-testid="add-button"
+                onClick={handleAddNewClick}
+                aria-label={I18n.t('Create temporary enrollment')}
+                {...analyticProps('Create')}
+              >
+                <Flex alignItems="center" justifyItems="center" gap="xx-small">
+                  <Flex.Item>
+                    <IconPlusLine />
+                  </Flex.Item>
+                  <Flex.Item shouldGrow={true}>{I18n.t('Recipient')}</Flex.Item>
+                </Flex>
+              </Button>
+            </Flex.Item>
+          )}
+        </Flex>
+      </Flex.Item>
+      <Flex.Item shouldGrow={true} padding="xx-small">
+        <Table caption={<ScreenReaderContent>{I18n.t('User information')}</ScreenReaderContent>}>
+          <Table.Head>
+            <Table.Row>
+              <Table.ColHeader id="usertable-name">
+                {enrollmentTypeLabel} {I18n.t('Name')}
               </Table.ColHeader>
-            )}
-          </Table.Row>
-        </Table.Head>
-        <Table.Body>
-          {props.enrollments.map(enrollment => (
-            <Table.Row key={enrollment.id}>
-              <Table.RowHeader>{enrollment.user.name}</Table.RowHeader>
-              <Table.Cell>
-                {formatDateTime(enrollment.start_at)} - {formatDateTime(enrollment.end_at)}
-              </Table.Cell>
-              <Table.Cell>{enrollment.type}</Table.Cell>
-              {(canEdit || canDelete) && <Table.Cell>{renderActionIcons(enrollment)}</Table.Cell>}
+              <Table.ColHeader id="usertable-email">
+                {I18n.t('Recipient Enrollment Period')}
+              </Table.ColHeader>
+              <Table.ColHeader id="usertable-loginid">
+                {I18n.t('Recipient Enrollment Type')}
+              </Table.ColHeader>
+              {(canEdit || canDelete) && (
+                <Table.ColHeader id="header-user-option-links" width="1">
+                  <ScreenReaderContent>
+                    {I18n.t('Temporary enrollment option links')}
+                  </ScreenReaderContent>
+                </Table.ColHeader>
+              )}
             </Table.Row>
-          ))}
-        </Table.Body>
-      </Table>
-    </>
+          </Table.Head>
+          <Table.Body>
+            {Object.entries(enrollmentGroups).map(([pairingId, enrollmentGroup]) => {
+              const firstEnrollment = enrollmentGroup[0]
+              return (
+                <Table.Row key={pairingId}>
+                  <Table.RowHeader>{getEnrollmentUserDisplayName(firstEnrollment)}</Table.RowHeader>
+                  <Table.Cell>
+                    {`${formatDateTime(firstEnrollment.start_at)} - ${formatDateTime(
+                      firstEnrollment.end_at
+                    )}`}
+                  </Table.Cell>
+                  <Table.Cell>{firstEnrollment.type}</Table.Cell>
+                  {canEditOrDelete && (
+                    <Table.Cell textAlign="end">{renderActionIcons(firstEnrollment)}</Table.Cell>
+                  )}
+                </Table.Row>
+              )
+            })}
+          </Table.Body>
+        </Table>
+      </Flex.Item>
+    </Flex>
   )
 }

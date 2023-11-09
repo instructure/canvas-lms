@@ -219,7 +219,7 @@ module GraphQLNodeLoader
       end
     when "Conversation"
       Loaders::IDLoader.for(Conversation).load(id).then do |conversation|
-        next nil unless conversation.conversation_participants.where(user: ctx[:current_user]).first
+        next nil unless conversation&.conversation_participants&.where(user: ctx[:current_user])&.first
 
         conversation
       end
@@ -244,6 +244,12 @@ module GraphQLNodeLoader
         next if !record || record.deleted? || !record.context.grants_right?(ctx[:current_user], :read)
 
         record
+      end
+    when "UsageRights"
+      Loaders::IDLoader.for(UsageRights).load(id).then do |usage_rights|
+        next unless usage_rights.context.grants_right?(ctx[:current_user], :read)
+
+        usage_rights
       end
     else
       raise UnsupportedTypeError, "don't know how to load #{type}"

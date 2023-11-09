@@ -96,6 +96,7 @@ describe RubricAssociationsController do
     end
 
     describe "rubrics associated in a different" do
+      specs_require_sharding
       describe "course" do
         before do
           course_factory
@@ -112,6 +113,20 @@ describe RubricAssociationsController do
           }.by(1)
           expect(assigns[:rubric].context).to eq @course2
           expect(assigns[:rubric].data).to eq @rubric.data
+        end
+
+        it "duplicates the associated rubric into the correct shard" do
+          @rubric.context = @course2
+          @shard2.activate do
+            account_model
+            @course3 = course_factory(account: @account)
+            @assignment = assignment_model(course: @course3)
+            course_with_teacher_logged_in(active_all: true, course: @course3)
+          end
+          post "create", params: { course_id: @course3.id, rubric_association: { rubric_id: @rubric.id, association_id: @assignment.id, association_type: "Assignment" } }
+          expect(assigns[:rubric].context).to eq @course3
+          expect(assigns[:rubric].data).to eq @rubric.data
+          expect(assigns[:rubric].shard).to eq @shard2
         end
 
         describe "with the account_level_mastery_scales FF" do
