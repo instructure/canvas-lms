@@ -31,6 +31,7 @@ describe('AssignToPanel', () => {
     footerHeight: '100px',
     moduleElement: document.createElement('div'),
     onDismiss: () => {},
+    mountNodeRef: {current: null},
   }
 
   const ASSIGNMENT_OVERRIDES_URL = `/api/v1/courses/${props.courseId}/modules/${props.moduleId}/assignment_overrides`
@@ -67,6 +68,7 @@ describe('AssignToPanel', () => {
 
   it('renders options', async () => {
     const {findByTestId} = renderComponent()
+    expect(await findByTestId('loading-overlay')).toBeInTheDocument()
     expect(await findByTestId('everyone-option')).toBeInTheDocument()
     expect(await findByTestId('custom-option')).toBeInTheDocument()
   })
@@ -82,6 +84,7 @@ describe('AssignToPanel', () => {
       overwriteRoutes: true,
     })
     const {findByTestId} = renderComponent()
+    expect(await findByTestId('loading-overlay')).toBeInTheDocument()
     expect(await findByTestId('custom-option')).toHaveProperty('checked', true)
   })
 
@@ -140,6 +143,7 @@ describe('AssignToPanel', () => {
       act(() => option1.click())
 
       getByRole('button', {name: 'Update Module'}).click()
+      expect(await findByTestId('loading-overlay')).toBeInTheDocument()
       expect((await findAllByText('Module access updated successfully.'))[0]).toBeInTheDocument()
       const requestBody = fetchMock.lastOptions(ASSIGNMENT_OVERRIDES_URL)?.body
       const expectedPayload = JSON.stringify({
@@ -165,6 +169,7 @@ describe('AssignToPanel', () => {
       act(() => option1.click())
 
       getByRole('button', {name: 'Update Module'}).click()
+      expect(await findByTestId('loading-overlay')).toBeInTheDocument()
       expect((await findAllByText('Module access updated successfully.'))[0]).toBeInTheDocument()
       const requestBody = fetchMock.lastOptions(ASSIGNMENT_OVERRIDES_URL)?.body
       // it sends back the student list override, including the assignment override id
@@ -179,9 +184,10 @@ describe('AssignToPanel', () => {
     it('updates the modules UI', async () => {
       fetchMock.put(ASSIGNMENT_OVERRIDES_URL, {})
       jest.spyOn(utils, 'updateModuleUI')
-      const {findByRole} = renderComponent()
+      const {findByRole, findByTestId} = renderComponent()
       const updateButton = await findByRole('button', {name: 'Update Module'})
       updateButton.click()
+      expect(await findByTestId('loading-overlay')).toBeInTheDocument()
       await waitFor(() => expect(utils.updateModuleUI).toHaveBeenCalled())
     })
   })

@@ -38,6 +38,7 @@ describe('SettingsPanel', () => {
     footerHeight: '100px',
     onDismiss: () => {},
     addModuleUI: () => {},
+    mountNodeRef: {current: null},
   }
 
   const renderComponent = (overrides = {}) => render(<SettingsPanel {...props} {...overrides} />)
@@ -120,10 +121,11 @@ describe('SettingsPanel', () => {
       expect(getByText('Module Name is required.')).toBeInTheDocument()
     })
 
-    it('makes a request to the modules update endpoint', () => {
+    it('makes a request to the modules update endpoint', async () => {
       doFetchApi.mockResolvedValue({response: {ok: true}, json: {}})
-      const {getByRole} = renderComponent()
+      const {getByRole, findByTestId} = renderComponent()
       getByRole('button', {name: 'Update Module'}).click()
+      expect(await findByTestId('loading-overlay')).toBeInTheDocument()
       expect(doFetchApi).toHaveBeenCalledWith(
         expect.objectContaining({
           path: '/courses/1/modules/1',
@@ -191,8 +193,9 @@ describe('SettingsPanel', () => {
       jest.spyOn(alerts, 'showFlashAlert')
       const addModuleUI = jest.fn()
       doFetchApi.mockResolvedValue({response: {ok: true}, json: {}})
-      const {getByRole} = renderComponent({moduleId: undefined, addModuleUI})
+      const {getByRole, findByTestId} = renderComponent({moduleId: undefined, addModuleUI})
       getByRole('button', {name: 'Add Module'}).click()
+      expect(await findByTestId('loading-overlay')).toBeInTheDocument()
       await waitFor(() => {
         expect(alerts.showFlashAlert).toHaveBeenCalledWith({
           type: 'success',
