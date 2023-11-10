@@ -149,10 +149,9 @@ describe('enrollment api', () => {
           expect.objectContaining({
             path: '/api/v1/users/1/enrollments',
             params: expect.objectContaining({
-              temporary_enrollments: true,
               state: ['current_and_future'],
               per_page: ITEMS_PER_PAGE,
-              temporary_enrollment_recipients: true,
+              temporary_enrollment_recipients_for_provider: true,
             }),
           })
         )
@@ -169,9 +168,9 @@ describe('enrollment api', () => {
           expect.objectContaining({
             path: '/api/v1/users/1/enrollments',
             params: expect.objectContaining({
-              temporary_enrollments: true,
               state: ['current_and_future'],
               per_page: ITEMS_PER_PAGE,
+              temporary_enrollments_for_recipient: true,
               include: 'temporary_enrollment_providers',
             }),
           })

@@ -349,7 +349,7 @@ describe('TempEnrollModal', () => {
 
     fetchMock.get(
       encodeURI(
-        `/api/v1/users/${modalProps.user.id}/enrollments?temporary_enrollments=true&state[]=current_and_future&per_page=${ITEMS_PER_PAGE}&temporary_enrollment_recipients=true`
+        `/api/v1/users/${modalProps.user.id}/enrollments?state[]=current_and_future&per_page=${ITEMS_PER_PAGE}&temporary_enrollment_recipients_for_provider=true`
       ),
       {
         status: 500,
