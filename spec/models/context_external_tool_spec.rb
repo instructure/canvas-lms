@@ -1536,6 +1536,19 @@ describe ContextExternalTool do
       expect(@found_tool).to eql(@tool)
     end
 
+    it "doesn't error when one of the tools has an invalid URL and it must match on domain" do
+      context = @course
+      domain = "notarealdomain.com"
+      url = "https://notarealdomain.com/another/launch"
+      first = external_tool_model(context:, opts: { url:, domain: })
+      second = external_tool_model(context:, opts: { url:, domain: })
+
+      first.update_column(:url, "http<>malformed url!?**&")
+      first.update_column(:domain, "<>not!*^%>>valid")
+
+      expect(ContextExternalTool.find_external_tool("https://#{domain}/deep_linking_request", context)).to eq(second)
+    end
+
     context "when exclude_tool_id is set" do
       subject { ContextExternalTool.find_external_tool("http://www.google.com", Course.find(course.id), nil, exclude_tool.id) }
 
@@ -1724,6 +1737,24 @@ describe ContextExternalTool do
           it "prefers LTI 1.1 tools when there is an domain match" do
             expect(find_tool("https://www.test.com/another_endpoint", prefer_1_1: true)).to \
               eq lti_1_1_tool
+          end
+        end
+
+        context "and the 1.3 tool has the same domain but a different URL" do
+          before do
+            lti_1_3_tool.update!(url: "https://#{domain}/1_3/foo?baz=fizz")
+          end
+
+          it "prefers the LTI 1.3 tool even when the 1.1 tool exactly matches" do
+            expect(find_tool(url)).to eq lti_1_3_tool
+          end
+
+          it "prefers the LTI 1.3 tool even when the 1.1 tool partially matches" do
+            expect(find_tool("#{url}&unmatched=bizz")).to eq lti_1_3_tool
+          end
+
+          it "prefers the LTI 1.3 tool even when both tools match on domain" do
+            expect(find_tool("https://#{domain}/deep_linking_location")).to eq lti_1_3_tool
           end
         end
       end
@@ -3546,7 +3577,9 @@ describe ContextExternalTool do
   end
 
   describe "upgrading from 1.1 to 1.3" do
-    let(:old_tool) { external_tool_model(opts: { url: "https://special.url" }) }
+    let(:domain) { "special.url" }
+    let(:url) { "https://special.url" }
+    let(:old_tool) { external_tool_model(opts: { url:, domain: }) }
     let(:tool) do
       t = old_tool.dup
       t.lti_version = "1.3"
@@ -3568,6 +3601,15 @@ describe ContextExternalTool do
 
       it "starts process when needed" do
         expect(tool).to receive(:prepare_for_ags)
+        tool.prepare_for_ags_if_needed!
+      end
+
+      it "finds the correct 1.1 tool even if there are similar 1.3 tools" do
+        expect(tool).to receive(:prepare_for_ags).with(old_tool.id)
+        t = tool.dup
+        t.url += "/1_3/launch"
+        t.save!
+
         tool.prepare_for_ags_if_needed!
       end
     end
