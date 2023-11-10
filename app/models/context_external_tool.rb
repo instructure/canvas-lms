@@ -1237,15 +1237,24 @@ class ContextExternalTool < ActiveRecord::Base
       ->(t) { t.url.present? }
     )
 
-    # If still no matches, use domain matching to try to find a tool
-    match ||= find_tool_match(
+    # Check for any 1.3 tools that might match on domain
+    domain_match = find_tool_match(
       sorted_external_tools,
       ->(t) { t.matches_tool_domain?(url) },
       ->(t) { t.domain.present? }
     )
 
+    # Prefer 1.3 domain match over 1.1 url match to make
+    # sure 1.3 tool gets launched during upgrade
+    if match.blank? || (!match.use_1_3? && domain_match&.use_1_3?)
+      match = domain_match
+    end
+
     # repeat matches with environment-specific url and domain overrides
-    if ApplicationController.test_cluster? && Account.site_admin.feature_enabled?(:dynamic_lti_environment_overrides)
+    # and we haven't been able to find anything yet
+    if ApplicationController.test_cluster? &&
+       Account.site_admin.feature_enabled?(:dynamic_lti_environment_overrides) &&
+       match.blank?
       match ||= find_tool_match(
         sorted_external_tools,
         ->(t) { t.matches_url?(url, use_environment_overrides: true) },
@@ -1258,11 +1267,17 @@ class ContextExternalTool < ActiveRecord::Base
         ->(t) { t.url.present? }
       )
 
-      match ||= find_tool_match(
+      domain_match = find_tool_match(
         sorted_external_tools,
         ->(t) { t.matches_tool_domain?(url, use_environment_overrides: true) },
         ->(t) { t.domain.present? }
       )
+      # Prefer 1.3 domain match over 1.1 url match to make
+      # sure 1.3 tool gets launched during upgrade
+      if match.blank? || (!match.use_1_3? && domain_match&.use_1_3?)
+        match = domain_match
+      end
+
     end
     match
   end
@@ -1457,7 +1472,7 @@ class ContextExternalTool < ActiveRecord::Base
     return unless use_1_3?
 
     # is there a 1.1 tool that matches this one?
-    matching_1_1_tool = self.class.find_external_tool(url || domain, context, nil, id)
+    matching_1_1_tool = self.class.find_external_tool(url || domain, context, nil, id, prefer_1_1: true)
     return if matching_1_1_tool.nil? || matching_1_1_tool.use_1_3?
 
     delay_if_production(priority: Delayed::LOW_PRIORITY).prepare_for_ags(matching_1_1_tool.id)
