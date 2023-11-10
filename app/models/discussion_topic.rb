@@ -363,7 +363,20 @@ class DiscussionTopic < ActiveRecord::Base
     # setting this ensures the assignment won't create a new discussion_topic when it gets created
     working_assignment.saved_by = :discussion_topic
 
-    %i[assignment_group_id assignment_overrides due_at grading_type grading_standard_id lock_at name points_possible unlock_at].each do |field|
+    basic_assignment_attributes = %i[
+      assignment_group_id
+      assignment_overrides
+      due_at
+      grading_type
+      grading_standard_id
+      lock_at
+      name
+      points_possible
+      unlock_at
+      post_to_sis
+    ]
+
+    basic_assignment_attributes.each do |field|
       working_assignment.send("#{field}=", assignment_input[field]) if assignment_input[field]
     end
 

@@ -59,6 +59,7 @@ class Mutations::AssignmentCreateOrUpdate < GraphQL::Schema::InputObject
   argument :peer_reviews, Mutations::AssignmentPeerReviewsUpdate, required: false
   argument :points_possible, Float, required: false
   argument :unlock_at, Types::DateTimeType, required: false
+  argument :post_to_sis, Boolean, required: false
 end
 
 class Mutations::AssignmentBase < Mutations::BaseMutation
