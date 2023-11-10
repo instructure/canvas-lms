@@ -865,6 +865,7 @@ describe Mutations::CreateDiscussionTopic do
             name: "#{title}",
             pointsPossible: 15,
             gradingType: percent,
+            postToSis: true,
             peerReviews: {
               anonymousReviews: true,
               automaticReviews: true,
@@ -890,6 +891,7 @@ describe Mutations::CreateDiscussionTopic do
         expect(discussion_topic["assignment"]["_id"]).to eq assignment.id.to_s
         expect(discussion_topic["_id"]).to eq assignment.discussion_topic.id.to_s
         expect(DiscussionTopic.count).to eq 1
+        expect(DiscussionTopic.last.assignment.post_to_sis).to be true
       end
     end
 
