@@ -64,6 +64,18 @@ describe CoursePaceHardEndDateCompressor do
         expect(compressed.pluck(:duration)).to eq([1, 1, 2])
       end
 
+      it "respects course blackout dates" do
+        @course.blackout_dates.create!(event_title: "Blackout Test", start_date: "2021-09-01", end_date: "2021-09-01")
+        compressed = CoursePaceHardEndDateCompressor.compress(@course_pace, @course_pace.course_pace_module_items.order(:id))
+        expect(compressed.pluck(:duration)).to eq([4, 0, 2])
+      end
+
+      it "respects account blackout dates" do
+        @course.account.calendar_events.create!(title: "Blackout Test", start_at: "2021-09-01", end_at: "2021-09-01", blackout_date: true)
+        compressed = CoursePaceHardEndDateCompressor.compress(@course_pace, @course_pace.course_pace_module_items.order(:id))
+        expect(compressed.pluck(:duration)).to eq([4, 0, 2])
+      end
+
       context "implicit end dates" do
         before :once do
           @course.update(start_at: "2021-12-27")

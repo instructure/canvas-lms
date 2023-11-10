@@ -52,11 +52,11 @@ class CoursePaceDueDatesCalculator
     due_dates
   end
 
-  private
-
   def blackout_dates
     @blackout_dates ||= course_pace.course.blackout_dates + calendar_event_blackout_dates
   end
+
+  private
 
   def calendar_event_blackout_dates
     account_codes =
