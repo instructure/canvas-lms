@@ -1183,7 +1183,7 @@ CanvasRails::Application.routes.draw do
       get  "courses/:course_id/enrollments", action: :index, as: "course_enrollments"
       get  "sections/:section_id/enrollments", action: :index, as: "section_enrollments"
       get  "users/:user_id/enrollments", action: :index, as: "user_enrollments"
-      get  "users/:user_id/temporary_enrollments", action: :temporary_enrollments, as: "user_temporary_enrollments"
+      get  "users/:user_id/temporary_enrollment_status", action: :show_temporary_enrollment_status
       get  "accounts/:account_id/enrollments/:id", action: :show, as: "enrollment"
 
       post "courses/:course_id/enrollments", action: :create
