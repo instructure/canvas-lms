@@ -38,15 +38,15 @@ export async function fetchTemporaryEnrollments(
 ): Promise<Enrollment[]> {
   const entityType = isRecipient ? 'recipients' : 'providers'
   const params: Record<string, any> = {
-    temporary_enrollments: true,
     state: ['current_and_future'],
     per_page: ITEMS_PER_PAGE,
   }
 
   if (isRecipient) {
+    params.temporary_enrollments_for_recipient = true
     params.include = 'temporary_enrollment_providers'
   } else {
-    params.temporary_enrollment_recipients = true
+    params.temporary_enrollment_recipients_for_provider = true
   }
 
   const {response, json} = await doFetchApi({
