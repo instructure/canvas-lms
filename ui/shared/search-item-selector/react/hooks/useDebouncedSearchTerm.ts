@@ -50,12 +50,18 @@ const TYPING_DEBOUNCE_TIMEOUT = 750
 
 // This jsdoc comment lets typescript know the types of the parameters to useDebouncedSearchTerm
 /**
- * @param deaultValue {unknown}
+ * @param deaultValue {string}
  * @param  {timeout: number, isSearchableTerm {() => boolean}}
  */
 export default function useDebouncedSearchTerm(
-  defaultValue,
-  {timeout = TYPING_DEBOUNCE_TIMEOUT, isSearchableTerm = () => true} = {}
+  defaultValue: string,
+  {
+    timeout = TYPING_DEBOUNCE_TIMEOUT,
+    isSearchableTerm = () => true,
+  }: {
+    timeout?: number
+    isSearchableTerm?: (term: string) => boolean
+  } = {}
 ) {
   const [searchTerm, rawSetSearchTerm] = useState(defaultValue)
   const [searchTermIsPending, setSearchIsPending] = useState(false)
@@ -68,7 +74,7 @@ export default function useDebouncedSearchTerm(
   )
 
   const [debouncedSetSearchTerm, cancelCallback, callPending] = useDebouncedCallback(
-    newSearchTerm => {
+    (newSearchTerm: string) => {
       // Set the new search term first to avoid a render where isPending is
       // false but the new search term hasn't been set yet.
       if (searchTermWillChange(searchTerm, newSearchTerm)) {
@@ -81,15 +87,16 @@ export default function useDebouncedSearchTerm(
     timeout
   )
 
-  const wrappedCancelCallback = (...args) => {
+  const wrappedCancelCallback = (...args: any[]) => {
     setSearchIsPending(false)
+    // @ts-expect-error
     cancelCallback(...args)
   }
 
   // Note that this depends on searchTerm, so this will return a new function
   // every time the searchTerm actually changes.
   const setSearchTerm = useCallback(
-    newSearchTerm => {
+    (newSearchTerm: string) => {
       // if the search term becomes the same as it was before, then a search
       // will no longer be pending and we can set that state to false.
       setSearchIsPending(searchTermWillChange(searchTerm, newSearchTerm))
