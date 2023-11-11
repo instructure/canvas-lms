@@ -57,13 +57,13 @@ const {Option: SelectOption, Group: SelectGroup} = Select as any
 
 const noOptionsOptionId = '_noOptionsOption'
 
-type Props = {
+export type CanvasSelectProps = {
   children: React.ReactNode
   disabled?: boolean
   id: string
   label?: ReactElement | string
   noOptionsLabel?: string
-  onChange: (event: ChangeEvent, value: string) => void
+  onChange: (event: ChangeEvent<HTMLSelectElement>, value: string) => void
   value: string
 }
 
@@ -97,12 +97,12 @@ function CanvasSelectGroup(_props: GroupProps): ReactElement {
   return <div />
 }
 
-class CanvasSelect extends React.Component<Props, State> {
+class CanvasSelect extends React.Component<CanvasSelectProps, State> {
   static Option = CanvasSelectOption
 
   static Group = CanvasSelectGroup
 
-  constructor(props: Props) {
+  constructor(props: CanvasSelectProps) {
     super(props)
 
     const option: ReactElement | null = this.getOptionByFieldValue('value', props.value)
@@ -116,7 +116,7 @@ class CanvasSelect extends React.Component<Props, State> {
     }
   }
 
-  componentDidUpdate(prevProps: Props) {
+  componentDidUpdate(prevProps: CanvasSelectProps) {
     if (this.props.value !== prevProps.value || !isEqual(this.props.children, prevProps.children)) {
       const option = this.getOptionByFieldValue('value', this.props.value)
       this.setState({
@@ -285,7 +285,7 @@ class CanvasSelect extends React.Component<Props, State> {
       const option = this.getOptionByFieldValue('id', id)
       if (prevSelection !== id) {
         const ne = event.nativeEvent as unknown
-        this.props.onChange(ne as ChangeEvent, option?.props.value)
+        this.props.onChange(ne as ChangeEvent<HTMLSelectElement>, option?.props.value)
       }
     }
   }
