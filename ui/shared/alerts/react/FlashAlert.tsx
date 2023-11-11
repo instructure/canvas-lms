@@ -101,7 +101,7 @@ const isLoadingChunkError = (a?: string): boolean => {
 
 type FlashAlertProps = {
   onClose: () => void
-  message: HTMLElement | string
+  message: string | React.ReactNode
   error?: Error | null
   variant?: 'info' | 'success' | 'warning' | 'error'
   timeout?: number
@@ -216,7 +216,7 @@ export default class FlashAlert extends React.Component<FlashAlertProps> {
 }
 
 type ShowFlashAlertArgs = {
-  message: string
+  message: string | React.ReactNode
   err?: Error | null
   type?: 'info' | 'success' | 'warning' | 'error'
   srOnly?: boolean
