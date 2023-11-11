@@ -31,6 +31,16 @@ type Setting =
   | 'comment_library_suggestions_enabled'
   | 'elementary_dashboard_disabled'
 
+type Role = {
+  addable_by_user: boolean
+  base_role_name: string
+  deleteable_by_user: boolean
+  id: string
+  label: string
+  name: string
+  plural_label: string
+}
+
 export interface EnvCommon {
   ASSET_HOST: string
   active_brand_config_json_url: string
@@ -51,6 +61,7 @@ export interface EnvCommon {
   csp?: string
   current_user_id: string | null
   current_user_global_id: string
+  COURSE_ROLES: Role[]
   current_user_roles: string[]
   current_user_is_student: boolean
   current_user_types: string[]
@@ -228,7 +239,7 @@ export type BrandAccountFeatureId = 'embedded_release_notes'
  * Feature id exported in ApplicationController that aren't mentioned in
  * JS_ENV_SITE_ADMIN_FEATURES or JS_ENV_ROOT_ACCOUNT_FEATURES or JS_ENV_BRAND_ACCOUNT_FEATURES
  */
-export type OtherFeatureId = 'canvas_k6_theme' | 'new_math_equation_handling'
+export type OtherFeatureId = 'canvas_k6_theme' | 'new_math_equation_handling' | 'learner_passport'
 
 /**
  * From ApplicationHelper#set_tutorial_js_env
