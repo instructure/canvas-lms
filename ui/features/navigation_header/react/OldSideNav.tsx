@@ -51,7 +51,7 @@ const profileNavLink = document.querySelector(`#global_nav_profile_link`)
 const EXTERNAL_TOOLS_REGEX = /^\/accounts\/[^\/]*\/(external_tools)/
 const ACTIVE_ROUTE_REGEX =
   /^\/(courses|groups|accounts|grades|calendar|conversations|profile)|^#history|(passport$)/
-// @ts-expect-error learning_passport is a temporary flag for a prototpye
+// learning_passport is a temporary flag for a prototpye
 const LEARNER_PASSPORT_REGEX = ENV.FEATURES.learner_passport ? /\/users\/\d+\/passport/ : null
 const ACTIVE_CLASS = 'ic-app-header__menu-list-item--active'
 

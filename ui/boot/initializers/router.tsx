@@ -54,7 +54,6 @@ const portalRouter = createBrowserRouter(
 
       {window.ENV.FEATURES.enhanced_rubrics && RubricRoutes}
 
-      {/* @ts-expect-error */}
       {window.ENV.FEATURES.learner_passport && LearnerPassportRoutes}
 
       <Route path="*" element={<></>} />
