@@ -17,22 +17,33 @@
  */
 
 import React from 'react'
-import {arrayOf, shape, string} from 'prop-types'
-import CanvasSelect from '@canvas/instui-bindings/react/Select'
+import CanvasSelect, {CanvasSelectProps} from '@canvas/instui-bindings/react/Select'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('edit_timezone')
 
-export default function TimeZoneSelect({
+type Timezone = {
+  name: string
+  localized_name: string
+}
+
+type Props = {
+  label: string
+  timezones: Timezone[]
+  priority_zones: Timezone[]
+  onChange: (event: React.ChangeEvent<HTMLSelectElement>, value: string) => void
+} & CanvasSelectProps
+
+const TimeZoneSelect: React.FC<Props> = ({
   label,
   timezones,
   priority_zones,
   onChange,
   ...otherPropsToPassOnToSelect
-}) {
+}) => {
   let idval = 0 // for setting ids on options, which are necessary for Select's inner workings but don't matter to us
 
-  function onChangeTimezone(event, value) {
+  function onChangeTimezone(event: React.ChangeEvent<HTMLSelectElement>, value: string) {
     event.persist?.()
     event.target.value = value // this is how our onChange expects the result
     onChange(event, value) // so it works either way, instui Select callback, or traditional
@@ -58,17 +69,6 @@ export default function TimeZoneSelect({
   )
 }
 
-const timezoneShape = shape({
-  name: string.isRequired,
-  localized_name: string.isRequired,
-}).isRequired
-
-TimeZoneSelect.propTypes = {
-  ...CanvasSelect.propTypes, // this accepts any prop you'd pass to InstUI's Select. see it's docs for examples
-  timezones: arrayOf(timezoneShape),
-  priority_zones: arrayOf(timezoneShape),
-}
-
 import(
   /* webpackChunkName: "[request]" */
   `./localized-timezone-lists/${ENV.LOCALE || 'en'}.json`
@@ -81,3 +81,9 @@ import(
       label: I18n.t('Time Zone'),
     }
   })
+  .catch(error => {
+    // eslint-disable-next-line no-console
+    console.error('Error loading localized timezone list', error)
+  })
+
+export default TimeZoneSelect

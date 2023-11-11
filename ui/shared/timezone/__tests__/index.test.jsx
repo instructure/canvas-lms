@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import TimeZoneSelect from '../index'
+import TimeZoneSelect from '../TimeZoneSelect'
 import {render} from '@testing-library/react'
 import isEqual from 'lodash/isEqual'
 
