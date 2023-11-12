@@ -47,7 +47,7 @@ import {
 } from './util/helpers'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 import {createAnalyticPropsGenerator, setAnalyticPropsOnRef} from './util/analytics'
-import {EnrollmentType, MODULE_NAME, RECIPIENT, User} from './types'
+import {Enrollment, EnrollmentType, MODULE_NAME, Permissions, RECIPIENT, Role, User} from './types'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 import {EnvCommon} from '@canvas/global/env/EnvCommon'
@@ -61,48 +61,41 @@ const I18n = useI18nScope('temporary_enrollment')
 const analyticProps = createAnalyticPropsGenerator(MODULE_NAME)
 
 interface EnrollmentRole {
-  readonly id: string
-  readonly base_role_name: string
+  id: string
+  base_role_name: string
 }
 
 interface SelectedEnrollment {
-  readonly course: string
-  readonly section: string
+  course: string
+  section: string
 }
 
 interface TemporaryEnrollmentPairing {
-  readonly id: string
+  id: string
 }
 
-interface Permissions {
-  readonly teacher: boolean
-  readonly ta: boolean
-  readonly student: boolean
-  readonly observer: boolean
-  readonly designer: boolean
-}
-
-interface Props {
-  readonly enrollment: User | any
-  readonly user: User
-  readonly permissions: Permissions
-  readonly roles: {id: string; label: string; base_role_name: string}[]
-  readonly goBack: Function
-  readonly doSubmit: () => boolean
-  readonly setEnrollmentStatus: Function
-  readonly isInAssignEditMode: boolean
-  readonly enrollmentType: EnrollmentType
+export interface Props {
+  enrollment: User | any
+  user: User
+  permissions: Permissions
+  roles: Role[]
+  goBack: Function
+  doSubmit: () => boolean
+  setEnrollmentStatus: Function
+  isInAssignEditMode: boolean
+  enrollmentType: EnrollmentType
+  tempEnrollmentsPairing?: Enrollment[] | null
 }
 
 interface RoleChoice {
-  readonly id: string
-  readonly name: string
+  id: string
+  name: string
 }
 
 interface StoredData {
-  readonly roleChoice: RoleChoice
-  readonly startDate: Date
-  readonly endDate: Date
+  roleChoice: RoleChoice
+  startDate: Date
+  endDate: Date
 }
 
 type RoleName =
@@ -153,14 +146,14 @@ function getStoredData(): StoredData {
 }
 
 interface EnrollmentAndUserProps {
-  readonly enrollmentProps: User
-  readonly userProps: User
+  enrollmentProps: User
+  userProps: User
 }
 
 interface EnrollmentAndUserContextProps {
-  readonly enrollmentType: EnrollmentType
-  readonly enrollment: User
-  readonly user: User
+  enrollmentType: EnrollmentType
+  enrollment: User
+  user: User
 }
 
 /**
@@ -209,6 +202,30 @@ export function TempEnrollAssign(props: Props) {
 
   const formatDateTime = useDateTimeFormat('date.formats.full_with_weekday')
 
+  // load data from tempEnrollmentsPairing if it exists
+  useEffect(() => {
+    if (props.tempEnrollmentsPairing && props.tempEnrollmentsPairing.length > 0) {
+      const firstEnrollment = props.tempEnrollmentsPairing[0]
+      // role
+      const roleId = firstEnrollment.role_id
+      const matchedRole = props.roles.find(role => role.id === roleId)
+      if (matchedRole) {
+        const roleName = removeStringAffix(matchedRole.base_role_name, 'Enrollment')
+        setRoleChoice({
+          id: roleId,
+          name: roleName,
+        })
+      }
+      // start and end date
+      if (firstEnrollment.start_at) {
+        setStartDate(new Date(firstEnrollment.start_at))
+      }
+      if (firstEnrollment.end_at) {
+        setEndDate(new Date(firstEnrollment.end_at))
+      }
+    }
+  }, [props.tempEnrollmentsPairing, props.roles])
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -242,7 +259,7 @@ export function TempEnrollAssign(props: Props) {
    *
    * Update the date state and localStorage values
    *
-   * @param {SyntheticEvent<Element, Event>} event Event object
+   * @param {SyntheticEvent<Element, Event>} _event Event object
    * @param {Dispatch<SetStateAction<Date>>} setDateState React state setter
    * @param {string} localStorageKey localStorage key to update
    * @param {string} [dateValue] Optional date value, which may not be a valid date
@@ -250,7 +267,7 @@ export function TempEnrollAssign(props: Props) {
    * @returns {void}
    */
   const handleDateChange = (
-    event: SyntheticEvent<Element, Event>,
+    _event: SyntheticEvent<Element, Event>,
     setDateState: Dispatch<SetStateAction<Date>>,
     localStorageKey: string,
     dateValue?: string
@@ -275,7 +292,7 @@ export function TempEnrollAssign(props: Props) {
     handleDateChange(event, setEndDate, 'endDate', dateValue)
   }
 
-  const handleRoleSearchChange = (event: ChangeEvent, selectedOption: {id: string}) => {
+  const handleRoleSearchChange = (_event: ChangeEvent, selectedOption: {id: string}) => {
     const foundRole: EnrollmentRole | undefined = props.roles.find(
       role => role.id === selectedOption.id
     )
@@ -447,6 +464,7 @@ export function TempEnrollAssign(props: Props) {
           <Grid.Row vAlign="top">
             <Grid.Col width={8}>
               <DateTimeInput
+                timezone={ENV.TIMEZONE}
                 data-testid="start-date-input"
                 layout="columns"
                 isRequired={true}
@@ -484,6 +502,7 @@ export function TempEnrollAssign(props: Props) {
           <Grid.Row>
             <Grid.Col width={8}>
               <DateTimeInput
+                timezone={ENV.TIMEZONE}
                 data-testid="end-date-input"
                 layout="columns"
                 isRequired={true}
@@ -535,6 +554,7 @@ export function TempEnrollAssign(props: Props) {
                 enrollmentsByCourse={enrollmentsByCourse}
                 roles={props.roles}
                 selectedRole={roleChoice}
+                tempEnrollmentsPairing={props.tempEnrollmentsPairing}
               />
             )}
           </Flex.Item>

@@ -44,13 +44,13 @@ const I18n = useI18nScope('temporary_enrollment')
 const analyticProps = createAnalyticPropsGenerator(MODULE_NAME)
 
 interface Props {
-  readonly enrollments: Enrollment[]
-  readonly user: User
-  readonly onEdit?: (enrollment: User) => void
-  readonly onDelete?: (enrollmentId: number) => void
-  readonly onAddNew?: () => void
-  readonly enrollmentType: EnrollmentType
-  readonly tempEnrollPermissions: TempEnrollPermissions
+  enrollments: Enrollment[]
+  user: User
+  onEdit?: (enrollment: User, tempEnrollments: Enrollment[]) => void
+  onDelete?: (enrollmentId: number) => void
+  onAddNew?: () => void
+  enrollmentType: EnrollmentType
+  tempEnrollPermissions: TempEnrollPermissions
 }
 
 export function getRelevantUserFromEnrollment(enrollment: Enrollment) {
@@ -81,7 +81,7 @@ export function groupEnrollmentsByPairingId(enrollments: Enrollment[]) {
  *                            likely passed in via props and used to update state
  */
 async function handleConfirmAndDeleteEnrollment(
-  courseId: number,
+  courseId: string,
   enrollmentId: number,
   onDelete?: (id: number) => void
 ) {
@@ -119,18 +119,19 @@ export function TempEnrollEdit(props: Props) {
 
   const enrollmentGroups = groupEnrollmentsByPairingId(props.enrollments)
 
-  const handleEditClick = (enrollment: Enrollment) => {
+  const handleEditClick = (enrollments: Enrollment[]) => {
     if (canEdit) {
-      props.onEdit?.(getRelevantUserFromEnrollment(enrollment))
+      props.onEdit?.(getRelevantUserFromEnrollment(enrollments[0]), enrollments)
     } else {
       // eslint-disable-next-line no-console
       console.error('User does not have permission to edit enrollment')
     }
   }
 
-  const handleDeleteClick = (enrollment: Enrollment) => {
+  const handleDeleteClick = (enrollments: Enrollment[]) => {
     if (canDelete) {
-      handleConfirmAndDeleteEnrollment(enrollment.course_id, enrollment.id, props.onDelete)
+      // TODO loop over tempEnrollmentsPairing and delete each enrollment
+      handleConfirmAndDeleteEnrollment(enrollments[0].course_id, enrollments[0].id, props.onDelete)
     } else {
       // eslint-disable-next-line no-console
       console.error('User does not have permission to delete enrollment')
@@ -146,7 +147,7 @@ export function TempEnrollEdit(props: Props) {
     }
   }
 
-  const renderActionIcons = (enrollment: Enrollment) => (
+  const renderActionIcons = (enrollments: Enrollment[]) => (
     <>
       {canEdit && (
         <Tooltip renderTip={I18n.t('Edit')}>
@@ -156,7 +157,7 @@ export function TempEnrollEdit(props: Props) {
             withBackground={false}
             size="small"
             screenReaderLabel={I18n.t('Edit')}
-            onClick={() => handleEditClick(enrollment)}
+            onClick={() => handleEditClick(enrollments)}
             {...analyticProps('Edit')}
           >
             <IconEditLine title={I18n.t('Edit')} />
@@ -172,7 +173,7 @@ export function TempEnrollEdit(props: Props) {
             withBackground={false}
             size="small"
             screenReaderLabel={I18n.t('Delete')}
-            onClick={() => handleDeleteClick(enrollment)}
+            onClick={() => handleDeleteClick(enrollments)}
             {...analyticProps('Delete')}
           >
             <IconTrashLine title={I18n.t('Delete')} />
@@ -196,13 +197,9 @@ export function TempEnrollEdit(props: Props) {
                 onClick={handleAddNewClick}
                 aria-label={I18n.t('Create temporary enrollment')}
                 {...analyticProps('Create')}
+                renderIcon={IconPlusLine}
               >
-                <Flex alignItems="center" justifyItems="center" gap="xx-small">
-                  <Flex.Item>
-                    <IconPlusLine />
-                  </Flex.Item>
-                  <Flex.Item shouldGrow={true}>{I18n.t('Recipient')}</Flex.Item>
-                </Flex>
+                {I18n.t('Recipient')}
               </Button>
             </Flex.Item>
           )}
@@ -232,7 +229,7 @@ export function TempEnrollEdit(props: Props) {
           </Table.Head>
           <Table.Body>
             {Object.entries(enrollmentGroups).map(([pairingId, enrollmentGroup]) => {
-              const firstEnrollment = enrollmentGroup[0]
+              const firstEnrollment: Enrollment = enrollmentGroup[0]
               return (
                 <Table.Row key={pairingId}>
                   <Table.RowHeader>{getEnrollmentUserDisplayName(firstEnrollment)}</Table.RowHeader>
@@ -243,7 +240,7 @@ export function TempEnrollEdit(props: Props) {
                   </Table.Cell>
                   <Table.Cell>{firstEnrollment.type}</Table.Cell>
                   {canEditOrDelete && (
-                    <Table.Cell textAlign="end">{renderActionIcons(firstEnrollment)}</Table.Cell>
+                    <Table.Cell textAlign="end">{renderActionIcons(enrollmentGroup)}</Table.Cell>
                   )}
                 </Table.Row>
               )

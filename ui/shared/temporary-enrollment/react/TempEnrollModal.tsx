@@ -53,17 +53,17 @@ const I18n = useI18nScope('temporary_enrollment')
 const analyticProps = createAnalyticPropsGenerator(MODULE_NAME)
 
 interface Props {
-  readonly title: string | ((enrollmentType: EnrollmentType, name: string) => string)
-  readonly enrollmentType: EnrollmentType
-  readonly children: ReactElement
-  readonly user: User
-  readonly canReadSIS?: boolean
-  readonly permissions: {
-    readonly teacher: boolean
-    readonly ta: boolean
-    readonly student: boolean
-    readonly observer: boolean
-    readonly designer: boolean
+  title: string | ((enrollmentType: EnrollmentType, name: string) => string)
+  enrollmentType: EnrollmentType
+  children: ReactElement
+  user: User
+  canReadSIS?: boolean
+  permissions: {
+    teacher: boolean
+    ta: boolean
+    student: boolean
+    observer: boolean
+    designer: boolean
   }
   readonly roles: Role[]
   readonly defaultOpen?: boolean
@@ -71,8 +71,8 @@ interface Props {
   readonly isEditMode: boolean
   readonly onToggleEditMode?: (mode?: boolean) => void
   // TODO add onDeleteEnrollment prop to parent component and update user list
-  readonly onDeleteEnrollment?: (enrollmentId: number) => void
-  readonly tempEnrollPermissions: TempEnrollPermissions
+  onDeleteEnrollment?: (enrollmentId: number) => void
+  tempEnrollPermissions: TempEnrollPermissions
 }
 
 export function TempEnrollModal(props: Props) {
@@ -86,6 +86,7 @@ export function TempEnrollModal(props: Props) {
   const [loading, setLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isModalOpenAnimationComplete, setIsModalOpenAnimationComplete] = useState(false)
+  const [tempEnrollmentsPairing, setTempEnrollmentsPairing] = useState<Enrollment[] | null>(null)
 
   useEffect(() => {
     if (isFetchEnrollmentDataComplete && isModalOpenAnimationComplete) {
@@ -123,14 +124,19 @@ export function TempEnrollModal(props: Props) {
   const handleModalReset = () => {
     setPage(0)
     setEnrollment(null)
+    setTempEnrollmentsPairing(null)
     setIsViewingAssignFromEdit(false)
     setIsFetchEnrollmentDataComplete(false)
     setIsModalOpenAnimationComplete(false)
     resetCommonState()
   }
 
-  const handleGoToAssignPageWithEnrollment = (enrollmentUser: User) => {
+  const handleGoToAssignPageWithEnrollment = (
+    enrollmentUser: User,
+    tempEnrollments: Enrollment[]
+  ) => {
     setEnrollment(enrollmentUser)
+    setTempEnrollmentsPairing(tempEnrollments)
     setPage(2)
     setIsViewingAssignFromEdit(true)
     resetCommonState()
@@ -240,6 +246,7 @@ export function TempEnrollModal(props: Props) {
             setEnrollmentStatus={handleEnrollmentSubmission}
             isInAssignEditMode={isViewingAssignFromEdit}
             enrollmentType={props.enrollmentType}
+            tempEnrollmentsPairing={tempEnrollmentsPairing}
           />
         )
       }

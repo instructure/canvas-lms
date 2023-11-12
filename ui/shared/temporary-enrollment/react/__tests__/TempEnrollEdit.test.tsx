@@ -190,10 +190,8 @@ describe('TempEnrollEdit component', () => {
     describe('edit', () => {
       it('calls onEdit with correct enrollment data when clicked', () => {
         render(<TempEnrollEdit {...props} />)
-
         fireEvent.click(screen.getByTestId('edit-button'))
-
-        expect(props.onEdit).toHaveBeenCalledWith(props.enrollments[0].user) // must be user object
+        expect(props.onEdit).toHaveBeenCalledWith(props.enrollments[0].user, props.enrollments)
       })
     })
 
@@ -233,7 +231,7 @@ describe('TempEnrollEdit component', () => {
       name: 'Recipient User',
     }
     const mockTempEnrollment: Enrollment = {
-      course_id: 0,
+      course_id: '0',
       end_at: '',
       id: 0,
       role_id: '',
