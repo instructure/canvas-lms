@@ -56,7 +56,7 @@ export function TempEnrollSearch(props: Props) {
   const [search, setSearch] = useState('')
   const [enrollment, setEnrollment] = useState<User>(EMPTY_USER)
 
-  const handleSearchTypeChange = (event: ChangeEvent<HTMLInputElement>, value: string) => {
+  const handleSearchTypeChange = (_event: ChangeEvent<HTMLInputElement>, value: string) => {
     setSearchType(value)
   }
 

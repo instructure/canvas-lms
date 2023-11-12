@@ -41,7 +41,7 @@ const mockSomeUser: User = {
 
 const mockEnrollment: Enrollment = {
   id: 1,
-  course_id: 101,
+  course_id: '101',
   start_at: '2023-01-01T00:00:00Z',
   end_at: '2023-06-01T00:00:00Z',
   role_id: '5',
@@ -187,7 +187,7 @@ describe('enrollment api', () => {
         const onDeleteMock = jest.fn()
         ;(doFetchApi as jest.Mock).mockResolvedValue({response: {status: 200}})
 
-        await deleteEnrollment(1, 2, onDeleteMock)
+        await deleteEnrollment('1', 2, onDeleteMock)
 
         expect(onDeleteMock).toHaveBeenCalledWith(2)
       })
@@ -197,7 +197,7 @@ describe('enrollment api', () => {
         ;(doFetchApi as jest.Mock).mockRejectedValue(new Error('An error occurred'))
 
         try {
-          await deleteEnrollment(1, 2)
+          await deleteEnrollment('1', 2)
         } catch (e) {
           // eslint-disable-next-line no-console
           console.log('Caught error:', e)
@@ -212,14 +212,14 @@ describe('enrollment api', () => {
       it.skip('handles deletion without onDelete gracefully', async () => {
         ;(doFetchApi as jest.Mock).mockResolvedValue({response: {status: 200}})
 
-        await expect(deleteEnrollment(1, 2)).resolves.not.toThrow()
+        await expect(deleteEnrollment('1', 2)).resolves.not.toThrow()
       })
 
       it.skip('handles non-200 status code gracefully', async () => {
         ;(doFetchApi as jest.Mock).mockResolvedValue({response: {status: 404}})
 
         try {
-          await deleteEnrollment(1, 2)
+          await deleteEnrollment('1', 2)
         } catch (e: any) {
           expect(e.message).toBe('Failed to delete enrollment: HTTP status code 404')
         }

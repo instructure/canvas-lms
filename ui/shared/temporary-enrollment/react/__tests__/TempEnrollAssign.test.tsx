@@ -20,11 +20,12 @@ import React from 'react'
 import {fireEvent, render, waitFor, within} from '@testing-library/react'
 import {
   getEnrollmentAndUserProps,
+  Props,
   TempEnrollAssign,
   tempEnrollAssignData,
 } from '../TempEnrollAssign'
 import fetchMock from 'fetch-mock'
-import {PROVIDER, RECIPIENT, User} from '../types'
+import {Enrollment, PROVIDER, RECIPIENT, Role, User} from '../types'
 
 const backCall = jest.fn()
 
@@ -51,7 +52,7 @@ const enrollmentsByCourse = [
     workflow_state: 'available',
     enrollments: [
       {
-        role_id: '1',
+        role_id: '92',
       },
     ],
     sections: [
@@ -64,7 +65,7 @@ const enrollmentsByCourse = [
   },
 ]
 
-const props = {
+const props: Props = {
   enrollment: {
     email: 'mel@email.com',
     id: '2',
@@ -101,6 +102,14 @@ function localToUTCTime(date: string, time: string): string {
   const utcMinutes = localDate.getUTCMinutes()
 
   return `${String(utcHours).padStart(2, '0')}:${String(utcMinutes).padStart(2, '0')}`
+}
+
+function formatDateToLocalString(utcDateStr: string) {
+  const date = new Date(utcDateStr)
+  return {
+    date: new Intl.DateTimeFormat(undefined, {dateStyle: 'long'}).format(date),
+    time: new Intl.DateTimeFormat(undefined, {timeStyle: 'short', hour12: true}).format(date),
+  }
 }
 
 describe('TempEnrollAssign', () => {
@@ -347,6 +356,73 @@ describe('TempEnrollAssign', () => {
 
       expect(enrollmentProps).toEqual(props.enrollment)
       expect(userProps).toEqual(props.user)
+    })
+  })
+
+  describe('props.tempEnrollmentsPairing', () => {
+    let tempProps: Props
+    const startAt = '2022-11-09T05:30:00Z'
+    const endAt = '2022-12-31T07:30:00Z'
+    const tempEnrollmentsPairingMock: Enrollment[] = [
+      {
+        course_id: '1',
+        course_section_id: '1',
+        role_id: '92',
+        start_at: startAt,
+        end_at: endAt,
+      },
+    ] as Enrollment[]
+
+    beforeEach(() => {
+      fetchMock.get(ENROLLMENTS_URI, enrollmentsByCourse)
+      tempProps = {
+        ...props,
+        tempEnrollmentsPairing: tempEnrollmentsPairingMock,
+      }
+    })
+
+    it('should set the role correctly when a matching role is found', async () => {
+      const {findByPlaceholderText} = render(<TempEnrollAssign {...tempProps} />)
+      const roleSelect = (await findByPlaceholderText('Select a Role')) as HTMLInputElement
+      expect(roleSelect.value).toBe('Custom Teacher Role')
+    })
+
+    it('should not set the role if no matching role is found', async () => {
+      const doNotFindThisRoleId: Role = {
+        id: '1',
+        base_role_name: 'TeacherEnrollment',
+        label: 'Teacher',
+      }
+      tempProps.roles = [doNotFindThisRoleId]
+      const {findByPlaceholderText} = render(<TempEnrollAssign {...tempProps} />)
+      const roleSelect = (await findByPlaceholderText('Select a Role')) as HTMLInputElement
+      expect(roleSelect.value).toBe('')
+    })
+
+    it('should set the start date and time correctly', async () => {
+      const localStartDate = formatDateToLocalString(startAt)
+      const {findByLabelText, getByText} = render(<TempEnrollAssign {...tempProps} />)
+      const startDate = (await findByLabelText('Begins On')) as HTMLInputElement
+      const startDateContainer = getByText('Start Date for Melvin').closest('fieldset')
+      const {findByLabelText: findByLabelTextWithinStartDate} = within(
+        startDateContainer as HTMLElement
+      )
+      const startTime = (await findByLabelTextWithinStartDate('Time')) as HTMLInputElement
+      expect(startDate.value).toBe(localStartDate.date)
+      expect(startTime.value).toBe(localStartDate.time)
+    })
+
+    it('should set the end date and time correctly', async () => {
+      const localEndDate = formatDateToLocalString(endAt)
+      const {findByLabelText, getByText} = render(<TempEnrollAssign {...tempProps} />)
+      const endDate = (await findByLabelText('Until')) as HTMLInputElement
+      const endDateContainer = getByText('End Date for Melvin').closest('fieldset')
+      const {findByLabelText: findByLabelTextWithinEndDate} = within(
+        endDateContainer as HTMLElement
+      )
+      const endTime = (await findByLabelTextWithinEndDate('Time')) as HTMLInputElement
+      expect(endDate.value).toBe(localEndDate.date)
+      expect(endTime.value).toBe(localEndDate.time)
     })
   })
 })

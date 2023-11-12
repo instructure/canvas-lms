@@ -72,7 +72,7 @@ export async function fetchTemporaryEnrollments(
  * @returns {Promise<void>}
  */
 export async function deleteEnrollment(
-  courseId: number,
+  courseId: string,
   enrollmentId: number,
   onDelete?: (enrollmentId: number) => void
 ): Promise<void> {

@@ -25,7 +25,7 @@ import {User} from '../types'
 const mockUser: User = {
   id: '1',
   name: 'John Doe',
-  avatar_url: 'http://example.com/avatar.jpg',
+  avatar_url: 'https://example.com/avatar.jpg',
 }
 
 const props = {

@@ -21,39 +21,45 @@ export const MODULE_NAME = 'TempEnroll'
 export const ITEMS_PER_PAGE = 100
 
 export interface Course {
-  readonly id: string
-  readonly name: string
-  readonly workflow_state: string
-  readonly enrollments: Enrollment[]
-  readonly sections: Section[]
+  id: string
+  name: string
+  workflow_state: string
+  enrollments: Enrollment[]
+  sections: Section[]
 }
 
 export interface Section {
-  readonly course_section_id: string
-  readonly course_id: string
-  readonly id: string
-  readonly name: string
-  readonly enrollment_role: string
+  course_section_id: string
+  course_id: string
+  id: string
+  name: string
+  enrollment_role: string
 }
 
 export interface Role {
-  readonly id: string
-  readonly role: string
-  readonly label: string
-  readonly base_role_name: string
+  id: string
+  role?: string
+  label: string
+  base_role_name: string
+}
+
+export interface RoleChoice {
+  id: string
+  name: string
 }
 
 export interface Enrollment {
-  readonly id: number
-  readonly course_id: number
-  readonly user: User
-  readonly start_at: string | null
-  readonly end_at: string | null
-  readonly role_id: string
-  readonly type: string
-  readonly temporary_enrollment_provider?: User
-  readonly temporary_enrollment_pairing_id: number
-  readonly temporary_enrollment_source_user_id: number
+  id: number
+  course_id: string
+  course_section_id?: string
+  user: User
+  start_at: string | null
+  end_at: string | null
+  role_id: string
+  type: string
+  temporary_enrollment_provider?: User
+  temporary_enrollment_pairing_id: number
+  temporary_enrollment_source_user_id: number
 }
 
 export const PROVIDER = 'provider' as const
@@ -62,12 +68,12 @@ export const RECIPIENT = 'recipient' as const
 export type EnrollmentType = typeof PROVIDER | typeof RECIPIENT | null
 
 export interface User {
-  readonly email?: string | null
-  readonly login_id?: string | null
-  readonly avatar_url?: string
-  readonly id: string
-  readonly name: string
-  readonly sis_user_id?: string | null
+  email?: string | null
+  login_id?: string | null
+  avatar_url?: string
+  id: string
+  name: string
+  sis_user_id?: string | null
 }
 
 export const EMPTY_USER: User = {
@@ -80,7 +86,15 @@ export const EMPTY_USER: User = {
 }
 
 export interface TempEnrollPermissions {
-  readonly canEdit: boolean
-  readonly canAdd: boolean
-  readonly canDelete: boolean
+  canEdit: boolean
+  canAdd: boolean
+  canDelete: boolean
+}
+
+export interface Permissions {
+  teacher: boolean
+  ta: boolean
+  student: boolean
+  observer: boolean
+  designer: boolean
 }
