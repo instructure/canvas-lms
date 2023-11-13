@@ -49,7 +49,7 @@ If an excessive number of events fail after these retries, the subscription will
 It is the end user’s responsibility to implement logging on their endpoints to alert them to any issues and enable troubleshooting should an issue arise. We are unable to provide detailed information the failures, beyond the type of failures and/or HTTP status code, estimated number of events that failed after exhausting retries, and date of occurrence. Common failures include:
 
 * HTTP 4xx or 5xx errors, suggesting some part of your endpoint's infrastructure has rejected requests due to authorization or load issues, or outages
-* Timeout errors, suggesting your endpoint's HTTP server may be down or overloaded, or there is a network misconfiguration. Timeouts occur when failing to receive a response after 60 seconds.
+* Timeout errors, suggesting your endpoint's HTTP server may be down or overloaded, or there is a network misconfiguration. Timeouts occur when failing to receive a response after 15 seconds.
 * SSL/certificate errors
 
 Since we only consider events that failed after exhausting retries, often errors can be reproduced by simply `curl`ing your endpoint.
