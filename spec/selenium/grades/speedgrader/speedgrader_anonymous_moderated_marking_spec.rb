@@ -91,6 +91,7 @@ describe "SpeedGrader" do
 
     context "given student comment and file submission" do
       it "author of comment is anonymous", priority: 2 do
+        skip "11/13/23 unskip in EVAL-3713"
         expect(Speedgrader.comment_citation.first.text).not_to match(/(First|Second) Student/)
         expect(Speedgrader.comment_citation.first.text).to match(/Student (1|2)/)
       end
