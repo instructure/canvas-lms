@@ -30,9 +30,9 @@ module DataFixup
       end
 
       def run_for_range(model, range)
-        user_ids = model.deleted.where(id: range).distinct.pluck(:user_id)
+        user_ids = model.deleted.where(id: range, user_id: ..Shard::IDS_PER_SHARD).distinct.pluck(:user_id)
         user_ids.each_slice(1_000) do |slice|
-          User.select(*User::MINIMAL_COLUMNS_TO_SAVE).where(id: slice).each(&:update_root_account_ids)
+          User.select(:root_account_ids, *User::MINIMAL_COLUMNS_TO_SAVE).where(id: slice).each(&:update_root_account_ids)
         end
       end
     end
