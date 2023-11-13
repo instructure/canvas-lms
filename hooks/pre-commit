@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+ORANGE='\033[0;33m'
+NC='\033[0m' # No Color
+
 if [[ "$SKIP_CANVAS_PRECOMMIT_HOOK" == "1" ]]; then
   exit 0
 fi
@@ -9,6 +12,13 @@ SCRIPTPATH="$(
   pwd -P
 )"
 CANVAS=$(dirname $SCRIPTPATH)
+
+NEW_JS_FILES=$(git diff --cached --name-only --diff-filter=A | grep -E "ui/.*\.(js|jsx)$")
+
+if [ -n "$NEW_JS_FILES" ]; then
+    echo -e "${ORANGE}Warning: Found new .js or .jsx files. Please use TypeScript for new files:${NC}"
+    echo "$NEW_JS_FILES"
+fi
 
 if [ $(pwd -P) = $CANVAS ]; then
   # if .js, .ts, or .tsx files have changed, run eslint
