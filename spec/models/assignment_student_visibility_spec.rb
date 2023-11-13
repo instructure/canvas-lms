@@ -409,6 +409,88 @@ describe "differentiated_assignments" do
         end
       end
 
+      context "module overrides" do
+        before do
+          Account.site_admin.enable_feature!(:differentiated_modules)
+          Setting.set("differentiated_modules_setting", Account.site_admin.feature_enabled?(:differentiated_modules) ? "true" : "false")
+          AssignmentStudentVisibility.reset_table_name
+        end
+
+        it "includes everyone else if there no modules and no overrides" do
+          assignment_with_false_only_visible_to_overrides
+          ensure_user_sees_assignment
+        end
+
+        it "does not apply context module overrides that don't apply to user" do
+          assignment_with_false_only_visible_to_overrides
+
+          module1 = @course.context_modules.create!(name: "Module 1")
+          @assignment.context_module_tags.create! context_module: module1, context: @course, tag_type: "context_module"
+
+          module1.assignment_overrides.create!
+
+          ensure_user_does_not_see_assignment
+        end
+
+        it "applies context module adhoc overrides" do
+          assignment_with_true_only_visible_to_overrides
+
+          module1 = @course.context_modules.create!(name: "Module 1")
+          @assignment.context_module_tags.create! context_module: module1, context: @course, tag_type: "context_module"
+
+          module_override = module1.assignment_overrides.create!
+          module_override.assignment_override_students.create!(user: @user)
+
+          ensure_user_sees_assignment
+        end
+
+        it "applies context module section overrides" do
+          assignment_with_true_only_visible_to_overrides
+          enroller_user_in_section(@section_foo)
+          module1 = @course.context_modules.create!(name: "Module 1")
+          @assignment.context_module_tags.create! context_module: module1, context: @course, tag_type: "context_module"
+
+          module_override = module1.assignment_overrides.create!
+
+          module_override.set_type = "CourseSection"
+          module_override.set_id = @section_foo
+          module_override.save!
+
+          ensure_user_sees_assignment
+        end
+
+        it "does not apply context module section overrides student is not enrolled in" do
+          assignment_with_false_only_visible_to_overrides
+
+          module1 = @course.context_modules.create!(name: "Module 1")
+          @assignment.context_module_tags.create! context_module: module1, context: @course, tag_type: "context_module"
+
+          module_override = module1.assignment_overrides.create!
+
+          module_override.set_type = "CourseSection"
+          module_override.set_id = @section_foo
+          module_override.save!
+
+          ensure_user_does_not_see_assignment
+        end
+
+        it "does not apply context module adhoc overrides with flag off" do
+          Account.site_admin.disable_feature!(:differentiated_modules)
+          Setting.set("differentiated_modules_setting", Account.site_admin.feature_enabled?(:differentiated_modules) ? "true" : "false")
+          AssignmentStudentVisibility.reset_table_name
+
+          assignment_with_true_only_visible_to_overrides
+
+          module1 = @course.context_modules.create!(name: "Module 1")
+          @assignment.context_module_tags.create! context_module: module1, context: @course, tag_type: "context_module"
+
+          module_override = module1.assignment_overrides.create!
+          module_override.assignment_override_students.create!(user: @user)
+
+          ensure_user_does_not_see_assignment
+        end
+      end
+
       context "course overrides" do
         before do
           Account.site_admin.enable_feature!(:differentiated_modules)
