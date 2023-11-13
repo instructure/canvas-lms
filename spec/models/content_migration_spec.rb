@@ -1788,7 +1788,7 @@ describe ContentMigration do
             mig_id = mig_id(@outcome_from)
             @outcome_to = @course_to.learning_outcomes.where(migration_id: mig_id).first
             @outcome_from.destroy!
-            allow_any_instance_of(ContentMigration).to receive(:outcome_has_alignments?).and_return true
+            allow_any_instance_of(ContentMigration).to receive(:can_unlink?).and_return false
             run_migration
             expect(@outcome_from.reload).to be_deleted
             expect(@outcome_to.reload).not_to be_deleted
@@ -1860,7 +1860,7 @@ describe ContentMigration do
             @ct_to = ContentTag.find_by!(content_id: @account_outcome.id, content_type: "LearningOutcome", context_type: "Course", context_id: @course_to.id)
             mig_id = @ct_to.migration_id
             @ct_from.destroy!
-            allow_any_instance_of(ContentMigration).to receive(:outcome_has_alignments?).and_return true
+            allow_any_instance_of(ContentMigration).to receive(:can_unlink?).and_return false
             run_migration
             expect(@ct_from.reload).to be_deleted
             expect(@ct_to.reload).not_to be_deleted
