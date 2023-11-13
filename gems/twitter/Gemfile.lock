@@ -89,7 +89,7 @@ GEM
     snaky_hash (2.0.1)
       hashie
       version_gem (~> 1.1, >= 1.1.1)
-    stringio (3.0.8)
+    stringio (3.0.9)
     twitter-text (3.1.0)
       idn-ruby
       unf (~> 0.1.0)
