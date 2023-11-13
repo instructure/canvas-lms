@@ -27,7 +27,7 @@ GEM
     minitest (5.20.0)
     psych (5.1.1.1)
       stringio
-    rake (13.0.6)
+    rake (13.1.0)
     rdoc (6.6.0)
       psych (>= 4.0.0)
     reline (0.4.0)

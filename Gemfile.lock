@@ -876,7 +876,7 @@ GEM
       thor (~> 1.0)
       zeitwerk (~> 2.5)
     rainbow (3.1.1)
-    rake (13.0.6)
+    rake (13.1.0)
     ratom-nokogiri (0.10.11)
       nokogiri (>= 1.5.6, < 2.0)
     rchardet (1.8.0)
