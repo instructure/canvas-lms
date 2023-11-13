@@ -4,6 +4,11 @@ Datafixup/EagerLoad:
     - "**/db/migrate/*.rb"
     - "**/lib/data_fixup/*.rb"
 
+Datafixup/StrandDownstreamJobs:
+  Enabled: true
+  Include:
+    - "**/lib/data_fixup/*.rb"
+
 Lint/NoFileUtilsRmRf:
   Enabled: true
 

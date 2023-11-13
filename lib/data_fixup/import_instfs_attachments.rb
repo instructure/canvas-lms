@@ -118,7 +118,7 @@ module DataFixup
     end
 
     def reenqueue_job(queue)
-      self.class.delay(run_at: @next_options[:run_at]).run(queue, @next_options)
+      self.class.delay(run_at: @next_options[:run_at]).run(queue, @next_options) # rubocop:disable Datafixup/StrandDownstreamJobs
     end
   end
 end
