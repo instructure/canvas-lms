@@ -141,7 +141,7 @@ GEM
       rake (>= 12.2)
       thor (~> 1.0)
       zeitwerk (~> 2.5)
-    rake (13.0.6)
+    rake (13.1.0)
     redis (5.0.8)
       redis-client (>= 0.17.0)
     redis-client (0.18.0)
