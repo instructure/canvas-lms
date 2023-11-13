@@ -22,7 +22,13 @@ import $ from 'jquery'
 
 const I18n = useI18nScope('modules_home_page')
 
-export const publishCourse = ({courseId, onSuccess = null}) => {
+export const publishCourse = ({
+  courseId,
+  onSuccess = null,
+}: {
+  courseId: string
+  onSuccess?: null | (() => void)
+}) => {
   axios
     .put(`/api/v1/courses/${courseId}`, {
       course: {event: 'offer'},
@@ -47,6 +53,6 @@ export const publishCourse = ({courseId, onSuccess = null}) => {
     })
 }
 
-export const getModules = ({courseId}) => {
+export const getModules = ({courseId}: {courseId: string}) => {
   return axios.get(`/api/v1/courses/${courseId}/modules`)
 }
