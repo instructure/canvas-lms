@@ -474,7 +474,7 @@ GEM
     database_cleaner-core (2.0.1)
     datadog-ci (0.3.0)
       msgpack
-    date (3.3.3)
+    date (3.3.4)
     db-query-matchers (0.11.0)
       activesupport (>= 4.0, < 7.1)
       rspec (>= 3.0)
@@ -720,13 +720,13 @@ GEM
       activerecord (>= 6.1)
     net-http (0.4.0)
       uri
-    net-imap (0.4.3)
+    net-imap (0.4.5)
       date
       net-protocol
     net-ldap (0.18.0)
     net-pop (0.1.2)
       net-protocol
-    net-protocol (0.2.1)
+    net-protocol (0.2.2)
       timeout
     net-smtp (0.4.0)
       net-protocol
