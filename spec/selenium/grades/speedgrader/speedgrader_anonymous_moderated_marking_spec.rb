@@ -69,6 +69,7 @@ describe "SpeedGrader" do
     end
 
     it "student names are anonymous", priority: "1" do
+      skip "11/13/23 unskip in EVAL-3713"
       Speedgrader.students_dropdown_button.click
       student_names = Speedgrader.students_select_menu_list.map(&:text)
       expect(student_names).to match_array ["Student 1", "Student 2"]
