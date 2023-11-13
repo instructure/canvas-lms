@@ -30,10 +30,13 @@ class User < ActiveRecord::Base
                                initial_enrollment_type
                                lti_id
                                name
+                               preferences
                                reminder_time_for_due_dates
                                reminder_time_for_grading
                                short_name
-                               sortable_name].freeze
+                               sortable_name
+                               uuid
+                               workflow_state].freeze
 
   include ManyRootAccounts
   include TurnitinID
