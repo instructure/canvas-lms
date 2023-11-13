@@ -93,28 +93,30 @@ module ActiveRecord
 
         # can be used to find the cache for an object by id alone
 
-        # when calling directly, you should be prepared to handle a `nil` return value (and skip caching if so)
-        # in the case that CacheRegister is disabled/reverted, since this would be preferable to
-        # adding a possible N+1 trying to get the updated_at on the object
-        # as such, this should only be used for places where we're adding new cache blocks,
-        # and thus won't be terribly affected if the caching doesn't work
+        # when cache register is disabled, or Redis fails, this will still return
+        # a valid cache key, just for the current time. this will likely result in
+        # N+1 queries or other slow behaviors, but is preferable to _incorrect_
+        # behavior of sharing cache keys
         def cache_key_for_id(id, key_type, skip_check: false)
           global_id = ::Shard.global_id_for(id)
-          return nil unless skip_check || (global_id && valid_cache_key_type?(key_type) && Canvas::CacheRegister.enabled?)
+          now = Time.now.utc.to_fs(cache_timestamp_format)
+          now_key = "#{model_name.cache_key}/#{global_id}-#{now}"
+
+          return now_key unless skip_check || (global_id && valid_cache_key_type?(key_type) && Canvas::CacheRegister.enabled?)
 
           base_key = base_cache_register_key_for(global_id)
-          return nil unless base_key
+          return now_key unless base_key
 
           prefer_multi_cache = prefer_multi_cache_for_key_type?(key_type)
           redis = Canvas::CacheRegister.redis(base_key, ::Shard.shard_for(global_id), prefer_multi_cache:)
           full_key = "#{base_key}/#{key_type}"
+
           RequestCache.cache(full_key) do
-            now = Time.now.utc.to_fs(cache_timestamp_format)
             # try to get the timestamp for the type, set it to now if it doesn't exist
             ts = Canvas::CacheRegister.lua.run(:get_key, [full_key], [now], redis)
             "#{model_name.cache_key}/#{global_id}-#{ts}"
           rescue Redis::BaseConnectionError
-            nil
+            now_key
           end
         end
       end
