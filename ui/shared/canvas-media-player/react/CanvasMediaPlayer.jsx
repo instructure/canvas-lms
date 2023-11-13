@@ -81,13 +81,12 @@ export default function CanvasMediaPlayer(props) {
   const containerRef = useRef(null)
   const mediaPlayerRef = useRef(null)
 
-  const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement
-  const isEmbedded =
-    window.frameElement?.tagName === 'IFRAME' ||
-    window.location !== window.top.location ||
-    !containerRef.current
-
   const boundingBox = useCallback(() => {
+    const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement
+    const isEmbedded =
+      window.frameElement?.tagName === 'IFRAME' ||
+      window.location !== window.top.location ||
+      !containerRef.current
     if (isFullscreen || isEmbedded) {
       return {
         width: window.innerWidth,
@@ -100,7 +99,7 @@ export default function CanvasMediaPlayer(props) {
       width: containerRef.current.clientWidth,
       height: Math.min(containerRef.current.clientHeight, window.innerHeight - 32),
     }
-  }, [isFullscreen, isEmbedded, containerRef])
+  }, [containerRef])
 
   const handleLoadedMetadata = useCallback(
     event => {
