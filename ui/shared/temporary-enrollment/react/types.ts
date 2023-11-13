@@ -59,7 +59,7 @@ export interface Enrollment {
 export const PROVIDER = 'provider' as const
 export const RECIPIENT = 'recipient' as const
 
-export type EnrollmentType = typeof PROVIDER | typeof RECIPIENT
+export type EnrollmentType = typeof PROVIDER | typeof RECIPIENT | null
 
 export interface User {
   readonly email?: string | null

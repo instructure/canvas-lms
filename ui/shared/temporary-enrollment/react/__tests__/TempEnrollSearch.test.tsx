@@ -52,8 +52,18 @@ describe('TempEnrollSearch', () => {
     ],
   }
 
+  beforeAll(() => {
+    // @ts-expect-error
+    window.ENV = {ROOT_ACCOUNT_ID: '1'}
+  })
+
   afterEach(() => {
     fetchMock.restore()
+  })
+
+  afterAll(() => {
+    // @ts-expect-error
+    window.ENV = {}
   })
 
   it('shows search page', () => {

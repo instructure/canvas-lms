@@ -121,6 +121,11 @@ jest.mock('@canvas/alerts/react/FlashAlert', () => ({
 }))
 
 describe('TempEnrollModal', () => {
+  beforeAll(() => {
+    // @ts-expect-error
+    window.ENV = {ROOT_ACCOUNT_ID: '1'}
+  })
+
   beforeEach(() => {
     localStorage.clear()
     fetchMock.reset()
@@ -133,6 +138,8 @@ describe('TempEnrollModal', () => {
   })
 
   afterAll(() => {
+    // @ts-expect-error
+    window.ENV = {}
     fetchMock.restore()
   })
 

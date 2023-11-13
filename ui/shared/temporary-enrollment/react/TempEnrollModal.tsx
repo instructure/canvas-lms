@@ -65,7 +65,6 @@ interface Props {
     readonly observer: boolean
     readonly designer: boolean
   }
-  readonly accountId: string
   readonly roles: Role[]
   readonly defaultOpen?: boolean
   readonly tempEnrollments?: Enrollment[]
@@ -247,7 +246,6 @@ export function TempEnrollModal(props: Props) {
 
       return (
         <TempEnrollSearch
-          accountId={props.accountId}
           canReadSIS={props.canReadSIS}
           user={props.user}
           page={page}
