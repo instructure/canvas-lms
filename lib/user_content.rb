@@ -208,37 +208,59 @@ module UserContent
     def translate_content(html)
       return html if html.blank?
 
-      asset_types = AssetTypes.slice(*@allowed_types)
+      return precise_translate_content(html) if Account.site_admin.feature_enabled?(:precise_link_replacements)
 
-      html.gsub(@toplevel_regex) do |url|
-        _absolute_part, prefix, type, obj_id, rest = [$1, $2, $3, $4, $5]
-        next url if !@contextless_types.include?(type) && prefix != @context_prefix && url.split("?").first != @context_prefix
+      html.gsub(@toplevel_regex) { |url| replacement(url) }
+    end
 
-        if type != "wiki" && type != "pages"
-          if obj_id.to_i > 0
-            obj_id = obj_id.to_i
-          else
-            rest = "/#{obj_id}#{rest}" if obj_id.present? || rest.present?
-            obj_id = nil
+    def precise_translate_content(html)
+      doc = Nokogiri::HTML5::DocumentFragment.parse(html)
+      attributes = %w[value href longdesc src srcset title]
+
+      doc.css("img, iframe, video, source, param, a").each do |e|
+        attributes.each do |attr|
+          attribute_value = e.attributes[attr]&.value
+          if attribute_value&.match?(@toplevel_regex)
+            e.inner_html = e.inner_html.gsub(@toplevel_regex) { |url| replacement(url) } if e.name == "a" && e.inner_html.delete("\n").strip.include?(e["href"].strip)
+            e.set_attribute(attr, attribute_value.gsub(@toplevel_regex) { |url| replacement(url) })
           end
         end
+      end
+      doc.inner_html
+    end
 
-        if (module_item = rest.try(:match, %r{/items/(\d+)}))
-          type   = "items"
-          obj_id = module_item[1].to_i
-        end
+    def replacement(url)
+      asset_types = AssetTypes.slice(*@allowed_types)
+      matched = url.match(@toplevel_regex)
+      prefix, type, obj_id, rest = [matched[2], matched[3], matched[4], matched[5]]
+      return url if !@contextless_types.include?(type) && prefix != @context_prefix && url.split("?").first != @context_prefix
 
-        if asset_types.key?(type)
-          klass = asset_types[type]
-          klass = klass.to_s.constantize if klass
-          match = UriMatch.new(url, type, klass, obj_id, rest, prefix)
-          handler = @handlers[type] || @default_handler
-          handler&.call(match) || url
+      if type != "wiki" && type != "pages"
+        if obj_id.to_i > 0
+          obj_id = obj_id.to_i
         else
-          match = UriMatch.new(url, type)
-          @unknown_handler&.call(match) || url
+          rest = "/#{obj_id}#{rest}" if obj_id.present? || rest.present?
+          obj_id = nil
         end
       end
+
+      if (module_item = rest.try(:match, %r{/items/(\d+)}))
+        type   = "items"
+        obj_id = module_item[1].to_i
+      end
+
+      if asset_types.key?(type)
+        klass = asset_types[type]
+        klass = klass.to_s.constantize if klass
+        match = UriMatch.new(url, type, klass, obj_id, rest, prefix)
+        handler = @handlers[type] || @default_handler
+        converted = handler&.call(match)
+      else
+        match = UriMatch.new(url, type)
+        converted = @unknown_handler&.call(match)
+      end
+      converted ||= url
+      converted.gsub("&amp;", "&") # get rid of ampersand conversions, it can trip up logic that runs after this
     end
 
     # if content is nil, it'll query the block for the content if needed (lazy content load)

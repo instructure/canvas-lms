@@ -785,66 +785,94 @@ describe "Canvas Cartridge importing" do
     expect(frame["src"]).to eq "/media_objects_iframe/#{media_id}?type=video"
   end
 
-  it "imports wiki pages" do
-    # make sure that the wiki page we're linking to in the test below exists
-    page = @copy_from.wiki_pages.create!(title: "assignments", body: "ohai")
-    @copy_to.wiki_pages.create!(title: "assignments", body: "ohai")
-    mod = @copy_from.context_modules.create!(name: "some module")
-    mod2 = @copy_to.context_modules.create(name: "some module")
-    mod2.migration_id = CC::CCHelper.create_key(mod)
-    mod2.save!
-    # Create files for the wiki text to reference
-    from_root = Folder.root_folders(@copy_from).first
-    from_dir = Folder.create!(name: "sub & folder", parent_folder: from_root, context: @copy_from)
-    from_att = Attachment.create!(filename: "picture+%2B+cropped.png", display_name: "picture + cropped.png", uploaded_data: StringIO.new("pretend .png data"), folder: from_dir, context: @copy_from)
+  context "Wiki page importing" do
+    before do
+      # make sure that the wiki page we're linking to in the test below exists
+      @page = @copy_from.wiki_pages.create!(title: "assignments", body: "ohai")
+      @copy_to.wiki_pages.create!(title: "assignments", body: "ohai")
+      @mod = @copy_from.context_modules.create!(name: "some module")
+      @mod2 = @copy_to.context_modules.create(name: "some module")
+      @mod2.migration_id = CC::CCHelper.create_key(@mod)
+      @mod2.save!
+      # Create files for the wiki text to reference
+      from_root = Folder.root_folders(@copy_from).first
+      from_dir = Folder.create!(name: "sub & folder", parent_folder: from_root, context: @copy_from)
+      from_att = Attachment.create!(filename: "picture+%2B+cropped.png", display_name: "picture + cropped.png", uploaded_data: StringIO.new("pretend .png data"), folder: from_dir, context: @copy_from)
 
-    to_root = Folder.root_folders(@copy_to).first
-    to_dir = Folder.create!(name: "sub & folder", parent_folder: to_root, context: @copy_to)
-    to_att = Attachment.create!(filename: "picture+%2B+cropped.png", display_name: "picture + cropped.png", uploaded_data: StringIO.new("pretend .png data"), folder: to_dir, context: @copy_to)
-    to_att.migration_id = CC::CCHelper.create_key(from_att)
-    to_att.save
-    path = to_att.full_display_path.gsub("course files/", "")
-    @migration.attachment_path_id_lookup = { path => to_att.migration_id }
+      to_root = Folder.root_folders(@copy_to).first
+      to_dir = Folder.create!(name: "sub & folder", parent_folder: to_root, context: @copy_to)
+      @to_att = Attachment.create!(filename: "picture+%2B+cropped.png", display_name: "picture + cropped.png", uploaded_data: StringIO.new("pretend .png data"), folder: to_dir, context: @copy_to)
+      @to_att.migration_id = CC::CCHelper.create_key(from_att)
+      @to_att.save
+      path = @to_att.full_display_path.gsub("course files/", "")
+      @migration.attachment_path_id_lookup = { path => @to_att.migration_id }
 
-    body_with_link = %(<p>Watup? <strong>eh?</strong>
-      <a href="/courses/%s/assignments">Assignments</a>
-      <a href="/courses/%s/file_contents/course%%20files/tbe_banner.jpg">Some file</a>
-      <a href="/courses/%s/pages/#{CC::CCHelper.create_key(page)}">Assignments wiki link</a>
-      <a href="/courses/%s/modules">Modules</a>
-      <a href="/courses/%s/modules/%s">some module</a>
-      <img src="/courses/%s/files/%s/preview" alt="picture.png" /></p>
-      <div>
-        <div><img src="http://www.instructure.com/images/header-logo.png"></div>
-        <div><img src="http://www.instructure.com/images/header-logo.png"></div>
-      </div>)
-    page = @copy_from.wiki_pages.create!(title: "some page", body: body_with_link % [@copy_from.id, @copy_from.id, @copy_from.id, @copy_from.id, @copy_from.id, mod.id, @copy_from.id, from_att.id], editing_roles: "teachers", notify_of_update: true)
-    page.workflow_state = "unpublished"
-    @copy_from.save!
+      @body_with_link = %(<p>Watup? <strong>eh?</strong>
+        <a href="/courses/%s/assignments">Assignments</a>
+        <a href="/courses/%s/file_contents/course%%20files/tbe_banner.jpg">Some file</a>
+        <a href="/courses/%s/pages/#{CC::CCHelper.create_key(@page)}">Assignments wiki link</a>
+        <a href="/courses/%s/modules">Modules</a>
+        <a href="/courses/%s/modules/%s">some module</a>
+        <img src="/courses/%s/files/%s/preview" alt="picture.png" /></p>
+        <div>
+          <div><img src="http://www.instructure.com/images/header-logo.png"></div>
+          <div><img src="http://www.instructure.com/images/header-logo.png"></div>
+        </div>)
+      @page = @copy_from.wiki_pages.create!(title: "some page", body: @body_with_link % [@copy_from.id, @copy_from.id, @copy_from.id, @copy_from.id, @copy_from.id, @mod.id, @copy_from.id, from_att.id], editing_roles: "teachers", notify_of_update: true)
+      @page.workflow_state = "unpublished"
+      @copy_from.save!
 
-    # export to html file
-    migration_id = CC::CCHelper.create_key(page)
-    meta_fields = { identifier: migration_id }
-    meta_fields[:editing_roles] = page.editing_roles
-    meta_fields[:notify_of_update] = page.notify_of_update
-    meta_fields[:workflow_state] = page.workflow_state
-    exported_html = CC::CCHelper::HtmlContentExporter.new(@copy_from, @from_teacher).html_page(page.body, page.title, meta_fields)
-    # convert to json
-    doc = Nokogiri::HTML5(exported_html)
-    hash = @converter.convert_wiki(doc, "some-page")
-    hash = hash.with_indifferent_access
-    # import into new course
-    Importers::WikiPageImporter.process_migration({ "wikis" => [hash, nil] }, @migration)
-    @migration.resolve_content_links!
+      # export to html file
+      @migration_id = CC::CCHelper.create_key(@page)
+      @meta_fields = { identifier: @migration_id }
+      @meta_fields[:editing_roles] = @page.editing_roles
+      @meta_fields[:notify_of_update] = @page.notify_of_update
+      @meta_fields[:workflow_state] = @page.workflow_state
+    end
 
-    expect(ErrorReport.last.message).to match(/nil wiki/)
+    it "works with the precise_link_replacements FF OFF" do
+      Account.site_admin.disable_feature! :precise_link_replacements
+      exported_html = CC::CCHelper::HtmlContentExporter.new(@copy_from, @from_teacher).html_page(@page.body, @page.title, @meta_fields)
+      # convert to json
+      doc = Nokogiri::HTML5(exported_html)
+      hash = @converter.convert_wiki(doc, "some-page")
+      hash = hash.with_indifferent_access
+      # import into new course
+      Importers::WikiPageImporter.process_migration({ "wikis" => [hash, nil] }, @migration)
+      @migration.resolve_content_links!
 
-    page_2 = @copy_to.wiki_pages.where(migration_id:).first
-    expect(page_2.title).to eq page.title
-    expect(page_2.url).to eq page.url
-    expect(page_2.editing_roles).to eq page.editing_roles
-    expect(page_2.notify_of_update).to eq page.notify_of_update
-    expect(page_2.body).to eq (body_with_link % [@copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, mod2.id, @copy_to.id, to_att.id]).gsub(%r{png" />}, 'png">')
-    expect(page_2.unpublished?).to be true
+      expect(ErrorReport.last.message).to match(/nil wiki/)
+
+      page_2 = @copy_to.wiki_pages.where(migration_id: @migration_id).first
+      expect(page_2.title).to eq @page.title
+      expect(page_2.url).to eq @page.url
+      expect(page_2.editing_roles).to eq @page.editing_roles
+      expect(page_2.notify_of_update).to eq @page.notify_of_update
+      expect(page_2.body).to eq (@body_with_link % [@copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, @mod2.id, @copy_to.id, @to_att.id]).gsub(%r{png" />}, 'png">')
+      expect(page_2.unpublished?).to be true
+    end
+
+    it "works with the precise_link_replacements FF ON" do
+      Account.site_admin.enable_feature! :precise_link_replacements
+      exported_html = CC::CCHelper::HtmlContentExporter.new(@copy_from, @from_teacher).html_page(@page.body, @page.title, @meta_fields)
+      # convert to json
+      doc = Nokogiri::HTML5(exported_html)
+      hash = @converter.convert_wiki(doc, "some-page")
+      hash = hash.with_indifferent_access
+      # import into new course
+      Importers::WikiPageImporter.process_migration({ "wikis" => [hash, nil] }, @migration)
+      @migration.resolve_content_links!
+
+      expect(ErrorReport.last.message).to match(/nil wiki/)
+
+      page_2 = @copy_to.wiki_pages.where(migration_id: @migration_id).first
+      expect(page_2.title).to eq @page.title
+      expect(page_2.url).to eq @page.url
+      expect(page_2.editing_roles).to eq @page.editing_roles
+      expect(page_2.notify_of_update).to eq @page.notify_of_update
+      expect(page_2.body).to eq (@body_with_link % [@copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, @mod2.id, @copy_to.id, @to_att.id]).gsub(%r{png" />}, 'png">')
+      expect(page_2.unpublished?).to be true
+    end
   end
 
   it "imports migrate inline external tool URLs in wiki pages" do

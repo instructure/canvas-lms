@@ -80,6 +80,30 @@ describe ContentMigration do
       expect(new_page.body).to match(%r{<p><a title="Home" href="/courses/#{@copy_to.id}/?\?wrap=1">Home</a></p><p><a title="Home" href="/courses/#{@copy_to.id}/?">Home 2</a></p>})
     end
 
+    context "with precise_link_replacements FF ON" do
+      before { Account.site_admin.enable_feature! :precise_link_replacements }
+
+      it "leaves non-href/non-src 'links' untouched" do
+        course_model
+        @copy_from.wiki_pages.create!(
+          title: "page 1",
+          body: <<~HTML)
+            /courses/#{@copy_from.id}/pages/1
+            <a href="/courses/#{@copy_from.id}/pages/1">http://fake.dom/courses/#{@copy_from.id}/pages/1</a>
+            <a href="/courses/#{@copy_from.id}/pages/1">/courses/#{@copy_from.id}/pages/1</a>
+          HTML
+
+        run_course_copy
+        expected_resulting_body = <<~HTML
+          /courses/#{@copy_from.id}/pages/1
+          <a href="/courses/#{@copy_to.id}/pages/1">/courses/#{@copy_to.id}/pages/1</a>
+          <a href="/courses/#{@copy_to.id}/pages/1">/courses/#{@copy_to.id}/pages/1</a>
+        HTML
+        dest_page = @copy_to.wiki_pages.where(migration_id: mig_id(@copy_from.wiki_pages.last)).first.body
+        expect(dest_page.delete("\n")).to eq(expected_resulting_body.delete("\n"))
+      end
+    end
+
     it "migrates syllabus links on copy" do
       course_model
 
