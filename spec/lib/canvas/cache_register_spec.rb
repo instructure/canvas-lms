@@ -361,13 +361,13 @@ describe Canvas::CacheRegister do
       end
     end
 
-    it "returns nil if cache register is disabled" do
+    it "returns a key for 'now' if cache register is disabled" do
       set_revert!
       Timecop.freeze(time1) do
         @user.cache_key(:enrollments)
       end
       Timecop.freeze(time2) do
-        expect(User.cache_key_for_id(@user.id, :enrollments)).to be_nil
+        expect(User.cache_key_for_id(@user.id, :enrollments)).to include(to_stamp(time2))
       end
     end
 
