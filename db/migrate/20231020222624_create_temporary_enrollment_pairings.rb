@@ -21,7 +21,7 @@ class CreateTemporaryEnrollmentPairings < ActiveRecord::Migration[7.0]
   disable_ddl_transaction!
 
   def change
-    create_table :temporary_enrollment_pairings do |t|
+    create_table :temporary_enrollment_pairings, if_not_exists: true do |t|
       t.references :root_account, foreign_key: { to_table: :accounts }, null: false, index: false
       t.string :workflow_state, null: false, default: "active", limit: 255
       t.timestamps
