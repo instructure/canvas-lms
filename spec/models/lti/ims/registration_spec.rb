@@ -281,7 +281,13 @@ module Lti::IMS
               "foo" => "bar"
             },
             icon_uri: "http://example.com/icon.png",
-            placements: ["global_navigation", "course_navigation"],
+            placements: [
+              "https://canvas.instructure.com/lti/assignment_edit",
+              "global_navigation",
+              "course_navigation",
+              "ContentArea",
+              "RichTextEditor",
+            ],
           }],
           claims: []
         }
@@ -290,25 +296,27 @@ module Lti::IMS
       subject { registration.placements }
 
       context "convert messages to placements" do
-        it do
+        it "accepts valid placements" do
+          canvas_placement_hash = {
+            custom_fields: { "foo" => "bar" },
+            enabled: true,
+            icon_url: "http://example.com/icon.png",
+            message_type: "LtiResourceLinkRequest",
+            target_link_uri: "http://example.com/launch"
+          }
           expect(subject).to eq [
-            {
-              custom_fields: { "foo" => "bar" },
-              enabled: true,
-              icon_url: "http://example.com/icon.png",
-              message_type: "LtiResourceLinkRequest",
-              placement: "global_navigation",
-              target_link_uri: "http://example.com/launch"
-            },
-            {
-              custom_fields: { "foo" => "bar" },
-              enabled: true,
-              icon_url: "http://example.com/icon.png",
-              message_type: "LtiResourceLinkRequest",
-              placement: "course_navigation",
-              target_link_uri: "http://example.com/launch"
-            }
+            canvas_placement_hash.merge(placement: "assignment_edit"),
+            canvas_placement_hash.merge(placement: "global_navigation"),
+            canvas_placement_hash.merge(placement: "course_navigation"),
+            canvas_placement_hash.merge(placement: "link_selection"),
+            canvas_placement_hash.merge(placement: "editor_button"),
           ]
+        end
+
+        it "rejects invalid placements" do
+          bad_placement_name = "course_navigationhttps://canvas.instructure.com/lti/"
+          registration.lti_tool_configuration["messages"].first["placements"] << bad_placement_name
+          expect { registration.save! }.to raise_error(ActiveRecord::RecordInvalid)
         end
       end
     end

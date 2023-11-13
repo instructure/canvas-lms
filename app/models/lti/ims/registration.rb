@@ -121,7 +121,7 @@ class Lti::IMS::Registration < ApplicationRecord
       else
         message["placements"].map do |placement|
           {
-            placement:,
+            placement: canvas_placement_name(placement),
             enabled: true,
             message_type: message["type"],
             target_link_uri: message["target_link_uri"],
@@ -206,5 +206,15 @@ class Lti::IMS::Registration < ApplicationRecord
       # Convert errors represented as a Hash to JSON
       config_errors.is_a?(Hash) ? config_errors.to_json : config_errors
     )
+  end
+
+  def canvas_placement_name(placement)
+    # IMS placement names that have different names in Canvas
+    return "link_selection" if placement == "ContentArea"
+    return "editor_button" if placement == "RichTextEditor"
+
+    # Otherwise, remove our URL prefix from the Canvas-specific placements
+    canvas_extension = "https://#{CANVAS_EXTENSION_LABEL}/lti/"
+    placement.start_with?(canvas_extension) ? placement.sub(canvas_extension, "") : placement
   end
 end
