@@ -73,11 +73,14 @@
   td {
     text-align: center;
     font-weight: bold;
+    div {
+      margin-right: 30px;
+    }
   }
 }
 
 .time-block-list-body {
-  width: 100%;
+  width: 97.5%;
 }
 
 .time-block-list {
@@ -106,7 +109,7 @@
     text-align: center;
   }
   .date_field {
-    width: $date_column_width - 80;
+    width: $date_column_width - 100;
   }
   .time_field {
     text-align: direction(right);
