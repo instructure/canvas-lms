@@ -72,7 +72,7 @@ GEM
     addressable (2.8.5)
       public_suffix (>= 2.0.2, < 6.0)
     aes_key_wrap (1.1.0)
-    base64 (0.1.1)
+    base64 (0.2.0)
     bindata (2.4.15)
     builder (3.2.4)
     concurrent-ruby (1.2.2)

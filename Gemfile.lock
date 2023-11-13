@@ -424,7 +424,7 @@ GEM
       descendants_tracker (~> 0.0.4)
       ice_nine (~> 0.11.0)
       thread_safe (~> 0.3, >= 0.3.1)
-    base64 (0.1.1)
+    base64 (0.2.0)
     bcrypt (3.1.19)
     bigdecimal (3.1.4)
     bindata (2.4.15)
@@ -718,7 +718,7 @@ GEM
     mustache (1.1.1)
     neighbor (0.3.1)
       activerecord (>= 6.1)
-    net-http (0.3.2)
+    net-http (0.4.0)
       uri
     net-imap (0.4.3)
       date
@@ -1062,7 +1062,7 @@ GEM
       axe-core-rspec (~> 4.1)
       axe-core-selenium (~> 4.1)
       rspec (~> 3.8)
-    stringio (3.0.8)
+    stringio (3.0.9)
     swearjar (1.4.0)
     switchman (3.5.16)
       activerecord (>= 6.1.4, < 7.2)
@@ -1087,7 +1087,7 @@ GEM
     thread_safe (0.3.6)
     thrift (0.9.3.0)
     timecop (0.9.8)
-    timeout (0.4.0)
+    timeout (0.4.1)
     tins (1.32.1)
       sync
     trailblazer-option (0.1.2)
@@ -1109,7 +1109,7 @@ GEM
     unicode-emoji (3.4.0)
       unicode-version (~> 1.0)
     unicode-version (1.3.0)
-    uri (0.12.2)
+    uri (0.13.0)
     vault (0.18.1)
       aws-sigv4
     vericite_api (1.5.3)
