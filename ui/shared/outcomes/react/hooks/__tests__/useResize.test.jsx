@@ -32,6 +32,7 @@ describe('useResize', () => {
     right: 1000,
     bottom: 500,
   }
+
   const mockDelimiter = {
     x: 250,
     left: 250,
@@ -42,6 +43,7 @@ describe('useResize', () => {
     right: 260,
     bottom: 500,
   }
+
   const mockElement = () => {
     Element.prototype.getBoundingClientRect = jest
       .fn()
@@ -207,6 +209,12 @@ describe('useResize', () => {
       })
       expect(getByTestId('leftColumn')).toHaveStyle('width: 743px')
       expect(getByTestId('rightColumn')).toHaveStyle('width: 245px')
+    })
+  })
+  describe('Delimiter attributes', () => {
+    it('has aria-valuenow', () => {
+      const {getByTestId} = render(<TestComponent />)
+      expect(getByTestId('delimiter')).toHaveAttribute('aria-valuenow')
     })
   })
 })
