@@ -1857,6 +1857,18 @@ module Lti
             expect(expand!("$Canvas.assignment.lockdownEnabled")).to be false
           end
 
+          it "returns false when masquerading" do
+            variable_expander = VariableExpander.new(root_account, course, controller, current_user: User.new, tool:, assignment:)
+            allow(assignment).to receive(:settings).and_return({
+                                                                 "lockdown_browser" => {
+                                                                   "require_lockdown_browser" => true
+                                                                 }
+                                                               })
+            exp_hash = { test: "$Canvas.assignment.lockdownEnabled" }
+            variable_expander.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to be false
+          end
+
           it "returns false as default" do
             allow(assignment).to receive(:settings).and_return({})
             expect(expand!("$Canvas.assignment.lockdownEnabled")).to be false
