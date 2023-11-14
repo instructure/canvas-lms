@@ -117,4 +117,6 @@ class Types::MutationType < Types::ApplicationObjectType
   field :create_submission, <<~MD, mutation: Mutations::CreateSubmission
     IN ACTIVE DEVELOPMENT, USE AT YOUR OWN RISK: Submit homework on an assignment.
   MD
+
+  field :update_rubric_archived_state, mutation: Mutations::UpdateRubricArchivedState
 end
