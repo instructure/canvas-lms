@@ -17,11 +17,16 @@
  */
 
 import axios from '@canvas/axios'
+import type {Card} from '../types'
+
 // Updates the positions of a given group of contexts asynchronously
-const updatePositions = (newPositions, userId, ajaxLib = axios) => {
-  const request = {}
-  request.dashboard_positions = {}
-  newPositions.forEach((c, i) => {
+const updatePositions = (newPositions: Card[], userId: string, ajaxLib = axios) => {
+  const request: {
+    dashboard_positions: Record<string, number>
+  } = {
+    dashboard_positions: {},
+  }
+  newPositions.forEach((c: Card, i: number) => {
     request.dashboard_positions[c.assetString] = i
   })
   return ajaxLib.put(`/api/v1/users/${userId}/dashboard_positions`, request)

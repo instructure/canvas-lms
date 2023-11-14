@@ -91,6 +91,10 @@ export interface EnvCommon {
   FULL_STORY_ENABLED: boolean
   RAILS_ENVIRONMENT: 'development' | 'CD' | 'Beta' | 'Production' | string
   IN_PACED_COURSE: boolean
+  PREFERENCES?: {
+    hide_dashcard_color_overlays: boolean
+    custom_colors: unknown
+  }
 
   SENTRY_FRONTEND?: {
     /**
