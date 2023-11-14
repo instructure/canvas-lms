@@ -19,15 +19,23 @@
 import React from 'react'
 import {fireEvent, render, waitFor, within} from '@testing-library/react'
 import {
+  deleteMultipleEnrollmentsByNoMatch,
   getEnrollmentAndUserProps,
+  isEnrollmentMatch,
+  isMatchFound,
   Props,
   TempEnrollAssign,
   tempEnrollAssignData,
 } from '../TempEnrollAssign'
 import fetchMock from 'fetch-mock'
 import {Enrollment, PROVIDER, RECIPIENT, Role, User} from '../types'
+import {deleteEnrollment} from '../api/enrollment'
 
 const backCall = jest.fn()
+
+jest.mock('../api/enrollment', () => ({
+  deleteEnrollment: jest.fn(),
+}))
 
 const falsePermissions = {
   teacher: true,
@@ -423,6 +431,163 @@ describe('TempEnrollAssign', () => {
       const endTime = (await findByLabelTextWithinEndDate('Time')) as HTMLInputElement
       expect(endDate.value).toBe(localEndDate.date)
       expect(endTime.value).toBe(localEndDate.time)
+    })
+  })
+
+  describe('isEnrollmentMatch', () => {
+    let mockTempEnrollment: Enrollment
+
+    beforeEach(() => {
+      mockTempEnrollment = {
+        course_id: '',
+        end_at: '',
+        id: '',
+        start_at: '',
+        user_id: '',
+        temporary_enrollment_pairing_id: 0,
+        temporary_enrollment_source_user_id: 0,
+        type: '',
+        course_section_id: '7',
+        user: {
+          id: '1',
+        } as User,
+        role_id: '20',
+      }
+    })
+
+    it('should return true when enrollment matches', () => {
+      const result = isEnrollmentMatch(mockTempEnrollment, '7', '1', '20')
+      expect(result).toBe(true)
+    })
+
+    it('should return false when course_section_id does not match', () => {
+      const result = isEnrollmentMatch(mockTempEnrollment, '8', '1', '20')
+      expect(result).toBe(false)
+    })
+
+    it('should return false when user ID does not match', () => {
+      const result = isEnrollmentMatch(mockTempEnrollment, '7', '2', '20')
+      expect(result).toBe(false)
+    })
+
+    it('should return false when role ID does not match', () => {
+      const result = isEnrollmentMatch(mockTempEnrollment, '7', '1', '21')
+      expect(result).toBe(false)
+    })
+  })
+
+  describe('isMatchFound', () => {
+    let mockTempEnrollment: Enrollment
+
+    beforeEach(() => {
+      mockTempEnrollment = {
+        course_id: '8',
+        end_at: '',
+        id: '92',
+        start_at: '',
+        user_id: '1',
+        temporary_enrollment_pairing_id: 0,
+        temporary_enrollment_source_user_id: 0,
+        type: '',
+        course_section_id: '7',
+        user: {
+          id: '1',
+        } as User,
+        role_id: '20',
+      }
+    })
+
+    it('should return false if a match is found', () => {
+      const sectionIds = ['7', '8', '9']
+      const userId = '1'
+      const roleId = '20'
+      expect(isMatchFound(sectionIds, mockTempEnrollment, userId, roleId)).toBe(true)
+    })
+
+    it('should return true if no match is found', () => {
+      const sectionIds = ['22', '55', '100']
+      const userId = '1'
+      const roleId = '20'
+      expect(isMatchFound(sectionIds, mockTempEnrollment, userId, roleId)).toBe(false)
+    })
+
+    it('should return true if user ID does not match', () => {
+      const sectionIds = ['7', '8', '9']
+      const nonMatchingUserId = '2'
+      const roleId = '20'
+      expect(isMatchFound(sectionIds, mockTempEnrollment, nonMatchingUserId, roleId)).toBe(false)
+    })
+
+    it('should return true if role ID does not match', () => {
+      const sectionIds = ['7', '8', '9']
+      const userId = '1'
+      const nonMatchingRoleId = '30'
+      expect(isMatchFound(sectionIds, mockTempEnrollment, userId, nonMatchingRoleId)).toBe(false)
+    })
+
+    it('should return true if sectionIds array is empty', () => {
+      const sectionIds: string[] = []
+      const userId = '1'
+      const roleId = '20'
+      expect(isMatchFound(sectionIds, mockTempEnrollment, userId, roleId)).toBe(false)
+    })
+  })
+
+  describe('processEnrollmentDeletions', () => {
+    let mockTempEnrollments: Enrollment[]
+
+    beforeEach(() => {
+      mockTempEnrollments = [
+        {
+          course_id: '8',
+          end_at: '',
+          id: '92',
+          start_at: '',
+          user_id: '1',
+          temporary_enrollment_pairing_id: 0,
+          temporary_enrollment_source_user_id: 0,
+          type: '',
+          course_section_id: '7',
+          user: {
+            id: '1',
+          } as User,
+          role_id: '20',
+        },
+      ]
+      ;(deleteEnrollment as jest.Mock).mockResolvedValue({
+        response: {status: 204, ok: true},
+        json: [],
+      })
+    })
+
+    it('should call deleteEnrollment for matching criteria', async () => {
+      const sectionIds = ['55', '220', '19']
+      const userId = '1'
+      const roleId = '20'
+      const promises = deleteMultipleEnrollmentsByNoMatch(
+        mockTempEnrollments,
+        sectionIds,
+        userId,
+        roleId
+      )
+      expect(promises).toHaveLength(1)
+      await Promise.all(promises)
+      expect(deleteEnrollment).toHaveBeenCalledTimes(1)
+    })
+
+    it('should not call deleteEnrollment for non-matching criteria', async () => {
+      const sectionIds = ['7', '55', '220', '19']
+      const userId = '1'
+      const roleId = '20'
+      const promises = deleteMultipleEnrollmentsByNoMatch(
+        mockTempEnrollments,
+        sectionIds,
+        userId,
+        roleId
+      )
+      expect(promises).toHaveLength(0)
+      await Promise.all(promises)
+      expect(deleteEnrollment).toHaveBeenCalledTimes(0)
     })
   })
 })

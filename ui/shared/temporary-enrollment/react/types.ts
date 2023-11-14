@@ -50,7 +50,8 @@ export interface RoleChoice {
 }
 
 export interface Enrollment {
-  id: number
+  id: string
+  user_id?: string
   course_id: string
   course_section_id?: string
   user: User
@@ -98,4 +99,13 @@ export interface Permissions {
   student: boolean
   observer: boolean
   designer: boolean
+}
+
+export interface SelectedEnrollment {
+  course: string
+  section: string
+}
+
+export interface TemporaryEnrollmentPairing {
+  id: string
 }

@@ -16,7 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {deleteEnrollment, fetchTemporaryEnrollments} from '../../api/enrollment'
+import {
+  createEnrollment,
+  deleteEnrollment,
+  createTemporaryEnrollmentPairing,
+  fetchTemporaryEnrollments,
+} from '../../api/enrollment'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Enrollment, ITEMS_PER_PAGE, User} from '../../types'
 
@@ -40,7 +45,7 @@ const mockSomeUser: User = {
 }
 
 const mockEnrollment: Enrollment = {
-  id: 1,
+  id: '1',
   course_id: '101',
   start_at: '2023-01-01T00:00:00Z',
   end_at: '2023-06-01T00:00:00Z',
@@ -57,6 +62,14 @@ describe('enrollment api', () => {
 
     let originalConsoleError: typeof console.error
 
+    beforeEach(() => {
+      jest.clearAllMocks()
+    })
+
+    afterEach(() => {
+      jest.restoreAllMocks()
+    })
+
     beforeAll(() => {
       // eslint-disable-next-line no-console
       originalConsoleError = console.error
@@ -70,10 +83,6 @@ describe('enrollment api', () => {
     })
 
     describe('fetchTemporaryEnrollments', () => {
-      beforeEach(() => {
-        jest.clearAllMocks()
-      })
-
       it('fetches enrollments where the user is a recipient', async () => {
         const mockJson = Promise.resolve([
           {
@@ -183,46 +192,112 @@ describe('enrollment api', () => {
         jest.clearAllMocks()
       })
 
-      it('successfully deletes an enrollment and calls onDelete', async () => {
-        const onDeleteMock = jest.fn()
-        ;(doFetchApi as jest.Mock).mockResolvedValue({response: {status: 200}})
-
-        await deleteEnrollment('1', 2, onDeleteMock)
-
-        expect(onDeleteMock).toHaveBeenCalledWith(2)
+      it('completes successful deletion without errors', async () => {
+        const mockResponse = {response: {status: 204}}
+        ;(doFetchApi as jest.Mock).mockResolvedValue(mockResponse)
+        const courseId = '1'
+        const enrollmentId = '2'
+        await expect(deleteEnrollment(courseId, enrollmentId)).resolves.not.toThrow()
+        expect(doFetchApi).toHaveBeenCalledWith({
+          path: `/api/v1/courses/${courseId}/enrollments/${enrollmentId}`,
+          method: 'DELETE',
+          params: {task: 'delete'},
+        })
+        expect(mockConsoleError).not.toHaveBeenCalled()
       })
 
-      // TODO remove skip once deleteEnrollment is implemented
-      it.skip('handles errors gracefully', async () => {
-        ;(doFetchApi as jest.Mock).mockRejectedValue(new Error('An error occurred'))
-
+      it('throws a specific error message on failure', async () => {
+        const mockError: Error = new Error('Network error occurred')
+        ;(doFetchApi as jest.Mock).mockRejectedValue(mockError)
+        const courseId = '1'
+        const enrollmentId = '2'
         try {
-          await deleteEnrollment('1', 2)
-        } catch (e) {
-          // eslint-disable-next-line no-console
-          console.log('Caught error:', e)
+          await deleteEnrollment(courseId, enrollmentId)
+        } catch (error) {
+          if (error instanceof Error) {
+            expect(error.message).toBe(`Failed to delete enrollment: ${mockError.message}`)
+          } else {
+            expect(error).toBeInstanceOf(Error)
+          }
         }
-
-        // eslint-disable-next-line no-console
-        console.log('mockConsoleError calls:', mockConsoleError.mock.calls.length)
-
-        expect(mockConsoleError).toHaveBeenCalled()
       })
 
-      it.skip('handles deletion without onDelete gracefully', async () => {
-        ;(doFetchApi as jest.Mock).mockResolvedValue({response: {status: 200}})
-
-        await expect(deleteEnrollment('1', 2)).resolves.not.toThrow()
-      })
-
-      it.skip('handles non-200 status code gracefully', async () => {
+      it('handles non-200 status code gracefully', async () => {
         ;(doFetchApi as jest.Mock).mockResolvedValue({response: {status: 404}})
-
         try {
-          await deleteEnrollment('1', 2)
+          await deleteEnrollment('1', '2')
         } catch (e: any) {
           expect(e.message).toBe('Failed to delete enrollment: HTTP status code 404')
         }
+      })
+    })
+
+    describe('fetchTemporaryEnrollmentPairing', () => {
+      it('creates temporary enrollment pairing successfully', async () => {
+        const mockResponse = {
+          json: {
+            temporary_enrollment_pairing: {
+              id: 10,
+              root_account_id: 2,
+              workflow_state: 'active',
+              created_at: '2023-11-14T03:56:42Z',
+              updated_at: '2023-11-14T03:56:42Z',
+            },
+          },
+        }
+        ;(doFetchApi as jest.Mock).mockResolvedValue(mockResponse)
+        const rootAccountId = '2'
+        const result = await createTemporaryEnrollmentPairing(rootAccountId)
+        expect(result).toEqual(mockResponse.json.temporary_enrollment_pairing)
+      })
+
+      it('throws a specific error message on failure', async () => {
+        const mockError: Error = new Error('Network error occurred')
+        ;(doFetchApi as jest.Mock).mockRejectedValue(mockError)
+        const rootAccountId = '2'
+        try {
+          await createTemporaryEnrollmentPairing(rootAccountId)
+        } catch (error) {
+          if (error instanceof Error) {
+            expect(error.message).toBe(
+              `Failed to fetch temporary enrollment pairing: ${mockError.message}`
+            )
+          } else {
+            expect(error).toBeInstanceOf(Error)
+          }
+        }
+      })
+    })
+
+    describe('createEnrollment', () => {
+      const mockParams: [string, string, string, string, Date, Date, string] = [
+        '1',
+        '1',
+        '2',
+        '1',
+        new Date('2022-01-01'),
+        new Date('2022-06-01'),
+        '1',
+      ]
+
+      it('calls doFetchApi with correct parameters', async () => {
+        ;(doFetchApi as jest.Mock).mockResolvedValue({response: {status: 204}})
+        await expect(createEnrollment(...mockParams)).resolves.not.toThrow()
+        expect(doFetchApi).toHaveBeenCalledWith({
+          path: `/api/v1/sections/${mockParams[0]}/enrollments`,
+          params: {
+            enrollment: {
+              user_id: '1',
+              temporary_enrollment_source_user_id: '2',
+              temporary_enrollment_pairing_id: '1',
+              start_at: '2022-01-01T00:00:00.000Z',
+              end_at: '2022-06-01T00:00:00.000Z',
+              role_id: '1',
+            },
+          },
+          method: 'POST',
+        })
+        expect(mockConsoleError).not.toHaveBeenCalled()
       })
     })
   })

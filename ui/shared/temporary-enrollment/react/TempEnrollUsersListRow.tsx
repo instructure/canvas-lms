@@ -27,7 +27,7 @@ import {
 } from '@instructure/ui-icons'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {MODULE_NAME, PROVIDER, RECIPIENT, EnrollmentType, Role} from './types'
+import {EnrollmentType, MODULE_NAME, PROVIDER, RECIPIENT, Role} from './types'
 import {TempEnrollModal} from './TempEnrollModal'
 import {createAnalyticPropsGenerator} from './util/analytics'
 

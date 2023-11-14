@@ -40,12 +40,12 @@ const I18n = useI18nScope('temporary_enrollment')
 const analyticProps = createAnalyticPropsGenerator(MODULE_NAME)
 
 interface Props {
-  readonly user: User
-  readonly page: number
-  readonly searchFail: Function
-  readonly searchSuccess: Function
-  readonly canReadSIS?: boolean
-  readonly foundEnroll?: User | null
+  user: User
+  page: number
+  searchFail: Function
+  searchSuccess: Function
+  canReadSIS?: boolean
+  foundEnroll?: User | null
 }
 
 export function TempEnrollSearch(props: Props) {
