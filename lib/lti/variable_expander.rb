@@ -333,6 +333,19 @@ module Lti
                        INTERNAL_TOOL_GUARD,
                        default_name: "com_instructure_rcs_service_jwt"
 
+    # Returns instui_nav release flag state
+    #
+    # @example
+    #   ```
+    #   "true"
+    #   "false"
+    #   ```
+    register_expansion "com.instructure.instui_nav",
+                       [],
+                       -> { @root_account.feature_enabled?(:instui_nav) },
+                       INTERNAL_TOOL_GUARD,
+                       default_name: "com_instructure_instui_nav"
+
     # returns all observee ids linked to this observer as an String separated by `,`
     # @launch_parameter com_instructure_observee_ids
     # @example
