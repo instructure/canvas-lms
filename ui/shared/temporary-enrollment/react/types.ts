@@ -19,6 +19,7 @@
 export const MODULE_NAME = 'TempEnroll'
 
 export const ITEMS_PER_PAGE = 100
+export const MAX_ALLOWED_COURSES_PER_PAGE = 50
 
 export interface Course {
   id: string
