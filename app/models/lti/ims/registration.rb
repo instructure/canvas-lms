@@ -120,15 +120,26 @@ class Lti::IMS::Registration < ApplicationRecord
         []
       else
         message["placements"].map do |placement|
+          display_type = message["https://#{CANVAS_EXTENSION_LABEL}/lti/display_type"]
+          window_target = nil
+          if display_type == "new_window"
+            display_type = "default"
+            window_target = "_blank"
+          end
+
+          placement_name = canvas_placement_name(placement)
+
           {
-            placement: canvas_placement_name(placement),
+            placement: placement_name,
             enabled: true,
             message_type: message["type"],
             target_link_uri: message["target_link_uri"],
             text: message["label"],
             icon_url: message["icon_uri"],
-            custom_fields: message["custom_parameters"]
-          }.compact
+            custom_fields: message["custom_parameters"],
+            display_type:,
+            windowTarget: window_target,
+          }.merge(width_and_height_settings(message, placement_name)).compact
         end
       end
     end.flatten
@@ -216,5 +227,23 @@ class Lti::IMS::Registration < ApplicationRecord
     # Otherwise, remove our URL prefix from the Canvas-specific placements
     canvas_extension = "https://#{CANVAS_EXTENSION_LABEL}/lti/"
     placement.start_with?(canvas_extension) ? placement.sub(canvas_extension, "") : placement
+  end
+
+  def width_and_height_settings(message, placement)
+    keys = ["selection_width", "selection_height"]
+    # placements that use launch_width and launch_height
+    # instead of selection_width and selection_height
+    uses_launch_width = ["assignment_edit", "post_grades"]
+    keys = ["launch_width", "launch_height"] if uses_launch_width.include?(placement)
+
+    values = [
+      message["https://#{CANVAS_EXTENSION_LABEL}/lti/launch_width"]&.to_i,
+      message["https://#{CANVAS_EXTENSION_LABEL}/lti/launch_height"]&.to_i,
+    ]
+
+    {
+      keys[0].to_sym => values[0],
+      keys[1].to_sym => values[1],
+    }
   end
 end

@@ -281,6 +281,9 @@ module Lti::IMS
               "foo" => "bar"
             },
             icon_uri: "http://example.com/icon.png",
+            "https://canvas.instructure.com/lti/launch_width": "200",
+            "https://canvas.instructure.com/lti/launch_height": "300",
+            "https://canvas.instructure.com/lti/display_type": "full_width",
             placements: [
               "https://canvas.instructure.com/lti/assignment_edit",
               "global_navigation",
@@ -302,15 +305,22 @@ module Lti::IMS
             enabled: true,
             icon_url: "http://example.com/icon.png",
             message_type: "LtiResourceLinkRequest",
-            target_link_uri: "http://example.com/launch"
+            target_link_uri: "http://example.com/launch",
+            display_type: "full_width",
           }
           expect(subject).to eq [
-            canvas_placement_hash.merge(placement: "assignment_edit"),
-            canvas_placement_hash.merge(placement: "global_navigation"),
-            canvas_placement_hash.merge(placement: "course_navigation"),
-            canvas_placement_hash.merge(placement: "link_selection"),
-            canvas_placement_hash.merge(placement: "editor_button"),
+            canvas_placement_hash.merge(placement: "assignment_edit", launch_width: 200, launch_height: 300),
+            canvas_placement_hash.merge(placement: "global_navigation", selection_width: 200, selection_height: 300),
+            canvas_placement_hash.merge(placement: "course_navigation", selection_width: 200, selection_height: 300),
+            canvas_placement_hash.merge(placement: "link_selection", selection_width: 200, selection_height: 300),
+            canvas_placement_hash.merge(placement: "editor_button", selection_width: 200, selection_height: 300),
           ]
+        end
+
+        it "sets windowTarget if display_type is new_window" do
+          message = registration.lti_tool_configuration["messages"].first
+          message["https://canvas.instructure.com/lti/display_type"] = "new_window"
+          expect(subject.first).to include({ windowTarget: "_blank", display_type: "default" })
         end
 
         it "rejects invalid placements" do
