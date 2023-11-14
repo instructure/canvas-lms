@@ -38,8 +38,8 @@ const mobileHeaderInboxUnreadBadge = document.getElementById('mobileHeaderInboxU
 const MobileContextMenu = React.lazy(() => import('./MobileContextMenu'))
 const MobileGlobalMenu = React.lazy(() => import('./MobileGlobalMenu'))
 
-const MobileNavigation = () => {
-  const [globalNavIsOpen, setGlobalNavIsOpen] = useState(false)
+const MobileNavigation: React.FC<{navIsOpen?: boolean}> = ({navIsOpen = false}) => {
+  const [globalNavIsOpen, setGlobalNavIsOpen] = useState(navIsOpen)
   const contextNavIsOpen = useRef(false)
 
   const countsEnabled = Boolean(

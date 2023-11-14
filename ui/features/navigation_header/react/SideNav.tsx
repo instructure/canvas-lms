@@ -88,6 +88,12 @@ const SideNav = () => {
   if (canvasLogo.current instanceof HTMLElement)
     canvasLogo.current.setAttribute('canvas-logo', 'true')
 
+  if (dashboardRef.current instanceof HTMLElement)
+    dashboardRef.current.setAttribute('dashboard-tray', 'true')
+
+  if (coursesRef.current instanceof HTMLElement)
+    coursesRef.current.setAttribute('courses-tray', 'true')
+
   if (brandLogo.current instanceof HTMLElement) brandLogo.current.setAttribute('brand-logo', 'true')
 
   // after tray is closed, eventually set activeTray to null
@@ -269,12 +275,13 @@ const SideNav = () => {
     >
       <style>{`
         .sidenav-container a {
-          padding: ${!collapseGlobalNav ? '0.4375rem' : '0.4735rem'} 0;
+          padding: ${!collapseGlobalNav ? '0.4735rem' : '0.4375rem'} 0;
           font-weight: 400;
           transition: background-color 0.3s;
         }
         .sidenav-container a:hover {
           text-decoration: inherit;
+          color: white !important;
           background-color: rgba(0, 0, 0, 0.2);
         }
         .sidenav-container a > div:first-child {
@@ -284,13 +291,19 @@ const SideNav = () => {
         .sidenav-container a > div:nth-child(2) {
           margin: 3px 0 0;
         }
+        .sidenav-container a[data-selected="true"] > div:first-child {
+          > svg {
+            width: ${!collapseGlobalNav ? '1.75rem' : '1.75rem'} !important;
+            height: ${!collapseGlobalNav ? '1.75rem' : '1.75rem'} !important;
+          }
+        }
         .sidenav-container a[data-selected="true"]:hover {
-          color: var(--ic-brand-primary);
+          color: var(--ic-brand-primary) !important;
           background-color: var(--ic-brand-global-nav-menu-item__text-color);
         }
         .sidenav-container div[canvas-logo="true"] {
           margin: ${!collapseGlobalNav ? '0.825rem' : '0.5395rem'} 0 ${
-        !collapseGlobalNav ? '0.435rem' : '0.4rem'
+        !collapseGlobalNav ? '0.535rem' : '0.4rem'
       } 0;
         }
         .sidenav-container div[canvas-logo="true"] > svg {
@@ -317,6 +330,22 @@ const SideNav = () => {
         .sidenav-container button[collapse-button="true"] {
           width: 100%;
           padding: 0.75rem !important;
+        }
+
+        .sidenav-container a[dashboard-tray="true"] > div:first-child {
+          > svg {
+            width: ${!collapseGlobalNav ? '1.605rem' : '1.25rem'} !important;
+            height: ${!collapseGlobalNav ? '1.605rem' : '1.25rem'} !important;
+            margin-bottom: -5px !important;
+          }
+        }
+
+        .sidenav-container a[courses-tray="true"] > div:first-child {
+          > svg {
+            width: ${!collapseGlobalNav ? '1.495rem' : '1.25rem'} !important;
+            height: ${!collapseGlobalNav ? '1.495rem' : '1.25rem'} !important;
+            margin-bottom: -1px !important;
+          }
         }
       `}</style>
       <SideNavBar
