@@ -303,7 +303,8 @@ const locale = {
   "yes_dde87d5": { "message": "Evet" },
   "your_webcam_may_already_be_in_use_6cd64c25": {
     "message": "Web kameranız kullanılıyor olabilir."
-  }
+  },
+  "zoom_f3e54d69": { "message": "Zoom" }
 }
 
 
