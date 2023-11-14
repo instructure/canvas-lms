@@ -176,6 +176,7 @@ tr:
   a_comma_delimited_list_of_user_ids_to_report_on_49e05a7: "Raporu oluşturulucak virgülle ayrılmış kullanıcı id listeleri"
   a_few_seconds_ago_e43118d: "birkaç saniye önce"
   a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "%{itemName} adlı bir dosya bu klasörde zaten var."
+  a_file_named_name_already_exists_do_you_want_to_re_6536980: "\"%{name}\" adına bir dosya zaten bu konumda var. Var olan dosyayı değiştirmek ister misiniz?"
   a_front_page_is_required_fd57b80: "Bir Ön sayfa gerekiyor"
   a_full_size_logo_that_appears_in_the_right_sidebar_18873685: "Canvas yönetim panelinin sağdaki kenar çubuğunda görünen tam ölçülü logo. İdeal boyutlar 360 x 140 pikseldir. Kabul edilen dosya formatları: svg, png, jepg, gif"
   a_handy_key_value_dump_of_a_host_of_interesting_en_d0518dfe: "Raporlayan kullanıcı için ilgi çekici ortam bilgisi barındırmada kullanışlı bir anahtar/değer yığını "
@@ -392,7 +393,9 @@ tr:
       unknown_user_url_description: "Kimliği doğrulanmış bir kullanıcı Canvas'ta bulunamadığında yönlendirilecek URL."
   account_course_and_user_search_22bf297a: "Hesap içinde Ders ve Kullanıcı Arama"
   account_creation_still_in_progress_ac0e0a18: "Hesap oluşturma hala devam ediyor"
+  account_default_time_8c7ab62d: "Hesap varsıylanı (%{time})"
   account_domain_78f43049: "Hesap Alan Adı"
+  account_domain_lookups_f9d1147e: "Hesap Alan Adı Araması"
   account_groups_2f301732: "Hesap Grupları"
   account_id_2c3b4f15: "hesap id"
   account_id_73966078: account_id
@@ -1885,6 +1888,7 @@ tr:
   add_icon_567dbcaa: "simge ekle"
   add_link_5c01c1e8: "Bağlantı Ekle"
   add_link_fc336ed6: "Bağlantı ekle"
+  add_lti_ad9aaef2: "Harici araç ekle"
   add_moderator_review_copy_1st_a484c813: "Moderatör İncelemesi Ekle (1. Kopyala)"
   add_moderator_review_copy_2nd_e80d458f: "Moderatör İncelemesi Ekle (2. Kopyala)"
   add_moderator_review_new_3c183cea: "Moderatör İncelemesi Ekle (Yeni)"
@@ -1900,8 +1904,12 @@ tr:
   add_new_set_of_due_dates_e8e240f: "Son tarih dizesi ekleyin"
   add_new_term_d2217c0d: "Yeni Dönem Ekle"
   add_old_quiz_f4c546a: "Eski Kısa Sınav Ekle"
+  add_outcomes_36272787: "Öğrenme Çıktısı Ekle"
+  add_outcomes_to_account_4647776f: "Öğrenme Çıktılarını Hesaba Ekle"
+  add_people_7948b7da: "Kullanıcı Ekle"
   add_people_7ee4b2ec: "Katılımcı Ekle"
   add_people_to_coursename_5ea234e1: "%{courseName}'e kişileri ekleyin"
+  add_proficiency_rating_d819f6b8: "Yeterlik düzeyi ekle"
   add_quiz_cebfa28b: "Kısa Sınav Ekle"
   add_quiz_ip_filter_c7b37dc5: "Kısa Sınav IP Filtresi Ekle"
   add_rating_89d7fbde: "Puanlama Ekle"
@@ -2084,10 +2092,12 @@ tr:
       Kullanıcının ders davetiyelerini tekrar göndermesine izin verir.
   allows_user_to_create_edit_and_delete_rubrics_1c0acc08: "Kullanıcıların değerlendirme listesi oluşturmalarına, düzenlemelerine ve silmelerine izin ver."
   allows_user_to_create_new_conferences_allows_user__89cebec2: "Kullanıcının yeni canlı dersler oluşturmasına izin verir. Kullanıcının oluşturduğu canlı dersleri başlatmasına izin verir."
+  allows_user_to_import_resources_from_commons_into__79e8255e: "Kullanıcının Commons'taki kaynakları bir derse aktarmasına izin verir."
   allows_user_to_manage_rubrics_326eedc2: "Kullanıcıların değerlendirme listelerini yönetmelerine izin ver."
   allows_user_to_view_list_of_users_in_the_course_pe_1b0b4bab: |-
       Kullanıcının dersteki Kişiler sayfasındaki kullanıcıların listesini görüntülemesine izin verir.
       Kullanıcının dersteki Kişiler sayfasındaki Önceki Kayıtlar düğmesini görüntülemesini sağlar.
+  allows_user_to_view_prior_enrollments_df5286d: "Kullanıcının önceki ders kayıtlarını görmesine izin verir."
   allows_users_to_edit_conferences_2d3c960c: "Canlı derslerin düzenlenmesine izin ver."
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Uluslararası cep telefonu numarası olan kullanıcıların Canvas'tan metin mesajları almasına izin verir."
   always_3a59e701: "Her zaman"
@@ -9847,6 +9857,7 @@ tr:
   hong_kong_852_98e3b3fe: "Hong Kong (+852)"
   host_8be927e0: Host
   hover_over_me_496521b9: "Fareyi üzerimde beklet"
+  how_do_i_send_a_message_to_an_individual_student_i_92c7fb: "Yeni Analitik aracında bir öğrenciye nasıl mesaj gönderebilirim?"
   how_many_minutes_ecca5ee7: "Kaç dakika?"
   html5_first_videos_description: |-
       Varsayılan olarak, Canvas videoları oynatmak için önce Flash'ı deneyecek. Önce HTML5'i
@@ -9857,6 +9868,7 @@ tr:
   i_agree_to_the_34aa16ce: "nı kabul ediyorum"
   i_agree_to_the_terms_of_use_18e16f0c: "*kullanım koşulları* nı kabul ediyorum."
   i_agree_to_the_terms_of_use_and_privacy_policy_f41760cc: "*Kullanım şartları* ve **gizlilik politikasını** Kabul Ediyorum."
+  i_cannot_get_things_done_until_i_hear_back_from_yo_83ba46b7: "Sizden onay almadan ilerleyemiyorum."
   i_cb2f5130: i
   i_have_obtained_permission_to_use_this_file_6386f087: "Bu dosyayı kullanmak için iznim var."
   i_hold_the_copyright_71ee91b1: "Telif hakkı bendedir"
@@ -9865,7 +9877,7 @@ tr:
     manage: yönet
   iceland_354_1a03c558: "İzlanda (+354)"
   icon_215a1dc6: Simge
-  icon_url_ecce6557: "İkon URL'si:"
+  icon_url_ecce6557: "Simge Bağlantısı:"
   icons: 
     discussion_submission: "Tartışma Gönderimi"
     file_upload_submission: "Dosya Yükleme Şeklinde Gönderim"
@@ -9885,6 +9897,7 @@ tr:
   idp_loginresponse_encoded_460dca94: "Şifrelenmiş IdP LoginResponse"
   idp_logoutresponse_encoded_bac9de6b: "Şifrelenmiş IdP LogoutResponse"
   idp_logoutresponse_xml_fe65de19: "IdP LogoutResponse XML"
+  if_commons_is_installed_allows_importing_favorited_eff368f: "Commons yüklüyse, tercih edilen içerik öğelerinin Canvas'tan aktarılmasını sağlar."
   if_enabled_allows_more_than_the_maximum_possible_s_5d79c0d5: "Etkinleştirilirse, bir Öğrenme Çıktısında mümkün olan en yüksek puanın bir değerlendirme listesine verilmesine izin verir."
   if_enabled_common_cartridge_importers_will_convert_9bffff09: "Etkinleştirilirse, Ortak Kartuş içe aktarılırken HTML dosyaları Sayfalara dönüştürülür"
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: "Etkinleştirildiğinde içerik tasarımcıları yayınlanmadan önce dosyalar için telif hakkı ve lisans bilgisi sağlamalıdır. Daha İyi Dosya Arama etkinleştirildiğinde geçerlidir."
@@ -9970,6 +9983,7 @@ tr:
       Epostanız kurumsal bir eposta değilse hassas bilgiler kurum dışına gönderiliyor olabilir.
   include_this_assignment_s_grades_when_posting_to_y_6bff3323: "Okulunuzun Öğrenc Bilgi Sistemine göderirken bu ödevin notlarını da dahil et"
   include_unpublished_assignments_83ebbaec: "Yayınlanmamış Ödevleri Dahil et"
+  include_unpublished_courses_2fde6389: "yayınlanmayan dersleri dahil et"
   include_unpublished_courses_7a0e7aab: "Yayınlanmamış Dersleri Dahil Et"
   incomplete_da3c2ea2: Eksik
   incompleteregistration: 
@@ -12889,6 +12903,14 @@ tr:
   never_df100b49: Asla
   new_13daf639: Yeni
   new_account_role_6e5c4964: "Yeni Hesap Rolü"
+  new_analytics_api_access_7eec1ead: "Yeni Analitikler API Erişimi"
+  new_analytics_f6147886: "Yeni Analitikler"
+  new_analytics_is_an_interactive_tool_that_helps_yo_9bd32611: |-
+      Yeni Analitikler, sizin ve öğrencilerinizin kurs içindeki performans ve etkinliklerini
+      daha iyi izlemenize yardımcı olan etkileşimli bir araçtır. Hangi öğrencilerin sayfaları
+      ve kaynakları görüntülediğini ve etkinliklere katıldığını ve hangi öğrencilerin biraz daha
+      motivasyona ihtiyacı olduğunu öğrenin.
+  new_analytics_tutorial_tray_2511a34a: "Yani Analitikler Kılavuz Bölümü"
   new_annotations_66932016: "Yeni Duyurular"
   new_announcement_23af4598: "Yeni Duyuru"
   new_assignment_for_course_name_f71dd337: "%{course_name} dersi için yeni ödev"
@@ -14669,6 +14691,8 @@ tr:
   published_c944a23d: yayınlandı
   published_click_to_modify_233c0d4: "Yayınlandı - Değiştirmek için tıklayın"
   published_click_to_unpublish_ec4495b5: "Yayınlanmış. Yayından kaldırmak için tıklayınız."
+  published_courses_294ef14c: "Yayınlanan Dersler"
+  published_courses_count_e7e82f3b: "Yayınlanan Dersler (%{count})"
   publishing_is_disabled_for_this_item_efa7803f: "Yayınlama bu öğe için pasif"
   purchases: 
     new: 
@@ -18791,6 +18815,7 @@ tr:
   unpublished_click_to_modify_60f9051: "Yayınlanmamış - Değiştirmek için tıklayın"
   unpublished_click_to_publish_c073631a: "Yayınlanmadı. Yayınlamak için tıklayınız."
   unpublished_courses_4299148e: "Yayınlanmamış Dersler"
+  unpublished_courses_count_d35672f0: "Yayınlanmayan Dersler (%{count})"
   unpublished_courses_title: "Yayınlanmamış Dersler"
   unread_e9c1b19c: Okunmamış
   unregister_service_985238e9: "Kayıtlı Olmayan Servisler"
@@ -19638,6 +19663,7 @@ tr:
   your_content_has_been_exported_bbb57764: "İçeriğiniz dışarı aktarıldı."
   your_course_db806851: Dersiniz
   your_custom_theme_has_been_successfully_applied_eaa0fc82: "Özelleştirilmiş temanız başarılı bir şekilde uygulandı."
+  your_email_address_844297ea: "E-Posta Adresiniz"
   your_email_address_f881e583: "E-Posta adresiniz"
   your_email_b5364bee: "E-Posta Adresiniz"
   your_instructor_has_released_grade_changes_and_new_ffe458c8: |-
@@ -19651,6 +19677,7 @@ tr:
   your_outcomes_were_successfully_imported_c5de884: "Öğrenme çıktılarınız başarılı bir şekilde içe aktarıldı."
   your_password_has_been_changed_df0e72aa: "Şifreniz değiştirildi"
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "Profil resminiz yüklenemedi. Doys yükleme limitinizi aşmış olabilirsiniz."
+  your_score_a1fc2fcf: Puanınız
   your_search_encountered_the_following_errors_fc3e5e7f: 
     one: "Aramanızda hata oluştu:"
     other: "Aramanızda hatalar oluştu:"
@@ -19684,3 +19711,4 @@ tr:
     upload: "Bunu Yükle"
     zip_options: "Zip dosyası ayarları"
   zip_no_folder_error: "Belirtmiş olduğunuz klasör bu derste bulunamadı."
+  zoom_f3e54d69: Zoom
