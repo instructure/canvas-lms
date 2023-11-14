@@ -119,6 +119,7 @@ declare global {
       success: (data: any) => void
       error: (response: JQuery.JQueryXHR) => void
     }) => void
+    getTemplateData: (options: {textValues: string[]}) => Record<string, unknown>
   }
 
   declare interface JQueryStatic {
