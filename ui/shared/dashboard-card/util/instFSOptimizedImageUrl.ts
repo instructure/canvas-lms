@@ -24,7 +24,9 @@ testImg.src = 'data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAw
 
 const dpiMultiplier =
   window.devicePixelRatio <= 1 /* device does not have a HighDPI screen */ ||
+  // @ts-expect-error
   navigator?.connection?.downlink < 5 /* slow (less than 5mbps) connection */ ||
+  // @ts-expect-error
   navigator?.connection?.saveData /* user has asked to save bandwidth */
     ? 1
     : 2
@@ -39,7 +41,16 @@ const dpiMultiplier =
  * @param {number} geometry.y - height
  * @returns <String> url with query string parameters added
  */
-export default function instFSOptimizedImageUrl(url, {x, y}) {
+export default function instFSOptimizedImageUrl(
+  url: string,
+  {
+    x,
+    y,
+  }: {
+    x: number
+    y: number
+  }
+) {
   if (url && url.startsWith('https://inst-fs-')) {
     url += (url.includes('?') ? '&' : '?') + `geometry=${x * dpiMultiplier}x${y * dpiMultiplier}`
     if (supportsWebp) url += '&format=webp'

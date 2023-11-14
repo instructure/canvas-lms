@@ -16,33 +16,36 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {asJson, defaultFetchOptions} from '@canvas/util/xhr'
-import createStore from '@canvas/util/createStore'
+import {defaultFetchOptions, asJson} from '@canvas/util/xhr'
+import createStore, {CanvasStore} from '@canvas/util/createStore'
 
-/**
- * @type { import('@canvas/util/createStore').CanvasStore<{streams: Record<string, {stream?: unknown[]}> }> & {
- *   _fetchForCourse: (courseId: string) => Promise<void>
- *   getStateForCourse: (courseId: string) => {stream?: unknown[]} | undefined
- * } }
- */
-const CourseActivitySummaryStore = createStore({streams: {}})
+type Stream = unknown[]
 
-CourseActivitySummaryStore.getStateForCourse = function (courseId) {
+type Streams = Record<string, {stream?: Stream}>
+
+const CourseActivitySummaryStore: CanvasStore<{
+  streams: Streams
+}> & {
+  _fetchForCourse?: (courseId: string) => Promise<void>
+  getStateForCourse?: (courseId: string) => {streams: Streams} | {stream?: Stream} | undefined
+} = createStore({streams: {}})
+
+CourseActivitySummaryStore.getStateForCourse = function (courseId?: string) {
   if (typeof courseId === 'undefined') return CourseActivitySummaryStore.getState()
 
   const {streams} = CourseActivitySummaryStore.getState()
   if (!(courseId in streams)) {
     streams[courseId] = {}
-    CourseActivitySummaryStore._fetchForCourse(courseId)
+    CourseActivitySummaryStore._fetchForCourse?.(courseId)
   }
   return streams[courseId]
 }
 
-CourseActivitySummaryStore._fetchForCourse = function (courseId) {
-  const fetch = window.fetchIgnoredByNewRelic || window.fetch // don't let this count against us in newRelic's SPA load time stats
+CourseActivitySummaryStore._fetchForCourse = function (courseId: string) {
+  // @ts-expect-error
   return asJson(
-    fetch(`/api/v1/courses/${courseId}/activity_stream/summary`, defaultFetchOptions)
-  ).then(stream => {
+    window.fetch(`/api/v1/courses/${courseId}/activity_stream/summary`, defaultFetchOptions)
+  ).then((stream: Stream) => {
     const state = CourseActivitySummaryStore.getState()
     state.streams[courseId] = {stream}
     CourseActivitySummaryStore.setState(state)

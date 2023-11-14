@@ -23,16 +23,22 @@ import DashboardCard from './react/DashboardCard'
 import axios from '@canvas/axios'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {asJson, checkStatus, getPrefetchedXHR} from '@canvas/util/xhr'
+// @ts-expect-error
 import buildURL from 'axios/lib/helpers/buildURL'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import type {Card} from './types'
 
 const I18n = useI18nScope('load_card_dashboard')
 
-export function createDashboardCards(dashboardCards, cardComponent = DashboardCard, extraProps) {
+export function createDashboardCards(
+  dashboardCards: Card[],
+  cardComponent = DashboardCard,
+  extraProps: any
+) {
   const Box = getDroppableDashboardCardBox()
 
   // Decide which dashboard to show based on role
-  const isTeacher = dashboardCards.some(card => card.enrollmentType === 'TeacherEnrollment')
+  const isTeacher = dashboardCards.some((card: Card) => card.enrollmentType === 'TeacherEnrollment')
 
   return (
     <Box
@@ -45,15 +51,15 @@ export function createDashboardCards(dashboardCards, cardComponent = DashboardCa
   )
 }
 export class CardDashboardLoader {
-  static observedUsersDashboardCards = {}
+  static observedUsersDashboardCards: Record<string, Card[]> = {}
 
-  constructor() {
-    this.promiseToGetDashboardCards = undefined
-    this.errorShown = false
-    this.observedUserId = undefined
-  }
+  errorShown = false
 
-  renderIntoDOM = dashboardCards => {
+  observedUserId?: string = undefined
+
+  promiseToGetDashboardCards?: Promise<Card[]> = undefined
+
+  renderIntoDOM = (dashboardCards: Card[]) => {
     const dashboardContainer = document.getElementById('DashboardCard_Container')
     ReactDOM.render(
       createDashboardCards(dashboardCards, DashboardCard, {observedUserId: this.observedUserId}),
@@ -61,16 +67,18 @@ export class CardDashboardLoader {
     )
   }
 
-  loadCardDashboard(renderFn = this.renderIntoDOM, observedUserId) {
+  loadCardDashboard(renderFn = this.renderIntoDOM, observedUserId: string) {
     if (observedUserId) {
       this.observedUserId = observedUserId
     }
 
     if (observedUserId && CardDashboardLoader.observedUsersDashboardCards[observedUserId]) {
+      // @ts-expect-error
       renderFn(CardDashboardLoader.observedUsersDashboardCards[observedUserId], true)
     } else if (this.promiseToGetDashboardCards) {
       this.promiseToGetDashboardCards
         .then(cards => {
+          // @ts-expect-error
           renderFn(cards, true)
         })
         .catch(e => {
@@ -78,7 +86,7 @@ export class CardDashboardLoader {
         })
     } else {
       let xhrHasReturned = false
-      let sessionStorageTimeout
+      let sessionStorageTimeout: number
       const sessionStorageKey = `dashcards_for_user_${ENV && ENV.current_user_id}`
       const urlPrefix = '/api/v1/dashboard/dashboard_cards'
       const url = buildURL(urlPrefix, {observed_user_id: observedUserId})
@@ -86,7 +94,9 @@ export class CardDashboardLoader {
         asJson(getPrefetchedXHR(url)) ||
         axios
           .get(url)
+          // @ts-expect-error
           .then(checkStatus)
+          // @ts-expect-error
           .then(({data}) => data)
           .catch(e => {
             this.showError(e)
@@ -107,17 +117,19 @@ export class CardDashboardLoader {
         sessionStorageTimeout = setTimeout(() => {
           const cachedCards = sessionStorage.getItem(sessionStorageKey)
           if (cachedCards) resolve(JSON.parse(cachedCards))
-        }, 1)
+        }, 1) as unknown as number
       })
       Promise.race([this.promiseToGetDashboardCards, promiseToGetCardsFromSessionStorage])
         .then(dashboardCards => {
           clearTimeout(sessionStorageTimeout)
           // calling the renderFn with `false` indicates to consumers that we're still waiting
           // on the follow-up xhr request to complete.
+          // @ts-expect-error
           renderFn(dashboardCards, xhrHasReturned)
           // calling it with `true` indicates that all outstanding card promises have settled.
-          if (!xhrHasReturned)
-            return this.promiseToGetDashboardCards.then(cards => renderFn(cards, true))
+          if (!xhrHasReturned && this.promiseToGetDashboardCards)
+            // @ts-expect-error
+            return this.promiseToGetDashboardCards.then((cards: Card[]) => renderFn(cards, true))
         })
         .catch(e => {
           this.showError(e)
@@ -128,7 +140,7 @@ export class CardDashboardLoader {
       // Also save the observed user's cards if observing so observer can switch between students
       // without any delay
       this.promiseToGetDashboardCards
-        .then(dashboardCards => {
+        .then((dashboardCards: Card[]) => {
           try {
             sessionStorage.setItem(sessionStorageKey, JSON.stringify(dashboardCards))
           } catch (_e) {
@@ -141,13 +153,13 @@ export class CardDashboardLoader {
             CardDashboardLoader.observedUsersDashboardCards[observedUserId] = dashboardCards
           }
         })
-        .catch(e => {
+        .catch((e: Error) => {
           this.showError(e)
         })
     }
   }
 
-  showError(e) {
+  showError(e: Error) {
     if (!this.errorShown) {
       this.errorShown = true
       showFlashAlert({message: I18n.t('Failed loading course cards'), err: e, type: 'error'})

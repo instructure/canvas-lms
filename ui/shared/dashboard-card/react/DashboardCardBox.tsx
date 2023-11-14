@@ -18,40 +18,46 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
-import PropTypes from 'prop-types'
 import {Text} from '@instructure/ui-text'
 
 import DraggableDashboardCard from './DraggableDashboardCard'
 import DashboardCardBackgroundStore from './DashboardCardBackgroundStore'
 import MovementUtils from './MovementUtils'
 import {showNoFavoritesAlert} from './ConfirmUnfavoriteCourseModal'
+import type {Card} from '../types'
 
 const I18n = useI18nScope('dashcards')
 
-export default class DashboardCardBox extends React.Component {
-  static propTypes = {
-    cardComponent: PropTypes.elementType.isRequired,
-    courseCards: PropTypes.arrayOf(PropTypes.object),
-    headingLevel: PropTypes.oneOf(['h2', 'h3']),
-    hideColorOverlays: PropTypes.bool,
-    connectDropTarget: PropTypes.func,
-    showSplitDashboardView: PropTypes.bool,
-    observedUserId: PropTypes.string,
-  }
+type Props = {
+  cardComponent: any
+  courseCards: any[]
+  headingLevel: string // 'h2' | 'h3'
+  hideColorOverlays: boolean
+  connectDropTarget: any
+  showSplitDashboardView: boolean
+  observedUserId: string
+}
 
+type State = {
+  courseCards: Card[]
+  observedUserId: string
+}
+
+export default class DashboardCardBox extends React.Component<Props, State> {
   static defaultProps = {
     courseCards: [],
     headingLevel: 'h2',
     hideColorOverlays: false,
-    connectDropTarget: el => el,
+    connectDropTarget: (el: unknown) => el,
     showSplitDashboardView: false,
   }
 
-  constructor(props) {
+  constructor(props: Props) {
     super(props)
 
     this.state = {
       observedUserId: props.observedUserId,
+      courseCards: [],
     }
     this.handleRerenderCards = this.handleRerenderCards.bind(this)
   }
@@ -67,7 +73,7 @@ export default class DashboardCardBox extends React.Component {
     DashboardCardBackgroundStore.setDefaultColors(this.allCourseAssetStrings())
   }
 
-  UNSAFE_componentWillReceiveProps(newProps) {
+  UNSAFE_componentWillReceiveProps(newProps: Props) {
     DashboardCardBackgroundStore.setDefaultColors(this.allCourseAssetStrings())
 
     // Only reset card state if the passed-in card props actually changed
@@ -88,16 +94,16 @@ export default class DashboardCardBox extends React.Component {
 
   allCourseAssetStrings = () => this.props.courseCards.map(card => card.assetString)
 
-  colorForCard = assetString => DashboardCardBackgroundStore.colorForCourse(assetString)
+  colorForCard = (assetString: string) => DashboardCardBackgroundStore.colorForCourse(assetString)
 
-  handleColorChange = (assetString, newColor) => {
+  handleColorChange = (assetString: string, newColor: string) => {
     DashboardCardBackgroundStore.setColorForCourse(assetString, newColor)
   }
 
-  getOriginalIndex = assetString =>
+  getOriginalIndex = (assetString: string) =>
     this.state.courseCards.findIndex(c => c.assetString === assetString)
 
-  moveCard = (assetString, atIndex, cb) => {
+  moveCard = (assetString: string, atIndex: number, cb: () => void) => {
     const cardIndex = this.state.courseCards.findIndex(card => card.assetString === assetString)
     let newCards = this.state.courseCards.slice()
     newCards.splice(atIndex, 0, newCards.splice(cardIndex, 1)[0])
@@ -113,7 +119,7 @@ export default class DashboardCardBox extends React.Component {
         }
       },
       () => {
-        MovementUtils.updatePositions(this.state.courseCards, window.ENV.current_user_id)
+        MovementUtils.updatePositions(this.state.courseCards, String(window.ENV.current_user_id))
         if (typeof cb === 'function') {
           cb()
         }
@@ -121,7 +127,7 @@ export default class DashboardCardBox extends React.Component {
     )
   }
 
-  handleRerenderCards(courseId) {
+  handleRerenderCards(courseId: string) {
     const cardIndex = this.state.courseCards.findIndex(card => card.id === courseId)
     const newCards = this.state.courseCards.slice()
     newCards[cardIndex].isFavorited = false
@@ -140,7 +146,7 @@ export default class DashboardCardBox extends React.Component {
     )
   }
 
-  handlePublishedCourse = courseId => {
+  handlePublishedCourse = (courseId: string) => {
     const cardIndex = this.state.courseCards.findIndex(card => card.id === courseId)
     const newCards = this.state.courseCards.slice()
     newCards[cardIndex].published = true
@@ -151,11 +157,12 @@ export default class DashboardCardBox extends React.Component {
     })
   }
 
-  renderCard = card => {
+  renderCard = (card: Card) => {
     const position =
       card.position !== null ? card.position : () => this.getOriginalIndex(card.assetString)
     const cardHeadingLevel = this.props.showSplitDashboardView
-      ? this.props.headingLevel.replace(/\d/, n => ++n)
+      ? // @ts-expect-error
+        this.props.headingLevel.replace(/\d/, n => ++n)
       : this.props.headingLevel
     return (
       <DraggableDashboardCard
@@ -170,7 +177,7 @@ export default class DashboardCardBox extends React.Component {
         assetString={card.assetString}
         backgroundColor={this.colorForCard(card.assetString)}
         courseColor={card.color}
-        handleColorChange={newColor => this.handleColorChange(card.assetString, newColor)}
+        handleColorChange={(newColor: string) => this.handleColorChange(card.assetString, newColor)}
         image={card.image}
         hideColorOverlays={this.props.hideColorOverlays}
         onConfirmUnfavorite={this.handleRerenderCards}
@@ -208,6 +215,7 @@ export default class DashboardCardBox extends React.Component {
     return (
       <div key={this.state.observedUserId} className="unpublished_courses_redesign">
         <div className="ic-DashboardCard__box">
+          {/* @ts-expect-error */}
           <HeadingElement className="ic-DashboardCard__box__header">
             {I18n.t(`Published Courses (%{count})`, {
               count: I18n.n(publishedCourses.length),
@@ -220,6 +228,7 @@ export default class DashboardCardBox extends React.Component {
           )}
         </div>
         <div className="ic-DashboardCard__box">
+          {/* @ts-expect-error */}
           <HeadingElement className="ic-DashboardCard__box__header">
             {I18n.t(`Unpublished Courses (%{count})`, {
               count: I18n.n(unpublishedCourses.length),

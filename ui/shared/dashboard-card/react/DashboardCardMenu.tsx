@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import PropTypes from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Popover} from '@instructure/ui-popover'
 import {Tabs} from '@instructure/ui-tabs'
@@ -28,32 +27,47 @@ import DashboardCardMovementMenu from './DashboardCardMovementMenu'
 
 const I18n = useI18nScope('dashcards')
 
-export default class DashboardCardMenu extends React.Component {
-  static propTypes = {
-    afterUpdateColor: PropTypes.func.isRequired,
-    currentColor: PropTypes.string.isRequired,
-    nicknameInfo: PropTypes.shape({
-      nickname: PropTypes.string,
-      originalName: PropTypes.string,
-      courseId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-      onNicknameChange: PropTypes.func,
-    }).isRequired,
-    trigger: PropTypes.node.isRequired,
-    assetString: PropTypes.string.isRequired,
-    popoverContentRef: PropTypes.func,
-    handleShow: PropTypes.func,
-    handleMove: PropTypes.func,
-    isFavorited: PropTypes.bool,
-    currentPosition: PropTypes.number,
-    lastPosition: PropTypes.number,
-    onUnfavorite: PropTypes.func,
-    menuOptions: PropTypes.shape({
-      canMoveLeft: PropTypes.bool,
-      canMoveRight: PropTypes.bool,
-      canMoveToBeginning: PropTypes.bool,
-      canMoveToEnd: PropTypes.bool,
-    }),
+type Props = {
+  afterUpdateColor: any
+  currentColor: string
+  nicknameInfo: {
+    nickname: string
+    originalName: string
+    courseId: string | number
+    onNicknameChange: any
   }
+  trigger: any
+  assetString: string
+  popoverContentRef: any
+  handleShow: any
+  handleMove: any
+  isFavorited: boolean
+  currentPosition: number
+  lastPosition: number
+  onUnfavorite: any
+  menuOptions: {
+    canMoveLeft: boolean
+    canMoveRight: boolean
+    canMoveToBeginning: boolean
+    canMoveToEnd: boolean
+  }
+}
+
+type State = {
+  show: boolean
+  selectedIndex: number
+}
+
+export default class DashboardCardMenu extends React.Component<Props, State> {
+  _colorPicker: any
+
+  _closeButton: any
+
+  _colorTab: any
+
+  _movementMenu: any
+
+  _tabList: any
 
   static defaultProps = {
     popoverContentRef: () => {},
@@ -64,7 +78,7 @@ export default class DashboardCardMenu extends React.Component {
     menuOptions: null,
   }
 
-  constructor(props) {
+  constructor(props: Props) {
     super(props)
 
     this.state = {
@@ -73,7 +87,7 @@ export default class DashboardCardMenu extends React.Component {
     }
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
+  shouldComponentUpdate(nextProps: Props, nextState: State) {
     // Don't rerender the popover every time the color changes
     // only when we open and close (flashes on each color select otherwise)
     return this.state !== nextState
@@ -91,7 +105,14 @@ export default class DashboardCardMenu extends React.Component {
     this.setState({show: false})
   }
 
-  handleTabChange = (event, {index}) => {
+  handleTabChange = (
+    event: unknown,
+    {
+      index,
+    }: {
+      index: number
+    }
+  ) => {
     this.setState({
       selectedIndex: index,
     })
@@ -115,7 +136,7 @@ export default class DashboardCardMenu extends React.Component {
     const colorPicker = (
       <div className="DashboardCardMenu__ColorPicker">
         <ColorPicker
-          ref={c => (this._colorPicker = c)}
+          ref={(c: unknown) => (this._colorPicker = c)}
           assetString={assetString}
           afterUpdateColor={afterUpdateColor}
           hidePrompt={true}
@@ -136,8 +157,7 @@ export default class DashboardCardMenu extends React.Component {
 
     const movementMenu = (
       <DashboardCardMovementMenu
-        ref={c => (this._movementMenu = c)}
-        cardTitle={nicknameInfo.nickname}
+        ref={(c: unknown) => (this._movementMenu = c)}
         currentPosition={currentPosition}
         lastPosition={lastPosition}
         assetString={assetString}
@@ -188,7 +208,8 @@ export default class DashboardCardMenu extends React.Component {
                 padding="none"
                 renderTitle={I18n.t('Color')}
                 isSelected={selectedIndex === 0}
-                tabRef={c => (this._colorTab = c)}
+                // @ts-expect-error TODO: change to elementRef
+                tabRef={(c: unknown) => (this._colorTab = c)}
               >
                 {colorPicker}
               </Tabs.Panel>

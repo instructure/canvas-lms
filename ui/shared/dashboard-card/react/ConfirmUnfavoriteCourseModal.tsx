@@ -19,7 +19,6 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import PropTypes from 'prop-types'
 
 import {Modal} from '@instructure/ui-modal'
 import {Button, CloseButton} from '@instructure/ui-buttons'
@@ -28,38 +27,33 @@ import {Alert} from '@instructure/ui-alerts'
 
 const I18n = useI18nScope('dashcards')
 
-export function showConfirmUnfavorite(props) {
+export function showConfirmUnfavorite(props: Props) {
   const parent = document.createElement('div')
   parent.setAttribute('class', 'confirm-unfavorite-modal-container')
   document.body.appendChild(parent)
 
-  function showConfirmUnfavoriteRef(modal) {
+  function showConfirmUnfavoriteRef(modal: null | {show: () => void}) {
     if (modal) modal.show()
   }
 
   ReactDOM.render(
-    <ConfirmUnfavoriteCourseModal {...props} parent={parent} ref={showConfirmUnfavoriteRef} />,
+    <ConfirmUnfavoriteCourseModal {...props} ref={showConfirmUnfavoriteRef} />,
     parent
   )
   return parent
 }
 
-export function hideConfirmModal(modal) {
+export function hideConfirmModal(modal: {hide: () => void}) {
   modal.hide()
 }
 
 export function showNoFavoritesAlert() {
   const parent = document.createElement('div')
   parent.setAttribute('class', 'no-favorites-alert-container')
-  document.querySelector('.ic-DashboardCard__box').appendChild(parent)
+  document.querySelector('.ic-DashboardCard__box')?.appendChild(parent)
 
   ReactDOM.render(
-    <Alert
-      variant="info"
-      renderCloseButtonLabel="Close"
-      label={I18n.t('No courses favorited')}
-      margin="small"
-    >
+    <Alert variant="info" renderCloseButtonLabel="Close" margin="small">
       {I18n.t(`You have no courses favorited. Reloading this page will show all
       your active courses. To add favorites, go to `)}{' '}
       <a href="/courses">{I18n.t('All Courses.')}</a>
@@ -69,21 +63,25 @@ export function showNoFavoritesAlert() {
   return parent
 }
 
-export default class ConfirmUnfavoriteCourseModal extends React.Component {
-  static propTypes = {
-    courseName: PropTypes.string.isRequired,
-    onConfirm: PropTypes.func.isRequired,
-    onClose: PropTypes.func,
-    onEntered: PropTypes.func,
-  }
+type Props = {
+  courseName: string
+  onConfirm: () => void
+  onClose: () => void
+  onEntered: () => void
+}
 
+type State = {
+  show: boolean
+}
+
+export default class ConfirmUnfavoriteCourseModal extends React.Component<Props, State> {
   static defaultProps = {
     onConfirm: null,
     onClose() {},
     onEntered() {},
   }
 
-  constructor(props) {
+  constructor(props: Props) {
     super(props)
     this.state = {
       show: false,

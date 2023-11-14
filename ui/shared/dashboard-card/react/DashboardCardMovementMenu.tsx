@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import PropTypes from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {Menu} from '@instructure/ui-menu'
@@ -32,30 +31,30 @@ import {
 
 const I18n = useI18nScope('dashcards')
 
-class DashboardCardMovementMenu extends React.Component {
-  static propTypes = {
-    assetString: PropTypes.string.isRequired,
-    handleMove: PropTypes.func.isRequired,
-    isFavorited: PropTypes.bool,
-    onMenuSelect: PropTypes.func,
-    onUnfavorite: PropTypes.func,
-    menuOptions: PropTypes.shape({
-      canMoveLeft: PropTypes.bool,
-      canMoveRight: PropTypes.bool,
-      canMoveToBeginning: PropTypes.bool,
-      canMoveToEnd: PropTypes.bool,
-    }).isRequired,
-    lastPosition: PropTypes.number,
-    currentPosition: PropTypes.number,
+type Props = {
+  assetString: string
+  handleMove: (assetString: string, positionToMoveTo: number) => void
+  isFavorited: boolean
+  onMenuSelect: () => void
+  onUnfavorite: () => void
+  menuOptions: {
+    canMoveLeft: boolean
+    canMoveRight: boolean
+    canMoveToBeginning: boolean
+    canMoveToEnd: boolean
   }
+  lastPosition: number
+  currentPosition: number
+}
 
+class DashboardCardMovementMenu extends React.Component<Props> {
   static defaultProps = {
     onMenuSelect: () => {},
     lastPosition: 0,
     currentPosition: 0,
   }
 
-  handleMoveCard = positionToMoveTo => () =>
+  handleMoveCard = (positionToMoveTo: number) => () =>
     this.props.handleMove(this.props.assetString, positionToMoveTo)
 
   render() {

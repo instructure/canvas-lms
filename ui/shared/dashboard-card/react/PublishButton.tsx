@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import PropTypes from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 
@@ -29,20 +28,24 @@ import * as apiClient from '@canvas/courses/courseAPIClient'
 
 const I18n = useI18nScope('dashcards')
 
-export default class PublishButton extends React.Component {
-  static propTypes = {
-    defaultView: PropTypes.string.isRequired,
-    pagesUrl: PropTypes.string.isRequired,
-    courseId: PropTypes.string.isRequired,
-    courseNickname: PropTypes.string.isRequired,
-    frontPageTitle: PropTypes.string,
-    onSuccess: PropTypes.func,
-  }
+type Props = {
+  defaultView: string
+  pagesUrl: string
+  courseId: string
+  courseNickname: string
+  frontPageTitle: string
+  onSuccess: () => void
+}
 
+export default class PublishButton extends React.Component<Props> {
   static defaultProps = {
     frontPageTitle: '',
     onSuccess: () => null,
   }
+
+  defaultViewStore?: ReturnType<typeof createStore>
+
+  publishButton: Element | null = null
 
   state = {
     showModal: false,
@@ -88,7 +91,7 @@ export default class PublishButton extends React.Component {
       <div className="ic-DashboardCard__header-publish">
         <Button
           onClick={this.handleClick}
-          elementRef={b => (this.publishButton = b)}
+          elementRef={(b: Element | null) => (this.publishButton = b)}
           color="secondary"
         >
           {I18n.t('Publish')}
@@ -102,7 +105,8 @@ export default class PublishButton extends React.Component {
             wikiUrl={pagesUrl}
             wikiFrontPageTitle={frontPageTitle}
             onSubmit={() => {
-              if (this.defaultViewStore.getState().savedDefaultView !== 'modules') {
+              // @ts-expect-error
+              if (this.defaultViewStore?.getState().savedDefaultView !== 'modules') {
                 apiClient.publishCourse({courseId, onSuccess})
               }
             }}
