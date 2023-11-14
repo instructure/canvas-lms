@@ -2149,6 +2149,10 @@
   path: "/api/v1/courses/:course_id/quizzes/:quiz_id/date_details"
 - verb: GET
   path: "/api/v1/courses/:course_id/modules/:context_module_id/date_details"
+- verb: PUT
+  path: "/api/v1/courses/:course_id/assignments/:assignment_id/date_details"
+- verb: PUT
+  path: "/api/v1/courses/:course_id/quizzes/:quiz_id/date_details"
 - verb: GET
   path: "/api/v1/accounts/:account_id/admins/self"
 - verb: GET
