@@ -47,7 +47,7 @@ interface Props {
   enrollments: Enrollment[]
   user: User
   onEdit?: (enrollment: User, tempEnrollments: Enrollment[]) => void
-  onDelete?: (enrollmentId: number) => void
+  onDelete?: (enrollmentIds: string[]) => void
   onAddNew?: () => void
   enrollmentType: EnrollmentType
   tempEnrollPermissions: TempEnrollPermissions
@@ -73,34 +73,45 @@ export function groupEnrollmentsByPairingId(enrollments: Enrollment[]) {
 }
 
 /**
- * Confirms and deletes an enrollment
+ * Confirms with the user and then attempts to delete a list of enrollments,
+ * calls the onDelete callback for each successfully deleted enrollment
  *
- * @param {number} courseId ID of course to delete enrollment from
- * @param {number} enrollmentId ID of enrollment to be deleted
- * @param {function} onDelete Callback function called after enrollment is deleted,
- *                            likely passed in via props and used to update state
+ * @param {Enrollment[]} tempEnrollments Enrollments to be deleted
+ * @param {function} onDelete Callback function
+ * @returns {Promise<void>}
  */
 async function handleConfirmAndDeleteEnrollment(
-  courseId: string,
-  enrollmentId: number,
-  onDelete?: (id: number) => void
-) {
+  tempEnrollments: Enrollment[],
+  onDelete?: (enrollmentIds: string[]) => void
+): Promise<void> {
   // TODO is there a good inst ui component for confirmation dialog?
   // eslint-disable-next-line no-alert
   const userConfirmed = window.confirm(I18n.t('Are you sure you want to delete this enrollment?'))
-
   if (userConfirmed) {
-    try {
-      await deleteEnrollment(courseId, enrollmentId, onDelete)
-
+    const results = await Promise.allSettled(
+      tempEnrollments.map(enrollment =>
+        deleteEnrollment(enrollment.course_id, enrollment.id)
+          .then(() => ({status: 'success', id: enrollment.id}))
+          .catch(() => ({status: 'error', id: enrollment.id}))
+      )
+    )
+    const successfulDeletions = results
+      .filter(result => result.status === 'fulfilled')
+      .map(result => (result as PromiseFulfilledResult<{status: string; id: string}>).value.id)
+    if (successfulDeletions.length > 0) {
       showFlashAlert({
         type: 'success',
-        message: I18n.t('Enrollment deleted successfully'),
+        message: `${successfulDeletions.length} enrollments deleted successfully.`,
       })
-    } catch (error) {
+      if (onDelete) {
+        onDelete(successfulDeletions)
+      }
+    }
+    const errorCount = results.filter(result => result.status === 'rejected').length
+    if (errorCount > 0) {
       showFlashAlert({
         type: 'error',
-        message: I18n.t('Enrollment could not be deleted'),
+        message: `${errorCount} enrollments could not be deleted.`,
       })
     }
   }
@@ -130,8 +141,7 @@ export function TempEnrollEdit(props: Props) {
 
   const handleDeleteClick = (enrollments: Enrollment[]) => {
     if (canDelete) {
-      // TODO loop over tempEnrollmentsPairing and delete each enrollment
-      handleConfirmAndDeleteEnrollment(enrollments[0].course_id, enrollments[0].id, props.onDelete)
+      handleConfirmAndDeleteEnrollment(enrollments, props.onDelete)
     } else {
       // eslint-disable-next-line no-console
       console.error('User does not have permission to delete enrollment')

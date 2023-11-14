@@ -55,12 +55,19 @@ import {
   Permissions,
   RECIPIENT,
   Role,
+  SelectedEnrollment,
+  TemporaryEnrollmentPairing,
   User,
 } from './types'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 import {EnvCommon} from '@canvas/global/env/EnvCommon'
 import {TempEnrollAvatar} from './TempEnrollAvatar'
+import {
+  createEnrollment,
+  deleteEnrollment,
+  createTemporaryEnrollmentPairing,
+} from './api/enrollment'
 
 declare const ENV: GlobalEnv & EnvCommon
 
@@ -72,15 +79,6 @@ const analyticProps = createAnalyticPropsGenerator(MODULE_NAME)
 interface EnrollmentRole {
   id: string
   base_role_name: string
-}
-
-interface SelectedEnrollment {
-  course: string
-  section: string
-}
-
-interface TemporaryEnrollmentPairing {
-  id: string
 }
 
 export interface Props {
@@ -185,6 +183,48 @@ export function getEnrollmentAndUserProps(
   return {enrollmentProps, userProps}
 }
 
+export function isEnrollmentMatch(
+  tempEnrollment: Enrollment,
+  sectionId: string,
+  userId: string,
+  roleId: string
+): boolean {
+  return (
+    tempEnrollment.course_section_id === sectionId &&
+    tempEnrollment.user.id === userId &&
+    tempEnrollment.role_id === roleId
+  )
+}
+
+export function isMatchFound(
+  sectionIds: string[],
+  tempEnrollment: Enrollment,
+  userId: string,
+  roleId: string
+): boolean {
+  for (const sectionId of sectionIds) {
+    if (isEnrollmentMatch(tempEnrollment, sectionId, userId, roleId)) {
+      return true
+    }
+  }
+  return false
+}
+
+export const deleteMultipleEnrollmentsByNoMatch = (
+  tempEnrollments: Enrollment[],
+  sectionIds: string[],
+  userId: string,
+  roleId: string
+): Promise<void>[] => {
+  const deletionPromises = []
+  for (const tempEnrollment of tempEnrollments) {
+    if (!isMatchFound(sectionIds, tempEnrollment, userId, roleId)) {
+      deletionPromises.push(deleteEnrollment(tempEnrollment.course_id, tempEnrollment.id))
+    }
+  }
+  return deletionPromises
+}
+
 export function TempEnrollAssign(props: Props) {
   const storedData = getStoredData()
 
@@ -215,7 +255,6 @@ export function TempEnrollAssign(props: Props) {
   useEffect(() => {
     if (props.tempEnrollmentsPairing && props.tempEnrollmentsPairing.length > 0) {
       const firstEnrollment = props.tempEnrollmentsPairing[0]
-      // role
       const roleId = firstEnrollment.role_id
       const matchedRole = props.roles.find(role => role.id === roleId)
       if (matchedRole) {
@@ -225,7 +264,6 @@ export function TempEnrollAssign(props: Props) {
           name: roleName,
         })
       }
-      // start and end date
       if (firstEnrollment.start_at) {
         setStartDate(new Date(firstEnrollment.start_at))
       }
@@ -332,7 +370,6 @@ export function TempEnrollAssign(props: Props) {
 
   const handleCollectSelectedEnrollments = (tree: NodeStructure[]): SelectedEnrollment[] => {
     const selectedEnrolls: SelectedEnrollment[] = []
-
     for (const role in tree) {
       for (const course of tree[role].children) {
         for (const section of course.children) {
@@ -347,25 +384,67 @@ export function TempEnrollAssign(props: Props) {
         }
       }
     }
-
     return selectedEnrolls
   }
 
-  const handleProcessEnrollments = async (submitEnrolls: SelectedEnrollment[]) => {
-    let success = true
+  const handleCreateTempEnroll = async (tree: NodeStructure[]): Promise<void> => {
+    setLoading(true)
+    if (endDate.getTime() <= startDate.getTime()) {
+      return handleValidationError(I18n.t('The start date must be before the end date'))
+    }
+    if (roleChoice.id === '') {
+      return handleValidationError(I18n.t('Please select a role before submitting'))
+    }
+    const submitEnrolls = handleCollectSelectedEnrollments(tree)
+    if (!props.tempEnrollmentsPairing && submitEnrolls.length === 0) {
+      return handleValidationError(
+        I18n.t('Please select at least one enrollment before submitting')
+      )
+    }
+    await handleProcessEnrollments(submitEnrolls)
+  }
 
+  const handleProcessEnrollments = async (submitEnrolls: SelectedEnrollment[]): Promise<void> => {
+    let success: boolean
     try {
       setErrorMsg('')
-      const {json} = await doFetchApi({
-        path: `/api/v1/accounts/${ENV.ROOT_ACCOUNT_ID}/temporary_enrollment_pairings`,
-        method: 'POST',
+      const temporaryEnrollmentPairing: TemporaryEnrollmentPairing =
+        await createTemporaryEnrollmentPairing(ENV.ROOT_ACCOUNT_ID)
+
+      if (props.tempEnrollmentsPairing && props.tempEnrollmentsPairing.length >= 1) {
+        // delete any enrollments that were not selected
+        const sectionIds: string[] = submitEnrolls.map(
+          (enroll: SelectedEnrollment) => enroll.section
+        )
+        await Promise.all(
+          deleteMultipleEnrollmentsByNoMatch(
+            props.tempEnrollmentsPairing,
+            sectionIds,
+            enrollmentProps.id,
+            roleChoice.id
+          )
+        )
+      }
+      // iterate through the form’s selected enrollments
+      const createPromises: Promise<void>[] = []
+      submitEnrolls.forEach(enroll => {
+        // create all selected enrollments
+        createPromises.push(
+          createEnrollment(
+            enroll.section,
+            enrollmentProps.id,
+            userProps.id,
+            temporaryEnrollmentPairing.id,
+            startDate,
+            endDate,
+            roleChoice.id
+          )
+        )
       })
-      const fetchPromises = submitEnrolls.map(enroll =>
-        createEnrollment(enroll, json.temporary_enrollment_pairing)
-      )
-      await Promise.all(fetchPromises)
+      await Promise.all(createPromises)
+      success = true
     } catch (error) {
-      setErrorMsg(I18n.t('Failed to create temporary enrollment, please try again'))
+      setErrorMsg(I18n.t('An error occurred, please try again'))
       success = false
     } finally {
       // using unstable_batchedUpdates to avoid getting the following error:
@@ -375,45 +454,6 @@ export function TempEnrollAssign(props: Props) {
         setLoading(false)
       })
     }
-  }
-
-  async function createEnrollment(enroll: SelectedEnrollment, pairing: TemporaryEnrollmentPairing) {
-    return doFetchApi({
-      path: `/api/v1/sections/${enroll.section}/enrollments`,
-      params: {
-        enrollment: {
-          user_id: enrollmentProps.id,
-          temporary_enrollment_source_user_id: userProps.id,
-          temporary_enrollment_pairing_id: pairing.id,
-          start_at: startDate.toISOString(),
-          end_at: endDate.toISOString(),
-          role_id: roleChoice.id,
-        },
-      },
-      method: 'POST',
-    })
-  }
-
-  const handleCreateTempEnroll = async (tree: NodeStructure[]) => {
-    setLoading(true)
-
-    if (endDate.getTime() <= startDate.getTime()) {
-      return handleValidationError(I18n.t('The start date must be before the end date'))
-    }
-
-    if (roleChoice.id === '') {
-      return handleValidationError(I18n.t('Please select a role before submitting'))
-    }
-
-    const submitEnrolls = handleCollectSelectedEnrollments(tree)
-
-    if (submitEnrolls.length === 0) {
-      return handleValidationError(
-        I18n.t('Please select at least one enrollment before submitting')
-      )
-    }
-
-    await handleProcessEnrollments(submitEnrolls)
   }
 
   const handleGoBack = () => {

@@ -23,7 +23,7 @@ import {
   TempEnrollEdit,
 } from '../TempEnrollEdit'
 import React from 'react'
-import {fireEvent, render, screen} from '@testing-library/react'
+import {fireEvent, render, screen, waitFor} from '@testing-library/react'
 import {Enrollment, PROVIDER, RECIPIENT, User} from '../types'
 
 describe('TempEnrollEdit component', () => {
@@ -46,7 +46,7 @@ describe('TempEnrollEdit component', () => {
           end_at: '2021-02-01T00:00:00Z',
           type: 'TeacherEnrollment',
         },
-      ],
+      ] as Enrollment[],
       user: {
         name: 'Provider User',
         avatar_url: 'https://someurl.com/avatar.png',
@@ -196,18 +196,32 @@ describe('TempEnrollEdit component', () => {
     })
 
     describe('delete', () => {
-      it('opens a confirmation dialog when clicked', async () => {
+      beforeEach(() => {
+        window.confirm = jest.fn(() => true)
+      })
+
+      it('opens a confirmation dialog when delete button is clicked', () => {
         render(<TempEnrollEdit {...props} />)
         fireEvent.click(screen.getByTestId('delete-button'))
-
         expect(window.confirm).toHaveBeenCalled()
       })
 
-      it('calls onDelete with correct enrollment ID on confirm', () => {
+      it('does not perform deletion if user cancels confirmation', async () => {
+        window.confirm = jest.fn(() => false)
         render(<TempEnrollEdit {...props} />)
         fireEvent.click(screen.getByTestId('delete-button'))
+        await waitFor(() => {
+          expect(props.onDelete).not.toHaveBeenCalled()
+        })
+      })
 
-        expect(props.onDelete).toHaveBeenCalledWith(props.enrollments[0].id)
+      it('calls onDelete with correct enrollment IDs on confirm', async () => {
+        render(<TempEnrollEdit {...props} />)
+        fireEvent.click(screen.getByTestId('delete-button'))
+        const allEnrollmentIds = props.enrollments.map((enrollment: Enrollment) => enrollment.id)
+        await waitFor(() => {
+          expect(props.onDelete).toHaveBeenCalledWith(allEnrollmentIds)
+        })
       })
     })
 
@@ -233,7 +247,7 @@ describe('TempEnrollEdit component', () => {
     const mockTempEnrollment: Enrollment = {
       course_id: '0',
       end_at: '',
-      id: 0,
+      id: '0',
       role_id: '',
       start_at: '',
       temporary_enrollment_source_user_id: 0,

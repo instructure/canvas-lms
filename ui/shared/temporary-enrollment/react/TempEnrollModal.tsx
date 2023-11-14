@@ -65,13 +65,11 @@ interface Props {
     observer: boolean
     designer: boolean
   }
-  readonly roles: Role[]
-  readonly defaultOpen?: boolean
-  readonly tempEnrollments?: Enrollment[]
-  readonly isEditMode: boolean
-  readonly onToggleEditMode?: (mode?: boolean) => void
-  // TODO add onDeleteEnrollment prop to parent component and update user list
-  onDeleteEnrollment?: (enrollmentId: number) => void
+  roles: Role[]
+  defaultOpen?: boolean
+  tempEnrollments?: Enrollment[]
+  isEditMode: boolean
+  onToggleEditMode?: (mode?: boolean) => void
   tempEnrollPermissions: TempEnrollPermissions
 }
 
@@ -151,12 +149,9 @@ export function TempEnrollModal(props: Props) {
     }
   }
 
-  const handleEnrollmentDeletion = (enrollmentId: number) => {
-    // remove/update enrollment from internal state
-    setEnrollmentData(prevData => prevData.filter(item => item.id !== enrollmentId))
-    if (props.onDeleteEnrollment) {
-      props.onDeleteEnrollment(enrollmentId)
-    }
+  const handleEnrollmentDeletion = (enrollmentIds: string[]) => {
+    // remove/update multiple enrollments from internal state
+    setEnrollmentData(prevData => prevData.filter(item => !enrollmentIds.includes(item.id)))
   }
 
   const handleOpenModal = () => {
