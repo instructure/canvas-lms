@@ -1794,7 +1794,7 @@ module Lti
     #   ```
     register_expansion "Canvas.assignment.lockdownEnabled",
                        [],
-                       -> { @assignment.settings&.dig("lockdown_browser", "require_lockdown_browser") || false },
+                       -> { !!@controller && @current_user == @controller.logged_in_user && (@assignment.settings&.dig("lockdown_browser", "require_lockdown_browser") || false) },
                        ASSIGNMENT_GUARD
 
     # Returns the allowed number of submission attempts.
