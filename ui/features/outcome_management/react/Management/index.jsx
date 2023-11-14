@@ -48,7 +48,7 @@ import {showImportOutcomesModal} from '@canvas/outcomes/react/ImportOutcomesModa
 import useOutcomesRemove from '@canvas/outcomes/react/hooks/useOutcomesRemove'
 import {getOutcomeGroupAncestorsWithSelf} from '../../helpers/getOutcomeGroupAncestorsWithSelf'
 import {ROOT_GROUP} from '@canvas/outcomes/react/hooks/useOutcomesImport'
-import { Heading } from '@instructure/ui-heading'
+import {Heading} from '@instructure/ui-heading'
 
 const I18n = useI18nScope('OutcomeManagement')
 
@@ -290,8 +290,8 @@ const OutcomeManagementPanel = ({
 
   const componentOverrides = {
     View: {
-      paddingLarge: '1.9rem'
-    }
+      paddingLarge: '1.9rem',
+    },
   }
 
   // if only one outcome is selected (kebab or bulk action)
@@ -404,7 +404,7 @@ const OutcomeManagementPanel = ({
               overflowX="hidden"
               elementRef={setLeftColumnRef}
             >
-              <View 
+              <View
                 as="div"
                 padding="large none none none"
                 minHeight="calc(720px - 10.75rem)"
@@ -438,7 +438,6 @@ const OutcomeManagementPanel = ({
               display="inline-block"
               tabIndex="0"
               role="separator"
-              aria-hidden="true"
               aria-orientation="vertical"
               onKeyDown={onKeyDownHandler}
               elementRef={setDelimiterRef}
