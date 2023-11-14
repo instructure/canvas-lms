@@ -126,7 +126,7 @@ module ModulesSettingsTray
   end
 
   def prerequisites_dropdown_selector
-    "#prerequisite"
+    "//*[starts-with(@id, 'prerequisite-')]"
   end
 
   def prerequisite_message_selector(context_module)
@@ -134,7 +134,7 @@ module ModulesSettingsTray
   end
 
   def remove_prerequisite_button_selector
-    "//button[.//*[contains(text(), 'Remove Prerequisite')]]"
+    "//button[.//*[starts-with(text(), 'Remove') and ends-with(text(), 'Prerequisite')]]"
   end
 
   def remove_requirement_button_selector
@@ -283,7 +283,7 @@ module ModulesSettingsTray
   end
 
   def prerequisites_dropdown
-    ff(prerequisites_dropdown_selector)
+    ffxpath(prerequisites_dropdown_selector)
   end
 
   def prerequisite_message(context_module)
