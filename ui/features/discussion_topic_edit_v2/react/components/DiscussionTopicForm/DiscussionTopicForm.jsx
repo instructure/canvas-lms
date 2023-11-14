@@ -215,6 +215,10 @@ export default function DiscussionTopicForm({
     }
   }, [availableFrom, delayPosting])
 
+  useEffect(() => {
+    if (!isGroupDiscussion) setGroupCategoryId(null)
+  }, [isGroupDiscussion])
+
   const validateTitle = newTitle => {
     if (newTitle.length > 255) {
       setTitleValidationMessages([
@@ -302,6 +306,31 @@ export default function DiscussionTopicForm({
         foundErrors.push({
           dueDateId: currentAssignedInfo.dueDateId,
           message: missingAssignToOptionError,
+        })
+      }
+
+      const illegalGroupCategoryError = {
+        text: I18n.t('Groups can only be part of the actively selected group set.'),
+        type: 'error',
+      }
+
+      const availableAssetCodes =
+        groupCategories
+          .find(groupCategory => groupCategory._id === groupCategoryId)
+          ?.groupsConnection?.nodes.map(group => `group_${group._id}`) || []
+
+      if (
+        currentAssignedInfo.assignedList.filter(assetCode => {
+          if (assetCode.includes('group')) {
+            return !availableAssetCodes.includes(assetCode)
+          } else {
+            return false
+          }
+        }).length > 0
+      ) {
+        foundErrors.push({
+          dueDateId: currentAssignedInfo.dueDateId,
+          message: illegalGroupCategoryError,
         })
       }
 

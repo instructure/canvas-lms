@@ -884,6 +884,38 @@ describe "discussions" do
         expect(dt.assignment.peer_reviews).to be true
         expect(dt.assignment.automatic_peer_reviews).to be true
       end
+
+      it "does not allow submitting, when groups outside of the selected group category are selected" do
+        group_category.groups.create!(name: "group 1", context_type: "Course", context_id: course.id)
+        get "/courses/#{course.id}/discussion_topics/new"
+
+        title = "Group Context Discussion"
+        message = "this is a group context discussion"
+
+        f("input[placeholder='Topic Title']").send_keys title
+        type_in_tiny("textarea#discussion-topic-message-body", message)
+        force_click('input[type=checkbox][value="graded"]')
+        force_click("input[data-testid='group-discussion-checkbox']")
+        group_selector = f("input[placeholder='Select a group category']")
+        group_selector.click
+        wait_for_ajaximations
+        group_selector.send_keys :arrow_down
+        group_selector.send_keys :enter
+        wait_for_ajaximations
+
+        assign_to_selector = f("input[data-testid='assign-to-select']")
+        assign_to_selector.click
+        assign_to_selector.send_keys "group 1"
+        assign_to_selector.send_keys :enter
+        wait_for_ajaximations
+        force_click("input[data-testid='group-discussion-checkbox']")
+        wait_for_ajaximations
+
+        f("button[data-testid='save-and-publish-button']").click
+        wait_for_ajaximations
+
+        expect(fj("body:contains('Groups can only be part of the actively selected group set.')")).to be_present
+      end
     end
 
     context "editing" do
