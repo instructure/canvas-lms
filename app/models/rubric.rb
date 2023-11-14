@@ -43,6 +43,7 @@ class Rubric < ActiveRecord::Base
   has_many :rubric_associations_with_deleted, class_name: "RubricAssociation", inverse_of: :rubric
   has_many :rubric_assessments, through: :rubric_associations, dependent: :destroy
   has_many :learning_outcome_alignments, -> { where("content_tags.tag_type='learning_outcome' AND content_tags.workflow_state<>'deleted'").preload(:learning_outcome) }, as: :content, inverse_of: :content, class_name: "ContentTag"
+  has_many :rubric_criteria, class_name: "RubricCriterion", inverse_of: :rubric, dependent: :destroy
 
   validates :context_id, :context_type, :workflow_state, presence: true
   validates :description, length: { maximum: maximum_text_length, allow_blank: true }
@@ -174,6 +175,7 @@ class Rubric < ActiveRecord::Base
     self.workflow_state = "deleted"
     if save
       rubric_associations.in_batches.destroy_all
+      rubric_criteria.in_batches.destroy_all
       true
     end
   end

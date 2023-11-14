@@ -186,6 +186,27 @@ describe Rubric do
       end
     end
 
+    context "rubric_criteria" do
+      before do
+        root_account_id = @course.root_account.id
+        RubricCriterion.create!(rubric: @rubric, description: "criterion", points: 10, order: 1, created_by: @teacher, root_account_id:)
+      end
+
+      it "returns the rubric_criteria" do
+        expect(@rubric.rubric_criteria.length).to eq 1
+        expect(@rubric.rubric_criteria.first.description).to eq "criterion"
+        expect(@rubric.rubric_criteria.first.points).to eq 10
+      end
+
+      it "marks all rubric_criteria as deleted when rubric deleted" do
+        root_account_id = @course.root_account.id
+        RubricCriterion.create!(rubric: @rubric, description: "criterion 2", points: 10, order: 2, created_by: @teacher, root_account_id:)
+        @rubric.destroy
+        expect(@rubric.rubric_criteria.first.workflow_state).to eq "deleted"
+        expect(@rubric.rubric_criteria.second.workflow_state).to eq "deleted"
+      end
+    end
+
     it "allows learning outcome rows in the rubric" do
       expect(@rubric).not_to be_new_record
       expect(@rubric.learning_outcome_alignments.reload).not_to be_empty
