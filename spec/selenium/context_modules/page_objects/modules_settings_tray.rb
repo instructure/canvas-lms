@@ -138,15 +138,15 @@ module ModulesSettingsTray
   end
 
   def remove_requirement_button_selector
-    "//button[.//*[.='Remove Requirement']]"
+    "//button[.//*[contains(text(), 'Content Requirement')]]"
   end
 
   def requirement_item_selector
-    "#requirement-item"
+    "//*[starts-with(@id, 'requirement-item-')]"
   end
 
   def requirement_type_selector
-    "#requirement-type"
+    "//*[starts-with(@id, 'requirement-type-')]"
   end
 
   def sequential_order_checkbox_selector
@@ -299,11 +299,11 @@ module ModulesSettingsTray
   end
 
   def requirement_item
-    ff(requirement_item_selector)
+    ffxpath(requirement_item_selector)
   end
 
   def requirement_type
-    ff(requirement_type_selector)
+    ffxpath(requirement_type_selector)
   end
 
   def sequential_order_checkbox

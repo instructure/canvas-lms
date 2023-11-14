@@ -151,7 +151,7 @@ describe('RequirementSelector', () => {
 
   it('calls onDropRequirement when the remove button is clicked', () => {
     const {getByText} = renderComponent()
-    getByText('Remove Requirement').click()
+    getByText('Remove Module 1 Content Requirement').click()
     expect(props.onDropRequirement).toHaveBeenCalledWith(0)
   })
 })
