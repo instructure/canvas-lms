@@ -21,7 +21,7 @@ import {cleanup, fireEvent, render, screen, waitFor} from '@testing-library/reac
 import {TempEnrollModal} from '../TempEnrollModal'
 import fetchMock from 'fetch-mock'
 import userEvent from '@testing-library/user-event'
-import {EnrollmentType, ITEMS_PER_PAGE, User} from '../types'
+import {EnrollmentType, ITEMS_PER_PAGE, MAX_ALLOWED_COURSES_PER_PAGE, User} from '../types'
 
 // Temporary Enrollment Provider
 const providerUser = {
@@ -104,7 +104,7 @@ const enrollmentsByCourse = [
 ]
 
 const ENROLLMENTS_URI = encodeURI(
-  `/api/v1/users/${modalProps.user.id}/courses?enrollment_state=active&include[]=sections`
+  `/api/v1/users/${modalProps.user.id}/courses?enrollment_state=active&include[]=sections&per_page=${MAX_ALLOWED_COURSES_PER_PAGE}`
 )
 
 const userListsData = {

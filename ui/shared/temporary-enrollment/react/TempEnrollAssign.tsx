@@ -47,7 +47,16 @@ import {
 } from './util/helpers'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 import {createAnalyticPropsGenerator, setAnalyticPropsOnRef} from './util/analytics'
-import {Enrollment, EnrollmentType, MODULE_NAME, Permissions, RECIPIENT, Role, User} from './types'
+import {
+  Enrollment,
+  EnrollmentType,
+  MAX_ALLOWED_COURSES_PER_PAGE,
+  MODULE_NAME,
+  Permissions,
+  RECIPIENT,
+  Role,
+  User,
+} from './types'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 import {EnvCommon} from '@canvas/global/env/EnvCommon'
@@ -231,7 +240,11 @@ export function TempEnrollAssign(props: Props) {
       try {
         const result = await doFetchApi({
           path: `/api/v1/users/${userProps.id}/courses`,
-          params: {enrollment_state: 'active', include: ['sections']},
+          params: {
+            enrollment_state: 'active',
+            include: ['sections'],
+            per_page: MAX_ALLOWED_COURSES_PER_PAGE,
+          },
         })
         setEnrollmentsByCourse(result.json)
       } catch (error: any) {
