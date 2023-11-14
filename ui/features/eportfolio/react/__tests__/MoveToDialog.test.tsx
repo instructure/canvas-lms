@@ -28,6 +28,10 @@ describe('MoveToDialog', () => {
       {label: 'bar', id: '1'},
       {label: 'baz', id: '2'},
     ],
+    onMove: () => {},
+    onClose: () => {},
+    triggerElement: document.createElement('div'),
+    appElement: document.createElement('div'),
   }
 
   it('renders the prop header', () => {

@@ -16,8 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export function fetchContent($section, section_type, name) {
-  const data = {}
+import JQuery from 'jquery'
+
+export function fetchContent($section: JQuery, section_type: string, name: string) {
+  const data: Record<string, unknown> = {}
   if (section_type === 'rich_text') {
     data[name + '[section_type]'] = 'rich_text'
     const editorContent = $section.find('.section_content').html()

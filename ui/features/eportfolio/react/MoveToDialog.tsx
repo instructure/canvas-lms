@@ -20,28 +20,38 @@ import {Button} from '@instructure/ui-buttons'
 import {FormField} from '@instructure/ui-form-field'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
-import PropTypes from 'prop-types'
 import React from 'react'
 
 const I18n = useI18nScope('eportfolio')
 
-class MoveToDialog extends React.Component {
-  static propTypes = {
-    header: PropTypes.string.isRequired,
-    source: PropTypes.object.isRequired,
-    destinations: PropTypes.arrayOf(PropTypes.object).isRequired,
-    onMove: PropTypes.func,
-    onClose: PropTypes.func,
-    appElement: PropTypes.object,
-    triggerElement: PropTypes.object,
+type Props = {
+  header: string
+  source: {
+    label: string
   }
+  destinations: Array<{
+    id: string
+    label: string
+  }>
+  onMove: (id: string) => void
+  onClose: () => void
+  appElement: HTMLElement
+  triggerElement: HTMLElement
+}
 
+type State = {
+  isOpen: boolean
+}
+
+class MoveToDialog extends React.Component<Props, State> {
   state = {
     isOpen: true,
   }
 
   handleMove = () => {
     if (this.props.onMove) {
+      // @ts-expect-error
+      // eslint-disable-next-line react/no-string-refs
       this.props.onMove(this.refs.select.value)
     }
     this.handleRequestClose()
@@ -65,7 +75,7 @@ class MoveToDialog extends React.Component {
 
   handleReady = () => {
     if (this.props.appElement) {
-      this.props.appElement.setAttribute('aria-hidden', true)
+      this.props.appElement.setAttribute('aria-hidden', 'true')
     }
   }
 
@@ -76,6 +86,7 @@ class MoveToDialog extends React.Component {
 
     return (
       <FormField id="MoveToDialog__formfield" label={selectLabel}>
+        {/* eslint-disable-next-line react/no-string-refs */}
         <select id="MoveToDialog__select" ref="select">
           {this.props.destinations.map(dest => (
             <option key={dest.id} value={dest.id}>
@@ -93,6 +104,7 @@ class MoveToDialog extends React.Component {
   render() {
     return (
       <Modal
+        // eslint-disable-next-line react/no-string-refs
         ref="modal"
         open={this.state.isOpen}
         modalSize="small"
