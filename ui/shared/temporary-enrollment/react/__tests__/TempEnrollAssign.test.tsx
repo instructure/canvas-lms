@@ -28,7 +28,7 @@ import {
   tempEnrollAssignData,
 } from '../TempEnrollAssign'
 import fetchMock from 'fetch-mock'
-import {Enrollment, PROVIDER, RECIPIENT, Role, User} from '../types'
+import {Enrollment, MAX_ALLOWED_COURSES_PER_PAGE, PROVIDER, RECIPIENT, Role, User} from '../types'
 import {deleteEnrollment} from '../api/enrollment'
 
 const backCall = jest.fn()
@@ -99,7 +99,7 @@ const props: Props = {
 }
 
 const ENROLLMENTS_URI = encodeURI(
-  `/api/v1/users/${props.user.id}/courses?enrollment_state=active&include[]=sections`
+  `/api/v1/users/${props.user.id}/courses?enrollment_state=active&include[]=sections&per_page=${MAX_ALLOWED_COURSES_PER_PAGE}`
 )
 
 // converts local time to UTC time based on a given date and time
