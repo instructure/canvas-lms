@@ -1082,7 +1082,6 @@ describe "Speedgrader" do
     end
 
     it "displays the correct file submission in the right sidebar", priority: "1" do
-      skip "11/13/23 unskip in EVAL-3713"
       submit_with_attachment
       user_session(@teacher)
 
