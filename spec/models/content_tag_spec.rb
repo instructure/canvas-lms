@@ -303,21 +303,96 @@ describe ContentTag do
     expect(@assignment.title).to eq "some assignment (renamed)"
   end
 
-  it "associates the tag with an external tool matching the url" do
-    course_factory
-    url = "http://quiz-lti.docker/lti/launch"
-    tool = @course.context_external_tools.create!({
-                                                    name: "tool",
-                                                    consumer_key: "key",
-                                                    shared_secret: "secret",
-                                                    url:
-                                                  })
-    assignment = @course.assignments.create!(
-      title: "some assignment",
-      submission_types: "external_tool",
-      external_tool_tag_attributes: { url: }
-    )
-    expect(assignment.external_tool_tag.content).to eq(tool)
+  describe "#associate_external_tool" do
+    subject do
+      tag.url = new_url
+      tag.save!
+    end
+
+    let(:course) { course_factory }
+    let(:url) { "http://quiz-lti.docker/lti/launch" }
+    let(:new_url) { "http://quizzes.new/lti/launch" }
+    let(:tool) do
+      course.context_external_tools.create!({
+                                              name: "tool",
+                                              consumer_key: "key",
+                                              shared_secret: "secret",
+                                              url:
+                                            })
+    end
+    let(:new_tool) do
+      course.context_external_tools.create!({
+                                              name: "tool",
+                                              consumer_key: "key",
+                                              shared_secret: "secret",
+                                              url: new_url
+                                            })
+    end
+    let(:course_module) { course.context_modules.create!(name: "module") }
+    let(:tag) do
+      course_module.add_item({
+                               type: "context_external_tool",
+                               title: "Example",
+                               url:
+                             })
+    end
+
+    before do
+      tool
+      new_tool
+      tag
+    end
+
+    it "associates the tag with an external tool matching the url" do
+      assignment = course.assignments.create!(
+        title: "some assignment",
+        submission_types: "external_tool",
+        external_tool_tag_attributes: { url: }
+      )
+      expect(assignment.external_tool_tag.content).to eq(tool)
+    end
+
+    context "when url host matches" do
+      let(:new_url) { "http://quiz-lti.docker/new/launch" }
+
+      context "with reassociate_external_tool" do
+        before do
+          tag.reassociate_external_tool = true
+        end
+
+        it "leaves content alone" do
+          subject
+          expect(tag.reload.content).to eq tool
+        end
+      end
+
+      context "without reassociate_external_tool" do
+        it "leaves content alone" do
+          subject
+          expect(tag.reload.content).to eq tool
+        end
+      end
+    end
+
+    context "when url host doesn't match" do
+      context "with reassociate_external_tool" do
+        before do
+          tag.reassociate_external_tool = true
+        end
+
+        it "relinks content" do
+          subject
+          expect(tag.reload.content).to eq new_tool
+        end
+      end
+
+      context "without reassociate_external_tool" do
+        it "leaves content alone" do
+          subject
+          expect(tag.reload.content).to eq tool
+        end
+      end
+    end
   end
 
   describe ".update_for" do

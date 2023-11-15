@@ -723,8 +723,7 @@ class ContextModulesController < ApplicationController
       @tag.title = params[:content_tag][:title] if params[:content_tag] && params[:content_tag][:title]
       if LINK_ITEM_TYPES.include?(@tag.content_type) && params[:content_tag] && params[:content_tag][:url]
         @tag.url = params[:content_tag][:url]
-        # If they are changing the external_url we attempt to find the new tool
-        @tag.content_id = ContextExternalTool.find_external_tool(@tag.url, @context)&.id if @tag.content_type == "ContextExternalTool"
+        @tag.reassociate_external_tool = true
       end
       @tag.indent = params[:content_tag][:indent] if params[:content_tag] && params[:content_tag][:indent]
       @tag.new_tab = params[:content_tag][:new_tab] if params[:content_tag] && params[:content_tag][:new_tab]
