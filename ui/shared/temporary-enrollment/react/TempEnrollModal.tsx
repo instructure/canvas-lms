@@ -26,7 +26,7 @@ import React, {
 } from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Modal} from '@instructure/ui-modal'
-import {Button} from '@instructure/ui-buttons'
+import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {TempEnrollSearch} from './TempEnrollSearch'
 import {TempEnrollEdit} from './TempEnrollEdit'
@@ -42,7 +42,7 @@ import {
   User,
 } from './types'
 import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
-import {createAnalyticPropsGenerator} from './util/analytics'
+import {createAnalyticPropsGenerator, setAnalyticPropsOnRef} from './util/analytics'
 import {Spinner} from '@instructure/ui-spinner'
 import {fetchTemporaryEnrollments} from './api/enrollment'
 import {Alert} from '@instructure/ui-alerts'
@@ -215,6 +215,22 @@ export function TempEnrollModal(props: Props) {
       }
     }
 
+  const renderCloseButton = () => {
+    return (
+      <CloseButton
+        placement="end"
+        offset="small"
+        onClick={handleCloseModal}
+        screenReaderLabel="Close"
+        elementRef={ref => {
+          if (ref instanceof HTMLElement) {
+            setAnalyticPropsOnRef(ref, analyticProps('Close'))
+          }
+        }}
+      />
+    )
+  }
+
   const renderBody = () => {
     if (props.isEditMode) {
       return (
@@ -340,6 +356,7 @@ export function TempEnrollModal(props: Props) {
         onExited={handleModalReset}
       >
         <Modal.Header>
+          {renderCloseButton()}
           <Heading tabIndex={-1} level="h2">
             {dynamicTitle}
           </Heading>
