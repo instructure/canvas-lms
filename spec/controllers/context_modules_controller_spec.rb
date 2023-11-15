@@ -713,13 +713,13 @@ describe ContextModulesController do
       expect(@external_tool_item.reload.url).to eq new_url
     end
 
-    it "removes the content_id for an external tool item if the external url is changed to a tool that doesn't exist" do
+    it "does not change the content_id for an external tool item if the external url is changed to a tool that doesn't exist" do
       expect(@external_tool_item.content_id).not_to be_nil
       new_url = "http://example.org/new_tool"
       put "update_item", params: { course_id: @course.id, id: @external_tool_item.id, content_tag: { url: new_url } }
       @external_tool_item.reload
       expect(@external_tool_item.url).to eq new_url
-      expect(@external_tool_item.content_id).to be_nil
+      expect(@external_tool_item.content_id).not_to be_nil
     end
 
     it "sets the content_id for an external tool item if the url is changed to another tool" do
@@ -729,6 +729,15 @@ describe ContextModulesController do
       @external_tool_item.reload
       expect(@external_tool_item.url).to eq new_url
       expect(@external_tool_item.content_id).to eq tool.id
+    end
+
+    it "does not change content_id for an external tool item if the url is not changed" do
+      expect(@external_tool_item.content_id).not_to be_nil
+      same_url = "http://example.com/tool"
+      put "update_item", params: { course_id: @course.id, id: @external_tool_item.id, content_tag: { url: same_url } }
+      @external_tool_item.reload
+      expect(@external_tool_item.url).to eq same_url
+      expect(@external_tool_item.content_id).not_to be_nil
     end
 
     it "ignores the url for a non-applicable type" do
