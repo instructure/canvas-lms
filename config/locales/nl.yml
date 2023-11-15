@@ -12263,8 +12263,8 @@ nl:
   exclude_assignments_graded_with_a_0_score_5c853dc4: "Opdrachten beoordeeld met een 0 score uitsluiten."
   excuse_this_assignment_for_the_selected_student_af04e132: "Deze opdracht vrijstellen voor de geselecteerde cursist"
   excused_3aab77: vrijgesteld
-  excused_5877183c: Geëxcuseerd!
-  excused_cf8792eb: Geëxcuseerd!
+  excused_5877183c: Vrijgesteld!
+  excused_cf8792eb: Vrijgesteld!
   exit_d0c7b013: Afmelden
   exit_theme_editor_9ddd41bb: "Afmelden Thema Bewerker"
   expand_2f2fadbd: Uitvouwen
@@ -29390,7 +29390,7 @@ nl:
   tls_7a2eaba5: TLS
   to_1126ab55: " tot"
   to_35c6baa2: "tot "
-  to_51406be9: Tot
+  to_51406be9: Aan
   to_access_a_course_people_page_users_view_list_mus_5a4ee1a5: "Om een cursuspagina Personen te openen, moet Gebruikers - lijst weergeven ook zijn ingeschakeld."
   to_access_assignment_submissions_through_assignmen_30c5c8f2: "Om inleveringen van opdrachten te openen via Opdrachten of de Cijferlijst en deze weer te geven in SpeedGrader, moet Cijfers - alle cijfers weergeven of Cijfers - bewerken ook worden ingeschakeld."
   to_access_assignment_submissions_through_assignmen_ce438715: |-
