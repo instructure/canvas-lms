@@ -28,6 +28,7 @@ import React, {
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Grid} from '@instructure/ui-grid'
+import {IconArrowOpenStartLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {DateTimeInput} from '@instructure/ui-date-time-input'
 import doFetchApi from '@canvas/do-fetch-api-effect'
@@ -65,8 +66,8 @@ import {EnvCommon} from '@canvas/global/env/EnvCommon'
 import {TempEnrollAvatar} from './TempEnrollAvatar'
 import {
   createEnrollment,
-  deleteEnrollment,
   createTemporaryEnrollmentPairing,
+  deleteEnrollment,
 } from './api/enrollment'
 
 declare const ENV: GlobalEnv & EnvCommon
@@ -492,7 +493,11 @@ export function TempEnrollAssign(props: Props) {
     <Flex gap="medium" direction="column">
       {!props.isInAssignEditMode && (
         <Flex.Item padding="xx-small">
-          <Button onClick={handleGoBack} {...analyticProps('Back')}>
+          <Button
+            onClick={handleGoBack}
+            renderIcon={IconArrowOpenStartLine}
+            {...analyticProps('Back')}
+          >
             {I18n.t('Back')}
           </Button>
         </Flex.Item>
