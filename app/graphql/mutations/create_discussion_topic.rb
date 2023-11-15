@@ -25,6 +25,8 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
   argument :anonymous_state, String, required: false
   argument :context_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Context")
   argument :context_type, String, required: true
+  argument :assignment, Mutations::AssignmentCreate, required: false
+
   # most arguments inherited from DiscussionBase
 
   def resolve(input:)

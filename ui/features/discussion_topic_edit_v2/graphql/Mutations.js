@@ -41,7 +41,7 @@ export const CREATE_DISCUSSION_TOPIC = gql`
     $isAnnouncement: Boolean
     $specificSections: String
     $groupCategoryId: ID
-    $assignment: AssignmentCreateOrUpdate
+    $assignment: AssignmentCreate
     $fileId: ID
   ) {
     createDiscussionTopic(
