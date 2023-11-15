@@ -4125,7 +4125,7 @@ de:
     gpa_scale_explainer: "Was versteht man unter GPA Scale Grading?"
     grading_type_options: 
       gpa_scale: GPA-Skala
-      letter_grade: Buchstaben-Note
+      letter_grade: "Buchstaben- oder Ziffernnote"
       not_graded: Unbenotet
       pass_fail: Vollständig/Unvollständig
       percent: Prozentsatz
@@ -16269,7 +16269,7 @@ de:
   let_students_see_their_quiz_responses_fbc07d14: "Studenten die eigenen Quiztest-Antworten anzeigen"
   let_students_see_their_quiz_responses_incorrect_qu_f5c9cb70: "Die Studierenden ihre Antworten sehen lassen (Falsche Fragen werden im Studenten-Feedback gekennzeichnet)."
   let_the_site_administrator_select_up_to_2_lti_apps_df016781: "Lassen Sie den Site-Administrator bis zu 2 LTI-Anwendungen als Favoriten auswählen, die dann in der Symbolleiste des RCE angezeigt werden"
-  letter_grade_29ff1938: Buchstaben-Note
+  letter_grade_29ff1938: "Buchstaben- oder Ziffernnote"
   letter_grade_f00fedc4: Buchstabennote
   letter_grade_report_d6772138: Buchstaben-Notenbericht
   letter_grades_by_section_259aec0e: "Buchstaben-Noten abschnittsweise"
@@ -25213,7 +25213,7 @@ de:
       assignment_subtotals: 
         ag_group_grade: Note
         ag_group_percent_grade: "% der Note"
-        ag_letter_grade: Buchstaben-Note
+        ag_letter_grade: "Buchstaben- oder Ziffernnote"
       details: 
         hidden: ausgeblendet
         secondary_id: "Sekundäre ID:"
