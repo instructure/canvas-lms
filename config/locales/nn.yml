@@ -5453,6 +5453,11 @@ nn:
     by_sa: "CC Namngjeving - Del på same vilkår BY-SA"
     private: "Privat (med opphavsrett)"
     public_domain: "Offentleg domene"
+  cc_attribution_f6de631f: " CC Namngjeving BY"
+  cc_attribution_no_derivatives_b006744f: "CC Namngjeving – Ikkje-kommersiell - Del på same vilkår BY-NC-SA"
+  cc_attribution_non_commercial_39e0d30d: "CC Namngjeving - Ingen behandling BY-ND"
+  cc_attribution_non_commercial_no_derivatives_9fe74c00: "CC Namngjeving – Ikkje-kommersiell - Ingen behandling BY-NC-ND "
+  cc_attribution_non_commercial_share_alike_c7edb1e5: "CC Namngjeving – Ikkje-kommersiell BY-NC"
   cc_subtitles_a0d16ff6: Undertekstar
   ccp_zero_activity_73d094c3: "CCP null aktivitet"
   cell_number_69a7c309: Mobiltelefonnummer
@@ -7598,6 +7603,7 @@ nn:
   course_sis_7ae8f649: emne-SIS
   course_sis_df8b379: Emne-SIS
   course_sis_id_bbed1a60: emne-SIS-ID
+  course_sis_id_cd834b3c: "Emne-SIS-ID:"
   course_sis_id_sis_id_or_canvas_id_4d323f5c: "Emne-SIS-ID (SIS_ID:####) ELLER Canvas-ID: (###)"
   course_start_date_daae16ae: "Startdatoen til emnet"
   course_start_date_on_before_a3a32883: "Emne startdato den/før"
@@ -8308,6 +8314,7 @@ nn:
     registered_services: "Registrerte tenester"
     revisions: Revisjonar
     rubrics: Vurderingsskjema
+    search: Søk
     settings: Innstillingar
     site_admin: Områdeadministrator
     stats: Statistikk
@@ -8647,6 +8654,7 @@ nn:
   default_grade_cannot_be_set_to_ex_723caa59: "Standard vurderingsverdi kan ikkje setjast til %{ex}"
   default_grading_scheme_894a0eb: "Standard karakteroppsett"
   default_order_8c409051: "Standard rekkefølgje"
+  default_question_bank_c7bcc5e7: "Standard spørsmålsbank"
   default_question_name: Spørsmål
   default_question_text: Spørsmålstekst
   default_sis_sync_for_assignments_quizzes_grade_dis_3b2b4878: "Standard SIS-synkronisering for oppgåver, testar, vurdert diskusjon"
@@ -12980,6 +12988,7 @@ nn:
   import_1b31507: Importer
   import_a_set_of_outcomes_6b782192: "Importer eit sett med læringsmål"
   import_anyway_8c996ef6: "Importer uansett"
+  import_assessment_as_new_quizzes_help_icon_3e49480f: "Importer vurdering som New Quizzes-hjelpeikon"
   import_commons_favorites_e68fce81: "Importer Commons-favorittar"
   import_content_b2fd6620: "Importer innhald"
   import_e929507b: Import...
@@ -17768,6 +17777,8 @@ nn:
   overview_of_student_status_a004bcf3: "Oversikt over studentstatus"
   overwrite_all_users_existing_default_dashboard_pre_9b2ad7d1: "Skriv over brukaren sine foretrukne dashbordvalg"
   overwrite_already_entered_grades_64a98037: "Overskriv vurderingane som allereie er lagt inn"
+  overwrite_assessment_content_with_matching_ids_b388f114: "Overskriv vurderingsinnhald med samsvarande ID-ar"
+  overwrite_assessment_help_icon_875d00a5: "Hjelp-ikon for overskriving av vurdering"
   own_copyright_cc59db55: "Eigen opphavsrett"
   owner_email_236d1b2: "Eigar sin e-post"
   owner_email_4d02f795: "Eigar sin e-post:"
@@ -21657,6 +21668,7 @@ nn:
   select_placements_type_or_use_arrow_keys_to_naviga_a6bfd561: "Vel plassering. Skriv eller bruk piltastane for å navigere mellom alternativa. Du kan velje fleire alternativ."
   select_prerequisite_module_57894963: "Vel modulen som er føresetnad"
   select_prerequite_module_e9042bb0: "Vel modulen som er føresetnad"
+  select_question_bank_508e5c08: "Vel spørsmålsbank"
   select_rubric_2aa2ffa2: "Vel vurderingsskjema"
   select_specific_content_5382e7ea: "Vel spesifikt innhald"
   select_student_group_c0be9f3e: "Vel studentgruppe"
@@ -22847,6 +22859,7 @@ nn:
   some_settings_have_been_administratively_locked_9e3ee880: "Nokre innstillingar er låste administrativt."
   some_settings_have_been_disabled_because_the_assig_6b6cc3b4: "Nokre innstillingar er deaktivert fordi oppgåva er i ein lukka karaktersetjingsperiode."
   some_submissions_are_not_gradeable_grade_changes_f_f8bf44e2: "Nokre innleveringar er ikke mogleg å vurdere; endring av vurdering for desse innleveringane er ignorert. "
+  some_systems_recycle_their_ids_for_each_new_export_884b8e46: "Nokre system resirkulerer ID-ane for kvar ny eksport. Dersom du eksporterer to ulike spørsmålsbankar resulterer dette i at dei får like ID-ar. For å ikkje miste vurderingdata handsamar vi desse objekta som ulike til trass for like ID-ar. Dersom du vel dette alternativet blir tryggleiksfunksjonen deaktivert og vurderingsdata kan overskrive gjeldande data med same ID-ar."
   someone: Nokon
   someone_bbbc538b: Nokon
   someone_just_made_a_new_annotation_on_the_anonymou_cbbe68ca: "Nokon har gitt ein anonym merknad på innleveringa (%{assignment_title}) for student %{user_id}."
@@ -23667,6 +23680,7 @@ nn:
     quizzes: Quizar
     rubrics: Vurderingsskjema
     schedule: Planlegge
+    search: Søk
     settings: Innstillingar
     syllabus: Emneoversikt
     tab_location_error: "Faneplasseringa er ugyldig"
