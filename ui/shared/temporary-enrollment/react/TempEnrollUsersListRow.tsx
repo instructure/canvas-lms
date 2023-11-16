@@ -53,11 +53,11 @@ export function generateIcon(role: string | null) {
 export function generateTooltip(enrollmentType: EnrollmentType, name: string) {
   switch (enrollmentType) {
     case PROVIDER:
-      return I18n.t('%{name}’s Temporary Enrollment Recipients', {name})
+      return I18n.t('Manage %{name}’s Temporary Enrollment Recipients', {name})
     case RECIPIENT:
-      return I18n.t('%{name}’s Temporary Enrollment Providers', {name})
+      return I18n.t('Manage %{name}’s Temporary Enrollment Providers', {name})
     default:
-      return I18n.t('Find a recipient of Temporary Enrollments', {name})
+      return I18n.t('Create Temporary Enrollment Pairing for %{name}', {name})
   }
 }
 
