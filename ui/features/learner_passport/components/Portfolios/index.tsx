@@ -17,7 +17,7 @@
  */
 
 import PortfolioLayout from './PortfolioLayout'
-import PortfolioEdit from './PortfolioEdit'
+import PortfolioEdit from './edit/PortfolioEdit'
 import PortfolioDashboard from './PortfolioDashboard'
 import PortfolioCreate from './PortfolioCreate'
 import PortfolioView from './PortfolioView'

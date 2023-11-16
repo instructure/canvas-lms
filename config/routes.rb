@@ -917,9 +917,12 @@ CanvasRails::Application.routes.draw do
 
     get "passport/data/portfolios" => "learner_passport#portfolios_index"
     put "passport/data/portfolios/create" => "learner_passport#portfolio_create"
+    post "passport/data/portfolios/:portfolio_id" => "learner_passport#portfolio_update"
     get "passport/data/portfolios/show/:portfolio_id" => "learner_passport#portfolio_show"
     put "passport/data/portfolios/duplicate" => "learner_passport#portfolio_duplicate"
-    get "passport/data/portfolios/reset" => "learner_pasport#portfolios_reset"
+    get "passport/data/portfolios/reset" => "learner_passport#portfolio_reset"
+
+    get "passport/data/skills" => "learner_passport#skills_index"
 
     get "passport/*path" => "learner_passport#index"
   end

@@ -16,7 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {AchievementData} from '../Achievements/types'
+export interface AchievementData {
+  id: string
+  isNew: boolean
+  title: string
+  type: string | null
+  criteria: string | null
+  issuer: {
+    name: string
+    url?: string
+    iconUrl?: string
+  }
+  issuedOn: string
+  expiresOn: string | null
+  imageUrl: string | null
+  skills: SkillData[]
+  verifiedBy: string | null
+}
 
 export interface PortfolioData {
   id: string
@@ -26,6 +42,10 @@ export interface PortfolioData {
 
 export interface PortfolioDetailData extends PortfolioData {
   blurb: string
+  city: string
+  state: string
+  phone: string
+  email: string
   about: string
   skills: SkillData[]
   links: string[]
@@ -37,6 +57,7 @@ export interface PortfolioDetailData extends PortfolioData {
 export interface SkillData {
   name: string
   verified: boolean
+  url?: string
 }
 
 export interface EducationData {

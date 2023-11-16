@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {useActionData, useLoaderData} from 'react-router-dom'
+import React, {useCallback} from 'react'
+import {useActionData, useLoaderData, useNavigate} from 'react-router-dom'
 import {Breadcrumb} from '@instructure/ui-breadcrumb'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -36,9 +36,14 @@ import {Link} from '@instructure/ui-link'
 import {Tag} from '@instructure/ui-tag'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import type {PortfolioDetailData, SkillData, EducationData, ExperienceData} from './types'
+import type {
+  AchievementData,
+  PortfolioDetailData,
+  SkillData,
+  EducationData,
+  ExperienceData,
+} from '../types'
 import AchievementCard from '../Achievements/AchievementCard'
-import type {AchievementData} from '../Achievements/types'
 
 function renderSkillTag(skill: SkillData) {
   return (
@@ -121,14 +126,21 @@ function renderExperience(experience: ExperienceData) {
 }
 
 const PortfolioView = () => {
+  const navigate = useNavigate()
   const create_portfolio = useActionData() as PortfolioDetailData
   const edit_portfolio = useLoaderData() as PortfolioDetailData
   const portfolio = create_portfolio || edit_portfolio
 
+  const handleEditClick = useCallback(() => {
+    navigate(`../edit/${portfolio.id}`)
+  }, [navigate, portfolio.id])
+
   return (
     <View as="div" id="foo" maxWidth="986px" margin="0 auto">
       <Breadcrumb label="You are here:" size="small">
-        <Breadcrumb.Link href="/users/1/portfolios/dashboard">Portfolios</Breadcrumb.Link>
+        <Breadcrumb.Link href={`/users/${ENV.current_user.id}/passport/portfolios/dashboard`}>
+          Portfolios
+        </Breadcrumb.Link>
         <Breadcrumb.Link>{portfolio.title}</Breadcrumb.Link>
       </Breadcrumb>
       <Flex as="div" margin="0 0 medium 0">
@@ -138,7 +150,7 @@ const PortfolioView = () => {
           </Heading>
         </Flex.Item>
         <Flex.Item>
-          <Button margin="0 x-small 0 0" renderIcon={IconEditLine}>
+          <Button margin="0 x-small 0 0" renderIcon={IconEditLine} onClick={handleEditClick}>
             Edit
           </Button>
           <Button margin="0 x-small 0 0" renderIcon={IconDownloadLine}>
@@ -202,14 +214,16 @@ const PortfolioView = () => {
               <Heading level="h3" themeOverride={{h3FontSize: '1rem'}}>
                 Skills
               </Heading>
-              <p>{portfolio.skills.map((skill: SkillData) => renderSkillTag(skill))}</p>
+              <View as="div" margin="small 0">
+                {portfolio.skills.map((skill: SkillData) => renderSkillTag(skill))}
+              </View>
             </View>
             <View as="div">
               <Heading level="h3" themeOverride={{h3FontSize: '1rem'}}>
                 Links
               </Heading>
               <List isUnstyled={true} itemSpacing="small" margin="small 0 0 0">
-                {portfolio.links.map(link => renderLink(link))}
+                {portfolio.links.map((link: string) => renderLink(link))}
               </List>
             </View>
             <View as="div" borderWidth="small 0 0 0" padding="large 0 0 0">
@@ -232,7 +246,7 @@ const PortfolioView = () => {
               </Heading>
               <View as="div" shadow="resting" padding="small">
                 <Flex direction="column" gap="small">
-                  {portfolio.experience.map(experience => {
+                  {portfolio.experience.map((experience: ExperienceData) => {
                     return (
                       <Flex.Item key={`${experience.where.replace(/\W+/, '-')}`}>
                         {renderExperience(experience)}
@@ -247,7 +261,7 @@ const PortfolioView = () => {
                 Achievements
               </Heading>
               <Flex as="div" margin="small 0" gap="medium" wrap="wrap">
-                {portfolio.achievements.map(achievement => {
+                {portfolio.achievements.map((achievement: AchievementData) => {
                   return (
                     <Flex.Item key={achievement.id} shouldShrink={false}>
                       {renderAchievement(achievement)}

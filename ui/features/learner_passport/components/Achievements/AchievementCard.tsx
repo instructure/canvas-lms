@@ -20,6 +20,7 @@ import React from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Pill} from '@instructure/ui-pill'
 import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
 
 export type AchievementCardProps = {
   isNew: boolean
@@ -28,50 +29,44 @@ export type AchievementCardProps = {
   imageUrl?: string | null
 }
 
-const cardStyle = {
-  position: 'relative',
-  width: '265px',
-  height: '130px',
-  padding: '16px',
-  border: '1px solid #f5f5f5',
-  boxShadow: '0px 1px 3px 0px rgba(0, 0, 0, 0.10), 0px 1px 2px 0px rgba(0, 0, 0, 0.20)',
-}
-
 const AchievementCard = ({isNew, title, issuer, imageUrl}: AchievementCardProps) => {
   return (
-    <>
-      {/*
-    // @ts-ignore-error */}
-      <div style={cardStyle}>
-        {isNew && (
-          <div style={{position: 'absolute', top: '1rem', left: '1rem'}}>
-            <Pill color="info">New</Pill>
-          </div>
-        )}
-        <Flex justifyItems="space-between" alignItems="center" direction="column" gap="x-small">
-          <Flex.Item size="64px">
-            <img
-              src={imageUrl || undefined}
-              alt=""
-              style={{
-                flexBasis: '64px',
-                height: '64px',
-                minWidth: '64px',
-                background: imageUrl
-                  ? 'none'
-                  : 'repeating-linear-gradient(45deg, #cecece, #cecece 10px, #aeaeae 10px, #aeaeae 20px)',
-              }}
-            />
-          </Flex.Item>
-          <Flex.Item>
-            <Text weight="bold">{title}</Text>
-          </Flex.Item>
-          <Flex.Item>
-            <Text>{issuer}</Text>
-          </Flex.Item>
-        </Flex>
-      </div>
-    </>
+    <View
+      data-testid="achievement-card"
+      as="div"
+      position="relative"
+      width="291px"
+      height="156px"
+      padding="small"
+    >
+      {isNew && (
+        <div style={{position: 'absolute', top: '1rem', left: '1rem'}}>
+          <Pill color="info">New</Pill>
+        </div>
+      )}
+      <Flex justifyItems="space-between" alignItems="center" direction="column" gap="x-small">
+        <Flex.Item size="64px">
+          <img
+            src={imageUrl || undefined}
+            alt=""
+            style={{
+              flexBasis: '64px',
+              height: '64px',
+              minWidth: '64px',
+              background: imageUrl
+                ? 'none'
+                : 'repeating-linear-gradient(45deg, #cecece, #cecece 10px, #aeaeae 10px, #aeaeae 20px)',
+            }}
+          />
+        </Flex.Item>
+        <Flex.Item>
+          <Text weight="bold">{title}</Text>
+        </Flex.Item>
+        <Flex.Item>
+          <Text>{issuer}</Text>
+        </Flex.Item>
+      </Flex>
+    </View>
   )
 }
 

@@ -26,7 +26,7 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import PortfolioCard, {PortfolioCardSkeleton} from './PortfolioCard'
-import type {PortfolioData} from './types'
+import type {PortfolioData} from '../types'
 import CreatePortfolioModal from './CreatePortfolioModal'
 
 function renderSkeleton() {

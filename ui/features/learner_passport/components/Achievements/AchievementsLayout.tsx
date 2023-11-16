@@ -22,8 +22,8 @@ import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import AchievementCard from './AchievementCard'
-import type {AchievementData} from './types'
+import AchievementDashboardCard from './AchievementDashboardCard'
+import type {AchievementData} from '../types'
 import AchievementTray from './AchievementTray'
 
 const AchievementsLayout = () => {
@@ -85,7 +85,7 @@ const AchievementsLayout = () => {
               onClick={handleCardClick}
               onKeyDown={handleCardKey}
             >
-              <AchievementCard
+              <AchievementDashboardCard
                 isNew={achievement.isNew}
                 title={achievement.title}
                 issuer={achievement.issuer.name}

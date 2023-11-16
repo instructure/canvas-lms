@@ -90,6 +90,22 @@ export const LearnerPassportRoutes = (
             `/users/${params.userId}/passport/data/portfolios/show/${params.portfolioId}`
           )
         }}
+        action={async ({request, params}) => {
+          const formData = await request.formData()
+          const response = await fetch(
+            `/users/${params.userId}/passport/data/portfolios/${params.portfolioId}`,
+            {
+              method: 'POST',
+              cache: 'no-cache',
+              headers: {
+                'X-CSRF-Token': getCookie('_csrf_token'),
+              },
+              body: formData,
+            }
+          )
+          const json = await response.json()
+          return redirect(`../view/${json.id}`)
+        }}
         lazy={() => import('../pages/PortfolioEdit')}
       />
     </Route>
