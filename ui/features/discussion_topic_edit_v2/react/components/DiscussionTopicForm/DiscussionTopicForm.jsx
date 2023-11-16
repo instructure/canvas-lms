@@ -365,7 +365,7 @@ export default function DiscussionTopicForm({
           name: title,
           pointsPossible,
           gradingType: displayGradeAs,
-          assignmentGroupId: assignmentGroup,
+          assignmentGroupId: assignmentGroup || null,
           peerReviews: preparePeerReviewPayload(),
         }
       : null
