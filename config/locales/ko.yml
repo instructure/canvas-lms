@@ -2879,6 +2879,11 @@ ko:
     by_sa: "CC 유형 동일조건변경허락"
     private: "비공개 (저작권 있음)"
     public_domain: "공개 도메인"
+  cc_attribution_f6de631f: "CC 유형"
+  cc_attribution_no_derivatives_b006744f: "CC 유형 변경금지"
+  cc_attribution_non_commercial_39e0d30d: "CC 유형 비영리"
+  cc_attribution_non_commercial_no_derivatives_9fe74c00: "CC 유형 비영리 변경금지"
+  cc_attribution_non_commercial_share_alike_c7edb1e5: "CC 유형 비영리 동일조건변경허락 "
   cell_number_69a7c309: "휴대 전화 번호"
   change_points_possible_to_match_rubric_dialog: 
     prompts: 
@@ -4636,6 +4641,7 @@ ko:
     registered_services: "등륵된 서비스"
     revisions: 수정
     rubrics: 루브릭
+    search: 검색
     settings: 설정
     site_admin: "사이트 관리자"
     stats: 통계
@@ -9856,7 +9862,10 @@ ko:
     everyone_else: "다른 모든 사람"
     overrides: 
       everyone: 모두
+  overwrite_848c08f: 덮어쓰기
   overwrite_already_entered_grades_64a98037: "이미 입력한 평점을 다시 정의"
+  overwrite_assessment_content_with_matching_ids_b388f114: "ID가 일치하는 평가 내용을 덮어쓰기"
+  overwrite_assessment_help_icon_875d00a5: "평가 덮어쓰기 도움말 아이콘"
   owner_email_4d02f795: "소유자 이메일:"
   page_comment: 
     default_user_name: 익명
@@ -12182,6 +12191,7 @@ ko:
   select_course_5b549441: "과목 선택"
   select_navigation_links_68e1e924: "탐색 링크 선택"
   select_one_8e0af564: "하나 선택"
+  select_question_bank_508e5c08: "문제 은행 선택"
   select_the_file_you_want_to_associate_with_this_mo_c88fcd46: "이 *모듈*에 연결하려는 파일을 선택하거나 \"새 파일\"을 선택해서 파일을 추가하십시오."
   selected_answer: "이 답변을 선택했습니다."
   selective_import_aff12a7c: "선택해서 가져오기"
@@ -12950,6 +12960,7 @@ ko:
   smartbanner: 
     android_banner_view_button: 보기
   sms_f0ddceeb: SMS
+  some_systems_recycle_their_ids_for_each_new_export_884b8e46: "어떤 시스템은 새로 내보내기를 할 때마다 ID를 재활용합니다. 그 결과, 내보낸 다른 문제 은행이 같은 ID를 갖게 됩니다. 평가 자료를 잃지 않으려면 ID를 무시하고 개체를 다른 것으로 처리해야 합니다. 이 옵션을 선택하면 이러한 안전 기능을 사용하지 않고 같은 ID를 가진 기존 평가 자료를 덮어쓰게 됩니다."
   someone_bbbc538b: 아무개
   sort_by_e75f9e3e: "정렬 조건"
   source_c377a469: 원본
@@ -13264,6 +13275,7 @@ ko:
     profile: 프로필
     quizzes: 퀴즈
     rubrics: 루브릭
+    search: 검색
     settings: 설정
     syllabus: "강의 계획"
   tag_7bb005ff: 태그
