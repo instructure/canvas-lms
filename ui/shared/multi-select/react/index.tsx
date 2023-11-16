@@ -20,8 +20,8 @@ import React, {useState, useEffect, useRef, useMemo} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import keycode from 'keycode'
 import {Select} from '@instructure/ui-select'
+import type {ViewProps} from '@instructure/ui-view'
 import {Tag} from '@instructure/ui-tag'
-import {func, string, node, arrayOf, oneOfType, bool, number} from 'prop-types'
 import {matchComponentTypes} from '@instructure/ui-react-utils'
 import {compact, uniqueId} from 'lodash'
 import {Alert} from '@instructure/ui-alerts'
@@ -29,26 +29,49 @@ import {Spinner} from '@instructure/ui-spinner'
 
 const I18n = useI18nScope('app_shared_components')
 
-const CanvasMultiSelectOption = () => <div />
-
-CanvasMultiSelectOption.propTypes = {
-  id: string.isRequired, // eslint-disable-line react/no-unused-prop-types
-  value: string.isRequired, // eslint-disable-line react/no-unused-prop-types
-  group: string, // eslint-disable-line react/no-unused-prop-types
+type OptionProps = {
+  id: string
+  value: string
+  label: React.ReactNode
 }
 
-function alwaysArray(scalarOrArray) {
-  if (!scalarOrArray) return null
-  return Array.isArray(scalarOrArray) ? scalarOrArray : [scalarOrArray]
-}
+const CanvasMultiSelectOption: React.FC = _props => <div />
 
-function liveRegion() {
-  return document.getElementById('flash_screenreader_holder')
+function liveRegion(): HTMLElement {
+  const div = document.getElementById('flash_screenreader_holder')
+  if (!(div instanceof HTMLElement)) {
+    throw new Error('live region not found')
+  }
+  return div
 }
 
 const NO_OPTIONS_OPTION_ID = '__no_option-'
 
-function CanvasMultiSelect(props) {
+type Props = {
+  assistiveText?: string
+  children: React.ReactNode
+  customMatcher: (option: any, term: string) => boolean
+  customOnInputChange: (value: string) => void
+  customOnRequestHideOptions: () => void
+  customOnRequestSelectOption: (ids: string[]) => void
+  customOnRequestShowOptions: () => void
+  customRenderBeforeInput: (tags: any) => React.ReactNode
+  disabled: boolean
+  id?: string
+  isLoading: boolean
+  isShowingOptions?: boolean
+  label: React.ReactNode
+  listRef?: (ref: HTMLUListElement | null) => void
+  noOptionsLabel: string
+  onChange: (ids: string[]) => void
+  placeholder?: string
+  renderAfterInput?: React.ReactNode
+  selectedOptionIds: string[]
+  size?: 'small' | 'medium' | 'large'
+  visibleOptionsCount?: number
+}
+
+function CanvasMultiSelect(props: Props) {
   const {
     id: selectId,
     label: renderLabel,
@@ -67,33 +90,53 @@ function CanvasMultiSelect(props) {
     ...otherProps
   } = props
 
-  const [inputValue, setInputValue] = useState('')
+  const [inputValue, setInputValue] = useState<string>('')
   const [isShowingOptions, setIsShowingOptions] = useState(false)
-  const [highlightedOptionId, setHighlightedOptionId] = useState(null)
-  const [announcement, setAnnouncement] = useState(null)
-  const inputRef = useRef(null)
+  const [highlightedOptionId, setHighlightedOptionId] = useState<string | null>(null)
+  const [announcement, setAnnouncement] = useState<string | null>(null)
+  const inputRef = useRef<HTMLInputElement | null>(null)
   const noOptionId = useRef(uniqueId(NO_OPTIONS_OPTION_ID))
 
-  const childProps = useMemo(
+  const childProps: OptionProps[] = useMemo<
+    {
+      id: string
+      value: string
+      label: React.ReactNode
+    }[]
+  >(
     () =>
-      React.Children.map(children, n => ({
-        id: n.props.id,
-        value: n.props.value,
-        label: n.props.children,
-      })),
+      React.Children.map(children, n => {
+        if (!React.isValidElement(n)) return null
+        return {
+          id: n.props.id,
+          value: n.props.value,
+          label: n.props.children,
+        }
+      }) || [],
     [children]
   )
 
-  const [filteredOptionIds, setFilteredOptionIds] = useState(null)
+  const [filteredOptionIds, setFilteredOptionIds] = useState<string[] | null>(null)
 
-  function getChildById(id) {
+  function getChildById(id?: string) {
     return childProps.find(c => c.id === id)
   }
 
-  function renderChildren() {
-  const groups = [...new Set(children.map(child => child.props.group))].filter(group => group);
+  function renderChildren(): React.ReactNode | React.ReactNode[] {
+    const groups: string[] = [
+      ...new Set(
+        React.Children.map(children, child => {
+          if (!React.isValidElement(child)) return undefined
+          return child.props.group
+        })
+      ),
+    ].filter((group: string) => group)
 
-    function renderOption(child) {
+    function renderOption(child: {
+      key: React.Key
+      props: {id: string; children: React.ReactNode; key?: string; group: string}
+    }) {
+      // eslint-disable-next-line @typescript-eslint/no-shadow
       const {id, children, ...optionProps} = child.props
       return (
         <Select.Option
@@ -110,46 +153,60 @@ function CanvasMultiSelect(props) {
     function renderNoOptionsOption() {
       return (
         <Select.Option id={noOptionId.current} isHighlighted={false} isSelected={false}>
-          { isLoading ? <Spinner renderTitle="Loading" size="x-small" /> :
-          noOptionsLabel}
+          {isLoading ? <Spinner renderTitle="Loading" size="x-small" /> : noOptionsLabel}
         </Select.Option>
       )
     }
 
     const filteredChildren = compact(
-      alwaysArray(children).map(child => {
+      (Array.isArray(children) ? children : []).map(child => {
         if (
           matchComponentTypes(child, [CanvasMultiSelectOption]) &&
           (!filteredOptionIds || filteredOptionIds.includes(child.props.id)) &&
           !selectedOptionIds.includes(child.props.id)
         ) {
-          return renderOption(child)
+          return renderOption({
+            ...child,
+            key: child.key || uniqueId('multi-select-option-'),
+          })
         }
         return null
       })
     )
 
     function renderGroups() {
-      const groupsToRender = groups.filter(group => filteredChildren.some(child => child.props.group === group))
-      return groupsToRender.map((group) => <Select.Group key={group} renderLabel={group}>
-        {filteredChildren.filter(({props}) => props.group === group).map(option => renderOption(option))}
-      </Select.Group>)
+      const groupsToRender = groups.filter(group =>
+        filteredChildren.some(child => child.props.group === group)
+      )
+      return groupsToRender.map(group => (
+        <Select.Group key={group} renderLabel={group}>
+          {filteredChildren
+            // eslint-disable-next-line @typescript-eslint/no-shadow, react/prop-types
+            .filter(({props}) => props.group === group)
+            .map(option =>
+              renderOption({
+                ...option,
+                key: option.key || uniqueId('multi-select-group-option-'),
+              })
+            )}
+        </Select.Group>
+      ))
     }
 
-    if(filteredChildren.length === 0) return renderNoOptionsOption();
+    if (filteredChildren.length === 0) return renderNoOptionsOption()
 
     return groups.length === 0 ? filteredChildren : renderGroups()
   }
 
-  function dismissTag(e, id) {
+  function dismissTag(e: React.MouseEvent<ViewProps, MouseEvent>, id: string) {
     e.stopPropagation()
     e.preventDefault()
     onChange(selectedOptionIds.filter(x => x !== id))
   }
 
   function renderTags() {
-    const options = alwaysArray(children)
-    if (!options) return null
+    if (!Array.isArray(children)) return null
+    const options = children
 
     return compact(
       selectedOptionIds.map(id => {
@@ -163,7 +220,7 @@ function CanvasMultiSelect(props) {
             text={tagText}
             title={I18n.t('Remove %{label}', {label: tagText})}
             margin="0 xxx-small"
-            onClick={e => dismissTag(e, id)}
+            onClick={(e: React.MouseEvent<ViewProps, MouseEvent>) => dismissTag(e, id)}
           />
         )
       })
@@ -176,20 +233,26 @@ function CanvasMultiSelect(props) {
   }
 
   useEffect(() => {
-    if(inputValue !== ''){
+    if (inputValue !== '') {
       filterOptions(inputValue)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [childProps])
 
-  function onInputChange(e) {
+  function onInputChange(e: React.ChangeEvent<HTMLInputElement>) {
     const {value} = e.target
     filterOptions(value)
     setInputValue(value)
     customOnInputChange(value)
   }
 
-  function filterOptions(value) {
-    const defaultMatcher = (option, term) => option.label.match(new RegExp(`^${term}`, 'i'))
+  function filterOptions(value: string) {
+    const defaultMatcher = (
+      option: {
+        label: string
+      },
+      term: string
+    ) => option.label.match(new RegExp(`^${term}`, 'i'))
     const matcher = customMatcher || defaultMatcher
     const filtered = childProps.filter(child => matcher(child, value.trim()))
     let message =
@@ -204,7 +267,7 @@ function CanvasMultiSelect(props) {
           )
         : null
     if (message && filtered.length > 0 && highlightedOptionId !== filtered[0].id) {
-      message = getChildById(filtered[0].id).label + '. ' + message
+      message = getChildById(filtered[0].id)?.label + '. ' + message
     }
     setFilteredOptionIds(filtered.map(f => f.id))
     if (filtered.length > 0) setHighlightedOptionId(filtered[0].id)
@@ -223,28 +286,28 @@ function CanvasMultiSelect(props) {
     setInputValue('')
     if (filteredOptionIds?.length === 1) {
       const option = getChildById(filteredOptionIds[0])
-      setAnnouncement(I18n.t('%{label} selected. List collapsed.', {label: option.label}))
+      setAnnouncement(I18n.t('%{label} selected. List collapsed.', {label: option?.label}))
       onChange([...selectedOptionIds, filteredOptionIds[0]])
     }
     setFilteredOptionIds(null)
     customOnRequestHideOptions()
   }
 
-  function onRequestHighlightOption(e, {id}) {
+  function onRequestHighlightOption(e: any, {id}: any) {
     e.persist()
     const option = getChildById(id)
     if (typeof option === 'undefined') return
-    if (e.type === 'keydown') setInputValue(option.label)
+    if (e.type === 'keydown') setInputValue(option.label as string)
     setHighlightedOptionId(id)
-    setAnnouncement(option.label)
+    setAnnouncement(option.label as string)
   }
 
-  function onRequestSelectOption(_e, {id}) {
+  function onRequestSelectOption(e: React.SyntheticEvent, {id}: {id?: string}): void {
     const option = getChildById(id)
     setInputValue('')
     setFilteredOptionIds(null)
     setIsShowingOptions(false)
-    if (typeof option === 'undefined') return
+    if (!id || typeof option === 'undefined') return
     setAnnouncement(I18n.t('%{label} selected. List collapsed.', {label: option.label}))
     onChange([...selectedOptionIds, id])
     customOnRequestSelectOption([...selectedOptionIds, id])
@@ -252,14 +315,14 @@ function CanvasMultiSelect(props) {
 
   // if backspace is pressed and there's no input to backspace over, remove the
   // last selected option if there is one
-  function onKeyDown(e) {
+  function onKeyDown(e: any) {
     if (
       e.keyCode === keycode.codes.backspace &&
       inputValue.length === 0 &&
       selectedOptionIds.length > 0
     ) {
       const option = getChildById(selectedOptionIds.slice(-1)[0])
-      setAnnouncement(I18n.t('%{label} removed.', {label: option.label}))
+      setAnnouncement(I18n.t('%{label} removed.', {label: option?.label || ''}))
       onChange(selectedOptionIds.slice(0, -1))
     }
   }
@@ -268,29 +331,30 @@ function CanvasMultiSelect(props) {
     setHighlightedOptionId(null)
   }
 
-  const selectProps = {
-    id: selectId,
-    disabled,
-    renderLabel,
-    inputValue,
-    inputRef: ref => {
-      inputRef.current = ref
-    },
-    onInputChange,
-    onRequestShowOptions,
-    onRequestHideOptions,
-    isShowingOptions,
-    onRequestHighlightOption,
-    onRequestSelectOption,
-    onKeyDown,
-    onBlur,
-    assistiveText: I18n.t('Type or use arrow keys to navigate. Multiple selections are allowed.'),
-    renderBeforeInput: contentBeforeInput(),
-  }
-
   return (
     <>
-      <Select {...selectProps} {...otherProps}>
+      <Select
+        id={selectId}
+        disabled={disabled}
+        renderLabel={renderLabel}
+        inputValue={inputValue}
+        inputRef={ref => {
+          inputRef.current = ref
+        }}
+        onInputChange={onInputChange}
+        onRequestShowOptions={onRequestShowOptions}
+        onRequestHideOptions={onRequestHideOptions}
+        isShowingOptions={isShowingOptions}
+        onRequestHighlightOption={onRequestHighlightOption}
+        onRequestSelectOption={onRequestSelectOption}
+        onKeyDown={onKeyDown}
+        onBlur={onBlur}
+        assistiveText={I18n.t(
+          'Type or use arrow keys to navigate. Multiple selections are allowed.'
+        )}
+        renderBeforeInput={contentBeforeInput()}
+        {...otherProps}
+      >
         {renderChildren()}
       </Select>
       {announcement && (
@@ -300,29 +364,6 @@ function CanvasMultiSelect(props) {
       )}
     </>
   )
-}
-
-CanvasMultiSelect.propTypes = {
-  id: string,
-  customMatcher: func,
-  customRenderBeforeInput: func,
-  renderAfterInput: node,
-  disabled: bool,
-  label: oneOfType([node, func]).isRequired,
-  onChange: func.isRequired,
-  placeholder: string,
-  children: node.isRequired,
-  selectedOptionIds: arrayOf(string).isRequired,
-  noOptionsLabel: string,
-  size: string,
-  customOnInputChange: func,
-  visibleOptionsCount: number,
-  isLoading: bool,
-  listRef: func,
-  isShowingOptions: bool,
-  customOnRequestShowOptions: func,
-  customOnRequestHideOptions: func,
-  customOnRequestSelectOption: func
 }
 
 CanvasMultiSelect.defaultProps = {
@@ -335,7 +376,7 @@ CanvasMultiSelect.defaultProps = {
   customOnInputChange: () => {},
   customOnRequestShowOptions: () => {},
   customOnRequestHideOptions: () => {},
-  customOnRequestSelectOption: () => {}
+  customOnRequestSelectOption: (_ids: []) => {},
 }
 
 CanvasMultiSelect.Option = CanvasMultiSelectOption
