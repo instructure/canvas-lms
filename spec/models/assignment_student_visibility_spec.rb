@@ -67,6 +67,7 @@ describe "differentiated_assignments" do
     ao.title = "ADHOC OVERRIDE"
     ao.workflow_state = "active"
     ao.set_type = "ADHOC"
+    ao.unassign_item = opts[:unassign_item] || "false"
     ao.save!
     assignment.reload
     override_student = ao.assignment_override_students.build
@@ -118,10 +119,11 @@ describe "differentiated_assignments" do
     assignment.reload
   end
 
-  def give_section_due_date(assignment, section)
+  def give_section_due_date(assignment, section, opts = {})
     create_override_for_assignment(assignment) do |ao|
       ao.set = section
       ao.due_at = 3.weeks.from_now
+      ao.unassign_item = opts[:unassign_item] || "false"
     end
   end
 
@@ -488,6 +490,75 @@ describe "differentiated_assignments" do
           module_override.assignment_override_students.create!(user: @user)
 
           ensure_user_does_not_see_assignment
+        end
+      end
+
+      context "unassign item overrides" do
+        before do
+          Account.site_admin.enable_feature!(:differentiated_modules)
+          Setting.set("differentiated_modules_setting", Account.site_admin.feature_enabled?(:differentiated_modules) ? "true" : "false")
+          AssignmentStudentVisibility.reset_table_name
+          assignment_with_true_only_visible_to_overrides
+        end
+
+        it "is not visible with an unassigned adhoc override" do
+          student_in_course_with_adhoc_override(@assignment, { unassign_item: "true" })
+          ensure_user_does_not_see_assignment
+        end
+
+        it "is not visible with an unassigned section override" do
+          enroller_user_in_section(@section_foo)
+          give_section_due_date(@assignment, @section_foo, { unassign_item: "true" })
+          ensure_user_does_not_see_assignment
+        end
+
+        it "is not visible with an unassigned adhoc override and assigned section override" do
+          enroller_user_in_section(@section_foo)
+          give_section_due_date(@assignment, @section_foo)
+          student_in_course_with_adhoc_override(@assignment, { unassign_item: "true" })
+          ensure_user_does_not_see_assignment
+        end
+
+        it "is visible with an unassigned section override and assigned adhoc override" do
+          enroller_user_in_section(@section_foo)
+          give_section_due_date(@assignment, @section_foo, { unassign_item: "true" })
+          student_in_course_with_adhoc_override(@assignment)
+          ensure_user_sees_assignment
+        end
+
+        it "does not apply context module section override with an unassigned section override" do
+          enroller_user_in_section(@section_foo)
+          module1 = @course.context_modules.create!(name: "Module 1")
+          @assignment.context_module_tags.create! context_module: module1, context: @course, tag_type: "context_module"
+
+          module_override = module1.assignment_overrides.create!
+
+          module_override.set_type = "CourseSection"
+          module_override.set_id = @section_foo
+          module_override.save!
+
+          give_section_due_date(@assignment, @section_foo, { unassign_item: "true" })
+
+          ensure_user_does_not_see_assignment
+        end
+
+        it "does not apply context module adhoc overrides with an unassigned adhoc override" do
+          module1 = @course.context_modules.create!(name: "Module 1")
+          @assignment.context_module_tags.create! context_module: module1, context: @course, tag_type: "context_module"
+
+          module_override = module1.assignment_overrides.create!
+          module_override.assignment_override_students.create!(user: @user)
+
+          student_in_course_with_adhoc_override(@assignment, { unassign_item: "true" })
+          ensure_user_does_not_see_assignment
+        end
+
+        it "does not unassign if the flag is off" do
+          Account.site_admin.disable_feature!(:differentiated_modules)
+          Setting.set("differentiated_modules_setting", Account.site_admin.feature_enabled?(:differentiated_modules) ? "true" : "false")
+          AssignmentStudentVisibility.reset_table_name
+          student_in_course_with_adhoc_override(@assignment, { unassign: "true" })
+          ensure_user_sees_assignment
         end
       end
 

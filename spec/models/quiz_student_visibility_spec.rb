@@ -54,6 +54,7 @@ describe "differentiated_assignments" do
     ao.title = "ADHOC OVERRIDE"
     ao.workflow_state = "active"
     ao.set_type = "ADHOC"
+    ao.unassign_item = opts[:unassign_item] || "false"
     ao.save!
     override_student = ao.assignment_override_students.build
     override_student.user = @user
@@ -89,10 +90,11 @@ describe "differentiated_assignments" do
     quiz.reload
   end
 
-  def give_section_foo_due_date(quiz)
+  def give_section_foo_due_date(quiz, opts = {})
     create_override_for_quiz(quiz) do |ao|
       ao.set = @section_foo
       ao.due_at = 3.weeks.from_now
+      ao.unassign_item = opts[:unassign_item] || "false"
     end
   end
 
@@ -348,6 +350,75 @@ describe "differentiated_assignments" do
         module_override.assignment_override_students.create!(user: @user)
 
         ensure_user_does_not_see_quiz
+      end
+    end
+
+    context "unassign item overrides" do
+      before do
+        Account.site_admin.enable_feature!(:differentiated_modules)
+        Setting.set("differentiated_modules_setting", Account.site_admin.feature_enabled?(:differentiated_modules) ? "true" : "false")
+        Quizzes::QuizStudentVisibility.reset_table_name
+        quiz_with_true_only_visible_to_overrides
+      end
+
+      it "is not visible with an unassigned adhoc override" do
+        student_in_course_with_adhoc_override(@quiz, { unassign_item: "true" })
+        ensure_user_does_not_see_quiz
+      end
+
+      it "is not visible with an unassigned section override" do
+        enroller_user_in_section(@section_foo)
+        give_section_foo_due_date(@quiz, { unassign_item: "true" })
+        ensure_user_does_not_see_quiz
+      end
+
+      it "is not visible with an unassigned adhoc override and assigned section override" do
+        enroller_user_in_section(@section_foo)
+        give_section_foo_due_date(@quiz)
+        student_in_course_with_adhoc_override(@quiz, { unassign_item: "true" })
+        ensure_user_does_not_see_quiz
+      end
+
+      it "is visible with an unassigned section override and assigned adhoc override" do
+        enroller_user_in_section(@section_foo)
+        give_section_foo_due_date(@quiz, { unassign_item: "true" })
+        student_in_course_with_adhoc_override(@quiz)
+        ensure_user_sees_quiz
+      end
+
+      it "does not apply context module section override with an unassigned section override" do
+        enroller_user_in_section(@section_foo)
+        module1 = @course.context_modules.create!(name: "Module 1")
+        @quiz.context_module_tags.create! context_module: module1, context: @course, tag_type: "context_module"
+
+        module_override = module1.assignment_overrides.create!
+
+        module_override.set_type = "CourseSection"
+        module_override.set_id = @section_foo
+        module_override.save!
+
+        give_section_foo_due_date(@quiz, { unassign_item: "true" })
+
+        ensure_user_does_not_see_quiz
+      end
+
+      it "does not apply context module adhoc overrides with an unassigned adhoc override" do
+        module1 = @course.context_modules.create!(name: "Module 1")
+        @quiz.context_module_tags.create! context_module: module1, context: @course, tag_type: "context_module"
+
+        module_override = module1.assignment_overrides.create!
+        module_override.assignment_override_students.create!(user: @user)
+
+        student_in_course_with_adhoc_override(@quiz, { unassign_item: "true" })
+        ensure_user_does_not_see_quiz
+      end
+
+      it "does not unassign if the flag is off" do
+        Account.site_admin.disable_feature!(:differentiated_modules)
+        Setting.set("differentiated_modules_setting", Account.site_admin.feature_enabled?(:differentiated_modules) ? "true" : "false")
+        Quizzes::QuizStudentVisibility.reset_table_name
+        student_in_course_with_adhoc_override(@quiz, { unassign: "true" })
+        ensure_user_sees_quiz
       end
     end
 
