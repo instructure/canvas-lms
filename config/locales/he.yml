@@ -4136,6 +4136,11 @@ he:
     by_sa: "הרשאה שימוש שניתנת להפצה הלאה באותם תנאי שימוש ועם קרדיט למחבר"
     private: "פרטי (מוגן בזכויות יוצרים)"
     public_domain: "נחלת הכלל"
+  cc_attribution_f6de631f: "הרשאה שימוש עם קרדיט למחבר"
+  cc_attribution_no_derivatives_b006744f: "הרשאה שימוש ללא שינויים עם קרדיט למחבר"
+  cc_attribution_non_commercial_39e0d30d: "הרשאת שימוש שאינה מסחרית עם קרדיט למחבר"
+  cc_attribution_non_commercial_no_derivatives_9fe74c00: "הרשאה שימוש שאינה מסחרית וללא שינויים עם קרדיט למחבר"
+  cc_attribution_non_commercial_share_alike_c7edb1e5: "הרשאה שימוש שאינה מסחרית וניתנת להפצה הלאה באותם תנאי שימוש ועם קרדיט למחבר"
   cell_number_69a7c309: "מספר סלולרי"
   cell_number_is_invalid_bd6faee0: "מספר טלפון לא חוקי!"
   cell_number_is_required_2edcee60: "נדרש מספר טלפון"
@@ -5858,6 +5863,7 @@ he:
   course_sis_7ae8f649: "המערכת הבית ספרית של הקורס"
   course_sis_df8b379: "המערכת הבית ספרית של הקורס"
   course_sis_id_bbed1a60: "מזהה הקורס במערכת הבית ספרית"
+  course_sis_id_cd834b3c: "מזהה קורס במערכת הבית ספרית"
   course_sis_id_sis_id_or_canvas_id_4d323f5c: "מזהה קורס  מערכת בית ספרית או של קנבס  SIS ID (SIS_ID:####) OR Canvas ID: (###)"
   course_starts_at_3a01f9da: "קורס מתחיל ב"
   course_statistics: 
@@ -6465,6 +6471,7 @@ he:
     registered_services: "שרותים רשומים"
     revisions: גירסאות
     rubrics: רובריקות
+    search: חיפוש
     settings: הגדרות
     site_admin: "מנהל אתר"
     stats: סטטיסטיקות
@@ -6789,6 +6796,7 @@ he:
   default_grade_cannot_be_set_to_ex_723caa59: "ציון ברירת מחדל לא יכול להיות %{ex}"
   default_grading_scheme_894a0eb: "ברירת מחדל של סכמת הערכה"
   default_order_8c409051: "סדר ברירת המחדל"
+  default_question_bank_c7bcc5e7: "בנק שאלות ברירת מחדל"
   default_question_name: שאלה
   default_question_text: "תוכן שאלה"
   default_sis_sync_for_assignments_quizzes_grade_dis_3b2b4878: "התאמת ברירת מחדל עם המערכת הבית ספרית למטלות, בחנים ודיון בהערכות"
@@ -13893,6 +13901,8 @@ he:
     overrides: 
       everyone: "כל אחד"
   overwrite_already_entered_grades_64a98037: "דריסת הערכות שכבר התבצעו"
+  overwrite_assessment_content_with_matching_ids_b388f114: "דריסת תוכן הערכות עם מזהה דומה"
+  overwrite_assessment_help_icon_875d00a5: "צלמית עזרה בדריסת הערכה"
   own_copyright_cc59db55: "בעל זכויות יוצרים"
   owner_email_4d02f795: "בעל כתובת הדוא\"ל"
   package_error: "טעות בזיהוי סוג חבילת תכנה: %{error}"
@@ -17257,6 +17267,7 @@ he:
   select_one_of_the_options_c8b0c6e4: "בחירת אחת האפשרויות:"
   select_prerequisite_module_57894963: "בחירת מודול המהווה דרישה מוקדמת"
   select_prerequite_module_e9042bb0: "בחירת מודול המהווה דרישה מוקדמת"
+  select_question_bank_508e5c08: "בחירת בנק שאלות"
   select_specific_content_5382e7ea: "בחירת תוכן ספציפי"
   select_student_name_caaff244: "בחירת התלמיד %{name}"
   select_students_for_review_6e004a12: "בחירת תלמידים לביקורת"
@@ -18243,6 +18254,7 @@ he:
   some_settings_have_been_administratively_locked_9e3ee880: "כמה מההגדרות ננעלו ע\"י מנהלי המערכת"
   some_settings_have_been_disabled_because_the_assig_6b6cc3b4: "חלק מההגדרות ננעלו כיון שהמטלה מוגדת בתחום תקופת הערכה שנסגרה"
   some_submissions_are_not_gradeable_grade_changes_f_f8bf44e2: "כמה מההגשות אינן ברות הערכה. שינויים בהערכות של הגשות אלו לא נשמרו"
+  some_systems_recycle_their_ids_for_each_new_export_884b8e46: "מערכות מסוימות נוהגות למחזר את המזהה שלהן לכל ייצוא חדש. כתוצאה מכך, אם הייצוא של כולל שני בנקי שאלות נפרדים הם יקבלו את אותו המזהה. כדי למנוע איבוד נתוני הערכה אנו מטפלים בפריטים אלו כנפרדים למרות המזהים שלהם. בחירת אפשרות זו תנטרל את אמצעי זהירות זה ותאפשר לנתוני הערכה לדרוס נתונים קיימים עם אותו מזהה."
   someone: מישהו/י
   someone_bbbc538b: מישהו/י
   something_is_broken_but_i_can_work_around_it_for_n_7fcedb9d: "משהו אינו תקין אבל בשלב זה אוכל לעקוף את הבעיה"
@@ -18792,6 +18804,7 @@ he:
     profile: פרופיל
     quizzes: בחנים
     rubrics: רובריקות
+    search: חיפוש
     settings: הגדרות
     syllabus: סילבוס
     tab_location_error: "מיקום הלשונית הזו אינו חוקי"
