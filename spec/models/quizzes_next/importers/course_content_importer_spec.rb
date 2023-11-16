@@ -36,6 +36,14 @@ describe QuizzesNext::Importers::CourseContentImporter do
       quiz01.build_assignment
       quiz01.assignment
     end
+    let!(:quiz01_context_module_tag) do
+      ContentTag.create!(
+        context: course,
+        content: quiz01,
+        title: "Some Module",
+        tag_type: "context_module"
+      )
+    end
     let!(:quiz02) do
       Quizzes::Quiz.create(
         context: course
@@ -93,12 +101,17 @@ describe QuizzesNext::Importers::CourseContentImporter do
         expect(migration.workflow_state).not_to eq("imported")
         original_setup_assets_imported.call(lti_assignment_quiz_set)
       end
-      expect { importer.import_content(double) }.to change(Assignment, :count).by(3)
+      expect(quiz01_context_module_tag.content).to eq(quiz01)
+      expect(quiz01_context_module_tag.content_type).to eq("Quizzes::Quiz")
+
+      expect { importer.import_content(double) }
+        .to change(Assignment, :count).by(3)
+
       expect(migration.workflow_state).to eq("imported")
-      practice_assginment = Assignment.find_by(title: practice_quiz_title)
+      practice_assignment = Assignment.find_by(title: practice_quiz_title)
       survey_assignment = Assignment.find_by(title: survey_quiz_title)
       ungraded_survey_assignment = Assignment.find_by(title: ungraded_survey_title)
-      expect(practice_assginment).not_to be_nil
+      expect(practice_assignment).not_to be_nil
       expect(survey_assignment).not_to be_nil
       expect(ungraded_survey_assignment).not_to be_nil
       expect(migration.migration_settings[:imported_assets][:lti_assignment_quiz_set])
@@ -106,11 +119,13 @@ describe QuizzesNext::Importers::CourseContentImporter do
                  [assignment01.global_id, quiz01.global_id],
                  [assignment02.global_id, quiz02.global_id],
                  [quiz03.assignment.global_id, quiz03.global_id],
-                 [practice_assginment.global_id, practice_quiz.global_id],
+                 [practice_assignment.global_id, practice_quiz.global_id],
                  [survey_assignment.global_id, survey_quiz.global_id],
                  [ungraded_survey_assignment.global_id, ungraded_survey.global_id]
                ])
-      expect(practice_assginment.omit_from_final_grade).to be(true)
+      expect(practice_assignment.omit_from_final_grade).to be(true)
+      expect(quiz01_context_module_tag.reload.content).to eq(assignment01)
+      expect(quiz01_context_module_tag.content_type).to eq("Assignment")
     end
   end
 

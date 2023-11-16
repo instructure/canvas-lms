@@ -51,12 +51,26 @@ module QuizzesNext::Importers
           assignment.save!
         end
 
+        # For Quizzes::Quiz, the context_module_tags are associated with the quiz
+        # This migrates context_module_tags over to the assignment so that modules
+        # are retained for Quizzes.Next.
+        migrate_context_module_tags(quiz, assignment)
+
         # Quizzes will be created in Quizzes.Next app
         # assignment.quiz_lti! breaks relation to quiz. Destroying Quizzes:Quiz wouldn't
         # mark assignment to be deleted.
         quiz.destroy
       end
       setup_assets_imported(lti_assignment_quiz_set)
+    end
+
+    def migrate_context_module_tags(quiz, assignment)
+      return unless quiz && assignment
+
+      quiz.context_module_tags.find_each do |tag|
+        tag.content = assignment
+        tag.save!
+      end
     end
 
     def quiz_assignment(quiz)
