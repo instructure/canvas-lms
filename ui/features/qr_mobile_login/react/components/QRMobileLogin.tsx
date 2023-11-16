@@ -30,7 +30,6 @@ import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {fromNow} from '@canvas/fuzzy-relative-time'
-import {number, bool} from 'prop-types'
 
 const I18n = useI18nScope('QRMobileLogin')
 
@@ -46,7 +45,15 @@ const DISPLAY_STATE = {
 
 const modalLabel = () => I18n.t('Confirm QR code display')
 
-export function QRMobileLogin({refreshInterval, pollInterval, withWarning}) {
+export function QRMobileLogin({
+  refreshInterval,
+  pollInterval,
+  withWarning,
+}: {
+  refreshInterval: number
+  pollInterval: number
+  withWarning: boolean
+}) {
   const [imagePng, setImagePng] = useState(null)
   const [validFor, setValidFor] = useState(null)
   const [display, setDisplay] = useState(
@@ -117,12 +124,12 @@ export function QRMobileLogin({refreshInterval, pollInterval, withWarning}) {
   }
 
   function startTimedEvents() {
-    let timerId = null
+    let timerId: number
     let isFetching = false
-    let validUntil = null
-    let refetchAt = null
+    let validUntil: number | undefined
+    let refetchAt: number | undefined
 
-    function displayValidFor(expireTime) {
+    function displayValidFor(expireTime?: number) {
       if (expireTime) validUntil = expireTime
       if (validUntil) {
         const newValidFor =
@@ -145,7 +152,7 @@ export function QRMobileLogin({refreshInterval, pollInterval, withWarning}) {
       } catch (err) {
         showFlashAlert({
           message: I18n.t('An error occurred while retrieving your QR Code'),
-          err,
+          err: err instanceof Error ? err : null,
         })
       } finally {
         isFetching = false
@@ -155,7 +162,7 @@ export function QRMobileLogin({refreshInterval, pollInterval, withWarning}) {
     function poll() {
       displayValidFor()
       if (!isFetching && (!refetchAt || Date.now() > refetchAt)) getQRCode()
-      timerId = setTimeout(poll, pollInterval)
+      timerId = setTimeout(poll, pollInterval) as unknown as number
     }
 
     if (display === DISPLAY_STATE.displayed) poll()
@@ -174,7 +181,15 @@ export function QRMobileLogin({refreshInterval, pollInterval, withWarning}) {
           <Heading level="h1">{I18n.t('QR for Mobile Login')}</Heading>
         </Flex.Item>
         <Flex.Item>
-          <View {...flexViewProps}>
+          <View
+            borderColor="primary"
+            borderWidth="small"
+            borderRadius="medium"
+            padding="medium"
+            margin="medium small"
+            maxWidth="30rem"
+            as="div"
+          >
             {renderQRCode()}
             {validFor && display === DISPLAY_STATE.displayed && (
               <Text weight="light" size="small">
@@ -236,22 +251,6 @@ export function QRMobileLogin({refreshInterval, pollInterval, withWarning}) {
       </Modal>
     </>
   )
-}
-
-const flexViewProps = {
-  borderColor: 'primary',
-  borderWidth: 'small',
-  borderRadius: 'medium',
-  padding: 'medium',
-  margin: 'medium small',
-  maxWidth: '30rem',
-  as: 'div',
-}
-
-QRMobileLogin.propTypes = {
-  refreshInterval: number,
-  pollInterval: number,
-  withWarning: bool,
 }
 
 QRMobileLogin.defaultProps = {

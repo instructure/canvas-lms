@@ -67,7 +67,7 @@ describe('QRMobileLogin', () => {
     })
 
     // advances both global time and the jest timers by the given time duration
-    function advance(delay) {
+    function advance(delay: number) {
       act(() => {
         const now = Date.now()
         jest.setSystemTime(now + delay)
@@ -77,7 +77,7 @@ describe('QRMobileLogin', () => {
 
     it('renders the image in the response, and the right expiration time', async () => {
       const {findByTestId, getByText} = render(<QRMobileLogin />)
-      const image = await findByTestId('qr-code-image')
+      const image = (await findByTestId('qr-code-image')) as HTMLImageElement
       expect(image.src).toBe(`data:image/png;base64, ${loginImageJsons[0].png}`)
       expect(getByText(/expires in 10 minutes/i)).toBeInTheDocument()
     })
@@ -105,7 +105,7 @@ describe('QRMobileLogin', () => {
     it('refreshes the code at the right time', async () => {
       const refreshInterval = 2 * MINUTES
       const {findByText, findByTestId} = render(<QRMobileLogin refreshInterval={refreshInterval} />)
-      const image = await findByTestId('qr-code-image')
+      const image = (await findByTestId('qr-code-image')) as HTMLImageElement
       expect(image.src).toBe(`data:image/png;base64, ${loginImageJsons[0].png}`)
       expect(fetchMock.calls(route)).toHaveLength(1)
       advance(1 * MINUTES)
@@ -151,7 +151,9 @@ describe('QRMobileLogin', () => {
     it('cancels the modal and displays no code when header close button is clicked', async () => {
       fetchMock.post(route, loginImageJsons[0], {overwriteRoutes: true})
       const {getByTestId, findByText, queryByTestId} = render(<QRMobileLogin withWarning={true} />)
-      const cancelButton = getByTestId('qr-header-close-button').querySelector('button')
+      const cancelButton = getByTestId('qr-header-close-button').querySelector(
+        'button'
+      ) as HTMLButtonElement
       fireEvent.click(cancelButton)
       await findByText(/qr code display was canceled/i)
       expect(queryByTestId('qr-code-image')).toBeNull()
