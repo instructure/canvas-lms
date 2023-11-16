@@ -54,11 +54,11 @@ class Mutations::AssignmentInputBase < GraphQL::Schema::InputObject
   argument :grading_type, Types::AssignmentType::AssignmentGradingType, required: false
   argument :grading_standard_id, ID, required: false
   argument :lock_at, Types::DateTimeType, required: false
-  argument :name, String, required: false
   argument :peer_reviews, Mutations::AssignmentPeerReviewsUpdate, required: false
   argument :points_possible, Float, required: false
   argument :unlock_at, Types::DateTimeType, required: false
   argument :post_to_sis, Boolean, required: false
+  argument :only_visible_to_overrides, Boolean, required: false
 end
 
 class Mutations::AssignmentCreate < Mutations::AssignmentInputBase
