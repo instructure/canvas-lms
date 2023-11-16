@@ -1718,8 +1718,37 @@ describe Attachment do
   end
 
   context "download/inline urls" do
+    subject { attachment.public_download_url }
+
     before :once do
       course_model
+    end
+
+    context "when the attachment context is a ContentExport" do
+      let(:attachment) do
+        content_export = ContentExport.new(id: 1)
+        Attachment.new(
+          id: 1,
+          context: content_export,
+          display_name: "attachment",
+          uuid: SecureRandom.uuid
+        )
+      end
+
+      it { is_expected.to eq "http://localhost/files/#{attachment.id}/download?verifier=#{attachment.uuid}" }
+    end
+
+    context "when the attachment context is not a ContentExport" do
+      let(:attachment) do
+        Attachment.new(
+          id: 1,
+          context: @course,
+          display_name: "attachment",
+          uuid: SecureRandom.uuid
+        )
+      end
+
+      it { is_expected.to eq "http://localhost/courses/#{@course.id}/files/#{attachment.id}/download?verifier=#{attachment.uuid}" }
     end
 
     it "works with s3 storage" do
