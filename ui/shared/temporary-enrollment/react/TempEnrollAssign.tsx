@@ -279,7 +279,7 @@ export function TempEnrollAssign(props: Props) {
         const result = await doFetchApi({
           path: `/api/v1/users/${userProps.id}/courses`,
           params: {
-            enrollment_state: 'active',
+            enrollment_state: ['active', 'completed'],
             include: ['sections'],
             per_page: MAX_ALLOWED_COURSES_PER_PAGE,
           },

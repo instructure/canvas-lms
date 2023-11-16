@@ -51,6 +51,7 @@ const mockEnrollment: Enrollment = {
   end_at: '2023-06-01T00:00:00Z',
   role_id: '5',
   user: mockSomeUser,
+  enrollment_state: 'active',
   temporary_enrollment_pairing_id: 2,
   temporary_enrollment_source_user_id: 3,
   type: 'TeacherEnrollment',

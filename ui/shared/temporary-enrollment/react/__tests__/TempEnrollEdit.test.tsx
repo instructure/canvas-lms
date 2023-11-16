@@ -250,6 +250,7 @@ describe('TempEnrollEdit component', () => {
       id: '0',
       role_id: '',
       start_at: '',
+      enrollment_state: '',
       temporary_enrollment_source_user_id: 0,
       type: '',
       user: mockRecipientUser,

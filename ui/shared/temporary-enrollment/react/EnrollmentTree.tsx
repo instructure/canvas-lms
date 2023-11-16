@@ -43,7 +43,7 @@ export interface NodeStructure {
   isToggle?: boolean
   label: string
   parent?: NodeStructure
-  workState?: string
+  workflowState?: string
 }
 
 export function EnrollmentTree(props: Props) {
@@ -134,13 +134,17 @@ export function EnrollmentTree(props: Props) {
         if (!roleData) {
           return
         }
+        const courseCheckedByDefault =
+          course.workflow_state === 'available' &&
+          enrollment.enrollment_state === 'active' &&
+          roleData.base_role_name === 'TeacherEnrollment'
         // unique id for each role
         const roleId = 'r' + enrollment.role_id
         let roleCheck: boolean
         if (courseEnrollmentMap) {
           roleCheck = course.id === courseEnrollmentMap.get(course.id)?.course_id
         } else {
-          roleCheck = roleData.base_role_name === 'TeacherEnrollment'
+          roleCheck = false
         }
         let roleNode = {
           id: roleId,
@@ -160,10 +164,10 @@ export function EnrollmentTree(props: Props) {
           id: cId,
           label: course.name,
           parent: roleNode,
-          isCheck: props.tempEnrollmentsPairing ? roleCheck : roleNode.isCheck,
+          isCheck: props.tempEnrollmentsPairing ? roleCheck : courseCheckedByDefault,
           children: childArray,
           isToggle: false,
-          workState: course.workflow_state,
+          workflowState: course.workflow_state,
           isMixed: false,
         }
         courseNode = findOrAppendNewNode(courseNode, roleNode.children)
@@ -191,7 +195,7 @@ export function EnrollmentTree(props: Props) {
           }
           findOrAppendNewNode(sectionNode, courseNode.children)
         })
-        if (courseEnrollmentMap) {
+        if (courseEnrollmentMap || courseCheckedByDefault) {
           updateParentBasedOnChildren(courseNode)
           updateParentBasedOnChildren(roleNode)
         }

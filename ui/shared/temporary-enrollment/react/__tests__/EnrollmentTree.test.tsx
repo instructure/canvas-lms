@@ -41,6 +41,12 @@ const props: Props = {
       label: 'DesignRole',
       base_role_name: 'DesignerEnrollment',
     },
+    {
+      id: '4',
+      role: 'CustomTeacherEnrollment',
+      label: 'TeacherRole',
+      base_role_name: 'TeacherEnrollment',
+    },
   ],
   selectedRole: {
     id: '',
@@ -54,6 +60,7 @@ const props: Props = {
       enrollments: [
         {
           role_id: '1',
+          enrollment_state: 'active',
         },
       ],
       sections: [
@@ -71,6 +78,7 @@ const props: Props = {
       enrollments: [
         {
           role_id: '2',
+          enrollment_state: 'active',
         },
       ],
       sections: [
@@ -88,6 +96,7 @@ const props: Props = {
       enrollments: [
         {
           role_id: '3',
+          enrollment_state: 'active',
         },
       ],
       sections: [
@@ -95,6 +104,24 @@ const props: Props = {
           id: '2',
           name: 'Section 2',
           enrollment_role: 'DesignerEnrollment',
+        },
+      ],
+    },
+    {
+      id: '2',
+      name: 'Studio Beats',
+      workflow_state: 'unpublished',
+      enrollments: [
+        {
+          role_id: '4',
+          enrollment_state: 'active',
+        },
+      ],
+      sections: [
+        {
+          id: '3',
+          name: 'Default Section',
+          enrollment_role: 'TeacherEnrollment',
         },
       ],
     },
@@ -156,6 +183,21 @@ describe('EnrollmentTree', () => {
 
     const checkedBox = getByRole('checkbox', {checked: true})
     expect(checkedBox.getAttribute('data-testid')).toMatch('check r2')
+  })
+
+  it('does not select unpublished course enrollments by default', async () => {
+    const {queryByText, getByTestId} = render(<EnrollmentTree {...props} />)
+
+    expect(queryByText('TeacherRole')).toBeInTheDocument()
+    expect(queryByText('SubTeacherRole')).toBeInTheDocument()
+
+    const subTeacherCheckbox = getByTestId('check r2') as HTMLInputElement
+    expect(subTeacherCheckbox.checked).toBe(true)
+    const teacherCheckbox = getByTestId('check r4') as HTMLInputElement
+    expect(teacherCheckbox.checked).toBe(false)
+
+    expect(queryByText('Toggle group TeacherRole')).toBeInTheDocument()
+    expect(queryByText('Toggle group SubTeacherRole')).toBeInTheDocument()
   })
 
   it('shows enrollments in one section with different roles under respective role groups', async () => {
