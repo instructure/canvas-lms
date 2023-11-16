@@ -120,5 +120,24 @@ module FeatureFlags
       # app/models/assignment_student_visibility.rb
       Setting.set("differentiated_modules_setting", (new_state == "on") ? "true" : "false")
     end
+
+    def self.archive_outcomes_after_change_hook(_user, context, _old_state, new_state)
+      # Get all root accounts that isn't the site admin account
+      root_accounts = Account.active.excluding(context).where(parent_account_id: nil)
+      # Filter out root accounts that aren't OS enabled
+      os_enabled_ras = root_accounts.select { |ra| OutcomesService::Service.enabled_in_context?(ra) }
+      os_enabled_ras.each do |account|
+        OutcomesService::Service.delay_if_production(priority: Delayed::LOW_PRIORITY,
+                                                     n_strand: [
+                                                       "outcomes_service_toggle_archive_outcomes_feature_flag",
+                                                       account.global_root_account_id
+                                                     ])
+                                .toggle_feature_flag(
+                                  account,
+                                  "archive_outcomes",
+                                  new_state == "on"
+                                )
+      end
+    end
   end
 end
