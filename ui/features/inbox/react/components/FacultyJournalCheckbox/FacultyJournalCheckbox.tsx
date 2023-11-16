@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import PropTypes from 'prop-types'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Responsive} from '@instructure/ui-responsive'
@@ -25,10 +24,16 @@ import {responsiveQuerySizes} from '../../../util/utils'
 
 const I18n = useI18nScope('conversations_2')
 
-export const FacultyJournalCheckBox = props => {
+type Props = {
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
+  checked?: boolean
+}
+
+export const FacultyJournalCheckBox = (props: Props) => {
   return (
     <Responsive
       match="media"
+      // @ts-expect-error
       query={responsiveQuerySizes({mobile: true, desktop: true})}
       props={{
         mobile: {
@@ -42,20 +47,17 @@ export const FacultyJournalCheckBox = props => {
       }}
       render={responsiveProps => (
         <Checkbox
+          // @ts-expect-error
           data-testid={responsiveProps.dataTestId}
           label={I18n.t('Add as a Faculty Journal entry')}
           size="small"
+          // @ts-expect-error
           variant={responsiveProps.variant}
           {...props}
         />
       )}
     />
   )
-}
-
-FacultyJournalCheckBox.propTypes = {
-  onChange: PropTypes.func.isRequired,
-  checked: PropTypes.bool,
 }
 
 FacultyJournalCheckBox.defaultProps = {

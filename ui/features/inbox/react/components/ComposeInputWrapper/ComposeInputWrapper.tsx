@@ -16,43 +16,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import PropTypes from 'prop-types'
 import React from 'react'
-
 import {Flex} from '@instructure/ui-flex'
-import {Modal} from '@instructure/ui-modal'
-import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 
-const ModalSpinner = props => (
-  <Modal
-    open={props.open}
-    label={props.label}
-    shouldCloseOnDocumentClick={false}
-    onExited={props.onExited}
-  >
-    <Modal.Body>
-      <Flex direction="column" textAlign="center">
-        <Flex.Item>
-          <Spinner renderTitle={props.label} size="large" />
-        </Flex.Item>
-        <Flex.Item>
-          <Text>{props.message}</Text>
-        </Flex.Item>
-      </Flex>
-    </Modal.Body>
-  </Modal>
-)
-
-ModalSpinner.defaultProps = {
-  open: true,
+type Props = {
+  title?: React.ReactNode
+  input: React.ReactNode
 }
 
-ModalSpinner.propTypes = {
-  label: PropTypes.string,
-  message: PropTypes.string,
-  onExited: PropTypes.func,
-  open: PropTypes.bool,
+export const ComposeInputWrapper = (props: Props) => {
+  return (
+    <Flex width="100%" direction="column">
+      {props.title && (
+        <Flex.Item padding="none none none xx-small">
+          <Text weight="bold">{props.title}</Text>
+        </Flex.Item>
+      )}
+      <Flex.Item shouldGrow={true} shouldShrink={true} padding="xx-small">
+        {props.input}
+      </Flex.Item>
+    </Flex>
+  )
 }
-
-export default ModalSpinner

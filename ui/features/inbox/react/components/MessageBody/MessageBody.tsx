@@ -16,19 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import PropTypes from 'prop-types'
 import React, {useState} from 'react'
-
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextArea} from '@instructure/ui-text-area'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('conversations_2')
 
-export const MessageBody = props => {
+type Message = {
+  text: string
+  type: 'error' | 'hint' | 'success' | 'screenreader-only'
+}
+
+type Props = {
+  onBodyChange: (body: string) => void
+  messages: Message[]
+}
+
+export const MessageBody = (props: Props) => {
   const [body, setBody] = useState('')
 
-  const handleBodyChange = e => {
+  const handleBodyChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setBody(e.target.value)
     props.onBodyChange(e.target.value)
   }
@@ -45,14 +53,4 @@ export const MessageBody = props => {
       data-testid="message-body"
     />
   )
-}
-
-MessageBody.propTypes = {
-  onBodyChange: PropTypes.func.isRequired,
-  messages: PropTypes.arrayOf(
-    PropTypes.shape({
-      text: PropTypes.string,
-      type: PropTypes.string,
-    })
-  ),
 }
