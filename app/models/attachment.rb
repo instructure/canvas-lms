@@ -75,6 +75,8 @@ class Attachment < ActiveRecord::Base
   VALID_CATEGORIES = [ICON_MAKER_ICONS, UNCATEGORIZED].freeze
   VALID_VISIBILITIES = %w[inherit context institution public].freeze
 
+  NO_PREFIX_CONTEXT_TYPES = [ContentExport].freeze
+
   NOTIFICATION_MAX_DISPLAY = 20
 
   include HasContentTags
@@ -1004,7 +1006,16 @@ class Attachment < ActiveRecord::Base
   end
 
   def local_storage_path
-    "#{HostUrl.context_host(context)}/#{context_type.underscore.pluralize}/#{context_id}/files/#{id}/download?verifier=#{uuid}"
+    "#{HostUrl.context_host(context)}#{context_path_prefix_for(context:)}/files/#{id}/download?verifier=#{uuid}"
+  end
+
+  def context_path_prefix_for(context:)
+    # Some context types (like ContentExport) don't have a Canvas route
+    # that includes the "context prefix" (e.g. "/content_exports/1/files/...").
+    # In those cases, use the base files path rather than a context prefix.
+    return if NO_PREFIX_CONTEXT_TYPES.include? context.class
+
+    "/#{context.class.to_s.underscore.pluralize}/#{context.id}"
   end
 
   def content_type_with_encoding
