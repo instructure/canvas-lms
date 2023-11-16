@@ -5239,6 +5239,11 @@ fa:
     by_sa: "ارجاع کریتیو کامنز، اشتراک سازی یکسان"
     private: "خصوصی (دارای حق تکثیر)"
     public_domain: "دامنه عمومی"
+  cc_attribution_f6de631f: "ارجاع کریتیو کامنز"
+  cc_attribution_no_derivatives_b006744f: "ارجاع کریتیو کامنز، بدون آثار اشتقاقی"
+  cc_attribution_non_commercial_39e0d30d: "ارجاع کریتیو کامنز، غیر تجاری"
+  cc_attribution_non_commercial_no_derivatives_9fe74c00: "ارجاع کریتیو کامنز، غیر تجاری، بدون آثار اشتقاقی"
+  cc_attribution_non_commercial_share_alike_c7edb1e5: "ارجاع کریتیو کامنز، غیر تجاری، اشتراک سازی یکسان"
   cc_subtitles_a0d16ff6: "کریتیو کامنز/زیرنویس"
   ccp_zero_activity_73d094c3: "فعالیت صفر CCP"
   cell_number_69a7c309: "شماره تلفن همراه"
@@ -7366,6 +7371,7 @@ fa:
   course_sis_7ae8f649: "سامانه اطلاعات دانشجویی درس"
   course_sis_df8b379: "سامانه اطلاعات دانشجویی درس"
   course_sis_id_bbed1a60: "شناسه درس در سامانه اطلاعات دانشجو"
+  course_sis_id_cd834b3c: "شناسه درس در سامانه اطلاعات دانشجو:"
   course_sis_id_sis_id_or_canvas_id_4d323f5c: "شناسه سامانه اطلاعات دانشجو درس (SIS_ID:####) یا شناسه کانواس: (###)"
   course_start_date_daae16ae: "تاریخ شروع درس"
   course_start_date_on_before_a3a32883: "تاریخ شروع دوره در/قبل"
@@ -8113,6 +8119,7 @@ fa:
     registered_services: "سرویس های ثبت شده"
     revisions: "تجدید نظرها"
     rubrics: "دستورالعمل های ارزیابی"
+    search: جستجو
     settings: تنظیمات
     site_admin: "مدیر تارنما"
     stats: آمار
@@ -8445,6 +8452,7 @@ fa:
   default_grade_cannot_be_set_to_ex_723caa59: "نمره پیش فرض را نمی توان روی %{ex} تعیین کرد"
   default_grading_scheme_894a0eb: "طرح نمره‌گذاری پیش فرض"
   default_order_8c409051: "ترتیب پیش فرض"
+  default_question_bank_c7bcc5e7: "مخزن پیش فرض پرسش"
   default_question_name: پرسش
   default_question_text: "متن پرسش"
   default_sis_sync_for_assignments_quizzes_grade_dis_3b2b4878: "همگام‌سازی پیش فرض سامانه اطلاعات دانشجو برای تکالیف، آزمون‌ها و بحث‌های نمره‌گذاری شده"
@@ -12564,6 +12572,7 @@ fa:
   import_1b31507: "وارد کردن"
   import_a_set_of_outcomes_6b782192: "مجموعه‌ای از نتایج را وارد کنید."
   import_anyway_8c996ef6: "در هر حالت وارد کن"
+  import_assessment_as_new_quizzes_help_icon_3e49480f: "وارد کردن ارزیابی بعنوان نماد راهنمای آزمونهای جدید"
   import_commons_favorites_e68fce81: "موارد دلخواه را وارد کنید"
   import_content_b2fd6620: "وارد کردن محتوا"
   import_e929507b: "وارد كردن..."
@@ -17192,8 +17201,11 @@ fa:
     overrides: 
       everyone: همه
   overview_of_student_status_a004bcf3: "مرور کلی بر وضعیت دانشجویی"
+  overwrite_848c08f: رونویسی
   overwrite_all_users_existing_default_dashboard_pre_9b2ad7d1: "تنظیمات دلخواه داشبورد پیش‌فرض‌های موجود همه‌ی کاربران را رونویسی کنید."
   overwrite_already_entered_grades_64a98037: "رونویسی نمره هایی که وارد شده اند"
+  overwrite_assessment_content_with_matching_ids_b388f114: "رونویسی محتوای ارزیابی با شناسه های منطبق"
+  overwrite_assessment_help_icon_875d00a5: "نماد راهنمای رونویسی ارزیابی"
   own_copyright_cc59db55: "حق نشر من"
   owner_email_236d1b2: "نشانی پست الکترونیکی مالک"
   owner_email_4d02f795: "نشانی پست الکترونیکی مالک:"
@@ -21049,6 +21061,7 @@ fa:
   select_page_e93fc123: "صفحه را انتخاب کنید"
   select_prerequisite_module_57894963: "انتخاب ماژول پیش نیاز"
   select_prerequite_module_e9042bb0: "انتخاب ماژول پیش‌نیاز"
+  select_question_bank_508e5c08: "انتخاب مخزن پرسش"
   select_rubric_2aa2ffa2: "انتخاب دستورالعمل ارزیابی"
   select_specific_content_5382e7ea: "انتخاب محتوای خاص"
   select_student_group_c0be9f3e: "گروه دانشجو را انتخاب کنید"
@@ -22222,6 +22235,7 @@ fa:
   some_settings_have_been_administratively_locked_9e3ee880: "برخی تنظیمات از لحاظ مدیریتی قفل شده اند."
   some_settings_have_been_disabled_because_the_assig_6b6cc3b4: "برخی تنظیمات به علت قرار گرفتن تکلیف در دوره نمره‌گذاری بسته شده، غیرفعال شده‌اند."
   some_submissions_are_not_gradeable_grade_changes_f_f8bf44e2: "بعضی موردهای ارسالی قابل نمره‌گذاری نیستند؛ تغییر نمره برای این موردها نادیده گرفته شده است."
+  some_systems_recycle_their_ids_for_each_new_export_884b8e46: "برخی از سیستم ها شناسه های خود را برای هر یک صدور جدید بازیابی می کنند. در نتیجه، اگر دو مخزن  پرسش جداگانه را صادر کنید، شناسه های یکسان خواهند داشت. برای جلوگیری از از دست رفتن داده های ارزیابی، علیرغم وجود این شناسه ها، این اشیاء را متفاوت در نظر می گیریم. انتخاب این گزینه این ویژگی ایمنی را غیر فعال می کند و امکان رونویسی داده های ارزیابی روی داده های موجود با شناسه های یکسان را فراهم می سازد."
   someone: "یک شخص"
   someone_bbbc538b: "یک شخص"
   someone_just_made_a_new_comment_on_the_anonymous_s_3627de61: "شخصی یک نظر جدید برای  یک مورد ارسالی ناشناس برای دانشجو (%{user_id}) برای %{assignment_title} ایجاد کرد. "
@@ -22994,6 +23008,7 @@ fa:
     quizzes: آزمون‌ها
     rubrics: "دستورالعمل های ارزیابی"
     schedule: "زمان بندی"
+    search: جستجو
     settings: تنظیمات
     syllabus: سرفصل
     tab_location_error: "مکان این زبانه معتبر نیست"
