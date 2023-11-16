@@ -4839,6 +4839,11 @@ hu:
     by_sa: "CC Nevezd meg!-Így add tovább!"
     private: "Magán (jogvédett)"
     public_domain: Közkincs
+  cc_attribution_f6de631f: "CC Nevezd meg!"
+  cc_attribution_no_derivatives_b006744f: "CC Nevezd meg!-Ne változtasd!"
+  cc_attribution_non_commercial_39e0d30d: "CC Nevezd meg!-Ne add el!"
+  cc_attribution_non_commercial_no_derivatives_9fe74c00: "CC Nevezd meg!-Ne add el!-Ne változtasd!"
+  cc_attribution_non_commercial_share_alike_c7edb1e5: "CC Nevezd meg!-Ne add el!-Így add tovább!"
   cc_subtitles_a0d16ff6: CC/Feliratok
   ccp_zero_activity_73d094c3: "CCP nulla aktivitás"
   cell_number_69a7c309: Mobilszám
@@ -6840,6 +6845,7 @@ hu:
   course_sis_7ae8f649: "kurzus sis"
   course_sis_df8b379: "Kurzus Sis"
   course_sis_id_bbed1a60: "kurzus sis azonosító"
+  course_sis_id_cd834b3c: "Kurzus SIS ID:"
   course_sis_id_sis_id_or_canvas_id_4d323f5c: "Kurzus SIS ID (SIS_ID:####) vagy Canvas ID: (###)"
   course_start_date_daae16ae: "Kurzus kezdési dátuma"
   course_start_date_on_before_a3a32883: "Kurzus kezdési dátum ekkor/ez előtt"
@@ -7440,6 +7446,7 @@ hu:
     registered_services: "Regisztrált szolgáltatások"
     revisions: Változatok
     rubrics: Értékelőtáblák
+    search: Keresés
     settings: Beállítások
     site_admin: rendszeradminisztrátor
     stats: Statisztikák
@@ -7772,6 +7779,7 @@ hu:
   default_grade_cannot_be_set_to_ex_723caa59: "Alapértelmezett osztályzat nem állítható be itt: %{ex}"
   default_grading_scheme_894a0eb: "Alapértelmezett osztályzási rendszer"
   default_order_8c409051: "Alapértelmezett sorrend"
+  default_question_bank_c7bcc5e7: "Alapértelmezett kérdésbank"
   default_question_name: Kérdés
   default_question_text: "Kérdés szövege"
   default_sis_sync_for_assignments_quizzes_grade_dis_3b2b4878: "Alapértelmezett SIS-szinkronizálás a feladatokhoz, kvízekhez és érdemjegy-beszélgetésekhez"
@@ -11243,6 +11251,7 @@ hu:
   immersive_reader_7b87538: "Imerzív olvasó"
   import_1b31507: Importálás
   import_a_set_of_outcomes_6b782192: "Tanulási eredményhalmaz importálása"
+  import_assessment_as_new_quizzes_help_icon_3e49480f: "Értékelés tartalmának importálása Új kvízekként súgó ikonja"
   import_content_b2fd6620: "Tartalom importálása"
   import_e929507b: Importálás...
   import_learning_outcomes_36d28a2b: "Tanulási eredmények importálása"
@@ -15106,6 +15115,8 @@ hu:
       everyone: Mindenki
   overwrite_all_users_existing_default_dashboard_pre_9b2ad7d1: "Az összes felhasználó létező alapértelmezett vezérlőpult preferenciáinak felülírása"
   overwrite_already_entered_grades_64a98037: "Már bejegyzett értékelések felülírása"
+  overwrite_assessment_content_with_matching_ids_b388f114: "Értékelések tartalmának felülírása egyező azonosítóval"
+  overwrite_assessment_help_icon_875d00a5: "Értékelés felülírás súgó ikonja"
   own_copyright_cc59db55: "Szerzői jog birtoklása"
   owner_email_4d02f795: "Tulajdonosi e-mail:"
   package_error: "Hiba történt a csomag azonosításakor: %{error}"
@@ -18264,6 +18275,7 @@ hu:
   select_one_b647b384: "Válasszon egyet"
   select_prerequisite_module_57894963: "Előfeltétel modul kiválasztása"
   select_prerequite_module_e9042bb0: "Előfeltétel modul kiválasztása"
+  select_question_bank_508e5c08: "Kérdésbank kiválasztása"
   select_rubric_2aa2ffa2: "Értékelőtábla kiválasztása"
   select_specific_content_5382e7ea: "Adott tartalom kiválasztása "
   select_student_group_c0be9f3e: "Hallgató csoport kiválasztása"
@@ -19110,6 +19122,7 @@ hu:
   some_conferences_on_this_page_are_hidden_because_o_789684fd: "Néhány konferencia rejtve van az oldalon, mert a státuszuk lekérdezése közben hiba történt"
   some_custom_columns_could_not_be_changed_because_t_88abc9be: "Néhány személyre szabott oszlopot nem lehetett megváltoztatni, mert azok csak olvashatók voltak; ezen oszlopok változásai figyelmen kívül hagyva."
   some_submissions_are_not_gradeable_grade_changes_f_f8bf44e2: "Néhány beadás nem osztályozható; érdemjegy változtatások ezekhez a beadásokhoz figyelmen kívül hagyva."
+  some_systems_recycle_their_ids_for_each_new_export_884b8e46: "Néhány rendszer újrahasználja az azonosítóit minden egyes új exportálás alkalmával. Ennek eredményeképpen, ha exportál két kérdésbankot, azoknak ugyanolyan azonosítói lesznek. Az adatvesztés megakadályozása érdekében mi ezeket az objektumokat különállóként kezeljük az azonosítók ellenére. Ennek az opciónak a kiválasztásával ez a biztonsági funkció letiltásra kerül és engedélyezve lesz, hogy az értékelési adatok felülírjanak létező adatokat megegyező azonosítóval."
   someone: Valaki
   someone_bbbc538b: Valaki
   someone_just_made_a_new_comment_on_the_anonymous_s_3627de61: "Valaki épp új megjegyzést fűzött egy hallgató (%{user_id}) névtelenül beadott munkájához: %{assignment_title}"
@@ -19676,6 +19689,7 @@ hu:
     people: Résztvevők
     quizzes: Kvízek
     rubrics: Értékelőtáblák
+    search: Keresés
     settings: Beállítások
     syllabus: Tematika
     tab_location_error: "Ezen fülelhelyezés helytelen."
