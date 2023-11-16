@@ -4334,6 +4334,11 @@ tr:
     by_sa: "CC Özelliği İlk lisans modeli korunacak"
     private: "Özel (Telif Hakkı Saklı)"
     public_domain: "Herkese Açık"
+  cc_attribution_f6de631f: "CC Özelliği"
+  cc_attribution_no_derivatives_b006744f: "CC Özelliği Özgün hali korunacak"
+  cc_attribution_non_commercial_39e0d30d: "CC Özelliği Ticari Olmayan"
+  cc_attribution_non_commercial_no_derivatives_9fe74c00: "CC Özelliği Ticari kullanılamayacak Özgün hali korunacak"
+  cc_attribution_non_commercial_share_alike_c7edb1e5: "CC Özelliği Ticari kullanılamayacak İlk lisans modeli korunacak"
   cc_subtitles_a0d16ff6: Altyazılar
   ccp_zero_activity_73d094c3: "CCP Zero Aktivitesi"
   cell_number_69a7c309: "Telefon Numarası"
@@ -6089,6 +6094,7 @@ tr:
   course_sis_7ae8f649: "ders öbs"
   course_sis_df8b379: "Ders Öbs"
   course_sis_id_bbed1a60: "ders sis id"
+  course_sis_id_cd834b3c: "Ders ÖBS ID:"
   course_sis_id_sis_id_or_canvas_id_4d323f5c: "Ders ÖBS ID (ÖBS_ID:####) YA DA Canvas ID: (###)"
   course_start_date_daae16ae: "Ders Başlangıç Tarihi"
   course_starts_at_3a01f9da: "Dersin başlangıç tarihi"
@@ -6744,6 +6750,7 @@ tr:
     registered_services: "Kayıt olunan Servisler"
     revisions: Değişiklikler
     rubrics: "Değerlendirme Listeleri"
+    search: Ara
     settings: Ayarlar
     site_admin: "Site Yöneticisi"
     stats: İstatistikler
@@ -7041,6 +7048,7 @@ tr:
   default_grade_cannot_be_set_to_ex_723caa59: "Varsayılan puan %{ex} olarak belirlenemez"
   default_grading_scheme_894a0eb: "Varsayılan Notlandırma Şeması"
   default_order_8c409051: "Varsayılan Sıra"
+  default_question_bank_c7bcc5e7: "Varsayılan Soru Bankası"
   default_question_name: Soru
   default_question_text: "Soru metni"
   default_template_f2a759ed: "Varsayılan Tema"
@@ -13958,7 +13966,10 @@ tr:
     everyone_else: "Geri kalan herkes"
     overrides: 
       everyone: Herkes
+  overwrite_848c08f: "Üzerine yaz"
   overwrite_already_entered_grades_64a98037: "Önceden girilmiş notların üzerine yaz"
+  overwrite_assessment_content_with_matching_ids_b388f114: "Eşleşen kimliklere sahip değerlendirme içeriğinin üzerine yaz"
+  overwrite_assessment_help_icon_875d00a5: "Değerlendirme Yardım Simgesinin Üzerine Yaz"
   own_copyright_cc59db55: Telifiniz
   owner_email_4d02f795: "Sahip Epostası:"
   page_50c4823d: Sayfa
@@ -17230,6 +17241,7 @@ tr:
   select_itemname_f70db487: "%{itemName} i Seçin"
   select_navigation_links_68e1e924: "Gezinme Bağlantılarını Seçin"
   select_one_8e0af564: "Birini Seçiniz"
+  select_question_bank_508e5c08: "Soru bankası seçiniz"
   select_specific_content_5382e7ea: "Belirli bir içerik seçin"
   select_sub_account_6704196a: "Alt Hesap Seçin"
   select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: "İlişkilendirmek istediğiniz dosyayı seçin veya \"Yeni Dosya\" yı seçerek br dosya ekleyin."
@@ -18169,6 +18181,7 @@ tr:
     android_banner_view_button: GÖSTER
   sms_f0ddceeb: sms
   some_conferences_on_this_page_are_hidden_because_o_789684fd: "Durumlarını alırken hata olduğundan bu sayfadaki bazı konferanslar gizlidir."
+  some_systems_recycle_their_ids_for_each_new_export_884b8e46: "Bazı sistemler her yeni dışa aktarımda kendi kimliklerini yeniden kullanırlar. Sonuç olarak iki farklı soru bankasını dışa aktarırsanız aynı kimliğe sahip olurlar. Değerlendirme verisinde olası kaybı önlemek için kimliklerine bakılmaksızın bu nesnelere ayrıymış gibi işlem yapılır. Bu tercihi seçerseniz bu güvenlik özelliği devre dışı kalır ve değerlendirme verisi aynı kimliğe sahip varolan verinin üzerine yazılır."
   someone: Birisi
   someone_bbbc538b: Birisi
   something_went_wrong_89195131: "Bazı sorunlar oluştu."
@@ -18669,6 +18682,7 @@ tr:
     profile: Profil
     quizzes: "Kısa sınavlar"
     rubrics: "Değerlendirme Listeleri"
+    search: Ara
     settings: Ayarlar
     syllabus: "Ders Programı"
     tab_location_error: "Sekme konumu geçersiz"
