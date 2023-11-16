@@ -121,6 +121,7 @@ class ContentTag < ActiveRecord::Base
   scope :not_deleted, -> { where("content_tags.workflow_state<>'deleted'") }
 
   attr_accessor :skip_touch
+  attr_accessor :reassociate_external_tool
 
   def touch_context_module
     return true if skip_touch.present? || context_module_id.nil?
@@ -167,8 +168,28 @@ class ContentTag < ActiveRecord::Base
   end
 
   def associate_external_tool
-    return if content.present? || content_type != "ContextExternalTool" || context.blank? || url.blank?
+    return if context.blank? || url.blank? || content_type != "ContextExternalTool"
 
+    if reassociate_external_tool
+      # set only when editing module item to allow changing the url,
+      # which will force a lookup of the new correct tool
+      # IF the url is potentially for a different tool.
+      old_url_host = Addressable::URI.parse(url_was)&.host
+      new_url_host = Addressable::URI.parse(url)&.host
+      if old_url_host != new_url_host
+        set_content_from_external_tool
+      end
+
+      return
+    end
+
+    # happy path
+    return if content.present?
+
+    set_content_from_external_tool
+  end
+
+  def set_content_from_external_tool
     content = ContextExternalTool.find_external_tool(url, context)
     self.content = content if content
   end
