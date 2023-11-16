@@ -999,6 +999,21 @@ describe "Api::V1::Assignment" do
           expect(json).to_not have_key "migrated_urls_content_migration_id"
         end
       end
+
+      context "and migration urls only contains urls for files which belong to the user" do
+        it "does not create migration" do
+          attachment = Attachment.create!(context: user, filename: "user_avatar_pic", uploaded_data: StringIO.new("sometextgoeshere"))
+
+          response_body = { "users/#{user.id}/files/#{attachment.id}" => "" }.to_json
+          stub_request(:get, report_url).to_return(status: 200, body: response_body, headers: {})
+
+          expect(subject).to eq :ok
+
+          json = api.assignment_json(assignment, user, session, opts)
+          expect(json).to be_a(Hash)
+          expect(json).to_not have_key "migrated_urls_content_migration_id"
+        end
+      end
     end
   end
 end
