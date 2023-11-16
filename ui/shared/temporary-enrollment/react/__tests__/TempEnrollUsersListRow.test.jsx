@@ -20,7 +20,7 @@ import React from 'react'
 import {render, screen} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
 import {PROVIDER, RECIPIENT} from '@canvas/temporary-enrollment/react/types'
-import TempEnrollUsersListRow, {generateIcon, generateTitle} from '../TempEnrollUsersListRow'
+import TempEnrollUsersListRow, {generateIcon, generateTooltip} from '../TempEnrollUsersListRow'
 
 function makeProps() {
   return {
@@ -126,21 +126,21 @@ describe('TempEnrollUsersListRow', () => {
       fetchMock.restore()
     })
 
-    describe('generateTitle function', () => {
-      it.skip('returns correct title for PROVIDER role', () => {
-        const title = generateTitle(PROVIDER, 'John Doe')
+    describe('generateTooltip function', () => {
+      it.skip('returns correct tooltip for PROVIDER role', () => {
+        const title = generateTooltip(PROVIDER, 'John Doe')
 
         expect(title).toEqual('John Doe’s Temporary Enrollment Recipients')
       })
 
-      it.skip('returns correct title for RECIPIENT role', () => {
-        const title = generateTitle(RECIPIENT, 'Jane Smith')
+      it.skip('returns correct tootip for RECIPIENT role', () => {
+        const title = generateTooltip(RECIPIENT, 'Jane Smith')
 
         expect(title).toEqual('Jane Smith’s Temporary Enrollment Providers')
       })
 
-      it.skip('returns default title for unknown role', () => {
-        const title = generateTitle('some_other_role', 'User Name')
+      it.skip('returns default tooltip for unknown role', () => {
+        const title = generateTooltip('some_other_role', 'User Name')
 
         expect(title).toEqual('Find a recipient of Temporary Enrollments')
       })
