@@ -16,8 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import PropTypes from 'prop-types'
-import React from 'react'
+import React, {useRef} from 'react'
 
 import {CondensedButton} from '@instructure/ui-buttons'
 import {IconPaperclipLine} from '@instructure/ui-icons'
@@ -27,9 +26,19 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('discussion_topics_post')
 
-export const UploadButton = ({...props}) => {
-  let attachmentInput = null
-  const handleAttachmentClick = () => attachmentInput?.click()
+type Props = {
+  onAttachmentUpload: (event: React.ChangeEvent<HTMLInputElement>) => void
+  attachmentToUpload?: boolean
+}
+
+export const UploadButton = ({...props}: Props) => {
+  const attachmentInput = useRef<HTMLInputElement | null>(null)
+
+  const handleAttachmentClick = () => {
+    if (attachmentInput instanceof HTMLInputElement) {
+      attachmentInput.click()
+    }
+  }
   return props.attachmentToUpload ? (
     <>
       <Spinner
@@ -50,7 +59,7 @@ export const UploadButton = ({...props}) => {
       </CondensedButton>
       <input
         data-testid="attachment-input"
-        ref={input => (attachmentInput = input)}
+        ref={attachmentInput}
         type="file"
         style={{display: 'none'}}
         aria-hidden={true}
@@ -58,15 +67,4 @@ export const UploadButton = ({...props}) => {
       />
     </>
   )
-}
-
-UploadButton.propTypes = {
-  /**
-   * function that performs on the file after button click, then upload file, upload
-   */
-  onAttachmentUpload: PropTypes.func.isRequired,
-  /**
-   * toggles loading state
-   */
-  attachmentToUpload: PropTypes.bool,
 }
