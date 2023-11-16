@@ -647,6 +647,9 @@ module Api::V1::Assignment
 
         data.each do |key, _|
           import_object = Context.find_asset_by_url(key)
+
+          next unless import_object.respond_to?(:context) && import_object.context.is_a?(Course)
+
           if import_object.is_a?(WikiPage)
             copy_values[:wiki_pages] ||= []
             copy_values[:wiki_pages] << CC::CCHelper.create_key(import_object, global: use_global_identifiers)
