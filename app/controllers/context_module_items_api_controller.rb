@@ -488,8 +488,7 @@ class ContextModuleItemsApiController < ApplicationController
       @tag.title = params[:module_item][:title] if params[:module_item][:title]
       if %w[ExternalUrl ContextExternalTool].include?(@tag.content_type) && params[:module_item][:external_url]
         @tag.url = params[:module_item][:external_url]
-        # If they are changing the external_url we attempt to find the new tool
-        @tag.content_id = ContextExternalTool.find_external_tool(@tag.url, @context)&.id if @tag.content_type == "ContextExternalTool"
+        @tag.reassociate_external_tool = true
       end
       @tag.indent = params[:module_item][:indent] if params[:module_item][:indent]
       @tag.new_tab = value_to_boolean(params[:module_item][:new_tab]) if params[:module_item][:new_tab]
