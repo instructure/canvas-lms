@@ -35,7 +35,7 @@ const analyticProps = createAnalyticPropsGenerator(MODULE_NAME)
 interface Props extends NodeStructure {
   indent: any
   updateCheck?: Function
-  workState?: string
+  workflowState?: string
 }
 
 export function EnrollmentTreeItem(props: Props) {
@@ -76,10 +76,10 @@ export function EnrollmentTreeItem(props: Props) {
             <RoleMismatchToolTip />
           </Flex.Item>
         ) : null}
-        {props.workState ? (
+        {props.workflowState ? (
           <Flex.Item margin="0 medium">
             <Text weight="light">
-              {I18n.t('course status: %{state}', {state: translateState(props.workState)})}
+              {I18n.t('course status: %{state}', {state: translateState(props.workflowState)})}
             </Text>
           </Flex.Item>
         ) : null}

@@ -59,6 +59,7 @@ export interface Enrollment {
   end_at: string | null
   role_id: string
   type: string
+  enrollment_state: string
   temporary_enrollment_provider?: User
   temporary_enrollment_pairing_id: number
   temporary_enrollment_source_user_id: number

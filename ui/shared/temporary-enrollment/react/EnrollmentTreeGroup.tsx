@@ -50,8 +50,6 @@ export function translateState(workflow: string) {
       return I18n.t('published')
     case 'completed':
       return I18n.t('completed')
-    case 'deleted':
-      return I18n.t('deleted')
     default:
       return I18n.t('unknown')
   }
@@ -88,7 +86,7 @@ export function EnrollmentTreeGroup(props: Props) {
                 updateToggle={props.updateToggle}
                 isMixed={course.isMixed}
                 isMismatch={course.isMismatch}
-                workState={course.workState}
+                workflowState={course.workflowState}
                 parent={course.parent}
               >
                 {course.children}
@@ -105,7 +103,7 @@ export function EnrollmentTreeGroup(props: Props) {
                 isCheck={course.isCheck}
                 updateCheck={props.updateCheck}
                 isMixed={false}
-                workState={course.workState}
+                workflowState={course.workflowState}
                 parent={course.parent}
                 isMismatch={course.isMismatch}
               >
@@ -174,10 +172,10 @@ export function EnrollmentTreeGroup(props: Props) {
               <RoleMismatchToolTip />
             </Flex.Item>
           ) : null}
-          {props.workState ? (
+          {props.workflowState ? (
             <Flex.Item margin="0 large">
               <Text weight="light">
-                {I18n.t('course status: %{state}', {state: translateState(props.workState)})}
+                {I18n.t('course status: %{state}', {state: translateState(props.workflowState)})}
               </Text>
             </Flex.Item>
           ) : null}
