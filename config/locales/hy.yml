@@ -3410,6 +3410,11 @@ hy:
     by_sa: "CC-ին պատկանելություն, հավասարապես"
     private: "Մասնավոր (պաշտպանված է հեղինակային իրավունքով)"
     public_domain: "Հանրային դոմեն"
+  cc_attribution_f6de631f: "CC-ին պատկանելություն "
+  cc_attribution_no_derivatives_b006744f: "CC-ին պատկանելություն, առանց ածանցյալների"
+  cc_attribution_non_commercial_39e0d30d: "CC-ին պատկանելություն, ոչ կոմերցիոն"
+  cc_attribution_non_commercial_no_derivatives_9fe74c00: "CC-ին պատկանելություն, ոչ կոմերցիոն, առանց ածանցյալների"
+  cc_attribution_non_commercial_share_alike_c7edb1e5: "CC-ին պատկանելություն, ոչ կոմերցիոն, հավասար բաժիններով"
   cell_number_69a7c309: "Բջջային հեռախոսի համարը"
   cell_number_is_invalid_bd6faee0: "Հեռախոսահամարը սխալ է"
   cell_number_is_required_2edcee60: "Անհրաժեշտ է հեռախոսահամար"
@@ -5428,6 +5433,7 @@ hy:
     registered_services: "Գրանցված ծառայություններ"
     revisions: Վերանայումներ
     rubrics: Ռուբրիկներ
+    search: Որոնել
     settings: Կարգաբերումներ
     site_admin: "Կայքի ադմինիստրատոր"
     stats: Վիճակագրություն
@@ -5691,6 +5697,7 @@ hy:
   deep_purple_bb3e2907: "Մուգ մանուշակագույն"
   default_conference_title: "%{course_name} կոնֆերանս"
   default_grade_cannot_be_set_to_ex_723caa59: "Լռությամբ ընդունվող գնահատականը չի կարող սահմանվել %{ex}"
+  default_question_bank_c7bcc5e7: "Լռելյայն ընդունված հարցերի շտեմարան"
   default_question_name: Հարց
   default_question_text: "Հարցի տեքստ"
   delay_posting_this_topic_until_aa483eec: "Այս թեմայի տեղադրումը հետաձգել մինչև"
@@ -11720,6 +11727,8 @@ hy:
     overrides: 
       everyone: Յուրաքանչյուրը
   overwrite_already_entered_grades_64a98037: "Արդեն մուտքագրված գնահատականները նորից գրել"
+  overwrite_assessment_content_with_matching_ids_b388f114: "Վերագրանցել գիտելիքների գնահատման բովանդակությունը համապատասխան նույնականացուցիչներով"
+  overwrite_assessment_help_icon_875d00a5: "Հանձնարարության վերագրանցման համար օգնության նշան"
   own_copyright_cc59db55: "Սեփական հեղինակային իրավունք"
   owner_email_4d02f795: "Օգտատիրոջ էլեկտրոնային փոստը՝"
   package_error: "Փաթեթի տեսակի բացահայտման սխալ․ %{error}"
@@ -14778,6 +14787,7 @@ hy:
   select_itemname_f70db487: "Ընտրել %{itemName}"
   select_navigation_links_68e1e924: "Ընտրել նավարկման հղումները"
   select_one_8e0af564: "Ընտրել մեկը"
+  select_question_bank_508e5c08: "Ընտրել հարցերի շտեմարանը"
   select_specific_content_5382e7ea: "Ընտրել որոշակի բովանդակություն"
   select_students_for_review_6e004a12: "Ընտրել ունկնդիրներ կարծիքներ ներկայացնելու համար"
   select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: "Ընտրել այն ֆայլը, որը ցանկանում եք կապակցել կամ ավելացնել ֆայլը, ընտրելով \"Նոր ֆայլը\":"
@@ -15672,6 +15682,7 @@ hy:
     android_banner_view_button: ԴԻՏԵԼ
   sms_f0ddceeb: sms
   some_conferences_on_this_page_are_hidden_because_o_789684fd: "Այս էջում որոշ կոնֆերանսներ անտեսանելի են, քանի որ դրանց կարգավիճակը վերականգնվում է տեղի ունեցած սխալների պատճառով:"
+  some_systems_recycle_their_ids_for_each_new_export_884b8e46: "Որոշ համակարգեր յուրաքանչյուր նոր արտահանման համար օգտագործում են իրենց նույն մեւտքանունը: Արդյունքում երկու առանձին հարցերի շտեմարանների արտահանման դեպքում դրանք կունենան նույն մուտքանունը: Գնահատման տվյալների կորուստը կանխելու համար այդ օբյեկտները տարբերակվում են, թեեւ ունեն նույն մուտքանունը: Այս օպցիայի ընտրությունը անջատում է  անվտանգության ֆունկցիան և թույլ է տալիս, որ առկա տվյալները փոխարինվեն նույն մուտքանունը ունեցող գնահատման տվյալներով: "
   someone: "որեւէ մեկը"
   someone_bbbc538b: "որեւէ մեկը"
   something_went_wrong_inactivating_the_user_please__ea7d0001: "Օգտատիրոջ կարգավիճակի ապաակտիվացման ժամանակ սխալ է տեղի ունեցել: Ավելի ուշ կրկին փորձեք:"
@@ -16118,6 +16129,7 @@ hy:
     profile: Պրոֆիլ
     quizzes: Թեստեր
     rubrics: Ռուբրիկներ
+    search: Որոնել
     settings: Կարգաբերումներ
     syllabus: "Ուսումնական ծրագիր"
     tab_location_error: "Ներդիրի տեղը սխալ է նշված"
