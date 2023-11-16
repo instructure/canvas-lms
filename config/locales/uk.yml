@@ -3794,6 +3794,10 @@ uk:
     by_sa: "CC атрибуція розповсюджена таким чином"
     private: "Приватний (Захищено авторським правом)"
     public_domain: "Публічний домен"
+  cc_attribution_f6de631f: "CC Атрибуція"
+  cc_attribution_no_derivatives_b006744f: "CC атрибуція непохідна"
+  cc_attribution_non_commercial_no_derivatives_9fe74c00: "CC атрибуція некомерційна і непохідна"
+  cc_attribution_non_commercial_share_alike_c7edb1e5: "CC атрибуція некомерційна розповсюджена таким чином"
   cell_number_69a7c309: "Номер мобільного"
   cell_number_is_invalid_bd6faee0: "Номер мобільного телефона недійсний!"
   cell_number_is_required_2edcee60: "Номер мобільного телефона обов'язковий"
@@ -5379,6 +5383,7 @@ uk:
   course_sis_7ae8f649: "sis курса"
   course_sis_df8b379: "Sis курсу"
   course_sis_id_bbed1a60: "ідентифікатор sis курса "
+  course_sis_id_cd834b3c: "SIS ID курсу:"
   course_sis_id_sis_id_or_canvas_id_4d323f5c: "SIS ID курсу (SIS_ID:####) або Canvas ID: (###)"
   course_starts_at_3a01f9da: "Курс починається в "
   course_statistics: 
@@ -5886,6 +5891,7 @@ uk:
     registered_services: "Зареєстровані сервіси"
     revisions: Редакції
     rubrics: Рубрики
+    search: Пошук
     settings: Налаштування
     site_admin: "Адміністратор сайту"
     stats: Статистика
@@ -6207,6 +6213,7 @@ uk:
   default_grade_cannot_be_set_to_ex_723caa59: "За замовчуванням оцінка не може бути встановлена на %{ex} "
   default_grading_scheme_894a0eb: "Оціночна схема за замовчуванням"
   default_order_8c409051: "Порядок за замовчуванням"
+  default_question_bank_c7bcc5e7: "Пустий банк запитань"
   default_question_name: Запитання
   default_question_text: "Текст запитання"
   default_sis_sync_for_assignments_quizzes_grade_dis_3b2b4878: "За замовчуванням SIS синхронізація для обговорення  виконання завдань, контрольних робіт, оцінок"
@@ -12434,6 +12441,8 @@ uk:
     overrides: 
       everyone: Кожен
   overwrite_already_entered_grades_64a98037: "Перезаписати вже введені оцінки"
+  overwrite_assessment_content_with_matching_ids_b388f114: "Переписати вміст оцінки з відповідними ідентифікаторами"
+  overwrite_assessment_help_icon_875d00a5: "Переписати Іконку Допомоги Оцінки"
   own_copyright_cc59db55: "Власне Авторське право"
   owner_email_4d02f795: "Власник електронної пошти:"
   package_error: "Помилка ідентифікації ьтпу пакета: %{error}"
@@ -15567,6 +15576,7 @@ uk:
   select_one_of_the_options_c8b0c6e4: "Виберіть один із варіантів:"
   select_prerequisite_module_57894963: "Виберіть необхідний модуль"
   select_prerequite_module_e9042bb0: "Виберіть необхідний модуль"
+  select_question_bank_508e5c08: "Вибрати банк запитань"
   select_specific_content_5382e7ea: "Виберіть конкретний вміст"
   select_student_name_caaff244: "Вибрати студента %{name}"
   select_studentname_e7b7908d: "Вибрати %{studentName}"
@@ -16378,6 +16388,7 @@ uk:
   some_settings_have_been_administratively_locked_9e3ee880: "Деякі налаштування були заблоковані в адміністративному режимі."
   some_settings_have_been_disabled_because_the_assig_6b6cc3b4: "Деякі налаштування були вимкнені, оскільки завдання потрапило до звкритого періоду оцінювання."
   some_submissions_are_not_gradeable_grade_changes_f_f8bf44e2: "Деякі відправлення не можна оцінити; зміна оцінок для цих завдань була вимкнена."
+  some_systems_recycle_their_ids_for_each_new_export_884b8e46: "Деякі системи перетворюють їхні ID при кожному новому експортуванні. В результаті, якщо ви експортуєте два окремі набори питань, вони матимуть однакові ID. Для запобігання втраті даних по контрольних роботах ми сприймаємо ці об'єкти як різні, незважаючи на їх ID. Обрання цієїї опції відключить функцію захисту та дозволить перезаписувати дані по контрольних завданнях замість існуючих даних з однаковими ID."
   someone: Дехто
   someone_bbbc538b: Дехто
   something_is_broken_but_i_can_work_around_it_for_n_7fcedb9d: "Щось зламано, але я можу обробити це зараз"
@@ -16927,6 +16938,7 @@ uk:
     people: Люди
     quizzes: "Контрольні роботи"
     rubrics: Категорії
+    search: Пошук
     settings: Налаштування
     syllabus: Розклад
     tab_location_error: "Положення цієї вкладки недійсне "
