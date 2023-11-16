@@ -53,7 +53,6 @@ const I18n = useI18nScope('temporary_enrollment')
 const analyticProps = createAnalyticPropsGenerator(MODULE_NAME)
 
 interface Props {
-  title: string | ((enrollmentType: EnrollmentType, name: string) => string)
   enrollmentType: EnrollmentType
   children: ReactElement
   user: User
@@ -73,6 +72,32 @@ interface Props {
   tempEnrollPermissions: TempEnrollPermissions
 }
 
+export const generateModalTitle = (
+  user: User,
+  enrollmentType: EnrollmentType,
+  isEditMode: boolean,
+  page: number,
+  enrollment: User | null
+): string => {
+  const userName = user.name
+  const enrollmentName = enrollment?.name
+  if (page >= 2) {
+    const recipient = enrollmentType === RECIPIENT && userName ? userName : enrollmentName
+    if (recipient) {
+      return I18n.t(`Assign temporary enrollments to %{recipient}`, {recipient})
+    } else {
+      return I18n.t('Assign temporary enrollments')
+    }
+  }
+  if (isEditMode && userName) {
+    return I18n.t(`%{userName}’s Temporary Enrollment %{enrollmentType}`, {
+      userName,
+      enrollmentType: enrollmentType === RECIPIENT ? 'Providers' : 'Recipients',
+    })
+  }
+  return I18n.t('Find a recipient of Temporary Enrollments')
+}
+
 export function TempEnrollModal(props: Props) {
   const [open, setOpen] = useState(props.defaultOpen || false)
   const [page, setPage] = useState(0)
@@ -85,6 +110,7 @@ export function TempEnrollModal(props: Props) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isModalOpenAnimationComplete, setIsModalOpenAnimationComplete] = useState(false)
   const [tempEnrollmentsPairing, setTempEnrollmentsPairing] = useState<Enrollment[] | null>(null)
+  const [title, setTitle] = useState('')
 
   useEffect(() => {
     if (isFetchEnrollmentDataComplete && isModalOpenAnimationComplete) {
@@ -104,10 +130,16 @@ export function TempEnrollModal(props: Props) {
     }
   }
 
-  const dynamicTitle =
-    typeof props.title === 'function'
-      ? props.title(props.enrollmentType, props.user.name)
-      : props.title
+  useEffect(() => {
+    const newTitle = generateModalTitle(
+      props.user,
+      props.enrollmentType,
+      props.isEditMode,
+      page,
+      enrollment
+    )
+    setTitle(newTitle)
+  }, [props.user, props.enrollmentType, props.isEditMode, page, enrollment])
 
   const resetCommonState = () => {
     if (props.isEditMode && props.onToggleEditMode) {
@@ -358,7 +390,7 @@ export function TempEnrollModal(props: Props) {
         <Modal.Header>
           {renderCloseButton()}
           <Heading tabIndex={-1} level="h2">
-            {dynamicTitle}
+            {title}
           </Heading>
         </Modal.Header>
 
