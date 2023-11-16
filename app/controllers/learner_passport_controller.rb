@@ -26,6 +26,15 @@ class LearnerPassportController < ApplicationController
   before_action :require_context
   before_action :require_user
 
+  def self.merge_skills_from_achievements(achievements)
+    skills = []
+    achievements.each do |achievement|
+      skills += achievement[:skills] if achievement[:skills].present?
+    end
+    skills.uniq! { |s| s[:name] }
+    skills
+  end
+
   @@current_achievements = [
     {
       id: "1",
@@ -42,7 +51,12 @@ class LearnerPassportController < ApplicationController
       type: "Certificate of Completion",
       criteria:
         "To earn this badge, participants must complete 50 yours of study over 10 weeks, and complete a case study project.",
-      skills: ["Product Management"],
+      skills: [
+        { name: "Product Management", verified: true, url: "https://generalassemb.ly/education/product-management" },
+        { name: "Product Strategy", verified: false },
+        { name: "Market Research", verified: false },
+        { name: "User Research", verified: false }
+      ],
       imageUrl: nil,
       verifiedBy: "Open Badges"
     },
@@ -57,6 +71,12 @@ class LearnerPassportController < ApplicationController
       issuedOn: "2020-05-03",
       expiresOn: nil,
       type: "Bachelor of Science",
+      skills: [
+        { name: "JavaScript", verified: true },
+        { name: "SQL", verified: true },
+        { name: "React", verified: true },
+        { name: "KPIs", verified: true },
+      ],
       imageUrl: "https://www.osu.edu/images/osu-logo-blocko.svg",
       verifiedBy: "Open Badges"
     },
@@ -89,12 +109,16 @@ class LearnerPassportController < ApplicationController
     }
   ]
 
-  @@portfolio_template = {
+  @@portfolio_sample = {
     id: "1",
     title: "A portfolio of my work",
     blurb: "A generally groovy person you want to know",
+    city: "Columbus",
+    state: "OH",
+    phone: "888-555-1212",
+    email: "me@example.com",
     heroImageUrl:
-      "https://previews.dropbox.com/p/thumb/ACGYYZllesAb0GLVRmMwkcuibMvY_7-RWOrGtN5Cbn1PZyidfBj7Gcwu5d7E2NUlIP1p4PDoiYalseeVdHDLSHuNoZy-Rzqeumu2BosbQSSKytIXX2A6t_tLn_Z8JgMozNpvsq-J0_vhMNU4OMUXV0zLu3lLSAKAHNMtnxjqn-vwKzIYPDq_3BS1bEbwby8TyknCuep4KxhDV4CJ5f8Pj6U0hsLK9bwWvbIL9zGqAzJQ35YBdnzrqRu_BiNtivBp8yHfL8M87kT1PZNjT_htUP5GpeJJn4FKbl0k-hnFmHzlrbqfO8-30wdftWm_ZvedbfQILH-cN8gzA7jr5NMyzyUm/p.jpeg",
+      "https://images.unsplash.com/photo-1464802686167-b939a6910659?q=80&w=3500&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     about: %(
     I am a recent computer science graduate from Ohio State University, and have also completed a General Assembly certification
    in Product Management. I bring a strong technical foundation from my computer science degree and have a deep passion for product
@@ -102,16 +126,7 @@ class LearnerPassportController < ApplicationController
      technology and business strategy. I am eager to grow and contribute in my first role as a product manager and am committed to
      continuous learning.
 ),
-    skills: [
-      { name: "Product Management", verified: true },
-      { name: "JavaScript", verified: true },
-      { name: "SQL", verified: true },
-      { name: "React", verified: true },
-      { name: "KPIs", verified: true },
-      { name: "Product Strategy", verified: false },
-      { name: "Market Research", verified: false },
-      { name: "User Research", verified: false }
-    ],
+    skills: merge_skills_from_achievements(@@current_achievements),
     links: %w[https://linkedin.com/in/eschiebel https://www.nspe.org https://eschiebel.github.io/],
     education: [
       {
@@ -182,7 +197,9 @@ class LearnerPassportController < ApplicationController
     achievements: @@current_achievements.clone
   }
 
-  @@current_portfolios = []
+  @@portfolio_template = @@portfolio_sample.clone # some day make a template with less pre-populated data
+
+  @@current_portfolios = [@@portfolio_sample.clone]
 
   def index
     js_env[:FEATURES][:learner_passport] = @domain_root_account.feature_enabled?(:learner_passport)
@@ -194,6 +211,10 @@ class LearnerPassportController < ApplicationController
     # hide the breadcrumbs application.html.erb renders
     render html: "<style>.ic-app-nav-toggle-and-crumbs.no-print {display: none;}</style>".html_safe,
            layout: true
+  end
+
+  def skills_index
+    render json: LearnerPassportController.merge_skills_from_achievements(@@current_achievements)
   end
 
   def achievements_index
@@ -210,6 +231,27 @@ class LearnerPassportController < ApplicationController
     new_portfolio[:title] = params[:title]
     @@current_portfolios << new_portfolio
     render json: new_portfolio
+  end
+
+  def portfolio_update
+    portfolio = @@current_portfolios.find { |p| p[:id] == params[:portfolio_id] }
+    return render json: { message: "Portfolio not found" }, status: :not_found if portfolio.nil?
+
+    portfolio[:skills] = []
+    portfolio.each do |key, _value|
+      next unless params[key].present?
+
+      case key
+      when :skills
+        params[key].each do |skill|
+          portfolio[:skills] << JSON.parse(skill)
+        end
+      else
+        portfolio[key] = params[key]
+      end
+    end
+
+    render json: portfolio
   end
 
   def portfolio_show
@@ -234,7 +276,8 @@ class LearnerPassportController < ApplicationController
     render json: portfolio
   end
 
-  def portfolios_reset
-    @@current_portfolios = []
+  def portfolio_reset
+    @@current_portfolios = [@@portfolio_sample.clone]
+    render json: { message: "Portfolios reset" }, status: :accepted
   end
 end

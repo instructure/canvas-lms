@@ -17,7 +17,7 @@
  */
 
 import {useActionData, useNavigate} from 'react-router-dom'
-import type {PortfolioData} from './types'
+import type {PortfolioData} from '../types'
 
 const PortfolioCreate = () => {
   const navigate = useNavigate()

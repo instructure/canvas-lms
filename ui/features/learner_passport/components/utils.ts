@@ -16,20 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export interface AchievementData {
-  id: string
-  isNew: boolean
-  title: string
-  type: string | null
-  criteria: string | null
-  issuer: {
-    name: string
-    url?: string
-    iconUrl?: string
-  }
-  issuedOn: string
-  expiresOn: string | null
-  imageUrl: string | null
-  skills: string[]
-  verifiedBy: string | null
+export function stringToId(s: string): string {
+  return s.replace(/\W+/g, '-')
 }
