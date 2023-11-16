@@ -255,6 +255,8 @@ class DiscussionTopicsController < ApplicationController
   include K5Mode
   include DiscussionTopicsHelper
 
+  ANONYMOUS_STATES = ["full_anonymity", "partial_anonymity"].freeze
+
   # @API List discussion topics
   #
   # Returns the paginated list of discussion topics for this course or group.
@@ -516,7 +518,7 @@ class DiscussionTopicsController < ApplicationController
     return render_unauthorized_action unless @topic.visible_for?(@current_user)
 
     @context.try(:require_assignment_group) unless @topic.is_announcement
-    can_set_group_category = @context.respond_to?(:group_categories) && @context.grants_right?(@current_user, session, :manage) # i.e. not a student
+    can_set_group_category = ANONYMOUS_STATES.exclude?(@topic.anonymous_state) && @context.respond_to?(:group_categories) && @context.grants_right?(@current_user, session, :manage) # i.e. not anonymous and not a student
     hash = {
       URL_ROOT: named_context_url(@context, :api_v1_context_discussion_topics_url),
       PERMISSIONS: {
@@ -1378,10 +1380,7 @@ class DiscussionTopicsController < ApplicationController
     end
 
     # only full_anonymity and partial_anonymity can be stored. the rest will be nil'ed out
-    if is_new &&
-       !params[:anonymous_state].nil? &&
-       !(params[:anonymous_state] == "full_anonymity" || params[:anonymous_state] == "partial_anonymity")
-
+    if is_new && params[:anonymous_state].present? && ANONYMOUS_STATES.exclude?(params[:anonymous_state])
       params[:anonymous_state] = nil
     end
 
@@ -1426,6 +1425,10 @@ class DiscussionTopicsController < ApplicationController
       if params.include?(:anonymous_state) && @topic.anonymous_state != params[:anonymous_state]
         @errors[:anonymous_state] = t(:error_anonymous_state_unauthorized_update,
                                       "You are not able to update the anonymous state of a discussion")
+      end
+      if ANONYMOUS_STATES.include?(@topic.anonymous_state) && params[:group_category_id]
+        @errors[:anonymous_state] = t(:error_anonymous_state_groups_update,
+                                      "Group discussions cannot be anonymous.")
       end
       prior_version = DiscussionTopic.find(@topic.id)
       verify_specific_section_visibilities # Make sure user actually has perms to modify this

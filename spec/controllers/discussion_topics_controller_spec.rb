@@ -433,6 +433,36 @@ describe DiscussionTopicsController do
       expect(response.location).to eq course_discussion_topics_url @course
     end
 
+    context "js_env DISCUSSION_TOPIC PERMISSIONS CAN_SET_GROUP" do
+      it "CAN_SET_GROUP is true when existing discussion_topic is not anonymous" do
+        user_session(@teacher)
+        not_anon = @course.discussion_topics.create!(user: @teacher, title: "Greetings", message: "Hello, and good morning!")
+        get "edit", params: { course_id: @course.id, id: not_anon.id }
+        expect(assigns[:js_env][:DISCUSSION_TOPIC][:PERMISSIONS][:CAN_SET_GROUP]).to be true
+      end
+
+      it "CAN_SET_GROUP is false when user is a student" do
+        regular_topic = @course.discussion_topics.create!(user: @student, title: "Greetings", message: "Hello, and good morning!")
+        user_session(@student)
+        get("edit", params: { course_id: @course.id, id: regular_topic.id })
+        expect(assigns[:js_env][:DISCUSSION_TOPIC][:PERMISSIONS][:CAN_SET_GROUP]).to be false
+      end
+
+      it "CAN_SET_GROUP is false when existing discussion_topic is fully anonymous" do
+        anon_topic = @course.discussion_topics.create!(title: "some topic", anonymous_state: "full_anonymity")
+        user_session(@teacher)
+        get("edit", params: { course_id: @course.id, id: anon_topic.id })
+        expect(assigns[:js_env][:DISCUSSION_TOPIC][:PERMISSIONS][:CAN_SET_GROUP]).to be false
+      end
+
+      it "CAN_SET_GROUP is false when existing discussion_topic is partially anonymous" do
+        anon_topic = @course.discussion_topics.create!(title: "some topic", anonymous_state: "partial_anonymity")
+        user_session(@teacher)
+        get("edit", params: { course_id: @course.id, id: anon_topic.id })
+        expect(assigns[:js_env][:DISCUSSION_TOPIC][:PERMISSIONS][:CAN_SET_GROUP]).to be false
+      end
+    end
+
     it "js_env TOTAL_USER_COUNT and IS_ANNOUNCEMENT are set correctly for section specific announcements" do
       user_session(@teacher)
       section1 = @course.course_sections.create!(name: "Section 1")
@@ -2441,6 +2471,38 @@ describe DiscussionTopicsController do
       visibilities = DiscussionTopicSectionVisibility.active
                                                      .where(discussion_topic_id: @announcement.id)
       expect(visibilities.count).to eq 2
+    end
+
+    context "anonymous discussion and group discussion relationship" do
+      it "returns an error when turning a fully anonymous discussion into a group discussion" do
+        full_anon = @course.discussion_topics.create!(title: "foo", message: "bar", user: @teacher, anonymous_state: "full_anonymity")
+        group_category = @course.group_categories.create(name: "gc")
+        @course.groups.create!(group_category:)
+        user_session(@teacher)
+        put "update", params: { course_id: @course.id, topic_id: full_anon.id, group_category_id: group_category.id }, format: "json"
+        expect(response).to have_http_status :bad_request
+        expect(response.parsed_body["errors"]).to(include { "anonymous_state" => "Group discussions cannot be anonymous." })
+      end
+
+      it "returns an error when turning a partially anonymous discussion into a group discussion" do
+        partial_anon = @course.discussion_topics.create!(title: "foo", message: "bar", user: @teacher, anonymous_state: "partial_anonymity")
+        group_category = @course.group_categories.create(name: "gc")
+        @course.groups.create!(group_category:)
+        user_session(@teacher)
+        put "update", params: { course_id: @course.id, topic_id: partial_anon.id, group_category_id: group_category.id }, format: "json"
+        expect(response).to have_http_status :bad_request
+        expect(response.parsed_body["errors"]).to(include { "anonymous_state" => "Group discussions cannot be anonymous." })
+      end
+
+      it "saves when turning a regular discussion into a group discussion" do
+        regular_discussion = @course.discussion_topics.create!(title: "foo", message: "bar", user: @teacher)
+        group_category = @course.group_categories.create(name: "gc")
+        @course.groups.create!(group_category:)
+        user_session(@teacher)
+        put "update", params: { course_id: @course.id, topic_id: regular_discussion.id, group_category_id: group_category.id }, format: "json"
+        expect(response).to be_successful
+        expect(regular_discussion.reload.group_category).to eq group_category
+      end
     end
   end
 
