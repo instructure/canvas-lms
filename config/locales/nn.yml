@@ -9157,6 +9157,7 @@ nn:
         one: "Vis 1 eit innlegg til"
         other: "Vis %{count} innlegg til"
     error_anonymous_state_groups_create: "Gruppediskusjonar kan ikkje vere anonyme."
+    error_anonymous_state_groups_update: "Gruppediskusjonar kan ikkje vere anonyme."
     error_anonymous_state_unauthorized_create: "Du har ikkje løyve til å lage ein anonym diskusjon"
     error_anonymous_state_unauthorized_update: "Du har ikkje løyve til å oppdatere den anonyme statusen til ein diskusjon"
     error_draft_state_unauthorized: "Du har ikkje løyve til å endre status på emnet til kladd."
