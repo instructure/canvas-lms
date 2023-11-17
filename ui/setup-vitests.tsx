@@ -56,3 +56,6 @@ vi.stubGlobal('matchMedia', () => ({
 }))
 
 vi.stubGlobal('jest', vi)
+
+// @ts-expect-error
+HTMLCanvasElement.prototype.getContext = vi.fn()

@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
  *

@@ -25,7 +25,7 @@ export default defineConfig({
   test: {
     environment: 'happy-dom',
     globals: true,
-    setupFiles: 'ui/setup-vitests.ts',
+    setupFiles: 'ui/setup-vitests.tsx',
     include: ['ui/**/__tests__/**/*.test.?(c|m)[jt]s?(x)'],
     coverage: {
       provider: 'istanbul',

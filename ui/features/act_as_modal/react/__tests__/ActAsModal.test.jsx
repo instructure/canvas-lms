@@ -96,13 +96,11 @@ describe('ActAsModal', () => {
     })
   })
 
-  test('it should only display loading spinner if state is loading', done => {
+  test('it should only display loading spinner if state is loading', async () => {
     const wrapper = shallow(<ActAsModal {...props} />)
     expect(wrapper.find(Spinner).exists()).toBeFalsy()
 
-    wrapper.setState({isLoading: true}, () => {
-      expect(wrapper.find(Spinner).exists()).toBeTruthy()
-      done()
-    })
+    await new Promise(resolve => wrapper.setState({isLoading: true}, resolve))
+    expect(wrapper.find(Spinner).exists()).toBeTruthy()
   })
 })

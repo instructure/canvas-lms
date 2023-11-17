@@ -29,6 +29,10 @@ import {shallow} from 'enzyme'
 import {waitFor} from '@testing-library/react'
 import ProficiencyTable from '../ProficiencyTable'
 
+function wait(ms = 0) {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
 const defaultProps = {
   accountId: '1',
 }
@@ -67,123 +71,128 @@ describe('default proficiency', () => {
       expect(wrapper.find('Billboard')).toHaveLength(1)
     })
   })
-
-  it('renders five ratings', done => {
+  it('renders five ratings', async () => {
     const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
-    setTimeout(() => {
-      wrapper.instance().removeBillboard()
-      expect(findProficiencyRatings(wrapper)).toHaveLength(5)
-      done()
-    }, 1)
+
+    await wait(1)
+
+    wrapper.instance().removeBillboard()
+    expect(findProficiencyRatings(wrapper)).toHaveLength(5)
   })
 
-  it('sets focusField on mastery on first rating only', done => {
+  it('sets focusField on mastery on first rating only', async () => {
     const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
-    setTimeout(() => {
-      wrapper.instance().removeBillboard()
-      const ratings = findProficiencyRatings(wrapper)
-      expect(ratings.at(0).prop('focusField')).toBe('mastery')
-      expect(ratings.at(1).prop('focusField')).toBeNull()
-      expect(ratings.at(2).prop('focusField')).toBeNull()
-      expect(ratings.at(3).prop('focusField')).toBeNull()
-      expect(ratings.at(4).prop('focusField')).toBeNull()
-      done()
-    }, 1)
+
+    await wait(1)
+
+    wrapper.instance().removeBillboard()
+    const ratings = findProficiencyRatings(wrapper)
+    expect(ratings.at(0).prop('focusField')).toBe('mastery')
+    expect(ratings.at(1).prop('focusField')).toBeNull()
+    expect(ratings.at(2).prop('focusField')).toBeNull()
+    expect(ratings.at(3).prop('focusField')).toBeNull()
+    expect(ratings.at(4).prop('focusField')).toBeNull()
   })
 
-  it('clicking button adds rating', done => {
+  it('clicking button adds rating', async () => {
     const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
-    setTimeout(() => {
-      wrapper.instance().removeBillboard()
-      wrapper.findWhere(n => n.prop('shape') === 'circle').simulate('click')
-      expect(findProficiencyRatings(wrapper)).toHaveLength(6)
-      done()
-    }, 1)
+
+    await wait(1)
+
+    wrapper.instance().removeBillboard()
+    wrapper.findWhere(n => n.prop('shape') === 'circle').simulate('click')
+    expect(findProficiencyRatings(wrapper)).toHaveLength(6)
   })
 
-  it('clicking add rating button flashes SR message', done => {
-    const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
-    const flashMock = jest.spyOn($, 'screenReaderFlashMessage')
-    setTimeout(() => {
-      wrapper.instance().removeBillboard()
-      wrapper.findWhere(n => n.prop('shape') === 'circle').simulate('click')
-      expect(flashMock).toHaveBeenCalledTimes(1)
-      flashMock.mockRestore()
-      done()
-    }, 1)
-  })
-
-  it('handling delete rating removes rating and flashes SR message', done => {
+  it('clicking add rating button flashes SR message', async () => {
     const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
     const flashMock = jest.spyOn($, 'screenReaderFlashMessage')
-    setTimeout(() => {
-      wrapper.instance().removeBillboard()
-      wrapper.instance().handleDelete(1)()
-      expect(findProficiencyRatings(wrapper)).toHaveLength(4)
-      expect(flashMock).toHaveBeenCalledTimes(1)
-      flashMock.mockRestore()
-      done()
-    }, 1)
+
+    await wait(1)
+
+    wrapper.instance().removeBillboard()
+    wrapper.findWhere(n => n.prop('shape') === 'circle').simulate('click')
+    expect(flashMock).toHaveBeenCalledTimes(1)
+    flashMock.mockRestore()
   })
 
-  it('setting blank description sets error', done => {
+  it('handling delete rating removes rating and flashes SR message', async () => {
     const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
-    setTimeout(() => {
-      wrapper.instance().removeBillboard()
-      wrapper.instance().handleDescriptionChange(0)('')
-      wrapper.find('Button').last().simulate('click')
-      expect(findProficiencyRatings(wrapper).first().prop('descriptionError')).toBe(
-        'Missing required description'
-      )
-      done()
-    }, 1)
+    const flashMock = jest.spyOn($, 'screenReaderFlashMessage')
+
+    await wait(1)
+
+    wrapper.instance().removeBillboard()
+    wrapper.instance().handleDelete(1)()
+    expect(findProficiencyRatings(wrapper)).toHaveLength(4)
+    expect(flashMock).toHaveBeenCalledTimes(1)
+    flashMock.mockRestore()
   })
 
-  it('setting blank points sets error', done => {
+  it('setting blank description sets error', async () => {
     const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
-    setTimeout(() => {
-      wrapper.instance().removeBillboard()
-      wrapper.instance().handlePointsChange(0)('')
-      wrapper.find('Button').last().simulate('click')
-      expect(findProficiencyRatings(wrapper).first().prop('pointsError')).toBe('Invalid points')
-      done()
-    }, 1)
+
+    await wait(1)
+
+    wrapper.instance().removeBillboard()
+    wrapper.instance().handleDescriptionChange(0)('')
+    wrapper.find('Button').last().simulate('click')
+    expect(findProficiencyRatings(wrapper).first().prop('descriptionError')).toBe(
+      'Missing required description'
+    )
   })
 
-  it('setting invalid points sets error', done => {
+  it('setting blank points sets error', async () => {
     const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
-    setTimeout(() => {
-      wrapper.instance().removeBillboard()
-      wrapper.instance().handlePointsChange(0)('1.1.1')
-      wrapper.find('Button').last().simulate('click')
-      expect(findProficiencyRatings(wrapper).first().prop('pointsError')).toBe('Invalid points')
-      done()
-    }, 1)
+
+    await wait(1)
+
+    wrapper.instance().removeBillboard()
+    wrapper.instance().handlePointsChange(0)('')
+    wrapper.find('Button').last().simulate('click')
+    expect(findProficiencyRatings(wrapper).first().prop('pointsError')).toBe('Invalid points')
   })
 
-  it('setting negative points sets error', done => {
+  it('setting invalid points sets error', async () => {
     const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
-    setTimeout(() => {
-      wrapper.instance().removeBillboard()
-      wrapper.instance().handlePointsChange(0)('-1')
-      wrapper.find('Button').last().simulate('click')
-      expect(findProficiencyRatings(wrapper).first().prop('pointsError')).toBe('Negative points')
-      done()
-    }, 1)
+
+    await wait(1)
+
+    wrapper.instance().removeBillboard()
+    wrapper.instance().handlePointsChange(0)('1.1.1')
+    wrapper.find('Button').last().simulate('click')
+    expect(findProficiencyRatings(wrapper).first().prop('pointsError')).toBe('Invalid points')
   })
 
-  it('sends POST on submit', done => {
+  it('setting negative points sets error', async () => {
+    const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
+
+    // Wait for 1 ms (or however long needed for your async operations)
+    await wait(1)
+
+    wrapper.instance().removeBillboard()
+    wrapper.instance().handlePointsChange(0)('-1')
+    wrapper.find('Button').last().simulate('click')
+    expect(findProficiencyRatings(wrapper).first().prop('pointsError')).toBe('Negative points')
+  })
+
+  it('sends POST on submit', async () => {
     const postSpy = jest
       .spyOn(axios, 'post')
       .mockImplementation(() => Promise.resolve({status: 200}))
+
     const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
-    setTimeout(() => {
-      wrapper.instance().removeBillboard()
-      wrapper.find('Button').last().simulate('click')
-      expect(axios.post).toHaveBeenCalledTimes(1)
-      postSpy.mockRestore()
-      done()
-    }, 1)
+
+    // Wait for 1 ms (or however long needed for your async operations)
+    await wait(1)
+
+    wrapper.instance().removeBillboard()
+    wrapper.find('Button').last().simulate('click')
+
+    // Ensure that the mocked POST request was called
+    expect(axios.post).toHaveBeenCalledTimes(1)
+
+    postSpy.mockRestore()
   })
 
   it('empty rating description generates errors', () => {
