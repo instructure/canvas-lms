@@ -8906,6 +8906,7 @@ fa:
         one: "نمایش %{count} ورودی بیشتر"
         other: "نمایش %{count} ورودی بیشتر"
     error_anonymous_state_groups_create: "بحث های گروهی نمی تواند ناشناس باشد."
+    error_anonymous_state_groups_update: "بحث های گروهی نمی تواند ناشناس باشد."
     error_anonymous_state_unauthorized_create: "شما قادر به ایجاد یک بحث ناشناس نیستید"
     error_anonymous_state_unauthorized_update: "شما نمی توانید وضعیت ناشناس یک بحث را به روز کنید"
     error_draft_state_unauthorized: "شما اجازه ندارید این موضوع را به حالت پیش نویس تغییر دهید."
