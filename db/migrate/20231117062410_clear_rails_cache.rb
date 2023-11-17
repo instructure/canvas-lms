@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class ClearRailsCache < ActiveRecord::Migration[4.2]
+class ClearRailsCache < ActiveRecord::Migration[7.0]
   tag :predeploy
 
   # NOTE: if you have any environments that are "split" somehow -
