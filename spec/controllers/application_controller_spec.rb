@@ -35,7 +35,10 @@ RSpec.describe ApplicationController do
         user_agent: nil,
         remote_ip: "0.0.0.0",
         base_url: "https://canvas.test",
-        referer: nil
+        referer: nil,
+        cookies: {}, # for make_lti_launch_debug_logger
+        cookie_jar: {}, # for make_lti_launch_debug_logger
+        original_fullpath: "/" # for make_lti_launch_debug_logger
       )
       allow(controller).to receive(:request).and_return(request_double)
     end
@@ -1139,8 +1142,14 @@ RSpec.describe ApplicationController do
               let(:cached_launch) { JSON.parse(Canvas.redis.get(redis_key)) }
 
               before do
+                Lti::LaunchDebugLogger.enable!(account, 1)
+
                 allow(SecureRandom).to receive(:hex).and_return(verifier)
                 controller.send(:content_tag_redirect, course, content_tag, nil)
+              end
+
+              after do
+                Lti::LaunchDebugLogger.disable!(account)
               end
 
               it "caches the LTI 1.3 launch" do
@@ -1198,6 +1207,12 @@ RSpec.describe ApplicationController do
                 it "uses the custom url as the target_link_uri" do
                   expect(assigns[:lti_launch].params["target_link_uri"]).to eq custom_url
                 end
+              end
+
+              it "includes debug_trace in the lti_message_hint (if enabled for the account)" do
+                message_hint = JSON::JWT.decode(assigns[:lti_launch].params["lti_message_hint"], :skip_verification)
+                expect(message_hint["debug_trace"]).to be_a(String)
+                expect(message_hint["debug_trace"]).to_not be_empty
               end
             end
 

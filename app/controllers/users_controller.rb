@@ -1500,7 +1500,9 @@ class UsersController < ApplicationController
                   return_url: @return_url,
                   expander: variable_expander,
                   include_storage_target: !in_lti_mobile_webview?,
-                  opts:
+                  opts: opts.merge(
+                    lti_launch_debug_logger: make_lti_launch_debug_logger(@tool)
+                  )
                 )
               else
                 Lti::LtiOutboundAdapter.new(@tool, @current_user, @domain_root_account).prepare_tool_launch(@return_url, variable_expander, opts)
