@@ -34,6 +34,7 @@ class ApplicationController < ActionController::Base
   include LegalInformationHelper
   include FullStoryHelper
   include ObserverEnrollmentsHelper
+  include LtiLaunchDebugLoggerHelper
 
   helper :all
 
@@ -2141,7 +2142,8 @@ class ApplicationController < ActionController::Base
                       expander: variable_expander,
                       include_storage_target: !in_lti_mobile_webview?,
                       opts: opts.merge(
-                        resource_link: @tag.associated_asset_lti_resource_link
+                        resource_link: @tag.associated_asset_lti_resource_link,
+                        lti_launch_debug_logger: make_lti_launch_debug_logger(@tool)
                       )
                     )
                   else

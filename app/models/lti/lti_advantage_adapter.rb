@@ -194,6 +194,7 @@ module Lti
       Canvas::Security.create_jwt(
         {
           verifier:,
+          debug_trace: @opts[:lti_launch_debug_logger]&.generate_debug_trace,
           canvas_domain: @opts[:domain],
           context_type: @context.class,
           context_id: @context.global_id,

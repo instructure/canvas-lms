@@ -732,7 +732,8 @@ class ExternalToolsController < ApplicationController
                   expander:,
                   include_storage_target: !in_lti_mobile_webview?,
                   opts: opts.merge(
-                    resource_link: lookup_resource_link(tool)
+                    resource_link: lookup_resource_link(tool),
+                    lti_launch_debug_logger: make_lti_launch_debug_logger(tool)
                   )
                 )
 
