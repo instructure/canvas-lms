@@ -83,6 +83,7 @@ export const assignmentRow = (
   queryData,
   setShowTray,
   handleReadStateChange,
+  handleRubricReadStateChange,
   setOpenAssignmentDetailIds,
   openAssignmentDetailIds,
   setSubmissionAssignmentId,
@@ -106,6 +107,9 @@ export const assignmentRow = (
   }
 
   const handleRubricDetailOpen = () => {
+    if (assignment?.submissionsConnection?.nodes[0]?.hasUnreadRubricAssessment) {
+      handleRubricReadStateChange(assignment?.submissionsConnection?.nodes[0]?._id)
+    }
     if (!openRubricDetailIds.includes(assignment._id)) {
       setOpenRubricDetailIds([...openRubricDetailIds, assignment._id])
     } else {
@@ -116,6 +120,39 @@ export const assignmentRow = (
         setOpenRubricDetailIds(arr)
       }
     }
+  }
+
+  const renderRubricButton = () => {
+    return assignment?.submissionsConnection?.nodes[0]?.hasUnreadRubricAssessment ? (
+      <Badge
+        type="notification"
+        formatOutput={() => (
+          <ScreenReaderContent>{I18n.t('Unread rubric assessment')}</ScreenReaderContent>
+        )}
+      >
+        <IconButton
+          data-testid="rubric_detail_button_with_badge"
+          margin="0 small"
+          screenReaderLabel="Rubric Results"
+          size="small"
+          onClick={handleRubricDetailOpen}
+          aria-expanded={openRubricDetailIds.includes(assignment._id)}
+        >
+          <IconRubricLine />
+        </IconButton>
+      </Badge>
+    ) : (
+      <IconButton
+        data-testid="rubric_detail_button"
+        margin="0 small"
+        screenReaderLabel="Rubric Results"
+        size="small"
+        onClick={handleRubricDetailOpen}
+        aria-expanded={openRubricDetailIds.includes(assignment._id)}
+      >
+        <IconRubricLine />
+      </IconButton>
+    )
   }
 
   return (
@@ -230,16 +267,7 @@ export const assignmentRow = (
             assignment?.rubric &&
             assignment?.submissionsConnection?.nodes[0]?.rubricAssessmentsConnection?.nodes.length >
               0 ? (
-              <IconButton
-                data-testid="rubric_detail_button"
-                margin="0 small"
-                screenReaderLabel="Rubric Results"
-                size="small"
-                onClick={handleRubricDetailOpen}
-                aria-expanded={openRubricDetailIds.includes(assignment._id)}
-              >
-                <IconRubricLine />
-              </IconButton>
+              renderRubricButton()
             ) : (
               <View as="div" width="52px" />
             )}

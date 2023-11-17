@@ -138,6 +138,13 @@ module Interfaces::SubmissionInterface
       end
   end
 
+  field :has_unread_rubric_assessment, Boolean, null: false
+  def has_unread_rubric_assessment
+    load_association(:content_participations).then do
+      submission.content_participations.where(workflow_state: "unread", content_item: "rubric").exists?
+    end
+  end
+
   field :user, Types::UserType, null: true
   def user
     load_association(:user)

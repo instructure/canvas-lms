@@ -66,6 +66,7 @@ const AssignmentTable = ({
   queryData,
   layout,
   handleReadStateChange,
+  handleRubricReadStateChange,
   setSubmissionAssignmentId,
   submissionAssignmentId,
 }) => {
@@ -160,6 +161,7 @@ const AssignmentTable = ({
                 queryData,
                 setShowTray,
                 handleReadStateChange,
+                handleRubricReadStateChange,
                 setOpenAssignmentDetailIds,
                 openAssignmentDetailIds,
                 setSubmissionAssignmentId,
