@@ -8207,6 +8207,7 @@ hu:
         one: "Mutasson még 1 bejegyzést"
         other: "Mutasson további %{count} bejegyzést"
     error_anonymous_state_groups_create: "A csoportos fórumok nem lehetnek névtelenek."
+    error_anonymous_state_groups_update: "A csoportos fórumok nem lehetnek névtelenek."
     error_anonymous_state_unauthorized_create: "Nem tud névtelen fórumot létrehozni"
     error_anonymous_state_unauthorized_update: "Nem frissítheti a fórum névtelen állapotát"
     error_draft_state_unauthorized: "Nincs jogosultsága arra, hogy ezt a témát vázlat állapotúra állítsa."
