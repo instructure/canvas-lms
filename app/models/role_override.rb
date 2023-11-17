@@ -1801,6 +1801,13 @@ class RoleOverride < ActiveRecord::Base
         true_for: %w[AccountAdmin],
         account_only: true,
         account_allows: ->(a) { a.feature_enabled?(:admin_analytics_view_permission) }
+      },
+      manage_impact: {
+        label: -> { t("Manage Impact") },
+        label_v2: -> { t("Impact - Manage") },
+        available_to: %w[AccountAdmin AccountMembership],
+        true_for: %w[AccountAdmin],
+        account_only: :root
       }
     }
   )
