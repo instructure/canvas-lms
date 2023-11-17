@@ -3298,6 +3298,11 @@ el:
     by_sa: "Αναφορά Δημιουργού-Παρόμοια Διανομή CC "
     private: "Ιδιωτική (Προστατευόμενη)"
     public_domain: "Δημόσιος Τομέας"
+  cc_attribution_f6de631f: "Αναφορά Δημιουργού CC"
+  cc_attribution_no_derivatives_b006744f: "Αναφορά Δημιουργού-Όχι Παράγωγα Έργα CC"
+  cc_attribution_non_commercial_39e0d30d: "Αναφορά Δημιουργού-Μη Εμπορική Χρήση CC "
+  cc_attribution_non_commercial_no_derivatives_9fe74c00: "Αναφορά Δημιουργού-Μη Εμπορική Χρήση-Όχι Παράγωγα Έργα CC "
+  cc_attribution_non_commercial_share_alike_c7edb1e5: "Αναφορά Δημιουργού-Μη Εμπορική Χρήση-Παρόμοια Διανομή CC "
   cell_number_69a7c309: "Αριθμός Κινητού"
   cell_number_is_invalid_bd6faee0: "Μη έγκυρος Αριθμός Κινητού!"
   cell_number_is_required_2edcee60: "Απαιτείται Αριθμός Κινητού!"
@@ -5043,6 +5048,7 @@ el:
     registered_services: "Υπηρεσίες στις οποίες έχετε Εγγραφεί"
     revisions: "Αναθεωρήσεις εκδόσεων"
     rubrics: "Ρουμπρίκες Αξιολόγισης"
+    search: Αναζήτηση
     settings: Ρυθμίσεις
     site_admin: "Διαχειριστής Ιστοτόπου"
     stats: "Στατιστικά Στοιχεία"
@@ -5288,6 +5294,7 @@ el:
   default_conference_title: "Συνεδρία για το μάθημα %{course_name}"
   default_email_9efb7fbd: "Προεπιλεγμένη Ηλεκτρονική Διεύθυνση"
   default_grade_cannot_be_set_to_ex_723caa59: "Ο προεπιλεγμένος βαθμός δεν μπορεί να είναι %{ex}"
+  default_question_bank_c7bcc5e7: "Προεπιλεγμένη Τράπεζα Ερωτήσεων"
   default_question_name: Ερώτημα
   default_question_text: "Κείμενρο Ερώτησης"
   define_text_to_go_before_and_after_the_dropdown_an_be8d16e2: "Ορίστε κείμενο που θα εμφανίζεται πριν και μετά την αναπτυσσόμενη λίστα και δημιουργήστε μερικές πιθανές απαντήσεις."
@@ -10486,7 +10493,10 @@ el:
     everyone_else: "Όλοι οι άλλοι"
     overrides: 
       everyone: Όλοι/ες
+  overwrite_848c08f: Αντικατάσταση
   overwrite_already_entered_grades_64a98037: "Αντικαταστήστε ήδη υπάρχοντες βαθμούς"
+  overwrite_assessment_content_with_matching_ids_b388f114: "Αντικατάσταση περιεχομένου αξιολόγησης με ID που αντιστοιχούν"
+  overwrite_assessment_help_icon_875d00a5: "Εικονίδιο Βοήθειας για την Αντικατάσταση Εργασίας"
   own_copyright_cc59db55: "Κατοχή Πνευματικών Δικαιωμάτων"
   owner_email_4d02f795: "Email Ιδιοκτήτη:"
   package_error: "<mrk mid=\"7501\" mtype=\"seg\">Σφάλμα κατά τον προσδιορισμό του τύπου πακέτου:</mrk> <mrk mid=\"7502\" mtype=\"seg\">%{error}</mrk>"
@@ -13269,6 +13279,7 @@ el:
   select_itemname_f70db487: "Επιλογή %{itemName}"
   select_navigation_links_68e1e924: "Επιλογή Συνδέσμων Πλοήγησης"
   select_one_8e0af564: "Επιλέξτε Ένα"
+  select_question_bank_508e5c08: "Επιλογή τράπεζας θεμάτων"
   select_specific_content_5382e7ea: "Επιλογή συγκεκριμένου περιεχομένου"
   select_students_for_review_6e004a12: "Επιλογή σπουδαστών για αναθεώρηση"
   select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: "Επιλέξτε το αρχείο που θέλετε να συνδέσετε ή προσθέστε ένα αρχείο επιλέγοντας «Νέο Αρχείο»."
@@ -13956,6 +13967,7 @@ el:
   skype_18850ba7: Skype
   sms_f0ddceeb: sms
   some_conferences_on_this_page_are_hidden_because_o_789684fd: "Μερικές συνεδρίες σε αυτή τη σελίδα είναι κρυφές λόγω σφαλμάτων κατά την ανάκτηση της κατάστασής τους"
+  some_systems_recycle_their_ids_for_each_new_export_884b8e46: "<mrk mid=\"3317\" mtype=\"seg\">Μερικοί σπουδαστές ανακυκλώνουν τα ID τους για κάθε νέα εξαγωγή.</mrk> <mrk mid=\"3318\" mtype=\"seg\">Κατά συνέπεια, αν εξάγετε δύο ξεχωριστές τράπεζες ερωτήσεων, θα έχουν το ίδιο ID.</mrk> <mrk mid=\"3319\" mtype=\"seg\">Για να μην χαθούν δεδομένα αξιολόγησης, διαχειριζόμαστε αυτά τα αντικείμενα ως διαφορετικά παρά τα ID τους.</mrk> <mrk mid=\"3320\" mtype=\"seg\">Αυτή η επιλογή θα απενεργοποιήσει αυτή τη λειτουργία ασφαλείας και θα επιτρέψει στα δεδομένα αξιολόγησης να αντικαταστήσουν τα υπάρχοντα δεδομένα με το ίδιο ID.</mrk>"
   someone: Κάποιος
   someone_bbbc538b: Κάποιος
   something_went_wrong_re_activating_the_user_please_82c3e7a: "<mrk mid=\"4894\" mtype=\"seg\">Κάτι δεν πήγε σωστά κατά την επανενεργοποίηση του χρήστη.</mrk> <mrk mid=\"4895\" mtype=\"seg\">Παρακαλώ δοκιμάστε ξανά αργότερα.</mrk>"
@@ -14376,6 +14388,7 @@ el:
     people: Άνθρωποι
     quizzes: Κουίζ
     rubrics: "Ρουμπρίκες Αξιολόγισης"
+    search: Αναζήτηση
     settings: Ρυθμίσεις
     syllabus: "Περίληψη Θεματολογίας Μαθήματος"
     tab_location_error: "Αυτή η τοποθεσία καρτέλας δεν είναι έγκυρη"
