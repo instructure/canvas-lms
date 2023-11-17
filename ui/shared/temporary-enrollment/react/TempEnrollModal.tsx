@@ -379,7 +379,7 @@ export function TempEnrollModal(props: Props) {
         open={open}
         size="large"
         label={I18n.t('Create a Temporary Enrollment')}
-        shouldCloseOnDocumentClick={true}
+        shouldCloseOnDocumentClick={false}
         themeOverride={{smallMaxWidth: '30em'}}
         onEnter={handleModalEnter}
         onEntered={handleModalEntered}
