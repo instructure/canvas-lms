@@ -4042,6 +4042,10 @@ class Assignment < ActiveRecord::Base
     ["duplicating", "failed_to_duplicate"].include?(workflow_state)
   end
 
+  def override_reflection_type_values
+    %w[Assignment AbstractAssignment]
+  end
+
   private
 
   def grading_type_requires_points?
