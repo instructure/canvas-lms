@@ -151,7 +151,7 @@ describe Lti::IMS::DynamicRegistrationController do
       end
 
       context "and with valid registration params" do
-        subject { get :create, params: { registration_token: valid_token, **registration_params } }
+        subject { post :create, params: { registration_token: valid_token, **registration_params } }
 
         it "accepts valid params and creates a registration model" do
           subject
@@ -182,7 +182,7 @@ describe Lti::IMS::DynamicRegistrationController do
       end
 
       context "and with invalid registration params" do
-        subject { get :create, params: { registration_token: valid_token, **invalid_registration_params } }
+        subject { post :create, params: { registration_token: valid_token, **invalid_registration_params } }
 
         let(:invalid_registration_params) do
           wrong_grant_types = registration_params
@@ -205,7 +205,7 @@ describe Lti::IMS::DynamicRegistrationController do
     end
 
     context "with an invalid token" do
-      subject { get :create, params: { registration_token: invalid_token, **registration_params } }
+      subject { post :create, params: { registration_token: invalid_token, **registration_params } }
 
       context "from more than an hour ago" do
         let(:invalid_token) do
