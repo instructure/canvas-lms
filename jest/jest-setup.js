@@ -79,8 +79,6 @@ global.console = {
 /* eslint-enable no-console */
 filterUselessConsoleMessages(global.console)
 
-require('jest-fetch-mock').enableFetchMocks()
-
 window.scroll = () => {}
 window.ENV = {
   use_rce_enhancements: true,
@@ -244,6 +242,9 @@ if (typeof window.URL.createObjectURL === 'undefined') {
 if (typeof window.URL.revokeObjectURL === 'undefined') {
   Object.defineProperty(window.URL, 'revokeObjectURL', {value: () => undefined})
 }
+
+global.fetch =
+  global.fetch || jest.fn().mockImplementation(() => Promise.resolve({json: () => ({})}))
 
 Document.prototype.createRange =
   Document.prototype.createRange ||

@@ -28,6 +28,9 @@ import {
 } from '../../../__tests__/fixtures'
 import ConnectedHeader, {Header} from '../header'
 import {CoursePace} from 'features/course_paces/react/types'
+import {enableFetchMocks} from 'jest-fetch-mock'
+
+enableFetchMocks()
 
 const defaultProps = {
   context_type: 'Course',

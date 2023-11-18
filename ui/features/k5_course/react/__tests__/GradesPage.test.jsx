@@ -28,6 +28,9 @@ import {
   MOCK_ENROLLMENTS,
   MOCK_ENROLLMENTS_WITH_OBSERVED_USERS,
 } from './mocks'
+import {enableFetchMocks} from 'jest-fetch-mock'
+
+enableFetchMocks()
 
 const GRADING_PERIODS_URL = encodeURI(
   '/api/v1/courses/12?include[]=grading_periods&include[]=current_grading_period_scores&include[]=total_scores'

@@ -19,9 +19,7 @@
 
 import fetchMock from 'fetch-mock'
 import {screen, waitFor} from '@testing-library/react'
-
 import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
-
 import {actions as uiActions} from '../ui'
 import {coursePaceActions, PUBLISH_STATUS_POLLING_MS} from '../course_paces'
 import {
@@ -37,6 +35,9 @@ import {
 } from '../../__tests__/fixtures'
 import {SyncState} from '../../shared/types'
 import {paceContextsActions} from '../pace_contexts'
+import {enableFetchMocks} from 'jest-fetch-mock'
+
+enableFetchMocks()
 
 const CREATE_API = `/api/v1/courses/${COURSE.id}/course_pacing`
 const UPDATE_API = `/api/v1/courses/${COURSE.id}/course_pacing/${PRIMARY_PACE.id}`

@@ -19,6 +19,9 @@
 import React from 'react'
 import ViolationTray from '../ViolationTray'
 import {render} from '@testing-library/react'
+import {enableFetchMocks} from 'jest-fetch-mock'
+
+enableFetchMocks()
 
 describe('Violation Tray', () => {
   beforeEach(() => {
