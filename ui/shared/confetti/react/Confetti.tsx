@@ -16,67 +16,31 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useState, useEffect, useRef} from 'react'
 import ConfettiGenerator from '../javascript/ConfettiGenerator'
-import getRandomConfettiFlavor from './confettiFlavor'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import hex2Rgb from '@canvas/util/hex2rgb'
+import {getBrandingColors, getProps} from '../javascript/confetti.utils'
 
 const I18n = useI18nScope('confetti')
 
-const getBrandingColors = () => {
-  if (window.ENV.confetti_branding_enabled && window.ENV.active_brand_config) {
-    const colorVars = window.ENV.active_brand_config.variables
-    const primaryBrand = colorVars['ic-brand-primary']
-    const secondaryBrand = colorVars['ic-brand-global-nav-bgd']
-    const colors = []
-    if (primaryBrand) colors.push(Object.values(hex2Rgb(primaryBrand)))
-    if (secondaryBrand) colors.push(Object.values(hex2Rgb(secondaryBrand)))
-    if (colors.length > 0) {
-      return {
-        colors,
-      }
-    }
-  }
-  return {}
-}
-
-const getProps = () => {
-  const props = ['square', getRandomConfettiFlavor()]
-  if (window.ENV.confetti_branding_enabled && window.ENV.active_brand_config) {
-    const variables = window.ENV.active_brand_config.variables
-    const logoUrl = variables['ic-brand-header-image']
-    if (logoUrl) {
-      props.push({
-        key: 'logo',
-        type: 'image',
-        src: logoUrl,
-        weight: 0.05,
-        size: 40,
-      })
-    }
-  }
-  return props.filter(p => p !== null)
-}
-
-export default function Confetti({triggerCount}) {
-  const [visible, setVisible] = React.useState(true)
-  React.useEffect(() => {
+export default function Confetti({triggerCount}: {triggerCount?: number | null}) {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const [visible, setVisible] = useState(true)
+  useEffect(() => {
     if (!visible) {
       setVisible(true)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [triggerCount])
 
-  React.useEffect(() => {
-    if (window.ENV.disable_celebrations || !visible) {
+  useEffect(() => {
+    if (window.ENV.disable_celebrations || !visible || !canvasRef.current) {
       return
     }
 
-    let forcefulCleanup
-    let clearConfettiOnSpaceOrEscape
-    let confetti
+    let forcefulCleanup: number | void
+    let clearConfettiOnSpaceOrEscape: (event: KeyboardEvent) => void
 
     const cleanup = () => {
       confetti.clear()
@@ -89,12 +53,9 @@ export default function Confetti({triggerCount}) {
       setVisible(false)
     }
 
-    confetti = new ConfettiGenerator({
-      props: getProps(),
-      ...getBrandingColors(),
-    })
+    const confetti = new ConfettiGenerator(getProps(), getBrandingColors(), canvasRef.current)
 
-    clearConfettiOnSpaceOrEscape = event => {
+    clearConfettiOnSpaceOrEscape = (event: KeyboardEvent) => {
       if (event.keyCode === 32 || event.keyCode === 27) {
         event.preventDefault()
         cleanup()
@@ -103,23 +64,21 @@ export default function Confetti({triggerCount}) {
 
     document.body.addEventListener('keydown', clearConfettiOnSpaceOrEscape)
     confetti.render()
-    setTimeout(() => {
-      showFlashAlert({
-        message: I18n.t('Great work! From the Canvas developers'),
-        srOnly: true,
-      })
-    }, 2500)
+    showFlashAlert({
+      message: I18n.t('Great work! From the Canvas developers'),
+      srOnly: true,
+    })
 
     // Automatically clear animation after 3 seconds, avoiding 5 second window
     // defined by WCAG Success Criterion 2.2.2: Pause, Stop, Hide.
-    forcefulCleanup = setTimeout(cleanup, 3000)
+    forcefulCleanup = setTimeout(cleanup, 3000) as unknown as number
 
     return cleanup
   }, [visible])
 
   return window.ENV.disable_celebrations || !visible ? null : (
     <canvas
-      id="confetti-canvas"
+      ref={canvasRef}
       data-testid="confetti-canvas"
       style={{position: 'fixed', top: 0, left: 0}}
     />

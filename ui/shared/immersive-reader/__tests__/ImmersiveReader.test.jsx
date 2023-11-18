@@ -17,7 +17,11 @@
  */
 import React from 'react'
 import {initializeReaderButton, ImmersiveReaderButton} from '../ImmersiveReader'
-import {render, fireEvent} from '@testing-library/react'
+import {render} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import {enableFetchMocks} from 'jest-fetch-mock'
+
+enableFetchMocks()
 
 describe('#initializeReaderButton', () => {
   it('renders the immersive reader button into the given mount point', () => {
@@ -65,7 +69,7 @@ describe('#initializeReaderButton', () => {
           <ImmersiveReaderButton content={fakeContent} readerSDK={fakeReaderLib} />
         )
         const button = await findByText(/Immersive Reader/)
-        fireEvent.click(button)
+        userEvent.click(button)
       })
 
       describe('with MathML content', () => {
@@ -119,7 +123,7 @@ describe('#initializeReaderButton', () => {
           )
 
           const button = await findByText(/^Immersive Reader$/)
-          fireEvent.click(button)
+          userEvent.click(button)
         })
       })
     })

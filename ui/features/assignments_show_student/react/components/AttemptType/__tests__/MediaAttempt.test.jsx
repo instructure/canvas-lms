@@ -17,12 +17,16 @@
  */
 
 import {mount} from 'enzyme'
-import {fireEvent, render} from '@testing-library/react'
+import {render} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import MediaAttempt from '../MediaAttempt'
 import {MediaPlayer} from '@instructure/ui-media-player'
 import {mockAssignmentAndSubmission} from '@canvas/assignments/graphql/studentMocks'
 import React from 'react'
 import StudentViewContext from '../../Context'
+import {enableFetchMocks} from 'jest-fetch-mock'
+
+enableFetchMocks()
 
 const submissionDraftOverrides = {
   Submission: {
@@ -116,7 +120,7 @@ describe('MediaAttempt', () => {
       const props = await makeProps(submissionDraftOverrides)
       const {getByTestId} = render(<MediaAttempt {...props} />)
       const trashButton = getByTestId('remove-media-recording')
-      fireEvent.click(trashButton)
+      userEvent.click(trashButton)
 
       expect(props.createSubmissionDraft).toHaveBeenCalledWith({
         variables: {
@@ -205,7 +209,7 @@ describe('MediaAttempt', () => {
   // const assignment = await mockAssignment()
   // const {getByText, getByTestId} = render(<MediaAttempt assignment={assignment} />)
   // const editButton = getByTestId('media-modal-launch-button')
-  // fireEvent.click(editButton)
+  // userEvent.click(editButton)
   // expect(
   // await waitFor(() => getByText('drag and drop or clik to browse'))
   // ).toBeInTheDocument()

@@ -44,7 +44,9 @@ type Role = {
 export interface EnvCommon {
   ASSET_HOST: string
   active_brand_config_json_url: string
-  active_brand_config: object
+  active_brand_config: {
+    variables: Record<string, string>
+  }
   badge_counts?: {
     discussions: number
     assignments: number

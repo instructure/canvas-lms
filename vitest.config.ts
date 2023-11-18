@@ -20,6 +20,7 @@
 
 import {defineConfig} from 'vitest/config'
 import handlebarsPlugin from './ui-build/esbuild/handlebars-plugin'
+import svgPlugin from './ui-build/esbuild/svg-plugin'
 
 export default defineConfig({
   test: {
@@ -31,5 +32,5 @@ export default defineConfig({
       provider: 'istanbul',
     },
   },
-  plugins: [handlebarsPlugin()],
+  plugins: [handlebarsPlugin(), svgPlugin()],
 })
