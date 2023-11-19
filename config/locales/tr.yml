@@ -180,6 +180,8 @@ tr:
   a_few_seconds_ago_e43118d: "birkaç saniye önce"
   a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "%{itemName} adlı bir dosya bu klasörde zaten var."
   a_file_named_name_already_exists_do_you_want_to_re_6536980: "\"%{name}\" adına bir dosya zaten bu konumda var. Var olan dosyayı değiştirmek ister misiniz?"
+  a_file_named_name_already_exists_in_this_folder_do_e39de0b2: "\"%{name}\" adlı dosya bu klasörde zaten var. Mevcut dosyayı değiştirmek ister misiniz?"
+  a_filter_preset_with_those_conditions_already_exis_43d3fe4e: "Bu koşullara sahip bir filtre ön ayarı zaten var."
   a_front_page_is_required_fd57b80: "Bir Ön sayfa gerekiyor"
   a_full_size_logo_that_appears_in_the_right_sidebar_18873685: "Canvas yönetim panelinin sağdaki kenar çubuğunda görünen tam ölçülü logo. İdeal boyutlar 360 x 140 pikseldir. Kabul edilen dosya formatları: svg, png, jepg, gif"
   a_great_discussion_6526a6d9: "Harika bir tartışma"
@@ -1452,6 +1454,7 @@ tr:
         turnitin_pledge: "Benzerlik Taahhüdü"
         turnitin_shared_secret: "Turnitin Gizli Anahtarı"
         users_can_edit_name: "Kullanıcılar kendi isimlerini düzenleyebilirler"
+        users_can_edit_profile: "Kullanıcılar profillerini düzenleyebilirler"
         value: "Duyurulara yorum yapılmasını engelle"
       links: 
         add_admins: "Hesap Yöneticileri"
@@ -2098,6 +2101,7 @@ tr:
   additional_outcomes_options_6df428f1: "Ek öğrenme çıktısı seçenekleri"
   additional_settings_for_sis_syncing_f926973e: "ÖBS eşzamanlaması için ek ayarlar"
   additional_sis_sync_assignment_quiz_and_discussion_d941fa5: "Ek ÖBS Eşzamanlama, Ödev, Kısa Sınav ve Tartışma ayarları"
+  additionally_if_this_permission_is_disabled_users__6acf5d08: "Ayrıca, eğer izin devre dışı bırakılırsa, kullanıcılar manuel olarak eklenen harici uygulamaları silemez"
   address_3159962f: "Adres:"
   address_book_dbecc4a3: "Adres Defteri"
   addressbook_microservice_a4940422: "Adres Defteri mikro servisi"
@@ -2237,12 +2241,15 @@ tr:
   allow_switching_to_the_enhanced_rce_317e746f: "Gelişmiş RCE'ye geçişe izin ver"
   allow_the_ability_to_send_notifications_through_ou_13cc8537: "Bildirimlerin gönderim kuyruğumuz ile gönderilebilmesine izin ver"
   allow_this_tool_to_access_the_ims_names_and_role_p_33e16d7f: "Bu aracın IMS İsileri ve Rol Sağlama Servisine erişimine izin verin"
+  allow_unconfirmed_e_mail_addresses_when_adding_use_47b7d5a2: "Kullanıcıları eklerken onaylanmamış e-posta adreslerine izin ver"
+  allow_users_to_comment_45b8f753: "Kullanıcıların yorum yapmasına izin ver"
   allowed_attempts_4e229caa: "İzin Verilen Hak"
   allows_creating_announcements_for_a_specific_secti_14e0a63d: "Belirli bir bölüm için duyuru oluşturulmasına izin verir"
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "ÖBS entegrasyonunda öğretmenler aktarılacak not verilerini toplu olarak   işaretleyebilsin."
   allows_the_duplicating_of_modules_in_canvas_2e15b444: "Canvas'ta modüllerin çoğaltılmasına izin verir"
   allows_the_duplication_of_calendar_events_7bb0d6c5: "Takvim olaylarının yinelenmesine izin verir"
   allows_the_scheduling_of_recurring_calendar_events_aac71007: "Yinelenen takvim olaylarının zamanlaması ayarlanabilsin"
+  allows_user_to_access_and_edit_the_admin_settings__e45da9d7: "Kullanıcının Commons'taki Yönetici ayarlarına erişmesine ve düzenlemesine izin ver"
   allows_user_to_add_remove_students_allows_user_to__44718712: "Kullanıcının öğrenci eklemesine / kaldırmasına izin verir. Kullanıcının gözlemci eklemesine / kaldırmasına izin verir. Kullanıcının öğrencilerin oturum açma ID bilgilerini görüntülemesine izin verir. Kullanıcının önceki ders kayıtlarını görüntülemesine izin verir. Kullanıcının bir kullanıcının ayarlar menüsüne ve kullanıcı ayrıntılarına erişmesine izin verir. Kullanıcının bir öğrencinin bölümünü veya rolünü düzenlemesine izin verir. Kullanıcının Ders Davetiyeleri sayfasından ders davetiyelerini tekrar göndermesine izin verir."
   allows_user_to_add_remove_students_to_the_course_a_f5b48d9: |-
       Kullanıcının derse öğrenci eklemesine / kaldırmasına izin verir.
@@ -2256,6 +2263,7 @@ tr:
   allows_user_to_create_new_conferences_allows_user__89cebec2: "Kullanıcının yeni canlı dersler oluşturmasına izin verir. Kullanıcının oluşturduğu canlı dersleri başlatmasına izin verir."
   allows_user_to_import_resources_from_commons_into__79e8255e: "Kullanıcının Commons'taki kaynakları bir derse aktarmasına izin verir."
   allows_user_to_manage_rubrics_326eedc2: "Kullanıcıların değerlendirme listelerini yönetmelerine izin ver."
+  allows_user_to_view_course_discussions_23346fa1: "Kullanıcının ders tartışmalarını görmesine izin ver"
   allows_user_to_view_list_of_users_in_the_course_pe_1b0b4bab: |-
       Kullanıcının dersteki Kişiler sayfasındaki kullanıcıların listesini görüntülemesine izin verir.
       Kullanıcının dersteki Kişiler sayfasındaki Önceki Kayıtlar düğmesini görüntülemesini sağlar.
@@ -6676,9 +6684,11 @@ tr:
   create_discussion_topics_8330d52b: "Tarışma başlıkları oluştur"
   create_educational_resources_8219326e: "Eğitsel kaynak oluştur"
   create_failed_15d07ad4: "Oluşturma başarısız"
+  create_filter_preset_d6f28bc4: "Filtre ön ayarı oluştur"
   create_group_set_7fe1cd53: "Grup Ayarı Oluştur"
   create_item_base: 
     there_was_an_error: "\"%{title}\" kaydedilmesinde hata, lütfen tekrar deneyiniz."
+  create_labels_to_organize_and_filter_conversations_9f5bb2c1: "Sohbetleri düzenlemek  ve filtrelemek için etiket oluştur"
   create_module_item: 
     assignment_name: "Ödev Adı"
   create_module_item_quiz: 
