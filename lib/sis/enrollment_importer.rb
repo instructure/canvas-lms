@@ -411,7 +411,7 @@ module SIS
           message = if user.deleted?
                       invalid_active_enrollment(enrollment, enrollment_info)
                     elsif pseudo.deleted?
-                      "Attempted enrolling with deleted sis login #{pseudo.id} in course #{enrollment_info.course_id}"
+                      "Attempted enrolling with deleted sis login #{pseudo.unique_id} in course #{enrollment_info.course_id}"
                     end
           if message
             @messages << SisBatch.build_error(enrollment_info.csv,
