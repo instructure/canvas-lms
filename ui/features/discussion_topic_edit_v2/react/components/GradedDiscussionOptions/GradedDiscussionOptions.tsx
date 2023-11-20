@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import PropTypes from 'prop-types'
 
 import {View} from '@instructure/ui-view'
 
@@ -27,8 +26,22 @@ import {PointsPossible} from './PointsPossible'
 import {PeerReviewOptions} from './PeerReviewOptions'
 import {AssignmentDueDatesManager} from './AssignmentDueDatesManager'
 
-// TODO: remove eslint-disable once this component is implemented
-// at the top of the file
+type Props = {
+  assignmentGroups: [{_id: string; name: string}]
+  pointsPossible: number
+  setPointsPossible: (points: number) => void
+  displayGradeAs: string
+  setDisplayGradeAs: (id: string | undefined) => void
+  assignmentGroup: string
+  setAssignmentGroup: (id: string | undefined) => void
+  peerReviewAssignment: string
+  setPeerReviewAssignment: (id: string | undefined) => void
+  peerReviewsPerStudent: number
+  setPeerReviewsPerStudent: (peerReviewsPerStudent: number) => void
+  peerReviewDueDate: string
+  setPeerReviewDueDate: (peerReviewDueDate: string) => void
+}
+
 export const GradedDiscussionOptions = ({
   assignmentGroups,
   pointsPossible,
@@ -43,7 +56,7 @@ export const GradedDiscussionOptions = ({
   setPeerReviewsPerStudent,
   peerReviewDueDate,
   setPeerReviewDueDate,
-}) => {
+}: Props) => {
   return (
     <View as="div">
       <View as="div" margin="medium 0">
@@ -74,20 +87,4 @@ export const GradedDiscussionOptions = ({
       </View>
     </View>
   )
-}
-
-GradedDiscussionOptions.propTypes = {
-  assignmentGroups: PropTypes.array,
-  pointsPossible: PropTypes.number,
-  setPointsPossible: PropTypes.func,
-  displayGradeAs: PropTypes.string,
-  setDisplayGradeAs: PropTypes.func,
-  assignmentGroup: PropTypes.string,
-  setAssignmentGroup: PropTypes.func,
-  peerReviewAssignment: PropTypes.string,
-  setPeerReviewAssignment: PropTypes.func,
-  peerReviewsPerStudent: PropTypes.number,
-  setPeerReviewsPerStudent: PropTypes.func,
-  peerReviewDueDate: PropTypes.string,
-  setPeerReviewDueDate: PropTypes.func,
 }

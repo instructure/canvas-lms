@@ -46,7 +46,12 @@ const gradedDiscussionOptions = [
   },
 ]
 
-export const DisplayGradeAs = ({displayGradeAs, setDisplayGradeAs}) => {
+type Props = {
+  displayGradeAs: string
+  setDisplayGradeAs: (id: string | undefined) => void
+}
+
+export const DisplayGradeAs = ({displayGradeAs, setDisplayGradeAs}: Props) => {
   return (
     <SimpleSelect
       renderLabel={I18n.t('Display Grade As')}
