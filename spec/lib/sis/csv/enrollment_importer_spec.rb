@@ -388,7 +388,7 @@ describe SIS::CSV::EnrollmentImporter do
       "test_1,user_1,student,,active,"
     )
     errors = importer.errors.map(&:last)
-    expect(errors).to include(/Attempted enrolling with deleted sis login/)
+    expect(errors).to include(/Attempted enrolling with deleted sis login user1 in course test_1/)
     expect(importer.batch.roll_back_data.count).to eq 0
   end
 
