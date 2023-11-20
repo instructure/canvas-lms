@@ -23,11 +23,17 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 
 const I18n = useI18nScope('discussion_create')
 
+type Props = {
+  assignmentGroup: string
+  setAssignmentGroup: (id: string | undefined) => void
+  availableAssignmentGroups: any[]
+}
+
 export const AssignmentGroupSelect = ({
   assignmentGroup,
   setAssignmentGroup,
   availableAssignmentGroups,
-}) => {
+}: Props) => {
   return (
     <SimpleSelect
       renderLabel={I18n.t('Assignment Group')}

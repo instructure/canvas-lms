@@ -23,14 +23,19 @@ import {NumberInput} from '@instructure/ui-number-input'
 
 const I18n = useI18nScope('discussion_create')
 
-export const PointsPossible = ({pointsPossible, setPointsPossible}) => {
+type Props = {
+  pointsPossible: number
+  setPointsPossible: (points: number) => void
+}
+
+export const PointsPossible = ({pointsPossible, setPointsPossible}: Props) => {
   return (
     <NumberInput
       data-testid="points-possible-input"
       renderLabel={I18n.t('Points Possible')}
       onIncrement={() => setPointsPossible(pointsPossible + 1)}
       onDecrement={() => setPointsPossible(pointsPossible - 1)}
-      value={pointsPossible}
+      value={pointsPossible.toString()}
       onChange={event => {
         // don't allow non-numeric values
         if (!/^\d*\.?\d*$/.test(event.target.value)) return
