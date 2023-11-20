@@ -130,7 +130,7 @@ exports[`shows an Alert when there's a query error 1`] = `
   >
     <div
       style={
-        Object {
+        {
           "margin": "0 auto",
           "width": "50%",
         }

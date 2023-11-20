@@ -228,7 +228,7 @@ exports[`renders 1`] = `
         </Text>
         <div
           dangerouslySetInnerHTML={
-            Object {
+            {
               "__html": "about this event",
             }
           }
@@ -467,7 +467,7 @@ exports[`renders with allDay 1`] = `
         </Text>
         <div
           dangerouslySetInnerHTML={
-            Object {
+            {
               "__html": "about this event",
             }
           }
@@ -706,7 +706,7 @@ exports[`renders with only the startTime 1`] = `
         </Text>
         <div
           dangerouslySetInnerHTML={
-            Object {
+            {
               "__html": "about this event",
             }
           }
@@ -945,7 +945,7 @@ exports[`renders with user displayName for calendar 1`] = `
         </Text>
         <div
           dangerouslySetInnerHTML={
-            Object {
+            {
               "__html": "about this event",
             }
           }
@@ -1146,7 +1146,7 @@ exports[`renders without address 1`] = `
         </Text>
         <div
           dangerouslySetInnerHTML={
-            Object {
+            {
               "__html": "about this event",
             }
           }
@@ -1562,7 +1562,7 @@ exports[`renders without location 1`] = `
         </Text>
         <div
           dangerouslySetInnerHTML={
-            Object {
+            {
               "__html": "about this event",
             }
           }

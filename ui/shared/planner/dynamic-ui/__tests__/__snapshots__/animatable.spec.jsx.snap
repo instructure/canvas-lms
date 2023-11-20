@@ -3,7 +3,7 @@
 exports[`passes trigger property functions and forwards the calls to the dynamic ui manager 1`] = `
 <DynamicUiProvider
   manager={
-    Object {
+    {
       "deregisterAnimatable": [MockFunction],
       "handleAction": [MockFunction],
       "preTriggerUpdates": [MockFunction],

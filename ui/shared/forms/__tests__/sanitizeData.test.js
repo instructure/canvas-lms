@@ -81,7 +81,7 @@ describe('sanitizeData()', () => {
 
     it('allows the elements', () => {
       expect(subject().text).toMatchInlineSnapshot(`
-        " <iframe style=\\"width: 800px; height: 600px;\\" title=\\"It's amazing\\" src=\\"/\\" width=\\"800\\" height=\\"600\\" allowfullscreen=\\"allowfullscreen\\" webkitallowfullscreen=\\"webkitallowfullscreen\\" mozallowfullscreen=\\"mozallowfullscreen\\" allow=\\"geolocation *; microphone *; camera *; midi *; encrypted-media *; autoplay *; clipboard-write *; display-capture *\\">
+        " <iframe style="width: 800px; height: 600px;" title="It's amazing" src="/" width="800" height="600" allowfullscreen="allowfullscreen" webkitallowfullscreen="webkitallowfullscreen" mozallowfullscreen="mozallowfullscreen" allow="geolocation *; microphone *; camera *; midi *; encrypted-media *; autoplay *; clipboard-write *; display-capture *">
                   </iframe> "
       `)
     })

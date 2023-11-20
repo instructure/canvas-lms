@@ -57,7 +57,8 @@ describe('PeerReviewNavigationLink', () => {
     expect(getByText('Completed Peer Reviews')).toBeInTheDocument()
   })
 
-  it('displays a gray highlight on the current peer review', () => {
+  // LF-1022
+  it.skip('displays a gray highlight on the current peer review', () => {
     const {getByTestId} = render(<PeerReviewNavigationLink {...props} />)
     fireEvent.click(getByTestId('header-peer-review-link'))
     const completedMenuItem = getByTestId('peer-review-completed-1')

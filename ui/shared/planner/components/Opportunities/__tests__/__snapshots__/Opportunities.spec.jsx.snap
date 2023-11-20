@@ -54,7 +54,7 @@ exports[`renders nothing if no opportunities 1`] = `
     id="opportunities_parent"
     onKeyDown={[Function]}
     style={
-      Object {
+      {
         "maxHeight": "none",
       }
     }
@@ -177,7 +177,7 @@ exports[`renders the base component correctly with one of each kind of opportuni
     id="opportunities_parent"
     onKeyDown={[Function]}
     style={
-      Object {
+      {
         "maxHeight": "none",
       }
     }
@@ -332,7 +332,7 @@ exports[`renders the right course with the right opportunity 1`] = `
     id="opportunities_parent"
     onKeyDown={[Function]}
     style={
-      Object {
+      {
         "maxHeight": "none",
       }
     }
