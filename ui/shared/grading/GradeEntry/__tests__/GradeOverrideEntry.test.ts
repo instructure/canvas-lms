@@ -687,8 +687,32 @@ describe('GradeOverrideEntry', () => {
           expect(gradeInfoFromGrade({schemeKey: 'B-'}).valid).toBe(false)
         })
 
-        it('is set to false when when the scheme is a points based grading scheme and the user input a number', () => {
-          // note that a product decision was made to disallow entry of percentages (or points) for points based grading schemes - only letter grade overrides are allowed
+        it('is set to true when the scheme is a points based grading scheme and the user inputs a number and returns the equivalent percentage', () => {
+          const gradeEntryOptions = {
+            gradingScheme: {
+              data: [
+                ['A', 0.9],
+                ['B', 0.8],
+                ['C', 0.7],
+                ['D', 0.6],
+                ['F', 0.5],
+              ],
+              id: 'some-id',
+              pointsBased: true,
+              scalingFactor: 10.0,
+              title: 'A Points Based Grading Scheme',
+            },
+            pointsBasedGradingSchemesFeatureEnabled: true,
+          }
+
+          const gradeOverrideEntry = new GradeOverrideEntry(gradeEntryOptions)
+          const res = gradeOverrideEntry.gradeInfoFromGrade({percentage: '9.7'}, true)
+          expect(res.valid).toBe(true)
+          expect(res.enteredAs).toBe(EnterGradesAs.POINTS)
+          expect(res.grade?.percentage).toBe(97)
+        })
+
+        it('is set to true when the scheme is a points based grading scheme and the user inputs a percentage and returns the percentage and schemeKey', () => {
           const gradeEntryOptions = {
             gradingScheme: {
               data: [
@@ -707,10 +731,14 @@ describe('GradeOverrideEntry', () => {
           }
 
           const gradeOverrideEntry = new GradeOverrideEntry(gradeEntryOptions)
-          expect(gradeOverrideEntry.gradeInfoFromGrade({percentage: 80}, true).valid).toBe(false)
+          const res = gradeOverrideEntry.gradeInfoFromGrade({percentage: '75%'}, true)
+          expect(res.valid).toBe(true)
+          expect(res.enteredAs).toBe(EnterGradesAs.PERCENTAGE)
+          expect(res.grade?.percentage).toBe(75)
+          expect(res.grade?.schemeKey).toBe('C')
         })
 
-        it('is set to true when when the scheme is a points based grading scheme and the persisted override is a percent', () => {
+        it('is set to true when the scheme is a points based grading scheme and the persisted override is a percent', () => {
           // note that the server always saves the override as a percentage, so this test is necessary to ensure initial rendering doesn't result in validation errors
           const gradeEntryOptions = {
             gradingScheme: {
@@ -730,7 +758,11 @@ describe('GradeOverrideEntry', () => {
           }
 
           const gradeOverrideEntry = new GradeOverrideEntry(gradeEntryOptions)
-          expect(gradeOverrideEntry.gradeInfoFromGrade({percentage: 80}, false).valid).toBe(true)
+          const res = gradeOverrideEntry.gradeInfoFromGrade({percentage: 80}, false)
+          expect(res.valid).toBe(true)
+          expect(res.enteredAs).toBe(EnterGradesAs.PERCENTAGE)
+          expect(res.grade?.percentage).toBe(80)
+          expect(res.grade?.schemeKey).toBe('B')
         })
       })
     })

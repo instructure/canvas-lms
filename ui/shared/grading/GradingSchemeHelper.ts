@@ -84,3 +84,12 @@ export function gradeToScoreLowerBound(
 
   return round(matchingSchemeValue * 100, 2)
 }
+
+export function gradePointsToPercentage(
+  grade: null | number,
+  gradingScheme: DeprecatedGradingScheme
+) {
+  if (gradingScheme.pointsBased && grade != null) {
+    return (grade / gradingScheme.scalingFactor) * 100
+  }
+}
