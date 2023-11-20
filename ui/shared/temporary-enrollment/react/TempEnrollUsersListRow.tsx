@@ -36,17 +36,13 @@ const I18n = useI18nScope('temporary_enrollment')
 const analyticProps = createAnalyticPropsGenerator(MODULE_NAME)
 
 export function generateIcon(role: string | null) {
-  let title: string
   switch (role) {
     case PROVIDER:
-      title = I18n.t('Provider of temporary enrollment, click to edit')
-      return <IconCalendarClockSolid color="success" title={title} />
+      return <IconCalendarClockSolid color="success" />
     case RECIPIENT:
-      title = I18n.t('Recipient of temporary enrollment, click to edit')
-      return <IconCalendarReservedSolid color="success" title={title} />
+      return <IconCalendarReservedSolid color="success" />
     default:
-      title = I18n.t('No temporary enrollment, click to create one')
-      return <IconCalendarClockLine title={title} />
+      return <IconCalendarClockLine />
   }
 }
 
