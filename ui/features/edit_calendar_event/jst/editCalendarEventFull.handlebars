@@ -141,7 +141,7 @@
 
   {{#if ENV.FEATURES.calendar_series}}
     <fieldset>
-      <div id="recurring_event_frequency_picker">frequency picker</div>
+      <div id="recurring_event_frequency_picker"></div>
     </fieldset>
   {{/if}}
 
@@ -180,8 +180,8 @@
     </fieldset>
   {{/if}}
 
-  {{#unless ENV.FEATURES.calendar_series}}
-    {{#if newRecord}}
+  {{!-- Only show duplicate form if is new record. If calendar_series flag is on, this is only enabled for section dates. --}}
+  {{#if newRecord}}
     <label class="label_with_checkbox" for="duplicate_event">
       <input type="checkbox" id="duplicate_event" name="duplicate" value="true"/>
       {{#t "repeat"}}Duplicate{{/t}}
@@ -213,8 +213,7 @@
         {{#t}}Number each event{{/t}}
       </label>
     </div>
-    {{/if}}
-  {{/unless}}
+  {{/if}}
 
   <div class="form-actions">
     {{#if url}}
