@@ -170,7 +170,7 @@ export function TempEnrollEdit(props: Props) {
             onClick={() => handleEditClick(enrollments)}
             {...analyticProps('Edit')}
           >
-            <IconEditLine title={I18n.t('Edit')} />
+            <IconEditLine />
           </IconButton>
         </Tooltip>
       )}
@@ -186,7 +186,7 @@ export function TempEnrollEdit(props: Props) {
             onClick={() => handleDeleteClick(enrollments)}
             {...analyticProps('Delete')}
           >
-            <IconTrashLine title={I18n.t('Delete')} />
+            <IconTrashLine />
           </IconButton>
         </Tooltip>
       )}
