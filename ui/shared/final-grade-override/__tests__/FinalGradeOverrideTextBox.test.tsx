@@ -93,9 +93,7 @@ describe('FinalGradeOverrideTextBox', () => {
       fireEvent.change(input, {target: {value: 'invalid'}})
       fireEvent.blur(input)
       expect(input).toHaveValue('84%')
-      expect(mockedOnGradeChange).toHaveBeenCalled()
-      const args = mockedOnGradeChange.mock.calls[0][0]
-      expect(args.valid).toEqual(false)
+      expect(mockedOnGradeChange).not.toHaveBeenCalled()
     })
 
     it('does not change the grade when the user enters the same grade', async () => {
