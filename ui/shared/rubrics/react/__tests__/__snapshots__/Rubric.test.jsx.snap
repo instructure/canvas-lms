@@ -4,7 +4,7 @@ exports[`the Rubric component hides the score total when needed 1`] = `
 <div
   className="react-rubric"
   style={
-    Object {
+    {
       "minWidth": "37.5rem",
     }
   }
@@ -92,7 +92,7 @@ exports[`the Rubric component hides the score total when needed 1`] = `
         allowExtraCredit={false}
         allowSavedComments={true}
         assessment={
-          Object {
+          {
             "comments": "i'd like to say some things",
             "comments_enabled": true,
             "criterion_id": "_1384",
@@ -100,7 +100,7 @@ exports[`the Rubric component hides the score total when needed 1`] = `
             "editComments": true,
             "id": "7_4778",
             "learning_outcome_id": null,
-            "points": Object {
+            "points": {
               "text": null,
               "valid": true,
               "value": 3.2,
@@ -108,28 +108,28 @@ exports[`the Rubric component hides the score total when needed 1`] = `
           }
         }
         criterion={
-          Object {
+          {
             "criterion_use_range": false,
             "description": "Description of criterion",
             "id": "_1384",
             "long_description": "",
             "points": 8,
-            "ratings": Array [
-              Object {
+            "ratings": [
+              {
                 "criterion_id": "_1384",
                 "description": "Full Marks",
                 "id": "blank",
                 "long_description": "",
                 "points": 8,
               },
-              Object {
+              {
                 "criterion_id": "_1384",
                 "description": "bleh",
                 "id": "7_4778",
                 "long_description": "blah",
                 "points": 3,
               },
-              Object {
+              {
                 "criterion_id": "_1384",
                 "description": "No Marks",
                 "id": "blank_2",
@@ -139,20 +139,20 @@ exports[`the Rubric component hides the score total when needed 1`] = `
             ],
           }
         }
-        customRatings={Array []}
+        customRatings={[]}
         freeForm={false}
         hasPointsColumn={true}
         hidePoints={false}
         isSummary={false}
         key="_1384"
         onAssessmentChange={null}
-        savedComments={Array []}
+        savedComments={[]}
       />
       <Row
         allowExtraCredit={false}
         allowSavedComments={true}
         assessment={
-          Object {
+          {
             "above_threshold": false,
             "comments": "here too",
             "comments_enabled": true,
@@ -161,7 +161,7 @@ exports[`the Rubric component hides the score total when needed 1`] = `
             "editComments": true,
             "id": "7_6639",
             "learning_outcome_id": "612",
-            "points": Object {
+            "points": {
               "text": null,
               "valid": true,
               "value": 3,
@@ -169,7 +169,7 @@ exports[`the Rubric component hides the score total when needed 1`] = `
           }
         }
         criterion={
-          Object {
+          {
             "criterion_use_range": false,
             "description": "Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.",
             "id": "7_391",
@@ -178,22 +178,22 @@ exports[`the Rubric component hides the score total when needed 1`] = `
             "long_description": "sa Sivert.",
             "mastery_points": 3,
             "points": 3,
-            "ratings": Array [
-              Object {
+            "ratings": [
+              {
                 "criterion_id": "7_391",
                 "description": "Naturligvis hadde han ogsaa længe forstaat hvorfor Inger hadde ordet om.",
                 "id": "7_6639",
                 "long_description": "",
                 "points": 3,
               },
-              Object {
+              {
                 "criterion_id": "7_391",
                 "description": "De levet tæt hos hverandre som Dyr i Skogen, de sov og spiste, det lidde saa.",
                 "id": "7_194",
                 "long_description": "",
                 "points": 2,
               },
-              Object {
+              {
                 "criterion_id": "7_391",
                 "description": "Et graat og rødt Uldtørklæde med Frynser var pragtfuldt paa hendes mørke Haar.",
                 "id": "7_8479",
@@ -203,14 +203,14 @@ exports[`the Rubric component hides the score total when needed 1`] = `
             ],
           }
         }
-        customRatings={Array []}
+        customRatings={[]}
         freeForm={false}
         hasPointsColumn={true}
         hidePoints={false}
         isSummary={false}
         key="7_391"
         onAssessmentChange={null}
-        savedComments={Array []}
+        savedComments={[]}
       />
     </Body>
   </Table>
@@ -221,7 +221,7 @@ exports[`the Rubric component points column does have a points column if points 
 <div
   className="react-rubric"
   style={
-    Object {
+    {
       "minWidth": "37.5rem",
     }
   }
@@ -309,7 +309,7 @@ exports[`the Rubric component points column does have a points column if points 
         allowExtraCredit={false}
         allowSavedComments={true}
         assessment={
-          Object {
+          {
             "comments": "i'd like to say some things",
             "comments_enabled": true,
             "criterion_id": "_1384",
@@ -317,7 +317,7 @@ exports[`the Rubric component points column does have a points column if points 
             "editComments": true,
             "id": "7_4778",
             "learning_outcome_id": null,
-            "points": Object {
+            "points": {
               "text": null,
               "valid": true,
               "value": 3.2,
@@ -325,28 +325,28 @@ exports[`the Rubric component points column does have a points column if points 
           }
         }
         criterion={
-          Object {
+          {
             "criterion_use_range": false,
             "description": "Description of criterion",
             "id": "_1384",
             "long_description": "",
             "points": 8,
-            "ratings": Array [
-              Object {
+            "ratings": [
+              {
                 "criterion_id": "_1384",
                 "description": "Full Marks",
                 "id": "blank",
                 "long_description": "",
                 "points": 8,
               },
-              Object {
+              {
                 "criterion_id": "_1384",
                 "description": "bleh",
                 "id": "7_4778",
                 "long_description": "blah",
                 "points": 3,
               },
-              Object {
+              {
                 "criterion_id": "_1384",
                 "description": "No Marks",
                 "id": "blank_2",
@@ -356,20 +356,20 @@ exports[`the Rubric component points column does have a points column if points 
             ],
           }
         }
-        customRatings={Array []}
+        customRatings={[]}
         freeForm={false}
         hasPointsColumn={true}
         hidePoints={true}
         isSummary={false}
         key="_1384"
         onAssessmentChange={[Function]}
-        savedComments={Array []}
+        savedComments={[]}
       />
       <Row
         allowExtraCredit={false}
         allowSavedComments={true}
         assessment={
-          Object {
+          {
             "above_threshold": false,
             "comments": "here too",
             "comments_enabled": true,
@@ -378,7 +378,7 @@ exports[`the Rubric component points column does have a points column if points 
             "editComments": true,
             "id": "7_6639",
             "learning_outcome_id": "612",
-            "points": Object {
+            "points": {
               "text": null,
               "valid": true,
               "value": 3,
@@ -386,7 +386,7 @@ exports[`the Rubric component points column does have a points column if points 
           }
         }
         criterion={
-          Object {
+          {
             "criterion_use_range": false,
             "description": "Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.",
             "id": "7_391",
@@ -395,22 +395,22 @@ exports[`the Rubric component points column does have a points column if points 
             "long_description": "sa Sivert.",
             "mastery_points": 3,
             "points": 3,
-            "ratings": Array [
-              Object {
+            "ratings": [
+              {
                 "criterion_id": "7_391",
                 "description": "Naturligvis hadde han ogsaa længe forstaat hvorfor Inger hadde ordet om.",
                 "id": "7_6639",
                 "long_description": "",
                 "points": 3,
               },
-              Object {
+              {
                 "criterion_id": "7_391",
                 "description": "De levet tæt hos hverandre som Dyr i Skogen, de sov og spiste, det lidde saa.",
                 "id": "7_194",
                 "long_description": "",
                 "points": 2,
               },
-              Object {
+              {
                 "criterion_id": "7_391",
                 "description": "Et graat og rødt Uldtørklæde med Frynser var pragtfuldt paa hendes mørke Haar.",
                 "id": "7_8479",
@@ -420,14 +420,14 @@ exports[`the Rubric component points column does have a points column if points 
             ],
           }
         }
-        customRatings={Array []}
+        customRatings={[]}
         freeForm={false}
         hasPointsColumn={true}
         hidePoints={true}
         isSummary={false}
         key="7_391"
         onAssessmentChange={[Function]}
-        savedComments={Array []}
+        savedComments={[]}
       />
     </Body>
   </Table>
@@ -438,7 +438,7 @@ exports[`the Rubric component points column does not have a points column if poi
 <div
   className="react-rubric"
   style={
-    Object {
+    {
       "minWidth": "30rem",
     }
   }
@@ -508,7 +508,7 @@ exports[`the Rubric component points column does not have a points column if poi
         allowExtraCredit={false}
         allowSavedComments={true}
         assessment={
-          Object {
+          {
             "comments": "i'd like to say some things",
             "comments_enabled": true,
             "criterion_id": "_1384",
@@ -516,7 +516,7 @@ exports[`the Rubric component points column does not have a points column if poi
             "editComments": true,
             "id": "7_4778",
             "learning_outcome_id": null,
-            "points": Object {
+            "points": {
               "text": null,
               "valid": true,
               "value": 3.2,
@@ -524,28 +524,28 @@ exports[`the Rubric component points column does not have a points column if poi
           }
         }
         criterion={
-          Object {
+          {
             "criterion_use_range": false,
             "description": "Description of criterion",
             "id": "_1384",
             "long_description": "",
             "points": 8,
-            "ratings": Array [
-              Object {
+            "ratings": [
+              {
                 "criterion_id": "_1384",
                 "description": "Full Marks",
                 "id": "blank",
                 "long_description": "",
                 "points": 8,
               },
-              Object {
+              {
                 "criterion_id": "_1384",
                 "description": "bleh",
                 "id": "7_4778",
                 "long_description": "blah",
                 "points": 3,
               },
-              Object {
+              {
                 "criterion_id": "_1384",
                 "description": "No Marks",
                 "id": "blank_2",
@@ -555,20 +555,20 @@ exports[`the Rubric component points column does not have a points column if poi
             ],
           }
         }
-        customRatings={Array []}
+        customRatings={[]}
         freeForm={true}
         hasPointsColumn={false}
         hidePoints={true}
         isSummary={false}
         key="_1384"
         onAssessmentChange={[Function]}
-        savedComments={Array []}
+        savedComments={[]}
       />
       <Row
         allowExtraCredit={false}
         allowSavedComments={true}
         assessment={
-          Object {
+          {
             "above_threshold": false,
             "comments": "here too",
             "comments_enabled": true,
@@ -577,7 +577,7 @@ exports[`the Rubric component points column does not have a points column if poi
             "editComments": true,
             "id": "7_6639",
             "learning_outcome_id": "612",
-            "points": Object {
+            "points": {
               "text": null,
               "valid": true,
               "value": 3,
@@ -585,7 +585,7 @@ exports[`the Rubric component points column does not have a points column if poi
           }
         }
         criterion={
-          Object {
+          {
             "criterion_use_range": false,
             "description": "Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.",
             "id": "7_391",
@@ -594,22 +594,22 @@ exports[`the Rubric component points column does not have a points column if poi
             "long_description": "sa Sivert.",
             "mastery_points": 3,
             "points": 3,
-            "ratings": Array [
-              Object {
+            "ratings": [
+              {
                 "criterion_id": "7_391",
                 "description": "Naturligvis hadde han ogsaa længe forstaat hvorfor Inger hadde ordet om.",
                 "id": "7_6639",
                 "long_description": "",
                 "points": 3,
               },
-              Object {
+              {
                 "criterion_id": "7_391",
                 "description": "De levet tæt hos hverandre som Dyr i Skogen, de sov og spiste, det lidde saa.",
                 "id": "7_194",
                 "long_description": "",
                 "points": 2,
               },
-              Object {
+              {
                 "criterion_id": "7_391",
                 "description": "Et graat og rødt Uldtørklæde med Frynser var pragtfuldt paa hendes mørke Haar.",
                 "id": "7_8479",
@@ -619,14 +619,14 @@ exports[`the Rubric component points column does not have a points column if poi
             ],
           }
         }
-        customRatings={Array []}
+        customRatings={[]}
         freeForm={true}
         hasPointsColumn={false}
         hidePoints={true}
         isSummary={false}
         key="7_391"
         onAssessmentChange={[Function]}
-        savedComments={Array []}
+        savedComments={[]}
       />
     </Body>
   </Table>
@@ -637,7 +637,7 @@ exports[`the Rubric component points column does not have a points column if poi
 <div
   className="react-rubric"
   style={
-    Object {
+    {
       "minWidth": "37.5rem",
     }
   }
@@ -707,7 +707,7 @@ exports[`the Rubric component points column does not have a points column if poi
         allowExtraCredit={false}
         allowSavedComments={true}
         assessment={
-          Object {
+          {
             "comments": "i'd like to say some things",
             "comments_enabled": true,
             "criterion_id": "_1384",
@@ -715,7 +715,7 @@ exports[`the Rubric component points column does not have a points column if poi
             "editComments": true,
             "id": "7_4778",
             "learning_outcome_id": null,
-            "points": Object {
+            "points": {
               "text": null,
               "valid": true,
               "value": 3.2,
@@ -723,28 +723,28 @@ exports[`the Rubric component points column does not have a points column if poi
           }
         }
         criterion={
-          Object {
+          {
             "criterion_use_range": false,
             "description": "Description of criterion",
             "id": "_1384",
             "long_description": "",
             "points": 8,
-            "ratings": Array [
-              Object {
+            "ratings": [
+              {
                 "criterion_id": "_1384",
                 "description": "Full Marks",
                 "id": "blank",
                 "long_description": "",
                 "points": 8,
               },
-              Object {
+              {
                 "criterion_id": "_1384",
                 "description": "bleh",
                 "id": "7_4778",
                 "long_description": "blah",
                 "points": 3,
               },
-              Object {
+              {
                 "criterion_id": "_1384",
                 "description": "No Marks",
                 "id": "blank_2",
@@ -754,20 +754,20 @@ exports[`the Rubric component points column does not have a points column if poi
             ],
           }
         }
-        customRatings={Array []}
+        customRatings={[]}
         freeForm={false}
         hasPointsColumn={false}
         hidePoints={true}
         isSummary={false}
         key="_1384"
         onAssessmentChange={null}
-        savedComments={Array []}
+        savedComments={[]}
       />
       <Row
         allowExtraCredit={false}
         allowSavedComments={true}
         assessment={
-          Object {
+          {
             "above_threshold": false,
             "comments": "here too",
             "comments_enabled": true,
@@ -776,7 +776,7 @@ exports[`the Rubric component points column does not have a points column if poi
             "editComments": true,
             "id": "7_6639",
             "learning_outcome_id": "612",
-            "points": Object {
+            "points": {
               "text": null,
               "valid": true,
               "value": 3,
@@ -784,7 +784,7 @@ exports[`the Rubric component points column does not have a points column if poi
           }
         }
         criterion={
-          Object {
+          {
             "criterion_use_range": false,
             "description": "Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.",
             "id": "7_391",
@@ -793,22 +793,22 @@ exports[`the Rubric component points column does not have a points column if poi
             "long_description": "sa Sivert.",
             "mastery_points": 3,
             "points": 3,
-            "ratings": Array [
-              Object {
+            "ratings": [
+              {
                 "criterion_id": "7_391",
                 "description": "Naturligvis hadde han ogsaa længe forstaat hvorfor Inger hadde ordet om.",
                 "id": "7_6639",
                 "long_description": "",
                 "points": 3,
               },
-              Object {
+              {
                 "criterion_id": "7_391",
                 "description": "De levet tæt hos hverandre som Dyr i Skogen, de sov og spiste, det lidde saa.",
                 "id": "7_194",
                 "long_description": "",
                 "points": 2,
               },
-              Object {
+              {
                 "criterion_id": "7_391",
                 "description": "Et graat og rødt Uldtørklæde med Frynser var pragtfuldt paa hendes mørke Haar.",
                 "id": "7_8479",
@@ -818,14 +818,14 @@ exports[`the Rubric component points column does not have a points column if poi
             ],
           }
         }
-        customRatings={Array []}
+        customRatings={[]}
         freeForm={false}
         hasPointsColumn={false}
         hidePoints={true}
         isSummary={false}
         key="7_391"
         onAssessmentChange={null}
-        savedComments={Array []}
+        savedComments={[]}
       />
     </Body>
   </Table>
@@ -835,7 +835,7 @@ exports[`the Rubric component points column does not have a points column if poi
 exports[`the Rubric component points column does not have a points column in summary mode 1`] = `
 <div
   className="react-rubric"
-  style={Object {}}
+  style={{}}
 >
   <Table
     caption="Point Rubric"
@@ -902,7 +902,7 @@ exports[`the Rubric component points column does not have a points column in sum
         allowExtraCredit={false}
         allowSavedComments={true}
         assessment={
-          Object {
+          {
             "comments": "i'd like to say some things",
             "comments_enabled": true,
             "criterion_id": "_1384",
@@ -910,7 +910,7 @@ exports[`the Rubric component points column does not have a points column in sum
             "editComments": true,
             "id": "7_4778",
             "learning_outcome_id": null,
-            "points": Object {
+            "points": {
               "text": null,
               "valid": true,
               "value": 3.2,
@@ -918,28 +918,28 @@ exports[`the Rubric component points column does not have a points column in sum
           }
         }
         criterion={
-          Object {
+          {
             "criterion_use_range": false,
             "description": "Description of criterion",
             "id": "_1384",
             "long_description": "",
             "points": 8,
-            "ratings": Array [
-              Object {
+            "ratings": [
+              {
                 "criterion_id": "_1384",
                 "description": "Full Marks",
                 "id": "blank",
                 "long_description": "",
                 "points": 8,
               },
-              Object {
+              {
                 "criterion_id": "_1384",
                 "description": "bleh",
                 "id": "7_4778",
                 "long_description": "blah",
                 "points": 3,
               },
-              Object {
+              {
                 "criterion_id": "_1384",
                 "description": "No Marks",
                 "id": "blank_2",
@@ -949,20 +949,20 @@ exports[`the Rubric component points column does not have a points column in sum
             ],
           }
         }
-        customRatings={Array []}
+        customRatings={[]}
         freeForm={false}
         hasPointsColumn={false}
         hidePoints={false}
         isSummary={true}
         key="_1384"
         onAssessmentChange={[Function]}
-        savedComments={Array []}
+        savedComments={[]}
       />
       <Row
         allowExtraCredit={false}
         allowSavedComments={true}
         assessment={
-          Object {
+          {
             "above_threshold": false,
             "comments": "here too",
             "comments_enabled": true,
@@ -971,7 +971,7 @@ exports[`the Rubric component points column does not have a points column in sum
             "editComments": true,
             "id": "7_6639",
             "learning_outcome_id": "612",
-            "points": Object {
+            "points": {
               "text": null,
               "valid": true,
               "value": 3,
@@ -979,7 +979,7 @@ exports[`the Rubric component points column does not have a points column in sum
           }
         }
         criterion={
-          Object {
+          {
             "criterion_use_range": false,
             "description": "Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.",
             "id": "7_391",
@@ -988,22 +988,22 @@ exports[`the Rubric component points column does not have a points column in sum
             "long_description": "sa Sivert.",
             "mastery_points": 3,
             "points": 3,
-            "ratings": Array [
-              Object {
+            "ratings": [
+              {
                 "criterion_id": "7_391",
                 "description": "Naturligvis hadde han ogsaa længe forstaat hvorfor Inger hadde ordet om.",
                 "id": "7_6639",
                 "long_description": "",
                 "points": 3,
               },
-              Object {
+              {
                 "criterion_id": "7_391",
                 "description": "De levet tæt hos hverandre som Dyr i Skogen, de sov og spiste, det lidde saa.",
                 "id": "7_194",
                 "long_description": "",
                 "points": 2,
               },
-              Object {
+              {
                 "criterion_id": "7_391",
                 "description": "Et graat og rødt Uldtørklæde med Frynser var pragtfuldt paa hendes mørke Haar.",
                 "id": "7_8479",
@@ -1013,14 +1013,14 @@ exports[`the Rubric component points column does not have a points column in sum
             ],
           }
         }
-        customRatings={Array []}
+        customRatings={[]}
         freeForm={false}
         hasPointsColumn={false}
         hidePoints={false}
         isSummary={true}
         key="7_391"
         onAssessmentChange={[Function]}
-        savedComments={Array []}
+        savedComments={[]}
       />
       <Row>
         <Cell
@@ -1056,7 +1056,7 @@ exports[`the Rubric component points column has a points column if points visibl
 <div
   className="react-rubric"
   style={
-    Object {
+    {
       "minWidth": "37.5rem",
     }
   }
@@ -1144,7 +1144,7 @@ exports[`the Rubric component points column has a points column if points visibl
         allowExtraCredit={false}
         allowSavedComments={true}
         assessment={
-          Object {
+          {
             "comments": "i'd like to say some things",
             "comments_enabled": true,
             "criterion_id": "_1384",
@@ -1152,7 +1152,7 @@ exports[`the Rubric component points column has a points column if points visibl
             "editComments": true,
             "id": "7_4778",
             "learning_outcome_id": null,
-            "points": Object {
+            "points": {
               "text": null,
               "valid": true,
               "value": 3.2,
@@ -1160,28 +1160,28 @@ exports[`the Rubric component points column has a points column if points visibl
           }
         }
         criterion={
-          Object {
+          {
             "criterion_use_range": false,
             "description": "Description of criterion",
             "id": "_1384",
             "long_description": "",
             "points": 8,
-            "ratings": Array [
-              Object {
+            "ratings": [
+              {
                 "criterion_id": "_1384",
                 "description": "Full Marks",
                 "id": "blank",
                 "long_description": "",
                 "points": 8,
               },
-              Object {
+              {
                 "criterion_id": "_1384",
                 "description": "bleh",
                 "id": "7_4778",
                 "long_description": "blah",
                 "points": 3,
               },
-              Object {
+              {
                 "criterion_id": "_1384",
                 "description": "No Marks",
                 "id": "blank_2",
@@ -1191,20 +1191,20 @@ exports[`the Rubric component points column has a points column if points visibl
             ],
           }
         }
-        customRatings={Array []}
+        customRatings={[]}
         freeForm={false}
         hasPointsColumn={true}
         hidePoints={false}
         isSummary={false}
         key="_1384"
         onAssessmentChange={[Function]}
-        savedComments={Array []}
+        savedComments={[]}
       />
       <Row
         allowExtraCredit={false}
         allowSavedComments={true}
         assessment={
-          Object {
+          {
             "above_threshold": false,
             "comments": "here too",
             "comments_enabled": true,
@@ -1213,7 +1213,7 @@ exports[`the Rubric component points column has a points column if points visibl
             "editComments": true,
             "id": "7_6639",
             "learning_outcome_id": "612",
-            "points": Object {
+            "points": {
               "text": null,
               "valid": true,
               "value": 3,
@@ -1221,7 +1221,7 @@ exports[`the Rubric component points column has a points column if points visibl
           }
         }
         criterion={
-          Object {
+          {
             "criterion_use_range": false,
             "description": "Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.",
             "id": "7_391",
@@ -1230,22 +1230,22 @@ exports[`the Rubric component points column has a points column if points visibl
             "long_description": "sa Sivert.",
             "mastery_points": 3,
             "points": 3,
-            "ratings": Array [
-              Object {
+            "ratings": [
+              {
                 "criterion_id": "7_391",
                 "description": "Naturligvis hadde han ogsaa længe forstaat hvorfor Inger hadde ordet om.",
                 "id": "7_6639",
                 "long_description": "",
                 "points": 3,
               },
-              Object {
+              {
                 "criterion_id": "7_391",
                 "description": "De levet tæt hos hverandre som Dyr i Skogen, de sov og spiste, det lidde saa.",
                 "id": "7_194",
                 "long_description": "",
                 "points": 2,
               },
-              Object {
+              {
                 "criterion_id": "7_391",
                 "description": "Et graat og rødt Uldtørklæde med Frynser var pragtfuldt paa hendes mørke Haar.",
                 "id": "7_8479",
@@ -1255,14 +1255,14 @@ exports[`the Rubric component points column has a points column if points visibl
             ],
           }
         }
-        customRatings={Array []}
+        customRatings={[]}
         freeForm={false}
         hasPointsColumn={true}
         hidePoints={false}
         isSummary={false}
         key="7_391"
         onAssessmentChange={[Function]}
-        savedComments={Array []}
+        savedComments={[]}
       />
       <Row>
         <Cell
@@ -1298,7 +1298,7 @@ exports[`the Rubric component renders as expected 1`] = `
 <div
   className="react-rubric"
   style={
-    Object {
+    {
       "minWidth": "37.5rem",
     }
   }
@@ -1386,7 +1386,7 @@ exports[`the Rubric component renders as expected 1`] = `
         allowExtraCredit={false}
         allowSavedComments={true}
         assessment={
-          Object {
+          {
             "comments": "i'd like to say some things",
             "comments_enabled": true,
             "criterion_id": "_1384",
@@ -1394,7 +1394,7 @@ exports[`the Rubric component renders as expected 1`] = `
             "editComments": true,
             "id": "7_4778",
             "learning_outcome_id": null,
-            "points": Object {
+            "points": {
               "text": null,
               "valid": true,
               "value": 3.2,
@@ -1402,28 +1402,28 @@ exports[`the Rubric component renders as expected 1`] = `
           }
         }
         criterion={
-          Object {
+          {
             "criterion_use_range": false,
             "description": "Description of criterion",
             "id": "_1384",
             "long_description": "",
             "points": 8,
-            "ratings": Array [
-              Object {
+            "ratings": [
+              {
                 "criterion_id": "_1384",
                 "description": "Full Marks",
                 "id": "blank",
                 "long_description": "",
                 "points": 8,
               },
-              Object {
+              {
                 "criterion_id": "_1384",
                 "description": "bleh",
                 "id": "7_4778",
                 "long_description": "blah",
                 "points": 3,
               },
-              Object {
+              {
                 "criterion_id": "_1384",
                 "description": "No Marks",
                 "id": "blank_2",
@@ -1433,20 +1433,20 @@ exports[`the Rubric component renders as expected 1`] = `
             ],
           }
         }
-        customRatings={Array []}
+        customRatings={[]}
         freeForm={false}
         hasPointsColumn={true}
         hidePoints={false}
         isSummary={false}
         key="_1384"
         onAssessmentChange={null}
-        savedComments={Array []}
+        savedComments={[]}
       />
       <Row
         allowExtraCredit={false}
         allowSavedComments={true}
         assessment={
-          Object {
+          {
             "above_threshold": false,
             "comments": "here too",
             "comments_enabled": true,
@@ -1455,7 +1455,7 @@ exports[`the Rubric component renders as expected 1`] = `
             "editComments": true,
             "id": "7_6639",
             "learning_outcome_id": "612",
-            "points": Object {
+            "points": {
               "text": null,
               "valid": true,
               "value": 3,
@@ -1463,7 +1463,7 @@ exports[`the Rubric component renders as expected 1`] = `
           }
         }
         criterion={
-          Object {
+          {
             "criterion_use_range": false,
             "description": "Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.",
             "id": "7_391",
@@ -1472,22 +1472,22 @@ exports[`the Rubric component renders as expected 1`] = `
             "long_description": "sa Sivert.",
             "mastery_points": 3,
             "points": 3,
-            "ratings": Array [
-              Object {
+            "ratings": [
+              {
                 "criterion_id": "7_391",
                 "description": "Naturligvis hadde han ogsaa længe forstaat hvorfor Inger hadde ordet om.",
                 "id": "7_6639",
                 "long_description": "",
                 "points": 3,
               },
-              Object {
+              {
                 "criterion_id": "7_391",
                 "description": "De levet tæt hos hverandre som Dyr i Skogen, de sov og spiste, det lidde saa.",
                 "id": "7_194",
                 "long_description": "",
                 "points": 2,
               },
-              Object {
+              {
                 "criterion_id": "7_391",
                 "description": "Et graat og rødt Uldtørklæde med Frynser var pragtfuldt paa hendes mørke Haar.",
                 "id": "7_8479",
@@ -1497,14 +1497,14 @@ exports[`the Rubric component renders as expected 1`] = `
             ],
           }
         }
-        customRatings={Array []}
+        customRatings={[]}
         freeForm={false}
         hasPointsColumn={true}
         hidePoints={false}
         isSummary={false}
         key="7_391"
         onAssessmentChange={null}
-        savedComments={Array []}
+        savedComments={[]}
       />
       <Row>
         <Cell
@@ -1540,7 +1540,7 @@ exports[`the Rubric component renders properly with no assessment 1`] = `
 <div
   className="react-rubric"
   style={
-    Object {
+    {
       "minWidth": "37.5rem",
     }
   }
@@ -1629,28 +1629,28 @@ exports[`the Rubric component renders properly with no assessment 1`] = `
         allowSavedComments={true}
         assessment={null}
         criterion={
-          Object {
+          {
             "criterion_use_range": false,
             "description": "Description of criterion",
             "id": "_1384",
             "long_description": "",
             "points": 8,
-            "ratings": Array [
-              Object {
+            "ratings": [
+              {
                 "criterion_id": "_1384",
                 "description": "Full Marks",
                 "id": "blank",
                 "long_description": "",
                 "points": 8,
               },
-              Object {
+              {
                 "criterion_id": "_1384",
                 "description": "bleh",
                 "id": "7_4778",
                 "long_description": "blah",
                 "points": 3,
               },
-              Object {
+              {
                 "criterion_id": "_1384",
                 "description": "No Marks",
                 "id": "blank_2",
@@ -1660,21 +1660,21 @@ exports[`the Rubric component renders properly with no assessment 1`] = `
             ],
           }
         }
-        customRatings={Array []}
+        customRatings={[]}
         freeForm={false}
         hasPointsColumn={true}
         hidePoints={false}
         isSummary={false}
         key="_1384"
         onAssessmentChange={null}
-        savedComments={Array []}
+        savedComments={[]}
       />
       <Row
         allowExtraCredit={false}
         allowSavedComments={true}
         assessment={null}
         criterion={
-          Object {
+          {
             "criterion_use_range": false,
             "description": "Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.",
             "id": "7_391",
@@ -1683,22 +1683,22 @@ exports[`the Rubric component renders properly with no assessment 1`] = `
             "long_description": "sa Sivert.",
             "mastery_points": 3,
             "points": 3,
-            "ratings": Array [
-              Object {
+            "ratings": [
+              {
                 "criterion_id": "7_391",
                 "description": "Naturligvis hadde han ogsaa længe forstaat hvorfor Inger hadde ordet om.",
                 "id": "7_6639",
                 "long_description": "",
                 "points": 3,
               },
-              Object {
+              {
                 "criterion_id": "7_391",
                 "description": "De levet tæt hos hverandre som Dyr i Skogen, de sov og spiste, det lidde saa.",
                 "id": "7_194",
                 "long_description": "",
                 "points": 2,
               },
-              Object {
+              {
                 "criterion_id": "7_391",
                 "description": "Et graat og rødt Uldtørklæde med Frynser var pragtfuldt paa hendes mørke Haar.",
                 "id": "7_8479",
@@ -1708,14 +1708,14 @@ exports[`the Rubric component renders properly with no assessment 1`] = `
             ],
           }
         }
-        customRatings={Array []}
+        customRatings={[]}
         freeForm={false}
         hasPointsColumn={true}
         hidePoints={false}
         isSummary={false}
         key="7_391"
         onAssessmentChange={null}
-        savedComments={Array []}
+        savedComments={[]}
       />
       <Row>
         <Cell
@@ -1751,7 +1751,7 @@ exports[`the Rubric component updates the total score when an individual criteri
 <div
   className="react-rubric"
   style={
-    Object {
+    {
       "minWidth": "37.5rem",
     }
   }
@@ -1839,7 +1839,7 @@ exports[`the Rubric component updates the total score when an individual criteri
         allowExtraCredit={false}
         allowSavedComments={true}
         assessment={
-          Object {
+          {
             "comments": "i'd like to say some things",
             "comments_enabled": true,
             "criterion_id": "_1384",
@@ -1847,35 +1847,35 @@ exports[`the Rubric component updates the total score when an individual criteri
             "editComments": true,
             "id": "7_4778",
             "learning_outcome_id": null,
-            "points": Object {
+            "points": {
               "valid": true,
               "value": 2,
             },
           }
         }
         criterion={
-          Object {
+          {
             "criterion_use_range": false,
             "description": "Description of criterion",
             "id": "_1384",
             "long_description": "",
             "points": 8,
-            "ratings": Array [
-              Object {
+            "ratings": [
+              {
                 "criterion_id": "_1384",
                 "description": "Full Marks",
                 "id": "blank",
                 "long_description": "",
                 "points": 8,
               },
-              Object {
+              {
                 "criterion_id": "_1384",
                 "description": "bleh",
                 "id": "7_4778",
                 "long_description": "blah",
                 "points": 3,
               },
-              Object {
+              {
                 "criterion_id": "_1384",
                 "description": "No Marks",
                 "id": "blank_2",
@@ -1885,20 +1885,20 @@ exports[`the Rubric component updates the total score when an individual criteri
             ],
           }
         }
-        customRatings={Array []}
+        customRatings={[]}
         freeForm={false}
         hasPointsColumn={true}
         hidePoints={false}
         isSummary={false}
         key="_1384"
         onAssessmentChange={[Function]}
-        savedComments={Array []}
+        savedComments={[]}
       />
       <Row
         allowExtraCredit={false}
         allowSavedComments={true}
         assessment={
-          Object {
+          {
             "above_threshold": false,
             "comments": "here too",
             "comments_enabled": true,
@@ -1907,7 +1907,7 @@ exports[`the Rubric component updates the total score when an individual criteri
             "editComments": true,
             "id": "7_6639",
             "learning_outcome_id": "612",
-            "points": Object {
+            "points": {
               "text": null,
               "valid": true,
               "value": 3,
@@ -1915,7 +1915,7 @@ exports[`the Rubric component updates the total score when an individual criteri
           }
         }
         criterion={
-          Object {
+          {
             "criterion_use_range": false,
             "description": "Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.",
             "id": "7_391",
@@ -1924,22 +1924,22 @@ exports[`the Rubric component updates the total score when an individual criteri
             "long_description": "sa Sivert.",
             "mastery_points": 3,
             "points": 3,
-            "ratings": Array [
-              Object {
+            "ratings": [
+              {
                 "criterion_id": "7_391",
                 "description": "Naturligvis hadde han ogsaa længe forstaat hvorfor Inger hadde ordet om.",
                 "id": "7_6639",
                 "long_description": "",
                 "points": 3,
               },
-              Object {
+              {
                 "criterion_id": "7_391",
                 "description": "De levet tæt hos hverandre som Dyr i Skogen, de sov og spiste, det lidde saa.",
                 "id": "7_194",
                 "long_description": "",
                 "points": 2,
               },
-              Object {
+              {
                 "criterion_id": "7_391",
                 "description": "Et graat og rødt Uldtørklæde med Frynser var pragtfuldt paa hendes mørke Haar.",
                 "id": "7_8479",
@@ -1949,14 +1949,14 @@ exports[`the Rubric component updates the total score when an individual criteri
             ],
           }
         }
-        customRatings={Array []}
+        customRatings={[]}
         freeForm={false}
         hasPointsColumn={true}
         hidePoints={false}
         isSummary={false}
         key="7_391"
         onAssessmentChange={[Function]}
-        savedComments={Array []}
+        savedComments={[]}
       />
       <Row>
         <Cell

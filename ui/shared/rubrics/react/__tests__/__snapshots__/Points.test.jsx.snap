@@ -24,7 +24,7 @@ exports[`The Points component renders the component when assessing with the expe
       <TextInput
         display="inline-block"
         isRequired={false}
-        messages={Array []}
+        messages={[]}
         onChange={[Function]}
         renderLabel={
           <ScreenReaderContent

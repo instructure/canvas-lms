@@ -150,7 +150,7 @@ exports[`ProficiencyRating can manage renders the ProficiencyRating component 1`
           >
             <div
               style={
-                Object {
+                {
                   "margin": "0 0.8rem",
                   "padding": "0.55rem 0 0",
                 }
@@ -159,7 +159,7 @@ exports[`ProficiencyRating can manage renders the ProficiencyRating component 1`
               <span
                 className="colorPickerIcon"
                 style={
-                  Object {
+                  {
                     "background": "#00ff00",
                   }
                 }
@@ -193,64 +193,64 @@ exports[`ProficiencyRating can manage renders the ProficiencyRating component 1`
           afterClose={[Function]}
           allowWhite={false}
           colors={
-            Array [
-              Object {
+            [
+              {
                 "hexcode": "#BD3C14",
                 "name": "Brick",
               },
-              Object {
+              {
                 "hexcode": "#FF2717",
                 "name": "Red",
               },
-              Object {
+              {
                 "hexcode": "#E71F63",
                 "name": "Magenta",
               },
-              Object {
+              {
                 "hexcode": "#8F3E97",
                 "name": "Purple",
               },
-              Object {
+              {
                 "hexcode": "#65499D",
                 "name": "Deep Purple",
               },
-              Object {
+              {
                 "hexcode": "#4554A4",
                 "name": "Indigo",
               },
-              Object {
+              {
                 "hexcode": "#1770AB",
                 "name": "Blue",
               },
-              Object {
+              {
                 "hexcode": "#0B9BE3",
                 "name": "Light Blue",
               },
-              Object {
+              {
                 "hexcode": "#06A3B7",
                 "name": "Cyan",
               },
-              Object {
+              {
                 "hexcode": "#009688",
                 "name": "Teal",
               },
-              Object {
+              {
                 "hexcode": "#009606",
                 "name": "Green",
               },
-              Object {
+              {
                 "hexcode": "#8D9900",
                 "name": "Olive",
               },
-              Object {
+              {
                 "hexcode": "#D97900",
                 "name": "Pumpkin",
               },
-              Object {
+              {
                 "hexcode": "#FD5D10",
                 "name": "Orange",
               },
-              Object {
+              {
                 "hexcode": "#F06291",
                 "name": "Pink",
               },
@@ -420,7 +420,7 @@ exports[`ProficiencyRating can not manage renders the ProficiencyRating componen
       <span
         className="colorPickerIcon"
         style={
-          Object {
+          {
             "background": "#00ff00",
             "marginLeft": "2rem",
           }

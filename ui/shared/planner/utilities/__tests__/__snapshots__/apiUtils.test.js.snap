@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`transformApiToInternalGrade transforms with grading periods 1`] = `
-Object {
+{
   "courseId": "42",
   "grade": "D",
   "hasGradingPeriods": true,
@@ -12,7 +12,7 @@ Object {
 `;
 
 exports[`transformApiToInternalGrade transforms without grading periods 1`] = `
-Object {
+{
   "courseId": "42",
   "grade": "F",
   "hasGradingPeriods": false,
@@ -23,7 +23,7 @@ Object {
 `;
 
 exports[`transformApiToInternalItem copes with a non-existent (e.g. concluded) course 1`] = `
-Object {
+{
   "address": null,
   "completed": false,
   "context": undefined,
@@ -50,11 +50,11 @@ Object {
 `;
 
 exports[`transformApiToInternalItem extracts and transforms the proper data for a calendar event response 1`] = `
-Object {
+{
   "address": "Here",
   "allDay": false,
   "completed": false,
-  "context": Object {
+  "context": {
     "color": "#abffaa",
     "id": "1",
     "image_url": "blah_url",
@@ -86,11 +86,11 @@ Object {
 `;
 
 exports[`transformApiToInternalItem extracts and transforms the proper data for a calendar event response with an all day date 1`] = `
-Object {
+{
   "address": "Here",
   "allDay": true,
   "completed": false,
-  "context": Object {
+  "context": {
     "color": "#abffaa",
     "id": "1",
     "image_url": "blah_url",
@@ -122,10 +122,10 @@ Object {
 `;
 
 exports[`transformApiToInternalItem extracts and transforms the proper data for a discussion response 1`] = `
-Object {
+{
   "address": null,
   "completed": false,
-  "context": Object {
+  "context": {
     "color": "#abffaa",
     "id": "1",
     "image_url": "blah_url",
@@ -156,10 +156,10 @@ Object {
 `;
 
 exports[`transformApiToInternalItem extracts and transforms the proper data for a graded discussion response 1`] = `
-Object {
+{
   "address": null,
   "completed": false,
-  "context": Object {
+  "context": {
     "color": "#abffaa",
     "id": "1",
     "image_url": "blah_url",
@@ -190,10 +190,10 @@ Object {
 `;
 
 exports[`transformApiToInternalItem extracts and transforms the proper data for a graded discussion response with an unread count 1`] = `
-Object {
+{
   "address": null,
   "completed": true,
-  "context": Object {
+  "context": {
     "color": "#abffaa",
     "id": "1",
     "image_url": "blah_url",
@@ -214,7 +214,7 @@ Object {
   "overrideAssignId": 9,
   "overrideId": null,
   "points": 40,
-  "status": Object {
+  "status": {
     "submitted": true,
     "unread_count": 10,
   },
@@ -227,10 +227,10 @@ Object {
 `;
 
 exports[`transformApiToInternalItem extracts and transforms the proper data for a planner_note response 1`] = `
-Object {
+{
   "address": null,
   "completed": false,
-  "context": Object {
+  "context": {
     "color": "#abffaa",
     "id": "1",
     "image_url": "blah_url",
@@ -261,7 +261,7 @@ Object {
 `;
 
 exports[`transformApiToInternalItem extracts and transforms the proper data for a planner_note response without an associated course 1`] = `
-Object {
+{
   "address": null,
   "completed": false,
   "course_id": undefined,
@@ -287,10 +287,10 @@ Object {
 `;
 
 exports[`transformApiToInternalItem extracts and transforms the proper data for a quiz response 1`] = `
-Object {
+{
   "address": null,
   "completed": false,
-  "context": Object {
+  "context": {
     "color": "#abffaa",
     "id": "1",
     "image_url": "blah_url",
@@ -320,10 +320,10 @@ Object {
 `;
 
 exports[`transformApiToInternalItem extracts and transforms the proper data for an assignment response 1`] = `
-Object {
+{
   "address": null,
   "completed": false,
-  "context": Object {
+  "context": {
     "color": "#abffaa",
     "id": "1",
     "image_url": "blah_url",
@@ -353,10 +353,10 @@ Object {
 `;
 
 exports[`transformApiToInternalItem extracts and transforms the proper data for an ungraded discussion reponse with an unread count 1`] = `
-Object {
+{
   "address": null,
   "completed": false,
-  "context": Object {
+  "context": {
     "color": "#abffaa",
     "id": "1",
     "image_url": "blah_url",
@@ -377,7 +377,7 @@ Object {
   "overrideAssignId": 9,
   "overrideId": null,
   "points": undefined,
-  "status": Object {
+  "status": {
     "unread_count": 10,
   },
   "title": "How to make enemies",
@@ -389,10 +389,10 @@ Object {
 `;
 
 exports[`transformApiToInternalItem extracts and transforms the proper date for a peer review 1`] = `
-Object {
+{
   "address": null,
   "completed": false,
-  "context": Object {
+  "context": {
     "color": "#abffaa",
     "id": "1",
     "image_url": "blah_url",
@@ -422,11 +422,11 @@ Object {
 `;
 
 exports[`transformApiToInternalItem extracts and transforms the proper date for an account calendar event 1`] = `
-Object {
+{
   "address": "Here",
   "allDay": false,
   "completed": false,
-  "context": Object {
+  "context": {
     "color": undefined,
     "id": "1",
     "image_url": undefined,
@@ -458,10 +458,10 @@ Object {
 `;
 
 exports[`transformApiToInternalItem handles account-level group items 1`] = `
-Object {
+{
   "address": null,
   "completed": false,
-  "context": Object {
+  "context": {
     "color": "#ffeeee",
     "id": "9",
     "image_url": undefined,
@@ -491,11 +491,11 @@ Object {
 `;
 
 exports[`transformApiToInternalItem includes location and endTime if given 1`] = `
-Object {
+{
   "address": "Here",
   "allDay": false,
   "completed": false,
-  "context": Object {
+  "context": {
     "color": "#abffaa",
     "id": "1",
     "image_url": "blah_url",
@@ -528,9 +528,9 @@ Object {
 `;
 
 exports[`transformPlannerNoteApiToInternalItem transforms the planner note response to an internal item when the planner note has an associated course 1`] = `
-Object {
+{
   "completed": false,
-  "context": Object {
+  "context": {
     "color": "#abffaa",
     "id": "1",
     "image_url": "blah_url",
@@ -551,9 +551,9 @@ Object {
 `;
 
 exports[`transformPlannerNoteApiToInternalItem transforms the planner note response to the internal item 1`] = `
-Object {
+{
   "completed": false,
-  "context": Object {},
+  "context": {},
   "course_id": null,
   "date": "2017-06-21T18:58:51.000Z",
   "dateBucketMoment": "2017-06-21T18:58:51.000Z",

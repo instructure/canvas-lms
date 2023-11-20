@@ -42,7 +42,7 @@ exports[`The Ratings component only renders the single selected Rating with a fo
     aria-label={null}
     className="shader nearMasteryShader"
     style={
-      Object {
+      {
         "backgroundColor": null,
       }
     }
@@ -50,7 +50,7 @@ exports[`The Ratings component only renders the single selected Rating with a fo
     <div
       className="triangle"
       style={
-        Object {
+        {
           "borderBottomColor": null,
         }
       }
@@ -99,7 +99,7 @@ exports[`The Ratings component renders a default rating if none of the ratings a
     aria-label={null}
     className="shader"
     style={
-      Object {
+      {
         "backgroundColor": undefined,
       }
     }
@@ -107,7 +107,7 @@ exports[`The Ratings component renders a default rating if none of the ratings a
     <div
       className="triangle"
       style={
-        Object {
+        {
           "borderBottomColor": undefined,
         }
       }
@@ -165,7 +165,7 @@ exports[`The Ratings component renders the Rating sub-components as expected whe
     aria-label={null}
     className="shader"
     style={
-      Object {
+      {
         "backgroundColor": "transparent",
       }
     }
@@ -173,7 +173,7 @@ exports[`The Ratings component renders the Rating sub-components as expected whe
     <div
       className="triangle"
       style={
-        Object {
+        {
           "borderBottomColor": "transparent",
         }
       }
@@ -233,7 +233,7 @@ exports[`The Ratings component renders the Rating sub-components as expected whe
     aria-label="This rating is selected"
     className="shader nearMasteryShader"
     style={
-      Object {
+      {
         "backgroundColor": null,
       }
     }
@@ -241,7 +241,7 @@ exports[`The Ratings component renders the Rating sub-components as expected whe
     <div
       className="triangle"
       style={
-        Object {
+        {
           "borderBottomColor": null,
         }
       }
@@ -299,7 +299,7 @@ exports[`The Ratings component renders the Rating sub-components as expected whe
     aria-label={null}
     className="shader"
     style={
-      Object {
+      {
         "backgroundColor": "transparent",
       }
     }
@@ -307,7 +307,7 @@ exports[`The Ratings component renders the Rating sub-components as expected whe
     <div
       className="triangle"
       style={
-        Object {
+        {
           "borderBottomColor": "transparent",
         }
       }
