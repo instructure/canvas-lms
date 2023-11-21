@@ -51,7 +51,7 @@ GEM
     os (1.1.4)
     psych (5.1.1.1)
       stringio
-    public_suffix (5.0.3)
+    public_suffix (5.0.4)
     rake (13.1.0)
     rdoc (6.6.0)
       psych (>= 4.0.0)
