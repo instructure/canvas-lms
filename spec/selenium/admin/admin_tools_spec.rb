@@ -651,7 +651,6 @@ describe "admin_tools" do
     end
 
     it "performs searches" do
-      skip "FOO-4092"
       @account.settings[:admins_can_view_notifications] = true
       @account.save!
       load_admin_tools_page
@@ -661,7 +660,7 @@ describe "admin_tools" do
       replace_content fj('label:contains("Last bounced before") input'), 3.days.ago.iso8601
       fj('button:contains("Search")').click
       wait_for_ajaximations
-      data = ff("#bouncedEmailsPane table td").map(&:text)
+      data = f("#bouncedEmailsPane").text
       expect(data).not_to include "one@example.com"
       expect(data).to include "two@example.com"
       expect(data).not_to include "three@example.com"
