@@ -1267,7 +1267,7 @@ fi:
     settings: 
       about_google_docs: |-
           Google Docs-esikatselut sallivat käyttäjien tarkastelevan asiakirjoja 
-           Canvasin sisällä sen sijaan, että heidän täytyisi ladata ne ja 
+          Canvasin sisällä sen sijaan, että heidän täytyisi ladata ne ja 
           avata vastaava ohjelma (esim. Word tai  Excel).
           
           Google Docs-esikatselut voivat myös näyttää tiedostotyyppejä,
@@ -2017,6 +2017,7 @@ fi:
   add_quiz_cebfa28b: "Lisää testi"
   add_quiz_ip_filter_c7b37dc5: "Lisää testin IP-suodatin"
   add_rating_89d7fbde: "Lisää luokitus"
+  add_recipient_by_6d95f71e: "Lisää vastaanottaja"
   add_recipient_ff135ed7: "Lisää vastaanottaja"
   add_remove_in_courses_d65aaee3: "lisää/poista kursseja"
   add_remove_in_courses_fa1c9081: "Lisää/poista kursseja"
@@ -2134,6 +2135,7 @@ fi:
   admins_3e1dce15: Järjestelmäkäyttäjät
   admins_add_remove_26811ce5: "Pääkäyttäjät - lisää/poista"
   advanced_36b35b8: Edistyneet
+  advanced_analytics_course_readiness_and_students_i_6b3c439f: "Lisäanalyysi - Kurssin valmius ja opiskelijat, jotka tarvitsevat huomiota"
   advanced_analytics_course_readiness_closed_alpha_13c8aaf: "Lisäanayysi - Kurssin valmiuden suljettu Alpha"
   advertise_release_notes_via_the_ui_9254bc6c: "Mainosta julkaisuilmoituksia käyttöliittymän kautta"
   affects_viewing_the_conclude_course_and_permanentl_8216fcc2: "Vaikuttaa Suorita kurssi loppuun - ja Poista tämä kurssi pysyvästi -painikkeiden tarkasteluun. Poista tämä kurssi pysyvästi -painike näkyy vain manuaalisesti luoduille kursseille."
@@ -3212,6 +3214,7 @@ fi:
   an_existing_canvas_user_with_the_user_id_has_alrea_e487b0: "Olemassa oleva Canvasin käyttäjä %{user_id} on jo ottanut käyttöön %{other_user_id}n  pyydetyn integration_id :n, ohitetaan"
   an_existing_user_does_not_match_existing_user_ids__156c7a52: "Olemassa oleva käyttäjä ei täsmää olemassa olevan käyttäjätunnuksen kanssa, joka annettiin SIS ID:n kanssa %{user_id}, ohitetaan"
   an_export_is_already_in_progress_54270f01: "Vienti on jo käynnissä."
+  an_in_progress_working_prototype_of_the_learner_pa_aa79f239: "Käynnissä oleva toimiva prototyyppi oppijan passiominaisuudesta."
   an_internal_error_occurred_83b8a685: "Tapahtui sisäinen virhe"
   an_item_named_name_already_exists_in_this_location_147b7312: "Tässä sijaintipaikassa on jo kohde nimeltä \"%{name}\" . Haluatko korvata olemassa olevan tiedoston?"
   an_object_of_type_graphql_type_was_hidden_due_to_i_60998e99: "Tyypin %{graphql_type} objekti piilotettiin riittämättömien näkyvyysalueiden vuoksi käyttöoikeustunnuksessa"
@@ -5548,6 +5551,7 @@ fi:
             on jokaiselle näkyvissä välittömästi.
   canvas_id_f42f6ad: "Canvasin tunnus"
   canvas_insights_beta_view_4cf67797: "Canvas Insights (beeta) - näkymä"
+  canvas_instructor_guide_7cf106cb: "Canvasin Ohjaajan opas"
   canvas_introduction_video_2d81f3ad: "Canvasin esittelyvideo"
   canvas_is_attempting_to_retreive_the_submissions_p_4d47973d: "Canvas yrittää palauttaa lähetyksiä. Tarkista myöhemmin uudelleen."
   canvas_is_not_configured_to_receive_logins_from_is_502a4491: "Canvasia ei ole konfiguroitu vastaanottamaan kirjautumisia kohteesta %{issuer}."
@@ -7110,6 +7114,7 @@ fi:
   copy_to_folder_32ecc3c3: "Kopioi kansioon"
   copying_628a9607: Kopioidaan...
   copyright_and_license_information_must_be_provided_5feffaf: "Tiedostojen tekijänoikeutta ja lisenssiä koskevat tiedot täytyy määrittää ennen niiden julkaisua."
+  copyright_holder_386cc8b8: "Tekijänoikeuden haltija"
   copyright_holder_66ee111: "Tekijänoikeuden haltija:"
   correct_answer: "Tämä oli oikea vastaus."
   correct_answer_5a6a57d1: "Oikea vastaus"
@@ -7810,6 +7815,7 @@ fi:
   course_sis_7ae8f649: "kurssin sis"
   course_sis_df8b379: "Kurssin sis"
   course_sis_id_bbed1a60: "kurssin sis-tunnus"
+  course_sis_id_cd834b3c: "Kurssin SIS-tunnus:"
   course_sis_id_sis_id_or_canvas_id_4d323f5c: "Kurssin SIS ID (SIS_ID:####) TAI Canvasin tunnus: (###)"
   course_start_date_daae16ae: "Kurssin alkamispäivä"
   course_start_date_on_before_a3a32883: "Kurssin aloituspäivämäärä/ennen"
@@ -8359,6 +8365,7 @@ fi:
   create_new_group_bf9561d4: "Luo uusi ryhmä"
   create_new_group_fca5cc73: "Luo uusi ryhmä"
   create_new_group_set_13b1f62a: "Luo uusi ryhmäjoukko"
+  create_new_question_bank_86f2afc6: "Luo uusi kysymyspankki..."
   create_number_of_groups_groups_now_f89f220e: "Luo heti %{number_of_groups} ryhmää"
   create_outcome_4dac05a0: "Luo tulos"
   create_pace_4ff3e9c: "Luo tahditus"
@@ -8445,6 +8452,7 @@ fi:
     registered_services: "Rekisteröidyt palvelut"
     revisions: Tarkistukset
     rubrics: Arviointitaulukot
+    search: Hae
     settings: Asetukset
     site_admin: "Sivuston pääkäyttäjä"
     stats: Tilastot
@@ -8826,6 +8834,7 @@ fi:
   default_grading_scheme_894a0eb: Oletusarviointiasteikko
   default_grading_scheme_for_accounts_6c9df019: "Tilien oletusarvosanojen antoasteikko"
   default_order_8c409051: Oletusjärjestys
+  default_question_bank_c7bcc5e7: Oletuskysymyspankki
   default_question_name: Kysymys
   default_question_text: "Kysymyksen teksti"
   default_sis_sync_for_assignments_quizzes_grade_dis_3b2b4878: "Oletus SIS-synkronointi tehtäville, testeille, arvosanoista keskustelulle"
@@ -9531,6 +9540,7 @@ fi:
   download_epub_757cf0af: "Lataa ePub"
   download_errors_attchment_82ffea3f: "Lataa errors_attchment"
   download_filename_781704f5: "Lataa %{filename}"
+  download_filename_b9d62bf1: "Lataa %{fileName}"
   download_item_analysis_report_statuslabel_8c9387ec: "Lataa kohde-analyysiraportti %{statusLabel}"
   download_page_views_csv_974f36e1: "Lataa sivunäkymien CSV"
   download_report_77164f62: "Lataa raportti"
@@ -10487,6 +10497,8 @@ fi:
   error_updating_cluster_error_674e5f2e: "Virhe päivitettäessä kohdetta %{cluster}: %{error}"
   error_updating_comment_4b80c76d: "Virhe päivitettäessä kommenttia"
   error_updating_discussion_topic_64522a23: "Virhe keskustelun aihetta päivitettäessä"
+  error_updating_discussion_topic_d47c64ff: "Virhe keskustelun aihetta päivitettäessä"
+  error_updating_file_usage_rights_f9216019: "Virhe päivitettäessä tiedoston käyttöoikeuksia"
   error_updating_module_access_f0970f4c: "Virhe moduulin käyttöoikeuden päivityksessä."
   error_updating_modulename_settings_da982acf: "Virhe asetuksia %{moduleName} päivitettäessä."
   error_updating_notes_31b24785: "Virhe päivitettäessä kommentteja"
@@ -10499,6 +10511,7 @@ fi:
   error_uploading_files_f709361f: "Virhe ladattaessa tiedostoja"
   error_uploading_video_audio_recording_16d9730a: "Virhe video-/ääninauhoituksen lataamisessa"
   error_while_importing_csv_please_contact_support_e_57e6b3b: "Virhe CSV:tä tuotaessa. Ota yhteyttä tukeen. (Virheraportti %{number})"
+  error_with_discussion_topic_37c699d1: "Virhe keskustelun aiheen suhteen"
   errormessage_efa8ae9: "%{errorMessage}"
   errors: 
     bad_navigation_config: "Virheellinen kurssivälilehden konfigurointi"
@@ -11130,6 +11143,7 @@ fi:
     titles: 
       bookmark_search: "Kirjanmerkin haku: %{service_name}"
   find_8d605019: Hae
+  find_a_recipient_of_temporary_enrollments_fcc649c9: "Löydä vastaanottaja, jolla on tilapäisiä ilmoittautumisia"
   find_a_recipient_of_temporary_enrollments_from_nam_3451f654: "Löydä kohteesta %{name} henkilö, joilla on tilapäisiä ilmoittautumisia"
   find_an_assignee_of_temporary_enrollments_from_nam_ba08bb2b: "Löydä kohteesta %{name} henkilö, joilla on tilapäisiä ilmoittatumisia"
   find_an_existing_grading_scheme_d836ea: "Hae olemassa oleva arviointiasteikko"
@@ -13055,10 +13069,13 @@ fi:
   import_1b31507: Tuo
   import_a_set_of_outcomes_6b782192: "Tuo osaamistulosten joukko"
   import_anyway_8c996ef6: "Tuo joka tapauksessa"
+  import_assessment_as_new_quizzes_help_icon_3e49480f: "Tuo arviointi Uusina testeinä Ohje-kuvake"
+  import_assessment_as_new_quizzes_help_modal_918a543d: "Tuo arviointi Uusina testeinä Ohje-modaali"
   import_commons_favorites_e68fce81: "Tuo Commons-suosikit"
   import_content_b2fd6620: "Tuo sisältö"
   import_course_student_groups_by_csv_d2cde97d: "Tuo kurssin opiskelijaryhmät csv:n perusteella"
   import_e929507b: Tuo...
+  import_existing_quizzes_as_c2694727: "Tuo olemassa olevat testit "
   import_existing_quizzes_as_new_quizzes_15ea1d: "Tuo olemassa olevat testit Uusina testeinä"
   import_groups_3a2ae14b: "Tuo ryhmiä"
   import_learning_outcomes_36d28a2b: "Tuo osaamistuloksia"
@@ -13670,7 +13687,7 @@ fi:
   jwts_4f397c85: "JWT:t"
   k12_description: "Päivitä kuvakkeet globaalissa navigointivalikossa, mikä on järkevää erityisesti K-12 -ympäristössä."
   k20_beta_538e64fb: "K20 - Beeta"
-  k20_beta_description: "Mahdollistaa K20-beetaominaisuudet järjestelmäkäyttäjän analyysin APP:Ssä."
+  k20_beta_description: "Ottaa käyttöön kurssivalmiuden- ja huomion tarpeessa olevat opiskelijat -hallintapaneelit suljetuille beta-asiakkaille."
   k20_course_readiness_alpha_testing_description: "Tämä merkki on laitoksille, jotka osallistuvat kehittyneeseen analyysin alfatestaukseen. Tämä merkki ottaa käyttöön näiden laitosten kurssin valmiuden."
   k20_course_readiness_alpha_testing_f45597b6: "K20 - Kurssin valmiuden alfatestaus"
   k20_course_readiness_description: "Mahdollistaa lisäanalyysikurssin valmiuskoontinäytön Alpha-testaajille."
@@ -13794,9 +13811,11 @@ fi:
   latex_equations_are_currently_migrated_as_images_a_1206c659: "LaTex kaavaat tuodaan parhaillaan kuvina, eikä kysymyksiä pitäisi muokata"
   latvian_2bbb6aab: latvia
   launch_external_tool_672c0409: "Käynnistä ulkoinen työkalu"
+  launch_height_2915768c: "Käynnistä korkeus"
   launch_registration_tool_38d4781: "Käynnistä rekisteröintityökalu"
   launch_speedgrader_filtered_by_student_group_8bd9b5c7: "Käynnistä SpeedGrader niin että suodattimena on opiskelijaryhmä"
   launch_url_e150bd41: "Avaa URL-osoite"
+  launch_width_9f8be877: "Käynnistä leveys"
   lavender_ce4d0ada: Laventeli
   layouts: 
     application: 
@@ -13833,6 +13852,7 @@ fi:
   learn_more_about_using_commons_and_blueprints_3df953f6: "Lue lisää kuvatekstien Commonsin ja Blueprintsin käytöstä"
   learn_more_about_video_conferencing_5f0e76e4: "oppia lisää videokonferensseista"
   learn_more_in_the_canvas_community_3bba7b11: "Lisätietoja on Canvas-yhteisössä"
+  learner_passport_prototype_1c3446b3: "Oppijan passin prototyyppi"
   learning_analytics_beta_view_46deb4c8: "Oppimisanalyysi (Beta) -näkymä"
   learning_mastery_5fc34276: "Osaamisen hallinta"
   learning_mastery_6ed4fd63: "Osaamisen hallinta..."
@@ -13846,6 +13866,7 @@ fi:
       osaaminen/osaamisessa parannettavaa.
   learning_mastery_gradebook_redesign_9ca88020: "Oppimisen hallinnan arvosanakirjan uudelleensuunnittelu"
   learning_object_1f9e5dd8: Oppimiskohde
+  learning_object_dates_36b05acb: "Oppimisobjektin päivämäärät"
   learning_outcome: 
     no_comment: "Ei kommenttia"
     no_description: "Ei kuvausta"
@@ -14119,6 +14140,7 @@ fi:
   loading_courses_started_6e6d742c: "Kurssien lataus alkoi"
   loading_data_ecd89ba: "Ladataan tietoja..."
   loading_discussions_8ed5fcd7: "Ladataan keskusteluja"
+  loading_enrollments_4fe0d951: "Ilmoittautumisia ladataan"
   loading_external_tool_d839042c: "Ladataan ulkoista työkalua"
   loading_f99d93d4: "...ladataan"
   loading_feature_options_82e07ee4: "Ladataan ominaisuuden asetuksia"
@@ -16895,6 +16917,7 @@ fi:
   new_outcome_group_af59f145: "Uusi tulosryhmä"
   new_post_policy_icons_da13a62c: "Uudet lähetyskäytännön kuvakkeet"
   new_question_9107c469: "Uusi kysymys"
+  new_question_bank_732bbf83: "Uusi kysymyspankki"
   new_question_group_d9306280: "Uusi kysymysryhmä"
   new_quiz_34aacba6: "Uusi testi"
   new_quiz_deleted_user_restore_pending_review_state_a117d744: "Uuden testin poistetun käyttäjän palautus odottaa tarkastelutilaa ilmoittautumisessa"
@@ -16910,6 +16933,7 @@ fi:
   new_quizzes_export_support_b0a6a625: "Uusien testien vientituki"
   new_quizzes_importing_c167dce0: "Uusien testien tuonti"
   new_quizzes_included_on_outcome_alignment_summary__4547b0ad: "Uusia testikohtia lisätty tulosten kohdistamisten yhteenveto-välilehteen"
+  new_quizzes_is_the_new_assessment_engine_for_canva_4125a679: "Uudet kyselyt on uusi arviointikone Canvasilta."
   new_quizzes_migrate_without_content_rewrite_1aec2ce8: "Uudet testit siirtyvät ilman sisällön uudelleenkirjoitusta"
   new_quizzes_migration_during_course_import_copy_e9dd124e: "Uusien testien siirto kurssin tuonnin/kopioinnin aikana"
   new_quizzes_migration_enabled_by_default_5f9bcc81: "Uusien testien siirto otettu käyttöön oletuksena"
@@ -17751,6 +17775,7 @@ fi:
   open_name_color_picker_a2646a33: "Avaa %{name} värinvalitsin"
   open_new_course_modal_a8f8ad52: "Avaa uusi kurssimodaali"
   open_new_subject_modal_c9049e1d: "Avaa uusi aihemodaali"
+  open_search_menu_1c4d4685: "Avaa hakuvalikko"
   open_sidebar_2852e8c8: "Avaa sivupalkki"
   open_speedgrader_11604608: "Avaa SpeedGrader"
   open_student_context_tray_24c1b1d6: "Avaa opiskelijan sisältöpaneeli"
@@ -18039,8 +18064,12 @@ fi:
       everyone: Kaikki
   overview_58268c72: Yleiskuva
   overview_of_student_status_a004bcf3: "Opiskelijan tilan yhteenveto"
+  overwrite_848c08f: Korvaa
   overwrite_all_users_existing_default_dashboard_pre_9b2ad7d1: "Korvaa kaikkien käyttäjien tämänhetkiset koontinäytön oletusasetukset"
   overwrite_already_entered_grades_64a98037: "Korvaa jo syötetyt arvosanat"
+  overwrite_assessment_content_with_matching_ids_b388f114: "Korvaa arvioinnin sisältö täsmäävillä tunnuksilla"
+  overwrite_assessment_help_icon_875d00a5: "Korvaa arvioinnin ohje -kuvake"
+  overwrite_assessment_help_modal_3254b23c: "Korvaa arvioinnin ohje -moduuli"
   overwrite_user_lti_url_input_on_select_content_dia_6d9c76f: "Korvaa käyttäjän LTI URL -syöttö valitussa sisällön valintaikkunassa"
   own_copyright_cc59db55: "Omista tekijänoikeudet"
   owner_email_236d1b2: "Omistajan sähköpostiosoite"
@@ -18184,6 +18213,7 @@ fi:
   pass_2a8c4f07: hyväksytty
   pass_fail_3d9461b0: Hyväksytty/hylätty
   pass_fail_grade_options_f9b06a58: "Läpäisy-epäonnistuminen -arvosanojen asetukset"
+  passport_a4733c1: Passi
   password_8a271b1c: Salasana
   past_14da759a: Menneet
   past_terms_4b6ec40e: "Menneet lukukaudet"
@@ -18366,6 +18396,7 @@ fi:
   please_select_a_user_role_for_this_link_9fb4e655: "Valitse käyttäjärooli tälle linkille."
   please_select_at_least_one_enrollment_before_submi_56b92b37: "Valitse vähintään yksi ilmoittautuminen ennen lähettämistä"
   please_select_at_least_one_filter_aafaa1a7: "Valitse vähintään yksi suodatin."
+  please_select_at_least_one_option_2b83cad: "Valitse vähintään yksi vaihtoehto."
   please_select_one_f931e883: "Valitse yksi"
   please_select_the_level_of_privacy_desired_for_sup_7744af5: "Valitse tuen käyttöoikeuden yksityisyyden taso"
   please_specify_whether_to_enable_or_disable_micros_10f43ce5: "Määritä, otetaanko Microsoft Teams -synkronisaatio käyttöön vai poistetaanko se käytöstä."
@@ -19315,6 +19346,7 @@ fi:
       hakupalvelusta.
   provide_tutorial_information_for_instructors_new_t_163c8ed4: "Anna opetusohjelmaa koskevia tietoja opettajille, joille Canvas on uusi."
   provide_tutorial_information_for_new_users_in_a_fl_c23462ac: "Tarjoa ohjetietoa uusille käyttäjille tietopaneelissa."
+  provider_2d212e55: Palveluntarjoaja
   provider_35796463: "| %{provider}"
   provider_attribute_b1cad655: "Palveluntarjoajan määrite"
   provider_enforces_mfa_when_logging_in_through_this_54adcd1d: "Palveluntarjoaja pakottaa MFA:n *Kun kirjaudut sisään tähän palvelutarjoajaan, Canvas ohittaa MFA-pakotuksen eksplisiittisesti. Tätä pitäisi käyttää vain, jos palveluntarjoaja on jo taannut MFA:n ennen SOO:ta Canvasiin.*"
@@ -20852,6 +20884,8 @@ fi:
   recentint_remainderint_weighted_average_f73369bc: "%{recentInt}/%{remainderInt} painotettu keskiarvo"
   recently_deleted_courses_title: "Äskettäin poistetut kurssit"
   recipient_4b8dbbc0: Vastaanottaja
+  recipient_enrollment_period_55183973: "Vastaanottajan ilmoittautumisjakso"
+  recipient_enrollment_type_b1690078: "Vastaanottajan ilmoittaumistyyppi"
   recipient_input: 
     context_search_placeholder: "Syötä nimi, kurssi tai ryhmä"
     context_search_title: "Nimi, kurssi tai ryhmä"
@@ -21279,6 +21313,8 @@ fi:
   retrieve_timeout: "Konfiguroinnin palautus ei onnistunut, palvelimen vastaus aikakatkaistiin"
   retrieving_content_ed0b9b33: "Haetaan sisältöä"
   retrieving_tool_51709735: Palautustyökalu
+  retrieving_user_enrollments_8dc523c1: "Käyttäjäilmoittautumisia noudetaan"
+  retrieving_user_information_6864fa70: "Käyttäjätietoja noudetaan"
   retry_duplicating_original_assignment_name_90b83bb8: "Yritä kopioida \"%{original_assignment_name}\" uudelleen\""
   retry_duplicating_originalassignmentname_884aee1: "Yritä kopioida \"%{originalAssignmentName}\" uudelleen\""
   retry_ebd5f8ba: "Yritä uudelleen"
@@ -21463,6 +21499,7 @@ fi:
   rubric_created_64980593: "Arviointitaulukko luotu"
   rubric_criterion_range_12499bf1: "Arviointitaulukon kriteerien vaihteluväli"
   rubric_deleted_3d9efc18: "Arviointitaulukko poistettu"
+  rubric_enhancements_73bf351c: "Rubriikin tehostukset"
   rubric_fc39da76: Arviointitaulukko
   rubric_updated_103e24dc: "Arviointitaulukko päivitetty"
   rubric_was_successfully_submitted_b0766474: "Rubriikin lähetys onnistui"
@@ -21526,6 +21563,7 @@ fi:
   saint_marys_student_missing_activity_report_c55865df: "Saint Marys -opiskelijan puuttuvan aktiviteetin raportti"
   salesforce_account_id_d0325865: Salesforce-tilitunnus
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: "Salesforcella on eri sisäänkirjautumisen isäntä sandbox-tileille kuin tuotantotileille, joten jos käytät Salesforcen Sanbox -tiliä etkä merkitse tätä ruutua, sitä ei tunnisteta"
+  salesforce_project_id_5d341843: Salesforce-projektitunnus
   salesforce_ticketing_webtocase_connector_80f75716: "Salesforce-lipunmyynti WebToCase -kytkentä"
   salmon_7d4b70d4: Lohi
   same_value_as_canvas_url__c_will_probably_be_going_37027686: "Sama arvo kuin 'Canvas_URL__c', todennäköisesti katoaa"
@@ -21787,7 +21825,10 @@ fi:
   search_for_your_school_or_institution_1eb2eeaf: "Hae koulua tai organisaatiotasi"
   search_form_fcaa38f7: Haku
   search_grading_periods_e947a3e9: "Hae arvosanojen antojaksoja"
+  search_groups_9ff9344c: "Hae ryhmiä"
   search_groups_or_people_6c15d6ad: "Hae ryhmiä tai henkilöitä"
+  search_input_615d0e77: "Haun syöttö"
+  search_menu_d327ff2b: Haku-valikko
   search_people_402e622c: "Hae henkilöitä"
   search_people_44f36cd2: "Hae henkilöitä..."
   search_people_4782671a: "Hae henkilöitä"
@@ -21843,6 +21884,7 @@ fi:
   section_level_calendar_permissions_6aff8cdb: "Toissijaiset kalenterin käyttöoikeudet"
   section_name_b6d82574: "Osion nimi"
   section_name_edb51b2: "osion nimi"
+  section_name_fa2b80d7: "Osion nimi:"
   section_pace_989d2856: "Osion tahditus"
   section_removed_2ac72a79: "%{section} poistettu"
   section_section_names_98f172e6: "Osio: %{section_names}"
@@ -21936,6 +21978,7 @@ fi:
   select_a_module_optional_7edb5cb0: "Valitse moduuli (valinnainen)"
   select_a_predefined_color_c77ab2f5: "Valitse esimääritelty väri."
   select_a_provisional_grade_7106e3d5: "Valitse alustava arvosana"
+  select_a_question_bank_f346e5a0: "Valitse kysymyspankki"
   select_a_role_287e53e8: "Valitse rooli"
   select_a_section_37ac1694: "Valitse osio"
   select_a_student_adfcc348: "Valitse opiskelija"
@@ -22018,6 +22061,7 @@ fi:
   select_prerequisite_3b049b02: "Valitse ennakkoedellytys"
   select_prerequisite_module_57894963: "Valitse ennakkoedellytyksen moduuli"
   select_prerequite_module_e9042bb0: "Valitse ennakkoedellytyksen moduuli"
+  select_question_bank_508e5c08: "Valitse kysymyspankki"
   select_requirement_count_e0948936: "Valitse vaatimusten määrä"
   select_requirement_type_bf9a39d9: "Valitse vaatimusten tyyppi"
   select_role_aa5cfd69: "Valitse rooli"
@@ -23089,6 +23133,7 @@ fi:
   some_settings_have_been_administratively_locked_9e3ee880: "Jotkin asetukset on lukittu hallinnollisesti."
   some_settings_have_been_disabled_because_the_assig_6b6cc3b4: "Jotkin asetukset on poistettu käytöstä, koska tehtävä on suljetulla arvosanojen antojaksolla."
   some_submissions_are_not_gradeable_grade_changes_f_f8bf44e2: "Joillekin tehtäväpalautuksille ei voida antaa arvosanoja; näiden tehtäväpalautusten arvosanojen muutokset on ohitettu."
+  some_systems_recycle_their_ids_for_each_new_export_884b8e46: "Jotkin järjestelmät kierrättävät tunnuksiaan jokaiselle uudelle viennille. Tämän takia viedessäsi kaksi erillistä kysymyspankkia, on niillä samat tunnukset. Ehkäistäksemme arviointitietojen menettämisen, käsittelemme näitä objekteja erilaisina tunnuksista huolimatta. Tämän asetuksen valinta poistaa tämän turvaominaisuuden käytöstä ja sallii arviointitietojen korvata samoilla tunnuksilla olevat olemassa olevat tiedot."
   someone: Joku
   someone_bbbc538b: Joku
   someone_just_made_a_new_annotation_on_the_anonymou_cbbe68ca: "Joku antoi juuri uuden huomautuksen opiskelijan nimettömään lähetykseen liittyen (%{user_id}) tehtävälle %{assignment_title}"
@@ -23995,6 +24040,7 @@ fi:
     quizzes: Testit
     rubrics: Arviointitaulukot
     schedule: Aikataulu
+    search: Hae
     settings: Asetukset
     syllabus: Opinto-ohjelma
     tab_location_error: "Välilehden sijainti on virheellinen"
@@ -24058,6 +24104,7 @@ fi:
   temporarily_enroll_name_8acb66ce: "Ilmoita %{name} tilapäisesti"
   temporary_9c54e959: "Temporary (Väliaikainen):"
   temporary_enrollment_option_links_eb9b8b2e: "Tilapäisen ilmoittutumisen asetusten linkit"
+  temporary_enrollment_pairings_56f35f5c: "Tilapäisen ilmoittautumisen yhdistämiset"
   temporary_enrollment_was_successfully_created_78b48a7a: "Tilapäisen ilmoittautumisen luonti onnistui."
   temporary_enrollments_add_373181b7: "Tilapäinen ilmoittautuminen - lisää"
   temporary_enrollments_delete_52ffaae4: "Tilapäinen ilmoittautuminen - poista"
@@ -24842,6 +24889,7 @@ fi:
                                   Loppukäyttäjät eivät näe sitä ellei sivuston järjestelmänvalvoja ole ottanut sitä käyttöön.
                                   Ennen kuin otat laitoksen käyttöön, varmista, että ymmärrät
                                   täysin toiminnollisuuden ja mahdolliset vaikutukset käyttäjille.
+  this_feature_provides_visual_and_functional_enhanc_e5e57a21: "Tämä ominaisuus tarjoaa visuaalisia ja toiminnollisia parannuksia rubriikkiin Canvasissa."
   this_feature_will_hide_all_quantitative_values_fro_6f006665: "Tämä ominaisuus piilottaa kaikki kvantitaaviset arvot käyttäjiltä"
   this_field_is_required_fa58c4a: "Tämä kenttä vaaditaan"
   this_field_name_is_required_988caebc: "Tämä kenttä ”%{name}” vaaditaan."
@@ -25648,6 +25696,7 @@ fi:
   to_join_the_canvas_community_you_must_first_have_a_6fe1b7d8: "Jotta Canvas-yhteisöön voi liittyä, täytyy ensin olla Canvas-tili."
   to_learn_more_about_canvas_for_elementary_please_r_7fd3af37: "Lisätietoja Canvas for Elementary -ohjelmasta löytyy *dokumentaatiostamme*."
   to_learn_more_becd2ce2: "oppiaksesi lisää."
+  to_learn_more_please_contact_your_system_administr_57af0d0a: "Jos haluat lukea lisää, ota yhteyttä pääkäyttäjääsi tai käy "
   to_link_an_observer_to_a_student_conversations_sen_37aad7b5: "Linkittääksesi tarkkailijan opiskelijaan, Keskustelut - lähetä viestejä yksittäisille kurssin jäsenille täytyy myös olla käytössä."
   to_link_an_observer_to_a_student_users_manage_logi_b77cb019: |-
       Jos haluat yhdistää havainnoijan opiskelijaan, Käyttäjät - hallitse kirjautumistietoja ja Keskustelut - lähetä viestejä yksilöllisille kurssilla täytyy olla käytössä.
@@ -26481,6 +26530,7 @@ fi:
   usage_rights_will_be_set_for_all_of_the_files_cont_b192336a: "Käyttöoikeudet määritetään kaikille tiedostoille, jotka ovat kohteessa:"
   use_a_new_endpoint_for_fetching_course_creation_ac_712382c2: "Käytä uutta päätepistettä kurssin luontitilien noutoon"
   use_a_resource_link_s_resource_link_uuid_in_the_re_3bb2f166: "Käytä resurssilinkkiä resource_link_uuid $ResourceLink.id-korvausparametrissa"
+  use_a_unique_html_id_for_each_tool_launch_form_7bf0e5ea: "Käytä yksilöllistä HTML-tunnusta jokaiselle työkalun käynnistyslomakkeelle"
   use_alternate_settings_for_lti_context_id_history__946a9dcc: "Käytä vaihtoehtoisia asetuksia LTI Context.id.history kyselylle"
   use_arrow_keys_to_navigate_options_2021cc50: "Siirry vaihtoehdoissa nuolinäppäinten avulla."
   use_arrow_keys_to_navigate_options_d45347e8: "Siirry vaihtoehdoissa nuolinäppäinten avulla."
@@ -26744,6 +26794,7 @@ fi:
       twitter: "Twitterissä voi kätevästi kommunikoida myös oppituntien ulkopuolella."
   user_settings_785eed40: Käyttäjäasetukset
   user_sis_id_c017cb14: "käyttäjän sis-tunnus"
+  user_sis_id_ce5d7a46: "Käyttäjän SIS-tunnus:"
   user_split_complete_links_to_split_user_accounts_f_dab79796: "Käyttäjien jakaminen valmis. Linkit käyttäjätilien jakamiseen seuraavat:"
   user_succesfully_logged_into_canvas_6cfbe279: "Käyttäjä on kirjautunut onnistuneesti Canvasiin"
   user_successfully_deactivated_9d92d80d: "Käyttäjän aktivoinnin poistaminen onnistui"
@@ -27258,7 +27309,9 @@ fi:
   welcome_name_a16afa7f: "Tervetuloa, %{name}!"
   welcome_to_the_canvas_theme_editor_73091d1: "Tervetuloa Canvasin teemaeditoriin"
   welcome_to_the_cold_dark_void_of_name_65fc9839: "Tervetuloa %{name}:n kylmään tummaan aukkoon."
+  welcome_to_your_courses_to_customize_the_list_of_c_22de652e: "Tervetuloa kursseillesi! Jos haluat mukauttaa kurssien listaa, napsauta ”Kaikki kurssit” -linkkiä ja tähteä tuodaksesi kurssin esiin."
   welcome_to_your_courses_to_customize_the_list_of_c_f95e4b2: "Tervetuloa kursseillesi! Jos haluat mukauttaa kurssien listaa, napsauta ”Kaikki kurssit\" -linkkiä ja tähteä tuodaksesi kurssin esiin."
+  welcome_to_your_subjects_to_customize_the_list_of__a735c17f: "Tervetuloa aiheisiisi! Jos haluat mukauttaa kurssien listaa, napsauta ”Kaikki aiheet” -linkkiä ja tähteä tuodaksesi aiheet esiin."
   welcome_to_your_subjects_to_customize_the_list_of__f6574116: "Tervetuloa aiheisiisi! Jos haluat mukauttaa kurssien listaa, napsauta ”Kaikki aiheet” -linkkiä ja tähteä tuodaksesi aiheet esiin."
   welcome_your_students_e1d96088: "Toivota opiskelijasi tervetulleeksi"
   well_below_mastery_37664bdc: "Heikko osaaminen"
@@ -27316,6 +27369,10 @@ fi:
       asetuksissa, joita ei ole vielä määritetty, määritetään. Tämä
       check tarkistus ja määritys ilmenee jokaisessasirussa kyseisen sirun alueella keskiyöllä.
   when_enabled_site_admin_account_ui_will_allow_asso_9d04a1d8: "Kun tämä ominaisuus on käytössä, sivuston järjestelmäkäyttäjän tilin käyttöliittymä sallii palvelun käyttäjän liittämisen DeveloperKey kanssa ja avaimen/käyttäjän käytön client_credentials käyttöoikeuden tyyppi"
+  when_enabled_the_hidden_html_forms_that_are_used_t_c5edd929: |-
+      Kun tämä on käytössä, piilotetut HTML-lomakkeet, joita käytetään LTI-käynnistyksen käynnistämiseen,
+      sisältävät satunnaisluvun liitettynä tunnukseensa. Kun se on poistettu käytöstä,
+      kaikilla on sama tunnus tool_form.
   when_enabled_the_internal_access_manager_will_be_u_bc470109: "Kun tämä asetus on käytössä, sisäistä käyttöoikeuksien päällikköä käytetään antamaan suostumus määrätyille pyynnöille"
   when_enabled_this_flag_displays_a_word_count_in_th_a75163d6: |-
       Kun tämä toiminto on käytössä, tämä merki esittää sanamäärän speed graderissä
