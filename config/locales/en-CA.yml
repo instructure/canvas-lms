@@ -2203,6 +2203,7 @@ en-CA:
   add_quiz_cebfa28b: "Add Quiz"
   add_quiz_ip_filter_c7b37dc5: "Add Quiz IP Filter"
   add_rating_89d7fbde: "Add rating"
+  add_recipient_by_6d95f71e: "Add recipient by"
   add_recipient_ff135ed7: "Add Recipient"
   add_remove_in_courses_d65aaee3: "add / remove in courses"
   add_remove_in_courses_fa1c9081: "Add / Remove in courses"
@@ -2325,6 +2326,7 @@ en-CA:
   admins_3e1dce15: Admins
   admins_add_remove_26811ce5: "Admins - add / remove"
   advanced_36b35b8: Advanced
+  advanced_analytics_course_readiness_and_students_i_6b3c439f: "Advanced Analytics - Course Readiness and Students in Need of Attention"
   advanced_analytics_course_readiness_closed_alpha_13c8aaf: "Advanced Analytics - Course Readiness Closed Alpha"
   advertise_release_notes_via_the_ui_9254bc6c: "Advertise release notes via the UI"
   affects_viewing_the_conclude_course_and_permanentl_8216fcc2: "Affects viewing the Conclude Course and Permanently Delete this Course buttons. The Permanently Delete this Course button only appears for manually created courses."
@@ -3440,6 +3442,7 @@ en-CA:
   an_existing_canvas_user_with_the_user_id_has_alrea_e487b0: "An existing Canvas user with the %{user_id} has already claimed %{other_user_id}'s requested integration_id, skipping"
   an_existing_user_does_not_match_existing_user_ids__156c7a52: "An existing user does not match existing user ids provided for login with SIS ID %{user_id}, skipping"
   an_export_is_already_in_progress_54270f01: "An export is already in progress."
+  an_in_progress_working_prototype_of_the_learner_pa_aa79f239: "An in-progress working prototype of the Learner Passport feature."
   an_internal_error_occurred_83b8a685: "An internal error occurred"
   an_item_named_name_already_exists_in_this_location_147b7312: "An item named \"%{name}\" already exists in this location. Do you want to replace the existing file?"
   an_object_of_type_graphql_type_was_hidden_due_to_i_60998e99: "An object of type %{graphql_type} was hidden due to insufficient scopes on access token"
@@ -5944,6 +5947,7 @@ en-CA:
             any user will be visible to everyone immediately.
   canvas_id_f42f6ad: "Canvas ID"
   canvas_insights_beta_view_4cf67797: "Canvas Insights (Beta) - view"
+  canvas_instructor_guide_7cf106cb: "Canvas Instructor Guide"
   canvas_introduction_video_2d81f3ad: "Canvas Introduction Video"
   canvas_is_attempting_to_retreive_the_submissions_p_4d47973d: "Canvas is attempting to retreive the submissions. Please check back again later."
   canvas_is_not_configured_to_receive_logins_from_is_502a4491: "Canvas is not configured to receive logins from %{issuer}."
@@ -7617,6 +7621,7 @@ en-CA:
   copy_to_folder_32ecc3c3: "Copy to Folder"
   copying_628a9607: Copying...
   copyright_and_license_information_must_be_provided_5feffaf: "Copyright and license information must be provided for files before they are published."
+  copyright_holder_386cc8b8: "Copyright Holder"
   copyright_holder_66ee111: "Copyright Holder:"
   correct_answer: "This was the correct answer."
   correct_answer_5a6a57d1: "Correct Answer"
@@ -8331,6 +8336,7 @@ en-CA:
   course_sis_7ae8f649: "course sis"
   course_sis_df8b379: "Course Sis"
   course_sis_id_bbed1a60: "course sis id"
+  course_sis_id_cd834b3c: "Course SIS ID:"
   course_sis_id_sis_id_or_canvas_id_4d323f5c: "Course SIS ID (SIS_ID:####) OR Canvas ID: (###)"
   course_start_date_daae16ae: "Course Start Date"
   course_start_date_on_before_a3a32883: "Course Start Date On/Before"
@@ -8915,6 +8921,7 @@ en-CA:
   create_new_group_bf9561d4: "Create New Group"
   create_new_group_fca5cc73: "Create new group"
   create_new_group_set_13b1f62a: "Create New Group Set"
+  create_new_question_bank_86f2afc6: "Create new question bank..."
   create_new_submission_e6b7c18d: "Create New Submission"
   create_number_of_groups_groups_now_f89f220e: "Create %{number_of_groups} groups now"
   create_outcome_4dac05a0: "Create Outcome"
@@ -9002,6 +9009,7 @@ en-CA:
     registered_services: "Registered Services"
     revisions: Revisions
     rubrics: Rubrics
+    search: Search
     settings: Settings
     site_admin: "Site Admin"
     stats: Statistics
@@ -9379,6 +9387,7 @@ en-CA:
   default_grading_scheme_894a0eb: "Default Grading Scheme"
   default_grading_scheme_for_accounts_6c9df019: "Default Grading Scheme for Accounts"
   default_order_8c409051: "Default Order"
+  default_question_bank_c7bcc5e7: "Default Question bank"
   default_question_name: Question
   default_question_text: "Question text"
   default_sis_sync_for_assignments_quizzes_grade_dis_3b2b4878: "Default SIS Sync for assignments, quizzes, grade discussion"
@@ -10253,6 +10262,7 @@ en-CA:
   download_epub_757cf0af: "Download ePub"
   download_errors_attchment_82ffea3f: "Download errors_attchment"
   download_filename_781704f5: "Download %{filename}"
+  download_filename_b9d62bf1: "Download %{fileName}"
   download_item_analysis_report_statuslabel_8c9387ec: "Download item analysis report %{statusLabel}"
   download_page_views_csv_974f36e1: "Download Page Views CSV"
   download_report_77164f62: "Download Report"
@@ -11238,6 +11248,8 @@ en-CA:
   error_updating_cluster_error_674e5f2e: "Error updating %{cluster}: %{error}"
   error_updating_comment_4b80c76d: "Error updating comment"
   error_updating_discussion_topic_64522a23: "Error Updating discussion topic"
+  error_updating_discussion_topic_d47c64ff: "Error updating discussion topic"
+  error_updating_file_usage_rights_f9216019: "Error updating file usage rights"
   error_updating_module_access_f0970f4c: "Error updating module access."
   error_updating_modulename_settings_da982acf: "Error updating %{moduleName} settings."
   error_updating_notes_31b24785: "Error updating notes"
@@ -11250,6 +11262,7 @@ en-CA:
   error_uploading_files_f709361f: "Error uploading files"
   error_uploading_video_audio_recording_16d9730a: "Error uploading video/audio recording"
   error_while_importing_csv_please_contact_support_e_57e6b3b: "Error while importing CSV. Please contact support. (Error report %{number})"
+  error_with_discussion_topic_37c699d1: "Error with discussion topic"
   errormessage_efa8ae9: "%{errorMessage}"
   errors: 
     bad_navigation_config: "Invalid course tab configuration"
@@ -11929,6 +11942,7 @@ en-CA:
     titles: 
       bookmark_search: "Bookmark Search: %{service_name}"
   find_8d605019: Find
+  find_a_recipient_of_temporary_enrollments_fcc649c9: "Find a recipient of Temporary Enrollments"
   find_a_recipient_of_temporary_enrollments_from_nam_3451f654: "Find a recipient of temporary enrollments from %{name}"
   find_an_assignee_of_temporary_enrollments_from_nam_ba08bb2b: "Find an assignee of temporary enrollments from %{name}"
   find_an_existing_grading_scheme_d836ea: "Find an Existing Grading Scheme"
@@ -13942,10 +13956,13 @@ en-CA:
   import_1b31507: Import
   import_a_set_of_outcomes_6b782192: "Import a set of Outcomes"
   import_anyway_8c996ef6: "Import Anyway"
+  import_assessment_as_new_quizzes_help_icon_3e49480f: "Import assessment as New Quizzes Help Icon"
+  import_assessment_as_new_quizzes_help_modal_918a543d: "Import assessment as New Quizzes Help Modal"
   import_commons_favorites_e68fce81: "Import Commons Favorites"
   import_content_b2fd6620: "Import Content"
   import_course_student_groups_by_csv_d2cde97d: "Import course student groups by csv"
   import_e929507b: Import...
+  import_existing_quizzes_as_c2694727: "Import existing quizzes as "
   import_existing_quizzes_as_new_quizzes_15ea1d: "Import existing quizzes as New Quizzes"
   import_groups_3a2ae14b: "Import Groups"
   import_learning_outcomes_36d28a2b: "Import learning outcomes"
@@ -14585,7 +14602,7 @@ en-CA:
   jwts_4f397c85: JWTs
   k12_description: "Update the icons in the Global Navigation Menu that make more sense specifically in a K-12 environment."
   k20_beta_538e64fb: "K20 - Beta"
-  k20_beta_description: "Enables K20 Beta features in Admin Analytics APP."
+  k20_beta_description: "Enables the Course Readiness and Students in Need of Attention dashboards for closed beta customers."
   k20_course_readiness_alpha_testing_description: "This flag is for institutions participating in Advanced Analytics Alpha testing. This flag enables the Course Readiness dashboard for these institutions."
   k20_course_readiness_alpha_testing_f45597b6: "K20 - Course Readiness Alpha Testing"
   k20_course_readiness_description: "Enables the Advanced Analytics Course Readiness Dashboard for Alpha testers."
@@ -14715,9 +14732,11 @@ en-CA:
   latex_equations_are_currently_migrated_as_images_a_1206c659: "LaTex equations are currently migrated as images, and the questions should not be edited."
   latvian_2bbb6aab: Latvian
   launch_external_tool_672c0409: "Launch External Tool"
+  launch_height_2915768c: "Launch Height"
   launch_registration_tool_38d4781: "Launch Registration Tool"
   launch_speedgrader_filtered_by_student_group_8bd9b5c7: "Launch SpeedGrader Filtered by Student Group"
   launch_url_e150bd41: "Launch URL"
+  launch_width_9f8be877: "Launch Width"
   lavender_ce4d0ada: Lavender
   layouts: 
     application: 
@@ -14754,6 +14773,7 @@ en-CA:
   learn_more_about_using_commons_and_blueprints_3df953f6: "Learn more about using Commons and Blueprints."
   learn_more_about_video_conferencing_5f0e76e4: "Learn more about Video Conferencing"
   learn_more_in_the_canvas_community_3bba7b11: "Learn more in the Canvas Community"
+  learner_passport_prototype_1c3446b3: "Learner Passport Prototype"
   learning_analytics_beta_view_46deb4c8: "Learning Analytics (Beta) - view"
   learning_mastery_5fc34276: "Learning Mastery"
   learning_mastery_6ed4fd63: "Learning Mastery…"
@@ -14767,6 +14787,7 @@ en-CA:
       mastery/remedial.
   learning_mastery_gradebook_redesign_9ca88020: "Learning Mastery Gradebook Redesign"
   learning_object_1f9e5dd8: "Learning Object"
+  learning_object_dates_36b05acb: "Learning Object Dates"
   learning_outcome: 
     no_comment: "No Comment"
     no_description: "No Description"
@@ -15047,6 +15068,7 @@ en-CA:
   loading_courses_started_6e6d742c: "Loading courses started"
   loading_data_ecd89ba: "Loading Data.."
   loading_discussions_8ed5fcd7: "Loading Discussions"
+  loading_enrollments_4fe0d951: "Loading enrollments"
   loading_external_tool_d839042c: "Loading External Tool"
   loading_f99d93d4: "...Loading"
   loading_feature_options_82e07ee4: "Loading feature options"
@@ -17953,6 +17975,7 @@ en-CA:
   new_outcome_group_af59f145: "New Outcome Group"
   new_post_policy_icons_da13a62c: "New Post Policy Icons"
   new_question_9107c469: "New Question"
+  new_question_bank_732bbf83: "New question bank"
   new_question_group_d9306280: "New Question Group"
   new_quiz_34aacba6: "New Quiz"
   new_quiz_deleted_user_restore_pending_review_state_a117d744: "New Quiz deleted user restore pending review state on enroll"
@@ -17968,6 +17991,7 @@ en-CA:
   new_quizzes_export_support_b0a6a625: "New Quizzes Export Support"
   new_quizzes_importing_c167dce0: "New Quizzes Importing"
   new_quizzes_included_on_outcome_alignment_summary__4547b0ad: "New Quizzes included on Outcome Alignment Summary Tab"
+  new_quizzes_is_the_new_assessment_engine_for_canva_4125a679: "New Quizzes is the new assessment engine for Canvas."
   new_quizzes_migrate_without_content_rewrite_1aec2ce8: "New Quizzes Migrate Without Content Rewrite"
   new_quizzes_migration_during_course_import_copy_e9dd124e: "New Quizzes migration during course import/copy"
   new_quizzes_migration_enabled_by_default_5f9bcc81: "New Quizzes migration enabled by default"
@@ -18829,6 +18853,7 @@ en-CA:
   open_name_color_picker_a2646a33: "Open %{name} Color Picker"
   open_new_course_modal_a8f8ad52: "Open new course modal"
   open_new_subject_modal_c9049e1d: "Open new subject modal"
+  open_search_menu_1c4d4685: "Open Search Menu"
   open_sidebar_2852e8c8: "Open sidebar"
   open_speedgrader_11604608: "Open SpeedGrader"
   open_student_context_tray_24c1b1d6: "Open student context tray"
@@ -19140,8 +19165,12 @@ en-CA:
   overrides_e8659a73: Overrides
   overview_58268c72: Overview
   overview_of_student_status_a004bcf3: "Overview of student status"
+  overwrite_848c08f: Overwrite
   overwrite_all_users_existing_default_dashboard_pre_9b2ad7d1: "Overwrite all users' existing default dashboard preferences"
   overwrite_already_entered_grades_64a98037: "Overwrite already-entered grades"
+  overwrite_assessment_content_with_matching_ids_b388f114: "Overwrite assessment content with matching IDs"
+  overwrite_assessment_help_icon_875d00a5: "Overwrite Assessment Help Icon"
+  overwrite_assessment_help_modal_3254b23c: "Overwrite Assessment Help Modal"
   overwrite_user_lti_url_input_on_select_content_dia_6d9c76f: "Overwrite user LTI URL input on select content dialog"
   own_copyright_cc59db55: "Own Copyright"
   owner_email_236d1b2: "Owner Email"
@@ -19286,6 +19315,7 @@ en-CA:
   pass_2a8c4f07: pass
   pass_fail_3d9461b0: Pass/Fail
   pass_fail_grade_options_f9b06a58: "Pass-Fail Grade Options"
+  passport_a4733c1: Passport
   password_8a271b1c: Password
   past_14da759a: Past
   past_terms_4b6ec40e: "Past Terms"
@@ -19484,6 +19514,7 @@ en-CA:
   please_select_an_item_30c287ef: "Please select an item"
   please_select_at_least_one_enrollment_before_submi_56b92b37: "Please select at least one enrollment before submitting"
   please_select_at_least_one_filter_aafaa1a7: "Please select at least one filter."
+  please_select_at_least_one_option_2b83cad: "Please select at least one option."
   please_select_one_f931e883: "Please select one"
   please_select_the_level_of_privacy_desired_for_sup_7744af5: "Please select the level of privacy desired for Support access"
   please_specify_whether_to_enable_or_disable_micros_10f43ce5: "Please specify whether to enable or disable Microsoft Teams sync."
@@ -20472,6 +20503,7 @@ en-CA:
       from the discovery service.
   provide_tutorial_information_for_instructors_new_t_163c8ed4: "Provide tutorial information for instructors new to Canvas."
   provide_tutorial_information_for_new_users_in_a_fl_c23462ac: "Provide tutorial information for new users in a flyout tray."
+  provider_2d212e55: Provider
   provider_35796463: "| %{provider}"
   provider_attribute_b1cad655: "Provider Attribute"
   provider_enforces_mfa_when_logging_in_through_this_54adcd1d: "Provider enforces MFA *When logging in through this Provider, Canvas will explicitly skip MFA enforcement. This should only be used if the Provider has already guaranteed MFA before SSO into Canvas.*"
@@ -22032,6 +22064,8 @@ en-CA:
   recentint_remainderint_weighted_average_f73369bc: "%{recentInt}/%{remainderInt} Weighted Average"
   recently_deleted_courses_title: "Recently Deleted Courses"
   recipient_4b8dbbc0: Recipient
+  recipient_enrollment_period_55183973: "Recipient Enrollment Period"
+  recipient_enrollment_type_b1690078: "Recipient Enrollment Type"
   recipient_input: 
     context_search_placeholder: "Enter a name, course, or group"
     context_search_title: "Name, course, or group"
@@ -22463,6 +22497,8 @@ en-CA:
   retrieve_timeout: "could not retrieve configuration, the server response timed out"
   retrieving_content_ed0b9b33: "Retrieving Content"
   retrieving_tool_51709735: "Retrieving Tool"
+  retrieving_user_enrollments_8dc523c1: "Retrieving user enrollments"
+  retrieving_user_information_6864fa70: "Retrieving user information"
   retry_duplicating_original_assignment_name_90b83bb8: "Retry duplicating \"%{original_assignment_name}\""
   retry_duplicating_originalassignmentname_884aee1: "Retry duplicating \"%{originalAssignmentName}\""
   retry_ebd5f8ba: Retry
@@ -22682,6 +22718,7 @@ en-CA:
   rubric_created_64980593: "Rubric created"
   rubric_criterion_range_12499bf1: "Rubric Criterion Range"
   rubric_deleted_3d9efc18: "Rubric deleted"
+  rubric_enhancements_73bf351c: "Rubric Enhancements"
   rubric_fc39da76: Rubric
   rubric_updated_103e24dc: "Rubric updated"
   rubric_was_successfully_submitted_b0766474: "Rubric was successfully submitted"
@@ -22752,6 +22789,7 @@ en-CA:
   salesforce_account_id_d0325865: "Salesforce Account ID"
   salesforce_account_id_eb5c78ad: "Salesforce Account Id"
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: "Salesforce has a different login host for sanbox accounts than it does for production accounts, so if you're using a Salesforce sanbox account and you don't check this box it won't be able to authenticate (and this works in reverse too, if you have a production account and you DO check this box it won't authenticate)"
+  salesforce_project_id_5d341843: "Salesforce Project ID"
   salesforce_ticketing_webtocase_connector_80f75716: "Salesforce Ticketing WebToCase Connector"
   salmon_7d4b70d4: Salmon
   same_value_as_canvas_url__c_will_probably_be_going_37027686: "Same value as 'Canvas_URL__c', will probably be going away soon"
@@ -23016,7 +23054,10 @@ en-CA:
   search_for_your_school_or_institution_1eb2eeaf: "Search for your school or institution"
   search_form_fcaa38f7: "Search Form"
   search_grading_periods_e947a3e9: "Search grading periods..."
+  search_groups_9ff9344c: "Search Groups"
   search_groups_or_people_6c15d6ad: "Search Groups or People"
+  search_input_615d0e77: "Search Input"
+  search_menu_d327ff2b: "Search Menu"
   search_people_402e622c: "Search people"
   search_people_44f36cd2: "Search people..."
   search_people_4782671a: "Search People"
@@ -23076,6 +23117,7 @@ en-CA:
   section_level_calendar_permissions_6aff8cdb: "Section-level calendar permissions"
   section_name_b6d82574: "Section Name"
   section_name_edb51b2: "section name"
+  section_name_fa2b80d7: "Section Name:"
   section_pace_989d2856: "Section Pace"
   section_removed_2ac72a79: "%{section} removed"
   section_section_names_98f172e6: "Section: %{section_names}"
@@ -23176,6 +23218,7 @@ en-CA:
   select_a_module_optional_7edb5cb0: "Select a Module (optional)"
   select_a_predefined_color_c77ab2f5: "Select a predefined color."
   select_a_provisional_grade_7106e3d5: "Select a provisional grade"
+  select_a_question_bank_f346e5a0: "Select a question bank"
   select_a_role_287e53e8: "Select a Role"
   select_a_section_37ac1694: "Select a section"
   select_a_student_adfcc348: "Select a student"
@@ -23265,6 +23308,7 @@ en-CA:
   select_prerequisite_3b049b02: "Select Prerequisite"
   select_prerequisite_module_57894963: "Select prerequisite module"
   select_prerequite_module_e9042bb0: "Select prerequite module"
+  select_question_bank_508e5c08: "Select question bank"
   select_requirement_count_e0948936: "Select Requirement Count"
   select_requirement_type_bf9a39d9: "Select Requirement Type"
   select_role_aa5cfd69: "Select role"
@@ -24423,6 +24467,7 @@ en-CA:
   some_settings_have_been_administratively_locked_9e3ee880: "Some settings have been administratively locked."
   some_settings_have_been_disabled_because_the_assig_6b6cc3b4: "Some settings have been disabled because the assignment is in a closed grading period."
   some_submissions_are_not_gradeable_grade_changes_f_f8bf44e2: "Some submissions are not gradeable; grade changes for those submissions have been ignored."
+  some_systems_recycle_their_ids_for_each_new_export_884b8e46: "Some systems recycle their IDs for each new export. As a result, if you export two separate question banks they will have the same IDs. To prevent losing assessment data we treat these objects as different despite the IDs. Choosing this option will disable this safety feature and allow assessment data to overwrite existing data with the same IDs."
   someone: Someone
   someone_bbbc538b: Someone
   someone_just_made_a_new_annotation_on_the_anonymou_cbbe68ca: "Someone just made a new annotation on the anonymous submission for Student (%{user_id}) for %{assignment_title}"
@@ -25353,6 +25398,7 @@ en-CA:
     quizzes: Quizzes
     rubrics: Rubrics
     schedule: Schedule
+    search: Search
     settings: Settings
     syllabus: Syllabus
     tab_location_error: "That tab location is invalid"
@@ -25417,6 +25463,7 @@ en-CA:
   temporarily_enroll_name_8acb66ce: "Temporarily enroll %{name}"
   temporary_9c54e959: "Temporary:"
   temporary_enrollment_option_links_eb9b8b2e: "Temporary enrollment option links"
+  temporary_enrollment_pairings_56f35f5c: "Temporary Enrollment Pairings"
   temporary_enrollment_was_successfully_created_78b48a7a: "Temporary enrollment was successfully created."
   temporary_enrollments_add_373181b7: "Temporary Enrollments - add"
   temporary_enrollments_delete_52ffaae4: "Temporary Enrollments - delete"
@@ -26231,6 +26278,7 @@ en-CA:
                                   End users will not see it until enabled by a Site Admin user.
                                   Before enabling for an institution, please be sure you fully understand
                                   the functionality and possible impacts to users.
+  this_feature_provides_visual_and_functional_enhanc_e5e57a21: "This feature provides visual and functional enhancements to rubrics across Canvas."
   this_feature_will_hide_all_quantitative_values_fro_6f006665: "This feature will hide all quantitative values from users"
   this_field_is_required_fa58c4a: "This field is required"
   this_field_name_is_required_988caebc: "This field \"%{name}\" is required."
@@ -27062,6 +27110,7 @@ en-CA:
   to_join_the_canvas_community_you_must_first_have_a_6fe1b7d8: "To join the Canvas Community, you must first have a Canvas Account."
   to_learn_more_about_canvas_for_elementary_please_r_7fd3af37: "To learn more about Canvas for Elementary, please refer to *our documentation*."
   to_learn_more_becd2ce2: "to learn more."
+  to_learn_more_please_contact_your_system_administr_57af0d0a: "To learn more, please contact your system administrator or visit "
   to_link_an_observer_to_a_student_conversations_sen_37aad7b5: "To link an observer to a student, Conversations - send to individual course members must be enabled."
   to_link_an_observer_to_a_student_users_manage_logi_b77cb019: |-
       To link an observer to a student, Users - manage login details and Conversations - send to individual course members must be enabled.
@@ -27922,6 +27971,7 @@ en-CA:
   usage_rights_will_be_set_for_all_of_the_files_cont_b192336a: "Usage rights will be set for all of the files contained in:"
   use_a_new_endpoint_for_fetching_course_creation_ac_712382c2: "Use a new endpoint for fetching course creation accounts"
   use_a_resource_link_s_resource_link_uuid_in_the_re_3bb2f166: "Use a Resource link's resource_link_uuid in the $ResourceLink.id substitution parameter"
+  use_a_unique_html_id_for_each_tool_launch_form_7bf0e5ea: "Use a unique HTML ID for each tool launch form"
   use_alternate_settings_for_lti_context_id_history__946a9dcc: "Use alternate settings for LTI Context.id.history query"
   use_arrow_keys_to_navigate_options_2021cc50: "Use arrow keys to navigate options."
   use_arrow_keys_to_navigate_options_d45347e8: "Use arrow keys to navigate options"
@@ -28194,6 +28244,7 @@ en-CA:
       yo: "Yo is a single-tap zero character communication tool."
   user_settings_785eed40: "User Settings"
   user_sis_id_c017cb14: "user sis id"
+  user_sis_id_ce5d7a46: "User SIS ID:"
   user_split_complete_links_to_split_user_accounts_f_dab79796: "User split complete. Links to split user accounts follow:"
   user_succesfully_logged_into_canvas_6cfbe279: "User succesfully logged into Canvas"
   user_successfully_deactivated_9d92d80d: "User successfully deactivated"
@@ -28727,6 +28778,7 @@ en-CA:
   welcome_to_the_cold_dark_void_of_name_65fc9839: "Welcome to the cold, dark void of %{name}."
   welcome_to_your_courses_to_customize_the_list_of_c_22de652e: "Welcome to your courses! To customize the list of courses, click on the \"All Courses\" link and star the courses to display."
   welcome_to_your_courses_to_customize_the_list_of_c_f95e4b2: "Welcome to your courses! To customize the list of courses,  click on the \"All Courses\" link and star the courses to display."
+  welcome_to_your_subjects_to_customize_the_list_of__a735c17f: "Welcome to your subjects! To customize the list of subjects, click on the \"All Subjects\" link and star the subjects to display."
   welcome_to_your_subjects_to_customize_the_list_of__f6574116: "Welcome to your subjects! To customize the list of subjects,  click on the \"All Subjects\" link and star the subjects to display."
   welcome_your_students_e1d96088: "Welcome your students"
   well_below_mastery_37664bdc: "Well Below Mastery"
@@ -28787,6 +28839,10 @@ en-CA:
       in their settings that have not been provisioned will be provisioned. This
       check and provision occurs on every shard around that shard region's midnight.
   when_enabled_site_admin_account_ui_will_allow_asso_9d04a1d8: "When enabled, site admin account UI will allow associating a service User with a DeveloperKey and using that key/user with the client_credentials grant type"
+  when_enabled_the_hidden_html_forms_that_are_used_t_c5edd929: |-
+      When enabled, the hidden HTML forms that are used to trigger an LTI launch
+      will each have a random number appended to their id. When disabled, each
+      one has the same id of tool_form.
   when_enabled_the_internal_access_manager_will_be_u_bc470109: "When enabled, the internal access manager will be used to gate access to certain requests"
   when_enabled_this_flag_displays_a_word_count_in_th_a75163d6: |-
       When enabled, this flag displays a word count in the speed grader for text
