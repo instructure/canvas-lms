@@ -293,7 +293,7 @@ declared user type from the user.</td>
 <td></td>
 <td></td>
 <td>Defaults to false. When true, user is notified for password setup if
-the authentication_provider_id is canvas</td>
+the authentication_provider_id is "canvas"</td>
 </tr>
 <tr>
 <td>home_account</td>
