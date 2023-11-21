@@ -519,7 +519,7 @@ GEM
       tzinfo
     expgen (0.1.1)
       parslet
-    factory_bot (6.3.0)
+    factory_bot (6.4.1)
       activesupport (>= 5.0.0)
     faraday (2.7.11)
       base64
