@@ -51,7 +51,7 @@ GEM
       statsd-ruby (~> 1.0)
     minitest (5.20.0)
     multipart-post (2.3.0)
-    public_suffix (5.0.3)
+    public_suffix (5.0.4)
     rake (13.1.0)
     rexml (3.2.6)
     rspec (3.12.0)
