@@ -14775,7 +14775,7 @@ hu:
         unit: Ft
     format: 
       delimiter: ","
-      round_mode: alapértelmezett
+      round_mode: default
       separator: "."
     human: 
       decimal_units: 

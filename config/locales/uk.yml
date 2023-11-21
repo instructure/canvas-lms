@@ -12113,7 +12113,7 @@ uk:
         unit: $
     format: 
       delimiter: ","
-      round_mode: "за замовчуванням"
+      round_mode: default
       separator: "."
     human: 
       decimal_units: 

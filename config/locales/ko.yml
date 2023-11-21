@@ -9629,7 +9629,7 @@ ko:
     format: 
       delimiter: ","
       precision: 3
-      round_mode: 기본
+      round_mode: default
       separator: "."
       significant: false
       strip_insignificant_zeros: false
