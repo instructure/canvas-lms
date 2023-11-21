@@ -534,7 +534,7 @@ GEM
     ffi-compiler (1.0.1)
       ffi (>= 1.0.0)
       rake
-    ffi-icu (0.5.1)
+    ffi-icu (0.5.2)
       ffi (~> 1.0, >= 1.0.9)
     find_a_port (1.0.1)
     flakey_spec_catcher (0.12.1)
