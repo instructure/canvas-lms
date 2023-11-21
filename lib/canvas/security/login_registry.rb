@@ -39,6 +39,12 @@ module Canvas::Security
   #   ...
   # }
   module LoginRegistry
+    # for easy stubbing of Redis accesses from this module, without overriding
+    # other accesses to Redis
+    def self.redis
+      Canvas.redis
+    end
+
     ##
     # this is the expected interface for the rest of the application.
     # When a pseudonym tries to login, it should be run through this method.
@@ -55,13 +61,9 @@ module Canvas::Security
     def self.audit_login(pseudonym, remote_ip, valid_password)
       return :too_many_attempts unless allow_login_attempt?(pseudonym, remote_ip)
 
-      if valid_password && pseudonym.current_login_at &&
-         pseudonym.current_login_at > Time.now.utc - Setting.get("successful_login_window", "5").to_f.seconds
-        # multiple _successful_ logins in a very short window?!
-        return :too_recent_login
-      end
-
       if valid_password
+        return :too_recent_login if recently_logged_in?(pseudonym)
+
         successful_login!(pseudonym)
       else
         failed_login!(pseudonym, remote_ip)
@@ -75,15 +77,28 @@ module Canvas::Security
       ip.present? || ip = "no_ip"
       total_allowed = Setting.get("login_attempts_total", "20").to_i
       ip_allowed = Setting.get("login_attempts_per_ip", "10").to_i
-      total, from_this_ip = Canvas.redis.hmget(login_attempts_key(pseudonym), "total", ip, failsafe: nil)
+      total, from_this_ip = redis.hmget(login_attempts_key(pseudonym), "total", ip, failsafe: nil)
       (!total || total.to_i < total_allowed) && (!from_this_ip || from_this_ip.to_i < ip_allowed)
+    end
+
+    def self.recently_logged_in?(pseudonym)
+      attempts_allowed = Setting.get("succesful_logins_allowed", "5").to_i
+      recent_attempts = redis.hget(succesful_logins_key(pseudonym), "count", failsafe: nil).to_i
+      recent_attempts > attempts_allowed
     end
 
     # log a successful login, resetting the failed login attempts counter
     def self.successful_login!(pseudonym)
       return unless Canvas.redis_enabled? && pseudonym
 
-      Canvas.redis.del(login_attempts_key(pseudonym), failsafe: nil)
+      redis.del(login_attempts_key(pseudonym), failsafe: nil)
+
+      key = succesful_logins_key(pseudonym)
+      exptime = Setting.get("successful_login_window", "5").to_f.seconds
+      redis.pipelined(key, failsafe: nil) do |pipeline|
+        pipeline.hincrby(key, "count", 1)
+        pipeline.expire(key, exptime)
+      end
     end
 
     # log a failed login attempt
@@ -92,7 +107,7 @@ module Canvas::Security
 
       key = login_attempts_key(pseudonym)
       exptime = Setting.get("login_attempts_ttl", 5.minutes.to_s).to_i
-      Canvas.redis.pipelined(key, failsafe: nil) do |pipeline|
+      redis.pipelined(key, failsafe: nil) do |pipeline|
         pipeline.hset(key, "unique_id", pseudonym.unique_id)
         pipeline.hincrby(key, "total", 1)
         pipeline.hincrby(key, ip, 1) if ip.present?
@@ -105,12 +120,16 @@ module Canvas::Security
       if allow_login_attempt?(pseudonym, ip)
         0
       else
-        Canvas.redis.ttl(login_attempts_key(pseudonym), failsafe: 0)
+        redis.ttl(login_attempts_key(pseudonym), failsafe: 0)
       end
     end
 
     def self.login_attempts_key(pseudonym)
       "login_attempts:#{pseudonym.global_id}"
+    end
+
+    def self.succesful_logins_key(pseudonym)
+      "successful_logins:#{pseudonym.global_id}"
     end
   end
 end
