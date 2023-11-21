@@ -337,7 +337,11 @@ class CoursePacesController < ApplicationController
   end
 
   def paces_publishing
-    jobs_progress = Progress.where(tag: "course_pace_publish", context: @context.course_paces).is_pending.map do |progress|
+    jobs_progress = Progress
+                    .where(tag: "course_pace_publish", context: @context.course_paces)
+                    .is_pending
+                    .select('DISTINCT ON ("context_id") *')
+                    .map do |progress|
       pace = progress.context
       if pace&.workflow_state == "active"
         pace_context = context_for(pace)
