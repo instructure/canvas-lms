@@ -21,7 +21,7 @@ import I18n from '@canvas/i18n'
 
 import round from '@canvas/round'
 import GradeFormatHelper from '../GradeFormatHelper'
-import {gradeToScoreLowerBound} from '../GradingSchemeHelper'
+import {gradePointsToPercentage, gradeToScoreLowerBound} from '../GradingSchemeHelper'
 import {scoreToGrade} from '@instructure/grading-utils'
 import GradeOverride from '../GradeOverride'
 import {parseEntryValue} from '../GradeInputHelper'
@@ -137,28 +137,33 @@ export default class GradeOverrideEntry extends GradeEntry {
         schemeKey: String(parseResult.value),
       }
       valid = true
+      // points based grading scheme
+    } else if (this.options.pointsBasedGradingSchemesFeatureEnabled && gradingScheme?.pointsBased) {
+      // entered percentage or is from backend which should be treated as percentage
+      if (parseResult.isPercentage || !inputByUser) {
+        enteredAs = EnterGradesAs.PERCENTAGE
+        grade = {
+          percentage: parseResult.value,
+          schemeKey: schemeKeyForPercentage(parseResult.value, gradingScheme),
+        }
+        valid = true
+        // entered points
+      } else if (parseResult.isPoints) {
+        enteredAs = EnterGradesAs.POINTS
+        grade = {
+          percentage: gradePointsToPercentage(parseResult.value, gradingScheme),
+          schemeKey: null,
+        }
+        valid = true
+      }
+      // percentage based grading scheme
     } else if (parseResult.isPercentage || parseResult.isPoints) {
       enteredAs = EnterGradesAs.PERCENTAGE
       grade = {
         percentage: parseResult.value,
         schemeKey: schemeKeyForPercentage(parseResult.value, gradingScheme),
       }
-      if (
-        this.options.pointsBasedGradingSchemesFeatureEnabled &&
-        gradingScheme &&
-        gradingScheme.pointsBased
-      ) {
-        // points based scheme
-        if (inputByUser) {
-          // don't allow user to input percents or points for points based scheme
-          valid = false
-        } else {
-          // the initial (ie, saved to server value) in percent format is valid
-          valid = true
-        }
-      } else {
-        valid = true
-      }
+      valid = true
     }
 
     if (grade != null) {
