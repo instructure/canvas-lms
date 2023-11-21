@@ -47,7 +47,7 @@ GEM
       deep_merge (~> 1.2)
       faraday (>= 0.9, < 3.0, != 2.0.0)
     erubi (1.12.0)
-    faraday (2.7.11)
+    faraday (2.7.12)
       base64
       faraday-net_http (>= 2.0, < 3.1)
       ruby2_keywords (>= 0.0.4)
