@@ -10203,7 +10203,7 @@ el:
         unit: $
     format: 
       delimiter: ","
-      round_mode: προεπιλογή
+      round_mode: default
       separator: "."
     human: 
       decimal_units: 
