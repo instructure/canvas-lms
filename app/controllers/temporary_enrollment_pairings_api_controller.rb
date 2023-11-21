@@ -39,7 +39,6 @@
 #     }
 #
 class TemporaryEnrollmentPairingsApiController < ApplicationController
-  before_action :require_account_context
   before_action :require_feature_flag
   before_action :authorize_action
   before_action :load_temporary_enrollment_pairing, only: %i[show destroy]
@@ -129,6 +128,7 @@ class TemporaryEnrollmentPairingsApiController < ApplicationController
   end
 
   def temporary_enrollment_pairing_params
-    params.permit(:workflow_state)
+    # account_id is inferred from the path, and format returned is always json
+    params.except(:format, :account_id).permit(:workflow_state)
   end
 end
