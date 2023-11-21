@@ -2370,6 +2370,7 @@ pl:
   add_quiz_cebfa28b: "Dodaj test"
   add_quiz_ip_filter_c7b37dc5: "Dodaj filtr adresu IP"
   add_rating_89d7fbde: "Dodaj punktację"
+  add_recipient_by_6d95f71e: "Dodaj odbiorcę wg"
   add_recipient_ff135ed7: "Dodaj odbiorcę"
   add_remove_in_courses_d65aaee3: "Dodaj / usuń w kursach"
   add_remove_in_courses_fa1c9081: "Dodaj / usuń w kursach"
@@ -2494,6 +2495,7 @@ pl:
   admins_3e1dce15: Administratorzy
   admins_add_remove_26811ce5: "Administratorzy - dodaj / usuń"
   advanced_36b35b8: Zaawansowane
+  advanced_analytics_course_readiness_and_students_i_6b3c439f: "Zaawansowana analityka – Gotowość kursu oraz Uczestnicy wymagający uwagi"
   advanced_analytics_course_readiness_closed_alpha_13c8aaf: "Zaawansowana Analityka – Gotowość do kursu, zamknięte testy alfa"
   advertise_release_notes_via_the_ui_9254bc6c: "Publikuj Informacje o wersji za pomocą UI"
   affects_viewing_the_conclude_course_and_permanentl_8216fcc2: "Wpływa na wyświetlanie przycisków Zakończ kurs i Trwale usuń ten kurs. Przycisk Trwale usuń ten kurs pojawia się tylko w przypadku kursów utworzonych ręcznie."
@@ -3625,6 +3627,7 @@ pl:
   an_existing_canvas_user_with_the_user_id_has_alrea_e487b0: "Istniejący użytkownik Canvas z %{user_id} odebrał już żądany integration_id %{other_user_id}, pomijając"
   an_existing_user_does_not_match_existing_user_ids__156c7a52: "Istniejący użytkownik nie odpowiada istniejącym nazwom użytkownika do logowania za pomocą identyfikatora systemu SIS %{user_id}, trwa pomijanie"
   an_export_is_already_in_progress_54270f01: "Eksportowanie w toku."
+  an_in_progress_working_prototype_of_the_learner_pa_aa79f239: "Opracowywana prototypowa wersja paszportu uczestnika."
   an_internal_error_occurred_83b8a685: "Wystąpił błąd wewnętrzny"
   an_item_named_name_already_exists_in_this_location_147b7312: "Pozycja o nazwie  \"%{name}\" już istnieje w danej lokalizacji. Czy chcesz zamienić istniejący plik?"
   an_object_of_type_graphql_type_was_hidden_due_to_i_60998e99: "Obiekt typu %{graphql_type} został ukryty z powodu niewystarczających zakresów tokena dostępu"
@@ -6404,6 +6407,7 @@ pl:
             przez dowolnego użytkownika będzie natychmiast widoczna dla każdego.
   canvas_id_f42f6ad: "identyfikator systemu Canvas"
   canvas_insights_beta_view_4cf67797: "Canvas Insights (beta) - wyświetl"
+  canvas_instructor_guide_7cf106cb: "Przewodnik nauczyciela Canvas"
   canvas_introduction_video_2d81f3ad: "Wideo wprowadzenia Canvas"
   canvas_is_attempting_to_retreive_the_submissions_p_4d47973d: "Canvas próbuje pobrać przesłane materiały. Spróbuj ponownie później."
   canvas_is_not_configured_to_receive_logins_from_is_502a4491: "Canvas nie jest skonfigurowany do odbierania loginów od %{issuer}."
@@ -8231,6 +8235,7 @@ pl:
   copy_to_folder_32ecc3c3: "Kopiuj do folderu"
   copying_628a9607: Kopiowanie...
   copyright_and_license_information_must_be_provided_5feffaf: "Przed opublikowaniem plików należy podać informacje o licencji i ochronie prawem autorskim."
+  copyright_holder_386cc8b8: "Właściciel praw autorskich"
   copyright_holder_66ee111: "Właściciel praw autorskich:"
   correct_answer: "To była prawidłowa odpowiedź."
   correct_answer_5a6a57d1: "Poprawna odpowiedź"
@@ -9137,6 +9142,7 @@ pl:
   course_sis_7ae8f649: "sis kursu"
   course_sis_df8b379: "SIS kursu"
   course_sis_id_bbed1a60: "identyfikator SIS kursu"
+  course_sis_id_cd834b3c: "SIS ID kursu:"
   course_sis_id_sis_id_or_canvas_id_4d323f5c: "SIS ID kursu (SIS_ID:####) LUB identyfikator Canvas: (###)"
   course_start_date_daae16ae: "Data rozpoczęcia kursu"
   course_start_date_on_before_a3a32883: "Data rozpoczęcia kursu w dniu/przed"
@@ -9868,6 +9874,7 @@ pl:
   create_new_group_bf9561d4: "Utwórz nową grupę"
   create_new_group_fca5cc73: "Utwórz nową grupę"
   create_new_group_set_13b1f62a: "Utwórz nowy zestaw grupy"
+  create_new_question_bank_86f2afc6: "Utwórz nowy bank pytań..."
   create_number_of_groups_groups_now_f89f220e: "Utwórz %{number_of_groups} grup teraz"
   create_outcome_4dac05a0: "Utwórz wynik"
   create_pace_4ff3e9c: "Utwórz tempo"
@@ -9954,6 +9961,7 @@ pl:
     registered_services: "Zarejestrowane usługi"
     revisions: Powtórki
     rubrics: "Kryteria ocen"
+    search: Wyszukaj
     settings: ~
     site_admin: "Administrator strony"
     stats: Statystyki
@@ -10386,6 +10394,7 @@ pl:
   default_grading_scheme_894a0eb: "Domyślny schemat oceniania"
   default_grading_scheme_for_accounts_6c9df019: "Domyślny schemat oceniania dla kont"
   default_order_8c409051: "Domyślna kolejność"
+  default_question_bank_c7bcc5e7: "Domyślny bank pytań"
   default_question_name: Pytanie
   default_question_text: "Tekst pytania"
   default_sis_sync_for_assignments_quizzes_grade_dis_3b2b4878: "Domyślna synchronizacja SIS dla zadań, quizów i dyskusji nt. ocen"
@@ -11338,6 +11347,7 @@ pl:
   download_epub_757cf0af: "Pobierz ePub"
   download_errors_attchment_82ffea3f: "Pobierz errors_attchment"
   download_filename_781704f5: "Pobierz %{filename}"
+  download_filename_b9d62bf1: "Pobierz %{fileName}"
   download_item_analysis_report_statuslabel_8c9387ec: "Pobierz raport z analizy elementu %{statusLabel}"
   download_page_views_csv_974f36e1: "Pobierz plik CSV z wyświetleniami strony"
   download_report_77164f62: "Pobierz raport"
@@ -12395,6 +12405,8 @@ pl:
   error_updating_cluster_error_674e5f2e: "Błąd podczas aktualizowania %{cluster}: %{error}"
   error_updating_comment_4b80c76d: "Błąd podczas aktualizowania komentarza"
   error_updating_discussion_topic_64522a23: "Błąd podczas aktualizowania tematu dyskusji"
+  error_updating_discussion_topic_d47c64ff: "Błąd podczas aktualizowania tematu dyskusji"
+  error_updating_file_usage_rights_f9216019: "Błąd podczas aktualizowania praw do użycia pliku"
   error_updating_module_access_f0970f4c: "Błąd podczas aktualizowania dostępu do modułu."
   error_updating_modulename_settings_da982acf: "Błąd podczas aktualizowania ustawień %{moduleName}."
   error_updating_notes_31b24785: "Błąd podczas aktualizowania notatek"
@@ -12407,6 +12419,7 @@ pl:
   error_uploading_files_f709361f: "Błąd podczas przekazywania plików"
   error_uploading_video_audio_recording_16d9730a: "Błąd podczas przesyłania nagrania wideo/audio"
   error_while_importing_csv_please_contact_support_e_57e6b3b: "Błąd podczas importowania pliku CSV. Należy skontaktować się z działem pomocy (raport błędu %{number})"
+  error_with_discussion_topic_37c699d1: "Błąd dotyczący tematu dyskusji"
   errormessage_efa8ae9: "%{errorMessage}"
   errors: 
     bad_navigation_config: "NIeprawidłowa konfiguracja zakładki kursu"
@@ -13288,6 +13301,7 @@ pl:
     titles: 
       bookmark_search: "Dodaj wyszukiwanie do ulubionych: %{service_name}"
   find_8d605019: Szukaj
+  find_a_recipient_of_temporary_enrollments_fcc649c9: "Znajdź odbiorcę tymczasowych zapisów"
   find_a_recipient_of_temporary_enrollments_from_nam_3451f654: "Znajdź odbiorcę tymczasowych zapisów od %{name}"
   find_an_assignee_of_temporary_enrollments_from_nam_ba08bb2b: "Znajdź osobę z tymczasowymi zapisami od %{name}"
   find_an_existing_grading_scheme_d836ea: "Wyszukaj istniejący schemat oceniania"
@@ -15866,10 +15880,13 @@ pl:
   import_1b31507: Importuj
   import_a_set_of_outcomes_6b782192: "Importuj zestaw wyników"
   import_anyway_8c996ef6: "Importuj pomimo to"
+  import_assessment_as_new_quizzes_help_icon_3e49480f: "Importuj test jako ikonę pomocy New Quizzes"
+  import_assessment_as_new_quizzes_help_modal_918a543d: "Importuj test jako okno dialogowe pomocy New Quizzes"
   import_commons_favorites_e68fce81: "Importuj Ulubione z Commons"
   import_content_b2fd6620: "Importuj zawartość"
   import_course_student_groups_by_csv_d2cde97d: "Importuj grupy uczestników kursów z plików CSV"
   import_e929507b: Importuj...
+  import_existing_quizzes_as_c2694727: "Importuj istniejące testy jako "
   import_existing_quizzes_as_new_quizzes_15ea1d: "Importuj istniejące testy jako New Quizzes"
   import_groups_3a2ae14b: "Importuj grupy"
   import_learning_outcomes_36d28a2b: "Importuj wyniki nauki"
@@ -16526,7 +16543,7 @@ pl:
   jwts_4f397c85: JWT
   k12_description: "Zaktualizuj ikony w menu globalnej nawigacji, które sprawdzają się lepiej w środowisku K-12."
   k20_beta_538e64fb: "K20 - Beta"
-  k20_beta_description: "Zapewnia dostęp do funkcji K20 Beta w aplikacji Admin Analytics."
+  k20_beta_description: "Zapewnia dostęp do paneli nawigacyjnych dla użytkowników funkcji Gotowość kursu oraz Uczestnicy wymagający uwagi w zamkniętej wersji beta."
   k20_course_readiness_alpha_testing_description: "Ta flaga jest przeznaczona dla instytucji uczestniczących w testach Advanced Analytics w wersji alfa. Ta flaga aktywuje panel nawigacyjny Course Readiness dla tych instytucji."
   k20_course_readiness_alpha_testing_f45597b6: "K20 – testowanie Course Readiness w wersji alfa"
   k20_course_readiness_description: "Aktywuje pulpit Zaawansowana Analityka – Gotowość do kursu dla testerów alfa."
@@ -16664,9 +16681,11 @@ pl:
   latex_equations_are_currently_migrated_as_images_a_1206c659: "Równania LaTex są obecnie migrowane jako obrazy, zaś pytań nie należy edytować."
   latvian_2bbb6aab: Łotewski
   launch_external_tool_672c0409: "Uruchom narzędzie zewnętrzne"
+  launch_height_2915768c: "Wysokość początkowa"
   launch_registration_tool_38d4781: "Uruchom narzędzie rejestracji"
   launch_speedgrader_filtered_by_student_group_8bd9b5c7: "Uruchomienie SpeedGrader filtrowane wg grupy uczestników"
   launch_url_e150bd41: "Uruchom adres URL"
+  launch_width_9f8be877: "Szerokość początkowa"
   lavender_ce4d0ada: Lawenda
   layouts: 
     application: 
@@ -16712,6 +16731,7 @@ pl:
   learn_more_about_using_commons_and_blueprints_3df953f6: "Uzyskaj więcej informacji na temat zasobów Commons i kursów Blueprint."
   learn_more_about_video_conferencing_5f0e76e4: "Uzyskaj więcej informacji na temat wideokonferencji"
   learn_more_in_the_canvas_community_3bba7b11: "Dowiedz się więcej w społeczności Canvas"
+  learner_passport_prototype_1c3446b3: "Prototyp paszportu uczestnika"
   learning_analytics_beta_view_46deb4c8: "Analiza nauki (beta) - wyświetl"
   learning_mastery_5fc34276: "Poziom biegłości"
   learning_mastery_6ed4fd63: "Opanowywanie materiału..."
@@ -16725,6 +16745,7 @@ pl:
       biegłości/wymagający poprawy.
   learning_mastery_gradebook_redesign_9ca88020: "Przeprojektowano Dzienniczek nauki poziomu biegłości"
   learning_object_1f9e5dd8: "Obiekt do nauki"
+  learning_object_dates_36b05acb: "Daty obiektu nauczania"
   learning_outcome: 
     no_comment: "Brak komentarzy"
     no_description: "Brak opisu"
@@ -17019,6 +17040,7 @@ pl:
   loading_courses_started_6e6d742c: "Rozpoczęto wczytywanie kursów"
   loading_data_ecd89ba: "Wczytywanie danych..."
   loading_discussions_8ed5fcd7: "Wczytywanie dyskusji"
+  loading_enrollments_4fe0d951: "Wczytywanie zapisów"
   loading_external_tool_d839042c: "Wczytywanie narzędzia zewnętrznego"
   loading_f99d93d4: "...wczytywanie"
   loading_feature_options_82e07ee4: "Wczytywanie opcji funkcji"
@@ -20325,6 +20347,7 @@ pl:
   new_outcome_group_af59f145: "Nowa grupa wyników"
   new_post_policy_icons_da13a62c: "Nowe ikony zasad publikowania"
   new_question_9107c469: "Nowe pytanie"
+  new_question_bank_732bbf83: "Nowy bank pytań"
   new_question_group_d9306280: "Nowa grupa pytań"
   new_quiz_34aacba6: "Nowy test"
   new_quiz_deleted_user_restore_pending_review_state_a117d744: "Oczekiwanie na przywrócenie użytkownika kursu usuniętego przez podczas rejestracji"
@@ -20341,6 +20364,7 @@ pl:
   new_quizzes_export_support_b0a6a625: "Wsparcie eksportu New Quizzes"
   new_quizzes_importing_c167dce0: "Importowanie New Quizzes"
   new_quizzes_included_on_outcome_alignment_summary__4547b0ad: "Na karcie podsumowania dostosowania wyników dodano nowe testy"
+  new_quizzes_is_the_new_assessment_engine_for_canva_4125a679: "New Quizzes to nowy mechanizm testów w Canvas."
   new_quizzes_migrate_without_content_rewrite_1aec2ce8: "Migracji testów bez zamiany treści"
   new_quizzes_migration_during_course_import_copy_e9dd124e: "Migracja nowych testów podczas importowania/kopiowania kursów"
   new_quizzes_migration_enabled_by_default_5f9bcc81: "Migracja New Quizzes jest domyślnie włączona"
@@ -21254,6 +21278,7 @@ pl:
   open_name_color_picker_a2646a33: "Wybierz menu rozwijające kolorów %{name}"
   open_new_course_modal_a8f8ad52: "Otwórz nowe okno kursu"
   open_new_subject_modal_c9049e1d: "Otwórz nowy temat modułowy"
+  open_search_menu_1c4d4685: "Otwórz menu wyszukiwania"
   open_sidebar_2852e8c8: "Otwórz pasek boczny"
   open_speedgrader_11604608: "Otwarty SpeedGrader"
   open_student_context_tray_24c1b1d6: "Otwórz panel kontekstu uczestnika"
@@ -21582,8 +21607,12 @@ pl:
   overrides_e8659a73: Nadpisy
   overview_58268c72: Omówienie
   overview_of_student_status_a004bcf3: "Omówienie statusu uczestnika"
+  overwrite_848c08f: Zastąp
   overwrite_all_users_existing_default_dashboard_pre_9b2ad7d1: "Zastąp istniejące domyślne preferencje dotyczące panelu dla wszystkich użytkowników"
   overwrite_already_entered_grades_64a98037: "Zastąp wprowadzone oceny"
+  overwrite_assessment_content_with_matching_ids_b388f114: "Zastąp zadania z tymi samymi identyfikatorami"
+  overwrite_assessment_help_icon_875d00a5: "Zastąp ikonę pomocy oceniania"
+  overwrite_assessment_help_modal_3254b23c: "Zastąp okno dialogowe pomocy oceniania"
   overwrite_user_lti_url_input_on_select_content_dia_6d9c76f: "Zastąp dane URL LTI użytkownika w wybranym oknie dialogowym zawartości"
   own_copyright_cc59db55: "Własne prawa autorskie"
   owner_email_236d1b2: "Adres e-mail właściciela"
@@ -21730,6 +21759,7 @@ pl:
   pass_2a8c4f07: zaliczenie
   pass_fail_3d9461b0: "Zaliczony/Nie zaliczony"
   pass_fail_grade_options_f9b06a58: "Opcje oceniania Zaliczone-Niezaliczone"
+  passport_a4733c1: Paszport
   password_8a271b1c: Hasło
   past_14da759a: Poprzedni
   past_collaborations_1241938f: "Byłe projekty współpracy"
@@ -21938,6 +21968,7 @@ pl:
   please_select_an_item_30c287ef: "Wybierz element"
   please_select_at_least_one_enrollment_before_submi_56b92b37: "Wybierz przynajmniej jeden zapis przed przesłaniem"
   please_select_at_least_one_filter_aafaa1a7: "Wybierz przynajmniej jeden filtr."
+  please_select_at_least_one_option_2b83cad: "Wybierz przynajmniej jedną opcję."
   please_select_one_f931e883: "Wybierz jedno"
   please_select_the_level_of_privacy_desired_for_sup_7744af5: "Wybierz poziom poufności dla dostępu pomocy technicznej"
   please_specify_whether_to_enable_or_disable_micros_10f43ce5: "Należy określić, czy synchronizacja Microsoft Teams będzie włączona."
@@ -22997,6 +23028,7 @@ pl:
       dostawców SAML.
   provide_tutorial_information_for_instructors_new_t_163c8ed4: "Przekaż informacje o samouczku dla nowych instruktorów w Canvas."
   provide_tutorial_information_for_new_users_in_a_fl_c23462ac: "Podaj informacje szkoleniowe dla nowych użytkownik w wysuwanym menu."
+  provider_2d212e55: Dostawca
   provider_35796463: "| %{provider}"
   provider_attribute_b1cad655: "Właściwości dostawcy"
   provider_enforces_mfa_when_logging_in_through_this_54adcd1d: "Usługodawca wymusza użycie MFA *Podczas logowania za pomocą tego usługodawcy, Canvas będzie wyraźnie pomijać wymuszenie zabezpieczeń MFA. Należy tego używać tylko wtedy, gdy usługodawca zagwarantował już funkcję MFA przed pojedynczym zalogowaniem do Canvas.*"
@@ -24910,6 +24942,8 @@ pl:
   recentint_remainderint_weighted_average_f73369bc: "Średnia ważona %{recentInt}/%{remainderInt}"
   recently_deleted_courses_title: "Ostatnio usunięte kursy"
   recipient_4b8dbbc0: Odbiorca
+  recipient_enrollment_period_55183973: "Okres zapisów odbiorcy"
+  recipient_enrollment_type_b1690078: "Typ zapisów odbiorcy"
   recipient_input: 
     context_search_placeholder: "Wprowadź nazwę, kurs lub grupę."
     context_search_title: "Nazwa, kurs lub grupa"
@@ -25388,6 +25422,8 @@ pl:
   retrieve_timeout: "nie można pobrać konfiguracji, serwer nie odpowiadał zbyt długo"
   retrieving_content_ed0b9b33: "Pobieranie zawartości..."
   retrieving_tool_51709735: "Narzędzie do odzyskiwania"
+  retrieving_user_enrollments_8dc523c1: "Pobieranie zapisów użytkownika"
+  retrieving_user_information_6864fa70: "Pobieranie informacji o użytkowniku"
   retry_duplicating_original_assignment_name_90b83bb8: "Ponów duplikowanie \"%{original_assignment_name}\""
   retry_duplicating_originalassignmentname_884aee1: "Ponów duplikowanie „%{originalAssignmentName}”"
   retry_ebd5f8ba: "Ponów próbę"
@@ -25613,6 +25649,7 @@ pl:
   rubric_created_64980593: "Utworzono kryteria ocen"
   rubric_criterion_range_12499bf1: "Zakres kryteriów Rubric"
   rubric_deleted_3d9efc18: "Usunięto kryteria ocen"
+  rubric_enhancements_73bf351c: "Ulepszenia kryteriów ocen"
   rubric_fc39da76: Rubric
   rubric_updated_103e24dc: "Zaktualizowano kryteria ocen"
   rubric_was_successfully_submitted_b0766474: "Kryteria oceny przesłano pomyślnie."
@@ -25690,6 +25727,7 @@ pl:
   salesforce_account_id_d0325865: "Identyfikator konta Salesforce"
   salesforce_account_id_eb5c78ad: "Identyfikator konta Salesforce"
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: "Salesforce posiada inny host logowania dla kont sandbox niż w przypadku kont produkcji, więc jeśli używasz konta Salesforce sandbox i nie zaznaczysz tego pola, nie będzie w stanie uwierzytelnić (działa to również w drugą stronę - jeśli posiadasz konto produkcyjne i zaznaczysz to pole - nie będzie mógł uwierzytelnić)"
+  salesforce_project_id_5d341843: "Identyfikator projektu Salesforce"
   salesforce_ticketing_webtocase_connector_80f75716: "Łącznik biletów WebToCase Salesforce"
   salmon_7d4b70d4: Łosoś
   same_value_as_canvas_url__c_will_probably_be_going_37027686: "Ta sama wartość jak 'Canvas_URL__c', prawdopodobnie wkrótce zniknie"
@@ -25975,7 +26013,10 @@ pl:
   search_for_your_school_or_institution_1eb2eeaf: "Wyszukaj szkołę lub instytucję"
   search_form_fcaa38f7: "Formularz wyszukiwania"
   search_grading_periods_e947a3e9: "Przeszukaj okresy oceniania..."
+  search_groups_9ff9344c: "Wyszukaj grupy"
   search_groups_or_people_6c15d6ad: "Wyszukaj grupy lub osoby"
+  search_input_615d0e77: "Wyszukiwane wyrażenie"
+  search_menu_d327ff2b: "Menu wyszukiwania"
   search_people_402e622c: "Wyszukuj osoby"
   search_people_44f36cd2: "Wyszukaj osoby..."
   search_people_4782671a: "Wyszukuj osoby"
@@ -26037,6 +26078,7 @@ pl:
   section_level_calendar_permissions_6aff8cdb: "Uprawnienia kalendarza na poziomie sekcji"
   section_name_b6d82574: "Nazwa sekcji"
   section_name_edb51b2: "nazwa sekcji"
+  section_name_fa2b80d7: "Nazwa sekcji:"
   section_pace_989d2856: "Tempo sekcji"
   section_removed_2ac72a79: "%{section} usunięte"
   section_section_names_98f172e6: "Sekcja: %{section_names}"
@@ -26144,6 +26186,7 @@ pl:
   select_a_module_optional_7edb5cb0: "Wybierz moduł (opcjonalnie)"
   select_a_predefined_color_c77ab2f5: "Wybierz uprzednio zdefiniowany kolor."
   select_a_provisional_grade_7106e3d5: "Wybierz ocenę wstępną"
+  select_a_question_bank_f346e5a0: "Wybierz bank pytań"
   select_a_role_287e53e8: "Wybierz rolę"
   select_a_section_37ac1694: "Wybierz sekcję"
   select_a_student_adfcc348: "Wybierz uczestnika"
@@ -26237,6 +26280,7 @@ pl:
   select_prerequisite_3b049b02: "Wybierz wymóg wstępny"
   select_prerequisite_module_57894963: "Wybierz moduł warunkowy"
   select_prerequite_module_e9042bb0: "Wybierz moduł warunkowy"
+  select_question_bank_508e5c08: "Wybierz bank pytań"
   select_requirement_count_e0948936: "Wybierz liczbę dla wymogu"
   select_requirement_type_bf9a39d9: "Wybierz typ dla wymogu"
   select_role_aa5cfd69: "Wybierz rolę"
@@ -27587,6 +27631,7 @@ pl:
   some_settings_have_been_administratively_locked_9e3ee880: "Niektóre ustawienia zostały administracyjnie zablokowane."
   some_settings_have_been_disabled_because_the_assig_6b6cc3b4: "Niektóre ustawienia zostały wyłączone, ponieważ zadanie przypada na zamknięty okres oceniania."
   some_submissions_are_not_gradeable_grade_changes_f_f8bf44e2: "Niektóre przesłane materiały nie nadają się do oceny; zmiany ocen dla tych materiałów zostały zignorowane."
+  some_systems_recycle_their_ids_for_each_new_export_884b8e46: "Niektóre systemy ponownie wykorzystują identyfikatory do każdego nowego eksportu. W wyniku tego, jeśli eksportowane są dwa oddzielne banki pytań, będą one korzystać z tych samych identyfikatorów. Aby zapobiec utracie danych testów, traktujemy te obiekty jako odmienne pomimo identycznych identyfikatorów. Wybór tej opcji wyłączy tę funkcję i sprawi, że dane testów zastąpią istniejące dane o takich samych identyfikatorach."
   someone: Gość
   someone_bbbc538b: Gość
   someone_just_made_a_new_annotation_on_the_anonymou_cbbe68ca: "Ktoś właśnie dodał adnotację do dostarczonego przez użytkownika anonimowego zadania (%{user_id}) do %{assignment_title}."
@@ -28592,6 +28637,7 @@ pl:
     quizzes: Testy
     rubrics: "Kryteria ocen"
     schedule: Harmonogram
+    search: Wyszukaj
     settings: Ustawienia
     syllabus: "Program kursu"
     tab_location_error: "Położenie tej karty jest niepoprawne"
@@ -28656,6 +28702,7 @@ pl:
   temporarily_enroll_name_8acb66ce: "Tymczasowo zapisz użytkownika %{name}"
   temporary_9c54e959: "Tymczasowe:"
   temporary_enrollment_option_links_eb9b8b2e: "Linki do opcji zapisu tymczasowego"
+  temporary_enrollment_pairings_56f35f5c: "Tymczasowe parowania zapisów"
   temporary_enrollment_was_successfully_created_78b48a7a: "Zapis tymczasowy został pomyślnie utworzony."
   temporary_enrollments_add_373181b7: "Zapisy tymczasowe - dodaj"
   temporary_enrollments_delete_52ffaae4: "Zapisy tymczasowe - usuń"
@@ -29518,6 +29565,7 @@ pl:
                                   Użytkownicy końcowi nie będą jej widzieć, o ile nie zostanie to włączone przez administratora lokalizacji.
                                   Przed włączeniem opcji dla instytucji należy upewnić się co do zrozumienia
                                   jej działania oraz możliwych konsekwencji dla użytkowników.
+  this_feature_provides_visual_and_functional_enhanc_e5e57a21: "Funkcja ta zapewnia ulepszenia wizualne i funkcjonalne dla kryteriów ocen w Canvas."
   this_feature_will_hide_all_quantitative_values_fro_6f006665: "Funkcja ta pozwala ukryć wszystkie dane ilościowe przed użytkownikiem"
   this_field_is_required_fa58c4a: "To pole jest wymagane"
   this_field_name_is_required_988caebc: "\"%{name}\" tego pola jest wymagana."
@@ -30362,6 +30410,7 @@ pl:
   to_join_the_canvas_community_you_must_first_have_a_6fe1b7d8: "Aby dołączyć do społeczności Canvas, należy najpierw posiadać konto Canvas."
   to_learn_more_about_canvas_for_elementary_please_r_7fd3af37: "Aby dowiedzieć się więcej o Canvas dla uczniów szkoły podstawowej, patrz *nasza dokumentacja*."
   to_learn_more_becd2ce2: "aby dowiedzieć się więcej."
+  to_learn_more_please_contact_your_system_administr_57af0d0a: "Aby dowiedzieć się więcej, skontaktuj się z administratorem systemu lub odwiedź "
   to_link_an_observer_to_a_student_conversations_sen_37aad7b5: "Aby powiązać obserwującego z uczestnikiem, należy włączyć uprawnienia Konwersacje - Wyślij wiadomości do poszczególnych uczestników kursu."
   to_link_an_observer_to_a_student_users_manage_logi_b77cb019: |-
       Aby powiązać obserwującego z uczestnikiem, należy włączyć uprawnienia Użytkownicy - Zarządzaj szczegółami logowania oraz Konwersacje - Wyślij wiadomości do poszczególnych uczestników kursu.
@@ -31267,6 +31316,7 @@ pl:
   use_a_new_endpoint_for_fetching_course_creation_ac_712382c2: "Użyj nowego punktu końcowego do pobierania kont tworzenia kursów"
   use_a_or_new_line_between_for_adding_multiple_user_e7c43ba9: "Użyj „,” lub nowego wiersza pomiędzy, aby dodać wielu użytkowników."
   use_a_resource_link_s_resource_link_uuid_in_the_re_3bb2f166: "Użyj łącza zasobu resource_link_uuid w parametrze zastępowania $ResourceLink.id"
+  use_a_unique_html_id_for_each_tool_launch_form_7bf0e5ea: "Użyj unikalnego identyfikatora HTML dla każdego formularza uruchamiania narzędzia"
   use_alternate_settings_for_lti_context_id_history__946a9dcc: "Użyj alternatywnych ustawień dla kwerendy LTI Context.id.history"
   use_arrow_keys_to_navigate_options_2021cc50: "Użyj klawiszy strzałek do nawigowania po opcjach."
   use_arrow_keys_to_navigate_options_d45347e8: "Użyj klawiszy strzałek do nawigowania po opcjach"
@@ -31567,6 +31617,7 @@ pl:
       yo: "Yo to narzędzie do komunikacji, które obsługuje się pojedynczymi kliknięciami bez wpisywania znaków."
   user_settings_785eed40: "Ustawienia użytkownika"
   user_sis_id_c017cb14: "identyfikator systemu sis użytkownika"
+  user_sis_id_ce5d7a46: "Identyfikator systemu SIS użytkownika:"
   user_split_complete_links_to_split_user_accounts_f_dab79796: "Podział użytkowników zakończony. Łącza do podziału kont użytkowników:"
   user_succesfully_logged_into_canvas_6cfbe279: "Zalogowano użytkownika do Canvas"
   user_successfully_deactivated_9d92d80d: "Użytkownik pomyślnie dezaktywowany"
@@ -32159,8 +32210,9 @@ pl:
   welcome_name_a16afa7f: "Witamy, %{name}!"
   welcome_to_the_canvas_theme_editor_73091d1: "Witamy w Edytorze motywu Canvas"
   welcome_to_the_cold_dark_void_of_name_65fc9839: "Witaj w zimnej, ciemnej otchłani %{name}."
-  welcome_to_your_courses_to_customize_the_list_of_c_22de652e: "Witamy w twoich kursach! Aby dostosować listę kursów, kliknij na link \"Wszystkie kursy\" i oznacz gwiazdką kursy do wyświetlenia."
+  welcome_to_your_courses_to_customize_the_list_of_c_22de652e: "Witamy w sekcji kursów! Aby skonfigurować listę kursów, kliknij łącze „Wszystkie kursy” i oznacz gwiazdką kursy do wyświetlenia."
   welcome_to_your_courses_to_customize_the_list_of_c_f95e4b2: "Witamy w sekcji kursów! Aby skonfigurować listę kursów, kliknij łącze Wszystkie kursy, wyświetlając kursy."
+  welcome_to_your_subjects_to_customize_the_list_of__a735c17f: "Witamy w sekcji tematów! Aby skonfigurować listę tematów, kliknij łącze „Wszystkie tematy” i oznacz gwiazdką tematy do wyświetlenia."
   welcome_to_your_subjects_to_customize_the_list_of__f6574116: "Witam w sekcji tematów! Aby skonfigurować listę tematów, kliknij łącze Wszystkie tematy i oznacz gwiazdką tematy do wyświetlenia."
   welcome_your_students_e1d96088: "Powitaj swoich uczestników"
   well_below_mastery_37664bdc: "Znacznie poniżej poziomu biegłości"
@@ -32225,6 +32277,10 @@ pl:
       w ustawieniach, które nie zostały zainicjowane, będą inicjowane. Ta
       kontrola z inicjowaniem odbywa się dla każdego odłamka w okolicach północy w danej strefie odłamka.
   when_enabled_site_admin_account_ui_will_allow_asso_9d04a1d8: "Po włączeniu tej opcji, interfejs konta administratora witryny pozwoli na powiązanie użytkownika usługi z DeveloperKey oraz korzystanie z tego klucza/użytkownika z typem grantu client_credentials."
+  when_enabled_the_hidden_html_forms_that_are_used_t_c5edd929: |-
+      Gdy funkcja jest włączona, ukryte formularze HTML używane do uruchamiania zawartości LTI
+      będą posiadać losowy numer w identyfikatorze. W przypadku wyłączeniu tej funkcji każdy formularz
+      ma taki sam identyfikator tool_form.
   when_enabled_the_internal_access_manager_will_be_u_bc470109: "Po włączeniu tej opcji, Internal Access Manager pozwoli zarządzać dostępem do określonych żądań."
   when_enabled_this_flag_displays_a_word_count_in_th_a75163d6: |-
       Jeśli ta flaga jest włączona, wyświetla liczbę słów w narzędziu SpeedGrader dla
