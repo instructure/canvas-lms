@@ -19,14 +19,21 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
+import {IconArrowOpenStartLine} from '@instructure/ui-icons'
 import {Modal} from '@instructure/ui-modal'
 import {TextInput} from '@instructure/ui-text-input'
 import * as React from 'react'
-import {useDynamicRegistrationState} from './DynamicRegistrationState'
-import {IconArrowLeftLine} from '@instructure/ui-icons'
+import {RegistrationOverlayForm} from '../RegistrationSettings/RegistrationOverlayForm'
 import storeCreator from '../store/store'
+import {useDynamicRegistrationState} from './DynamicRegistrationState'
+import {getRegistrationToken} from './registrationApi'
 import actions from '../actions/developerKeysActions'
 import {AnyAction} from 'redux'
+import {Flex} from '@instructure/ui-flex'
+import {View} from '@instructure/ui-view'
+import {Spinner} from '@instructure/ui-spinner'
+import GenericErrorPage from '@canvas/generic-error-page/react'
+import errorShipUrl from '@canvas/images/ErrorShip.svg'
 
 const I18n = useI18nScope('react_developer_keys')
 type DynamicRegistrationModalProps = {
@@ -75,6 +82,14 @@ const isValidUrl = (str: string) => {
   }
 }
 
+const addParams = (url: string, params: Record<string, string>) => {
+  const u = new URL(url)
+  Object.entries(params).forEach(([key, value]) => {
+    u.searchParams.set(key, value)
+  })
+  return u.toString()
+}
+
 type DynamicRegistrationModalBodyProps = {}
 
 const DynamicRegistrationModalBody = (_props: DynamicRegistrationModalBodyProps) => {
@@ -84,11 +99,13 @@ const DynamicRegistrationModalBody = (_props: DynamicRegistrationModalBodyProps)
     case 'closed':
       return null
     case 'opened':
+    case 'loading_registration_token':
       return (
         <Modal.Body>
           <TextInput
             value={state.dynamicRegistrationUrl}
             renderLabel={I18n.t('Dynamic Registration Url')}
+            disabled={state.tag === 'loading_registration_token'}
             onChange={(_event, value) => {
               setUrl(value)
             }}
@@ -99,11 +116,50 @@ const DynamicRegistrationModalBody = (_props: DynamicRegistrationModalBodyProps)
     case 'registering':
       return (
         <iframe
+          src={addParams(state.dynamicRegistrationUrl, {
+            openid_configuration: state.registrationToken.oidc_configuration_url,
+            registration_token: state.registrationToken.token,
+          })}
+          style={{width: '100%', height: '600px', border: '0', display: 'block'}}
           title={I18n.t('Register App')}
           data-testid="dynamic-reg-modal-iframe"
-          src={`/api/lti/register?registration_url=${state.dynamicRegistrationUrl}`}
-          style={{width: '100%', height: '600px', border: '0', display: 'block'}}
         />
+      )
+    case 'loading_registration':
+      return (
+        <Modal.Body>
+          <View as="div" height="20rem" data-testid="dynamic-reg-modal-loading-registration">
+            <Flex justifyItems="center" alignItems="center" height="100%">
+              <Flex.Item>
+                <Spinner renderTitle={I18n.t('Loading')} />
+              </Flex.Item>
+            </Flex>
+          </View>
+        </Modal.Body>
+      )
+    case 'confirming':
+    case 'closing_and_saving':
+    case 'enabling_and_closing':
+    case 'deleting':
+      return (
+        <Modal.Body>
+          <div data-testid="dynamic-reg-modal-confirmation">
+            <RegistrationOverlayForm
+              store={state.overlayStore}
+              ltiRegistration={state.registration}
+            />
+          </div>
+        </Modal.Body>
+      )
+    case 'error':
+      return (
+        <Modal.Body>
+          <GenericErrorPage
+            imageUrl={errorShipUrl}
+            error={state.error}
+            errorCategory="Dynamic Registration"
+          />
+        </Modal.Body>
       )
   }
 }
@@ -114,12 +170,23 @@ type DynamicRegistrationModalFooterProps = {
 }
 
 const DynamicRegistrationModalFooter = (props: DynamicRegistrationModalFooterProps) => {
-  const {state, register, close, open} = useDynamicRegistrationState(s => s)
+  const {
+    state,
+    register,
+    close,
+    open,
+    loadingRegistrationToken,
+    enableAndClose,
+    closeAndSaveOverlay,
+    deleteKey,
+    error,
+  } = useDynamicRegistrationState(s => s)
 
   switch (state.tag) {
     case 'closed':
       return null
     case 'opened':
+    case 'loading_registration_token':
       return (
         <>
           <Button color="secondary" margin="small" onClick={close}>
@@ -128,17 +195,19 @@ const DynamicRegistrationModalFooter = (props: DynamicRegistrationModalFooterPro
           <Button
             color="primary"
             margin="small"
-            disabled={!isValidUrl(state.dynamicRegistrationUrl)}
+            disabled={
+              !isValidUrl(state.dynamicRegistrationUrl) ||
+              state.tag === 'loading_registration_token'
+            }
             onClick={() => {
-              register(state.dynamicRegistrationUrl, () => {
-                props.store.dispatch(
-                  // Redux types are really bad, hence the cast here...
-                  actions.getDeveloperKeys(
-                    `/api/v1/accounts/${props.contextId}/developer_keys`,
-                    true
-                  ) as unknown as AnyAction
-                )
-              })
+              loadingRegistrationToken()
+              getRegistrationToken()
+                .then(token => {
+                  register(token)
+                })
+                .catch(err => {
+                  error(err instanceof Error ? err : undefined)
+                })
             }}
             data-testid="dynamic-reg-modal-continue-button"
           >
@@ -147,13 +216,14 @@ const DynamicRegistrationModalFooter = (props: DynamicRegistrationModalFooterPro
         </>
       )
     case 'registering':
+    case 'loading_registration':
       return (
         <>
           <Button
             color="secondary"
             margin="small"
             onClick={() => open(state.dynamicRegistrationUrl)}
-            renderIcon={IconArrowLeftLine}
+            renderIcon={IconArrowOpenStartLine}
           >
             Back
           </Button>
@@ -161,6 +231,73 @@ const DynamicRegistrationModalFooter = (props: DynamicRegistrationModalFooterPro
             Cancel
           </Button>
         </>
+      )
+    case 'confirming':
+    case 'closing_and_saving':
+    case 'enabling_and_closing':
+    case 'deleting': {
+      const onFinish = () => {
+        props.store.dispatch(
+          // Redux types are really bad, hence the cast here...
+          actions.getDeveloperKeys(
+            `/api/v1/accounts/${props.contextId}/developer_keys`,
+            true
+          ) as unknown as AnyAction
+        )
+        close()
+      }
+      const buttonsDisabled = state.tag !== 'confirming'
+      return (
+        <>
+          <Button
+            color="secondary"
+            margin="0 x-small"
+            disabled={buttonsDisabled}
+            onClick={() => {
+              // eslint-disable-next-line promise/catch-or-return
+              deleteKey(state.registration).then(onFinish)
+            }}
+          >
+            {I18n.t('Delete')}
+          </Button>
+          <Button
+            color="secondary"
+            margin="0 x-small"
+            disabled={buttonsDisabled}
+            onClick={() => {
+              // eslint-disable-next-line promise/catch-or-return
+              closeAndSaveOverlay(
+                state.registration,
+                state.overlayStore.getState().state.registration
+              ).then(onFinish)
+            }}
+          >
+            {I18n.t('Save')}
+          </Button>
+          <Button
+            color="primary"
+            margin="0 x-small"
+            disabled={buttonsDisabled}
+            data-testid="dynamic-reg-modal-enable-and-close-button"
+            onClick={() => {
+              // eslint-disable-next-line promise/catch-or-return
+              enableAndClose(
+                props.contextId,
+                state.registration,
+                state.overlayStore.getState().state.registration
+              ).then(onFinish)
+            }}
+          >
+            {I18n.t('Enable & Close')}
+          </Button>
+        </>
+      )
+    }
+    case 'error':
+      return (
+        <Button color="secondary" margin="small" onClick={close}>
+          {I18n.t('Close')}
+        </Button>
       )
   }
 }

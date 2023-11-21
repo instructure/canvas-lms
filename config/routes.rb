@@ -777,6 +777,7 @@ CanvasRails::Application.routes.draw do
       get :statistics
     end
     resources :developer_keys, only: :index
+    get "/developer_keys/:key_id", controller: :developer_keys, action: :index, as: "account_developer_key_view"
 
     get "release_notes" => "release_notes#manage", :as => :release_notes_manage
 
@@ -2761,7 +2762,10 @@ CanvasRails::Application.routes.draw do
 
     # Dynamic Registration Service
     scope(controller: "lti/ims/dynamic_registration") do
+      get "registration_token", action: :registration_token
       get "register", action: :redirect_to_tool_registration
+      get "registrations/uuid/:registration_uuid", action: :registration_by_uuid
+      put "registrations/:registration_id/overlay", action: :update_registration_overlay
       post "registrations", action: :create
     end
 
