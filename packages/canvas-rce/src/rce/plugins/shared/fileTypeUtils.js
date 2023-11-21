@@ -120,6 +120,12 @@ export function mediaPlayerURLFromFile(file, canvasOrigin) {
   }
 
   if (file.embedded_iframe_url) {
+    const url = new URL(file.embedded_iframe_url, canvasOrigin)
+
+    if (url.searchParams.has('type')) {
+      return `${absoluteToRelativeUrl(file.embedded_iframe_url, canvasOrigin)}`
+    }
+
     return `${absoluteToRelativeUrl(file.embedded_iframe_url, canvasOrigin)}?type=${type}`
   }
 
