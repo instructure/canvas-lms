@@ -2341,6 +2341,7 @@ ja:
   add_quiz_cebfa28b: 小テストを追加
   add_quiz_ip_filter_c7b37dc5: "小テスト IP フィルタの追加"
   add_rating_89d7fbde: 評価を追加する
+  add_recipient_by_6d95f71e: .により受取人を追加する
   add_recipient_ff135ed7: 受信者の追加
   add_remove_in_courses_d65aaee3: コース内で追加/削除
   add_remove_in_courses_fa1c9081: コース内で追加/削除
@@ -2465,6 +2466,7 @@ ja:
   admins_3e1dce15: 管理者
   admins_add_remove_26811ce5: "管理者 - 追加/削除"
   advanced_36b35b8: アドバンスト
+  advanced_analytics_course_readiness_and_students_i_6b3c439f: "高度な分析 - コースの準備状況と注意が必要な受講者"
   advanced_analytics_course_readiness_closed_alpha_13c8aaf: "Advanced Analytics - コース準備クローズド・アルファ"
   advertise_release_notes_via_the_ui_9254bc6c: UIを介してリリースノートを広告します
   affects_viewing_the_conclude_course_and_permanentl_8216fcc2: "[コースを終了]および[このコースを完全に削除]ボタンの表示に影響します。このコースを完全に削除するボタンは、手動で作成したコースにのみ表示されます。"
@@ -3586,6 +3588,7 @@ ja:
   an_existing_canvas_user_with_the_user_id_has_alrea_e487b0: "%{user_id} の既存 Canvas ユーザーは %{other_user_id}の要求された integration_id をすでに請求済みです。スキップする"
   an_existing_user_does_not_match_existing_user_ids__156c7a52: "既存ユーザーが SIS ID %{user_id},でログイン用の既存ユーザー ID と一致しません。スキップします。"
   an_export_is_already_in_progress_54270f01: エクスポートはすでに進行中です。
+  an_in_progress_working_prototype_of_the_learner_pa_aa79f239: 学習者パスポート機能の作業中プロトタイプ。
   an_internal_error_occurred_83b8a685: 内部エラーが発生しました。
   an_item_named_name_already_exists_in_this_location_147b7312: "\"%{name}\" という名前のアイテムは、この場所に既に存在しています。既存のファイルを置き換えますか?"
   an_object_of_type_graphql_type_was_hidden_due_to_i_60998e99: "オブジェクトタイプは、%{graphql_type}アクセストークンの範囲が不十分なため非表示にされました"
@@ -6314,6 +6317,7 @@ ja:
             どのユーザーが行った変更も、全員がすぐさま閲覧できるようになります。
   canvas_id_f42f6ad: "Canvas ID"
   canvas_insights_beta_view_4cf67797: "Canvas Insights（ベータ版）-表示"
+  canvas_instructor_guide_7cf106cb: Canvasインストラクターガイド
   canvas_introduction_video_2d81f3ad: "Canvas 概要ビデオ"
   canvas_is_attempting_to_retreive_the_submissions_p_4d47973d: "Canvas が投稿を取得しようとしています。後ほどもういちど確認してください。"
   canvas_is_not_configured_to_receive_logins_from_is_502a4491: "Canvas iは、%{issuer}からのログインを受信するように設定されていません。"
@@ -8120,6 +8124,7 @@ ja:
   copy_to_folder_32ecc3c3: フォルダへコピー
   copying_628a9607: コピー中・・・
   copyright_and_license_information_must_be_provided_5feffaf: ファイルを公開する前に著作権とライセンス情報をファイルに提供しなければなりません。
+  copyright_holder_386cc8b8: 著作権所有者
   copyright_holder_66ee111: "著作権保有者:"
   correct_answer: これが正解です。
   correct_answer_5a6a57d1: 正解
@@ -8887,6 +8892,7 @@ ja:
   course_sis_7ae8f649: "コース sis"
   course_sis_df8b379: "コース Sis"
   course_sis_id_bbed1a60: "コース SIS ID"
+  course_sis_id_cd834b3c: "コース SIS ID:"
   course_sis_id_sis_id_or_canvas_id_4d323f5c: "コース SIS ID (SIS_ID:####)または Canvas ID(###)"
   course_start_date_daae16ae: コース開始日
   course_start_date_on_before_a3a32883: "コース開始日 当日/前"
@@ -9610,6 +9616,7 @@ ja:
   create_new_group_bf9561d4: 新しいグループを作成
   create_new_group_fca5cc73: 新しいグループを作成
   create_new_group_set_13b1f62a: 新しいグループセットを作成
+  create_new_question_bank_86f2afc6: 新しい問題バンクを作成...
   create_number_of_groups_groups_now_f89f220e: "%{number_of_groups}グループを今すぐ作成"
   create_outcome_4dac05a0: アウトカムを作成する
   create_pace_4ff3e9c: ペースを作成
@@ -9696,6 +9703,7 @@ ja:
     registered_services: 登録済みサービス
     revisions: リビジョン
     rubrics: ルーブリック
+    search: 検索
     settings: ~
     site_admin: サイト管理者
     stats: 統計
@@ -10090,6 +10098,7 @@ ja:
   default_grading_scheme_894a0eb: デフォルトの採点スキーム
   default_grading_scheme_for_accounts_6c9df019: アカウントのデフォルト評定スキーム
   default_order_8c409051: デフォルトオーダー
+  default_question_bank_c7bcc5e7: デフォルトの問題バンク
   default_question_name: 問題
   default_question_text: 問題文
   default_sis_sync_for_assignments_quizzes_grade_dis_3b2b4878: 課題、小テスト、学年のディスカッション用のデフォルトのSIS同期化
@@ -11031,6 +11040,7 @@ ja:
   download_epub_757cf0af: ePubをダウンロード
   download_errors_attchment_82ffea3f: ダウンロードerrors_attchment
   download_filename_781704f5: "%{filename}をダウンロードする"
+  download_filename_b9d62bf1: "%{fileName}をダウンロードする"
   download_item_analysis_report_statuslabel_8c9387ec: "アイテム分析レポートのダウンロード%{statusLabel}"
   download_page_views_csv_974f36e1: ページビューCSVをダウンロード
   download_report_77164f62: レポートをダウンロードする
@@ -12078,6 +12088,8 @@ ja:
   error_updating_cluster_error_674e5f2e: "%{cluster}更新時のエラー：%{error}"
   error_updating_comment_4b80c76d: コメントの更新中にエラーが発生しました
   error_updating_discussion_topic_64522a23: ディスカッショントピックの更新中にエラー
+  error_updating_discussion_topic_d47c64ff: ディスカッショントピックの更新中にエラー
+  error_updating_file_usage_rights_f9216019: ファイル使用権の更新エラー
   error_updating_module_access_f0970f4c: モジュール・アクセスの更新エラー。
   error_updating_modulename_settings_da982acf: "%{moduleName}設定更新中にエラー。"
   error_updating_notes_31b24785: ノートの更新エラー
@@ -12090,6 +12102,7 @@ ja:
   error_uploading_files_f709361f: ファイル読み込み中にエラー
   error_uploading_video_audio_recording_16d9730a: 映像/オーディオ録音のアップロード中にエラーが発生しました
   error_while_importing_csv_please_contact_support_e_57e6b3b: "CSV のインポート中にエラーが発生しました。サポートに連絡してください。(エラー レポート %{number})"
+  error_with_discussion_topic_37c699d1: ディスカッショントピックのエラー
   errormessage_efa8ae9: "%{errorMessage}"
   errors: 
     bad_navigation_config: "無効なコース タブ構成です"
@@ -12921,6 +12934,7 @@ ja:
     titles: 
       bookmark_search: "ブックマーク検索: %{service_name}"
   find_8d605019: 検索
+  find_a_recipient_of_temporary_enrollments_fcc649c9: 一時的な登録の受取人を検索する
   find_a_recipient_of_temporary_enrollments_from_nam_3451f654: "臨時登録の受信者を%{name}から検索します。"
   find_an_assignee_of_temporary_enrollments_from_nam_ba08bb2b: "%{name}からの一時的な登録の割当先を探す "
   find_an_existing_grading_scheme_d836ea: 既存の採点スキームの検索
@@ -15446,10 +15460,13 @@ ja:
   import_1b31507: インポート
   import_a_set_of_outcomes_6b782192: アウトカムのセットをインポートする
   import_anyway_8c996ef6: それでもインポートする
+  import_assessment_as_new_quizzes_help_icon_3e49480f: "評価をNew Quizzesヘルプアイコンとしてインポートする"
+  import_assessment_as_new_quizzes_help_modal_918a543d: "New Quizzesとしてアセスメントをインポートする"
   import_commons_favorites_e68fce81: Commonsお気に入りをインポートする
   import_content_b2fd6620: コンテンツのインポート
   import_course_student_groups_by_csv_d2cde97d: コースの受講生グループをcsvでインポートする
   import_e929507b: インポート...
+  import_existing_quizzes_as_c2694727: "既存の小テストを.としてインポートする "
   import_existing_quizzes_as_new_quizzes_15ea1d: 既存の小テストを新規小テストとしてインポートする
   import_groups_3a2ae14b: グループをインポートする
   import_learning_outcomes_36d28a2b: 学習アウトカムをインポートする
@@ -16104,7 +16121,7 @@ ja:
   jwts_4f397c85: JWT
   k12_description: "K-12 環境では特に有意となるグローバルナビゲーションメニューのアイコンを更新します。"
   k20_beta_538e64fb: "K20 - ベータ"
-  k20_beta_description: "Admin Analytics APPのK20ベータ機能を有効にします。"
+  k20_beta_description: クローズドベータ版の顧客向けに、コース準備状況および注意が必要な受講者ダッシュボードを有効にしました。
   k20_course_readiness_alpha_testing_description: "このフラグは、Advanced Analytics Alphaテストに参加している教育機関を対象としています。このフラグは、これらの教育機関のコース準備状況ダッシュボードを有効にします。"
   k20_course_readiness_alpha_testing_f45597b6: "K20 - コース準備状況アルファテスト"
   k20_course_readiness_description: "アルファ版テスターのAdvanced Analyticsコース準備ダッシュボードを有効にします。"
@@ -16238,9 +16255,11 @@ ja:
   latex_equations_are_currently_migrated_as_images_a_1206c659: "LaTex 方程式は現在、画像として移行されていますので、質問を編集しないでください。"
   latvian_2bbb6aab: ラトビア語
   launch_external_tool_672c0409: 外部ツールを起動する
+  launch_height_2915768c: 起動の高さ
   launch_registration_tool_38d4781: 登録ツールを起動
   launch_speedgrader_filtered_by_student_group_8bd9b5c7: "学生グループがフィルタリングした SpeedGrader を開始"
   launch_url_e150bd41: "URL を起動"
+  launch_width_9f8be877: 起動幅
   lavender_ce4d0ada: ラベンダー
   layouts: 
     application: 
@@ -16286,6 +16305,7 @@ ja:
   learn_more_about_using_commons_and_blueprints_3df953f6: "Commons と青写真の使用に関する詳細について学びます。"
   learn_more_about_video_conferencing_5f0e76e4: ビデオ会議の詳細について学ぶ
   learn_more_in_the_canvas_community_3bba7b11: "Canvas Community で詳細を見る"
+  learner_passport_prototype_1c3446b3: 学習者パスポートプロトタイプ
   learning_analytics_beta_view_46deb4c8: 学習分析（ベータ）-表示
   learning_mastery_5fc34276: 学習の達成度
   learning_mastery_6ed4fd63: 学習達成度表...
@@ -16299,6 +16319,7 @@ ja:
       達成/修復可能の両方で表示されます。
   learning_mastery_gradebook_redesign_9ca88020: 達成度評定表の再設計
   learning_object_1f9e5dd8: 学習オブジェクト
+  learning_object_dates_36b05acb: 学習オブジェクトの日付
   learning_outcome: 
     no_comment: コメントなし
     no_description: 説明なし
@@ -16587,6 +16608,7 @@ ja:
   loading_courses_started_6e6d742c: コース読み込み開始
   loading_data_ecd89ba: データをロード中...
   loading_discussions_8ed5fcd7: ディスカッションを読み込み中
+  loading_enrollments_4fe0d951: 登録を読み込み中
   loading_external_tool_d839042c: 外部ツールを読み込み中
   loading_f99d93d4: "...読込み中"
   loading_feature_options_82e07ee4: 機能オプションの読み込み
@@ -19851,6 +19873,7 @@ ja:
   new_outcome_group_af59f145: 新しいアウトカムグループ
   new_post_policy_icons_da13a62c: 新しい投稿ポリシーアイコン
   new_question_9107c469: 新しい問題
+  new_question_bank_732bbf83: 新しい問題バンク
   new_question_group_d9306280: 新しい問題グループ
   new_quiz_34aacba6: 新しい小テスト
   new_quiz_deleted_user_restore_pending_review_state_a117d744: 新規クイズを削除されたユーザーは登録時のレビュー保留状態を復元する
@@ -19867,6 +19890,7 @@ ja:
   new_quizzes_export_support_b0a6a625: 新しい小テストエクスポート対応
   new_quizzes_importing_c167dce0: 新クイズのインポート
   new_quizzes_included_on_outcome_alignment_summary__4547b0ad: アウトカムアライメントサマリータブに新しい小テストが追加されました。
+  new_quizzes_is_the_new_assessment_engine_for_canva_4125a679: "New Quizzes（新小テスト）はCanvasの新しい評価エンジンです。"
   new_quizzes_migrate_without_content_rewrite_1aec2ce8: 新しい小テストは、コンテンツを書き換えることなく移行されます。
   new_quizzes_migration_during_course_import_copy_e9dd124e: コースのインポート/コピー中の、新しい小テストの移行
   new_quizzes_migration_enabled_by_default_5f9bcc81: デフォルトで有効になっている新しい小テストの移行
@@ -20771,6 +20795,7 @@ ja:
   open_name_color_picker_a2646a33: "%{name} カラーピッカーを開く"
   open_new_course_modal_a8f8ad52: 新しいコースモーダルを開く
   open_new_subject_modal_c9049e1d: 新しいコースモーダルを開く
+  open_search_menu_1c4d4685: 検索メニューを開く
   open_sidebar_2852e8c8: サイドバーを開く
   open_speedgrader_11604608: 開くSpeedGrader
   open_student_context_tray_24c1b1d6: 受講者コンテクストトレイを開く
@@ -21093,8 +21118,12 @@ ja:
   overrides_e8659a73: 上書き
   overview_58268c72: 概要
   overview_of_student_status_a004bcf3: 受講者テータスの概要
+  overwrite_848c08f: 上書き
   overwrite_all_users_existing_default_dashboard_pre_9b2ad7d1: すべてのユーザーの既存のデフォルトダッシュボード設定を上書きする
   overwrite_already_entered_grades_64a98037: 既に入力されている評定を上書き
+  overwrite_assessment_content_with_matching_ids_b388f114: "アセスメント コンテンツを、一致する ID で上書きします"
+  overwrite_assessment_help_icon_875d00a5: "アセスメント ヘルプ アイコンの上書き"
+  overwrite_assessment_help_modal_3254b23c: "アセスメント ヘルプ モダルの上書き"
   overwrite_user_lti_url_input_on_select_content_dia_6d9c76f: "コンテンツ選択ダイアログのユーザーLTI URL入力を上書きする"
   own_copyright_cc59db55: 著作権保有
   owner_email_236d1b2: 所有者の電子メール
@@ -21241,6 +21270,7 @@ ja:
   pass_2a8c4f07: 合格
   pass_fail_3d9461b0: 合格/不合格
   pass_fail_grade_options_f9b06a58: 合否評定オプション
+  passport_a4733c1: パスポート
   password_8a271b1c: パスワード
   past_14da759a: 過去
   past_collaborations_1241938f: 過去のコラボレーション
@@ -21447,6 +21477,7 @@ ja:
   please_select_an_item_30c287ef: 項目を選択してください。
   please_select_at_least_one_enrollment_before_submi_56b92b37: 少なくとも1つの登録を選択してから送信してください。
   please_select_at_least_one_filter_aafaa1a7: 最低ひとつのフィルタを選択してください。
+  please_select_at_least_one_option_2b83cad: 少なくとも1つのオプションを選択してください。
   please_select_one_f931e883: "1 つ選択してください"
   please_select_the_level_of_privacy_desired_for_sup_7744af5: サポートアクセスに必要なプライバシーレベルを選択してください。
   please_specify_whether_to_enable_or_disable_micros_10f43ce5: "Microsoft Teamsの同期を有​​効にするか無効にするかを指定してください。"
@@ -22503,6 +22534,7 @@ ja:
       ディスカバリサービスからの応答に従うように設定する必要があります。
   provide_tutorial_information_for_instructors_new_t_163c8ed4: Canvasを初めて使う講師のためのチュートリアル情報の提供
   provide_tutorial_information_for_new_users_in_a_fl_c23462ac: 新規ユーザーのチュートリアル情報をフライアウトトレイに提供します。
+  provider_2d212e55: プロバイダ
   provider_35796463: "| %{provider}"
   provider_attribute_b1cad655: プロバイダ属性
   provider_enforces_mfa_when_logging_in_through_this_54adcd1d: "Provider enforces MFA *このプロバイダ経由でログインする場合、Canvas は MFA の実施を明示的にスキップします。これは、プロバイダが Canvas に SSO する前に、すでに MFA を保証している場合にのみ使用してください。*"
@@ -24332,6 +24364,8 @@ ja:
   recentint_remainderint_weighted_average_f73369bc: "%{recentInt}/%{remainderInt}比重平均"
   recently_deleted_courses_title: 最近削除したコース
   recipient_4b8dbbc0: 受信者
+  recipient_enrollment_period_55183973: 受取人登録期間
+  recipient_enrollment_type_b1690078: 受取人登録タイプ
   recipient_input: 
     context_search_placeholder: 名前、コース、またはグループを入力してください
     context_search_title: 名前、コース、またはグループ
@@ -24786,6 +24820,8 @@ ja:
   retrieve_timeout: 設定を取得できませんでした。サーバの応答がタイムアウトしました
   retrieving_content_ed0b9b33: コンテンツを取得
   retrieving_tool_51709735: ツールを取得する
+  retrieving_user_enrollments_8dc523c1: ユーザー登録情報検索中
+  retrieving_user_information_6864fa70: ユーザー情報検索中
   retry_duplicating_original_assignment_name_90b83bb8: "\"%{original_assignment_name}\"の重複を再試行"
   retry_duplicating_originalassignmentname_884aee1: "\"%{originalAssignmentName}\"の重複を再試行"
   retry_ebd5f8ba: 再試行
@@ -25011,6 +25047,7 @@ ja:
   rubric_created_64980593: ルーブリックが作成しました
   rubric_criterion_range_12499bf1: 試験指示基準範囲
   rubric_deleted_3d9efc18: ルーブリックが削除されました
+  rubric_enhancements_73bf351c: ルーブリックの強化
   rubric_fc39da76: ルービック
   rubric_updated_103e24dc: ルーブリックが更新されました
   rubric_was_successfully_submitted_b0766474: ルーブリックが正常に送信されました
@@ -25084,6 +25121,7 @@ ja:
   salesforce_account_id_d0325865: "Salesforce アカウント ID"
   salesforce_account_id_eb5c78ad: "Salesforce アカウント ID"
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: セールスフォースには、制作アカウントより、サンドボックスアカウント用の異なるログインホストがあるので、セールスフォースアカウントを使用していて、このボックスをチェックしない場合は、認証されません。(そして、これは逆の場合でも起こります。制作アカウントを所持していて、このボックスをチェックする場合は、認証されません。)
+  salesforce_project_id_5d341843: "Salesforce プロジェクト ID"
   salesforce_ticketing_webtocase_connector_80f75716: "セールスフォース・チケット WebToCase コネクタ"
   salmon_7d4b70d4: サーモン
   same_value_as_canvas_url__c_will_probably_be_going_37027686: "'Canvas_URL__c'と同じ値は、おそらくすぐに消失するでしょう。"
@@ -25366,7 +25404,10 @@ ja:
   search_for_your_school_or_institution_1eb2eeaf: あなたの学校や教育機関を検索する
   search_form_fcaa38f7: 検索フォーム
   search_grading_periods_e947a3e9: 採点期間を検索...
+  search_groups_9ff9344c: 検索グループ
   search_groups_or_people_6c15d6ad: グループまたはメンバーを検索
+  search_input_615d0e77: 検索入力
+  search_menu_d327ff2b: 検索メニュー
   search_people_402e622c: メンバーの検索
   search_people_44f36cd2: 人を検索...
   search_people_4782671a: メンバーの検索
@@ -25428,6 +25469,7 @@ ja:
   section_level_calendar_permissions_6aff8cdb: セクションレベルのカレンダー権限
   section_name_b6d82574: セクション名
   section_name_edb51b2: セクション名
+  section_name_fa2b80d7: 検索名
   section_pace_989d2856: セクションのペース
   section_removed_2ac72a79: "%{section}削除済み"
   section_section_names_98f172e6: "セクション：%{section_names}"
@@ -25529,6 +25571,7 @@ ja:
   select_a_module_optional_7edb5cb0: モジュールを選択（オプション）
   select_a_predefined_color_c77ab2f5: 所定の色を選択。
   select_a_provisional_grade_7106e3d5: 暫定的な評定を選択する
+  select_a_question_bank_f346e5a0: 問題バンクを選択
   select_a_role_287e53e8: 役割を選択してください。
   select_a_section_37ac1694: セクションの選択
   select_a_student_adfcc348: 受講者の選択
@@ -25620,6 +25663,7 @@ ja:
   select_prerequisite_3b049b02: 前提条件を選択
   select_prerequisite_module_57894963: 前提条件モジュールの選択
   select_prerequite_module_e9042bb0: 前提条件モジュールの選択
+  select_question_bank_508e5c08: 問題バンクを選択
   select_requirement_count_e0948936: 要件数を選択
   select_requirement_type_bf9a39d9: 要件タイプを選択
   select_role_aa5cfd69: 役割を選択
@@ -26955,6 +26999,7 @@ ja:
   some_settings_have_been_administratively_locked_9e3ee880: 一部の設定は管理上の理由でロックされています。
   some_settings_have_been_disabled_because_the_assig_6b6cc3b4: 一部の設定は、課題が閉じられた採点期間にあるため、無効となっています。
   some_submissions_are_not_gradeable_grade_changes_f_f8bf44e2: 採点できない提出があります。これら提出の採点変更は無視されました。
+  some_systems_recycle_their_ids_for_each_new_export_884b8e46: システムによっては、新しいエクスポートごとにIDを再利用するものもあります。その結果、2つの別々の問題バンクをエクスポートした場合、それらは同じIDを持つことになります。評価データの紛失を防ぐため、これらのオブジェクトはIDは同じですが、異なるものとして扱われます。このオプションを選択すると、この安全機能が無効になり、評価データが同じIDを持つ既存のデータを上書きすることができます。
   someone: 名前未登録ユーザ
   someone_bbbc538b: 名前未登録ユーザ
   someone_just_made_a_new_annotation_on_the_anonymou_cbbe68ca: "受講者 (%{user_id}) の%{assignment_title}への提出物に新しい注釈が付きました。"
@@ -27938,6 +27983,7 @@ ja:
     quizzes: 小テスト
     rubrics: ルーブリック
     schedule: スケジュール
+    search: 検索
     settings: 設定
     syllabus: シラバス
     tab_location_error: そのタブ位置は無効です
@@ -28002,6 +28048,7 @@ ja:
   temporarily_enroll_name_8acb66ce: "一時登録%{name}"
   temporary_9c54e959: 一時的：
   temporary_enrollment_option_links_eb9b8b2e: 仮登録オプションリンク
+  temporary_enrollment_pairings_56f35f5c: 一時的な登録ペアリング
   temporary_enrollment_was_successfully_created_78b48a7a: 一時登録が正常に作成されました。
   temporary_enrollments_add_373181b7: "一時登録 - 追加する"
   temporary_enrollments_delete_52ffaae4: "一時登録 - 削除する"
@@ -28841,6 +28888,7 @@ ja:
                                   エンドユーザーには、サイト管理者ユーザーによって有効にされるまで表示されません。
                                   教育機関で有効にする前に、
                                   機能とユーザーへの影響の可能性を十分に理解してください。
+  this_feature_provides_visual_and_functional_enhanc_e5e57a21: この機能により、Canvas全体のルーブリックが視覚的および機能的に強化されます。
   this_feature_will_hide_all_quantitative_values_fro_6f006665: これは、ユーザーからすべての定量的な値を隠す機能です
   this_field_is_required_fa58c4a: このフィールドは必須項目です
   this_field_name_is_required_988caebc: "このフィールド \"%{name}\" は必須です。"
@@ -29679,6 +29727,7 @@ ja:
   to_join_the_canvas_community_you_must_first_have_a_6fe1b7d8: "Canvas Community に参加するには、まず Canvas アカウントが必要です。"
   to_learn_more_about_canvas_for_elementary_please_r_7fd3af37: "Canvas for Elementaryの詳細については、*ドキュメント*を参照してください。"
   to_learn_more_becd2ce2: もっと詳しく。
+  to_learn_more_please_contact_your_system_administr_57af0d0a: "詳細については、システム管理者に連絡するか、以下をご覧ください。 "
   to_link_an_observer_to_a_student_conversations_sen_37aad7b5: "オブザーバーを受講者にリンクするには、[会話 - 個々のコースメンバーに送信する]も有効にされていなければなりません。"
   to_link_an_observer_to_a_student_users_manage_logi_b77cb019: |-
       オブザーバーを受講生にリンクするには、ユーザー - ログインの詳細と会話を管理する - を個々のコースメンバーに送信するも有効になっていなければなりません。
@@ -30576,6 +30625,7 @@ ja:
   use_a_new_endpoint_for_fetching_course_creation_ac_712382c2: コース作成アカウントの取得に新しいエンドポイントを使用する
   use_a_or_new_line_between_for_adding_multiple_user_e7c43ba9: "複数のユーザーを追加するには、\",\" か改行を使用します。"
   use_a_resource_link_s_resource_link_uuid_in_the_re_3bb2f166: $ResourceLink.id置換パラメータ内のリソースリンクのresource_link_uuidを使用します
+  use_a_unique_html_id_for_each_tool_launch_form_7bf0e5ea: "各ツール起動フォームに一意のHTML IDを使用する"
   use_alternate_settings_for_lti_context_id_history__946a9dcc: LTIContext.id.historyクエリの代替設定を使用する
   use_arrow_keys_to_navigate_options_2021cc50: 矢印キーを使用してオプションを移動します。
   use_arrow_keys_to_navigate_options_d45347e8: 矢印キーを使用してオプションをナビゲートします
@@ -30864,6 +30914,7 @@ ja:
       yo: "Yo は、タップするだけの文字入力が不要なコミュニケーション ツールです。"
   user_settings_785eed40: ユーザ設定
   user_sis_id_c017cb14: "ユーザ SIS ID"
+  user_sis_id_ce5d7a46: "ユーザー SIS ID:"
   user_split_complete_links_to_split_user_accounts_f_dab79796: ユーザー分割が完了しました。分割ユーザーアカウントへのリンクはこちら：
   user_succesfully_logged_into_canvas_6cfbe279: "ユーザーが Canvas に正常にログインしました"
   user_successfully_deactivated_9d92d80d: ユーザーは、非アクティブ化されました
@@ -31443,8 +31494,9 @@ ja:
   welcome_name_a16afa7f: "ようこそ、%{name}さん！"
   welcome_to_the_canvas_theme_editor_73091d1: "Canvasテーマ エディター へようこそ"
   welcome_to_the_cold_dark_void_of_name_65fc9839: "%{name} の冷たく暗い空間へようこそ。"
-  welcome_to_your_courses_to_customize_the_list_of_c_22de652e: コースへようこそ！コースのリストをカスタマイズするには、「すべてのコース」リンクをクリックし、コースの表示を開始してください。
+  welcome_to_your_courses_to_customize_the_list_of_c_22de652e: "あなたのコースへようこそ！コースの一覧をカスタマイズするには、[すべてのコース]のリンクをクリックして、表示するコースにスターを付けます。"
   welcome_to_your_courses_to_customize_the_list_of_c_f95e4b2: "あなたのコースへようこそ！コースの一覧をカスタマイズするには、[すべてのコース]のリンクをクリックして、表示するコースにスターを付けます。"
+  welcome_to_your_subjects_to_customize_the_list_of__a735c17f: "あなたの科目へようこそ！科目の一覧をカスタマイズするには、[すべての科目]のリンクをクリックして、表示する科目にスターを付けます。"
   welcome_to_your_subjects_to_customize_the_list_of__f6574116: "あなたの科目へようこそ！科目の一覧をカスタマイズするには、[すべての科目]のリンクをクリックして、表示する科目にスターを付けます。"
   welcome_your_students_e1d96088: 受講者を歓迎する
   well_below_mastery_37664bdc: 熟達を大きく下回る
@@ -31507,6 +31559,10 @@ ja:
       プロビジョニングされていない`:ready_for_new_quizzes_provision`キーを設定に持つRootアカウントがプロビジョニングされます。この
       チェックとプロビジョニングは、そのシャードリージョンの真夜中前後にすべてのシャードで行われます。
   when_enabled_site_admin_account_ui_will_allow_asso_9d04a1d8: 有効にすると、サイト管理者アカウントUIが、DeveloperKeyを持つサービスユーザをキーに関連付け、そのキー/ユーザをclient_credentialsグラントタイプに使用できるようになります。
+  when_enabled_the_hidden_html_forms_that_are_used_t_c5edd929: |-
+      有効にすると、LTIの起動をトリガするために使用される非表示のHTMLフォームの
+       ID に乱数が追加されます。無効にすると、全
+      が同じ ID を持つようになりますtool_form。
   when_enabled_the_internal_access_manager_will_be_u_bc470109: 有効にすると、内部アクセスマネージャが、特定のリクエストへのアクセスをゲートするために使用されます。
   when_enabled_this_flag_displays_a_word_count_in_th_a75163d6: |-
       有効にすると、このフラグはテキスト
