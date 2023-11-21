@@ -97,7 +97,7 @@ GEM
       concurrent-ruby (~> 1.0)
     unf (0.1.4)
       unf_ext
-    unf_ext (0.0.9)
+    unf_ext (0.0.9.1)
     version_gem (1.1.3)
 
 PLATFORMS
