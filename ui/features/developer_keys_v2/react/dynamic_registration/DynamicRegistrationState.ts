@@ -16,7 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import create from 'zustand'
+import create, {StoreApi} from 'zustand'
+import {
+  RegistrationToken,
+  getRegistrationByUUID,
+  updateRegistrationOverlay,
+} from './registrationApi'
+import {LtiRegistration} from '../../model/LtiRegistration'
+import {
+  RegistrationOverlay,
+  RegistrationOverlayStore,
+  createRegistrationOverlayStore,
+} from '../RegistrationSettings/RegistrationOverlayState'
+import {deleteDeveloperKey, updateDeveloperKeyWorkflowState} from './developerKeyApi'
 
 /**
  * Steps are:
@@ -48,11 +60,27 @@ interface DynamicRegistrationActions {
   setUrl: (url: string) => void
   /**
    * Embeds an iframe to the tool's dynamic registration UI at the given url.
-   * @param url The dynamic registration url
-   * @param onFinish A callback to run when the app responds with a postMessage done
+   * @param registrationToken The registration token from canvas
    * @returns
    */
-  register: (url: string, onFinish: () => void) => void
+  register: (registrationToken: RegistrationToken) => void
+  loadingRegistrationToken: () => void
+  loadingRegistration: (
+    registrationToken: RegistrationToken,
+    dynamicRegistrationUrl: string
+  ) => void
+  confirm: (registration: LtiRegistration, overlayStore: StoreApi<RegistrationOverlayStore>) => void
+  enableAndClose: (
+    contextId: string,
+    registration: LtiRegistration,
+    overlay: RegistrationOverlay
+  ) => Promise<unknown>
+  closeAndSaveOverlay: (
+    registration: LtiRegistration,
+    overlay: RegistrationOverlay
+  ) => Promise<unknown>
+  deleteKey: (registration: LtiRegistration) => Promise<unknown>
+  error: (error?: Error) => void
 }
 
 /**
@@ -72,9 +100,37 @@ export type DynamicRegistrationState =
       dynamicRegistrationUrl: string
     }
   | {
-      tag: 'registering'
+      tag: 'loading_registration_token'
       dynamicRegistrationUrl: string
     }
+  | {
+      tag: 'registering'
+      dynamicRegistrationUrl: string
+      registrationToken: RegistrationToken
+    }
+  | {
+      tag: 'loading_registration'
+      dynamicRegistrationUrl: string
+      registrationToken: RegistrationToken
+    }
+  | {
+      tag: 'error'
+      error?: Error
+    }
+  | ConfirmationState<'confirming'>
+  | ConfirmationState<'enabling_and_closing'>
+  | ConfirmationState<'closing_and_saving'>
+  | ConfirmationState<'deleting'>
+
+type ConfirmationTag = 'confirming' | 'enabling_and_closing' | 'closing_and_saving' | 'deleting'
+/**
+ * Helper for constructing a 'confirmation' state (a substate of the confirmation screen)
+ */
+type ConfirmationState<Tag extends ConfirmationTag> = {
+  tag: Tag
+  registration: LtiRegistration
+  overlayStore: StoreApi<RegistrationOverlayStore>
+}
 
 /**
  * Helper for constructing an 'opened' state
@@ -86,22 +142,17 @@ const opened = (dynamicRegistrationUrl: string): DynamicRegistrationState => ({
   dynamicRegistrationUrl,
 })
 
+const errorState = (error?: Error): DynamicRegistrationState => ({
+  tag: 'error',
+  error,
+})
+
 /**
  * Helper for constructing a 'closed' state
  */
 const notOpened: DynamicRegistrationState = {
   tag: 'closed',
 }
-
-/**
- * Helper for constructing a 'registering' state
- * @param dynamicRegistrationUrl
- * @returns
- */
-const registering = (dynamicRegistrationUrl: string): DynamicRegistrationState => ({
-  tag: 'registering',
-  dynamicRegistrationUrl,
-})
 
 /**
  * Wraps a value into an object with a state key, for use with Zustand
@@ -122,6 +173,60 @@ const stateFor =
  *   return
  * })
  *
+ * @param tag
+ * @returns
+ */
+const loadingRegistrationToken = (dynamicRegistrationUrl: string): DynamicRegistrationState => ({
+  tag: 'loading_registration_token',
+  dynamicRegistrationUrl,
+})
+
+/**
+ * Helper for constructing a 'registering' state
+ * @param dynamicRegistrationUrl
+ * @returns
+ */
+const registering = (
+  dynamicRegistrationUrl: string,
+  registrationToken: RegistrationToken
+): DynamicRegistrationState => ({
+  tag: 'registering',
+  dynamicRegistrationUrl,
+  registrationToken,
+})
+
+const loadingRegistration = (
+  registrationToken: RegistrationToken,
+  dynamicRegistrationUrl: string
+): DynamicRegistrationState => ({
+  tag: 'loading_registration',
+  dynamicRegistrationUrl,
+  registrationToken,
+})
+
+/**
+ * Helper for constructing a 'confirming' state
+ * @param tag
+ * @returns
+ */
+const confirmationState =
+  <Tag extends ConfirmationTag>(tag: Tag) =>
+  (registration: LtiRegistration, overlayStore: StoreApi<RegistrationOverlayStore>) =>
+    ({
+      tag,
+      registration,
+      overlayStore,
+    } as const)
+
+const confirming = confirmationState('confirming')
+const enablingAndClosing = confirmationState('enabling_and_closing')
+const closingAndSaving = confirmationState('closing_and_saving')
+const deleting = confirmationState('deleting')
+
+/**
+ * Helper for constructing a state from another state.
+ * If the previous state is not current, the new state will not be applied
+ * A "lens" into a zustand state.
  * @param tag
  * @returns
  */
@@ -150,26 +255,65 @@ export const useDynamicRegistrationState = create<
   {state: DynamicRegistrationState} & DynamicRegistrationActions
 >(set => ({
   state: {tag: 'closed'},
-  open: (url?: string) => set(stateFor(opened(url || ''))),
+  open: url => set(stateFor(opened(url || ''))),
   close: () => set(stateFor(notOpened)),
+  loadingRegistrationToken: () =>
+    set(stateFrom('opened')(state => loadingRegistrationToken(state.dynamicRegistrationUrl))),
   setUrl: url => set(stateFor(opened(url))),
-  register: (url: string, onClose: () => void) =>
+  register: (registrationToken: RegistrationToken) =>
     set(
-      stateFrom('opened')((state, {close}) => {
+      stateFrom('loading_registration_token')((state, {loadingRegistration, confirm, error}) => {
         const onMessage = (message: MessageEvent) => {
           if (
             message.data.subject === 'org.imsglobal.lti.close' &&
-            message.origin === originOfUrl(url)
+            message.origin === originOfUrl(state.dynamicRegistrationUrl)
           ) {
             window.removeEventListener('message', onMessage)
-            onClose()
-            close()
+            loadingRegistration(registrationToken, state.dynamicRegistrationUrl)
+            getRegistrationByUUID(registrationToken.uuid)
+              .then(reg => {
+                const store = createRegistrationOverlayStore(reg.client_name, reg)
+                confirm(reg, store)
+              })
+              .catch(err => {
+                error(err instanceof Error ? err : undefined)
+              })
           }
         }
         window.addEventListener('message', onMessage)
-        return registering(url)
+        return registering(state.dynamicRegistrationUrl, registrationToken)
       })
     ),
+  loadingRegistration: (registrationToken: RegistrationToken, dynamicRegistrationUrl: string) =>
+    set(stateFor(loadingRegistration(registrationToken, dynamicRegistrationUrl))),
+  confirm: (registration: LtiRegistration, overlayStore: StoreApi<RegistrationOverlayStore>) =>
+    set(stateFor(confirming(registration, overlayStore))),
+  enableAndClose: (
+    contextId: string,
+    registration: LtiRegistration,
+    overlay: RegistrationOverlay
+  ) => {
+    set(
+      stateFrom('confirming')(state => enablingAndClosing(state.registration, state.overlayStore))
+    )
+    return Promise.all([
+      updateRegistrationOverlay(registration.id, overlay),
+      updateDeveloperKeyWorkflowState(contextId, registration.developer_key_id, 'on'),
+    ]).catch(err => set(stateFor(errorState(err))))
+  },
+  closeAndSaveOverlay: (registration: LtiRegistration, overlay: RegistrationOverlay) => {
+    set(stateFrom('confirming')(state => closingAndSaving(state.registration, state.overlayStore)))
+    return updateRegistrationOverlay(registration.id, overlay).catch(err =>
+      set(stateFor(errorState(err)))
+    )
+  },
+  deleteKey: (registration: LtiRegistration) => {
+    set(stateFrom('confirming')(state => deleting(state.registration, state.overlayStore)))
+    return deleteDeveloperKey(registration.developer_key_id).catch(err =>
+      set(stateFor(errorState(err)))
+    )
+  },
+  error: (error?: Error) => set(stateFor(errorState(error))),
 }))
 
 const originOfUrl = (urlStr: string) => {

@@ -20,6 +20,67 @@ paths:
             Location:
               schema:
                 type: string
+  /api/lti/registration_token:
+    get:
+      summary: TBD
+      responses:
+        200:
+          description: TBD
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  uuid:
+                    type: string
+                  oidc_configuration_url:
+                    type: string
+                  token:
+                    type: string
+        401:
+          description: TBD
+  /api/lti/registrations/uuid/:registration_uuid:
+    get:
+      summary: TBD
+      parameters:
+        - in: path
+          name: registration_uuid
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: TBD
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/registration"
+        401:
+          description: TBD
+  /api/lti/registrations/:registration_id/overlay:
+    put:
+      summary: TBD
+      parameters:
+        - in: path
+          name: registration_id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: TBD
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/overlay"
+        401:
+          description: TBD
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/registration"
   /api/lti/registrations:
     post:
       summary: TBD
@@ -68,3 +129,127 @@ paths:
                       type: array
                     target_link_uri:
                       type: string
+components:
+  schemas:
+    placement:
+      enum: [course_navigation, account_navigation, user_navigation, assignment_selection, link_selection, editor_button, resource_selection, global_navigation]
+    registration:
+      type: object
+      properties:
+        id:
+          type: string
+        developer_key_id:
+          type: string
+        overlay:
+          type: TODO
+        lti_tool_configuration:
+          claims:
+            type: array
+            items:
+              type: string
+          domain:
+            type: string
+          messages:
+            type: array
+            items:
+              type: object
+              properties:
+                path:
+                  type:
+                    enum: [LtiResourceLinkRequest, LtiDeepLinkingRequest]
+                label:
+                  type: string
+                roles:
+                  type: array
+                  items:
+                    type: string
+                icon_uri:
+                  type: string
+                placements:
+                  type: array
+                  items:
+                    schema:
+                      $ref: "#/components/schemas/placement"
+                target_link_uri:
+                  type: string
+                custom_parameters:
+                  type: object
+                  additionalProperties:
+                    type: string
+          target_link_uri:
+            type: string
+        application_type:
+          enum: [web]
+        grant_types:
+          type: array
+          items:
+            type: string
+        response_types:
+          type: array
+          items:
+            type: string
+        redirect_uris:
+          type: array
+          items:
+            type: string
+        initiate_login_uri:
+          type: string
+        client_name:
+          type: string
+        jwks_uri:
+          type: string
+        logo_uri:
+          type: string
+        token_endpoint_auth_method:
+          type: string
+        contacts:
+          type: array
+          items:
+            type: string
+        client_uri:
+          type: string
+        policy_uri:
+          type: string
+        tos_uri:
+          type: string
+        scopes:
+          type: array
+          items:
+            type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        guid:
+          type: string
+    overlay:
+      type: object
+      properties:
+        disabeldPlacements:
+          type: array
+          items:
+            schema:
+              $ref: "#/components/schemas/placement"
+        disabledScopes:
+          type: array
+          items:
+            type: string
+          placements:
+            type: array
+            items:
+              schema:
+                type: object
+                properties:
+                  type:
+                    $ref: "#/components/schemas/placement"
+                  enabled:
+                    type: boolean
+                  icon_url:
+                    type: string
+                  label:
+                    type: string
+                  
+
+        

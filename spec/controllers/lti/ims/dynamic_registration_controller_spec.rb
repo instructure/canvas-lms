@@ -47,6 +47,9 @@ describe Lti::IMS::DynamicRegistrationController do
   it "has openapi documentation for each of our controller routes" do
     controller_routes.each do |route|
       route_path = route.path.spec.to_s.gsub("(.:format)", "")
+      if openapi_spec.dig("paths", route_path, route.verb.downcase).nil?
+        throw "No openapi documentation for #{route_path} #{route.verb.downcase}"
+      end
       expect(openapi_spec["paths"][route_path][route.verb.downcase]).not_to be_nil
     end
   end
@@ -151,6 +154,7 @@ describe Lti::IMS::DynamicRegistrationController do
           user_id: User.create!.id,
           initiated_at: 1.minute.ago,
           root_account_global_id: Account.first.root_account_id,
+          uuid: SecureRandom.uuid,
         }
       end
       let(:valid_token) do
@@ -220,6 +224,23 @@ describe Lti::IMS::DynamicRegistrationController do
     context "with an invalid token" do
       subject { post :create, params: { registration_token: invalid_token, **registration_params } }
 
+      context "that has no uuid" do
+        let(:invalid_token) do
+          initiation_time = 1.minute.ago
+          token_hash = {
+            user_id: User.create!.id,
+            initiated_at: initiation_time,
+            root_account_global_id: Account.first.root_account_id,
+          }
+          Canvas::Security.create_jwt(token_hash, initiation_time)
+        end
+
+        it "returns a 401" do
+          subject
+          expect(response).to have_http_status(:unauthorized)
+        end
+      end
+
       context "from more than an hour ago" do
         let(:invalid_token) do
           initiation_time = 62.minutes.ago # this should be too long ago to be accepted
@@ -227,6 +248,7 @@ describe Lti::IMS::DynamicRegistrationController do
             user_id: User.create!.id,
             initiated_at: initiation_time,
             root_account_global_id: Account.first.root_account_id,
+            uuid: SecureRandom.uuid,
           }
           Canvas::Security.create_jwt(token_hash, initiation_time)
         end

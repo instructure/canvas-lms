@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {RegistrationOverlay} from '../react/RegistrationSettings/RegistrationOverlayState'
 import {LtiPlacement} from './LtiPlacements'
 import {LtiScope} from './LtiScopes'
 
@@ -33,29 +34,30 @@ export type LtiMessage = {
 }
 
 export type LtiRegistration = {
-  registration: {
-    id: number
-    lti_tool_configuration: {
-      claims: SubClaims
-      domain: string
-      messages: Array<LtiMessage>
-      target_link_uri: string
-    }
-    developer_key_id: number
-    application_type: 'web'
-    grant_types: Array<string>
-    response_types: Array<string>
-    redirect_uris: Array<string>
-    initiate_login_uri: string
-    client_name: string
-    logo_uri: string | null
-    contacts: Array<string>
-    client_uri: string | null
-    policy_uri: string | null
-    tos_uri: string | null
-    scopes: Array<LtiScope>
-    root_account_id: number
-    created_at: string
-    updated_at: string
+  id: string
+  lti_tool_configuration: {
+    claims: SubClaims
+    domain: string
+    messages: Array<LtiMessage>
+    target_link_uri: string
   }
+  developer_key_id: string
+  overlay: null | RegistrationOverlay
+  application_type: 'web'
+  grant_types: Array<string>
+  response_types: Array<string>
+  redirect_uris: Array<string>
+  initiate_login_uri: string
+  client_name: string
+  jwks_uri: string
+  logo_uri: string | null
+  token_endpoint_auth_method: string
+  contacts: Array<string>
+  client_uri: string | null
+  policy_uri: string | null
+  tos_uri: string | null
+  scopes: Array<LtiScope>
+  created_at: string
+  updated_at: string
+  guid: string
 }

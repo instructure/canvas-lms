@@ -20,6 +20,8 @@ import React from 'react'
 
 import {DynamicRegistrationModal} from '../DynamicRegistrationModal'
 import {useDynamicRegistrationState} from '../DynamicRegistrationState'
+import {LtiRegistration} from 'features/developer_keys_v2/model/LtiRegistration'
+import {createRegistrationOverlayStore} from '../../RegistrationSettings/RegistrationOverlayState'
 
 describe('DynamicRegistrationModal', () => {
   let error: (...data: any[]) => void
@@ -28,18 +30,22 @@ describe('DynamicRegistrationModal', () => {
   beforeAll(() => {
     // instui logs an error when we render a component
     // immediately under Modal
+
+    // eslint-disable-next-line no-console
     error = console.error
+    // eslint-disable-next-line no-console
     warn = console.warn
 
+    // eslint-disable-next-line no-console
     console.error = jest.fn()
+    // eslint-disable-next-line no-console
     console.warn = jest.fn()
-
-    // const node = document.createElement('div')
-    // document.body.appendChild(node)
   })
 
   afterAll(() => {
+    // eslint-disable-next-line no-console
     console.error = error
+    // eslint-disable-next-line no-console
     console.warn = warn
   })
 
@@ -55,11 +61,74 @@ describe('DynamicRegistrationModal', () => {
     })
 
     it('forwards users to the tool', async () => {
-      useDynamicRegistrationState.getState().register('http://localhost', () => {})
+      useDynamicRegistrationState.getState().open('http://localhost?foo=bar')
+      useDynamicRegistrationState.getState().loadingRegistrationToken()
+      useDynamicRegistrationState.getState().register({
+        oidc_configuration_url: 'http://canvas.instructure.com',
+        token: 'abc',
+        uuid: '123',
+      })
       const component = render(<DynamicRegistrationModal contextId="1" store={store as any} />)
       const iframe = await component.findByTestId('dynamic-reg-modal-iframe')
       expect(iframe).toBeInTheDocument()
-      expect(iframe).toHaveAttribute('src', '/api/lti/register?registration_url=http://localhost')
+      expect(iframe).toHaveAttribute(
+        'src',
+        'http://localhost/?foo=bar&openid_configuration=http%3A%2F%2Fcanvas.instructure.com&registration_token=abc'
+      )
+    })
+
+    it('brings up the confirmation screen', async () => {
+      const registration: LtiRegistration = {
+        application_type: 'web',
+        client_name: 'test',
+        client_uri: 'http://localhost',
+        contacts: [],
+        grant_types: ['implicit'],
+        jwks_uri: 'http://localhost',
+        logo_uri: 'http://localhost',
+        policy_uri: 'http://localhost',
+        redirect_uris: ['http://localhost'],
+        created_at: '2023-01-01T00:00:00Z',
+        updated_at: '2023-01-01T00:00:00Z',
+        developer_key_id: '2',
+        guid: '123',
+        id: '1',
+        initiate_login_uri: 'http://localhost',
+        lti_tool_configuration: {
+          claims: [],
+          domain: 'localhost',
+          messages: [
+            {
+              custom_parameters: {},
+              placements: ['global_navigation'],
+              type: 'LtiResourceLinkRequest',
+              target_link_uri: 'http://localhost/global',
+              label: 'Lti Tool (Global)',
+              roles: [],
+              icon_uri: 'http://localhost/icon.jpg',
+            },
+          ],
+          target_link_uri: 'http://localhost',
+        },
+        overlay: null,
+        response_types: ['id_token'],
+        scopes: [],
+        token_endpoint_auth_method: 'none',
+        tos_uri: null,
+      }
+
+      const overlayStore = createRegistrationOverlayStore(registration.client_name, registration)
+
+      useDynamicRegistrationState.getState().confirm(registration, overlayStore)
+      const component = render(<DynamicRegistrationModal contextId="1" store={store as any} />)
+
+      const enableAndCloseButton = await component.findByTestId(
+        'dynamic-reg-modal-enable-and-close-button'
+      )
+      expect(enableAndCloseButton).toBeInTheDocument()
+
+      const confirmationScreen = await component.findByTestId('dynamic-reg-modal-confirmation')
+      expect(confirmationScreen).toBeInTheDocument()
     })
   })
 })

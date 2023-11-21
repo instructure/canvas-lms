@@ -128,21 +128,35 @@ class DeveloperKeyActionButtons extends React.Component {
 
     return (
       developerKey.is_lti_registration ? (
-        null
+        <Tooltip renderTip={I18n.t('Edit this key')}>
+          <IconButton
+            id="edit-developer-key-button"
+            as={"a"}
+            href={`/accounts/${this.props.contextId}/developer_keys/${developerKey.id}`}
+            withBackground={false}
+            withBorder={false}
+            screenReaderLabel={I18n.t('Edit key %{developerName}', {developerName})}
+            margin="0"
+            size="small"
+          >
+            <IconEditLine />
+          </IconButton>
+        </Tooltip>
       ) : (
-      <Tooltip renderTip={I18n.t('Edit this key')}>
-        <IconButton
-          id="edit-developer-key-button"
-          withBackground={false}
-          withBorder={false}
-          screenReaderLabel={I18n.t('Edit key %{developerName}', {developerName})}
-          margin="0"
-          size="small"
-          onClick={this.editLinkHandler}
-        >
-          <IconEditLine />
-        </IconButton>
-      </Tooltip>)
+        <Tooltip renderTip={I18n.t('Edit this key')}>
+          <IconButton
+            id="edit-developer-key-button"
+            withBackground={false}
+            withBorder={false}
+            screenReaderLabel={I18n.t('Edit key %{developerName}', {developerName})}
+            margin="0"
+            size="small"
+            onClick={this.editLinkHandler}
+          >
+            <IconEditLine />
+          </IconButton>
+        </Tooltip>
+      )
     )
   }
 
@@ -180,6 +194,7 @@ DeveloperKeyActionButtons.propTypes = {
   editDeveloperKey: PropTypes.func.isRequired,
   developerKeysModalOpen: PropTypes.func.isRequired,
   ltiKeysSetLtiKey: PropTypes.func.isRequired,
+  contextId: PropTypes.string.isRequired,
   developerKey: PropTypes.shape({
     id: PropTypes.string.isRequired,
     api_key: PropTypes.string,

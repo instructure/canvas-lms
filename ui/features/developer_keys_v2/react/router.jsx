@@ -23,8 +23,12 @@ import qs from 'qs'
 import DeveloperKeysApp from './App'
 import actions from './actions/developerKeysActions'
 import storeCreator from './store/store'
+import {RegistrationSettings} from './RegistrationSettings/RegistrationSettings'
+import {QueryProvider} from '@canvas/query'
 
 const store = storeCreator()
+
+const reactRoot = () => document.getElementById('reactContent')
 
 /**
  * Route Handlers
@@ -62,7 +66,7 @@ function renderShowDeveloperKeys(ctx) {
           store={store}
           ctx={ctx}
         />,
-        document.getElementById('reactContent')
+        reactRoot()
       )
     }
     // returns A function that unsubscribes the change listener.
@@ -70,6 +74,15 @@ function renderShowDeveloperKeys(ctx) {
     // renders the page
     view()
   }
+}
+
+const renderDeveloperKeySettings = (ctx) => {
+  ReactDOM.render(
+    <QueryProvider>
+      <RegistrationSettings ctx={ctx}/>
+    </QueryProvider>,
+    reactRoot()
+  )
 }
 
 /**
@@ -87,6 +100,15 @@ function parseQueryString(ctx, next) {
 page('*', parseQueryString) // Middleware to parse querystring to object
 
 page('/accounts/:contextId/developer_keys', renderShowDeveloperKeys)
+page.exit('/accounts/:contextId/developer_keys', (_ctx, next) => {
+  ReactDOM.unmountComponentAtNode(reactRoot())
+  next()
+})
+page('/accounts/:contextId/developer_keys/:developerKeyId', renderDeveloperKeySettings)
+page.exit('/accounts/:contextId/developer_keys/:developerKeyId', (_ctx, next) => {
+  ReactDOM.unmountComponentAtNode(reactRoot())
+  next()
+})
 
 // export default for a module
 // when we import router.js, this is what we get by default
