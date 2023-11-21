@@ -73,9 +73,11 @@ class GradebooksController < ApplicationController
            })
     return render :grade_summary_list unless @presenter.student
 
-    add_crumb(@presenter.student_name, named_context_url(@context,
-                                                         :context_student_grades_url,
-                                                         @presenter.student_id))
+    unless @context.root_account.feature_enabled?(:instui_nav)
+      add_crumb(@presenter.student_name, named_context_url(@context,
+                                                           :context_student_grades_url,
+                                                           @presenter.student_id))
+    end
 
     js_bundle :grade_summary, :rubric_assessment
     css_bundle :grade_summary

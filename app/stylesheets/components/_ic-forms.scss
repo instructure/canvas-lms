@@ -954,6 +954,13 @@ form.ic-Form-group { margin: 0; }
   margin-bottom: $ic-sp*0.5;
 }
 
+.ic-Action-header-title {
+  font-weight: 700;
+  line-height: 1.05;
+  font-size: 2.375rem;
+  margin: 0;
+}
+
 .ic-Form-action-box {
   display: flex;
   align-items: flex-start;
