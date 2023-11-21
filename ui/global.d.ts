@@ -96,7 +96,7 @@ declare global {
       scroll?: boolean,
       override_position?: string | number
     ) => JQuery<HTMLElement>
-    getFormData: () => Record<string, unknown>
+    getFormData: <T>(obj?: Record<string, unknown>) => T
     live: any
     loadDocPreview: (options: {
       height: string
@@ -113,13 +113,18 @@ declare global {
     showIf: ShowIf
     underscore: (str: string) => string
     formSubmit: (options: {
-      formErrors: boolean
-      disableWhileLoading: boolean
+      object_name?: string
+      formErrors?: boolean
+      disableWhileLoading?: boolean
       required: string[]
       success: (data: any) => void
+      beforeSubmit?: (data: any) => void
       error: (response: JQuery.JQueryXHR) => void
     }) => void
+    formErrors: (errors: Record<string, string>) => void
     getTemplateData: (options: {textValues: string[]}) => Record<string, unknown>
+    fancyPlaceholder: () => void
+    loadingImage: (str?: string) => void
   }
 
   declare interface JQueryStatic {

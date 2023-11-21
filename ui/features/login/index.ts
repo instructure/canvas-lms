@@ -16,9 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
+import ready from '@instructure/ready'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import htmlEscape from 'html-escape'
+// @ts-expect-error
 import signupDialog from '@canvas/signup-dialog'
 import 'jquery-fancy-placeholder' /* fancyPlaceholder */
 import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, getFormData, formErrors, errorBox */
@@ -31,6 +33,7 @@ $('#coenrollment_link').click(function (event) {
   event.preventDefault()
   const template = $(this).data('template')
   const path = $(this).data('path')
+  // @ts-expect-error
   signupDialog(template, I18n.t('parent_signup', 'Parent Signup'), path)
 })
 
@@ -64,7 +67,12 @@ $('#forgot_password_form').formSubmit({
 })
 
 $('#login_form').submit(function (_event) {
-  const data = $(this).getFormData({object_name: 'pseudonym_session'})
+  const data = $(this).getFormData<
+    Partial<{
+      unique_id: string
+      password: string
+    }>
+  >({object_name: 'pseudonym_session'})
   let success = true
   if (!data.unique_id || data.unique_id.length < 1) {
     $(this).formErrors({
@@ -86,4 +94,25 @@ $('#login_form').submit(function (_event) {
   }
 
   return success
+})
+
+ready(() => {
+  const $loginForm = $('#login_form')
+  const $forgotPasswordForm = $('#forgot_password_form')
+
+  $('.forgot_password_link').click(event => {
+    event.preventDefault()
+    $loginForm.hide()
+    $forgotPasswordForm.show()
+    $forgotPasswordForm.find('input:visible:first').focus()
+  })
+
+  $('.login_link').click(event => {
+    event.preventDefault()
+    $forgotPasswordForm.hide()
+    $loginForm.show()
+    $loginForm.find('input:visible:first').focus()
+  })
+
+  sessionStorage.clear()
 })
