@@ -555,10 +555,8 @@ describe Login::CanvasController do
 
     before do
       redis = double("Redis")
-      allow(redis).to receive(:setex)
-      allow(redis).to receive(:hmget)
-      allow(redis).to receive(:del)
-      allow(Canvas).to receive_messages(redis:)
+      allow(redis).to receive_messages(setex: nil, hget: nil, hmget: nil, del: nil, pipelined: nil)
+      allow(Canvas::Security::LoginRegistry).to receive_messages(redis:)
     end
 
     let_once(:key) { DeveloperKey.create! redirect_uri: "https://example.com" }

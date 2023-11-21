@@ -47,8 +47,12 @@ describe Canvas::Security::LoginRegistry do
       expect(registry.audit_login(@p, "7.7.7.7", true)).to eq(:too_many_attempts)
     end
 
+    it "allows 3 rapid fire successful logins" do
+      3.times { expect(registry.audit_login(@p, "7.7.7.7", true)).to be_nil }
+    end
+
     it "prohibits rapid fire successful logins" do
-      @p.update_attribute(:current_login_at, 1.second.ago)
+      6.times { registry.audit_login(@p, "7.7.7.7", true) }
       expect(registry.audit_login(@p, "7.7.7.7", true)).to be :too_recent_login
       expect(registry.audit_login(@p, "7.7.7.7", false)).to be_nil
     end
