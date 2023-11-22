@@ -17,12 +17,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
 import axios from '@canvas/axios'
-import parseLinkHeader from 'link-header-parsing/parseLinkHeader'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {DeveloperKey, DeveloperKeyAccountBinding, DeveloperKeyScope} from '../../model/DeveloperKey'
+import {LtiScope} from 'features/developer_keys_v2/model/LtiScopes'
+import $ from 'jquery'
+import parseLinkHeader from 'link-header-parsing/parseLinkHeader'
 import {AnyAction, Dispatch} from 'redux'
+import {DeveloperKey, DeveloperKeyAccountBinding} from '../../model/DeveloperKey'
 
 const I18n = useI18nScope('react_developer_keys')
 
@@ -349,7 +350,7 @@ export const actions = {
   }),
 
   LIST_DEVELOPER_KEY_SCOPES_SET: 'LIST_DEVELOPER_KEY_SCOPES_SET',
-  listDeveloperKeyScopesSet: (selectedScopes: Array<DeveloperKeyScope>) => ({
+  listDeveloperKeyScopesSet: (selectedScopes: Array<LtiScope>) => ({
     type: actions.LIST_DEVELOPER_KEY_SCOPES_SET,
     payload: selectedScopes,
   }),

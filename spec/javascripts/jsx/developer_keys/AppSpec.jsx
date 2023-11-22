@@ -28,6 +28,16 @@ QUnit.module('DevelopersKeyApp', {
   teardown() {
     document.getElementById('fixtures').innerHTML = ''
   },
+  beforeEach: () => {
+    window.ENV = {
+      FEATURES: {
+        lti_dynamic_registration: true
+      }
+    }
+  },
+  afterEach: () => {
+    window.ENV = {}
+  },
 })
 
 const listDeveloperKeyScopes = {

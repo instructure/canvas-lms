@@ -19,6 +19,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import PropTypes from 'prop-types'
+import page from 'page'
 
 import {IconButton} from '@instructure/ui-buttons'
 import {Tooltip} from '@instructure/ui-tooltip'
@@ -123,9 +124,12 @@ class DeveloperKeyActionButtons extends React.Component {
   }
 
   renderEditButton() {
-    const {developerName} = this.props
+    const {developerName, developerKey} = this.props
 
     return (
+      developerKey.is_lti_registration ? (
+        null
+      ) : (
       <Tooltip renderTip={I18n.t('Edit this key')}>
         <IconButton
           id="edit-developer-key-button"
@@ -138,7 +142,7 @@ class DeveloperKeyActionButtons extends React.Component {
         >
           <IconEditLine />
         </IconButton>
-      </Tooltip>
+      </Tooltip>)
     )
   }
 

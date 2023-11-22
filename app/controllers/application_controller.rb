@@ -368,6 +368,7 @@ class ApplicationController < ActionController::Base
     granular_permissions_manage_users
     create_course_subaccount_picker
     lti_deep_linking_module_index_menu_modal
+    lti_dynamic_registration
     lti_multiple_assignment_deep_linking
     lti_overwrite_user_url_input_select_content_dialog
     lti_unique_tool_form_ids
