@@ -45,6 +45,7 @@
     "fmt:fix": "prettier --write '**/*.js*' '**/*.ts*'",
     "clean": "rm -rf lib && yarn clean:es && rm -rf coverage && yarn demo:clean",
     "clean:es": "rm -rf es",
+    "check:ts": "tsc -p tsconfig.json",
     "generate-svgs": "yarn build:es && node --experimental-modules scripts/generateSvgs.js && prettier --write src/rce/plugins/instructure_equation/MathIcon/svgs.js",
     "publishToNpm": "scripts/publish_to_npm.sh"
   },
