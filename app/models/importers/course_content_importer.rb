@@ -184,7 +184,8 @@ module Importers
         end
         migration.update_import_progress(90)
 
-        if migration.migration_settings[:import_blueprint_settings] || (migration.copy_options && migration.copy_options[:all_blueprint_settings])
+        if (migration.migration_settings[:import_blueprint_settings] || (migration.copy_options && migration.copy_options[:all_blueprint_settings])) &&
+           (course.account.grants_any_right?(migration.user, :manage_courses, :manage_courses_admin) && course.account.grants_right?(migration.user, :manage_master_courses))
           Importers::BlueprintSettingsImporter.process_migration(data, migration)
         end
 
