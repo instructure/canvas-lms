@@ -48,6 +48,7 @@ class Progress < ActiveRecord::Base
     state :queued do
       event :start, transitions_to: :running
       event :fail, transitions_to: :failed
+      event :cancel, transitions_to: :canceled
     end
     state :running do
       event(:complete, transitions_to: :completed) { self.completion = 100 }
@@ -55,6 +56,7 @@ class Progress < ActiveRecord::Base
     end
     state :completed
     state :failed
+    state :canceled
   end
 
   set_policy do
@@ -116,9 +118,19 @@ class Progress < ActiveRecord::Base
       ActiveRecord::Base.connection.after_transaction_commit do
         job = Delayed::Job.enqueue(work, **enqueue_args)
         update(delayed_job_id: job.id)
+        cancel_orphaned_progresses(job.id) if enqueue_args[:on_conflict] == :overwrite && job.enqueue_result == :updated
         job
       end
     end
+  end
+
+  private
+
+  # If a job is enqueued with `on_conflict: :overwrite`, and another job already exists with the same
+  # singleton, then the existing job's handler will be updated to point at the new Progress. Thus, cancel any
+  # other queued Progresses that were pointing at the job (since they'll never get updated).
+  def cancel_orphaned_progresses(job_id)
+    Progress.where(delayed_job_id: job_id, workflow_state: "queued").where.not(id:).update_all(workflow_state: "canceled")
   end
 
   # (private)
