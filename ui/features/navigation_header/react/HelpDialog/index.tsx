@@ -16,64 +16,33 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useState} from 'react'
 import CreateTicketForm from './CreateTicketForm'
 import TeacherFeedbackForm from './TeacherFeedbackForm'
 import HelpLinks from './HelpLinks'
-import type {HelpLink} from '../../../../api.d'
 
 type Props = {
-  links: HelpLink[]
-  hasLoaded: boolean
-  onFormSubmit: (event: Event) => void
+  onFormSubmit: () => void
 }
 
-type State = {
-  view: string
-}
+function HelpDialog({onFormSubmit}: Props) {
+  const [view, setView] = useState('links')
 
-class HelpDialog extends React.Component<Props, State> {
-  static defaultProps = {
-    hasLoaded: false,
-    links: [],
-    onFormSubmit() {},
+  const handleLinkClick = (url: string) => {
+    setView(url)
   }
 
-  state = {
-    view: 'links',
+  const handleCancelClick = () => {
+    setView('links')
   }
 
-  handleLinkClick = (url: string) => {
-    this.setState({view: url})
-  }
-
-  handleCancelClick = () => {
-    this.setState({view: 'links'})
-  }
-
-  render() {
-    switch (this.state.view) {
-      case '#create_ticket':
-        return (
-          // @ts-expect-error
-          <CreateTicketForm onCancel={this.handleCancelClick} onSubmit={this.props.onFormSubmit} />
-        )
-      case '#teacher_feedback':
-        return (
-          <TeacherFeedbackForm
-            onCancel={this.handleCancelClick}
-            onSubmit={this.props.onFormSubmit}
-          />
-        )
-      default:
-        return (
-          <HelpLinks
-            links={this.props.links}
-            hasLoaded={this.props.hasLoaded}
-            onClick={this.handleLinkClick}
-          />
-        )
-    }
+  switch (view) {
+    case '#create_ticket':
+      return <CreateTicketForm onCancel={handleCancelClick} onSubmit={onFormSubmit} />
+    case '#teacher_feedback':
+      return <TeacherFeedbackForm onCancel={handleCancelClick} onSubmit={onFormSubmit} />
+    default:
+      return <HelpLinks onClick={handleLinkClick} />
   }
 }
 

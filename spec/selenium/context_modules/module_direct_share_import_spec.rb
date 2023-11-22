@@ -42,8 +42,7 @@ describe "modules" do
     user_session(@teacher)
   end
 
-  it "shares a module" do
-    skip "FOO-3805 (10/6/2023)"
+  it "shares a module", :ignore_js_errors do
     visit_modules_index_page(@course.id)
     manage_module_button(@module1).click
     module_index_menu_tool_link("Send To...").click
@@ -69,8 +68,7 @@ describe "modules" do
     expect(@other_course.content_migrations.last.migration_settings["copy_options"].keys).to eq(["context_modules"])
   end
 
-  it "shares a module item" do
-    skip "FOO-3805 (10/6/2023)"
+  it "shares a module item", :ignore_js_errors do
     visit_modules_index_page(@course.id)
     manage_module_item_button(@item1).click
     module_index_menu_tool_link("Send To...").click
@@ -96,8 +94,7 @@ describe "modules" do
     expect(@other_course.content_migrations.last.migration_settings["copy_options"].keys).to eq(["assignments"])
   end
 
-  it "shares a newly created module item" do
-    skip "FOO-3805 (10/6/2023)"
+  it "shares a newly created module item", :ignore_js_errors do
     wiki_page = @course.wiki_pages.create!(title: "New Page Title", body: "Here is the body")
     @module1.add_item({ id: wiki_page.id, type: "wiki_page" })
     visit_modules_index_page(@course.id)

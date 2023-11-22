@@ -87,20 +87,4 @@ module Api::V1::WikiPage
   def wiki_page_revisions_json(versions, current_user, current_session, latest_version = nil)
     versions.map { |ver| wiki_page_revision_json(ver, current_user, current_session, false, latest_version) }
   end
-
-  def wiki_pages_search_json(wiki_pages)
-    wiki_pages.map { |page| wiki_page_search_json(page) }
-  end
-
-  def wiki_page_search_json(wiki_page)
-    hash = {}
-    hash["wiki_page"] = {}
-    hash["wiki_page"]["id"] = wiki_page.id
-    hash["wiki_page"]["title"] = wiki_page.title
-    hash["wiki_page"]["url"] = polymorphic_url([wiki_page.context, wiki_page])
-    hash["wiki_page"]["body_text"] = wiki_page.body_text
-    hash["wiki_page"]["distance"] = wiki_page.distance
-
-    hash
-  end
 end

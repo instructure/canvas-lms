@@ -435,6 +435,15 @@ describe "calendar2" do
         expect(@event.all_day).to be true
       end
 
+      it "shows a SR alert when an event is created" do
+        get "/calendar2"
+        calendar_create_event_button.click
+        replace_content(edit_calendar_event_form_title, "new event")
+        edit_calendar_event_form_submit_button.click
+        wait_for_ajaximations
+        expect(screenreader_message_holder).to include_text("The event was successfully created")
+      end
+
       it "can create timed events in calendar" do
         @date = Time.zone.now.beginning_of_day
         start_time = "6:30 AM"

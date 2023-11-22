@@ -17,6 +17,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+# Scenarios:
+# Academic Benchmark Import
+# Blueprint Sync
+# Course copy
 module Importers
   class LearningOutcomeImporter < Importer
     self.item_class = LearningOutcome
@@ -45,6 +49,8 @@ module Importers
     end
 
     def self.import_from_migration(hash, migration, item = nil)
+      # For Academic Benchmark (global outcomes) the context is Account.site_admin
+      # For Course copy and Blueprint Sync the Context is the course wea are copying data to
       context = migration.context
       hash = hash.with_indifferent_access
       outcome = nil
@@ -88,7 +94,7 @@ module Importers
         if hash[:is_global_standard]
           if Account.site_admin.grants_right?(migration.user, :manage_global_outcomes)
             # import from vendor with global outcomes
-            context = nil
+            # When creating an Academic Benchmark the context is set to nil. Does not belong to a Context
             hash[:learning_outcome_group] ||= LearningOutcomeGroup.global_root_outcome_group
             item ||= LearningOutcome.global.where(migration_id: hash[:migration_id]).first if hash[:migration_id] && !migration.cross_institution?
             item ||= LearningOutcome.global.where(vendor_guid: hash[:vendor_guid]).first if hash[:vendor_guid]
@@ -142,12 +148,20 @@ module Importers
 
       # don't implicitly add an outcome to the root outcome group if it's already in an outcome group
       if hash[:learning_outcome_group].present? || context.learning_outcome_links.not_deleted.where(content: item).none?
+
         log = hash[:learning_outcome_group] || context.root_outcome_group
-        outcome_link = log.add_outcome(item, migration_id: hash[:migration_id])
+
+        outcome_link = context.learning_outcome_links.find_by(content: item, migration_id: hash[:migration_id])
+        if outcome_link
+          log.adopt_outcome_link(outcome_link)
+        else
+          outcome_link = log.add_outcome(item, migration_id: hash[:migration_id])
+        end
         migration.add_imported_item(outcome_link)
       end
 
       if hash[:alignments] && !previously_imported
+        # This part is executed for Blueprint Sync and Course Copy
         alignments = hash[:alignments].sort_by { |a| a[:position].to_i }
         alignments.each do |alignment|
           next unless alignment[:content_type] && alignment[:content_id]

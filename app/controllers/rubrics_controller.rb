@@ -41,6 +41,10 @@ class RubricsController < ApplicationController
     mastery_scales_js_env
     set_tutorial_js_env
 
+    if Account.site_admin.feature_enabled?(:enhanced_rubrics)
+      return show_rubrics_redesign
+    end
+
     @rubric_associations = @context.rubric_associations.bookmarked.include_rubric.to_a
     @rubric_associations = Canvas::ICU.collate_by(@rubric_associations.select(&:rubric_id).uniq(&:rubric_id)) { |r| r.rubric.title }
     @rubrics = @rubric_associations.map(&:rubric)
@@ -58,6 +62,11 @@ class RubricsController < ApplicationController
              },
              OUTCOMES_NEW_DECAYING_AVERAGE_CALCULATION: @domain_root_account.feature_enabled?(:outcomes_new_decaying_average_calculation)
       mastery_scales_js_env
+
+      if Account.site_admin.feature_enabled?(:enhanced_rubrics)
+        return show_rubrics_redesign
+      end
+
       @rubric_association = @context.rubric_associations.bookmarked.find_by(rubric_id: params[:id])
       raise ActiveRecord::RecordNotFound unless @rubric_association
 
@@ -65,6 +74,10 @@ class RubricsController < ApplicationController
     else
       raise ActiveRecord::RecordNotFound
     end
+  end
+
+  def show_rubrics_redesign
+    render html: "".html_safe, layout: true
   end
 
   # @API Create a single rubric

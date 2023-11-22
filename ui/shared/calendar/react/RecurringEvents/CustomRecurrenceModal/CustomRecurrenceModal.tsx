@@ -139,6 +139,7 @@ export default function CustomRecurrenceModal({
 
   return (
     <CanvasModal
+      id="custom-repeating-event-modal"
       label={I18n.t('Custom Repeating Event')}
       onClose={onClose}
       onDismiss={onDismiss}

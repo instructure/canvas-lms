@@ -63,7 +63,6 @@ import {View} from '@instructure/ui-view'
 import {ReportReply} from '../../components/ReportReply/ReportReply'
 import {Text} from '@instructure/ui-text'
 import useCreateDiscussionEntry from '../../hooks/useCreateDiscussionEntry'
-import {DiscussionEntry} from '../../../graphql/DiscussionEntry'
 
 const I18n = useI18nScope('discussion_topics_post')
 
@@ -214,7 +213,6 @@ export const DiscussionThreadContainer = props => {
     })
   }
 
-  const marginDepth = `calc(${theme.variables.spacing.xxLarge} * ${props.depth})`
   const getReplyLeftMargin = responsiveProp => {
     // If the entry is in threadMode, then we want the RCE to be aligned with the authorInfo
     const threadMode = props.discussionEntry?.depth > 1
@@ -451,16 +449,18 @@ export const DiscussionThreadContainer = props => {
       props={{
         // If you change the padding notation on these, please update the getReplyLeftMargin function
         mobile: {
+          marginDepth: `calc(${theme.variables.spacing.medium} * ${props.depth})`,
           padding: 'small xx-small small',
         },
         desktop: {
+          marginDepth: `calc(${theme.variables.spacing.xxLarge} * ${props.depth})`,
           padding: 'small medium small',
         },
       }}
       render={responsiveProps => (
         <>
           <Highlight isHighlighted={props.discussionEntry._id === props.highlightEntryId}>
-            <div style={{marginLeft: marginDepth}} ref={onThreadRefCurrentSet}>
+            <div style={{marginLeft: responsiveProps.marginDepth}} ref={onThreadRefCurrentSet}>
               <Flex padding={responsiveProps.padding}>
                 <Flex.Item shouldShrink={true} shouldGrow={true}>
                   <DiscussionEntryContainer
@@ -665,7 +665,6 @@ DiscussionThreadContainer.propTypes = {
   refetchDiscussionEntries: PropTypes.func,
   depth: PropTypes.number,
   markAsRead: PropTypes.func,
-  parentRefCurrent: PropTypes.object,
   onOpenIsolatedView: PropTypes.func,
   goToTopic: PropTypes.func,
   highlightEntryId: PropTypes.string,
@@ -792,7 +791,6 @@ const DiscussionSubentriesMemo = props => {
 
 DiscussionSubentries.propTypes = {
   discussionTopic: Discussion.shape,
-  discussionEntry: DiscussionEntry.shape,
   depth: PropTypes.number,
   markAsRead: PropTypes.func,
   parentRefCurrent: PropTypes.object,

@@ -57,7 +57,6 @@ export default class UnassignedUsersView extends GroupUsersView {
 
     this.prototype.events = {
       'click .assign-to-group': 'focusAssignToGroup',
-      'focus .assign-to-group': 'showAssignToGroup',
       'blur .assign-to-group': 'hideAssignToGroup',
       scroll: 'hideAssignToGroup',
     }

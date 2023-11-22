@@ -76,3 +76,5 @@ if (typeof window.URL.createObjectURL === 'undefined') {
 if (typeof window.URL.revokeObjectURL === 'undefined') {
   Object.defineProperty(window.URL, 'revokeObjectURL', {value: () => undefined})
 }
+
+global.DataTransferItem = global.DataTransferItem || class DataTransferItem {}

@@ -54,6 +54,9 @@ describe Mutations::CreateDiscussionTopic do
               _id
               name
             }
+            attachment{
+              _id
+            }
           }
           errors {
             attribute
@@ -289,6 +292,32 @@ describe Mutations::CreateDiscussionTopic do
     expect(result["errors"]).to be_nil
     expect(result.dig("data", "discussionTopic", "errors")).to be_nil
     expect(created_discussion_topic["published"]).to be true
+  end
+
+  it "creates a topic with an attachment" do
+    attachment = attachment_with_context(@teacher)
+    attachment.update!(user: @teacher)
+
+    context_type = "Course"
+    title = "Test Title"
+    message = "A message"
+    published = true
+    file_id = attachment.id
+    query = <<~GQL
+      contextId: "#{@course.id}"
+      contextType: "#{context_type}"
+      title: "#{title}"
+      message: "#{message}"
+      published: #{published}
+      anonymousState: "off"
+      fileId: "#{file_id}"
+    GQL
+
+    result = execute_with_input(query)
+    created_discussion_topic = result.dig("data", "createDiscussionTopic", "discussionTopic")
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "discussionTopic", "errors")).to be_nil
+    expect(created_discussion_topic["attachment"]["_id"]).to eq(attachment.id.to_s)
   end
 
   it "creates a full_anonymity discussion topic" do
@@ -848,15 +877,20 @@ describe Mutations::CreateDiscussionTopic do
       GQL
 
       result = execute_with_input_with_assignment(query)
+      assignment = Assignment.last
       discussion_topic = result.dig("data", "createDiscussionTopic", "discussionTopic")
-      expect(result.dig("data", "discussionTopic", "errors")).to be_nil
-      expect(discussion_topic["assignment"]["name"]).to eq title
-      expect(discussion_topic["assignment"]["pointsPossible"]).to eq 15
-      expect(discussion_topic["assignment"]["gradingType"]).to eq "percent"
-      expect(discussion_topic["assignment"]["peerReviews"]["anonymousReviews"]).to be true
-      expect(discussion_topic["assignment"]["peerReviews"]["automaticReviews"]).to be true
-      expect(discussion_topic["assignment"]["peerReviews"]["count"]).to eq 2
-      expect(discussion_topic["assignment"]["_id"]).to eq Assignment.last.id.to_s
+      aggregate_failures do
+        expect(result.dig("data", "discussionTopic", "errors")).to be_nil
+        expect(discussion_topic["assignment"]["name"]).to eq title
+        expect(discussion_topic["assignment"]["pointsPossible"]).to eq 15
+        expect(discussion_topic["assignment"]["gradingType"]).to eq "percent"
+        expect(discussion_topic["assignment"]["peerReviews"]["anonymousReviews"]).to be true
+        expect(discussion_topic["assignment"]["peerReviews"]["automaticReviews"]).to be true
+        expect(discussion_topic["assignment"]["peerReviews"]["count"]).to eq 2
+        expect(discussion_topic["assignment"]["_id"]).to eq assignment.id.to_s
+        expect(discussion_topic["_id"]).to eq assignment.discussion_topic.id.to_s
+        expect(DiscussionTopic.count).to eq 1
+      end
     end
 
     it "student fails to create graded discussion topic" do

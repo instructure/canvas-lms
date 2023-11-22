@@ -21,6 +21,23 @@
 require "spec_helper"
 
 describe Api::V1::SubmissionComment do
+  subject(:fake_controller) do
+    Class.new do
+      include Api
+      include Api::V1::Submission
+      include Api::V1::SubmissionComment
+      include Rails.application.routes.url_helpers
+
+      attr_writer :current_user
+
+      private
+
+      def default_url_options
+        { host: :localhost }
+      end
+    end.new
+  end
+
   before(:once) do
     course = Course.create!
     @student = User.create!
@@ -46,6 +63,22 @@ describe Api::V1::SubmissionComment do
 
     it "'edited_at' is nil if the submission comment has not been edited" do
       expect(comment_json[:edited_at]).to be_nil
+    end
+
+    it "media_type in submission comment json has video instead of the specific mime type" do
+      @submission_comment.media_comment_id = 1
+      @submission_comment.media_comment_type = "video/mp4"
+      fake_controller.current_user = @student
+      submission_comment_json = fake_controller.submission_comment_json(@submission_comment, @student)
+      expect(submission_comment_json["media_comment"]["media_type"]).to eq("video")
+    end
+
+    it "media_type in submission comment json has audio instead of the specific mime type" do
+      @submission_comment.media_comment_id = 1
+      @submission_comment.media_comment_type = "audio/mp4"
+      fake_controller.current_user = @student
+      submission_comment_json = fake_controller.submission_comment_json(@submission_comment, @student)
+      expect(submission_comment_json["media_comment"]["media_type"]).to eq("audio")
     end
   end
 

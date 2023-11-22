@@ -19,10 +19,14 @@
 
 require_relative "../helpers/context_modules_common"
 require_relative "../helpers/public_courses_context"
+require_relative "page_objects/modules_index_page"
+require_relative "page_objects/modules_settings_tray"
 
 describe "context modules" do
   include_context "in-process server selenium tests"
   include ContextModulesCommon
+  include ModulesIndexPage
+  include ModulesSettingsTray
 
   context "as a teacher", priority: "1" do
     before(:once) do
@@ -91,7 +95,9 @@ describe "context modules" do
       end
     end
 
-    it "retains focus when deleting prerequisites" do
+    it "retains focus when deleting prerequisites without differentiated modules" do
+      Account.site_admin.disable_feature! :differentiated_modules
+
       modules = create_modules(2)
       get "/courses/#{@course.id}/modules"
       mod1 = f("#context_module_#{modules[1].id}")
@@ -111,6 +117,27 @@ describe "context modules" do
       links[0].click
       wait_for_animations
       check_element_has_focus(add_button)
+    end
+
+    it "retains focus when deleting prerequisites with different modules" do
+      skip("LF-960 Waiting for updates to a11y issues found for new tray")
+      Account.site_admin.enable_feature! :differentiated_modules
+      modules = create_modules(3)
+      go_to_modules
+      manage_module_button(modules[2]).click
+      module_index_menu_tool_link("Edit").click
+
+      2.times do
+        click_add_prerequisites_button
+      end
+
+      expect(remove_prerequisite_button.size).to eq 2
+      click_remove_prerequisite_button(1)
+
+      check_element_has_focus(remove_prerequisite_button[0])
+      click_remove_prerequisite_button(0)
+
+      check_element_has_focus(add_prerequisite_button)
     end
 
     it "adds a title attribute to the text header" do
@@ -261,6 +288,34 @@ describe "context modules" do
         @active_element.send_keys("d")
         driver.switch_to.alert.accept
         expect(context_module_items).to have_size(2)
+      end
+    end
+
+    context "Specific Keyboard Accessibility with differentiated modules", priority: "1" do
+      before :once do
+        Account.site_admin.enable_feature! :differentiated_modules
+        modules = create_modules(2, true)
+        modules[0].add_item({ id: @assignment.id, type: "assignment" })
+        modules[0].add_item({ id: @assignment2.id, type: "assignment" })
+        modules[1].add_item({ id: @assignment3.id, type: "assignment" })
+      end
+
+      before do
+        go_to_modules
+
+        # focus the first item
+        f("html").send_keys("j")
+        @active_element = driver.execute_script("return document.activeElement")
+      end
+
+      it "edits modules with differentiated modules" do
+        @active_element.send_keys("e")
+        expect(settings_tray_exists?).to be_truthy
+      end
+
+      it "creates a module with differentiated modules" do
+        @active_element.send_keys("n")
+        expect(add_module_tray_exists?).to be true
       end
     end
   end

@@ -17,7 +17,13 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require "webmock"
+
+WebMock.enable!
+
 describe MediaObjectsController do
+  include WebMock::API
+
   before :once do
     course_with_teacher(active_all: true)
     student_in_course(active_all: true)
@@ -1168,6 +1174,7 @@ describe MediaObjectsController do
   describe "#media_sources_json" do
     before do
       @media_object = @course.media_objects.create! media_id: "0_deadbeef", user_entered_title: "blah.flv"
+      @attachment = @course.attachments.create! media_entry_id: "0_deadbeef", filename: "blah.flv", uploaded_data: StringIO.new("data")
       allow_any_instance_of(MediaObject).to receive(:media_sources).and_return(
         [{ url: "whatever man", bitrate: 12_345 }]
       )
@@ -1191,14 +1198,40 @@ describe MediaObjectsController do
         Account.site_admin.enable_feature!(:authenticated_iframe_content)
       end
 
-      it "returns the redirect url as the source" do
+      it "returns the media_object redirect url as the source" do
         expect(controller.media_sources_json(@media_object)).to eq(
           [
             {
               bitrate: 12_345,
               label: "12 kbps",
-              src: "http://test.host/media_objects/#{@media_object.id}/redirect?bitrate=12345",
-              url: "http://test.host/media_objects/#{@media_object.id}/redirect?bitrate=12345"
+              src: "http://test.host/media_objects/#{@media_object.media_id}/redirect?bitrate=12345",
+              url: "http://test.host/media_objects/#{@media_object.media_id}/redirect?bitrate=12345"
+            }
+          ]
+        )
+      end
+
+      it "returns the media_attachment redirect url as the source when attachment is present" do
+        expect(controller.media_sources_json(@media_object, attachment: @attachment)).to eq(
+          [
+            {
+              bitrate: 12_345,
+              label: "12 kbps",
+              src: "http://test.host/media_attachments/#{@attachment.id}/redirect?bitrate=12345",
+              url: "http://test.host/media_attachments/#{@attachment.id}/redirect?bitrate=12345"
+            }
+          ]
+        )
+      end
+
+      it "returns the media_attachment redirect url as the source when attachment is present and attached verifier if passed" do
+        expect(controller.media_sources_json(@media_object, attachment: @attachment, verifier: @attachment.uuid)).to eq(
+          [
+            {
+              bitrate: 12_345,
+              label: "12 kbps",
+              src: "http://test.host/media_attachments/#{@attachment.id}/redirect?bitrate=12345&verifier=#{@attachment.uuid}",
+              url: "http://test.host/media_attachments/#{@attachment.id}/redirect?bitrate=12345&verifier=#{@attachment.uuid}"
             }
           ]
         )
@@ -1206,7 +1239,7 @@ describe MediaObjectsController do
     end
   end
 
-  describe "GET '/media_objects/:id/redirect'" do
+  describe "GET media_object_redirect" do
     before do
       allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
       allow_any_instance_of(CanvasKaltura::ClientV3).to receive(:assetSwfUrl).and_return(
@@ -1221,71 +1254,167 @@ describe MediaObjectsController do
         Account.site_admin.enable_feature!(:authenticated_iframe_content)
         allow_any_instance_of(CanvasKaltura::ClientV3).to receive(:media_sources).and_return(
           [
-            { bitrate: 1, url: "http://test.host/media_redirect" },
-            { bitrate: 2, url: "http://test.host/media_redirect_2" }
+            { bitrate: 2, url: "http://test.host/media_2" },
+            { bitrate: 1, url: "http://test.host/media"   },
+            { bitrate: 3, url: "http://test.host/media_3" }
           ]
         )
         @attachment = @media_object.attachment
       end
 
-      it "returns the file" do
-        temp_file = Tempfile.new("foo")
-        expect(controller).to receive(:media_source_temp_file).with("http://test.host/media_redirect").and_return(temp_file)
-        expect(controller).to receive(:send_file).with(temp_file, filename: @attachment.filename, type: @attachment.content_type, stream: true).and_call_original
-        get :media_object_redirect, params: { id: @media_object.id }
+      it "returns the redirected URL" do
+        stub_request(:get, "http://test.host/media").to_return(status: 302, headers: { location: "http://s3link.example.com/" })
+        stub_request(:get, "http://s3link.example.com/").to_return(status: 200)
+        get :media_object_redirect, params: { attachment_id: @media_object.attachment_id }
+        assert_status(302)
+        expect(response.location).to eq "http://s3link.example.com/"
       end
 
-      it "does not return the file if the user does not have access" do
+      it "returns the URL if the response is not a redirect" do
+        stub_request(:get, "http://test.host/media").to_return(status: 200)
+        get :media_object_redirect, params: { attachment_id: @media_object.attachment_id }
+        assert_status(302)
+        expect(response.location).to eq "http://test.host/media"
+      end
+
+      it "does not return the redirected URL if the user does not have access" do
         user_session(user_factory)
-        get :media_object_redirect, params: { id: @media_object.id }
+        get :media_object_redirect, params: { attachment_id: @media_object.attachment_id }
         assert_status(401)
       end
 
       context "with public files" do
-        it "returns the file if it is a public file and the user does not have access" do
-          user_session(user_factory)
-          @attachment.update(visibility_level: "public")
-          temp_file = Tempfile.new("foo")
-          expect(controller).to receive(:media_source_temp_file).with("http://test.host/media_redirect").and_return(temp_file)
-          expect(controller).to receive(:send_file).with(temp_file, filename: @attachment.filename, type: @attachment.content_type, stream: true).and_call_original
-          get :media_object_redirect, params: { id: @media_object.id }
+        context "users with access" do
+          it "returns the redirected URL if it is a public file and the user does not have access" do
+            user_session(user_factory)
+            @attachment.update(visibility_level: "public")
+            stub_request(:get, "http://test.host/media").to_return(status: 302, headers: { location: "http://s3link.example.com/" })
+            stub_request(:get, "http://s3link.example.com/").to_return(status: 200)
+            get :media_object_redirect, params: { attachment_id: @media_object.attachment_id }
+            assert_status(302)
+            expect(response.location).to eq "http://s3link.example.com/"
+          end
+
+          it "returns the redirected URL if it is a public file and there is no user session" do
+            remove_user_session
+            @attachment.update(visibility_level: "public")
+            stub_request(:get, "http://test.host/media").to_return(status: 302, headers: { location: "http://s3link.example.com/" })
+            stub_request(:get, "http://s3link.example.com/").to_return(status: 200)
+            get :media_object_redirect, params: { attachment_id: @media_object.attachment_id }
+            assert_status(302)
+            expect(response.location).to eq "http://s3link.example.com/"
+          end
+
+          it "returns the redirected URL if there is a verifier attached and there is no user session" do
+            remove_user_session
+            stub_request(:get, "http://test.host/media").to_return(status: 302, headers: { location: "http://s3link.example.com/" })
+            stub_request(:get, "http://s3link.example.com/").to_return(status: 200)
+            get :media_object_redirect, params: { attachment_id: @media_object.attachment_id, verifier: @attachment.uuid }
+            assert_status(302)
+            expect(response.location).to eq "http://s3link.example.com/"
+          end
         end
 
-        it "returns the file if it is a public file and there is no user session" do
-          remove_user_session
-          @attachment.update(visibility_level: "public")
-          temp_file = Tempfile.new("foo")
-          expect(controller).to receive(:media_source_temp_file).with("http://test.host/media_redirect").and_return(temp_file)
-          expect(controller).to receive(:send_file).with(temp_file, filename: @attachment.filename, type: @attachment.content_type, stream: true).and_call_original
-          get :media_object_redirect, params: { id: @media_object.id }
-        end
-
-        it "does not return locked public files" do
-          remove_user_session
-          @attachment.update(locked: true, visibility_level: "public")
-          get :media_object_redirect, params: { id: @media_object.id }
-          assert_status(302)
+        context "users without access" do
+          it "does not return locked public files" do
+            remove_user_session
+            @attachment.update(locked: true, visibility_level: "public")
+            get :media_object_redirect, params: { attachment_id: @media_object.attachment_id }
+            assert_status(302)
+            expect(response.location).not_to eq "http://s3link.example.com/"
+          end
         end
       end
 
-      it "returns the file by bitrate" do
-        temp_file = Tempfile.new("foo")
-        expect(controller).to receive(:media_source_temp_file).with("http://test.host/media_redirect_2").and_return(temp_file)
-        expect(controller).to receive(:send_file).with(temp_file, filename: @attachment.filename, type: @attachment.content_type, stream: true).and_call_original
-        get :media_object_redirect, params: { id: @media_object.id, bitrate: 2 }
+      it "returns the redirected URL by bitrate" do
+        stub_request(:head, "http://test.host/media_2").to_return(status: 302, headers: { location: "http://s3link.example.com/" })
+        stub_request(:get, "http://test.host/media_2").to_return(status: 302, headers: { location: "http://s3link.example.com/" })
+        stub_request(:get, "http://s3link.example.com/").to_return(status: 200)
+        get :media_object_redirect, params: { attachment_id: @media_object.attachment_id, bitrate: 2 }
+        assert_status(302)
+        expect(response.location).to eq "http://s3link.example.com/"
       end
 
-      it "returns the first file if the bitrate is invalid" do
-        temp_file = Tempfile.new("foo")
-        expect(controller).to receive(:media_source_temp_file).with("http://test.host/media_redirect").and_return(temp_file)
-        expect(controller).to receive(:send_file).with(temp_file, filename: @attachment.filename, type: @attachment.content_type, stream: true).and_call_original
-        get :media_object_redirect, params: { id: @media_object.id, bitrate: "not real" }
+      it "returns the lowest bitrate file redirected URL if the bitrate is invalid" do
+        stub_request(:get, "http://test.host/media").to_return(status: 302, headers: { location: "http://s3link.example.com/" })
+        stub_request(:get, "http://s3link.example.com/").to_return(status: 200)
+        get :media_object_redirect, params: { attachment_id: @media_object.attachment_id, bitrate: "not real" }
+        assert_status(302)
+        expect(response.location).to eq "http://s3link.example.com/"
       end
 
-      it "renders an error if there was a problem fetching the file" do
-        allow(controller).to receive(:media_source_temp_file).and_raise(CanvasHttp::InvalidResponseCodeError.new(400, "error fetching url"))
-        get :media_object_redirect, params: { id: @media_object.id }
+      it "renders an error if there was a problem fetching the file redirect URL" do
+        stub_request(:get, "http://test.host/media").to_return(status: 400)
+        get :media_object_redirect, params: { attachment_id: @media_object.attachment_id }
         assert_status(400)
+      end
+
+      context "with media_links_use_attachment_id feature flag disabled" do
+        before do
+          Account.site_admin.disable_feature!(:media_links_use_attachment_id)
+        end
+
+        it "returns the redirected URL" do
+          stub_request(:get, "http://test.host/media").to_return(status: 302, headers: { location: "http://s3link.example.com/" })
+          stub_request(:get, "http://s3link.example.com/").to_return(status: 200)
+          get :media_object_redirect, params: { media_object_id: @media_object.media_id }
+          assert_status(302)
+          expect(response.location).to eq "http://s3link.example.com/"
+        end
+
+        it "returns the URL if the response is not a redirect" do
+          stub_request(:get, "http://test.host/media").to_return(status: 200)
+          get :media_object_redirect, params: { media_object_id: @media_object.media_id }
+          assert_status(302)
+          expect(response.location).to eq "http://test.host/media"
+        end
+
+        context "with public files" do
+          context "users with access" do
+            it "returns the redirected URL if it is a public file and the user does not have access" do
+              user_session(user_factory)
+              @attachment.update(visibility_level: "public")
+              stub_request(:get, "http://test.host/media").to_return(status: 302, headers: { location: "http://s3link.example.com/" })
+              stub_request(:get, "http://s3link.example.com/").to_return(status: 200)
+              get :media_object_redirect, params: { media_object_id: @media_object.media_id }
+              assert_status(302)
+              expect(response.location).to eq "http://s3link.example.com/"
+            end
+
+            it "returns the redirected URL if it is a public file and there is no user session" do
+              remove_user_session
+              @attachment.update(visibility_level: "public")
+              stub_request(:get, "http://test.host/media").to_return(status: 302, headers: { location: "http://s3link.example.com/" })
+              stub_request(:get, "http://s3link.example.com/").to_return(status: 200)
+              get :media_object_redirect, params: { media_object_id: @media_object.media_id }
+              assert_status(302)
+              expect(response.location).to eq "http://s3link.example.com/"
+            end
+          end
+        end
+
+        it "returns the redirected URL by bitrate" do
+          stub_request(:head, "http://test.host/media_2").to_return(status: 302, headers: { location: "http://s3link.example.com/" })
+          stub_request(:get, "http://test.host/media_2").to_return(status: 302, headers: { location: "http://s3link.example.com/" })
+          stub_request(:get, "http://s3link.example.com/").to_return(status: 200)
+          get :media_object_redirect, params: { media_object_id: @media_object.media_id, bitrate: 2 }
+          assert_status(302)
+          expect(response.location).to eq "http://s3link.example.com/"
+        end
+
+        it "returns the lowest bitrate file redirected URL if the bitrate is invalid" do
+          stub_request(:get, "http://test.host/media").to_return(status: 302, headers: { location: "http://s3link.example.com/" })
+          stub_request(:get, "http://s3link.example.com/").to_return(status: 200)
+          get :media_object_redirect, params: { media_object_id: @media_object.media_id, bitrate: "not real" }
+          assert_status(302)
+          expect(response.location).to eq "http://s3link.example.com/"
+        end
+
+        it "renders an error if there was a problem fetching the file redirect URL" do
+          stub_request(:get, "http://test.host/media").to_return(status: 400)
+          get :media_object_redirect, params: { media_object_id: @media_object.media_id }
+          assert_status(400)
+        end
       end
     end
   end

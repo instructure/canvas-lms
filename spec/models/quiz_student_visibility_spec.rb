@@ -96,6 +96,13 @@ describe "differentiated_assignments" do
     end
   end
 
+  def give_course_due_date(quiz)
+    create_override_for_quiz(quiz) do |ao|
+      ao.set = @course
+      ao.due_at = 3.weeks.from_now
+    end
+  end
+
   def ensure_user_does_not_see_quiz
     visible_quiz_ids = Quizzes::QuizStudentVisibility.where(user_id: @user.id, course_id: @course.id).pluck(:quiz_id)
     expect(visible_quiz_ids.map(&:to_i).include?(@quiz.id)).to be_falsey
@@ -259,6 +266,52 @@ describe "differentiated_assignments" do
         it "shows the quiz to the user" do
           ensure_user_sees_quiz
         end
+      end
+    end
+
+    context "course overrides" do
+      before do
+        Account.site_admin.enable_feature!(:differentiated_modules)
+        Setting.set("differentiated_modules_setting", Account.site_admin.feature_enabled?(:differentiated_modules) ? "true" : "false")
+        Quizzes::QuizStudentVisibility.reset_table_name
+        quiz_with_true_only_visible_to_overrides
+        give_course_due_date(@quiz)
+      end
+
+      it "shows the quiz to users in the course" do
+        ensure_user_sees_quiz
+      end
+
+      it "does not show unpublished quizzes" do
+        @quiz.workflow_state = "unpublished"
+        @quiz.save!
+        ensure_user_does_not_see_quiz
+      end
+
+      it "updates when enrollments are destroyed" do
+        ensure_user_sees_quiz
+        enrollments = StudentEnrollment.where(user_id: @user.id, course_id: @course.id)
+        enrollments.destroy_all
+        ensure_user_does_not_see_quiz
+      end
+
+      it "updates when enrollments are inactive" do
+        ensure_user_sees_quiz
+        @user.enrollments.where(course_id: @course.id).first.deactivate
+        ensure_user_does_not_see_quiz
+      end
+
+      it "updates when the override is deleted" do
+        ensure_user_sees_quiz
+        @quiz.assignment_overrides.each(&:destroy!)
+        ensure_user_does_not_see_quiz
+      end
+
+      it "does not show the quiz to users in the course with flag off" do
+        Account.site_admin.disable_feature!(:differentiated_modules)
+        Setting.set("differentiated_modules_setting", Account.site_admin.feature_enabled?(:differentiated_modules) ? "true" : "false")
+        Quizzes::QuizStudentVisibility.reset_table_name
+        ensure_user_does_not_see_quiz
       end
     end
 

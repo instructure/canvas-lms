@@ -16,7 +16,7 @@ GEM
       minitest (>= 5.1)
       tzinfo (~> 2.0)
     aes_key_wrap (1.1.0)
-    base64 (0.1.1)
+    base64 (0.2.0)
     bindata (2.4.15)
     concurrent-ruby (1.2.2)
     diff-lcs (1.5.0)

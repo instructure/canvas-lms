@@ -21,12 +21,16 @@
 module Api::V1::AssignmentOverride
   include Api::V1::Json
 
-  def assignment_override_json(override, visible_users = nil, student_names: nil)
+  def assignment_override_json(override, visible_users = nil, student_names: nil, module_names: nil)
+    # gave notice in API docs that effective 03/01/2024, the assignment_id field will only be included
+    # if the override targets an assignment
     fields = %i[id assignment_id title]
+    %i[quiz_id context_module_id].each { |f| fields << f if override.send(f).present? }
     fields.push(:due_at, :all_day, :all_day_date) if override.due_at_overridden
     fields << :unlock_at if override.unlock_at_overridden
     fields << :lock_at if override.lock_at_overridden
     api_json(override, @current_user, session, only: fields).tap do |json|
+      json[:context_module_name] = module_names[override.context_module_id] if module_names && override.context_module_id
       case override.set_type
       when "ADHOC"
         student_ids = if override.preloaded_student_ids
@@ -50,17 +54,19 @@ module Api::V1::AssignmentOverride
     end
   end
 
-  def assignment_overrides_json(overrides, user = nil, include_student_names: false)
+  def assignment_overrides_json(overrides, user = nil, include_names: false)
     visible_users_ids = ::AssignmentOverride.visible_enrollments_for(overrides.compact, user).select(:user_id)
     # we most likely already have the student_ids preloaded here because of overridden_for, but just in case
     if overrides.any? { |ov| ov.present? && ov.set_type == "ADHOC" && !ov.preloaded_student_ids }
       AssignmentOverrideApplicator.preload_student_ids_for_adhoc_overrides(overrides.select { |ov| ov.set_type == "ADHOC" }, visible_users_ids)
     end
-    if include_student_names
+    if include_names
       student_ids = overrides.select { |ov| ov.present? && ov.set_type == "ADHOC" }.map(&:preloaded_student_ids).flatten.uniq
       student_names = User.where(id: student_ids).pluck(:id, :name).to_h
+      module_ids = overrides.select { |ov| ov.present? && ov.context_module_id.present? }.map(&:context_module_id).uniq
+      module_names = ContextModule.where(id: module_ids).pluck(:id, :name).to_h
     end
-    overrides.map { |override| assignment_override_json(override, visible_users_ids, student_names:) if override }
+    overrides.map { |override| assignment_override_json(override, visible_users_ids, student_names:, module_names:) if override }
   end
 
   def assignment_override_collection(assignment, include_students = false)

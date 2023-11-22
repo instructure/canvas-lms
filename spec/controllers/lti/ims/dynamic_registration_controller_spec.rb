@@ -121,6 +121,16 @@ describe Lti::IMS::DynamicRegistrationController do
           "messages" => [{
             "type" => "LtiResourceLinkRequest",
             "label" => "deep link label",
+            "placements" => ["course_navigation"],
+            "target_link_uri" => "https://example.com/launch",
+            "custom_parameters" => {
+              "foo" => "bar"
+            },
+            "roles" => [
+              "http://purl.imsglobal.org/vocab/lis/v2/membership#ContentDeveloper",
+              "http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor"
+            ],
+            "icon_uri" => "https://example.com/icon.jpg"
           }],
           "claims" => ["iss", "sub"],
           "target_link_uri" => "https://example.com/launch",
@@ -167,6 +177,7 @@ describe Lti::IMS::DynamicRegistrationController do
           expect(dk.redirect_uris).to eq(registration_params["redirect_uris"])
           expect(dk.public_jwk_url).to eq(registration_params["jwks_uri"])
           expect(dk.is_lti_key).to be(true)
+          expect(dk.oidc_initiation_url).to eq(registration_params["initiate_login_uri"])
         end
       end
 

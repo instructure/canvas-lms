@@ -115,7 +115,7 @@ export const AddressBook = ({
     ...menuData.contextData,
     ...menuData.userData,
   ])
-  const ariaAddressBookLabel = I18n.t('Address Book')
+  const ariaAddressBookLabel = I18n.t('Search')
   const [menuItemCurrent, setMenuItemCurrent] = useState(null)
   const [isSubMenuSelection, setIsSubMenuSelection] = useState(true)
   const {setOnSuccess} = useContext(AlertManagerContext)
@@ -315,7 +315,7 @@ export const AddressBook = ({
           isSelected={isSelected}
           hasPopup={hasPopup}
           id={`address-book-menu-item-${menuId}-${itemType}`}
-          onSelect={(e) => {
+          onSelect={e => {
             e.persist()
             selectHandler(menuItem, e, isContext, isBackButton, isSubmenu)
           }}
@@ -487,6 +487,7 @@ export const AddressBook = ({
         isMenuOpen && setIsMenuOpen(false)
         break
       case 13: // Enter
+        if (!isMenuOpen) return
         selectHandler(selectedItem, undefined, undefined, undefined)
         break
       default:
@@ -541,7 +542,7 @@ export const AddressBook = ({
 
     setSelectedMenuItems([...newSelectedMenuItems])
     onSelectedIdsChange([...newSelectedMenuItems])
-    if(shouldCloseMenu){
+    if (shouldCloseMenu) {
       setIsMenuOpen(false)
     }
   }
@@ -584,9 +585,7 @@ export const AddressBook = ({
               renderTrigger={
                 <TextInput
                   placeholder={selectedMenuItems.length === 0 ? searchPlaceholder : null}
-                  renderLabel={
-                    <ScreenReaderContent>{I18n.t('Address Book Input')}</ScreenReaderContent>
-                  }
+                  renderLabel={<ScreenReaderContent>{I18n.t('Search Input')}</ScreenReaderContent>}
                   renderBeforeInput={
                     selectedMenuItems.length === 0 ? (
                       <IconSearchLine inline={false} />
@@ -594,11 +593,6 @@ export const AddressBook = ({
                       renderedSelectedTags
                     )
                   }
-                  onFocus={() => {
-                    if (!isLimitReached) {
-                      setIsMenuOpen(true)
-                    }
-                  }}
                   onBlur={() => {
                     if (focusType === KEYBOARD_FOCUS_TYPE) {
                       setIsMenuOpen(false)
@@ -641,7 +635,7 @@ export const AddressBook = ({
                 >
                   <ul
                     role="menu"
-                    aria-label={I18n.t('Address Book Menu')}
+                    aria-label={I18n.t('Search Menu')}
                     id={popoverInstanceId.current}
                     style={{
                       paddingInlineStart: '0px',
@@ -662,7 +656,7 @@ export const AddressBook = ({
           <Flex.Item>
             <IconButton
               data-testid="address-button"
-              screenReaderLabel={I18n.t('Open Address Book')}
+              screenReaderLabel={I18n.t('Open Search Menu')}
               onClick={() => {
                 if (isMenuOpen) {
                   setIsMenuOpen(false)

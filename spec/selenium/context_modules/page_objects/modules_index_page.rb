@@ -29,8 +29,16 @@ module ModulesIndexPage
     ".module-item-assign-to-link"
   end
 
+  def module_create_button_selector
+    "//button[.//*[contains(text(), 'Create a new Module')]]"
+  end
+
   def module_item_selector(module_item_id)
     "#context_module_item_#{module_item_id}"
+  end
+
+  def new_module_link_selector
+    ".add_module_link"
   end
 
   def pill_message_selector(module_id)
@@ -62,6 +70,10 @@ module ModulesIndexPage
     fj("[role=menuitem]:contains('#{tool_text}')")
   end
 
+  def module_create_button
+    fxpath(module_create_button_selector)
+  end
+
   def module_item(module_item_id)
     f(module_item_selector(module_item_id))
   end
@@ -76,6 +88,10 @@ module ModulesIndexPage
 
   def module_index_settings_menu
     f(".module_index_tools ul[role=menu]")
+  end
+
+  def new_module_link
+    f(new_module_link_selector)
   end
 
   def pill_message(module_id)
@@ -135,6 +151,14 @@ module ModulesIndexPage
 
   def click_manage_module_item_assign_to
     manage_module_item_assign_to.click
+  end
+
+  def click_module_create_button
+    module_create_button.click
+  end
+
+  def click_new_module_link
+    new_module_link.click
   end
 
   def retrieve_assignment_content_tag(content_module, assignment)

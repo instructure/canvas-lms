@@ -513,7 +513,7 @@ CanvasRails::Application.routes.draw do
   resources :page_views, only: :update
   post "media_objects" => "media_objects#create_media_object", :as => :create_media_object
   get "media_objects/:id" => "media_objects#media_object_inline", :as => :media_object
-  get "media_objects/:id/redirect" => "media_objects#media_object_redirect", :as => :media_object_redirect
+  get "media_objects/:media_object_id/redirect" => "media_objects#media_object_redirect", :as => :media_object_redirect
   get "media_objects/:media_object_id/thumbnail" => "media_objects#media_object_thumbnail", :as => :media_object_thumbnail
   get "media_objects/:media_object_id/info" => "media_objects#show", :as => :media_object_info
   get "media_objects_iframe/:media_object_id" => "media_objects#iframe_media_player", :as => :media_object_iframe
@@ -526,6 +526,7 @@ CanvasRails::Application.routes.draw do
   get "media_attachments/:attachment_id/thumbnail" => "media_objects#media_object_thumbnail", :as => :media_attachment_thumbnail
   get "media_attachments/:attachment_id/info" => "media_objects#show", :as => :media_attachment_info
   get "media_attachments_iframe/:attachment_id" => "media_objects#iframe_media_player", :as => :media_attachment_iframe
+  get "media_attachments/:attachment_id/redirect" => "media_objects#media_object_redirect", :as => :media_attachment_redirect
   get "media_attachments/:attachment_id/media_tracks/:id" => "media_tracks#show", :as => :show_media_attachment_tracks
   post "media_attachments/:attachment_id/media_tracks" => "media_tracks#create", :as => :create_media_attachment_tracks
   delete "media_attachments/:attachment_id/media_tracks/:id" => "media_tracks#destroy", :as => :delete_media_attachment_tracks
@@ -910,6 +911,11 @@ CanvasRails::Application.routes.draw do
     end
   end
 
+  resources :users, only: [:passport] do
+    get "passport" => "learner_passport#index"
+    get "passport/*path" => "learner_passport#index"
+  end
+
   get "show_message_template" => "messages#show_message_template"
   get "message_templates" => "messages#templates"
   resource :profile, controller: :profile, only: [:show, :update] do
@@ -1045,8 +1051,9 @@ CanvasRails::Application.routes.draw do
   get "privacy_policy" => "legal_information#privacy_policy", :as => "privacy_policy_redirect"
 
   scope(controller: :smart_search) do
-    get "search", action: :show
-    get "smartsearch", action: :index, as: "smart_search_query"
+    get "courses/:course_id/search", action: :show, as: :course_search
+    # TODO: Add back global search once we have a good way to handle it
+    # get "search", action: :show
   end
 
   ### API routes ###
@@ -1189,6 +1196,14 @@ CanvasRails::Application.routes.draw do
       delete "courses/:course_id/enrollments/:id", action: :destroy, as: "destroy_enrollment"
     end
 
+    scope(controller: :temporary_enrollment_pairings_api) do
+      get "accounts/:account_id/temporary_enrollment_pairings", action: :index
+      get "accounts/:account_id/temporary_enrollment_pairings/:id", action: :show
+      get "accounts/:account_id/temporary_enrollment_pairings/new", action: :new
+      post "accounts/:account_id/temporary_enrollment_pairings", action: :create
+      delete "accounts/:account_id/temporary_enrollment_pairings/:id", action: :destroy
+    end
+
     scope(controller: :terms_api) do
       get "accounts/:account_id/terms", action: :index, as: "enrollment_terms"
       get "accounts/:account_id/terms/:id", action: :show, as: "enrollment_term"
@@ -1264,8 +1279,6 @@ CanvasRails::Application.routes.draw do
       put "courses/:course_id/assignments/:id", action: :update
       post "courses/:course_id/assignments/:assignment_id/duplicate", action: :duplicate
       delete "courses/:course_id/assignments/:id", action: :destroy, controller: :assignments
-      get "courses/:course_id/assignments/:assignment_id/date_details", action: :date_details, as: "course_assignment_date_details"
-      get "courses/:course_id/quizzes/:quiz_id/date_details", action: :date_details, as: "course_quiz_date_details"
     end
 
     scope(controller: "assignment_extensions") do
@@ -1586,6 +1599,12 @@ CanvasRails::Application.routes.draw do
         delete "users/:user_id/observees/:observee_id", action: :destroy
       end
 
+      scope(controller: :learning_object_dates) do
+        get "courses/:course_id/assignments/:assignment_id/date_details", action: :show, as: "course_assignment_date_details"
+        get "courses/:course_id/quizzes/:quiz_id/date_details", action: :show, as: "course_quizzes_quiz_date_details"
+        get "courses/:course_id/modules/:context_module_id/date_details", action: :show, as: "course_context_module_date_details"
+      end
+
       scope(controller: :login) do
         get "login/session_token", action: :session_token, as: :login_session_token
       end
@@ -1671,6 +1690,7 @@ CanvasRails::Application.routes.draw do
       post "accounts/:account_id/admins", action: :create
       delete "accounts/:account_id/admins/:user_id", action: :destroy
       get "accounts/:account_id/admins", action: :index, as: "account_admins"
+      get "accounts/:account_id/admins/self", action: :self_roles, as: "account_self_roles"
     end
 
     scope(controller: :authentication_providers) do
@@ -2545,6 +2565,11 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: "course_pacing/pace_contexts_api") do
       get "courses/:course_id/pace_contexts", action: :index, as: :pace_contexts
+    end
+
+    scope(controller: "smart_search") do
+      get "courses/:course_id/smartsearch", action: :search, as: :course_smart_search_query
+      # TODO: add account level search
     end
   end
 

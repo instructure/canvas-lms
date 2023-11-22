@@ -98,6 +98,16 @@ module ContextModulesCommon
     wait_for_ajaximations
   end
 
+  def ignore_relock
+    expect(element_exists?("#relock_modules_dialog")).to be_truthy
+    fj(".ui-dialog:visible .ui-button:nth-child(2)").click
+  end
+
+  def relock_modules
+    expect(element_exists?("#relock_modules_dialog")).to be_truthy
+    fj(".ui-dialog:visible .ui-button:first-child").click
+  end
+
   def create_context_module(module_name)
     @course.context_modules.create!(name: module_name, require_sequential_progress: true)
   end
@@ -177,7 +187,11 @@ module ContextModulesCommon
   end
 
   def manually_add_module_item(item_select_selector, module_name, item_name)
-    add_module(module_name + "Module")
+    if Account.site_admin.feature_enabled?(:differentiated_modules)
+      add_module_with_tray(module_name + "Module")
+    else
+      add_module(module_name + "Module")
+    end
     f(".ig-header-admin .al-trigger").click
     wait_for_ajaximations
     f(".add_module_item_link").click
@@ -269,6 +283,12 @@ module ContextModulesCommon
     wait_for_ajaximations
     expect(add_form).not_to be_displayed
     expect(f("#context_modules")).to include_text(module_name)
+  end
+
+  def add_module_with_tray(module_name = "Test Module")
+    click_new_module_link
+    update_module_name(module_name)
+    click_add_tray_add_module_button
   end
 
   def add_new_module_item_and_yield(item_select_selector, module_name, new_item_text, item_title_text)

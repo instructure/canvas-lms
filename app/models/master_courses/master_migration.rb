@@ -243,7 +243,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
     return false unless obj
     return true if last_export_at.nil? || ignore_updated_at
 
-    if obj.is_a?(LearningOutcome) && obj.context_type == "Account"
+    if obj.is_a?(LearningOutcome)
       link = master_template.course.learning_outcome_links.where(content: obj).first
       obj = link if link # export the outcome if it's a new link
     end

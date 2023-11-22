@@ -233,7 +233,7 @@ class LearningOutcome < ActiveRecord::Base
       create_missing_outcome_link(context)
       if MasterCourses::MasterTemplate.is_master_course?(context)
         # mark for re-sync
-        context.learning_outcome_links.where(content: self).touch_all if context_type == "Account"
+        context.learning_outcome_links.where(content: self).touch_all
         touch
       end
     end

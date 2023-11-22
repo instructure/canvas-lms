@@ -1682,7 +1682,7 @@ describe CalendarEventsApiController, type: :request do
         it "fails if RRULE's UNTIL date creates too many events" do
           start_at = Time.zone.now.utc.change(hour: 0, min: 1)
           end_at = Time.zone.now.utc.change(hour: 23)
-          series_end = start_at + 1.year
+          series_end = start_at + 2.years
           api_call(
             :post,
             "/api/v1/calendar_events",

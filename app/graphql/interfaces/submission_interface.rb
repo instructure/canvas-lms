@@ -114,6 +114,14 @@ module Interfaces::SubmissionInterface
     load_association(:assignment)
   end
 
+  field :graded_anonymously, Boolean, null: true
+
+  field :hide_grade_from_student,
+        Boolean,
+        "hide unpublished grades",
+        method: :hide_grade_from_student?,
+        null: true
+
   field :feedback_for_current_attempt, Boolean, null: false
   def feedback_for_current_attempt
     submission.feedback_for_current_attempt?

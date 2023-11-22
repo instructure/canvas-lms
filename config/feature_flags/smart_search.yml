@@ -4,4 +4,4 @@ smart_search:
   applies_to: RootAccount
   display_name: Smart Search
   description: AI driven smart search feature.
-
+  after_state_change_proc: smart_search_after_state_change_hook

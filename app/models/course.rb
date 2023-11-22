@@ -454,7 +454,8 @@ class Course < ActiveRecord::Base
       state_settings = [:restrict_student_future_view, :restrict_student_past_view]
       changed_keys = saved_change_to_account_id? ? state_settings : (@changed_settings & state_settings)
       if changed_keys.any?
-        EnrollmentState.delay_if_production.invalidate_access_for_course(self, changed_keys)
+        EnrollmentState.delay_if_production(n_strand: ["invalidate_access_for_course", global_root_account_id])
+                       .invalidate_access_for_course(self, changed_keys)
       end
     end
 
@@ -3176,6 +3177,7 @@ class Course < ActiveRecord::Base
   TAB_RUBRICS = 18
   TAB_SCHEDULE = 19
   TAB_COURSE_PACES = 20
+  TAB_SEARCH = 21
 
   CANVAS_K6_TAB_IDS = [TAB_HOME, TAB_ANNOUNCEMENTS, TAB_GRADES, TAB_MODULES].freeze
   COURSE_SUBJECT_TAB_IDS = [TAB_HOME, TAB_SCHEDULE, TAB_MODULES, TAB_GRADES, TAB_GROUPS].freeze
@@ -3361,6 +3363,16 @@ class Course < ActiveRecord::Base
                    else
                      Course.default_tabs
                    end
+
+    if OpenAi.smart_search_available?(root_account)
+      default_tabs.insert(1,
+                          {
+                            id: TAB_SEARCH,
+                            label: t("#tabs.search", "Search"),
+                            css_class: "search",
+                            href: :course_search_path
+                          })
+    end
 
     if account.feature_enabled?(:course_paces) && enable_course_paces && grants_any_right?(user, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
       default_tabs.insert(default_tabs.index { |t| t[:id] == TAB_MODULES } + 1, {

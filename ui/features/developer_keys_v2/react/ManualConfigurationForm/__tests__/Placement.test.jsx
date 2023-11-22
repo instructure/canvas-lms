@@ -50,8 +50,8 @@ const checkToolConfigPart = (toolConfig, path, value) => {
   expect(get(toolConfig, path)).toEqual(value)
 }
 
-const checkChange = (path, funcName, value, event = null) => {
-  const wrapper = mount(<Placement {...props()} />)
+const checkChange = (path, funcName, value, placementOverrides, event = null) => {
+  const wrapper = mount(<Placement {...props({},{...placementOverrides})} />)
 
   event = event || {target: {value}}
   event = Array.isArray(event) ? event : [event]
@@ -73,15 +73,23 @@ it('changes the output when text changes', () => {
 })
 
 it('changes the output when selection_height changes', () => {
-  checkChange(['selection_height'], 'handleSelectionHeightChange', 250)
+  checkChange(['selection_height'], 'handleHeightChange', 250, {}, {target: {value: 250, name: 'placement_name_selection_height'}})
 })
 
 it('changes the output when selection_width changes', () => {
-  checkChange(['selection_width'], 'handleSelectionWidthChange', 250)
+  checkChange(['selection_width'], 'handleWidthChange', 250, {}, {target: {value: 250, name: 'placement_name_selection_width'}})
+})
+
+it('changes the output when launch_height changes', () => {
+  checkChange(['launch_height'], 'handleHeightChange', 250, {launch_height: 10, launch_width: 10}, {target: {value: 250, name: 'placement_name_launch_height'}})
+})
+
+it('changes the output when launch_width changes', () => {
+  checkChange(['launch_width'], 'handleWidthChange', 250, {launch_height: 10, launch_width: 10}, {target: {value: 250, name: 'placement_name_launch_width'}})
 })
 
 it('changes the output when message_type changes', () => {
-  checkChange(['message_type'], 'handleMessageTypeChange', 'LtiDeepLinkingRequest', [
+  checkChange(['message_type'], 'handleMessageTypeChange', 'LtiDeepLinkingRequest', {}, [
     null,
     'LtiDeepLinkingRequest',
   ])
@@ -96,13 +104,20 @@ it('removes target_link_uri from the placement if it is empty', () => {
 
 it('removes selection_width from the placement if it is empty', () => {
   const wrapper = mount(<Placement {...props()} />)
-  wrapper.instance().handleSelectionWidthChange({target: {value: ''}})
+  wrapper.instance().handleWidthChange({target: {value: '', name: 'placement_name_selection_width'}})
   const placement = wrapper.instance().generateToolConfigurationPart()
   expect(Object.keys(placement)).not.toContain('selection_width')
 })
 
+it('removes launch_width from the placement if it is empty', () => {
+  const wrapper = mount(<Placement {...props()} />)
+  wrapper.instance().handleWidthChange({target: {value: '', name: 'placement_name_launch_width'}})
+  const placement = wrapper.instance().generateToolConfigurationPart()
+  expect(Object.keys(placement)).not.toContain('launch_width')
+})
+
 it('cleans up invalid inputs', () => {
-  const wrapper = mount(<Placement {...props({placementOverrides: {message_type: undefined}})} />)
+  const wrapper = mount(<Placement {...props({}, {message_type: undefined})} />)
   expect(wrapper.instance().valid()).toEqual(true)
 })
 

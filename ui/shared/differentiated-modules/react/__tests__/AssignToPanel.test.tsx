@@ -17,16 +17,19 @@
  */
 
 import React from 'react'
-import {act, render} from '@testing-library/react'
+import {act, render, waitFor} from '@testing-library/react'
 import AssignToPanel, {AssignToPanelProps} from '../AssignToPanel'
 import {ASSIGNMENT_OVERRIDES_DATA, SECTIONS_DATA, STUDENTS_DATA} from './mocks'
+import * as utils from '../../utils/assignToHelper'
 import fetchMock from 'fetch-mock'
 
 describe('AssignToPanel', () => {
   const props: AssignToPanelProps = {
     courseId: '1',
     moduleId: '2',
-    height: '500px',
+    bodyHeight: '400px',
+    footerHeight: '100px',
+    moduleElement: document.createElement('div'),
     onDismiss: () => {},
   }
 
@@ -171,6 +174,15 @@ describe('AssignToPanel', () => {
         ],
       })
       expect(requestBody).toEqual(expectedPayload)
+    })
+
+    it('updates the modules UI', async () => {
+      fetchMock.put(ASSIGNMENT_OVERRIDES_URL, {})
+      jest.spyOn(utils, 'updateModuleUI')
+      const {findByRole} = renderComponent()
+      const updateButton = await findByRole('button', {name: 'Update Module'})
+      updateButton.click()
+      await waitFor(() => expect(utils.updateModuleUI).toHaveBeenCalled())
     })
   })
 })

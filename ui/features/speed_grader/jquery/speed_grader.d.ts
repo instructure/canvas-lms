@@ -58,6 +58,7 @@ export type StudentWithSubmission = Student & {
   id: string
   anonymous_id: string
   anonymous_name_position: number
+  fake_student?: boolean
   provisional_crocodoc_urls: ProvisionalCrocodocUrl[]
   rubric_assessments: RubricAssessment[]
   submission: Submission & {

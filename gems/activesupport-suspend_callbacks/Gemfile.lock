@@ -21,7 +21,7 @@ GEM
     i18n (1.14.1)
       concurrent-ruby (~> 1.0)
     io-console (0.6.0)
-    irb (1.8.1)
+    irb (1.8.3)
       rdoc
       reline (>= 0.3.8)
     minitest (5.20.0)
@@ -51,7 +51,7 @@ GEM
       simplecov_json_formatter (~> 0.1)
     simplecov-html (0.12.3)
     simplecov_json_formatter (0.1.4)
-    stringio (3.0.8)
+    stringio (3.0.9)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
 

@@ -73,13 +73,13 @@ module Lti::IMS
         [
           {
             type: "file",
-            url: "https://filesamples.com/samples/document/txt/sample1.txt",
+            url: "https://getsamplefiles.com/download/txt/sample-1.txt",
             title: "sample1.txt",
             media_type: "text/html" # different than the mime type from extension
           },
           {
             type: "not",
-            url: "https://filesamples.com/samples/document/txt/sample1.txt",
+            url: "https://getsamplefiles.com/download/txt/sample-1.txt",
             title: "notAFile.txt"
           }
         ]

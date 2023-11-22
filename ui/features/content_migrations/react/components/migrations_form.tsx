@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useState, useCallback} from 'react'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
@@ -26,31 +26,63 @@ import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
 import {Alert} from '@instructure/ui-alerts'
 import {completeUpload} from '@canvas/upload-file'
-import {MigratorSpecificForm} from './migrator_specific_form'
-import {GeneralMigrationControls} from './general_migration_controls'
+import CourseCopyImporter from './migrator_forms/course_copy'
+import CanvasCartridgeImporter from './migrator_forms/canvas_cartridge'
+import LegacyMigratorWrapper from './migrator_forms/legacy_migrator_wrapper'
 import {
   AttachmentProgressResponse,
   ContentMigrationItem,
   ContentMigrationResponse,
   Migrator,
-  submitMigrationProps,
+  onSubmitMigrationFormCallback,
 } from './types'
+import CommonCartridgeImporter from './migrator_forms/common_cartridge'
+import MoodleZipImporter from './migrator_forms/moodle_zip'
+import QTIZipImporter from './migrator_forms/qti_zip'
+import CommonMigratorControls from './migrator_forms/common_migrator_controls'
 
 const I18n = useI18nScope('content_migrations_redesign')
 
 type RequestBody = {
   course_id: string
   migration_type: string
-  settings: {
-    import_quizzes_next: boolean
-    source_course_id?: string
-  }
-  selective_import: boolean
   date_shift_options: boolean
+  selective_import: boolean
+  settings: {[key: string]: any}
   pre_attachment?: {
     name: string
     no_redirect: boolean
     size: number
+  }
+}
+
+type MigratorProps = {
+  value: string
+  onSubmit: onSubmitMigrationFormCallback
+  onCancel: () => void
+}
+
+const renderMigrator = (props: MigratorProps) => {
+  switch (props.value) {
+    case 'zip_file_importer':
+      // TODO: Replace this with the zip importer component
+      return <CommonMigratorControls {...props} />
+    case 'course_copy_importer':
+      return <CourseCopyImporter {...props} />
+    case 'moodle_converter':
+      return <MoodleZipImporter {...props} />
+    case 'canvas_cartridge_importer':
+      return <CanvasCartridgeImporter {...props} />
+    case 'common_cartridge_importer':
+      return <CommonCartridgeImporter {...props} />
+    case 'qti_converter':
+      return <QTIZipImporter {...props} />
+    case 'angel_exporter':
+    case 'blackboard_exporter':
+    case 'd2l_exporter':
+      return <LegacyMigratorWrapper {...props} />
+    default:
+      return null
   }
 }
 
@@ -62,84 +94,57 @@ export const ContentMigrationsForm = ({
   setMigrations: (migrations: ContentMigrationItem[]) => void
 }) => {
   const [migrators, setMigrators] = useState<any>([])
-  const [chosenMigrator, setChosenMigrator] = useState<string>('empty')
-  const [sourceCourse, setSourceCourse] = useState<string>('')
-  const [preAttachmentFile, setPreAttachmentFile] = useState<File | null>(null)
+  const [chosenMigrator, setChosenMigrator] = useState<string | null>(null)
+
+  const handleFileProgress = (_: AttachmentProgressResponse) => {}
+  // console.log(`${(response.loaded / response.total) * 100}%`)
+
+  const onResetForm = useCallback(() => setChosenMigrator(null), [])
+
+  const onSubmitForm: onSubmitMigrationFormCallback = useCallback(
+    async (formData, preAttachmentFile) => {
+      const courseId = window.ENV.COURSE_ID
+      if (!chosenMigrator || !courseId) {
+        return
+      }
+      const requestBody: RequestBody = {
+        course_id: courseId,
+        migration_type: chosenMigrator,
+        ...formData,
+      }
+
+      const {json} = (await doFetchApi({
+        method: 'POST',
+        path: `/api/v1/courses/${courseId}/content_migrations`,
+        body: requestBody,
+      })) as {json: ContentMigrationResponse} // TODO: remove type assertion once doFetchApi is typed
+      if (preAttachmentFile && json.pre_attachment) {
+        completeUpload(json.pre_attachment, preAttachmentFile, {
+          ignoreResult: true,
+          onProgress: handleFileProgress,
+        })
+      }
+      setMigrations([json as ContentMigrationItem].concat(migrations))
+      onResetForm()
+    },
+    [chosenMigrator, migrations, setMigrations, onResetForm]
+  )
 
   useEffect(() => {
     doFetchApi({
       path: `/api/v1/courses/${window.ENV.COURSE_ID}/content_migrations/migrators`,
     })
-      .then((response: {json: Migrator[]}) =>
+      .then((response: {json: Migrator[]}) => {
+        // TODO: webct_scraper is not supported anymore, this should be removed from backend too.
+        const filteredMigrators = response.json.filter((m: Migrator) => m.type !== 'webct_scraper')
         setMigrators(
-          response.json.sort((a: Migrator, _b: Migrator) => {
-            if (a.type === 'course_copy_importer' || a.type === 'canvas_cartridge_importer') {
-              return -1
-            }
-            return 0
-          })
+          filteredMigrators.sort((a: Migrator, _: Migrator) =>
+            a.type === 'course_copy_importer' || a.type === 'canvas_cartridge_importer' ? -1 : 0
+          )
         )
-      )
+      })
       .catch(showFlashError(I18n.t("Couldn't load migrators")))
   }, [])
-
-  const handleFileProgress = (_: AttachmentProgressResponse) => {}
-  // console.log(`${(response.loaded / response.total) * 100}%`)
-
-  const handleMigratorChange = (migrator_type: string) => {
-    setChosenMigrator(migrator_type)
-  }
-
-  const resetForm = () => {
-    setChosenMigrator('empty')
-    setSourceCourse('')
-    setPreAttachmentFile(null)
-  }
-
-  const submitMigration = async ({
-    selectiveImport,
-    importAsNewQuizzes,
-    adjustDates,
-  }: submitMigrationProps) => {
-    const courseId = window.ENV.COURSE_ID
-    if (!courseId) {
-      return
-    }
-    const requestBody: RequestBody = {
-      course_id: courseId,
-      migration_type: chosenMigrator,
-      settings: {
-        import_quizzes_next: importAsNewQuizzes,
-      },
-      selective_import: selectiveImport,
-      date_shift_options: adjustDates,
-    }
-    if (chosenMigrator === 'course_copy_importer') {
-      requestBody.settings.source_course_id = sourceCourse
-    } else if (chosenMigrator === 'canvas_cartridge_importer' && preAttachmentFile) {
-      const {size, name} = preAttachmentFile
-      requestBody.pre_attachment = {
-        size,
-        name,
-        no_redirect: true,
-      }
-    }
-
-    const {json} = (await doFetchApi({
-      method: 'POST',
-      headers: {'Content-Type': 'application/json; charset=utf-8'},
-      path: `/api/v1/courses/${courseId}/content_migrations`,
-      body: requestBody,
-    })) as {json: ContentMigrationResponse} // TODO: remove type assertion once doFetchApi is typed
-    if (preAttachmentFile && json.pre_attachment) {
-      completeUpload(json.pre_attachment, preAttachmentFile, {
-        ignoreResult: true,
-        onProgress: handleFileProgress,
-      })
-    }
-    setMigrations([json as ContentMigrationItem].concat(migrations))
-    resetForm()
-  }
 
   return (
     <View as="div" margin="small none xx-large none">
@@ -160,10 +165,11 @@ export const ContentMigrationsForm = ({
       <View as="div" margin="medium 0" maxWidth="22.5rem">
         {migrators.length > 0 ? (
           <SimpleSelect
+            value={chosenMigrator || 'empty'}
             renderLabel={I18n.t('Select Content Type')}
-            onChange={(_e: any, {value}: any) => {
-              handleMigratorChange(value)
-            }}
+            onChange={(_e: any, {value}: any) =>
+              setChosenMigrator(value !== 'empty' ? value : null)
+            }
           >
             <SimpleSelect.Option key="empty-option" id="empty" value="empty">
               {I18n.t('Select one')}
@@ -178,14 +184,17 @@ export const ContentMigrationsForm = ({
           I18n.t('Loading options...')
         )}
       </View>
-      <MigratorSpecificForm
-        migrator={chosenMigrator}
-        setSourceCourse={setSourceCourse}
-        onSelectPreAttachmentFile={setPreAttachmentFile}
-      />
-      {chosenMigrator !== 'empty' ? (
-        <GeneralMigrationControls submitMigration={submitMigration} />
-      ) : null}
+
+      {chosenMigrator && (
+        <>
+          {renderMigrator({
+            value: chosenMigrator,
+            onSubmit: onSubmitForm,
+            onCancel: onResetForm,
+          })}
+          <hr role="presentation" aria-hidden="true" />
+        </>
+      )}
     </View>
   )
 }

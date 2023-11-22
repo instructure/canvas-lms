@@ -27,7 +27,7 @@ module CanvasCache
 
       def build_redis(**redis_options)
         Redis.patch
-        return Redis::Cluster.new(**redis_options) if redis_options.key?(:nodes)
+        return ::Redis::Cluster.new(**redis_options) if redis_options.key?(:nodes)
 
         super
       end

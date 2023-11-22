@@ -23,7 +23,8 @@ require_relative "../graphql_spec_helper"
 RSpec.describe Mutations::UpdateDiscussionTopic do
   before(:once) do
     course_with_teacher(active_all: true)
-    discussion_topic_model({ context: @course })
+    @attachment = attachment_with_context(@teacher)
+    discussion_topic_model({ context: @course, attachment: @attachment })
   end
 
   def mutation_str(
@@ -35,7 +36,9 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     require_initial_post: nil,
     specific_sections: nil,
     delayed_post_at: nil,
-    lock_at: nil
+    lock_at: nil,
+    file_id: nil,
+    remove_attachment: nil
   )
     <<~GQL
       mutation {
@@ -49,6 +52,8 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
           #{"specificSections: \"#{specific_sections}\"" unless specific_sections.nil?}
           #{"delayedPostAt: \"#{delayed_post_at}\"" unless delayed_post_at.nil?}
           #{"lockAt: \"#{lock_at}\"" unless lock_at.nil?}
+          #{"removeAttachment: #{remove_attachment}" unless remove_attachment.nil?}
+          #{"fileId: #{file_id}" unless file_id.nil?}
         }) {
           discussionTopic {
             published
@@ -94,6 +99,25 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     expect(@topic.is_section_specific).to be false
     expect(@topic.delayed_post_at).to eq delayed_post_at
     expect(@topic.lock_at).to eq lock_at
+  end
+
+  context "attachments" do
+    it "removes a discussion topic attachment" do
+      expect(@topic.attachment).to eq(@attachment)
+      result = run_mutation({ id: @topic.id, remove_attachment: true })
+
+      expect(result["errors"]).to be_nil
+      expect(@topic.reload.attachment).to be_nil
+    end
+
+    it "replaces a discussion topic attachment" do
+      attachment = attachment_with_context(@teacher)
+      attachment.update!(user: @teacher)
+      result = run_mutation({ id: @topic.id, file_id: attachment.id })
+
+      expect(result["errors"]).to be_nil
+      expect(@topic.reload.attachment_id).to eq attachment.id
+    end
   end
 
   it "publishes the discussion topic" do

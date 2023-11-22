@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useContext} from 'react'
+import React, {useContext, useEffect, useState} from 'react'
 import {AssignmentDueDate} from './AssignmentDueDate'
 import {Text} from '@instructure/ui-text'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -30,36 +30,65 @@ import {GradedDiscussionDueDatesContext} from '../../util/constants'
 
 const I18n = useI18nScope('discussion_create')
 
-// This default information will be replaced by queried information
-const DEFAULT_LIST_OPTIONS = {
-  'Master Paths': [{assetCode: 'mp_option1', label: 'Master Path Option'}],
-  'Course Sections': [
-    {assetCode: 'sec_1', label: 'Section 1'},
-    {assetCode: 'sec_2', label: 'Section 2'},
-    {assetCode: 'sec_3', label: 'Section 3'},
-  ],
-  Students: [
-    {assetCode: 'u_1', label: 'Jason'},
-    {assetCode: 'u_2', label: 'Drake'},
-    {assetCode: 'u_3', label: 'Caleb'},
-    {assetCode: 'u_4', label: 'Aaron'},
-    {assetCode: 'u_5', label: 'Chawn'},
-    {assetCode: 'u_6', label: 'Omar'},
-  ],
+const defaultEveryoneOption = {
+  assetCode: 'everyone',
+  label: 'Everyone',
+}
+const defaultEveryoneElseOption = {
+  assetCode: 'everyone',
+  label: 'Everyone else',
+}
+
+const getDefaultBaseOptions = (includeMasteryPath, everyoneOption) => {
+  return includeMasteryPath
+    ? [{...everyoneOption}, {assetCode: 'mastery_paths', label: 'Mastery Paths'}]
+    : [{...everyoneOption}]
 }
 
 export const AssignmentDueDatesManager = () => {
-  const {assignedInfoList, setAssignedInfoList} = useContext(GradedDiscussionDueDatesContext)
+  const {
+    assignedInfoList,
+    setAssignedInfoList,
+    studentEnrollments,
+    sections,
+    groups,
+    dueDateErrorMessages,
+    setDueDateErrorMessages,
+  } = useContext(GradedDiscussionDueDatesContext)
+  const [listOptions, setListOptions] = useState({
+    '': getDefaultBaseOptions(ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED, defaultEveryoneOption),
+    'Course Sections': sections.map(section => {
+      return {assetCode: `course_section_${section?._id}`, label: section?.name}
+    }),
+    Students: studentEnrollments.map(enrollment => {
+      return {assetCode: `user_${enrollment?.user?._id}`, label: enrollment?.user?.name}
+    }),
+    Groups: groups?.map(group => {
+      return {assetCode: `group_${group?._id}`, label: group?.name}
+    }),
+  })
 
   const handleAssignedInfoChange = (newInfo, dueDateId) => {
     const updatedInfoList = assignedInfoList.map(info =>
       info.dueDateId === dueDateId ? {...info, ...newInfo} : info
     )
     setAssignedInfoList(updatedInfoList)
+    // Remove the error message for the dueDateId if it exists
+    const updatedErrorMessages = dueDateErrorMessages.filter(error => error.dueDateId !== dueDateId)
+    setDueDateErrorMessages(updatedErrorMessages)
   }
 
   const handleAddAssignment = () => {
-    setAssignedInfoList([...assignedInfoList, {dueDateId: nanoid()}]) // Add a new object with a unique id
+    setAssignedInfoList([
+      ...assignedInfoList,
+      {
+        dueDateId: nanoid(),
+        assignedList: [],
+        dueDate: '',
+        availableFrom: '',
+        availableUntil: '',
+      },
+    ]) // Add a new object with a unique id
   }
 
   const handleCloseAssignmentDueDate = dueDateId => () => {
@@ -76,14 +105,40 @@ export const AssignmentDueDatesManager = () => {
 
     // Filter out options based on assigned ids
     const filteredOptions = {}
-    Object.keys(DEFAULT_LIST_OPTIONS).forEach(category => {
-      filteredOptions[category] = DEFAULT_LIST_OPTIONS[category].filter(option => {
+    Object.keys(listOptions).forEach(category => {
+      filteredOptions[category] = listOptions[category].filter(option => {
         return !allAssignedListsExceptCurrent.includes(option.assetCode)
       })
     })
 
     return filteredOptions
   }
+
+  useEffect(() => {
+    const assignedList = assignedInfoList
+      .map(info => {
+        return info.assignedList || []
+      })
+      .flat()
+
+    const showEveryoneElseOption = assignedList.filter(item => item !== 'everyone').length > 0
+
+    setListOptions({
+      '': getDefaultBaseOptions(
+        ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED,
+        showEveryoneElseOption ? defaultEveryoneElseOption : defaultEveryoneOption
+      ),
+      'Course Sections': sections.map(section => {
+        return {assetCode: `course_section_${section?._id}`, label: section?.name}
+      }),
+      Students: studentEnrollments.map(enrollment => {
+        return {assetCode: `user_${enrollment?.user?._id}`, label: enrollment?.user?.name}
+      }),
+      Groups: groups?.map(group => {
+        return {assetCode: `group_${group?._id}`, label: group?.name}
+      }),
+    })
+  }, [assignedInfoList, groups, sections, studentEnrollments])
 
   return (
     <>
@@ -116,8 +171,12 @@ export const AssignmentDueDatesManager = () => {
               </View>
             )}
             <AssignmentDueDate
+              initialAssignedInformation={info}
               availableAssignToOptions={getAvailableOptionsFor(info.dueDateId)}
               onAssignedInfoChange={newInfo => handleAssignedInfoChange(newInfo, info.dueDateId)}
+              assignToErrorMessages={dueDateErrorMessages
+                ?.filter(element => element.dueDateId === info.dueDateId && element.message)
+                .map(element => element.message)}
             />
           </div>
         </View>

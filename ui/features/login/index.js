@@ -33,4 +33,6 @@ ready(() => {
     event.preventDefault()
     return switcher.switchToLogin()
   })
+
+  sessionStorage.clear()
 })

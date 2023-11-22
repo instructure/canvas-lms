@@ -49,7 +49,7 @@ export interface EnvCommon {
   url_to_what_gets_loaded_inside_the_tinymce_editor_css: string
   url_for_high_contrast_tinymce_editor_css: string
   csp?: string
-  current_user_id: string
+  current_user_id: string | null
   current_user_global_id: string
   current_user_roles: string[]
   current_user_is_student: boolean
@@ -63,6 +63,7 @@ export interface EnvCommon {
     label: string
   }[]
   DOMAIN_ROOT_ACCOUNT_ID: string
+  ROOT_ACCOUNT_ID: string
   k12: false
   help_link_name: string
   help_link_icon: string
@@ -197,6 +198,7 @@ export type SiteAdminFeatureId =
   | 'differentiated_modules'
   | 'enhanced_course_creation_account_fetching'
   | 'instui_for_import_page'
+  | 'enhanced_rubrics'
 
 /**
  * From ApplicationController#JS_ENV_ROOT_ACCOUNT_FEATURES

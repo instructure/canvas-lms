@@ -29,6 +29,8 @@ class GradingPeriodGradeSummaryPresenter < GradeSummaryPresenter
     includes = ["completed"]
     includes << "inactive" if user_has_elevated_permissions?
     grading_period = GradingPeriod.for(@context).where(id: grading_period_id).first
+    return [] unless grading_period.present?
+
     grading_period.assignments_for_student(@context, super, student, includes:)
   end
 

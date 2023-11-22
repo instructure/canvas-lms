@@ -428,31 +428,5 @@ describe ContentMigration do
 
       expect(group.reload).to be_active
     end
-
-    it "still works when copying the same outcome twice" do
-      default = @copy_from.root_outcome_group
-      log1 = @copy_from.learning_outcome_groups.create!(title: "some group")
-      default.adopt_outcome_group(log1)
-      log2 = @copy_from.learning_outcome_groups.create!(title: "some other group")
-      default.adopt_outcome_group(log2)
-
-      lo = @copy_from.created_learning_outcomes.new(context: @copy_from, short_description: "outcome1", workflow_state: "active")
-      lo.data = { rubric_criterion: { mastery_points: 2, ratings: [{ description: "e", points: 50 }, { description: "me", points: 2 }, { description: "Does Not Meet Expectations", points: 0.5 }], description: "First outcome", points_possible: 5 } }
-      lo.save!
-
-      log1.add_outcome(lo)
-      log2.add_outcome(lo)
-
-      expect_any_instance_of(LearningOutcome).to receive(:mark_as_importing!).exactly(:once)
-
-      run_course_copy
-
-      lo_to = @copy_to.created_learning_outcomes.where(migration_id: mig_id(lo)).first
-      log1_to = @copy_to.learning_outcome_groups.where(migration_id: mig_id(log1)).first
-      log2_to = @copy_to.learning_outcome_groups.where(migration_id: mig_id(log2)).first
-
-      expect(log1_to.child_outcome_links.map(&:content)).to eq [lo_to]
-      expect(log2_to.child_outcome_links.map(&:content)).to eq [lo_to]
-    end
   end
 end

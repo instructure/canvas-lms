@@ -448,7 +448,10 @@ function mergeStudentsAndSubmission() {
       (student: StudentWithSubmission) => student.section_ids.includes(sectionToShow)
     )
 
-    if (studentsInSection.length > 0) {
+    if (
+      studentsInSection.length > 0 &&
+      !(studentsInSection.length === 1 && studentsInSection[0].fake_student)
+    ) {
       jsonData.studentsWithSubmissions = studentsInSection
     } else {
       // eslint-disable-next-line no-alert
@@ -816,7 +819,7 @@ function renderCommentTextArea() {
     <CommentArea
       getTextAreaRef={getTextAreaRef}
       courseId={ENV.course_id}
-      userId={ENV.current_user_id}
+      userId={ENV.current_user_id!}
     />,
     document.getElementById(SPEED_GRADER_COMMENT_TEXTAREA_MOUNT_POINT)
   )

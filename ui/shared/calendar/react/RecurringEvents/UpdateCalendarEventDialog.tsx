@@ -38,9 +38,15 @@ type Props = {
 const UpdateCalendarEventDialog = ({event, isOpen, onUpdate, onCancel}: Props) => {
   const [which, setWhich] = useState<Which>('one')
 
-  const handleCancel = useCallback(() => {
-    onCancel?.()
-  }, [onCancel])
+  const handleCancel = useCallback(
+    (e = null) => {
+      if (e?.code !== 'Escape' && e?.target.type === 'radio') {
+        return
+      }
+      onCancel?.()
+    },
+    [onCancel]
+  )
 
   const handleSubmit = useCallback(() => {
     onUpdate?.(which)

@@ -26,3 +26,6 @@ ready(() => {
     ReactDOM.render(<App />, document.getElementById('instui_content_migrations'))
   }
 })
+
+// package.json's source-file-extension needs a default export
+export default null

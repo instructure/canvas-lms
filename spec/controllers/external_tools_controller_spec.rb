@@ -20,10 +20,12 @@
 
 require "lti_1_3_spec_helper"
 require_relative "lti/concerns/parent_frame_shared_examples"
+require_relative "../support/request_helper"
 
 describe ExternalToolsController do
   include ExternalToolsSpecHelper
   include Lti::RedisMessageClient
+  include RequestHelper
 
   before :once do
     course_with_teacher(active_all: true)
@@ -1345,6 +1347,13 @@ describe ExternalToolsController do
         subject
         expect(response.body).to include(".push('post_message_forwarding')")
       end
+
+      it "includes IN_RCE and IGNORE_LTI_POST_MESSAGES in the JS ENV" do
+        subject
+        env = js_env_from_response(response)
+        expect(env["IN_RCE"]).to be(true)
+        expect(env["IGNORE_LTI_POST_MESSAGES"]).to be(true)
+      end
     end
 
     context "for Quizzes Next launch" do
@@ -2577,26 +2586,66 @@ describe ExternalToolsController do
       end
     end
 
-    it "generates a sessionless launch for an external tool assignment" do
-      assignment_model(course: @course,
-                       name: "tool assignment",
-                       submission_types: "external_tool",
-                       points_possible: 20,
-                       grading_type: "points")
-      tag = @assignment.build_external_tool_tag(url: tool.url)
-      tag.content_type = "ContextExternalTool"
-      tag.save!
+    context 'with "launch_type" set to "assessment' do
+      let(:due_at) { Time.zone.now }
+      let(:course) { @course }
+      let(:assignment) do
+        a = assignment_model(
+          course: @course,
+          name: "tool assignment",
+          submission_types: "external_tool",
+          points_possible: 20,
+          grading_type: "points",
+          due_at:
+        )
 
-      get :generate_sessionless_launch, params: { course_id: @course.id, launch_type: "assessment", assignment_id: @assignment.id }
-      expect(response).to be_successful
+        tag = @assignment.build_external_tool_tag(url: tool.url)
+        tag.update!(content_type: "ContextExternalTool")
 
-      expect(launch_settings["launch_url"]).to eq "http://www.example.com/basic_lti"
-      expect(launch_settings["tool_name"]).to eq "bob"
-      expect(launch_settings["analytics_id"]).to eq "some_tool"
-      expect(tool_settings["custom_canvas_course_id"]).to eq @course.id.to_s
-      expect(tool_settings["custom_canvas_user_id"]).to eq @user.id.to_s
-      expect(tool_settings["resource_link_id"]).to eq opaque_id(@assignment.external_tool_tag)
-      expect(tool_settings["resource_link_title"]).to eq "tool assignment"
+        a
+      end
+
+      before do
+        tool.settings["custom_fields"] ||= {}
+        tool.settings["custom_fields"]["assignment_due_at"] = "$Canvas.assignment.dueAt.iso8601"
+        tool.save!
+      end
+
+      it "generates a sessionless launch for an external tool assignment" do
+        get :generate_sessionless_launch, params: { course_id: course.id, launch_type: "assessment", assignment_id: assignment.id }
+        expect(response).to be_successful
+
+        expect(launch_settings["launch_url"]).to eq "http://www.example.com/basic_lti"
+        expect(launch_settings["tool_name"]).to eq "bob"
+        expect(launch_settings["analytics_id"]).to eq "some_tool"
+        expect(tool_settings["custom_canvas_course_id"]).to eq @course.id.to_s
+        expect(tool_settings["custom_canvas_user_id"]).to eq @user.id.to_s
+        expect(tool_settings["resource_link_id"]).to eq opaque_id(@assignment.external_tool_tag)
+        expect(tool_settings["resource_link_title"]).to eq "tool assignment"
+
+        expect(Time.parse(tool_settings["custom_assignment_due_at"])).to be_within(5.seconds).of due_at
+      end
+
+      context "and the assignment has due date overrides" do
+        let!(:assignment_override) do
+          override = assignment.assignment_overrides.create!(
+            title: "1 student",
+            set_type: "ADHOC",
+            due_at_overridden: true,
+            due_at: due_at + 1.day
+          )
+
+          override.assignment_override_students.create!(user: @user)
+
+          override
+        end
+
+        it "sends the overridden due_at value in the launch parameters" do
+          get :generate_sessionless_launch, params: { course_id: course.id, launch_type: "assessment", assignment_id: assignment.id }
+
+          expect(Time.parse(tool_settings["custom_assignment_due_at"])).to be_within(5.seconds).of(assignment_override.due_at)
+        end
+      end
     end
 
     context "when url is provided in params" do

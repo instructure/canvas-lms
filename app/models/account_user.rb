@@ -42,6 +42,7 @@ class AccountUser < ActiveRecord::Base
   alias_method :context, :account
 
   scope :active, -> { where.not(workflow_state: "deleted") }
+  scope :deleted, -> { where(workflow_state: "deleted") }
 
   include Workflow
   workflow do

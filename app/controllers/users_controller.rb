@@ -3097,7 +3097,7 @@ class UsersController < ApplicationController
 
     notify_policy = Users::CreationNotifyPolicy.new(manage_user_logins, params[:pseudonym])
 
-    includes = %w[locale]
+    includes = %w[locale uuid]
 
     cc_params = params[:communication_channel]
 

@@ -112,6 +112,24 @@ RSpec.describe Mutations::UpdateDiscussionEntry do
     expect(@entry.reload.attachment_id).to eq attachment.id
   end
 
+  it "allows students to update discussion entry even without allow_student_forum_attachments permission" do
+    new_message = "updated banana"
+    @course.update!(allow_student_forum_attachments: false)
+    result = run_mutation({ discussion_entry_id: @entry.id, remove_attachment: true, message: new_message }, @student)
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "updateDiscussionEntry", "errors")).to be_nil
+    expect(@entry.reload.message).to eq new_message
+  end
+
+  it "allows teachers to update discussion entry even without allow_student_forum_attachments permission" do
+    new_message = "updated banana"
+    @course.update!(allow_student_forum_attachments: false)
+    result = run_mutation({ discussion_entry_id: @entry.id, remove_attachment: true, message: new_message }, @teacher)
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "updateDiscussionEntry", "errors")).to be_nil
+    expect(@entry.reload.message).to eq new_message
+  end
+
   it "allows teachers to edit post with student attachment" do
     attachment = attachment_with_context(@student)
     attachment.update!(user: @student)
