@@ -55,6 +55,18 @@ export function QueryProvider({children}: {children: React.ReactNode}) {
 
 const queriesFetched = new Set<string>()
 
+window.BroadcastChannel =
+  window.BroadcastChannel ||
+  class BroadcastChannel {
+    close() {}
+
+    postMessage() {}
+
+    addEventListener() {}
+
+    removeEventListener() {}
+  }
+
 const broadcastChannel = new BroadcastChannel(CHANNEL_KEY)
 
 interface CustomUseQueryOptions<
