@@ -31,6 +31,7 @@ import {
   IconReviewScreenLine,
   IconShareLine,
 } from '@instructure/ui-icons'
+import {Img} from '@instructure/ui-img'
 import {List} from '@instructure/ui-list'
 import {Link} from '@instructure/ui-link'
 import {Tag} from '@instructure/ui-tag'
@@ -168,109 +169,113 @@ const PortfolioView = () => {
         </Flex.Item>
       </Flex>
       <View as="div">
-        <div
-          style={{
-            position: 'relative',
-            height: '160px',
-            backgroundImage: `url(${portfolio.heroImageUrl})`,
-            backgroundSize: '100%, 80px',
-            zIndex: -1,
-          }}
-        >
-          <Flex direction="column">
-            <Flex.Item align="center">
-              <div
-                style={{
-                  boxSizing: 'border-box',
-                  margin: '50% auto 0 auto',
-                  borderRadius: '50%',
-                  width: '10rem',
-                  height: '10rem',
-                  overflow: 'hidden',
-                  border: '6px solid white',
-                  boxShadow:
-                    '0px 1px 3px 0px rgba(0, 0, 0, 0.10), 0px 1px 2px 0px rgba(0, 0, 0, 0.20)',
-                  backgroundImage: ENV.current_user.avatar_image_url
-                    ? `url(${ENV.current_user.avatar_image_url})`
-                    : 'none',
-                }}
+        <div style={{position: 'relative'}}>
+          <div style={{height: '184px', background: '#C7CDD1', overflow: 'hidden', zIndex: -1}}>
+            {portfolio.heroImageUrl && (
+              <Img
+                src={portfolio.heroImageUrl}
+                alt="Cover image"
+                constrain="cover"
+                height="184px"
               />
-            </Flex.Item>
-            <Flex.Item align="center" margin="small 0 0 0" overflowY="visible">
-              <Heading level="h2">{ENV.current_user.display_name}</Heading>
-            </Flex.Item>
-            <Flex.Item align="center">
-              <Text size="x-small">{portfolio.blurb}</Text>
-            </Flex.Item>
-          </Flex>
-          <Flex as="div" direction="column" gap="large">
-            <View as="div">
-              <Heading level="h3" themeOverride={{h3FontSize: '1rem'}}>
-                About Me
-              </Heading>
-              <p>{portfolio.about || ''}</p>
-            </View>
-            <View as="div">
-              <Heading level="h3" themeOverride={{h3FontSize: '1rem'}}>
-                Skills
-              </Heading>
-              <View as="div" margin="small 0">
-                {portfolio.skills.map((skill: SkillData) => renderSkillTag(skill))}
+            )}
+          </div>
+          <div style={{position: 'relative', top: '-5rem'}}>
+            <Flex direction="column">
+              <Flex.Item align="center">
+                <div
+                  style={{
+                    boxSizing: 'border-box',
+                    margin: '0 auto 0 auto',
+                    borderRadius: '50%',
+                    width: '10rem',
+                    height: '10rem',
+                    overflow: 'hidden',
+                    border: '6px solid white',
+                    boxShadow:
+                      '0px 1px 3px 0px rgba(0, 0, 0, 0.10), 0px 1px 2px 0px rgba(0, 0, 0, 0.20)',
+                    backgroundImage: ENV.current_user.avatar_image_url
+                      ? `url(${ENV.current_user.avatar_image_url})`
+                      : 'none',
+                  }}
+                />
+              </Flex.Item>
+              <Flex.Item align="center" margin="small 0 0 0" overflowY="visible">
+                <Heading level="h2">{ENV.current_user.display_name}</Heading>
+              </Flex.Item>
+              <Flex.Item align="center">
+                <Text size="x-small">{portfolio.blurb}</Text>
+              </Flex.Item>
+            </Flex>
+            <Flex as="div" direction="column" gap="large">
+              <View as="div">
+                <Heading level="h3" themeOverride={{h3FontSize: '1rem'}}>
+                  About Me
+                </Heading>
+                <p>{portfolio.about || ''}</p>
               </View>
-            </View>
-            <View as="div">
-              <Heading level="h3" themeOverride={{h3FontSize: '1rem'}}>
-                Links
-              </Heading>
-              <List isUnstyled={true} itemSpacing="small" margin="small 0 0 0">
-                {portfolio.links.map((link: string) => renderLink(link))}
-              </List>
-            </View>
-            <View as="div" borderWidth="small 0 0 0" padding="large 0 0 0">
-              <Heading level="h3" themeOverride={{h3FontSize: '1rem'}}>
-                Education
-              </Heading>
-              <List isUnstyled={true} itemSpacing="small" margin="small 0 0 0">
-                {portfolio.education.map((education: EducationData) => {
-                  return (
-                    <List.Item key={education.institution.replace(/\W+/, '-')}>
-                      {renderEducation(education)}
-                    </List.Item>
-                  )
-                })}
-              </List>
-            </View>
-            <View as="div" borderWidth="small 0 0 0" padding="large 0 0 0">
-              <Heading level="h3" themeOverride={{h3FontSize: '1rem'}} margin="large 0 small 0">
-                Experience
-              </Heading>
-              <View as="div" shadow="resting" padding="small">
-                <Flex direction="column" gap="small">
-                  {portfolio.experience.map((experience: ExperienceData) => {
+              <View as="div">
+                <Heading level="h3" themeOverride={{h3FontSize: '1rem'}}>
+                  Skills
+                </Heading>
+                <View as="div" margin="small 0">
+                  {portfolio.skills.map((skill: SkillData) => renderSkillTag(skill))}
+                </View>
+              </View>
+              <View as="div">
+                <Heading level="h3" themeOverride={{h3FontSize: '1rem'}}>
+                  Links
+                </Heading>
+                <List isUnstyled={true} itemSpacing="small" margin="small 0 0 0">
+                  {portfolio.links.map((link: string) => renderLink(link))}
+                </List>
+              </View>
+              <View as="div" borderWidth="small 0 0 0" padding="large 0 0 0">
+                <Heading level="h3" themeOverride={{h3FontSize: '1rem'}}>
+                  Education
+                </Heading>
+                <List isUnstyled={true} itemSpacing="small" margin="small 0 0 0">
+                  {portfolio.education.map((education: EducationData) => {
                     return (
-                      <Flex.Item key={`${experience.where.replace(/\W+/, '-')}`}>
-                        {renderExperience(experience)}
+                      <List.Item key={education.institution.replace(/\W+/, '-')}>
+                        {renderEducation(education)}
+                      </List.Item>
+                    )
+                  })}
+                </List>
+              </View>
+              <View as="div" borderWidth="small 0 0 0" padding="large 0 0 0">
+                <Heading level="h3" themeOverride={{h3FontSize: '1rem'}} margin="large 0 small 0">
+                  Experience
+                </Heading>
+                <View as="div" shadow="resting" padding="small">
+                  <Flex direction="column" gap="small">
+                    {portfolio.experience.map((experience: ExperienceData) => {
+                      return (
+                        <Flex.Item key={`${experience.where.replace(/\W+/, '-')}`}>
+                          {renderExperience(experience)}
+                        </Flex.Item>
+                      )
+                    })}
+                  </Flex>
+                </View>
+              </View>
+              <View as="div" borderWidth="small 0 0 0">
+                <Heading level="h3" themeOverride={{h3FontSize: '1rem'}} margin="large 0 small 0">
+                  Achievements
+                </Heading>
+                <Flex as="div" margin="small 0" gap="medium" wrap="wrap">
+                  {portfolio.achievements.map((achievement: AchievementData) => {
+                    return (
+                      <Flex.Item key={achievement.id} shouldShrink={false}>
+                        {renderAchievement(achievement)}
                       </Flex.Item>
                     )
                   })}
                 </Flex>
               </View>
-            </View>
-            <View as="div" borderWidth="small 0 0 0">
-              <Heading level="h3" themeOverride={{h3FontSize: '1rem'}} margin="large 0 small 0">
-                Achievements
-              </Heading>
-              <Flex as="div" margin="small 0" gap="medium" wrap="wrap">
-                {portfolio.achievements.map((achievement: AchievementData) => {
-                  return (
-                    <Flex.Item key={achievement.id} shouldShrink={false}>
-                      {renderAchievement(achievement)}
-                    </Flex.Item>
-                  )
-                })}
-              </Flex>
-            </View>
-          </Flex>
+            </Flex>
+          </div>
         </div>
       </View>
     </View>
