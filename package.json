@@ -252,7 +252,7 @@
     "babel-jest": "^28",
     "babel-loader": "^8",
     "babel-plugin-transform-react-remove-prop-types": "^0.4",
-    "babel-plugin-typescript-to-proptypes": "^1.4.2",
+    "babel-plugin-typescript-to-proptypes": "^2.1.0",
     "chai-assert-change": "^2.0.0",
     "change-case": "3.0.1",
     "coffee-loader": "~0.7.2",
