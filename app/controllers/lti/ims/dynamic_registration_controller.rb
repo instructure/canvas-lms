@@ -152,8 +152,12 @@ module Lti
             { messages: [:type, :target_link_uri, :label, :icon_uri, { custom_parameters: ArbitraryStrongishParams::ANYTHING }, { roles: [] }, { placements: [] }] },
             { claims: [] },
             :target_link_uri,
+            :custom_parameters,
           ] },
-          :target_link_uri,
+          :client_uri,
+          :logo_uri,
+          :tos_uri,
+          :policy_uri,
         ]
       end
     end

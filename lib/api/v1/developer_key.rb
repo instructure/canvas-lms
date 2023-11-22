@@ -67,7 +67,9 @@ module Api::V1::DeveloperKey
         hash["visible"] = key.visible
       end
       hash["tool_configuration"] = key.tool_configuration&.configuration if include_tool_config
+      hash["lti_registration"] = key.lti_registration if include_tool_config
       hash["is_lti_key"] = (key.is_lti_key.nil? ? key.public_jwk.present? : key.is_lti_key)
+      hash["is_lti_registration"] = key.lti_registration?
       hash["id"] = key.global_id
     end
   end

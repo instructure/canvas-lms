@@ -242,7 +242,7 @@ export default class DeveloperKeyModal extends React.Component<Props, State> {
       return
     }
     let settings: {
-      scopes?: any
+      scopes?: unknown
     } = {}
     if (this.isJsonConfig) {
       if (!this.state.toolConfiguration) {
@@ -267,7 +267,7 @@ export default class DeveloperKeyModal extends React.Component<Props, State> {
         account_id: string
         developer_key: DeveloperKey
         settings_url?: string
-        settings?: any
+        settings?: unknown
       } = {
         account_id: this.props.ctx.params.contextId,
         developer_key,

@@ -134,6 +134,10 @@ class DeveloperKeysController < ApplicationController
       return parent_keys + scope
     end
 
+    if params[:id].present?
+      scope = scope.where(id: params[:id])
+    end
+
     scope
   end
 

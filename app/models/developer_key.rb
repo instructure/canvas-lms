@@ -127,6 +127,10 @@ class DeveloperKey < ActiveRecord::Base
     super(value)
   end
 
+  def lti_registration?
+    lti_registration.present?
+  end
+
   def validate_redirect_uris
     uris = redirect_uris&.map do |value|
       value, _ = CanvasHttp.validate_url(value, allowed_schemes: nil)

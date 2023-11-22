@@ -16,20 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export type DeveloperKeyScope =
-  | 'https://purl.imsglobal.org/spec/lti-ags/scope/lineitem'
-  | 'https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly'
-  | 'https://purl.imsglobal.org/spec/lti-ags/scope/score'
-  | 'https://canvas.instructure.com/lti/feature_flags/scope/show'
-  | 'https://canvas.instructure.com/lti-ags/progress/scope/show'
-  | 'https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly'
-  | 'https://canvas.instructure.com/lti/public_jwk/scope/update'
-  | 'https://canvas.instructure.com/lti/data_services/scope/create'
-  | 'https://canvas.instructure.com/lti/data_services/scope/update'
-  | 'https://canvas.instructure.com/lti/data_services/scope/list'
-  | 'https://canvas.instructure.com/lti/data_services/scope/destroy'
-  | 'https://canvas.instructure.com/lti/data_services/scope/show'
-  | 'https://canvas.instructure.com/lti/data_services/scope/list_event_types'
+import {LtiScope} from './LtiScopes'
+import {LtiRegistration} from './LtiRegistration'
 
 export interface DeveloperKeyAccountBinding {
   account_id: string
@@ -47,7 +35,7 @@ export interface DeveloperKey {
   api_key: string
   created_at: string
   developer_key_account_binding?: DeveloperKeyAccountBinding
-  scopes: Array<DeveloperKeyScope>
+  scopes: Array<LtiScope>
   inherited_from?: string
 
   notes: string | null
@@ -65,4 +53,7 @@ export interface DeveloperKey {
   } | null
   test_cluster_only?: boolean
   client_credentials_audience: string | null
+  is_lti_key: boolean
+  is_lti_registration: boolean
+  lti_registration?: LtiRegistration
 }
