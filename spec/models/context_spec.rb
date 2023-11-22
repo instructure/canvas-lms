@@ -127,6 +127,7 @@ describe Context do
       expect(Context.find_asset_by_url("/courses/#{@course.id}/files/#{@attachment.id}/download?wrap=1")).to eq @attachment
       expect(Context.find_asset_by_url("/courses/#{@course.id}/files/#{@attachment.id}/?wrap=1")).to eq @attachment
       expect(Context.find_asset_by_url("/courses/#{@course.id}/file_contents/course%20files//#{@attachment.name}")).to eq @attachment
+      expect(Context.find_asset_by_url("/media_attachments_iframe/#{@attachment.id}?type=video&amp;embedded=true")).to eq @attachment
     end
 
     it "finds folders" do
