@@ -25,7 +25,7 @@ import {Heading} from '@instructure/ui-heading'
 import {IconDragHandleLine, IconReviewScreenLine, IconSaveLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
 
-import PersonalInfo from './PersonalInfo'
+import PersonalInfo from './personal_info/PersonalInfo'
 import AchievementsEdit from './AchievementsEdit'
 import EducationEdit from './EducationEdit'
 import ExperienceEdit from './ExperienceEdit'

@@ -24,7 +24,7 @@ import {Modal} from '@instructure/ui-modal'
 import {TextInput} from '@instructure/ui-text-input'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
-import type {SkillData} from '../../types'
+import type {SkillData} from '../../../types'
 
 interface AddSkillModalProps {
   open: boolean
