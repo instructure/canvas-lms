@@ -1337,6 +1337,44 @@ module Lti
           end
         end
 
+        describe "$com.instructure.instui_nav" do
+          subject do
+            variable_expander.expand_variables!({ test: "$com.instructure.instui_nav" })[:test]
+          end
+
+          context "internal tool" do
+            before { allow(tool).to receive(:internal_service?).with(any_args).and_return(true) }
+
+            context "release flag instui_nav is true" do
+              before { root_account.enable_feature!(:instui_nav) }
+
+              it { is_expected.to be true }
+            end
+
+            context "release flag instui_nav is false" do
+              before { root_account.disable_feature!(:instui_nav) }
+
+              it { is_expected.to be false }
+            end
+          end
+
+          context "not internal tool" do
+            before { allow(tool).to receive(:internal_service?).with(any_args).and_return(false) }
+
+            context "release flag instui_nav is true" do
+              before { root_account.enable_feature!(:instui_nav) }
+
+              it { is_expected.to eq "$com.instructure.instui_nav" }
+            end
+
+            context "release flag instui_nav is false" do
+              before { root_account.disable_feature!(:instui_nav) }
+
+              it { is_expected.to eq "$com.instructure.instui_nav" }
+            end
+          end
+        end
+
         describe "$com.instructure.RCS.app_host" do
           subject do
             exp_hash = { test: "$com.instructure.RCS.app_host" }

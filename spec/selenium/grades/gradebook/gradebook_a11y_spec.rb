@@ -79,7 +79,7 @@ describe "Gradebook" do
     end
 
     it "moves focus to Actions menu trigger button during current export", priority: "2" do
-      Gradebook.select_export
+      Gradebook.select_export(@course)
 
       Gradebook.action_menu_item_selector("export").click
 
@@ -99,7 +99,7 @@ describe "Gradebook" do
       end
 
       it "maintains focus to Actions menu trigger during past csv export", priority: "2" do
-        Gradebook.select_export
+        Gradebook.select_export(@course)
         Gradebook.select_previous_grade_export
 
         expect(current_active_element.tag_name).to eq("button")

@@ -159,7 +159,10 @@ export function safeDateConversion(date: Date | string | undefined): Date | unde
  *          property values from the input array, and values as arrays of
  *          objects sharing that property value
  */
-export function splitArrayByProperty(arr: any[], property: string) {
+export function splitArrayByProperty(
+  arr: any[],
+  property: string
+): {[propertyValue: string]: any[]} {
   return arr.reduce((result: {[x: string]: any[]}, obj: {[x: string]: any}) => {
     const index = obj[property]
     if (!result[index]) {

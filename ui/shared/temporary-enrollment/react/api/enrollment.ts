@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Enrollment, ITEMS_PER_PAGE} from '../types'
+import {Enrollment, ITEMS_PER_PAGE, TemporaryEnrollmentPairing} from '../types'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
 /**
@@ -29,83 +29,130 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
  *  - Fetches enrollments where the user is a provider
  *
  * @param {number} userId ID of the user to fetch data for
- * @param {boolean} isRecipient Whether to fetch recipients or providers
- * @returns {Promise} Resolves to an array of enrollment data
+ * @param {boolean} isRecipient Fetch enrollments for recipients or providers
+ * @returns {Promise<Enrollment[]>} Resolves to an array of enrollment data
  */
 export async function fetchTemporaryEnrollments(
-  userId: number,
+  userId: string,
   isRecipient: boolean
 ): Promise<Enrollment[]> {
-  let responseStatus = -1
   const entityType = isRecipient ? 'recipients' : 'providers'
-
   const params: Record<string, any> = {
-    temporary_enrollments: true,
     state: ['current_and_future'],
     per_page: ITEMS_PER_PAGE,
   }
 
   if (isRecipient) {
+    params.temporary_enrollments_for_recipient = true
     params.include = 'temporary_enrollment_providers'
   } else {
-    params.temporary_enrollment_recipients = true
+    params.temporary_enrollment_recipients_for_provider = true
   }
 
-  try {
-    const {response, json} = await doFetchApi({
-      path: `/api/v1/users/${userId}/enrollments`,
-      params,
-    })
+  const {response, json} = await doFetchApi({
+    path: `/api/v1/users/${userId}/enrollments`,
+    params,
+  })
 
-    responseStatus = response.status
-
-    if (responseStatus === 204) {
-      return []
-    } else if (!response.ok) {
-      throw new Error(`Failed to fetch ${entityType} data. Status: ${responseStatus}`)
-    } else {
-      return await json
-    }
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error(
-      `Failed to fetch ${entityType} data for user ${userId}. Status: ${responseStatus}`,
-      error
-    )
-
+  if (response.status === 204) {
     return []
+  } else if (!response.ok) {
+    throw new Error(`Failed to fetch ${entityType} data. Status: ${response.status}`)
+  }
+
+  return json
+}
+
+/**
+ * Creates a temporary enrollment pairing object
+ *
+ * @param {string} rootAccountId Root account ID
+ * @returns {Promise<TemporaryEnrollmentPairing>} Resolves to a temporary enrollment pairing object
+ */
+export async function createTemporaryEnrollmentPairing(
+  rootAccountId: string
+): Promise<TemporaryEnrollmentPairing> {
+  try {
+    const response = await doFetchApi({
+      path: `/api/v1/accounts/${rootAccountId}/temporary_enrollment_pairings`,
+      method: 'POST',
+    })
+    return response.json.temporary_enrollment_pairing
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Failed to fetch temporary enrollment pairing: ${error.message}`)
+    } else {
+      throw new Error('Failed to fetch temporary enrollment pairing due to an unknown error')
+    }
   }
 }
 
 /**
- * Deletes an enrollment based on its ID and course ID
+ * Deletes an enrollment
  *
  * @param {string} courseId ID of the course
  * @param {string} enrollmentId ID of the enrollment to delete
- * @param {Function} onDelete Callback function to call on successful delete
- * @returns {Promise<void>}
+ * @returns {Promise<void>} API response
  */
-export async function deleteEnrollment(
-  courseId: number,
-  enrollmentId: number,
-  onDelete?: (enrollmentId: number) => void
+export async function deleteEnrollment(courseId: string, enrollmentId: string): Promise<void> {
+  try {
+    return await doFetchApi({
+      path: `/api/v1/courses/${courseId}/enrollments/${enrollmentId}`,
+      params: {
+        task: 'delete',
+      },
+      method: 'DELETE',
+    })
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Failed to delete enrollment: ${error.message}`)
+    } else {
+      throw new Error('Failed to delete enrollment due to an unknown error')
+    }
+  }
+}
+
+/**
+ * Updates or creates an enrollment
+ *
+ * @param sectionId
+ * @param enrollmentUserId
+ * @param userId
+ * @param pairingId
+ * @param startDate
+ * @param endDate
+ * @param roleId
+ * @returns {Promise<any>} API response
+ */
+export async function createEnrollment(
+  sectionId: string,
+  enrollmentUserId: string,
+  userId: string,
+  pairingId: string,
+  startDate: Date,
+  endDate: Date,
+  roleId: string
 ): Promise<void> {
   try {
-    // Note: Temporarily commented out in preparation for near-future feature work
-    // const {response} = await doFetchApi({
-    //   path: `/api/v1/courses/${courseId}/enrollments/${enrollmentId}`,
-    //   method: 'DELETE',
-    //   params: {task: 'delete'},
-    // })
-
-    // placeholder response for testing
-    const response = {status: 200}
-
-    if (response.status === 200 && onDelete) {
-      onDelete(enrollmentId)
-    }
+    return await doFetchApi({
+      path: `/api/v1/sections/${sectionId}/enrollments`,
+      params: {
+        enrollment: {
+          user_id: enrollmentUserId,
+          temporary_enrollment_source_user_id: userId,
+          temporary_enrollment_pairing_id: pairingId,
+          start_at: startDate.toISOString(),
+          end_at: endDate.toISOString(),
+          role_id: roleId,
+        },
+      },
+      method: 'POST',
+    })
   } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('Failed to delete enrollment:', error)
+    if (error instanceof Error) {
+      throw new Error(`Failed to create enrollment:`, error)
+    } else {
+      throw new Error(`Failed to create enrollment due to an unknown error`)
+    }
   }
 }

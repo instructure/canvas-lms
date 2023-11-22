@@ -289,8 +289,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
       expect(updateMediaObject).not.toHaveBeenCalled()
     })
 
-    // fickle. LF-968
-    it.skip('replaces the video with a link', async () => {
+    it('replaces the video with a link', async () => {
       const updateMediaObject = jest.fn().mockResolvedValue()
       const ed = editors[0]
       trayController.showTrayForEditor(ed)

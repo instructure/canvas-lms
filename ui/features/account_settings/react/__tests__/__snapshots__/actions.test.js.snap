@@ -1,8 +1,8 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`addDomainAction creates an ADD_DOMAIN action when passed string value 1`] = `
-Object {
-  "payload": Object {
+{
+  "payload": {
     "account": "instructure.com",
   },
   "type": "ADD_DOMAIN",
@@ -10,8 +10,8 @@ Object {
 `;
 
 exports[`addDomainAction creates an ADD_DOMAIN_OPTIMISTIC action when optimistic option is given 1`] = `
-Object {
-  "payload": Object {
+{
+  "payload": {
     "account": "instructure.com",
   },
   "type": "ADD_DOMAIN_OPTIMISTIC",
@@ -19,7 +19,7 @@ Object {
 `;
 
 exports[`addDomainAction creates an error action if given an invalid domainType 1`] = `
-Object {
+{
   "error": true,
   "payload": [Error: domainType is invalid],
   "type": "ADD_DOMAIN",
@@ -27,7 +27,7 @@ Object {
 `;
 
 exports[`addDomainAction creates an error action if passed a non-string value 1`] = `
-Object {
+{
   "error": true,
   "payload": [Error: Can only set to String values],
   "type": "ADD_DOMAIN",
@@ -35,14 +35,14 @@ Object {
 `;
 
 exports[`addDomainBulkAction creates a ADD_DOMAIN_BULK action when passed an value 1`] = `
-Object {
-  "payload": Object {
-    "account": Array [
+{
+  "payload": {
+    "account": [
       "instructure.com",
     ],
-    "tools": Object {
-      "google.com": Array [
-        Object {
+    "tools": {
+      "google.com": [
+        {
           "account_id": "1",
           "id": "1",
           "name": "Cool Tool 1",
@@ -55,7 +55,7 @@ Object {
 `;
 
 exports[`addDomainBulkAction creates an error action if passed an invalid domainMap 1`] = `
-Object {
+{
   "error": true,
   "payload": [Error: Invalid domain type key provided in domainsMap],
   "type": "ADD_DOMAIN_BULK",
@@ -63,14 +63,14 @@ Object {
 `;
 
 exports[`copyInheritedAction creates a COPY_INHERITED_SUCCESS action 1`] = `
-Object {
-  "payload": Array [],
+{
+  "payload": [],
   "type": "COPY_INHERITED_SUCCESS",
 }
 `;
 
 exports[`copyInheritedAction creates an error action if passed an error param 1`] = `
-Object {
+{
   "error": true,
   "payload": [Error: Error: something happened],
   "type": "COPY_INHERITED_FAILURE",
@@ -78,7 +78,7 @@ Object {
 `;
 
 exports[`removeDomainAction creates a REMOVE_DOMAIN_OPTIMISTIC action when optimistic option is given 1`] = `
-Object {
+{
   "error": true,
   "payload": [Error: Can only set to Boolean values],
   "type": "SET_CSP_ENABLED_OPTIMISTIC",
@@ -86,14 +86,14 @@ Object {
 `;
 
 exports[`removeDomainAction creates an REMOVE_DOMAIN action when passed a string value 1`] = `
-Object {
+{
   "payload": "instructure.com",
   "type": "REMOVE_DOMAIN",
 }
 `;
 
 exports[`removeDomainAction creates an error action if passed a non-string value 1`] = `
-Object {
+{
   "error": true,
   "payload": [Error: Domain can only set to String values],
   "type": "REMOVE_DOMAIN",
@@ -101,21 +101,21 @@ Object {
 `;
 
 exports[`setCspEnabledAction creates a SET_CSP_ENABLED action when passed a boolean value 1`] = `
-Object {
+{
   "payload": true,
   "type": "SET_CSP_ENABLED",
 }
 `;
 
 exports[`setCspEnabledAction creates a SET_CSP_ENABLED_OPTIMISTIC action when optimistic option is given 1`] = `
-Object {
+{
   "payload": true,
   "type": "SET_CSP_ENABLED_OPTIMISTIC",
 }
 `;
 
 exports[`setCspEnabledAction creates an error action if passed a non-boolean value 1`] = `
-Object {
+{
   "error": true,
   "payload": [Error: Can only set to Boolean values],
   "type": "SET_CSP_ENABLED",
@@ -123,21 +123,21 @@ Object {
 `;
 
 exports[`setCspInheritedAction creates a SET_CSP_INHERITED_OPTIMISTIC action when optimistic option is given 1`] = `
-Object {
+{
   "payload": true,
   "type": "SET_CSP_INHERITED_OPTIMISTIC",
 }
 `;
 
 exports[`setCspInheritedAction creates an SET_CSP_INHERITED action when passed a boolean value 1`] = `
-Object {
+{
   "payload": true,
   "type": "SET_CSP_INHERITED",
 }
 `;
 
 exports[`setCspInheritedAction creates an error action if passed a non-boolean value 1`] = `
-Object {
+{
   "error": true,
   "payload": [Error: Can only set to Boolean values],
   "type": "SET_CSP_INHERITED",
@@ -145,14 +145,14 @@ Object {
 `;
 
 exports[`setDirtyAction creates a SET_DIRTY action when passed a boolean value 1`] = `
-Object {
+{
   "payload": true,
   "type": "SET_DIRTY",
 }
 `;
 
 exports[`setDirtyAction creates an error action if passed a non-boolean value 1`] = `
-Object {
+{
   "error": true,
   "payload": [Error: Can only set to Boolean values],
   "type": "SET_DIRTY",

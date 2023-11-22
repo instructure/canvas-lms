@@ -18,7 +18,7 @@
 
 import React, {useEffect} from 'react'
 import {useMatch} from 'react-router-dom'
-import {Achievements} from '../components/Achievments'
+import {AchievementsLayout} from '../components/Achievements'
 
 export function Component() {
   const pathMatch = useMatch('/users/:userId/*')
@@ -27,8 +27,8 @@ export function Component() {
   }
 
   useEffect(() => {
-    document.title = 'Learner Passport: Portfolios'
+    document.title = 'Learner Passport: Achievements'
   }, [])
 
-  return <Achievements />
+  return <AchievementsLayout />
 }

@@ -170,4 +170,90 @@ describe Assignment do
       }
     end
   end
+
+  describe "#destroy" do
+    subject { assignment.destroy! }
+
+    context "with external tool assignment" do
+      let(:course) { course_model }
+      let(:tool) { external_tool_1_3_model(context: course) }
+      let(:assignment) do
+        course.assignments.create!(
+          submission_types: "external_tool",
+          external_tool_tag_attributes: {
+            url: tool.url,
+            content_type: "ContextExternalTool",
+            content_id: tool.id
+          },
+          points_possible: 42
+        )
+      end
+
+      it "destroys resource links and keeps them associated" do
+        expect(assignment.lti_resource_links.first).to be_active
+        subject
+        expect(assignment.lti_resource_links.first).to be_deleted
+      end
+    end
+  end
+
+  describe "#restore" do
+    subject { assignment.restore }
+
+    context "with external tool assignment" do
+      let(:course) { course_model }
+      let(:tool) { external_tool_1_3_model(context: course) }
+      let(:assignment) do
+        course.assignments.create!(
+          submission_types: "external_tool",
+          external_tool_tag_attributes: {
+            url: tool.url,
+            content_type: "ContextExternalTool",
+            content_id: tool.id
+          },
+          points_possible: 42
+        )
+      end
+
+      before do
+        assignment.destroy!
+      end
+
+      it "restores resource links" do
+        expect(assignment.lti_resource_links.first).to be_deleted
+        subject
+        expect(assignment.lti_resource_links.first).to be_active
+      end
+    end
+  end
+
+  def setup_assignment_without_submission
+    assignment_model(course: @course)
+    @assignment.reload
+  end
+
+  def setup_assignment_with_homework
+    setup_assignment_without_submission
+    @assignment.submit_homework(@user, { submission_type: "online_text_entry", body: "blah" })
+    @assignment.reload
+  end
+
+  it "queries to Assignment.versions consider the override_reflection_type_values method returns" do
+    course_with_teacher(active_all: true)
+    setup_assignment_with_homework
+
+    @assignment.update!(points_possible: 5)
+    @assignment.update!(points_possible: 8)
+    versions = Version.where(versionable_type: %w[Assignment AbstractAssignment], versionable_id: @assignment.id)
+    version_one = versions.first
+    version_two = versions.second
+    version_one.update_columns(versionable_type: "Assignment")
+    version_two.update_columns(versionable_type: "AbstractAssignment")
+
+    versions = @assignment.versions
+
+    expect(versions).to include version_one
+    expect(versions).to include version_two
+    expect(versions.length).to eq(3)
+  end
 end

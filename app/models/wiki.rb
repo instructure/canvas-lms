@@ -91,7 +91,7 @@ class Wiki < ActiveRecord::Base
     # TODO: i18n
     t :front_page_name, "Front Page"
     # attempt to find the page and store it's url (if it is found)
-    page = wiki_pages.not_deleted.where(url:).first
+    page = find_page(url)
     set_front_page_url!(url) if has_no_front_page && page
 
     # return an implicitly created page if a page could not be found

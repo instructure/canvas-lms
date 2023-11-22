@@ -89,6 +89,8 @@ module Types
                                 .then { object.email }
     end
 
+    field :uuid, String, null: true
+
     field :sis_id, String, null: true
     def sis_id
       domain_root_account = context[:domain_root_account]

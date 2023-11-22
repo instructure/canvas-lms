@@ -913,6 +913,17 @@ CanvasRails::Application.routes.draw do
 
   resources :users, only: [:passport] do
     get "passport" => "learner_passport#index"
+    get "passport/data/achievements" => "learner_passport#achievements_index"
+
+    get "passport/data/portfolios" => "learner_passport#portfolios_index"
+    put "passport/data/portfolios/create" => "learner_passport#portfolio_create"
+    post "passport/data/portfolios/:portfolio_id" => "learner_passport#portfolio_update"
+    get "passport/data/portfolios/show/:portfolio_id" => "learner_passport#portfolio_show"
+    put "passport/data/portfolios/duplicate" => "learner_passport#portfolio_duplicate"
+    get "passport/data/portfolios/reset" => "learner_passport#portfolio_reset"
+
+    get "passport/data/skills" => "learner_passport#skills_index"
+
     get "passport/*path" => "learner_passport#index"
   end
 
@@ -1183,6 +1194,7 @@ CanvasRails::Application.routes.draw do
       get  "courses/:course_id/enrollments", action: :index, as: "course_enrollments"
       get  "sections/:section_id/enrollments", action: :index, as: "section_enrollments"
       get  "users/:user_id/enrollments", action: :index, as: "user_enrollments"
+      get  "users/:user_id/temporary_enrollment_status", action: :show_temporary_enrollment_status
       get  "accounts/:account_id/enrollments/:id", action: :show, as: "enrollment"
 
       post "courses/:course_id/enrollments", action: :create
@@ -1603,6 +1615,8 @@ CanvasRails::Application.routes.draw do
         get "courses/:course_id/assignments/:assignment_id/date_details", action: :show, as: "course_assignment_date_details"
         get "courses/:course_id/quizzes/:quiz_id/date_details", action: :show, as: "course_quizzes_quiz_date_details"
         get "courses/:course_id/modules/:context_module_id/date_details", action: :show, as: "course_context_module_date_details"
+        put "courses/:course_id/assignments/:assignment_id/date_details", action: :update
+        put "courses/:course_id/quizzes/:quiz_id/date_details", action: :update
       end
 
       scope(controller: :login) do

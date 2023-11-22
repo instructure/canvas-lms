@@ -446,6 +446,7 @@ module Factories
     course = opts[:course] || course_factory(active_course: true)
     user = opts[:user] || user_factory(active_user: true)
     course.enroll_student(user, enrollment_state: "active") unless user.enrollments.any? { |e| e.course_id == course.id }
+    late_policy_factory(course:, deduct: 10, every: :day) if opts[:late]
     @assignment = course.assignments.create(title: opts.fetch(:title, "Test Assignment"))
     @assignment.workflow_state = "published"
     @assignment.submission_types = "online_quiz"

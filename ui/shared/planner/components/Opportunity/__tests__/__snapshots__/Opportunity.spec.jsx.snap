@@ -119,7 +119,7 @@ exports[`renders the base component correctly 1`] = `
           iconPlacement="start"
           isWithinText={false}
           themeOverride={
-            Object {
+            {
               "mediumHeight": "normal",
               "mediumPaddingHorizontal": "0",
             }
@@ -313,7 +313,7 @@ exports[`renders the base component correctly with 0 points 1`] = `
           iconPlacement="start"
           isWithinText={false}
           themeOverride={
-            Object {
+            {
               "mediumHeight": "normal",
               "mediumPaddingHorizontal": "0",
             }
@@ -507,7 +507,7 @@ exports[`renders the base component correctly without points 1`] = `
           iconPlacement="start"
           isWithinText={false}
           themeOverride={
-            Object {
+            {
               "mediumHeight": "normal",
               "mediumPaddingHorizontal": "0",
             }

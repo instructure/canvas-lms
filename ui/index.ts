@@ -21,7 +21,6 @@
 import './boot/initializers/setWebpackCdnHost'
 import '@canvas/jquery/jquery.instructure_jquery_patches' // this needs to be before anything else that requires jQuery
 import './boot'
-import './boot/initializers/router'
 
 // true modules that we use in this file
 import $ from 'jquery'
@@ -32,6 +31,7 @@ import {Mathml} from '@instructure/canvas-rce'
 import loadBundle from 'bundles-generated'
 import {isolate} from '@canvas/sentry'
 import {Capabilities as C, up} from '@canvas/engine'
+import {loadReactRouter} from './boot/initializers/router'
 
 // these are all things that either define global $.whatever or $.fn.blah
 // methods or set something up that other code expects to exist at runtime.
@@ -93,6 +93,7 @@ function afterDocumentReady() {
     advanceReadiness('deferredBundles')
   })
 
+  isolate(loadReactRouter)()
   isolate(loadNewUserTutorials)()
 
   if (!ENV.FEATURES.explicit_latex_typesetting) {

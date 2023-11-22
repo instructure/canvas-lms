@@ -73,7 +73,7 @@ export const Component = () => {
         </Tabs.Panel>
         <Tabs.Panel
           id="gradingSchemeTab"
-          renderTitle={I18n.t('Schemes')}
+          renderTitle={I18n.t('Grading Schemes')}
           isSelected={selectedTab === 'schemes'}
         >
           {selectedTab === 'schemes' ? <Outlet /> : null}

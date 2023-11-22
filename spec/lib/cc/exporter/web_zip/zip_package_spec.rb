@@ -882,6 +882,27 @@ describe "ZipPackage" do
         )
       end
 
+      it "doesn't blow up when content is exported with a special reference without a path" do
+        media = add_file(fixture_file_upload("292.mp3", "audio/mpeg"), @course, "292.mp3")
+        page =
+          @course.wiki_pages.create!(
+            title: "Home Page",
+            wiki: @course.wiki,
+            body:
+              "<p>
+                <iframe style=\"width: 320px; height: 14.25rem; display: inline-block;\"
+                        title=\"Audio player for 292.mp3\" data-media-type=\"audio\"
+                        src=\"/media_objects_iframe?mediahref=/files/#{media.id}/download&amp;type=audio?type=audio\"
+                        data-media-id=\"maybe\"></iframe>
+                <img src=\"$BAD-FILEBASE$/\" alt=\"bad_image.jpg\"></img>
+              </p>"
+          )
+        @module.content_tags.create!(content: page, context: @course, indent: 0)
+        course_data = create_zip_package.parse_course_data
+        expect(course_data[:pages].length).to eq 1
+        expect(course_data[:files]).to include({ type: "file", name: "292.mp3", size: 123_716, files: nil })
+      end
+
       it "does not blow up when exporting linked recorded media files" do
         media_id = "m_media-id"
         file_data = { type: "file", name: "video.mp4", size: 172_780, files: nil }
@@ -935,29 +956,6 @@ describe "ZipPackage" do
         course_data = create_zip_package.parse_course_data
         expect(course_data[:pages].length).to eq 1
         expect(course_data[:files]).to include(file_data)
-      end
-
-      it "doesn't blow up when content is exported with a special reference without a path" do
-        media = add_file(fixture_file_upload("292.mp3", "audio/mpeg"), @course, "292.mp3")
-        page =
-          @course.wiki_pages.create!(
-            title: "Home Page",
-            wiki: @course.wiki,
-            body:
-              "<p>
-                <iframe style=\"width: 320px; height: 14.25rem; display: inline-block;\"
-                        title=\"Audio player for 292.mp3\" data-media-type=\"audio\"
-                        src=\"/media_objects_iframe?mediahref=/files/#{media.id}/download&amp;type=audio?type=audio\"
-                        data-media-id=\"maybe\"></iframe>
-                <img src=\"$BAD-FILEBASE$/\" alt=\"bad_image.jpg\"></img>
-              </p>"
-          )
-        @module.content_tags.create!(content: page, context: @course, indent: 0)
-        course_data = create_zip_package.parse_course_data
-        expect(course_data[:pages].length).to eq 1
-        expect(course_data[:files]).to include(
-          { type: "file", name: "292.mp3", size: 123_716, files: nil }
-        )
       end
 
       it "handles circle-linked items" do

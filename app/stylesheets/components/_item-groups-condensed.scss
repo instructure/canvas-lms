@@ -35,10 +35,9 @@
 }
 
 .item-group-condensed {
-  padding: 9px;
+  margin-top: 24px;
 
   .ig-header {
-    margin-top: 15px;
     background-color: $ic-bg-light-neutral;
     border: 1px solid $ic-border-light;
     padding: direction-sides($ic-sp $ic-sp*0.5); // match the ig-list and ig-row that appear below the header

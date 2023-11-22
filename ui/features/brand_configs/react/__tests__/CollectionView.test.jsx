@@ -21,7 +21,12 @@ import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
 import {within} from '@testing-library/dom'
 import Subject from '../CollectionView'
-import * as submitHtmlForm from '@canvas/theme-editor/submitHtmlForm'
+import {submitHtmlForm} from '@canvas/theme-editor/submitHtmlForm'
+
+jest.mock('@canvas/theme-editor/submitHtmlForm', () => ({
+  __esModule: true,
+  submitHtmlForm: jest.fn(),
+}))
 
 const OUR_ACCOUNT_ID = '123'
 const ACTIVE_BASIS = {
@@ -105,14 +110,10 @@ const props = {
 
 describe('CollectionView', () => {
   const deleteURL = new RegExp('/api/v1/shared_brand_configs/(.+)')
-  let mockedSubmitForm
-  const savedSubmit = submitHtmlForm.default
   const {location: savedLocation} = window
 
   beforeEach(() => {
     fetchMock.delete(deleteURL, {})
-    mockedSubmitForm = jest.fn()
-    submitHtmlForm.default = mockedSubmitForm
     // JS DOM doesn't implement location.reload
     delete window.location
     window.location = {reload: jest.fn()}
@@ -120,8 +121,8 @@ describe('CollectionView', () => {
 
   afterEach(() => {
     fetchMock.restore()
-    submitHtmlForm.default = savedSubmit
     window.location = savedLocation
+    jest.clearAllMocks()
   })
 
   it('renders', () => {
@@ -197,7 +198,7 @@ describe('CollectionView', () => {
     const basis = menuItems.find(item => within(item).queryByText(ACTIVE_BASIS.name))
     expect(basis).toBeDefined()
     fireEvent.click(basis)
-    expect(mockedSubmitForm).toHaveBeenCalledWith(
+    expect(submitHtmlForm).toHaveBeenCalledWith(
       `/accounts/${OUR_ACCOUNT_ID}/brand_configs/save_to_user_session`,
       'POST',
       undefined
@@ -212,7 +213,7 @@ describe('CollectionView', () => {
     const basis = menuItems.find(item => within(item).queryByText(DELETABLE_BASIS.name))
     expect(basis).toBeDefined()
     fireEvent.click(basis)
-    expect(mockedSubmitForm).toHaveBeenCalledWith(
+    expect(submitHtmlForm).toHaveBeenCalledWith(
       `/accounts/${OUR_ACCOUNT_ID}/brand_configs/save_to_user_session`,
       'POST',
       DELETABLE_BASIS.md5
@@ -258,7 +259,7 @@ describe('CollectionView', () => {
     const cardButtons = getAllByTestId('themecard-name-button')
     const card = cardButtons.find(c => within(c).queryByText(DELETABLE_BASIS.name))
     fireEvent.click(card)
-    expect(mockedSubmitForm).toHaveBeenCalledWith(
+    expect(submitHtmlForm).toHaveBeenCalledWith(
       `/accounts/${OUR_ACCOUNT_ID}/brand_configs/save_to_user_session`,
       'POST',
       DELETABLE_BASIS.md5
@@ -270,7 +271,7 @@ describe('CollectionView', () => {
     const cardButtons = getAllByTestId('themecard-name-button')
     const card = cardButtons.find(c => within(c).queryByText(ACTIVE_BASIS.name))
     fireEvent.click(card)
-    expect(mockedSubmitForm).toHaveBeenCalledWith(
+    expect(submitHtmlForm).toHaveBeenCalledWith(
       `/accounts/${OUR_ACCOUNT_ID}/brand_configs/save_to_user_session`,
       'POST',
       undefined

@@ -2179,6 +2179,25 @@ if Rails.version >= "6.1"
         end
       end
     end
+
+    module Associations
+      class Association
+        private
+
+        def association_scope
+          if klass
+            @association_scope ||= if disable_joins
+                                     DisableJoinsAssociationScope.scope(self)
+                                   elsif reflection.type && owner.respond_to?(:override_reflection_type_values)
+                                     reflection_type_values = owner.override_reflection_type_values
+                                     AssociationScope.scope(self).unscope(where: reflection.type.to_s).where(reflection.type.to_s => reflection_type_values)
+                                   else
+                                     AssociationScope.scope(self)
+                                   end
+          end
+        end
+      end
+    end
   end
   # rubocop:enable Lint/RescueException
   # rubocop:enable Naming/RescuedExceptionsVariableName

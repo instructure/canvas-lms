@@ -337,7 +337,11 @@ class CoursePacesController < ApplicationController
   end
 
   def paces_publishing
-    jobs_progress = Progress.where(tag: "course_pace_publish", context: @context.course_paces).is_pending.map do |progress|
+    jobs_progress = Progress
+                    .where(tag: "course_pace_publish", context: @context.course_paces)
+                    .is_pending
+                    .select('DISTINCT ON ("context_id") *')
+                    .map do |progress|
       pace = progress.context
       if pace&.workflow_state == "active"
         pace_context = context_for(pace)
@@ -656,7 +660,7 @@ class CoursePacesController < ApplicationController
         full_name: enrollment.user.name,
         sortable_name: enrollment.user.sortable_name,
         start_at: enrollment.start_at,
-        avatar_url: User.find_by(id: enrollment.user_id).avatar_image_url
+        avatar_url: enrollment.user.avatar_image_url
       }
     end
     json.index_by { |h| h[:id] }

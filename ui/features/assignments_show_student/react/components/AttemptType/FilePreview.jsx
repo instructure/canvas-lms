@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -20,7 +21,7 @@ import {getIconByType} from '@canvas/mime/react/mimeClassIconHelper'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
 import previewUnavailable from '../../../images/PreviewUnavailable.svg'
-import React, {Component} from 'react'
+import React, {useState, useEffect, useRef, useMemo} from 'react'
 import {bool} from 'prop-types'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import elideString from '../../helpers/elideString'
@@ -38,17 +39,14 @@ import {getOriginalityData} from '@canvas/grading/originalityReportHelper'
 
 const I18n = useI18nScope('assignments_2')
 
-export default class FilePreview extends Component {
-  static propTypes = {
-    submission: Submission.shape,
-    isOriginalityReportVisible: bool,
-  }
+export default function FilePreview({submission, isOriginalityReportVisible}) {
+  const [selectedFileIndex, setSelectedFileIndex] = useState(0)
 
-  state = {
-    selectedFile: 0,
-  }
+  useEffect(() => {
+    setSelectedFileIndex(0)
+  }, [submission.attempt])
 
-  translateMimeClass(mimeClass) {
+  const translateMimeClass = mimeClass => {
     switch (mimeClass) {
       case 'audio':
         return I18n.t('audio')
@@ -79,25 +77,25 @@ export default class FilePreview extends Component {
     }
   }
 
-  capitalize = s => {
+  const capitalize = s => {
     if (typeof s !== 'string') return ''
     return s.charAt(0).toUpperCase() + s.slice(1)
   }
 
-  selectFile = index => {
-    if (index >= 0 || index < this.props.submission.attachments.length) {
-      this.setState({selectedFile: index})
+  const selectFile = index => {
+    if (index >= 0 || index < submission.attachments.length) {
+      setSelectedFileIndex(index)
     }
   }
 
-  shouldDisplayThumbnail = file => {
+  const shouldDisplayThumbnail = file => {
     return file.mimeClass === 'image' && file.thumbnailUrl
   }
 
-  renderThumbnail = (file, index) => {
+  const renderThumbnail = (file, index) => {
     return (
       <IconButton
-        onClick={() => this.selectFile(index)}
+        onClick={() => selectFile(index)}
         size="large"
         screenReaderLabel={file.displayName}
         withBorder={false}
@@ -110,20 +108,20 @@ export default class FilePreview extends Component {
     )
   }
 
-  renderIcon = (file, index) => {
+  const renderIcon = (file, index) => {
     return (
       <IconButton
         size="large"
         withBackground={false}
         withBorder={false}
-        onClick={() => this.selectFile(index)}
+        onClick={() => selectFile(index)}
         renderIcon={getIconByType(file.mimeClass)}
         screenReaderLabel={file.displayName}
       />
     )
   }
 
-  renderFileIcons = () => {
+  const renderFileIcons = () => {
     const cellTheme = {background: theme.variables.colors.backgroundLight}
     return (
       <Table caption={I18n.t('Uploaded files')} data-testid="uploaded_files_table">
@@ -141,16 +139,16 @@ export default class FilePreview extends Component {
           </Table.Row>
         </Table.Head>
         <Table.Body>
-          {this.props.submission.attachments.map((file, index) => (
+          {submission.attachments.map((file, index) => (
             <Table.Row key={file._id}>
               <Table.Cell themeOverride={cellTheme}>
-                {this.shouldDisplayThumbnail(file)
-                  ? this.renderThumbnail(file, index)
-                  : this.renderIcon(file, index)}
+                {shouldDisplayThumbnail(file)
+                  ? renderThumbnail(file, index)
+                  : renderIcon(file, index)}
               </Table.Cell>
               <Table.Cell themeOverride={cellTheme}>
                 <>
-                  <Link onClick={() => this.selectFile(index)}>
+                  <Link onClick={() => selectFile(index)}>
                     {elideString(file.displayName || file.name)}
                   </Link>
                   <ScreenReaderContent>{file.displayName || file.name}</ScreenReaderContent>
@@ -160,13 +158,11 @@ export default class FilePreview extends Component {
                 {file.size}
               </Table.Cell>
               <Table.Cell themeOverride={cellTheme}>
-                {this.props.submission.originalityData &&
-                  this.props.isOriginalityReportVisible &&
-                  getOriginalityData(this.props.submission, index) && (
+                {submission.originalityData &&
+                  isOriginalityReportVisible &&
+                  getOriginalityData(submission, index) && (
                     <Flex.Item>
-                      <OriginalityReport
-                        originalityData={getOriginalityData(this.props.submission, index)}
-                      />
+                      <OriginalityReport originalityData={getOriginalityData(submission, index)} />
                     </Flex.Item>
                   )}
               </Table.Cell>
@@ -180,7 +176,7 @@ export default class FilePreview extends Component {
     )
   }
 
-  renderUnavailablePreview(message) {
+  const renderUnavailablePreview = message => {
     return (
       <div style={{textAlign: 'center'}}>
         <img alt="" src={previewUnavailable} style={{width: '150px'}} />
@@ -201,7 +197,7 @@ export default class FilePreview extends Component {
     )
   }
 
-  renderFilePreview = () => {
+  const renderFilePreview = () => {
     const iframeContainerStyle = {
       maxWidth: '1366px',
       height: '0',
@@ -216,9 +212,8 @@ export default class FilePreview extends Component {
       position: 'absolute',
       borderLeft: `1px solid ${theme.variables.colors.borderMedium}`,
     }
-
-    const selectedFile = this.props.submission.attachments[this.state.selectedFile]
-    if (!selectedFile.submissionPreviewUrl) {
+    const selectedFile = submission.attachments[selectedFileIndex]
+    if (selectedFile && !selectedFile.submissionPreviewUrl) {
       return (
         <div
           style={{
@@ -228,7 +223,7 @@ export default class FilePreview extends Component {
           }}
         >
           <div style={{display: 'block'}}>
-            {this.renderUnavailablePreview(I18n.t('Preview Unavailable'))}
+            {renderUnavailablePreview(I18n.t('Preview Unavailable'))}
             {selectedFile.displayName}
             <div style={{display: 'block'}}>
               <Button
@@ -247,9 +242,9 @@ export default class FilePreview extends Component {
 
     return (
       <div style={iframeContainerStyle} data-testid="assignments_2_submission_preview">
-        <ScreenReaderContent>{selectedFile.displayName}</ScreenReaderContent>
+        <ScreenReaderContent>{selectedFile?.displayName}</ScreenReaderContent>
         <iframe
-          src={selectedFile.submissionPreviewUrl}
+          src={selectedFile?.submissionPreviewUrl}
           title="preview"
           style={iframeStyle}
           allowFullScreen={true}
@@ -258,22 +253,25 @@ export default class FilePreview extends Component {
     )
   }
 
-  render() {
-    if (!this.props.submission.attachments) {
-      return <LoadingIndicator />
-    }
-
-    if (this.props.submission.attachments.length) {
+  const renderFilePreviewContent = () => {
+    if (submission.attachments.length) {
       return (
         <Flex data-testid="file-preview" direction="column" width="100%" alignItems="stretch">
-          {this.props.submission.attachments.length > 1 && (
-            <Flex.Item padding="0 x-large x-large">{this.renderFileIcons()}</Flex.Item>
+          {submission.attachments.length > 1 && (
+            <Flex.Item padding="0 x-large x-large">{renderFileIcons()}</Flex.Item>
           )}
-          <Flex.Item>{this.renderFilePreview()}</Flex.Item>
+          <Flex.Item>{renderFilePreview()}</Flex.Item>
         </Flex>
       )
     } else {
-      return this.renderUnavailablePreview(I18n.t('No Submission'))
+      return renderUnavailablePreview(I18n.t('No Submission'))
     }
   }
+
+  return <>{!submission.attachments ? <LoadingIndicator /> : renderFilePreviewContent()}</>
+}
+
+FilePreview.propTypes = {
+  submission: Submission.shape,
+  isOriginalityReportVisible: bool,
 }

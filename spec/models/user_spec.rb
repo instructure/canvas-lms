@@ -1317,6 +1317,18 @@ describe User do
       @fake_student = @course.student_view_student
       expect(@fake_student.can_masquerade?(@teacher, Account.default)).to be_truthy
     end
+
+    it "doesn't allow teacher to become student view of random student" do
+      course_with_teacher(active_all: true)
+      @fake_student = user_factory
+      expect(@fake_student.can_masquerade?(@teacher, Account.default)).to be_falsey
+    end
+
+    it "doesn't allow fake student to become teacher" do
+      course_with_teacher(active_all: true)
+      @fake_student = @course.student_view_student
+      expect(@teacher.can_masquerade?(@fake_student, Account.default)).to be_falsey
+    end
   end
 
   describe "#has_subset_of_account_permissions?" do

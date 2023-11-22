@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -58,13 +57,13 @@ const {Option: SelectOption, Group: SelectGroup} = Select as any
 
 const noOptionsOptionId = '_noOptionsOption'
 
-type Props = {
-  children: ReactElement | ReactElement[]
+export type CanvasSelectProps = {
+  children: React.ReactNode
   disabled?: boolean
   id: string
   label?: ReactElement | string
   noOptionsLabel?: string
-  onChange: (event: ChangeEvent, value: string) => void
+  onChange: (event: ChangeEvent<HTMLSelectElement>, value: string) => void
   value: string
 }
 
@@ -98,12 +97,12 @@ function CanvasSelectGroup(_props: GroupProps): ReactElement {
   return <div />
 }
 
-class CanvasSelect extends React.Component<Props, State> {
+class CanvasSelect extends React.Component<CanvasSelectProps, State> {
   static Option = CanvasSelectOption
 
   static Group = CanvasSelectGroup
 
-  constructor(props) {
+  constructor(props: CanvasSelectProps) {
     super(props)
 
     const option: ReactElement | null = this.getOptionByFieldValue('value', props.value)
@@ -117,7 +116,7 @@ class CanvasSelect extends React.Component<Props, State> {
     }
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps: CanvasSelectProps) {
     if (this.props.value !== prevProps.value || !isEqual(this.props.children, prevProps.children)) {
       const option = this.getOptionByFieldValue('value', this.props.value)
       this.setState({
@@ -155,7 +154,7 @@ class CanvasSelect extends React.Component<Props, State> {
     )
   }
 
-  renderChildren(children: ReactElement | ReactElement[]): any {
+  renderChildren(children: React.ReactNode): any {
     if (!Array.isArray(children)) {
       // children is 1 child
       if (matchComponentTypes(children, [CanvasSelectOption])) {
@@ -286,7 +285,7 @@ class CanvasSelect extends React.Component<Props, State> {
       const option = this.getOptionByFieldValue('id', id)
       if (prevSelection !== id) {
         const ne = event.nativeEvent as unknown
-        this.props.onChange(ne as ChangeEvent, option?.props.value)
+        this.props.onChange(ne as ChangeEvent<HTMLSelectElement>, option?.props.value)
       }
     }
   }
@@ -299,13 +298,13 @@ class CanvasSelect extends React.Component<Props, State> {
   getOptionByFieldValue(
     field: string,
     value: string | undefined,
-    options = castArray<ReactElement>(this.props.children)
+    options = React.Children.toArray(this.props.children) as ReactElement[]
   ): ReactElement | null {
     if (!this.props.children) return null
 
     let foundOpt: ReactElement | null = null
     for (let i = 0; i < options.length; ++i) {
-      const o: ReactElement = options[i]
+      const o: React.ReactNode = options[i]
       if (Array.isArray(o)) {
         foundOpt = this.getOptionByFieldValue(field, value, o)
       } else if (matchComponentTypes(o, [CanvasSelectOption])) {
@@ -313,11 +312,14 @@ class CanvasSelect extends React.Component<Props, State> {
           foundOpt = o
         }
       } else if (matchComponentTypes(o, [CanvasSelectGroup])) {
-        // @ts-ignore
-        const groupOptions = castArray(o.props.children)
+        const groupOptions = castArray<
+          ReactElement | ReactElement[] | (ReactElement | ReactElement[])[]
+        >(o.props.children)
         for (let j = 0; j < groupOptions.length; ++j) {
           const o2 = groupOptions[j]
+          // @ts-expect-error
           if (o2.props[field] === value) {
+            // @ts-expect-error
             foundOpt = o2
             break
           }

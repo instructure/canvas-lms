@@ -408,6 +408,7 @@ shared_examples_for "an object whose dates are overridable" do
     end
 
     it "does not include context module overrides without the flag" do
+      Account.site_admin.disable_feature!(:differentiated_modules)
       expect(overridable.all_assignment_overrides).not_to include(@module_override)
     end
   end

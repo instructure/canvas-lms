@@ -175,7 +175,7 @@ export default function StatusBar(props) {
   }
 
   function renderPath() {
-    return <View data-testid="whole-status-bar-path">{renderPathString(props)}</View>
+    return <View data-testid="whole-status-bar-path" style={{display: 'flex'}}>{renderPathString(props)}</View>
   }
 
   function renderA11yButton() {
@@ -228,7 +228,7 @@ export default function StatusBar(props) {
         ? formatMessage('Switch to raw HTML Editor')
         : formatMessage('Switch to pretty HTML Editor')
     return (
-      <View data-testid="html-editor-message">
+      <View data-testid="html-editor-message" style={{display: 'flex'}}>
         <Button
           data-btn-id="rce-editormessage-btn"
           margin="0 small"

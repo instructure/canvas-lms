@@ -30,6 +30,9 @@ import {
   defaultEnv,
 } from './mocks'
 import {fetchShowK5Dashboard} from '@canvas/observer-picker/react/utils'
+import {enableFetchMocks} from 'jest-fetch-mock'
+
+enableFetchMocks()
 
 jest.mock('@canvas/observer-picker/react/utils', () => ({
   ...jest.requireActual('@canvas/observer-picker/react/utils'),

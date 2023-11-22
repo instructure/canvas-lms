@@ -56,6 +56,7 @@ export const GRADEBOOK_QUERY = gql`
           userId
           state
           gradingPeriodId
+          excused
         }
       }
       assignmentGroupsConnection {

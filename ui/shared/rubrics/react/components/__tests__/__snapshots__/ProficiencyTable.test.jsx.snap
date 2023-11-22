@@ -3,7 +3,7 @@
 exports[`default proficiency renders the ProficiencyRating component 1`] = `
 <div
   style={
-    Object {
+    {
       "textAlign": "center",
     }
   }

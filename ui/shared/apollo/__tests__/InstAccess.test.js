@@ -17,6 +17,9 @@
  */
 import getCookie from '@instructure/get-cookie'
 import InstAccess from '../InstAccess'
+import {enableFetchMocks} from 'jest-fetch-mock'
+
+enableFetchMocks()
 
 jest.mock('@instructure/get-cookie', () => {
   return jest.fn().mockImplementation(cookieName => {

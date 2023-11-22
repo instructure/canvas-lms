@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useEffect} from 'react'
 import {Outlet, useMatch, useNavigate} from 'react-router-dom'
 import {SVGIcon} from '@instructure/ui-svg-images'
 import {IconAlertsLine} from '@instructure/ui-icons'
@@ -49,15 +49,23 @@ const inactiveStyle = {
 export const Component = () => {
   const navigate = useNavigate()
   const pathMatch = useMatch('/users/:userId/:tabPath/*')
-  const selectedTab = pathMatch?.params?.['*']
+  const selectedTab = pathMatch?.params?.['*']?.split('/')[0] || 'achievements'
 
-  const mountPoint: HTMLElement | null = document.querySelector('#content')
-  if (!mountPoint) {
-    return null
-  }
+  useEffect(() => {
+    // canvas limits the width of the content area. For learner passport, let's not.
+    document.body.classList.add('learner-passport')
+    const s = document.createElement('style')
+    s.textContent = `
+      body:not(.full-width):not(.outcomes):not(.body--login-confirmation).learner-passport .ic-Layout-wrapper {
+        max-width: 100%;
+      }
+    `
+    document.head.appendChild(s)
+  }, [])
 
   const handleTabChange = (tabname: string) => {
-    navigate(`../${tabname}`, {relative: 'path'})
+    const route = tabname === 'portfolios' ? 'portfolios/dashboard' : tabname
+    navigate(`${route}`)
   }
 
   const handleTabClick = (event: React.MouseEvent) => {
@@ -72,64 +80,73 @@ export const Component = () => {
     }
   }
 
+  const mountPoint: HTMLElement | null = document.querySelector('#content')
+  if (!mountPoint) {
+    return null
+  }
+
   return (
     <Portal open={true} mountNode={mountPoint}>
-      <View as="div" background="secondary" padding="small">
-        <Flex>
-          <SVGIcon src={passportSvg} inline={true} size="small" title="Learner Passport" />
-          <Flex.Item shouldGrow={true}>
-            <div style={{display: 'inline-block', marginInlineStart: '1.5rem'}} role="tablist">
-              <div
-                role="tab"
-                data-tabid="achievements"
-                style={selectedTab === 'achievements' ? activeStyle : inactiveStyle}
-                tabIndex={0}
-                onClick={handleTabClick}
-                onKeyDown={handleTabKey}
-              >
-                Achievements
-              </div>
-              <div
-                role="tab"
-                data-tabid="portfolios"
-                style={selectedTab === 'portfolios' ? activeStyle : inactiveStyle}
-                tabIndex={0}
-                onClick={handleTabClick}
-                onKeyDown={handleTabKey}
-              >
-                Portfolios
-              </div>
-              <div
-                role="tab"
-                data-tabid="projects"
-                style={selectedTab === 'projects' ? activeStyle : inactiveStyle}
-                tabIndex={0}
-                onClick={handleTabClick}
-                onKeyDown={handleTabKey}
-              >
-                Projects
-              </div>
+      <div style={{marginInlineStart: '-24px'}}>
+        <View as="div" background="secondary" padding="small medium">
+          <Flex>
+            <div style={{color: 'var(--ic-brand-primary)'}}>
+              <SVGIcon src={passportSvg} inline={true} size="small" title="Learner Passport" />
             </div>
-          </Flex.Item>
-          <Flex.Item>
-            <IconAlertsLine size="x-small" />
-          </Flex.Item>
-          <Flex.Item>
-            <div
-              style={{
-                margin: '0 0 0 .75rem',
-                padding: '0 0 0 .75rem',
-                borderWidth: '0 0 0 1px',
-                borderStyle: 'solid',
-                borderColor: 'var(--ic-brand-border)',
-              }}
-            >
-              {window.ENV.current_user.display_name}
-            </div>
-          </Flex.Item>
-        </Flex>
-      </View>
-      <View as="div" padding="small">
+            <Flex.Item shouldGrow={true} margin="0 medium 0 0">
+              <div style={{display: 'inline-block', marginInlineStart: '1.5rem'}} role="tablist">
+                <div
+                  role="tab"
+                  data-tabid="achievements"
+                  style={selectedTab === 'achievements' ? activeStyle : inactiveStyle}
+                  tabIndex={0}
+                  onClick={handleTabClick}
+                  onKeyDown={handleTabKey}
+                >
+                  Achievements
+                </div>
+                <div
+                  role="tab"
+                  data-tabid="portfolios"
+                  style={selectedTab === 'portfolios' ? activeStyle : inactiveStyle}
+                  tabIndex={0}
+                  onClick={handleTabClick}
+                  onKeyDown={handleTabKey}
+                >
+                  Portfolios
+                </div>
+                <div
+                  role="tab"
+                  data-tabid="projects"
+                  style={selectedTab === 'projects' ? activeStyle : inactiveStyle}
+                  tabIndex={0}
+                  onClick={handleTabClick}
+                  onKeyDown={handleTabKey}
+                >
+                  Projects
+                </div>
+              </div>
+            </Flex.Item>
+            <Flex.Item>
+              <IconAlertsLine size="x-small" />
+            </Flex.Item>
+            <Flex.Item>
+              <div
+                style={{
+                  margin: '0 0 0 .75rem',
+                  padding: '0 0 0 .75rem',
+                  borderWidth: '0 0 0 1px',
+                  borderStyle: 'solid',
+                  borderColor: 'var(--ic-brand-border)',
+                }}
+              >
+                {window.ENV.current_user.display_name}
+              </div>
+            </Flex.Item>
+          </Flex>
+        </View>
+      </div>
+      <View as="div" margin="large x-large 0">
         <Outlet />
       </View>
     </Portal>

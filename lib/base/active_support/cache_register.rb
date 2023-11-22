@@ -75,7 +75,7 @@ module ActiveSupport
           redis = Canvas::CacheRegister.redis(base_obj_key, batch_object.shard)
 
           instrument(:read, name, options) do |payload|
-            keys_to_batch = batched_keys.map { |type| "#{base_obj_key}/#{type}" }
+            keys_to_batch = batched_keys.map { |type| "{#{base_obj_key}}/#{type}" }
             now = Time.now.utc.to_fs(batch_object.cache_timestamp_format)
             # pass in the base key, followed by the intermediate keys (that the script will pull and append to the base)
             keys = [key] + keys_to_batch

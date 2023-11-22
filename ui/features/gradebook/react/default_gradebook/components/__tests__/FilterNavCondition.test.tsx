@@ -65,7 +65,7 @@ const dateTests = (testType: string) => {
   })
 
   it('sets the date field value if the filter value is present', () => {
-    filter.value = 'Fri Dec 03 2021 02:00:00 GMT-0500 (Colombia Standard Time)'
+    filter.value = '2021-12-03T02:00:00-0500'
     props.filter = filter
     const {getByTestId} = render(
       <FilterNavFilter {...props} onChange={onChange} onDelete={onDelete} />

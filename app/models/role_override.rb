@@ -1799,8 +1799,15 @@ class RoleOverride < ActiveRecord::Base
         label: -> { I18n.t("Admin Analytics - view and export data") },
         available_to: %w[AccountAdmin AccountMembership],
         true_for: %w[AccountAdmin],
-        applies_to_concluded: true,
+        account_only: true,
         account_allows: ->(a) { a.feature_enabled?(:admin_analytics_view_permission) }
+      },
+      manage_impact: {
+        label: -> { t("Manage Impact") },
+        label_v2: -> { t("Impact - Manage") },
+        available_to: %w[AccountAdmin AccountMembership],
+        true_for: %w[AccountAdmin],
+        account_only: :root
       }
     }
   )

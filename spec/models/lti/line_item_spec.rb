@@ -112,36 +112,34 @@ RSpec.describe Lti::LineItem do
     let(:creation_arguments) { base_line_item_params(assignment_model, DeveloperKey.create!) }
   end
 
-  context "when destroying a line item" do
+  describe "when destroying" do
+    subject { line_item.destroy }
+
     let(:line_item) { line_item_model }
-    let(:assignment) { assignment_model }
-    let(:resource_link) { resource_link_model }
+    let(:result) { lti_result_model(line_item:) }
 
-    it "destroys the assignment if it is the first line item and is not coupled" do
-      line_item_one = line_item_model(assignment:, coupled: false)
-      line_item_two = line_item_model(assignment:)
-      line_item_two.update!(created_at: line_item_one.created_at + 5.seconds)
-      expect do
-        line_item_one.destroy!
-      end.to change(assignment, :workflow_state).from("published").to("deleted")
+    it "destroys associated results" do
+      expect(result).to be_active
+      subject
+      expect(result.reload).to be_deleted
+    end
+  end
+
+  describe "when undestroying" do
+    subject { line_item.undestroy }
+
+    let(:line_item) { line_item_model }
+    let(:result) { lti_result_model(line_item:) }
+
+    before do
+      result
+      line_item.destroy
     end
 
-    it "doesn't destroy the assignment if the line item is not the first line item" do
-      line_item_one = line_item_model(assignment:)
-      line_item_two = line_item_model(assignment:, coupled: false)
-      line_item_two.update!(created_at: line_item_one.created_at + 5.seconds)
-      expect do
-        line_item_two.destroy!
-      end.not_to change(assignment, :workflow_state)
-    end
-
-    it "doesn't destroy the assignment if the line item is coupled" do
-      line_item_one = line_item_model(assignment:, coupled: true)
-      line_item_two = line_item_model(assignment:)
-      line_item_two.update!(created_at: line_item_one.created_at + 5.seconds)
-      expect do
-        line_item_one.destroy!
-      end.not_to change(assignment, :workflow_state)
+    it "undestroys associated results" do
+      expect(result.reload).to be_deleted
+      subject
+      expect(result.reload).to be_active
     end
   end
 

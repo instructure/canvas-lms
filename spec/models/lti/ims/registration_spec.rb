@@ -281,7 +281,16 @@ module Lti::IMS
               "foo" => "bar"
             },
             icon_uri: "http://example.com/icon.png",
-            placements: ["global_navigation", "course_navigation"],
+            "https://canvas.instructure.com/lti/launch_width": "200",
+            "https://canvas.instructure.com/lti/launch_height": "300",
+            "https://canvas.instructure.com/lti/display_type": "full_width",
+            placements: [
+              "https://canvas.instructure.com/lti/assignment_edit",
+              "global_navigation",
+              "course_navigation",
+              "ContentArea",
+              "RichTextEditor",
+            ],
           }],
           claims: []
         }
@@ -290,25 +299,34 @@ module Lti::IMS
       subject { registration.placements }
 
       context "convert messages to placements" do
-        it do
+        it "accepts valid placements" do
+          canvas_placement_hash = {
+            custom_fields: { "foo" => "bar" },
+            enabled: true,
+            icon_url: "http://example.com/icon.png",
+            message_type: "LtiResourceLinkRequest",
+            target_link_uri: "http://example.com/launch",
+            display_type: "full_width",
+          }
           expect(subject).to eq [
-            {
-              custom_fields: { "foo" => "bar" },
-              enabled: true,
-              icon_url: "http://example.com/icon.png",
-              message_type: "LtiResourceLinkRequest",
-              placement: "global_navigation",
-              target_link_uri: "http://example.com/launch"
-            },
-            {
-              custom_fields: { "foo" => "bar" },
-              enabled: true,
-              icon_url: "http://example.com/icon.png",
-              message_type: "LtiResourceLinkRequest",
-              placement: "course_navigation",
-              target_link_uri: "http://example.com/launch"
-            }
+            canvas_placement_hash.merge(placement: "assignment_edit", launch_width: 200, launch_height: 300),
+            canvas_placement_hash.merge(placement: "global_navigation", selection_width: 200, selection_height: 300),
+            canvas_placement_hash.merge(placement: "course_navigation", selection_width: 200, selection_height: 300),
+            canvas_placement_hash.merge(placement: "link_selection", selection_width: 200, selection_height: 300),
+            canvas_placement_hash.merge(placement: "editor_button", selection_width: 200, selection_height: 300),
           ]
+        end
+
+        it "sets windowTarget if display_type is new_window" do
+          message = registration.lti_tool_configuration["messages"].first
+          message["https://canvas.instructure.com/lti/display_type"] = "new_window"
+          expect(subject.first).to include({ windowTarget: "_blank", display_type: "default" })
+        end
+
+        it "rejects invalid placements" do
+          bad_placement_name = "course_navigationhttps://canvas.instructure.com/lti/"
+          registration.lti_tool_configuration["messages"].first["placements"] << bad_placement_name
+          expect { registration.save! }.to raise_error(ActiveRecord::RecordInvalid)
         end
       end
     end

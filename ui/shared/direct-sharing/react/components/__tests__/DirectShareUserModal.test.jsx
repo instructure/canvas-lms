@@ -21,6 +21,9 @@ import {render, fireEvent, act} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
 import useContentShareUserSearchApi from '../../effects/useContentShareUserSearchApi'
 import DirectShareUserModal from '../DirectShareUserModal'
+import {enableFetchMocks} from 'jest-fetch-mock'
+
+enableFetchMocks()
 
 jest.mock('../../effects/useContentShareUserSearchApi')
 

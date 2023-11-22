@@ -30,6 +30,9 @@ import {Flex} from '@instructure/ui-flex'
 import {createAnalyticPropsGenerator} from './util/analytics'
 import {TempEnrollAvatar} from './TempEnrollAvatar'
 import {EMPTY_USER, MODULE_NAME, User} from './types'
+import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+
+declare const ENV: GlobalEnv
 
 const I18n = useI18nScope('temporary_enrollment')
 
@@ -37,13 +40,12 @@ const I18n = useI18nScope('temporary_enrollment')
 const analyticProps = createAnalyticPropsGenerator(MODULE_NAME)
 
 interface Props {
-  readonly user: User
-  readonly page: number
-  readonly searchFail: Function
-  readonly searchSuccess: Function
-  readonly canReadSIS?: boolean
-  readonly accountId: string
-  readonly foundEnroll?: User | null
+  user: User
+  page: number
+  searchFail: Function
+  searchSuccess: Function
+  canReadSIS?: boolean
+  foundEnroll?: User | null
 }
 
 export function TempEnrollSearch(props: Props) {
@@ -54,7 +56,7 @@ export function TempEnrollSearch(props: Props) {
   const [search, setSearch] = useState('')
   const [enrollment, setEnrollment] = useState<User>(EMPTY_USER)
 
-  const handleSearchTypeChange = (event: ChangeEvent<HTMLInputElement>, value: string) => {
+  const handleSearchTypeChange = (_event: ChangeEvent<HTMLInputElement>, value: string) => {
     setSearchType(value)
   }
 
@@ -110,7 +112,7 @@ export function TempEnrollSearch(props: Props) {
       const findUser = async () => {
         try {
           const {json} = await doFetchApi({
-            path: `/accounts/${props.accountId}/user_lists.json`,
+            path: `/accounts/${ENV.ROOT_ACCOUNT_ID}/user_lists.json`,
             method: 'POST',
             params: {user_list: search, v2: true, search_type: searchType},
           })
@@ -159,9 +161,7 @@ export function TempEnrollSearch(props: Props) {
   if (loading) {
     return (
       <Flex justifyItems="center" alignItems="center">
-        <Flex.Item shouldGrow={true}>
-          <Spinner renderTitle={I18n.t('Retrieving user information')} />
-        </Flex.Item>
+        <Spinner renderTitle={I18n.t('Retrieving user information')} />
       </Flex>
     )
   }

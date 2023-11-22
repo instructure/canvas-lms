@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 // Copyright (C) 2020 - present Instructure, Inc.
 //
 // This file is part of Canvas.

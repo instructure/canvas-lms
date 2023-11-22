@@ -884,6 +884,38 @@ describe "discussions" do
         expect(dt.assignment.peer_reviews).to be true
         expect(dt.assignment.automatic_peer_reviews).to be true
       end
+
+      it "does not allow submitting, when groups outside of the selected group category are selected" do
+        group_category.groups.create!(name: "group 1", context_type: "Course", context_id: course.id)
+        get "/courses/#{course.id}/discussion_topics/new"
+
+        title = "Group Context Discussion"
+        message = "this is a group context discussion"
+
+        f("input[placeholder='Topic Title']").send_keys title
+        type_in_tiny("textarea#discussion-topic-message-body", message)
+        force_click('input[type=checkbox][value="graded"]')
+        force_click("input[data-testid='group-discussion-checkbox']")
+        group_selector = f("input[placeholder='Select a group category']")
+        group_selector.click
+        wait_for_ajaximations
+        group_selector.send_keys :arrow_down
+        group_selector.send_keys :enter
+        wait_for_ajaximations
+
+        assign_to_selector = f("input[data-testid='assign-to-select']")
+        assign_to_selector.click
+        assign_to_selector.send_keys "group 1"
+        assign_to_selector.send_keys :enter
+        wait_for_ajaximations
+        force_click("input[data-testid='group-discussion-checkbox']")
+        wait_for_ajaximations
+
+        f("button[data-testid='save-and-publish-button']").click
+        wait_for_ajaximations
+
+        expect(fj("body:contains('Groups can only be part of the actively selected group set.')")).to be_present
+      end
     end
 
     context "editing" do
@@ -893,6 +925,7 @@ describe "discussions" do
 
       context "discussion" do
         before do
+          attachment_model
           # TODO: Update to cover: graded, group discussions, file attachment, any other options later implemented
           all_discussion_options_enabled = {
             title: "value for title",
@@ -909,6 +942,7 @@ describe "discussions" do
             delayed_post_at: "Tue, 10 Oct 2023 16:00:00.000000000 UTC +00:00",
             lock_at: "Wed, 11 Nov 2023 15:59:59.999999000 UTC +00:00",
             is_section_specific: false,
+            attachment: @attachment
           }
 
           @topic_all_options = course.discussion_topics.create!(all_discussion_options_enabled)
@@ -950,6 +984,32 @@ describe "discussions" do
           # makes an exact comparison too fragile.
           expect(ff("input[placeholder='Select Date']")[0].attribute("value")).to eq("")
           expect(ff("input[placeholder='Select Date']")[1].attribute("value")).to eq("")
+        end
+
+        context "usage rights" do
+          before do
+            course.root_account.enable_feature!(:usage_rights_discussion_topics)
+            course.update!(usage_rights_required: true)
+
+            usage_rights = @course.usage_rights.create! use_justification: "creative_commons", legal_copyright: "(C) 2014 XYZ Corp", license: "cc_by_nd"
+            @attachment.usage_rights = usage_rights
+            @attachment.save!
+          end
+
+          it "displays correct usage rights" do
+            get "/courses/#{course.id}/discussion_topics/#{@topic_all_options.id}/edit"
+
+            expect(f("button[data-testid='usage-rights-icon']")).to be_truthy
+            f("button[data-testid='usage-rights-icon']").find_element(css: "svg")
+            # Verify that the correct icon appears
+            expect(f("button[data-testid='usage-rights-icon']").find_element(css: "svg").attribute("name")).to eq "IconFilesCreativeCommons"
+
+            f("button[data-testid='usage-rights-icon']").click
+
+            expect(f("input[data-testid='usage-select']").attribute("value")).to eq "The material is licensed under Creative Commons"
+            expect(f("input[data-testid='cc-license-select']").attribute("value")).to eq "CC Attribution No Derivatives"
+            expect(f("input[data-testid='legal-copyright']").attribute("value")).to eq "(C) 2014 XYZ Corp"
+          end
         end
       end
 

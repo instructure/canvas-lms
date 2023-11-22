@@ -119,3 +119,4 @@ c893bf9d12390b846f5437e98db60046f1e9f364 # Prettier /public/javascripts/
 b2b0bff902677f75180fc8e6139badb4a8ec62f4 # Style/TernaryParentheses, Style/RedundantParentheses
 62fc5c033d6361bcbdbbe3ad8f93ff085b21713d # RSpec/Be*
 23f8cf9da04dc70359e4dc34ad786c1612404c2d # Prettier packages/canvas-rce
+c6f2f9a81beddc714a0523e3780c7eec47b50ebf # Run prettier on app/jsx/ from blueprint_courses to bundles

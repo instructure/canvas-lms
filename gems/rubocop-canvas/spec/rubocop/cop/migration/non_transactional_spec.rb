@@ -31,7 +31,7 @@ describe RuboCop::Cop::Migration::NonTransactional do
     RUBY
     expect(cop.offenses.size).to eq(1)
     expect(cop.messages.first).to match(/disable_ddl/)
-    expect(cop.offenses.first.severity.name).to eq(:warning)
+    expect(cop.offenses.first.severity.name).to eq(:error)
   end
 
   it "ignores non-concurrent indexes" do
@@ -71,7 +71,7 @@ describe RuboCop::Cop::Migration::NonTransactional do
     RUBY
     expect(cop.offenses.size).to eq(1)
     expect(cop.messages.first).to match(/if_not_exists/)
-    expect(cop.offenses.first.severity.name).to eq(:warning)
+    expect(cop.offenses.first.severity.name).to eq(:error)
   end
 
   it "complains about missing if_not_exists for add_column" do
@@ -86,7 +86,7 @@ describe RuboCop::Cop::Migration::NonTransactional do
     RUBY
     expect(cop.offenses.size).to eq(1)
     expect(cop.messages.first).to match(/if_not_exists/)
-    expect(cop.offenses.first.severity.name).to eq(:warning)
+    expect(cop.offenses.first.severity.name).to eq(:error)
   end
 
   it "complains about missing if_not_exists for add_reference" do
@@ -101,7 +101,7 @@ describe RuboCop::Cop::Migration::NonTransactional do
     RUBY
     expect(cop.offenses.size).to eq 1
     expect(cop.messages.first).to match(/if_not_exists/)
-    expect(cop.offenses.first.severity.name).to eq :warning
+    expect(cop.offenses.first.severity.name).to eq :error
   end
 
   it "is ok about missing if_not_exists for add_index when transactional" do
@@ -164,6 +164,137 @@ describe RuboCop::Cop::Migration::NonTransactional do
     RUBY
     expect(cop.offenses.size).to eq(1)
     expect(cop.messages.first).to match(/if_exists/)
-    expect(cop.offenses.first.severity.name).to eq(:warning)
+    expect(cop.offenses.first.severity.name).to eq(:error)
+  end
+
+  it "complains about missing if_not_exists on create_table" do
+    inspect_source(<<~RUBY)
+      class TestMigration < ActiveRecord::Migration
+        disable_ddl_transaction!
+
+        def up
+          create_table :table do |t|
+            t.timestamps
+          end
+        end
+      end
+    RUBY
+    expect(cop.offenses.size).to eq(1)
+    expect(cop.messages.first).to match(/if_not_exists/)
+    expect(cop.offenses.first.severity.name).to eq(:error)
+  end
+
+  it "complains about missing if_not_exists on indexes in create_table" do
+    inspect_source(<<~RUBY)
+      class TestMigration < ActiveRecord::Migration
+        disable_ddl_transaction!
+
+        def up
+          create_table :table, if_not_exists: true do |t|
+            t.timestamps
+            t.index :created_at
+          end
+        end
+      end
+    RUBY
+    expect(cop.offenses.size).to eq(1)
+    expect(cop.messages.first).to match(/if_not_exists/)
+    expect(cop.offenses.first.severity.name).to eq(:error)
+  end
+
+  it "complains about missing if_not_exists on indexes in add_reference" do
+    inspect_source(<<~RUBY)
+      class TestMigration < ActiveRecord::Migration
+        disable_ddl_transaction!
+
+        def up
+          create_table :table, if_not_exists: true do |t|
+            t.references :column, index: true
+            t.timestamps
+          end
+        end
+      end
+    RUBY
+    expect(cop.offenses.size).to eq(1)
+    expect(cop.messages.first).to match(/if_not_exists/)
+    expect(cop.offenses.first.severity.name).to eq(:error)
+  end
+
+  it "complains about missing if_not_exists on indexes with options in add_reference" do
+    inspect_source(<<~RUBY)
+      class TestMigration < ActiveRecord::Migration
+        disable_ddl_transaction!
+
+        def up
+          create_table :table, if_not_exists: true do |t|
+            t.references :column, index: { name: "special" }
+            t.timestamps
+          end
+        end
+      end
+    RUBY
+    expect(cop.offenses.size).to eq(1)
+    expect(cop.messages.first).to match(/if_not_exists/)
+    expect(cop.offenses.first.severity.name).to eq(:error)
+  end
+
+  it "doesn't complain about present if_not_exists on indexes in add_reference" do
+    inspect_source(<<~RUBY)
+      class TestMigration < ActiveRecord::Migration
+        disable_ddl_transaction!
+
+        def up
+          create_table :table, if_not_exists: true do |t|
+            t.references :column, index: { name: "special", if_not_exists: true }
+            t.timestamps
+            t.index :create_at, if_not_exists: true
+          end
+        end
+      end
+    RUBY
+    expect(cop.offenses.size).to eq(0)
+  end
+
+  it "doesn't complain about non-index in add_reference" do
+    inspect_source(<<~RUBY)
+      class TestMigration < ActiveRecord::Migration
+        disable_ddl_transaction!
+
+        def up
+          create_table :table, if_not_exists: true do |t|
+            t.references :column, index: false
+          end
+        end
+      end
+    RUBY
+    expect(cop.offenses.size).to eq(0)
+  end
+
+  it "complains about drop_table without if_exists" do
+    inspect_source(<<~RUBY)
+      class TestMigration < ActiveRecord::Migration
+        disable_ddl_transaction!
+
+        def up
+          drop_table :table
+        end
+      end
+    RUBY
+    expect(cop.offenses.size).to eq(1)
+    expect(cop.messages.first).to match(/if_exists/)
+    expect(cop.offenses.first.severity.name).to eq(:error)
+  end
+
+  it "doesn't complain about drop_table with if_exists" do
+    inspect_source(<<~RUBY)
+      class TestMigration < ActiveRecord::Migration
+        disable_ddl_transaction!
+
+        def up
+          drop_table :table, if_exists: true
+        end
+      end
+    RUBY
+    expect(cop.offenses.size).to eq(0)
   end
 end
