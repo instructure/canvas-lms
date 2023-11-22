@@ -557,7 +557,11 @@ class CoursesController < ApplicationController
         @past_enrollments << first_enrollment unless first_enrollment.workflow_state == "invited"
       elsif !first_enrollment.hard_inactive?
         if first_enrollment.enrollment_state.pending? || state == :creation_pending ||
-           (first_enrollment.admin? && first_enrollment.course.start_at&.>(Time.now.utc))
+           (first_enrollment.admin? && (
+               first_enrollment.course.restrict_enrollments_to_course_dates &&
+               first_enrollment.course.start_at&.>(Time.now.utc)
+             )
+           )
           @future_enrollments << first_enrollment unless first_enrollment.restrict_future_listing?
         elsif state != :inactive
           @current_enrollments << first_enrollment

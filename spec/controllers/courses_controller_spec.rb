@@ -263,6 +263,35 @@ describe CoursesController do
           expect(assigns[:current_enrollments].map(&:course_id)).to eq [course2.id, course1.id]
         end
       end
+
+      context "as enrollment admin" do
+        it "includes courses with no applicable start/end dates" do
+          # no dates at all
+          enrollment1 = teacher_in_course active_all: true, course_name: "A"
+
+          course2 = Account.default.courses.create! start_at: 2.weeks.ago,
+                                                    conclude_at: 1.week.from_now,
+                                                    restrict_enrollments_to_course_dates: false,
+                                                    name: "B"
+          course2.offer!
+          enrollment2 = teacher_in_course user: @teacher, course: course2, active_all: true
+
+          # future date that doesn't count
+          course3 = Account.default.courses.create! start_at: 1.week.from_now,
+                                                    conclude_at: 2.weeks.from_now,
+                                                    restrict_enrollments_to_course_dates: false,
+                                                    name: "C"
+          course3.offer!
+          enrollment3 = teacher_in_course user: @teacher, course: course3, active_all: true
+
+          user_session(@teacher)
+          get_index
+          expect(response).to be_successful
+          expect(assigns[:past_enrollments]).to be_empty
+          expect(assigns[:current_enrollments]).to eq [enrollment1, enrollment2, enrollment3]
+          expect(assigns[:future_enrollments]).to be_empty
+        end
+      end
     end
 
     describe "past_enrollments" do
