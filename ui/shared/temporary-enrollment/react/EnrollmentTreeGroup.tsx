@@ -160,6 +160,7 @@ export function EnrollmentTreeGroup(props: Props) {
               size="small"
               screenReaderLabel={I18n.t('Toggle group %{group}', {group: props.label})}
               {...analyticProps('Group')}
+              aria-expanded={props.isToggle}
             >
               {toggleIcon}
             </IconButton>
