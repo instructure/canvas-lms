@@ -192,12 +192,15 @@ tr:
   a_name_for_this_set_is_required_222bad23: "Bu set için bir isim gereklidir"
   a_name_is_required_b5df38a9: "Bir isim gerekli"
   a_new_assignment_has_been_created_for_your_course__12b72639: "Dersiniz %{course_name} için yeni bir ödev oluşturuldu"
+  a_new_module_has_been_created_with_the_content_ret_b01468b2: "Araçtan alınan içerikle yeni bir modül oluşturuldu. Görmek isterseniz Modüller sayfasını ziyaret edin."
+  a_page_with_this_title_already_exists_please_choos_19c53cc4: "Aynı başlığa sahip bir sayfa zaten var. Lütfen başka bir başlık seçin."
   a_partner_id_is_required_to_use_academic_benchmark_adba3df0: "Akademik Karşılaştırma'yı kullanmak için Partner ID'si gerekiyor"
   a_partner_key_is_required_to_use_academic_benchmar_da9f31bd: "Akademik Karşılaştırma'yı kullanmak için Partner anahtarı gerekiyor"
   a_problem_occurred_adding_reviewers_57b083d9: "Gözlemci ekleme esnasında hata oluştu."
   a_process_is_already_in_progress_f4495f5e: "Süreç zaten devam ediyor."
   a_redirect_uri_is_required_please_supply_one_471908db: "Yönlendirme uri'si gerekiyor, lütfen bir tane girin."
   a_role_name_is_required_47efd33: "Rol adı gereklidir."
+  a_save_is_in_progress_63a2887d: "Kaydetme işlemi devam ediyor"
   a_section_is_required_64103992: "Bir bölüm gerekli"
   a_sis_integration_is_not_configured_and_the_enable_3c560d89: "Yeni bir ÖBS entegrasyonu yapılandırılmamış ve yeni ÖBS Entegrasyonunu Etkinleştirme ayarları etkin değil."
   a_table_containing_the_name_of_the_grading_scheme__2c25dc3: "Notlandırma şemaları, şemayı düzenleme ya da silme ikonlarının adlarını içeren tablo"
@@ -2238,6 +2241,7 @@ tr:
        
       Öğrencilerin, hâlâ kullanılabilir olan zaman aralıklarına kimlerin kaydolduğunu görmelerine izin verin.
   allow_students_to_see_who_was_signed_up_for_time_s_160ba252: "Öğrenciler zaman aralıklarına kimlerin kaydolduğunu görebilsin."
+  allow_students_to_sync_their_course_content_in_the_b6fd9169: "Öğrencilerin ders içeriklerini mobil uygulamalarda eşzamanlamasına ve çevrimdışıyken görüntülemesine izin ver."
   allow_switching_to_the_enhanced_rce_317e746f: "Gelişmiş RCE'ye geçişe izin ver"
   allow_the_ability_to_send_notifications_through_ou_13cc8537: "Bildirimlerin gönderim kuyruğumuz ile gönderilebilmesine izin ver"
   allow_this_tool_to_access_the_ims_names_and_role_p_33e16d7f: "Bu aracın IMS İsileri ve Rol Sağlama Servisine erişimine izin verin"
@@ -2285,6 +2289,7 @@ tr:
   an_error_occured_while_updating_the_grading_period_9e024cd1: "Notlandırma peryot setini güncellerken bir hata oluştu"
   an_error_occurred_attempting_to_dismiss_the_opport_f86e0667: "Fırsatı gözardı etmeye çalışırken bir hata oluştu."
   an_error_occurred_changing_the_lock_state_for_file_77443f15: "\"%{fileName}\" için kilitleme durumunu değiştirirken bir hata oluştu."
+  an_error_occurred_during_the_sync_process_error_62d98be7: "Eşzamanlama işlemi sırasında bir hata meydana geldi: %{error}"
   an_error_occurred_making_a_network_request_d1bda348: "Ağ isteğinde bulunurken bir hata oluştu"
   an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*Bir hata oluştu*, lütfen cevabınızı daha sonra tekrar gönderin"
   an_error_occurred_please_try_again_95361e05: "Hata oluştu. Lütfen tekrar deneyin."
@@ -3474,6 +3479,7 @@ tr:
     titles: 
       attendance_help: "Katılım Yardımı"
   attendance_ca433183: Katılım
+  attendee_sync_in_progress_cd882292: "Katılımcı eşzamanlama işlemi devam ediyor..."
   attendees_eb402bac: Katılımcılar
   attention_aaca1f1d: Uyarı!
   attribute_d9f3af72: Özellik
@@ -13610,7 +13616,7 @@ tr:
     format: 
       delimiter: ","
       precision: 3
-      round_mode: default
+      round_mode: varsayılan
       separator: "."
       significant: false
       strip_insignificant_zeros: false
