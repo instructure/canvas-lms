@@ -5382,6 +5382,7 @@ nn:
   canvas_course_id_db4de2b8: canvas_course_id
   canvas_course_tutorial_video_5205c1c1: "Opplæringsvideo for Canvasemne"
   canvas_dashboard_links_will_navigate_to_the_catalo_4143635e: "Canvas sine dashbord-lenker navigerer til dashbordet for katalogen"
+  canvas_default_7f81a6b8: "Canvas standard"
   canvas_demo_7a005cf3: Canvasdemo
   canvas_did_not_recognize_your_identity_provider_cb0e50fc: "Canvas kjenner ikkje att identitetsleverandøren din"
   canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "Canvas har ingen konto for brukar: %{user}"
@@ -17285,7 +17286,7 @@ nn:
     format: 
       delimiter: ","
       precision: 3
-      round_mode: default
+      round_mode: standard
       separator: "."
       significant: false
       strip_insignificant_zeros: false
