@@ -13551,7 +13551,7 @@ he:
     format: 
       delimiter: ","
       precision: 3
-      round_mode: default
+      round_mode: "ברירת מחדל"
       separator: "."
       significant: false
       strip_insignificant_zeros: false
