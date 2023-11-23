@@ -3760,6 +3760,7 @@ uk:
   canvas_cloud_information_fdd404f2: "Хмарні дані Canvas"
   canvas_course_id_db4de2b8: canvas_course_id
   canvas_dashboard_links_will_navigate_to_the_catalo_4143635e: "Посилання панелі інструментів Canvas будуть приводити до панелі інструментів Каталогу"
+  canvas_default_7f81a6b8: "Canvas по замовчуванню"
   canvas_demo_7a005cf3: "Демонстрація Canvas"
   canvas_did_not_recognize_your_identity_provider_cb0e50fc: "Canvas не може розпізнати провайдера Вашої тотожності"
   canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "Canvas не має облікового запису для користувача: %{user}"
@@ -12113,7 +12114,7 @@ uk:
         unit: $
     format: 
       delimiter: ","
-      round_mode: default
+      round_mode: "за замовчуванням"
       separator: "."
     human: 
       decimal_units: 
