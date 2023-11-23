@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useMemo, useRef} from 'react'
+import React, {useState, useMemo, useRef, useCallback} from 'react'
 import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
@@ -28,14 +28,23 @@ import {IconModuleSolid} from '@instructure/ui-icons'
 import {calculatePanelHeight} from '../utils/miscHelpers'
 import type {Module} from './types'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {AssigneeOption} from './AssigneeSelector'
+import {SettingsPanelState} from './settingsReducer'
+import {createModule, updateModule} from './SettingsPanel'
+import {OptionValue, updateModuleAssignees} from './AssignToPanel'
 
 const I18n = useI18nScope('differentiated_modules')
 
-export interface DifferentiatedModulesTrayProps {
+const SETTINGS_ID = 'settings'
+const ASSIGN_TO_ID = 'assign-to'
+
+type DifferentiatedModulesTrayTabId = typeof SETTINGS_ID | typeof ASSIGN_TO_ID
+
+export type DifferentiatedModulesTrayProps = {
   onDismiss: () => void
   moduleElement: HTMLDivElement
   moduleId?: string
-  initialTab?: 'settings' | 'assign-to'
+  initialTab?: DifferentiatedModulesTrayTabId
   moduleName?: string
   unlockAt?: string
   prerequisites?: Module[]
@@ -47,16 +56,72 @@ export interface DifferentiatedModulesTrayProps {
 const SettingsPanel = React.lazy(() => import('./SettingsPanel'))
 const AssignToPanel = React.lazy(() => import('./AssignToPanel'))
 
-export default function DifferentiatedModulesTray({
+function Header({
+  moduleId,
+  moduleElement,
+  onDismiss,
+  headerLabel,
+}: {
+  moduleId?: string
+  moduleElement: HTMLDivElement
+  onDismiss: () => void
+  headerLabel: String
+}) {
+  const customOnDismiss = useCallback(() => {
+    if (!moduleId) {
+      // remove the temp module element on cancel
+      moduleElement?.remove()
+    }
+    onDismiss()
+  }, [moduleId, moduleElement, onDismiss])
+  return (
+    <View as="div" padding="small">
+      <Flex as="div" margin="0 0 medium 0">
+        <Flex.Item>
+          <CloseButton
+            onClick={customOnDismiss}
+            screenReaderLabel={I18n.t('Close')}
+            placement="end"
+          />
+        </Flex.Item>
+        <Flex.Item>
+          <IconModuleSolid size="x-small" />
+        </Flex.Item>
+        <Flex.Item margin="0 0 0 small">
+          <Heading data-testid="header-label" as="h3">
+            {headerLabel}
+          </Heading>
+        </Flex.Item>
+      </Flex>
+    </View>
+  )
+}
+
+function Fallback() {
+  return (
+    <View as="div" textAlign="center">
+      <Spinner renderTitle={I18n.t('Loading...')} />
+    </View>
+  )
+}
+
+function Body({
   onDismiss,
   moduleElement,
   moduleId,
-  initialTab = 'assign-to',
+  initialTab = ASSIGN_TO_ID,
   courseId,
+  trayRef,
   ...settingsProps
-}: DifferentiatedModulesTrayProps) {
+}: DifferentiatedModulesTrayProps & {trayRef: React.RefObject<HTMLElement>}) {
   const [selectedTab, setSelectedTab] = useState<string | undefined>(initialTab)
-  const headerLabel = moduleId ? I18n.t('Edit Module Settings') : I18n.t('Add Module')
+  const changes = useRef<Set<string>>(new Set())
+  const settingsData = useRef<SettingsPanelState | null>(null)
+  const assignToData = useRef<{
+    selectedOption: OptionValue
+    selectedAssignees: AssigneeOption[]
+  } | null>(null)
+
   const footerHeight = '63'
   const panelHeight = useMemo(
     (): string => calculatePanelHeight(moduleId !== undefined),
@@ -66,103 +131,114 @@ export default function DifferentiatedModulesTray({
     (): string => `calc(${panelHeight} - ${footerHeight}px)`,
     [panelHeight]
   )
-  const trayRef = useRef<HTMLElement | null>(null)
 
-  function customOnDismiss() {
-    if (!moduleId) {
-      // remove the temp module element on cancel
-      moduleElement?.remove()
+  const handleSubmitMissingTabs = () => {
+    if (
+      selectedTab === SETTINGS_ID &&
+      changes.current.has(ASSIGN_TO_ID) &&
+      assignToData.current &&
+      moduleId
+    ) {
+      // eslint-disable-next-line promise/catch-or-return
+      updateModuleAssignees({
+        courseId,
+        moduleId,
+        moduleElement,
+        selectedAssignees: assignToData.current?.selectedAssignees,
+      }).finally(onDismiss)
+    } else if (
+      selectedTab === ASSIGN_TO_ID &&
+      changes.current.has(SETTINGS_ID) &&
+      settingsData.current
+    ) {
+      const performRequest = moduleId === undefined ? createModule : updateModule
+      // eslint-disable-next-line promise/catch-or-return
+      performRequest({
+        moduleId,
+        moduleElement,
+        addModuleUI: settingsProps.addModuleUI,
+        data: settingsData.current,
+      }).finally(onDismiss)
+    } else {
+      onDismiss()
     }
-    onDismiss()
   }
 
-  function Header() {
-    return (
-      <View as="div" padding="small">
-        <Flex as="div" margin="0 0 medium 0">
-          <Flex.Item>
-            <CloseButton
-              onClick={customOnDismiss}
-              screenReaderLabel={I18n.t('Close')}
-              placement="end"
+  return (
+    <React.Suspense fallback={<Fallback />}>
+      {moduleId === undefined ? (
+        <SettingsPanel
+          bodyHeight={bodyHeight}
+          footerHeight={footerHeight}
+          onDismiss={onDismiss}
+          moduleElement={moduleElement}
+          enablePublishFinalGrade={ENV?.PUBLISH_FINAL_GRADE}
+          mountNodeRef={trayRef}
+          updateParentData={newSettingsData => (settingsData.current = newSettingsData)}
+          onDidSubmit={onDismiss}
+          {...settingsProps}
+          {...(settingsData.current ?? {})}
+        />
+      ) : (
+        <Tabs onRequestTabChange={(_e: any, {id}: {id?: string}) => setSelectedTab(id)}>
+          <Tabs.Panel
+            id={SETTINGS_ID}
+            data-testid="settings-panel"
+            renderTitle={I18n.t('Settings')}
+            isSelected={selectedTab === SETTINGS_ID}
+            padding="none"
+          >
+            <SettingsPanel
+              bodyHeight={bodyHeight}
+              footerHeight={footerHeight}
+              onDismiss={onDismiss}
+              moduleElement={moduleElement}
+              moduleId={moduleId}
+              enablePublishFinalGrade={ENV?.PUBLISH_FINAL_GRADE}
+              mountNodeRef={trayRef}
+              updateParentData={(newSettingsData, changed) => {
+                settingsData.current = newSettingsData
+                changed && changes.current.add(SETTINGS_ID)
+              }}
+              onDidSubmit={handleSubmitMissingTabs}
+              {...settingsProps}
+              {...(settingsData.current ?? {})}
             />
-          </Flex.Item>
-          <Flex.Item>
-            <IconModuleSolid size="x-small" />
-          </Flex.Item>
-          <Flex.Item margin="0 0 0 small">
-            <Heading data-testid="header-label" as="h3">
-              {headerLabel}
-            </Heading>
-          </Flex.Item>
-        </Flex>
-      </View>
-    )
-  }
+          </Tabs.Panel>
+          <Tabs.Panel
+            id={ASSIGN_TO_ID}
+            data-testid="assign-to-panel"
+            renderTitle={I18n.t('Assign To')}
+            isSelected={selectedTab === ASSIGN_TO_ID}
+            padding="none"
+          >
+            <AssignToPanel
+              bodyHeight={bodyHeight}
+              footerHeight={footerHeight}
+              courseId={courseId}
+              moduleId={moduleId}
+              mountNodeRef={trayRef}
+              moduleElement={moduleElement}
+              onDismiss={onDismiss}
+              updateParentData={(newAssignToData, changed) => {
+                assignToData.current = newAssignToData
+                changed && changes.current.add(ASSIGN_TO_ID)
+              }}
+              defaultOption={assignToData.current?.selectedOption}
+              defaultAssignees={assignToData.current?.selectedAssignees}
+              onDidSubmit={handleSubmitMissingTabs}
+            />
+          </Tabs.Panel>
+        </Tabs>
+      )}
+    </React.Suspense>
+  )
+}
 
-  function Fallback() {
-    return (
-      <View as="div" textAlign="center">
-        <Spinner renderTitle={I18n.t('Loading...')} />
-      </View>
-    )
-  }
-
-  function Body() {
-    return (
-      <React.Suspense fallback={<Fallback />}>
-        {moduleId === undefined ? (
-          <SettingsPanel
-            bodyHeight={bodyHeight}
-            footerHeight={footerHeight}
-            onDismiss={onDismiss}
-            moduleElement={moduleElement}
-            enablePublishFinalGrade={ENV?.PUBLISH_FINAL_GRADE}
-            mountNodeRef={trayRef}
-            {...settingsProps}
-          />
-        ) : (
-          <Tabs onRequestTabChange={(_e: any, {id}: {id?: string}) => setSelectedTab(id)}>
-            <Tabs.Panel
-              id="settings"
-              data-testid="settings-panel"
-              renderTitle={I18n.t('Settings')}
-              isSelected={selectedTab === 'settings'}
-              padding="none"
-            >
-              <SettingsPanel
-                bodyHeight={bodyHeight}
-                footerHeight={footerHeight}
-                onDismiss={onDismiss}
-                moduleElement={moduleElement}
-                moduleId={moduleId}
-                enablePublishFinalGrade={ENV?.PUBLISH_FINAL_GRADE}
-                mountNodeRef={trayRef}
-                {...settingsProps}
-              />
-            </Tabs.Panel>
-            <Tabs.Panel
-              id="assign-to"
-              data-testid="assign-to-panel"
-              renderTitle={I18n.t('Assign To')}
-              isSelected={selectedTab === 'assign-to'}
-              padding="none"
-            >
-              <AssignToPanel
-                bodyHeight={bodyHeight}
-                footerHeight={footerHeight}
-                courseId={courseId}
-                moduleId={moduleId}
-                mountNodeRef={trayRef}
-                moduleElement={moduleElement}
-                onDismiss={onDismiss}
-              />
-            </Tabs.Panel>
-          </Tabs>
-        )}
-      </React.Suspense>
-    )
-  }
+export default function DifferentiatedModulesTray(props: DifferentiatedModulesTrayProps) {
+  const {onDismiss, moduleElement, moduleId} = props
+  const headerLabel = moduleId ? I18n.t('Edit Module Settings') : I18n.t('Add Module')
+  const trayRef = useRef<HTMLElement | null>(null)
 
   return (
     <Tray
@@ -172,8 +248,13 @@ export default function DifferentiatedModulesTray({
       size="regular"
       contentRef={r => (trayRef.current = r)}
     >
-      <Header />
-      <Body />
+      <Header
+        moduleId={moduleId}
+        moduleElement={moduleElement}
+        onDismiss={onDismiss}
+        headerLabel={headerLabel}
+      />
+      <Body {...props} trayRef={trayRef} />
     </Tray>
   )
 }
