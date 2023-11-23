@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useReducer, useMemo, useState} from 'react'
+import React, {useReducer, useMemo, useState, useEffect, useCallback, useRef} from 'react'
+import _ from 'lodash'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {TextInput} from '@instructure/ui-text-input'
@@ -26,7 +27,7 @@ import PrerequisiteForm from './PrerequisiteForm'
 import RequirementForm from './RequirementForm'
 import Footer from './Footer'
 import {DateTimeInput} from '@instructure/ui-date-time-input'
-import {defaultState, actions, reducer} from './settingsReducer'
+import {defaultState, actions, reducer, SettingsPanelState} from './settingsReducer'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {convertModuleSettingsForApi} from '../utils/miscHelpers'
 import {updateModuleUI} from '../utils/moduleHelpers'
@@ -38,7 +39,7 @@ import LoadingOverlay from './LoadingOverlay'
 
 const I18n = useI18nScope('differentiated_modules')
 
-export interface SettingsPanelProps {
+export type SettingsPanelProps = {
   bodyHeight: string
   footerHeight: string
   onDismiss: () => void
@@ -46,6 +47,7 @@ export interface SettingsPanelProps {
   moduleId?: string
   moduleName?: string
   unlockAt?: string
+  lockUntilChecked?: boolean
   prerequisites?: Module[]
   moduleList?: Module[]
   requirementCount?: 'all' | 'one'
@@ -56,7 +58,70 @@ export interface SettingsPanelProps {
   enablePublishFinalGrade?: boolean
   addModuleUI?: (data: Record<string, any>, element: HTMLDivElement) => void
   mountNodeRef: React.RefObject<HTMLElement>
+  updateParentData?: (data: SettingsPanelState, changed: boolean) => void
+  onDidSubmit?: () => void
 }
+
+const doRequest = (
+  path: string,
+  method: string,
+  data: any,
+  onSuccess: (res: Record<string, any>) => void,
+  successMessage: string,
+  errorMessage: string
+) =>
+  doFetchApi({
+    path,
+    method,
+    body: convertModuleSettingsForApi(data),
+  })
+    .then((response: {json: Record<string, any>}) => {
+      onSuccess(response.json)
+      showFlashAlert({
+        type: 'success',
+        message: successMessage,
+      })
+    })
+    .catch((e: Error) =>
+      showFlashAlert({
+        err: e,
+        message: errorMessage,
+      })
+    )
+
+export const updateModule = ({moduleId, moduleElement, data}: any) => {
+  if (!moduleId) return Promise.reject(I18n.t('Invalid module id.'))
+
+  return doRequest(
+    `/courses/${ENV.COURSE_ID}/modules/${moduleId}`,
+    'PUT',
+    data,
+    responseData => {
+      updateModuleUI(moduleElement, data)
+      const dialog = new RelockModulesDialog()
+      dialog.renderIfNeeded({
+        relock_warning: responseData?.context_module?.relock_warning ?? false,
+        id: moduleId,
+      })
+    },
+    I18n.t('%{moduleName} settings updated successfully.', {
+      moduleName: data.moduleName,
+    }),
+    I18n.t('Error updating %{moduleName} settings.', {moduleName: data.moduleName})
+  )
+}
+
+export const createModule = ({moduleElement, addModuleUI, data}: any) =>
+  doRequest(
+    `/courses/${ENV.COURSE_ID}/modules/`,
+    'POST',
+    data,
+    res => addModuleUI(res, moduleElement),
+    I18n.t('%{moduleName} created successfully.', {
+      moduleName: data.moduleName,
+    }),
+    I18n.t('Error creating %{moduleName}.', {moduleName: data.moduleName})
+  )
 
 export default function SettingsPanel({
   moduleElement,
@@ -66,6 +131,7 @@ export default function SettingsPanel({
   moduleId,
   moduleName,
   unlockAt,
+  lockUntilChecked,
   prerequisites,
   requirementCount,
   requireSequentialProgress,
@@ -76,18 +142,22 @@ export default function SettingsPanel({
   moduleItems = [],
   addModuleUI = () => {},
   mountNodeRef,
+  updateParentData,
+  onDidSubmit,
 }: SettingsPanelProps) {
   const [state, dispatch] = useReducer(reducer, {
     ...defaultState,
     moduleName: moduleName ?? '',
     unlockAt: unlockAt ?? new Date().toISOString(),
-    lockUntilChecked: !!unlockAt,
+    lockUntilChecked: lockUntilChecked ?? !!unlockAt,
     prerequisites: prerequisites ?? [],
     requirements: requirements ?? [],
     requirementCount: requirementCount ?? 'all',
     requireSequentialProgress: requireSequentialProgress ?? false,
     publishFinalGrade: publishFinalGrade ?? false,
   })
+  const initialState = useRef(_.cloneDeep(state))
+
   const [loading, setLoading] = useState(false)
 
   const availableModules = useMemo(() => {
@@ -95,69 +165,7 @@ export default function SettingsPanel({
     return cutoffIndex === -1 ? moduleList : moduleList.slice(0, cutoffIndex)
   }, [moduleList, moduleName])
 
-  function doRequest(
-    path: string,
-    method: string,
-    onSuccess: (res: Record<string, any>) => void,
-    successMessage: string,
-    errorMessage: string
-  ) {
-    setLoading(true)
-    doFetchApi({
-      path,
-      method,
-      body: convertModuleSettingsForApi(state),
-    })
-      .then((data: {json: Record<string, any>}) => {
-        setLoading(false)
-        onDismiss()
-        onSuccess(data.json)
-        showFlashAlert({
-          type: 'success',
-          message: successMessage,
-        })
-      })
-      .catch((e: Error) =>
-        showFlashAlert({
-          err: e,
-          message: errorMessage,
-        })
-      )
-  }
-
-  const handleUpdate = () => {
-    if (!moduleId) return
-
-    doRequest(
-      `/courses/${ENV.COURSE_ID}/modules/${moduleId}`,
-      'PUT',
-      responseData => {
-        updateModuleUI(moduleElement, state)
-        const dialog = new RelockModulesDialog()
-        dialog.renderIfNeeded({
-          relock_warning: responseData?.context_module?.relock_warning ?? false,
-          id: moduleId,
-        })
-      },
-      I18n.t('%{moduleName} settings updated successfully.', {
-        moduleName: state.moduleName,
-      }),
-      I18n.t('Error updating %{moduleName} settings.', {moduleName: state.moduleName})
-    )
-  }
-
-  const handleCreate = () =>
-    doRequest(
-      `/courses/${ENV.COURSE_ID}/modules/`,
-      'POST',
-      res => addModuleUI(res, moduleElement),
-      I18n.t('%{moduleName} created successfully.', {
-        moduleName: state.moduleName,
-      }),
-      I18n.t('Error creating %{moduleName}.', {moduleName: state.moduleName})
-    )
-
-  const handleSave = () => {
+  const handleSave = useCallback(() => {
     if (state.moduleName.length === 0) {
       dispatch({
         type: actions.SET_NAME_INPUT_MESSAGES,
@@ -171,10 +179,13 @@ export default function SettingsPanel({
       return
     }
 
-    const callback = moduleId ? handleUpdate : handleCreate
+    const handleRequest = moduleId ? updateModule : createModule
 
-    callback()
-  }
+    setLoading(true)
+    handleRequest({moduleId, moduleElement, addModuleUI, data: state})
+      .then(() => (onDidSubmit ? onDidSubmit() : onDismiss()))
+      .catch(() => setLoading(false))
+  }, [onDidSubmit, onDismiss, addModuleUI, moduleId, moduleElement, state])
 
   function customOnDismiss() {
     if (!moduleId) {
@@ -183,6 +194,12 @@ export default function SettingsPanel({
     }
     onDismiss()
   }
+
+  // Sends data to parent when unmounting
+  useEffect(
+    () => () => updateParentData?.(state, !_.isEqual(initialState.current, state)),
+    [state, updateParentData]
+  )
 
   return (
     <Flex direction="column" justifyItems="space-between">

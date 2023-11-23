@@ -22,6 +22,7 @@ import AssignToPanel, {AssignToPanelProps} from '../AssignToPanel'
 import {ASSIGNMENT_OVERRIDES_DATA, SECTIONS_DATA, STUDENTS_DATA} from './mocks'
 import * as utils from '../../utils/assignToHelper'
 import fetchMock from 'fetch-mock'
+import userEvent from '@testing-library/user-event'
 
 describe('AssignToPanel', () => {
   const props: AssignToPanelProps = {
@@ -79,13 +80,54 @@ describe('AssignToPanel', () => {
     expect(await findByTestId('custom-option')).not.toBeChecked()
   })
 
+  it('renders option if a default option is passed', async () => {
+    const {findByTestId} = renderComponent({defaultOption: 'custom'})
+    expect(await findByTestId('everyone-option')).not.toBeChecked()
+    expect(await findByTestId('custom-option')).toBeChecked()
+  })
+
   it('renders custom access as the default option if there are assignmentOverrides', async () => {
     fetchMock.getOnce(ASSIGNMENT_OVERRIDES_URL, ASSIGNMENT_OVERRIDES_DATA, {
       overwriteRoutes: true,
     })
     const {findByTestId} = renderComponent()
     expect(await findByTestId('loading-overlay')).toBeInTheDocument()
-    expect(await findByTestId('custom-option')).toHaveProperty('checked', true)
+    expect(await findByTestId('custom-option')).toBeChecked()
+  })
+
+  it('not render custom access as the default option if default option is called', async () => {
+    fetchMock.getOnce(ASSIGNMENT_OVERRIDES_URL, ASSIGNMENT_OVERRIDES_DATA, {
+      overwriteRoutes: true,
+    })
+    const {findByTestId} = renderComponent({defaultOption: 'everyone'})
+    expect(await findByTestId('everyone-option')).toBeChecked()
+  })
+
+  it('calls updateParentData on unmount with changes', async () => {
+    const updateParentDataMock = jest.fn()
+    const {unmount, findByTestId} = renderComponent({updateParentData: updateParentDataMock})
+    userEvent.click(await findByTestId('custom-option'))
+    unmount()
+    expect(updateParentDataMock).toHaveBeenCalledWith(
+      {
+        selectedAssignees: [],
+        selectedOption: 'custom',
+      },
+      true
+    )
+  })
+
+  it('calls updateParentData on unmount with no changes', async () => {
+    const updateParentDataMock = jest.fn()
+    const {unmount} = renderComponent({updateParentData: updateParentDataMock})
+    unmount()
+    expect(updateParentDataMock).toHaveBeenCalledWith(
+      {
+        selectedAssignees: [],
+        selectedOption: 'everyone',
+      },
+      false
+    )
   })
 
   describe('AssigneeSelector', () => {
@@ -127,6 +169,25 @@ describe('AssignToPanel', () => {
       expect(await findByText(ASSIGNMENT_OVERRIDES_DATA[0].students![0].name)).toBeInTheDocument()
       expect(getAllByTestId('assignee_selector_selected_option').length).toBe(
         ASSIGNMENT_OVERRIDES_DATA[0].students!.length + assignedSections.length
+      )
+    })
+
+    it('does not show existing assignmentOverrides as the default if defaultOption and defaultAssignees are passed', async () => {
+      const defaultAssignees = [
+        {
+          id: '3',
+          overrideId: '3',
+          value: 'Previously added assignment',
+          group: 'Sections',
+        },
+      ]
+      const {getAllByTestId, findByText} = renderComponent({
+        defaultOption: 'custom',
+        defaultAssignees,
+      })
+      expect(await findByText(defaultAssignees[0].value)).toBeInTheDocument()
+      expect(getAllByTestId('assignee_selector_selected_option').length).toBe(
+        defaultAssignees.length
       )
     })
   })
@@ -189,6 +250,24 @@ describe('AssignToPanel', () => {
       updateButton.click()
       expect(await findByTestId('loading-overlay')).toBeInTheDocument()
       await waitFor(() => expect(utils.updateModuleUI).toHaveBeenCalled())
+    })
+
+    it('calls onDidSubmit instead of onDismiss if passed', async () => {
+      fetchMock.put(ASSIGNMENT_OVERRIDES_URL, {})
+      const onDidSubmitMock = jest.fn()
+      const onDismissMock = jest.fn()
+      const {findByTestId, findByText, getByRole} = renderComponent({
+        onDidSubmit: onDidSubmitMock,
+        onDismiss: onDismissMock,
+      })
+      userEvent.click(await findByTestId('custom-option'))
+      userEvent.click(await findByTestId('assignee_selector'))
+      userEvent.click(await findByText(SECTIONS_DATA[0].name))
+      userEvent.click(getByRole('button', {name: 'Update Module'}))
+
+      expect(await findByTestId('loading-overlay')).toBeInTheDocument()
+      expect(onDidSubmitMock).toHaveBeenCalled()
+      expect(onDismissMock).not.toHaveBeenCalled()
     })
   })
 })

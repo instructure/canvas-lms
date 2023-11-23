@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useState} from 'react'
+import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import Footer from './Footer'
 import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
@@ -33,7 +33,7 @@ import LoadingOverlay from './LoadingOverlay'
 
 const I18n = useI18nScope('differentiated_modules')
 
-export interface AssignToPanelProps {
+export type AssignToPanelProps = {
   bodyHeight: string
   footerHeight: string
   courseId: string
@@ -41,27 +41,67 @@ export interface AssignToPanelProps {
   moduleElement: HTMLDivElement
   onDismiss: () => void
   mountNodeRef: React.RefObject<HTMLElement>
+  updateParentData?: (
+    data: {selectedOption: OptionValue; selectedAssignees: AssigneeOption[]},
+    changed: boolean
+  ) => void
+  defaultOption?: OptionValue
+  defaultAssignees?: AssigneeOption[]
+  onDidSubmit?: () => void
 }
 
-interface Option {
-  value: string
+export type OptionValue = 'everyone' | 'custom'
+
+type Option = {
+  value: OptionValue
   getLabel: () => string
   getDescription: () => string
 }
 
-const OPTIONS: Option[] = [
-  {
-    value: 'everyone',
-    getLabel: () => I18n.t('Everyone'),
-    getDescription: () => I18n.t('This module will be visible to everyone.'),
-  },
-  {
-    value: 'custom',
-    getLabel: () => I18n.t('Custom Access'),
-    getDescription: () =>
-      I18n.t('Create custom access and optionally set Lock Until date for each group.'),
-  },
-]
+const EVERYONE_OPTION: Option = {
+  value: 'everyone',
+  getLabel: () => I18n.t('Everyone'),
+  getDescription: () => I18n.t('This module will be visible to everyone.'),
+}
+
+const CUSTOM_OPTION: Option = {
+  value: 'custom',
+  getLabel: () => I18n.t('Custom Access'),
+  getDescription: () =>
+    I18n.t('Create custom access and optionally set Lock Until date for each group.'),
+}
+
+export const updateModuleAssignees = ({
+  courseId,
+  moduleId,
+  moduleElement,
+  selectedAssignees,
+}: {
+  courseId: string
+  moduleId: string
+  moduleElement: HTMLDivElement
+  selectedAssignees: AssigneeOption[]
+}) => {
+  const payload = generateAssignmentOverridesPayload(selectedAssignees)
+  return doFetchApi({
+    path: `/api/v1/courses/${courseId}/modules/${moduleId}/assignment_overrides`,
+    method: 'PUT',
+    body: payload,
+  })
+    .then(() => {
+      showFlashAlert({
+        type: 'success',
+        message: I18n.t('Module access updated successfully.'),
+      })
+      updateModuleUI(moduleElement, payload)
+    })
+    .catch((err: Error) => {
+      showFlashAlert({
+        err,
+        message: I18n.t('Error updating module access.'),
+      })
+    })
+}
 
 export default function AssignToPanel({
   bodyHeight,
@@ -71,13 +111,27 @@ export default function AssignToPanel({
   moduleElement,
   mountNodeRef,
   onDismiss,
+  updateParentData,
+  defaultOption,
+  defaultAssignees,
+  onDidSubmit,
 }: AssignToPanelProps) {
-  const [selectedOption, setSelectedOption] = useState<string>(OPTIONS[0].value)
-  const [selectedAssignees, setSelectedAssignees] = useState<AssigneeOption[]>([])
+  const [selectedOption, setSelectedOption] = useState<OptionValue>(
+    defaultOption || EVERYONE_OPTION.value
+  )
+  const [selectedAssignees, setSelectedAssignees] = useState<AssigneeOption[]>(
+    defaultAssignees || []
+  )
   const [isLoading, setIsLoading] = useState(false)
-  const [defaultValues, setDefaultValues] = useState<AssigneeOption[]>([])
+  const changed = useRef(false)
 
   useEffect(() => {
+    // If defaultOption and defaultAssignees are passed, there is no need to fetch the data again.
+    if (defaultOption && Array.isArray(defaultAssignees)) {
+      setSelectedOption(defaultOption)
+      return
+    }
+
     setIsLoading(true)
     doFetchApi({
       path: `/api/v1/courses/${courseId}/modules/${moduleId}/assignment_overrides`,
@@ -104,53 +158,41 @@ export default function AssignToPanel({
           }
           return [...acc, ...overrideOptions]
         }, [])
-        setDefaultValues(parsedOptions)
-        if (parsedOptions.length > 0) {
-          setSelectedOption(OPTIONS[1].value)
+        setSelectedAssignees(parsedOptions)
+
+        // If the user manually selected an option, we should keep it after switching tabs.
+        if (!defaultOption && parsedOptions.length > 0) {
+          setSelectedOption(CUSTOM_OPTION.value)
         }
       })
       .catch(showFlashError())
       .finally(() => {
         setIsLoading(false)
       })
-  }, [courseId, moduleId])
-
-  const handleSelect = useCallback((newSelectedAssignees: AssigneeOption[]) => {
-    setSelectedAssignees(newSelectedAssignees)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const handleSave = useCallback(() => {
     setIsLoading(true)
-    const payload = generateAssignmentOverridesPayload(selectedAssignees)
-    doFetchApi({
-      path: `/api/v1/courses/${courseId}/modules/${moduleId}/assignment_overrides`,
-      method: 'PUT',
-      body: payload,
-    })
-      .then(() => {
-        showFlashAlert({
-          type: 'success',
-          message: I18n.t('Module access updated successfully.'),
-        })
-        updateModuleUI(moduleElement, payload)
-        onDismiss()
-      })
-      .catch((err: Error) => {
-        setIsLoading(false)
-        showFlashAlert({
-          err,
-          message: I18n.t('Error updating module access.'),
-        })
-      })
-  }, [courseId, moduleElement, moduleId, onDismiss, selectedAssignees])
+    updateModuleAssignees({courseId, moduleId, moduleElement, selectedAssignees})
+      .then(() => (onDidSubmit ? onDidSubmit() : onDismiss()))
+      .catch(() => setIsLoading(false))
+  }, [courseId, moduleElement, moduleId, onDidSubmit, onDismiss, selectedAssignees])
 
-  const handleClick = useCallback((event: React.MouseEvent<HTMLInputElement>) => {
+  const handleChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const value = (event.target as HTMLInputElement).value
-    if (value === OPTIONS[0].value) {
+    if (value === EVERYONE_OPTION.value) {
       setSelectedAssignees([])
     }
-    setSelectedOption(value)
+    setSelectedOption(value as OptionValue)
+    changed.current = true
   }, [])
+
+  // Sends data to parent when unmounting
+  useEffect(
+    () => () => updateParentData?.({selectedOption, selectedAssignees}, changed.current),
+    [selectedOption, selectedAssignees, updateParentData]
+  )
 
   return (
     <Flex direction="column" justifyItems="start">
@@ -164,7 +206,7 @@ export default function AssignToPanel({
           </Flex.Item>
           <Flex.Item overflowX="hidden">
             <RadioInputGroup description={I18n.t('Select Access Type')} name="access_type">
-              {OPTIONS.map(option => (
+              {[EVERYONE_OPTION, CUSTOM_OPTION].map(option => (
                 <Flex key={option.value} justifyItems="start">
                   <Flex.Item align="start">
                     <View as="div" margin="xx-small">
@@ -172,7 +214,7 @@ export default function AssignToPanel({
                         data-testid={`${option.value}-option`}
                         value={option.value}
                         checked={selectedOption === option.value}
-                        onClick={handleClick}
+                        onChange={handleChange}
                         label={<ScreenReaderContent>{option.getLabel()}</ScreenReaderContent>}
                       />
                     </View>
@@ -186,15 +228,19 @@ export default function AssignToPanel({
                         {option.getDescription()}
                       </Text>
                     </View>
-                    {option.value === OPTIONS[1].value && selectedOption === OPTIONS[1].value && (
-                      <View as="div" margin="small x-large none none">
-                        <ModuleAssignments
-                          courseId={courseId}
-                          onSelect={handleSelect}
-                          defaultValues={defaultValues}
-                        />
-                      </View>
-                    )}
+                    {option.value === CUSTOM_OPTION.value &&
+                      selectedOption === CUSTOM_OPTION.value && (
+                        <View as="div" margin="small x-large none none">
+                          <ModuleAssignments
+                            courseId={courseId}
+                            onSelect={assignees => {
+                              setSelectedAssignees(assignees)
+                              changed.current = true
+                            }}
+                            defaultValues={selectedAssignees}
+                          />
+                        </View>
+                      )}
                   </Flex.Item>
                 </Flex>
               ))}
