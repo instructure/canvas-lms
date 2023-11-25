@@ -197,8 +197,8 @@ export default function CanvasDateInput({
     const inputEmpty = inputValue?.length === 0
     return inputEmpty
       ? false
-      : internalMessages.filter(m => m.type === 'error').length > 0 || tz.parse(inputValue) === null
-  }, [inputValue, internalMessages])
+      : internalMessages.filter(m => m.type === 'error').length > 0 || !renderedMoment.isValid()
+  }, [inputValue, internalMessages, renderedMoment])
 
   const isDifferentMoment = useCallback(
     (firstMoment: Moment | null, secondMoment: Moment | null) => {
