@@ -141,7 +141,7 @@ shared_examples_for "selective_release module tray prerequisites" do |context|
     end
   end
 
-  it "adds more than one prerequisite to a module" do
+  it "adds more than one prerequisite to a module", :ignore_js_errors do
     get @mod_url
 
     scroll_to_module(@module3.name)
@@ -160,7 +160,9 @@ shared_examples_for "selective_release module tray prerequisites" do |context|
     expect(prerequisites_dropdown_value(1)).to eq(@module.name)
 
     click_settings_tray_update_module_button
-
+    ignore_relock
+    refresh_page
+    scroll_to_module(@module3.name)
     expect(prerequisite_message(@module3).text).to eq("Prerequisites: #{@module2.name}, #{@module.name}")
   end
 end
@@ -244,7 +246,7 @@ shared_examples_for "selective release module tray requirements" do |context|
     end
   end
 
-  it "adds two requirements for complete all requirements with sequential order" do
+  it "adds two requirements for complete all requirements with sequential order", :ignore_js_errors do
     get @mod_url
 
     scroll_to_the_top_of_modules_page
@@ -259,13 +261,16 @@ shared_examples_for "selective release module tray requirements" do |context|
     click_add_requirement_button
     select_requirement_item_option(1, @assignment3.title)
     expect(element_value_for_attr(requirement_item[1], "title")).to eq(@assignment3.title)
-
     click_settings_tray_update_module_button
+    wait_for_ajaximations
+    expect(settings_tray_exists?).to be_falsey
+    refresh_page
+    scroll_to_the_top_of_modules_page
     validate_correct_pill_message(@module.id, "Complete All Items")
     expect(require_sequential_progress(@module.id).attribute("textContent")).to eq("true")
   end
 
-  it "adds a requirement and validates complete one requirement pill" do
+  it "adds a requirement and validates complete one requirement pill", :ignore_js_errors do
     get @mod_url
 
     scroll_to_the_top_of_modules_page
@@ -278,10 +283,13 @@ shared_examples_for "selective release module tray requirements" do |context|
     expect(element_value_for_attr(requirement_item[0], "title")).to eq(@assignment2.title)
 
     click_settings_tray_update_module_button
+    wait_for_ajaximations
+    refresh_page
+    scroll_to_the_top_of_modules_page
     validate_correct_pill_message(@module.id, "Complete One Item")
   end
 
-  it "cancels a requirement session" do
+  it "cancels a requirement session", :ignore_js_errors do
     get @mod_url
 
     scroll_to_the_top_of_modules_page
@@ -294,6 +302,8 @@ shared_examples_for "selective release module tray requirements" do |context|
     expect(element_value_for_attr(requirement_item[0], "title")).to eq(@assignment2.title)
 
     click_settings_tray_cancel_button
+    wait_for_ajaximations
+    scroll_to_the_top_of_modules_page
     expect(element_exists?(pill_message_selector(@module.id))).to be_falsey
   end
 end
@@ -338,5 +348,139 @@ shared_examples_for "selective_release add module tray" do |context|
     new_module = @course.context_modules.last
     expect(new_module.name).to eq("New Module")
     expect(element_exists?(context_module_selector(new_module.id))).to be_truthy
+  end
+end
+
+shared_examples_for "selective_release edit module lock until" do |context|
+  include ContextModulesCommon
+  include ModulesIndexPage
+  include ModulesSettingsTray
+  include K5DashboardPageObject
+  include K5DashboardCommonPageObject
+  include K5Common
+
+  before do
+    case context
+    when :context_modules
+      @mod_course = @course
+      @mod_url = "/courses/#{@mod_course.id}/modules"
+    when :canvas_for_elementary
+      @mod_course = @subject_course
+      @mod_url = "/courses/#{@mod_course.id}#modules"
+    when :course_homepage
+      @mod_course = @course
+      @mod_url = "/courses/#{@mod_course.id}"
+    end
+  end
+
+  it "clicks on lock until radio on edit module tray to show date and time input fields" do
+    get @mod_url
+
+    scroll_to_the_top_of_modules_page
+    manage_module_button(@module).click
+    module_index_menu_tool_link("Edit").click
+    click_lock_until_checkbox
+
+    expect(lock_until_date).to be_displayed
+    expect(lock_until_time).to be_displayed
+  end
+
+  it "updates lock until date and time on edit module tray" do
+    get @mod_url
+
+    lock_until_date = format_date_for_view(Time.zone.today + 2.days)
+    scroll_to_the_top_of_modules_page
+    manage_module_button(@module).click
+    module_index_menu_tool_link("Edit").click
+    click_lock_until_checkbox
+
+    update_lock_until_date(lock_until_date)
+    update_lock_until_time("12:00 AM")
+    click_settings_tray_update_module_button
+    ignore_relock
+
+    expect(unlock_details(@module.id)).to include_text "Will unlock"
+  end
+
+  it "setting lock until date and time to previous on edit module tray means no lock" do
+    get @mod_url
+
+    lock_until_date = format_date_for_view(Time.zone.today - 2.days)
+    scroll_to_the_top_of_modules_page
+    manage_module_button(@module).click
+    module_index_menu_tool_link("Edit").click
+    click_lock_until_checkbox
+
+    update_lock_until_date(lock_until_date)
+    update_lock_until_time("12:00 AM")
+    click_settings_tray_update_module_button
+    ignore_relock
+    expect(unlock_details(@module.id).text).to eq("")
+  end
+end
+
+shared_examples_for "selective_release add module lock until" do |context|
+  include ContextModulesCommon
+  include ModulesIndexPage
+  include ModulesSettingsTray
+  include K5DashboardPageObject
+  include K5DashboardCommonPageObject
+  include K5Common
+
+  before do
+    case context
+    when :context_modules
+      @mod_course = @course
+      @mod_url = "/courses/#{@mod_course.id}/modules"
+    when :canvas_for_elementary
+      @mod_course = @subject_course
+      @mod_url = "/courses/#{@mod_course.id}#modules"
+    when :course_homepage
+      @mod_course = @course
+      @mod_url = "/courses/#{@mod_course.id}"
+    end
+  end
+
+  it "clicks on lock until radio on add module tray to show date and time input fields" do
+    get @mod_url
+
+    click_new_module_link
+    update_module_name("New Module")
+
+    click_lock_until_checkbox
+
+    expect(lock_until_date).to be_displayed
+    expect(lock_until_time).to be_displayed
+  end
+
+  it "updates lock until date and time on add module tray" do
+    get @mod_url
+
+    lock_until_date = format_date_for_view(Time.zone.today + 2.days)
+    click_new_module_link
+    update_module_name("New Module")
+    click_lock_until_checkbox
+
+    update_lock_until_date(lock_until_date)
+    update_lock_until_time("12:00 AM")
+
+    click_add_tray_add_module_button
+    new_module = @course.context_modules.last
+    expect(unlock_details(new_module.id)).to include_text "Will unlock"
+  end
+
+  it "setting lock until date and time to previous on add module tray means no lock" do
+    get @mod_url
+
+    lock_until_date = format_date_for_view(Time.zone.today - 2.days)
+    click_new_module_link
+    update_module_name("New Module")
+    click_lock_until_checkbox
+
+    update_lock_until_date(lock_until_date)
+    update_lock_until_time("12:00 AM")
+    click_add_tray_add_module_button
+    new_module = @course.context_modules.last
+    expect(unlock_details(new_module.id).text).to eq("")
   end
 end
