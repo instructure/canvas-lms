@@ -63,11 +63,26 @@ ready(() => {
     }
   }
 
+  const mediaTracks = media_object?.media_tracks?.map(track => {
+    return {
+      id: track.id,
+      src: track.url,
+      label: captionLanguageForLocale(track.locale),
+      type: track.kind,
+      language: track.locale,
+      inherited: track.inherited,
+    }
+  })
+
   window.addEventListener(
     'message',
     event => {
       if (event?.data?.subject === 'reload_media' && media_id === event?.data?.media_object_id) {
         document.getElementsByTagName('video')[0].load()
+      }
+      else if (event?.data?.subject === 'media_tracks_request') {
+        const tracks = mediaTracks?.map(t => ({locale: t.language, language: t.label, inherited: t.inherited}))
+        if (tracks) event.source.postMessage({subject: 'media_tracks_response', payload: tracks}, event.origin)
       }
     },
     false
@@ -88,16 +103,6 @@ ready(() => {
     }
   }
 
-  const mediaTracks = media_object?.media_tracks?.map(track => {
-    return {
-      id: track.id,
-      src: track.url,
-      label: captionLanguageForLocale(track.locale),
-      type: track.kind,
-      language: track.locale,
-      inherited: track.inherited,
-    }
-  })
 
   const aria_label = !media_object.title ? undefined : media_object.title
   ReactDOM.render(
