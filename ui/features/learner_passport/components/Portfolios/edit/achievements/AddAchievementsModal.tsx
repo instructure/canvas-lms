@@ -105,7 +105,7 @@ const AddAchievementsModal = ({
   const renderBodyContents = () => {
     if (achievements.length === 0) {
       return (
-        <View as="div" padding="small">
+        <View as="div" padding="small" minWidth="23rem">
           <Text>No achievements received</Text>
         </View>
       )

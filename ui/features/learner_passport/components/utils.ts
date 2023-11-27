@@ -16,6 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import type {EducationData} from './types'
+
 export function stringToId(s: string): string {
   return s.replace(/\W+/g, '-')
+}
+
+export function compareEducationDates(a: EducationData, b: EducationData) {
+  if (a.from_date < b.from_date) {
+    return 1
+  }
+  if (a.from_date > b.from_date) {
+    return -1
+  }
+  return 0
 }
