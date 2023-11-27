@@ -45,6 +45,8 @@ import type {
   ExperienceData,
 } from '../types'
 import AchievementCard from '../Achievements/AchievementCard'
+import EducationCard from '../Education/EducationCard'
+import {compareEducationDates} from '../utils'
 
 function renderSkillTag(skill: SkillData) {
   return (
@@ -89,22 +91,6 @@ const dateFormatter = new Intl.DateTimeFormat(ENV.LOCALE, {
 
 function formatDate(date: string) {
   return dateFormatter(new Date(date))
-}
-
-function renderEducation(education: EducationData) {
-  return (
-    <View as="div" margin="0 0 small 0" padding="x-small" shadow="resting">
-      <Text size="x-small" weight="light">
-        {formatDate(education.from_date)} - {formatDate(education.to_date)}
-      </Text>
-      <Heading level="h4" margin="small 0" themeOverride={{h4FontSize: '1.375rem'}}>
-        {education.institution}
-      </Heading>
-      <Text as="div">{education.location}</Text>
-      <Text as="div">{education.title}</Text>
-      <Text as="div">{education.description}</Text>
-    </View>
-  )
 }
 
 function renderExperience(experience: ExperienceData) {
@@ -235,13 +221,17 @@ const PortfolioView = () => {
                   Education
                 </Heading>
                 <List isUnstyled={true} itemSpacing="small" margin="small 0 0 0">
-                  {portfolio.education.map((education: EducationData) => {
-                    return (
-                      <List.Item key={education.institution.replace(/\W+/, '-')}>
-                        {renderEducation(education)}
-                      </List.Item>
-                    )
-                  })}
+                  {portfolio.education
+                    .sort(compareEducationDates)
+                    .map((education: EducationData) => {
+                      return (
+                        <List.Item key={education.institution.replace(/\W+/, '-')}>
+                          <View as="div" shadow="resting">
+                            <EducationCard education={education} />
+                          </View>
+                        </List.Item>
+                      )
+                    })}
                 </List>
               </View>
               <View as="div" borderWidth="small 0 0 0" padding="large 0 0 0">

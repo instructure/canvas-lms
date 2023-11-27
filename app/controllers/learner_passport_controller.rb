@@ -130,28 +130,34 @@ class LearnerPassportController < ApplicationController
     links: %w[https://linkedin.com/in/eschiebel https://www.nspe.org https://eschiebel.github.io/],
     education: [
       {
+        id: "1",
         title: "Product Management Certificate",
-        location: "Raleigh, NC",
+        city: "Raleigh",
+        state: "NC",
         institution: "General Assembly",
         from_date: "2023-04",
         to_date: "2023-10",
-        description: "GPA: 3.8"
+        gpa: "3.8"
       },
       {
+        id: "2",
         title: "Bachelor's in Computer Science",
         institution: "The Ohio State University",
-        location: "Columbus, OH",
+        city: "Columbus",
+        state: "OH",
         from_date: "2018-09",
         to_date: "2022-05",
-        description: "GPA: 3.8"
+        gpa: "3.8"
       },
       {
+        id: "3",
         title: "High School Diploma",
         institution: "Walnut Hills High School",
-        locaiton: "Cincinnati, OH",
+        city: "Cincinnati",
+        state: "OH",
         from_date: "2004-09",
         to_date: "2018-05",
-        description: "GPA: 3.7"
+        gpa: "3.7"
       }
     ],
     experience: [
@@ -265,6 +271,8 @@ class LearnerPassportController < ApplicationController
         params[key].each do |skill|
           portfolio[:skills] << JSON.parse(skill)
         end
+      when :education
+        portfolio[:education] = JSON.parse(params[:education])
       when :achievements
         portfolio[:achievements] = @@current_achievements.select { |a| params[key].include?(a[:id]) }
       else

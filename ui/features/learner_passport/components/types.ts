@@ -63,12 +63,14 @@ export interface SkillData {
 }
 
 export interface EducationData {
+  id: string
   title: string
   institution: string
-  location: string
+  city: string
+  state: string
   from_date: string
   to_date: string
-  description: string
+  gpa: string
 }
 
 export interface ExperienceData {
