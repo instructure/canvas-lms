@@ -18,14 +18,6 @@
 
 <% provide :page_title, t(:page_title, "Rubrics") %>
 <% add_crumb t('#crumbs.rubrics', "Rubrics") %>
-<% if !!js_env.dig(:PERMISSIONS, :manage_rubrics)%>
-  <% provide :right_side do %>
-    <a href="<%= context_url(@context, :context_rubrics_url) %>" role="button" class="btn button-sidebar-wide add_rubric_link">
-      <i class="icon-add"></i>
-      <%= t('buttons.add_rubric', 'Add Rubric') %>
-    </a>
-  <% end %>
-<% end %>
 
 <% js_bundle :edit_rubric %>
 <% css_bundle :learning_outcomes %>
@@ -41,6 +33,28 @@
   </style>
 
 <% js_bundle 'rubrics_index' %>
+<% if @context.root_account.feature_enabled?(:instui_nav)%>
+  <div class="rubric-header">
+    <div class="rubric-header-left">
+      <h1 class="rubric-title"><%= t('#crumbs.rubrics', "Rubrics") %></h1>
+    </div>
+    <% if !!js_env.dig(:PERMISSIONS, :manage_rubrics)%>
+        <a href="<%= context_url(@context, :context_rubrics_url) %>" role="button" class="Button Button--primary add_rubric_link">
+          <i class="icon-add" style="margin-right: 7px;"></i>
+          <%= t('buttons.add_rubric', 'Add Rubric') %>
+        </a>
+    <% end %>
+  </div>
+<% else %>
+  <% if !!js_env.dig(:PERMISSIONS, :manage_rubrics)%>
+    <% provide :right_side do %>
+      <a href="<%= context_url(@context, :context_rubrics_url) %>" role="button" class="btn button-sidebar-wide add_rubric_link">
+        <i class="icon-add"></i>
+        <%= t('buttons.add_rubric', 'Add Rubric') %>
+      </a>
+    <% end %>
+  <% end %>
+<% end %>
 <h1 class="screenreader-only">
   <% case @context.class.to_s %>
     <% when 'Course' %>
