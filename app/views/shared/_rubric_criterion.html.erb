@@ -27,7 +27,6 @@
   friendly_description ||= ''
   range_rating_enabled = @domain_root_account.feature_enabled?(:rubric_criterion_range)
   learning_outcome_criterion = criterion.try(:learning_outcome_id)
-  assessed_outcomes = edit_view ? rubric.rubric_assessments.preload(:learning_outcome_results).map { |ra| ra.learning_outcome_results }.flatten.pluck(:learning_outcome_id).uniq : []
   range_rating_visible = range_rating_enabled && !learning_outcome_criterion
 
   long_description_text = criterion.try(:long_description) || ''
@@ -42,9 +41,7 @@
         <% if !learning_outcome_criterion %>
           <a href="#" class="edit_criterion_link" role="button"><i class="icon-edit standalone-icon"></i><span class="screenreader-only"><%= t 'Edit criterion description' %></span></a>
         <% end %>
-        <% if !learning_outcome_criterion || (learning_outcome_criterion && !assessed_outcomes.include?(learning_outcome_criterion)) %>
-          <a href="#" class="delete_criterion_link" role="button"><i class="icon-trash standalone-icon"></i><span class="screenreader-only"><%= t 'Delete criterion row' %></span></a>
-        <% end %>
+        <a href="#" class="delete_criterion_link" role="button"><i class="icon-trash standalone-icon"></i><span class="screenreader-only"><%= t 'Delete criterion row' %></span></a>
       </div>
       <div class="description_content">
         <span class="outcome_sr_content" aria-hidden="<%= learning_outcome_criterion.nil? %>">
