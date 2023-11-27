@@ -34,9 +34,11 @@ describe('RCE "Audios" Plugin > AudioOptionsTray', () => {
       onRequestClose: jest.fn(),
       onSave: jest.fn(),
       open: true,
+      requestSubtitlesFromIframe: jest.fn(),
       audioOptions: {
         id: 'm-audio-id',
         titleText: 'Audio player',
+        tracks: [{locale: 'en', inherited: false}],
       },
       trayProps: {
         host: 'localhost:3001',
@@ -75,5 +77,18 @@ describe('RCE "Audios" Plugin > AudioOptionsTray', () => {
     renderComponent()
     tray.$doneButton.click()
     expect(props.onSave).toHaveBeenCalledTimes(1)
+  })
+
+  describe('requestSubtitlesFromIframe', () => {
+    it('is not called when subtitles are present', () => {
+      renderComponent()
+      expect(props.requestSubtitlesFromIframe).not.toHaveBeenCalled()
+    })
+
+    it('is called when no subtitles present', () => {
+      props.audioOptions.tracks = null
+      renderComponent()
+      expect(props.requestSubtitlesFromIframe).toHaveBeenCalledTimes(1)
+    })
   })
 })
