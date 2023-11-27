@@ -204,7 +204,7 @@ class Mutations::AssignmentBase < Mutations::BaseMutation
   end
 
   def prepare_peer_reviews!(input_hash)
-    if input_hash.key? :peer_reviews
+    if input_hash.key?(:peer_reviews) && input_hash[:peer_reviews].present?
       peer_reviews = input_hash.delete(:peer_reviews)
       input_hash[:peer_reviews] = peer_reviews[:enabled] if peer_reviews.key? :enabled
       input_hash[:peer_review_count] = peer_reviews[:count] if peer_reviews.key? :count

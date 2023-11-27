@@ -100,18 +100,23 @@ describe "discussion assignments" do
         expect(dt.assignment).to be_nil
       end
 
-      # TODO: Uncomment and complete the test when ability to create graded discussions works
-      # it "creates a graded group discussion in a course context" do
-      #   get "/courses/#{@course.id}/discussion_topics/new"
-      #   f("input[placeholder='Topic Title']").send_keys "Graded Group Discussion"
-      #   force_click("input[data-testid='group-discussion-checkbox']")
-      #   force_click("input[placeholder='Select a group category']")
-      #   fj("li:contains('category 1')").click
-      #   force_click("label:contains('Graded')")
-      #   f("input[data-testid='points-possible-input']").send_keys 10
-      #   fj("li:contains('Percentage')").click
-      #   f("button[data-testid='save-button']").click
-      # end
+      it "creates a graded group discussion in a course context" do
+        get "/courses/#{@course.id}/discussion_topics/new"
+        f("input[placeholder='Topic Title']").send_keys "Graded Group Discussion"
+        force_click("input[data-testid='group-discussion-checkbox']")
+        force_click("input[placeholder='Select a group category']")
+        fj("li:contains('category 1')").click
+        force_click("label:contains('Graded')")
+        f("input[data-testid='points-possible-input']").send_keys 10
+        force_click("input[title='Points']")
+        fj("li:contains('Percentage')").click
+        f("button[data-testid='save-button']").click
+        expect(Assignment.count).to eq 1
+        dt = DiscussionTopic.last
+        expect(dt.assignment).to eq Assignment.last
+        expect(dt.assignment.points_possible).to eq 10
+        expect(dt.assignment.grading_type).to eq "percent"
+      end
     end
   end
 
