@@ -4782,6 +4782,7 @@ hu:
   canvas_course_id_db4de2b8: canvas_kurzus_azonosító
   canvas_course_tutorial_video_5205c1c1: "Canvas  kurzus tutoriál videó"
   canvas_dashboard_links_will_navigate_to_the_catalo_4143635e: "A Canvas vezérlőpult hivatkozások a Katalógus vezérlőpultra fognak navigálni"
+  canvas_default_7f81a6b8: "Canvas alapértelmezés"
   canvas_demo_7a005cf3: "Canvas Demo"
   canvas_did_not_recognize_your_identity_provider_cb0e50fc: "A Canvas nem ismeri fel az Ön azonosítási szolgáltatóját"
   canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "A Canvasban nincs fiókja a következő felhasználónak: %{user}"
@@ -14775,7 +14776,7 @@ hu:
         unit: Ft
     format: 
       delimiter: ","
-      round_mode: default
+      round_mode: alapértelmezett
       separator: "."
     human: 
       decimal_units: 

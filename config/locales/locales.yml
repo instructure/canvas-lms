@@ -42,6 +42,9 @@ ar:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
   proper_noun_singular_genitive: "%{noun}"
+  number:
+    format:
+      round_mode: default
 ca:
   bigeasy_locale: ca_ES
   dow_offset: 1
@@ -58,6 +61,7 @@ ca:
     format:
       delimiter: "."
       separator: ","
+      round_mode: default
   helpers:
     accessible_date_only_format: "DD/MM/YYYY"
     accessible_date_format: "DD/MM/YYYY hh:mm"
@@ -105,6 +109,9 @@ cy:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
   proper_noun_singular_genitive: "%{noun}-"
+  number:
+    format:
+      round_mode: default
 da:
   bigeasy_locale: da_DK
   date:
@@ -153,6 +160,7 @@ da:
     format:
       delimiter: "."
       separator: ","
+      round_mode: default
   proper_noun_singular_genitive: "%{noun}s"
 da-x-k12:
   bigeasy_locale: da_DK
@@ -204,6 +212,7 @@ da-x-k12:
     format:
       delimiter: "."
       separator: ","
+      round_mode: default
   proper_noun_singular_genitive: "%{noun}s"
 de:
   bigeasy_locale: de_DE
@@ -253,6 +262,7 @@ de:
     format:
       delimiter: "."
       separator: ","
+      round_mode: default
   proper_noun_singular_genitive: "%{noun}s"
 el:
   bigeasy_locale: el_GR
@@ -303,11 +313,15 @@ el:
     format:
       delimiter: "."
       separator: ","
+      round_mode: default
   proper_noun_singular_genitive: "%{noun}"
 en:
   bigeasy_locale: en_US
   locales:
     en: English (United States)
+  number:
+    format:
+      round_mode: default
 en-AU:
   date:
     abbr_month_names:
@@ -347,6 +361,9 @@ en-AU:
     formats:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
+  number:
+    format:
+      round_mode: default
 en-CA:
   date:
     abbr_month_names:
@@ -387,6 +404,9 @@ en-CA:
     formats:
       tiny: "%l:%M%P"
       tiny_on_the_hour: "%l%P"
+  number:
+    format:
+      round_mode: default
 en-GB:
   date:
     abbr_month_names:
@@ -426,6 +446,9 @@ en-GB:
     formats:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
+  number:
+    format:
+      round_mode: default
 es:
   bigeasy_locale: es_ES
   date:
@@ -467,6 +490,9 @@ es:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
   proper_noun_singular_genitive: de %{noun}
+  number:
+    format:
+      round_mode: default
 es-ES:
   locales:
     es-ES: Español (España)
@@ -516,6 +542,7 @@ es-ES:
     format:
       delimiter: "."
       separator: ","
+      round_mode: default
   helpers:
     accessible_date_only_format: "DD/MM/YYYY"
     accessible_date_format: "DD/MM/YYYY hh:mm"
@@ -565,6 +592,9 @@ fa:
       tiny: "%l:%M%P"
       tiny_on_the_hour: "%l%P"
   proper_noun_singular_genitive: "%{noun}"
+  number:
+    format:
+      round_mode: default
 fi:
   bigeasy_locale: fi_FI
   date:
@@ -606,6 +636,9 @@ fi:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
   proper_noun_singular_genitive: "%{noun}"
+  number:
+    format:
+      round_mode: default
 fr:
   bigeasy_locale: fr_FR
   date:
@@ -654,6 +687,7 @@ fr:
     format:
       delimiter: " "
       separator: ","
+      round_mode: default
   proper_noun_singular_genitive: de %{noun}
 fr-CA:
   bigeasy_locale: fr_CA
@@ -703,6 +737,7 @@ fr-CA:
     format:
       delimiter: " "
       separator: ","
+      round_mode: default
   proper_noun_singular_genitive: de %{noun}
 he:
   bigeasy_locale: he_IL
@@ -746,6 +781,9 @@ he:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
   proper_noun_singular_genitive: "%{noun}"
+  number:
+    format:
+      round_mode: default
 ht:
   bigeasy_locale: ht_HT
   date:
@@ -795,6 +833,7 @@ ht:
     format:
       delimiter: " "
       separator: ","
+      round_mode: default
   proper_noun_singular_genitive: "%{noun}"
 hu:
   bigeasy_locale: hu_HU
@@ -845,6 +884,7 @@ hu:
     format:
       delimiter: " "
       separator: ","
+      round_mode: default
   proper_noun_singular_genitive: "%{noun}"
 hy:
   bigeasy_locale: hy_AM
@@ -890,6 +930,9 @@ hy:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
   proper_noun_singular_genitive: "%{noun}-ի"
+  number:
+    format:
+      round_mode: default
 is:
   bigeasy_locale: is_IS
   date:
@@ -938,6 +981,7 @@ is:
     format:
       delimiter: "."
       separator: ","
+      round_mode: default
   proper_noun_singular_genitive: "%{noun}"
 it:
   bigeasy_locale: it_IT
@@ -987,6 +1031,7 @@ it:
     format:
       delimiter: "."
       separator: ","
+      round_mode: default
   proper_noun_singular_genitive: di %{noun}
 ja:
   bigeasy_locale: ja_JP
@@ -1028,6 +1073,9 @@ ja:
       tiny: "%k.%M"
       tiny_on_the_hour: "%k.%M"
   proper_noun_singular_genitive: "%{noun}"
+  number:
+    format:
+      round_mode: default
 ko:
   bigeasy_locale: ko_KR
   crowdsourced: true
@@ -1075,6 +1123,9 @@ ko:
       tiny: "%P %l:%M"
       tiny_on_the_hour: "%l%P"
   proper_noun_singular_genitive: "%{noun}"
+  number:
+    format:
+      round_mode: default
 mi:
   bigeasy_locale: mi_NZ
   date:
@@ -1117,6 +1168,9 @@ mi:
       tiny: "%l:%M%P"
       tiny_on_the_hour: "%l%P"
   proper_noun_singular_genitive: "%{noun}'s"
+  number:
+    format:
+      round_mode: default
 ms:
   bigeasy_locale: ms_MY
   date:
@@ -1160,6 +1214,9 @@ ms:
       tiny: "%l:%M %P"
       tiny_on_the_hour: "%l %P"
   proper_noun_singular_genitive: "%{noun}"
+  number:
+    format:
+      round_mode: default
 nb:
   bigeasy_locale: nb_NO
   date:
@@ -1208,6 +1265,7 @@ nb:
     format:
       delimiter: " "
       separator: ","
+      round_mode: default
   proper_noun_singular_genitive: "%{noun}'s"
 nb-x-k12:
   bigeasy_locale: nb_NO
@@ -1259,6 +1317,7 @@ nb-x-k12:
     format:
       delimiter: " "
       separator: ","
+      round_mode: default
   proper_noun_singular_genitive: "%{noun}'s"
 nl:
   bigeasy_locale: nl_NL
@@ -1309,6 +1368,7 @@ nl:
     format:
       delimiter: "."
       separator: ","
+      round_mode: default
   proper_noun_singular_genitive: van %{noun}
 nn:
   bigeasy_locale: nn_NO
@@ -1360,6 +1420,7 @@ nn:
     format:
       delimiter: " "
       separator: ","
+      round_mode: default
   proper_noun_singular_genitive: "%{noun}s"
 pl:
   bigeasy_locale: pl_PL
@@ -1409,6 +1470,7 @@ pl:
     format:
       delimiter: " "
       separator: ","
+      round_mode: default
   proper_noun_singular_genitive: "%{noun}"
 pt:
   bigeasy_locale: pt_PT
@@ -1458,6 +1520,7 @@ pt:
     format:
       delimiter: " "
       separator: ","
+      round_mode: default
   proper_noun_singular_genitive: de %{noun}
 pt-BR:
   date:
@@ -1505,6 +1568,7 @@ pt-BR:
     format:
       delimiter: "."
       separator: ","
+      round_mode: default
   proper_noun_singular_genitive: de %{noun}
 ru:
   bigeasy_locale: ru_RU
@@ -1554,6 +1618,7 @@ ru:
     format:
       delimiter: " "
       separator: ","
+      round_mode: default
   proper_noun_singular_genitive: "%{noun}"
 sl:
   bigeasy_locale: sl_SI
@@ -1595,6 +1660,9 @@ sl:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
   proper_noun_singular_genitive: "%{noun}"
+  number:
+    format:
+      round_mode: default
 sv:
   bigeasy_locale: sv_SE
   date:
@@ -1643,6 +1711,7 @@ sv:
     format:
       delimiter: " "
       separator: ","
+      round_mode: default
   proper_noun_singular_genitive: "%{noun}s"
 sv-x-k12:
   bigeasy_locale: sv_SE
@@ -1687,6 +1756,9 @@ sv-x-k12:
       tiny: "%k.%M"
       tiny_on_the_hour: "%k.%M"
   proper_noun_singular_genitive: "%{noun}s"
+  number:
+    format:
+      round_mode: default
 th:
   locales:
     th: ไทย
@@ -1735,6 +1807,7 @@ th:
     format:
       delimiter: ","
       separator: "."
+      round_mode: default
   helpers:
     accessible_date_only_format: "DD/MM/YYYY"
     accessible_date_format: "DD/MM/YYYY hh:mm"
@@ -1790,6 +1863,7 @@ tr:
     format:
       delimiter: "."
       separator: ","
+      round_mode: default
   proper_noun_singular_genitive: "%{noun}'nın"
 uk:
   bigeasy_locale: uk_UA
@@ -1840,6 +1914,7 @@ uk:
     format:
       delimiter: " "
       separator: ","
+      round_mode: default
   proper_noun_singular_genitive: "%{noun}"
 vi:
   locales:
@@ -1889,6 +1964,7 @@ vi:
     format:
       delimiter: ","
       separator: "."
+      round_mode: default
   helpers:
     accessible_date_only_format: "DD/MM/YYYY"
     accessible_date_format: "hh:mm DD/MM/YYYY"
@@ -1939,6 +2015,9 @@ zh-Hans:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
   proper_noun_singular_genitive: "%{noun}"
+  number:
+    format:
+      round_mode: default
 zh-Hant:
   aliases: zh-TW
   bigeasy_locale: zh_HK
@@ -1983,3 +2062,6 @@ zh-Hant:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
   proper_noun_singular_genitive: "%{noun}"
+  number:
+    format:
+      round_mode: default
