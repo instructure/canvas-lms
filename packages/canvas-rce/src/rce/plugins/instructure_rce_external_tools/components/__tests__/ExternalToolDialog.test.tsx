@@ -19,6 +19,7 @@
 
 import React from 'react'
 import ExternalToolDialog, {ExternalToolDialogProps} from '../ExternalToolDialog/ExternalToolDialog'
+import {waitFor} from '@testing-library/react'
 import ReactDOM, {Container} from 'react-dom'
 import {InstUISettingsProvider} from '@instructure/emotion'
 import {createDeepMockProxy} from '../../../../../util/__tests__/deepMockProxy'
@@ -180,7 +181,7 @@ describe('ExternalToolDialog', () => {
       const instance = await getInstance(container)
       instance.open(toolHelper(1))
       expect(container?.querySelector('form')?.action).toBe('http://url/with/1')
-      expect(submit).toHaveBeenCalled()
+      await waitFor(() => expect(submit).toHaveBeenCalled())
     })
 
     it('submits current selection to tool', async () => {
@@ -192,7 +193,7 @@ describe('ExternalToolDialog', () => {
       expect((container?.querySelector('input[name="selection"]') as HTMLInputElement)?.value).toBe(
         selection
       )
-      expect(submit).toHaveBeenCalled()
+      await waitFor(() => expect(submit).toHaveBeenCalled())
     })
 
     it('submits current editor contents to tool', async () => {
@@ -203,7 +204,7 @@ describe('ExternalToolDialog', () => {
       expect(
         (container?.querySelector('input[name="editor_contents"]') as HTMLInputElement)?.value
       ).toBe(contents)
-      expect(submit).toHaveBeenCalled()
+      await waitFor(() => expect(submit).toHaveBeenCalled())
     })
 
     it('uses default resource selection url', async () => {
@@ -334,7 +335,7 @@ describe('ExternalToolDialog', () => {
       const instance = await getInstance(container)
       instance.open(toolHelper(2))
       instance.handleClose()
-      expect(window.dispatchEvent).toHaveBeenCalledWith(new Event('resize'))
+      await waitFor(() => expect(window.dispatchEvent).toHaveBeenCalledWith(new Event('resize')))
     })
   })
 

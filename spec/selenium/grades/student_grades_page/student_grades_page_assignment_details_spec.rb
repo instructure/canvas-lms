@@ -111,7 +111,7 @@ describe "Student Gradebook - Assignment Details" do
         # nor submission comments to show
         # there is no grade distribution implementation for quantitative data restricted users
         # so expecting the table row's text to be exactly like below makes sure no grade distribution is showing
-        expect(ff("#grade-summary-react tr")[1].text).to eq "Assignment 1\nAssignments\nGRADED\nF\nYour grade has been updated"
+        expect(ff("#grade-summary-react tr")[1].text).to eq "Assignment 1\nAssignments\nGraded\nF\nYour grade has been updated"
       end
     end
   end

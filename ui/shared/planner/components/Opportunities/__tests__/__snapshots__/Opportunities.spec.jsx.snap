@@ -79,6 +79,7 @@ exports[`renders nothing if no opportunities 1`] = `
       variant="default"
     >
       <Panel
+        active={false}
         isDisabled={false}
         isSelected={true}
         maxHeight="auto"
@@ -99,6 +100,7 @@ exports[`renders nothing if no opportunities 1`] = `
         </div>
       </Panel>
       <Panel
+        active={false}
         isDisabled={false}
         isSelected={false}
         maxHeight="auto"
@@ -202,6 +204,7 @@ exports[`renders the base component correctly with one of each kind of opportuni
       variant="default"
     >
       <Panel
+        active={false}
         isDisabled={false}
         isSelected={true}
         maxHeight="auto"
@@ -238,6 +241,7 @@ exports[`renders the base component correctly with one of each kind of opportuni
         </ol>
       </Panel>
       <Panel
+        active={false}
         isDisabled={false}
         isSelected={false}
         maxHeight="auto"
@@ -357,6 +361,7 @@ exports[`renders the right course with the right opportunity 1`] = `
       variant="default"
     >
       <Panel
+        active={false}
         isDisabled={false}
         isSelected={true}
         maxHeight="auto"
@@ -408,6 +413,7 @@ exports[`renders the right course with the right opportunity 1`] = `
         </ol>
       </Panel>
       <Panel
+        active={false}
         isDisabled={false}
         isSelected={false}
         maxHeight="auto"

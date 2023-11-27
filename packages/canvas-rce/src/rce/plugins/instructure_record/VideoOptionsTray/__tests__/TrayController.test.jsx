@@ -171,7 +171,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
     it('closes the tray when open for the given editor', async () => {
       trayController.showTrayForEditor(editors[0])
       trayController.hideTrayForEditor(editors[0])
-      await waitFor(() => expect(getTray()).toBeNull()) // the tray is closed after a transition
+      await waitFor(() => expect(getTray()).toBeNull(), {timeout: 2000}) // the tray is closed after a transition
     })
 
     it('does not close the tray when open for a different editor', () => {
@@ -208,7 +208,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
         media_object_id: 'm_somevideo',
         updateMediaObject,
       })
-      await waitFor(() => expect(getTray()).toBeNull()) // the tray is closed after a transition
+      await waitFor(() => expect(getTray()).toBeNull(), {timeout: 2000}) // the tray is closed after a transition
       const videoIframe = trayController.$videoContainer
       const videoContainer = videoIframe.parentElement
       expect(videoContainer.getAttribute('data-mce-p-title')).toBe('new title')
@@ -268,7 +268,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
         media_object_id: undefined,
         updateMediaObject,
       })
-      await waitFor(() => expect(getTray()).toBeNull()) // the tray is closed after a transition
+      await waitFor(() => expect(getTray()).toBeNull(), {timeout: 2000}) // the tray is closed after a transition
       const videoIframe = trayController.$videoContainer
       const videoContainer = videoIframe.parentElement
       expect(videoContainer.getAttribute('data-mce-p-title')).toBe('new title')
@@ -299,7 +299,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
         media_object_id: 'm_somevideo',
         updateMediaObject,
       })
-      await waitFor(() => expect(getTray()).toBeNull()) // the tray is closed after a transition
+      await waitFor(() => expect(getTray()).toBeNull(), {timeout: 2000}) // the tray is closed after a transition
       const videoContainer = trayController.$videoContainer
       expect(videoContainer).toBe(null)
       const sel = ed.selection.getNode()
