@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback} from 'react'
+import React, {useCallback, useState} from 'react'
 import {useActionData, useLoaderData, useNavigate, useSubmit} from 'react-router-dom'
 import {Breadcrumb} from '@instructure/ui-breadcrumb'
 import {Button} from '@instructure/ui-buttons'
@@ -26,19 +26,24 @@ import {IconDragHandleLine, IconReviewScreenLine, IconSaveLine} from '@instructu
 import {View} from '@instructure/ui-view'
 
 import PersonalInfo from './personal_info/PersonalInfo'
-import AchievementsEdit from './AchievementsEdit'
+import AchievementsEdit from './achievements/AchievementsEdit'
 import EducationEdit from './EducationEdit'
 import ExperienceEdit from './ExperienceEdit'
 import ProjectsEdit from './ProjectsEdit'
 
-import type {PortfolioDetailData, SkillData} from '../../types'
+import type {PortfolioEditData, SkillData} from '../../types'
 
 const PortfolioEdit = () => {
   const navigate = useNavigate()
   const submit = useSubmit()
-  const create_portfolio = useActionData() as PortfolioDetailData
-  const edit_portfolio = useLoaderData() as PortfolioDetailData
-  const portfolio = create_portfolio || edit_portfolio
+  const create_portfolio = useActionData() as PortfolioEditData
+  const edit_portfolio = useLoaderData() as PortfolioEditData
+  const portfolio_data = create_portfolio || edit_portfolio
+  const portfolio = portfolio_data.portfolio
+  const allAchievements = portfolio_data.achievements
+  const [achievementIds, setAchievementIds] = useState<string[]>(() => {
+    return portfolio.achievements.map(achievement => achievement.id)
+  })
 
   const handlePreviewClick = useCallback(() => {
     navigate(`../view/${portfolio.id}`)
@@ -64,6 +69,10 @@ const PortfolioEdit = () => {
     },
     [submit]
   )
+
+  const handleNewAchievements = useCallback((newAchievementIds: string[]) => {
+    setAchievementIds(newAchievementIds)
+  }, [])
 
   return (
     <View as="div">
@@ -117,7 +126,12 @@ const PortfolioEdit = () => {
               <ProjectsEdit portfolio={portfolio} />
             </View>
             <View margin="0 medium" borderWidth="small">
-              <AchievementsEdit portfolio={portfolio} />
+              <input type="hidden" name="achievements" value={achievementIds.join(',')} />
+              <AchievementsEdit
+                allAchievements={allAchievements}
+                selectedAchievementIds={achievementIds}
+                onChange={handleNewAchievements}
+              />
             </View>
           </Flex>
         </form>

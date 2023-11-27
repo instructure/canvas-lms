@@ -194,10 +194,27 @@ class LearnerPassportController < ApplicationController
         ).html_safe,
       },
     ],
-    achievements: @@current_achievements.clone
+    projects: [],
+    achievements: @@current_achievements.first(2).clone
   }
 
-  @@portfolio_template = @@portfolio_sample.clone # some day make a template with less pre-populated data
+  @@portfolio_template = {
+    id: "",
+    title: "",
+    blurb: "",
+    city: "",
+    state: "",
+    phone: "",
+    email: "",
+    heroImageUrl: "",
+    about: "",
+    skills: merge_skills_from_achievements(@@current_achievements),
+    links: [],
+    education: @@portfolio_sample[:education].clone,
+    experience: @@portfolio_sample[:experience].clone,
+    projects: @@portfolio_sample[:projects].clone,
+    achievements: [],
+  }
 
   @@current_portfolios = [@@portfolio_sample.clone]
 
@@ -229,6 +246,8 @@ class LearnerPassportController < ApplicationController
     new_portfolio = @@portfolio_template.clone
     new_portfolio[:id] = (@@current_portfolios.length + 1).to_s
     new_portfolio[:title] = params[:title]
+    new_portfolio[:phone] = @current_user.phone || ""
+    new_portfolio[:email] = @current_user.email || ""
     @@current_portfolios << new_portfolio
     render json: new_portfolio
   end
@@ -239,13 +258,15 @@ class LearnerPassportController < ApplicationController
 
     portfolio[:skills] = []
     portfolio.each do |key, _value|
-      next unless params[key].present?
+      next if params[key].nil?
 
       case key
       when :skills
         params[key].each do |skill|
           portfolio[:skills] << JSON.parse(skill)
         end
+      when :achievements
+        portfolio[:achievements] = @@current_achievements.select { |a| params[key].include?(a[:id]) }
       else
         portfolio[key] = params[key]
       end

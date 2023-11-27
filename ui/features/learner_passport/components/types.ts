@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// import {PortfolioCardSkeleton} from './Portfolios/PortfolioCard'
+
 export interface AchievementData {
   id: string
   isNew: boolean
@@ -75,4 +77,9 @@ export interface ExperienceData {
   from_date: string
   to_date: string
   description: string
+}
+
+export interface PortfolioEditData {
+  portfolio: PortfolioDetailData
+  achievements: AchievementData[]
 }

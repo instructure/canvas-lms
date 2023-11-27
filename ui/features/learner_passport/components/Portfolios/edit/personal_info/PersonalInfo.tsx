@@ -154,7 +154,7 @@ const PersonalInfo = ({portfolio}: PersonalInfoProps) => {
                 Edit cover image
               </Button>
             </div>
-            <input type="hidden" name="heroImageUrl" value={heroImageUrl || undefined} />
+            <input type="hidden" name="heroImageUrl" value={heroImageUrl || ''} />
           </div>
 
           <Flex gap="large">
