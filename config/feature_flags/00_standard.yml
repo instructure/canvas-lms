@@ -22,7 +22,7 @@ analytics_2:
       to ON. For full details, please see the *New Analytics user group* in the Canvas
       Community.
   after_state_change_proc: analytics_2_after_state_change_hook
-  beta: true
+  beta: false
 admin_analytics:
   state: allowed
   applies_to: Account
@@ -34,7 +34,7 @@ admin_analytics:
       Learn more in the *Admin Analytics Hub* in the Canvas community.
   after_state_change_proc: analytics_2_after_state_change_hook
   root_opt_in: true
-  beta: true
+  beta: false
 k20_course_readiness_alpha_testing:
   state: hidden
   applies_to: Account
