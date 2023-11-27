@@ -86,9 +86,14 @@ export const LearnerPassportRoutes = (
       <Route
         path="edit/:portfolioId"
         loader={async ({params}) => {
-          return fetch(
-            `/users/${params.userId}/passport/data/portfolios/show/${params.portfolioId}`
+          const p1 = fetch(`/users/${params.userId}/passport/data/achievements`).then(res =>
+            res.json()
           )
+          const p2 = fetch(
+            `/users/${params.userId}/passport/data/portfolios/show/${params.portfolioId}`
+          ).then(res => res.json())
+          const [achievements, portfolio] = await Promise.all([p1, p2])
+          return {achievements, portfolio}
         }}
         action={async ({request, params}) => {
           const formData = await request.formData()
