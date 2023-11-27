@@ -23,7 +23,6 @@ import {Tag} from '@instructure/ui-tag'
 import {Alert} from '@instructure/ui-alerts'
 import {Select} from '@instructure/ui-select'
 import {IconCheckSolid} from '@instructure/ui-icons'
-import {View} from '@instructure/ui-view'
 
 const I18n = useI18nScope('discussion_create')
 const liveRegion = () => document.getElementById('flash_screenreader_holder')
@@ -48,29 +47,17 @@ export const AssignedTo = ({
   // This is the value that is used to filter out the available options
   const [currentFilterInput, setCurrentFilterInput] = useState('')
 
-  const filterOptions = value => {
-    return Object.values(availableAssignToOptions)
-      .flat()
-      .filter(option => option.label.toLowerCase().includes(value.toLowerCase()))
-  }
-
   const [activeOptions, setActiveOptions] = useState(
     Object.values(availableAssignToOptions)
       .flat()
       .find(option => initialAssignedToInformation.includes(option.assetCode)) || []
   )
 
-  // filterOptions only occur based on user input.
-  const filteredOptions = useMemo(() => {
-    if (!currentFilterInput) return availableAssignToOptions
-
-    return Object.keys(availableAssignToOptions).reduce((acc, key) => {
-      acc[key] = availableAssignToOptions[key].filter(option =>
-        option.label.toLowerCase().includes(currentFilterInput.toLowerCase())
-      )
-      return acc
-    }, {})
-  }, [currentFilterInput, availableAssignToOptions])
+  // Add the checkmark icon to the selected options
+  const addIconToOption = (option, isSelected) => ({
+    ...option,
+    renderBeforeLabel: <IconCheckSolid style={{opacity: isSelected ? 1 : 0}} />,
+  })
 
   const getOptionByAssetCode = useCallback(
     assetCode => {
@@ -86,6 +73,45 @@ export const AssignedTo = ({
     [availableAssignToOptions]
   )
 
+  // filterOptions only occur based on user input.
+  const filteredOptions = useMemo(() => {
+    return Object.keys(availableAssignToOptions).reduce((visibleOptions, groupName) => {
+      const options = availableAssignToOptions[groupName]
+
+      visibleOptions[groupName] = options
+        .filter(
+          option =>
+            !currentFilterInput ||
+            option.label.toLowerCase().includes(currentFilterInput.toLowerCase())
+        )
+        .map(option => addIconToOption(option, selectedOptionAssetCode.includes(option.assetCode)))
+
+      return visibleOptions
+    }, {})
+  }, [currentFilterInput, availableAssignToOptions, selectedOptionAssetCode])
+
+  // For screen-reader users, we want to announce when the available options change
+  useEffect(() => {
+    setAnnouncement(
+      `${currentFilterInput}. ${I18n.t('%{optionCount} options available.', {
+        optionCount: filteredOptions.length,
+      })}`
+    )
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filteredOptions])
+
+  const getDefaultHighlightedOption = () => {
+    const defaultOptions = Object.values(filteredOptions).flat()
+    return defaultOptions.length > 0 ? defaultOptions[0].assetCode : null
+  }
+
+  // Highlight the default item
+  useEffect(() => {
+    setHighlightedOptionAssetCode(getDefaultHighlightedOption())
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentFilterInput, filteredOptions])
+
   useEffect(() => {
     setActiveOptions(selectedOptionAssetCode.map(assetCode => getOptionByAssetCode(assetCode)))
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -95,11 +121,6 @@ export const AssignedTo = ({
   const handleOptionSelected = assetCode => {
     setSelectedOptionAssetCode(prev => [...prev, assetCode])
     onOptionSelect(assetCode) // Notify parent
-  }
-
-  const getDefaultHighlightedOption = (newOptions = {}) => {
-    const defaultOptions = Object.values(newOptions).flat()
-    return defaultOptions.length > 0 ? defaultOptions[0].assetCode : null
   }
 
   const handleBlur = () => {
@@ -112,13 +133,9 @@ export const AssignedTo = ({
     const option = getOptionByAssetCode(assetCode)
     if (!option) return
     setHighlightedOptionAssetCode(assetCode)
-    // Set the visible input correctly when using keyboard
-    if (event.type === 'keydown') {
-      setInputValue(option.label)
-    } else {
-      setCurrentFilterInput(inputValue)
-      setInputValue(inputValue)
-    }
+    if (!selectedOptionAssetCode.includes(assetCode)) setInputValue(option.label)
+
+    // Announce the option that is highlighted
     setAnnouncement(option.label)
   }
 
@@ -138,30 +155,13 @@ export const AssignedTo = ({
     setAnnouncement(I18n.t('%{optionName} selected. List collapsed.', {optionName: option.label}))
   }
 
-  const getOptionsChangedMessage = newOptions => {
-    let message =
-      newOptions.length !== filteredOptions.length
-        ? I18n.t('%{optionCount} options available.', {optionCount: newOptions.length}) // options changed, announce new total
-        : null // options haven't changed, don't announce
-    if (message && newOptions.length > 0) {
-      if (highlightedOptionAssetCode !== newOptions[0].assetCode) {
-        const option = getOptionByAssetCode(newOptions[0].assetCode).label
-        message = `${option}. ${message}`
-      }
-    }
-    return message
-  }
-
   // Changes that occur when the user types in the input
   const handleInputChange = event => {
     const value = event.target.value
-    const newFilteredOptions = filterOptions(value)
     // Any time input is typed, the filter should change
     setCurrentFilterInput(value)
     setInputValue(value)
-    setHighlightedOptionAssetCode(getDefaultHighlightedOption(newFilteredOptions))
     setIsShowingOptions(true)
-    setAnnouncement(getOptionsChangedMessage(newFilteredOptions))
   }
 
   const handleShowOptions = () => {
@@ -226,21 +226,14 @@ export const AssignedTo = ({
       return (
         <Select.Group key={key} renderLabel={key}>
           {filteredOptions[key].map(option => {
-            const isOptionSelected = selectedOptionAssetCode.includes(option.assetCode)
-            // If the option is selected, show the checkmark icon
-            const iconStyle = {
-              opacity: isOptionSelected ? 1 : 0,
-            }
             return (
               <Select.Option
                 id={option.assetCode}
                 key={option.assetCode}
                 isHighlighted={option.assetCode === highlightedOptionAssetCode}
                 data-testid="assign-to-select-option"
+                renderBeforeLabel={option.renderBeforeLabel}
               >
-                <View padding="none xx-small none none">
-                  <IconCheckSolid style={iconStyle} />
-                </View>
                 {option.label}
               </Select.Option>
             )
