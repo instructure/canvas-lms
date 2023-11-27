@@ -53,30 +53,65 @@ describe "discussion assignments" do
   end
 
   context "create group discussion" do
-    before do
-      get "/courses/#{@course.id}/discussion_topics/new"
-      f("#discussion-title").send_keys("New Discussion Title")
-      type_in_tiny("textarea[name=message]", "Discussion topic message body")
-      f("#has_group_category").click
-      click_option("#assignment_group_category_id", "category 1")
+    context "when discussion_create feature flag is OFF" do
+      before do
+        get "/courses/#{@course.id}/discussion_topics/new"
+        f("#discussion-title").send_keys("New Discussion Title")
+        type_in_tiny("textarea[name=message]", "Discussion topic message body")
+        f("#has_group_category").click
+        click_option("#assignment_group_category_id", "category 1")
+      end
+
+      it "creates a group discussion ungraded", priority: "1" do
+        expect_new_page_load { submit_form(".form-actions") }
+        expect(f("#discussion_container").text).to include("Since this is a group discussion, " \
+                                                           "each group has its own conversation for this topic. " \
+                                                           "Here are the ones you have access to:\nsome group")
+      end
+
+      it "creates a group discussion graded", priority: "1" do
+        f("#use_for_grading").click
+        f("#discussion_topic_assignment_points_possible").send_keys("10")
+        click_option("#assignment_group_id", "Assignment Group")
+        expect_new_page_load { submit_form(".form-actions") }
+        expect(f("#discussion_container").text).to include("This is a graded discussion: 10 points possible")
+        expect(f("#discussion_container").text).to include("Since this is a group discussion, " \
+                                                           "each group has its own conversation for this topic. " \
+                                                           "Here are the ones you have access to:\nsome group")
+      end
     end
 
-    it "creates a group discussion ungraded", priority: "1" do
-      expect_new_page_load { submit_form(".form-actions") }
-      expect(f("#discussion_container").text).to include("Since this is a group discussion, " \
-                                                         "each group has its own conversation for this topic. " \
-                                                         "Here are the ones you have access to:\nsome group")
-    end
+    context "when discussion_create feature flag is ON" do
+      before do
+        Account.site_admin.enable_feature!(:discussion_create)
+        Account.site_admin.enable_feature!(:react_discussions_post)
+      end
 
-    it "creates a group discussion graded", priority: "1" do
-      f("#use_for_grading").click
-      f("#discussion_topic_assignment_points_possible").send_keys("10")
-      click_option("#assignment_group_id", "Assignment Group")
-      expect_new_page_load { submit_form(".form-actions") }
-      expect(f("#discussion_container").text).to include("This is a graded discussion: 10 points possible")
-      expect(f("#discussion_container").text).to include("Since this is a group discussion, " \
-                                                         "each group has its own conversation for this topic. " \
-                                                         "Here are the ones you have access to:\nsome group")
+      it "creates an ungraded group discussion in a course context" do
+        get "/courses/#{@course.id}/discussion_topics/new"
+        f("input[placeholder='Topic Title']").send_keys "Ungraded Group Discussion"
+        force_click("input[data-testid='group-discussion-checkbox']")
+        force_click("input[placeholder='Select a group category']")
+        fj("li:contains('category 1')").click
+        f("button[data-testid='save-button']").click
+        dt = DiscussionTopic.last
+        expect(dt.title).to eq "Ungraded Group Discussion - some group"
+        expect(dt.group_category).to eq @category1
+        expect(dt.assignment).to be_nil
+      end
+
+      # TODO: Uncomment and complete the test when ability to create graded discussions works
+      # it "creates a graded group discussion in a course context" do
+      #   get "/courses/#{@course.id}/discussion_topics/new"
+      #   f("input[placeholder='Topic Title']").send_keys "Graded Group Discussion"
+      #   force_click("input[data-testid='group-discussion-checkbox']")
+      #   force_click("input[placeholder='Select a group category']")
+      #   fj("li:contains('category 1')").click
+      #   force_click("label:contains('Graded')")
+      #   f("input[data-testid='points-possible-input']").send_keys 10
+      #   fj("li:contains('Percentage')").click
+      #   f("button[data-testid='save-button']").click
+      # end
     end
   end
 
