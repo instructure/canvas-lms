@@ -1111,7 +1111,7 @@ GEM
       unicode-version (~> 1.0)
     unicode-version (1.3.0)
     uri (0.13.0)
-    vault (0.18.1)
+    vault (0.18.2)
       aws-sigv4
     vericite_api (1.5.3)
       json (>= 1.4.6)
