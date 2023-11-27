@@ -126,6 +126,8 @@ module Api::V1::AssignmentOverride
   end
 
   def interpret_assignment_override_data(assignment, data, set_type = nil)
+    @domain_root_account ||= LoadAccount.default_domain_root_account
+
     data ||= {}
     return {}, ["invalid override data"] unless data.is_a?(Hash) || data.is_a?(ActionController::Parameters)
 
@@ -168,7 +170,7 @@ module Api::V1::AssignmentOverride
       override_data[:students] = students
     end
 
-    if !set_type && data.key?(:group_id)
+    if !set_type && data.key?(:group_id) && data[:group_id].present?
       group_category_id = assignment.group_category_id || assignment.discussion_topic.try(:group_category_id)
       if group_category_id
         set_type = "Group"
@@ -185,7 +187,7 @@ module Api::V1::AssignmentOverride
       end
     end
 
-    if !set_type && data.key?(:course_section_id)
+    if !set_type && data.key?(:course_section_id) && data[:course_section_id].present?
       set_type = "CourseSection"
 
       # look up the section
@@ -442,6 +444,7 @@ module Api::V1::AssignmentOverride
 
     override_errors = []
     overrides_to_save = overrides_params.map do |override_params|
+      # override_params.values.filter {|v| v.present?}.length > 0
       override = get_override_from_params(override_params, assignment, overrides_to_keep)
       update_override_with_invisible_data(override_params, override, invisible_override_ids, invisible_user_ids)
 

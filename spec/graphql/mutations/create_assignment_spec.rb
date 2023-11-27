@@ -282,7 +282,7 @@ describe Mutations::CreateAssignment do
           dueAt: "#{due2.iso8601}"
         },
         {
-          sectionId: #{@course.default_section.to_param}
+          courseSectionId: #{@course.default_section.to_param}
           dueAt: "#{due3.iso8601}"
         }
       ]

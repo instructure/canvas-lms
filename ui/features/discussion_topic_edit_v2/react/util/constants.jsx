@@ -17,6 +17,15 @@
  */
 import React from 'react'
 
+export const defaultEveryoneOption = {
+  assetCode: 'everyone',
+  label: 'Everyone',
+}
+export const defaultEveryoneElseOption = {
+  assetCode: 'everyone',
+  label: 'Everyone else',
+}
+
 const GradedDiscussionDueDateDefaultValues = {
   assignedInfoList: [],
   setAssignedInfoList: () => {},
