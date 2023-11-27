@@ -2751,6 +2751,7 @@ class UsersController < ApplicationController
 
     key = nil
     sekrit = nil
+    pandata_credentials = PandataEvents.credentials
     token_prefixes.each do |prefix|
       next unless params[:app_key] == pandata_credentials["#{prefix}_key"]
 
@@ -2781,7 +2782,7 @@ class UsersController < ApplicationController
     auth_token = Canvas::Security.create_jwt(auth_body, expires_at, private_key, :ES512)
     props_token = Canvas::Security.create_jwt(props_body, nil, private_key, :ES512)
     render json: {
-      url: DynamicSettings.find("pandata/events", service: "canvas")["url"],
+      url: PandataEvents.endpoint,
       auth_token:,
       props_token:,
       expires_at: expires_at.to_f * 1000
@@ -2947,10 +2948,6 @@ class UsersController < ApplicationController
     # nil and '' will get converted to 0 in the .to_i call
     id = period_id.to_i
     (id == 0) ? nil : id
-  end
-
-  def pandata_credentials
-    @pandata_credentials ||= Rails.application.credentials.pandata_creds.with_indifferent_access || {}
   end
 
   def render_new_user_tutorial_statuses(user)

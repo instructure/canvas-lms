@@ -56,6 +56,9 @@ development:
       microsoft-sync:
         client-id: some_client_id
         client-secret: some_client_secret
+      pandata/events:
+        enabled_for_canvas: false
+        url: 'https://cbbsk4vb5k.execute-api.us-east-1.amazonaws.com/prod/pandata-event' # dev PandataEvents environment
       rich-content-service:
         # if you're running canvas-rce-api on its own
         app-host: "rce.canvas.docker"
