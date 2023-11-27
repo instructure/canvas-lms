@@ -253,10 +253,7 @@ module Context
     user = User.find(params[:user_id]) if params[:user_id]
     context = course || group || user
 
-    media_obj = MediaObject.where(media_id: params[:media_object_id]).first if params[:media_object_id]
-    context = media_obj.context if media_obj
-
-    return nil unless context
+    return nil unless context || params[:controller] == "media_objects"
 
     case params[:controller]
     when "files"
@@ -296,7 +293,12 @@ module Context
                  context.context_modules.find_by(id: params[:id])
                end
     when "media_objects"
-      object = media_obj
+      object = if params[:media_object_id]
+                 MediaObject.where(media_id: params[:media_object_id]).first
+               elsif params[:attachment_id]
+                 # get possibly replaced attachment, see app/models/attachment.rb find_attachment_possibly_replaced
+                 Attachment.find_by(id: params[:attachment_id])&.context&.attachments&.find_by(id: params[:attachment_id])
+               end
     when "context"
       object = context.users.find(params[:id]) if params[:action] == "roster_user" && params[:id]
     else
