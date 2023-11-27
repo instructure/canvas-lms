@@ -149,7 +149,7 @@ describe Mutations::UpdateAssignment do
       id: "#{@assignment_id}"
       assignmentOverrides: [
         {
-          sectionId: "#{section.id}"
+          courseSectionId: "#{section.id}"
         }
       ]
     GQL
@@ -195,7 +195,7 @@ describe Mutations::UpdateAssignment do
           studentIds: ["#{@student.id}"]
         }
         {
-          sectionId: "#{section.id}"
+          courseSectionId: "#{section.id}"
         }
         {
           groupId: "#{@group.id}"
@@ -343,11 +343,11 @@ describe Mutations::UpdateAssignment do
       id: "#{@assignment_id}"
       assignmentOverrides: [
         {
-          sectionId: "#{section.id}"
+          courseSectionId: "#{section.id}"
           unlockAt: "2018-01-01T01:00:00Z"
         }
         {
-          sectionId: "#{section.id}"
+          courseSectionId: "#{section.id}"
           unlockAt: "2018-01-02T01:00:00Z"
         }
       ]
@@ -363,11 +363,11 @@ describe Mutations::UpdateAssignment do
       id: "#{@assignment_id}"
       assignmentOverrides: [
         {
-          sectionId: "#{section1.id}"
+          courseSectionId: "#{section1.id}"
           dueAt: "2019-02-28T17:01:00Z-05:00"
         }
         {
-          sectionId: "#{section2.id}"
+          courseSectionId: "#{section2.id}"
           dueAt: "2018:02-28T17:02:00Z-05:00"
         }
       ]

@@ -26,18 +26,13 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {IconAddLine} from '@instructure/ui-icons'
 import theme from '@instructure/canvas-theme'
-import {GradedDiscussionDueDatesContext} from '../../util/constants'
+import {
+  GradedDiscussionDueDatesContext,
+  defaultEveryoneOption,
+  defaultEveryoneElseOption,
+} from '../../util/constants'
 
 const I18n = useI18nScope('discussion_create')
-
-const defaultEveryoneOption = {
-  assetCode: 'everyone',
-  label: 'Everyone',
-}
-const defaultEveryoneElseOption = {
-  assetCode: 'everyone',
-  label: 'Everyone else',
-}
 
 const getDefaultBaseOptions = (includeMasteryPath, everyoneOption) => {
   return includeMasteryPath
@@ -181,7 +176,11 @@ export const AssignmentDueDatesManager = () => {
           </div>
         </View>
       ))}
-      <Button renderIcon={IconAddLine} onClick={handleAddAssignment}>
+      <Button
+        renderIcon={IconAddLine}
+        onClick={handleAddAssignment}
+        data-testid="add-assignment-override-seciont-btn"
+      >
         {I18n.t('Add Assignment')}
       </Button>
     </>

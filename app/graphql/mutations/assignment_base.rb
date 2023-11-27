@@ -24,7 +24,7 @@ class Mutations::AssignmentOverrideCreateOrUpdate < GraphQL::Schema::InputObject
   argument :lock_at, Types::DateTimeType, required: false
   argument :unlock_at, Types::DateTimeType, required: false
 
-  argument :section_id, ID, required: false
+  argument :course_section_id, ID, required: false
   argument :group_id, ID, required: false
   argument :student_ids, [ID], required: false
 end
@@ -53,6 +53,7 @@ class Mutations::AssignmentInputBase < GraphQL::Schema::InputObject
   argument :due_at, Types::DateTimeType, required: false
   argument :grading_type, Types::AssignmentType::AssignmentGradingType, required: false
   argument :grading_standard_id, ID, required: false
+  argument :group_category_id, ID, required: false
   argument :lock_at, Types::DateTimeType, required: false
   argument :peer_reviews, Mutations::AssignmentPeerReviewsUpdate, required: false
   argument :points_possible, Float, required: false
@@ -174,7 +175,7 @@ class Mutations::AssignmentBase < Mutations::BaseMutation
   end
 
   def prepare_overrides!(input_hash, api_proxy)
-    if input_hash.key? :assignment_overrides
+    if input_hash.key?(:assignment_overrides) && input_hash[:assignment_overrides].present?
       api_proxy.load_root_account
       input_hash[:assignment_overrides].each do |override|
         if override[:id].blank?
@@ -182,9 +183,9 @@ class Mutations::AssignmentBase < Mutations::BaseMutation
         else
           override[:id] = GraphQLHelpers.parse_relay_or_legacy_id(override[:id], "AssignmentOverride")
         end
-        override[:course_section_id] = GraphQLHelpers.parse_relay_or_legacy_id(override[:section_id], "Section") if override.key? :section_id
-        override[:group_id] = GraphQLHelpers.parse_relay_or_legacy_id(override[:group_id], "Group") if override.key? :group_id
-        override[:student_ids] = override[:student_ids].map { |id| GraphQLHelpers.parse_relay_or_legacy_id(id, "User") } if override.key? :student_ids
+        override[:course_section_id] = GraphQLHelpers.parse_relay_or_legacy_id(override[:section_id], "Section") if override.key?(:section_id) && override[:section_id].present?
+        override[:group_id] = GraphQLHelpers.parse_relay_or_legacy_id(override[:group_id], "Group") if override.key?(:group_id) && override[:group_id].present?
+        override[:student_ids] = override[:student_ids].map { |id| GraphQLHelpers.parse_relay_or_legacy_id(id, "User") } if override.key?(:student_ids) && override[:student_ids].present?
       end
     end
   end
@@ -206,11 +207,11 @@ class Mutations::AssignmentBase < Mutations::BaseMutation
   def prepare_peer_reviews!(input_hash)
     if input_hash.key?(:peer_reviews) && input_hash[:peer_reviews].present?
       peer_reviews = input_hash.delete(:peer_reviews)
-      input_hash[:peer_reviews] = peer_reviews[:enabled] if peer_reviews.key? :enabled
-      input_hash[:peer_review_count] = peer_reviews[:count] if peer_reviews.key? :count
-      input_hash[:intra_group_peer_reviews] = peer_reviews[:intra_reviews] if peer_reviews.key? :intra_reviews
-      input_hash[:anonymous_peer_reviews] = peer_reviews[:anonymous_reviews] if peer_reviews.key? :anonymous_reviews
-      input_hash[:automatic_peer_reviews] = peer_reviews[:automatic_reviews] if peer_reviews.key? :automatic_reviews
+      input_hash[:peer_reviews] = peer_reviews[:enabled] if peer_reviews.key?(:enabled) && peer_reviews[:enabled].present?
+      input_hash[:peer_review_count] = peer_reviews[:count] if peer_reviews.key?(:count) && peer_reviews[:count].present?
+      input_hash[:intra_group_peer_reviews] = peer_reviews[:intra_reviews] if peer_reviews.key?(:intra_reviews) && peer_reviews[:intra_reviews].present?
+      input_hash[:anonymous_peer_reviews] = peer_reviews[:anonymous_reviews] if peer_reviews.key?(:anonymous_reviews) && peer_reviews[:anonymous_reviews].present?
+      input_hash[:automatic_peer_reviews] = peer_reviews[:automatic_reviews] if peer_reviews.key?(:automatic_reviews) && peer_reviews[:automatic_reviews].present?
 
       # this should be peer_reviews_due_at, but its not permitted in the backend and peer_reviews_assign_at
       # is transformed into peer_reviews_due_at. that's probably a bug, but just to keep this update resilient

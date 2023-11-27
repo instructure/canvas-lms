@@ -104,6 +104,9 @@ describe Mutations::CreateDiscussionTopic do
               name
               pointsPossible
               gradingType
+              groupSet {
+                _id
+              }
               peerReviews {
                 anonymousReviews
                 automaticReviews
@@ -860,6 +863,7 @@ describe Mutations::CreateDiscussionTopic do
       message = "Lorem ipsum..."
       published = true
       student = @course.enroll_student(User.create!, enrollment_state: "active").user
+      group_category = @course.group_categories.create! name: "foo"
 
       query = <<~GQL
         contextId: "#{@course.id}"
@@ -867,12 +871,14 @@ describe Mutations::CreateDiscussionTopic do
         title: "#{title}"
         message: "#{message}"
         published: #{published}
+        groupCategoryId: "#{group_category.id}"
         assignment: {
           courseId: "#{@course.id}",
           name: "#{title}",
           pointsPossible: 15,
           gradingType: percent,
           postToSis: true,
+          groupCategoryId: "#{group_category.id}"
           peerReviews: {
             anonymousReviews: true,
             automaticReviews: true,
@@ -900,6 +906,7 @@ describe Mutations::CreateDiscussionTopic do
         expect(discussion_topic["assignment"]["peerReviews"]["count"]).to eq 2
         expect(discussion_topic["assignment"]["assignmentOverrides"]["nodes"]).to match([{ "_id" => assignment.assignment_overrides.first.id.to_s, "title" => assignment.assignment_overrides.first.title }])
         expect(discussion_topic["assignment"]["_id"]).to eq assignment.id.to_s
+        expect(discussion_topic["assignment"]["groupSet"]["_id"]).to eq group_category.id.to_s
         expect(discussion_topic["_id"]).to eq assignment.discussion_topic.id.to_s
         expect(DiscussionTopic.count).to eq 1
         expect(DiscussionTopic.last.assignment.post_to_sis).to be true
