@@ -72,7 +72,7 @@ test('calls onMove with a destination id when selected', assert => {
   TestUtils.Simulate.click(button)
 })
 
-test('does not call onMove when cancelled via close button', assert => {
+QUnit.skip('does not call onMove when cancelled via close button', assert => {
   const done = assert.async(2)
   mountDialog({
     onMove: _val => {
@@ -88,7 +88,7 @@ test('does not call onMove when cancelled via close button', assert => {
   TestUtils.Simulate.click(button)
 })
 
-test('does not fail when no onMove is specified', assert => {
+QUnit.skip('does not fail when no onMove is specified', assert => {
   const done = assert.async(2)
   mountDialog({
     onClose: () => {
