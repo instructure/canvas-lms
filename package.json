@@ -84,6 +84,7 @@
     "@instructure/ui-time-select": "^8",
     "@instructure/ui-toggle-details": "^8",
     "@instructure/ui-tooltip": "^8",
+    "@instructure/ui-top-nav-bar": "^8",
     "@instructure/ui-tray": "^8",
     "@instructure/ui-tree-browser": "^8",
     "@instructure/ui-view": "^8",
