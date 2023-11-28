@@ -25,8 +25,29 @@ import {Text} from '@instructure/ui-text'
 import {outcomeShape} from './shapes'
 import useLMGBContext from '@canvas/outcomes/react/hooks/useLMGBContext'
 import {Link} from '@instructure/ui-link'
+import {Pill} from '@instructure/ui-pill'
 
 const I18n = useI18nScope('OutcomeDescriptionModal')
+
+const getCalculationMethod = (outcome) => {
+  const calc_int = outcome.calculation_int
+  const other_int = (100 - calc_int)
+
+  switch (outcome.calculation_method) {
+    case ('decaying_average'):
+      return I18n.t('%{calc_int}/%{other_int} Weighted Average', {calc_int, other_int})
+    case ('standard_decaying_average'):
+      return I18n.t('%{calc_int}/%{other_int} Decaying Average', {calc_int, other_int})
+    case ('n_mastery'):
+      return I18n.t('Number of Times (%{calc_int})', {calc_int})
+    case ('highest'):
+      return I18n.t('Highest')
+    case ('latest'):
+      return I18n.t('Most Recent Score')
+    default:
+      return I18n.t('Average')
+  }
+}
 
 const OutcomeDescriptionModal = ({outcome, isOpen, onCloseHandler}) => {
   const {outcomesFriendlyDescriptionFF, contextURL} = useLMGBContext()
@@ -34,6 +55,7 @@ const OutcomeDescriptionModal = ({outcome, isOpen, onCloseHandler}) => {
   const missingDisplayName = outcome.display_name === ""
   const missingDescription = outcome.description === ""
   const missingFriendlyDescription = outcome.friendly_description === null || outcome.friendly_description === ""
+  const calculationMethod = getCalculationMethod(outcome)
   const shouldDisplayEmptyModal = missingDisplayName && missingDescription && missingFriendlyDescription
 
   return (
@@ -58,6 +80,7 @@ const OutcomeDescriptionModal = ({outcome, isOpen, onCloseHandler}) => {
             >
               <Text wrap='break-word' size='x-large' weight='bold'>{outcome.display_name}</Text>
             </View>
+            <Pill data-testid="calculation-method">{calculationMethod}</Pill>
             {outcomesFriendlyDescriptionFF && !missingFriendlyDescription &&  (
               <View
                 display='block'
