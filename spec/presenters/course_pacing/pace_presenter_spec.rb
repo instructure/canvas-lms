@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-describe CoursePacing::PacePresenterInterface do
+describe CoursePacing::PacePresenter do
   let(:pace) { course_pace_model }
-  let(:presenter) { CoursePacing::PacePresenterInterface.new(pace) }
+  let(:presenter) { CoursePacing::PacePresenter.new(pace) }
 
   describe "#as_json" do
     it "requires implementation" do

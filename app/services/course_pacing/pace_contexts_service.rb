@@ -44,10 +44,7 @@ class CoursePacing::PaceContextsService
       student_enrollments = student_enrollments.reverse_order if params[:order] == "desc"
       student_enrollments.to_a
     else
-      Canvas::Errors.capture_exception(
-        :pace_contexts_service,
-        "Expected a value of 'course', 'section', or 'student_enrollment', got '#{type}'"
-      )
+      raise ArgumentError, "Expected a value of 'course', 'section', or 'student_enrollment', got '#{type}'"
     end
   end
 end

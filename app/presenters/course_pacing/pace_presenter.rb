@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class CoursePacing::PacePresenterInterface
+class CoursePacing::PacePresenter
   include Rails.application.routes.url_helpers
 
   attr_reader :pace
