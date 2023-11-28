@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require_relative "content_migration/course_copy_helper"
+
 describe ContentMigration do
   before :once do
     course_with_teacher
@@ -1055,24 +1057,34 @@ describe ContentMigration do
   end
 
   context "insert_into_module_id" do
-    it "successfully migrates into context module" do
-      @module = @course.context_modules.create! name: "test"
+    include_context "course copy"
 
-      @cm.migration_type = "common_cartridge_importer"
-      @cm.migration_settings["import_immediately"] = true
-      @cm.migration_settings["insert_into_module_id"] = @module.id
+    it "successfully migrates headers" do
+      @module_to = @copy_to.context_modules.create! name: "test"
+      @module_from = @copy_from.context_modules.create! name: "test"
+      @module_from.add_item(title: "Some subheader", type: "sub_header", indent: 2)
+      @module_from.add_item(title: "example", type: "external_url", indent: 3, url: "http://example.com")
+      @module_from.add_item(title: "Some Other subheader", type: "sub_header", indent: 2)
+      @cm.migration_settings["insert_into_module_id"] = @module_to.id
       @cm.save!
+      run_export_and_import
+      expect(@cm.warnings).to be_empty
+      expect(@module_to.content_tags.pluck(:title, :indent)).to eq([["Some subheader", 2], ["example", 3], ["Some Other subheader", 2]])
+    end
 
-      package_path = File.join("#{File.dirname(__FILE__)}/../fixtures/migration/child-course-2-export.imscc")
-      attachment = Attachment.new(context: @cm, filename: "file.zip")
-      attachment.uploaded_data = File.open(package_path, "rb")
-      attachment.save!
-
-      @cm.update_attribute(:attachment, attachment)
-      @cm.queue_migration
-      run_jobs
-      expect(@module.content_tags.length).to eq 5
-      expect(@module.content_tags.map(&:title)).to eq(["Whatever Else", "Assignment 1 Upper", "Whatever", "Assignment 1 Upper", "Whatever Else Else"])
+    it "successfully migrates quiz assignments without apparent duplication" do
+      skip unless Qti.qti_enabled?
+      @module_to = @copy_to.context_modules.create! name: "test"
+      @q = @copy_from.quizzes.create! title: "some quiz"
+      @q.did_edit
+      @q.offer!
+      @cm.migration_settings["insert_into_module_id"] = @module_to.id
+      @cm.save!
+      run_export_and_import
+      expect(@cm.warnings).to be_empty
+      expect(@module_to.content_tags.pluck(:title)).to eq(["some quiz"])
+      expect(@copy_to.assignments.pluck(:title)).to eq(["some quiz"])
+      expect(@copy_to.quizzes.pluck(:title)).to eq(["some quiz"])
     end
   end
 
