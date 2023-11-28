@@ -139,4 +139,82 @@ describe PandataEvents do
       it { is_expected.to be_falsy }
     end
   end
+
+  describe ".send_event" do
+    subject do
+      described_class.send_event(event_type, data, for_user_id: sub)
+      run_jobs
+    end
+
+    let(:data) { { hello: :world } }
+    let(:sub) { 123 }
+    let(:event_type) { "event_type" }
+
+    before do
+      allow(PandataEvents).to receive(:enabled?).and_return(enabled)
+      allow(PandataEvents).to receive(:post_event)
+    end
+
+    context "when PandataEvents is enabled" do
+      let(:enabled) { true }
+
+      it "enqueues post_event in a job" do
+        subject
+        expect(PandataEvents).to have_received(:post_event).with(event_type, data, sub)
+      end
+    end
+
+    context "when PandataEvents is not enabled" do
+      let(:enabled) { false }
+
+      it "does nothing" do
+        subject
+        expect(PandataEvents).not_to have_received(:post_event)
+      end
+    end
+  end
+
+  describe ".post_event" do
+    subject { described_class.send(:post_event, event_type, data, sub) }
+
+    let(:data) { { hello: "world" }.with_indifferent_access }
+    let(:sub) { 123 }
+    let(:event_type) { "event_type" }
+    let(:credentials) do
+      {
+        canvas_key: "CANVAS",
+        canvas_secret: "secret",
+        canvas_secret_alg: "HS256"
+      }.with_indifferent_access
+    end
+    let(:endpoint) { "https://example.com" }
+
+    before do
+      allow(PandataEvents).to receive_messages(credentials:, endpoint:)
+      allow(CanvasHttp).to receive(:post)
+    end
+
+    it "posts to the endpoint" do
+      subject
+      expect(CanvasHttp).to have_received(:post).with(endpoint, anything, anything)
+    end
+
+    it "structures event data correctly" do
+      subject
+      expect(CanvasHttp).to have_received(:post) do |_, _, options|
+        body = JSON.parse(options[:body]).with_indifferent_access
+        expect(body[:timestamp]).to be_present
+        expect(body[:eventType]).to eq(event_type)
+        expect(body[:appTag]).to eq(credentials[:canvas_key])
+        expect(body[:properties].with_indifferent_access).to eq(data)
+      end
+    end
+
+    it "includes the auth token" do
+      subject
+      expect(CanvasHttp).to have_received(:post) do |_, headers, _|
+        expect { CanvasSecurity.decode_jwt(headers[:Authorization].split.last, [credentials[:canvas_secret]]) }.not_to raise_error
+      end
+    end
+  end
 end
