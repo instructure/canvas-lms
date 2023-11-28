@@ -19,31 +19,18 @@
 import React, {useEffect, useState} from 'react'
 import {EnrollmentTreeGroup} from './EnrollmentTreeGroup'
 import {Spinner} from '@instructure/ui-spinner'
-import {Course, Enrollment, Role, RoleChoice, Section} from './types'
+import {Course, Enrollment, NodeStructure, Role, RoleChoice, Section} from './types'
 import {Flex} from '@instructure/ui-flex'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('temporary_enrollment')
 
 export interface Props {
-  enrollmentsByCourse: Course[] | any
-  roles: Role[] | any
+  enrollmentsByCourse: Course[]
+  roles: Role[]
   selectedRole: RoleChoice
   createEnroll?: Function
   tempEnrollmentsPairing?: Enrollment[] | null
-}
-
-export interface NodeStructure {
-  children: NodeStructure[]
-  enrollId?: string
-  id: string
-  isCheck: boolean
-  isMismatch?: boolean
-  isMixed: boolean
-  isToggle?: boolean
-  label: string
-  parent?: NodeStructure
-  workflowState?: string
 }
 
 export function EnrollmentTree(props: Props) {
@@ -328,30 +315,33 @@ export function EnrollmentTree(props: Props) {
     const roleElements = []
     for (const role in tree) {
       roleElements.push(
-        <EnrollmentTreeGroup
-          key={tree[role].id}
-          id={tree[role].id}
-          label={tree[role].label}
-          indent="0"
-          updateCheck={handleUpdateTreeCheck}
-          updateToggle={handleUpdateTreeToggle}
-          isCheck={tree[role].isCheck}
-          isToggle={tree[role].isToggle}
-          isMixed={tree[role].isMixed}
-        >
-          {[...tree[role].children]}
-        </EnrollmentTreeGroup>
+        <Flex.Item key={tree[role].id} shouldGrow={true} overflowY="visible">
+          <EnrollmentTreeGroup
+            id={tree[role].id}
+            label={tree[role].label}
+            indent="0"
+            updateCheck={handleUpdateTreeCheck}
+            updateToggle={handleUpdateTreeToggle}
+            isCheck={tree[role].isCheck}
+            isToggle={tree[role].isToggle}
+            isMixed={tree[role].isMixed}
+          >
+            {[...tree[role].children]}
+          </EnrollmentTreeGroup>
+        </Flex.Item>
       )
     }
-    return <>{roleElements}</>
+    return (
+      <Flex gap="medium" direction="column">
+        {roleElements}
+      </Flex>
+    )
   }
 
   if (loading) {
     return (
       <Flex justifyItems="center" alignItems="center">
-        <Flex.Item shouldGrow={true}>
-          <Spinner renderTitle={I18n.t('Loading enrollments')} />
-        </Flex.Item>
+        <Spinner renderTitle={I18n.t('Loading enrollments')} />
       </Flex>
     )
   } else {

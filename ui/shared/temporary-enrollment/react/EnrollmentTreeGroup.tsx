@@ -16,18 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {IconButton} from '@instructure/ui-buttons'
 import React from 'react'
+import {IconButton} from '@instructure/ui-buttons'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {IconArrowOpenDownSolid, IconArrowOpenEndSolid} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {EnrollmentTreeItem} from './EnrollmentTreeItem'
-import {NodeStructure} from './EnrollmentTree'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
-import RoleMismatchToolTip from './RoleMismatchToolTip'
 import {createAnalyticPropsGenerator} from './util/analytics'
-import {MODULE_NAME} from './types'
+import {
+  ENROLLMENT_TREE_ICON_OFFSET,
+  ENROLLMENT_TREE_SPACING,
+  MODULE_NAME,
+  NodeStructure,
+} from './types'
+import {Spacing} from '@instructure/emotion'
+import RoleMismatchToolTipWrapper from './RoleMismatchToolTipWrapper'
 
 const I18n = useI18nScope('temporary_enrollment')
 
@@ -35,7 +40,7 @@ const I18n = useI18nScope('temporary_enrollment')
 const analyticProps = createAnalyticPropsGenerator(MODULE_NAME)
 
 interface Props extends NodeStructure {
-  indent: any
+  indent: Spacing
   updateCheck: Function
   updateToggle: Function
 }
@@ -66,123 +71,144 @@ export function EnrollmentTreeGroup(props: Props) {
     props.updateToggle(props, !props.isToggle)
   }
 
-  const renderChildren = () => {
-    const childRows = []
+  const renderChildren = (): {elements: JSX.Element | undefined; count: number} => {
+    const childRows: JSX.Element[] = []
     if (props.isToggle) {
       // if parent is a role
       if (props.id.startsWith('r')) {
-        for (const course of props.children) {
-          if (course.children.length === 0) return
+        for (const course of props.children as NodeStructure[]) {
+          if (course.children.length === 0) return {elements: undefined, count: 0}
           if (course.children.length > 1) {
             childRows.push(
-              <EnrollmentTreeGroup
-                key={course.id}
-                indent="0 0 0 medium"
-                id={course.id}
-                label={course.label}
-                isCheck={course.isCheck}
-                isToggle={course.isToggle}
-                updateCheck={props.updateCheck}
-                updateToggle={props.updateToggle}
-                isMixed={course.isMixed}
-                isMismatch={course.isMismatch}
-                workflowState={course.workflowState}
-                parent={course.parent}
-              >
-                {course.children}
-              </EnrollmentTreeGroup>
+              <Flex.Item key={course.id} shouldGrow={true} overflowY="visible">
+                <EnrollmentTreeGroup
+                  indent="0"
+                  id={course.id}
+                  label={course.label}
+                  isCheck={course.isCheck}
+                  isToggle={course.isToggle}
+                  updateCheck={props.updateCheck}
+                  updateToggle={props.updateToggle}
+                  isMixed={course.isMixed}
+                  isMismatch={course.isMismatch}
+                  workflowState={course.workflowState}
+                  parent={course.parent}
+                >
+                  {course.children}
+                </EnrollmentTreeGroup>
+              </Flex.Item>
             )
           } else {
             const label = course.label + ' - ' + course.children[0].label
             childRows.push(
-              <EnrollmentTreeItem
-                key={course.id}
-                indent="0 0 0 medium"
-                id={course.id}
-                label={label}
-                isCheck={course.isCheck}
-                updateCheck={props.updateCheck}
-                isMixed={false}
-                workflowState={course.workflowState}
-                parent={course.parent}
-                isMismatch={course.isMismatch}
-              >
-                {[]}
-              </EnrollmentTreeItem>
+              <Flex.Item key={course.id} shouldGrow={true} overflowY="visible">
+                <EnrollmentTreeItem
+                  indent="0 0 0 large"
+                  id={course.id}
+                  label={label}
+                  isCheck={course.isCheck}
+                  updateCheck={props.updateCheck}
+                  isMixed={false}
+                  workflowState={course.workflowState}
+                  parent={course.parent}
+                  isMismatch={course.isMismatch}
+                >
+                  {[]}
+                </EnrollmentTreeItem>
+              </Flex.Item>
             )
           }
         }
       } else {
         for (const section of props.children) {
           childRows.push(
-            <EnrollmentTreeItem
-              key={section.id}
-              indent="0 0 0 x-large"
-              id={section.id}
-              label={section.label}
-              isCheck={section.isCheck}
-              updateCheck={props.updateCheck}
-              isMixed={false}
-              parent={section.parent}
-              isMismatch={section.isMismatch}
-            >
-              {[]}
-            </EnrollmentTreeItem>
+            <Flex.Item key={section.id} shouldGrow={true} overflowY="visible">
+              <EnrollmentTreeItem
+                indent="0 0 0 large"
+                id={section.id}
+                label={section.label}
+                isCheck={section.isCheck}
+                updateCheck={props.updateCheck}
+                isMixed={false}
+                parent={section.parent}
+                isMismatch={section.isMismatch}
+              >
+                {[]}
+              </EnrollmentTreeItem>
+            </Flex.Item>
           )
         }
       }
     }
-    return childRows
+
+    return {
+      elements: (
+        <Flex gap="xx-small" direction="column">
+          {childRows}
+        </Flex>
+      ),
+      count: childRows.length,
+    }
   }
 
   const renderRow = () => {
-    const toggleIcon = props.isToggle ? IconArrowOpenDownSolid : IconArrowOpenEndSolid
+    const {elements, count} = renderChildren()
 
     return (
-      <>
-        <Flex key={props.id} padding="xx-small" as="div" alignItems="center">
-          <Flex.Item margin={props.indent}>
-            <Checkbox
-              data-testid={'check ' + props.id}
-              label=""
-              size="medium"
-              checked={props.isCheck}
-              indeterminate={props.isMixed}
-              onChange={handleCheckboxChange}
-              {...analyticProps('Enrollment')}
-            />
-          </Flex.Item>
-          <Flex.Item margin="0 0 0 x-small">
-            <IconButton
-              withBorder={false}
-              withBackground={false}
-              onClick={handleIconButtonClick}
-              size="small"
-              screenReaderLabel={I18n.t('Toggle group %{group}', {group: props.label})}
-              {...analyticProps('Group')}
-              aria-expanded={props.isToggle}
-            >
-              {toggleIcon}
-            </IconButton>
-          </Flex.Item>
-          <Flex.Item margin="0 0 0 x-small">
-            <Text>{props.label}</Text>
-          </Flex.Item>
-          {props.isMismatch ? (
+      <Flex key={props.id} gap="xx-small" direction="column">
+        <Flex.Item overflowY="visible">
+          <Flex padding={props.indent} alignItems="start" gap="x-small">
             <Flex.Item>
-              <RoleMismatchToolTip />
+              <div style={{marginTop: ENROLLMENT_TREE_ICON_OFFSET}}>
+                <IconButton
+                  withBorder={false}
+                  withBackground={false}
+                  onClick={handleIconButtonClick}
+                  size="small"
+                  screenReaderLabel={I18n.t('Toggle group %{group}', {group: props.label})}
+                  {...analyticProps('Group')}
+                  aria-expanded={props.isToggle}
+                >
+                  {props.isToggle ? IconArrowOpenDownSolid : IconArrowOpenEndSolid}
+                </IconButton>
+              </div>
             </Flex.Item>
-          ) : null}
-          {props.workflowState ? (
-            <Flex.Item margin="0 large">
-              <Text weight="light">
-                {I18n.t('course status: %{state}', {state: translateState(props.workflowState)})}
-              </Text>
+            <Flex.Item shouldShrink={true}>
+              <Flex alignItems="start" gap="x-small">
+                <Flex.Item shouldShrink={true}>
+                  <Checkbox
+                    data-testid={'check ' + props.id}
+                    label={<Text weight="bold">{props.label}</Text>}
+                    checked={props.isCheck}
+                    indeterminate={props.isMixed}
+                    onChange={handleCheckboxChange}
+                    {...analyticProps('Enrollment')}
+                  />
+                </Flex.Item>
+                {props.isMismatch ? (
+                  <Flex.Item>
+                    <RoleMismatchToolTipWrapper />
+                  </Flex.Item>
+                ) : null}
+              </Flex>
+              {props.workflowState ? (
+                <div style={{paddingLeft: ENROLLMENT_TREE_SPACING}}>
+                  <Text size="small">
+                    {I18n.t('course status: %{state}', {
+                      state: translateState(props.workflowState),
+                    })}
+                  </Text>
+                </div>
+              ) : null}
             </Flex.Item>
-          ) : null}
-        </Flex>
-        {renderChildren()}
-      </>
+          </Flex>
+        </Flex.Item>
+        {count > 0 ? (
+          <Flex.Item overflowY="visible">
+            <div style={{paddingLeft: ENROLLMENT_TREE_SPACING}}>{elements}</div>
+          </Flex.Item>
+        ) : null}
+      </Flex>
     )
   }
 

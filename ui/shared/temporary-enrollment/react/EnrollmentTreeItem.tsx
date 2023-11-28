@@ -21,11 +21,12 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
-import {NodeStructure} from './EnrollmentTree'
 import {translateState} from './EnrollmentTreeGroup'
-import RoleMismatchToolTip from './RoleMismatchToolTip'
 import {createAnalyticPropsGenerator} from './util/analytics'
-import {MODULE_NAME} from './types'
+import {ENROLLMENT_TREE_SPACING, MODULE_NAME, NodeStructure} from './types'
+import {Spacing} from '@instructure/emotion'
+import {View} from '@instructure/ui-view'
+import RoleMismatchToolTipWrapper from './RoleMismatchToolTipWrapper'
 
 const I18n = useI18nScope('temporary_enrollment')
 
@@ -33,7 +34,7 @@ const I18n = useI18nScope('temporary_enrollment')
 const analyticProps = createAnalyticPropsGenerator(MODULE_NAME)
 
 interface Props extends NodeStructure {
-  indent: any
+  indent: Spacing
   updateCheck?: Function
   workflowState?: string
 }
@@ -57,33 +58,33 @@ export function EnrollmentTreeItem(props: Props) {
 
   const renderRow = () => {
     return (
-      <Flex key={props.id} padding="xxx-small" as="div" alignItems="center">
-        <Flex.Item margin={props.indent}>
-          <Checkbox
-            data-testid={'check ' + props.id}
-            label=""
-            size="medium"
-            checked={checked}
-            onChange={handleCheckboxChange}
-            {...analyticProps('Course')}
-          />
-        </Flex.Item>
-        <Flex.Item margin="0 0 0 x-small">
-          <Text>{props.label}</Text>
-        </Flex.Item>
-        {props.isMismatch ? (
-          <Flex.Item>
-            <RoleMismatchToolTip />
+      <View as="div" key={props.id} padding={props.indent}>
+        <Flex alignItems="start" gap="x-small">
+          <Flex.Item shouldShrink={true}>
+            <Checkbox
+              data-testid={'check ' + props.id}
+              label={<Text weight="bold">{props.label}</Text>}
+              checked={checked}
+              onChange={handleCheckboxChange}
+              {...analyticProps('Course')}
+            />
           </Flex.Item>
-        ) : null}
+          {props.isMismatch ? (
+            <Flex.Item>
+              <RoleMismatchToolTipWrapper />
+            </Flex.Item>
+          ) : null}
+        </Flex>
         {props.workflowState ? (
-          <Flex.Item margin="0 medium">
-            <Text weight="light">
-              {I18n.t('course status: %{state}', {state: translateState(props.workflowState)})}
+          <div style={{paddingLeft: ENROLLMENT_TREE_SPACING}}>
+            <Text size="small">
+              {I18n.t('course status: %{state}', {
+                state: translateState(props.workflowState),
+              })}
             </Text>
-          </Flex.Item>
+          </div>
         ) : null}
-      </Flex>
+      </View>
     )
   }
 
