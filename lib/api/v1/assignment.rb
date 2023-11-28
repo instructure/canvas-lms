@@ -643,7 +643,6 @@ module Api::V1::Assignment
           migration_type:,
           initiated_source: :new_quizzes
         )
-        use_global_identifiers = content_migration.use_global_identifiers?
 
         data.each do |key, _|
           import_object = Context.find_asset_by_url(key)
@@ -652,23 +651,31 @@ module Api::V1::Assignment
 
           if import_object.is_a?(WikiPage)
             copy_values[:wiki_pages] ||= []
-            copy_values[:wiki_pages] << CC::CCHelper.create_key(import_object, global: use_global_identifiers)
+            copy_values[:wiki_pages] << import_object
             source_course ||= import_object.context
           elsif import_object.is_a?(Attachment)
             copy_values[:attachments] ||= []
-            copy_values[:attachments] << CC::CCHelper.create_key(import_object, global: use_global_identifiers)
+            copy_values[:attachments] << import_object
             source_course ||= import_object.context
           end
         end
 
         return response if source_course.nil?
 
+        content_migration.source_course = source_course
+        use_global_identifiers = content_migration.use_global_identifiers?
+
+        copy_values.transform_values! do |import_objects|
+          import_objects.map do |import_object|
+            CC::CCHelper.create_key(import_object, global: use_global_identifiers)
+          end
+        end
+
         content_migration.update_migration_settings({
                                                       import_quizzes_next: false,
                                                       source_course_id: source_course.id
                                                     })
         content_migration.workflow_state = "created"
-        content_migration.source_course = source_course
         content_migration.migration_settings[:import_immediately] = false
         content_migration.save
 
