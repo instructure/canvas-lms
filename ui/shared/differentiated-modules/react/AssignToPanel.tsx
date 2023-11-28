@@ -238,6 +238,7 @@ export default function AssignToPanel({
                               changed.current = true
                             }}
                             defaultValues={selectedAssignees}
+                            onDismiss={onDismiss}
                           />
                         </View>
                       )}

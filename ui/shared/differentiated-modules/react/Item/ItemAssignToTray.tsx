@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useState} from 'react'
+import React, {useCallback, useEffect, useMemo, useState} from 'react'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {ApplyLocale} from '@instructure/ui-i18n'
 import {Flex} from '@instructure/ui-flex'
@@ -39,6 +39,8 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {BaseDateDetails, FetchDueDatesResponse} from './types'
 import ItemAssignToCard from './ItemAssignToCard'
 import TrayFooter from '../Footer'
+import {AssigneeOption} from '../AssigneeSelector'
+import useFetchAssignees from '../../utils/hooks/useFetchAssignees'
 
 const I18n = useI18nScope('differentiated_modules')
 
@@ -90,13 +92,13 @@ export interface ItemAssignToTrayProps {
 
 // TODO: will eventually be ItemAssignToCardSpec, I think
 interface CardSpec {
+  key: string
   isValid: boolean
+  hasAssignees: boolean
   due_at: string | null
   unlock_at: string | null
   lock_at: string | null
-}
-interface CardMap {
-  [key: string]: CardSpec
+  selectedAssigneeIds: string[]
 }
 
 export default function ItemAssignToTray({
@@ -114,8 +116,21 @@ export default function ItemAssignToTray({
   locale,
   timezone,
 }: ItemAssignToTrayProps) {
-  const [assignToCards, setAssignToCards] = useState<CardMap>({})
+  const [assignToCards, setAssignToCards] = useState<CardSpec[]>([])
   const [fetchInFlight, setFetchInFlight] = useState(false)
+  const [disabledOptionIds, setDisabledOptionIds] = useState<string[]>([])
+  const [includeEveryoneOption, setIncludeEveryoneOption] = useState(false)
+  const everyoneOption = useMemo(
+    () => (includeEveryoneOption ? getEveryoneOption(assignToCards.length > 1) : undefined),
+    [includeEveryoneOption, assignToCards.length]
+  )
+
+  const {allOptions, isLoading, setSearchTerm} = useFetchAssignees({
+    courseId,
+    everyoneOption,
+    defaultValues: [],
+    onError: onDismiss,
+  })
 
   useEffect(() => {
     setFetchInFlight(true)
@@ -128,39 +143,68 @@ export default function ItemAssignToTray({
         const overrides = dateDetailsApiResponse.overrides
         delete dateDetailsApiResponse.overrides
         const baseDates: BaseDateDetails = dateDetailsApiResponse
+        const onlyOverrides = dateDetailsApiResponse.only_visible_to_overrides
+        setIncludeEveryoneOption(!onlyOverrides)
 
-        const cards: CardMap = {}
-        if ('id' in dateDetailsApiResponse) {
+        const cards: CardSpec[] = []
+        const selectedOptionIds: string[] = []
+        if (!onlyOverrides) {
           const cardId = makeCardId()
-          cards[cardId] = {
+          const everyoneOption = [getEveryoneOption(assignToCards.length > 1).id]
+          cards.push({
+            key: cardId,
             isValid: true,
+            hasAssignees: true,
             due_at: baseDates.due_at,
             unlock_at: baseDates.unlock_at,
             lock_at: baseDates.lock_at,
-          }
+            selectedAssigneeIds: everyoneOption,
+          })
+          selectedOptionIds.push(...everyoneOption)
         }
         if (overrides?.length) {
           overrides.forEach(override => {
+            const studentOverrides =
+              override.student_ids?.map(studentId => `student-${studentId}`) ?? []
+            const defaultOptions = studentOverrides
+            if (override.course_section_id) {
+              defaultOptions.push(`section-${override.course_section_id}`)
+            }
             const cardId = makeCardId()
-            cards[cardId] = {
+            cards.push({
+              key: cardId,
               isValid: true,
+              hasAssignees: true,
               due_at: override.due_at,
               unlock_at: override.unlock_at,
               lock_at: override.lock_at,
-            }
+              selectedAssigneeIds: defaultOptions,
+            })
+            selectedOptionIds.push(...defaultOptions)
           })
         }
+        setDisabledOptionIds(selectedOptionIds)
         setAssignToCards(cards)
       })
       .catch(showFlashError())
       .finally(() => {
         setFetchInFlight(false)
       })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [courseId, moduleItemContentId, moduleItemContentType, moduleItemId, moduleItemType])
 
   const handleAddCard = useCallback(() => {
     const cardId = makeCardId()
-    setAssignToCards({...assignToCards, [cardId]: {isValid: true}} as any)
+    const cards: CardSpec[] = [
+      ...assignToCards,
+      {
+        key: cardId,
+        isValid: true,
+        hasAssignees: false,
+        selectedAssigneeIds: [] as string[],
+      } as CardSpec,
+    ]
+    setAssignToCards(cards)
   }, [assignToCards])
 
   const handleUpdate = useCallback(() => {
@@ -169,24 +213,50 @@ export default function ItemAssignToTray({
 
   const handleDeleteCard = useCallback(
     (cardId: string) => {
-      const cards = {...assignToCards}
-      delete cards[cardId]
+      const cardSelection =
+        assignToCards.find(card => card.key === cardId)?.selectedAssigneeIds ?? []
+      const newDisabled = disabledOptionIds.filter(id => !cardSelection.includes(id))
+      const cards = assignToCards.filter(({key}) => key !== cardId)
       setAssignToCards(cards)
+      setDisabledOptionIds(newDisabled)
     },
-    [assignToCards]
+    [assignToCards, disabledOptionIds]
   )
 
   const handleCardValidityChange = useCallback(
     (cardId: string, isValid: boolean) => {
-      const cards = {...assignToCards}
-      cards[cardId].isValid = isValid
+      const cards = assignToCards.map(card => (card.key === cardId ? {...card, isValid} : card))
       setAssignToCards(cards)
     },
     [assignToCards]
   )
 
+  const handleCardAssignment = (
+    cardId: string,
+    assignees: AssigneeOption[],
+    deletedAssignees: string[]
+  ) => {
+    const selectedAssigneeIds = assignees.map(({id}) => id)
+    const cards = assignToCards.map(card =>
+      card.key === cardId
+        ? {...card, selectedAssigneeIds, hasAssignees: assignees.length > 0}
+        : card
+    )
+    const allSelectedOptions = [...disabledOptionIds, ...assignees.map(({id}) => id)]
+    const uniqueOptions = [...new Set(allSelectedOptions)]
+    const newDisabled = uniqueOptions.filter(id =>
+      deletedAssignees.length > 0 ? !deletedAssignees.includes(id) : true
+    )
+    setAssignToCards(cards)
+    setDisabledOptionIds(newDisabled)
+  }
+
   const allCardsValid = useCallback(() => {
-    return Object.values(assignToCards).every(card => card.isValid)
+    return assignToCards.every(card => card.isValid)
+  }, [assignToCards])
+
+  const allCardsAssigned = useCallback(() => {
+    return assignToCards.every(card => card.hasAssignees)
   }, [assignToCards])
 
   function Header() {
@@ -222,20 +292,34 @@ export default function ItemAssignToTray({
     }
   }
 
-  function renderCards() {
-    const cardIds = Object.keys(assignToCards)
-    const cardCount = cardIds.length
-    return cardIds.map(cardId => {
-      const dateProps = assignToCards[cardId]
+  function getEveryoneOption(hasOverrides: boolean) {
+    return {
+      id: 'everyone',
+      value: hasOverrides ? I18n.t('Everyone else') : I18n.t('Everyone'),
+    }
+  }
+
+  function renderCards(isOpen?: boolean) {
+    const cardCount = assignToCards.length
+    return assignToCards.map(card => {
       return (
-        <View key={cardId} as="div" margin="small 0 0 0">
+        <View key={card.key} as="div" margin="small 0 0 0">
           <ItemAssignToCard
-            cardId={cardId}
-            due_at={dateProps.due_at}
-            unlock_at={dateProps.unlock_at}
-            lock_at={dateProps.lock_at}
+            courseId={courseId}
+            cardId={card.key}
+            due_at={card.due_at}
+            unlock_at={card.unlock_at}
+            lock_at={card.lock_at}
             onDelete={cardCount === 1 ? undefined : handleDeleteCard}
+            onCardAssignmentChange={handleCardAssignment}
             onValidityChange={handleCardValidityChange}
+            isOpen={isOpen}
+            disabledOptionIds={disabledOptionIds}
+            everyoneOption={everyoneOption}
+            selectedAssigneeIds={card.selectedAssigneeIds}
+            customAllOptions={allOptions}
+            customIsLoading={isLoading}
+            customSetSearchTerm={setSearchTerm}
           />
         </View>
       )
@@ -251,10 +335,16 @@ export default function ItemAssignToTray({
           </Mask>
         )}
         <ApplyLocale locale={locale} timezone={timezone}>
-          {renderCards()}
+          {renderCards(open)}
         </ApplyLocale>
 
-        <Button onClick={handleAddCard} margin="small 0 0 0" renderIcon={IconAddLine}>
+        <Button
+          onClick={handleAddCard}
+          data-testid="add-card"
+          margin="small 0 0 0"
+          renderIcon={IconAddLine}
+          disabled={!allCardsAssigned()}
+        >
           {I18n.t('Add')}
         </Button>
       </Flex.Item>
