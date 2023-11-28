@@ -23,6 +23,7 @@ export interface ModuleAssignmentsProps {
   courseId: string
   onSelect: (options: AssigneeOption[]) => void
   defaultValues: AssigneeOption[]
+  onDismiss?: () => void
 }
 
 export type {AssigneeOption} from './AssigneeSelector'
@@ -31,6 +32,7 @@ export default function ModuleAssignments({
   courseId,
   onSelect,
   defaultValues,
+  onDismiss,
 }: ModuleAssignmentsProps) {
   const [selectedOptions, setSelectedOptions] = useState<AssigneeOption[]>(defaultValues)
 
@@ -52,6 +54,7 @@ export default function ModuleAssignments({
       onSelect={handleSelect}
       defaultValues={defaultValues}
       selectedOptionIds={selectedOptions.map(({id}) => id)}
+      onError={onDismiss}
     />
   )
 }

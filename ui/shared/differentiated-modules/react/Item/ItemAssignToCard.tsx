@@ -24,18 +24,10 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import DateValidator from '@canvas/datetime/DateValidator'
 import ClearableDateTimeInput from './ClearableDateTimeInput'
 import moment from 'moment'
-// import AssigneeSelector from '../AssigneeSelector'
+import AssigneeSelector, {AssigneeOption} from '../AssigneeSelector'
+import {FormMessage} from '@instructure/ui-form-field'
 
 const I18n = useI18nScope('differentiated_modules')
-
-// TODO: until we resolve how to handle queries (which wreak havoc on specs)
-function AssigneeSelector({cardId}: {cardId: string}) {
-  return (
-    <View as="div" borderWidth="small" padding="small" margin="medium 0 0 0">
-      Assign To goes here (cardId: {cardId})
-    </View>
-  )
-}
 
 function arrayEquals(a: any[], b: any[]) {
   return a.length === b.length && a.every((v, i) => v === b[i])
@@ -51,21 +43,43 @@ export interface DateValidatorInputArgs {
 }
 
 export type ItemAssignToCardProps = {
+  courseId: string
   cardId: string
   due_at: string | null
   unlock_at: string | null
   lock_at: string | null
   onDelete?: (cardId: string) => void
   onValidityChange?: (cardId: string, isValid: boolean) => void
+  onCardAssignmentChange?: (
+    cardId: string,
+    assignees: AssigneeOption[],
+    deletedAssignees: string[]
+  ) => void
+  disabledOptionIds: string[]
+  selectedAssigneeIds: string[]
+  isOpen?: boolean
+  everyoneOption?: AssigneeOption
+  customAllOptions?: AssigneeOption[]
+  customIsLoading?: boolean
+  customSetSearchTerm?: (term: string) => void
 }
 
 export default function ItemAssignToCard({
+  courseId,
   cardId,
   due_at,
   unlock_at,
   lock_at,
   onDelete,
   onValidityChange,
+  onCardAssignmentChange,
+  disabledOptionIds,
+  selectedAssigneeIds,
+  isOpen,
+  everyoneOption,
+  customAllOptions,
+  customIsLoading,
+  customSetSearchTerm,
 }: ItemAssignToCardProps) {
   const [dateValidator] = useState<DateValidator>(
     new DateValidator({
@@ -80,6 +94,19 @@ export default function ItemAssignToCard({
   const [availableFromDate, setAvailableFromDate] = useState<string | null>(unlock_at)
   const [availableToDate, setAvailableToDate] = useState<string | null>(lock_at)
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({})
+  const [error, setError] = useState<FormMessage[]>([])
+
+  const handleSelect = (newSelectedAssignees: AssigneeOption[]) => {
+    const errorMessage: FormMessage = {
+      text: I18n.t('A student or section must be selected'),
+      type: 'error',
+    }
+    const deletedAssigneeIds = selectedAssigneeIds.filter(
+      assigneeId => newSelectedAssignees.find(({id}) => id === assigneeId) === undefined
+    )
+    setError(newSelectedAssignees.length > 0 ? [] : [errorMessage])
+    onCardAssignmentChange?.(cardId, newSelectedAssignees, deletedAssigneeIds)
+  }
 
   const handleDelete = useCallback(() => {
     onDelete?.(cardId)
@@ -205,7 +232,21 @@ export default function ItemAssignToCard({
           </IconButton>
         </div>
       )}
-      <AssigneeSelector cardId={cardId} />
+      <AssigneeSelector
+        onSelect={handleSelect}
+        selectedOptionIds={selectedAssigneeIds}
+        everyoneOption={everyoneOption}
+        courseId={courseId}
+        defaultValues={[]}
+        clearAllDisabled={true}
+        size="medium"
+        messages={error}
+        disabledOptionIds={disabledOptionIds}
+        disableFetch={!isOpen}
+        customAllOptions={customAllOptions}
+        customIsLoading={customIsLoading}
+        customSetSearchTerm={customSetSearchTerm}
+      />
       {dateTimeInputs.map(props => (
         <ClearableDateTimeInput
           {...props}

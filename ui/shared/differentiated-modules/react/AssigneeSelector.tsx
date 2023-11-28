@@ -16,16 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import CanvasMultiSelect from '@canvas/multi-select/react'
+import CanvasMultiSelect, {Size} from '@canvas/multi-select/react'
 import React, {ReactElement, useEffect, useRef, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Link} from '@instructure/ui-link'
 import {View} from '@instructure/ui-view'
-import doFetchApi from '@canvas/do-fetch-api-effect'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-import {debounce, uniqBy} from 'lodash'
+import {debounce} from 'lodash'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {setContainScrollBehavior} from '../utils/assignToHelper'
+import useFetchAssignees from '../utils/hooks/useFetchAssignees'
+import {FormMessage} from '@instructure/ui-form-field'
 
 const {Option: CanvasMultiSelectOption} = CanvasMultiSelect as any
 
@@ -36,6 +36,16 @@ interface Props {
   onSelect: (options: AssigneeOption[]) => void
   defaultValues: AssigneeOption[]
   selectedOptionIds: string[]
+  clearAllDisabled?: boolean
+  size?: Size
+  messages?: FormMessage[]
+  disabledOptionIds?: string[]
+  everyoneOption?: AssigneeOption
+  disableFetch?: boolean // avoid mutating the state when closing the tray
+  customAllOptions?: AssigneeOption[]
+  customIsLoading?: boolean
+  customSetSearchTerm?: (term: string) => void
+  onError?: () => void
 }
 
 export interface AssigneeOption {
@@ -45,87 +55,49 @@ export interface AssigneeOption {
   group?: string
 }
 
-const AssigneeSelector = ({courseId, onSelect, defaultValues, selectedOptionIds}: Props) => {
-  const [searchTerm, setSearchTerm] = useState('')
-  const [options, setOptions] = useState<AssigneeOption[]>(defaultValues)
-  const [isLoading, setIsLoading] = useState(false)
+const AssigneeSelector = ({
+  courseId,
+  onSelect,
+  defaultValues,
+  selectedOptionIds = [],
+  clearAllDisabled,
+  size = 'large',
+  messages,
+  disabledOptionIds = [],
+  disableFetch = false,
+  everyoneOption,
+  customAllOptions,
+  customIsLoading,
+  customSetSearchTerm,
+  onError,
+}: Props) => {
   const listElementRef = useRef<HTMLElement | null>(null)
+  const [options, setOptions] = useState<AssigneeOption[]>(defaultValues)
   const [isShowingOptions, setIsShowingOptions] = useState(false)
+  const {allOptions, isLoading, setSearchTerm} = useFetchAssignees({
+    courseId,
+    everyoneOption,
+    defaultValues,
+    disableFetch,
+    customAllOptions,
+    customIsLoading,
+    customSetSearchTerm,
+    onError,
+  })
+
+  const shouldUpdateOptions = [
+    JSON.stringify(allOptions),
+    JSON.stringify(disabledOptionIds),
+    JSON.stringify(selectedOptionIds),
+  ]
 
   useEffect(() => {
-    const params: Record<string, string> = {}
-    const shouldSearchTerm = searchTerm.length > 2
-    if (shouldSearchTerm || searchTerm === '') {
-      setIsLoading(true)
-      if (shouldSearchTerm) {
-        params.search_term = searchTerm
-      }
-      const fetchSections = doFetchApi({
-        path: `/api/v1/courses/${courseId}/sections`,
-        params,
-      })
-      const fetchStudents = doFetchApi({
-        path: `/api/v1/courses/${courseId}/users`,
-        params: {...params, enrollment_type: 'student'},
-      })
-
-      Promise.allSettled([fetchSections, fetchStudents])
-        .then(results => {
-          const sectionsResult = results[0]
-          const studentsResult = results[1]
-          let sectionsParsedResult: AssigneeOption[] = []
-          let studentsParsedResult: AssigneeOption[] = []
-          if (sectionsResult.status === 'fulfilled') {
-            const sectionsJSON = sectionsResult.value.json as Record<string, string>[]
-            sectionsParsedResult =
-              sectionsJSON?.map(({id, name}: any) => {
-                const parsedId = `section-${id}`
-                // if an existing override exists for this section, use it so we have its overrideId
-                const existing = options.find(option => option.id === parsedId)
-                if (existing !== undefined) {
-                  return existing
-                }
-                return {
-                  id: parsedId,
-                  value: name,
-                  group: I18n.t('Sections'),
-                }
-              }) ?? []
-          } else {
-            showFlashError(I18n.t('Failed to load sections data'))(sectionsResult.reason)
-          }
-
-          if (studentsResult.status === 'fulfilled') {
-            const studentsJSON = studentsResult.value.json as Record<string, string>[]
-            studentsParsedResult =
-              studentsJSON?.map(({id, name}: any) => {
-                const parsedId = `student-${id}`
-                // if an existing override exists for this student, use it so we have its overrideId
-                const existing = options.find(option => option.id === parsedId)
-                if (existing !== undefined) {
-                  return existing
-                }
-                return {
-                  id: parsedId,
-                  value: name,
-                  group: I18n.t('Students'),
-                }
-              }) ?? []
-          } else {
-            showFlashError(I18n.t('Failed to load students data'))(studentsResult.reason)
-          }
-
-          const newOptions = uniqBy(
-            [...options, ...sectionsParsedResult, ...studentsParsedResult],
-            'id'
-          )
-          setOptions(newOptions)
-          setIsLoading(false)
-        })
-        .catch(e => showFlashError(I18n.t('Something went wrong while fetching data'))(e))
-    }
+    const newOptions = allOptions.filter(
+      option => selectedOptionIds.includes(option.id) || !disabledOptionIds.includes(option.id)
+    )
+    setOptions(newOptions)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [courseId, searchTerm])
+  }, shouldUpdateOptions)
 
   const handleSelectOption = () => {
     setIsShowingOptions(false)
@@ -150,8 +122,9 @@ const AssigneeSelector = ({courseId, onSelect, defaultValues, selectedOptionIds}
     <>
       <CanvasMultiSelect
         data-testid="assignee_selector"
+        messages={messages}
         label={I18n.t('Assign To')}
-        size="large"
+        size={size}
         selectedOptionIds={selectedOptionIds}
         onChange={handleChange}
         renderAfterInput={<></>}
@@ -190,16 +163,18 @@ const AssigneeSelector = ({courseId, onSelect, defaultValues, selectedOptionIds}
           )
         })}
       </CanvasMultiSelect>
-      <View as="div" textAlign="end" margin="small none">
-        <Link
-          data-testid="clear_selection_button"
-          onClick={() => onSelect([])}
-          isWithinText={false}
-        >
-          <span aria-hidden={true}>{I18n.t('Clear All')}</span>
-          <ScreenReaderContent>{I18n.t('Clear Assign To')}</ScreenReaderContent>
-        </Link>
-      </View>
+      {!clearAllDisabled && (
+        <View as="div" textAlign="end" margin="small none">
+          <Link
+            data-testid="clear_selection_button"
+            onClick={() => onSelect([])}
+            isWithinText={false}
+          >
+            <span aria-hidden={true}>{I18n.t('Clear All')}</span>
+            <ScreenReaderContent>{I18n.t('Clear Assign To')}</ScreenReaderContent>
+          </Link>
+        </View>
+      )}
     </>
   )
 }

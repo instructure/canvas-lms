@@ -26,6 +26,7 @@ import {matchComponentTypes} from '@instructure/ui-react-utils'
 import {compact, uniqueId} from 'lodash'
 import {Alert} from '@instructure/ui-alerts'
 import {Spinner} from '@instructure/ui-spinner'
+import {FormMessage} from '@instructure/ui-form-field'
 
 const I18n = useI18nScope('app_shared_components')
 
@@ -34,6 +35,8 @@ type OptionProps = {
   value: string
   label: React.ReactNode
 }
+
+export type Size = 'small' | 'medium' | 'large'
 
 const CanvasMultiSelectOption: React.FC = _props => <div />
 
@@ -67,8 +70,9 @@ type Props = {
   placeholder?: string
   renderAfterInput?: React.ReactNode
   selectedOptionIds: string[]
-  size?: 'small' | 'medium' | 'large'
+  size?: Size
   visibleOptionsCount?: number
+  messages?: FormMessage[]
 }
 
 function CanvasMultiSelect(props: Props) {
@@ -175,22 +179,32 @@ function CanvasMultiSelect(props: Props) {
     )
 
     function renderGroups() {
+      const grouplessOptions = filteredChildren.filter(o => o.props.group === undefined)
       const groupsToRender = groups.filter(group =>
         filteredChildren.some(child => child.props.group === group)
       )
-      return groupsToRender.map(group => (
-        <Select.Group key={group} renderLabel={group}>
-          {filteredChildren
-            // eslint-disable-next-line @typescript-eslint/no-shadow, react/prop-types
-            .filter(({props}) => props.group === group)
-            .map(option =>
-              renderOption({
-                ...option,
-                key: option.key || uniqueId('multi-select-group-option-'),
-              })
-            )}
-        </Select.Group>
-      ))
+      const optionsToRender = grouplessOptions.map(isolatedOption =>
+        renderOption({
+          ...isolatedOption,
+          key: isolatedOption.key ?? uniqueId('multi-select-option-'),
+        })
+      )
+      return [
+        ...optionsToRender,
+        ...groupsToRender.map(group => (
+          <Select.Group key={group} renderLabel={group}>
+            {filteredChildren
+              // eslint-disable-next-line @typescript-eslint/no-shadow, react/prop-types
+              .filter(({props}) => props.group === group)
+              .map(option =>
+                renderOption({
+                  ...option,
+                  key: option.key || uniqueId('multi-select-group-option-'),
+                })
+              )}
+          </Select.Group>
+        )),
+      ]
     }
 
     if (filteredChildren.length === 0) return renderNoOptionsOption()
