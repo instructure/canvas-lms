@@ -19,7 +19,7 @@
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
-import {PROVIDER, RECIPIENT} from '@canvas/temporary-enrollment/react/types'
+import {PROVIDER, RECIPIENT} from '../types'
 import TempEnrollUsersListRow, {generateIcon, generateTooltip} from '../TempEnrollUsersListRow'
 
 function makeProps() {

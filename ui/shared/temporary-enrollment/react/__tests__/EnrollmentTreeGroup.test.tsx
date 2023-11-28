@@ -19,7 +19,8 @@
 import React from 'react'
 import {fireEvent, render} from '@testing-library/react'
 import {EnrollmentTreeGroup} from '../EnrollmentTreeGroup'
-import {NodeStructure} from '../EnrollmentTree'
+import {NodeStructure} from '../types'
+import {Spacing} from '@instructure/emotion'
 
 const checkCallback = jest.fn()
 const toggleCallback = jest.fn()
@@ -85,7 +86,7 @@ const rProps = {
   isMixed: roleNode.isMixed,
   isToggle: roleNode.isToggle,
   children: roleNode.children,
-  indent: '0 0 0 0',
+  indent: '0 0 0 0' as Spacing,
   updateCheck: checkCallback,
   updateToggle: toggleCallback,
 }
@@ -93,7 +94,6 @@ const rProps = {
 describe('EnrollmentTreeGroup', () => {
   it('renders role with one course item when toggled', () => {
     const {getByText} = render(<EnrollmentTreeGroup {...rProps} />)
-
     expect(getByText('Role 1')).toBeInTheDocument()
     expect(getByText('Course 1 - Section 1')).toBeInTheDocument()
   })
@@ -101,7 +101,6 @@ describe('EnrollmentTreeGroup', () => {
   it('renders role with one course group when toggled', () => {
     courseNode.children.push(section2Node)
     const {getByText} = render(<EnrollmentTreeGroup {...rProps} />)
-
     expect(getByText('Role 1')).toBeInTheDocument()
     expect(getByText('Course 1')).toBeInTheDocument()
     expect(getByText('Section 1')).toBeInTheDocument()
@@ -110,7 +109,6 @@ describe('EnrollmentTreeGroup', () => {
 
   it('does not render children when not toggled', () => {
     const {getByText, queryByText} = render(<EnrollmentTreeGroup {...rProps} isToggle={false} />)
-
     expect(getByText('Role 1')).toBeInTheDocument()
     expect(queryByText('Course 1')).not.toBeInTheDocument()
     expect(queryByText('Section 1')).not.toBeInTheDocument()
@@ -118,7 +116,6 @@ describe('EnrollmentTreeGroup', () => {
 
   it('calls updateCheck when checked', () => {
     const {getByTestId} = render(<EnrollmentTreeGroup {...rProps} />)
-
     const checkBox = getByTestId('check r1')
     fireEvent.click(checkBox)
     expect(checkCallback).toHaveBeenCalled()
@@ -126,7 +123,6 @@ describe('EnrollmentTreeGroup', () => {
 
   it('calls updateToggle when clicked', () => {
     const {getByText} = render(<EnrollmentTreeGroup {...rProps} />)
-
     const toggle = getByText('Toggle group Role 1')
     fireEvent.click(toggle)
     expect(toggleCallback).toHaveBeenCalled()

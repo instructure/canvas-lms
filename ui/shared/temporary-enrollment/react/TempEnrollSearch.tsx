@@ -170,7 +170,7 @@ export function TempEnrollSearch(props: Props) {
     // user confirmation page
     return (
       <Flex gap="medium" direction="column">
-        <Flex.Item padding="xx-small">
+        <Flex.Item>
           <Flex gap="x-small" direction="column">
             <Flex.Item>
               <TempEnrollAvatar user={props.user} />
@@ -184,14 +184,14 @@ export function TempEnrollSearch(props: Props) {
             </Flex.Item>
           </Flex>
         </Flex.Item>
-        <Flex.Item shouldGrow={true} padding="xx-small">
+        <Flex.Item shouldGrow={true}>
           <Alert variant="success" margin="0">
             {I18n.t('%{name} is ready to be assigned temporary enrollments.', {
               name: enrollment.name,
             })}
           </Alert>
         </Flex.Item>
-        <Flex.Item shouldGrow={true} padding="xx-small">
+        <Flex.Item shouldGrow={true}>
           <Table caption={<ScreenReaderContent>{I18n.t('User information')}</ScreenReaderContent>}>
             <Table.Head>
               <Table.Row>
@@ -218,7 +218,7 @@ export function TempEnrollSearch(props: Props) {
   } else {
     return (
       <Flex gap="medium" direction="column">
-        <Flex.Item padding="xx-small">
+        <Flex.Item>
           <Flex gap="x-small" direction="column">
             <Flex.Item>
               <TempEnrollAvatar user={props.user} />
@@ -233,13 +233,13 @@ export function TempEnrollSearch(props: Props) {
           </Flex>
         </Flex.Item>
         {message && (
-          <Flex.Item shouldGrow={true} padding="xx-small">
+          <Flex.Item shouldGrow={true}>
             <Alert variant="error" margin="0">
               {message}
             </Alert>
           </Flex.Item>
         )}
-        <Flex.Item shouldGrow={true} padding="xx-small">
+        <Flex.Item shouldGrow={true} overflowY="visible">
           <RadioInputGroup
             name="search_type"
             defaultValue={searchType}
@@ -272,7 +272,7 @@ export function TempEnrollSearch(props: Props) {
             ) : null}
           </RadioInputGroup>
         </Flex.Item>
-        <Flex.Item padding="xx-small">
+        <Flex.Item overflowY="visible">
           <TextInput
             renderLabel={
               <>

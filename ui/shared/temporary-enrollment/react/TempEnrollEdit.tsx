@@ -158,44 +158,48 @@ export function TempEnrollEdit(props: Props) {
   }
 
   const renderActionIcons = (enrollments: Enrollment[]) => (
-    <>
+    <Flex gap="xxx-small" wrap="no-wrap" justifyItems="end">
       {canEdit && (
-        <Tooltip renderTip={I18n.t('Edit')}>
-          <IconButton
-            data-testid="edit-button"
-            withBorder={false}
-            withBackground={false}
-            size="small"
-            screenReaderLabel={I18n.t('Edit')}
-            onClick={() => handleEditClick(enrollments)}
-            {...analyticProps('Edit')}
-          >
-            <IconEditLine />
-          </IconButton>
-        </Tooltip>
+        <Flex.Item shouldShrink={true}>
+          <Tooltip renderTip={I18n.t('Edit')}>
+            <IconButton
+              data-testid="edit-button"
+              withBorder={false}
+              withBackground={false}
+              size="small"
+              screenReaderLabel={I18n.t('Edit')}
+              onClick={() => handleEditClick(enrollments)}
+              {...analyticProps('Edit')}
+            >
+              <IconEditLine />
+            </IconButton>
+          </Tooltip>
+        </Flex.Item>
       )}
 
       {canDelete && (
-        <Tooltip renderTip={I18n.t('Delete')}>
-          <IconButton
-            data-testid="delete-button"
-            withBorder={false}
-            withBackground={false}
-            size="small"
-            screenReaderLabel={I18n.t('Delete')}
-            onClick={() => handleDeleteClick(enrollments)}
-            {...analyticProps('Delete')}
-          >
-            <IconTrashLine />
-          </IconButton>
-        </Tooltip>
+        <Flex.Item shouldShrink={true}>
+          <Tooltip renderTip={I18n.t('Delete')}>
+            <IconButton
+              data-testid="delete-button"
+              withBorder={false}
+              withBackground={false}
+              size="small"
+              screenReaderLabel={I18n.t('Delete')}
+              onClick={() => handleDeleteClick(enrollments)}
+              {...analyticProps('Delete')}
+            >
+              <IconTrashLine />
+            </IconButton>
+          </Tooltip>
+        </Flex.Item>
       )}
-    </>
+    </Flex>
   )
 
   return (
     <Flex gap="medium" direction="column">
-      <Flex.Item padding="xx-small">
+      <Flex.Item overflowY="visible">
         <Flex wrap="wrap" gap="x-small" justifyItems="space-between">
           <Flex.Item>
             <TempEnrollAvatar user={props.user} />
@@ -215,7 +219,7 @@ export function TempEnrollEdit(props: Props) {
           )}
         </Flex>
       </Flex.Item>
-      <Flex.Item shouldGrow={true} padding="xx-small">
+      <Flex.Item shouldGrow={true}>
         <Table caption={<ScreenReaderContent>{I18n.t('User information')}</ScreenReaderContent>}>
           <Table.Head>
             <Table.Row>
@@ -229,7 +233,7 @@ export function TempEnrollEdit(props: Props) {
                 {I18n.t('Recipient Enrollment Type')}
               </Table.ColHeader>
               {(canEdit || canDelete) && (
-                <Table.ColHeader id="header-user-option-links" width="1">
+                <Table.ColHeader id="header-user-option-links">
                   <ScreenReaderContent>
                     {I18n.t('Temporary enrollment option links')}
                   </ScreenReaderContent>
@@ -249,9 +253,7 @@ export function TempEnrollEdit(props: Props) {
                     )}`}
                   </Table.Cell>
                   <Table.Cell>{firstEnrollment.type}</Table.Cell>
-                  {canEditOrDelete && (
-                    <Table.Cell textAlign="end">{renderActionIcons(enrollmentGroup)}</Table.Cell>
-                  )}
+                  {canEditOrDelete && <Table.Cell>{renderActionIcons(enrollmentGroup)}</Table.Cell>}
                 </Table.Row>
               )
             })}

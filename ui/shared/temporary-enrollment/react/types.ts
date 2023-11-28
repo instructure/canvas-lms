@@ -21,6 +21,10 @@ export const MODULE_NAME = 'TempEnroll'
 export const ITEMS_PER_PAGE = 100
 export const MAX_ALLOWED_COURSES_PER_PAGE = 50
 
+export const TOOLTIP_MAX_WIDTH: string = '15rem'
+export const ENROLLMENT_TREE_SPACING: string = '1.75rem'
+export const ENROLLMENT_TREE_ICON_OFFSET: string = '-.25em'
+
 export interface Course {
   id: string
   name: string
@@ -77,6 +81,19 @@ export interface User {
   id: string
   name: string
   sis_user_id?: string | null
+}
+
+export interface NodeStructure {
+  children: NodeStructure[]
+  enrollId?: string
+  id: string
+  isCheck: boolean
+  isMismatch?: boolean
+  isMixed: boolean
+  isToggle?: boolean
+  label: string
+  parent?: NodeStructure
+  workflowState?: string
 }
 
 export const EMPTY_USER: User = {

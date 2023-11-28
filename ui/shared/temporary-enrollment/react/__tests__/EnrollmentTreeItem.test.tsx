@@ -19,6 +19,7 @@
 import React from 'react'
 import {fireEvent, render} from '@testing-library/react'
 import {EnrollmentTreeItem} from '../EnrollmentTreeItem'
+import {Spacing} from '@instructure/emotion'
 
 const callback = jest.fn()
 
@@ -28,7 +29,7 @@ const props = {
   label: 'Section 1',
   children: [],
   isCheck: false,
-  indent: '0 0 0 0',
+  indent: '0 0 0 0' as Spacing,
   updateCheck: callback,
   isMixed: false,
 }

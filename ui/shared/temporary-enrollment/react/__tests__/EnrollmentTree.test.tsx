@@ -21,6 +21,27 @@ import {fireEvent, render, waitFor} from '@testing-library/react'
 import {EnrollmentTree, Props} from '../EnrollmentTree'
 import {Enrollment} from '../types'
 
+const mockEnrollment = {
+  enrollment_state: 'active',
+  course_id: '',
+  course_section_id: '',
+  end_at: '',
+  id: '',
+  start_at: '',
+  temporary_enrollment_pairing_id: 0,
+  temporary_enrollment_provider: {
+    id: '',
+    name: '',
+  },
+  temporary_enrollment_source_user_id: 0,
+  type: '',
+  user: {
+    id: '',
+    name: '',
+  },
+  user_id: '',
+}
+
 const props: Props = {
   roles: [
     {
@@ -60,7 +81,7 @@ const props: Props = {
       enrollments: [
         {
           role_id: '1',
-          enrollment_state: 'active',
+          ...mockEnrollment,
         },
       ],
       sections: [
@@ -68,6 +89,8 @@ const props: Props = {
           id: '1',
           name: 'Section 1',
           enrollment_role: 'StudentEnrollment',
+          course_id: '',
+          course_section_id: '',
         },
       ],
     },
@@ -78,7 +101,7 @@ const props: Props = {
       enrollments: [
         {
           role_id: '2',
-          enrollment_state: 'active',
+          ...mockEnrollment,
         },
       ],
       sections: [
@@ -86,6 +109,8 @@ const props: Props = {
           id: '1',
           name: 'Section 1',
           enrollment_role: 'TeacherEnrollment',
+          course_id: '',
+          course_section_id: '',
         },
       ],
     },
@@ -96,7 +121,7 @@ const props: Props = {
       enrollments: [
         {
           role_id: '3',
-          enrollment_state: 'active',
+          ...mockEnrollment,
         },
       ],
       sections: [
@@ -104,6 +129,8 @@ const props: Props = {
           id: '2',
           name: 'Section 2',
           enrollment_role: 'DesignerEnrollment',
+          course_id: '',
+          course_section_id: '',
         },
       ],
     },
@@ -114,7 +141,7 @@ const props: Props = {
       enrollments: [
         {
           role_id: '4',
-          enrollment_state: 'active',
+          ...mockEnrollment,
         },
       ],
       sections: [
@@ -122,6 +149,8 @@ const props: Props = {
           id: '3',
           name: 'Default Section',
           enrollment_role: 'TeacherEnrollment',
+          course_id: '',
+          course_section_id: '',
         },
       ],
     },

@@ -310,7 +310,7 @@ export function TempEnrollModal(props: Props) {
   const renderButtons = () => {
     if (props.isEditMode) {
       return (
-        <Flex.Item margin="0 small 0 0">
+        <Flex.Item>
           <Button disabled={buttonsDisabled} onClick={handleCloseModal} {...analyticProps('Done')}>
             {I18n.t('Done')}
           </Button>
@@ -318,7 +318,7 @@ export function TempEnrollModal(props: Props) {
       )
     } else {
       return [
-        <Flex.Item key="cancel" margin="0 small 0 0">
+        <Flex.Item key="cancel">
           <Button
             disabled={buttonsDisabled}
             onClick={handleCloseModal}
@@ -329,7 +329,7 @@ export function TempEnrollModal(props: Props) {
         </Flex.Item>,
 
         page === 1 && (
-          <Flex.Item key="startOver" margin="0 small 0 0">
+          <Flex.Item key="startOver">
             <Button
               disabled={buttonsDisabled}
               onClick={handleModalReset}
@@ -341,7 +341,7 @@ export function TempEnrollModal(props: Props) {
         ),
 
         !props.isEditMode && (
-          <Flex.Item key="nextOrSubmit" margin="0 small 0 0">
+          <Flex.Item key="nextOrSubmit">
             <Button
               disabled={buttonsDisabled}
               color="primary"
@@ -399,7 +399,7 @@ export function TempEnrollModal(props: Props) {
         </Modal.Body>
 
         <Modal.Footer>
-          <Flex>{renderButtons()}</Flex>
+          <Flex gap="small">{renderButtons()}</Flex>
         </Modal.Footer>
       </Modal>
 
