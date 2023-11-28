@@ -28,7 +28,7 @@ import {View} from '@instructure/ui-view'
 import type {EducationData} from '../../../types'
 import EducationModal from './EducationModal'
 import EducationCard from '../../../Education/EducationCard'
-import {compareEducationDates} from '../../../utils'
+import {compareFromToDates} from '../../../utils'
 
 type EducationEditCardProps = {
   education: EducationData
@@ -55,21 +55,19 @@ const EducationEditCard = ({education, onEdit, onRemove}: EducationEditCardProps
           </View>
         </Flex.Item>
         <Flex.Item shouldShrink={false} shouldGrow={true}>
-          <View as="div" position="relative" shadow="resting">
+          <View as="div" position="relative">
             <EducationCard education={education} />
             <div
               style={{
                 position: 'absolute',
-                top: '0',
-                right: '0',
+                top: '.5rem',
+                right: '.5rem',
               }}
             >
               <IconButton
                 screenReaderLabel={`edit education ${education.title}`}
                 renderIcon={IconEditLine}
                 size="small"
-                withBackground={false}
-                withBorder={false}
                 onClick={() => onEdit(education)}
               />
               <IconButton
@@ -77,8 +75,6 @@ const EducationEditCard = ({education, onEdit, onRemove}: EducationEditCardProps
                 renderIcon={IconTrashLine}
                 margin="0 0 0 x-small"
                 size="small"
-                withBackground={false}
-                withBorder={false}
                 onClick={() => onRemove(education.id)}
               />
             </div>
@@ -172,7 +168,7 @@ const EducationEdit = ({education, onChange}: EducationEditProps) => {
             </Button>
           </View>
           <View as="div" margin="0 0 medium 0">
-            {newEducation.sort(compareEducationDates).map(edu => (
+            {newEducation.sort(compareFromToDates).map(edu => (
               <View key={edu.id} as="div" margin="0 0 medium 0">
                 <EducationEditCard
                   education={edu}

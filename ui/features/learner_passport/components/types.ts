@@ -74,7 +74,8 @@ export interface EducationData {
 }
 
 export interface ExperienceData {
-  where: 'Pendo'
+  id: string
+  where: string
   title: string
   from_date: string
   to_date: string

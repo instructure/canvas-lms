@@ -17,34 +17,32 @@
  */
 
 import React from 'react'
-
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-
-import type {EducationData} from '../types'
+import type {ExperienceData} from '../types'
 import {formatDate} from '../utils'
 
-interface EducationCardProps {
-  education: EducationData
+interface ExperienceCardProps {
+  experience: ExperienceData
 }
-
-const EducationCard = ({education}: EducationCardProps) => {
+const ExperienceCard = ({experience}: ExperienceCardProps) => {
   return (
-    <View as="div" padding="x-small" data-testid="education-card">
+    <View as="div" padding="x-small" data-testid="experience-card">
       <Text size="x-small" weight="light">
-        {formatDate(education.from_date)} - {formatDate(education.to_date)}
+        {formatDate(experience.from_date)} - {formatDate(experience.to_date)}
       </Text>
-      <Heading level="h4" margin="small 0" themeOverride={{h4FontSize: '1.375rem'}}>
-        {education.institution}
+      <Heading level="h4" margin="small 0 0 0" themeOverride={{h4FontSize: '1.375rem'}}>
+        {experience.where}
       </Heading>
-      <Text as="div">
-        {education.city}, {education.state}
-      </Text>
-      {education.title && <Text as="div">{education.title}</Text>}
-      {education.gpa && <Text as="div">GPA: {education.gpa}</Text>}
+      <Text as="div">{experience.title}</Text>
+      <View as="div" margin="medium 0 0 0">
+        <Text as="div" size="small" wrap="break-word">
+          <div dangerouslySetInnerHTML={{__html: experience.description}} />
+        </Text>
+      </View>
     </View>
   )
 }
 
-export default EducationCard
+export default ExperienceCard

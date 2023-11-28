@@ -16,13 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {EducationData} from './types'
-
 export function stringToId(s: string): string {
   return s.replace(/\W+/g, '-')
 }
 
-export function compareEducationDates(a: EducationData, b: EducationData) {
+type hasFromToDates = {
+  from_date: string
+  to_date: string
+}
+
+export function compareFromToDates(a: hasFromToDates, b: hasFromToDates) {
   if (a.from_date < b.from_date) {
     return 1
   }
@@ -30,4 +33,10 @@ export function compareEducationDates(a: EducationData, b: EducationData) {
     return -1
   }
   return 0
+}
+
+export const formatDate = (date: string | Date) => {
+  return new Intl.DateTimeFormat(ENV.LOCALE || 'en', {month: 'short', year: 'numeric'}).format(
+    new Date(date)
+  )
 }
