@@ -51,6 +51,10 @@ export const DiscussionTopic = {
       attachment {
         ...Attachment
       }
+      assignment {
+        postToSis
+        pointsPossible
+      }
     }
     ${Attachment.fragment}
     ${Section.fragment}
