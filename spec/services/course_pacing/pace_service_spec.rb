@@ -17,59 +17,80 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-describe CoursePacing::PaceServiceInterface do
+describe CoursePacing::PaceService do
+  describe ".for" do
+    let(:course) { course_model }
+
+    it "returns a reference to CoursePacing::CoursePaceService for a Course" do
+      expect(
+        CoursePacing::PaceService.for(course)
+      ).to be CoursePacing::CoursePaceService
+    end
+
+    it "returns a reference to CoursePacing::SectionPaceService for a CourseSection" do
+      expect(
+        CoursePacing::PaceService.for(add_section("Section", course:))
+      ).to be CoursePacing::SectionPaceService
+    end
+
+    it "returns a reference to CoursePacing::StudentEnrollmentPaceService for a StudentEnrollment" do
+      expect(
+        CoursePacing::PaceService.for(course.enroll_student(user_model, enrollment_state: "active"))
+      ).to be CoursePacing::StudentEnrollmentPaceService
+    end
+
+    it "raises for an invalid type" do
+      expect { CoursePacing::PaceService.for("foobar") }.to raise_error(ArgumentError)
+    end
+  end
+
   describe ".paces_in_course" do
     it "requires implementation" do
-      expect do
-        CoursePacing::PaceServiceInterface.paces_in_course(double)
-      end.to raise_error NotImplementedError
+      expect { CoursePacing::PaceService.paces_in_course(double) }.to raise_error(NotImplementedError)
     end
   end
 
   describe ".pace_for" do
     context "when context is invalid" do
       before do
-        allow(CoursePacing::PaceServiceInterface).to receive_messages(valid_context?: false, pace_in_context: "invalid context")
+        allow(CoursePacing::PaceService).to receive_messages(valid_context?: false, pace_in_context: "invalid context")
       end
 
       it "returns nil if invalid context" do
-        expect(CoursePacing::PaceServiceInterface.pace_for(double)).to be_nil
+        expect(CoursePacing::PaceService.pace_for(double)).to be_nil
       end
     end
 
     context "when there is an existing pace within the context" do
-      before { allow(CoursePacing::PaceServiceInterface).to receive(:pace_in_context).and_return("foobar") }
+      before { allow(CoursePacing::PaceService).to receive(:pace_in_context).and_return("foobar") }
 
       it "returns the pace in the context" do
-        expect(CoursePacing::PaceServiceInterface.pace_for(double)).to eq "foobar"
+        expect(CoursePacing::PaceService.pace_for(double)).to eq "foobar"
       end
     end
 
     context "when there is no existing pace within the context" do
       before do
-        allow(CoursePacing::PaceServiceInterface).to receive(:pace_in_context).and_raise(ActiveRecord::RecordNotFound)
-        allow(CoursePacing::PaceServiceInterface).to receive(:template_pace_for).and_return(nil)
+        allow(CoursePacing::PaceService).to receive_messages(pace_in_context: nil, template_pace_for: nil)
       end
 
-      it "raises a RecordNotFound error" do
-        expect do
-          CoursePacing::PaceServiceInterface.pace_for(double)
-        end.to raise_error ActiveRecord::RecordNotFound
+      it "returns nil" do
+        expect(CoursePacing::PaceService.pace_for(double)).to be_nil
       end
 
       context "when there is an existing template to fall back to" do
         let(:template) { double }
 
-        before { allow(CoursePacing::PaceServiceInterface).to receive(:template_pace_for).and_return(template) }
+        before { allow(CoursePacing::PaceService).to receive(:template_pace_for).and_return(template) }
 
         it "returns the existing template" do
-          expect(CoursePacing::PaceServiceInterface.pace_for(double)).to eq template
+          expect(CoursePacing::PaceService.pace_for(double)).to eq template
         end
 
         context "when the should_duplicate option is set to true" do
           it "duplicates the template within the context" do
             expect(template).to receive(:duplicate)
-            CoursePacing::PaceServiceInterface.pace_for(double, should_duplicate: true)
+            CoursePacing::PaceService.pace_for(double, should_duplicate: true)
           end
         end
       end
@@ -79,19 +100,19 @@ describe CoursePacing::PaceServiceInterface do
   describe ".pace_in_context" do
     it "requires implementation" do
       expect do
-        CoursePacing::PaceServiceInterface.pace_in_context(double)
+        CoursePacing::PaceService.pace_in_context(double)
       end.to raise_error NotImplementedError
     end
   end
 
   describe ".create_in_context" do
     context "when context is invalid" do
-      before { allow(CoursePacing::PaceServiceInterface).to receive(:valid_context?).and_return(false) }
+      before { allow(CoursePacing::PaceService).to receive(:valid_context?).and_return(false) }
 
       let(:context) { double(course_paces: double(not_deleted: double(take: "invalid context"))) }
 
       it "returns nil if invalid context" do
-        expect(CoursePacing::PaceServiceInterface.create_in_context(context)).to be_nil
+        expect(CoursePacing::PaceService.create_in_context(context)).to be_nil
       end
     end
 
@@ -99,7 +120,7 @@ describe CoursePacing::PaceServiceInterface do
       let(:context) { double(course_paces: double(not_deleted: double(take: "foobar"))) }
 
       it "returns the pace" do
-        expect(CoursePacing::PaceServiceInterface.create_in_context(context)).to eq "foobar"
+        expect(CoursePacing::PaceService.create_in_context(context)).to eq "foobar"
       end
     end
 
@@ -108,18 +129,18 @@ describe CoursePacing::PaceServiceInterface do
 
       it "requires implementation" do
         expect do
-          CoursePacing::PaceServiceInterface.create_in_context(context)
+          CoursePacing::PaceService.create_in_context(context)
         end.to raise_error NotImplementedError
       end
 
       it "starts off publishing progress" do
-        allow(CoursePacing::PaceServiceInterface).to receive(:course_for).and_return(course_factory)
+        allow(CoursePacing::PaceService).to receive(:course_for).and_return(course_factory)
 
         expect(Progress).to receive(:create!)
           .with({ context: instance_of(CoursePace), tag: "course_pace_publish" })
           .and_return(double(process_job: nil))
 
-        CoursePacing::PaceServiceInterface.create_in_context(context)
+        CoursePacing::PaceService.create_in_context(context)
       end
     end
   end
@@ -136,7 +157,7 @@ describe CoursePacing::PaceServiceInterface do
           .and_return(double(process_job: nil))
         expect do
           expect(
-            CoursePacing::PaceServiceInterface.update_pace(pace, update_params)
+            CoursePacing::PaceService.update_pace(pace, update_params)
           ).to eq pace
         end.to change {
           pace.exclude_weekends
@@ -150,7 +171,7 @@ describe CoursePacing::PaceServiceInterface do
       it "returns false" do
         allow(pace).to receive(:update).and_return false
         expect(
-          CoursePacing::PaceServiceInterface.update_pace(pace, update_params)
+          CoursePacing::PaceService.update_pace(pace, update_params)
         ).to be false
       end
     end
@@ -159,7 +180,7 @@ describe CoursePacing::PaceServiceInterface do
   describe ".delete_in_context" do
     it "requires implementation" do
       expect do
-        CoursePacing::PaceServiceInterface.delete_in_context(double)
+        CoursePacing::PaceService.delete_in_context(double)
       end.to raise_error NotImplementedError
     end
   end
