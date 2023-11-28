@@ -25,6 +25,7 @@ import {DisplayGradeAs} from './DisplayGradeAs'
 import {PointsPossible} from './PointsPossible'
 import {PeerReviewOptions} from './PeerReviewOptions'
 import {AssignmentDueDatesManager} from './AssignmentDueDatesManager'
+import {SyncToSisCheckbox} from './SyncToSisCheckbox'
 
 type Props = {
   assignmentGroups: [{_id: string; name: string}]
@@ -40,6 +41,8 @@ type Props = {
   setPeerReviewsPerStudent: (peerReviewsPerStudent: number) => void
   peerReviewDueDate: string
   setPeerReviewDueDate: (peerReviewDueDate: string) => void
+  postToSis: boolean
+  setPostToSis: (postToSis: boolean) => void
 }
 
 export const GradedDiscussionOptions = ({
@@ -56,6 +59,8 @@ export const GradedDiscussionOptions = ({
   setPeerReviewsPerStudent,
   peerReviewDueDate,
   setPeerReviewDueDate,
+  postToSis,
+  setPostToSis,
 }: Props) => {
   return (
     <View as="div">
@@ -65,6 +70,11 @@ export const GradedDiscussionOptions = ({
       <View as="div" margin="medium 0">
         <DisplayGradeAs displayGradeAs={displayGradeAs} setDisplayGradeAs={setDisplayGradeAs} />
       </View>
+      {ENV.POST_TO_SIS && (
+        <View as="div" margin="medium 0">
+          <SyncToSisCheckbox postToSis={postToSis} setPostToSis={setPostToSis} />
+        </View>
+      )}
       <View as="div" margin="medium 0">
         <AssignmentGroupSelect
           assignmentGroup={assignmentGroup}

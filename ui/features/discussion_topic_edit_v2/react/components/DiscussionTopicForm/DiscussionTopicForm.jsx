@@ -169,6 +169,8 @@ export default function DiscussionTopicForm({
   const [usageRightsData, setUsageRightsData] = useState({})
   const [usageRightsErrorState, setUsageRightsErrorState] = useState(false)
 
+  const [postToSis, setPostToSis] = useState(false)
+
   const handleSettingUsageRightsData = data => {
     setUsageRightsErrorState(false)
     setUsageRightsData(data)
@@ -203,6 +205,9 @@ export default function DiscussionTopicForm({
     setLocked(currentDiscussionTopic.locked && isAnnouncement)
     setAttachment(currentDiscussionTopic.attachment)
     setUsageRightsData(currentDiscussionTopic?.attachment?.usageRights)
+    setIsGraded(!!currentDiscussionTopic?.assignment)
+    setPostToSis(!!currentDiscussionTopic?.assignment?.postToSis)
+    setPointsPossible(currentDiscussionTopic?.assignment?.pointsPossible)
   }, [isEditing, currentDiscussionTopic, discussionAnonymousState, isAnnouncement])
 
   useEffect(() => {
@@ -359,16 +364,27 @@ export default function DiscussionTopicForm({
   }
 
   const prepareAssignmentPayload = () => {
-    return isGraded
-      ? {
-          courseId: ENV.context_id,
-          name: title,
-          pointsPossible,
-          gradingType: displayGradeAs,
-          assignmentGroupId: assignmentGroup || null,
-          peerReviews: preparePeerReviewPayload(),
-        }
-      : null
+    // Return null immediately if the assignment is not graded
+    if (!isGraded) {
+      return null
+    }
+    // Common payload properties for graded assignments
+    let payload = {
+      pointsPossible,
+      postToSis,
+      gradingType: displayGradeAs,
+      assignmentGroupId: assignmentGroup || null,
+      peerReviews: preparePeerReviewPayload(),
+    }
+    // Additional properties for creation of a graded assignment
+    if (!isEditing) {
+      payload = {
+        ...payload,
+        courseId: ENV.context_id,
+        name: title,
+      }
+    }
+    return payload
   }
 
   const submitForm = shouldPublish => {
@@ -796,6 +812,8 @@ export default function DiscussionTopicForm({
                   setPeerReviewsPerStudent={setPeerReviewsPerStudent}
                   peerReviewDueDate={peerReviewDueDate}
                   setPeerReviewDueDate={setPeerReviewDueDate}
+                  postToSis={postToSis}
+                  setPostToSis={setPostToSis}
                 />
               </GradedDiscussionDueDatesContext.Provider>
             </View>
