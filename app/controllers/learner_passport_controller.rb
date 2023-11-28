@@ -162,6 +162,7 @@ class LearnerPassportController < ApplicationController
     ],
     experience: [
       {
+        id: "1",
         where: "Pendo",
         title: "Software Engineering Team",
         from_date: "2023-08",
@@ -197,6 +198,16 @@ class LearnerPassportController < ApplicationController
           </li><li>
           Participate in cross-team initiatives aimed at improving technology and work culture.
           </li></ul>
+        ).html_safe,
+      },
+      {
+        id: "2",
+        where: "Instructure",
+        title: "Software Engineering Intern",
+        from_date: "2022-08",
+        to_date: "2023-08",
+        description: %(
+          <p>I did some cool stuff here.</p>
         ).html_safe,
       },
     ],
@@ -273,6 +284,8 @@ class LearnerPassportController < ApplicationController
         end
       when :education
         portfolio[:education] = JSON.parse(params[:education])
+      when :experience
+        portfolio[:experience] = JSON.parse(params[:experience])
       when :achievements
         portfolio[:achievements] = @@current_achievements.select { |a| params[key].include?(a[:id]) }
       else

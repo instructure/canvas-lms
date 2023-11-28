@@ -67,16 +67,14 @@ const AchievementEditCard = ({achievement, onRemove}: AchievementEditCardProps) 
             <div
               style={{
                 position: 'absolute',
-                top: '0',
-                right: '0',
+                top: '0.5rem',
+                right: '0.5rem',
               }}
             >
               <IconButton
                 screenReaderLabel={`remove achievement ${achievement.title}`}
                 renderIcon={IconTrashLine}
                 size="small"
-                withBackground={false}
-                withBorder={false}
                 onClick={handleRemoveAchievement}
               />
             </div>

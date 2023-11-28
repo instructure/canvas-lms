@@ -28,10 +28,10 @@ import {View} from '@instructure/ui-view'
 import PersonalInfo from './personal_info/PersonalInfo'
 import AchievementsEdit from './achievements/AchievementsEdit'
 import EducationEdit from './education/EducationEdit'
-import ExperienceEdit from './ExperienceEdit'
+import ExperienceEdit from './experience/ExperienceEdit'
 import ProjectsEdit from './ProjectsEdit'
 
-import type {EducationData, PortfolioEditData, SkillData} from '../../types'
+import type {EducationData, ExperienceData, PortfolioEditData, SkillData} from '../../types'
 
 const PortfolioEdit = () => {
   const navigate = useNavigate()
@@ -45,6 +45,7 @@ const PortfolioEdit = () => {
     return portfolio.achievements.map(achievement => achievement.id)
   })
   const [education, setEducation] = useState(portfolio.education)
+  const [experience, setExperience] = useState(portfolio.experience)
 
   const handlePreviewClick = useCallback(() => {
     navigate(`../view/${portfolio.id}`)
@@ -77,6 +78,10 @@ const PortfolioEdit = () => {
 
   const handleNewEducation = useCallback((newEducation: EducationData[]) => {
     setEducation(newEducation)
+  }, [])
+
+  const handleNewExperience = useCallback((newExperience: ExperienceData[]) => {
+    setExperience(newExperience)
   }, [])
 
   return (
@@ -126,7 +131,8 @@ const PortfolioEdit = () => {
               <EducationEdit education={education} onChange={handleNewEducation} />
             </View>
             <View margin="0 medium" borderWidth="small">
-              <ExperienceEdit portfolio={portfolio} />
+              <input type="hidden" name="experience" value={JSON.stringify(experience)} />
+              <ExperienceEdit experience={experience} onChange={handleNewExperience} />
             </View>
             <View margin="0 medium" borderWidth="small">
               <ProjectsEdit portfolio={portfolio} />
