@@ -1291,7 +1291,8 @@ rubricEditing.init = function () {
       ) {
         skipPointsUpdate = true
       } else if (data['rubric_association[use_for_grading]'] === '1') {
-        const externalToolPoints = $('#tool_form #custom_canvas_assignment_points_possible').val()
+        const toolFormId = ENV['LTI_TOOL_FORM_ID'] ? `#tool_form_${ENV['LTI_TOOL_FORM_ID']}` : '#tool_form'
+        const externalToolPoints = $(`${toolFormId} #custom_canvas_assignment_points_possible`).val()
         let assignmentPoints
         if (externalToolPoints) {
           assignmentPoints = numberHelper.parse(externalToolPoints)
