@@ -35,18 +35,18 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import type {ViewOwnProps} from '@instructure/ui-view'
 
-const PORTFOLIO_CARD_WIDTH = '400px'
-const PORTFOLIO_CARD_HEIGHT = '200px'
-const PORTFOLIO_CARD_IMAGE_HEIGHT = `${200 - 96}px`
+const PROJECT_CARD_WIDTH = '400px'
+const PROJECT_CARD_HEIGHT = '200px'
+const PROJECT_CARD_IMAGE_HEIGHT = `${200 - 96}px`
 
-export type PortfolioCardProps = {
+export type ProjectCardProps = {
   id: string
   title: string
   heroImageUrl?: string | null
-  onAction: (portfolioId: string, action: string) => void
+  onAction: (projectId: string, action: string) => void
 }
 
-const PortfolioCard = ({id, title, heroImageUrl, onAction}: PortfolioCardProps) => {
+const ProjectCard = ({id, title, heroImageUrl, onAction}: ProjectCardProps) => {
   const [kabobButtonRef, setKabobButtonRef] = useState<Element | null>(null)
 
   const handleKabobMenuSelect = useCallback(
@@ -73,11 +73,11 @@ const PortfolioCard = ({id, title, heroImageUrl, onAction}: PortfolioCardProps) 
 
   return (
     <View
-      id={`portfolio-${id}`}
+      id={`project-${id}`}
       as="div"
       background="secondary"
-      width={PORTFOLIO_CARD_WIDTH}
-      height={PORTFOLIO_CARD_HEIGHT}
+      width={PROJECT_CARD_WIDTH}
+      height={PROJECT_CARD_HEIGHT}
       role="button"
       cursor="pointer"
       onClick={handleCardClick}
@@ -89,7 +89,7 @@ const PortfolioCard = ({id, title, heroImageUrl, onAction}: PortfolioCardProps) 
           style={{
             display: 'block',
             width: '100%',
-            height: PORTFOLIO_CARD_IMAGE_HEIGHT,
+            height: PROJECT_CARD_IMAGE_HEIGHT,
             background:
               'repeating-linear-gradient(45deg, #cecece, #cecece 10px, #aeaeae 10px, #aeaeae 20px)',
           }}
@@ -147,5 +147,5 @@ const PortfolioCard = ({id, title, heroImageUrl, onAction}: PortfolioCardProps) 
   )
 }
 
-export default PortfolioCard
-export {PORTFOLIO_CARD_HEIGHT, PORTFOLIO_CARD_WIDTH}
+export default ProjectCard
+export {PROJECT_CARD_HEIGHT, PROJECT_CARD_WIDTH}

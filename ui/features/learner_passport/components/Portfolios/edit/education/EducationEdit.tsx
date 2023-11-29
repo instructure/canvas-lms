@@ -28,7 +28,7 @@ import {View} from '@instructure/ui-view'
 import type {EducationData} from '../../../types'
 import EducationModal from './EducationModal'
 import EducationCard from '../../../Education/EducationCard'
-import {compareFromToDates} from '../../../utils'
+import {compareFromToDates} from '../../../shared/utils'
 
 type EducationEditCardProps = {
   education: EducationData

@@ -23,9 +23,9 @@ import {IconAddLine} from '@instructure/ui-icons'
 import {Select} from '@instructure/ui-select'
 import useFetchApi from '@canvas/use-fetch-api-hook'
 import type {SkillData} from '../../../types'
-import {stringToId} from '../../../utils'
+import {stringToId} from '../../../shared/utils'
 import AddSkillModal from './AddSkillModal'
-import SkillTag from '../../../SkillTag'
+import SkillTag from '../../../shared/SkillTag'
 
 interface SkillSelectProps {
   portfolioSkills: SkillData[]

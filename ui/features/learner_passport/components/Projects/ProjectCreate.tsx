@@ -16,27 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export function stringToId(s: string): string {
-  return s.replace(/\W+/g, '-')
-}
+import {useActionData, useNavigate} from 'react-router-dom'
+import type {ProjectData} from '../types'
 
-type hasFromToDates = {
-  from_date: string
-  to_date: string
-}
-
-export function compareFromToDates(a: hasFromToDates, b: hasFromToDates) {
-  if (a.from_date < b.from_date) {
-    return 1
+const ProjectCreate = () => {
+  const navigate = useNavigate()
+  const project = useActionData() as ProjectData
+  if (project) {
+    navigate(`../edit/${project.id}`)
+  } else {
+    navigate('..')
   }
-  if (a.from_date > b.from_date) {
-    return -1
-  }
-  return 0
+  return null
 }
 
-export const formatDate = (date: string | Date) => {
-  return new Intl.DateTimeFormat(ENV.LOCALE || 'en', {month: 'short', year: 'numeric'}).format(
-    new Date(date)
-  )
-}
+export default ProjectCreate

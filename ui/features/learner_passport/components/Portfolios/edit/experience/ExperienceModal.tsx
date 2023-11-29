@@ -28,7 +28,7 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
 import {uid} from '@instructure/uid'
 import type {ExperienceData} from '../../../types'
-import {formatDate} from '../../../utils'
+import {formatDate} from '../../../shared/utils'
 import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
 import CanvasRce from '@canvas/rce/react/CanvasRce'
 

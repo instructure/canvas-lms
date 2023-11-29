@@ -22,7 +22,7 @@ import {Tag} from '@instructure/ui-tag'
 import {Flex} from '@instructure/ui-flex'
 import type {Spacing} from '@instructure/emotion'
 import type {ViewProps} from '@instructure/ui-view'
-import type {SkillData} from './types'
+import type {SkillData} from '../types'
 
 interface SkillTagProps {
   id: string
@@ -57,4 +57,20 @@ const SkillTag = ({id, dismissable, skill, margin, onClick}: SkillTagProps) => {
   )
 }
 
+function renderSkillTag(skill: SkillData) {
+  return (
+    <Tag
+      key={skill.name.replace(/\s+/g, '-').toLowerCase()}
+      text={
+        <>
+          {skill.verified ? <IconCertifiedSolid color="success" title="certified" /> : null}{' '}
+          {skill.name}
+        </>
+      }
+      margin="0 x-small x-small 0"
+    />
+  )
+}
+
 export default SkillTag
+export {renderSkillTag}

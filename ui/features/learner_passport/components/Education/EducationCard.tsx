@@ -23,7 +23,7 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
 import type {EducationData} from '../types'
-import {formatDate} from '../utils'
+import {formatDate} from '../shared/utils'
 
 interface EducationCardProps {
   education: EducationData

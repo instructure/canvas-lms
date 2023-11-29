@@ -64,8 +64,13 @@ export const Component = () => {
   }, [])
 
   const handleTabChange = (tabname: string) => {
-    const route = tabname === 'portfolios' ? 'portfolios/dashboard' : tabname
-    navigate(`${route}`)
+    if (tabname === 'portfolios') {
+      navigate('portfolios/dashboard')
+    } else if (tabname === 'projects') {
+      navigate('projects/dashboard')
+    } else {
+      navigate(tabname)
+    }
   }
 
   const handleTabClick = (event: React.MouseEvent) => {

@@ -16,19 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect} from 'react'
-import {useMatch} from 'react-router-dom'
-import {ProjectLayout} from '../components/Projects'
+import React from 'react'
+import {Outlet} from 'react-router-dom'
 
-export function Component() {
-  const pathMatch = useMatch('/users/:userId/*')
-  if (!pathMatch || !pathMatch.params || !pathMatch.params.userId) {
-    throw new Error('user id is not present on path')
-  }
-
-  useEffect(() => {
-    document.title = 'Learner Passport: Projects'
-  }, [])
-
-  return <ProjectLayout />
+export const ProjectLayout = () => {
+  return (
+    <div>
+      <Outlet />
+    </div>
+  )
 }
+
+export default ProjectLayout

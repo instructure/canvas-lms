@@ -24,13 +24,14 @@ import {TextInput} from '@instructure/ui-text-input'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
 
-export type CreatePortfolioModalProps = {
+export type CreateModalProps = {
+  forObject: string
   open: boolean
   onDismiss: () => void
   onSubmit: (f: HTMLFormElement) => void
 }
 
-const CreatePortfolioModal = ({open, onDismiss, onSubmit}: CreatePortfolioModalProps) => {
+const CreateModal = ({forObject, open, onDismiss, onSubmit}: CreateModalProps) => {
   const [name, setName] = useState('')
 
   const handleNameChange = useCallback((_e: React.ChangeEvent<HTMLInputElement>, value: string) => {
@@ -41,13 +42,13 @@ const CreatePortfolioModal = ({open, onDismiss, onSubmit}: CreatePortfolioModalP
     (e: React.UIEvent) => {
       e.preventDefault()
       if (!name.trim()) return
-      onSubmit(document.getElementById('create_portfolio_form') as HTMLFormElement)
+      onSubmit(document.getElementById('create_form') as HTMLFormElement)
     },
     [name, onSubmit]
   )
 
   return (
-    <Modal open={open} size="auto" label="Create Portfolio" onDismiss={onDismiss}>
+    <Modal open={open} size="auto" label={`Create ${forObject}`} onDismiss={onDismiss}>
       <Modal.Header>
         <CloseButton
           placement="end"
@@ -55,17 +56,17 @@ const CreatePortfolioModal = ({open, onDismiss, onSubmit}: CreatePortfolioModalP
           onClick={onDismiss}
           screenReaderLabel="Close"
         />
-        <Heading>Create Portfolio</Heading>
+        <Heading>Create {forObject}</Heading>
       </Modal.Header>
       <Modal.Body>
         {/* @ts-expect-error */}
-        <form id="create_portfolio_form" action="create" method="PUT" onSubmit={handleSubmit}>
+        <form id="create_form" action="create" method="PUT" onSubmit={handleSubmit}>
           <input type="hidden" name="userId" value={ENV.current_user.id} />
           <View as="div" minWidth="700px">
             <TextInput
               name="title"
-              placeholder="Enter portfolio name"
-              renderLabel="Portfolio Name"
+              placeholder={`Enter ${forObject.toLowerCase()} name`}
+              renderLabel={`${forObject} Name`}
               onChange={handleNameChange}
               value={name}
             />
@@ -75,7 +76,7 @@ const CreatePortfolioModal = ({open, onDismiss, onSubmit}: CreatePortfolioModalP
       <Modal.Footer>
         <Button onClick={onDismiss}>Cancel</Button>
         <Tooltip
-          renderTip="You must provide a portfolio name"
+          renderTip="You must provide a name"
           on={name.trim() ? [] : ['click', 'hover', 'focus']}
         >
           {/* @ts-expect-error */}
@@ -88,4 +89,4 @@ const CreatePortfolioModal = ({open, onDismiss, onSubmit}: CreatePortfolioModalP
   )
 }
 
-export default CreatePortfolioModal
+export default CreateModal

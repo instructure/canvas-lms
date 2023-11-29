@@ -29,7 +29,7 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
 import {uid} from '@instructure/uid'
 import type {EducationData} from '../../../types'
-import {formatDate} from '../../../utils'
+import {formatDate} from '../../../shared/utils'
 import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
 
 interface EducationModalProps {
@@ -83,13 +83,13 @@ const EducationModal = ({education, open, onDismiss, onSave}: EducationModalProp
     if (!isValid()) return
     onSave({
       id,
-      institution,
-      city,
-      state,
-      title,
+      institution: institution.trim(),
+      city: city.trim(),
+      state: state.trim(),
+      title: title.trim(),
       from_date,
       to_date,
-      gpa,
+      gpa: gpa.trim(),
     })
   }, [city, from_date, gpa, id, institution, isValid, onSave, state, title, to_date])
 
@@ -184,7 +184,7 @@ const EducationModal = ({education, open, onDismiss, onSave}: EducationModalProp
             name="education[institution]"
             renderLabel="Institution name"
             value={institution}
-            onChange={(_e, value) => setInstitution(value.trim())}
+            onChange={(_e, value) => setInstitution(value)}
           />
         </View>
         <Flex gap="small">
@@ -193,7 +193,7 @@ const EducationModal = ({education, open, onDismiss, onSave}: EducationModalProp
               name="education[city]"
               renderLabel="City"
               value={city}
-              onChange={(_e, value) => setCity(value.trim())}
+              onChange={(_e, value) => setCity(value)}
             />
           </Flex.Item>
           <Flex.Item shouldGrow={true}>
@@ -213,7 +213,7 @@ const EducationModal = ({education, open, onDismiss, onSave}: EducationModalProp
               name="education[title]"
               renderLabel="Degree or certification (optional)"
               value={title}
-              onChange={(_e, value) => setTitle(value.trim())}
+              onChange={(_e, value) => setTitle(value)}
             />
           </Flex.Item>
           <Flex.Item shouldGrow={true}>
@@ -221,7 +221,7 @@ const EducationModal = ({education, open, onDismiss, onSave}: EducationModalProp
               name="education[gpa]"
               renderLabel="GPA (optional)"
               value={gpa}
-              onChange={(_e, value) => setGpa(value.trim())}
+              onChange={(_e, value) => setGpa(value)}
             />
           </Flex.Item>
         </Flex>
