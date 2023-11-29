@@ -856,6 +856,22 @@ describe "discussions" do
         user_session(teacher)
       end
 
+      it "does not display multiple assignTo options for students in multiple sections" do
+        # create and enroll student into a second section
+        section2 = course.course_sections.create! name: "section2"
+        course.enroll_student(student, enrollment_state: "active", section: section2, allow_multiple_enrollments: true)
+
+        get "/courses/#{course.id}/discussion_topics/new"
+
+        force_click('input[type=checkbox][value="graded"]')
+        wait_for_ajaximations
+
+        f("input[data-testid='assign-to-select']").click
+
+        assign_to_option_count = course.all_accepted_students.count + course.course_sections.active.count + 1
+        expect(ff("span[data-testid='assign-to-select-option']").count).to eq assign_to_option_count
+      end
+
       it "creates a discussion topic with an assignment with peer reviews" do
         get "/courses/#{course.id}/discussion_topics/new"
 
