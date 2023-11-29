@@ -458,6 +458,40 @@ class Rubric < ActiveRecord::Base
     criteria.reject { |c| c[:ignore_for_scoring] }.sum { |c| c[:points] }
   end
 
+  def reconcile_criteria_models(current_user)
+    return unless Account.site_admin.feature_enabled?(:enhanced_rubrics)
+
+    return unless criteria.present? && criteria.is_a?(Array)
+
+    criteria.each.with_index(1) do |old_school_criterion, index|
+      criterion = rubric_criteria.find_by(order: index)
+      if criterion
+        update_params = { description: old_school_criterion[:description],
+                          long_description: old_school_criterion[:long_description],
+                          points: old_school_criterion[:points],
+                          learning_outcome_id: old_school_criterion[:learning_outcome_id],
+                          mastery_points: old_school_criterion[:mastery_points],
+                          ignore_for_scoring: !!old_school_criterion[:ignore_for_scoring],
+                          criterion_use_range: !!old_school_criterion[:criterion_use_range] }
+
+        update_params[:created_by] = current_user if criterion.will_change_with_update(update_params)
+        criterion.update!(update_params)
+      else
+        rubric_criteria.create!(description: old_school_criterion[:description],
+                                long_description: old_school_criterion[:long_description],
+                                points: old_school_criterion[:points],
+                                order: index,
+                                learning_outcome_id: old_school_criterion[:learning_outcome_id],
+                                mastery_points: old_school_criterion[:mastery_points],
+                                ignore_for_scoring: !!old_school_criterion[:ignore_for_scoring],
+                                criterion_use_range: !!old_school_criterion[:criterion_use_range],
+                                root_account_id:,
+                                created_by: current_user)
+      end
+    end
+    rubric_criteria.where("rubric_criteria.order > ?", criteria.length).delete_all
+  end
+
   # undo innocuous changes introduced by migrations which break `will_change_with_update?`
   def self.normalize(criteria)
     case criteria
