@@ -1,0 +1,48 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - develop
+      - master
+      - release/*
+    tags:
+      - v*
+  pull_request:
+    branches:
+      - develop
+      - master
+      - release/*
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build and push Docker images
+        uses: docker/build-push-action@v1.1.0
+        with:
+          # Username used to log in to a Docker registry. If not set then no login will occur
+          username: ${{ github.actor }}
+          # Password or personal access token used to log in to a Docker registry. If not set then no login will occur
+          password: ${{ secrets.GITHUB_TOKEN }}
+          # Server address of Docker registry. If not set then will default to Docker Hub
+          registry: ghcr.io
+          # Docker repository to tag the image with
+          repository: talview/canvas-lms/canvas_lms
+          # Automatically tags the built image with the git reference as per the readme
+          tag_with_ref: true
+          tag_with_sha: true
+          # Path to the build context
+          path: .
+          # Path to the Dockerfile (Default is '{path}/Dockerfile')
+          dockerfile: Dockerfile
+          # Always attempt to pull a newer version of the image
+          always_pull: true
+          # Comma-delimited list of images to consider as cache sources
+          cache_froms: talview/canvas-lms/canvas_lms:develop,talview/canvas-lms/canvas_lms:latest
+          # Adds labels with git repository information to the built image
+          add_git_labels: true
+          # Whether to push the image
+          push: true
