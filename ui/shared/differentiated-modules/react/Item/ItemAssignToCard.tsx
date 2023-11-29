@@ -64,12 +64,19 @@ export type ItemAssignToCardProps = {
   customSetSearchTerm?: (term: string) => void
 }
 
+function setTimeToStringDate(time: string, date: string | undefined): string | undefined {
+  const [hour, minute, second] = time.split(':').map(Number)
+  const chosenDate = moment.tz(date, ENV.TIMEZONE)
+  chosenDate.set({hour, minute, second})
+  return chosenDate.isValid() ? chosenDate.utc().toISOString() : date
+}
+
 export default function ItemAssignToCard({
   courseId,
   cardId,
-  due_at,
-  unlock_at,
-  lock_at,
+  due_at = null,
+  unlock_at = null,
+  lock_at = null,
   onDelete,
   onValidityChange,
   onCardAssignmentChange,
@@ -115,36 +122,26 @@ export default function ItemAssignToCard({
   const handleDueDateChange = useCallback(
     (_event: React.SyntheticEvent, value: string | undefined) => {
       const defaultDueTime = ENV.DEFAULT_DUE_TIME ?? '23:59:00'
-      if (dueDate === null) {
-        const [hour, minute, second] = defaultDueTime.split(':').map(Number)
-        const chosenDate = moment(value)
-        chosenDate.set({hour, minute, second})
-        const newDueDate = chosenDate.isValid() ? chosenDate.toISOString() : value
-        setDueDate(newDueDate || null)
-      } else {
-        setDueDate(value || null)
-      }
+      const newDueDate = dueDate ? value : setTimeToStringDate(defaultDueTime, value)
+      setDueDate(newDueDate || null)
     },
     [dueDate]
   )
 
   const handleAvailableFromDateChange = useCallback(
     (_event: React.SyntheticEvent, value: string | undefined) => {
-      setAvailableFromDate(value || null)
+      const newAvailableFromDate = availableFromDate
+        ? value
+        : setTimeToStringDate('00:00:00', value)
+      setAvailableFromDate(newAvailableFromDate || null)
     },
-    []
+    [availableFromDate]
   )
 
   const handleAvailableToDateChange = useCallback(
     (_event: React.SyntheticEvent, value: string | undefined) => {
-      if (availableToDate === null) {
-        const chosenDate = moment(value)
-        chosenDate.set({hour: 23, minute: 59, second: 0})
-        const newAvailableToDate = chosenDate.isValid() ? chosenDate.toISOString() : value
-        setAvailableToDate(newAvailableToDate || null)
-      } else {
-        setAvailableToDate(value || null)
-      }
+      const newAvailableToDate = availableToDate ? value : setTimeToStringDate('23:59:00', value)
+      setAvailableToDate(newAvailableToDate || null)
     },
     [availableToDate]
   )
@@ -174,7 +171,16 @@ export default function ItemAssignToCard({
     validationErrors,
   ])
 
-  const dateTimeInputs = [
+  type DateTimeInput = {
+    key: string
+    description: string
+    dateRenderLabel: string
+    value: string | null
+    onChange: (event: React.SyntheticEvent, value: string | undefined) => void
+    onClear: () => void
+  }
+
+  const dateTimeInputs: DateTimeInput[] = [
     {
       key: 'due_at',
       description: I18n.t('Choose a due date and time'),
