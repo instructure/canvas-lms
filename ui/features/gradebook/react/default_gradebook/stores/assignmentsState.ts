@@ -41,6 +41,7 @@ export type AssignmentsState = {
   ) => Promise<AssignmentGroup[] | undefined>
   fetchAssignmentGroups: (
     params: AssignmentLoaderParams,
+    isSelectedGradingPeriodId: boolean,
     gradingPeriodIds?: string[]
   ) => Promise<AssignmentGroup[] | undefined>
   recentlyLoadedAssignmentGroups: {
@@ -167,7 +168,7 @@ export default (
       return get().loadAssignmentGroupsForGradingPeriods(params, normalizeGradingdPeriodId)
     }
 
-    return get().fetchAssignmentGroups(params)
+    return get().fetchAssignmentGroups(params, true)
   },
 
   loadAssignmentGroupsForGradingPeriods(params: AssignmentLoaderParams, selectedPeriodId: string) {
@@ -189,28 +190,29 @@ export default (
       selectedAssignmentIds.length > maxAssignments ||
       otherAssignmentIds.length > maxAssignments
     ) {
-      return get().fetchAssignmentGroups(params)
+      return get().fetchAssignmentGroups(params, true)
     }
 
     // If there are no assignments in the selected grading period, request all
     // assignments in a single query
     if (selectedAssignmentIds.length === 0) {
-      return get().fetchAssignmentGroups(params)
+      return get().fetchAssignmentGroups(params, true)
     }
 
     const ids1 = selectedAssignmentIds.join()
-    const gotGroups = get().fetchAssignmentGroups({...params, assignment_ids: ids1}, [
+    const gotGroups = get().fetchAssignmentGroups({...params, assignment_ids: ids1}, true, [
       selectedPeriodId,
     ])
 
     const ids2 = otherAssignmentIds.join()
-    get().fetchAssignmentGroups({...params, assignment_ids: ids2}, otherGradingPeriodIds)
+    get().fetchAssignmentGroups({...params, assignment_ids: ids2}, false, otherGradingPeriodIds)
 
     return gotGroups
   },
 
   fetchAssignmentGroups: (
     params: AssignmentLoaderParams,
+    isSelectedGradingPeriodId: boolean,
     gradingPeriodIds?: string[]
   ): Promise<undefined | AssignmentGroup[]> => {
     set({isAssignmentGroupsLoading: true})
@@ -227,11 +229,15 @@ export default (
             ...Object.fromEntries(assignments.map(assignment => [assignment.id, assignment])),
           }
           const assignmentList = get().assignmentList.concat(assignments)
+          if (isSelectedGradingPeriodId) {
+            set({
+              recentlyLoadedAssignmentGroups: {
+                assignmentGroups,
+                gradingPeriodIds,
+              },
+            })
+          }
           set({
-            recentlyLoadedAssignmentGroups: {
-              assignmentGroups,
-              gradingPeriodIds,
-            },
             assignmentMap,
             assignmentList,
             assignmentGroups: get().assignmentGroups.concat(assignmentGroups),
