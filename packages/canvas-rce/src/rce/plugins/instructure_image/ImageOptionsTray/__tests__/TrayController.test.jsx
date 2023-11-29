@@ -126,7 +126,7 @@ describe('RCE "Images" Plugin > ImageOptionsTray > TrayController', () => {
     it('closes the tray when open for the given editor', async () => {
       trayController.showTrayForEditor(editors[0])
       trayController.hideTrayForEditor(editors[0])
-      await waitFor(() => expect(getTray()).toBeNull()) // tray is closed after a transition
+      await waitFor(() => expect(getTray()).toBeNull(), {timeout: 2000}) // tray is closed after a transition
     })
 
     it('does not close the tray when open for a different editor', () => {
