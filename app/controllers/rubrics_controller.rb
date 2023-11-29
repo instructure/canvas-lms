@@ -205,6 +205,7 @@ class RubricsController < ApplicationController
 
         @rubric = @association.rubric if @association
       end
+      @rubric.reconcile_criteria_models(@current_user)
       json_res = {}
       json_res[:rubric] = @rubric.as_json(methods: :criteria, include_root: false, permissions: { user: @current_user, session: }) if @rubric
       json_res[:rubric_association] = @association.as_json(include_root: false, include: [:assessment_requests], permissions: { user: @current_user, session: }) if @association
