@@ -16,13 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {Heading} from '@instructure/ui-heading'
+import ProjectDashboard from './ProjectDashboard'
+import ProjectEdit from './ProjectEdit'
+import ProjectLayout from './ProjectLayout'
+import ProjectView from './ProjectView'
 
-export const Projects = () => {
-  return (
-    <div>
-      <Heading level="h1">Projects</Heading>
-    </div>
-  )
-}
+export {ProjectDashboard, ProjectEdit, ProjectLayout, ProjectView}

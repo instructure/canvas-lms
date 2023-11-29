@@ -913,6 +913,7 @@ CanvasRails::Application.routes.draw do
 
   resources :users, only: [:passport] do
     get "passport" => "learner_passport#index"
+
     get "passport/data/achievements" => "learner_passport#achievements_index"
 
     get "passport/data/portfolios" => "learner_passport#portfolios_index"
@@ -920,9 +921,15 @@ CanvasRails::Application.routes.draw do
     post "passport/data/portfolios/:portfolio_id" => "learner_passport#portfolio_update"
     get "passport/data/portfolios/show/:portfolio_id" => "learner_passport#portfolio_show"
     put "passport/data/portfolios/duplicate" => "learner_passport#portfolio_duplicate"
-    get "passport/data/portfolios/reset" => "learner_passport#portfolio_reset"
+
+    get "passport/data/projects" => "learner_passport#projects_index"
+    put "passport/data/projects/create" => "learner_passport#project_create"
+    post "passport/data/projects/:project_id" => "learner_passport#project_update"
+    get "passport/data/projects/show/:project_id" => "learner_passport#project_show"
+    put "passport/data/projects/duplicate" => "learner_passport#project_duplicate"
 
     get "passport/data/skills" => "learner_passport#skills_index"
+    get "passport/data/reset" => "learner_passport#reset"
 
     get "passport/*path" => "learner_passport#index"
   end

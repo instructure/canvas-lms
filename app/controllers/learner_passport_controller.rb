@@ -235,6 +235,52 @@ class LearnerPassportController < ApplicationController
 
   @@current_portfolios = [@@portfolio_sample.clone]
 
+  @@project_template = {
+    id: "",
+    title: "",
+    heroImageUrl: "",
+    description: "",
+    skills: [],
+    attachments: [],
+    links: [],
+    achievements: [],
+  }
+
+  @@project_sample = {
+    id: "1",
+    title: "Project 1",
+    heroImageUrl: "https://images.unsplash.com/photo-1464802686167-b939a6910659?q=80&w=3500&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    description: %(
+      Over the last four months, we had the opportunity to collaborate with 99P Labs for our graduate program’s
+      (<a href="https;//wikipedia.com">Master of Science in Product Management</a>) semester-long capstone project. We were delighted to work on a
+      really exciting problem that helped us hone some of the key concepts that we had learned as a part of our curriculum,
+      such as analyzing KPIs, writing user stories, conducting user research, and prototyping. Our problem statement
+      was to increase organic engagement for the developer portal of 99P Labs (<a href="https://developer.99plabs.io/home/">
+      https://developer.99plabs.io/home/</a>).
+    ).html_safe,
+    skills: merge_skills_from_achievements(@@current_achievements),
+    attachments: [
+      {
+        id: "1",
+        filename: "99b White Paper.pdf",
+        size: "1.2 MB",
+        contentType: "application/pdf",
+        url: "http://localhost:3000/courses/2/files/11",
+      },
+      {
+        id: "2",
+        filename: "plain text.txt",
+        size: "5 KB",
+        contentType: "text/plain",
+        url: "https://filesamples.com/samples/document/txt/sample3.txt"
+      }
+    ],
+    links: %w[https://linkedin.com/in/eschiebel https://www.nspe.org https://eschiebel.github.io/],
+    achievements: @@current_achievements.first(1).clone,
+  }
+
+  @@current_projects = []
+
   def index
     js_env[:FEATURES][:learner_passport] = @domain_root_account.feature_enabled?(:learner_passport)
 
@@ -254,6 +300,8 @@ class LearnerPassportController < ApplicationController
   def achievements_index
     render json: @@current_achievements
   end
+
+  ######## Portfolios ########
 
   def portfolios_index
     render json: @@current_portfolios.map { |p| p.slice(:id, :title, :heroImageUrl) }
@@ -318,8 +366,52 @@ class LearnerPassportController < ApplicationController
     render json: portfolio
   end
 
-  def portfolio_reset
+  ###### Projects ######
+  def projects_index
+    render json: @@current_projects.map { |p| p.slice(:id, :title, :heroImageUrl) }
+  end
+
+  def project_create
+    new_project = @@project_template.clone
+    new_project[:id] = (@@current_projects.length + 1).to_s
+    new_project[:title] = params[:title]
+    @@current_projects << new_project
+    render json: new_project
+  end
+
+  def project_update
+    project = @@current_projects.find { |p| p[:id] == params[:project_id] }
+    return render json: { message: "Project not found" }, status: :not_found if project.nil?
+
+    render json: project
+  end
+
+  def project_show
+    project = @@current_projects.find { |p| p[:id] == params[:project_id] }
+    return render json: { message: "Project not found" }, status: :not_found if project.nil?
+
+    render json: project
+  end
+
+  def project_duplicate
+    project = @@projectfolios.find { |p| p[:id] == params[:project_id] }
+    new_project = project.clone
+    new_project[:id] = (@@current_projects.length + 1).to_s
+    @@current_projects << new_project
+    render json: @@current_projects.last
+  end
+
+  def project_edit
+    project = @@current_projects.find { |p| p[:id] == params[:project_id] }
+    return render json: { message: "Project not found" }, status: :not_found if project.nil?
+
+    render json: project
+  end
+
+  def reset
     @@current_portfolios = [@@portfolio_sample.clone]
+    @@current_projects = [@@project_sample.clone]
+
     render json: { message: "Portfolios reset" }, status: :accepted
   end
 end

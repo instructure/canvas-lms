@@ -28,7 +28,7 @@ import {View} from '@instructure/ui-view'
 import type {ExperienceData} from '../../../types'
 import ExperienceCard from '../../../Experience/ExperienceCard'
 import ExperienceModal from './ExperienceModal'
-import {compareFromToDates} from '../../../utils'
+import {compareFromToDates} from '../../../shared/utils'
 
 type ExperienceEditCardProps = {
   experience: ExperienceData

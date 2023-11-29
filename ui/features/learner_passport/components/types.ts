@@ -86,3 +86,25 @@ export interface PortfolioEditData {
   portfolio: PortfolioDetailData
   achievements: AchievementData[]
 }
+
+export interface ProjectData {
+  id: string
+  title: string
+  heroImageUrl: string | null
+}
+
+export interface AttachmentData {
+  id: string
+  filename: string
+  size: string
+  contentType: string
+  url: string
+}
+
+export interface ProjectDetailData extends ProjectData {
+  description: string
+  skills: SkillData[]
+  attachments: AttachmentData[]
+  links: string[]
+  achievements: AchievementData[]
+}

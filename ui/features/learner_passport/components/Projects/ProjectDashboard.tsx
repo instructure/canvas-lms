@@ -25,15 +25,15 @@ import {IconPlusLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import PortfolioCard, {PORTFOLIO_CARD_WIDTH, PORTFOLIO_CARD_HEIGHT} from './PortfolioCard'
-import type {PortfolioData} from '../types'
+import ProjectCard, {PROJECT_CARD_WIDTH, PROJECT_CARD_HEIGHT} from './ProjectCard'
+import type {ProjectData} from '../types'
 import CreateModal from '../shared/CreateModal'
 import {renderCardSkeleton} from '../shared/CardSkeleton'
 
-const PortfolioDashboard = () => {
+const ProjectDashboard = () => {
   const navigate = useNavigate()
   const submit = useSubmit()
-  const portfolios = useLoaderData() as PortfolioData[]
+  const projects = useLoaderData() as ProjectData[]
   const [createModalIsOpen, setCreateModalIsOpen] = useState(false)
 
   const handleDismissCreateModal = useCallback(() => {
@@ -44,7 +44,7 @@ const PortfolioDashboard = () => {
     setCreateModalIsOpen(true)
   }, [])
 
-  const handleCreateNewPortfolio = useCallback(
+  const handleCreateNewProject = useCallback(
     (f: HTMLFormElement) => {
       setCreateModalIsOpen(false)
       submit(f, {method: 'PUT'})
@@ -53,20 +53,20 @@ const PortfolioDashboard = () => {
   )
 
   const handleCardAction = useCallback(
-    (portfolioId: string, action: string) => {
+    (projectId: string, action: string) => {
       switch (action) {
         case 'duplicate':
-          navigate(`duplicate/${portfolioId}`)
+          navigate(`duplicate/${projectId}`)
           break
         case 'edit':
-          navigate(`../edit/${portfolioId}`)
+          navigate(`../edit/${projectId}`)
           break
         case 'view':
-          navigate(`../view/${portfolioId}`)
+          navigate(`../view/${projectId}`)
           break
         default:
           showFlashAlert({
-            message: `portfolio ${portfolioId} action ${action}`,
+            message: `project ${projectId} action ${action}`,
             type: 'success',
           })
       }
@@ -79,37 +79,37 @@ const PortfolioDashboard = () => {
       <Flex justifyItems="space-between">
         <Flex.Item shouldGrow={true}>
           <Heading level="h1" themeOverride={{h1FontWeight: 700}}>
-            Portfolios
+            Projects
           </Heading>
         </Flex.Item>
         <Flex.Item>
           <Button renderIcon={IconPlusLine} color="primary" onClick={handleCreateClick}>
-            Create Portfolio
+            Create Project
           </Button>
         </Flex.Item>
       </Flex>
       <View as="div" margin="small 0 large 0">
         <Text size="large">
-          Create and share a portfolio of your achievements, work, eduation history, and work
+          Create and share a project of your achievements, work, eduation history, and work
           experience.
         </Text>
       </View>
       <View>
-        {portfolios?.length > 0 || (
+        {projects?.length > 0 || (
           <View as="div" margin="0">
-            <Text size="x-small">No portfolios created</Text>
+            <Text size="x-small">No projects created</Text>
           </View>
         )}
         <View as="div" margin="small 0">
-          {portfolios && portfolios.length > 0 ? (
+          {projects && projects.length > 0 ? (
             <Flex gap="medium" wrap="wrap">
-              {portfolios.map(portfolio => (
-                <Flex.Item shouldGrow={false} shouldShrink={false} key={portfolio.id}>
+              {projects.map(project => (
+                <Flex.Item shouldGrow={false} shouldShrink={false} key={project.id}>
                   <View as="div" shadow="resting">
-                    <PortfolioCard
-                      id={portfolio.id}
-                      title={portfolio.title}
-                      heroImageUrl={portfolio.heroImageUrl}
+                    <ProjectCard
+                      id={project.id}
+                      title={project.title}
+                      heroImageUrl={project.heroImageUrl}
                       onAction={handleCardAction}
                     />
                   </View>
@@ -117,18 +117,18 @@ const PortfolioDashboard = () => {
               ))}
             </Flex>
           ) : (
-            renderCardSkeleton(PORTFOLIO_CARD_WIDTH, PORTFOLIO_CARD_HEIGHT)
+            renderCardSkeleton(PROJECT_CARD_WIDTH, PROJECT_CARD_HEIGHT)
           )}
         </View>
       </View>
       <CreateModal
-        forObject="Portfolio"
+        forObject="Project"
         open={createModalIsOpen}
         onDismiss={handleDismissCreateModal}
-        onSubmit={handleCreateNewPortfolio}
+        onSubmit={handleCreateNewProject}
       />
     </>
   )
 }
 
-export default PortfolioDashboard
+export default ProjectDashboard

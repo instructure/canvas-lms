@@ -21,7 +21,7 @@ import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import type {ExperienceData} from '../types'
-import {formatDate} from '../utils'
+import {formatDate} from '../shared/utils'
 
 interface ExperienceCardProps {
   experience: ExperienceData

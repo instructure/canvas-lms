@@ -41,7 +41,7 @@ import {uid} from '@instructure/uid'
 import SkillSelect from './SkillSelect'
 import CoverImageModal from './CoverImageModal'
 import type {PortfolioDetailData, SkillData} from '../../../types'
-import {stringToId} from '../../../utils'
+import {stringToId} from '../../../shared/utils'
 
 type PersonalInfoProps = {
   portfolio: PortfolioDetailData

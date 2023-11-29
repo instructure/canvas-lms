@@ -23,7 +23,6 @@ import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {
-  IconCertifiedSolid,
   IconDownloadLine,
   IconEditLine,
   IconLinkLine,
@@ -34,7 +33,6 @@ import {
 import {Img} from '@instructure/ui-img'
 import {List} from '@instructure/ui-list'
 import {Link} from '@instructure/ui-link'
-import {Tag} from '@instructure/ui-tag'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import type {
@@ -47,22 +45,8 @@ import type {
 import AchievementCard from '../Achievements/AchievementCard'
 import EducationCard from '../Education/EducationCard'
 import ExperienceCard from '../Experience/ExperienceCard'
-import {compareFromToDates} from '../utils'
-
-function renderSkillTag(skill: SkillData) {
-  return (
-    <Tag
-      key={skill.name.replace(/\s+/g, '-').toLowerCase()}
-      text={
-        <>
-          {skill.verified ? <IconCertifiedSolid color="success" title="certified" /> : null}{' '}
-          {skill.name}
-        </>
-      }
-      margin="0 x-small 0 0"
-    />
-  )
-}
+import {compareFromToDates} from '../shared/utils'
+import {renderSkillTag} from '../shared/SkillTag'
 
 function renderLink(link: string) {
   return (

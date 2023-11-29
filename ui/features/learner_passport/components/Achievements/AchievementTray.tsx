@@ -40,8 +40,8 @@ import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
 import type {ViewProps} from '@instructure/ui-view'
 import {AchievementData} from '../types'
-import SkillTag from '../SkillTag'
-import {stringToId} from '../utils'
+import SkillTag from '../shared/SkillTag'
+import {stringToId} from '../shared/utils'
 
 const icon_verified = `<svg width="12" height="16" viewBox="0 0 12 16" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path fill-rule="evenodd" clip-rule="evenodd" d="M10.5611 8.74483C10.5611 10.7674 7.61901 12.3745 6.36318 13.0607C6.20134 13.1491 6.06636 13.2226 5.96742 13.2812C5.86848 13.2226 5.7335 13.1491 5.57166 13.0607C4.31583 12.3745 1.37378 10.7674 1.37378 8.74483V4.73776L5.96742 2.76886L10.5611 4.73776V8.74483ZM5.96735 2L0.666992 4.27138V8.74488C0.666992 11.1866 3.86699 12.935 5.23307 13.6813C5.4048 13.7753 5.54402 13.8509 5.63943 13.9081V13.9088C5.74049 13.9696 5.85356 14 5.96735 14C6.08042 14 6.1942 13.9696 6.29526 13.9081C6.39067 13.8509 6.52989 13.7753 6.70162 13.6813C8.0677 12.935 11.2677 11.1866 11.2677 8.74488V4.27138L5.96735 2ZM3.7433 7.43494L3.24365 7.93458L5.25991 9.95154L9.04365 6.1678L8.54401 5.66815L5.25991 8.95154L3.7433 7.43494Z" fill="#0B874B"/>
