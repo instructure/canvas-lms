@@ -25,7 +25,7 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 
 const I18n = useI18nScope('account_manage')
 
-const ACC_PER_PAGE = 30
+const ACC_PER_PAGE = 50
 
 interface Props {
   readonly pageIndex: number
@@ -50,7 +50,7 @@ export function AccountList(props: Props) {
           setLoad(true)
           setError(false)
           setAccounts(json)
-          const lastPage = parseInt(link.last.page, 10)
+          const lastPage = parseInt(link?.last?.page, 10)
           setLast(lastPage)
         }
       } catch (err) {
