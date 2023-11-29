@@ -195,6 +195,9 @@ export default function ItemAssignToTray({
         key: cardId,
         isValid: true,
         hasAssignees: false,
+        due_at: null,
+        unlock_at: null,
+        lock_at: null,
         selectedAssigneeIds: [] as string[],
       } as CardSpec,
     ]
