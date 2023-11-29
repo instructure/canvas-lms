@@ -18,7 +18,8 @@
 
 import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {Button, CloseButton} from '@instructure/ui-buttons'
-import {FormFieldGroup} from '@instructure/ui-form-field'
+import {Flex} from '@instructure/ui-flex'
+import {FormField, FormFieldGroup} from '@instructure/ui-form-field'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
 import {Text} from '@instructure/ui-text'
@@ -120,53 +121,73 @@ const ExperienceModal = ({experience, open, onDismiss, onSave}: ExperienceModalP
 
   const renderBodyContents = () => {
     return (
-      <>
-        <View as="div" margin="small 0">
-          <TextInput renderLabel="Title" value={title} onChange={(_e, value) => setTitle(value)} />
+      <View as="div" maxWidth="45rem">
+        <View as="div" margin="0 0 medium 0">
+          <TextInput
+            renderLabel="Title"
+            placeholder="Enter title"
+            value={title}
+            onChange={(_e, value) => setTitle(value)}
+          />
         </View>
-        <View as="div" margin="small 0">
+        <View as="div" margin="0 0 medium 0">
           <TextInput
             renderLabel="Organization name"
+            placeholder="Enter organization name"
             value={where}
             onChange={(_e, value) => setWhere(value)}
           />
         </View>
-        <View as="div" margin="small 0">
-          <textarea id="erxperience_description_text" style={{display: 'none'}} />
-          <CanvasRce
-            ref={rceRef}
-            autosave={false}
-            defaultContent={description}
-            height={300}
-            textareaId="erxperience_description_text"
-            onInit={handleInitRce}
-            onContentChange={handleDescriptionChange}
-          />
+        <View as="div" margin="0 0 small 0">
+          <FormField id="experience_description_label" label="Description">
+            <textarea id="experience_description_text" style={{display: 'none'}} />
+            <div style={{marginTop: '-.75rem'}}>
+              <CanvasRce
+                ref={rceRef}
+                autosave={false}
+                defaultContent={description}
+                height={300}
+                textareaId="erxperience_description_text"
+                onInit={handleInitRce}
+                onContentChange={handleDescriptionChange}
+              />
+            </div>
+          </FormField>
         </View>
-        <View as="div" margin="small 0">
+        <View as="div" margin="0 0 0 0">
           <FormFieldGroup
             description="Time Period"
-            colSpacing="small"
+            colSpacing="medium"
             layout="columns"
             vAlign="top"
           >
-            <CanvasDateInput
-              renderLabel={<Text weight="normal">From</Text>}
-              formatDate={formatDate}
-              interaction="enabled"
-              selectedDate={from_date}
-              onSelectedDateChange={handleSetFromDate}
-            />
-            <CanvasDateInput
-              renderLabel={<Text weight="normal">To</Text>}
-              formatDate={formatDate}
-              interaction="enabled"
-              selectedDate={to_date}
-              onSelectedDateChange={handleSetToDate}
-            />
+            <Flex gap="small">
+              <Flex.Item shouldGrow={true}>
+                <CanvasDateInput
+                  renderLabel={<Text weight="normal">From</Text>}
+                  placeholder="Select"
+                  formatDate={formatDate}
+                  interaction="enabled"
+                  width="20rem"
+                  selectedDate={from_date}
+                  onSelectedDateChange={handleSetFromDate}
+                />
+              </Flex.Item>
+              <Flex.Item shouldGrow={true}>
+                <CanvasDateInput
+                  renderLabel={<Text weight="normal">To</Text>}
+                  placeholder="Select"
+                  formatDate={formatDate}
+                  interaction="enabled"
+                  width="20rem"
+                  selectedDate={to_date}
+                  onSelectedDateChange={handleSetToDate}
+                />
+              </Flex.Item>
+            </Flex>
           </FormFieldGroup>
         </View>
-      </>
+      </View>
     )
   }
 
@@ -187,11 +208,7 @@ const ExperienceModal = ({experience, open, onDismiss, onSave}: ExperienceModalP
         />
         <Heading>{experience ? 'Edit Experience' : 'Add Experience'}</Heading>
       </Modal.Header>
-      <Modal.Body>
-        <View as="div" margin="small 0">
-          {renderBodyContents()}
-        </View>
-      </Modal.Body>
+      <Modal.Body>{renderBodyContents()}</Modal.Body>
       <Modal.Footer>
         <Button color="secondary" onClick={handleDismiss}>
           Cancel
