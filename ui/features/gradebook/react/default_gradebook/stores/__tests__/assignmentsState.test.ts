@@ -30,7 +30,7 @@ describe('Gradebook > DataLoader > GradingPeriodAssignmentsLoader', () => {
 
   beforeEach(() => {
     exampleData = {
-      gradingPeriodAssignments: {1401: ['2301']},
+      gradingPeriodAssignments: {1401: ['2301'], 0: ['119']},
       assignmentGroups: [
         {
           id: '2301',
@@ -87,8 +87,8 @@ describe('Gradebook > DataLoader > GradingPeriodAssignmentsLoader', () => {
       return network.allRequestsReady()
     }
 
-    function loadAssignmentGroups() {
-      const loaded = store.getState().loadAssignmentGroups()
+    function loadAssignmentGroups(selectedGradingPeriodId) {
+      const loaded = store.getState().loadAssignmentGroups(false, selectedGradingPeriodId)
       const requestsReady = network.allRequestsReady()
       return [loaded, requestsReady]
     }
@@ -130,6 +130,16 @@ describe('Gradebook > DataLoader > GradingPeriodAssignmentsLoader', () => {
       await loaded
       await requestsReady
       expect(store.getState().assignmentGroups).toStrictEqual(exampleData.assignmentGroups)
+    })
+
+    test('recently loaded grading period id contains the selected filter grading period ', async () => {
+      const [loaded, requestsReady] = await loadAssignmentGroups('1401')
+      resolveAssignmentGroupRequest()
+      await loaded
+      await requestsReady
+      expect(store.getState().recentlyLoadedAssignmentGroups.gradingPeriodIds).toStrictEqual([
+        '1401',
+      ])
     })
   })
 })
