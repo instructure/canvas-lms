@@ -106,11 +106,22 @@ describe('ContentMigrationForm', () => {
     const [url, response] = fetchMock.lastCall()
     expect(url).toBe('/api/v1/courses/0/content_migrations')
     expect(JSON.parse(response.body)).toStrictEqual({
+      adjust_dates: {
+        enabled: false,
+        operation: 'shift_dates',
+      },
       course_id: '0',
       migration_type: 'course_copy_importer',
       settings: {import_quizzes_next: false, source_course_id: '3'},
       selective_import: false,
-      date_shift_options: false,
+      date_shift_options: {
+        day_substitutions: [],
+        new_end_date: false,
+        new_start_date: false,
+        old_end_date: false,
+        old_start_date: false,
+        substitutions: {},
+      },
     })
   })
 

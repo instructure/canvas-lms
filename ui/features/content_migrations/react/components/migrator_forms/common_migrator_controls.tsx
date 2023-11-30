@@ -26,8 +26,12 @@ import {Checkbox, CheckboxGroup} from '@instructure/ui-checkbox'
 import {Button} from '@instructure/ui-buttons'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {InfoButton} from './info_button'
-import {DateAdjustment} from '../date_adjustment'
-import type {onSubmitMigrationFormCallback} from '../types'
+import {DateAdjustments, remapSubstitutions} from '../date_adjustments'
+import type {
+  onSubmitMigrationFormCallback,
+  DateAdjustmentConfig,
+  submitMigrationFormData,
+} from '../types'
 
 const I18n = useI18nScope('content_migrations_redesign')
 
@@ -101,25 +105,42 @@ export const CommonMigratorControls = ({
   const [selectiveImport, setSelectiveImport] = useState<boolean>(false)
   const [importAsNewQuizzes, setImportAsNewQuizzes] = useState<boolean>(false)
   const [overwriteAssessmentContent, setOverwriteAssessmentContent] = useState<boolean>(false)
-  const [adjustDates, setAdjustDates] = useState<boolean>(false)
+  const [showAdjustDates, setShowAdjustDates] = useState<boolean>(false)
+  const [dateAdjustments, setDateAdjustments] = useState<DateAdjustmentConfig>({
+    adjust_dates: {
+      enabled: false,
+      operation: 'shift_dates',
+    },
+    date_shift_options: {
+      substitutions: {},
+      old_start_date: false,
+      new_start_date: false,
+      old_end_date: false,
+      new_end_date: false,
+      day_substitutions: [],
+    },
+  })
 
   const handleSubmit = useCallback(() => {
-    const data: any = {settings: {}}
+    const data: submitMigrationFormData = {settings: {}} as submitMigrationFormData
     canSelectContent && (data.selective_import = selectiveImport)
-    canAdjustDates && (data.date_shift_options = adjustDates)
+    if (canAdjustDates && dateAdjustments) {
+      dateAdjustments.adjust_dates && (data.adjust_dates = dateAdjustments.adjust_dates)
+      remapSubstitutions(data, dateAdjustments)
+    }
     canImportAsNewQuizzes && (data.settings.import_quizzes_next = importAsNewQuizzes)
     canOverwriteAssessmentContent && (data.settings.overwrite_quizzes = overwriteAssessmentContent)
     onSubmit(data)
   }, [
-    onSubmit,
     canSelectContent,
-    canAdjustDates,
-    canImportAsNewQuizzes,
-    canOverwriteAssessmentContent,
     selectiveImport,
-    adjustDates,
+    canAdjustDates,
+    dateAdjustments,
+    canImportAsNewQuizzes,
     importAsNewQuizzes,
+    canOverwriteAssessmentContent,
     overwriteAssessmentContent,
+    onSubmit,
   ])
 
   const options = useMemo(() => {
@@ -161,12 +182,16 @@ export const CommonMigratorControls = ({
           label={I18n.t('Adjust events and due dates')}
           onChange={(e: React.SyntheticEvent<Element, Event>) => {
             const target = e.target as HTMLInputElement
-            setAdjustDates(target.checked)
+            setShowAdjustDates(target.checked)
+
+            const tmp = JSON.parse(JSON.stringify(dateAdjustments))
+            tmp.adjust_dates.enabled = target.checked ? 1 : 0
+            setDateAdjustments(tmp)
           }}
         />
       )
     return result
-  }, [canImportAsNewQuizzes, canOverwriteAssessmentContent, canAdjustDates])
+  }, [canImportAsNewQuizzes, canOverwriteAssessmentContent, canAdjustDates, dateAdjustments])
 
   return (
     <>
@@ -202,11 +227,16 @@ export const CommonMigratorControls = ({
       )}
 
       {options.length > 0 && (
-        <View as="div" margin="large none none none">
+        <View as="div" margin="medium none none none">
           <CheckboxGroup name={I18n.t('Options')} layout="stacked" description={I18n.t('Options')}>
             {options}
           </CheckboxGroup>
-          {adjustDates ? <DateAdjustment /> : null}
+          {showAdjustDates ? (
+            <DateAdjustments
+              dateAdjustments={dateAdjustments}
+              setDateAdjustments={setDateAdjustments}
+            />
+          ) : null}
         </View>
       )}
 
