@@ -68,7 +68,7 @@ export function EnrollmentTreeItem(props: Props) {
         <Flex alignItems="start" gap="x-small">
           <Flex.Item shouldShrink={true}>
             <Checkbox
-              data-testid={'check ' + props.id}
+              data-testid={'check-' + props.id}
               label={<Text weight="bold">{props.label}</Text>}
               checked={checked}
               onChange={handleCheckboxChange}
@@ -78,7 +78,7 @@ export function EnrollmentTreeItem(props: Props) {
           {props.isMismatch ? (
             <Flex.Item>
               <ToolTipWrapper positionTop={ENROLLMENT_TREE_ICON_OFFSET}>
-                <RoleMismatchToolTip />
+                <RoleMismatchToolTip testId={'tip-' + props.id} />
               </ToolTipWrapper>
             </Flex.Item>
           ) : null}
