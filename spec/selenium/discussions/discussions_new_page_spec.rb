@@ -1040,7 +1040,6 @@ describe "discussions" do
         end
 
         it "creates a discussion topic with an assignment with group overrides" do
-          skip # will fix as part of VICE-3927
           get "/courses/#{course.id}/discussion_topics/new"
 
           title = "Graded Discussion Topic with group overrides"
@@ -1125,7 +1124,6 @@ describe "discussions" do
         end
 
         it "creates a discussion topic with an assignment with section, group, and student overries as part of one" do
-          skip # will fix as part of VICE-3927
           get "/courses/#{course.id}/discussion_topics/new"
 
           title = "Graded Discussion Topic with section, group, and student overries as part of one"
@@ -1187,7 +1185,6 @@ describe "discussions" do
         end
 
         it "creates a discussion topic with an assignment with section, group, and student overries separately" do
-          skip # will fix as part of VICE-3927
           get "/courses/#{course.id}/discussion_topics/new"
 
           title = "Graded Discussion Topic with section, group, and student overries separately"
