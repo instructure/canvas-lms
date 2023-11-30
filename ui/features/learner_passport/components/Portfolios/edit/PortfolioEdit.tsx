@@ -26,7 +26,7 @@ import {IconDragHandleLine, IconReviewScreenLine, IconSaveLine} from '@instructu
 import {View} from '@instructure/ui-view'
 
 import PersonalInfo from './personal_info/PersonalInfo'
-import AchievementsEdit from './achievements/AchievementsEdit'
+import AchievementsEditToggle from './achievements/AchievementsEdit'
 import EducationEdit from './education/EducationEdit'
 import ExperienceEdit from './experience/ExperienceEdit'
 import ProjectsEdit from './ProjectsEdit'
@@ -139,7 +139,7 @@ const PortfolioEdit = () => {
             </View>
             <View margin="0 medium" borderWidth="small">
               <input type="hidden" name="achievements" value={achievementIds.join(',')} />
-              <AchievementsEdit
+              <AchievementsEditToggle
                 allAchievements={allAchievements}
                 selectedAchievementIds={achievementIds}
                 onChange={handleNewAchievements}

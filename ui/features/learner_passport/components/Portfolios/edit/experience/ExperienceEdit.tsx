@@ -118,9 +118,14 @@ const ExperienceEdit = ({experience, onChange}: ExperienceEditProps) => {
     [newExperience, onChange]
   )
 
+  const handleDismissExperienceModal = useCallback(() => {
+    setExperienceModalOpen(false)
+    setEditingExperience(null)
+  }, [])
+
   const handleSaveExperience = useCallback(
     changedExperience => {
-      setExperienceModalOpen(false)
+      handleDismissExperienceModal()
       const index = newExperience.findIndex(exp => exp.id === changedExperience.id)
       if (index === -1) {
         const newExperienceList = [...newExperience, changedExperience]
@@ -133,7 +138,7 @@ const ExperienceEdit = ({experience, onChange}: ExperienceEditProps) => {
         onChange(newExperienceList)
       }
     },
-    [newExperience, onChange]
+    [handleDismissExperienceModal, newExperience, onChange]
   )
 
   const handleAddExperience = useCallback(() => {
@@ -180,7 +185,7 @@ const ExperienceEdit = ({experience, onChange}: ExperienceEditProps) => {
       <ExperienceModal
         experience={editingExperience}
         open={experienceModalOpen}
-        onDismiss={() => setExperienceModalOpen(false)}
+        onDismiss={handleDismissExperienceModal}
         onSave={handleSaveExperience}
       />
     </ToggleDetails>

@@ -22,26 +22,18 @@ import {Button, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Img} from '@instructure/ui-img'
-import {
-  IconAddLine,
-  IconEditLine,
-  IconLinkLine,
-  IconSearchLine,
-  IconTrashLine,
-} from '@instructure/ui-icons'
+import {IconAddLine, IconEditLine, IconSearchLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {View} from '@instructure/ui-view'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextArea} from '@instructure/ui-text-area'
 import {TextInput} from '@instructure/ui-text-input'
 import type {ViewProps} from '@instructure/ui-view'
-import {uid} from '@instructure/uid'
 
-import SkillSelect from './SkillSelect'
-import CoverImageModal from './CoverImageModal'
+import SkillSelect from '../../../shared/SkillSelect'
+import CoverImageModal from '../../../shared/CoverImageModal'
 import type {PortfolioDetailData, SkillData} from '../../../types'
-import {stringToId} from '../../../shared/utils'
+import {renderEditLink, stringToId} from '../../../shared/utils'
 
 type PersonalInfoProps = {
   portfolio: PortfolioDetailData
@@ -98,32 +90,6 @@ const PersonalInfo = ({portfolio}: PersonalInfoProps) => {
     setHeroImageUrl(imageUrl)
     setEditCoverImageModalOpen(false)
   }, [])
-
-  const renderEditLink = (link: string) => {
-    const id = stringToId(link) || uid('link', 2)
-    return (
-      <Flex as="div" gap="small" key={id}>
-        <TextInput
-          id={id}
-          name="links[]"
-          renderLabel={<ScreenReaderContent>Link</ScreenReaderContent>}
-          renderBeforeInput={IconLinkLine}
-          display="inline-block"
-          width="30rem"
-          defaultValue={link}
-          onBlur={handleEditLink}
-        />
-        <IconButton
-          screenReaderLabel="delete link"
-          size="small"
-          data-linkid={id}
-          onClick={handleDeleteLink}
-        >
-          <IconTrashLine />
-        </IconButton>
-      </Flex>
-    )
-  }
 
   return (
     <>
@@ -238,7 +204,8 @@ const PersonalInfo = ({portfolio}: PersonalInfoProps) => {
           <View as="div" margin="medium 0 0 0">
             <input type="hidden" name="skills" value={JSON.stringify(skills)} />
             <SkillSelect
-              portfolioSkills={skills}
+              label="Skills"
+              objectSkills={skills}
               selectedSkillIds={skills.map(s => stringToId(s.name))}
               onSelect={handleSelectSkills}
             />
@@ -252,7 +219,7 @@ const PersonalInfo = ({portfolio}: PersonalInfoProps) => {
               publications
             </Text>
             <Flex as="div" direction="column" gap="small" margin="0 0 small 0">
-              {links.map((link: string) => renderEditLink(link))}
+              {links.map((link: string) => renderEditLink(link, handleEditLink, handleDeleteLink))}
             </Flex>
             <Button renderIcon={IconAddLine} onClick={handleAddLink}>
               Add a Link

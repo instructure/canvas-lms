@@ -17,7 +17,7 @@
  */
 
 import ProjectDashboard from './ProjectDashboard'
-import ProjectEdit from './ProjectEdit'
+import ProjectEdit from './edit/ProjectEdit'
 import ProjectLayout from './ProjectLayout'
 import ProjectView from './ProjectView'
 

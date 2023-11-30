@@ -96,13 +96,8 @@ const AchievementsEdit = ({
   selectedAchievementIds,
   onChange,
 }: AchievementsEditProps) => {
-  const [expanded, setExpanded] = useState(true)
   const [addAchievementsModalOpen, setAddAchievementsModalOpen] = useState(false)
   const [newSelectedAchievementIds, setNewSelectedAchievementIds] = useState(selectedAchievementIds)
-
-  const handleToggle = useCallback((_event: React.MouseEvent, toggleExpanded: boolean) => {
-    setExpanded(toggleExpanded)
-  }, [])
 
   const handleAddAchievementClick = useCallback(() => {
     setAddAchievementsModalOpen(true)
@@ -144,6 +139,42 @@ const AchievementsEdit = ({
   }
 
   return (
+    <>
+      <View as="div" margin="medium 0 large 0">
+        <View as="div">
+          <Text size="small">
+            Add verified badges, degrees, certificates, and awards from your achievements
+          </Text>
+        </View>
+        <View as="div" margin="medium 0 0 0">
+          <Button renderIcon={IconAddLine} onClick={handleAddAchievementClick}>
+            Add achievements
+          </Button>
+        </View>
+        <Flex as="div" margin="medium 0 0 0" gap="medium" wrap="wrap">
+          {newSelectedAchievementIds.length > 0 ? renderAchievements() : null}
+        </Flex>
+      </View>
+      <AddAchievementsModal
+        achievements={allAchievements.filter(
+          achievement => !newSelectedAchievementIds.includes(achievement.id)
+        )}
+        open={addAchievementsModalOpen}
+        onDismiss={handleDismissAddAchievementModal}
+        onSave={handleAddAchievementsClick}
+      />
+    </>
+  )
+}
+
+const AchievementsEditToggle = (props: AchievementsEditProps) => {
+  const [expanded, setExpanded] = useState(true)
+
+  const handleToggle = useCallback((_event: React.MouseEvent, toggleExpanded: boolean) => {
+    setExpanded(toggleExpanded)
+  }, [])
+
+  return (
     <ToggleDetails
       summary={
         <View as="div" margin="small 0">
@@ -156,34 +187,10 @@ const AchievementsEdit = ({
       expanded={expanded}
       onToggle={handleToggle}
     >
-      <>
-        <View as="div" margin="medium 0 large 0">
-          <View as="div">
-            <Text size="small">
-              Add verified badges, degrees, certificates, and awards from your achievements
-            </Text>
-          </View>
-          <View as="div" margin="medium 0 0 0">
-            <Button renderIcon={IconAddLine} onClick={handleAddAchievementClick}>
-              Add achievements
-            </Button>
-          </View>
-          <Flex as="div" margin="medium 0 0 0" gap="medium" wrap="wrap">
-            {newSelectedAchievementIds.length > 0 ? renderAchievements() : null}
-          </Flex>
-        </View>
-        <AddAchievementsModal
-          achievements={allAchievements.filter(
-            achievement => !newSelectedAchievementIds.includes(achievement.id)
-          )}
-          open={addAchievementsModalOpen}
-          onDismiss={handleDismissAddAchievementModal}
-          onSave={handleAddAchievementsClick}
-        />
-      </>
+      <AchievementsEdit {...props} />
     </ToggleDetails>
   )
 }
 
-export default AchievementsEdit
-export {AchievementEditCard}
+export default AchievementsEditToggle
+export {AchievementEditCard, AchievementsEdit}

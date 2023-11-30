@@ -25,58 +25,18 @@ import {Heading} from '@instructure/ui-heading'
 import {
   IconDownloadLine,
   IconEditLine,
-  IconLinkLine,
   IconPrinterLine,
   IconReviewScreenLine,
   IconShareLine,
-  IconMsWordLine,
-  IconPdfLine,
-  IconImageLine,
 } from '@instructure/ui-icons'
-import {SVGIcon} from '@instructure/ui-svg-images'
 import {Img} from '@instructure/ui-img'
 import {List} from '@instructure/ui-list'
-import {Link} from '@instructure/ui-link'
-import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import type {ViewProps} from '@instructure/ui-view'
-import type {AchievementData, AttachmentData, ProjectDetailData, SkillData} from '../types'
-import AchievementCard from '../Achievements/AchievementCard'
+import AttachmentsTable from './AttachmentsTable'
+import type {AchievementData, ProjectDetailData, SkillData} from '../types'
 import {renderSkillTag} from '../shared/SkillTag'
-import {isUrlToLocalCanvasFile} from '../shared/utils'
-
-function renderFileTypeIcon(contentType: string) {
-  if (contentType === 'application/pdf') return <IconPdfLine />
-  if (contentType === 'application/msword') return <IconMsWordLine />
-  if (contentType.startsWith('image/')) return <IconImageLine />
-  return (
-    <SVGIcon src='<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="1rem" height="1rem"> </svg>' />
-  )
-}
-
-function renderLink(link: string) {
-  return (
-    <List.Item key={link.replace(/\W+/, '-')}>
-      <Link href={link} renderIcon={<IconLinkLine color="primary" size="x-small" />}>
-        {link}
-      </Link>
-    </List.Item>
-  )
-}
-
-function renderAchievement(achievement: AchievementData) {
-  return (
-    <View as="div" shadow="resting">
-      <AchievementCard
-        isNew={achievement.isNew}
-        title={achievement.title}
-        issuer={achievement.issuer.name}
-        imageUrl={achievement.imageUrl}
-      />
-    </View>
-  )
-}
+import {renderAchievement, renderLink} from '../shared/utils'
 
 const ProjectView = () => {
   const navigate = useNavigate()
@@ -87,28 +47,6 @@ const ProjectView = () => {
   const handleEditClick = useCallback(() => {
     navigate(`../edit/${project.id}`)
   }, [navigate, project.id])
-
-  const handleDownloadAttachment = useCallback(
-    (event: React.KeyboardEvent<ViewProps> | React.MouseEvent<ViewProps>) => {
-      const attachmentId = (event.target as HTMLButtonElement).getAttribute('data-attachmentId')
-      if (!attachmentId) return
-      const thisAttachment = project.attachments.find(attachment => attachment.id === attachmentId)
-      if (!thisAttachment) return
-
-      let href = thisAttachment.url
-      if (isUrlToLocalCanvasFile(thisAttachment.url)) {
-        const url = new URL(thisAttachment.url)
-        url.searchParams.set('download', '1')
-        href = url.href
-      }
-
-      const link = document.createElement('a')
-      link.setAttribute('dowload', thisAttachment.filename)
-      link.href = href
-      link.click()
-    },
-    [project.attachments]
-  )
 
   return (
     <View as="div" id="foo" maxWidth="986px" margin="0 auto">
@@ -176,49 +114,7 @@ const ProjectView = () => {
           <Heading level="h3" themeOverride={{h3FontSize: '1rem'}}>
             Attachments
           </Heading>
-          <Table caption="attachments" layout="auto">
-            <Table.Head>
-              <Table.Row>
-                <Table.ColHeader id="fliename">File name</Table.ColHeader>
-                <Table.ColHeader id="size" width="10rem">
-                  Size
-                </Table.ColHeader>
-                <Table.ColHeader id="action" width="10rem">
-                  Action
-                </Table.ColHeader>
-              </Table.Row>
-            </Table.Head>
-            <Table.Body>
-              {project.attachments.map((attachment: AttachmentData) => {
-                return (
-                  <Table.Row key={attachment.id}>
-                    <Table.Cell>
-                      <Flex gap="small">
-                        <Flex.Item shouldGrow={false}>
-                          {renderFileTypeIcon(attachment.contentType)}
-                        </Flex.Item>
-                        <Flex.Item shouldGrow={true}>
-                          <a href={attachment.url} target={attachment.filename}>
-                            {attachment.filename}
-                          </a>
-                        </Flex.Item>
-                      </Flex>
-                    </Table.Cell>
-                    <Table.Cell>{attachment.size}</Table.Cell>
-                    <Table.Cell>
-                      <Button
-                        renderIcon={IconDownloadLine}
-                        data-attachmentId={attachment.id}
-                        onClick={handleDownloadAttachment}
-                      >
-                        Download
-                      </Button>
-                    </Table.Cell>
-                  </Table.Row>
-                )
-              })}
-            </Table.Body>
-          </Table>
+          <AttachmentsTable attachments={project.attachments} />
         </View>
       )}
       {project.links.length > 0 && (
