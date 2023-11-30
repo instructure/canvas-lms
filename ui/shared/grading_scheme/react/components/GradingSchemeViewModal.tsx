@@ -46,13 +46,7 @@ const GradingSchemeViewModal = ({
     return <></>
   }
   return (
-    <Modal
-      as="form"
-      open={open}
-      onDismiss={handleClose}
-      label={I18n.t('Edit Grading Scheme')}
-      size="small"
-    >
+    <Modal as="form" open={open} onDismiss={handleClose} label={gradingScheme.title} size="small">
       <Modal.Header>
         <CloseButton
           screenReaderLabel={I18n.t('Close')}
