@@ -45,12 +45,14 @@ const portalRouter = createBrowserRouter(
 
       {accountGradingSettingsRoutes}
 
-      {(window.ENV.FEATURES.instui_nav || localStorage.instui_nav_dev) && (
-        <Route
-          path="/accounts/:accountId/*"
-          lazy={() => import('../../features/navigation_header/react/NavigationHeaderRoute')}
-        />
-      )}
+      {(window.ENV.FEATURES.instui_nav || localStorage.instui_nav_dev) &&
+        ['/', '/accounts/*', '/calendar/*', '/courses/*', '/conversations/*'].map(path => (
+          <Route
+            key={`key-to-${path}`}
+            path={path}
+            lazy={() => import('../../features/navigation_header/react/NavigationHeaderRoute')}
+          />
+        ))}
 
       {window.ENV.FEATURES.enhanced_rubrics && RubricRoutes}
 
