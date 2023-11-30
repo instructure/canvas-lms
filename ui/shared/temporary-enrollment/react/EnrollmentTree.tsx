@@ -22,6 +22,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import type {Course, Enrollment, NodeStructure, Role, RoleChoice, Section} from './types'
 import {Flex} from '@instructure/ui-flex'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import cloneDeep from 'lodash/cloneDeep'
 
 const I18n = useI18nScope('temporary_enrollment')
 
@@ -74,34 +75,28 @@ export function EnrollmentTree(props: Props) {
   }, [props.createEnroll])
 
   useEffect(() => {
-    if (!loading) {
-      if (props.selectedRole.name !== '') {
-        for (const roles in tree) {
-          if (tree[roles].label.toLowerCase() === props.selectedRole.name.toLowerCase()) {
-            tree[roles].isToggle = true
-
-            // set mismatch for all sections and courses with role
-            for (const course of tree[roles].children) {
-              course.isMismatch = false
-
-              for (const section of course.children) {
-                section.isMismatch = false
-              }
-            }
-          } else {
-            for (const course of tree[roles].children) {
-              course.isMismatch = course.isCheck
-
-              for (const section of course.children) {
-                section.isMismatch = section.isCheck
-              }
-            }
-          }
-        }
-      }
+    if (loading) return
+    // update `isMismatch` of a course based on the `isCheck` status of its sections
+    const updateCourseMismatch = (course: NodeStructure) => {
+      course.isMismatch = course.children.some(section => section.isCheck)
     }
-
-    setTree([...tree])
+    // use a deep copy of `tree` to avoid direct state mutation and ensure proper React state updates
+    const treeCopy = cloneDeep(tree)
+    treeCopy.forEach((role: NodeStructure) => {
+      if (role.label.toLowerCase() === props.selectedRole.name.toLowerCase()) {
+        role.isToggle = true
+        role.children.forEach((course: NodeStructure) => {
+          course.isMismatch = false
+          course.children.forEach(section => (section.isMismatch = false))
+        })
+      } else {
+        role.children.forEach((course: NodeStructure) => {
+          course.children.forEach(section => (section.isMismatch = section.isCheck))
+          updateCourseMismatch(course)
+        })
+      }
+    })
+    setTree(treeCopy)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.selectedRole.name, loading])
 
