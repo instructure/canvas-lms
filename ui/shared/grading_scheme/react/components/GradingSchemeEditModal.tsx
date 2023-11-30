@@ -63,7 +63,7 @@ const GradingSchemeEditModal = ({
       as="form"
       open={open}
       onDismiss={() => handleCancelEdit(gradingScheme.id)}
-      label={gradingScheme.title}
+      label={I18n.t('Edit Grading Scheme')}
       size="small"
     >
       <Modal.Header>

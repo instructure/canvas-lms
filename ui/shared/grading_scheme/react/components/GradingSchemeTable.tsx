@@ -39,6 +39,7 @@ type Props = {
   gradingSchemeCards: GradingSchemeCardData[]
   editGradingScheme: (gradingSchemeId: string) => void
   openGradingScheme: (gradingScheme: GradingScheme) => void
+  viewUsedLocations: (gradingScheme: GradingScheme) => void
   handleGradingSchemeDelete: (gradingSchemeId: string) => void
   defaultScheme?: boolean
 }
@@ -47,6 +48,7 @@ export const GradingSchemeTable = ({
   gradingSchemeCards,
   editGradingScheme,
   openGradingScheme,
+  viewUsedLocations,
   handleGradingSchemeDelete,
   defaultScheme = false,
 }: Props) => {
@@ -116,7 +118,17 @@ export const GradingSchemeTable = ({
                     </Link>
                   </Table.Cell>
                   <Table.Cell key="locationsUsed">
-                    {gradingSchemeCard.gradingScheme.used_locations ?? ''}
+                    {gradingSchemeCard.gradingScheme.used_locations ? (
+                      <Link
+                        isWithinText={false}
+                        onClick={() => viewUsedLocations(gradingSchemeCard.gradingScheme)}
+                      >
+                        {' '}
+                        {I18n.t('Show courses and assignments')}
+                      </Link>
+                    ) : (
+                      ''
+                    )}
                   </Table.Cell>
                   <Table.Cell key="actions" textAlign="end">
                     <IconButton
