@@ -44,18 +44,38 @@ describe SubmissionsController do
       expect(assigns[:submission].url).to eql("http://url")
     end
 
-    it "gracefully handles a submission not yet existing for an assigned student" do
-      course_with_student_logged_in(active_all: true)
+    it "creates a submission if a submission does not yet exist for an assigned student" do
+      course_with_student(active_all: true)
+      course_with_teacher_logged_in(course: @course, active_all: true)
       @course.account.enable_service(:avatars)
       @assignment = @course.assignments.create!(title: "some assignment", submission_types: "online_url,online_upload")
-      Submission.find_by(assignment: @assignment, user: @student).destroy
+      # This simulates a scenario where the SubmissionLifecyleManager job to create submissions for assigned students has
+      # not yet completed.
+      @assignment.submissions.find_by(user: @student).destroy
       post "create", params: {
         course_id: @course.id,
         assignment_id: @assignment.id,
         submission: { submission_type: "online_url", url: "url", user_id: @student.id }
       }
 
-      expect(response).to be_successful
+      aggregate_failures do
+        expect(response).to be_redirect
+        expect(@assignment.submissions.where(user: @student).exists?).to be true
+      end
+    end
+
+    it "returns unauthorized if the student is not assigned" do
+      course_with_student(active_all: true)
+      course_with_teacher_logged_in(course: @course, active_all: true)
+      @course.account.enable_service(:avatars)
+      @assignment = @course.assignments.create!(title: "some assignment", submission_types: "online_url,online_upload", only_visible_to_overrides: true)
+      post "create", params: {
+        course_id: @course.id,
+        assignment_id: @assignment.id,
+        submission: { submission_type: "online_url", url: "url", user_id: @student.id }
+      }
+
+      expect(response).to be_unauthorized
     end
 
     it "only emits one live event" do
