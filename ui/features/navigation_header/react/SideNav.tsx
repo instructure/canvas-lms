@@ -81,6 +81,7 @@ const SideNav = () => {
   const avatarRef = useRef<Element | null>(null)
   const canvasLogo = useRef<Element | null>(null)
   const brandLogo = useRef<Element | null>(null)
+  const logoRef = useRef<Element | null>(null)
 
   if (avatarRef.current instanceof HTMLElement)
     avatarRef.current.setAttribute('user-avatar', 'true')
@@ -88,13 +89,12 @@ const SideNav = () => {
   if (canvasLogo.current instanceof HTMLElement)
     canvasLogo.current.setAttribute('canvas-logo', 'true')
 
-  if (dashboardRef.current instanceof HTMLElement)
-    dashboardRef.current.setAttribute('dashboard-tray', 'true')
-
-  if (coursesRef.current instanceof HTMLElement)
-    coursesRef.current.setAttribute('courses-tray', 'true')
-
   if (brandLogo.current instanceof HTMLElement) brandLogo.current.setAttribute('brand-logo', 'true')
+
+  if (logoRef.current instanceof HTMLElement) logoRef.current.setAttribute('logo-tray', 'true')
+
+  if (accountRef.current instanceof HTMLElement)
+    accountRef.current.setAttribute('account-tray', 'true')
 
   // after tray is closed, eventually set activeTray to null
   // we don't do this immediately in order to maintain animation of closing tray
@@ -275,9 +275,16 @@ const SideNav = () => {
     >
       <style>{`
         .sidenav-container a {
-          padding: ${!collapseGlobalNav ? '0.4735rem' : '0.4375rem'} 0;
+          padding: 0.4735rem 0 !important;
           font-weight: 400;
           transition: background-color 0.3s;
+
+          ${
+            !collapseGlobalNav
+              ? `width: auto !important;
+          height: 63.55px !important;`
+              : ''
+          }
         }
         .sidenav-container a:hover {
           text-decoration: inherit;
@@ -287,14 +294,10 @@ const SideNav = () => {
         .sidenav-container a > div:first-child {
           display: flex;
           justify-content: center;
-        }
-        .sidenav-container a > div:nth-child(2) {
-          margin: 3px 0 0;
-        }
-        .sidenav-container a[data-selected="true"] > div:first-child {
+
           > svg {
-            width: ${!collapseGlobalNav ? '1.75rem' : '1.75rem'} !important;
-            height: ${!collapseGlobalNav ? '1.75rem' : '1.75rem'} !important;
+            width: 1.625rem !important;
+            height: 1.625rem !important;
           }
         }
         .sidenav-container a[data-selected="true"]:hover {
@@ -307,8 +310,8 @@ const SideNav = () => {
       } 0;
         }
         .sidenav-container div[canvas-logo="true"] > svg {
-          width: ${!collapseGlobalNav ? '2.63rem' : '1.695rem'} !important;
-          height: ${!collapseGlobalNav ? '2.63rem' : '1.695rem'} !important;
+            width: ${!collapseGlobalNav ? '2.63rem' : '1.695rem'} !important;
+            height: ${!collapseGlobalNav ? '2.63rem' : '1.695rem'} !important;
         }
         .sidenav-container div[brand-logo="true"] {
           margin: ${!collapseGlobalNav ? '-0.4rem' : '0.275rem'} 0 ${
@@ -320,6 +323,17 @@ const SideNav = () => {
           height: ${!collapseGlobalNav ? '2.25rem' : '1.875rem'};
           border: 2px solid var(--ic-brand-global-nav-avatar-border) !important;
         }
+        ${
+          !collapseGlobalNav
+            ? `
+        .sidenav-container a[logo-tray="true"] {
+          height: 85px !important;
+        }
+        .sidenav-container a[account-tray="true"] {
+          height: 72.59px !important;
+        }`
+            : ''
+        }
         .sidenav-container div[collapse-div="true"] {
           display: flex;
           align-items: end;
@@ -330,22 +344,6 @@ const SideNav = () => {
         .sidenav-container button[collapse-button="true"] {
           width: 100%;
           padding: 0.75rem !important;
-        }
-
-        .sidenav-container a[dashboard-tray="true"] > div:first-child {
-          > svg {
-            width: ${!collapseGlobalNav ? '1.605rem' : '1.25rem'} !important;
-            height: ${!collapseGlobalNav ? '1.605rem' : '1.25rem'} !important;
-            margin-bottom: -5px !important;
-          }
-        }
-
-        .sidenav-container a[courses-tray="true"] > div:first-child {
-          > svg {
-            width: ${!collapseGlobalNav ? '1.495rem' : '1.25rem'} !important;
-            height: ${!collapseGlobalNav ? '1.495rem' : '1.25rem'} !important;
-            margin-bottom: -1px !important;
-          }
         }
       `}</style>
       <SideNavBar
@@ -361,6 +359,7 @@ const SideNav = () => {
         }}
       >
         <SideNavBar.Item
+          elementRef={el => (logoRef.current = el)}
           icon={
             !logoUrl ? (
               <div ref={el => (canvasLogo.current = el)}>

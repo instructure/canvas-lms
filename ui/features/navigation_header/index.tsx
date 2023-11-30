@@ -20,6 +20,7 @@ import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import ReactDOM from 'react-dom'
+import SideNav from './react/SideNav'
 import Navigation from './react/OldSideNav'
 import MobileNavigation from './react/MobileNavigation'
 import ready from '@instructure/ready'
@@ -72,7 +73,7 @@ ready(() => {
     const mobileContextNavContainer = document.getElementById('mobileContextNavContainer')
     ReactDOM.render(
       <QueryProvider>
-        <Navigation />
+        <SideNav />
       </QueryProvider>,
       mobileContextNavContainer,
       () => {

@@ -39,10 +39,12 @@ $ic-tooltip-arrow-size: 0.375rem;
 @include desktop-only {
   .tray-with-space-for-global-nav {
     margin-#{direction(left)}: $ic-header-primary-width - 30;
+
     body.primary-nav-expanded & {
       margin-#{direction(left)}: $ic-header-primary-width;
     }
   }
+
   .navigation-tray-container {
     min-height: 100vh;
   }
@@ -86,11 +88,17 @@ $ic-tooltip-arrow-size: 0.375rem;
 .ic-app-header__menu-list-item {
   box-sizing: border-box;
 
+  svg {
+    width: 1.625rem !important;
+    height: 1.625rem !important;
+  }
+
   &.ic-app-header__menu-list-item--active {
     .ic-app-header__menu-list-link {
       background: $ic-color-light;
 
       body:not(.primary-nav-expanded) & {
+
         &:hover,
         &:focus {
           .menu-item__text {
@@ -101,24 +109,30 @@ $ic-tooltip-arrow-size: 0.375rem;
           }
         }
       }
+
       &:focus {
         box-shadow: inset 0 0 0 1px var(--ic-brand-global-nav-bgd),
           inset 0 0 0 2px var(--ic-brand-global-nav-menu-item__text-color--active);
       }
     }
+
     .ic-icon-svg {
       fill: var(--ic-brand-global-nav-ic-icon-svg-fill--active);
     }
+
     .menu-item__badge {
       background: var(--ic-brand-global-nav-menu-item__badge-bgd--active);
       color: var(--ic-brand-global-nav-menu-item__badge-text--active);
     }
+
     .ic-avatar {
       border-color: $ic-border-light;
+
       &.ic-avatar--fake-student {
         border-color: $ic-masquerade-color;
       }
     }
+
     .menu-item-icon-container {
       color: var(--ic-brand-global-nav-ic-icon-svg-fill--active);
     }
@@ -136,6 +150,7 @@ $ic-tooltip-arrow-size: 0.375rem;
 
   &:not(.ic-app-header__menu-list-link--nav-toggle) {
     padding: 0.25rem 0;
+
     @media only screen and (min-height: 400px) {
       padding: 0.4375rem 0;
     }
@@ -154,16 +169,20 @@ $ic-tooltip-arrow-size: 0.375rem;
   &:hover,
   &:focus {
     background-color: $ic-global-nav-link-hover;
-    @if $use_high_contrast == false {
+
+    @if $use_high_contrast ==false {
       text-decoration: none;
       outline: none;
     }
+
     .ic-avatar {
       border-color: var(--ic-brand-global-nav-avatar-border);
+
       &.ic-avatar--fake-student {
         border-color: $ic-masquerade-color;
       }
     }
+
     .menu-item__text {
       transform: translate3d($ic-tooltip-arrow-size, 0, 0);
       opacity: 1;
@@ -203,6 +222,7 @@ button.ic-app-header__menu-list-link {
   box-sizing: border-box;
   display: inline-block;
   vertical-align: middle;
+
   &.ic-avatar--fake-student {
     border-color: $ic-masquerade-color;
   }
@@ -299,12 +319,14 @@ button.ic-app-header__menu-list-link {
   body.primary-nav-expanded & {
     height: 85px;
   }
+
   &:focus {
     outline-style: none;
     box-shadow: inset 0 0 0 1px var(--ic-brand-global-nav-bgd),
       inset 0 0 0 2px var(--ic-brand-global-nav-menu-item__text-color);
   }
 }
+
 // set to block to avoid any exta inline spacing at bottom
 .ic-app-header__uploaded-logo {
   display: block;
@@ -334,7 +356,9 @@ body.primary-nav-expanded {
     .menu-item__text {
       @if $use_high_contrast {
         color: var(--ic-link-color);
-      } @else {
+      }
+
+      @else {
         color: var(--ic-brand-global-nav-menu-item__text-color--active);
       }
     }
@@ -408,15 +432,18 @@ body.primary-nav-expanded {
   align-items: center;
   z-index: 100;
   background-color: var(--ic-brand-global-nav-bgd);
+
   * {
     color: var(--ic-brand-global-nav-menu-item__text-color);
   }
 }
+
 #mobileContextNavContainer {
   overflow: hidden;
   // we transition max-height instead of height because otherwise we'd have to give it an explicit height and not "auto"
   transition: max-height 1.5s ease-out;
   max-height: 0px;
+
   &[aria-expanded='true'] {
     max-height: 3000px;
     margin-bottom: 50px;
@@ -425,29 +452,35 @@ body.primary-nav-expanded {
 }
 
 @include desktop-only {
+
   #mobile-header,
   #mobileContextNavContainer {
     display: none;
   }
 }
+
 .mobile-header-title {
   text-align: center;
   display: block;
   flex-grow: 1;
 }
+
 .mobile-header-hamburger,
 .mobile-header-student-view,
 .mobile-header-arrow,
 .mobile-header-title,
-.mobile-header-space{
+.mobile-header-space {
   padding: $ic-sp * 1.3;
 }
+
 .mobile-header-student-view {
   padding-#{direction('right')}: $ic-sp * 0.65;
 }
+
 .mobile-header-arrow {
   padding-#{direction('left')}: $ic-sp * 0.65;
 }
+
 .ic-brand-mobile-global-nav-logo {
   height: 48px;
   display: block;
@@ -465,6 +498,7 @@ body.primary-nav-expanded {
     max-width: 515px;
     width: calc(100vw - 20px);
   }
+
   .tour-star-image {
     max-width: 120px;
     padding: 1rem 0;
