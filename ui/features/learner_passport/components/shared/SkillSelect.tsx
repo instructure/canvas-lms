@@ -21,20 +21,29 @@ import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {Alert} from '@instructure/ui-alerts'
 import {IconAddLine} from '@instructure/ui-icons'
 import {Select} from '@instructure/ui-select'
+import {Text} from '@instructure/ui-text'
 import useFetchApi from '@canvas/use-fetch-api-hook'
-import type {SkillData} from '../../../types'
-import {stringToId} from '../../../shared/utils'
-import AddSkillModal from './AddSkillModal'
-import SkillTag from '../../../shared/SkillTag'
+import type {SkillData} from '../types'
+import {stringToId} from './utils'
+import AddSkillModal from '../Portfolios/edit/personal_info/AddSkillModal'
+import SkillTag from './SkillTag'
 
 interface SkillSelectProps {
-  portfolioSkills: SkillData[]
+  label: string
+  subLabel?: string
+  objectSkills: SkillData[]
   selectedSkillIds: string[]
   onSelect: (skills: SkillData[]) => void
 }
 
 // this is a tweaked copy of the multi-select example from the instui Select docs
-const SkillSelect = ({portfolioSkills, selectedSkillIds, onSelect}: SkillSelectProps) => {
+const SkillSelect = ({
+  label,
+  subLabel,
+  objectSkills,
+  selectedSkillIds,
+  onSelect,
+}: SkillSelectProps) => {
   const [options, setOptions] = useState([])
   const [inputValue, setInputValue] = useState('')
   const [isShowingOptions, setIsShowingOptions] = useState(false)
@@ -57,7 +66,7 @@ const SkillSelect = ({portfolioSkills, selectedSkillIds, onSelect}: SkillSelectP
           skill,
         }))
         // add portfolio skills to options
-        portfolioSkills.forEach(skill => {
+        objectSkills.forEach(skill => {
           const id = stringToId(skill.name)
           if (!opts.find(opt => opt.id === id)) {
             opts.push({id, label: skill.name, skill})
@@ -310,7 +319,16 @@ const SkillSelect = ({portfolioSkills, selectedSkillIds, onSelect}: SkillSelectP
   return (
     <div>
       <Select
-        renderLabel="Skills"
+        renderLabel={
+          <div>
+            <Text as="div" weight="bold" lineHeight="double">
+              {label}
+            </Text>
+            <Text as="div" weight="normal">
+              {subLabel}
+            </Text>
+          </div>
+        }
         assistiveText="Type or use arrow keys to navigate options. Multiple selections allowed."
         inputValue={inputValue}
         isShowingOptions={isShowingOptions}

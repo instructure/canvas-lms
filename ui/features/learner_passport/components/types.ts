@@ -108,3 +108,8 @@ export interface ProjectDetailData extends ProjectData {
   links: string[]
   achievements: AchievementData[]
 }
+
+export interface ProjectEditData {
+  project: ProjectDetailData
+  achievements: AchievementData[]
+}

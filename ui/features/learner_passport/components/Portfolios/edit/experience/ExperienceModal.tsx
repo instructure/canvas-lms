@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useRef, useState} from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
-import {FormField, FormFieldGroup} from '@instructure/ui-form-field'
+import {FormFieldGroup} from '@instructure/ui-form-field'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
 import {Text} from '@instructure/ui-text'
@@ -30,7 +30,8 @@ import {uid} from '@instructure/uid'
 import type {ExperienceData} from '../../../types'
 import {formatDate} from '../../../shared/utils'
 import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
-import CanvasRce from '@canvas/rce/react/CanvasRce'
+// import CanvasRce from '@canvas/rce/react/CanvasRce'
+import RichTextEdit from '../../../shared/RichTextEdit'
 
 interface ExperienceModalProps {
   experience: ExperienceData | null
@@ -46,8 +47,15 @@ const ExperienceModal = ({experience, open, onDismiss, onSave}: ExperienceModalP
   const [from_date, setFromDate] = useState(experience?.from_date ?? '')
   const [to_date, setToDate] = useState(experience?.to_date ?? '')
   const [description, setDescription] = useState(experience?.description ?? '')
-  const [tinymce, setTinymce] = useState(null)
-  const rceRef = useRef(null)
+
+  const clear = () => {
+    setId(uid('edu', 2))
+    setWhere('')
+    setTitle('')
+    setFromDate('')
+    setToDate('')
+    setDescription('')
+  }
 
   useEffect(() => {
     if (experience) {
@@ -57,17 +65,10 @@ const ExperienceModal = ({experience, open, onDismiss, onSave}: ExperienceModalP
       setFromDate(experience.from_date)
       setToDate(experience.to_date)
       setDescription(experience.description.trim())
-      // @ts-expect-error
-      tinymce?.setContent(experience.description.trim())
     } else {
-      setId(uid('edu', 2))
-      setWhere('')
-      setTitle('')
-      setFromDate('')
-      setToDate('')
-      setDescription('')
+      clear()
     }
-  }, [experience, tinymce])
+  }, [experience])
 
   const isValid = useCallback(() => {
     return title?.trim() && where?.trim() && from_date && to_date
@@ -111,10 +112,6 @@ const ExperienceModal = ({experience, open, onDismiss, onSave}: ExperienceModalP
     []
   )
 
-  const handleInitRce = useCallback((tinyeditor: any) => {
-    setTinymce(tinyeditor)
-  }, [])
-
   const handleDescriptionChange = useCallback((content: string) => {
     setDescription(content)
   }, [])
@@ -139,20 +136,12 @@ const ExperienceModal = ({experience, open, onDismiss, onSave}: ExperienceModalP
           />
         </View>
         <View as="div" margin="0 0 small 0">
-          <FormField id="experience_description_label" label="Description">
-            <textarea id="experience_description_text" style={{display: 'none'}} />
-            <div style={{marginTop: '-.75rem'}}>
-              <CanvasRce
-                ref={rceRef}
-                autosave={false}
-                defaultContent={description}
-                height={300}
-                textareaId="erxperience_description_text"
-                onInit={handleInitRce}
-                onContentChange={handleDescriptionChange}
-              />
-            </div>
-          </FormField>
+          <RichTextEdit
+            id="experience_description"
+            label="Description"
+            content={description}
+            onContentChange={handleDescriptionChange}
+          />
         </View>
         <View as="div" margin="0 0 0 0">
           <FormFieldGroup

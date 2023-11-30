@@ -25,6 +25,7 @@
 class LearnerPassportController < ApplicationController
   before_action :require_context
   before_action :require_user
+  before_action :require_learner_passport_feature_flag
 
   def self.merge_skills_from_achievements(achievements)
     skills = []
@@ -284,10 +285,6 @@ class LearnerPassportController < ApplicationController
   def index
     js_env[:FEATURES][:learner_passport] = @domain_root_account.feature_enabled?(:learner_passport)
 
-    unless @domain_root_account.feature_enabled?(:learner_passport)
-      return render status: :not_found, template: "shared/errors/404_message"
-    end
-
     # hide the breadcrumbs application.html.erb renders
     render html: "<style>.ic-app-nav-toggle-and-crumbs.no-print {display: none;}</style>".html_safe,
            layout: true
@@ -413,5 +410,13 @@ class LearnerPassportController < ApplicationController
     @@current_projects = [@@project_sample.clone]
 
     render json: { message: "Portfolios reset" }, status: :accepted
+  end
+
+  private
+
+  def require_learner_passport_feature_flag
+    unless @domain_root_account.feature_enabled?(:learner_passport)
+      render status: :not_found, template: "shared/errors/404_message"
+    end
   end
 end
