@@ -34,6 +34,7 @@ import type {
   ContentMigrationItem,
   ContentMigrationResponse,
   Migrator,
+  DateShifts,
   onSubmitMigrationFormCallback,
 } from './types'
 import CommonCartridgeImporter from './migrator_forms/common_cartridge'
@@ -46,7 +47,7 @@ const I18n = useI18nScope('content_migrations_redesign')
 type RequestBody = {
   course_id: string
   migration_type: string
-  date_shift_options: boolean
+  date_shift_options: DateShifts
   selective_import: boolean
   settings: {[key: string]: any}
   pre_attachment?: {
