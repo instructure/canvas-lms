@@ -23,7 +23,7 @@ QUnit.module('ToolLaunchResizer', {
     this.fixtures = document.getElementById('fixtures')
     this.fixtures.innerHTML = `\
 <div class='tool_content_wrapper' id="first-wrapper" data-tool-wrapper-id="1234" >
-  <form action='http://my-lti.docker/course-navigation' class='hide' method='POST' target='tool_content' id='tool_form' data-tool-launch-type=' data-tool-id='my-lti.docker' data-tool-path='/course-navigation' data-message-type='tool_launch' style='display: none;'>
+  <form action='http://my-lti.docker/course-navigation' class='hide' method='POST' target='tool_content' id='tool_form_1' data-tool-launch-type=' data-tool-id='my-lti.docker' data-tool-path='/course-navigation' data-message-type='tool_launch' style='display: none;'>
       <div style='margin-bottom: 20px;'>
           <div class='load_tab'>
               This tool needs to be loaded in a new browser window
@@ -42,7 +42,7 @@ QUnit.module('ToolLaunchResizer', {
 </div>
 
 <div class='tool_content_wrapper' id="second-wrapper" data-tool-wrapper-id="5678">
-  <form action='http://chat.docker' class='hide' method='POST' target='tool_content' id='tool_form' data-tool-launch-type=' data-tool-id='my-lti.docker' data-tool-path='/course-navigation' data-message-type='tool_launch' style='display: none;'>
+  <form action='http://chat.docker' class='hide' method='POST' target='tool_content' id='tool_form_1' data-tool-launch-type=' data-tool-id='my-lti.docker' data-tool-path='/course-navigation' data-message-type='tool_launch' style='display: none;'>
       <div style='margin-bottom: 20px;'>
           <div class='load_tab'>
               This tool needs to be loaded in a new browser window

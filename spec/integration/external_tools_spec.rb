@@ -39,7 +39,7 @@ describe "External Tools" do
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       expect(response).to be_successful
       doc = Nokogiri::HTML5(response.body)
-      form = doc.at_css("form#tool_form")
+      form = doc.at_css(".tool_content_wrapper > form")
 
       expect(form.at_css("input#launch_presentation_locale")["value"]).to eq "en"
       expect(form.at_css("input#oauth_callback")["value"]).to eq "about:blank"
@@ -62,9 +62,9 @@ describe "External Tools" do
       expect(response).to be_successful
       doc = Nokogiri::HTML5(response.body)
 
-      expect(doc.at_css("form#tool_form input#lis_result_sourcedid")["value"]).to eq BasicLTI::Sourcedid.new(@tool, @course, @assignment, @user).to_s
-      expect(doc.at_css("form#tool_form input#lis_outcome_service_url")["value"]).to eq lti_grade_passback_api_url(@tool)
-      expect(doc.at_css("form#tool_form input#ext_ims_lis_basic_outcome_url")["value"]).to eq blti_legacy_grade_passback_api_url(@tool)
+      expect(doc.at_css(".tool_content_wrapper > form input#lis_result_sourcedid")["value"]).to eq BasicLTI::Sourcedid.new(@tool, @course, @assignment, @user).to_s
+      expect(doc.at_css(".tool_content_wrapper > form input#lis_outcome_service_url")["value"]).to eq lti_grade_passback_api_url(@tool)
+      expect(doc.at_css(".tool_content_wrapper > form input#ext_ims_lis_basic_outcome_url")["value"]).to eq blti_legacy_grade_passback_api_url(@tool)
     end
 
     it "does not include outcome service sourcedid when viewing as teacher" do
@@ -73,8 +73,8 @@ describe "External Tools" do
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       expect(response).to be_successful
       doc = Nokogiri::HTML5(response.body)
-      expect(doc.at_css("form#tool_form input#lis_result_sourcedid")).to be_nil
-      expect(doc.at_css("form#tool_form input#lis_outcome_service_url")).not_to be_nil
+      expect(doc.at_css(".tool_content_wrapper > form input#lis_result_sourcedid")).to be_nil
+      expect(doc.at_css(".tool_content_wrapper > form input#lis_outcome_service_url")).not_to be_nil
     end
 
     it "includes time zone in LTI paramaters if included in custom fields" do
@@ -92,7 +92,7 @@ describe "External Tools" do
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       expect(response).to be_successful
       doc = Nokogiri::HTML5(response.body)
-      expect(doc.at_css("form#tool_form input#custom_time_zone")["value"]).to eq "America/Juneau"
+      expect(doc.at_css(".tool_content_wrapper > form input#custom_time_zone")["value"]).to eq "America/Juneau"
 
       @user.time_zone = "Hawaii"
       @user.save!
@@ -100,7 +100,7 @@ describe "External Tools" do
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       expect(response).to be_successful
       doc = Nokogiri::HTML5(response.body)
-      expect(doc.at_css("form#tool_form input#custom_time_zone")["value"]).to eq "Pacific/Honolulu"
+      expect(doc.at_css(".tool_content_wrapper > form input#custom_time_zone")["value"]).to eq "Pacific/Honolulu"
     end
 
     it "redirects if the tool can't be configured" do
@@ -119,7 +119,7 @@ describe "External Tools" do
       get "/courses/#{@course.id}/external_tools/retrieve?url=#{CGI.escape(@tag.url)}"
       expect(response).to be_successful
       doc = Nokogiri::HTML5(response.body)
-      expect(doc.at_css("#tool_form")).not_to be_nil
+      expect(doc.at_css(".tool_content_wrapper > form")).not_to be_nil
       expect(doc.at_css("input[name='launch_presentation_return_url']")["value"]).to match(/^http/)
     end
 
@@ -133,7 +133,7 @@ describe "External Tools" do
       get "/users/#{@user.id}/external_tools/#{tool.id}"
       expect(response).to be_successful
       doc = Nokogiri::HTML5(response.body)
-      expect(doc.at_css("#tool_form")).not_to be_nil
+      expect(doc.at_css(".tool_content_wrapper > form")).not_to be_nil
       expect(doc.at_css("input[name='launch_presentation_return_url']")["value"]).to match(/^http/)
     end
   end
