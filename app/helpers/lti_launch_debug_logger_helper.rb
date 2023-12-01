@@ -36,5 +36,7 @@ module LtiLaunchDebugLoggerHelper
       context_enrollment: @context_enrollment,
       cookies:
     )
+  rescue => e
+    Rails.logger.error "Unable to make lti_launch_debug_logger: #{e.message}"
   end
 end

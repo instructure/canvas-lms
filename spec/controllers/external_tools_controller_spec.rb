@@ -3070,6 +3070,29 @@ describe ExternalToolsController do
           expect(json_parse["id"]).to eq(tool.id)
         end
       end
+
+      context "when Lti::LaunchDebugLogger is enabled" do
+        subject do
+          allow(RequestContext::Generator).to receive(:request_id).and_return("1234")
+          get(:generate_sessionless_launch, params:)
+          json_parse["url"]
+        end
+
+        before do
+          Lti::LaunchDebugLogger.enable!(Account.default, 4)
+        end
+
+        after { Lti::LaunchDebugLogger.disable!(Account.default) }
+
+        it "includes a sessionless_source in the URL" do
+          debug_trace = CGI.parse(URI.parse(subject).query)["sessionless_source"].first
+          expect(Lti::LaunchDebugLogger.decode_debug_trace(debug_trace)).to \
+            eq({
+                 "request_id" => "1234",
+                 "user_agent" => "Rails Testing",
+               })
+        end
+      end
     end
   end
 
