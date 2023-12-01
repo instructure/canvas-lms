@@ -27,6 +27,8 @@ class Mutations::AssignmentOverrideCreateOrUpdate < GraphQL::Schema::InputObject
   argument :course_section_id, ID, required: false
   argument :group_id, ID, required: false
   argument :student_ids, [ID], required: false
+  argument :noop_id, ID, required: false
+  argument :title, String, required: false
 end
 
 class Mutations::AssignmentModeratedGradingUpdate < GraphQL::Schema::InputObject
