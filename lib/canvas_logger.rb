@@ -96,7 +96,7 @@ class CanvasLogger < ActiveSupport::Logger
       captured_message_stack.each do |messages|
         messages << captured_message if messages.length < CAPTURE_LIMIT
       end
-      super severity, message, progname
+      super(severity, message, progname)
     end
   end
 end

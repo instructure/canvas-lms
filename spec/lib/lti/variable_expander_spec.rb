@@ -122,7 +122,7 @@ module Lti
       end
 
       it "removes the requested expansion" do
-        expect(subject).not_to include("$#{expansion}".to_sym)
+        expect(subject).not_to include(:"$#{expansion}")
       end
     end
 

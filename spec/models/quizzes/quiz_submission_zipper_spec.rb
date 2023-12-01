@@ -124,7 +124,7 @@ describe Quizzes::QuizSubmissionZipper do
       quiz.save!
       submission = quiz.generate_submission @student
       attach = create_attachment_for_file_upload_submission!(submission)
-      submission.submission_data["question_#{question.id}".to_sym] = [attach.id.to_s]
+      submission.submission_data[:"question_#{question.id}"] = [attach.id.to_s]
       submission.save!
       Quizzes::SubmissionGrader.new(submission).grade_submission
       quiz.reload

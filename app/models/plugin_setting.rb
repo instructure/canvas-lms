@@ -68,10 +68,10 @@ class PluginSetting < ActiveRecord::Base
     if plugin.encrypted_settings
       was_dirty = changed?
       plugin.encrypted_settings.each do |key|
-        next unless settings["#{key}_enc".to_sym]
+        next unless settings[:"#{key}_enc"]
 
         begin
-          settings["#{key}_dec".to_sym] = self.class.decrypt(settings["#{key}_enc".to_sym], settings["#{key}_salt".to_sym])
+          settings[:"#{key}_dec"] = self.class.decrypt(settings[:"#{key}_enc"], settings[:"#{key}_salt"])
         rescue
           @valid_settings = false
         end
@@ -92,14 +92,14 @@ class PluginSetting < ActiveRecord::Base
         next if settings[key].blank?
 
         value = settings.delete(key)
-        settings.delete("#{key}_dec".to_sym)
+        settings.delete(:"#{key}_dec")
         if value == DUMMY_STRING # no change, use what was there previously
           unless settings_was.nil? # we wont have setting_was if we are a new plugin
-            settings["#{key}_enc".to_sym] = settings_was["#{key}_enc".to_sym]
-            settings["#{key}_salt".to_sym] = settings_was["#{key}_salt".to_sym]
+            settings[:"#{key}_enc"] = settings_was[:"#{key}_enc"]
+            settings[:"#{key}_salt"] = settings_was[:"#{key}_salt"]
           end
         else
-          settings["#{key}_enc".to_sym], settings["#{key}_salt".to_sym] = self.class.encrypt(value)
+          settings[:"#{key}_enc"], settings[:"#{key}_salt"] = self.class.encrypt(value)
         end
       end
     end

@@ -232,7 +232,7 @@ class Folder < ActiveRecord::Base
 
     sub_folders.each do |f|
       f.reload
-      f.full_name = f.full_name(true)
+      f.full_name = f.full_name(true) # rubocop:disable Lint/SelfAssignment
       f.save
     end
   end

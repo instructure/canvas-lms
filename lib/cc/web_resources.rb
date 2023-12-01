@@ -286,7 +286,7 @@ module CC
         # download from kaltura if the file wasn't already exported here in add_course_files
         if !@added_attachments || @added_attachments[obj.attachment_id] != path
           unless CanvasKaltura::ClientV3::ASSET_STATUSES[info[:asset][:status]] == :READY &&
-                 (url = (client.flavorAssetGetPlaylistUrl(obj.media_id, info[:asset][:id]) || client.flavorAssetGetDownloadUrl(info[:asset][:id])))
+                 (url = client.flavorAssetGetPlaylistUrl(obj.media_id, info[:asset][:id]) || client.flavorAssetGetDownloadUrl(info[:asset][:id]))
             add_error(I18n.t("course_exports.errors.media_file", "A media file failed to export"))
             next
           end

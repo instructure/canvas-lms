@@ -277,7 +277,7 @@ module Turnitin
       keys = %i[aid assign assignid cid cpw ctl diagnostic dis dtdue dtstart dtpost encrypt fcmd fid gmtime newassign newupw oid pfn pln ptl ptype said tem uem ufn uid uln upw utp]
       keys.each do |key|
         keys_used << key if params[key].present?
-        str += (params[key] || "")
+        str += params[key] || ""
       end
       str += @shared_secret
       Digest::MD5.hexdigest(str)

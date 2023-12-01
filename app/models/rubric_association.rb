@@ -328,7 +328,7 @@ class RubricAssociation < ActiveRecord::Base
     replace_ratings = false
     has_score = false
     rubric.criteria_object.each do |criterion|
-      data = params["criterion_#{criterion.id}".to_sym]
+      data = params[:"criterion_#{criterion.id}"]
       rating = {}
       next unless data
 

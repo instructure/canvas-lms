@@ -2348,10 +2348,10 @@ class UsersController < ApplicationController
         render json: @user
       end
     else
-      unless session["reported_#{@user.id}".to_sym]
+      unless session[:"reported_#{@user.id}"]
         @user.report_avatar_image!
       end
-      session["reports_#{@user.id}".to_sym] = true
+      session[:"reports_#{@user.id}"] = true
       render json: { reported: true }
     end
   end
@@ -2851,7 +2851,7 @@ class UsersController < ApplicationController
 
     # find last interactions
     last_comment_dates = SubmissionCommentInteraction.in_course_between(course, teacher.id, ids)
-    last_comment_dates.each do |(user_id, _author_id), date|
+    last_comment_dates.each do |(user_id, _author_id), date| # rubocop:disable Style/HashEachMethods
       next unless (student = data[user_id])
 
       student[:last_interaction] = [student[:last_interaction], date].compact.max
@@ -2882,7 +2882,7 @@ class UsersController < ApplicationController
     end
 
     if course.root_account.enable_user_notes?
-      data.each { |_k, v| v[:last_user_note] = nil }
+      data.each_value { |v| v[:last_user_note] = nil }
       # find all last user note times in one query
       note_dates = UserNote.active
                            .group(:user_id)

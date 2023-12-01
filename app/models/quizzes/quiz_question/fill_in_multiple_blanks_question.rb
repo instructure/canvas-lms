@@ -64,8 +64,8 @@ class Quizzes::QuizQuestion::FillInMultipleBlanksQuestion < Quizzes::QuizQuestio
 
     chosen_answers.count do |variable, answer|
       answer ||= { id: nil, text: nil, weight: 0 }
-      user_answer.answer_details["answer_for_#{variable}".to_sym] = answer_text(answer)
-      user_answer.answer_details["answer_id_for_#{variable}".to_sym] = answer[:id]
+      user_answer.answer_details[:"answer_for_#{variable}"] = answer_text(answer)
+      user_answer.answer_details[:"answer_id_for_#{variable}"] = answer[:id]
       answer && answer[:weight] == 100 && !variables.empty?
     end
   end
@@ -115,7 +115,7 @@ class Quizzes::QuizQuestion::FillInMultipleBlanksQuestion < Quizzes::QuizQuestio
           end
           answer[:responses] += 1 if response[:correct]
           answer[:answer_matches].each do |right|
-            next unless response["answer_for_#{answer[:blank_id]}".to_sym] == right[:text]
+            next unless response[:"answer_for_#{answer[:blank_id]}"] == right[:text]
 
             found = true
             right[:responses] += 1
@@ -127,7 +127,7 @@ class Quizzes::QuizQuestion::FillInMultipleBlanksQuestion < Quizzes::QuizQuestio
             id: answer_md5,
             responses: 1,
             user_ids: [response[:user_id]],
-            text: response["answer_for_#{answer[:blank_id]}".to_sym]
+            text: response[:"answer_for_#{answer[:blank_id]}"]
           }
           answer[:answer_matches] << match
         end

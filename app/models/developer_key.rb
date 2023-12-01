@@ -391,7 +391,7 @@ class DeveloperKey < ActiveRecord::Base
   end
 
   def tool_configuration
-    (lti_registration.presence || referenced_tool_configuration)
+    lti_registration.presence || referenced_tool_configuration
   end
 
   private

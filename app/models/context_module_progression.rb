@@ -280,7 +280,7 @@ class ContextModuleProgression < ActiveRecord::Base
       score = get_submission_score(sub)
 
       new_score = near_enough?(score, score.round) ? score.round : score if score.present?
-      requirement_met = (score.present? && new_score.to_f >= requirement[:min_score].to_f)
+      requirement_met = score.present? && new_score.to_f >= requirement[:min_score].to_f
       if requirement_met
         remove_incomplete_requirement(requirement[:id])
       else

@@ -247,7 +247,7 @@ class Mutations::ImportOutcomes < Mutations::BaseMutation
 
       total = ancestors_to_be_imported_map.values.size
       i = 0
-      ancestors_to_be_imported_map.each do |_, ancestors_ids|
+      ancestors_to_be_imported_map.each_value do |ancestors_ids|
         destination_parent_group = target_group
         ancestors_ids.each do |gid|
           unless source_target_groups_map[gid]

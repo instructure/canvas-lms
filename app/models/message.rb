@@ -733,7 +733,7 @@ self.user,
     if check_acct.feature_enabled?(:notification_service)
       enqueue_to_sqs
     else
-      delivery_method = "deliver_via_#{path_type}".to_sym
+      delivery_method = :"deliver_via_#{path_type}"
       if !delivery_method || !respond_to?(delivery_method, true)
         logger.warn("Could not set delivery_method from #{path_type}")
         return nil

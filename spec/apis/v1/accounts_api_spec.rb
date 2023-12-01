@@ -655,7 +655,7 @@ describe "Accounts API", type: :request do
                    {},
                    { expected_status: 400 })
           account.reload
-          expected_settings.each do |key, _|
+          expected_settings.each_key do |key|
             expect(account.settings[key]).to be_nil
           end
         end
@@ -735,7 +735,7 @@ describe "Accounts API", type: :request do
                              {},
                              { expected_result: 401 })
             account.reload
-            expected_settings.each do |key, _|
+            expected_settings.each_key do |key|
               expect(account.settings[key]).to be_nil
             end
           end
@@ -1324,7 +1324,7 @@ describe "Accounts API", type: :request do
       before :once do
         @me = @user
         %i[c1 c2 c3 c4].each do |course|
-          instance_variable_set("@#{course}".to_sym, course_model(name: course.to_s, account: @a1))
+          instance_variable_set(:"@#{course}", course_model(name: course.to_s, account: @a1))
         end
         @c2.destroy
         Course.where(id: @c1).update_all(workflow_state: "claimed")
@@ -1430,7 +1430,7 @@ describe "Accounts API", type: :request do
       before :once do
         @me = @user
         [:c1, :c2].each do |course|
-          instance_variable_set("@#{course}".to_sym, course_model(name: course.to_s, account: @a1))
+          instance_variable_set(:"@#{course}", course_model(name: course.to_s, account: @a1))
         end
         @c1.offer!
         @user = @me
@@ -1473,7 +1473,7 @@ describe "Accounts API", type: :request do
       before :once do
         @me = @user
         %i[c1 c2 c3 c4 c5].each do |course|
-          instance_variable_set("@#{course}".to_sym, course_model(name: course.to_s, account: @a1, conclude_at: 2.days.from_now))
+          instance_variable_set(:"@#{course}", course_model(name: course.to_s, account: @a1, conclude_at: 2.days.from_now))
         end
 
         # c2 -- condluded
@@ -1546,7 +1546,7 @@ describe "Accounts API", type: :request do
       before :once do
         @me = @user
         %i[c1 c2 c3 c4].each do |course|
-          instance_variable_set("@#{course}".to_sym, course_model(name: course.to_s, account: @a1, start_at: 2.days.ago))
+          instance_variable_set(:"@#{course}", course_model(name: course.to_s, account: @a1, start_at: 2.days.ago))
         end
 
         @c2.start_at = 1.week.ago
@@ -1604,7 +1604,7 @@ describe "Accounts API", type: :request do
       before :once do
         @me = @user
         %i[c1 c2 c3 c4].each do |course|
-          instance_variable_set("@#{course}".to_sym, course_model(name: course.to_s, account: @a1, conclude_at: 2.days.from_now))
+          instance_variable_set(:"@#{course}", course_model(name: course.to_s, account: @a1, conclude_at: 2.days.from_now))
         end
 
         @c2.conclude_at = 1.week.from_now

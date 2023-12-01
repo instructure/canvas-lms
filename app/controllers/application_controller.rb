@@ -642,7 +642,7 @@ class ApplicationController < ActionController::Base
 
     link_settings = @tag&.link_settings || {}
 
-    tool_dimensions.each do |k, _v|
+    tool_dimensions.each_key do |k|
       # it may happen that we get "link_settings"=>{"selection_width"=>"", "selection_height"=>""}
       if link_settings[k.to_s].present?
         tool_dimensions[k] = link_settings[k.to_s]
@@ -2859,7 +2859,7 @@ class ApplicationController < ActionController::Base
         instance_name = instance_symbol.to_s
         obj = instance_variable_get("@#{instance_name}")
         policy = obj.check_policy(@current_user, session) unless obj.nil? || !obj.respond_to?(:check_policy)
-        hash["#{instance_name.upcase}_RIGHTS".to_sym] = ActiveSupport::HashWithIndifferentAccess[policy.map { |right| [right, true] }] unless policy.nil?
+        hash[:"#{instance_name.upcase}_RIGHTS"] = ActiveSupport::HashWithIndifferentAccess[policy.map { |right| [right, true] }] unless policy.nil?
       end
 
       js_env hash

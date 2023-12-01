@@ -119,7 +119,7 @@ module BroadcastPolicies
     end
 
     def just_submitted_late?
-      (just_submitted? || submission.saved_change_to_submitted_at?)
+      just_submitted? || submission.saved_change_to_submitted_at?
     end
 
     def is_a_resubmission?

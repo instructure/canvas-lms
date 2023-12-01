@@ -26,7 +26,7 @@ class BrandConfigRegenerator
     def process(account, current_user, new_brand_config)
       progress = Progress.new(
         context: account,
-        tag: "brand_config_regenerate_for_#{account.root_account.global_id}".to_sym,
+        tag: :"brand_config_regenerate_for_#{account.root_account.global_id}",
         message: I18n.t("Regenerating themes...")
       )
       progress.user = current_user

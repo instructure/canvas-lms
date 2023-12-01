@@ -124,8 +124,8 @@ describe "Outcomes Import API", type: :request do
       let(:request) do
         lambda do |type:, guid: nil, expected_status: 200|
           case type
-          when "available" then return available_json(expected_status:)
-          when "create" then return create_json(guid:, expected_status:)
+          when "available" then available_json(expected_status:)
+          when "create" then create_json(guid:, expected_status:)
           else raise "unknown request type"
           end
         end

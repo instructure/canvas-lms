@@ -367,7 +367,7 @@ class LearnerPassportController < ApplicationController
     return render json: { message: "Portfolio not found" }, status: :not_found if portfolio.nil?
 
     portfolio[:skills] = []
-    portfolio.each do |key, _value|
+    portfolio.each_key do |key|
       next if params[key].nil?
 
       case key
@@ -444,7 +444,7 @@ class LearnerPassportController < ApplicationController
 
     project[:skills] = []
     project[:attachments] = []
-    project.each do |key, _value|
+    project.each_key do |key|
       next if params[key].nil?
 
       case key

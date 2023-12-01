@@ -166,7 +166,7 @@ class UserMerge
       touching_updates = ["access_tokens", "group_memberships"]
       updates.each do |table, column|
         klass = table.classify.constantize
-        if klass.new.respond_to?("#{column}=".to_sym)
+        if klass.new.respond_to?(:"#{column}=")
           scope = klass.where(column => from_user)
           klass.transaction do
             if version_updates.include?(table)

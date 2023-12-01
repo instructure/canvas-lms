@@ -100,7 +100,7 @@ module ConversationsHelper
     context_tags.each do |tag|
       next unless tag =~ /\A(course|group)_(\d+)\z/
 
-      result["#{$1}s".to_sym][$2.to_i] = []
+      result[:"#{$1}s"][$2.to_i] = []
     end
 
     if audience.size == 1 && include_private_conversation_enrollments
