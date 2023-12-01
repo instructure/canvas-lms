@@ -76,10 +76,11 @@ describe Lti::IMS::AuthenticationController do
   before { user_session(user) }
 
   describe "authorize_redirect" do
-    before { post :authorize_redirect, params: }
-
     context "when authorization request has no errors" do
-      subject { URI.parse(response.headers["Location"]) }
+      subject do
+        post(:authorize_redirect, params:)
+        URI.parse(response.headers["Location"])
+      end
 
       it "redirects to the domain in the lti_message_hint" do
         expect(subject.host).to eq "redirect.instructure.com"
@@ -93,6 +94,15 @@ describe Lti::IMS::AuthenticationController do
         sent_params = Rack::Utils.parse_nested_query(subject.query)
         expect(sent_params).to eq params
       end
+
+      context "when Lti::LaunchDebugLogger is enabled for the account" do
+        before { Lti::LaunchDebugLogger.enable!(Account.default, 4) }
+        after { Lti::LaunchDebugLogger.disable!(Account.default) }
+
+        it "adds authredir=1" do
+          expect(subject.query).to match(/lti_message_hint.*&authredir=1/)
+        end
+      end
     end
 
     shared_examples_for "lti_message_hint error" do
@@ -104,7 +114,10 @@ describe Lti::IMS::AuthenticationController do
     end
 
     context "when the authorization request has errors" do
-      subject { response }
+      subject do
+        post(:authorize_redirect, params:)
+        response
+      end
 
       context "when the lti_message_hint is not a JWT" do
         let(:lti_message_hint) { "Not a JWT" }
@@ -186,6 +199,8 @@ describe Lti::IMS::AuthenticationController do
 
     shared_examples_for "logs using the lti launch debug logger" do |min_enabled_level:|
       let(:extra_expected_debug_log_fields) { {} } # Override in usage if desired
+      let(:extra_debug_trace_fields) { {} } # Override in usage if desired
+
       let(:lti_message_hint_jwt_params) { super().merge({ debug_trace: "fake debug_trace" }) }
 
       around do |example|
@@ -220,11 +235,14 @@ describe Lti::IMS::AuthenticationController do
         before { Lti::LaunchDebugLogger.enable!(Account.default, min_enabled_level) }
         after { Lti::LaunchDebugLogger.disable!(Account.default) }
 
-        it "logs to the front end data collection framework" do
-          debug_trace_fields = {
+        let(:debug_trace_fields) do
+          {
             "request_id" => "abc",
             "cookie_names" => "chocolatechip,peanutbutter"
-          }
+          }.merge(extra_debug_trace_fields)
+        end
+
+        it "logs to the front end data collection framework" do
           expect(Lti::LaunchDebugLogger).to \
             receive(:decode_debug_trace).with("fake debug_trace").and_return(debug_trace_fields)
 
@@ -318,6 +336,35 @@ describe Lti::IMS::AuthenticationController do
         let(:extra_expected_debug_log_fields) do
           { "user" => user.global_id }
         end
+      end
+
+      context "when there is a valid sessionless_source" do
+        before do
+          allow(Lti::LaunchDebugLogger).to \
+            receive(:decode_debug_trace).with("fake_sessionless_source").and_return({ "a" => "b" })
+        end
+
+        it_behaves_like "logs using the lti launch debug logger", min_enabled_level: 3 do
+          let(:extra_debug_trace_fields) do
+            { "path" => "/assignments/1?sessionless_source=fake_sessionless_source" }
+          end
+
+          let(:extra_expected_debug_log_fields) do
+            { "sessionless_a" => "b" }
+          end
+        end
+      end
+
+      context "when there is an invalid sessionless_source" do
+        let(:params) { super().merge(sessionless_source: "fake_sessionless_source") }
+
+        # it still launches successfully and logs what it can
+        before do
+          allow(Lti::LaunchDebugLogger).to \
+            receive(:decode_debug_trace).with("fake_sessionless_source").and_raise(StandardError)
+        end
+
+        it_behaves_like "logs using the lti launch debug logger", min_enabled_level: 3
       end
 
       context "when platform storage flag is enabled" do

@@ -144,12 +144,27 @@ module Lti
         end
       end
 
+      # extract debug info added in concerns/sessionless_launches.rb
+      def lti_launch_debug_logger_sessionless_source_metrics(launch_kickoff_path)
+        launch_kickoff_path
+          &.then { URI.parse _1 }
+          &.query
+          &.then { CGI.parse _1 }
+          &.dig("sessionless_source")
+          &.first
+          &.then { Lti::LaunchDebugLogger.decode_debug_trace _1 }
+          &.transform_keys { "sessionless_#{_1}" }
+      rescue => e
+        Rails.logger.error("Error finding sessionless source debug_trace_metrics: #{e}")
+      end
+
       def report_lti_launch_debug_logger_metrics!(error = nil)
         return unless report_lti_launch_debug_logger_metrics?(error)
 
         metrics_endpoint = DynamicSettings.find(tree: :private)["frontend_data_collection_endpoint"]
         return unless metrics_endpoint
 
+        #  Metrics added when constructing the launch (see AdvantageAdapter#cache_payload:
         debug_trace_metrics = (@decoded_jwt && Lti::LaunchDebugLogger.decode_debug_trace(@decoded_jwt["debug_trace"])) || {}
         orig_timestamp = debug_trace_metrics&.dig("time")&.then { Time.parse _1 }
 
@@ -169,9 +184,10 @@ module Lti
           pseudonym_session_class: @pseudonym_session.class.name,
           time_since_launch_kickoff: orig_timestamp && (Time.now - orig_timestamp).round(3),
 
-          **Lti::LaunchDebugLogger.request_related_fields(request:, session:, cookies:),
+          **Lti::LaunchDebugLogger.request_related_fields(request:, session:, cookies:) || {},
 
-          **debug_trace_metrics.transform_keys { |orig_key| "init_#{orig_key}" }
+          **debug_trace_metrics.transform_keys { |orig_key| "init_#{orig_key}" } || {},
+          **lti_launch_debug_logger_sessionless_source_metrics(debug_trace_metrics["path"]) || {}
         }.compact
 
         CanvasHttp.put(metrics_endpoint, {}, body: metrics.to_json, content_type: "application/json")
@@ -284,6 +300,9 @@ module Lti
         parts = canvas_domain.split(":")
         url.host = parts.first
         url.port = parts.last if parts.size > 1
+        if Lti::LaunchDebugLogger.log_level(@domain_root_account) > 0
+          url.query = url.query.present? ? "#{url.query}&authredir=1" : "authredir=1"
+        end
         url.to_s
       end
 
