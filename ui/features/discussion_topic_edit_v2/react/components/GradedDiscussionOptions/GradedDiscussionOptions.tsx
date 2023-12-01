@@ -98,3 +98,7 @@ export const GradedDiscussionOptions = ({
     </View>
   )
 }
+
+GradedDiscussionOptions.defaultProps = {
+  pointsPossible: 0,
+}
