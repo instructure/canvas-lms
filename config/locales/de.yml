@@ -27466,7 +27466,7 @@ de:
   subjects_14c0c4de: Themen
   submission: 
     atom_no_author: "Kein Autor"
-    attached_files_comment: "Bitte sehen Sie sich die angehängten Dateien an."
+    attached_files_comment: "Siehe Dateianhang."
     media_comment: "Dies ist ein Medienkommentar."
     state: 
       graded: benotet
@@ -27575,7 +27575,7 @@ de:
     originality_score: 
       see_vericite_results: "VeriCite-Ergebnisse ansehen"
     resubmitted_to_turnitin: "Erfolgreich erneut an Turnitin versandt."
-    see_attached_files: "Bitte sehen Sie sich die angehängten Dateien an."
+    see_attached_files: "Siehe Dateianhang."
     show: 
       allowed_attempts: "Zulässige Versuche"
       anonymous_user: "Anonymer Benutzer\\*in"
