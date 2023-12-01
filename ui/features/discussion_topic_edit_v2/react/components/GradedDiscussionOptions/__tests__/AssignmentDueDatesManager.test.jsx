@@ -235,5 +235,21 @@ describe('AssignmentDueDatesManager', () => {
       expect(availableOptions.length).toBe(10)
       expect(availableOptions.map(o => o.textContent).includes('Group 1')).toBe(false)
     })
+
+    it('renders the course pacing notice instead fo ', () => {
+      window.ENV = {
+        DISCUSSION_TOPIC: {
+          ATTRIBUTES: {in_paced_course: true},
+        },
+      }
+      setup()
+      const coursePacingNotice = screen.getByText(
+        'This course is using Course Pacing. Go to Course Pacing to manage due dates.'
+      )
+      const addAssignmentOption = screen.queryByText('Add Assignment')
+
+      expect(coursePacingNotice).toBeInTheDocument()
+      expect(addAssignmentOption).not.toBeInTheDocument()
+    })
   })
 })

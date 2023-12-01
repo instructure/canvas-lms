@@ -31,6 +31,7 @@ import {
   defaultEveryoneOption,
   defaultEveryoneElseOption,
 } from '../../util/constants'
+import CoursePacingNotice from '@canvas/due-dates/react/CoursePacingNotice'
 
 const I18n = useI18nScope('discussion_create')
 
@@ -135,54 +136,68 @@ export const AssignmentDueDatesManager = () => {
     })
   }, [assignedInfoList, groups, sections, studentEnrollments])
 
+  const isPacedDiscussion = ENV?.DISCUSSION_TOPIC?.ATTRIBUTES?.in_paced_course
+
   return (
     <>
       <Text size="large">{I18n.t('Assignment Settings')}</Text>
-      {assignedInfoList.map((info, index) => (
-        <View key={info.dueDateId}>
-          <div
-            style={{
-              paddingTop: assignedInfoList.length === 1 ? theme.variables.spacing.medium : '0',
-              borderBottom: index < assignedInfoList.length - 1 ? '1px solid #C7CDD1' : 'none',
-              paddingBottom: theme.variables.spacing.medium,
-            }}
+      {isPacedDiscussion ? (
+        <CoursePacingNotice courseId={ENV.COURSE_ID} />
+      ) : (
+        <>
+          {assignedInfoList.map((info, index) => (
+            <View key={info.dueDateId}>
+              <div
+                style={{
+                  paddingTop: assignedInfoList.length === 1 ? theme.variables.spacing.medium : '0',
+                  borderBottom: index < assignedInfoList.length - 1 ? '1px solid #C7CDD1' : 'none',
+                  paddingBottom: theme.variables.spacing.medium,
+                }}
+              >
+                {assignedInfoList.length > 1 && (
+                  <View display="block">
+                    <Flex
+                      justifyItems="space-between"
+                      alignItems="center"
+                      padding="small none small"
+                    >
+                      <Flex.Item shouldShrink={true} shouldGrow={true}>
+                        <Text size="x-small" color="secondary">{`(${index + 1}/${
+                          assignedInfoList.length
+                        })`}</Text>
+                      </Flex.Item>
+                      <Flex.Item padding="none none none none">
+                        <CloseButton
+                          size="small"
+                          screenReaderLabel={I18n.t('Close')}
+                          onClick={handleCloseAssignmentDueDate(info.dueDateId)}
+                        />
+                      </Flex.Item>
+                    </Flex>
+                  </View>
+                )}
+                <AssignmentDueDate
+                  initialAssignedInformation={info}
+                  availableAssignToOptions={getAvailableOptionsFor(info.dueDateId)}
+                  onAssignedInfoChange={newInfo =>
+                    handleAssignedInfoChange(newInfo, info.dueDateId)
+                  }
+                  assignToErrorMessages={dueDateErrorMessages
+                    ?.filter(element => element.dueDateId === info.dueDateId && element.message)
+                    .map(element => element.message)}
+                />
+              </div>
+            </View>
+          ))}
+          <Button
+            renderIcon={IconAddLine}
+            onClick={handleAddAssignment}
+            data-testid="add-assignment-override-seciont-btn"
           >
-            {assignedInfoList.length > 1 && (
-              <View display="block">
-                <Flex justifyItems="space-between" alignItems="center" padding="small none small">
-                  <Flex.Item shouldShrink={true} shouldGrow={true}>
-                    <Text size="x-small" color="secondary">{`(${index + 1}/${
-                      assignedInfoList.length
-                    })`}</Text>
-                  </Flex.Item>
-                  <Flex.Item padding="none none none none">
-                    <CloseButton
-                      size="small"
-                      screenReaderLabel={I18n.t('Close')}
-                      onClick={handleCloseAssignmentDueDate(info.dueDateId)}
-                    />
-                  </Flex.Item>
-                </Flex>
-              </View>
-            )}
-            <AssignmentDueDate
-              initialAssignedInformation={info}
-              availableAssignToOptions={getAvailableOptionsFor(info.dueDateId)}
-              onAssignedInfoChange={newInfo => handleAssignedInfoChange(newInfo, info.dueDateId)}
-              assignToErrorMessages={dueDateErrorMessages
-                ?.filter(element => element.dueDateId === info.dueDateId && element.message)
-                .map(element => element.message)}
-            />
-          </div>
-        </View>
-      ))}
-      <Button
-        renderIcon={IconAddLine}
-        onClick={handleAddAssignment}
-        data-testid="add-assignment-override-seciont-btn"
-      >
-        {I18n.t('Add Assignment')}
-      </Button>
+            {I18n.t('Add Assignment')}
+          </Button>
+        </>
+      )}
     </>
   )
 }
