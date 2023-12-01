@@ -101,7 +101,7 @@ module Lti::Concerns
     def sessionless_launch_link(options, context, tool, session_token)
       if options[:assignment].present?
         assignment = options[:assignment]
-        assignment.prepare_for_ags_if_needed!(tool)
+        assignment.migrate_to_1_3_if_needed!(tool)
         assignment_launch_link(assignment, session_token)
       elsif options[:module_item].present?
         module_item_link(options[:module_item], session_token)

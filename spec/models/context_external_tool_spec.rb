@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
 
 describe ContextExternalTool do
   before(:once) do
@@ -3589,43 +3588,43 @@ describe ContextExternalTool do
 
     context "prechecks" do
       it "ignores 1.1 tools" do
-        expect(old_tool).not_to receive(:prepare_for_ags)
-        old_tool.prepare_for_ags_if_needed!
+        expect(old_tool).not_to receive(:migrate_content_to_1_3)
+        old_tool.migrate_content_to_1_3_if_needed!
       end
 
       it "ignores 1.3 tools without matching 1.1 tool" do
         other_tool = external_tool_model(opts: { url: "http://other.url" })
-        expect(other_tool).not_to receive(:prepare_for_ags)
-        other_tool.prepare_for_ags_if_needed!
+        expect(other_tool).not_to receive(:migrate_content_to_1_3)
+        other_tool.migrate_content_to_1_3_if_needed!
       end
 
       it "starts process when needed" do
-        expect(tool).to receive(:prepare_for_ags)
-        tool.prepare_for_ags_if_needed!
+        expect(tool).to receive(:migrate_content_to_1_3)
+        tool.migrate_content_to_1_3_if_needed!
       end
 
       it "finds the correct 1.1 tool even if there are similar 1.3 tools" do
-        expect(tool).to receive(:prepare_for_ags).with(old_tool.id)
+        expect(tool).to receive(:migrate_content_to_1_3).with(old_tool.id)
         t = tool.dup
         t.url += "/1_3/launch"
         t.save!
 
-        tool.prepare_for_ags_if_needed!
+        tool.migrate_content_to_1_3_if_needed!
       end
     end
 
-    describe "#prepare_for_ags" do
-      subject { tool.prepare_for_ags(old_tool.id) }
+    describe "#migrate_content_to_1_3" do
+      subject { tool.migrate_content_to_1_3(old_tool.id) }
 
       let(:course) { course_model(account:) }
       let(:account) { account_model }
-      let(:direct) do
+      let(:direct_assignment) do
         a = assignment_model(context: course, title: "direct", submission_types: "external_tool")
         a.external_tool_tag = ContentTag.create!(context: a, content: old_tool)
         a.save!
         a
       end
-      let(:indirect) do
+      let(:indirect_assignment) do
         a = assignment_model(context: course, title: "indirect", submission_types: "external_tool")
         a.external_tool_tag = ContentTag.create!(context: a, content: old_tool)
         a.save!
@@ -3640,42 +3639,56 @@ describe ContextExternalTool do
         t
       end
 
-      it "calls assignment#prepare_for_ags_if_needed!" do
-        expect(direct.line_items.count).to eq 0
-        expect(indirect.line_items.count).to eq 0
+      it "calls assignment#migrate_to_1_3_if_needed!" do
+        expect(direct_assignment.line_items.count).to eq 0
+        expect(indirect_assignment.line_items.count).to eq 0
         subject
-        expect(direct.line_items.count).to eq 1
-        expect(indirect.line_items.count).to eq 1
+        expect(direct_assignment.line_items.count).to eq 1
+        expect(indirect_assignment.line_items.count).to eq 1
       end
 
-      shared_examples_for "finds related assignments" do
+      shared_examples_for "finds related content" do
         before do
-          # assignments that should never get returned
-          diff_context = assignment_model(context: course_model)
-          ContentTag.create!(context: diff_context, content: old_tool)
-          diff_account = assignment_model(context: course_model(account: account_model))
-          ContentTag.create!(context: diff_account, content: old_tool)
-          invalid_url = assignment_model(context: course)
-          ContentTag.create!(context: invalid_url, url: "https://invalid.url")
-          other_tool = external_tool_model(opts: { url: "https://different.url" })
-          diff_url = assignment_model(context: course)
-          ContentTag.create!(context: diff_url, url: other_tool.url)
+          # content that should never get returned
+          ## assignments
+          diff_context = assignment_model(context: course_model, title: "diff context", submission_types: "external_tool")
+          diff_context.external_tool_tag = ContentTag.create!(context: diff_context, content: old_tool)
+          diff_context.save!
 
-          allow(tool).to receive(:prepare_assignment_for_ags)
+          diff_account = assignment_model(context: course_model(account: account_model), title: "diff account", submission_types: "external_tool")
+          diff_account.external_tool_tag = ContentTag.create!(context: diff_account, content: old_tool)
+          diff_account.save!
+
+          invalid_url = assignment_model(context: course)
+          invalid_url.external_tool_tag = ContentTag.create!(context: invalid_url, url: "https://invalid.url")
+          invalid_url.save!
+
+          other_tool = external_tool_model(opts: { url: "https://different.url" })
+          diff_url = assignment_model(context: course, submission_types: "external_tool", title: "diff url")
+          diff_url = ContentTag.create!(context: diff_url, url: other_tool.url)
+          diff_url.save!
+
+          ## module items
+          ContentTag.create!(context: course_model, content: old_tool)
+          ContentTag.create!(context: course_model(account: account_model), content: old_tool)
+          ContentTag.create!(context: course, url: "https://invalid.url")
+          ContentTag.create!(context: course, url: other_tool.url)
+
+          allow(tool).to receive(:prepare_content_for_migration)
         end
 
         it "finds assignments using tool id" do
           direct = assignment_model(context: course, title: "direct")
           ContentTag.create!(context: direct, content: old_tool)
           subject
-          expect(tool).to have_received(:prepare_assignment_for_ags).with(direct)
+          expect(tool).to have_received(:prepare_content_for_migration).with(direct)
         end
 
         it "finds assignments using tool url" do
           indirect = assignment_model(context: course, title: "indirect")
           ContentTag.create!(context: indirect, url: old_tool.url)
           subject
-          expect(tool).to have_received(:prepare_assignment_for_ags).with(indirect)
+          expect(tool).to have_received(:prepare_content_for_migration).with(indirect)
         end
 
         it "finds both direct and indirect assignments" do
@@ -3684,8 +3697,16 @@ describe ContextExternalTool do
           indirect = assignment_model(context: course, title: "indirect")
           ContentTag.create!(context: indirect, url: old_tool.url)
           subject
-          expect(tool).to have_received(:prepare_assignment_for_ags).with(direct)
-          expect(tool).to have_received(:prepare_assignment_for_ags).with(indirect)
+          expect(tool).to have_received(:prepare_content_for_migration).with(direct)
+          expect(tool).to have_received(:prepare_content_for_migration).with(indirect)
+        end
+
+        it "finds both direct and indirect module items" do
+          direct = ContentTag.create!(context: course, content: old_tool, tag_type: "context_module")
+          indirect = ContentTag.create!(context: course, url: old_tool.url, tag_type: "context_module")
+          subject
+          expect(tool).to have_received(:prepare_content_for_migration).with(direct)
+          expect(tool).to have_received(:prepare_content_for_migration).with(indirect)
         end
       end
 
@@ -3698,7 +3719,7 @@ describe ContextExternalTool do
           t
         end
 
-        it_behaves_like "finds related assignments"
+        it_behaves_like "finds related content"
       end
 
       context "when installed in an account" do
@@ -3710,7 +3731,7 @@ describe ContextExternalTool do
           t
         end
 
-        it_behaves_like "finds related assignments"
+        it_behaves_like "finds related content"
       end
 
       context "with assignments that error" do
@@ -3738,9 +3759,10 @@ describe ContextExternalTool do
         it "sends errors to sentry" do
           subject
           expect(Sentry).to have_received(:capture_message)
-          expect(scope).to have_received(:set_tags).with(assignment_id: invalid_assignment.global_id)
+          expect(scope).to have_received(:set_tags).with(content_id: invalid_assignment.global_id)
           expect(scope).to have_received(:set_tags).with(tool_id: tool.global_id)
           expect(scope).to have_received(:set_tags).with(exception_class: "ActiveRecord::RecordInvalid")
+          expect(scope).to have_received(:set_tags).with(content_type: "Assignment")
         end
 
         it "completes the batch" do

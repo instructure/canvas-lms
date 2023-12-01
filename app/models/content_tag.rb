@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 class ContentTag < ActiveRecord::Base
+  include Lti::Migratable
+
   class LastLinkToOutcomeNotDestroyed < StandardError
   end
 
@@ -119,6 +121,7 @@ class ContentTag < ActiveRecord::Base
 
   scope :active, -> { where(workflow_state: "active") }
   scope :not_deleted, -> { where("content_tags.workflow_state<>'deleted'") }
+  scope :nondeleted, -> { not_deleted }
 
   attr_accessor :skip_touch
   attr_accessor :reassociate_external_tool
@@ -696,6 +699,79 @@ class ContentTag < ActiveRecord::Base
 
   def self.order_by_outcome_title
     eager_load(:learning_outcome_content).order(outcome_title_order_by_clause)
+  end
+
+  # Used to either Just-In-Time migrate a ContentTag to fully support 1.3 or
+  # as part of a backfill job to migrate existing 1.3 ContentTags to fully
+  # support 1.3. Fully support in this case means the associated resource link
+  # has the LTI 1.1 resource_link_id stored on it. Will only migrate tags that
+  # are module items that are associated with ContextExternalTools.
+  def migrate_to_1_3_if_needed!(tool)
+    return if !tool&.use_1_3? || associated_asset_lti_resource_link&.lti_1_1_id.present?
+
+    return unless context_module_id.present? && content_type == ContextExternalTool.to_s
+
+    # Updating a 1.3 module item
+    if associated_asset_lti_resource_link.present? && content&.use_1_3?
+      associated_asset_lti_resource_link.update!(lti_1_1_id: tool.opaque_identifier_for(self))
+    # Migrating a 1.1 module item
+    elsif !content&.use_1_3?
+      rl = Lti::ResourceLink.create_with(context, tool, nil, url, lti_1_1_id: tool.opaque_identifier_for(self))
+      update!(associated_asset: rl, content: tool)
+    end
+  end
+
+  def self.directly_associated_items(tool_id, context)
+    module_item_scope = ContentTag.nondeleted.where(tag_type: :context_module)
+    case context
+    when Course
+      module_item_scope = module_item_scope.where(context_id: context.id)
+    when Account
+      module_item_scope = module_item_scope.where(root_account_id: context.root_account? ? context.id : context.root_account_id)
+    end
+
+    module_item_scope.where(content_id: tool_id)
+  end
+
+  def self.indirectly_associated_items(_tool_id, context)
+    module_item_scope = ContentTag.nondeleted.where(tag_type: :context_module)
+    case context
+    when Course
+      module_item_scope = module_item_scope.where(context_id: context.id)
+    when Account
+      module_item_scope = module_item_scope.where(root_account_id: context.root_account? ? context.id : context.root_account_id)
+    end
+    # TODO: this does not account for content tagsthat _are_ linked to a
+    # tool and the tag has a content_id, but the content_id doesn't match
+    # the current tool
+    module_item_scope.where(content_id: nil)
+  end
+
+  # @param [Array<Integer>] ids The IDs of the resources to fetch for this batch
+  def self.fetch_direct_batch(ids, &)
+    return to_enum(:fetch_direct_batch, ids) unless block_given?
+
+    ContentTag
+      .where(id: ids)
+      .preload(:associated_asset, :context)
+      .find_each(&)
+  end
+
+  # @param [Integer] tool_id The ID of the LTI 1.1 tool that the resource is indirectly
+  # associated with
+  # @param [Array<Integer>] ids The IDs of the resources to fetch for this batch
+  def self.fetch_indirect_batch(tool_id, new_tool_id, ids)
+    return to_enum(:fetch_indirect_batch, tool_id, new_tool_id, ids) unless block_given?
+
+    ContentTag
+      .where(id: ids)
+      .preload(:associated_asset, :context)
+      .find_each do |item|
+      possible_tool = ContextExternalTool.find_external_tool(item.url, item.context, nil, new_tool_id)
+      next if possible_tool.nil? || possible_tool.id != tool_id
+
+      yield item
+    end
   end
 
   def visible_to_user?(user, opts = nil, session = nil)

@@ -1083,4 +1083,157 @@ describe ContentTag do
       expect(tag.reload.published?).to be(true)
     end
   end
+
+  describe "Lti::Migratable" do
+    let(:tag_type) { "context_module" }
+    let(:url) { "http://www.example.com" }
+    let(:account) { account_model }
+    let(:course) { course_model(account:) }
+    let(:tool) { external_tool_model(context: course, opts: { url: }) }
+    let(:tool_1_3) { external_tool_1_3_model(context: course, opts: { url: }) }
+    let(:direct_tag) { ContentTag.create!(context: course, content: tool, url:, context_module:, tag_type:) }
+    let(:unpublished_direct) do
+      ct = direct_tag.dup
+      ct.update!(workflow_state: "unpublished")
+      ct
+    end
+    let(:indirect_tag) do
+      ct = ContentTag.create!(context: course, url:, context_module:, tag_type:)
+      # To work around a before_save that associates tools. Yay for old data in Canvas.
+      ct.update_column(:content_id, nil)
+      ct
+    end
+    let(:unpublished_indirect) do
+      ct = indirect_tag.dup
+      ct.update!(workflow_state: "unpublished")
+      ct.update_column(:content_id, nil)
+      ct
+    end
+    let(:context_module) { ContextModule.create!(context: course, name: "first") }
+
+    describe "#migrate_to_1_3_if_needed!" do
+      it "doesn't migrate tags when given a 1.1 tool" do
+        tag = ContentTag.create!(content: tool, context: course, context_module:, url:, tag_type:)
+        expect { tag.migrate_to_1_3_if_needed!(tool) }
+          .not_to change { tag.reload.associated_asset_lti_resource_link.present? }
+      end
+
+      it "doesn't migrate tags that have already been migrated" do
+        tag = ContentTag.create!(content: tool_1_3, context: course, url:, context_module:, tag_type:)
+        tag.associated_asset_lti_resource_link = Lti::ResourceLink.create_with(course, tool_1_3, lti_1_1_id: tool.opaque_identifier_for(tag))
+        tag.save!
+        expect { tag.migrate_to_1_3_if_needed!(tool_1_3) }
+          .not_to change { tag.reload.associated_asset_lti_resource_link.lti_1_1_id }
+      end
+
+      it "doesn't migrate content tags that aren't part of context modules" do
+        tag = ContentTag.create!(content: tool_1_3, context: course, url:, tag_type:)
+        expect { tag.migrate_to_1_3_if_needed!(tool_1_3) }
+          .not_to change { tag.reload.associated_asset_lti_resource_link.present? }
+      end
+
+      it "doesn't migrate content tags who's content is not an external tool" do
+        tag = ContentTag.create!(content: assignment_model, context: course, tag_type: "assignment")
+        expect { tag.migrate_to_1_3_if_needed!(tool_1_3) }
+          .not_to change { tag.reload.associated_asset_lti_resource_link.present? }
+      end
+
+      it "migrates tags associated with 1.3 tools" do
+        tag = ContentTag.create!(content: tool_1_3, context: course, url:, context_module:, tag_type:)
+        tag.associated_asset_lti_resource_link = Lti::ResourceLink.create_with(course, tool_1_3)
+        tag.save!
+        expect { tag.migrate_to_1_3_if_needed!(tool_1_3) }
+          .to change { tag.reload.associated_asset_lti_resource_link.lti_1_1_id }
+          .from(nil).to(tool.opaque_identifier_for(tag))
+      end
+
+      it "migrates tags associated with 1.1 tools" do
+        tag = ContentTag.create!(content: tool, context: course, url:, context_module:, tag_type:)
+        expect { tag.migrate_to_1_3_if_needed!(tool_1_3) }
+          .to change { tag.reload.associated_asset_lti_resource_link&.lti_1_1_id }
+          .from(nil).to(tool.opaque_identifier_for(tag))
+          .and change { tag.reload.content }.from(tool).to(tool_1_3)
+      end
+    end
+
+    context "finding items" do
+      def create_misc_content_tags
+        # Same course, just deleted
+        ct = direct_tag.dup
+        ct.update!(workflow_state: "deleted")
+        ct = indirect_tag.dup
+        ct.update!(workflow_state: "deleted")
+
+        new_course = course_model(account: account_model)
+
+        # Different account
+        cm = ContextModule.create!(context: new_course, name: "third")
+        cm.content_tags.create!(content: tool, context: new_course, tag_type:)
+      end
+
+      describe "#directly_associated_items" do
+        it "finds all active directly associated items within a course" do
+          create_misc_content_tags
+          indirect_tag
+          direct_tag
+
+          expect(ContentTag.directly_associated_items(tool.id, course))
+            .to contain_exactly(direct_tag, unpublished_direct)
+        end
+
+        it "finds all active directly associated items within an account" do
+          create_misc_content_tags
+          direct_tag
+          indirect_tag
+          course = course_model(account:)
+          context_module = course.context_modules.create!(name: "other module")
+          other_direct_tag = ContentTag.create!(context: course, content: tool, context_module:, tag_type:)
+
+          tags = ContentTag.directly_associated_items(tool.id, account)
+          expect(tags).to contain_exactly(direct_tag, other_direct_tag, unpublished_direct)
+        end
+      end
+
+      describe "#indirectly_associated_items" do
+        it "finds all active indirectly associated items only within a course" do
+          create_misc_content_tags
+          indirect_tag
+          direct_tag
+
+          tags = ContentTag.indirectly_associated_items(tool.id, course)
+          expect(tags).to contain_exactly(indirect_tag, unpublished_indirect)
+        end
+
+        it "finds all active indirectly associated items only within an account" do
+          create_misc_content_tags
+          indirect_tag
+          direct_tag
+          course = course_model(account:)
+          context_module = course.context_modules.create!(name: "other module")
+          other_indirect_tag = ContentTag.create!(context: course, context_module:, url:, tag_type:)
+
+          tags = ContentTag.indirectly_associated_items(tool.id, account)
+          expect(tags).to contain_exactly(indirect_tag, other_indirect_tag, unpublished_indirect)
+        end
+      end
+    end
+
+    describe "#fetch_direct_batch" do
+      it "fetches only the ids it's given" do
+        direct_tag
+        indirect_tag
+        expect(ContentTag.fetch_direct_batch([direct_tag.id]).to_a)
+          .to contain_exactly(direct_tag)
+      end
+    end
+
+    describe "#fetch_indirect_batch" do
+      it "ignores tags that can't be associated with the tool being migrated" do
+        diff_url = ContentTag.create!(context: course, url: "http://notreallythere.com")
+        tags = ContentTag.fetch_indirect_batch(tool.id, tool_1_3.id, [indirect_tag, diff_url].pluck(:id)).to_a
+        expect(tags)
+          .to contain_exactly(indirect_tag)
+      end
+    end
+  end
 end

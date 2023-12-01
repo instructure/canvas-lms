@@ -337,13 +337,13 @@ describe Lti::Messages::ResourceLinkRequest do
 
     context "lti1p1 claims" do
       let(:lti1p1_claim) { "https://purl.imsglobal.org/spec/lti/claim/lti1p1" }
+      let(:message_lti1p1) { jws[lti1p1_claim] }
+      let(:message_resource_link_id) { jws.dig(lti1p1_claim, "resource_link_id") }
 
       context "resource_link_id claim" do
         context "the LTI 1.1 resource_link_id is the same as the LTI 1.3 resource_link_id" do
-          let(:message_lti1p1) { jws[lti1p1_claim] }
-
           before do
-            allow(expected_assignment_line_item.resource_link).to receive(:resource_link_uuid).and_return(assignment.lti_resource_link_id)
+            allow(expected_assignment_line_item.resource_link).to receive(:lti_1_1_id).and_return(expected_assignment_line_item.resource_link.resource_link_uuid)
           end
 
           it "doesn't include the resource_link_id property" do
@@ -352,10 +352,10 @@ describe Lti::Messages::ResourceLinkRequest do
         end
 
         context "the LTI 1.1 resource_link_id is different from the LTI 1.3 resource_link_id" do
-          let(:message_resource_link_id) { jws.dig(lti1p1_claim, "resource_link_id") }
+          before do
+            expected_assignment_line_item.resource_link.update!(lti_1_1_id: assignment.lti_resource_link_id)
+          end
 
-          # LTI 1.1 and LTI 1.3 resource links are always different by default, as LTI 1.3 uses UUIDs
-          # and LTI 1.1 used hashes, so no setup necessary!
           it "includes the resource_link_id property with the different lti_context_id" do
             expect(message_resource_link_id).to eq assignment.lti_resource_link_id
           end

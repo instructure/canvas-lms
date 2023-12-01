@@ -25,6 +25,7 @@ class ContextExternalTool < ActiveRecord::Base
 
   has_many :content_tags, as: :content
   has_many :context_external_tool_placements, autosave: true
+  has_many :lti_resource_links, class_name: "Lti::ResourceLink"
 
   belongs_to :context, polymorphic: [:course, :account]
   belongs_to :developer_key
@@ -1457,105 +1458,79 @@ class ContextExternalTool < ActiveRecord::Base
     !feature || (context || self.context).feature_enabled?(feature)
   end
 
+  # Add new types to this as we finish their migration methods
+  # and they'll be automagically migrated.
+  VALID_MIGRATION_TYPES = [Assignment, ContentTag].freeze
+
   # for helping tool providers upgrade from 1.1 to 1.3.
-  # this method will upgrade all related assignments to 1.3,
+  # this method will upgrade all related content to 1.3,
   # only if this is a 1.3 tool and has a matching 1.1 tool.
-  # since finding all assignments related to this tool is an
+  # since finding all content related to this tool is an
   # expensive operation (unavoidable N+1 for indirectly
   # related assignments, which are more rare), this is done
   # in a delayed job.
-  def prepare_for_ags_if_needed!
+  # @see Lti::Migratable
+  def migrate_content_to_1_3_if_needed!
     return unless use_1_3?
 
     # is there a 1.1 tool that matches this one?
     matching_1_1_tool = self.class.find_external_tool(url || domain, context, nil, id, prefer_1_1: true)
     return if matching_1_1_tool.nil? || matching_1_1_tool.use_1_3?
 
-    delay_if_production(priority: Delayed::LOW_PRIORITY).prepare_for_ags(matching_1_1_tool.id)
+    delay_if_production(priority: Delayed::LOW_PRIORITY).migrate_content_to_1_3(matching_1_1_tool.id)
   end
 
-  # finds all assignments related to a tool, whether directly through a
-  # ContentTag with a ContextExternalTool as its `content`, or indirectly
-  # through a ContentTag with a `url` that matches a ContextExternalTool.
-  # accepts a `tool_id` parameter that specifies the matching 1.1 tool.
-  # if this isn't provided, searches for self.
-  #
-  # Loads assignments in batches and kicks off smaller jobs that perform
-  # the actual work of creating LTI records for the assignments.
-  def prepare_for_ags(tool_id)
+  # Migrates all content associated with an LTI 1.1 tool to LTI 1.3.
+  # Loads content in batches and kicks off smaller jobs that perform
+  # the actual work of migrating the content.
+  # @param [Integer] tool_id The id of the LTI 1.1 tool whose content we're migrating
+  # @see Lti::Migratable
+  def migrate_content_to_1_3(tool_id)
     tool_id ||= id
-    scope = Assignment.active.joins(:external_tool_tag)
-
-    # limit to assignments in the tool's context
-    case context
-    when Course
-      scope = scope.where(context_id: context.id)
-    when Account
-      scope = scope.where(root_account_id:, content_tags: { root_account_id: })
-    end
-
     GuardRail.activate(:secondary) do
-      # directly associated
-      scope
-        .where(content_tags: { content_id: tool_id })
-        .find_ids_in_batches do |ids|
+      VALID_MIGRATION_TYPES.each do |type|
+        next unless type.include?(Lti::Migratable)
+
+        type.directly_associated_items(tool_id, context).find_ids_in_batches do |ids|
           delay_if_production(
             priority: Delayed::LOW_PRIORITY,
-            n_strand: ["ContextExternalTool#prepare_batch_for_ags", tool_id]
-          ).prepare_direct_batch_for_ags(ids)
+            n_strand: ["ContextExternalTool#migrate_content_to_1_3", tool_id]
+          ).prepare_direct_batch_for_migration(ids, type)
         end
-
-      # indirectly associated
-      # TODO: this does not account for assignments that _are_ linked to a
-      # tool and the tag has a content_id, but the content_id doesn't match
-      # the current tool
-      scope
-        .where(content_tags: { content_id: nil })
-        .find_ids_in_batches do |ids|
+        type.indirectly_associated_items(tool_id, context).find_ids_in_batches do |ids|
           delay_if_production(
             priority: Delayed::LOW_PRIORITY,
-            n_strand: ["ContextExternalTool#prepare_batch_for_ags", tool_id]
-          ).prepare_indirect_batch_for_ags(tool_id, ids)
+            n_strand: ["ContextExternalTool#migrate_content_to_1_3", tool_id]
+          ).prepare_indirect_batch_for_migration(tool_id, ids, type)
         end
-    end
-  end
-
-  # Creates LTI 1.3 records (ResourceLink and LineItem) for
-  # assignments directly associated with the 1.1 tool that
-  # matches this 1.3 tool, as part of the 1.1 -> 1.3 migration.
-  # Direct association: Assignment -> external_tool_tag -> content
-  def prepare_direct_batch_for_ags(assignment_ids)
-    Assignment.where(id: assignment_ids).find_each do |a|
-      prepare_assignment_for_ags(a)
-    end
-  end
-
-  # Creates LTI 1.3 records (ResourceLink and LineItem) for
-  # assignments indirectly associated with the 1.1 tool that
-  # matches this 1.3 tool, as part of the 1.1 -> 1.3 migration.
-  # Indirect association: Assignment -> external_tool_tag -> url ->
-  # find_external_tool. Commonly needed when directly linked tool
-  # is deleted/reinstalled.
-  def prepare_indirect_batch_for_ags(tool_id, assignment_ids)
-    Assignment
-      .where(id: assignment_ids)
-      .joins(:external_tool_tag)
-      .select("assignments.*", "content_tags.url as tool_url")
-      .find_each do |a|
-        # again, look for the 1.1 tool by excluding self from this query.
-        # a (currently) unavoidable N+1, sadly
-        a_tool = self.class.find_external_tool(a.tool_url, a, nil, id)
-        next if a_tool.nil? || a_tool.id != tool_id
-
-        prepare_assignment_for_ags(a)
       end
+    end
   end
 
-  def prepare_assignment_for_ags(assignment)
-    assignment.prepare_for_ags_if_needed!(self, use_tool: true)
+  # For the given content_type, migrates the direct batch
+  # from 1.1 to 1.3 according to the types migration method.
+  # @see Lti::Migratable
+  def prepare_direct_batch_for_migration(ids, content_type)
+    content_type.fetch_direct_batch(ids).each do |item|
+      prepare_content_for_migration(item)
+    end
+  end
+
+  # For the given content_type, migrates the direct batch
+  # from 1.1 to 1.3 according to the types migration method.
+  # @see Lti::Migratable
+  def prepare_indirect_batch_for_migration(tool_id, ids, content_type)
+    content_type.fetch_indirect_batch(tool_id, id, ids).each do |item|
+      prepare_content_for_migration(item)
+    end
+  end
+
+  def prepare_content_for_migration(content)
+    content.migrate_to_1_3_if_needed!(self)
   rescue ActiveRecord::RecordInvalid, PG::UniqueViolation => e
     Sentry.with_scope do |scope|
-      scope.set_tags(assignment_id: assignment.global_id)
+      scope.set_tags(content_id: content.global_id)
+      scope.set_tags(content_type: content.class.name)
       scope.set_tags(tool_id: global_id)
       scope.set_tags(exception_class: e.class.name)
       scope.set_context(
@@ -1565,7 +1540,7 @@ class ContextExternalTool < ActiveRecord::Base
           message: e.message
         }
       )
-      Sentry.capture_message("ContextExternalTool#prepare_assignment_for_ags", level: :warning)
+      Sentry.capture_message("ContextExternalTool#prepare_content_for_migration", level: :warning)
     end
   end
 

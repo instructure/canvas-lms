@@ -10529,94 +10529,6 @@ describe Assignment do
               expect(subject.line_items.first.resource_link).not_to eq resource_link
             end
           end
-
-          describe "#prepare_for_ags_if_needed!" do
-            subject { assignment }
-
-            let(:use_tool) { false }
-
-            context "when the assignment is not AGS ready" do
-              before do
-                assignment.update!(lti_context_id: SecureRandom.uuid)
-
-                # assignments configured with LTI 1.1 will not have
-                # LineItem or ResouceLink records prior to the LTI 1.3
-                # launch.
-                # (note: this needs to happen _after_ any other calls to
-                # assignment.save! since that calls update_line_items)
-                # (note: this setup and test hierarchy is not great)
-                assignment.line_items.destroy_all
-
-                Lti::ResourceLink.where(
-                  resource_link_uuid: assignment.lti_context_id
-                ).destroy_all
-
-                allow(assignment).to receive(:tool_from_external_tool_tag).and_call_original
-                assignment.prepare_for_ags_if_needed!(tool, use_tool:)
-              end
-
-              it "creates the default line item" do
-                expect(subject.line_items).to be_present
-              end
-
-              it "creates the LTI resource link" do
-                expect(
-                  Lti::ResourceLink.where(
-                    resource_link_uuid: subject.lti_context_id
-                  )
-                ).to be_present
-              end
-
-              it "queries to find correct tool" do
-                expect(assignment).to have_received(:tool_from_external_tool_tag).at_least(:once)
-              end
-
-              context "when told to use the given tool" do
-                let(:use_tool) { true }
-
-                it "does not query for the tool again" do
-                  expect(subject).not_to have_received(:tool_from_external_tool_tag)
-                end
-              end
-            end
-
-            shared_examples_for "a method that does not change AGS columns" do
-              it "does not recreate the default line item" do
-                expect do
-                  assignment.prepare_for_ags_if_needed!(tool)
-                end.not_to change { assignment.line_items.first.id }
-              end
-
-              it "does not recreate the LTI resource link" do
-                expect do
-                  assignment.prepare_for_ags_if_needed!(tool)
-                end.not_to change {
-                  Lti::ResourceLink.where(resource_link_uuid: subject.lti_context_id)
-                                   .first
-                                   .id
-                }
-              end
-            end
-
-            context "when the tool does not use 1.3" do
-              before do
-                tool.use_1_3 = false
-                tool.save!
-              end
-
-              it_behaves_like "a method that does not change AGS columns"
-            end
-
-            context "when the tool does not have a developer key" do
-              before { tool.update!(developer_key: nil) }
-
-              it_behaves_like "a method that does not change AGS columns"
-            end
-
-            context "when the assignment already has line items" do
-              it_behaves_like "a method that does not change AGS columns"
-            end
-          end
         end
 
         context "and resource link and line item exist" do
@@ -11410,6 +11322,245 @@ describe Assignment do
 
     it "soft-deletes child assignments when the parent assignment is soft-deleted" do
       expect { @parent.destroy }.to change { @child.reload.deleted? }.from(false).to(true)
+    end
+  end
+
+  describe "Lti::Migratable" do
+    let(:url) { "http://www.example.com" }
+    let(:account) { account_model }
+    let(:course) { course_model(account:) }
+    let(:developer_key) { dev_key_model_1_3(account:) }
+    let(:old_tool) { external_tool_model(context: course, opts: { url: }) }
+    let(:new_tool) { external_tool_1_3_model(context: course, developer_key:, opts: { url:, name: "1.3 tool" }) }
+    let(:direct_assignment) do
+      assignment_model(
+        context: course,
+        name: "Direct Assignment",
+        submission_types: "external_tool",
+        external_tool_tag_attributes: { content: old_tool },
+        lti_context_id: SecureRandom.uuid
+      )
+    end
+    let(:unpublished_direct) do
+      a = direct_assignment.dup
+      a.update!(lti_context_id: SecureRandom.uuid, workflow_state: "unpublished", external_tool_tag_attributes: { content: old_tool })
+      a
+    end
+    let(:indirect_assignment) do
+      assign = assignment_model(
+        context: course,
+        name: "Indirect Assignment",
+        submission_types: "external_tool",
+        external_tool_tag_attributes: { url: },
+        lti_context_id: SecureRandom.uuid
+      )
+      # There's an before_save hook that looks up the appropriate tool
+      # based on the URL. Great for production, bad for testing :(
+      assign.external_tool_tag.update_column(:content_id, nil)
+      assign
+    end
+    let(:unpublished_indirect) do
+      a = indirect_assignment.dup
+      a.update!(lti_context_id: SecureRandom.uuid, workflow_state: "unpublished", external_tool_tag_attributes: { url: })
+      a.external_tool_tag.update_column(:content_id, nil)
+      a
+    end
+
+    describe "#migrate_to_1_3_if_needed!" do
+      subject { direct_assignment.migrate_to_1_3_if_needed!(new_tool) }
+
+      context "when the assignment is not AGS ready" do
+        before do
+          direct_assignment.line_items.destroy_all
+
+          Lti::ResourceLink.where(
+            resource_link_uuid: direct_assignment.lti_context_id
+          ).destroy_all
+        end
+
+        it "creates the default line item" do
+          subject
+          expect(direct_assignment.line_items).to be_present
+        end
+
+        it "creates the LTI resource link" do
+          subject
+          expect(
+            Lti::ResourceLink.where(
+              resource_link_uuid: direct_assignment.lti_context_id
+            )
+          ).to be_present
+        end
+
+        it "does not query for the tool again" do
+          expect(direct_assignment).not_to receive(:tool_from_external_tool_tag)
+          subject
+        end
+      end
+
+      shared_examples_for "an idempotent migration" do
+        it "does not recreate the default line item" do
+          direct_assignment.migrate_to_1_3_if_needed!(new_tool)
+          expect { direct_assignment.migrate_to_1_3_if_needed!(new_tool) }
+            .not_to change { direct_assignment.line_items.first&.id }
+        end
+
+        it "does not recreate the LTI resource link" do
+          direct_assignment.migrate_to_1_3_if_needed!(new_tool)
+          expect { direct_assignment.migrate_to_1_3_if_needed!(new_tool) }
+            .not_to change {
+                      Lti::ResourceLink.where(resource_link_uuid: direct_assignment.lti_context_id)
+                                       .first
+                                       &.id
+                    }
+        end
+      end
+
+      context "when the tool does not use 1.3" do
+        before do
+          new_tool.update!(use_1_3: false)
+        end
+
+        it_behaves_like "an idempotent migration"
+      end
+
+      context "when the tool does not have a developer key" do
+        before { new_tool.update!(developer_key: nil) }
+
+        it_behaves_like "an idempotent migration"
+      end
+
+      context "when the assignment already has line items" do
+        it_behaves_like "an idempotent migration"
+      end
+
+      context "when the assignment has line items but hasn't written the LTI 1.1 id" do
+        let(:assignment) { assignment_model(context: course, submission_types: "external_tool", external_tool_tag_attributes: { content: new_tool }) }
+
+        before do
+          # Avoid any callbacks that might write the LTI 1.1 id
+          assignment.primary_resource_link.update_column(:lti_1_1_id, nil)
+        end
+
+        it "updates the existing resource link with the LTI 1.1 id" do
+          resource_link = assignment.primary_resource_link
+          expect(resource_link.lti_1_1_id).to be_nil
+
+          assignment.migrate_to_1_3_if_needed!(new_tool)
+          expect(resource_link.reload.lti_1_1_id).to eq(assignment.lti_resource_link_id)
+        end
+      end
+    end
+
+    context "finding items" do
+      def create_misc_assignments
+        # Same course, just deleted
+        assign = direct_assignment.dup
+        assign.update!(workflow_state: "deleted", lti_context_id: SecureRandom.uuid, name: "Deleted Same Course")
+
+        # Different account
+        new_course = course_model(account: account_model)
+
+        assignment_model(
+          context: new_course,
+          name: "Different Account Direct Relation",
+          submission_types: "external_tool",
+          external_tool_tag_attributes: { content: old_tool },
+          lti_context_id: SecureRandom.uuid
+        )
+        indirect = assignment_model(
+          context: new_course,
+          name: "Different Account Indirect Relation",
+          submission_types: "external_tool",
+          external_tool_tag_attributes: { url: },
+          lti_context_id: SecureRandom.uuid
+        )
+        indirect.external_tool_tag.update_column(:content_id, nil)
+      end
+
+      describe "#directly_associated_items" do
+        it "finds all active assignments in the same course" do
+          create_misc_assignments
+          direct_assignment
+          indirect_assignment
+
+          expect(Assignment.directly_associated_items(old_tool.id, course))
+            .to contain_exactly(direct_assignment, unpublished_direct)
+        end
+
+        it "finds all active assignments in the same account" do
+          create_misc_assignments
+          direct_assignment
+          indirect_assignment
+
+          new_course = course_model(account:)
+          other_assign = assignment_model(
+            context: new_course,
+            submission_types: "external_tool",
+            external_tool_tag_attributes: { content: old_tool },
+            lti_context_id: SecureRandom.uuid
+          )
+
+          expect(Assignment.directly_associated_items(old_tool.id, account))
+            .to contain_exactly(direct_assignment, other_assign, unpublished_direct)
+        end
+      end
+
+      describe "#indirectly_associated_items" do
+        it "finds all active assignments in the same course" do
+          create_misc_assignments
+          direct_assignment
+          indirect_assignment
+
+          expect(Assignment.indirectly_associated_items(old_tool.id, course))
+            .to contain_exactly(indirect_assignment, unpublished_indirect)
+        end
+
+        it "finds all active assignments in the same account" do
+          create_misc_assignments
+          direct_assignment
+          indirect_assignment
+
+          new_course = course_model(account:)
+          other_assign = assignment_model(
+            context: new_course,
+            title: "Indirect Assignment, Same Account",
+            submission_types: "external_tool",
+            external_tool_tag_attributes: { url: },
+            lti_context_id: SecureRandom.uuid
+          )
+          other_assign.external_tool_tag.update_column(:content_id, nil)
+
+          expect(Assignment.indirectly_associated_items(old_tool.id, account))
+            .to contain_exactly(indirect_assignment, other_assign, unpublished_indirect)
+        end
+      end
+    end
+
+    describe "#fetch_direct_batch" do
+      it "fetches only the ids it's given" do
+        direct_assignment
+        indirect_assignment
+
+        expect(Assignment.fetch_direct_batch([direct_assignment.id]).to_a)
+          .to contain_exactly(direct_assignment)
+      end
+    end
+
+    describe "#fetch_indirect_batch" do
+      it "ignores assignments that can't be associated with the tool being migrated" do
+        invalid_assign = assignment_model(
+          context: course,
+          submission_types: "external_tool",
+          external_tool_tag_attributes: { url: "https://notreallythere.com" },
+          lti_context_id: SecureRandom.uuid
+        )
+
+        p old_tool.id
+        p new_tool.id
+        expect(Assignment.fetch_indirect_batch(old_tool.id, new_tool.id, [indirect_assignment.id, invalid_assign.id]).to_a)
+          .to contain_exactly(indirect_assignment)
+      end
     end
   end
 end
