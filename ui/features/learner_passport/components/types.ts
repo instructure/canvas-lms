@@ -96,6 +96,7 @@ export interface ProjectData {
 export interface AttachmentData {
   id: string
   filename: string
+  display_name: string
   size: string
   contentType: string
   url: string

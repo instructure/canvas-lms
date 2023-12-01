@@ -21,10 +21,9 @@ import {useActionData, useLoaderData, useNavigate, useSubmit} from 'react-router
 import {Breadcrumb} from '@instructure/ui-breadcrumb'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
-import {Heading} from '@instructure/ui-heading'
 import {IconDragHandleLine, IconReviewScreenLine, IconSaveLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
-
+import HeadingEditor from '../../shared/HeadingEditor'
 import PersonalInfo from './personal_info/PersonalInfo'
 import AchievementsEditToggle from './achievements/AchievementsEdit'
 import EducationEdit from './education/EducationEdit'
@@ -44,8 +43,13 @@ const PortfolioEdit = () => {
   const [achievementIds, setAchievementIds] = useState<string[]>(() => {
     return portfolio.achievements.map(achievement => achievement.id)
   })
+  const [title, setTitle] = useState(portfolio.title)
   const [education, setEducation] = useState(portfolio.education)
   const [experience, setExperience] = useState(portfolio.experience)
+
+  const handleTitleChange = useCallback((newTitle: string) => {
+    setTitle(newTitle)
+  }, [])
 
   const handlePreviewClick = useCallback(() => {
     navigate(`../view/${portfolio.id}`)
@@ -97,15 +101,14 @@ const PortfolioEdit = () => {
               <Breadcrumb.Link
                 href={`/users/${ENV.current_user.id}/passport/portfolios/view/${portfolio.id}`}
               >
-                {portfolio.title}
+                {title}
               </Breadcrumb.Link>
               <Breadcrumb.Link>edit</Breadcrumb.Link>
             </Breadcrumb>
-            <Flex as="div" margin="0 0 medium 0">
+            <Flex as="div" margin="0 0 medium 0" gap="small">
               <Flex.Item shouldGrow={true}>
-                <Heading level="h1" themeOverride={{h1FontWeight: 700}}>
-                  {portfolio.title}
-                </Heading>
+                <HeadingEditor value={title} onChange={handleTitleChange} />
+                <input type="hidden" name="title" value={title} />
               </Flex.Item>
               <Flex.Item>
                 <Button margin="0 x-small 0 0" renderIcon={IconDragHandleLine}>

@@ -60,12 +60,16 @@ const AddFilesModal = ({open, onDismiss, onSave}: AddFilesModalProps) => {
     [fileDropMessages]
   )
 
-  const handleDismiss = useCallback(() => {
+  const handleClose = useCallback(() => {
     setFileDropMessages([])
     setTheFiles([])
     setUploadInFlight(false)
+  }, [])
+
+  const handleDismiss = useCallback(() => {
+    handleClose()
     onDismiss()
-  }, [onDismiss])
+  }, [handleClose, onDismiss])
 
   const handleSave = useCallback(async () => {
     if (uploadInFlight) return
@@ -84,6 +88,7 @@ const AddFilesModal = ({open, onDismiss, onSave}: AddFilesModalProps) => {
         return {
           id: fdata.id,
           filename: fdata.filename,
+          display_name: fdata.display_name,
           size: fdata.size,
           contentType: fdata['content-type'],
           url: url.href,
@@ -107,11 +112,19 @@ const AddFilesModal = ({open, onDismiss, onSave}: AddFilesModalProps) => {
   }, [])
 
   const handleDropAccepted = useCallback(
-    ([file]) => {
+    (acceptedFiles: ArrayLike<File | DataTransferItem>) => {
       setFileDropMessages([])
-      // replace files with the same name
-      const fileList = theFiles.filter(f => f.name !== file.name)
-      setTheFiles([...fileList, file])
+      const newFiles = acceptedFiles as File[]
+
+      // add new files, replacing files with the same name
+      const newFileList: Record<string, File> = {}
+      theFiles.forEach(file => {
+        newFileList[file.name] = file
+      })
+      newFiles.forEach(file => {
+        newFileList[file.name] = file
+      })
+      setTheFiles(Object.values(newFileList).sort((a, b) => a.name.localeCompare(b.name)))
     },
     [theFiles]
   )
@@ -166,7 +179,13 @@ const AddFilesModal = ({open, onDismiss, onSave}: AddFilesModalProps) => {
   }
 
   return (
-    <Modal open={open} size="auto" label="Edit Cover Image" onDismiss={onDismiss}>
+    <Modal
+      open={open}
+      size="auto"
+      label="Edit Cover Image"
+      onDismiss={handleDismiss}
+      onClose={handleClose}
+    >
       <Modal.Header>
         <CloseButton
           placement="end"
@@ -197,7 +216,7 @@ const AddFilesModal = ({open, onDismiss, onSave}: AddFilesModalProps) => {
               }
             />
           }
-          shouldAllowMultiple={false}
+          shouldAllowMultiple={true}
           width="942px"
         />
         <View as="div" margin="small 0">

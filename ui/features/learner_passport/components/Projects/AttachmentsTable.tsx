@@ -76,7 +76,7 @@ const AttachmentsTable = ({attachments}: AttachmnetsTableProps) => {
                   </Flex.Item>
                   <Flex.Item shouldGrow={true}>
                     <a href={attachment.url} target={attachment.filename}>
-                      {attachment.filename}
+                      {attachment.display_name}
                     </a>
                   </Flex.Item>
                 </Flex>

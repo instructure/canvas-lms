@@ -62,6 +62,7 @@ function setError(error: Error | null) {
   }
 }
 interface CoverImageModalProps {
+  subTitle: string
   imageUrl: string | null
   open: boolean
   onDismiss: () => void
@@ -74,7 +75,7 @@ interface Preview {
   error: string | null
 }
 
-const CoverImageModal = ({imageUrl, open, onDismiss, onSave}: CoverImageModalProps) => {
+const CoverImageModal = ({subTitle, imageUrl, open, onDismiss, onSave}: CoverImageModalProps) => {
   const [newImageUrl, setNewImageUrl] = useState(imageUrl)
   const [showUpload, setShowUpload] = useState(false)
   const [fileDropMessages, setFileDropMessages] = useState<FormMessage[]>([])
@@ -286,7 +287,7 @@ const CoverImageModal = ({imageUrl, open, onDismiss, onSave}: CoverImageModalPro
             <CondensedButton onClick={() => setShowUpload(false)}>&lt; Back</CondensedButton>
           </View>
         )}
-        <Text>Upload and edit a decorative cover image for your profile.</Text>
+        <Text>{subTitle}</Text>
         <View as="div" margin="small 0">
           {renderBodyContents()}
         </View>

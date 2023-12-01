@@ -228,6 +228,7 @@ const PersonalInfo = ({portfolio}: PersonalInfoProps) => {
         </Flex>
       </ToggleDetails>
       <CoverImageModal
+        subTitle="Upload and edit a decorative cover image for your profile."
         imageUrl={heroImageUrl}
         open={editCoverImageModalOpen}
         onDismiss={handleCloseEditCoverImageModal}

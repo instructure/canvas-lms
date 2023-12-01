@@ -57,8 +57,8 @@ const RichTextEdit = ({id, content, label, onContentChange}: RichTextEditProps) 
 
   return (
     <FormField id={`${id}_label`} label={label}>
-      <textarea id={`${id}_text`} style={{display: 'none'}} />
-      <div style={{marginTop: '-.75rem'}}>
+      <div style={{marginTop: '-.75rem', position: 'relative'}}>
+        <textarea id={`${id}_text`} style={{display: 'none'}} />
         <CanvasRce
           ref={rceRef}
           autosave={false}

@@ -35,6 +35,7 @@ import {renderEditLink, stringToId} from '../../shared/utils'
 import CoverImageModal from '../../shared/CoverImageModal'
 import SkillSelect from '../../shared/SkillSelect'
 import RichTextEdit from '../../shared/RichTextEdit'
+import HeadingEditor from '../../shared/HeadingEditor'
 import AddFilesModal from './AddFilesModal'
 
 const ProjectEdit = () => {
@@ -48,6 +49,7 @@ const ProjectEdit = () => {
   const [achievementIds, setAchievementIds] = useState<string[]>(() => {
     return project.achievements.map(achievement => achievement.id)
   })
+  const [title, setTitle] = useState(project.title)
   const [heroImageUrl, setHeroImageUrl] = useState(project.heroImageUrl)
   const [attachments, setAttachments] = useState<AttachmentData[]>(project.attachments)
   const [links, setLinks] = useState(project.links)
@@ -68,23 +70,33 @@ const ProjectEdit = () => {
     (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault()
 
-      const formData = new FormData(e.currentTarget)
-      const data = {
-        ...Object.fromEntries(formData),
-        achievements: achievementIds,
-      }
+      const form = document.getElementById('edit_project_form') as HTMLFormElement
+      const formData = new FormData(form)
 
-      submit(data)
+      const sklls = JSON.parse(formData.get('skills') as string)
+      formData.delete('skills')
+      sklls.forEach((skill: SkillData) => {
+        formData.append('skills[]', JSON.stringify(skill))
+      })
+
+      const attch = JSON.parse(formData.get('attachments') as string)
+      formData.delete('attachments')
+      attch.forEach((attachment: AttachmentData) => {
+        formData.append('attachments[]', JSON.stringify(attachment))
+      })
+
+      submit(formData, {method: 'POST'})
     },
-    [achievementIds, submit]
+    [submit]
   )
-  //
-  // const handleAchievementIdsChange = useCallback(
-  //   (achievementIds: string[]) => {
-  //     setAchievementIds(achievementIds)
-  //   },
-  //   [setAchievementIds]
-  // )
+
+  const handleTitleChange = useCallback((newTitle: string) => {
+    setTitle(newTitle)
+  }, [])
+
+  const handleNewAchievements = useCallback((newAchievementIds: string[]) => {
+    setAchievementIds(newAchievementIds)
+  }, [])
 
   const handleEditCoverImageClick = useCallback(() => {
     setEditCoverImageModalOpen(true)
@@ -139,7 +151,17 @@ const ProjectEdit = () => {
 
   const handleAddFiles = useCallback(
     (newAttachments: AttachmentData[]) => {
-      setAttachments([...attachments, ...newAttachments])
+      // add new files, replacing files with the same name
+      const newFileList: Record<string, AttachmentData> = {}
+      attachments.forEach(file => {
+        newFileList[file.filename] = file
+      })
+      newAttachments.forEach(file => {
+        newFileList[file.filename] = file
+      })
+      setAttachments(
+        Object.values(newFileList).sort((a, b) => a.filename.localeCompare(b.filename))
+      )
       setAddFilesModalOpen(false)
     },
     [attachments]
@@ -160,11 +182,10 @@ const ProjectEdit = () => {
             </Breadcrumb.Link>
             <Breadcrumb.Link>Edit</Breadcrumb.Link>
           </Breadcrumb>
-          <Flex as="div" margin="0 0 medium 0" justifyItems="space-between">
-            <Flex.Item shouldShrink={true}>
-              <Heading level="h1" themeOverride={{h1FontSize: '1.5rem'}}>
-                {project.title}
-              </Heading>
+          <Flex as="div" margin="0 0 medium 0" justifyItems="space-between" gap="small">
+            <Flex.Item shouldGrow={true}>
+              <HeadingEditor value={project.title} onChange={handleTitleChange} />
+              <input type="hidden" name="title" value={title} />
             </Flex.Item>
             <Flex.Item>
               <Button margin="0 x-small 0 0" renderIcon={IconReviewScreenLine}>
@@ -201,7 +222,7 @@ const ProjectEdit = () => {
               <input type="hidden" name="skills" value={JSON.stringify(skills)} />
               <SkillSelect
                 label="Skills and tools"
-                subLabel="Tag this project with verified skills or tools"
+                subLabel="Tag this project with skills or tools"
                 objectSkills={skills}
                 selectedSkillIds={skills.map(s => stringToId(s.name))}
                 onSelect={handleSelectSkills}
@@ -209,8 +230,9 @@ const ProjectEdit = () => {
             </View>
 
             <View as="div" margin="0 0 medium 0">
+              <input type="hidden" name="description" value={description} />
               <RichTextEdit
-                id="project_description"
+                id="description"
                 label="Project Description"
                 content={description}
                 onContentChange={handleDescriptionChange}
@@ -244,6 +266,7 @@ const ProjectEdit = () => {
                     </Button>
                     {attachments.length > 0 ? <AttachmentsTable attachments={attachments} /> : null}
                   </FormField>
+                  <input type="hidden" name="attachments" value={JSON.stringify(attachments)} />
                 </View>
                 <View as="div" margin="0 0 medium 0">
                   <FormField
@@ -279,14 +302,16 @@ const ProjectEdit = () => {
                 Associate any badges to this project by selecting from previously earned
                 achievements
               </Text>
+              <input type="hidden" name="achievements" value={achievementIds.join(',')} />
               <AchievementsEdit
                 allAchievements={allAchievements}
                 selectedAchievementIds={achievementIds}
-                onChange={setAchievementIds}
+                onChange={handleNewAchievements}
               />
             </View>
           </View>
           <CoverImageModal
+            subTitle="Upload and edit a cover image for your project."
             imageUrl={heroImageUrl}
             open={editCoverImageModalOpen}
             onDismiss={handleCloseEditCoverImageModal}
