@@ -2071,7 +2071,8 @@ class ApplicationController < ActionController::Base
       @resource_url = @tag.url
       @tool = ContextExternalTool.from_content_tag(tag, context)
 
-      @assignment&.prepare_for_ags_if_needed!(@tool)
+      @assignment&.migrate_to_1_3_if_needed!(@tool)
+      tag.migrate_to_1_3_if_needed!(@tool)
 
       tag.context_module_action(@current_user, :read)
       if @tool

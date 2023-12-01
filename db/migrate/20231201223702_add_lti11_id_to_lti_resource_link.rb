@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2017 - present Instructure, Inc.
+# Copyright (C) 2023 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,26 +16,13 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
 
-module Factories
-  BASE_ATTRS = {
-    name: "a",
-    url: "http://google.com",
-    consumer_key: "12345",
-    shared_secret: "secret"
-  }.freeze
+class AddLti11IdToLtiResourceLink < ActiveRecord::Migration[7.0]
+  tag :predeploy
+  disable_ddl_transaction!
 
-  def external_tool_model(context: nil, opts: {})
-    context ||= course_model
-    context.context_external_tools.create(
-      BASE_ATTRS.merge(opts)
-    )
-  end
-
-  def external_tool_1_3_model(context: nil, opts: {}, developer_key: nil)
-    developer_key ||= DeveloperKey.create!
-    opts = { developer_key_id: developer_key.id, lti_version: "1.3", url: "https://example.com/1_3/launch", domain: "example.com" }.merge(opts)
-    external_tool_model(context:, opts:)
+  def change
+    add_column :lti_resource_links, :lti_1_1_id, :string, if_not_exists: true
+    add_index :lti_resource_links, :lti_1_1_id, unique: true, algorithm: :concurrently, if_not_exists: true, where: "lti_1_1_id IS NOT NULL"
   end
 end

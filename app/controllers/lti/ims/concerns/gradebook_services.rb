@@ -100,7 +100,7 @@ module Lti::IMS::Concerns
         raise ActiveRecord::RecordNotFound unless assignment
 
         if tool == ContextExternalTool.from_content_tag(assignment.external_tool_tag, assignment)
-          assignment.prepare_for_ags_if_needed!(tool)
+          assignment.migrate_to_1_3_if_needed!(tool)
           return
         end
         render_error("Resource link id points to Tool not associated with this Context", :unprocessable_entity)

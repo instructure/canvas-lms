@@ -1161,7 +1161,7 @@ class ExternalToolsController < ApplicationController
     end
     @tool.check_for_duplication(params.dig(:external_tool, :verify_uniqueness).present?)
     if @tool.errors.blank? && @tool.save
-      @tool.prepare_for_ags_if_needed!
+      @tool.migrate_content_to_1_3_if_needed!
       invalidate_nav_tabs_cache(@tool)
       if api_request?
         render json: external_tool_json(@tool, @context, @current_user, session)
