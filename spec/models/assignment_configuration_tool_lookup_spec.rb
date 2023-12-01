@@ -108,7 +108,7 @@ describe AssignmentConfigurationToolLookup do
       expect(AssignmentConfigurationToolLookup.by_tool_proxy(tool_proxy)).to match_array [assignment]
     end
 
-    it "finds configured assignments when installed in a root acocunt" do
+    it "finds configured assignments when installed in a root account" do
       tool_proxy.update!(context: root_account)
       expect(AssignmentConfigurationToolLookup.by_tool_proxy(tool_proxy)).to match_array [assignment]
     end
