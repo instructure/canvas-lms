@@ -8,7 +8,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     diff-lcs (1.5.0)
-    json (2.6.3)
+    json (2.7.0)
     rake (13.1.0)
     rspec (3.12.0)
       rspec-core (~> 3.12.0)
