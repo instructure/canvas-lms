@@ -238,7 +238,7 @@ class FilesController < ApplicationController
       session["file_access_user_id"] = access_verifier[:user].global_id
       session["file_access_real_user_id"] = access_verifier[:real_user]&.global_id
       session["file_access_developer_key_id"] = access_verifier[:developer_key]&.global_id
-      session["file_access_root_acocunt_id"] = access_verifier[:root_account]&.global_id
+      session["file_access_root_account_id"] = access_verifier[:root_account]&.global_id
       session["file_access_oauth_host"] = access_verifier[:oauth_host]
       session["file_access_expiration"] = 1.hour.from_now.to_i
       session.file_access_user = access_verifier[:user]
