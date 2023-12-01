@@ -201,6 +201,7 @@ module Lti
             { claims: [] },
             :target_link_uri,
             :custom_parameters,
+            "https://#{Lti::IMS::Registration::CANVAS_EXTENSION_LABEL}/lti/privacy_level"
           ] },
           :client_uri,
           :logo_uri,

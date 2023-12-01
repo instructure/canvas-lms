@@ -20,6 +20,7 @@ import type {LtiMessage, LtiRegistration} from '../../model/LtiRegistration'
 import createStore from 'zustand/vanilla'
 import type {LtiScope} from '../../model/LtiScopes'
 import {subscribeWithSelector} from 'zustand/middleware'
+import type {LtiPrivacyLevel} from 'features/developer_keys_v2/model/LtiPrivacyLevel'
 
 export interface RegistrationOverlayStore extends RegistrationOverlayActions {
   state: RegistrationOverlayState
@@ -38,6 +39,7 @@ interface RegistrationOverlayActions {
     placement_type: LtiPlacement
   ) => (fn: (placementOverlay: PlacementOverlay) => PlacementOverlay) => void
   resetOverlays: (ltiRegistration: LtiRegistration) => void
+  updatePrivacyLevel: (placement_type: LtiPrivacyLevel) => void
 }
 
 // fields explicitly not overlayable:
@@ -83,6 +85,7 @@ export interface RegistrationOverlay {
   launch_width?: string
   disabledPlacements: Array<LtiPlacement>
   placements: Array<PlacementOverlay>
+  privacy_level: LtiPrivacyLevel
 }
 
 export interface PlacementOverlay {
@@ -121,6 +124,11 @@ const updateDevKeyName = (name: string) =>
     return {...state, developerKeyName: name}
   })
 
+const updatePrivacyLevel = (privacyLevel: LtiPrivacyLevel) =>
+  updateState(state => {
+    return {...state, registration: {...state.registration, privacy_level: privacyLevel}}
+  })
+
 const updateRegistrationKey =
   <K extends keyof RegistrationOverlay>(key: K) =>
   (f: (prevVal: RegistrationOverlay[K]) => RegistrationOverlay[K]) =>
@@ -150,14 +158,6 @@ const resetOverlays = (registration: LtiRegistration) =>
   updateState(state =>
     initialOverlayStateFromLtiRegistration(registration, state.developerKeyName, false)
   )
-
-// title?: string
-// scopes?: string[]
-// subs?: string[]
-// icon_url?: string
-// launch_height?: string
-// launch_width?: string
-// placements?: Array<PlacementOverlay>
 
 export const createRegistrationOverlayStore = (
   developerKeyName: string | null,
@@ -191,6 +191,7 @@ export const createRegistrationOverlayStore = (
         (placement_type: LtiPlacement) =>
         (fn: (placementOverlay: PlacementOverlay) => PlacementOverlay) =>
           set(updatePlacement(placement_type)(fn)),
+      updatePrivacyLevel: (privacyLevel: LtiPrivacyLevel) => set(updatePrivacyLevel(privacyLevel)),
     }))
   )
 
@@ -219,6 +220,11 @@ const initialOverlayStateFromLtiRegistration = (
       launch_height: undefined,
       launch_width: undefined,
       placements: placementsWithOverlay(reg, applyOverlay),
+      privacy_level:
+        valueFor(
+          reg.lti_tool_configuration['https://canvas.instructure.com/lti/privacy_level'],
+          reg.overlay?.privacy_level
+        ) || 'anonymous',
     },
   }
 }
