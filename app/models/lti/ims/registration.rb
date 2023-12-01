@@ -74,13 +74,14 @@ class Lti::IMS::Registration < ApplicationRecord
 
     {
       title: client_name,
-      scopes: scopes.reject { |s| (overlay || {})["disabledScopes"]&.include?(s) || false },
+      scopes: scopes.reject { |s| overlay["disabledScopes"]&.include?(s) || false },
       public_jwk_url: jwks_uri,
       description: config["description"],
       custom_parameters: config["custom_parameters"],
       target_link_uri: config["target_link_uri"],
       oidc_initiation_url: initiate_login_uri,
       url: config["target_link_uri"],
+      privacy_level:,
       extensions: [{
         domain: config["domain"],
         platform: "canvas.instructure.com",
@@ -105,9 +106,7 @@ class Lti::IMS::Registration < ApplicationRecord
   end
 
   def privacy_level
-    # TODO: Allow tools to control this with an extension to the
-    # tool configuration
-    "public"
+    registration_overlay["privacy_level"] || lti_tool_configuration["https://#{CANVAS_EXTENSION_LABEL}/lti/privacy_level"] || "anonymous"
   end
 
   def update_external_tools?
@@ -148,11 +147,11 @@ class Lti::IMS::Registration < ApplicationRecord
   end
 
   def lookup_placement_overlay(placement_type)
-    (registration_overlay || {})["placements"]&.find { |p| p["type"] == placement_type }
+    registration_overlay["placements"]&.find { |p| p["type"] == placement_type }
   end
 
   def placement_disabled?(placement_type)
-    (registration_overlay || {})["disabledPlacements"]&.include?(placement_type) || false
+    registration_overlay["disabledPlacements"]&.include?(placement_type) || false
   end
 
   def canvas_extensions
@@ -169,6 +168,10 @@ class Lti::IMS::Registration < ApplicationRecord
   end
 
   def new_external_tool(context, existing_tool: nil)
+    # disabled tools should stay disabled while getting updated
+    # deleted tools are never updated during a dev key update so can be safely ignored
+    tool_is_disabled = existing_tool&.workflow_state == ContextExternalTool::DISABLED_STATE
+
     tool = existing_tool || ContextExternalTool.new(context:)
     Importers::ContextExternalToolImporter.import_from_migration(
       importable_configuration,
@@ -178,7 +181,7 @@ class Lti::IMS::Registration < ApplicationRecord
       false
     )
     tool.developer_key = developer_key
-    tool.workflow_state = "active"
+    tool.workflow_state = (tool_is_disabled && ContextExternalTool::DISABLED_STATE) || privacy_level || DEFAULT_PRIVACY_LEVEL
     tool.use_1_3 = true
     tool
   end

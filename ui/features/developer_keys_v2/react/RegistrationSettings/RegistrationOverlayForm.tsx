@@ -32,6 +32,7 @@ import {type LtiPlacement, i18nLtiPlacement} from '../../model/LtiPlacements'
 import type {LtiRegistration} from '../../model/LtiRegistration'
 import {i18nLtiScope} from '../../model/LtiScopes'
 import type {PlacementOverlay, RegistrationOverlayStore} from './RegistrationOverlayState'
+import {RegistrationPrivacyField} from './RegistrationPrivacyField'
 
 const I18n = useI18nScope('react_developer_keys')
 
@@ -41,8 +42,13 @@ export const RegistrationOverlayForm = (props: {
 }) => {
   const [{state, ...actions}, setState] = React.useState(props.store.getState())
 
-  const {toggleDisabledScope, toggleDisabledPlacement, updatePlacement, resetOverlays} =
-    React.useMemo(() => actions, [actions])
+  const {
+    toggleDisabledScope,
+    toggleDisabledPlacement,
+    updatePlacement,
+    resetOverlays,
+    updatePrivacyLevel,
+  } = React.useMemo(() => actions, [actions])
 
   React.useEffect(() => {
     props.store.subscribe(state => {
@@ -86,6 +92,12 @@ export const RegistrationOverlayForm = (props: {
             )
           })}
         </FormFieldGroup>
+      </View>
+      <View margin="medium 0" as="div">
+        <RegistrationPrivacyField
+          value={state.registration.privacy_level}
+          onChange={updatePrivacyLevel}
+        />
       </View>
       <View margin="medium 0" as="div">
         <FormFieldGroup description={I18n.t('Placements')} size={10}>

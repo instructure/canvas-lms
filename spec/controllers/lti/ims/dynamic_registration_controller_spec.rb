@@ -144,6 +144,7 @@ describe Lti::IMS::DynamicRegistrationController do
           }],
           "claims" => ["iss", "sub"],
           "target_link_uri" => "https://example.com/launch",
+          "https://canvas.instructure.com/lti/privacy_level" => "email_only",
         },
       }
     end
@@ -182,6 +183,7 @@ describe Lti::IMS::DynamicRegistrationController do
           expect(parsed_body).to include(expected_response_keys)
           expect(parsed_body["client_id"]).to eq DeveloperKey.last.global_id.to_s
           created_registration = Lti::IMS::Registration.last
+          expect(created_registration.privacy_level).to eq("email_only")
           expect(created_registration).not_to be_nil
         end
 
