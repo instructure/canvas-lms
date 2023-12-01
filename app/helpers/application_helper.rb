@@ -943,7 +943,7 @@ module ApplicationHelper
     if ApplicationController.test_cluster_name
       url =
         @domain_root_account.settings[
-          "#{ApplicationController.test_cluster_name}_dashboard_url".to_sym
+          :"#{ApplicationController.test_cluster_name}_dashboard_url"
         ]
     end
     url ||= @domain_root_account.settings[:dashboard_url]
@@ -1419,8 +1419,8 @@ module ApplicationHelper
   def load_hotjar?
     # Only load hotjar UX survey tool for the Learner Passport prototype
     # Skip it in production and development environments, include it for Beta & CD
-    controller.controller_name == "learner_passport" && \
-      Canvas.environment !~ /(production|development)/ && \
+    controller.controller_name == "learner_passport" &&
+      Canvas.environment !~ /(production|development)/ &&
       @domain_root_account&.feature_enabled?(:learner_passport)
   end
 end

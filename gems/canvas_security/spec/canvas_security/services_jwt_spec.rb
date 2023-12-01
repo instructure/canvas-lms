@@ -50,7 +50,7 @@ module CanvasSecurity
       let(:translate_token) do
         lambda do |jwt|
           decoded_crypted_token = CanvasSecurity.base64_decode(jwt)
-          return CanvasSecurity::ServicesJwt.decrypt(decoded_crypted_token)
+          CanvasSecurity::ServicesJwt.decrypt(decoded_crypted_token)
         end
       end
 

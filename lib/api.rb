@@ -635,7 +635,7 @@ module Api
           user:,
           preloaded_attachments:,
           is_public:,
-          in_app: (respond_to?(:in_app?, true) && in_app?)
+          in_app: respond_to?(:in_app?, true) && in_app?
         ).processed_url
       end
       rewriter.translate_content(html)

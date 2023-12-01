@@ -48,12 +48,12 @@ describe DumpHelper do
   end
 
   it "searches hash keys" do
-    val = { (-> {}) => 1 }
+    val = { -> {} => 1 }
     expect { DumpHelper.find_dump_error(val) }.to raise_error("val.keys[0]: no _dump_data is defined for class Proc")
   end
 
   it "searches hash values" do
-    val = { a: (-> {}) }
+    val = { a: -> {} }
     expect { DumpHelper.find_dump_error(val) }.to raise_error("val[:a]: no _dump_data is defined for class Proc")
   end
 

@@ -728,7 +728,7 @@ class Attachment < ActiveRecord::Base
         { "key" => sanitized_filename },
         { "acl" => "private" },
         ["starts-with", "$Filename", ""],
-        ["content-length-range", 1, (options[:max_size] || CONTENT_LENGTH_RANGE)]
+        ["content-length-range", 1, options[:max_size] || CONTENT_LENGTH_RANGE]
       ]
     }
 
@@ -2208,7 +2208,7 @@ class Attachment < ActiveRecord::Base
     random_backup_name = "#{dir}#{basename}-#{SecureRandom.uuid}#{extname}"
     return random_backup_name if attempts >= 8
 
-    until block.call(new_name = "#{dir}#{basename}-#{addition}#{extname}")
+    until block.call(new_name = "#{dir}#{basename}-#{addition}#{extname}") # rubocop:disable Lint/LiteralAssignmentInCondition
       addition += 1
       return random_backup_name if addition >= 8
     end

@@ -363,9 +363,9 @@ class SplitUsers
         relation = relation.instance_exec(&update[:scope]) if update[:scope]
 
         relation
-          .where((update[:context_id] || :context_id) => shard_course,
-                 (update[:foreign_key] || :user_id) => source_user_id)
-          .update_all((update[:foreign_key] || :user_id) => target_user_id)
+          .where(update[:context_id] || :context_id => shard_course,
+                 update[:foreign_key] || :user_id => source_user_id)
+          .update_all(update[:foreign_key] || :user_id => target_user_id)
       end
     end
   end

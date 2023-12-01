@@ -552,9 +552,8 @@ class GradebooksController < ApplicationController
       post_grades_ltis:,
       post_manually: @context.post_manually?,
       proxy_submissions_allowed: Account.site_admin.feature_enabled?(:proxy_file_uploads) && @context.grants_right?(@current_user, session, :proxy_assignment_submission),
-      publish_to_sis_enabled: (
-        !!@context.sis_source_id && @context.allows_grade_publishing_by(@current_user) && gradebook_is_editable
-      ),
+      publish_to_sis_enabled:
+        !!@context.sis_source_id && @context.allows_grade_publishing_by(@current_user) && gradebook_is_editable,
 
       publish_to_sis_url: context_url(@context, :context_details_url, anchor: "tab-grade-publishing"),
       re_upload_submissions_url: named_context_url(@context, :submissions_upload_context_gradebook_url, "{{ assignment_id }}"),
@@ -622,9 +621,8 @@ class GradebooksController < ApplicationController
       individual_gradebook_enhancements: true,
       outcome_gradebook_enabled: outcome_gradebook_enabled?,
       proxy_submissions_allowed: Account.site_admin.feature_enabled?(:proxy_file_uploads) && @context.grants_right?(@current_user, session, :proxy_assignment_submission),
-      publish_to_sis_enabled: (
-        !!@context.sis_source_id && @context.allows_grade_publishing_by(@current_user) && gradebook_is_editable
-      ),
+      publish_to_sis_enabled:
+        !!@context.sis_source_id && @context.allows_grade_publishing_by(@current_user) && gradebook_is_editable,
       publish_to_sis_url: context_url(@context, :context_details_url, anchor: "tab-grade-publishing"),
       reorder_custom_columns_url: api_v1_custom_gradebook_columns_reorder_url(@context),
       save_view_ungraded_as_zero_to_server: allow_view_ungraded_as_zero?,
@@ -727,9 +725,8 @@ class GradebooksController < ApplicationController
       post_grades_feature: post_grades_feature?,
       post_manually: @context.post_manually?,
       proxy_submissions_allowed: Account.site_admin.feature_enabled?(:proxy_file_uploads) && @context.grants_right?(@current_user, session, :proxy_assignment_submission),
-      publish_to_sis_enabled: (
-        !!@context.sis_source_id && @context.allows_grade_publishing_by(@current_user) && gradebook_is_editable
-      ),
+      publish_to_sis_enabled:
+        !!@context.sis_source_id && @context.allows_grade_publishing_by(@current_user) && gradebook_is_editable,
 
       publish_to_sis_url: context_url(@context, :context_details_url, anchor: "tab-grade-publishing"),
       re_upload_submissions_url: named_context_url(@context, :submissions_upload_context_gradebook_url, "{{ assignment_id }}"),

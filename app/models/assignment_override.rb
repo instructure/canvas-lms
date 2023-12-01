@@ -83,7 +83,7 @@ class AssignmentOverride < ActiveRecord::Base
     record.assignment_override_students.each do |s|
       next if s.valid?
 
-      s.errors.each do |_, error|
+      s.errors.each do |_, error| # rubocop:disable Style/HashEachMethods
         record.errors.add(:assignment_override_students,
                           error.type,
                           message: error.message)

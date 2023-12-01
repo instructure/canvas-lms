@@ -815,7 +815,7 @@ describe ActiveRecord::Migration::CommandRecorder do
     recorder.revert do
       r.add_column :accounts, :course_template_id, :integer, limit: 8, if_not_exists: true
       r.add_foreign_key :accounts, :courses, column: :course_template_id, if_not_exists: true
-      r.add_index :accounts, :course_template_id, algorithm: :concurrently, if_not_exists: true
+      r.add_index :accounts, :course_template_id, algorithm: :concurrently, if_not_exists: true # rubocop:disable Migration/NonTransactional
 
       r.remove_column :courses, :id, :integer, limit: 8, if_exists: true
       r.remove_foreign_key :enrollments, :users, if_exists: true

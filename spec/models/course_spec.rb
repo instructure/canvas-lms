@@ -3864,7 +3864,7 @@ describe Course do
                                                                                expect(enrollments.sort_by(&:id)).to eq @ase.sort_by(&:id)
                                                                                expect(publishing_pseudonym).to eq @pseudonym
                                                                                expect(publishing_user).to eq @user
-                                                                               return [
+                                                                               [
                                                                                  [[@ase[2].id, @ase[5].id],
                                                                                   "post1",
                                                                                   "test/mime1"],
@@ -3902,7 +3902,7 @@ describe Course do
                   expect(publishing_pseudonym).to eq @pseudonym
                   expect(publishing_user).to eq @user
                   @checked = true
-                  return []
+                  []
                 end
               }
             }
@@ -3930,7 +3930,7 @@ describe Course do
                                                                                expect(publishing_pseudonym).to eq @pseudonym
                                                                                expect(publishing_user).to eq @user
                                                                                @checked = true
-                                                                               return []
+                                                                               []
                                                                              end
                                                                            }
                                                                          })
@@ -4000,7 +4000,7 @@ describe Course do
                                                                                expect(enrollments.sort_by(&:id)).to eq @ase.sort_by(&:id)
                                                                                expect(publishing_pseudonym).to eq @pseudonym
                                                                                expect(publishing_user).to eq @user
-                                                                               return [
+                                                                               [
                                                                                  [[@ase[1].id, @ase[3].id],
                                                                                   "post1",
                                                                                   "test/mime1"],
@@ -4063,7 +4063,7 @@ describe Course do
                                                                                expect(enrollments.sort_by(&:id)).to eq @ase.sort_by(&:id)
                                                                                expect(publishing_pseudonym).to eq @pseudonym
                                                                                expect(publishing_user).to eq @user
-                                                                               return [
+                                                                               [
                                                                                  [[@ase[1].id, @ase[3].id],
                                                                                   "post1",
                                                                                   "test/mime1"],
@@ -4097,7 +4097,7 @@ describe Course do
                                                                                expect(enrollments.sort_by(&:id)).to eq @ase.sort_by(&:id)
                                                                                expect(publishing_pseudonym).to eq @pseudonym
                                                                                expect(publishing_user).to eq @user
-                                                                               return [
+                                                                               [
                                                                                  [[@ase[1].id, @ase[3].id],
                                                                                   "post1",
                                                                                   "test/mime1"],
@@ -4148,7 +4148,7 @@ describe Course do
                                                                                expect(enrollments.sort_by(&:id)).to eq @ase.sort_by(&:id)
                                                                                expect(publishing_pseudonym).to eq @pseudonym
                                                                                expect(publishing_user).to eq @user
-                                                                               return [
+                                                                               [
                                                                                  [[@ase[1].id, @ase[3].id],
                                                                                   "post1",
                                                                                   "test/mime1",
@@ -4178,7 +4178,7 @@ describe Course do
                                                                                expect(enrollments.sort_by(&:id)).to eq @ase.sort_by(&:id)
                                                                                expect(publishing_pseudonym).to eq @pseudonym
                                                                                expect(publishing_user).to eq @user
-                                                                               return [
+                                                                               [
                                                                                  [[@ase[1].id, @ase[3].id],
                                                                                   nil,
                                                                                   nil],
@@ -4561,7 +4561,7 @@ describe Course do
                       expect(course).to eq @course
                       expect(publishing_pseudonym).to eq @pseudonym
                       expect(publishing_user).to eq @user
-                      return [[[], "test-jt-data", "application/jtmimetype"]]
+                      [[[], "test-jt-data", "application/jtmimetype"]]
                     end,
           requires_grading_standard: false,
           requires_publishing_pseudonym: true

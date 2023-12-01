@@ -107,7 +107,7 @@ module Api::V1::AssignmentOverride
     if assignment
       scope = scope.where(
         context_id: assignment.context_id,
-        group_category_id: (group_category_id || assignment.group_category_id)
+        group_category_id: group_category_id || assignment.group_category_id
       )
     end
     group = scope.find(group_id)

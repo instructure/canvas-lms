@@ -621,9 +621,9 @@ class AppointmentGroupsController < ApplicationController
     student_course_id = @group.contexts_for_user(@current_user).first.id
     # If they are a student and they do not have an appointment, we should enter find appointment mode.
     # Otherwise the appointment group will not be visible to student.
-    needs_appointment = (!params[:event_id] && student_course_id &&
-                         !@group.appointments_participants.pluck(:user_id).include?(@current_user.id) &&
-                         !@group.users_with_reservations_through_group.include?(@current_user.id))
+    needs_appointment = !params[:event_id] && student_course_id &&
+                        !@group.appointments_participants.pluck(:user_id).include?(@current_user.id) &&
+                        !@group.users_with_reservations_through_group.include?(@current_user.id)
     anchor = if needs_appointment
                # start at the appointment group; enter find-appointment mode for a relevant course
                args[:view_start] = @group.start_at.strftime("%Y-%m-%d")

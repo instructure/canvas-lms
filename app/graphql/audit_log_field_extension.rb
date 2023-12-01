@@ -157,7 +157,7 @@ class AuditLogFieldExtension < GraphQL::Schema::FieldExtension
 
       # TODO? I make a log entry all the fields of the mutation, but maybe I
       # should make them on the arguments too???
-      mutation.fields.each do |_, return_field|
+      mutation.fields.each_value do |return_field|
         next if return_field.original_name == :errors
 
         if (entry = value[return_field.original_name])

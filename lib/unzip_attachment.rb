@@ -199,7 +199,7 @@ class UnzipAttachment
   end
 
   def last_position
-    @last_position ||= (@context.attachments.active.filter_map(&:position).last || 0)
+    @last_position ||= @context.attachments.active.filter_map(&:position).last || 0
   end
 
   def should_skip?(entry)

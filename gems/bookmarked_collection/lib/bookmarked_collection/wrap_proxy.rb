@@ -29,7 +29,7 @@ class BookmarkedCollection::WrapProxy < BookmarkedCollection::Proxy
   end
 
   def execute_pager(pager)
-    output_pager = super pager
+    output_pager = super(pager)
     pager.replace output_pager
     pager.has_more! if output_pager.next_page
     pager

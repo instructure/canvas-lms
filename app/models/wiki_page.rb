@@ -103,7 +103,7 @@ class WikiPage < ActiveRecord::Base
   self.ignored_columns += %i[view_count]
 
   def ensure_wiki_and_context
-    self.wiki_id ||= (context.wiki_id || context.wiki.id)
+    self.wiki_id ||= context.wiki_id || context.wiki.id
   end
 
   def should_generate_embeddings?

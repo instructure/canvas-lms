@@ -285,7 +285,7 @@ module Qti
       text, html = detect_html(node)
       hash[field] = text
       if html
-        hash["#{field}_html".to_sym] = html
+        hash[:"#{field}_html"] = html
       end
     end
 

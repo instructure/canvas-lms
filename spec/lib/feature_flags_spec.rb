@@ -102,7 +102,7 @@ describe FeatureFlags do
       feature = double(
         "Feature double",
         feature: "some_feature",
-        visible_on: ->(_) { return false },
+        visible_on: ->(_) { false },
         state: "allowed",
         shadow?: false
       )
