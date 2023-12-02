@@ -1148,7 +1148,7 @@ nn:
           account_reports: 
             default: 
               description: 
-                text: "Rapporten viser alle studentane sine sluttvurderingar i eit bestemt semester. CSV-fila inneheld ei rad per påmelding og viser gjeldande og endelege vurderingar som er lagt ut vurderingsoversikta for emnet."
+                text: "Rapporten viser alle studentane sine sluttvurderingar i eit bestemt semester. CSV-fila inneheld ei rad per påmelding og viser gjeldande og endelege vurderingar som er lagt ut i vurderingsoversikta for emnet."
     last_enrollment_activity_csv_description: 
       account_reports: 
         default: 
@@ -9248,7 +9248,7 @@ nn:
       show_rubric: "Vis vurderingsskjema"
       speed_grader: SpeedGrader™
       tooltips: 
-        cannot_unpublish_discussion: "Kan ikkje fjerne publisering med studentinnlegg"
+        cannot_unpublish_discussion: "Kan ikkje fjerne publisering om det er studentinnlegg"
       topic: Emne
       topic_podcast_feed_link: "Podkaststraum for emnet"
       topic_subscribe: Abonner
