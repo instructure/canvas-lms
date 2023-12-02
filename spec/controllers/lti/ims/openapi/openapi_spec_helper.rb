@@ -48,7 +48,7 @@ module OpenApiSpecHelper
         @errors[request.path] ||= {}
         @errors[request.path][method] ||= {}
         @errors[request.path][method]["request"] ||= {}
-        @errors[request.path][method]["request"].deep_merge(req_errors)
+        @errors[request.path][method]["request"].deep_merge!(req_errors)
       end
 
       spec_for_response = spec_for_method["responses"][response.code]
@@ -80,11 +80,15 @@ module OpenApiSpecHelper
         end
       end
 
-      body_param_schema = spec_at_method.dig("requestBody", "content", request.content_type)
-      if body_param_schema
-        request_body_errors = request_body_errors(body_param_schema["schema"], request.parameters)
-        if request_body_errors.any?
-          errors["body parameters"] = request_body_errors
+      if request.content_type
+        body_param_schema = spec_at_method.dig("requestBody", "content", request.content_type)
+        if body_param_schema
+          request_body_errors = request_body_errors(body_param_schema["schema"], request.parameters)
+          if request_body_errors.any?
+            errors["body parameters"] = request_body_errors.pluck("error")
+          end
+        else
+          errors["body parameters"] = "The content type #{request.content_type} is not in the schema"
         end
       end
 

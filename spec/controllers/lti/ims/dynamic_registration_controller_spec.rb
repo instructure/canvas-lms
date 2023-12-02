@@ -39,9 +39,7 @@ describe Lti::IMS::DynamicRegistrationController do
   end
 
   after do
-    return unless request && response
-
-    verifier.verify(request, response)
+    verifier.verify(request, response) if response.sent?
   end
 
   it "has openapi documentation for each of our controller routes" do
