@@ -17,7 +17,7 @@
  */
 
 import React, {useCallback, useState} from 'react'
-import {useActionData, useLoaderData, useNavigate, useSubmit} from 'react-router-dom'
+import {useActionData, useLoaderData, useSubmit} from 'react-router-dom'
 import {Breadcrumb} from '@instructure/ui-breadcrumb'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -29,11 +29,17 @@ import AchievementsEditToggle from './achievements/AchievementsEdit'
 import EducationEdit from './education/EducationEdit'
 import ExperienceEdit from './experience/ExperienceEdit'
 import ProjectsEdit from './ProjectsEdit'
+import PreviewModal from './PreviewModal'
 
-import type {EducationData, ExperienceData, PortfolioEditData, SkillData} from '../../types'
+import type {
+  EducationData,
+  ExperienceData,
+  PortfolioDetailData,
+  PortfolioEditData,
+  SkillData,
+} from '../../types'
 
 const PortfolioEdit = () => {
-  const navigate = useNavigate()
   const submit = useSubmit()
   const create_portfolio = useActionData() as PortfolioEditData
   const edit_portfolio = useLoaderData() as PortfolioEditData
@@ -46,14 +52,34 @@ const PortfolioEdit = () => {
   const [title, setTitle] = useState(portfolio.title)
   const [education, setEducation] = useState(portfolio.education)
   const [experience, setExperience] = useState(portfolio.experience)
+  const [showPreview, setShowPreview] = useState(false)
+  const [previewPortfolio, setPreviewPortfolio] = useState(portfolio)
+
+  const handlePreviewClick = useCallback(() => {
+    setPreviewPortfolio({
+      ...previewPortfolio,
+      title,
+      education,
+      experience,
+      achievements: allAchievements.filter(achievement => achievementIds.includes(achievement.id)),
+    })
+    setShowPreview(true)
+  }, [previewPortfolio, title, education, experience, allAchievements, achievementIds])
+
+  const handleClosePreview = useCallback(() => {
+    setShowPreview(false)
+  }, [])
+
+  const handleChangePersonalInfo = useCallback(
+    (newPortfolioData: Partial<PortfolioDetailData>) => {
+      setPreviewPortfolio({...previewPortfolio, ...newPortfolioData})
+    },
+    [previewPortfolio]
+  )
 
   const handleTitleChange = useCallback((newTitle: string) => {
     setTitle(newTitle)
   }, [])
-
-  const handlePreviewClick = useCallback(() => {
-    navigate(`../view/${portfolio.id}`)
-  }, [navigate, portfolio.id])
 
   const handleSaveClick = useCallback(() => {
     ;(document.getElementById('edit_portfolio_form') as HTMLFormElement)?.requestSubmit()
@@ -127,7 +153,7 @@ const PortfolioEdit = () => {
               </Flex.Item>
             </Flex>
             <View margin="0 medium" borderWidth="small">
-              <PersonalInfo portfolio={portfolio} />
+              <PersonalInfo portfolio={portfolio} onChange={handleChangePersonalInfo} />
             </View>
             <View margin="0 medium" borderWidth="small">
               <input type="hidden" name="education" value={JSON.stringify(education)} />
@@ -168,6 +194,7 @@ const PortfolioEdit = () => {
           </Flex>
         </View>
       </div>
+      <PreviewModal portfolio={previewPortfolio} open={showPreview} onClose={handleClosePreview} />
     </View>
   )
 }

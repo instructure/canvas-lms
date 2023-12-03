@@ -16,65 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback} from 'react'
-import {useActionData, useLoaderData, useNavigate} from 'react-router-dom'
-import {Breadcrumb} from '@instructure/ui-breadcrumb'
-import {Button} from '@instructure/ui-buttons'
-import {Flex} from '@instructure/ui-flex'
+import React from 'react'
+import {AchievementData, ProjectDetailData, SkillData} from '../types'
 import {Heading} from '@instructure/ui-heading'
-import {
-  IconDownloadLine,
-  IconEditLine,
-  IconPrinterLine,
-  IconReviewScreenLine,
-  IconShareLine,
-} from '@instructure/ui-icons'
-import {Img} from '@instructure/ui-img'
-import {List} from '@instructure/ui-list'
+import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
+import {List} from '@instructure/ui-list'
 import {View} from '@instructure/ui-view'
+import {Img} from '@instructure/ui-img'
 import AttachmentsTable from './AttachmentsTable'
-import type {AchievementData, ProjectDetailData, SkillData} from '../types'
-import {renderSkillTag} from '../shared/SkillTag'
 import {renderAchievement, renderLink} from '../shared/utils'
+import {renderSkillTag} from '../shared/SkillTag'
 
-const ProjectView = () => {
-  const navigate = useNavigate()
-  const create_project = useActionData() as ProjectDetailData
-  const edit_project = useLoaderData() as ProjectDetailData
-  const project = create_project || edit_project
+type ProjectViewProps = {
+  project: ProjectDetailData
+}
 
-  const handleEditClick = useCallback(() => {
-    navigate(`../edit/${project.id}`)
-  }, [navigate, project.id])
-
+const ProjectView = ({project}: ProjectViewProps) => {
   return (
-    <View as="div" id="foo" maxWidth="986px" margin="0 auto">
-      <Breadcrumb label="You are here:" size="small">
-        <Breadcrumb.Link href={`/users/${ENV.current_user.id}/passport/projects/dashboard`}>
-          Projects
-        </Breadcrumb.Link>
-        <Breadcrumb.Link>{project.title}</Breadcrumb.Link>
-      </Breadcrumb>
-      <Flex as="div" margin="0 0 medium 0" justifyItems="end">
-        <Flex.Item>
-          <Button margin="0 x-small 0 0" renderIcon={IconEditLine} onClick={handleEditClick}>
-            Edit
-          </Button>
-          <Button margin="0 x-small 0 0" renderIcon={IconDownloadLine}>
-            Download
-          </Button>
-          <Button margin="0 x-small 0 0" renderIcon={IconPrinterLine}>
-            Print
-          </Button>
-          <Button margin="0 x-small 0 0" renderIcon={IconReviewScreenLine}>
-            Preview
-          </Button>
-          <Button color="primary" margin="0" renderIcon={IconShareLine}>
-            Share
-          </Button>
-        </Flex.Item>
-      </Flex>
+    <>
       <View as="div" margin="0 0 large 0">
         <div style={{height: '184px', background: '#C7CDD1', overflow: 'hidden', zIndex: -1}}>
           {project.heroImageUrl && (
@@ -143,7 +103,7 @@ const ProjectView = () => {
           </Flex>
         </View>
       )}
-    </View>
+    </>
   )
 }
 

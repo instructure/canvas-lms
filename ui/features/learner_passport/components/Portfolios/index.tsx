@@ -20,6 +20,14 @@ import PortfolioLayout from './PortfolioLayout'
 import PortfolioEdit from './edit/PortfolioEdit'
 import PortfolioDashboard from './PortfolioDashboard'
 import PortfolioCreate from './PortfolioCreate'
+import PortfolioViewPage from './PortfolioViewPage'
 import PortfolioView from './PortfolioView'
 
-export {PortfolioLayout, PortfolioEdit, PortfolioDashboard, PortfolioCreate, PortfolioView}
+export {
+  PortfolioLayout,
+  PortfolioEdit,
+  PortfolioDashboard,
+  PortfolioCreate,
+  PortfolioViewPage,
+  PortfolioView,
+}

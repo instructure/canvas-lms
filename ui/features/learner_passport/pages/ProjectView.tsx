@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {useMatch} from 'react-router-dom'
-import {ProjectView} from '../components/Projects'
+import {ProjectViewPage} from '../components/Projects'
 
 export function Component() {
   const pathMatch = useMatch('/users/:userId/*')
@@ -26,5 +26,5 @@ export function Component() {
     throw new Error('user id is not present on path')
   }
 
-  return <ProjectView />
+  return <ProjectViewPage />
 }
