@@ -429,9 +429,13 @@ class LearnerPassportController < ApplicationController
   end
 
   def reset
-    @@current_portfolios = [@@portfolio_sample.clone]
-    @@current_projects = [@@project_sample.clone]
-
+    if params.key? :empty
+      @@current_achievements = []
+      @@current_portfolios = []
+    else
+      @@current_portfolios = [@@portfolio_sample.clone]
+      @@current_projects = [@@project_sample.clone]
+    end
     render json: { message: "Portfolios reset" }, status: :accepted
   end
 

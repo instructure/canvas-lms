@@ -37,10 +37,16 @@ import {renderEditLink, stringToId} from '../../../shared/utils'
 
 type PersonalInfoProps = {
   portfolio: PortfolioDetailData
+  onChange: (newPersonalInfo: Partial<PortfolioDetailData>) => void
 }
 
-const PersonalInfo = ({portfolio}: PersonalInfoProps) => {
-  const {blurb, city, state, phone, email, about} = portfolio
+const PersonalInfo = ({portfolio, onChange}: PersonalInfoProps) => {
+  const [blurb, setBlurb] = useState(portfolio.blurb)
+  const [city, setCity] = useState(portfolio.city)
+  const [state, setState] = useState(portfolio.state)
+  const [phone, setPhone] = useState(portfolio.phone)
+  const [email, setEmail] = useState(portfolio.email)
+  const [about, setAbout] = useState(portfolio.about)
   const [heroImageUrl, setHeroImageUrl] = useState(portfolio.heroImageUrl)
   const [links, setLinks] = useState(portfolio.links)
   const [skills, setSkills] = useState(portfolio.skills)
@@ -52,6 +58,54 @@ const PersonalInfo = ({portfolio}: PersonalInfoProps) => {
     setExpanded(toggleExpanded)
   }, [])
 
+  const handleBlurbChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setBlurb(event.target.value)
+      onChange({blurb: event.target.value})
+    },
+    [onChange]
+  )
+
+  const handleCityChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setCity(event.target.value)
+      onChange({city: event.target.value})
+    },
+    [onChange]
+  )
+
+  const handleStateChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setState(event.target.value)
+      onChange({state: event.target.value})
+    },
+    [onChange]
+  )
+
+  const handlePhoneChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setPhone(event.target.value)
+      onChange({phone: event.target.value})
+    },
+    [onChange]
+  )
+
+  const handleEmailChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setEmail(event.target.value)
+      onChange({email: event.target.value})
+    },
+    [onChange]
+  )
+
+  const handleAboutChange = useCallback(
+    (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+      setAbout(event.target.value)
+      onChange({about: event.target.value})
+    },
+    [onChange]
+  )
+
   const handleAddLink = useCallback(() => {
     setLinks([...links, ''])
   }, [links])
@@ -60,23 +114,32 @@ const PersonalInfo = ({portfolio}: PersonalInfoProps) => {
     (event: React.KeyboardEvent<ViewProps> | React.MouseEvent<ViewProps>) => {
       const link_id = (event.target as HTMLInputElement).getAttribute('data-linkid') as string
       const link = (document.getElementById(link_id) as HTMLInputElement).value
-      setLinks(links.filter(l => l !== link))
+      const newLinks = links.filter(l => l !== link)
+      setLinks(newLinks)
+      onChange({links: newLinks})
     },
-    [links]
+    [links, onChange]
   )
 
-  const handleEditLink = useCallback((event: React.FocusEvent<HTMLInputElement>) => {
-    event.preventDefault()
-    setLinks(
-      Array.from(document.getElementsByName('links[]')).map((link: HTMLElement) =>
+  const handleEditLink = useCallback(
+    (event: React.FocusEvent<HTMLInputElement>) => {
+      event.preventDefault()
+      const newLinks = Array.from(document.getElementsByName('links[]')).map((link: HTMLElement) =>
         (link as HTMLInputElement).value.trim()
       )
-    )
-  }, [])
+      setLinks(newLinks)
+      onChange({links: newLinks})
+    },
+    [onChange]
+  )
 
-  const handleSelectSkills = useCallback((newSkills: SkillData[]) => {
-    setSkills(newSkills)
-  }, [])
+  const handleSelectSkills = useCallback(
+    (newSkills: SkillData[]) => {
+      setSkills(newSkills)
+      onChange({skills: newSkills})
+    },
+    [onChange]
+  )
 
   const handleEditCoverImageClick = useCallback(() => {
     setEditCoverImageModalOpen(true)
@@ -86,10 +149,14 @@ const PersonalInfo = ({portfolio}: PersonalInfoProps) => {
     setEditCoverImageModalOpen(false)
   }, [])
 
-  const handleSaveHeroImageUrl = useCallback((imageUrl: string | null) => {
-    setHeroImageUrl(imageUrl)
-    setEditCoverImageModalOpen(false)
-  }, [])
+  const handleSaveHeroImageUrl = useCallback(
+    (imageUrl: string | null) => {
+      setHeroImageUrl(imageUrl)
+      setEditCoverImageModalOpen(false)
+      onChange({heroImageUrl: imageUrl})
+    },
+    [onChange]
+  )
 
   return (
     <>
@@ -154,7 +221,8 @@ const PersonalInfo = ({portfolio}: PersonalInfoProps) => {
                 placeholder="Enter a headline"
                 width="20rem"
                 size="small"
-                defaultValue={blurb}
+                value={blurb}
+                onChange={handleBlurbChange}
               />
             </Flex.Item>
           </Flex>
@@ -167,7 +235,8 @@ const PersonalInfo = ({portfolio}: PersonalInfoProps) => {
                 placeholder="Select city"
                 size="small"
                 renderAfterInput={IconSearchLine}
-                defaultValue={city}
+                value={city}
+                onChange={handleCityChange}
               />
               <TextInput
                 name="state"
@@ -175,21 +244,24 @@ const PersonalInfo = ({portfolio}: PersonalInfoProps) => {
                 placeholder="Select state"
                 size="small"
                 renderAfterInput={IconSearchLine}
-                defaultValue={state}
+                value={state}
+                onChange={handleStateChange}
               />
               <TextInput
                 name="phone"
                 renderLabel="Phone"
                 placeholder="Enter phone"
                 size="small"
-                defaultValue={phone}
+                value={phone}
+                onChange={handlePhoneChange}
               />
               <TextInput
                 name="email"
                 renderLabel="Email address"
                 placeholder="Enter email"
                 size="small"
-                defaultValue={email}
+                value={email}
+                onChange={handleEmailChange}
               />
             </Flex>
           </View>
@@ -198,7 +270,8 @@ const PersonalInfo = ({portfolio}: PersonalInfoProps) => {
             <TextArea
               name="about"
               label="About"
-              defaultValue={about.replace(/(\n|\s)+/g, ' ').trim()}
+              value={about.replace(/(\n|\s)+/g, ' ').trim()}
+              onChange={handleAboutChange}
             />
           </View>
           <View as="div" margin="medium 0 0 0">

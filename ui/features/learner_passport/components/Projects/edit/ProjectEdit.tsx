@@ -17,7 +17,7 @@
  */
 
 import React, {useCallback, useState} from 'react'
-import {useActionData, useLoaderData, useNavigate, useSubmit} from 'react-router-dom'
+import {useActionData, useLoaderData, useSubmit} from 'react-router-dom'
 import {Breadcrumb} from '@instructure/ui-breadcrumb'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -37,9 +37,9 @@ import SkillSelect from '../../shared/SkillSelect'
 import RichTextEdit from '../../shared/RichTextEdit'
 import HeadingEditor from '../../shared/HeadingEditor'
 import AddFilesModal from './AddFilesModal'
+import PreviewModal from './PreviewModal'
 
 const ProjectEdit = () => {
-  const navigate = useNavigate()
   const submit = useSubmit()
   const create_project = useActionData() as ProjectEditData
   const edit_project = useLoaderData() as ProjectEditData
@@ -57,10 +57,25 @@ const ProjectEdit = () => {
   const [description, setDescription] = useState(project.description)
   const [editCoverImageModalOpen, setEditCoverImageModalOpen] = useState(false)
   const [addFilesModalOpen, setAddFilesModalOpen] = useState(false)
+  const [showPreview, setShowPreview] = useState(false)
+  const [previewProject, setPreviewProject] = useState(project)
 
   const handlePreviewClick = useCallback(() => {
-    navigate(`../view/${project.id}`)
-  }, [navigate, project.id])
+    setPreviewProject({
+      ...project,
+      title,
+      heroImageUrl,
+      attachments,
+      links,
+      skills,
+      description,
+    })
+    setShowPreview(true)
+  }, [attachments, description, heroImageUrl, links, project, skills, title])
+
+  const handleClosePreview = useCallback(() => {
+    setShowPreview(false)
+  }, [])
 
   const handleSaveClick = useCallback(() => {
     ;(document.getElementById('edit_project_form') as HTMLFormElement)?.requestSubmit()
@@ -188,7 +203,11 @@ const ProjectEdit = () => {
               <input type="hidden" name="title" value={title} />
             </Flex.Item>
             <Flex.Item>
-              <Button margin="0 x-small 0 0" renderIcon={IconReviewScreenLine}>
+              <Button
+                margin="0 x-small 0 0"
+                renderIcon={IconReviewScreenLine}
+                onClick={handlePreviewClick}
+              >
                 Preview
               </Button>
               <Button color="primary" margin="0" renderIcon={IconSaveLine}>
@@ -340,6 +359,7 @@ const ProjectEdit = () => {
         onDismiss={handleCloseFilesModal}
         onSave={handleAddFiles}
       />
+      <PreviewModal project={previewProject} onClose={handleClosePreview} open={showPreview} />
     </View>
   )
 }

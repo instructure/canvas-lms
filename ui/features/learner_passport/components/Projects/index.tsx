@@ -19,6 +19,7 @@
 import ProjectDashboard from './ProjectDashboard'
 import ProjectEdit from './edit/ProjectEdit'
 import ProjectLayout from './ProjectLayout'
+import ProjectViewPage from './ProjectViewPage'
 import ProjectView from './ProjectView'
 
-export {ProjectDashboard, ProjectEdit, ProjectLayout, ProjectView}
+export {ProjectDashboard, ProjectEdit, ProjectLayout, ProjectViewPage, ProjectView}
