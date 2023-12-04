@@ -18,7 +18,7 @@
 
 import React, {useCallback, useState} from 'react'
 import {Avatar} from '@instructure/ui-avatar'
-import {Button, IconButton} from '@instructure/ui-buttons'
+import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Img} from '@instructure/ui-img'
@@ -201,13 +201,6 @@ const PersonalInfo = ({portfolio, onChange}: PersonalInfoProps) => {
                   ) : undefined
                 }
               />
-              <div style={{position: 'absolute', right: '-.5rem', bottom: '-.5rem'}}>
-                <IconButton
-                  screenReaderLabel="Edit profile image"
-                  renderIcon={IconEditLine}
-                  size="small"
-                />
-              </div>
             </View>
             <Flex.Item shouldGrow={true}>
               <View as="div" margin="0 0 small 0">
@@ -270,7 +263,7 @@ const PersonalInfo = ({portfolio, onChange}: PersonalInfoProps) => {
             <TextArea
               name="about"
               label="About"
-              value={about.replace(/(\n|\s)+/g, ' ').trim()}
+              value={about.replace(/(\n|\s)+/g, ' ')}
               onChange={handleAboutChange}
             />
           </View>

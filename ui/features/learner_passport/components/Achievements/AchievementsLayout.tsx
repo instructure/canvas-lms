@@ -81,6 +81,7 @@ const AchievementsLayout = () => {
             <div
               data-cardid={achievement.id}
               role="button"
+              style={{cursor: 'pointer'}}
               tabIndex={0}
               onClick={handleCardClick}
               onKeyDown={handleCardKey}
