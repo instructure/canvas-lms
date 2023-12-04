@@ -26,6 +26,11 @@ export const defaultEveryoneElseOption = {
   label: 'Everyone else',
 }
 
+export const masteryPathsOption = {
+  assetCode: 'mastery_paths',
+  label: 'Mastery Paths',
+}
+
 const GradedDiscussionDueDateDefaultValues = {
   assignedInfoList: [],
   setAssignedInfoList: () => {},

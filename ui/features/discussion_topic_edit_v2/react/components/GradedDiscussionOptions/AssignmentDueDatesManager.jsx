@@ -30,15 +30,14 @@ import {
   GradedDiscussionDueDatesContext,
   defaultEveryoneOption,
   defaultEveryoneElseOption,
+  masteryPathsOption,
 } from '../../util/constants'
 import CoursePacingNotice from '@canvas/due-dates/react/CoursePacingNotice'
 
 const I18n = useI18nScope('discussion_create')
 
 const getDefaultBaseOptions = (includeMasteryPath, everyoneOption) => {
-  return includeMasteryPath
-    ? [{...everyoneOption}, {assetCode: 'mastery_paths', label: 'Mastery Paths'}]
-    : [{...everyoneOption}]
+  return includeMasteryPath ? [everyoneOption, masteryPathsOption] : [everyoneOption]
 }
 
 export const AssignmentDueDatesManager = () => {

@@ -42,6 +42,7 @@ import {
   GradedDiscussionDueDatesContext,
   defaultEveryoneOption,
   defaultEveryoneElseOption,
+  masteryPathsOption,
 } from '../../util/constants'
 import {nanoid} from 'nanoid'
 import {AttachmentDisplay} from '@canvas/discussions/react/components/AttachmentDisplay/AttachmentDisplay'
@@ -361,7 +362,13 @@ export default function DiscussionTopicForm({
     overrideDueDate,
     overrideAvailableUntil,
     overrideAvailableFrom,
-    overrideIds = {groupId: null, courseSectionId: null, studentIds: null}
+    overrideIds = {
+      groupId: null,
+      courseSectionId: null,
+      studentIds: null,
+      noopId: null,
+    },
+    overrideTitle = null
   ) => {
     return {
       dueAt: overrideDueDate || null,
@@ -370,6 +377,8 @@ export default function DiscussionTopicForm({
       groupId: overrideIds.groupIds || null,
       courseSectionId: overrideIds.courseSectionId || null,
       studentIds: overrideIds.studentIds || null,
+      noopId: overrideIds.noopId || null,
+      title: overrideTitle || null,
     }
   }
 
@@ -435,6 +444,24 @@ export default function DiscussionTopicForm({
         })
       }
     })
+
+    const masteryPathOverride = assignedInfoList.find(info =>
+      info.assignedList.includes(masteryPathsOption.assetCode)
+    )
+
+    if (masteryPathOverride) {
+      preparedOverrides.push(
+        prepareOverride(
+          masteryPathOverride.dueDate || null,
+          masteryPathOverride.availableUntil || null,
+          masteryPathOverride.availableFrom || null,
+          {
+            noopId: '1',
+          },
+          masteryPathsOption.label
+        )
+      )
+    }
 
     return preparedOverrides
   }
