@@ -922,12 +922,14 @@ CanvasRails::Application.routes.draw do
     post "passport/data/portfolios/:portfolio_id" => "learner_passport#portfolio_update"
     get "passport/data/portfolios/show/:portfolio_id" => "learner_passport#portfolio_show"
     put "passport/data/portfolios/duplicate" => "learner_passport#portfolio_duplicate"
+    put "passport/data/portfolios/delete" => "learner_passport#portfolio_delete"
 
     get "passport/data/projects" => "learner_passport#projects_index"
     put "passport/data/projects/create" => "learner_passport#project_create"
     post "passport/data/projects/:project_id" => "learner_passport#project_update"
     get "passport/data/projects/show/:project_id" => "learner_passport#project_show"
     put "passport/data/projects/duplicate" => "learner_passport#project_duplicate"
+    put "passport/data/projects/delete" => "learner_passport#project_delete"
 
     get "passport/data/skills" => "learner_passport#skills_index"
     get "passport/data/reset" => "learner_passport#reset"

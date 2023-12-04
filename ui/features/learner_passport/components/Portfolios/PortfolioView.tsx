@@ -91,7 +91,7 @@ const PortfolioView = ({portfolio}: PortfolioViewProps) => {
               <Text size="x-small">{portfolio.blurb}</Text>
             </Flex.Item>
           </Flex>
-          <Flex as="div" direction="column" gap="large">
+          <Flex as="div" direction="column" gap="large" padding="0 medium">
             <View as="div">
               <Heading level="h3" themeOverride={{h3FontSize: '1rem'}}>
                 About Me

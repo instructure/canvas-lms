@@ -55,6 +55,21 @@ export const LearnerPassportRoutes = (
           }}
         />
         <Route
+          path="delete/:portfolioId"
+          loader={async ({params}) => {
+            await fetch(`/users/${params.userId}/passport/data/portfolios/delete`, {
+              method: 'PUT',
+              cache: 'no-cache',
+              headers: {
+                'X-CSRF-Token': getCookie('_csrf_token'),
+                'Content-type': 'application/json',
+              },
+              body: JSON.stringify({portfolio_id: params.portfolioId}),
+            })
+            return redirect('..')
+          }}
+        />
+        <Route
           path="create"
           action={async ({request}) => {
             const formData = await request.formData()
@@ -72,6 +87,25 @@ export const LearnerPassportRoutes = (
             )
             const json = await response.json()
             return redirect(`../../edit/${json.id}`)
+          }}
+        />
+        <Route
+          path="rename"
+          action={async ({request}) => {
+            const formData = await request.formData()
+            await fetch(
+              `/users/${formData.get('userId')}/passport/data/portfolios/${formData.get('id')}`,
+              {
+                method: 'POST',
+                cache: 'no-cache',
+                headers: {
+                  'X-CSRF-Token': getCookie('_csrf_token'),
+                  'Content-type': 'application/json',
+                },
+                body: JSON.stringify({title: formData.get('title')}),
+              }
+            )
+            return redirect('..')
           }}
         />
       </Route>
@@ -140,6 +174,21 @@ export const LearnerPassportRoutes = (
           }}
         />
         <Route
+          path="delete/:projectId"
+          loader={async ({params}) => {
+            await fetch(`/users/${params.userId}/passport/data/projects/delete`, {
+              method: 'PUT',
+              cache: 'no-cache',
+              headers: {
+                'X-CSRF-Token': getCookie('_csrf_token'),
+                'Content-type': 'application/json',
+              },
+              body: JSON.stringify({project_id: params.projectId}),
+            })
+            return redirect('..')
+          }}
+        />
+        <Route
           path="create"
           action={async ({request}) => {
             const formData = await request.formData()
@@ -157,6 +206,25 @@ export const LearnerPassportRoutes = (
             )
             const json = await response.json()
             return redirect(`../../edit/${json.id}`)
+          }}
+        />
+        <Route
+          path="rename"
+          action={async ({request}) => {
+            const formData = await request.formData()
+            await fetch(
+              `/users/${formData.get('userId')}/passport/data/projects/${formData.get('id')}`,
+              {
+                method: 'POST',
+                cache: 'no-cache',
+                headers: {
+                  'X-CSRF-Token': getCookie('_csrf_token'),
+                  'Content-type': 'application/json',
+                },
+                body: JSON.stringify({title: formData.get('title')}),
+              }
+            )
+            return redirect('..')
           }}
         />
       </Route>

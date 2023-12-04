@@ -24,12 +24,13 @@ import {Flex} from '@instructure/ui-flex'
 import {IconDragHandleLine, IconReviewScreenLine, IconSaveLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
 import HeadingEditor from '../../shared/HeadingEditor'
+import {showUnimplemented} from '../../shared/utils'
 import PersonalInfo from './personal_info/PersonalInfo'
 import AchievementsEditToggle from './achievements/AchievementsEdit'
 import EducationEdit from './education/EducationEdit'
 import ExperienceEdit from './experience/ExperienceEdit'
 import ProjectsEdit from './ProjectsEdit'
-import PreviewModal from './PreviewModal'
+import PortfolioPreviewModal from '../PortfolioPreviewModal'
 
 import type {
   EducationData,
@@ -137,7 +138,11 @@ const PortfolioEdit = () => {
                 <input type="hidden" name="title" value={title} />
               </Flex.Item>
               <Flex.Item>
-                <Button margin="0 x-small 0 0" renderIcon={IconDragHandleLine}>
+                <Button
+                  margin="0 x-small 0 0"
+                  renderIcon={IconDragHandleLine}
+                  onClick={showUnimplemented}
+                >
                   Reorder
                 </Button>
                 <Button
@@ -186,7 +191,7 @@ const PortfolioEdit = () => {
       >
         <View as="div" background="primary" borderWidth="small 0 0 0">
           <Flex justifyItems="end" padding="small" gap="small">
-            <Button>Reorder</Button>
+            <Button onClick={showUnimplemented}>Reorder</Button>
             <Button onClick={handlePreviewClick}>Preview</Button>
             <Button color="primary" onClick={handleSaveClick}>
               Save
@@ -194,7 +199,11 @@ const PortfolioEdit = () => {
           </Flex>
         </View>
       </div>
-      <PreviewModal portfolio={previewPortfolio} open={showPreview} onClose={handleClosePreview} />
+      <PortfolioPreviewModal
+        portfolio={previewPortfolio}
+        open={showPreview}
+        onClose={handleClosePreview}
+      />
     </View>
   )
 }

@@ -24,10 +24,10 @@ import {Heading} from '@instructure/ui-heading'
 import {IconPlusLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import PortfolioCard, {PORTFOLIO_CARD_WIDTH, PORTFOLIO_CARD_HEIGHT} from './PortfolioCard'
+import {showUnimplemented} from '../shared/utils'
 import type {PortfolioData} from '../types'
-import CreateModal from '../shared/CreateModal'
+import NamingModal from '../shared/NamingModal'
 import {renderCardSkeleton} from '../shared/CardSkeleton'
 
 const PortfolioDashboard = () => {
@@ -35,9 +35,12 @@ const PortfolioDashboard = () => {
   const submit = useSubmit()
   const portfolios = useLoaderData() as PortfolioData[]
   const [createModalIsOpen, setCreateModalIsOpen] = useState(false)
+  const [renameModalIsOpen, setRenameModalIsOpen] = useState(false)
+  const [actionPortfolioId, setActionProjectId] = useState('')
 
   const handleDismissCreateModal = useCallback(() => {
     setCreateModalIsOpen(false)
+    setRenameModalIsOpen(false)
   }, [])
 
   const handleCreateClick = useCallback(() => {
@@ -48,6 +51,14 @@ const PortfolioDashboard = () => {
     (f: HTMLFormElement) => {
       setCreateModalIsOpen(false)
       submit(f, {method: 'PUT'})
+    },
+    [submit]
+  )
+
+  const handleRenameProfile = useCallback(
+    (f: HTMLFormElement) => {
+      setRenameModalIsOpen(false)
+      submit(f, {method: 'POST', action: 'rename'})
     },
     [submit]
   )
@@ -64,11 +75,15 @@ const PortfolioDashboard = () => {
         case 'view':
           navigate(`../view/${portfolioId}`)
           break
+        case 'delete':
+          navigate(`delete/${portfolioId}`)
+          break
+        case 'rename':
+          setActionProjectId(portfolioId)
+          setRenameModalIsOpen(true)
+          break
         default:
-          showFlashAlert({
-            message: `portfolio ${portfolioId} action ${action}`,
-            type: 'success',
-          })
+          showUnimplemented({currentTarget: {textContent: action}})
       }
     },
     [navigate]
@@ -95,11 +110,11 @@ const PortfolioDashboard = () => {
         </Text>
       </View>
       <View>
-        {portfolios?.length > 0 ? (
+        {portfolios?.length > 0 ? null : (
           <View as="div" margin="0">
             <Text size="x-small">No portfolios created</Text>
           </View>
-        ) : null}
+        )}
         <View as="div" margin="small 0">
           {portfolios && portfolios.length > 0 ? (
             <Flex gap="medium" wrap="wrap">
@@ -121,11 +136,16 @@ const PortfolioDashboard = () => {
           )}
         </View>
       </View>
-      <CreateModal
-        forObject="Portfolio"
-        open={createModalIsOpen}
+      <NamingModal
+        objectType="Portfolio"
+        objectId={actionPortfolioId}
+        mode={createModalIsOpen ? 'create' : 'rename'}
+        currentName={
+          renameModalIsOpen ? portfolios.find(p => p.id === actionPortfolioId)?.title : undefined
+        }
+        open={createModalIsOpen || renameModalIsOpen}
         onDismiss={handleDismissCreateModal}
-        onSubmit={handleCreateNewPortfolio}
+        onSubmit={createModalIsOpen ? handleCreateNewPortfolio : handleRenameProfile}
       />
     </>
   )

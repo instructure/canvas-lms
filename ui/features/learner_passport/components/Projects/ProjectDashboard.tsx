@@ -24,10 +24,10 @@ import {Heading} from '@instructure/ui-heading'
 import {IconPlusLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import ProjectCard, {PROJECT_CARD_WIDTH, PROJECT_CARD_HEIGHT} from './ProjectCard'
+import {showUnimplemented} from '../shared/utils'
 import type {ProjectData} from '../types'
-import CreateModal from '../shared/CreateModal'
+import NamingModal from '../shared/NamingModal'
 import {renderCardSkeleton} from '../shared/CardSkeleton'
 
 const ProjectDashboard = () => {
@@ -35,9 +35,12 @@ const ProjectDashboard = () => {
   const submit = useSubmit()
   const projects = useLoaderData() as ProjectData[]
   const [createModalIsOpen, setCreateModalIsOpen] = useState(false)
+  const [renameModalIsOpen, setRenameModalIsOpen] = useState(false)
+  const [actionProjectId, setActionProjectId] = useState('')
 
   const handleDismissCreateModal = useCallback(() => {
     setCreateModalIsOpen(false)
+    setRenameModalIsOpen(false)
   }, [])
 
   const handleCreateClick = useCallback(() => {
@@ -48,6 +51,14 @@ const ProjectDashboard = () => {
     (f: HTMLFormElement) => {
       setCreateModalIsOpen(false)
       submit(f, {method: 'PUT'})
+    },
+    [submit]
+  )
+
+  const handleRenameProject = useCallback(
+    (f: HTMLFormElement) => {
+      setRenameModalIsOpen(false)
+      submit(f, {method: 'POST', action: 'rename'})
     },
     [submit]
   )
@@ -64,11 +75,15 @@ const ProjectDashboard = () => {
         case 'view':
           navigate(`../view/${projectId}`)
           break
+        case 'delete':
+          navigate(`delete/${projectId}`)
+          break
+        case 'rename':
+          setActionProjectId(projectId)
+          setRenameModalIsOpen(true)
+          break
         default:
-          showFlashAlert({
-            message: `project ${projectId} action ${action}`,
-            type: 'success',
-          })
+          showUnimplemented({currentTarget: {textContent: action}})
       }
     },
     [navigate]
@@ -95,7 +110,7 @@ const ProjectDashboard = () => {
         </Text>
       </View>
       <View>
-        {projects?.length > 0 || (
+        {projects?.length > 0 ? null : (
           <View as="div" margin="0">
             <Text size="x-small">No projects created</Text>
           </View>
@@ -121,11 +136,16 @@ const ProjectDashboard = () => {
           )}
         </View>
       </View>
-      <CreateModal
-        forObject="Project"
-        open={createModalIsOpen}
+      <NamingModal
+        objectType="Project"
+        objectId={actionProjectId}
+        mode={createModalIsOpen ? 'create' : 'rename'}
+        currentName={
+          renameModalIsOpen ? projects.find(p => p.id === actionProjectId)?.title : undefined
+        }
+        open={createModalIsOpen || renameModalIsOpen}
         onDismiss={handleDismissCreateModal}
-        onSubmit={handleCreateNewProject}
+        onSubmit={createModalIsOpen ? handleCreateNewProject : handleRenameProject}
       />
     </>
   )

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback} from 'react'
+import React, {useCallback, useState} from 'react'
 import {useActionData, useLoaderData, useNavigate} from 'react-router-dom'
 import {Breadcrumb} from '@instructure/ui-breadcrumb'
 import {Button} from '@instructure/ui-buttons'
@@ -31,17 +31,28 @@ import {
 } from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
 import type {PortfolioDetailData} from '../types'
+import {showUnimplemented} from '../shared/utils'
 import PortfolioView from './PortfolioView'
+import PortfolioPreviewModal from './PortfolioPreviewModal'
 
 const PortfolioViewPage = () => {
   const navigate = useNavigate()
   const create_portfolio = useActionData() as PortfolioDetailData
   const edit_portfolio = useLoaderData() as PortfolioDetailData
   const portfolio = create_portfolio || edit_portfolio
+  const [showPreview, setShowPreview] = useState(false)
 
   const handleEditClick = useCallback(() => {
     navigate(`../edit/${portfolio.id}`)
   }, [navigate, portfolio.id])
+
+  const handlePreviewClick = useCallback(() => {
+    setShowPreview(true)
+  }, [])
+
+  const handleClosePreview = useCallback(() => {
+    setShowPreview(false)
+  }, [])
 
   return (
     <View as="div" id="foo" maxWidth="986px" margin="0 auto">
@@ -61,21 +72,30 @@ const PortfolioViewPage = () => {
           <Button margin="0 x-small 0 0" renderIcon={IconEditLine} onClick={handleEditClick}>
             Edit
           </Button>
-          <Button margin="0 x-small 0 0" renderIcon={IconDownloadLine}>
+          <Button margin="0 x-small 0 0" renderIcon={IconDownloadLine} onClick={showUnimplemented}>
             Download
           </Button>
-          <Button margin="0 x-small 0 0" renderIcon={IconPrinterLine}>
+          <Button margin="0 x-small 0 0" renderIcon={IconPrinterLine} onClick={window.print}>
             Print
           </Button>
-          <Button margin="0 x-small 0 0" renderIcon={IconReviewScreenLine}>
+          <Button
+            margin="0 x-small 0 0"
+            renderIcon={IconReviewScreenLine}
+            onClick={handlePreviewClick}
+          >
             Preview
           </Button>
-          <Button color="primary" margin="0" renderIcon={IconShareLine}>
+          <Button color="primary" margin="0" renderIcon={IconShareLine} onClick={showUnimplemented}>
             Share
           </Button>
         </Flex.Item>
       </Flex>
       <PortfolioView portfolio={portfolio} />
+      <PortfolioPreviewModal
+        portfolio={portfolio}
+        open={showPreview}
+        onClose={handleClosePreview}
+      />
     </View>
   )
 }
