@@ -17,14 +17,6 @@
  */
 
 import React from 'react'
-import {IconButton} from '@instructure/ui-buttons'
-import {
-  IconEditLine,
-  IconMoreLine,
-  IconReviewScreenLine,
-  IconTrashLine,
-} from '@instructure/ui-icons'
-import {Menu} from '@instructure/ui-menu'
 import {View} from '@instructure/ui-view'
 
 import AchievementCard from './AchievementCard'
@@ -33,28 +25,6 @@ import type {AchievementCardProps} from './AchievementCard'
 const AchievementDashboardCard = (props: AchievementCardProps) => {
   return (
     <View as="div" position="relative" borderWidth="small" shadow="resting">
-      <div style={{position: 'absolute', top: '.5rem', right: '.5rem'}}>
-        <Menu
-          onSelect={undefined}
-          placement="bottom"
-          trigger={
-            <IconButton screenReaderLabel="More" withBackground={false} withBorder={false}>
-              <IconMoreLine />
-            </IconButton>
-          }
-        >
-          <Menu.Item value="view">
-            <IconReviewScreenLine /> View
-          </Menu.Item>
-          <Menu.Item value="edit">
-            <IconEditLine /> Edit
-          </Menu.Item>
-
-          <Menu.Item value="delete">
-            <IconTrashLine /> Delete
-          </Menu.Item>
-        </Menu>
-      </div>
       <AchievementCard {...props} />
     </View>
   )

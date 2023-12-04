@@ -106,14 +106,16 @@ const PortfolioView = ({portfolio}: PortfolioViewProps) => {
                 {portfolio.skills.map((skill: SkillData) => renderSkillTag(skill))}
               </View>
             </View>
-            <View as="div">
-              <Heading level="h3" themeOverride={{h3FontSize: '1rem'}}>
-                Links
-              </Heading>
-              <List isUnstyled={true} itemSpacing="small" margin="small 0 0 0">
-                {portfolio.links.map((link: string) => renderLink(link))}
-              </List>
-            </View>
+            {portfolio.links.length > 0 && (
+              <View as="div">
+                <Heading level="h3" themeOverride={{h3FontSize: '1rem'}}>
+                  Links
+                </Heading>
+                <List isUnstyled={true} itemSpacing="small" margin="small 0 0 0">
+                  {portfolio.links.map((link: string) => renderLink(link))}
+                </List>
+              </View>
+            )}
             <View as="div" borderWidth="small 0 0 0">
               <Heading level="h3" themeOverride={{h3FontSize: '1rem'}} margin="large 0 small 0">
                 Education

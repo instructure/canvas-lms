@@ -95,11 +95,11 @@ const PortfolioDashboard = () => {
         </Text>
       </View>
       <View>
-        {portfolios?.length > 0 || (
+        {portfolios?.length > 0 ? (
           <View as="div" margin="0">
             <Text size="x-small">No portfolios created</Text>
           </View>
-        )}
+        ) : null}
         <View as="div" margin="small 0">
           {portfolios && portfolios.length > 0 ? (
             <Flex gap="medium" wrap="wrap">
