@@ -65,7 +65,10 @@ export const GradedDiscussionOptions = ({
   return (
     <View as="div">
       <View as="div" margin="medium 0">
-        <PointsPossible pointsPossible={pointsPossible} setPointsPossible={setPointsPossible} />
+        <PointsPossible
+          pointsPossible={pointsPossible || 0}
+          setPointsPossible={setPointsPossible}
+        />
       </View>
       <View as="div" margin="medium 0">
         <DisplayGradeAs displayGradeAs={displayGradeAs} setDisplayGradeAs={setDisplayGradeAs} />
