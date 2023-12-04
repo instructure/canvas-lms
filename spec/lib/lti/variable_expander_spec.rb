@@ -1916,6 +1916,39 @@ module Lti
             expect(exp_hash[:test]).to eq "$ResourceLink.submission.endDateTime"
           end
         end
+
+        context "when ResourceLink.title is populated" do
+          let(:resource_link_title) { "Tool Title" }
+
+          let(:resource_link) do
+            Lti::ResourceLink.new(
+              resource_link_uuid: SecureRandom.uuid,
+              context_external_tool_id: tool.id,
+              workflow_state: "active",
+              root_account_id: course.root_account.id,
+              context_id: course.id,
+              context_type: "Course",
+              custom: {},
+              lookup_uuid: SecureRandom.uuid,
+              title: resource_link_title
+            )
+          end
+
+          let(:variable_expander) do
+            VariableExpander.new(
+              root_account,
+              course,
+              controller,
+              resource_link:
+            )
+          end
+
+          it "has substitution for $ResourceLink.title" do
+            exp_hash = { test: "$ResourceLink.title" }
+            variable_expander.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq resource_link_title
+          end
+        end
       end
 
       context "context is a course with an assignment" do

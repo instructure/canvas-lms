@@ -230,8 +230,8 @@ module Lti
     # Returns "$ResourceLink.title" otherwise
     register_expansion "ResourceLink.title",
                        [],
-                       -> { @assignment.title },
-                       -> { @assignment && @assignment.title.present? },
+                       -> { @resource_link&.title || @assignment&.title || lti_helper.tag_from_resource_link(@resource_link)&.title || @context.name },
+                       -> { @resource_link || (@assignment && @assignment.title.present?) },
                        default_name: "resourcelink_title"
 
     # LTI - Custom parameter substitution: ResourceLink.available.startDateTime
