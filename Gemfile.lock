@@ -720,7 +720,7 @@ GEM
       activerecord (>= 6.1)
     net-http (0.4.0)
       uri
-    net-imap (0.4.6)
+    net-imap (0.4.7)
       date
       net-protocol
     net-ldap (0.18.0)
