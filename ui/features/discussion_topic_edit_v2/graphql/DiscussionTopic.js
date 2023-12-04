@@ -21,6 +21,7 @@ import {Section} from './Section'
 import gql from 'graphql-tag'
 import {Attachment} from './Attachment'
 import {GroupSet} from './GroupSet'
+import {AssignmentGroup} from './AssignmentGroup'
 
 export const DiscussionTopic = {
   fragment: gql`
@@ -52,11 +53,15 @@ export const DiscussionTopic = {
         ...Attachment
       }
       assignment {
+        assignmentGroup {
+          ...AssignmentGroup
+        }
         postToSis
         pointsPossible
       }
     }
     ${Attachment.fragment}
+    ${AssignmentGroup.fragment}
     ${Section.fragment}
     ${GroupSet.fragment}
   `,

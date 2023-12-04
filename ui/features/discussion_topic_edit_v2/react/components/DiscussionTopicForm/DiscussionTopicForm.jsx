@@ -212,6 +212,7 @@ export default function DiscussionTopicForm({
     setIsGraded(!!currentDiscussionTopic?.assignment)
     setPostToSis(!!currentDiscussionTopic?.assignment?.postToSis)
     setPointsPossible(currentDiscussionTopic?.assignment?.pointsPossible)
+    setAssignmentGroup(currentDiscussionTopic?.assignment?.assignmentGroup?._id)
   }, [isEditing, currentDiscussionTopic, discussionAnonymousState, isAnnouncement])
 
   useEffect(() => {
