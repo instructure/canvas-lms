@@ -1220,7 +1220,7 @@ module ApplicationHelper
     else
       # map wiki page url to id
       if asset_type == "WikiPage"
-        page = @context.wiki_pages.not_deleted.where(url: asset_id).first
+        page = @context.wiki.find_page(asset_id)
         asset_id = page.id if page
       else
         asset_id = asset_id.to_i
