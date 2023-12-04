@@ -607,7 +607,7 @@ GEM
       ruby_parser (~> 3.10)
       sexp_processor (~> 4.10)
       ya2yaml (= 0.31)
-    icalendar (2.10.0)
+    icalendar (2.10.1)
       ice_cube (~> 0.16)
     ice_cube (0.16.4)
     ice_nine (0.11.2)
