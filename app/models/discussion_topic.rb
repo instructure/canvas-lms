@@ -82,7 +82,7 @@ class DiscussionTopic < ActiveRecord::Base
   belongs_to :editor, class_name: "User"
   belongs_to :root_topic, class_name: "DiscussionTopic"
   belongs_to :group_category
-  has_many :checkpoint_assignments, through: :assignment
+  has_many :sub_assignments, through: :assignment
   has_many :child_topics, class_name: "DiscussionTopic", foreign_key: :root_topic_id, dependent: :destroy
   has_many :discussion_topic_participants, dependent: :destroy
   has_many :discussion_entry_participants, through: :discussion_entries
@@ -106,7 +106,7 @@ class DiscussionTopic < ActiveRecord::Base
   # For our users, when setting checkpoints, the value must be between 1 and 10.
   # But we also allow 0 when there are no checkpoints.
   validates :reply_to_entry_required_count, presence: true, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 10 }
-  validates :reply_to_entry_required_count, numericality: { greater_than: 0 }, if: :checkpoints?
+  validates :reply_to_entry_required_count, numericality: { greater_than: 0 }, if: -> { reply_to_entry_checkpoint.present? }
   validate :validate_draft_state_change, if: :workflow_state_changed?
   validate :section_specific_topics_must_have_sections
   validate :only_course_topics_can_be_section_specific
@@ -966,6 +966,13 @@ class DiscussionTopic < ActiveRecord::Base
                      end
   end
 
+  def self.create_graded_topic!(course:, title:, user: nil)
+    raise ActiveRecord::RecordInvalid if course.nil?
+
+    assignment = course.assignments.create!(submission_types: "discussion_topic", updating_user: user, title:)
+    assignment.discussion_topic
+  end
+
   def self.preload_can_unpublish(context, topics, assmnt_ids_with_subs = nil)
     return unless topics.any?
 
@@ -1805,25 +1812,25 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def checkpoints?
-    checkpoint_assignments.any?
+    sub_assignments.any?
   end
 
   def reply_to_topic_checkpoint
-    checkpoint_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+    sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
   end
 
   def reply_to_entry_checkpoint
-    checkpoint_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
+    sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
   end
 
-  def create_checkpoints(reply_to_topic_points:, reply_to_entry_points:, reply_to_entry_required_count: 0)
+  def create_checkpoints(reply_to_topic_points:, reply_to_entry_points:, reply_to_entry_required_count: 1)
     return false if checkpoints?
     return false unless context.is_a?(Course)
+    return false unless assignment.present?
 
-    parent = context.assignments.create!(has_sub_assignments: true, sub_assignment_tag: CheckpointLabels::PARENT)
-    parent.checkpoint_assignments.create!(context:, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, points_possible: reply_to_topic_points)
-    parent.checkpoint_assignments.create!(context:, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, points_possible: reply_to_entry_points)
-    self.assignment = parent
+    assignment.update!(has_sub_assignments: true)
+    assignment.sub_assignments.create!(context:, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, points_possible: reply_to_topic_points)
+    assignment.sub_assignments.create!(context:, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, points_possible: reply_to_entry_points)
     self.reply_to_entry_required_count = reply_to_entry_required_count
 
     save

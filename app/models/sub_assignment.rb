@@ -16,25 +16,17 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+#
 
-module Checkpointable
-  def self.included(klass)
-    klass.belongs_to :parent_assignment, class_name: "Assignment", optional: true, inverse_of: :checkpoint_assignments
-    klass.has_many :checkpoint_assignments, -> { active }, class_name: "Assignment", foreign_key: :parent_assignment_id, inverse_of: :parent_assignment
-    klass.has_many :checkpoint_submissions, through: :checkpoint_assignments, source: :submissions
+class SubAssignment < AbstractAssignment
+  validates :parent_assignment_id, presence: true, comparison: { other_than: :id, message: -> { I18n.t("cannot reference self") }, allow_blank: true }
+  validates :has_sub_assignments, inclusion: { in: [false], message: -> { I18n.t("cannot be true for sub assignments") } }
+  validates :sub_assignment_tag, inclusion: { in: [CheckpointLabels::REPLY_TO_TOPIC, CheckpointLabels::REPLY_TO_ENTRY] }
 
-    klass.validates :parent_assignment_id, absence: true, if: :has_sub_assignments?
-    klass.validates :parent_assignment_id, comparison: { other_than: :id, message: -> { I18n.t("cannot reference self") } }, allow_nil: true
-
-    klass.after_commit :aggregate_checkpoint_assignments, if: :checkpoint_changes?
-  end
+  after_commit :aggregate_checkpoint_assignments, if: :checkpoint_changes?
 
   def checkpoint?
-    parent_assignment_id.present?
-  end
-
-  def find_checkpoint(sub_assignment_tag)
-    checkpoint_assignments.find_by(sub_assignment_tag:)
+    true
   end
 
   private
@@ -44,7 +36,7 @@ module Checkpointable
   end
 
   def checkpoint_changes?
-    checkpoint? && !!root_account&.feature_enabled?(:discussion_checkpoints) && checkpoint_attributes_changed?
+    !!root_account&.feature_enabled?(:discussion_checkpoints) && checkpoint_attributes_changed?
   end
 
   def checkpoint_attributes_changed?

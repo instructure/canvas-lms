@@ -23,7 +23,7 @@ describe Checkpoints::SubmissionAggregatorService do
       @course = course_model
       @course.root_account.enable_feature!(:discussion_checkpoints)
       @student = student_in_course(course: @course, active_all: true).user
-      @topic = @course.discussion_topics.create!(title: "graded topic")
+      @topic = DiscussionTopic.create_graded_topic!(course: @course, title: "graded topic")
       @topic.create_checkpoints(reply_to_topic_points: 3, reply_to_entry_points: 7)
     end
 
@@ -38,7 +38,7 @@ describe Checkpoints::SubmissionAggregatorService do
       end
 
       it "returns false when called with a 'child' (checkpoint) assignment" do
-        assignment = @topic.checkpoint_assignments.first
+        assignment = @topic.sub_assignments.first
         expect(service.call(assignment:, student: @student)).to be false
       end
 

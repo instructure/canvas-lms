@@ -3640,9 +3640,9 @@ describe "Submissions API", type: :request do
     describe "checkpointed discussions" do
       before do
         @course.root_account.enable_feature!(:discussion_checkpoints)
-        assignment = @course.assignments.create!(has_sub_assignments: true, sub_assignment_tag: CheckpointLabels::PARENT)
-        assignment.checkpoint_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, due_at: 2.days.from_now)
-        assignment.checkpoint_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, due_at: 3.days.from_now)
+        assignment = @course.assignments.create!(has_sub_assignments: true)
+        assignment.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, due_at: 2.days.from_now)
+        assignment.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, due_at: 3.days.from_now)
         @topic = @course.discussion_topics.create!(assignment:, reply_to_entry_required_count: 1)
       end
 

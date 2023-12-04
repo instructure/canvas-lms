@@ -85,9 +85,9 @@ describe AssignmentsApiController, type: :request do
       before do
         @course.root_account.enable_feature!(:discussion_checkpoints)
 
-        assignment = @course.assignments.create!(title: "Assignment 1", has_sub_assignments: true, sub_assignment_tag: CheckpointLabels::PARENT)
-        @c1 = assignment.checkpoint_assignments.create!(context: assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 3.days.from_now)
-        @c2 = assignment.checkpoint_assignments.create!(context: assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 10, due_at: 5.days.from_now)
+        assignment = @course.assignments.create!(title: "Assignment 1", has_sub_assignments: true)
+        @c1 = assignment.sub_assignments.create!(context: assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 3.days.from_now)
+        @c2 = assignment.sub_assignments.create!(context: assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 10, due_at: 5.days.from_now)
       end
 
       it "returns the assignments list with API-formatted Checkpoint data" do
@@ -1580,9 +1580,9 @@ describe AssignmentsApiController, type: :request do
         course_with_teacher(active_all: true)
         @course.root_account.enable_feature!(:discussion_checkpoints)
 
-        assignment = @course.assignments.create!(title: "Assignment 1", has_sub_assignments: true, sub_assignment_tag: CheckpointLabels::PARENT)
-        @c1 = assignment.checkpoint_assignments.create!(context: assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 3.days.from_now)
-        @c2 = assignment.checkpoint_assignments.create!(context: assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 10, due_at: 5.days.from_now)
+        assignment = @course.assignments.create!(title: "Assignment 1", has_sub_assignments: true)
+        @c1 = assignment.sub_assignments.create!(context: assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 3.days.from_now)
+        @c2 = assignment.sub_assignments.create!(context: assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 10, due_at: 5.days.from_now)
       end
 
       it "returns the assignments list with API-formatted Checkpoint data" do
@@ -5789,9 +5789,9 @@ describe AssignmentsApiController, type: :request do
       before do
         @course.root_account.enable_feature!(:discussion_checkpoints)
 
-        @assignment = @course.assignments.create!(title: "Assignment 1", has_sub_assignments: true, sub_assignment_tag: CheckpointLabels::PARENT)
-        @c1 = @assignment.checkpoint_assignments.create!(context: @assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 3.days.from_now)
-        @c2 = @assignment.checkpoint_assignments.create!(context: @assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 10, due_at: 5.days.from_now)
+        @assignment = @course.assignments.create!(title: "Assignment 1", has_sub_assignments: true)
+        @c1 = @assignment.sub_assignments.create!(context: @assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 3.days.from_now)
+        @c2 = @assignment.sub_assignments.create!(context: @assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 10, due_at: 5.days.from_now)
       end
 
       it "returns the assignment with API-formatted Checkpoint data" do

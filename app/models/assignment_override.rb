@@ -32,7 +32,7 @@ class AssignmentOverride < ActiveRecord::Base
   attr_writer :for_nonactive_enrollment
 
   belongs_to :root_account, class_name: "Account"
-  belongs_to :assignment, inverse_of: :assignment_overrides
+  belongs_to :assignment, inverse_of: :assignment_overrides, class_name: "AbstractAssignment"
   belongs_to :quiz, class_name: "Quizzes::Quiz", inverse_of: :assignment_overrides
   belongs_to :context_module, inverse_of: :assignment_overrides
   belongs_to :wiki_page, inverse_of: :assignment_overrides

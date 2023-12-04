@@ -390,9 +390,9 @@ describe AssignmentGroupsController, type: :request do
 
       setup_groups
 
-      assignment = @course.assignments.create!(title: "Assignment 1", assignment_group: @group1, has_sub_assignments: true, sub_assignment_tag: CheckpointLabels::PARENT)
-      @c1 = assignment.checkpoint_assignments.create!(context: assignment.context, assignment_group: @group1, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 3.days.from_now)
-      @c2 = assignment.checkpoint_assignments.create!(context: assignment.context, assignment_group: @group1, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 10, due_at: 5.days.from_now)
+      assignment = @course.assignments.create!(title: "Assignment 1", assignment_group: @group1, has_sub_assignments: true)
+      @c1 = assignment.sub_assignments.create!(context: assignment.context, assignment_group: @group1, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 3.days.from_now)
+      @c2 = assignment.sub_assignments.create!(context: assignment.context, assignment_group: @group1, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 10, due_at: 5.days.from_now)
     end
 
     it "includes checkpoints data on the assignments" do

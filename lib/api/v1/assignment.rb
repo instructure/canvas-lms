@@ -170,7 +170,7 @@ module Api::V1::Assignment
 
     if opts[:include_checkpoints] && assignment.root_account.feature_enabled?(:discussion_checkpoints)
       hash["has_sub_assignments"] = assignment.has_sub_assignments?
-      hash["checkpoints"] = assignment.checkpoint_assignments.map { |checkpoint| Checkpoint.new(checkpoint).as_json }
+      hash["checkpoints"] = assignment.sub_assignments.map { |sub_assignment| Checkpoint.new(sub_assignment).as_json }
     end
 
     if opts[:overrides].present?

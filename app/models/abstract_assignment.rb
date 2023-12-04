@@ -37,7 +37,6 @@ class AbstractAssignment < ActiveRecord::Base
   include Plannable
   include DuplicatingObjects
   include LockedFor
-  include Checkpointable
 
   self.ignored_columns += %i[context_code checkpointed checkpoint_label]
 
@@ -168,6 +167,10 @@ class AbstractAssignment < ActiveRecord::Base
   has_many :conditional_release_associations, class_name: "ConditionalRelease::AssignmentSetAssociation", dependent: :destroy, inverse_of: :assignment, foreign_key: :assignment_id
   has_one :master_content_tag, class_name: "MasterCourses::MasterContentTag", inverse_of: :assignment, foreign_key: :content_id
 
+  belongs_to :parent_assignment, class_name: "Assignment", inverse_of: :sub_assignments
+  has_many :sub_assignments, -> { active }, foreign_key: :parent_assignment_id, inverse_of: :parent_assignment
+  has_many :sub_assignment_submissions, through: :sub_assignments, source: :submissions
+
   scope :assigned_to_student, ->(student_id) { joins(:submissions).where(submissions: { user_id: student_id }) }
   scope :anonymous, -> { where(anonymous_grading: true) }
   scope :moderated, -> { where(moderated_grading: true) }
@@ -258,6 +261,10 @@ class AbstractAssignment < ActiveRecord::Base
   # included to make it easier to work with api, which returns
   # sis_source_id as sis_assignment_id.
   alias_attribute :sis_assignment_id, :sis_source_id
+
+  def checkpoint?
+    false
+  end
 
   def context_code
     "#{context_type.downcase}_#{context_id}"
@@ -420,6 +427,24 @@ class AbstractAssignment < ActiveRecord::Base
     return unless grading_type_requires_points?
 
     update!(points_possible: DEFAULT_POINTS_POSSIBLE)
+  end
+
+  # Returns the value to be stored in the polymorphic type column for Polymorphic Associations.
+  def self.polymorphic_name
+    "Assignment"
+  end
+
+  # Returns the value to be used for asset string prefixes.
+  def self.reflection_type_name
+    name.underscore
+  end
+
+  def self.serialization_root_key
+    name.underscore
+  end
+
+  def self.url_context_class
+    self
   end
 
   def self.clean_up_duplicating_assignments
@@ -1439,7 +1464,6 @@ class AbstractAssignment < ActiveRecord::Base
     each_submission_type { |submission| submission.destroy if submission && !submission.deleted? }
     conditional_release_rules.destroy_all
     conditional_release_associations.destroy_all
-    checkpoint_assignments.destroy_all
     refresh_course_content_participation_counts
 
     # Assignment owns deletion of Lti::LineItem, Lti::ResourceLink

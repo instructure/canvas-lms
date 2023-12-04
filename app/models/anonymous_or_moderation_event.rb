@@ -65,7 +65,7 @@ class AnonymousOrModerationEvent < ApplicationRecord
   ].freeze
   SUBMISSION_ID_REQUIRED_EVENT_TYPES = (EVENT_TYPES - SUBMISSION_ID_EXCLUDED_EVENT_TYPES).freeze
 
-  belongs_to :assignment
+  belongs_to :assignment, class_name: "AbstractAssignment"
   belongs_to :user, optional: true
   belongs_to :submission
   belongs_to :canvadoc

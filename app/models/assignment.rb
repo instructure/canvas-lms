@@ -19,21 +19,17 @@
 #
 
 class Assignment < AbstractAssignment
-  # Returns the value to be stored in the polymorphic type column for Polymorphic Associations.
-  def self.polymorphic_name
-    "Assignment"
+  validates :parent_assignment_id, :sub_assignment_tag, absence: true
+
+  before_save :before_soft_delete, if: -> { will_save_change_to_workflow_state?(to: "deleted") }
+
+  def find_checkpoint(sub_assignment_tag)
+    sub_assignments.find_by(sub_assignment_tag:)
   end
 
-  # Returns the value to be used for asset string prefixes.
-  def self.reflection_type_name
-    "assignment"
-  end
+  private
 
-  def self.serialization_root_key
-    "assignment"
-  end
-
-  def self.url_context_class
-    self
+  def before_soft_delete
+    sub_assignments.destroy_all
   end
 end

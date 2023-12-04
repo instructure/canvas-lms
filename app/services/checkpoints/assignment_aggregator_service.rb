@@ -28,7 +28,7 @@ class Checkpoints::AssignmentAggregatorService < Checkpoints::AggregatorService
   def call
     return false unless checkpoint_aggregation_supported?(@assignment)
 
-    checkpoint_assignments = @assignment.checkpoint_assignments.order(updated_at: :desc).to_a
+    checkpoint_assignments = @assignment.sub_assignments.order(updated_at: :desc).to_a
     return false if checkpoint_assignments.empty?
 
     aggregate_assignment = build_aggregate_assignment(checkpoint_assignments, @assignment)

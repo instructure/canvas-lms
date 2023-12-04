@@ -19,6 +19,37 @@
 #
 
 describe Assignment do
+  describe "asset strings" do
+    it "can be found via asset string" do
+      course = Course.create!
+      assignment = course.assignments.create!
+      expect(ActiveRecord::Base.find_by_asset_string(assignment.asset_string)).to eq assignment
+    end
+  end
+
+  describe "serialization" do
+    before do
+      course = Course.create!
+      @assignment = course.assignments.create!
+    end
+
+    it "uses assignment as the root key for as_json" do
+      expect(@assignment.as_json).to have_key "assignment"
+    end
+
+    it "uses assignment as the root key for to_json" do
+      expect(JSON.parse(@assignment.to_json)).to have_key "assignment"
+    end
+  end
+
+  describe "validations" do
+    it "must have a blank sub_assignment_tag" do
+      assignment = Assignment.new(sub_assignment_tag: "my_tag")
+      assignment.validate
+      expect(assignment.errors.full_messages).to include "Sub assignment tag must be blank"
+    end
+  end
+
   describe "#anonymous_student_identities" do
     before(:once) do
       @course = Course.create!
@@ -95,9 +126,9 @@ describe Assignment do
         course_with_teacher(active_all: true)
         @student = student_in_course(active_all: true).user
         @course.root_account.enable_feature!(:discussion_checkpoints)
-        assignment = @course.assignments.create!(has_sub_assignments: true, sub_assignment_tag: CheckpointLabels::PARENT)
-        assignment.checkpoint_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, due_at: 2.days.from_now)
-        assignment.checkpoint_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, due_at: 3.days.from_now)
+        assignment = @course.assignments.create!(has_sub_assignments: true)
+        assignment.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, due_at: 2.days.from_now)
+        assignment.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, due_at: 3.days.from_now)
         @topic = @course.discussion_topics.create!(assignment:, reply_to_entry_required_count: 1)
       end
 
@@ -139,35 +170,6 @@ describe Assignment do
         expect(reply_to_topic_submission.score).to be_nil
         expect(@topic.assignment.submissions.find_by(user: @student).score).to eq 5
       end
-    end
-  end
-
-  describe "checkpointed discussions" do
-    before(:once) do
-      course = course_model
-      course.root_account.enable_feature!(:discussion_checkpoints)
-      @topic = @course.discussion_topics.create!(title: "graded topic")
-      @topic.create_checkpoints(reply_to_topic_points: 3, reply_to_entry_points: 7)
-      @checkpoint_assignment = @topic.reply_to_topic_checkpoint
-    end
-
-    it "updates the parent assignment when tracked attrs change on a checkpoint assignment" do
-      expect { @checkpoint_assignment.update!(points_possible: 4) }.to change {
-        @topic.assignment.reload.points_possible
-      }.from(10).to(11)
-    end
-
-    it "does not update the parent assignment when attrs that changed are not tracked" do
-      expect { @checkpoint_assignment.update!(title: "potato") }.not_to change {
-        @topic.assignment.reload.updated_at
-      }
-    end
-
-    it "does not update the parent assignment when the checkpoints flag is disabled" do
-      @topic.root_account.disable_feature!(:discussion_checkpoints)
-      expect { @checkpoint_assignment.update!(points_possible: 4) }.not_to change {
-        @topic.assignment.reload.points_possible
-      }
     end
   end
 
