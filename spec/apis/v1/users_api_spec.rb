@@ -1370,8 +1370,8 @@ describe "Users API", type: :request do
             expect(json.pluck("name").sort).to eq [temporary_enrollment_provider.name, temporary_enrollment_recipient.name].sort
           end
 
-          it "returns only current and future enrollments" do
-            temp_enrollment.update!(workflow_state: "deleted")
+          it "returns only active or pending by date enrollments" do
+            temp_enrollment.enrollment_state.update!(state: "completed")
             json = api_call_as_user(
               subject,
               :get,
