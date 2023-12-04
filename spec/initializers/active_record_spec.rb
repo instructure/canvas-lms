@@ -19,6 +19,20 @@
 
 module ActiveRecord
   describe Base do
+    describe ".serializable_hash" do
+      let(:account) { Account.create! }
+
+      it "returns a hash with indifferent access when the root is included" do
+        hash = account.serializable_hash(include_root: true)
+        expect(hash).to be_a ActiveSupport::HashWithIndifferentAccess
+      end
+
+      it "returns a hash with indifferent access when the root is excluded" do
+        hash = account.serializable_hash(include_root: false)
+        expect(hash).to be_a ActiveSupport::HashWithIndifferentAccess
+      end
+    end
+
     describe ".wildcard" do
       it "produces a useful wildcard sql string" do
         sql = Base.wildcard("users.name", "users.short_name", "Sinatra, Frank", delimiter: ",")
