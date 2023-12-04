@@ -2119,7 +2119,7 @@ module UserContentSerialization
       end
     end
     if options && options[:include_root]
-      result = { self.class.base_class.model_name.element => result }
+      result = { self.class.base_class.model_name.element => result }.with_indifferent_access
     end
     result
   end
