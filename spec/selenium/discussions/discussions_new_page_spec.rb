@@ -1000,6 +1000,42 @@ describe "discussions" do
           course.enroll_student(@student_3, enrollment_state: "active", section: @section_3)
         end
 
+        it "creates a discussion topic with an assignment with a mastery path override" do
+          course.conditional_release = true
+          course.save!
+          get "/courses/#{course.id}/discussion_topics/new"
+
+          title = "Graded Discussion Topic with mastery path override"
+          message = "replying to topic"
+
+          f("input[placeholder='Topic Title']").send_keys title
+          type_in_tiny("textarea", message)
+
+          force_click('input[type=checkbox][value="graded"]')
+          wait_for_ajaximations
+
+          f("input[data-testid='points-possible-input']").send_keys "12"
+
+          assign_to_element = f("input[data-testid='assign-to-select']")
+          assign_to_element.click
+          assign_to_element.send_keys :backspace
+          assign_to_element.send_keys "mastery path"
+          assign_to_element.send_keys :enter
+
+          f("button[data-testid='save-and-publish-button']").click
+          wait_for_ajaximations
+
+          dt = DiscussionTopic.last
+          expect(dt.title).to eq title
+          expect(dt.assignment.name).to eq title
+
+          overrides = dt.assignment.assignment_overrides
+          expect(overrides.length).to be 1
+          expect(overrides[0].title).to eq "Mastery Paths"
+          expect(overrides[0].set_id).to eq 1
+          expect(overrides[0].set_type).to eq "Noop"
+        end
+
         it "creates a discussion topic with an assignment with section overrides" do
           get "/courses/#{course.id}/discussion_topics/new"
 

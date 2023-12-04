@@ -19,7 +19,12 @@
 import {render, fireEvent, screen} from '@testing-library/react'
 import React from 'react'
 import {AssignmentDueDatesManager} from '../AssignmentDueDatesManager'
-import {GradedDiscussionDueDatesContext} from '../../../util/constants'
+import {
+  GradedDiscussionDueDatesContext,
+  defaultEveryoneOption,
+  defaultEveryoneElseOption,
+  masteryPathsOption,
+} from '../../../util/constants'
 
 const DEFAULT_LIST_OPTIONS = {
   'Course Sections': [
@@ -42,7 +47,7 @@ const DEFAULT_LIST_OPTIONS = {
 }
 
 const setup = ({
-  assignedInfoList = [{assignedList: ['everyone'], dueDateId: 'uniqueID'}],
+  assignedInfoList = [{assignedList: [defaultEveryoneOption.assetCode], dueDateId: 'uniqueID'}],
   setAssignedInfoList = () => {},
   dueDateErrorMessages = [],
   students = DEFAULT_LIST_OPTIONS.Students,
@@ -126,7 +131,7 @@ describe('AssignmentDueDatesManager', () => {
       },
       {
         dueDateId: 'Wd7eOGpYc-KFouW-ePdpm',
-        assignedList: ['mastery_paths'],
+        assignedList: [masteryPathsOption.assetCode],
         dueDate: '',
         availableFrom: '',
         availableUntil: '',
@@ -207,7 +212,9 @@ describe('AssignmentDueDatesManager', () => {
       fireEvent.click(assignToOptionOne)
 
       const availableOptions = screen.getAllByTestId('assign-to-select-option')
-      expect(availableOptions.map(o => o.textContent).includes('Everyone else')).toBe(true)
+      expect(
+        availableOptions.map(o => o.textContent).includes(defaultEveryoneElseOption.label)
+      ).toBe(true)
     })
   })
 
