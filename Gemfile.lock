@@ -449,7 +449,7 @@ GEM
     canvas_webex (0.18.2)
       railties
     chunky_png (1.4.0)
-    code_ownership (1.34.2)
+    code_ownership (1.36.0)
       code_teams (~> 1.0)
       packs-specification
       sorbet-runtime (>= 0.5.10821)

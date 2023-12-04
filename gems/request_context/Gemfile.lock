@@ -70,7 +70,7 @@ GEM
     base64 (0.2.0)
     bindata (2.4.15)
     builder (3.2.4)
-    code_ownership (1.34.2)
+    code_ownership (1.36.0)
       code_teams (~> 1.0)
       packs-specification
       sorbet-runtime (>= 0.5.10821)
