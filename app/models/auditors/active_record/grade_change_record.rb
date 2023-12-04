@@ -32,7 +32,7 @@ module Auditors::ActiveRecord
     belongs_to :grader, class_name: "User", inverse_of: :auditor_grader_grade_change_records
     belongs_to :submission, inverse_of: :auditor_grade_change_records
     belongs_to :course, -> { where(context_type: "Course") }, class_name: "::Course", foreign_key: "context_id", inverse_of: :auditor_grade_change_records
-    belongs_to :assignment, inverse_of: :auditor_grade_change_records
+    belongs_to :assignment, inverse_of: :auditor_grade_change_records, class_name: "AbstractAssignment"
     belongs_to :grading_period, inverse_of: :auditor_grade_change_records
 
     attr_accessor :grade_current

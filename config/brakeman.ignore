@@ -256,7 +256,7 @@
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "app/controllers/calendar_events_api_controller.rb",
-      "line": 1344,
+      "line": 1337,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
       "code": "InstStatsd::Statsd.count(\"account_calendars.modal.enabled_calendars\", params[:enabled_account_calendars].length)",
       "render_path": null,
@@ -266,29 +266,6 @@
         "method": "save_enabled_account_calendars"
       },
       "user_input": "params[:enabled_account_calendars].length",
-      "confidence": "Medium",
-      "cwe_id": [
-        89
-      ],
-      "note": ""
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "2d881ab88942d987968b9fe72f1e9963a90a2c4d2f2e04a5ddfc99e9e061c695",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "lib/submission_lifecycle_manager.rb",
-      "line": 486,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "Submission.connection.execute(\"UPDATE #{Submission.quoted_table_name}\\n  SET\\n    cached_due_date = vals.due_date::timestamptz,\\n    grading_period_id = vals.grading_period_id::integer,\\n    workflow_state = COALESCE(NULLIF(workflow_state, 'deleted'), (\\n      #{self.class.infer_submission_workflow_state_sql}\\n    )),\\n    anonymous_id = COALESCE(submissions.anonymous_id, vals.anonymous_id),\\n    cached_quiz_lti = vals.cached_quiz_lti,\\n    updated_at = now() AT TIME ZONE 'UTC'\\n  FROM (VALUES #{batch_values.join(\",\")})\\n    AS vals(assignment_id, student_id, due_date, grading_period_id, anonymous_id, cached_quiz_lti, root_account_id)\\n  WHERE submissions.user_id = vals.student_id AND\\n        submissions.assignment_id = vals.assignment_id AND\\n        (\\n          (submissions.cached_due_date IS DISTINCT FROM vals.due_date::timestamptz) OR\\n          (submissions.grading_period_id IS DISTINCT FROM vals.grading_period_id::integer) OR\\n          (submissions.workflow_state <> COALESCE(NULLIF(submissions.workflow_state, 'deleted'),\\n            (#{self.class.infer_submission_workflow_state_sql})\\n          )) OR\\n          (submissions.anonymous_id IS DISTINCT FROM COALESCE(submissions.anonymous_id, vals.anonymous_id)) OR\\n          (submissions.cached_quiz_lti IS DISTINCT FROM vals.cached_quiz_lti)\\n        );\\nINSERT INTO #{Submission.quoted_table_name}\\n  (assignment_id, user_id, workflow_state, created_at, updated_at, course_id,\\n  cached_due_date, grading_period_id, anonymous_id, cached_quiz_lti, root_account_id)\\n  SELECT\\n    assignments.id, vals.student_id, 'unsubmitted',\\n    now() AT TIME ZONE 'UTC', now() AT TIME ZONE 'UTC',\\n    assignments.context_id, vals.due_date::timestamptz, vals.grading_period_id::integer,\\n    vals.anonymous_id,\\n    vals.cached_quiz_lti,\\n    vals.root_account_id\\n  FROM (VALUES #{batch_values.join(\",\")})\\n    AS vals(assignment_id, student_id, due_date, grading_period_id, anonymous_id, cached_quiz_lti, root_account_id)\\n  INNER JOIN #{Assignment.quoted_table_name} assignments\\n    ON assignments.id = vals.assignment_id\\n  LEFT OUTER JOIN #{Submission.quoted_table_name} submissions\\n    ON submissions.assignment_id = assignments.id\\n    AND submissions.user_id = vals.student_id\\n  WHERE submissions.id IS NULL;\\n\".squish)",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "SubmissionLifecycleManager",
-        "method": "perform_submission_upsert"
-      },
-      "user_input": "self.class.infer_submission_workflow_state_sql",
       "confidence": "Medium",
       "cwe_id": [
         89
@@ -315,6 +292,29 @@
       "confidence": "Medium",
       "cwe_id": [
         79
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "31f88105cfdba1a8b47d81e9fd40a12a89078b134b6bab08fa2d188c3341d57b",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "lib/submission_lifecycle_manager.rb",
+      "line": 486,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Submission.connection.execute(\"UPDATE #{Submission.quoted_table_name}\\n  SET\\n    cached_due_date = vals.due_date::timestamptz,\\n    grading_period_id = vals.grading_period_id::integer,\\n    workflow_state = COALESCE(NULLIF(workflow_state, 'deleted'), (\\n      #{self.class.infer_submission_workflow_state_sql}\\n    )),\\n    anonymous_id = COALESCE(submissions.anonymous_id, vals.anonymous_id),\\n    cached_quiz_lti = vals.cached_quiz_lti,\\n    updated_at = now() AT TIME ZONE 'UTC'\\n  FROM (VALUES #{batch_values.join(\",\")})\\n    AS vals(assignment_id, student_id, due_date, grading_period_id, anonymous_id, cached_quiz_lti, root_account_id)\\n  WHERE submissions.user_id = vals.student_id AND\\n        submissions.assignment_id = vals.assignment_id AND\\n        (\\n          (submissions.cached_due_date IS DISTINCT FROM vals.due_date::timestamptz) OR\\n          (submissions.grading_period_id IS DISTINCT FROM vals.grading_period_id::integer) OR\\n          (submissions.workflow_state <> COALESCE(NULLIF(submissions.workflow_state, 'deleted'),\\n            (#{self.class.infer_submission_workflow_state_sql})\\n          )) OR\\n          (submissions.anonymous_id IS DISTINCT FROM COALESCE(submissions.anonymous_id, vals.anonymous_id)) OR\\n          (submissions.cached_quiz_lti IS DISTINCT FROM vals.cached_quiz_lti)\\n        );\\nINSERT INTO #{Submission.quoted_table_name}\\n  (assignment_id, user_id, workflow_state, created_at, updated_at, course_id,\\n  cached_due_date, grading_period_id, anonymous_id, cached_quiz_lti, root_account_id)\\n  SELECT\\n    assignments.id, vals.student_id, 'unsubmitted',\\n    now() AT TIME ZONE 'UTC', now() AT TIME ZONE 'UTC',\\n    assignments.context_id, vals.due_date::timestamptz, vals.grading_period_id::integer,\\n    vals.anonymous_id,\\n    vals.cached_quiz_lti,\\n    vals.root_account_id\\n  FROM (VALUES #{batch_values.join(\",\")})\\n    AS vals(assignment_id, student_id, due_date, grading_period_id, anonymous_id, cached_quiz_lti, root_account_id)\\n  INNER JOIN #{AbstractAssignment.quoted_table_name} assignments\\n    ON assignments.id = vals.assignment_id\\n  LEFT OUTER JOIN #{Submission.quoted_table_name} submissions\\n    ON submissions.assignment_id = assignments.id\\n    AND submissions.user_id = vals.student_id\\n  WHERE submissions.id IS NULL;\\n\".squish)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "SubmissionLifecycleManager",
+        "method": "perform_submission_upsert"
+      },
+      "user_input": "self.class.infer_submission_workflow_state_sql",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
       ],
       "note": ""
     },
@@ -959,7 +959,7 @@
       "check_name": "UnsafeReflection",
       "message": "Unsafe reflection method `const_get` called with parameter value",
       "file": "app/controllers/application_controller.rb",
-      "line": 1459,
+      "line": 1458,
       "link": "https://brakemanscanner.org/docs/warning_types/remote_code_execution/",
       "code": "Object.const_get((params[:feed_code].split(\"_\", 2) or [\"group_membership\", params[:feed_code].split(\"_\", 3)[-1]])[0].classify, false)",
       "render_path": null,
@@ -1679,6 +1679,6 @@
       "note": ""
     }
   ],
-  "updated": "2023-12-18 10:16:04 -0700",
+  "updated": "2023-12-18 14:36:43 -0600",
   "brakeman_version": "6.1.0"
 }

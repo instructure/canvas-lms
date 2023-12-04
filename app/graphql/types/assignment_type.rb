@@ -529,7 +529,7 @@ module Types
       load_association(:context).then do |course|
         return nil unless course.root_account&.feature_enabled?(:discussion_checkpoints)
 
-        load_association(:checkpoint_assignments)
+        load_association(:sub_assignments)
       end
     end
   end

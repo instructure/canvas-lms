@@ -11393,31 +11393,19 @@ describe Assignment do
 
   describe "checkpointed assignments" do
     before do
-      @parent = @course.assignments.create!(has_sub_assignments: true, sub_assignment_tag: CheckpointLabels::PARENT)
-      @child = @parent.checkpoint_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+      @parent = @course.assignments.create!(has_sub_assignments: true)
+      @child = @parent.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
     end
 
-    it "does not allow parent assignments to have their own parent assignments" do
+    it "does not allow assignments to have parent assignments (only sub assignments can have parent assignments)" do
       assignment = @course.assignments.create!
       @parent.parent_assignment = assignment
       expect(@parent).not_to be_valid
       expect(@parent.errors.full_messages).to include "Parent assignment must be blank"
     end
 
-    it "does not allow child assignments to be marked with has_sub_assignments" do
-      @child.has_sub_assignments = true
-      expect(@child).not_to be_valid
-      expect(@child.errors.full_messages).to include "Parent assignment must be blank"
-    end
-
-    it "does not allow child assignments to reference themselves as a parent assignment" do
-      @child.parent_assignment = @child
-      expect(@child).not_to be_valid
-      expect(@child.errors.full_messages).to include "Parent assignment cannot reference self"
-    end
-
-    it "excludes soft-deleted child assignments from the checkpoint_assignments association" do
-      expect { @child.destroy }.to change { @parent.checkpoint_assignments.exists? }.from(true).to(false)
+    it "excludes soft-deleted child assignments from the sub_assignments association" do
+      expect { @child.destroy }.to change { @parent.sub_assignments.exists? }.from(true).to(false)
     end
 
     it "soft-deletes child assignments when the parent assignment is soft-deleted" do

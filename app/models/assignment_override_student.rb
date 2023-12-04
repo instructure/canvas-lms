@@ -20,7 +20,7 @@
 
 class AssignmentOverrideStudent < ActiveRecord::Base
   include Canvas::SoftDeletable
-  belongs_to :assignment
+  belongs_to :assignment, class_name: "AbstractAssignment"
   belongs_to :assignment_override
   belongs_to :user
   belongs_to :quiz, class_name: "Quizzes::Quiz"

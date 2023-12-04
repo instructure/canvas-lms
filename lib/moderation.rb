@@ -19,7 +19,7 @@
 
 module Moderation
   def create_moderation_selections_for_assignment(assignment, student_ids, student_context)
-    assignment = Assignment.find(assignment) unless assignment.is_a?(Assignment)
+    assignment = Assignment.find(assignment) unless assignment.is_a?(AbstractAssignment)
     return unless assignment.moderated_grading
 
     # Add selections for students in Student IDs

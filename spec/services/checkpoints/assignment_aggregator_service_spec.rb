@@ -23,10 +23,11 @@ describe Checkpoints::AssignmentAggregatorService do
       @course = course_model
       @course.root_account.enable_feature!(:discussion_checkpoints)
       @student = student_in_course(course: @course, active_all: true).user
-      @topic = @course.discussion_topics.create!(title: "graded topic")
       Assignment.suspend_callbacks(:aggregate_checkpoint_assignments) do
-        @topic.create_checkpoints(reply_to_topic_points: 1, reply_to_entry_points: 2)
+        @topic = DiscussionTopic.create_graded_topic!(course: @course, title: "graded topic")
       end
+
+      @topic.create_checkpoints(reply_to_topic_points: 1, reply_to_entry_points: 2)
     end
 
     let(:service) { Checkpoints::AssignmentAggregatorService }
@@ -39,7 +40,7 @@ describe Checkpoints::AssignmentAggregatorService do
       end
 
       it "returns false when called with a 'child' (checkpoint) assignment" do
-        assignment = @topic.checkpoint_assignments.first
+        assignment = @topic.sub_assignments.first
         expect(service.call(assignment:)).to be false
       end
 
@@ -130,7 +131,7 @@ describe Checkpoints::AssignmentAggregatorService do
 
       it "handles all assignments not having an updated_at" do
         @topic.assignment.update_columns(updated_at: nil)
-        @topic.checkpoint_assignments.update_all(updated_at: nil)
+        @topic.sub_assignments.update_all(updated_at: nil)
         success = service_call
         expect(success).to be true
         expect(@topic.assignment.updated_at).to be_nil

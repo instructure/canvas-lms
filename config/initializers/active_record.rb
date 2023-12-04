@@ -593,7 +593,7 @@ class ActiveRecord::Base
     case name
     when "Assignment"
       # Let's be consistent with the way AR handles things by default for STI. If name is "Assignment"
-      # we'll fetch the Assignment through its base class (AbstractAssignment).
+      # we'll fetch the Assignment or SubAssignment through its base class (AbstractAssignment).
       super("AbstractAssignment")
     else
       super

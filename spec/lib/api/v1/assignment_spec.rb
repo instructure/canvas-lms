@@ -236,10 +236,9 @@ describe "Api::V1::Assignment" do
           assignment.root_account.enable_feature!(:discussion_checkpoints)
 
           assignment.update_attribute(:has_sub_assignments, true)
-          assignment.update_attribute(:sub_assignment_tag, CheckpointLabels::PARENT)
 
-          @c1 = assignment.checkpoint_assignments.create!(context: assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 2.days.from_now)
-          @c2 = assignment.checkpoint_assignments.create!(context: assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 5, due_at: 5.days.from_now)
+          @c1 = assignment.sub_assignments.create!(context: assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 2.days.from_now)
+          @c2 = assignment.sub_assignments.create!(context: assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 5, due_at: 5.days.from_now)
         end
 
         it "returns the checkpoints attribute with the correct values" do

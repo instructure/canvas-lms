@@ -19,7 +19,7 @@
 #
 
 class SubmissionVersion < ActiveRecord::Base
-  belongs_to :assignment
+  belongs_to :assignment, class_name: "AbstractAssignment"
   belongs_to :context, polymorphic: [:course]
   belongs_to :root_account, class_name: "Account"
 

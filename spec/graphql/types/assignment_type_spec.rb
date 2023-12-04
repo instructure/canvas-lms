@@ -862,9 +862,9 @@ describe Types::AssignmentType do
 
       describe "when assignment has checkpoint assignments" do
         before do
-          assignment.update!(has_sub_assignments: true, sub_assignment_tag: CheckpointLabels::PARENT)
-          @c1 = assignment.checkpoint_assignments.create!(context: course, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 3.days.from_now)
-          @c2 = assignment.checkpoint_assignments.create!(context: course, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 10, due_at: 5.days.from_now)
+          assignment.update!(has_sub_assignments: true)
+          @c1 = assignment.sub_assignments.create!(context: course, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 3.days.from_now)
+          @c2 = assignment.sub_assignments.create!(context: course, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 10, due_at: 5.days.from_now)
         end
 
         it "checkpoints returns the correct tags" do

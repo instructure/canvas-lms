@@ -46,6 +46,34 @@ describe DiscussionTopic do
       )
   end
 
+  describe ".create_graded_topic!" do
+    it "returns a discussion topic with an attached assignment" do
+      topic = DiscussionTopic.create_graded_topic!(course: @course, title: "My Graded Topic")
+      aggregate_failures do
+        expect(topic).to be_a DiscussionTopic
+        expect(topic.assignment.submission_types).to eq "discussion_topic"
+      end
+    end
+
+    it "sets the title on both the assignment and discussion topic" do
+      title = "My Graded Topic"
+      topic = DiscussionTopic.create_graded_topic!(course: @course, title:)
+      aggregate_failures do
+        expect(topic.title).to eq title
+        expect(topic.assignment.title).to eq title
+      end
+    end
+
+    it "optionally accepts a user to be assigned to the discussion topic" do
+      topic = DiscussionTopic.create_graded_topic!(course: @course, title: "My Graded Topic", user: @teacher)
+      expect(topic.user).to eq @teacher
+    end
+
+    it "raises an error when the assignment is invalid" do
+      expect { DiscussionTopic.create_graded_topic!(course: nil, title: "My Graded Topic") }.to raise_error(ActiveRecord::RecordInvalid)
+    end
+  end
+
   describe ".preload_subentry_counts" do
     it "preloads the discussion subentry count" do
       topic1 = @course.discussion_topics.create!
@@ -2976,12 +3004,12 @@ describe DiscussionTopic do
 
   describe "checkpoints" do
     before do
-      @topic = @course.discussion_topics.create!(title: "Discussion Topic Title", user: @teacher)
+      @topic = DiscussionTopic.create_graded_topic!(course: @course, title: "Discussion Topic Title", user: @teacher)
     end
 
     it "not in place in the topic" do
       expect(@topic.checkpoints?).to be false
-      expect(@topic.checkpoint_assignments.length).to eq 0
+      expect(@topic.sub_assignments.length).to eq 0
       expect(@topic.reply_to_topic_checkpoint).to be_nil
       expect(@topic.reply_to_entry_checkpoint).to be_nil
       expect(@topic.reply_to_entry_required_count).to eq 0
@@ -3008,8 +3036,7 @@ describe DiscussionTopic do
 
       it "in the topic" do
         expect(@topic.checkpoints?).to be true
-        expect(@topic.checkpoint_assignments.length).to eq 2
-        expect(@topic.assignment.sub_assignment_tag).to eq CheckpointLabels::PARENT
+        expect(@topic.sub_assignments.length).to eq 2
         expect(@topic.reply_to_topic_checkpoint.sub_assignment_tag).to eq CheckpointLabels::REPLY_TO_TOPIC
         expect(@topic.reply_to_entry_checkpoint.sub_assignment_tag).to eq CheckpointLabels::REPLY_TO_ENTRY
       end
