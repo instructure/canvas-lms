@@ -21,7 +21,9 @@
 require "atom"
 require "canvas/draft_state_validations"
 
-class Assignment < ActiveRecord::Base
+class AbstractAssignment < ActiveRecord::Base
+  self.table_name = "assignments"
+
   include Workflow
   include TextHelper
   include HasContentTags
@@ -111,23 +113,23 @@ class Assignment < ActiveRecord::Base
   attribute :line_item_resource_id, :string, default: nil
   attribute :line_item_tag, :string, default: nil
 
-  has_many :submissions, -> { active.preload(:grading_period) }, inverse_of: :assignment
-  has_many :all_submissions, class_name: "Submission", dependent: :delete_all
+  has_many :submissions, -> { active.preload(:grading_period) }, inverse_of: :assignment, foreign_key: :assignment_id
+  has_many :all_submissions, class_name: "Submission", dependent: :delete_all, inverse_of: :assignment, foreign_key: :assignment_id
   has_many :observer_alerts, through: :all_submissions
   has_many :provisional_grades, through: :submissions
   belongs_to :annotatable_attachment, class_name: "Attachment"
   has_many :attachments, as: :context, inverse_of: :context, dependent: :destroy
-  has_many :assignment_student_visibilities
-  has_one :quiz, class_name: "Quizzes::Quiz"
+  has_many :assignment_student_visibilities, inverse_of: :assignment, foreign_key: :assignment_id
+  has_one :quiz, class_name: "Quizzes::Quiz", inverse_of: :assignment, foreign_key: :assignment_id
   belongs_to :assignment_group
-  has_one :discussion_topic, -> { where(root_topic_id: nil).order(:created_at) }, inverse_of: :assignment
-  has_one :wiki_page, inverse_of: :assignment
+  has_one :discussion_topic, -> { where(root_topic_id: nil).order(:created_at) }, inverse_of: :assignment, foreign_key: :assignment_id
+  has_one :wiki_page, inverse_of: :assignment, foreign_key: :assignment_id
   has_many :learning_outcome_alignments, -> { where("content_tags.tag_type='learning_outcome' AND content_tags.workflow_state<>'deleted'").preload(:learning_outcome) }, as: :content, inverse_of: :content, class_name: "ContentTag"
   has_one :rubric_association, -> { where(purpose: "grading").order(:created_at).preload(:rubric) }, as: :association, inverse_of: :association_object
   has_one :rubric, -> { merge(RubricAssociation.active) }, through: :rubric_association
   has_one :teacher_enrollment, -> { preload(:user).where(enrollments: { workflow_state: "active", type: "TeacherEnrollment" }) }, class_name: "TeacherEnrollment", foreign_key: "course_id", primary_key: "context_id"
   has_many :ignores, as: :asset
-  has_many :moderated_grading_selections, class_name: "ModeratedGrading::Selection"
+  has_many :moderated_grading_selections, class_name: "ModeratedGrading::Selection", inverse_of: :assignment, foreign_key: :assignment_id
   belongs_to :context, polymorphic: [:course]
   delegate :moderated_grading_max_grader_count, to: :course
   belongs_to :grading_standard
@@ -140,21 +142,22 @@ class Assignment < ActiveRecord::Base
   belongs_to :duplicate_of, class_name: "Assignment", optional: true, inverse_of: :duplicates
   has_many :duplicates, class_name: "Assignment", inverse_of: :duplicate_of, foreign_key: "duplicate_of_id"
 
-  has_many :assignment_configuration_tool_lookups, dependent: :delete_all
+  has_many :assignment_configuration_tool_lookups, dependent: :delete_all, inverse_of: :assignment, foreign_key: :assignment_id
   has_many :tool_settings_context_external_tools, through: :assignment_configuration_tool_lookups, source: :tool, source_type: "ContextExternalTool"
-  has_many :line_items, inverse_of: :assignment, class_name: "Lti::LineItem", dependent: :destroy
+  has_many :line_items, inverse_of: :assignment, class_name: "Lti::LineItem", dependent: :destroy, foreign_key: :assignment_id
 
   has_one :external_tool_tag, class_name: "ContentTag", as: :context, inverse_of: :context, dependent: :destroy
-  has_one :score_statistic, dependent: :destroy
-  has_one :post_policy, dependent: :destroy, inverse_of: :assignment
+  has_one :score_statistic, dependent: :destroy, inverse_of: :assignment, foreign_key: :assignment_id
+  has_one :post_policy, dependent: :destroy, inverse_of: :assignment, foreign_key: :assignment_id
 
-  has_many :moderation_graders, inverse_of: :assignment
+  has_many :moderation_graders, inverse_of: :assignment, foreign_key: :assignment_id
   has_many :moderation_grader_users, through: :moderation_graders, source: :user
 
   has_many :auditor_grade_change_records,
            class_name: "Auditors::ActiveRecord::GradeChangeRecord",
            dependent: :destroy,
-           inverse_of: :assignment
+           inverse_of: :assignment,
+           foreign_key: :assignment_id
   has_many :lti_resource_links,
            as: :context,
            inverse_of: :context,
@@ -162,8 +165,8 @@ class Assignment < ActiveRecord::Base
            dependent: :destroy
 
   has_many :conditional_release_rules, class_name: "ConditionalRelease::Rule", dependent: :destroy, foreign_key: "trigger_assignment_id", inverse_of: :trigger_assignment
-  has_many :conditional_release_associations, class_name: "ConditionalRelease::AssignmentSetAssociation", dependent: :destroy, inverse_of: :assignment
-  has_one :master_content_tag, class_name: "MasterCourses::MasterContentTag", inverse_of: :assignment
+  has_many :conditional_release_associations, class_name: "ConditionalRelease::AssignmentSetAssociation", dependent: :destroy, inverse_of: :assignment, foreign_key: :assignment_id
+  has_one :master_content_tag, class_name: "MasterCourses::MasterContentTag", inverse_of: :assignment, foreign_key: :content_id
 
   scope :assigned_to_student, ->(student_id) { joins(:submissions).where(submissions: { user_id: student_id }) }
   scope :anonymous, -> { where(anonymous_grading: true) }
@@ -2063,15 +2066,15 @@ class Assignment < ActiveRecord::Base
   end
 
   def grade_student(original_student, opts = {})
-    raise GradeError, "Student is required" unless original_student
+    raise ::Assignment::GradeError, "Student is required" unless original_student
     unless context.includes_user?(original_student, context.admin_visible_student_enrollments) # allows inactive users to be graded
-      raise GradeError, "Student must be enrolled in the course as a student to be graded"
+      raise ::Assignment::GradeError, "Student must be enrolled in the course as a student to be graded"
     end
-    raise GradeError, "Grader must be enrolled as a course admin" if opts[:grader] && !context.grants_right?(opts[:grader], :manage_grades)
+    raise ::Assignment::GradeError, "Grader must be enrolled as a course admin" if opts[:grader] && !context.grants_right?(opts[:grader], :manage_grades)
 
     opts[:excused] = Canvas::Plugin.value_to_boolean(opts.delete(:excuse)) if opts.key? :excuse
-    raise GradeError, "Cannot simultaneously grade and excuse an assignment" if opts[:excused] && (opts[:grade] || opts[:score])
-    raise GradeError, "Provisional grades require a grader" if opts[:provisional] && opts[:grader].nil?
+    raise ::Assignment::GradeError, "Cannot simultaneously grade and excuse an assignment" if opts[:excused] && (opts[:grade] || opts[:score])
+    raise ::Assignment::GradeError, "Provisional grades require a grader" if opts[:provisional] && opts[:grader].nil?
 
     opts.delete(:id)
     group, students = group_students(original_student)
@@ -2082,7 +2085,7 @@ class Assignment < ActiveRecord::Base
       checkpoint_label = opts.delete(:checkpoint_label)
       checkpoint_assignment = find_checkpoint(checkpoint_label)
       if checkpoint_label.blank? || checkpoint_assignment.nil?
-        raise GradeError, "Must provide a valid checkpoint label when grading checkpointed discussions"
+        raise ::Assignment::GradeError, "Must provide a valid checkpoint label when grading checkpointed discussions"
       end
 
       checkpoint_submissions = checkpoint_assignment.grade_student(original_student, opts)
@@ -2175,7 +2178,7 @@ class Assignment < ActiveRecord::Base
   def save_grade_to_submission(submission, original_student, group, opts)
     unless submission.grader_can_grade?
       error_details = submission.grading_error_message
-      raise GradeError.new("Cannot grade this submission at this time: #{error_details}", :forbidden)
+      raise ::Assignment::GradeError.new("Cannot grade this submission at this time: #{error_details}", :forbidden)
     end
 
     submission.skip_grade_calc = opts[:skip_grade_calc]
@@ -2239,7 +2242,7 @@ class Assignment < ActiveRecord::Base
 
     if opts[:provisional]
       if !(score.present? || submission.excused) && opts[:grade] != ""
-        raise GradeError.new(error_code: GradeError::PROVISIONAL_GRADE_INVALID_SCORE)
+        raise ::Assignment::GradeError.new(error_code: ::Assignment::GradeError::PROVISIONAL_GRADE_INVALID_SCORE)
       end
 
       submission.find_or_create_provisional_grade!(
@@ -3878,7 +3881,7 @@ class Assignment < ActiveRecord::Base
       # when there weren't enough slots open for all of them. If we ended up
       # with too many provisional graders, throw an error to roll things back.
       if filled_available_slot && provisional_moderation_graders.count > grader_count
-        raise MaxGradersReachedError
+        raise ::Assignment::MaxGradersReachedError
       end
     end
   end
@@ -4042,10 +4045,6 @@ class Assignment < ActiveRecord::Base
     ["duplicating", "failed_to_duplicate"].include?(workflow_state)
   end
 
-  def override_reflection_type_values
-    %w[Assignment AbstractAssignment]
-  end
-
   private
 
   def grading_type_requires_points?
@@ -4069,7 +4068,7 @@ class Assignment < ActiveRecord::Base
 
   def ensure_moderation_grader_slot_available(user)
     if moderated_grader_limit_reached? && user.id != final_grader_id
-      raise MaxGradersReachedError
+      raise ::Assignment::MaxGradersReachedError
     end
   end
 

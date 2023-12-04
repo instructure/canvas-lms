@@ -1678,7 +1678,7 @@ class ExternalToolsController < ApplicationController
   end
 
   def placement_from_params
-    params[:placement] || params[:launch_type] || "#{@context.class.base_class.to_s.downcase}_navigation"
+    params[:placement] || params[:launch_type] || "#{@context.class.url_context_class.to_s.downcase}_navigation"
   end
 
   def whitelisted_query_params

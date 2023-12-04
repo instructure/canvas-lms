@@ -39,6 +39,7 @@ module Canvas
                       resolved_outcome_calculation_method],
       "Course" => %w[account_associations conditional_release],
       "User" => %w[enrollments groups account_users todo_list submissions user_services k5_user potential_unread_submission_ids],
+      "AbstractAssignment" => %w[availability conditional_release needs_grading],
       "Assignment" => %w[availability conditional_release needs_grading],
       "Quizzes::Quiz" => %w[availability]
     }.freeze

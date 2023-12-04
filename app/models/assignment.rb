@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2018 - present Instructure, Inc.
+# Copyright (C) 2023 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,10 +16,24 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+#
 
-class ScoreStatistic < ApplicationRecord
-  belongs_to :assignment, inverse_of: :score_statistic
+class Assignment < AbstractAssignment
+  # Returns the value to be stored in the polymorphic type column for Polymorphic Associations.
+  def self.polymorphic_name
+    "Assignment"
+  end
 
-  validates :assignment, :maximum, :minimum, :mean, :count, :lower_q, :median, :upper_q, presence: true
-  validates :maximum, :minimum, :mean, :count, :lower_q, :median, :upper_q, numericality: true
+  # Returns the value to be used for asset string prefixes.
+  def self.reflection_type_name
+    "assignment"
+  end
+
+  def self.serialization_root_key
+    "assignment"
+  end
+
+  def self.url_context_class
+    self
+  end
 end

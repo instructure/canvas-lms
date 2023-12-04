@@ -136,7 +136,7 @@ module ApplicationHelper
   end
 
   def url_helper_context_from_object(context)
-    (context ? context.class.base_class : context.class).name.underscore
+    (context ? context.class.url_context_class : context.class).name.underscore
   end
 
   def message_user_path(user, context = nil)

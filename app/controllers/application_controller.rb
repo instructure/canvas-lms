@@ -694,7 +694,7 @@ class ApplicationController < ActionController::Base
     if context.is_a?(UserProfile)
       name = name.to_s.sub("context", "profile")
     else
-      klass = context.class.base_class
+      klass = context.class.url_context_class
       name = name.to_s.sub("context", klass.name.underscore)
       opts.unshift(context)
     end
