@@ -155,7 +155,7 @@ GEM
       net-protocol
     net-pop (0.1.2)
       net-protocol
-    net-protocol (0.2.1)
+    net-protocol (0.2.2)
       timeout
     net-smtp (0.4.0)
       net-protocol
@@ -216,7 +216,7 @@ GEM
       nokogiri (>= 1.12.0)
     sorbet-runtime (0.5.10965)
     statsd-ruby (1.5.0)
-    stringio (3.0.9)
+    stringio (3.1.0)
     thor (1.3.0)
     timecop (0.9.8)
     timeout (0.4.1)

@@ -59,7 +59,7 @@ GEM
       simplecov_json_formatter (~> 0.1)
     simplecov-html (0.12.3)
     simplecov_json_formatter (0.1.4)
-    stringio (3.0.9)
+    stringio (3.1.0)
 
 PLATFORMS
   aarch64-linux
