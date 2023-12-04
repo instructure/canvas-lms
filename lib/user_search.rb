@@ -174,11 +174,11 @@ module UserSearch
       end
 
       if context.is_a?(Account) && !enrollment_types && context.root_account&.feature_enabled?(:temporary_enrollments)
-        recipients = options[:temporary_enrollment_recipients]
-        providers = options[:temporary_enrollment_providers]
+        recipients = value_to_boolean(options[:temporary_enrollment_recipients])
+        providers = value_to_boolean(options[:temporary_enrollment_providers])
 
-        recipient_scope = Enrollment.current_and_future.temporary_enrollment_recipients_for_provider(users_scope) if recipients
-        provider_scope = Enrollment.current_and_future.temporary_enrollments_for_recipient(users_scope) if providers
+        recipient_scope = Enrollment.active_or_pending_by_date.temporary_enrollment_recipients_for_provider(users_scope) if recipients
+        provider_scope = Enrollment.active_or_pending_by_date.temporary_enrollments_for_recipient(users_scope) if providers
 
         users_scope =
           if recipients && providers
@@ -196,6 +196,10 @@ module UserSearch
     end
 
     private
+
+    def value_to_boolean(value)
+      Canvas::Plugin.value_to_boolean(value)
+    end
 
     def complex_sql(users_scope, params)
       users_scope = users_scope.group(:id)
