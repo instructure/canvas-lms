@@ -1499,7 +1499,7 @@ class Submission < ActiveRecord::Base
     inferred_state = workflow_state
 
     # New Quizzes returned a partial grade, but manual review is needed from a human
-    return workflow_state if workflow_state == Submission.workflow_states.pending_review && graded_by_new_quizzes?
+    return workflow_state if workflow_state == Submission.workflow_states.pending_review && cached_quiz_lti
 
     inferred_state = Submission.workflow_states.submitted if unsubmitted? && submitted_at
     inferred_state = Submission.workflow_states.unsubmitted if submitted? && !has_submission?
@@ -3072,10 +3072,6 @@ class Submission < ActiveRecord::Base
     tracked_attributes = Checkpoints::SubmissionAggregatorService::AggregateSubmission.members.map(&:to_s) - ["updated_at"]
     relevant_changes = tracked_attributes & saved_changes.keys
     relevant_changes.any?
-  end
-
-  def graded_by_new_quizzes?
-    cached_quiz_lti && autograded?
   end
 
   def remove_sticker
