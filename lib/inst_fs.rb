@@ -184,8 +184,11 @@ module InstFS
         retries ||= 0
         response = CanvasHttp.post(url, form_data: data, multipart: true, streaming: true)
       rescue Timeout::Error
-        retry if (retries += 1) < 2
-        raise InstFS::ServiceError, "unable to communicate with instfs"
+        if file_object.respond_to?(:rewind) && (retries += 1) < 2
+          file_object.rewind
+          retry
+        end
+        raise InstFS::ServiceError, "timed out communicating with instfs"
       rescue CanvasHttp::CircuitBreakerError
         raise InstFS::ServiceError, "unable to communicate with instfs"
       end
