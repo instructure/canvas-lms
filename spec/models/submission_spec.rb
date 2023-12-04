@@ -113,6 +113,26 @@ describe Submission do
           end
 
           it { is_expected.to eq Submission.workflow_states.pending_review }
+
+          context "and the submission was manually given a late policy status of missing" do
+            before do
+              submission.grader_id = @teacher.id
+              submission.cached_quiz_lti = true
+              submission.late_policy_status = "missing"
+            end
+
+            it { is_expected.to eq Submission.workflow_states.pending_review }
+          end
+
+          context "and the submission was manually given a late policy status of late" do
+            before do
+              submission.grader_id = @teacher.id
+              submission.cached_quiz_lti = true
+              submission.late_policy_status = "late"
+            end
+
+            it { is_expected.to eq Submission.workflow_states.pending_review }
+          end
         end
       end
 
