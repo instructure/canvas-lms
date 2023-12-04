@@ -31,13 +31,13 @@ import type {ViewProps} from '@instructure/ui-view'
 import AttachmentsTable from '../AttachmentsTable'
 import {AchievementsEdit} from '../../Portfolios/edit/achievements/AchievementsEdit'
 import type {AttachmentData, ProjectEditData, SkillData} from '../../types'
-import {renderEditLink, stringToId} from '../../shared/utils'
+import {renderEditLink, stringToId, showUnimplemented} from '../../shared/utils'
 import CoverImageModal from '../../shared/CoverImageModal'
 import SkillSelect from '../../shared/SkillSelect'
 import RichTextEdit from '../../shared/RichTextEdit'
 import HeadingEditor from '../../shared/HeadingEditor'
 import AddFilesModal from './AddFilesModal'
-import PreviewModal from './PreviewModal'
+import PreviewModal from '../ProjectPreviewModal'
 
 const ProjectEdit = () => {
   const submit = useSubmit()
@@ -210,7 +210,12 @@ const ProjectEdit = () => {
               >
                 Preview
               </Button>
-              <Button color="primary" margin="0" renderIcon={IconSaveLine}>
+              <Button
+                color="primary"
+                margin="0"
+                renderIcon={IconSaveLine}
+                onClick={showUnimplemented}
+              >
                 Share
               </Button>
             </Flex.Item>

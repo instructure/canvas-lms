@@ -42,67 +42,69 @@ const ProjectView = ({project}: ProjectViewProps) => {
           )}
         </div>
       </View>
-      <Heading level="h1" themeOverride={{h1FontWeight: 700}} margin="0 0 small 0">
-        {project.title}
-      </Heading>
-
-      <View as="div" margin="0 0 large 0">
-        <Heading level="h3" themeOverride={{h3FontSize: '1rem'}}>
-          By {ENV.current_user.display_name}
+      <View as="div" padding="0 medium medium medium">
+        <Heading level="h1" themeOverride={{h1FontWeight: 700}} margin="0 0 small 0">
+          {project.title}
         </Heading>
-      </View>
 
-      <View as="div" margin="0 0 large 0">
-        <Heading level="h3" themeOverride={{h3FontSize: '1rem'}}>
-          Skills and tools
-        </Heading>
-        <View as="div" margin="small 0">
-          {project.skills.map((skill: SkillData) => renderSkillTag(skill))}
-        </View>
-      </View>
-
-      <View as="div" margin="0 0 large 0">
-        <Heading level="h3" themeOverride={{h3FontSize: '1rem'}} margin="0 0 x-small 0">
-          Description
-        </Heading>
-        <Text as="div" size="small" wrap="break-word">
-          <div dangerouslySetInnerHTML={{__html: project.description}} />
-        </Text>
-      </View>
-      {project.attachments.length > 0 && (
         <View as="div" margin="0 0 large 0">
           <Heading level="h3" themeOverride={{h3FontSize: '1rem'}}>
-            Attachments
+            By {ENV.current_user.display_name}
           </Heading>
-          <AttachmentsTable attachments={project.attachments} />
         </View>
-      )}
-      {project.links.length > 0 && (
+
         <View as="div" margin="0 0 large 0">
           <Heading level="h3" themeOverride={{h3FontSize: '1rem'}}>
-            Links
+            Skills and tools
           </Heading>
-          <List isUnstyled={true} itemSpacing="small" margin="small 0 0 0">
-            {project.links.map((link: string) => renderLink(link))}
-          </List>
+          <View as="div" margin="small 0">
+            {project.skills.map((skill: SkillData) => renderSkillTag(skill))}
+          </View>
         </View>
-      )}
-      {project.achievements.length > 0 && (
+
         <View as="div" margin="0 0 large 0">
-          <Heading level="h3" themeOverride={{h3FontSize: '1rem'}} margin="large 0 small 0">
-            Achievements
+          <Heading level="h3" themeOverride={{h3FontSize: '1rem'}} margin="0 0 x-small 0">
+            Description
           </Heading>
-          <Flex as="div" margin="small 0" gap="medium" wrap="wrap">
-            {project.achievements.map((achievement: AchievementData) => {
-              return (
-                <Flex.Item key={achievement.id} shouldShrink={false}>
-                  {renderAchievement(achievement)}
-                </Flex.Item>
-              )
-            })}
-          </Flex>
+          <Text as="div" size="small" wrap="break-word">
+            <div dangerouslySetInnerHTML={{__html: project.description}} />
+          </Text>
         </View>
-      )}
+        {project.attachments.length > 0 && (
+          <View as="div" margin="0 0 large 0">
+            <Heading level="h3" themeOverride={{h3FontSize: '1rem'}}>
+              Attachments
+            </Heading>
+            <AttachmentsTable attachments={project.attachments} />
+          </View>
+        )}
+        {project.links.length > 0 && (
+          <View as="div" margin="0 0 large 0">
+            <Heading level="h3" themeOverride={{h3FontSize: '1rem'}}>
+              Links
+            </Heading>
+            <List isUnstyled={true} itemSpacing="small" margin="small 0 0 0">
+              {project.links.map((link: string) => renderLink(link))}
+            </List>
+          </View>
+        )}
+        {project.achievements.length > 0 && (
+          <View as="div" margin="0 0 large 0">
+            <Heading level="h3" themeOverride={{h3FontSize: '1rem'}} margin="large 0 small 0">
+              Achievements
+            </Heading>
+            <Flex as="div" margin="small 0" gap="medium" wrap="wrap">
+              {project.achievements.map((achievement: AchievementData) => {
+                return (
+                  <Flex.Item key={achievement.id} shouldShrink={false}>
+                    {renderAchievement(achievement)}
+                  </Flex.Item>
+                )
+              })}
+            </Flex>
+          </View>
+        )}
+      </View>
     </>
   )
 }

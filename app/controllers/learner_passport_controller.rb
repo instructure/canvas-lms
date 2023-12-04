@@ -23,7 +23,7 @@
 # bundles included below with css_bundle
 
 class LearnerPassportController < ApplicationController
-  CACHE_EXPIRATION = 1.week
+  CACHE_EXPIRATION = 1.day
   before_action :require_context
   before_action :require_user
   before_action :require_learner_passport_feature_flag
@@ -357,7 +357,7 @@ class LearnerPassportController < ApplicationController
     new_portfolio[:email] = @current_user.email || ""
     current_portfolios = Rails.cache.fetch(current_portfolios_key) { learner_passport_current_portfolios }
     current_portfolios << new_portfolio
-    Rails.cache.write(current_portfolios_key, current_portfolios, version: "1")
+    Rails.cache.write(current_portfolios_key, current_portfolios, expires_in: CACHE_EXPIRATION)
     render json: new_portfolio
   end
 
@@ -385,7 +385,7 @@ class LearnerPassportController < ApplicationController
         portfolio[key] = params[key]
       end
     end
-    Rails.cache.write(current_portfolios_key, current_portfolios, version: "1")
+    Rails.cache.write(current_portfolios_key, current_portfolios, expires_in: CACHE_EXPIRATION)
 
     render json: portfolio
   end
@@ -404,8 +404,15 @@ class LearnerPassportController < ApplicationController
     new_portfolio[:id] = (current_portfolios.length + 1).to_s
     new_portfolio[:title] = "#{portfolio[:title]} (copy)"
     current_portfolios << new_portfolio
-    Rails.cache.write(current_portfolios_key, current_portfolios, version: "1")
+    Rails.cache.write(current_portfolios_key, current_portfolios, expires_in: CACHE_EXPIRATION)
     render json: new_portfolio
+  end
+
+  def portfolio_delete
+    current_portfolios = Rails.cache.fetch(current_portfolios_key) { learner_passport_current_portfolios }
+    current_portfolios.reject! { |p| p[:id] == params[:portfolio_id] }
+    Rails.cache.write(current_portfolios_key, current_portfolios, expires_in: CACHE_EXPIRATION)
+    render json: { message: "Portfolio deleted" }, status: :accepted
   end
 
   def portfolio_edit
@@ -426,7 +433,7 @@ class LearnerPassportController < ApplicationController
     new_project[:id] = (current_projects.length + 1).to_s
     new_project[:title] = params[:title]
     current_projects << new_project
-    Rails.cache.write(current_projects_key, current_projects, version: "1")
+    Rails.cache.write(current_projects_key, current_projects, expires_in: CACHE_EXPIRATION)
     render json: new_project
   end
 
@@ -455,7 +462,7 @@ class LearnerPassportController < ApplicationController
         project[key] = params[key]
       end
     end
-    Rails.cache.write(current_projects_key, current_projects, version: "1")
+    Rails.cache.write(current_projects_key, current_projects, expires_in: CACHE_EXPIRATION)
 
     render json: project
   end
@@ -476,8 +483,15 @@ class LearnerPassportController < ApplicationController
     new_project[:id] = (current_projects.length + 1).to_s
     new_project[:title] = "#{project[:title]} (copy)"
     current_projects << new_project
-    Rails.cache.write(current_projects_key, current_projects, version: "1")
+    Rails.cache.write(current_projects_key, current_projects, expires_in: CACHE_EXPIRATION)
     render json: new_project
+  end
+
+  def project_delete
+    current_projects = Rails.cache.fetch(current_projects_key) { learner_passport_current_projects }
+    current_projects.reject! { |p| p[:id] == params[:project_id] }
+    Rails.cache.write(current_projects_key, current_projects, expires_in: CACHE_EXPIRATION)
+    render json: { message: "Project deleted" }, status: :accepted
   end
 
   def project_edit
@@ -489,13 +503,13 @@ class LearnerPassportController < ApplicationController
 
   def reset
     if params.key? :empty
-      Rails.cache.write(current_achievements_key, [], version: "1")
-      Rails.cache.write(current_portfolios_key, [], version: "1")
+      Rails.cache.write(current_portfolios_key, [], expires_in: CACHE_EXPIRATION)
+      Rails.cache.write(current_projects_key, [], expires_in: CACHE_EXPIRATION)
     else
       sample_portfolio = Rails.cache.fetch(portfolio_sample_key) { learner_passport_portfolio_sample }
-      Rails.cache.write(current_portfolios_key, [sample_portfolio.clone], version: "1")
+      Rails.cache.write(current_portfolios_key, [sample_portfolio.clone], expires_in: CACHE_EXPIRATION)
       sample_project = Rails.cache.fetch(project_sample_key) { learner_passport_project_sample }
-      Rails.cache.write(current_projects_key, [sample_project.clone], version: "1")
+      Rails.cache.write(current_projects_key, [sample_project.clone], expires_in: CACHE_EXPIRATION)
     end
     render json: { message: "Portfolios reset" }, status: :accepted
   end

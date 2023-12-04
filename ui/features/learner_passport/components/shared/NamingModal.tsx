@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useState} from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 import {CloseButton, Button} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
@@ -25,14 +25,29 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
 
 export type CreateModalProps = {
-  forObject: string
+  objectType: string
+  objectId: string
+  mode: 'create' | 'rename'
+  currentName?: string
   open: boolean
   onDismiss: () => void
   onSubmit: (f: HTMLFormElement) => void
 }
 
-const CreateModal = ({forObject, open, onDismiss, onSubmit}: CreateModalProps) => {
-  const [name, setName] = useState('')
+const NamingModal = ({
+  objectType,
+  objectId,
+  mode,
+  currentName,
+  open,
+  onDismiss,
+  onSubmit,
+}: CreateModalProps) => {
+  const [name, setName] = useState(currentName ?? '')
+
+  useEffect(() => {
+    setName(currentName ?? '')
+  }, [currentName])
 
   const handleNameChange = useCallback((_e: React.ChangeEvent<HTMLInputElement>, value: string) => {
     setName(value)
@@ -47,8 +62,17 @@ const CreateModal = ({forObject, open, onDismiss, onSubmit}: CreateModalProps) =
     [name, onSubmit]
   )
 
+  const renderTitle = () => {
+    switch (mode) {
+      case 'create':
+        return `Create ${objectType}`
+      case 'rename':
+        return `Rename ${objectType}`
+    }
+  }
+
   return (
-    <Modal open={open} size="auto" label={`Create ${forObject}`} onDismiss={onDismiss}>
+    <Modal open={open} size="auto" label={`Create ${objectType}`} onDismiss={onDismiss}>
       <Modal.Header>
         <CloseButton
           placement="end"
@@ -56,17 +80,18 @@ const CreateModal = ({forObject, open, onDismiss, onSubmit}: CreateModalProps) =
           onClick={onDismiss}
           screenReaderLabel="Close"
         />
-        <Heading>Create {forObject}</Heading>
+        <Heading>{renderTitle()}</Heading>
       </Modal.Header>
       <Modal.Body>
         {/* @ts-expect-error */}
-        <form id="create_form" action="create" method="PUT" onSubmit={handleSubmit}>
+        <form id="create_form" action={mode} onSubmit={handleSubmit}>
           <input type="hidden" name="userId" value={ENV.current_user.id} />
+          <input type="hidden" name="id" value={objectId} />
           <View as="div" minWidth="700px">
             <TextInput
               name="title"
-              placeholder={`Enter ${forObject.toLowerCase()} name`}
-              renderLabel={`${forObject} Name`}
+              placeholder={`Enter ${objectType.toLowerCase()} name`}
+              renderLabel={`${objectType} Name`}
               onChange={handleNameChange}
               value={name}
             />
@@ -89,4 +114,4 @@ const CreateModal = ({forObject, open, onDismiss, onSubmit}: CreateModalProps) =
   )
 }
 
-export default CreateModal
+export default NamingModal

@@ -16,54 +16,53 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback} from 'react'
-import {Button, CloseButton} from '@instructure/ui-buttons'
-import {Heading} from '@instructure/ui-heading'
+import React from 'react'
+import {CloseButton} from '@instructure/ui-buttons'
 import {Modal} from '@instructure/ui-modal'
 import {View} from '@instructure/ui-view'
-import {ProjectDetailData} from '../../types'
-import ProjectView from '../ProjectView'
+import {previewBackgroundImage} from '../shared/utils'
+import {ProjectDetailData} from '../types'
+import ProjectView from './ProjectView'
 
-interface PreviewModalProps {
+interface ProjectPreviewModalProps {
   open: boolean
   project: ProjectDetailData
   onClose: () => void
 }
 
-const PreviewModal = ({open, project, onClose}: PreviewModalProps) => {
-  const handleDismiss = useCallback(() => {
-    onClose()
-  }, [onClose])
-
+const ProjectPreviewModal = ({open, project, onClose}: ProjectPreviewModalProps) => {
   return (
     <Modal
       open={open}
-      size="auto"
+      size="fullscreen"
       label={`Preview Project: ${project.title}`}
       shouldCloseOnDocumentClick={true}
       onDismiss={onClose}
     >
-      <Modal.Header>
-        <CloseButton
-          placement="end"
-          offset="medium"
-          onClick={handleDismiss}
-          screenReaderLabel="Close"
-        />
-        <Heading>{`Preview Project: ${project.title}`}</Heading>
-      </Modal.Header>
       <Modal.Body>
-        <View as="div" maxWidth="986px" margin="0 auto">
-          <ProjectView project={project} />
-        </View>
+        <div
+          style={{
+            margin: '-1.5rem',
+            position: 'relative',
+          }}
+        >
+          <CloseButton placement="end" screenReaderLabel="Close" size="small" onClick={onClose} />
+          <div
+            style={{
+              padding: '3rem 0 1.5rem 0',
+              backgroundColor: '#c7cdd1',
+              backgroundRepeat: 'repeat',
+              backgroundImage: `url(${previewBackgroundImage})`,
+            }}
+          >
+            <View as="div" maxWidth="986px" margin="0 auto" background="primary" shadow="resting">
+              <ProjectView project={project} />
+            </View>
+          </div>
+        </div>
       </Modal.Body>
-      <Modal.Footer>
-        <Button color="secondary" onClick={handleDismiss}>
-          Close
-        </Button>
-      </Modal.Footer>
     </Modal>
   )
 }
 
-export default PreviewModal
+export default ProjectPreviewModal
