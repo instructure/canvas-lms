@@ -40,7 +40,8 @@ module MasterCourses::TagHelper
       tag_scope = tag_scope.where(content: objects_to_load)
     end
     tag_scope.to_a.group_by(&:content_type).each do |content_type, typed_tags|
-      @content_tag_index[content_type] = typed_tags.index_by(&:content_id).merge(@content_tag_index[content_type] || {})
+      index_type = (content_type == "Assignment") ? "AbstractAssignment" : content_type
+      @content_tag_index[index_type] = typed_tags.index_by(&:content_id).merge(@content_tag_index[index_type] || {})
     end
     true
   end

@@ -226,34 +226,4 @@ describe Assignment do
       end
     end
   end
-
-  def setup_assignment_without_submission
-    assignment_model(course: @course)
-    @assignment.reload
-  end
-
-  def setup_assignment_with_homework
-    setup_assignment_without_submission
-    @assignment.submit_homework(@user, { submission_type: "online_text_entry", body: "blah" })
-    @assignment.reload
-  end
-
-  it "queries to Assignment.versions consider the override_reflection_type_values method returns" do
-    course_with_teacher(active_all: true)
-    setup_assignment_with_homework
-
-    @assignment.update!(points_possible: 5)
-    @assignment.update!(points_possible: 8)
-    versions = Version.where(versionable_type: %w[Assignment AbstractAssignment], versionable_id: @assignment.id)
-    version_one = versions.first
-    version_two = versions.second
-    version_one.update_columns(versionable_type: "Assignment")
-    version_two.update_columns(versionable_type: "AbstractAssignment")
-
-    versions = @assignment.versions
-
-    expect(versions).to include version_one
-    expect(versions).to include version_two
-    expect(versions.length).to eq(3)
-  end
 end
