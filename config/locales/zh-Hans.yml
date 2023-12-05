@@ -2723,6 +2723,7 @@ zh-Hans:
       准许管理员查看包含所有近期运行的
       GraphQL突变的信息日志。
   allows_aligning_outcomes_to_non_scoring_content_537ce399: 允许根据非评分内容来调整结果
+  allows_an_account_administrator_to_manage_the_impa_71112028: "允许帐户管理员管理 Impact 服务集成。"
   allows_assessors_to_view_the_assessment_audit_tray_84c0c4c2: 允许评估者查看SpeedGrader评估审核托盘中的匿名或已核对作业。
   allows_blueprint_course_settings_to_be_exported_an_a34bb7f: 允许将模板课程设置导出并复制到另一模板课程
   allows_blueprint_courses_to_keep_track_of_assignme_3faaa416: "允许模板课程跟踪作业的资源 ID 更改情况。"
@@ -3390,6 +3391,7 @@ zh-Hans:
   allows_users_to_add_a_temporary_enrollment_with_a__22f73d4: 允许用户使用开始日期、结束日期和角色添加临时注册
   allows_users_to_add_conferences_from_the_calendar_f36c5008: 允许用户从日历添加会议
   allows_users_to_add_lti_tools_with_conference_sele_c38545ab: "允许用户使用 conference_selection 位置类型添加 LTI 工具"
+  allows_users_to_archive_outcomes_and_outcome_group_313b6b4e: 允许用户将不再使用的结果和结果组存档。
   allows_users_to_delete_a_temporary_enrollment_7fd33cdd: 允许用户删除临时注册
   allows_users_to_edit_an_existing_temporary_enrollm_b3543354: 允许用户编辑现有的临时注册
   allows_users_to_edit_conferences_2d3c960c: 允许用户编辑会议。
@@ -3464,6 +3466,7 @@ zh-Hans:
     other: "移动这些结果时出错：%{errorMessage}。"
   an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*发生错误*，请稍候再次发表您的回复"
   an_error_occurred_please_try_again_95361e05: 发生错误。请重试。
+  an_error_occurred_please_try_again_ceb4d85e: 发生错误，请重试
   an_error_occurred_please_try_again_error_error_8800b506: "发生错误。请再试一次。错误：%{error}"
   an_error_occurred_please_try_again_later_84223241: 发生错误。请稍后再试。
   an_error_occurred_publishing_grades_cfdf7631: 发布成绩时出错
@@ -3855,6 +3858,9 @@ zh-Hans:
   apply_filter_7e4f6113: 应用过滤器
   apply_filters_e98823c0: 应用过滤器
   apply_filters_note_clicking_this_button_will_cause_753f04: 应用筛选条件。注释：点击此按钮将重载页面。
+  apply_link_replacement_logic_to_a_select_list_of_e_7fadfdd7: |-
+      将链接替换逻辑应用到仅部分
+      元素的列表，而不是应用到全部文本
   apply_missing_status_cd98e1d3: 应用缺失状态
   apply_score_1edd7cda: 应用分数
   apply_score_to_ungraded_afd025d0: 对未评分的提交项应用分数
@@ -3892,7 +3898,9 @@ zh-Hans:
   arc_a935e585: ARC
   arc_media_recorder_in_rce_cf900c6: "RCE 中的 Arc Media Recorder"
   archive_3f794d7e: 存档
+  archive_grading_scheme_cbbf4264: 将评分方案存档
   archive_operation_failed_5504706: 消息存档失败
+  archive_outcomes_20b869b6: 将结果存档
   archive_selected_d64506ca: 已选择归档
   archived_de543437: 已归档
   archived_grading_schemes_6d698d0: 已存档的评分方案
@@ -4030,7 +4038,9 @@ zh-Hans:
   assign_eedf72bb: 分配
   assign_manually_1785dcfc: 手动分配
   assign_reviews_on_date_7e48ec50: 分配审阅日期
+  assign_temporary_enrollments_bdaaa58a: 分配临时注册学生
   assign_temporary_enrollments_to_name_e8b43c5c: "将注册学生临时分配到 %{name}"
+  assign_temporary_enrollments_to_recipient_b25cb6be: "将注册学生临时分配到 %{recipient}"
   assign_this_module_a4685e57: 分配此单元
   assign_to_6b806cd9: 分配至：
   assign_to_95404a83: 分配到
@@ -4105,6 +4115,7 @@ zh-Hans:
   assignment_comments_e43ed898: 作业评论
   assignment_configuration_4153cb88: 作业配置
   assignment_context_has_been_graded_for_name_af51759a: "%{assignment}已经给%{name}的%{context}评分。"
+  assignment_context_id_must_match_discussion_topic__891e7ed4: "作业 context_id 必须与讨论主题 context_id 一致"
   assignment_created_assignment_name_course_name_324a5639: "作业已创建 - %{assignment_name}, %{course_name}"
   assignment_created_b3ee04d7: 已创建作业
   assignment_d8387b78: 作业
@@ -6280,7 +6291,7 @@ zh-Hans:
   canvas_course_id_db4de2b8: canvas_course_id
   canvas_course_tutorial_video_5205c1c1: "Canvas 课程教程视频"
   canvas_dashboard_links_will_navigate_to_the_catalo_4143635e: Canvas的控制板链接将导航到目录控制板
-  canvas_default_7f81a6b8: Canvas默认
+  canvas_default_7f81a6b8: "Canvas 默认值"
   canvas_demo_7a005cf3: "Canvas 演示"
   canvas_did_not_recognize_your_identity_provider_cb0e50fc: "Canvas 无法识别您的身份提供者"
   canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "以下用户没有Canvas 帐户: %{user}"
@@ -6373,6 +6384,11 @@ zh-Hans:
     by_sa: "CC 署名、相同方式共享"
     private: 私有（版权保护）
     public_domain: 公共域
+  cc_attribution_f6de631f: "CC 署名"
+  cc_attribution_no_derivatives_b006744f: "CC 署名、禁止改写"
+  cc_attribution_non_commercial_39e0d30d: "CC 署名、非商业"
+  cc_attribution_non_commercial_no_derivatives_9fe74c00: "CC 署名、非商业、禁止改写"
+  cc_attribution_non_commercial_share_alike_c7edb1e5: "CC 署名、非商业、相同方式共享"
   cc_subtitles_a0d16ff6: CC/字幕
   ccp_zero_activity_73d094c3: "CCP 零活动"
   cell_number_69a7c309: 手机号码
@@ -8851,6 +8867,7 @@ zh-Hans:
       invitation: 邀请已发送。
       linkError: 更新用户的学生链接时出错。请稍后重试。
       links: 学生链接已成功更新
+      observerObservingObserverError: 无法使用正在被当前用户观察的另一名用户来观察用户
       sectionError: 更新用户的班级时出错。请稍后重试。
       sections: 班级注册已成功更新
     invitation_sent: 邀请已发送！
@@ -9606,15 +9623,18 @@ zh-Hans:
   create_new_group_fca5cc73: 创建新组
   create_new_group_set_13b1f62a: 创建新小组集
   create_new_question_bank_86f2afc6: 新建题库...
+  create_new_rubric_dd44f4e3: 创建新评分细则
   create_number_of_groups_groups_now_f89f220e: "立即创建 %{number_of_groups} 个小组"
   create_outcome_4dac05a0: 创建结果
   create_pace_4ff3e9c: 创建进度
   create_pages_581a4d59: 创建页面
+  create_quiz_d08bb72a: 创建测验
   create_slots_71dbb2f8: 创建时段
   create_subject_86de5618: 创建主题
   create_temporary_enrollment_3d4eaa33: 创建临时注册
   create_temporary_enrollment_68eff9e8: 创建临时注册学生
   create_temporary_enrollment_based_on_name_5291381e: "基于 %{name} 创建临时注册"
+  create_temporary_enrollment_pairing_for_name_33086b8b: "为 %{name} 创建临时注册学生配对"
   create_theme_based_on_40651ed3: 在基础上创建主题
   create_theme_based_on_name_7b1bd318: "根据 %{name} 创建主题"
   create_users_view: 
@@ -10660,6 +10680,7 @@ zh-Hans:
         one: "再显示 %{count} 个条目"
         other: "再显示 %{count} 个条目"
     error_anonymous_state_groups_create: 小组讨论无法匿名。
+    error_anonymous_state_groups_update: 小组讨论无法匿名。
     error_anonymous_state_unauthorized_create: 您无法再创建匿名讨论
     error_anonymous_state_unauthorized_update: 您无法再更新讨论的匿名状态
     error_draft_state_unauthorized: 您无权将此主题设置为草稿状态。
@@ -11136,6 +11157,7 @@ zh-Hans:
   duplicate_assignment_name_3ca7d753: "复制作业%{name}"
   duplicate_discussion_title_43b39959: "重复讨论%{title}"
   duplicate_discussion_title_6537ef4d: "复制讨论%{title}"
+  duplicate_grading_scheme_d0e57758: 重复的评分方案
   duplicate_ids_23b0a29e: "重复的 ID"
   duplicate_item_339f54bb: 复制项目
   duplicate_module_module_name_be40ad50: "复制单元%{module_name}"
@@ -12549,6 +12571,7 @@ zh-Hans:
   failed_to_export_some_tool_settings_c992fc56: 导出一些工具设置失败
   failed_to_fetch_content_for_import_a042cc27: 无法获取要导入的内容。
   failed_to_fetch_migration_issues_data_a896da98: 无法获取迁移问题数据。
+  failed_to_fetch_temporary_enrollment_data_9422003: 无法获取临时注册学生数据
   failed_to_get_new_activity_17e7ec7c: 获取新活动失败
   failed_to_ignore_assignment_46565fa3: 无法忽略作业
   failed_to_import_media_objects_4c1fcb4f: 导入媒体对象失败
@@ -13188,6 +13211,7 @@ zh-Hans:
   grade_anonymously_6c37133a: 匿名评分
   grade_assignment_7c1abc11: "评改%{assignment}"
   grade_by_9ea3661e: 评分人
+  grade_by_b2742bc: 评分人
   grade_by_question_9d9b8a71: 按问题评分
   grade_calculator_performance_improvements_564af0de: 评分计算器性能改进
   grade_change_activity_75fb525: 评分更改活动
@@ -14647,6 +14671,7 @@ zh-Hans:
       组可以协作处理文档，甚至还可以安排网络会议。
       这就像一个小班课程，您可以与更少的学生共同处
       理一个更加集中的项目。
+  groups_can_only_be_part_of_the_actively_selected_g_b59e301b: 小组只能是当前选择的小组集中的小组。
   groups_cannot_have_size_restrictions_to_assign_by__7d36fa32: 小组不能由班级分配规模限制
   groups_course_c73e4c2c: 组（课程）
   groups_delete_bb79a2b4: "小组 - 删除"
@@ -15442,6 +15467,9 @@ zh-Hans:
   immediately_c128ede6: 立即
   immersive_reader_7b87538: "Immersive Reader"
   immersive_reader_failed_to_load_bc8d4dd4: "Immersive Reader加载失败"
+  impact_58f41b1d: 影响力
+  impact_is_an_add_on_to_canvas_lms_contact_your_csm_23307a67: "Impact 是 Canvas LMS 的附加项。如有兴趣，请联系您的 CSM。"
+  impact_manage_3641fd7f: "Impact - 管理"
   import_1b31507: 导入
   import_a_set_of_outcomes_6b782192: 导入一组结果
   import_anyway_8c996ef6: 以任意方式导入
@@ -16665,6 +16693,8 @@ zh-Hans:
     zh-Hans: 简体中文
   location_3b6ff307: 位置：
   location_e17bd402: 位置
+  location_used_8909c9af: 使用的位置
+  locations_used_1c050e8e: 使用的位置
   lock_at_time_3c8a044e: "请看: %{time}"
   lock_c341af13: 锁定
   lock_date_cannot_be_after_course_end_a473158b: 锁定日期不能晚于课程结束日期
@@ -16973,6 +17003,7 @@ zh-Hans:
   manage_groups_4c3a2a9f: 管理小组
   manage_home_4fc3480b: 管理主页
   manage_home_for_coursename_5e5c7661: "管理%{courseName}主页"
+  manage_impact_7ff2d6de: "管理 Impact"
   manage_internal_analytics_fcfa306e: 管理内部分析工具
   manage_item_name_6118d4b0: "管理%{item_name}"
   manage_labels_98611fe: 管理标签
@@ -16980,6 +17011,8 @@ zh-Hans:
   manage_lti_8fcdc6ba: "管理 LTI"
   manage_module_name_dfe16816: "管理 %{module_name}"
   manage_name_7f55f792: "管理 %{name}"
+  manage_name_s_temporary_enrollment_providers_dcae7962: "管理 %{name} 的临时注册学生提供者"
+  manage_name_s_temporary_enrollment_recipients_e4eca781: "管理 %{name} 的临时注册学生接收者"
   manage_options_for_name_83278ad0: "管理%{name}的选项"
   manage_pages_4d2adeb6: 管理页面
   manage_profile_pictures_40c958ce: 管理个人资料图片
@@ -22064,6 +22097,7 @@ zh-Hans:
   ppt_9393890d: ppt
   practice_quiz_19a8505d: 练习测验
   pre_processing_92865c1d: 预处理
+  precise_link_replacement_on_content_migrations_51976596: 对内容迁移的精确链接替换
   prefer_lti_tools_with_a_matching_client_id_when_fi_b6cf4809: "在查找外部工具时，建议使用具有匹配客户端 ID 的 LTI 工具"
   prefetch_user_ids_in_gradebook_b96521b0: 预读取评分册中的用户名
   prerequisite_completion_period_c562d63: 先修课程完成时间段
@@ -23105,6 +23139,7 @@ zh-Hans:
         manage_question_banks: 管理题库
         publish_multiple_quizzes: 发布多个测验
         settings: 设置
+      quiz_search: 搜索...
       quizzes_title: 测验
       search_for_quiz: 搜索测验
       title_add_quiz: 添加测验
@@ -24528,6 +24563,8 @@ zh-Hans:
   remove_name_624e06be: "移除 %{name}"
   remove_name_as_an_admin_c296cf49: "以管理员身份删除 %{name}"
   remove_name_calendar_bdc329d9: "删除 %{name} 日历"
+  remove_name_content_requirement_7af56c50: "删除 %{name} 内容要求"
+  remove_name_prerequisite_98377b60: "删除 %{name} 先决条件"
   remove_null_values_from_live_event_payloads_3c826f: 从实时活动有效负荷中删除空值
   remove_observers_from_courses_703edc34: 移除课程中的观察员
   remove_optionname_8a67379b: "移除 %{optionName}"
@@ -25029,6 +25066,8 @@ zh-Hans:
   rubric_deleted_3d9efc18: 已删除评价量规
   rubric_enhancements_73bf351c: 评价量规增强
   rubric_fc39da76: 评测
+  rubric_name_e11b76de: 评分细则名称
+  rubric_options_c92d7130: 评分细则选项
   rubric_updated_103e24dc: 已更新评价量规
   rubric_was_successfully_submitted_b0766474: 已成功提交评价量规
   rubrics: 
@@ -25395,6 +25434,7 @@ zh-Hans:
   search_permissions_915bbd09: 搜索权限
   search_results_4d5af4eb: 搜索结果
   search_results_for_62243f02: 搜索结果
+  search_rubrics_8d933686: 搜索评分细则
   search_students_e1f506c: 搜索学生
   search_term_is_mutually_exclusive_with_name_and_do_225d27f1: "search_term 的名称和域相互排除"
   search_term_must_be_at_least_num_characters_669098ed: "检索词都必须至少为%{num}个字符"
@@ -29041,6 +29081,7 @@ zh-Hans:
   this_report_gets_the_submissions_for_courses_d83bb449: 此报告获取课程的提交项。
   this_report_provides_a_list_of_all_developer_keys__dd2bfadf: "此报告提供适用于机构的所有开发人员密钥的列表。这些密钥可以直接安装在从中运行报告的根帐户中，也可以从父级根帐户集成。开发人员密钥可以是 API 或 LTI 密钥。"
   this_report_provides_all_active_eportfolios_for_th_f7432621: 该报告提供当前机构的所有活跃的电子档案。可以选择“仅包括无注册学员的用户的电子档案”，以将电子档案的结果范围缩小至无注册学员的用户。您还可以使用“包括删除的对象”运行报告，以仅包括已经被删除的电子档案。
+  this_report_provides_transparency_regarding_instru_6f9e227e: "该报告提供关于 Instructure 员工访问帐户的透明信息。访问许可允许员工在有限的时间内（例如支持客户或响应事件时）访问帐户。如果许可失效，员工必须重新获得许可才能通过用户界面或 API 访问帐户。"
   this_report_shows_all_learning_outcomes_that_exist_e77bd04b: 此报告显示在该帐户中存在的所有学习结果。生成的csv文件每个结果都将有一行，并将显示每个结果所有相关属性的详细信息。
   this_report_shows_all_the_activity_from_users_enro_46394fa6: |-
       此报告显示注册特定课程的用户或
@@ -30894,6 +30935,7 @@ zh-Hans:
   userinfo_d21114ef: 用户信息
   username_47bb5bbe: 用户名
   username_could_not_be_found_6c3e8383: 无法找到用户名
+  username_s_temporary_enrollment_enrollmenttype_20165bec: "%{userName} 的临时注册学生 %{enrollmentType}"
   username_saved_successfully_9303974f: "*%{userName}*保存成功！"
   username_saved_successfully_they_should_receive_an_877e31e: "*%{userName}*保存成功！他们应该很快会收到一封确认电子邮件。"
   users: 
@@ -32180,6 +32222,7 @@ zh-Hans:
   your_file_is_being_uploaded_to_the_gradebook_and_y_aa5edfc6: 您的文件正被上传到评分册。您可以在任何时候离开这个页面。如果您有一个大的CSV文件，您的更改可能需要几分钟来更新。为了避免覆盖任何数据，请确认上载完成与您的评分册是正确才进行任何另外的更改。
   your_grade_has_been_updated_f1cd8f06: 已更新您的评分
   your_gradebook_export_has_been_cancelled_c1b99ca1: 评分册导出已取消
+  your_grading_schemes_b785: 您的评分方案
   your_group_is_being_created_88c0c024: 正在创建您的组
   your_groups_are_being_created_50156e34: 正在创建您的组。
   your_homeroom_is_currently_unpublished_93c14f4f: 您的指导教室当前被取消发布。
