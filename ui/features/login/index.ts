@@ -114,5 +114,8 @@ ready(() => {
     $loginForm.find('input:visible:first').focus()
   })
 
-  sessionStorage.clear()
+  // do not clear session storage if previewing via the theme editor
+  if (!document.querySelector('.ic-Login--previewing')) {
+    sessionStorage.clear()
+  }
 })
