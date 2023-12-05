@@ -662,6 +662,7 @@ export const AddressBook = ({
                   setIsMenuOpen(false)
                 } else {
                   textInputRef.current.focus()
+                  setIsMenuOpen(true)
                 }
               }}
               disabled={isLimitReached}
