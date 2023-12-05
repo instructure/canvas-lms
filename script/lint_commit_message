@@ -125,7 +125,7 @@ end
 touches_lti_variable_expander_file = commit_files.any? { |f| f.start_with?("lib/lti/variable_expander") }
 touches_lti_variable_expander_docs = commit_files.any? { |f| f.start_with?("doc/api/tools_variable_substitutions") }
 if touches_lti_variable_expander_file && !touches_lti_variable_expander_docs
-  comment "warn", nil, "Changes were made to the variable expander file. The docs are created from the comments and there are no document changes. Do you need to update the docs also? If so, run `rake doc:api` and commit the changes. Otherwise you may ignore this warning."
+  comment "warn", nil, "Changes were made to the variable expander file. The docs are created from the comments and there are no document changes. Do you need to update the docs also? If so, run `rake doc:api` and commit the changes. Otherwise (if you didn't modify the descriptions of any variable expansions, or if you added an internal-only expansion using @internal) you may ignore this warning."
 end
 
 gh_issue = (commit_message =~ /(?:refs|fixes|closes|resolves|references) gh-\d+/i)

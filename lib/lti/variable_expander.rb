@@ -319,6 +319,7 @@ module Lti
 
     # Returns the RCS Service JWT for the current user
     #
+    # @internal
     # @example
     #   ```
     #   "base64-encoded-service-jwt"
@@ -335,6 +336,7 @@ module Lti
 
     # Returns instui_nav release flag state
     #
+    # @internal
     # @example
     #   ```
     #   "true"
