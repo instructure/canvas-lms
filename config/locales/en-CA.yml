@@ -2582,6 +2582,7 @@ en-CA:
       Allows admins to view a log containing information about all recently run
       GraphQL mutations
   allows_aligning_outcomes_to_non_scoring_content_537ce399: "Allows aligning outcomes to non-scoring content"
+  allows_an_account_administrator_to_manage_the_impa_71112028: "Allows an account administrator to manage the Impact service integration."
   allows_assessors_to_view_the_assessment_audit_tray_84c0c4c2: "Allows assessors to view the assessment audit tray in SpeedGrader for anonymous or moderated assignments."
   allows_blueprint_course_settings_to_be_exported_an_a34bb7f: "Allows Blueprint Course settings to be exported and copied to another Blueprint Course"
   allows_blueprint_courses_to_keep_track_of_assignme_3faaa416: "Allows blueprint courses to keep track of assignment's resource id changes."
@@ -3249,6 +3250,7 @@ en-CA:
   allows_users_to_add_a_temporary_enrollment_with_a__22f73d4: "Allows users to add a temporary enrollment with a start date, end date, and role"
   allows_users_to_add_conferences_from_the_calendar_f36c5008: "Allows users to add conferences from the calendar"
   allows_users_to_add_lti_tools_with_conference_sele_c38545ab: "Allows users to add LTI tools with conference_selection placement type"
+  allows_users_to_archive_outcomes_and_outcome_group_313b6b4e: "Allows users to archive outcomes and outcome groups no longer in use."
   allows_users_to_delete_a_temporary_enrollment_7fd33cdd: "Allows users to delete a temporary enrollment"
   allows_users_to_edit_an_existing_temporary_enrollm_b3543354: "Allows users to edit an existing temporary enrollment"
   allows_users_to_edit_conferences_2d3c960c: "Allows users to edit Conferences."
@@ -3320,6 +3322,7 @@ en-CA:
     other: "An error occurred moving these outcomes: %{errorMessage}."
   an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*An error occurred*, please post your reply again later"
   an_error_occurred_please_try_again_95361e05: "An error occurred. Please try again."
+  an_error_occurred_please_try_again_ceb4d85e: "An error occurred, please try again"
   an_error_occurred_please_try_again_error_error_8800b506: "An error occurred, please try again. Error: %{error}"
   an_error_occurred_please_try_again_later_84223241: "An error occurred. Please try again later."
   an_error_occurred_publishing_grades_cfdf7631: "An error occurred publishing grades."
@@ -3704,6 +3707,9 @@ en-CA:
   apply_filter_7e4f6113: "Apply filter"
   apply_filters_e98823c0: "Apply Filters"
   apply_filters_note_clicking_this_button_will_cause_753f04: "Apply filters. Note: clicking this button will cause the page to reload."
+  apply_link_replacement_logic_to_a_select_list_of_e_7fadfdd7: |-
+      Apply link replacement logic to a select list of
+      elements only, as opposed to all texts
   apply_missing_status_cd98e1d3: "Apply missing status"
   apply_score_1edd7cda: "Apply Score"
   apply_score_to_ungraded_afd025d0: "Apply Score to Ungraded"
@@ -3741,7 +3747,9 @@ en-CA:
   arc_a935e585: ARC
   arc_media_recorder_in_rce_cf900c6: "Arc Media Recorder in RCE"
   archive_3f794d7e: Archive
+  archive_grading_scheme_cbbf4264: "Archive Grading Scheme"
   archive_operation_failed_5504706: "Archive operation failed"
+  archive_outcomes_20b869b6: "Archive Outcomes"
   archive_selected_d64506ca: "Archive Selected"
   archived_de543437: Archived
   archived_grading_schemes_6d698d0: "Archived Grading Schemes"
@@ -3873,7 +3881,9 @@ en-CA:
   assign_eedf72bb: Assign
   assign_manually_1785dcfc: "Assign manually"
   assign_reviews_on_date_7e48ec50: "Assign Reviews on Date"
+  assign_temporary_enrollments_bdaaa58a: "Assign temporary enrollments"
   assign_temporary_enrollments_to_name_e8b43c5c: "Assign temporary enrollments to %{name}"
+  assign_temporary_enrollments_to_recipient_b25cb6be: "Assign temporary enrollments to %{recipient}"
   assign_this_module_a4685e57: "Assign this module"
   assign_to_6b806cd9: "Assign to:"
   assign_to_95404a83: "Assign To"
@@ -3944,6 +3954,7 @@ en-CA:
   assignment_bulk_editing_phase_2_fde6f7d3: "Assignment Bulk Editing phase 2"
   assignment_comments_e43ed898: "Assignment Comments"
   assignment_context_has_been_graded_for_name_af51759a: "%{assignment}, %{context} has been graded for %{name}."
+  assignment_context_id_must_match_discussion_topic__891e7ed4: "Assignment context_id must match discussion topic context_id"
   assignment_created_assignment_name_course_name_324a5639: "Assignment Created - %{assignment_name}, %{course_name}"
   assignment_created_b3ee04d7: "Assignment created"
   assignment_d8387b78: assignment
@@ -5920,6 +5931,7 @@ en-CA:
   canvas_course_id_db4de2b8: canvas_course_id
   canvas_course_tutorial_video_5205c1c1: "Canvas Course Tutorial Video"
   canvas_dashboard_links_will_navigate_to_the_catalo_4143635e: "Canvas dashboard links will navigate to the Catalog dashboard"
+  canvas_default_7f81a6b8: "Canvas Default"
   canvas_demo_7a005cf3: "Canvas Demo"
   canvas_did_not_recognize_your_identity_provider_cb0e50fc: "Canvas did not recognize your identity provider"
   canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "Canvas doesn't have an account for user: %{user}"
@@ -6009,6 +6021,11 @@ en-CA:
     by_sa: "CC Attribution Share Alike"
     private: "Private (Copyrighted)"
     public_domain: "Public Domain"
+  cc_attribution_f6de631f: "CC Attribution"
+  cc_attribution_no_derivatives_b006744f: "CC Attribution No Derivatives"
+  cc_attribution_non_commercial_39e0d30d: "CC Attribution Non-Commercial"
+  cc_attribution_non_commercial_no_derivatives_9fe74c00: "CC Attribution Non-Commercial No Derivatives"
+  cc_attribution_non_commercial_share_alike_c7edb1e5: "CC Attribution Non-Commercial Share Alike"
   cc_subtitles_a0d16ff6: CC/Subtitles
   ccp_zero_activity_73d094c3: "CCP Zero Activity"
   cell_number_69a7c309: "Cell Number"
@@ -8307,6 +8324,7 @@ en-CA:
       invitation: "Invitation sent."
       linkError: "Something went wrong updating the user's student links. Please try again later."
       links: "Student links successfully updated"
+      observerObservingObserverError: "Cannot observe user with another user that is being observed by the current user."
       sectionError: "Something went wrong updating the user's sections. Please try again later."
       sections: "Section enrollments successfully updated"
     invitation_sent: "Invitation Sent!"
@@ -8922,16 +8940,19 @@ en-CA:
   create_new_group_fca5cc73: "Create new group"
   create_new_group_set_13b1f62a: "Create New Group Set"
   create_new_question_bank_86f2afc6: "Create new question bank..."
+  create_new_rubric_dd44f4e3: "Create New Rubric"
   create_new_submission_e6b7c18d: "Create New Submission"
   create_number_of_groups_groups_now_f89f220e: "Create %{number_of_groups} groups now"
   create_outcome_4dac05a0: "Create Outcome"
   create_pace_4ff3e9c: "Create Pace"
   create_pages_581a4d59: "Create pages"
+  create_quiz_d08bb72a: "Create Quiz"
   create_slots_71dbb2f8: "Create Slots"
   create_subject_86de5618: "Create Subject"
   create_temporary_enrollment_3d4eaa33: "Create Temporary Enrollment"
   create_temporary_enrollment_68eff9e8: "Create temporary enrollment"
   create_temporary_enrollment_based_on_name_5291381e: "Create temporary enrollment based on %{name}"
+  create_temporary_enrollment_pairing_for_name_33086b8b: "Create Temporary Enrollment Pairing for %{name}"
   create_theme_based_on_40651ed3: "Create theme based on"
   create_theme_based_on_name_7b1bd318: "Create theme based on %{name}"
   create_users_view: 
@@ -9930,6 +9951,7 @@ en-CA:
         one: "Show 1 More Entry"
         other: "Show %{count} More Entries"
     error_anonymous_state_groups_create: "Group discussions cannot be anonymous."
+    error_anonymous_state_groups_update: "Group discussions cannot be anonymous."
     error_anonymous_state_unauthorized_create: "You are not able to create an anonymous discussion"
     error_anonymous_state_unauthorized_update: "You are not able to update the anonymous state of a discussion"
     error_draft_state_unauthorized: "You do not have permission to set this topic to draft state."
@@ -10362,6 +10384,7 @@ en-CA:
   duplicate_assignment_name_3ca7d753: "Duplicate Assignment %{name}"
   duplicate_discussion_title_43b39959: "Duplicate Discussion %{title}"
   duplicate_discussion_title_6537ef4d: "Duplicate discussion %{title}"
+  duplicate_grading_scheme_d0e57758: "Duplicate Grading Scheme"
   duplicate_ids_23b0a29e: "Duplicate IDs"
   duplicate_item_339f54bb: "Duplicate Item"
   duplicate_module_module_name_be40ad50: "Duplicate Module %{module_name}"
@@ -11633,6 +11656,7 @@ en-CA:
   failed_to_export_some_tool_settings_c992fc56: "Failed to export some tool settings"
   failed_to_fetch_content_for_import_a042cc27: "Failed to fetch content for import."
   failed_to_fetch_migration_issues_data_a896da98: "Failed to fetch migration issues data."
+  failed_to_fetch_temporary_enrollment_data_9422003: "Failed to fetch temporary enrollment data"
   failed_to_get_new_activity_17e7ec7c: "Failed to get new activity"
   failed_to_ignore_assignment_46565fa3: "Failed to ignore assignment"
   failed_to_import_media_objects_4c1fcb4f: "Failed to import media objects"
@@ -12197,6 +12221,7 @@ en-CA:
   grade_anonymously_6c37133a: "Grade anonymously"
   grade_assignment_7c1abc11: "Grade %{assignment}"
   grade_by_9ea3661e: "Grade by"
+  grade_by_b2742bc: "Grade By"
   grade_by_question_9d9b8a71: "Grade by question"
   grade_calculator_performance_improvements_564af0de: "Grade Calculator Performance Improvements"
   grade_change_activity_75fb525: "Grade Change Activity"
@@ -13186,6 +13211,7 @@ en-CA:
                     files.  Groups can collaborate on documents, or even schedule web conferences.
                     It's really like a mini-course where you can work with a smaller number of students on a
                     more focused project.
+  groups_can_only_be_part_of_the_actively_selected_g_b59e301b: "Groups can only be part of the actively selected group set."
   groups_cannot_have_size_restrictions_to_assign_by__7d36fa32: "Groups cannot have size restrictions to assign by section"
   groups_course_c73e4c2c: "Groups (Course)"
   groups_delete_bb79a2b4: "Groups - delete"
@@ -13953,6 +13979,9 @@ en-CA:
   immediately_c128ede6: Immediately
   immersive_reader_7b87538: "Immersive Reader"
   immersive_reader_failed_to_load_bc8d4dd4: "Immersive Reader Failed to Load"
+  impact_58f41b1d: Impact
+  impact_is_an_add_on_to_canvas_lms_contact_your_csm_23307a67: "Impact is an add-on to Canvas LMS. Contact your CSM if interested."
+  impact_manage_3641fd7f: "Impact - Manage"
   import_1b31507: Import
   import_a_set_of_outcomes_6b782192: "Import a set of Outcomes"
   import_anyway_8c996ef6: "Import Anyway"
@@ -15140,6 +15169,8 @@ en-CA:
     en-CA: "English (Canada)"
   location_3b6ff307: "Location:"
   location_e17bd402: Location
+  location_used_8909c9af: "Location Used"
+  locations_used_1c050e8e: "Locations Used"
   lock_at_time_3c8a044e: "Lock at: %{time}"
   lock_c341af13: Lock
   lock_date_cannot_be_after_course_end_a473158b: "Lock date cannot be after course end"
@@ -15416,6 +15447,7 @@ en-CA:
   manage_groups_4c3a2a9f: "Manage groups"
   manage_home_4fc3480b: "Manage Home"
   manage_home_for_coursename_5e5c7661: "Manage home for %{courseName}"
+  manage_impact_7ff2d6de: "Manage Impact"
   manage_internal_analytics_fcfa306e: "Manage Internal Analytics"
   manage_item_name_6118d4b0: "Manage %{item_name}"
   manage_labels_98611fe: "Manage labels"
@@ -15423,6 +15455,8 @@ en-CA:
   manage_lti_8fcdc6ba: "Manage LTI"
   manage_module_name_dfe16816: "Manage %{module_name}"
   manage_name_7f55f792: "Manage %{name}"
+  manage_name_s_temporary_enrollment_providers_dcae7962: "Manage %{name}’s Temporary Enrollment Providers"
+  manage_name_s_temporary_enrollment_recipients_e4eca781: "Manage %{name}’s Temporary Enrollment Recipients"
   manage_options_for_name_83278ad0: "Manage options for %{name}"
   manage_pages_4d2adeb6: "Manage Pages"
   manage_profile_pictures_40c958ce: "Manage profile pictures"
@@ -20087,6 +20121,7 @@ en-CA:
   ppt_9393890d: ppt
   practice_quiz_19a8505d: "Practice Quiz"
   pre_processing_92865c1d: Pre-processing
+  precise_link_replacement_on_content_migrations_51976596: "Precise link replacement on content migrations"
   prefer_lti_tools_with_a_matching_client_id_when_fi_b6cf4809: "Prefer LTI tools with a matching client ID when finding an external tool"
   prefetch_user_ids_in_gradebook_b96521b0: "Prefetch User IDs in Gradebook"
   prerequisite_completion_period_c562d63: "Prerequisite Completion Period"
@@ -21001,6 +21036,7 @@ en-CA:
       links: 
         manage_question_banks: "Manage Question Banks"
         publish_multiple_quizzes: "Publish Multiple Quizzes"
+      quiz_search: Search...
       quizzes_title: Quizzes
       search_for_quiz: "Search for Quiz"
       title_add_quiz: "Add Quiz"
@@ -22243,6 +22279,8 @@ en-CA:
   remove_name_624e06be: "Remove %{name}"
   remove_name_as_an_admin_c296cf49: "Remove %{name} as an admin"
   remove_name_calendar_bdc329d9: "Remove %{name} Calendar"
+  remove_name_content_requirement_7af56c50: "Remove %{name} Content Requirement"
+  remove_name_prerequisite_98377b60: "Remove %{name} Prerequisite"
   remove_null_values_from_live_event_payloads_3c826f: "Remove null values from live event payloads"
   remove_observers_from_courses_703edc34: "Remove Observers from courses"
   remove_optionname_8a67379b: "Remove %{optionName}"
@@ -22720,6 +22758,8 @@ en-CA:
   rubric_deleted_3d9efc18: "Rubric deleted"
   rubric_enhancements_73bf351c: "Rubric Enhancements"
   rubric_fc39da76: Rubric
+  rubric_name_e11b76de: "Rubric Name"
+  rubric_options_c92d7130: "Rubric Options"
   rubric_updated_103e24dc: "Rubric updated"
   rubric_was_successfully_submitted_b0766474: "Rubric was successfully submitted"
   rubrics: 
@@ -23065,6 +23105,7 @@ en-CA:
   search_permissions_915bbd09: "Search Permissions"
   search_results_4d5af4eb: "Search Results"
   search_results_for_62243f02: "search results for"
+  search_rubrics_8d933686: "Search Rubrics"
   search_students_e1f506c: "Search Students"
   search_term_is_mutually_exclusive_with_name_and_do_225d27f1: "search_term is mutually exclusive with name and domain"
   search_term_must_be_at_least_num_characters_669098ed: "Search term must be at least %{num} characters"
@@ -26456,6 +26497,7 @@ en-CA:
   this_report_gets_the_submissions_for_courses_d83bb449: "This report gets the submissions for courses."
   this_report_provides_a_list_of_all_developer_keys__dd2bfadf: "This report provides a list of all Developer Keys available to the institution. These keys can either be installed directly in the root account the report is run from or can be inherited from parent root accounts. Developer Keys can either be API or LTI keys."
   this_report_provides_all_active_eportfolios_for_th_f7432621: "This report provides all active ePortfolios for the current institution. Optionally select 'Only include ePortfolios from users with no enrollments' to reduce the scope of the ePortfolio results to just those users with no enrollments. You can also run the report with 'Include Deleted Objects' to only include those ePortfolios that have been removed."
+  this_report_provides_transparency_regarding_instru_6f9e227e: "This report provides transparency regarding Instructure employee access to the account. An access grant allows an Instructure employee to access the account for a limited duration (ex: when supporting the account or responding to an incident). If a grant expires, employees must renew their grant before accessing the account via the user interface or API."
   this_report_shows_all_learning_outcomes_that_exist_e77bd04b: "This report shows all learning outcomes that exist within this account. The resulting csv file will have one row per outcome, and will show the details of all associated attributes with each outcome."
   this_report_shows_all_the_activity_from_users_enro_46394fa6: |-
       This report shows all the activity from users enrolled in a given course or
@@ -28257,6 +28299,7 @@ en-CA:
   userinfo_d21114ef: Userinfo
   username_47bb5bbe: Username
   username_could_not_be_found_6c3e8383: "Username could not be found"
+  username_s_temporary_enrollment_enrollmenttype_20165bec: "%{userName}’s Temporary Enrollment %{enrollmentType}"
   username_saved_successfully_9303974f: "*%{userName}* saved successfully!"
   username_saved_successfully_they_should_receive_an_877e31e: "*%{userName}* saved successfully! They should receive an email confirmation shortly."
   users: 
@@ -29477,6 +29520,7 @@ en-CA:
   your_email_b5364bee: "Your Email"
   your_grade_has_been_updated_f1cd8f06: "Your grade has been updated"
   your_gradebook_export_has_been_cancelled_c1b99ca1: "Your gradebook export has been cancelled"
+  your_grading_schemes_b785: "Your Grading Schemes"
   your_group_is_being_created_88c0c024: "Your Group is Being Created"
   your_groups_are_being_created_50156e34: "Your groups are being created."
   your_homeroom_is_currently_unpublished_93c14f4f: "Your homeroom is currently unpublished."
