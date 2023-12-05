@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useCallback, useState} from 'react'
 import {AchievementData, ProjectDetailData, SkillData} from '../types'
 import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
@@ -27,12 +27,48 @@ import {Img} from '@instructure/ui-img'
 import AttachmentsTable from './AttachmentsTable'
 import {renderAchievement, renderLink} from '../shared/utils'
 import {renderSkillTag} from '../shared/SkillTag'
+import AchievementTray from '../Achievements/AchievementTray'
 
 type ProjectViewProps = {
   project: ProjectDetailData
 }
 
 const ProjectView = ({project}: ProjectViewProps) => {
+  const [showingAchievementDetails, setShowingAchievementDetails] = useState(false)
+  const [activeCard, setActiveCard] = useState<AchievementData | undefined>(undefined)
+
+  const handleDismissAchievementDetails = useCallback(() => {
+    setShowingAchievementDetails(false)
+    setActiveCard(undefined)
+  }, [])
+
+  const showAchievementDetails = useCallback(
+    (achievementId: string) => {
+      const card = project.achievements.find(a => a.id === achievementId)
+      setActiveCard(card)
+      setShowingAchievementDetails(card !== undefined)
+    },
+    [project.achievements]
+  )
+
+  const handleAchievementCardClick = useCallback(
+    (e: React.MouseEvent) => {
+      // @ts-expect-error
+      showAchievementDetails(e.currentTarget.getAttribute('data-cardid'))
+    },
+    [showAchievementDetails]
+  )
+
+  const handleAchievementCardKey = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        // @ts-expect-error
+        showAchievementDetails(e.currentTarget.getAttribute('data-cardid'))
+      }
+    },
+    [showAchievementDetails]
+  )
+
   return (
     <>
       <View as="div" margin="0 0 large 0">
@@ -97,7 +133,11 @@ const ProjectView = ({project}: ProjectViewProps) => {
               {project.achievements.map((achievement: AchievementData) => {
                 return (
                   <Flex.Item key={achievement.id} shouldShrink={false}>
-                    {renderAchievement(achievement)}
+                    {renderAchievement(
+                      achievement,
+                      handleAchievementCardClick,
+                      handleAchievementCardKey
+                    )}
                   </Flex.Item>
                 )
               })}
@@ -105,6 +145,13 @@ const ProjectView = ({project}: ProjectViewProps) => {
           </View>
         )}
       </View>
+      {activeCard && (
+        <AchievementTray
+          open={showingAchievementDetails}
+          onDismiss={handleDismissAchievementDetails}
+          activeCard={activeCard}
+        />
+      )}
     </>
   )
 }

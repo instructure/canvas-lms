@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useCallback, useState} from 'react'
 import {
   AchievementData,
   EducationData,
@@ -34,6 +34,7 @@ import {compareFromToDates, renderAchievement, renderLink} from '../shared/utils
 import {renderSkillTag} from '../shared/SkillTag'
 import EducationCard from '../Education/EducationCard'
 import ExperienceCard from '../Experience/ExperienceCard'
+import AchievementTray from '../Achievements/AchievementTray'
 
 function renderEducation(education: EducationData) {
   return (
@@ -56,6 +57,41 @@ type PortfolioViewProps = {
 }
 
 const PortfolioView = ({portfolio}: PortfolioViewProps) => {
+  const [showingAchievementDetails, setShowingAchievementDetails] = useState(false)
+  const [activeCard, setActiveCard] = useState<AchievementData | undefined>(undefined)
+
+  const handleDismissAchievementDetails = useCallback(() => {
+    setShowingAchievementDetails(false)
+    setActiveCard(undefined)
+  }, [])
+
+  const showAchievementDetails = useCallback(
+    (achievementId: string) => {
+      const card = portfolio.achievements.find(a => a.id === achievementId)
+      setActiveCard(card)
+      setShowingAchievementDetails(card !== undefined)
+    },
+    [portfolio.achievements]
+  )
+
+  const handleAchievementCardClick = useCallback(
+    (e: React.MouseEvent) => {
+      // @ts-expect-error
+      showAchievementDetails(e.currentTarget.getAttribute('data-cardid'))
+    },
+    [showAchievementDetails]
+  )
+
+  const handleAchievementCardKey = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        // @ts-expect-error
+        showAchievementDetails(e.currentTarget.getAttribute('data-cardid'))
+      }
+    },
+    [showAchievementDetails]
+  )
+
   return (
     <View as="div">
       <div style={{position: 'relative'}}>
@@ -152,7 +188,11 @@ const PortfolioView = ({portfolio}: PortfolioViewProps) => {
                 {portfolio.achievements.map((achievement: AchievementData) => {
                   return (
                     <Flex.Item key={achievement.id} shouldShrink={false}>
-                      {renderAchievement(achievement)}
+                      {renderAchievement(
+                        achievement,
+                        handleAchievementCardClick,
+                        handleAchievementCardKey
+                      )}
                     </Flex.Item>
                   )
                 })}
@@ -161,6 +201,13 @@ const PortfolioView = ({portfolio}: PortfolioViewProps) => {
           </Flex>
         </div>
       </div>
+      {activeCard && (
+        <AchievementTray
+          open={showingAchievementDetails}
+          onDismiss={handleDismissAchievementDetails}
+          activeCard={activeCard}
+        />
+      )}
     </View>
   )
 }

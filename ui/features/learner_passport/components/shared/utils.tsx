@@ -122,15 +122,28 @@ export const renderEditLink = (
   )
 }
 
-export function renderAchievement(achievement: AchievementData) {
+export function renderAchievement(
+  achievement: AchievementData,
+  onCardClick: (e: React.MouseEvent) => void,
+  onCardKey: (e: React.KeyboardEvent) => void
+) {
   return (
     <View as="div" shadow="resting">
-      <AchievementCard
-        isNew={achievement.isNew}
-        title={achievement.title}
-        issuer={achievement.issuer.name}
-        imageUrl={achievement.imageUrl}
-      />
+      <div
+        data-cardid={achievement.id}
+        role="button"
+        style={{cursor: 'pointer'}}
+        tabIndex={0}
+        onClick={onCardClick}
+        onKeyDown={onCardKey}
+      >
+        <AchievementCard
+          isNew={achievement.isNew}
+          title={achievement.title}
+          issuer={achievement.issuer.name}
+          imageUrl={achievement.imageUrl}
+        />
+      </div>
     </View>
   )
 }

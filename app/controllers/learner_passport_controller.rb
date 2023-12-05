@@ -300,31 +300,31 @@ class LearnerPassportController < ApplicationController
   end
 
   def current_achievements_key
-    "learner_passport_current_achievements #{@current_user.id}"
+    "learner_passport_current_achievements #{@current_user.global_id}"
   end
 
   def portfolio_sample_key
-    "learner_passport_portfolio_sample #{@current_user.id}"
+    "learner_passport_portfolio_sample #{@current_user.global_id}"
   end
 
   def portfolio_template_key
-    "learner_passport_portfolio_template #{@current_user.id}"
+    "learner_passport_portfolio_template #{@current_user.global_id}"
   end
 
   def current_portfolios_key
-    "learner_passport_current_portfolios #{@current_user.id}"
+    "learner_passport_current_portfolios #{@current_user.global_id}"
   end
 
   def project_template_key
-    "learner_passport_project_template #{@current_user.id}"
+    "learner_passport_project_template #{@current_user.global_id}"
   end
 
   def project_sample_key
-    "learner_passport_project_sample #{@current_user.id}"
+    "learner_passport_project_sample #{@current_user.global_id}"
   end
 
   def current_projects_key
-    "learner_passport_current_projects #{@current_user.id}"
+    "learner_passport_current_projects #{@current_user.global_id}"
   end
 
   def index
