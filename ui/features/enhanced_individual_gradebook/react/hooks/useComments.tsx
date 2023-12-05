@@ -22,8 +22,12 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {executeApiRequest} from '@canvas/util/apiRequest'
 
 import {GRADEBOOK_SUBMISSION_COMMENTS} from '../../queries/Queries'
-import {ApiCallStatus, CommentConnection, GradebookSubmissionCommentsResponse} from '../../types'
-import {Submission} from '../../../../api.d'
+import {
+  ApiCallStatus,
+  type CommentConnection,
+  type GradebookSubmissionCommentsResponse,
+} from '../../types'
+import type {Submission} from '../../../../api.d'
 
 const I18n = useI18nScope('enhanced_individual_gradebook_submit_score')
 

@@ -19,8 +19,8 @@
 import React from 'react'
 import {fireEvent, render} from '@testing-library/react'
 import {EnrollmentTreeGroup} from '../EnrollmentTreeGroup'
-import {NodeStructure} from '../types'
-import {Spacing} from '@instructure/emotion'
+import type {NodeStructure} from '../types'
+import type {Spacing} from '@instructure/emotion'
 
 const checkCallback = jest.fn()
 const toggleCallback = jest.fn()

@@ -36,10 +36,10 @@ import {
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {BaseDateDetails, FetchDueDatesResponse} from './types'
+import type {BaseDateDetails, FetchDueDatesResponse} from './types'
 import ItemAssignToCard from './ItemAssignToCard'
 import TrayFooter from '../Footer'
-import {AssigneeOption} from '../AssigneeSelector'
+import type {AssigneeOption} from '../AssigneeSelector'
 import useFetchAssignees from '../../utils/hooks/useFetchAssignees'
 
 const I18n = useI18nScope('differentiated_modules')

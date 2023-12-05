@@ -27,11 +27,11 @@ import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
 import {View} from '@instructure/ui-view'
 import * as React from 'react'
-import {StoreApi} from 'zustand'
-import {LtiPlacement, i18nLtiPlacement} from '../../model/LtiPlacements'
-import {LtiRegistration} from '../../model/LtiRegistration'
+import type {StoreApi} from 'zustand'
+import {type LtiPlacement, i18nLtiPlacement} from '../../model/LtiPlacements'
+import type {LtiRegistration} from '../../model/LtiRegistration'
 import {i18nLtiScope} from '../../model/LtiScopes'
-import {PlacementOverlay, RegistrationOverlayStore} from './RegistrationOverlayState'
+import type {PlacementOverlay, RegistrationOverlayStore} from './RegistrationOverlayState'
 
 const I18n = useI18nScope('react_developer_keys')
 

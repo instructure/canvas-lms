@@ -16,15 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {
-  ChangeEvent,
-  Dispatch,
-  SetStateAction,
-  SyntheticEvent,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react'
+import React, {useEffect, useMemo, useState} from 'react'
+import type {ChangeEvent, Dispatch, SetStateAction, SyntheticEvent} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Grid} from '@instructure/ui-grid'
@@ -48,23 +41,21 @@ import {
 } from './util/helpers'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 import {createAnalyticPropsGenerator, setAnalyticPropsOnRef} from './util/analytics'
-import {
+import {MODULE_NAME, RECIPIENT, MAX_ALLOWED_COURSES_PER_PAGE} from './types'
+import type {
   Course,
   Enrollment,
   EnrollmentType,
-  MAX_ALLOWED_COURSES_PER_PAGE,
-  MODULE_NAME,
   NodeStructure,
   Permissions,
-  RECIPIENT,
   Role,
   SelectedEnrollment,
   TemporaryEnrollmentPairing,
   User,
 } from './types'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
-import {EnvCommon} from '@canvas/global/env/EnvCommon'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import type {EnvCommon} from '@canvas/global/env/EnvCommon'
 import {TempEnrollAvatar} from './TempEnrollAvatar'
 import {
   createEnrollment,

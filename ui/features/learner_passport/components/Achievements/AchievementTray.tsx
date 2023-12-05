@@ -39,7 +39,7 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
 import type {ViewProps} from '@instructure/ui-view'
-import {AchievementData} from '../types'
+import type {AchievementData} from '../types'
 import SkillTag from '../shared/SkillTag'
 import {stringToId} from '../shared/utils'
 

@@ -20,7 +20,7 @@ import {useEffect, useState} from 'react'
 
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-import {AssigneeOption} from '@canvas/differentiated-modules/react/AssigneeSelector'
+import {type AssigneeOption} from '@canvas/differentiated-modules/react/AssigneeSelector'
 import {uniqBy} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 

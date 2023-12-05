@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import CanvasMultiSelect, {Size} from '@canvas/multi-select/react'
-import React, {ReactElement, useEffect, useRef, useState} from 'react'
+import CanvasMultiSelect, {type Size} from '@canvas/multi-select/react'
+import React, {type ReactElement, useEffect, useRef, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Link} from '@instructure/ui-link'
 import {View} from '@instructure/ui-view'
@@ -25,7 +25,7 @@ import {debounce} from 'lodash'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {setContainScrollBehavior} from '../utils/assignToHelper'
 import useFetchAssignees from '../utils/hooks/useFetchAssignees'
-import {FormMessage} from '@instructure/ui-form-field'
+import type {FormMessage} from '@instructure/ui-form-field'
 
 const {Option: CanvasMultiSelectOption} = CanvasMultiSelect as any
 

@@ -25,13 +25,9 @@ import {EnrollmentTreeItem} from './EnrollmentTreeItem'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
 import {createAnalyticPropsGenerator} from './util/analytics'
-import {
-  ENROLLMENT_TREE_ICON_OFFSET,
-  ENROLLMENT_TREE_SPACING,
-  MODULE_NAME,
-  NodeStructure,
-} from './types'
-import {Spacing} from '@instructure/emotion'
+import {ENROLLMENT_TREE_ICON_OFFSET, ENROLLMENT_TREE_SPACING, MODULE_NAME} from './types'
+import type {NodeStructure} from './types'
+import type {Spacing} from '@instructure/emotion'
 import RoleMismatchToolTipWrapper from './RoleMismatchToolTipWrapper'
 
 const I18n = useI18nScope('temporary_enrollment')

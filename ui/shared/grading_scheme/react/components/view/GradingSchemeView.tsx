@@ -29,7 +29,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {calculateHighRangeForDataRow} from '../../helpers/calculateHighRangeForDataRow'
 import {GradingSchemeDataRowView} from './GradingSchemeDataRowView'
 import {Heading} from '@instructure/ui-heading'
-import {GradingScheme} from '@canvas/grading-scheme'
+import type {GradingScheme} from '@canvas/grading-scheme'
 
 const I18n = useI18nScope('GradingSchemes')
 

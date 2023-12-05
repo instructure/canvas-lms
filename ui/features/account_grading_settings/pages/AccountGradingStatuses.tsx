@@ -22,7 +22,7 @@ import {ApolloProvider, createClient} from '@canvas/apollo'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {AccountStatusManagement} from '../components/account_grading_status/AccountStatusManagement'
-import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 
 const I18n = useI18nScope('account_grading_status')
 

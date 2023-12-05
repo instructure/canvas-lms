@@ -17,7 +17,7 @@
  */
 
 import ACTION_NAMES from '../actions/developerKeysActions'
-import {DeveloperKey} from '../../model/DeveloperKey'
+import type {DeveloperKey} from '../../model/DeveloperKey'
 import _ from 'lodash'
 import {makeReducer} from './makeReducer'
 

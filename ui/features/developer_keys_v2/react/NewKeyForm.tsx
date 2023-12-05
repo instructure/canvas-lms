@@ -33,8 +33,8 @@ import React from 'react'
 
 import Scopes from './Scopes'
 import ToolConfigurationForm from './ToolConfigurationForm'
-import {AvailableScope} from './reducers/listScopesReducer'
-import {DeveloperKey} from '../model/DeveloperKey'
+import type {AvailableScope} from './reducers/listScopesReducer'
+import type {DeveloperKey} from '../model/DeveloperKey'
 
 type Props = {
   dispatch: Function

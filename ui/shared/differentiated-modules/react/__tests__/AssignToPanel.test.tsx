@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {act, render, waitFor} from '@testing-library/react'
-import AssignToPanel, {AssignToPanelProps} from '../AssignToPanel'
+import AssignToPanel, {type AssignToPanelProps} from '../AssignToPanel'
 import {ASSIGNMENT_OVERRIDES_DATA, SECTIONS_DATA, STUDENTS_DATA} from './mocks'
 import * as utils from '../../utils/assignToHelper'
 import fetchMock from 'fetch-mock'

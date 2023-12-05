@@ -26,11 +26,11 @@ import {Modal} from '@instructure/ui-modal'
 import {View} from '@instructure/ui-view'
 import React from 'react'
 import NewKeyForm from './NewKeyForm'
-import {AvailableScope} from './reducers/listScopesReducer'
-import {DeveloperKeyCreateOrEditState} from './reducers/createOrEditReducer'
+import type {AvailableScope} from './reducers/listScopesReducer'
+import type {DeveloperKeyCreateOrEditState} from './reducers/createOrEditReducer'
 import actions from './actions/developerKeysActions'
-import {AnyAction, Dispatch} from 'redux'
-import {DeveloperKey} from '../model/DeveloperKey'
+import type {AnyAction, Dispatch} from 'redux'
+import type {DeveloperKey} from '../model/DeveloperKey'
 
 const I18n = useI18nScope('react_developer_keys')
 

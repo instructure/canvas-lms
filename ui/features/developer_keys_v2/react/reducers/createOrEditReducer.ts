@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {DeveloperKey} from '../../model/DeveloperKey'
+import type {DeveloperKey} from '../../model/DeveloperKey'
 import ACTION_NAMES from '../actions/developerKeysActions'
 import {makeReducer} from './makeReducer'
 

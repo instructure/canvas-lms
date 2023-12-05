@@ -19,7 +19,7 @@
 import React from 'react'
 import {fireEvent, render} from '@testing-library/react'
 import {EnrollmentTreeItem} from '../EnrollmentTreeItem'
-import {Spacing} from '@instructure/emotion'
+import type {Spacing} from '@instructure/emotion'
 
 const callback = jest.fn()
 

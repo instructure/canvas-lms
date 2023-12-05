@@ -21,7 +21,10 @@ import {BrowserRouter, Route, Routes} from 'react-router-dom'
 import {MockedProvider} from '@apollo/react-testing'
 import {render, fireEvent, waitFor, act} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {AccountStatusManagement, AccountStatusManagementProps} from '../AccountStatusManagement'
+import {
+  AccountStatusManagement,
+  type AccountStatusManagementProps,
+} from '../AccountStatusManagement'
 import {setupGraphqlMocks} from './fixtures'
 
 describe('Account Grading Status Management', () => {

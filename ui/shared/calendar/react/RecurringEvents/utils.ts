@@ -17,8 +17,13 @@
  */
 
 import moment from 'moment'
-import {Moment} from 'moment-timezone'
-import {AllRRULEDayValues, FrequencyValue, MonthlyModeValue, SelectedDaysArray} from './types'
+import type {Moment} from 'moment-timezone'
+import {
+  AllRRULEDayValues,
+  type FrequencyValue,
+  type MonthlyModeValue,
+  type SelectedDaysArray,
+} from './types'
 
 type CardinalDayInMonth = {
   cardinal: number

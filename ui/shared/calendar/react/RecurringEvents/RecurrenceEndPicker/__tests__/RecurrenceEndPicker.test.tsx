@@ -19,13 +19,13 @@
 import React from 'react'
 import {render, act, fireEvent, screen, waitFor} from '@testing-library/react'
 import moment from 'moment-timezone'
-import {UnknownSubset, FrequencyValue} from '../../types'
+import type {UnknownSubset, FrequencyValue} from '../../types'
 import RecurrenceEndPicker, {
-  RecurrenceEndPickerProps,
+  type RecurrenceEndPickerProps,
   CountValidator,
   UntilValidator,
-  InstuiMessage,
-  ModeValues,
+  type InstuiMessage,
+  type ModeValues,
 } from '../RecurrenceEndPicker'
 import {MAX_COUNT} from '../../RRuleHelper'
 

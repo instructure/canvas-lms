@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {GradingScheme, GradingSchemeTemplate} from '@canvas/grading_scheme'
+import type {GradingScheme, GradingSchemeTemplate} from '@canvas/grading_scheme'
 
 export const AccountGradingSchemes: GradingScheme[] = [
   {

@@ -31,7 +31,7 @@ import {Link} from '@instructure/ui-link'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import GradeOverrideTrayRadioInputGroup from './GradeOverrideTrayRadioInputGroup'
-import {GradeStatus} from '@canvas/grading/accountGradingStatus'
+import type {GradeStatus} from '@canvas/grading/accountGradingStatus'
 
 import useStore from '../stores'
 import {gradeOverrideCustomStatus} from '../FinalGradeOverrides/FinalGradeOverride.utils'

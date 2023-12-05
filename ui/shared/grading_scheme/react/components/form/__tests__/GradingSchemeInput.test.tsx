@@ -30,7 +30,7 @@ import {
   FORM_INPUT_DUPLICATE_NAMED_RANGES,
   FORM_INPUT_MISSING_RANGE_NAME,
 } from './fixtures'
-import {GradingSchemeInput, GradingSchemeInputHandle} from '../GradingSchemeInput'
+import {GradingSchemeInput, type GradingSchemeInputHandle} from '../GradingSchemeInput'
 
 const onSave = jest.fn()
 

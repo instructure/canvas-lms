@@ -18,7 +18,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-import {Collection, AccountData, Account} from './types'
+import type {Collection, AccountData, Account} from './types'
 
 const I18n = useI18nScope('account_calendar_settings_utils')
 

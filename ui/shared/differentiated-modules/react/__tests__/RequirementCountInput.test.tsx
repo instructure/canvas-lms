@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import RequirementCountInput, {RequirementCountInputProps} from '../RequirementCountInput'
+import RequirementCountInput, {type RequirementCountInputProps} from '../RequirementCountInput'
 import {render} from '@testing-library/react'
 
 describe('RequirementCountInput', () => {

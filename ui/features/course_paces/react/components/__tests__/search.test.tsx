@@ -20,7 +20,7 @@ import React from 'react'
 import {act, fireEvent, render} from '@testing-library/react'
 
 import {Search} from '../search'
-import {OrderType, SortableColumn} from '../../types'
+import type {OrderType, SortableColumn} from '../../types'
 
 const fetchPaceContexts = jest.fn()
 const setSearchTerm = jest.fn()

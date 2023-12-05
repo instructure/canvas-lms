@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {CustomColumn, HandleCheckboxChange, TeacherNotes} from '../../../types'
+import type {CustomColumn, HandleCheckboxChange, TeacherNotes} from '../../../types'
 import {executeApiRequest} from '@canvas/util/apiRequest'
 import CheckboxTemplate from './CheckboxTemplate'
 

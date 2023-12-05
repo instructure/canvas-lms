@@ -16,15 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import {
-  ResourceLinkContentItem,
+  type ResourceLinkContentItem,
   resourceLinkContentItemToHtmlString,
 } from './ResourceLinkContentItem'
 import {
-  HtmlFragmentContentItem,
+  type HtmlFragmentContentItem,
   htmlFragmentContentItemToHtmlString,
 } from './HtmlFragmentContentItem'
-import {ImageContentItem, imageContentItemToHtmlString} from './ImageContentItem'
-import {LinkContentItem, linkContentItemToHtmlString} from './LinkContentItem'
+import {type ImageContentItem, imageContentItemToHtmlString} from './ImageContentItem'
+import {type LinkContentItem, linkContentItemToHtmlString} from './LinkContentItem'
 
 export type ContentItem =
   | ResourceLinkContentItem

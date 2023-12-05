@@ -17,7 +17,7 @@
  */
 
 import React, {useCallback, useState} from 'react'
-import {
+import type {
   AchievementData,
   EducationData,
   ExperienceData,

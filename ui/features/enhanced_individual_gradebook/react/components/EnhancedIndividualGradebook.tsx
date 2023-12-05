@@ -25,13 +25,13 @@ import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import gradingHelpers from '@canvas/grading/AssignmentGroupGradeCalculator'
 
-import {AssignmentGroupCriteriaMap} from '../../../../shared/grading/grading.d'
+import type {AssignmentGroupCriteriaMap} from '../../../../shared/grading/grading.d'
 import AssignmentInformation from './AssignmentInformation'
 import ContentSelection from './ContentSelection'
 import GlobalSettings from './GlobalSettings'
 import GradingResults from './GradingResults'
 import StudentInformation from './StudentInformation'
-import {
+import type {
   AssignmentSubmissionsMap,
   CustomOptions,
   GradebookOptions,

@@ -21,7 +21,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {Checkbox} from '@instructure/ui-checkbox'
 import {FormField} from '@instructure/ui-form-field'
-import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 
 declare const ENV: GlobalEnv & {
   SIS_NAME: string

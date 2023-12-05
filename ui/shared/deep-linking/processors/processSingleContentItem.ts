@@ -17,7 +17,7 @@
  */
 
 import {contentItemProcessorPrechecks} from '../ContentItemProcessor'
-import {DeepLinkResponse} from '../DeepLinkResponse'
+import type {DeepLinkResponse} from '../DeepLinkResponse'
 
 export default function processSingleContentItem(event: {data: DeepLinkResponse}) {
   contentItemProcessorPrechecks(event.data)

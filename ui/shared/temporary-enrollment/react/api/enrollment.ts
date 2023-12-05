@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Enrollment, ITEMS_PER_PAGE, TemporaryEnrollmentPairing} from '../types'
+import {ITEMS_PER_PAGE} from '../types'
+import type {Enrollment, TemporaryEnrollmentPairing} from '../types'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
 /**

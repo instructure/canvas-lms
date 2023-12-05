@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
-import ClearableDateTimeInput, {ClearableDateTimeInputProps} from '../ClearableDateTimeInput'
+import ClearableDateTimeInput, {type ClearableDateTimeInputProps} from '../ClearableDateTimeInput'
 
 describe('ClearableDateTimeInput', () => {
   const props: ClearableDateTimeInputProps = {

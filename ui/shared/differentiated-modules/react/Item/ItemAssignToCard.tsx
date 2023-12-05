@@ -24,8 +24,8 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import DateValidator from '@canvas/datetime/DateValidator'
 import ClearableDateTimeInput from './ClearableDateTimeInput'
 import moment from 'moment'
-import AssigneeSelector, {AssigneeOption} from '../AssigneeSelector'
-import {FormMessage} from '@instructure/ui-form-field'
+import AssigneeSelector, {type AssigneeOption} from '../AssigneeSelector'
+import type {FormMessage} from '@instructure/ui-form-field'
 
 const I18n = useI18nScope('differentiated_modules')
 

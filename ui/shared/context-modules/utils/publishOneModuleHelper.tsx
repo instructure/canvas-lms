@@ -24,7 +24,7 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import ContextModulesPublishIcon from '../react/ContextModulesPublishIcon'
 import {updateModuleItem, itemContentKey} from '../jquery/utils'
 import RelockModulesDialog from '../backbone/views/RelockModulesDialog'
-import {
+import type {
   CanvasId,
   DoFetchModuleResponse,
   DoFetchModuleItemsResponse,

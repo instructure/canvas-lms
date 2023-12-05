@@ -20,7 +20,7 @@ import $ from 'jquery'
 import React from 'react'
 import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import GradingResults, {GradingResultsComponentProps} from '..'
+import GradingResults, {type GradingResultsComponentProps} from '..'
 import {
   defaultStudentSubmissions,
   defaultAssignment,
@@ -30,7 +30,7 @@ import {
 import {GRADEBOOK_SUBMISSION_COMMENTS} from '../../../../queries/Queries'
 import {MockedProvider} from '@apollo/react-testing'
 import {executeApiRequest} from '@canvas/util/apiRequest'
-import {
+import type {
   AssignmentConnection,
   GradebookUserSubmissionDetails,
 } from 'features/enhanced_individual_gradebook/types'

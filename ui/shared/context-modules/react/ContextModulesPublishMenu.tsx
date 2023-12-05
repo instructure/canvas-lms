@@ -17,7 +17,7 @@
  */
 
 import React, {useCallback, useEffect, useState} from 'react'
-import {CanvasId, CanvasProgress} from './types'
+import type {CanvasId, CanvasProgress} from './types'
 import {
   IconMiniArrowDownLine,
   IconPublishLine,

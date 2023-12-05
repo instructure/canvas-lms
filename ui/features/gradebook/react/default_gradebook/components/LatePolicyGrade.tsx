@@ -19,7 +19,7 @@
 import React from 'react'
 import {Text} from '@instructure/ui-text'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {SubmissionData} from '@canvas/grading/grading.d'
+import type {SubmissionData} from '@canvas/grading/grading.d'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 
 const I18n = useI18nScope('gradebook')

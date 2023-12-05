@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {StoreState as CoursePageStoreState} from '../../types'
-import {BlackoutDate, SyncState, BlackoutDateState} from '../types'
-import {Constants, BlackoutDatesAction} from '../actions/blackout_dates'
+import type {StoreState as CoursePageStoreState} from '../../types'
+import {type BlackoutDate, SyncState, type BlackoutDateState} from '../types'
+import {Constants, type BlackoutDatesAction} from '../actions/blackout_dates'
 import {getInitialBlackoutDates} from '../../reducers/original'
 
 export const getBlackoutDates = (state: CoursePageStoreState): BlackoutDate[] => {

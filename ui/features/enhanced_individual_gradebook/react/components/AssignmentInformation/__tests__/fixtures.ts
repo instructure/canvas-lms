@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AssignmentConnection} from 'features/enhanced_individual_gradebook/types'
-import {AssignmentInformationComponentProps} from '..'
+import type {AssignmentConnection} from 'features/enhanced_individual_gradebook/types'
+import type {AssignmentInformationComponentProps} from '..'
 import {defaultGradebookOptions} from '../../__tests__/fixtures'
 
 export const defaultAssignment: AssignmentConnection = {

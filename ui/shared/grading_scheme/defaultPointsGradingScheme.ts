@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {GradingSchemeTemplate} from './gradingSchemeApiModel'
+import type {GradingSchemeTemplate} from './gradingSchemeApiModel'
 
 export const defaultPointsGradingScheme: GradingSchemeTemplate = {
   data: [

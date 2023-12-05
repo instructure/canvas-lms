@@ -26,7 +26,7 @@ import {matchComponentTypes} from '@instructure/ui-react-utils'
 import {compact, uniqueId} from 'lodash'
 import {Alert} from '@instructure/ui-alerts'
 import {Spinner} from '@instructure/ui-spinner'
-import {FormMessage} from '@instructure/ui-form-field'
+import type {FormMessage} from '@instructure/ui-form-field'
 
 const I18n = useI18nScope('app_shared_components')
 

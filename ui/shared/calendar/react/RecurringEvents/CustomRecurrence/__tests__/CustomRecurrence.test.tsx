@@ -19,8 +19,8 @@
 import React from 'react'
 import {render, act, fireEvent} from '@testing-library/react'
 import moment from 'moment-timezone'
-import {UnknownSubset} from '../../types'
-import {RRuleHelperSpec} from '../../RRuleHelper'
+import type {UnknownSubset} from '../../types'
+import type {RRuleHelperSpec} from '../../RRuleHelper'
 import {
   formatDate,
   makeSimpleIsoDate,
@@ -28,7 +28,7 @@ import {
 } from '../../RecurrenceEndPicker/__tests__/RecurrenceEndPicker.test'
 import {changeFreq} from '../../RepeatPicker/__tests__/RepeatPicker.test'
 import {weekdaysFromMoment} from '../../utils'
-import CustomRecurrence, {CustomRecurrenceProps} from '../CustomRecurrence'
+import CustomRecurrence, {type CustomRecurrenceProps} from '../CustomRecurrence'
 
 const defaultTZ = 'Asia/Tokyo'
 const today = moment().tz(defaultTZ)

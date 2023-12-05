@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {GradingResultsComponentProps} from '..'
+import type {GradingResultsComponentProps} from '..'
 import {
-  AssignmentConnection,
-  GradebookUserSubmissionDetails,
-  GradebookOptions,
+  type AssignmentConnection,
+  type GradebookUserSubmissionDetails,
+  type GradebookOptions,
   GradebookSortOrder,
 } from '../../../../types'
 

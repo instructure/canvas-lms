@@ -19,7 +19,7 @@
 import React, {useState} from 'react'
 import ContentMigrationsForm from './components/migrations_form'
 import ContentMigrationsTable from './components/migrations_table'
-import {ContentMigrationItem} from './components/types'
+import type {ContentMigrationItem} from './components/types'
 
 export const App = () => {
   const [migrations, setMigrations] = useState<ContentMigrationItem[]>([])

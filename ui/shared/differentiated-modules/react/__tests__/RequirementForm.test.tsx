@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import RequirementForm, {RequirementFormProps} from '../RequirementForm'
+import RequirementForm, {type RequirementFormProps} from '../RequirementForm'
 
 describe('RequirementForm', () => {
   const props: RequirementFormProps = {

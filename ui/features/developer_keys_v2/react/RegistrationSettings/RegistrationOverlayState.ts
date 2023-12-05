@@ -15,10 +15,10 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {LtiPlacement} from '../../model/LtiPlacements'
-import {LtiMessage, LtiRegistration} from '../../model/LtiRegistration'
+import type {LtiPlacement} from '../../model/LtiPlacements'
+import type {LtiMessage, LtiRegistration} from '../../model/LtiRegistration'
 import createStore from 'zustand/vanilla'
-import {LtiScope} from '../../model/LtiScopes'
+import type {LtiScope} from '../../model/LtiScopes'
 import {subscribeWithSelector} from 'zustand/middleware'
 
 export interface RegistrationOverlayStore extends RegistrationOverlayActions {

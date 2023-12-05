@@ -20,7 +20,7 @@ import React from 'react'
 import {render, waitFor, screen} from '@testing-library/react'
 import ContentMigrationsTable from '../migrations_table'
 import fetchMock from 'fetch-mock'
-import {ContentMigrationItem} from '../types'
+import type {ContentMigrationItem} from '../types'
 
 const migrations: ContentMigrationItem[] = [
   {

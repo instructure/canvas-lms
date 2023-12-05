@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import ready from '@instructure/ready'
-import {Role} from './react/tour'
+import type {Role} from './react/tour'
 
 const Tour = React.lazy(() => import('./react/tour'))
 

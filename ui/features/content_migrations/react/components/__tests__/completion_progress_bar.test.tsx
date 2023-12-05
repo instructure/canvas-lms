@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {ReactElement} from 'react'
+import React, {type ReactElement} from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {CompletionProgressBar, buildProgressCellContent} from '../completion_progress_bar'
-import {ContentMigrationItem} from '../types'
+import type {ContentMigrationItem} from '../types'
 
 jest.mock('@canvas/do-fetch-api-effect')
 

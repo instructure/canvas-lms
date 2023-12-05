@@ -20,7 +20,7 @@ import React from 'react'
 
 import {DynamicRegistrationModal} from '../DynamicRegistrationModal'
 import {useDynamicRegistrationState} from '../DynamicRegistrationState'
-import {LtiRegistration} from 'features/developer_keys_v2/model/LtiRegistration'
+import type {LtiRegistration} from 'features/developer_keys_v2/model/LtiRegistration'
 import {createRegistrationOverlayStore} from '../../RegistrationSettings/RegistrationOverlayState'
 
 describe('DynamicRegistrationModal', () => {

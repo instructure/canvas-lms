@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {LtiPlacement} from './LtiPlacements'
+import type {LtiPlacement} from './LtiPlacements'
 
 export interface LtiToolConfiguration {
   title: string

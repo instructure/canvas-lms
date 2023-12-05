@@ -21,7 +21,7 @@ import {FormFieldGroup} from '@instructure/ui-form-field'
 import SubmissionTrayRadioInput from './SubmissionTrayRadioInput'
 import {statusesTitleMap} from '../constants/statuses'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {CamelizedSubmission} from '@canvas/grading/grading.d'
+import type {CamelizedSubmission} from '@canvas/grading/grading.d'
 import type {GradeStatus} from '@canvas/grading/accountGradingStatus'
 
 const I18n = useI18nScope('gradebook')

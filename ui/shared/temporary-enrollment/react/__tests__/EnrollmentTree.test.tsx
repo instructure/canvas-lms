@@ -18,8 +18,8 @@
 
 import React from 'react'
 import {fireEvent, render, waitFor} from '@testing-library/react'
-import {EnrollmentTree, Props} from '../EnrollmentTree'
-import {Enrollment} from '../types'
+import {EnrollmentTree, type Props} from '../EnrollmentTree'
+import type {Enrollment} from '../types'
 
 const mockEnrollment = {
   enrollment_state: 'active',

@@ -21,7 +21,7 @@ import {render, fireEvent} from '@testing-library/react'
 
 import GradeOverrideEntry from '@canvas/grading/GradeEntry/GradeOverrideEntry'
 import {ApiCallStatus} from '@canvas/util/apiRequest'
-import {TotalGradeOverrideTray, TotalGradeOverrideTrayProps} from '../TotalGradeOverrideTray'
+import {TotalGradeOverrideTray, type TotalGradeOverrideTrayProps} from '../TotalGradeOverrideTray'
 import useStore from '../../stores'
 import * as FinalGradeOverrideHooks from '../../hooks/useFinalGradeOverrideCustomStatus'
 

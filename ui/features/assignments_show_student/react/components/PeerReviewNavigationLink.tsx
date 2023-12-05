@@ -28,7 +28,7 @@ import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
 import {getPeerReviewUrl} from '../helpers/PeerReviewHelpers'
-import {AssignedAssessments} from 'api'
+import type {AssignedAssessments} from 'api'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 
 const I18n = useI18nScope('assignments_2_student_header')

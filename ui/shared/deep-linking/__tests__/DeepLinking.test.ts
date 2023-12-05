@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {isValidDeepLinkingEvent, handleDeepLinking, DeepLinkEvent} from '../DeepLinking'
+import {isValidDeepLinkingEvent, handleDeepLinking, type DeepLinkEvent} from '../DeepLinking'
 
 describe('isValidDeepLinkingEvent', () => {
   let data: {

@@ -42,11 +42,11 @@ import '@canvas/jquery/jquery.instructure_misc_plugins' /* showIf */
 import '@canvas/keycodes'
 import '@canvas/loading-image'
 import '@canvas/util/templateData'
-import {DeepLinkResponse} from '@canvas/deep-linking/DeepLinkResponse'
+import type {DeepLinkResponse} from '@canvas/deep-linking/DeepLinkResponse'
 import {contentItemProcessorPrechecks} from '@canvas/deep-linking/ContentItemProcessor'
-import {ResourceLinkContentItem} from '@canvas/deep-linking/models/ResourceLinkContentItem'
-import {EnvContextModules} from '@canvas/global/env/EnvContextModules'
-import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import type {ResourceLinkContentItem} from '@canvas/deep-linking/models/ResourceLinkContentItem'
+import type {EnvContextModules} from '@canvas/global/env/EnvContextModules'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 import replaceTags from '@canvas/util/replaceTags'
 
 // @ts-expect-error

@@ -17,8 +17,7 @@
  */
 
 import React from 'react'
-import {CanvasId} from './types'
-// @ts-ignore
+import type {CanvasId} from './types'
 import {IconMiniArrowDownLine, IconPublishSolid, IconUnpublishedLine} from '@instructure/ui-icons'
 import {IconButton} from '@instructure/ui-buttons'
 import {Menu} from '@instructure/ui-menu'

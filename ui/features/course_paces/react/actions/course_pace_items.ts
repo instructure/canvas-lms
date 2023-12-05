@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createAction, ActionsUnion} from '../shared/types'
+import {createAction, type ActionsUnion} from '../shared/types'
 
 export enum Constants {
   SET_PACE_ITEM_DURATION = 'COURSE_PACE_ITEMS/SET_PACE_ITEM_DURATION',

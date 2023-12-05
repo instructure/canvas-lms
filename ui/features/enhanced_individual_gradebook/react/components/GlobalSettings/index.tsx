@@ -20,12 +20,12 @@ import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {
-  CustomColumn,
-  GradebookOptions,
+  type CustomColumn,
+  type GradebookOptions,
   GradebookSortOrder,
-  HandleCheckboxChange,
-  SectionConnection,
-  TeacherNotes,
+  type HandleCheckboxChange,
+  type SectionConnection,
+  type TeacherNotes,
 } from '../../../types'
 import {Link} from '@instructure/ui-link'
 import {Button} from '@instructure/ui-buttons'

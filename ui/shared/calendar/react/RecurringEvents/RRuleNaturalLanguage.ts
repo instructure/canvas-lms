@@ -17,8 +17,12 @@
  */
 
 import moment from 'moment-timezone'
-import RruleHelper, {RRuleHelperSpec, RruleValidationError, icalDateToISODate} from './RRuleHelper'
-import {RRULEDayValue, SelectedDaysArray} from './types'
+import RruleHelper, {
+  type RRuleHelperSpec,
+  RruleValidationError,
+  icalDateToISODate,
+} from './RRuleHelper'
+import type {RRULEDayValue, SelectedDaysArray} from './types'
 import {useScope} from '@canvas/i18n'
 
 const I18n = useScope('calendar_custom_recurring_event_natural_language')

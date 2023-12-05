@@ -18,7 +18,7 @@
 
 // @ts-expect-error
 import _ from 'underscore'
-import createStore, {CanvasStore} from '@canvas/util/createStore'
+import createStore, {type CanvasStore} from '@canvas/util/createStore'
 import ContextColorer from '@canvas/util/contextColorer'
 
 const DEFAULT_COLOR_OPTIONS = [

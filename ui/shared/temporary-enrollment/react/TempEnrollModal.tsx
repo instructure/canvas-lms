@@ -16,14 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {
-  cloneElement,
-  MouseEvent,
-  MouseEventHandler,
-  ReactElement,
-  useEffect,
-  useState,
-} from 'react'
+import React, {cloneElement, useEffect, useState} from 'react'
+import type {MouseEvent, MouseEventHandler, ReactElement} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Modal} from '@instructure/ui-modal'
 import {Button, CloseButton} from '@instructure/ui-buttons'
@@ -32,15 +26,8 @@ import {TempEnrollSearch} from './TempEnrollSearch'
 import {TempEnrollEdit} from './TempEnrollEdit'
 import {TempEnrollAssign} from './TempEnrollAssign'
 import {Flex} from '@instructure/ui-flex'
-import {
-  Enrollment,
-  EnrollmentType,
-  MODULE_NAME,
-  RECIPIENT,
-  Role,
-  TempEnrollPermissions,
-  User,
-} from './types'
+import {MODULE_NAME, RECIPIENT} from './types'
+import type {Enrollment, EnrollmentType, Role, TempEnrollPermissions, User} from './types'
 import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {createAnalyticPropsGenerator, setAnalyticPropsOnRef} from './util/analytics'
 import {Spinner} from '@instructure/ui-spinner'
