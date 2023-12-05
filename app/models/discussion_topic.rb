@@ -1807,20 +1807,20 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def reply_to_topic_checkpoint
-    checkpoint_assignments.find_by(checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC)
+    checkpoint_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
   end
 
   def reply_to_entry_checkpoint
-    checkpoint_assignments.find_by(checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY)
+    checkpoint_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
   end
 
   def create_checkpoints(reply_to_topic_points:, reply_to_entry_points:, reply_to_entry_required_count: 0)
     return false if checkpoints?
     return false unless context.is_a?(Course)
 
-    parent = context.assignments.create!(checkpointed: true, checkpoint_label: CheckpointLabels::PARENT)
-    parent.checkpoint_assignments.create!(context:, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC, points_possible: reply_to_topic_points)
-    parent.checkpoint_assignments.create!(context:, checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY, points_possible: reply_to_entry_points)
+    parent = context.assignments.create!(has_sub_assignments: true, sub_assignment_tag: CheckpointLabels::PARENT)
+    parent.checkpoint_assignments.create!(context:, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, points_possible: reply_to_topic_points)
+    parent.checkpoint_assignments.create!(context:, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, points_possible: reply_to_entry_points)
     self.assignment = parent
     self.reply_to_entry_required_count = reply_to_entry_required_count
 

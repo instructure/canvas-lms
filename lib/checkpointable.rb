@@ -23,7 +23,7 @@ module Checkpointable
     klass.has_many :checkpoint_assignments, -> { active }, class_name: "Assignment", foreign_key: :parent_assignment_id, inverse_of: :parent_assignment
     klass.has_many :checkpoint_submissions, through: :checkpoint_assignments, source: :submissions
 
-    klass.validates :parent_assignment_id, absence: true, if: :checkpointed?
+    klass.validates :parent_assignment_id, absence: true, if: :has_sub_assignments?
     klass.validates :parent_assignment_id, comparison: { other_than: :id, message: -> { I18n.t("cannot reference self") } }, allow_nil: true
 
     klass.after_commit :aggregate_checkpoint_assignments, if: :checkpoint_changes?
@@ -33,8 +33,8 @@ module Checkpointable
     parent_assignment_id.present?
   end
 
-  def find_checkpoint(checkpoint_label)
-    checkpoint_assignments.find_by(checkpoint_label:)
+  def find_checkpoint(sub_assignment_tag)
+    checkpoint_assignments.find_by(sub_assignment_tag:)
   end
 
   private

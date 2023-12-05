@@ -95,9 +95,9 @@ describe Assignment do
         course_with_teacher(active_all: true)
         @student = student_in_course(active_all: true).user
         @course.root_account.enable_feature!(:discussion_checkpoints)
-        assignment = @course.assignments.create!(checkpointed: true, checkpoint_label: CheckpointLabels::PARENT)
-        assignment.checkpoint_assignments.create!(context: @course, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC, due_at: 2.days.from_now)
-        assignment.checkpoint_assignments.create!(context: @course, checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY, due_at: 3.days.from_now)
+        assignment = @course.assignments.create!(has_sub_assignments: true, sub_assignment_tag: CheckpointLabels::PARENT)
+        assignment.checkpoint_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, due_at: 2.days.from_now)
+        assignment.checkpoint_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, due_at: 3.days.from_now)
         @topic = @course.discussion_topics.create!(assignment:, reply_to_entry_required_count: 1)
       end
 
@@ -110,8 +110,8 @@ describe Assignment do
       end
 
       it "supports grading checkpoints" do
-        @topic.assignment.grade_student(@student, grader: @teacher, score: 5, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC)
-        @topic.assignment.grade_student(@student, grader: @teacher, score: 2, checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY)
+        @topic.assignment.grade_student(@student, grader: @teacher, score: 5, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+        @topic.assignment.grade_student(@student, grader: @teacher, score: 2, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
         expect(reply_to_topic_submission.score).to eq 5
         expect(reply_to_entry_submission.score).to eq 2
       end
@@ -119,23 +119,23 @@ describe Assignment do
       it "raises an error if no checkpoint label is provided" do
         expect do
           @topic.assignment.grade_student(@student, grader: @teacher, score: 5)
-        end.to raise_error(Assignment::GradeError, "Must provide a valid checkpoint label when grading checkpointed discussions")
+        end.to raise_error(Assignment::GradeError, "Must provide a valid sub assignment tag when grading checkpointed discussions")
       end
 
       it "raises an error if an invalid checkpoint label is provided" do
         expect do
-          @topic.assignment.grade_student(@student, grader: @teacher, score: 5, checkpoint_label: "potato")
-        end.to raise_error(Assignment::GradeError, "Must provide a valid checkpoint label when grading checkpointed discussions")
+          @topic.assignment.grade_student(@student, grader: @teacher, score: 5, sub_assignment_tag: "potato")
+        end.to raise_error(Assignment::GradeError, "Must provide a valid sub assignment tag when grading checkpointed discussions")
       end
 
       it "returns the submissions for the 'parent' assignment" do
-        submissions = @topic.assignment.grade_student(@student, grader: @teacher, score: 5, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC)
+        submissions = @topic.assignment.grade_student(@student, grader: @teacher, score: 5, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
         expect(submissions.map(&:assignment_id).uniq).to eq [@topic.assignment.id]
       end
 
       it "ignores checkpoints when the feature flag is disabled" do
         @course.root_account.disable_feature!(:discussion_checkpoints)
-        @topic.assignment.grade_student(@student, grader: @teacher, score: 5, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC)
+        @topic.assignment.grade_student(@student, grader: @teacher, score: 5, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
         expect(reply_to_topic_submission.score).to be_nil
         expect(@topic.assignment.submissions.find_by(user: @student).score).to eq 5
       end

@@ -390,9 +390,9 @@ describe AssignmentGroupsController, type: :request do
 
       setup_groups
 
-      assignment = @course.assignments.create!(title: "Assignment 1", assignment_group: @group1, checkpointed: true, checkpoint_label: CheckpointLabels::PARENT)
-      @c1 = assignment.checkpoint_assignments.create!(context: assignment.context, assignment_group: @group1, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 3.days.from_now)
-      @c2 = assignment.checkpoint_assignments.create!(context: assignment.context, assignment_group: @group1, checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 10, due_at: 5.days.from_now)
+      assignment = @course.assignments.create!(title: "Assignment 1", assignment_group: @group1, has_sub_assignments: true, sub_assignment_tag: CheckpointLabels::PARENT)
+      @c1 = assignment.checkpoint_assignments.create!(context: assignment.context, assignment_group: @group1, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 3.days.from_now)
+      @c2 = assignment.checkpoint_assignments.create!(context: assignment.context, assignment_group: @group1, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 10, due_at: 5.days.from_now)
     end
 
     it "includes checkpoints data on the assignments" do
@@ -411,14 +411,14 @@ describe AssignmentGroupsController, type: :request do
       assignment_group = json[1]
       assignment = assignment_group["assignments"].first
 
-      expect(assignment["checkpointed"]).to be_truthy
+      expect(assignment["has_sub_assignments"]).to be_truthy
       expect(assignment["checkpoints"]).to be_present
 
       checkpoints = assignment["checkpoints"]
 
       expect(checkpoints.length).to eq 2
       expect(checkpoints.pluck("name")).to match_array [@c1.name, @c2.name]
-      expect(checkpoints.pluck("label")).to match_array [@c1.checkpoint_label, @c2.checkpoint_label]
+      expect(checkpoints.pluck("tag")).to match_array [@c1.sub_assignment_tag, @c2.sub_assignment_tag]
       expect(checkpoints.pluck("points_possible")).to match_array [@c1.points_possible, @c2.points_possible]
       expect(checkpoints.pluck("due_at")).to match_array [@c1.due_at.iso8601, @c2.due_at.iso8601]
       expect(checkpoints.pluck("only_visible_to_overrides")).to match_array [@c1.only_visible_to_overrides, @c2.only_visible_to_overrides]

@@ -60,8 +60,8 @@ describe Checkpoints::SubmissionAggregatorService do
     describe "score" do
       it "saves the sum of checkpoint scores on the parent submission" do
         Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
-          @topic.assignment.grade_student(@student, grader: @teacher, score: 3, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC)
-          @topic.assignment.grade_student(@student, grader: @teacher, score: 7, checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY)
+          @topic.assignment.grade_student(@student, grader: @teacher, score: 3, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+          @topic.assignment.grade_student(@student, grader: @teacher, score: 7, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
         end
 
         success = service_call
@@ -77,7 +77,7 @@ describe Checkpoints::SubmissionAggregatorService do
 
       it "handles the first checkpoint having no score" do
         Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
-          @topic.assignment.grade_student(@student, grader: @teacher, score: 7, checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY)
+          @topic.assignment.grade_student(@student, grader: @teacher, score: 7, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
         end
 
         success = service_call
@@ -87,7 +87,7 @@ describe Checkpoints::SubmissionAggregatorService do
 
       it "handles the second checkpoint having no score" do
         Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
-          @topic.assignment.grade_student(@student, grader: @teacher, score: 3, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC)
+          @topic.assignment.grade_student(@student, grader: @teacher, score: 3, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
         end
 
         success = service_call
@@ -97,9 +97,9 @@ describe Checkpoints::SubmissionAggregatorService do
 
       it "ignores excused submissions" do
         Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
-          @topic.assignment.grade_student(@student, grader: @teacher, score: 3, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC)
-          @topic.assignment.grade_student(@student, grader: @teacher, excused: true, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC)
-          @topic.assignment.grade_student(@student, grader: @teacher, score: 7, checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY)
+          @topic.assignment.grade_student(@student, grader: @teacher, score: 3, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+          @topic.assignment.grade_student(@student, grader: @teacher, excused: true, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+          @topic.assignment.grade_student(@student, grader: @teacher, score: 7, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
         end
 
         success = service_call
@@ -111,8 +111,8 @@ describe Checkpoints::SubmissionAggregatorService do
     describe "published_score" do
       it "saves the sum of checkpoint published_scores on the parent submission" do
         Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
-          @topic.assignment.grade_student(@student, grader: @teacher, score: 3, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC)
-          @topic.assignment.grade_student(@student, grader: @teacher, score: 7, checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY)
+          @topic.assignment.grade_student(@student, grader: @teacher, score: 3, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+          @topic.assignment.grade_student(@student, grader: @teacher, score: 7, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
         end
 
         success = service_call
@@ -128,7 +128,7 @@ describe Checkpoints::SubmissionAggregatorService do
 
       it "handles the first checkpoint having no published_score" do
         Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
-          @topic.assignment.grade_student(@student, grader: @teacher, score: 7, checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY)
+          @topic.assignment.grade_student(@student, grader: @teacher, score: 7, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
         end
 
         success = service_call
@@ -138,7 +138,7 @@ describe Checkpoints::SubmissionAggregatorService do
 
       it "handles the second checkpoint having no published_score" do
         Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
-          @topic.assignment.grade_student(@student, grader: @teacher, score: 3, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC)
+          @topic.assignment.grade_student(@student, grader: @teacher, score: 3, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
         end
 
         success = service_call
@@ -148,9 +148,9 @@ describe Checkpoints::SubmissionAggregatorService do
 
       it "ignores excused submissions" do
         Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
-          @topic.assignment.grade_student(@student, grader: @teacher, score: 3, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC)
-          @topic.assignment.grade_student(@student, grader: @teacher, excused: true, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC)
-          @topic.assignment.grade_student(@student, grader: @teacher, score: 7, checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY)
+          @topic.assignment.grade_student(@student, grader: @teacher, score: 3, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+          @topic.assignment.grade_student(@student, grader: @teacher, excused: true, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+          @topic.assignment.grade_student(@student, grader: @teacher, score: 7, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
         end
 
         success = service_call
@@ -164,11 +164,11 @@ describe Checkpoints::SubmissionAggregatorService do
         now = Time.zone.now
         Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
           Timecop.freeze(5.minutes.ago(now)) do
-            @topic.assignment.grade_student(@student, grader: @teacher, score: 3, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC)
+            @topic.assignment.grade_student(@student, grader: @teacher, score: 3, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
           end
 
           Timecop.freeze(now) do
-            @topic.assignment.grade_student(@student, grader: @teacher, score: 7, checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY)
+            @topic.assignment.grade_student(@student, grader: @teacher, score: 7, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
           end
         end
 
@@ -188,7 +188,7 @@ describe Checkpoints::SubmissionAggregatorService do
         now = Time.zone.now
         Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
           Timecop.freeze(now) do
-            @topic.assignment.grade_student(@student, grader: @teacher, score: 7, checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY)
+            @topic.assignment.grade_student(@student, grader: @teacher, score: 7, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
             @topic.reply_to_topic_checkpoint.submissions.find_by(user: @student).update_columns(updated_at: nil)
           end
         end
@@ -201,7 +201,7 @@ describe Checkpoints::SubmissionAggregatorService do
         now = Time.zone.now
         Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
           Timecop.freeze(now) do
-            @topic.assignment.grade_student(@student, grader: @teacher, score: 7, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC)
+            @topic.assignment.grade_student(@student, grader: @teacher, score: 7, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
             @topic.reply_to_entry_checkpoint.submissions.find_by(user: @student).update_columns(updated_at: nil)
           end
         end
@@ -219,8 +219,8 @@ describe Checkpoints::SubmissionAggregatorService do
 
         it "sets the grade to the stringified version of the aggregate score" do
           Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
-            @topic.assignment.grade_student(@student, grader: @teacher, score: 3, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC)
-            @topic.assignment.grade_student(@student, grader: @teacher, score: 7, checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY)
+            @topic.assignment.grade_student(@student, grader: @teacher, score: 3, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+            @topic.assignment.grade_student(@student, grader: @teacher, score: 7, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
           end
 
           success = service_call
@@ -236,7 +236,7 @@ describe Checkpoints::SubmissionAggregatorService do
 
         it "works when one checkpoint has no score" do
           Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
-            @topic.assignment.grade_student(@student, grader: @teacher, score: 3, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC)
+            @topic.assignment.grade_student(@student, grader: @teacher, score: 3, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
           end
 
           success = service_call
@@ -252,8 +252,8 @@ describe Checkpoints::SubmissionAggregatorService do
 
         it "sets the grade to the letter grade associated with the aggregate score" do
           Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
-            @topic.assignment.grade_student(@student, grader: @teacher, score: 3, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC)
-            @topic.assignment.grade_student(@student, grader: @teacher, score: 7, checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY)
+            @topic.assignment.grade_student(@student, grader: @teacher, score: 3, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+            @topic.assignment.grade_student(@student, grader: @teacher, score: 7, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
           end
 
           success = service_call
@@ -269,7 +269,7 @@ describe Checkpoints::SubmissionAggregatorService do
 
         it "works when one checkpoint has no score" do
           Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
-            @topic.assignment.grade_student(@student, grader: @teacher, score: 3, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC)
+            @topic.assignment.grade_student(@student, grader: @teacher, score: 3, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
           end
 
           success = service_call
@@ -287,8 +287,8 @@ describe Checkpoints::SubmissionAggregatorService do
 
         it "sets the grade to the stringified version of the aggregate published_score" do
           Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
-            @topic.assignment.grade_student(@student, grader: @teacher, score: 3, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC)
-            @topic.assignment.grade_student(@student, grader: @teacher, score: 7, checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY)
+            @topic.assignment.grade_student(@student, grader: @teacher, score: 3, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+            @topic.assignment.grade_student(@student, grader: @teacher, score: 7, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
           end
 
           success = service_call
@@ -304,7 +304,7 @@ describe Checkpoints::SubmissionAggregatorService do
 
         it "works when one checkpoint has no published_score" do
           Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
-            @topic.assignment.grade_student(@student, grader: @teacher, score: 3, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC)
+            @topic.assignment.grade_student(@student, grader: @teacher, score: 3, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
           end
 
           success = service_call
@@ -320,8 +320,8 @@ describe Checkpoints::SubmissionAggregatorService do
 
         it "sets the grade to the letter grade associated with the aggregate published_score" do
           Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
-            @topic.assignment.grade_student(@student, grader: @teacher, score: 3, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC)
-            @topic.assignment.grade_student(@student, grader: @teacher, score: 7, checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY)
+            @topic.assignment.grade_student(@student, grader: @teacher, score: 3, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+            @topic.assignment.grade_student(@student, grader: @teacher, score: 7, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
           end
 
           success = service_call
@@ -337,7 +337,7 @@ describe Checkpoints::SubmissionAggregatorService do
 
         it "works when one checkpoint has no published_score" do
           Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
-            @topic.assignment.grade_student(@student, grader: @teacher, score: 3, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC)
+            @topic.assignment.grade_student(@student, grader: @teacher, score: 3, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
           end
 
           success = service_call
@@ -358,11 +358,11 @@ describe Checkpoints::SubmissionAggregatorService do
           now = Time.zone.now
           Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
             Timecop.freeze(5.minutes.ago(now)) do
-              @topic.assignment.grade_student(@student, grader: @earliest_grader, score: 3, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC)
+              @topic.assignment.grade_student(@student, grader: @earliest_grader, score: 3, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
             end
 
             Timecop.freeze(now) do
-              @topic.assignment.grade_student(@student, grader: @most_recent_grader, score: 7, checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY)
+              @topic.assignment.grade_student(@student, grader: @most_recent_grader, score: 7, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
             end
           end
 
@@ -381,7 +381,7 @@ describe Checkpoints::SubmissionAggregatorService do
           now = Time.zone.now
           Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
             Timecop.freeze(now) do
-              @topic.assignment.grade_student(@student, grader: @most_recent_grader, score: 3, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC)
+              @topic.assignment.grade_student(@student, grader: @most_recent_grader, score: 3, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
             end
           end
 
@@ -396,11 +396,11 @@ describe Checkpoints::SubmissionAggregatorService do
           now = Time.zone.now
           Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
             Timecop.freeze(5.minutes.ago(now)) do
-              @topic.assignment.grade_student(@student, grader: @earliest_grader, score: 3, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC)
+              @topic.assignment.grade_student(@student, grader: @earliest_grader, score: 3, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
             end
 
             Timecop.freeze(now) do
-              @topic.assignment.grade_student(@student, grader: @most_recent_grader, score: 7, checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY)
+              @topic.assignment.grade_student(@student, grader: @most_recent_grader, score: 7, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
             end
           end
 
@@ -419,7 +419,7 @@ describe Checkpoints::SubmissionAggregatorService do
           now = Time.zone.now
           Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
             Timecop.freeze(now) do
-              @topic.assignment.grade_student(@student, grader: @most_recent_grader, score: 3, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC)
+              @topic.assignment.grade_student(@student, grader: @most_recent_grader, score: 3, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
             end
           end
 
@@ -439,7 +439,7 @@ describe Checkpoints::SubmissionAggregatorService do
                 grader: @earliest_grader,
                 graded_anonymously: true,
                 score: 3,
-                checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC
+                sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC
               )
             end
 
@@ -449,7 +449,7 @@ describe Checkpoints::SubmissionAggregatorService do
                 grader: @most_recent_grader,
                 graded_anonymously: false,
                 score: 7,
-                checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY
+                sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY
               )
             end
           end
@@ -474,7 +474,7 @@ describe Checkpoints::SubmissionAggregatorService do
                 grader: @most_recent_grader,
                 graded_anonymously: true,
                 score: 7,
-                checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY
+                sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY
               )
             end
           end
@@ -494,7 +494,7 @@ describe Checkpoints::SubmissionAggregatorService do
                 @student,
                 grader: @earliest_grader,
                 score: 3,
-                checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC
+                sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC
               )
             end
 
@@ -511,7 +511,7 @@ describe Checkpoints::SubmissionAggregatorService do
                 @student,
                 grader: @most_recent_grader,
                 score: 7,
-                checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY
+                sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY
               )
             end
           end
@@ -533,7 +533,7 @@ describe Checkpoints::SubmissionAggregatorService do
                 @student,
                 grader: @earliest_grader,
                 score: 3,
-                checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC
+                sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC
               )
             end
 
@@ -546,7 +546,7 @@ describe Checkpoints::SubmissionAggregatorService do
                 @student,
                 grader: @most_recent_grader,
                 score: 7,
-                checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY
+                sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY
               )
             end
           end
@@ -579,11 +579,11 @@ describe Checkpoints::SubmissionAggregatorService do
         Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
           # grading a student automatically posts their submission when the assignment is set to automatically post
           Timecop.freeze(5.minutes.ago(now)) do
-            @topic.assignment.grade_student(@student, grader: @teacher, score: 3, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC)
+            @topic.assignment.grade_student(@student, grader: @teacher, score: 3, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
           end
 
           Timecop.freeze(now) do
-            @topic.assignment.grade_student(@student, grader: @teacher, score: 3, checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY)
+            @topic.assignment.grade_student(@student, grader: @teacher, score: 3, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
           end
         end
 
@@ -595,7 +595,7 @@ describe Checkpoints::SubmissionAggregatorService do
       it "is nil when one checkpoint is posted and the other is not" do
         Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
           # grading a student automatically posts their submission when the assignment is set to automatically post
-          @topic.assignment.grade_student(@student, grader: @teacher, score: 3, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC)
+          @topic.assignment.grade_student(@student, grader: @teacher, score: 3, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
         end
 
         success = service_call
@@ -613,8 +613,8 @@ describe Checkpoints::SubmissionAggregatorService do
     describe "workflow_state" do
       it "sets the workflow_state to the workflow_state of checkpoints when they match" do
         Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
-          @topic.assignment.grade_student(@student, grader: @teacher, score: 3, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC)
-          @topic.assignment.grade_student(@student, grader: @teacher, score: 7, checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY)
+          @topic.assignment.grade_student(@student, grader: @teacher, score: 3, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+          @topic.assignment.grade_student(@student, grader: @teacher, score: 7, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
         end
 
         success = service_call

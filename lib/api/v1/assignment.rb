@@ -169,7 +169,7 @@ module Api::V1::Assignment
     hash["graded_submissions_exist"] = assignment.graded_submissions_exist?
 
     if opts[:include_checkpoints] && assignment.root_account.feature_enabled?(:discussion_checkpoints)
-      hash["checkpointed"] = assignment.checkpointed?
+      hash["has_sub_assignments"] = assignment.has_sub_assignments?
       hash["checkpoints"] = assignment.checkpoint_assignments.map { |checkpoint| Checkpoint.new(checkpoint).as_json }
     end
 

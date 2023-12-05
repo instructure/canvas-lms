@@ -11393,8 +11393,8 @@ describe Assignment do
 
   describe "checkpointed assignments" do
     before do
-      @parent = @course.assignments.create!(checkpointed: true, checkpoint_label: CheckpointLabels::PARENT)
-      @child = @parent.checkpoint_assignments.create!(context: @course, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC)
+      @parent = @course.assignments.create!(has_sub_assignments: true, sub_assignment_tag: CheckpointLabels::PARENT)
+      @child = @parent.checkpoint_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
     end
 
     it "does not allow parent assignments to have their own parent assignments" do
@@ -11404,8 +11404,8 @@ describe Assignment do
       expect(@parent.errors.full_messages).to include "Parent assignment must be blank"
     end
 
-    it "does not allow child assignments to be marked as checkpointed" do
-      @child.checkpointed = true
+    it "does not allow child assignments to be marked with has_sub_assignments" do
+      @child.has_sub_assignments = true
       expect(@child).not_to be_valid
       expect(@child.errors.full_messages).to include "Parent assignment must be blank"
     end
