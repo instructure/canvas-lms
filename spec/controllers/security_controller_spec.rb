@@ -84,6 +84,10 @@ RSpec.describe SecurityController, type: :request do
   end
 
   describe "openid_configuration" do
+    before do
+      allow(Lti::Oidc).to receive(:auth_domain).and_return("canvas.instructure.com")
+    end
+
     it "rejects timed-out tokens" do
       jwt = Canvas::Security.create_jwt({
                                           user_id: 1,
@@ -124,6 +128,10 @@ RSpec.describe SecurityController, type: :request do
 
   context "sharding" do
     specs_require_sharding
+
+    before do
+      allow(Lti::Oidc).to receive(:auth_domain).and_return("canvas.instructure.com")
+    end
 
     describe "openid_configuration" do
       it "works cross-shard" do

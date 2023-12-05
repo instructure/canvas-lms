@@ -16,16 +16,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% if Lti::PlatformStorage.flag_enabled? &&
-    # Don't render the forwarder frame _inside_ the forwarder frame
-    action_name != "post_message_forwarding" &&
-    # or on any login pages/when not logged in
-    !request.path.starts_with?("/login")
-  %>
-  <%
-    current_domain = HostUrl.context_host(@domain_root_account, request.host_with_port)
+<%
+  # Don't render the forwarder frame _inside_ the forwarder frame
+  # or on any login pages/when not logged in
+  if action_name != "post_message_forwarding" && !request.path.starts_with?("/login")
+    current_domain = request.host_with_port
     oidc_auth_domain = Lti::Oidc.auth_domain(current_domain)
-  %>
+ %>
   <%=
     iframe(
       lti_post_message_forwarding_url(

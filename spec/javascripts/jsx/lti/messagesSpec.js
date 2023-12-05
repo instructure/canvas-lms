@@ -96,7 +96,7 @@ QUnit.module('Messages', suiteHooks => {
     const iframe = $('iframe')
 
     equal(toolContentWrapper.height(), 100)
-    await ltiMessageHandler(postMessageEvent(resizeMessage), iframe[0].contentWindow)
+    await ltiMessageHandler(postMessageEvent(resizeMessage, iframe[0].contentWindow))
     equal(toolContentWrapper.height(), finalHeight)
   })
 

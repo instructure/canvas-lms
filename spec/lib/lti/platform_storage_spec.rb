@@ -19,50 +19,6 @@
 #
 
 describe Lti::PlatformStorage do
-  describe "::flag_enabled?" do
-    subject { Lti::PlatformStorage.flag_enabled? }
-
-    context "when flag is disabled" do
-      before do
-        Account.site_admin.disable_feature! :lti_platform_storage
-      end
-
-      it { is_expected.to be false }
-    end
-
-    context "when flag is enabled" do
-      before do
-        Account.site_admin.enable_feature! :lti_platform_storage
-      end
-
-      it { is_expected.to be true }
-    end
-  end
-
-  describe "::lti_storage_target" do
-    subject { Lti::PlatformStorage.lti_storage_target }
-
-    before do
-      allow(Lti::PlatformStorage).to receive(:flag_enabled?).and_return(flag_enabled)
-    end
-
-    context "when flag is disabled" do
-      let(:flag_enabled) { false }
-
-      it "returns default target" do
-        expect(subject).to eq Lti::PlatformStorage::DEFAULT_TARGET
-      end
-    end
-
-    context "when flag is enabled" do
-      let(:flag_enabled) { true }
-
-      it "returns forwarding target" do
-        expect(subject).to eq Lti::PlatformStorage::FORWARDING_TARGET
-      end
-    end
-  end
-
   describe "::signing_secret" do
     subject { Lti::PlatformStorage.signing_secret }
 
@@ -76,5 +32,12 @@ describe Lti::PlatformStorage do
     it "should return value from vault" do
       expect(subject).to eq signing_secret
     end
+  end
+
+  describe "::FORWARDING_TARGET" do
+    subject { Lti::PlatformStorage::FORWARDING_TARGET }
+
+    it { is_expected.to be_a String }
+    it { is_expected.to_not be_empty }
   end
 end

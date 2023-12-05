@@ -24,7 +24,7 @@ module Lti::Oidc
   # `sso.canvaslms.com` for the OIDC Auth endpoint
   # format: canvas.docker, canvas.instructure.com (no protocol)
   def self.auth_domain(current_domain)
-    return current_domain if Rails.env.development?
+    return current_domain if Rails.env.development? || Rails.env.test?
 
     iss = CanvasSecurity.config["lti_iss"] || current_domain
     return iss unless /^https?:/.match?(iss)

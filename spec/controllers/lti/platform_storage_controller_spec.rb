@@ -22,19 +22,7 @@ describe Lti::PlatformStorageController do
   describe "#post_message_forwarding" do
     subject { get :post_message_forwarding }
 
-    before do
-      Account.site_admin.enable_feature!(:lti_platform_storage)
-    end
-
     let(:forwarding_domain) { "localhost" }
-
-    context "with lti_platform_storage flag off" do
-      before do
-        Account.site_admin.disable_feature!(:lti_platform_storage)
-      end
-
-      it { is_expected.to be_not_found }
-    end
 
     before do
       allow(CanvasSecurity).to receive(:config).and_return({ "lti_iss" => forwarding_domain })
