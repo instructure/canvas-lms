@@ -17,7 +17,7 @@
  */
 
 import React, {useCallback, useEffect, useState} from 'react'
-import AssigneeSelector, {AssigneeOption} from './AssigneeSelector'
+import AssigneeSelector, {type AssigneeOption} from './AssigneeSelector'
 
 export interface ModuleAssignmentsProps {
   courseId: string

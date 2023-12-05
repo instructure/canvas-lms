@@ -20,7 +20,7 @@ import React, {useEffect, useMemo, useState} from 'react'
 import {View} from '@instructure/ui-view'
 import {getFinalGradeOverrides} from '@canvas/grading/FinalGradeOverrideApi'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
-import {
+import type {
   AssignmentGroupCriteriaMap,
   FinalGradeOverrideMap,
   FinalGradeOverride,
@@ -30,9 +30,9 @@ import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {Text} from '@instructure/ui-text'
 import {IconWarningLine} from '@instructure/ui-icons'
 import {
-  GradebookOptions,
-  GradebookStudentDetails,
-  GradebookUserSubmissionDetails,
+  type GradebookOptions,
+  type GradebookStudentDetails,
+  type GradebookUserSubmissionDetails,
   ApiCallStatus,
 } from '../../../types'
 import Notes from './Notes'

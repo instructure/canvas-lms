@@ -18,7 +18,7 @@
 
 import {useCallback, useEffect, useState} from 'react'
 import {useQuery} from 'react-apollo'
-import {
+import type {
   GradebookStudentDetails,
   GradebookStudentQueryResponse,
   GradebookUserSubmissionDetails,

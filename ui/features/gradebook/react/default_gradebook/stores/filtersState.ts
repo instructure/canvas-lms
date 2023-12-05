@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {SetState, GetState} from 'zustand'
+import type {SetState, GetState} from 'zustand'
 import uuid from 'uuid'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -36,7 +36,7 @@ import {
 } from '../Gradebook.utils'
 import GradebookApi from '../apis/GradebookApi'
 import type {GradebookStore} from './index'
-import {GradeStatus} from '@canvas/grading/accountGradingStatus'
+import type {GradeStatus} from '@canvas/grading/accountGradingStatus'
 
 const I18n = useI18nScope('gradebook')
 

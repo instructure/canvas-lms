@@ -16,16 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import create, {StoreApi} from 'zustand'
+import create, {type StoreApi} from 'zustand'
 import {
-  RegistrationToken,
+  type RegistrationToken,
   getRegistrationByUUID,
   updateRegistrationOverlay,
 } from './registrationApi'
-import {LtiRegistration} from '../../model/LtiRegistration'
+import {type LtiRegistration} from '../../model/LtiRegistration'
 import {
-  RegistrationOverlay,
-  RegistrationOverlayStore,
+  type RegistrationOverlay,
+  type RegistrationOverlayStore,
   createRegistrationOverlayStore,
 } from '../RegistrationSettings/RegistrationOverlayState'
 import {deleteDeveloperKey, updateDeveloperKeyWorkflowState} from './developerKeyApi'

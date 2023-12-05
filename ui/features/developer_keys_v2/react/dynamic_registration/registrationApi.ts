@@ -17,8 +17,8 @@
  */
 import axios from '@canvas/axios'
 
-import {LtiRegistration} from 'features/developer_keys_v2/model/LtiRegistration'
-import {RegistrationOverlay} from '../RegistrationSettings/RegistrationOverlayState'
+import type {LtiRegistration} from 'features/developer_keys_v2/model/LtiRegistration'
+import type {RegistrationOverlay} from '../RegistrationSettings/RegistrationOverlayState'
 
 export type RegistrationToken = {
   token: string

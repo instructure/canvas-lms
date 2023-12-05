@@ -17,7 +17,7 @@
  */
 
 import {defaultFetchOptions, asJson} from '@canvas/util/xhr'
-import createStore, {CanvasStore} from '@canvas/util/createStore'
+import createStore, {type CanvasStore} from '@canvas/util/createStore'
 
 type Stream = unknown[]
 

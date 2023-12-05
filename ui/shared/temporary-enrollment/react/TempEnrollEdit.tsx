@@ -24,14 +24,8 @@ import {IconEditLine, IconPlusLine, IconTrashLine} from '@instructure/ui-icons'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Table} from '@instructure/ui-table'
-import {
-  Enrollment,
-  EnrollmentType,
-  MODULE_NAME,
-  PROVIDER,
-  TempEnrollPermissions,
-  User,
-} from './types'
+import {MODULE_NAME, PROVIDER} from './types'
+import type {Enrollment, EnrollmentType, TempEnrollPermissions, User} from './types'
 import {deleteEnrollment} from './api/enrollment'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'

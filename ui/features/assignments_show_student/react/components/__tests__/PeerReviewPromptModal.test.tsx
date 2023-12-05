@@ -18,8 +18,8 @@
 
 import React from 'react'
 import PeerReviewPromptModal, {
-  PeerReviewPromptModalProps,
-  PeerReviewSubheader,
+  type PeerReviewPromptModalProps,
+  type PeerReviewSubheader,
 } from '../PeerReviewPromptModal'
 import {fireEvent, render} from '@testing-library/react'
 

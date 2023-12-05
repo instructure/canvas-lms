@@ -22,12 +22,12 @@ import {generateModalTitle, TempEnrollModal} from '../TempEnrollModal'
 import fetchMock from 'fetch-mock'
 import userEvent from '@testing-library/user-event'
 import {
-  EnrollmentType,
+  type EnrollmentType,
   ITEMS_PER_PAGE,
   MAX_ALLOWED_COURSES_PER_PAGE,
   PROVIDER,
   RECIPIENT,
-  User,
+  type User,
 } from '../types'
 
 // Temporary Enrollment Provider

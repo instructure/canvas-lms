@@ -18,7 +18,7 @@
 
 import htmlEscape from 'html-escape'
 import {setUnloadMessage} from '../util'
-import {LtiMessageHandler} from '../lti_message_handler'
+import type {LtiMessageHandler} from '../lti_message_handler'
 
 const set: LtiMessageHandler<{message: string}> = ({message}) => {
   setUnloadMessage(htmlEscape(message.message))

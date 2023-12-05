@@ -33,7 +33,7 @@ import {useGradingSchemeSummaries} from '../hooks/useGradingSchemeSummaries'
 import {useDefaultGradingScheme} from '../hooks/useDefaultGradingScheme'
 import {GradingSchemesManagement} from './GradingSchemesManagement'
 
-import {GradingSchemeTemplate, GradingSchemeSummary} from '../../gradingSchemeApiModel'
+import type {GradingSchemeTemplate, GradingSchemeSummary} from '../../gradingSchemeApiModel'
 import {GradingSchemeViewEditModal} from './GradingSchemeViewEditModal'
 import {GradingSchemeViewCopyTemplateModal} from './GradingSchemeViewCopyTemplateModal'
 

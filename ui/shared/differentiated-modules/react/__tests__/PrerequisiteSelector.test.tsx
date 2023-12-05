@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import PrerequisiteSelector, {PrerequisiteSelectorProps} from '../PrerequisiteSelector'
+import PrerequisiteSelector, {type PrerequisiteSelectorProps} from '../PrerequisiteSelector'
 
 describe('PrerequisiteSelector', () => {
   const props: PrerequisiteSelectorProps = {

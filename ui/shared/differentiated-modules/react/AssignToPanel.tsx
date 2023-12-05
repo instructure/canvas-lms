@@ -24,11 +24,11 @@ import {Text} from '@instructure/ui-text'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import ModuleAssignments, {AssigneeOption} from './ModuleAssignments'
+import ModuleAssignments, {type AssigneeOption} from './ModuleAssignments'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashAlert, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {generateAssignmentOverridesPayload, updateModuleUI} from '../utils/assignToHelper'
-import {AssignmentOverride} from './types'
+import type {AssignmentOverride} from './types'
 import LoadingOverlay from './LoadingOverlay'
 
 const I18n = useI18nScope('differentiated_modules')

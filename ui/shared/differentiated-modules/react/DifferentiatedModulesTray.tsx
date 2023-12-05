@@ -28,10 +28,10 @@ import {IconModuleSolid} from '@instructure/ui-icons'
 import {calculatePanelHeight} from '../utils/miscHelpers'
 import type {Module} from './types'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {AssigneeOption} from './AssigneeSelector'
-import {SettingsPanelState} from './settingsReducer'
+import type {AssigneeOption} from './AssigneeSelector'
+import type {SettingsPanelState} from './settingsReducer'
 import {createModule, updateModule} from './SettingsPanel'
-import {OptionValue, updateModuleAssignees} from './AssignToPanel'
+import {type OptionValue, updateModuleAssignees} from './AssignToPanel'
 
 const I18n = useI18nScope('differentiated_modules')
 

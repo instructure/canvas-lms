@@ -19,7 +19,7 @@
 import React from 'react'
 import {act, render, waitFor} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
-import ItemAssignToTray, {ItemAssignToTrayProps} from '../ItemAssignToTray'
+import ItemAssignToTray, {type ItemAssignToTrayProps} from '../ItemAssignToTray'
 import {SECTIONS_DATA, STUDENTS_DATA} from '../../__tests__/mocks'
 
 describe('ItemAssignToTray', () => {

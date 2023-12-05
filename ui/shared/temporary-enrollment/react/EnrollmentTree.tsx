@@ -19,7 +19,7 @@
 import React, {useEffect, useState} from 'react'
 import {EnrollmentTreeGroup} from './EnrollmentTreeGroup'
 import {Spinner} from '@instructure/ui-spinner'
-import {Course, Enrollment, NodeStructure, Role, RoleChoice, Section} from './types'
+import type {Course, Enrollment, NodeStructure, Role, RoleChoice, Section} from './types'
 import {Flex} from '@instructure/ui-flex'
 import {useScope as useI18nScope} from '@canvas/i18n'
 

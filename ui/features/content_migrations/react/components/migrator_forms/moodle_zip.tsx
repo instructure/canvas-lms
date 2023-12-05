@@ -18,8 +18,8 @@
 
 import React, {useCallback, useState} from 'react'
 import CommonMigratorControls from './common_migrator_controls'
-import {onSubmitMigrationFormCallback} from '../types'
-import QuestionBankSelector, {QuestionBankSettings} from './question_bank_selector'
+import type {onSubmitMigrationFormCallback} from '../types'
+import QuestionBankSelector, {type QuestionBankSettings} from './question_bank_selector'
 import MigrationFileInput from './file_input'
 
 type MoodleZipImporterProps = {

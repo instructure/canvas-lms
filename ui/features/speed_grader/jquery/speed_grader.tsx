@@ -147,8 +147,8 @@ import 'jquery-scroll-to-visible/jquery.scrollTo'
 import 'jquery-selectmenu'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import '@canvas/util/jquery/fixDialogButtons'
-import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
-import {EnvGradebookSpeedGrader} from '@canvas/global/env/EnvGradebook'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import type {EnvGradebookSpeedGrader} from '@canvas/global/env/EnvGradebook'
 import replaceTags from '@canvas/util/replaceTags'
 
 // @ts-expect-error

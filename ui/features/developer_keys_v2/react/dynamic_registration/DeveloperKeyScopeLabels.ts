@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {LtiScope} from 'features/developer_keys_v2/model/LtiScopes'
+import type {LtiScope} from 'features/developer_keys_v2/model/LtiScopes'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('react_developer_keys')

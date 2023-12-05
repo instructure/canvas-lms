@@ -19,7 +19,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {Checkbox} from '@instructure/ui-checkbox'
-import {I18nType} from './types'
+import type {I18nType} from './types'
 
 const I18n: I18nType = useI18nScope('external_tools')
 

@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AssignedAssessments} from '../../../../api.d'
+import type {AssignedAssessments} from '../../../../api.d'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {PeerReviewSubheader} from '../components/PeerReviewPromptModal'
+import type {PeerReviewSubheader} from '../components/PeerReviewPromptModal'
 
 const I18n = useI18nScope('assignments_2_peer_review')
 

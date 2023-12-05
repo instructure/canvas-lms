@@ -17,7 +17,7 @@
  */
 
 import React, {useCallback, useState} from 'react'
-import {AchievementData, ProjectDetailData, SkillData} from '../types'
+import type {AchievementData, ProjectDetailData, SkillData} from '../types'
 import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'

@@ -17,7 +17,7 @@
  */
 
 import {toggleCourseNav} from '@canvas/courses/jquery/toggleCourseNav'
-import {LtiMessageHandler} from '../lti_message_handler'
+import type {LtiMessageHandler} from '../lti_message_handler'
 
 const handler: LtiMessageHandler = () => {
   toggleCourseNav()

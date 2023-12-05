@@ -20,7 +20,7 @@ import {useState, useCallback} from 'react'
 import {buildContextPath} from './buildContextPath'
 
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {GradingScheme} from '../../gradingSchemeApiModel'
+import type {GradingScheme} from '../../gradingSchemeApiModel'
 import {ApiCallStatus} from './ApiCallStatus'
 
 export const useGradingScheme = (): {

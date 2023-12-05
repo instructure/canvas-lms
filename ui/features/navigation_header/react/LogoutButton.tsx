@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {Button, ButtonProps} from '@instructure/ui-buttons'
+import {Button, type ButtonProps} from '@instructure/ui-buttons'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import getCookie from '@instructure/get-cookie'
 

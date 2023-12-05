@@ -32,7 +32,7 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {useScope} from '@canvas/i18n'
 
-import {RRULEDayValue, SelectedDaysArray} from '../types'
+import type {RRULEDayValue, SelectedDaysArray} from '../types'
 
 const I18n = useScope('calendar_custom_recurring_event_weekday_picker')
 

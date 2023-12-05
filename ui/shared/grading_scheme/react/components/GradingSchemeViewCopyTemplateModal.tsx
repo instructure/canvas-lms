@@ -27,10 +27,10 @@ import {useGradingSchemeCreate} from '../hooks/useGradingSchemeCreate'
 import {useDefaultGradingScheme} from '../hooks/useDefaultGradingScheme'
 import {
   GradingSchemeInput,
-  GradingSchemeEditableData,
-  GradingSchemeInputHandle,
+  type GradingSchemeEditableData,
+  type GradingSchemeInputHandle,
 } from './form/GradingSchemeInput'
-import {GradingScheme, GradingSchemeSummary} from '../../gradingSchemeApiModel'
+import type {GradingScheme, GradingSchemeSummary} from '../../gradingSchemeApiModel'
 import {GradingSchemeTemplateView} from './view/GradingSchemeTemplateView'
 import {defaultPointsGradingScheme} from '../../defaultPointsGradingScheme'
 

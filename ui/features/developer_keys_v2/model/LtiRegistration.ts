@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {RegistrationOverlay} from '../react/RegistrationSettings/RegistrationOverlayState'
-import {LtiPlacement} from './LtiPlacements'
-import {LtiScope} from './LtiScopes'
+import type {RegistrationOverlay} from '../react/RegistrationSettings/RegistrationOverlayState'
+import type {LtiPlacement} from './LtiPlacements'
+import type {LtiScope} from './LtiScopes'
 
 export type SubClaims = Array<string>
 export type MessageType = 'LtiResourceLinkRequest' | 'LtiDeepLinkingRequest'

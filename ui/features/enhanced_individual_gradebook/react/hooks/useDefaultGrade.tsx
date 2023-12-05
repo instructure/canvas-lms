@@ -19,9 +19,9 @@
 import {useCallback, useState} from 'react'
 import {executeApiRequest} from '@canvas/util/apiRequest'
 
-import {ApiCallStatus, SubmissionGradeChange} from '../../types'
+import {ApiCallStatus, type SubmissionGradeChange} from '../../types'
 import {mapToSubmissionGradeChange} from '../../utils/gradebookUtils'
-import {Submission} from '../../../../api'
+import type {Submission} from '../../../../api'
 
 export type DefaultGradeSubmissionParams = {
   submissions: {

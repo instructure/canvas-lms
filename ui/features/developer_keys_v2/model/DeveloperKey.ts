@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {LtiScope} from './LtiScopes'
-import {LtiRegistration} from './LtiRegistration'
+import type {LtiScope} from './LtiScopes'
+import type {LtiRegistration} from './LtiRegistration'
 
 export interface DeveloperKeyAccountBinding {
   account_id: string

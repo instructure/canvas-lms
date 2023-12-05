@@ -59,7 +59,7 @@ import type {
 import type {GridColumn, SlickGridKeyboardEvent} from './grid'
 import {columnWidths} from './initialState'
 import SubmissionStateMap from '@canvas/grading/SubmissionStateMap'
-import {GradeStatus} from '@canvas/grading/accountGradingStatus'
+import type {GradeStatus} from '@canvas/grading/accountGradingStatus'
 
 const I18n = useI18nScope('gradebook')
 

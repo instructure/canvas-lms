@@ -39,8 +39,8 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
 import {coursePaceDateFormatter} from '../../shared/api/backend_serializer'
-import {CoursePaceItem, CoursePace, StoreState} from '../../types'
-import {BlackoutDate} from '../../shared/types'
+import type {CoursePaceItem, CoursePace, StoreState} from '../../types'
+import type {BlackoutDate} from '../../shared/types'
 import {
   getCoursePace,
   getExcludeWeekends,
@@ -57,7 +57,7 @@ import {
   getBlueprintLocked,
 } from '../../reducers/ui'
 import {getBlackoutDates} from '../../shared/reducers/blackout_dates'
-import {Change} from '../../utils/change_tracking'
+import type {Change} from '../../utils/change_tracking'
 
 const I18n = useI18nScope('course_paces_assignment_row')
 

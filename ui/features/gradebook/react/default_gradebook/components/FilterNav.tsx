@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useCallback, useRef, SetStateAction} from 'react'
+import React, {useState, useCallback, useRef, type SetStateAction} from 'react'
 import {Link} from '@instructure/ui-link'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import uuid from 'uuid'
@@ -34,7 +34,7 @@ import FilterDropdown from './FilterDropdown'
 import FilterNavDateModal from './FilterDateModal'
 import FilterTray from './FilterTray'
 import {useFilterDropdownData} from './FilterNav.utils'
-import {GradeStatus} from '@canvas/grading/accountGradingStatus'
+import type {GradeStatus} from '@canvas/grading/accountGradingStatus'
 
 const I18n = useI18nScope('gradebook')
 

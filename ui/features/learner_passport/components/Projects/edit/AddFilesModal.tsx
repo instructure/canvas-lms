@@ -32,7 +32,7 @@ import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import type {ViewProps} from '@instructure/ui-view'
-import {AttachmentData} from '../../types'
+import type {AttachmentData} from '../../types'
 import doFileUpload from '../../shared/UploadFile'
 import {renderFileTypeIcon, stringToId} from '../../shared/utils'
 

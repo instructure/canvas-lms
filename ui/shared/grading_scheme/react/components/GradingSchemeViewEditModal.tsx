@@ -29,10 +29,10 @@ import {useGradingSchemeDelete} from '../hooks/useGradingSchemeDelete'
 import {useGradingScheme} from '../hooks/useGradingScheme'
 import {
   GradingSchemeInput,
-  GradingSchemeEditableData,
-  GradingSchemeInputHandle,
+  type GradingSchemeEditableData,
+  type GradingSchemeInputHandle,
 } from './form/GradingSchemeInput'
-import {
+import type {
   GradingScheme,
   GradingSchemeSummary,
   GradingSchemeTemplate,

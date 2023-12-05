@@ -24,7 +24,7 @@ import {Button} from '@instructure/ui-buttons'
 import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
-import {Which, CalendarEvent} from './types'
+import type {Which, CalendarEvent} from './types'
 
 const I18n = useI18nScope('calendar_event')
 

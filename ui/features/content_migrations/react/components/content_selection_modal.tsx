@@ -44,11 +44,10 @@ import {
   IconStandardsLine,
   IconFolderLine,
   IconDocumentLine,
-  // @ts-ignore
 } from '@instructure/ui-icons'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {CollapsableList, Item} from '@canvas/content-migrations'
-import {ContentMigrationWorkflowState} from './types'
+import {CollapsableList, type Item} from '@canvas/content-migrations'
+import type {ContentMigrationWorkflowState} from './types'
 
 const I18n = useI18nScope('content_migrations_redesign')
 

@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AssigneeOption} from '../react/AssigneeSelector'
-import {AssignmentOverridePayload, AssignmentOverridesPayload} from '../react/types'
+import type {AssigneeOption} from '../react/AssigneeSelector'
+import type {AssignmentOverridePayload, AssignmentOverridesPayload} from '../react/types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('differentiated_modules')

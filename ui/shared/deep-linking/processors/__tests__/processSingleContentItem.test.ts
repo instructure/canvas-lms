@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {DeepLinkResponse} from '@canvas/deep-linking/DeepLinkResponse'
+import type {DeepLinkResponse} from '@canvas/deep-linking/DeepLinkResponse'
 import $ from 'jquery'
 import processSingleContentItem from '../processSingleContentItem'
 

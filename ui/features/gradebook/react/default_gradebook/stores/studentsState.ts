@@ -17,7 +17,7 @@
  */
 
 import {difference, chunk} from 'lodash'
-import {SetState, GetState} from 'zustand'
+import type {SetState, GetState} from 'zustand'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import type {GradebookStore} from './index'
 import {getContentForStudentIdChunk} from './studentsState.utils'

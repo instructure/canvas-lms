@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Action} from 'redux'
-import {ThunkAction} from 'redux-thunk'
+import type {Action} from 'redux'
+import type {ThunkAction} from 'redux-thunk'
 
 import {actions as uiActions} from '../../actions/ui'
-import {StoreState} from '../../types'
-import {createAction, ActionsUnion, BlackoutDate} from '../types'
+import type {StoreState} from '../../types'
+import {createAction, type ActionsUnion, type BlackoutDate} from '../types'
 import * as BlackoutDatesApi from '../../api/blackout_dates_api'
 
 export enum Constants {

@@ -20,11 +20,11 @@ import React, {useMemo} from 'react'
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import MessageStudentsWhoDialog, {
-  SendMessageArgs,
-  Student,
+  type SendMessageArgs,
+  type Student,
 } from '@canvas/message-students-dialog/react/MessageStudentsWhoDialog'
-import {CamelizedAssignment} from '@canvas/grading/grading'
-import {
+import type {CamelizedAssignment} from '@canvas/grading/grading'
+import type {
   AssignmentConnection,
   GradebookOptions,
   SortableStudent,

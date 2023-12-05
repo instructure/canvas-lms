@@ -18,7 +18,7 @@
 
 import React, {useState, useEffect} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {
+import type {
   DeprecatedGradingScheme,
   FinalGradeOverride,
   GradeEntryOptions,

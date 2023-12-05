@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import {ltiState} from '@canvas/lti/jquery/messages'
-import {DeepLinkResponse} from './DeepLinkResponse'
+import type {DeepLinkResponse} from './DeepLinkResponse'
 
 const loggingEnabled = () => {
   return ENV && ENV.DEEP_LINKING_LOGGING

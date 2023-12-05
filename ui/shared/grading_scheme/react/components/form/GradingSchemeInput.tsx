@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {Fragment, ChangeEvent, useState, useImperativeHandle} from 'react'
+import React, {Fragment, type ChangeEvent, useState, useImperativeHandle} from 'react'
 import shortid from '@canvas/shortid'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -27,7 +27,7 @@ import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
 import numberHelper from '@canvas/i18n/numberHelper'
 
 import {GradingSchemeDataRowInput} from './GradingSchemeDataRowInput'
-import {GradingSchemeDataRow} from '@instructure/grading-utils'
+import type {GradingSchemeDataRow} from '@instructure/grading-utils'
 import {GradingSchemeValidationAlert} from './GradingSchemeValidationAlert'
 import {gradingSchemeIsValid} from './validations/gradingSchemeValidations'
 import {roundToTwoDecimalPlaces, roundToFourDecimalPlaces} from '../../helpers/roundDecimalPlaces'

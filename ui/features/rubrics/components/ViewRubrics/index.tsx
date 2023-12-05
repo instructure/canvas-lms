@@ -30,9 +30,9 @@ import {IconAddLine, IconSearchLine} from '@instructure/ui-icons'
 import {TextInput} from '@instructure/ui-text-input'
 import {View} from '@instructure/ui-view'
 import {RubricTable} from './RubricTable'
-import {RubricQueryResponse} from '../../types/Rubric'
+import type {RubricQueryResponse} from '../../types/Rubric'
 import {
-  FetchRubricVariables,
+  type FetchRubricVariables,
   fetchAccountRubrics,
   fetchCourseRubrics,
 } from '../../queries/ViewRubricQueries'

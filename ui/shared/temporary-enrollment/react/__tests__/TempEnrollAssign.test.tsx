@@ -23,12 +23,19 @@ import {
   getEnrollmentAndUserProps,
   isEnrollmentMatch,
   isMatchFound,
-  Props,
+  type Props,
   TempEnrollAssign,
   tempEnrollAssignData,
 } from '../TempEnrollAssign'
 import fetchMock from 'fetch-mock'
-import {Enrollment, MAX_ALLOWED_COURSES_PER_PAGE, PROVIDER, RECIPIENT, Role, User} from '../types'
+import {
+  type Enrollment,
+  MAX_ALLOWED_COURSES_PER_PAGE,
+  PROVIDER,
+  RECIPIENT,
+  type Role,
+  type User,
+} from '../types'
 import {deleteEnrollment} from '../api/enrollment'
 
 const backCall = jest.fn()

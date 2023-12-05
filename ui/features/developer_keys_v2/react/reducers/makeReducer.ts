@@ -17,8 +17,8 @@
  */
 
 import actions, {
-  DeveloperKeyActionNames,
-  ToActionCreatorName,
+  type DeveloperKeyActionNames,
+  type ToActionCreatorName,
 } from '../actions/developerKeysActions'
 
 type ActionFromActionName<ActionName extends DeveloperKeyActionNames> = ReturnType<

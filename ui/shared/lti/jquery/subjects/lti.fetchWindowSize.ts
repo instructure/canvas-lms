@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import {LtiMessageHandler} from '../lti_message_handler'
+import type {LtiMessageHandler} from '../lti_message_handler'
 
 const fetchWindowSize: LtiMessageHandler = ({responseMessages}) => {
   responseMessages.sendResponse({

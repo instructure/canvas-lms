@@ -17,7 +17,7 @@
  */
 
 import {useEffect, useState} from 'react'
-import {CustomColumn} from '../../types'
+import type {CustomColumn} from '../../types'
 import {executeApiRequest} from '@canvas/util/apiRequest'
 
 export const useCustomColumns = (getCustomColumnsUrl?: string | null) => {

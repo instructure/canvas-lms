@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import _ from '@instructure/lodash-underscore'
-import createStore, {CanvasStore} from '@canvas/util/createStore'
+import createStore, {type CanvasStore} from '@canvas/util/createStore'
 import parseLinkHeader from 'link-header-parsing/parseLinkHeaderFromXHR'
 import '@canvas/rails-flash-notifications'
 

@@ -26,7 +26,7 @@ import {
 } from '../../../__tests__/fixtures'
 
 import PaceModalStats from '../stats'
-import {CoursePace, ResponsiveSizes} from 'features/course_paces/react/types'
+import type {CoursePace, ResponsiveSizes} from 'features/course_paces/react/types'
 import {render} from '@testing-library/react'
 
 const defaultProps = {

@@ -23,7 +23,7 @@ import React, {useCallback, useEffect, useState} from 'react'
 import {Story, Meta} from '@storybook/react'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import CanvasDateInput, {CanvasDateInputProps} from './DateInput'
+import CanvasDateInput, {type CanvasDateInputProps} from './DateInput'
 import type {FormMessage} from '@instructure/ui-form-field'
 
 export default {

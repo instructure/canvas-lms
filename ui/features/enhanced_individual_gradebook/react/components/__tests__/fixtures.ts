@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {MockedResponse} from '@apollo/react-testing'
+import type {MockedResponse} from '@apollo/react-testing'
 import {GRADEBOOK_QUERY, GRADEBOOK_STUDENT_QUERY} from '../../../queries/Queries'
-import {GradebookOptions, GradebookSortOrder} from '../../../types'
+import {type GradebookOptions, GradebookSortOrder} from '../../../types'
 
 export const DEFAULT_ENV = {
   active_grading_periods: [],

@@ -242,8 +242,8 @@ import {ExportProgressBar} from './components/ExportProgressBar'
 import {ProgressBar} from '@instructure/ui-progress'
 import GradebookExportManager from '../shared/GradebookExportManager'
 import {handleExternalContentMessages} from '@canvas/external-tools/messages'
-import {EnvGradebookCommon} from '@canvas/global/env/EnvGradebook'
-import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import type {EnvGradebookCommon} from '@canvas/global/env/EnvGradebook'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 import {TotalGradeOverrideTrayProvider} from './components/TotalGradeOverrideTray'
 
 const I18n = useI18nScope('gradebook')

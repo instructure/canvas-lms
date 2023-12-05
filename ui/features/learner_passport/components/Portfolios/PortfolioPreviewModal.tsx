@@ -21,7 +21,7 @@ import {CloseButton} from '@instructure/ui-buttons'
 import {Modal} from '@instructure/ui-modal'
 import {View} from '@instructure/ui-view'
 import {previewBackgroundImage} from '../shared/utils'
-import {PortfolioDetailData} from '../types'
+import type {PortfolioDetailData} from '../types'
 import PortfolioView from './PortfolioView'
 
 interface PortfolioPreviewModalProps {

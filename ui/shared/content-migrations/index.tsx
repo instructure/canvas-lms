@@ -16,7 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {CollapsableList, CollapsableListProps, Item} from './react/CollapsableList/CollapsableList'
+import {
+  CollapsableList,
+  type CollapsableListProps,
+  type Item,
+} from './react/CollapsableList/CollapsableList'
 
 export {CollapsableList}
 export type {CollapsableListProps, Item}

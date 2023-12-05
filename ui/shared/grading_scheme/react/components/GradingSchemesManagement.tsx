@@ -34,16 +34,16 @@ import {useDefaultGradingScheme} from '../hooks/useDefaultGradingScheme'
 import {useGradingSchemeCreate} from '../hooks/useGradingSchemeCreate'
 import {useGradingSchemeDelete} from '../hooks/useGradingSchemeDelete'
 import {useGradingSchemeUpdate} from '../hooks/useGradingSchemeUpdate'
-import {
+import type {
   GradingScheme,
   GradingSchemeCardData,
   GradingSchemeTemplate,
 } from '../../gradingSchemeApiModel'
 
 import {
-  GradingSchemeEditableData,
+  type GradingSchemeEditableData,
   GradingSchemeInput,
-  GradingSchemeInputHandle,
+  type GradingSchemeInputHandle,
 } from './form/GradingSchemeInput'
 import {defaultPointsGradingScheme} from '../../defaultPointsGradingScheme'
 import {canManageAccountGradingSchemes} from '../helpers/gradingSchemePermissions'

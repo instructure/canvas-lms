@@ -10,6 +10,7 @@
     "moduleResolution": "node", // required for non-commonjs imports
     "noEmit": true, // don't generate transpiled JS files, source-maps, or .d.ts files for Canvas source code
     "resolveJsonModule": true, // enables importing json files
+    "verbatimModuleSyntax": true, // for better tree-shaking
     "skipLibCheck": true, // don't do type-checking on dependencies' internal types for improved performance
     "strict": true, // enables a bunch of strict mode family options. See https://www.typescriptlang.org/tsconfig#strict
     "target": "es2020", // support the most modern JS features (let babel handle transpilation)

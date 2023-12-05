@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {act, fireEvent, render} from '@testing-library/react'
-import ModuleAssignments, {ModuleAssignmentsProps} from '../ModuleAssignments'
+import ModuleAssignments, {type ModuleAssignmentsProps} from '../ModuleAssignments'
 import fetchMock from 'fetch-mock'
 import {FILTERED_SECTIONS_DATA, FILTERED_STUDENTS_DATA, SECTIONS_DATA, STUDENTS_DATA} from './mocks'
 
