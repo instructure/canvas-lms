@@ -2722,6 +2722,7 @@ sv:
       Låter administratörer visa en logg med information om senast körda
       GraphQL-mutationer
   allows_aligning_outcomes_to_non_scoring_content_537ce399: "Tillåter koppling av lärandemål för innehåll som inte ges poäng"
+  allows_an_account_administrator_to_manage_the_impa_71112028: "Tillåter kontoadministratörer att hantera Impact-tjänsteintegration."
   allows_assessors_to_view_the_assessment_audit_tray_84c0c4c2: "Tillåt bedömare att se spårningsfältet för bedömningar i SpeedGrader för anonyma eller modererade uppgifter."
   allows_blueprint_course_settings_to_be_exported_an_a34bb7f: "Tillåter att inställningar för Blueprint-kurser exporteras och kopieras till en annan Blueprint-kurs"
   allows_blueprint_courses_to_keep_track_of_assignme_3faaa416: "Tillåter ritningskurser för att hålla reda på uppgiftens resurs-id-ändringar."
@@ -3387,6 +3388,7 @@ sv:
   allows_users_to_add_a_temporary_enrollment_with_a__22f73d4: "Tillåter användare att lägga till en tillfällig registrering med start- och slutdatum samt en roll"
   allows_users_to_add_conferences_from_the_calendar_f36c5008: "Tillåt användare att lägga till konferenser från kalendern"
   allows_users_to_add_lti_tools_with_conference_sele_c38545ab: "Tillåt att användare lägger till LTI-verktyg med placeringstyp för conference_selection"
+  allows_users_to_archive_outcomes_and_outcome_group_313b6b4e: "Tillåter användare att arkivera lärandemål och lärandemålsgrupper som inte längre används."
   allows_users_to_delete_a_temporary_enrollment_7fd33cdd: "Tillåter användare att ta bort en tillfällig registrering"
   allows_users_to_edit_an_existing_temporary_enrollm_b3543354: "Tillåter användare att redigera en tillfällig registrering"
   allows_users_to_edit_conferences_2d3c960c: "Gör det möjligt för användaren att redigera konferenser."
@@ -3461,6 +3463,7 @@ sv:
     other: "Ett fel inträffade när dessa lärandemål skulle flyttas: %{errorMessage}."
   an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*Ett fel uppstod*, skicka in ditt svar igen senare."
   an_error_occurred_please_try_again_95361e05: "Ett fel uppstod. Försök igen."
+  an_error_occurred_please_try_again_ceb4d85e: "Ett fel inträffade. Försök igen."
   an_error_occurred_please_try_again_error_error_8800b506: "Ett fel uppstod. Försök igen. Fel: %{error}"
   an_error_occurred_please_try_again_later_84223241: "Ett fel uppstod. Försök igen senare."
   an_error_occurred_publishing_grades_cfdf7631: "Ett fel uppstod när omdömen publicerades."
@@ -3854,6 +3857,9 @@ sv:
   apply_filter_7e4f6113: "Tillämpa filter"
   apply_filters_e98823c0: "Tillämpa filter"
   apply_filters_note_clicking_this_button_will_cause_753f04: "Använd filter. Obs! Om du klickar på den här knappen kommer sidan att laddas om."
+  apply_link_replacement_logic_to_a_select_list_of_e_7fadfdd7: |-
+      Tillämpa logik för länkersättning för att välja en lista med
+      endast element, istället för alla texter
   apply_missing_status_cd98e1d3: "Tillämpa saknad status"
   apply_score_1edd7cda: "Tillämpa poäng"
   apply_score_to_ungraded_afd025d0: "Tillämpa resultat på obedömd"
@@ -3891,7 +3897,9 @@ sv:
   arc_a935e585: ARC
   arc_media_recorder_in_rce_cf900c6: "Arc-medieinspelare i RCE"
   archive_3f794d7e: Arkivera
+  archive_grading_scheme_cbbf4264: "Arkivera omdömesscheman"
   archive_operation_failed_5504706: "Arkiveringen misslyckades"
+  archive_outcomes_20b869b6: "Arkivera lärandemål"
   archive_selected_d64506ca: "Arkivera valda"
   archived_de543437: Arkiverade
   archived_grading_schemes_6d698d0: "Arkiverade omdömesscheman"
@@ -4029,7 +4037,9 @@ sv:
   assign_eedf72bb: Tilldela
   assign_manually_1785dcfc: "Tilldela manuellt"
   assign_reviews_on_date_7e48ec50: "Tilldela bedömningar efter datum"
+  assign_temporary_enrollments_bdaaa58a: "Tilldela temporära registreringar"
   assign_temporary_enrollments_to_name_e8b43c5c: "Tilldela temporära registreringar till %{name}"
+  assign_temporary_enrollments_to_recipient_b25cb6be: "Tilldela temporära registreringar till %{recipient}"
   assign_this_module_a4685e57: "Tilldela den här modulen"
   assign_to_6b806cd9: "Tilldela till:"
   assign_to_95404a83: "Tilldela till"
@@ -4104,6 +4114,7 @@ sv:
   assignment_comments_e43ed898: Uppgiftskommentarer
   assignment_configuration_4153cb88: Uppgiftskonfigurering
   assignment_context_has_been_graded_for_name_af51759a: "%{assignment}, %{context} har bedömts för %{name}."
+  assignment_context_id_must_match_discussion_topic__891e7ed4: "Uppgiften context_id måste matcha diskussionsämnet context_id"
   assignment_created_assignment_name_course_name_324a5639: "Uppgift skapad – %{assignment_name}, %{course_name}"
   assignment_created_b3ee04d7: "Uppgiften har skapats"
   assignment_d8387b78: uppgift
@@ -6286,7 +6297,7 @@ sv:
   canvas_course_id_db4de2b8: canvas_course_id
   canvas_course_tutorial_video_5205c1c1: "Handledningsvideo för kurser i Canvas"
   canvas_dashboard_links_will_navigate_to_the_catalo_4143635e: "Länkar från Canvas-översikten till Catalog-översikten"
-  canvas_default_7f81a6b8: "Canvas förinställt"
+  canvas_default_7f81a6b8: Canvas-standard
   canvas_demo_7a005cf3: "Canvas Demo"
   canvas_did_not_recognize_your_identity_provider_cb0e50fc: "Canvas kände inte igen din identitetsleverantör"
   canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "Canvas har inget konto för användaren: %{user}"
@@ -6379,6 +6390,11 @@ sv:
     by_sa: "CC-attribution Dela lika"
     private: "Privat (Upphovsrättsskyddad)"
     public_domain: "Offentlig domän"
+  cc_attribution_f6de631f: "CC Attribution"
+  cc_attribution_no_derivatives_b006744f: "CC Attribution No Derivatives"
+  cc_attribution_non_commercial_39e0d30d: "CC Attribution Non-Commercial"
+  cc_attribution_non_commercial_no_derivatives_9fe74c00: "CC Attribution Non-Commercial No Derivatives"
+  cc_attribution_non_commercial_share_alike_c7edb1e5: "CC Attribution Non-Commercial Share Alike"
   cc_subtitles_a0d16ff6: CC/undertext
   ccp_zero_activity_73d094c3: "Noll aktivitet för CCP"
   cell_number_69a7c309: Mobiltelefonnummer
@@ -8865,6 +8881,7 @@ sv:
       invitation: "Inbjudan har skickats."
       linkError: "Något gick fel när användares studentlänkar uppdaterades. Försök igen senare."
       links: "Studentlänkarna har uppdaterats"
+      observerObservingObserverError: "Det går inte att observera användare med en annan användare som observeras av den aktuella användaren."
       sectionError: "Något gick fel när användarens sektioner uppdaterades. Försök igen senare."
       sections: "Sektionsregistreringar uppdaterades"
     invitation_sent: "Inbjudan har skickats!"
@@ -9625,15 +9642,18 @@ sv:
   create_new_group_fca5cc73: "Skapa ny grupp"
   create_new_group_set_13b1f62a: "Skapa ny gruppuppsättning"
   create_new_question_bank_86f2afc6: "Skapa ny frågebank …"
+  create_new_rubric_dd44f4e3: "Skapa ny matris"
   create_number_of_groups_groups_now_f89f220e: "Skapa %{number_of_groups} grupper nu"
   create_outcome_4dac05a0: "Skapa ett lärandemål"
   create_pace_4ff3e9c: "Skapa takt"
   create_pages_581a4d59: "Skapa sidor"
+  create_quiz_d08bb72a: "Skapa quiz"
   create_slots_71dbb2f8: "Skapa tider"
   create_subject_86de5618: "Skapa ämne"
   create_temporary_enrollment_3d4eaa33: "Skapa tillfällig registrering"
   create_temporary_enrollment_68eff9e8: "Skapa tillfällig registrering"
   create_temporary_enrollment_based_on_name_5291381e: "Skapa en tillfällig registrering baserad på %{name}"
+  create_temporary_enrollment_pairing_for_name_33086b8b: "Skapa parkoppling för tillfällig registrering för %{name}"
   create_theme_based_on_40651ed3: "Skapa tema baserat på"
   create_theme_based_on_name_7b1bd318: "Skapa tema baserat på %{name}"
   create_users_view: 
@@ -10679,6 +10699,7 @@ sv:
         one: "Visa 1 till inlägg"
         other: "Visa %{count} fler inlägg"
     error_anonymous_state_groups_create: "Gruppdiskussioner kan inte vara anonyma."
+    error_anonymous_state_groups_update: "Gruppdiskussioner kan inte vara anonyma."
     error_anonymous_state_unauthorized_create: "Du kan inte skapa en anonym diskussion"
     error_anonymous_state_unauthorized_update: "Du kan inte uppdatera en anonym diskussions tillstånd"
     error_draft_state_unauthorized: "Du har inte tillåtelse att ställa in det här ämnet till utkast."
@@ -11155,6 +11176,7 @@ sv:
   duplicate_assignment_name_3ca7d753: "Duplicera uppgiften %{name}"
   duplicate_discussion_title_43b39959: "Duplicera diskussion %{title}"
   duplicate_discussion_title_6537ef4d: "Duplicera diskussion %{title}"
+  duplicate_grading_scheme_d0e57758: "Duplicera omdömesschema"
   duplicate_ids_23b0a29e: "Dubbletter av ID"
   duplicate_item_339f54bb: "Kopiera objekt"
   duplicate_module_module_name_be40ad50: "Duplicerad modul %{module_name}"
@@ -12568,6 +12590,7 @@ sv:
   failed_to_export_some_tool_settings_c992fc56: "Misslyckades med att exportera vissa verktygsinställningar"
   failed_to_fetch_content_for_import_a042cc27: "Det gick inte att hämta innehåll för import."
   failed_to_fetch_migration_issues_data_a896da98: "Det gick inte att hämta data om migreringsproblem."
+  failed_to_fetch_temporary_enrollment_data_9422003: "Det gick inte att hämta data om tillfällig registrering"
   failed_to_get_new_activity_17e7ec7c: "Det gick inte att hämta ny aktivitet"
   failed_to_ignore_assignment_46565fa3: "Det gick inte att ignorera uppgiften"
   failed_to_import_media_objects_4c1fcb4f: "Det gick inte att importera mediaobjekt"
@@ -13207,6 +13230,7 @@ sv:
   grade_anonymously_6c37133a: "Sätt omdöme anonymt"
   grade_assignment_7c1abc11: "Bedöm %{assignment}"
   grade_by_9ea3661e: "Omdöme av"
+  grade_by_b2742bc: "Omdöme efter"
   grade_by_question_9d9b8a71: "Bedöm baserat på fråga"
   grade_calculator_performance_improvements_564af0de: "Förbättrade prestanda i omdömesberäkningar"
   grade_change_activity_75fb525: "Ändringsaktivitet för omdömen"
@@ -14672,6 +14696,7 @@ sv:
                     filer.  Grupper kan samarbeta om dokument eller till och med planera webbkonferenser.
                     Man skulle faktiskt kunna säga att det är som en minikurs där du kan arbeta med ett mindre antal studenter på ett
                     mer fokuserat projekt.
+  groups_can_only_be_part_of_the_actively_selected_g_b59e301b: "Grupper kan endast vara del av en aktivt valt gruppsammansättning."
   groups_cannot_have_size_restrictions_to_assign_by__7d36fa32: "Grupper får inte ha storleksbegränsningar för tilldelning per sektion"
   groups_course_c73e4c2c: "Grupper (kurs)"
   groups_delete_bb79a2b4: "Grupper – ta bort"
@@ -15469,6 +15494,9 @@ sv:
   immediately_c128ede6: Omedelbart
   immersive_reader_7b87538: "Avancerad läsare"
   immersive_reader_failed_to_load_bc8d4dd4: "Den Avancerade läsaren lästes inte in"
+  impact_58f41b1d: Påverkan
+  impact_is_an_add_on_to_canvas_lms_contact_your_csm_23307a67: "Impact är ett tilläggsprogram till Canvas LMS. Kontakta din CSM om du är intresserad."
+  impact_manage_3641fd7f: "Impact – hantera"
   import_1b31507: Importera
   import_a_set_of_outcomes_6b782192: "Importera en uppsättning lärandemål"
   import_anyway_8c996ef6: "Importera i alla fall"
@@ -16695,6 +16723,8 @@ sv:
     sv: Svenska
   location_3b6ff307: "Plats:"
   location_e17bd402: Plats
+  location_used_8909c9af: "Platsen har använts"
+  locations_used_1c050e8e: "Platserna har använts"
   lock_at_time_3c8a044e: "Lås klockan: %{time}"
   lock_c341af13: Lås
   lock_date_cannot_be_after_course_end_a473158b: "Låsdatumet får inte infalla efter kursens slut"
@@ -17003,6 +17033,7 @@ sv:
   manage_groups_4c3a2a9f: "Hantera grupper"
   manage_home_4fc3480b: "Hantera startsidan"
   manage_home_for_coursename_5e5c7661: "Hantera startsidan för %{courseName}"
+  manage_impact_7ff2d6de: "Hantera Impact"
   manage_internal_analytics_fcfa306e: "Hantera interna analyser"
   manage_item_name_6118d4b0: "Hantera %{item_name}"
   manage_labels_98611fe: "Hantera etiketter"
@@ -17010,6 +17041,8 @@ sv:
   manage_lti_8fcdc6ba: "Hantera LTI"
   manage_module_name_dfe16816: "Hantera %{module_name}"
   manage_name_7f55f792: "Hantera %{name}"
+  manage_name_s_temporary_enrollment_providers_dcae7962: "Hantera leverantörer för tillfälliga registreringar för %{name}"
+  manage_name_s_temporary_enrollment_recipients_e4eca781: "Hantera mottagare av tillfälliga registreringar för %{name}"
   manage_options_for_name_83278ad0: "Hantera alternativ för %{name}"
   manage_pages_4d2adeb6: "Hantera sidor"
   manage_profile_pictures_40c958ce: "Hantera profilbilder"
@@ -22097,6 +22130,7 @@ sv:
   ppt_9393890d: ppt
   practice_quiz_19a8505d: Övningsquiz
   pre_processing_92865c1d: Förbearbetning
+  precise_link_replacement_on_content_migrations_51976596: "Precis länkersättning på innehållsmigreringar"
   prefer_lti_tools_with_a_matching_client_id_when_fi_b6cf4809: "Föredra LTI-verktyg med matchande klient-ID när ett externt verktyg hittas"
   prefetch_user_ids_in_gradebook_b96521b0: "Hämtar användar-ID:n i bedömningsöversikten i förväg"
   prerequisite_completion_period_c562d63: "Slutförandeperiod för förutsättning"
@@ -23136,6 +23170,7 @@ sv:
         manage_question_banks: "Hantera frågebanker"
         publish_multiple_quizzes: "Publicera flera quiz"
         settings: Inställningar
+      quiz_search: "Sök ..."
       quizzes_title: Quiz
       search_for_quiz: "Sök efter ett quiz"
       title_add_quiz: "Lägg till quiz"
@@ -24559,6 +24594,8 @@ sv:
   remove_name_624e06be: "Ta bort %{name}"
   remove_name_as_an_admin_c296cf49: "Ta bort %{name} som admin"
   remove_name_calendar_bdc329d9: "Ta bort %{name}-kalendern"
+  remove_name_content_requirement_7af56c50: "Ta bort innehållskrav för %{name}"
+  remove_name_prerequisite_98377b60: "Ta bort förutsättning för %{name}"
   remove_null_values_from_live_event_payloads_3c826f: "Ta bort null-värden från livehändelsers nyttolaster"
   remove_observers_from_courses_703edc34: "Ta bort observatörer från kurser"
   remove_optionname_8a67379b: "Ta bort %{optionName}"
@@ -25061,6 +25098,8 @@ sv:
   rubric_deleted_3d9efc18: "Matris har tagits bort"
   rubric_enhancements_73bf351c: Matrisförbättringar
   rubric_fc39da76: Matris
+  rubric_name_e11b76de: Matrisnamn
+  rubric_options_c92d7130: Matrisalternativ
   rubric_updated_103e24dc: "Matris har uppdaterats"
   rubric_was_successfully_submitted_b0766474: "Matrisen lämnades in"
   rubrics: 
@@ -25427,6 +25466,7 @@ sv:
   search_permissions_915bbd09: "Sök behörigheter"
   search_results_4d5af4eb: Sökresultat
   search_results_for_62243f02: "sökresultat för"
+  search_rubrics_8d933686: "Sök efter matriser"
   search_students_e1f506c: "Sök studenter"
   search_term_is_mutually_exclusive_with_name_and_do_225d27f1: "search_term kan utesluta namn eller domän"
   search_term_must_be_at_least_num_characters_669098ed: "Söktermen måste bestå av minst %{num} tecken"
@@ -29077,6 +29117,7 @@ sv:
   this_report_gets_the_submissions_for_courses_d83bb449: "Den här rapporten hämtar inlämningarna för en kurs."
   this_report_provides_a_list_of_all_developer_keys__dd2bfadf: "Den här rapporten ger en lista över alla utvecklarnycklar som är tillgängliga för institutionen. Dessa nycklar kan antingen installeras direkt i rotkontot som rapporten körs från eller kan ärvas från överordnade rotkonton. Utvecklarnycklar kan antingen vara API- eller LTI-nycklar."
   this_report_provides_all_active_eportfolios_for_th_f7432621: "Den här rapporten tillhandahåller alla aktiva e-portföljer för den aktuella lärosätet. Du kan även välja ”Ta endast med e-portföljer från användare utan registreringar” för att minska omfånget för e-portföljsresultaten till endast de användare som inte har registreringar. Du kan även köra rapporten med ”Ta med borttagna objekt” för att endast ta med de e-portföljer som tagits bort."
+  this_report_provides_transparency_regarding_instru_6f9e227e: "Den här rapporten tillhandahåller transparens vad gäller Instructure-anställds åtkomst till kontot. Med ett åtkomstmedgivande kan Instructure-anställda få åtkomst till kontot under en begränsad tid (t.ex. när de ger support för kontot eller utreder en incident. Om ett medgivande upphör att gälla måste de anställda förnya medgivandet innan de försöker komma åt kontot via användargränssnittet eller API:et."
   this_report_shows_all_learning_outcomes_that_exist_e77bd04b: "Denna rapport visar alla läranderesultat som finns inom detta konto. Den resulterande csv-filen kommer att ha en rad per utfall, och kommer att visa detaljerna för alla associerade attribut med varje utfall."
   this_report_shows_all_the_activity_from_users_enro_46394fa6: |-
       Den här rapporten visar alla aktiviteter för en användare som registrerat sig för en given kurs eller
@@ -30935,6 +30976,7 @@ sv:
   userinfo_d21114ef: Användarinformation
   username_47bb5bbe: Användarnamn
   username_could_not_be_found_6c3e8383: "Användarnamnet hittades inte"
+  username_s_temporary_enrollment_enrollmenttype_20165bec: "Tillfällig %{enrollmentType}-registrering för  %{userName}"
   username_saved_successfully_9303974f: "*%{userName}* sparades!"
   username_saved_successfully_they_should_receive_an_877e31e: "*%{userName}* sparades! De bör får en e-postbekräftelse inom kort."
   users: 
@@ -32228,6 +32270,7 @@ sv:
   your_file_is_being_uploaded_to_the_gradebook_and_y_aa5edfc6: "Din fil laddas upp till betygsboken och du kan lämna den här sidan när du vill. Om du har en stor CSV-fil kan det ta ett par minuter att uppdatera. För att förhindra att data över skrivs ber vi dig att vänligen bekräfta att uppladdning är färdig och att din Betygsbok är korrekt innan du gör ändringar."
   your_grade_has_been_updated_f1cd8f06: "Ditt betyg har uppdaterats"
   your_gradebook_export_has_been_cancelled_c1b99ca1: "Din export av omdömesboken har avbrutits."
+  your_grading_schemes_b785: "Dina omdömesscheman"
   your_group_is_being_created_88c0c024: "Din grupp skapas"
   your_groups_are_being_created_50156e34: "Dina grupper skapas."
   your_homeroom_is_currently_unpublished_93c14f4f: "Ditt fjärrundervisningsrum är för närvarande inte publicerat."
