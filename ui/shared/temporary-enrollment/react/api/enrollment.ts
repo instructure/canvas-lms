@@ -67,15 +67,15 @@ export async function fetchTemporaryEnrollments(
 /**
  * Creates a temporary enrollment pairing object
  *
- * @param {string} rootAccountId Root account ID
+ * @param {string} accountId Account ID
  * @returns {Promise<TemporaryEnrollmentPairing>} Resolves to a temporary enrollment pairing object
  */
 export async function createTemporaryEnrollmentPairing(
-  rootAccountId: string
+  accountId: string
 ): Promise<TemporaryEnrollmentPairing> {
   try {
     const response = await doFetchApi({
-      path: `/api/v1/accounts/${rootAccountId}/temporary_enrollment_pairings`,
+      path: `/api/v1/accounts/${accountId}/temporary_enrollment_pairings`,
       method: 'POST',
     })
     return response.json.temporary_enrollment_pairing

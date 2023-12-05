@@ -65,6 +65,7 @@ const enrollmentsByCourse = [
     id: '1',
     name: 'Apple Music',
     workflow_state: 'available',
+    account_id: '1',
     enrollments: [
       {
         role_id: '92',
@@ -106,7 +107,7 @@ const props: Props = {
 }
 
 const ENROLLMENTS_URI = encodeURI(
-  `/api/v1/users/${props.user.id}/courses?enrollment_state=active&include[]=sections&per_page=${MAX_ALLOWED_COURSES_PER_PAGE}`
+  `/api/v1/users/${props.user.id}/courses?enrollment_state[]=active&enrollment_state[]=completed&include[]=sections&account_id=${enrollmentsByCourse[0].account_id}&per_page=${MAX_ALLOWED_COURSES_PER_PAGE}`
 )
 
 // converts local time to UTC time based on a given date and time
@@ -128,12 +129,22 @@ function formatDateToLocalString(utcDateStr: string) {
 }
 
 describe('TempEnrollAssign', () => {
+  beforeAll(() => {
+    // @ts-expect-error
+    window.ENV = {ACCOUNT_ID: '1'}
+  })
+
   afterEach(() => {
     fetchMock.reset()
     fetchMock.restore()
     jest.clearAllMocks()
     // ensure a clean state before each tests
     localStorage.clear()
+  })
+
+  afterAll(() => {
+    // @ts-expect-error
+    window.ENV = {}
   })
 
   describe('With Successful API calls', () => {

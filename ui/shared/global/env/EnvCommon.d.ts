@@ -76,6 +76,7 @@ export interface EnvCommon {
     id: string
     label: string
   }[]
+  ACCOUNT_ID: string
   DOMAIN_ROOT_ACCOUNT_ID: string
   ROOT_ACCOUNT_ID: string
   k12: false

@@ -80,10 +80,9 @@
 <div id="user-info-fieldsets">
   <%= render :partial => 'users/name' %>
   <%= render :partial => 'users/logins' %>
-
   <% if @domain_root_account.feature_enabled?(:temporary_enrollments) &&
         @enrollments.detect(&:temporary_enrollment_source_user_id).present? &&
-        @domain_root_account.grants_any_right?(@current_user, *RoleOverride::MANAGE_TEMPORARY_ENROLLMENT_PERMISSIONS)%>
+        @context_account.grants_any_right?(@current_user, *RoleOverride::MANAGE_TEMPORARY_ENROLLMENT_PERMISSIONS)%>
     <fieldset id="courses" class="">
     <legend><%= t('Temporary Enrollments') %></legend>
     <% num_enrollments = 0 %>

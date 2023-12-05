@@ -684,6 +684,9 @@ class CoursesController < ApplicationController
   # @argument homeroom [Optional, Boolean]
   #   If set, only return homeroom courses.
   #
+  # @argument account_id [Optional, String]
+  #   If set, only include courses associated with this account
+  #
   # @returns [Course]
   def user_index
     GuardRail.activate(:secondary) do
@@ -3952,6 +3955,11 @@ class CoursesController < ApplicationController
       enrollments.reject! { |e| homeroom_ids.exclude?(e.course_id) }
     end
 
+    if params[:account_id]
+      account = api_find(Account.active, params[:account_id])
+      enrollments = enrollments.select { |e| e.course.account == account }
+    end
+
     Canvas::Builders::EnrollmentDateBuilder.preload_state(enrollments)
     enrollments_by_course = enrollments.group_by(&:course_id).values
     enrollments_by_course.sort_by! do |course_enrollments|
@@ -4013,7 +4021,9 @@ class CoursesController < ApplicationController
     return render_unauthorized_action unless @current_user.present?
 
     @user = (params[:user_id] == "self") ? @current_user : api_find(User, params[:user_id])
-    authorized_action(@user, @current_user, :read)
+    unless @user.grants_right?(@current_user, :read) || @user.check_accounts_right?(@current_user, :read)
+      render_unauthorized_action
+    end
   end
 
   def visibility_configuration(params)

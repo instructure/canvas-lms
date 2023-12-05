@@ -915,6 +915,10 @@ class EnrollmentsApiController < ApplicationController
   #
   # Returns a JSON Object containing the temporary enrollment status for a user.
   #
+  # @argument account_id [Optional, String]
+  #  The ID of the account to check for temporary enrollment status.
+  #  Defaults to the domain root account if not provided.
+  #
   # @example_response
   #   {
   #     "is_provider": false, "is_recipient": true
@@ -922,9 +926,9 @@ class EnrollmentsApiController < ApplicationController
   def show_temporary_enrollment_status
     GuardRail.activate(:secondary) do
       if (user = api_find(User, params[:user_id])) && @domain_root_account&.feature_enabled?(:temporary_enrollments)
-        if user.account.grants_right?(@current_user, session, :read_roster)
-          current_and_future = %w[active invited creation_pending pending_active pending_invited]
-          enrollment_scope = Enrollment.joins(:enrollment_state).where(enrollment_states: { state: current_and_future })
+        if user.grants_right?(@current_user, session, :api_show_user)
+          account = params[:account_id].present? ? api_find(Account, params[:account_id]) : @domain_root_account
+          enrollment_scope = Enrollment.active_or_pending_by_date.joins(:course).where(courses: { account_id: account.id })
 
           is_provider = enrollment_scope.temporary_enrollment_recipients_for_provider(user).exists?
           is_recipient = enrollment_scope.temporary_enrollments_for_recipient(user).exists?
@@ -983,11 +987,13 @@ class EnrollmentsApiController < ApplicationController
       temp_enroll_params = params.slice(:temporary_enrollments_for_recipient,
                                         :temporary_enrollment_recipients_for_provider)
       if temp_enroll_params.present?
-        if user.account.grants_right?(@current_user, session, :read_roster)
-          return temporary_enrollment_conditions(user, temp_enroll_params)
-        else
-          render_unauthorized_action and return false
-        end
+        enrollments =
+          temporary_enrollment_conditions(user, temp_enroll_params).to_a.select do |e|
+            e.course.account.grants_any_right?(@current_user, *RoleOverride::MANAGE_TEMPORARY_ENROLLMENT_PERMISSIONS)
+          end
+        return Enrollment.where(id: enrollments) if enrollments.present?
+
+        render_unauthorized_action and return false
       end
     end
 
