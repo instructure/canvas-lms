@@ -118,7 +118,6 @@ export type SpeedGrader = {
   handleStatePopped: (event: PopStateEvent) => void
   getStudentNameAndGrade: (student?: StudentWithSubmission) => string
   handleStudentChanged: (historyBehavior: 'push' | 'replace' | null) => void
-  isStudentConcluded: (currentStudent: string) => boolean
   postPolicies?: PostPolicies
   reassignAssignment: () => void
   refreshFullRubric: () => void

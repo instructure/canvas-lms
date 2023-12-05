@@ -29,7 +29,6 @@ import type {
 import type {
   Attachment,
   AttachmentData,
-  Enrollment,
   GradingPeriod,
   Submission,
   SubmissionComment,
@@ -99,6 +98,7 @@ import {
   renderSettingsMenu,
   configureRecognition,
   hideMediaRecorderContainer,
+  isStudentConcluded,
   renderDeleteAttachmentLink,
   renderPostGradesMenu,
   renderStatusMenu,
@@ -2449,7 +2449,11 @@ EG = {
       )
     )
 
-    const isConcluded = EG.isStudentConcluded(this.currentStudent[anonymizableId])
+    const isConcluded = isStudentConcluded(
+      window.jsonData.studentMap,
+      this.currentStudent[anonymizableId],
+      ENV.selected_section_id
+    )
     $enrollment_concluded_notice.showIf(isConcluded)
 
     const gradingPeriod = window.jsonData.gradingPeriods[(submissionHolder || {}).grading_period_id]
@@ -2476,17 +2480,6 @@ EG = {
     }
 
     EG.showDiscussion()
-  },
-
-  isStudentConcluded(student: string) {
-    if (!window.jsonData.studentMap) {
-      return false
-    }
-
-    return _.some(
-      window.jsonData.studentMap[student].enrollments,
-      (enrollment: Enrollment) => enrollment.workflow_state === 'completed'
-    )
   },
 
   refreshSubmissionsToView() {
@@ -3008,7 +3001,11 @@ EG = {
     // set.  what this is saying is: if I am able to grade this
     // assignment (I am administrator in the course) or if I wrote
     // this comment... and if the student isn't concluded
-    const isConcluded = EG.isStudentConcluded(EG.currentStudent[anonymizableId])
+    const isConcluded = isStudentConcluded(
+      window.jsonData.studentMap,
+      EG.currentStudent[anonymizableId],
+      ENV.selected_section_id
+    )
     const commentIsDeleteableByMe =
       (ENV.RUBRIC_ASSESSMENT.assessment_type === 'grading' ||
         ENV.RUBRIC_ASSESSMENT.assessor_id === comment[anonymizableAuthorId]) &&
@@ -3054,7 +3051,11 @@ EG = {
   addCommentSubmissionHandler(commentElement, comment) {
     const that = this
 
-    const isConcluded = EG.isStudentConcluded(EG.currentStudent[anonymizableId])
+    const isConcluded = isStudentConcluded(
+      window.jsonData.studentMap,
+      EG.currentStudent[anonymizableId],
+      ENV.selected_section_id
+    )
     commentElement
       .find('.submit_comment_button')
       .click(_event => {
@@ -3482,7 +3483,13 @@ EG = {
   // should only be called from the anonymous function attached so
   // #submit_same_score.
   handleGradeSubmit(e, use_existing_score: boolean) {
-    if (EG.isStudentConcluded(EG.currentStudent[anonymizableId])) {
+    if (
+      isStudentConcluded(
+        window.jsonData.studentMap,
+        EG.currentStudent[anonymizableId],
+        ENV.selected_section_id
+      )
+    ) {
       EG.showGrade()
       return
     }
