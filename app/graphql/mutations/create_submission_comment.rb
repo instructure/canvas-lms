@@ -35,8 +35,9 @@ class Mutations::CreateSubmissionComment < Mutations::BaseMutation
     submission = Submission.find input[:submission_id]
     verify_authorized_action!(submission, :comment)
 
+    latest_attempt = submission.context.feature_enabled?(:assignments_2_student) ? submission.attempt : nil
     opts = {
-      attempt: input[:attempt],
+      attempt: input[:attempt] || latest_attempt,
       author: current_user,
       comment: input[:comment]
     }

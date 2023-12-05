@@ -2299,6 +2299,7 @@ class Submission < ActiveRecord::Base
     opts[:comment] = opts[:comment].try(:strip) || ""
     opts[:attachments] ||= opts[:comment_attachments]
     opts[:draft] = !!opts[:draft_comment]
+    opts[:attempt] = (!unsubmitted? && !opts.key?(:attempt)) ? self.attempt : opts[:attempt]
     if opts[:comment].empty?
       if opts[:media_comment_id]
         opts[:comment] = ""

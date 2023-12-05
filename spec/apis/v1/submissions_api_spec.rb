@@ -1153,7 +1153,7 @@ describe "Submissions API", type: :request do
                           "custom_grade_status_id" => nil,
                           "submission_comments" =>
          [{ "comment" => "Well here's the thing...",
-            "attempt" => nil,
+            "attempt" => 1,
             "media_comment" => {
               "media_id" => "3232",
               "media_type" => "audio",
@@ -1526,7 +1526,7 @@ describe "Submissions API", type: :request do
          "user_id" => student1.id,
          "submission_comments" =>
          [{ "comment" => "Well here's the thing...",
-            "attempt" => nil,
+            "attempt" => 3,
             "media_comment" => {
               "media_type" => "audio",
               "media_id" => "3232",
