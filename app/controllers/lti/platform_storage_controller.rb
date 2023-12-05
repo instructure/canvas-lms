@@ -60,17 +60,15 @@ module Lti
 
     def self.js_rev
       js_url = Canvas::Cdn.registry.url_for("javascripts/lti_post_message_forwarding.js")
+      # Seems to be nil at least sometimes in specs
+      return Date.today.to_s unless js_url
+
       File.basename(js_url).split("-").last.split(".").first
     end
 
     # render a *very* bare-bones page that only has the JS it needs
     # to forward postMessages to the parent Canvas window
     def post_message_forwarding
-      unless Lti::PlatformStorage.flag_enabled?
-        render status: :not_found
-        return
-      end
-
       @parent_origin = "#{HostUrl.protocol}://#{parent_domain}"
 
       set_extra_csp_frame_ancestor!
@@ -101,20 +99,6 @@ module Lti
     # load an iframe that points to `canvas.instructure.com`
     def set_extra_csp_frame_ancestor!
       csp_frame_ancestors << parent_domain
-    end
-
-    # In most instances, the OIDC Auth endpoint will share a domain with the Issuer Identifier/iss.
-    # Instructure-hosted Canvas overrides this method in MRA, since it uses (for example):
-    # `canvas.instructure.com` for the iss, and
-    # `sso.canvaslms.com` for the OIDC Auth endpoint
-    # format: canvas.docker, canvas.instructure.com (no protocol)
-    def oidc_auth_domain
-      return current_domain if Rails.env.development?
-
-      iss = CanvasSecurity.config["lti_iss"] || current_domain
-      return iss unless /^https?:/.match?(iss)
-
-      URI(iss)&.host
     end
 
     def parent_domain

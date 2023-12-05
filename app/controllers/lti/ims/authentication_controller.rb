@@ -288,7 +288,7 @@ module Lti
       def lti_storage_target
         return nil unless decoded_jwt["include_storage_target"]
 
-        Lti::PlatformStorage.lti_storage_target
+        Lti::PlatformStorage::FORWARDING_TARGET
       end
 
       def id_token

@@ -19,14 +19,6 @@ microsoft_group_enrollments_syncing:
     If enabled, syncing course enrollments to Microsoft Groups will be
     available. Account admins may enable this in account settings.
   applies_to: RootAccount
-lti_platform_storage:
-  state: hidden
-  display_name: LTI Platform Storage
-  description: |-
-    Controls the final changes needed to fully conform to the LTI Platform Storage
-    spec, including receiving messages addressed to the correct OIDC Auth
-    URI origin, and the postMessage forwarding proxy frame.
-  applies_to: SiteAdmin
 lti_multiple_assignment_deep_linking:
   state: hidden
   display_name: LTI Multiple Assignment Deep Linking

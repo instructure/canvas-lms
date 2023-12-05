@@ -1470,22 +1470,9 @@ describe ExternalToolsController do
         Account.site_admin.enable_feature!(:lti_rce_postmessage_support)
       end
 
-      context "with platform storage flag enabled" do
-        before { Account.site_admin.enable_feature!(:lti_platform_storage) }
-
-        it "renders the sibling forwarder frame once" do
-          subject
-          expect(response.body.scan('id="post_message_forwarding').count).to eq 1
-        end
-      end
-
-      context "with platform storage flag disabled" do
-        before { Account.site_admin.disable_feature!(:lti_platform_storage) }
-
-        it "does not render the sibling forwarder frame" do
-          subject
-          expect(response.body.scan('id="post_message_forwarding').count).to eq 0
-        end
+      it "renders the sibling forwarder frame once" do
+        subject
+        expect(response.body.scan('id="post_message_forwarding').count).to eq 1
       end
 
       it "renders the tool launch iframe" do

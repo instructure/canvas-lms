@@ -347,7 +347,6 @@ class ApplicationController < ActionController::Base
   # so altogether we can get them faster the vast majority of the time
   JS_ENV_SITE_ADMIN_FEATURES = %i[
     featured_help_links
-    lti_platform_storage
     account_level_blackout_dates
     deleted_user_tools
     render_both_to_do_lists

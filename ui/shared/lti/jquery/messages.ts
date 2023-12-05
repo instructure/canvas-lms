@@ -46,9 +46,6 @@ const SUBJECT_ALLOW_LIST = [
   'lti.setUnloadMessage',
   'lti.showAlert',
   'lti.showModuleNavigation',
-  'org.imsglobal.lti.capabilities', // not part of the final LTI Platform Storage spec
-  'org.imsglobal.lti.get_data', // not part of the final LTI Platform Storage spec
-  'org.imsglobal.lti.put_data', // not part of the final LTI Platform Storage spec
   'lti.capabilities',
   'lti.get_data',
   'lti.put_data',
@@ -120,9 +117,6 @@ const handlers: Record<
   'lti.setUnloadMessage': () => import(`./subjects/lti.setUnloadMessage`),
   'lti.showAlert': () => import(`./subjects/lti.showAlert`),
   'lti.showModuleNavigation': () => import(`./subjects/lti.showModuleNavigation`),
-  'org.imsglobal.lti.capabilities': () => import(`./subjects/lti.capabilities`),
-  'org.imsglobal.lti.get_data': () => import(`./subjects/lti.get_data`),
-  'org.imsglobal.lti.put_data': () => import(`./subjects/lti.put_data`),
   'lti.capabilities': () => import(`./subjects/lti.capabilities`),
   'lti.get_data': () => import(`./subjects/lti.get_data`),
   'lti.put_data': () => import(`./subjects/lti.put_data`),
@@ -135,10 +129,7 @@ const handlers: Record<
  * @param e
  * @returns
  */
-async function ltiMessageHandler(
-  e: MessageEvent<unknown>,
-  platformStorageFeatureFlag: boolean = false
-) {
+async function ltiMessageHandler(e: MessageEvent<unknown>) {
   if (isDevtoolMessageData(e.data)) {
     return false
   }
@@ -185,9 +176,6 @@ async function ltiMessageHandler(
     // Since tools launched from within an active RCE are inside a nested
     // iframe, some subjects can't find the tool frame and so are not supported
     responseMessages.sendUnsupportedSubjectError('Not supported inside Rich Content Editor')
-    return false
-  } else if (platformStorageFeatureFlag && subject.includes('org.imsglobal.')) {
-    responseMessages.sendUnsupportedSubjectError()
     return false
   } else {
     try {
@@ -242,9 +230,8 @@ function monitorLtiMessages() {
   // This should only be true when canvas is in an iframe (like for postMessage forwarding),
   // to prevent duplicate listeners across canvas windows.
   const shouldIgnoreLtiPostMessages: boolean = ENV?.IGNORE_LTI_POST_MESSAGES || false
-  const platformStorageFeatureFlag: boolean = ENV?.FEATURES?.lti_platform_storage || false
   const cb = (e: MessageEvent<unknown>) => {
-    if (e.data !== '') ltiMessageHandler(e, platformStorageFeatureFlag)
+    if (e.data !== '') ltiMessageHandler(e)
   }
   if (!hasListener && !shouldIgnoreLtiPostMessages) {
     window.addEventListener('message', cb)

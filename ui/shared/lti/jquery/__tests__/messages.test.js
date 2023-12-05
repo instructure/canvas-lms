@@ -92,27 +92,16 @@ describe('ltiMessageHander', () => {
   })
 
   describe('LTI Platform Storage subjects', () => {
-    it('processes older org.imsglobal.lti.* subjects', async () => {
-      await expectMessage({subject: 'org.imsglobal.lti.capabilities'}, true)
-      await expectMessage({subject: 'org.imsglobal.lti.put_data'}, true)
-      await expectMessage({subject: 'org.imsglobal.lti.get_data'}, true)
-    })
-
     it('processes newer lti.* subjects', async () => {
       await expectMessage({subject: 'lti.capabilities'}, true)
       await expectMessage({subject: 'lti.put_data'}, true)
       await expectMessage({subject: 'lti.get_data'}, true)
     })
 
-    describe('when flag is enabled', () => {
-      it('rejects older org.imsglobal.lti.* subjects', async () => {
-        expect(
-          await ltiMessageHandler(
-            postMessageEvent({subject: 'org.imsglobal.lti.capabilities'}),
-            true
-          )
-        ).toBe(false)
-      })
+    it('rejects older org.imsglobal.lti.* subjects', async () => {
+      expect(
+        await ltiMessageHandler(postMessageEvent({subject: 'org.imsglobal.lti.capabilities'}))
+      ).toBe(false)
     })
   })
 
