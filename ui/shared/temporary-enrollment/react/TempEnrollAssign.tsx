@@ -270,12 +270,15 @@ export function TempEnrollAssign(props: Props) {
 
   useEffect(() => {
     const fetchData = async () => {
+      const accountId =
+        ENV.ACCOUNT_ID === ENV.ROOT_ACCOUNT_ID ? ENV.ROOT_ACCOUNT_ID : ENV.ACCOUNT_ID
       try {
         const result = await doFetchApi({
           path: `/api/v1/users/${userProps.id}/courses`,
           params: {
             enrollment_state: ['active', 'completed'],
             include: ['sections'],
+            account_id: accountId,
             per_page: MAX_ALLOWED_COURSES_PER_PAGE,
           },
         })
@@ -404,7 +407,7 @@ export function TempEnrollAssign(props: Props) {
     try {
       setErrorMsg('')
       const temporaryEnrollmentPairing: TemporaryEnrollmentPairing =
-        await createTemporaryEnrollmentPairing(ENV.ROOT_ACCOUNT_ID)
+        await createTemporaryEnrollmentPairing(ENV.ACCOUNT_ID)
 
       if (props.tempEnrollmentsPairing && props.tempEnrollmentsPairing.length >= 1) {
         // delete any enrollments that were not selected

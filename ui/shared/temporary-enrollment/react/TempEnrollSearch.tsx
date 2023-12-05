@@ -47,7 +47,7 @@ interface Props {
   searchFail: Function
   searchSuccess: Function
   canReadSIS?: boolean
-  foundEnroll?: User | null
+  foundUser?: User | null
 }
 
 export function TempEnrollSearch(props: Props) {
@@ -56,7 +56,7 @@ export function TempEnrollSearch(props: Props) {
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
   const [search, setSearch] = useState('')
-  const [enrollment, setEnrollment] = useState<User>(EMPTY_USER)
+  const [userDetails, setUserDetails] = useState<User>(EMPTY_USER)
 
   const handleSearchTypeChange = (_event: ChangeEvent<HTMLInputElement>, value: string) => {
     setSearchType(value)
@@ -69,18 +69,18 @@ export function TempEnrollSearch(props: Props) {
   }
 
   // user_lists.json does not always return email, sis id, and login
-  const fetchUserDetails = async (user: any) => {
+  const fetchUserDetails = async (user: User) => {
     try {
       const {json} = await doFetchApi({
-        path: `/api/v1/users/${user.user_id}`,
+        path: `/api/v1/users/${user.user_id}/profile`,
         method: 'GET',
       })
-      setEnrollment(json)
+      setUserDetails(json)
       setMessage('')
       props.searchSuccess(json)
     } catch (error: any) {
       setMessage(error)
-      setEnrollment(EMPTY_USER)
+      setUserDetails(EMPTY_USER)
       props.searchFail()
     } finally {
       setLoading(false)
@@ -91,7 +91,7 @@ export function TempEnrollSearch(props: Props) {
     const foundUser = response.users[0]
     if (typeof foundUser === 'undefined') {
       setMessage(I18n.t('User could not be found.'))
-      setEnrollment(EMPTY_USER)
+      setUserDetails(EMPTY_USER)
       props.searchFail()
       setLoading(false)
     } else if (response.users.length === 1 && foundUser.user_id !== props.user.id) {
@@ -99,22 +99,22 @@ export function TempEnrollSearch(props: Props) {
       fetchUserDetails(foundUser)
     } else {
       setMessage(
-        I18n.t('The user found matches the source user. Please search for a different user.')
+        I18n.t('The user found matches the provider. Please search for a new recipient user.')
       )
-      setEnrollment(EMPTY_USER)
+      setUserDetails(EMPTY_USER)
       props.searchFail()
       setLoading(false)
     }
   }
 
   useEffect(() => {
-    if (props.page === 1 && !props.foundEnroll) {
+    if (props.page === 1 && !props.foundUser) {
       setLoading(true)
 
       const findUser = async () => {
         try {
           const {json} = await doFetchApi({
-            path: `/accounts/${ENV.ROOT_ACCOUNT_ID}/user_lists.json`,
+            path: `/accounts/${ENV.ACCOUNT_ID}/user_lists.json`,
             method: 'POST',
             params: {user_list: search, v2: true, search_type: searchType},
           })
@@ -122,7 +122,7 @@ export function TempEnrollSearch(props: Props) {
           processSearchApiResponse(json)
         } catch (error: any) {
           setMessage(error.message)
-          setEnrollment(EMPTY_USER)
+          setUserDetails(EMPTY_USER)
 
           props.searchFail()
 
@@ -131,8 +131,8 @@ export function TempEnrollSearch(props: Props) {
       }
 
       findUser()
-    } else if (props.foundEnroll) {
-      setEnrollment({...props.foundEnroll})
+    } else if (props.foundUser) {
+      setUserDetails({...props.foundUser})
     }
     // useEffect hook should only be triggered when page is changed
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -168,7 +168,7 @@ export function TempEnrollSearch(props: Props) {
     )
   }
 
-  if (props.page === 1 && enrollment.name !== '') {
+  if (props.page === 1 && userDetails.name !== '') {
     // user confirmation page
     return (
       <Flex gap="medium" direction="column">
@@ -189,7 +189,7 @@ export function TempEnrollSearch(props: Props) {
         <Flex.Item shouldGrow={true}>
           <Alert variant="success" margin="0">
             {I18n.t('%{name} is ready to be assigned temporary enrollments.', {
-              name: enrollment.name,
+              name: userDetails.name,
             })}
           </Alert>
         </Flex.Item>
@@ -207,10 +207,10 @@ export function TempEnrollSearch(props: Props) {
             </Table.Head>
             <Table.Body>
               <Table.Row>
-                <Table.RowHeader>{enrollment.name}</Table.RowHeader>
-                <Table.Cell>{enrollment.email}</Table.Cell>
-                <Table.Cell>{enrollment.login_id}</Table.Cell>
-                {props.canReadSIS ? <Table.Cell>{enrollment.sis_user_id}</Table.Cell> : null}
+                <Table.RowHeader>{userDetails.name}</Table.RowHeader>
+                <Table.Cell>{userDetails.primary_email}</Table.Cell>
+                <Table.Cell>{userDetails.login_id}</Table.Cell>
+                {props.canReadSIS ? <Table.Cell>{userDetails.sis_user_id}</Table.Cell> : null}
               </Table.Row>
             </Table.Body>
           </Table>

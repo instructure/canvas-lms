@@ -76,11 +76,13 @@ export type EnrollmentType = typeof PROVIDER | typeof RECIPIENT | null
 
 export interface User {
   email?: string | null
+  primary_email?: string | null
   login_id?: string | null
   avatar_url?: string
   id: string
   name: string
   sis_user_id?: string | null
+  user_id?: string
 }
 
 export interface NodeStructure {

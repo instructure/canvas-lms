@@ -33,6 +33,10 @@ import {TempEnrollModal} from './TempEnrollModal'
 import {createAnalyticPropsGenerator} from './util/analytics'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import type {EnvCommon} from '@canvas/global/env/EnvCommon'
+
+declare const ENV: GlobalEnv & EnvCommon
 
 const I18n = useI18nScope('temporary_enrollment')
 
@@ -118,6 +122,7 @@ export default function TempEnrollUsersListRow(props: Props) {
     // @ts-ignore - this hook isn't ts-ified
     {
       path: `/api/v1/users/${props.user.id}/temporary_enrollment_status`,
+      params: {account_id: ENV.ACCOUNT_ID},
       success: (json: TemporaryEnrollmentData) => setTemporaryEnrollmentState(json),
       error: showFlashError(I18n.t('Failed to fetch temporary enrollment data')),
     },

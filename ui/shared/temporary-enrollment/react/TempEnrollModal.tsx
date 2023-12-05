@@ -288,7 +288,7 @@ export function TempEnrollModal(props: Props) {
           page={page}
           searchFail={handleModalReset}
           searchSuccess={handleSetEnrollmentFromSearch}
-          foundEnroll={enrollment}
+          foundUser={enrollment}
         />
       )
     }

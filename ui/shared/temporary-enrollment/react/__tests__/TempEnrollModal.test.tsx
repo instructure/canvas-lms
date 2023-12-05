@@ -94,6 +94,7 @@ const enrollmentsByCourse = [
     id: '1',
     name: 'Apple Music',
     workflow_state: 'available',
+    account_id: '1',
     enrollments: [
       {
         role_id: '2',
@@ -110,7 +111,7 @@ const enrollmentsByCourse = [
 ]
 
 const ENROLLMENTS_URI = encodeURI(
-  `/api/v1/users/${modalProps.user.id}/courses?enrollment_state[]=active&enrollment_state[]=completed&include[]=sections&per_page=${MAX_ALLOWED_COURSES_PER_PAGE}`
+  `/api/v1/users/${modalProps.user.id}/courses?enrollment_state[]=active&enrollment_state[]=completed&include[]=sections&account_id=${enrollmentsByCourse[0].account_id}&per_page=${MAX_ALLOWED_COURSES_PER_PAGE}`
 )
 
 const userListsData = {
@@ -122,6 +123,9 @@ const userListsParams = Object.entries(userListsData)
   .map(([key, value]) => `${key}=${value}`)
   .join('&')
 
+const userDetailsUriMock = (userId: string, response: object) =>
+  fetchMock.get(`/api/v1/users/${userId}/profile`, response)
+
 jest.mock('@canvas/alerts/react/FlashAlert', () => ({
   showFlashSuccess: jest.fn(() => jest.fn(() => {})),
 }))
@@ -129,7 +133,7 @@ jest.mock('@canvas/alerts/react/FlashAlert', () => ({
 describe('TempEnrollModal', () => {
   beforeAll(() => {
     // @ts-expect-error
-    window.ENV = {ROOT_ACCOUNT_ID: '1'}
+    window.ENV = {ACCOUNT_ID: '1'}
   })
 
   beforeEach(() => {
@@ -200,7 +204,7 @@ describe('TempEnrollModal', () => {
 
   it('closes modal when submission is successful', async () => {
     fetchMock.post(`/accounts/1/user_lists.json?${userListsParams}`, userData)
-    fetchMock.get('/api/v1/users/2', userData.users[0])
+    userDetailsUriMock(recipientUser.id, userData.users[0])
     fetchMock.get(ENROLLMENTS_URI, enrollmentsByCourse)
 
     render(
@@ -241,13 +245,13 @@ describe('TempEnrollModal', () => {
     fireEvent.click(submit)
 
     expect(fetchMock.calls(`/accounts/1/user_lists.json?${userListsParams}`).length).toBe(1)
-    expect(fetchMock.calls('/api/v1/users/2').length).toBe(1)
+    expect(fetchMock.calls('/api/v1/users/2/profile').length).toBe(1)
     expect(fetchMock.calls(ENROLLMENTS_URI).length).toBe(1)
   })
 
   it('shows error and stays open if data is missing', async () => {
     fetchMock.post(`/accounts/1/user_lists.json?${userListsParams}`, userData)
-    fetchMock.get('/api/v1/users/2', userData.users[0])
+    userDetailsUriMock(recipientUser.id, userData.users[0])
     fetchMock.get(ENROLLMENTS_URI, enrollmentsByCourse)
 
     render(
@@ -279,13 +283,13 @@ describe('TempEnrollModal', () => {
     expect(await screen.findByText(/please select a role before submitting/i)).toBeInTheDocument()
 
     expect(fetchMock.calls(`/accounts/1/user_lists.json?${userListsParams}`).length).toBe(1)
-    expect(fetchMock.calls('/api/v1/users/2').length).toBe(1)
+    expect(fetchMock.calls('/api/v1/users/2/profile').length).toBe(1)
     expect(fetchMock.calls(ENROLLMENTS_URI).length).toBe(1)
   })
 
   it('starts over when start over button is clicked', async () => {
     fetchMock.post(`/accounts/1/user_lists.json?${userListsParams}`, userData)
-    fetchMock.get('/api/v1/users/2', userData.users[0])
+    userDetailsUriMock(recipientUser.id, userData.users[0])
 
     render(
       <TempEnrollModal {...modalProps} defaultOpen={true}>
@@ -312,12 +316,12 @@ describe('TempEnrollModal', () => {
     })
 
     expect(fetchMock.calls(`/accounts/1/user_lists.json?${userListsParams}`).length).toBe(1)
-    expect(fetchMock.calls('/api/v1/users/2').length).toBe(1)
+    expect(fetchMock.calls('/api/v1/users/2/profile').length).toBe(1)
   })
 
   it('goes back when the assign screen (page 3) back button is clicked', async () => {
     fetchMock.post(`/accounts/1/user_lists.json?${userListsParams}`, userData)
-    fetchMock.get('/api/v1/users/2', userData.users[0])
+    userDetailsUriMock(recipientUser.id, userData.users[0])
     fetchMock.get(ENROLLMENTS_URI, enrollmentsByCourse)
 
     render(
@@ -354,7 +358,7 @@ describe('TempEnrollModal', () => {
     })
 
     expect(fetchMock.calls(`/accounts/1/user_lists.json?${userListsParams}`).length).toBe(1)
-    expect(fetchMock.calls('/api/v1/users/2').length).toBe(1)
+    expect(fetchMock.calls('/api/v1/users/2/profile').length).toBe(1)
     expect(fetchMock.calls(ENROLLMENTS_URI).length).toBe(1)
   })
 
