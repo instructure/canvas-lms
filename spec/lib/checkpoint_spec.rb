@@ -22,7 +22,7 @@ describe Checkpoint do
     it "returns a hash with the correct keys" do
       assignment = Assignment.new(
         name: "Assignment Name",
-        checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+        sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC,
         points_possible: 10,
         due_at: 3.days.from_now,
         only_visible_to_overrides: false
@@ -31,7 +31,7 @@ describe Checkpoint do
       checkpoint = Checkpoint.new(assignment)
       expect(checkpoint.as_json).to eq({
                                          name: assignment.name,
-                                         label: assignment.checkpoint_label,
+                                         tag: assignment.sub_assignment_tag,
                                          points_possible: assignment.points_possible,
                                          due_at: assignment.due_at,
                                          only_visible_to_overrides: assignment.only_visible_to_overrides

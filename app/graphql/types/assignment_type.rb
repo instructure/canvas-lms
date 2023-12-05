@@ -522,7 +522,7 @@ module Types
       end
     end
 
-    field :checkpointed, Boolean, null: false
+    field :has_sub_assignments, Boolean, null: false
 
     field :checkpoints, [CheckpointType], null: true
     def checkpoints

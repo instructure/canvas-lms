@@ -33,7 +33,7 @@ describe Checkpoints::AssignmentAggregatorService do
     let(:service_call) { service.call(assignment: @topic.assignment) }
 
     describe "invalid states" do
-      it "returns false when called with an assignment that is not checkpointed" do
+      it "returns false when called with an assignment that does not have sub assignments" do
         assignment = @course.assignments.create!
         expect(service.call(assignment:)).to be false
       end
@@ -43,7 +43,7 @@ describe Checkpoints::AssignmentAggregatorService do
         expect(service.call(assignment:)).to be false
       end
 
-      it "returns false when called with a soft-deleted checkpointed assignment" do
+      it "returns false when called with a soft-deleted assignment" do
         @topic.assignment.destroy
         expect(service_call).to be false
       end

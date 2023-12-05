@@ -3009,9 +3009,9 @@ describe DiscussionTopic do
       it "in the topic" do
         expect(@topic.checkpoints?).to be true
         expect(@topic.checkpoint_assignments.length).to eq 2
-        expect(@topic.assignment.checkpoint_label).to eq CheckpointLabels::PARENT
-        expect(@topic.reply_to_topic_checkpoint.checkpoint_label).to eq CheckpointLabels::REPLY_TO_TOPIC
-        expect(@topic.reply_to_entry_checkpoint.checkpoint_label).to eq CheckpointLabels::REPLY_TO_ENTRY
+        expect(@topic.assignment.sub_assignment_tag).to eq CheckpointLabels::PARENT
+        expect(@topic.reply_to_topic_checkpoint.sub_assignment_tag).to eq CheckpointLabels::REPLY_TO_TOPIC
+        expect(@topic.reply_to_entry_checkpoint.sub_assignment_tag).to eq CheckpointLabels::REPLY_TO_ENTRY
       end
 
       it "correctly marks the reply to topic checkpoint submission as submitted when the student replies to topic" do

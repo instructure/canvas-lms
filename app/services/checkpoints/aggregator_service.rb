@@ -23,7 +23,7 @@ class Checkpoints::AggregatorService < ApplicationService
   def checkpoint_aggregation_supported?(assignment)
     assignment.present? &&
       assignment.active? &&
-      assignment.checkpointed? &&
+      assignment.has_sub_assignments? &&
       !!assignment.root_account&.feature_enabled?(:discussion_checkpoints)
   end
 

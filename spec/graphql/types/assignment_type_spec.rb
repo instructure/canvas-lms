@@ -844,9 +844,9 @@ describe Types::AssignmentType do
 
   describe "checkpoints" do
     describe "when feature flag is disabled" do
-      it "checkpoints is nil and checkpointed is false" do
-        expect(assignment_type.resolve("checkpoints {label}")).to be_nil
-        expect(assignment_type.resolve("checkpointed")).to be_falsey
+      it "checkpoints is nil and hasSubAssignments is false" do
+        expect(assignment_type.resolve("checkpoints {tag}")).to be_nil
+        expect(assignment_type.resolve("hasSubAssignments")).to be_falsey
       end
     end
 
@@ -855,24 +855,24 @@ describe Types::AssignmentType do
         course.root_account.enable_feature!(:discussion_checkpoints)
       end
 
-      it "checkpoints is [] and checkpointed is false" do
-        expect(assignment_type.resolve("checkpoints {label}")).to eq []
-        expect(assignment_type.resolve("checkpointed")).to be_falsey
+      it "checkpoints is [] and hasSubAssignments is false" do
+        expect(assignment_type.resolve("checkpoints {tag}")).to eq []
+        expect(assignment_type.resolve("hasSubAssignments")).to be_falsey
       end
 
       describe "when assignment has checkpoint assignments" do
         before do
-          assignment.update!(checkpointed: true, checkpoint_label: CheckpointLabels::PARENT)
-          @c1 = assignment.checkpoint_assignments.create!(context: course, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 3.days.from_now)
-          @c2 = assignment.checkpoint_assignments.create!(context: course, checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 10, due_at: 5.days.from_now)
+          assignment.update!(has_sub_assignments: true, sub_assignment_tag: CheckpointLabels::PARENT)
+          @c1 = assignment.checkpoint_assignments.create!(context: course, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 3.days.from_now)
+          @c2 = assignment.checkpoint_assignments.create!(context: course, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 10, due_at: 5.days.from_now)
         end
 
-        it "checkpoints returns the correct labels" do
-          expect(assignment_type.resolve("checkpoints {label}")).to match_array [CheckpointLabels::REPLY_TO_TOPIC, CheckpointLabels::REPLY_TO_ENTRY]
+        it "checkpoints returns the correct tags" do
+          expect(assignment_type.resolve("checkpoints {tag}")).to match_array [CheckpointLabels::REPLY_TO_TOPIC, CheckpointLabels::REPLY_TO_ENTRY]
         end
 
-        it "checkpointed is true" do
-          expect(assignment_type.resolve("checkpointed")).to be_truthy
+        it "hasSubAssignments is true" do
+          expect(assignment_type.resolve("hasSubAssignments")).to be_truthy
         end
 
         it "checkpoints returns the points possible" do

@@ -39,7 +39,7 @@ class AbstractAssignment < ActiveRecord::Base
   include LockedFor
   include Checkpointable
 
-  self.ignored_columns += %i[context_code]
+  self.ignored_columns += %i[context_code checkpointed checkpoint_label]
 
   GRADING_TYPES = OpenStruct.new(
     {
@@ -2081,11 +2081,11 @@ class AbstractAssignment < ActiveRecord::Base
     submissions = []
     grade_group_students = !(grade_group_students_individually || opts[:excused])
 
-    if checkpointed? && root_account&.feature_enabled?(:discussion_checkpoints)
-      checkpoint_label = opts.delete(:checkpoint_label)
-      checkpoint_assignment = find_checkpoint(checkpoint_label)
-      if checkpoint_label.blank? || checkpoint_assignment.nil?
-        raise ::Assignment::GradeError, "Must provide a valid checkpoint label when grading checkpointed discussions"
+    if has_sub_assignments? && root_account&.feature_enabled?(:discussion_checkpoints)
+      sub_assignment_tag = opts.delete(:sub_assignment_tag)
+      checkpoint_assignment = find_checkpoint(sub_assignment_tag)
+      if sub_assignment_tag.blank? || checkpoint_assignment.nil?
+        raise ::Assignment::GradeError, "Must provide a valid sub assignment tag when grading checkpointed discussions"
       end
 
       checkpoint_submissions = checkpoint_assignment.grade_student(original_student, opts)

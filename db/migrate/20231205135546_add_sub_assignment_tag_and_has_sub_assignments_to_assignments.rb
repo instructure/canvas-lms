@@ -16,42 +16,12 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
 
-class Checkpoint
-  def initialize(assignment)
-    @assignment = assignment
-  end
+class AddSubAssignmentTagAndHasSubAssignmentsToAssignments < ActiveRecord::Migration[7.0]
+  tag :predeploy
 
-  def as_json
-    {
-      name:,
-      tag:,
-      points_possible:,
-      due_at:,
-      only_visible_to_overrides:
-    }
-  end
-
-  private
-
-  def name
-    @assignment.name
-  end
-
-  def tag
-    @assignment.sub_assignment_tag
-  end
-
-  def points_possible
-    @assignment.points_possible
-  end
-
-  def due_at
-    @assignment.due_at
-  end
-
-  def only_visible_to_overrides
-    @assignment.only_visible_to_overrides
+  def change
+    add_column :assignments, :sub_assignment_tag, :string, limit: 255
+    add_column :assignments, :has_sub_assignments, :boolean, default: false, null: false
   end
 end

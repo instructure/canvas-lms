@@ -212,9 +212,9 @@ describe "Api::V1::Assignment" do
 
     context "checkpoints" do
       context "not in-place" do
-        it "json does not have checkpointed and checkpoints when FF is turned off" do
+        it "json does not have has_sub_assignments and checkpoints when FF is turned off" do
           json = api.assignment_json(assignment, user, session, { include_checkpoints: true })
-          expect(json).not_to have_key "checkpointed"
+          expect(json).not_to have_key "has_sub_assignments"
           expect(json).not_to have_key "checkpoints"
         end
       end
@@ -224,9 +224,9 @@ describe "Api::V1::Assignment" do
           assignment.root_account.enable_feature!(:discussion_checkpoints)
         end
 
-        it "returns false for the checkpointed attribute and [] for the checkpoints attribute" do
+        it "returns false for the has_sub_assignments attribute and [] for the checkpoints attribute" do
           json = api.assignment_json(assignment, user, session, { include_checkpoints: true })
-          expect(json["checkpointed"]).to be_falsey
+          expect(json["has_sub_assignments"]).to be_falsey
           expect(json["checkpoints"]).to eq []
         end
       end
@@ -235,21 +235,21 @@ describe "Api::V1::Assignment" do
         before do
           assignment.root_account.enable_feature!(:discussion_checkpoints)
 
-          assignment.update_attribute(:checkpointed, true)
-          assignment.update_attribute(:checkpoint_label, CheckpointLabels::PARENT)
+          assignment.update_attribute(:has_sub_assignments, true)
+          assignment.update_attribute(:sub_assignment_tag, CheckpointLabels::PARENT)
 
-          @c1 = assignment.checkpoint_assignments.create!(context: assignment.context, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 2.days.from_now)
-          @c2 = assignment.checkpoint_assignments.create!(context: assignment.context, checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 5, due_at: 5.days.from_now)
+          @c1 = assignment.checkpoint_assignments.create!(context: assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 2.days.from_now)
+          @c2 = assignment.checkpoint_assignments.create!(context: assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 5, due_at: 5.days.from_now)
         end
 
         it "returns the checkpoints attribute with the correct values" do
           json = api.assignment_json(assignment, user, session, { include_checkpoints: true })
           checkpoints = json["checkpoints"]
 
-          expect(json["checkpointed"]).to be_truthy
+          expect(json["has_sub_assignments"]).to be_truthy
 
           expect(checkpoints).to be_present
-          expect(checkpoints.pluck(:label)).to match_array [@c1.checkpoint_label, @c2.checkpoint_label]
+          expect(checkpoints.pluck(:tag)).to match_array [@c1.sub_assignment_tag, @c2.sub_assignment_tag]
           expect(checkpoints.pluck(:points_possible)).to match_array [@c1.points_possible, @c2.points_possible]
           expect(checkpoints.pluck(:due_at)).to match_array [@c1.due_at, @c2.due_at]
           expect(checkpoints.pluck(:only_visible_to_overrides)).to match_array [@c1.only_visible_to_overrides, @c2.only_visible_to_overrides]
