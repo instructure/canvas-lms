@@ -411,6 +411,35 @@ describe "discussions" do
           fj("button:contains('Save')").click
           expect(assignment.reload.assignment_group_id).to eq assign_group_2.id
         end
+
+        it "allows editing the points possible, grading type, group category, and peer review for the graded discussion" do
+          pp_string = "80"
+          course.group_categories.create!(name: "another group set")
+          get "/courses/#{course.id}/discussion_topics/#{assignment_topic.id}/edit"
+
+          # change points possible from 10 to 80. selenium's clear method does not completely remove the previous value
+          # so we use backspace instead
+          pp_string.each_char { f("input[data-testid='points-possible-input']").send_keys(:backspace) }
+          f("input[data-testid='points-possible-input']").send_keys(pp_string)
+
+          force_click("input[value='Points']")
+          fj("li:contains('Letter Grade')").click
+
+          force_click("input[data-testid='peer_review_manual']")
+
+          # TODO: fix in VICE-4001
+          # force_click("input[data-testid='group-discussion-checkbox']")
+          # force_click("input[placeholder='Select a group category']")
+          # fj("li:contains('#{group_cat.name}')").click
+
+          fj("button:contains('Save')").click
+          updated_assignment = assignment.reload
+          expect(updated_assignment.points_possible).to eq 80
+          expect(updated_assignment.grading_type).to eq "letter_grade"
+          expect(updated_assignment.peer_reviews).to be true
+          expect(updated_assignment.automatic_peer_reviews).to be false
+          expect(updated_assignment.peer_reviews_assign_at).to be_nil
+        end
       end
     end
   end
