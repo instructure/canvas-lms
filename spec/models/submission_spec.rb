@@ -6602,6 +6602,12 @@ describe Submission do
       expect(comment.attempt).to eq 3
     end
 
+    it "sets the attempt to latest submission attempt when an attempt option is not specified" do
+      @submission.update!(attempt: 5, workflow_state: "graded")
+      comment = @submission.add_comment(author: @teacher, comment: "42")
+      expect(comment.attempt).to eq 5
+    end
+
     it "sets comment hidden to false if comment causes posting" do
       @assignment.ensure_post_policy(post_manually: false)
       @assignment.grade_student(@student, grader: @teacher, score: 5)
