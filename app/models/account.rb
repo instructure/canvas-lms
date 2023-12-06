@@ -1589,8 +1589,12 @@ class Account < ActiveRecord::Base
     settings[:auth_discovery_url] = url
   end
 
-  def auth_discovery_url
+  def auth_discovery_url(_request = nil)
     settings[:auth_discovery_url]
+  end
+
+  def auth_discovery_url_options(_request)
+    {}
   end
 
   def login_handle_name=(handle_name)

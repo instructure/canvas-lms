@@ -33,7 +33,7 @@ class SelfEnrollmentsController < ApplicationController
     @login_label_name = login_handle_name if login_handle_name
 
     if !@current_user && (
-      (@domain_root_account.auth_discovery_url && !params[:authentication_provider]) ||
+      (@domain_root_account.auth_discovery_url(request) && !params[:authentication_provider]) ||
       (@domain_root_account.delegated_authentication? && params[:authentication_provider] != "canvas")
     )
       store_location
