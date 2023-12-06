@@ -35,8 +35,9 @@ import {View} from '@instructure/ui-view'
 import type {ViewProps} from '@instructure/ui-view'
 import {uid} from '@instructure/uid'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import type {AchievementData} from '../types'
+import type {AchievementData, ProjectDetailData} from '../types'
 import AchievementCard from '../Achievements/AchievementCard'
+import ProjectCard from '../Projects/ProjectCard'
 
 export function stringToId(s: string): string {
   return s.replace(/\W+/g, '-')
@@ -122,10 +123,20 @@ export const renderEditLink = (
   )
 }
 
+function handleCardKey(id: string, onClick: (id: string) => void, e: React.KeyboardEvent) {
+  if (e.key === 'Enter') {
+    e.preventDefault()
+    onClick(id)
+  }
+}
+
+function handleCardClick(id: string, onClick: (id: string) => void, _e: React.MouseEvent) {
+  onClick(id)
+}
+
 export function renderAchievement(
   achievement: AchievementData,
-  onCardClick: (e: React.MouseEvent) => void,
-  onCardKey: (e: React.KeyboardEvent) => void
+  onCardClick: (achievementId: string) => void
 ) {
   return (
     <View as="div" shadow="resting">
@@ -134,8 +145,8 @@ export function renderAchievement(
         role="button"
         style={{cursor: 'pointer'}}
         tabIndex={0}
-        onClick={onCardClick}
-        onKeyDown={onCardKey}
+        onClick={handleCardClick.bind(null, achievement.id, onCardClick)}
+        onKeyDown={handleCardKey.bind(null, achievement.id, onCardClick)}
       >
         <AchievementCard
           isNew={achievement.isNew}
@@ -143,6 +154,23 @@ export function renderAchievement(
           issuer={achievement.issuer.name}
           imageUrl={achievement.imageUrl}
         />
+      </div>
+    </View>
+  )
+}
+
+export function renderProject(project: ProjectDetailData, onClick: (projectId: string) => void) {
+  return (
+    <View as="div" shadow="resting">
+      <div
+        data-cardid={project.id}
+        role="button"
+        style={{cursor: 'pointer'}}
+        tabIndex={0}
+        onClick={handleCardClick.bind(null, project.id, onClick)}
+        onKeyDown={handleCardKey.bind(null, project.id, onClick)}
+      >
+        <ProjectCard project={project} />
       </div>
     </View>
   )

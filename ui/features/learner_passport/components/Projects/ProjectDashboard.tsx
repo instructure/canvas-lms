@@ -24,7 +24,7 @@ import {Heading} from '@instructure/ui-heading'
 import {IconPlusLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import ProjectCard, {PROJECT_CARD_WIDTH, PROJECT_CARD_HEIGHT} from './ProjectCard'
+import ProjectDashboardCard, {PROJECT_CARD_WIDTH, PROJECT_CARD_HEIGHT} from './ProjectDashboardCard'
 import {showUnimplemented} from '../shared/utils'
 import type {ProjectData} from '../types'
 import NamingModal from '../shared/NamingModal'
@@ -121,12 +121,7 @@ const ProjectDashboard = () => {
               {projects.map(project => (
                 <Flex.Item shouldGrow={false} shouldShrink={false} key={project.id}>
                   <View as="div" shadow="resting">
-                    <ProjectCard
-                      id={project.id}
-                      title={project.title}
-                      heroImageUrl={project.heroImageUrl}
-                      onAction={handleCardAction}
-                    />
+                    <ProjectDashboardCard project={project} onAction={handleCardAction} />
                   </View>
                 </Flex.Item>
               ))}

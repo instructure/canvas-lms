@@ -22,6 +22,7 @@ import type {
   EducationData,
   ExperienceData,
   PortfolioDetailData,
+  ProjectDetailData,
   SkillData,
 } from '../types'
 import {Flex} from '@instructure/ui-flex'
@@ -30,11 +31,12 @@ import {Img} from '@instructure/ui-img'
 import {List} from '@instructure/ui-list'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import {compareFromToDates, renderAchievement, renderLink} from '../shared/utils'
+import {compareFromToDates, renderAchievement, renderLink, renderProject} from '../shared/utils'
 import {renderSkillTag} from '../shared/SkillTag'
 import EducationCard from '../Education/EducationCard'
 import ExperienceCard from '../Experience/ExperienceCard'
 import AchievementTray from '../Achievements/AchievementTray'
+import ProjectTray from '../Projects/ProjectTray'
 
 function renderEducation(education: EducationData) {
   return (
@@ -59,13 +61,15 @@ type PortfolioViewProps = {
 const PortfolioView = ({portfolio}: PortfolioViewProps) => {
   const [showingAchievementDetails, setShowingAchievementDetails] = useState(false)
   const [activeCard, setActiveCard] = useState<AchievementData | undefined>(undefined)
+  const [showingProjectDetails, setShowingProjectDetails] = useState(false)
+  const [activeProject, setActiveProject] = useState<ProjectDetailData | undefined>(undefined)
 
   const handleDismissAchievementDetails = useCallback(() => {
     setShowingAchievementDetails(false)
     setActiveCard(undefined)
   }, [])
 
-  const showAchievementDetails = useCallback(
+  const handleAchievementCardClick = useCallback(
     (achievementId: string) => {
       const card = portfolio.achievements.find(a => a.id === achievementId)
       setActiveCard(card)
@@ -74,23 +78,19 @@ const PortfolioView = ({portfolio}: PortfolioViewProps) => {
     [portfolio.achievements]
   )
 
-  const handleAchievementCardClick = useCallback(
-    (e: React.MouseEvent) => {
-      // @ts-expect-error
-      showAchievementDetails(e.currentTarget.getAttribute('data-cardid'))
+  const handleProjectCardClick = useCallback(
+    (projectId: string) => {
+      const card = portfolio.projects.find(a => a.id === projectId)
+      setActiveProject(card)
+      setShowingProjectDetails(card !== undefined)
     },
-    [showAchievementDetails]
+    [portfolio.projects]
   )
 
-  const handleAchievementCardKey = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (e.key === 'Enter') {
-        // @ts-expect-error
-        showAchievementDetails(e.currentTarget.getAttribute('data-cardid'))
-      }
-    },
-    [showAchievementDetails]
-  )
+  const handleDismissProjectDetails = useCallback(() => {
+    setShowingProjectDetails(false)
+    setActiveProject(undefined)
+  }, [])
 
   return (
     <View as="div">
@@ -180,6 +180,22 @@ const PortfolioView = ({portfolio}: PortfolioViewProps) => {
                 })}
               </List>
             </View>
+            {portfolio.projects.length > 0 && (
+              <View as="div" borderWidth="small 0 0 0">
+                <Heading level="h3" themeOverride={{h3FontSize: '1rem'}} margin="large 0 small 0">
+                  Projects
+                </Heading>
+                <Flex as="div" margin="small 0" gap="medium" wrap="wrap">
+                  {portfolio.projects.map((project: ProjectDetailData) => {
+                    return (
+                      <Flex.Item key={project.id} shouldShrink={false}>
+                        {renderProject(project, handleProjectCardClick)}
+                      </Flex.Item>
+                    )
+                  })}
+                </Flex>
+              </View>
+            )}
             <View as="div" borderWidth="small 0 0 0">
               <Heading level="h3" themeOverride={{h3FontSize: '1rem'}} margin="large 0 small 0">
                 Achievements
@@ -188,11 +204,7 @@ const PortfolioView = ({portfolio}: PortfolioViewProps) => {
                 {portfolio.achievements.map((achievement: AchievementData) => {
                   return (
                     <Flex.Item key={achievement.id} shouldShrink={false}>
-                      {renderAchievement(
-                        achievement,
-                        handleAchievementCardClick,
-                        handleAchievementCardKey
-                      )}
+                      {renderAchievement(achievement, handleAchievementCardClick)}
                     </Flex.Item>
                   )
                 })}
@@ -206,6 +218,13 @@ const PortfolioView = ({portfolio}: PortfolioViewProps) => {
           open={showingAchievementDetails}
           onDismiss={handleDismissAchievementDetails}
           activeCard={activeCard}
+        />
+      )}
+      {activeProject && (
+        <ProjectTray
+          open={showingProjectDetails}
+          onClose={handleDismissProjectDetails}
+          project={activeProject}
         />
       )}
     </View>

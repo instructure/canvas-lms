@@ -16,75 +16,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useState} from 'react'
-import {IconButton} from '@instructure/ui-buttons'
-import {
-  IconCopyLine,
-  IconDownloadLine,
-  IconEditLine,
-  IconLinkLine,
-  IconMoreLine,
-  IconResetLine,
-  IconReviewScreenLine,
-  IconTrashLine,
-} from '@instructure/ui-icons'
+import React from 'react'
 import {Flex} from '@instructure/ui-flex'
-import {Menu} from '@instructure/ui-menu'
-import type {MenuItemProps} from '@instructure/ui-menu'
+import {Tag} from '@instructure/ui-tag'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import type {ViewOwnProps} from '@instructure/ui-view'
+import {renderSkillTag} from '../shared/SkillTag'
+import type {ProjectData} from '../types'
 
 const PROJECT_CARD_WIDTH = '400px'
-const PROJECT_CARD_HEIGHT = '200px'
+const PROJECT_CARD_HEIGHT = '204px'
 const PROJECT_CARD_IMAGE_HEIGHT = `${200 - 96}px`
 
 export type ProjectCardProps = {
-  id: string
-  title: string
-  heroImageUrl?: string | null
-  onAction: (projectId: string, action: string) => void
+  project: ProjectData
 }
 
-const ProjectCard = ({id, title, heroImageUrl, onAction}: ProjectCardProps) => {
-  const [kabobButtonRef, setKabobButtonRef] = useState<Element | null>(null)
-
-  const handleKabobMenuSelect = useCallback(
-    (
-      e: React.MouseEvent<Element, MouseEvent>,
-      value: MenuItemProps['value'] | MenuItemProps['value'][]
-    ) => {
-      e.preventDefault()
-      e.stopPropagation()
-      if (!value) return
-      if (typeof value !== 'string') return
-      onAction(id, value)
-    },
-    [id, onAction]
-  )
-
-  const handleCardClick = useCallback(
-    (e: React.MouseEvent<ViewOwnProps, MouseEvent>) => {
-      if (e.target === kabobButtonRef) return
-      onAction(id, 'view')
-    },
-    [id, kabobButtonRef, onAction]
-  )
-
+const ProjectCard = ({project}: ProjectCardProps) => {
   return (
-    <View
-      id={`project-${id}`}
-      as="div"
-      background="secondary"
-      width={PROJECT_CARD_WIDTH}
-      height={PROJECT_CARD_HEIGHT}
-      role="button"
-      cursor="pointer"
-      onClick={handleCardClick}
-    >
+    <View id={`project-${project.id}`} as="div" width={PROJECT_CARD_WIDTH} height="auto">
       <View as="div">
         <img
-          src={heroImageUrl || undefined}
+          src={project.heroImageUrl || undefined}
           alt=""
           style={{
             display: 'block',
@@ -95,52 +48,67 @@ const ProjectCard = ({id, title, heroImageUrl, onAction}: ProjectCardProps) => {
           }}
         />
       </View>
-      <Flex as="div">
+      <Flex as="div" direction="column" gap="small" padding="small">
         <Flex.Item shouldGrow={true} padding="small small 0 small">
           <Text weight="bold" size="medium">
-            {title}
+            {project.title}
           </Text>
         </Flex.Item>
+        {project.skills?.length > 0 ? (
+          <Flex.Item>
+            <Flex>
+              {project.skills.length > 0 ? renderSkillTag(project.skills[0]) : null}
+              {project.skills.length > 1 ? renderSkillTag(project.skills[1]) : null}
+              {project.skills.length > 2 ? (
+                <Tag
+                  key="more-skills"
+                  text={`+${project.skills.length - 2} more`}
+                  margin="0 x-small x-small 0"
+                />
+              ) : null}
+            </Flex>
+          </Flex.Item>
+        ) : null}
         <Flex.Item>
-          <Menu
-            onSelect={handleKabobMenuSelect}
-            placement="bottom"
-            trigger={
-              <IconButton
-                elementRef={(el: Element | null) => setKabobButtonRef(el)}
-                screenReaderLabel="More"
-                withBackground={false}
-                withBorder={false}
+          <Flex margin="medium 0 0 0" gap="small">
+            <Flex.Item>
+              <div
+                style={{
+                  display: 'inline-block',
+                  borderRadius: '50%',
+                  backgroundColor: '#F5F5F5',
+                  marginInlineEnd: '.25rem',
+                  padding: '.25rem',
+                  width: '1.5rem',
+                  height: '1.5rem',
+                  lineHeight: '1.5rem',
+                  textAlign: 'center',
+                }}
               >
-                <IconMoreLine />
-              </IconButton>
-            }
-          >
-            <Menu.Item value="view">
-              <IconReviewScreenLine /> View
-            </Menu.Item>
-            <Menu.Item value="edit">
-              <IconEditLine /> Edit
-            </Menu.Item>
-            <Menu.Item value="duplicate">
-              <IconCopyLine /> Duplicate
-            </Menu.Item>
-            <Menu.Item value="download">
-              <IconDownloadLine /> Download
-            </Menu.Item>
-            <Menu.Item value="rename">
-              <IconEditLine /> Rename
-            </Menu.Item>
-            <Menu.Item value="share">
-              <IconLinkLine /> Copy share link
-            </Menu.Item>
-            <Menu.Item value="regen_share">
-              <IconResetLine /> Regenerate share link
-            </Menu.Item>
-            <Menu.Item value="delete">
-              <IconTrashLine /> Delete
-            </Menu.Item>
-          </Menu>
+                {project.attachments.length}
+              </div>
+              <Text>Attachments</Text>
+            </Flex.Item>
+            <View borderWidth="0 0 0 small" height="1.5rem" />
+            <Flex.Item>
+              <div
+                style={{
+                  display: 'inline-block',
+                  borderRadius: '50%',
+                  backgroundColor: '#F5F5F5',
+                  marginInlineEnd: '.25rem',
+                  padding: '.25rem',
+                  width: '1.5rem',
+                  height: '1.5rem',
+                  lineHeight: '1.5rem',
+                  textAlign: 'center',
+                }}
+              >
+                {project.achievements.length}
+              </div>
+              <Text>Achievements</Text>
+            </Flex.Item>
+          </Flex>
         </Flex.Item>
       </Flex>
     </View>
@@ -148,4 +116,4 @@ const ProjectCard = ({id, title, heroImageUrl, onAction}: ProjectCardProps) => {
 }
 
 export default ProjectCard
-export {PROJECT_CARD_HEIGHT, PROJECT_CARD_WIDTH}
+export {PROJECT_CARD_HEIGHT, PROJECT_CARD_WIDTH, PROJECT_CARD_IMAGE_HEIGHT}

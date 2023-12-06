@@ -29,7 +29,7 @@ import PersonalInfo from './personal_info/PersonalInfo'
 import AchievementsEditToggle from './achievements/AchievementsEdit'
 import EducationEdit from './education/EducationEdit'
 import ExperienceEdit from './experience/ExperienceEdit'
-import ProjectsEdit from './ProjectsEdit'
+import ProjectsEditToggle from './projects/ProjectsEdit'
 import PortfolioPreviewModal from '../PortfolioPreviewModal'
 
 import type {
@@ -47,8 +47,12 @@ const PortfolioEdit = () => {
   const portfolio_data = create_portfolio || edit_portfolio
   const portfolio = portfolio_data.portfolio
   const allAchievements = portfolio_data.achievements
+  const allProjects = portfolio_data.projects
   const [achievementIds, setAchievementIds] = useState<string[]>(() => {
     return portfolio.achievements.map(achievement => achievement.id)
+  })
+  const [projectIds, setProjectIds] = useState<string[]>(() => {
+    return portfolio.projects.map(project => project.id)
   })
   const [title, setTitle] = useState(portfolio.title)
   const [education, setEducation] = useState(portfolio.education)
@@ -115,6 +119,10 @@ const PortfolioEdit = () => {
     setExperience(newExperience)
   }, [])
 
+  const handleNewProjects = useCallback((newProjectIds: string[]) => {
+    setProjectIds(newProjectIds)
+  }, [])
+
   return (
     <View as="div">
       <View as="div" maxWidth="986px" margin="0 auto">
@@ -169,7 +177,12 @@ const PortfolioEdit = () => {
               <ExperienceEdit experience={experience} onChange={handleNewExperience} />
             </View>
             <View margin="0 medium" borderWidth="small">
-              <ProjectsEdit portfolio={portfolio} />
+              <input type="hidden" name="projects" value={projectIds.join(',')} />
+              <ProjectsEditToggle
+                allProjects={allProjects}
+                selectedProjectIds={projectIds}
+                onChange={handleNewProjects}
+              />
             </View>
             <View margin="0 medium" borderWidth="small">
               <input type="hidden" name="achievements" value={achievementIds.join(',')} />
