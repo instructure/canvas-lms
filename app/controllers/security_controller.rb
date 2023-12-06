@@ -31,8 +31,6 @@
 #  }
 #
 class SecurityController < ApplicationController
-  include Lti::Oidc
-
   # @API Show all available JWKs used by Canvas for signing.
   #
   # @returns JWKs
@@ -75,11 +73,11 @@ class SecurityController < ApplicationController
 
     render json: {
       issuer: Canvas::Security.config["lti_iss"],
-      authorization_endpoint: lti_authorize_redirect_url(host: oidc_authorization_domain(account_domain)),
+      authorization_endpoint: lti_authorize_redirect_url(host: Lti::Oidc.auth_domain(account_domain)),
       # TODO: use a path helper for this when this path gets created
       registration_endpoint: "#{HostUrl.protocol}://#{account_domain}/api/lti/registrations",
-      jwks_uri: oauth2_jwks_url(host: oidc_authorization_domain(account_domain)),
-      token_endpoint: oauth2_token_url(host: oidc_authorization_domain(account_domain)),
+      jwks_uri: oauth2_jwks_url(host: Lti::Oidc.auth_domain(account_domain)),
+      token_endpoint: oauth2_token_url(host: Lti::Oidc.auth_domain(account_domain)),
       token_endpoint_auth_methods_supported: ["private_key_jwt"],
       token_endpoint_auth_signing_alg_values_supported: ["RS256"],
       scopes_supported: TokenScopes::LTI_SCOPES.keys,
@@ -88,7 +86,7 @@ class SecurityController < ApplicationController
       # TODO: this list can probably be dynamic, with admins choosing the scopes they want to admit to this tool
       claims_supported: %w[sub picture email name given_name family_name locale],
       subject_types_supported: ["public"],
-      authorization_server: oidc_authorization_domain(account_domain),
+      authorization_server: Lti::Oidc.auth_domain(account_domain),
       "https://purl.imsglobal.org/spec/lti-platform-configuration": lti_platform_configuration(account)
     }
   end

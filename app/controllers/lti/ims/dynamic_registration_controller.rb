@@ -20,8 +20,6 @@
 module Lti
   module IMS
     class DynamicRegistrationController < ApplicationController
-      include Lti::Oidc
-
       REGISTRATION_TOKEN_EXPIRATION = 1.hour
 
       before_action :require_dynamic_registration_flag
