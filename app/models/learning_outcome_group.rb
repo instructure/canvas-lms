@@ -50,6 +50,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
 
   workflow do
     state :active
+    state :archived
     state :deleted
   end
 
@@ -253,6 +254,28 @@ class LearningOutcomeGroup < ActiveRecord::Base
 
       self.workflow_state = "deleted"
       save!
+    end
+  end
+
+  def archive!
+    # Only active groups can be archived
+    if workflow_state == "active"
+      self.workflow_state = "archived"
+      self.archived_at = Time.now.utc
+      save!
+    elsif workflow_state == "deleted"
+      raise ActiveRecord::RecordNotSaved, "Cannot archive a deleted LearningOutcomeGroup"
+    end
+  end
+
+  def unarchive!
+    # Only archived groups can be unarchived
+    if workflow_state == "archived"
+      self.workflow_state = "active"
+      self.archived_at = nil
+      save!
+    elsif workflow_state == "deleted"
+      raise ActiveRecord::RecordNotSaved, "Cannot unarchive a deleted LearningOutcomeGroup"
     end
   end
 

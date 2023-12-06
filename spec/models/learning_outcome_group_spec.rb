@@ -341,6 +341,71 @@ describe LearningOutcomeGroup do
     end
   end
 
+  describe "#archive" do
+    it "sets the workflow_state to archived and sets archived_at" do
+      group = @course.learning_outcome_groups.create!(title: "group")
+      group.archive!
+      expect(group.workflow_state).to eq("archived")
+      expect(group.archived_at).not_to be_nil
+    end
+
+    it "won't update an already archived group" do
+      group = @course.learning_outcome_groups.create!(title: "group")
+      group.archive!
+      archived_at = group.archived_at
+      expect(group.workflow_state).to eq("archived")
+      expect(group.archived_at).not_to be_nil
+      group.archive!
+      expect(group.workflow_state).to eq("archived")
+      expect(group.archived_at).to eq(archived_at)
+    end
+
+    it "raises an ActiveRecord::RecordNotSaved error if we try to archive a deleted group" do
+      group = @course.learning_outcome_groups.create!(title: "group")
+      group.destroy!
+      expect(group.workflow_state).to eq("deleted")
+      expect { group.archive! }.to raise_error(
+        ActiveRecord::RecordNotSaved,
+        "Cannot archive a deleted LearningOutcomeGroup"
+      )
+      expect(group.workflow_state).to eq("deleted")
+      expect(group.archived_at).to be_nil
+    end
+  end
+
+  describe "#unarchive" do
+    it "sets the workflow_state to active and sets archived_at to nil" do
+      group = @course.learning_outcome_groups.create!(title: "group")
+      group.archive!
+      expect(group.workflow_state).to eq("archived")
+      expect(group.archived_at).not_to be_nil
+      group.unarchive!
+      expect(group.workflow_state).to eq("active")
+      expect(group.archived_at).to be_nil
+    end
+
+    it "won't update an active group" do
+      group = @course.learning_outcome_groups.create!(title: "group")
+      expect(group.workflow_state).to eq("active")
+      expect(group.archived_at).to be_nil
+      group.unarchive!
+      expect(group.workflow_state).to eq("active")
+      expect(group.archived_at).to be_nil
+    end
+
+    it "raises an ActiveRecord::RecordNotSaved error if we try to unarchive a deleted group" do
+      group = @course.learning_outcome_groups.create!(title: "group")
+      group.destroy!
+      expect(group.workflow_state).to eq("deleted")
+      expect { group.unarchive! }.to raise_error(
+        ActiveRecord::RecordNotSaved,
+        "Cannot unarchive a deleted LearningOutcomeGroup"
+      )
+      expect(group.workflow_state).to eq("deleted")
+      expect(group.archived_at).to be_nil
+    end
+  end
+
   context "root account resolution" do
     it "sets root_account_id using Account context" do
       group = LearningOutcomeGroup.create!(title: "group", context: Account.default)

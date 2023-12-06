@@ -736,6 +736,59 @@ describe LearningOutcome do
                                                                                "Does Not Meet Expectations"
                                                                              ])
     end
+
+    it "archive! updates the workflow_state to archived and sets archived_at" do
+      @outcome.archive!
+      expect(@outcome.workflow_state).to eq("archived")
+      expect(@outcome.archived_at).not_to be_nil
+    end
+
+    it "archive! raises an ActiveRecord::RecordNotSaved error when we try to archive a deleted outcome" do
+      @outcome.destroy!
+      expect(@outcome.workflow_state).to eq("deleted")
+      expect { @outcome.archive! }.to raise_error(
+        ActiveRecord::RecordNotSaved,
+        "Cannot archive a deleted LearningOutcome"
+      )
+      expect(@outcome.workflow_state).to eq("deleted")
+      expect(@outcome.archived_at).to be_nil
+    end
+
+    it "archive! will not update an already archived outcome" do
+      @outcome.archive!
+      archived_at = @outcome.archived_at
+      expect(@outcome.workflow_state).to eq("archived")
+      expect(@outcome.archived_at).not_to be_nil
+      @outcome.archive!
+      expect(@outcome.workflow_state).to eq("archived")
+      expect(@outcome.archived_at).to eq(archived_at)
+    end
+
+    it "unarchive! updates the workflow_state to active and sets archived_at to nil" do
+      @outcome.archive!
+      expect(@outcome.workflow_state).to eq("archived")
+      expect(@outcome.archived_at).not_to be_nil
+      @outcome.unarchive!
+      expect(@outcome.workflow_state).to eq("active")
+      expect(@outcome.archived_at).to be_nil
+    end
+
+    it "unarchive! raises an ActiveRecord::RecordNotSaved error when we try to unarchive a deleted outcome" do
+      @outcome.destroy!
+      expect(@outcome.workflow_state).to eq("deleted")
+      expect { @outcome.unarchive! }.to raise_error(
+        ActiveRecord::RecordNotSaved,
+        "Cannot unarchive a deleted LearningOutcome"
+      )
+      expect(@outcome.workflow_state).to eq("deleted")
+      expect(@outcome.archived_at).to be_nil
+    end
+
+    it "unarchive! will not update an active outcome" do
+      @outcome.unarchive!
+      expect(@outcome.workflow_state).to eq("active")
+      expect(@outcome.archived_at).to be_nil
+    end
   end
 
   context "Don't create outcomes with illegal values" do
