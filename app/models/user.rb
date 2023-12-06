@@ -567,12 +567,20 @@ class User < ActiveRecord::Base
       shards = associated_shards(:strong) + associated_shards(:weak)
 
       Shard.with_each_shard(shards) do
-        (user_account_associations.for_root_accounts.shard(Shard.current).distinct.pluck(:account_id) +
-        # need to add back in deleted associations
-        pseudonyms.deleted.shard(Shard.current).except(:order).distinct.pluck(:account_id) +
-        enrollments.deleted.shard(Shard.current).distinct.pluck(:root_account_id) +
-        account_users.deleted.shard(Shard.current).distinct.pluck(:root_account_id))
-          .each do |account_id|
+        root_account_ids = user_account_associations.for_root_accounts.shard(Shard.current).distinct.pluck(:account_id)
+        root_account_ids.concat(if deleted? || creation_pending?
+                                  # if the user is deleted, they'll have no user_account_associations, so we need to add
+                                  # back in associations from both active and deleted objects
+                                  pseudonyms.shard(Shard.current).except(:order).distinct.pluck(:account_id) +
+                                  enrollments.shard(Shard.current).distinct.pluck(:root_account_id) +
+                                  account_users.shard(Shard.current).distinct.pluck(:root_account_id)
+                                else
+                                  # need to add back in deleted associations
+                                  pseudonyms.deleted.shard(Shard.current).except(:order).distinct.pluck(:account_id) +
+                                  enrollments.deleted.shard(Shard.current).distinct.pluck(:root_account_id) +
+                                  account_users.deleted.shard(Shard.current).distinct.pluck(:root_account_id)
+                                end)
+        root_account_ids.each do |account_id|
           refreshed_root_account_ids << Shard.relative_id_for(account_id, Shard.current, shard)
         end
       end
