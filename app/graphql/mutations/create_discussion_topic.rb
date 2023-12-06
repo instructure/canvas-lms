@@ -72,9 +72,11 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
     # TODO: On update, we load here instead of creating a new one.
     discussion_topic = is_announcement ? Announcement.new : DiscussionTopic.new
 
-    # This fields aren't common because they are just needed when it is a new discussion topic or announcement
+    # These fields are needed when creating a new discussion topic or announcement
     discussion_topic.context_id = discussion_topic_context.id
     discussion_topic.context_type = input[:context_type]
+    discussion_topic.user = current_user
+    discussion_topic.workflow_state = (input[:published] || is_announcement) ? "active" : "unpublished"
 
     verify_authorized_action!(discussion_topic, :create)
 
@@ -91,7 +93,7 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
       return validation_error(I18n.t("You do not have permissions to modify discussion for section(s) %{section_ids}", section_ids: invalid_sections.join(", ")))
     end
 
-    process_common_inputs(input, is_announcement, discussion_topic, true)
+    process_common_inputs(input, is_announcement, discussion_topic)
     process_future_date_inputs(input[:delayed_post_at], input[:lock_at], discussion_topic)
     process_locked_parameter(input[:locked], discussion_topic)
 
