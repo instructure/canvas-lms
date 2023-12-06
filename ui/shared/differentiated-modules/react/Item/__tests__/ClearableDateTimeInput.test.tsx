@@ -28,7 +28,7 @@ describe('ClearableDateTimeInput', () => {
     messages: [],
     onChange: jest.fn(),
     onClear: jest.fn(),
-    breakpoints: null,
+    breakpoints: {},
   }
 
   const renderComponent = (overrides = {}) =>
