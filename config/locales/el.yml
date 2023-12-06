@@ -14174,6 +14174,7 @@ el:
       graded: βαθμολογήθηκε/αν
       submitted: υποβλήθηκε
       unsubmitted: "δεν έχει υποβληθεί"
+  submission_action_take_quiz: "Επιλογή του %{title}"
   submission_comment: 
     unknown_author: Κάποιος
   submission_comments_4fa03a17: "Σχόλια Υποβολής"
@@ -14202,6 +14203,9 @@ el:
   submission_details_f3975756: "Λεπτομέρεις Υποβολής"
   submission_score_b7a291e8: "βαθμολογία υποβολής"
   submission_type_a925fc5f: "Είδος υποβολής"
+  submission_types: 
+    a_discussion_post: "μια δημοσίευση συζήτησης"
+    a_quiz: "ένα κουίζ"
   submission_types_79f7b436: "Είδη υποβολής:"
   submissions: 
     assignment_submit_success: "Η εργασία υποβλήθηκε επιτυχώς."
