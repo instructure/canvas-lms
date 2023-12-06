@@ -1426,7 +1426,7 @@ describe ExternalToolsController do
 
       it "includes post_message_forwarding JS for main frame" do
         subject
-        expect(response.body).to include(".push('post_message_forwarding')")
+        expect(response.body).to match %r{<script src="/dist/javascripts/lti_post_message_forwarding-[0-9a-z]+\.js">}
       end
 
       it "includes IN_RCE and IGNORE_LTI_POST_MESSAGES in the JS ENV" do

@@ -84,7 +84,7 @@ window.ENV = {
   use_rce_enhancements: true,
   FEATURES: {
     extended_submission_state: true,
-  },
+  }
 }
 
 Enzyme.configure({adapter: new Adapter()})

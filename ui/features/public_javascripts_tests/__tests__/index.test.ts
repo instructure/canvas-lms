@@ -17,9 +17,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {handler} from '../index'
+import {handler, init} from '../../../../public/javascripts/lti_post_message_forwarding'
 
-describe('post_message_forwarding', () => {
+describe('lti_post_message_forwarding', () => {
   describe('handler', () => {
     let message: string | object
     let origin: string
@@ -159,6 +159,22 @@ describe('post_message_forwarding', () => {
           expect.anything()
         )
       })
+    })
+  })
+
+  describe('init', () => {
+    afterEach(() => jest.restoreAllMocks())
+
+    it('sets up an event handler for postMessage when the DOM loads', () => {
+      jest.spyOn(document, 'readyState', 'get').mockReturnValue('loading')
+      jest.spyOn(document, 'addEventListener').mockImplementation(() => {})
+      init()
+      expect(document.addEventListener).toHaveBeenCalledWith('DOMContentLoaded', expect.anything())
+      const cb = document.addEventListener.mock.calls[0][1]
+
+      jest.spyOn(window, 'addEventListener').mockImplementation(() => {})
+      cb()
+      expect(window.addEventListener).toHaveBeenCalledWith('message', expect.anything())
     })
   })
 })

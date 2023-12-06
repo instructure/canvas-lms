@@ -22,10 +22,10 @@
 
 <% css_bundle :external_tool_full_width %>
 
-<% js_bundle :post_message_forwarding %>
 <% js_bundle :external_tools_show %>
 
 <body class="ic-full-screen-lti-tool" style="height: 100vh; overflow: hidden;">
   <%= render partial: "lti/launch_iframe" %>
   <%= render :partial => 'layouts/foot', :locals => { :include_common_bundle => true } %>
+  <script src="<%= javascript_path("/javascripts/lti_post_message_forwarding.js") %>"></script>
 </body>
