@@ -2789,11 +2789,6 @@ class ApplicationController < ActionController::Base
     !!(mobile_device? && (in_android_app || in_ios_app))
   end
 
-  # temp: will remove in INTEROP-8277
-  include Lti::Oidc
-  helper_method :oidc_authorization_domain
-  # end temp
-
   def ms_office?
     request.user_agent.to_s.include?("ms-office") ||
       request.user_agent.to_s.match?(%r{Word/\d+\.\d+})

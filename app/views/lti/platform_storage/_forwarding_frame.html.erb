@@ -24,7 +24,7 @@
   %>
   <%
     current_domain = HostUrl.context_host(@domain_root_account, request.host_with_port)
-    oidc_auth_domain = oidc_authorization_domain(current_domain)
+    oidc_auth_domain = Lti::Oidc.auth_domain(current_domain)
   %>
   <%= iframe(
     # rev=1 -- bust cache until we have a better way of doing that (next commit)
