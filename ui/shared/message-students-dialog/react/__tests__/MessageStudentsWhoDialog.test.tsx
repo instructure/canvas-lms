@@ -39,6 +39,7 @@ const students: Student[] = [
     sortableName: 'Ford, Betty',
     score: undefined,
     submittedAt: undefined,
+    excused: false,
   },
   {
     id: '101',
@@ -48,6 +49,7 @@ const students: Student[] = [
     sortableName: 'Jones, Adam',
     score: undefined,
     submittedAt: undefined,
+    excused: false,
   },
   {
     id: '102',
@@ -57,6 +59,7 @@ const students: Student[] = [
     sortableName: 'Xi, Charlie',
     score: undefined,
     submittedAt: undefined,
+    excused: false,
   },
   {
     id: '103',
@@ -66,6 +69,7 @@ const students: Student[] = [
     sortableName: 'Smith, Dana',
     score: undefined,
     submittedAt: undefined,
+    excused: false,
   },
 ]
 
@@ -446,6 +450,14 @@ describe.skip('MessageStudentsWhoDialog', () => {
   })
 
   describe('selected criteria', () => {
+    beforeEach(() => {
+      students.forEach(student => {
+        student.submittedAt = undefined
+        student.excused = undefined
+        student.grade = undefined
+        student.score = undefined
+      })
+    })
     it('updates the student and observer checkbox counts', async () => {
       students[0].grade = '8'
       students[1].grade = '10'
@@ -465,6 +477,31 @@ describe.skip('MessageStudentsWhoDialog', () => {
 
       expect(await findByRole('checkbox', {name: /Students/})).toHaveAccessibleName('2 Students')
       expect(await findByRole('checkbox', {name: /Observers/})).toHaveAccessibleName('0 Observers')
+    })
+
+    it('"Have not yet submitted" does not display students who are excused', async () => {
+      const mocks = await makeMocks()
+      students[2].excused = true
+      const {getAllByRole, getByRole, findByLabelText, getByText} = render(
+        <MockedProvider mocks={mocks} cache={createCache()}>
+          <MessageStudentsWhoDialog {...makeProps()} />
+        </MockedProvider>
+      )
+
+      const button = await findByLabelText(/For students who/)
+      fireEvent.click(button)
+      fireEvent.click(getByText(/Have not yet submitted/))
+
+      fireEvent.click(getByRole('button', {name: 'Show all recipients'}))
+      expect(getByRole('table')).toBeInTheDocument()
+
+      const tableRows = getAllByRole('row') as HTMLTableRowElement[]
+      const studentCells = tableRows.map(row => row.cells[0])
+      expect(studentCells).toHaveLength(4)
+      expect(studentCells[0]).toHaveTextContent('Students')
+      expect(studentCells[1]).toHaveTextContent('Betty Ford')
+      expect(studentCells[2]).toHaveTextContent('Adam Jones')
+      expect(studentCells[3]).toHaveTextContent('Dana Smith')
     })
 
     it('"Have not yet submitted" displays students who have no submitted next to their observers', async () => {
@@ -494,6 +531,32 @@ describe.skip('MessageStudentsWhoDialog', () => {
       expect(observerCells[1]).toHaveTextContent('Observer0')
       expect(studentCells[2]).toHaveTextContent('Adam Jones')
       expect(observerCells[2]).toHaveTextContent('Observer1')
+    })
+
+    it('"Have not been graded" does not display students who are excused', async () => {
+      const mocks = await makeMocks()
+      students[2].excused = true
+      const {getAllByRole, getByRole, findByLabelText, getByText} = render(
+        <MockedProvider mocks={mocks} cache={createCache()}>
+          <MessageStudentsWhoDialog {...makeProps()} />
+        </MockedProvider>
+      )
+
+      const button = await findByLabelText(/For students who/)
+      fireEvent.click(button)
+      fireEvent.click(getByText(/Have not been graded/))
+
+      fireEvent.click(getByRole('button', {name: 'Show all recipients'}))
+      expect(getByRole('table')).toBeInTheDocument()
+
+      const tableRows = getAllByRole('row') as HTMLTableRowElement[]
+      const studentCells = tableRows.map(row => row.cells[0])
+      // first cell will be the header
+      expect(studentCells).toHaveLength(4)
+      expect(studentCells[0]).toHaveTextContent('Students')
+      expect(studentCells[1]).toHaveTextContent('Betty Ford')
+      expect(studentCells[2]).toHaveTextContent('Adam Jones')
+      expect(studentCells[3]).toHaveTextContent('Dana Smith')
     })
 
     it('"Have not been graded" displays students who do not have a grade', async () => {

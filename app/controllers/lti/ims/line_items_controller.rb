@@ -242,7 +242,15 @@ module Lti
       def destroy
         head :unauthorized and return if line_item.coupled
 
-        line_item.destroy!
+        if line_item.assignment_line_item?
+          # assignment owns the lifecycle of line items
+          # and resource links
+          line_item.assignment.destroy!
+        else
+          # this is an extra non-default line item and can be
+          # safely deleted on its own
+          line_item.destroy!
+        end
         head :no_content
       end
 

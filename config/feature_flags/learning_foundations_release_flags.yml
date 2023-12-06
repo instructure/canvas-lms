@@ -229,3 +229,11 @@ learner_passport:
   root_opt_in: true
   display_name: Learner Passport Prototype
   description: An in-progress working prototype of the Learner Passport feature.
+
+precise_link_replacements:
+  state: hidden
+  display_name: Precise link replacement on content migrations
+  description: |-
+    Apply link replacement logic to a select list of
+    elements only, as opposed to all texts
+  applies_to: SiteAdmin

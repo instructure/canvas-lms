@@ -256,6 +256,21 @@ describe CoursePacesController do
         expect(js_env[:PACES_PUBLISHING].length).to eq(1)
       end
 
+      it "does not return duplicate paces publishing for the same pace context" do
+        @course_pace1.create_publish_progress
+        @course_pace1.create_publish_progress
+        section_pace = course_pace_model(course: @course1, course_section: @course1.default_section)
+        section_pace.create_publish_progress
+
+        user_session(@teacher1)
+
+        get :index, params: { course_id: @course1.id }
+        expect(response).to be_successful
+
+        js_env = controller.js_env
+        expect(js_env[:PACES_PUBLISHING].length).to eq(2)
+      end
+
       it "removes the progress if the enrollment is no longer active" do
         student_enrollment = @course1.enroll_student(@student, enrollment_state: "active", allow_multiple_enrollments: true)
         # Stop other publishing progresses
@@ -670,14 +685,18 @@ describe CoursePacesController do
       expect(json_response["workflow_state"]).to eq("queued")
     end
 
-    it "emits course_pacing.publishing.count_exceeding_limit to statsd when pace publishing proccesses exceeded limit" do
+    it "emits course_pacing.publishing.count_exceeding_limit to statsd when pace publishing processes exceeded limit" do
       allow(InstStatsd::Statsd).to receive(:count).and_call_original
+      stub_const("CoursePacesController::COURSE_PACES_PUBLISHING_LIMIT", 5)
 
       Progress.destroy_all
-      50.times { @course_pace.create_publish_progress(run_at: Time.now) }
+      6.times do
+        pace = course_pace_model(course: @course, course_section: @course.course_sections.create!)
+        pace.create_publish_progress(run_at: Time.now)
+      end
 
       post :publish, params: { course_id: @course.id, id: @course_pace.id }
-      expect(InstStatsd::Statsd).to have_received(:count).with("course_pacing.publishing.count_exceeding_limit", 51)
+      expect(InstStatsd::Statsd).to have_received(:count).with("course_pacing.publishing.count_exceeding_limit", 6)
     end
   end
 

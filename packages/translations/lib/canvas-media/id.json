@@ -5,6 +5,9 @@
   "armenian_12da6118": { "message": "Armenia" },
   "belarusian_b2f19c76": { "message": "Belarus" },
   "bulgarian_feccab7e": { "message": "Bulgaria" },
+  "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
+    "message": "Caption yang diwarisi dari kursus induk tidak dapat dihapus."
+  },
   "catalan_16f6b78f": { "message": "Catalan" },
   "chinese_111d37f6": { "message": "Mandarin" },
   "chinese_simplified_7f0bd370": { "message": "Mandarin Tiongkok" },
@@ -62,9 +65,15 @@
   "swedish_59a593ca": { "message": "Swedia" },
   "tagalog_74906db7": { "message": "Tagalog" },
   "thai_8f9bc548": { "message": "Thai" },
+  "the_selected_file_exceeds_the_maxsize_byte_limit_f7e8c771": {
+    "message": "File yang dipilih melebihi batas { maxSize } Byte"
+  },
   "turkish_5b69578b": { "message": "Turki" },
   "ukrainian_945b00b7": { "message": "Ukraina" },
   "vietnamese_e7a76583": { "message": "Vietnam" },
   "welsh_42ab94b1": { "message": "Wales" },
-  "yiddish_f96986df": { "message": "Yiddish" }
+  "yiddish_f96986df": { "message": "Yiddish" },
+  "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
+    "message": "Anda bisa mengganti dengan mengunggah file caption baru."
+  }
 }

@@ -22,10 +22,16 @@ export type EnvAccounts = Partial<EnvAccountsAdminTools>
  * From AccountsController#admin_tools
  */
 export interface EnvAccountsAdminTools {
+  ROOT_ACCOUNT_NAME: string
   ACCOUNT_ID: string
   PERMISSIONS: {
-    restore_course: boolean
-    view_messages: boolean
+    can_allow_course_admin_actions: boolean
+    can_create_enrollments: boolean
+    can_create_users: boolean
+    can_manage_admin_users: boolean
+    can_manage_groups: boolean
+    can_read_roster: boolean
+    can_view_temporary_enrollments: boolean
     logging:
       | false
       | {
@@ -34,6 +40,8 @@ export interface EnvAccountsAdminTools {
           course: boolean
           mutation: boolean
         }
+    restore_course: boolean
+    view_messages: boolean
   }
   bounced_emails_admin_tool: boolean
 }

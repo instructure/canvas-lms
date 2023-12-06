@@ -45,7 +45,7 @@ module Types
       end
     end
 
-    field :conversation, ConversationType, null: false
+    field :conversation, ConversationType, null: true
     def conversation
       load_association(:conversation)
     end

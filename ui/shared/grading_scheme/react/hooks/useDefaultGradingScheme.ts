@@ -19,7 +19,7 @@
 import {useState, useCallback} from 'react'
 
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {GradingSchemeTemplate} from '../../gradingSchemeApiModel'
+import {GradingScheme} from '../../gradingSchemeApiModel'
 import {ApiCallStatus} from './ApiCallStatus'
 import {buildContextPath} from './buildContextPath'
 
@@ -27,7 +27,7 @@ export const useDefaultGradingScheme = (): {
   loadDefaultGradingScheme: (
     contextType: 'Account' | 'Course',
     contextId: string
-  ) => Promise<GradingSchemeTemplate>
+  ) => Promise<GradingScheme>
   loadDefaultGradingSchemeStatus: ApiCallStatus
 } => {
   const [loadDefaultGradingSchemeStatus, setLoadDefaultGradingSchemeStatus] = useState(
@@ -35,24 +35,21 @@ export const useDefaultGradingScheme = (): {
   )
 
   const loadDefaultGradingScheme = useCallback(
-    async (
-      contextType: 'Account' | 'Course',
-      contextId: string
-    ): Promise<GradingSchemeTemplate> => {
+    async (contextType: 'Account' | 'Course', contextId: string): Promise<GradingScheme> => {
       setLoadDefaultGradingSchemeStatus(ApiCallStatus.NOT_STARTED)
       const contextPath = buildContextPath(contextType, contextId)
       try {
         setLoadDefaultGradingSchemeStatus(ApiCallStatus.PENDING)
 
         // @ts-expect-error
-        const result = await doFetchApi<GradingSchemeTemplate>({
+        const result = await doFetchApi<GradingScheme>({
           path: `${contextPath}/grading_schemes/default`,
           method: 'GET',
         })
         if (!result.response.ok) {
           throw new Error(result.response.statusText)
         }
-        const defaultGradingScheme: GradingSchemeTemplate = result.json
+        const defaultGradingScheme: GradingScheme = result.json
         setLoadDefaultGradingSchemeStatus(ApiCallStatus.COMPLETED)
         return defaultGradingScheme
       } catch (err) {

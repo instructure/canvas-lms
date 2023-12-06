@@ -143,6 +143,56 @@ describe RubricAssessment do
     it "returns true if the rubric association exists and is active" do
       expect(@assessment).to be_active_rubric_association
     end
+
+    context "triggering a rubric_assessed live event" do
+      it "does not trigger if there is not rubric association" do
+        expect(Canvas::LiveEvents).not_to receive(:rubric_assessed)
+        @assessment.update!(rubric_association: nil)
+      end
+
+      it "does not trigger if the rubric association is soft-deleted" do
+        expect(Canvas::LiveEvents).not_to receive(:rubric_assessed)
+        @association.destroy
+      end
+
+      context "if the rubric association exists and is active" do
+        before do
+          @assignment = assignment_model
+          @association = @rubric.associate_with(@assignment, @course, purpose: "grading", use_for_grading: true)
+          @course.enroll_student(@student, enrollment_state: :active)
+          @artifact = @assignment.find_or_create_submission(@student)
+        end
+
+        def assess_assignment(criterion_points)
+          @association.assess({
+                                user: @student,
+                                assessor: @teacher,
+                                artifact: @artifact,
+                                assessment: {
+                                  assessment_type: "grading",
+                                  criterion_crit1: {
+                                    points: criterion_points,
+                                    comments: "comments",
+                                  }
+                                }
+                              })
+        end
+
+        it "does trigger an event when saving the initial assessment" do
+          expect(Canvas::LiveEvents).to receive(:rubric_assessed)
+          @assessment = assess_assignment("3")
+        end
+
+        it "does trigger an event when reassessing an assessment" do
+          expect(Canvas::LiveEvents).to receive(:rubric_assessed).twice
+          first_assessment = assess_assignment("3")
+          expect(first_assessment.versions.count).to eq 1
+
+          second_assessment = assess_assignment("5")
+          expect(second_assessment.versions.count).to eq 2
+        end
+      end
+    end
   end
 
   it { is_expected.to have_many(:learning_outcome_results).dependent(:destroy) }
@@ -357,6 +407,48 @@ describe RubricAssessment do
         expect { @association.assess(assessment_opts) }.to change {
           @provisional_grade.reload.score
         }.from(3).to(5)
+      end
+    end
+
+    context "aligned_outcome_ids" do
+      it "returns ids if rubric is aligned with outcomes" do
+        assignment_model
+        outcome_with_rubric
+        @association = @rubric.associate_with(@assignment, @course, purpose: "grading", use_for_grading: true)
+        @course.enroll_student(@student, enrollment_state: :active)
+        criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym
+        assessment = @association.assess({
+                                           user: @student,
+                                           assessor: @teacher,
+                                           artifact: @assignment.find_or_create_submission(@student),
+                                           assessment: {
+                                             :assessment_type => "grading",
+                                             criterion_id => {
+                                               points: "3"
+                                             }
+                                           }
+                                         })
+        expect(assessment.aligned_outcome_ids).to eq [@rubric.data[0][:learning_outcome_id]]
+      end
+
+      it "returns emptry array if rubric is aligned with outcomes" do
+        assignment_model
+        rubric_model
+        @association = @rubric.associate_with(@assignment, @course, purpose: "grading", use_for_grading: true)
+        @course.enroll_student(@student, enrollment_state: :active)
+        criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym
+        assessment = @association.assess({
+                                           user: @student,
+                                           assessor: @teacher,
+                                           artifact: @assignment.find_or_create_submission(@student),
+                                           assessment: {
+                                             :assessment_type => "grading",
+                                             criterion_id => {
+                                               points: "3"
+                                             }
+                                           }
+                                         })
+        expect(assessment.aligned_outcome_ids).to eq []
       end
     end
 

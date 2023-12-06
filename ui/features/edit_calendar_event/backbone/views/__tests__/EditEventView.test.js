@@ -21,6 +21,7 @@ import '@canvas/backbone'
 import _ from 'lodash'
 import moment from 'moment-timezone'
 import {fireEvent, within, getByText, waitFor} from '@testing-library/dom'
+import userEvent from '@testing-library/user-event'
 import CalendarEvent from '../../models/CalendarEvent'
 import EditEventView from '../EditEventView'
 import * as UpdateCalendarEventDialogModule from '@canvas/calendar/react/RecurringEvents/UpdateCalendarEventDialog'
@@ -318,6 +319,33 @@ describe('EditEventView', () => {
 
       fireEvent.click(section_checkbox)
       expect(within(document.body).queryByTestId('frequency-picker')).not.toBeVisible()
+    })
+
+    it('shows the duplicates when section dates are enabled', async () => {
+      jest.spyOn($, 'ajaxJSON').mockImplementation((url, method, params, successCB) => {
+        const sections = [{id: 1}]
+        return Promise.resolve(sections).then(() => {
+          successCB(sections, {getResponseHeader: () => ''})
+        })
+      })
+
+      const event = new CalendarEvent({
+        context_code: 'course_1',
+        sections_url: '/api/v1/courses/21/sections',
+      })
+      event.sync = () => {}
+
+      new EditEventView({el: document.getElementById('content'), model: event})
+
+      const section_checkbox = await within(document.body).findByRole('checkbox', {
+        id: 'use_section_dates',
+      })
+      expect(section_checkbox).toBeVisible()
+      expect(document.getElementById('duplicate_event')).not.toBeVisible()
+
+      userEvent.click(section_checkbox)
+
+      expect(document.getElementById('duplicate_event')).toBeVisible()
     })
 
     it('renders update calendar event dialog', async () => {

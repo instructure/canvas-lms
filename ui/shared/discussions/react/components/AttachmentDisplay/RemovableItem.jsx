@@ -60,7 +60,7 @@ export const RemovableItem = ({
               {children}
             </View>
             {(showRemove || ['mobile', 'tablet'].some(device => matches.includes(device))) && (
-              <div style={{display: 'inline-block', margin: '0 0.25rem'}}>
+              <div style={{display: 'inline-block', margin: '0 0.5rem'}}>
                 <IconButton
                   size="small"
                   shape="circle"

@@ -47,6 +47,14 @@ export function hasSubmitted(submission) {
   return !!(submission.submittedAt || submission.submitted_at)
 }
 
+export function hasGraded(submission) {
+  if (submission.excused) {
+    return true
+  }
+
+  return MessageStudentsWhoHelper.exists(submission.score)
+}
+
 export function hasSubmission(assignment) {
   const submissionTypes = getSubmissionTypes(assignment)
   if (submissionTypes.length === 0) return false
@@ -140,7 +148,7 @@ const MessageStudentsWhoHelper = {
         text: I18n.t("Haven't been graded"),
         subjectFn: assignment =>
           I18n.t('No grade for %{assignment}', {assignment: assignment.name}),
-        criteriaFn: student => !this.exists(student.score),
+        criteriaFn: student => !hasGraded(student),
       },
       {
         text: I18n.t('Scored less than'),

@@ -23,7 +23,7 @@ import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import handleOpenTray from '../handleOpenTray'
-import assetFactory from '@canvas/confetti/react/assetFactory'
+import assetFactory from '@canvas/confetti/javascript/assetFactory'
 
 const I18n = useI18nScope('TourPoints')
 

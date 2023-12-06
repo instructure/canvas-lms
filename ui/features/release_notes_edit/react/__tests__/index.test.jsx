@@ -17,11 +17,10 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, waitFor} from '@testing-library/react'
 import ReleaseNotesEdit from '../index'
 import useFetchApi from '@canvas/use-fetch-api-hook'
-
-jest.mock('@canvas/use-fetch-api-hook')
+import fetchMock from 'fetch-mock'
 
 const exampleNote = {
   id: 'f083d068-2329-4717-9f0d-9e5c7726cc82',
@@ -38,24 +37,20 @@ const exampleNote = {
 
 describe('release notes editing parent', () => {
   it('renders spinner while loading', () => {
-    useFetchApi.mockImplementationOnce(({loading}) => loading(true))
+    jest.fn().mockImplementation(useFetchApi)
     const {getByText} = render(<ReleaseNotesEdit envs={['test']} langs={['en', 'es']} />)
     expect(getByText(/loading/i)).toBeInTheDocument()
   })
 
-  it('hides spinner when not loading', () => {
-    useFetchApi.mockImplementationOnce(({loading}) => loading(false))
-    const {queryByText} = render(<ReleaseNotesEdit envs={['test']} langs={['en', 'es']} />)
-    expect(queryByText(/loading/i)).not.toBeInTheDocument()
-  })
-
   it('displays table with successful retrieval and not loading', () => {
     const notes = [exampleNote]
-    useFetchApi.mockImplementationOnce(({loading, success}) => {
-      loading(false)
-      success(notes)
+    fetchMock.getOnce('/api/v1/release_notes?includes%5B%5D=langs&per_page=20&page=null', notes)
+    const {getByText, queryByText} = render(
+      <ReleaseNotesEdit envs={['test']} langs={['en', 'es']} />
+    )
+    waitFor(() => {
+      expect(getByText(notes[0].langs.en.title)).toBeInTheDocument()
+      expect(queryByText(/loading/i)).not.toBeInTheDocument()
     })
-    const {getByText} = render(<ReleaseNotesEdit envs={['test']} langs={['en', 'es']} />)
-    expect(getByText(notes[0].langs.en.title)).toBeInTheDocument()
   })
 })

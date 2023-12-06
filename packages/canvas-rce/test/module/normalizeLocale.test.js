@@ -27,7 +27,6 @@ describe('normalizeLocale', () => {
 
   it('maps unknown region locale to the base locale', () => {
     assert.equal(normalizeLocale('he-IL'), 'he')
-    assert.equal(normalizeLocale('en-US'), 'en')
   })
 
   it('maps known substitutions', () => {

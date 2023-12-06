@@ -19,6 +19,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
+import {waitFor} from '@testing-library/react'
 import ExternalToolDialog from '../ExternalToolDialog'
 import {InstUISettingsProvider} from '@instructure/emotion'
 import {send} from '@canvas/rce/RceCommandShim'
@@ -148,7 +149,7 @@ describe('open', () => {
     const instance = await getInstance(container)
     instance.open({name: 'foo', id: 1})
     expect(container.querySelector('form').action).toBe('http://url/with/1')
-    expect(submit).toHaveBeenCalled()
+    await waitFor(() => expect(submit).toHaveBeenCalled())
   })
 
   it('submits current selection to tool', async () => {
@@ -158,7 +159,7 @@ describe('open', () => {
     const instance = await getInstance(container, {editor})
     instance.open({name: 'foo', id: 1})
     expect(container.querySelector('input[name="selection"]').value).toBe(selection)
-    expect(submit).toHaveBeenCalled()
+    await waitFor(() => expect(submit).toHaveBeenCalled())
   })
 
   it('submits current editor contents to tool', async () => {
@@ -168,7 +169,7 @@ describe('open', () => {
     const instance = await getInstance(container, {editor})
     instance.open({name: 'foo', id: 1})
     expect(container.querySelector('input[name="editor_contents"]').value).toBe(contents)
-    expect(submit).toHaveBeenCalled()
+    await waitFor(() => expect(submit).toHaveBeenCalled())
   })
 
   it('uses default resource selection url', async () => {
@@ -334,7 +335,7 @@ describe('handleRemove', () => {
     const instance = await getInstance(container, {win})
     instance.open({name: 'foo', id: 2})
     instance.handleClose()
-    expect(win.dispatchEvent).toHaveBeenCalledWith(new Event('resize'))
+    await waitFor(() => expect(win.dispatchEvent).toHaveBeenCalledWith(new Event('resize')))
   })
 })
 

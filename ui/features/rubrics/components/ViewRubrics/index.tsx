@@ -17,7 +17,11 @@
  */
 
 import React from 'react'
-import {useNavigate} from 'react-router-dom'
+import {useNavigate, useParams} from 'react-router-dom'
+import {useQuery} from '@canvas/query'
+import {useScope as useI18nScope} from '@canvas/i18n'
+import LoadingIndicator from '@canvas/loading-indicator'
+import type {Rubric} from '@canvas/rubrics/react/types/rubric'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -26,54 +30,80 @@ import {IconAddLine, IconSearchLine} from '@instructure/ui-icons'
 import {TextInput} from '@instructure/ui-text-input'
 import {View} from '@instructure/ui-view'
 import {RubricTable} from './RubricTable'
+import {RubricQueryResponse} from '../../types/Rubric'
+import {
+  FetchRubricVariables,
+  fetchAccountRubrics,
+  fetchCourseRubrics,
+} from '../../queries/ViewRubricQueries'
 
 const {Item: FlexItem} = Flex
 
-type Rubric = {
-  id: string
-  name: string
-  points: number
-  criterion: number
-  locations: string[]
-}
+const I18n = useI18nScope('rubrics-list-view')
 
 export const ViewRubrics = () => {
   const navigate = useNavigate()
+  const {accountId, courseId} = useParams()
+  const isAccount = !!accountId
+  const isCourse = !!courseId
 
-  // Temporary setup data
-  const mainRubricProps: Rubric[] = [
-    {
-      id: '1',
-      criterion: 3,
-      name: 'Quizzes Rubric',
-      points: 30,
-      locations: ['GD101', 'ART220', 'CS220', 'MS230'],
+  let queryVariables: FetchRubricVariables
+  let fetchQuery: (queryVariables: FetchRubricVariables) => Promise<RubricQueryResponse>
+  let queryKey: string = ''
+
+  if (isAccount) {
+    queryVariables = {accountId}
+    fetchQuery = fetchAccountRubrics
+    queryKey = `accountRubrics-${accountId}`
+  } else if (isCourse) {
+    queryVariables = {courseId}
+    fetchQuery = fetchCourseRubrics
+    queryKey = `courseRubrics-${courseId}`
+  }
+
+  const {data, isLoading} = useQuery({
+    queryKey: [queryKey],
+    queryFn: async () => fetchQuery(queryVariables),
+  })
+
+  if (isLoading) {
+    return <LoadingIndicator />
+  }
+
+  if (!data) {
+    return null
+  }
+
+  const {activeRubrics, archivedRubrics} = data.rubricsConnection.nodes.reduce(
+    (prev, curr) => {
+      const rubric: Rubric = {
+        id: curr.id,
+        title: curr.title,
+        pointsPossible: curr.pointsPossible,
+        criteriaCount: curr.criteriaCount,
+        locations: [], // TODO: add locations once we have them
+      }
+
+      curr.workflowState === 'active'
+        ? prev.activeRubrics.push(rubric)
+        : prev.archivedRubrics.push(rubric)
+      return prev
     },
-    {id: '2', criterion: 5, name: 'ART 101 Rubric', points: 100, locations: []},
-    {id: '3', criterion: 1, name: 'Test 1', points: 0, locations: []},
-  ]
-  const archivedRubricProps: Rubric[] = [
-    {
-      id: '4',
-      criterion: 3,
-      name: 'Old Rubric 1',
-      points: 30,
-      locations: ['GD101', 'ART220', 'CS220', 'MS230'],
-    },
-  ]
+    {activeRubrics: [] as Rubric[], archivedRubrics: [] as Rubric[]}
+  )
 
   return (
     <View as="div">
       <Flex>
         <FlexItem shouldShrink={true} shouldGrow={true}>
           <Heading level="h1" themeOverride={{h1FontWeight: 700}} margin="medium 0 0 0">
-            Rubrics
+            {I18n.t('Rubrics')}
           </Heading>
         </FlexItem>
         <FlexItem>
           <TextInput
-            renderLabel={<ScreenReaderContent>Search Rubrics</ScreenReaderContent>}
-            placeholder="Search..."
+            renderLabel={<ScreenReaderContent>{I18n.t('Search Rubrics')}</ScreenReaderContent>}
+            placeholder={I18n.t('Search...')}
             value=""
             width="17"
             renderBeforeInput={<IconSearchLine inline={false} />}
@@ -86,27 +116,27 @@ export const ViewRubrics = () => {
             margin="small"
             onClick={() => navigate('./create')}
           >
-            Create New Rubric
+            {I18n.t('Create New Rubric')}
           </Button>
         </FlexItem>
       </Flex>
 
       <View as="div" margin="large 0 0 0">
         <Heading level="h2" themeOverride={{h1FontWeight: 700}}>
-          Saved
+          {I18n.t('Saved')}
         </Heading>
       </View>
-      <View as="div" margin="medium 0">
-        <RubricTable rubrics={mainRubricProps} />
+      <View as="div" margin="medium 0" data-testid="saved-rubrics-table">
+        <RubricTable rubrics={activeRubrics} />
       </View>
 
       <View as="div" margin="large 0 0 0">
         <Heading level="h2" themeOverride={{h1FontWeight: 700}}>
-          Archived
+          {I18n.t('Archived')}
         </Heading>
       </View>
-      <View as="div" margin="medium 0">
-        <RubricTable rubrics={archivedRubricProps} />
+      <View as="div" margin="medium 0" data-testid="archived-rubrics-table">
+        <RubricTable rubrics={archivedRubrics} />
       </View>
     </View>
   )

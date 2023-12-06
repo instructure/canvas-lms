@@ -74,7 +74,7 @@ module ActiveRecord
 
             if key_types.any?
               base_keys.group_by { |key| Canvas::CacheRegister.redis(key, ::Shard.current) }.each do |redis, node_base_keys|
-                node_base_keys.map { |k| key_types.map { |type| "#{k}/#{type}" } }.flatten.each_slice(1000) do |slice|
+                node_base_keys.map { |k| key_types.map { |type| "{#{k}}/#{type}" } }.flatten.each_slice(1000) do |slice|
                   redis.del(*slice)
                 end
               rescue Redis::BaseConnectionError
@@ -84,7 +84,7 @@ module ActiveRecord
             if multi_key_types.any?
               base_keys.each do |base_key|
                 multi_key_types.each do |type|
-                  MultiCache.delete("#{base_key}/#{type}", { unprefixed_key: true })
+                  MultiCache.delete("{#{base_key}}/#{type}", { unprefixed_key: true })
                 end
               end
             end
@@ -109,7 +109,7 @@ module ActiveRecord
 
           prefer_multi_cache = prefer_multi_cache_for_key_type?(key_type)
           redis = Canvas::CacheRegister.redis(base_key, ::Shard.shard_for(global_id), prefer_multi_cache:)
-          full_key = "#{base_key}/#{key_type}"
+          full_key = "{#{base_key}}/#{key_type}"
 
           RequestCache.cache(full_key) do
             # try to get the timestamp for the type, set it to now if it doesn't exist

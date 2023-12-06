@@ -152,7 +152,12 @@ module Gradebook
     f('span[data-menu-id="previous-export"]')
   end
 
-  def self.link_export
+  # EVAL-3711 Remove ICE Evaluate feature flag
+  def self.link_export(course)
+    if course.root_account.feature_enabled?(:instui_nav)
+      return ff('[data-component="EnhancedActionMenu"] button')[2]
+    end
+
     ff('[data-component="EnhancedActionMenu"] button')[1]
   end
 
@@ -160,7 +165,12 @@ module Gradebook
     ff('[data-component="EnhancedActionMenu"] button')[0]
   end
 
-  def self.link_import
+  # EVAL-3711 Remove ICE Evaluate feature flag
+  def self.link_import(course)
+    if course.root_account.feature_enabled?(:instui_nav)
+      return ff('[data-component="EnhancedActionMenu"] button')[1]
+    end
+
     ff('[data-component="EnhancedActionMenu"] button')[0]
   end
 
@@ -185,7 +195,11 @@ module Gradebook
   end
 
   def self.gradebook_menu_element
-    f('.gradebook-menus [data-component="GradebookMenu"]')
+    f('[data-testid="gradebook-select-dropdown"]')
+  end
+
+  def self.gradebook_title
+    f('[data-testid="gradebook-title"]')
   end
 
   def self.gradebook_settings_button
@@ -387,16 +401,16 @@ module Gradebook
     notes_option.click
   end
 
-  def self.select_export
-    link_export.click
+  def self.select_export(course)
+    link_export(course).click
   end
 
   def self.select_sync
     link_sync.click
   end
 
-  def self.select_import
-    link_import.click
+  def self.select_import(course)
+    link_import(course).click
   end
 
   def self.select_previous_grade_export

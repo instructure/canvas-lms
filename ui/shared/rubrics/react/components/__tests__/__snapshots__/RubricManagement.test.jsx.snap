@@ -8,6 +8,7 @@ exports[`RubricManagement renders the RubricManagement component 1`] = `
   variant="default"
 >
   <Panel
+    active={false}
     id="tab-panel-rubrics"
     isDisabled={false}
     isSelected={true}
@@ -19,6 +20,7 @@ exports[`RubricManagement renders the RubricManagement component 1`] = `
     <RubricPanel />
   </Panel>
   <Panel
+    active={false}
     elementRef={[Function]}
     id="tab-panel-mastery"
     isDisabled={false}

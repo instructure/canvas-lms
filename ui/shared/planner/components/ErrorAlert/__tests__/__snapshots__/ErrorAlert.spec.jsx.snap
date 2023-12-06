@@ -31,7 +31,7 @@ exports[`renders with Error details 1`] = `
   uh oh
   <span
     style={
-      Object {
+      {
         "display": "none",
       }
     }
@@ -56,7 +56,7 @@ exports[`renders with string details 1`] = `
   uh oh
   <span
     style={
-      Object {
+      {
         "display": "none",
       }
     }

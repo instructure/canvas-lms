@@ -1,12 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`adds a new item to a new day when the loaded range is open ended in the future 1`] = `
-Object {
-  "days": Array [
-    Array [
+{
+  "days": [
+    [
       "2018-01-01",
-      Array [
-        Object {
+      [
+        {
           "date": "2018-01-01T00:00:00.000Z",
           "dateBucketMoment": "2018-01-01T00:00:00.000Z",
           "id": 0,
@@ -15,10 +15,10 @@ Object {
         },
       ],
     ],
-    Array [
+    [
       "2018-01-02",
-      Array [
-        Object {
+      [
+        {
           "date": "2018-01-02T00:00:00.000Z",
           "dateBucketMoment": "2018-01-02T00:00:00.000Z",
           "id": "new future",
@@ -28,23 +28,23 @@ Object {
       ],
     ],
   ],
-  "loading": Object {
+  "loading": {
     "allFutureItemsLoaded": true,
     "allPastItemsLoaded": false,
-    "partialFutureDays": Array [],
-    "partialPastDays": Array [],
+    "partialFutureDays": [],
+    "partialPastDays": [],
     "plannerLoaded": true,
   },
 }
 `;
 
 exports[`adds a new item to a new day when the loaded range is open ended in the past 1`] = `
-Object {
-  "days": Array [
-    Array [
+{
+  "days": [
+    [
       "2017-12-31",
-      Array [
-        Object {
+      [
+        {
           "date": "2017-12-31T00:00:00.000Z",
           "dateBucketMoment": "2017-12-31T00:00:00.000Z",
           "id": "new past",
@@ -53,10 +53,10 @@ Object {
         },
       ],
     ],
-    Array [
+    [
       "2018-01-01",
-      Array [
-        Object {
+      [
+        {
           "date": "2018-01-01T00:00:00.000Z",
           "dateBucketMoment": "2018-01-01T00:00:00.000Z",
           "id": 0,
@@ -66,23 +66,23 @@ Object {
       ],
     ],
   ],
-  "loading": Object {
+  "loading": {
     "allFutureItemsLoaded": false,
     "allPastItemsLoaded": true,
-    "partialFutureDays": Array [],
-    "partialPastDays": Array [],
+    "partialFutureDays": [],
+    "partialPastDays": [],
     "plannerLoaded": true,
   },
 }
 `;
 
 exports[`adds a new item to a new day when the new date is within the loaded range 1`] = `
-Object {
-  "days": Array [
-    Array [
+{
+  "days": [
+    [
       "2018-01-01",
-      Array [
-        Object {
+      [
+        {
           "date": "2018-01-01T00:00:00.000Z",
           "dateBucketMoment": "2018-01-01T00:00:00.000Z",
           "id": 0,
@@ -91,10 +91,10 @@ Object {
         },
       ],
     ],
-    Array [
+    [
       "2018-01-02",
-      Array [
-        Object {
+      [
+        {
           "date": "2018-01-02T00:00:00.000Z",
           "dateBucketMoment": "2018-01-02T00:00:00.000Z",
           "id": 1,
@@ -103,10 +103,10 @@ Object {
         },
       ],
     ],
-    Array [
+    [
       "2018-01-03",
-      Array [
-        Object {
+      [
+        {
           "date": "2018-01-03T00:00:00.000Z",
           "dateBucketMoment": "2018-01-03T00:00:00.000Z",
           "id": 2,
@@ -116,37 +116,37 @@ Object {
       ],
     ],
   ],
-  "loading": Object {
+  "loading": {
     "allFutureItemsLoaded": false,
     "allPastItemsLoaded": false,
-    "partialFutureDays": Array [],
-    "partialPastDays": Array [],
+    "partialFutureDays": [],
+    "partialPastDays": [],
     "plannerLoaded": true,
   },
 }
 `;
 
 exports[`adds a new item to an existing day when the new date is within the loaded range 1`] = `
-Object {
-  "days": Array [
-    Array [
+{
+  "days": [
+    [
       "2018-01-01",
-      Array [
-        Object {
+      [
+        {
           "date": "2018-01-01T00:00:00.000Z",
           "dateBucketMoment": "2018-01-01T00:00:00.000Z",
           "id": 0,
           "title": "0",
           "uniqueId": 0,
         },
-        Object {
+        {
           "date": "2018-01-01T00:00:00.000Z",
           "dateBucketMoment": "2018-01-01T00:00:00.000Z",
           "id": 1,
           "title": "1",
           "uniqueId": 1,
         },
-        Object {
+        {
           "date": "2018-01-01T00:00:00.000Z",
           "dateBucketMoment": "2018-01-01T00:00:00.000Z",
           "id": 2,
@@ -156,23 +156,23 @@ Object {
       ],
     ],
   ],
-  "loading": Object {
+  "loading": {
     "allFutureItemsLoaded": false,
     "allPastItemsLoaded": false,
-    "partialFutureDays": Array [],
-    "partialPastDays": Array [],
+    "partialFutureDays": [],
+    "partialPastDays": [],
     "plannerLoaded": true,
   },
 }
 `;
 
 exports[`adds a new item to partial future days when the new date is before the near future boundary but outside loaded range 1`] = `
-Object {
-  "days": Array [
-    Array [
+{
+  "days": [
+    [
       "2018-01-01",
-      Array [
-        Object {
+      [
+        {
           "date": "2018-01-01T00:00:00.000Z",
           "dateBucketMoment": "2018-01-01T00:00:00.000Z",
           "id": 0,
@@ -182,14 +182,14 @@ Object {
       ],
     ],
   ],
-  "loading": Object {
+  "loading": {
     "allFutureItemsLoaded": false,
     "allPastItemsLoaded": false,
-    "partialFutureDays": Array [
-      Array [
+    "partialFutureDays": [
+      [
         "2018-01-03",
-        Array [
-          Object {
+        [
+          {
             "date": "2018-01-03T00:00:00.000Z",
             "dateBucketMoment": "2018-01-03T00:00:00.000Z",
             "id": "new future partial",
@@ -198,10 +198,10 @@ Object {
           },
         ],
       ],
-      Array [
+      [
         "2018-01-04",
-        Array [
-          Object {
+        [
+          {
             "date": "2018-01-04T00:00:00.000Z",
             "dateBucketMoment": "2018-01-04T00:00:00.000Z",
             "id": "existing future partial +3",
@@ -211,19 +211,19 @@ Object {
         ],
       ],
     ],
-    "partialPastDays": Array [],
+    "partialPastDays": [],
     "plannerLoaded": true,
   },
 }
 `;
 
 exports[`adds a new item to partial future days when the new date is within the partial future date range 1`] = `
-Object {
-  "days": Array [
-    Array [
+{
+  "days": [
+    [
       "2018-01-01",
-      Array [
-        Object {
+      [
+        {
           "date": "2018-01-01T00:00:00.000Z",
           "dateBucketMoment": "2018-01-01T00:00:00.000Z",
           "id": 0,
@@ -233,14 +233,14 @@ Object {
       ],
     ],
   ],
-  "loading": Object {
+  "loading": {
     "allFutureItemsLoaded": false,
     "allPastItemsLoaded": false,
-    "partialFutureDays": Array [
-      Array [
+    "partialFutureDays": [
+      [
         "2018-01-02",
-        Array [
-          Object {
+        [
+          {
             "date": "2018-01-02T00:00:00.000Z",
             "dateBucketMoment": "2018-01-02T00:00:00.000Z",
             "id": "existing future partial +1",
@@ -249,10 +249,10 @@ Object {
           },
         ],
       ],
-      Array [
+      [
         "2018-01-03",
-        Array [
-          Object {
+        [
+          {
             "date": "2018-01-03T00:00:00.000Z",
             "dateBucketMoment": "2018-01-03T00:00:00.000Z",
             "id": "new future partial",
@@ -261,10 +261,10 @@ Object {
           },
         ],
       ],
-      Array [
+      [
         "2018-01-04",
-        Array [
-          Object {
+        [
+          {
             "date": "2018-01-04T00:00:00.000Z",
             "dateBucketMoment": "2018-01-04T00:00:00.000Z",
             "id": "existing future partial +3",
@@ -274,19 +274,19 @@ Object {
         ],
       ],
     ],
-    "partialPastDays": Array [],
+    "partialPastDays": [],
     "plannerLoaded": true,
   },
 }
 `;
 
 exports[`adds a new item to partial future days when the new date matches the near future boundary 1`] = `
-Object {
-  "days": Array [
-    Array [
+{
+  "days": [
+    [
       "2018-01-01",
-      Array [
-        Object {
+      [
+        {
           "date": "2018-01-01T00:00:00.000Z",
           "dateBucketMoment": "2018-01-01T00:00:00.000Z",
           "id": 0,
@@ -296,21 +296,21 @@ Object {
       ],
     ],
   ],
-  "loading": Object {
+  "loading": {
     "allFutureItemsLoaded": false,
     "allPastItemsLoaded": false,
-    "partialFutureDays": Array [
-      Array [
+    "partialFutureDays": [
+      [
         "2018-01-02",
-        Array [
-          Object {
+        [
+          {
             "date": "2018-01-02T00:00:00.000Z",
             "dateBucketMoment": "2018-01-02T00:00:00.000Z",
             "id": "existing future partial",
             "title": "existing future partial",
             "uniqueId": "existing future partial",
           },
-          Object {
+          {
             "date": "2018-01-02T00:00:00.000Z",
             "dateBucketMoment": "2018-01-02T00:00:00.000Z",
             "id": "new future partial",
@@ -320,19 +320,19 @@ Object {
         ],
       ],
     ],
-    "partialPastDays": Array [],
+    "partialPastDays": [],
     "plannerLoaded": true,
   },
 }
 `;
 
 exports[`adds a new item to partial past days when the new date is after the near past boundary but outside loaded range 1`] = `
-Object {
-  "days": Array [
-    Array [
+{
+  "days": [
+    [
       "2018-01-01",
-      Array [
-        Object {
+      [
+        {
           "date": "2018-01-01T00:00:00.000Z",
           "dateBucketMoment": "2018-01-01T00:00:00.000Z",
           "id": 0,
@@ -342,15 +342,15 @@ Object {
       ],
     ],
   ],
-  "loading": Object {
+  "loading": {
     "allFutureItemsLoaded": false,
     "allPastItemsLoaded": false,
-    "partialFutureDays": Array [],
-    "partialPastDays": Array [
-      Array [
+    "partialFutureDays": [],
+    "partialPastDays": [
+      [
         "2017-12-29",
-        Array [
-          Object {
+        [
+          {
             "date": "2017-12-29T00:00:00.000Z",
             "dateBucketMoment": "2017-12-29T00:00:00.000Z",
             "id": "existing past partial -3",
@@ -359,10 +359,10 @@ Object {
           },
         ],
       ],
-      Array [
+      [
         "2017-12-30",
-        Array [
-          Object {
+        [
+          {
             "date": "2017-12-30T00:00:00.000Z",
             "dateBucketMoment": "2017-12-30T00:00:00.000Z",
             "id": "new past partial",
@@ -378,12 +378,12 @@ Object {
 `;
 
 exports[`adds a new item to partial past days when the new date is within the partial past date range 1`] = `
-Object {
-  "days": Array [
-    Array [
+{
+  "days": [
+    [
       "2018-01-01",
-      Array [
-        Object {
+      [
+        {
           "date": "2018-01-01T00:00:00.000Z",
           "dateBucketMoment": "2018-01-01T00:00:00.000Z",
           "id": 0,
@@ -393,15 +393,15 @@ Object {
       ],
     ],
   ],
-  "loading": Object {
+  "loading": {
     "allFutureItemsLoaded": false,
     "allPastItemsLoaded": false,
-    "partialFutureDays": Array [],
-    "partialPastDays": Array [
-      Array [
+    "partialFutureDays": [],
+    "partialPastDays": [
+      [
         "2017-12-29",
-        Array [
-          Object {
+        [
+          {
             "date": "2017-12-29T00:00:00.000Z",
             "dateBucketMoment": "2017-12-29T00:00:00.000Z",
             "id": "existing past partial -3",
@@ -410,10 +410,10 @@ Object {
           },
         ],
       ],
-      Array [
+      [
         "2017-12-30",
-        Array [
-          Object {
+        [
+          {
             "date": "2017-12-30T00:00:00.000Z",
             "dateBucketMoment": "2017-12-30T00:00:00.000Z",
             "id": "new past partial",
@@ -422,10 +422,10 @@ Object {
           },
         ],
       ],
-      Array [
+      [
         "2017-12-31",
-        Array [
-          Object {
+        [
+          {
             "date": "2017-12-31T00:00:00.000Z",
             "dateBucketMoment": "2017-12-31T00:00:00.000Z",
             "id": "existing past partial -1",
@@ -441,12 +441,12 @@ Object {
 `;
 
 exports[`adds a new item to partial past days when the new date matches the near past boundary 1`] = `
-Object {
-  "days": Array [
-    Array [
+{
+  "days": [
+    [
       "2018-01-01",
-      Array [
-        Object {
+      [
+        {
           "date": "2018-01-01T00:00:00.000Z",
           "dateBucketMoment": "2018-01-01T00:00:00.000Z",
           "id": 0,
@@ -456,22 +456,22 @@ Object {
       ],
     ],
   ],
-  "loading": Object {
+  "loading": {
     "allFutureItemsLoaded": false,
     "allPastItemsLoaded": false,
-    "partialFutureDays": Array [],
-    "partialPastDays": Array [
-      Array [
+    "partialFutureDays": [],
+    "partialPastDays": [
+      [
         "2017-12-31",
-        Array [
-          Object {
+        [
+          {
             "date": "2017-12-31T00:00:00.000Z",
             "dateBucketMoment": "2017-12-31T00:00:00.000Z",
             "id": "existing past partial",
             "title": "existing past partial",
             "uniqueId": "existing past partial",
           },
-          Object {
+          {
             "date": "2017-12-31T00:00:00.000Z",
             "dateBucketMoment": "2017-12-31T00:00:00.000Z",
             "id": "new past partial",
@@ -487,12 +487,12 @@ Object {
 `;
 
 exports[`changes the date to a new day when the date has changed within the loaded range 1`] = `
-Object {
-  "days": Array [
-    Array [
+{
+  "days": [
+    [
       "2018-01-01",
-      Array [
-        Object {
+      [
+        {
           "date": "2018-01-01T00:00:00.000Z",
           "dateBucketMoment": "2018-01-01T00:00:00.000Z",
           "id": 0,
@@ -501,10 +501,10 @@ Object {
         },
       ],
     ],
-    Array [
+    [
       "2018-01-02",
-      Array [
-        Object {
+      [
+        {
           "date": "2018-01-02T00:00:00.000Z",
           "dateBucketMoment": "2018-01-02T00:00:00.000Z",
           "id": "to move",
@@ -513,10 +513,10 @@ Object {
         },
       ],
     ],
-    Array [
+    [
       "2018-01-03",
-      Array [
-        Object {
+      [
+        {
           "date": "2018-01-03T00:00:00.000Z",
           "dateBucketMoment": "2018-01-03T00:00:00.000Z",
           "id": 2,
@@ -526,23 +526,23 @@ Object {
       ],
     ],
   ],
-  "loading": Object {
+  "loading": {
     "allFutureItemsLoaded": false,
     "allPastItemsLoaded": false,
-    "partialFutureDays": Array [],
-    "partialPastDays": Array [],
+    "partialFutureDays": [],
+    "partialPastDays": [],
     "plannerLoaded": true,
   },
 }
 `;
 
 exports[`changes the date to an existing day when the date has changed within the loaded range 1`] = `
-Object {
-  "days": Array [
-    Array [
+{
+  "days": [
+    [
       "2018-01-01",
-      Array [
-        Object {
+      [
+        {
           "date": "2018-01-01T00:00:00.000Z",
           "dateBucketMoment": "2018-01-01T00:00:00.000Z",
           "id": 0,
@@ -551,24 +551,24 @@ Object {
         },
       ],
     ],
-    Array [
+    [
       "2018-01-02",
-      Array [
-        Object {
+      [
+        {
           "date": "2018-01-02T00:00:00.000Z",
           "dateBucketMoment": "2018-01-02T00:00:00.000Z",
           "id": 1,
           "title": "1",
           "uniqueId": 1,
         },
-        Object {
+        {
           "date": "2018-01-02T00:00:00.000Z",
           "dateBucketMoment": "2018-01-02T00:00:00.000Z",
           "id": 2,
           "title": "2",
           "uniqueId": 2,
         },
-        Object {
+        {
           "date": "2018-01-02T00:00:00.000Z",
           "dateBucketMoment": "2018-01-02T00:00:00.000Z",
           "id": "to move",
@@ -578,36 +578,36 @@ Object {
       ],
     ],
   ],
-  "loading": Object {
+  "loading": {
     "allFutureItemsLoaded": false,
     "allPastItemsLoaded": false,
-    "partialFutureDays": Array [],
-    "partialPastDays": Array [],
+    "partialFutureDays": [],
+    "partialPastDays": [],
     "plannerLoaded": true,
   },
 }
 `;
 
 exports[`does not insert a past item into days if the state is empty and past is not loaded 1`] = `
-Object {
-  "days": Array [],
-  "loading": Object {
+{
+  "days": [],
+  "loading": {
     "allFutureItemsLoaded": false,
     "allPastItemsLoaded": false,
-    "partialFutureDays": Array [],
-    "partialPastDays": Array [],
+    "partialFutureDays": [],
+    "partialPastDays": [],
     "plannerLoaded": true,
   },
 }
 `;
 
 exports[`does nothing if action.error 1`] = `
-Object {
-  "days": Array [
-    Array [
+{
+  "days": [
+    [
       "2018-01-01",
-      Array [
-        Object {
+      [
+        {
           "date": "2018-01-01T00:00:00.000Z",
           "dateBucketMoment": "2018-01-01T00:00:00.000Z",
           "id": 0,
@@ -617,23 +617,23 @@ Object {
       ],
     ],
   ],
-  "loading": Object {
+  "loading": {
     "allFutureItemsLoaded": false,
     "allPastItemsLoaded": false,
-    "partialFutureDays": Array [],
-    "partialPastDays": Array [],
+    "partialFutureDays": [],
+    "partialPastDays": [],
     "plannerLoaded": true,
   },
 }
 `;
 
 exports[`does nothing if the action is not SAVED_PLANNER_ITEM 1`] = `
-Object {
-  "days": Array [
-    Array [
+{
+  "days": [
+    [
       "2018-01-01",
-      Array [
-        Object {
+      [
+        {
           "date": "2018-01-01T00:00:00.000Z",
           "dateBucketMoment": "2018-01-01T00:00:00.000Z",
           "id": 0,
@@ -643,23 +643,23 @@ Object {
       ],
     ],
   ],
-  "loading": Object {
+  "loading": {
     "allFutureItemsLoaded": false,
     "allPastItemsLoaded": false,
-    "partialFutureDays": Array [],
-    "partialPastDays": Array [],
+    "partialFutureDays": [],
+    "partialPastDays": [],
     "plannerLoaded": true,
   },
 }
 `;
 
 exports[`does nothing if the planner is not loaded 1`] = `
-Object {
-  "days": Array [
-    Array [
+{
+  "days": [
+    [
       "2018-01-01",
-      Array [
-        Object {
+      [
+        {
           "date": "2018-01-01T00:00:00.000Z",
           "dateBucketMoment": "2018-01-01T00:00:00.000Z",
           "id": 0,
@@ -669,23 +669,23 @@ Object {
       ],
     ],
   ],
-  "loading": Object {
+  "loading": {
     "allFutureItemsLoaded": false,
     "allPastItemsLoaded": false,
-    "partialFutureDays": Array [],
-    "partialPastDays": Array [],
+    "partialFutureDays": [],
+    "partialPastDays": [],
     "plannerLoaded": false,
   },
 }
 `;
 
 exports[`does nothing when date falls in distant future and there is no near future range 1`] = `
-Object {
-  "days": Array [
-    Array [
+{
+  "days": [
+    [
       "2018-01-01",
-      Array [
-        Object {
+      [
+        {
           "date": "2018-01-01T00:00:00.000Z",
           "dateBucketMoment": "2018-01-01T00:00:00.000Z",
           "id": 0,
@@ -695,23 +695,23 @@ Object {
       ],
     ],
   ],
-  "loading": Object {
+  "loading": {
     "allFutureItemsLoaded": false,
     "allPastItemsLoaded": false,
-    "partialFutureDays": Array [],
-    "partialPastDays": Array [],
+    "partialFutureDays": [],
+    "partialPastDays": [],
     "plannerLoaded": true,
   },
 }
 `;
 
 exports[`does nothing when date falls in distant past and there is no near past range 1`] = `
-Object {
-  "days": Array [
-    Array [
+{
+  "days": [
+    [
       "2018-01-01",
-      Array [
-        Object {
+      [
+        {
           "date": "2018-01-01T00:00:00.000Z",
           "dateBucketMoment": "2018-01-01T00:00:00.000Z",
           "id": 0,
@@ -721,23 +721,23 @@ Object {
       ],
     ],
   ],
-  "loading": Object {
+  "loading": {
     "allFutureItemsLoaded": false,
     "allPastItemsLoaded": false,
-    "partialFutureDays": Array [],
-    "partialPastDays": Array [],
+    "partialFutureDays": [],
+    "partialPastDays": [],
     "plannerLoaded": true,
   },
 }
 `;
 
 exports[`does nothing when the date falls in the distant future 1`] = `
-Object {
-  "days": Array [
-    Array [
+{
+  "days": [
+    [
       "2018-01-01",
-      Array [
-        Object {
+      [
+        {
           "date": "2018-01-01T00:00:00.000Z",
           "dateBucketMoment": "2018-01-01T00:00:00.000Z",
           "id": 0,
@@ -747,14 +747,14 @@ Object {
       ],
     ],
   ],
-  "loading": Object {
+  "loading": {
     "allFutureItemsLoaded": false,
     "allPastItemsLoaded": false,
-    "partialFutureDays": Array [
-      Array [
+    "partialFutureDays": [
+      [
         "2018-01-02",
-        Array [
-          Object {
+        [
+          {
             "date": "2018-01-02T00:00:00.000Z",
             "dateBucketMoment": "2018-01-02T00:00:00.000Z",
             "id": "existing future partial",
@@ -764,19 +764,19 @@ Object {
         ],
       ],
     ],
-    "partialPastDays": Array [],
+    "partialPastDays": [],
     "plannerLoaded": true,
   },
 }
 `;
 
 exports[`does nothing when the date falls in the distant past 1`] = `
-Object {
-  "days": Array [
-    Array [
+{
+  "days": [
+    [
       "2018-01-01",
-      Array [
-        Object {
+      [
+        {
           "date": "2018-01-01T00:00:00.000Z",
           "dateBucketMoment": "2018-01-01T00:00:00.000Z",
           "id": 0,
@@ -786,15 +786,15 @@ Object {
       ],
     ],
   ],
-  "loading": Object {
+  "loading": {
     "allFutureItemsLoaded": false,
     "allPastItemsLoaded": false,
-    "partialFutureDays": Array [],
-    "partialPastDays": Array [
-      Array [
+    "partialFutureDays": [],
+    "partialPastDays": [
+      [
         "2017-12-31",
-        Array [
-          Object {
+        [
+          {
             "date": "2017-12-31T00:00:00.000Z",
             "dateBucketMoment": "2017-12-31T00:00:00.000Z",
             "id": "existing past partial",
@@ -810,12 +810,12 @@ Object {
 `;
 
 exports[`inserts a future item into days if the state is empty and allFutureItemsLoaded 1`] = `
-Object {
-  "days": Array [
-    Array [
+{
+  "days": [
+    [
       "2018-01-02",
-      Array [
-        Object {
+      [
+        {
           "date": "2018-01-02T00:00:00.000Z",
           "dateBucketMoment": "2018-01-02T00:00:00.000Z",
           "id": "new item",
@@ -825,23 +825,23 @@ Object {
       ],
     ],
   ],
-  "loading": Object {
+  "loading": {
     "allFutureItemsLoaded": true,
     "allPastItemsLoaded": false,
-    "partialFutureDays": Array [],
-    "partialPastDays": Array [],
+    "partialFutureDays": [],
+    "partialPastDays": [],
     "plannerLoaded": true,
   },
 }
 `;
 
 exports[`inserts a past item into days if state is empty and allPastItemsLoaded 1`] = `
-Object {
-  "days": Array [
-    Array [
+{
+  "days": [
+    [
       "2017-12-31",
-      Array [
-        Object {
+      [
+        {
           "date": "2017-12-31T00:00:00.000Z",
           "dateBucketMoment": "2017-12-31T00:00:00.000Z",
           "id": "new item",
@@ -851,23 +851,23 @@ Object {
       ],
     ],
   ],
-  "loading": Object {
+  "loading": {
     "allFutureItemsLoaded": false,
     "allPastItemsLoaded": true,
-    "partialFutureDays": Array [],
-    "partialPastDays": Array [],
+    "partialFutureDays": [],
+    "partialPastDays": [],
     "plannerLoaded": true,
   },
 }
 `;
 
 exports[`inserts a today item into days if the state is empty 1`] = `
-Object {
-  "days": Array [
-    Array [
+{
+  "days": [
+    [
       "2018-01-01",
-      Array [
-        Object {
+      [
+        {
           "date": "2018-01-01T00:00:00.000Z",
           "dateBucketMoment": "2018-01-01T00:00:00.000Z",
           "id": "new item",
@@ -877,23 +877,23 @@ Object {
       ],
     ],
   ],
-  "loading": Object {
+  "loading": {
     "allFutureItemsLoaded": false,
     "allPastItemsLoaded": false,
-    "partialFutureDays": Array [],
-    "partialPastDays": Array [],
+    "partialFutureDays": [],
+    "partialPastDays": [],
     "plannerLoaded": true,
   },
 }
 `;
 
 exports[`inserts an item into last loaded day even when it is after startOf("day") 1`] = `
-Object {
-  "days": Array [
-    Array [
+{
+  "days": [
+    [
       "2018-01-01",
-      Array [
-        Object {
+      [
+        {
           "date": "2018-01-01T00:00:00.000Z",
           "dateBucketMoment": "2018-01-01T00:00:00.000Z",
           "id": 0,
@@ -902,17 +902,17 @@ Object {
         },
       ],
     ],
-    Array [
+    [
       "2018-01-02",
-      Array [
-        Object {
+      [
+        {
           "date": "2018-01-02T00:00:00.000Z",
           "dateBucketMoment": "2018-01-02T00:00:00.000Z",
           "id": 1,
           "title": "1",
           "uniqueId": 1,
         },
-        Object {
+        {
           "date": "2018-01-02T00:00:00.000Z",
           "dateBucketMoment": "2018-01-02T13:00:00.000Z",
           "id": "afternoon item",
@@ -922,23 +922,23 @@ Object {
       ],
     ],
   ],
-  "loading": Object {
+  "loading": {
     "allFutureItemsLoaded": false,
     "allPastItemsLoaded": false,
-    "partialFutureDays": Array [],
-    "partialPastDays": Array [],
+    "partialFutureDays": [],
+    "partialPastDays": [],
     "plannerLoaded": true,
   },
 }
 `;
 
 exports[`removes item from days and adds it to partial future days when the date has changed to a near future date 1`] = `
-Object {
-  "days": Array [
-    Array [
+{
+  "days": [
+    [
       "2018-01-01",
-      Array [
-        Object {
+      [
+        {
           "date": "2018-01-01T00:00:00.000Z",
           "dateBucketMoment": "2018-01-01T00:00:00.000Z",
           "id": 0,
@@ -948,21 +948,21 @@ Object {
       ],
     ],
   ],
-  "loading": Object {
+  "loading": {
     "allFutureItemsLoaded": false,
     "allPastItemsLoaded": false,
-    "partialFutureDays": Array [
-      Array [
+    "partialFutureDays": [
+      [
         "2018-01-03",
-        Array [
-          Object {
+        [
+          {
             "date": "2018-01-03T00:00:00.000Z",
             "dateBucketMoment": "2018-01-03T00:00:00.000Z",
             "id": 2,
             "title": "2",
             "uniqueId": 2,
           },
-          Object {
+          {
             "date": "2018-01-03T00:00:00.000Z",
             "dateBucketMoment": "2018-01-03T00:00:00.000Z",
             "id": "should be in partial future",
@@ -972,19 +972,19 @@ Object {
         ],
       ],
     ],
-    "partialPastDays": Array [],
+    "partialPastDays": [],
     "plannerLoaded": true,
   },
 }
 `;
 
 exports[`removes item from days and adds it to partial past days when the date has changed to a near past date 1`] = `
-Object {
-  "days": Array [
-    Array [
+{
+  "days": [
+    [
       "2018-01-01",
-      Array [
-        Object {
+      [
+        {
           "date": "2018-01-01T00:00:00.000Z",
           "dateBucketMoment": "2018-01-01T00:00:00.000Z",
           "id": 0,
@@ -994,22 +994,22 @@ Object {
       ],
     ],
   ],
-  "loading": Object {
+  "loading": {
     "allFutureItemsLoaded": false,
     "allPastItemsLoaded": false,
-    "partialFutureDays": Array [],
-    "partialPastDays": Array [
-      Array [
+    "partialFutureDays": [],
+    "partialPastDays": [
+      [
         "2017-12-30",
-        Array [
-          Object {
+        [
+          {
             "date": "2017-12-30T00:00:00.000Z",
             "dateBucketMoment": "2017-12-30T00:00:00.000Z",
             "id": -2,
             "title": "-2",
             "uniqueId": -2,
           },
-          Object {
+          {
             "date": "2017-12-30T00:00:00.000Z",
             "dateBucketMoment": "2017-12-30T00:00:00.000Z",
             "id": "should be in partial past",
@@ -1025,12 +1025,12 @@ Object {
 `;
 
 exports[`removes item from days when the date has changed to a distant future date 1`] = `
-Object {
-  "days": Array [
-    Array [
+{
+  "days": [
+    [
       "2018-01-01",
-      Array [
-        Object {
+      [
+        {
           "date": "2018-01-01T00:00:00.000Z",
           "dateBucketMoment": "2018-01-01T00:00:00.000Z",
           "id": 0,
@@ -1040,14 +1040,14 @@ Object {
       ],
     ],
   ],
-  "loading": Object {
+  "loading": {
     "allFutureItemsLoaded": false,
     "allPastItemsLoaded": false,
-    "partialFutureDays": Array [
-      Array [
+    "partialFutureDays": [
+      [
         "2018-01-03",
-        Array [
-          Object {
+        [
+          {
             "date": "2018-01-03T00:00:00.000Z",
             "dateBucketMoment": "2018-01-03T00:00:00.000Z",
             "id": 2,
@@ -1057,19 +1057,19 @@ Object {
         ],
       ],
     ],
-    "partialPastDays": Array [],
+    "partialPastDays": [],
     "plannerLoaded": true,
   },
 }
 `;
 
 exports[`removes item from days when the date has changed to a distant past date 1`] = `
-Object {
-  "days": Array [
-    Array [
+{
+  "days": [
+    [
       "2017-12-31",
-      Array [
-        Object {
+      [
+        {
           "date": "2017-12-31T00:00:00.000Z",
           "dateBucketMoment": "2017-12-31T00:00:00.000Z",
           "id": -1,
@@ -1079,15 +1079,15 @@ Object {
       ],
     ],
   ],
-  "loading": Object {
+  "loading": {
     "allFutureItemsLoaded": false,
     "allPastItemsLoaded": false,
-    "partialFutureDays": Array [],
-    "partialPastDays": Array [
-      Array [
+    "partialFutureDays": [],
+    "partialPastDays": [
+      [
         "2017-12-30",
-        Array [
-          Object {
+        [
+          {
             "date": "2017-12-30T00:00:00.000Z",
             "dateBucketMoment": "2017-12-30T00:00:00.000Z",
             "id": -2,
@@ -1103,26 +1103,26 @@ Object {
 `;
 
 exports[`resorts the order of items when the item date has not changed 1`] = `
-Object {
-  "days": Array [
-    Array [
+{
+  "days": [
+    [
       "2018-01-01",
-      Array [
-        Object {
+      [
+        {
           "date": "2018-01-01T00:00:00.000Z",
           "dateBucketMoment": "2018-01-01T00:00:00.000Z",
           "id": 0,
           "title": "aaa",
           "uniqueId": 0,
         },
-        Object {
+        {
           "date": "2018-01-01T00:00:00.000Z",
           "dateBucketMoment": "2018-01-01T00:00:00.000Z",
           "id": 2,
           "title": "ccc",
           "uniqueId": 2,
         },
-        Object {
+        {
           "date": "2018-01-01T00:00:00.000Z",
           "dateBucketMoment": "2018-01-01T00:00:00.000Z",
           "id": 1,
@@ -1132,30 +1132,30 @@ Object {
       ],
     ],
   ],
-  "loading": Object {
+  "loading": {
     "allFutureItemsLoaded": false,
     "allPastItemsLoaded": false,
-    "partialFutureDays": Array [],
-    "partialPastDays": Array [],
+    "partialFutureDays": [],
+    "partialPastDays": [],
     "plannerLoaded": true,
   },
 }
 `;
 
 exports[`updates the item when its date does not change 1`] = `
-Object {
-  "days": Array [
-    Array [
+{
+  "days": [
+    [
       "2018-01-01",
-      Array [
-        Object {
+      [
+        {
           "date": "2018-01-01T00:00:00.000Z",
           "dateBucketMoment": "2018-01-01T00:00:00.000Z",
           "id": 0,
           "title": "0",
           "uniqueId": 0,
         },
-        Object {
+        {
           "date": "2018-01-01T00:00:00.000Z",
           "dateBucketMoment": "2018-01-01T00:00:00.000Z",
           "id": "to update",
@@ -1165,11 +1165,11 @@ Object {
       ],
     ],
   ],
-  "loading": Object {
+  "loading": {
     "allFutureItemsLoaded": false,
     "allPastItemsLoaded": false,
-    "partialFutureDays": Array [],
-    "partialPastDays": Array [],
+    "partialFutureDays": [],
+    "partialPastDays": [],
     "plannerLoaded": true,
   },
 }

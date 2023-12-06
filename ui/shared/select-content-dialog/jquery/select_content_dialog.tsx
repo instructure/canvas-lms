@@ -738,7 +738,14 @@ $(document).ready(function () {
           const url = quiz_lti ? $urls.last().attr('href') : $urls.attr('href')
           let data = $(
             '#select_context_content_dialog .module_item_option:visible:first'
-          ).getFormData()
+          ).getFormData<{
+            'quiz[title]'?: string
+            'quiz[assignment_group_id]'?: string
+            'assignment[title]'?: string
+            'assignment[assignment_group_id]'?: string
+            'assignment[post_to_sis]'?: boolean
+            quiz_lti?: number
+          }>()
           if (quiz_lti) {
             data = {
               'assignment[title]': data['quiz[title]'],

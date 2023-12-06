@@ -37,7 +37,7 @@ export function TempEnrollAvatar(props: Props) {
         <Avatar
           size="small"
           name={props.user.name}
-          src={props.user.avatar_url}
+          src={props.user.avatar_url || undefined}
           data-fs-exclude={true}
           data-heap-redact-attributes="name"
           alt={I18n.t('Avatar for %{name}', {name: props.user.name})}

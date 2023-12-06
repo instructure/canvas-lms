@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useRef, useMemo} from 'react'
+import React, {useState, useRef, useMemo, useEffect, useCallback} from 'react'
 import PropTypes from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Tag} from '@instructure/ui-tag'
@@ -54,6 +54,12 @@ export const AssignedTo = ({
       .filter(option => option.label.toLowerCase().includes(value.toLowerCase()))
   }
 
+  const [activeOptions, setActiveOptions] = useState(
+    Object.values(availableAssignToOptions)
+      .flat()
+      .find(option => initialAssignedToInformation.includes(option.assetCode)) || []
+  )
+
   // filterOptions only occur based on user input.
   const filteredOptions = useMemo(() => {
     if (!currentFilterInput) return availableAssignToOptions
@@ -66,11 +72,24 @@ export const AssignedTo = ({
     }, {})
   }, [currentFilterInput, availableAssignToOptions])
 
-  const getOptionByAssetCode = assetCode => {
-    return Object.values(availableAssignToOptions)
-      .flat()
-      .find(o => o?.assetCode === assetCode)
-  }
+  const getOptionByAssetCode = useCallback(
+    assetCode => {
+      const returnOption = Object.values(availableAssignToOptions)
+        .flat()
+        .find(o => o?.assetCode === assetCode)
+
+      if (returnOption) return returnOption
+
+      return activeOptions.find(o => o?.assetCode === assetCode) || {}
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [availableAssignToOptions]
+  )
+
+  useEffect(() => {
+    setActiveOptions(selectedOptionAssetCode.map(assetCode => getOptionByAssetCode(assetCode)))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedOptionAssetCode])
 
   // Might rely on id
   const handleOptionSelected = assetCode => {

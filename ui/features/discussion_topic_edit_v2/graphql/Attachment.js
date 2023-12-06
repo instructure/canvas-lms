@@ -18,6 +18,7 @@
 
 import gql from 'graphql-tag'
 import {shape, string} from 'prop-types'
+import {UsageRights} from './UsageRights'
 
 export const Attachment = {
   fragment: gql`
@@ -26,7 +27,11 @@ export const Attachment = {
       _id
       displayName
       url
+      usageRights {
+        ...UsageRights
+      }
     }
+    ${UsageRights.fragment}
   `,
 
   shape: shape({
@@ -34,6 +39,7 @@ export const Attachment = {
     _id: string,
     displayName: string,
     url: string,
+    usageRights: UsageRights.shape,
   }),
 
   mock: ({
@@ -41,11 +47,13 @@ export const Attachment = {
     _id = '7',
     displayName = '288777.jpeg',
     url = 'some_url',
+    usageRights = UsageRights.mock(),
   } = {}) => ({
     id,
     _id,
     displayName,
     url,
+    usageRights,
     __typename: 'File',
   }),
 }

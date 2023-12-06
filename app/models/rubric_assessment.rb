@@ -50,11 +50,15 @@ class RubricAssessment < ActiveRecord::Base
   after_save :track_outcomes
 
   def track_outcomes
-    outcome_ids = (data || []).filter_map { |r| r[:learning_outcome_id] }.uniq
+    outcome_ids = aligned_outcome_ids
     peer_review = assessment_type == "peer_review"
     provisional_grade = artifact_type == "ModeratedGrading::ProvisionalGrade"
     update_outcomes = outcome_ids.present? && !peer_review && !provisional_grade
     delay_if_production.update_outcomes_for_assessment(outcome_ids) if update_outcomes
+  end
+
+  def aligned_outcome_ids
+    (data || []).filter_map { |r| r[:learning_outcome_id] }.uniq
   end
 
   def update_outcomes_for_assessment(outcome_ids = [])

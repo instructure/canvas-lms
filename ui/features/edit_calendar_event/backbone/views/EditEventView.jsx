@@ -237,6 +237,14 @@ export default class EditCalendarEventView extends Backbone.View {
     }
   }
 
+  showDuplicates(duplicatesEnabled) {
+    if (ENV.FEATURES.calendar_series && this.model.isNew()) {
+      this.$el.find('.label_with_checkbox[for="duplicate_event"]').toggle(duplicatesEnabled)
+      $('#duplicate_event').prop('checked', false)
+      this.enableDuplicateFields(false)
+    }
+  }
+
   _handleFrequencyChange(newFrequency, newRRule) {
     if (newFrequency !== 'custom') {
       this.model.set('rrule', newRRule)
@@ -246,7 +254,7 @@ export default class EditCalendarEventView extends Backbone.View {
   }
 
   renderRecurringEventFrequencyPicker() {
-    if (ENV.FEATURES.calendar_series) {
+    if (ENV.FEATURES.calendar_series && !this.model.get('use_section_dates')) {
       const pickerNode = document.getElementById('recurring_event_frequency_picker')
       const start = this.$el.find('[name="start_date"]').val()
       const eventStart = start ? moment.tz(start, 'MMM D, YYYY', ENV.TIMEZONE) : moment('invalid')
@@ -287,6 +295,7 @@ export default class EditCalendarEventView extends Backbone.View {
   afterRender() {
     this.handleFrequencyChange = this._handleFrequencyChange.bind(this)
     this.renderRecurringEventFrequencyPicker()
+    this.showDuplicates(this.model.get('use_section_dates'))
 
     this.$el.find('[name="start_date"]').on('change', () => {
       const start = this.$el.find('[name="start_date"]').val()
@@ -436,6 +445,7 @@ export default class EditCalendarEventView extends Backbone.View {
   toggleUseSectionDates(e) {
     this.model.set('use_section_dates', !this.model.get('use_section_dates'))
     this.toggleRecurringEeventFrequencyPicker(e)
+    this.showDuplicates(e.target.checked)
     return this.updateRemoveChildEvents(e)
   }
 

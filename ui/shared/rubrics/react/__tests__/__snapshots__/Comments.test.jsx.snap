@@ -8,7 +8,7 @@ exports[`The Comments component renders a footer after the comment when provided
 >
   <CommentText
     assessment={
-      Object {
+      {
         "above_threshold": false,
         "comments": "I award you no points, and may God have mercy on your soul.",
         "comments_enabled": true,
@@ -17,7 +17,7 @@ exports[`The Comments component renders a footer after the comment when provided
         "description": "No details",
         "editComments": true,
         "learning_outcome_id": "612",
-        "points": Object {
+        "points": {
           "text": null,
           "valid": true,
           "value": 0,
@@ -56,7 +56,7 @@ exports[`The Comments component renders the root component as expected when edit
   large={true}
   saveLater={false}
   savedComments={
-    Array [
+    [
       "I award you no points",
       "May god have mercy on your soul",
     ]

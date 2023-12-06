@@ -1,0 +1,79 @@
+# this config file is useful if you don't want to run a consul
+# cluster with canvas.  Just provide the config data you would
+# like for the DynamicSettings class to find, and it will use
+# it whenever a call for consul data is issued. Data should be
+# shaped like the example below, one key for the related set of data,
+# and a hash of key/value pairs (no nesting)
+development:
+  # tree
+  config:
+    # service
+    canvas:
+      # prefix
+      address-book:
+        app-host: "http://address-book.docker"
+        secret: "opensesame"
+      live_events.yml: |-
+        aws_endpoint: http://quiz-api-kinesis.<%= Inst::Config.domain %>:4567
+        kinesis_stream_name: canvas-live-events
+        aws_access_key_id: fake-key-id
+        aws_secret_access_key_dec: toomanysecrets
+        aws_region: us-east-1
+      live-events-subscription-service:
+        app-host: "http://les.docker"
+        sad-panda: null
+      math-man:
+        base_url: "http://mathman.docker"
+        use_for_svg: "false"
+        use_for_mml: "false"
+      microsoft-sync:
+        client-id: some_client_id
+        client-secret: some_client_secret
+      rich-content-service:
+        app-host: "http://canvas-rce-api-web.<%= Inst::Config.domain %>"
+      lti:
+        # Used by ContextExternalTool#internal_service? to determine if
+        # an Instructure-owned tool is launching to an Instructure-owned URL.
+        # For OSS users: If you have a use case for marking your own tools as
+        # "internal services", then replace this with your tool launch domains,
+        # but this should rarely (if ever) be needed and can be safely ignored.
+        # Domains should not have a preceding "." (ex: "instructure.com")
+        internal_tool_domain_allowlist:
+          - 'docker'
+          - 'localhost'
+          - 'test'
+    pandata:
+      ios-pandata-key: IOS_pandata_key
+      ios-pandata-secret: teamrocketblastoffatthespeedoflight
+      android-pandata-key: ANDROID_pandata_key
+      android-pandata-secret: surrendernoworpreparetofight
+  store:
+    canvas:
+      lti-keys:
+        # these are all the same JWK but with different kid
+        # to generate a new key, run the following in a Canvas console:
+        #
+        # key = OpenSSL::PKey::RSA.generate(2048)
+        # key.public_key.to_jwk(kid: Time.now.utc.iso8601).to_json
+        jwk-past.json: '{"kty":"RSA","e":"AQAB","n":"uX1MpfEMQCBUMcj0sBYI-iFaG5Nodp3C6OlN8uY60fa5zSBd83-iIL3n_qzZ8VCluuTLfB7rrV_tiX727XIEqQ","kid":"2018-05-18T22:33:20Z","d":"pYwR64x-LYFtA13iHIIeEvfPTws50ZutyGfpHN-kIZz3k-xVpun2Hgu0hVKZMxcZJ9DkG8UZPqD-zTDbCmCyLQ","p":"6OQ2bi_oY5fE9KfQOcxkmNhxDnIKObKb6TVYqOOz2JM","q":"y-UBef95njOrqMAxJH1QPds3ltYWr8QgGgccmcATH1M","dp":"Ol_xkL7rZgNFt_lURRiJYpJmDDPjgkDVuafIeFTS4Ic","dq":"RtzDY5wXr5TzrwWEztLCpYzfyAuF_PZj1cfs976apsM","qi":"XA5wnwIrwe5MwXpaBijZsGhKJoypZProt47aVCtWtPE"}'
+        jwk-present.json: '{"kty":"RSA","e":"AQAB","n":"uX1MpfEMQCBUMcj0sBYI-iFaG5Nodp3C6OlN8uY60fa5zSBd83-iIL3n_qzZ8VCluuTLfB7rrV_tiX727XIEqQ","kid":"2018-06-18T22:33:20Z","d":"pYwR64x-LYFtA13iHIIeEvfPTws50ZutyGfpHN-kIZz3k-xVpun2Hgu0hVKZMxcZJ9DkG8UZPqD-zTDbCmCyLQ","p":"6OQ2bi_oY5fE9KfQOcxkmNhxDnIKObKb6TVYqOOz2JM","q":"y-UBef95njOrqMAxJH1QPds3ltYWr8QgGgccmcATH1M","dp":"Ol_xkL7rZgNFt_lURRiJYpJmDDPjgkDVuafIeFTS4Ic","dq":"RtzDY5wXr5TzrwWEztLCpYzfyAuF_PZj1cfs976apsM","qi":"XA5wnwIrwe5MwXpaBijZsGhKJoypZProt47aVCtWtPE"}'
+        jwk-future.json: '{"kty":"RSA","e":"AQAB","n":"uX1MpfEMQCBUMcj0sBYI-iFaG5Nodp3C6OlN8uY60fa5zSBd83-iIL3n_qzZ8VCluuTLfB7rrV_tiX727XIEqQ","kid":"2018-07-18T22:33:20Z","d":"pYwR64x-LYFtA13iHIIeEvfPTws50ZutyGfpHN-kIZz3k-xVpun2Hgu0hVKZMxcZJ9DkG8UZPqD-zTDbCmCyLQ","p":"6OQ2bi_oY5fE9KfQOcxkmNhxDnIKObKb6TVYqOOz2JM","q":"y-UBef95njOrqMAxJH1QPds3ltYWr8QgGgccmcATH1M","dp":"Ol_xkL7rZgNFt_lURRiJYpJmDDPjgkDVuafIeFTS4Ic","dq":"RtzDY5wXr5TzrwWEztLCpYzfyAuF_PZj1cfs976apsM","qi":"XA5wnwIrwe5MwXpaBijZsGhKJoypZProt47aVCtWtPE"}'
+  private:
+    canvas:
+      uuid_provisioner:
+        lti_domain: quiz-lti-web.<%= Inst::Config.domain %>/api/internal/provisions
+        outcomes_domain: outcomes.docker/api/internal/accounts
+        core_api_domain: quiz-api-web.<%= Inst::Config.domain %>
+        canvas_domain: canvas-web.<%= Inst::Config.domain %>
+        oauth_client_id: <%= ENV['CANVAS_CLIENT_ID'] %>
+        prod_oauth_client_id: <%= ENV['CANVAS_CLIENT_ID'] %>
+        nonprod_oauth_client_id: <%= ENV['CANVAS_CLIENT_ID'] %>
+      # api_gateway_enabled: 'true'
+      # api_gateway_uri: 'http://inst-gateway.docker/graphql'
+      auditors.yml: |
+        write_paths:
+          - active_record
+        read_path: active_record
+      datadog_apm.yml: |
+        sample_rate: 0.0
+        host_sample_rate: 0.0

@@ -74,6 +74,11 @@
 #       "id": "Role",
 #       "description": "",
 #       "properties": {
+#         "id": {
+#           "description": "The id of the role",
+#           "example": 1,
+#           "type": "integer"
+#          },
 #         "label": {
 #           "description": "The label of the role.",
 #           "example": "New Role",
@@ -89,8 +94,13 @@
 #           "example": "AccountMembership",
 #           "type": "string"
 #         },
+#         "is_account_role": {
+#           "description": "Whether this role applies to account memberships (i.e., not linked to an enrollment in a course).",
+#           "example": true,
+#           "type": "boolean"
+#         },
 #         "account": {
-#           "description": "JSON representation of the account the role is in.",
+#           "description": "JSON representation of the account the role is defined in.",
 #           "example": {"id": 1019, "name": "CGNU", "parent_account_id": 73, "root_account_id": 1, "sis_account_id": "cgnu"},
 #           "type": "object",
 #           "$ref": "Account"
@@ -99,6 +109,16 @@
 #           "description": "The state of the role: 'active', 'inactive', or 'built_in'",
 #           "example": "active",
 #           "type": "string"
+#         },
+#         "created_at": {
+#           "description": "The date and time the role was created.",
+#           "example": "2020-12-01T16:20:00-06:00",
+#           "type": "datetime"
+#         },
+#         "last_updated_at": {
+#           "description": "The date and time the role was last updated.",
+#           "example": "2023-10-31T23:59:00-06:00",
+#           "type": "datetime"
 #         },
 #         "permissions": {
 #           "description": "A dictionary of permissions keyed by name (see permissions input parameter in the 'Create a role' API).",

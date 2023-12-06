@@ -17,6 +17,9 @@
 import React from 'react'
 import {render, waitFor} from '@testing-library/react'
 import MobileContextMenu from '../MobileContextMenu'
+import {enableFetchMocks} from 'jest-fetch-mock'
+
+enableFetchMocks()
 
 const tabsFromApi = [
   {

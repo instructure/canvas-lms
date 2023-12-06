@@ -18,11 +18,12 @@
  */
 
 import React from 'react'
-
 import {renderConnected} from './utils'
 import {PRIMARY_PACE} from './fixtures'
-
 import {App} from '../app'
+import {enableFetchMocks} from 'jest-fetch-mock'
+
+enableFetchMocks()
 
 const pollForPublishStatus = jest.fn()
 const setBlueprintLocked = jest.fn()

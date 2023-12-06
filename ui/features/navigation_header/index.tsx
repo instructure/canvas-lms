@@ -31,6 +31,7 @@ const I18n = useI18nScope('common')
 // #
 // Handle user toggling of nav width
 let navCollapsed = Boolean(window.ENV.SETTINGS?.collapse_global_nav)
+let globalNavIsOpen = Boolean(false)
 
 $('body').on('click', '#primaryNavToggle', function () {
   let primaryNavToggleText
@@ -54,26 +55,58 @@ $('body').on('click', '#primaryNavToggle', function () {
   }
 })
 
+if (window.ENV.FEATURES.instui_nav || localStorage.instui_nav_dev) {
+  const mobileHeaderHamburger = document.getElementsByClassName('mobile-header-hamburger')
+  mobileHeaderHamburger[0].addEventListener('touchstart', event => {
+    event.preventDefault()
+    globalNavIsOpen = !globalNavIsOpen
+  })
+  mobileHeaderHamburger[0].addEventListener('click', event => {
+    event.preventDefault()
+    globalNavIsOpen = !globalNavIsOpen
+  })
+}
+
 ready(() => {
-  const globalNavTrayContainer = document.getElementById('global_nav_tray_container')
-  if (globalNavTrayContainer) {
+  if (window.ENV.FEATURES.instui_nav || localStorage.instui_nav_dev) {
+    const mobileContextNavContainer = document.getElementById('mobileContextNavContainer')
     ReactDOM.render(
       <QueryProvider>
         <Navigation />
       </QueryProvider>,
-      globalNavTrayContainer,
+      mobileContextNavContainer,
       () => {
-        const mobileContextNavContainer = document.getElementById('mobileContextNavContainer')
         if (mobileContextNavContainer) {
           ReactDOM.render(
             <QueryProvider>
-              <MobileNavigation />
+              <MobileNavigation navIsOpen={globalNavIsOpen} />
             </QueryProvider>,
             mobileContextNavContainer
           )
         }
       }
     )
+  } else {
+    const globalNavTrayContainer = document.getElementById('global_nav_tray_container')
+    if (globalNavTrayContainer) {
+      ReactDOM.render(
+        <QueryProvider>
+          <Navigation />
+        </QueryProvider>,
+        globalNavTrayContainer,
+        () => {
+          const mobileContextNavContainer = document.getElementById('mobileContextNavContainer')
+          if (mobileContextNavContainer) {
+            ReactDOM.render(
+              <QueryProvider>
+                <MobileNavigation />
+              </QueryProvider>,
+              mobileContextNavContainer
+            )
+          }
+        }
+      )
+    }
   }
 
   const newTabContainers = document.getElementsByClassName('new-tab-indicator')

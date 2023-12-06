@@ -160,7 +160,7 @@ exports[`groups itemsForDay that come in on prop changes 1`] = `
         animatableIndex={1}
         color="#0B874B"
         currentUser={
-          Object {
+          {
             "avatarUrl": "/picture/is/here",
             "color": "#0B874B",
             "displayName": "Jane",
@@ -169,9 +169,9 @@ exports[`groups itemsForDay that come in on prop changes 1`] = `
         }
         isObserving={false}
         items={
-          Array [
-            Object {
-              "context": Object {
+          [
+            {
+              "context": {
                 "id": 128,
                 "type": "Course",
               },
@@ -185,7 +185,7 @@ exports[`groups itemsForDay that come in on prop changes 1`] = `
         simplifiedControls={false}
         singleCourseView={false}
         themeOverride={
-          Object {
+          {
             "titleColor": "#0B874B",
           }
         }
@@ -195,7 +195,7 @@ exports[`groups itemsForDay that come in on prop changes 1`] = `
         animatableIndex={2}
         color="#0B874B"
         currentUser={
-          Object {
+          {
             "avatarUrl": "/picture/is/here",
             "color": "#0B874B",
             "displayName": "Jane",
@@ -204,9 +204,9 @@ exports[`groups itemsForDay that come in on prop changes 1`] = `
         }
         isObserving={false}
         items={
-          Array [
-            Object {
-              "context": Object {
+          [
+            {
+              "context": {
                 "id": 256,
                 "type": "Course",
               },
@@ -220,7 +220,7 @@ exports[`groups itemsForDay that come in on prop changes 1`] = `
         simplifiedControls={false}
         singleCourseView={false}
         themeOverride={
-          Object {
+          {
             "titleColor": "#0B874B",
           }
         }
@@ -273,7 +273,7 @@ exports[`groups itemsForDay that come in on prop changes 2`] = `
         animatableIndex={1}
         color="#0B874B"
         currentUser={
-          Object {
+          {
             "avatarUrl": "/picture/is/here",
             "color": "#0B874B",
             "displayName": "Jane",
@@ -282,9 +282,9 @@ exports[`groups itemsForDay that come in on prop changes 2`] = `
         }
         isObserving={false}
         items={
-          Array [
-            Object {
-              "context": Object {
+          [
+            {
+              "context": {
                 "id": 128,
                 "type": "Course",
               },
@@ -298,7 +298,7 @@ exports[`groups itemsForDay that come in on prop changes 2`] = `
         simplifiedControls={false}
         singleCourseView={false}
         themeOverride={
-          Object {
+          {
             "titleColor": "#0B874B",
           }
         }
@@ -308,7 +308,7 @@ exports[`groups itemsForDay that come in on prop changes 2`] = `
         animatableIndex={2}
         color="#0B874B"
         currentUser={
-          Object {
+          {
             "avatarUrl": "/picture/is/here",
             "color": "#0B874B",
             "displayName": "Jane",
@@ -317,17 +317,17 @@ exports[`groups itemsForDay that come in on prop changes 2`] = `
         }
         isObserving={false}
         items={
-          Array [
-            Object {
-              "context": Object {
+          [
+            {
+              "context": {
                 "id": 256,
                 "type": "Course",
               },
               "date": "2017-04-25T23:59:00.000Z",
               "title": "San Juan",
             },
-            Object {
-              "context": Object {
+            {
+              "context": {
                 "id": 256,
                 "type": "Course",
               },
@@ -341,7 +341,7 @@ exports[`groups itemsForDay that come in on prop changes 2`] = `
         simplifiedControls={false}
         singleCourseView={false}
         themeOverride={
-          Object {
+          {
             "titleColor": "#0B874B",
           }
         }
@@ -351,7 +351,7 @@ exports[`groups itemsForDay that come in on prop changes 2`] = `
         animatableIndex={3}
         color="#0B874B"
         currentUser={
-          Object {
+          {
             "avatarUrl": "/picture/is/here",
             "color": "#0B874B",
             "displayName": "Jane",
@@ -360,8 +360,8 @@ exports[`groups itemsForDay that come in on prop changes 2`] = `
         }
         isObserving={false}
         items={
-          Array [
-            Object {
+          [
+            {
               "title": "Get work done!",
             },
           ]
@@ -371,7 +371,7 @@ exports[`groups itemsForDay that come in on prop changes 2`] = `
         simplifiedControls={false}
         singleCourseView={false}
         themeOverride={
-          Object {
+          {
             "titleColor": "#0B874B",
           }
         }
@@ -424,7 +424,7 @@ exports[`groups itemsForDay that have no context into the "Notes" category 1`] =
         animatableIndex={1}
         color="#0B874B"
         currentUser={
-          Object {
+          {
             "avatarUrl": "/picture/is/here",
             "color": "#0B874B",
             "displayName": "Jane",
@@ -433,9 +433,9 @@ exports[`groups itemsForDay that have no context into the "Notes" category 1`] =
         }
         isObserving={false}
         items={
-          Array [
-            Object {
-              "context": Object {
+          [
+            {
+              "context": {
                 "id": 128,
                 "type": "Course",
               },
@@ -449,7 +449,7 @@ exports[`groups itemsForDay that have no context into the "Notes" category 1`] =
         simplifiedControls={false}
         singleCourseView={false}
         themeOverride={
-          Object {
+          {
             "titleColor": "#0B874B",
           }
         }
@@ -459,7 +459,7 @@ exports[`groups itemsForDay that have no context into the "Notes" category 1`] =
         animatableIndex={2}
         color="#0B874B"
         currentUser={
-          Object {
+          {
             "avatarUrl": "/picture/is/here",
             "color": "#0B874B",
             "displayName": "Jane",
@@ -468,17 +468,17 @@ exports[`groups itemsForDay that have no context into the "Notes" category 1`] =
         }
         isObserving={false}
         items={
-          Array [
-            Object {
-              "context": Object {
+          [
+            {
+              "context": {
                 "id": 256,
                 "type": "Course",
               },
               "date": "2017-04-25T23:59:00.000Z",
               "title": "San Juan",
             },
-            Object {
-              "context": Object {
+            {
+              "context": {
                 "id": 256,
                 "type": "Course",
               },
@@ -492,7 +492,7 @@ exports[`groups itemsForDay that have no context into the "Notes" category 1`] =
         simplifiedControls={false}
         singleCourseView={false}
         themeOverride={
-          Object {
+          {
             "titleColor": "#0B874B",
           }
         }
@@ -502,7 +502,7 @@ exports[`groups itemsForDay that have no context into the "Notes" category 1`] =
         animatableIndex={3}
         color="#0B874B"
         currentUser={
-          Object {
+          {
             "avatarUrl": "/picture/is/here",
             "color": "#0B874B",
             "displayName": "Jane",
@@ -511,8 +511,8 @@ exports[`groups itemsForDay that have no context into the "Notes" category 1`] =
         }
         isObserving={false}
         items={
-          Array [
-            Object {
+          [
+            {
               "title": "Get work done!",
             },
           ]
@@ -522,7 +522,7 @@ exports[`groups itemsForDay that have no context into the "Notes" category 1`] =
         simplifiedControls={false}
         singleCourseView={false}
         themeOverride={
-          Object {
+          {
             "titleColor": "#0B874B",
           }
         }
@@ -575,7 +575,7 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
         animatableIndex={101}
         color="#0B874B"
         currentUser={
-          Object {
+          {
             "avatarUrl": "/picture/is/here",
             "color": "#0B874B",
             "displayName": "Jane",
@@ -584,9 +584,9 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
         }
         isObserving={false}
         items={
-          Array [
-            Object {
-              "context": Object {
+          [
+            {
+              "context": {
                 "id": 128,
                 "type": "Course",
                 "url": "http://www.non_default_url.com",
@@ -601,7 +601,7 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
         simplifiedControls={false}
         singleCourseView={false}
         themeOverride={
-          Object {
+          {
             "titleColor": "#0B874B",
           }
         }
@@ -612,7 +612,7 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
         animatableIndex={102}
         color="#0B874B"
         currentUser={
-          Object {
+          {
             "avatarUrl": "/picture/is/here",
             "color": "#0B874B",
             "displayName": "Jane",
@@ -621,9 +621,9 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
         }
         isObserving={false}
         items={
-          Array [
-            Object {
-              "context": Object {
+          [
+            {
+              "context": {
                 "id": 256,
                 "type": "Course",
                 "url": "http://www.non_default_url.com",
@@ -631,8 +631,8 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
               "date": "2017-04-25T23:59:00.000Z",
               "title": "San Juan",
             },
-            Object {
-              "context": Object {
+            {
+              "context": {
                 "id": 256,
                 "type": "Course",
                 "url": "http://www.non_default_url.com",
@@ -647,7 +647,7 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
         simplifiedControls={false}
         singleCourseView={false}
         themeOverride={
-          Object {
+          {
             "titleColor": "#0B874B",
           }
         }
@@ -658,7 +658,7 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
         animatableIndex={103}
         color="#0B874B"
         currentUser={
-          Object {
+          {
             "avatarUrl": "/picture/is/here",
             "color": "#0B874B",
             "displayName": "Jane",
@@ -667,9 +667,9 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
         }
         isObserving={false}
         items={
-          Array [
-            Object {
-              "context": Object {
+          [
+            {
+              "context": {
                 "id": 256,
                 "type": "Group",
               },
@@ -683,7 +683,7 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
         simplifiedControls={false}
         singleCourseView={false}
         themeOverride={
-          Object {
+          {
             "titleColor": "#0B874B",
           }
         }

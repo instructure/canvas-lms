@@ -925,6 +925,25 @@ module Canvas::LiveEvents
     post_event_stringified("learning_outcome_link_updated", get_learning_outcome_link_data(link).merge(updated_at: link.updated_at))
   end
 
+  def self.rubric_assessed(rubric_assessment)
+    # context uuid may have the potential to be nil. Instead of throwing an error if
+    # context uuid is nil, it will be up to the consumer of the live event to
+    # handle as they deem fit.  This way the consumer can raise an error if
+    # the data is expected and required by their service.
+    uuid = rubric_assessment.rubric_association&.association_object&.context&.uuid
+
+    data = {
+      id: rubric_assessment.id,
+      aligned_to_outcomes: rubric_assessment.aligned_outcome_ids.count.positive?,
+      artifact_id: rubric_assessment.artifact_id,
+      artifact_type: rubric_assessment.artifact_type,
+      assessment_type: rubric_assessment.assessment_type,
+      context_uuid: uuid
+    }
+
+    post_event_stringified("rubric_assessed", data)
+  end
+
   def self.grade_override(score, old_score, enrollment, course)
     return unless score.course_score && score.override_score != old_score
 

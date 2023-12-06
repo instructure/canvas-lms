@@ -35,6 +35,7 @@ export function Component() {
       pointsBasedGradingSchemesEnabled={!!ENV.POINTS_BASED_GRADING_SCHEMES_ENABLED}
       contextType="Account"
       contextId={pathMatch.params.accountId}
+      archivedGradingSchemesEnabled={!!ENV.ARCHIVED_GRADING_SCHEMES_ENABLED}
     />
   )
 }

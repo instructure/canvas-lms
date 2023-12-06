@@ -34,7 +34,8 @@ class CoursePaceHardEndDateCompressor
     return if compress_items_after && compress_items_after >= items.length - 1
     return items if items.empty?
 
-    blackout_dates = course_pace.course.blackout_dates
+    course_pace_due_dates_calculator = CoursePaceDueDatesCalculator.new(course_pace)
+    blackout_dates = course_pace_due_dates_calculator.blackout_dates
     enrollment_start_date = enrollment&.start_at || [enrollment&.effective_start_at, enrollment&.created_at].compact.max
     start_date_of_item_group = start_date || enrollment_start_date&.to_date || course_pace.start_date.to_date
     end_date = course_pace.end_date || course_pace.course.end_at&.to_date || course_pace.course.enrollment_term&.end_at&.to_date
@@ -46,7 +47,7 @@ class CoursePaceHardEndDateCompressor
       end_date = CoursePacesDateHelpers.previous_enabled_day(end_date, course_pace.exclude_weekends, blackout_dates)
     end
 
-    due_dates = CoursePaceDueDatesCalculator.new(course_pace).get_due_dates(items, enrollment, start_date: start_date_of_item_group)
+    due_dates = course_pace_due_dates_calculator.get_due_dates(items, enrollment, start_date: start_date_of_item_group)
 
     if compress_items_after
       starting_item = items[compress_items_after]
@@ -94,7 +95,7 @@ class CoursePaceHardEndDateCompressor
 
     # when compressing heavily, the final due date can end up being after the course pace hard end date
     # adjust later module items
-    new_due_dates = CoursePaceDueDatesCalculator.new(course_pace).get_due_dates(items, enrollment, start_date: start_date_of_item_group)
+    new_due_dates = course_pace_due_dates_calculator.get_due_dates(items, enrollment, start_date: start_date_of_item_group)
     # If the course pace hasn't been committed yet we are grouping the items by their module_item_id since the item.id is
     # not set yet.
     key = course_pace.persisted? ? items[-1].id : items[-1].module_item_id

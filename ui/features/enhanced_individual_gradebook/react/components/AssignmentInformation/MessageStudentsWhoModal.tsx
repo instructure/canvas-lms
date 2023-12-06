@@ -76,6 +76,7 @@ export default function MessageStudentsWhoModal({
         grade: submission?.grade,
         redoRequest: submission?.redoRequest,
         score: submission?.score,
+        excused: submission?.excused,
       })
 
       return filteredStudents

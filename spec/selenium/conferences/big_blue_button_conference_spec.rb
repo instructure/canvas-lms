@@ -48,6 +48,10 @@ describe "BigBlueButton conferences" do
 
   before do
     user_session(@teacher)
+    # ensure requests that aren't stubbed don't actually attempt to hit blah.com
+    # (the "real" stubs take precedence)
+    WebMock.stub_request(:any, /bbb.blah.com/)
+           .to_return(body: big_blue_button_mock_response("failed", "notstubbed"))
   end
 
   after do
@@ -485,7 +489,7 @@ describe "BigBlueButton conferences" do
       end
 
       context "and the conference has no recordings" do
-        before(:once) do
+        before do
           stub_request(:get, /getRecordings/)
             .with(query: bbb_fixtures[:get_recordings])
             .to_return(body: big_blue_button_mock_response("get_recordings", "none"))
@@ -521,7 +525,7 @@ describe "BigBlueButton conferences" do
       end
 
       context "and the conference has one recording and it is deleted" do
-        before(:once) do
+        before do
           stub_request(:get, /deleteRecordings/)
             .with(query: bbb_fixtures[:delete_recordings])
             .to_return(body: big_blue_button_mock_response("delete_recordings"))
@@ -540,7 +544,7 @@ describe "BigBlueButton conferences" do
       end
 
       context "and the conference has one recording with statistics" do
-        before(:once) do
+        before do
           stub_request(:get, /getRecordings/)
             .with(query: bbb_fixtures[:get_recordings])
             .to_return(body: big_blue_button_mock_response("get_recordings", "one"))

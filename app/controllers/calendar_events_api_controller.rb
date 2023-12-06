@@ -66,7 +66,7 @@ require "rrule"
 #           "type": "string"
 #         },
 #         "context_code": {
-#           "description": "the context code of the calendar this event belongs to (course, user or group)",
+#           "description": "the context code of the calendar this event belongs to (course, group, user, or account)",
 #           "example": "course_123",
 #           "type": "string"
 #         },
@@ -351,7 +351,7 @@ class CalendarEventsApiController < ApplicationController
   #   Defaults to false (uses start_date, end_date, and undated criteria).
   #   If true, all events are returned, ignoring start_date, end_date, and undated criteria.
   # @argument context_codes[] [String]
-  #   List of context codes of courses/groups/users whose events you want to see.
+  #   List of context codes of courses, groups, users, or accounts whose events you want to see.
   #   If not specified, defaults to the current user (i.e personal calendar,
   #   no course/group events). Limited to 10 context codes, additional ones are
   #   ignored. The format of this field is the context type, followed by an
@@ -394,7 +394,7 @@ class CalendarEventsApiController < ApplicationController
   #   Defaults to false (uses start_date, end_date, and undated criteria).
   #   If true, all events are returned, ignoring start_date, end_date, and undated criteria.
   # @argument context_codes[] [String]
-  #   List of context codes of courses/groups/users whose events you want to see.
+  #   List of context codes of courses, groups, users, or accounts whose events you want to see.
   #   If not specified, defaults to the current user (i.e personal calendar,
   #   no course/group events). Limited to 10 context codes, additional ones are
   #   ignored. The format of this field is the context type, followed by an
@@ -485,8 +485,8 @@ class CalendarEventsApiController < ApplicationController
   # Create and return a new calendar event
   #
   # @argument calendar_event[context_code] [Required, String]
-  #   Context code of the course/group/user whose calendar this event should be
-  #   added to.
+  #   Context code of the course, group, user, or account whose calendar
+  #   this event should be added to.
   # @argument calendar_event[title] [String]
   #   Short title for the calendar event.
   # @argument calendar_event[description] [String]
@@ -705,7 +705,7 @@ class CalendarEventsApiController < ApplicationController
   # Update and return a calendar event
   #
   # @argument calendar_event[context_code] [Optional, String]
-  #   Context code of the course/group/user to move this event to.
+  #   Context code of the course, group, user, or account to move this event to.
   #   Scheduler appointments and events with section-specific times cannot be moved between calendars.
   # @argument calendar_event[title] [String]
   #   Short title for the calendar event.

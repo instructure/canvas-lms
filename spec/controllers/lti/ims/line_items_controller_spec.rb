@@ -820,43 +820,23 @@ module Lti
               coupled: false
             )
           end
-          let(:line_item) do
-            second_line_item
-          end
 
-          it_behaves_like "the line item destroy endpoint"
-
-          context do
+          context "when destroying the default line item" do
             let(:line_item) { coupled_line_item }
 
-            it "does not allow destroying default line items" do
+            it "returns unauthorized" do
               send_request
               expect(response).to be_unauthorized
               expect(Lti::LineItem.active.find_by(id: line_item_id)).not_to be_nil
             end
           end
-        end
 
-        context "when using the uncoupled model" do
-          let(:line_item) do
-            line_item_model(
-              course:,
-              tag:,
-              resource_id:,
-              client_id: developer_key.global_id,
-              coupled: false
-            )
-          end
+          context "when destroying an extra line item" do
+            let(:line_item) do
+              second_line_item
+            end
 
-          it "deletes the correct line item but not the assignment" do
-            send_request
-            expect(Lti::LineItem.active.find_by(id: line_item_id)).to be_nil
-            expect(line_item.assignment).to be_active
-          end
-
-          it "responds with no content" do
-            send_request
-            expect(response).to be_no_content
+            it_behaves_like "the line item destroy endpoint"
           end
         end
 

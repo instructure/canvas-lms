@@ -28,259 +28,146 @@ describe UserContent, type: :request do
     attachment_model
   end
 
-  it "translates course file download links to directly-downloadable urls" do
-    @assignment = @course.assignments.create!(title: "first assignment", description: <<~HTML)
-      <p>
-        Hello, students.<br>
-        This will explain everything: <img src="/courses/#{@course.id}/files/#{@attachment.id}/download" alt="important">
-      </p>
-    HTML
+  shared_examples "link translation examples" do
+    subject do
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+                      { controller: "assignments_api",
+                        action: "show",
+                        format: "json",
+                        course_id: @course.id.to_s,
+                        id: @assignment.id.to_s })
 
-    json = api_call(:get,
-                    "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
-                    { controller: "assignments_api",
-                      action: "show",
-                      format: "json",
-                      course_id: @course.id.to_s,
-                      id: @assignment.id.to_s })
+      @doc = Nokogiri::HTML5.fragment(json["description"])
+    end
 
-    doc = Nokogiri::HTML5.fragment(json["description"])
-    expect(doc.at_css("img")["src"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
+    it "translates course file download links to directly-downloadable urls" do
+      @assignment = @course.assignments.create!(title: "first assignment", description: "<img src=\"/courses/#{@course.id}/files/#{@attachment.id}/download\" alt=\"important\">")
+      subject
+      expect(@doc.at_css("img")["src"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
+    end
+
+    it "translates group file download links to directly-downloadable urls" do
+      @group = @course.groups.create!(name: "course group")
+      attachment_model(context: @group)
+      @group.add_user(@teacher)
+      @group_topic = @group.discussion_topics.create!(title: "group topic", user: @teacher, message: "<img src=\"/groups/#{@group.id}/files/#{@attachment.id}/download\" alt=\"important\">")
+      json = api_call(:get,
+                      "/api/v1/groups/#{@group.id}/discussion_topics/#{@group_topic.id}",
+                      { controller: "discussion_topics_api",
+                        action: "show",
+                        format: "json",
+                        group_id: @group.id.to_s,
+                        topic_id: @group_topic.id.to_s })
+
+      @doc = Nokogiri::HTML5.fragment(json["message"])
+      expect(@doc.at_css("img")["src"]).to eq "http://www.example.com/groups/#{@group.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
+    end
+
+    it "translates file download links to directly-downloadable urls for deleted and replaced files" do
+      @attachment.destroy
+      attachment2 = Attachment.create!(folder: @attachment.folder, context: @attachment.context, filename: @attachment.filename, uploaded_data: StringIO.new("first"))
+      expect(@context.attachments.find(@attachment.id).id).to eq attachment2.id
+
+      @assignment = @course.assignments.create!(title: "first assignment", description: "<img src=\"/courses/#{@course.id}/files/#{@attachment.id}/download\" alt=\"important\">")
+      subject
+      expect(@doc.at_css("img")["src"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{attachment2.id}/download?verifier=#{attachment2.uuid}"
+    end
+
+    it "does not corrupt absolute links" do
+      attachment_model(context: @course)
+      @assignment = @course.assignments.create!(title: "first assignment", description: "<img src=\"http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download\" alt=\"important\">")
+      subject
+      expect(@doc.at_css("img")["src"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
+    end
+
+    it "does not remove wrap parameter on file download links" do
+      attachment_model(context: @course)
+      @assignment = @course.assignments.create!(title: "first assignment", description: "<img src=\"/courses/#{@course.id}/files/#{@attachment.id}/download?wrap=1\" alt=\"important\">")
+      subject
+      expect(@doc.at_css("img")["src"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}&wrap=1"
+    end
+
+    it "translates file preview links to directly-downloadable preview urls" do
+      @assignment = @course.assignments.create!(title: "first assignment", description: "<img src=\"/courses/#{@course.id}/files/#{@attachment.id}/preview\" alt=\"important\">")
+      subject
+      expect(@doc.at_css("img")["src"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/preview?verifier=#{@attachment.uuid}"
+    end
+
+    it "translates media comments to embedded video tags" do
+      @assignment = @course.assignments.create!(title: "first assignment", description: '<a href="/media_objects/qwerty" class="instructure_inline_media_comment video_comment" id="media_comment_qwerty">Watch</a>')
+      subject
+      video = @doc.at_css("video")
+      expect(video).to be_present
+      expect(video["class"]).to match(/\binstructure_inline_media_comment\b/)
+      expect(video["data-media_comment_type"]).to eq "video"
+      expect(video["data-media_comment_id"]).to eq "qwerty"
+      expect(video["poster"]).to match(%r{http://www.example.com/media_objects/qwerty/thumbnail})
+      expect(video["src"]).to match(%r{http://www.example.com/courses/#{@course.id}/media_download})
+      expect(video["src"]).to match(/entryId=qwerty/)
+      # we leave width/height out of it, since browsers tend to have good
+      # defaults and it makes it easier to set via client css rules
+      expect(video["width"]).to be_nil
+      expect(video["height"]).to be_nil
+    end
+
+    it "translates media comments to audio tags" do
+      @assignment = @course.assignments.create!(title: "first assignment", description: '<a href="/media_objects/abcde" class="instructure_inline_media_comment audio_comment" id="media_comment_abcde">Listen</a>')
+      subject
+      audio = @doc.at_css("audio")
+      expect(audio).to be_present
+      expect(audio["class"]).to match(/\binstructure_inline_media_comment\b/)
+      expect(audio["data-media_comment_type"]).to eq "audio"
+      expect(audio["data-media_comment_id"]).to eq "abcde"
+      expect(audio["poster"]).to be_blank
+      expect(audio["src"]).to match(%r{http://www.example.com/courses/#{@course.id}/media_download})
+      expect(audio["src"]).to match(/entryId=abcde/)
+    end
+
+    it "does not translate links from content not viewable by user" do
+      @assignment = @course.assignments.create!(title: "first assignment", description: "<img src=\"/courses/#{@course.id}/files/#{@attachment.id}/preview\" alt=\"important\">")
+      student_in_course(course: @course, active_all: true)
+      @attachment.locked = true
+      @attachment.save
+      subject
+      expect(@doc.at_css("img")["src"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/preview"
+    end
+
+    it "prepends the hostname to all absolute-path links" do
+      @assignment = @course.assignments.create!(title: "first assignment", description: <<~HTML)
+        <p>
+          Hello, students.<br>
+          <img src='/equation_images/1234'>
+          <a href='/help'>click for teh help</a>
+          <a href='//example.com/quiz'>a quiz</a>
+          <a href='http://example.com/test1'>moar</a>
+          <a href='invalid url'>broke</a>
+        </p>
+      HTML
+      subject
+      expect(@doc.at_css("img")["src"]).to eq "http://www.example.com/equation_images/1234"
+      expect(@doc.css("a").pluck("href")).to eq %w[http://www.example.com/help //example.com/quiz http://example.com/test1 invalid%20url]
+    end
+
+    it "does not choke on funny email addresses" do
+      @assignment = @course.assignments.create!(title: "first assignment", description: '<a href="mailto:djmankiewicz@homestarrunner,com">e-nail</a>')
+      subject
+      assert_status(200)
+    end
   end
 
-  it "translates group file download links to directly-downloadable urls" do
-    @group = @course.groups.create!(name: "course group")
-    attachment_model(context: @group)
-    @group.add_user(@teacher)
-    @group_topic = @group.discussion_topics.create!(title: "group topic", user: @teacher, message: <<~HTML)
-      <p>
-        Hello, students.<br>
-        This will explain everything: <img src="/groups/#{@group.id}/files/#{@attachment.id}/download" alt="important">
-      </p>
-    HTML
+  describe "link translation" do
+    context "with precise_link_replacements FF OFF" do
+      before { Account.site_admin.disable_feature! :precise_link_replacements }
 
-    json = api_call(:get,
-                    "/api/v1/groups/#{@group.id}/discussion_topics/#{@group_topic.id}",
-                    { controller: "discussion_topics_api",
-                      action: "show",
-                      format: "json",
-                      group_id: @group.id.to_s,
-                      topic_id: @group_topic.id.to_s })
+      include_examples "link translation examples"
+    end
 
-    doc = Nokogiri::HTML5.fragment(json["message"])
-    expect(doc.at_css("img")["src"]).to eq "http://www.example.com/groups/#{@group.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
-  end
+    context "with precise_link_replacements FF ON" do
+      before { Account.site_admin.enable_feature! :precise_link_replacements }
 
-  it "translates file download links to directly-downloadable urls for deleted and replaced files" do
-    @attachment.destroy
-    attachment2 = Attachment.create!(folder: @attachment.folder, context: @attachment.context, filename: @attachment.filename, uploaded_data: StringIO.new("first"))
-    expect(@context.attachments.find(@attachment.id).id).to eq attachment2.id
-
-    @assignment = @course.assignments.create!(title: "first assignment", description: <<~HTML)
-      <p>
-        Hello, students.<br>
-        This will explain everything: <img src="/courses/#{@course.id}/files/#{@attachment.id}/download" alt="important">
-      </p>
-    HTML
-
-    json = api_call(:get,
-                    "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
-                    { controller: "assignments_api",
-                      action: "show",
-                      format: "json",
-                      course_id: @course.id.to_s,
-                      id: @assignment.id.to_s })
-
-    doc = Nokogiri::HTML5.fragment(json["description"])
-    expect(doc.at_css("img")["src"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{attachment2.id}/download?verifier=#{attachment2.uuid}"
-  end
-
-  it "does not corrupt absolute links" do
-    attachment_model(context: @course)
-    @topic = @course.discussion_topics.create!(title: "course topic", user: @teacher, message: <<~HTML)
-      <p>
-        Hello, students.<br>
-        This will explain everything: <img src="http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download" alt="important">
-      </p>
-    HTML
-    json = api_call(:get,
-                    "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                    { controller: "discussion_topics_api",
-                      action: "show",
-                      format: "json",
-                      course_id: @course.id.to_s,
-                      topic_id: @topic.id.to_s })
-    doc = Nokogiri::HTML5.fragment(json["message"])
-    expect(doc.at_css("img")["src"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
-  end
-
-  it "does not remove wrap parameter on file download links" do
-    attachment_model(context: @course)
-    @topic = @course.discussion_topics.create!(title: "course topic", user: @teacher, message: <<~HTML)
-      <p>
-        Hello, students.<br>
-        This will explain everything: <img src="/courses/#{@course.id}/files/#{@attachment.id}/download?wrap=1" alt="important">
-      </p>
-    HTML
-    json = api_call(:get,
-                    "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                    { controller: "discussion_topics_api",
-                      action: "show",
-                      format: "json",
-                      course_id: @course.id.to_s,
-                      topic_id: @topic.id.to_s })
-    doc = Nokogiri::HTML5.fragment(json["message"])
-    expect(doc.at_css("img")["src"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}&wrap=1"
-  end
-
-  it "translates file preview links to directly-downloadable preview urls" do
-    @assignment = @course.assignments.create!(title: "first assignment", description: <<~HTML)
-      <p>
-        Hello, students.<br>
-        This will explain everything: <img src="/courses/#{@course.id}/files/#{@attachment.id}/preview" alt="important">
-      </p>
-    HTML
-
-    json = api_call(:get,
-                    "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
-                    { controller: "assignments_api",
-                      action: "show",
-                      format: "json",
-                      course_id: @course.id.to_s,
-                      id: @assignment.id.to_s })
-
-    doc = Nokogiri::HTML5.fragment(json["description"])
-    expect(doc.at_css("img")["src"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/preview?verifier=#{@attachment.uuid}"
-  end
-
-  it "translates media comment links to embedded video tags" do
-    @assignment = @course.assignments.create!(title: "first assignment", description: <<~HTML)
-      <p>
-        Hello, students.<br>
-        Watch this awesome video: <a href="/media_objects/qwerty" class="instructure_inline_media_comment video_comment" id="media_comment_qwerty"><img></a>
-      </p>
-    HTML
-
-    json = api_call(:get,
-                    "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
-                    { controller: "assignments_api",
-                      action: "show",
-                      format: "json",
-                      course_id: @course.id.to_s,
-                      id: @assignment.id.to_s })
-
-    doc = Nokogiri::HTML5.fragment(json["description"])
-    video = doc.at_css("video")
-    expect(video).to be_present
-    expect(video["class"]).to match(/\binstructure_inline_media_comment\b/)
-    expect(video["data-media_comment_type"]).to eq "video"
-    expect(video["data-media_comment_id"]).to eq "qwerty"
-    expect(video["poster"]).to match(%r{http://www.example.com/media_objects/qwerty/thumbnail})
-    expect(video["src"]).to match(%r{http://www.example.com/courses/#{@course.id}/media_download})
-    expect(video["src"]).to match(/entryId=qwerty/)
-    # we leave width/height out of it, since browsers tend to have good
-    # defaults and it makes it easier to set via client css rules
-    expect(video["width"]).to be_nil
-    expect(video["height"]).to be_nil
-  end
-
-  it "translates media comment audio tags" do
-    @assignment = @course.assignments.create!(title: "first assignment", description: <<~HTML)
-      <p>
-        Hello, students.<br>
-        Listen up: <a href="/media_objects/abcde" class="instructure_inline_media_comment audio_comment" id="media_comment_abcde"><img></a>
-      </p>
-    HTML
-
-    json = api_call(:get,
-                    "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
-                    { controller: "assignments_api",
-                      action: "show",
-                      format: "json",
-                      course_id: @course.id.to_s,
-                      id: @assignment.id.to_s })
-
-    doc = Nokogiri::HTML5.fragment(json["description"])
-    audio = doc.at_css("audio")
-    expect(audio).to be_present
-    expect(audio["class"]).to match(/\binstructure_inline_media_comment\b/)
-    expect(audio["data-media_comment_type"]).to eq "audio"
-    expect(audio["data-media_comment_id"]).to eq "abcde"
-    expect(audio["poster"]).to be_blank
-    expect(audio["src"]).to match(%r{http://www.example.com/courses/#{@course.id}/media_download})
-    expect(audio["src"]).to match(/entryId=abcde/)
-  end
-
-  it "does not translate links in content not viewable by user" do
-    @assignment = @course.assignments.create!(title: "first assignment", description: <<~HTML)
-      <p>
-        Hello, students.<br>
-        This will explain everything: <img src="/courses/#{@course.id}/files/#{@attachment.id}/preview" alt="important">
-      </p>
-    HTML
-
-    # put a student in the course. this will be the active user during the API
-    # call (necessary since the teacher has manage content rights and will thus
-    # ignore the lock). lock the attachment so the student can't view it.
-    student_in_course(course: @course, active_all: true)
-    @attachment.locked = true
-    @attachment.save
-
-    json = api_call(:get,
-                    "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
-                    { controller: "assignments_api",
-                      action: "show",
-                      format: "json",
-                      course_id: @course.id.to_s,
-                      id: @assignment.id.to_s })
-
-    doc = Nokogiri::HTML5.fragment(json["description"])
-    expect(doc.at_css("img")["src"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/preview"
-  end
-
-  it "prepends the hostname to all absolute-path links" do
-    @assignment = @course.assignments.create!(title: "first assignment", description: <<~HTML)
-      <p>
-        Hello, students.<br>
-        <img src='/equation_images/1234'>
-        <a href='/help'>click for teh help</a>
-        <a href='//example.com/quiz'>a quiz</a>
-        <a href='http://example.com/test1'>moar</a>
-        <a href='invalid url'>broke</a>
-      </p>
-    HTML
-
-    json = api_call(:get,
-                    "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
-                    { controller: "assignments_api",
-                      action: "show",
-                      format: "json",
-                      course_id: @course.id.to_s,
-                      id: @assignment.id.to_s })
-
-    doc = Nokogiri::HTML5.fragment(json["description"])
-    expect(doc.at_css("img")["src"]).to eq "http://www.example.com/equation_images/1234"
-    expect(doc.css("a").pluck("href")).to eq [
-      "http://www.example.com/help",
-      "//example.com/quiz",
-      "http://example.com/test1",
-      "invalid%20url",
-    ]
-  end
-
-  it "does not choke on funny email addresses" do
-    @wiki_page = @course.wiki_pages.build(title: "title")
-    @wiki_page.body = "<a href='mailto:djmankiewicz@homestarrunner,com'>e-nail</a>"
-    @wiki_page.workflow_state = "active"
-    @wiki_page.save!
-    api_call(:get,
-             "/api/v1/courses/#{@course.id}/pages/#{@wiki_page.url}",
-             { controller: "wiki_pages_api",
-               action: "show",
-               format: "json",
-               course_id: @course.id.to_s,
-               url_or_id: @wiki_page.url })
-    assert_status(200)
+      include_examples "link translation examples"
+    end
   end
 
   context "data api endpoints" do

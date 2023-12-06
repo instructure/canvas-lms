@@ -50,7 +50,7 @@ function renderComponent(wrapper, overrides = {}) {
     viewPastLocked: false,
     viewFutureLocked: false,
     course_start_at: moment('2020-08-14').toISOString(),
-    course_conclude_at: null,
+    course_conclude_at: '',
     course_restrict_student_past_view: 'false',
     course_restrict_student_future_view: 'false',
     course_restrict_enrollments_to_course_dates: 'false',

@@ -17,6 +17,9 @@
  */
 
 import {createClient, gql} from '..'
+import {enableFetchMocks} from 'jest-fetch-mock'
+
+enableFetchMocks()
 
 describe('host configuration', () => {
   const someQuery = gql`

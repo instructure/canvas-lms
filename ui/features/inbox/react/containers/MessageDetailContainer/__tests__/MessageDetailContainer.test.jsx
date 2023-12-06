@@ -31,6 +31,9 @@ import {
   ConversationContext,
   CONVERSATION_ID_WHERE_CAN_REPLY_IS_FALSE,
 } from '../../../../util/constants'
+import {enableFetchMocks} from 'jest-fetch-mock'
+
+enableFetchMocks()
 
 jest.mock('../../../../util/utils', () => ({
   ...jest.requireActual('../../../../util/utils'),

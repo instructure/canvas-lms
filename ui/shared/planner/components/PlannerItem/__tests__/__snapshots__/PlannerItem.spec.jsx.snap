@@ -249,9 +249,9 @@ exports[`does not render end time if the same as start time 1`] = `
     >
       <InstUISettingsProvider
         theme={
-          Object {
-            "componentOverrides": Object {
-              "CheckboxFacade": Object {
+          {
+            "componentOverrides": {
+              "CheckboxFacade": {
                 "borderColor": "#d71f85",
                 "checkedBackground": "#d71f85",
                 "checkedBorderColor": "#d71f85",
@@ -285,7 +285,7 @@ exports[`does not render end time if the same as start time 1`] = `
       aria-hidden="true"
       className="PlannerItem-styles__icon"
       style={
-        Object {
+        {
           "color": "#d71f85",
         }
       }
@@ -317,7 +317,7 @@ exports[`does not render end time if the same as start time 1`] = `
           <div
             className="PlannerItem-styles__title"
             style={
-              Object {
+              {
                 "position": "relative",
               }
             }
@@ -330,7 +330,7 @@ exports[`does not render end time if the same as start time 1`] = `
               isWithinText={false}
               onClick={[Function]}
               themeOverride={
-                Object {
+                {
                   "linkColor": undefined,
                   "linkHoverColor": undefined,
                   "mediumPaddingHorizontal": "0",
@@ -352,7 +352,7 @@ exports[`does not render end time if the same as start time 1`] = `
               allDay={false}
               courseName="A Course about being Diffrient"
               currentUser={
-                Object {
+                {
                   "avatarUrl": "/picture/is/here",
                   "color": "#0B874B",
                   "displayName": "Jane",
@@ -651,9 +651,9 @@ exports[`prefers to render feedback if it and the location are available 1`] = `
     >
       <InstUISettingsProvider
         theme={
-          Object {
-            "componentOverrides": Object {
-              "CheckboxFacade": Object {
+          {
+            "componentOverrides": {
+              "CheckboxFacade": {
                 "borderColor": "#d71f85",
                 "checkedBackground": "#d71f85",
                 "checkedBorderColor": "#d71f85",
@@ -687,7 +687,7 @@ exports[`prefers to render feedback if it and the location are available 1`] = `
       aria-hidden="true"
       className="PlannerItem-styles__icon"
       style={
-        Object {
+        {
           "color": "#d71f85",
         }
       }
@@ -725,7 +725,7 @@ exports[`prefers to render feedback if it and the location are available 1`] = `
             interaction="enabled"
             isWithinText={false}
             themeOverride={
-              Object {
+              {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
               }
@@ -1057,9 +1057,9 @@ exports[`renders Announcement correctly with everything 1`] = `
     >
       <InstUISettingsProvider
         theme={
-          Object {
-            "componentOverrides": Object {
-              "CheckboxFacade": Object {
+          {
+            "componentOverrides": {
+              "CheckboxFacade": {
                 "borderColor": "#d71f85",
                 "checkedBackground": "#d71f85",
                 "checkedBorderColor": "#d71f85",
@@ -1093,7 +1093,7 @@ exports[`renders Announcement correctly with everything 1`] = `
       aria-hidden="true"
       className="PlannerItem-styles__icon"
       style={
-        Object {
+        {
           "color": "#d71f85",
         }
       }
@@ -1131,7 +1131,7 @@ exports[`renders Announcement correctly with everything 1`] = `
             interaction="enabled"
             isWithinText={false}
             themeOverride={
-              Object {
+              {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
               }
@@ -1452,9 +1452,9 @@ exports[`renders Announcement correctly with just date 1`] = `
     >
       <InstUISettingsProvider
         theme={
-          Object {
-            "componentOverrides": Object {
-              "CheckboxFacade": Object {
+          {
+            "componentOverrides": {
+              "CheckboxFacade": {
                 "borderColor": "#d71f85",
                 "checkedBackground": "#d71f85",
                 "checkedBorderColor": "#d71f85",
@@ -1488,7 +1488,7 @@ exports[`renders Announcement correctly with just date 1`] = `
       aria-hidden="true"
       className="PlannerItem-styles__icon"
       style={
-        Object {
+        {
           "color": "#d71f85",
         }
       }
@@ -1526,7 +1526,7 @@ exports[`renders Announcement correctly with just date 1`] = `
             interaction="enabled"
             isWithinText={false}
             themeOverride={
-              Object {
+              {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
               }
@@ -1826,9 +1826,9 @@ exports[`renders Announcement correctly with just points 1`] = `
     >
       <InstUISettingsProvider
         theme={
-          Object {
-            "componentOverrides": Object {
-              "CheckboxFacade": Object {
+          {
+            "componentOverrides": {
+              "CheckboxFacade": {
                 "borderColor": "#d71f85",
                 "checkedBackground": "#d71f85",
                 "checkedBorderColor": "#d71f85",
@@ -1862,7 +1862,7 @@ exports[`renders Announcement correctly with just points 1`] = `
       aria-hidden="true"
       className="PlannerItem-styles__icon"
       style={
-        Object {
+        {
           "color": "#d71f85",
         }
       }
@@ -1900,7 +1900,7 @@ exports[`renders Announcement correctly with just points 1`] = `
             interaction="enabled"
             isWithinText={false}
             themeOverride={
-              Object {
+              {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
               }
@@ -2221,9 +2221,9 @@ exports[`renders Announcement correctly without right side content 1`] = `
     >
       <InstUISettingsProvider
         theme={
-          Object {
-            "componentOverrides": Object {
-              "CheckboxFacade": Object {
+          {
+            "componentOverrides": {
+              "CheckboxFacade": {
                 "borderColor": "#d71f85",
                 "checkedBackground": "#d71f85",
                 "checkedBorderColor": "#d71f85",
@@ -2257,7 +2257,7 @@ exports[`renders Announcement correctly without right side content 1`] = `
       aria-hidden="true"
       className="PlannerItem-styles__icon"
       style={
-        Object {
+        {
           "color": "#d71f85",
         }
       }
@@ -2295,7 +2295,7 @@ exports[`renders Announcement correctly without right side content 1`] = `
             interaction="enabled"
             isWithinText={false}
             themeOverride={
-              Object {
+              {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
               }
@@ -2595,9 +2595,9 @@ exports[`renders Assignment correctly with everything 1`] = `
     >
       <InstUISettingsProvider
         theme={
-          Object {
-            "componentOverrides": Object {
-              "CheckboxFacade": Object {
+          {
+            "componentOverrides": {
+              "CheckboxFacade": {
                 "borderColor": "#d71f85",
                 "checkedBackground": "#d71f85",
                 "checkedBorderColor": "#d71f85",
@@ -2631,7 +2631,7 @@ exports[`renders Assignment correctly with everything 1`] = `
       aria-hidden="true"
       className="PlannerItem-styles__icon"
       style={
-        Object {
+        {
           "color": "#d71f85",
         }
       }
@@ -2669,7 +2669,7 @@ exports[`renders Assignment correctly with everything 1`] = `
             interaction="enabled"
             isWithinText={false}
             themeOverride={
-              Object {
+              {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
               }
@@ -2990,9 +2990,9 @@ exports[`renders Assignment correctly with just date 1`] = `
     >
       <InstUISettingsProvider
         theme={
-          Object {
-            "componentOverrides": Object {
-              "CheckboxFacade": Object {
+          {
+            "componentOverrides": {
+              "CheckboxFacade": {
                 "borderColor": "#d71f85",
                 "checkedBackground": "#d71f85",
                 "checkedBorderColor": "#d71f85",
@@ -3026,7 +3026,7 @@ exports[`renders Assignment correctly with just date 1`] = `
       aria-hidden="true"
       className="PlannerItem-styles__icon"
       style={
-        Object {
+        {
           "color": "#d71f85",
         }
       }
@@ -3064,7 +3064,7 @@ exports[`renders Assignment correctly with just date 1`] = `
             interaction="enabled"
             isWithinText={false}
             themeOverride={
-              Object {
+              {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
               }
@@ -3364,9 +3364,9 @@ exports[`renders Assignment correctly with just points 1`] = `
     >
       <InstUISettingsProvider
         theme={
-          Object {
-            "componentOverrides": Object {
-              "CheckboxFacade": Object {
+          {
+            "componentOverrides": {
+              "CheckboxFacade": {
                 "borderColor": "#d71f85",
                 "checkedBackground": "#d71f85",
                 "checkedBorderColor": "#d71f85",
@@ -3400,7 +3400,7 @@ exports[`renders Assignment correctly with just points 1`] = `
       aria-hidden="true"
       className="PlannerItem-styles__icon"
       style={
-        Object {
+        {
           "color": "#d71f85",
         }
       }
@@ -3438,7 +3438,7 @@ exports[`renders Assignment correctly with just points 1`] = `
             interaction="enabled"
             isWithinText={false}
             themeOverride={
-              Object {
+              {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
               }
@@ -3759,9 +3759,9 @@ exports[`renders Assignment correctly without right side content 1`] = `
     >
       <InstUISettingsProvider
         theme={
-          Object {
-            "componentOverrides": Object {
-              "CheckboxFacade": Object {
+          {
+            "componentOverrides": {
+              "CheckboxFacade": {
                 "borderColor": "#d71f85",
                 "checkedBackground": "#d71f85",
                 "checkedBorderColor": "#d71f85",
@@ -3795,7 +3795,7 @@ exports[`renders Assignment correctly without right side content 1`] = `
       aria-hidden="true"
       className="PlannerItem-styles__icon"
       style={
-        Object {
+        {
           "color": "#d71f85",
         }
       }
@@ -3833,7 +3833,7 @@ exports[`renders Assignment correctly without right side content 1`] = `
             interaction="enabled"
             isWithinText={false}
             themeOverride={
-              Object {
+              {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
               }
@@ -4133,9 +4133,9 @@ exports[`renders Calendar Event correctly with an all day date 1`] = `
     >
       <InstUISettingsProvider
         theme={
-          Object {
-            "componentOverrides": Object {
-              "CheckboxFacade": Object {
+          {
+            "componentOverrides": {
+              "CheckboxFacade": {
                 "borderColor": "#d71f85",
                 "checkedBackground": "#d71f85",
                 "checkedBorderColor": "#d71f85",
@@ -4169,7 +4169,7 @@ exports[`renders Calendar Event correctly with an all day date 1`] = `
       aria-hidden="true"
       className="PlannerItem-styles__icon"
       style={
-        Object {
+        {
           "color": "#d71f85",
         }
       }
@@ -4201,7 +4201,7 @@ exports[`renders Calendar Event correctly with an all day date 1`] = `
           <div
             className="PlannerItem-styles__title"
             style={
-              Object {
+              {
                 "position": "relative",
               }
             }
@@ -4214,7 +4214,7 @@ exports[`renders Calendar Event correctly with an all day date 1`] = `
               isWithinText={false}
               onClick={[Function]}
               themeOverride={
-                Object {
+                {
                   "linkColor": undefined,
                   "linkHoverColor": undefined,
                   "mediumPaddingHorizontal": "0",
@@ -4236,7 +4236,7 @@ exports[`renders Calendar Event correctly with an all day date 1`] = `
               allDay={true}
               courseName="A Course about being Diffrient"
               currentUser={
-                Object {
+                {
                   "avatarUrl": "/picture/is/here",
                   "color": "#0B874B",
                   "displayName": "Jane",
@@ -4534,9 +4534,9 @@ exports[`renders Calendar Event correctly with everything 1`] = `
     >
       <InstUISettingsProvider
         theme={
-          Object {
-            "componentOverrides": Object {
-              "CheckboxFacade": Object {
+          {
+            "componentOverrides": {
+              "CheckboxFacade": {
                 "borderColor": "#d71f85",
                 "checkedBackground": "#d71f85",
                 "checkedBorderColor": "#d71f85",
@@ -4570,7 +4570,7 @@ exports[`renders Calendar Event correctly with everything 1`] = `
       aria-hidden="true"
       className="PlannerItem-styles__icon"
       style={
-        Object {
+        {
           "color": "#d71f85",
         }
       }
@@ -4602,7 +4602,7 @@ exports[`renders Calendar Event correctly with everything 1`] = `
           <div
             className="PlannerItem-styles__title"
             style={
-              Object {
+              {
                 "position": "relative",
               }
             }
@@ -4615,7 +4615,7 @@ exports[`renders Calendar Event correctly with everything 1`] = `
               isWithinText={false}
               onClick={[Function]}
               themeOverride={
-                Object {
+                {
                   "linkColor": undefined,
                   "linkHoverColor": undefined,
                   "mediumPaddingHorizontal": "0",
@@ -4637,7 +4637,7 @@ exports[`renders Calendar Event correctly with everything 1`] = `
               allDay={false}
               courseName="A Course about being Diffrient"
               currentUser={
-                Object {
+                {
                   "avatarUrl": "/picture/is/here",
                   "color": "#0B874B",
                   "displayName": "Jane",
@@ -4956,9 +4956,9 @@ exports[`renders Calendar Event correctly with just date 1`] = `
     >
       <InstUISettingsProvider
         theme={
-          Object {
-            "componentOverrides": Object {
-              "CheckboxFacade": Object {
+          {
+            "componentOverrides": {
+              "CheckboxFacade": {
                 "borderColor": "#d71f85",
                 "checkedBackground": "#d71f85",
                 "checkedBorderColor": "#d71f85",
@@ -4992,7 +4992,7 @@ exports[`renders Calendar Event correctly with just date 1`] = `
       aria-hidden="true"
       className="PlannerItem-styles__icon"
       style={
-        Object {
+        {
           "color": "#d71f85",
         }
       }
@@ -5024,7 +5024,7 @@ exports[`renders Calendar Event correctly with just date 1`] = `
           <div
             className="PlannerItem-styles__title"
             style={
-              Object {
+              {
                 "position": "relative",
               }
             }
@@ -5037,7 +5037,7 @@ exports[`renders Calendar Event correctly with just date 1`] = `
               isWithinText={false}
               onClick={[Function]}
               themeOverride={
-                Object {
+                {
                   "linkColor": undefined,
                   "linkHoverColor": undefined,
                   "mediumPaddingHorizontal": "0",
@@ -5059,7 +5059,7 @@ exports[`renders Calendar Event correctly with just date 1`] = `
               allDay={false}
               courseName="A Course about being Diffrient"
               currentUser={
-                Object {
+                {
                   "avatarUrl": "/picture/is/here",
                   "color": "#0B874B",
                   "displayName": "Jane",
@@ -5357,9 +5357,9 @@ exports[`renders Calendar Event correctly with start and end time 1`] = `
     >
       <InstUISettingsProvider
         theme={
-          Object {
-            "componentOverrides": Object {
-              "CheckboxFacade": Object {
+          {
+            "componentOverrides": {
+              "CheckboxFacade": {
                 "borderColor": "#d71f85",
                 "checkedBackground": "#d71f85",
                 "checkedBorderColor": "#d71f85",
@@ -5393,7 +5393,7 @@ exports[`renders Calendar Event correctly with start and end time 1`] = `
       aria-hidden="true"
       className="PlannerItem-styles__icon"
       style={
-        Object {
+        {
           "color": "#d71f85",
         }
       }
@@ -5425,7 +5425,7 @@ exports[`renders Calendar Event correctly with start and end time 1`] = `
           <div
             className="PlannerItem-styles__title"
             style={
-              Object {
+              {
                 "position": "relative",
               }
             }
@@ -5438,7 +5438,7 @@ exports[`renders Calendar Event correctly with start and end time 1`] = `
               isWithinText={false}
               onClick={[Function]}
               themeOverride={
-                Object {
+                {
                   "linkColor": undefined,
                   "linkHoverColor": undefined,
                   "mediumPaddingHorizontal": "0",
@@ -5460,7 +5460,7 @@ exports[`renders Calendar Event correctly with start and end time 1`] = `
               allDay={false}
               courseName="A Course about being Diffrient"
               currentUser={
-                Object {
+                {
                   "avatarUrl": "/picture/is/here",
                   "color": "#0B874B",
                   "displayName": "Jane",
@@ -5759,9 +5759,9 @@ exports[`renders Calendar Event correctly without right side content 1`] = `
     >
       <InstUISettingsProvider
         theme={
-          Object {
-            "componentOverrides": Object {
-              "CheckboxFacade": Object {
+          {
+            "componentOverrides": {
+              "CheckboxFacade": {
                 "borderColor": "#d71f85",
                 "checkedBackground": "#d71f85",
                 "checkedBorderColor": "#d71f85",
@@ -5795,7 +5795,7 @@ exports[`renders Calendar Event correctly without right side content 1`] = `
       aria-hidden="true"
       className="PlannerItem-styles__icon"
       style={
-        Object {
+        {
           "color": "#d71f85",
         }
       }
@@ -5827,7 +5827,7 @@ exports[`renders Calendar Event correctly without right side content 1`] = `
           <div
             className="PlannerItem-styles__title"
             style={
-              Object {
+              {
                 "position": "relative",
               }
             }
@@ -5840,7 +5840,7 @@ exports[`renders Calendar Event correctly without right side content 1`] = `
               isWithinText={false}
               onClick={[Function]}
               themeOverride={
-                Object {
+                {
                   "linkColor": undefined,
                   "linkHoverColor": undefined,
                   "mediumPaddingHorizontal": "0",
@@ -5862,7 +5862,7 @@ exports[`renders Calendar Event correctly without right side content 1`] = `
               allDay={false}
               courseName="A Course about being Diffrient"
               currentUser={
-                Object {
+                {
                   "avatarUrl": "/picture/is/here",
                   "color": "#0B874B",
                   "displayName": "Jane",
@@ -6160,9 +6160,9 @@ exports[`renders Discussion correctly with everything 1`] = `
     >
       <InstUISettingsProvider
         theme={
-          Object {
-            "componentOverrides": Object {
-              "CheckboxFacade": Object {
+          {
+            "componentOverrides": {
+              "CheckboxFacade": {
                 "borderColor": "#d71f85",
                 "checkedBackground": "#d71f85",
                 "checkedBorderColor": "#d71f85",
@@ -6196,7 +6196,7 @@ exports[`renders Discussion correctly with everything 1`] = `
       aria-hidden="true"
       className="PlannerItem-styles__icon"
       style={
-        Object {
+        {
           "color": "#d71f85",
         }
       }
@@ -6234,7 +6234,7 @@ exports[`renders Discussion correctly with everything 1`] = `
             interaction="enabled"
             isWithinText={false}
             themeOverride={
-              Object {
+              {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
               }
@@ -6555,9 +6555,9 @@ exports[`renders Discussion correctly with just date 1`] = `
     >
       <InstUISettingsProvider
         theme={
-          Object {
-            "componentOverrides": Object {
-              "CheckboxFacade": Object {
+          {
+            "componentOverrides": {
+              "CheckboxFacade": {
                 "borderColor": "#d71f85",
                 "checkedBackground": "#d71f85",
                 "checkedBorderColor": "#d71f85",
@@ -6591,7 +6591,7 @@ exports[`renders Discussion correctly with just date 1`] = `
       aria-hidden="true"
       className="PlannerItem-styles__icon"
       style={
-        Object {
+        {
           "color": "#d71f85",
         }
       }
@@ -6629,7 +6629,7 @@ exports[`renders Discussion correctly with just date 1`] = `
             interaction="enabled"
             isWithinText={false}
             themeOverride={
-              Object {
+              {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
               }
@@ -6929,9 +6929,9 @@ exports[`renders Discussion correctly with just points 1`] = `
     >
       <InstUISettingsProvider
         theme={
-          Object {
-            "componentOverrides": Object {
-              "CheckboxFacade": Object {
+          {
+            "componentOverrides": {
+              "CheckboxFacade": {
                 "borderColor": "#d71f85",
                 "checkedBackground": "#d71f85",
                 "checkedBorderColor": "#d71f85",
@@ -6965,7 +6965,7 @@ exports[`renders Discussion correctly with just points 1`] = `
       aria-hidden="true"
       className="PlannerItem-styles__icon"
       style={
-        Object {
+        {
           "color": "#d71f85",
         }
       }
@@ -7003,7 +7003,7 @@ exports[`renders Discussion correctly with just points 1`] = `
             interaction="enabled"
             isWithinText={false}
             themeOverride={
-              Object {
+              {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
               }
@@ -7324,9 +7324,9 @@ exports[`renders Discussion correctly without right side content 1`] = `
     >
       <InstUISettingsProvider
         theme={
-          Object {
-            "componentOverrides": Object {
-              "CheckboxFacade": Object {
+          {
+            "componentOverrides": {
+              "CheckboxFacade": {
                 "borderColor": "#d71f85",
                 "checkedBackground": "#d71f85",
                 "checkedBorderColor": "#d71f85",
@@ -7360,7 +7360,7 @@ exports[`renders Discussion correctly without right side content 1`] = `
       aria-hidden="true"
       className="PlannerItem-styles__icon"
       style={
-        Object {
+        {
           "color": "#d71f85",
         }
       }
@@ -7398,7 +7398,7 @@ exports[`renders Discussion correctly without right side content 1`] = `
             interaction="enabled"
             isWithinText={false}
             themeOverride={
-              Object {
+              {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
               }
@@ -7698,9 +7698,9 @@ exports[`renders Note correctly with Group 1`] = `
     >
       <InstUISettingsProvider
         theme={
-          Object {
-            "componentOverrides": Object {
-              "CheckboxFacade": Object {
+          {
+            "componentOverrides": {
+              "CheckboxFacade": {
                 "borderColor": "#F06291",
                 "checkedBackground": "#F06291",
                 "checkedBorderColor": "#F06291",
@@ -7734,7 +7734,7 @@ exports[`renders Note correctly with Group 1`] = `
       aria-hidden="true"
       className="PlannerItem-styles__icon"
       style={
-        Object {
+        {
           "color": "#F06291",
         }
       }
@@ -7772,7 +7772,7 @@ exports[`renders Note correctly with Group 1`] = `
             interaction="enabled"
             isWithinText={false}
             themeOverride={
-              Object {
+              {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
               }
@@ -8072,9 +8072,9 @@ exports[`renders Note correctly with everything 1`] = `
     >
       <InstUISettingsProvider
         theme={
-          Object {
-            "componentOverrides": Object {
-              "CheckboxFacade": Object {
+          {
+            "componentOverrides": {
+              "CheckboxFacade": {
                 "borderColor": undefined,
                 "checkedBackground": undefined,
                 "checkedBorderColor": undefined,
@@ -8108,7 +8108,7 @@ exports[`renders Note correctly with everything 1`] = `
       aria-hidden="true"
       className="PlannerItem-styles__avatar"
       style={
-        Object {
+        {
           "color": undefined,
         }
       }
@@ -8150,7 +8150,7 @@ exports[`renders Note correctly with everything 1`] = `
           <div
             className="PlannerItem-styles__title"
             style={
-              Object {
+              {
                 "position": "relative",
               }
             }
@@ -8163,7 +8163,7 @@ exports[`renders Note correctly with everything 1`] = `
               isWithinText={false}
               onClick={[Function]}
               themeOverride={
-                Object {
+                {
                   "linkColor": undefined,
                   "linkHoverColor": undefined,
                   "mediumPaddingHorizontal": "0",
@@ -8197,9 +8197,9 @@ exports[`renders Note correctly with everything 1`] = `
             >
               <InstUISettingsProvider
                 theme={
-                  Object {
-                    "componentOverrides": Object {
-                      "IconButton": Object {
+                  {
+                    "componentOverrides": {
+                      "IconButton": {
                         "iconColor": undefined,
                       },
                     },
@@ -8496,9 +8496,9 @@ exports[`renders Note correctly without Course 1`] = `
     >
       <InstUISettingsProvider
         theme={
-          Object {
-            "componentOverrides": Object {
-              "CheckboxFacade": Object {
+          {
+            "componentOverrides": {
+              "CheckboxFacade": {
                 "borderColor": undefined,
                 "checkedBackground": undefined,
                 "checkedBorderColor": undefined,
@@ -8532,7 +8532,7 @@ exports[`renders Note correctly without Course 1`] = `
       aria-hidden="true"
       className="PlannerItem-styles__avatar"
       style={
-        Object {
+        {
           "color": undefined,
         }
       }
@@ -8574,7 +8574,7 @@ exports[`renders Note correctly without Course 1`] = `
           <div
             className="PlannerItem-styles__title"
             style={
-              Object {
+              {
                 "position": "relative",
               }
             }
@@ -8587,7 +8587,7 @@ exports[`renders Note correctly without Course 1`] = `
               isWithinText={false}
               onClick={[Function]}
               themeOverride={
-                Object {
+                {
                   "linkColor": undefined,
                   "linkHoverColor": undefined,
                   "mediumPaddingHorizontal": "0",
@@ -8621,9 +8621,9 @@ exports[`renders Note correctly without Course 1`] = `
             >
               <InstUISettingsProvider
                 theme={
-                  Object {
-                    "componentOverrides": Object {
-                      "IconButton": Object {
+                  {
+                    "componentOverrides": {
+                      "IconButton": {
                         "iconColor": undefined,
                       },
                     },
@@ -8920,9 +8920,9 @@ exports[`renders Page correctly with everything 1`] = `
     >
       <InstUISettingsProvider
         theme={
-          Object {
-            "componentOverrides": Object {
-              "CheckboxFacade": Object {
+          {
+            "componentOverrides": {
+              "CheckboxFacade": {
                 "borderColor": "#d71f85",
                 "checkedBackground": "#d71f85",
                 "checkedBorderColor": "#d71f85",
@@ -8956,7 +8956,7 @@ exports[`renders Page correctly with everything 1`] = `
       aria-hidden="true"
       className="PlannerItem-styles__icon"
       style={
-        Object {
+        {
           "color": "#d71f85",
         }
       }
@@ -8994,7 +8994,7 @@ exports[`renders Page correctly with everything 1`] = `
             interaction="enabled"
             isWithinText={false}
             themeOverride={
-              Object {
+              {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
               }
@@ -9315,9 +9315,9 @@ exports[`renders Page correctly with just date 1`] = `
     >
       <InstUISettingsProvider
         theme={
-          Object {
-            "componentOverrides": Object {
-              "CheckboxFacade": Object {
+          {
+            "componentOverrides": {
+              "CheckboxFacade": {
                 "borderColor": "#d71f85",
                 "checkedBackground": "#d71f85",
                 "checkedBorderColor": "#d71f85",
@@ -9351,7 +9351,7 @@ exports[`renders Page correctly with just date 1`] = `
       aria-hidden="true"
       className="PlannerItem-styles__icon"
       style={
-        Object {
+        {
           "color": "#d71f85",
         }
       }
@@ -9389,7 +9389,7 @@ exports[`renders Page correctly with just date 1`] = `
             interaction="enabled"
             isWithinText={false}
             themeOverride={
-              Object {
+              {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
               }
@@ -9689,9 +9689,9 @@ exports[`renders Page correctly with just points 1`] = `
     >
       <InstUISettingsProvider
         theme={
-          Object {
-            "componentOverrides": Object {
-              "CheckboxFacade": Object {
+          {
+            "componentOverrides": {
+              "CheckboxFacade": {
                 "borderColor": "#d71f85",
                 "checkedBackground": "#d71f85",
                 "checkedBorderColor": "#d71f85",
@@ -9725,7 +9725,7 @@ exports[`renders Page correctly with just points 1`] = `
       aria-hidden="true"
       className="PlannerItem-styles__icon"
       style={
-        Object {
+        {
           "color": "#d71f85",
         }
       }
@@ -9763,7 +9763,7 @@ exports[`renders Page correctly with just points 1`] = `
             interaction="enabled"
             isWithinText={false}
             themeOverride={
-              Object {
+              {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
               }
@@ -10084,9 +10084,9 @@ exports[`renders Page correctly without right side content 1`] = `
     >
       <InstUISettingsProvider
         theme={
-          Object {
-            "componentOverrides": Object {
-              "CheckboxFacade": Object {
+          {
+            "componentOverrides": {
+              "CheckboxFacade": {
                 "borderColor": "#d71f85",
                 "checkedBackground": "#d71f85",
                 "checkedBorderColor": "#d71f85",
@@ -10120,7 +10120,7 @@ exports[`renders Page correctly without right side content 1`] = `
       aria-hidden="true"
       className="PlannerItem-styles__icon"
       style={
-        Object {
+        {
           "color": "#d71f85",
         }
       }
@@ -10158,7 +10158,7 @@ exports[`renders Page correctly without right side content 1`] = `
             interaction="enabled"
             isWithinText={false}
             themeOverride={
-              Object {
+              {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
               }
@@ -10458,9 +10458,9 @@ exports[`renders Quiz correctly with everything 1`] = `
     >
       <InstUISettingsProvider
         theme={
-          Object {
-            "componentOverrides": Object {
-              "CheckboxFacade": Object {
+          {
+            "componentOverrides": {
+              "CheckboxFacade": {
                 "borderColor": "#d71f85",
                 "checkedBackground": "#d71f85",
                 "checkedBorderColor": "#d71f85",
@@ -10494,7 +10494,7 @@ exports[`renders Quiz correctly with everything 1`] = `
       aria-hidden="true"
       className="PlannerItem-styles__icon"
       style={
-        Object {
+        {
           "color": "#d71f85",
         }
       }
@@ -10532,7 +10532,7 @@ exports[`renders Quiz correctly with everything 1`] = `
             interaction="enabled"
             isWithinText={false}
             themeOverride={
-              Object {
+              {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
               }
@@ -10853,9 +10853,9 @@ exports[`renders Quiz correctly with just date 1`] = `
     >
       <InstUISettingsProvider
         theme={
-          Object {
-            "componentOverrides": Object {
-              "CheckboxFacade": Object {
+          {
+            "componentOverrides": {
+              "CheckboxFacade": {
                 "borderColor": "#d71f85",
                 "checkedBackground": "#d71f85",
                 "checkedBorderColor": "#d71f85",
@@ -10889,7 +10889,7 @@ exports[`renders Quiz correctly with just date 1`] = `
       aria-hidden="true"
       className="PlannerItem-styles__icon"
       style={
-        Object {
+        {
           "color": "#d71f85",
         }
       }
@@ -10927,7 +10927,7 @@ exports[`renders Quiz correctly with just date 1`] = `
             interaction="enabled"
             isWithinText={false}
             themeOverride={
-              Object {
+              {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
               }
@@ -11227,9 +11227,9 @@ exports[`renders Quiz correctly with just points 1`] = `
     >
       <InstUISettingsProvider
         theme={
-          Object {
-            "componentOverrides": Object {
-              "CheckboxFacade": Object {
+          {
+            "componentOverrides": {
+              "CheckboxFacade": {
                 "borderColor": "#d71f85",
                 "checkedBackground": "#d71f85",
                 "checkedBorderColor": "#d71f85",
@@ -11263,7 +11263,7 @@ exports[`renders Quiz correctly with just points 1`] = `
       aria-hidden="true"
       className="PlannerItem-styles__icon"
       style={
-        Object {
+        {
           "color": "#d71f85",
         }
       }
@@ -11301,7 +11301,7 @@ exports[`renders Quiz correctly with just points 1`] = `
             interaction="enabled"
             isWithinText={false}
             themeOverride={
-              Object {
+              {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
               }
@@ -11622,9 +11622,9 @@ exports[`renders Quiz correctly without right side content 1`] = `
     >
       <InstUISettingsProvider
         theme={
-          Object {
-            "componentOverrides": Object {
-              "CheckboxFacade": Object {
+          {
+            "componentOverrides": {
+              "CheckboxFacade": {
                 "borderColor": "#d71f85",
                 "checkedBackground": "#d71f85",
                 "checkedBorderColor": "#d71f85",
@@ -11658,7 +11658,7 @@ exports[`renders Quiz correctly without right side content 1`] = `
       aria-hidden="true"
       className="PlannerItem-styles__icon"
       style={
-        Object {
+        {
           "color": "#d71f85",
         }
       }
@@ -11696,7 +11696,7 @@ exports[`renders Quiz correctly without right side content 1`] = `
             interaction="enabled"
             isWithinText={false}
             themeOverride={
-              Object {
+              {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
               }
@@ -11996,9 +11996,9 @@ exports[`renders assignment peer reviews correctly 1`] = `
     >
       <InstUISettingsProvider
         theme={
-          Object {
-            "componentOverrides": Object {
-              "CheckboxFacade": Object {
+          {
+            "componentOverrides": {
+              "CheckboxFacade": {
                 "borderColor": "#d71f85",
                 "checkedBackground": "#d71f85",
                 "checkedBorderColor": "#d71f85",
@@ -12032,7 +12032,7 @@ exports[`renders assignment peer reviews correctly 1`] = `
       aria-hidden="true"
       className="PlannerItem-styles__icon"
       style={
-        Object {
+        {
           "color": "#d71f85",
         }
       }
@@ -12070,7 +12070,7 @@ exports[`renders assignment peer reviews correctly 1`] = `
             interaction="enabled"
             isWithinText={false}
             themeOverride={
-              Object {
+              {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
               }
@@ -12370,9 +12370,9 @@ exports[`renders correctly 1`] = `
     >
       <InstUISettingsProvider
         theme={
-          Object {
-            "componentOverrides": Object {
-              "CheckboxFacade": Object {
+          {
+            "componentOverrides": {
+              "CheckboxFacade": {
                 "borderColor": "#d71f85",
                 "checkedBackground": "#d71f85",
                 "checkedBorderColor": "#d71f85",
@@ -12406,7 +12406,7 @@ exports[`renders correctly 1`] = `
       aria-hidden="true"
       className="PlannerItem-styles__icon"
       style={
-        Object {
+        {
           "color": "#d71f85",
         }
       }
@@ -12444,7 +12444,7 @@ exports[`renders correctly 1`] = `
             interaction="enabled"
             isWithinText={false}
             themeOverride={
-              Object {
+              {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
               }
@@ -12765,9 +12765,9 @@ exports[`renders feedback anonymously according to the assignment settings 1`] =
     >
       <InstUISettingsProvider
         theme={
-          Object {
-            "componentOverrides": Object {
-              "CheckboxFacade": Object {
+          {
+            "componentOverrides": {
+              "CheckboxFacade": {
                 "borderColor": "#d71f85",
                 "checkedBackground": "#d71f85",
                 "checkedBorderColor": "#d71f85",
@@ -12801,7 +12801,7 @@ exports[`renders feedback anonymously according to the assignment settings 1`] =
       aria-hidden="true"
       className="PlannerItem-styles__icon"
       style={
-        Object {
+        {
           "color": "#d71f85",
         }
       }
@@ -12839,7 +12839,7 @@ exports[`renders feedback anonymously according to the assignment settings 1`] =
             interaction="enabled"
             isWithinText={false}
             themeOverride={
-              Object {
+              {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
               }
@@ -13170,9 +13170,9 @@ exports[`renders feedback if available 1`] = `
     >
       <InstUISettingsProvider
         theme={
-          Object {
-            "componentOverrides": Object {
-              "CheckboxFacade": Object {
+          {
+            "componentOverrides": {
+              "CheckboxFacade": {
                 "borderColor": "#d71f85",
                 "checkedBackground": "#d71f85",
                 "checkedBorderColor": "#d71f85",
@@ -13206,7 +13206,7 @@ exports[`renders feedback if available 1`] = `
       aria-hidden="true"
       className="PlannerItem-styles__icon"
       style={
-        Object {
+        {
           "color": "#d71f85",
         }
       }
@@ -13244,7 +13244,7 @@ exports[`renders feedback if available 1`] = `
             interaction="enabled"
             isWithinText={false}
             themeOverride={
-              Object {
+              {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
               }
@@ -13576,9 +13576,9 @@ exports[`renders media feedback if available 1`] = `
     >
       <InstUISettingsProvider
         theme={
-          Object {
-            "componentOverrides": Object {
-              "CheckboxFacade": Object {
+          {
+            "componentOverrides": {
+              "CheckboxFacade": {
                 "borderColor": "#d71f85",
                 "checkedBackground": "#d71f85",
                 "checkedBorderColor": "#d71f85",
@@ -13612,7 +13612,7 @@ exports[`renders media feedback if available 1`] = `
       aria-hidden="true"
       className="PlannerItem-styles__icon"
       style={
-        Object {
+        {
           "color": "#d71f85",
         }
       }
@@ -13650,7 +13650,7 @@ exports[`renders media feedback if available 1`] = `
             interaction="enabled"
             isWithinText={false}
             themeOverride={
-              Object {
+              {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
               }
@@ -13982,9 +13982,9 @@ exports[`renders the end time if available 1`] = `
     >
       <InstUISettingsProvider
         theme={
-          Object {
-            "componentOverrides": Object {
-              "CheckboxFacade": Object {
+          {
+            "componentOverrides": {
+              "CheckboxFacade": {
                 "borderColor": "#d71f85",
                 "checkedBackground": "#d71f85",
                 "checkedBorderColor": "#d71f85",
@@ -14018,7 +14018,7 @@ exports[`renders the end time if available 1`] = `
       aria-hidden="true"
       className="PlannerItem-styles__icon"
       style={
-        Object {
+        {
           "color": "#d71f85",
         }
       }
@@ -14050,7 +14050,7 @@ exports[`renders the end time if available 1`] = `
           <div
             className="PlannerItem-styles__title"
             style={
-              Object {
+              {
                 "position": "relative",
               }
             }
@@ -14063,7 +14063,7 @@ exports[`renders the end time if available 1`] = `
               isWithinText={false}
               onClick={[Function]}
               themeOverride={
-                Object {
+                {
                   "linkColor": undefined,
                   "linkHoverColor": undefined,
                   "mediumPaddingHorizontal": "0",
@@ -14085,7 +14085,7 @@ exports[`renders the end time if available 1`] = `
               allDay={false}
               courseName="A Course about being Diffrient"
               currentUser={
-                Object {
+                {
                   "avatarUrl": "/picture/is/here",
                   "color": "#0B874B",
                   "displayName": "Jane",
@@ -14384,9 +14384,9 @@ exports[`renders the location if available 1`] = `
     >
       <InstUISettingsProvider
         theme={
-          Object {
-            "componentOverrides": Object {
-              "CheckboxFacade": Object {
+          {
+            "componentOverrides": {
+              "CheckboxFacade": {
                 "borderColor": "#d71f85",
                 "checkedBackground": "#d71f85",
                 "checkedBorderColor": "#d71f85",
@@ -14420,7 +14420,7 @@ exports[`renders the location if available 1`] = `
       aria-hidden="true"
       className="PlannerItem-styles__icon"
       style={
-        Object {
+        {
           "color": "#d71f85",
         }
       }
@@ -14458,7 +14458,7 @@ exports[`renders the location if available 1`] = `
             interaction="enabled"
             isWithinText={false}
             themeOverride={
-              Object {
+              {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
               }
@@ -14770,9 +14770,9 @@ exports[`renders user-created Todo correctly 1`] = `
     >
       <InstUISettingsProvider
         theme={
-          Object {
-            "componentOverrides": Object {
-              "CheckboxFacade": Object {
+          {
+            "componentOverrides": {
+              "CheckboxFacade": {
                 "borderColor": null,
                 "checkedBackground": null,
                 "checkedBorderColor": null,
@@ -14806,7 +14806,7 @@ exports[`renders user-created Todo correctly 1`] = `
       aria-hidden="true"
       className="PlannerItem-styles__icon"
       style={
-        Object {
+        {
           "color": null,
         }
       }
@@ -14854,7 +14854,7 @@ exports[`renders user-created Todo correctly 1`] = `
             interaction="enabled"
             isWithinText={false}
             themeOverride={
-              Object {
+              {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
               }

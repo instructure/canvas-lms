@@ -169,8 +169,6 @@ describe('RCE Plugins > CanvasContentTray', () => {
     })
 
     it('sets placeholder to the current link title', async () => {
-      renderComponent()
-      await showTrayForPlugin('course_link_edit')
       await waitFor(() => {
         expect(LinkDisplay).toHaveBeenCalledWith(
           expect.objectContaining({placeholderText: 'some filename'}),

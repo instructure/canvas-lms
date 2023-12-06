@@ -28,6 +28,9 @@ import {mswServer} from '../../../../../shared/msw/mswServer'
 import React from 'react'
 import {responsiveQuerySizes} from '../../../util/utils'
 import {ConversationContext} from '../../../util/constants'
+import {enableFetchMocks} from 'jest-fetch-mock'
+
+enableFetchMocks()
 
 jest.mock('../../../util/utils', () => ({
   ...jest.requireActual('../../../util/utils'),

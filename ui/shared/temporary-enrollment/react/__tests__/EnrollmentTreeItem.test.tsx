@@ -34,8 +34,8 @@ const props = {
 }
 
 describe('EnrollmentTreeItem', () => {
-  it('shows workState when passed via props', () => {
-    const {getByText} = render(<EnrollmentTreeItem workState="available" {...props} />)
+  it('shows workflow state when passed via props', () => {
+    const {getByText} = render(<EnrollmentTreeItem workflowState="available" {...props} />)
     expect(getByText('course status: published')).toBeInTheDocument()
   })
 

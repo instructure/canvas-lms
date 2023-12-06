@@ -1782,14 +1782,14 @@ QUnit.module('EditView: anonymous grading', hooks => {
     strictEqual(anonymousGradingCheckbox.prop('disabled'), true)
   })
 
-  test('is disabled when editing a quiz lti assignment with anonymous grading turned on', () => {
+  test('is still enabled when editing a quiz lti assignment with anonymous grading turned on', () => {
     ENV.NEW_QUIZZES_ANONYMOUS_GRADING_ENABLED = true
     ENV.ANONYMOUS_GRADING_ENABLED = true
     const view = editView({id: '1', is_quiz_lti_assignment: true, anonymous_grading: true})
     view.$el.appendTo($('#fixtures'))
     view.afterRender()
     const anonymousGradingCheckbox = view.$el.find('input#assignment_anonymous_grading')
-    strictEqual(anonymousGradingCheckbox.prop('disabled'), true)
+    strictEqual(anonymousGradingCheckbox.prop('disabled'), false)
   })
 
   test('is enabled when creating a quiz lti assignment with anonymous grading turned on', () => {

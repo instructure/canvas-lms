@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useMemo} from 'react'
+import React, {useState, useMemo, useRef} from 'react'
 import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
@@ -66,6 +66,8 @@ export default function DifferentiatedModulesTray({
     (): string => `calc(${panelHeight} - ${footerHeight}px)`,
     [panelHeight]
   )
+  const trayRef = useRef<HTMLElement | null>(null)
+
   function customOnDismiss() {
     if (!moduleId) {
       // remove the temp module element on cancel
@@ -116,6 +118,7 @@ export default function DifferentiatedModulesTray({
             onDismiss={onDismiss}
             moduleElement={moduleElement}
             enablePublishFinalGrade={ENV?.PUBLISH_FINAL_GRADE}
+            mountNodeRef={trayRef}
             {...settingsProps}
           />
         ) : (
@@ -134,6 +137,7 @@ export default function DifferentiatedModulesTray({
                 moduleElement={moduleElement}
                 moduleId={moduleId}
                 enablePublishFinalGrade={ENV?.PUBLISH_FINAL_GRADE}
+                mountNodeRef={trayRef}
                 {...settingsProps}
               />
             </Tabs.Panel>
@@ -149,6 +153,7 @@ export default function DifferentiatedModulesTray({
                 footerHeight={footerHeight}
                 courseId={courseId}
                 moduleId={moduleId}
+                mountNodeRef={trayRef}
                 moduleElement={moduleElement}
                 onDismiss={onDismiss}
               />
@@ -160,7 +165,13 @@ export default function DifferentiatedModulesTray({
   }
 
   return (
-    <Tray open={true} label={headerLabel} placement="end" size="regular">
+    <Tray
+      open={true}
+      label={headerLabel}
+      placement="end"
+      size="regular"
+      contentRef={r => (trayRef.current = r)}
+    >
       <Header />
       <Body />
     </Tray>

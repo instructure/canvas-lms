@@ -33,6 +33,11 @@ module Types
       object.criteria
     end
 
+    field :criteria_count, Integer, null: false
+    def criteria_count
+      object.criteria&.count || 0
+    end
+
     field :free_form_criterion_comments, Boolean, null: false
     def free_form_criterion_comments
       !!object.free_form_criterion_comments
@@ -45,5 +50,6 @@ module Types
 
     field :points_possible, Float, null: true
     field :title, String, null: true
+    field :workflow_state, String, null: false
   end
 end

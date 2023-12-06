@@ -6,7 +6,7 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    rake (13.0.6)
+    rake (13.1.0)
 
 PLATFORMS
   aarch64-linux

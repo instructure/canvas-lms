@@ -22,6 +22,7 @@ import {useSearchParams} from 'react-router-dom'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import userSettings from '@canvas/user-settings'
 import {View} from '@instructure/ui-view'
+import {Text} from '@instructure/ui-text'
 import gradingHelpers from '@canvas/grading/AssignmentGroupGradeCalculator'
 
 import {AssignmentGroupCriteriaMap} from '../../../../shared/grading/grading.d'
@@ -268,101 +269,109 @@ export default function EnhancedIndividualGradebook() {
   )
 
   return (
-    <View as="div">
-      <View as="div" className="row-fluid">
-        <View as="div" className="span12">
+    <>
+      {/* EVAL-3711 Remove ICE Feature Flag */}
+      <View as="div" margin={window.ENV.FEATURES.instui_nav ? 'small 0 large 0' : '0'}>
+        {!window.ENV.FEATURES.instui_nav && (
           <View as="h1">{I18n.t('Gradebook: Individual View')}</View>
-          {I18n.t(
-            'Note: Grades and notes will be saved automatically after moving out of the field.'
-          )}
-        </View>
+        )}
+        {/* Was not able to manually change lineHeight in View so used div to modify lineHeight */}
+        <div style={{lineHeight: 1}}>
+          <Text size={window.ENV.FEATURES.instui_nav ? 'large' : 'medium'}>
+            {I18n.t(
+              'Note: Grades and notes will be saved automatically after moving out of the field.'
+            )}
+          </Text>
+        </div>
       </View>
 
-      <GlobalSettings
-        sections={sections}
-        gradebookOptions={gradebookOptions}
-        customColumns={customColumns}
-        onSortChange={sortType => {
-          userSettings.contextSet('sort_grade_columns_by', {sortType})
-          const newGradebookOptions = {...gradebookOptions, sortOrder: sortType}
-          setGradebookOptions(newGradebookOptions)
-        }}
-        onSectionChange={sectionId => {
-          const newGradebookOptions = {...gradebookOptions, selectedSection: sectionId}
-          setGradebookOptions(newGradebookOptions)
-        }}
-        onGradingPeriodChange={gradingPeriodId => {
-          userSettings.contextSet('gradebook_current_grading_period', gradingPeriodId)
-          const newGradebookOptions = {
-            ...gradebookOptions,
-            selectedGradingPeriodId: gradingPeriodId,
-          }
-          setGradebookOptions(newGradebookOptions)
-        }}
-        handleCheckboxChange={(key: keyof CustomOptions, value: boolean) => {
-          setGradebookOptions(prevGradebookOptions => {
-            const newCustomOptions = {...prevGradebookOptions.customOptions, [key]: value}
-            return {...prevGradebookOptions, customOptions: newCustomOptions}
-          })
-        }}
-        onTeacherNotesCreation={(teacherNotes: TeacherNotes) => {
-          setGradebookOptions(prevGradebookOptions => {
-            return {...prevGradebookOptions, teacherNotes}
-          })
-        }}
-      />
+      <View as="div">
+        <GlobalSettings
+          sections={sections}
+          gradebookOptions={gradebookOptions}
+          customColumns={customColumns}
+          onSortChange={sortType => {
+            userSettings.contextSet('sort_grade_columns_by', {sortType})
+            const newGradebookOptions = {...gradebookOptions, sortOrder: sortType}
+            setGradebookOptions(newGradebookOptions)
+          }}
+          onSectionChange={sectionId => {
+            const newGradebookOptions = {...gradebookOptions, selectedSection: sectionId}
+            setGradebookOptions(newGradebookOptions)
+          }}
+          onGradingPeriodChange={gradingPeriodId => {
+            userSettings.contextSet('gradebook_current_grading_period', gradingPeriodId)
+            const newGradebookOptions = {
+              ...gradebookOptions,
+              selectedGradingPeriodId: gradingPeriodId,
+            }
+            setGradebookOptions(newGradebookOptions)
+          }}
+          handleCheckboxChange={(key: keyof CustomOptions, value: boolean) => {
+            setGradebookOptions(prevGradebookOptions => {
+              const newCustomOptions = {...prevGradebookOptions.customOptions, [key]: value}
+              return {...prevGradebookOptions, customOptions: newCustomOptions}
+            })
+          }}
+          onTeacherNotesCreation={(teacherNotes: TeacherNotes) => {
+            setGradebookOptions(prevGradebookOptions => {
+              return {...prevGradebookOptions, teacherNotes}
+            })
+          }}
+        />
 
-      <div className="hr" style={{margin: 10, padding: 10, borderBottom: '1px solid #eee'}} />
+        <div className="hr" style={{margin: 10, padding: 10, borderBottom: '1px solid #eee'}} />
 
-      <ContentSelection
-        courseId={courseId}
-        assignments={assignments}
-        students={students}
-        selectedStudentId={selectedStudentId}
-        selectedAssignmentId={selectedAssignmentId}
-        gradebookOptions={gradebookOptions}
-        onStudentChange={handleStudentChange}
-        onAssignmentChange={handleAssignmentChange}
-      />
+        <ContentSelection
+          courseId={courseId}
+          assignments={assignments}
+          students={students}
+          selectedStudentId={selectedStudentId}
+          selectedAssignmentId={selectedAssignmentId}
+          gradebookOptions={gradebookOptions}
+          onStudentChange={handleStudentChange}
+          onAssignmentChange={handleAssignmentChange}
+        />
 
-      <div className="hr" style={{margin: 10, padding: 10, borderBottom: '1px solid #eee'}} />
+        <div className="hr" style={{margin: 10, padding: 10, borderBottom: '1px solid #eee'}} />
 
-      <GradingResults
-        assignment={selectedAssignment}
-        courseId={courseId}
-        currentStudent={currentStudent}
-        studentSubmissions={studentSubmissions}
-        gradebookOptions={gradebookOptions}
-        loadingStudent={loadingStudent}
-        onSubmissionSaved={handleSubmissionSaved}
-        currentStudentHiddenName={currentStudentHiddenName}
-        dropped={assignmentDropped}
-      />
+        <GradingResults
+          assignment={selectedAssignment}
+          courseId={courseId}
+          currentStudent={currentStudent}
+          studentSubmissions={studentSubmissions}
+          gradebookOptions={gradebookOptions}
+          loadingStudent={loadingStudent}
+          onSubmissionSaved={handleSubmissionSaved}
+          currentStudentHiddenName={currentStudentHiddenName}
+          dropped={assignmentDropped}
+        />
 
-      <div className="hr" style={{margin: 10, padding: 10, borderBottom: '1px solid #eee'}} />
+        <div className="hr" style={{margin: 10, padding: 10, borderBottom: '1px solid #eee'}} />
 
-      <StudentInformation
-        assignmentGroupMap={assignmentGroupMap}
-        gradebookOptions={gradebookOptions}
-        invalidAssignmentGroups={invalidAssignmentGroups}
-        student={currentStudent}
-        studentNotesColumnId={studentNotesColumnId}
-        currentStudentHiddenName={currentStudentHiddenName}
-        submissions={studentSubmissions}
-      />
+        <StudentInformation
+          assignmentGroupMap={assignmentGroupMap}
+          gradebookOptions={gradebookOptions}
+          invalidAssignmentGroups={invalidAssignmentGroups}
+          student={currentStudent}
+          studentNotesColumnId={studentNotesColumnId}
+          currentStudentHiddenName={currentStudentHiddenName}
+          submissions={studentSubmissions}
+        />
 
-      <div className="hr" style={{margin: 10, padding: 10, borderBottom: '1px solid #eee'}} />
+        <div className="hr" style={{margin: 10, padding: 10, borderBottom: '1px solid #eee'}} />
 
-      <AssignmentInformation
-        assignment={selectedAssignment}
-        assignmentGroupInvalid={selectedAssignmentGroupInvalid}
-        gradebookOptions={gradebookOptions}
-        students={students}
-        submissions={submissionsForSelectedAssignment}
-        handleSetGrades={handleSetGrades}
-      />
+        <AssignmentInformation
+          assignment={selectedAssignment}
+          assignmentGroupInvalid={selectedAssignmentGroupInvalid}
+          gradebookOptions={gradebookOptions}
+          students={students}
+          submissions={submissionsForSelectedAssignment}
+          handleSetGrades={handleSetGrades}
+        />
 
-      <div className="hr" style={{margin: 10, padding: 10, borderBottom: '1px solid #eee'}} />
-    </View>
+        <div className="hr" style={{margin: 10, padding: 10, borderBottom: '1px solid #eee'}} />
+      </View>
+    </>
   )
 }

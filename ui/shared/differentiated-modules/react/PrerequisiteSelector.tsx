@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useEffect, useRef} from 'react'
 import CanvasSelect from '@canvas/instui-bindings/react/Select'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Flex} from '@instructure/ui-flex'
@@ -33,6 +33,8 @@ export interface PrerequisiteSelectorProps {
   onDropPrerequisite: (index: number) => void
   onUpdatePrerequisite: (module: Module, index: number) => void
   index: number
+  focusDropdown?: boolean
+  focusDeleteButton?: boolean
 }
 
 export default function PrerequisiteSelector({
@@ -41,21 +43,38 @@ export default function PrerequisiteSelector({
   onDropPrerequisite,
   onUpdatePrerequisite,
   index,
+  focusDropdown = false,
+  focusDeleteButton = false,
 }: PrerequisiteSelectorProps) {
+  const removeButton = useRef<Element | null>(null)
+  const dropdown = useRef<HTMLInputElement | null>(null)
+
+  useEffect(() => {
+    // @ts-expect-error
+    focusDeleteButton && removeButton.current?.focus()
+  }, [focusDeleteButton, removeButton])
+
+  useEffect(() => {
+    focusDropdown && dropdown.current?.focus()
+  }, [focusDropdown, dropdown])
+
   return (
     <Flex direction="row">
       <Flex.Item shouldGrow={true} shouldShrink={true}>
         <CanvasSelect
-          id="prerequisite"
+          id={`prerequisite-${index}`}
+          // @ts-expect-error
+          inputRef={el => (dropdown.current = el)}
           value={selection}
           label={<ScreenReaderContent>{I18n.t('Select Prerequisite')}</ScreenReaderContent>}
-          onChange={(event, value) =>
-            onUpdatePrerequisite({id: event.target.id, name: value}, index)
-          }
+          onChange={(event, value) => {
+            const moduleItem = options.find(item => item.name === value)!
+            onUpdatePrerequisite(moduleItem, index)
+          }}
         >
           {options.map(module => {
             return (
-              <CanvasSelect.Option key={module.name} id={module.id} value={module.name}>
+              <CanvasSelect.Option key={module.id} id={module.id} value={module.name}>
                 {module.name}
               </CanvasSelect.Option>
             )
@@ -64,9 +83,12 @@ export default function PrerequisiteSelector({
       </Flex.Item>
       <Flex.Item margin="0 0 0 medium">
         <IconButton
+          elementRef={el => (removeButton.current = el)}
           renderIcon={<IconTrashLine color="error" />}
           onClick={() => onDropPrerequisite(index)}
-          screenReaderLabel={I18n.t('Remove Prerequisite')}
+          screenReaderLabel={I18n.t('Remove %{name} Prerequisite', {
+            name: selection,
+          })}
           withBackground={false}
           withBorder={false}
         />

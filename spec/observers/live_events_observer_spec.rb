@@ -609,6 +609,31 @@ describe LiveEventsObserver do
     end
   end
 
+  describe "RubricAssessment" do
+    before(:once) do
+      outcome_model
+      outcome_with_rubric(outcome: @outcome, context: Account.default)
+      course_with_student
+    end
+
+    it "posts create events" do
+      expect(Canvas::LiveEvents).to receive(:rubric_assessed).once
+      rubric_assessment_model(rubric: @rubric, user: @student)
+    end
+
+    # an update event will look like a save for a rubric assessment
+    # because it is simply versioned
+    it "posts update events" do
+      expect(Canvas::LiveEvents).to receive(:rubric_assessed).twice
+      first_assessment = rubric_assessment_model(rubric: @rubric, user: @student)
+      expect(first_assessment.versions.count).to eq 1
+
+      first_assessment.score = 1
+      first_assessment.save
+      expect(first_assessment.reload.versions.count).to eq 2
+    end
+  end
+
   describe "MasterCourses::MasterTemplate" do
     it "posts create events" do
       course_model

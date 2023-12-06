@@ -185,7 +185,7 @@ describe "student k5 course grades tab" do
 
       expect(outcomes_group).to be_displayed
       expect(outcomes_group).to include_text(@subject_course.name)
-      expect(outcomes_group).to include_text("1 OF 1 MASTERED")
+      expect(outcomes_group).to include_text("1 of 1 Mastered")
     end
   end
 end

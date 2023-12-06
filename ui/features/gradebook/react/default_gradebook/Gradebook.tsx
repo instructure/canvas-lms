@@ -1820,13 +1820,16 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       true
     )
     this.renderGradebookSettingsModal()
-    return $('#keyboard-shortcuts').click(function () {
-      const questionMarkKeyDown = $.Event('keydown', {
-        keyCode: 191,
-        shiftKey: true,
+    // EVAL-3711 Remove Evaluate ICE feature flag
+    if (!window.ENV.FEATURES.instui_nav) {
+      return $('#keyboard-shortcuts').click(function () {
+        const questionMarkKeyDown = $.Event('keydown', {
+          keyCode: 191,
+          shiftKey: true,
+        })
+        return $(document).trigger(questionMarkKeyDown)
       })
-      return $(document).trigger(questionMarkKeyDown)
-    })
+    }
   }
 
   renderGradebookMenus = () => {

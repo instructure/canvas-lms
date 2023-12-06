@@ -27,7 +27,7 @@ import '@canvas/rails-flash-notifications'
 
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Button} from '@instructure/ui-buttons'
-import {Grid} from '@instructure/ui-grid'
+import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {IconSearchLine} from '@instructure/ui-icons'
 import {Tabs} from '@instructure/ui-tabs'
@@ -149,48 +149,45 @@ export default function PermissionsIndex(props) {
     return (
       <div className="permissions-v2__header_container">
         <View display="block">
-          <Grid>
-            <Grid.Row vAlign="middle">
-              <Grid.Col width={3}>
-                <TextInput
-                  renderLabel={
-                    <ScreenReaderContent>{I18n.t('Search Permissions')}</ScreenReaderContent>
-                  }
-                  placeholder={I18n.t('Search Permissions')}
-                  renderAfterInput={() => (
-                    <span disabled={true}>
-                      <IconSearchLine focusable={false} />
-                    </span>
-                  )}
-                  onChange={onSearchStringChange}
-                  name="permission_search"
-                />
-              </Grid.Col>
-              <Grid.Col width={8}>
-                <CanvasMultiSelect
-                  id="permissions-role-filter"
-                  label={I18n.t('Permission role filter')}
-                  assistiveText={I18n.t(
-                    'Filter Roles. Type or use arrow keys to navigate. Multiple selections are allowed.'
-                  )}
-                  onChange={onRoleFilterChange}
-                  selectedOptionIds={selectedIds}
-                >
-                  {optionsToRender()}
-                </CanvasMultiSelect>
-              </Grid.Col>
-              <Grid.Col width={2}>
-                <Button
-                  id="add_role"
-                  color="primary"
-                  margin="0 x-small 0 0"
-                  onClick={props.setAndOpenAddTray}
-                >
-                  {I18n.t('Add Role')}
-                </Button>
-              </Grid.Col>
-            </Grid.Row>
-          </Grid>
+          <Flex alignItems="end">
+            <Flex.Item size="20%">
+              <TextInput
+                renderLabel={
+                  <ScreenReaderContent>{I18n.t('Search Permissions')}</ScreenReaderContent>
+                }
+                placeholder={I18n.t('Search Permissions')}
+                renderAfterInput={() => (
+                  <span disabled={true}>
+                    <IconSearchLine focusable={false} />
+                  </span>
+                )}
+                onChange={onSearchStringChange}
+                name="permission_search"
+              />
+            </Flex.Item>
+            <Flex.Item shouldShrink shouldGrow padding="0 small">
+              <CanvasMultiSelect
+                id="permissions-role-filter"
+                label={I18n.t('Permission role filter')}
+                assistiveText={I18n.t(
+                  'Filter Roles. Type or use arrow keys to navigate. Multiple selections are allowed.'
+                )}
+                onChange={onRoleFilterChange}
+                selectedOptionIds={selectedIds}
+              >
+                {optionsToRender()}
+              </CanvasMultiSelect>
+            </Flex.Item>
+            <Flex.Item shouldShrink justifyItems="end">
+              <Flex justifyItems="end">
+                <Flex.Item>
+                  <Button id="add_role" color="primary" onClick={props.setAndOpenAddTray}>
+                    {I18n.t('Add Role')}
+                  </Button>
+                </Flex.Item>
+              </Flex>
+            </Flex.Item>
+          </Flex>
         </View>
       </div>
     )

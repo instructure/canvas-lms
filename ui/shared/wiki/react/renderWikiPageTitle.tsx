@@ -59,7 +59,7 @@ const EditableContent = (props: Props) => {
   useEffect(() => {
     const handleSubmit = (evt?: JQuery.Event) => {
       evt?.stopPropagation()
-      const data = props.viewElement.getFormData()
+      const data = props.viewElement.getFormData<Record<string, unknown>>()
       const dataErrors = props.validationCallback(data)
       const titleErrors = dataErrors?.title || []
       if (titleErrors.length > 0) {

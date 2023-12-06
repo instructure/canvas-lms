@@ -21,69 +21,69 @@ import withinMomentDates from '../momentDateHelper'
 
 describe('Moment Date helpers ', () => {
   it('withinMomentDates correctly identifies date that is before as false', () => {
-    const dueDate = moment('2015-11-1')
-    const startDate = moment('2015-12-1')
-    const endDate = moment('2015-12-14')
+    const dueDate = moment('2015-11-1', 'YYYY-MM-DD')
+    const startDate = moment('2015-12-1', 'YYYY-MM-DD')
+    const endDate = moment('2015-12-14', 'YYYY-MM-DD')
     const check = withinMomentDates(dueDate, startDate, endDate)
     expect(check).toBe(false)
   })
 
   it('withinMomentDates correctly identifies date that is on the start date as true', () => {
-    const dueDate = moment('2015-12-1')
-    const startDate = moment('2015-12-1')
-    const endDate = moment('2015-12-14')
+    const dueDate = moment('2015-12-1', 'YYYY-MM-DD')
+    const startDate = moment('2015-12-1', 'YYYY-MM-DD')
+    const endDate = moment('2015-12-14', 'YYYY-MM-DD')
     const check = withinMomentDates(dueDate, startDate, endDate)
     expect(check).toBe(true)
   })
 
   it('withinMomentDates correctly identifies date that is within range as true', () => {
-    const dueDate = moment('2015-12-12')
-    const startDate = moment('2015-12-1')
-    const endDate = moment('2015-12-14')
+    const dueDate = moment('2015-12-12', 'YYYY-MM-DD')
+    const startDate = moment('2015-12-1', 'YYYY-MM-DD')
+    const endDate = moment('2015-12-14', 'YYYY-MM-DD')
     const check = withinMomentDates(dueDate, startDate, endDate)
     expect(check).toBe(true)
   })
 
   it('withinMomentDates correctly identifies date that is on the end date as true', () => {
-    const dueDate = moment('2015-12-14')
-    const startDate = moment('2015-12-1')
-    const endDate = moment('2015-12-14')
+    const dueDate = moment('2015-12-14', 'YYYY-MM-DD')
+    const startDate = moment('2015-12-1', 'YYYY-MM-DD')
+    const endDate = moment('2015-12-14', 'YYYY-MM-DD')
     const check = withinMomentDates(dueDate, startDate, endDate)
     expect(check).toBe(true)
   })
 
   it('withinMomentDates correctly identifies date that is after the end date as false', () => {
-    const dueDate = moment('2016-12-14')
-    const startDate = moment('2015-12-1')
-    const endDate = moment('2015-12-14')
+    const dueDate = moment('2016-12-14', 'YYYY-MM-DD')
+    const startDate = moment('2015-12-1', 'YYYY-MM-DD')
+    const endDate = moment('2015-12-14', 'YYYY-MM-DD')
     const check = withinMomentDates(dueDate, startDate, endDate)
     expect(check).toBe(false)
   })
 
   it('rejects a date before the start of an open-ended period', () => {
-    const dueDate = moment('2021-02-01')
-    const startDate = moment('2021-02-15')
+    const dueDate = moment('2021-02-01', 'YYYY-MM-DD')
+    const startDate = moment('2021-02-15', 'YYYY-MM-DD')
     const check = withinMomentDates(dueDate, startDate, null)
     expect(check).toBe(false)
   })
 
   it('accepts a date after the start of an open-ended period', () => {
-    const dueDate = moment('2021-03-01')
-    const startDate = moment('2021-02-15')
+    const dueDate = moment('2021-03-01', 'YYYY-MM-DD')
+    const startDate = moment('2021-02-15', 'YYYY-MM-DD')
     const check = withinMomentDates(dueDate, startDate, null)
     expect(check).toBe(true)
   })
 
   it('rejects a date after the end of an open-beginning period', () => {
-    const dueDate = moment('2021-03-01')
-    const endDate = moment('2021-02-15')
+    const dueDate = moment('2021-03-01', 'YYYY-MM-DD')
+    const endDate = moment('2021-02-15', 'YYYY-MM-DD')
     const check = withinMomentDates(dueDate, null, endDate)
     expect(check).toBe(false)
   })
 
   it('accepts a date before the end of an open-beginning period', () => {
-    const dueDate = moment('2021-02-01')
-    const endDate = moment('2021-02-15')
+    const dueDate = moment('2021-02-01', 'YYYY-MM-DD')
+    const endDate = moment('2021-02-15', 'YYYY-MM-DD')
     const check = withinMomentDates(dueDate, null, endDate)
     expect(check).toBe(true)
   })

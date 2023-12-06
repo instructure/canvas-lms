@@ -96,6 +96,9 @@ react_inbox:
   description: |-
     This refactor will make this page more maintainable
   applies_to: RootAccount
+  environments:
+    development:
+      state: on # enable for local development
 
 react_inbox_labels:
   state: hidden

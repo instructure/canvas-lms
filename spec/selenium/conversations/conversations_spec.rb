@@ -269,6 +269,30 @@ describe "conversations new" do
       end
     end
 
+    context "conversation participant with a null conversation" do
+      before do
+        @participant = conversation(@teacher, @s[0], @s[1], body: "hi there", workflow_state: "unread")
+        @convo = @participant.conversation
+        @convo.update_attribute(:subject, "test")
+        @conversation_participants = @convo.conversation_participants
+        @convo.conversation_messages[0].conversation_message_participants.delete_all
+        @convo.conversation_messages[0].delete
+        @convo.delete
+      end
+
+      it "does not crash when opening inbox" do
+        get "/conversations"
+
+        # The page should load with no conversations
+        expect(fj("span:contains('No Conversations Selected')")).to be_present
+
+        # Verify that the orphaned state exists
+        expect(@conversation_participants[0].reload).to be_truthy
+        expect(@conversation_participants[0].conversation_id).to be_truthy
+        expect { Conversation.find(@conversation_participants[0].conversation_id) }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+    end
+
     context "course selection" do
       it "resets the course selection when the reset button is clicked" do
         get "/conversations"

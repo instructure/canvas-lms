@@ -111,7 +111,7 @@ export function asAxios<T>(
 /**
  * Takes a `fetch` request and returns a promise of the json data of the response
  */
-export function asJson(fetchRequest: Promise<Response>) {
+export function asJson(fetchRequest?: Promise<Response>) {
   if (!fetchRequest) return
   return fetchRequest.then(checkStatus).then((res: Response) => res.clone().json())
 }

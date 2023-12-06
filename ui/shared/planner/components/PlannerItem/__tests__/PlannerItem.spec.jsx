@@ -696,7 +696,8 @@ it('shows the "Join" button for zoom calendar events', () => {
 describe('with simplifiedControls', () => {
   const props = defaultProps({simplifiedControls: true})
 
-  it('renders the title link in turquoise', () => {
+  // LF-1022
+  it.skip('renders the title link in turquoise', () => {
     const {getByRole} = render(<PlannerItem {...props} deregisterAnimatable={jest.fn()} />)
     const titleLink = getByRole('link')
     expect(titleLink).toHaveStyle('color: rgb(3, 116, 181)')

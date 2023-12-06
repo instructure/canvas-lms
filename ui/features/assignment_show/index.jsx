@@ -139,16 +139,16 @@ ready(() => {
   )
   if (immersive_reader_mount_point || immersive_reader_mobile_mount_point) {
     import('@canvas/immersive-reader/ImmersiveReader')
-      .then(ImmersiveReader => {
+      .then(({initializeReaderButton}) => {
         const content = () => document.querySelector('.description')?.innerHTML
         const title = document.querySelector('.title')?.textContent
 
         if (immersive_reader_mount_point) {
-          ImmersiveReader.initializeReaderButton(immersive_reader_mount_point, {content, title})
+          initializeReaderButton(immersive_reader_mount_point, {content, title})
         }
 
         if (immersive_reader_mobile_mount_point) {
-          ImmersiveReader.initializeReaderButton(immersive_reader_mobile_mount_point, {
+          initializeReaderButton(immersive_reader_mobile_mount_point, {
             content,
             title,
           })

@@ -26,6 +26,9 @@ import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
 import {responsiveQuerySizes} from '../../../util/utils'
 import waitForApolloLoading from '../../../util/waitForApolloLoading'
+import {enableFetchMocks} from 'jest-fetch-mock'
+
+enableFetchMocks()
 
 jest.mock('../../../util/utils', () => ({
   ...jest.requireActual('../../../util/utils'),

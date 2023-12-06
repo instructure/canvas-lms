@@ -92,6 +92,7 @@ describe UserContent do
       rewriter.set_handler("wiki") do |match|
         called = true
         expect(match.obj_id.class).to eq String
+        ""
       end
       rewriter.translate_content("<a href=\"/courses/#{rewriter.context.id}/wiki/1234-numbered-page\">test</a>")
       expect(called).to be_truthy
@@ -102,6 +103,7 @@ describe UserContent do
       rewriter.set_handler("pages") do |match|
         called = true
         expect(match.obj_id.class).to eq String
+        ""
       end
       rewriter.translate_content("<a href=\"/courses/#{rewriter.context.id}/pages/1234-numbered-page\">test</a>")
       expect(called).to be_truthy

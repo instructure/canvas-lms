@@ -86,8 +86,8 @@ describe('CoursePacesDateSelector', () => {
     const blackoutDates = [
       {
         event_title: 'Student Break',
-        start_date: moment('September 2, 2021'),
-        end_date: moment('September 10, 2021'),
+        start_date: moment('09-02-2021', 'MM-DD-YYYY'),
+        end_date: moment('09-10-2021', 'MM-DD-YYYY'),
       },
     ]
     const {getByText} = render(

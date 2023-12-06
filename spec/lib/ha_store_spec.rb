@@ -144,11 +144,11 @@ describe ActiveSupport::Cache::HaStore do
       Timecop.freeze do
         now = Time.now.utc.to_s(Account.cache_timestamp_format)
         base_key = Account.base_cache_register_key_for(Account.site_admin)
-        full_key = base_key + "/feature_flags"
+        full_key = "{#{base_key}}/feature_flags"
         expect(Canvas::CacheRegister.lua).to receive(:run).with(:get_key, [full_key], [now], store.redis).and_return("cool beans")
         expect(Account.site_admin.cache_key(:feature_flags)).to eq("accounts/#{Account.site_admin.global_id}-cool beans")
         # doesn't use it for other key types
-        expect(Canvas::CacheRegister.lua).to receive(:run).with(:get_key, [base_key + "/global_navigation"], [now], Canvas.redis).and_return(now)
+        expect(Canvas::CacheRegister.lua).to receive(:run).with(:get_key, ["{#{base_key}}/global_navigation"], [now], Canvas.redis).and_return(now)
         expect(Account.site_admin.cache_key(:global_navigation)).to eq("accounts/#{Account.site_admin.global_id}-#{now}")
       end
     end

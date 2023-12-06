@@ -21,7 +21,7 @@ import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import {Heading} from '@instructure/ui-heading'
 import handleOpenTray from '../handleOpenTray'
-import assetFactory from '@canvas/confetti/react/assetFactory'
+import assetFactory from '@canvas/confetti/javascript/assetFactory'
 
 const I18n = useI18nScope('TourPoints')
 

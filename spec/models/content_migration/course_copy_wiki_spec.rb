@@ -161,6 +161,20 @@ describe ContentMigration do
         expect(@copy_to.wiki.front_page).to eq copy_to_front_page
       end
 
+      it "does not point to an incorrect front page after url change" do
+        first_page = @copy_from.wiki_pages.create!(title: "page", body: "first page!")
+        second_page = @copy_from.wiki_pages.create!(title: "page", body: "second page!")
+        first_page.delete
+        @copy_from.wiki.set_front_page_url!(second_page.url)
+
+        run_course_copy
+        front_page = @copy_to.wiki.front_page
+        expect(front_page.body).to eq "second page!"
+        front_page.body = "edited body!"
+        front_page.save!
+        expect(@copy_to.wiki.front_page).to eq front_page
+      end
+
       it "overwrites current front page if default_view setting is also changed to wiki" do
         copy_from_front_page = @copy_from.wiki_pages.create!(title: "stuff and stuff")
         @copy_from.wiki.set_front_page_url!(copy_from_front_page.url)

@@ -146,4 +146,25 @@ describe Types::AccountType do
       expect(account_type.resolve("standardGradeStatusesConnection { nodes { _id } }")).to be_nil
     end
   end
+
+  describe "RubricsConnection" do
+    before(:once) do
+      @rubric = Rubric.create!(context: account)
+      rubric_association_model(context: account, rubric: @rubric, association_object: account, purpose: "bookmark")
+    end
+
+    it "returns rubrics" do
+      expect(
+        account_type.resolve("rubricsConnection { edges { node { _id } } }")
+      ).to eq [account.rubrics.first.to_param]
+
+      expect(
+        account_type.resolve("rubricsConnection { edges { node { criteriaCount } } }")
+      ).to eq [0]
+
+      expect(
+        account_type.resolve("rubricsConnection { edges { node { workflowState } } }")
+      ).to eq ["active"]
+    end
+  end
 end

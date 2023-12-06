@@ -21,6 +21,10 @@ module RuboCop
   module Cop
     module Migration
       class NonTransactional < Cop
+        prepend RuboCop::Canvas::LegacyMigrations
+
+        self.legacy_cutoff_date = "20230830143713"
+
         def on_send(node)
           _receiver, method_name, *args = *node
 
@@ -29,20 +33,56 @@ module RuboCop
             @disable_ddl_transaction = true
           when :add_index
             check_add_index(node, args)
-          when :add_column, :add_column_and_fk, :add_foreign_key, :add_reference
+          when :add_column, :add_column_and_fk, :add_foreign_key
             check_add_column(node, args)
-          when :remove_foreign_key, :remove_index
+          when :add_reference
+            check_add_index(node, args)
+            check_reference_args(args)
+          when :create_table
+            check_create_table(node, args)
+          when :remove_foreign_key, :remove_index, :drop_table
             check_remove_foreign_key(node, args)
           end
         end
 
         ALGORITHM = AST::Node.new(:sym, [:algorithm])
+        INDEX = AST::Node.new(:sym, [:index])
         IF_NOT_EXISTS = AST::Node.new(:sym, [:if_not_exists])
         IF_EXISTS = AST::Node.new(:sym, [:if_exists])
 
+        def check_create_table(node, args)
+          check_add_index(node, args)
+
+          return unless node.parent.is_a?(RuboCop::AST::BlockNode)
+
+          block_arg = node.parent.arguments.first
+          node.parent.body.each_child_node do |child|
+            next unless child.send_type? && child.receiver.children.first == block_arg.name
+
+            case child.method_name
+            when :references
+              check_reference_args(child.arguments)
+            when :index
+              check_add_index(child, child.arguments)
+            end
+          end
+        end
+
+        def check_reference_args(args)
+          options = args.last
+          return unless options&.hash_type?
+
+          options.each_pair do |key, value|
+            next unless key == INDEX
+            next if value.false_type?
+
+            check_add_index(value, [value])
+          end
+        end
+
         def check_add_index(node, args)
           options = args.last
-          options = nil unless options.hash_type?
+          options = nil unless options&.hash_type?
 
           algorithm = options&.children&.find do |pair|
             pair.children.first == ALGORITHM
@@ -52,7 +92,7 @@ module RuboCop
           if algorithm_name == :concurrently && !@disable_ddl_transaction
             add_offense(node,
                         message: "Concurrent index adds require `disable_ddl_transaction!`",
-                        severity: :warning)
+                        severity: :error)
           end
 
           check_add_column(node, args)
@@ -60,7 +100,7 @@ module RuboCop
 
         def check_add_column(node, args)
           options = args.last
-          options = nil unless options.hash_type?
+          options = nil unless options&.hash_type?
 
           if_not_exists = options&.children&.find do |pair|
             pair.children.first == IF_NOT_EXISTS
@@ -69,7 +109,7 @@ module RuboCop
           if @disable_ddl_transaction && value != :true # rubocop:disable Lint/BooleanSymbol
             add_offense(node,
                         message: "Non-transactional migrations should be idempotent; add `if_not_exists: true`",
-                        severity: :warning)
+                        severity: :error)
           end
         end
 
@@ -84,7 +124,7 @@ module RuboCop
           if @disable_ddl_transaction && value != :true # rubocop:disable Lint/BooleanSymbol
             add_offense(node,
                         message: "Non-transactional migrations should be idempotent; add `if_exists: true`",
-                        severity: :warning)
+                        severity: :error)
           end
         end
       end

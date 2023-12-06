@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useReducer, useMemo} from 'react'
+import React, {useReducer, useMemo, useState} from 'react'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {TextInput} from '@instructure/ui-text-input'
@@ -34,6 +34,7 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import type {Module, ModuleItem, Requirement} from './types'
 import RelockModulesDialog from '@canvas/context-modules/backbone/views/RelockModulesDialog'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import LoadingOverlay from './LoadingOverlay'
 
 const I18n = useI18nScope('differentiated_modules')
 
@@ -54,6 +55,7 @@ export interface SettingsPanelProps {
   publishFinalGrade?: boolean
   enablePublishFinalGrade?: boolean
   addModuleUI?: (data: Record<string, any>, element: HTMLDivElement) => void
+  mountNodeRef: React.RefObject<HTMLElement>
 }
 
 export default function SettingsPanel({
@@ -73,6 +75,7 @@ export default function SettingsPanel({
   moduleList = [],
   moduleItems = [],
   addModuleUI = () => {},
+  mountNodeRef,
 }: SettingsPanelProps) {
   const [state, dispatch] = useReducer(reducer, {
     ...defaultState,
@@ -85,6 +88,7 @@ export default function SettingsPanel({
     requireSequentialProgress: requireSequentialProgress ?? false,
     publishFinalGrade: publishFinalGrade ?? false,
   })
+  const [loading, setLoading] = useState(false)
 
   const availableModules = useMemo(() => {
     const cutoffIndex = moduleList.findIndex(module => module.name === moduleName)
@@ -98,12 +102,14 @@ export default function SettingsPanel({
     successMessage: string,
     errorMessage: string
   ) {
+    setLoading(true)
     doFetchApi({
       path,
       method,
       body: convertModuleSettingsForApi(state),
     })
       .then((data: {json: Record<string, any>}) => {
+        setLoading(false)
         onDismiss()
         onSuccess(data.json)
         showFlashAlert({
@@ -180,6 +186,7 @@ export default function SettingsPanel({
 
   return (
     <Flex direction="column" justifyItems="space-between">
+      <LoadingOverlay showLoadingOverlay={loading} mountNode={mountNodeRef.current} />
       <Flex.Item shouldGrow={true} padding="small" size={bodyHeight}>
         <View as="div" padding="small">
           <TextInput

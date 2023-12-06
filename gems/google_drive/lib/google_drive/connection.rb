@@ -97,6 +97,7 @@ module GoogleDrive
     end
 
     def authorized?
+      force_token_update
       drive.get_about(fields: "user")
       true
     rescue ConnectionException, NoTokenError, Google::Apis::Error

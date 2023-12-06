@@ -74,6 +74,7 @@ const QuizzesIndexRouter = Backbone.Router.extend({
       noQuizzesView: this.quizzes.noQuizzes,
       permissions: ENV.PERMISSIONS,
       flags: ENV.FLAGS,
+      features: ENV.FEATURES,
       urls: ENV.URLS,
     })
     this.view.render()

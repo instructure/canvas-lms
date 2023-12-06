@@ -19,7 +19,7 @@ import $ from 'jquery'
 
 if (ENV.ping_url) {
   const interval = setInterval(() => {
-    if (!document.hidden) {
+    if (document.visibilityState === 'visible') {
       $.post(ENV.ping_url).fail(xhr => {
         if (xhr.status === 401) clearInterval(interval)
       })

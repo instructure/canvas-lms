@@ -94,6 +94,8 @@ Tools that wish to utilize this redirect need to make sure that all possible ini
 
 Tools that utilize different instances for beta and test must also make sure that they are storing the correct corresponding values for Canvas URLS like the OIDC Auth URL, JWKs URL, and the Issuer/`iss`, and that they use the beta or test versions of all of those URLs when the tool is launched from beta or test Canvas.
 
+Using the `oidc_initiation_urls` option described [in the JSON tool config](#request-params) can also produce a similar outcome while removing the need for the tool to perform an internal redirect.
+
 <a name="step-2"></a>
 ###Step 2: Authentication Request
 To complete authentication, tools are expected to send back an <a href="http://www.imsglobal.org/spec/security/v1p0/#step-2-authentication-request" target="_blank">authentication request</a> to an "OIDC Authorization end-point". This can be a GET or POST, however, this request needs to be a redirect in the user’s browser and not made server to server as we need to validate the current user's session data. For cloud-hosted Canvas, regardless of the domain used by the client, the endpoint is always:
@@ -127,28 +129,30 @@ or another situation where cookies can't get set to still store data across requ
 Canvas asking it to store and retrieve arbitrary data, which acts as a cookie-like proxy.
 
 The LTI Platform Storage spec includes an [implementation guide](https://www.imsglobal.org/spec/lti-cs-oidc/v0p1)
-which should function as the primary resource for implementing this, though a brief usage overview is included below:
-
-In Step 2, instead of storing the `state` parameter in a cookie, the tool should store it in Canvas's LTI Platform Storage using the `lti.put_data` postMessage. It's recommended that the key include the value (eg key: "state-1234", value: "1234) to avoid any collisions during multiple launches, and to make recovering the value easy.
-
-In Step 4, instead of comparing the `state` parameter to the stored value in the cookie, the tool should retrieve it using the `lti.get_data` postMessage. Since this comparison has to happen in Javascript instead of on the server, the tool should render _something_, then check these values. If the values don't match, the tool can then log the user out or render an error.
-
-**Note** that according to the spec, the target origin for these postMessages must be the OIDC Auth domain (e.g. `https://sso.canvaslms.com`). Since every institution's domain varies, Canvas renders a frame at this domain that will respond to postMessages, and the name of this frame is supplied in the `lti_storage_target` parameter, provided as a body parameter in both login and launch requests. Tools should send their `lti.put_data` and `lti.get_data` postMessages to that frame, but can continue send all other postMessage types to the parent window.
-
-Other LTI Platform Storage spec docs:
-
-- [Client-side postMessages](https://www.imsglobal.org/spec/lti-cs-pm/v0p1)
-- [postMessage Platform Storage](https://www.imsglobal.org/spec/lti-pm-s/v0p1)
-- [Canvas postMessage documentation](file.lti_window_post_message.html)
+which **needs to be the primary resource for implementing this**, though a brief usage overview is included below.
 
 Support for this API is determined by either:
 
 1. the presence of the `lti_storage_target` as an extra body parameter in both the login (Step 1) and launch (Step 3) requests, or
 2. a response postMessage to the `lti.capabilities` postMessage that contains the `lti.get_data` and `lti.put_data` subjects.
 
-**Note** that `lti_storage_target` is currently present in all launches, including from the Canvas mobile apps. Support for this API in the Canvas mobile apps is not yet implemented, and
-the requirements for supporting it are currently under review. Tools should confirm using the `lti.capabilities` postMessage if the current launch supports this API. If tools do not get a
-response to that or any message in this API, they should assume that this API is not supported and try to set a cookie instead.
+If the `lti_storage_target` parameter is absent, or the tool doesn't receive a response postMessage for `lti.capabilities`, then the tool
+should not attempt to use this API and should fall back to cookies to verify the launch `state` parameter.
+
+When the tool sees either of the above signals that Canvas supports this API, then:
+
+1. In Step 2, instead of storing the `state` parameter in a cookie the tool should store it in Canvas's LTI Platform Storage using the `lti.put_data` postMessage. It's recommended that the key include the value (eg key: "state-1234", value: "1234") to avoid any collisions during multiple launches, and to make recovering the value easy.
+
+2. In Step 4, instead of comparing the `state` parameter to the stored value in the cookie, the tool should retrieve it using the `lti.get_data` postMessage. Since this comparison has to happen in Javascript instead of on the server, the tool should render _something_, then check these values. If the values don't match, the tool can then log the user out or render an error.
+
+According to the spec, the target origin for these postMessages must be the OIDC Auth domain (e.g. `https://sso.canvaslms.com`). Since every institution's domain varies, Canvas renders a frame at this domain that will respond to postMessages, and the name of this frame is supplied in the `lti_storage_target` parameter, provided as a body parameter in both login and launch requests. Tools should send their `lti.put_data` and `lti.get_data` postMessages to that frame, but can continue to send all other postMessage types to the parent window.
+
+The LTI Platform Storage spec docs:
+
+- [LTI OIDC Login with LTI Client Side postMessages](https://www.imsglobal.org/spec/lti-cs-oidc/v0p1)
+- [Client-side postMessages](https://www.imsglobal.org/spec/lti-cs-pm/v0p1)
+- [postMessage Platform Storage](https://www.imsglobal.org/spec/lti-pm-s/v0p1)
+- [Canvas postMessage documentation](file.lti_window_post_message.html)
 
 <a name="config-in-tool"></a>
 Configuring Canvas in the Tool
@@ -281,6 +285,8 @@ also found in the placements sub-menu in the left-navigation of this documentati
   }
 }
 ```
+
+<a name="request-params"></a>
 
 <table class="request-params">
   <thead>

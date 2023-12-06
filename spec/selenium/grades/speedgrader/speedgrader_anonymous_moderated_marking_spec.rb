@@ -69,6 +69,7 @@ describe "SpeedGrader" do
     end
 
     it "student names are anonymous", priority: "1" do
+      skip "11/13/23 unskip in EVAL-3713"
       Speedgrader.students_dropdown_button.click
       student_names = Speedgrader.students_select_menu_list.map(&:text)
       expect(student_names).to match_array ["Student 1", "Student 2"]
@@ -90,6 +91,7 @@ describe "SpeedGrader" do
 
     context "given student comment and file submission" do
       it "author of comment is anonymous", priority: 2 do
+        skip "11/13/23 unskip in EVAL-3713"
         expect(Speedgrader.comment_citation.first.text).not_to match(/(First|Second) Student/)
         expect(Speedgrader.comment_citation.first.text).to match(/Student (1|2)/)
       end

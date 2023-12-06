@@ -48,17 +48,6 @@ module OutcomesServiceAlignmentsHelper
 
     active_os_alignments = {}
 
-    active_new_quizes = Assignment
-                        .active
-                        .where(context:, submission_types: "external_tool")
-                        .pluck(:id)
-                        .map do |id|
-      {
-        associated_asset_type: "canvas.assignment.quizzes",
-        assocated_asset_id: id.to_s
-      }
-    end
-
     active_outcome_ids = ContentTag
                          .not_deleted
                          .learning_outcome_links
@@ -66,20 +55,60 @@ module OutcomesServiceAlignmentsHelper
                          .pluck(:content_id)
                          .map(&:to_s)
 
+    active_artifacts = if context.is_a?(Account)
+                         quizzes = Assignment
+                                   .active
+                                   .where(submission_types: "external_tool")
+                                   .pluck(:id)
+                                   .map do |id|
+                           {
+                             associated_asset_type: "canvas.assignment.quizzes",
+                             associated_asset_id: id.to_s
+                           }
+                         end
+                         # This is to account for alignments to Item Banks where there is no associated_asset (quiz)
+                         quizzes << { associated_asset_type: nil, associated_asset_id: nil }
+                       else
+                         Assignment
+                           .active
+                           .where(context:, submission_types: "external_tool")
+                           .pluck(:id)
+                           .map do |id|
+                           {
+                             associated_asset_type: "canvas.assignment.quizzes",
+                             associated_asset_id: id.to_s
+                           }
+                         end
+                       end
+
     # remove deleted outcomes and alignments to deleted new quizzes
     os_aligned_outcomes
       .slice(*active_outcome_ids)
       .each do |key, value|
       active_os_alignments.merge!(key => value.filter do |a|
-                                           active_new_quizes.include?({
-                                                                        associated_asset_type: a[:associated_asset_type],
-                                                                        assocated_asset_id: a[:associated_asset_id]
-                                                                      })
+                                           active_artifacts.include?({
+                                                                       associated_asset_type: a[:associated_asset_type],
+                                                                       associated_asset_id: a[:associated_asset_id]
+                                                                     })
                                          end)
     end
 
     # remove outcomes without alignments
     active_os_alignments.reject { |_, val| val.empty? }
+  end
+
+  def can_unlink?(link, can_manage: true)
+    # Return false the user cannot manage outcomes
+    return false unless can_manage
+    # Return false if the link cannot be destroyed
+    return false unless link.can_destroy?
+    # Return true if it is a global outcome (context is LearningOutcomeGroup)
+    return true if link.context.is_a?(LearningOutcomeGroup)
+
+    # Otherwise we make sure the user can manage outcomes and that there are no alignmnets in OS
+    outcome_id, _shard = Switchman::Shard.local_id_for(link.learning_outcome_content.id)
+    active_alignments = get_active_os_alignments(link.context)
+    !active_alignments.key?(outcome_id.to_s)
   end
 
   def make_paginated_request(context:, scope:, endpoint:, params:)

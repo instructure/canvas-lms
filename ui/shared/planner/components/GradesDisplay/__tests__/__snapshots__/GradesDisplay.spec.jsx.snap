@@ -69,7 +69,7 @@ exports[`does not render caveat if no courses have grading periods 1`] = `
       <div
         className="GradesDisplay-styles__course"
         style={
-          Object {
+          {
             "borderBottom": "solid thin",
             "borderBottomColor": "blue",
           }
@@ -315,7 +315,7 @@ exports[`renders some course grades 1`] = `
       <div
         className="GradesDisplay-styles__course"
         style={
-          Object {
+          {
             "borderBottom": "solid thin",
             "borderBottomColor": "blue",
           }
@@ -369,7 +369,7 @@ exports[`renders some course grades 1`] = `
       <div
         className="GradesDisplay-styles__course"
         style={
-          Object {
+          {
             "borderBottom": "solid thin",
             "borderBottomColor": "green",
           }
@@ -423,7 +423,7 @@ exports[`renders some course grades 1`] = `
       <div
         className="GradesDisplay-styles__course"
         style={
-          Object {
+          {
             "borderBottom": "solid thin",
             "borderBottomColor": "red",
           }

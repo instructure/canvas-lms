@@ -21,5 +21,6 @@
     }
   },
   "include": ["ui/*", "ui/**/*"],
-  "exclude": ["**/node_modules", "**/.*/", "vendor"]
+  "exclude": ["**/node_modules", "**/.*/", "vendor"],
+  "types": ["vitest/globals"]
 }

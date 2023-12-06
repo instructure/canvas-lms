@@ -29,6 +29,22 @@ const I18n = useI18nScope('discussion_topics_post')
 export function AttachmentDisplay(props) {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
 
+  const returnFocus = () => {
+    // clear conversation selection then use timeout to give time
+    // for the conversation list to appear for mobile
+    // setSelectedConversations([])
+    setTimeout(() => {
+      // successful upload: className="discussions-attach-button"
+      // failed upload: data-testid="attach-btn"
+      const downloadLink = document.querySelector('.discussions-attach-button')
+      if (downloadLink) {
+        downloadLink.children[0].focus()
+      } else {
+        document.querySelector(`[data-testid="attach-btn"]`).focus()
+      }
+    }, 0)
+  }
+
   const removeAttachment = () => {
     props.setAttachment(null)
   }
@@ -87,6 +103,7 @@ export function AttachmentDisplay(props) {
       setOnFailure(I18n.t('Error uploading file'))
     } finally {
       props.setAttachmentToUpload(false)
+      returnFocus()
     }
   }
 

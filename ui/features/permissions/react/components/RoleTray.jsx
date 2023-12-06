@@ -167,7 +167,11 @@ export default class RoleTray extends Component {
       file may not be set up yet. By putting it in a setTimeout it works the same
       pre and post react 16 and calls the callback AFTER everything has rerendered
       */
-      () => setTimeout(callback)
+      () => {
+        if (typeof callback === 'function') {
+          setTimeout(callback)
+        }
+      }
     )
   }
 

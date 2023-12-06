@@ -65,7 +65,7 @@ exports[`renders an indicator 1`] = `
   >
     <Animatable(NewActivityIndicator)
       itemIds={
-        Array [
+        [
           "first",
           "second",
         ]

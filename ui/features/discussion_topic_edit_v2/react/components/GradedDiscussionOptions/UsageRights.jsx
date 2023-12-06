@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useEffect, useContext} from 'react'
+import React, {useEffect, useState, useCallback} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 
@@ -35,141 +35,88 @@ import {
   IconWarningLine,
 } from '@instructure/ui-icons'
 import {Tooltip} from '@instructure/ui-tooltip'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 
 const I18n = useI18nScope('discussion_create')
 
-const CONTENT_OPTIONS = [
-  {
-    display: I18n.t('Choose usage rights...'),
-    value: 'choose',
-  },
-  {
-    display: I18n.t('I hold the copyright'),
-    value: 'own_copyright',
-  },
-  {
-    display: I18n.t('I have obtained permission to use this file.'),
-    value: 'used_by_permission',
-  },
-  {
-    display: I18n.t('The material is in the public domain'),
-    value: 'public_domain',
-  },
-  {
-    display: I18n.t(
-      'The material is subject to an exception - e.g. fair use, the right to quote, or others under applicable copyright laws'
-    ),
-    value: 'fair_use',
-  },
-  {
-    display: I18n.t('The material is licensed under Creative Commons'),
-    value: 'creative_commons',
-  },
-]
-
 export const UsageRights = ({
-  contextType,
-  contextId,
-  basicFileSystemData,
   onSaveUsageRights,
   isOpen,
-  currentUsageRights,
+  initialUsageRights,
   errorState,
+  usageRightsOptions,
+  creativeCommonsOptions,
 }) => {
   const [open, setOpen] = useState(isOpen)
-  // The value of the Copyright Holder input
-  const [copyrightHolder, setCopyrightHolder] = useState(currentUsageRights?.copyrightHolder || '')
-  // Usage Right selection
-  const [selectedUsageRightsOption, setSelectedUsageRightsOption] = useState(
-    currentUsageRights?.selectedUsageRightsOption
+  // These are the realtime values used in the modal.
+  // If the save button is not pressed, these values are lost
+  const [copyrightHolder, setCopyrightHolder] = useState('')
+  const [selectedUsageRightsOption, setSelectedUsageRightsOption] = useState()
+  const [selectedCreativeLicense, setSelectedCreativeLicense] = useState()
+
+  const findUsageRightsOption = useCallback(
+    useJustification => {
+      return usageRightsOptions.find(opt => opt.value === useJustification) || null
+    },
+    [usageRightsOptions]
   )
-  // Selected Creative Commons License:
-  const [selectedCreativeLicense, setSelectedCreativeLicense] = useState(
-    currentUsageRights?.selectedCreativeLicense
+
+  const findCreativeLicenseOption = useCallback(
+    license => {
+      return creativeCommonsOptions.find(opt => opt.id === license) || null
+    },
+    [creativeCommonsOptions]
   )
-  // Will be used as selectable options for the creative Commons Licenses
-  const [ccLicenseOptions, setCCLicenseOptions] = useState([])
 
-  // New state to save the initial values when the modal opens
-  const [initialValues, setInitialValues] = useState({
-    copyrightHolder: currentUsageRights?.copyrightHolder,
-    selectedUsageRightsOption: currentUsageRights?.selectedUsageRightsOption,
-    selectedCreativeLicense: currentUsageRights?.selectedCreativeLicense,
-  })
-
-  const saveAsInitial = () => {
-    setInitialValues({
-      copyrightHolder,
-      selectedUsageRightsOption,
-      selectedCreativeLicense,
-    })
-  }
-
-  const revertToInitial = () => {
-    setCopyrightHolder(initialValues.copyrightHolder)
-    setSelectedUsageRightsOption(initialValues.selectedUsageRightsOption)
-    setSelectedCreativeLicense(initialValues.selectedCreativeLicense)
-  }
-
-  const {setOnFailure} = useContext(AlertManagerContext)
-
-  // Retrieve the content_licenses that are selected for a given context
-  const getCreativeCommonsOptions = async () => {
-    try {
-      const pluralized_contextType = contextType.replace(/([^s])$/, '$1s')
-      const res = await fetch(`/api/v1/${pluralized_contextType}/${contextId}/content_licenses`)
-      let ccData = await res.json()
-      ccData = ccData.filter(obj => obj.id.startsWith('cc'))
-
-      setCCLicenseOptions(ccData)
-    } catch (error) {
-      setOnFailure(error)
-    }
-  }
-
-  // Logic to prevent the content_license from being fetched multiple times
+  // Set Initial values
   useEffect(() => {
-    if (open && ccLicenseOptions.length === 0) {
-      getCreativeCommonsOptions()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, ccLicenseOptions])
+    setCopyrightHolder(initialUsageRights?.legalCopyright || '')
+    setSelectedUsageRightsOption(findUsageRightsOption(initialUsageRights?.useJustification))
+    setSelectedCreativeLicense(findCreativeLicenseOption(initialUsageRights?.license))
+  }, [findCreativeLicenseOption, findUsageRightsOption, initialUsageRights])
+
+  const revertToInitialValues = () => {
+    setCopyrightHolder(initialUsageRights?.legalCopyright || '')
+    setSelectedUsageRightsOption(
+      usageRightsOptions.find(opt => opt.value === initialUsageRights?.useJustification) || null
+    )
+    setSelectedCreativeLicense(
+      creativeCommonsOptions.find(opt => opt.id === initialUsageRights?.license) || null
+    )
+  }
 
   const handleSelect = (e, {value}) => {
-    const newSelectedOption = CONTENT_OPTIONS.find(opt => opt?.value === value)
+    const newSelectedOption = findUsageRightsOption(value)
     if (newSelectedOption) {
       setSelectedUsageRightsOption(newSelectedOption)
     }
   }
 
   const handleCreativeSelect = (e, {value}) => {
-    const newSelectedOption = ccLicenseOptions.find(opt => opt.id === value)
+    const newSelectedOption = findCreativeLicenseOption(value)
     if (newSelectedOption) {
       setSelectedCreativeLicense(newSelectedOption)
     }
   }
 
   const toggleModal = () => {
-    if (!open) {
-      saveAsInitial() // Save initial values when the modal is opening
-    } else {
-      revertToInitial() // Revert to the last saved initial state when modal is closing
+    if (open) {
+      revertToInitialValues()
     }
     setOpen(!open)
   }
 
   const handleSaveClick = e => {
     e.preventDefault()
-    saveAsInitial()
+
     const newUsageRightsState = {
-      selectedUsageRightsOption,
-      copyrightHolder,
-      basicFileSystemData,
+      legalCopyright: copyrightHolder,
+      useJustification: selectedUsageRightsOption.value,
     }
-    if (selectedCreativeLicense) {
-      newUsageRightsState.selectedCreativeLicense = selectedCreativeLicense
+    // We only send the license information if the selected usage right is creative commons
+    if (selectedUsageRightsOption?.value === 'creative_commons') {
+      newUsageRightsState.license = selectedCreativeLicense?.id || 'cc_by'
     }
+
     // Send current state to the parent component onSave
     onSaveUsageRights(newUsageRightsState)
     setOpen(false)
@@ -177,12 +124,12 @@ export const UsageRights = ({
 
   const handleCancelClick = e => {
     e.preventDefault()
-    revertToInitial()
+    revertToInitialValues()
     setOpen(false)
   }
 
   const handleModalClose = () => {
-    revertToInitial()
+    revertToInitialValues()
   }
 
   const renderCloseButton = () => {
@@ -236,7 +183,6 @@ export const UsageRights = ({
         }}
         size="auto"
         label={I18n.t('Usage Rights')}
-        shouldCloseOnDocumentClick={true}
       >
         <Modal.Header>
           {renderCloseButton()}
@@ -251,7 +197,7 @@ export const UsageRights = ({
               onChange={handleSelect}
               data-testid="usage-select"
             >
-              {CONTENT_OPTIONS.map(opt => (
+              {usageRightsOptions.map(opt => (
                 <SimpleSelect.Option
                   key={opt?.value}
                   id={`opt-${opt?.value}`}
@@ -269,8 +215,9 @@ export const UsageRights = ({
                 assistiveText={I18n.t('Use arrow keys to navigate options.')}
                 value={selectedCreativeLicense?.id}
                 onChange={handleCreativeSelect}
+                data-testid="cc-license-select"
               >
-                {ccLicenseOptions.map(opt => (
+                {creativeCommonsOptions.map(opt => (
                   <SimpleSelect.Option key={opt.id} id={`opt-${opt.id}`} value={opt.id}>
                     {opt.name}
                   </SimpleSelect.Option>
@@ -282,6 +229,7 @@ export const UsageRights = ({
               placeholder={I18n.t('(c) 2001 Acme Inc.')}
               value={copyrightHolder}
               onChange={e => setCopyrightHolder(e.target.value)}
+              data-testid="legal-copyright"
             />
           </FormFieldGroup>
         </Modal.Body>
@@ -304,19 +252,29 @@ export const UsageRights = ({
 }
 
 UsageRights.propTypes = {
-  contextType: PropTypes.string.isRequired, // used to fetch the available cc content_licenses
-  contextId: PropTypes.string.isRequired, // used to fetch the available cc content_licenses
-  basicFileSystemData: PropTypes.arrayOf(PropTypes.object), // represents the files or folder's who's usage rights object is being updated
   onSaveUsageRights: PropTypes.func, // When the user clicks save, this function is called with the new usage rights object
-  currentUsageRights: PropTypes.object, // passes in the initial usage rights modal state
+  initialUsageRights: PropTypes.shape({
+    legalCopyright: PropTypes.string,
+    license: PropTypes.string,
+    useJustification: PropTypes.string,
+  }),
   isOpen: PropTypes.bool, // can be used to open the modal
   errorState: PropTypes.bool, // can be used to show an error state
+  creativeCommonsOptions: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+    })
+  ), // Array of objects with id and name for creative commons options
+  usageRightsOptions: PropTypes.arrayOf(
+    PropTypes.shape({
+      display: PropTypes.string.isRequired,
+      value: PropTypes.string.isRequired,
+    })
+  ),
 }
 
 UsageRights.defaultProps = {
-  contextType: '',
-  contextId: '',
-  basicFileSystemData: [],
   onSaveUsageRights: () => {},
   isOpen: false,
   errorState: false,

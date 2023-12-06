@@ -23,6 +23,9 @@ import {ApolloProvider} from 'react-apollo'
 import {handlers} from '../../../../graphql/mswHandlers'
 import {mswClient} from '../../../../../../shared/msw/mswClient'
 import {mswServer} from '../../../../../../shared/msw/mswServer'
+import {enableFetchMocks} from 'jest-fetch-mock'
+
+enableFetchMocks()
 
 const server = mswServer(handlers)
 beforeAll(() => {

@@ -94,3 +94,9 @@ outcomes_new_decaying_average_calculation:
   applies_to: RootAccount
   display_name: Outcomes New Decaying Average Calculation Method
   description: Allows users to use new decaying average as a calulcation method for a given outcome.
+archive_outcomes:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Archive Outcomes
+  description: Allows users to archive outcomes and outcome groups no longer in use.
+  after_state_change_proc: archive_outcomes_after_change_hook

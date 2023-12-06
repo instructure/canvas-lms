@@ -43,6 +43,7 @@ class Rubric < ActiveRecord::Base
   has_many :rubric_associations_with_deleted, class_name: "RubricAssociation", inverse_of: :rubric
   has_many :rubric_assessments, through: :rubric_associations, dependent: :destroy
   has_many :learning_outcome_alignments, -> { where("content_tags.tag_type='learning_outcome' AND content_tags.workflow_state<>'deleted'").preload(:learning_outcome) }, as: :content, inverse_of: :content, class_name: "ContentTag"
+  has_many :rubric_criteria, class_name: "RubricCriterion", inverse_of: :rubric, dependent: :destroy
 
   validates :context_id, :context_type, :workflow_state, presence: true
   validates :description, length: { maximum: maximum_text_length, allow_blank: true }
@@ -94,8 +95,23 @@ class Rubric < ActiveRecord::Base
   end
 
   workflow do
-    state :active
+    state :active do
+      event :archive, transitions_to: :archived
+    end
+    state :archived do
+      event :unarchive, transitions_to: :active
+    end
     state :deleted
+  end
+
+  def archive
+    # overrides 'archive' event in workflow to make sure the feature flag is enabled
+    # remove this and 'unarchive' method when feature flag is removed
+    super if enhanced_rubrics_enabled?
+  end
+
+  def unarchive
+    super if enhanced_rubrics_enabled?
   end
 
   def self.aligned_to_outcomes
@@ -174,6 +190,7 @@ class Rubric < ActiveRecord::Base
     self.workflow_state = "deleted"
     if save
       rubric_associations.in_batches.destroy_all
+      rubric_criteria.in_batches.destroy_all
       true
     end
   end
@@ -465,5 +482,9 @@ class Rubric < ActiveRecord::Base
       else
         context&.root_account_id
       end
+  end
+
+  def enhanced_rubrics_enabled?
+    Account.site_admin.feature_enabled?(:enhanced_rubrics)
   end
 end

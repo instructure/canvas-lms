@@ -203,4 +203,9 @@ module GradebooksHelper
   def show_message_students_with_observers_dialog?
     Account.site_admin.feature_enabled?(:message_observers_of_students_who)
   end
+
+  # EVAL-3711 Remove ICE Evaluate feature flag
+  def instui_nav?
+    @context.root_account.feature_enabled?(:instui_nav)
+  end
 end

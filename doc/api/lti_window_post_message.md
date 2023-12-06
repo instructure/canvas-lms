@@ -51,9 +51,6 @@ Messages sent by a tool that has been launched from a Canvas mobile app will not
 
 ## lti.capabilities
 
-**At one point, this message type was named 'org.imsglobal.lti.capabilities', but the prefix**
-**was dropped before finalizing the spec. This format is no longer supported.**
-
 Responds with a list of subjects that Canvas will respond to, and if necessary the named
 frame to address each subject to. Part of the LTI Platform Storage spec, defined
 [here](https://www.imsglobal.org/spec/lti-cs-pm/v0p1#capabilities-request-postmessage).
@@ -75,9 +72,6 @@ window.parent.postMessage({subject: 'lti.capabilities'}, '*')
 
 ## lti.put_data
 
-**At one point, this message type was named 'org.imsglobal.lti.put_data', but the prefix**
-**was dropped before finalizing the spec. This format is no longer supported.**
-
 Stores the provided `value` at the provided `key` in Canvas's [localstorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage),
 partitioned by tool. Data stored by one tool cannot be accessed by another, is
 only stored in the user's browser, and is short-lived. Part of the LTI Platform Storage spec,
@@ -89,9 +83,10 @@ is the entity receiving the message. To enable this feature, Canvas also require
 with this target origin are sent to the `post_message_forwarding` frame, which is a sibling frame to the tool.
 For now, tools are also still allowed to send this message directly to the parent window and use the wildcard `*` origin, although this does not conform to the spec.
 
-All LTI login and launch requests include the `lti_storage_target` parameter, which signals to the
-tool which frame should receive these messages. The default value is `_parent`, which means messages
-should be sent to `window.parent`. When the value is something else (like `post_message_forwarding`),
+Support for this API is signalled using the `lti_storage_target` parameter, which is included in
+the LTI 1.3 login and launch requests. If this parameter absent, tools should use cookies instead
+of trying to use this postMessage. The default value for this parameter is `_parent`, which means
+messages should be sent to `window.parent`. When the value is something else (like `post_message_forwarding`),
 the tool should send message to the frame with that name present at `window.parent.frames[lti_storage_target]`.
 
 **Note:** When a tool is launched from within an active RCE (Rich Content Editor) this sibling
@@ -137,9 +132,6 @@ window.parent.postMessage(
 
 ## lti.get_data
 
-**At one point, this message type was named 'org.imsglobal.lti.get_data', but the prefix**
-**was dropped before finalizing the spec. This format is no longer supported.**
-
 Fetches the value stored at the provided `key` in Canvas's [localstorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage),
 partitioned by tool. Data stored by one tool cannot be accessed by another, is
 only stored in the user's browser, and is short-lived. Part of the LTI Platform Storage spec,
@@ -151,9 +143,10 @@ is the entity receiving the message. To enable this feature, Canvas also require
 with this target origin are sent to the `post_message_forwarding` frame, which is a sibling frame to the tool.
 For now, tools are also still allowed to send this message directly to the parent window and use the wildcard `*` origin, although this does not conform to the spec.
 
-All LTI login and launch requests include the `lti_storage_target` parameter, which signals to the
-tool which frame should receive these messages. The default value is `_parent`, which means messages
-should be sent to `window.parent`. When the value is something else (like `post_message_forwarding`),
+Support for this API is signalled using the `lti_storage_target` parameter, which is included in
+the LTI 1.3 login and launch requests. If this parameter absent, tools should use cookies instead
+of trying to use this postMessage. The default value for this parameter is `_parent`, which means
+messages should be sent to `window.parent`. When the value is something else (like `post_message_forwarding`),
 the tool should send message to the frame with that name present at `window.parent.frames[lti_storage_target]`.
 
 **Note:** When a tool is launched from within an active RCE (Rich Content Editor) this sibling

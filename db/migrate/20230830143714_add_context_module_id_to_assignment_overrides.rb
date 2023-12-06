@@ -27,7 +27,7 @@ class AddContextModuleIdToAssignmentOverrides < ActiveRecord::Migration[7.0]
                   :context_module,
                   if_not_exists: true,
                   foreign_key: true,
-                  index: { algorithm: :concurrently, where: "context_module_id IS NOT NULL" }
+                  index: { algorithm: :concurrently, where: "context_module_id IS NOT NULL", if_not_exists: true }
 
     add_index :assignment_overrides,
               [:context_module_id, :set_id],

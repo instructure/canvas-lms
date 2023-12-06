@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {createRef, useEffect} from 'react'
 import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Checkbox} from '@instructure/ui-checkbox'
@@ -32,6 +32,7 @@ export interface RequirementCountInputProps {
   requireSequentialProgress: boolean
   onChangeRequirementCount: (type: 'all' | 'one') => void
   onToggleSequentialProgress: () => void
+  focus?: boolean
 }
 
 export default function RequirementCountInput({
@@ -39,7 +40,15 @@ export default function RequirementCountInput({
   requireSequentialProgress,
   onChangeRequirementCount,
   onToggleSequentialProgress,
+  focus = false,
 }: RequirementCountInputProps) {
+  const defaultRadioInput = createRef<RadioInput>()
+
+  useEffect(() => {
+    // Focus radio button on load
+    focus && defaultRadioInput.current?.focus()
+  }, [focus, defaultRadioInput])
+
   return (
     <RadioInputGroup
       name="requirement-count"
@@ -48,6 +57,7 @@ export default function RequirementCountInput({
       <Flex>
         <Flex.Item align="start">
           <RadioInput
+            ref={defaultRadioInput}
             data-testid="complete-all-radio"
             checked={requirementCount === 'all'}
             value="all"

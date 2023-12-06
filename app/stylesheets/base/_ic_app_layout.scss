@@ -54,7 +54,7 @@ body:not(.ic-no-flex-layout):not(.embedded) .ic-app-main-content {
     outline-offset: -2px;
     outline-style: solid;
   }
-  padding: $ic-sp * 2;
+  padding: $ic-sp * 3 $ic-sp * 4 $ic-sp * 4 $ic-sp * 4;
   @include mobile-only {
     & {
       padding-#{direction(left)}: $ic-sp;

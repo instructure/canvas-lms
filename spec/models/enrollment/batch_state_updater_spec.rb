@@ -226,6 +226,7 @@ describe "Enrollment::BatchStateUpdater" do
       update_assignment_overrides_if_needed
       update_linked_enrollments
       update_user_account_associations_if_necessary
+      _notify_live_events_observer_for_after_save
     ]
     expect(Enrollment._save_callbacks.collect(&:filter).select { |k| k.is_a? Symbol } - accounted_for_callbacks).to eq []
   end

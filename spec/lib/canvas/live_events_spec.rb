@@ -2704,6 +2704,47 @@ describe Canvas::LiveEvents do
     end
   end
 
+  describe "rubric_assessed" do
+    before(:once) do
+      outcome_model
+      outcome_with_rubric(outcome: @outcome, context: Account.default)
+      course_with_student
+      @rubric_assessment = rubric_assessment_model(rubric: @rubric, user: @student, assessment_type: "graded")
+    end
+
+    context "triggers a live event" do
+      it "successfully with context uuid" do
+        assessment_data = {
+          id: @rubric_assessment.id.to_s,
+          aligned_to_outcomes: @rubric_assessment.aligned_outcome_ids.count.positive?,
+          artifact_id: @rubric_assessment.artifact_id.to_s,
+          artifact_type: @rubric_assessment.artifact_type,
+          assessment_type: @rubric_assessment.assessment_type,
+          context_uuid: @rubric_assessment.rubric_association.context.uuid
+        }
+        expect_event("rubric_assessed", assessment_data)
+        Canvas::LiveEvents.rubric_assessed(@rubric_assessment)
+      end
+
+      it "context uuid is not present event data when nil" do
+        context = @rubric_assessment.rubric_association.context
+        allow_any_instance_of(Course).to receive(:assign_uuid).and_return(true)
+        context.uuid = nil
+        context.save
+
+        assessment_data = {
+          id: @rubric_assessment.id.to_s,
+          aligned_to_outcomes: @rubric_assessment.aligned_outcome_ids.count.positive?,
+          artifact_id: @rubric_assessment.artifact_id.to_s,
+          artifact_type: @rubric_assessment.artifact_type,
+          assessment_type: @rubric_assessment.assessment_type
+        }
+        expect_event("rubric_assessed", assessment_data)
+        Canvas::LiveEvents.rubric_assessed(@rubric_assessment)
+      end
+    end
+  end
+
   describe "heartbeat" do
     context "when database region is not set (local/open source)" do
       it "sets region to not_configured" do

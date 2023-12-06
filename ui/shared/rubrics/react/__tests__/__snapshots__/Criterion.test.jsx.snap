@@ -27,7 +27,7 @@ exports[`Free-form Rubric with a custom criterion by default renders the LongDes
       offset="medium"
       onClick={[Function]}
       placement="end"
-      screenReaderLabel="\\\\n          Close\\\\n        "
+      screenReaderLabel="\\n          Close\\n        "
       size="small"
       type="button"
     />
@@ -53,7 +53,7 @@ exports[`Free-form Rubric with a custom criterion by default renders the LongDes
     >
       <div
         dangerouslySetInnerHTML={
-          Object {
+          {
             "__html": "",
           }
         }
@@ -99,7 +99,7 @@ exports[`Free-form Rubric with a custom criterion by default renders the root co
     <Comments
       allowSaving={true}
       assessment={
-        Object {
+        {
           "comments": "",
           "comments_enabled": true,
           "criterion_id": "_1384",
@@ -107,7 +107,7 @@ exports[`Free-form Rubric with a custom criterion by default renders the root co
           "editComments": false,
           "id": "blank_2",
           "learning_outcome_id": null,
-          "points": Object {
+          "points": {
             "text": null,
             "valid": true,
             "value": 0,
@@ -117,7 +117,7 @@ exports[`Free-form Rubric with a custom criterion by default renders the root co
       editing={false}
       footer={null}
       large={true}
-      savedComments={Array []}
+      savedComments={[]}
       setComments={[Function]}
       setSaveLater={[Function]}
     />
@@ -130,7 +130,7 @@ exports[`Free-form Rubric with a custom criterion by default renders the root co
       allowExtraCredit={true}
       assessing={false}
       assessment={
-        Object {
+        {
           "comments": "",
           "comments_enabled": true,
           "criterion_id": "_1384",
@@ -138,7 +138,7 @@ exports[`Free-form Rubric with a custom criterion by default renders the root co
           "editComments": false,
           "id": "blank_2",
           "learning_outcome_id": null,
-          "points": Object {
+          "points": {
             "text": null,
             "valid": true,
             "value": 0,
@@ -178,7 +178,7 @@ exports[`Free-form Rubric with a custom criterion when assessing renders the Lon
       offset="medium"
       onClick={[Function]}
       placement="end"
-      screenReaderLabel="\\\\n          Close\\\\n        "
+      screenReaderLabel="\\n          Close\\n        "
       size="small"
       type="button"
     />
@@ -204,7 +204,7 @@ exports[`Free-form Rubric with a custom criterion when assessing renders the Lon
     >
       <div
         dangerouslySetInnerHTML={
-          Object {
+          {
             "__html": "",
           }
         }
@@ -250,7 +250,7 @@ exports[`Free-form Rubric with a custom criterion when assessing renders the roo
     <Comments
       allowSaving={true}
       assessment={
-        Object {
+        {
           "comments": "",
           "comments_enabled": true,
           "criterion_id": "_1384",
@@ -258,7 +258,7 @@ exports[`Free-form Rubric with a custom criterion when assessing renders the roo
           "editComments": false,
           "id": "blank_2",
           "learning_outcome_id": null,
-          "points": Object {
+          "points": {
             "text": null,
             "valid": true,
             "value": 0,
@@ -268,7 +268,7 @@ exports[`Free-form Rubric with a custom criterion when assessing renders the roo
       editing={true}
       footer={null}
       large={true}
-      savedComments={Array []}
+      savedComments={[]}
       setComments={[Function]}
       setSaveLater={[Function]}
     />
@@ -281,7 +281,7 @@ exports[`Free-form Rubric with a custom criterion when assessing renders the roo
       allowExtraCredit={true}
       assessing={true}
       assessment={
-        Object {
+        {
           "comments": "",
           "comments_enabled": true,
           "criterion_id": "_1384",
@@ -289,7 +289,7 @@ exports[`Free-form Rubric with a custom criterion when assessing renders the roo
           "editComments": false,
           "id": "blank_2",
           "learning_outcome_id": null,
-          "points": Object {
+          "points": {
             "text": null,
             "valid": true,
             "value": 0,
@@ -329,7 +329,7 @@ exports[`Free-form Rubric with a custom criterion without an assessment renders 
       offset="medium"
       onClick={[Function]}
       placement="end"
-      screenReaderLabel="\\\\n          Close\\\\n        "
+      screenReaderLabel="\\n          Close\\n        "
       size="small"
       type="button"
     />
@@ -355,7 +355,7 @@ exports[`Free-form Rubric with a custom criterion without an assessment renders 
     >
       <div
         dangerouslySetInnerHTML={
-          Object {
+          {
             "__html": "",
           }
         }
@@ -404,7 +404,7 @@ exports[`Free-form Rubric with a custom criterion without an assessment renders 
       editing={false}
       footer={null}
       large={true}
-      savedComments={Array []}
+      savedComments={[]}
       setComments={[Function]}
       setSaveLater={[Function]}
     />
@@ -471,7 +471,7 @@ exports[`Free-form Rubric with a outcome criterion by default renders the LongDe
       offset="medium"
       onClick={[Function]}
       placement="end"
-      screenReaderLabel="\\\\n          Close\\\\n        "
+      screenReaderLabel="\\n          Close\\n        "
       size="small"
       type="button"
     />
@@ -497,7 +497,7 @@ exports[`Free-form Rubric with a outcome criterion by default renders the LongDe
     >
       <div
         dangerouslySetInnerHTML={
-          Object {
+          {
             "__html": "sa Sivert.",
           }
         }
@@ -574,7 +574,7 @@ exports[`Free-form Rubric with a outcome criterion by default renders the root c
     <Comments
       allowSaving={true}
       assessment={
-        Object {
+        {
           "above_threshold": false,
           "comments": "I award you no points, and may God have mercy on your soul.",
           "comments_enabled": true,
@@ -583,7 +583,7 @@ exports[`Free-form Rubric with a outcome criterion by default renders the root c
           "description": "No details",
           "editComments": true,
           "learning_outcome_id": "612",
-          "points": Object {
+          "points": {
             "text": null,
             "valid": true,
             "value": 0,
@@ -593,7 +593,7 @@ exports[`Free-form Rubric with a outcome criterion by default renders the root c
       editing={false}
       footer={null}
       large={true}
-      savedComments={Array []}
+      savedComments={[]}
       setComments={[Function]}
       setSaveLater={[Function]}
     />
@@ -606,7 +606,7 @@ exports[`Free-form Rubric with a outcome criterion by default renders the root c
       allowExtraCredit={false}
       assessing={false}
       assessment={
-        Object {
+        {
           "above_threshold": false,
           "comments": "I award you no points, and may God have mercy on your soul.",
           "comments_enabled": true,
@@ -615,7 +615,7 @@ exports[`Free-form Rubric with a outcome criterion by default renders the root c
           "description": "No details",
           "editComments": true,
           "learning_outcome_id": "612",
-          "points": Object {
+          "points": {
             "text": null,
             "valid": true,
             "value": 0,
@@ -676,7 +676,7 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the Lo
       offset="medium"
       onClick={[Function]}
       placement="end"
-      screenReaderLabel="\\\\n          Close\\\\n        "
+      screenReaderLabel="\\n          Close\\n        "
       size="small"
       type="button"
     />
@@ -702,7 +702,7 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the Lo
     >
       <div
         dangerouslySetInnerHTML={
-          Object {
+          {
             "__html": "sa Sivert.",
           }
         }
@@ -779,7 +779,7 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the ro
     <Comments
       allowSaving={true}
       assessment={
-        Object {
+        {
           "above_threshold": false,
           "comments": "I award you no points, and may God have mercy on your soul.",
           "comments_enabled": true,
@@ -788,7 +788,7 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the ro
           "description": "No details",
           "editComments": true,
           "learning_outcome_id": "612",
-          "points": Object {
+          "points": {
             "text": null,
             "valid": true,
             "value": 0,
@@ -798,7 +798,7 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the ro
       editing={true}
       footer={null}
       large={true}
-      savedComments={Array []}
+      savedComments={[]}
       setComments={[Function]}
       setSaveLater={[Function]}
     />
@@ -811,7 +811,7 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the ro
       allowExtraCredit={false}
       assessing={true}
       assessment={
-        Object {
+        {
           "above_threshold": false,
           "comments": "I award you no points, and may God have mercy on your soul.",
           "comments_enabled": true,
@@ -820,7 +820,7 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the ro
           "description": "No details",
           "editComments": true,
           "learning_outcome_id": "612",
-          "points": Object {
+          "points": {
             "text": null,
             "valid": true,
             "value": 0,
@@ -881,7 +881,7 @@ exports[`Free-form Rubric with a outcome criterion without an assessment renders
       offset="medium"
       onClick={[Function]}
       placement="end"
-      screenReaderLabel="\\\\n          Close\\\\n        "
+      screenReaderLabel="\\n          Close\\n        "
       size="small"
       type="button"
     />
@@ -907,7 +907,7 @@ exports[`Free-form Rubric with a outcome criterion without an assessment renders
     >
       <div
         dangerouslySetInnerHTML={
-          Object {
+          {
             "__html": "sa Sivert.",
           }
         }
@@ -987,7 +987,7 @@ exports[`Free-form Rubric with a outcome criterion without an assessment renders
       editing={false}
       footer={null}
       large={true}
-      savedComments={Array []}
+      savedComments={[]}
       setComments={[Function]}
       setSaveLater={[Function]}
     />
@@ -1033,7 +1033,7 @@ exports[`Point Rubric with a custom criterion by default renders the LongDescrip
       offset="medium"
       onClick={[Function]}
       placement="end"
-      screenReaderLabel="\\\\n          Close\\\\n        "
+      screenReaderLabel="\\n          Close\\n        "
       size="small"
       type="button"
     />
@@ -1059,7 +1059,7 @@ exports[`Point Rubric with a custom criterion by default renders the LongDescrip
     >
       <div
         dangerouslySetInnerHTML={
-          Object {
+          {
             "__html": "",
           }
         }
@@ -1104,13 +1104,13 @@ exports[`Point Rubric with a custom criterion by default renders the root compon
   >
     <Ratings
       assessing={false}
-      customRatings={Array []}
+      customRatings={[]}
       defaultMasteryThreshold={8}
       footer={
         <Comments
           allowSaving={true}
           assessment={
-            Object {
+            {
               "comments": "i'd like to say some things",
               "comments_enabled": true,
               "criterion_id": "_1384",
@@ -1118,7 +1118,7 @@ exports[`Point Rubric with a custom criterion by default renders the root compon
               "editComments": true,
               "id": "7_4778",
               "learning_outcome_id": null,
-              "points": Object {
+              "points": {
                 "text": null,
                 "valid": true,
                 "value": 3.2,
@@ -1128,7 +1128,7 @@ exports[`Point Rubric with a custom criterion by default renders the root compon
           editing={false}
           footer={null}
           large={false}
-          savedComments={Array []}
+          savedComments={[]}
           setComments={[Function]}
           setSaveLater={[Function]}
         />
@@ -1140,22 +1140,22 @@ exports[`Point Rubric with a custom criterion by default renders the root compon
       pointsPossible={8}
       selectedRatingId="7_4778"
       tiers={
-        Array [
-          Object {
+        [
+          {
             "criterion_id": "_1384",
             "description": "Full Marks",
             "id": "blank",
             "long_description": "",
             "points": 8,
           },
-          Object {
+          {
             "criterion_id": "_1384",
             "description": "bleh",
             "id": "7_4778",
             "long_description": "blah",
             "points": 3,
           },
-          Object {
+          {
             "criterion_id": "_1384",
             "description": "No Marks",
             "id": "blank_2",
@@ -1175,7 +1175,7 @@ exports[`Point Rubric with a custom criterion by default renders the root compon
       allowExtraCredit={true}
       assessing={false}
       assessment={
-        Object {
+        {
           "comments": "i'd like to say some things",
           "comments_enabled": true,
           "criterion_id": "_1384",
@@ -1183,7 +1183,7 @@ exports[`Point Rubric with a custom criterion by default renders the root compon
           "editComments": true,
           "id": "7_4778",
           "learning_outcome_id": null,
-          "points": Object {
+          "points": {
             "text": null,
             "valid": true,
             "value": 3.2,
@@ -1223,7 +1223,7 @@ exports[`Point Rubric with a custom criterion when assessing renders the LongDes
       offset="medium"
       onClick={[Function]}
       placement="end"
-      screenReaderLabel="\\\\n          Close\\\\n        "
+      screenReaderLabel="\\n          Close\\n        "
       size="small"
       type="button"
     />
@@ -1249,7 +1249,7 @@ exports[`Point Rubric with a custom criterion when assessing renders the LongDes
     >
       <div
         dangerouslySetInnerHTML={
-          Object {
+          {
             "__html": "",
           }
         }
@@ -1294,13 +1294,13 @@ exports[`Point Rubric with a custom criterion when assessing renders the root co
   >
     <Ratings
       assessing={true}
-      customRatings={Array []}
+      customRatings={[]}
       defaultMasteryThreshold={8}
       footer={
         <Comments
           allowSaving={true}
           assessment={
-            Object {
+            {
               "comments": "i'd like to say some things",
               "comments_enabled": true,
               "criterion_id": "_1384",
@@ -1308,7 +1308,7 @@ exports[`Point Rubric with a custom criterion when assessing renders the root co
               "editComments": true,
               "id": "7_4778",
               "learning_outcome_id": null,
-              "points": Object {
+              "points": {
                 "text": null,
                 "valid": true,
                 "value": 3.2,
@@ -1318,7 +1318,7 @@ exports[`Point Rubric with a custom criterion when assessing renders the root co
           editing={true}
           footer={null}
           large={false}
-          savedComments={Array []}
+          savedComments={[]}
           setComments={[Function]}
           setSaveLater={[Function]}
         />
@@ -1330,22 +1330,22 @@ exports[`Point Rubric with a custom criterion when assessing renders the root co
       pointsPossible={8}
       selectedRatingId="7_4778"
       tiers={
-        Array [
-          Object {
+        [
+          {
             "criterion_id": "_1384",
             "description": "Full Marks",
             "id": "blank",
             "long_description": "",
             "points": 8,
           },
-          Object {
+          {
             "criterion_id": "_1384",
             "description": "bleh",
             "id": "7_4778",
             "long_description": "blah",
             "points": 3,
           },
-          Object {
+          {
             "criterion_id": "_1384",
             "description": "No Marks",
             "id": "blank_2",
@@ -1365,7 +1365,7 @@ exports[`Point Rubric with a custom criterion when assessing renders the root co
       allowExtraCredit={true}
       assessing={true}
       assessment={
-        Object {
+        {
           "comments": "i'd like to say some things",
           "comments_enabled": true,
           "criterion_id": "_1384",
@@ -1373,7 +1373,7 @@ exports[`Point Rubric with a custom criterion when assessing renders the root co
           "editComments": true,
           "id": "7_4778",
           "learning_outcome_id": null,
-          "points": Object {
+          "points": {
             "text": null,
             "valid": true,
             "value": 3.2,
@@ -1413,7 +1413,7 @@ exports[`Point Rubric with a custom criterion without an assessment renders the 
       offset="medium"
       onClick={[Function]}
       placement="end"
-      screenReaderLabel="\\\\n          Close\\\\n        "
+      screenReaderLabel="\\n          Close\\n        "
       size="small"
       type="button"
     />
@@ -1439,7 +1439,7 @@ exports[`Point Rubric with a custom criterion without an assessment renders the 
     >
       <div
         dangerouslySetInnerHTML={
-          Object {
+          {
             "__html": "",
           }
         }
@@ -1484,7 +1484,7 @@ exports[`Point Rubric with a custom criterion without an assessment renders the 
   >
     <Ratings
       assessing={false}
-      customRatings={Array []}
+      customRatings={[]}
       defaultMasteryThreshold={8}
       footer={null}
       hidePoints={false}
@@ -1492,22 +1492,22 @@ exports[`Point Rubric with a custom criterion without an assessment renders the 
       onPointChange={[Function]}
       pointsPossible={8}
       tiers={
-        Array [
-          Object {
+        [
+          {
             "criterion_id": "_1384",
             "description": "Full Marks",
             "id": "blank",
             "long_description": "",
             "points": 8,
           },
-          Object {
+          {
             "criterion_id": "_1384",
             "description": "bleh",
             "id": "7_4778",
             "long_description": "blah",
             "points": 3,
           },
-          Object {
+          {
             "criterion_id": "_1384",
             "description": "No Marks",
             "id": "blank_2",
@@ -1581,7 +1581,7 @@ exports[`Point Rubric with a outcome criterion by default renders the LongDescri
       offset="medium"
       onClick={[Function]}
       placement="end"
-      screenReaderLabel="\\\\n          Close\\\\n        "
+      screenReaderLabel="\\n          Close\\n        "
       size="small"
       type="button"
     />
@@ -1607,7 +1607,7 @@ exports[`Point Rubric with a outcome criterion by default renders the LongDescri
     >
       <div
         dangerouslySetInnerHTML={
-          Object {
+          {
             "__html": "sa Sivert.",
           }
         }
@@ -1683,13 +1683,13 @@ exports[`Point Rubric with a outcome criterion by default renders the root compo
   >
     <Ratings
       assessing={false}
-      customRatings={Array []}
+      customRatings={[]}
       defaultMasteryThreshold={3}
       footer={
         <Comments
           allowSaving={true}
           assessment={
-            Object {
+            {
               "above_threshold": false,
               "comments": "here too",
               "comments_enabled": true,
@@ -1698,7 +1698,7 @@ exports[`Point Rubric with a outcome criterion by default renders the root compo
               "editComments": true,
               "id": "7_6639",
               "learning_outcome_id": "612",
-              "points": Object {
+              "points": {
                 "text": null,
                 "valid": true,
                 "value": 3,
@@ -1708,7 +1708,7 @@ exports[`Point Rubric with a outcome criterion by default renders the root compo
           editing={false}
           footer={null}
           large={false}
-          savedComments={Array []}
+          savedComments={[]}
           setComments={[Function]}
           setSaveLater={[Function]}
         />
@@ -1720,22 +1720,22 @@ exports[`Point Rubric with a outcome criterion by default renders the root compo
       pointsPossible={3}
       selectedRatingId="7_6639"
       tiers={
-        Array [
-          Object {
+        [
+          {
             "criterion_id": "7_391",
             "description": "Naturligvis hadde han ogsaa længe forstaat hvorfor Inger hadde ordet om.",
             "id": "7_6639",
             "long_description": "",
             "points": 3,
           },
-          Object {
+          {
             "criterion_id": "7_391",
             "description": "De levet tæt hos hverandre som Dyr i Skogen, de sov og spiste, det lidde saa.",
             "id": "7_194",
             "long_description": "",
             "points": 2,
           },
-          Object {
+          {
             "criterion_id": "7_391",
             "description": "Et graat og rødt Uldtørklæde med Frynser var pragtfuldt paa hendes mørke Haar.",
             "id": "7_8479",
@@ -1755,7 +1755,7 @@ exports[`Point Rubric with a outcome criterion by default renders the root compo
       allowExtraCredit={false}
       assessing={false}
       assessment={
-        Object {
+        {
           "above_threshold": false,
           "comments": "here too",
           "comments_enabled": true,
@@ -1764,7 +1764,7 @@ exports[`Point Rubric with a outcome criterion by default renders the root compo
           "editComments": true,
           "id": "7_6639",
           "learning_outcome_id": "612",
-          "points": Object {
+          "points": {
             "text": null,
             "valid": true,
             "value": 3,
@@ -1825,7 +1825,7 @@ exports[`Point Rubric with a outcome criterion when assessing renders the LongDe
       offset="medium"
       onClick={[Function]}
       placement="end"
-      screenReaderLabel="\\\\n          Close\\\\n        "
+      screenReaderLabel="\\n          Close\\n        "
       size="small"
       type="button"
     />
@@ -1851,7 +1851,7 @@ exports[`Point Rubric with a outcome criterion when assessing renders the LongDe
     >
       <div
         dangerouslySetInnerHTML={
-          Object {
+          {
             "__html": "sa Sivert.",
           }
         }
@@ -1927,13 +1927,13 @@ exports[`Point Rubric with a outcome criterion when assessing renders the root c
   >
     <Ratings
       assessing={true}
-      customRatings={Array []}
+      customRatings={[]}
       defaultMasteryThreshold={3}
       footer={
         <Comments
           allowSaving={true}
           assessment={
-            Object {
+            {
               "above_threshold": false,
               "comments": "here too",
               "comments_enabled": true,
@@ -1942,7 +1942,7 @@ exports[`Point Rubric with a outcome criterion when assessing renders the root c
               "editComments": true,
               "id": "7_6639",
               "learning_outcome_id": "612",
-              "points": Object {
+              "points": {
                 "text": null,
                 "valid": true,
                 "value": 3,
@@ -1952,7 +1952,7 @@ exports[`Point Rubric with a outcome criterion when assessing renders the root c
           editing={true}
           footer={null}
           large={false}
-          savedComments={Array []}
+          savedComments={[]}
           setComments={[Function]}
           setSaveLater={[Function]}
         />
@@ -1964,22 +1964,22 @@ exports[`Point Rubric with a outcome criterion when assessing renders the root c
       pointsPossible={3}
       selectedRatingId="7_6639"
       tiers={
-        Array [
-          Object {
+        [
+          {
             "criterion_id": "7_391",
             "description": "Naturligvis hadde han ogsaa længe forstaat hvorfor Inger hadde ordet om.",
             "id": "7_6639",
             "long_description": "",
             "points": 3,
           },
-          Object {
+          {
             "criterion_id": "7_391",
             "description": "De levet tæt hos hverandre som Dyr i Skogen, de sov og spiste, det lidde saa.",
             "id": "7_194",
             "long_description": "",
             "points": 2,
           },
-          Object {
+          {
             "criterion_id": "7_391",
             "description": "Et graat og rødt Uldtørklæde med Frynser var pragtfuldt paa hendes mørke Haar.",
             "id": "7_8479",
@@ -1999,7 +1999,7 @@ exports[`Point Rubric with a outcome criterion when assessing renders the root c
       allowExtraCredit={false}
       assessing={true}
       assessment={
-        Object {
+        {
           "above_threshold": false,
           "comments": "here too",
           "comments_enabled": true,
@@ -2008,7 +2008,7 @@ exports[`Point Rubric with a outcome criterion when assessing renders the root c
           "editComments": true,
           "id": "7_6639",
           "learning_outcome_id": "612",
-          "points": Object {
+          "points": {
             "text": null,
             "valid": true,
             "value": 3,
@@ -2069,7 +2069,7 @@ exports[`Point Rubric with a outcome criterion without an assessment renders the
       offset="medium"
       onClick={[Function]}
       placement="end"
-      screenReaderLabel="\\\\n          Close\\\\n        "
+      screenReaderLabel="\\n          Close\\n        "
       size="small"
       type="button"
     />
@@ -2095,7 +2095,7 @@ exports[`Point Rubric with a outcome criterion without an assessment renders the
     >
       <div
         dangerouslySetInnerHTML={
-          Object {
+          {
             "__html": "sa Sivert.",
           }
         }
@@ -2171,7 +2171,7 @@ exports[`Point Rubric with a outcome criterion without an assessment renders the
   >
     <Ratings
       assessing={false}
-      customRatings={Array []}
+      customRatings={[]}
       defaultMasteryThreshold={3}
       footer={null}
       hidePoints={false}
@@ -2179,22 +2179,22 @@ exports[`Point Rubric with a outcome criterion without an assessment renders the
       onPointChange={[Function]}
       pointsPossible={3}
       tiers={
-        Array [
-          Object {
+        [
+          {
             "criterion_id": "7_391",
             "description": "Naturligvis hadde han ogsaa længe forstaat hvorfor Inger hadde ordet om.",
             "id": "7_6639",
             "long_description": "",
             "points": 3,
           },
-          Object {
+          {
             "criterion_id": "7_391",
             "description": "De levet tæt hos hverandre som Dyr i Skogen, de sov og spiste, det lidde saa.",
             "id": "7_194",
             "long_description": "",
             "points": 2,
           },
-          Object {
+          {
             "criterion_id": "7_391",
             "description": "Et graat og rødt Uldtørklæde med Frynser var pragtfuldt paa hendes mørke Haar.",
             "id": "7_8479",

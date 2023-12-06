@@ -18,9 +18,10 @@
 
 import React from 'react'
 import {fireEvent, render, waitFor} from '@testing-library/react'
-import {EnrollmentTree} from '../EnrollmentTree'
+import {EnrollmentTree, Props} from '../EnrollmentTree'
+import {Enrollment} from '../types'
 
-const props = {
+const props: Props = {
   roles: [
     {
       id: '1',
@@ -40,6 +41,12 @@ const props = {
       label: 'DesignRole',
       base_role_name: 'DesignerEnrollment',
     },
+    {
+      id: '4',
+      role: 'CustomTeacherEnrollment',
+      label: 'TeacherRole',
+      base_role_name: 'TeacherEnrollment',
+    },
   ],
   selectedRole: {
     id: '',
@@ -53,6 +60,7 @@ const props = {
       enrollments: [
         {
           role_id: '1',
+          enrollment_state: 'active',
         },
       ],
       sections: [
@@ -70,6 +78,7 @@ const props = {
       enrollments: [
         {
           role_id: '2',
+          enrollment_state: 'active',
         },
       ],
       sections: [
@@ -87,6 +96,7 @@ const props = {
       enrollments: [
         {
           role_id: '3',
+          enrollment_state: 'active',
         },
       ],
       sections: [
@@ -94,6 +104,24 @@ const props = {
           id: '2',
           name: 'Section 2',
           enrollment_role: 'DesignerEnrollment',
+        },
+      ],
+    },
+    {
+      id: '2',
+      name: 'Studio Beats',
+      workflow_state: 'unpublished',
+      enrollments: [
+        {
+          role_id: '4',
+          enrollment_state: 'active',
+        },
+      ],
+      sections: [
+        {
+          id: '3',
+          name: 'Default Section',
+          enrollment_role: 'TeacherEnrollment',
         },
       ],
     },
@@ -134,7 +162,7 @@ describe('EnrollmentTree', () => {
     expect(await screen.findByText('Apple Music - Section 1')).toBeInTheDocument()
 
     fireEvent.click(roleGroup)
-    expect(await screen.queryByText('Apple Music - Section 1')).not.toBeInTheDocument()
+    expect(screen.queryByText('Apple Music - Section 1')).not.toBeInTheDocument()
   })
 
   it('renders enrollments in order of base role', async () => {
@@ -155,6 +183,21 @@ describe('EnrollmentTree', () => {
 
     const checkedBox = getByRole('checkbox', {checked: true})
     expect(checkedBox.getAttribute('data-testid')).toMatch('check r2')
+  })
+
+  it('does not select unpublished course enrollments by default', async () => {
+    const {queryByText, getByTestId} = render(<EnrollmentTree {...props} />)
+
+    expect(queryByText('TeacherRole')).toBeInTheDocument()
+    expect(queryByText('SubTeacherRole')).toBeInTheDocument()
+
+    const subTeacherCheckbox = getByTestId('check r2') as HTMLInputElement
+    expect(subTeacherCheckbox.checked).toBe(true)
+    const teacherCheckbox = getByTestId('check r4') as HTMLInputElement
+    expect(teacherCheckbox.checked).toBe(false)
+
+    expect(queryByText('Toggle group TeacherRole')).toBeInTheDocument()
+    expect(queryByText('Toggle group SubTeacherRole')).toBeInTheDocument()
   })
 
   it('shows enrollments in one section with different roles under respective role groups', async () => {
@@ -192,5 +235,47 @@ describe('EnrollmentTree', () => {
     const {getByText} = render(<EnrollmentTree {...props} />)
     await waitFor(() => expect(getByText('SubTeacherRole')).toBeInTheDocument())
     expect(props.createEnroll).toHaveBeenCalledTimes(1)
+  })
+
+  describe('props.tempEnrollmentsPairing', () => {
+    let tempProps: Props
+    const tempEnrollmentsPairingMock: Enrollment[] = [
+      {
+        course_id: '1',
+        course_section_id: '1',
+        role_id: '1', // student
+      },
+      {
+        course_id: '1',
+        course_section_id: '1',
+        role_id: '2', // teacher
+      },
+    ] as Enrollment[]
+
+    beforeEach(() => {
+      tempProps = {
+        ...props,
+        tempEnrollmentsPairing: tempEnrollmentsPairingMock,
+      }
+    })
+
+    it('renders role groups based on tempEnrollmentsPairing', async () => {
+      const {queryByText, getByTestId} = render(<EnrollmentTree {...tempProps} />)
+
+      expect(queryByText('StudentRole')).toBeInTheDocument()
+      expect(queryByText('SubTeacherRole')).toBeInTheDocument()
+      expect(queryByText('DesignRole')).toBeInTheDocument()
+
+      const studentCheckbox = getByTestId('check r1') as HTMLInputElement
+      expect(studentCheckbox.checked).toBe(true)
+      const teacherCheckbox = getByTestId('check r2') as HTMLInputElement
+      expect(teacherCheckbox.checked).toBe(true)
+      const designCheckbox = getByTestId('check r3') as HTMLInputElement
+      expect(designCheckbox.checked).toBe(false)
+
+      expect(queryByText('Toggle group StudentRole')).toBeInTheDocument()
+      expect(queryByText('Toggle group SubTeacherRole')).toBeInTheDocument()
+      expect(queryByText('Toggle group DesignRole')).toBeInTheDocument()
+    })
   })
 })

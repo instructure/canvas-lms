@@ -45,6 +45,7 @@
     "fmt:fix": "prettier --write '**/*.js*' '**/*.ts*'",
     "clean": "rm -rf lib && yarn clean:es && rm -rf coverage && yarn demo:clean",
     "clean:es": "rm -rf es",
+    "check:ts": "tsc -p tsconfig.json",
     "generate-svgs": "yarn build:es && node --experimental-modules scripts/generateSvgs.js && prettier --write src/rce/plugins/instructure_equation/MathIcon/svgs.js",
     "publishToNpm": "scripts/publish_to_npm.sh"
   },
@@ -80,6 +81,7 @@
     "@instructure/emotion": "^8.39",
     "@instructure/k5uploader": "*",
     "@instructure/media-capture": "^9.0.0",
+    "@instructure/postcss-themeable-styles": "^7",
     "@instructure/theme-registry": "^8",
     "@instructure/ui-a11y-content": "^8",
     "@instructure/ui-a11y-utils": "^8",
@@ -109,6 +111,7 @@
     "@instructure/ui-overlays": "^8",
     "@instructure/ui-pagination": "^8",
     "@instructure/ui-popover": "^8",
+    "@instructure/ui-postcss-config": "^7",
     "@instructure/ui-radio-input": "^8",
     "@instructure/ui-react-utils": "^8",
     "@instructure/ui-simple-select": "^8",

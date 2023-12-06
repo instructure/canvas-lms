@@ -165,9 +165,14 @@ class EnrollmentState < ActiveRecord::Base
         # Not strictly within any range so no translation needed
         self.state = wf_state
       elsif global_start_at < now
-        # we've past the end date so no matter what the state was, we're "completed" now
+        if enrollment.temporary_enrollment?
+          # special case for temporary enrollments, mark them deleted once we're past the end date
+          enrollment.destroy
+        else
+          # we've past the end date so no matter what the state was, we're "completed" now
+          self.state = "completed"
+        end
         self.state_started_at = ranges.filter_map(&:last).min
-        self.state = "completed"
       elsif enrollment.fake_student? # rubocop:disable Lint/DuplicateBranch
         # Allow student view students to use the course before the term starts
         self.state = wf_state

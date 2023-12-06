@@ -19,6 +19,9 @@
 import React from 'react'
 import {render, act, fireEvent, waitFor} from '@testing-library/react'
 import HomeroomPage from '../HomeroomPage'
+import {enableFetchMocks} from 'jest-fetch-mock'
+
+enableFetchMocks()
 
 describe('HomeroomPage', () => {
   const getProps = (overrides = {}) => ({

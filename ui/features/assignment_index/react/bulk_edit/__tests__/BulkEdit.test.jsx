@@ -24,6 +24,9 @@ import tokyo from 'timezone/Asia/Tokyo'
 import anchorage from 'timezone/America/Anchorage'
 import moment from 'moment-timezone'
 import BulkEdit from '../BulkEdit'
+import {enableFetchMocks} from 'jest-fetch-mock'
+
+enableFetchMocks()
 
 // grab this before fake timers replace it
 const realSetTimeout = setTimeout

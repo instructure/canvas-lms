@@ -19,11 +19,13 @@
 
 require_relative "../helpers/context_modules_common"
 require_relative "page_objects/modules_index_page"
+require_relative "page_objects/modules_settings_tray"
 
 describe "context modules" do
   include_context "in-process server selenium tests"
   include ContextModulesCommon
   include ModulesIndexPage
+  include ModulesSettingsTray
 
   context "module index tool placement" do
     before do
@@ -166,14 +168,33 @@ describe "context modules" do
     end
 
     it "adds links to newly created modules" do
+      Account.site_admin.disable_feature! :differentiated_modules
       get "/courses/#{@course.id}/modules"
-
       f(".add_module_link").click
       wait_for_ajaximations
       form = f("#add_context_module_form")
       replace_content(form.find_element(:id, "context_module_name"), "new module")
       submit_form(form)
       wait_for_ajaximations
+
+      new_module = ContextModule.last
+      expect(new_module.name).to eq "new module"
+
+      gear = f("#context_module_#{new_module.id} .header .al-trigger")
+      gear.click
+      link = f("#context_module_#{new_module.id} .header li a.menu_tool_link")
+      expect(link).to be_displayed
+      expect(link.text).to match_ignoring_whitespace(@tool.label_for(:module_menu))
+      expect(link["href"]).to eq course_external_tool_url(@course, @tool, launch_type: "module_menu", modules: [new_module.id])
+    end
+
+    it "adds links to newly created modules with differentiated modules tray" do
+      Account.site_admin.enable_feature! :differentiated_modules
+
+      go_to_modules
+      click_new_module_link
+      update_module_name("new module")
+      click_add_tray_add_module_button
 
       new_module = ContextModule.last
       expect(new_module.name).to eq "new module"

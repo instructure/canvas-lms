@@ -18,10 +18,11 @@
 
 .header-bar {
   @include clearfix;
-  border-bottom: 1px solid $ic-border-light;
   background-color: #fff;
   min-height: 33px;
   padding-bottom: $ic-sp;
+  display: flex;
+  align-items: center;
 
   &.pinned {
     position: fixed;
@@ -50,12 +51,22 @@
   }
   // helpers for alignment, use .row-fluid and .span classes to align where possible instead of these
   .header-bar-right {
-    float: direction(right);
-    padding-bottom: 5px;
+    margin-#{direction(left)}: auto;
+
+    .kebab-trigger {
+      margin: 0 12px;
+    }
+  }
+  .no-font-size {
+    font-size: 0;
   }
   .header-bar-left {
-    float: direction(left);
-    padding-bottom: 5px;
+    margin-#{direction(right)}: auto;
+
+    .quizzes-header {
+      margin: 0;
+      line-height: 1;
+    }
   }
   &.no-line {
     border: none;
@@ -72,4 +83,5 @@
 
 #searchTerm {
   width: 225px;
+  margin-bottom: 0;
 }

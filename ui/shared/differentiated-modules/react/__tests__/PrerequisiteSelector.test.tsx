@@ -69,7 +69,7 @@ describe('PrerequisiteSelector', () => {
 
   it('calls onDropPrerequisite when the remove button is clicked', () => {
     const {getByText} = renderComponent()
-    getByText('Remove Prerequisite').click()
+    getByText('Remove Module 1 Prerequisite').click()
     expect(props.onDropPrerequisite).toHaveBeenCalledWith(0)
   })
 })

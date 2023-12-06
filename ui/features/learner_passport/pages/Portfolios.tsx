@@ -18,7 +18,7 @@
 
 import React, {useEffect} from 'react'
 import {useMatch} from 'react-router-dom'
-import {Portfolios} from '../components/Portfolios'
+import {PortfolioLayout} from '../components/Portfolios'
 
 export function Component() {
   const pathMatch = useMatch('/users/:userId/*')
@@ -30,5 +30,5 @@ export function Component() {
     document.title = 'Learner Passport: Portfolios'
   }, [])
 
-  return <Portfolios />
+  return <PortfolioLayout />
 }

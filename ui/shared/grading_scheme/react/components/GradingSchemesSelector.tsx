@@ -46,6 +46,7 @@ interface ComponentProps {
   courseDefaultSchemeId?: string
   initiallySelectedGradingSchemeId?: string
   pointsBasedGradingSchemesEnabled: boolean
+  archivedGradingSchemesEnabled: boolean
   onChange: (gradingStandardId?: string) => any
 }
 export const GradingSchemesSelector = ({
@@ -56,6 +57,7 @@ export const GradingSchemesSelector = ({
   contextId,
   courseDefaultSchemeId,
   pointsBasedGradingSchemesEnabled,
+  archivedGradingSchemesEnabled,
 }: ComponentProps) => {
   if (initiallySelectedGradingSchemeId === '0' || initiallySelectedGradingSchemeId === '') {
     initiallySelectedGradingSchemeId = undefined
@@ -257,6 +259,7 @@ export const GradingSchemesSelector = ({
                 onUpdate={handleUpdatedGradingScheme}
                 onDelete={() => handleDeletedGradingScheme(selectedGradingSchemeId)}
                 pointsBasedGradingSchemesEnabled={pointsBasedGradingSchemesEnabled}
+                archivedGradingSchemesEnabled={archivedGradingSchemesEnabled}
               />
             ) : courseDefaultSchemeId && courseDefaultSchemeId !== '0' ? (
               <GradingSchemeViewEditModal
@@ -267,6 +270,7 @@ export const GradingSchemesSelector = ({
                 onUpdate={handleUpdatedGradingScheme}
                 onDelete={() => handleDeletedGradingScheme(courseDefaultSchemeId)}
                 pointsBasedGradingSchemesEnabled={pointsBasedGradingSchemesEnabled}
+                archivedGradingSchemesEnabled={archivedGradingSchemesEnabled}
               />
             ) : (
               <GradingSchemeViewCopyTemplateModal
@@ -306,6 +310,7 @@ export const GradingSchemesSelector = ({
                   contextType={contextType}
                   onGradingSchemesChanged={handleGradingSchemesChanged}
                   pointsBasedGradingSchemesEnabled={pointsBasedGradingSchemesEnabled}
+                  archivedGradingSchemesEnabled={archivedGradingSchemesEnabled}
                 />
               </>
             </Modal.Body>

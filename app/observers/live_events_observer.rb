@@ -45,6 +45,7 @@ class LiveEventsObserver < ActiveRecord::Observer
           :outcome_proficiency,
           :outcome_calculation_method,
           :outcome_friendly_description,
+          :rubric_assessment,
           :sis_batch,
           :submission_comment,
           :submission,
@@ -75,6 +76,12 @@ class LiveEventsObserver < ActiveRecord::Observer
   def after_destroy(obj)
     obj.class.connection.after_transaction_commit do
       Canvas::LiveEventsCallbacks.after_destroy(obj)
+    end
+  end
+
+  def after_save(obj)
+    obj.class.connection.after_transaction_commit do
+      Canvas::LiveEventsCallbacks.after_save(obj)
     end
   end
 end

@@ -2509,7 +2509,6 @@ class Course < ActiveRecord::Base
          opts[:temporary_enrollment_pairing_id]
         source_user_id = opts[:temporary_enrollment_source_user_id]
         pairing_id = opts[:temporary_enrollment_pairing_id]
-        scope = scope.where(temporary_enrollment_source_user_id: source_user_id, temporary_enrollment_pairing_id: pairing_id)
       end
       e = if opts[:allow_multiple_enrollments]
             scope.where(course_section_id: section.id).first

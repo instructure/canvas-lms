@@ -22,6 +22,9 @@ import {render} from '@testing-library/react'
 import {mount} from 'enzyme'
 import PublishButton from '../PublishButton'
 import * as apiClient from '@canvas/courses/courseAPIClient'
+import {enableFetchMocks} from 'jest-fetch-mock'
+
+enableFetchMocks()
 
 jest.mock('@canvas/courses/courseAPIClient')
 

@@ -1,32 +1,46 @@
-<h1 class="screenreader-only">{{#t "quizzes_title"}}Quizzes{{/t}}</h1>
+{{#unless features.instui_nav}}
+  <h1 class="screenreader-only">{{#t "quizzes_title"}}Quizzes{{/t}}</h1>
+{{/unless}}
+
 <div class="header-bar">
-  <div class="header-bar-left form-inline">
-    <label class="hidden-inline-text" for="searchTerm">{{#t "search_for_quiz"}}Search for Quiz{{/t}}</label>
-    <input id="searchTerm" placeholder="{{#t "search_for_quiz"}}Search for Quiz{{/t}}" value="" type="search" />
+  <div class="header-bar-left">
+    {{#if features.instui_nav}}
+      <h1 class="quizzes-header">{{#t}}Quizzes{{/t}}</h1>
+    {{else}}
+      <label class="hidden-inline-text" for="searchTerm">{{#t "search_for_quiz"}}Search for Quiz{{/t}}</label>
+      <input id="searchTerm" placeholder="{{#t "search_for_quiz"}}Search for Quiz{{/t}}" value="" type="search" />
+    {{/if}}
   </div>
 
   {{#ifAny permissions.create permissions.manage}}
-    <div class="header-bar-right">
-      {{#if permissions.create}}
-        {{#if flags.quiz_lti_enabled}}
-          <button class="btn btn-primary choose-quiz-engine"
-            title='{{#t}}Add Quiz{{/t}}'
-            aria-label='{{#t}}Add Quiz{{/t}}'>
-            <i class="icon-plus" />&nbsp;{{#t}}Quiz{{/t}}
-          </button>
-        {{else}}
-          <form class="new-quiz-form" action="{{urls.new_quiz_url}}" method="post">
-            <input type="hidden" name="authenticity_token" />
-            <button class="btn btn-primary new-quiz-link"
+    <div class="header-bar-right {{#if features.instui_nav}}no-font-size{{/if}}">
+      {{#if features.instui_nav}}
+        <label class="hidden-inline-text" for="searchTerm">{{#t "search_for_quiz"}}Search for Quiz{{/t}}</label>
+        <input id="searchTerm" placeholder="{{#t "quiz_search"}}Search...{{/t}}" value="" type="search" />
+      {{/if}}
+
+      {{#unless features.instui_nav}}
+        {{#if permissions.create}}
+          {{#if flags.quiz_lti_enabled}}
+            <button class="btn btn-primary choose-quiz-engine"
               title='{{#t}}Add Quiz{{/t}}'
               aria-label='{{#t}}Add Quiz{{/t}}'>
               <i class="icon-plus" />&nbsp;{{#t}}Quiz{{/t}}
             </button>
-          </form>
+          {{else}}
+            <form class="new-quiz-form" action="{{urls.new_quiz_url}}" method="post">
+              <input type="hidden" name="authenticity_token" />
+              <button class="btn btn-primary new-quiz-link"
+                title='{{#t}}Add Quiz{{/t}}'
+                aria-label='{{#t}}Add Quiz{{/t}}'>
+                <i class="icon-plus" />&nbsp;{{#t}}Quiz{{/t}}
+              </button>
+            </form>
+          {{/if}}
         {{/if}}
-      {{/if}}
+      {{/unless}}
 
-      <div class="inline-block">
+      <div class="inline-block {{#if features.instui_nav}}kebab-trigger{{/if}}">
         <a class="al-trigger btn" role="button" aria-haspopup="true" href="#">
           <i class="icon-more" aria-hidden="true"></i>
           <span class="screenreader-only">{{#t}}Quiz Settings{{/t}}</span>
@@ -59,10 +73,31 @@
           {{>ui/shared/external-tools/jst/_external_tools_menu.handlebars quizIndexPlacements}}
         </ul>
       </div>
+
+      {{#if features.instui_nav}}
+        {{#if permissions.create}}
+          {{#if flags.quiz_lti_enabled}}
+            <button class="btn btn-primary choose-quiz-engine"
+              title='{{#t}}Add Quiz{{/t}}'
+              aria-label='{{#t}}Add Quiz{{/t}}'>
+              <i class="icon-plus" />&nbsp;{{#t}}Create Quiz{{/t}}
+            </button>
+          {{else}}
+            <form class="new-quiz-form" action="{{urls.new_quiz_url}}" method="post">
+              <input type="hidden" name="authenticity_token" />
+              <button class="btn btn-primary new-quiz-link"
+                title='{{#t}}Add Quiz{{/t}}'
+                aria-label='{{#t}}Add Quiz{{/t}}'>
+                <i class="icon-plus" />&nbsp;{{#t}}Create Quiz{{/t}}
+              </button>
+            </form>
+          {{/if}}
+        {{/if}}
+      {{/if}}
     </div>
   {{else}}
     {{#if permissions.read_question_banks}}
-      <div class="header-bar-right form-inline">
+      <div class="header-bar-right">
         <a href="{{urls.question_banks_url}}" class="btn view_question_banks"
            title='{{#t}}View Question Banks{{/t}}'
            aria-label='{{#t}}View Question Banks{{/t}}'>
@@ -79,18 +114,18 @@
 
 <div class="item-group-container">
   {{#if hasNoQuizzes}}
-  <div data-view="no_quizzes" class="item-group-condensed"></div>
+    <div data-view="no_quizzes" class="item-group-condensed"></div>
   {{/if}}
 
   {{#if hasAssignmentQuizzes}}
-  <div data-view="assignment" class="item-group-condensed"></div>
+    <div data-view="assignment" class="item-group-condensed"></div>
   {{/if}}
 
   {{#if hasOpenQuizzes}}
-  <div data-view="open" class="item-group-condensed"></div>
+    <div data-view="open" class="item-group-condensed"></div>
   {{/if}}
 
   {{#if hasSurveys}}
-  <div data-view="surveys" class="item-group-condensed"></div>
+    <div data-view="surveys" class="item-group-condensed"></div>
   {{/if}}
 </div>

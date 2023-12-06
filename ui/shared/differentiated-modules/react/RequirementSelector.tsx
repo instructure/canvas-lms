@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useMemo} from 'react'
+import React, {useEffect, useMemo, useRef} from 'react'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
@@ -56,6 +56,8 @@ export interface RequirementSelectorProps {
   onDropRequirement: (index: number) => void
   onUpdateRequirement: (module: Requirement, index: number) => void
   index: number
+  focusDropdown?: boolean
+  focusDeleteButton?: boolean
 }
 
 export default function RequirementSelector({
@@ -64,7 +66,11 @@ export default function RequirementSelector({
   onDropRequirement,
   onUpdateRequirement,
   index,
+  focusDropdown = false,
+  focusDeleteButton = false,
 }: RequirementSelectorProps) {
+  const removeButton = useRef<Element | null>(null)
+  const dropdown = useRef<HTMLInputElement | null>(null)
   const requirementTypeOptions = useMemo(() => {
     const requirementTypes = requirementTypesForResource(requirement.resource)
     return requirementTypes.map(type => {
@@ -73,6 +79,15 @@ export default function RequirementSelector({
   }, [requirement.resource])
 
   const options = useMemo(() => groupBy(moduleItems, 'resource'), [moduleItems])
+
+  useEffect(() => {
+    // @ts-expect-error
+    focusDeleteButton && removeButton.current?.focus()
+  }, [focusDeleteButton, removeButton])
+
+  useEffect(() => {
+    focusDropdown && dropdown.current?.focus()
+  }, [focusDropdown, dropdown])
 
   return (
     <View data-testid="module-requirement-card" as="div" borderRadius="medium" borderWidth="small">
@@ -83,9 +98,12 @@ export default function RequirementSelector({
           </Flex.Item>
           <Flex.Item padding="0 0 small 0">
             <IconButton
+              elementRef={el => (removeButton.current = el)}
               renderIcon={<IconTrashLine color="error" />}
               onClick={() => onDropRequirement(index)}
-              screenReaderLabel={I18n.t('Remove Requirement')}
+              screenReaderLabel={I18n.t('Remove %{name} Content Requirement', {
+                name: requirement.name,
+              })}
               withBackground={false}
               withBorder={false}
             />
@@ -93,7 +111,9 @@ export default function RequirementSelector({
         </Flex>
         <View as="div" padding="0 0 small 0">
           <CanvasSelect
-            id="requirement-item"
+            id={`requirement-item-${index}`}
+            // @ts-expect-error
+            inputRef={el => (dropdown.current = el)}
             value={requirement.name}
             label={<ScreenReaderContent>{I18n.t('Select Module Item')}</ScreenReaderContent>}
             onChange={(_event, value) => {
@@ -120,11 +140,11 @@ export default function RequirementSelector({
           </CanvasSelect>
         </View>
         <CanvasSelect
-          id="requirement-type"
+          id={`requirement-type-${index}`}
           value={requirement.type}
           label={<ScreenReaderContent>{I18n.t('Select Requirement Type')}</ScreenReaderContent>}
-          onChange={event => {
-            onUpdateRequirement({...requirement, type: event.target.id} as Requirement, index)
+          onChange={(_event, value) => {
+            onUpdateRequirement({...requirement, type: value} as Requirement, index)
           }}
         >
           {requirementTypeOptions.map(({type, label}) => {

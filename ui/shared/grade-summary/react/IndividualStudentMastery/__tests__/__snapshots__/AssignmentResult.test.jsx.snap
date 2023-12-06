@@ -25,7 +25,7 @@ exports[`renders the AlignmentResult component 1`] = `
       isWithinText={false}
       renderIcon={[Function]}
       themeOverride={
-        Object {
+        {
           "fontWeight": "700",
           "mediumHeight": "normal",
           "mediumPaddingHorizontal": "0",
@@ -88,11 +88,11 @@ exports[`renders the AlignmentResult component 1`] = `
           points={1}
           pointsPossible={5}
           tiers={
-            Array [
-              Object {
+            [
+              {
                 "description": "My first rating",
               },
-              Object {
+              {
                 "description": "My second rating",
               },
             ]

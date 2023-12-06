@@ -27,9 +27,9 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import ModuleAssignments, {AssigneeOption} from './ModuleAssignments'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashAlert, showFlashError} from '@canvas/alerts/react/FlashAlert'
-import {Spinner} from '@instructure/ui-spinner'
 import {generateAssignmentOverridesPayload, updateModuleUI} from '../utils/assignToHelper'
 import {AssignmentOverride} from './types'
+import LoadingOverlay from './LoadingOverlay'
 
 const I18n = useI18nScope('differentiated_modules')
 
@@ -40,6 +40,7 @@ export interface AssignToPanelProps {
   moduleId: string
   moduleElement: HTMLDivElement
   onDismiss: () => void
+  mountNodeRef: React.RefObject<HTMLElement>
 }
 
 interface Option {
@@ -68,6 +69,7 @@ export default function AssignToPanel({
   courseId,
   moduleId,
   moduleElement,
+  mountNodeRef,
   onDismiss,
 }: AssignToPanelProps) {
   const [selectedOption, setSelectedOption] = useState<string>(OPTIONS[0].value)
@@ -150,10 +152,9 @@ export default function AssignToPanel({
     setSelectedOption(value)
   }, [])
 
-  if (isLoading) return <Spinner renderTitle={I18n.t('Loading')} size="small" />
-
   return (
     <Flex direction="column" justifyItems="start">
+      <LoadingOverlay showLoadingOverlay={isLoading} mountNode={mountNodeRef.current} />
       <Flex.Item padding="medium medium small" size={bodyHeight}>
         <Flex direction="column" justifyItems="start">
           <Flex.Item>
@@ -164,9 +165,9 @@ export default function AssignToPanel({
           <Flex.Item overflowX="hidden">
             <RadioInputGroup description={I18n.t('Select Access Type')} name="access_type">
               {OPTIONS.map(option => (
-                <Flex key={option.value}>
+                <Flex key={option.value} justifyItems="start">
                   <Flex.Item align="start">
-                    <View as="div" margin="none">
+                    <View as="div" margin="xx-small">
                       <RadioInput
                         data-testid={`${option.value}-option`}
                         value={option.value}
@@ -180,13 +181,13 @@ export default function AssignToPanel({
                     <View as="div" margin="none">
                       <Text>{option.getLabel()}</Text>
                     </View>
-                    <View as="div" margin="none">
+                    <View as="div" margin="none x-large none none">
                       <Text color="secondary" size="small">
                         {option.getDescription()}
                       </Text>
                     </View>
                     {option.value === OPTIONS[1].value && selectedOption === OPTIONS[1].value && (
-                      <View as="div" margin="small large none none">
+                      <View as="div" margin="small x-large none none">
                         <ModuleAssignments
                           courseId={courseId}
                           onSelect={handleSelect}

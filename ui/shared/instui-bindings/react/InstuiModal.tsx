@@ -101,4 +101,6 @@ export default function CanvasInstUIModal({
   )
 }
 
-;['Header', 'Body', 'Footer'].forEach(prop => (CanvasInstUIModal[prop] = Modal[prop]))
+CanvasInstUIModal.Header = Modal.Header
+CanvasInstUIModal.Body = Modal.Body
+CanvasInstUIModal.Footer = Modal.Footer

@@ -187,6 +187,7 @@ export default function FrequencyPicker({
 
   const handleDismissModal = useCallback(() => {
     setIsModalOpen(false)
+    handleCloseModal()
     let freq: FrequencyOptionValue
     if (currRRule === null) {
       freq = 'not-repeat'
@@ -197,7 +198,7 @@ export default function FrequencyPicker({
       }
     }
     setFrequency(freq)
-  }, [currRRule, parsedMoment])
+  }, [currRRule, parsedMoment, handleCloseModal])
 
   const handleSaveCustomRecurrence = useCallback(
     (newRRule: string) => {

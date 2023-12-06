@@ -17,12 +17,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require "yaml"
+require_relative "openapi/openapi_spec_helper"
 
 describe Lti::IMS::DynamicRegistrationController do
-  before do
-    Account.default.root_account.enable_feature! :lti_dynamic_registration
-  end
-
   let(:controller_routes) do
     dynamic_registration_routes = []
     CanvasRails::Application.routes.routes.each do |route|
@@ -32,9 +29,19 @@ describe Lti::IMS::DynamicRegistrationController do
     dynamic_registration_routes
   end
 
-  let(:openapi_spec) do
-    openapi_location = File.join(File.dirname(__FILE__), "openapi", "dynamic_registration.yml")
-    YAML.load_file(openapi_location)
+  openapi_location = File.join(File.dirname(__FILE__), "openapi", "dynamic_registration.yml")
+  openapi_spec = YAML.load_file(openapi_location)
+
+  verifier = OpenApiSpecHelper::SchemaVerifier.new(openapi_spec)
+
+  before do
+    Account.default.root_account.enable_feature! :lti_dynamic_registration
+  end
+
+  after do
+    return unless request && response
+
+    verifier.verify(request, response)
   end
 
   it "has openapi documentation for each of our controller routes" do
@@ -115,7 +122,7 @@ describe Lti::IMS::DynamicRegistrationController do
         "client_name" => "the client name",
         "jwks_uri" => "https://example.com/api/jwks",
         "token_endpoint_auth_method" => "private_key_jwt",
-        "scope" => scopes.join(","),
+        "scope" => scopes.join(" "),
         "https://purl.imsglobal.org/spec/lti-tool-configuration" => {
           "domain" => "example.com",
           "messages" => [{
@@ -151,28 +158,34 @@ describe Lti::IMS::DynamicRegistrationController do
       end
 
       context "and with valid registration params" do
-        subject { get :create, params: { registration_token: valid_token, **registration_params } }
+        subject { post :create, params: { registration_token: valid_token, **registration_params } }
 
         it "accepts valid params and creates a registration model" do
           subject
           parsed_body = response.parsed_body
-          expected_response_keys = registration_params
-          expected_response_keys["lti_tool_configuration"] = registration_params["https://purl.imsglobal.org/spec/lti-tool-configuration"]
-          expected_response_keys.delete("https://purl.imsglobal.org/spec/lti-tool-configuration")
-          expected_response_keys["scopes"] = scopes
-          expected_response_keys.delete("scope")
+          expected_response_keys = {
+            "application_type" => registration_params["application_type"],
+            "grant_types" => registration_params["grant_types"],
+            "initiate_login_uri" => registration_params["initiate_login_uri"],
+            "redirect_uris" => registration_params["redirect_uris"],
+            "response_types" => registration_params["response_types"],
+            "client_name" => registration_params["client_name"],
+            "jwks_uri" => registration_params["jwks_uri"],
+            "token_endpoint_auth_method" => registration_params["token_endpoint_auth_method"],
+            "scope" => registration_params["scope"],
+          }
 
-          expect(parsed_body["registration"]).to include(expected_response_keys)
+          expect(parsed_body).to include(expected_response_keys)
+          expect(parsed_body["client_id"]).to eq DeveloperKey.last.global_id.to_s
           created_registration = Lti::IMS::Registration.last
           expect(created_registration).not_to be_nil
-          expect(parsed_body["registration"]["id"]).to eq(created_registration.id)
-          expect(created_registration["scopes"]).to eq(scopes)
         end
 
         it "fills in values on the developer key" do
           subject
           dk = DeveloperKey.last
           expect(dk.name).to eq(registration_params["client_name"])
+          expect(dk.scopes).to eq(scopes)
           expect(dk.account.id).to eq(token_hash[:root_account_global_id])
           expect(dk.redirect_uris).to eq(registration_params["redirect_uris"])
           expect(dk.public_jwk_url).to eq(registration_params["jwks_uri"])
@@ -182,7 +195,7 @@ describe Lti::IMS::DynamicRegistrationController do
       end
 
       context "and with invalid registration params" do
-        subject { get :create, params: { registration_token: valid_token, **invalid_registration_params } }
+        subject { post :create, params: { registration_token: valid_token, **invalid_registration_params } }
 
         let(:invalid_registration_params) do
           wrong_grant_types = registration_params
@@ -205,7 +218,7 @@ describe Lti::IMS::DynamicRegistrationController do
     end
 
     context "with an invalid token" do
-      subject { get :create, params: { registration_token: invalid_token, **registration_params } }
+      subject { post :create, params: { registration_token: invalid_token, **registration_params } }
 
       context "from more than an hour ago" do
         let(:invalid_token) do

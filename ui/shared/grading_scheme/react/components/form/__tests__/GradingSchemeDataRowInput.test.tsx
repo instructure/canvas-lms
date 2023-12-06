@@ -44,6 +44,7 @@ const testProps = {
   onRowAddRequested,
   pointsBased: false,
   displayScalingFactor: 1,
+  archivedGradingSchemesEnabled: false,
 }
 
 describe('GradingSchemeDataRowInput', () => {
@@ -202,6 +203,7 @@ describe('GradingSchemeDataRowInput', () => {
       onRowAddRequested,
       pointsBased: true,
       displayScalingFactor: 3.0,
+      archivedGradingSchemesEnabled: false,
     }
 
     render(
