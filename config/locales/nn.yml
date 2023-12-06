@@ -186,6 +186,7 @@ nn:
   a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "Ei fil med namnet %{itemName} finst allereie i denne mappa."
   a_file_named_name_already_exists_do_you_want_to_re_6536980: "Ei fil med namnet \"%{name}\" finst allereie. Vil du erstatte den eksisterande fila? "
   a_file_named_name_already_exists_in_this_folder_do_e39de0b2: "Ei fil med namnet \"%{name}\" finst allereie i denne mappa. Vil du erstatte den eksisterandre fila?"
+  a_filter_with_that_name_already_exists_9bba05bc: "Eit filter med det namnet finst allereie"
   a_front_page_is_required_fd57b80: "Forside er obligatorisk"
   a_full_size_logo_that_appears_in_the_right_sidebar_18873685: "Ein logo i full storleik i høgre sidestolpe på Canvas-skrivebordet. Ideell storleik er 360 x 140 pikslar. Aksepterte format: .svg, .png, .jpeg, .gif"
   a_great_discussion_6526a6d9: "Ein glimrande diskusjon"
@@ -194,11 +195,14 @@ nn:
   a_locked_file_named_name_already_exists_in_this_fo_33ca9a0c: "Ei låst fil med namnet \"%{name}\" finst allereie i denne mappa. Gi fila eit nytt namn."
   a_locked_file_named_name_already_exists_please_ent_3b2e65a: "Ein låst fil med namnet \"%{name}\" finst allereie. Skriv inn eit anna namn."
   a_locked_item_named_name_already_exists_in_this_lo_ab03ee39: "Eit låst element med namnet \"%{name}\" finst allereie. Skriv inn eit anna namn."
+  a_maximum_of_limit_events_may_be_created_b08f97d2: "Maksimum%{limit}hendingar kan opprettast"
   a_message_is_required_129e1814: "Ei melding er nødvendig"
   a_microsoft_365_group_must_have_owners_and_no_user_96f91864: "Ei Microsoft 365-gruppe må ha eigarar, og ingen brukarar som tilsvarer faglærarane i Canvas-emnet, kan bli funnen på Microsoft-sida. Dersom du nyleg la til eller fjerna emneeigarar, kan ei ny synkronisering løyse dette problemet."
   a_name_for_this_set_is_required_222bad23: "Eit namn er obligatorisk. "
   a_name_is_required_b5df38a9: "Eit namn er obligatorisk"
   a_new_assignment_has_been_created_for_your_course__12b72639: "Ei ny oppgåve er oppretta for emnet ditt, %{course_name}"
+  a_new_module_has_been_created_with_the_content_ret_b01468b2: "Ein ny modul er blitt oppretta med innhaldet som vart returnert frå verktøyet. Om du vil sjå det, kan du gå til Modular."
+  a_page_with_this_title_already_exists_please_choos_19c53cc4: "Ei side med denne tittelen finst allereie. Vennligst vel ein annan tittel."
   a_partner_id_is_required_to_use_academic_benchmark_adba3df0: "Ein partnar-ID er nødvendig for å bruke Academic Benchmarks"
   a_partner_key_is_required_to_use_academic_benchmar_da9f31bd: "Ein partnarnøkkel er nødvendig for å bruke Academic Benchmarks"
   a_problem_occurred_adding_reviewers_57b083d9: "Det oppstod eit problem då nye fagfellevurderarar blei lagt til."
@@ -4281,6 +4285,7 @@ nn:
   at_least_one_section_must_be_selected_to_post_grad_2c140f52: "Minst ein seksjon må vere vald for å poste vurderingsresultat til seksjonar."
   at_the_bottom_a6a5f0fe: Nedst
   at_the_top_fa836591: Øvst
+  atom_no_author: "Utan forfattar"
   attach_4234a79b: "Legg ved"
   attach_a_file_86a4fc00: "Legg ved ei fil"
   attach_files_to_discussions_bd16c245: "Legg filer til diskusjonar"
@@ -5811,6 +5816,9 @@ nn:
   comment_by_replying_to_this_message_or_join_the_co_886bc612: "Kommentér ved å svare på denne meldinga, eller delta i samtalen ved å bruke linken: %{link}. Om du vil inkludere eit vedlegg i svarmeldnga, må du logge inn i Canvas og svare på kunngjeringa der. "
   comment_destroyed_5cfc922d: "Kommentar sletta"
   comment_failed_to_post_please_try_again_later_e2d19a0a: "Kunne ikkje poste kommentar. Prøv på nytt seinare."
+  comment_from_files: 
+    one: "Sjå vedlagde fil"
+    other: "Sjå vedlagde filer"
   comment_input_box_b8c7e58b: Kommentarfelt
   comment_library_84735835: Kommentarbibliotek
   comment_library_suggestions_disabled_ae04eb77: "Kommentarbibliotek (forslag ikkje slått på)"
@@ -9696,6 +9704,7 @@ nn:
       criterion_long_description: "Lang skildring av kriterium"
       edit_rubric_rating: "Rediger vurdering"
       find_existing_rubric: "Finn gjeldande vurderingsskjema"
+  edit_rubric_7d4d139d: "Rediger vurderingsskjema"
   edit_rubric_title_104d6fd2: "Endre vurderingsskjema: %{title}"
   edit_section_name_558cc89: "Rediger seksjon \"%{name}\""
   edit_status_612572db: "Rediger status"
@@ -10330,6 +10339,7 @@ nn:
   errors: 
     bad_navigation_config: "Ugyldig konfigurasjon av emnefane"
     blank: Obligatorisk
+    cannot_save_att: "Du har ikkje løyve til å redigere det låste attributtet %{att_name}"
     format: "%{attribute} %{message}"
     index: 
       all_categories: "- Alle kategoriar -"
@@ -10690,6 +10700,8 @@ nn:
   features_2581da: Funksjonar
   federated_attributes_5cbe6441: "Felles attributter"
   federated_attributes_are_information_sent_from_you_2116fb61: "Fellesattributter er informasjon som sendast frå den gjeldande autentiseringstenesta og som nyttast til å automatisk oppdatere korresponderande brukarinformasjon i Canvas kvar gong ein brukar loggar inn.  "
+  feed_entry_title: "Oppgåve: %{assignment}"
+  feed_entry_title_with_course: "Oppgåve, %{course}: %{assignment}"
   feed_url_8a433438: Datastraum-URL
   feed_url_is_required_253fda4e: "Aktivitetsstrøm-URL er obligatorisk"
   feedback_6dcc1991: Tilbakemelding
@@ -13549,6 +13561,7 @@ nn:
   label_selected_list_collapsed_d93e77da: "%{label} vald. Liste skjult."
   label_values_76f4b5fa: "Merk verdiar"
   labels: 
+    due: Frist
     lock_module_until: "Lås til"
   language_6b3e2c7c: Språk
   language_arts_35b79a8b: Språkvitskap
@@ -23117,6 +23130,7 @@ nn:
   student_activity_and_performance_career_step_585731dc: "Aktivitet og prestasjon - Career Step"
   student_activity_and_performance_de2e0754: "Aktivitet og prestasjon til student"
   student_activity_tracking_90bdd519: "Spor studentaktivitet"
+  student_annotation: "ein studentmerknad"
   student_annotation_assignments_are_not_currently_s_d840064b: "Studentmerknader er foreløbig ikkje mogleg i gruppeoppgåver"
   student_annotation_documents_c0f5c4ec: "Studentmerknader Dokument"
   student_annotation_f6810b5c: "Studentmerknader "
@@ -23315,6 +23329,8 @@ nn:
       graded: vurdert
       submitted: levert
       unsubmitted: "ikkje levert"
+  submission_action_take_quiz: "Ta %{title}"
+  submission_action_turn_in_assignment: "Lever %{title}"
   submission_added_title_50ebdc85: "innlevering lagt til: %{title}"
   submission_annotation_user_name_assignment_title_c_39910597: "Innleveringsmerknad: %{user_name}, %{assignment_title}, %{course_name}"
   submission_comment: 
@@ -23373,6 +23389,16 @@ nn:
   submission_type_displayname_currently_selected_3f8aa9f8: "Type innlevering%{displayName}, som no er valt"
   submission_type_lti_placement_b448d5d0: "Oppgåvetype LTI plassering"
   submission_type_selection_72ce19f: "Vel innleveringstype"
+  submission_types: 
+    a_content_page: "ei innhaldsside"
+    a_discussion_post: "eit diskusjonsinnlegg"
+    a_file_upload: "ei filopplasting"
+    a_media_recording: "ei mediainnspeling"
+    a_quiz: "ein quiz"
+    a_text_entry_box: teksteditoren
+    a_website_url: "ei URL-adresse til ein nettstad"
+    external_tool: "eit eksternt verktøy"
+    on_paper: "på papir"
   submission_types_79f7b436: "Innleveringstypar:"
   submission_updated_8897f3b7: "Innlevering oppdatert"
   submission_user_name_assignment_title_2cf5e3e9: "Innlevering: %{user_name},%{assignment_title}"
