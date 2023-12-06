@@ -4122,6 +4122,7 @@ fa:
   at_least_one_section_must_be_selected_to_post_grad_2c140f52: "حداقل باید یک بخش برای ارسال نمرات براساس بخش انتخاب شود."
   at_the_bottom_a6a5f0fe: "در پایین"
   at_the_top_fa836591: "در بالا"
+  atom_no_author: "نویسنده موجود نیست"
   attach_4234a79b: "پیوست کردن"
   attach_a_file_86a4fc00: "پیوست کردن یک فایل"
   attach_files_to_discussions_bd16c245: "پیوست کردن فایل ها به بحث ها"
@@ -5602,6 +5603,9 @@ fa:
   comment_by_replying_to_this_message_or_join_the_co_886bc612: " شما می‌توانید  با پاسخ دادن به این پیام نظر دهید و یا با استفاده از پیوند %{link}  به مکالمه ملحق شوید. هنگامی که مجاز است، اگر نیاز به یک ضمیمه دارید، لطفا به کانواس وارد شوید و به اطلاعیه پاسخ دهید."
   comment_destroyed_5cfc922d: "کامنت نابود شد"
   comment_failed_to_post_please_try_again_later_e2d19a0a: "اظهار نظر درج نشد!لطفا دوباره تلاش کنید."
+  comment_from_files: 
+    one: "مشاهده فایل های پیوست شده"
+    other: "مشاهده فایل های پیوست شده"
   comment_input_box_b8c7e58b: "کادر ورودی نظر"
   comment_library_84735835: "کتابخانه نظرات"
   comment_library_suggestions_disabled_ae04eb77: "کتابخانه نظرات (پیشنهادات غیرفعال)"
@@ -9422,6 +9426,7 @@ fa:
       criterion_long_description: "شرح طولانی معیار"
       edit_rubric_rating: "ویرایش رتبه بندی"
       find_existing_rubric: "یافتن دستورالعمل ارزیابی موجود"
+  edit_rubric_7d4d139d: "ویرایش دستورالعمل ارزیابی"
   edit_rubric_title_104d6fd2: "ویرایش دستورالعمل ارزیابی : %{title}"
   edit_section_name_558cc89: "ویرایش بخش \"%{name}\""
   edit_status_612572db: "وضعیت ویرایش"
@@ -10038,6 +10043,7 @@ fa:
   errors: 
     bad_navigation_config: "پیکربندی زبانه درس معتبر نیست"
     blank: لازم
+    cannot_save_att: "شما مجوز ویرایش ویژگی قفل شده %{att_name} را ندارید"
     format: "%{attribute} %{message}"
     index: 
       all_categories: "- همه رده ها -"
@@ -10479,6 +10485,8 @@ fa:
   features_2581da: ویژگی‌ها
   federated_attributes_5cbe6441: "ویژگی های متحد"
   federated_attributes_are_information_sent_from_you_2116fb61: "ویژگی های متحد به اطلاعات ارسالی از ارائه دهنده اعتبارسنجی گفته می شود که می توان از آن برای بهنگام سازی خودکار اطلاعات نظیر برای کاربران در کانواس در هر بار ورود آنها استفاده کرد."
+  feed_entry_title: "تکلیف: %{assignment}"
+  feed_entry_title_with_course: "تکلیف، %{course}: %{assignment}"
   feed_url_8a433438: "نشانی اینترنتی خوراک خبری"
   feed_url_is_required_253fda4e: "نشانی اینترنتی خوراک خبری لازم است"
   feeds_9f1c5c76: "خوراک خبری"
@@ -13047,6 +13055,7 @@ fa:
   label_removed_8793d8b4: "%{label} حذف شده است."
   label_values_76f4b5fa: "برچسب گذاری مقادیر"
   labels: 
+    due: مهلت
     lock_module_until: "قفل کردن تا تاریخ"
   language_6b3e2c7c: زبان
   languages_835813f0: "زبان ها"
@@ -22487,6 +22496,7 @@ fa:
   student_activity_and_performance_career_step_585731dc: "فعالیت و عملکرد دانشجو - مرحله شغلی"
   student_activity_and_performance_de2e0754: "فعالیت و عملکرد دانشجو"
   student_activity_tracking_90bdd519: "پیگیری فعالیت دانشجو"
+  student_annotation: "یادآوری یک دانش آموز"
   student_annotation_documents_c0f5c4ec: "اسناد حاشیه نویسی دانشجو"
   student_annotation_f6810b5c: "یادآوری دانشجو"
   student_annotation_submission_d0025105: "ارسال حاشیه نویسی دانشجو"
@@ -22674,6 +22684,8 @@ fa:
       graded: "نمره گذاری شده"
       submitted: "ارسال شده"
       unsubmitted: "ارسال نشده"
+  submission_action_take_quiz: "دادن آزمون %{title}"
+  submission_action_turn_in_assignment: "تحویل دادن %{title}"
   submission_added_title_50ebdc85: "ارسال‌ها اضافه شد: %{title}"
   submission_comment: 
     unknown_author: "یک نفر"
@@ -22722,6 +22734,16 @@ fa:
   submission_sent_3f0d2ee1: "مورد ارسالی ارسال شد."
   submission_tray_429ac3df: "سینی موارد ارسالی"
   submission_type_a925fc5f: "نوع مورد ارسالی"
+  submission_types: 
+    a_content_page: "صفحه محتوا"
+    a_discussion_post: "ارسال مربوط به بحث"
+    a_file_upload: "بارگذاری یک فایل"
+    a_media_recording: "یک ضبط رسانه ای"
+    a_quiz: "یک آزمون"
+    a_text_entry_box: "یک کادر ورودی متن"
+    a_website_url: "نشانی اینترنتی یک تارنما"
+    external_tool: "یک ابزار بیرونی"
+    on_paper: "روی کاغذ"
   submission_types_79f7b436: "انواع ارسال:"
   submission_updated_8897f3b7: "مورد ارسالی به روز شد"
   submission_user_name_assignment_title_2cf5e3e9: "ارسال:%{user_name}، %{assignment_title}"
