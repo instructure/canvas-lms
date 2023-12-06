@@ -3832,6 +3832,7 @@ hu:
   at_least_one_section_must_be_selected_to_post_grad_2c140f52: "Legalább egy szekciót ki kell választani az osztályzatok szekciónkénti közzétételéhez."
   at_the_bottom_a6a5f0fe: "A lap alján"
   at_the_top_fa836591: "A lap tetején"
+  atom_no_author: "Nincs szerző"
   attach_4234a79b: Csatolás
   attach_a_file_86a4fc00: "Fájl csatolása"
   attach_files_to_discussions_bd16c245: "Fájlok csatolása a fórumokhoz"
@@ -5177,6 +5178,9 @@ hu:
   comment_by_replying_to_this_message_or_join_the_co_886bc612: "Adjon hozzá megjegyzéseket erre az üzenetre válaszolva, vagy csatlakozzon a beszélgetéshez ezt a linket követve: %{link}! Amikor engedélyezett, ha mellékletet kell csatolnia, kérjük, lépjen be a Canvas-ba, és válaszoljon a közleményre!"
   comment_destroyed_5cfc922d: "A megjegyzés megsemmisült"
   comment_failed_to_post_please_try_again_later_e2d19a0a: "Nem sikerült elküldeni a megjegyzést! Kérlek, próbáld újra később."
+  comment_from_files: 
+    one: "Lásd a csatolt fájlt"
+    other: "Lásd a csatolt fájlokat"
   comment_input_box_b8c7e58b: "Megjegyzés beviteli mező"
   comment_library_84735835: "Megjegyzés könyvtár"
   comment_library_suggestions_disabled_ae04eb77: "Megjegyzéskönyvtár (javaslatok letiltva)"
@@ -8686,6 +8690,7 @@ hu:
     titles: 
       edit_rubric_rating: "Értékelés szerkesztése"
       find_existing_rubric: "Létező értékelőtábla keresése"
+  edit_rubric_7d4d139d: "Értékelőtábla szerkesztése"
   edit_rubric_title_104d6fd2: "%{title}értékelőtábla szerkesztése"
   edit_section_name_558cc89: "%{name}szekció szerkesztése"
   edit_status_612572db: "Státusz szerkesztése"
@@ -9277,6 +9282,7 @@ hu:
   errors: 
     bad_navigation_config: "Érvénytelen kurzusfül-beállítások"
     blank: Kötelező
+    cannot_save_att: "Nincs jogosultsága a következő zárt attribútum szerkesztésére: %{att_name} "
     format: "%{attribute} %{message}"
     index: 
       all_categories: "- Minden kategória - "
@@ -9625,6 +9631,8 @@ hu:
   features_2581da: Funkciók
   federated_attributes_5cbe6441: "Egyesített jellemzők"
   federated_attributes_are_information_sent_from_you_2116fb61: "A szövetségi attribútumok olyan információk, amelyeket a hitelesítő szolgáltató küld, és arra használatos, hogy automatikusan frissítse a megfelelő információkat a Canvas felhasználóknál, amikor bejelentkeznek. "
+  feed_entry_title: "Feladat: %{assignment}"
+  feed_entry_title_with_course: "Feladat, %{course}: %{assignment}"
   feed_url_8a433438: "Hírfolyam URL"
   feed_url_is_required_253fda4e: "Hírfolyam URL szükséges"
   feedback_6dcc1991: Visszajelzés
@@ -11670,6 +11678,7 @@ hu:
   label_disabled_not_visible_to_students_da093eec: "%{label}. Letiltva. Hallgatók számára nem látható"
   label_no_content_not_visible_to_students_84345d2f: "%{label}. Nincs tartalom. Hallgatók számára nem látható"
   labels: 
+    due: Határidő
     lock_module_until: "Zárolva eddig"
   language_6b3e2c7c: Nyelv
   language_arts_35b79a8b: "Nyelvi művészet"
@@ -19311,6 +19320,7 @@ hu:
     assessment_request_title: "Társértékelés %{title} számára"
   student_5da6bfd1: Hallgató
   student_921b864d: hallgató
+  student_annotation: "hallgatói megjegyzés"
   student_annotation_f6810b5c: "Hallgatói megjegyzés"
   student_assignment_outcome_map_title: "Hallgatói alkalmasság"
   student_author_id_just_made_a_new_comment_on_the_a_115d92e6: "Egy hallgató (%{author_id}) épp új megjegyzést fűzött egy másik hallgató (%{user_id}) névtelenül beadott munkájához: %{assignment_title}"
@@ -19434,6 +19444,8 @@ hu:
       graded: értékelve
       submitted: beadva
       unsubmitted: "nincs beadva"
+  submission_action_take_quiz: "%{title} kitöltése"
+  submission_action_turn_in_assignment: "%{title} bekapcsolása"
   submission_comment: 
     unknown_author: Valaki
   submission_comment_user_name_assignment_title_cour_d88ba875: "Hozzászólás a leadáshoz: %{user_name}, %{assignment_title}, %{course_name}"
@@ -19467,6 +19479,15 @@ hu:
   submission_preview_383473ec: "Beadás előnézet"
   submission_score_b7a291e8: "beadás pontszáma"
   submission_type_a925fc5f: "Beadás típusa"
+  submission_types: 
+    a_content_page: "egy tartalomoldal"
+    a_discussion_post: "egy fórumbejegyzés "
+    a_file_upload: "egy fájlfeltöltés"
+    a_media_recording: "egy médiafelvétel"
+    a_quiz: "egy kvíz"
+    a_text_entry_box: "egy szövegdoboz"
+    a_website_url: "egy webcím"
+    on_paper: "papíron "
   submission_types_79f7b436: "Beadástípusok:"
   submission_user_name_assignment_title_2cf5e3e9: "Küldés: %{user_name}, %{assignment_title}"
   submissions: 
