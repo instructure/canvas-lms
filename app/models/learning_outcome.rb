@@ -281,6 +281,7 @@ class LearningOutcome < ActiveRecord::Base
 
   workflow do
     state :active
+    state :archived
     state :retired
     state :deleted
   end
@@ -373,6 +374,28 @@ class LearningOutcome < ActiveRecord::Base
 
     self.workflow_state = "deleted"
     save!
+  end
+
+  def archive!
+    # Only active outcomes can be archived
+    if workflow_state == "active"
+      self.workflow_state = "archived"
+      self.archived_at = Time.now.utc
+      save!
+    elsif workflow_state == "deleted"
+      raise ActiveRecord::RecordNotSaved, "Cannot archive a deleted LearningOutcome"
+    end
+  end
+
+  def unarchive!
+    # Only archived outcomes can be unarchived
+    if workflow_state == "archived"
+      self.workflow_state = "active"
+      self.archived_at = nil
+      save!
+    elsif workflow_state == "deleted"
+      raise ActiveRecord::RecordNotSaved, "Cannot unarchive a deleted LearningOutcome"
+    end
   end
 
   def assessed?(course = nil)
