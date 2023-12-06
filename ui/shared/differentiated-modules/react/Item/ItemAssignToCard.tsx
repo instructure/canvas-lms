@@ -249,8 +249,10 @@ export default function ItemAssignToCard({
       />
       {dateTimeInputs.map(props => (
         <ClearableDateTimeInput
+          breakpoints={{}}
           {...props}
           messages={
+            // eslint-disable-next-line react/prop-types
             validationErrors[props.key] ? [{type: 'error', text: validationErrors[props.key]}] : []
           }
         />

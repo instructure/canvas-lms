@@ -17,13 +17,13 @@
  */
 
 import React from 'react'
-import type {InferType} from 'prop-types'
 import {DateTimeInput} from '@instructure/ui-date-time-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {CondensedButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
-import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints/'
+import WithBreakpoints from '@canvas/with-breakpoints'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import type {Breakpoints} from '@canvas/with-breakpoints'
 
 const I18n = useI18nScope('differentiated_modules')
 
@@ -34,7 +34,7 @@ export interface ClearableDateTimeInputProps {
   messages: Array<{type: 'error'; text: string}>
   onChange: (event: React.SyntheticEvent, value: string | undefined) => void
   onClear: () => void
-  breakpoints: InferType<typeof breakpointsShape>
+  breakpoints: Breakpoints
 }
 
 function ClearableDateTimeInput({

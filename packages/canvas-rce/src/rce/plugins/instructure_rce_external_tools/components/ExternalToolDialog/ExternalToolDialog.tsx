@@ -25,7 +25,6 @@ import ToolLaunchIframe from '../util/ToolLaunchIframe'
 import processEditorContentItems from '../../lti13-content-items/processEditorContentItems'
 import {RceLti11ContentItem} from '../../lti11-content-items/RceLti11ContentItem'
 import formatMessage from '../../../../../format-message'
-import {TsMigrationAny} from '../../../../../types/ts-migration'
 import {ExternalToolsEnv} from '../../ExternalToolsEnv'
 import {RceToolWrapper} from '../../RceToolWrapper'
 import {instuiPopupMountNode} from '../../../../../util/fullscreenHelpers'
@@ -118,7 +117,7 @@ export default class ExternalToolDialog extends React.Component<
   }
 
   handleBeforeUnload = (ev: Event) =>
-    ((ev as TsMigrationAny).returnValue = formatMessage('Changes you made may not be saved.'))
+    ((ev as any).returnValue = formatMessage('Changes you made may not be saved.'))
 
   private handleExternalContentReady = (data: {
     contentItems: Array<{

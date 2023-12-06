@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 - present Instructure, Inc.
+ * Copyright (C) 2023 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * Alias for the `any` type to be used when migrating JavaScript to TypeScript. Use this to indicate that a cast to
- * any was done solely for converting to TypeScript.
- *
- * Uses of this type should eventually be refactored out, either by updating the logic to be type-safe, or by converting
- * it to a cast to regular `any` to indicate an intentional and necessary use of any.
- */
-export type TsMigrationAny = any
+export type Breakpoints = {
+  miniTablet?: boolean
+  tablet?: boolean
+  desktop?: boolean
+  desktopNavOpen?: boolean
+  desktopOnly?: boolean
+  mobileOnly?: boolean
+}
