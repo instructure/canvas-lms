@@ -491,9 +491,33 @@ describe "Files API", type: :request do
                base_params.merge(controller: "files", action: "api_capture", format: "json"))
       existing.reload
       attachment = Attachment.where(instfs_uuid:).first
+      expect(attachment).not_to eq(existing)
       expect(attachment.display_name).to eq params[:name]
       expect(existing).to be_deleted
       expect(existing.replacement_attachment).to eq attachment
+    end
+
+    it "reuses the Attachment if a file is re-uploaded to the same folder" do
+      existing = Attachment.create!(
+        context: @course,
+        folder:,
+        uploaded_data: StringIO.new("a file"),
+        filename: base_params[:name],
+        display_name: base_params[:name],
+        instfs_uuid: "old-instfs-uuid"
+      )
+
+      capture_params = base_params.merge(controller: "files",
+                                         action: "api_capture",
+                                         format: "json",
+                                         size: existing.size,
+                                         sha512: existing.md5,
+                                         instfs_uuid: "new-instfs-uuid",
+                                         on_duplicate: "overwrite")
+      expect(InstFS).to receive(:delete_file).with("old-instfs-uuid")
+      json = api_call(:post, "/api/v1/files/capture?#{capture_params.to_query}", capture_params)
+      expect(json["id"]).to eq existing.id
+      expect(existing.reload.instfs_uuid).to eq "new-instfs-uuid"
     end
 
     it "redirect has preview_url include if requested" do
