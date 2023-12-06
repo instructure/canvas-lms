@@ -40,9 +40,22 @@ describe Lti::PlatformStorageController do
       allow(CanvasSecurity).to receive(:config).and_return({ "lti_iss" => forwarding_domain })
     end
 
-    it "sets parent origin in js env" do
-      subject
-      expect(assigns.dig(:js_env, :PARENT_ORIGIN)).to match(forwarding_domain)
+    context "when rendering the view" do
+      render_views
+
+      it "sets parent origin in js env" do
+        subject
+        expected_parent_origin = (HostUrl.protocol + "://" + forwarding_domain).to_json
+        expect(response.body).to \
+          match(
+            %r[<script>\s+window\.ENV = { PARENT_ORIGIN: #{Regexp.escape expected_parent_origin} }\s+</script>]
+          )
+      end
+
+      it "includes the lti_post_message_forwarding.js script" do
+        subject
+        expect(response.body).to match(%r{<script src=.*javascripts/lti_post_message_forwarding.*js})
+      end
     end
 
     it { is_expected.to be_successful }
