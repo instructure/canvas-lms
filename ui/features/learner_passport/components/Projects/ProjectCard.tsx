@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {Flex} from '@instructure/ui-flex'
+import {Img} from '@instructure/ui-img'
 import {Tag} from '@instructure/ui-tag'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
@@ -25,7 +26,7 @@ import {renderSkillTag} from '../shared/SkillTag'
 import type {ProjectData} from '../types'
 
 const PROJECT_CARD_WIDTH = '400px'
-const PROJECT_CARD_HEIGHT = '204px'
+const PROJECT_CARD_HEIGHT = '280px'
 const PROJECT_CARD_IMAGE_HEIGHT = `${200 - 96}px`
 
 export type ProjectCardProps = {
@@ -35,18 +36,24 @@ export type ProjectCardProps = {
 const ProjectCard = ({project}: ProjectCardProps) => {
   return (
     <View id={`project-${project.id}`} as="div" width={PROJECT_CARD_WIDTH} height="auto">
-      <View as="div">
-        <img
-          src={project.heroImageUrl || undefined}
-          alt=""
-          style={{
-            display: 'block',
-            width: '100%',
-            height: PROJECT_CARD_IMAGE_HEIGHT,
-            background:
-              'repeating-linear-gradient(45deg, #cecece, #cecece 10px, #aeaeae 10px, #aeaeae 20px)',
-          }}
-        />
+      <View as="div" height={PROJECT_CARD_IMAGE_HEIGHT} overflowY="hidden">
+        {project.heroImageUrl ? (
+          <Img
+            src={project.heroImageUrl}
+            alt="Cover image"
+            constrain="cover"
+            height={PROJECT_CARD_IMAGE_HEIGHT}
+          />
+        ) : (
+          <div
+            style={{
+              width: '100%',
+              height: PROJECT_CARD_IMAGE_HEIGHT,
+              background:
+                'repeating-linear-gradient(45deg, #cecece, #cecece 10px, #aeaeae 10px, #aeaeae 20px)',
+            }}
+          />
+        )}
       </View>
       <Flex as="div" direction="column" gap="small" padding="small">
         <Flex.Item shouldGrow={true} padding="small small 0 small">

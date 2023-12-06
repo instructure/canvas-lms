@@ -120,7 +120,13 @@ const AchievementTray = ({activeCard, open, onDismiss}: AchievementTrayProps) =>
         </Flex.Item>
         {activeCard.verifiedBy && (
           <Flex.Item align="center">
-            <Text>Verified by {activeCard.verifiedBy}</Text>
+            <SVGIcon src={icon_verified} size="x-small" color="success" />{' '}
+            <Text size="small">
+              Verified by{' '}
+              <Link href=" https://openbadges.org/" target="_blank">
+                {activeCard.verifiedBy}
+              </Link>
+            </Text>
           </Flex.Item>
         )}
         <Flex.Item align="end" margin="medium 0">
@@ -185,7 +191,7 @@ const AchievementTray = ({activeCard, open, onDismiss}: AchievementTrayProps) =>
             </Text>
             <SVGIcon src={icon_verified} size="x-small" color="success" />{' '}
             <Text as="span" size="x-small">
-              Verified by Lightcase
+              Verified by Lightcast
             </Text>
             <View as="div" margin="x-small 0 0 0">
               {activeCard.skills.map((skill: SkillData) => renderSkillTag(skill))}

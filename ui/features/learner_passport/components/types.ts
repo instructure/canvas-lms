@@ -102,7 +102,7 @@ export interface AttachmentData {
   id: string
   filename: string
   display_name: string
-  size: string
+  size: string | number
   contentType: string
   url: string
 }

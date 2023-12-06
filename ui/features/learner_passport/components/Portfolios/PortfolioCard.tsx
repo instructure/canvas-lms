@@ -28,6 +28,7 @@ import {
   IconReviewScreenLine,
   IconTrashLine,
 } from '@instructure/ui-icons'
+import {Img} from '@instructure/ui-img'
 import {Flex} from '@instructure/ui-flex'
 import {Menu} from '@instructure/ui-menu'
 import type {MenuItemProps} from '@instructure/ui-menu'
@@ -82,18 +83,24 @@ const PortfolioCard = ({id, title, heroImageUrl, onAction}: PortfolioCardProps) 
       cursor="pointer"
       onClick={handleCardClick}
     >
-      <View as="div">
-        <img
-          src={heroImageUrl || undefined}
-          alt=""
-          style={{
-            display: 'block',
-            width: '100%',
-            height: PORTFOLIO_CARD_IMAGE_HEIGHT,
-            background:
-              'repeating-linear-gradient(45deg, #cecece, #cecece 10px, #aeaeae 10px, #aeaeae 20px)',
-          }}
-        />
+      <View as="div" height={PORTFOLIO_CARD_IMAGE_HEIGHT} overflowY="hidden">
+        {heroImageUrl ? (
+          <Img
+            src={heroImageUrl}
+            alt="Cover image"
+            constrain="cover"
+            height={PORTFOLIO_CARD_IMAGE_HEIGHT}
+          />
+        ) : (
+          <div
+            style={{
+              width: '100%',
+              height: PORTFOLIO_CARD_IMAGE_HEIGHT,
+              background:
+                'repeating-linear-gradient(45deg, #cecece, #cecece 10px, #aeaeae 10px, #aeaeae 20px)',
+            }}
+          />
+        )}
       </View>
       <Flex as="div">
         <Flex.Item shouldGrow={true} padding="small small 0 small">

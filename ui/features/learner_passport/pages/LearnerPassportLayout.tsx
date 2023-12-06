@@ -19,7 +19,6 @@
 import React, {useEffect} from 'react'
 import {Outlet, useMatch, useNavigate} from 'react-router-dom'
 import {SVGIcon} from '@instructure/ui-svg-images'
-import {IconAlertsLine} from '@instructure/ui-icons'
 import {Flex} from '@instructure/ui-flex'
 import {Portal} from '@instructure/ui-portal'
 import {View} from '@instructure/ui-view'
@@ -92,8 +91,8 @@ export const Component = () => {
 
   return (
     <Portal open={true} mountNode={mountPoint}>
-      <div style={{marginInlineStart: '-24px'}}>
-        <View as="div" background="secondary" padding="small medium">
+      <div style={{margin: '-36px -48px -48px -48px'}}>
+        <View as="div" background="secondary" padding="small medium" borderWidth="0 0 small 0">
           <Flex>
             <div style={{color: 'var(--ic-brand-primary)'}}>
               <SVGIcon src={passportSvg} inline={true} size="small" title="Learner Passport" />
@@ -132,28 +131,13 @@ export const Component = () => {
                 </div>
               </div>
             </Flex.Item>
-            <Flex.Item>
-              <IconAlertsLine size="x-small" />
-            </Flex.Item>
-            <Flex.Item>
-              <div
-                style={{
-                  margin: '0 0 0 .75rem',
-                  padding: '0 0 0 .75rem',
-                  borderWidth: '0 0 0 1px',
-                  borderStyle: 'solid',
-                  borderColor: 'var(--ic-brand-border)',
-                }}
-              >
-                {window.ENV.current_user.display_name}
-              </div>
-            </Flex.Item>
+            <Flex.Item>{window.ENV.current_user.display_name}</Flex.Item>
           </Flex>
         </View>
+        <View id="foo" as="div" margin="large x-large 0">
+          <Outlet />
+        </View>
       </div>
-      <View as="div" margin="large x-large 0">
-        <Outlet />
-      </View>
     </Portal>
   )
 }

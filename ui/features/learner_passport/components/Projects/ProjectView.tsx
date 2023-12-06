@@ -61,7 +61,7 @@ const ProjectView = ({project, inTray}: ProjectViewProps) => {
 
   return (
     <>
-      <View as="div" margin="0 0 large 0">
+      <View as="div" margin="0 0 x-large 0">
         <div style={{height: '184px', background: '#C7CDD1', overflow: 'hidden', zIndex: -1}}>
           {project.heroImageUrl && (
             <Img src={project.heroImageUrl} alt="Cover image" constrain="cover" height="184px" />
@@ -81,7 +81,7 @@ const ProjectView = ({project, inTray}: ProjectViewProps) => {
               {project.title}
             </Heading>
 
-            <View as="div" margin="0 0 large 0">
+            <View as="div" margin="0 0 x-large 0">
               <Heading level="h3" themeOverride={{h3FontSize: '1rem'}}>
                 By {ENV.current_user.display_name}
               </Heading>
@@ -93,12 +93,12 @@ const ProjectView = ({project, inTray}: ProjectViewProps) => {
           <Heading level="h3" themeOverride={{h3FontSize: '1rem'}}>
             Skills and tools
           </Heading>
-          <View as="div" margin="small 0">
+          <View as="div" margin="x-small 0 x-large 0">
             {project.skills.map((skill: SkillData) => renderSkillTag(skill))}
           </View>
         </View>
 
-        <View as="div" margin="0 0 large 0">
+        <View as="div" margin="0 0 x-large 0">
           <Heading level="h3" themeOverride={{h3FontSize: '1rem'}} margin="0 0 x-small 0">
             Description
           </Heading>
@@ -108,7 +108,7 @@ const ProjectView = ({project, inTray}: ProjectViewProps) => {
         </View>
         {project.attachments.length > 0 && (
           <View as="div" margin="0 0 large 0">
-            <Heading level="h3" themeOverride={{h3FontSize: '1rem'}}>
+            <Heading level="h3" themeOverride={{h3FontSize: '1rem'}} margin="0 0 x-small 0">
               Attachments
             </Heading>
             <AttachmentsTable attachments={project.attachments} />

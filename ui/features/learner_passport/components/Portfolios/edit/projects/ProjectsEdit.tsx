@@ -64,16 +64,14 @@ const ProjectEditCard = ({project, onRemove}: ProjectEditCardProps) => {
             <div
               style={{
                 position: 'absolute',
-                top: PROJECT_CARD_IMAGE_HEIGHT,
-                right: '0',
+                top: `calc(${PROJECT_CARD_IMAGE_HEIGHT} + .5rem)`,
+                right: '.5rem',
               }}
             >
               <IconButton
                 screenReaderLabel={`remove project ${project.title}`}
                 renderIcon={IconTrashLine}
                 size="small"
-                withBackground={false}
-                withBorder={false}
                 onClick={handleRemoveProject}
               />
             </div>

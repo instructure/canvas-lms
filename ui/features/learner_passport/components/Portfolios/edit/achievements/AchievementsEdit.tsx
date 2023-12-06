@@ -21,7 +21,6 @@ import {Button, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {IconAddLine, IconDragHandleLine, IconTrashLine} from '@instructure/ui-icons'
-import {Text} from '@instructure/ui-text'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {View} from '@instructure/ui-view'
 
@@ -142,11 +141,6 @@ const AchievementsEdit = ({
   return (
     <>
       <View as="div" margin="medium 0 large 0">
-        <View as="div">
-          <Text size="small">
-            Add verified badges, degrees, certificates, and awards from your achievements
-          </Text>
-        </View>
         <View as="div" margin="medium 0 0 0">
           <Button renderIcon={IconAddLine} onClick={handleAddAchievementClick}>
             Add achievements

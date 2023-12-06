@@ -34,6 +34,7 @@ type HeadingEditorProps = {
 const HeadingEditor = ({value, onChange}: HeadingEditorProps) => {
   const [editMode, setEditMode] = useState<EditorMode>('view')
   const [currValue, setCurrValue] = useState(value)
+  const [isHovering, setIsHovering] = useState(false)
 
   useEffect(() => {
     setCurrValue(value)
@@ -54,48 +55,43 @@ const HeadingEditor = ({value, onChange}: HeadingEditorProps) => {
     }
   }, [])
 
-  const renderButton = useCallback(
-    ({onClick, onFocus, onBlur, buttonRef}) => {
-      // To correctly handle focus, always return the Button, but
-      // only visible if isVisible (if you want the UI to work in the standard way)
-      return (
-        <span style={{opacity: editMode === 'view' ? 1 : 0}}>
-          <View as="div" background="secondary">
-            <IconButton
-              screenReaderLabel="Edit"
-              size="small"
-              margin="0 0 0 x-small"
-              onClick={onClick}
-              onFocus={onFocus}
-              onBlur={onBlur}
-              elementRef={buttonRef}
-              withBackground={false}
-              withBorder={false}
-            >
-              <IconEditLine />
-            </IconButton>
-          </View>
-        </span>
-      )
-    },
-    [editMode]
-  )
+  const renderButton = useCallback(({isVisible, onClick, onFocus, onBlur, buttonRef}) => {
+    // To correctly handle focus, always return the Button, but
+    // only visible if isVisible (if you want the UI to work in the standard way)
+    setIsHovering(isVisible)
+    return (
+      <span style={{opacity: isVisible ? 1 : 0}}>
+        <View as="div" background="secondary" padding="0 0 0 x-small">
+          <IconButton
+            screenReaderLabel="Edit"
+            size="large"
+            onClick={onClick}
+            onFocus={onFocus}
+            onBlur={onBlur}
+            elementRef={buttonRef}
+            withBackground={false}
+            withBorder={false}
+          >
+            <IconEditLine />
+          </IconButton>
+        </View>
+      </span>
+    )
+  }, [])
 
   const renderViewer = useCallback(() => {
     return (
-      <View as="div" background="secondary">
-        <Heading level="h1" themeOverride={{h1FontSize: '1.5rem'}}>
-          {currValue}
-        </Heading>
+      <View as="div" background={isHovering ? 'secondary' : 'transparent'}>
+        <Heading level="h1">{currValue}</Heading>
       </View>
     )
-  }, [currValue])
+  }, [currValue, isHovering])
 
   const renderEditor = useCallback(
     ({onBlur, editorRef}) => {
       return (
         <input
-          style={{fontSize: '1.5rem', backgroundColor: '#f5f5f5', width: '100%'}}
+          style={{fontSize: '2.375rem', backgroundColor: '#f5f5f5', width: '100%'}}
           ref={editorRef}
           onBlur={onBlur}
           value={currValue}
