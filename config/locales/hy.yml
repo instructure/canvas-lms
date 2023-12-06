@@ -2664,6 +2664,7 @@ hy:
   assignments_dce45885: "# հանձնարարություններ"
   assignments_in_this_group_have_no_points_possible__3cd35922: "Այս խմբի հանձնարարությունները գնահատվող չեն եւ չեն կարող ընդգրկվել ամփոփիչ գնահատականի մեջ"
   assignments_usage_report_50671804: "Հանձնարարությունների օգտագործման մասին հաշվետվություն"
+  atom_no_author: "Հեղինակ չկա"
   attach_4234a79b: Կցել
   attach_files_to_discussions_bd16c245: "Քննարկումներին կցել ֆայլեր"
   attached_files_4c1d26cf: "Կցված ֆայլեր՝"
@@ -3574,6 +3575,9 @@ hy:
     from_beginning: Սկիզբը
     to_now: Այժմ
   comment_by_replying_to_this_message_or_join_the_co_26d42fde: "Թողեք մեկնաբանություն պատասխանելով այս հաղորդագրությանը կամ միացեք խոսակցությանը հետեւյալ հղման միջոցով. %{link}:"
+  comment_from_files: 
+    one: "Տես կից ֆայլը"
+    other: "Տես կից ֆայլերը"
   comments_e07bcbe3: Մեկնաբանություններ
   common_cartridge_description: "Սա հնարավորություն է տալիս փոխարկել Common Cartridge փաթեթները միջանկյալ json ֆորմատի՝ ներմուծման համար:"
   common_cartridge_display: "Ընդհանուր Cartridge"
@@ -6286,6 +6290,7 @@ hy:
     titles: 
       criterion_long_description: "Չափանիշի երկար նկարագրություն"
       find_existing_rubric: "Գտնել գոյություն ունեցող ռուբրիկը"
+  edit_rubric_7d4d139d: "Խմբագրել ռուբրիկը"
   edit_survey_b0d6890d: "Խմբագրել հարցումը"
   edit_this_key_1ee53473: "Խմբագրել այս բանալին"
   edit_toolname_app_23cfbb8: "Խմբագրել %{toolName}  հավելվածը"
@@ -6697,6 +6702,7 @@ hy:
   errors: 
     bad_navigation_config: "Դասընթացի տաբուլյացիայի կարգաբերման սխալ"
     blank: "Պահանջվում է"
+    cannot_save_att: "Ձեզ թույլատրված չէ խմբագրել արգելափակված հատկությունները %{att_name}:"
     format: "%{attribute}%{message}"
     index: 
       all_categories: "-Բոլոր կատեգորիաները-"
@@ -6972,6 +6978,8 @@ hy:
     quiz_log_auditing: "Թեստերի գործողությունների վերահսկողության մատյան"
     student_groups: "Ունկնդիրների նոր խմբերի էջ"
     student_outcome_gradebook: "Ուսուցման գծով ունկնդիրների գնահատականների մատյան "
+  feed_entry_title: "Հանձնարարություն՝ %{assignment}"
+  feed_entry_title_with_course: "Հանձնարարություն, %{course}: %{assignment}"
   field_9ec0ec01: Դաշտ
   field_name_31fff38e: "Դաշտի անվանում"
   file_6863ad33: ֆայլ
@@ -8614,6 +8622,7 @@ hy:
   key_settings_44df6a41: "Հիմնական կարգաբերումներ"
   label_3c9a991: "%{label}:"
   labels: 
+    due: Մինչև
     lock_module_until: "Արգելափակել մինչև"
   language_6b3e2c7c: Լեզուն
   last_activity_a983e541: "Վերջին գործողությունը"
@@ -15900,6 +15909,8 @@ hy:
       graded: գնահատվող
       submitted: "ուղարկված է"
       unsubmitted: "ուղարկված չէ"
+  submission_action_take_quiz: "Օգտագործել %{title}"
+  submission_action_turn_in_assignment: "Ներառել %{title}-ում"
   submission_comment: 
     unknown_author: "Ինչ-որ մեկը"
   submission_comments_4fa03a17: "Ուղարկված աշխատանքների մեկնաբանություններ"
@@ -15929,6 +15940,15 @@ hy:
   submission_in_another_grading_period_e754b329: "Աշխատանքի ուղարկում գնահատման այլ ժամանակահատվածի համար"
   submission_score_b7a291e8: "ուղարկված աշխատանքի գնահատական"
   submission_type_a925fc5f: "Ուղարկման տեսակ"
+  submission_types: 
+    a_discussion_post: "քննարկման վերաբերյալ գրառում"
+    a_file_upload: "ֆայլի ներբեռնում"
+    a_media_recording: "մուլտիմեդիա տվյալների գրառում"
+    a_quiz: թեստ
+    a_text_entry_box: "տեքստի մուտքագրման դաշտ"
+    a_website_url: "վեբ-կայքի url"
+    external_tool: "արտաքին գործիք"
+    on_paper: "թղթի վրա"
   submission_types_79f7b436: "Ուղարկման տեսակներ՝"
   submissions: 
     assignment_submit_success: "Հանձնարարությունը հաջողությամբ ուղարկված է:"
