@@ -53,6 +53,7 @@ export interface PortfolioDetailData extends PortfolioData {
   links: string[]
   education: EducationData[]
   experience: ExperienceData[]
+  projects: ProjectDetailData[]
   achievements: AchievementData[]
 }
 
@@ -85,12 +86,16 @@ export interface ExperienceData {
 export interface PortfolioEditData {
   portfolio: PortfolioDetailData
   achievements: AchievementData[]
+  projects: ProjectData[]
 }
 
 export interface ProjectData {
   id: string
   title: string
   heroImageUrl: string | null
+  skills: SkillData[]
+  attachments: AttachmentData[]
+  achievements: AchievementData[]
 }
 
 export interface AttachmentData {
@@ -104,10 +109,7 @@ export interface AttachmentData {
 
 export interface ProjectDetailData extends ProjectData {
   description: string
-  skills: SkillData[]
-  attachments: AttachmentData[]
   links: string[]
-  achievements: AchievementData[]
 }
 
 export interface ProjectEditData {

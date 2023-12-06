@@ -17,7 +17,9 @@
  */
 
 import React, {useCallback, useState} from 'react'
+import {useNavigate} from 'react-router-dom'
 import type {AchievementData, ProjectDetailData, SkillData} from '../types'
+import {Button} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
@@ -31,9 +33,11 @@ import AchievementTray from '../Achievements/AchievementTray'
 
 type ProjectViewProps = {
   project: ProjectDetailData
+  inTray?: boolean
 }
 
-const ProjectView = ({project}: ProjectViewProps) => {
+const ProjectView = ({project, inTray}: ProjectViewProps) => {
+  const navigate = useNavigate()
   const [showingAchievementDetails, setShowingAchievementDetails] = useState(false)
   const [activeCard, setActiveCard] = useState<AchievementData | undefined>(undefined)
 
@@ -42,7 +46,7 @@ const ProjectView = ({project}: ProjectViewProps) => {
     setActiveCard(undefined)
   }, [])
 
-  const showAchievementDetails = useCallback(
+  const handleAchievementCardClick = useCallback(
     (achievementId: string) => {
       const card = project.achievements.find(a => a.id === achievementId)
       setActiveCard(card)
@@ -51,23 +55,9 @@ const ProjectView = ({project}: ProjectViewProps) => {
     [project.achievements]
   )
 
-  const handleAchievementCardClick = useCallback(
-    (e: React.MouseEvent) => {
-      // @ts-expect-error
-      showAchievementDetails(e.currentTarget.getAttribute('data-cardid'))
-    },
-    [showAchievementDetails]
-  )
-
-  const handleAchievementCardKey = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (e.key === 'Enter') {
-        // @ts-expect-error
-        showAchievementDetails(e.currentTarget.getAttribute('data-cardid'))
-      }
-    },
-    [showAchievementDetails]
-  )
+  const handleViewPage = useCallback(() => {
+    navigate(`../../projects/view/${project.id}`)
+  }, [navigate, project.id])
 
   return (
     <>
@@ -79,15 +69,25 @@ const ProjectView = ({project}: ProjectViewProps) => {
         </div>
       </View>
       <View as="div" padding="0 medium medium medium">
-        <Heading level="h1" themeOverride={{h1FontWeight: 700}} margin="0 0 small 0">
-          {project.title}
-        </Heading>
+        {inTray === true ? (
+          <Flex as="div" justifyItems="end" margin="0 0 medium 0">
+            <Button size="small" onClick={handleViewPage}>
+              View Page
+            </Button>
+          </Flex>
+        ) : (
+          <>
+            <Heading level="h1" themeOverride={{h1FontWeight: 700}} margin="0 0 small 0">
+              {project.title}
+            </Heading>
 
-        <View as="div" margin="0 0 large 0">
-          <Heading level="h3" themeOverride={{h3FontSize: '1rem'}}>
-            By {ENV.current_user.display_name}
-          </Heading>
-        </View>
+            <View as="div" margin="0 0 large 0">
+              <Heading level="h3" themeOverride={{h3FontSize: '1rem'}}>
+                By {ENV.current_user.display_name}
+              </Heading>
+            </View>
+          </>
+        )}
 
         <View as="div" margin="0 0 large 0">
           <Heading level="h3" themeOverride={{h3FontSize: '1rem'}}>
@@ -133,11 +133,7 @@ const ProjectView = ({project}: ProjectViewProps) => {
               {project.achievements.map((achievement: AchievementData) => {
                 return (
                   <Flex.Item key={achievement.id} shouldShrink={false}>
-                    {renderAchievement(
-                      achievement,
-                      handleAchievementCardClick,
-                      handleAchievementCardKey
-                    )}
+                    {renderAchievement(achievement, handleAchievementCardClick)}
                   </Flex.Item>
                 )
               })}

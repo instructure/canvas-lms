@@ -50,6 +50,7 @@ const AchievementEditCard = ({achievement, onRemove}: AchievementEditCardProps) 
                 top: '50%',
                 left: '50%',
                 transform: 'translate(-50%, -50%)',
+                cursor: 'grab',
               }}
             >
               <IconDragHandleLine inline={false} />

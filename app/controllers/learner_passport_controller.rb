@@ -113,6 +113,56 @@ class LearnerPassportController < ApplicationController
     ]
   end
 
+  def learner_passport_project_sample
+    {
+      id: "1",
+      title: "Project 1",
+      heroImageUrl: "https://images.unsplash.com/photo-1464802686167-b939a6910659?q=80&w=3500&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      description: %(
+        Over the last four months, we had the opportunity to collaborate with 99P Labs for our graduate program’s
+        (<a href="https;//wikipedia.com">Master of Science in Product Management</a>) semester-long capstone project. We were delighted to work on a
+        really exciting problem that helped us hone some of the key concepts that we had learned as a part of our curriculum,
+        such as analyzing KPIs, writing user stories, conducting user research, and prototyping. Our problem statement
+        was to increase organic engagement for the developer portal of 99P Labs (<a href="https://developer.99plabs.io/home/">
+        https://developer.99plabs.io/home/</a>).
+      ).html_safe,
+      skills: merge_skills_from_achievements(Rails.cache.fetch(current_achievements_key) { learner_passport_current_achievements }),
+      attachments: [
+        {
+          id: "1",
+          filename: "99b+White+Paper.pdf",
+          display_name: "99b White Paper.pdf",
+          size: "1.2 MB",
+          contentType: "application/pdf",
+          url: "http://localhost:3000/courses/2/files/11",
+        },
+        {
+          id: "2",
+          filename: "plain+text.txt",
+          display_name: "plain text.txt",
+          size: "5 KB",
+          contentType: "text/plain",
+          url: "https://filesamples.com/samples/document/txt/sample3.txt"
+        }
+      ],
+      links: %w[https://linkedin.com/in/eschiebel https://www.nspe.org https://eschiebel.github.io/],
+      achievements: Rails.cache.fetch(current_achievements_key) { learner_passport_current_achievements }.first(1).clone,
+    }
+  end
+
+  def learner_passport_project_template
+    {
+      id: "",
+      title: "",
+      heroImageUrl: "",
+      description: "",
+      skills: [],
+      attachments: [],
+      links: [],
+      achievements: [],
+    }
+  end
+
   def learner_passport_portfolio_sample
     {
       id: "1",
@@ -216,7 +266,7 @@ class LearnerPassportController < ApplicationController
                 ).html_safe,
         },
       ],
-      projects: [],
+      projects: [learner_passport_project_sample.clone],
       achievements: learner_passport_current_achievements.first(2).clone
     }
   end
@@ -243,56 +293,6 @@ class LearnerPassportController < ApplicationController
 
   def learner_passport_current_portfolios
     [learner_passport_portfolio_sample.clone]
-  end
-
-  def learner_passport_project_sample
-    {
-      id: "1",
-      title: "Project 1",
-      heroImageUrl: "https://images.unsplash.com/photo-1464802686167-b939a6910659?q=80&w=3500&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      description: %(
-        Over the last four months, we had the opportunity to collaborate with 99P Labs for our graduate program’s
-        (<a href="https;//wikipedia.com">Master of Science in Product Management</a>) semester-long capstone project. We were delighted to work on a
-        really exciting problem that helped us hone some of the key concepts that we had learned as a part of our curriculum,
-        such as analyzing KPIs, writing user stories, conducting user research, and prototyping. Our problem statement
-        was to increase organic engagement for the developer portal of 99P Labs (<a href="https://developer.99plabs.io/home/">
-        https://developer.99plabs.io/home/</a>).
-      ).html_safe,
-      skills: merge_skills_from_achievements(Rails.cache.fetch(current_achievements_key) { learner_passport_current_achievements }),
-      attachments: [
-        {
-          id: "1",
-          filename: "99b+White+Paper.pdf",
-          display_name: "99b White Paper.pdf",
-          size: "1.2 MB",
-          contentType: "application/pdf",
-          url: "http://localhost:3000/courses/2/files/11",
-        },
-        {
-          id: "2",
-          filename: "plain+text.txt",
-          display_name: "plain text.txt",
-          size: "5 KB",
-          contentType: "text/plain",
-          url: "https://filesamples.com/samples/document/txt/sample3.txt"
-        }
-      ],
-      links: %w[https://linkedin.com/in/eschiebel https://www.nspe.org https://eschiebel.github.io/],
-      achievements: Rails.cache.fetch(current_achievements_key) { learner_passport_current_achievements }.first(1).clone,
-    }
-  end
-
-  def learner_passport_project_template
-    {
-      id: "",
-      title: "",
-      heroImageUrl: "",
-      description: "",
-      skills: [],
-      attachments: [],
-      links: [],
-      achievements: [],
-    }
   end
 
   def learner_passport_current_projects
@@ -381,6 +381,8 @@ class LearnerPassportController < ApplicationController
         portfolio[:experience] = JSON.parse(params[:experience])
       when :achievements
         portfolio[:achievements] = Rails.cache.fetch(current_achievements_key) { learner_passport_current_achievements }.select { |a| params[key].include?(a[:id]) }
+      when :projects
+        portfolio[:projects] = Rails.cache.fetch(current_projects_key) { learner_passport_current_projects }.select { |a| params[key].include?(a[:id]) }
       else
         portfolio[key] = params[key]
       end
@@ -424,7 +426,9 @@ class LearnerPassportController < ApplicationController
 
   ###### Projects ######
   def projects_index
-    render json: Rails.cache.fetch(current_projects_key) { learner_passport_current_projects }.map { |p| p.slice(:id, :title, :heroImageUrl) }
+    render json: Rails.cache.fetch(current_projects_key) { learner_passport_current_projects }.map do |p|
+      p.slice(:id, :title, :heroImageUrl, :skills, :attachments, :achievements)
+    end
   end
 
   def project_create

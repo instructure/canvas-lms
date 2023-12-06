@@ -21,6 +21,7 @@ import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {IconDownloadLine} from '@instructure/ui-icons'
 import {Table} from '@instructure/ui-table'
+import {TruncateText} from '@instructure/ui-truncate-text'
 import type {ViewProps} from '@instructure/ui-view'
 import type {AttachmentData} from '../types'
 import {renderFileTypeIcon, isUrlToLocalCanvasFile} from '../shared/utils'
@@ -76,7 +77,7 @@ const AttachmentsTable = ({attachments}: AttachmnetsTableProps) => {
                   </Flex.Item>
                   <Flex.Item shouldGrow={true}>
                     <a href={attachment.url} target={attachment.filename}>
-                      {attachment.display_name}
+                      <TruncateText>{attachment.display_name}</TruncateText>
                     </a>
                   </Flex.Item>
                 </Flex>
