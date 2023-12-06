@@ -6300,7 +6300,7 @@ ja:
   canvas_course_id_db4de2b8: canvas_course_id
   canvas_course_tutorial_video_5205c1c1: "Canvas コースチュートリアルビデオ"
   canvas_dashboard_links_will_navigate_to_the_catalo_4143635e: Canvasのロゴは、Catalogダッシュボードへ誘導します
-  canvas_default_7f81a6b8: "Canvas のデフォルト"
+  canvas_default_7f81a6b8: Canvasデフォルト
   canvas_demo_7a005cf3: "Canvas デモ"
   canvas_did_not_recognize_your_identity_provider_cb0e50fc: "Canvas は使用されている ID プロバイダーを認識しませんでした"
   canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "Canvas に、次のユーザのアカウントがありません: %{user}"
@@ -9639,7 +9639,7 @@ ja:
   create_outcome_4dac05a0: アウトカムを作成する
   create_pace_4ff3e9c: ペースを作成
   create_pages_581a4d59: ページを作成
-  create_quiz_d08bb72a: 小テストを作成
+  create_quiz_d08bb72a: クイズの作成
   create_slots_71dbb2f8: スロットの作成
   create_subject_86de5618: 件名を作成
   create_temporary_enrollment_3d4eaa33: 一時登録を作成
@@ -11314,6 +11314,7 @@ ja:
       criterion_long_description: 基準の詳しい説明
       edit_rubric_rating: 評価を編集
       find_existing_rubric: 既存のルーブリックの検索
+  edit_rubric_7d4d139d: 注釈の編集
   edit_rubric_title_104d6fd2: "ルーブリックを編集する：%{title}"
   edit_section_name_558cc89: "セクション\"%{name}\"の編集"
   edit_status_612572db: ステータスを編集
@@ -12737,6 +12738,8 @@ ja:
   february_f2c77675: 2月
   federated_attributes_5cbe6441: 連合した属性
   federated_attributes_are_information_sent_from_you_2116fb61: "連合された属性とはあなたの認証プロバイダから送信された情報で、ユーザーが Canvas にログインする度に該当する情報を自動的に更新するために使われます。"
+  feed_entry_title: "課題: %{assignment}"
+  feed_entry_title_with_course: "課題、%{course}: %{assignment}"
   feed_url_8a433438: フィードURL
   feed_url_is_required_253fda4e: "フィード URLが必要です"
   feedback_6dcc1991: フィードバック
@@ -16195,6 +16198,7 @@ ja:
   label_selected_list_collapsed_d93e77da: "%{label} が選択されました。リストが破損しています。"
   label_values_76f4b5fa: ラベル値
   labels: 
+    due: 期限
     lock_module_until: ロック終了時刻
   labels_292cd90b: ラベル
   language_6b3e2c7c: 言語
@@ -27601,6 +27605,8 @@ ja:
       graded: 採点済み
       submitted: 提出済み
       unsubmitted: 未提出
+  submission_action_take_quiz: "%{title} を受ける"
+  submission_action_turn_in_assignment: "%{title} を提出"
   submission_added_title_50ebdc85: "提出が追加されました：%{title}"
   submission_annotation_user_name_assignment_title_c_39910597: "提出注釈：%{user_name}、%{assignment_title}、%{course_name}"
   submission_annotation_user_name_assignment_title_c_80c1963e: "提出注釈：%{user_name}、%{assignment_title}、%{course_name}"
