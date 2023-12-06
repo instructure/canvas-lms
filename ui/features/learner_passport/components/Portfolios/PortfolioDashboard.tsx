@@ -24,11 +24,13 @@ import {Heading} from '@instructure/ui-heading'
 import {IconPlusLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import PortfolioCard, {PORTFOLIO_CARD_WIDTH, PORTFOLIO_CARD_HEIGHT} from './PortfolioCard'
 import {showUnimplemented} from '../shared/utils'
 import type {PortfolioData} from '../types'
 import NamingModal from '../shared/NamingModal'
 import {renderCardSkeleton} from '../shared/CardSkeleton'
+import confirm from '../shared/Confirmation'
 
 const PortfolioDashboard = () => {
   const navigate = useNavigate()
@@ -37,6 +39,16 @@ const PortfolioDashboard = () => {
   const [createModalIsOpen, setCreateModalIsOpen] = useState(false)
   const [renameModalIsOpen, setRenameModalIsOpen] = useState(false)
   const [actionPortfolioId, setActionProjectId] = useState('')
+
+  const url = new URL(window.location.href)
+  if (url.searchParams.get('dupe') === 'true') {
+    showFlashAlert({message: 'Portfolio duplicated', type: 'success'})
+    window.history.replaceState(window.history.state, '', url.pathname)
+  }
+  if (url.searchParams.get('delete') === 'true') {
+    showFlashAlert({message: 'Portfolio deleted', type: 'success'})
+    window.history.replaceState(window.history.state, '', url.pathname)
+  }
 
   const handleDismissCreateModal = useCallback(() => {
     setCreateModalIsOpen(false)
@@ -64,7 +76,7 @@ const PortfolioDashboard = () => {
   )
 
   const handleCardAction = useCallback(
-    (portfolioId: string, action: string) => {
+    async (portfolioId: string, action: string) => {
       switch (action) {
         case 'duplicate':
           navigate(`duplicate/${portfolioId}`)
@@ -76,7 +88,21 @@ const PortfolioDashboard = () => {
           navigate(`../view/${portfolioId}`)
           break
         case 'delete':
-          navigate(`delete/${portfolioId}`)
+          {
+            const portfolio = portfolios.find(p => p.id === portfolioId)
+            if (portfolio) {
+              const ok = await confirm(
+                <div>
+                  Are you sure you want to delete
+                  <span style={{whiteSpace: 'nowrap'}}>{portfolio.title}</span>?
+                </div>
+              )
+              if (ok) {
+                navigate(`delete/${portfolioId}`)
+              }
+            }
+          }
+
           break
         case 'rename':
           setActionProjectId(portfolioId)
@@ -86,11 +112,11 @@ const PortfolioDashboard = () => {
           showUnimplemented({currentTarget: {textContent: action}})
       }
     },
-    [navigate]
+    [navigate, portfolios]
   )
 
   return (
-    <>
+    <div style={{maxWidth: '1260px', margin: '0 auto'}}>
       <Flex justifyItems="space-between">
         <Flex.Item shouldGrow={true}>
           <Heading level="h1" themeOverride={{h1FontWeight: 700}}>
@@ -112,7 +138,7 @@ const PortfolioDashboard = () => {
       <View>
         {portfolios?.length > 0 ? null : (
           <View as="div" margin="0">
-            <Text size="x-small">No portfolios created</Text>
+            <Text size="medium">No portfolios created</Text>
           </View>
         )}
         <View as="div" margin="small 0">
@@ -147,7 +173,7 @@ const PortfolioDashboard = () => {
         onDismiss={handleDismissCreateModal}
         onSubmit={createModalIsOpen ? handleCreateNewPortfolio : handleRenameProfile}
       />
-    </>
+    </div>
   )
 }
 

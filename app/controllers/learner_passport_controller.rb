@@ -132,7 +132,7 @@ class LearnerPassportController < ApplicationController
           id: "1",
           filename: "99b+White+Paper.pdf",
           display_name: "99b White Paper.pdf",
-          size: "1.2 MB",
+          size: "1234567",
           contentType: "application/pdf",
           url: "http://localhost:3000/courses/2/files/11",
         },
@@ -140,7 +140,7 @@ class LearnerPassportController < ApplicationController
           id: "2",
           filename: "plain+text.txt",
           display_name: "plain text.txt",
-          size: "5 KB",
+          size: "5432",
           contentType: "text/plain",
           url: "https://filesamples.com/samples/document/txt/sample3.txt"
         }
@@ -404,7 +404,8 @@ class LearnerPassportController < ApplicationController
     portfolio = current_portfolios.find { |p| p[:id] == params[:portfolio_id] }
     new_portfolio = portfolio.clone
     new_portfolio[:id] = (current_portfolios.length + 1).to_s
-    new_portfolio[:title] = "#{portfolio[:title]} (copy)"
+
+    new_portfolio[:title] = make_copy_title(portfolio[:title])
     current_portfolios << new_portfolio
     Rails.cache.write(current_portfolios_key, current_portfolios, expires_in: CACHE_EXPIRATION)
     render json: new_portfolio
@@ -485,7 +486,7 @@ class LearnerPassportController < ApplicationController
 
     new_project = project.clone
     new_project[:id] = (current_projects.length + 1).to_s
-    new_project[:title] = "#{project[:title]} (copy)"
+    new_project[:title] = make_copy_title(project[:title])
     current_projects << new_project
     Rails.cache.write(current_projects_key, current_projects, expires_in: CACHE_EXPIRATION)
     render json: new_project
@@ -524,5 +525,13 @@ class LearnerPassportController < ApplicationController
     unless @domain_root_account.feature_enabled?(:learner_passport)
       render status: :not_found, template: "shared/errors/404_message"
     end
+  end
+
+  def make_copy_title(title)
+    md = (/copy(\d*)$/.match title)
+    return "#{title} - copy" if md.nil?
+
+    new_count = md.captures[0].blank? ? 1 : md.captures[0].to_i + 1
+    title.sub(/copy\d*$/, "copy#{new_count}")
   end
 end

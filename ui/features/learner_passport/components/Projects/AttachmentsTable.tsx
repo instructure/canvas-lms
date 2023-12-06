@@ -24,7 +24,7 @@ import {Table} from '@instructure/ui-table'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import type {ViewProps} from '@instructure/ui-view'
 import type {AttachmentData} from '../types'
-import {renderFileTypeIcon, isUrlToLocalCanvasFile} from '../shared/utils'
+import {renderFileTypeIcon, isUrlToLocalCanvasFile, showFilePreviewInOverlay} from '../shared/utils'
 
 type AttachmnetsTableProps = {
   attachments: AttachmentData[]
@@ -53,6 +53,17 @@ const AttachmentsTable = ({attachments}: AttachmnetsTableProps) => {
     [attachments]
   )
 
+  const renderSize = (sz: string | number) => {
+    const size = Number(sz)
+    if (size < 1024) {
+      return `${size} bytes`
+    } else if (size < 1024 * 1024) {
+      return `${Math.round((size / 1024) * 10) / 10} KB`
+    } else {
+      return `${Math.round((size / (1024 * 1024)) * 10) / 10} MB`
+    }
+  }
+
   return (
     <Table caption="attachments" layout="auto">
       <Table.Head>
@@ -76,13 +87,17 @@ const AttachmentsTable = ({attachments}: AttachmnetsTableProps) => {
                     {renderFileTypeIcon(attachment.contentType)}
                   </Flex.Item>
                   <Flex.Item shouldGrow={true}>
-                    <a href={attachment.url} target={attachment.filename}>
+                    <a
+                      href={attachment.url}
+                      target={attachment.filename}
+                      onClick={showFilePreviewInOverlay}
+                    >
                       <TruncateText>{attachment.display_name}</TruncateText>
                     </a>
                   </Flex.Item>
                 </Flex>
               </Table.Cell>
-              <Table.Cell>{attachment.size}</Table.Cell>
+              <Table.Cell>{renderSize(attachment.size)}</Table.Cell>
               <Table.Cell>
                 <Button
                   renderIcon={IconDownloadLine}

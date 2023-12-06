@@ -18,13 +18,13 @@
 
 import React from 'react'
 import {
+  IconDocumentLine,
   IconLinkLine,
   IconMsWordLine,
   IconPdfLine,
   IconImageLine,
   IconTrashLine,
 } from '@instructure/ui-icons'
-import {SVGIcon} from '@instructure/ui-svg-images'
 import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {List} from '@instructure/ui-list'
@@ -78,15 +78,17 @@ export function renderFileTypeIcon(contentType: string) {
   if (contentType === 'application/pdf') return <IconPdfLine />
   if (contentType === 'application/msword') return <IconMsWordLine />
   if (contentType.startsWith('image/')) return <IconImageLine />
-  return (
-    <SVGIcon src='<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="1rem" height="1rem"> </svg>' />
-  )
+  return <IconDocumentLine />
 }
 
 export function renderLink(link: string) {
   return (
     <List.Item key={link.replace(/\W+/, '-')}>
-      <Link href={link} renderIcon={<IconLinkLine color="primary" size="x-small" />}>
+      <Link
+        href={link}
+        target="_blank"
+        renderIcon={<IconLinkLine color="primary" size="x-small" />}
+      >
         {link}
       </Link>
     </List.Item>
@@ -191,6 +193,36 @@ export function showUnimplemented(
     message: `Sorry, ${action} is not implemented yet.`,
     type: 'info',
   })
+}
+
+export function showFilePreviewInOverlay(event: React.MouseEvent | React.KeyboardEvent) {
+  let target: HTMLAnchorElement | null = null
+  if ((event.target as HTMLAnchorElement)?.href) {
+    target = event.target as HTMLAnchorElement
+  } else if ((event.currentTarget as HTMLAnchorElement)?.href) {
+    target = event.currentTarget as HTMLAnchorElement
+  }
+  if (!target) return
+  const href = target.href
+  if (!href) return
+
+  const matches = href.match(/\/files\/(\d+~\d+|\d+)/)
+  if (matches) {
+    if (event.ctrlKey || event.altKey || event.metaKey || event.shiftKey) {
+      // if any modifier keys are pressed, do the browser default thing
+      return
+    }
+    event.preventDefault()
+    const origin = window.location.origin
+    const url = new URL(href, origin)
+    const verifier = url?.searchParams.get('verifier')
+    const file_id = matches[1]
+    // TODO:
+    // 1. what window should be be using
+    // 2. is that the right origin?
+    // 3. this is temporary until we can decouple the file previewer from canvas
+    window.top?.postMessage({subject: 'preview_file', file_id, verifier}, origin)
+  }
 }
 
 export const previewBackgroundImage =

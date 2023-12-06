@@ -80,6 +80,7 @@ const ProjectDashboardCard = ({project, onAction}: ProjectDashboardCardProps) =>
       cursor="pointer"
       onClick={handleCardClick}
       position="relative"
+      shadow="resting"
     >
       <div style={{position: 'absolute', top: PROJECT_CARD_IMAGE_HEIGHT, right: 0}}>
         <Menu

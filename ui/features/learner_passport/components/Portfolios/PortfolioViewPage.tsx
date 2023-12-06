@@ -90,7 +90,9 @@ const PortfolioViewPage = () => {
           </Button>
         </Flex.Item>
       </Flex>
-      <PortfolioView portfolio={portfolio} />
+      <View as="div" shadow="resting" margin="0 0 x-large 0">
+        <PortfolioView portfolio={portfolio} />
+      </View>
       <PortfolioPreviewModal
         portfolio={portfolio}
         open={showPreview}

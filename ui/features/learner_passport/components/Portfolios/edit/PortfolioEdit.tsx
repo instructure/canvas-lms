@@ -200,6 +200,7 @@ const PortfolioEdit = () => {
         style={{
           position: 'sticky',
           bottom: '0',
+          margin: '0 -3rem',
         }}
       >
         <View as="div" background="primary" borderWidth="small 0 0 0">

@@ -184,7 +184,7 @@ const ProjectEdit = () => {
 
   return (
     <View as="div">
-      <View as="div" id="foo" maxWidth="986px" margin="0 auto">
+      <View as="div" maxWidth="986px" margin="0 auto">
         <form id="edit_project_form" method="POST" onSubmit={handleSubmit}>
           <Breadcrumb label="You are here:" size="small">
             <Breadcrumb.Link href={`/users/${ENV.current_user.id}/passport/projects/dashboard`}>
@@ -197,7 +197,7 @@ const ProjectEdit = () => {
             </Breadcrumb.Link>
             <Breadcrumb.Link>Edit</Breadcrumb.Link>
           </Breadcrumb>
-          <Flex as="div" margin="0 0 medium 0" justifyItems="space-between" gap="small">
+          <Flex as="div" margin="medium 0 xx-large 0" justifyItems="space-between" gap="small">
             <Flex.Item shouldGrow={true}>
               <HeadingEditor value={project.title} onChange={handleTitleChange} />
               <input type="hidden" name="title" value={title} />
@@ -253,7 +253,7 @@ const ProjectEdit = () => {
               />
             </View>
 
-            <View as="div" margin="0 0 medium 0">
+            <View as="div" margin="0 0 large 0" borderWidth="0 0 small 0" padding="0 0 large 0">
               <input type="hidden" name="description" value={description} />
               <RichTextEdit
                 id="description"
@@ -262,7 +262,7 @@ const ProjectEdit = () => {
                 onContentChange={handleDescriptionChange}
               />
             </View>
-            <View as="div" borderWidth="0 0 small 0" margin="0 0 medium 0">
+            <View as="div" borderWidth="0 0 small 0" margin="0 0 large 0" padding="0 0 large 0">
               <View as="div" margin="0 0 medium 0">
                 <Heading
                   level="h2"
@@ -292,7 +292,7 @@ const ProjectEdit = () => {
                   </FormField>
                   <input type="hidden" name="attachments" value={JSON.stringify(attachments)} />
                 </View>
-                <View as="div" margin="0 0 medium 0">
+                <View as="div">
                   <FormField
                     id="project_links_label"
                     label={
@@ -348,6 +348,7 @@ const ProjectEdit = () => {
         style={{
           position: 'sticky',
           bottom: '0',
+          margin: '0 -3rem',
         }}
       >
         <View as="div" background="primary" borderWidth="small 0 0 0">

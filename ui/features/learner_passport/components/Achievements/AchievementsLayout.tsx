@@ -63,7 +63,7 @@ const AchievementsLayout = () => {
   )
 
   return (
-    <div>
+    <View as="div" maxWidth="1260px">
       <Heading level="h1" themeOverride={{h1FontWeight: 700}}>
         Achievements
       </Heading>
@@ -103,7 +103,7 @@ const AchievementsLayout = () => {
           activeCard={activeCard}
         />
       )}
-    </div>
+    </View>
   )
 }
 

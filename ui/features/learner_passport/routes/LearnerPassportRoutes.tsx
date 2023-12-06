@@ -51,7 +51,7 @@ export const LearnerPassportRoutes = (
               },
               body: JSON.stringify({portfolio_id: params.portfolioId}),
             })
-            return redirect('..')
+            return redirect(`/users/${params.userId}/passport/portfolios/dashboard?dupe=true`)
           }}
         />
         <Route
@@ -66,7 +66,7 @@ export const LearnerPassportRoutes = (
               },
               body: JSON.stringify({portfolio_id: params.portfolioId}),
             })
-            return redirect('..')
+            return redirect(`/users/${params.userId}/passport/portfolios/dashboard?delete=true`)
           }}
         />
         <Route
@@ -171,7 +171,7 @@ export const LearnerPassportRoutes = (
               },
               body: JSON.stringify({project_id: params.projectId}),
             })
-            return redirect('..')
+            return redirect(`/users/${params.userId}/passport/projects/dashboard?dupe=true`)
           }}
         />
         <Route
@@ -186,7 +186,7 @@ export const LearnerPassportRoutes = (
               },
               body: JSON.stringify({project_id: params.projectId}),
             })
-            return redirect('..')
+            return redirect(`/users/${params.userId}/passport/projects/dashboard?delete=true`)
           }}
         />
         <Route
