@@ -150,6 +150,7 @@ import '@canvas/util/jquery/fixDialogButtons'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 import type {EnvGradebookSpeedGrader} from '@canvas/global/env/EnvGradebook'
 import replaceTags from '@canvas/util/replaceTags'
+import type {GradeStatusUnderscore} from '@canvas/grading/accountGradingStatus'
 
 // @ts-expect-error
 if (!('INST' in window)) window.INST = {}
@@ -1212,7 +1213,9 @@ function statusMenuComponent(submission: Submission) {
       selection={determineSubmissionSelection(submission)}
       updateSubmission={updateSubmissionAndPageEffects}
       cachedDueDate={submission.cached_due_date}
-      customStatuses={ENV.custom_grade_statuses}
+      customStatuses={(ENV.custom_grade_statuses as GradeStatusUnderscore[])?.filter(
+        status => status.applies_to_submissions
+      )}
     />
   )
 }
@@ -2544,7 +2547,7 @@ EG = {
         return {
           value: i,
           late_policy_status: EG.currentStudent.submission.late_policy_status,
-          custom_grade_status_name: ENV.custom_grade_statuses
+          custom_grade_status_name: (ENV.custom_grade_statuses as GradeStatusUnderscore[])
             ?.find(status => status.id === s.custom_grade_status_id)
             ?.name.toUpperCase(),
           custom_grade_status_id: s.custom_grade_status_id,

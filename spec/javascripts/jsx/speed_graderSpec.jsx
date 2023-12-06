@@ -336,8 +336,8 @@ QUnit.module('SpeedGrader', rootHooks => {
         help_url: 'example.com/support',
         show_help_menu_item: false,
         custom_grade_statuses: [
-          {id: '1', name: 'Custom Status'},
-          {id: '2', name: 'Custom Status 2'},
+          {id: '1', name: 'Custom Status', applies_to_submissions: true},
+          {id: '2', name: 'Custom Status 2', applies_to_submissions: true},
         ],
       })
       setupFixtures('<span id="multiple_submissions"></span>')
@@ -1796,8 +1796,8 @@ QUnit.module('SpeedGrader', rootHooks => {
         help_url: 'helpUrl',
         show_help_menu_item: false,
         custom_grade_statuses: [
-          {id: '1', name: 'Custom Status One'},
-          {id: '2', name: 'Custom Status Two'},
+          {id: '1', name: 'Custom Status One', applies_to_submissions: true},
+          {id: '2', name: 'Custom Status Two', applies_to_submissions: true},
         ],
       })
       originalWindowJSONData = window.jsonData
