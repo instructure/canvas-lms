@@ -2234,6 +2234,7 @@ ko:
   assignments_2_e88d7a26: "과제 2"
   assignments_dce45885: "과제 수"
   assignments_usage_report_50671804: "과제 이용 보고서"
+  atom_no_author: "작성자 없음"
   attach_4234a79b: 첨부
   attach_files_to_discussions_bd16c245: "토론에 파일 첨부하기"
   attached_files_4c1d26cf: "첨부 파일:"
@@ -3049,6 +3050,9 @@ ko:
   comm_messages: 
     from_beginning: 시작
     to_now: 지금
+  comment_from_files: 
+    one: "첨부 파일 보기"
+    other: "첨부 파일 보기"
   common_cartridge_description: "Common Cartridge 패키지를 가져올 중재 JSON 형식으로 변환"
   common_cartridge_display: "Common Cartridge"
   common_cartridge_name: "Common Cartridge 가져오기"
@@ -5276,6 +5280,7 @@ ko:
     titles: 
       criterion_long_description: "기준 상세 설명"
       find_existing_rubric: "기존 루브릭 찾기"
+  edit_rubric_7d4d139d: "루브릭 편집"
   edit_survey_b0d6890d: "설문 편집"
   edit_this_key_1ee53473: "이 키 편집"
   editor: 
@@ -5643,6 +5648,7 @@ ko:
   errors: 
     bad_navigation_config: "유효하지 않은 과목 탭 구성"
     blank: "필수 사항"
+    cannot_save_att: "잠긴 속성 %{att_name}을(를) 편집할 권한이 없음"
     format: "%{attribute} %{message}"
     index: 
       all_categories: "- 모든 범주 -"
@@ -5868,6 +5874,8 @@ ko:
     quizzes: 
       next: "새로운 퀴즈"
     student_outcome_gradebook: "학생 학습 숙달 평점 기록부"
+  feed_entry_title: "과제: %{assignment}"
+  feed_entry_title_with_course: "과제, %{course}: %{assignment}"
   file_6863ad33: 파일
   file_preview: 
     file_preview_headerbutton_close: 닫기
@@ -7173,6 +7181,8 @@ ko:
   keep_editing_11ff42e5: "계속 편집"
   key_name_7311d22: "키 이름:"
   key_settings_44df6a41: "키 설정"
+  labels: 
+    due: 기한
   language_6b3e2c7c: 언어
   last_error_a3832668: "마지막 오류"
   last_modified_by_ca4bb5e1: "마지막 수정한 사람"
@@ -13089,6 +13099,8 @@ ko:
       graded: 평가됨
       submitted: 제출됨
       unsubmitted: "제출 안 됨"
+  submission_action_take_quiz: "%{title} 보기"
+  submission_action_turn_in_assignment: "%{title} 제출"
   submission_comment: 
     unknown_author: 아무개
   submission_comments_4fa03a17: "제출물 의견"
@@ -13113,6 +13125,13 @@ ko:
     view_rubric_assessment_in_the_speedgrader: "SpeedGrader에서 루브릭 평가 보기"
   submission_details_f3975756: "제출물 세부 정보"
   submission_type_a925fc5f: "제출물 유형"
+  submission_types: 
+    a_discussion_post: "토론 게시물"
+    a_file_upload: "파일 업로드"
+    a_media_recording: "미디어 녹음/녹화"
+    a_quiz: 퀴즈
+    a_text_entry_box: "텍스트 항목 상자"
+    a_website_url: "웹사이트 URL"
   submissions: 
     assignment_submit_success: "과제를 성공적으로 제출했습니다."
     assignment_submitted: "과제를 제출했습니다."

@@ -2975,6 +2975,7 @@ uk:
   associations_saved_successfully_48b9eae3: "Зв'язки успішно збережено"
   at_the_bottom_a6a5f0fe: Внизу
   at_the_top_fa836591: Наверху
+  atom_no_author: "Немає автора"
   attach_4234a79b: Приєднати
   attach_files_to_discussions_bd16c245: "Прикріпити файли до обговорення"
   attach_terms_2b8770a5: "Додати терміни"
@@ -4043,6 +4044,11 @@ uk:
     to_now: зараз
   comment_by_replying_to_this_message_or_join_the_co_52b5ac1c: "Прокоментуйте, відповівши на це повідомлення, або долучіться до розмови за посиланням: %{link}. Якщо потрібно додати вкладення, за наявності дозволу, будь ласка увійдіть у Canvas та надішліть відповідь на це обговорення."
   comment_by_replying_to_this_message_or_join_the_co_886bc612: "Прокоментуйте, відповівши на це повідомлення або долучіться до розмови за посиланням: %{link}. Якщо потрібно додати вкладення, за наявності дозволу, будь ласка увійдіть у Canvas та надішліть відповідь на це оголошення."
+  comment_from_files: 
+    few: "Дивись прікріплений файл"
+    many: "Дитвись прікріплені файли"
+    one: "Дивись прікріплений файл"
+    other: "Дитвись прікріплені файли"
   comments_e07bcbe3: Коментарі
   common_cartridge_description: "Ця функція дозволяє перетворити пакети Common Cartridge у проміжний формат json для імпортування"
   common_cartridge_display: "Загальний картридж"
@@ -6884,6 +6890,7 @@ uk:
     titles: 
       edit_rubric_rating: "Редагувати Рейтинг"
       find_existing_rubric: "Знайти існуючу рубрику"
+  edit_rubric_7d4d139d: "Редагувати категорію"
   edit_section_name_558cc89: "Редагувати Розділ \"%{name}\""
   edit_survey_b0d6890d: "Редагувати огляд"
   edit_term_name_29a8a322: "Редагувати термін %{name}"
@@ -7340,6 +7347,7 @@ uk:
   errors: 
     bad_navigation_config: "Невірне налаштування закладки курсу"
     blank: Обов'язковий
+    cannot_save_att: "Ви не маєте дозволу для редагування заблокованого атрибуту %{att_name}"
     format: "%{attribute} %{message}"
     index: 
       all_categories: "- Всі категорії -"
@@ -7583,6 +7591,8 @@ uk:
   features_2581da: Особливості
   federated_attributes_5cbe6441: "Інтегровані Атрибути"
   federated_attributes_are_information_sent_from_you_2116fb61: "Федеративні атрибути - це інформація, яка надійшла від Вашого постачальника аутентифікації, яку можна використовувати для автоматичного обновлення відповідної інформації для користувачів у Canvas щоразу при їх вході у систему."
+  feed_entry_title: "Завдання: %{assignment}"
+  feed_entry_title_with_course: "Завдання, %{course}: %{assignment}"
   feed_url_is_required_253fda4e: "URL-адреса каналу обов'язкова"
   feedback_6dcc1991: "Зворотній зв'язок"
   field_9ec0ec01: Поле
@@ -9131,6 +9141,7 @@ uk:
   kind_7f0a88c4: Тип
   label_3c9a991: "%{label}:"
   labels: 
+    due: Очікується
     lock_module_until: "Заблоковано до"
   language_6b3e2c7c: Мова
   last_activity_a983e541: "Остання активність"
@@ -16680,6 +16691,8 @@ uk:
       graded: оцінено
       submitted: відправлено
       unsubmitted: "не відправлено"
+  submission_action_take_quiz: "Скласти %{title}"
+  submission_action_turn_in_assignment: "Включити %{title}"
   submission_added_title_50ebdc85: "Завдання додано: %{title}"
   submission_comment: 
     unknown_author: Дехто
@@ -16710,6 +16723,16 @@ uk:
   submission_score_b7a291e8: "оцінка матеріалу"
   submission_tray_429ac3df: "Пул відправлень"
   submission_type_a925fc5f: "Тип матеріалу"
+  submission_types: 
+    a_content_page: "Сторінка змісту"
+    a_discussion_post: "пост для обговорення"
+    a_file_upload: "файл завантажено"
+    a_media_recording: "медіа запис"
+    a_quiz: "контрольна робота"
+    a_text_entry_box: "поле для вводу тексту"
+    a_website_url: "url вебсайту"
+    external_tool: "зовнішній інструмент"
+    on_paper: надрукований
   submission_types_79f7b436: "Типи відправлень:"
   submissions: 
     assignment_submit_success: "Завдання було успішно відправлено."

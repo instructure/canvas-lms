@@ -11313,6 +11313,7 @@ nl:
       criterion_long_description: "Criterium voor uitgebreide beschrijving"
       edit_rubric_rating: "Beoordeling bewerken"
       find_existing_rubric: "Bestaande rubriek zoeken"
+  edit_rubric_7d4d139d: "Rubric bewerken"
   edit_rubric_title_104d6fd2: "Rubriek bewerken: %{title}"
   edit_section_name_558cc89: "Sectie \"%{name}\" bewerken"
   edit_status_612572db: "Status bewerken"
@@ -16191,6 +16192,7 @@ nl:
   label_selected_list_collapsed_d93e77da: "%{label} geselecteerd. Lijst samengevouwen."
   label_values_76f4b5fa: Labelwaarden
   labels: 
+    due: Inleverdatum
     lock_module_until: "Vergrendelen tot"
   labels_292cd90b: Labels
   language_6b3e2c7c: Taal
