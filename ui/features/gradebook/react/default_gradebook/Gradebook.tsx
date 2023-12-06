@@ -3531,7 +3531,9 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       editedCommentId,
       proxySubmissionsAllowed: ENV.GRADEBOOK_OPTIONS.proxy_submissions_allowed,
       reloadSubmission: proxyDetails => this.reloadSubmission(submission, student, proxyDetails),
-      customGradeStatuses: this.options.custom_grade_statuses,
+      customGradeStatuses: this.options.custom_grade_statuses?.filter(
+        status => status.applies_to_submissions
+      ),
       customGradeStatusesEnabled: this.options.custom_grade_statuses_enabled,
     }
   }

@@ -21,6 +21,7 @@ import GradeOverrideEntry from '@canvas/grading/GradeEntry/GradeOverrideEntry'
 import type Gradebook from '../../../Gradebook'
 import {htmlDecode} from '../../../Gradebook.utils'
 import useStore from '../../../stores'
+import {gradeOverrideCustomStatus} from '../../../FinalGradeOverrides/FinalGradeOverride.utils'
 
 export default class TotalGradeOverrideCellPropFactory {
   _gradebook: Gradebook
@@ -57,7 +58,8 @@ export default class TotalGradeOverrideCellPropFactory {
       enrollmentId: enrollment.id,
     }
 
-    const {finalGradeOverrideTrayProps} = useStore.getState()
+    const {finalGradeOverrideTrayProps, finalGradeOverrides: finalGradeOverrideMap = {}} =
+      useStore.getState()
     useStore.setState({
       finalGradeOverrideTrayProps: {
         ...finalGradeOverrideTrayProps,
@@ -67,6 +69,15 @@ export default class TotalGradeOverrideCellPropFactory {
         studentInfo,
       },
     })
+
+    const selectedCustomStatusId = gradeOverrideCustomStatus(
+      finalGradeOverrideMap,
+      userId,
+      this._gradebook.gradingPeriodId
+    )
+    const selectedCustomGradeStatus = this._gradebook.options.custom_grade_statuses?.find(
+      status => status.id === selectedCustomStatusId
+    )
 
     return {
       customGradeStatusesEnabled: this._gradebook.options.custom_grade_statuses_enabled,
@@ -84,6 +95,9 @@ export default class TotalGradeOverrideCellPropFactory {
 
       pendingGradeInfo,
       studentIsGradeable: this._gradebook.studentCanReceiveGradeOverride(userId),
+      disabledByCustomStatus:
+        this._gradebook.options.custom_grade_statuses_enabled &&
+        selectedCustomGradeStatus?.allow_final_grade_value === false,
     }
   }
 }

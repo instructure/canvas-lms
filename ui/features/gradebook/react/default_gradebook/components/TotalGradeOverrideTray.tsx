@@ -31,7 +31,7 @@ import {Link} from '@instructure/ui-link'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import GradeOverrideTrayRadioInputGroup from './GradeOverrideTrayRadioInputGroup'
-import type {GradeStatus} from '@canvas/grading/accountGradingStatus'
+import type {GradeStatusUnderscore} from '@canvas/grading/accountGradingStatus'
 
 import useStore from '../stores'
 import {gradeOverrideCustomStatus} from '../FinalGradeOverrides/FinalGradeOverride.utils'
@@ -49,7 +49,7 @@ const componentOverrides = {
 }
 
 export type TotalGradeOverrideTrayProps = {
-  customGradeStatuses: GradeStatus[]
+  customGradeStatuses: GradeStatusUnderscore[]
   handleDismiss: (manualDismiss: boolean) => void
   handleOnGradeChange: (studentId: string, grade: GradeOverrideInfo) => void
   selectedGradingPeriodId?: string
@@ -105,6 +105,10 @@ export function TotalGradeOverrideTray({
     selectedGradingPeriodId
   )
 
+  const selectedCustomStatus = customGradeStatuses.find(
+    status => status.id === selectedCustomStatusId
+  )
+
   const {name, avatarUrl, gradesUrl, enrollmentId} = studentInfo
 
   const getNullableSelectedGradingPeriodId = (): string | null | undefined => {
@@ -150,6 +154,10 @@ export function TotalGradeOverrideTray({
 
   const studentFinalGradeOverrides = finalGradeOverrides[studentId]
   const gradingPeriodId = getNullableSelectedGradingPeriodId()
+
+  const studentFinalGradePercentage = gradingPeriodId
+    ? studentFinalGradeOverrides?.gradingPeriodGrades?.[gradingPeriodId]?.percentage
+    : studentFinalGradeOverrides?.courseGrade?.percentage
 
   return (
     <Tray
@@ -209,6 +217,7 @@ export function TotalGradeOverrideTray({
               gradingScheme={gradeEntry?.gradingScheme}
               showPercentageLabel={false}
               width="4rem"
+              disabled={selectedCustomStatus?.allow_final_grade_value === false}
             />
           </View>
 
@@ -219,6 +228,10 @@ export function TotalGradeOverrideTray({
               <View as="div" margin="medium 0">
                 <GradeOverrideTrayRadioInputGroup
                   disabled={saveCallStatus === ApiCallStatus.PENDING}
+                  hasOverrideScore={
+                    studentFinalGradePercentage !== null &&
+                    studentFinalGradePercentage !== undefined
+                  }
                   handleRadioInputChanged={handleRadioInputChanged}
                   customGradeStatuses={customGradeStatuses}
                   selectedCustomStatusId={selectedCustomStatusId}
