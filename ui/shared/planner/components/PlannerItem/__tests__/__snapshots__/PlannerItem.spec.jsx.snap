@@ -785,6 +785,7 @@ exports[`prefers to render feedback if it and the location are available 1`] = `
             name="Dr. David Bowman"
             onImageLoaded={[Function]}
             shape="circle"
+            showBorder="auto"
             size="small"
             src="/avatar/is/here/"
           />
@@ -8121,6 +8122,7 @@ exports[`renders Note correctly with everything 1`] = `
         name="Jane"
         onImageLoaded={[Function]}
         shape="circle"
+        showBorder="auto"
         size="small"
         src="/picture/is/here"
       />
@@ -8545,6 +8547,7 @@ exports[`renders Note correctly without Course 1`] = `
         name="Jane"
         onImageLoaded={[Function]}
         shape="circle"
+        showBorder="auto"
         size="small"
         src="/picture/is/here"
       />
@@ -12899,6 +12902,7 @@ exports[`renders feedback anonymously according to the assignment settings 1`] =
             name="?"
             onImageLoaded={[Function]}
             shape="circle"
+            showBorder="auto"
             size="small"
           />
         </span>
@@ -13304,6 +13308,7 @@ exports[`renders feedback if available 1`] = `
             name="Boyd Crowder"
             onImageLoaded={[Function]}
             shape="circle"
+            showBorder="auto"
             size="small"
             src="/avatar/is/here/"
           />
@@ -13710,6 +13715,7 @@ exports[`renders media feedback if available 1`] = `
             name="Howard Stern"
             onImageLoaded={[Function]}
             shape="circle"
+            showBorder="auto"
             size="small"
             src="/avatar/is/here/"
           />
@@ -14819,6 +14825,7 @@ exports[`renders user-created Todo correctly 1`] = `
         name="Jane"
         onImageLoaded={[Function]}
         shape="circle"
+        showBorder="auto"
         size="small"
         src="/picture/is/here"
       />
