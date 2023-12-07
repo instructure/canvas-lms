@@ -19,22 +19,43 @@
 import {string} from 'prop-types'
 import gql from 'graphql-tag'
 
-export const AssignmentGroup = {
+import {AssignmentGroup} from './AssignmentGroup'
+
+export const Assignment = {
   fragment: gql`
-    fragment AssignmentGroup on AssignmentGroup {
+    fragment Assignment on Assignment {
       _id
       id
       name
+      postToSis
+      pointsPossible
+      assignmentGroup {
+        ...AssignmentGroup
+      }
     }
+    ${AssignmentGroup.fragment}
   `,
   shape: {
     _id: string,
     id: string,
     name: string,
+    postToSis: string,
+    pointsPossible: string,
+    assignmentGroup: AssignmentGroup.shape,
   },
-  mock: ({_id = '1', id = '1', name = 'Homework'} = {}) => ({
+  mock: ({
+    _id = '1',
+    id = '1',
+    name = 'Homework',
+    postToSis = '1',
+    pointsPossible = '10',
+    assignmentGroup = AssignmentGroup.mock(),
+  } = {}) => ({
     _id,
     id,
     name,
+    postToSis,
+    pointsPossible,
+    assignmentGroup,
   }),
 }
