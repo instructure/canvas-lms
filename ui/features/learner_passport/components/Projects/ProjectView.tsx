@@ -40,19 +40,16 @@ type ProjectViewProps = {
 
 const ProjectView = ({project, inTray}: ProjectViewProps) => {
   const navigate = useNavigate()
-  const [showingAchievementDetails, setShowingAchievementDetails] = useState(false)
-  const [activeCard, setActiveCard] = useState<AchievementData | undefined>(undefined)
+  const [activeAchievement, setActiveAchievement] = useState<AchievementData | undefined>(undefined)
 
   const handleDismissAchievementDetails = useCallback(() => {
-    setShowingAchievementDetails(false)
-    setActiveCard(undefined)
+    setActiveAchievement(undefined)
   }, [])
 
   const handleAchievementCardClick = useCallback(
     (achievementId: string) => {
       const card = project.achievements.find(a => a.id === achievementId)
-      setActiveCard(card)
-      setShowingAchievementDetails(card !== undefined)
+      setActiveAchievement(card)
     },
     [project.achievements]
   )
@@ -142,13 +139,11 @@ const ProjectView = ({project, inTray}: ProjectViewProps) => {
           </View>
         )}
       </View>
-      {activeCard && (
-        <AchievementTray
-          open={showingAchievementDetails}
-          onDismiss={handleDismissAchievementDetails}
-          activeCard={activeCard}
-        />
-      )}
+      <AchievementTray
+        open={!!activeAchievement}
+        onClose={handleDismissAchievementDetails}
+        activeCard={activeAchievement}
+      />
     </>
   )
 }

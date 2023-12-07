@@ -22,6 +22,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import ClickableCard from '../shared/ClickableCard'
 import AchievementDashboardCard from './AchievementDashboardCard'
 import type {AchievementData} from '../types'
 import AchievementTray from './AchievementTray'
@@ -44,24 +45,6 @@ const AchievementsLayout = () => {
     setShowingDetails(false)
   }, [])
 
-  const handleCardClick = useCallback(
-    (e: React.MouseEvent) => {
-      // @ts-expect-error
-      showDetails(e.currentTarget.getAttribute('data-cardid'))
-    },
-    [showDetails]
-  )
-
-  const handleCardKey = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (e.key === 'Enter') {
-        // @ts-expect-error
-        showDetails(e.currentTarget.getAttribute('data-cardid'))
-      }
-    },
-    [showDetails]
-  )
-
   return (
     <View as="div" maxWidth="1260px">
       <Heading level="h1" themeOverride={{h1FontWeight: 700}}>
@@ -78,28 +61,21 @@ const AchievementsLayout = () => {
       <Flex as="div" margin="small 0" gap="medium" wrap="wrap">
         {achievements.map((achievement: AchievementData) => (
           <Flex.Item key={achievement.id} shouldShrink={false}>
-            <div
-              data-cardid={achievement.id}
-              role="button"
-              style={{cursor: 'pointer'}}
-              tabIndex={0}
-              onClick={handleCardClick}
-              onKeyDown={handleCardKey}
-            >
+            <ClickableCard onClick={showDetails} cardId={achievement.id}>
               <AchievementDashboardCard
                 isNew={achievement.isNew}
                 title={achievement.title}
                 issuer={achievement.issuer.name}
                 imageUrl={achievement.imageUrl}
               />
-            </div>
+            </ClickableCard>
           </Flex.Item>
         ))}
       </Flex>
       {activeCard && (
         <AchievementTray
           open={showingDetails}
-          onDismiss={handleDismissTray}
+          onClose={handleDismissTray}
           activeCard={activeCard}
         />
       )}

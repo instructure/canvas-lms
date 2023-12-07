@@ -38,6 +38,7 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import type {AchievementData, ProjectDetailData} from '../types'
 import AchievementCard from '../Achievements/AchievementCard'
 import ProjectCard from '../Projects/ProjectCard'
+import ClickableCard from './ClickableCard'
 
 export function stringToId(s: string): string {
   return s.replace(/\W+/g, '-')
@@ -125,38 +126,20 @@ export const renderEditLink = (
   )
 }
 
-function handleCardKey(id: string, onClick: (id: string) => void, e: React.KeyboardEvent) {
-  if (e.key === 'Enter') {
-    e.preventDefault()
-    onClick(id)
-  }
-}
-
-function handleCardClick(id: string, onClick: (id: string) => void, _e: React.MouseEvent) {
-  onClick(id)
-}
-
 export function renderAchievement(
   achievement: AchievementData,
   onCardClick: (achievementId: string) => void
 ) {
   return (
     <View as="div" shadow="resting">
-      <div
-        data-cardid={achievement.id}
-        role="button"
-        style={{cursor: 'pointer'}}
-        tabIndex={0}
-        onClick={handleCardClick.bind(null, achievement.id, onCardClick)}
-        onKeyDown={handleCardKey.bind(null, achievement.id, onCardClick)}
-      >
+      <ClickableCard cardId={achievement.id} onClick={onCardClick}>
         <AchievementCard
           isNew={achievement.isNew}
           title={achievement.title}
           issuer={achievement.issuer.name}
           imageUrl={achievement.imageUrl}
         />
-      </div>
+      </ClickableCard>
     </View>
   )
 }
@@ -164,16 +147,9 @@ export function renderAchievement(
 export function renderProject(project: ProjectDetailData, onClick: (projectId: string) => void) {
   return (
     <View as="div" shadow="resting">
-      <div
-        data-cardid={project.id}
-        role="button"
-        style={{cursor: 'pointer'}}
-        tabIndex={0}
-        onClick={handleCardClick.bind(null, project.id, onClick)}
-        onKeyDown={handleCardKey.bind(null, project.id, onClick)}
-      >
+      <ClickableCard cardId={project.id} onClick={onClick}>
         <ProjectCard project={project} />
-      </div>
+      </ClickableCard>
     </View>
   )
 }
