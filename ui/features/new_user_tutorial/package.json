@@ -2,5 +2,6 @@
   "name": "@canvas-features/new_user_tutorial",
   "private": true,
   "version": "1.0.0",
-  "main": "./index.tsx"
+  "main": "./index.tsx",
+  "owner": "FOO"
 }
