@@ -40,6 +40,31 @@ module Lti
   #   * postMessage Storage: https://www.imsglobal.org/spec/lti-pm-s/v0p1
   #   * Implementation Guide: https://www.imsglobal.org/spec/lti-cs-oidc/v0p1
   class PlatformStorageController < ApplicationController
+    RB_REV =
+      begin
+        code = File.read(__FILE__)
+        view_file = Rails.root.join("app/views/lti/platform_storage/post_message_forwarding.html.erb")
+        code += File.read(view_file)
+        Digest::SHA256.hexdigest(code)[0...16]
+      rescue => e
+        Canvas::Errors.capture(e)
+        Date.today.to_s
+      end
+
+    # The forwarder iframe HTML and Javascript are heavily cached. This
+    # fingerprints the ruby and JS files. This can then be used as a query
+    # param, so the URL will change and bypass the cache when the code changes
+    def self.rev_fingerprint
+      "#{js_rev}-#{RB_REV}"
+    end
+
+    def self.js_rev
+      js_url = Canvas::Cdn.registry.url_for("javascripts/lti_post_message_forwarding.js")
+      File.basename(js_url).split("-").last.split(".").first
+    end
+
+    # render a *very* bare-bones page that only has the JS it needs
+    # to forward postMessages to the parent Canvas window
     def post_message_forwarding
       unless Lti::PlatformStorage.flag_enabled?
         render status: :not_found
