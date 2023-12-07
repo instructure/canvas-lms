@@ -4,5 +4,6 @@
   "version": "1.0.0",
   "canvas": {
     "component": "permissions"
-  }
+  },
+  "owner": "DEMO"
 }
