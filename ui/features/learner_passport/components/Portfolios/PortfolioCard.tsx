@@ -104,7 +104,7 @@ const PortfolioCard = ({id, title, heroImageUrl, onAction}: PortfolioCardProps) 
       </View>
       <Flex as="div">
         <Flex.Item shouldGrow={true} padding="small small 0 small">
-          <Text weight="bold" size="medium">
+          <Text weight="bold" size="large">
             {title}
           </Text>
         </Flex.Item>

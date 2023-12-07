@@ -62,7 +62,7 @@ const PortfolioViewPage = () => {
         </Breadcrumb.Link>
         <Breadcrumb.Link>{portfolio.title}</Breadcrumb.Link>
       </Breadcrumb>
-      <Flex as="div" margin="0 0 medium 0">
+      <Flex as="div" margin="medium 0 medium 0">
         <Flex.Item shouldGrow={true}>
           <Heading level="h1" themeOverride={{h1FontWeight: 700}}>
             {portfolio.title}
@@ -90,7 +90,7 @@ const PortfolioViewPage = () => {
           </Button>
         </Flex.Item>
       </Flex>
-      <View as="div" shadow="resting" margin="0 0 x-large 0">
+      <View as="div" shadow="above" margin="0 0 x-large 0">
         <PortfolioView portfolio={portfolio} />
       </View>
       <PortfolioPreviewModal

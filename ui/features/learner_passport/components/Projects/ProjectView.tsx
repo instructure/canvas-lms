@@ -31,6 +31,8 @@ import {renderAchievement, renderLink} from '../shared/utils'
 import {renderSkillTag} from '../shared/SkillTag'
 import AchievementTray from '../Achievements/AchievementTray'
 
+const css = '.description p:first-child { margin-top: 0; }'
+
 type ProjectViewProps = {
   project: ProjectDetailData
   inTray?: boolean
@@ -61,6 +63,7 @@ const ProjectView = ({project, inTray}: ProjectViewProps) => {
 
   return (
     <>
+      <style>{css}</style>
       <View as="div" margin="0 0 x-large 0">
         <div style={{height: '184px', background: '#C7CDD1', overflow: 'hidden', zIndex: -1}}>
           {project.heroImageUrl && (
@@ -82,9 +85,7 @@ const ProjectView = ({project, inTray}: ProjectViewProps) => {
             </Heading>
 
             <View as="div" margin="0 0 x-large 0">
-              <Heading level="h3" themeOverride={{h3FontSize: '1rem'}}>
-                By {ENV.current_user.display_name}
-              </Heading>
+              <Text size="large">By {ENV.current_user.display_name}</Text>
             </View>
           </>
         )}
@@ -103,7 +104,7 @@ const ProjectView = ({project, inTray}: ProjectViewProps) => {
             Description
           </Heading>
           <Text as="div" size="small" wrap="break-word">
-            <div dangerouslySetInnerHTML={{__html: project.description}} />
+            <div className="description" dangerouslySetInnerHTML={{__html: project.description}} />
           </Text>
         </View>
         {project.attachments.length > 0 && (

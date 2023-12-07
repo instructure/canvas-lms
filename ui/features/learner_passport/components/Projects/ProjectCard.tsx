@@ -56,8 +56,8 @@ const ProjectCard = ({project}: ProjectCardProps) => {
         )}
       </View>
       <Flex as="div" direction="column" gap="small" padding="small">
-        <Flex.Item shouldGrow={true} padding="small small 0 small">
-          <Text weight="bold" size="medium">
+        <Flex.Item shouldGrow={true}>
+          <Text weight="bold" size="large">
             {project.title}
           </Text>
         </Flex.Item>
@@ -86,15 +86,16 @@ const ProjectCard = ({project}: ProjectCardProps) => {
                   backgroundColor: '#F5F5F5',
                   marginInlineEnd: '.25rem',
                   padding: '.25rem',
-                  width: '1.5rem',
-                  height: '1.5rem',
-                  lineHeight: '1.5rem',
+                  width: '1rem',
+                  height: '1rem',
+                  lineHeight: '1rem',
                   textAlign: 'center',
+                  fontSize: '.75rem',
                 }}
               >
                 {project.attachments.length}
               </div>
-              <Text>Attachments</Text>
+              <Text size="small">Attachments</Text>
             </Flex.Item>
             <View borderWidth="0 0 0 small" height="1.5rem" />
             <Flex.Item>
@@ -105,15 +106,16 @@ const ProjectCard = ({project}: ProjectCardProps) => {
                   backgroundColor: '#F5F5F5',
                   marginInlineEnd: '.25rem',
                   padding: '.25rem',
-                  width: '1.5rem',
-                  height: '1.5rem',
-                  lineHeight: '1.5rem',
+                  width: '1rem',
+                  height: '1rem',
+                  lineHeight: '1rem',
                   textAlign: 'center',
+                  fontSize: '.75rem',
                 }}
               >
                 {project.achievements.length}
               </div>
-              <Text>Achievements</Text>
+              <Text size="small">Achievements</Text>
             </Flex.Item>
           </Flex>
         </Flex.Item>

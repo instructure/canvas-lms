@@ -31,7 +31,7 @@ interface EducationCardProps {
 
 const EducationCard = ({education}: EducationCardProps) => {
   return (
-    <View as="div" padding="x-small" data-testid="education-card">
+    <View as="div" padding="medium" data-testid="education-card">
       <Text size="x-small" weight="light">
         {formatDate(education.from_date)} - {formatDate(education.to_date)}
       </Text>

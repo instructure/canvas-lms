@@ -41,7 +41,9 @@ export const LearnerPassportRoutes = (
       >
         <Route
           path="duplicate/:portfolioId"
-          loader={async ({params}) => {
+          action={async ({request, params}) => {
+            const fd = await request.formData()
+            const title = fd.get('title')
             await fetch(`/users/${params.userId}/passport/data/portfolios/duplicate`, {
               method: 'PUT',
               cache: 'no-cache',
@@ -51,12 +53,14 @@ export const LearnerPassportRoutes = (
               },
               body: JSON.stringify({portfolio_id: params.portfolioId}),
             })
-            return redirect(`/users/${params.userId}/passport/portfolios/dashboard?dupe=true`)
+            return redirect(`/users/${params.userId}/passport/portfolios/dashboard?dupe=${title}`)
           }}
         />
         <Route
           path="delete/:portfolioId"
-          loader={async ({params}) => {
+          action={async ({request, params}) => {
+            const fd = await request.formData()
+            const title = fd.get('title')
             await fetch(`/users/${params.userId}/passport/data/portfolios/delete`, {
               method: 'PUT',
               cache: 'no-cache',
@@ -66,7 +70,7 @@ export const LearnerPassportRoutes = (
               },
               body: JSON.stringify({portfolio_id: params.portfolioId}),
             })
-            return redirect(`/users/${params.userId}/passport/portfolios/dashboard?delete=true`)
+            return redirect(`/users/${params.userId}/passport/portfolios/dashboard?delete=${title}`)
           }}
         />
         <Route
@@ -161,7 +165,9 @@ export const LearnerPassportRoutes = (
       >
         <Route
           path="duplicate/:projectId"
-          loader={async ({params}) => {
+          action={async ({request, params}) => {
+            const fd = await request.formData()
+            const title = fd.get('title')
             await fetch(`/users/${params.userId}/passport/data/projects/duplicate`, {
               method: 'PUT',
               cache: 'no-cache',
@@ -171,12 +177,14 @@ export const LearnerPassportRoutes = (
               },
               body: JSON.stringify({project_id: params.projectId}),
             })
-            return redirect(`/users/${params.userId}/passport/projects/dashboard?dupe=true`)
+            return redirect(`/users/${params.userId}/passport/projects/dashboard?dupe=${title}`)
           }}
         />
         <Route
           path="delete/:projectId"
-          loader={async ({params}) => {
+          action={async ({request, params}) => {
+            const fd = await request.formData()
+            const title = fd.get('title')
             await fetch(`/users/${params.userId}/passport/data/projects/delete`, {
               method: 'PUT',
               cache: 'no-cache',
@@ -186,7 +194,7 @@ export const LearnerPassportRoutes = (
               },
               body: JSON.stringify({project_id: params.projectId}),
             })
-            return redirect(`/users/${params.userId}/passport/projects/dashboard?delete=true`)
+            return redirect(`/users/${params.userId}/passport/projects/dashboard?delete=${title}`)
           }}
         />
         <Route

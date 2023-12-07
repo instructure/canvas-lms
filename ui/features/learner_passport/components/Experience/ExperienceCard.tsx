@@ -28,7 +28,7 @@ interface ExperienceCardProps {
 }
 const ExperienceCard = ({experience}: ExperienceCardProps) => {
   return (
-    <View as="div" padding="x-small" data-testid="experience-card">
+    <View as="div" padding="medium" data-testid="experience-card">
       <Text size="x-small" weight="light">
         {formatDate(experience.from_date)} - {formatDate(experience.to_date)}
       </Text>

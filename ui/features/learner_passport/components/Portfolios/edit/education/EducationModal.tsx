@@ -22,7 +22,6 @@ import {Flex} from '@instructure/ui-flex'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
-import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
 import {Tooltip} from '@instructure/ui-tooltip'
@@ -30,6 +29,7 @@ import {View} from '@instructure/ui-view'
 import {uid} from '@instructure/uid'
 import type {EducationData} from '../../../types'
 import {formatDate} from '../../../shared/utils'
+import StatePicker from '../../../shared/StatePicker'
 import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
 
 interface EducationModalProps {
@@ -115,67 +115,6 @@ const EducationModal = ({education, open, onDismiss, onSave}: EducationModalProp
     []
   )
 
-  const renderStates = () => {
-    const states: Record<string, string> = {
-      '--': '',
-      Alabama: 'AL',
-      Alaska: 'AK',
-      Arizona: 'AZ',
-      Arkansas: 'AR',
-      California: 'CA',
-      Colorado: 'CO',
-      Connecticut: 'CT',
-      Delaware: 'DE',
-      Florida: 'FL',
-      Georgia: 'GA',
-      Hawaii: 'HI',
-      Idaho: 'ID',
-      Illinois: 'IL',
-      Indiana: 'IN',
-      Iowa: 'IA',
-      Kansas: 'KS',
-      Kentucky: 'KY',
-      Louisiana: 'LA',
-      Maine: 'ME',
-      Maryland: 'MD',
-      Massachusetts: 'MA',
-      Michigan: 'MI',
-      Minnesota: 'MN',
-      Mississippi: 'MS',
-      Missouri: 'MO',
-      Montana: 'MT',
-      Nebraska: 'NE',
-      Nevada: 'NV',
-      'New Hampshire': 'NH',
-      'New Jersey': 'NJ',
-      'New Mexico': 'NM',
-      'New York': 'NY',
-      'North Carolina': 'NC',
-      'North Dakota': 'ND',
-      Ohio: 'OH',
-      Oklahoma: 'OK',
-      Oregon: 'OR',
-      Pennsylvania: 'PA',
-      'Rhode Island': 'RI',
-      'South Carolina': 'SC',
-      'South Dakota': 'SD',
-      Tennessee: 'TN',
-      Texas: 'TX',
-      Utah: 'UT',
-      Vermont: 'VT',
-      Virginia: 'VA',
-      Washington: 'WA',
-      'West Virginia': 'WV',
-      Wisconsin: 'WI',
-      Wyoming: 'WY',
-    }
-    return Object.keys(states).map(st => (
-      <SimpleSelect.Option id={st} key={st} value={states[st]}>
-        {st}
-      </SimpleSelect.Option>
-    ))
-  }
-
   const renderBodyContents = () => {
     return (
       <>
@@ -197,14 +136,7 @@ const EducationModal = ({education, open, onDismiss, onSave}: EducationModalProp
             />
           </Flex.Item>
           <Flex.Item shouldGrow={true}>
-            <SimpleSelect
-              name="education[state]"
-              renderLabel="State"
-              value={state}
-              onChange={(_e, data) => setState(data.value as string)}
-            >
-              {renderStates()}
-            </SimpleSelect>
+            <StatePicker state={state} onChange={setState} />
           </Flex.Item>
         </Flex>
         <Flex gap="small">

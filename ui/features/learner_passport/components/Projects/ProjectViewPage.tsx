@@ -84,7 +84,7 @@ const ProjectViewPage = () => {
           </Button>
         </Flex.Item>
       </Flex>
-      <View as="div" shadow="resting" margin="0 0 x-large 0">
+      <View as="div" shadow="above" margin="0 0 x-large 0">
         <ProjectView project={project} />
       </View>
       <ProjectPreviewModal project={project} open={showPreview} onClose={handleClosePreview} />

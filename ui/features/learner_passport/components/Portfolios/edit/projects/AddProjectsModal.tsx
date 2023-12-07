@@ -96,7 +96,7 @@ const AddProjectsModal = ({projects, open, onDismiss, onSave}: AddProjectsModalP
     if (projects.length === 0) {
       return (
         <View as="div" padding="small" minWidth="23rem">
-          <Text>No projects received</Text>
+          <Text>No projects available</Text>
         </View>
       )
     }

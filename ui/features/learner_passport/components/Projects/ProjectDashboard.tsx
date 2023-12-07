@@ -41,12 +41,14 @@ const ProjectDashboard = () => {
   const [actionProjectId, setActionProjectId] = useState('')
 
   const url = new URL(window.location.href)
-  if (url.searchParams.get('dupe') === 'true') {
-    showFlashAlert({message: 'Project duplicated', type: 'success'})
+  if (url.searchParams.has('dupe')) {
+    const title = url.searchParams.get('dupe') || 'Project'
+    showFlashAlert({message: `"${title}" duplicated`, type: 'success'})
     window.history.replaceState(window.history.state, '', url.pathname)
   }
-  if (url.searchParams.get('delete') === 'true') {
-    showFlashAlert({message: 'Project deleted', type: 'success'})
+  if (url.searchParams.has('delete')) {
+    const title = url.searchParams.get('delete') || 'Project'
+    showFlashAlert({message: `"${title}" deleted`, type: 'success'})
     window.history.replaceState(window.history.state, '', url.pathname)
   }
 
@@ -79,7 +81,15 @@ const ProjectDashboard = () => {
     async (projectId: string, action: string) => {
       switch (action) {
         case 'duplicate':
-          navigate(`duplicate/${projectId}`)
+          {
+            const portfolio = projects.find(p => p.id === projectId)
+            if (portfolio) {
+              submit(
+                {projectId, title: portfolio.title},
+                {method: 'PUT', action: `duplicate/${projectId}`}
+              )
+            }
+          }
           break
         case 'edit':
           navigate(`../edit/${projectId}`)
@@ -93,12 +103,14 @@ const ProjectDashboard = () => {
             if (project) {
               const ok = await confirm(
                 <div>
-                  Are you sure you want to delete
-                  <span style={{whiteSpace: 'nowrap'}}>{project.title}</span>?
+                  <span>Are you sure you want to delete &quot;{project.title}&quot;</span>?
                 </div>
               )
               if (ok) {
-                navigate(`delete/${projectId}`)
+                submit(
+                  {projectId, title: project.title},
+                  {method: 'PUT', action: `delete/${projectId}`}
+                )
               }
             }
           }
@@ -111,7 +123,7 @@ const ProjectDashboard = () => {
           showUnimplemented({currentTarget: {textContent: action}})
       }
     },
-    [navigate, projects]
+    [navigate, projects, submit]
   )
 
   return (
