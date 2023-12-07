@@ -2595,6 +2595,7 @@ el:
   associated_account_name_91854e37: "Όνομα Σχετιζόμενου Λογαριασμού"
   associated_course_name_9b5b1945: "Όνομα Σχετιζόμενου Μαθήματος"
   associations_3fd4abe8: Συσχετίσεις
+  atom_no_author: "Δεν υπάρχει Συγγραφέας"
   attach_4234a79b: Επισύναψη
   attach_files_to_discussions_bd16c245: "Επισύναψη αρχείων στις συζητήσεις"
   attached_files_4c1d26cf: "Επισυναπτόμενα Αρχεία:"
@@ -3449,6 +3450,9 @@ el:
   comm_messages: 
     from_beginning: "η αρχή"
     to_now: τώρα
+  comment_from_files: 
+    one: "Δείτε το επισυναπτόμενο αρχείο"
+    other: "Δείτε τα επισυναπτόμενα αρχεία"
   comments_e07bcbe3: Σχόλια
   common_cartridge_description: "Αυτή η επιλογή επιτρέπει τη μετατροπή πακέτων Common Cartridge στην ενδιάμεση μορφή json για εισαγωγή"
   common_cartridge_display: "Common Cartridge"
@@ -5837,6 +5841,7 @@ el:
       read_only_rubric: "<mrk mid=\"862\" mtype=\"seg\">Δεν μπορείτε να επεξεργαστείτε αυτή τη ρουμπρίκα είτε επειδή δεν έχετε άδεια ή επειδή χρησιμοποιείται σε περισσότερα από ένα σημεία.</mrk> <mrk mid=\"863\" mtype=\"seg\">Τυχόν αλλαγές που θα πραγματοποιήσετε θα έχουν ως αποτέλεσμα μια νέα ρουμπρίκα βασισμένη στην παλιά ρουμπρίκα.</mrk> <mrk mid=\"864\" mtype=\"seg\">Θέλετε, παρόλα αυτά, να συνεχίσετε;</mrk>"
     titles: 
       find_existing_rubric: "Βρείτε Υπάρχουσα Ρουμπρίκα"
+  edit_rubric_7d4d139d: "Επεξεργασία Ρουμπρίκας"
   edit_survey_b0d6890d: "Τροποποίησης Δημοσκόπισης"
   edit_this_key_1ee53473: "Επεξεργασία αυτού του κλειδιού"
   edit_toolname_app_23cfbb8: "Τροποποίηση %{toolName} Εφαρμογής"
@@ -6223,6 +6228,7 @@ el:
   errors: 
     bad_navigation_config: "Μη έγκυρη ρύθμιση της καρτέλας του μαθήματος"
     blank: Απαιτούμενο
+    cannot_save_att: "Δεν έχετε άδεια να επεξεργαστείτε το κλειδωμένο χαρακτηριστικό %{att_name}"
     format: "%{attribute} %{message}"
     index: 
       all_categories: " - Όλες οι Κατηγορίες - "
@@ -6404,6 +6410,8 @@ el:
     post_grades: "Δημοσίευση Βαθμών στο SIS"
     quiz_log_auditing: "Έλεγχος Καταγραφής Κουίζ"
     student_outcome_gradebook: "Βαθμολόγιο Μαθησιακής Επιδεξιότητας Φοιτητή/τριας"
+  feed_entry_title: "Εργασία: %{assignment}"
+  feed_entry_title_with_course: "Εργασία, %{course}: %{assignment}"
   field_9ec0ec01: Πεδίο
   field_name_31fff38e: "Όνομα Πεδίου"
   file_6863ad33: αρχείο
@@ -7660,6 +7668,7 @@ el:
   kind_7f0a88c4: Είδος
   label_3c9a991: "%{label}:"
   labels: 
+    due: "Καταληκτική Ημερομηνία"
     lock_module_until: "Κλειδωμένο έως"
   language_6b3e2c7c: Γλώσσα
   last_activity_a983e541: "Τελευταία Δραστηριότητα"
@@ -14175,6 +14184,7 @@ el:
       submitted: υποβλήθηκε
       unsubmitted: "δεν έχει υποβληθεί"
   submission_action_take_quiz: "Επιλογή του %{title}"
+  submission_action_turn_in_assignment: "Υποβολή %{title}"
   submission_comment: 
     unknown_author: Κάποιος
   submission_comments_4fa03a17: "Σχόλια Υποβολής"
@@ -14204,8 +14214,15 @@ el:
   submission_score_b7a291e8: "βαθμολογία υποβολής"
   submission_type_a925fc5f: "Είδος υποβολής"
   submission_types: 
+    a_content_page: "μια σελίδα περιεχομένου"
     a_discussion_post: "μια δημοσίευση συζήτησης"
+    a_file_upload: "μια μεταφόρτωση αρχείου"
+    a_media_recording: "καταγραφή ήχου/βίντεο"
     a_quiz: "ένα κουίζ"
+    a_text_entry_box: "πλαίσιο καταχώρισης κειμένου"
+    a_website_url: "url ιστοσελίδας"
+    external_tool: "εξωτερικό εργαλείο"
+    on_paper: χειρόγραφο/δακτυλογραφημένο
   submission_types_79f7b436: "Είδη υποβολής:"
   submissions: 
     assignment_submit_success: "Η εργασία υποβλήθηκε επιτυχώς."
