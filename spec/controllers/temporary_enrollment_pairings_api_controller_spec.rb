@@ -27,7 +27,7 @@ describe TemporaryEnrollmentPairingsApiController do
 
   before do
     user_session(@admin)
-    @temporary_enrollment_pairing = @account.temporary_enrollment_pairings.create!
+    @temporary_enrollment_pairing = @account.temporary_enrollment_pairings.create!(created_by: @admin)
   end
 
   describe "GET #index" do
@@ -68,15 +68,17 @@ describe TemporaryEnrollmentPairingsApiController do
       json_response = response.parsed_body
       temporary_enrollment_pairing = json_response["temporary_enrollment_pairing"]
       expect(temporary_enrollment_pairing["id"]).not_to be_nil
+      expect(temporary_enrollment_pairing["created_by_id"]).to eq(@admin.id)
     end
   end
 
   describe "DELETE #destroy" do
     it "deletes a temporary enrollment pairing" do
-      get :destroy, params: { account_id: @account.id, id: @temporary_enrollment_pairing.id }
+      delete :destroy, params: { account_id: @account.id, id: @temporary_enrollment_pairing.id }
 
       expect(response).to be_successful
       expect(@temporary_enrollment_pairing.reload).to be_deleted
+      expect(@temporary_enrollment_pairing["deleted_by_id"]).to eq(@admin.id)
     end
   end
 end

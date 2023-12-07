@@ -229,7 +229,7 @@ describe EnrollmentsApiController, type: :request do
           teacher_in_course(active_all: true)
           @account = Account.default
           @account.enable_feature!(:temporary_enrollments)
-          @temporary_enrollment_pairing = TemporaryEnrollmentPairing.create!(root_account: @account)
+          @temporary_enrollment_pairing = TemporaryEnrollmentPairing.create!(root_account: @account, created_by: account_admin_user)
         end
 
         context "when feature flag is enabled" do
@@ -1150,7 +1150,7 @@ describe EnrollmentsApiController, type: :request do
         @recipient = user_factory(active_all: true)
         course1 = course_with_teacher(active_all: true, user: @provider).course
         course2 = course_with_teacher(active_all: true, user: @provider).course
-        temporary_enrollment_pairing = TemporaryEnrollmentPairing.create!(root_account: Account.default)
+        temporary_enrollment_pairing = TemporaryEnrollmentPairing.create!(root_account: Account.default, created_by: account_admin_user)
         course1.enroll_user(
           @recipient,
           "TeacherEnrollment",
@@ -3510,7 +3510,7 @@ describe EnrollmentsApiController, type: :request do
       @recipient = user_factory(active_all: true)
       course1 = course_with_teacher(active_all: true, user: @provider).course
       course2 = course_with_teacher(active_all: true, user: @provider).course
-      temporary_enrollment_pairing = TemporaryEnrollmentPairing.create!(root_account: Account.default)
+      temporary_enrollment_pairing = TemporaryEnrollmentPairing.create!(root_account: Account.default, created_by: account_admin_user)
       course1.enroll_user(
         @recipient,
         "TeacherEnrollment",
