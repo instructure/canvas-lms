@@ -18,8 +18,8 @@
 
 import moment from 'moment-timezone'
 
-import {CoursePace, OriginalState, StoreState} from '../types'
-import {BlackoutDate} from '../shared/types'
+import type {CoursePace, OriginalState, StoreState} from '../types'
+import type {BlackoutDate} from '../shared/types'
 import {Constants as CoursePaceConstants} from '../actions/course_paces'
 import {Constants as BlackoutDateConstants} from '../shared/actions/blackout_dates'
 import {Constants as UIConstants} from '../actions/ui'

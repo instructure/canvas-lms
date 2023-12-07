@@ -121,7 +121,7 @@ module Lti::IMS::NamesAndRolesMatchers
     [
       {
         "https://purl.imsglobal.org/spec/lti/claim/message_type" => "LtiResourceLinkRequest",
-        "locale" => (user.locale || I18n.default_locale.to_s),
+        "locale" => user.locale || I18n.default_locale.to_s,
         "https://purl.imsglobal.org/spec/lti/claim/custom" => {},
         "https://purl.imsglobal.org/spec/lti/claim/lti11_legacy_user_id" => tool.opaque_identifier_for(user),
         "https://purl.imsglobal.org/spec/lti/claim/lti1p1" => {

@@ -471,7 +471,7 @@ test("sets the record's assignment group id", () => {
 
 QUnit.module('Assignment#canDelete', {
   setup() {
-    fakeENV.setup({current_user_roles: ['teacher']})
+    fakeENV.setup({current_user_roles: ['teacher'], current_user_is_admin: false})
   },
   teardown() {
     fakeENV.teardown()
@@ -499,7 +499,7 @@ test("returns true if 'frozen' and 'in_closed_grading_period' are false", () => 
 
 QUnit.module('Assignment#canMove as teacher', {
   setup() {
-    fakeENV.setup({current_user_roles: ['teacher']})
+    fakeENV.setup({current_user_roles: ['teacher'], current_user_is_admin: false})
   },
   teardown() {
     fakeENV.teardown()
@@ -527,7 +527,7 @@ test('returns true if grading period not closed and and group id is not locked',
 
 QUnit.module('Assignment#canMove as admin', {
   setup() {
-    fakeENV.setup({current_user_roles: ['admin']})
+    fakeENV.setup({current_user_is_admin: true})
   },
   teardown() {
     fakeENV.teardown()
@@ -555,7 +555,7 @@ test('returns true if grading period not closed and and group id is not locked',
 
 QUnit.module('Assignment#inClosedGradingPeriod as a non admin', {
   setup() {
-    fakeENV.setup({current_user_roles: ['teacher']})
+    fakeENV.setup({current_user_roles: ['teacher'], current_user_is_admin: false})
   },
   teardown() {
     fakeENV.teardown()
@@ -572,7 +572,7 @@ test("returns the value of 'in_closed_grading_period' when isAdmin is false", ()
 
 QUnit.module('Assignment#inClosedGradingPeriod as an admin', {
   setup() {
-    fakeENV.setup({current_user_roles: ['admin']})
+    fakeENV.setup({current_user_is_admin: true})
   },
   teardown() {
     fakeENV.teardown()

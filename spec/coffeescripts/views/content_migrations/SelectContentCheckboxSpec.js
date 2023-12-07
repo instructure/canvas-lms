@@ -32,6 +32,7 @@ QUnit.module('SelectContentCheckbox: Blueprint Settings', {
 
 test('does not show import blueprint settings checkbox if dest course is ineligible', function () {
   window.ENV.BLUEPRINT_ELIGIBLE_IMPORT = false
+  window.ENV.SHOW_BP_SETTINGS_IMPORT_OPTION = true
   $('#fixtures').html(this.SelectContentCheckbox.render().el)
   this.SelectContentCheckbox.courseSelected({blueprint: true})
   equal($('#importBlueprintSettingsCheckbox').length, 0)
@@ -39,6 +40,7 @@ test('does not show import blueprint settings checkbox if dest course is ineligi
 
 test('does not show import blueprint settings checkbox if selected course is not blueprint', function () {
   window.ENV.BLUEPRINT_ELIGIBLE_IMPORT = true
+  window.ENV.SHOW_BP_SETTINGS_IMPORT_OPTION = true
   $('#fixtures').html(this.SelectContentCheckbox.render().el)
   this.SelectContentCheckbox.courseSelected({blueprint: false})
   $('[name=selective_import]')[0].click()
@@ -47,6 +49,7 @@ test('does not show import blueprint settings checkbox if selected course is not
 
 test('does not show import blueprint settings checkbox if selective import is selected', function () {
   window.ENV.BLUEPRINT_ELIGIBLE_IMPORT = true
+  window.ENV.SHOW_BP_SETTINGS_IMPORT_OPTION = true
   $('#fixtures').html(this.SelectContentCheckbox.render().el)
   this.SelectContentCheckbox.courseSelected({blueprint: false})
   $('[name=selective_import]')[1].click()
@@ -55,6 +58,7 @@ test('does not show import blueprint settings checkbox if selective import is se
 
 test('has working blueprint settings checkbox if dest course is eligible', function () {
   window.ENV.BLUEPRINT_ELIGIBLE_IMPORT = true
+  window.ENV.SHOW_BP_SETTINGS_IMPORT_OPTION = true
   $('#fixtures').html(this.SelectContentCheckbox.render().el)
   this.SelectContentCheckbox.courseSelected({blueprint: true})
   $('[name=selective_import]')[0].click()

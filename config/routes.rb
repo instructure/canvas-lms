@@ -777,6 +777,7 @@ CanvasRails::Application.routes.draw do
       get :statistics
     end
     resources :developer_keys, only: :index
+    get "/developer_keys/:key_id", controller: :developer_keys, action: :index, as: "account_developer_key_view"
 
     get "release_notes" => "release_notes#manage", :as => :release_notes_manage
 
@@ -913,6 +914,7 @@ CanvasRails::Application.routes.draw do
 
   resources :users, only: [:passport] do
     get "passport" => "learner_passport#index"
+
     get "passport/data/achievements" => "learner_passport#achievements_index"
 
     get "passport/data/portfolios" => "learner_passport#portfolios_index"
@@ -920,9 +922,17 @@ CanvasRails::Application.routes.draw do
     post "passport/data/portfolios/:portfolio_id" => "learner_passport#portfolio_update"
     get "passport/data/portfolios/show/:portfolio_id" => "learner_passport#portfolio_show"
     put "passport/data/portfolios/duplicate" => "learner_passport#portfolio_duplicate"
-    get "passport/data/portfolios/reset" => "learner_passport#portfolio_reset"
+    put "passport/data/portfolios/delete" => "learner_passport#portfolio_delete"
+
+    get "passport/data/projects" => "learner_passport#projects_index"
+    put "passport/data/projects/create" => "learner_passport#project_create"
+    post "passport/data/projects/:project_id" => "learner_passport#project_update"
+    get "passport/data/projects/show/:project_id" => "learner_passport#project_show"
+    put "passport/data/projects/duplicate" => "learner_passport#project_duplicate"
+    put "passport/data/projects/delete" => "learner_passport#project_delete"
 
     get "passport/data/skills" => "learner_passport#skills_index"
+    get "passport/data/reset" => "learner_passport#reset"
 
     get "passport/*path" => "learner_passport#index"
   end
@@ -2754,7 +2764,10 @@ CanvasRails::Application.routes.draw do
 
     # Dynamic Registration Service
     scope(controller: "lti/ims/dynamic_registration") do
+      get "registration_token", action: :registration_token
       get "register", action: :redirect_to_tool_registration
+      get "registrations/uuid/:registration_uuid", action: :registration_by_uuid
+      put "registrations/:registration_id/overlay", action: :update_registration_overlay
       post "registrations", action: :create
     end
 

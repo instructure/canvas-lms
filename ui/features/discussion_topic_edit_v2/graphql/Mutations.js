@@ -141,6 +141,7 @@ export const UPDATE_DISCUSSION_TOPIC = gql`
     $specificSections: String
     $fileId: ID
     $removeAttachment: Boolean
+    $assignment: AssignmentUpdate
   ) {
     updateDiscussionTopic(
       input: {
@@ -160,6 +161,7 @@ export const UPDATE_DISCUSSION_TOPIC = gql`
         specificSections: $specificSections
         fileId: $fileId
         removeAttachment: $removeAttachment
+        assignment: $assignment
       }
     ) {
       discussionTopic {
@@ -181,6 +183,30 @@ export const UPDATE_DISCUSSION_TOPIC = gql`
         isAnnouncement
         attachment {
           ...Attachment
+        }
+        assignment {
+          _id
+          name
+          pointsPossible
+          gradingType
+          assignmentGroupId
+          canDuplicate
+          canUnpublish
+          courseId
+          description
+          dueAt
+          groupCategoryId
+          id
+          published
+          restrictQuantitativeData
+          sisId
+          state
+          peerReviews {
+            automaticReviews
+            count
+            dueAt
+            enabled
+          }
         }
       }
       errors {

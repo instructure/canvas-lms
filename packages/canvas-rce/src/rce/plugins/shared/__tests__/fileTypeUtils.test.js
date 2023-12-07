@@ -117,7 +117,16 @@ describe('fileTypeUtils', () => {
         embedded_iframe_url: '/media_objects_iframe/m-media_object_id',
         type: 'video/mov',
       }
-      const url = mediaPlayerURLFromFile(file)
+      const url = mediaPlayerURLFromFile(file, 'https://mycanvas.com')
+      expect(url).toBe('/media_objects_iframe/m-media_object_id?type=video')
+    })
+
+    it('does not repeat type if already included in embedded_iframe_url', () => {
+      const file = {
+        embedded_iframe_url: '/media_objects_iframe/m-media_object_id?type=video',
+        type: 'video/mov',
+      }
+      const url = mediaPlayerURLFromFile(file, 'https://mycanvas.com')
       expect(url).toBe('/media_objects_iframe/m-media_object_id?type=video')
     })
 

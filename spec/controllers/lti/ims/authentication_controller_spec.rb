@@ -46,17 +46,17 @@ describe Lti::IMS::AuthenticationController do
   let(:scope) { "openid" }
   let(:state) { SecureRandom.uuid }
   let(:include_storage_target) { true }
+  let(:lti_message_hint_jwt_params) do
+    {
+      verifier:,
+      canvas_domain: redirect_domain,
+      context_id: context.global_id,
+      context_type: context.class.to_s,
+      include_storage_target:
+    }
+  end
   let(:lti_message_hint) do
-    Canvas::Security.create_jwt(
-      {
-        verifier:,
-        canvas_domain: redirect_domain,
-        context_id: context.global_id,
-        context_type: context.class.to_s,
-        include_storage_target:
-      },
-      1.year.from_now
-    )
+    Canvas::Security.create_jwt(lti_message_hint_jwt_params, 1.year.from_now)
   end
   let(:params) do
     {
@@ -184,6 +184,79 @@ describe Lti::IMS::AuthenticationController do
       end
     end
 
+    shared_examples_for "logs using the lti launch debug logger" do |min_enabled_level:|
+      let(:extra_expected_debug_log_fields) { {} } # Override in usage if desired
+      let(:lti_message_hint_jwt_params) { super().merge({ debug_trace: "fake debug_trace" }) }
+
+      around do |example|
+        override_dynamic_settings(private: { canvas: { "frontend_data_collection_endpoint" => "fake endpoint" } }) do
+          example.run
+        end
+      end
+
+      context "when log level is less then #{min_enabled_level}" do
+        before do
+          if min_enabled_level > 1
+            Lti::LaunchDebugLogger.enable!(Account.default, min_enabled_level - 1)
+          end
+        end
+
+        after { Lti::LaunchDebugLogger.disable!(Account.default) }
+
+        it "does not log to the front end data collection framework" do
+          expect(Lti::LaunchDebugLogger).to_not receive(:decode_debug_trace)
+          allow(CanvasHttp).to receive(:put).and_call_original
+          subject
+          expect(CanvasHttp).to_not have_received(:put).with(
+            anything,
+            anything,
+            content_type: anything,
+            body: a_string_including("lti_launch_debug_logger")
+          )
+        end
+      end
+
+      context "when log level is at #{min_enabled_level}" do
+        before { Lti::LaunchDebugLogger.enable!(Account.default, min_enabled_level) }
+        after { Lti::LaunchDebugLogger.disable!(Account.default) }
+
+        it "logs to the front end data collection framework" do
+          debug_trace_fields = {
+            "request_id" => "abc",
+            "cookie_names" => "chocolatechip,peanutbutter"
+          }
+          expect(Lti::LaunchDebugLogger).to \
+            receive(:decode_debug_trace).with("fake debug_trace").and_return(debug_trace_fields)
+
+          allow(CanvasHttp).to receive(:put).and_call_original
+          subject
+          expect(CanvasHttp).to have_received(:put).at_least(:once).with(
+            "fake endpoint",
+            anything,
+            content_type: "application/json",
+            body: a_string_including("lti_launch_debug_logger")
+          ) do |*_args, body:, **_kwargs|
+            log = JSON.parse(body)
+            expect(log["type"]).to eq("lti_launch_debug_logger")
+
+            expect(log["id"]).to match(/\A[0-9a-f-]{16,}\z/)
+            expect(Time.parse(log["time"])).to be_within(60.seconds).of(Time.now)
+            expect(log["state"]).to eq(state)
+            expect(log["host"]).to eq(request.host)
+            expect(log["path"]).to be_present
+            expect(log["user_agent"]).to be_present
+            expect(log["ip"]).to be_present
+            expect(log["session_id"]).to be_present
+
+            expect(log["init_request_id"]).to eq("abc")
+            expect(log["init_cookie_names"]).to eq("chocolatechip,peanutbutter")
+
+            expect(log).to include(extra_expected_debug_log_fields)
+          end
+        end
+      end
+    end
+
     context "when there is a cached LTI 1.3 launch" do
       subject do
         get :authorize, params:
@@ -239,6 +312,12 @@ describe Lti::IMS::AuthenticationController do
       it "sends the default lti_storage_target" do
         subject
         expect(assigns.dig(:launch_parameters, :lti_storage_target)).to eq Lti::PlatformStorage::DEFAULT_TARGET
+      end
+
+      it_behaves_like "logs using the lti launch debug logger", min_enabled_level: 3 do
+        let(:extra_expected_debug_log_fields) do
+          { "user" => user.global_id }
+        end
       end
 
       context "when platform storage flag is enabled" do
@@ -307,6 +386,14 @@ describe Lti::IMS::AuthenticationController do
           it "generates an id token" do
             subject
             expect(id_token.except("nonce")).to eq lti_launch.except("nonce")
+          end
+        end
+
+        it_behaves_like "logs using the lti launch debug logger", min_enabled_level: 1 do
+          let(:extra_expected_debug_log_fields) do
+            {
+              "oidc_errors" => "login_required"
+            }
           end
         end
       end
@@ -400,6 +487,12 @@ describe Lti::IMS::AuthenticationController do
       it_behaves_like "redirect_uri errors" do
         let(:expected_message) { "Invalid redirect_uri" }
       end
+
+      it_behaves_like "logs using the lti launch debug logger", min_enabled_level: 4 do
+        let(:extra_expected_debug_log_fields) do
+          { "error" => a_string_including("Invalid redirect_uri") }
+        end
+      end
     end
 
     context "when the developer key redirect uri contains a query string" do
@@ -416,6 +509,12 @@ describe Lti::IMS::AuthenticationController do
       it_behaves_like "redirect_uri errors" do
         let(:expected_message) { nil }
         let(:expected_status) { 404 }
+      end
+
+      it_behaves_like "logs using the lti launch debug logger", min_enabled_level: 4 do
+        let(:extra_expected_debug_log_fields) do
+          { "error" => a_string_including("ActiveRecord::RecordNotFound") }
+        end
       end
     end
   end

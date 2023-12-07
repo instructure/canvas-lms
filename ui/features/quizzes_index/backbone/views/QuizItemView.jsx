@@ -269,7 +269,7 @@ export default class ItemView extends Backbone.View {
   }
 
   canDuplicate() {
-    const userIsAdmin = _.includes(ENV.current_user_roles, 'admin')
+    const userIsAdmin = ENV.current_user_is_admin
     const canDuplicate = this.model.get('can_duplicate')
     return (userIsAdmin || this.canCreate()) && canDuplicate
   }

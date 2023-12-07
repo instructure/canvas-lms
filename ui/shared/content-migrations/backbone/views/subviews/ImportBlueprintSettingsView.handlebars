@@ -1,6 +1,8 @@
-<div id="importBlueprintSettingsContainer">
+<div id="importBlueprintSettingsContainer" style="display: inline-block" data-tooltip='{"position":"top"}' title="{{#t}}You do not have Blueprint Course management permissions{{/t}}">
   <label class="checkbox">
-    <input type="checkbox" id="importBlueprintSettingsCheckbox">
-    {{#t "checkbox_label"}}Import Blueprint Course settings{{/t}}
+    <input type="checkbox" {{#unless ENV.SHOW_BP_SETTINGS_IMPORT_OPTION}} disabled {{/unless}} id="importBlueprintSettingsCheckbox">
+    <span {{#unless ENV.SHOW_BP_SETTINGS_IMPORT_OPTION}} style="opacity: 0.6" {{/unless}}>
+      {{#t "checkbox_label"}}Import Blueprint Course settings{{/t}}
+    </span>
   </label>
 </div>

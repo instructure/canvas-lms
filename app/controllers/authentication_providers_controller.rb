@@ -1035,7 +1035,7 @@ class AuthenticationProvidersController < ApplicationController
     return if data.empty?
 
     data.each do |setting, value|
-      @account.public_send("#{setting}=".to_sym, value.presence)
+      @account.public_send(:"#{setting}=", value.presence)
     end
     @account.save!
   end

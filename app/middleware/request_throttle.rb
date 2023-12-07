@@ -64,7 +64,7 @@ class RequestThrottle
     bucket = LeakyBucket.new(client_identifier(request))
 
     up_front_cost = bucket.get_up_front_cost_for_path(path)
-    pre_judged = (approved?(request) || blocked?(request))
+    pre_judged = approved?(request) || blocked?(request)
     cost = bucket.reserve_capacity(up_front_cost, request_prejudged: pre_judged) do
       status, headers, response = if allowed?(request, bucket)
                                     @app.call(env)
@@ -79,7 +79,7 @@ class RequestThrottle
       user_cpu = ending_cpu.utime - starting_cpu.utime
       system_cpu = ending_cpu.stime - starting_cpu.stime
       account = env["canvas.domain_root_account"]
-      db_runtime = (self.db_runtime(request) || 0.0)
+      db_runtime = self.db_runtime(request) || 0.0
       report_on_stats(db_runtime, account, starting_mem, ending_mem, user_cpu, system_cpu)
       cost = calculate_cost(user_cpu, db_runtime, env)
       cost

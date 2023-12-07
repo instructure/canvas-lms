@@ -24,6 +24,7 @@ import * as miscUtils from '../../utils/miscHelpers'
 import * as moduleUtils from '../../utils/moduleHelpers'
 import * as alerts from '@canvas/alerts/react/FlashAlert'
 import RelockModulesDialog from '@canvas/context-modules/backbone/views/RelockModulesDialog'
+import userEvent from '@testing-library/user-event'
 
 jest.mock('@canvas/do-fetch-api-effect')
 jest.mock('@canvas/context-modules/backbone/views/RelockModulesDialog')
@@ -64,6 +65,19 @@ describe('SettingsPanel', () => {
     expect(getByText('Date')).toBeInTheDocument()
   })
 
+  it('renders the date time input when unlockAt is set and lockUntilChecked is true', () => {
+    const {getByText} = renderComponent({lockUntilChecked: true, unlockAt: '2020-01-01T00:00:00Z'})
+    expect(getByText('Date')).toBeInTheDocument()
+  })
+
+  it('does not render the date time input when unlockAt is set and lockUntilChecked is false', () => {
+    const {queryByText} = renderComponent({
+      lockUntilChecked: false,
+      unlockAt: '2020-01-01T00:00:00Z',
+    })
+    expect(queryByText('Date')).not.toBeInTheDocument()
+  })
+
   it('does not render prerequisites when there are no modules available', () => {
     const {queryByTestId} = renderComponent()
     expect(queryByTestId('prerequisite-form')).not.toBeInTheDocument()
@@ -99,6 +113,47 @@ describe('SettingsPanel', () => {
   it('renders publish final grade if enabled', () => {
     const {getByRole} = renderComponent({enablePublishFinalGrade: true})
     expect(getByRole('checkbox', {name: /Publish final grade/})).toBeInTheDocument()
+  })
+
+  it('calls updateParentData on unmount with changes', async () => {
+    const updateParentDataMock = jest.fn()
+    const {unmount, findByTestId} = renderComponent({updateParentData: updateParentDataMock})
+    userEvent.type(await findByTestId('module-name-input'), '2')
+    unmount()
+    expect(updateParentDataMock).toHaveBeenCalledWith(
+      {
+        lockUntilChecked: false,
+        moduleName: 'Week 12',
+        nameInputMessages: [],
+        prerequisites: [],
+        publishFinalGrade: false,
+        requireSequentialProgress: false,
+        requirementCount: 'all',
+        requirements: [],
+        unlockAt: '',
+      },
+      true
+    )
+  })
+
+  it('calls updateParentData on unmount with no changes', () => {
+    const updateParentDataMock = jest.fn()
+    const {unmount} = renderComponent({updateParentData: updateParentDataMock})
+    unmount()
+    expect(updateParentDataMock).toHaveBeenCalledWith(
+      {
+        lockUntilChecked: false,
+        moduleName: 'Week 1',
+        nameInputMessages: [],
+        prerequisites: [],
+        publishFinalGrade: false,
+        requireSequentialProgress: false,
+        requirementCount: 'all',
+        requirements: [],
+        unlockAt: '',
+      },
+      false
+    )
   })
 
   describe('on update', () => {
@@ -186,6 +241,21 @@ describe('SettingsPanel', () => {
       getByRole('button', {name: 'Update Module'}).click()
       await waitFor(() => expect(RelockModulesDialog.prototype.renderIfNeeded).toHaveBeenCalled())
     })
+
+    it('calls onDidSubmit instead of onDismiss if passed', async () => {
+      const onDidSubmitMock = jest.fn()
+      const onDismissMock = jest.fn()
+      doFetchApi.mockResolvedValue({response: {ok: true}, json: {}})
+      const {getByRole, findByTestId} = renderComponent({
+        onDidSubmit: onDidSubmitMock,
+        onDismiss: onDismissMock,
+      })
+      userEvent.click(getByRole('button', {name: 'Update Module'}))
+
+      expect(await findByTestId('loading-overlay')).toBeInTheDocument()
+      expect(onDidSubmitMock).toHaveBeenCalled()
+      expect(onDismissMock).not.toHaveBeenCalled()
+    })
   })
 
   describe('on create', () => {
@@ -203,6 +273,22 @@ describe('SettingsPanel', () => {
         })
         expect(addModuleUI).toHaveBeenCalled()
       })
+    })
+
+    it('calls onDidSubmit instead of onDismiss if passed', async () => {
+      const onDidSubmitMock = jest.fn()
+      const onDismissMock = jest.fn()
+      doFetchApi.mockResolvedValue({response: {ok: true}, json: {}})
+      const {getByRole, findByTestId} = renderComponent({
+        moduleId: undefined,
+        onDidSubmit: onDidSubmitMock,
+        onDismiss: onDismissMock,
+      })
+      userEvent.click(getByRole('button', {name: 'Add Module'}))
+
+      expect(await findByTestId('loading-overlay')).toBeInTheDocument()
+      expect(onDidSubmitMock).toHaveBeenCalled()
+      expect(onDismissMock).not.toHaveBeenCalled()
     })
   })
 })

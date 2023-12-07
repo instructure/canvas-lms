@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {StoreState} from '../types'
-import {Course} from '../shared/types'
+import type {StoreState} from '../types'
+import type {Course} from '../shared/types'
 
 export const courseInitialState: Course = (window.ENV.COURSE || {}) as Course
 

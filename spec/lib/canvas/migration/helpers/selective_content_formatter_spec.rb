@@ -269,7 +269,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
     end
 
     it "lists blueprint_settings when appropriate" do
-      allow(@migration).to receive(:context).and_return(course_model)
+      allow(@migration).to receive_messages(user: account_admin_user, context: course_model)
       allow(MasterCourses::MasterTemplate).to receive(:is_master_course?).and_return(true)
       expect(formatter.get_content_list).to include({
                                                       property: "copy[all_blueprint_settings]",

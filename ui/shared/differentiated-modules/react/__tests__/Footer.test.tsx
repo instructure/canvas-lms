@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import Footer, {FooterProps} from '../Footer'
+import Footer, {type FooterProps} from '../Footer'
 
 describe('Footer', () => {
   const props: FooterProps = {

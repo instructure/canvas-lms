@@ -17,6 +17,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+# NOTE: If you are looking for a way to add custom parameters or change LTI 1.1
+# tool settings in bulk, there is an easier way written after this fixup. See
+# DataFixup::BulkToolUpdater in instructure_misc_plugin (run
+# `DataFixup::BulkToolUpdater.help` in Rails console for help)
+
 module DataFixup::AddManageAccountBanksPermissionToQuizLtiTools
   def self.run
     ContextExternalTool.quiz_lti.find_each do |quiz_lti_tool|

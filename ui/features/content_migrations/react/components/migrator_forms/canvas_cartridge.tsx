@@ -18,7 +18,7 @@
 
 import React, {useCallback, useState} from 'react'
 import CommonMigratorControls from './common_migrator_controls'
-import {onSubmitMigrationFormCallback} from '../types'
+import type {onSubmitMigrationFormCallback} from '../types'
 import MigrationFileInput from './file_input'
 
 type CanvasCartridgeImporterProps = {

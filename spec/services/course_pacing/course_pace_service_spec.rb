@@ -36,10 +36,8 @@ describe CoursePacing::CoursePaceService do
       ).to eq course_pace
     end
 
-    it "raises RecordNotFound when the pace is not found" do
-      expect do
-        CoursePacing::CoursePaceService.pace_in_context(course_model)
-      end.to raise_error ActiveRecord::RecordNotFound
+    it "returns nil when the pace is not found" do
+      expect(CoursePacing::CoursePaceService.pace_in_context(course_model)).to be_nil
     end
   end
 

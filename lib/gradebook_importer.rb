@@ -434,7 +434,7 @@ class GradebookImporter
     # after the row.length check above.
 
     # includes name, ID, section
-    @has_student_first_last_names = (row[0] == "LastName" && row[1] == "FirstName")
+    @has_student_first_last_names = row[0] == "LastName" && row[1] == "FirstName"
     raise InvalidHeaderRow if @has_student_first_last_names && !allow_student_last_first_names?
 
     @student_columns = student_name_column_count = @has_student_first_last_names ? 4 : 3

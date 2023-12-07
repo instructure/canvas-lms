@@ -76,13 +76,13 @@ module Canvas::Security
           next
         end
         Array(settings.plugin.encrypted_settings).each do |setting|
-          cleartext = Canvas::Security.decrypt_password(settings.settings["#{setting}_enc".to_sym],
-                                                        settings.settings["#{setting}_salt".to_sym],
+          cleartext = Canvas::Security.decrypt_password(settings.settings[:"#{setting}_enc"],
+                                                        settings.settings[:"#{setting}_salt"],
                                                         "instructure_plugin_setting",
                                                         encryption_key)
           new_crypted_data, new_salt = Canvas::Security.encrypt_password(cleartext, "instructure_plugin_setting")
-          settings.settings["#{setting}_enc".to_sym] = new_crypted_data
-          settings.settings["#{setting}_salt".to_sym] = new_salt
+          settings.settings[:"#{setting}_enc"] = new_crypted_data
+          settings.settings[:"#{setting}_salt"] = new_salt
           settings.settings_will_change!
         end
         settings.save! if settings.changed?

@@ -273,12 +273,12 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
           case question[:question_type]
           when "fill_in_multiple_blanks_question"
             blank_ids = question[:answers].pluck(:blank_id).uniq
-            row << blank_ids.filter_map { |blank_id| answer["answer_for_#{blank_id}".to_sym].try(:gsub, /,/, "\\,") }.join(",")
+            row << blank_ids.filter_map { |blank_id| answer[:"answer_for_#{blank_id}"].try(:gsub, /,/, "\\,") }.join(",")
           when "multiple_answers_question"
-            row << question[:answers].filter_map { |a| (answer["answer_#{a[:id]}".to_sym] == "1") ? a[:text].gsub(",", "\\,") : nil }.join(",")
+            row << question[:answers].filter_map { |a| (answer[:"answer_#{a[:id]}"] == "1") ? a[:text].gsub(",", "\\,") : nil }.join(",")
           when "multiple_dropdowns_question"
             blank_ids = question[:answers].pluck(:blank_id).uniq
-            answer_ids = blank_ids.map { |blank_id| answer["answer_for_#{blank_id}".to_sym] }
+            answer_ids = blank_ids.map { |blank_id| answer[:"answer_for_#{blank_id}"] }
             row << answer_ids.filter_map { |answer_id| (question[:answers].detect { |a| a[:id] == answer_id } || {})[:text].try(:gsub, /,/, "\\,") }.join(",")
           when "calculated_question"
             list = question[:answers].take(1).flat_map do |ans|
@@ -290,7 +290,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
             row << list.map { |str| (str || "").gsub(",", "\\,") }.join(",")
           when "matching_question"
             answer_ids = question[:answers].pluck(:id)
-            answer_and_matches = answer_ids.map { |aid| [aid, answer["answer_#{aid}".to_sym].to_i] }
+            answer_and_matches = answer_ids.map { |aid| [aid, answer[:"answer_#{aid}"].to_i] }
             row << answer_and_matches.map do |answer_id, match_id|
               res = []
               res << (question[:answers].detect { |a| a[:id] == answer_id } || {})[:text]

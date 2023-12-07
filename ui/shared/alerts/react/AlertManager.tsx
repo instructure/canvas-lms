@@ -17,7 +17,7 @@
  */
 
 import {Alert} from '@instructure/ui-alerts'
-import React, {createContext, PropsWithChildren} from 'react'
+import React, {createContext, type PropsWithChildren} from 'react'
 import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 
 export type AlertManagerContextType = {

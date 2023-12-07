@@ -98,7 +98,7 @@ module ModulesSettingsTray
   end
 
   def lock_until_date_selector
-    "[data-testid='lock-until-input'] #Selectable_0"
+    "//*[@data-testid = 'lock-until-input']//*[contains(@class,'-dateInput')]//input"
   end
 
   def lock_until_input_selector
@@ -106,7 +106,7 @@ module ModulesSettingsTray
   end
 
   def lock_until_time_selector
-    "[data-testid='lock-until-input'] #Select_0"
+    "//*[@data-testid = 'lock-until-input']//*[contains(@class, '-select')]//input"
   end
 
   def module_name_input_selector
@@ -255,7 +255,7 @@ module ModulesSettingsTray
   end
 
   def lock_until_date
-    f(lock_until_date_selector)
+    fxpath(lock_until_date_selector)
   end
 
   def lock_until_input
@@ -263,7 +263,7 @@ module ModulesSettingsTray
   end
 
   def lock_until_time
-    f(lock_until_time_selector)
+    fxpath(lock_until_time_selector)
   end
 
   def module_name_input

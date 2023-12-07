@@ -305,7 +305,7 @@ describe PageView do
 
     let(:params) { { action: "path", controller: "some" } }
     let(:session) { { id: "42" } }
-    let(:request) { double(url: (@url || "host.com/some/path"), path_parameters: params, user_agent: "Mozilla", session_options: session, method: :get, remote_ip: "0.0.0.0", request_method: "GET") }
+    let(:request) { double(url: @url || "host.com/some/path", path_parameters: params, user_agent: "Mozilla", session_options: session, method: :get, remote_ip: "0.0.0.0", request_method: "GET") }
     let(:user) { User.new }
     let(:attributes) { { real_user: user, user: } }
 
@@ -397,7 +397,7 @@ describe PageView do
     end
 
     it "forces encoding on string fields" do
-      request = double(url: (@url || "host.com/some/path"), path_parameters: params, user_agent: "Mozilla", session_options: session, method: :get, remote_ip: "0.0.0.0".encode(Encoding::US_ASCII), request_method: "GET")
+      request = double(url: @url || "host.com/some/path", path_parameters: params, user_agent: "Mozilla", session_options: session, method: :get, remote_ip: "0.0.0.0".encode(Encoding::US_ASCII), request_method: "GET")
       pv = PageView.generate(request, attributes)
 
       expect(pv.remote_ip.encoding).to eq Encoding::UTF_8

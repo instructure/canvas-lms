@@ -59,7 +59,7 @@ import type {
 import type {GridColumn, SlickGridKeyboardEvent} from './grid'
 import {columnWidths} from './initialState'
 import SubmissionStateMap from '@canvas/grading/SubmissionStateMap'
-import {GradeStatus} from '@canvas/grading/accountGradingStatus'
+import type {GradeStatus} from '@canvas/grading/accountGradingStatus'
 
 const I18n = useI18nScope('gradebook')
 
@@ -704,6 +704,21 @@ export const filterStudentBySubmissionFn = (
 
     // when sorting rows, we only use .some to determine visiblity
     return filterSubmissionsByCategorizedFilters(submissionFilters, [], submissions, customStatuses)
+  }
+}
+
+export const filterStudentBySectionFn = (appliedFilters: Filter[]) => {
+  const sectionFilters = findFilterValuesOfType(
+    'section',
+    appliedFilters
+  ) as SubmissionFilterValue[]
+
+  return (student: Student) => {
+    if (sectionFilters.length === 0) {
+      return true
+    }
+
+    return student.sections ? student.sections.includes(sectionFilters[0]) : false
   }
 }
 

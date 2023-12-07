@@ -47,10 +47,10 @@ describe CoursePacing::StudentEnrollmentPaceService do
       ).to eq pace
     end
 
-    it "raises RecordNotFound when the pace is not found" do
-      expect do
+    it "returns nil" do
+      expect(
         CoursePacing::StudentEnrollmentPaceService.pace_in_context(extra_enrollment)
-      end.to raise_error ActiveRecord::RecordNotFound
+      ).to be_nil
     end
   end
 

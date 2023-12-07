@@ -644,7 +644,7 @@ module Api::V1::Assignment
           initiated_source: :new_quizzes
         )
 
-        data.each do |key, _|
+        data.each_key do |key|
           import_object = Context.find_asset_by_url(key)
 
           next unless import_object.respond_to?(:context) && import_object.context.is_a?(Course)

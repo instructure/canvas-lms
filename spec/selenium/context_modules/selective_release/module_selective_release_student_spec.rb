@@ -39,6 +39,7 @@ describe "selective_release modules for students" do
       Account.site_admin.enable_feature! :differentiated_modules
       course_with_teacher(active_all: true)
       module_setup
+      @module.update!(workflow_state: "active")
       @student1 = student_in_course(active_all: true, name: "Student 1").user
       @student2 = student_in_course(active_all: true, name: "Student 2").user
       @student3 = student_in_course(active_all: true, name: "Student 3").user

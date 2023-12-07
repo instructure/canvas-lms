@@ -143,7 +143,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
 
   def assessment_question=(aq)
     self.assessment_question_version = aq.version_number
-    super aq
+    super(aq)
   end
 
   def delete_assessment_question
@@ -211,7 +211,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
   # be futzing with questions and groups and not affect
   # the quiz, as students see it.
   def data
-    res = (question_data || assessment_question.question_data) rescue Quizzes::QuizQuestion::QuestionData.new(ActiveSupport::HashWithIndifferentAccess.new)
+    res = question_data || assessment_question.question_data rescue Quizzes::QuizQuestion::QuestionData.new(ActiveSupport::HashWithIndifferentAccess.new)
     res[:assessment_question_id] = assessment_question_id
     res[:question_name] = t("#quizzes.quiz_question.defaults.question_name", "Question") if res[:question_name].blank?
     res[:id] = id

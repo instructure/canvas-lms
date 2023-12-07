@@ -80,7 +80,7 @@ module Lti::IMS::Concerns
       end
 
       def access_token_scopes
-        @_access_token_scopes ||= (access_token&.claim("scopes")&.split(" ").presence || [])
+        @_access_token_scopes ||= access_token&.claim("scopes")&.split(" ").presence || []
       end
 
       def tool_permissions_granted?

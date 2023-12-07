@@ -106,6 +106,7 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
       end
     end
 
+    discussion_topic.saved_by = :assignment if discussion_topic.assignment.present?
     return errors_for(discussion_topic) unless discussion_topic.save!
 
     { discussion_topic: }

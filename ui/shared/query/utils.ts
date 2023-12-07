@@ -17,7 +17,7 @@
  */
 
 import {useState, useEffect} from 'react'
-import {useQuery, QueryClient, QueryKey} from '@tanstack/react-query'
+import {useQuery, QueryClient, type QueryKey} from '@tanstack/react-query'
 
 export function useReception({
   queryKey,

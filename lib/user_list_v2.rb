@@ -127,7 +127,7 @@ class UserListV2
   def resolve_duplicates_and_missing
     grouped_results = @all_results.group_by { |r| @lowercase ? r[:address].downcase : r[:address] }
 
-    grouped_results.each do |_a, results|
+    grouped_results.each_value do |results|
       if results.count == 1
         @resolved_results << results.first
       elsif results.uniq { |r| Shard.global_id_for(r[:user_id]) }.count == 1

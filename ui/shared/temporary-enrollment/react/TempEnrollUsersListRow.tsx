@@ -27,9 +27,16 @@ import {
 } from '@instructure/ui-icons'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {EnrollmentType, MODULE_NAME, PROVIDER, RECIPIENT, Role} from './types'
+import {MODULE_NAME, PROVIDER, RECIPIENT, TOOLTIP_MAX_WIDTH} from './types'
+import type {EnrollmentType, Role} from './types'
 import {TempEnrollModal} from './TempEnrollModal'
 import {createAnalyticPropsGenerator} from './util/analytics'
+import {View} from '@instructure/ui-view'
+import {Text} from '@instructure/ui-text'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import type {EnvCommon} from '@canvas/global/env/EnvCommon'
+
+declare const ENV: GlobalEnv & EnvCommon
 
 const I18n = useI18nScope('temporary_enrollment')
 
@@ -46,15 +53,23 @@ export function generateIcon(role: string | null) {
   }
 }
 
-export function generateTooltip(enrollmentType: EnrollmentType, name: string) {
+export function generateTooltip(enrollmentType: EnrollmentType, name: string): JSX.Element {
+  let message
   switch (enrollmentType) {
     case PROVIDER:
-      return I18n.t('Manage %{name}’s Temporary Enrollment Recipients', {name})
+      message = I18n.t('Manage %{name}’s Temporary Enrollment Recipients', {name})
+      break
     case RECIPIENT:
-      return I18n.t('Manage %{name}’s Temporary Enrollment Providers', {name})
+      message = I18n.t('Manage %{name}’s Temporary Enrollment Providers', {name})
+      break
     default:
-      return I18n.t('Create Temporary Enrollment Pairing for %{name}', {name})
+      message = I18n.t('Create Temporary Enrollment Pairing for %{name}', {name})
   }
+  return (
+    <View as="div" textAlign="center" maxWidth={TOOLTIP_MAX_WIDTH}>
+      <Text size="small">{message}</Text>
+    </View>
+  )
 }
 
 interface Props {
@@ -107,6 +122,7 @@ export default function TempEnrollUsersListRow(props: Props) {
     // @ts-ignore - this hook isn't ts-ified
     {
       path: `/api/v1/users/${props.user.id}/temporary_enrollment_status`,
+      params: {account_id: ENV.ACCOUNT_ID},
       success: (json: TemporaryEnrollmentData) => setTemporaryEnrollmentState(json),
       error: showFlashError(I18n.t('Failed to fetch temporary enrollment data')),
     },
@@ -118,8 +134,8 @@ export default function TempEnrollUsersListRow(props: Props) {
     icon: JSX.Element,
     editModeStatus: boolean,
     toggleOrSetEditModeFunction: () => boolean | void
-  ) {
-    const tooltipText = generateTooltip(enrollmentType, props.user.name)
+  ): JSX.Element {
+    const tooltipText: JSX.Element = generateTooltip(enrollmentType, props.user.name)
 
     return (
       <TempEnrollModal

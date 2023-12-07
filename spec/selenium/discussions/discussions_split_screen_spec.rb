@@ -49,7 +49,7 @@ describe "threaded discussions" do
     )
   end
 
-  it "toggles splitscreen" do
+  it "toggles from inline to split-screen" do
     # initially set user preference discussions_split_screen, so 'Inline will be the initial View'
     @teacher.preferences[:discussions_splitscreen_view] = false
     @teacher.save!
@@ -82,6 +82,34 @@ describe "threaded discussions" do
     wait_for_ajaximations
 
     # check ss closes
+    expect(f("body")).not_to contain_jqcss("div[data-testid='drawer-layout-tray']")
+  end
+
+  it "toggles from split-screen to inline" do
+    # initially set user preference discussions_split_screen, so 'Split-screen will be the initial View'
+    @teacher.preferences[:discussions_splitscreen_view] = true
+    @teacher.save!
+
+    user_session(@teacher)
+    Discussion.visit(@course, @topic)
+
+    # Open split-screen
+    f("button[data-testid='expand-button']").click
+    wait_for_ajaximations
+
+    # Check that split-screen is open
+    expect(fj("div:contains('2nd level reply')")).to be_truthy
+    expect(f("div[data-testid='drawer-layout-tray']")).to be_truthy
+
+    # click "View Inline" button. closes the split-screen view
+    f("button[data-testid='splitscreenButton']").click
+    wait_for_ajaximations
+
+    f("button[data-testid='expand-button']").click
+    wait_for_ajaximations
+
+    # Check that inline view is open
+    expect(fj("div:contains('2nd level reply')")).to be_truthy
     expect(f("body")).not_to contain_jqcss("div[data-testid='drawer-layout-tray']")
   end
 

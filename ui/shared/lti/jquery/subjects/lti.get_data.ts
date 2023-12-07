@@ -17,7 +17,7 @@
  */
 
 import {getData} from '../platform_storage'
-import {LtiMessageHandler} from '../lti_message_handler'
+import type {LtiMessageHandler} from '../lti_message_handler'
 
 const handler: LtiMessageHandler<{
   key: string

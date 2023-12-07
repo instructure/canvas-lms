@@ -144,7 +144,7 @@ module Context
     raise ArgumentError, "only_check is either an empty array or you are aking for invalid types" if types_to_check.empty?
 
     base_cache_key = "active_record_types3"
-    cache_key = [base_cache_key, (only_check.presence || "everything"), self].cache_key
+    cache_key = [base_cache_key, only_check.presence || "everything", self].cache_key
 
     # if it exists in redis, return that
     if (cached = Rails.cache.read(cache_key))

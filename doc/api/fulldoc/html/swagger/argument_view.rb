@@ -111,13 +111,13 @@ class ArgumentView < HashView
   end
 
   def swagger_type
-    type = (types.first || "string")
+    type = types.first || "string"
     type = "number" if type.casecmp?("float")
     builtin?(type) ? type.downcase : type
   end
 
   def swagger_format
-    type = (types.first || "string")
+    type = types.first || "string"
     return "int64" if swagger_type == "integer"
 
     "float" if type.casecmp?("float")

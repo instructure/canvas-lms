@@ -151,6 +151,17 @@ describe "Enhanced Gradebook Filters" do
         expect(Gradebook.fetch_student_names).to eq [@student1.name, @student2.name]
       end
 
+      it "does not update default grades for users not in this section" do
+        Gradebook.apply_filters_button.click
+        Gradebook.select_filter_type_menu_item("Sections")
+        Gradebook.select_filter_menu_item(@section1.name)
+        expect(Gradebook.fetch_student_names).to eq [@student1.name]
+        Gradebook.click_assignment_header_menu(@a6.id)
+        set_default_grade(13)
+        @section1.users.each { |u| expect(u.submissions.map(&:grade)).to include "13" }
+        @section2.users.each { |u| expect(u.submissions.map(&:grade)).not_to include "13" }
+      end
+
       it "can filter and unfilter by student group" do
         Gradebook.apply_filters_button.click
         Gradebook.select_filter_type_menu_item("Student Groups")

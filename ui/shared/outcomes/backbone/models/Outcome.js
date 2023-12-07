@@ -136,11 +136,11 @@ Outcome.prototype.canManage = function () {
 }
 
 Outcome.prototype.canManageInContext = function () {
-  let ref, ref1, ref2
+  let ref, ref1
   return (
     ((ref = ENV.ROOT_OUTCOME_GROUP) != null ? ref.context_type : void 0) === 'Course' &&
     ((ref1 = ENV.PERMISSIONS) != null ? ref1.manage_outcomes : void 0) &&
-    ((ref2 = ENV.current_user_roles) != null ? ref2.includes('admin') : void 0)
+    ENV.current_user_is_admin
   )
 }
 

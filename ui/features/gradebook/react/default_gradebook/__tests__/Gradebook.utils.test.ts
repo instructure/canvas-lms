@@ -22,6 +22,7 @@ import {
   doesSubmissionNeedGrading,
   doFiltersMatch,
   findFilterValuesOfType,
+  filterStudentBySectionFn,
   getAssignmentColumnId,
   getAssignmentGroupColumnId,
   getCustomColumnId,
@@ -37,9 +38,70 @@ import {
 import {isDefaultSortOrder, localeSort} from '../Gradebook.sorting'
 import {createGradebook} from './GradebookSpecHelper'
 import {fireEvent, screen, waitFor} from '@testing-library/dom'
-import type {FilterPreset} from '../gradebook.d'
+import type {FilterPreset, Filter} from '../gradebook.d'
 import type {SlickGridKeyboardEvent} from '../grid.d'
-import type {Submission} from '../../../../../api.d'
+import type {Submission, Student} from '../../../../../api.d'
+
+const students: Student[] = [
+  {
+    created_at: '',
+    email: '',
+    group_ids: [],
+    id: '1',
+    integration_id: '',
+    login_id: '',
+    short_name: 'John',
+    sis_import_id: '',
+    sis_user_id: null,
+    enrollments: [],
+    first_name: 'Jim',
+    last_name: 'Doe',
+    name: 'Jim Doe',
+    index: 0,
+    section_ids: [],
+    anonymous_name: '',
+    computed_current_score: 100,
+    computed_final_score: 100,
+    cssClass: '',
+    displayName: 'Jim Doe',
+    initialized: false,
+    isConcluded: false,
+    isInactive: false,
+    loaded: false,
+    sections: [],
+    sortable_name: 'Doe, Jim',
+    total_grade: 100,
+  },
+  {
+    created_at: '',
+    email: '',
+    group_ids: [],
+    id: '2',
+    integration_id: '',
+    login_id: '',
+    short_name: 'John',
+    sis_import_id: '',
+    sis_user_id: null,
+    enrollments: [],
+    first_name: 'Bob',
+    last_name: 'Smith',
+    name: 'Bob Smith',
+    index: 1,
+    section_ids: [],
+    anonymous_name: '',
+    computed_current_score: 100,
+    computed_final_score: 100,
+    cssClass: '',
+    displayName: 'Jim Doe',
+    initialized: false,
+    isConcluded: false,
+    isInactive: false,
+    loaded: false,
+    sections: [],
+    sortable_name: 'Smith, Bob',
+    total_grade: 100,
+  },
+]
 
 const unsubmittedSubmission: Submission = {
   anonymous_id: 'dNq5T',
@@ -527,5 +589,42 @@ describe('isGradedOrExcusedSubmissionUnposted', () => {
 
   it('returns false if submission is ungraded', () => {
     expect(isGradedOrExcusedSubmissionUnposted(ungradedSubmission)).toStrictEqual(false)
+  })
+})
+
+describe('filterStudentBySectionFn', () => {
+  const appliedFilters: Filter[] = [
+    {
+      id: '1',
+      type: 'section',
+      created_at: '',
+      value: '',
+    },
+  ]
+  it('filteredStudents include the correct student when switching between different section filters', () => {
+    appliedFilters[0].value = 'section1'
+    students[0].sections = ['section1']
+    students[1].sections = ['section2']
+    const filteredStudentsSection1 = students.filter(filterStudentBySectionFn(appliedFilters))
+    expect(filteredStudentsSection1[0].name).toBe('Jim Doe')
+    appliedFilters[0].value = 'section2'
+    const filteredStudentsSection2 = students.filter(filterStudentBySectionFn(appliedFilters))
+    expect(filteredStudentsSection2[0].name).toBe('Bob Smith')
+  })
+
+  it('filteredStudents include the student with multiple section enrollments that contains the matching filter section', () => {
+    students[0].sections = ['section1', 'section2']
+    students[1].sections = ['section2']
+    appliedFilters[0].value = 'section2'
+    const filteredStudents = students.filter(filterStudentBySectionFn(appliedFilters))
+    expect(filteredStudents.length).toBe(2)
+  })
+
+  it('filteredStudents include all students when the filters do not contain sections', () => {
+    students[0].sections = ['section1']
+    students[1].sections = ['section2']
+    appliedFilters[0].type = 'submissions'
+    const filteredStudents = students.filter(filterStudentBySectionFn(appliedFilters))
+    expect(filteredStudents.length).toBe(2)
   })
 })

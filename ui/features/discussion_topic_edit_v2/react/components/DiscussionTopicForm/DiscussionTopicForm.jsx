@@ -38,7 +38,12 @@ import CanvasMultiSelect from '@canvas/multi-select'
 import CanvasRce from '@canvas/rce/react/CanvasRce'
 import {Alert} from '@instructure/ui-alerts'
 import {GradedDiscussionOptions} from '../GradedDiscussionOptions/GradedDiscussionOptions'
-import {GradedDiscussionDueDatesContext} from '../../util/constants'
+import {
+  GradedDiscussionDueDatesContext,
+  defaultEveryoneOption,
+  defaultEveryoneElseOption,
+  masteryPathsOption,
+} from '../../util/constants'
 import {nanoid} from 'nanoid'
 import {AttachmentDisplay} from '@canvas/discussions/react/components/AttachmentDisplay/AttachmentDisplay'
 import {responsiveQuerySizes} from '@canvas/discussions/react/utils'
@@ -141,7 +146,7 @@ export default function DiscussionTopicForm({
   const [assignedInfoList, setAssignedInfoList] = useState([
     {
       dueDateId: nanoid(),
-      assignedList: ['everyone'],
+      assignedList: [defaultEveryoneOption.assetCode],
       dueDate: '',
       availableFrom: '',
       availableUntil: '',
@@ -168,6 +173,8 @@ export default function DiscussionTopicForm({
 
   const [usageRightsData, setUsageRightsData] = useState({})
   const [usageRightsErrorState, setUsageRightsErrorState] = useState(false)
+
+  const [postToSis, setPostToSis] = useState(false)
 
   const handleSettingUsageRightsData = data => {
     setUsageRightsErrorState(false)
@@ -203,6 +210,10 @@ export default function DiscussionTopicForm({
     setLocked(currentDiscussionTopic.locked && isAnnouncement)
     setAttachment(currentDiscussionTopic.attachment)
     setUsageRightsData(currentDiscussionTopic?.attachment?.usageRights)
+    setIsGraded(!!currentDiscussionTopic?.assignment)
+    setPostToSis(!!currentDiscussionTopic?.assignment?.postToSis)
+    setPointsPossible(currentDiscussionTopic?.assignment?.pointsPossible)
+    setAssignmentGroup(currentDiscussionTopic?.assignment?.assignmentGroup?._id)
   }, [isEditing, currentDiscussionTopic, discussionAnonymousState, isAnnouncement])
 
   useEffect(() => {
@@ -347,6 +358,114 @@ export default function DiscussionTopicForm({
     return true
   }
 
+  const prepareOverride = (
+    overrideDueDate,
+    overrideAvailableUntil,
+    overrideAvailableFrom,
+    overrideIds = {
+      groupId: null,
+      courseSectionId: null,
+      studentIds: null,
+      noopId: null,
+    },
+    overrideTitle = null
+  ) => {
+    return {
+      dueAt: overrideDueDate || null,
+      lockAt: overrideAvailableUntil || null,
+      unlockAt: overrideAvailableFrom || null,
+      groupId: overrideIds.groupIds || null,
+      courseSectionId: overrideIds.courseSectionId || null,
+      studentIds: overrideIds.studentIds || null,
+      noopId: overrideIds.noopId || null,
+      title: overrideTitle || null,
+    }
+  }
+
+  const prepareAssignmentOverridesPayload = () => {
+    const onlyVisibleToEveryone = assignedInfoList.every(
+      info =>
+        info.assignedList.length === 1 && info.assignedList[0] === defaultEveryoneOption.assetCode
+    )
+
+    if (onlyVisibleToEveryone) return null
+
+    const preparedOverrides = []
+    assignedInfoList.forEach(info => {
+      const {assignedList} = info
+      const studentIds = assignedList.filter(assetCode => assetCode.includes('user'))
+      const sectionIds = assignedList.filter(assetCode => assetCode.includes('section'))
+      const groupIds = assignedList.filter(assetCode => assetCode.includes('group'))
+
+      // override for student ids
+      if (studentIds.length > 0) {
+        preparedOverrides.push(
+          prepareOverride(
+            info.dueDate || null,
+            info.availableUntil || null,
+            info.availableFrom || null,
+            {
+              studentIds:
+                studentIds.length > 0 ? studentIds.map(id => id.split('_').reverse()[0]) : null,
+            }
+          )
+        )
+      }
+
+      // override for section ids
+      if (sectionIds.length > 0) {
+        sectionIds.forEach(sectionId => {
+          preparedOverrides.push(
+            prepareOverride(
+              info.dueDate || null,
+              info.availableUntil || null,
+              info.availableFrom || null,
+              {
+                courseSectionId: sectionId.split('_').reverse()[0] || null,
+              }
+            )
+          )
+        })
+      }
+
+      // override for group ids
+      if (groupIds.length > 0) {
+        groupIds.forEach(groupId => {
+          preparedOverrides.push(
+            prepareOverride(
+              info.dueDate || null,
+              info.availableUntil || null,
+              info.availableFrom || null,
+              {
+                groupIds: groupId.split('_').reverse()[0] || null,
+              }
+            )
+          )
+        })
+      }
+    })
+
+    const masteryPathOverride = assignedInfoList.find(info =>
+      info.assignedList.includes(masteryPathsOption.assetCode)
+    )
+
+    if (masteryPathOverride) {
+      preparedOverrides.push(
+        prepareOverride(
+          masteryPathOverride.dueDate || null,
+          masteryPathOverride.availableUntil || null,
+          masteryPathOverride.availableFrom || null,
+          {
+            noopId: '1',
+          },
+          masteryPathsOption.label
+        )
+      )
+    }
+
+    return preparedOverrides
+  }
+
   const preparePeerReviewPayload = () => {
     return peerReviewAssignment === 'off'
       ? null
@@ -359,16 +478,42 @@ export default function DiscussionTopicForm({
   }
 
   const prepareAssignmentPayload = () => {
-    return isGraded
-      ? {
-          courseId: ENV.context_id,
-          name: title,
-          pointsPossible,
-          gradingType: displayGradeAs,
-          assignmentGroupId: assignmentGroup || null,
-          peerReviews: preparePeerReviewPayload(),
-        }
-      : null
+    // Return null immediately if the assignment is not graded
+    if (!isGraded) return null
+
+    const everyoneOverride =
+      assignedInfoList.find(
+        info =>
+          info.assignedList.includes(defaultEveryoneOption.assetCode) ||
+          info.assignedList.includes(defaultEveryoneElseOption.assetCode)
+      ) || {}
+
+    // Common payload properties for graded assignments
+    let payload = {
+      pointsPossible,
+      postToSis,
+      gradingType: displayGradeAs,
+      assignmentGroupId: assignmentGroup || null,
+      peerReviews: preparePeerReviewPayload(),
+      assignmentOverrides: prepareAssignmentOverridesPayload(),
+      groupCategoryId: isGroupDiscussion ? groupCategoryId : null,
+      dueAt: everyoneOverride.dueDate || null,
+      lockAt: everyoneOverride.availableUntil || null,
+      unlockAt: everyoneOverride.availableFrom || null,
+      onlyVisibleToOverrides: assignedInfoList.every(
+        info =>
+          info.assignedList.length === 1 && info.assignedList[0] === defaultEveryoneOption.assetCode
+      ),
+    }
+    // Additional properties for creation of a graded assignment
+    if (!isEditing) {
+      payload = {
+        ...payload,
+        courseId: ENV.context_id,
+        name: title,
+      }
+    }
+    return payload
   }
 
   const submitForm = shouldPublish => {
@@ -796,6 +941,8 @@ export default function DiscussionTopicForm({
                   setPeerReviewsPerStudent={setPeerReviewsPerStudent}
                   peerReviewDueDate={peerReviewDueDate}
                   setPeerReviewDueDate={setPeerReviewDueDate}
+                  postToSis={postToSis}
+                  setPostToSis={setPostToSis}
                 />
               </GradedDiscussionDueDatesContext.Provider>
             </View>

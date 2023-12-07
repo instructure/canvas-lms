@@ -32,7 +32,7 @@ import {datetimeString} from '@canvas/datetime/date-functions'
 import {Responsive} from '@instructure/ui-responsive'
 import {StatusPill} from './status_pill'
 import {SourceLink} from './source_link'
-import {ContentMigrationItem} from './types'
+import type {ContentMigrationItem} from './types'
 import {ActionButton} from './action_button'
 import {buildProgressCellContent} from './completion_progress_bar'
 

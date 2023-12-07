@@ -2299,6 +2299,7 @@ class Submission < ActiveRecord::Base
     opts[:comment] = opts[:comment].try(:strip) || ""
     opts[:attachments] ||= opts[:comment_attachments]
     opts[:draft] = !!opts[:draft_comment]
+    opts[:attempt] = (!unsubmitted? && !opts.key?(:attempt)) ? self.attempt : opts[:attempt]
     if opts[:comment].empty?
       if opts[:media_comment_id]
         opts[:comment] = ""
@@ -2528,7 +2529,7 @@ class Submission < ActiveRecord::Base
     end
 
     def seconds_late
-      return (seconds_late_override || 0) if late_policy_status == "late"
+      return seconds_late_override || 0 if late_policy_status == "late"
       return 0 if cached_due_date.nil? || time_of_submission <= cached_due_date
 
       (time_of_submission - cached_due_date).to_i
@@ -2838,7 +2839,7 @@ class Submission < ActiveRecord::Base
   def eligible_for_showing_score_statistics?
     # This checks whether this submission meets the requirements in order
     # for the submitter to be able to see score statistics for the assignment
-    (score.present? && !hide_grade_from_student?)
+    score.present? && !hide_grade_from_student?
   end
 
   def posted?

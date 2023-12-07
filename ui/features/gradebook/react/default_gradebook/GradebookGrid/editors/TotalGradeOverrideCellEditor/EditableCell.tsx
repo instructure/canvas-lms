@@ -49,6 +49,7 @@ export default class EditableCell extends CellEditorComponent {
     gradeIsUpdating: bool.isRequired,
     onGradeUpdate: func.isRequired,
     pendingGradeInfo: gradeInfo,
+    disabledByCustomStatus: bool,
   }
 
   static defaultProps = {
@@ -141,7 +142,7 @@ export default class EditableCell extends CellEditorComponent {
             }}
           >
             <GradeInput
-              disabled={this.props.gradeIsUpdating}
+              disabled={this.props.gradeIsUpdating || this.props.disabledByCustomStatus}
               gradeEntry={this.props.gradeEntry}
               gradeInfo={this.props.gradeInfo}
               pendingGradeInfo={this.props.pendingGradeInfo}

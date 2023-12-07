@@ -25,30 +25,36 @@ import {IconPlusLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import PortfolioCard, {PortfolioCardSkeleton} from './PortfolioCard'
+import PortfolioCard, {PORTFOLIO_CARD_WIDTH, PORTFOLIO_CARD_HEIGHT} from './PortfolioCard'
+import {showUnimplemented} from '../shared/utils'
 import type {PortfolioData} from '../types'
-import CreatePortfolioModal from './CreatePortfolioModal'
-
-function renderSkeleton() {
-  return (
-    <Flex gap="medium" wrap="wrap">
-      {['a', 'b', 'c'].map(key => (
-        <Flex.Item shouldGrow={false} shouldShrink={false} key={key}>
-          <PortfolioCardSkeleton />
-        </Flex.Item>
-      ))}
-    </Flex>
-  )
-}
+import NamingModal from '../shared/NamingModal'
+import {renderCardSkeleton} from '../shared/CardSkeleton'
+import confirm from '../shared/Confirmation'
 
 const PortfolioDashboard = () => {
   const navigate = useNavigate()
   const submit = useSubmit()
   const portfolios = useLoaderData() as PortfolioData[]
   const [createModalIsOpen, setCreateModalIsOpen] = useState(false)
+  const [renameModalIsOpen, setRenameModalIsOpen] = useState(false)
+  const [actionPortfolioId, setActionProjectId] = useState('')
+
+  const url = new URL(window.location.href)
+  if (url.searchParams.has('dupe')) {
+    const title = url.searchParams.get('dupe') || 'Portfolio'
+    showFlashAlert({message: `"${title}" duplicated`, type: 'success'})
+    window.history.replaceState(window.history.state, '', url.pathname)
+  }
+  if (url.searchParams.has('delete')) {
+    const title = url.searchParams.get('delete') || 'Portfolio'
+    showFlashAlert({message: `"${title}" deleted`, type: 'success'})
+    window.history.replaceState(window.history.state, '', url.pathname)
+  }
 
   const handleDismissCreateModal = useCallback(() => {
     setCreateModalIsOpen(false)
+    setRenameModalIsOpen(false)
   }, [])
 
   const handleCreateClick = useCallback(() => {
@@ -63,11 +69,27 @@ const PortfolioDashboard = () => {
     [submit]
   )
 
+  const handleRenameProfile = useCallback(
+    (f: HTMLFormElement) => {
+      setRenameModalIsOpen(false)
+      submit(f, {method: 'POST', action: 'rename'})
+    },
+    [submit]
+  )
+
   const handleCardAction = useCallback(
-    (portfolioId: string, action: string) => {
+    async (portfolioId: string, action: string) => {
       switch (action) {
         case 'duplicate':
-          navigate(`duplicate/${portfolioId}`)
+          {
+            const portfolio = portfolios.find(p => p.id === portfolioId)
+            if (portfolio) {
+              submit(
+                {portfolioId, title: portfolio.title},
+                {method: 'PUT', action: `duplicate/${portfolioId}`}
+              )
+            }
+          }
           break
         case 'edit':
           navigate(`../edit/${portfolioId}`)
@@ -75,18 +97,38 @@ const PortfolioDashboard = () => {
         case 'view':
           navigate(`../view/${portfolioId}`)
           break
+        case 'delete':
+          {
+            const portfolio = portfolios.find(p => p.id === portfolioId)
+            if (portfolio) {
+              const ok = await confirm(
+                <div>
+                  <span>Are you sure you want to delete &quot;{portfolio.title}&quot;</span>?
+                </div>
+              )
+              if (ok) {
+                submit(
+                  {portfolioId, title: portfolio.title},
+                  {method: 'PUT', action: `delete/${portfolioId}`}
+                )
+              }
+            }
+          }
+
+          break
+        case 'rename':
+          setActionProjectId(portfolioId)
+          setRenameModalIsOpen(true)
+          break
         default:
-          showFlashAlert({
-            message: `portfolio ${portfolioId} action ${action}`,
-            type: 'success',
-          })
+          showUnimplemented({currentTarget: {textContent: action}})
       }
     },
-    [navigate]
+    [navigate, portfolios, submit]
   )
 
   return (
-    <>
+    <div style={{maxWidth: '1260px', margin: '0 auto'}}>
       <Flex justifyItems="space-between">
         <Flex.Item shouldGrow={true}>
           <Heading level="h1" themeOverride={{h1FontWeight: 700}}>
@@ -106,9 +148,9 @@ const PortfolioDashboard = () => {
         </Text>
       </View>
       <View>
-        {portfolios?.length > 0 || (
+        {portfolios?.length > 0 ? null : (
           <View as="div" margin="0">
-            <Text size="x-small">No portfolios created</Text>
+            <Text size="medium">No portfolios created</Text>
           </View>
         )}
         <View as="div" margin="small 0">
@@ -116,26 +158,34 @@ const PortfolioDashboard = () => {
             <Flex gap="medium" wrap="wrap">
               {portfolios.map(portfolio => (
                 <Flex.Item shouldGrow={false} shouldShrink={false} key={portfolio.id}>
-                  <PortfolioCard
-                    id={portfolio.id}
-                    title={portfolio.title}
-                    heroImageUrl={portfolio.heroImageUrl}
-                    onAction={handleCardAction}
-                  />
+                  <View as="div" shadow="resting">
+                    <PortfolioCard
+                      id={portfolio.id}
+                      title={portfolio.title}
+                      heroImageUrl={portfolio.heroImageUrl}
+                      onAction={handleCardAction}
+                    />
+                  </View>
                 </Flex.Item>
               ))}
             </Flex>
           ) : (
-            renderSkeleton()
+            renderCardSkeleton(PORTFOLIO_CARD_WIDTH, PORTFOLIO_CARD_HEIGHT)
           )}
         </View>
       </View>
-      <CreatePortfolioModal
-        open={createModalIsOpen}
+      <NamingModal
+        objectType="Portfolio"
+        objectId={actionPortfolioId}
+        mode={createModalIsOpen ? 'create' : 'rename'}
+        currentName={
+          renameModalIsOpen ? portfolios.find(p => p.id === actionPortfolioId)?.title : undefined
+        }
+        open={createModalIsOpen || renameModalIsOpen}
         onDismiss={handleDismissCreateModal}
-        onSubmit={handleCreateNewPortfolio}
+        onSubmit={createModalIsOpen ? handleCreateNewPortfolio : handleRenameProfile}
       />
-    </>
+    </div>
   )
 }
 

@@ -32,7 +32,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {AccountCalendarItem} from './AccountCalendarItem'
 import {FilterType} from './FilterControls'
-import {Account, AccountData, VisibilityChange, SubscriptionChange} from '../types'
+import type {Account, AccountData, VisibilityChange, SubscriptionChange} from '../types'
 import {castIdsToInt} from '../utils'
 import {alertForMatchingAccounts} from '@canvas/calendar/AccountCalendarsUtils'
 

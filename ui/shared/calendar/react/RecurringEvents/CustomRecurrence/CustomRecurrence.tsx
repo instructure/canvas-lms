@@ -18,11 +18,11 @@
 
 import React, {useCallback, useEffect, useState} from 'react'
 import moment from 'moment-timezone'
-import {FrequencyValue, RRULEDayValue, UnknownSubset} from '../types'
-import RRuleHelper, {RRuleHelperSpec, RruleValidationError} from '../RRuleHelper'
-import RepeatPicker, {OnRepeatPickerChangeType} from '../RepeatPicker/RepeatPicker'
+import type {FrequencyValue, RRULEDayValue, UnknownSubset} from '../types'
+import RRuleHelper, {type RRuleHelperSpec, RruleValidationError} from '../RRuleHelper'
+import RepeatPicker, {type OnRepeatPickerChangeType} from '../RepeatPicker/RepeatPicker'
 import RecurrenceEndPicker, {
-  OnRecurrenceEndChangeType,
+  type OnRecurrenceEndChangeType,
 } from '../RecurrenceEndPicker/RecurrenceEndPicker'
 import {View} from '@instructure/ui-view'
 

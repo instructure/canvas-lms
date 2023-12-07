@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import PrerequisiteForm, {PrerequisiteFormProps} from '../PrerequisiteForm'
+import PrerequisiteForm, {type PrerequisiteFormProps} from '../PrerequisiteForm'
 
 describe('PrerequisiteForm', () => {
   const props: PrerequisiteFormProps = {

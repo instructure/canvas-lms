@@ -80,7 +80,7 @@ class ExternalContentController < ApplicationController
     @headers = false
 
     js_env({
-             retrieved_data: (@retrieved_data || {}),
+             retrieved_data: @retrieved_data || {},
              lti_response_messages:,
              service: params[:service],
              service_id: params[:id],

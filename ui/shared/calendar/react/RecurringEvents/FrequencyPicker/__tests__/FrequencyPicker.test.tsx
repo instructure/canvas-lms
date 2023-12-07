@@ -21,10 +21,10 @@ import moment from 'moment-timezone'
 import {render, screen} from '@testing-library/react'
 import FrequencyPicker, {
   FrequencyPickerErrorBoundary,
-  FrequencyPickerProps,
+  type FrequencyPickerProps,
 } from '../FrequencyPicker'
 import userEvent from '@testing-library/user-event'
-import {FrequencyOptionValue, UnknownSubset} from '../../types'
+import type {FrequencyOptionValue, UnknownSubset} from '../../types'
 
 const defaultTZ = 'Asia/Tokyo'
 

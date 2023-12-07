@@ -16,11 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {ReactNode} from 'react'
+import React from 'react'
+import type {ReactNode} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {Avatar} from '@instructure/ui-avatar'
-import {User} from './types'
+import type {User} from './types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('temporary_enrollment')

@@ -27,7 +27,7 @@ describe BookmarkedCollection::SimpleBookmarker do
     end
 
     BookmarkedCollection.best_unicode_collation_key_proc = lambda do |col|
-      return "lower(#{col})"
+      "lower(#{col})"
     end
 
     @bookmarker = BookmarkedCollection::SimpleBookmarker.new(@example_class, :name, :id)

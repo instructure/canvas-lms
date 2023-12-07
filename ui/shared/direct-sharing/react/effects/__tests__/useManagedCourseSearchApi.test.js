@@ -104,6 +104,7 @@ describe('useManagedCourseSearchApi', () => {
   describe('when user is an admin', () => {
     beforeEach(() => {
       global.ENV.current_user_roles.push('admin')
+      global.ENV.current_user_is_admin = true
     })
 
     it('does not make network request if search term is not included', async () => {

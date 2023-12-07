@@ -16,7 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {imageContentItem, imageContentItemToHtmlString, ImageContentItem} from '../ImageContentItem'
+import {
+  imageContentItem,
+  imageContentItemToHtmlString,
+  type ImageContentItem,
+} from '../ImageContentItem'
 
 const json = imageContentItem({
   url: 'https://www.test.com/image',

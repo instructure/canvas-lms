@@ -2916,8 +2916,8 @@ describe Assignment do
     shared_examples_for "submittable" do
       subject(:assignment) { Assignment.new }
 
-      let(:be_type) { "be_#{submission_type}".to_sym }
-      let(:build_type) { "build_#{submission_type}".to_sym }
+      let(:be_type) { :"be_#{submission_type}" }
+      let(:build_type) { :"build_#{submission_type}" }
 
       it "returns false if an assignment does not have a submission" \
          "or matching submission_types" do

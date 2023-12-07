@@ -20,7 +20,7 @@ import React from 'react'
 import {render, screen} from '@testing-library/react'
 import '@testing-library/jest-dom'
 import {TempEnrollAvatar} from '../TempEnrollAvatar'
-import {User} from '../types'
+import type {User} from '../types'
 
 const mockUser: User = {
   id: '1',

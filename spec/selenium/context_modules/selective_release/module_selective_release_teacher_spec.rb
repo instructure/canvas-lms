@@ -46,6 +46,11 @@ describe "selective_release module set up" do
     end
 
     it_behaves_like "selective_release module tray", :context_modules
+    it_behaves_like "selective_release edit module lock until", :context_modules
+    it_behaves_like "selective_release edit module lock until", :course_homepage
+
+    it_behaves_like "selective_release add module lock until", :context_modules
+    it_behaves_like "selective_release add module lock until", :course_homepage
   end
 
   context "uses tray to update prerequisites" do
@@ -420,7 +425,7 @@ describe "selective_release module set up" do
       @section1 = @subject_course.course_sections.create!(name: "section1")
       @section2 = @subject_course.course_sections.create!(name: "section2")
       @student1 = student_in_course(course: @subject_course, active_all: true, name: "user1").user
-      @student2 = student_in_course(coure: @subject_course, active_all: true, name: "Student 4", section: @section2).user
+      @student2 = student_in_course(course: @subject_course, active_all: true, name: "Student 4", section: @section2).user
       @module2 = @subject_course.context_modules.create!(name: "module2")
       @module2.add_item type: "assignment", id: @assignment2.id
       @module3 = @subject_course.context_modules.create!(name: "module3")
@@ -434,6 +439,7 @@ describe "selective_release module set up" do
     it_behaves_like "selective_release module tray prerequisites", :canvas_for_elementary
     it_behaves_like "selective_release module tray assign to", :canvas_for_elementary
     it_behaves_like "selective release module tray requirements", :canvas_for_elementary
+    it_behaves_like "selective_release edit module lock until", :canvas_for_elementary
   end
 
   context "Canvas for Elementary Modules Selective Release Limited Set Up" do
@@ -447,5 +453,6 @@ describe "selective_release module set up" do
     end
 
     it_behaves_like "selective_release add module tray", :canvas_for_elementary
+    it_behaves_like "selective_release add module lock until", :canvas_for_elementary
   end
 end

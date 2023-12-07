@@ -149,11 +149,7 @@ class GradingSchemesJsonController < ApplicationController
   end
 
   def self.json_serialized_fields
-    if Account.site_admin.feature_enabled?(:points_based_grading_schemes)
-      %w[id title scaling_factor points_based context_type context_id]
-    else
-      %w[id title context_type context_id]
-    end
+    %w[id title scaling_factor points_based context_type context_id]
   end
 
   def self.default_canvas_grading_standard(context)
@@ -161,25 +157,18 @@ class GradingSchemesJsonController < ApplicationController
     props = {}
     props["title"] = I18n.t("Default Canvas Grading Scheme")
     props["data"] = grading_standard_data
-    if Account.site_admin.feature_enabled?(:points_based_grading_schemes)
-      props["scaling_factor"] = 1.0
-      props["points_based"] = false
-    end
+    props["scaling_factor"] = 1.0
+    props["points_based"] = false
     context.grading_standards.build(props)
   end
 
   private
 
   def grading_scheme_payload
-    if Account.site_admin.feature_enabled?(:points_based_grading_schemes)
-      { title: params[:title],
-        data: GradingSchemesJsonController.to_grading_standard_data(params[:data]),
-        points_based: params[:points_based],
-        scaling_factor: params[:scaling_factor] }
-    else
-      { title: params[:title],
-        data: GradingSchemesJsonController.to_grading_standard_data(params[:data]) }
-    end
+    { title: params[:title],
+      data: GradingSchemesJsonController.to_grading_standard_data(params[:data]),
+      points_based: params[:points_based],
+      scaling_factor: params[:scaling_factor] }
   end
 
   def track_update_metrics(grading_standard)

@@ -249,8 +249,8 @@ module Api::V1::PlannerItem
     if item.is_a?(DiscussionTopic) || item.try(:discussion_topic)
       topic = item.try(:discussion_topic) || item
       unread_count, read_state = opts.dig(:topics_status, topic.id)
-      return (read_state == "unread" || unread_count > 0) if unread_count && read_state
-      return (topic.unread?(user) || topic.unread_count(user) > 0) if topic
+      return read_state == "unread" || unread_count > 0 if unread_count && read_state
+      return topic.unread?(user) || topic.unread_count(user) > 0 if topic
     end
     false
   end

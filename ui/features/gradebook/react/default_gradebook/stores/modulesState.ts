@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {GetState, SetState} from 'zustand'
+import type {GetState, SetState} from 'zustand'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import type {Module} from '../../../../../api.d'
 import type {GradebookStore} from './index'

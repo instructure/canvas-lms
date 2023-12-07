@@ -210,6 +210,10 @@ IndexView.prototype.afterRender = function () {
 }
 
 IndexView.prototype.requestBulkEdit = function () {
+  if (window.ENV.FEATURES.instui_nav) {
+    const bulkEditCrumb = $('<li>').text('Edit Assignment Dates')
+    $('#breadcrumbs ul').append(bulkEditCrumb)
+  }
   easy_student_view.hide()
   this.bulkEditMode = true
   return this.render()
@@ -220,6 +224,10 @@ IndexView.prototype.handleBulkEditSaved = function () {
 }
 
 IndexView.prototype.cancelBulkEdit = function () {
+  if (window.ENV.FEATURES.instui_nav) {
+    const lastCrumb = $('#breadcrumbs ul').children().last()
+    lastCrumb.remove()
+  }
   easy_student_view.show()
   if (this.bulkEditSaved) {
     return window.location.reload()

@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {CoursePaceItem, Module} from '../types'
+import type {CoursePaceItem, Module} from '../types'
 import {
   Constants as CoursePaceItemConstants,
-  CoursePaceItemAction,
+  type CoursePaceItemAction,
 } from '../actions/course_pace_items'
 
 /* Reducers */

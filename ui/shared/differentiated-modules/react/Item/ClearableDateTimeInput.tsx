@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {InferType} from 'prop-types'
+import type {InferType} from 'prop-types'
 import {DateTimeInput} from '@instructure/ui-date-time-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {CondensedButton} from '@instructure/ui-buttons'

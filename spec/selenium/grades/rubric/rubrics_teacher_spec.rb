@@ -73,7 +73,7 @@ describe "course rubrics" do
       get "/courses/#{@course.id}/rubrics/#{@rubric.id}"
       expect(f(".rubric_total")).to include_text "5"
 
-      f("#right-side .edit_rubric_link").click
+      f("#rubric-action-buttons .edit_rubric_link").click
       criterion_points = fj(".criterion_points:visible")
       replace_content(criterion_points, "10")
       criterion_points.send_keys(:return)
@@ -90,7 +90,7 @@ describe "course rubrics" do
       assignment_with_editable_rubric(10)
       get "/courses/#{@course.id}/rubrics/#{@rubric.id}"
 
-      f("#right-side .edit_rubric_link").click
+      f("#rubric-action-buttons .edit_rubric_link").click
       replace_content(fj(".criterion_points:visible"), "50")
       fj(".criterion_points:visible").send_keys(:return)
       expect(ff(".points").map(&:text).reject!(&:empty?)).to eq %w[50 15 0]
@@ -108,7 +108,7 @@ describe "course rubrics" do
     it "does not show an error when adjusting from 0 points" do
       assignment_with_editable_rubric(0)
       get "/courses/#{@course.id}/rubrics/#{@rubric.id}"
-      f("#right-side .edit_rubric_link").click
+      f("#rubric-action-buttons .edit_rubric_link").click
       replace_content(fj(".criterion_points:visible"), "10")
       fj(".criterion_points:visible").send_keys(:return)
       submit_form("#edit_rubric_form")
@@ -120,7 +120,7 @@ describe "course rubrics" do
 
       get "/courses/#{@course.id}/rubrics/#{@rubric.id}"
 
-      2.times { f("#right-side .edit_rubric_link").click }
+      2.times { f("#rubric-action-buttons .edit_rubric_link").click }
       expect(ff(".rubric .ic-Action-header").length).to eq 1
     end
 
@@ -155,7 +155,7 @@ describe "course rubrics" do
       wait_for_ajaximations
       import_outcome
 
-      f("#right-side .edit_rubric_link").click
+      f("#rubric-action-buttons .edit_rubric_link").click
       wait_for_ajaximations
 
       links = ffj("#rubric_#{rubric.id}.editing .ratings:first .edit_rating_link")

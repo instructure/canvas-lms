@@ -58,11 +58,9 @@ export default function DiscussionTopicFormContainer({apolloClient}) {
       const usageRights = {
         use_justification: usageData?.useJustification,
         legal_copyright: usageData?.legalCopyright || '',
+        license: usageData?.license || '',
       }
 
-      if (usageData.license) {
-        usageRights.license = usageData?.license
-      }
       // Run API if a usageRight option is provided and there is a file/folder to update
       if (basicFileSystemData.length !== 0 && usageData?.useJustification) {
         await setUsageRights(basicFileSystemData, usageRights, ENV.context_id, contextType)
@@ -127,6 +125,7 @@ export default function DiscussionTopicFormContainer({apolloClient}) {
           locked,
           fileId: attachment?._id,
           removeAttachment: !attachment?._id,
+          assignment,
         },
       })
     } else {
@@ -189,6 +188,24 @@ export default function DiscussionTopicFormContainer({apolloClient}) {
     },
   })
 
+  const filterUniqueUsers = nodes => {
+    if (!nodes) {
+      return []
+    }
+
+    const seenIds = new Set()
+    const uniqueNodes = []
+
+    nodes.forEach(node => {
+      if (!seenIds.has(node.user._id)) {
+        seenIds.add(node.user._id)
+        uniqueNodes.push(node)
+      }
+    })
+
+    return uniqueNodes
+  }
+
   const [updateDiscussionTopic] = useMutation(UPDATE_DISCUSSION_TOPIC, {
     onCompleted: completionData => {
       const updatedDiscussionTopic = completionData?.updateDiscussionTopic?.discussionTopic
@@ -215,7 +232,7 @@ export default function DiscussionTopicFormContainer({apolloClient}) {
       assignmentGroups={currentContext?.assignmentGroupsConnection?.nodes}
       sections={currentContext?.sectionsConnection?.nodes}
       groupCategories={currentContext?.groupSetsConnection?.nodes}
-      studentEnrollments={currentContext?.enrollmentsConnection?.nodes}
+      studentEnrollments={filterUniqueUsers(currentContext?.enrollmentsConnection?.nodes)}
       apolloClient={apolloClient}
       onSubmit={handleFormSubmit}
     />

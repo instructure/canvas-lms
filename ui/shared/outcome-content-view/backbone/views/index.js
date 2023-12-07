@@ -203,7 +203,7 @@ export default class ContentView extends Backbone.View {
   }
 
   clearNoOutcomeWarning() {
-    return this.$el != null ? this.$el.empty() : undefined
+    return this.$el != null ? this.$el.find('.no-outcomes-warning').empty() : undefined
   }
 }
 ContentView.mixin(DefaultUrlMixin)

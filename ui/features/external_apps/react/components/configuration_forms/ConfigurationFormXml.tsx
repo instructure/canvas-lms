@@ -19,11 +19,11 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {TextInput} from '@instructure/ui-text-input'
-import {FormMessage} from '@instructure/ui-form-field'
+import type {FormMessage} from '@instructure/ui-form-field'
 import {TextArea} from '@instructure/ui-text-area'
 import {Grid} from '@instructure/ui-grid'
 import '@canvas/rails-flash-notifications'
-import {I18nType, TextAreaChangeHandler, TextInputChangeHandler} from './types'
+import type {I18nType, TextAreaChangeHandler, TextInputChangeHandler} from './types'
 import MembershipServiceAccess from './MembershipServiceAccess'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 

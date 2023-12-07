@@ -20,7 +20,7 @@ import React, {useEffect, useMemo, useState} from 'react'
 import {View} from '@instructure/ui-view'
 import {getFinalGradeOverrides} from '@canvas/grading/FinalGradeOverrideApi'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
-import {
+import type {
   AssignmentGroupCriteriaMap,
   FinalGradeOverrideMap,
   FinalGradeOverride,
@@ -30,9 +30,9 @@ import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {Text} from '@instructure/ui-text'
 import {IconWarningLine} from '@instructure/ui-icons'
 import {
-  GradebookOptions,
-  GradebookStudentDetails,
-  GradebookUserSubmissionDetails,
+  type GradebookOptions,
+  type GradebookStudentDetails,
+  type GradebookUserSubmissionDetails,
   ApiCallStatus,
 } from '../../../types'
 import Notes from './Notes'
@@ -88,7 +88,6 @@ export default function StudentInformation({
     gradingStandardScalingFactor,
     gradingStandardPointsBased,
     groupWeightingScheme,
-    pointsBasedGradingSchemesFeatureEnabled,
     selectedGradingPeriodId,
   } = gradebookOptions
 
@@ -178,24 +177,23 @@ export default function StudentInformation({
     }
 
     let displayAsScaledPoints = false
-    let finalGradeText
-    if (pointsBasedGradingSchemesFeatureEnabled) {
-      if (gradingStandard) {
-        displayAsScaledPoints = gradingStandardPointsBased
-        const scalingFactor = gradingStandardScalingFactor
+    let finalGradeText = ''
 
-        if (displayAsScaledPoints && possible) {
-          const scaledPossible = I18n.n(scalingFactor, {
-            precision: 1,
-          })
-          const scaledScore = I18n.n(scoreToScaledPoints(score, possible, scalingFactor), {
-            precision: 1,
-          })
+    if (gradingStandard) {
+      displayAsScaledPoints = gradingStandardPointsBased
+      const scalingFactor = gradingStandardScalingFactor
 
-          finalGradeText = `${scaledScore} / ${scaledPossible}`
-        } else {
-          finalGradeText = Number.isNaN(Number(finalGradePercent)) ? '-' : `${finalGradePercent}%`
-        }
+      if (displayAsScaledPoints && possible) {
+        const scaledPossible = I18n.n(scalingFactor, {
+          precision: 1,
+        })
+        const scaledScore = I18n.n(scoreToScaledPoints(score, possible, scalingFactor), {
+          precision: 1,
+        })
+
+        finalGradeText = `${scaledScore} / ${scaledPossible}`
+      } else {
+        finalGradeText = Number.isNaN(Number(finalGradePercent)) ? '-' : `${finalGradePercent}%`
       }
     } else {
       finalGradeText = Number.isNaN(Number(finalGradePercent)) ? '-' : `${finalGradePercent}%`
@@ -310,9 +308,6 @@ export default function StudentInformation({
                           pointsBased: gradingStandardPointsBased,
                           scalingFactor: gradingStandardScalingFactor,
                         }}
-                        pointsBasedGradingSchemesFeatureEnabled={
-                          pointsBasedGradingSchemesFeatureEnabled
-                        }
                         includeUngradedAssignments={includeUngradedAssignments}
                       />
                     ))
@@ -327,9 +322,6 @@ export default function StudentInformation({
                           pointsBased: gradingStandardPointsBased,
                           scalingFactor: gradingStandardScalingFactor,
                         }}
-                        pointsBasedGradingSchemesFeatureEnabled={
-                          pointsBasedGradingSchemesFeatureEnabled
-                        }
                         includeUngradedAssignments={includeUngradedAssignments}
                       />
                     ))}
@@ -345,7 +337,6 @@ export default function StudentInformation({
           </View>
           {finalGradeOverrideEnabled && allowFinalGradeOverride && (
             <FinalGradeOverrideContainer
-              pointsBasedGradingSchemesFeatureEnabled={pointsBasedGradingSchemesFeatureEnabled}
               finalGradeOverride={finalGradeOverrides[student.id]}
               enrollmentId={student.enrollments[0]?.id}
               onSubmit={(finalGradeOverride: FinalGradeOverride) => {

@@ -19,7 +19,7 @@
 import React, {useState, useEffect} from 'react'
 
 import {Text} from '@instructure/ui-text'
-import {Select, SelectProps} from '@instructure/ui-select'
+import {Select, type SelectProps} from '@instructure/ui-select'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 import {useScope as useI18nScope} from '@canvas/i18n'

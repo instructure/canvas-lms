@@ -40,7 +40,7 @@ module Turnitin
     end
 
     def process
-      submission = @assignment.submissions.find_by(user: @user, submitted_at: (turnitin_client.uploaded_at || Time.zone.now))
+      submission = @assignment.submissions.find_by(user: @user, submitted_at: turnitin_client.uploaded_at || Time.zone.now)
       submission.nil? ? new_submission : submission.retrieve_lti_tii_score
     end
 

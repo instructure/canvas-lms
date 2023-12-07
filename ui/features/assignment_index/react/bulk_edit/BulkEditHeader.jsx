@@ -75,7 +75,69 @@ export default function BulkEditHeader({
 
   const selectedAssignmentsCount = assignments.filter(a => a.selected).length
 
-  return (
+  return window.ENV.FEATURES.instui_nav ? (
+    <>
+      <Flex margin={jobRunning ? '0 0 medium 0' : '0 0 large 0'} wrap="wrap" gap="medium">
+        <Flex.Item shouldGrow={true} shouldShrink={true}>
+          <Heading themeOverride={{h1FontWeight: 700, lineHeight: 1.05}} level="h1">
+            {I18n.t('Edit Assignment Dates')}
+          </Heading>
+        </Flex.Item>
+        <Flex.Item shouldShrink={true}>
+          <Flex.Item>
+            <Text>
+              {I18n.t(
+                {one: '%{count} assignment selected', other: '%{count} assignments selected'},
+                {count: selectedAssignmentsCount}
+              )}
+            </Text>
+          </Flex.Item>
+          <Flex.Item>
+            <Button
+              margin="0 0 0 small"
+              onClick={onOpenBatchEdit}
+              interaction={selectedAssignmentsCount > 0 ? 'enabled' : 'disabled'}
+            >
+              {I18n.t('Batch Edit')}
+            </Button>
+          </Flex.Item>
+          <Flex.Item>
+            <Button margin="0 0 0 small" onClick={onCancel}>
+              {jobSuccess ? I18n.t('Close') : I18n.t('Cancel')}
+            </Button>
+          </Flex.Item>
+          <Flex.Item>
+            <Button
+              margin="0 0 0 small"
+              color="primary"
+              interaction={
+                startingSave || jobRunning || !anyAssignmentsEdited || validationErrorsExist
+                  ? 'disabled'
+                  : 'enabled'
+              }
+              onClick={onSave}
+            >
+              {startingSave || jobRunning ? I18n.t('Saving...') : I18n.t('Save')}
+            </Button>
+          </Flex.Item>
+        </Flex.Item>
+      </Flex>
+      {jobRunning && (
+        <View as="div" maxWidth="500px" margin="0 0 large 0">
+          <ProgressBar
+            screenReaderLabel={I18n.t('Saving assignment dates progress')}
+            valueNow={jobCompletion}
+            renderValue={renderProgressValue}
+          />
+          <CanvasInlineAlert liveAlert={true} screenReaderOnly={true} variant="info">
+            {I18n.t('Saving assignment dates progress: %{percent}%', {
+              percent: jobCompletion,
+            })}
+          </CanvasInlineAlert>
+        </View>
+      )}
+    </>
+  ) : (
     <>
       <Heading level="h2">{I18n.t('Edit Assignment Dates')}</Heading>
       <Flex as="div" padding="0 0 medium 0">

@@ -23,7 +23,7 @@ module RubricsCommon
   def create_rubric_with_criterion_points(points)
     get rubric_url
 
-    f("#right-side-wrapper .add_rubric_link").click
+    f(".add_rubric_link").click
     check_element_has_focus(fj("#rubric_new :text:first"))
     criterion_points = f("#criterion_1 .criterion_points")
     set_value(criterion_points, points.to_s)
@@ -143,7 +143,7 @@ module RubricsCommon
   end
 
   def import_outcome
-    f("#right-side .edit_rubric_link").click
+    f("#rubric-action-buttons .edit_rubric_link").click
     wait_for_ajaximations
     f(".rubric.editing tr.criterion .delete_criterion_link").click
     wait_for_ajaximations

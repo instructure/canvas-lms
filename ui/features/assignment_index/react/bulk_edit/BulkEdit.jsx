@@ -58,7 +58,7 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
         },
         hasGradingPeriods: !!ENV.HAS_GRADING_PERIODS,
         gradingPeriods: GradingPeriodsAPI.deserializePeriods(ENV.active_grading_periods || []),
-        userIsAdmin: (ENV.current_user_roles || []).includes('admin'),
+        userIsAdmin: ENV.current_user_is_admin,
       }),
     []
   )

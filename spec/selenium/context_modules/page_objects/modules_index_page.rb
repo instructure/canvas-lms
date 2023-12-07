@@ -50,7 +50,7 @@ module ModulesIndexPage
   end
 
   def unlock_details_selector(module_id)
-    "context_module_content_#{module_id} .unlock_details"
+    "#context_module_content_#{module_id} .unlock_details"
   end
 
   #------------------------------ Elements ------------------------------

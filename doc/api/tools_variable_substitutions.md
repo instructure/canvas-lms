@@ -251,15 +251,6 @@ Returns the host of the rich content service for the current region.
 ```
 "rich-content-iad.inscloudgate.net"
 ```
-## com.instructure.RCS.service_jwt
-Returns the RCS Service JWT for the current user.
-
-**Availability**: *internal LTI tools*  
-**Launch Parameter**: *com_instructure_rcs_service_jwt*  
-
-```
-"base64-encoded-service-jwt"
-```
 ## com.instructure.Observee.sisIds
 returns all observee ids linked to this observer as an String separated by `,`.
 

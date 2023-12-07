@@ -25,7 +25,6 @@ module PactConfig
     CANVAS_LMS_API = "Canvas LMS API"
     CANVAS_API_VERSION = "1.0"
     CANVAS_LMS_LIVE_EVENTS = "Canvas LMS Live Events"
-    OUTCOMES = "Outcomes"
     ALL = Providers.constants.map { |c| Providers.const_get(c) }
   end
 
@@ -38,11 +37,6 @@ module PactConfig
     ANDROID = "android"
     CANVAS_IOS = "canvas-ios"
     ALL = Consumers.constants.map { |c| Consumers.const_get(c) }
-  end
-
-  # Add new Live Events consumers to this module
-  module LiveEventConsumers
-    OUTCOMES = "Outcomes"
   end
 
   class << self

@@ -20,7 +20,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {send} from '@canvas/rce/RceCommandShim'
 import $ from 'jquery'
 import {contentItemProcessorPrechecks} from '../ContentItemProcessor'
-import {DeepLinkResponse} from '../DeepLinkResponse'
+import type {DeepLinkResponse} from '../DeepLinkResponse'
 import {contentItemToHtmlString} from '../models/ContentItem'
 
 const I18n = useI18nScope('external_content.success')

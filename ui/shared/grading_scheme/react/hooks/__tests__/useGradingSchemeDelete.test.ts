@@ -20,7 +20,7 @@ import {useGradingSchemeDelete} from '../useGradingSchemeDelete'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
 import {renderHook} from '@testing-library/react-hooks/dom'
-import {GradingSchemeTemplate} from '../../../gradingSchemeApiModel'
+import type {GradingSchemeTemplate} from '../../../gradingSchemeApiModel'
 import {ApiCallStatus} from '../ApiCallStatus'
 
 const courseId = '11'

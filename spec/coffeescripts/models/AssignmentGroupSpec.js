@@ -116,7 +116,7 @@ test('#hasIntegrationData returns false if sis_source_id and integration_data is
 
 QUnit.module('AssignmentGroup#canDelete as admin', {
   setup() {
-    fakeENV.setup({current_user_roles: ['admin']})
+    fakeENV.setup({current_user_is_admin: true})
   },
   teardown() {
     fakeENV.teardown()
@@ -169,7 +169,7 @@ test("returns true if 'frozen' and 'any_assignment_in_closed_grading_period' are
 
 QUnit.module('AssignmentGroup#canDelete as non admin', {
   setup() {
-    fakeENV.setup({current_user_roles: ['teacher']})
+    fakeENV.setup({current_user_roles: ['teacher'], current_user_is_admin: false})
   },
   teardown() {
     fakeENV.teardown()

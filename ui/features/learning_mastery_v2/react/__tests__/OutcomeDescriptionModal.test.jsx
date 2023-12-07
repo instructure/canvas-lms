@@ -26,6 +26,12 @@ import {defaultRatings, defaultMasteryPoints} from '@canvas/outcomes/react/hooks
 describe('OutcomeDescriptionModal', () => {
   let onCloseHandlerMock
 
+  const setCalculationMethod = (outcome, method, calculationInt = null) => {
+    outcome.calculation_method = method
+    outcome.calculation_int = calculationInt
+    return outcome
+  }
+
   const defaultOutcome = {
     id: '1',
     title: 'Outcome',
@@ -115,6 +121,7 @@ describe('OutcomeDescriptionModal', () => {
   it('correctly renders outcome information in modal', () => {
     const {getByTestId} = renderWithProvider()
     expect(getByTestId('outcome-display-name')).toBeInTheDocument()
+    expect(getByTestId('calculation-method')).toBeInTheDocument()
     expect(getByTestId('outcome-description')).toBeInTheDocument()
   })
 
@@ -122,6 +129,43 @@ describe('OutcomeDescriptionModal', () => {
     const {getByTestId} = renderWithProvider({outcome: outcomeEmpty})
     expect(getByTestId('outcome-empty-title')).toBeInTheDocument()
     expect(getByTestId('outcome-empty-description')).toBeInTheDocument()
+  })
+
+  describe('Outcome Calculation Methods', () => {
+    it('renders correctly when given an outcome with \'decaying_average\' calculation method', () => {
+      const {getByText} = renderWithProvider({outcome: setCalculationMethod(defaultOutcome, 'decaying_average', 65)})
+      expect(getByText('65/35 Weighted Average')).toBeInTheDocument()
+    })
+
+    it('renders correctly when given an outcome with \'standard_decaying_average\' calculation method', () => {
+      const {getByText} = renderWithProvider({outcome: setCalculationMethod(defaultOutcome, 'standard_decaying_average', 65)})
+      expect(getByText('65/35 Decaying Average')).toBeInTheDocument()
+    })
+
+    it('renders correctly when given an outcome with \'n_mastery\' calculation method', () => {
+      const {getByText} = renderWithProvider({outcome: setCalculationMethod(defaultOutcome, 'n_mastery', 5)})
+      expect(getByText('Number of Times (5)')).toBeInTheDocument()
+    })
+
+    it('renders correctly when given an outcome with \'highest\' calculation method', () => {
+      const {getByText} = renderWithProvider({outcome: setCalculationMethod(defaultOutcome, 'highest')})
+      expect(getByText('Highest')).toBeInTheDocument()
+    })
+
+    it('renders correctly when given an outcome with \'latest\' calculation method', () => {
+      const {getByText} = renderWithProvider({outcome: setCalculationMethod(defaultOutcome, 'latest')})
+      expect(getByText('Most Recent Score')).toBeInTheDocument()
+    })
+
+    it('renders correctly when given an outcome with \'average\' calculation method', () => {
+      const {getByText} = renderWithProvider({outcome: setCalculationMethod(defaultOutcome, 'average')})
+      expect(getByText('Average')).toBeInTheDocument()
+    })
+
+    it('renders \'Average\' when given an outcome with invalid calculation method', () => {
+      const {getByText} = renderWithProvider({outcome: setCalculationMethod(defaultOutcome, 'not_a_calculation_method')})
+      expect(getByText('Average')).toBeInTheDocument()
+    })
   })
 
   describe('Outcome Friendly Descriptions', () => {

@@ -36,6 +36,7 @@ export interface DateDetailsOverride {
   title: string
   course_section_id: number | null
   students?: StudentInfo[]
+  student_ids: string[]
   due_at: string
   unlock_at: string | null
   lock_at: string | null

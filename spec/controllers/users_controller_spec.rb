@@ -132,12 +132,16 @@ describe UsersController do
       let(:developer_key) { DeveloperKey.create! }
 
       before do
+        Lti::LaunchDebugLogger.enable!(account, 1)
+
         allow(SecureRandom).to receive(:hex).and_return(verifier)
         tool.use_1_3 = true
         tool.developer_key = developer_key
         tool.save!
         get :external_tool, params: { id: tool.id, user_id: user.id }
       end
+
+      after { Lti::LaunchDebugLogger.disable!(account) }
 
       it "creates a login message" do
         expect(assigns[:lti_launch].params.keys).to match_array %w[
@@ -177,6 +181,12 @@ describe UsersController do
         it "uses the oidc_initiation_url as the resource_url" do
           expect(assigns[:lti_launch].resource_url).to eq oidc_initiation_url
         end
+      end
+
+      it "includes debug_trace in the lti_message_hint (if enabled for the account)" do
+        message_hint = JSON::JWT.decode(assigns[:lti_launch].params["lti_message_hint"], :skip_verification)
+        expect(message_hint["debug_trace"]).to be_a(String)
+        expect(message_hint["debug_trace"]).to_not be_empty
       end
     end
   end

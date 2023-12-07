@@ -20,20 +20,6 @@
 <% add_crumb t('#crumbs.rubrics', 'Rubrics'), context_url(@context, :context_rubrics_url) %>
 <% add_crumb @actual_rubric.title %>
 
-<% provide :right_side do %>
-  <% if !!js_env.dig(:PERMISSIONS, :manage_rubrics)%>
-    <% if can_do(@actual_rubric, @current_user, :update) %>
-      <a href="#" class="edit_rubric_link Button button-sidebar-wide"><i class="icon-edit" aria-hidden="true"></i> <%= t('titles.edit_rubric', 'Edit Rubric') %></a>
-    <% else %>
-        <%= t('rubric_can_not_modify', 'Rubrics cannot be modified once they have been used in more than one place.') %>
-    <% end %>
-    <% if can_do(@actual_rubric, @current_user, :delete) %>
-      <a href="#" class="delete_rubric_link Button button-sidebar-wide"><i class="icon-trash" aria-hidden="true"></i> <%= t('buttons.delete', 'Delete Rubric') %></a>
-    <% end %>
-  <% end %>
-  <a href="<%= context_url(@context, :context_rubrics_url) %>" class="rubrics_url" style="display: none;">&nbsp;</a>
-<% end %>
-
 <% js_bundle :edit_rubric %>
 <% css_bundle :learning_outcomes %>
 
@@ -50,7 +36,42 @@
   </style>
 
 <% js_bundle 'rubrics_show' %>
-<h1><%= @actual_rubric.title %></h1>
+<% if @context.root_account.feature_enabled?(:instui_nav) %>
+  <div class="rubric-header">
+    <div class="rubric-header-left">
+      <h1 class="rubric-title"><%= @actual_rubric.title %></h1>
+    </div>
+    <div class="rubric-header-right" id="rubric-action-buttons">
+      <% if !!js_env.dig(:PERMISSIONS, :manage_rubrics)%>
+        <% if can_do(@actual_rubric, @current_user, :update) %>
+          <a href="#" class="edit_rubric_link Button button-sidebar-wide"><i class="icon-edit" aria-hidden="true" style="margin-right: 7px;"></i> <%= t('titles.edit_rubric', 'Edit Rubric') %></a>
+        <% else %>
+          <%= t('rubric_can_not_modify', 'Rubrics cannot be modified once they have been used in more than one place.') %>
+        <% end %>
+        <% if can_do(@actual_rubric, @current_user, :delete) %>
+          <a href="#" style="margin-left: 12px" class="delete_rubric_link Button button-sidebar-wide"><i class="icon-trash" aria-hidden="true" style="margin-right: 7px;"></i> <%= t('buttons.delete', 'Delete Rubric') %></a>
+        <% end %>
+      <% end %>
+      <a href="<%= context_url(@context, :context_rubrics_url) %>" class="rubrics_url" style="display: none;">&nbsp;</a>
+    </div>
+  </div>
+<% else %>
+  <% provide :right_side do %>
+    <div id="rubric-action-buttons">
+      <% if !!js_env.dig(:PERMISSIONS, :manage_rubrics)%>
+        <% if can_do(@actual_rubric, @current_user, :update) %>
+          <a href="#" class="edit_rubric_link Button button-sidebar-wide"><i class="icon-edit" aria-hidden="true"></i> <%= t('titles.edit_rubric', 'Edit Rubric') %></a>
+        <% else %>
+            <%= t('rubric_can_not_modify', 'Rubrics cannot be modified once they have been used in more than one place.') %>
+        <% end %>
+        <% if can_do(@actual_rubric, @current_user, :delete) %>
+          <a href="#" class="delete_rubric_link Button button-sidebar-wide"><i class="icon-trash" aria-hidden="true"></i> <%= t('buttons.delete', 'Delete Rubric') %></a>
+        <% end %>
+      <% end %>
+      <a href="<%= context_url(@context, :context_rubrics_url) %>" class="rubrics_url" style="display: none;">&nbsp;</a>
+    </div>
+  <% end %>
+<% end %>
 <div id="rubrics" class="raw_listing">
   <% [@actual_rubric].each do |rubric| %>
     <%= render :partial => "shared/rubric", :object => rubric, :locals => {:association => @account, :editable => can_do(rubric, @current_user, :update), :edit_view => true, :for_context => true} %>

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import {StudentViewPeerReviews, StudentViewPeerReviewsProps} from '../StudentViewPeerReviews'
+import {StudentViewPeerReviews, type StudentViewPeerReviewsProps} from '../StudentViewPeerReviews'
 
 describe('StudentViewPeerReviews Component Tests', () => {
   it('renders the StudentViewPeerReviews component with anonymous peer reviewers', async () => {

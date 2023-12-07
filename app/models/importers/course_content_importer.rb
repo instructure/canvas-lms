@@ -184,7 +184,8 @@ module Importers
         end
         migration.update_import_progress(90)
 
-        if migration.migration_settings[:import_blueprint_settings] || (migration.copy_options && migration.copy_options[:all_blueprint_settings])
+        if (migration.migration_settings[:import_blueprint_settings] || (migration.copy_options && migration.copy_options[:all_blueprint_settings])) &&
+           (course.account.grants_any_right?(migration.user, :manage_courses, :manage_courses_admin) && course.account.grants_right?(migration.user, :manage_master_courses))
           Importers::BlueprintSettingsImporter.process_migration(data, migration)
         end
 
@@ -279,6 +280,9 @@ module Importers
       imported_items = migration.imported_migration_items_for_insert_type
       return unless imported_items.any?
 
+      # get rid of assignments relating to quizzes lest they create 2 quizzes in the module
+      quiz_assignments = imported_items.filter { |item| item.is_a? Quizzes::Quiz }.pluck(:assignment_id)
+      imported_items.filter! { |item| !(item.is_a?(Assignment) && quiz_assignments.include?(item.id)) }
       start_pos = migration.migration_settings[:insert_into_module_position]
       start_pos = start_pos.to_i unless start_pos.nil? # 0 = start; nil = end
       mod.insert_items(imported_items, start_pos)

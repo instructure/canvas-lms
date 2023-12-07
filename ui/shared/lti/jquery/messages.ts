@@ -24,7 +24,7 @@ import {
   INPUT_CHANGE_MESSAGE as MENTIONS_INPUT_CHANGE_MESSAGE,
   SELECTION_MESSAGE as MENTIONS_SELECTION_MESSAGE,
 } from '@canvas/rce/plugins/canvas_mentions/constants'
-import {LtiMessageHandler} from './lti_message_handler'
+import type {LtiMessageHandler} from './lti_message_handler'
 import buildResponseMessages from './response_messages'
 import {getKey, hasKey, deleteKey} from './util'
 

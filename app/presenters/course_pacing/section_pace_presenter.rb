@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class CoursePacing::SectionPacePresenter < CoursePacing::PacePresenterInterface
+class CoursePacing::SectionPacePresenter < CoursePacing::PacePresenter
   attr_reader :section
 
   def initialize(section_pace, section = nil)
