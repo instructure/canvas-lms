@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState} from 'react'
 import type {ChangeEvent} from 'react'
+import React, {useEffect, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -30,8 +30,8 @@ import {Table} from '@instructure/ui-table'
 import {Flex} from '@instructure/ui-flex'
 import {createAnalyticPropsGenerator} from './util/analytics'
 import {TempEnrollAvatar} from './TempEnrollAvatar'
-import {EMPTY_USER, MODULE_NAME} from './types'
 import type {User} from './types'
+import {EMPTY_USER, MODULE_NAME} from './types'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 
 declare const ENV: GlobalEnv

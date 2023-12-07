@@ -47,26 +47,26 @@ const props: Props = {
   roles: [
     {
       id: '1',
-      role: 'StudentEnrollment',
       label: 'StudentRole',
+      name: 'StudentEnrollment',
       base_role_name: 'StudentEnrollment',
     },
     {
       id: '2',
-      role: 'TeacherEnrollment',
       label: 'SubTeacherRole',
+      name: 'TeacherEnrollment',
       base_role_name: 'TeacherEnrollment',
     },
     {
       id: '3',
-      role: 'DesignerEnrollment',
       label: 'DesignRole',
+      name: 'DesignerEnrollment',
       base_role_name: 'DesignerEnrollment',
     },
     {
       id: '4',
-      role: 'CustomTeacherEnrollment',
       label: 'TeacherRole',
+      name: 'TeacherEnrollment',
       base_role_name: 'TeacherEnrollment',
     },
   ],
