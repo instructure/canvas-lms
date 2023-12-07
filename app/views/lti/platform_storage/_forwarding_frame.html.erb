@@ -26,13 +26,18 @@
     current_domain = HostUrl.context_host(@domain_root_account, request.host_with_port)
     oidc_auth_domain = Lti::Oidc.auth_domain(current_domain)
   %>
-  <%= iframe(
-    # rev=1 -- bust cache until we have a better way of doing that (next commit)
-    lti_post_message_forwarding_url(host: oidc_auth_domain, target: current_domain, rev: 1),
-    name: Lti::PlatformStorage::FORWARDING_TARGET,
-    title: Lti::PlatformStorage::FORWARDING_TARGET,
-    id: Lti::PlatformStorage::FORWARDING_TARGET,
-    sandbox: "allow-scripts allow-same-origin",
-    style: "display:none;"
-  ) %>
+  <%=
+    iframe(
+      lti_post_message_forwarding_url(
+        host: oidc_auth_domain,
+        target: current_domain,
+        rev: Lti::PlatformStorageController.rev_fingerprint
+      ),
+      name: Lti::PlatformStorage::FORWARDING_TARGET,
+      title: Lti::PlatformStorage::FORWARDING_TARGET,
+      id: Lti::PlatformStorage::FORWARDING_TARGET,
+      sandbox: "allow-scripts allow-same-origin",
+      style: "display:none;"
+    )
+  %>
 <% end %>
