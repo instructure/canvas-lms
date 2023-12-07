@@ -1673,86 +1673,60 @@ describe CoursesController do
         @student1 = @student
       end
 
-      context "with 'Assignments 2 Observer View'" do
+      context "as a student" do
         before do
-          Setting.set("assignments_2_observer_view", "true")
+          user_session(@student1)
         end
 
-        context "as a student" do
-          before do
-            user_session(@student1)
-          end
-
-          it "redirects to the xlisted course when there's no enrollment in the requested course" do
-            @course1.default_section.crosslist_to_course(@course2, run_jobs_immediately: true)
-            get "show", params: { id: @course1.id }
-            expect(response).to redirect_to(course_url(@course2))
-          end
-
-          it "does not redirect to the xlisted course when there's an enrollment in the requested course" do
-            section2 = @course1.course_sections.create!(name: "section2")
-            @course1.enroll_student(@student1, section: section2, enrollment_state: "active", allow_multiple_enrollments: true)
-            @course1.default_section.crosslist_to_course(@course2, run_jobs_immediately: true)
-            get "show", params: { id: @course1.id }
-            expect(response).not_to be_redirect
-          end
+        it "redirects to the xlisted course when there's no enrollment in the requested course" do
+          @course1.default_section.crosslist_to_course(@course2, run_jobs_immediately: true)
+          get "show", params: { id: @course1.id }
+          expect(response).to redirect_to(course_url(@course2))
         end
 
-        context "as an observer" do
-          before do
-            @observer = course_with_observer(course: @course1, associated_user_id: @student1.id, active_all: true).user
-            user_session(@observer)
-          end
-
-          it "redirects to the xlisted course when there's no enrollment in the requested course" do
-            @course1.default_section.crosslist_to_course(@course2, run_jobs_immediately: true)
-            get "show", params: { id: @course1.id }
-            expect(response).to redirect_to(course_url(@course2))
-          end
-
-          it "does not redirect to the xlisted course when there's an unlinked enrollment in the requested course" do
-            section2 = @course1.course_sections.create!(name: "section2")
-            @course1.enroll_user(@observer, "ObserverEnrollment", section: section2, enrollment_state: :active)
-            @course1.default_section.crosslist_to_course(@course2, run_jobs_immediately: true)
-            get "show", params: { id: @course1.id }
-            expect(response).not_to be_redirect
-          end
-
-          it "does not redirect to the xlisted course when there's a linked enrollment in the requested course" do
-            section2 = @course1.course_sections.create!(name: "section2")
-            student2 = student_in_course(course: @course1, section: section2, active_all: true).user
-            course_with_observer(
-              user: @observer,
-              course: @course1,
-              section: section2,
-              associated_user_id: student2.id,
-              active_all: true,
-              allow_multiple_enrollments: true
-            )
-            @course1.default_section.crosslist_to_course(@course2, run_jobs_immediately: true)
-            get "show", params: { id: @course1.id }
-            expect(response).not_to be_redirect
-          end
+        it "does not redirect to the xlisted course when there's an enrollment in the requested course" do
+          section2 = @course1.course_sections.create!(name: "section2")
+          @course1.enroll_student(@student1, section: section2, enrollment_state: "active", allow_multiple_enrollments: true)
+          @course1.default_section.crosslist_to_course(@course2, run_jobs_immediately: true)
+          get "show", params: { id: @course1.id }
+          expect(response).not_to be_redirect
         end
       end
 
-      context "without 'Assignments 2 Observer View'" do
-        it "redirects to the xlisted course" do
-          user_session(@student1)
-          @course1.default_section.crosslist_to_course(@course2, run_jobs_immediately: true)
-
-          get "show", params: { id: @course1.id }
-          expect(response).to be_redirect
-          expect(response.location).to match(%r{/courses/#{@course2.id}})
+      context "as an observer" do
+        before do
+          @observer = course_with_observer(course: @course1, associated_user_id: @student1.id, active_all: true).user
+          user_session(@observer)
         end
 
-        it "does not redirect to the xlisted course if the enrollment is deleted" do
-          user_session(@student1)
+        it "redirects to the xlisted course when there's no enrollment in the requested course" do
           @course1.default_section.crosslist_to_course(@course2, run_jobs_immediately: true)
-          @user.enrollments.destroy_all
-
           get "show", params: { id: @course1.id }
-          expect(response).to have_http_status :unauthorized
+          expect(response).to redirect_to(course_url(@course2))
+        end
+
+        it "does not redirect to the xlisted course when there's an unlinked enrollment in the requested course" do
+          section2 = @course1.course_sections.create!(name: "section2")
+          @course1.enroll_user(@observer, "ObserverEnrollment", section: section2, enrollment_state: :active)
+          @course1.default_section.crosslist_to_course(@course2, run_jobs_immediately: true)
+          get "show", params: { id: @course1.id }
+          expect(response).not_to be_redirect
+        end
+
+        it "does not redirect to the xlisted course when there's a linked enrollment in the requested course" do
+          section2 = @course1.course_sections.create!(name: "section2")
+          student2 = student_in_course(course: @course1, section: section2, active_all: true).user
+          course_with_observer(
+            user: @observer,
+            course: @course1,
+            section: section2,
+            associated_user_id: student2.id,
+            active_all: true,
+            allow_multiple_enrollments: true
+          )
+          @course1.default_section.crosslist_to_course(@course2, run_jobs_immediately: true)
+          get "show", params: { id: @course1.id }
+          expect(response).not_to be_redirect
         end
       end
     end
@@ -2132,34 +2106,20 @@ describe CoursesController do
         user_session(@observer)
       end
 
-      it "sets context_enrollment using first enrollment" do
+      it "sets context_enrollment using selected observed user" do
+        cookies["#{ObserverEnrollmentsHelper::OBSERVER_COOKIE_PREFIX}#{@observer.id}"] = @student2.id
         get :show, params: { id: @course.id }
         enrollment = assigns[:context_enrollment]
         expect(enrollment.is_a?(ObserverEnrollment)).to be true
         expect(enrollment.user_id).to eq @observer.id
-        expect(enrollment.associated_user_id).to eq @student.id
+        expect(enrollment.associated_user_id).to eq @student2.id
       end
 
-      context "when a2 observer view is enabled" do
-        before do
-          Setting.set("assignments_2_observer_view", "true")
-        end
-
-        it "sets context_enrollment using selected observed user" do
-          cookies["#{ObserverEnrollmentsHelper::OBSERVER_COOKIE_PREFIX}#{@observer.id}"] = @student2.id
-          get :show, params: { id: @course.id }
-          enrollment = assigns[:context_enrollment]
-          expect(enrollment.is_a?(ObserverEnrollment)).to be true
-          expect(enrollment.user_id).to eq @observer.id
-          expect(enrollment.associated_user_id).to eq @student2.id
-        end
-
-        it "sets js_env variables" do
-          get :show, params: { id: @course.id }
-          expect(assigns[:js_env]).to have_key(:OBSERVER_OPTIONS)
-          expect(assigns[:js_env][:OBSERVER_OPTIONS][:OBSERVED_USERS_LIST].is_a?(Array)).to be true
-          expect(assigns[:js_env][:OBSERVER_OPTIONS][:CAN_ADD_OBSERVEE]).to be false
-        end
+      it "sets js_env variables" do
+        get :show, params: { id: @course.id }
+        expect(assigns[:js_env]).to have_key(:OBSERVER_OPTIONS)
+        expect(assigns[:js_env][:OBSERVER_OPTIONS][:OBSERVED_USERS_LIST].is_a?(Array)).to be true
+        expect(assigns[:js_env][:OBSERVER_OPTIONS][:CAN_ADD_OBSERVEE]).to be false
       end
     end
   end

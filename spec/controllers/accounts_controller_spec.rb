@@ -1910,8 +1910,8 @@ describe AccountsController do
     end
 
     context "pagination" do
-      before(:once) do
-        Setting.set("eportfolio_moderation_results_per_page", 2)
+      before do
+        stub_const("AccountsController::EPORTFOLIO_MODERATION_PER_PAGE", 2)
       end
 
       it "does not return more than the specified results per page" do

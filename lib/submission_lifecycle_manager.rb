@@ -22,6 +22,8 @@ require "anonymity"
 class SubmissionLifecycleManager
   include Moderation
 
+  MAX_RUNNING_JOBS = 10
+
   thread_mattr_accessor :executing_users, instance_accessor: false
 
   # These methods allow the caller to specify a user to whom due date
@@ -154,13 +156,12 @@ class SubmissionLifecycleManager
 
     if opts[:sis_import]
       running_jobs_count = Delayed::Job.running.where(shard_id: course.shard.id, tag: "SubmissionLifecycleManager#recompute_for_sis_import").count
-      max_jobs = Setting.get("SubmissionLifecycleManager#recompute_for_sis_import_num_strands", "10").to_i
 
-      if running_jobs_count >= max_jobs
+      if running_jobs_count >= MAX_RUNNING_JOBS
         # there are too many sis recompute jobs running concurrently now. let's check again in a bit to see if we can run.
         return delay_if_production(
           **inst_jobs_opts,
-          run_at: Setting.get("SubmissionLifecycleManager#recompute_for_sis_import_requeue_delay", "10").to_i.seconds.from_now
+          run_at: 10.seconds.from_now
         ).recompute_users_for_course(user_ids, course, assignments, opts)
       else
         submission_lifecycle_manager = new(course, assignments, user_ids, update_grades:, original_caller: current_caller, executing_user:)

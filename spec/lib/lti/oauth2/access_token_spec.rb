@@ -52,14 +52,7 @@ module Lti
           expect(Canvas::Security.decode_jwt(access_token.to_s)["aud"]).to eq aud
         end
 
-        it "has an 'exp' that is derived from the settings" do
-          Timecop.freeze do
-            Setting.set("lti.oauth2.access_token.exp", 2.hours)
-            expect(Canvas::Security.decode_jwt(access_token.to_s)["exp"]).to eq 2.hours.from_now.to_i
-          end
-        end
-
-        it "has a default 'exp' of 1 hour" do
+        it "has an 'exp' of 1 hour" do
           Timecop.freeze do
             expect(Canvas::Security.decode_jwt(access_token.to_s)["exp"]).to eq 1.hour.from_now.to_i
           end
@@ -71,14 +64,7 @@ module Lti
           end
         end
 
-        it "has a 'nbf' derived from the settings" do
-          Timecop.freeze do
-            Setting.set("lti.oauth2.access_token.nbf", 2.minutes)
-            expect(Canvas::Security.decode_jwt(access_token.to_s)["nbf"]).to eq 2.minutes.ago.to_i
-          end
-        end
-
-        it "has a default 'nbf' 30 seconds ago" do
+        it "has a 'nbf' 30 seconds ago" do
           Timecop.freeze do
             expect(Canvas::Security.decode_jwt(access_token.to_s)["nbf"]).to eq 30.seconds.ago.to_i
           end

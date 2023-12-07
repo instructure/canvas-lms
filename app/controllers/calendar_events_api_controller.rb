@@ -1157,8 +1157,8 @@ class CalendarEventsApiController < ApplicationController
       # if the feed url included the information on the requesting user,
       # we can properly filter calendar events to the user's course sections
       @type = :feed
-      @start_date = Setting.get("calendar_feed_previous_days", "30").to_i.days.ago
-      @end_date = Setting.get("calendar_feed_upcoming_days", "366").to_i.days.from_now
+      @start_date = 30.days.ago
+      @end_date = 366.days.from_now
 
       get_options(nil)
 

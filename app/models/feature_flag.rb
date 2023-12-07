@@ -86,10 +86,6 @@ class FeatureFlag < ActiveRecord::Base
   end
 
   def audit_log_update(operation: :update)
-    # kill switch in case something goes crazy in rolling this out.
-    # TODO: we can yank this guard clause once we're happy with it's stability.
-    return unless Setting.get("write_feature_flag_audit_logs", "true") == "true"
-
     # User feature flags only get changed by the target user,
     # are much higher volume than higher level flags, and are generally
     # uninteresting from a forensics standpoint.  We can save a lot of writes

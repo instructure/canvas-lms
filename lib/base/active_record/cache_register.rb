@@ -46,8 +46,7 @@ module ActiveRecord
 
         def skip_touch_for_type?(key_type)
           valid_cache_key_type?(key_type) &&
-            Canvas::CacheRegister::MIGRATED_TYPES[base_class.name]&.include?(key_type.to_s) &&
-            Setting.get("revert_cache_register_migration_#{base_class.name.downcase}_#{key_type}", "false") != "true"
+            Canvas::CacheRegister::MIGRATED_TYPES[base_class.name]&.include?(key_type.to_s)
         end
 
         def touch_and_clear_cache_keys(ids_or_records, *key_types, skip_locked: false)

@@ -19,8 +19,7 @@
 
 module DataFixup::MigrateMessagesToPartitions
   def self.run(batch_size: 1000, last_run_date_threshold: nil)
-    weeks_to_keep = Setting.get("messages_partitions_keep_weeks", 52).to_i
-    min_date_threshold = Time.now.utc.beginning_of_week - weeks_to_keep.weeks
+    min_date_threshold = Time.now.utc.beginning_of_week - 52.weeks
 
     # don't re-run the deletion if we don't need to
     unless last_run_date_threshold && last_run_date_threshold >= min_date_threshold

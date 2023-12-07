@@ -1019,9 +1019,9 @@ describe Api do
 
       context "with no max_per_page argument" do
         it "limits to the default max_per_page" do
-          controller = double("controller", request:, response:, params: { per_page: Api.max_per_page + 5 })
+          controller = double("controller", request:, response:, params: { per_page: Api::MAX_PER_PAGE + 5 })
           expect(Api.paginate(collection, controller, "example.com").size)
-            .to eq Api.max_per_page
+            .to eq Api::MAX_PER_PAGE
         end
       end
 
@@ -1029,7 +1029,7 @@ describe Api do
         it "limits to the default per_page" do
           controller = double("controller", request:, response:, params: {})
           expect(Api.paginate(collection, controller, "example.com").size)
-            .to eq Api.per_page
+            .to eq Api::PER_PAGE
         end
       end
 

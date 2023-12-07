@@ -236,7 +236,7 @@ describe SubmissionLifecycleManager do
         course_with_student(active_all: true)
         assignment_model(course: @course)
 
-        Setting.set("SubmissionLifecycleManager#recompute_for_sis_import_num_strands", "1")
+        stub_const("SubmissionLifecycleManager::MAX_RUNNING_JOBS", 1)
         Delayed::Job.create!(
           locked_at: Time.zone.now,
           locked_by: "foo",

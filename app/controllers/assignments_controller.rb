@@ -103,8 +103,7 @@ class AssignmentsController < ApplicationController
 
   def render_a2_student_view?
     @current_user.present? && @assignment.a2_enabled? && !can_do(@context, @current_user, :read_as_admin) &&
-      (!params.key?(:assignments_2) || value_to_boolean(params[:assignments_2])) &&
-      (!@context_enrollment&.observer? || Setting.get("assignments_2_observer_view", "false") == "true")
+      (!params.key?(:assignments_2) || value_to_boolean(params[:assignments_2]))
   end
 
   def a2_active_student_and_enrollment
@@ -302,15 +301,13 @@ class AssignmentsController < ApplicationController
         log_asset_access(@assignment, "assignments", @assignment.assignment_group)
 
         if render_a2_student_view?
-          if Setting.get("assignments_2_observer_view", "false") == "true"
-            js_env({ OBSERVER_OPTIONS: {
-                     OBSERVED_USERS_LIST: observed_users(@current_user, session, @context.id),
-                     CAN_ADD_OBSERVEE: @current_user
-                                       .profile
-                                       .tabs_available(@current_user, root_account: @domain_root_account)
-                                       .any? { |t| t[:id] == UserProfile::TAB_OBSERVEES }
-                   } })
-          end
+          js_env({ OBSERVER_OPTIONS: {
+                   OBSERVED_USERS_LIST: observed_users(@current_user, session, @context.id),
+                   CAN_ADD_OBSERVEE: @current_user
+                                      .profile
+                                      .tabs_available(@current_user, root_account: @domain_root_account)
+                                      .any? { |t| t[:id] == UserProfile::TAB_OBSERVEES }
+                 } })
 
           student_to_view, active_enrollment = a2_active_student_and_enrollment
           if student_to_view.present?

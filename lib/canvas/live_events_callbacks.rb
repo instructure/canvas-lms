@@ -163,7 +163,7 @@ module Canvas::LiveEventsCallbacks
         singleton_key = "course_progress_course_#{obj.context_module.global_context_id}_user_#{obj.global_user_id}"
         CourseProgress.delay_if_production(
           singleton: singleton_key,
-          run_at: Setting.get("course_progress_live_event_delay_seconds", "120").to_i.seconds.from_now,
+          run_at: 2.minutes.from_now,
           on_conflict: :overwrite,
           priority: 15
         ).dispatch_live_event(obj)

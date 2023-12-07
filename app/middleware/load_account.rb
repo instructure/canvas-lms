@@ -63,7 +63,7 @@ class LoadAccount
   end
 
   def self.clear_shard_cache
-    @timed_cache ||= TimedCache.new(-> { Setting.get("shard_cache_time", 60).to_i.seconds.ago }) do
+    @timed_cache ||= TimedCache.new(-> { 60.seconds.ago }) do
       Shard.clear_cache
     end
     @timed_cache.clear

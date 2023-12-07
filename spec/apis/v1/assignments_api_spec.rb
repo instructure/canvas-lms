@@ -490,7 +490,7 @@ describe AssignmentsApiController, type: :request do
     end
 
     it "fails if given too many assignment_ids" do
-      all_ids = (1...(Api.max_per_page + 10)).map(&:to_s)
+      all_ids = (1...(Api::MAX_PER_PAGE + 10)).map(&:to_s)
       query_string = all_ids.map { |id| "assignment_ids[]=#{id}" }.join("&")
       api_call(:get,
                "/api/v1/courses/#{@course.id}/assignments.json?#{query_string}",
@@ -1461,7 +1461,7 @@ describe AssignmentsApiController, type: :request do
       o1 = assignment_override_model(assignment: a)
       o1.assignment_override_students.create!(user: s1)
 
-      Setting.set("assignment_all_dates_too_many_threshold", "2")
+      stub_const("Api::V1::Assignment::ALL_DATES_LIMIT", 2)
 
       @user = @teacher
       json = api_call(:get,

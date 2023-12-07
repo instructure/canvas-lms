@@ -255,16 +255,6 @@ module Canvas::OAuth
         allow(Canvas).to receive_messages(redis:)
         Token.generate_code_for(1, 2, 3)
       end
-
-      it "sets the new data hash into redis with 10 sec ttl" do
-        redis = Object.new
-        code_data = { user: 1, real_user: 2, client_id: 3, scopes: nil, purpose: nil, remember_access: nil }
-        # should have 10 sec ttl passed as second param with setting
-        Setting.set("oath_token_request_timeout", "10")
-        expect(redis).to receive(:setex).with("oauth2:brand_new_code", 10, code_data.to_json)
-        allow(Canvas).to receive_messages(redis:)
-        Token.generate_code_for(1, 2, 3)
-      end
     end
 
     context "token expiration" do

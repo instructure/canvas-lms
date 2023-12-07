@@ -27,6 +27,8 @@ module Api::V1::Assignment
   include SubmittablesGradingPeriodProtection
   include Api::V1::PlannerOverride
 
+  ALL_DATES_LIMIT = 25
+
   PRELOADS = %i[external_tool_tag
                 duplicate_of
                 rubric
@@ -357,7 +359,7 @@ module Api::V1::Assignment
                        else
                          assignment.assignment_overrides.active.count
                        end
-      if override_count < Setting.get("assignment_all_dates_too_many_threshold", "25").to_i
+      if override_count < ALL_DATES_LIMIT
         hash["all_dates"] = assignment.dates_hash_visible_to(user)
       else
         hash["all_dates_count"] = override_count

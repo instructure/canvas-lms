@@ -304,6 +304,7 @@ class AccountsController < ApplicationController
 
   INTEGER_REGEX = /\A[+-]?\d+\z/
   SIS_ASSINGMENT_NAME_LENGTH_DEFAULT = 255
+  EPORTFOLIO_MODERATION_PER_PAGE = 100
 
   # @API List accounts
   # A paginated list of accounts that the current user can view or manage.
@@ -833,7 +834,7 @@ class AccountsController < ApplicationController
     all_precalculated_permissions = nil
 
     page_opts = { total_entries: nil }
-    if includes.include?("ui_invoked") && Setting.get("ui_invoked_count_pages", "true") == "true"
+    if includes.include?("ui_invoked")
       page_opts = {} # let Folio calculate total entries
       includes.delete("ui_invoked")
     end
@@ -1469,7 +1470,6 @@ class AccountsController < ApplicationController
 
   def eportfolio_moderation
     if authorized_action(@account, @current_user, :moderate_user_content)
-      results_per_page = Setting.get("eportfolio_moderation_results_per_page", 1000)
       spam_status_order = "CASE spam_status WHEN 'flagged_as_possible_spam' THEN 0 WHEN 'marked_as_spam' THEN 1 WHEN 'marked_as_safe' THEN 2 ELSE 3 END"
       @eportfolios = Eportfolio.active.preload(:user)
                                .joins(:user)
@@ -1478,7 +1478,7 @@ class AccountsController < ApplicationController
                                .where(Eportfolio.where("user_id = users.id").where(spam_status: ["flagged_as_possible_spam", "marked_as_spam"]).arel.exists)
                                .merge(User.active)
                                .order(Arel.sql(spam_status_order), Arel.sql("eportfolios.public DESC NULLS LAST"), updated_at: :desc)
-                               .paginate(per_page: results_per_page, page: params[:page])
+                               .paginate(per_page: EPORTFOLIO_MODERATION_PER_PAGE, page: params[:page])
     end
   end
 

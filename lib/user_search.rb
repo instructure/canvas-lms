@@ -49,8 +49,7 @@ module UserSearch
     end
 
     def like_string_for(search_term)
-      pattern_type = (gist_search_enabled? ? :full : :right)
-      wildcard_pattern(search_term, type: pattern_type, case_sensitive: false)
+      wildcard_pattern(search_term, type: :full, case_sensitive: false)
     end
 
     def like_condition(value)
@@ -204,14 +203,12 @@ module UserSearch
     def complex_sql(users_scope, params)
       users_scope = users_scope.group(:id)
       queries = [name_sql(users_scope, params)]
-      if complex_search_enabled?
-        queries << id_sql(users_scope, params) if @is_id
-        queries << ids_sql(users_scope, params)
-        queries << login_sql(users_scope, params) if @include_login
-        queries << sis_sql(users_scope, params) if @include_sis
-        queries << integration_sql(users_scope, params) if @include_integration
-        queries << email_sql(users_scope, params) if @include_email
-      end
+      queries << id_sql(users_scope, params) if @is_id
+      queries << ids_sql(users_scope, params)
+      queries << login_sql(users_scope, params) if @include_login
+      queries << sis_sql(users_scope, params) if @include_sis
+      queries << integration_sql(users_scope, params) if @include_integration
+      queries << email_sql(users_scope, params) if @include_email
       queries.compact.map(&:to_sql).join("\nUNION\n")
     end
 
@@ -286,14 +283,6 @@ module UserSearch
           AND pseudonyms.workflow_state = 'active'")
                  .where(communication_channels: { workflow_state: ["active", "unconfirmed"], path_type: params[:path_type] })
                  .where(like_condition("communication_channels.path"), pattern: params[:pattern])
-    end
-
-    def gist_search_enabled?
-      Setting.get("user_search_with_gist", "true") == "true"
-    end
-
-    def complex_search_enabled?
-      Setting.get("user_search_with_full_complexity", "true") == "true"
     end
 
     def wildcard_pattern(value, **options)

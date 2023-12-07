@@ -44,347 +44,331 @@ describe UserSearch do
       end
     end
 
-    describe "with complex search enabled" do
-      before { Setting.set("user_search_with_full_complexity", "true") }
+    it "searches case-insensitively" do
+      expect(UserSearch.for_user_in_context("steWArt", course, user).size).to eq 3
+    end
 
-      describe "with gist setting enabled" do
-        before { Setting.set("user_search_with_gist", "true") }
+    it "uses postgres lower(), not ruby downcase()" do
+      # ruby 1.9 downcase doesn't handle the downcasing of many multi-byte characters correctly
+      expect(UserSearch.for_user_in_context("Ĭńşŧřůćƭǜȑȩ", course, user).size).to eq 1
+    end
 
-        it "searches case-insensitively" do
-          expect(UserSearch.for_user_in_context("steWArt", course, user).size).to eq 3
+    it "returns an enumerable" do
+      expect(users.size).to eq 3
+    end
+
+    it "contains the matching users" do
+      expect(names).to include("Martha Stewart")
+      expect(names).to include("Stewart Little")
+      expect(names).to include("Jon Stewart")
+    end
+
+    it "does not contain users I am not allowed to see" do
+      unenrolled_user = User.create!(name: "Unenrolled User")
+      search_results = UserSearch.for_user_in_context("Stewart", course, unenrolled_user).map(&:name)
+      expect(search_results).to eq []
+    end
+
+    it "will not pickup students outside the course" do
+      User.create!(name: "Stewart Stewart")
+      # names is evaluated lazily from the 'let' block so ^ user is still being
+      # created before the query executes
+      expect(names).not_to include("Stewart Stewart")
+    end
+
+    it "will find teachers" do
+      results = UserSearch.for_user_in_context("Tyler", course, user)
+      expect(results.map(&:name)).to include("Tyler Teacher")
+    end
+
+    it "sorts by name" do
+      expect(names.size).to eq 3
+      expect(names[0]).to eq "Stewart Little"
+      expect(names[1]).to eq "Jon Stewart"
+      expect(names[2]).to eq "Martha Stewart"
+    end
+
+    describe "filtering by role" do
+      subject { names }
+
+      describe "to a single role" do
+        let(:users) { UserSearch.for_user_in_context("Tyler", course, user, nil, enrollment_type: "student").to_a }
+
+        it { is_expected.to include("Rose Tyler") }
+        it { is_expected.to include("Tyler Pickett") }
+        it { is_expected.not_to include("Tyler Teacher") }
+      end
+
+      describe "to multiple roles" do
+        let(:users) { UserSearch.for_user_in_context("Tyler", course, student, nil, enrollment_type: ["ta", "teacher"]).to_a }
+
+        before do
+          ta = User.create!(name: "Tyler TA")
+          TaEnrollment.create!(user: ta, course:, workflow_state: "active")
         end
 
-        it "uses postgres lower(), not ruby downcase()" do
-          # ruby 1.9 downcase doesn't handle the downcasing of many multi-byte characters correctly
-          expect(UserSearch.for_user_in_context("Ĭńşŧřůćƭǜȑȩ", course, user).size).to eq 1
+        it { is_expected.to include("Tyler TA") }
+        it { is_expected.to include("Tyler Teacher") }
+        it { is_expected.not_to include("Rose Tyler") }
+      end
+
+      describe "FooEnrollment names" do
+        let(:users) { UserSearch.for_user_in_context("Tyler", course, user, nil, enrollment_type: "StudentEnrollment").to_a }
+
+        it { is_expected.to include("Rose Tyler") }
+        it { is_expected.to include("Tyler Pickett") }
+        it { is_expected.not_to include("Tyler Teacher") }
+      end
+
+      describe "with the broader role parameter" do
+        let(:users) { UserSearch.for_user_in_context("Tyler", course, student, nil, enrollment_role: "ObserverEnrollment").to_a }
+
+        before do
+          ta = User.create!(name: "Tyler Observer")
+          ObserverEnrollment.create!(user: ta, course:, workflow_state: "active")
+          ta2 = User.create!(name: "Tyler Observer 2")
+          ObserverEnrollment.create!(user: ta2, course:, workflow_state: "active")
+          add_linked_observer(student, ta2)
         end
 
-        it "returns an enumerable" do
-          expect(users.size).to eq 3
+        it { is_expected.not_to include("Tyler Observer 2") }
+        it { is_expected.not_to include("Tyler Observer") }
+        it { is_expected.not_to include("Tyler Teacher") }
+        it { is_expected.not_to include("Rose Tyler") }
+      end
+
+      describe "with the role name parameter" do
+        before do
+          newstudent = User.create!(name: "Tyler Student")
+          StudentEnrollment.create!(user: newstudent, course:, workflow_state: "active")
         end
 
-        it "contains the matching users" do
-          expect(names).to include("Martha Stewart")
-          expect(names).to include("Stewart Little")
-          expect(names).to include("Jon Stewart")
+        describe "when the context is a course" do
+          let(:users) { UserSearch.for_user_in_context("Tyler", course, user, nil, enrollment_role: "StudentEnrollment").to_a }
+
+          it { is_expected.to include("Rose Tyler") }
+          it { is_expected.to include("Tyler Pickett") }
+          it { is_expected.to include("Tyler Student") }
+          it { is_expected.not_to include("Tyler Teacher") }
         end
 
-        it "does not contain users I am not allowed to see" do
-          unenrolled_user = User.create!(name: "Unenrolled User")
-          search_results = UserSearch.for_user_in_context("Stewart", course, unenrolled_user).map(&:name)
-          expect(search_results).to eq []
-        end
+        describe "when the context is an account" do
+          let(:users) { UserSearch.for_user_in_context("Tyler", course.account, user, nil, enrollment_role: "StudentEnrollment").to_a }
 
-        it "will not pickup students outside the course" do
-          User.create!(name: "Stewart Stewart")
-          # names is evaluated lazily from the 'let' block so ^ user is still being
-          # created before the query executes
-          expect(names).not_to include("Stewart Stewart")
-        end
-
-        it "will find teachers" do
-          results = UserSearch.for_user_in_context("Tyler", course, user)
-          expect(results.map(&:name)).to include("Tyler Teacher")
-        end
-
-        it "sorts by name" do
-          expect(names.size).to eq 3
-          expect(names[0]).to eq "Stewart Little"
-          expect(names[1]).to eq "Jon Stewart"
-          expect(names[2]).to eq "Martha Stewart"
-        end
-
-        describe "filtering by role" do
-          subject { names }
-
-          describe "to a single role" do
-            let(:users) { UserSearch.for_user_in_context("Tyler", course, user, nil, enrollment_type: "student").to_a }
-
-            it { is_expected.to include("Rose Tyler") }
-            it { is_expected.to include("Tyler Pickett") }
-            it { is_expected.not_to include("Tyler Teacher") }
-          end
-
-          describe "to multiple roles" do
-            let(:users) { UserSearch.for_user_in_context("Tyler", course, student, nil, enrollment_type: ["ta", "teacher"]).to_a }
-
-            before do
-              ta = User.create!(name: "Tyler TA")
-              TaEnrollment.create!(user: ta, course:, workflow_state: "active")
-            end
-
-            it { is_expected.to include("Tyler TA") }
-            it { is_expected.to include("Tyler Teacher") }
-            it { is_expected.not_to include("Rose Tyler") }
-          end
-
-          describe "FooEnrollment names" do
-            let(:users) { UserSearch.for_user_in_context("Tyler", course, user, nil, enrollment_type: "StudentEnrollment").to_a }
-
-            it { is_expected.to include("Rose Tyler") }
-            it { is_expected.to include("Tyler Pickett") }
-            it { is_expected.not_to include("Tyler Teacher") }
-          end
-
-          describe "with the broader role parameter" do
-            let(:users) { UserSearch.for_user_in_context("Tyler", course, student, nil, enrollment_role: "ObserverEnrollment").to_a }
-
-            before do
-              ta = User.create!(name: "Tyler Observer")
-              ObserverEnrollment.create!(user: ta, course:, workflow_state: "active")
-              ta2 = User.create!(name: "Tyler Observer 2")
-              ObserverEnrollment.create!(user: ta2, course:, workflow_state: "active")
-              add_linked_observer(student, ta2)
-            end
-
-            it { is_expected.not_to include("Tyler Observer 2") }
-            it { is_expected.not_to include("Tyler Observer") }
-            it { is_expected.not_to include("Tyler Teacher") }
-            it { is_expected.not_to include("Rose Tyler") }
-          end
-
-          describe "with the role name parameter" do
-            before do
-              newstudent = User.create!(name: "Tyler Student")
-              StudentEnrollment.create!(user: newstudent, course:, workflow_state: "active")
-            end
-
-            describe "when the context is a course" do
-              let(:users) { UserSearch.for_user_in_context("Tyler", course, user, nil, enrollment_role: "StudentEnrollment").to_a }
-
-              it { is_expected.to include("Rose Tyler") }
-              it { is_expected.to include("Tyler Pickett") }
-              it { is_expected.to include("Tyler Student") }
-              it { is_expected.not_to include("Tyler Teacher") }
-            end
-
-            describe "when the context is an account" do
-              let(:users) { UserSearch.for_user_in_context("Tyler", course.account, user, nil, enrollment_role: "StudentEnrollment").to_a }
-
-              it { is_expected.to include("Rose Tyler") }
-              it { is_expected.to include("Tyler Pickett") }
-              it { is_expected.to include("Tyler Student") }
-              it { is_expected.not_to include("Tyler Teacher") }
-            end
-          end
-
-          describe "with the role id parameter" do
-            let(:users) { UserSearch.for_user_in_context("Tyler", course, student, nil, enrollment_role_id: student_role.id).to_a }
-
-            before do
-              newstudent = User.create!(name: "Tyler Student")
-              StudentEnrollment.create!(user: newstudent, course:, workflow_state: "active")
-            end
-
-            it { is_expected.to include("Rose Tyler") }
-            it { is_expected.to include("Tyler Pickett") }
-            it { is_expected.to include("Tyler Student") }
-            it { is_expected.not_to include("Tyler Teacher") }
-          end
-        end
-
-        describe "searching on logins" do
-          let(:pseudonym) { user.pseudonyms.build }
-
-          before do
-            pseudonym.sis_user_id = "SOME_SIS_ID"
-            pseudonym.unique_id = "SOME_UNIQUE_ID@example.com"
-            pseudonym.integration_id = "ACME_123"
-            pseudonym.current_login_at = Time.utc(2019, 11, 11)
-            pseudonym.save!
-          end
-
-          it "will match against an sis id" do
-            expect(UserSearch.for_user_in_context("SOME_SIS", course, user)).to eq [user]
-          end
-
-          it "will match against an integration id" do
-            expect(UserSearch.for_user_in_context("ACME", course, user)).to eq [user]
-          end
-
-          describe "will match against a suspended user" do
-            before do
-              pseudonym.workflow_state = "suspended"
-              pseudonym.save!
-            end
-
-            it "by sis id" do
-              expect(UserSearch.for_user_in_context("SOME_SIS", course, user)).to eq [user]
-            end
-
-            it "by integrtion id" do
-              expect(UserSearch.for_user_in_context("ACME", course, user)).to eq [user]
-            end
-
-            it "by user name" do
-              expect(UserSearch.for_user_in_context("admin", course, user)).to eq [user]
-            end
-          end
-
-          it "will not match against a sis id without :read_sis permission" do
-            RoleOverride.create!(context: Account.default,
-                                 role: teacher_role,
-                                 permission: "read_sis",
-                                 enabled: false)
-            expect(UserSearch.for_user_in_context("SOME_SIS", course, user)).to eq []
-          end
-
-          it "will not match against an integration id without :read_sis permission" do
-            RoleOverride.create!(context: Account.default,
-                                 role: teacher_role,
-                                 permission: "read_sis",
-                                 enabled: false)
-            expect(UserSearch.for_user_in_context("ACME", course, user)).to eq []
-          end
-
-          it "will match against an sis id and regular id" do
-            user2 = User.create(name: "user two")
-            pseudonym.sis_user_id = user2.id.to_s
-            pseudonym.save!
-            course.enroll_user(user2)
-            expect(UserSearch.for_user_in_context(user2.id.to_s, course, user)).to eq [user, user2]
-          end
-
-          it "handles search terms out of bounds for max bigint" do
-            pseudonym.sis_user_id = "9223372036854775808"
-            pseudonym.save!
-            expect(UserSearch.for_user_in_context("9223372036854775808", course, user)).to eq [user]
-          end
-
-          it "will match against a login id" do
-            expect(UserSearch.for_user_in_context("UNIQUE_ID", course, user)).to eq [user]
-          end
-
-          it "will not search login id without permission" do
-            RoleOverride.create!(context: Account.default,
-                                 role: teacher_role,
-                                 permission: "view_user_logins",
-                                 enabled: false)
-            expect(UserSearch.for_user_in_context("UNIQUE_ID", course, user)).to eq []
-          end
-
-          it "returns the last_login column when searching and sorting" do
-            results = UserSearch.for_user_in_context("UNIQUE_ID", course, user, nil, sort: "last_login")
-            expect(results.first.read_attribute("last_login")).to eq(Time.utc(2019, 11, 11))
-          end
-
-          it "can match an SIS id and a user name in the same query" do
-            pseudonym.sis_user_id = "MARTHA_SIS_ID"
-            pseudonym.save!
-            other_user = User.where(name: "Martha Stewart").first
-            results = UserSearch.for_user_in_context("martha", course, user)
-            expect(results).to include(user)
-            expect(results).to include(other_user)
-          end
-
-          it "sorts by sis id" do
-            User.find_by(name: "Rose Tyler").pseudonyms.create!(unique_id: "rose.tyler@example.com",
-                                                                sis_user_id: "25rose",
-                                                                account_id: course.root_account_id)
-            User.find_by(name: "Tyler Pickett").pseudonyms.create!(unique_id: "tyler.pickett@example.com",
-                                                                   sis_user_id: "1tyler",
-                                                                   account_id: course.root_account_id)
-            users = UserSearch.for_user_in_context("Tyler", course, user, nil, sort: "sis_id")
-            expect(users.map(&:name)).to eq ["Tyler Pickett", "Rose Tyler", "Tyler Teacher"]
-          end
-
-          it "sorts by integration id" do
-            User.find_by(name: "Rose Tyler").pseudonyms.create!(unique_id: "rose.tyler@example.com",
-                                                                integration_id: "25rose",
-                                                                account_id: course.root_account_id)
-            User.find_by(name: "Tyler Pickett").pseudonyms.create!(unique_id: "tyler.pickett@example.com",
-                                                                   integration_id: "1tyler",
-                                                                   account_id: course.root_account_id)
-            users = UserSearch.for_user_in_context("Tyler", course, user, nil, sort: "integration_id")
-            expect(users.map(&:name)).to eq ["Tyler Pickett", "Rose Tyler", "Tyler Teacher"]
-          end
-
-          it "does not return users twice if it matches their name and an old login" do
-            tyler = User.find_by(name: "Tyler Pickett")
-            tyler.pseudonyms.create!(unique_id: "Yo", account_id: course.root_account_id, current_login_at: Time.zone.now)
-            tyler.pseudonyms.create!(unique_id: "Pickett", account_id: course.root_account_id, current_login_at: 1.week.ago)
-            users = UserSearch.for_user_in_context("Pickett", course, user, nil, sort: "username")
-            expect(users.map(&:name)).to eq ["Tyler Pickett"]
-          end
-        end
-
-        describe "searching on emails" do
-          let(:user1) { user_with_pseudonym(user:) }
-          let(:cc) { communication_channel(user1, { username: "the.giver@example.com" }) }
-
-          before do
-            cc.confirm!
-          end
-
-          it "matches against an email" do
-            expect(UserSearch.for_user_in_context("the.giver", course, user)).to eq [user]
-          end
-
-          it "requires :read_email_addresses permission" do
-            RoleOverride.create!(context: Account.default,
-                                 role: teacher_role,
-                                 permission: "read_email_addresses",
-                                 enabled: false)
-            expect(UserSearch.for_user_in_context("the.giver", course, user)).to eq []
-          end
-
-          it "can match an email and a name in the same query" do
-            results = UserSearch.for_user_in_context("giver", course, user)
-            expect(results).to include(user)
-            expect(results).to include(User.where(name: "Rosemary Giver").first)
-          end
-
-          it "will not match channels where the type is not email" do
-            cc.update!(path_type: CommunicationChannel::TYPE_TWITTER)
-            expect(UserSearch.for_user_in_context("the.giver", course, user)).to eq []
-          end
-
-          it "doesn't match retired channels" do
-            cc.retire!
-            expect(UserSearch.for_user_in_context("the.giver", course, user)).to eq []
-          end
-
-          it "matches unconfirmed channels", priority: 1 do
-            communication_channel(user, { username: "unconfirmed@example.com" })
-            expect(UserSearch.for_user_in_context("unconfirmed", course, user)).to eq [user]
-          end
-
-          it "sorts by email" do
-            communication_channel(User.find_by(name: "Tyler Pickett"), { username: "1tyler@example.com" })
-            communication_channel(User.find_by(name: "Tyler Teacher"), { username: "25teacher@example.com" })
-            users = UserSearch.for_user_in_context("Tyler", course, user, nil, sort: "email")
-            expect(users.map(&:name)).to eq ["Tyler Pickett", "Tyler Teacher", "Rose Tyler"]
-          end
-        end
-
-        describe "searching by a DB ID" do
-          it "matches against the database id" do
-            expect(UserSearch.for_user_in_context(user.id, course, user)).to eq [user]
-          end
-
-          it "matches against a database id and a user simultaneously" do
-            other_user = student_in_course(course:, name: user.id.to_s).user
-            expect(UserSearch.for_user_in_context(user.id, course, user)).to match_array [user, other_user]
-          end
-
-          describe "cross-shard users" do
-            specs_require_sharding
-
-            it "matches against the database id of a cross-shard user" do
-              user = @shard1.activate { user_model }
-              course.enroll_student(user)
-              expect(UserSearch.for_user_in_context(user.global_id, course, user)).to eq [user]
-              expect(UserSearch.for_user_in_context(user.global_id, course.account, user)).to eq [user]
-            end
-          end
+          it { is_expected.to include("Rose Tyler") }
+          it { is_expected.to include("Tyler Pickett") }
+          it { is_expected.to include("Tyler Student") }
+          it { is_expected.not_to include("Tyler Teacher") }
         end
       end
 
-      describe "with gist setting disabled" do
-        before { Setting.set("user_search_with_gist", "false") }
+      describe "with the role id parameter" do
+        let(:users) { UserSearch.for_user_in_context("Tyler", course, student, nil, enrollment_role_id: student_role.id).to_a }
 
-        it "returns a list of matching users using a prefix search" do
-          expect(names).to eq ["Stewart Little"]
+        before do
+          newstudent = User.create!(name: "Tyler Student")
+          StudentEnrollment.create!(user: newstudent, course:, workflow_state: "active")
+        end
+
+        it { is_expected.to include("Rose Tyler") }
+        it { is_expected.to include("Tyler Pickett") }
+        it { is_expected.to include("Tyler Student") }
+        it { is_expected.not_to include("Tyler Teacher") }
+      end
+    end
+
+    describe "searching on logins" do
+      let(:pseudonym) { user.pseudonyms.build }
+
+      before do
+        pseudonym.sis_user_id = "SOME_SIS_ID"
+        pseudonym.unique_id = "SOME_UNIQUE_ID@example.com"
+        pseudonym.integration_id = "ACME_123"
+        pseudonym.current_login_at = Time.utc(2019, 11, 11)
+        pseudonym.save!
+      end
+
+      it "will match against an sis id" do
+        expect(UserSearch.for_user_in_context("SOME_SIS", course, user)).to eq [user]
+      end
+
+      it "will match against an integration id" do
+        expect(UserSearch.for_user_in_context("ACME", course, user)).to eq [user]
+      end
+
+      describe "will match against a suspended user" do
+        before do
+          pseudonym.workflow_state = "suspended"
+          pseudonym.save!
+        end
+
+        it "by sis id" do
+          expect(UserSearch.for_user_in_context("SOME_SIS", course, user)).to eq [user]
+        end
+
+        it "by integrtion id" do
+          expect(UserSearch.for_user_in_context("ACME", course, user)).to eq [user]
+        end
+
+        it "by user name" do
+          expect(UserSearch.for_user_in_context("admin", course, user)).to eq [user]
+        end
+      end
+
+      it "will not match against a sis id without :read_sis permission" do
+        RoleOverride.create!(context: Account.default,
+                             role: teacher_role,
+                             permission: "read_sis",
+                             enabled: false)
+        expect(UserSearch.for_user_in_context("SOME_SIS", course, user)).to eq []
+      end
+
+      it "will not match against an integration id without :read_sis permission" do
+        RoleOverride.create!(context: Account.default,
+                             role: teacher_role,
+                             permission: "read_sis",
+                             enabled: false)
+        expect(UserSearch.for_user_in_context("ACME", course, user)).to eq []
+      end
+
+      it "will match against an sis id and regular id" do
+        user2 = User.create(name: "user two")
+        pseudonym.sis_user_id = user2.id.to_s
+        pseudonym.save!
+        course.enroll_user(user2)
+        expect(UserSearch.for_user_in_context(user2.id.to_s, course, user)).to eq [user, user2]
+      end
+
+      it "handles search terms out of bounds for max bigint" do
+        pseudonym.sis_user_id = "9223372036854775808"
+        pseudonym.save!
+        expect(UserSearch.for_user_in_context("9223372036854775808", course, user)).to eq [user]
+      end
+
+      it "will match against a login id" do
+        expect(UserSearch.for_user_in_context("UNIQUE_ID", course, user)).to eq [user]
+      end
+
+      it "will not search login id without permission" do
+        RoleOverride.create!(context: Account.default,
+                             role: teacher_role,
+                             permission: "view_user_logins",
+                             enabled: false)
+        expect(UserSearch.for_user_in_context("UNIQUE_ID", course, user)).to eq []
+      end
+
+      it "returns the last_login column when searching and sorting" do
+        results = UserSearch.for_user_in_context("UNIQUE_ID", course, user, nil, sort: "last_login")
+        expect(results.first.read_attribute("last_login")).to eq(Time.utc(2019, 11, 11))
+      end
+
+      it "can match an SIS id and a user name in the same query" do
+        pseudonym.sis_user_id = "MARTHA_SIS_ID"
+        pseudonym.save!
+        other_user = User.where(name: "Martha Stewart").first
+        results = UserSearch.for_user_in_context("martha", course, user)
+        expect(results).to include(user)
+        expect(results).to include(other_user)
+      end
+
+      it "sorts by sis id" do
+        User.find_by(name: "Rose Tyler").pseudonyms.create!(unique_id: "rose.tyler@example.com",
+                                                            sis_user_id: "25rose",
+                                                            account_id: course.root_account_id)
+        User.find_by(name: "Tyler Pickett").pseudonyms.create!(unique_id: "tyler.pickett@example.com",
+                                                               sis_user_id: "1tyler",
+                                                               account_id: course.root_account_id)
+        users = UserSearch.for_user_in_context("Tyler", course, user, nil, sort: "sis_id")
+        expect(users.map(&:name)).to eq ["Tyler Pickett", "Rose Tyler", "Tyler Teacher"]
+      end
+
+      it "sorts by integration id" do
+        User.find_by(name: "Rose Tyler").pseudonyms.create!(unique_id: "rose.tyler@example.com",
+                                                            integration_id: "25rose",
+                                                            account_id: course.root_account_id)
+        User.find_by(name: "Tyler Pickett").pseudonyms.create!(unique_id: "tyler.pickett@example.com",
+                                                               integration_id: "1tyler",
+                                                               account_id: course.root_account_id)
+        users = UserSearch.for_user_in_context("Tyler", course, user, nil, sort: "integration_id")
+        expect(users.map(&:name)).to eq ["Tyler Pickett", "Rose Tyler", "Tyler Teacher"]
+      end
+
+      it "does not return users twice if it matches their name and an old login" do
+        tyler = User.find_by(name: "Tyler Pickett")
+        tyler.pseudonyms.create!(unique_id: "Yo", account_id: course.root_account_id, current_login_at: Time.zone.now)
+        tyler.pseudonyms.create!(unique_id: "Pickett", account_id: course.root_account_id, current_login_at: 1.week.ago)
+        users = UserSearch.for_user_in_context("Pickett", course, user, nil, sort: "username")
+        expect(users.map(&:name)).to eq ["Tyler Pickett"]
+      end
+    end
+
+    describe "searching on emails" do
+      let(:user1) { user_with_pseudonym(user:) }
+      let(:cc) { communication_channel(user1, { username: "the.giver@example.com" }) }
+
+      before do
+        cc.confirm!
+      end
+
+      it "matches against an email" do
+        expect(UserSearch.for_user_in_context("the.giver", course, user)).to eq [user]
+      end
+
+      it "requires :read_email_addresses permission" do
+        RoleOverride.create!(context: Account.default,
+                             role: teacher_role,
+                             permission: "read_email_addresses",
+                             enabled: false)
+        expect(UserSearch.for_user_in_context("the.giver", course, user)).to eq []
+      end
+
+      it "can match an email and a name in the same query" do
+        results = UserSearch.for_user_in_context("giver", course, user)
+        expect(results).to include(user)
+        expect(results).to include(User.where(name: "Rosemary Giver").first)
+      end
+
+      it "will not match channels where the type is not email" do
+        cc.update!(path_type: CommunicationChannel::TYPE_TWITTER)
+        expect(UserSearch.for_user_in_context("the.giver", course, user)).to eq []
+      end
+
+      it "doesn't match retired channels" do
+        cc.retire!
+        expect(UserSearch.for_user_in_context("the.giver", course, user)).to eq []
+      end
+
+      it "matches unconfirmed channels", priority: 1 do
+        communication_channel(user, { username: "unconfirmed@example.com" })
+        expect(UserSearch.for_user_in_context("unconfirmed", course, user)).to eq [user]
+      end
+
+      it "sorts by email" do
+        communication_channel(User.find_by(name: "Tyler Pickett"), { username: "1tyler@example.com" })
+        communication_channel(User.find_by(name: "Tyler Teacher"), { username: "25teacher@example.com" })
+        users = UserSearch.for_user_in_context("Tyler", course, user, nil, sort: "email")
+        expect(users.map(&:name)).to eq ["Tyler Pickett", "Tyler Teacher", "Rose Tyler"]
+      end
+    end
+
+    describe "searching by a DB ID" do
+      it "matches against the database id" do
+        expect(UserSearch.for_user_in_context(user.id, course, user)).to eq [user]
+      end
+
+      it "matches against a database id and a user simultaneously" do
+        other_user = student_in_course(course:, name: user.id.to_s).user
+        expect(UserSearch.for_user_in_context(user.id, course, user)).to match_array [user, other_user]
+      end
+
+      describe "cross-shard users" do
+        specs_require_sharding
+
+        it "matches against the database id of a cross-shard user" do
+          user = @shard1.activate { user_model }
+          course.enroll_student(user)
+          expect(UserSearch.for_user_in_context(user.global_id, course, user)).to eq [user]
+          expect(UserSearch.for_user_in_context(user.global_id, course.account, user)).to eq [user]
         end
       end
     end
@@ -444,48 +428,10 @@ describe UserSearch do
         it { is_expected.not_to include("not enrolled Tyler 01") }
       end
     end
-
-    describe "with complex search disabled" do
-      before do
-        Setting.set("user_search_with_full_complexity", "false")
-        Setting.set("user_search_with_gist", "true")
-      end
-
-      it "matches against the display name" do
-        expect(users.size).to eq 3
-      end
-
-      it "does not match against sis ids" do
-        pseudonym = user.pseudonyms.build
-        pseudonym.sis_user_id = "SOME_SIS_ID"
-        pseudonym.unique_id = "SOME_UNIQUE_ID@example.com"
-        pseudonym.save!
-        expect(UserSearch.for_user_in_context("SOME_SIS", course, user)).to eq []
-      end
-
-      it "does not match against integration ids" do
-        pseudonym = user.pseudonyms.build
-        pseudonym.unique_id = "SOME_UNIQUE_ID@example.com"
-        pseudonym.integration_id = "ACME_123"
-        pseudonym.save!
-        expect(UserSearch.for_user_in_context("ACME", course, user)).to eq []
-      end
-
-      it "does not match against emails" do
-        communication_channel(user, { username: "the.giver@example.com" })
-        expect(UserSearch.for_user_in_context("the.giver", course, user)).to eq []
-      end
-    end
   end
 
   describe ".like_string_for" do
-    it "uses a prefix if gist is not configured" do
-      Setting.set("user_search_with_gist", "false")
-      expect(UserSearch.like_string_for("word")).to eq "word%"
-    end
-
-    it "modulos both sides if gist is configured" do
-      Setting.set("user_search_with_gist", "true")
+    it "modulos both sides" do
       expect(UserSearch.like_string_for("word")).to eq "%word%"
     end
   end

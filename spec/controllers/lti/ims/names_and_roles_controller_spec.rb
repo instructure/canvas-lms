@@ -76,7 +76,7 @@ describe Lti::IMS::NamesAndRolesController do
 
     context "when the page size parameter is too large" do
       let(:rqst_page_size) { 4_611_686_018_427_387_903 }
-      let(:effective_page_size) { 50 } # system max
+      let(:effective_page_size) { Lti::IMS::Providers::MembershipsProvider::MAX_PAGE_SIZE } # system max
       let(:rsp_page_size) { total_items }
 
       it "defaults to the system maximum page size" do
