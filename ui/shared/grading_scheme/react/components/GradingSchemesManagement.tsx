@@ -54,6 +54,8 @@ import {TextInput} from '@instructure/ui-text-input'
 import GradingSchemeCreateModal from './GradingSchemeCreateModal'
 import {Heading} from '@instructure/ui-heading'
 import GradingSchemeUsedLocationsModal from './GradingSchemeUsedLocationsModal'
+import GradingSchemeDuplicateModal from './GradingSchemeDuplicateModal'
+import GradingSchemeDeleteModal from './GradingSchemeDeleteModal'
 
 const I18n = useI18nScope('GradingSchemeManagement')
 
@@ -89,6 +91,10 @@ export const GradingSchemesManagement = ({
 
   const [viewingUsedLocations, setViewingUsedLocations] = useState<boolean>(false)
   const [editing, setEditing] = useState<boolean>(false)
+  const [duplicateSchemeModalOpen, setDuplicateSchemeModalOpen] = useState<boolean>(false)
+  const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false)
+  const [creatingGradingScheme, setCreatingGradingScheme] = useState<boolean>(false)
+  const [deletingGradingScheme, setDeletingGradingScheme] = useState<boolean>(false)
   const [selectedGradingScheme, setSelectedGradingScheme] = useState<GradingScheme | undefined>(
     undefined
   )
@@ -161,11 +167,13 @@ export const GradingSchemesManagement = ({
   ])
 
   const handleGradingSchemeDelete = async (gradingSchemeId: string) => {
-    if (!gradingSchemeCards) return
+    if (!gradingSchemeCards) {
+      return
+    }
 
-    // TODO: is there a good inst ui component for confirmation dialog?
-    // TODO: replace with modal dialog for delete
+    setDeletingGradingScheme(true)
     if (
+      !archivedGradingSchemesEnabled &&
       // eslint-disable-next-line no-alert
       !window.confirm(
         I18n.t('confirm.delete', 'Are you sure you want to delete this grading scheme?')
@@ -199,15 +207,35 @@ export const GradingSchemesManagement = ({
     } catch (error) {
       showFlashError(I18n.t('There was an error while removing the grading scheme'))(error as Error)
     }
+    setDeletingGradingScheme(false)
+  }
+  const handleDuplicateScheme = async (gradingScheme: GradingScheme) => {
+    setCreatingGradingScheme(true)
+    await handleCreateScheme(
+      {
+        title: `${gradingScheme.title} ${I18n.t('Copy')}`,
+        data: gradingScheme.data,
+        scalingFactor: gradingScheme.scaling_factor,
+        pointsBased: gradingScheme.points_based,
+      },
+      gradingScheme.context_type,
+      gradingScheme.context_id
+    )
+    setCreatingGradingScheme(false)
+    handleCloseDuplicateModal()
   }
 
-  const handleCreateScheme = async (gradingSchemeFormInput: GradingSchemeEditableData) => {
+  const handleCreateScheme = async (
+    gradingSchemeFormInput: GradingSchemeEditableData,
+    schemeContextType = contextType,
+    schemeContextId = contextId
+  ) => {
     if (!gradingSchemeCards) {
       return
     }
     // TODO: if (!saving) {
     try {
-      const gradingScheme = await createGradingScheme(contextType, contextId, {
+      const gradingScheme = await createGradingScheme(schemeContextType, schemeContextId, {
         ...gradingSchemeFormInput,
         points_based: gradingSchemeFormInput.pointsBased,
         scaling_factor: gradingSchemeFormInput.scalingFactor,
@@ -298,6 +326,26 @@ export const GradingSchemesManagement = ({
 
   function handleCancelViewUsedLocations() {
     setViewingUsedLocations(false)
+    setSelectedGradingScheme(undefined)
+  }
+
+  function openDuplicateModal(gradingScheme: GradingScheme) {
+    setDuplicateSchemeModalOpen(true)
+    setSelectedGradingScheme(gradingScheme)
+  }
+
+  function handleCloseDuplicateModal() {
+    setDuplicateSchemeModalOpen(false)
+    setSelectedGradingScheme(undefined)
+  }
+
+  function openDeleteModal(gradingScheme: GradingScheme) {
+    setDeleteModalOpen(true)
+    setSelectedGradingScheme(gradingScheme)
+  }
+
+  function handleCloseDeleteModal() {
+    setDeleteModalOpen(false)
     setSelectedGradingScheme(undefined)
   }
 
@@ -439,7 +487,8 @@ export const GradingSchemesManagement = ({
                 editGradingScheme={editGradingScheme}
                 openGradingScheme={openGradingScheme}
                 viewUsedLocations={viewUsedLocations}
-                handleGradingSchemeDelete={handleGradingSchemeDelete}
+                openDuplicateModal={openDuplicateModal}
+                openDeleteModal={openDeleteModal}
                 defaultScheme={true}
               />
               <Heading
@@ -455,13 +504,20 @@ export const GradingSchemesManagement = ({
                 editGradingScheme={editGradingScheme}
                 viewUsedLocations={viewUsedLocations}
                 openGradingScheme={openGradingScheme}
-                handleGradingSchemeDelete={handleGradingSchemeDelete}
+                openDuplicateModal={openDuplicateModal}
+                openDeleteModal={openDeleteModal}
               />
               <GradingSchemeViewModal
-                open={selectedGradingScheme !== undefined && !editing && !viewingUsedLocations}
+                open={
+                  selectedGradingScheme !== undefined &&
+                  !editing &&
+                  !viewingUsedLocations &&
+                  !duplicateSchemeModalOpen &&
+                  !deleteModalOpen
+                }
                 gradingScheme={selectedGradingScheme}
                 handleClose={() => setSelectedGradingScheme(undefined)}
-                handleGradingSchemeDelete={handleGradingSchemeDelete}
+                openDeleteModal={openDeleteModal}
                 editGradingScheme={editGradingScheme}
                 canManageScheme={canManageScheme}
               />
@@ -473,7 +529,7 @@ export const GradingSchemesManagement = ({
                 defaultGradingSchemeTemplate={defaultGradingScheme}
                 defaultPointsGradingScheme={defaultPointsGradingScheme}
                 archivedGradingSchemesEnabled={archivedGradingSchemesEnabled}
-                handleGradingSchemeDelete={handleGradingSchemeDelete}
+                openDeleteModal={openDeleteModal}
               />
               <GradingSchemeCreateModal
                 open={!!gradingSchemeCreating}
@@ -487,6 +543,25 @@ export const GradingSchemesManagement = ({
                 open={selectedGradingScheme !== undefined && !editing && viewingUsedLocations}
                 handleClose={handleCancelViewUsedLocations}
                 usedLocations={selectedGradingScheme?.used_locations}
+              />
+              <GradingSchemeDuplicateModal
+                open={
+                  selectedGradingScheme !== undefined &&
+                  !editing &&
+                  !viewingUsedLocations &&
+                  duplicateSchemeModalOpen
+                }
+                selectedGradingScheme={selectedGradingScheme}
+                handleCloseDuplicateModal={handleCloseDuplicateModal}
+                handleDuplicateScheme={handleDuplicateScheme}
+                creatingGradingScheme={creatingGradingScheme}
+              />
+              <GradingSchemeDeleteModal
+                open={selectedGradingScheme !== undefined && !editing && deleteModalOpen}
+                selectedGradingScheme={selectedGradingScheme}
+                handleCloseDeleteModal={handleCloseDeleteModal}
+                handleGradingSchemeDelete={handleGradingSchemeDelete}
+                deletingGradingScheme={deletingGradingScheme}
               />
             </>
           ) : (
