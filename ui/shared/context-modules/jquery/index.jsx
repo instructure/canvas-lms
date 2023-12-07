@@ -606,7 +606,6 @@ window.modules = (function () {
           $a.attr('data-item-context-id', data.context_id)
           $a.attr('data-item-context-type', data.context_type)
           $a.attr('data-item-content-id', data.content_id)
-          $a.attr('data-item-content-type', data.content_type)
         }
       }
 
@@ -2557,13 +2556,10 @@ $(document).ready(function () {
           renderItemAssignToTray(false, returnFocusTo, itemProps)
           returnFocusTo.focus()
         }}
-        onSave={() => {}}
         courseId={itemProps.courseId}
-        moduleItemId={itemProps.moduleItemId}
-        moduleItemName={itemProps.moduleItemName}
-        moduleItemType={itemProps.moduleItemType}
-        moduleItemContentType={itemProps.moduleItemContentType}
-        moduleItemContentId={itemProps.moduleItemContentId}
+        itemName={itemProps.moduleItemName}
+        itemType={itemProps.moduleItemType}
+        itemContentId={itemProps.moduleItemContentId}
         pointsPossible={itemProps.pointsPossible}
         locale={ENV.LOCALE || 'en'}
         timezone={ENV.TIMEZONE || 'UTC'}
@@ -2587,17 +2583,14 @@ $(document).ready(function () {
     const moduleItemName = event.target.getAttribute('data-item-name')
     const moduleItemType = event.target.getAttribute('data-item-type')
     const courseId = event.target.getAttribute('data-item-context-id')
-    const moduleItemContentType = event.target.getAttribute('data-item-content-type')
     const moduleItemContentId = event.target.getAttribute('data-item-content-id')
     const itemProps = parseModuleItemElement(
       document.getElementById(`context_module_item_${moduleItemId}`)
     )
     renderItemAssignToTray(true, returnFocusTo, {
       courseId,
-      moduleItemId,
       moduleItemName,
       moduleItemType,
-      moduleItemContentType,
       moduleItemContentId,
       ...itemProps,
     })

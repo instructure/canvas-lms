@@ -38,6 +38,7 @@ import DirectShareCourseTray from '@canvas/direct-sharing/react/components/Direc
 import {setupSubmitHandler} from '@canvas/assignments/jquery/reuploadSubmissionsHelper'
 import ready from '@instructure/ready'
 import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
+import ItemAssignToTray from '@canvas/differentiated-modules/react/Item/ItemAssignToTray'
 
 if (!('INST' in window)) window.INST = {}
 
@@ -197,6 +198,44 @@ $(() => {
   })
 
   return vddTooltip()
+})
+
+function renderItemAssignToTray(open, returnFocusTo, itemProps) {
+  ReactDOM.render(
+    <ItemAssignToTray
+      open={open}
+      onClose={() => {
+        ReactDOM.unmountComponentAtNode(
+          document.getElementById('assign-to-mount-point')
+        )
+      }}
+      onDismiss={() => {
+        renderItemAssignToTray(false, returnFocusTo, itemProps)
+        returnFocusTo.focus()
+      }}
+      itemType='assignment'
+      locale={ENV.LOCALE || 'en'}
+      timezone={ENV.TIMEZONE || 'UTC'}
+      {...itemProps}
+    />,
+    document.getElementById('assign-to-mount-point')
+  )
+}
+
+$('.assign-to-link').on('click keyclick', function (event) {
+  event.preventDefault()
+  const returnFocusTo = $(event.target).closest('ul').prev('.al-trigger')
+
+  const courseId = event.target.getAttribute('data-assignment-context-id')
+  const itemName = event.target.getAttribute('data-assignment-name')
+  const itemContentId = event.target.getAttribute('data-assignment-id')
+  const pointsPossible = parseFloat(event.target.getAttribute('data-assignment-points-possible')) + ' pts'
+  renderItemAssignToTray(true, returnFocusTo, {
+    courseId,
+    itemName,
+    itemContentId,
+    pointsPossible
+  })
 })
 
 $(() =>

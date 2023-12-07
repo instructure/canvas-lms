@@ -27,13 +27,10 @@ describe('ItemAssignToTray', () => {
     open: true,
     onClose: () => {},
     onDismiss: () => {},
-    onSave: () => {},
     courseId: '1',
-    moduleItemId: '2',
-    moduleItemName: 'Item Name',
-    moduleItemType: 'assignment',
-    moduleItemContentType: 'assignment',
-    moduleItemContentId: '23',
+    itemName: 'Item Name',
+    itemType: 'assignment',
+    itemContentId: '23',
     pointsPossible: '10 pts',
     locale: 'en',
     timezone: 'UTC',
@@ -119,12 +116,12 @@ describe('ItemAssignToTray', () => {
   })
 
   it('renders a quiz', () => {
-    const {getByText} = renderComponent({moduleItemType: 'quiz', moduleItemContentType: 'quiz'})
+    const {getByText} = renderComponent({itemType: 'quiz'})
     expect(getByText('Quiz | 10 pts')).toBeInTheDocument()
   })
 
   it('renders a new quiz', () => {
-    const {getByText} = renderComponent({moduleItemType: 'lti-quiz'})
+    const {getByText} = renderComponent({itemType: 'lti-quiz'})
     expect(getByText('Quiz | 10 pts')).toBeInTheDocument()
   })
 
@@ -137,7 +134,7 @@ describe('ItemAssignToTray', () => {
   })
 
   it('renders times in the given timezone', async () => {
-    const {findAllByText} = renderComponent({moduleItemContentId: '25', timezone: 'America/Denver'})
+    const {findAllByText} = renderComponent({itemContentId: '25', timezone: 'America/Denver'})
 
     const times = await findAllByText('Thursday, October 5, 2023 6:01 AM')
     expect(times).toHaveLength(2) // screenreader + visible message
@@ -145,7 +142,7 @@ describe('ItemAssignToTray', () => {
 
   it('renders times in the given locale', async () => {
     const {findAllByText} = renderComponent({
-      moduleItemContentId: '25',
+      itemContentId: '25',
       locale: 'en-GB',
       timezone: 'America/Denver',
     })
@@ -158,13 +155,6 @@ describe('ItemAssignToTray', () => {
     const {getByRole} = renderComponent({onDismiss})
     getByRole('button', {name: 'Close'}).click()
     expect(onDismiss).toHaveBeenCalled()
-  })
-
-  it('calls onSave when save button is clicked', () => {
-    const onSave = jest.fn()
-    const {getByRole} = renderComponent({onSave})
-    getByRole('button', {name: 'Save'}).click()
-    expect(onSave).toHaveBeenCalled()
   })
 
   it('adds a card when add button is clicked', async () => {
@@ -202,30 +192,6 @@ describe('ItemAssignToTray', () => {
     const {getByRole} = renderComponent({onDismiss})
     getByRole('button', {name: 'Cancel'}).click()
     expect(onDismiss).toHaveBeenCalled()
-  })
-
-  it('calls onSave when the Save buton is clicked', () => {
-    const onSave = jest.fn()
-    const {getByRole} = renderComponent({onSave})
-    getByRole('button', {name: 'Save'}).click()
-    expect(onSave).toHaveBeenCalled()
-  })
-
-  it('Save does not call onSave when a card is invalid', async () => {
-    const onSave = jest.fn()
-    const {getAllByTestId, getByRole, getByText} = renderComponent({
-      onSave,
-      moduleItemContentId: '24',
-    })
-    await waitFor(() => {
-      expect(getAllByTestId('item-assign-to-card')).toHaveLength(1)
-    })
-    const savebtn = getByRole('button', {name: 'Save'})
-
-    savebtn.click()
-    expect(onSave).not.toHaveBeenCalled()
-    savebtn.focus()
-    expect(getByText('Please fix errors before continuing')).toBeInTheDocument()
   })
 
   describe('AssigneeSelector', () => {
