@@ -326,8 +326,8 @@
             <% unless @submission.user_can_read_grade?(@current_user, session) %>
               <% if @submission.hide_grade_from_student? %>
                 <i><%= t('only_see_your_own_comments_muted', "You may not see all comments right now because the assignment is currently being graded") %></i>
-              <% else %>
-                <i><%= t('only_see_your_own_comments_peer', "As a peer reviewing student, you will only see comments written by you.") %></i>
+              <% elsif @submission.peer_reviewer?(@current_user)%>
+                  <i><%= t('only_see_your_own_comments_peer', "As a peer reviewing student, you will only see comments written by you.") %></i>
               <% end %>
               <br/><br/>
             <% end %>

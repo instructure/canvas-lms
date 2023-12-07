@@ -715,6 +715,29 @@ describe "submissions/show" do
       message_container = html.at_css(".assessment_request_incomplete_message")
       expect(message_container.attr("style")).to match(/display:\s*none/)
     end
+
+    it "shows a warning that only commments written by the peer reviewer will be displayed" do
+      render "submissions/show"
+      html = Nokogiri::HTML5.fragment(response.body)
+      comment_sidebar = html.css(".submission-details-comments")
+      expect(comment_sidebar.text).to include("As a peer reviewing student, you will only see comments written by you.")
+    end
+
+    context "when current_user is an observer" do
+      before :once do
+        @observer = User.create!
+        observer_enrollment = @course.enroll_user(@observer, "ObserverEnrollment", enrollment_state: "active")
+        observer_enrollment.update_attribute(:associated_user_id, submission.user)
+      end
+
+      it "does not show a warning that only commments written by the peer reviewer" do
+        view_context(@course, @observer)
+        render "submissions/show"
+        html = Nokogiri::HTML5.fragment(response.body)
+        comment_sidebar = html.css(".submission-details-comments")
+        expect(comment_sidebar.text).not_to include("As a peer reviewing student, you will only see comments written by you.")
+      end
+    end
   end
 
   describe "media comments" do
