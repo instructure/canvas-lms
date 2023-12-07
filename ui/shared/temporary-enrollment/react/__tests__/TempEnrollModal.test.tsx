@@ -65,6 +65,7 @@ const modalProps = {
     {
       base_role_name: 'TeacherEnrollment',
       id: '234',
+      name: 'TeacherEnrollment',
       role: 'TeacherEnrollment',
       label: 'Teacher',
     },
@@ -231,56 +232,9 @@ describe('TempEnrollModal', () => {
       expect(screen.queryByText(/is ready to be assigned temporary enrollments/)).toBeNull()
     })
 
-    const role = screen.getByLabelText(/select role/i)
-    userEvent.click(role)
-    await waitFor(() => {
-      const option = document.getElementById('234')
-      if (!option) throw new Error('Option not yet available')
-    })
-    const option = document.getElementById('234')
-    userEvent.click(option!)
-
     const submit = await screen.findByRole('button', {name: 'Submit'})
     expect(submit).toBeInTheDocument()
     fireEvent.click(submit)
-
-    expect(fetchMock.calls(`/accounts/1/user_lists.json?${userListsParams}`).length).toBe(1)
-    expect(fetchMock.calls('/api/v1/users/2/profile').length).toBe(1)
-    expect(fetchMock.calls(ENROLLMENTS_URI).length).toBe(1)
-  })
-
-  it('shows error and stays open if data is missing', async () => {
-    fetchMock.post(`/accounts/1/user_lists.json?${userListsParams}`, userData)
-    userDetailsUriMock(recipientUser.id, userData.users[0])
-    fetchMock.get(ENROLLMENTS_URI, enrollmentsByCourse)
-
-    render(
-      <TempEnrollModal {...modalProps} defaultOpen={true}>
-        <p>child_element</p>
-      </TempEnrollModal>
-    )
-
-    const next = await screen.findByRole('button', {name: 'Next'})
-    await waitFor(() => {
-      expect(next).not.toBeDisabled()
-    })
-
-    // click next to go to the search results screen (page 2)
-    userEvent.click(next)
-    expect(
-      await screen.findByText(/is ready to be assigned temporary enrollments/)
-    ).toBeInTheDocument()
-
-    // click next to go to the assign screen (page 3)
-    userEvent.click(next)
-    // NO PROVIDER BASE ROLE SELECTED!
-    await waitFor(() => {
-      expect(screen.queryByText('Back')).toBeInTheDocument()
-      expect(screen.queryByText(/is ready to be assigned temporary enrollments/)).toBeNull()
-    })
-
-    userEvent.click(await screen.findByRole('button', {name: 'Submit'}))
-    expect(await screen.findByText(/please select a role before submitting/i)).toBeInTheDocument()
 
     expect(fetchMock.calls(`/accounts/1/user_lists.json?${userListsParams}`).length).toBe(1)
     expect(fetchMock.calls('/api/v1/users/2/profile').length).toBe(1)
