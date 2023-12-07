@@ -176,6 +176,10 @@ describe ExternalToolsController do
           message_hint = JSON::JWT.decode(assigns[:lti_launch].params["lti_message_hint"], :skip_verification)
           expect(message_hint["canvas_domain"]).to eq "localhost"
         end
+
+        it "defaults placement to context navigation" do
+          expect(cached_launch["https://www.instructure.com/placement"]).to eq "course_navigation"
+        end
       end
 
       context "when Lti::LaunchDebugLogger is enabled" do
@@ -958,6 +962,28 @@ describe ExternalToolsController do
 
         let(:get_page) { get "retrieve", params: get_page_params }
 
+        context "when launch_type is not provided" do
+          it "does not include placement in launch" do
+            get_page
+            expect(launch_hash["https://www.instructure.com/placement"]).to be_nil
+          end
+        end
+
+        context "when launch_type is provided" do
+          let(:launch_type) { "homework_submission" }
+          let(:get_page_params) { super().merge(launch_type:) }
+
+          before do
+            lti_1_3_tool.homework_submission = { enabled: true }
+            lti_1_3_tool.save!
+          end
+
+          it "includes placement in launch" do
+            get_page
+            expect(launch_hash["https://www.instructure.com/placement"]).to eq launch_type
+          end
+        end
+
         it "sets the custom parameters in the launch hash" do
           get_page
           expect(launch_hash["https://purl.imsglobal.org/spec/lti/claim/custom"]).to include(
@@ -1270,7 +1296,7 @@ describe ExternalToolsController do
       tool = new_valid_tool(@course)
       tool.settings[:course_navigation] = { "required_permissions" => "not-real-permissions,nor-this-one" }
       tool.save!
-      get "retrieve", params: { course_id: @course.id, url: "http://www.example.com/basic_lti" }
+      get "retrieve", params: { course_id: @course.id, url: "http://www.example.com/basic_lti", placement: :course_navigation }
       expect(response).to be_unauthorized
     end
 
