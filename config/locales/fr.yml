@@ -11323,6 +11323,7 @@ fr:
       criterion_long_description: "Description longue du critère"
       edit_rubric_rating: "Modifier les notes"
       find_existing_rubric: "Chercher un barème existant"
+  edit_rubric_7d4d139d: "Modifier un barème"
   edit_rubric_title_104d6fd2: "Modifier le barème : %{title}"
   edit_section_name_558cc89: "Modifier la section « %{name} »"
   edit_status_612572db: "Modifier le statut"
@@ -12745,6 +12746,8 @@ fr:
   february_f2c77675: Février
   federated_attributes_5cbe6441: "Attributs fédérés"
   federated_attributes_are_information_sent_from_you_2116fb61: "Les attributs fédérés sont des informations envoyées par votre fournisseur d'authentification qui peuvent être utilisées pour mettre à jour automatiquement les informations correspondantes des utilisateurs dans Canvas, à chacune de leurs connexions."
+  feed_entry_title: "Devoir : %{assignment}"
+  feed_entry_title_with_course: "Devoir, %{course} : %{assignment}"
   feed_url_8a433438: "Url du flux"
   feed_url_is_required_253fda4e: "L'URL du flux est requise"
   feedback_6dcc1991: Commentaire
@@ -16198,6 +16201,7 @@ fr:
   label_selected_list_collapsed_d93e77da: "%{label} sélectionné. Liste réduite."
   label_values_76f4b5fa: "Valeurs des étiquettes"
   labels: 
+    due: Échéance
     lock_module_until: "Verrouiller jusqu'à/au/en"
   labels_292cd90b: Étiquettes
   language_6b3e2c7c: Langue
@@ -27609,6 +27613,8 @@ fr:
       graded: noté
       submitted: envoyé
       unsubmitted: "non envoyé"
+  submission_action_take_quiz: "Prendre %{title}"
+  submission_action_turn_in_assignment: "Remettre %{title}"
   submission_added_title_50ebdc85: "soumission ajoutée : %{title}"
   submission_annotation_user_name_assignment_title_c_39910597: "Annotation de soumission : %{user_name}, %{assignment_title}, %{course_name}"
   submission_annotation_user_name_assignment_title_c_80c1963e: "Annotation de soumission : %{user_name}, %{assignment_title}, %{course_name}"

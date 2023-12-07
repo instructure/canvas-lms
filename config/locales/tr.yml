@@ -3439,6 +3439,7 @@ tr:
   at_least_one_section_must_be_selected_to_hide_grad_f88c946f: "Bölümelere göre notları gizle özelliği için en az bir bölüm seçilmeli."
   at_the_bottom_a6a5f0fe: "Alt kısımda"
   at_the_top_fa836591: "Üst kısımda"
+  atom_no_author: "Yazar Yok"
   attach_4234a79b: Ekle
   attach_files_to_discussions_bd16c245: "Tartışmalara dosya ekle"
   attach_terms_2b8770a5: "Dönemleri ekleyin"
@@ -4639,6 +4640,9 @@ tr:
     from_beginning: başlangıç
     to_now: şimdi
   comment_by_replying_to_this_message_or_join_the_co_26d42fde: "Bu mesaja cevap yazarak yorum yapın veya %{link} bağlantısına tıklayarak karşılıklı konuşmaya katılın."
+  comment_from_files: 
+    one: "Ekli dosyaya bakın"
+    other: "Ekli dosyalara bakın"
   comments_e07bcbe3: Yorumlar
   common_cartridge_description: "Bu eklenti ile, Ortak paketler, içe aktarılacak aracı json formatında dönüştürmeyi sağlar."
   common_cartridge_display: "Ortak Paket"
@@ -7801,6 +7805,7 @@ tr:
       criterion_long_description: "Kriterin Uzun Açıklaması"
       edit_rubric_rating: "Dereceyi Düzenle"
       find_existing_rubric: "Varolan Denetim Listesi Bul"
+  edit_rubric_7d4d139d: "Değerlendirme Listesini Düzenle"
   edit_survey_b0d6890d: "Anketi Düzenle"
   edit_this_announcement_ae6e17b3: "Bu Duyuruyu Düzenle"
   edit_this_collaboration_393b1a9a: "Bu İşbirliğini  Düzenle"
@@ -8277,6 +8282,7 @@ tr:
   errors: 
     bad_navigation_config: "Geçersiz ders sekme yapılandırması"
     blank: Zorunlu
+    cannot_save_att: "%{att_name} kilitli özelliğini düzenleme yetkiniz yok."
     format: "%{attribute} %{message}"
     index: 
       all_categories: "- Tüm Kategoriler -"
@@ -8601,6 +8607,8 @@ tr:
     student_groups: "Yeni Öğrenci Grubu Sayfası"
     student_outcome_gradebook: "Öğrenci Öğrenme Yeterlilik Not Defteri"
   features_2581da: Özellikler
+  feed_entry_title: "Ödev: %{assignment}"
+  feed_entry_title_with_course: "Ödev, %{course}: %{assignment}"
   feedback_6dcc1991: Geribildirim
   field_9ec0ec01: Alan
   field_name_31fff38e: "Alan Adı"
@@ -10531,6 +10539,7 @@ tr:
   label_disabled_not_visible_to_students_da093eec: "%{label}. Etkin değil. Öğrenciler göremez"
   label_no_content_not_visible_to_students_84345d2f: "%{label}. İçerik yok. Öğrenciler göremez"
   labels: 
+    due: Bitiş
     lock_module_until: "Bu tarihe kadar kilitle"
   language_6b3e2c7c: Dil
   last_activity_a983e541: "Son Etkinlik"
@@ -18445,6 +18454,8 @@ tr:
       graded: notlandırıldı
       submitted: gönderildi
       unsubmitted: gönderilmedi
+  submission_action_take_quiz: " %{title}Al"
+  submission_action_turn_in_assignment: "%{title} teslim et"
   submission_comment: 
     unknown_author: Birisi
   submission_comments_4fa03a17: "Gönderi Yorumları"
@@ -18476,6 +18487,16 @@ tr:
   submission_index_e960f9bf: " %{index}Gönderi"
   submission_score_b7a291e8: "gönderi puanı"
   submission_type_a925fc5f: "Gönderi Türü"
+  submission_types: 
+    a_content_page: "içerik sayfası"
+    a_discussion_post: "gönderilen tartışmalar"
+    a_file_upload: "bir dosya yükleme"
+    a_media_recording: "bir medya kaydı"
+    a_quiz: "bir kısa sınav"
+    a_text_entry_box: "metin giriş kutusu"
+    a_website_url: "bir web sayfası url'si"
+    external_tool: "bir harici araç"
+    on_paper: "kağıt üzerinde"
   submission_types_79f7b436: "Gönderi tipi:"
   submissions: 
     assignment_submit_success: "Ödev başarıyla gönderildi."
