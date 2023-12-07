@@ -25,6 +25,9 @@ class AssignmentOverrideStudent < ActiveRecord::Base
   belongs_to :user
   belongs_to :quiz, class_name: "Quizzes::Quiz"
   belongs_to :context_module
+  belongs_to :wiki_page
+  belongs_to :discussion_topic
+  belongs_to :attachment
 
   before_create :set_root_account_id
   after_save :destroy_override_if_needed
@@ -35,7 +38,7 @@ class AssignmentOverrideStudent < ActiveRecord::Base
   before_validation :clean_up_assignment_if_override_student_orphaned
 
   validates :assignment_override, :user, presence: true
-  validates :user_id, uniqueness: { scope: %i[assignment_id quiz_id context_module_id],
+  validates :user_id, uniqueness: { scope: %i[assignment_id quiz_id context_module_id wiki_page_id discussion_topic_id attachment_id],
                                     conditions: -> { where.not(workflow_state: "deleted") },
                                     message: -> { t("already belongs to an assignment override") } }
 
@@ -58,8 +61,8 @@ class AssignmentOverrideStudent < ActiveRecord::Base
   end
 
   validate do |record|
-    if record.active? && [record.assignment, record.quiz, record.context_module].all?(&:nil?)
-      record.errors.add :base, "requires assignment, quiz, or module"
+    if record.active? && [record.assignment, record.quiz, record.context_module, record.wiki_page, record.discussion_topic, record.attachment].all?(&:nil?)
+      record.errors.add :base, "requires assignment, quiz, module, page, discussion, or file"
     end
   end
 
@@ -73,6 +76,15 @@ class AssignmentOverrideStudent < ActiveRecord::Base
     elsif context_module
       context_module.reload if context_module.id != context_module_id
       context_module.context_id
+    elsif wiki_page
+      wiki_page.reload if wiki_page.id != wiki_page_id
+      wiki_page.context_id
+    elsif discussion_topic
+      discussion_topic.reload if discussion_topic.id != discussion_topic_id
+      discussion_topic.context_id
+    elsif attachment
+      attachment.reload if attachment.id != attachment_id
+      attachment.context_id
     end
   end
 
@@ -81,6 +93,9 @@ class AssignmentOverrideStudent < ActiveRecord::Base
       self.assignment_id = assignment_override.assignment_id
       self.quiz_id = assignment_override.quiz_id
       self.context_module_id = assignment_override.context_module_id
+      self.wiki_page_id = assignment_override.wiki_page_id
+      self.discussion_topic_id = assignment_override.discussion_topic_id
+      self.attachment_id = assignment_override.attachment_id
     end
   end
   protected :default_values
@@ -138,6 +153,6 @@ class AssignmentOverrideStudent < ActiveRecord::Base
   end
 
   def set_root_account_id
-    self.root_account_id ||= assignment&.root_account_id || quiz&.root_account_id || context_module&.root_account_id
+    self.root_account_id ||= assignment&.root_account_id || quiz&.root_account_id || context_module&.root_account_id || wiki_page&.root_account_id || discussion_topic&.root_account_id || attachment&.root_account_id
   end
 end

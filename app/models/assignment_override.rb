@@ -35,6 +35,9 @@ class AssignmentOverride < ActiveRecord::Base
   belongs_to :assignment, inverse_of: :assignment_overrides
   belongs_to :quiz, class_name: "Quizzes::Quiz", inverse_of: :assignment_overrides
   belongs_to :context_module, inverse_of: :assignment_overrides
+  belongs_to :wiki_page, inverse_of: :assignment_overrides
+  belongs_to :discussion_topic, inverse_of: :assignment_overrides
+  belongs_to :attachment, inverse_of: :assignment_overrides
   belongs_to :set, polymorphic: %i[group course_section course], exhaustive: false
   has_many :assignment_override_students, -> { where(workflow_state: "active") }, inverse_of: :assignment_override, dependent: :destroy, validate: false
   validates :assignment_version, presence: { if: :assignment }
@@ -50,6 +53,12 @@ class AssignmentOverride < ActiveRecord::Base
                                    if: ->(override) { override.quiz? && override.active? && concrete_set.call(override) } }
   validates :set_id, uniqueness: { scope: %i[context_module_id set_type workflow_state],
                                    if: ->(override) { override.context_module? && override.active? && concrete_set.call(override) } }
+  validates :set_id, uniqueness: { scope: %i[wiki_page_id set_type workflow_state],
+                                   if: ->(override) { override.wiki_page? && override.active? && concrete_set.call(override) } }
+  validates :set_id, uniqueness: { scope: %i[discussion_topic_id set_type workflow_state],
+                                   if: ->(override) { override.discussion_topic? && override.active? && concrete_set.call(override) } }
+  validates :set_id, uniqueness: { scope: %i[attachment_id set_type workflow_state],
+                                   if: ->(override) { override.attachment? && override.active? && concrete_set.call(override) } }
 
   before_create :set_root_account_id
 
@@ -74,8 +83,8 @@ class AssignmentOverride < ActiveRecord::Base
   end
 
   validate do |record|
-    if [record.assignment, record.quiz, record.context_module].all?(&:nil?)
-      record.errors.add :base, "assignment, quiz, or module required"
+    if [record.assignment, record.quiz, record.context_module, record.wiki_page, record.discussion_topic, record.attachment].all?(&:nil?)
+      record.errors.add :base, "assignment, quiz, module, page, discussion, or file required"
     end
   end
 
@@ -94,6 +103,21 @@ class AssignmentOverride < ActiveRecord::Base
   validate do |record|
     if record.set_type == "Course" && record.unassign_item
       record.errors.add :unassign_item, "must be false with set_type Course"
+    end
+  end
+
+  validate do |record|
+    if record.due_at && (record.wiki_page || record.discussion_topic || record.attachment)
+      record.errors.add :due_at, "cannot be set for pages, discussions, or files"
+    end
+  end
+
+  validate do |record|
+    association_count = [record.assignment, record.quiz, record.context_module, record.wiki_page, record.discussion_topic, record.attachment].compact.count
+    has_assignment_and_quiz = association_count == 2 && record.assignment && record.quiz
+    # assignment+quiz can be set simultaneously, but otherwise there should only be 1 association
+    if association_count > 1 && !has_assignment_and_quiz
+      record.errors.add :base, "only one of assignment, quiz, module, page, discussion, or file may be set (except assignment and quiz may both be set)"
     end
   end
 
@@ -195,6 +219,18 @@ class AssignmentOverride < ActiveRecord::Base
 
   def context_module?
     !!context_module_id
+  end
+
+  def wiki_page?
+    !!wiki_page_id
+  end
+
+  def discussion_topic?
+    !!discussion_topic_id
+  end
+
+  def attachment?
+    !!attachment_id
   end
 
   workflow do
@@ -486,7 +522,7 @@ class AssignmentOverride < ActiveRecord::Base
 
   def root_account_id
     # Use the attribute if available, otherwise fall back to getting it from a parent entity
-    super || assignment&.root_account_id || quiz&.root_account_id || quiz&.assignment&.root_account_id || context_module&.root_account_id
+    super || assignment&.root_account_id || quiz&.root_account_id || quiz&.assignment&.root_account_id || context_module&.root_account_id || wiki_page&.root_account_id || discussion_topic&.root_account_id || attachment&.root_account_id
   end
 
   def set_root_account_id
