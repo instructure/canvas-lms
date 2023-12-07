@@ -625,7 +625,7 @@ describe "discussions" do
 
         it "allows editing the points possible, grading type, group category, and peer review for the graded discussion" do
           pp_string = "80"
-          course.group_categories.create!(name: "another group set")
+          group_cat = course.group_categories.create!(name: "another group set")
           get "/courses/#{course.id}/discussion_topics/#{assignment_topic.id}/edit"
 
           # change points possible from 10 to 80. selenium's clear method does not completely remove the previous value
@@ -638,10 +638,9 @@ describe "discussions" do
 
           force_click("input[data-testid='peer_review_manual']")
 
-          # TODO: fix in VICE-4001
-          # force_click("input[data-testid='group-discussion-checkbox']")
-          # force_click("input[placeholder='Select a group category']")
-          # fj("li:contains('#{group_cat.name}')").click
+          force_click("input[data-testid='group-discussion-checkbox']")
+          force_click("input[placeholder='Select a group category']")
+          fj("li:contains('#{group_cat.name}')").click
 
           fj("button:contains('Save')").click
           updated_assignment = assignment.reload
@@ -650,6 +649,7 @@ describe "discussions" do
           expect(updated_assignment.peer_reviews).to be true
           expect(updated_assignment.automatic_peer_reviews).to be false
           expect(updated_assignment.peer_reviews_assign_at).to be_nil
+          expect(assignment.effective_group_category_id).to eq group_cat.id
         end
 
         it "adds an attachment to a graded discussion" do

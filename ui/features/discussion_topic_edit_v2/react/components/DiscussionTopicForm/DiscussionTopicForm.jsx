@@ -520,7 +520,6 @@ export default function DiscussionTopicForm({
       assignmentGroupId: assignmentGroup || null,
       peerReviews: preparePeerReviewPayload(),
       assignmentOverrides: prepareAssignmentOverridesPayload(),
-      groupCategoryId: isGroupDiscussion ? groupCategoryId : null,
       dueAt: everyoneOverride.dueDate || null,
       lockAt: everyoneOverride.availableUntil || null,
       unlockAt: everyoneOverride.availableFrom || null,
@@ -535,6 +534,7 @@ export default function DiscussionTopicForm({
         ...payload,
         courseId: ENV.context_id,
         name: title,
+        groupCategoryId: isGroupDiscussion ? groupCategoryId : null,
       }
     }
     return payload
