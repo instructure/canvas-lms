@@ -17,19 +17,20 @@
  */
 
 import React from 'react'
-import {IconCertifiedSolid, IconExternalLinkLine} from '@instructure/ui-icons'
+import {IconCertifiedSolid} from '@instructure/ui-icons'
 import {Tag} from '@instructure/ui-tag'
 import {Flex} from '@instructure/ui-flex'
 import type {Spacing} from '@instructure/emotion'
 import type {ViewProps} from '@instructure/ui-view'
 import type {SkillData} from '../types'
+import {stringToId} from './utils'
 
 interface SkillTagProps {
   id: string
   dismissable: boolean
   skill: SkillData
   margin: Spacing
-  onClick: (e: React.MouseEvent<ViewProps, MouseEvent>, id: string) => void
+  onClick?: (e: React.MouseEvent<ViewProps, MouseEvent>, id: string) => void
 }
 
 const SkillTag = ({id, dismissable, skill, margin, onClick}: SkillTagProps) => {
@@ -40,34 +41,36 @@ const SkillTag = ({id, dismissable, skill, margin, onClick}: SkillTagProps) => {
       title={`Remove ${skill.name}`}
       text={
         <Flex gap="xx-small">
-          <Flex.Item shouldGrow={false} padding="0 0 xxx-small 0">
-            {skill.verified ? <IconCertifiedSolid color="success" title="certified" /> : null}
-          </Flex.Item>
+          {skill.verified ? (
+            <Flex.Item shouldGrow={false}>
+              <div style={{marginTop: '-3px'}}>
+                <IconCertifiedSolid color="success" title="certified" />
+              </div>
+            </Flex.Item>
+          ) : null}
           <Flex.Item shouldGrow={true}>{skill.name}</Flex.Item>
-          {skill.url ? (
+          {/* skill.url ? (
             <Flex.Item shouldGrow={false}>
               <IconExternalLinkLine title="external link" />
             </Flex.Item>
-          ) : null}
+          ) : null */}
         </Flex>
       }
       margin={margin}
-      onClick={e => onClick(e, id)}
+      onClick={onClick ? e => onClick?.(e, id) : undefined}
     />
   )
 }
 
-function renderSkillTag(skill: SkillData) {
+function renderSkillTag(skill: SkillData, dismissable: boolean = false) {
   return (
-    <Tag
-      key={skill.name.replace(/\s+/g, '-').toLowerCase()}
-      text={
-        <>
-          {skill.verified ? <IconCertifiedSolid color="success" title="certified" /> : null}{' '}
-          {skill.name}
-        </>
-      }
+    <SkillTag
+      key={stringToId(skill.name)}
+      id={stringToId(skill.name)}
+      dismissable={!!dismissable}
+      skill={skill}
       margin="0 x-small x-small 0"
+      onClick={undefined}
     />
   )
 }

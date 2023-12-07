@@ -29,7 +29,7 @@ import ProjectView from './ProjectView'
 
 interface ProjectPreviewModalProps {
   open: boolean
-  project: ProjectDetailData
+  project?: ProjectDetailData
   onClose: () => void
 }
 
@@ -41,34 +41,37 @@ const ProjectPreviewModal = ({open, project, onClose}: ProjectPreviewModalProps)
   }, [])
 
   const renderTrayHeading = useCallback(() => {
+    if (!project) return null
+
     return (
       <Heading margin="0 large 0 0">
         <TruncateText onUpdate={handleTruncatedHeading}>{project.title}</TruncateText>
       </Heading>
     )
-  }, [handleTruncatedHeading, project.title])
+  }, [handleTruncatedHeading, project])
+
+  const renderTrayHeader = useCallback(() => {
+    if (!project) return null
+
+    return trayHeadingIsTruncated ? (
+      <Tooltip renderTip={project.title}>{renderTrayHeading()}</Tooltip>
+    ) : (
+      renderTrayHeading()
+    )
+  }, [project, renderTrayHeading, trayHeadingIsTruncated])
+
   return (
-    <Tray
-      label="Achievement Details"
-      open={open}
-      onDismiss={onClose}
-      size="regular"
-      placement="end"
-    >
+    <Tray label="Project Details" open={open} onDismiss={onClose} size="regular" placement="end">
       <Flex as="div" padding="small small small medium">
         <Flex.Item shouldGrow={true} shouldShrink={true}>
-          {trayHeadingIsTruncated ? (
-            <Tooltip renderTip={project.title}>{renderTrayHeading()}</Tooltip>
-          ) : (
-            renderTrayHeading()
-          )}
+          {renderTrayHeader()}
         </Flex.Item>
         <Flex.Item>
           <CloseButton placement="end" offset="small" screenReaderLabel="Close" onClick={onClose} />
         </Flex.Item>
       </Flex>
       <View as="div" maxWidth="986px" margin="0 auto" background="primary" shadow="resting">
-        <ProjectView project={project} inTray={true} />
+        {project ? <ProjectView project={project} inTray={true} /> : null}
       </View>
     </Tray>
   )

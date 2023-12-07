@@ -70,38 +70,26 @@ type PortfolioViewProps = {
 }
 
 const PortfolioView = ({portfolio}: PortfolioViewProps) => {
-  const [showingAchievementDetails, setShowingAchievementDetails] = useState(false)
-  const [activeCard, setActiveCard] = useState<AchievementData | undefined>(undefined)
-  const [showingProjectDetails, setShowingProjectDetails] = useState(false)
+  const [activeAchievement, setActiveAchievement] = useState<AchievementData | undefined>(undefined)
   const [activeProject, setActiveProject] = useState<ProjectDetailData | undefined>(undefined)
-
-  const handleDismissAchievementDetails = useCallback(() => {
-    setShowingAchievementDetails(false)
-    setActiveCard(undefined)
-  }, [])
 
   const handleAchievementCardClick = useCallback(
     (achievementId: string) => {
       const card = portfolio.achievements.find(a => a.id === achievementId)
-      setActiveCard(card)
-      setShowingAchievementDetails(card !== undefined)
+      setActiveAchievement(card)
+      setActiveProject(undefined)
     },
-    [portfolio.achievements]
+    [portfolio.achievements, setActiveAchievement, setActiveProject]
   )
 
   const handleProjectCardClick = useCallback(
     (projectId: string) => {
       const card = portfolio.projects.find(a => a.id === projectId)
       setActiveProject(card)
-      setShowingProjectDetails(card !== undefined)
+      setActiveAchievement(undefined)
     },
-    [portfolio.projects]
+    [portfolio.projects, setActiveAchievement, setActiveProject]
   )
-
-  const handleDismissProjectDetails = useCallback(() => {
-    setShowingProjectDetails(false)
-    setActiveProject(undefined)
-  }, [])
 
   return (
     <View as="div">
@@ -251,20 +239,16 @@ const PortfolioView = ({portfolio}: PortfolioViewProps) => {
           </Flex>
         </div>
       </div>
-      {activeCard && (
-        <AchievementTray
-          open={showingAchievementDetails}
-          onDismiss={handleDismissAchievementDetails}
-          activeCard={activeCard}
-        />
-      )}
-      {activeProject && (
-        <ProjectTray
-          open={showingProjectDetails}
-          onClose={handleDismissProjectDetails}
-          project={activeProject}
-        />
-      )}
+      <AchievementTray
+        open={!!activeAchievement}
+        onClose={() => setActiveAchievement(undefined)}
+        activeCard={activeAchievement}
+      />
+      <ProjectTray
+        open={!!activeProject}
+        project={activeProject}
+        onClose={() => setActiveProject(undefined)}
+      />
     </View>
   )
 }
