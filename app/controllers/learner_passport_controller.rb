@@ -296,7 +296,7 @@ class LearnerPassportController < ApplicationController
   end
 
   def learner_passport_current_projects
-    []
+    [learner_passport_project_sample.clone]
   end
 
   def current_achievements_key
