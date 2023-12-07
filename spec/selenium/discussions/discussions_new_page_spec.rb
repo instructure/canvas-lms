@@ -1340,6 +1340,24 @@ describe "discussions" do
           expect(ff("input[placeholder='Select Date']")[1].attribute("value")).to be_truthy
         end
 
+        it "displays all selected options correctly with group category set" do
+          group_category = course.group_categories.create!(name: "group category 1")
+
+          discussion_with_group_category = {
+            title: "value for title",
+            message: "value for message",
+            group_category_id: group_category.id,
+          }
+
+          group_topic = course.discussion_topics.create!(discussion_with_group_category)
+          group_topic.update!(group_category_id: group_category.id)
+
+          get "/courses/#{course.id}/discussion_topics/#{group_topic.id}/edit"
+
+          expect(f("input[value='group-discussion']").selected?).to be_truthy
+          expect(f("input[placeholder='Select a group category']").attribute("title")).to eq group_category.name
+        end
+
         it "displays all unselected options correctly" do
           get "/courses/#{course.id}/discussion_topics/#{@topic_no_options.id}/edit"
 
