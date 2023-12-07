@@ -459,7 +459,7 @@ class ExternalToolsController < ApplicationController
         render json: external_tool_json(tool, @context, @current_user, session)
         timing_meta.tags = { lti_version: tool.lti_version }
       else
-        placement = placement_from_params
+        placement = placement_from_params || "#{@context.class.url_context_class.to_s.downcase}_navigation"
         unless find_tool(params[:id], placement)
           timing_meta.tags = { error: true }
           return
@@ -1678,7 +1678,7 @@ class ExternalToolsController < ApplicationController
   end
 
   def placement_from_params
-    params[:placement] || params[:launch_type] || "#{@context.class.url_context_class.to_s.downcase}_navigation"
+    params[:placement] || params[:launch_type]
   end
 
   def whitelisted_query_params
