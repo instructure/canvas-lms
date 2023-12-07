@@ -1003,9 +1003,10 @@ RSpec.describe ApplicationController do
       end
 
       context "ContextExternalTool" do
-        let(:course) { course_model }
         let_once(:dev_key) { DeveloperKey.create! }
 
+        let(:course) { course_model }
+        let(:user) { user_model }
         let(:tool) do
           tool = course.context_external_tools.new(
             name: "bob",
@@ -1028,16 +1029,21 @@ RSpec.describe ApplicationController do
           tool
         end
 
-        let(:content_tag) { ContentTag.create(content: tool, url: tool.url) }
+        let(:content_tag) { ContentTag.create(id: 42, content: tool, url: tool.url) }
+
+        before do
+          allow(controller).to receive(:named_context_url).and_return("wrong_url")
+          allow(controller).to receive(:render)
+          allow(controller).to receive_messages(js_env: [])
+          allow(controller).to receive(:require_user) { user_model }
+
+          controller.instance_variable_set(:@current_user, user)
+          controller.instance_variable_set(:@context, course)
+          controller.instance_variable_set(:@domain_root_account, course.account)
+        end
 
         context "display type" do
           before do
-            allow(controller).to receive(:named_context_url).and_return("wrong_url")
-            allow(controller).to receive(:render)
-            allow(controller).to receive_messages(js_env: [])
-            controller.instance_variable_set(:@context, course)
-            allow(content_tag).to receive(:id).and_return(42)
-            allow(controller).to receive(:require_user) { user_model }
             allow(controller).to receive(:lti_launch_params) { {} }
             content_tag.update!(context: assignment_model)
           end
@@ -1131,21 +1137,10 @@ RSpec.describe ApplicationController do
         end
 
         context "lti version" do
-          let_once(:user) { user_model }
-
           before do
-            allow(controller).to receive_messages(named_context_url: "wrong_url",
-                                                  lti_grade_passback_api_url: "wrong_url",
+            allow(controller).to receive_messages(lti_grade_passback_api_url: "wrong_url",
                                                   blti_legacy_grade_passback_api_url: "wrong_url",
                                                   lti_turnitin_outcomes_placement_url: "wrong_url")
-
-            allow(controller).to receive(:render)
-            allow(controller).to receive_messages(js_env: [])
-            controller.instance_variable_set(:@context, course)
-            allow(content_tag).to receive(:id).and_return(42)
-            allow(controller).to receive(:require_user) { user_model }
-            controller.instance_variable_set(:@current_user, user)
-            controller.instance_variable_set(:@domain_root_account, course.account)
             content_tag.update!(context: assignment_model)
           end
 
@@ -1310,10 +1305,8 @@ RSpec.describe ApplicationController do
 
         context "return_url" do
           before do
-            controller.instance_variable_set(:@context, course)
             content_tag.update!(context: assignment_model)
             allow(content_tag.context).to receive(:quiz_lti?).and_return(true)
-            allow(controller).to receive(:render)
             allow(controller).to receive(:lti_launch_params)
             allow(controller).to receive_messages(require_user: true,
                                                   named_context_url: "named_context_url",
@@ -1486,12 +1479,6 @@ RSpec.describe ApplicationController do
           let(:override_url) { "http://www.example-beta.com/basic_lti" }
 
           before do
-            allow(controller).to receive(:named_context_url).and_return(tool.url)
-            allow(controller).to receive(:render)
-            allow(controller).to receive_messages(js_env: [])
-            controller.instance_variable_set(:@context, course)
-            allow(content_tag).to receive(:id).and_return(42)
-
             allow(ApplicationController).to receive_messages(test_cluster?: true, test_cluster_name: "beta")
             Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
 
@@ -1515,41 +1502,20 @@ RSpec.describe ApplicationController do
             "external_tool_redirect",
             { include_host: true }
           ).and_return("wrong_url")
-          allow(controller).to receive(:render)
-          allow(controller).to receive_messages(js_env: [])
-          controller.instance_variable_set(:@context, course)
           controller.send(:content_tag_redirect, course, content_tag, nil)
         end
 
         it "sets the resource_link_id correctly" do
-          allow(controller).to receive(:named_context_url).and_return("wrong_url")
-          allow(controller).to receive(:render)
-          allow(controller).to receive_messages(js_env: [])
-          controller.instance_variable_set(:@context, course)
-          allow(content_tag).to receive(:id).and_return(42)
           controller.send(:content_tag_redirect, course, content_tag, nil)
           expect(assigns[:lti_launch].params["resource_link_id"]).to eq "e62d81a8a1587cdf9d3bbc3de0ef303d6bc70d78"
         end
 
         it "sets the post message token" do
-          allow(controller).to receive(:named_context_url).and_return("wrong_url")
-          allow(controller).to receive(:render)
-          allow(controller).to receive_messages(js_env: [])
-          controller.instance_variable_set(:@context, course)
-          allow(content_tag).to receive(:id).and_return(42)
           controller.send(:content_tag_redirect, course, content_tag, nil)
           expect(assigns[:lti_launch].params["custom_test_token"]).to be_present
         end
 
         context "tool dimensions" do
-          before do
-            allow(controller).to receive(:named_context_url).and_return(tool.url)
-            allow(controller).to receive(:render)
-            allow(controller).to receive_messages(js_env: [])
-            controller.instance_variable_set(:@context, course)
-            allow(content_tag).to receive(:id).and_return(42)
-          end
-
           context "when ContentTag provides selection_width or selection_height" do
             before do
               content_tag.update(link_settings: { selection_width: 543, selection_height: 321 })
@@ -1670,7 +1636,7 @@ RSpec.describe ApplicationController do
             end
           end
 
-          context do
+          context "misc" do
             it "appends px to tool dimensions when receives numeric values" do
               tool.update(settings: { selection_width: 50, selection_height: 90 })
               controller.send(:content_tag_redirect, course, content_tag, nil)
