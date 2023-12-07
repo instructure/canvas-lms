@@ -29,6 +29,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Img} from '@instructure/ui-img'
 import {List} from '@instructure/ui-list'
+import {SVGIcon} from '@instructure/ui-svg-images'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {compareFromToDates, renderAchievement, renderLink, renderProject} from '../shared/utils'
@@ -37,6 +38,16 @@ import EducationCard from '../Education/EducationCard'
 import ExperienceCard from '../Experience/ExperienceCard'
 import AchievementTray from '../Achievements/AchievementTray'
 import ProjectTray from '../Projects/ProjectTray'
+
+const pinSVG = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M12.2812 10.1565C11.2114 11.2174 9.903 12.6866 9.16837 14.5328C8.44725 12.6664 7.15125 11.2061 6.09375 10.1554C4.7685 8.8425 4.125 7.53525 4.125 6.15713C4.125 3.38288 6.38288 1.125 9.21675 1.125C11.9921 1.125 14.25 3.38288 14.25 6.15713C14.25 7.53525 13.6065 8.8425 12.2812 10.1565ZM9.15825 0C5.763 0 3 2.76187 3 6.15712C3 7.85025 3.75263 9.41963 5.30062 10.9541C7.54837 13.1839 8.59575 15.2437 8.59575 17.4375V18H9.72075V17.4375C9.72075 15.2539 10.7557 13.2547 13.0744 10.9552C14.6224 9.41962 15.375 7.85025 15.375 6.15712C15.375 2.76187 12.612 0 9.15825 0Z" fill="#2D3B45"/>
+</svg>`
+const phoneSVG = `<svg width="10" height="18" viewBox="0 0 10 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M9.53674e-07 -4.80825e-07L2.38397e-07 18L10 18L10 6.33498e-07L9.53674e-07 -4.80825e-07ZM0.888047 1.05859L9.06072 1.05859L9.06072 16.9409L8.74681 16.9409L0.888047 16.9409L0.888047 1.05859Z" fill="#2D3B45"/>
+</svg>`
+const emailSVG = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M0 15.7647H18V2H0V15.7647ZM1.05882 3.41247V3.05883H16.9412V3.41247L9 10.2991L1.05882 3.41247ZM16.9412 4.81435V13.7254L13.6493 9.61082L12.8213 10.2715L16.3684 14.7059H1.63164L5.1787 10.2715L4.3507 9.61082L1.05882 13.7254V4.81435L9 11.7009L16.9412 4.81435Z" fill="#394B58"/>
+</svg>`
 
 function renderEducation(education: EducationData) {
   return (
@@ -117,6 +128,9 @@ const PortfolioView = ({portfolio}: PortfolioViewProps) => {
                   backgroundImage: ENV.current_user.avatar_image_url
                     ? `url(${ENV.current_user.avatar_image_url})`
                     : 'none',
+                  backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'center center',
+                  backgroundColor: '#f5f5f5',
                 }}
               />
             </Flex.Item>
@@ -127,7 +141,31 @@ const PortfolioView = ({portfolio}: PortfolioViewProps) => {
               <Text size="x-small">{portfolio.blurb}</Text>
             </Flex.Item>
           </Flex>
-          <Flex as="div" direction="column" gap="large" padding="0 medium">
+          <Flex as="div" direction="column" gap="large" padding="0 medium" margin="large 0 0 0">
+            <View as="div" background="secondary" padding="small">
+              <Flex as="div" direction="row" justifyItems="center" gap="xx-large">
+                <Flex.Item align="start">
+                  <div style={{display: 'inline-block', marginRight: '0.25rem'}}>
+                    <SVGIcon src={pinSVG} inline={true} width="1rem" height="1rem" />
+                  </div>
+                  <Text>
+                    {portfolio.city}, {portfolio.state}
+                  </Text>
+                </Flex.Item>
+                <Flex.Item align="start">
+                  <div style={{display: 'inline-block', marginRight: '0.25rem'}}>
+                    <SVGIcon src={phoneSVG} inline={true} width="1rem" height="1rem" />
+                  </div>
+                  <Text>{portfolio.phone}</Text>
+                </Flex.Item>
+                <Flex.Item align="start">
+                  <div style={{display: 'inline-block', marginRight: '0.25rem'}}>
+                    <SVGIcon src={emailSVG} inline={true} width="1rem" height="1rem" />
+                  </div>
+                  <Text>{portfolio.email}</Text>
+                </Flex.Item>
+              </Flex>
+            </View>
             <View as="div">
               <Heading level="h3" themeOverride={{h3FontSize: '1rem'}}>
                 About Me

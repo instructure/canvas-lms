@@ -32,6 +32,7 @@ import type {ViewProps} from '@instructure/ui-view'
 
 import SkillSelect from '../../../shared/SkillSelect'
 import CoverImageModal from '../../../shared/CoverImageModal'
+import StatePicker from '../../../shared/StatePicker'
 import type {PortfolioDetailData, SkillData} from '../../../types'
 import {renderEditLink, stringToId} from '../../../shared/utils'
 
@@ -75,9 +76,9 @@ const PersonalInfo = ({portfolio, onChange}: PersonalInfoProps) => {
   )
 
   const handleStateChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      setState(event.target.value)
-      onChange({state: event.target.value})
+    (newState: string) => {
+      setState(newState)
+      onChange({state: newState})
     },
     [onChange]
   )
@@ -172,126 +173,129 @@ const PersonalInfo = ({portfolio, onChange}: PersonalInfoProps) => {
         expanded={expanded}
         onToggle={handleToggle}
       >
-        <Flex as="div" direction="column" gap="large" margin="medium 0">
-          <div
-            style={{
-              position: 'relative',
-              height: '184px',
-              background: '#C7CDD1',
-              overflow: 'hidden',
-            }}
-          >
-            {heroImageUrl ? <Img src={heroImageUrl} alt="Cover image" constrain="cover" /> : null}
-            <div style={{position: 'absolute', right: '12px', bottom: '12px'}}>
-              <Button renderIcon={IconEditLine} onClick={handleEditCoverImageClick}>
-                Edit cover image
-              </Button>
+        <div style={{marginLeft: '-18px', padding: '0 1rem'}}>
+          <Flex as="div" direction="column" gap="large" margin="medium 0">
+            <div
+              style={{
+                position: 'relative',
+                height: '184px',
+                background: '#C7CDD1',
+                overflow: 'hidden',
+              }}
+            >
+              {heroImageUrl ? <Img src={heroImageUrl} alt="Cover image" constrain="cover" /> : null}
+              <div style={{position: 'absolute', right: '12px', bottom: '12px'}}>
+                <Button renderIcon={IconEditLine} onClick={handleEditCoverImageClick}>
+                  Edit cover image
+                </Button>
+              </div>
+              <input type="hidden" name="heroImageUrl" value={heroImageUrl || ''} />
             </div>
-            <input type="hidden" name="heroImageUrl" value={heroImageUrl || ''} />
-          </div>
 
-          <Flex gap="large">
-            <View as="div" position="relative">
-              <Avatar
-                size="xx-large"
-                name={ENV.current_user.display_name}
-                renderIcon={
-                  ENV.current_user.avatar_image_url ? (
-                    <Img src={ENV.current_user.avatar_image_url} />
-                  ) : undefined
-                }
+            <Flex gap="medium">
+              <View as="div" position="relative">
+                <Avatar
+                  color="ash"
+                  size="xx-large"
+                  name={ENV.current_user.display_name}
+                  renderIcon={
+                    ENV.current_user.avatar_image_url ? (
+                      <Img src={ENV.current_user.avatar_image_url} />
+                    ) : undefined
+                  }
+                />
+              </View>
+              <Flex.Item shouldGrow={true}>
+                <View as="div" margin="0 0 small 0">
+                  <Text as="div" size="x-large" weight="bold">
+                    {ENV.current_user.display_name}
+                  </Text>
+                </View>
+                <TextInput
+                  name="blurb"
+                  renderLabel="Personal headline"
+                  placeholder="Enter a headline"
+                  width="20rem"
+                  size="small"
+                  value={blurb}
+                  onChange={handleBlurbChange}
+                />
+              </Flex.Item>
+            </Flex>
+
+            <View as="div" background="secondary" padding="small">
+              <Flex gap="medium">
+                <TextInput
+                  name="city"
+                  renderLabel="City"
+                  placeholder="Select city"
+                  size="small"
+                  renderAfterInput={IconSearchLine}
+                  value={city}
+                  onChange={handleCityChange}
+                />
+                <input type="hidden" name="state" value={state} />
+                <StatePicker
+                  state={state}
+                  size="small"
+                  width="12rem"
+                  onChange={handleStateChange}
+                />
+                <TextInput
+                  name="phone"
+                  renderLabel="Phone"
+                  placeholder="Enter phone"
+                  size="small"
+                  value={phone}
+                  onChange={handlePhoneChange}
+                />
+                <TextInput
+                  name="email"
+                  renderLabel="Email address"
+                  placeholder="Enter email"
+                  size="small"
+                  value={email}
+                  onChange={handleEmailChange}
+                />
+              </Flex>
+            </View>
+            <View as="div">
+              {/* should probably be an RCE */}
+              <TextArea
+                name="about"
+                label="About"
+                value={about.replace(/(\n|\s)+/g, ' ')}
+                onChange={handleAboutChange}
               />
             </View>
-            <Flex.Item shouldGrow={true}>
-              <View as="div" margin="0 0 small 0">
-                <Text as="div" size="x-large" weight="bold">
-                  {ENV.current_user.display_name}
-                </Text>
-              </View>
-              <TextInput
-                name="blurb"
-                renderLabel="Personal headline"
-                placeholder="Enter a headline"
-                width="20rem"
-                size="small"
-                value={blurb}
-                onChange={handleBlurbChange}
+            <View as="div" margin="medium 0 0 0">
+              <input type="hidden" name="skills" value={JSON.stringify(skills)} />
+              <SkillSelect
+                label="Skills"
+                objectSkills={skills}
+                selectedSkillIds={skills.map(s => stringToId(s.name))}
+                onSelect={handleSelectSkills}
               />
-            </Flex.Item>
+            </View>
+            <View as="div">
+              <Text as="p" weight="bold" themeOverride={{paragraphMargin: '1rem 0'}}>
+                Links
+              </Text>
+              <Text as="p" themeOverride={{paragraphMargin: '1rem 0'}}>
+                Add any additional links such as a personal website, social media profile, or
+                publications
+              </Text>
+              <Flex as="div" direction="column" gap="small" margin="0 0 small 0">
+                {links.map((link: string) =>
+                  renderEditLink(link, handleEditLink, handleDeleteLink)
+                )}
+              </Flex>
+              <Button renderIcon={IconAddLine} onClick={handleAddLink}>
+                Add a Link
+              </Button>
+            </View>
           </Flex>
-
-          <View as="div" background="secondary" padding="small">
-            <Flex gap="medium">
-              <TextInput
-                name="city"
-                renderLabel="City"
-                placeholder="Select city"
-                size="small"
-                renderAfterInput={IconSearchLine}
-                value={city}
-                onChange={handleCityChange}
-              />
-              <TextInput
-                name="state"
-                renderLabel="State"
-                placeholder="Select state"
-                size="small"
-                renderAfterInput={IconSearchLine}
-                value={state}
-                onChange={handleStateChange}
-              />
-              <TextInput
-                name="phone"
-                renderLabel="Phone"
-                placeholder="Enter phone"
-                size="small"
-                value={phone}
-                onChange={handlePhoneChange}
-              />
-              <TextInput
-                name="email"
-                renderLabel="Email address"
-                placeholder="Enter email"
-                size="small"
-                value={email}
-                onChange={handleEmailChange}
-              />
-            </Flex>
-          </View>
-          <View as="div">
-            {/* should probably be an RCE */}
-            <TextArea
-              name="about"
-              label="About"
-              value={about.replace(/(\n|\s)+/g, ' ')}
-              onChange={handleAboutChange}
-            />
-          </View>
-          <View as="div" margin="medium 0 0 0">
-            <input type="hidden" name="skills" value={JSON.stringify(skills)} />
-            <SkillSelect
-              label="Skills"
-              objectSkills={skills}
-              selectedSkillIds={skills.map(s => stringToId(s.name))}
-              onSelect={handleSelectSkills}
-            />
-          </View>
-          <View as="div">
-            <Text as="p" weight="bold" themeOverride={{paragraphMargin: '1rem 0'}}>
-              Links
-            </Text>
-            <Text as="p" themeOverride={{paragraphMargin: '1rem 0'}}>
-              Add any additional links such as a personal website, social media profile, or
-              publications
-            </Text>
-            <Flex as="div" direction="column" gap="small" margin="0 0 small 0">
-              {links.map((link: string) => renderEditLink(link, handleEditLink, handleDeleteLink))}
-            </Flex>
-            <Button renderIcon={IconAddLine} onClick={handleAddLink}>
-              Add a Link
-            </Button>
-          </View>
-        </Flex>
+        </div>
       </ToggleDetails>
       <CoverImageModal
         subTitle="Upload and edit a decorative cover image for your profile."

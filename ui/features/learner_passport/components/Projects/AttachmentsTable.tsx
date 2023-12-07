@@ -100,6 +100,7 @@ const AttachmentsTable = ({attachments}: AttachmnetsTableProps) => {
               <Table.Cell>{renderSize(attachment.size)}</Table.Cell>
               <Table.Cell>
                 <Button
+                  size="small"
                   renderIcon={IconDownloadLine}
                   data-attachmentid={attachment.id}
                   onClick={handleDownloadAttachment}

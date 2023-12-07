@@ -41,12 +41,14 @@ const PortfolioDashboard = () => {
   const [actionPortfolioId, setActionProjectId] = useState('')
 
   const url = new URL(window.location.href)
-  if (url.searchParams.get('dupe') === 'true') {
-    showFlashAlert({message: 'Portfolio duplicated', type: 'success'})
+  if (url.searchParams.has('dupe')) {
+    const title = url.searchParams.get('dupe') || 'Portfolio'
+    showFlashAlert({message: `"${title}" duplicated`, type: 'success'})
     window.history.replaceState(window.history.state, '', url.pathname)
   }
-  if (url.searchParams.get('delete') === 'true') {
-    showFlashAlert({message: 'Portfolio deleted', type: 'success'})
+  if (url.searchParams.has('delete')) {
+    const title = url.searchParams.get('delete') || 'Portfolio'
+    showFlashAlert({message: `"${title}" deleted`, type: 'success'})
     window.history.replaceState(window.history.state, '', url.pathname)
   }
 
@@ -79,7 +81,15 @@ const PortfolioDashboard = () => {
     async (portfolioId: string, action: string) => {
       switch (action) {
         case 'duplicate':
-          navigate(`duplicate/${portfolioId}`)
+          {
+            const portfolio = portfolios.find(p => p.id === portfolioId)
+            if (portfolio) {
+              submit(
+                {portfolioId, title: portfolio.title},
+                {method: 'PUT', action: `duplicate/${portfolioId}`}
+              )
+            }
+          }
           break
         case 'edit':
           navigate(`../edit/${portfolioId}`)
@@ -93,12 +103,14 @@ const PortfolioDashboard = () => {
             if (portfolio) {
               const ok = await confirm(
                 <div>
-                  Are you sure you want to delete
-                  <span style={{whiteSpace: 'nowrap'}}>{portfolio.title}</span>?
+                  <span>Are you sure you want to delete &quot;{portfolio.title}&quot;</span>?
                 </div>
               )
               if (ok) {
-                navigate(`delete/${portfolioId}`)
+                submit(
+                  {portfolioId, title: portfolio.title},
+                  {method: 'PUT', action: `delete/${portfolioId}`}
+                )
               }
             }
           }
@@ -112,7 +124,7 @@ const PortfolioDashboard = () => {
           showUnimplemented({currentTarget: {textContent: action}})
       }
     },
-    [navigate, portfolios]
+    [navigate, portfolios, submit]
   )
 
   return (

@@ -82,7 +82,9 @@ const HeadingEditor = ({value, onChange}: HeadingEditorProps) => {
   const renderViewer = useCallback(() => {
     return (
       <View as="div" background={isHovering ? 'secondary' : 'transparent'}>
-        <Heading level="h1">{currValue}</Heading>
+        <Heading level="h1" themeOverride={{h1FontWeight: 700}}>
+          {currValue}
+        </Heading>
       </View>
     )
   }, [currValue, isHovering])
@@ -91,7 +93,7 @@ const HeadingEditor = ({value, onChange}: HeadingEditorProps) => {
     ({onBlur, editorRef}) => {
       return (
         <input
-          style={{fontSize: '2.375rem', backgroundColor: '#f5f5f5', width: '100%'}}
+          style={{fontSize: '2.375rem', backgroundColor: '#f5f5f5', width: '100%', fontWeight: 700}}
           ref={editorRef}
           onBlur={onBlur}
           value={currValue}

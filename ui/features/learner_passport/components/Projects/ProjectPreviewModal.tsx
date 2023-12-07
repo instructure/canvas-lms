@@ -55,7 +55,7 @@ const ProjectPreviewModal = ({open, project, onClose}: ProjectPreviewModalProps)
               backgroundImage: `url(${previewBackgroundImage})`,
             }}
           >
-            <View as="div" maxWidth="986px" margin="0 auto" background="primary" shadow="resting">
+            <View as="div" maxWidth="986px" margin="0 auto" background="primary" shadow="above">
               <ProjectView project={project} />
             </View>
           </div>
