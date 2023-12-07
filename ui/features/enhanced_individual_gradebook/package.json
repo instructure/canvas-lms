@@ -1,5 +1,5 @@
 {
-  "name": "@canvas/module_student_view_peer_reviews",
+  "name": "@canvas-features/enhanced_individual_gradebook",
   "private": true,
   "version": "1.0.0",
   "owner": "EVAL"
