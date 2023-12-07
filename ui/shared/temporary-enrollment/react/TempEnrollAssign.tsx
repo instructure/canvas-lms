@@ -270,16 +270,14 @@ export function TempEnrollAssign(props: Props) {
 
   useEffect(() => {
     const fetchData = async () => {
-      const accountId =
-        ENV.ACCOUNT_ID === ENV.ROOT_ACCOUNT_ID ? ENV.ROOT_ACCOUNT_ID : ENV.ACCOUNT_ID
       try {
         const result = await doFetchApi({
           path: `/api/v1/users/${userProps.id}/courses`,
           params: {
             enrollment_state: ['active', 'completed'],
             include: ['sections'],
-            account_id: accountId,
             per_page: MAX_ALLOWED_COURSES_PER_PAGE,
+            ...(ENV.ACCOUNT_ID !== ENV.ROOT_ACCOUNT_ID && {account_id: ENV.ACCOUNT_ID}),
           },
         })
         setEnrollmentsByCourse(result.json)

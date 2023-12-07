@@ -118,11 +118,16 @@ export default function TempEnrollUsersListRow(props: Props) {
     designer: props.permissions.can_add_observer,
   }
 
+  let enrollmentStatusParams = {}
+  if (ENV.ACCOUNT_ID !== ENV.ROOT_ACCOUNT_ID) {
+    enrollmentStatusParams = {account_id: ENV.ACCOUNT_ID}
+  }
+
   useFetchApi(
     // @ts-ignore - this hook isn't ts-ified
     {
       path: `/api/v1/users/${props.user.id}/temporary_enrollment_status`,
-      params: {account_id: ENV.ACCOUNT_ID},
+      params: enrollmentStatusParams,
       success: (json: TemporaryEnrollmentData) => setTemporaryEnrollmentState(json),
       error: showFlashError(I18n.t('Failed to fetch temporary enrollment data')),
     },

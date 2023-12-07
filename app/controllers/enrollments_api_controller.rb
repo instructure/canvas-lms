@@ -927,9 +927,13 @@ class EnrollmentsApiController < ApplicationController
     GuardRail.activate(:secondary) do
       if (user = api_find(User, params[:user_id])) && @domain_root_account&.feature_enabled?(:temporary_enrollments)
         if user.grants_right?(@current_user, session, :api_show_user)
-          account = params[:account_id].present? ? api_find(Account, params[:account_id]) : @domain_root_account
-          enrollment_scope = Enrollment.active_or_pending_by_date.joins(:course).where(courses: { account_id: account.id })
-
+          account = api_find(Account, params[:account_id]) if params[:account_id].present?
+          enrollment_scope =
+            if account
+              Enrollment.active_or_pending_by_date.joins(:course).where(courses: { account_id: account.id })
+            else
+              Enrollment.active_or_pending_by_date
+            end
           is_provider = enrollment_scope.temporary_enrollment_recipients_for_provider(user).exists?
           is_recipient = enrollment_scope.temporary_enrollments_for_recipient(user).exists?
 
