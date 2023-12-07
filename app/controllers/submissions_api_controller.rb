@@ -418,7 +418,7 @@ class SubmissionsApiController < ApplicationController
       end
     end
 
-    if student_ids.is_a?(Array) && student_ids.length > Api.max_per_page
+    if student_ids.is_a?(Array) && student_ids.length > Api::MAX_PER_PAGE
       return render json: { error: "too many students" }, status: :bad_request
     end
 

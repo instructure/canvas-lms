@@ -326,8 +326,7 @@ class BigBlueButtonConference < WebConference
 
   def self.fetch_and_preload_recordings(conferences, use_fallback_config: false)
     # have a limit so we don't send a ridiculously long URL over
-    limit = Setting.get("big_blue_button_preloaded_recordings_limit", "50").to_i
-    conferences.each_slice(limit) do |sliced_conferences|
+    conferences.each_slice(50) do |sliced_conferences|
       meeting_ids = sliced_conferences.map(&:conference_key).join(",")
       response = send_request(:getRecordings,
                               { meetingID: meeting_ids },

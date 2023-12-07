@@ -1380,10 +1380,6 @@ describe GradebooksController do
       describe "performance_controls" do
         let(:performance_controls) { assigns[:js_env][:GRADEBOOK_OPTIONS][:performance_controls] }
 
-        before(:once) do
-          Setting.set("api_max_per_page", 100)
-        end
-
         it "includes active_request_limit" do
           Setting.set("gradebook.active_request_limit", 20)
           get :show, params: { course_id: @course.id }

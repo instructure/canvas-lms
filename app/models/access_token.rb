@@ -147,12 +147,8 @@ class AccessToken < ActiveRecord::Base
     Shard.shard_for(global_developer_key_id).default?
   end
 
-  def record_last_used_threshold
-    Setting.get("access_token_last_used_threshold", 10.minutes).to_i
-  end
-
   def used!(at: nil)
-    return if last_used_at && last_used_at >= record_last_used_threshold.seconds.ago
+    return if last_used_at && last_used_at >= 10.minutes.ago
 
     at ||= Time.now.utc
 

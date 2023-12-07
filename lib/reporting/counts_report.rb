@@ -60,7 +60,7 @@ module Reporting
           data[:media_files] = 0
           data[:media_files_size] = 0
         else
-          timespan = Setting.get("recently_logged_in_timespan", 30.days.to_s).to_i.seconds
+          timespan = 30.days.seconds
           enrollment_scope = Enrollment.active.not_fake
                                        .joins("INNER JOIN #{Pseudonym.quoted_table_name} ON enrollments.user_id=pseudonyms.user_id")
                                        .where(pseudonyms: { workflow_state: "active" })

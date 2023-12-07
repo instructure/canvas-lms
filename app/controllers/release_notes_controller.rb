@@ -158,7 +158,7 @@ class ReleaseNotesController < ApplicationController
   end
 
   def latest_limit
-    Setting.get("release_notes_latest_limit", "10").to_i
+    10
   end
 
   def include_langs?

@@ -570,12 +570,12 @@ describe AccountNotification do
       end
 
       it "sends messages out in batches" do
+        stub_const("AccountNotification::USERS_PER_MESSAGE_BATCH", 2) # split into 2 batches
         Notification.create!(name: "Account Notification", category: "TestImmediately")
 
         an = account_notification(account: Account.default, send_message: true, role_ids: [student_role.id], message: "wazzuuuuup")
         user_ids = create_users(3, active_all: true)
         allow(an).to receive(:applicable_user_ids).and_return(user_ids)
-        Setting.set("account_notification_message_batch_size", 2) # split into 2 batches
 
         expect(BroadcastPolicy.notifier).to receive(:send_notification).ordered.with(*send_notification_args(user_ids[0, 2])).and_call_original
         expect(BroadcastPolicy.notifier).to receive(:send_notification).ordered.with(*send_notification_args(user_ids[2, 3])).and_call_original
@@ -595,10 +595,8 @@ describe AccountNotification do
         an = account_notification(account: Account.default, send_message: true, role_ids: [student_role.id], message: "wazzuuuuup")
         user_ids = create_users(3, active_all: true)
         allow(an).to receive(:applicable_user_ids).and_return(user_ids)
-        Setting.set("account_notification_message_batch_size", 2) # split into 2 batches
 
-        expect(BroadcastPolicy.notifier).to receive(:send_notification).ordered.with(*send_notification_args(user_ids[0, 2])).and_call_original
-        expect(BroadcastPolicy.notifier).to receive(:send_notification).ordered.with(*send_notification_args(user_ids[2, 3])).and_call_original
+        expect(BroadcastPolicy.notifier).to receive(:send_notification).ordered.with(*send_notification_args(user_ids)).and_call_original
         an.broadcast_messages
         expect(Message.count).to eq initial_message_count
       end

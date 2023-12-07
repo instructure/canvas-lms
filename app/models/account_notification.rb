@@ -32,6 +32,8 @@ class AccountNotification < ActiveRecord::Base
   after_save :queue_message_broadcast
   after_save :clear_cache
 
+  USERS_PER_MESSAGE_BATCH = 1000
+
   ACCOUNT_SERVICE_NOTIFICATION_FLAGS = %w[account_survey_notifications].freeze
   validates :required_account_service, inclusion: { in: ACCOUNT_SERVICE_NOTIFICATION_FLAGS, allow_nil: true }
 
@@ -334,15 +336,11 @@ class AccountNotification < ActiveRecord::Base
     MultiCache.delete(self.class.cache_key_for_root_account(account_id, Time.now.utc)) if account.root_account?
   end
 
-  def self.users_per_message_batch
-    Setting.get("account_notification_message_batch_size", "1000").to_i
-  end
-
   def broadcast_messages
     return unless should_send_message? # sanity check before we start grabbing user ids
 
     # don't try to send a message to an entire account in one job
-    applicable_user_ids.each_slice(self.class.users_per_message_batch) do |sliced_user_ids|
+    applicable_user_ids.each_slice(USERS_PER_MESSAGE_BATCH) do |sliced_user_ids|
       self.message_recipients = sliced_user_ids.map { |id| "user_#{id}" }
       save # trigger the broadcast policy
     ensure

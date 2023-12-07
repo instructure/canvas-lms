@@ -61,7 +61,7 @@ module Canvas::OAuth
     def generate_claims
       scopes = allowed_scopes
       timestamp = Time.zone.now.to_i
-      ttl = Setting.get("oauth2_jwt_exp_in_seconds", 1.hour.to_s).to_i
+      ttl = 1.hour.to_i
       claims = {
         iss: Canvas::Security.config["lti_iss"],
         sub: @client_id,

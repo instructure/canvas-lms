@@ -292,7 +292,7 @@ describe "Modules API", type: :request do
       end
 
       it "skips items for modules that have too many" do
-        Setting.set("api_max_per_page", "3")
+        stub_const("Api::MAX_PER_PAGE", 3)
         json = api_call(:get,
                         "/api/v1/courses/#{@course.id}/modules?include[]=items",
                         controller: "context_modules_api",
@@ -481,7 +481,7 @@ describe "Modules API", type: :request do
       end
 
       it "does not include items if there are too many" do
-        Setting.set("api_max_per_page", "3")
+        stub_const("Api::MAX_PER_PAGE", 3)
         json = api_call(:get,
                         "/api/v1/courses/#{@course.id}/modules/#{@module1.id}?include[]=items",
                         controller: "context_modules_api",

@@ -890,7 +890,7 @@ class ApplicationController < ActionController::Base
     # we can't block frames on the files domain, since files domain requests
     # are typically embedded in an iframe in canvas, but the hostname is
     # different
-    if !files_domain? && Setting.get("block_html_frames", "true") == "true" && !@embeddable
+    if !files_domain? && !@embeddable
       append_to_header("Content-Security-Policy", "frame-ancestors 'self' #{csp_frame_ancestors&.uniq&.join(" ")};")
     end
     RequestContext::Generator.store_request_meta(request, @context, @sentry_trace)
@@ -1576,15 +1576,11 @@ class ApplicationController < ActionController::Base
 
   def set_no_cache_headers
     response.headers["Pragma"] = "no-cache"
-    response.headers["Cache-Control"] = if Setting.get("legacy_cache_control", "false") == "true"
-                                          "no-cache, no-store"
-                                        else
-                                          "no-store"
-                                        end
+    response.headers["Cache-Control"] = "no-store"
   end
 
   def manage_robots_meta
-    @allow_robot_indexing = true if @domain_root_account&.enable_search_indexing? || Setting.get("enable_search_indexing", "false") == "true"
+    @allow_robot_indexing = true if @domain_root_account&.enable_search_indexing?
   end
 
   def set_page_view

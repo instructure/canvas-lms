@@ -773,7 +773,7 @@ describe "Users API", type: :request do
       end
 
       it "returns page view history" do
-        Setting.set("api_max_per_page", "2")
+        stub_const("Api::MAX_PER_PAGE", 2)
         json = api_call(:get,
                         "/api/v1/users/#{@student.id}/page_views?per_page=1000",
                         { controller: "page_views", action: "index", user_id: @student.to_param, format: "json", per_page: "1000" })
@@ -797,7 +797,7 @@ describe "Users API", type: :request do
       end
 
       it "recognizes start_time parameter" do
-        Setting.set("api_max_per_page", "3")
+        stub_const("Api::MAX_PER_PAGE", 3)
         start_time = @timestamp.iso8601
         json = api_call(:get,
                         "/api/v1/users/#{@student.id}/page_views?start_time=#{start_time}",
@@ -807,7 +807,7 @@ describe "Users API", type: :request do
       end
 
       it "recognizes end_time parameter" do
-        Setting.set("api_max_per_page", "3")
+        stub_const("Api::MAX_PER_PAGE", 3)
         end_time = @timestamp.iso8601
         json = api_call(:get,
                         "/api/v1/users/#{@student.id}/page_views?end_time=#{end_time}",
@@ -1098,7 +1098,7 @@ describe "Users API", type: :request do
         user.pseudonyms.create!(unique_id: "u#{n}@example.com", account: @account)
       end
       expect(api_call(:get, "/api/v1/accounts/#{@account.id}/users?per_page=2", controller: "users", action: "api_index", account_id: @account.id.to_param, format: "json", per_page: "2").size).to eq 2
-      Setting.set("api_max_per_page", "1")
+      stub_const("Api::MAX_PER_PAGE", 1)
       expect(api_call(:get, "/api/v1/accounts/#{@account.id}/users?per_page=2", controller: "users", action: "api_index", account_id: @account.id.to_param, format: "json", per_page: "2").size).to eq 1
     end
 
@@ -1180,8 +1180,6 @@ describe "Users API", type: :request do
     end
 
     context "includes ui_invoked" do
-      before(:once) { Setting.set("ui_invoked_count_pages", "true") }
-
       let(:root_account) { Account.default }
 
       it "sets pagination total_pages/last page link" do

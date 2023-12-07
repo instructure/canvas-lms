@@ -69,7 +69,7 @@ module SIS
         raise ImportError, "Improper status \"#{status}\" for course #{course_id}" unless /\A(active|deleted|completed|unpublished|published)/i.match?(status)
         raise ImportError, "Invalid course_format \"#{course_format}\" for course #{course_id}" unless course_format.blank? || course_format =~ /\A(online|on_campus|blended|not_set)/i
 
-        valid_grade_passback_settings = (Setting.get("valid_grade_passback_settings", "nightly_sync,disabled").split(",") << "not_set")
+        valid_grade_passback_settings = %w[nightly_sync disabled not_set]
         raise ImportError, "Invalid grade_passback_setting \"#{grade_passback_setting}\" for course #{course_id}" unless grade_passback_setting.blank? || valid_grade_passback_settings.include?(grade_passback_setting.downcase.strip)
         return if @batch.skip_deletes? && status =~ /deleted/i
 

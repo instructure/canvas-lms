@@ -19,6 +19,14 @@
 #
 
 module Api
+  PER_PAGE = 10
+  MAX_PER_PAGE = 100
+
+  # For plugin usage during transition; remove after
+  def self.max_per_page
+    MAX_PER_PAGE
+  end
+
   # find id in collection, by either id or sis_*_id
   # if the collection is over the users table, `self` is replaced by @current_user.id
   # if `writable` is true and a shadow record is found, the corresponding primary record will be returned
@@ -369,20 +377,9 @@ module Api
     relation
   end
 
-  def self.max_per_page(action = nil)
-    result = Setting.get("api_max_per_page_#{action}", nil)&.to_i if action
-    result || Setting.get("api_max_per_page", "50").to_i
-  end
-
-  def self.per_page(action = nil)
-    result = Setting.get("api_per_page_#{action}", nil)&.to_i if action
-    result || Setting.get("api_per_page", "10").to_i
-  end
-
   def self.per_page_for(controller, options = {})
-    action = "#{controller.params[:controller]}##{controller.params[:action]}"
-    per_page_requested = controller.params[:per_page] || options[:default] || per_page(action)
-    max = options[:max] || max_per_page(action)
+    per_page_requested = controller.params[:per_page] || options[:default] || PER_PAGE
+    max = options[:max] || MAX_PER_PAGE
     per_page_requested.to_i.clamp(1, max.to_i)
   end
 
@@ -507,7 +504,7 @@ module Api
 
     # Apache limits the HTTP response headers to 8KB total; with lots of query parameters, link headers can exceed this
     # so prioritize the links we include and don't exceed (by default) 6KB in total
-    max_link_headers_size = Setting.get("pagination_max_link_headers_size", "6144").to_i
+    max_link_headers_size = 6.kilobytes.to_i
     link_headers_size = 0
     LINK_PRIORITY.each_with_object({}) do |param, obj|
       next unless opts[param].present?

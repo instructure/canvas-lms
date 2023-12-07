@@ -21,6 +21,9 @@
 require "atom"
 
 class DiscussionEntry < ActiveRecord::Base
+  # The maximum discussion entry threading depth that is allowed
+  MAX_DEPTH = 50
+
   include Workflow
   include SendToStream
   include TextHelper
@@ -141,11 +144,6 @@ class DiscussionEntry < ActiveRecord::Base
     end
   end
 
-  # The maximum discussion entry threading depth that is allowed
-  def self.max_depth
-    Setting.get("discussion_entry_max_depth", "50").to_i
-  end
-
   def self.rating_sums(entry_ids)
     sums = where(id: entry_ids).where("COALESCE(rating_sum, 0) != 0")
     sums.to_h { |x| [x.id, x.rating_sum] }
@@ -156,7 +154,7 @@ class DiscussionEntry < ActiveRecord::Base
   end
 
   def validate_depth
-    if !self.depth || self.depth > self.class.max_depth
+    if !self.depth || self.depth > MAX_DEPTH
       errors.add(:base, "Maximum entry depth reached")
     end
   end
