@@ -20,9 +20,11 @@
 
 require_relative "../../db/migrate/20180611205754_clean_up_assignment_overrides"
 require_relative "../../db/migrate/20230830143715_change_require_quiz_or_assignment_constraint"
+require_relative "../../db/migrate/20231206164010_change_assignment_overrides_check_constraint"
 
 describe "CleanUpAssignmentOverrides" do
   it "cleans up invalid overrides and orphaned override students" do
+    ChangeAssignmentOverridesCheckConstraint.new.migrate(:down)
     ChangeRequireQuizOrAssignmentConstraint.new.migrate(:down)
     CleanUpAssignmentOverrides.down
 
@@ -37,6 +39,7 @@ describe "CleanUpAssignmentOverrides" do
 
     CleanUpAssignmentOverrides.up
     ChangeRequireQuizOrAssignmentConstraint.new.migrate(:up)
+    ChangeAssignmentOverridesCheckConstraint.new.migrate(:up)
 
     expect(override1.reload).to be_deleted
     expect(aos.reload).to be_deleted

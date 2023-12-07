@@ -95,6 +95,8 @@ class DiscussionTopic < ActiveRecord::Base
   has_many :course_sections, through: :discussion_topic_section_visibilities, dependent: :destroy
   belongs_to :user
   has_one :master_content_tag, class_name: "MasterCourses::MasterContentTag", inverse_of: :discussion_topic
+  has_many :assignment_overrides, dependent: :destroy, inverse_of: :discussion_topic
+  has_many :assignment_override_students, dependent: :destroy
 
   validates_associated :discussion_topic_section_visibilities
   validates :context_id, :context_type, presence: true

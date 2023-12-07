@@ -447,6 +447,33 @@ describe AssignmentOverride do
       @override.quiz = quiz_model
       expect(@override).to be_valid
     end
+
+    it "does not allow setting due dates with pages, discussions, or files" do
+      @override.due_at = 5.days.from_now
+      @override.assignment = assignment_model
+      expect(@override).to be_valid
+      @override.assignment = nil
+      @override.wiki_page = wiki_page_model
+      expect(@override).not_to be_valid
+      @override.wiki_page = nil
+      @override.discussion_topic = discussion_topic_model
+      expect(@override).not_to be_valid
+      @override.discussion_topic = nil
+      @override.attachment = attachment_model
+      expect(@override).not_to be_valid
+    end
+
+    it "allows setting both an assignment and a quiz" do
+      @override.assignment = assignment_model
+      @override.quiz = quiz_model
+      expect(@override).to be_valid
+    end
+
+    it "does not allow setting both an assignment and a wiki page" do
+      @override.assignment = assignment_model
+      @override.wiki_page = wiki_page_model
+      expect(@override).not_to be_valid
+    end
   end
 
   describe "title" do
