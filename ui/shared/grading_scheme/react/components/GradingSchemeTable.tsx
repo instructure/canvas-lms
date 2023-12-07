@@ -40,7 +40,8 @@ type Props = {
   editGradingScheme: (gradingSchemeId: string) => void
   openGradingScheme: (gradingScheme: GradingScheme) => void
   viewUsedLocations: (gradingScheme: GradingScheme) => void
-  handleGradingSchemeDelete: (gradingSchemeId: string) => void
+  openDuplicateModal: (gradingScheme: GradingScheme) => void
+  openDeleteModal: (gradingScheme: GradingScheme) => void
   defaultScheme?: boolean
 }
 export const GradingSchemeTable = ({
@@ -49,7 +50,8 @@ export const GradingSchemeTable = ({
   editGradingScheme,
   openGradingScheme,
   viewUsedLocations,
-  handleGradingSchemeDelete,
+  openDuplicateModal,
+  openDeleteModal,
   defaultScheme = false,
 }: Props) => {
   const [ascending, setAscending] = useState(true)
@@ -135,6 +137,7 @@ export const GradingSchemeTable = ({
                       withBorder={false}
                       withBackground={false}
                       screenReaderLabel={I18n.t('Duplicate Grading Scheme')}
+                      onClick={() => openDuplicateModal(gradingSchemeCard.gradingScheme)}
                     >
                       <IconDuplicateLine />
                     </IconButton>
@@ -159,9 +162,7 @@ export const GradingSchemeTable = ({
                           withBorder={false}
                           withBackground={false}
                           screenReaderLabel={I18n.t('Delete Grading Scheme')}
-                          onClick={() =>
-                            handleGradingSchemeDelete(gradingSchemeCard.gradingScheme.id)
-                          }
+                          onClick={() => openDeleteModal(gradingSchemeCard.gradingScheme)}
                         >
                           <IconTrashLine />
                         </IconButton>

@@ -18,59 +18,63 @@
 import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Modal} from '@instructure/ui-modal'
-import type {GradingScheme} from '../../gradingSchemeApiModel'
+import type {GradingScheme} from '@canvas/grading_scheme/gradingSchemeApiModel'
 import {Heading} from '@instructure/ui-heading'
-import {GradingSchemeView} from './view/GradingSchemeView'
-import {CloseButton, Button} from '@instructure/ui-buttons'
+import {TruncateText} from '@instructure/ui-truncate-text'
 import {Flex} from '@instructure/ui-flex'
+import {Button, CloseButton} from '@instructure/ui-buttons'
 
 const I18n = useI18nScope('GradingSchemeViewModal')
 
 type Props = {
   open: boolean
-  gradingScheme?: GradingScheme
-  handleClose: () => void
-  openDeleteModal: (gradingScheme: GradingScheme) => void
-  editGradingScheme: (gradingSchemeId: string) => void
-  canManageScheme: (gradingScheme: GradingScheme) => boolean
+  creatingGradingScheme: boolean
+  selectedGradingScheme?: GradingScheme
+  handleDuplicateScheme: (gradingScheme: GradingScheme) => void
+  handleCloseDuplicateModal: () => void
 }
-const GradingSchemeViewModal = ({
+const GradingSchemeDuplicateModal = ({
   open,
-  gradingScheme,
-  handleClose,
-  openDeleteModal,
-  editGradingScheme,
-  canManageScheme,
+  selectedGradingScheme,
+  creatingGradingScheme,
+  handleDuplicateScheme,
+  handleCloseDuplicateModal,
 }: Props) => {
-  if (!gradingScheme) {
+  if (!selectedGradingScheme) {
     return <></>
   }
   return (
-    <Modal as="form" open={open} onDismiss={handleClose} label={gradingScheme.title} size="small">
+    <Modal
+      as="form"
+      open={open}
+      onDismiss={handleCloseDuplicateModal}
+      label={I18n.t('Duplicate ') + selectedGradingScheme.title}
+      size="small"
+    >
       <Modal.Header>
         <CloseButton
           screenReaderLabel={I18n.t('Close')}
           placement="end"
           offset="small"
-          onClick={handleClose}
+          onClick={handleCloseDuplicateModal}
         />
-        <Heading>{gradingScheme.title}</Heading>
+        <Heading>
+          <TruncateText>{I18n.t('Duplicate ') + selectedGradingScheme.title}</TruncateText>
+        </Heading>
       </Modal.Header>
-      <Modal.Body>
-        <GradingSchemeView
-          gradingScheme={gradingScheme}
-          archivedGradingSchemesEnabled={true}
-          disableDelete={!canManageScheme(gradingScheme)}
-          disableEdit={!canManageScheme(gradingScheme)}
-          onDeleteRequested={() => openDeleteModal(gradingScheme)}
-          onEditRequested={() => editGradingScheme(gradingScheme.id)}
-        />
-      </Modal.Body>
+      <Modal.Body>{I18n.t('Are you sure you want to duplicate this grading scheme?')}</Modal.Body>
       <Modal.Footer>
         <Flex justifyItems="end">
           <Flex.Item>
-            <Button onClick={handleClose} margin="0 x-small 0 x-small">
+            <Button onClick={handleCloseDuplicateModal} margin="0 x-small">
               {I18n.t('Cancel')}
+            </Button>
+            <Button
+              onClick={() => handleDuplicateScheme(selectedGradingScheme)}
+              color="primary"
+              disabled={creatingGradingScheme}
+            >
+              {I18n.t('Duplicate')}
             </Button>
           </Flex.Item>
         </Flex>
@@ -79,4 +83,4 @@ const GradingSchemeViewModal = ({
   )
 }
 
-export default GradingSchemeViewModal
+export default GradingSchemeDuplicateModal

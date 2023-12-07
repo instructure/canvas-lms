@@ -34,7 +34,7 @@ type Props = {
   open: boolean
   gradingScheme?: GradingScheme
   handleCancelEdit: (gradingSchemeId: string) => void
-  handleGradingSchemeDelete: (gradingSchemeId: string) => void
+  openDeleteModal: (gradingScheme: GradingScheme) => void
   handleUpdateScheme: (
     gradingSchemeFormInput: GradingSchemeEditableData,
     gradingSchemeId: string
@@ -47,7 +47,7 @@ const GradingSchemeEditModal = ({
   open,
   gradingScheme,
   handleCancelEdit,
-  handleGradingSchemeDelete,
+  openDeleteModal,
   handleUpdateScheme,
   archivedGradingSchemesEnabled,
   defaultGradingSchemeTemplate,
@@ -108,9 +108,7 @@ const GradingSchemeEditModal = ({
       <Modal.Footer>
         <Flex justifyItems="end">
           <Flex.Item>
-            <Button onClick={() => handleGradingSchemeDelete(gradingScheme.id)}>
-              {I18n.t('Delete')}
-            </Button>
+            <Button onClick={() => openDeleteModal(gradingScheme)}>{I18n.t('Delete')}</Button>
             <Button onClick={() => handleCancelEdit(gradingScheme.id)} margin="0 x-small 0 x-small">
               {I18n.t('Cancel')}
             </Button>
