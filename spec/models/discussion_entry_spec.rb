@@ -739,7 +739,7 @@ describe DiscussionEntry do
 
     it "does not allow replies from students to topics locked based on date" do
       @entry = @topic.reply_from(user: @teacher, text: "topic")
-      @topic.unlock_at = 1.day.from_now
+      @topic.delayed_post_at = 1.day.from_now
       @topic.save!
       @entry.reply_from(user: @teacher, text: "reply") # should not raise error
       student_in_course(course: @course)

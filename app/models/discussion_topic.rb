@@ -849,8 +849,15 @@ class DiscussionTopic < ActiveRecord::Base
   }
 
   alias_attribute :available_from, :delayed_post_at
-  alias_attribute :unlock_at, :delayed_post_at
   alias_attribute :available_until, :lock_at
+
+  def unlock_at
+    Account.site_admin.feature_enabled?(:differentiated_modules) ? super : delayed_post_at
+  end
+
+  def unlock_at=(value)
+    Account.site_admin.feature_enabled?(:differentiated_modules) ? super : self.delayed_post_at = value
+  end
 
   def should_lock_yet
     # not assignment or vdd aware! only use this to check the topic's own field!
