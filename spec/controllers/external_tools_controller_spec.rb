@@ -1190,6 +1190,45 @@ describe ExternalToolsController do
       assert_unauthorized
     end
 
+    context "logging" do
+      before do
+        allow(Lti::LogService).to receive(:new) do
+          double("Lti::LogService").tap { |s| allow(s).to receive(:call) }
+        end
+        user_session(@teacher)
+      end
+
+      context "when placement is provided" do
+        let(:placement) { "assignment_selection" }
+
+        it "logs launch with placement and indirect_link launch_type" do
+          expect(Lti::LogService).to receive(:new).with(
+            tool:,
+            context: @course,
+            user: @teacher,
+            placement:,
+            launch_type: :indirect_link
+          )
+
+          get "retrieve", params: { course_id: @course.id, url: tool.url, placement: }
+        end
+      end
+
+      context "when placement isn't provided (like rich content)" do
+        it "logs launch with no placement and content_item launch_type" do
+          expect(Lti::LogService).to receive(:new).with(
+            tool:,
+            context: @course,
+            user: @teacher,
+            placement: nil,
+            launch_type: :content_item
+          )
+
+          get "retrieve", params: { course_id: @course.id, url: tool.url }
+        end
+      end
+    end
+
     it "passes prefer_1_1=false to find_external_tool by default when looking up by URL" do
       user_session(@teacher)
       expect(ContextExternalTool).to receive(:find_external_tool).with(
@@ -1667,6 +1706,25 @@ describe ExternalToolsController do
       user_session(@user)
       get "resource_selection", params: { course_id: @course.id, external_tool_id: 0 }
       assert_unauthorized
+    end
+
+    it "logs the launch" do
+      allow(Lti::LogService).to receive(:new) do
+        double("Lti::LogService").tap { |s| allow(s).to receive(:call) }
+      end
+
+      user_session(@teacher)
+      tool = new_valid_tool(@course)
+
+      expect(Lti::LogService).to receive(:new).with(
+        tool:,
+        context: @course,
+        user: @teacher,
+        placement: "resource_selection",
+        launch_type: :resource_selection
+      )
+
+      get "resource_selection", params: { course_id: @course.id, external_tool_id: tool.id }
     end
 
     it "is accessible by students" do
@@ -2595,6 +2653,7 @@ describe ExternalToolsController do
       expect(response).to be_successful
 
       expect(launch_settings["launch_url"]).to eq "http://www.example.com/basic_lti"
+      expect(launch_settings.dig("metadata", "launch_type")).to eq "direct_link"
       expect(launch_settings["tool_name"]).to eq "bob"
       expect(launch_settings["analytics_id"]).to eq "some_tool"
       expect(tool_settings["custom_canvas_course_id"]).to eq @course.id.to_s
@@ -2658,6 +2717,7 @@ describe ExternalToolsController do
         expect(response).to be_successful
 
         expect(launch_settings["launch_url"]).to eq "http://www.example.com/basic_lti"
+        expect(launch_settings.dig("metadata", "launch_type")).to eq "content_item"
         expect(launch_settings["tool_name"]).to eq "bob"
         expect(launch_settings["analytics_id"]).to eq "some_tool"
         expect(tool_settings["custom_canvas_course_id"]).to eq @course.id.to_s
@@ -2697,6 +2757,14 @@ describe ExternalToolsController do
         get :generate_sessionless_launch, params: { course_id: @course.id, id: tool.id, url: provided_url }
         expect(response).to be_successful
         expect(launch_settings["launch_url"]).to eq provided_url
+      end
+    end
+
+    context "with only launch url" do
+      it "is successful" do
+        get :generate_sessionless_launch, params: { course_id: @course.id, url: tool.url }
+        expect(response).to be_successful
+        expect(launch_settings.dig("metadata", "launch_type")).to eq "indirect_link"
       end
     end
 
@@ -2792,6 +2860,7 @@ describe ExternalToolsController do
 
       expect(launch_settings["tool_settings"]["resource_link_id"]).to eq opaque_id(@tg)
       expect(launch_settings["tool_settings"]["resource_link_title"]).to eq "my module item title"
+      expect(launch_settings.dig("metadata", "launch_type")).to eq "content_item"
     end
 
     it "makes the module item available for variable expansions" do
@@ -2859,7 +2928,7 @@ describe ExternalToolsController do
         expect(response).to be_successful
 
         expect(url.path).to eq("#{course_external_tools_path(@course)}/#{tool.id}")
-        expect(url.query).to match(/^display=borderless&session_token=[0-9a-zA-Z_-]+$/)
+        expect(url.query).to match(/session_token=[0-9a-zA-Z_-]+/)
         expect(session_token.pseudonym_id).to eq(login_pseudonym.global_id)
       end
 
@@ -3123,6 +3192,18 @@ describe ExternalToolsController do
   end
 
   describe "#sessionless_launch" do
+    let(:tool) do
+      new_valid_tool(@course).tap do |t|
+        t.course_navigation = { enabled: true }
+        t.save!
+      end
+    end
+    let(:verifier) do
+      get :generate_sessionless_launch, params: { course_id: @course.id, id: tool.id, launch_type: :course_navigation }
+      json = response.parsed_body
+      CGI.parse(URI.parse(json["url"]).query)["verifier"].first
+    end
+
     before do
       allow(BasicLTI::Sourcedid).to receive(:encryption_secret) { "encryption-secret-5T14NjaTbcYjc4" }
       allow(BasicLTI::Sourcedid).to receive(:signing_secret) { "signing-secret-vp04BNqApwdwUYPUI" }
@@ -3130,17 +3211,24 @@ describe ExternalToolsController do
     end
 
     it "generates a sessionless launch" do
-      @tool = new_valid_tool(@course)
-
-      get :generate_sessionless_launch, params: { course_id: @course.id, id: @tool.id }
-
-      expect(response).to be_successful
-
-      json = response.parsed_body
-      verifier = CGI.parse(URI.parse(json["url"]).query)["verifier"].first
-
       expect(controller).to receive(:log_asset_access).once
       get :sessionless_launch, params: { course_id: @course.id, verifier: }
+    end
+
+    it "logs the launch" do
+      allow(Lti::LogService).to receive(:new) do
+        double("Lti::LogService").tap { |s| allow(s).to receive(:call) }
+      end
+
+      get :sessionless_launch, params: { course_id: @course.id, verifier: }
+
+      expect(Lti::LogService).to have_received(:new).with(
+        tool:,
+        context: @course,
+        user: @user,
+        placement: "course_navigation",
+        launch_type: :direct_link
+      )
     end
   end
 

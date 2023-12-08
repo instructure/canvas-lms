@@ -108,7 +108,7 @@ module Lti::Concerns
       elsif (options[:launch_url] || options[:lookup_id]) && options[:id].blank? && options[:launch_type].blank?
         retrieve_launch_link(context, session_token, options[:launch_url], options[:lookup_id])
       else
-        course_or_account_launch_link(context, tool, session_token, options[:launch_url])
+        course_or_account_launch_link(context, tool, session_token, options[:launch_url], options[:launch_type])
       end
     end
 
@@ -146,7 +146,7 @@ module Lti::Concerns
       )
     end
 
-    def course_or_account_launch_link(context, tool, session_token, launch_url)
+    def course_or_account_launch_link(context, tool, session_token, launch_url, launch_type)
       context_type = context.class.to_s.downcase
       send(
         :"#{context_type}_external_tool_url",
@@ -155,7 +155,8 @@ module Lti::Concerns
         display: :borderless,
         session_token:,
         sessionless_source:,
-        launch_url:
+        launch_url:,
+        launch_type:
       )
     end
 
