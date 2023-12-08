@@ -2202,6 +2202,7 @@ CanvasRails::Application.routes.draw do
     scope(controller: :outcome_results) do
       get "courses/:course_id/outcome_rollups", action: :rollups, as: "course_outcome_rollups"
       get "courses/:course_id/outcome_results", action: :index, as: "course_outcome_results"
+      post "courses/:course_id/assign_outcome_order", action: :outcome_order, as: "course_outcomes_order"
     end
 
     scope(controller: :outcomes_academic_benchmark_import_api) do
