@@ -2365,7 +2365,7 @@ describe DiscussionTopic do
     it "does not allow replies from students to topics locked based on date" do
       course_with_teacher(active_all: true)
       discussion_topic_model(context: @course)
-      @topic.unlock_at = 1.day.from_now
+      @topic.delayed_post_at = 1.day.from_now
       @topic.save!
       @topic.reply_from(user: @teacher, text: "reply") # should not raise error
       student_in_course(course: @course).accept!
