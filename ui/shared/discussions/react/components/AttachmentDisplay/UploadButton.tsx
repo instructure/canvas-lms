@@ -35,10 +35,11 @@ export const UploadButton = ({...props}: Props) => {
   const attachmentInput = useRef<HTMLInputElement | null>(null)
 
   const handleAttachmentClick = () => {
-    if (attachmentInput instanceof HTMLInputElement) {
-      attachmentInput.click()
+    if (attachmentInput?.current instanceof HTMLInputElement) {
+      attachmentInput.current.click()
     }
   }
+
   return props.attachmentToUpload ? (
     <>
       <Spinner
