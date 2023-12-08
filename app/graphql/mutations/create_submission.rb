@@ -134,14 +134,28 @@ class Mutations::CreateSubmission < Mutations::BaseMutation
         owning_user = current_user
       end
       file_ids = (input[:file_ids] || []).compact.uniq
-      attachments = owning_user&.submittable_attachments&.active&.where(id: file_ids) || []
-      unless file_ids.size == attachments.size
-        attachment_ids = attachments.map(&:id)
+      error_files = []
+      attachments = []
+      file_ids.each do |file_id|
+        attachment = Attachment.active.where(context_type: "User", context_id: owning_user&.id).find_by(id: file_id)
+        attachment ||= Attachment.active.where(
+          context_type: "Group",
+          context_id: GroupMembership.where(workflow_state: "accepted", user_id: [owning_user&.id, owning_user&.global_id]).select(:group_id)
+        ).find_by(id: file_id)
+
+        if attachment
+          attachments << attachment
+        else
+          error_files << file_id
+        end
+      end
+
+      if error_files.present?
         return(
           validation_error(
             I18n.t(
               "No attachments found for the following ids: %{ids}",
-              { ids: file_ids - attachment_ids.map(&:to_s) }
+              { ids: error_files }
             ),
             attribute: "file_ids"
           )

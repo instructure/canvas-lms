@@ -8554,7 +8554,7 @@ nl:
     public: "Openbaar "
     student_summary: 
       not_sorted: "Overzichtstabel voor cursist"
-    student_view_student_name: "Cursist toetsen"
+    student_view_student_name: Testcursist
     syllabus: Syllabus
     wiki_permissions: 
       all: Iedereen
