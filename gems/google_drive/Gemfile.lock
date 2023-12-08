@@ -45,7 +45,7 @@ GEM
     hashdiff (1.0.1)
     httpclient (2.8.3)
     io-console (0.6.0)
-    irb (1.10.0)
+    irb (1.10.1)
       rdoc
       reline (>= 0.3.8)
     jwt (2.7.1)
@@ -56,7 +56,7 @@ GEM
       stringio
     public_suffix (5.0.4)
     rake (13.1.0)
-    rdoc (6.6.0)
+    rdoc (6.6.1)
       psych (>= 4.0.0)
     reline (0.4.1)
       io-console (~> 0.5)
