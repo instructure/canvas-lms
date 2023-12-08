@@ -189,6 +189,9 @@ class ExternalToolsController < ApplicationController
         return
       end
 
+      launch_type = placement.present? ? :indirect_link : :content_item
+      Lti::LogService.new(tool:, context: @context, user: @current_user, placement:, launch_type:).call
+
       display_override = params["borderless"] ? "borderless" : params[:display]
       render Lti::AppUtil.display_template(@tool.display_type(placement), display_override:)
       timing_meta.tags = { lti_version: tool&.lti_version }.compact
@@ -342,16 +345,20 @@ class ExternalToolsController < ApplicationController
       end
 
       launch_settings = JSON.parse(launch_settings)
-      if (tool = ContextExternalTool.find_external_tool(launch_settings["launch_url"], @context))
-        log_asset_access(tool, "external_tools", "external_tools", overwrite: false)
-      end
-
       @lti_launch = Lti::Launch.new
       @lti_launch.params = launch_settings["tool_settings"]
       @lti_launch.resource_url = launch_settings["launch_url"]
       @lti_launch.link_text =  launch_settings["tool_name"]
       @lti_launch.analytics_id = launch_settings["analytics_id"]
-      InstStatsd::Statsd.increment("lti.launch", tags: { lti_version: tool&.lti_version, type: :sessionless_launch })
+
+      tool = ContextExternalTool.where(id: launch_settings.dig("metadata", "tool_id")).first ||
+             ContextExternalTool.find_external_tool(launch_settings["launch_url"], @context)
+      if tool
+        placement = launch_settings.dig("metadata", "placement")
+        launch_type = launch_settings.dig("metadata", "launch_type")&.to_sym
+        Lti::LogService.new(tool:, context: @context, user: @current_user, placement:, launch_type:).call
+        log_asset_access(tool, "external_tools", "external_tools", overwrite: false)
+      end
 
       render Lti::AppUtil.display_template("borderless")
       timing_meta.tags = { lti_version: tool&.lti_version }.compact
@@ -490,6 +497,8 @@ class ExternalToolsController < ApplicationController
         js_env(LTI_LAUNCH_RESOURCE_URL: @lti_launch.resource_url)
         set_tutorial_js_env
 
+        Lti::LogService.new(tool: @tool, context: @context, user: @current_user, placement:, launch_type: :direct_link).call
+
         render Lti::AppUtil.display_template(@tool.display_type(placement), display_override: params[:display])
         timing_meta.tags = { lti_version: @tool&.lti_version }.compact
       end
@@ -548,6 +557,8 @@ class ExternalToolsController < ApplicationController
         timing_meta.tags = { error: true, lti_version: @tool&.lti_version }.compact
         return
       end
+
+      Lti::LogService.new(tool: @tool, context: @context, user: @current_user, placement: selection_type, launch_type: :resource_selection).call
 
       render Lti::AppUtil.display_template("borderless")
       timing_meta.tags = { lti_version: @tool&.lti_version }.compact
@@ -775,7 +786,6 @@ class ExternalToolsController < ApplicationController
     lti_launch.resource_url = opts[:launch_url] || adapter.launch_url
     lti_launch.link_text = selection_type ? tool.label_for(selection_type.to_sym, I18n.locale) : tool.default_label
     lti_launch.analytics_id = tool.tool_id
-    InstStatsd::Statsd.increment("lti.launch", tags: { lti_version: tool.lti_version, type: :standard })
 
     lti_launch
   end
@@ -819,7 +829,6 @@ class ExternalToolsController < ApplicationController
     )
     lti_launch.link_text = tool.label_for(placement.to_sym)
     lti_launch.analytics_id = tool.tool_id
-    InstStatsd::Statsd.increment("lti.launch", tags: { lti_version: tool.lti_version, type: :content_item_selection })
 
     lti_launch
   end
@@ -854,7 +863,6 @@ class ExternalToolsController < ApplicationController
 
     expander = Lti::PrivacyLevelExpander.new(placement, base_expander)
 
-    InstStatsd::Statsd.increment("lti.launch", tags: { lti_version: tool.lti_version, type: :content_item_selection_request })
     selection_request.generate_lti_launch(
       placement:,
       expanded_variables: expander.expanded_variables!(tool.set_custom_fields(placement)),
@@ -1528,6 +1536,11 @@ class ExternalToolsController < ApplicationController
         render_unauthorized_action
       end
     else
+      metadata = {
+        placement: launch_type,
+        launch_type: tool_id.present? ? :direct_link : :indirect_link,
+        tool_id:
+      }
       # generate the launch
       opts = {
         launch_url: @tool.url_with_environment_overrides(launch_url),
@@ -1535,6 +1548,7 @@ class ExternalToolsController < ApplicationController
       }
       if module_item || assignment
         opts[:link_code] = @tool.opaque_identifier_for(module_item || assignment.external_tool_tag)
+        metadata[:launch_type] = :content_item
       end
 
       opts[:overrides] = {
@@ -1552,22 +1566,23 @@ class ExternalToolsController < ApplicationController
         opts
       )
 
+      tool_settings = if assignment
+                        adapter.generate_post_payload_for_assignment(
+                          assignment,
+                          lti_grade_passback_api_url(@tool),
+                          blti_legacy_grade_passback_api_url(@tool),
+                          lti_turnitin_outcomes_placement_url(@tool.id)
+                        )
+                      else
+                        adapter.generate_post_payload
+                      end
       launch_settings = {
-        "launch_url" => adapter.launch_url(post_only: @tool.settings["post_only"]),
-        "tool_name" => @tool.name,
-        "analytics_id" => @tool.tool_id
+        launch_url: adapter.launch_url(post_only: @tool.settings["post_only"]),
+        tool_name: @tool.name,
+        analytics_id: @tool.tool_id,
+        tool_settings:,
+        metadata:
       }
-
-      launch_settings["tool_settings"] = if assignment
-                                           adapter.generate_post_payload_for_assignment(
-                                             assignment,
-                                             lti_grade_passback_api_url(@tool),
-                                             blti_legacy_grade_passback_api_url(@tool),
-                                             lti_turnitin_outcomes_placement_url(@tool.id)
-                                           )
-                                         else
-                                           adapter.generate_post_payload
-                                         end
 
       # store the launch settings and return to the user
       verifier = cache_launch(launch_settings, @context, prefix: Lti::RedisMessageClient::SESSIONLESS_LAUNCH_PREFIX)

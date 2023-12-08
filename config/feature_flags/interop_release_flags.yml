@@ -227,3 +227,15 @@ lti_unique_tool_form_ids:
     When enabled, the hidden HTML forms that are used to trigger an LTI launch
     will each have a random number appended to their id. When disabled, each
     one has the same id of tool_form.
+lti_log_launches:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Log LTI launches
+  description: |-
+    When enabled, sends data for all LTI launches to the PandataEvents system
+    for querying and visualization.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on

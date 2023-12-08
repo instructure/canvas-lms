@@ -1494,6 +1494,22 @@ RSpec.describe ApplicationController do
           end
         end
 
+        it "logs the launch" do
+          allow(Lti::LogService).to receive(:new) do
+            double("Lti::LogService").tap { |s| allow(s).to receive(:call) }
+          end
+
+          controller.send(:content_tag_redirect, course, content_tag, nil)
+
+          expect(Lti::LogService).to have_received(:new).with(
+            tool:,
+            context: course,
+            user:,
+            placement: nil,
+            launch_type: :content_item
+          )
+        end
+
         it "returns the full path for the redirect url" do
           expect(controller).to receive(:named_context_url).with(course, :context_url, { include_host: true })
           expect(controller).to receive(:named_context_url).with(
