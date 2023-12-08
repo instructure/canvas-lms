@@ -3,8 +3,6 @@
   "private": true,
   "version": "1.0.0",
   "author": "neme",
-  "main": "./react/index.jsx",
-  "canvas": {
-    "component": "enrollments"
-  }
+  "owner": "FOO",
+  "main": "./react/index.jsx"
 }

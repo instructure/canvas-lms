@@ -3,5 +3,6 @@
   "private": true,
   "version": "1.0.0",
   "author": "neme",
-  "main": "./index.js"
+  "main": "./index.js",
+  "owner": "OUT"
 }
