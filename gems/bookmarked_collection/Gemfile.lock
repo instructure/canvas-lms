@@ -63,7 +63,7 @@ GEM
     irb (1.10.0)
       rdoc
       reline (>= 0.3.8)
-    json (2.7.0)
+    json (2.7.1)
     loofah (2.22.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
