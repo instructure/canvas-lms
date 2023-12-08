@@ -225,6 +225,15 @@ RSpec.describe Mutations::CreateSubmission do
       expect(result.dig(:data, :createSubmission, :submission, :_id)).to eq Submission.last.id.to_s
     end
 
+    it "allows cross-shard users to upload non-group assignments" do
+      @assignment.update!(submission_types: "online_upload")
+      @cross_shard_student = @shard2.activate { user_factory(name: "Shard2 User") }
+      @attachment3 = attachment_with_context(@cross_shard_student)
+      @course.enroll_user(@cross_shard_student, "StudentEnrollment", enrollment_state: "active")
+      result = run_mutation({ submission_type: "online_upload", file_ids: [@attachment3.id], assignment_id: @assignment.id }, @cross_shard_student)
+      expect(result.dig(:data, :createSubmission, :submission, :_id)).to eq Submission.last.id.to_s
+    end
+
     it "logs as a proxy submission if student_id if provided" do
       teacher_role =
         Role.get_built_in_role("TeacherEnrollment", root_account_id: Account.default.id)
