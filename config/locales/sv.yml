@@ -9360,7 +9360,7 @@ sv:
       sis_source_id: "SIS ID"
       tab_cant_disable: "Sidan kan inte inaktiveras, enbart döljas"
       tab_disabled: "Sidan har inaktiverats, dirigerar om till kursens startsida"
-      tab_hidden_if_disabled: "Kursen har inaktiverats, syns inte i navigeringen"
+      tab_hidden_if_disabled: "Sidan har inaktiverats, syns inte i navigeringen"
       tab_hidden_if_disabled_k5: "Fliken är inaktiverad och visas inte i ämnesnavigeringen"
       tabs: 
         alerts: Notiser
