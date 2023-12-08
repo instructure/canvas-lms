@@ -3,6 +3,7 @@
   "version": "5.11.1",
   "description": "A component wrapping Canvas's usage of Tinymce",
   "main": "es/index.js",
+  "owner": "LF",
   "scripts": {
     "i18n:extract": "format-message extract \"src/**/*.[jt]s*\" -g underscored_crc32 -o locales/en.json",
     "integration-test": "nightwatch --env integration",

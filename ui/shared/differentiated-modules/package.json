@@ -3,5 +3,6 @@
     "private": true,
     "version": "1.0.0",
     "author": "Learning Foundations",
-    "main": "index.ts"
+    "main": "index.ts",
+    "owner": "LF"
 }
