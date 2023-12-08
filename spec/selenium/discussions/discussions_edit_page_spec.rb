@@ -440,6 +440,14 @@ describe "discussions" do
           expect(updated_assignment.automatic_peer_reviews).to be false
           expect(updated_assignment.peer_reviews_assign_at).to be_nil
         end
+
+        it "adds an attachment to a graded discussion" do
+          get "/courses/#{course.id}/discussion_topics/#{assignment_topic.id}/edit"
+          _filename, fullpath, _data = get_file("testfile5.zip")
+          f("input[data-testid='attachment-input']").send_keys(fullpath)
+          fj("button:contains('Save')").click
+          expect(assignment_topic.reload.attachment_id).to eq Attachment.last.id
+        end
       end
     end
   end
