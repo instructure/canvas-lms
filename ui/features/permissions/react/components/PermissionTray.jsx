@@ -116,46 +116,48 @@ export default function PermissionTray(props) {
         onClick={props.hideTray}
       />
 
-      <View as="div" padding="small small x-large small">
-        <Heading level="h3" as="h2" margin="0 0 medium 0">
-          {props.label}
-        </Heading>
-        {props.permissionName && (
-          <PermissionDetailToggles tab={props.tab} permissionName={props.permissionName} />
-        )}
-        {props.assignedRoles.length !== 0 && (
-          <RoleTrayTable title={I18n.t('Assigned Roles')}>
-            {props.assignedRoles.map(role => (
-              <RoleTrayTableRow
-                key={role.label}
-                title={role.label}
-                description=""
-                expandable={false}
-                permissionName={props.permissionName}
-                permissionLabel={props.label}
-                permission={role.permissions[props.permissionName]}
-                role={role}
-              />
-            ))}
-          </RoleTrayTable>
-        )}
-        {props.unassignedRoles.length !== 0 && (
-          <RoleTrayTable title={I18n.t('Unassigned Roles')}>
-            {props.unassignedRoles.map(role => (
-              <RoleTrayTableRow
-                key={role.label}
-                title={role.label}
-                description=""
-                expandable={false}
-                permissionName={props.permissionName}
-                permissionLabel={props.label}
-                permission={role.permissions[props.permissionName]}
-                role={role}
-              />
-            ))}
-          </RoleTrayTable>
-        )}
-      </View>
+      {props.label.length > 0 && (
+        <View as="div" padding="small small x-large small">
+          <Heading level="h3" as="h2" margin="0 0 medium 0">
+            {props.label}
+          </Heading>
+          {props.permissionName && (
+            <PermissionDetailToggles tab={props.tab} permissionName={props.permissionName} />
+          )}
+          {props.assignedRoles.length !== 0 && (
+            <RoleTrayTable title={I18n.t('Assigned Roles')}>
+              {props.assignedRoles.map(role => (
+                <RoleTrayTableRow
+                  key={role.label}
+                  title={role.label}
+                  description=""
+                  expandable={false}
+                  permissionName={props.permissionName}
+                  permissionLabel={props.label}
+                  permission={role.permissions[props.permissionName]}
+                  role={role}
+                />
+              ))}
+            </RoleTrayTable>
+          )}
+          {props.unassignedRoles.length !== 0 && (
+            <RoleTrayTable title={I18n.t('Unassigned Roles')}>
+              {props.unassignedRoles.map(role => (
+                <RoleTrayTableRow
+                  key={role.label}
+                  title={role.label}
+                  description=""
+                  expandable={false}
+                  permissionName={props.permissionName}
+                  permissionLabel={props.label}
+                  permission={role.permissions[props.permissionName]}
+                  role={role}
+                />
+              ))}
+            </RoleTrayTable>
+          )}
+        </View>
+      )}
     </Tray>
   )
 }
