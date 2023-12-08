@@ -100,6 +100,7 @@ function OutcomeGradebookView(options) {
   this._toggleStudentsWithInactiveEnrollments =
     this._toggleStudentsWithInactiveEnrollments.bind(this)
   this._toggleStudentsWithNoResults = this._toggleStudentsWithNoResults.bind(this)
+  this.setOutcomeOrder = this.setOutcomeOrder.bind(this)
   let ref
   OutcomeGradebookView.__super__.constructor.apply(this, arguments)
   this._validateOptions(options)
@@ -282,6 +283,7 @@ OutcomeGradebookView.prototype._toggleSort = function (e, arg) {
 OutcomeGradebookView.prototype._attachGridEvents = function () {
   this.grid.onHeaderRowCellRendered.subscribe(Grid.Events.headerRowCellRendered)
   this.grid.onHeaderCellRendered.subscribe(Grid.Events.headerCellRendered)
+  this.grid.onColumnsReordered.subscribe(this.setOutcomeOrder)
   return this.grid.onSort.subscribe(this._toggleSort)
 }
 
@@ -478,6 +480,38 @@ OutcomeGradebookView.prototype._rollupsUrl = function (course, exclude, page) {
     page +
     sortParams +
     sectionParam
+  )
+}
+
+// Public: Set ordering for outcome columns in gradebook grid
+//
+// Returns nothing.
+OutcomeGradebookView.prototype.setOutcomeOrder = function () {
+
+  const course_id = ENV.context_asset_string.split('_')[1]
+  const columns = this.grid.getColumns().slice()
+
+  // save ordering of columns to grid for frontend state
+  this.columns = columns.slice()
+
+  // Need to remove first column because it is the student column
+  columns.shift()
+
+  const outcomes = columns.map((c, index) => {
+    return {
+      outcome_id: parseInt(c.outcome.id),
+      position: index + 1,
+    }
+  })
+
+  $.post(this._assignOrderUrl(course_id), JSON.stringify(outcomes))
+
+  return Grid.View.redrawHeader(this.grid, Grid.averageFn)
+}
+
+OutcomeGradebookView.prototype._assignOrderUrl = function (course) {
+  return (
+    `/api/v1/courses/${course}/assign_outcome_order`
   )
 }
 
