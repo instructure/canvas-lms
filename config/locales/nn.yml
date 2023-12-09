@@ -27114,6 +27114,7 @@ nn:
   zero_activity_title: "Null aktivitet"
   zip_26961da: zip
   zip_argument_error: "Ei ZIP-opplasting må ha ei mappe å laste opp til."
+  zip_file_3e736239: "Zip fil"
   zip_file_description: "Overføringsprogramtillegg for utpakking av ZIP-arkiv til emne, gruppe eller brukarfiler"
   zip_file_display: Filimport
   zip_file_file_description: "Pakk ut ZIP-fil til mappe"
