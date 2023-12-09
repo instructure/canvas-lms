@@ -162,7 +162,6 @@
     "redux": "^4",
     "redux-batch-middleware": "^0.2.0",
     "redux-thunk": "^2",
-    "scroll-into-view": "https://github.com/bkirkby/scroll-into-view.git#588b0ced98eeecf84e6fb2074aa076e80b7cffab",
     "text-field-edit": "^3.2.0",
     "tinymce": "^5",
     "uri-js": "^4.2.2",

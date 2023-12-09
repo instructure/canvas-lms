@@ -22776,7 +22776,7 @@ qunitjs@^1.23.0:
   resolved "https://registry.yarnpkg.com/qunitjs/-/qunitjs-1.23.1.tgz#1971cf97ac9be01a64d2315508d2e48e6fd4e719"
   integrity sha1-GXHPl6yb4Bpk0jFVCNLkjm/U5xk=
 
-raf@^3.1.0, raf@^3.4.1:
+raf@^3.4.1:
   version "3.4.1"
   resolved "https://registry.yarnpkg.com/raf/-/raf-3.4.1.tgz#0742e99a4a6552f445d73e3ee0328af0ff1ede39"
   integrity sha512-Sq4CW4QhwOHE8ucn6J34MqtZCeWFP2aQSmrlroYgqAV1PjStIhJXxYuTgUIfkEk7zTLjmIjLmU5q+fbD1NnOJA==
@@ -24420,12 +24420,6 @@ script-loader@^0.7:
   integrity sha512-UMNLEvgOAQuzK8ji8qIscM3GIrRCWN6MmMXGD4SD5l6cSycgGsCo0tX5xRnfQcoghqct0tjHjcykgI1PyBE2aA==
   dependencies:
     raw-loader "~0.5.1"
-
-"scroll-into-view@https://github.com/bkirkby/scroll-into-view.git#588b0ced98eeecf84e6fb2074aa076e80b7cffab":
-  version "1.7.4"
-  resolved "https://github.com/bkirkby/scroll-into-view.git#588b0ced98eeecf84e6fb2074aa076e80b7cffab"
-  dependencies:
-    raf "^3.1.0"
 
 scroll-smooth@1.1.0:
   version "1.1.0"
