@@ -317,6 +317,19 @@ module Lti
                        },
                        default_name: "com_instructure_rcs_app_host"
 
+    # Returns true if the User is from student view process
+    #
+    # @example
+    #   ```
+    #  "true"
+    #  "false"
+    #   ```
+    register_expansion "com.instructure.User.student_view",
+                       [],
+                       -> { @current_user.fake_student? || false },
+                       USER_GUARD,
+                       default_name: "com_instructure_user_student_view"
+
     # Returns the RCS Service JWT for the current user
     #
     # @internal
