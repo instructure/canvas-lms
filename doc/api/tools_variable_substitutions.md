@@ -251,6 +251,13 @@ Returns the host of the rich content service for the current region.
 ```
 "rich-content-iad.inscloudgate.net"
 ```
+## com.instructure.User.student_view
+Returns true if the user is launching from student view.
+
+**Availability**: *always*  
+**Launch Parameter**: *com_instructure_user_student_view*  
+
+```
 ## com.instructure.Observee.sisIds
 returns all observee ids linked to this observer as an String separated by `,`.
 
