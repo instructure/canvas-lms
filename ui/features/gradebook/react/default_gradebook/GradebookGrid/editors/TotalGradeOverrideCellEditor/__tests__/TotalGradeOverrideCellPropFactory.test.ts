@@ -23,7 +23,7 @@ import GradeOverrideEntry from '@canvas/grading/GradeEntry/GradeOverrideEntry'
 import GradeOverrideInfo from '@canvas/grading/GradeEntry/GradeOverrideInfo'
 import FinalGradeOverrides from '../../../../FinalGradeOverrides/index'
 import TotalGradeOverrideCellPropFactory from '../TotalGradeOverrideCellPropFactory'
-import {DeprecatedGradingScheme} from '@canvas/grading/grading'
+import type {DeprecatedGradingScheme} from '@canvas/grading/grading.d'
 import useStore from '../../../../stores'
 
 const mockTotalGradeOverrideStore = (state = {}) => {

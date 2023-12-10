@@ -46,7 +46,7 @@ import type {DeepLinkResponse} from '@canvas/deep-linking/DeepLinkResponse'
 import {contentItemProcessorPrechecks} from '@canvas/deep-linking/ContentItemProcessor'
 import type {ResourceLinkContentItem} from '@canvas/deep-linking/models/ResourceLinkContentItem'
 import type {EnvContextModules} from '@canvas/global/env/EnvContextModules'
-import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import replaceTags from '@canvas/util/replaceTags'
 
 // @ts-expect-error

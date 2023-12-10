@@ -17,12 +17,12 @@
  */
 
 import _ from 'lodash'
-import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import type {
   AssignmentGroupCriteriaMap,
   CamelizedGradingPeriodSet,
   SubmissionGradeCriteria,
-} from '@canvas/grading/grading'
+} from '@canvas/grading/grading.d'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import round from '@canvas/round'
 import tz from '@canvas/timezone'

@@ -39,7 +39,7 @@ import {actions as blackoutDateActions} from '../../../shared/actions/blackout_d
 import {getBlackoutDates} from '../../../shared/reducers/blackout_dates'
 import {getResponsiveSize, getSyncing} from '../../../reducers/ui'
 import {EnvCoursePaces} from '@canvas/global/env/EnvCoursePaces'
-import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 
 import type {ButtonProps} from '@instructure/ui-buttons'
 

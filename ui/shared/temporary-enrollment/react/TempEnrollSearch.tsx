@@ -32,7 +32,7 @@ import {createAnalyticPropsGenerator} from './util/analytics'
 import {TempEnrollAvatar} from './TempEnrollAvatar'
 import {EMPTY_USER, MODULE_NAME} from './types'
 import type {User} from './types'
-import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 
 declare const ENV: GlobalEnv
 

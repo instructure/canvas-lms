@@ -22,7 +22,7 @@ import type {
   DeprecatedGradingScheme,
   FinalGradeOverride,
   GradeEntryOptions,
-} from '@canvas/grading/grading'
+} from '@canvas/grading/grading.d'
 import {TextInput} from '@instructure/ui-text-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import GradeOverrideEntry from '@canvas/grading/GradeEntry/GradeOverrideEntry'

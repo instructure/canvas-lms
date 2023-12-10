@@ -17,7 +17,7 @@
  */
 
 import {sendMessageStudentsWho} from './shared/grading/messageStudentsWhoHelper'
-import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import {GlobalInst} from '@canvas/global/inst/GlobalInst'
 
 declare global {
