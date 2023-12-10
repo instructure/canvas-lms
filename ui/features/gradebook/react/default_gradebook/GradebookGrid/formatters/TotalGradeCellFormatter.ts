@@ -26,7 +26,7 @@ import htmlEscape from 'html-escape'
 import listFormatterPolyfill from '@canvas/util/listFormatter'
 import type Gradebook from '../../Gradebook'
 import type {Assignment} from '../../../../../../api.d'
-import type {DeprecatedGradingScheme} from '@canvas/grading/grading'
+import type {DeprecatedGradingScheme} from '@canvas/grading/grading.d'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 
 const I18n = useI18nScope('gradebook')

@@ -54,7 +54,7 @@ import type {
   User,
 } from './types'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import type {EnvCommon} from '@canvas/global/env/EnvCommon'
 import {TempEnrollAvatar} from './TempEnrollAvatar'
 import {

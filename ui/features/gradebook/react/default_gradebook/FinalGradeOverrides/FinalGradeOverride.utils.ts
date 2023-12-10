@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {FinalGradeOverrideMap} from '@canvas/grading/grading'
+import type {FinalGradeOverrideMap} from '@canvas/grading/grading.d'
 
 export const gradeOverrideCustomStatus = (
   finalGradeOverrides: FinalGradeOverrideMap,

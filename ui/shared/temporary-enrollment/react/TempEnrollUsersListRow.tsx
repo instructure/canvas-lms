@@ -33,7 +33,7 @@ import {TempEnrollModal} from './TempEnrollModal'
 import {createAnalyticPropsGenerator} from './util/analytics'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
-import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import type {EnvCommon} from '@canvas/global/env/EnvCommon'
 
 declare const ENV: GlobalEnv & EnvCommon

@@ -20,7 +20,7 @@ import round from '@canvas/round'
 import I18n from '@canvas/i18n'
 import {scoreToPercentage, scoreToScaledPoints} from '@canvas/grading/GradeCalculationHelper'
 import Gradebook from '../../Gradebook'
-import type {DeprecatedGradingScheme} from '@canvas/grading/grading'
+import type {DeprecatedGradingScheme} from '@canvas/grading/grading.d'
 
 function getGradePercentage(score: number, pointsPossible: number) {
   const grade = scoreToPercentage(score, pointsPossible)
