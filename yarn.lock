@@ -19956,7 +19956,7 @@ moment-timezone-data-webpack-plugin@^1.5.0:
     find-cache-dir "^3.0.0"
     make-dir "^3.0.0"
 
-moment-timezone@^0.5, moment-timezone@^0.5.13, moment-timezone@^0.5.40, moment-timezone@^0.5.43:
+moment-timezone@^0.5, moment-timezone@^0.5.13, moment-timezone@^0.5.43:
   version "0.5.43"
   resolved "https://registry.yarnpkg.com/moment-timezone/-/moment-timezone-0.5.43.tgz#3dd7f3d0c67f78c23cd1906b9b2137a09b3c4790"
   integrity sha512-72j3aNyuIsDxdF1i7CEgV2FfxM1r6aaqJyLB2vwb33mXYyoyLly+F1zbWqhA3/bVIoJ4szlUoMbUnVdid32NUQ==

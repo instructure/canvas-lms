@@ -149,7 +149,7 @@
     "lodash": "^4",
     "mathlive": "^0.77.0",
     "minimatch": "~3.0.4",
-    "moment-timezone": "^0.5.13",
+    "moment-timezone": "^0.5.43",
     "prop-types": "^15",
     "react": "^0.14.8 || ^15.0.0 || ^16",
     "react-aria-live": "^2",
