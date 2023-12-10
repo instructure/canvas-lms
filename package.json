@@ -332,7 +332,7 @@
     "moxios": "^0.4",
     "msw": "^0.43.1",
     "nyc": "^13",
-    "prettier": "^2.2.1",
+    "prettier": "^3.1.1",
     "qunitjs": "^1.23.0",
     "react-moment-proptypes": "^1.4.0",
     "react-test-renderer": "^16",
