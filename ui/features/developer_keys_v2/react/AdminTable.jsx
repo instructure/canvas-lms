@@ -20,6 +20,7 @@ import $ from 'jquery'
 import {Table} from '@instructure/ui-table'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
+import {Tooltip} from '@instructure/ui-tooltip'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import React from 'react'
 import {arrayOf, func, shape, string} from 'prop-types'
@@ -49,10 +50,127 @@ const createSetFocusCallback =
   }
 
 class AdminTable extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      sortBy: 'keystable-details',
+      sortAscending: false,
+    }
+  }
+
+  headers = {
+    'keystable-name': {
+      id: 'keystable-name',
+      text: I18n.t('Name'),
+      sortable: true,
+      sortText: I18n.t('Sort by Name'),
+      sortValue: key => key.name,
+    },
+    'keystable-owneremail': {
+      id: 'keystable-owneremail',
+      text: I18n.t('Owner Email'),
+      sortable: true,
+      sortText: I18n.t('Sort by Email'),
+      sortValue: key => key.email,
+    },
+    'keystable-details': {
+      id: 'keystable-details',
+      text: I18n.t('Details'),
+      sortable: true,
+      sortText: I18n.t('Sort by Client ID'),
+      sortValue: key => key.id,
+    },
+    'keystable-stats': {
+      id: 'keystable-stats',
+      text: I18n.t('Stats'),
+      sortable: true,
+      sortText: I18n.t('Sort by Access Token count'),
+      sortValue: key => key.access_token_count,
+    },
+    'keystable-type': {
+      id: 'keystable-type',
+      text: I18n.t('Type'),
+      sortable: true,
+      sortText: I18n.t('Sort by Type'),
+      sortValue: key => key.is_lti_key,
+    },
+    'keystable-state': {
+      id: 'keystable-state',
+      text: I18n.t('State'),
+      sortable: true,
+      sortText: I18n.t('Sort by State'),
+      sortValue: key => key.developer_key_account_binding.workflow_state,
+    },
+    'keystable-actions': {
+      id: 'keystable-actions',
+      text: I18n.t('Actions'),
+      sortable: false,
+    },
+  }
+
+  onRequestSort = (_, {id}) => {
+    const {sortBy, sortAscending} = this.state
+
+    if (id === sortBy) {
+      this.setState({
+        sortAscending: !sortAscending,
+      })
+    } else {
+      this.setState({
+        sortBy: id,
+        sortAscending: true,
+      })
+    }
+  }
+
+  renderHeader = () => {
+    const {sortBy, sortAscending} = this.state
+    const direction = sortAscending ? 'ascending' : 'descending'
+
+    return (
+      <Table.Row>
+        {Object.values(this.headers).map(header => (
+          <Table.ColHeader
+            key={header.id}
+            id={header.id}
+            {...(header.sortable && {
+              sortDirection: sortBy === header.id ? direction : 'none',
+              onRequestSort: this.onRequestSort,
+            })}
+          >
+            {header.sortText ? (
+              <Tooltip renderTip={header.sortText} placement="top">
+                {header.text}
+              </Tooltip>
+            ) : (
+              header.text
+            )}
+          </Table.ColHeader>
+        ))}
+      </Table.Row>
+    )
+  }
+
+  sortedDeveloperKeys = () => {
+    const {sortBy, sortAscending} = this.state
+    return [...this.props.developerKeysList].sort((a, b) => {
+      const aVal = this.headers[sortBy].sortValue(a)
+      const bVal = this.headers[sortBy].sortValue(b)
+      if (aVal < bVal) {
+        return sortAscending ? -1 : 1
+      }
+      if (aVal > bVal) {
+        return sortAscending ? 1 : -1
+      }
+      return 0
+    })
+  }
+
   onDelete = developerKeyId => {
-    const {developerKeysList, setFocus} = this.props
-    const position = developerKeysList.findIndex(key => key.id === developerKeyId)
-    const previousDeveloperKey = developerKeysList[position - 1]
+    const {setFocus} = this.props
+    const developerKeys = this.sortedDeveloperKeys()
+    const position = developerKeys.findIndex(key => key.id === developerKeyId)
+    const previousDeveloperKey = developerKeys[position - 1]
     const ref = previousDeveloperKey ? this.developerKeyRef(previousDeveloperKey) : undefined
     let srMsg
     // If ref is undefined it means that position was -1 and we deleted
@@ -79,7 +197,7 @@ class AdminTable extends React.Component {
   // and only handles the screenreader callout
   setFocusCallback = () =>
     createSetFocusCallback({
-      developerKeysList: this.props.developerKeysList,
+      developerKeysList: this.sortedDeveloperKeys(),
       developerKeyRef: this.developerKeyRef,
       srMsg: I18n.t(
         'Loaded more developer keys. Focus moved to the delete button of the last loaded developer key in the list.'
@@ -92,7 +210,7 @@ class AdminTable extends React.Component {
   }
 
   render() {
-    const {developerKeysList} = this.props
+    const developerKeys = this.sortedDeveloperKeys()
     const srcontent = I18n.t('Developer Keys')
     return (
       <div>
@@ -101,19 +219,9 @@ class AdminTable extends React.Component {
           caption={<ScreenReaderContent>{srcontent}</ScreenReaderContent>}
           size="medium"
         >
-          <Table.Head>
-            <Table.Row>
-              <Table.ColHeader id="keystable-name">{I18n.t('Name')}</Table.ColHeader>
-              <Table.ColHeader id="keystable-owneremail">{I18n.t('Owner Email')}</Table.ColHeader>
-              <Table.ColHeader id="keystable-details">{I18n.t('Details')}</Table.ColHeader>
-              <Table.ColHeader id="keystable-stats">{I18n.t('Stats')}</Table.ColHeader>
-              <Table.ColHeader id="keystable-type">{I18n.t('Type')}</Table.ColHeader>
-              <Table.ColHeader id="keystable-state">{I18n.t('State')}</Table.ColHeader>
-              <Table.ColHeader id="keystable-actions">{I18n.t('Actions')}</Table.ColHeader>
-            </Table.Row>
-          </Table.Head>
+          <Table.Head renderSortLabel={I18n.t('Sort by')}>{this.renderHeader()}</Table.Head>
           <Table.Body>
-            {developerKeysList.map(developerKey => (
+            {developerKeys.map(developerKey => (
               <DeveloperKey
                 ref={key => {
                   this[`developerKey-${developerKey.id}`] = key
@@ -129,7 +237,7 @@ class AdminTable extends React.Component {
             ))}
           </Table.Body>
         </Table>
-        {developerKeysList.length === 0 && (
+        {developerKeys.length === 0 && (
           <View as="div" margin="medium" textAlign="center">
             <Text size="large">{I18n.t('Nothing here yet')}</Text>
           </View>
