@@ -75,6 +75,17 @@ describe('FileBrowser', () => {
       expect(file).toBeInTheDocument()
     })
 
+    it('renders titles on items', async () => {
+      subject(props)
+      const folder = await screen.findByText('My files')
+      fireEvent.click(folder)
+      const elements = await screen.findAllByRole('treeitem')
+      const items = elements.filter(elem => !['Course files', 'My files'].includes(elem.name))
+      items.forEach(item => {
+        expect(item.title === item.getAttribute('aria-label'))
+      })
+    })
+
     describe('when a media file is still processing', () => {
       it('the view contains the file name and a "media ... processing..." message', async () => {
         const {getByText} = subject(props)
