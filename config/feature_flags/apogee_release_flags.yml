@@ -318,6 +318,6 @@ enhanced_rubrics:
   description: This feature provides visual and functional enhancements to rubrics across Canvas.
   environments:
     ci:
-      state: allowed_on
+      state: allowed
     development:
-      state: allowed_on
+      state: allowed
