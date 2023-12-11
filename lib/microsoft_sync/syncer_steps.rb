@@ -154,6 +154,8 @@ module MicrosoftSync
 
       # If we've created the group previously, we're good to go
       if group.ms_group_id && remote_ids == [group.ms_group_id]
+        debug_info_tracker.restart!(group.ms_group_id, new_group: false)
+
         return StateMachineJob::NextStep.new(:step_ensure_enrollments_user_mappings_filled)
       end
 
@@ -165,6 +167,8 @@ module MicrosoftSync
       new_group_id = remote_ids.first
 
       new_group_id ||= graph_service_helpers.create_education_class(course)["id"]
+
+      debug_info_tracker.restart!(group.ms_group_id, new_group: true)
 
       StateMachineJob::DelayedNextStep.new(
         :step_update_group_with_course_data, DELAY_BEFORE_UPDATE_GROUP, new_group_id
@@ -216,13 +220,18 @@ module MicrosoftSync
         # as passed into UsersUluvsFinder AND as used in #tenant, for the "have settings changed?"
         # check to work. For example, using course.root_account here would NOT be correct.
         UserMapping.bulk_insert_for_root_account(group.root_account, user_id_to_aad)
-
         user_ids_with_aads.concat(user_id_to_aad.keys)
       end
 
       # Make sure users who deleted whose email address no longer maps to a Microsoft user
       # get their mappings cleared out:
       UserMapping.delete_if_needs_updating(group.root_account_id, user_ids - user_ids_with_aads)
+
+      debug_info_tracker.record_filtered_users(
+        irrelevant_enrollments_scope: course.enrollments.microsoft_sync_irrelevant_but_not_fake,
+        users_without_uluvs: user_ids - users_and_uluvs.map(&:first),
+        users_without_aads: users_and_uluvs.map(&:first) - user_ids_with_aads
+      )
     end
 
     # Get group members/owners from the API and local enrollments and calculate
@@ -265,6 +274,7 @@ module MicrosoftSync
       raise_and_disable_group(MaxOwnerEnrollmentsReached) if diff.max_enrollment_owners_reached?
 
       execute_diff(diff)
+      debug_info_tracker.record_diff_stats(diff)
 
       StateMachineJob::NextStep.new(:step_check_team_exists)
     rescue *Errors::INTERMITTENT_AND_NOTFOUND => e
@@ -487,6 +497,10 @@ module MicrosoftSync
 
     def graph_service
       @graph_service ||= graph_service_helpers.graph_service
+    end
+
+    def debug_info_tracker
+      @debug_info_tracker ||= DebugInfoTracker.new(group)
     end
   end
 end
