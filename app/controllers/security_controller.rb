@@ -31,6 +31,8 @@
 #  }
 #
 class SecurityController < ApplicationController
+  skip_before_action :load_user
+
   # @API Show all available JWKs used by Canvas for signing.
   #
   # @returns JWKs
@@ -61,12 +63,19 @@ class SecurityController < ApplicationController
 
   # Schema is specified here: https://www.imsglobal.org/spec/lti-dr/v1p0#openid-configuration
   def openid_configuration
-    params.require(:registration_token)
-    token = Canvas::Security.decode_jwt(params[:registration_token])
+    access_token = AuthenticationMethods.access_token(request)
+
+    unless access_token
+      render json: { error: "Access token missing." }, status: :unauthorized
+      return
+    end
+
+    token = Canvas::Security.decode_jwt(access_token)
 
     account = Account.find_by(id: token["root_account_global_id"])
     unless account
-      render formats: :html, status: :not_found, template: "shared/errors/404_message"
+      render json: { error: "Account #{token["root_account_global_id"]} not found." }, status: :not_found
+      return
     end
 
     account_domain = HostUrl.context_host(account, ApplicationController.test_cluster_name)

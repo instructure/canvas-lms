@@ -163,7 +163,10 @@ describe Lti::IMS::DynamicRegistrationController do
       end
 
       context "and with valid registration params" do
-        subject { post :create, params: { registration_token: valid_token, **registration_params } }
+        subject do
+          request.headers["Authorization"] = "Bearer #{valid_token}"
+          post :create, params: { **registration_params }
+        end
 
         it "accepts valid params and creates a registration model" do
           subject
@@ -201,7 +204,10 @@ describe Lti::IMS::DynamicRegistrationController do
       end
 
       context "and with invalid registration params" do
-        subject { post :create, params: { registration_token: valid_token, **invalid_registration_params } }
+        subject do
+          request.headers["Authorization"] = "Bearer #{valid_token}"
+          post :create, params: invalid_registration_params
+        end
 
         let(:invalid_registration_params) do
           wrong_grant_types = registration_params
@@ -224,7 +230,10 @@ describe Lti::IMS::DynamicRegistrationController do
     end
 
     context "with an invalid token" do
-      subject { post :create, params: { registration_token: invalid_token, **registration_params } }
+      subject do
+        request.headers["Authorization"] = "Bearer #{invalid_token}"
+        post :create, params: registration_params
+      end
 
       context "that has no uuid" do
         let(:invalid_token) do
