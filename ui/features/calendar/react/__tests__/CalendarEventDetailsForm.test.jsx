@@ -312,6 +312,18 @@ describe('CalendarEventDetailsForm', () => {
     expect(errMessage).not.toBeInTheDocument()
   })
 
+  it('allows setting arbitrary start/ end times', () => {
+    const {getByTestId} = render(<CalendarEventDetailsForm {...defaultProps} />)
+    const startInput = getByTestId('event-form-start-time')
+    const endInput = getByTestId('event-form-end-time')
+    userEvent.clear(startInput)
+    userEvent.type(startInput, '8:14 AM')
+    userEvent.clear(endInput)
+    userEvent.type(endInput, '9:38 AM')
+    expect(startInput.value).toBe('8:14 AM')
+    expect(endInput.value).toBe('9:38 AM')
+  })
+
   it('cannot submit with an empty title', () => {
     const event = {...defaultProps.event, title: ''}
     const component = render(<CalendarEventDetailsForm {...defaultProps} event={event} />)

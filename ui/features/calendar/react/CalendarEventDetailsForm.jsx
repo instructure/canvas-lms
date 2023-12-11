@@ -472,7 +472,8 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
               messages={startMessages}
               format="LT"
               timezone={timezone}
-              step={5}
+              step={15}
+              allowNonStepInput={true}
             />
           </Flex.Item>
           <Flex.Item padding="none none none small" shouldShrink={true}>
@@ -487,7 +488,8 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
               messages={endMessages}
               format="LT"
               timezone={timezone}
-              step={5}
+              step={15}
+              allowNonStepInput={true}
             />
           </Flex.Item>
         </Flex>
