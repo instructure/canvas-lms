@@ -35,10 +35,9 @@
       <% if @current_user.mfa_settings(pseudonym_hint: @current_pseudonym) == :required %>
         <p><%= t('details.mfa_required', "You are required to set up multi-factor authentication.") %></p>
       <% end %>
-      <p><%=  mt('details.mfa_enrollment', <<~BODY, :secret_key => session[:pending_otp_secret_key])
+      <p><%=  mt('details.mfa_enrollment', <<~BODY, secret_key: session[:pending_otp_secret_key], otp_via_sms_message:)
 Multi-factor authentication increases security by requiring that you have something in your physical possession,
-in addition to knowing your password, in order to log in to Canvas. This can be a device that can generate
-verification codes, or a phone that can receive text messages. MFA can be configured by scanning the QR code
+in addition to knowing your password, in order to log in to Canvas. %{otp_via_sms_message} MFA can be configured by scanning the QR code
 below using a Time-based one-time password (TOTP) authenticator app on iPhone or Android (ex: Google Authenticator,
 Microsoft Authenticator, Authy). Other tokens can be configured by entering the secret key **%{secret_key}**.
 Once you have configured multi-factor authentication, it is recommended that you go to your profile page and print
@@ -46,6 +45,7 @@ out a set of back-up codes, in case your normal multi-factor device is unavailab
           BODY
       %></p>
       <div class="content-box">
+        <% if otp_via_sms? %>
         <div class="grid-row">
           <div class="col-xs-8">
             <% ccs = @current_user.communication_channels.sms.unretired.map { |cc| [ cc.path, cc.id ] } %>
@@ -73,6 +73,9 @@ out a set of back-up codes, in case your normal multi-factor device is unavailab
               </div>
             <% end %>
           </div>
+        <% else %>
+        <div class="grid-row center-xs">
+        <% end %>
           <div class="col-xs-4">
             <% provisioning_uri = ROTP::TOTP.new(session[:pending_otp_secret_key]).provisioning_uri("#{@domain_root_account.name} Canvas- #{@current_pseudonym.unique_id}") %>
             <% qr_code = RQRCode::QRCode.new(provisioning_uri, level: :l) %>

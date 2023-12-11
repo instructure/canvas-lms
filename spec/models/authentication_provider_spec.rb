@@ -343,4 +343,24 @@ describe AuthenticationProvider do
       end
     end
   end
+
+  context "otp_via_sms" do
+    let(:aac) do
+      account.authentication_providers.new(auth_type: "canvas")
+    end
+
+    it "defaults to true" do
+      expect(aac.otp_via_sms?).to be_truthy
+    end
+
+    it "can opt out" do
+      aac.update! settings: { otp_via_sms: false }
+      expect(aac.otp_via_sms?).to be_falsey
+    end
+
+    it "can opt back in" do
+      aac.update! settings: { otp_via_sms: true }
+      expect(aac.otp_via_sms?).to be_truthy
+    end
+  end
 end
