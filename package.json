@@ -352,6 +352,7 @@
     "ts-node": "^10.9.1",
     "typescript": "^5.3.2",
     "vitest": "^1.0.4",
+    "@vitest/ui": "^1.0.4",
     "waait": "^1",
     "webpack": "^5",
     "webpack-bundle-analyzer": "^4.5.0",
