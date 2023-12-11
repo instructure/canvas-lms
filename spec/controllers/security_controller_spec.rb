@@ -91,7 +91,7 @@ RSpec.describe SecurityController, type: :request do
                                         },
                                         5.minutes.ago)
 
-      get "/api/lti/security/openid-configuration", params: { registration_token: jwt }
+      get "/api/lti/security/openid-configuration", headers: { "Authorization" => "Bearer #{jwt}" }
       expect(response).to have_http_status :unauthorized
     end
 
@@ -109,7 +109,7 @@ RSpec.describe SecurityController, type: :request do
         }
       end
 
-      get "/api/lti/security/openid-configuration", params: { registration_token: jwt }
+      get "/api/lti/security/openid-configuration", headers: { "Authorization" => "Bearer #{jwt}" }
       expect(response).to have_http_status :ok
       parsed_body = response.parsed_body
       expect(parsed_body["issuer"]).to eq "https://canvas.instructure.com"
@@ -141,7 +141,7 @@ RSpec.describe SecurityController, type: :request do
                                           },
                                           5.minutes.from_now)
 
-        get "/api/lti/security/openid-configuration", params: { registration_token: jwt }
+        get "/api/lti/security/openid-configuration", headers: { "Authorization" => "Bearer #{jwt}" }
         expect(response).to have_http_status :ok
         parsed_body = response.parsed_body
         expect(parsed_body["issuer"]).to eq "https://canvas.instructure.com"

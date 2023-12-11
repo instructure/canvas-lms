@@ -25,6 +25,11 @@ module Lti
       before_action :require_dynamic_registration_flag
       before_action :require_user, except: [:create]
 
+      # This skip_before_action is required because :load_user will
+      # attempt to find the bearer token, which is not stored with
+      # the other Canvas tokens.
+      skip_before_action :load_user, only: [:create]
+
       def registration_token
         uuid = SecureRandom.uuid
         current_time = DateTime.now.iso8601
@@ -103,8 +108,8 @@ module Lti
       end
 
       def create
-        token_param = params.require(:registration_token)
-        jwt = Canvas::Security.decode_jwt(token_param)
+        access_token = AuthenticationMethods.access_token(request)
+        jwt = Canvas::Security.decode_jwt(access_token)
 
         expected_jwt_keys = %w[user_id initiated_at root_account_global_id exp uuid]
 
