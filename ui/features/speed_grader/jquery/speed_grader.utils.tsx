@@ -309,12 +309,6 @@ export function renderPostGradesMenu(EG: SpeedGrader) {
   )
 }
 
-export function getStatusPills() {
-  return document.querySelectorAll(
-    '.submission-missing-pill, .submission-late-pill, .submission-excused-pill, .submission-extended-pill, [class^="submission-custom-grade-status-pill-"]'
-  )
-}
-
 export function hideMediaRecorderContainer() {
   $('#media_media_recording').hide().removeData('comment_id').removeData('comment_type')
 }

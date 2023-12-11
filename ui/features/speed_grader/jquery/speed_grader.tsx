@@ -75,7 +75,6 @@ import {
 } from '@instructure/ui-icons'
 import {Pill} from '@instructure/ui-pill'
 import {
-  styleSubmissionStatusPills,
   determineSubmissionSelection,
   makeSubmissionUpdateRequest,
 } from '../SpeedGraderStatusMenuHelpers'
@@ -99,7 +98,6 @@ import {
   getSelectedAssessment,
   renderSettingsMenu,
   configureRecognition,
-  getStatusPills,
   hideMediaRecorderContainer,
   renderDeleteAttachmentLink,
   renderPostGradesMenu,
@@ -1233,7 +1231,6 @@ function updateSubmissionAndPageEffects(data?: {
       refreshGrades(() => {
         EG.showSubmissionDetails()
         if (availableMountPointForStatusMenu()) {
-          styleSubmissionStatusPills(getStatusPills())
           const mountPoint = availableMountPointForStatusMenu()
           if (!mountPoint) throw new Error('SpeedGrader: mount point for status menu not found')
           renderStatusMenu(statusMenuComponent(submission), mountPoint)
@@ -2474,7 +2471,6 @@ EG = {
     if (mountPoint) {
       const isInModeration = isModerated && !window.jsonData.grades_published_at
       const shouldRender = isMostRecent && !isClosedForSubmission && !isConcluded && !isInModeration
-      styleSubmissionStatusPills(getStatusPills())
       const component = shouldRender ? statusMenuComponent(this.currentStudent.submission) : null
       renderStatusMenu(component, mountPoint)
     }
