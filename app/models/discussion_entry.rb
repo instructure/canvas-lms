@@ -51,7 +51,6 @@ class DiscussionEntry < ActiveRecord::Base
   has_one :external_feed_entry, as: :asset
 
   before_create :infer_root_entry_id
-  before_create :populate_legacy
   before_create :set_root_account_id
   after_save :update_discussion
   after_save :context_module_action_later
@@ -300,21 +299,6 @@ class DiscussionEntry < ActiveRecord::Base
 
   def user_name
     user.name rescue t :default_user_name, "User Name"
-  end
-
-  def populate_legacy
-    # TODO
-    # when this feature flag is removed, we should add a predeploy migration
-    # that changes the column default. Then just get rid of this method.
-    #
-    # class FlipLegacyDefaultOnDiscussionEntry < ActiveRecord::Migration[6.0]
-    #   tag :predeploy
-    #
-    #   def change
-    #     change_column_default :discussion_entries, :legacy, false
-    #   end
-    # end
-    self.legacy = !(context.feature_enabled?(:react_discussions_post) && Account.site_admin.feature_enabled?(:isolated_view))
   end
 
   def infer_root_entry_id

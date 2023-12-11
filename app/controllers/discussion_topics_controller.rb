@@ -832,8 +832,6 @@ class DiscussionTopicsController < ApplicationController
                manual_mark_as_read: @current_user&.manual_mark_as_read?,
                discussion_topic_menu_tools: external_tools_display_hashes(:discussion_topic_menu),
                rce_mentions_in_discussions: @context.feature_enabled?(:react_discussions_post) && !@topic.anonymous?,
-               isolated_view: Account.site_admin.feature_enabled?(:isolated_view),
-               split_screen_view: Account.site_admin.feature_enabled?(:split_screen_view),
                discussion_grading_view: Account.site_admin.feature_enabled?(:discussion_grading_view),
                draft_discussions: Account.site_admin.feature_enabled?(:draft_discussions),
                discussion_entry_version_history: Account.site_admin.feature_enabled?(:discussion_entry_version_history),

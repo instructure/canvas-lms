@@ -34,7 +34,6 @@ describe "threaded discussions" do
   before do
     stub_rcs_config
     Account.site_admin.enable_feature! :react_discussions_post
-    Account.site_admin.enable_feature! :split_screen_view
 
     @first_reply = @topic.discussion_entries.create!(
       user: @student,

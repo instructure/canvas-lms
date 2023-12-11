@@ -33,9 +33,10 @@ module Types
     field :rating_count, Integer, null: true
     field :rating_sum, Integer, null: true
 
+    # This will get removed when references to isolated_entry_id are removed from the react_discussion
     field :isolated_entry_id, ID, null: true
     def isolated_entry_id
-      object.legacy? ? object.parent_id : object.root_entry_id
+      object.parent_id
     end
 
     field :message, String, null: true
@@ -206,9 +207,6 @@ module Types
 
     field :subentries_count, Integer, null: true
     def subentries_count
-      # don't try to count subentries if isolated view is active
-      return nil if Account.site_admin.feature_enabled?(:isolated_view)
-
       Loaders::AssociationCountLoader.for(DiscussionEntry, :discussion_subentries).load(object)
     end
 
