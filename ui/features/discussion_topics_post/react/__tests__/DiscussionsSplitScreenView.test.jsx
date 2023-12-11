@@ -51,7 +51,6 @@ describe('DiscussionsSplitScreenView', () => {
       current_page: 0,
       discussion_topic_id: '1',
       course_id: '1',
-      split_screen_view: true,
       current_user: {
         id: '2',
         avatar_image_url:
@@ -96,18 +95,17 @@ describe('DiscussionsSplitScreenView', () => {
     const container = setup(mocks)
     const replyButton = await container.findByTestId('threading-toolbar-reply')
     fireEvent.click(replyButton)
-    expect(container.queryByTestId('isolated-view-container')).toBeNull()
     expect(container.queryByTestId('discussions-split-screen-view-content')).toBeTruthy()
   })
 
-  it('should render isolated view container if split screen view is also enabled', async () => {
+  it('should render Split-screen view container if split-screen and isolated view FF are enabled', async () => {
     window.ENV.isolated_view = true
     const mocks = [...getDiscussionQueryMock()]
     const container = setup(mocks)
     const replyButton = await container.findByTestId('threading-toolbar-reply')
     fireEvent.click(replyButton)
-    expect(container.queryByTestId('isolated-view-container')).not.toBeNull()
-    expect(container.queryByTestId('discussions-split-screen-view-content')).toBeNull()
+    expect(container.queryByTestId('isolated-view-container')).toBeNull()
+    expect(container.queryByTestId('discussions-split-screen-view-content')).toBeTruthy()
   })
 
   it('should be able to edit a root entry', async () => {
@@ -149,7 +147,6 @@ describe('DiscussionsSplitScreenView', () => {
       ...getDiscussionQueryMock({searchTerm: 'a', rootEntries: false}),
     ]
     const container = setup(mocks)
-    await waitFor(() => expect(container.queryByTestId('isolated-view-container')).toBeNull())
     fireEvent.change(await container.findByTestId('search-filter'), {
       target: {value: 'a'},
     })

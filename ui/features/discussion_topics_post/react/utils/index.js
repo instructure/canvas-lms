@@ -121,12 +121,7 @@ export const addReplyToDiscussionEntry = (cache, variables, newDiscussionEntry) 
     // The writeQuery creates a subentry query shape using the data from the new discussion entry
     // Using that query object it tries to find the cached subentry query for that reply and add the new reply to the cache
     const parentEntryOptions = {
-      id: btoa(
-        'DiscussionEntry-' +
-          (ENV.split_screen_view || ENV.isolated_view
-            ? newDiscussionEntry.rootEntryId
-            : newDiscussionEntry.parentId)
-      ),
+      id: btoa('DiscussionEntry-' + newDiscussionEntry.rootEntryId),
       fragment: DiscussionEntry.fragment,
       fragmentName: 'DiscussionEntry',
     }

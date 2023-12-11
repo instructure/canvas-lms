@@ -67,11 +67,7 @@ import useCreateDiscussionEntry from '../../hooks/useCreateDiscussionEntry'
 const I18n = useI18nScope('discussion_topics_post')
 
 const defaultExpandedReplies = id => {
-  if (
-    (ENV.split_screen_view && ENV.DISCUSSION?.preferences?.discussions_splitscreen_view) ||
-    ENV.isolated_view
-  )
-    return false
+  if (ENV.DISCUSSION?.preferences?.discussions_splitscreen_view) return false
   if (id === ENV.discussions_deep_link?.entry_id) return false
   if (id === ENV.discussions_deep_link?.root_entry_id) return true
 
@@ -243,7 +239,7 @@ export const DiscussionThreadContainer = props => {
   })
 
   // Condense SplitScreen to one variable & link with the SplitScreenButton
-  const splitScreenOn = ENV.split_screen_view && props.userSplitScreenPreference
+  const splitScreenOn = props.userSplitScreenPreference
 
   const threadActions = []
   if (props.discussionEntry.permissions.reply) {
@@ -257,7 +253,7 @@ export const DiscussionThreadContainer = props => {
           const newEditorExpanded = !editorExpanded
           setEditorExpanded(newEditorExpanded)
 
-          if (ENV.isolated_view || splitScreenOn) {
+          if (splitScreenOn) {
             props.onOpenIsolatedView(
               props.discussionEntry._id,
               props.discussionEntry.isolatedEntryId,
@@ -298,7 +294,7 @@ export const DiscussionThreadContainer = props => {
           />
         }
         onClick={() => {
-          if (ENV.isolated_view || splitScreenOn) {
+          if (splitScreenOn) {
             props.onOpenIsolatedView(
               props.discussionEntry._id,
               props.discussionEntry.isolatedEntryId,
@@ -490,22 +486,18 @@ export const DiscussionThreadContainer = props => {
                               : null
                           }
                           isReported={props.discussionEntry?.entryParticipant?.reportType != null}
-                          onQuoteReply={
-                            !ENV.isolated_view
-                              ? () => {
-                                  setReplyFromId(props.discussionEntry._id)
-                                  if (ENV.isolated_view || splitScreenOn) {
-                                    props.onOpenIsolatedView(
-                                      props.discussionEntry._id,
-                                      props.discussionEntry.isolatedEntryId,
-                                      true
-                                    )
-                                  } else {
-                                    setEditorExpanded(true)
-                                  }
-                                }
-                              : null
-                          }
+                          onQuoteReply={() => {
+                            setReplyFromId(props.discussionEntry._id)
+                            if (splitScreenOn) {
+                              props.onOpenIsolatedView(
+                                props.discussionEntry._id,
+                                props.discussionEntry.isolatedEntryId,
+                                true
+                              )
+                            } else {
+                              setEditorExpanded(true)
+                            }
+                          }}
                           onMarkThreadAsRead={readState =>
                             updateDiscussionThreadReadState({
                               variables: {
@@ -590,7 +582,7 @@ export const DiscussionThreadContainer = props => {
             </div>
           </Highlight>
           <div style={{marginLeft: getReplyLeftMargin(responsiveProps)}}>
-            {editorExpanded && !(ENV.isolated_view || splitScreenOn) && (
+            {editorExpanded && !splitScreenOn && (
               <View
                 display="block"
                 background="primary"
@@ -625,7 +617,7 @@ export const DiscussionThreadContainer = props => {
             )}
           </div>
           {((expandReplies && !searchTerm) || props.depth > 0) &&
-            !(ENV.isolated_view || splitScreenOn) &&
+            !splitScreenOn &&
             props.discussionEntry.subentriesCount > 0 && (
               <DiscussionSubentries
                 discussionTopic={props.discussionTopic}

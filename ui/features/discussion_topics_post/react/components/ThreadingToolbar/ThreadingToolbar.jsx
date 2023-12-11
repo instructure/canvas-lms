@@ -19,7 +19,6 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React from 'react'
-import {IconEditLine} from '@instructure/ui-icons'
 import {InlineList} from '@instructure/ui-list'
 import {Reply} from './Reply'
 import {Like} from './Like'

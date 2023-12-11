@@ -249,21 +249,21 @@ export const DiscussionPostToolbar = props => {
                     </span>
                   </Tooltip>
                 </Flex.Item>
-                {ENV.split_screen_view && (
-                  <Flex.Item
-                    margin={responsiveProps?.viewSplitScreen?.margin}
-                    padding={responsiveProps.padding}
-                    shouldGrow={responsiveProps?.viewSplitScreen?.shouldGrow}
-                  >
-                    <SplitScreenButton
-                      setUserSplitScreenPreference={props.setUserSplitScreenPreference}
-                      userSplitScreenPreference={props.userSplitScreenPreference}
-                      closeView={props.closeView}
-                      display={matches.includes('mobile') ? 'block' : 'inline-block'}
-                    />
-                  </Flex.Item>
-                )}
-                {!ENV.isolated_view && !props.userSplitScreenPreference && (
+
+                <Flex.Item
+                  margin={responsiveProps?.viewSplitScreen?.margin}
+                  padding={responsiveProps.padding}
+                  shouldGrow={responsiveProps?.viewSplitScreen?.shouldGrow}
+                >
+                  <SplitScreenButton
+                    setUserSplitScreenPreference={props.setUserSplitScreenPreference}
+                    userSplitScreenPreference={props.userSplitScreenPreference}
+                    closeView={props.closeView}
+                    display={matches.includes('mobile') ? 'block' : 'inline-block'}
+                  />
+                </Flex.Item>
+
+                {!props.userSplitScreenPreference && (
                   <Flex.Item margin="0 small 0 0" padding={responsiveProps.padding}>
                     <ExpandCollapseThreadsButton showText={!matches.includes('mobile')} />
                   </Flex.Item>

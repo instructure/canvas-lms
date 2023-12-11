@@ -92,20 +92,7 @@ describe('DiscussionPostToolbar', () => {
   })
 
   describe('Splitscreen Button', () => {
-    it('should not render if split_screen_view ff is off', async () => {
-      window.ENV.split_screen_view = false
-      const {queryByTestId} = setup(
-        {
-          setUserSplitScreenPreference: jest.fn(),
-          userSplitScreenPreference: false,
-        },
-        updateUserDiscussionsSplitscreenViewMock({discussionsSplitscreenView: true})
-      )
-
-      expect(queryByTestId('splitscreenButton')).toBeNull()
-    })
     it('should call updateUserDiscussionsSplitscreenView mutation when clicked', async () => {
-      window.ENV.split_screen_view = true
       const {getByTestId} = setup(
         {
           setUserSplitScreenPreference: jest.fn(),

@@ -30,7 +30,6 @@ import {
   AllThreadsState,
 } from './utils/constants'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {IsolatedViewContainer} from './containers/IsolatedViewContainer/IsolatedViewContainer'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {NoResultsFound} from './components/NoResultsFound/NoResultsFound'
 import PropTypes from 'prop-types'
@@ -82,19 +81,13 @@ const DiscussionTopicManager = props => {
 
   // Isolated View State
   const [threadParentEntryId, setThreadParentEntryId] = useState(
-    ENV.isolated_view
-      ? ENV.discussions_deep_link?.root_entry_id
-      : ENV.discussions_deep_link?.parent_id
+    ENV.discussions_deep_link?.parent_id
   )
   const [replyFromId, setReplyFromId] = useState(null)
-  const [isolatedViewOpen, setIsolatedViewOpen] = useState(
-    !ENV.split_screen_view && !!ENV.discussions_deep_link?.root_entry_id
-  )
 
   // split screen view
   const [isSplitScreenViewOpen, setSplitScreenViewOpen] = useState(
-    ENV.split_screen_view &&
-      ENV.DISCUSSION?.preferences?.discussions_splitscreen_view &&
+    ENV.DISCUSSION?.preferences?.discussions_splitscreen_view &&
       !!(ENV.discussions_deep_link?.parent_id
         ? ENV.discussions_deep_link?.parent_id
         : ENV.discussions_deep_link?.entry_id)
@@ -163,20 +156,7 @@ const DiscussionTopicManager = props => {
   }, [highlightEntryId])
 
   const openView = (discussionEntryId, isolatedId, withRCE, relativeId = null) => {
-    if (ENV.isolated_view) {
-      openIsolatedView(discussionEntryId, isolatedId, withRCE, relativeId)
-    }
-    if (ENV.split_screen_view) {
-      openSplitScreenView(discussionEntryId, withRCE, relativeId)
-    }
-  }
-
-  const openIsolatedView = (discussionEntryId, isolatedId, withRCE, relativeId = null) => {
-    setReplyFromId(discussionEntryId)
-    setThreadParentEntryId(isolatedId || discussionEntryId)
-    setIsolatedViewOpen(true)
-    setEditorExpanded(withRCE)
-    setRelativeEntryId(relativeId)
+    openSplitScreenView(discussionEntryId, withRCE, relativeId)
   }
 
   const openSplitScreenView = (discussionEntryId, withRCE, relativeId = null) => {
@@ -187,13 +167,8 @@ const DiscussionTopicManager = props => {
   }
 
   const closeView = () => {
-    if (ENV.isolated_view) {
-      setIsolatedViewOpen(false)
-    }
-    if (ENV.split_screen_view) {
-      setIsTrayFinishedOpening(false)
-      setSplitScreenViewOpen(false)
-    }
+    setIsTrayFinishedOpening(false)
+    setSplitScreenViewOpen(false)
   }
 
   const variables = {
@@ -322,7 +297,11 @@ const DiscussionTopicManager = props => {
                   <Mask onClick={() => closeView()} />
                 )}
                 <DrawerLayout.Content label="Splitscreen View Content">
-                <View display="block" padding="medium medium 0 small" height={isSplitScreenViewOpen ? "100vh" : "100%"}>
+                  <View
+                    display="block"
+                    padding="medium medium 0 small"
+                    height={isSplitScreenViewOpen ? '100vh' : '100%'}
+                  >
                     <DiscussionTopicToolbarContainer
                       discussionTopic={discussionTopicQuery.data.legacyNode}
                       setUserSplitScreenPreference={setUserSplitScreenPreference}
@@ -379,22 +358,6 @@ const DiscussionTopicManager = props => {
                         />
                       )
                     )}
-                    {ENV.isolated_view && threadParentEntryId && (
-                      <IsolatedViewContainer
-                        relativeEntryId={relativeEntryId}
-                        discussionTopic={discussionTopicQuery.data.legacyNode}
-                        discussionEntryId={threadParentEntryId}
-                        replyFromId={replyFromId}
-                        open={isolatedViewOpen}
-                        RCEOpen={editorExpanded}
-                        setRCEOpen={setEditorExpanded}
-                        onClose={closeView}
-                        onOpenIsolatedView={openIsolatedView}
-                        goToTopic={goToTopic}
-                        highlightEntryId={highlightEntryId}
-                        setHighlightEntryId={setHighlightEntryId}
-                      />
-                    )}
                   </View>
                 </DrawerLayout.Content>
                 <DrawerLayout.Tray
@@ -407,7 +370,7 @@ const DiscussionTopicManager = props => {
                   data-testid="drawer-layout-tray"
                   shouldCloseOnDocumentClick={false}
                 >
-                  {ENV.split_screen_view && !ENV.isolated_view && threadParentEntryId && (
+                  {threadParentEntryId && (
                     <View as="div" maxWidth={responsiveProps.viewPortWidth}>
                       <SplitScreenViewContainer
                         relativeEntryId={relativeEntryId}
