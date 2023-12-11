@@ -286,8 +286,11 @@ class FileBrowser extends React.Component {
     } else {
       itemIcon = getIconFromType(file.type)
     }
+    const containerRef = (node) => {
+      if (node && !node.title && props.name) node.title = props.name
+    }
 
-    return {...props, thumbnail, itemIcon}
+    return {...props, thumbnail, itemIcon, containerRef}
   }
 
   formatFileInfo(apiFile, opts = {}) {
