@@ -88,6 +88,7 @@ class Enrollment < ActiveRecord::Base
 
   after_commit :sync_microsoft_group
   scope :microsoft_sync_relevant, -> { active_or_pending.accepted.not_fake }
+  scope :microsoft_sync_irrelevant_but_not_fake, -> { not_fake.where("enrollments.workflow_state IN ('rejected', 'completed', 'inactive', 'invited')") }
 
   attr_accessor :already_enrolled, :need_touch_user, :skip_touch_user
 

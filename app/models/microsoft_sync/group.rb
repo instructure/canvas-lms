@@ -68,6 +68,7 @@ class MicrosoftSync::Group < ActiveRecord::Base
   end
 
   serialize :job_state
+  serialize :debug_info
 
   resolves_root_account through: :course
 
