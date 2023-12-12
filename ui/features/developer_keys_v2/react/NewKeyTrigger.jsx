@@ -65,7 +65,7 @@ export default class DeveloperKeyModalTrigger extends React.Component {
 
   render() {
     return (
-      <View as="div" margin="0 0 small 0" padding="none" textAlign="end">
+      <View as="div" padding="small" textAlign="end">
         {this.developerKeyTrigger()}
       </View>
     )
