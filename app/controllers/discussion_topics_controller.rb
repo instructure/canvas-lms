@@ -755,7 +755,7 @@ class DiscussionTopicsController < ApplicationController
     if @context.feature_enabled?(:react_discussions_post)
       env_hash = {
         per_page: 20,
-        isolated_view_initial_page_size: 5,
+        split_screen_view_initial_page_size: 5,
         current_page: 0
       }
       if params[:entry_id]
