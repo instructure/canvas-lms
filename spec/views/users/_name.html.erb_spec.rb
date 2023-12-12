@@ -21,7 +21,7 @@
 require_relative "../views_helper"
 
 describe "users/name" do
-  it "allows deletes for unmanagaged pseudonyms with correct privileges" do
+  it "allows deletes for unmanaged pseudonyms with correct privileges" do
     account_admin_user account: Account.default
     course_with_student account: Account.default
     view_context(Account.default, @admin)
@@ -31,10 +31,10 @@ describe "users/name" do
     expect(response.body).to match(/Delete from #{Account.default.name}/)
   end
 
-  it "allows deletes for managaged pseudonyms with correct privileges" do
+  it "allows deletes for managed pseudonyms with correct privileges" do
     account_admin_user account: Account.default
     course_with_student account: Account.default
-    managed_pseudonym(@student, account: account_model)
+    managed_pseudonym(@student, account: account_model).destroy
     view_context(Account.default, @admin)
     assign(:user, @student)
     assign(:enrollments, [])
@@ -45,7 +45,7 @@ describe "users/name" do
   it "does not allow deletes for managed pseudonyms without correct privileges" do
     @admin = user_factory account: Account.default
     course_with_student account: Account.default
-    managed_pseudonym(@student, account: account_model)
+    managed_pseudonym(@student, account: account_model).destroy
     view_context(Account.default, @admin)
     assign(:user, @student)
     assign(:enrollments, [])

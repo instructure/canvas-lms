@@ -110,6 +110,20 @@ create_course_subaccount_picker:
     people who can manually create courses to put those courses into any sub-account
     where they have enrollments.
 
+deleted_user_tools:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: 'Deleted User Tools'
+  description: |-
+    Adds a new page to the admin tools that allows admins to view and manage
+    deleted users. Also allows admins to search for deleted users with a checkbox
+    on the account user page.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
+
 enhanced_course_creation_account_fetching:
   applies_to: SiteAdmin
   state: hidden

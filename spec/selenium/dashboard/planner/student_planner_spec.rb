@@ -366,7 +366,7 @@ describe "student planner" do
       date_input = ff("input", @modal)[1]
 
       keep_trying_until(10) do
-        date_input.send_keys([:control, "a"], :backspace, day)
+        replace_content(date_input, day)
         expect(element_value_for_attr(date_input, "value")).to eq(day)
       end
 
