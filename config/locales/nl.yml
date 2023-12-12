@@ -6294,7 +6294,7 @@ nl:
   canvas_course_id_db4de2b8: canvas_course_id
   canvas_course_tutorial_video_5205c1c1: "Instructievideo over Canvas-cursussen"
   canvas_dashboard_links_will_navigate_to_the_catalo_4143635e: "Canvas dashboardlinks zullen naar het Catalog dashboard navigeren"
-  canvas_default_7f81a6b8: "Canvas Standaard"
+  canvas_default_7f81a6b8: Canvas-standaard
   canvas_demo_7a005cf3: Canvas-demo
   canvas_did_not_recognize_your_identity_provider_cb0e50fc: "Canvas herkent je identiteitsprovider niet"
   canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "Canvas heeft geen account voor gebruiker: %{user}"
@@ -9636,7 +9636,7 @@ nl:
   create_outcome_4dac05a0: "Leerdoel maken"
   create_pace_4ff3e9c: "Tempo definiëren"
   create_pages_581a4d59: "Pagina's maken"
-  create_quiz_d08bb72a: "Toets aanmaken"
+  create_quiz_d08bb72a: "Toets maken"
   create_slots_71dbb2f8: "Tijdblok maken"
   create_subject_86de5618: "Vak maken"
   create_temporary_enrollment_3d4eaa33: "Tijdelijke inschrijving maken"
@@ -10169,7 +10169,7 @@ nl:
   delete_from_all_accounts_a1c5e621: "Verwijderen van ALLE accounts"
   delete_grading_period_dba36e59: "Beoordelingsperiode verwijderen"
   delete_grading_period_set_b35358dd: "Ingestelde beoordelingsperiode verwijderen"
-  delete_grading_scheme_6b308832: "Beoordelingsschema verwijderen "
+  delete_grading_scheme_6b308832: "Beoordelingsschema verwijderen"
   delete_grading_scheme_a1f8f5dc: "Beoordelingsschema verwijderen"
   delete_grading_scheme_title_215f0a40: "Beoordelingsschema %{title} verwijderen"
   delete_group_86c381ec: "Groep verwijderen"
@@ -11258,7 +11258,7 @@ nl:
   edit_discussion_settings_1bbb03d: "Discussie-instellingen bewerken"
   edit_grading_period_e39af45d: "Beoordelingsperiode bewerken"
   edit_grading_period_set_c548f4df: "Ingestelde beoordelingsperiode bewerken"
-  edit_grading_scheme_53091236: "Beoordelingsschema bewerken  "
+  edit_grading_scheme_53091236: "Beoordelingsschema bewerken"
   edit_grading_scheme_99c16fd8: "Beoordelingsschema bewerken"
   edit_grading_scheme_title_ff41d916: "Beoordelingsschema %{title} bewerken"
   edit_group_c8679dba: "Groep bewerken"
