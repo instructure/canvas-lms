@@ -79,7 +79,7 @@ const DiscussionTopicManager = props => {
     setIsTopicHighlighted(true)
   }
 
-  // Isolated View State
+  // Split_screen parent id
   const [threadParentEntryId, setThreadParentEntryId] = useState(
     ENV.discussions_deep_link?.parent_id
   )
@@ -155,10 +155,18 @@ const DiscussionTopicManager = props => {
     }
   }, [highlightEntryId])
 
-  const openView = (discussionEntryId, isolatedId, withRCE, relativeId = null) => {
-    openSplitScreenView(discussionEntryId, withRCE, relativeId)
-  }
-
+  /**
+   * Opens a split-screen view for a discussion entry.
+   *
+   * @param {number} discussionEntryId - The ID of the discussion entry that will be displayed.
+   *                                     This ID represents the ThreadParentEntryId and is the root entry in the thread.
+   * @param {boolean} withRCE - Controls whether the Rich Content Editor (RCE) will be open or not.
+   * @param {number|null} relativeId - Optional. Used primarily when opening from a search context.
+   *                                   This parameter determines the starting point for querying additional entries.
+   *                                   For example, if opening entry 120 out of 200, and when clicking next,
+   *                                   the function needs to know it's at entry 120 to fetch entries 121-140.
+   *                                   Defaults to `null` if not specified.
+   */
   const openSplitScreenView = (discussionEntryId, withRCE, relativeId = null) => {
     setThreadParentEntryId(discussionEntryId)
     setSplitScreenViewOpen(true)
@@ -340,15 +348,14 @@ const DiscussionTopicManager = props => {
                       discussionTopicQuery.data.legacyNode.availableForUser && (
                         <DiscussionTopicRepliesContainer
                           discussionTopic={discussionTopicQuery.data.legacyNode}
-                          onOpenIsolatedView={(
+                          onOpenSplitView={(
                             discussionEntryId,
-                            isolatedId,
                             withRCE,
                             relativeId,
                             highlightId
                           ) => {
                             setHighlightEntryId(highlightId)
-                            openView(discussionEntryId, isolatedId, withRCE, relativeId)
+                            openSplitScreenView(discussionEntryId, withRCE, relativeId)
                           }}
                           goToTopic={goToTopic}
                           highlightEntryId={highlightEntryId}

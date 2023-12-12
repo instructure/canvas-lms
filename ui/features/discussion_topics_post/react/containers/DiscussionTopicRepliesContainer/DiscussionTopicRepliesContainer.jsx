@@ -111,7 +111,7 @@ export const DiscussionTopicRepliesContainer = props => {
             discussionEntry={thread}
             discussionTopic={props.discussionTopic}
             markAsRead={markAsRead}
-            onOpenIsolatedView={props.onOpenIsolatedView}
+            onOpenSplitView={props.onOpenSplitView}
             goToTopic={props.goToTopic}
             highlightEntryId={props.highlightEntryId}
             setHighlightEntryId={props.setHighlightEntryId}
@@ -135,7 +135,7 @@ export const DiscussionTopicRepliesContainer = props => {
 
 DiscussionTopicRepliesContainer.propTypes = {
   discussionTopic: Discussion.shape,
-  onOpenIsolatedView: PropTypes.func,
+  onOpenSplitView: PropTypes.func,
   goToTopic: PropTypes.func,
   highlightEntryId: PropTypes.string,
   isSearchResults: PropTypes.bool,
