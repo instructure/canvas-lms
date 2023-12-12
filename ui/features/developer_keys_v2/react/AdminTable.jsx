@@ -27,8 +27,11 @@ import {arrayOf, func, shape, string} from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 import DeveloperKey from './DeveloperKey'
+import DeveloperKeyModalTrigger from './NewKeyTrigger'
 
 import '@canvas/rails-flash-notifications'
+import FilterBar from '@canvas/filter-bar'
+import {Flex} from '@instructure/ui-flex'
 
 const I18n = useI18nScope('react_developer_keys')
 
@@ -55,6 +58,8 @@ class AdminTable extends React.Component {
     this.state = {
       sortBy: 'keystable-details',
       sortAscending: false,
+      typeFilter: 'all',
+      searchQuery: '',
     }
   }
 
@@ -153,7 +158,7 @@ class AdminTable extends React.Component {
 
   sortedDeveloperKeys = () => {
     const {sortBy, sortAscending} = this.state
-    return [...this.props.developerKeysList].sort((a, b) => {
+    return this.filteredDeveloperKeys().sort((a, b) => {
       const aVal = this.headers[sortBy].sortValue(a)
       const bVal = this.headers[sortBy].sortValue(b)
       if (aVal < bVal) {
@@ -166,8 +171,26 @@ class AdminTable extends React.Component {
     })
   }
 
+  filteredDeveloperKeys = () => {
+    const {typeFilter, searchQuery} = this.state
+
+    return this.props.developerKeysList.filter(key => {
+      const keyType = key.is_lti_key ? 'lti' : 'api'
+      const typeMatch = typeFilter === 'all' || typeFilter === keyType
+      const searchMatch =
+        searchQuery === '' ||
+        this.checkForMatch(key.name, searchQuery) ||
+        this.checkForMatch(key.email, searchQuery) ||
+        this.checkForMatch(key.id, searchQuery)
+      return typeMatch && searchMatch
+    })
+  }
+
+  checkForMatch = (attr, searchQuery) => {
+    return attr && attr.toLowerCase().includes(searchQuery.toLowerCase())
+  }
+
   onDelete = developerKeyId => {
-    const {setFocus} = this.props
     const developerKeys = this.sortedDeveloperKeys()
     const position = developerKeys.findIndex(key => key.id === developerKeyId)
     const previousDeveloperKey = developerKeys[position - 1]
@@ -181,7 +204,7 @@ class AdminTable extends React.Component {
         'Developer key %{developerKeyId} deleted. Focus moved to add developer key button.',
         {developerKeyId}
       )
-      setFocus()
+      this.focusDevKeyButton()
     } else {
       srMsg = I18n.t(
         'Developer key %{developerKeyId} deleted. Focus moved to the delete button of the previous developer key in the list.',
@@ -209,11 +232,36 @@ class AdminTable extends React.Component {
     return this[`developerKey-${key.id}`]
   }
 
+  setAddKeyButtonRef = node => {
+    this.addDevKeyButton = node
+  }
+
+  focusDevKeyButton = () => {
+    this.addDevKeyButton.focus()
+  }
+
   render() {
     const developerKeys = this.sortedDeveloperKeys()
     const srcontent = I18n.t('Developer Keys')
     return (
       <div>
+        <Flex justifyItems="space-between" margin="medium 0 0 0" wrap="wrap">
+          <FilterBar
+            filterOptions={[
+              {value: 'lti', text: I18n.t('LTI Keys')},
+              {value: 'api', text: I18n.t('API Keys')},
+            ]}
+            onFilter={typeFilter => this.setState({typeFilter})}
+            onSearch={searchQuery => this.setState({searchQuery})}
+            searchPlaceholder={I18n.t('Search by name, email, or ID')}
+            searchScreenReaderLabel={I18n.t('Search Developer Keys')}
+          />
+          <DeveloperKeyModalTrigger
+            store={this.props.store}
+            actions={this.props.actions}
+            setAddKeyButtonRef={this.setAddKeyButtonRef}
+          />
+        </Flex>
         <Table
           data-automation="devKeyAdminTable"
           caption={<ScreenReaderContent>{srcontent}</ScreenReaderContent>}
@@ -258,10 +306,7 @@ AdminTable.propTypes = {
       contextId: string.isRequired,
     }),
   }).isRequired,
-  setFocus: func,
 }
-
-AdminTable.defaultProps = {setFocus: () => {}}
 
 export default AdminTable
 export {createSetFocusCallback}

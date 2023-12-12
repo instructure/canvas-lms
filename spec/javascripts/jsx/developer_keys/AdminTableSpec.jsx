@@ -25,6 +25,16 @@ QUnit.module('AdminTable', {
   teardown() {
     document.getElementById('fixtures').innerHTML = ''
   },
+  beforeEach: () => {
+    window.ENV = {
+      FEATURES: {
+        lti_dynamic_registration: true,
+      },
+    }
+  },
+  afterEach: () => {
+    window.ENV = {}
+  },
 })
 
 function devKeyList(numKeys = 10) {
@@ -108,10 +118,11 @@ test('makes correct screenReader notification if key deleted', () => {
 
 test('focuses on external button if first item deleted', () => {
   const list = devKeyList()
-  const setFocus = sinon.spy()
-  const table = component(list, {setFocus})
+  const table = component(list)
+  const focusSpy = sinon.spy()
+  table.addDevKeyButton.focus = focusSpy
   table.onDelete('0')
-  ok(setFocus.called)
+  ok(focusSpy.called)
 })
 
 test('makes correct screenReader notification if first item deleted', () => {

@@ -23,9 +23,23 @@ import userEvent from '@testing-library/user-event'
 import AdminTable from '../AdminTable'
 
 describe('AdminTable', () => {
+  let originalENV
+  beforeEach(() => {
+    originalENV = global.ENV
+    global.ENV = {
+      FEATURES: {},
+    }
+  })
+
+  afterEach(() => {
+    global.ENV = originalENV
+  })
+
+  const idFor = n => `1000000000000${n}`
+
   const devKeyList = (numKeys = 10) => {
     return [...Array(numKeys).keys()].map(n => ({
-      id: `${n}`,
+      id: idFor(n),
       name: `key-${n}`,
       email: `email-${n}`,
       access_token_count: n * 2,
@@ -78,6 +92,7 @@ describe('AdminTable', () => {
 
   describe('when sorting table', () => {
     const firstRow = wrapper => wrapper.getAllByRole('row')[1]
+
     it('defaults to descending id', () => {
       const wrapper = component()
 
@@ -108,10 +123,10 @@ describe('AdminTable', () => {
       const wrapper = component()
 
       userEvent.click(wrapper.getByText('Details')) // ascending
-      expect(firstRow(wrapper)).toHaveTextContent('0')
+      expect(firstRow(wrapper)).toHaveTextContent(idFor(0))
 
       userEvent.click(wrapper.getByText('Details')) // descending
-      expect(firstRow(wrapper)).toHaveTextContent('9')
+      expect(firstRow(wrapper)).toHaveTextContent(idFor(9))
     })
 
     it('allows sorting by access token count', () => {
@@ -152,6 +167,42 @@ describe('AdminTable', () => {
 
       userEvent.click(wrapper.getByText('Actions')) // descending
       expect(firstRow(wrapper)).toHaveTextContent('key-9')
+    })
+  })
+
+  describe('when filtering table', () => {
+    const waitForDebounce = () => new Promise(resolve => setTimeout(resolve, 400))
+
+    it('filters by selecting type', () => {
+      const wrapper = component()
+
+      userEvent.click(wrapper.getByRole('combobox'))
+      userEvent.click(wrapper.getByRole('option', {name: 'LTI Keys'}))
+      expect(wrapper.getAllByRole('row')).toHaveLength(2)
+    })
+
+    it('filters by searching for name', async () => {
+      const wrapper = component()
+
+      userEvent.type(wrapper.getByRole('searchbox'), 'key-1')
+      await waitForDebounce()
+      expect(wrapper.getAllByRole('row')).toHaveLength(2)
+    })
+
+    it('filters by searching for email', async () => {
+      const wrapper = component()
+
+      userEvent.type(wrapper.getByRole('searchbox'), 'email-1')
+      await waitForDebounce()
+      expect(wrapper.getAllByRole('row')).toHaveLength(2)
+    })
+
+    it('filters by searching for id', async () => {
+      const wrapper = component()
+
+      userEvent.type(wrapper.getByRole('searchbox'), idFor(1))
+      await waitForDebounce()
+      expect(wrapper.getAllByRole('row')).toHaveLength(2)
     })
   })
 

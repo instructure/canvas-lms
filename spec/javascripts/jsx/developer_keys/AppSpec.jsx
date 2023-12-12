@@ -356,42 +356,6 @@ test('renders the spinner', () => {
   ok(spinner.exists())
 })
 
-test('opens the key selection menu when the create button is clicked', () => {
-  const applicationState = {
-    listDeveloperKeyScopes,
-    createOrEditDeveloperKey: {isLtiKey: false},
-    listDeveloperKeys: {
-      listDeveloperKeysPending: true,
-      listDeveloperKeysSuccessful: false,
-      list: [
-        {
-          id: '111',
-          api_key: 'abc12345678',
-          created_at: '2012-06-07T20:36:50Z',
-        },
-      ],
-    },
-  }
-
-  const props = {
-    applicationState,
-    actions: {developerKeysModalOpen: () => {}},
-    store: fakeStore(),
-    ctx: {
-      params: {
-        contextId: '',
-      },
-    },
-  }
-  const wrapper = mount(<DeveloperKeysApp {...props} />)
-
-  notOk(wrapper.find('Menu').first().find('Portal').exists())
-  wrapper.find('Button').first().simulate('click')
-  ok(wrapper.find('Menu').first().find('Portal').first().prop('open'))
-  wrapper.unmount()
-  window.ENV = {}
-})
-
 test('does not have the create button on inherited tab', () => {
   const openSpy = sinon.spy()
 
