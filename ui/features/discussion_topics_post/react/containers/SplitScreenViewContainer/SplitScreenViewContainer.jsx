@@ -67,7 +67,7 @@ export const SplitScreenViewContainer = props => {
     const newDiscussionEntry = result.data.createDiscussionEntry.discussionEntry
     const variables = {
       discussionEntryID: newDiscussionEntry.parentId,
-      last: ENV.isolated_view_initial_page_size,
+      last: ENV.split_screen_view_initial_page_size,
       sort: 'asc',
       courseID: window.ENV?.course_id,
       includeRelativeEntry: false,
@@ -254,7 +254,7 @@ export const SplitScreenViewContainer = props => {
   const splitScreenEntryOlderDirection = useQuery(DISCUSSION_SUBENTRIES_QUERY, {
     variables: {
       discussionEntryID: props.discussionEntryId,
-      last: ENV.isolated_view_initial_page_size,
+      last: ENV.split_screen_view_initial_page_size,
       sort: 'asc',
       courseID: window.ENV?.course_id,
       ...(props.relativeEntryId &&
