@@ -1448,6 +1448,8 @@ class AccountsController < ApplicationController
     raise ActiveRecord::RecordNotFound unless @account.root_account?
 
     user = api_find(User, params[:user_id])
+    raise ActiveRecord::RecordNotFound if user.try(:frd_deleted?)
+
     pseudonym = user && @account.pseudonyms.where(user_id: user).order(deleted_at: :desc).first!
 
     is_permissible =

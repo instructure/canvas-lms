@@ -427,6 +427,23 @@ describe UserSearch do
         # don't include users not enrolled
         it { is_expected.not_to include("not enrolled Tyler 01") }
       end
+
+      describe "deleted users" do
+        before :once do
+          user_with_pseudonym(name: "Deleted User")
+          @user.remove_from_root_account(course.account)
+        end
+
+        it "doesn't include deleted users" do
+          users = UserSearch.for_user_in_context("Deleted", course.account, user, nil, sort: "username", order: "asc").to_a
+          expect(users).not_to include(@user)
+        end
+
+        it "includes deleted users with option" do
+          users = UserSearch.for_user_in_context("Deleted", course.account, user, nil, sort: "username", order: "asc", include_deleted_users: true).to_a
+          expect(users).to include(@user)
+        end
+      end
     end
   end
 

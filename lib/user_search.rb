@@ -32,7 +32,7 @@ module UserSearch
       @include_integration = @include_sis
 
       context.shard.activate do
-        users_scope = context_scope(context, searcher, options.slice(:enrollment_state, :include_inactive_enrollments))
+        users_scope = context_scope(context, searcher, options.slice(:enrollment_state, :include_inactive_enrollments, :include_deleted_users))
         users_scope = users_scope.from("(#{conditions_statement(search_term, context.root_account, users_scope)}) AS users")
         users_scope = order_scope(users_scope, context, options.slice(:order, :sort))
         roles_scope(users_scope, context, options.slice(:enrollment_type,
@@ -60,7 +60,8 @@ module UserSearch
       users_scope = context_scope(context, searcher, options.slice(:enrollment_state,
                                                                    :include_inactive_enrollments,
                                                                    :enrollment_role_id,
-                                                                   :ui_invoked))
+                                                                   :ui_invoked,
+                                                                   :include_deleted_users))
       users_scope = roles_scope(users_scope, context, options.slice(:enrollment_role,
                                                                     :enrollment_role_id,
                                                                     :enrollment_type,
@@ -77,7 +78,9 @@ module UserSearch
       include_inactive_enrollments = !!options[:include_inactive_enrollments]
       case context
       when Account
-        User.of_account(context).active
+        users = User.of_account(context).active
+        users = users.union(context.deleted_users) if options[:include_deleted_users]
+        users
       when Course
         context.users_visible_to(searcher,
                                  include_prior_enrollments,
@@ -213,7 +216,7 @@ module UserSearch
     end
 
     def id_sql(users_scope, params)
-      users_scope.select("users.*, MAX(current_login_at) as last_login")
+      users_scope.select("users.*, MAX(pseudonyms.current_login_at) as last_login")
                  .joins("LEFT JOIN #{Pseudonym.quoted_table_name} ON pseudonyms.user_id = users.id
           AND pseudonyms.account_id = #{User.connection.quote(params[:account].id_for_database)}
           AND pseudonyms.workflow_state = 'active'")
@@ -225,7 +228,7 @@ module UserSearch
       ids = specific_ids(params)
       return nil unless ids.length.positive?
 
-      users_scope.select("users.*, MAX(current_login_at) as last_login")
+      users_scope.select("users.*, MAX(pseudonyms.current_login_at) as last_login")
                  .joins("LEFT JOIN #{Pseudonym.quoted_table_name} ON pseudonyms.user_id = users.id
           AND pseudonyms.account_id = #{User.connection.quote(params[:account].id_for_database)}
           AND pseudonyms.workflow_state = 'active'")
@@ -238,7 +241,7 @@ module UserSearch
     end
 
     def name_sql(users_scope, params)
-      users_scope.select("users.*, MAX(current_login_at) as last_login")
+      users_scope.select("users.*, MAX(pseudonyms.current_login_at) as last_login")
                  .joins("LEFT JOIN #{Pseudonym.quoted_table_name} ON pseudonyms.user_id = users.id
           AND pseudonyms.account_id = #{User.connection.quote(params[:account].id_for_database)}
           AND pseudonyms.workflow_state = 'active'")
@@ -276,7 +279,7 @@ module UserSearch
     end
 
     def email_sql(users_scope, params)
-      users_scope.select("users.*, MAX(current_login_at) as last_login")
+      users_scope.select("users.*, MAX(pseudonyms.current_login_at) as last_login")
                  .joins(:communication_channels)
                  .joins("LEFT JOIN #{Pseudonym.quoted_table_name} ON pseudonyms.user_id = users.id
           AND pseudonyms.account_id = #{User.connection.quote(params[:account].id_for_database)}

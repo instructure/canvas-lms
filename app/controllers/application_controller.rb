@@ -349,6 +349,7 @@ class ApplicationController < ActionController::Base
     featured_help_links
     lti_platform_storage
     account_level_blackout_dates
+    deleted_user_tools
     render_both_to_do_lists
     course_paces_redesign
     course_paces_for_students

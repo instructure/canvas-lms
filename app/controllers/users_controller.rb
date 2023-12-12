@@ -415,6 +415,10 @@ class UsersController < ApplicationController
   # @argument order [String, "asc"|"desc"]
   #   The order to sort the given column by.
   #
+  # @argument include_deleted_users [Boolean]
+  #   When set to true and used with an account context, returns users who have deleted
+  #   pseudonyms for the context
+  #
   #  @example_request
   #    curl https://<canvas>/api/v1/accounts/self/users?search_term=<search value> \
   #       -X GET \
@@ -438,7 +442,8 @@ class UsersController < ApplicationController
                                                order: params[:order],
                                                sort: params[:sort],
                                                enrollment_role_id: params[:role_filter_id],
-                                               enrollment_type: params[:enrollment_type]
+                                               enrollment_type: params[:enrollment_type],
+                                               include_deleted_users: value_to_boolean(params[:include_deleted_users])
                                              })
     else
       users = UserSearch.scope_for(@context,
@@ -450,7 +455,8 @@ class UsersController < ApplicationController
                                      enrollment_type: params[:enrollment_type],
                                      ui_invoked: includes.include?("ui_invoked"),
                                      temporary_enrollment_recipients: value_to_boolean(params[:temporary_enrollment_recipients]),
-                                     temporary_enrollment_providers: value_to_boolean(params[:temporary_enrollment_providers])
+                                     temporary_enrollment_providers: value_to_boolean(params[:temporary_enrollment_providers]),
+                                     include_deleted_users: value_to_boolean(params[:include_deleted_users])
                                    })
       users = users.with_last_login if params[:sort] == "last_login"
     end
@@ -1349,7 +1355,9 @@ class UsersController < ApplicationController
       get_context(user_scope: User) if params[:account_id] || params[:course_id] || params[:group_id]
 
       @context_account = @context.is_a?(Account) ? @context : @domain_root_account
-      @user = api_find_all(@context&.all_users || User, [params[:id]]).first
+      all_users = @context&.all_users
+      all_users = all_users.union(@context.deleted_users) if @context.is_a?(Account)
+      @user = api_find_all(all_users || User, [params[:id]]).first
       allowed = @user&.grants_right?(@current_user, session, :read_full_profile)
 
       return render_unauthorized_action unless allowed
