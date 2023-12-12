@@ -317,17 +317,17 @@ test('filters out course pacing assignments for teachers', function () {
     CONTEXTS: [
       {
         asset_string: 'course_1',
-        can_make_reservation: false,
+        user_is_student: false,
         course_pacing_enabled: false,
       },
       {
         asset_string: 'course_2',
-        can_make_reservation: false,
+        user_is_student: false,
         course_pacing_enabled: true,
       },
       {
         asset_string: 'course_3',
-        can_make_reservation: true,
+        user_is_student: true,
         course_pacing_enabled: true,
       },
     ],

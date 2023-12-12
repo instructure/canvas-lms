@@ -365,6 +365,33 @@ describe AppointmentGroup do
       expect(@g9.grants_right?(@student_in_course3_section2, :reserve)).to be_truthy
     end
 
+    it "allows observers to reserve appointments only when allow_observer_signup is true" do
+      observer = user_factory(active_all: true)
+      @course.enroll_user(observer, "ObserverEnrollment", enrollment_state: "active")
+      @g1.update!(allow_observer_signup: true)
+      @g3.update!(allow_observer_signup: true)
+      @g8.update!(allow_observer_signup: true) # observer not enrolled in this course
+      expect(AppointmentGroup.reservable_by(observer).pluck(:id)).to contain_exactly(@g1.id, @g3.id)
+      expect(@g1.grants_right?(observer, :reserve)).to be_truthy
+      expect(@g2.grants_right?(observer, :reserve)).to be_falsey
+      expect(@g3.grants_right?(observer, :reserve)).to be_truthy
+      expect(@g4.grants_right?(observer, :reserve)).to be_falsey
+      expect(@g5.grants_right?(observer, :reserve)).to be_falsey
+      expect(@g8.grants_right?(observer, :reserve)).to be_falsey
+    end
+
+    it "allows users who are students and observers to reserve appointments where appropriate" do
+      user = user_factory(active_all: true)
+      @course.enroll_user(user, "ObserverEnrollment", enrollment_state: "active")
+      @course2.enroll_user(user, "StudentEnrollment", enrollment_state: "active")
+      @g1.update!(allow_observer_signup: true)
+      expect(AppointmentGroup.reservable_by(user).pluck(:id)).to contain_exactly(@g1.id, @g8.id)
+      expect(@g1.grants_right?(user, :reserve)).to be_truthy
+      expect(@g2.grants_right?(user, :reserve)).to be_falsey
+      expect(@g8.grants_right?(user, :reserve)).to be_truthy
+      expect(@g9.grants_right?(user, :reserve)).to be_falsey
+    end
+
     it "returns only appointment groups that are manageable by the user" do
       # teacher can manage everything in the course
       visible_groups = AppointmentGroup.manageable_by(@teacher).sort_by(&:id)

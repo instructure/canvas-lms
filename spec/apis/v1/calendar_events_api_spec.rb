@@ -4697,6 +4697,35 @@ describe CalendarEventsApiController, type: :request do
       end
       expect(context).not_to be_present
     end
+
+    describe "allow_observers_in_appointment_groups" do
+      let :json do
+        api_call(:get, "/api/v1/calendar_events/visible_contexts", {
+                   controller: "calendar_events_api",
+                   action: "visible_contexts",
+                   format: "json"
+                 })
+      end
+
+      it "is false for contexts with the setting disabled" do
+        context = json["contexts"].find { |c| c["asset_string"] == "course_#{@course.id}" }
+        expect(context["allow_observers_in_appointment_groups"]).to be false
+      end
+
+      it "is false for user contexts" do
+        @user.account.settings[:allow_observers_in_appointment_groups] = { value: true }
+        @user.account.save!
+        context = json["contexts"].find { |c| c["asset_string"] == "user_#{@user.id}" }
+        expect(context["allow_observers_in_appointment_groups"]).to be false
+      end
+
+      it "is true for contexts with the setting enabled" do
+        @course.account.settings[:allow_observers_in_appointment_groups] = { value: true }
+        @course.account.save!
+        context = json["contexts"].find { |c| c["asset_string"] == "course_#{@course.id}" }
+        expect(context["allow_observers_in_appointment_groups"]).to be true
+      end
+    end
   end
 
   describe "#set_course_timetable" do

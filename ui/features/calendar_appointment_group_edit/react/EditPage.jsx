@@ -47,6 +47,7 @@ const parseFormValues = data => ({
   limitUsersPerSlot: data.participants_per_appointment,
   limitSlotsPerUser: data.max_appointments_per_participant,
   allowStudentsToView: data.participant_visibility === 'protected',
+  allowObserverSignup: data.allow_observer_signup,
 })
 
 const parseTimeData = appointmentGroup => {
@@ -85,7 +86,17 @@ class EditPage extends React.Component {
       contexts: [],
       isDeleting: false,
       eventDataSource: null,
+      selectedContexts: new Set(),
+      selectedSubContexts: new Set(),
     }
+  }
+
+  setSelectedContexts = selectedContexts => {
+    this.setState({selectedContexts})
+  }
+
+  setSelectedSubContexts = selectedSubContexts => {
+    this.setState({selectedSubContexts})
   }
 
   componentDidMount() {
@@ -99,6 +110,8 @@ class EditPage extends React.Component {
           {
             formValues,
             appointmentGroup: response.data,
+            selectedContexts: new Set(response.data.context_codes),
+            selectedSubContexts: new Set(response.data.sub_context_codes),
           },
           () => {
             // Handle setting some pesky values
@@ -151,6 +164,17 @@ class EditPage extends React.Component {
     })
     messageStudentsDialog.show()
   }
+
+  groupSubContextsSelected = () => [...this.state.selectedSubContexts].some(code => code.startsWith('group_'))
+
+  observerSignupAllowed = () =>
+    this.state.contexts?.length > 0 &&
+    !this.groupSubContextsSelected() &&
+    [...this.state.selectedContexts].every(
+      context_code =>
+        this.state.contexts.find(c => c.asset_string === context_code)
+          .allow_observers_in_appointment_groups
+    )
 
   deleteGroup = () => {
     if (!this.state.isDeleting) {
@@ -216,8 +240,9 @@ class EditPage extends React.Component {
             $.unfudgeDateForProfileTimezone(tb.timeData.startTime),
             $.unfudgeDateForProfileTimezone(tb.timeData.endTime),
           ]),
-        context_codes: [...this.contextSelector.state.selectedContexts],
-        sub_context_codes: [...this.contextSelector.state.selectedSubContexts],
+        context_codes: [...this.state.selectedContexts],
+        sub_context_codes: [...this.state.selectedSubContexts],
+        allow_observer_signup: this.observerSignupAllowed() && formValues.allowObserverSignup,
       },
     }
 
@@ -271,12 +296,13 @@ class EditPage extends React.Component {
         >
           <FormFieldGroup description={I18n.t('Calendars')} layout="inline" vAlign="top">
             <ContextSelector
-              ref={c => {
-                this.contextSelector = c
-              }}
               id="context"
               appointmentGroup={this.state.appointmentGroup}
               contexts={this.state.contexts}
+              selectedContexts={this.state.selectedContexts}
+              selectedSubContexts={this.state.selectedSubContexts}
+              setSelectedContexts={this.setSelectedContexts}
+              setSelectedSubContexts={this.setSelectedSubContexts}
             />
           </FormFieldGroup>
           <TextInput
@@ -369,6 +395,14 @@ class EditPage extends React.Component {
                   }}
                 />
               </div>
+              {this.observerSignupAllowed() && (
+                <Checkbox
+                  label={I18n.t('Allow observers to sign-up')}
+                  checked={this.state.formValues.allowObserverSignup}
+                  name="allowObserverSignup"
+                  onChange={this.handleCheckboxChange}
+                />
+              )}
             </FormFieldGroup>
           </div>
           <FormFieldGroup

@@ -396,6 +396,18 @@
                   </tr>
                 <% end %>
 
+                <% if Account.site_admin.feature_enabled?(:observer_appointment_groups) %>
+                  <%= settings.fields_for :allow_observers_in_appointment_groups do |r| %>
+                    <% hash = @account.allow_observers_in_appointment_groups %>
+                    <tr>
+                      <td colspan="2">
+                        <%= r.check_box :value, checked: hash[:value] %>
+                        <%= r.label :value, t("Allow observers to sign-up for appointments when enabled by the teacher") %>
+                      </td>
+                    </tr>
+                  <% end %>
+                <% end %>
+
                 <% if Account.site_admin.feature_enabled?(:gradebook_show_first_last_names) %>
                   <%= settings.fields_for :allow_gradebook_show_first_last_names do |r| %>
                     <% hash = @account.allow_gradebook_show_first_last_names %>

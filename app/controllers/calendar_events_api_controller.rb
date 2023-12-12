@@ -1286,7 +1286,8 @@ class CalendarEventsApiController < ApplicationController
         name: context.nickname_for(@current_user),
         asset_string: context.asset_string,
         color: @current_user.custom_colors[context.asset_string],
-        selected: selected_contexts.include?(context.asset_string)
+        selected: selected_contexts.include?(context.asset_string),
+        allow_observers_in_appointment_groups: context.is_a?(Course) && context.account.allow_observers_in_appointment_groups?
       }
 
       if context.is_a?(Course)

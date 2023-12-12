@@ -579,7 +579,7 @@ export default class EventDataSource {
       params.context_codes = ENV.CALENDAR.CONTEXTS.filter(
         context =>
           params.context_codes.includes(context.asset_string) &&
-          (!context.course_pacing_enabled || context.can_make_reservation)
+          (!context.course_pacing_enabled || context.user_is_student)
       ).map(context => context.asset_string)
     }
     return {type: 'assignment', ...params}

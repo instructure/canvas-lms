@@ -47,6 +47,7 @@ export default class EditAppointmentGroupDetails {
       use_group_signup: this.apptGroup.participant_type === 'Group',
       ...this.apptGroup,
     }
+    this.allowObserverOption = false
 
     $(selector).html(
       editAppointmentGroupTemplate({
@@ -152,6 +153,7 @@ export default class EditAppointmentGroupDetails {
       const checked = !!jsEvent.target.checked
       this.form.find('.per_appointment_groups_label').toggle(checked)
       this.form.find('.per_appointment_users_label').toggle(!checked)
+      this.toggleObserverSignupVisibility()
       return this.form.find('.group-signup').toggle(checked)
     })
     this.form.find('.group-signup-checkbox').change()
@@ -328,6 +330,10 @@ export default class EditAppointmentGroupDetails {
     params['appointment_group[participant_visibility]'] =
       data.participant_visibility === '1' ? 'protected' : 'private'
 
+    if (this.allowObserverOption) {
+      params['appointment_group[allow_observer_signup]'] = data.allow_observer_signup
+    }
+
     // get the context/section info from @contextSelector instead
     delete data['context_codes[]']
     delete data['sections[]']
@@ -421,6 +427,19 @@ export default class EditAppointmentGroupDetails {
     } else {
       this.disableGroups()
     }
+
+    this.toggleObserverSignupVisibility()
+  }
+
+  toggleObserverSignupVisibility = () => {
+    const contextCodes = this.contextSelector?.selectedContexts() || []
+    const groupSignupEnabled = this.form.find('.group-signup-checkbox').is(':checked')
+    const showObserverSignupCheckbox =
+      !groupSignupEnabled &&
+      contextCodes.length > 0 &&
+      contextCodes.every(c => this.contextsHash[c].allow_observers_in_appointment_groups)
+    this.allowObserverOption = showObserverSignupCheckbox
+    this.form.find('#observer-signup-option').toggle(showObserverSignupCheckbox)
   }
 
   disableGroups() {
