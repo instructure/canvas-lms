@@ -254,11 +254,7 @@ export const DiscussionThreadContainer = props => {
           setEditorExpanded(newEditorExpanded)
 
           if (splitScreenOn) {
-            props.onOpenIsolatedView(
-              props.discussionEntry._id,
-              props.discussionEntry.isolatedEntryId,
-              true
-            )
+            props.onOpenSplitView(props.discussionEntry._id, true)
           }
         }}
       />
@@ -295,11 +291,7 @@ export const DiscussionThreadContainer = props => {
         }
         onClick={() => {
           if (splitScreenOn) {
-            props.onOpenIsolatedView(
-              props.discussionEntry._id,
-              props.discussionEntry.isolatedEntryId,
-              false
-            )
+            props.onOpenSplitView(props.discussionEntry._id, false)
           } else {
             setExpandReplies(!expandReplies)
           }
@@ -489,11 +481,7 @@ export const DiscussionThreadContainer = props => {
                           onQuoteReply={() => {
                             setReplyFromId(props.discussionEntry._id)
                             if (splitScreenOn) {
-                              props.onOpenIsolatedView(
-                                props.discussionEntry._id,
-                                props.discussionEntry.isolatedEntryId,
-                                true
-                              )
+                              props.onOpenSplitView(props.discussionEntry._id, true)
                             } else {
                               setEditorExpanded(true)
                             }
@@ -551,7 +539,7 @@ export const DiscussionThreadContainer = props => {
                         <ThreadingToolbar
                           searchTerm={searchTerm}
                           discussionEntry={props.discussionEntry}
-                          onOpenIsolatedView={props.onOpenIsolatedView}
+                          onOpenSplitView={props.onOpenSplitView}
                           isIsolatedView={false}
                           filter={filter}
                         >
@@ -642,7 +630,7 @@ DiscussionThreadContainer.propTypes = {
   refetchDiscussionEntries: PropTypes.func,
   depth: PropTypes.number,
   markAsRead: PropTypes.func,
-  onOpenIsolatedView: PropTypes.func,
+  onOpenSplitView: PropTypes.func,
   goToTopic: PropTypes.func,
   highlightEntryId: PropTypes.string,
   setHighlightEntryId: PropTypes.func,
