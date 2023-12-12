@@ -274,7 +274,7 @@ export default class ShowEventDetailsDialog {
     })
 
     // For now used to eliminate the ability of teachers and tas seeing the excess reserveration link
-    if (!this.event.contextInfo.can_make_reservation) {
+    if (!this.event.contextInfo.user_is_student && !(this.event.contextInfo.user_is_observer && this.event.contextInfo.allow_observers_in_appointment_groups)) {
       params.can_reserve = false
     }
 

@@ -99,6 +99,11 @@
 #           "type": "array",
 #           "items": {"$ref": "Appointment"}
 #         },
+#         "allow_observer_signup": {
+#           "description": "Boolean indicating whether observer users should be able to sign-up for an appointment",
+#           "example": false,
+#           "type": "boolean"
+#         },
 #         "context_codes": {
 #           "description": "The context codes (i.e. courses) this appointment group belongs to. Only people in these courses will be eligible to sign up.",
 #           "example": ["course_123"],
@@ -326,6 +331,9 @@ class AppointmentGroupsController < ApplicationController
   #   "protected":: participants can see who has signed up.  Defaults to
   #                 "private".
   #
+  # @argument appointment_group[allow_observer_signup] [Boolean]
+  #   Whether observer users can sign-up for an appointment. Defaults to false.
+  #
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/appointment_groups.json' \
@@ -350,6 +358,11 @@ class AppointmentGroupsController < ApplicationController
     if contexts.any?(&:concluded?)
       return render json: { error: t("cannot create an appointment group for a concluded course") },
                     status: :bad_request
+    end
+
+    if value_to_boolean(params[:appointment_group][:allow_observer_signup]) && contexts.any? { |c| !c.is_a?(Course) || !c.account.allow_observers_in_appointment_groups? }
+      return render json: { error: "cannot allow observers to sign up for appointment groups in this course" },
+                    status: :forbidden
     end
 
     raise ActiveRecord::RecordNotFound unless contexts.present?
@@ -466,6 +479,9 @@ class AppointmentGroupsController < ApplicationController
   #   "private":: participants cannot see who has signed up for a particular
   #               time slot
   #   "protected":: participants can see who has signed up. Defaults to "private".
+  #
+  # @argument appointment_group[allow_observer_signup] [Boolean]
+  #   Whether observer users can sign-up for an appointment.
   #
   # @example_request
   #
@@ -604,6 +620,7 @@ class AppointmentGroupsController < ApplicationController
                                               :max_appointments_per_participant,
                                               :participant_visibility,
                                               :cancel_reason,
+                                              :allow_observer_signup,
                                               sub_context_codes: [],
                                               new_appointments: strong_anything)
   end

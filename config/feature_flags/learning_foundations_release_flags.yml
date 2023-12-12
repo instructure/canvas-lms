@@ -219,3 +219,16 @@ precise_link_replacements:
     Apply link replacement logic to a select list of
     elements only, as opposed to all texts
   applies_to: SiteAdmin
+
+observer_appointment_groups:
+  applies_to: SiteAdmin
+  state: hidden
+  display_name: Allow observers to schedule appointments in the calendar
+  description: |-
+    When enabled, teachers can choose to allow observers to schedule appointments
+    when creating appointment groups in the calendar.
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on

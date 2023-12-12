@@ -178,6 +178,29 @@ describe "accounts/settings" do
       end
     end
 
+    describe "allow_observers_in_appointment_groups setting" do
+      before do
+        account = Account.default
+        admin = account_admin_user
+        view_context(account, admin)
+        assign(:account, account)
+        assign(:announcements, AccountNotification.none.paginate)
+      end
+
+      let(:setting_label) { "Allow observers to sign-up for appointments when enabled by the teacher" }
+
+      it "renders the setting when the observer_appointment_groups feature is enabled" do
+        render
+        expect(rendered).to include(setting_label)
+      end
+
+      it "does not render the setting when the observer_appointment_groups feature is disabled" do
+        Account.site_admin.disable_feature!(:observer_appointment_groups)
+        render
+        expect(rendered).not_to include(setting_label)
+      end
+    end
+
     context "account admin user" do
       let_once(:account) { Account.default }
       let_once(:admin) { account_admin_user(account:) }

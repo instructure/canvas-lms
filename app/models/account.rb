@@ -398,6 +398,8 @@ class Account < ActiveRecord::Base
   # Allow enabling metrics like Heap for sandboxes and other accounts without Salesforce data
   add_setting :enable_usage_metrics, boolean: true, root_only: true, default: false
 
+  add_setting :allow_observers_in_appointment_groups, boolean: true, default: false, inheritable: true
+
   def settings=(hash)
     if hash.is_a?(Hash) || hash.is_a?(ActionController::Parameters)
       hash.each do |key, val|
@@ -494,6 +496,10 @@ class Account < ActiveRecord::Base
 
   def disable_rce_media_uploads?
     disable_rce_media_uploads[:value]
+  end
+
+  def allow_observers_in_appointment_groups?
+    allow_observers_in_appointment_groups[:value] && Account.site_admin.feature_enabled?(:observer_appointment_groups)
   end
 
   def allow_gradebook_show_first_last_names?

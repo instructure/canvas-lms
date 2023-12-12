@@ -293,6 +293,7 @@ module Api::V1::CalendarEvent
     hash["participant_type"] = group.participant_type
     hash["url"] = api_v1_appointment_group_url(group)
     hash["html_url"] = appointment_group_url(hash["id"])
+    hash["allow_observer_signup"] = group.allow_observer_signup if Account.site_admin.feature_enabled?(:observer_appointment_groups)
     hash
   ensure
     @context = orig_context
