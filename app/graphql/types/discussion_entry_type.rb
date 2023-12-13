@@ -33,12 +33,6 @@ module Types
     field :rating_count, Integer, null: true
     field :rating_sum, Integer, null: true
 
-    # This will get removed when references to isolated_entry_id are removed from the react_discussion
-    field :isolated_entry_id, ID, null: true
-    def isolated_entry_id
-      object.parent_id
-    end
-
     field :message, String, null: true
     def message
       if object.deleted?

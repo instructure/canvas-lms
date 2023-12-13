@@ -20,18 +20,18 @@
 
 require_relative "../graphql_spec_helper"
 
-RSpec.describe Mutations::UpdateIsolatedViewDeeplyNestedAlert do
+RSpec.describe Mutations::UpdateSplitScreenViewDeeplyNestedAlert do
   before(:once) do
     course_with_teacher(active_all: true)
   end
 
   def mutation_str(
-    isolated_view_deeply_nested_alert: true
+    split_screen_view_deeply_nested_alert: true
   )
     <<~GQL
       mutation {
-        updateIsolatedViewDeeplyNestedAlert(input: {
-          isolatedViewDeeplyNestedAlert: #{isolated_view_deeply_nested_alert}
+        updateSplitScreenViewDeeplyNestedAlert(input: {
+          splitScreenViewDeeplyNestedAlert: #{split_screen_view_deeply_nested_alert}
         }) {
           user {
             id
@@ -51,14 +51,14 @@ RSpec.describe Mutations::UpdateIsolatedViewDeeplyNestedAlert do
     result.to_h.with_indifferent_access
   end
 
-  it "changes isolatedViewDeeplyNestedAlert to TRUE" do
-    result = run_mutation({ isolated_view_deeply_nested_alert: true })
+  it "changes splitScreenViewDeeplyNestedAlert to TRUE" do
+    result = run_mutation({ split_screen_view_deeply_nested_alert: true })
     expect(result["errors"]).to be_nil
     expect(@teacher.should_show_deeply_nested_alert?).to be true
   end
 
-  it "changes isolatedViewDeeplyNestedAlert to FALSE" do
-    result = run_mutation({ isolated_view_deeply_nested_alert: false })
+  it "changes splitScreenViewDeeplyNestedAlert to FALSE" do
+    result = run_mutation({ split_screen_view_deeply_nested_alert: false })
     expect(result["errors"]).to be_nil
     expect(@teacher.should_show_deeply_nested_alert?).to be false
   end

@@ -35,7 +35,7 @@ import {Text} from '@instructure/ui-text'
 import {ThreadActions} from '../../components/ThreadActions/ThreadActions'
 import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolbar'
 import {
-  UPDATE_ISOLATED_VIEW_DEEPLY_NESTED_ALERT,
+  UPDATE_SPLIT_SCREEN_VIEW_DEEPLY_NESTED_ALERT,
   UPDATE_DISCUSSION_THREAD_READ_STATE,
   UPDATE_DISCUSSION_ENTRY_PARTICIPANT,
 } from '../../../graphql/Mutations'
@@ -48,7 +48,7 @@ const I18n = useI18nScope('discussion_posts')
 
 export const SplitScreenParent = props => {
   const [updateSplitScreenViewDeeplyNestedAlert] = useMutation(
-    UPDATE_ISOLATED_VIEW_DEEPLY_NESTED_ALERT
+    UPDATE_SPLIT_SCREEN_VIEW_DEEPLY_NESTED_ALERT
   )
 
   const client = useApolloClient()
@@ -172,7 +172,7 @@ export const SplitScreenParent = props => {
                 onDismiss={() => {
                   updateSplitScreenViewDeeplyNestedAlert({
                     variables: {
-                      isolatedViewDeeplyNestedAlert: false,
+                      splitScreenViewDeeplyNestedAlert: false,
                     },
                   })
 
