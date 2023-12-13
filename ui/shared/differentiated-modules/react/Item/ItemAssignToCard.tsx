@@ -55,6 +55,7 @@ export type ItemAssignToCardProps = {
     assignees: AssigneeOption[],
     deletedAssignees: string[]
   ) => void
+  onCardDatesChange?: (cardId: string, dateAttribute: string, dateValue: string | null) => void
   disabledOptionIds: string[]
   selectedAssigneeIds: string[]
   isOpen?: boolean
@@ -80,6 +81,7 @@ export default function ItemAssignToCard({
   onDelete,
   onValidityChange,
   onCardAssignmentChange,
+  onCardDatesChange,
   disabledOptionIds,
   selectedAssigneeIds,
   isOpen,
@@ -119,13 +121,29 @@ export default function ItemAssignToCard({
     onDelete?.(cardId)
   }, [cardId, onDelete])
 
+  const handleDueAtChange = useCallback(
+    (newDate: string | null) => {
+      setDueDate(newDate)
+      onCardDatesChange?.(cardId, 'due_at', newDate)
+    },
+    [cardId, onCardDatesChange]
+  )
+
   const handleDueDateChange = useCallback(
     (_event: React.SyntheticEvent, value: string | undefined) => {
       const defaultDueTime = ENV.DEFAULT_DUE_TIME ?? '23:59:00'
       const newDueDate = dueDate ? value : setTimeToStringDate(defaultDueTime, value)
-      setDueDate(newDueDate || null)
+      handleDueAtChange(newDueDate || null)
     },
-    [dueDate]
+    [dueDate, handleDueAtChange]
+  )
+
+  const handleUnlockAtChange = useCallback(
+    (newDate: string | null) => {
+      setAvailableFromDate(newDate)
+      onCardDatesChange?.(cardId, 'unlock_at', newDate)
+    },
+    [cardId, onCardDatesChange]
   )
 
   const handleAvailableFromDateChange = useCallback(
@@ -133,17 +151,25 @@ export default function ItemAssignToCard({
       const newAvailableFromDate = availableFromDate
         ? value
         : setTimeToStringDate('00:00:00', value)
-      setAvailableFromDate(newAvailableFromDate || null)
+      handleUnlockAtChange(newAvailableFromDate || null)
     },
-    [availableFromDate]
+    [availableFromDate, handleUnlockAtChange]
+  )
+
+  const handleLockAtChange = useCallback(
+    (newDate: string | null) => {
+      setAvailableToDate(newDate)
+      onCardDatesChange?.(cardId, 'lock_at', newDate)
+    },
+    [cardId, onCardDatesChange]
   )
 
   const handleAvailableToDateChange = useCallback(
     (_event: React.SyntheticEvent, value: string | undefined) => {
       const newAvailableToDate = availableToDate ? value : setTimeToStringDate('23:59:00', value)
-      setAvailableToDate(newAvailableToDate || null)
+      handleLockAtChange(newAvailableToDate || null)
     },
-    [availableToDate]
+    [availableToDate, handleLockAtChange]
   )
 
   useEffect(() => {
@@ -187,7 +213,7 @@ export default function ItemAssignToCard({
       dateRenderLabel: I18n.t('Due Date'),
       value: dueDate,
       onChange: handleDueDateChange,
-      onClear: () => setDueDate(null),
+      onClear: () => handleDueAtChange(null),
     },
     {
       key: 'unlock_at',
@@ -195,7 +221,7 @@ export default function ItemAssignToCard({
       dateRenderLabel: I18n.t('Available from'),
       value: availableFromDate,
       onChange: handleAvailableFromDateChange,
-      onClear: () => setAvailableFromDate(null),
+      onClear: () => handleUnlockAtChange(null),
     },
     {
       key: 'lock_at',
@@ -203,7 +229,7 @@ export default function ItemAssignToCard({
       dateRenderLabel: I18n.t('Until'),
       value: availableToDate,
       onChange: handleAvailableToDateChange,
-      onClear: () => setAvailableToDate(null),
+      onClear: () => handleLockAtChange(null),
     },
   ]
 

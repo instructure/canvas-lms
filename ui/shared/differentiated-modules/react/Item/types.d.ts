@@ -19,7 +19,7 @@
 import {FetchLinkHeader} from '@canvas/do-fetch-api-effect/types'
 
 export interface BaseDateDetails {
-  id: number
+  id: string
   due_at: string | null
   unlock_at: string | null
   lock_at: string | null
@@ -31,21 +31,37 @@ export interface StudentInfo {
   name: string
 }
 export interface DateDetailsOverride {
-  id: number
-  assignment_id: number | null
-  title: string
-  course_section_id: number | null
+  id?: string
+  assignment_id?: number | null
+  title?: string
+  course_section_id?: string | null
   students?: StudentInfo[]
-  student_ids: string[]
-  due_at: string
+  student_ids?: string[]
+  due_at: string | null
   unlock_at: string | null
   lock_at: string | null
-  all_day: boolean
-  all_day_date: string | null
+  all_day?: boolean
+  all_day_date?: string | null
+}
+
+export interface ItemAssignToCardSpec {
+  overrideId?: string
+  key: string
+  isValid: boolean
+  hasAssignees: boolean
+  due_at: string | null
+  unlock_at: string | null
+  lock_at: string | null
+  selectedAssigneeIds: string[]
+  defaultOptions?: string[]
 }
 
 export interface DateDetails extends BaseDateDetails {
   overrides?: DateDetailsOverride[]
+}
+
+export interface DateDetailsPayload extends BaseDateDetails {
+  assignment_overrides: DateDetailsOverride[]
 }
 
 export interface FetchDueDatesResponse {

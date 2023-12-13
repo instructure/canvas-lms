@@ -65,6 +65,12 @@ export type AssignmentOverridesPayload = {
   overrides: AssignmentOverridePayload[]
 }
 
+export type DateDetailsOverride = AssignmentOverridePayload & {
+  due_at: string | null
+  unlock_at: string | null
+  lock_at: string | null
+}
+
 interface BaseRequirement extends ModuleItem {
   type: RequirementType
 }

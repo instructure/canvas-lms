@@ -33,14 +33,20 @@ import {
   IconQuizSolid,
   IconQuestionLine,
 } from '@instructure/ui-icons'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import type {BaseDateDetails, FetchDueDatesResponse} from './types'
+import type {
+  BaseDateDetails,
+  DateDetails,
+  FetchDueDatesResponse,
+  ItemAssignToCardSpec,
+} from './types'
 import ItemAssignToCard from './ItemAssignToCard'
 import TrayFooter from '../Footer'
 import type {AssigneeOption} from '../AssigneeSelector'
 import useFetchAssignees from '../../utils/hooks/useFetchAssignees'
+import {generateDateDetailsPayload} from '../../utils/assignToHelper'
 
 const I18n = useI18nScope('differentiated_modules')
 
@@ -73,6 +79,41 @@ function makeCardId(): string {
   return uid('assign-to-card', 3)
 }
 
+export const updateModuleItem = ({
+  courseId,
+  moduleItemType,
+  moduleItemName,
+  moduleItemContentId,
+  payload,
+  onSuccess,
+}: {
+  courseId: string
+  moduleItemType: string
+  moduleItemName: string
+  moduleItemContentId: string
+  payload: DateDetails
+  onSuccess: () => void
+}) => {
+  return doFetchApi({
+    path: itemTypeToApiURL(courseId, moduleItemType, moduleItemContentId),
+    method: 'PUT',
+    body: payload,
+  })
+    .then(() => {
+      showFlashAlert({
+        type: 'success',
+        message: I18n.t(`%{moduleItemName} updated`, {moduleItemName}),
+      })
+      onSuccess()
+    })
+    .catch((err: Error) => {
+      showFlashAlert({
+        err,
+        message: I18n.t(`Error updating "%{moduleItemName}`, {moduleItemName}),
+      })
+    })
+}
+
 // TODO: need props to initialize with cards corresponding to current assignments
 export interface ItemAssignToTrayProps {
   open: boolean
@@ -87,17 +128,6 @@ export interface ItemAssignToTrayProps {
   timezone: string
 }
 
-// TODO: will eventually be ItemAssignToCardSpec, I think
-interface CardSpec {
-  key: string
-  isValid: boolean
-  hasAssignees: boolean
-  due_at: string | null
-  unlock_at: string | null
-  lock_at: string | null
-  selectedAssigneeIds: string[]
-}
-
 export default function ItemAssignToTray({
   open,
   onClose,
@@ -110,13 +140,12 @@ export default function ItemAssignToTray({
   locale,
   timezone,
 }: ItemAssignToTrayProps) {
-  const [assignToCards, setAssignToCards] = useState<CardSpec[]>([])
+  const [assignToCards, setAssignToCards] = useState<ItemAssignToCardSpec[]>([])
   const [fetchInFlight, setFetchInFlight] = useState(false)
   const [disabledOptionIds, setDisabledOptionIds] = useState<string[]>([])
-  const [includeEveryoneOption, setIncludeEveryoneOption] = useState(false)
   const everyoneOption = useMemo(
-    () => (includeEveryoneOption ? getEveryoneOption(assignToCards.length > 1) : undefined),
-    [includeEveryoneOption, assignToCards.length]
+    () => getEveryoneOption(assignToCards.length > 1),
+    [assignToCards.length]
   )
 
   const {allOptions, isLoading, setSearchTerm} = useFetchAssignees({
@@ -138,13 +167,12 @@ export default function ItemAssignToTray({
         delete dateDetailsApiResponse.overrides
         const baseDates: BaseDateDetails = dateDetailsApiResponse
         const onlyOverrides = dateDetailsApiResponse.only_visible_to_overrides
-        setIncludeEveryoneOption(!onlyOverrides)
 
-        const cards: CardSpec[] = []
+        const cards: ItemAssignToCardSpec[] = []
         const selectedOptionIds: string[] = []
         if (!onlyOverrides) {
           const cardId = makeCardId()
-          const everyoneOption = [getEveryoneOption(assignToCards.length > 1).id]
+          const selectedOption = [getEveryoneOption(assignToCards.length > 1).id]
           cards.push({
             key: cardId,
             isValid: true,
@@ -152,9 +180,10 @@ export default function ItemAssignToTray({
             due_at: baseDates.due_at,
             unlock_at: baseDates.unlock_at,
             lock_at: baseDates.lock_at,
-            selectedAssigneeIds: everyoneOption,
+            selectedAssigneeIds: selectedOption,
+            overrideId: dateDetailsApiResponse.id,
           })
-          selectedOptionIds.push(...everyoneOption)
+          selectedOptionIds.push(...selectedOption)
         }
         if (overrides?.length) {
           overrides.forEach(override => {
@@ -173,6 +202,8 @@ export default function ItemAssignToTray({
               unlock_at: override.unlock_at,
               lock_at: override.lock_at,
               selectedAssigneeIds: defaultOptions,
+              defaultOptions,
+              overrideId: override.id,
             })
             selectedOptionIds.push(...defaultOptions)
           })
@@ -180,7 +211,10 @@ export default function ItemAssignToTray({
         setDisabledOptionIds(selectedOptionIds)
         setAssignToCards(cards)
       })
-      .catch(showFlashError())
+      .catch(() => {
+        showFlashError()()
+        onDismiss()
+      })
       .finally(() => {
         setFetchInFlight(false)
       })
@@ -189,7 +223,7 @@ export default function ItemAssignToTray({
 
   const handleAddCard = useCallback(() => {
     const cardId = makeCardId()
-    const cards: CardSpec[] = [
+    const cards: ItemAssignToCardSpec[] = [
       ...assignToCards,
       {
         key: cardId,
@@ -199,14 +233,22 @@ export default function ItemAssignToTray({
         unlock_at: null,
         lock_at: null,
         selectedAssigneeIds: [] as string[],
-      } as CardSpec,
+      } as ItemAssignToCardSpec,
     ]
     setAssignToCards(cards)
   }, [assignToCards])
 
   const handleUpdate = useCallback(() => {
-    // todo: implement save
-  }, [])
+    const payload = generateDateDetailsPayload(assignToCards)
+    updateModuleItem({
+      courseId,
+      moduleItemContentId: itemContentId,
+      moduleItemType: itemType,
+      moduleItemName: itemName,
+      payload,
+      onSuccess: onDismiss,
+    })
+  }, [assignToCards, courseId, itemContentId, itemName, itemType, onDismiss])
 
   const handleDeleteCard = useCallback(
     (cardId: string) => {
@@ -247,6 +289,16 @@ export default function ItemAssignToTray({
     setAssignToCards(cards)
     setDisabledOptionIds(newDisabled)
   }
+
+  const handleDatesChange = useCallback(
+    (cardId: string, dateAttribute: string, dateValue: string | null) => {
+      const cards = assignToCards.map(card =>
+        card.key === cardId ? {...card, [dateAttribute]: dateValue} : card
+      )
+      setAssignToCards(cards)
+    },
+    [assignToCards]
+  )
 
   const allCardsValid = useCallback(() => {
     return assignToCards.every(card => card.isValid)
@@ -309,6 +361,7 @@ export default function ItemAssignToTray({
             lock_at={card.lock_at}
             onDelete={cardCount === 1 ? undefined : handleDeleteCard}
             onCardAssignmentChange={handleCardAssignment}
+            onCardDatesChange={handleDatesChange}
             onValidityChange={handleCardValidityChange}
             isOpen={isOpen}
             disabledOptionIds={disabledOptionIds}
