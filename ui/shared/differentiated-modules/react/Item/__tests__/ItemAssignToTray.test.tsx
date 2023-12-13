@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {act, render, waitFor} from '@testing-library/react'
+import {act, fireEvent, render, waitFor} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
 import ItemAssignToTray, {type ItemAssignToTrayProps} from '../ItemAssignToTray'
 import {SECTIONS_DATA, STUDENTS_DATA} from '../../__tests__/mocks'
@@ -52,6 +52,15 @@ describe('ItemAssignToTray', () => {
       course_section_id: '4',
     },
   ]
+
+  beforeAll(() => {
+    if (!document.getElementById('flash_screenreader_holder')) {
+      const liveRegion = document.createElement('div')
+      liveRegion.id = 'flash_screenreader_holder'
+      liveRegion.setAttribute('role', 'alert')
+      document.body.appendChild(liveRegion)
+    }
+  })
 
   beforeEach(() => {
     // @ts-expect-error
@@ -306,6 +315,81 @@ describe('ItemAssignToTray', () => {
         sectionOption = listOptions.find(listitem => listitem.textContent === section.name)
         expect(sectionOption).not.toBeUndefined()
       })
+    })
+  })
+  describe('on save', () => {
+    const DATE_DETAILS = `/api/v1/courses/${props.courseId}/assignments/${props.itemContentId}/date_details`
+    const DATE_DETAILS_OBJ = {
+      id: '23',
+      due_at: '2023-10-05T12:00:00Z',
+      unlock_at: '2023-10-01T12:00:00Z',
+      lock_at: '2023-11-01T12:00:00Z',
+      only_visible_to_overrides: false,
+      overrides: [],
+    }
+
+    beforeEach(() => {
+      fetchMock.get('/api/v1/courses/1/assignments/23/date_details', DATE_DETAILS_OBJ, {
+        overwriteRoutes: true,
+      })
+      fetchMock.put(DATE_DETAILS, {})
+    })
+
+    it('creates new assignment overrides', async () => {
+      const {findByTestId, findByText, getByRole, findAllByText} = renderComponent()
+      const assigneeSelector = await findByTestId('assignee_selector')
+      act(() => assigneeSelector.click())
+      const option1 = await findByText(SECTIONS_DATA[0].name)
+      act(() => option1.click())
+
+      getByRole('button', {name: 'Save'}).click()
+      expect((await findAllByText(`${props.itemName} updated`))[0]).toBeInTheDocument()
+      const requestBody = fetchMock.lastOptions(DATE_DETAILS)?.body
+      const {id, overrides, only_visible_to_overrides, ...payloadValues} = DATE_DETAILS_OBJ
+      const expectedPayload = JSON.stringify({
+        ...payloadValues,
+        only_visible_to_overrides,
+        assignment_overrides: [
+          {
+            course_section_id: SECTIONS_DATA[0].id,
+            ...payloadValues,
+          },
+        ],
+      })
+      expect(requestBody).toEqual(expectedPayload)
+    })
+
+    it('calls onDismiss after saving', async () => {
+      const onDismissMock = jest.fn()
+      const {findAllByLabelText, getByRole, findAllByText} = renderComponent({
+        onDismiss: onDismissMock,
+      })
+      const dateInput = await findAllByLabelText('Due Date')
+      fireEvent.change(dateInput[0], {target: {value: 'Oct 2, 2023'}})
+      getByRole('button', {name: 'Save'}).click()
+      expect((await findAllByText(`${props.itemName} updated`))[0]).toBeInTheDocument()
+      await waitFor(() => {
+        expect(onDismissMock).toHaveBeenCalled()
+      })
+    })
+
+    it('Save does not persist changes when a card is invalid', async () => {
+      const onDismissMock = jest.fn()
+      const {getAllByTestId, getByRole, getByText} = renderComponent({
+        itemContentId: '24',
+        onDismiss: onDismissMock,
+      })
+      await waitFor(() => {
+        expect(getAllByTestId('item-assign-to-card')).toHaveLength(1)
+      })
+      const savebtn = getByRole('button', {name: 'Save'})
+
+      savebtn.click()
+      expect(getByText('Please fix errors before continuing')).toBeInTheDocument()
+      expect(fetchMock.lastOptions('/api/v1/courses/1/assignments/24/date_details')?.method).toBe(
+        'GET'
+      )
+      expect(onDismissMock).not.toHaveBeenCalled()
     })
   })
 })

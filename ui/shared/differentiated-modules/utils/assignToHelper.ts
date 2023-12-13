@@ -17,8 +17,13 @@
  */
 
 import type {AssigneeOption} from '../react/AssigneeSelector'
-import type {AssignmentOverridePayload, AssignmentOverridesPayload} from '../react/types'
+import type {
+  AssignmentOverridePayload,
+  AssignmentOverridesPayload,
+  DateDetailsOverride,
+} from '../react/types'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {type DateDetailsPayload, type ItemAssignToCardSpec} from '../react/Item/types'
 
 const I18n = useI18nScope('differentiated_modules')
 
@@ -60,6 +65,52 @@ export const generateAssignmentOverridesPayload = (
   }
 
   return {overrides}
+}
+
+export const generateDateDetailsPayload = (cards: ItemAssignToCardSpec[]) => {
+  const payload: DateDetailsPayload = {} as DateDetailsPayload
+  const everyoneCard = cards.find(card => card.selectedAssigneeIds.includes('everyone'))
+  const overrideCards = cards.filter(card => card.key !== 'everyone')
+  if (everyoneCard !== undefined) {
+    payload.due_at = everyoneCard.due_at
+    payload.unlock_at = everyoneCard.unlock_at
+    payload.lock_at = everyoneCard.lock_at
+    payload.only_visible_to_overrides = false
+  } else {
+    payload.only_visible_to_overrides = true
+  }
+  payload.assignment_overrides = overrideCards
+    .map(card => {
+      const isSectionOverride =
+        card.defaultOptions?.[0].includes('section') && card.overrideId !== everyoneCard?.overrideId
+      const overrides: DateDetailsOverride[] = card.selectedAssigneeIds
+        .filter(assignee => assignee.includes('section'))
+        ?.map((section, index) => ({
+          id: index === 0 && isSectionOverride ? card.overrideId : undefined,
+          course_section_id: section.split('-')[1],
+          due_at: card.due_at,
+          unlock_at: card.unlock_at,
+          lock_at: card.lock_at,
+        }))
+      const isOverrideUsed = overrides.some(
+        override => override.id === card.overrideId || everyoneCard?.overrideId === card.overrideId
+      )
+      const studentIds = card.selectedAssigneeIds
+        .filter(assignee => assignee.includes('student'))
+        ?.map(id => id.split('-')[1])
+      if (studentIds.length > 0) {
+        overrides.push({
+          id: !isOverrideUsed ? card.overrideId : undefined,
+          student_ids: studentIds,
+          due_at: card.due_at,
+          unlock_at: card.unlock_at,
+          lock_at: card.lock_at,
+        })
+      }
+      return overrides
+    })
+    .flat()
+  return payload
 }
 
 export function updateModuleUI(moduleElement: HTMLDivElement, payload: AssignmentOverridesPayload) {
