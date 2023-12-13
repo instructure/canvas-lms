@@ -18,14 +18,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Mutations::UpdateIsolatedViewDeeplyNestedAlert < Mutations::BaseMutation
-  graphql_name "UpdateIsolatedViewDeeplyNestedAlert"
+class Mutations::UpdateSplitScreenViewDeeplyNestedAlert < Mutations::BaseMutation
+  graphql_name "UpdateSplitScreenViewDeeplyNestedAlert"
 
-  argument :isolated_view_deeply_nested_alert, Boolean, required: true
+  argument :split_screen_view_deeply_nested_alert, Boolean, required: true
 
   field :user, Types::UserType, null: false
   def resolve(input:)
-    current_user.set_preference(:isolated_view_deeply_nested_alert, input[:isolated_view_deeply_nested_alert].to_s)
+    current_user.set_preference(:split_screen_view_deeply_nested_alert, input[:split_screen_view_deeply_nested_alert].to_s)
 
     {
       user: current_user

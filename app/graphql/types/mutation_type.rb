@@ -98,7 +98,7 @@ class Types::MutationType < Types::ApplicationObjectType
   field :delete_outcome_links, mutation: Mutations::DeleteOutcomeLinks
   field :update_learning_outcome_group, mutation: Mutations::UpdateLearningOutcomeGroup
   field :create_learning_outcome_group, mutation: Mutations::CreateLearningOutcomeGroup
-  field :update_isolated_view_deeply_nested_alert, mutation: Mutations::UpdateIsolatedViewDeeplyNestedAlert
+  field :update_split_screen_view_deeply_nested_alert, mutation: Mutations::UpdateSplitScreenViewDeeplyNestedAlert
   field :create_internal_setting, mutation: Mutations::CreateInternalSetting
   field :update_internal_setting, mutation: Mutations::UpdateInternalSetting
   field :delete_internal_setting, mutation: Mutations::DeleteInternalSetting
