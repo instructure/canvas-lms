@@ -22,7 +22,7 @@ import actions from '../actions'
 
 import {COURSE, ACCOUNT} from '@canvas/permissions/react/propTypes'
 import {PERMISSIONS, ROLES} from './examples'
-import {moxiosWait} from 'jest-moxios-utils'
+import {moxiosWait} from '@canvas/jest-moxios-utils'
 
 // This is needed for $.screenReaderFlashMessageExclusive to work.
 import '@canvas/rails-flash-notifications'

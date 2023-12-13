@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-const moxios = require('moxios')
+import moxios from 'moxios'
 
-function isPromise(subject) {
+export function isPromise(subject) {
   return (
     typeof subject !== 'undefined' &&
     typeof subject.then !== 'undefined' &&
@@ -26,7 +26,7 @@ function isPromise(subject) {
   )
 }
 
-function moxiosWait(fn) {
+export function moxiosWait(fn) {
   return new Promise((resolve, reject) => {
     moxios.wait(() => {
       try {
@@ -38,7 +38,7 @@ function moxiosWait(fn) {
   })
 }
 
-function moxiosRespond(response, requestPromise, opts = {}) {
+export function moxiosRespond(response, requestPromise, opts = {}) {
   if (!isPromise(requestPromise)) throw new Error('moxiosResult requires a promise for the request')
   const waitPromise = moxiosWait(request => {
     request.respondWith({status: 200, headers: {}, response, ...opts})
@@ -46,10 +46,4 @@ function moxiosRespond(response, requestPromise, opts = {}) {
   return Promise.all([waitPromise, requestPromise]).then(
     ([_waitResult, requestResult]) => requestResult
   )
-}
-
-module.exports = {
-  isPromise,
-  moxiosWait,
-  moxiosRespond
 }
