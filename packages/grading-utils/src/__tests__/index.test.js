@@ -16,9 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// eslint-disable-next-line import/no-extraneous-dependencies
 import {describe, test, expect} from '@jest/globals'
-import {scoreToGrade} from '../lib/index'
+import {scoreToGrade, scoreToLetterGrade} from '../index.js'
 
 describe('index', () => {
   describe('scoreToGrade', () => {
@@ -81,6 +80,54 @@ describe('index', () => {
       expect(scoreToGrade(50, gradingScheme)).toBe('M')
       expect(scoreToGrade(0, gradingScheme)).toBe('M')
       expect(scoreToGrade(-100, gradingScheme)).toBe('M')
+    })
+  })
+
+  describe('scoreToLetterGrade', () => {
+    test('returns null when scheme is null or score is NaN', () => {
+      const gradingScheme = [
+        {name: 'A', value: 0.9},
+        {name: 'B', value: 0.8},
+        {name: 'C', value: 0.7},
+        {name: 'D', value: 0.6},
+        {name: 'E', value: 0.5},
+      ]
+
+      expect(scoreToLetterGrade(Number.NaN, gradingScheme)).toBe(null)
+      expect(scoreToLetterGrade(40, null)).toBe(null)
+      expect(scoreToLetterGrade('40', gradingScheme)).toBe(null)
+      expect(scoreToLetterGrade('B', gradingScheme)).toBe(null)
+    })
+
+    test('returns the lowest grade to below-scale scores', () => {
+      const gradingScheme = [
+        {name: 'A', value: 0.9},
+        {name: 'B', value: 0.8},
+        {name: 'C', value: 0.7},
+        {name: 'D', value: 0.6},
+        {name: 'E', value: 0.5},
+      ]
+
+      expect(scoreToLetterGrade(40, gradingScheme)).toBe('E')
+    })
+
+    test('accounts for floating-point rounding errors', () => {
+      const gradingScheme = [
+        {name: 'A', value: 0.9},
+        {name: 'B+', value: 0.886},
+        {name: 'B', value: 0.8},
+        {name: 'C', value: 0.695},
+        {name: 'D', value: 0.555},
+        {name: 'E', value: 0.545},
+        {name: 'M', value: 0.0},
+      ]
+
+      expect(scoreToLetterGrade(1005, gradingScheme)).toBe('A')
+      expect(scoreToLetterGrade(105, gradingScheme)).toBe('A')
+      expect(scoreToLetterGrade(100, gradingScheme)).toBe('A')
+      expect(scoreToLetterGrade(99, gradingScheme)).toBe('A')
+      expect(scoreToLetterGrade(90, gradingScheme)).toBe('A')
+      expect(scoreToLetterGrade(89.999, gradingScheme)).toBe('B+')
     })
   })
 })

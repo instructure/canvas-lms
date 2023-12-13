@@ -28,7 +28,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import GradeOverrideEntry from '@canvas/grading/GradeEntry/GradeOverrideEntry'
 import GradeOverrideInfo from '@canvas/grading/GradeEntry/GradeOverrideInfo'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
-import {scoreToGrade} from '@instructure/grading-utils/lib'
+import {scoreToGrade} from '@instructure/grading-utils'
 import {View} from '@instructure/ui-view'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
