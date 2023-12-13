@@ -11,7 +11,6 @@ services:
       - bundler:/home/docker/.bundle/
       - canvas-docker-gems:/home/docker/.gem/
       - canvas-planner_node_modules:/usr/src/app/packages/canvas-planner/node_modules
-      - jest-moxios-utils_node_modules:/usr/src/app/packages/jest-moxios-utils/node_modules
       - js-utils_es:/usr/src/app/packages/js-utils/es
       - js-utils_lib:/usr/src/app/packages/js-utils/lib
       - js-utils_node_modules:/usr/src/app/packages/js-utils/node_modules
@@ -71,7 +70,6 @@ volumes:
   canvas-docker-gems: {}
   canvas-planner_node_modules: {}
   i18nliner_node_modules: {}
-  jest-moxios-utils_node_modules: {}
   js-utils_es: {}
   js-utils_lib: {}
   js-utils_node_modules: {}

@@ -20,7 +20,7 @@ import $ from 'jquery'
 import React from 'react'
 import moxios from 'moxios'
 import sinon from 'sinon'
-import {moxiosWait} from 'jest-moxios-utils'
+import {moxiosWait} from '@canvas/jest-moxios-utils'
 import {act, cleanup, render, waitFor} from '@testing-library/react'
 
 import DashboardCard from '@canvas/dashboard-card/react/DashboardCard'

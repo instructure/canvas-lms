@@ -17729,6 +17729,13 @@ jest-mock@^29.7.0:
     "@types/node" "*"
     jest-util "^29.7.0"
 
+jest-moxios-utils@^1:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/jest-moxios-utils/-/jest-moxios-utils-1.0.0.tgz#7463a0038a68a970572ab48bc6a863c9f22e9b53"
+  integrity sha512-LilGf281Ywd8bzfRx0V5jLKJHAMx5wLSfos7DSEvg0FQaar+5E9ehNE2kz/rCtZmHd7R27whdXCtNXHdMTQbdg==
+  dependencies:
+    moxios "^0.4"
+
 jest-pnp-resolver@^1.2.2:
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/jest-pnp-resolver/-/jest-pnp-resolver-1.2.2.tgz#b704ac0ae028a89108a4d040b3f919dfddc8e33c"

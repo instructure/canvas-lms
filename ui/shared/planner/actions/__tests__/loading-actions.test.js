@@ -18,7 +18,7 @@
 import moxios from 'moxios'
 import moment from 'moment-timezone'
 import MockDate from 'mockdate'
-import {moxiosWait, moxiosRespond} from 'jest-moxios-utils'
+import {moxiosWait, moxiosRespond} from '@canvas/jest-moxios-utils'
 import * as Actions from '../loading-actions'
 import {initialize as alertInitialize} from '../../utilities/alertUtils'
 import configureStore from '../../store/configureStore'

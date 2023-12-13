@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-const axios = require('axios')
-const moxios = require('moxios')
-const {moxiosWait, moxiosRespond} = require('../index')
+import axios from 'axios'
+import moxios from 'moxios'
+import {moxiosWait, moxiosRespond} from '../index'
 
 describe('moxiosWait', () => {
   it('rejects if the passed function throws', () => {
@@ -27,7 +27,7 @@ describe('moxiosWait', () => {
     })
     return new Promise((resolve, reject) => {
       waitPromise
-        .then(() => reject('did not expect waitPromise to resolve'))
+        .then(() => reject(new Error('did not expect waitPromise to resolve')))
         .catch(() => resolve('yay, this is what its supposed to do'))
     })
   })
@@ -50,7 +50,7 @@ describe('moxiosRespond', () => {
     const requestPromise = axios.get('http://example.com')
     const responsePromise = moxiosRespond({some: 'data'}, requestPromise, {
       status: 418,
-      headers: {key: 'value'}
+      headers: {key: 'value'},
     })
     return responsePromise.catch(err => {
       expect(err.response.data).toMatchObject({some: 'data'})
