@@ -361,8 +361,16 @@ $icon-size: 1.4rem;
     }
     span.draft-marker {
       color: $red;
-      padding-#{direction(right)}: 0.5em;
       flex: none;
+      border-style: solid;
+      border-radius: 12px;
+      border-width: 2px;
+      padding: 0.3em 0.5em;
+      height: 15px;
+      width: auto;
+      font-size: 0.8em;
+      font-weight: bold;
+      margin-#{direction(right)}: 5px;
     }
     div.comment_flex {
       display: flex;
