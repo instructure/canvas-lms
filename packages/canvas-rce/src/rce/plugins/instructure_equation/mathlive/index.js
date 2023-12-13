@@ -16,12 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import 'mathlive/dist/mathlive-fonts.css'
+const mathliveCss = require('mathlive/dist/mathlive-fonts.css')
 
-// There currently isn't a great way to do this so use this workaround to inject these styles
-const cssRules = require('./override.css').template()
+const cssRules = `.ML__popover {
+  /* Override this so it shows up on top of dialogs */
+  z-index: 20000 !important;
+}`
 
 const style = document.createElement('style')
+style.appendChild(document.createTextNode(mathliveCss))
 style.appendChild(document.createTextNode(cssRules))
 document.head.appendChild(style)
 

@@ -61,8 +61,8 @@ import {countShouldIgnore} from './plugins/instructure_wordcount/utils/countCont
 import launchWordcountModal from './plugins/instructure_wordcount/clickCallback'
 import {determineOSDependentKey} from './userOS'
 
-import skinCSSBinding from 'tinymce/skins/ui/oxide/skin.min.css'
-import contentCSSBinding from 'tinymce/skins/ui/oxide/content.css'
+import skinCSS from './tinymce.oxide.skin.min.css'
+import contentCSS from './tinymce.oxide.content.min.css'
 import {rceWrapperPropTypes} from './RCEWrapperProps'
 import {insertPlaceholder, placeholderInfoFor, removePlaceholder} from '../util/loadingPlaceholder'
 import {transformRceContentForEditing} from './transformContent'
@@ -75,9 +75,6 @@ const RceHtmlEditor = React.lazy(() => import('./RceHtmlEditor'))
 
 const ASYNC_FOCUS_TIMEOUT = 250
 const DEFAULT_RCE_HEIGHT = '400px'
-
-const skinCSS = skinCSSBinding.template().replace(/tinymce__oxide--/g, '')
-const contentCSS = contentCSSBinding.template().replace(/tinymce__oxide--/g, '')
 
 function addKebabIcon(editor) {
   // This has to be done here instead of of in plugins/instructure-ui-icons/plugin.ts
@@ -92,10 +89,7 @@ function injectTinySkin() {
   inserted = true
   const style = document.createElement('style')
   style.setAttribute('data-skin', 'tiny oxide skin')
-  style.appendChild(
-    // the .replace here is because the ui-themeable babel hook adds that prefix to all the class names
-    document.createTextNode(skinCSS)
-  )
+  style.appendChild(document.createTextNode(skinCSS))
   // there's CSS from discussions that turns the instui Selectors bold
   // and in classic quizzes that also mucks with padding
   style.appendChild(
