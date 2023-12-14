@@ -477,20 +477,22 @@ describe GradebooksController do
             expect(assigns[:js_env]).not_to have_key(:final_override_custom_grade_status_id)
           end
 
-          it "does not include the final grade override score custom status id if there is no score" do
-            invited_student = @course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "invited").user
+          it "does not include the final grade override score custom status id if there is no status" do
+            Score.find_by(course_score: true).update!(custom_grade_status_id: nil, override_score: 95)
             user_session(@teacher)
-            get :grade_summary, params: { course_id: @course.id, id: invited_student.id }
+            get :grade_summary, params: { course_id: @course.id, id: @student.id }
             expect(assigns[:js_env]).not_to have_key(:final_override_custom_grade_status_id)
           end
 
-          it "includes the final grade override score custom status id if the ff is on and there is a score" do
-            invited_student_enrollment = @course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "invited")
-            score = invited_student_enrollment.update_override_score(
-              override_score: 95,
-              updating_user: @teacher
-            )
-            score.update!(custom_grade_status_id: status.id)
+          it "includes the final grade override score custom status id if the ff is on and there is a status" do
+            Score.find_by(course_score: true).update!(custom_grade_status_id: status.id)
+            user_session(@teacher)
+            get :grade_summary, params: { course_id: @course.id, id: @student.id }
+            expect(assigns[:js_env]).to have_key(:final_override_custom_grade_status_id)
+          end
+
+          it "includes the final grade override score custom status id if the ff is on and there is a status and there is no score" do
+            Score.find_by(course_score: true).update!(custom_grade_status_id: status.id, override_score: nil)
             user_session(@teacher)
             get :grade_summary, params: { course_id: @course.id, id: @student.id }
             expect(assigns[:js_env]).to have_key(:final_override_custom_grade_status_id)
