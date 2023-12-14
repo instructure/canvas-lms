@@ -3005,6 +3005,7 @@ describe DiscussionTopic do
   describe "checkpoints" do
     before do
       @topic = DiscussionTopic.create_graded_topic!(course: @course, title: "Discussion Topic Title", user: @teacher)
+      @topic.root_account.enable_feature!(:discussion_checkpoints)
     end
 
     it "not in place in the topic" do
@@ -3016,15 +3017,9 @@ describe DiscussionTopic do
     end
 
     it "does not allow setting the reply_to_entry_required_count to more than 10" do
-      @topic.create_checkpoints(reply_to_topic_points: 10, reply_to_entry_points: 15, reply_to_entry_required_count: 11)
-
-      expect(@topic).to_not be_valid
-    end
-
-    it "does not allow setting the reply_to_entry_required_count to 0 when checkpoints are there" do
-      @topic.create_checkpoints(reply_to_topic_points: 10, reply_to_entry_points: 15, reply_to_entry_required_count: 0)
-
-      expect(@topic).to_not be_valid
+      expect do
+        @topic.create_checkpoints(reply_to_topic_points: 10, reply_to_entry_points: 15, reply_to_entry_required_count: 11)
+      end.to raise_error(ActiveRecord::RecordInvalid)
     end
 
     it "does not create a discussion topic per-checkpoint (instead, checkpoints belong to the topic through the parent)" do
@@ -3068,10 +3063,11 @@ describe DiscussionTopic do
 
       it "correctly leaves the reply to entry checkpoint submission as unsubmitted when the student has not replied to an entry 5 times" do
         entry = @topic.discussion_entries.create!(user: @teacher, message: "reply to topic")
+        @topic.discussion_entries.create!(user: @student, message: "reply to topic by student")
         @topic.discussion_entries.create!(user: @student, message: "reply to entry", root_entry_id: entry.id, parent_id: entry.id)
 
         expect(@topic.assignment.submissions.find_by(user: @student).workflow_state).to eq "unsubmitted"
-        expect(@topic.reply_to_topic_checkpoint.submissions.find_by(user: @student).workflow_state).to eq "unsubmitted"
+        expect(@topic.reply_to_topic_checkpoint.submissions.find_by(user: @student).workflow_state).to eq "submitted"
         expect(@topic.reply_to_entry_checkpoint.submissions.find_by(user: @student).workflow_state).to eq "unsubmitted"
       end
 
@@ -3082,9 +3078,7 @@ describe DiscussionTopic do
           @topic.discussion_entries.create!(user: @student, message: "reply to entry by student", root_entry_id: entry_by_teacher.id, parent_id: entry_by_teacher.id)
         end
 
-        # TODO: When all the children submissions are marked as submitted, the parent submission should be marked as submitted too.
-        # This will be done in a subsequent ticket.
-        expect(@topic.assignment.submissions.find_by(user: @student).workflow_state).to eq "unsubmitted"
+        expect(@topic.assignment.submissions.find_by(user: @student).workflow_state).to eq "submitted"
         expect(@topic.reply_to_topic_checkpoint.submissions.find_by(user: @student).workflow_state).to eq "submitted"
         expect(@topic.reply_to_entry_checkpoint.submissions.find_by(user: @student).workflow_state).to eq "submitted"
       end

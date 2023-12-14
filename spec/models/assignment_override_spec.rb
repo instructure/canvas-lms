@@ -1236,6 +1236,7 @@ describe AssignmentOverride do
 
   describe "discussion checkpoints" do
     it "allows creating a group override for a checkpoint" do
+      @course.root_account.enable_feature!(:discussion_checkpoints)
       category = group_category
       group = category.groups.create!(context: @course)
       topic = DiscussionTopic.create_graded_topic!(course: @course, title: "graded_topic")

@@ -126,10 +126,20 @@ describe Assignment do
         course_with_teacher(active_all: true)
         @student = student_in_course(active_all: true).user
         @course.root_account.enable_feature!(:discussion_checkpoints)
-        assignment = @course.assignments.create!(has_sub_assignments: true)
-        assignment.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, due_at: 2.days.from_now)
-        assignment.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, due_at: 3.days.from_now)
-        @topic = @course.discussion_topics.create!(assignment:, reply_to_entry_required_count: 1)
+        @topic = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: @topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [{ type: "everyone", due_at: 2.days.from_now }],
+          points_possible: 4
+        )
+
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: @topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [{ type: "everyone", due_at: 3.days.from_now }],
+          points_possible: 7
+        )
       end
 
       let(:reply_to_topic_submission) do
@@ -140,11 +150,29 @@ describe Assignment do
         @topic.reply_to_entry_checkpoint.submissions.find_by(user: @student)
       end
 
+      let(:parent_submission) do
+        @topic.assignment.submissions.find_by(user: @student)
+      end
+
       it "supports grading checkpoints" do
         @topic.assignment.grade_student(@student, grader: @teacher, score: 5, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
         @topic.assignment.grade_student(@student, grader: @teacher, score: 2, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
-        expect(reply_to_topic_submission.score).to eq 5
-        expect(reply_to_entry_submission.score).to eq 2
+        aggregate_failures do
+          expect(reply_to_topic_submission.score).to eq 5
+          expect(reply_to_entry_submission.score).to eq 2
+          expect(parent_submission.score).to eq 7
+        end
+      end
+
+      it "incorporates the checkpointed discussion's score into the overall current grade upon all checkpoints having been posted" do
+        @topic.assignment.grade_student(@student, grader: @teacher, score: 5, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+        enrollment = @course.enrollments.find_by(user: @student)
+
+        expect do
+          @topic.assignment.grade_student(@student, grader: @teacher, score: 2, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
+        end.to change {
+          enrollment.reload.computed_current_score
+        }.from(nil).to(63.64) # (5 + 2) / 11 points possible => 63.64%
       end
 
       it "raises an error if no checkpoint label is provided" do

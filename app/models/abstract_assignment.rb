@@ -3378,7 +3378,7 @@ class AbstractAssignment < ActiveRecord::Base
   # * AssignmentOverride and
   # * AssignmentOverrideStudent
   def self.suspend_due_date_caching(&)
-    Assignment.suspend_callbacks(:update_cached_due_dates) do
+    AbstractAssignment.suspend_callbacks(:update_cached_due_dates) do
       AssignmentOverride.suspend_callbacks(:update_cached_due_dates) do
         AssignmentOverrideStudent.suspend_callbacks(:update_cached_due_dates, &)
       end
@@ -3387,8 +3387,14 @@ class AbstractAssignment < ActiveRecord::Base
 
   # Suspend callbacks that recalculate grading period grades
   def self.suspend_grading_period_grade_recalculation(&)
-    Assignment.suspend_callbacks(:update_grading_period_grades) do
+    AbstractAssignment.suspend_callbacks(:update_grading_period_grades) do
       AssignmentOverride.suspend_callbacks(:update_grading_period_grades, &)
+    end
+  end
+
+  def self.suspend_due_date_caching_and_score_recalculation(&)
+    suspend_due_date_caching do
+      suspend_grading_period_grade_recalculation(&)
     end
   end
 
