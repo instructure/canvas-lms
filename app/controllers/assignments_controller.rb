@@ -570,8 +570,55 @@ class AssignmentsController < ApplicationController
     end
   end
 
+  def filter_by_assigned_assessment(submissions, search_term)
+    cleaned_search_term = User.clean_name(search_term, /[\s,]+/)
+
+    assessments = AssessmentRequest
+                  .where(asset_id: submissions.map(&:id))
+                  .for_active_users(@context)
+                  .for_active_assessors(@context)
+                  .preload(:assessor, :user)
+
+    unique_assessors_set = Set.new
+    assessments.each do |assessment|
+      assessment_user = assessment.user
+      cleaned_first_name_last = User.clean_name(assessment_user.name, /\s+/)
+      cleaned_last_name_first = User.clean_name(assessment_user.sortable_name, /[\s,]+/)
+      if cleaned_first_name_last.include?(cleaned_search_term) || cleaned_last_name_first.include?(cleaned_search_term)
+        unique_assessors_set << assessment.assessor
+      end
+    end
+
+    unique_assessors_set.to_a
+  end
+
+  def filter_by_all(student_list, submissions, search_term)
+    filter_by_reviewer_list = filter_by_assessor(student_list, search_term)
+    filter_by_assigned_assessment_list = filter_by_assigned_assessment(submissions, search_term)
+    (filter_by_reviewer_list + filter_by_assigned_assessment_list).uniq
+  end
+
+  def filter_by_assessor(student_list, search_term)
+    student_list.name_like(search_term, "peer_review")
+  end
+
+  def filter_by_selected_option(student_list, submissions, search_term, selected_option)
+    case selected_option
+    when "all"
+      filter_by_all(student_list, submissions, search_term)
+    when "student"
+      filter_by_assigned_assessment(submissions, search_term)
+    when "reviewer"
+      filter_by_assessor(student_list, search_term)
+    end
+  end
+
   def peer_reviews
     @assignment = @context.assignments.active.find(params[:assignment_id])
+    js_env({
+             ASSIGNMENT_ID: @assignment.id,
+             COURSE_ID: @context.id
+           })
     if authorized_action(@assignment, @current_user, :grade)
       unless @assignment.has_peer_reviews?
         redirect_to named_context_url(@context, :context_assignment_url, @assignment.id)
@@ -585,11 +632,10 @@ class AssignmentsController < ApplicationController
 
       visible_students = @context.students_visible_to(@current_user).not_fake_student
       visible_students_assigned_to_assignment = visible_students.joins(:submissions).where(submissions: { assignment: @assignment }).merge(Submission.active)
-
-      @students_dropdown_list = visible_students_assigned_to_assignment.distinct.order_by_sortable_name
-      @students = params[:search_term].present? ? @students_dropdown_list.name_like(params[:search_term], search_pseudonyms: false) : @students_dropdown_list
-      @students = @students.paginate(page: params[:page], per_page: 10)
       @submissions = @assignment.submissions.include_assessment_requests
+      @students_dropdown_list = visible_students_assigned_to_assignment.distinct.order_by_sortable_name
+      @students = params[:search_term].present? ? filter_by_selected_option(@students_dropdown_list, @submissions, params[:search_term], params[:selected_option]) : @students_dropdown_list
+      @students = @students.paginate(page: params[:page], per_page: 10)
     end
   end
 

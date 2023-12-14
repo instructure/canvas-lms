@@ -292,6 +292,10 @@ class User < ActiveRecord::Base
     PageView.for_user(self, options)
   end
 
+  def self.clean_name(name, replacement)
+    name.downcase.gsub(replacement, "")
+  end
+
   scope :of_account, ->(account) { joins(:user_account_associations).where(user_account_associations: { account_id: account }).shard(account.shard) }
   scope :recently_logged_in, lambda {
     eager_load(:pseudonyms)
@@ -307,15 +311,20 @@ class User < ActiveRecord::Base
       where("enrollments.limit_privileges_to_course_section IS NULL OR enrollments.limit_privileges_to_course_section<>? OR enrollments.course_section_id IN (?)", true, sections)
     end
   }
-  scope :name_like, lambda { |name, search_pseudonyms: true|
+  scope :name_like, lambda { |name, source = ""|
     next none if name.strip.empty?
 
     scopes = []
     all.primary_shard.activate do
       base_scope = except(:select, :order, :group, :having)
-      scopes << base_scope.where(wildcard("users.name", name))
-      scopes << base_scope.where(wildcard("users.short_name", name))
-      if search_pseudonyms
+      case source
+      when "peer_review"
+        cleaned_name = clean_name(name, /[\s,]+/)
+        scopes << base_scope.where(wildcard("REPLACE(REPLACE(users.sortable_name, ',', ''), ' ', '')", cleaned_name))
+        scopes << base_scope.where(wildcard("REPLACE(users.name, ' ', '')", cleaned_name))
+      else
+        scopes << base_scope.where(wildcard("users.name", name))
+        scopes << base_scope.where(wildcard("users.short_name", name))
         scopes << base_scope.joins(:pseudonyms).where(wildcard("pseudonyms.sis_user_id", name)).where(pseudonyms: { workflow_state: "active" })
         scopes << base_scope.joins(:pseudonyms).where(wildcard("pseudonyms.unique_id", name)).where(pseudonyms: { workflow_state: "active" })
       end
