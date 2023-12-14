@@ -44,7 +44,7 @@ GEM
       signet (>= 0.16, < 2.a)
     hashdiff (1.0.1)
     httpclient (2.8.3)
-    io-console (0.6.0)
+    io-console (0.7.1)
     irb (1.10.1)
       rdoc
       reline (>= 0.3.8)
