@@ -514,13 +514,18 @@ function calculateTotals(calculatedGrades, currentOrFinal, groupWeightingScheme)
   $finalGradeRow.find('.grade').text(finalGrade)
   $finalGradeRow.find('.score_teaser').text(teaserText)
 
-  if (overrideScorePresent() && ENV?.final_override_custom_grade_status_id) {
+  if (ENV?.final_override_custom_grade_status_id) {
     $finalGradeRow
       .find('.status')
       .html('')
       .append(
         `<span class='submission-custom-grade-status-pill-${ENV.final_override_custom_grade_status_id}'></span>`
       )
+
+    const matchingCustomStatus = ENV?.custom_grade_statuses?.find(status => status.id === ENV.final_override_custom_grade_status_id)
+    if (matchingCustomStatus?.allow_final_grade_value === false) {
+      $finalGradeRow.find('.grade').text('-')
+    }
   }
 
   const pointsPossibleText = finalGradePointsPossibleText(groupWeightingScheme, scoreAsPoints)
