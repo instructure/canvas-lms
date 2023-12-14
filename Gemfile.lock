@@ -645,7 +645,7 @@ GEM
       statsd-ruby (~> 1.0)
     instructure-happymapper (0.5.10)
       nokogiri (~> 1.5)
-    io-console (0.6.0)
+    io-console (0.7.1)
     irb (1.10.1)
       rdoc
       reline (>= 0.3.8)
