@@ -24,6 +24,7 @@ class AssignmentOverride < ActiveRecord::Base
 
   NOOP_MASTERY_PATHS = 1
 
+  SET_TYPE_ADHOC = "ADHOC"
   SET_TYPE_NOOP = "Noop"
 
   simply_versioned keep: 10

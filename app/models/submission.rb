@@ -432,6 +432,7 @@ class Submission < ActiveRecord::Base
   after_save :update_attachment_associations
   after_save :submit_attachments_to_canvadocs
   after_save :queue_websnap
+  after_save :aggregate_checkpoint_submissions, if: :checkpoint_changes?
   after_save :update_final_score
   after_save :submit_to_plagiarism_later
   after_save :update_admins_if_just_submitted
@@ -446,8 +447,6 @@ class Submission < ActiveRecord::Base
   after_save :handle_posted_at_changed, if: :saved_change_to_posted_at?
   after_save :delete_submission_drafts!, if: :saved_change_to_attempt?
   after_save :send_timing_data_if_needed
-
-  after_commit :aggregate_checkpoint_submissions, if: :checkpoint_changes?
 
   def reset_regraded
     @regraded = false
@@ -3079,7 +3078,7 @@ class Submission < ActiveRecord::Base
 
   def checkpoint_attributes_changed?
     tracked_attributes = Checkpoints::SubmissionAggregatorService::AggregateSubmission.members.map(&:to_s) - ["updated_at"]
-    relevant_changes = tracked_attributes & previous_changes.keys
+    relevant_changes = tracked_attributes & saved_changes.keys
     relevant_changes.any?
   end
 

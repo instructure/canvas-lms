@@ -1835,22 +1835,20 @@ class DiscussionTopic < ActiveRecord::Base
     return false unless context.is_a?(Course)
     return false unless assignment.present?
 
-    assignment.update!(has_sub_assignments: true)
-    assignment.sub_assignments.create!(
-      context:,
-      sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC,
-      submission_types: "discussion_topic",
+    Checkpoints::DiscussionCheckpointCreatorService.call(
+      discussion_topic: self,
+      checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+      dates: [],
       points_possible: reply_to_topic_points
     )
-    assignment.sub_assignments.create!(
-      context:,
-      sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY,
-      submission_types: "discussion_topic",
-      points_possible: reply_to_entry_points
-    )
-    self.reply_to_entry_required_count = reply_to_entry_required_count
 
-    save
+    Checkpoints::DiscussionCheckpointCreatorService.call(
+      discussion_topic: self,
+      checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+      dates: [],
+      points_possible: reply_to_entry_points,
+      replies_required: reply_to_entry_required_count
+    )
   end
 
   private

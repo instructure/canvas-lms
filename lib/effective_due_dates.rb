@@ -95,7 +95,7 @@ class EffectiveDueDates
   # This iterates through a single assignment's EffectiveDueDate hash to see
   # if any students in them are in a closed grading period.
   def in_closed_grading_period?(assignment_id, student_or_student_id = nil)
-    assignment_id = assignment_id.id if assignment_id.is_a?(Assignment)
+    assignment_id = assignment_id.id if assignment_id.is_a?(AbstractAssignment)
     return false if assignment_id.nil?
 
     # false if there aren't even grading periods set up
@@ -298,10 +298,10 @@ class EffectiveDueDates
       else
         # otherwise, map through the array as necessary to get id's
         assignment_collection.flatten!
-        assignment_collection.map! { |assignment| assignment.try(:id) } if assignment_collection.first.is_a?(Assignment)
+        assignment_collection.map! { |assignment| assignment.try(:id) } if assignment_collection.first.is_a?(AbstractAssignment)
         assignment_collection.compact!
-        if assignment_collection.any? { |id| Assignment.global_id?(id) }
-          assignment_collection = Assignment.where(id: assignment_collection).pluck(:id)
+        if assignment_collection.any? { |id| AbstractAssignment.global_id?(id) }
+          assignment_collection = AbstractAssignment.where(id: assignment_collection).pluck(:id)
         end
         assignment_collection = assignment_collection.join(",")
       end
@@ -313,7 +313,7 @@ class EffectiveDueDates
           /* fetch the assignment itself */
           WITH models AS (
             SELECT *
-            FROM #{Assignment.quoted_table_name}
+            FROM #{AbstractAssignment.quoted_table_name}
             WHERE
               id IN (#{assignment_collection}) AND
               workflow_state <> 'deleted' AND
