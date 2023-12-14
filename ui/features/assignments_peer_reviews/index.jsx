@@ -17,6 +17,8 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 
+import React from 'react'
+import ReactDOM from 'react-dom'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/datetime/jquery'
@@ -26,6 +28,7 @@ import '@canvas/jquery/jquery.instructure_misc_plugins'
 import '@canvas/loading-image'
 import '@canvas/util/templateData'
 import replaceTags from '@canvas/util/replaceTags'
+import FilterPeerReview from './react/FilterPeerReview'
 
 const I18n = useI18nScope('assignments.peer_reviews')
 
@@ -169,4 +172,6 @@ $(document).ready(() => {
     event.preventDefault()
     $('.peer_review.assigned .remind_peer_review_link').click()
   })
+
+  ReactDOM.render(<FilterPeerReview />, document.getElementById('filter_peer_review'))
 })

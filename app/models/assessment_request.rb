@@ -81,6 +81,10 @@ class AssessmentRequest < ActiveRecord::Base
     current_enrollments = course.current_enrollments.pluck(:user_id)
     where(user_id: current_enrollments)
   }
+  scope :for_active_assessors, lambda { |course|
+                                 current_enrollments = course.current_enrollments.pluck(:user_id)
+                                 where(assessor_id: current_enrollments)
+                               }
 
   scope :not_ignored_by, lambda { |user, purpose|
     where.not(

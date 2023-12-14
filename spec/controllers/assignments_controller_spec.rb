@@ -2648,27 +2648,70 @@ describe AssignmentsController do
       user_session(@teacher)
       @assignment = @course.assignments.create(title: "Peer Review Assignment", workflow_state: "published")
       @assignment.update!(peer_reviews: true, submission_types: "text_entry")
-      @student2 = User.create!(name: "Sam")
-      @student3 = User.create!(name: "Samantha")
-      @student4 = User.create!(name: "Jim")
+      @student2 = User.create!(name: "Bob Travis")
+      @student3 = User.create!(name: "Samantha Lee")
+      @student4 = User.create!(name: "Jim Carey")
       @course.enroll_user(@student2, "StudentEnrollment", enrollment_state: "active")
       @course.enroll_user(@student3, "StudentEnrollment", enrollment_state: "active")
       @course.enroll_user(@student4, "StudentEnrollment", enrollment_state: "active")
-    end
-
-    it "students instance variable contains students who match the search term parameter" do
-      get "peer_reviews", params: { course_id: @course.id, assignment_id: @assignment.id, search_term: "Sa" }
-      expect(assigns[:students]).to include(have_attributes(name: "Sam"), have_attributes(name: "Samantha"))
-    end
-
-    it "students intance variable has no students when search term parameter does not match any student names" do
-      get "peer_reviews", params: { course_id: @course.id, assignment_id: @assignment.id, search_term: "Hello World" }
-      expect(assigns[:students].length).to eq(0)
+      @assignment.assign_peer_review(@student2, @student3)
+      @assignment.assign_peer_review(@student3, @student4)
     end
 
     it "all visible students are listed in the assign peer review dropdown" do
       get "peer_reviews", params: { course_id: @course.id, assignment_id: @assignment.id, search_term: "Sa" }
       expect(assigns[:students_dropdown_list].length).to eq(4)
+    end
+
+    context "when Search By Reviewer option is selected" do
+      it "students instance variable contains the assessors who match the search term" do
+        get "peer_reviews", params: { course_id: @course.id, assignment_id: @assignment.id, search_term: "Sa", selected_option: "reviewer" }
+        expect(assigns[:students]).to include(have_attributes(name: "Samantha Lee"))
+      end
+
+      it "students instance variable contains the assessors who match the search term parameter when search term has extraneous spaces" do
+        get "peer_reviews", params: { course_id: @course.id, assignment_id: @assignment.id, search_term: " Samantha   Lee ", selected_option: "reviewer" }
+        expect(assigns[:students]).to include(have_attributes(name: "Samantha Lee"))
+      end
+
+      it "students instance variable contains the assessors who match the search term parameter when search term has the users last name first" do
+        get "peer_reviews", params: { course_id: @course.id, assignment_id: @assignment.id, search_term: "Lee, Samantha", selected_option: "reviewer" }
+        expect(assigns[:students]).to include(have_attributes(name: "Samantha Lee"))
+      end
+
+      it "students instance variable has no assessors when search term does not match any assessor names" do
+        get "peer_reviews", params: { course_id: @course.id, assignment_id: @assignment.id, search_term: "Hello World", selected_option: "reviewer" }
+        expect(assigns[:students].length).to eq(0)
+      end
+    end
+
+    context "when Search By Peer Review option is selected" do
+      it "students instance variable contains assessor whose assigned assessments contains the student matching the search term" do
+        get "peer_reviews", params: { course_id: @course.id, assignment_id: @assignment.id, search_term: "Jim Carey", selected_option: "student" }
+        expect(assigns[:students]).to include(have_attributes(name: "Samantha Lee"))
+      end
+
+      it "students instance variable contains assessor whose assigned assessments contains the student matching the search term when search term has extraneous spaces" do
+        get "peer_reviews", params: { course_id: @course.id, assignment_id: @assignment.id, search_term: " Jim  Carey  ", selected_option: "student" }
+        expect(assigns[:students]).to include(have_attributes(name: "Samantha Lee"))
+      end
+
+      it "students instance variable contains assessor whose assigned assessments contains the student matching the search term when search term is last name first" do
+        get "peer_reviews", params: { course_id: @course.id, assignment_id: @assignment.id, search_term: "Carey, Jim", selected_option: "student" }
+        expect(assigns[:students]).to include(have_attributes(name: "Samantha Lee"))
+      end
+    end
+
+    context "when All option is selected" do
+      it "students instance variable contains both the assessor and asset that contain the search term" do
+        get "peer_reviews", params: { course_id: @course.id, assignment_id: @assignment.id, search_term: "sa", selected_option: "all" }
+        expect(assigns[:students]).to include(have_attributes(name: "Samantha Lee"), have_attributes(name: "Bob Travis"))
+      end
+
+      it "students instance variable contains the assessor when there are no peer reviews assigned to the assessor" do
+        get "peer_reviews", params: { course_id: @course.id, assignment_id: @assignment.id, search_term: "ji", selected_option: "all" }
+        expect(assigns[:students]).to include(have_attributes(name: "Jim Carey"))
+      end
     end
   end
 end
