@@ -488,7 +488,7 @@ GEM
     debug (1.9.0)
       irb (~> 1.10)
       reline (>= 0.3.8)
-    debug_inspector (1.1.0)
+    debug_inspector (1.2.0)
     declarative (0.0.20)
     deep_merge (1.2.2)
     descendants_tracker (0.0.4)
