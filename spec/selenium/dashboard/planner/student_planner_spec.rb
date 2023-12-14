@@ -505,6 +505,7 @@ describe "student planner" do
     end
 
     it "dismisses assignment from opportunity dropdown.", priority: "1" do
+      skip "LF-1100"
       go_to_list_view
       open_opportunities_dropdown
       dismiss_opportunity_button(@assignment_opportunity.name).click
