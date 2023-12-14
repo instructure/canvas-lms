@@ -331,3 +331,13 @@ multiselect_gradebook_filters:
       state: allowed
     development:
       state: allowed
+customizable_default_due_time:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Customizable Default Due Date
+  description: Users can now set the default due date for a course to be in minutes
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
