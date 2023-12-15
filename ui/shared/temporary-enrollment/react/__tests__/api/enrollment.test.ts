@@ -144,7 +144,7 @@ describe('enrollment api', () => {
           json: Promise.resolve({error: statusText}),
         })
         await expect(fetchTemporaryEnrollments('1', true)).rejects.toThrow(
-          new Error(`Failed to fetch recipients data. Status: ${status}`)
+          new Error(`Failed to get temporary enrollments for recipient`)
         )
       })
 
@@ -216,7 +216,7 @@ describe('enrollment api', () => {
           await deleteEnrollment(courseId, enrollmentId)
         } catch (error) {
           if (error instanceof Error) {
-            expect(error.message).toBe(`Failed to delete enrollment: ${mockError.message}`)
+            expect(error.message).toBe(`Failed to delete temporary enrollment`)
           } else {
             expect(error).toBeInstanceOf(Error)
           }
@@ -260,9 +260,7 @@ describe('enrollment api', () => {
           await createTemporaryEnrollmentPairing(rootAccountId)
         } catch (error) {
           if (error instanceof Error) {
-            expect(error.message).toBe(
-              `Failed to fetch temporary enrollment pairing: ${mockError.message}`
-            )
+            expect(error.message).toBe(`Failed to create temporary enrollment pairing`)
           } else {
             expect(error).toBeInstanceOf(Error)
           }
@@ -299,6 +297,60 @@ describe('enrollment api', () => {
           method: 'POST',
         })
         expect(mockConsoleError).not.toHaveBeenCalled()
+      })
+
+      it('handles JSON parsing error', async () => {
+        ;(doFetchApi as jest.Mock).mockRejectedValueOnce({
+          response: {
+            status: 400,
+            text: async () => {
+              throw new Error('Invalid JSON data')
+            },
+          },
+        })
+        await expect(async () => {
+          try {
+            await createEnrollment(...mockParams)
+          } catch (error: any) {
+            expect(error.message).toBe('Unable to process your request, please try again later')
+            throw error
+          }
+        }).rejects.toThrow()
+      })
+
+      // server-side error messages found here: app/controllers/enrollments_api_controller.rb
+      describe('user-facing doFetchApi server error message string translations', () => {
+        it.each([
+          {
+            // concluded_course
+            apiMessage: "Can't add an enrollment to a concluded course.",
+            translatedMessage: 'Cannot add a temporary enrollment to a concluded course',
+          },
+          {
+            // inactive_role
+            apiMessage: 'Cannot create an enrollment with this role because it is inactive.',
+            translatedMessage: 'Cannot create a temporary enrollment with an inactive role',
+          },
+          {
+            // base_type_mismatch
+            apiMessage: 'The specified type must match the base type for the role',
+            translatedMessage: 'The specified type must match the base type for the role',
+          },
+          {
+            // default
+            apiMessage: 'Some other error message',
+            translatedMessage: 'Failed to create temporary enrollment, please try again later',
+          },
+        ])('Translate API error message', async ({apiMessage, translatedMessage}) => {
+          const mockJsonFunction = jest.fn().mockResolvedValue({message: apiMessage})
+          ;(doFetchApi as jest.Mock).mockRejectedValueOnce({
+            response: {
+              json: mockJsonFunction,
+              status: 500,
+            },
+          })
+          await expect(createEnrollment(...mockParams)).rejects.toThrow(translatedMessage)
+        })
       })
     })
   })
