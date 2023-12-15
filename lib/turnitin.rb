@@ -352,9 +352,11 @@ module Turnitin
           con.read_timeout = 30
           begin
             con.request(req, query)
-          rescue
+          rescue => e
             Rails.logger.error("Turnitin API error for account_id #{@account_id}: POSTING FAILED")
             Rails.logger.error(params.to_json)
+            Canvas::Errors.capture(e, { tags: { type: "turnitin_api_unreachable", host: @host, endpoint: @endpoint } })
+            raise e
           end
         end
       else
