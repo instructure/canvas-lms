@@ -74,58 +74,37 @@ export default class ShowEventDetailsDialog {
       url = replaceTags(this.event.deleteURL, 'id', this.event.object.id)
     }
 
-    if (ENV.FEATURES.calendar_series) {
-      let delModalContainer = document.getElementById('delete_modal_container')
-      if (!delModalContainer) {
-        delModalContainer = document.createElement('div')
-        delModalContainer.id = 'delete_modal_container'
-        document.body.appendChild(delModalContainer)
-      }
-      renderDeleteCalendarEventDialog(delModalContainer, {
-        isOpen: true,
-        onCancel: () => ReactDOM.unmountComponentAtNode(delModalContainer),
-        onDeleting: which => {
-          if (which === 'one') {
-            publish('CommonEvent/eventDeleting', event)
-          } else {
-            publish('CommonEvent/eventsDeletingFromSeries', {selectedEvent: event, which})
-          }
-        },
-        onDeleted: deletedEvents => {
-          ReactDOM.unmountComponentAtNode(delModalContainer)
-          if (!Array.isArray(deletedEvents) || deletedEvents.length === 1) {
-            publish('CommonEvent/eventDeleted', event)
-          } else {
-            publish('CommonEvent/eventsDeletedFromSeries', {deletedEvents})
-          }
-        },
-        onUpdated: updatedEvents => {
-          $.publish('CommonEvent/eventsUpdatedFromSeries', {updatedEvents})
-        },
-        delUrl: url,
-        isRepeating: !!event.calendarEvent?.series_uuid,
-        isSeriesHead: !!event.calendarEvent?.series_head,
-      })
-    } else {
-      return $('<div />').confirmDelete({
-        url,
-        message: $(
-          deleteItemTemplate({
-            message: opts.message || event.deleteConfirmation,
-            hide_reason: event.object.workflow_state !== 'locked',
-          })
-        ),
-        dialog: {title: opts.dialogTitle || I18n.t('Confirm Deletion')},
-        prepareData: $dialog => ({cancel_reason: $dialog.find('#cancel_reason').val()}),
-        confirmed: () => {
-          this.popover.hide()
-          publish('CommonEvent/eventDeleting', event)
-        },
-        success: () => {
-          publish('CommonEvent/eventDeleted', event)
-        },
-      })
+    let delModalContainer = document.getElementById('delete_modal_container')
+    if (!delModalContainer) {
+      delModalContainer = document.createElement('div')
+      delModalContainer.id = 'delete_modal_container'
+      document.body.appendChild(delModalContainer)
     }
+    renderDeleteCalendarEventDialog(delModalContainer, {
+      isOpen: true,
+      onCancel: () => ReactDOM.unmountComponentAtNode(delModalContainer),
+      onDeleting: which => {
+        if (which === 'one') {
+          publish('CommonEvent/eventDeleting', event)
+        } else {
+          publish('CommonEvent/eventsDeletingFromSeries', {selectedEvent: event, which})
+        }
+      },
+      onDeleted: deletedEvents => {
+        ReactDOM.unmountComponentAtNode(delModalContainer)
+        if (!Array.isArray(deletedEvents) || deletedEvents.length === 1) {
+          publish('CommonEvent/eventDeleted', event)
+        } else {
+          publish('CommonEvent/eventsDeletedFromSeries', {deletedEvents})
+        }
+      },
+      onUpdated: updatedEvents => {
+        $.publish('CommonEvent/eventsUpdatedFromSeries', {updatedEvents})
+      },
+      delUrl: url,
+      isRepeating: !!event.calendarEvent?.series_uuid,
+      isSeriesHead: !!event.calendarEvent?.series_head,
+    })
   }
 
   reserveErrorCB = (data, request, ...otherArgs) => {

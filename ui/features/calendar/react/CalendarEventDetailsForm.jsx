@@ -94,7 +94,6 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
   const shouldEnableTimeFields = () => !isBlackout
   // Right now we don't have a way to edit event series and backend doesn't support to change
   // the rrule of an event. Also we don't save frequency in database.
-  const shouldShowFrequencyPicker = () => ENV?.FEATURES?.calendar_series
   const shouldShowLocationField = () => event.calendarEvent?.parent_event_id == null
   const shouldEnableLocationField = () => !isBlackout
   const shouldShowConferenceField = () => shouldShowConferences
@@ -312,7 +311,7 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
       'calendar_event[blackout_date]': isBlackout,
     }
 
-    if (ENV?.FEATURES?.calendar_series && rrule) params['calendar_event[rrule]'] = rrule
+    if (rrule) params['calendar_event[rrule]'] = rrule
 
     if (canUpdateConference()) {
       if (webConference && shouldEnableConferenceField()) {
@@ -344,7 +343,7 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
 
     if (event.isNewEvent()) {
       params['calendar_event[context_code]'] = context.asset_string
-      if (ENV?.FEATURES?.calendar_series && rrule) params['calendar_event[rrule]'] = rrule
+      if (rrule) params['calendar_event[rrule]'] = rrule
       const objectData = {
         calendar_event: {
           title: params['calendar_event[title]'],
@@ -386,7 +385,7 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
         params['calendar_event[context_code]'] = context.asset_string
       }
 
-      if (ENV?.FEATURES?.calendar_series && event.calendarEvent?.series_uuid) {
+      if (event.calendarEvent?.series_uuid) {
         const which = await renderUpdateCalendarEventDialog(event)
         if (which === undefined) return
         params.which = which
@@ -493,19 +492,17 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
             />
           </Flex.Item>
         </Flex>
-        {shouldShowFrequencyPicker() && (
-          <FrequencyPicker
-            key={date || today}
-            date={date || today}
-            locale={locale}
-            timezone={timezone}
-            width="auto"
-            initialFrequency={frequency}
-            rrule={rrule}
-            onChange={(newFrequency, newRRule) => handleFrequencyChange(newFrequency, newRRule)}
-            courseEndAt={context.course_conclude_at || undefined}
-          />
-        )}
+        <FrequencyPicker
+          key={date || today}
+          date={date || today}
+          locale={locale}
+          timezone={timezone}
+          width="auto"
+          initialFrequency={frequency}
+          rrule={rrule}
+          onChange={(newFrequency, newRRule) => handleFrequencyChange(newFrequency, newRRule)}
+          courseEndAt={context.course_conclude_at || undefined}
+        />
         {shouldShowLocationField() && (
           <TextInput
             data-testid="edit-calendar-event-form-location"

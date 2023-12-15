@@ -238,7 +238,7 @@ export default class EditCalendarEventView extends Backbone.View {
   }
 
   showDuplicates(duplicatesEnabled) {
-    if (ENV.FEATURES.calendar_series && this.model.isNew()) {
+    if (this.model.isNew()) {
       this.$el.find('.label_with_checkbox[for="duplicate_event"]').toggle(duplicatesEnabled)
       $('#duplicate_event').prop('checked', false)
       this.enableDuplicateFields(false)
@@ -254,7 +254,7 @@ export default class EditCalendarEventView extends Backbone.View {
   }
 
   renderRecurringEventFrequencyPicker() {
-    if (ENV.FEATURES.calendar_series && !this.model.get('use_section_dates')) {
+    if (!this.model.get('use_section_dates')) {
       const pickerNode = document.getElementById('recurring_event_frequency_picker')
       const start = this.$el.find('[name="start_date"]').val()
       const eventStart = start ? moment.tz(start, 'MMM D, YYYY', ENV.TIMEZONE) : moment('invalid')
@@ -389,49 +389,30 @@ export default class EditCalendarEventView extends Backbone.View {
   }
 
   destroyModel() {
-    if (ENV.FEATURES.calendar_series) {
-      let delModalContainer = document.getElementById('delete_modal_container')
-      if (!delModalContainer) {
-        delModalContainer = document.createElement('div')
-        delModalContainer.id = 'delete_modal_container'
-        document.body.appendChild(delModalContainer)
-      }
-      renderDeleteCalendarEventDialog(delModalContainer, {
-        isOpen: true,
-        onCancel: () => {
-          ReactDOM.unmountComponentAtNode(delModalContainer)
-        },
-        onDeleting: () => {},
-        onDeleted: () => {
-          ReactDOM.unmountComponentAtNode(delModalContainer)
-          this.redirectWithMessage(
-            I18n.t('event_deleted', '%{event_title} deleted successfully', {
-              event_title: this.model.get('title'),
-            })
-          )
-        },
-        delUrl: this.model.url(),
-        isRepeating: !!this.model.get('series_uuid'),
-        isSeriesHead: !!this.model.get('series_head'),
-      })
-    } else {
-      const msg = I18n.t(
-        'confirm_delete_calendar_event',
-        'Are you sure you want to delete this calendar event?'
-      )
-      if (window.confirm(msg)) {
-        return this.$el.disableWhileLoading(
-          this.model.destroy({
-            success: () =>
-              this.redirectWithMessage(
-                I18n.t('event_deleted', '%{event_title} deleted successfully', {
-                  event_title: this.model.get('title'),
-                })
-              ),
+    let delModalContainer = document.getElementById('delete_modal_container')
+    if (!delModalContainer) {
+      delModalContainer = document.createElement('div')
+      delModalContainer.id = 'delete_modal_container'
+      document.body.appendChild(delModalContainer)
+    }
+    renderDeleteCalendarEventDialog(delModalContainer, {
+      isOpen: true,
+      onCancel: () => {
+        ReactDOM.unmountComponentAtNode(delModalContainer)
+      },
+      onDeleting: () => {},
+      onDeleted: () => {
+        ReactDOM.unmountComponentAtNode(delModalContainer)
+        this.redirectWithMessage(
+          I18n.t('event_deleted', '%{event_title} deleted successfully', {
+            event_title: this.model.get('title'),
           })
         )
-      }
-    }
+      },
+      delUrl: this.model.url(),
+      isRepeating: !!this.model.get('series_uuid'),
+      isSeriesHead: !!this.model.get('series_head'),
+    })
   }
 
   // boilerplate that could be replaced with data bindings
@@ -568,7 +549,7 @@ export default class EditCalendarEventView extends Backbone.View {
   async saveEvent(eventData) {
     RichContentEditor.closeRCE(this.$('textarea'))
 
-    if (ENV?.FEATURES?.calendar_series && this.model.get('series_uuid')) {
+    if (this.model.get('series_uuid')) {
       const which = await renderUpdateCalendarEventDialog(this.model.attributes)
       if (which === undefined) return
       this.model.set('which', which)
