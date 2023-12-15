@@ -158,6 +158,11 @@ module Lti
         end
       end
 
+      def registration_view
+        registration = Lti::IMS::Registration.find(params[:registration_id])
+        redirect_to account_developer_key_view_url(registration.root_account_id, registration.developer_key_id)
+      end
+
       private
 
       def render_registration(registration, developer_key)
@@ -172,7 +177,11 @@ module Lti
           jwks_uri: registration.jwks_uri,
           token_endpoint_auth_method: registration.token_endpoint_auth_method,
           scope: registration.scopes.join(" "),
-          "https://purl.imsglobal.org/spec/lti-tool-configuration": registration.lti_tool_configuration
+          "https://purl.imsglobal.org/spec/lti-tool-configuration": registration.lti_tool_configuration.merge(
+            {
+              "https://#{Lti::IMS::Registration::CANVAS_EXTENSION_LABEL}/lti/registration_config_url": lti_registration_config_url(registration.global_id),
+            }
+          ),
         }
       end
 
