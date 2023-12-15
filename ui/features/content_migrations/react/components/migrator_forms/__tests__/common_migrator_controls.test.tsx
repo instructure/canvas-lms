@@ -34,6 +34,8 @@ describe('CommonMigratorControls', () => {
     window.ENV.NEW_QUIZZES_MIGRATION_DEFAULT = false
   })
 
+  afterEach(() => jest.clearAllMocks())
+
   it('calls onSubmit with import_quizzes_next', () => {
     renderComponent({canImportAsNewQuizzes: true})
 
@@ -99,6 +101,7 @@ describe('CommonMigratorControls', () => {
       canAdjustDates: true,
     })
 
+    userEvent.click(screen.getByRole('radio', {name: 'Select specific content'}))
     userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
 
     expect(onSubmit).toHaveBeenCalledWith({
@@ -106,6 +109,7 @@ describe('CommonMigratorControls', () => {
         enabled: false,
         operation: 'shift_dates',
       },
+      selective_import: true,
       date_shift_options: {
         day_substitutions: [],
         new_end_date: false,
@@ -114,7 +118,7 @@ describe('CommonMigratorControls', () => {
         old_start_date: false,
         substitutions: {},
       },
-      selective_import: false,
+      errored: false,
       settings: {import_quizzes_next: false, overwrite_quizzes: false},
     })
   })

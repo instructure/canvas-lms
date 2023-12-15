@@ -80,6 +80,7 @@ export type DateAdjustmentConfig = {
 }
 
 export type submitMigrationFormData = {
+  errored?: boolean
   adjust_dates: AdjustDates
   selective_import: boolean
   date_shift_options: DateShifts

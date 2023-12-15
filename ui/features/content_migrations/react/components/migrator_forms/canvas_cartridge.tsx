@@ -17,9 +17,13 @@
  */
 
 import React, {useCallback, useState} from 'react'
+import {useScope as useI18nScope} from '@canvas/i18n'
+import {Text} from '@instructure/ui-text'
 import CommonMigratorControls from './common_migrator_controls'
 import type {onSubmitMigrationFormCallback} from '../types'
 import MigrationFileInput from './file_input'
+
+const I18n = useI18nScope('content_migrations_redesign')
 
 type CanvasCartridgeImporterProps = {
   onSubmit: onSubmitMigrationFormCallback
@@ -28,16 +32,20 @@ type CanvasCartridgeImporterProps = {
 
 const CanvasCartridgeImporter = ({onSubmit, onCancel}: CanvasCartridgeImporterProps) => {
   const [file, setFile] = useState<File | null>(null)
+  const [fileError, setFileError] = useState<boolean>(false)
 
   const handleSubmit: onSubmitMigrationFormCallback = useCallback(
     formData => {
       if (file) {
+        setFileError(false)
         formData.pre_attachment = {
           name: file.name,
           size: file.size,
           no_redirect: true,
         }
         onSubmit(formData, file)
+      } else {
+        setFileError(true)
       }
     },
     [file, onSubmit]
@@ -46,6 +54,11 @@ const CanvasCartridgeImporter = ({onSubmit, onCancel}: CanvasCartridgeImporterPr
   return (
     <>
       <MigrationFileInput onChange={setFile} />
+      {fileError && (
+        <p>
+          <Text color="danger">{I18n.t('You must select a file to import content from')}</Text>
+        </p>
+      )}
       <CommonMigratorControls
         canSelectContent={true}
         canImportAsNewQuizzes={ENV.NEW_QUIZZES_MIGRATION}
