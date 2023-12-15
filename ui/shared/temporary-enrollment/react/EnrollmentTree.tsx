@@ -133,7 +133,7 @@ export function EnrollmentTree(props: Props) {
         } else {
           roleCheck = false
         }
-        let roleNode = {
+        let roleNode: NodeStructure = {
           id: roleId,
           label: roleData?.label,
           // eslint-disable-next-line no-array-constructor
@@ -146,7 +146,7 @@ export function EnrollmentTree(props: Props) {
         const courseId = course.id
         const cId = 'c' + courseId
         const childArray: NodeStructure[] = []
-        let courseNode = {
+        let courseNode: NodeStructure = {
           isMismatch: false,
           id: cId,
           label: course.name,
@@ -194,19 +194,12 @@ export function EnrollmentTree(props: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.tempEnrollmentsPairing, props.enrollmentsByCourse])
 
-  const findOrAppendNewNode = (currentNode: any, parentNode: any) => {
-    let found = false
-    parentNode.find((node: NodeStructure) => {
-      if (node.label === currentNode.label) {
-        currentNode = node
-        found = true
-      }
-      return found
-    })
-    if (!found) {
+  const findOrAppendNewNode = (currentNode: NodeStructure, parentNode: NodeStructure[]) => {
+    const matchingNode = parentNode.find((node: NodeStructure) => node.id === currentNode.id)
+    if (!matchingNode) {
       parentNode.push(currentNode)
     }
-    return currentNode
+    return matchingNode || currentNode
   }
 
   const locateNode = (node: NodeStructure) => {
