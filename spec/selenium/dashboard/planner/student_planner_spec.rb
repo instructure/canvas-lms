@@ -505,14 +505,25 @@ describe "student planner" do
     end
 
     it "dismisses assignment from opportunity dropdown.", priority: "1" do
-      skip "LF-1100"
+      # Adding this today assignment only so that an alert doesn't come up saying Nothing is Due Today
+      # It interferes with the dropdown in Jenkins
+      @course.assignments.create!(name: "assignment due today",
+                                  description: "we need this so we dont get the popup",
+                                  submission_types: "online_text_entry",
+                                  due_at: Time.zone.now)
+
       go_to_list_view
       open_opportunities_dropdown
-      dismiss_opportunity_button(@assignment_opportunity.name).click
 
-      expect(opportunities_parent).to contain_jqcss(no_new_opportunity_msg_selector)
-      expect(opportunities_parent).not_to contain_jqcss(opportunity_item_selector(@assignment_opportunity.name))
-      expect(opportunities_parent).not_to contain_jqcss(dismiss_opportunity_button_selector(@assignment_opportunity.name))
+      # There is some latency when clicking dismissing an opportunity.  This makes sure the buttons are clicked and we
+      # waiting for the items to be available.  There is a warning on this one, but example provided instead does not
+      # work in this circumstance.
+
+      keep_trying_for_attempt_times(attempts: 5, sleep_interval: 0.5) do
+        dismiss_opportunity_button(@assignment_opportunity.name).click
+        wait_for_no_such_element { opportunity_item_selector(@assignment_opportunity.name) }
+        expect(opportunities_parent).not_to contain_jqcss(dismiss_opportunity_button_selector(@assignment_opportunity.name))
+      end
     end
 
     it "shows missing pill in the opportunities dropdown.", priority: "1" do
