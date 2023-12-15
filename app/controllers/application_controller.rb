@@ -366,6 +366,7 @@ class ApplicationController < ActionController::Base
     assignment_edit_placement_not_on_announcements
     platform_service_speedgrader
     instui_header
+    rce_find_replace
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours
