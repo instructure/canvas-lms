@@ -295,11 +295,9 @@ class AccountsController < ApplicationController
   before_action :reject_student_view_student
   before_action :get_context
   before_action :rce_js_env, only: [:settings]
-  before_action :require_site_admin, only: [:restore_user]
 
   include Api::V1::Account
   include CustomSidebarLinksHelper
-  include SupportHelpers::ControllerHelpers
   include DefaultDueTimeHelper
 
   INTEGER_REGEX = /\A[+-]?\d+\z/
@@ -1373,6 +1371,7 @@ class AccountsController < ApplicationController
 
     js_env PERMISSIONS: {
       restore_course: @account.grants_right?(@current_user, session, :undelete_courses),
+      restore_user: @account.grants_right?(@current_user, session, :manage_user_logins),
       # Permission caching issue makes explicitly checking the account setting
       # an easier option.
       view_messages: (@account.settings[:admins_can_view_notifications] &&
@@ -1433,10 +1432,9 @@ class AccountsController < ApplicationController
   end
 
   # @API Restore a deleted user from a root account
-  # @internal
   #
   # Restore a user record along with the most recently deleted pseudonym
-  # from a Canvas root account. Can only be done by a siteadmin.
+  # from a Canvas root account.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/accounts/3/users/5/restore \
@@ -1467,7 +1465,7 @@ class AccountsController < ApplicationController
     pseudonym.clear_permissions_cache(user)
     user.update_account_associations
     user.clear_caches
-    render json: user || {}
+    render json: user_json(user, @current_user, session, [], @account)
   end
 
   def eportfolio_moderation
