@@ -361,4 +361,16 @@ describe AuthenticationProvidersController do
       end
     end
   end
+
+  describe "PUT #restore" do
+    it "restores a deleted auth config successfully" do
+      account.authentication_providers.create!(saml_hash)
+      aac = account.authentication_providers.active.find_by(auth_type: "saml")
+      aac.destroy
+
+      put "restore", params: { account_id: account.id, id: aac.id }
+
+      expect(aac.reload).to be_active
+    end
+  end
 end
