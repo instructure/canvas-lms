@@ -33,7 +33,6 @@ export default class CourseSearchResultsView extends Backbone.View {
 
   initialize(_options) {
     this.disableResults = this.disableResults.bind(this)
-    this.enableResults = this.enableResults.bind(this)
     this.resultsFound = this.resultsFound.bind(this)
     super.initialize(...arguments)
     return this.applyBindings()
@@ -43,14 +42,6 @@ export default class CourseSearchResultsView extends Backbone.View {
   // restore a course when a search is happening.
   disableResults() {
     return this.$el.find('button').prop('disabled', true)
-  }
-
-  // Enable the search results. This means you can now
-  // restore a course when a search has completed.
-  enableResults() {
-    if (this.model.get('workflow_state') === 'deleted') {
-      return this.$el.find('button').prop('disabled', false)
-    }
   }
 
   resultsFound() {

@@ -23,7 +23,7 @@ import 'jqueryui/tabs'
 // It allows you to give it a tab property that should
 // look like this
 // tabs:
-//   courseRestore  : true
+//   contentRestore  : true
 //   viewMessages   : true
 //   anotherTabName : true
 
@@ -34,7 +34,6 @@ export default class AdminToolsView extends Backbone.View {
     this.child('restoreContentPaneView', '#restoreContentPane')
     this.child('messageContentPaneView', '#commMessagesPane')
     this.child('loggingContentPaneView', '#loggingPane')
-    this.child('bouncedEmailsPaneView', '#bouncedEmailsPane')
     this.optionProperty('tabs')
 
     this.prototype.template = template
@@ -50,7 +49,7 @@ export default class AdminToolsView extends Backbone.View {
 
   toJSON(json) {
     json = super.toJSON(...arguments)
-    json.courseRestore = this.tabs.courseRestore
+    json.contentRestore = this.tabs.contentRestore
     json.viewMessages = this.tabs.viewMessages
     json.logging = this.tabs.logging
     json.bouncedEmails = this.tabs.bouncedEmails

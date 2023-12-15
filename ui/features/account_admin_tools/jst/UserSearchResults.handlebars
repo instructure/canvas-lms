@@ -1,0 +1,52 @@
+{{#if showRestore }}
+<div class="admin-tool-well">
+  <div class="h2">
+    <span class="lead">{{name}}</span>
+    <p>
+    <strong>{{#t}}User ID:{{/t}}</strong> {{id}} <br />
+    <strong>{{#t}}User SIS ID:{{/t}}</strong> {{sis_user_id}}<br />
+    </p>
+  </div>
+  <button id="restoreUserBtn" class="btn">{{#t}}Restore{{/t}}</button>&nbsp;&nbsp;<span>{{#t "info_text"}}Enrollments, communication channels, and observers must be restored manually.{{/t}}</span>
+</div>
+{{/if}}
+
+{{#if showNotFound}}
+<div class="alert alert-error">
+  <p class="text-error no-spacing">{{#t}}A deleted user with that ID could not be found for this account.{{/t}}</p>
+</div>
+{{/if}}
+
+{{#if showSuccessfullRestore}}
+<div class="alert alert-success" role="alert">
+  <p class="lead">
+  {{name}} has been restored!
+  </p>
+  <div>
+    <strong>{{#t}}What would you like to do next?{{/t}}</strong>
+    <div>
+      <a href="users/{{id}}" id="viewUser" class="btn">{{#t}}View User{{/t}}</a>
+    </div>
+  </div>
+</div>
+{{/if}}
+
+{{#if showNonDeletedUser}}
+<div class="alert alert-block">
+  <div class="h2">
+    <span class="lead">{{name}} {{#t}}(Not Deleted){{/t}}</span>
+    <p>
+    <strong>{{#t}}User ID:{{/t}}</strong> {{id}} <br />
+    <strong>{{#t}}User login ID:{{/t}}</strong> {{login_id}}<br />
+    <strong>{{#t}}User SIS ID:{{/t}}</strong> {{sis_user_id}}<br />
+    </p>
+  </div>
+
+  <div>
+    <div>
+      <a href="users/{{id}}" id="viewUser" class="btn">{{#t}}View User{{/t}}</a>
+    </div>
+  </div>
+
+</div>
+{{/if}}
