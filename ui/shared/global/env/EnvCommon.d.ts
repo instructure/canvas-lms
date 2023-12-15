@@ -208,7 +208,6 @@ export type SiteAdminFeatureId =
   | 'render_both_to_do_lists'
   | 'course_paces_redesign'
   | 'course_paces_for_students'
-  | 'module_publish_menu'
   | 'explicit_latex_typesetting'
   | 'dev_key_oidc_alert'
   | 'media_links_use_attachment_id'

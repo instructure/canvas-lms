@@ -53,6 +53,26 @@ module ModulesIndexPage
     "#context_module_content_#{module_id} .unlock_details"
   end
 
+  def module_publish_button_selector(module_id)
+    "#context_module_#{module_id} div.module-publish-icon button"
+  end
+
+  def publish_module_and_items_option_selector
+    "button:contains('Publish module and all items')"
+  end
+
+  def unpublish_module_and_items_option_selector
+    "button:contains('Unpublish module and all items')"
+  end
+
+  def published_module_icon_selector(module_id)
+    "#context_module_#{module_id} .module_header_items svg[name='IconPublish']"
+  end
+
+  def unpublished_module_icon_selector(module_id)
+    "#context_module_#{module_id} .module_header_items svg[name='IconUnpublished']"
+  end
+
   #------------------------------ Elements ------------------------------
   def context_module(module_id)
     f(context_module_selector(module_id))
@@ -134,6 +154,26 @@ module ModulesIndexPage
     f(unlock_details_selector(module_id))
   end
 
+  def module_publish_button(module_id)
+    f(module_publish_button_selector(module_id))
+  end
+
+  def publish_module_and_items_option
+    fj(publish_module_and_items_option_selector)
+  end
+
+  def unpublish_module_and_items_option
+    fj(unpublish_module_and_items_option_selector)
+  end
+
+  def published_module_icon(module_id)
+    f(published_module_icon_selector(module_id))
+  end
+
+  def unpublished_module_icon(module_id)
+    f(unpublished_module_icon_selector(module_id))
+  end
+
   #------------------------------ Actions ------------------------------
   def visit_modules_index_page(course_id)
     get "/courses/#{course_id}/modules"
@@ -175,5 +215,17 @@ module ModulesIndexPage
 
   def scroll_to_module(module_name)
     scroll_to(f("[aria-label='Manage #{module_name}']"))
+  end
+
+  def publish_module_and_items(module_id)
+    module_publish_button(module_id).click
+    publish_module_and_items_option.click
+    wait_for_ajax_requests
+  end
+
+  def unpublish_module_and_items(module_id)
+    module_publish_button(module_id).click
+    unpublish_module_and_items_option.click
+    wait_for_ajax_requests
   end
 end

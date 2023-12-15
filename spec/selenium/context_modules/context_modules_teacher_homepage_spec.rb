@@ -61,7 +61,7 @@ describe "context modules" do
       it "unpublishes a published module", priority: "1" do
         mod = @course.context_modules.first
         expect(mod).to be_published
-        unpublish_module
+        unpublish_module_and_items(mod.id)
         mod.reload
         expect(mod).to be_unpublished
       end
@@ -153,10 +153,10 @@ describe "context modules" do
         expect(@course.context_modules.count).to eq 1
         mod = @course.context_modules.first
         expect(mod.name).to eq "New Module"
-        publish_module
+        publish_module_and_items(mod.id)
         mod.reload
         expect(mod).to be_published
-        expect(f("#context_modules .publish-icon-published")).to be_displayed
+        expect(published_module_icon(mod.id)).to be_displayed
       end
 
       it "edits a module", priority: "1" do
@@ -199,10 +199,10 @@ describe "context modules" do
         expect(@course.context_modules.count).to eq 2
         mod = @course.context_modules.last
         expect(mod.name).to eq "New Module2"
-        publish_module
+        publish_module_and_items(mod.id)
         mod.reload
         expect(mod).to be_published
-        expect(ff("#context_modules .publish-icon-published")[1]).to be_displayed
+        expect(published_module_icon(mod.id)).to be_displayed
       end
 
       it "edits a module with differentiated modules", priority: "1" do

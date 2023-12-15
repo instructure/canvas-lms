@@ -153,12 +153,6 @@ deprecate_faculty_journal:
     development:
       state: allowed_on
 
-module_publish_menu:
-  state: hidden
-  display_name: 'Module Publish Menu'
-  description: Enable the module publish menus to make mass publishing and unpublishing easier.
-  applies_to: SiteAdmin
-
 blueprint_line_item_support:
   state: hidden
   display_name: 'Blueprint Resource ID Support'
