@@ -241,3 +241,10 @@ instui_header:
   description: |-
     If enabled, pages will use the new InstUI headers
   applies_to: SiteAdmin
+
+rce_find_replace:
+  state: hidden
+  display_name: Find and Replace RCE Plugin
+  description: |-
+    Enable a plugin which can find and replace content when editing in an RCE
+  applies_to: SiteAdmin

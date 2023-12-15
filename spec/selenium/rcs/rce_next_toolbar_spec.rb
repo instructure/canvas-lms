@@ -522,5 +522,33 @@ describe "RCE Next toolbar features", :ignore_js_errors do
         assert_insert_buttons_enabled(true)
       end
     end
+
+    context "find and replace plugin" do
+      before(:once) do
+        Account.site_admin.enable_feature!(:rce_find_replace)
+      end
+
+      it "finds and replaces text" do
+        rce_wysiwyg_state_setup(@course, "find me")
+
+        find_and_replace_menu_item.click
+        find_and_replace_tray_find_input.send_keys("find me")
+        find_and_replace_tray_replace_input.send_keys("replace me")
+        find_and_replace_tray_replace_button.click
+
+        in_frame rce_page_body_ifr_id do
+          expect(wiki_body).to contain_css("p", text: "replace me")
+        end
+      end
+
+      it "opens with shortcut" do
+        rce_wysiwyg_state_setup(@course)
+        driver.switch_to.frame("wiki_page_body_ifr")
+        wiki_body.click
+        wiki_body.send_keys [:control, "f"]
+        driver.switch_to.default_content
+        expect(find_and_replace_tray_header).to be_displayed
+      end
+    end
   end
 end
