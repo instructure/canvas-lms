@@ -188,6 +188,7 @@ describe Lti::IMS::DynamicRegistrationController do
           created_registration = Lti::IMS::Registration.last
           expect(created_registration.privacy_level).to eq("email_only")
           expect(created_registration).not_to be_nil
+          expect(parsed_body["https://purl.imsglobal.org/spec/lti-tool-configuration"]["https://canvas.instructure.com/lti/registration_config_url"]).to eq "http://test.host/api/lti/registrations/#{created_registration.global_id}/view"
         end
 
         it "fills in values on the developer key" do

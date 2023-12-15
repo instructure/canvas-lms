@@ -2773,6 +2773,7 @@ CanvasRails::Application.routes.draw do
       get "register", action: :redirect_to_tool_registration
       get "registrations/uuid/:registration_uuid", action: :registration_by_uuid
       put "registrations/:registration_id/overlay", action: :update_registration_overlay
+      get "registrations/:registration_id/view", action: :registration_view, as: :lti_registration_config
       post "registrations", action: :create
     end
 

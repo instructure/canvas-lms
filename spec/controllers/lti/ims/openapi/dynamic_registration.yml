@@ -129,6 +129,22 @@ paths:
                       type: array
                     target_link_uri:
                       type: string
+  /api/lti/registrations/:registration_id/view:
+    get:
+      summary: Redirects the user to the tool's configuration view.
+      parameters:
+        - in: path
+          name: registration_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '302':
+          description: "The user was redirected to the tool's configuration view."
+          headers:
+            Location:
+              schema:
+                type: string
 components:
   schemas:
     placement:
