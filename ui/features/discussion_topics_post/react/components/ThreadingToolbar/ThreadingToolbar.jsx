@@ -47,7 +47,7 @@ export function ThreadingToolbar({...props}) {
         },
       }}
       render={(responsiveProps, matches) =>
-        (props.searchTerm || props.filter !== 'all') && !props.isIsolatedView ? (
+        (props.searchTerm || props.filter !== 'all') && !props.isSplitView ? (
           <Link
             as="button"
             isWithinText={false}
@@ -95,7 +95,7 @@ ThreadingToolbar.propTypes = {
   filter: PropTypes.string,
   onOpenSplitView: PropTypes.func,
   discussionEntry: PropTypes.object,
-  isIsolatedView: PropTypes.bool,
+  isSplitView: PropTypes.bool,
 }
 
 ThreadingToolbar.Reply = Reply

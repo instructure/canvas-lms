@@ -20,7 +20,7 @@ import React from 'react'
 import {ShowMoreRepliesButton} from './ShowMoreRepliesButton'
 
 export default {
-  title: 'Examples/Discussion Posts/Components/IsolatedView/ShowMoreRepliesButton',
+  title: 'Examples/Discussion Posts/Components/SplitScreenView/ShowMoreRepliesButton',
   component: ShowMoreRepliesButton,
   argTypes: {
     onClick: {action: 'On Click'},

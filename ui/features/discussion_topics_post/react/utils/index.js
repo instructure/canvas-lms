@@ -272,7 +272,6 @@ export const getOptimisticResponse = ({
   message = '',
   parentId = 'PLACEHOLDER',
   rootEntryId = null,
-  isolatedEntryId = null,
   quotedEntry = null,
   isAnonymous = false,
   depth = null,
@@ -353,7 +352,6 @@ export const getOptimisticResponse = ({
         },
         parentId,
         rootEntryId,
-        isolatedEntryId,
         quotedEntry,
         attachment: attachment
           ? {...attachment, id: 'ATTACHMENT_PLACEHOLDER', __typename: 'File'}

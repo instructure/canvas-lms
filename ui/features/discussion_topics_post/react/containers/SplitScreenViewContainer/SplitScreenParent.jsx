@@ -260,7 +260,7 @@ export const SplitScreenParent = props => {
                         props.moreOptionsButtonRef?.current?.focus()
                       }, 0)
                     }}
-                    isIsolatedView={true}
+                    isSplitView={true}
                     editor={props.discussionEntry.editor}
                     isUnread={!props.discussionEntry.entryParticipant?.read}
                     isForcedRead={props.discussionEntry.entryParticipant?.forcedReadState}
@@ -285,7 +285,7 @@ export const SplitScreenParent = props => {
                       <View as="div" padding="0">
                         <ThreadingToolbar
                           discussionEntry={props.discussionEntry}
-                          isIsolatedView={true}
+                          isSplitView={true}
                         >
                           {threadActions}
                         </ThreadingToolbar>

@@ -400,7 +400,7 @@ const SplitScreenThreadContainer = props => {
                         props.moreOptionsButtonRef?.current?.focus()
                       }, 0)
                     }}
-                    isIsolatedView={true}
+                    isSplitView={true}
                     editor={props.discussionEntry.editor}
                     isUnread={!props.discussionEntry.entryParticipant?.read}
                     isForcedRead={props.discussionEntry.entryParticipant?.forcedReadState}
@@ -422,10 +422,7 @@ const SplitScreenThreadContainer = props => {
                     attachment={props.discussionEntry.attachment}
                   >
                     <View as="div">
-                      <ThreadingToolbar
-                        discussionEntry={props.discussionEntry}
-                        isIsolatedView={true}
-                      >
+                      <ThreadingToolbar discussionEntry={props.discussionEntry} isSplitView={true}>
                         {threadActions}
                       </ThreadingToolbar>
                     </View>

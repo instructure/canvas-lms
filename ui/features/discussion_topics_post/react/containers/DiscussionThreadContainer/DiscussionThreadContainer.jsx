@@ -510,7 +510,7 @@ export const DiscussionThreadContainer = props => {
                         moreOptionsButtonRef?.current?.focus()
                       }, 0)
                     }}
-                    isIsolatedView={false}
+                    isSplitView={false}
                     editor={props.discussionEntry.editor}
                     isUnread={
                       !props.discussionEntry.entryParticipant?.read ||
@@ -540,7 +540,7 @@ export const DiscussionThreadContainer = props => {
                           searchTerm={searchTerm}
                           discussionEntry={props.discussionEntry}
                           onOpenSplitView={props.onOpenSplitView}
-                          isIsolatedView={false}
+                          isSplitView={false}
                           filter={filter}
                         >
                           {threadActions}

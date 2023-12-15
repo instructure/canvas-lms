@@ -143,7 +143,7 @@ export const AuthorInfo = props => {
                         ) : (
                           <>
                             <SearchSpan
-                              isIsolatedView={props.isIsolatedView}
+                              isSplitView={props.isSplitView}
                               searchTerm={searchTerm}
                               text={getDisplayName(props)}
                             />
@@ -224,9 +224,9 @@ AuthorInfo.propTypes = {
    */
   isForcedRead: PropTypes.bool,
   /**
-   * Boolean to determine if we are in the isolated view
+   * Boolean to determine if we are in the split view
    */
-  isIsolatedView: PropTypes.bool,
+  isSplitView: PropTypes.bool,
   /**
    * Display text for the relative time information. This prop is expected
    * to be provided as a string of the exact text to be displayed, not a

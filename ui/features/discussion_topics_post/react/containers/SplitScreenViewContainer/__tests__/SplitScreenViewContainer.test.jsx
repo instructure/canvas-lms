@@ -107,7 +107,6 @@ describe('SplitScreenViewContainer', () => {
       includeRelativeEntry: false,
     })
     mocks[0].result.data.legacyNode.parentId = '77'
-    mocks[0].result.data.legacyNode.isolatedEntryId = '77'
     const {findByTestId} = setup(defaultProps(), mocks)
 
     const backButton = await findByTestId('back-button')
