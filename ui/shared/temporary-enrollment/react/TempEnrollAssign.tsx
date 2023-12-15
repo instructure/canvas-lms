@@ -31,7 +31,6 @@ import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
 import {EnrollmentTree} from './EnrollmentTree'
 import {Flex} from '@instructure/ui-flex'
-import {unstable_batchedUpdates} from 'react-dom'
 import {
   getDayBoundaries,
   getFromLocalStorage,
@@ -405,7 +404,7 @@ export function TempEnrollAssign(props: Props) {
   }
 
   const handleProcessEnrollments = async (submitEnrolls: SelectedEnrollment[]): Promise<void> => {
-    let success: boolean
+    let success: boolean = false
     try {
       setErrorMsg('')
       const temporaryEnrollmentPairing: TemporaryEnrollmentPairing =
@@ -447,12 +446,8 @@ export function TempEnrollAssign(props: Props) {
       setErrorMsg(I18n.t('An error occurred, please try again'))
       success = false
     } finally {
-      // using unstable_batchedUpdates to avoid getting the following error:
-      // “Can't perform a React state update on an unmounted component”
-      unstable_batchedUpdates(() => {
-        props.setEnrollmentStatus(success)
-        setLoading(false)
-      })
+      props.setEnrollmentStatus(success)
+      setLoading(false)
     }
   }
 
