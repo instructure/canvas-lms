@@ -7741,7 +7741,6 @@ describe Course do
       @wiki_page_tag.trigger_unpublish!
 
       @ids_to_update = @modules_to_update.map(&:id)
-      Account.site_admin.enable_feature!(:module_publish_menu)
     end
 
     context "with publish event" do

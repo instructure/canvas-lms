@@ -86,19 +86,17 @@ export function addModuleElement(
     }
     overrideModel(moduleItems, relockModulesDialog, view.model, view)
   }
-  if (window.ENV?.FEATURES?.module_publish_menu) {
-    const isPublishing =
-      document.querySelector<Element & {dataset: Record<string, string>}>(
-        '#context-modules-publish-menu'
-      )?.dataset['data-progress-id'] !== undefined
-    updatePublishMenuDisabledState(isPublishing)
-    renderContextModulesPublishIcon(
-      data.context_module.context_id,
-      data.context_module.id,
-      published,
-      isPublishing
-    )
-  }
+  const isPublishing =
+    document.querySelector<Element & {dataset: Record<string, string>}>(
+      '#context-modules-publish-menu'
+    )?.dataset['data-progress-id'] !== undefined
+  updatePublishMenuDisabledState(isPublishing)
+  renderContextModulesPublishIcon(
+    data.context_module.context_id,
+    data.context_module.id,
+    published,
+    isPublishing
+  )
   relockModulesDialog.renderIfNeeded(data.context_module)
   $module.triggerHandler('update', data)
   const module_dnd = $module.find('.module_dnd')[0]

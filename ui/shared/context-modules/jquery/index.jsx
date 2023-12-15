@@ -1343,9 +1343,7 @@ modules.initModuleManagement = function (duplicate) {
             const $contextModules = $('#context_modules .context_module')
             if (!$contextModules.length) {
               $('#expand_collapse_all').hide()
-              if (window.ENV?.FEATURES?.module_publish_menu) {
-                updatePublishMenuDisabledState(true)
-              }
+              updatePublishMenuDisabledState(true)
             }
           })
           $.flashMessage(
