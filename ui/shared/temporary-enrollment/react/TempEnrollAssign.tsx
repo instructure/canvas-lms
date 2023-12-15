@@ -443,7 +443,11 @@ export function TempEnrollAssign(props: Props) {
       await Promise.all(createPromises)
       success = true
     } catch (error) {
-      setErrorMsg(I18n.t('An error occurred, please try again'))
+      if (error instanceof Error) {
+        setErrorMsg(error.message)
+      } else {
+        setErrorMsg(I18n.t('An unexpected error occurred, please try again later'))
+      }
       success = false
     } finally {
       props.setEnrollmentStatus(success)
