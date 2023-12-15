@@ -54,9 +54,9 @@ describe('PostToolbar', () => {
     expect(getByText('Go to Reply')).toBeTruthy()
   })
 
-  it('should not render go to reply button when isIsolatedView prop is true', () => {
+  it('should not render go to reply button when isSplitView prop is true', () => {
     const {queryByText} = render(
-      <ThreadingToolbar searchTerm="" filter="unread" isIsolatedView={true}>
+      <ThreadingToolbar searchTerm="" filter="unread" isSplitView={true}>
         <>First</>
         <>Second</>
       </ThreadingToolbar>
@@ -105,7 +105,6 @@ describe('PostToolbar', () => {
           discussionEntry={DiscussionEntry.mock({
             _id: '1',
             rootEntryId: null,
-            isolatedEntryId: null,
             parentId: null,
           })}
           searchTerm="neato"
@@ -125,7 +124,6 @@ describe('PostToolbar', () => {
         discussionEntry={DiscussionEntry.mock({
           id: '1',
           _id: '1',
-          isolatedEntryId: null,
           rootEntryId: null,
         })}
         searchTerm="neato"
@@ -139,7 +137,7 @@ describe('PostToolbar', () => {
 
   it('renders provided children', () => {
     const {getByText} = render(
-      <ThreadingToolbar filter="all" searchTerm="" isIsolatedView={false}>
+      <ThreadingToolbar filter="all" searchTerm="" isSplitView={false}>
         <>First</>
         <>Second</>
       </ThreadingToolbar>

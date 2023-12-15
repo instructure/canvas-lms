@@ -124,7 +124,7 @@ export const DiscussionEntryContainer = props => {
                     editor={props.editor}
                     isUnread={props.isUnread}
                     isForcedRead={props.isForcedRead}
-                    isIsolatedView={props.isIsolatedView}
+                    isSplitView={props.isSplitView}
                     timingDisplay={props.timingDisplay}
                     editedTimingDisplay={props.editedTimingDisplay}
                     lastReplyAtDisplay={props.lastReplyAtDisplay}
@@ -173,7 +173,7 @@ export const DiscussionEntryContainer = props => {
               isEditing={props.isEditing}
               onSave={props.onSave}
               onCancel={props.onCancel}
-              isIsolatedView={props.isIsolatedView}
+              isSplitView={props.isSplitView}
             >
               {props.attachment && (
                 <View as="div" padding="small none none">
@@ -202,7 +202,7 @@ DiscussionEntryContainer.propTypes = {
   isEditing: PropTypes.bool,
   onSave: PropTypes.func,
   onCancel: PropTypes.func,
-  isIsolatedView: PropTypes.bool,
+  isSplitView: PropTypes.bool,
   editor: User.shape,
   isUnread: PropTypes.bool,
   isForcedRead: PropTypes.bool,

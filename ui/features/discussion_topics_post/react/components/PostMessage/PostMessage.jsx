@@ -106,7 +106,7 @@ export function PostMessage({...props}) {
                 }}
               >
                 <SearchSpan
-                  isIsolatedView={props.isIsolatedView}
+                  isSplitView={props.isSplitView}
                   searchTerm={searchTerm}
                   text={props.message}
                 />
@@ -153,7 +153,7 @@ PostMessage.propTypes = {
    * Callback for when Editor Cancel button is pressed
    */
   onCancel: PropTypes.func,
-  isIsolatedView: PropTypes.bool,
+  isSplitView: PropTypes.bool,
   discussionAnonymousState: PropTypes.string,
   canReplyAnonymously: PropTypes.bool,
   threadMode: PropTypes.bool,
@@ -161,7 +161,7 @@ PostMessage.propTypes = {
 }
 
 PostMessage.defaultProps = {
-  isIsolatedView: false,
+  isSplitView: false,
 }
 
 export default PostMessage

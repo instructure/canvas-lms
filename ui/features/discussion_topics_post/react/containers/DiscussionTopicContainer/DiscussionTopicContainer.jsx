@@ -395,7 +395,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                             anonymousAuthor={props.discussionTopic.anonymousAuthor}
                             title={props.discussionTopic.title}
                             message={props.discussionTopic.message}
-                            isIsolatedView={false}
+                            isSplitView={false}
                             editor={props.discussionTopic.editor}
                             timingDisplay={DateHelper.formatDatetimeForDiscussions(
                               props.discussionTopic.postedAt
