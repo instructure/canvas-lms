@@ -102,7 +102,7 @@ export const CommonMigratorControls = ({
   onSubmit,
   onCancel,
 }: CommonMigratorControlsProps) => {
-  const [selectiveImport, setSelectiveImport] = useState<boolean>(false)
+  const [selectiveImport, setSelectiveImport] = useState<null | boolean>(null)
   const [importAsNewQuizzes, setImportAsNewQuizzes] = useState<boolean>(false)
   const [overwriteAssessmentContent, setOverwriteAssessmentContent] = useState<boolean>(false)
   const [showAdjustDates, setShowAdjustDates] = useState<boolean>(false)
@@ -120,9 +120,12 @@ export const CommonMigratorControls = ({
       day_substitutions: [],
     },
   })
+  const [contentError, setContentError] = useState<boolean>(false)
 
   const handleSubmit = useCallback(() => {
-    const data: submitMigrationFormData = {settings: {}} as submitMigrationFormData
+    const data: any = {settings: {}}
+    setContentError(selectiveImport === null)
+    data.errored = selectiveImport === null // So the parent form can guard submit and show it's own errors
     canSelectContent && (data.selective_import = selectiveImport)
     if (canAdjustDates && dateAdjustments) {
       dateAdjustments.adjust_dates && (data.adjust_dates = dateAdjustments.adjust_dates)
@@ -210,7 +213,7 @@ export const CommonMigratorControls = ({
                 const target = e.target as HTMLInputElement
                 setSelectiveImport(!target.checked)
               }}
-              checked={selectiveImport}
+              checked={selectiveImport === true}
             />
             <RadioInput
               name="selective_import"
@@ -220,9 +223,14 @@ export const CommonMigratorControls = ({
                 const target = e.target as HTMLInputElement
                 setSelectiveImport(target.checked)
               }}
-              checked={!selectiveImport}
+              checked={selectiveImport === false}
             />
           </RadioInputGroup>
+          {contentError && (
+            <p>
+              <Text color="danger">{I18n.t('You must choose a content option')}</Text>
+            </p>
+          )}
         </View>
       )}
 
