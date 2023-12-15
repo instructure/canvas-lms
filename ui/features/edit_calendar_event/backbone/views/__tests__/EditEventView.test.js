@@ -254,10 +254,6 @@ describe('EditEventView', () => {
   })
 
   describe('recurring events', () => {
-    beforeEach(() => {
-      ENV.FEATURES = {calendar_series: true}
-    })
-
     afterEach(() => {
       jest.restoreAllMocks()
     })

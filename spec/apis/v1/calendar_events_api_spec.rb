@@ -1566,7 +1566,6 @@ describe CalendarEventsApiController, type: :request do
       end
 
       it "emits calendar.calendar_event.create with series tag when creating a new event series" do
-        Account.site_admin.enable_feature!(:calendar_series)
         start_at = Time.zone.now.utc.change(hour: 0, min: 1)
         end_at = Time.zone.now.utc.change(hour: 23)
         allow(InstStatsd::Statsd).to receive(:increment)
@@ -1620,10 +1619,6 @@ describe CalendarEventsApiController, type: :request do
     end
 
     context "event series" do
-      before :once do
-        Account.site_admin.enable_feature!(:calendar_series)
-      end
-
       describe "create" do
         it "creates an event series if an rrule has been specified" do
           start_at = Time.zone.now.utc.change(hour: 0, min: 1)

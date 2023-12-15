@@ -194,7 +194,7 @@ module Api::V1::CalendarEvent
     end
     hash["important_dates"] = event.important_dates
     hash["blackout_date"] = event.blackout_date
-    if event[:series_uuid] && event[:rrule] && Account.site_admin.feature_enabled?(:calendar_series)
+    if event[:series_uuid] && event[:rrule]
       hash["series_head"] = event.series_head?
       if include.include?("series_natural_language")
         series_nat_lang = rrule_to_natural_language(event[:rrule])
