@@ -567,7 +567,7 @@ $(document).ready(function () {
       $sectionContent.append($frame)
       $section.addClass('read_only')
       $(this).focus()
-      $.screenReaderFlashMessageExclusive(I18n.t('submission added: %{title}', {title}))
+      $.screenReaderFlashMessage(I18n.t('submission added: %{title}', {title}))
     })
     .delegate('.upload_file_button', 'click', function (event) {
       event.preventDefault()
