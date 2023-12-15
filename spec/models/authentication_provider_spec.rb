@@ -208,6 +208,18 @@ describe AuthenticationProvider do
       expect(pseudonym.reload.workflow_state).to eq("deleted")
     end
 
+    it "does not call destroy on associated pseudonyms if they're already deleted" do
+      user = user_model
+      pseudonym = user.pseudonyms.create!(unique_id: "user@facebook.com")
+      pseudonym.workflow_state = "deleted"
+      pseudonym.authentication_provider = aac
+      pseudonym.save!
+
+      expect(pseudonym).not_to receive(:destroy)
+
+      aac.destroy
+    end
+
     context "when the authentication provider is restorable" do
       let!(:pseudonym) do
         user = user_model
@@ -229,6 +241,46 @@ describe AuthenticationProvider do
       it "soft deletes the authentication provider" do
         expect { destroy_authentication_provider }.to change { aac.reload.workflow_state }.from("active").to("deleted")
       end
+    end
+  end
+
+  describe "#restore" do
+    let(:user) { user_model }
+    let(:aac) { account.authentication_providers.create!(auth_type: "cas") }
+    let(:pseudonym) do
+      user.pseudonyms.create!(unique_id: "user@facebook.com", authentication_provider: aac)
+    end
+    let(:deleted_pseudonym) do
+      user.pseudonyms.create!(unique_id: "user@facebook.com",
+                              authentication_provider: aac,
+                              workflow_state: "deleted",
+                              deleted_at: 6.minutes.ago)
+    end
+
+    it "restores associated pseudonyms when deleted_at matches provider updated_at" do
+      pseudonym
+      aac.destroy
+      expect { aac.restore }.to change { pseudonym.reload.workflow_state }.to "active"
+    end
+
+    it "ignores already deleted pseudonyms" do
+      deleted_pseudonym
+      aac.destroy
+      expect { aac.restore }.not_to change { deleted_pseudonym.reload.workflow_state }
+    end
+
+    it "does not restore pseudonyms if deleted_at is nil" do
+      pseudonym
+      aac.destroy
+      pseudonym.update_column(:deleted_at, nil)
+      expect { aac.restore }.not_to change { pseudonym.reload.workflow_state }
+    end
+
+    it "does not restore pseudonyms if deleted_at does not match provider updated_at" do
+      pseudonym
+      aac.destroy
+      pseudonym.update_column(:deleted_at, 6.minutes.ago)
+      expect { aac.restore }.not_to change { pseudonym.reload.workflow_state }
     end
   end
 
@@ -264,6 +316,19 @@ describe AuthenticationProvider do
       aac2.destroy
       expect(aac1.reload.position).to eq(1)
       expect(aac3.reload.position).to eq(2)
+    end
+
+    it "moves to bottom of list upon restoration with respect to conflicts" do
+      aac3 = account.authentication_providers.create!(auth_type: "cas")
+      expect(aac2.reload.position).to eq(2)
+      aac2.destroy
+      aac2.restore
+      expect(aac1.reload.position).to eq(1)
+      expect(aac2.reload.position).to eq(2)
+      expect(aac3.reload.position).to eq(3)
+      aac1.destroy
+      aac1.restore
+      expect(aac1.reload.position).to eq(3)
     end
   end
 

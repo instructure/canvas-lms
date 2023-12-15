@@ -508,12 +508,21 @@ class Pseudonym < ActiveRecord::Base
   end
 
   alias_method :destroy_permanently!, :destroy
-  def destroy
+  def destroy(custom_deleted_at: nil)
     self.workflow_state = "deleted"
-    self.deleted_at = Time.now.utc
+    self.deleted_at = (custom_deleted_at.presence || Time.now.utc)
     result = save
     user.try(:update_account_associations) if result
     result
+  end
+
+  def restore
+    self.workflow_state = "active"
+    self.deleted_at = nil
+    if save
+      user.try(:update_account_associations)
+      true
+    end
   end
 
   def never_logged_in?

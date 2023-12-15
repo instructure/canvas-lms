@@ -1791,6 +1791,7 @@ CanvasRails::Application.routes.draw do
       post "accounts/:account_id/authentication_providers", action: :create, as: "account_create_ap"
       put "accounts/:account_id/authentication_providers/:id", action: :update, as: "account_update_ap"
       delete "accounts/:account_id/authentication_providers/:id", action: :destroy, as: "account_delete_ap"
+      put "accounts/:account_id/authentication_providers/:id/restore", action: :restore, as: "account_restore_ap"
     end
 
     get "users/:user_id/page_views", controller: :page_views, action: :index, as: "user_page_views"
