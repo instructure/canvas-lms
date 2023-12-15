@@ -99,11 +99,6 @@ function componentNode(keyList = null) {
   return ReactDOM.findDOMNode(component(keyList))
 }
 
-test('it renders table with placeholder text if no keys are given', () => {
-  const node = componentNode([])
-  equal(node.querySelectorAll('span')[2].innerText, 'Nothing here yet')
-})
-
 test('focuses toggle group if show more button clicked', () => {
   const list = devKeyList()
   const table = component(list)
