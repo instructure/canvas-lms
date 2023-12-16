@@ -583,7 +583,7 @@ export function TempEnrollAssign(props: Props) {
             <Flex.Item shouldGrow={true}>
               <Text as="p" data-testid="temp-enroll-summary">
                 {I18n.t(
-                  'Canvas will enroll %{recipient} as a %{role} in %{source}’s selected courses from %{start} - %{end}',
+                  'Canvas will enroll %{recipient} as a %{role} in the selected courses of %{source} from %{start} - %{end}',
                   {
                     recipient: enrollmentProps.name,
                     role: roleLabel,

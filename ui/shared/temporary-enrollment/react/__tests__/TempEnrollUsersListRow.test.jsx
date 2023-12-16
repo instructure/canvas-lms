@@ -129,14 +129,12 @@ describe('TempEnrollUsersListRow', () => {
     describe('generateTooltip function', () => {
       it.skip('returns correct tooltip for PROVIDER role', () => {
         const title = generateTooltip(PROVIDER, 'John Doe')
-
-        expect(title).toEqual('John Doe’s Temporary Enrollment Recipients')
+        expect(title).toEqual('Temporary Enrollment Recipients for John Doe')
       })
 
-      it.skip('returns correct tootip for RECIPIENT role', () => {
+      it.skip('returns correct tooltip for RECIPIENT role', () => {
         const title = generateTooltip(RECIPIENT, 'Jane Smith')
-
-        expect(title).toEqual('Jane Smith’s Temporary Enrollment Providers')
+        expect(title).toEqual('Temporary Enrollment Providers for Jane Smith')
       })
 
       it.skip('returns default tooltip for unknown role', () => {

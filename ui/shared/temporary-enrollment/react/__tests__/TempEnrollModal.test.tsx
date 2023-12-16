@@ -403,12 +403,12 @@ describe('TempEnrollModal', () => {
     describe('edit mode titles', () => {
       it('should return provider’s recipients title when in edit mode and type is provider', () => {
         const title = generateModalTitle(providerUser, PROVIDER, true, 1, null)
-        expect(title).toBe(`${providerUser.name}’s Temporary Enrollment Recipients`)
+        expect(title).toBe(`Temporary Enrollment Recipients for ${providerUser.name}`)
       })
 
       it('should return recipient’s providers title when in edit mode and type is recipient', () => {
         const title = generateModalTitle(recipientUser, RECIPIENT, true, 1, null)
-        expect(title).toBe(`${recipientUser.name}’s Temporary Enrollment Providers`)
+        expect(title).toBe(`Temporary Enrollment Providers for ${recipientUser.name}`)
       })
     })
 
