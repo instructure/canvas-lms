@@ -77,9 +77,9 @@ export const generateModalTitle = (
     }
   }
   if (isEditMode && userName) {
-    return I18n.t(`%{userName}’s Temporary Enrollment %{enrollmentType}`, {
-      userName,
+    return I18n.t(`Temporary Enrollment %{enrollmentType} for %{userName}`, {
       enrollmentType: enrollmentType === RECIPIENT ? 'Providers' : 'Recipients',
+      userName,
     })
   }
   return I18n.t('Find a recipient of Temporary Enrollments')

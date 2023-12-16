@@ -166,7 +166,7 @@ describe('TempEnrollAssign', () => {
     it('initializes with ROLE as the default role in the summary', async () => {
       const {findByText} = render(<TempEnrollAssign {...props} />)
       const defaultMessage = await findByText(
-        /Canvas will enroll .+ as a .+ in .+’s selected courses from .+ - .+/
+        /Canvas will enroll .+ as a .+ in the selected courses of .+ from .+ - .+/
       )
 
       expect(defaultMessage).toBeInTheDocument()
@@ -219,7 +219,7 @@ describe('TempEnrollAssign', () => {
       fireEvent.blur(endDate)
 
       expect((await findByTestId('temp-enroll-summary')).textContent).toBe(
-        'Canvas will enroll Melvin as a Teacher in John Smith’s selected courses from Sun, Apr 10, 2022, 12:00 AM - Tue, Apr 12, 2022, 11:59 PM'
+        'Canvas will enroll Melvin as a Teacher in the selected courses of John Smith from Sun, Apr 10, 2022, 12:00 AM - Tue, Apr 12, 2022, 11:59 PM'
       )
     })
 

@@ -57,10 +57,10 @@ export function generateTooltip(enrollmentType: EnrollmentType, name: string): J
   let message
   switch (enrollmentType) {
     case PROVIDER:
-      message = I18n.t('Manage %{name}’s Temporary Enrollment Recipients', {name})
+      message = I18n.t('Manage Temporary Enrollment Recipients for %{name}', {name})
       break
     case RECIPIENT:
-      message = I18n.t('Manage %{name}’s Temporary Enrollment Providers', {name})
+      message = I18n.t('Manage Temporary Enrollment Providers for %{name}', {name})
       break
     default:
       message = I18n.t('Create Temporary Enrollment Pairing for %{name}', {name})
