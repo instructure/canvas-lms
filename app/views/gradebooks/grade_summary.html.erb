@@ -143,6 +143,7 @@
           <tr>
             <th scope="col"><%= t('headers.name', "Name") %></th>
             <th scope="col"><%= t('headers.due', "Due") %></th>
+            <th scope="col"><%= t('headers.submitted', "Submitted") %></th>
             <th scope="col" class="status"><%= t('Status') %></th>
             <th scope="col" class="assignment_score"><%= t('headers.score', "Score") %></th>
             <th scope="col"><span class="screenreader-only"><%= t('headers.details', "Details") %></span></th>
@@ -188,7 +189,11 @@
                 <%= datetime_string(assignment.due_at, :due_date) rescue "" %>
               <% end %>
             </td>
-
+            <td class="submitted">
+              <% if assignment_presenter.has_no_group_weight?  %>
+                <%= datetime_string(submission.submitted_at, :submitted_at) rescue "" %>
+              <% end %>
+            </td>
             <td class="status" scope="row">
               <% if assignment_presenter.custom_grade_status?%>
                 <span class="submission-custom-grade-status-pill-<%= assignment_presenter.custom_grade_status_id %>">

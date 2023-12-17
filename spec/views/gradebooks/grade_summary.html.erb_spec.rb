@@ -697,6 +697,58 @@ describe "gradebooks/grade_summary" do
     end
   end
 
+  describe "display due value" do
+    let(:course) { Course.create! }
+    let(:student) { course.enroll_student(User.create!, active_all: true).user }
+    let(:teacher) { course.enroll_teacher(User.create!, active_all: true).user }
+    let(:presenter) { GradeSummaryPresenter.new(course, student, student.id) }
+
+    before do
+      view_context(course, student)
+      assign(:presenter, presenter)
+    end
+
+    it "due is not shown" do
+      render "gradebooks/grade_summary"
+      expect(response).not_to have_tag("#grades_summary .due")
+    end
+
+    it "renders \"due\" when there is a submission" do
+      assignment1 = course.assignments.create!(points_possible: 10)
+      assignment1.submit_homework student, submission_type: "online_text_entry", body: "hey"
+      assignment1.grade_student(student, score: 10, grader: teacher)
+
+      render "gradebooks/grade_summary"
+      expect(response).to have_tag("#grades_summary .due")
+    end
+  end
+
+  describe "display submitted value" do
+    let(:course) { Course.create! }
+    let(:student) { course.enroll_student(User.create!, active_all: true).user }
+    let(:teacher) { course.enroll_teacher(User.create!, active_all: true).user }
+    let(:presenter) { GradeSummaryPresenter.new(course, student, student.id) }
+
+    before do
+      view_context(course, student)
+      assign(:presenter, presenter)
+    end
+
+    it "submitted is not shown" do
+      render "gradebooks/grade_summary"
+      expect(response).not_to have_tag("#grades_summary .submitted")
+    end
+
+    it "renders \"submitted\" when there is a submission" do
+      assignment1 = course.assignments.create!(points_possible: 10)
+      assignment1.submit_homework student, submission_type: "online_text_entry", body: "hey"
+      assignment1.grade_student(student, score: 10, grader: teacher)
+
+      render "gradebooks/grade_summary"
+      expect(response).to have_tag("#grades_summary .submitted")
+    end
+  end
+
   describe "display out of value" do
     let(:course) { Course.create! }
     let(:student) { course.enroll_student(User.create!, active_all: true).user }
