@@ -2530,6 +2530,11 @@ describe CoursesController, type: :request do
       expect(json.first.dig("account", "name")).to eq "Default Account"
     end
 
+    it "includes subaccount_id if requested for backwards compatibility" do
+      json = api_call(:get, "/api/v1/courses.json", { controller: "courses", action: "index", format: "json" }, { include: ["subaccount"] })
+      expect(json.first["subaccount_id"]).to eq @course1.account.id
+    end
+
     it "includes subaccount_name if requested for backwards compatibility" do
       json = api_call(:get, "/api/v1/courses.json", { controller: "courses", action: "index", format: "json" }, { include: ["subaccount"] })
       expect(json.first["subaccount_name"]).to eq "Default Account"

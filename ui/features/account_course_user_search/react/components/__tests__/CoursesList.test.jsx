@@ -32,6 +32,7 @@ describe('Account Course User Search CoursesList Sorting', () => {
         workflow_state: 'alive',
         total_students: 6,
         subaccount_name: 'subaccount name',
+        subaccount_id: '1',
         teachers: [
           {
             id: '1',
@@ -49,6 +50,7 @@ describe('Account Course User Search CoursesList Sorting', () => {
         workflow_state: 'alive',
         total_students: 7,
         subaccount_name: 'subaccount name',
+        subaccount_id: '2',
         teachers: [
           {
             id: '1',
@@ -66,6 +68,7 @@ describe('Account Course User Search CoursesList Sorting', () => {
         workflow_state: 'alive',
         total_students: 6,
         subaccount_name: 'subaccount name',
+        subaccount_id: '3',
         teachers: [
           {
             id: '1',
@@ -83,6 +86,7 @@ describe('Account Course User Search CoursesList Sorting', () => {
         workflow_state: 'alive',
         total_students: 6,
         subaccount_name: 'subaccount name',
+        subaccount_id: '4',
         teachers: [
           {
             id: '1',
@@ -100,6 +104,7 @@ describe('Account Course User Search CoursesList Sorting', () => {
         workflow_state: 'alive',
         total_students: 11,
         subaccount_name: 'subaccount name',
+        subaccount_id: '5',
         teachers: [
           {
             id: '1',
@@ -116,6 +121,7 @@ describe('Account Course User Search CoursesList Sorting', () => {
         sis_course_id: 'SIS Dz',
         workflow_state: 'alive',
         subaccount_name: 'subaccount name',
+        subaccount_id: '6',
         total_students: 10,
         teachers: [
           {
