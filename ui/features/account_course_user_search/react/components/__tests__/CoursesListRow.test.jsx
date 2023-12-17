@@ -27,6 +27,7 @@ const props = {
   showSISIds: false,
   sis_course_id: 'SIS 1',
   subaccount_name: 'dummy_value',
+  subaccount_id: '1',
   total_students: 6,
   teachers: [
     {

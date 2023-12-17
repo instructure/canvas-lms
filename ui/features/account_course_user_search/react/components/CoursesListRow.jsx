@@ -58,6 +58,7 @@ export default class CoursesListRow extends React.Component {
     teacher_count: number,
     sis_course_id: string,
     subaccount_name: string.isRequired,
+    subaccount_id: string.isRequired,
     term: shape({name: string.isRequired}).isRequired,
     roles: arrayOf(shape({id: string.isRequired})),
     showSISIds: bool,
@@ -187,6 +188,7 @@ export default class CoursesListRow extends React.Component {
       teachers,
       teacher_count,
       subaccount_name,
+      subaccount_id,
       showSISIds,
       term,
       blueprint,
@@ -194,6 +196,7 @@ export default class CoursesListRow extends React.Component {
     } = this.props
     const {teachersToShow, newlyEnrolledStudents} = this.state
     const url = `/courses/${id}`
+    const sub_url = `/accounts/${subaccount_id}`
     const isPublished = workflow_state !== 'unpublished'
 
     const blueprintTip = I18n.t('This is a blueprint course')
@@ -254,7 +257,11 @@ export default class CoursesListRow extends React.Component {
           )}
           {!teachers && teacher_count && I18n.t('%{teacher_count} teachers', {teacher_count})}
         </Table.Cell>
-        <Table.Cell>{subaccount_name}</Table.Cell>
+        <Table.Cell>
+          <a href={sub_url}>
+            {subaccount_name}
+          </a>
+        </Table.Cell>
         <Table.Cell>
           {template ? '\u2014' : I18n.n(total_students + newlyEnrolledStudents)}
         </Table.Cell>
