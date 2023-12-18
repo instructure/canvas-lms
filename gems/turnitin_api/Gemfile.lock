@@ -42,7 +42,7 @@ GEM
     faraday-multipart (1.0.4)
       multipart-post (~> 2)
     faraday-net_http (3.0.2)
-    hashdiff (1.0.1)
+    hashdiff (1.1.0)
     i18n (1.14.1)
       concurrent-ruby (~> 1.0)
     inst_statsd (3.0.4)

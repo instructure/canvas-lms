@@ -91,7 +91,7 @@ GEM
     guardrail (3.0.3)
       activerecord (>= 6.1, < 7.2)
       railties (>= 6.1, < 7.2)
-    hashdiff (1.0.1)
+    hashdiff (1.1.0)
     i18n (1.14.1)
       concurrent-ruby (~> 1.0)
     loofah (2.22.0)
