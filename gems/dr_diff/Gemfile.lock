@@ -26,7 +26,7 @@ GEM
     multi_xml (0.6.0)
     psych (5.1.1.1)
       stringio
-    rdoc (6.6.1)
+    rdoc (6.6.2)
       psych (>= 4.0.0)
     reline (0.4.1)
       io-console (~> 0.5)
