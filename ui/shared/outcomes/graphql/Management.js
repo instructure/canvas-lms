@@ -169,6 +169,7 @@ export const SEARCH_GROUP_OUTCOMES = gql`
                   points
                 }
                 canEdit
+                canArchive(contextId: $outcomesContextId, contextType: $outcomesContextType)
                 contextType
                 contextId
                 friendlyDescription(

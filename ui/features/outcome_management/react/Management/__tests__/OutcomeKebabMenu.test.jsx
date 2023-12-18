@@ -39,7 +39,7 @@ describe('OutcomeKebabMenu', () => {
 
   const renderWithProvider = (
     children,
-    {contextType = 'Account', contextId = '1', menuOptionForOutcomeDetailsPageFF = true} = {}
+    {contextType = 'Account', contextId = '1', menuOptionForOutcomeDetailsPageFF = true, archiveOutcomesFF = false} = {}
   ) => {
     return render(
       <OutcomesContext.Provider
@@ -48,6 +48,7 @@ describe('OutcomeKebabMenu', () => {
             contextType,
             contextId,
             menuOptionForOutcomeDetailsPageFF,
+            archiveOutcomesFF,
           },
         }}
       >
@@ -116,6 +117,74 @@ describe('OutcomeKebabMenu', () => {
     const menuButton = getByText(groupMenuTitle)
     fireEvent.click(menuButton)
     expect(getByText('Import Outcomes')).toBeInTheDocument()
+  })
+
+  describe('Archive Outcome FF', () => {
+    describe('when FF is disabled', () => {
+      it('does not render Archive menu option for an outcome', () => {
+        const {queryByText} = renderWithProvider(
+          <OutcomeKebabMenu {...defaultProps()} />,
+          {
+            archiveOutcomesFF: false,
+          }
+        )
+        const menuButton = queryByText(groupMenuTitle)
+        fireEvent.click(menuButton)
+        expect(queryByText('Archive')).not.toBeInTheDocument()
+      })
+
+      it('does not render Archive menu option for an outcome group', () => {
+        const {queryByText} = renderWithProvider(
+          <OutcomeKebabMenu {...defaultProps({isGroup: true})} />,
+          {
+            archiveOutcomesFF: false,
+          }
+        )
+        const menuButton = queryByText(groupMenuTitle)
+        fireEvent.click(menuButton)
+        expect(queryByText('Archive')).not.toBeInTheDocument()
+      })
+    })
+
+    describe('when FF is enabled', () => {
+      it('renders enabled Archive menu option for an outcome when canArchive is true', () => {
+        const {getByText, getByTestId} = renderWithProvider(
+          <OutcomeKebabMenu {...defaultProps({canArchive: true})} />,
+          {
+            archiveOutcomesFF: true,
+          }
+        )
+        const menuButton = getByText(groupMenuTitle)
+        fireEvent.click(menuButton)
+        expect(getByText('Archive')).toBeInTheDocument()
+        expect(getByTestId("outcome-kebab-menu-archive")).toBeInTheDocument()
+      })
+
+      it('renders disabled Archive menu option for an outcome when canArchive is false', () => {
+        const {getByText, getByTestId} = renderWithProvider(
+          <OutcomeKebabMenu {...defaultProps({canArchive: false})} />,
+          {
+            archiveOutcomesFF: true,
+          }
+        )
+        const menuButton = getByText(groupMenuTitle)
+        fireEvent.click(menuButton)
+        expect(getByText('Archive')).toBeInTheDocument()
+        expect(getByTestId("outcome-kebab-menu-archive-disabled")).toBeInTheDocument()
+      })
+
+      it('renders enabled Archive menu option for an outcome group', () => {
+        const {getByText} = renderWithProvider(
+          <OutcomeKebabMenu {...defaultProps({isGroup: true})} />,
+          {
+            archiveOutcomesFF: true,
+          }
+        )
+        const menuButton = getByText(groupMenuTitle)
+        fireEvent.click(menuButton)
+        expect(getByText('Archive')).toBeInTheDocument()
+      })
+    })
   })
 
   describe('Menu Option for Outcome Details Page FF', () => {

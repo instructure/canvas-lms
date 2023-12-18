@@ -166,6 +166,7 @@ const ManageOutcomesView = ({
                 friendlyDescription,
                 contextType,
                 contextId,
+                canArchive
               },
             }) => (
               <ManageOutcomeItem
@@ -187,6 +188,7 @@ const ManageOutcomesView = ({
                 onMenuHandler={onOutcomeMenuHandler}
                 onCheckboxHandler={onSelectOutcomesHandler}
                 isEnhanced={isEnhanced}
+                canArchive={canArchive}
               />
             )
           )}
@@ -222,6 +224,7 @@ ManageOutcomesView.propTypes = {
             canEdit: PropTypes.bool.isRequired,
             contextType: PropTypes.string,
             contextId: PropTypes.string,
+            canArchive: PropTypes.bool
           }),
         })
       ),
