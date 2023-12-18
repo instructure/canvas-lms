@@ -354,20 +354,20 @@ class AssignmentOverride < ActiveRecord::Base
   end
 
   def self.override(field)
-    define_method "override_#{field}" do |value|
-      send("#{field}_overridden=", true)
-      send("#{field}=", value)
+    define_method :"override_#{field}" do |value|
+      send(:"#{field}_overridden=", true)
+      send(:"#{field}=", value)
     end
 
-    define_method "clear_#{field}_override" do
-      send("#{field}_overridden=", false)
-      send("#{field}=", nil)
+    define_method :"clear_#{field}_override" do
+      send(:"#{field}_overridden=", false)
+      send(:"#{field}=", nil)
     end
 
     validates "#{field}_overridden", inclusion: { in: [false, true] }
     before_validation do |override|
-      if override.send("#{field}_overridden").nil?
-        override.send("#{field}_overridden=", false)
+      if override.send(:"#{field}_overridden").nil?
+        override.send(:"#{field}_overridden=", false)
       end
       true
     end

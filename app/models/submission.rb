@@ -360,10 +360,10 @@ class Submission < ActiveRecord::Base
   def needs_grading?(was = false)
     suffix = was ? "_before_last_save" : ""
 
-    !send("submission_type#{suffix}").nil? &&
-      (send("workflow_state#{suffix}") == "pending_review" ||
-       (["submitted", "graded"].include?(send("workflow_state#{suffix}")) &&
-        (send("score#{suffix}").nil? || !send("grade_matches_current_submission#{suffix}"))
+    !send(:"submission_type#{suffix}").nil? &&
+      (send(:"workflow_state#{suffix}") == "pending_review" ||
+       (["submitted", "graded"].include?(send(:"workflow_state#{suffix}")) &&
+        (send(:"score#{suffix}").nil? || !send(:"grade_matches_current_submission#{suffix}"))
        )
       )
   end

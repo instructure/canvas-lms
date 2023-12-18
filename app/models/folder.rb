@@ -297,7 +297,7 @@ class Folder < ActiveRecord::Base
     dup ||= Folder.new
     dup = existing if existing && options[:overwrite]
     attributes.except("id", "full_name", "parent_folder_id").each do |key, val|
-      dup.send("#{key}=", val)
+      dup.send(:"#{key}=", val)
     end
     if unique_type && context.folders.active.where(unique_type:).exists?
       dup.unique_type = nil # we'll just copy the folder as a normal one and leave the existing unique_type'd one alone

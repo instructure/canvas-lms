@@ -44,7 +44,7 @@ module SubmittableHelper
           assignment = submittable.assignment
           submittable.assignment = nil
           submittable.save!
-          assignment.send("#{submittable.class.name.underscore}=", nil)
+          assignment.send(:"#{submittable.class.name.underscore}=", nil)
           assignment.destroy
         end
 

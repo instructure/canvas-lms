@@ -90,7 +90,7 @@ class AccessToken < ActiveRecord::Base
     token = access_token || not_deleted.where(token_key => hashed_tokens).first
     if token && token.send(token_key) != hashed_tokens.first
       # we found the token but, its hashed using an old key. save the updated hash
-      token.send("#{token_key}=", hashed_tokens.first)
+      token.send(:"#{token_key}=", hashed_tokens.first)
       token.save!
     end
     token = nil unless token&.usable?(token_key)

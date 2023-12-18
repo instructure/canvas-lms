@@ -574,7 +574,7 @@ class AppointmentGroupsController < ApplicationController
       render json: Api.paginate(
         @group.possible_participants(registration_status: params[:registration_status]),
         self,
-        send("api_v1_appointment_group_#{params[:action]}_url", @group)
+        send(:"api_v1_appointment_group_#{params[:action]}_url", @group)
       ).map(&)
     end
   end

@@ -328,7 +328,7 @@ describe AssetUserAccess do
         hash_key ||= attribute
         access.log(context, { hash_key => "value" })
         expect(access.send(attribute)).to eq "value"
-        access.send("#{attribute}=", "other")
+        access.send(:"#{attribute}=", "other")
         access.log(context, { hash_key => "value" })
         expect(access.send(attribute)).to eq "other"
       end

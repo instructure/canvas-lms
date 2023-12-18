@@ -999,7 +999,7 @@ self.user,
   def truncate_invalid_message
     [:body, :html_body].each do |attr|
       if send(attr) && send(attr).bytesize > self.class.maximum_text_length
-        send("#{attr}=", Message.unavailable_message)
+        send(:"#{attr}=", Message.unavailable_message)
       end
     end
   end

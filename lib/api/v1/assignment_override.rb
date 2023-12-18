@@ -352,9 +352,9 @@ module Api::V1::AssignmentOverride
 
     %i[due_at unlock_at lock_at].each do |field|
       if override_data.key?(field)
-        override.send("override_#{field}", override_data[field])
+        override.send(:"override_#{field}", override_data[field])
       else
-        override.send("clear_#{field}_override")
+        override.send(:"clear_#{field}_override")
       end
     end
   end

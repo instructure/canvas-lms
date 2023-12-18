@@ -60,11 +60,11 @@ class Assignment::BulkUpdate
 
         %w[due_at unlock_at lock_at].each do |date|
           if override_data.key?(date)
-            override.send("#{date}=", override_data[date])
-            override.send("#{date}_overridden=", true)
+            override.send(:"#{date}=", override_data[date])
+            override.send(:"#{date}_overridden=", true)
           else
-            override.send("#{date}=", nil)
-            override.send("#{date}_overridden=", false)
+            override.send(:"#{date}=", nil)
+            override.send(:"#{date}_overridden=", false)
           end
         end
         assignments_to_save << assignment if override.changed?

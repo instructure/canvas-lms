@@ -387,7 +387,7 @@ module Importers
               date = event.send(field)
               next unless date
 
-              event.send("#{field}=", shift_date(date, shift_options))
+              event.send(:"#{field}=", shift_date(date, shift_options))
             end
             event.save_without_broadcasting
           end
@@ -501,7 +501,7 @@ module Importers
       end
 
       settings.slice(*atts.map(&:to_s)).each do |key, val|
-        course.send("#{key}=", val)
+        course.send(:"#{key}=", val)
       end
       if settings.key?(:grading_standard_enabled)
         if settings[:grading_standard_enabled]

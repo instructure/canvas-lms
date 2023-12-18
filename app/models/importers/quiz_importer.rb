@@ -223,9 +223,9 @@ module Importers
       ].each do |attr|
         attr = attr.to_sym
         if hash.key?(attr)
-          item.send("#{attr}=", hash[attr])
+          item.send(:"#{attr}=", hash[attr])
         elsif master_migration
-          item.send("#{attr}=", nil)
+          item.send(:"#{attr}=", nil)
         end
       end
 
@@ -263,7 +263,7 @@ module Importers
           AssignmentOverride.overridden_dates.each do |field|
             next unless o.key?(field)
 
-            override.send "override_#{field}", Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(o[field])
+            override.send :"override_#{field}", Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(o[field])
           end
           override.save!
           added_overrides = true

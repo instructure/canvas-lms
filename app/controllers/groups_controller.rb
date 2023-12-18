@@ -357,7 +357,7 @@ class GroupsController < ApplicationController
 
       format.atom { render xml: @groups.map(&:to_atom).to_xml }
       format.json do
-        path = send("api_v1_#{@context.class.to_s.downcase}_user_groups_url")
+        path = send(:"api_v1_#{@context.class.to_s.downcase}_user_groups_url")
 
         if value_to_boolean(params[:only_own_groups]) || !tab_enabled?(Course::TAB_PEOPLE, no_render: true)
           all_groups = all_groups.merge(@current_user.current_groups)

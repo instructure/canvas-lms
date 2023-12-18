@@ -785,7 +785,7 @@ class AbstractAssignment < ActiveRecord::Base
 
   def ab_guid_through_rubric
     # ab_guid is an academic benchmark guid - it can be saved on the assignmenmt itself, or accessed through this association
-    rubric&.learning_outcome_alignments&.map { |loa| loa.learning_outcome.vendor_guid }&.compact || []
+    rubric&.learning_outcome_alignments&.filter_map { |loa| loa.learning_outcome.vendor_guid } || []
   end
 
   def update_student_submissions(updating_user)
@@ -1142,7 +1142,7 @@ class AbstractAssignment < ActiveRecord::Base
   def all_context_module_tags
     all_tags = context_module_tags.to_a
     each_submission_type do |submission, _, short_type|
-      all_tags.concat(submission.context_module_tags) if send("#{short_type}?")
+      all_tags.concat(submission.context_module_tags) if send(:"#{short_type}?")
     end
     all_tags
   end
@@ -1512,7 +1512,7 @@ class AbstractAssignment < ActiveRecord::Base
       copy_attrs = %w[due_at lock_at unlock_at]
       if quiz && @saved_by != :quiz &&
          copy_attrs.any? { |attr| changes[attr] }
-        copy_attrs.each { |attr| quiz.send "#{attr}=", send(attr) }
+        copy_attrs.each { |attr| quiz.send :"#{attr}=", send(attr) }
         quiz.saved_by = :assignment
         quiz.save
       end
@@ -1798,7 +1798,7 @@ class AbstractAssignment < ActiveRecord::Base
         locked = { object: assignment_for_user, lock_at: assignment_for_user.lock_at, can_view: true }
       else
         each_submission_type do |submission, _, short_type|
-          next unless send("#{short_type}?")
+          next unless send(:"#{short_type}?")
 
           if (submission_locked = submission.low_level_locked_for?(user, opts.merge(skip_assignment: true)))
             locked = submission_locked

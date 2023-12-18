@@ -134,7 +134,7 @@ module Workflow
       self.workflow_spec.states.each_value do |state|
         state_name = state.name
         workflow_methods.module_eval do
-          define_method "#{state_name}?" do
+          define_method :"#{state_name}?" do
             state_name == current_state.name
           end
         end
