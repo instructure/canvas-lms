@@ -472,7 +472,7 @@ GEM
       activerecord (>= 5.a)
       database_cleaner-core (~> 2.0.0)
     database_cleaner-core (2.0.1)
-    datadog-ci (0.5.0)
+    datadog-ci (0.5.1)
       msgpack
     date (3.3.4)
     db-query-matchers (0.12.0)
