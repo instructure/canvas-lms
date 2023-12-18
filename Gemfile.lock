@@ -370,10 +370,10 @@ GEM
       activerecord (>= 5.2)
       activesupport (>= 5.2)
     ast (2.4.2)
-    authlogic (6.4.2)
-      activemodel (>= 5.2, < 7.1)
-      activerecord (>= 5.2, < 7.1)
-      activesupport (>= 5.2, < 7.1)
+    authlogic (6.4.3)
+      activemodel (>= 5.2, < 7.2)
+      activerecord (>= 5.2, < 7.2)
+      activesupport (>= 5.2, < 7.2)
       request_store (~> 1.0)
     awesome_print (1.9.2)
     aws-eventstream (1.3.0)
@@ -1161,7 +1161,7 @@ DEPENDENCIES
   adheres_to_policy!
   apollo-federation (~> 3.8)
   attachment_fu!
-  authlogic (= 6.4.2)
+  authlogic (~> 6.4)
   autoextend!
   aws-sdk-kinesis (~> 1.45)
   aws-sdk-s3 (~> 1.119)
@@ -1318,7 +1318,7 @@ DEPENDENCIES
   rubyzip (~> 2.3)
   saml2 (~> 3.1)
   sanitize (~> 6.0)
-  scrypt (= 3.0.7)
+  scrypt (~> 3.0)
   selenium-webdriver (~> 4.12)
   sentry-inst_jobs (~> 5.10)
   sentry-rails (~> 5.10)

@@ -30,8 +30,8 @@ gem "academic_benchmarks", "~> 1.1", require: false
 gem "active_model-better_errors", "1.6.7", require: "active_model/better_errors"
 gem "active_model_serializers", "~> 0.9.9"
 gem "addressable", "~> 2.8", require: false
-gem "authlogic", "6.4.2"
-  gem "scrypt", "3.0.7"
+gem "authlogic", "~> 6.4"
+  gem "scrypt", "~> 3.0"
 gem "aws-sdk-kinesis", "~> 1.45", require: false
 gem "aws-sdk-s3", "~> 1.119", require: false
 gem "aws-sdk-sns", "~> 1.60", require: false
