@@ -38,6 +38,7 @@ const useCanvasContext = () => {
   const accountLevelMasteryScalesFF = context?.env?.accountLevelMasteryScalesFF
   const outcomeAllowAverageCalculationFF = context?.env?.outcomeAllowAverageCalculationFF
   const menuOptionForOutcomeDetailsPageFF = context?.env?.menuOptionForOutcomeDetailsPageFF
+  const archiveOutcomesFF = context?.env?.archiveOutcomesFF
 
   return {
     contextType,
@@ -57,6 +58,7 @@ const useCanvasContext = () => {
     accountLevelMasteryScalesFF,
     outcomeAllowAverageCalculationFF,
     menuOptionForOutcomeDetailsPageFF,
+    archiveOutcomesFF,
   }
 }
 

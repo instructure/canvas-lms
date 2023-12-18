@@ -39,6 +39,7 @@ export const getContext = isMobileView => {
   const accountLevelMasteryScalesFF = ENV.ACCOUNT_LEVEL_MASTERY_SCALES
   const outcomeAllowAverageCalculationFF = ENV.OUTCOME_AVERAGE_CALCULATION
   const menuOptionForOutcomeDetailsPageFF = ENV.MENU_OPTION_FOR_OUTCOME_DETAILS_PAGE
+  const archiveOutcomesFF = ENV.ARCHIVE_OUTCOMES
 
   return {
     env: {
@@ -58,6 +59,7 @@ export const getContext = isMobileView => {
       accountLevelMasteryScalesFF,
       outcomeAllowAverageCalculationFF,
       menuOptionForOutcomeDetailsPageFF,
+      archiveOutcomesFF,
     },
   }
 }
