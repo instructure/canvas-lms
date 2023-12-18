@@ -42,7 +42,7 @@ GEM
       multi_json (~> 1.11)
       os (>= 0.9, < 2.0)
       signet (>= 0.16, < 2.a)
-    hashdiff (1.0.1)
+    hashdiff (1.1.0)
     httpclient (2.8.3)
     io-console (0.7.1)
     irb (1.10.1)
