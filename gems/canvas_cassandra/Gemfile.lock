@@ -152,4 +152,4 @@ DEPENDENCIES
   thrift_client (= 0.9.3)!
 
 BUNDLED WITH
-   2.4.20
+   2.5.3
