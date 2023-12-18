@@ -108,6 +108,24 @@ module Lti
       login_request(resource_link_request.generate_post_payload_for_homework_submission(*args))
     end
 
+    # Generates a login request pointing to a cached launch (ID token)
+    # suitable for student context card LTI launches.
+    #
+    # These launches occur when a teacher launches a tool from the
+    # student context card, which shows when clicking on the name
+    # from the gradebook or course user list.
+    #
+    # See method-level documentation of "generate_post_payload" for
+    # more details.
+    #
+    # For information on how the cached ID token is eventually retrieved
+    # and sent to a tool, please refer to the inline documentation of
+    # app/controllers/lti/ims/authentication_controller.rb
+    def generate_post_payload_for_student_context_card(student_id:)
+      @opts[:student_id] = student_id
+      login_request(resource_link_request.generate_post_payload)
+    end
+
     # Generates a login request pointing to a general-use
     # cached launch (ID token).
     #
@@ -133,10 +151,7 @@ module Lti
     # For information on how the cached ID token is eventually retrieved
     # and sent to a tool, please refer to the inline documentation of
     # app/controllers/lti/ims/authentication_controller.rb
-    def generate_post_payload(student_id: nil)
-      # Takes a student ID parameter for compatibility with the LTI 1.1 method
-      # (in LtiOutboundAdapter), but we don't use it here yet. See INTEROP-7227
-      # and student_context_card spec in external_tools_controller_spec.rb
+    def generate_post_payload
       login_request(generate_lti_params)
     end
 

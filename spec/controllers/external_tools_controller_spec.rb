@@ -145,12 +145,14 @@ describe ExternalToolsController do
       end
 
       context "when current user is a teacher" do
+        subject { get :show, params: { course_id: @course.id, id: tool.id } }
+
         before do
           user_session(@teacher)
-          get :show, params: { course_id: @course.id, id: tool.id }
         end
 
         it "creates a login message" do
+          subject
           expect(assigns[:lti_launch].params.keys).to match_array %w[
             iss
             login_hint
@@ -165,20 +167,72 @@ describe ExternalToolsController do
         end
 
         it 'sets the "login_hint" to the current user lti id' do
+          subject
           expect(assigns[:lti_launch].params["login_hint"]).to eq Lti::Asset.opaque_identifier_for(@teacher)
         end
 
         it "caches the the LTI 1.3 launch" do
+          subject
           expect(cached_launch["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
         end
 
         it 'sets the "canvas_domain" to the request domain' do
+          subject
           message_hint = JSON::JWT.decode(assigns[:lti_launch].params["lti_message_hint"], :skip_verification)
           expect(message_hint["canvas_domain"]).to eq "localhost"
         end
 
         it "defaults placement to context navigation" do
+          subject
           expect(cached_launch["https://www.instructure.com/placement"]).to eq "course_navigation"
+        end
+
+        context "in the student_context_card placement" do
+          subject { get :show, params: { course_id: @course.id, id: tool.id, placement: "student_context_card", student_id: }.compact }
+
+          let(:student_id) { raise "override" }
+
+          before do
+            tool.student_context_card = { enabled: true }
+            tool.save!
+          end
+
+          context "without student_id param" do
+            let(:student_id) { nil }
+
+            it "does not include lti_student_id in launch" do
+              subject
+              expect(cached_launch).not_to have_key("https://www.instructure.com/lti_student_id")
+            end
+          end
+
+          context "with non-existent student_id param" do
+            let(:student_id) { "wrong" }
+
+            it "returns a JSON error" do
+              subject
+              expect(response).to be_not_found
+            end
+          end
+
+          context "with non-student student_id param" do
+            let(:student_id) { @teacher.id.to_s }
+
+            it "returns a JSON error" do
+              subject
+              expect(response).to be_unauthorized
+            end
+          end
+
+          context "with valid student_id param" do
+            let(:student) { student_in_course(course: @course, active_all: true).user }
+            let(:student_id) { student.id }
+
+            it "includes lti_student_id in launch" do
+              subject
+              expect(cached_launch["https://www.instructure.com/lti_student_id"]).to eq(student.global_id.to_s)
+            end
+          end
         end
       end
 
@@ -334,6 +388,21 @@ describe ExternalToolsController do
 
             expect(assigns[:lti_launch].resource_url).to eq override_launch_url
           end
+        end
+      end
+
+      context "in the student_context_card placement" do
+        before do
+          tool.student_context_card = { enabled: true }
+          tool.save!
+        end
+
+        let(:student) { student_in_course(course: @course, active_all: true).user }
+        let(:student_id) { student.id }
+
+        it "includes ext_lti_student_id in the launch" do
+          get :show, params: { course_id: @course.id, id: tool.id, student_id:, placement: :student_context_card }
+          expect(assigns[:lti_launch].params["ext_lti_student_id"]).to eq(student.global_id.to_s)
         end
       end
     end
