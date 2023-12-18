@@ -7108,8 +7108,8 @@ nn:
     other: "%{count}tillatne forsøk"
     zero: "Uavgrensa tillatne forsøk"
   count_attempts_d23c69a0: 
-    one: "1 Forsøk"
-    other: "%{count} Forsøk"
+    one: "1 forsøk"
+    other: "%{count} forsøk"
     zero: "Uavgrensa forsøk"
   count_changes_pushed_by_user_654aade2: "%{count} endringar sendt av %{user}"
   count_comments_cb137ab8: 
