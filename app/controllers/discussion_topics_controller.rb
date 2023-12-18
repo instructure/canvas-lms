@@ -402,7 +402,7 @@ class DiscussionTopicsController < ApplicationController
         }
         fetch_params[:include] = ["sections_user_count", "sections"] if @context.is_a?(Course)
 
-        discussion_topics_fetch_url = send("api_v1_#{@context.class.to_s.downcase}_discussion_topics_path", fetch_params)
+        discussion_topics_fetch_url = send(:"api_v1_#{@context.class.to_s.downcase}_discussion_topics_path", fetch_params)
         (scope.count / fetch_params[:per_page].to_f).ceil.times do |i|
           url = discussion_topics_fetch_url.gsub(fetch_params[:page], (i + 1).to_s)
           prefetch_xhr(url, id: "prefetched_discussion_topic_page_#{i}")
@@ -459,9 +459,9 @@ class DiscussionTopicsController < ApplicationController
       end
 
       InstStatsd::Statsd.increment("discussion_topic.index.visit")
-      InstStatsd::Statsd.count("discussion_topic.index.visit.pinned", @topics&.select(&:pinned)&.count)
+      InstStatsd::Statsd.count("discussion_topic.index.visit.pinned", @topics&.count(&:pinned))
       InstStatsd::Statsd.count("discussion_topic.index.visit.discussions", @topics&.length)
-      InstStatsd::Statsd.count("discussion_topic.index.visit.closed_for_comments", @topics&.select(&:locked)&.count)
+      InstStatsd::Statsd.count("discussion_topic.index.visit.closed_for_comments", @topics&.count(&:locked))
 
       format.json do
         log_api_asset_access(["topics", @context], "topics", "other")

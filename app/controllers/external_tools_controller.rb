@@ -1617,7 +1617,7 @@ class ExternalToolsController < ApplicationController
     attrs += [:allow_membership_service_access] if @context.root_account.feature_enabled?(:membership_service_for_lti_tools)
 
     attrs.each do |prop|
-      tool.send("#{prop}=", params[prop]) if params.key?(prop)
+      tool.send(:"#{prop}=", params[prop]) if params.key?(prop)
     end
   end
 

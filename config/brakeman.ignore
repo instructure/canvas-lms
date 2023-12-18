@@ -273,29 +273,6 @@
       "note": ""
     },
     {
-      "warning_type": "Dangerous Send",
-      "warning_code": 23,
-      "fingerprint": "2734ed0a9a2d2604962cd8232b217636b6aaeaf45f43369a4876197a03387cbc",
-      "check_name": "Send",
-      "message": "User controlled method execution",
-      "file": "app/controllers/appointment_groups_controller.rb",
-      "line": 577,
-      "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
-      "code": "send(\"api_v1_appointment_group_#{params[:action]}_url\", @group)",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "AppointmentGroupsController",
-        "method": "participants"
-      },
-      "user_input": "params[:action]",
-      "confidence": "High",
-      "cwe_id": [
-        77
-      ],
-      "note": ""
-    },
-    {
       "warning_type": "SQL Injection",
       "warning_code": 0,
       "fingerprint": "2d881ab88942d987968b9fe72f1e9963a90a2c4d2f2e04a5ddfc99e9e061c695",
@@ -430,29 +407,6 @@
       "confidence": "Medium",
       "cwe_id": [
         89
-      ],
-      "note": ""
-    },
-    {
-      "warning_type": "Remote Code Execution",
-      "warning_code": 119,
-      "fingerprint": "42acb42096367d73efe3943f3456226d3d664227e85cf7514c6c8a72b34d8a3e",
-      "check_name": "UnsafeReflectionMethods",
-      "message": "Unsafe reflection method `method` called with model attribute",
-      "file": "app/controllers/grading_periods_controller.rb",
-      "line": 208,
-      "link": "https://brakemanscanner.org/docs/warning_types/remote_code_execution/",
-      "code": "method(\"#{Account.active.where(:id => GradingPeriodGroup.active.select(:account_id).where(:id => params[:set_id])).take.class.to_s.downcase}_batch_update\")",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "GradingPeriodsController",
-        "method": "batch_update"
-      },
-      "user_input": "Account.active.where(:id => GradingPeriodGroup.active.select(:account_id).where(:id => params[:set_id]))",
-      "confidence": "Medium",
-      "cwe_id": [
-        470
       ],
       "note": ""
     },
@@ -685,7 +639,7 @@
       "check_name": "Redirect",
       "message": "Possible unprotected redirect",
       "file": "app/controllers/courses_controller.rb",
-      "line": 3412,
+      "line": 3414,
       "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
       "code": "redirect_to((params[:continue_to] or course_url(@course)))",
       "render_path": null,
@@ -959,7 +913,7 @@
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "app/models/assignment_override.rb",
-      "line": 339,
+      "line": 375,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
       "code": "where(\"#{field}_overridden\" => true)",
       "render_path": null,
@@ -1563,6 +1517,29 @@
       "note": ""
     },
     {
+      "warning_type": "Remote Code Execution",
+      "warning_code": 119,
+      "fingerprint": "f0ce9e6c59ff5a02e7830e209ac7bd6b64afd67f4bf02e067e3f2c5d12d05c31",
+      "check_name": "UnsafeReflectionMethods",
+      "message": "Unsafe reflection method `method` called with model attribute",
+      "file": "app/controllers/grading_periods_controller.rb",
+      "line": 208,
+      "link": "https://brakemanscanner.org/docs/warning_types/remote_code_execution/",
+      "code": "method(:\"#{Account.active.where(:id => GradingPeriodGroup.active.select(:account_id).where(:id => params[:set_id])).take.class.to_s.downcase}_batch_update\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "GradingPeriodsController",
+        "method": "batch_update"
+      },
+      "user_input": "Account.active.where(:id => GradingPeriodGroup.active.select(:account_id).where(:id => params[:set_id]))",
+      "confidence": "Medium",
+      "cwe_id": [
+        470
+      ],
+      "note": ""
+    },
+    {
       "warning_type": "Redirect",
       "warning_code": 18,
       "fingerprint": "f18c6627c65a531716401e8792725bca3c11c11129d387a2aa86074a6c409cd5",
@@ -1702,6 +1679,6 @@
       "note": ""
     }
   ],
-  "updated": "2023-12-08 11:31:18 -0700",
+  "updated": "2023-12-18 10:16:04 -0700",
   "brakeman_version": "6.1.0"
 }

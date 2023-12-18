@@ -175,11 +175,11 @@ class ActiveRecord::Base
 
   # little helper to keep checks concise and avoid a db lookup
   def has_asset?(asset, field = :context)
-    asset&.id == send("#{field}_id") && asset.class.polymorphic_name == send("#{field}_type")
+    asset&.id == send(:"#{field}_id") && asset.class.polymorphic_name == send(:"#{field}_type")
   end
 
   def context_string(field = :context)
-    send("#{field}_type").underscore + "_" + send("#{field}_id").to_s if send("#{field}_type")
+    send(:"#{field}_type").underscore + "_" + send(:"#{field}_id").to_s if send(:"#{field}_type")
   end
 
   def self.asset_string_backcompat_module
@@ -191,7 +191,7 @@ class ActiveRecord::Base
     unless method
       # this is weird, but gets the instance methods defined so they can be chained
       begin
-        new.send("#{association_version_name}_id")
+        new.send(:"#{association_version_name}_id")
       rescue
         # the db doesn't exist yet; no need to bother with backcompat methods anyway
         return
@@ -825,7 +825,7 @@ module UsefulFindInBatches
 
     kwargs.delete(:error_on_ignore)
     activate do |r|
-      r.send("in_batches_with_#{strategy}", start:, finish:, order:, **kwargs, &block)
+      r.send(:"in_batches_with_#{strategy}", start:, finish:, order:, **kwargs, &block)
       nil
     end
   end

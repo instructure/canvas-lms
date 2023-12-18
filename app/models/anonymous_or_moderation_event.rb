@@ -121,7 +121,7 @@ class AnonymousOrModerationEvent < ApplicationRecord
   private
 
   %w[id student_id annotation_body].each do |key|
-    define_method "payload_#{key}_present" do
+    define_method :"payload_#{key}_present" do
       if payload[key].blank?
         errors.add(:payload, "#{key} can't be blank")
       end

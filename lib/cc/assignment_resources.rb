@@ -231,7 +231,7 @@ module CC
         assignment.assignment_overrides.active.where(set_type: "Noop", quiz_id: nil).each do |o|
           override_attrs = o.slice(:set_type, :set_id, :title)
           AssignmentOverride.overridden_dates.each do |field|
-            next unless o.send("#{field}_overridden")
+            next unless o.send(:"#{field}_overridden")
 
             override_attrs[field] = o[field]
           end

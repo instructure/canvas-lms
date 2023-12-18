@@ -2856,7 +2856,7 @@ class ApplicationController < ActionController::Base
       hash = {}
       objtypes.each do |instance_symbol|
         instance_name = instance_symbol.to_s
-        obj = instance_variable_get("@#{instance_name}")
+        obj = instance_variable_get(:"@#{instance_name}")
         policy = obj.check_policy(@current_user, session) unless obj.nil? || !obj.respond_to?(:check_policy)
         hash[:"#{instance_name.upcase}_RIGHTS"] = ActiveSupport::HashWithIndifferentAccess[policy.map { |right| [right, true] }] unless policy.nil?
       end

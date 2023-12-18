@@ -588,7 +588,7 @@ class Attachment < ActiveRecord::Base
     self.folder_id ||= Folder.root_folders(context).first.id rescue nil
     if root_attachment && new_record?
       %i[md5 size content_type].each do |key|
-        send("#{key}=", root_attachment.send(key))
+        send(:"#{key}=", root_attachment.send(key))
       end
       self.workflow_state = "processed"
       write_attribute(:filename, root_attachment.filename)

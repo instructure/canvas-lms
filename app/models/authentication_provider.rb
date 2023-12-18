@@ -320,7 +320,7 @@ class AuthenticationProvider < ActiveRecord::Base
           user.locale = I18n.available_locales[i].to_s
         end
       else
-        user.send("#{attribute}=", value)
+        user.send(:"#{attribute}=", value)
       end
     end
     if pseudonym.changed? && !pseudonym.save

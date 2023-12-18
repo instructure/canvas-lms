@@ -3198,7 +3198,7 @@ class CoursesController < ApplicationController
             @course.errors.add(:master_course, message)
           else
             action = master_course ? "set" : "remove"
-            MasterCourses::MasterTemplate.send("#{action}_as_master_course", @course)
+            MasterCourses::MasterTemplate.send(:"#{action}_as_master_course", @course)
             @new_save_master_course = master_course
           end
         end
@@ -3318,14 +3318,14 @@ class CoursesController < ApplicationController
     end
 
     if params[:course][:"#{setting_name}_url"]
-      @course.send("#{setting_name}_url=", params[:course][:"#{setting_name}_url"])
-      @course.send("#{setting_name}_id=", nil)
+      @course.send(:"#{setting_name}_url=", params[:course][:"#{setting_name}_url"])
+      @course.send(:"#{setting_name}_id=", nil)
     end
 
     if params[:course][:"#{setting_name}_id"]
       if @course.attachments.active.where(id: params[:course][:"#{setting_name}_id"]).exists?
-        @course.send("#{setting_name}_id=", params[:course][:"#{setting_name}_id"])
-        @course.send("#{setting_name}_url=", nil)
+        @course.send(:"#{setting_name}_id=", params[:course][:"#{setting_name}_id"])
+        @course.send(:"#{setting_name}_url=", nil)
       else
         respond_to do |format|
           format.json { render json: { message: "The image_id is not a valid course file id." }, status: :bad_request }
@@ -3335,8 +3335,8 @@ class CoursesController < ApplicationController
     end
 
     if params[:course][:"remove_#{setting_name}"]
-      @course.send("#{setting_name}_url=", nil)
-      @course.send("#{setting_name}_id=", nil)
+      @course.send(:"#{setting_name}_url=", nil)
+      @course.send(:"#{setting_name}_id=", nil)
     end
   end
 

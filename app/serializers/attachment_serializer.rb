@@ -31,7 +31,7 @@ class AttachmentSerializer < Canvas::APISerializer
     super(object, options)
 
     %w[current_user current_pseudonym quota quota_used].each do |ivar|
-      instance_variable_set "@#{ivar}", @controller.instance_variable_get("@#{ivar}")
+      instance_variable_set :"@#{ivar}", @controller.instance_variable_get(:"@#{ivar}")
     end
   end
 

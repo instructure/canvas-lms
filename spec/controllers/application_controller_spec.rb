@@ -1764,7 +1764,7 @@ RSpec.describe ApplicationController do
         ]
 
         @tool_settings.each do |setting|
-          @tool.send("#{setting}=", tool_settings(setting))
+          @tool.send(:"#{setting}=", tool_settings(setting))
         end
         @tool.save!
       end
@@ -1799,7 +1799,7 @@ RSpec.describe ApplicationController do
 
       it "all settings return canvas_icon_class if set" do
         @tool_settings.each do |setting|
-          @tool.send("#{setting}=", tool_settings(setting, true))
+          @tool.send(:"#{setting}=", tool_settings(setting, true))
           @tool.save!
 
           hash = controller.external_tool_display_hash(@tool, setting)

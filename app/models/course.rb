@@ -3635,11 +3635,11 @@ class Course < ActiveRecord::Base
         end
       end
     RUBY
-    alias_method "#{setting}?", setting if opts[:boolean]
+    alias_method :"#{setting}?", setting if opts[:boolean]
     if opts[:alias]
       alias_method opts[:alias], setting
-      alias_method "#{opts[:alias]}=", "#{setting}="
-      alias_method "#{opts[:alias]}?", "#{setting}?"
+      alias_method :"#{opts[:alias]}=", "#{setting}="
+      alias_method :"#{opts[:alias]}?", "#{setting}?"
     end
   end
 

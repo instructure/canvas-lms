@@ -575,15 +575,15 @@ describe AssignmentOverride do
       end
 
       it "sets the override when a override_#{field} is called" do
-        @override.send("override_#{field}", value2)
-        expect(@override.send("#{field}_overridden")).to be true
+        @override.send(:"override_#{field}", value2)
+        expect(@override.send(:"#{field}_overridden")).to be true
         expect(@override.send(field)).to eq value2
       end
 
       it "clears the override when clear_#{field}_override is called" do
-        @override.send("override_#{field}", value2)
-        @override.send("clear_#{field}_override")
-        expect(@override.send("#{field}_overridden")).to be false
+        @override.send(:"override_#{field}", value2)
+        @override.send(:"clear_#{field}_override")
+        expect(@override.send(:"#{field}_overridden")).to be false
         expect(@override.send(field)).to be_nil
       end
     end

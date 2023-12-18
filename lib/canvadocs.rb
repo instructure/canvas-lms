@@ -136,7 +136,7 @@ module Canvadocs
     # Returns the json parsed response body of the call
     def api_call(method, endpoint, params = {})
       # dispatch to the right method, with the full path (/api/v2 + endpoint)
-      request = send("format_#{method}", "#{@url.path}/#{endpoint}", params)
+      request = send(:"format_#{method}", "#{@url.path}/#{endpoint}", params)
       request["Authorization"] = "Token #{token}"
       response = @http.request(request)
 

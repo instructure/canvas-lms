@@ -382,7 +382,7 @@ class AssessmentQuestion < ActiveRecord::Base
   def clone_for(question_bank, dup = nil, **)
     dup ||= AssessmentQuestion.new
     attributes.except("id", "question_data").each do |key, val|
-      dup.send("#{key}=", val)
+      dup.send(:"#{key}=", val)
     end
     dup.assessment_question_bank_id = question_bank
     dup.write_attribute(:question_data, self.question_data)
