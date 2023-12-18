@@ -101,6 +101,14 @@ module Types
       Account.site_admin.grants_right?(current_user, session, :manage_global_outcomes)
     end
 
+    field :can_archive, Boolean, null: false do
+      argument :context_id, ID, required: true
+      argument :context_type, String, required: true
+    end
+    def can_archive(context_id:, context_type:)
+      outcome.context_type == context_type && outcome.context_id == context_id.to_i
+    end
+
     field :assessed, Boolean, null: false
     def assessed
       AssessedLoader.load(outcome)
