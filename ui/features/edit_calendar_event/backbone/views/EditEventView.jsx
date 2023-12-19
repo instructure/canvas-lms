@@ -162,11 +162,13 @@ export default class EditCalendarEventView extends Backbone.View {
             .find('#calendar_event_blackout_date')
             .prop('checked', picked_params[key] === 'true')
         }
-        if(key === 'calendar_event_context_code' && picked_params['course_sections'].length > 0){
+        if (key === 'calendar_event_context_code' && picked_params.course_sections?.length > 0) {
           const active_section_id = picked_params[key].split('_')[2]
           const eventDateKeys = ['start_date', 'start_time', 'end_time']
-          eventDateKeys.forEach((dateKey) => {
-            const $element = this.$el.find(`input[name='child_event_data[${active_section_id}][${dateKey}]']`)
+          eventDateKeys.forEach(dateKey => {
+            const $element = this.$el.find(
+              `input[name='child_event_data[${active_section_id}][${dateKey}]']`
+            )
             $element.val(picked_params[dateKey])
           })
         }
@@ -174,10 +176,13 @@ export default class EditCalendarEventView extends Backbone.View {
           const sections = picked_params[key]
           sections.forEach(section => {
             if (section.event) {
-              ['start_time', 'end_time'].forEach((timeKey) => {
-                const $element = this.$el.find(`input[name='child_event_data[${section.id}][${timeKey}]']`)
-                const value = $element.val();
-                $element.val(value.toUpperCase())
+              const timeKeys = ['start_time', 'end_time']
+              timeKeys.forEach(timeKey => {
+                const $element = this.$el.find(
+                  `input[name='child_event_data[${section.id}][${timeKey}]']`
+                )
+                const newValue = section.event.all_day ? '' : $element.val().toUpperCase()
+                $element.val(newValue)
                 $element.change()
               })
             }
