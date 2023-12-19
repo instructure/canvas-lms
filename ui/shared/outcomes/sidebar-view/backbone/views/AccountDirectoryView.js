@@ -17,7 +17,7 @@
 //
 
 import OutcomesDirectoryView from './OutcomesDirectoryView'
-import OutcomeCollection from '@canvas/outcomes/backbone/collections/OutcomeCollection'
+import OutcomeCollection from '../../../backbone/collections/OutcomeCollection'
 import OutcomeGroupCollection from '../collections/OutcomeGroupCollection'
 
 // for working with Account Standards in the import dialog

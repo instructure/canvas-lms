@@ -18,7 +18,7 @@
 
 import OutcomesDirectoryView from './OutcomesDirectoryView'
 
-import OutcomeCollection from '@canvas/outcomes/backbone/collections/OutcomeCollection'
+import OutcomeCollection from '../../../backbone/collections/OutcomeCollection'
 
 // for working with State Standards in the import dialog
 export default class StateStandardsDirectoryView extends OutcomesDirectoryView {
