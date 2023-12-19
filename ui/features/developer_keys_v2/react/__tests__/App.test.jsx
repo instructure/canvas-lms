@@ -130,62 +130,6 @@ describe('DeveloperKeys App', () => {
     act(() => getByText('Inherited').click())
   }
 
-  describe('OIDC auth change alert box', () => {
-    describe('preFlip', () => {
-      beforeEach(() => {
-        jest.useFakeTimers().setSystemTime(new Date('August 18 2023'))
-        ENV = {FEATURES: {dev_key_oidc_alert: true}}
-        setup(ENV, [...parentKeys, ...siteAdminKeys])
-      })
-
-      afterEach(() => {
-        jest.useRealTimers()
-        ENV = {}
-      })
-
-      it('renders a pre OIDC change warning when the feature flag is on and today date is before changeDate', () => {
-        const alertBox = queryByTestId('OIDC_alert')
-        const preFlipText = queryByTestId('preFlipText')
-        expect(alertBox).toBeInTheDocument()
-        expect(preFlipText).toBeInTheDocument()
-      })
-    })
-
-    describe('postFlip', () => {
-      beforeEach(() => {
-        jest.useFakeTimers().setSystemTime(new Date('August 20 2023'))
-        ENV = {FEATURES: {dev_key_oidc_alert: true}}
-        setup(ENV, [...parentKeys, ...siteAdminKeys])
-      })
-
-      afterEach(() => {
-        jest.useRealTimers()
-        ENV = {}
-      })
-
-      it('renders a post OIDC change warning when the feature flag is on and today date is after changeDate', () => {
-        const alertBox = queryByTestId('OIDC_alert')
-        const postFlipText = queryByTestId('postFlipText')
-        expect(alertBox).toBeInTheDocument()
-        expect(postFlipText).toBeInTheDocument()
-      })
-    })
-
-    describe('no OIDC change warning shown when the feature flag is off', () => {
-      beforeEach(() => {
-        ENV = {FEATURES: {dev_key_oidc_alert: false}}
-        setup(ENV, [...parentKeys, ...siteAdminKeys])
-      })
-
-      afterEach(() => (ENV = {}))
-
-      it('does not render the warning', () => {
-        const alertBox = queryByTestId('OIDC_alert')
-        expect(alertBox).not.toBeInTheDocument()
-      })
-    })
-  })
-
   describe('inherited tab', () => {
     describe('when parent keys are present', () => {
       beforeEach(() => {
