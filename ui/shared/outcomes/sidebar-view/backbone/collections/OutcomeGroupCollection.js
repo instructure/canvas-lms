@@ -18,7 +18,7 @@
 
 import {extend} from '@canvas/backbone/utils'
 import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection'
-import OutcomeGroup from '@canvas/outcomes/backbone/models/OutcomeGroup'
+import OutcomeGroup from '../../../backbone/models/OutcomeGroup'
 
 extend(OutcomeGroupCollection, PaginatedCollection)
 
