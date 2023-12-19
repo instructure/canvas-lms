@@ -290,6 +290,7 @@ zh-Hans:
   a_student_just_turned_in_their_anonymous_assignmen_1a0e1c47: "一个学生刚刚提交了匿名作业（再次），%{assignment_title}"
   a_student_just_turned_in_their_anonymous_assignmen_75cc5465: "一个学生刚刚提交了匿名作业（延迟），%{assignment_name}"
   a_student_just_turned_in_their_assignment_late_ass_e991e212: "一位学生刚刚提交了作业（延迟），%{assignment_name}"
+  a_student_or_section_must_be_selected_79ff673d: 必须选择学生或班次
   a_studious_panda_658eba28: 一只勤奋的熊猫
   a_suffix_cannot_be_longer_than_255_characters_plea_2f2fefd5: "后缀不得超过 255 个字符。请使用较短的后缀并重试。"
   a_suffix_cannot_have_any_tabs_or_spaces_please_rem_47db763e: 后缀不得包含任何制表符或空格符。请删除后重试。
@@ -3575,6 +3576,7 @@ zh-Hans:
   an_error_occurred_while_updating_this_outcome_mess_5ada5958: "更新此结果时出错：%{message}"
   an_error_occurred_while_updating_this_outcome_mess_92be298e: "更新此结果时出错：%{message}。"
   an_error_occurred_while_updating_view_options_c4807f37: 更新视图选项时出错
+  an_error_ocurred_5535dc08: 发生了错误。
   an_error_ocurred_while_deleting_the_appointment_gr_4948bbc5: 删除预约组时出错
   an_error_ocurred_while_fetching_course_details_ple_9cab7735: 获取课程详情时出错。请重试。
   an_error_ocurred_while_loading_announcements_32af2ce4: 加载公告时出错
@@ -5610,6 +5612,7 @@ zh-Hans:
     submit_assignment: 提交作业
   button_73be8181: 按钮。
   button_a1577211: 按钮
+  button_display_84bad037: 按钮显示
   buttons: 
     add_item: 添加项目
     apply: 申请
@@ -5674,6 +5677,8 @@ zh-Hans:
     close: 关闭
   cache_cleared_successfully_9ab84d5a: 已成功清除缓存
   cache_site_admin_access_tokens_c2cdf974: 缓存站点管理员访问令牌
+  calc_int_other_int_decaying_average_21de419d: "%{calc_int}/%{other_int} 衰减平均分"
+  calc_int_other_int_weighted_average_af5121da: "%{calc_int}/%{other_int} 加权平均值"
   calculated_by_4ac40468: "计算人： "
   calculated_by_baa3c8f3: 计算人：
   calculation_d82f6181: 计算
@@ -8862,6 +8867,7 @@ zh-Hans:
       invitation: 邀请失败。请重试。
       publish_grades: 在尝试发布评分到学生信息系统时出错。请稍后重试。
       re_send_all: 发送失败，请重试
+      restrict_quantitative_data: 如果启用了“限制查看定量数据”，课程必须启用默认评分方案。
       section: 添加班级失败，请重试
     flash: 
       invitation: 邀请已发送。
@@ -9556,6 +9562,8 @@ zh-Hans:
   create_account_263ec6: 创建帐户
   create_an_ba36d171: 创建
   create_and_administer_online_quizzes_and_surveys_b_7d2fa85f: 创建和管理已评分和未评分的在线测验和调查。
+  create_and_edit_line_items_cacad0fa: 创建和编辑行项目
+  create_and_edit_scores_4177662c: 创建和编辑分数
   create_announcements_above_1c36202b: 在上方创建公告
   create_anonymous_discussion_topics_d573e88e: 创建匿名讨论主题
   create_as_many_discussion_topics_as_needed_as_assi_45ec1df: |-
@@ -9585,6 +9593,7 @@ zh-Hans:
   create_discussion_topics_8330d52b: 创建讨论主题
   create_edit_line_item_scores_116482c7: 创建/编辑行项目评分
   create_educational_resources_8219326e: 创建教学资源
+  create_external_tools_2108e0b3: 创建外部工具
   create_failed_15d07ad4: 创建失败
   create_file_71aa1922: "[创建文件]"
   create_file_s_188549e6: "[创建文件]"
@@ -9598,6 +9607,7 @@ zh-Hans:
     there_was_an_error: "保存 \"%{title}\" 时出错，请重试。"
   create_labels_to_organize_and_filter_conversations_9f5bb2c1: 创建标签以组织并过滤会话。
   create_live_event_subscriptions_on_toolproxy_7c8378b1: "在 ToolProxy 上创建在线活动订阅"
+  create_live_events_subscriptions_9c7f53cc: 创建实时事件订阅
   create_lookup_7ceb6d90: 创建查找
   create_manage_filter_presets_18404c3a: 创建并管理过滤器预设
   create_module_item: 
@@ -9614,6 +9624,7 @@ zh-Hans:
     quiz_name: 测验名称
     ungrded_survey: 非评分调查
     url: URL
+  create_new_assignment_d77dfc4: 创建新作业
   create_new_attempt_19c96c03: 新建尝试
   create_new_course_e3ef9cd0: 创建新课程
   create_new_discussions_6ab69da2: 创建新讨论
@@ -9671,6 +9682,7 @@ zh-Hans:
   creative_commons_licenses_7d557d9a: 知识共享许可证
   creatorname_performed_actions_while_anonymous_was__c2124eca: "%{creatorName} 在匿名关闭时执行操作"
   criteria_9fac648: 标准
+  criteria_builder_b214069e: 标准生成器
   criterion_5f0b62f8: 标准
   criterion_created_42669293: 创建的标准
   criterion_long_description_e9a97247: 标准长说明
@@ -10154,6 +10166,7 @@ zh-Hans:
   delete_domain_5ba75b7c: 删除域
   delete_domain_domain_c5b68f5: "删除域 %{domain}"
   delete_entry_title_5e59727b: "删除条目%{title}"
+  delete_external_tools_9c862186: 删除外部工具
   delete_failed_6285e600: 删除失败
   delete_feedname_1ac9a4a4: "删除%{feedName}"
   delete_filter_83ca1a6a: 删除过滤器
@@ -10168,6 +10181,7 @@ zh-Hans:
   delete_in_progress_2d3f0e0d: 正在删除
   delete_key_developername_be80e695: "删除键%{developerName}"
   delete_key_name_c2de8c0c: "删除键%{name}"
+  delete_live_events_subscriptions_b15bc9a6: 删除实时事件订阅
   delete_lti_1d1cef27: "删除 LTI"
   delete_mastery_level_position_5cf0f8f7: "删除掌握程度级别 %{position}"
   delete_my_account_41060aad: 删除我的帐户
@@ -11184,6 +11198,7 @@ zh-Hans:
   dutch_6d05cee5: 荷兰语
   dynamic_concurrency_231dbdc5: 动态并发
   dynamic_lti_1_1_environment_specific_override_urls_395db495: "动态 LTI 1.1 特定于环境的覆盖 URL"
+  dynamic_registration_url_5670504d: "动态注册 Url"
   e_c2991d1b: e
   e_g_doe_jon_fe1d9298: "例如，Doe, Jon"
   e_g_http_university_edu_helpdesk_acab04d6: "例如, http://university.edu/helpdesk"
@@ -11303,6 +11318,7 @@ zh-Hans:
       criterion_long_description: 标准长说明
       edit_rubric_rating: 编辑评分
       find_existing_rubric: 查找现有评分标准说明
+  edit_rubric_7d4d139d: 编辑评分标准说明
   edit_rubric_title_104d6fd2: "编辑评价量规：%{title}"
   edit_section_name_558cc89: "编辑班级“%{name}”"
   edit_status_612572db: 编辑状态
@@ -11433,6 +11449,7 @@ zh-Hans:
   embedded_release_notes_72d79b9b: 嵌入式发行说明
   ember_modules_description: "单元已在 Ember 中重新编写。使用本机拖放 API 可从外部位置进行拖动。"
   embry_riddle_student_activity_tracking_8020dd95: "Embry Riddle 学生活动记录"
+  emoji_737e5f6b: 表情符号
   emoji_categories_a08744ae: 表情符号类别
   emoji_picker_5bb954f9: 表情符号选择器
   emojis_in_submission_comments_72720afc: 提交项评论中的表情符号
@@ -11446,6 +11463,7 @@ zh-Hans:
   enable_anonymous_marking_of_assignments_only_relev_792a2a17: 对作业启用匿名打分。仅当启用匿名审核打分标记时相关。
   enable_byte_order_mark_and_semi_colon_field_separa_f4375c16: "启用要为结果导出启用或关闭的 byte_order_mark 和 semi_colon_field_separator 用户级功能标记。"
   enable_cbcd2eef: "启用 "
+  enable_close_e8001638: 启用并关闭
   enable_content_security_policy_8bd0b492: 启用内容安全策略
   enable_course_as_a_blueprint_course_8515ffd5: 将课程启用为模板课程
   enable_course_as_a_course_template_5299afb6: 启用课程作为课程模板
@@ -11582,6 +11600,7 @@ zh-Hans:
   enrolled_as_enrollment_type_a784f82b: "注册为：%{enrollment_type}"
   enrolled_as_enrollment_type_with_section_only_acce_110d7929: "注册为：具有仅限于班次访问权限的 %{enrollment_type}"
   enrolling_the_recipient_in_these_courses_c421fcb0: 在这些课程中注册接收人
+  enrolling_the_recipient_in_these_courses_will_gran_67cbc293: 在这些课程中注册接收人将授予他们来自注册提供商的不同权限
   enrollment: 
     default_course_name: 课程
     default_email: 无电子邮件
@@ -14919,6 +14938,7 @@ zh-Hans:
   high_contrast_description: |-
       高对比度增强用户界面（文本、按钮，等等）的颜色对比度，使这
       些项目更加清晰、更容易识别。注意：禁用机构的品牌推广。
+  high_low_826694e3: "高 < 低"
   high_score_267b6641: 高分
   high_score_47924c1a: "高：%{score}"
   highest_28ad71e6: 最高
@@ -14940,6 +14960,7 @@ zh-Hans:
   honduras_504_af7aa636: 洪都拉斯(+504)
   hong_kong_37f0321: 香港
   hong_kong_852_98e3b3fe: 香港(+852)
+  horizontal_f4a3385c: 横向
   host_8be927e0: 主持
   host_is_unreachable_or_not_pointing_to_catalog_fb3fc082: 主机不可达或无法指向目录
   host_virtual_lectures_in_real_time_150cef95: 实时管理虚拟课程
@@ -15077,6 +15098,7 @@ zh-Hans:
   icelandic_9d6d35de: 冰岛语
   icon_215a1dc6: 图标
   icon_maker_icons_cc560f7e: 图标编辑器图标
+  icon_url_4d3f6ae3: "图标 URL"
   icon_url_e3d56e89: 图标网址
   icon_url_ecce6557: "图标 URL:"
   icon_url_required_unless_present_in_additional_set_e453ad8f: "图标 Url（必填，除非存在于其他设置中）"
@@ -15913,6 +15935,7 @@ zh-Hans:
   invalid_microsoft_team_sync_remote_attribute_valid_4d3015a7: "无效的 Microsoft Team Sync 远程属性。有效的远程属性：%{VALID_SYNC_REMOTE_ATTRIBUTES}"
   invalid_microsoft_teams_sync_login_attribute_suffi_3c6eb0e6: "无效的 Microsoft Team Sync 登录属性后缀。后缀必须少于 255 个字符，且不得包含任何空白符。"
   invalid_microsoft_teams_sync_login_attribute_valid_9905edaf: "无效的 Microsoft Teams Sync 登录属性。无效的登录属性：%{valid_attributes}"
+  invalid_module_id_f19ec4bf: "无效的模块 id。"
   invalid_or_missing_login_attribute_config_in_accou_eb1d9a0: 帐户中的“登录属性”配置无效或缺失
   invalid_or_missing_session_for_oauth_3ce4b605: 身份验证会话无效或缺失
   invalid_pairing_code_dde8d40a: 无效的配对码。
@@ -16152,6 +16175,30 @@ zh-Hans:
   key_api_key_68bf80ae: "密钥：*%{api_key}*"
   key_f2a919d5: 密钥
   key_ff4089c5: 图例：
+  key_missing_here_at_the_top: 
+    atom_no_author: 无作者
+    comment_from_files: 
+      one: 查看附件文件
+      other: 查看附件文件
+    errors: 
+      cannot_save_att: "您没有权限编辑锁定的属性 %{att_name}"
+    feed_entry_title: "作业：%{assignment}"
+    feed_entry_title_with_course: "作业，%{course}：%{assignment}"
+    labels: 
+      due: 截止
+    student_annotation: 学生注释
+    submission_action_take_quiz: "参加 %{title}"
+    submission_action_turn_in_assignment: "上交 %{title}"
+    submission_types: 
+      a_content_page: 一个内容页面
+      a_discussion_post: 一个讨论帖
+      a_file_upload: 一份上传文件
+      a_media_recording: 一份媒体录音
+      a_quiz: 一份测验
+      a_text_entry_box: 一个文本输入框
+      a_website_url: "网站 URL"
+      external_tool: 外部工具
+      on_paper: 书面
   key_name_7311d22: "密钥名称:"
   key_name_bc712026: 密钥名称
   key_settings_44df6a41: 密钥设置
@@ -16367,6 +16414,7 @@ zh-Hans:
   let_students_see_their_quiz_responses_fbc07d14: 让学生们查看他们的测验回应
   let_students_see_their_quiz_responses_incorrect_qu_f5c9cb70: 让学生看到他们在测验中的回答（学生反馈中将标记错误的问题）
   let_the_site_administrator_select_up_to_2_lti_apps_df016781: "让站点管理员选择最多 2 个 LTI 应用程序收藏，这随后会显示在 RCE 的工具栏中"
+  letter_12ff3510: 字母
   letter_grade_29ff1938: 字母评分
   letter_grade_f00fedc4: 字母评分
   letter_grade_report_d6772138: 字母评分报告
@@ -16546,6 +16594,10 @@ zh-Hans:
   list_collapsed_dde87718: 列表已折叠
   list_expanded_4857ff4c: 列表展开
   list_expanded_efec2d0: 列表已展开。
+  list_external_tools_ac2aaf90: 列出外部工具
+  list_feature_flags_6be9c646: 列出功能标记
+  list_live_events_event_types_db3f39c4: 列出实时事件类型
+  list_live_events_subscriptions_55ba2893: 列出实时事件订阅
   list_of_pseudonyms_to_get_report_for_af38e1c6: 要获取报告的假名列表
   list_of_students_and_observers_f7f1a58a: 学生和观察员列表
   list_of_the_currently_attainable_trophies_959b2518: 当前可获得的奖品列表
@@ -16871,6 +16923,7 @@ zh-Hans:
   los_gatos_saratoga_joint_union_high_school_distric_91f5b3c6: "Los Gatos-Saratoga Joint Union 高中地区评分报告"
   low_eab1cadd: 低的
   low_f1831924: 低：
+  low_high_a709235f: "低 < 高"
   low_score_4eeb95b2: "低：%{score}"
   low_score_6d05905b: 低分
   lower_bound_ed528347: 下方定界
@@ -16919,6 +16972,7 @@ zh-Hans:
   lti_launch_error_41eac9a: "LTI 语言错误"
   lti_multiple_assignment_deep_linking_b7d641d7: "LTI 多作业深度链接"
   lti_platform_storage_9d11dc60: "LTI 平台储存"
+  lti_registration_9e0f754d: "LTI 注册"
   lti_report_2b6193ab: LTI报告
   lti_submissions_require_a_url_to_submit_85ca9988: "LTI 提交文件要求通过 URL 进行提交"
   lti_tool_report_f13213b3: "LTI 工具报告"
@@ -20596,8 +20650,10 @@ zh-Hans:
   number_of_respondents_e1e7e8b: 应答者的数量
   number_of_scores_to_ignore_for_each_student_fb94e818: 为每位学生忽略的分数数量
   number_of_students_per_group_8abe7189: 每组学生人数
+  number_of_times_calc_int_6d1f8687: "次数 (%{calc_int})"
   number_to_grade_661b05dd: "%{number}评分"
   number_unsubmitted_145fefae: "%{number}未提交"
+  numeric_ad248ca9: 数字
   numerical_answer_ec7120bf: 数值答案
   nummastered_of_numgroup_mastered_b8113c9c: "已掌握%{numMastered}/%{numGroup}"
   numpoints_points_b1f0666a: "%{numPoints} 分"
@@ -22056,6 +22112,7 @@ zh-Hans:
   position_select_c2dd3980: 位置选择
   possible_combination_count_db651ca4: 可能的组合数
   possible_matches_for_address_select_the_correct_on_e206f972: "可能与“%{address}”匹配的结果从以下选择正确的一个或创建新用户。"
+  possible_points_b1df0a5c: 满分
   possible_pts_b63dff4c: "%{possible}分"
   possible_pts_f4681c49: "共 %{possible} 分"
   possible_score_5e0a328e: "可能：%{score}"
@@ -24239,6 +24296,7 @@ zh-Hans:
   rating_description_db6adf39: 评分描述
   rating_max_score_eade1523: 评分最高分数
   rating_min_score_3d35a762: 评分最低分数
+  rating_order_e57f63ed: 评分顺序
   rating_score_22cfc724: 评分分数
   rating_selected_85c31e4c: 已选择等级
   rating_tier_index_threshold_3f02a6d7: "等级%{index}阈值"
@@ -24339,7 +24397,9 @@ zh-Hans:
   read_7cabda44: 读取
   read_comments_3fcc7590: 阅读评论
   read_context_membership_8068f3dd: "读取 Context 会员"
+  read_context_membership_data_cf406033: 读取上下文成员数据
   read_dc99757a: 阅读
+  read_feature_flags_ec9a6434: 读取功能标记
   read_less_ae7bd04f: 阅读更少
   read_less_reply_from_author_4a41ca22: "收起阅读，从 %{author} 回复"
   read_line_item_results_6472a120: 读取行项目结果
@@ -24347,6 +24407,8 @@ zh-Hans:
   read_more_f69fb6ec: 阅读更多
   read_more_reply_from_author_7cac484e: "展开阅读，从 %{author} 回复"
   read_only_3d26d8fe: 只读
+  read_progress_data_63bebb1d: 读取进度数据
+  read_result_data_bce1356c: 读取结果数据
   read_state_change_failed_859eeaa1: 读取状态更改失败
   read_state_change_operation_failed_86710e1: 读取状态更改操作失败
   read_state_changed_16ff9607: 读取状态已更改！
@@ -24435,6 +24497,7 @@ zh-Hans:
   regenerating_themes_462e6cd9: 重新生成主题...
   region_47e29025: 地区：
   region_939f2a6c: 地区
+  register_app_a8aaabdf: 注册应用
   register_email_efc06d59: 注册电子邮件
   register_slack_email_1f6d7e6d: "注册 Slack 电子邮件"
   register_tool_84de3186: 注册工具
@@ -24629,6 +24692,7 @@ zh-Hans:
         hour: 小时
         minute: 最小
   render_both_to_do_lists_for_teachers_with_student__6fc0fdda: 为有学生注册的教师显示两个待办事项列表
+  renderheadertitle_5015f4da: "%{renderHeaderTitle}"
   renders_both_to_do_lists_on_the_dashboard_sidebar__c7d38ae: 在控制面板侧栏为有学生注册的教师显示两个待办事项列表。
   reorders_some_menu_options_for_more_consistency_an_90efff07: 对一些菜单选项重新排序以提高一致性并在SpeedGrader中添加链接。
   repeat_every_e653d6d0: 重复日：
@@ -24789,6 +24853,7 @@ zh-Hans:
   restart_link_validation_b61286fc: 重新启动链接验证
   restore_6d523f1d: 恢复
   restore_courses_182e162e: 恢复课程
+  restore_defaults_440a0814: 恢复默认设置
   restored_course_association_course_c9e16045: "还原的课程关联%{course}"
   restoring_122bdbbf: "恢复： "
   restrict_access_84ba6bb8: 限制访问
@@ -25061,6 +25126,7 @@ zh-Hans:
   rubric_assessment_5f0e8a83: 评价量规评估
   rubric_association: 
     no_details: 无详细信息
+  rubric_button_display_4e4a26fe: 评分细则按钮显示
   rubric_created_64980593: 已创建评价量规
   rubric_criterion_range_12499bf1: Rubric标准范围
   rubric_deleted_3d9efc18: 已删除评价量规
@@ -25068,6 +25134,13 @@ zh-Hans:
   rubric_fc39da76: 评测
   rubric_name_e11b76de: 评分细则名称
   rubric_options_c92d7130: 评分细则选项
+  rubric_rating_order_ead13c09: 评分细则评分顺序
+  rubric_read_state_change_failed_1a1e23da: 评分细则读取状态更改失败
+  rubric_read_state_change_operation_failed_e39e6a3: 评分细则读取状态更改操作失败
+  rubric_read_states_changed_4e4959a5: 
+    one: 评分细则读取状态已更改！
+    other: 评分细则读取状态已更改！
+  rubric_type_33e65ff1: 评分细则类型
   rubric_updated_103e24dc: 已更新评价量规
   rubric_was_successfully_submitted_b0766474: 已成功提交评价量规
   rubrics: 
@@ -25165,6 +25238,7 @@ zh-Hans:
   save_mastery_scale_2b4dc13a: 保存掌握程度范围
   save_name_796fa6a2: "保存 %{name}"
   save_publish_36440725: 保存并发布
+  save_rubric_1e4f6a44: 保存评分细则
   save_settings_cafe79a5: 保存设置
   save_successful_b2f64da4: 成功保存。
   save_theme_36c73e6a: 保存主题
@@ -25251,6 +25325,7 @@ zh-Hans:
   score_to_ungraded_process_failed_e143fd1b: 对未评分项目应用分数的流程失败
   score_to_ungraded_process_failed_reason_788f9030: "对未评分项目应用分数的流程失败：%{reason}"
   score_to_ungraded_process_finished_successfully_6689b418: 对未评分项目应用分数的流程已成功完成
+  scored_187e6983: 已评分
   scored_less_than_2427896c: 分数低于
   scored_less_than_cutoff_on_assignment_5f5c4303: "%{assignment} 的得分少于 %{cutoff}"
   scored_less_than_score_on_assignmenttitle_5a011033: "%{assignmentTitle} 的得分少于 %{score}"
@@ -25688,6 +25763,7 @@ zh-Hans:
   select_requirement_type_bf9a39d9: 选择要求类型
   select_role_aa5cfd69: 选择角色
   select_rubric_2aa2ffa2: 选择评价量规
+  select_rubric_display_type_15bf2af1: 选择评分细则显示类型
   select_sections_to_post_to_type_or_use_arrow_keys__902a41ed: 选择要发布到的班次。键入或使用箭头键进行浏览。允许选择多项。
   select_specific_content_5382e7ea: 选择具体内容
   select_student_group_c0be9f3e: 选择学生组
@@ -26760,6 +26836,7 @@ zh-Hans:
   show_embedded_documentation_in_live_events_lti_too_cbe229f3: 在实时事件LTI工具中显示嵌入式文档
   show_event_on_homeroom_sidebar_c618275d: 在教室边栏显示事件
   show_exceptions_270ea1c5: 显示异常
+  show_external_tools_b824f16b: 显示外部工具
   show_final_grade_a95e14dc: 显示最后的成绩
   show_final_grade_override_8cde5803: 显示最终评分推翻
   show_final_grade_overrides_only_c3017aaa: 仅显示最终评分覆盖
@@ -26769,6 +26846,7 @@ zh-Hans:
   show_key_1fbf0c64: 显示密钥
   show_less_d5bbf728: 显示更少
   show_links_to_unpublished_content_30c0450d: 显示链接到未发布的内容
+  show_live_events_subscriptions_68b69a03: 显示实时事件订阅
   show_lti_2_configuration_ui_94ce35a9: "显示 LTI 2 配置 UI"
   show_lti_tools_from_federated_parent_accounts_47135c98: 显示来自联合父级帐户的LTI工具
   show_me_76823679: 给我看看
@@ -27943,6 +28021,7 @@ zh-Hans:
   sync_to_name_successfully_disabled_8045ad95: "已成功禁用“同步到 %{name}”"
   sync_to_posttosisname_9837a8bf: "同步到%{postToSISName}："
   sync_to_posttosisname_dffd5c9: "同步到%{postToSISName}"
+  sync_to_sis_friendly_name_a0e7d231: "同步到 %{sis_friendly_name}"
   sync_to_sisname_f343e59: "同步到%{sisName}"
   sync_uris_50c59540: 同步URI
   synced_97764882: 已同步
@@ -28558,6 +28637,7 @@ zh-Hans:
   the_url_a_sufficiently_priviledged_user_could_use__e6b02c56: 一个有足够优越用户的网站可以用来伪装成同一个页面上的用户报告，以尝试重现该问题。
   the_url_of_the_page_the_user_was_on_when_they_repo_11dfa92f: 当用户报告错误时使用的网站
   the_user_below_is_ready_to_be_assigned_temporary_e_fd6bb909: 下面的用户已准备好分配临时注册。
+  the_user_found_matches_the_provider_please_search__60e29949: 找到的用户与提供商相符。请搜索新的接收用户。
   the_user_found_matches_the_source_user_please_sear_a1d0004f: 找到的用户与源用户匹配。请搜索其他用户。
   the_user_id_s_of_the_admin_s_making_submissions_5432b2ce: "进行提交的管理员的用户 id"
   the_user_id_to_report_on_b1de2577: "要报告的用户 id"
@@ -30096,6 +30176,7 @@ zh-Hans:
       got_it: 好的，我知道了
   track_individual_student_and_class_progress_c13cf2d1: 跟踪单个学生和课堂进度
   track_student_performance_and_activity_a92a2a8b: 跟踪学生成绩和活动
+  traditional_e5a0d358: 传统的
   traditional_gradebook_d7ad59c6: 传统评分册...
   traditional_gradebook_d90461dc: 传统评分册
   transferred_student_enrollments_90dc27d3: 转移的学生注册
@@ -30463,12 +30544,14 @@ zh-Hans:
   unread_e9c1b19c: 未读
   unread_ee6db4aa: 未读
   unread_post_47a1a06b: 未读文章
+  unread_rubric_assessment_2b2d5c47: 未读评分细则评估
   unreadcount_unread_9c86f4d1: "%{unreadCount}未读"
   unreadcount_unread_replies_509e167f: "%{unreadCount} 未读回复"
   unregister_service_985238e9: 未登记的服务
   unreserved_e86b7425: 未保存
   unsafe_file_link_8a18eceb: 不安全的文件链接
   unsaved_change_eb23d452: 未保存的更改
+  unscored_d0bf39d6: 未评分
   unselected_all_courses_99a9d35c: 已取消选择所有课程
   unselected_course_course_89995a83: "取消选择课程%{course}"
   unselected_external_tool_tool_1bd68403: "未选择外部工具%{tool}"
@@ -30513,6 +30596,7 @@ zh-Hans:
   update_details_6abfed16: 更新详细信息
   update_discussions_to_use_react_instui_ef06b300: "更新讨论以使用 React & InstUI"
   update_domain_account_lookup_9c89440d: 更新域帐户查找
+  update_external_tools_81fd014d: 更新外部工具
   update_failed_2c87428c: 更新失败
   update_file_links_to_prefer_preview_not_download_94535382: 更新文件链接以首选预览，而不是下载
   update_grade_b47eb3ff: 更新评分
@@ -30521,10 +30605,12 @@ zh-Hans:
   update_important_info_bcc01d6a: 更新重要信息
   update_inbox_page_to_use_react_instui_4d343fd: 更新收件箱页面以使用反应/instui
   update_link_b7cab181: 更新链接
+  update_live_events_subscriptions_e9c618b0: 更新实时事件订阅
   update_lti_region_912491e4: "更新 LTI 地区"
   update_module_b984c2e5: 更新单元
   update_name_6581781d: "更新 %{name}"
   update_pages_c91d7ba: 更新页面
+  update_public_jwk_9f25f520: "更新公开 JWK"
   update_rating_6d29c2ef: 更新评分
   update_settings_9b422d0f: 更新设置
   update_tool_7d48ef2a: "更新 %{tool}"
@@ -31273,6 +31359,7 @@ zh-Hans:
   verify_tls_certificate_9cfa26d1: "验证 TLS 证书"
   verify_tls_certificates_presented_by_ldap_authenti_946337a3: "验证 LDAP 身份验证提供程序提供的 TLS 证书。"
   version_versionnumber_updatedat_9f5b7a5b: "版本 %{versionNumber} %{updatedAt}"
+  vertical_17932955: 纵向
   video_78335c71: 视频
   video_b9f27375: 视频
   video_conferencing_guides_for_remote_classrooms_ffab4a1b: 远程教室的视频会议指南
@@ -32003,6 +32090,7 @@ zh-Hans:
   you_do_not_have_access_to_the_requested_discussion_90d8ec99: 您没有访问所要求的讨论。
   you_do_not_have_access_to_the_requested_quiz_d3659e4b: 您无需测验的访问权限。
   you_do_not_have_access_to_the_requested_resource_316ce49a: 您无法访问所需的资源。
+  you_do_not_have_blueprint_course_management_permis_51ae6ef5: "您没有 Blueprint 课程管理权限"
   you_do_not_have_permission_to_add_this_topic_to_th_fc8622a0: 您没有权限将此主题添加到学生待办事项列表。
   you_do_not_have_permission_to_change_this_488c536: 您没有对其进行更改的权限
   you_do_not_have_permission_to_delete_file_please_c_3b0abf50: "您没有权限删除 %{file}。请联系您的帐户管理员。"
