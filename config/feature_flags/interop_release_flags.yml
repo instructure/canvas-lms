@@ -123,18 +123,6 @@ consistent_ags_ids_based_on_account_principal_domain:
     launch happens on or the API is accessed through. For schools with multiple
     domains, this ensures consistency in Line Item IDs.
   applies_to: RootAccount
-dev_key_oidc_alert:
-  state: hidden
-  display_name: OIDC Auth endpoint changes - show alert for upcoming changes
-  description: |-
-    If enabled, the user will see a warning Alert box near the top of the
-    Developer Keys page informing them of upcoming or completed OIDC Auth endpoint changes.
-  applies_to: SiteAdmin
-  environments:
-    development:
-      state: allowed_on
-    ci:
-      state: allowed_on
 lti_dynamic_registration:
   state: hidden
   display_name: LTI Dynamic Registration
