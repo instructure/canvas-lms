@@ -19,9 +19,9 @@
 import React from 'react'
 import {act, render, waitFor} from '@testing-library/react'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {updateModuleItem} from '@canvas/context-modules/jquery/utils'
+import {updateModuleItem} from '../../jquery/utils'
 import ContextModulesPublishIcon from '../ContextModulesPublishIcon'
-import {initBody, makeModuleWithItems} from '@canvas/context-modules/__tests__/testHelpers'
+import {initBody, makeModuleWithItems} from '../../__tests__/testHelpers'
 
 jest.mock('@canvas/do-fetch-api-effect')
 jest.mock('@canvas/context-modules/jquery/utils', () => {
