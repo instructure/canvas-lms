@@ -48,6 +48,7 @@ export type ContentMigrationItem = {
   progress_url: string
   settings: ContentMigrationItemSettings
   attachment?: ContentMigrationItemAttachment
+  completion?: number
   workflow_state: ContentMigrationWorkflowState
   migration_issues_count: number
   migration_issues_url: string
