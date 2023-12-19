@@ -30,9 +30,7 @@ jest.mock('@canvas/upload-file', () => ({
 const setMigrationsMock = jest.fn()
 
 const renderComponent = (overrideProps?: any) =>
-  render(
-    <ContentMigrationsForm migrations={[]} setMigrations={setMigrationsMock} {...overrideProps} />
-  )
+  render(<ContentMigrationsForm setMigrations={setMigrationsMock} {...overrideProps} />)
 
 describe('ContentMigrationForm', () => {
   beforeEach(() => {
@@ -82,7 +80,7 @@ describe('ContentMigrationForm', () => {
   })
 
   it('Populates select with migrator options', async () => {
-    render(<ContentMigrationsForm migrations={[]} setMigrations={jest.fn()} />)
+    render(<ContentMigrationsForm setMigrations={jest.fn()} />)
     const selectOne = await screen.findByTitle('Select one')
     userEvent.click(selectOne)
     expect(screen.getByText('Copy a Canvas Course')).toBeInTheDocument()

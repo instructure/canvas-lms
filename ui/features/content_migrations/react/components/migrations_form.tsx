@@ -17,6 +17,7 @@
  */
 
 import React, {useEffect, useState, useCallback} from 'react'
+import type {SetStateAction, Dispatch} from 'react'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
@@ -36,6 +37,7 @@ import type {
   Migrator,
   DateShifts,
   onSubmitMigrationFormCallback,
+  AdjustDates,
 } from './types'
 import CommonCartridgeImporter from './migrator_forms/common_cartridge'
 import MoodleZipImporter from './migrator_forms/moodle_zip'
@@ -48,6 +50,7 @@ type RequestBody = {
   course_id: string
   migration_type: string
   date_shift_options: DateShifts
+  adjust_dates: AdjustDates
   selective_import: boolean
   settings: {[key: string]: any}
   daySubCollection?: object
@@ -90,11 +93,9 @@ const renderMigrator = (props: MigratorProps) => {
 }
 
 export const ContentMigrationsForm = ({
-  migrations,
   setMigrations,
 }: {
-  migrations: ContentMigrationItem[]
-  setMigrations: (migrations: ContentMigrationItem[]) => void
+  setMigrations: Dispatch<SetStateAction<ContentMigrationItem[]>>
 }) => {
   const [migrators, setMigrators] = useState<any>([])
   const [chosenMigrator, setChosenMigrator] = useState<string | null>(null)
@@ -127,10 +128,10 @@ export const ContentMigrationsForm = ({
           onProgress: handleFileProgress,
         })
       }
-      setMigrations([json as ContentMigrationItem].concat(migrations))
+      setMigrations(prevMigrations => [json as ContentMigrationItem].concat(prevMigrations))
       onResetForm()
     },
-    [chosenMigrator, migrations, setMigrations, onResetForm]
+    [chosenMigrator, setMigrations, onResetForm]
   )
 
   useEffect(() => {
