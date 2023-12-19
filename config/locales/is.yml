@@ -289,6 +289,7 @@ is:
   a_student_just_turned_in_their_anonymous_assignmen_1a0e1c47: "Nemandi hefur skilað nafnlausu verkefni sínu (aftur), %{assignment_title}"
   a_student_just_turned_in_their_anonymous_assignmen_75cc5465: "Nemandi hefur skilað nafnlausu verkefni sínu (seint), %{assignment_name}"
   a_student_just_turned_in_their_assignment_late_ass_e991e212: "Nemandi hefur skilað verkefni sínu (seint) %{assignment_name}"
+  a_student_or_section_must_be_selected_79ff673d: "Velja verður nemanda eða hluta"
   a_studious_panda_658eba28: "Dugleg panda"
   a_suffix_cannot_be_longer_than_255_characters_plea_2f2fefd5: "Viðskeyti má ekki vera lengra en 255 stafir. Vinsamlegast notaðu styttra viðskeyti og reyndu aftur."
   a_suffix_cannot_have_any_tabs_or_spaces_please_rem_47db763e: "Viðskeyti má ekki hafa tab eða stafabil. Vinsamlegast fjarlægðu þau og reyndu aftur."
@@ -3479,6 +3480,7 @@ is:
   an_error_occurred_while_updating_this_outcome_mess_5ada5958: "Villa kom upp við að uppfæra þessa niðurstöðu: %{message}"
   an_error_occurred_while_updating_this_outcome_mess_92be298e: "Villa kom upp við að uppfæra þessa niðurstöðu: %{message}."
   an_error_occurred_while_updating_view_options_c4807f37: "Villa kom upp við uppfærslu skoðunarval"
+  an_error_ocurred_5535dc08: "Villa kom upp."
   an_error_ocurred_while_deleting_the_appointment_gr_4948bbc5: "Villa kom upp við eyðingu á fundahópnum"
   an_error_ocurred_while_fetching_course_details_ple_9cab7735: "Villa kom upp við að sækja upplýsingar um námskeið. Vinsamlegast reynið aftur."
   an_error_ocurred_while_loading_announcements_32af2ce4: "Villa kom upp þegar sækja átti tilkynningar"
@@ -5340,6 +5342,7 @@ is:
     submit_assignment: "Skila verkefni"
   button_73be8181: hnappur.
   button_a1577211: hnappur
+  button_display_84bad037: "Sýna hnapp"
   buttons: 
     add_item: "Bæta við atriði"
     apply: Virkja
@@ -5398,6 +5401,8 @@ is:
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
   cache_cleared_successfully_9ab84d5a: "Flýtiminni var hreinsað"
   cache_site_admin_access_tokens_c2cdf974: "Aðgangstákn fyrir skyndiminni vefstjóra"
+  calc_int_other_int_decaying_average_21de419d: "%{calc_int}/%{other_int} Lækkandi meðaltal"
+  calc_int_other_int_weighted_average_af5121da: "%{calc_int}/%{other_int} Vegið meðaltal"
   calculated_by_4ac40468: "Reiknað út af: "
   calculated_by_baa3c8f3: "Reiknað út af:"
   calculation_d82f6181: Útreikningur
@@ -8388,6 +8393,7 @@ is:
     errors: 
       invitation: "Boð tókst ekki, reyndu aftur"
       re_send_all: "Ekki tókst að senda. Reyndu aftur."
+      restrict_quantitative_data: "Ef „Takmarka skoðun á megindlegum gögnum“ er virkt þá verður námskeiðið að hafa sjálfgildan einkunnakvarða virkan."
       section: "Ekki tókst að bæta við hluta. Reyndu aftur"
     flash: 
       invitation: "Boð hafa verið send."
@@ -8961,6 +8967,8 @@ is:
   create_account_263ec6: "Stofna reikning"
   create_an_ba36d171: "Búa til"
   create_and_administer_online_quizzes_and_surveys_b_7d2fa85f: "Stofna og sjá um próf og kannanir á netinu, bæði metin og ómetin."
+  create_and_edit_line_items_cacad0fa: "Búa til og breyta línuatriði"
+  create_and_edit_scores_4177662c: "Búa til og breyta einkunnum"
   create_announcements_above_1c36202b: "Búa til tilkynningar að ofan"
   create_anonymous_discussion_topics_d573e88e: "Búa til nafnlaus umræðuefni"
   create_as_many_discussion_topics_as_needed_as_assi_45ec1df: |-
@@ -8988,6 +8996,7 @@ is:
   create_discussion_topics_8330d52b: "Stofna umræðuefni"
   create_edit_line_item_scores_116482c7: "Búa til / breyta einkunnum línuatriða"
   create_educational_resources_8219326e: "Stofna menntunartilföng"
+  create_external_tools_2108e0b3: "Búa til ytri verkfæri"
   create_failed_15d07ad4: "Ekki tókst að stofna"
   create_file_71aa1922: "[ Búa til skrá ]"
   create_file_s_188549e6: "[ Búa til skrá(r) ]"
@@ -8999,8 +9008,10 @@ is:
   create_interactive_course_content_76665336: "Búðu til gagnvirkt námskeiðsefni"
   create_labels_to_organize_and_filter_conversations_9f5bb2c1: "Búðu til merki til að skipuleggja og sía samræður."
   create_live_event_subscriptions_on_toolproxy_7c8378b1: "Búa til áskrift að viðburðum í beinni á ToolProxy"
+  create_live_events_subscriptions_9c7f53cc: "Búa til áskriftir rauntímaviðburða"
   create_lookup_7ceb6d90: "Búa til uppflettingu"
   create_manage_filter_presets_18404c3a: "Búa til og stjórna forstillingum sía"
+  create_new_assignment_d77dfc4: "Búa til nýtt verkefni"
   create_new_attempt_19c96c03: "Búa til nýja tilraun"
   create_new_course_e3ef9cd0: "Búa til nýjan kúrs"
   create_new_discussions_6ab69da2: "Búa til nýjar umræður"
@@ -9059,6 +9070,7 @@ is:
   creative_commons_licenses_7d557d9a: "Creative Commons leyfi"
   creatorname_performed_actions_while_anonymous_was__c2124eca: "%{creatorName} framkvæmdi aðgerðir á meðan slökkt var á nafnleysi"
   criteria_9fac648: Viðmiðun
+  criteria_builder_b214069e: Viðmiðunarsmiður
   criterion_5f0b62f8: Viðmiðun
   criterion_created_42669293: "Viðmið stofnað"
   criterion_long_description_e9a97247: "Löng lýsing á viðmiðun"
@@ -9523,6 +9535,7 @@ is:
   delete_domain_5ba75b7c: "Eyða léni"
   delete_domain_domain_c5b68f5: "Eyða léni %{domain}"
   delete_entry_title_5e59727b: "Eyða færslu %{title}"
+  delete_external_tools_9c862186: "Eyða ytri verkfærum"
   delete_failed_6285e600: "Ekki tókst að eyða"
   delete_feedname_1ac9a4a4: "Eyða %{feedName}"
   delete_filter_83ca1a6a: "Eyða síu"
@@ -9535,6 +9548,7 @@ is:
   delete_groups_c637c07: "Eyða hópum"
   delete_in_progress_2d3f0e0d: "Eyðsla í gangi"
   delete_key_developername_be80e695: "Eyða lykli %{developerName}"
+  delete_live_events_subscriptions_b15bc9a6: "Eyða áskriftum rauntímaviðburða"
   delete_lti_1d1cef27: "Eyða LTI"
   delete_mastery_level_position_5cf0f8f7: "Eyða tileinkunarstigi %{position}"
   delete_my_account_41060aad: "Eyða reikningi mínum"
@@ -10472,6 +10486,7 @@ is:
   dutch_6d05cee5: Hollenska
   dynamic_concurrency_231dbdc5: "Kvikt samtíma"
   dynamic_lti_1_1_environment_specific_override_urls_395db495: "Dynamic LTI 1.1 umhverfissértækar hnekkingarslóðir"
+  dynamic_registration_url_5670504d: "Url Dynamic skráningar"
   e_c2991d1b: e
   e_g_doe_jon_fe1d9298: "t.d. Jónsson, Jón"
   e_g_http_university_edu_helpdesk_acab04d6: "t.d , http://university.edu/helpdesk"
@@ -10580,6 +10595,7 @@ is:
       criterion_long_description: "Löng lýsing á viðmiðun"
       edit_rubric_rating: "Breyta mati"
       find_existing_rubric: "Finna matskvarða"
+  edit_rubric_7d4d139d: "Breyta matskvarða"
   edit_rubric_title_104d6fd2: "Breyta matskvarða: %{title}"
   edit_section_name_558cc89: "Breyta hluta „%{name}“"
   edit_status_612572db: "Breyta stöðu"
@@ -10700,6 +10716,7 @@ is:
   embedded_images_598ff8da: embedded_images
   embedded_release_notes_72d79b9b: "Innbyggð útgáfuyfirlýsing"
   embry_riddle_student_activity_tracking_8020dd95: "Embry Riddle rakning virkni nemanda"
+  emoji_737e5f6b: Emoji
   emoji_categories_a08744ae: Emoji-flokkar
   emoji_picker_5bb954f9: Emoji-veljari
   emojis_in_submission_comments_72720afc: "Emojis í athugasemdir við skil"
@@ -10713,6 +10730,7 @@ is:
   enable_anonymous_marking_of_assignments_only_relev_792a2a17: "Virkja nafnlausa einkunnagjöf verkefna.Á aðeins við ef nafnlausi stjórnunarfáninn er virkjaður."
   enable_byte_order_mark_and_semi_colon_field_separa_f4375c16: "Virkja byte_order_mark og semi_colon_field_separator eiginleika flögg á notandastigi til að hægt sé að kveikja eða slökkva á þeim fyrir útkomu útflutninga."
   enable_cbcd2eef: "Heimila "
+  enable_close_e8001638: "Virkja og loka"
   enable_content_security_policy_8bd0b492: "Virkja Canvas efnisöryggisstefnu"
   enable_course_as_a_blueprint_course_8515ffd5: "Heimila námskeið sem Blueprint námskeið"
   enable_course_as_a_course_template_5299afb6: "Virkja námskeið sem Sniðmát námskeiðs"
@@ -10842,6 +10860,7 @@ is:
   enrolled_as_enrollment_type_a784f82b: "innritaður sem: %{enrollment_type}"
   enrolled_as_enrollment_type_with_section_only_acce_110d7929: "innritaður sem: %{enrollment_type} með aðgangi að hluta eingöngu"
   enrolling_the_recipient_in_these_courses_c421fcb0: "Innritun viðtakanda á þessi námskeið"
+  enrolling_the_recipient_in_these_courses_will_gran_67cbc293: "Innritun viðtakanda á þessi námskeið mun veita þeim mismunandi heimildir frá veitanda innritananna"
   enrollment: 
     default_course_name: Námskeið
     default_email: "Ekkert netfang"
@@ -13535,6 +13554,7 @@ is:
   high_contrast_description: |-
       Háskerpa eykur litaskil notandaviðmótsins (texta, hnappa o.s.frv.), sem gerir þessi atriði
       greinilegri og auðveldara að sjá þau. Athugasemd: Stofnanavörumerking verður óvirk.
+  high_low_826694e3: "Hátt < Lágt"
   high_score_267b6641: "Hæsta einkunn"
   high_score_47924c1a: "Hátt: %{score}"
   highest_28ad71e6: Hæst
@@ -13554,6 +13574,7 @@ is:
   homework_submission_172e8354: Heimaverkefnisskil
   honduras_504_af7aa636: "Hondúras (+504)"
   hong_kong_852_98e3b3fe: "Hong Kong (+852)"
+  horizontal_f4a3385c: Lárétt
   host_8be927e0: Hýsitölva
   host_is_unreachable_or_not_pointing_to_catalog_fb3fc082: "Ekki næst samband við hýsitölvu eða bendir ekki á Catalog"
   host_virtual_lectures_in_real_time_150cef95: "Haltu sýndarfyrirlestra í rauntíma"
@@ -13686,6 +13707,7 @@ is:
   icelandic_9d6d35de: Íslenska
   icon_215a1dc6: Tákn
   icon_maker_icons_cc560f7e: Tákngerðartákn
+  icon_url_4d3f6ae3: "Tákn Url"
   icon_url_e3d56e89: "Tákn Url"
   icon_url_ecce6557: "Táknslóð:"
   icon_url_required_unless_present_in_additional_set_e453ad8f: "URL tákns (krafist nema hún sé til staðar í viðbótarstillingum)"
@@ -14507,6 +14529,7 @@ is:
   invalid_microsoft_team_sync_remote_attribute_valid_4d3015a7: "Ógildur Microsoft Team Sync fjareiginleiki. Gildir fjareiginleikar: %{VALID_SYNC_REMOTE_ATTRIBUTES}"
   invalid_microsoft_teams_sync_login_attribute_suffi_3c6eb0e6: "Ógildur Microsoft Teams Sync innskráningareiginleiki viðskeytis. Viðskeyti verður að vera minna en 255 stafir og má ekki hafa nein bil."
   invalid_microsoft_teams_sync_login_attribute_valid_9905edaf: "Ógildur Microsoft Teams Sync innskráningareiginleiki. Gildir innskráningareiginleikar: %{valid_attributes}"
+  invalid_module_id_f19ec4bf: "Ógilt auðkenni námsefnis."
   invalid_or_missing_login_attribute_config_in_accou_eb1d9a0: "Ógild eða vantar “innskráningareiginleika” stillingu í reikningi"
   invalid_or_missing_session_for_oauth_3ce4b605: "Lota ógild eða hana vantar fyrir oauth"
   invalid_pairing_code_dde8d40a: "Ógildur pörunarkóði."
@@ -14740,6 +14763,30 @@ is:
   key_api_key_68bf80ae: "Lykill: *%{api_key}*"
   key_f2a919d5: Lykill
   key_ff4089c5: "Lykill:"
+  key_missing_here_at_the_top: 
+    atom_no_author: "Enginn höfundur"
+    comment_from_files: 
+      one: "Sjá viðhengda skrá"
+      other: "Sjá viðhengdar skrár"
+    errors: 
+      cannot_save_att: "Þú hefur ekki heimild til að breyta læstum eiginleika %{att_name}"
+    feed_entry_title: "Verkefni: %{assignment}"
+    feed_entry_title_with_course: "Verkefni, %{course}: %{assignment}"
+    labels: 
+      due: Skilafrestur
+    student_annotation: "athugasemd nemanda"
+    submission_action_take_quiz: "Taka %{title}"
+    submission_action_turn_in_assignment: "Skila %{title}"
+    submission_types: 
+      a_content_page: efnissíða
+      a_discussion_post: umræðupóstur
+      a_file_upload: "upphleðsla skrár"
+      a_media_recording: "upptaka á miðli"
+      a_quiz: próf
+      a_text_entry_box: textareitur
+      a_website_url: "url vefsíðu"
+      external_tool: "ytra tæki"
+      on_paper: "á blaði"
   key_name_7311d22: "Heiti lykils:"
   key_name_bc712026: "Nafn lykils"
   key_settings_44df6a41: "Stillingar lykils"
@@ -14947,6 +14994,7 @@ is:
   let_students_see_the_correct_answers_dacc2faf: "Leyfa nemendum að sjá rétt svör"
   let_students_see_their_quiz_responses_incorrect_qu_f5c9cb70: "Leyfa nemendum að sjá prófsvörin (röng svör verða merkt í endurgjöf til nemanda)"
   let_the_site_administrator_select_up_to_2_lti_apps_df016781: "Fáðu kerfisstjórann til að velja allt að 2 LTI-forrit sem eftirlæti, sem síðan verða birt í RCE-tækjastikunni."
+  letter_12ff3510: Stafur
   letter_grade_29ff1938: Bókstafseinkunn
   letter_grade_f00fedc4: bókstafseinkunn
   letter_grade_report_d6772138: Bókstafseinkunn
@@ -15119,6 +15167,10 @@ is:
   list_collapsed_dde87718: "Listi dreginn saman"
   list_expanded_4857ff4c: "Listi víkkaður"
   list_expanded_efec2d0: "Listi víkkaður út."
+  list_external_tools_ac2aaf90: "Listi yfir ytri verkfæri"
+  list_feature_flags_6be9c646: "Listi yfir eiginleika flögg"
+  list_live_events_event_types_db3f39c4: "Listi yfir tegundir rauntímaviðburða"
+  list_live_events_subscriptions_55ba2893: "Listi yfir áskriftir rauntímaviðburða"
   list_of_pseudonyms_to_get_report_for_af38e1c6: "Listi af dulnefnum til að fá skýrslu fyrir"
   list_of_students_and_observers_f7f1a58a: "Listi af nemendum og áhorfendum"
   list_of_the_currently_attainable_trophies_959b2518: "Listi yfir fáanlega bikara"
@@ -15412,6 +15464,7 @@ is:
   los_gatos_saratoga_joint_union_high_school_distric_91f5b3c6: "Einkunnaskýrsla Los Gatos-Saratoga Joint Union High School District"
   low_eab1cadd: Lágt
   low_f1831924: "Lágt:"
+  low_high_a709235f: "Lágt < Hátt"
   low_score_4eeb95b2: "Lágt: %{score}"
   low_score_6d05905b: "Lægsta einkunn"
   lower_bound_ed528347: "Neðri mörk"
@@ -15460,6 +15513,7 @@ is:
   lti_launch_error_41eac9a: "LTI ræsivilla"
   lti_multiple_assignment_deep_linking_b7d641d7: "LTI margra verkefna djúptengingar"
   lti_platform_storage_9d11dc60: "LTI vettvangsgeymsla"
+  lti_registration_9e0f754d: "LTI skráning"
   lti_report_2b6193ab: "LTI skýrsla"
   lti_submissions_require_a_url_to_submit_85ca9988: "LTI skil krefjast URL til að skila"
   lti_tool_report_f13213b3: "LTI tólaskýrsla"
@@ -18790,8 +18844,10 @@ is:
   number_of_respondents_e1e7e8b: "Fjöldi svarenda"
   number_of_scores_to_ignore_for_each_student_fb94e818: "Fjöldi einkunna sem á að hunsa fyrir hvern nemanda"
   number_of_students_per_group_8abe7189: "Fjöldi nemenda í hverjum hóp"
+  number_of_times_calc_int_6d1f8687: "Fjöldi skipta (%{calc_int})"
   number_to_grade_661b05dd: "%{number} til að gefa einkunn"
   number_unsubmitted_145fefae: "%{number} óframlagt"
+  numeric_ad248ca9: "Töluleg spurning"
   numerical_answer_ec7120bf: "Tölulegt svar"
   nummastered_of_numgroup_mastered_b8113c9c: "%{numMastered} af %{numGroup} fullnumið"
   numpoints_points_b1f0666a: "%{numPoints} punktar"
@@ -20192,6 +20248,7 @@ is:
   position_select_c2dd3980: "Velja stöðu"
   possible_combination_count_db651ca4: "Fjöldi mögulegra samsetninga"
   possible_matches_for_address_select_the_correct_on_e206f972: "Mögulegar samsvaranir fyrir \"%{address}\".  Veldu þá réttu eða stofnaðu nýjan notanda."
+  possible_points_b1df0a5c: "Mögulegir punktar"
   possible_pts_b63dff4c: "%{possible} Punktar"
   possible_pts_f4681c49: "/ %{possible} punktar"
   possible_score_5e0a328e: "Mögulegt: %{score}"
@@ -22087,6 +22144,7 @@ is:
   rating_description_db6adf39: Matslýsing
   rating_max_score_eade1523: "Hámarkseinkunn mats"
   rating_min_score_3d35a762: "Lágmarkseinkunn mats"
+  rating_order_e57f63ed: Einkunnaröð
   rating_score_22cfc724: Matseinkunn
   rating_selected_85c31e4c: "Einkunn valin"
   rating_tier_index_threshold_3f02a6d7: "Þröskuldur %{index} einkunnaþreps"
@@ -22172,7 +22230,9 @@ is:
   read_7cabda44: lesið
   read_comments_3fcc7590: "Lesa athugasemdir"
   read_context_membership_8068f3dd: "Lesa samhengisaðild"
+  read_context_membership_data_cf406033: "Lesa gögn samhengisaðildar"
   read_dc99757a: Lesa
+  read_feature_flags_ec9a6434: "Lesa eiginleika flögg"
   read_less_ae7bd04f: "Lesa minna"
   read_less_reply_from_author_4a41ca22: "Lesa minna, svar frá %{author}"
   read_line_item_results_6472a120: "Lesa niðurstöður línuatriða"
@@ -22180,6 +22240,8 @@ is:
   read_more_f69fb6ec: "Lesa meira"
   read_more_reply_from_author_7cac484e: "Lesa meira, svar frá %{author}"
   read_only_3d26d8fe: Skrifvarið
+  read_progress_data_63bebb1d: "Lesa framvindugögn"
+  read_result_data_bce1356c: "Lesa niðurstöðugögn"
   read_state_change_failed_859eeaa1: "Breyting lesástands mistókst"
   read_state_change_operation_failed_86710e1: "Breyting lesástands aðgerðar mistókst"
   read_state_changed_16ff9607: "Lesástandi breytt!"
@@ -22268,6 +22330,7 @@ is:
   regenerating_themes_462e6cd9: "Endurgerir þemu..."
   region_47e29025: "Svæði:"
   region_939f2a6c: Svæði
+  register_app_a8aaabdf: Skráningarsmáforrit
   register_email_efc06d59: "Skrá netfang"
   register_slack_email_1f6d7e6d: "Skrá Slack netfang"
   register_tool_84de3186: Skráningartól
@@ -22455,6 +22518,7 @@ is:
         hour: klst.
         minute: mín.
   render_both_to_do_lists_for_teachers_with_student__6fc0fdda: "Lætur í té bæði minnislista fyrir kennara með innritun nema"
+  renderheadertitle_5015f4da: "%{renderHeaderTitle}"
   renders_both_to_do_lists_on_the_dashboard_sidebar__c7d38ae: "Lætur í té bæði minnislista á hliðarstiku mælaborðsins með innritun nema."
   reorders_some_menu_options_for_more_consistency_an_90efff07: "Endurröðun sumra valmyndavalkosta fyrir meiri samkvæmni og bætir tengli við SpeedGrader."
   repeat_every_e653d6d0: "Endurtaka hvern:"
@@ -22617,6 +22681,7 @@ is:
   restart_link_validation_b61286fc: "Endurræsa staðfestingu á tengli"
   restore_6d523f1d: Endurheimta
   restore_courses_182e162e: "Endurheimta námskeið"
+  restore_defaults_440a0814: "Enduheimta sjálfgilt"
   restored_course_association_course_c9e16045: "Endurheimtar námskeiðstengingar %{course}"
   restoring_122bdbbf: "Endurheimti: "
   restrict_instructors_from_changing_mastery_scales_5af13053: "Takmarka leiðbeinendur frá því að breyta leiknikvörðum"
@@ -22868,6 +22933,7 @@ is:
   rubric_assessment_5f0e8a83: "Mat matskvarða"
   rubric_association: 
     no_details: "Engar upplýsingar"
+  rubric_button_display_4e4a26fe: "Sýna matsviðmiðahnapp"
   rubric_created_64980593: "Matskvarði búið til"
   rubric_criterion_range_12499bf1: "Matskvarða viðmiðasvið"
   rubric_deleted_3d9efc18: "Matskvarði eytt"
@@ -22875,6 +22941,13 @@ is:
   rubric_fc39da76: Matskvarði
   rubric_name_e11b76de: "Nafn matskvarða"
   rubric_options_c92d7130: "Valkostir matskvarða"
+  rubric_rating_order_ead13c09: "Einkunnaröð matsviðmiðs"
+  rubric_read_state_change_failed_1a1e23da: "Breyting lesástands matsviðmiðs mistókst"
+  rubric_read_state_change_operation_failed_e39e6a3: "Breyting lesástands aðgerðar matsviðmiðs mistókst"
+  rubric_read_states_changed_4e4959a5: 
+    one: "Lesástands matsviðmiðs breyttist!"
+    other: "Lesástands matsviðmiðs breyttist!"
+  rubric_type_33e65ff1: "Gerð matsviðmiðs"
   rubric_updated_103e24dc: "Matskvarði uppfært"
   rubric_was_successfully_submitted_b0766474: "Skil matsviðmiðs tókust"
   rubrics: 
@@ -22968,6 +23041,7 @@ is:
   save_mastery_scale_2b4dc13a: "Vista tileinkunarkvarða"
   save_name_796fa6a2: "Vista „%{name}“"
   save_publish_36440725: "Vista og birta"
+  save_rubric_1e4f6a44: "Vista matsviðmið"
   save_settings_cafe79a5: "Vista stillingar"
   save_successful_b2f64da4: "Vistun tókst."
   save_theme_36c73e6a: "Vista þema"
@@ -23050,6 +23124,7 @@ is:
   score_to_ungraded_process_failed_e143fd1b: "Einkunn í ómetið ferli mistókst"
   score_to_ungraded_process_failed_reason_788f9030: "Einkunn í ómetið ferli mistókst: %{reason}"
   score_to_ungraded_process_finished_successfully_6689b418: "Einkunn í ómetið ferli lauk"
+  scored_187e6983: "Fékk einkunn"
   scored_less_than_2427896c: "Lægri einkunn en"
   scored_less_than_cutoff_on_assignment_5f5c4303: "Lægri einkunn en %{cutoff} á %{assignment}"
   scored_less_than_score_on_assignmenttitle_5a011033: "Lægri einkunn en %{score} á %{assignmentTitle}"
@@ -23469,6 +23544,7 @@ is:
   select_requirement_type_bf9a39d9: "Veldu gerð kröfu"
   select_role_aa5cfd69: "Veldu hlutverk"
   select_rubric_2aa2ffa2: "Veldu matskvarði"
+  select_rubric_display_type_15bf2af1: "Veldu skjágerð matsviðmiðs"
   select_sections_to_post_to_type_or_use_arrow_keys__902a41ed: "Veldu hluta til að birta á. Sláðu inn eða notaðu örvalyklana til að fara um. Leyfilegt að velja mörg atriði."
   select_specific_content_5382e7ea: "Veldu tiltekið efni"
   select_student_group_c0be9f3e: "Velja nemendahóp"
@@ -24414,6 +24490,7 @@ is:
   show_embedded_documentation_in_live_events_lti_too_cbe229f3: "Sýndu innfelld skjöl í Beinar útsendingar LTI verkfærinu"
   show_event_on_homeroom_sidebar_c618275d: "Sýna viðburð á hliðarvalmynd skólastofu"
   show_exceptions_270ea1c5: "Sýna undantekningar"
+  show_external_tools_b824f16b: "Sýna ytri verkfæri"
   show_final_grade_override_8cde5803: "Sýna hnekkingu lokaeinkunnar"
   show_final_grade_overrides_only_c3017aaa: "Sýna aðeins hnekkingar á lokaeinkunnum"
   show_groups_navigation_menu_1521d38d: "Sýna leiðarstýringarvalmynd hópa"
@@ -24422,6 +24499,7 @@ is:
   show_key_1fbf0c64: "Sýna lykil"
   show_less_d5bbf728: "sýna minna"
   show_links_to_unpublished_content_30c0450d: "Sýna tengla á óbirt efni"
+  show_live_events_subscriptions_68b69a03: "Sýna áskriftir rauntímaviðburða"
   show_lti_tools_from_federated_parent_accounts_47135c98: "Sýna LTI verkfæri frá sameinuðum foreldrareikningum"
   show_more_8d5f918b: "sýna meira"
   show_more_af9cbc16: "Sýna meira"
@@ -25521,6 +25599,7 @@ is:
   sync_to_name_successfully_disabled_8045ad95: "Samstilling við %{name} hefur verið afvirkjuð"
   sync_to_posttosisname_9837a8bf: "Samhæfa við %{postToSISName}:"
   sync_to_posttosisname_dffd5c9: "Samhæfa við %{postToSISName}"
+  sync_to_sis_friendly_name_a0e7d231: "Samhæfa við %{sis_friendly_name}"
   sync_to_sisname_f343e59: "Samhæfa við %{sisName}"
   sync_uris_50c59540: "Samhæfa vefslóðir"
   synced_97764882: Samhæft
@@ -26117,6 +26196,7 @@ is:
   the_url_a_sufficiently_priviledged_user_could_use__e6b02c56: "Vefslóðin sem notandi með nægilegar aðgangsheimildir gæti notað til að dyljast sem tilkynnandi á sömu síðu í því skyni að reyna að endurgera vandamálið"
   the_url_of_the_page_the_user_was_on_when_they_repo_11dfa92f: "Vefslóð síðunnar sem notandi var á þegar villan var tilkynnt"
   the_user_below_is_ready_to_be_assigned_temporary_e_fd6bb909: "Notandinn hér að neðan er tilbúinn til að fá úthlutað tímabundnar innritanir."
+  the_user_found_matches_the_provider_please_search__60e29949: "Notandinn sem fannst passar við veitandan. Leitaðu að nýjum notanda viðtakanda."
   the_user_found_matches_the_source_user_please_sear_a1d0004f: "Notandinn sem fannst passar við upprunanotandann. Vinsamlegast leitaðu að öðrum notanda."
   the_user_id_s_of_the_admin_s_making_submissions_5432b2ce: "Notenda_aukenni stjórnanda(enda-) sem skila"
   the_user_id_to_report_on_b1de2577: "Notendaauðkenni til að segja frá"
@@ -27636,6 +27716,7 @@ is:
   totals_be24703: Alls
   track_individual_student_and_class_progress_c13cf2d1: "Rekja framvindu nemanda og námshóps"
   track_student_performance_and_activity_a92a2a8b: "Vakta frammistöðu og virkni nemanda"
+  traditional_e5a0d358: Hefðbundið
   traditional_gradebook_d7ad59c6: "Hefðbundin einkunnabók…"
   traditional_gradebook_d90461dc: "Hefðbundin einkunnabók"
   transferred_student_enrollments_90dc27d3: "Innritanir fluttra nemenda"
@@ -27994,12 +28075,14 @@ is:
   unread_e9c1b19c: Ólesið
   unread_ee6db4aa: ólesið
   unread_post_47a1a06b: "Ólesinn póstur"
+  unread_rubric_assessment_2b2d5c47: "Ólesið mat matsviðmiðs"
   unreadcount_unread_9c86f4d1: "%{unreadCount} ólesið"
   unreadcount_unread_replies_509e167f: "%{unreadCount} ólesin svör"
   unregister_service_985238e9: "Afskrá þjónustu"
   unreserved_e86b7425: Ófrátekið
   unsafe_file_link_8a18eceb: "ótraustur skráarhlekkur"
   unsaved_change_eb23d452: "Óvistuð breyting"
+  unscored_d0bf39d6: "Ekki með einkunn"
   unselected_all_courses_99a9d35c: "Afvaldi öll námskeið"
   unselected_course_course_89995a83: "Afvalið námskeið %{course}"
   unselected_external_tool_tool_1bd68403: "Óvalið ytra verkfæri %{tool}"
@@ -28043,6 +28126,7 @@ is:
   update_details_6abfed16: "Uppfæra upplýsingar"
   update_discussions_to_use_react_instui_ef06b300: "Uppfæra Umræður til að nota React & InstUI"
   update_domain_account_lookup_9c89440d: "Uppfærðu leit á lénsreikningi"
+  update_external_tools_81fd014d: "Uppfæra ytri verkfæri"
   update_failed_2c87428c: "Uppfærsla mistókst"
   update_file_links_to_prefer_preview_not_download_94535382: "Uppfæra tengla á skrár til að nota frekar forskoðun en ekki niðurhal"
   update_grade_b47eb3ff: "Uppfæra einkunn"
@@ -28051,10 +28135,12 @@ is:
   update_important_info_bcc01d6a: "Uppfæra mikilvægar upplýsingar"
   update_inbox_page_to_use_react_instui_4d343fd: "Uppfæra innhólfssíðuna til að nota react/instui"
   update_link_b7cab181: "Uppfæra tengil"
+  update_live_events_subscriptions_e9c618b0: "Uppfæra áskriftir rauntímaviðburða"
   update_lti_region_912491e4: "Uppfæra LTI svæði"
   update_module_b984c2e5: "Uppfæra námsefni"
   update_name_6581781d: "Uppfæra %{name}"
   update_pages_c91d7ba: "Uppfæra síður"
+  update_public_jwk_9f25f520: "Uppfæra opinber JWK"
   update_rating_6d29c2ef: "Uppfæra mat"
   update_settings_9b422d0f: "Uppfæra stillingar"
   update_tool_7d48ef2a: "Uppfæra %{tool}"
@@ -28745,6 +28831,7 @@ is:
   verify_tls_certificate_9cfa26d1: "Staðfestu TLS vottorð"
   verify_tls_certificates_presented_by_ldap_authenti_946337a3: "Staðfestu TLS vottorð kynnt af LDAP auðkenningaraðilum."
   version_versionnumber_updatedat_9f5b7a5b: "Útgáfa %{versionNumber} %{updatedAt}"
+  vertical_17932955: Lóðrétt
   video_78335c71: myndband
   video_b9f27375: Myndband
   video_conferencing_guides_for_remote_classrooms_ffab4a1b: "Myndbandafundaleiðbeiningar fyrir fjarkennslustofur"
@@ -29466,6 +29553,7 @@ is:
   you_do_not_have_access_to_the_requested_discussion_90d8ec99: "Þú hefur ekki aðgang að umbeðinni umræðu."
   you_do_not_have_access_to_the_requested_quiz_d3659e4b: "Þú hefur ekki aðgang að umbeðnu prófi."
   you_do_not_have_access_to_the_requested_resource_316ce49a: "Þú hefur ekki aðgang að umbeðnu úrræði."
+  you_do_not_have_blueprint_course_management_permis_51ae6ef5: "Þú ert ekki með stjórnunaraðgangsheimildir fyrir Blueprint námskeið"
   you_do_not_have_permission_to_add_this_topic_to_th_fc8622a0: "Þú hefur ekki heimild til að bæta þessu efni á verkefnalista nemandans."
   you_do_not_have_permission_to_change_this_488c536: "Þú hefur ekki heimild til að breyta þessu."
   you_do_not_have_permission_to_delete_file_please_c_3b0abf50: "Þú hefur ekki heimild til að eyða %{file}. Hafðu samband við reikningsstjórnandann þinn."

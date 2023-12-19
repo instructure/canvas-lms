@@ -291,6 +291,7 @@ en-GB:
   a_student_just_turned_in_their_anonymous_assignmen_1a0e1c47: "A student just turned in their anonymous assignment (again), %{assignment_title}"
   a_student_just_turned_in_their_anonymous_assignmen_75cc5465: "A student just turned in their anonymous assignment (late), %{assignment_name}"
   a_student_just_turned_in_their_assignment_late_ass_e991e212: "A student just turned in their assignment (late), %{assignment_name}"
+  a_student_or_section_must_be_selected_79ff673d: "A student or section must be selected"
   a_studious_panda_658eba28: "A studious panda"
   a_suffix_cannot_be_longer_than_255_characters_plea_2f2fefd5: "A suffix cannot be longer than 255 characters. Please use a shorter suffix and try again."
   a_suffix_cannot_have_any_tabs_or_spaces_please_rem_47db763e: "A suffix cannot have any tabs or spaces. Please remove them and try again."
@@ -3581,6 +3582,7 @@ en-GB:
   an_error_occurred_while_updating_this_outcome_mess_5ada5958: "An error occurred while updating this outcome: %{message}"
   an_error_occurred_while_updating_this_outcome_mess_92be298e: "An error occurred while updating this outcome: %{message}."
   an_error_occurred_while_updating_view_options_c4807f37: "An error occurred while updating view options"
+  an_error_ocurred_5535dc08: "An error occurred."
   an_error_ocurred_while_deleting_the_appointment_gr_4948bbc5: "An error occurred while deleting the appointment group"
   an_error_ocurred_while_fetching_course_details_ple_9cab7735: "An error occurred while fetching course details. Please try again."
   an_error_ocurred_while_loading_announcements_32af2ce4: "An error occurred while loading announcements"
@@ -5627,6 +5629,7 @@ en-GB:
     submit_assignment: "Submit assignment"
   button_73be8181: button.
   button_a1577211: button
+  button_display_84bad037: "Button Display"
   buttons: 
     add_item: "Add item"
     apply: Apply
@@ -5691,6 +5694,8 @@ en-GB:
     close: close
   cache_cleared_successfully_9ab84d5a: "Cache cleared successfully"
   cache_site_admin_access_tokens_c2cdf974: "Cache site admin access tokens"
+  calc_int_other_int_decaying_average_21de419d: "%{calc_int}/%{other_int} Decaying Average"
+  calc_int_other_int_weighted_average_af5121da: "%{calc_int}/%{other_int} Weighted Average"
   calculated_by_4ac40468: "Calculated by: "
   calculated_by_baa3c8f3: "Calculated by:"
   calculation_d82f6181: Calculation
@@ -8888,6 +8893,7 @@ en-GB:
       invitation: "Invitation failed.  Please try again."
       publish_grades: "Something went wrong when trying to publish grades to the student information system. Please try again later."
       re_send_all: "Send failed. Please try again"
+      restrict_quantitative_data: "If \"Restrict view of quantitative data\" is enabled, then the course must have a default grading scheme enabled."
       section: "Add section failed. Please try again"
     flash: 
       invitation: "Invitation sent."
@@ -9582,6 +9588,8 @@ en-GB:
   create_account_263ec6: "Create account"
   create_an_ba36d171: "Create an"
   create_and_administer_online_quizzes_and_surveys_b_7d2fa85f: "Create and administer online quizzes and surveys, both graded and ungraded."
+  create_and_edit_line_items_cacad0fa: "Create and Edit Line Items"
+  create_and_edit_scores_4177662c: "Create and Edit Scores"
   create_announcements_above_1c36202b: "Create announcements above"
   create_anonymous_discussion_topics_d573e88e: "Create anonymous discussion topics"
   create_as_many_discussion_topics_as_needed_as_assi_45ec1df: |-
@@ -9616,6 +9624,7 @@ en-GB:
   create_discussion_topics_8330d52b: "Create discussion topics"
   create_edit_line_item_scores_116482c7: "Create/Edit Line Item Scores"
   create_educational_resources_8219326e: "Create educational resources"
+  create_external_tools_2108e0b3: "Create External Tools"
   create_failed_15d07ad4: "Create failed"
   create_file_71aa1922: "[ Create File ]"
   create_file_s_188549e6: "[ Create File(s) ]"
@@ -9629,6 +9638,7 @@ en-GB:
     there_was_an_error: "There was an error saving \"%{title}\", please try again."
   create_labels_to_organize_and_filter_conversations_9f5bb2c1: "Create labels to organise and filter conversations."
   create_live_event_subscriptions_on_toolproxy_7c8378b1: "Create live event subscriptions on ToolProxy"
+  create_live_events_subscriptions_9c7f53cc: "Create Live Events Subscriptions"
   create_lookup_7ceb6d90: "Create Lookup"
   create_manage_filter_presets_18404c3a: "Create & Manage Filter Pre-sets"
   create_module_item: 
@@ -9645,6 +9655,7 @@ en-GB:
     quiz_name: "Quiz name"
     ungrded_survey: "Ungraded survey"
     url: URL
+  create_new_assignment_d77dfc4: "Create New Assignment"
   create_new_attempt_19c96c03: "Create New Attempt"
   create_new_course_e3ef9cd0: "Create new course"
   create_new_discussions_6ab69da2: "Create new discussions"
@@ -9703,6 +9714,7 @@ en-GB:
   creative_commons_licenses_7d557d9a: "Creative Commons Licenses"
   creatorname_performed_actions_while_anonymous_was__c2124eca: "%{creatorName} performed actions while anonymous was off"
   criteria_9fac648: Criteria
+  criteria_builder_b214069e: "Criteria Builder"
   criterion_5f0b62f8: Criterion
   criterion_created_42669293: "Criterion created"
   criterion_long_description_e9a97247: "Criterion long description"
@@ -10186,6 +10198,7 @@ en-GB:
   delete_domain_5ba75b7c: "Delete domain"
   delete_domain_domain_c5b68f5: "Delete domain %{domain}"
   delete_entry_title_5e59727b: "Delete entry %{title}"
+  delete_external_tools_9c862186: "Delete External Tools"
   delete_failed_6285e600: "Delete failed"
   delete_feedname_1ac9a4a4: "Delete %{feedName}"
   delete_filter_83ca1a6a: "Delete filter"
@@ -10200,6 +10213,7 @@ en-GB:
   delete_in_progress_2d3f0e0d: "Delete in progress"
   delete_key_developername_be80e695: "Delete key %{developerName}"
   delete_key_name_c2de8c0c: "Delete key %{name}"
+  delete_live_events_subscriptions_b15bc9a6: "Delete Live Events Subscriptions"
   delete_lti_1d1cef27: "Delete LTI"
   delete_mastery_level_position_5cf0f8f7: "Delete mastery level %{position}"
   delete_my_account_41060aad: "Delete My Account"
@@ -11218,6 +11232,7 @@ en-GB:
   dutch_6d05cee5: Dutch
   dynamic_concurrency_231dbdc5: "Dynamic concurrency"
   dynamic_lti_1_1_environment_specific_override_urls_395db495: "Dynamic LTI 1.1 Environment-specific override URLs"
+  dynamic_registration_url_5670504d: "Dynamic Registration URL"
   e_c2991d1b: e
   e_g_doe_jon_fe1d9298: "e.g. Doe, Jon"
   e_g_http_university_edu_helpdesk_acab04d6: "e.g. http://university.edu/helpdesk"
@@ -11337,6 +11352,7 @@ en-GB:
       criterion_long_description: "Criterion long description"
       edit_rubric_rating: "Edit Rating"
       find_existing_rubric: "Find existing rubric"
+  edit_rubric_7d4d139d: "Edit Rubric"
   edit_rubric_title_104d6fd2: "Edit rubric: %{title}"
   edit_section_name_558cc89: "Edit Section \"%{name}\""
   edit_status_612572db: "Edit status"
@@ -11467,6 +11483,7 @@ en-GB:
   embedded_release_notes_72d79b9b: "Embedded Release Notes"
   ember_modules_description: "Modules rewritten in Ember. Uses the native drag and drop API to allow dragging from external locations."
   embry_riddle_student_activity_tracking_8020dd95: "Embry Riddle Student Activity Tracking"
+  emoji_737e5f6b: Emoji
   emoji_categories_a08744ae: "Emoji categories"
   emoji_picker_5bb954f9: "Emoji picker"
   emojis_in_submission_comments_72720afc: "Emojis in Submission Comments"
@@ -11480,6 +11497,7 @@ en-GB:
   enable_anonymous_marking_of_assignments_only_relev_792a2a17: "Enable anonymous marking of assignments. Only relevant if the Anonymous Moderated Marking flag is enabled."
   enable_byte_order_mark_and_semi_colon_field_separa_f4375c16: "Enable byte_order_mark and semi_colon_field_separator user-level feature flags to be toggled on or off for outcomes exports."
   enable_cbcd2eef: "Enable "
+  enable_close_e8001638: "Enable & Close"
   enable_content_security_policy_8bd0b492: "Enable Content Security Policy"
   enable_course_as_a_blueprint_course_8515ffd5: "Enable course as a blueprint course"
   enable_course_as_a_course_template_5299afb6: "Enable course as a Course Template"
@@ -11616,6 +11634,7 @@ en-GB:
   enrolled_as_enrollment_type_a784f82b: "enrolled as: %{enrollment_type}"
   enrolled_as_enrollment_type_with_section_only_acce_110d7929: "enrolled as: %{enrollment_type} with section-only access"
   enrolling_the_recipient_in_these_courses_c421fcb0: "Enrolling the recipient in these courses"
+  enrolling_the_recipient_in_these_courses_will_gran_67cbc293: "Enrolling the recipient in these courses will grant them different permissions from the provider of the enrolments"
   enrollment: 
     default_course_name: Course
     default_email: "No email"
@@ -14962,6 +14981,7 @@ en-GB:
   high_contrast_description: |-
       High Contrast enhances the colour contrast of the UI (text, buttons, etc.), making those items more
       distinct and easier to identify. Note: Institution branding will be disabled.
+  high_low_826694e3: "High < Low"
   high_score_267b6641: "High score"
   high_score_47924c1a: "High: %{score}"
   highest_28ad71e6: Highest
@@ -14983,6 +15003,7 @@ en-GB:
   honduras_504_af7aa636: "Honduras (+504)"
   hong_kong_37f0321: "Hong Kong"
   hong_kong_852_98e3b3fe: "Hong Kong (+852)"
+  horizontal_f4a3385c: Horizontal
   host_8be927e0: Host
   host_is_unreachable_or_not_pointing_to_catalog_fb3fc082: "Host is unreachable or not pointing to Catalogue"
   host_virtual_lectures_in_real_time_150cef95: "Host virtual lectures in real time"
@@ -15120,6 +15141,7 @@ en-GB:
   icelandic_9d6d35de: Icelandic
   icon_215a1dc6: Icon
   icon_maker_icons_cc560f7e: "Icon Maker Icons"
+  icon_url_4d3f6ae3: "Icon URL"
   icon_url_e3d56e89: "Icon URL"
   icon_url_ecce6557: "Icon URL:"
   icon_url_required_unless_present_in_additional_set_e453ad8f: "Icon URL (required unless present in Additional Settings)"
@@ -15978,6 +16000,7 @@ en-GB:
   invalid_microsoft_team_sync_remote_attribute_valid_4d3015a7: "Invalid Microsoft Team Sync remote attribute. Valid remote attributes: %{VALID_SYNC_REMOTE_ATTRIBUTES}"
   invalid_microsoft_teams_sync_login_attribute_suffi_3c6eb0e6: "Invalid Microsoft Teams Sync login attribute suffix. A suffix must be less than 255 characters and cannot have any whitespace."
   invalid_microsoft_teams_sync_login_attribute_valid_9905edaf: "Invalid Microsoft Teams Sync login attribute. Valid login attributes: %{valid_attributes}"
+  invalid_module_id_f19ec4bf: "Invalid module id."
   invalid_or_missing_login_attribute_config_in_accou_eb1d9a0: "Invalid or missing \"login attribute\" config in account"
   invalid_or_missing_session_for_oauth_3ce4b605: "Invalid or missing session for oauth"
   invalid_pairing_code_dde8d40a: "Invalid pairing code."
@@ -16218,6 +16241,30 @@ en-GB:
   key_api_key_68bf80ae: "Key: *%{api_key}*"
   key_f2a919d5: Key
   key_ff4089c5: "Key:"
+  key_missing_here_at_the_top: 
+    atom_no_author: "No Author"
+    comment_from_files: 
+      one: "See attached file"
+      other: "See attached files"
+    errors: 
+      cannot_save_att: "You don't have permission to edit the locked attribute %{att_name}"
+    feed_entry_title: "Assignment: %{assignment}"
+    feed_entry_title_with_course: "Assignment, %{course}: %{assignment}"
+    labels: 
+      due: Due
+    student_annotation: "a student annotation"
+    submission_action_take_quiz: "Take %{title}"
+    submission_action_turn_in_assignment: "Turn in %{title}"
+    submission_types: 
+      a_content_page: "a content page"
+      a_discussion_post: "a discussion post"
+      a_file_upload: "a file upload"
+      a_media_recording: "a media recording"
+      a_quiz: "a quiz"
+      a_text_entry_box: "a text entry box"
+      a_website_url: "a website url"
+      external_tool: "an external tool"
+      on_paper: "on paper"
   key_name_7311d22: "Key name:"
   key_name_bc712026: "Key Name"
   key_settings_44df6a41: "Key settings"
@@ -16432,6 +16479,7 @@ en-GB:
   let_students_see_their_quiz_responses_fbc07d14: "Let students see their quiz responses"
   let_students_see_their_quiz_responses_incorrect_qu_f5c9cb70: "Let students see their quiz responses (incorrect questions will be marked in student feedback)"
   let_the_site_administrator_select_up_to_2_lti_apps_df016781: "Let the site administrator select up to 2 LTI apps as favourites, which will then be displayed in the RCE's toolbar"
+  letter_12ff3510: Letter
   letter_grade_29ff1938: "Letter grade"
   letter_grade_f00fedc4: "letter mark"
   letter_grade_report_d6772138: "Letter Grade Report"
@@ -16611,6 +16659,10 @@ en-GB:
   list_collapsed_dde87718: "List collapsed"
   list_expanded_4857ff4c: "List Expanded"
   list_expanded_efec2d0: "List expanded."
+  list_external_tools_ac2aaf90: "List External Tools"
+  list_feature_flags_6be9c646: "List Feature Flags"
+  list_live_events_event_types_db3f39c4: "List Live Events Event Types"
+  list_live_events_subscriptions_55ba2893: "List Live Events Subscriptions"
   list_of_pseudonyms_to_get_report_for_af38e1c6: "List of Pseudonyms to get report for"
   list_of_students_and_observers_f7f1a58a: "List of students and observers"
   list_of_the_currently_attainable_trophies_959b2518: "List of the currently attainable trophies"
@@ -16936,6 +16988,7 @@ en-GB:
   los_gatos_saratoga_joint_union_high_school_distric_91f5b3c6: "Los Gatos-Saratoga Joint Union High School District Grade Report"
   low_eab1cadd: Low
   low_f1831924: "Low:"
+  low_high_a709235f: "Low < High"
   low_score_4eeb95b2: "Low: %{score}"
   low_score_6d05905b: "Low score"
   lower_bound_ed528347: "Lower bound"
@@ -16984,6 +17037,7 @@ en-GB:
   lti_launch_error_41eac9a: "LTI Launch Error"
   lti_multiple_assignment_deep_linking_b7d641d7: "LTI Multiple Assignment Deep Linking"
   lti_platform_storage_9d11dc60: "LTI Platform Storage"
+  lti_registration_9e0f754d: "LTI Registration"
   lti_report_2b6193ab: "LTI Report"
   lti_submissions_require_a_url_to_submit_85ca9988: "LTI submissions require a URL to submit"
   lti_tool_report_f13213b3: "LTI Tool Report"
@@ -20662,8 +20716,10 @@ en-GB:
   number_of_respondents_e1e7e8b: "Number of Respondents"
   number_of_scores_to_ignore_for_each_student_fb94e818: "Number of scores to ignore for each student"
   number_of_students_per_group_8abe7189: "Number of students per group"
+  number_of_times_calc_int_6d1f8687: "Number of Times (%{calc_int})"
   number_to_grade_661b05dd: "%{number} to grade"
   number_unsubmitted_145fefae: "%{number} unsubmitted"
+  numeric_ad248ca9: Numeric
   numerical_answer_ec7120bf: "Numerical answer"
   nummastered_of_numgroup_mastered_b8113c9c: "%{numMastered} of %{numGroup} mastered"
   numpoints_points_b1f0666a: "%{numPoints} points"
@@ -22128,6 +22184,7 @@ en-GB:
   position_select_c2dd3980: "Position select"
   possible_combination_count_db651ca4: "Possible combination count"
   possible_matches_for_address_select_the_correct_on_e206f972: "Possible matches for \"%{address}\". Select the correct one below or create a new user."
+  possible_points_b1df0a5c: "Possible Points"
   possible_pts_b63dff4c: "%{possible} pts"
   possible_pts_f4681c49: "/ %{possible} pts"
   possible_score_5e0a328e: "Possible: %{score}"
@@ -24319,6 +24376,7 @@ en-GB:
   rating_description_db6adf39: "Rating Description"
   rating_max_score_eade1523: "Rating max score"
   rating_min_score_3d35a762: "Rating min score"
+  rating_order_e57f63ed: "Rating Order"
   rating_score_22cfc724: "Rating Score"
   rating_selected_85c31e4c: "Rating selected"
   rating_tier_index_threshold_3f02a6d7: "rating tier %{index} threshold"
@@ -24419,7 +24477,9 @@ en-GB:
   read_7cabda44: read
   read_comments_3fcc7590: "Read comments"
   read_context_membership_8068f3dd: "Read Context Membership"
+  read_context_membership_data_cf406033: "Read Context Membership Data"
   read_dc99757a: Read
+  read_feature_flags_ec9a6434: "Read Feature Flags"
   read_less_ae7bd04f: "Read Less"
   read_less_reply_from_author_4a41ca22: "Read Less, Reply from %{author}"
   read_line_item_results_6472a120: "Read Line Item Results"
@@ -24427,6 +24487,8 @@ en-GB:
   read_more_f69fb6ec: "Read more"
   read_more_reply_from_author_7cac484e: "Read More, Reply from %{author}"
   read_only_3d26d8fe: "Read only"
+  read_progress_data_63bebb1d: "Read Progress Data"
+  read_result_data_bce1356c: "Read Result Data"
   read_state_change_failed_859eeaa1: "Read state change failed"
   read_state_change_operation_failed_86710e1: "Read state change operation failed"
   read_state_changed_16ff9607: "Read state Changed!"
@@ -24515,6 +24577,7 @@ en-GB:
   regenerating_themes_462e6cd9: "Regenerating themes..."
   region_47e29025: "Region:"
   region_939f2a6c: Region
+  register_app_a8aaabdf: "Register App"
   register_email_efc06d59: "Register email"
   register_slack_email_1f6d7e6d: "Register Slack Email"
   register_tool_84de3186: "Register Tool"
@@ -24709,6 +24772,7 @@ en-GB:
         hour: hr
         minute: min
   render_both_to_do_lists_for_teachers_with_student__6fc0fdda: "Render both To Do lists for teachers with student enrolments"
+  renderheadertitle_5015f4da: "%{renderHeaderTitle}"
   renders_both_to_do_lists_on_the_dashboard_sidebar__c7d38ae: "Renders both To Do lists on the dashboard sidebar for teachers with student enrolments."
   reorders_some_menu_options_for_more_consistency_an_90efff07: "Reorders some menu options for more consistency and adds link to SpeedGrader."
   repeat_every_e653d6d0: "Repeat every:"
@@ -24871,6 +24935,7 @@ en-GB:
   restart_link_validation_b61286fc: "Restart link validation"
   restore_6d523f1d: Restore
   restore_courses_182e162e: "Restore courses"
+  restore_defaults_440a0814: "Restore Defaults"
   restored_course_association_course_c9e16045: "Restored course association %{course}"
   restoring_122bdbbf: "Restoring: "
   restrict_access_84ba6bb8: "Restrict access"
@@ -25143,6 +25208,7 @@ en-GB:
   rubric_assessment_5f0e8a83: "Rubric Assessment"
   rubric_association: 
     no_details: "No details"
+  rubric_button_display_4e4a26fe: "Rubric Button Display"
   rubric_created_64980593: "Rubric created"
   rubric_criterion_range_12499bf1: "Rubric criterion range"
   rubric_deleted_3d9efc18: "Rubric deleted"
@@ -25150,6 +25216,13 @@ en-GB:
   rubric_fc39da76: Rubric
   rubric_name_e11b76de: "Rubric Name"
   rubric_options_c92d7130: "Rubric Options"
+  rubric_rating_order_ead13c09: "Rubric Rating Order"
+  rubric_read_state_change_failed_1a1e23da: "Rubric read state change failed"
+  rubric_read_state_change_operation_failed_e39e6a3: "Rubric read state change operation failed"
+  rubric_read_states_changed_4e4959a5: 
+    one: "Rubric read state Changed!"
+    other: "Rubric read states Changed!"
+  rubric_type_33e65ff1: "Rubric Type"
   rubric_updated_103e24dc: "Rubric updated"
   rubric_was_successfully_submitted_b0766474: "Rubric was successfully submitted"
   rubrics: 
@@ -25247,6 +25320,7 @@ en-GB:
   save_mastery_scale_2b4dc13a: "Save Mastery Scale"
   save_name_796fa6a2: "Save \"%{name}\""
   save_publish_36440725: "Save & publish"
+  save_rubric_1e4f6a44: "Save Rubric"
   save_settings_cafe79a5: "Save settings"
   save_successful_b2f64da4: "Save successful."
   save_theme_36c73e6a: "Save Theme"
@@ -25333,6 +25407,7 @@ en-GB:
   score_to_ungraded_process_failed_e143fd1b: "Score to ungraded process failed"
   score_to_ungraded_process_failed_reason_788f9030: "Score to ungraded process failed: %{reason}"
   score_to_ungraded_process_finished_successfully_6689b418: "Score to ungraded process finished successfully"
+  scored_187e6983: Scored
   scored_less_than_2427896c: "Scored less than"
   scored_less_than_cutoff_on_assignment_5f5c4303: "Scored less than %{cutoff} on %{assignment}"
   scored_less_than_score_on_assignmenttitle_5a011033: "Scored less than %{score} on %{assignmentTitle}"
@@ -25771,6 +25846,7 @@ en-GB:
   select_requirement_type_bf9a39d9: "Select Requirement Type"
   select_role_aa5cfd69: "Select role"
   select_rubric_2aa2ffa2: "Select rubric"
+  select_rubric_display_type_15bf2af1: "Select Rubric Display Type"
   select_sections_to_post_to_type_or_use_arrow_keys__902a41ed: "Select sections to post to. Type or use arrow keys to navigate. Multiple selections are allowed."
   select_specific_content_5382e7ea: "Select specific content"
   select_student_group_c0be9f3e: "Select Student Group"
@@ -26856,6 +26932,7 @@ en-GB:
   show_embedded_documentation_in_live_events_lti_too_cbe229f3: "Show embedded documentation in Live Events LTI Tool"
   show_event_on_homeroom_sidebar_c618275d: "Show event on homeroom sidebar"
   show_exceptions_270ea1c5: "Show exceptions"
+  show_external_tools_b824f16b: "Show External Tools"
   show_final_grade_a95e14dc: "Show final grade"
   show_final_grade_override_8cde5803: "Show Final Grade Override"
   show_final_grade_overrides_only_c3017aaa: "Show Final Grade Overrides Only"
@@ -26865,6 +26942,7 @@ en-GB:
   show_key_1fbf0c64: "Show key"
   show_less_d5bbf728: "show less"
   show_links_to_unpublished_content_30c0450d: "Show links to unpublished content"
+  show_live_events_subscriptions_68b69a03: "Show Live Events Subscriptions"
   show_lti_2_configuration_ui_94ce35a9: "Show LTI 2 Configuration UI"
   show_lti_tools_from_federated_parent_accounts_47135c98: "Show LTI tools from federated parent accounts"
   show_me_76823679: "Show me"
@@ -28045,6 +28123,7 @@ en-GB:
   sync_to_name_successfully_disabled_8045ad95: "Sync to %{name} successfully disabled"
   sync_to_posttosisname_9837a8bf: "Sync to %{postToSISName}:"
   sync_to_posttosisname_dffd5c9: "Sync to %{postToSISName}"
+  sync_to_sis_friendly_name_a0e7d231: "Sync to %{sis_friendly_name}"
   sync_to_sisname_f343e59: "Sync to %{sisName}"
   sync_uris_50c59540: "Sync URIs"
   synced_97764882: Synced
@@ -28660,6 +28739,7 @@ en-GB:
   the_url_a_sufficiently_priviledged_user_could_use__e6b02c56: "URL a sufficiently priviledged user could use to masquerade as reporting user on the same page to try and reproduce stated problem"
   the_url_of_the_page_the_user_was_on_when_they_repo_11dfa92f: "URL of the page user was on when s/he reported the error"
   the_user_below_is_ready_to_be_assigned_temporary_e_fd6bb909: "The user below is ready to be assigned temporary enrolments."
+  the_user_found_matches_the_provider_please_search__60e29949: "The user found matches the provider. Please search for a new recipient user."
   the_user_found_matches_the_source_user_please_sear_a1d0004f: "The user found matches the source user. Please search for a different user."
   the_user_id_s_of_the_admin_s_making_submissions_5432b2ce: "The user_id(s) of the admin(s) making submissions"
   the_user_id_to_report_on_b1de2577: "The user id to report on"
@@ -30199,6 +30279,7 @@ en-GB:
       got_it: "Ok, got it"
   track_individual_student_and_class_progress_c13cf2d1: "Track individual student and class progress"
   track_student_performance_and_activity_a92a2a8b: "Track student performance and activity"
+  traditional_e5a0d358: Traditional
   traditional_gradebook_d7ad59c6: "Traditional Gradebook…"
   traditional_gradebook_d90461dc: "Traditional Gradebook"
   transferred_student_enrollments_90dc27d3: "Transferred Student Enrolments"
@@ -30566,12 +30647,14 @@ en-GB:
   unread_e9c1b19c: Unread
   unread_ee6db4aa: unread
   unread_post_47a1a06b: "Unread post"
+  unread_rubric_assessment_2b2d5c47: "Unread rubric assessment"
   unreadcount_unread_9c86f4d1: "%{unreadCount} unread"
   unreadcount_unread_replies_509e167f: "%{unreadCount} unread replies"
   unregister_service_985238e9: "Unregister service"
   unreserved_e86b7425: Unreserved
   unsafe_file_link_8a18eceb: "unsafe file link"
   unsaved_change_eb23d452: "Unsaved change"
+  unscored_d0bf39d6: Unscored
   unselected_all_courses_99a9d35c: "Unselected all courses"
   unselected_course_course_89995a83: "Unselected course %{course}"
   unselected_external_tool_tool_1bd68403: "Unselected external tool %{tool}"
@@ -30619,6 +30702,7 @@ en-GB:
   update_details_6abfed16: "Update details"
   update_discussions_to_use_react_instui_ef06b300: "Update Discussions to use React & InstUI"
   update_domain_account_lookup_9c89440d: "Update Domain Account Lookup"
+  update_external_tools_81fd014d: "Update External Tools"
   update_failed_2c87428c: "Update failed"
   update_file_links_to_prefer_preview_not_download_94535382: "Update file links to prefer preview, not download"
   update_grade_b47eb3ff: "Update Grade"
@@ -30627,10 +30711,12 @@ en-GB:
   update_important_info_bcc01d6a: "Update Important Info"
   update_inbox_page_to_use_react_instui_4d343fd: "Update Inbox page to use react/instui"
   update_link_b7cab181: "Update link"
+  update_live_events_subscriptions_e9c618b0: "Update Live Events Subscriptions"
   update_lti_region_912491e4: "Update LTI Region"
   update_module_b984c2e5: "Update Module"
   update_name_6581781d: "Update %{name}"
   update_pages_c91d7ba: "Update pages"
+  update_public_jwk_9f25f520: "Update Public JWK"
   update_rating_6d29c2ef: "Update Rating"
   update_settings_9b422d0f: "Update Settings"
   update_tool_7d48ef2a: "Update %{tool}"
@@ -31384,6 +31470,7 @@ en-GB:
   verify_tls_certificate_9cfa26d1: "Verify TLS Certificate"
   verify_tls_certificates_presented_by_ldap_authenti_946337a3: "Verify TLS certificates presented by LDAP authentication providers."
   version_versionnumber_updatedat_9f5b7a5b: "Version %{versionNumber} %{updatedAt}"
+  vertical_17932955: Vertical
   video_78335c71: video
   video_b9f27375: Video
   video_conferencing_guides_for_remote_classrooms_ffab4a1b: "Video Conferencing Guides for Remote Classrooms"
@@ -32132,6 +32219,7 @@ en-GB:
   you_do_not_have_access_to_the_requested_discussion_90d8ec99: "You do not have access to the requested discussion."
   you_do_not_have_access_to_the_requested_quiz_d3659e4b: "You do not have access to the requested quiz."
   you_do_not_have_access_to_the_requested_resource_316ce49a: "You do not have access to the requested resource."
+  you_do_not_have_blueprint_course_management_permis_51ae6ef5: "You do not have Blueprint Course management permissions"
   you_do_not_have_permission_to_add_this_topic_to_th_fc8622a0: "You do not have permission to add this topic to the student to-do list."
   you_do_not_have_permission_to_change_this_488c536: "You do not have permission to change this"
   you_do_not_have_permission_to_delete_file_please_c_3b0abf50: "You do not have permission to delete %{file}. Please contact your account administrator."
