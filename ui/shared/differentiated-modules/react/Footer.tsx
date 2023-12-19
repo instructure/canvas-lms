@@ -47,22 +47,34 @@ export default function Footer({
     }
   }, [onUpdate, updateInteraction])
 
+  const updateButton = () => {
+    if (updateInteraction === 'inerror') {
+      return (
+        <Tooltip
+          renderTip={I18n.t('Please fix errors before continuing')}
+          on={['click', 'focus', 'hover']}
+        >
+          <Button color="primary" onClick={handleUpdate}>
+            {saveButtonLabel}
+          </Button>
+        </Tooltip>
+      )
+    } else {
+      return (
+        <Button color="primary" onClick={handleUpdate}>
+          {saveButtonLabel}
+        </Button>
+      )
+    }
+  }
+
   return (
     <View as="div" padding="small" background="secondary" borderWidth="small none none none">
       <Flex as="div" justifyItems="end">
         <FlexItem>
           <Button onClick={onDismiss}>{I18n.t('Cancel')}</Button>
         </FlexItem>
-        <FlexItem margin="0 0 0 small">
-          <Tooltip
-            renderTip={I18n.t('Please fix errors before continuing')}
-            on={updateInteraction === 'inerror' ? ['click', 'hover'] : undefined}
-          >
-            <Button color="primary" onClick={handleUpdate}>
-              {saveButtonLabel}
-            </Button>
-          </Tooltip>
-        </FlexItem>
+        <FlexItem margin="0 0 0 small">{updateButton()}</FlexItem>
       </Flex>
     </View>
   )

@@ -65,4 +65,18 @@ describe('Footer', () => {
     savebtn.focus()
     expect(getByText('Please fix errors before continuing')).toBeInTheDocument()
   })
+
+  it('does not display the error tooltip when not in-error', () => {
+    const {getByRole, queryByText} = renderComponent()
+    const savebtn = getByRole('button', {name: /update module/i})
+    savebtn.focus()
+    expect(queryByText('Please fix errors before continuing')).not.toBeInTheDocument()
+  })
+
+  it('displays the error tooltip when in-error', () => {
+    const {getByRole, queryByText} = renderComponent({updateInteraction: 'inerror'})
+    const savebtn = getByRole('button', {name: /update module/i})
+    savebtn.focus()
+    expect(queryByText('Please fix errors before continuing')).toBeInTheDocument()
+  })
 })
