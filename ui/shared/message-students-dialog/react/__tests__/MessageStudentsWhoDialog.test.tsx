@@ -645,6 +645,67 @@ describe.skip('MessageStudentsWhoDialog', () => {
       expect(studentCells[1]).toHaveTextContent('Dana Smith')
     })
 
+    it('"Total Grade higher than" displays students who have a total grade higher than grade inputed', async () => {
+      const mocks = await makeMocks()
+      students[0].currentScore = 80
+      students[1].currentScore = 50
+      students[2].currentScore = 75
+      const {getAllByRole, getByRole, findByLabelText, getByLabelText, getByText, getByTestId} =
+        render(
+          <MockedProvider mocks={mocks} cache={createCache()}>
+            <MessageStudentsWhoDialog
+              {...makeProps({assignment: null, pointsBasedGradingScheme: false})}
+            />
+          </MockedProvider>
+        )
+
+      const button = await findByLabelText(/For students who/)
+      fireEvent.click(button)
+      fireEvent.click(getByText(/Total Grade higher than/))
+      fireEvent.change(getByLabelText('Enter score cutoff'), {target: {value: '70'}})
+
+      fireEvent.click(getByTestId('show_all_recipients'))
+      expect(getByRole('table')).toBeInTheDocument()
+
+      const tableRows = getAllByRole('row') as HTMLTableRowElement[]
+      const studentCells = tableRows.map(row => row.cells[0])
+      // first cell with be the header
+      expect(studentCells).toHaveLength(3)
+      expect(studentCells[0]).toHaveTextContent('Students')
+      expect(studentCells[1]).toHaveTextContent('Betty Ford')
+      expect(studentCells[2]).toHaveTextContent('Charlie Xi')
+    })
+
+    it('"Total Grade lower than" displays students who have a total grade higher than grade inputed', async () => {
+      const mocks = await makeMocks()
+      students[0].currentScore = 80
+      students[1].currentScore = 50
+      students[2].currentScore = 75
+      const {getAllByRole, getByRole, findByLabelText, getByLabelText, getByText, getByTestId} =
+        render(
+          <MockedProvider mocks={mocks} cache={createCache()}>
+            <MessageStudentsWhoDialog
+              {...makeProps({assignment: null, pointsBasedGradingScheme: false})}
+            />
+          </MockedProvider>
+        )
+
+      const button = await findByLabelText(/For students who/)
+      fireEvent.click(button)
+      fireEvent.click(getByText(/Total Grade lower than/))
+      fireEvent.change(getByLabelText('Enter score cutoff'), {target: {value: '70'}})
+
+      fireEvent.click(getByTestId('show_all_recipients'))
+      expect(getByRole('table')).toBeInTheDocument()
+
+      const tableRows = getAllByRole('row') as HTMLTableRowElement[]
+      const studentCells = tableRows.map(row => row.cells[0])
+      // first cell with be the header
+      expect(studentCells).toHaveLength(2)
+      expect(studentCells[0]).toHaveTextContent('Students')
+      expect(studentCells[1]).toHaveTextContent('Adam Jones')
+    })
+
     it('"Reassigned" displays students who have been asked to resubmit to the assignment', async () => {
       const mocks = await makeMocks()
       students[0].redoRequest = true

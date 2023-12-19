@@ -20,13 +20,18 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import AssignmentGroupColumnHeader from './AssignmentGroupColumnHeader'
+import {scoreToPercentage, scoreToScaledPoints} from '@canvas/grading/GradeCalculationHelper'
 import type GridSupport from '../GridSupport/index'
 import type Gradebook from '../../Gradebook'
+import type {PartialStudent} from '@canvas/grading/grading.d'
+import type {Student} from '../../../../../../api.d'
+import type {SendMessageArgs} from '@canvas/message-students-dialog/react/MessageStudentsWhoDialog'
 
 function getProps(column, gradebook: Gradebook, options) {
   const columnId = column.id
   const sortRowsBySetting = gradebook.getSortRowsBySetting()
   const assignmentGroup = gradebook.getAssignmentGroup(column.assignmentGroupId)
+  const pointsBased = gradebook.options.grading_standard_points_based
 
   const gradeSortDataLoaded =
     gradebook.assignmentsLoadedForCurrentView() &&
@@ -39,6 +44,28 @@ function getProps(column, gradebook: Gradebook, options) {
       gradebook.onApplyScoreToUngradedRequested(assignmentGroup)
     }
   }
+
+  const processStudent = (student: Student, assignmentGroupId: number): PartialStudent => {
+    return {
+      id: student.id,
+      isInactive: Boolean(student.isInactive),
+      isTestStudent: student.enrollments[0].type === 'StudentViewEnrollment',
+      name: student.name,
+      sortableName: student.sortable_name || '',
+      submission: null,
+      currentScore: pointsBased
+        ? scoreToScaledPoints(
+            student[`assignment_group_${assignmentGroupId}`]?.score,
+            student[`assignment_group_${assignmentGroupId}`]?.possible,
+            gradebook.options.grading_standard_scaling_factor
+          )
+        : scoreToPercentage(
+            student[`assignment_group_${assignmentGroupId}`]?.score,
+            student[`assignment_group_${assignmentGroupId}`]?.possible
+          ),
+    }
+  }
+
   return {
     ref: options.ref,
     addGradebookElement: gradebook.keyboardNav?.addGradebookElement,
@@ -57,6 +84,9 @@ function getProps(column, gradebook: Gradebook, options) {
     },
     removeGradebookElement: gradebook.keyboardNav?.removeGradebookElement,
 
+    showMessageStudentsWithObserversDialog:
+      gradebook.options.show_message_students_with_observers_dialog,
+
     sortBySetting: {
       direction: sortRowsBySetting.direction,
       disabled: !gradeSortDataLoaded,
@@ -71,8 +101,16 @@ function getProps(column, gradebook: Gradebook, options) {
     },
 
     viewUngradedAsZero: gradebook.viewUngradedAsZero(),
+    pointsBasedGradingScheme: pointsBased,
     isRunningScoreToUngraded: gradebook.isRunningScoreToUngraded,
     weightedGroups: gradebook.weightedGroups(),
+    allStudents: Object.keys(gradebook.students).map(key =>
+      processStudent(gradebook.students[key], assignmentGroup.id)
+    ),
+    courseId: gradebook.options.context_id,
+    messageAttachmentUploadFolderId: gradebook.options.message_attachment_upload_folder_id,
+    userId: gradebook.options.currentUserId,
+    onSendMessageStudentsWho: gradebook.sendMessageStudentsWho,
   }
 }
 

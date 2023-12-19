@@ -86,12 +86,14 @@ export type Student = {
 }
 
 export type Props = {
-  assignment: CamelizedAssignment
+  assignment?: CamelizedAssignment
   onClose: () => void
   students: Student[]
   onSend: (args: SendMessageArgs) => void
   messageAttachmentUploadFolderId: string
   userId: string
+  courseId?: string
+  pointsBasedGradingScheme: boolean
 }
 
 type Attachment = {
@@ -121,9 +123,11 @@ type FilterCriterion = {
 }
 
 const isScored = (assignment: CamelizedAssignment) =>
+  assignment !== null &&
   ['points', 'percent', 'letter_grade', 'gpa_scale'].includes(assignment.gradingType)
 
 const isReassignable = (assignment: CamelizedAssignment) =>
+  assignment !== null &&
   (assignment.allowedAttempts === -1 || (assignment.allowedAttempts || 0) > 1) &&
   assignment.dueDate != null &&
   !assignment.submissionTypes.includes(
@@ -134,13 +138,14 @@ const filterCriteria: FilterCriterion[] = [
   {
     requiresCutoff: false,
     shouldShow: assignment =>
+      assignment !== null &&
       !['on_paper', 'none', 'not_graded', ''].includes(assignment.submissionTypes[0]),
     title: I18n.t('Have not yet submitted'),
     value: 'unsubmitted',
   },
   {
     requiresCutoff: false,
-    shouldShow: () => true,
+    shouldShow: assignment => assignment !== null,
     title: I18n.t('Have not been graded'),
     value: 'ungraded',
   },
@@ -158,7 +163,7 @@ const filterCriteria: FilterCriterion[] = [
   },
   {
     requiresCutoff: false,
-    shouldShow: assignment => assignment.gradingType === 'pass_fail',
+    shouldShow: assignment => assignment !== null && assignment.gradingType === 'pass_fail',
     title: I18n.t('Marked incomplete'),
     value: 'marked_incomplete',
   },
@@ -167,6 +172,18 @@ const filterCriteria: FilterCriterion[] = [
     shouldShow: isReassignable,
     title: I18n.t('Reassigned'),
     value: 'reassigned',
+  },
+  {
+    requiresCutoff: true,
+    shouldShow: assignment => !assignment,
+    title: I18n.t('Total grade higher than'),
+    value: 'total_grade_higher_than',
+  },
+  {
+    requiresCutoff: true,
+    shouldShow: assignment => !assignment,
+    title: I18n.t('Total grade lower than'),
+    value: 'total_grade_lower_than',
   },
 ]
 
@@ -208,34 +225,66 @@ function filterStudents(criterion, students, cutoff) {
           newfilteredStudents.push(student)
         }
         break
+      case 'total_grade_higher_than':
+        if (parseFloat(student.currentScore) > cutoff) {
+          newfilteredStudents.push(student)
+        }
+        break
+      case 'total_grade_lower_than':
+        if (parseFloat(student.currentScore) < cutoff) {
+          newfilteredStudents.push(student)
+        }
+        break
     }
   }
   return newfilteredStudents
 }
 
-function defaultSubject(criterion, assignment, cutoff) {
+function defaultSubject(criterion, assignment, cutoff, pointsBasedGradingScheme) {
   if (cutoff === '') {
     cutoff = 0
   }
-  switch (criterion) {
-    case 'unsubmitted':
-      return I18n.t('No submission for %{assignment}', {assignment: assignment.name})
-    case 'ungraded':
-      return I18n.t('No grade for %{assignment}', {assignment: assignment.name})
-    case 'scored_more_than':
-      return I18n.t('Scored more than %{cutoff} on %{assignment}', {
-        cutoff,
-        assignment: assignment.name,
-      })
-    case 'scored_less_than':
-      return I18n.t('Scored less than %{cutoff} on %{assignment}', {
-        cutoff,
-        assignment: assignment.name,
-      })
-    case 'marked_incomplete':
-      return I18n.t('%{assignment} is incomplete', {assignment: assignment.name})
-    case 'reassigned':
-      return I18n.t('%{assignment} is reassigned', {assignment: assignment.name})
+
+  if (assignment !== null) {
+    switch (criterion) {
+      case 'unsubmitted':
+        return I18n.t('No submission for %{assignment}', {assignment: assignment.name})
+      case 'ungraded':
+        return I18n.t('No grade for %{assignment}', {assignment: assignment.name})
+      case 'scored_more_than':
+        return I18n.t('Scored more than %{cutoff} on %{assignment}', {
+          cutoff,
+          assignment: assignment.name,
+        })
+      case 'scored_less_than':
+        return I18n.t('Scored less than %{cutoff} on %{assignment}', {
+          cutoff,
+          assignment: assignment.name,
+        })
+      case 'marked_incomplete':
+        return I18n.t('%{assignment} is incomplete', {assignment: assignment.name})
+      case 'reassigned':
+        return I18n.t('%{assignment} is reassigned', {assignment: assignment.name})
+    }
+  } else {
+    switch (criterion) {
+      case 'total_grade_higher_than':
+        return pointsBasedGradingScheme
+          ? I18n.t('Current total score is higher than %{cutoff}', {
+              cutoff,
+            })
+          : I18n.t('Current total score is higher than %{cutoff}%', {
+              cutoff,
+            })
+      case 'total_grade_lower_than':
+        return pointsBasedGradingScheme
+          ? I18n.t('Current total score is lower than %{cutoff}', {
+              cutoff,
+            })
+          : I18n.t('Current total score is lower than %{cutoff}%', {
+              cutoff,
+            })
+    }
   }
 }
 
@@ -246,6 +295,8 @@ const MessageStudentsWhoDialog = ({
   onSend,
   messageAttachmentUploadFolderId,
   userId,
+  courseId,
+  pointsBasedGradingScheme = true,
 }: Props) => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const [open, setOpen] = useState(true)
@@ -274,7 +325,7 @@ const MessageStudentsWhoDialog = ({
 
   const {loading, data} = useQuery(OBSERVER_ENROLLMENTS_QUERY, {
     variables: {
-      courseId: assignment.courseId,
+      courseId: assignment?.courseId || courseId,
       studentIds: students.map(student => student.id),
     },
   })
@@ -302,7 +353,7 @@ const MessageStudentsWhoDialog = ({
     filterStudents(availableCriteria[0], sortedStudents, cutoff)
   )
   const [subject, setSubject] = useState(
-    defaultSubject(availableCriteria[0].value, assignment, cutoff)
+    defaultSubject(availableCriteria[0].value, assignment, cutoff, pointsBasedGradingScheme)
   )
   const [observersDisplayed, setObserversDisplayed] = useState(0.0)
 
@@ -381,7 +432,7 @@ const MessageStudentsWhoDialog = ({
       setObserversDisplayed(
         observerCount(filterStudents(newCriterion, sortedStudents, cutoff), observersByStudentID)
       )
-      setSubject(defaultSubject(newCriterion.value, assignment, cutoff))
+      setSubject(defaultSubject(newCriterion.value, assignment, cutoff, pointsBasedGradingScheme))
     }
   }
 
@@ -547,7 +598,14 @@ const MessageStudentsWhoDialog = ({
                     setCutoff(value)
                     if (value !== '') {
                       setFilteredStudents(filterStudents(selectedCriterion, sortedStudents, value))
-                      setSubject(defaultSubject(selectedCriterion.value, assignment, value))
+                      setSubject(
+                        defaultSubject(
+                          selectedCriterion.value,
+                          assignment,
+                          value,
+                          pointsBasedGradingScheme
+                        )
+                      )
                     }
                   }}
                   showArrows={false}
