@@ -113,7 +113,6 @@ export default defineConfig({
       'ui/shared/message-students-modal/**/*',
       'ui/shared/network/**/*',
       'ui/shared/notification-preferences-course/**/*',
-      'ui/shared/outcome-content-viewer/**/*',
       'ui/shared/outcomes/**/*',
       'ui/shared/planner/**/*',
       'ui/shared/publish-button-view/**/*',

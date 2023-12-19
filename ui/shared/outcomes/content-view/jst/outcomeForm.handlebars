@@ -21,7 +21,7 @@
       <thead>
         <tr>
           {{#eachWithIndex ratings}}
-            {{> ui/shared/outcome-content-view/jst/_criterionHeader.handlebars}}
+            {{> ui/shared/outcomes/content-view/jst/_criterionHeader.handlebars}}
           {{/eachWithIndex}}
           <th class="total" aria-label='{{#t}}Total Points{{/t}}'>
             <h5 class="total">{{#t}}Total Points{{/t}}</h5>
@@ -31,7 +31,7 @@
       <tbody>
         <tr>
           {{#eachWithIndex ratings}}
-            {{> ui/shared/outcome-content-view/jst/_criterion.handlebars}}
+            {{> ui/shared/outcomes/content-view/jst/_criterion.handlebars}}
           {{/eachWithIndex}}
         <td class="total">
           <div class="points_possible">

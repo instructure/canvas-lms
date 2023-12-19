@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import OutcomeGroup from '@canvas/outcomes/backbone/models/OutcomeGroup'
+import OutcomeGroup from '../../../backbone/models/OutcomeGroup'
 import splitAssetString from '@canvas/util/splitAssetString'
 
 function RootOutcomesFinder() {}
