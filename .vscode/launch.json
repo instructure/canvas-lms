@@ -15,6 +15,13 @@
     },
     {
       "type": "rdbg",
+      "name": "Attach with rdbg (tcp 12345)",
+      "request": "attach",
+      "debugPort": "localhost:12345",
+      "localfsMap": "/usr/src/app:${workspaceFolder}"
+    },
+    {
+      "type": "rdbg",
       "request": "launch",
       "name": "Run Current Spec File",
       "rdbgPath": "bin/rdbg-spring",

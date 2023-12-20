@@ -1,0 +1,17 @@
+# to use this add docker-compose/puma.override.yml to your COMPOSE_FILE var in .env and rebuilid your web container
+
+version: '2.3'
+services:
+  web:
+    build:
+      dockerfile: Dockerfile.puma
+    environment:
+      RUBY_DEBUG_OPEN: true
+      RUBY_DEBUG_PORT: 12345
+      RUBY_DEBUG_HOST: 0.0.0.0
+      VIRTUAL_PORT: 80
+      PIDFILE: /tmp/pids/server.pid
+    ports:
+      - "12345:12345"
+    tmpfs:
+      - /tmp/pids:mode=1777
