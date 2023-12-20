@@ -50,8 +50,8 @@ import {generateDateDetailsPayload} from '../../utils/assignToHelper'
 
 const I18n = useI18nScope('differentiated_modules')
 
-function itemTypeToIcon(itemType: string) {
-  switch (itemType) {
+function itemTypeToIcon(iconType: string) {
+  switch (iconType) {
     case 'assignment':
       return <IconAssignmentLine />
     case 'quiz':
@@ -122,6 +122,7 @@ export interface ItemAssignToTrayProps {
   courseId: string
   itemName: string
   itemType: string
+  iconType: string
   itemContentId: string
   pointsPossible: string
   locale: string
@@ -135,6 +136,7 @@ export default function ItemAssignToTray({
   courseId,
   itemName,
   itemType,
+  iconType,
   itemContentId,
   pointsPossible,
   locale,
@@ -309,7 +311,7 @@ export default function ItemAssignToTray({
   }, [assignToCards])
 
   function Header() {
-    const icon = itemTypeToIcon(itemType)
+    const icon = itemTypeToIcon(iconType)
     return (
       <Flex.Item margin="medium 0" padding="0 medium" width="100%">
         <CloseButton

@@ -215,6 +215,7 @@ function renderItemAssignToTray(open, returnFocusTo, itemProps) {
         returnFocusTo.focus()
       }}
       itemType='assignment'
+      iconType='assignment'
       locale={ENV.LOCALE || 'en'}
       timezone={ENV.TIMEZONE || 'UTC'}
       {...itemProps}
