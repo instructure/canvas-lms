@@ -29,6 +29,7 @@ class Course < ActiveRecord::Base
   include ContentLicenses
   include TurnitinID
   include Courses::ItemVisibilityHelper
+  include Courses::ExportWarnings
   include OutcomeImportContext
   include MaterialChanges
 

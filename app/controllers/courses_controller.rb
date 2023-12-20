@@ -2664,7 +2664,12 @@ class CoursesController < ApplicationController
     unless account.grants_any_right?(@current_user, session, :create_courses, :manage_courses, :manage_courses_admin)
       account = @domain_root_account.manually_created_courses_account
     end
+
     return unless authorized_action(account, @current_user, [:manage_courses, :create_courses])
+
+    # For warnings messages previous to export
+    warnings = @context.export_warnings
+    js_env(EXPORT_WARNINGS: warnings) unless warnings.empty?
 
     # For prepopulating the date fields
     js_env(OLD_START_DATE: datetime_string(@context.start_at, :verbose))
