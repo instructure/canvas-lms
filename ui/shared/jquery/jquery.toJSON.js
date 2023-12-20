@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import '@canvas/forms/jquery/serializeForm'
+import './jquery.serializeForm'
 
 const patterns = {
   validate: /^[a-zA-Z][a-zA-Z0-9_-]*(?:\[(?:\d*|[a-zA-Z0-9_-]+)\])*$/,

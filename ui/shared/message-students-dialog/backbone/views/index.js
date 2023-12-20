@@ -25,7 +25,7 @@ import wrapperTemplate from '@canvas/forms/jst/EmptyDialogFormWrapper.handlebars
 import ConversationCreator from '../models/ConversationCreator'
 import recipientListTemplate from '../../jst/_messageStudentsWhoRecipientList.handlebars'
 import _ from 'underscore'
-import '@canvas/forms/jquery/serializeForm'
+import '@canvas/jquery/jquery.serializeForm'
 
 const I18n = useI18nScope('viewsMessageStudentsDialog')
 

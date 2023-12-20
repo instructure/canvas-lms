@@ -20,7 +20,7 @@ import Backbone from '@canvas/backbone'
 import $ from 'jquery'
 import Markup from '../../jst/LDBLoginPopup.handlebars'
 import htmlEscape from 'html-escape'
-import '@canvas/util/toJSON'
+import '@canvas/jquery/jquery.toJSON'
 
 // Consumes an event and stops it from propagating.
 function consume(e) {
