@@ -34,6 +34,7 @@ import {
   onGridKeyDown,
   otherGradingPeriodAssignmentIds,
   sectionList,
+  getLabelForFilter,
 } from '../Gradebook.utils'
 import {isDefaultSortOrder, localeSort} from '../Gradebook.sorting'
 import {createGradebook} from './GradebookSpecHelper'
@@ -626,5 +627,33 @@ describe('filterStudentBySectionFn', () => {
     appliedFilters[0].type = 'submissions'
     const filteredStudents = students.filter(filterStudentBySectionFn(appliedFilters))
     expect(filteredStudents.length).toBe(2)
+  })
+
+  describe('filter start and end date pill display', () => {
+    ENV.TIMEZONE = 'Asia/Tokyo'
+
+    const startFilter: Filter = {
+      id: '1',
+      type: 'start-date',
+      created_at: '',
+      value: '2023-12-13T16:00:00.000Z',
+    }
+
+    const endFilter: Filter = {
+      id: '1',
+      type: 'end-date',
+      created_at: '',
+      value: '2023-12-15T16:00:00.000Z',
+    }
+
+    it('takes the UTC filter start-date and converts it to user local time for filter pill display', () => {
+      const result = getLabelForFilter(startFilter, [], [], [], [], {}, [])
+      expect(result).toEqual('Start Date 12/14/2023')
+    })
+
+    it('takes the UTC filter end-date and converts it to user local time for filter pill display', () => {
+      const result = getLabelForFilter(endFilter, [], [], [], [], {}, [])
+      expect(result).toEqual('End Date 12/16/2023')
+    })
   })
 })
