@@ -53,9 +53,6 @@ development:
         base_url: 'http://mathman.docker'
         use_for_svg: 'false'
         use_for_mml: 'false'
-      microsoft-sync:
-        client-id: some_client_id
-        client-secret: some_client_secret
       pandata/events:
         enabled_for_canvas: false
         url: 'https://cbbsk4vb5k.execute-api.us-east-1.amazonaws.com/prod/pandata-event' # dev PandataEvents environment
