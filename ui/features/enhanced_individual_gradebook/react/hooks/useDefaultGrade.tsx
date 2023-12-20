@@ -17,7 +17,7 @@
  */
 
 import {useCallback, useState} from 'react'
-import {executeApiRequest} from '@canvas/util/apiRequest'
+import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
 
 import {ApiCallStatus, type SubmissionGradeChange} from '../../types'
 import {mapToSubmissionGradeChange} from '../../utils/gradebookUtils'

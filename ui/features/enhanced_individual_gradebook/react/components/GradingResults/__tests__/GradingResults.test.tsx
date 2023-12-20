@@ -30,13 +30,13 @@ import {
 } from './fixtures'
 import {GRADEBOOK_SUBMISSION_COMMENTS} from '../../../../queries/Queries'
 import {MockedProvider} from '@apollo/react-testing'
-import {executeApiRequest} from '@canvas/util/apiRequest'
+import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
 import type {
   AssignmentConnection,
   GradebookUserSubmissionDetails,
 } from 'features/enhanced_individual_gradebook/types'
 
-jest.mock('@canvas/util/apiRequest', () => ({
+jest.mock('@canvas/do-fetch-api-effect/apiRequest', () => ({
   executeApiRequest: jest.fn(),
 }))
 
