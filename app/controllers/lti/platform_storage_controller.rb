@@ -51,6 +51,8 @@ module Lti
         Date.today.to_s
       end
 
+    before_action :ensure_decoded_jwt
+
     # The forwarder iframe HTML and Javascript are heavily cached. This
     # fingerprints the ruby and JS files. This can then be used as a query
     # param, so the URL will change and bypass the cache when the code changes
@@ -74,7 +76,7 @@ module Lti
       set_extra_csp_frame_ancestor!
 
       # cache aggressively since this is rendered on every page
-      ttl = Setting.get("post_message_forwarding_ttl", 1.day.seconds.to_s).to_i
+      ttl = Setting.get("post_message_forwarding_html_ttl", 1.year.seconds.to_s).to_i
       response.headers["Cache-Control"] = "max-age=#{ttl}"
       cancel_cache_buster
 
@@ -101,21 +103,59 @@ module Lti
       csp_frame_ancestors << parent_domain
     end
 
-    def parent_domain
-      domain_from_referer || current_domain
-    end
-
-    def domain_from_referer
-      return nil unless request.referer
-
-      URI(request.referer)&.host
-    rescue URI::InvalidURIError
-      nil
-    end
-
     # format: canvas.docker, school.instructure.com, etc.
     def current_domain
       HostUrl.context_host(@domain_root_account, request.host_with_port)
+    end
+
+    def parent_domain
+      decoded_jwt["parent_domain"] || current_domain
+    end
+
+    def ensure_decoded_jwt
+      decoded_jwt
+    rescue JSON::JWT::InvalidFormat, CanvasSecurity::InvalidToken
+      # Plain text error rather than an HTML error page, which would have another forwarder iframe...
+      render status: :forbidden, plain: "Invalid token"
+    end
+
+    # We generate a JWT on Canvas pages with the iframe and pass it in to
+    # ensure that the iframe (on our trusted domain) will only forward messages
+    # to domains that are really Canvas.
+    def decoded_jwt
+      @decoded_jwt ||=
+        if params[:token].blank?
+          {}
+        else
+          CanvasSecurity.decode_jwt(params[:token], [self.class.signing_secret])
+        end
+    end
+
+    MAX_THREAD_JWT_CACHE_SIZE = 256
+
+    # In my tests, uncached this took ~0.9ms, but that's on EVERY canvas page load.
+    # Cached it took about 0.003ms.
+    def self.parent_domain_jwt(current_domain)
+      cached_val = parent_domain_jwt_cache[current_domain]
+      return cached_val if cached_val
+
+      new_val = new_parent_domain_jwt(current_domain)
+      if parent_domain_jwt_cache.length < MAX_THREAD_JWT_CACHE_SIZE
+        parent_domain_jwt_cache[current_domain] = new_val
+      end
+      new_val
+    end
+
+    def self.parent_domain_jwt_cache
+      Thread.current[:lti_platform_storage_jwt_cache] ||= {}
+    end
+
+    def self.new_parent_domain_jwt(current_domain)
+      CanvasSecurity.create_jwt({ parent_domain: current_domain }, nil, signing_secret, :HS512)
+    end
+
+    def self.signing_secret
+      Lti::PlatformStorage.signing_secret
     end
   end
 end
