@@ -29,7 +29,7 @@ import QuizLogAuditing from '@canvas/quiz-log-auditing'
 import QuizLogAuditingEventDumper from '@canvas/quiz-log-auditing/jquery/dump_events'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/util/toJSON'
+import '@canvas/jquery/jquery.toJSON'
 import '@canvas/datetime' /* friendlyDatetime, friendlyDate */
 import '@canvas/forms/jquery/jquery.instructure_forms' /* getFormData, errorBox */
 import 'jqueryui/dialog'

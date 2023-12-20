@@ -52,7 +52,7 @@ import ExternalToolModalLauncher from '@canvas/external-tools/react/components/E
 import * as returnToHelper from '@canvas/util/validateReturnToURL'
 import setUsageRights from '@canvas/files/util/setUsageRights'
 import 'jqueryui/dialog'
-import '@canvas/util/toJSON'
+import '@canvas/jquery/jquery.toJSON'
 import '@canvas/rails-flash-notifications'
 import '../../../../boot/initializers/activateTooltips'
 import {AnnotatedDocumentSelector} from '../../react/EditAssignment'
