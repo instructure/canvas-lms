@@ -58,6 +58,7 @@ function ClearableDateTimeInput({
 
   return (
     <Flex
+      data-testid="clearable-date-time-input"
       as="div"
       margin="small none"
       height={determineHeight()}

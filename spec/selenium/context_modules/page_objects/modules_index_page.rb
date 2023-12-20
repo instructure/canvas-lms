@@ -25,8 +25,8 @@ module ModulesIndexPage
     "#context_module_#{module_id}"
   end
 
-  def manage_module_item_assign_to_selector
-    ".module-item-assign-to-link"
+  def manage_module_item_assign_to_selector(module_item_id)
+    "#context_module_item_#{module_item_id} .module-item-assign-to-link"
   end
 
   def module_create_button_selector
@@ -78,8 +78,8 @@ module ModulesIndexPage
     f(context_module_selector(module_id))
   end
 
-  def manage_module_item_assign_to
-    f(manage_module_item_assign_to_selector)
+  def manage_module_item_assign_to(module_item_id)
+    f(manage_module_item_assign_to_selector(module_item_id))
   end
 
   def modules_index_settings_button
@@ -189,8 +189,8 @@ module ModulesIndexPage
     wait_for_ajax_requests
   end
 
-  def click_manage_module_item_assign_to
-    manage_module_item_assign_to.click
+  def click_manage_module_item_assign_to(module_item)
+    manage_module_item_assign_to(module_item.id).click
   end
 
   def click_module_create_button
