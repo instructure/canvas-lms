@@ -31,18 +31,32 @@ describe Lti::PlatformStorageController do
     context "when rendering the view" do
       render_views
 
-      it "sets parent origin in js env" do
-        subject
-        expected_parent_origin = (HostUrl.protocol + "://" + forwarding_domain).to_json
-        expect(response.body).to \
-          match(
-            %r[<script>\s+window\.ENV = { PARENT_ORIGIN: #{Regexp.escape expected_parent_origin} }\s+</script>]
-          )
+      def expected_script_tag_regex(domain)
+        parent_origin = HostUrl.protocol + "://" + domain
+        %r[<script>\s+window\.ENV = { PARENT_ORIGIN: #{Regexp.escape parent_origin.to_json} }\s+</script>]
       end
 
       it "includes the lti_post_message_forwarding.js script" do
         subject
         expect(response.body).to match(%r{<script src=.*javascripts/lti_post_message_forwarding.*js})
+      end
+
+      it "sets parent origin in js env to the current domain by default" do
+        subject
+        expect(response.body).to match(expected_script_tag_regex(forwarding_domain))
+      end
+
+      it "sets the parent origin based on the token jwt" do
+        get :post_message_forwarding, params: {
+          token: described_class.parent_domain_jwt("example.instructure.com")
+        }
+        expect(response.body).to match(expected_script_tag_regex("example.instructure.com"))
+      end
+
+      it "returns a 403 if the token is invalid" do
+        get :post_message_forwarding, params: { token: "invalid" }
+        expect(response).to be_forbidden
+        expect(response.body).to eq("Invalid token")
       end
     end
 
@@ -56,7 +70,7 @@ describe Lti::PlatformStorageController do
 
     it "caches the response" do
       subject
-      expect(response.headers["Cache-Control"]).to match(/max-age=#{1.day.seconds}/)
+      expect(response.headers["Cache-Control"]).to match(/max-age=#{1.year.seconds}/)
     end
 
     describe ".rev_fingerprint" do
@@ -74,6 +88,29 @@ describe Lti::PlatformStorageController do
         ]
         files_contents = files.map { |f| File.read(f) }.join
         expect(described_class.rev_fingerprint).to include(Digest::SHA256.hexdigest(files_contents)[0...16])
+      end
+    end
+
+    describe ".parent_domain_jwt" do
+      it "creates a jwt with the given domain" do
+        %w[example.com example2.com].each do |domain|
+          jwt = described_class.parent_domain_jwt(domain)
+          decoded = CanvasSecurity.decode_jwt(jwt, [described_class.signing_secret])
+          expect(decoded).to include("parent_domain" => domain)
+        end
+      end
+
+      it "is cached in Thread.current" do
+        Thread.current[:lti_platform_storage_jwt_cache] = nil
+        expect(described_class).to receive(:new_parent_domain_jwt).once.and_call_original
+        jwt1 = described_class.parent_domain_jwt("example.com")
+        jwt2 = described_class.parent_domain_jwt("example.com")
+        expect(jwt1).to eq(jwt2)
+      end
+
+      it "limits the size of the cache in Thread.current" do
+        257.times { |i| described_class.parent_domain_jwt("example#{i}.com") }
+        expect(Thread.current[:lti_platform_storage_jwt_cache].size).to eq(256)
       end
     end
   end

@@ -27,7 +27,7 @@
     iframe(
       lti_post_message_forwarding_url(
         host: oidc_auth_domain,
-        target: current_domain,
+        token: Lti::PlatformStorageController.parent_domain_jwt(current_domain),
         rev: Lti::PlatformStorageController.rev_fingerprint
       ),
       name: Lti::PlatformStorage::FORWARDING_TARGET,
