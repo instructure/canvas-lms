@@ -18,7 +18,7 @@
  */
 
 import _ from 'underscore'
-import type {CamelizedGradingPeriod} from '@canvas/grading/grading.d'
+import type {CamelizedGradingPeriod} from './grading.d'
 
 function validateDate(date, nullAllowed = false) {
   let valid = _.isDate(date)
