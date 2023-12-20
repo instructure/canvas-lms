@@ -19,7 +19,7 @@
 import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import type {CustomColumn, HandleCheckboxChange, TeacherNotes} from '../../../types'
-import {executeApiRequest} from '@canvas/util/apiRequest'
+import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
 import CheckboxTemplate from './CheckboxTemplate'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')

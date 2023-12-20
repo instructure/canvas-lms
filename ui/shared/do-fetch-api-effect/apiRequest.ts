@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import doFetchApi from './index'
 
 export type ApiResponse<T> = {
   data: T
@@ -36,6 +36,7 @@ export type ApiRequest = {
 }
 
 export async function executeApiRequest<T>(request: ApiRequest): Promise<ApiResponse<T>> {
+  // @ts-expect-error
   const {json, response, link} = await doFetchApi(request)
 
   return {

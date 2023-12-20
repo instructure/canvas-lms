@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {executeApiRequest} from '@canvas/util/apiRequest'
+import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import numberHelper from '@canvas/i18n/numberHelper'
