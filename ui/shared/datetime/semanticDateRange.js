@@ -18,7 +18,7 @@
 // requires $.sameDate, $.dateString, $.timeString, $.datetimeString
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import tz from '@canvas/timezone'
+import tz from './timezone'
 import htmlEscape from 'html-escape'
 import './jquery/index'
 

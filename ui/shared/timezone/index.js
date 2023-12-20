@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 - present Instructure, Inc.
+ * Copyright (C) 2023 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,30 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {
-  parse,
-  format,
-  adjustFormat,
-  shift,
-  hasMeridiem as hasMeridian, // TODO: rename instances of 'meridian' to 'meridiem'
-} from 'datetime'
+// temporary for gems/plugins
 
-import {
-  changeToTheSecondBeforeMidnight,
-  isMidnight,
-  mergeTimeAndDate,
-  setToEndOfMinute,
-} from '@canvas/datetime'
+import timezone from '@canvas/datetime/timezone'
 
-// TODO: remove this module and redirect callers to @canvas/datetime
-export default {
-  adjustFormat,
-  changeToTheSecondBeforeMidnight,
-  format,
-  hasMeridian,
-  isMidnight,
-  mergeTimeAndDate,
-  parse,
-  setToEndOfMinute,
-  shift,
-}
+export default timezone

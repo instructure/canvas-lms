@@ -18,7 +18,7 @@
 
 import EventDataSource from '@canvas/calendar/jquery/EventDataSource'
 import fcUtil from '@canvas/calendar/jquery/fcUtil'
-import tz from '@canvas/timezone'
+import tz from '@canvas/datetime/timezone'
 import denver from 'timezone/America/Denver'
 
 QUnit.module('EventDataSource: getEvents', {

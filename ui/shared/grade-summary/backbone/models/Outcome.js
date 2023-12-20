@@ -25,7 +25,7 @@ import _ from 'underscore'
 
 import Outcome from '@canvas/outcomes/backbone/models/Outcome'
 
-import tz from '@canvas/timezone'
+import tz from '@canvas/datetime/timezone'
 
 const I18n = useI18nScope('grade_summaryOutcome')
 

@@ -18,7 +18,7 @@
 import {ApolloProvider, Query, gql, createClient} from '@canvas/apollo'
 import React, {useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import tz from '@canvas/timezone'
+import tz from '@canvas/datetime/timezone'
 import {Button} from '@instructure/ui-buttons'
 import {TextInput} from '@instructure/ui-text-input'
 import CanvasDateInput from '@canvas/datetime/react/components/DateInput'

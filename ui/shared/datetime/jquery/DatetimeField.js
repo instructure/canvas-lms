@@ -18,7 +18,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {debounce} from 'underscore'
-import tz from '@canvas/timezone'
+import tz from '../timezone'
 import datePickerFormat from '../datePickerFormat'
 import {isRTL} from '@canvas/i18n/rtlHelper'
 

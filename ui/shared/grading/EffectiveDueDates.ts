@@ -17,7 +17,7 @@
  */
 
 import _ from 'lodash'
-import timezone from '@canvas/timezone'
+import timezone from '@canvas/datetime/timezone'
 import GradingPeriodsHelper from './GradingPeriodsHelper'
 import type {CamelizedGradingPeriod} from '@canvas/grading/grading.d'
 import type {Submission, DueDate, UserDueDateMap, AssignmentUserDueDateMap} from '../../api.d'

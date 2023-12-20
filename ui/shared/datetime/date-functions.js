@@ -17,7 +17,7 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import tz from '@canvas/timezone'
+import tz from './timezone'
 
 const I18n = useI18nScope('instructure_date_and_time')
 

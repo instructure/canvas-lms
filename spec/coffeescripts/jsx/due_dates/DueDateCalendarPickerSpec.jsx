@@ -20,8 +20,8 @@ import React from 'react'
 import {mount} from 'enzyme'
 import chicago from 'timezone/America/Chicago'
 import DueDateCalendarPicker from '@canvas/due-dates/react/DueDateCalendarPicker'
-import tz from '@canvas/timezone'
-import tzInTest from '@canvas/timezone/specHelpers'
+import tz from '@canvas/datetime/timezone'
+import tzInTest from '@canvas/datetime/timezone/specHelpers'
 import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('DueDateCalendarPicker', suiteHooks => {

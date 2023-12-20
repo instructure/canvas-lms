@@ -18,10 +18,9 @@
 
 /* eslint-disable qunit/no-global-expect */
 /* eslint-disable jest/valid-expect */
-/* eslint-disable import/extensions */
 import $ from 'jquery'
 import _ from 'lodash'
-import tzInTest from '@canvas/timezone/specHelpers'
+import tzInTest from '@canvas/datetime/timezone/specHelpers'
 import timezone from 'timezone'
 import denver from 'timezone/America/Denver'
 import newYork from 'timezone/America/New_York'

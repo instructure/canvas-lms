@@ -20,7 +20,7 @@ import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime
 import {func, object, shape, string} from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
-import tz from '@canvas/timezone'
+import tz from '@canvas/datetime/timezone'
 
 import {Flex} from '@instructure/ui-flex'
 import {

@@ -20,7 +20,7 @@ import React from 'react'
 import TestUtils from 'react-dom/test-utils'
 import ReactDOM from 'react-dom'
 import Collaboration from 'ui/features/lti_collaborations/react/Collaboration'
-import tz from '@canvas/timezone'
+import tz from '@canvas/datetime/timezone'
 
 QUnit.module('Collaboration')
 

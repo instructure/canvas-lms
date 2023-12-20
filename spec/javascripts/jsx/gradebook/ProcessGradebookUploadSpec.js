@@ -20,7 +20,7 @@ import _ from 'lodash'
 
 import ProcessGradebookUpload from 'ui/features/gradebook_uploads/jquery/process_gradebook_upload'
 import fakeENV from 'helpers/fakeENV'
-import '@canvas/timezone'
+import '@canvas/datetime/timezone'
 
 const oldAssignment1 = {id: 1, title: 'Old Assignment 1', points_possible: 25, published: true}
 

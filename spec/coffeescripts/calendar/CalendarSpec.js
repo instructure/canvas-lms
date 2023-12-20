@@ -21,8 +21,7 @@ import CalendarEvent from '@canvas/calendar/jquery/CommonEvent/CalendarEvent'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import fcUtil from '@canvas/calendar/jquery/fcUtil'
 import moment from 'moment'
-import tz from '@canvas/timezone'
-import tzInTest from '@canvas/timezone/specHelpers'
+import tzInTest from '@canvas/datetime/timezone/specHelpers'
 import timezone from 'timezone'
 import denver from 'timezone/America/Denver'
 import fixtures from 'helpers/fixtures'
@@ -81,7 +80,7 @@ const makeCal = () =>
   new Calendar('#fixtures', [], null, makeMockDataSource(), {header: makeMockHeader()})
 
 test('creates a fullcalendar instance', () => {
-  const cal = makeCal()
+  makeCal()
   ok($('.fc')[0])
 })
 
@@ -102,7 +101,7 @@ test('return correct format for non 24 hour times', () => {
 test('collaborates with header and data source', () => {
   const mockHeader = makeMockHeader()
   const mockDataSource = makeMockDataSource()
-  const cal = new Calendar('#fixtures', [], null, mockDataSource, {header: mockHeader})
+  new Calendar('#fixtures', [], null, mockDataSource, {header: mockHeader})
   ok(mockDataSource.getEvents.called)
   ok(mockHeader.on.called)
 })
@@ -178,7 +177,7 @@ test('isSameWeek: should behave with ambiguously timed/zoned arguments', () => {
 test('gets appointment groups when show scheduler activated', () => {
   const mockHeader = makeMockHeader()
   const mockDataSource = makeMockDataSource()
-  const cal = new Calendar('#fixtures', [], null, mockDataSource, {
+  new Calendar('#fixtures', [], null, mockDataSource, {
     header: mockHeader,
     showScheduler: true,
   })

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import tz from '@canvas/timezone'
+import tz from '../../timezone'
 import _ from 'lodash'
 import $ from 'jquery'
 import '../../jquery/index'

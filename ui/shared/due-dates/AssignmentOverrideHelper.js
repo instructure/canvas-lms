@@ -17,7 +17,7 @@
  */
 
 import _ from 'underscore'
-import tz from '@canvas/timezone'
+import tz from '@canvas/datetime/timezone'
 
 function addStudentID(student, collection = []) {
   return collection.concat([student.id])
