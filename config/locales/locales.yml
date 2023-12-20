@@ -347,7 +347,7 @@ en-AU:
       long_with_weekday: "%A, %B %-d"
       medium: "%b %-d, %Y"
       medium_month: "%b %Y"
-      medium_with_weekday: "%a %b %-d, %Y"
+      medium_with_weekday: "%a, %-d %b %Y"
       short: "%b %-d"
       short_month: "%b"
       short_weekday: "%a"
