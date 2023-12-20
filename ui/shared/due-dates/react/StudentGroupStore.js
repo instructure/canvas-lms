@@ -17,7 +17,7 @@
  */
 
 import _ from 'underscore'
-import createStore from '@canvas/util/createStore'
+import createStore from '@canvas/backbone/createStore'
 import $ from 'jquery'
 import splitAssetString from '@canvas/util/splitAssetString'
 import parseLinkHeader from 'link-header-parsing/parseLinkHeaderFromXHR'

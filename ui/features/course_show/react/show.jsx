@@ -23,7 +23,7 @@ import {
   getHandleChangeObservedUser,
   autoFocusObserverPicker,
 } from '@canvas/observer-picker/util/pageReloadHelper'
-import createStore from '@canvas/util/createStore'
+import createStore from '@canvas/backbone/createStore'
 import {View} from '@instructure/ui-view'
 import $ from 'jquery'
 import '@canvas/rails-flash-notifications'
