@@ -64,10 +64,11 @@ export const PeerReviewOptions = ({
           ))}
         </RadioInputGroup>
       </View>
-      {peerReviewAssignment !== 'off' && (
+      {peerReviewAssignment === 'automatically' && (
         <>
           <View as="div" margin="small 0 small large">
             <NumberInput
+              data-testid="peer-review-count-input"
               renderLabel={I18n.t('Reviews Per Student')}
               onIncrement={() => setPeerReviewsPerStudent(peerReviewsPerStudent + 1)}
               onDecrement={() => setPeerReviewsPerStudent(peerReviewsPerStudent - 1)}

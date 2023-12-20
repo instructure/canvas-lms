@@ -154,20 +154,34 @@ export default function DiscussionTopicForm({
   const [availableFrom, setAvailableFrom] = useState(currentDiscussionTopic?.delayedPostAt || null)
   const [availableUntil, setAvailableUntil] = useState(currentDiscussionTopic?.lockAt || null)
   const [willAnnouncementPostRightAway, setWillAnnouncementPostRightAway] = useState(true)
-  const [availabiltyValidationMessages, setAvailabilityValidationMessages] = useState([
+  const [availabilityValidationMessages, setAvailabilityValidationMessages] = useState([
     {text: '', type: 'success'},
   ])
 
   const [pointsPossible, setPointsPossible] = useState(
     currentDiscussionTopic?.assignment?.pointsPossible || 0
   )
-  const [displayGradeAs, setDisplayGradeAs] = useState('points')
+  const [displayGradeAs, setDisplayGradeAs] = useState(
+    currentDiscussionTopic?.assignment?.gradingType || 'points'
+  )
   const [assignmentGroup, setAssignmentGroup] = useState(
     currentDiscussionTopic?.assignment?.assignmentGroup?._id || ''
   )
-  const [peerReviewAssignment, setPeerReviewAssignment] = useState('off')
-  const [peerReviewsPerStudent, setPeerReviewsPerStudent] = useState(1)
-  const [peerReviewDueDate, setPeerReviewDueDate] = useState('')
+  const [peerReviewAssignment, setPeerReviewAssignment] = useState(() => {
+    if (currentDiscussionTopic?.assignment?.peerReviews?.enabled) {
+      return currentDiscussionTopic?.assignment?.peerReviews?.automaticReviews
+        ? 'automatically'
+        : 'manually'
+    }
+    return 'off'
+  })
+
+  const [peerReviewsPerStudent, setPeerReviewsPerStudent] = useState(
+    currentDiscussionTopic?.assignment?.peerReviews?.count || 1
+  )
+  const [peerReviewDueDate, setPeerReviewDueDate] = useState(
+    currentDiscussionTopic?.assignment?.peerReviews?.dueAt || ''
+  )
   const [dueDateErrorMessages, setDueDateErrorMessages] = useState([])
   const [assignedInfoList, setAssignedInfoList] = useState([
     {
@@ -785,6 +799,7 @@ export default function DiscussionTopicForm({
           )}
           {discussionAnonymousState === 'off' && !isAnnouncement && !isGroupContext && (
             <Checkbox
+              data-testid="graded-checkbox"
               label={I18n.t('Graded')}
               value="graded"
               checked={isGraded}
@@ -971,7 +986,7 @@ export default function DiscussionTopicForm({
                 }}
                 datePlaceholder={I18n.t('Select Date')}
                 invalidDateTimeMessage={I18n.t('Invalid date and time')}
-                messages={availabiltyValidationMessages}
+                messages={availabilityValidationMessages}
                 layout="columns"
               />
             </FormFieldGroup>

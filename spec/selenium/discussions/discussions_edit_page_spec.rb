@@ -402,6 +402,59 @@ describe "discussions" do
       end
 
       context "graded" do
+        it "displays graded assignment options correctly when initially opening edit page" do
+          discussion_assignment_options = {
+            name: "assignment",
+            points_possible: 10,
+            grading_type: "percent",
+            assignment_group: course.assignment_groups.create!(name: "assignment group"),
+          }
+
+          discussion_assignment_peer_review_options = {
+            peer_reviews: true,
+            automatic_peer_reviews: true,
+            peer_reviews_due_at: 1.day.ago,
+            peer_review_count: 2,
+          }
+
+          discussion_assignment_options = discussion_assignment_options.merge(discussion_assignment_peer_review_options)
+          discussion_assignment = course.assignments.create!(discussion_assignment_options)
+
+          all_graded_discussion_options = {
+            user: teacher,
+            title: "assignment topic title",
+            message: "assignment topic message",
+            discussion_type: "threaded",
+            assignment: discussion_assignment,
+          }
+
+          graded_discussion = course.discussion_topics.create!(all_graded_discussion_options)
+
+          get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
+
+          # Graded checkbox
+          expect(is_checked(f("input[data-testid='graded-checkbox']"))).to be_truthy
+          # Points possible
+          expect(f("input[data-testid='points-possible-input']").attribute("value")).to eq "10"
+          # Grading type
+          expect(f("input[data-testid='display-grade-input']").attribute("value")).to eq "Percentage"
+          # Assignment Group
+          expect(f("input[data-testid='assignment-group-input']").attribute("value")).to eq "assignment group"
+          # Peer review checkboxes
+          expect(is_checked(f("input[data-testid='peer_review_manual']"))).to be_falsey
+          expect(is_checked(f("input[data-testid='peer_review_off']"))).to be_falsey
+          expect(is_checked(f("input[data-testid='peer_review_auto']"))).to be_truthy
+          # peer review count
+          expect(f("input[data-testid='peer-review-count-input']").attribute("value")).to eq "2"
+
+          # Peer review date
+          # Just checking for a value. Formatting and TZ differences between front-end and back-end
+          # makes an exact comparison too fragile.
+          expect(ff("input[placeholder='Select Date']")[0].attribute("value")).not_to be_empty
+
+          # Add additional tests for overrides and due dates when completed
+        end
+
         it "allows editing the assignment group for the graded discussion" do
           assign_group_2 = course.assignment_groups.create!(name: "Group 2")
           get "/courses/#{course.id}/discussion_topics/#{assignment_topic.id}/edit"
