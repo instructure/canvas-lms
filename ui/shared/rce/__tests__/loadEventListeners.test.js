@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import loadEventListeners from '@canvas/rce/loadEventListeners'
+import loadEventListeners from '../loadEventListeners'
 import 'jquery'
 import 'jqueryui/tabs'
 
