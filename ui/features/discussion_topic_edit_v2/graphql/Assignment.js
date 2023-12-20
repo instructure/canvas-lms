@@ -15,47 +15,72 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-import {string} from 'prop-types'
 import gql from 'graphql-tag'
-
+import {bool, number, shape, string} from 'prop-types'
 import {AssignmentGroup} from './AssignmentGroup'
 
 export const Assignment = {
   fragment: gql`
     fragment Assignment on Assignment {
-      _id
       id
+      _id
       name
       postToSis
       pointsPossible
+      gradingType
+      unlockAt
+      dueAt
+      lockAt
+      peerReviews {
+        anonymousReviews
+        automaticReviews
+        count
+        dueAt
+        enabled
+        intraReviews
+      }
       assignmentGroup {
         ...AssignmentGroup
       }
     }
     ${AssignmentGroup.fragment}
   `,
-  shape: {
+
+  shape: shape({
     _id: string,
     id: string,
     name: string,
-    postToSis: string,
-    pointsPossible: string,
     assignmentGroup: AssignmentGroup.shape,
-  },
+    postToSis: bool,
+    pointsPossible: number,
+    gradingType: string,
+    unlockAt: string,
+    dueAt: string,
+    lockAt: string,
+  }),
+
   mock: ({
-    _id = '1',
-    id = '1',
-    name = 'Homework',
-    postToSis = '1',
-    pointsPossible = '10',
+    id = 'gfhrgsjaksa==',
+    _id = '9',
+    name = 'This is an Assignment',
     assignmentGroup = AssignmentGroup.mock(),
+    postToSis = false,
+    pointsPossible = 10,
+    gradingType = 'points',
+    unlockAt = null,
+    dueAt = null,
+    lockAt = null,
   } = {}) => ({
-    _id,
     id,
+    _id,
     name,
+    assignmentGroup,
     postToSis,
     pointsPossible,
-    assignmentGroup,
+    gradingType,
+    unlockAt,
+    dueAt,
+    lockAt,
+    __typename: 'Assignment',
   }),
 }
