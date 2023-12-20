@@ -22,8 +22,8 @@ import DatetimeField, {
   DATETIME_FORMAT_OPTIONS,
 } from '@canvas/datetime/jquery/DatetimeField'
 import $ from 'jquery'
-import tz from '@canvas/timezone'
-import tzInTest from '@canvas/timezone/specHelpers'
+import tz from '@canvas/datetime/timezone'
+import tzInTest from '@canvas/datetime/timezone/specHelpers'
 import timezone from 'timezone'
 import detroit from 'timezone/America/Detroit'
 import juneau from 'timezone/America/Juneau'

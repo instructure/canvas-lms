@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import tz from '@canvas/timezone'
+import tz from '@canvas/datetime/timezone'
 import enrollmentName from './enrollmentName'
 import _Handlebars from 'handlebars/runtime'
 import I18nObj, {useScope as useI18nScope} from '@canvas/i18n' //  'i18nObj' gets the extended I18n object with all the extra functions (interpolate, strftime, ...)

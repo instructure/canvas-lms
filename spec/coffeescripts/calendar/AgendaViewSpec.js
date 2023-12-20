@@ -1,3 +1,6 @@
+/* eslint-disable qunit/assert-args */
+/* eslint-disable qunit/no-ok-equality */
+
 /*
  * Copyright (C) 2013 - present Instructure, Inc.
  *
@@ -18,7 +21,7 @@
 
 import $ from 'jquery'
 import {isArray, isObject, uniq} from 'lodash'
-import tzInTest from '@canvas/timezone/specHelpers'
+import tzInTest from '@canvas/datetime/timezone/specHelpers'
 import timezone from 'timezone'
 import fcUtil from '@canvas/calendar/jquery/fcUtil'
 import denver from 'timezone/America/Denver'
@@ -151,7 +154,7 @@ test('should only include days on page breaks once', function () {
   view.fetch(this.contextCodes, this.startDate)
   let id = 1
   const addEvents = (events, date) =>
-    [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(i =>
+    [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(_i =>
       events.push({
         start_at: date.toISOString(),
         context_code: 'user_1',

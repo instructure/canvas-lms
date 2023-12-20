@@ -22,7 +22,7 @@ import _ from 'lodash'
 import assertions from 'helpers/assertions'
 import fakeENV from 'helpers/fakeENV'
 import numberFormat from '@canvas/i18n/numberFormat'
-import tzInTest from '@canvas/timezone/specHelpers'
+import tzInTest from '@canvas/datetime/timezone/specHelpers'
 import timezone from 'timezone'
 import detroit from 'timezone/America/Detroit'
 import chicago from 'timezone/America/Chicago'
@@ -45,6 +45,7 @@ const context = {
   alien: false,
 }
 
+// eslint-disable-next-line @typescript-eslint/no-shadow
 const testCheckbox = function (context, prop, hash = {}) {
   const $input = $(`<span>${helpers.checkbox.call(context, prop, {hash}).string}</span>`)
     .find('input')

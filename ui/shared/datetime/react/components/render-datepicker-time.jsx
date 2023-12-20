@@ -17,7 +17,7 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import tz from '@canvas/timezone'
+import tz from '../../timezone'
 import React from 'react'
 import ReactDOM from 'react-dom'
 

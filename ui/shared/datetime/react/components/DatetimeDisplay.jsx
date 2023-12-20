@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import tz from '@canvas/timezone'
+import tz from '../../timezone'
 
 // eslint-disable-next-line react/prefer-stateless-function
 class DatetimeDisplay extends React.Component {

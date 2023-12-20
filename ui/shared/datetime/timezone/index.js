@@ -16,10 +16,30 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import tz from '@canvas/datetime/timezone'
-import tzInTest from '@canvas/datetime/timezone/specHelpers'
+import {
+  parse,
+  format,
+  adjustFormat,
+  shift,
+  hasMeridiem as hasMeridian, // TODO: rename instances of 'meridian' to 'meridiem'
+} from 'datetime'
 
-tz.snapshot = () => {}
-tz.restore = tzInTest.restore
-tz.changeZone = tzInTest.changeZone
-tz.changeLocale = tzInTest.changeLocale
+import {
+  changeToTheSecondBeforeMidnight,
+  isMidnight,
+  mergeTimeAndDate,
+  setToEndOfMinute,
+} from '../index'
+
+// TODO: remove this module and redirect callers to @canvas/datetime
+export default {
+  adjustFormat,
+  changeToTheSecondBeforeMidnight,
+  format,
+  hasMeridian,
+  isMidnight,
+  mergeTimeAndDate,
+  parse,
+  setToEndOfMinute,
+  shift,
+}

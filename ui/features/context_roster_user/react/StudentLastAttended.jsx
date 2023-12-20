@@ -21,7 +21,7 @@ import PropTypes from 'prop-types'
 import moment from 'moment'
 import axios from '@canvas/axios'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import tz from '@canvas/timezone'
+import tz from '@canvas/datetime/timezone'
 
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'

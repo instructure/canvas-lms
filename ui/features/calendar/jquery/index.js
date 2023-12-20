@@ -23,7 +23,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import _ from 'underscore'
-import tz from '@canvas/timezone'
+import tz from '@canvas/datetime/timezone'
 import moment from 'moment'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import decodeFromHex from '@canvas/util/decodeFromHex'

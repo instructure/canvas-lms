@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import tz from '@canvas/timezone'
+import tz from '@canvas/datetime/timezone'
 import type {SettingsPanelState} from '../react/settingsReducer'
 import type {ModuleItem, Requirement} from '../react/types'
 

@@ -17,7 +17,7 @@
 //
 
 import _ from 'underscore'
-import tz from '@canvas/timezone'
+import tz from './timezone'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import GradingPeriodsHelper from '@canvas/grading/GradingPeriodsHelper'
 import DateHelper from './dateHelper'

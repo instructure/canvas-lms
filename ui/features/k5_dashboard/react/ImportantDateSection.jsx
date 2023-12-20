@@ -23,7 +23,7 @@ import moment from 'moment-timezone'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 
-import tz from '@canvas/timezone'
+import tz from '@canvas/datetime/timezone'
 import ImportantDateItem, {ImportantDateItemShape} from './ImportantDateItem'
 
 const ImportantDateSection = ({date, items, timeZone}) => {

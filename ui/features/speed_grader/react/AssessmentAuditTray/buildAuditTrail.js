@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import timezone from '@canvas/timezone'
+import timezone from '@canvas/datetime/timezone'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {auditEventStudentAnonymityStates, overallAnonymityStates} from './AuditTrailHelpers'

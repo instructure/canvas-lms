@@ -18,7 +18,7 @@
 
 import _ from 'underscore'
 import $ from 'jquery'
-import tz from '@canvas/timezone'
+import tz from './timezone'
 import './jquery/index'
 
 const DateHelper = {
