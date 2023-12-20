@@ -2557,6 +2557,7 @@ $(document).ready(function () {
         courseId={itemProps.courseId}
         itemName={itemProps.moduleItemName}
         itemType={itemProps.moduleItemType}
+        iconType={itemProps.moduleItemType}
         itemContentId={itemProps.moduleItemContentId}
         pointsPossible={itemProps.pointsPossible}
         locale={ENV.LOCALE || 'en'}

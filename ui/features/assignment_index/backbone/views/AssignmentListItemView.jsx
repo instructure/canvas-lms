@@ -42,6 +42,7 @@ import template from '../../jst/AssignmentListItem.handlebars'
 import scoreTemplate from '../../jst/_assignmentListItemScore.handlebars'
 import AssignmentKeyBindingsMixin from '../mixins/AssignmentKeyBindingsMixin'
 import CreateAssignmentView from './CreateAssignmentView'
+import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
 
 const I18n = useI18nScope('AssignmentListItemView')
 
@@ -61,6 +62,8 @@ export default AssignmentListItemView = (function () {
       this.onDuplicateFailedRetry = this.onDuplicateFailedRetry.bind(this)
       this.onMigrateFailedRetry = this.onMigrateFailedRetry.bind(this)
       this.onDuplicateOrImportFailedCancel = this.onDuplicateOrImportFailedCancel.bind(this)
+      this.renderItemAssignToTray = this.renderItemAssignToTray.bind(this)
+      this.onAssign = this.onAssign.bind(this)
       this.onDelete = this.onDelete.bind(this)
       this.onSendAssignmentTo = this.onSendAssignmentTo.bind(this)
       this.onCopyAssignmentTo = this.onCopyAssignmentTo.bind(this)
@@ -107,6 +110,7 @@ export default AssignmentListItemView = (function () {
       this.prototype.events = {
         'click .delete_assignment': 'onDelete',
         'click .duplicate_assignment': 'onDuplicate',
+        'click .assign-to-link': 'onAssign',
         'click .send_assignment_to': 'onSendAssignmentTo',
         'click .copy_assignment_to': 'onCopyAssignmentTo',
         'click .tooltip_link': preventDefault(function () {}),
@@ -370,6 +374,7 @@ export default AssignmentListItemView = (function () {
         data = this._setJSONForGrade(data)
       }
       data.courseId = this.model.get('course_id')
+      data.differentiatedModulesFlag = ENV.FEATURES?.differentiated_modules
       data.showSpeedGraderLinkFlag = ENV.FLAGS?.show_additional_speed_grader_link
       data.showSpeedGraderLink = ENV.SHOW_SPEED_GRADER_LINK
       // publishing and unpublishing the underlying model does not rerender this view.
@@ -504,6 +509,47 @@ export default AssignmentListItemView = (function () {
     onDuplicateOrImportFailedCancel(e) {
       e.preventDefault()
       return this.delete({silent: true})
+    }
+
+
+    renderItemAssignToTray(open, returnFocusTo, itemProps) {
+      ReactDOM.render(
+        <ItemAssignToTray
+          open={open}
+          onClose={() => {
+            ReactDOM.unmountComponentAtNode(
+              document.getElementById('assign-to-mount-point')
+            )
+          }}
+          onDismiss={() => {
+            this.renderItemAssignToTray(false, returnFocusTo, itemProps)
+            returnFocusTo.focus()
+          }}
+          itemType='assignment'
+          locale={ENV.LOCALE || 'en'}
+          timezone={ENV.TIMEZONE || 'UTC'}
+          {...itemProps}
+        />,
+        document.getElementById('assign-to-mount-point')
+      )
+    }
+
+    onAssign(e) {
+      e.preventDefault()
+      const returnFocusTo = $(e.target).closest('ul').prev('.al-trigger')
+
+      const courseId = e.target.getAttribute('data-assignment-context-id')
+      const itemName = e.target.getAttribute('data-assignment-name')
+      const itemContentId = e.target.getAttribute('data-assignment-id')
+      const pointsPossible = parseFloat(e.target.getAttribute('data-assignment-points-possible')) + ' pts'
+      const iconType = e.target.getAttribute('data-assignment-type') ? 'quiz' : 'assignment'
+      this.renderItemAssignToTray(true, returnFocusTo, {
+        courseId,
+        itemName,
+        itemContentId,
+        pointsPossible,
+        iconType
+      })
     }
 
     onDelete(e) {

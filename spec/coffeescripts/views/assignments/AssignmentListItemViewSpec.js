@@ -134,6 +134,7 @@ const createView = function (model, options) {
     newquizzes_on_quiz_page: options.newquizzes_on_quiz_page,
   }
   ENV.SHOW_SPEED_GRADER_LINK = options.show_additional_speed_grader_link
+  ENV.FEATURES.differentiated_modules = options.differentiated_modules
 
   const view = new AssignmentListItemView({
     model,
@@ -839,6 +840,30 @@ test('displays cancel button when assignment failed to duplicate is not blueprin
   })
   const view = createView(model)
   ok(view.$('button.duplicate-failed-cancel.btn').text().includes('Cancel'))
+})
+
+test('can assign assignment if flag is on and has edit permissions', function () {
+  const view = createView(this.model, {
+    canManage: true,
+    differentiated_modules: true,
+  })
+  equal(view.$('.assign-to-link').length, 1)
+})
+
+test('canot assign assignment if no edit permissions', function () {
+  const view = createView(this.model, {
+    canManage: false,
+    differentiated_modules: true,
+  })
+  equal(view.$('.assign-to-link').length, 0)
+})
+
+test('cannot assign assignment if flag is off', function () {
+  const view = createView(this.model, {
+    canManage: true,
+    differentiated_modules: false,
+  })
+  equal(view.$('.assign-to-link').length, 0)
 })
 
 test('can move when userIsAdmin is true', function () {

@@ -30,6 +30,7 @@ describe('ItemAssignToTray', () => {
     courseId: '1',
     itemName: 'Item Name',
     itemType: 'assignment',
+    iconType: 'assignment',
     itemContentId: '23',
     pointsPossible: '10 pts',
     locale: 'en',
