@@ -17,7 +17,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Backbone from '@canvas/backbone'
+import Backbone from './index'
 
 export type CanvasStore<A> = {
   setState(newState: Partial<A>): void

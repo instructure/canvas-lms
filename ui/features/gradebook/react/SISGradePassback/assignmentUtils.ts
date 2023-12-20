@@ -19,7 +19,7 @@
 
 import $ from 'jquery'
 import _ from 'underscore'
-import '@canvas/util/createStore'
+import '@canvas/backbone/createStore'
 import type {AssignmentWithOverride} from '../default_gradebook/gradebook.d'
 
 type PartialAssignment = Pick<

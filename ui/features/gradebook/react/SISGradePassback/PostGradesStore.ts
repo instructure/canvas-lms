@@ -19,7 +19,7 @@
 
 import $ from 'jquery'
 import _ from 'underscore'
-import createStore from '@canvas/util/createStore'
+import createStore from '@canvas/backbone/createStore'
 import assignmentUtils from './assignmentUtils'
 import type {AssignmentWithOverride} from '../default_gradebook/gradebook.d'
 
