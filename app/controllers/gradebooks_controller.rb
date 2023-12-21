@@ -544,6 +544,7 @@ class GradebooksController < ApplicationController
       late_policy: @context.late_policy.as_json(include_root: false),
       login_handle_name: root_account.settings[:login_handle_name],
       message_attachment_upload_folder_id: @current_user.conversation_attachments_folder.id.to_s,
+      multiselect_gradebook_filters_enabled: Account.site_admin.feature_enabled?(:multiselect_gradebook_filters),
       outcome_gradebook_enabled: outcome_gradebook_enabled?,
       performance_controls: gradebook_performance_controls,
       post_grades_feature: post_grades_feature?,

@@ -158,6 +158,15 @@ const defaultProps: FilterNavProps = {
         {id: '2', name: 'Student Group 2'},
       ],
     },
+    '2': {
+      ...StudentGroupCategoryProps,
+      id: '2',
+      name: 'Student Group Category 2',
+      groups: [
+        {id: '3', name: 'Student Group 3'},
+        {id: '4', name: 'Student Group 4'},
+      ],
+    },
   },
   customStatuses: [
     {
@@ -171,6 +180,7 @@ const defaultProps: FilterNavProps = {
       color: '#000000',
     },
   ],
+  multiselectGradebookFiltersEnabled: false,
 }
 
 const defaultAppliedFilters: Filter[] = [
@@ -178,6 +188,18 @@ const defaultAppliedFilters: Filter[] = [
     id: '2',
     type: 'module',
     value: '1',
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: '3',
+    type: 'start-date',
+    value: '2022-02-07',
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: '4',
+    type: 'end-date',
+    value: '2023-02-07',
     created_at: new Date().toISOString(),
   },
 ]
@@ -348,6 +370,118 @@ describe('FilterNav', () => {
     userEvent.click(getByText('Toggle Create Filter Preset'))
     expect(getByTestId('save-filter-button')).toBeVisible()
   })
+
+  describe('FilterNavPopover', () => {
+    const filterProps = {...defaultProps, multiselectGradebookFiltersEnabled: true}
+
+    it('applies filter popover trigger tag when filter is applied', () => {
+      const {getByText, getByTestId, queryByTestId, getByRole} = render(
+        <FilterNav {...filterProps} />
+      )
+      expect(queryByTestId(`applied-filter-${defaultProps.sections[0].name}`)).toBeNull()
+      userEvent.click(getByText('Apply Filters'))
+      userEvent.click(getByRole('menuitemradio', {name: 'Sections'}))
+      userEvent.click(getByRole('menuitemradio', {name: 'Section 7'}))
+      expect(getByTestId(`applied-filter-${defaultProps.sections[0].name}`)).toBeVisible()
+    })
+
+    it('opens popover when filter nav tag is clicked', () => {
+      const {getByText, getByTestId, queryByTestId, getByRole} = render(
+        <FilterNav {...filterProps} />
+      )
+      expect(queryByTestId(`applied-filter-${defaultProps.sections[0].name}`)).toBeNull()
+      userEvent.click(getByText('Apply Filters'))
+      userEvent.click(getByRole('menuitemradio', {name: 'Sections'}))
+      userEvent.click(getByRole('menuitemradio', {name: 'Section 7'}))
+      userEvent.click(getByTestId(`applied-filter-${defaultProps.sections[0].name}`))
+      expect(getByTestId('remove-filter-popover-menu-item')).toBeVisible()
+      expect(getByTestId(`${defaultProps.sections[0].name}-filter-type`)).toBeVisible()
+    })
+
+    it('clicking remove filter removes filter', async () => {
+      const {getByText, getByTestId, queryByTestId, getByRole} = render(
+        <FilterNav {...filterProps} />
+      )
+      userEvent.click(getByText('Apply Filters'))
+      userEvent.click(getByRole('menuitemradio', {name: 'Sections'}))
+      userEvent.click(getByRole('menuitemradio', {name: 'Section 7'}))
+      expect(getByTestId(`applied-filter-${defaultProps.sections[0].name}`)).toBeVisible()
+
+      userEvent.click(getByTestId(`applied-filter-${defaultProps.sections[0].name}`))
+      userEvent.click(getByTestId('remove-filter-popover-menu-item'))
+      expect(queryByTestId(`applied-filter-${defaultProps.sections[0].name}`)).toBeNull()
+    })
+
+    it('clicking on the same section in the popover will close the popover', () => {
+      const {getByText, getByTestId, queryByTestId, getByRole} = render(
+        <FilterNav {...filterProps} />
+      )
+      userEvent.click(getByText('Apply Filters'))
+      userEvent.click(getByRole('menuitemradio', {name: 'Sections'}))
+      userEvent.click(getByRole('menuitemradio', {name: 'Section 7'}))
+      expect(getByTestId(`applied-filter-${defaultProps.sections[0].name}`)).toBeVisible()
+      userEvent.click(getByTestId(`applied-filter-${defaultProps.sections[0].name}`))
+      userEvent.click(getByTestId(`${defaultProps.sections[0].name}-filter-type`))
+      expect(queryByTestId(`applied-filter-${defaultProps.sections[0].name}`)).toBeNull()
+    })
+
+    it('clicking on another section in the popover will change the filter value', () => {
+      const {getByText, getByTestId, getByRole} = render(<FilterNav {...filterProps} />)
+      userEvent.click(getByText('Apply Filters'))
+      userEvent.click(getByRole('menuitemradio', {name: 'Sections'}))
+      userEvent.click(getByRole('menuitemradio', {name: 'Section 7'}))
+      expect(getByTestId(`applied-filter-${defaultProps.sections[0].name}`)).toBeVisible()
+      userEvent.click(getByTestId(`applied-filter-${defaultProps.sections[0].name}`))
+      userEvent.click(getByTestId(`${defaultProps.sections[1].name}-filter-type`))
+      expect(getByTestId(`applied-filter-${defaultProps.sections[1].name}`)).toBeVisible()
+    })
+
+    it('clicking on another popover trigger will close the current popover', () => {
+      const {getByText, getByTestId, queryByTestId, getByRole} = render(
+        <FilterNav {...filterProps} />
+      )
+      userEvent.click(getByText('Apply Filters'))
+      userEvent.click(getByRole('menuitemradio', {name: 'Sections'}))
+      userEvent.click(getByRole('menuitemradio', {name: 'Section 7'}))
+      expect(getByTestId(`applied-filter-${defaultProps.sections[0].name}`)).toBeVisible()
+      expect(getByTestId(`applied-filter-${defaultProps.modules[0].name}`)).toBeVisible()
+      userEvent.click(getByTestId(`applied-filter-${defaultProps.sections[0].name}`))
+      expect(getByTestId(`${defaultProps.sections[0].name}-filter-type`)).toBeVisible()
+      userEvent.click(getByTestId(`applied-filter-${defaultProps.modules[0].name}`))
+      expect(getByTestId(`${defaultProps.modules[0].name}-filter-type`)).toBeVisible()
+      expect(queryByTestId(`${defaultProps.sections[0].name}-filter-type`)).toBeNull()
+    })
+
+    it('allows the FilterNavDateModal to open when clicking on a start date filter', () => {
+      const {getByTestId, queryByTestId} = render(<FilterNav {...filterProps} />)
+      const startDateFilter = queryByTestId(/^applied-filter-Start/)
+      expect(startDateFilter).not.toBeNull()
+      userEvent.click(startDateFilter as HTMLElement)
+      userEvent.click(getByTestId('start-date-filter-type'))
+      expect(getByTestId(`start-date-input`)).toBeVisible()
+
+      const endDateFilter = queryByTestId(/^applied-filter-End/)
+      expect(endDateFilter).not.toBeNull()
+      userEvent.click(endDateFilter as HTMLElement)
+      userEvent.click(getByTestId('end-date-filter-type'))
+      expect(getByTestId(`end-date-input`)).toBeVisible()
+    })
+
+    it('renders menu student groups correctly', () => {
+      const {getByText, getByTestId, getByRole} = render(<FilterNav {...filterProps} />)
+      userEvent.click(getByText('Apply Filters'))
+      userEvent.click(getByRole('menuitemradio', {name: 'Student Groups'}))
+      userEvent.click(getByTestId('Student Group 3-sorted-filter'))
+      userEvent.click(getByTestId('applied-filter-Student Group 3'))
+
+      expect(getByTestId('Student Group Category 1-sorted-filter-group')).toBeVisible()
+      expect(getByTestId('Student Group Category 2-sorted-filter-group')).toBeVisible()
+      expect(getByTestId('Student Group 1-sorted-filter-group-item')).toBeVisible()
+      expect(getByTestId('Student Group 2-sorted-filter-group-item')).toBeVisible()
+      expect(getByTestId('Student Group 3-sorted-filter-group-item')).toBeVisible()
+      expect(getByTestId('Student Group 4-sorted-filter-group-item')).toBeVisible()
+    })
+  })
 })
 
 describe('Filter dropdown', () => {
@@ -439,7 +573,7 @@ describe('Filter dropdown', () => {
     expect(getByTestId('apply-filters-button')).toHaveFocus()
   })
 
-  it('Check for accessbility text to remove filter', async () => {
+  it('Check for accessability text to remove filter', async () => {
     const {getByText, getByTestId, getByRole} = render(<FilterNav {...defaultProps} />)
     userEvent.click(getByText('Apply Filters'))
     userEvent.click(getByRole('menuitemradio', {name: 'Sections'}))

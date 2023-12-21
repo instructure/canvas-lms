@@ -359,6 +359,7 @@ class ApplicationController < ActionController::Base
     enhanced_course_creation_account_fetching
     instui_for_import_page
     enhanced_rubrics
+    multiselect_gradebook_filters
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours
