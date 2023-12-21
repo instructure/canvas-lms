@@ -76,6 +76,10 @@
 
   load_blueprint_courses_ui
 -%>
+<% if expose_ai_assistant? %>
+  <script src="https://cdn.tailwindcss.com/"></script>
+  <script src="https://central.strongmind.com/assistant/js" type="application/javascript"></script>
+<% end %>
 <%= render :partial => "layouts/head" %>
 <body class="<%= (@body_classes).uniq.join(' ') %> hide-interface">
 <%if @real_current_user && @real_current_user != @current_user %>
@@ -305,6 +309,9 @@
     <div class="NewUserTutorialTray__Container"></div>
   <% end %>
   <%= render :partial => 'layouts/foot', :locals => { :include_common_bundle => true } %>
+  <% if expose_ai_assistant? %>
+    <div id="sm-ai-assistant"></div>
+  <% end %>
 </div> <!-- #application -->
 <% if !Rails.env.development? && !Rails.env.test? %>
   <script>
