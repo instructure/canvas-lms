@@ -8468,7 +8468,7 @@ ar:
     one: "1 محاولة"
     other: "%{count} من المحاولات"
     two: "%{count} من المحاولات"
-    zero: "%{count} من المحاولات"
+    zero: "0 من المحاولات"
   count_changes_pushed_by_user_654aade2: "%{count} من التغييرات مدفوعة بواسطة %{user}"
   count_comments_cb137ab8: 
     few: "%{count} تعليقات"
