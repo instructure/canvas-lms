@@ -18,6 +18,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
+import '@canvas/jquery/jquery.ajaxJSON'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import axios from '@canvas/axios'
