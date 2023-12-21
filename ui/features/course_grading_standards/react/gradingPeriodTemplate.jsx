@@ -23,7 +23,7 @@ import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import _ from 'underscore'
 import DateHelper from '@canvas/datetime/dateHelper'
-import '@canvas/datetime'
+import '@canvas/datetime/jquery'
 
 const I18n = useI18nScope('gradingPeriodTemplate')
 

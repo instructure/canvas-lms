@@ -32,14 +32,14 @@ import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import SelectContent from '../select_content'
 import setDefaultToolValues from '../setDefaultToolValues'
 import {findLinkForService, getUserServices} from '@canvas/services/findLinkForService'
-import '@canvas/datetime' /* datetime_field */
+import '@canvas/datetime/jquery' /* datetime_field */
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, ajaxJSONFiles, getFormData, errorBox */
 import 'jqueryui/dialog'
 import '@canvas/util/jquery/fixDialogButtons'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* showIf */
-import '@canvas/keycodes'
+import '@canvas/jquery/jquery.keycodes'
 import '@canvas/loading-image'
 import '@canvas/util/templateData'
 import type {DeepLinkResponse} from '@canvas/deep-linking/DeepLinkResponse'

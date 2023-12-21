@@ -129,12 +129,12 @@ import 'jqueryui/draggable'
 import '@canvas/jquery/jquery.ajaxJSON' /* getJSON, ajaxJSON */
 import '@canvas/forms/jquery/jquery.instructure_forms' /* ajaxJSONFiles */
 import '@canvas/doc-previews' /* loadDocPreview */
-import '@canvas/datetime' /* datetimeString */
+import '@canvas/datetime/jquery' /* datetimeString */
 import 'jqueryui/dialog'
 import 'jqueryui/menu'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, showIf, hasScrollbar */
-import '@canvas/keycodes'
+import '@canvas/jquery/jquery.keycodes'
 import '@canvas/loading-image'
 import '@canvas/util/templateData'
 import '@canvas/media-comments'

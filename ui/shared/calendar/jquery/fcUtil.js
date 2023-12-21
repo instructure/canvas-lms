@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import tz from '@canvas/datetime/timezone'
 import 'fullcalendar'
-import '@canvas/datetime'
+import '@canvas/datetime/jquery'
 
 // expects a date (unfudged), and returns a fullcalendar moment
 // (fudged) appropriate for passing to fullcalendar methods

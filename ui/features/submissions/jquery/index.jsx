@@ -26,7 +26,7 @@ import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import {EmojiPicker, EmojiQuickPicker} from '@canvas/emoji'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/forms/jquery/jquery.instructure_forms' /* ajaxJSONFiles */
-import '@canvas/datetime' /* datetimeString */
+import '@canvas/datetime/jquery' /* datetimeString */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* fragmentChange, showIf */
 import '@canvas/loading-image'
 import '@canvas/util/templateData'

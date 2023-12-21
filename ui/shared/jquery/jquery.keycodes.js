@@ -20,7 +20,6 @@
 // when they occur.  Can use text or key codes, passed in as a
 // space-separated string.
 import $ from 'jquery'
-import '@canvas/datetime'
 
 function isFirefox() {
   return /Firefox/i.test(window.navigator.userAgent)

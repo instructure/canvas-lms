@@ -28,12 +28,12 @@ import './instructure_helper'
 import 'jqueryui/draggable'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/doc-previews' /* loadDocPreview */
-import '@canvas/datetime' /* datetimeString, dateString, fudgeDateForProfileTimezone */
+import '@canvas/datetime/jquery' /* datetimeString, dateString, fudgeDateForProfileTimezone */
 import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */
 import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags, youTubeID */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* ifExists, .dim, confirmDelete, showIf, fillWindowWithMe */
-import '@canvas/keycodes'
+import '@canvas/jquery/jquery.keycodes'
 import '@canvas/loading-image'
 import '@canvas/rails-flash-notifications'
 import '@canvas/util/templateData'

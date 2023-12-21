@@ -24,7 +24,8 @@ import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, getFormDat
 import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, showIf, .dim */
-import '@canvas/keycodes' /* keycodes */
+import '@canvas/datetime/jquery'
+import '@canvas/jquery/jquery.keycodes' /* keycodes */
 import '@canvas/loading-image' /* loadingImage */
 import '@canvas/util/templateData'
 

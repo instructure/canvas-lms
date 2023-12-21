@@ -41,5 +41,3 @@ export function setToEndOfMinute(date) {
 export function mergeTimeAndDate(time, date) {
   return parse(format(date, '%F ') + format(time, '%T'))
 }
-
-export {default} from './jquery/index'
