@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// import {PortfolioCardSkeleton} from './Portfolios/PortfolioCard'
-
 export interface AchievementData {
   id: string
   isNew: boolean
@@ -36,6 +34,7 @@ export interface AchievementData {
   verifiedBy: string | null
 }
 
+// ----------------- portfolios -----------------
 export interface PortfolioData {
   id: string
   title: string
@@ -89,6 +88,7 @@ export interface PortfolioEditData {
   projects: ProjectData[]
 }
 
+// ----------------- projects -----------------
 export interface ProjectData {
   id: string
   title: string
@@ -115,4 +115,40 @@ export interface ProjectDetailData extends ProjectData {
 export interface ProjectEditData {
   project: ProjectDetailData
   achievements: AchievementData[]
+}
+
+// ---------- pathways ----------
+
+export type MilestoneId = string
+
+// this is a node in the pathway tree
+
+export interface RequirementData {
+  id: string
+}
+export interface MilestoneData {
+  id: MilestoneId
+  title: string
+  description: string
+  required?: boolean
+  requirements: RequirementData[]
+  next_milestones: MilestoneId[]
+}
+
+// this is the root of the pathway tree
+export interface PathwayData {
+  id: string
+  title: string
+  milestoneCount: number
+  requirementCount: number
+  published?: string // iso8601 date
+  enrolled_student_count: number
+  started_count: number
+  completed_count: number
+}
+
+export interface PathwayDetailData extends PathwayData {
+  description: string
+  first_milestones: MilestoneId[]
+  milestones: MilestoneData[]
 }

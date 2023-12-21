@@ -204,7 +204,11 @@
     "velocity-animate": "^1.5.0",
     "webpack-retry-chunk-load-plugin": "^3.1.1",
     "yarn-deduplicate": "^3.0.1",
-    "zustand": "3.7.2"
+    "zustand": "3.7.2",
+    "dagre": "^0.8.5",
+    "@types/dagre": "^0.7.52",
+    "b-spline": "^2.0.2",
+    "@types/b-spline": "^2.0.4"
   },
   "devDependencies": {
     "@apollo/react-common": "~3.0.1",

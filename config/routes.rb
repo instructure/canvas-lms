@@ -931,6 +931,9 @@ CanvasRails::Application.routes.draw do
     put "passport/data/projects/duplicate" => "learner_passport#project_duplicate"
     put "passport/data/projects/delete" => "learner_passport#project_delete"
 
+    get "passport/data/pathways" => "learner_passport#pathways_index"
+    get "passport/data/pathways/show/:pathway_id" => "learner_passport#pathway_show"
+
     get "passport/data/skills" => "learner_passport#skills_index"
     get "passport/data/reset" => "learner_passport#reset"
 

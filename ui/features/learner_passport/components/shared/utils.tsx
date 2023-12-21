@@ -65,6 +65,14 @@ export const formatDate = (date: string | Date) => {
   )
 }
 
+export const formatDate2 = (date: string | Date) => {
+  return new Intl.DateTimeFormat(ENV.LOCALE || 'en', {
+    day: 'numeric',
+    month: 'numeric',
+    year: 'numeric',
+  }).format(new Date(date))
+}
+
 export function isUrlToLocalCanvasFile(url: string): boolean {
   const fileURL = new URL(url, window.location.origin)
 
