@@ -48,4 +48,8 @@ class SubAssignment < AbstractAssignment
     relevant_changes = tracked_attributes & previous_changes.keys
     relevant_changes.any?
   end
+
+  def governs_submittable?
+    false
+  end
 end

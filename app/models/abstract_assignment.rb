@@ -1093,7 +1093,7 @@ class AbstractAssignment < ActiveRecord::Base
   end
 
   def delete_empty_abandoned_children
-    if saved_change_to_submission_types?
+    if governs_submittable? && saved_change_to_submission_types?
       each_submission_type do |submittable, type|
         unless self.submission_types == type.to_s
           submittable&.unlink!(:assignment)
@@ -1120,7 +1120,7 @@ class AbstractAssignment < ActiveRecord::Base
   def update_submittable
     # If we're updating the assignment's muted status as part of posting
     # grades, don't bother doing this
-    return true if deleted? || grade_posting_in_progress
+    return true if !governs_submittable? || deleted? || grade_posting_in_progress
 
     if self.submission_types == "online_quiz" && @saved_by != :quiz
       quiz = Quizzes::Quiz.where(assignment_id: self).first || context.quizzes.build
