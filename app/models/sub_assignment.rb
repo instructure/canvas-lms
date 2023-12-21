@@ -25,6 +25,10 @@ class SubAssignment < AbstractAssignment
 
   after_commit :aggregate_checkpoint_assignments, if: :checkpoint_changes?
 
+  set_broadcast_policy do
+    # TODO: define broadcast policies for checkpoints
+  end
+
   def checkpoint?
     true
   end
