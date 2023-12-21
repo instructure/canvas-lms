@@ -25,7 +25,7 @@ GEM
       rdoc
       reline (>= 0.3.8)
     minitest (5.20.0)
-    psych (5.1.1.1)
+    psych (5.1.2)
       stringio
     rake (13.1.0)
     rdoc (6.6.2)
