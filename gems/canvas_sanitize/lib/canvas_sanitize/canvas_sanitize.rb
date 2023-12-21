@@ -47,6 +47,13 @@ module CanvasSanitize # :nodoc:
   end
 
   DEFAULT_PROTOCOLS = ["http", "https", :relative].freeze
+
+  remove_spaces_from_ids = lambda do |env|
+    return unless env[:node]&.element? && env[:node][:id] && env[:node][:id].match?(/\s/)
+
+    env[:node][:id] = env[:node][:id].gsub(/\s+/, "")
+  end
+
   SANITIZE = {
     elements: [
       "a",
@@ -712,7 +719,9 @@ module CanvasSanitize # :nodoc:
       %w[bottom left right top].map { |i| "padding-#{i}" }
                   ).to_set.freeze,
       protocols: DEFAULT_PROTOCOLS
-    }
+    },
+
+    transformers: remove_spaces_from_ids
   }.freeze
 
   # Any allowed elements for which we don't explicitly declare a
