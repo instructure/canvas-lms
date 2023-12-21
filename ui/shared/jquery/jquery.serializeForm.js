@@ -16,7 +16,6 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import {send} from '@canvas/rce/RceCommandShim'
 
 const rselectTextarea = /^(?:select|textarea)/i
 const rCRLF = /\r?\n/g
@@ -50,6 +49,28 @@ function resultFor(name, value) {
   return {name, value}
 }
 
+/**
+ * @type {((a: import('jquery').JQuery ) => {tag: 'none'} | {tag: 'value', value: unknown})[]}
+ */
+const extraValueHandlers = []
+
+/**
+ * Regsters a handler that will be called when serializing a form.
+ * Handlers are given an input field, and can optionally return a value to use.
+ * If no value is returned, the handler is skipped
+ * @param {(a: import('jquery').JQuery ) => {tag: 'none'} | {tag: 'value', value: unknown}} handler
+ * @returns {() => void} deregister
+ */
+export const registerJQueryValueHandler = function (handler) {
+  extraValueHandlers.push(handler)
+  return () => {
+    const index = extraValueHandlers.indexOf(handler)
+    if (index > -1) {
+      extraValueHandlers.splice(index, 1)
+    }
+  }
+}
+
 function getValue() {
   const $input = $(this)
   const value = (() => {
@@ -62,10 +83,27 @@ function getValue() {
       } else {
         return $input.data('date') || null
       }
-    } else if ($input.data('rich_text')) {
-      return send($input, 'get_code', false)
     } else {
-      return $input.val()
+      /**
+       * @type { {tag: 'none'} | {tag: 'value', value: unknown }
+       */
+      const handled = extraValueHandlers.reduce(
+        (current, handler) => {
+          if (current.tag === 'value') return current
+          const result = handler($input)
+          if (result.tag === 'value') {
+            return result
+          } else {
+            return {tag: 'none'}
+          }
+        },
+        {tag: 'none'}
+      )
+      if (handled.tag === 'value') {
+        return handled.value
+      } else {
+        return $input.val()
+      }
     }
   })()
 
