@@ -29,7 +29,7 @@ import criterionHeaderTemplate from '../../jst/_criterionHeader.handlebars'
 import {showConfirmOutcomeEdit} from '../../react/ConfirmOutcomeEditModal'
 import {addCriterionInfoButton} from '../../react/CriterionInfo'
 import 'jqueryui/dialog'
-import CalculationMethodContent from '@canvas/grade-summary/backbone/models/CalculationMethodContent'
+import CalculationMethodContent from '@canvas/grading/CalculationMethodContent'
 
 const I18n = useI18nScope('OutcomeView')
 

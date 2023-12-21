@@ -19,14 +19,20 @@
 import I18n from './i18nObj'
 
 const numberFormat = {
-  _format(n, options) {
+  _format(
+    n: number,
+    options: {
+      precision?: number
+      strip_insignificant_zeros?: boolean
+    }
+  ) {
     if (typeof n !== 'number' || Number.isNaN(Number(n))) {
       return n
     }
     return I18n.n(n, options)
   },
 
-  outcomeScore(n) {
+  outcomeScore(n: number) {
     return numberFormat._format(n, {precision: 2, strip_insignificant_zeros: true})
   },
 }
