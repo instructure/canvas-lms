@@ -5276,6 +5276,7 @@ fa:
       update_assignment_points: "امتیازهای تکلیف را برای مطابقت با دستورالعمل ارزیابی تغییر می دهید؟"
   change_section_to_sectionname_6e947e90: "تغییر بخش به %{sectionName}"
   change_sis_ids_3a47154d: "تغییر شناسه های سامانه اطلاعات دانشجو"
+  change_to_b757d327: "تغییر به"
   changed_item_1d16a85f: "مورد تغییر یافته"
   changes_will_still_apply_if_you_leave_this_page_935cedc6: "در صورتی که از این صفحه خارج شوید، تغییرات باز هم اعمال خواهند شد."
   changes_you_made_may_not_be_saved_4e8db973: "تغییرات انجام شده ممکن است ذخیره نشوند."
@@ -11317,6 +11318,7 @@ fa:
         out_of: از
         score: نمره
         submission_progress_status: "وضعیت پیشرفت ارسال"
+        submitted: "ارسال شد"
       icons: 
         turnitin_results: "مشاهده نتایج Turnitin"
       labels: 
@@ -20178,6 +20180,7 @@ fa:
   remove_contact_method_ca890ba3: "حذف روش تماس"
   remove_course_association_name_b760c502: "حذف انجمن درس %{name}"
   remove_d83a966c: "حذف:"
+  remove_dates_5a5a8df2: "حذف تاریخ ها"
   remove_dates_9b9ba2f6: "حذف تاریخ ها"
   remove_displayname_a2f31aa3: "حذف %{displayName}"
   remove_domain_from_the_whitelist_14c7d5e9: "حذف%{domain} از لیست سفید"
@@ -22014,6 +22017,7 @@ fa:
   shared_content_803ac37b: "محتوای مشترک"
   shared_secret_892c88f2: "رمز مشترک"
   she_her_3f459cc2: "او \"زن\" / او \"مرد\""
+  shift_dates_746698a5: "تغییر دادن تاریخ ها"
   shift_dates_b5a7b7a1: "تاریخ های شیفت"
   short_name_42f454a1: "نام کوتاه"
   short_name_ad9bf84f: "نام کوتاه"
@@ -22900,6 +22904,7 @@ fa:
   subscribe_failed_2eb62de0: "اشتراک انجام نشد"
   subscribe_to_title_c7d6bbd2: "اشتراک در %{title}"
   subscribed_fe74d22a: "مشترک شدید"
+  substitution_713c65b9: جایگزینی
   subtitle_ee60ca78: زیرنویس
   success_file_uploaded_8174e93f: "موفقیت: پرونده بارگذاری شد"
   success_grades_have_been_hidden_for_assignmentname_4ed03c00: "موفقیت! نمرات مخفی شد برای قسمتهای %{assignmentName}."
@@ -25659,6 +25664,7 @@ fa:
   you_must_allow_at_least_one_group_to_attend_68531eab: "باید حداقل به یک گروه اجازه حضور بدهید"
   you_must_attach_a_file_b6041092: "شما باید یک فایل پیوست کنید"
   you_must_attach_at_least_one_file_to_this_assignme_9f39ce12: "باید حداقل یک فایل را به این تکلیف پیوست کنید"
+  you_must_choose_a_content_option_c776bdef: "باید یک گزینه محتوا را انتخاب کنید"
   you_must_enter_a_date_f8eabfb1: "باید یک تاریخ وارد کنید"
   you_must_have_a_student_or_section_selected_a99e45df: "باید یک دانشجو یا بخش را انتخاب کنید"
   you_must_input_a_section_b8d370fe: "شما باید یک بخش را وارد کنید"
@@ -25668,6 +25674,7 @@ fa:
   you_must_provide_a_value_or_unselect_the_option_3b28b754: "باید یک مقدار آماده کنید و یا انتخاب گزینه را لغو کنید."
   you_must_provide_targetgroupid_or_targetcontextid__dd2bf92: "شما باید targetGroupId یا targetContextId و targetContextType را ارائه دهید"
   you_must_select_a_course_to_copy_content_from_e7bd9e09: "باید یک درس را برای کپی کردن محتوا از آن، انتخاب کنید"
+  you_must_select_a_file_to_import_content_from_28a242ff: "یک فایل را برای وارد کردن محتوا از آن انتخاب کنید"
   you_must_select_a_folder_to_upload_your_migration__ac7bc7c0: "باید یک پوشه انتخاب کنید برای بارگذاری انتقال خود در"
   you_must_select_an_assignment_group_c16a2168: "شما باید یک گروه تکلیف انتخاب کنید."
   you_must_set_document_usage_rights_b4afa1e9: "شما باید حقوق استفاده از سند را تنظیم کنید"
