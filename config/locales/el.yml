@@ -3319,6 +3319,7 @@ el:
       update_assignment_points: "Αν η εργασία παραμείνει με %{assignmentPoints} συνολικά μόρια και η ρουμπρίκα με %{rubricPoints} συνολικά μόρια, τότε η μέγιστη δυνατή βαθμολογία που μπορεί να επιτευχθεί είναι %{toPercentage_pointRatio} για υποβολές σπουδαστών που έχουν βαθμολογηθεί με τη ρουμπρίκα."
     titles: 
       update_assignment_points: "Αλλαγή μορίων της εργασίας ώστε να ταιριάζουν με τη ρουμπρίκα;"
+  change_to_b757d327: "αλλαγή σε"
   changes_will_still_apply_if_you_leave_this_page_935cedc6: "Οι αλλαγές θα εφαρμοστούν ακόμα και εάν φύγετε από αυτή τη σελίδα"
   chat_2153c6b7: "Συζήτηση (Chat)"
   child_s_username_dde3aa9: "Όνομα Χρήστη Παιδιού"
