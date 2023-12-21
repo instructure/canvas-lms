@@ -171,7 +171,7 @@ module Api::V1::AssignmentOverride
     end
 
     if !set_type && data.key?(:group_id) && data[:group_id].present?
-      group_category_id = assignment.group_category_id || assignment.discussion_topic.try(:group_category_id)
+      group_category_id = assignment.effective_group_category_id
       if group_category_id
         set_type = "Group"
         # look up the group

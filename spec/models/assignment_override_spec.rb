@@ -1233,4 +1233,17 @@ describe AssignmentOverride do
       expect(override.root_account_id).to eq @assignment.root_account_id
     end
   end
+
+  describe "discussion checkpoints" do
+    it "allows creating a group override for a checkpoint" do
+      category = group_category
+      group = category.groups.create!(context: @course)
+      topic = DiscussionTopic.create_graded_topic!(course: @course, title: "graded_topic")
+      topic.update!(group_category: category)
+      topic.create_checkpoints(reply_to_topic_points: 4, reply_to_entry_points: 2)
+      checkpoint = topic.reply_to_topic_checkpoint
+      override = assignment_override_model(assignment: checkpoint, course: @course, set: group)
+      expect(checkpoint.assignment_overrides).to include override
+    end
+  end
 end

@@ -68,7 +68,7 @@ class AssignmentOverride < ActiveRecord::Base
       when CourseSection
         record.errors.add :set, "not from assignment's course" unless record.set.course_id == record.assignment.context_id
       when Group
-        valid_group_category_id = record.assignment.group_category_id || record.assignment.discussion_topic.try(:group_category_id)
+        valid_group_category_id = record.assignment.effective_group_category_id
         record.errors.add :set, "not from assignment's group category" unless record.set.group_category_id == valid_group_category_id
       when Course
         record.errors.add :set, "not from assignment's course" unless record.set.id == record.assignment.context_id
