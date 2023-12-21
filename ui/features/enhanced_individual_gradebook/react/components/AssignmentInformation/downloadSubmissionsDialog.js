@@ -18,8 +18,8 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import htmlEscape from 'html-escape'
 import '@canvas/jquery/jquery.ajaxJSON'
+import htmlEscape from 'html-escape'
 import 'jqueryui/dialog'
 import 'jqueryui/progressbar'
 
