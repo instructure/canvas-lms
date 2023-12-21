@@ -2275,4 +2275,10 @@ class ApplicationController < ActionController::Base
                           }
   end
   before_action :launch_darkly_user, if: Proc.new { @current_user.present? }
+
+  def expose_ai_assistant?
+    return false if @launch_darkly_user.nil?
+    Rails.configuration.launch_darkly_client.variation("expose-ai-assistant", @launch_darkly_user, false)
+  end
+  helper_method :expose_ai_assistant?
 end
