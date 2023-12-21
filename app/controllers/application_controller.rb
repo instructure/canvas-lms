@@ -2278,7 +2278,9 @@ class ApplicationController < ActionController::Base
 
   def expose_ai_assistant?
     return false if @launch_darkly_user.nil?
-    Rails.configuration.launch_darkly_client.variation("expose-ai-assistant", @launch_darkly_user, false)
+    Rails.cache.fetch("expose-ai-assistant-#{@launch_darkly_user[:key]}", expires_in: 10.minutes) do
+      Rails.configuration.launch_darkly_client.variation("expose-ai-assistant", @launch_darkly_user, false)
+    end
   end
   helper_method :expose_ai_assistant?
 end
