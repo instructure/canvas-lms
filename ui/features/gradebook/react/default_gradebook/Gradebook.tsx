@@ -4676,9 +4676,13 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   refreshScoreToUngradedColumnHeaders() {
-    const columnIds = this.gridDisplaySettings.hideAssignmentGroupTotals
-      ? ['total_grade']
-      : [...this.assignmentGroupColumnIds(), 'total_grade']
+    let columnIds: string[] = []
+    if (!this.gridDisplaySettings.hideAssignmentGroupTotals) {
+      columnIds = [...this.assignmentGroupColumnIds()]
+    }
+    if (!this.gridDisplaySettings.hideTotal) {
+      columnIds.push('total_grade')
+    }
     this.gradebookGrid?.gridSupport?.columns.updateColumnHeaders(columnIds)
   }
 
