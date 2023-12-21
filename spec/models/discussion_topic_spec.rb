@@ -3027,6 +3027,12 @@ describe DiscussionTopic do
       expect(@topic).to_not be_valid
     end
 
+    it "does not create a discussion topic per-checkpoint (instead, checkpoints belong to the topic through the parent)" do
+      expect do
+        @topic.create_checkpoints(reply_to_topic_points: 10, reply_to_entry_points: 15, reply_to_entry_required_count: 0)
+      end.not_to change { DiscussionTopic.count }.from(1)
+    end
+
     describe "in place" do
       before do
         @course.root_account.enable_feature!(:discussion_checkpoints)

@@ -86,4 +86,8 @@ class Assignment < AbstractAssignment
   def before_soft_delete
     sub_assignments.destroy_all
   end
+
+  def governs_submittable?
+    true
+  end
 end

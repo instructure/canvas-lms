@@ -1836,8 +1836,18 @@ class DiscussionTopic < ActiveRecord::Base
     return false unless assignment.present?
 
     assignment.update!(has_sub_assignments: true)
-    assignment.sub_assignments.create!(context:, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, points_possible: reply_to_topic_points)
-    assignment.sub_assignments.create!(context:, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, points_possible: reply_to_entry_points)
+    assignment.sub_assignments.create!(
+      context:,
+      sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC,
+      submission_types: "discussion_topic",
+      points_possible: reply_to_topic_points
+    )
+    assignment.sub_assignments.create!(
+      context:,
+      sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY,
+      submission_types: "discussion_topic",
+      points_possible: reply_to_entry_points
+    )
     self.reply_to_entry_required_count = reply_to_entry_required_count
 
     save
