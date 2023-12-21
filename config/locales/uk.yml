@@ -3818,6 +3818,7 @@ uk:
       update_assignment_points: "Змінити бали завдання для відповідності рубрики?"
   change_section_to_sectionname_6e947e90: "Змінити розділ  %{sectionName}"
   change_sis_ids_3a47154d: "Змінити SIS IDs"
+  change_to_b757d327: "змінити на"
   changed_item_1d16a85f: "Змінені елементи"
   changes_will_still_apply_if_you_leave_this_page_935cedc6: "Якщо Ви залишите цю сторінку, зміни будуть застосовані."
   changes_you_made_may_not_be_saved_4e8db973: "Зроблені Вами зміни можуть бути не збережені."
@@ -8087,6 +8088,7 @@ uk:
         name: Ім'я
         out_of: З
         score: Оцінка
+        submitted: Підтверджено
       labels: 
         final_grade_hidden: "Розрахунок підсумків був відключений"
         high: Вище
@@ -14929,6 +14931,7 @@ uk:
   remove_avatar_picture_aba765eb: "Видалити аватарку"
   remove_contact_method_ca890ba3: "Видалити метод зв'язку"
   remove_course_association_name_b760c502: "Прибрати зв'язок з курсом %{name}"
+  remove_dates_5a5a8df2: "Видалити дати"
   remove_edf2b8a7: (Видалити)
   remove_email_address_b1820820: "Видалити адресу електронної пошти"
   remove_empty_attachment_b2aea632: "видалити порожнє вкладення"
@@ -16264,6 +16267,7 @@ uk:
       no_points_possible: "Неможливо побудувати криву без можливих точок"
       none_to_update: "Нічого немає для оновлення"
   shared_secret_892c88f2: "Загальний секретний ключ"
+  shift_dates_746698a5: "Зсунути дати"
   short_name_42f454a1: "Коротке ім'я"
   short_name_ad9bf84f: "коротке ім'я"
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "ID Canvas звітуючого користувача повинен бути самоочевидним"
@@ -16864,6 +16868,7 @@ uk:
   submitting_types_7c5a7096: "Відправлено: %{types}"
   subscribe_4b301fb7: Підписатися
   subscribed_fe74d22a: Підписано
+  substitution_713c65b9: Заміна
   success_grades_were_published_to_the_grade_book_da3b4fba: "Успіх! Оцінки були опубліковані до Щоденника."
   success_to_do_created_e34ed395: "Успіх: План робіт створений"
   successfully_created_a_set_38374719: "Набір успішно створено"
@@ -18667,12 +18672,14 @@ uk:
   you_must_allow_at_least_one_appointment_per_time_s_76e22300: "Ви повинні дозволити принаймні одне призначення на один часовий інтервал."
   you_must_allow_at_least_one_group_to_attend_68531eab: "Ви повинні дозволити вступити хоча б до однієї групи"
   you_must_attach_at_least_one_file_to_this_assignme_9f39ce12: "Ви маєте приєднати принаймні один файл до цього завдання"
+  you_must_choose_a_content_option_c776bdef: "Ви маєте обрати конкретну опцію"
   you_must_enter_a_date_f8eabfb1: "Ви повинні ввести дату"
   you_must_have_a_student_or_section_selected_a99e45df: "Ви повинні обрати студента чи розділ"
   you_must_log_in_to_view_replies_9ccd4da0: "Ви повинні увійти, щоб переглянути відповіді"
   you_must_provide_a_date_and_time_a86839d2: "Ви маєте задати дату та час."
   you_must_provide_a_value_or_unselect_the_option_3b28b754: "Ви повинні надати значення або скасувати вибір параметра."
   you_must_select_a_course_to_copy_content_from_e7bd9e09: "Ви повинні вибрати курс для копіювання вмісту з нього"
+  you_must_select_a_file_to_import_content_from_28a242ff: "Ви повинні вибрати файл для імпорту вмісту з"
   you_must_select_a_folder_to_upload_your_migration__ac7bc7c0: "Ви повинні вибрати теку для завантаження вашої інформації, що переміщується"
   you_must_specify_a_usage_right_5eb57f87: "Ви повинні вказати право користування."
   you_must_use_a_number_912ce4bd: "Ви повинні використовувати число"
