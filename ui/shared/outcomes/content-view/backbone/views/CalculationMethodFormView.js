@@ -21,7 +21,7 @@ import _ from 'underscore'
 import Backbone from '@canvas/backbone'
 import template from '../../jst/outcomeCalculationMethodForm.handlebars'
 import numberHelper from '@canvas/i18n/numberHelper'
-import CalculationMethodContent from '@canvas/grade-summary/backbone/models/CalculationMethodContent'
+import CalculationMethodContent from '@canvas/grading/CalculationMethodContent'
 
 export default class CalculationMethodFormView extends Backbone.View {
   static initClass() {

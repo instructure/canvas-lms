@@ -22,7 +22,7 @@ import {extend} from '@canvas/backbone/utils'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import _ from 'underscore'
 import Backbone from '@canvas/backbone'
-import CalculationMethodContent from '@canvas/grade-summary/backbone/models/CalculationMethodContent'
+import CalculationMethodContent from '@canvas/grading/CalculationMethodContent'
 
 const I18n = useI18nScope('modelsOutcome')
 
