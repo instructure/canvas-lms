@@ -89,14 +89,4 @@ describe('loadEventListeners', () => {
     })
     dispatchEvent('initEquella')
   })
-
-  it('initializes external tools plugin', () => {
-    fakeEditor.addCommand = jest.fn()
-    loadEventListeners()
-    dispatchEvent('initExternalTools')
-    expect(fakeEditor.addCommand).toHaveBeenCalledWith(
-      'instructureExternalButton__BUTTON_ID__',
-      expect.any(Function)
-    )
-  })
 })

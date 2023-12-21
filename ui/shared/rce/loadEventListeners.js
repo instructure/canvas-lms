@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import initializeExternalTools from '@canvas/tinymce-external-tools'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
@@ -41,10 +40,5 @@ export default function loadEventListeners(callbacks = {}) {
         callbacks.equellaCB()
       })
       .catch(showFlashError(I18n.t('Something went wrong loading Equella')))
-  })
-
-  document.addEventListener('tinyRCE/initExternalTools', e => {
-    initializeExternalTools.init(e.detail.ed, e.detail.url, INST)
-    callbacks.externalToolCB()
   })
 }
