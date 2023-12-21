@@ -5144,6 +5144,9 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
                     ? this.options.custom_grade_statuses
                     : []
                 }
+                multiselectGradebookFiltersEnabled={
+                  this.options.multiselect_gradebook_filters_enabled
+                }
               />
             )}
         </div>
