@@ -67,6 +67,8 @@ export const Component = () => {
       navigate('portfolios/dashboard')
     } else if (tabname === 'projects') {
       navigate('projects/dashboard')
+    } else if (tabname === 'pathways') {
+      navigate('pathways/dashboard')
     } else {
       navigate(tabname)
     }
@@ -129,6 +131,18 @@ export const Component = () => {
                 >
                   Projects
                 </div>
+                {ENV.FEATURES.learner_passport_r2 ? (
+                  <div
+                    role="tab"
+                    data-tabid="pathways"
+                    style={selectedTab === 'pathways' ? activeStyle : inactiveStyle}
+                    tabIndex={0}
+                    onClick={handleTabClick}
+                    onKeyDown={handleTabKey}
+                  >
+                    Pathways
+                  </div>
+                ) : null}
               </div>
             </Flex.Item>
             <Flex.Item>{window.ENV.current_user.display_name}</Flex.Item>

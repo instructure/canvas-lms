@@ -275,5 +275,44 @@ export const LearnerPassportRoutes = (
         lazy={() => import('../pages/ProjectEdit')}
       />
     </Route>
+    {ENV.FEATURES.learner_passport_r2 ? (
+      <Route path="pathways" lazy={() => import('../pages/Pathways')}>
+        <Route
+          path="dashboard"
+          lazy={() => import('../pages/PathwayDashboard')}
+          loader={async ({params}) => {
+            return fetch(`/users/${params.userId}/passport/data/pathways`)
+          }}
+        >
+          <Route
+            path="create"
+            action={async ({request}) => {
+              const formData = await request.formData()
+              const response = await fetch(
+                `/users/${formData.get('userId')}/passport/data/pathways/create`,
+                {
+                  method: 'PUT',
+                  cache: 'no-cache',
+                  headers: {
+                    'X-CSRF-Token': getCookie('_csrf_token'),
+                    'Content-type': 'application/json',
+                  },
+                  body: JSON.stringify({title: formData.get('title')}),
+                }
+              )
+              const json = await response.json()
+              return redirect(`../../edit/${json.id}`)
+            }}
+          />
+        </Route>
+        <Route
+          path="view/:pathwayId"
+          loader={async ({params}) => {
+            return fetch(`/users/${params.userId}/passport/data/pathways/show/${params.pathwayId}`)
+          }}
+          lazy={() => import('../pages/PathwayView')}
+        />
+      </Route>
+    ) : null}
   </Route>
 )

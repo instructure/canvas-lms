@@ -291,12 +291,86 @@ class LearnerPassportController < ApplicationController
     }
   end
 
+  def learner_passport_pathway_template
+    {
+      id: "",
+      title: "",
+      description: "",
+      published: nil,
+      enrolled_student_count: 0,
+      started_count: 0,
+      completed_count: 0,
+      first_milestones: [],
+      milestones: [],
+    }
+  end
+
+  def learner_passport_pathway_sample
+    {
+      id: "1",
+      title: "Business Foundations Specialization",
+      description: "Solve Real Business Problems. Build a foundation of core business skills in marketing, finance, accounting and operations.",
+      published: "2024-01-03",
+      enrolled_student_count: 63,
+      started_count: 42,
+      completed_count: 15,
+      first_milestones: ["1", "2"],
+      milestones: [
+        {
+          id: "1",
+          title: "Introduction to Marketing",
+          description: "Taught by three of Warton's top faculty in the marketing department, consistently raked as the #1 business school in the world, this course covers three core topics in customer loyalty: branding, customer centricity, and practical, go-to-market strategies.",
+          required: true,
+          requirements: [{ id: "1" }, { id: "2" }],
+          next_milestones: ["3", "4"]
+        },
+        {
+          id: "2",
+          title: "Introduction to Financial Accounting",
+          description: "Master the technical skills needed to analyze financial statements and disclosures for use in financial analysis.",
+          required: false,
+          requirements: [{ id: "3" }],
+          next_milestones: []
+        },
+        {
+          id: "3",
+          title: "Marketing Strategy and Brand Positioning",
+          description: "Professor Kahn starts us off with the first of two Branding modules: Marketing Strategy and Brand Positioning. Then, you'll move on to the second Branding module where we'll teach you to analyze end line data and develop insights to guide your brand strategy.",
+          required: true,
+          requirements: [{ id: "4" }, { id: "5" }],
+          next_milestones: []
+        },
+        {
+          id: "4",
+          title: "The Limits of Product-Centric Thinking & The Opportunities and Challenges of Customer Centricity",
+          description: "Module 2 of our class features Professor Peter Fader, who will focus on concepts related to Customer Centric Marketing. In an economy that is increasingly responsive to customer behaviors, it is imperative to focus on the right customers for strategic advantages. You will learn how to acquire and retain the right customers, generate more profits from them and evaluate the effectiveness of your marketing activities.",
+          required: true,
+          requirements: [{ id: "6" }, { id: "7" }],
+          next_milestones: ["5"]
+        },
+        {
+          id: "5",
+          title: "Communications Strategy & Fundamentals of Pricing",
+          description: "Complte this course as part of the Wharton's Business Foundations Specialization, and you'll have the opportunity to learn the essentials of marketing management while earning an online certificate from The Wharton School!",
+          required: true,
+          requirements: [],
+          next_milestones: []
+        }
+      ],
+
+    }
+  end
+
   def learner_passport_current_portfolios
     [learner_passport_portfolio_sample.clone]
   end
 
   def learner_passport_current_projects
     [learner_passport_project_sample.clone]
+  end
+
+  def learner_passport_current_pathways
+    [learner_passport_pathway_sample.clone]
   end
 
   def current_achievements_key
@@ -327,8 +401,13 @@ class LearnerPassportController < ApplicationController
     "learner_passport_current_projects #{@current_user.global_id}"
   end
 
+  def current_pathways_key
+    "lerner_passport_current_pathways #{@current_user.global_id}"
+  end
+
   def index
     js_env[:FEATURES][:learner_passport] = @domain_root_account.feature_enabled?(:learner_passport)
+    js_env[:FEATURES][:learner_passport_r2] = @domain_root_account.feature_enabled?(:learner_passport_r2)
 
     # hide the breadcrumbs application.html.erb renders
     render html: "<style>.ic-app-nav-toggle-and-crumbs.no-print {display: none;}</style>".html_safe,
@@ -506,15 +585,44 @@ class LearnerPassportController < ApplicationController
     render json: project
   end
 
+  ###### Pathways ######
+
+  def pathways_index
+    pathways = Rails.cache.fetch(current_pathways_key) { learner_passport_current_pathways }.map do |p|
+      pw = {
+        id: p[:id],
+        title: p[:title],
+        milestoneCount: p[:milestones].length,
+        requirementCount: p[:milestones].reduce(0) { |sum, m| sum + m[:requirements].length },
+        enrolled_student_count: p[:enrolled_student_count],
+        started_count: p[:started_count],
+        completed_count: p[:completed_count],
+      }
+      pw[:published] = p[:published] if p[:published].present?
+      pw
+    end
+    render json: pathways
+  end
+
+  def pathway_show
+    pathway = Rails.cache.fetch(current_pathways_key) { learner_passport_current_pathways }.find { |p| p[:id] == params[:pathway_id] }
+    return render json: { message: "Pathway not found" }, status: :not_found if pathway.nil?
+
+    render json: pathway
+  end
+
   def reset
     if params.key? :empty
       Rails.cache.write(current_portfolios_key, [], expires_in: CACHE_EXPIRATION)
       Rails.cache.write(current_projects_key, [], expires_in: CACHE_EXPIRATION)
+      Rails.cache.write(current_pathways_key, [], expires_in: CACHE_EXPIRATION)
     else
       sample_portfolio = Rails.cache.fetch(portfolio_sample_key) { learner_passport_portfolio_sample }
       Rails.cache.write(current_portfolios_key, [sample_portfolio.clone], expires_in: CACHE_EXPIRATION)
       sample_project = Rails.cache.fetch(project_sample_key) { learner_passport_project_sample }
       Rails.cache.write(current_projects_key, [sample_project.clone], expires_in: CACHE_EXPIRATION)
+      sample_pathway = Rails.cache.fetch(current_pathways_key) { learner_passport_pathway_sample }
+      Rails.cache.write(current_pathways_key, [sample_pathway.clone], expires_in: CACHE_EXPIRATION)
     end
     render json: { message: "Portfolios reset" }, status: :accepted
   end
