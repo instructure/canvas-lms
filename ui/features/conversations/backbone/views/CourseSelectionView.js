@@ -21,7 +21,7 @@ import _ from 'underscore'
 import {View} from '@canvas/backbone'
 import SearchableSubmenuView from './SearchableSubmenuView'
 import template from '../../jst/courseOptions.handlebars'
-import '@canvas/datetime'
+import '@canvas/datetime/jquery'
 import 'bootstrap-dropdown'
 import 'bootstrap-select'
 

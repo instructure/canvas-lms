@@ -30,7 +30,7 @@ import apiUserContent from '@canvas/util/jquery/apiUserContent'
 import {formatMessage, truncateText} from '@canvas/util/TextHelper'
 import numberFormat from '@canvas/i18n/numberFormat'
 import listFormatterPolyfill from '@canvas/util/listFormatter'
-import '@canvas/datetime'
+import '@canvas/datetime/jquery'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 

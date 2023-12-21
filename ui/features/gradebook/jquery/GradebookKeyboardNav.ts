@@ -19,7 +19,8 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import '@canvas/keycodes'
+import '@canvas/datetime/jquery'
+import '@canvas/jquery/jquery.keycodes'
 import type GridSupport from '../react/default_gradebook/GradebookGrid/GridSupport/index'
 
 type KeyBinding = {

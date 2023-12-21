@@ -18,7 +18,7 @@
 import $ from 'jquery'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import '@canvas/datetime'
+import '@canvas/datetime/jquery'
 import '@canvas/util/templateData'
 import 'jquery-pageless'
 

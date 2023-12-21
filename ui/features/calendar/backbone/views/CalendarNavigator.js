@@ -20,7 +20,7 @@ import {extend} from '@canvas/backbone/utils'
 import _ from 'underscore'
 import Backbone from '@canvas/backbone'
 import template from '../../jst/calendarNavigator.handlebars'
-import '@canvas/datetime'
+import '@canvas/datetime/jquery'
 
 extend(CalendarNavigator, Backbone.View)
 

@@ -33,7 +33,7 @@ import addPrivacyLinkToDialog from './addPrivacyLinkToDialog'
 import htmlEscape from 'html-escape'
 import './validate'
 import '@canvas/forms/jquery/jquery.instructure_forms'
-import '@canvas/datetime'
+import '@canvas/datetime/jquery'
 import '@canvas/util/jquery/fixDialogButtons'
 
 let $nodes, I18n, signupDialog, templates, termsHtml

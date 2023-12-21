@@ -24,7 +24,7 @@ import $ from 'jquery'
 import customPropTypes from '../modules/customPropTypes'
 import Folder from '../../backbone/models/Folder'
 import File from '../../backbone/models/File'
-import '@canvas/datetime'
+import '@canvas/datetime/jquery'
 import accessibleDateFormat from '@canvas/datetime/accessibleDateFormat'
 import filesEnv from '../modules/filesEnv'
 

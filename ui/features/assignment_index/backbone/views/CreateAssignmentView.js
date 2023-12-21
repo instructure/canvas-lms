@@ -32,7 +32,7 @@ import round from '@canvas/round'
 import $ from 'jquery'
 import GradingPeriodsAPI from '@canvas/grading/jquery/gradingPeriodsApi'
 import SisValidationHelper from '@canvas/sis/SisValidationHelper'
-import '@canvas/datetime'
+import '@canvas/datetime/jquery'
 import tz from '@canvas/datetime/timezone'
 
 const I18n = useI18nScope('CreateAssignmentView')

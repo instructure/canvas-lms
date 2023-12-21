@@ -25,7 +25,7 @@ import authenticity_token from '@canvas/authenticity-token'
 import htmlEscape from 'html-escape'
 import '@canvas/jquery/jquery.ajaxJSON' /* ajaxJSON, defaultAjaxError */
 import '@canvas/jquery/jquery.disableWhileLoading'
-import '@canvas/datetime' /* date_field, time_field, datetime_field */
+import '@canvas/datetime/jquery' /* date_field, time_field, datetime_field */
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* /\$\.uniq/ */
 import '@canvas/rails-flash-notifications'
 import 'jquery-scroll-to-visible/jquery.scrollTo'

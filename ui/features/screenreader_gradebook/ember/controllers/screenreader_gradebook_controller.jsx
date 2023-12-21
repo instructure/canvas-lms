@@ -40,7 +40,7 @@ import GradingPeriodsApi from '@canvas/grading/jquery/gradingPeriodsApi'
 import GradingPeriodSetsApi from '@canvas/grading/jquery/gradingPeriodSetsApi'
 import ProxyUploadModal from '@canvas/proxy-submission/react/ProxyUploadModal'
 import {updateFinalGradeOverride} from '@canvas/grading/FinalGradeOverrideApi'
-import '@canvas/datetime'
+import '@canvas/datetime/jquery'
 import 'jquery-tinypubsub'
 
 import '../components/ic_submission_download_dialog_component'

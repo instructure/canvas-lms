@@ -26,7 +26,7 @@ import {setupCache} from 'axios-cache-adapter/src/index'
 import 'jqueryui/tabs'
 import globalAnnouncements from './global_announcements'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/datetime' // date_field, time_field, datetime_field, /\$\.datetime/
+import '@canvas/datetime/jquery' // date_field, time_field, datetime_field, /\$\.datetime/
 import '@canvas/forms/jquery/jquery.instructure_forms' // formSubmit, getFormData, validateForm
 import '@canvas/jquery/jquery.instructure_misc_helpers' // replaceTags
 import '@canvas/jquery/jquery.instructure_misc_plugins' // confirmDelete, showIf, /\.log/
