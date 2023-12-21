@@ -210,9 +210,9 @@ module AssignmentOverrideApplicator
   end
 
   def self.group_overrides(assignment_or_quiz, user)
-    return nil unless assignment_or_quiz.is_a?(Assignment)
+    return nil unless assignment_or_quiz.is_a?(AbstractAssignment)
 
-    group_category_id = assignment_or_quiz.group_category_id || assignment_or_quiz.discussion_topic.try(:group_category_id)
+    group_category_id = assignment_or_quiz.effective_group_category_id
     return nil unless group_category_id
 
     group = if assignment_or_quiz.context.user_has_been_student?(user)

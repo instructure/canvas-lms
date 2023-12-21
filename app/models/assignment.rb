@@ -77,6 +77,10 @@ class Assignment < AbstractAssignment
     end
   end
 
+  def effective_group_category_id
+    group_category_id || discussion_topic&.group_category_id
+  end
+
   def find_checkpoint(sub_assignment_tag)
     sub_assignments.find_by(sub_assignment_tag:)
   end

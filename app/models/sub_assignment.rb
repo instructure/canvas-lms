@@ -29,6 +29,8 @@ class SubAssignment < AbstractAssignment
     # TODO: define broadcast policies for checkpoints
   end
 
+  delegate :effective_group_category_id, to: :parent_assignment
+
   def checkpoint?
     true
   end
