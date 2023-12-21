@@ -6305,7 +6305,7 @@ ja:
   canvas_course_id_db4de2b8: canvas_course_id
   canvas_course_tutorial_video_5205c1c1: "Canvas コースチュートリアルビデオ"
   canvas_dashboard_links_will_navigate_to_the_catalo_4143635e: Canvasのロゴは、Catalogダッシュボードへ誘導します
-  canvas_default_7f81a6b8: "Canvas のデフォルト"
+  canvas_default_7f81a6b8: Canvasデフォルト
   canvas_demo_7a005cf3: "Canvas デモ"
   canvas_did_not_recognize_your_identity_provider_cb0e50fc: "Canvas は使用されている ID プロバイダーを認識しませんでした"
   canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "Canvas に、次のユーザのアカウントがありません: %{user}"
@@ -9650,7 +9650,7 @@ ja:
   create_outcome_4dac05a0: アウトカムを作成する
   create_pace_4ff3e9c: ペースを作成
   create_pages_581a4d59: ページを作成
-  create_quiz_d08bb72a: 小テストを作成
+  create_quiz_d08bb72a: クイズの作成
   create_slots_71dbb2f8: スロットの作成
   create_subject_86de5618: 件名を作成
   create_temporary_enrollment_3d4eaa33: 一時登録を作成
@@ -11329,7 +11329,7 @@ ja:
       criterion_long_description: 基準の詳しい説明
       edit_rubric_rating: 評価を編集
       find_existing_rubric: 既存のルーブリックの検索
-  edit_rubric_7d4d139d: ルーブリックの編集
+  edit_rubric_7d4d139d: 注釈の編集
   edit_rubric_title_104d6fd2: "ルーブリックを編集する：%{title}"
   edit_section_name_558cc89: "セクション\"%{name}\"の編集"
   edit_status_612572db: ステータスを編集
@@ -13726,6 +13726,7 @@ ja:
         out_of: 配点
         score: スコア
         submission_progress_status: 提出進捗状況
+        submitted: 提出済み
       icons: 
         turnitin_results: "Turnitin の結果を参照"
       labels: 
