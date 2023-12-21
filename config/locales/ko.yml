@@ -2889,6 +2889,7 @@ ko:
   change_points_possible_to_match_rubric_dialog: 
     prompts: 
       update_assignment_points: "이 과제는 %{assignmentPoints}점이 가능하지만 이 루브릭과 일치하도록 %{rubricPoints}점이 가능하도록 바꾸시겠습니까?"
+  change_to_b757d327: "다음으로 변경"
   choose_a_course_home_page_8059c7b: "과목 홈 페이지 선택"
   choose_a_csv_file_to_upload_9644480c: "업로드할 CSV 파일 선택:"
   choose_assignment_group_9e7de13c: "과제 그룹 선택"
@@ -6252,6 +6253,7 @@ ko:
         name: 이름
         out_of: 총점
         score: 점수
+        submitted: 제출됨
       icons: 
         turnitin_results: "Turnitin 결과 보기"
       labels: 
@@ -13243,6 +13245,7 @@ ko:
   submitted_d5ba370a: "제출:"
   subscribe_4b301fb7: 구독
   subscribed_fe74d22a: 구독함
+  substitution_713c65b9: 대체
   support: 
     array: 
       last_word_connector: ", "
@@ -14313,6 +14316,7 @@ ko:
   you_must_attach_at_least_one_file_to_this_assignme_9f39ce12: "이 과제에 적어도 하나의 파일을 첨부해야 함"
   you_must_enter_a_date_f8eabfb1: "날짜를 입력해야 합니다."
   you_must_log_in_to_view_replies_9ccd4da0: "답변을 보기 위해서는 로그인해야 합니다."
+  you_must_select_a_file_to_import_content_from_28a242ff: "내용을 가져올 파일을 선택해야 함"
   your_email_address_f881e583: "귀하의 이메일 주소"
   your_instructor_has_released_grade_changes_and_new_ffe458c8: |-
       교사가 %{title}에 대한 평점 변경 사항과 새 의견을 배포했습니다. 이제 변경 사항을 볼 수 있습니다.
