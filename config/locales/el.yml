@@ -6763,6 +6763,7 @@ el:
         name: Όνομα
         out_of: Από
         score: Βαθμολογία
+        submitted: Υποβλήθηκαν
       labels: 
         final_grade_hidden: "Ο υπολογισμός των συνόλων έχει απενεργοποιηθεί"
         high: Υψηλό
@@ -12755,6 +12756,7 @@ el:
   remove_attachment_ceae0973: "Αφαίρεση Επισύναψης"
   remove_avatar_picture_aba765eb: "Αφαίρεση εικόνας άβαταρ"
   remove_contact_method_ca890ba3: "Αφαίρεση τρόπου επικοινωνίας"
+  remove_dates_5a5a8df2: "Αφαίρεση ημερομηνιών"
   remove_email_address_b1820820: "Αφαίρεση ηλεκτρονικής διεύθυνσης"
   remove_empty_attachment_b2aea632: "αφαίρεση κενής επισύναψης"
   remove_f47dc62a: Αφαίρεση
@@ -13895,6 +13897,7 @@ el:
       no_points_possible: "Δεν είναι δυνατή η αναπροσαρμογή χωρίς πιθανά μόρια"
       none_to_update: "Δεν υπάρχουν δεδομένα προς ενημέρωση"
   shared_secret_892c88f2: "Διαμοιρασμένο Μυστικό"
+  shift_dates_746698a5: "Αλλαγή ημερομηνιών"
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "θα πρέπει να είναι αυταπόδεικτο, το ID στο Canvas του χρήστη που αναφέρει το σφάλμα"
   show_and_hide_courses_menu_9e09d1d0: "Εμφάνιση και απόκρυψη μενού μαθημάτων"
   show_by_date_e3967761: "Εμφάνιση βάσει Ημερομηνίας"
@@ -14346,6 +14349,7 @@ el:
   submitting_types_7c5a7096: "<mrk mid=\"5857\" mtype=\"seg\">Υποβολή σε εξέλιξη:</mrk> <mrk mid=\"5858\" mtype=\"seg\">%{types}</mrk>"
   subscribe_4b301fb7: Εγγραφή
   subscribed_fe74d22a: "Έγινε εγγραφή"
+  substitution_713c65b9: Υποκατάσταση
   success_grades_were_published_to_the_grade_book_da3b4fba: "<mrk mid=\"6237\" mtype=\"seg\">Τέλεια!</mrk> <mrk mid=\"6238\" mtype=\"seg\">Οι βαθμοί δημοσιεύθηκαν στο βιβλίο βαθμών.</mrk>"
   successfully_moved_model_to_newgroup_f7b7aa5a: "Το %{model} μετακινήθηκε στην ομάδα %{newGroup} επιτυχώς"
   summary_statistics_f74852a5: "Ανακεφαλαιωτικά Στατιστικά"
@@ -15656,9 +15660,11 @@ el:
   you_may_want_to_assign_some_tas_to_help_you_with_t_702244aa: "<mrk mid=\"4376\" mtype=\"seg\">Ίσως θέλετε να ορίσετε κάποιους βοηθούς διδασκαλίας για να σας βοηθήσουν με το μάθημα.</mrk>  <mrk mid=\"4377\" mtype=\"seg\">Οι βοηθοί διδασκαλίας μπορούν να βαθμολογήσουν τις υποβολές των μαθητών, να βοηθήσουν στον συντονισμό των συζητήσεων, ακόμη και να ενημερώσουν τις καταληκτικές ημερομηνίες και τις λεπτομέρειες κάποιας εργασίας αντί για εσάς.</mrk>"
   you_must_agree_to_the_terms_99723f97: "Πρέπει να συμφωνήσετε με αυτούς τους όρους"
   you_must_attach_at_least_one_file_to_this_assignme_9f39ce12: "Πρέπει να επισυνάψετε τουλάγιστον ένα αρχείο σε αυτήν την εργασία"
+  you_must_choose_a_content_option_c776bdef: "Πρέπει να επιλέξετε μια επιλογή περιεχομένου"
   you_must_have_a_student_or_section_selected_a99e45df: "Θα πρέπει να έχετε επιλέξει κάποιον σπουδαστή ή κάποια ενότητα"
   you_must_log_in_to_view_replies_9ccd4da0: "Πρέπει να είσαστε συνδεδεμένοι για να δείτε τις απαντήσεις"
   you_must_select_a_course_to_copy_content_from_e7bd9e09: "Πρέπει να επιλέξετε ένα μάθημα απ' το οποίο θα γίνει αντιγραφή περιεχομένου"
+  you_must_select_a_file_to_import_content_from_28a242ff: "Πρέπει να επιλέξετε ένα αρχείο απ' το οποίο θα γίνει εισαγωγή περιεχομένου"
   you_must_specify_a_usage_right_5eb57f87: "Πρέπει να προσδιορίσετε ένα δικαίωμα χρήσης."
   you_re_editing_your_canvas_theme_apply_or_cancel_c_1633384e: "<mrk mid=\"7535\" mtype=\"seg\">Επεξεργάζεστε το Θέμα σας στο Canvas!</mrk> <mrk mid=\"7536\" mtype=\"seg\">Εφαρμόστε ή ακυρώστε τις αλλαγές μέσω του *Επεξεργαστή Θέματος (Theme Editor)*.</mrk>"
   you_re_editing_your_canvas_theme_the_changes_have__c0ae1bd1: "<mrk mid=\"4519\" mtype=\"seg\">Επεξεργάζεστε το Θέμα σας στο Canvas!</mrk> <mrk mid=\"4520\" mtype=\"seg\">Οι αλλαγές δεν έχουν εφαρμοστεί ακόμη.</mrk>"
