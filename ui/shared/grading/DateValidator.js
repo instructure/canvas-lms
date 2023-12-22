@@ -17,10 +17,10 @@
 //
 
 import _ from 'underscore'
-import tz from './timezone'
+import tz from '@canvas/datetime/timezone'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import GradingPeriodsHelper from '@canvas/grading/GradingPeriodsHelper'
-import DateHelper from './dateHelper'
+import GradingPeriodsHelper from './GradingPeriodsHelper'
+import DateHelper from '@canvas/datetime/dateHelper'
 
 const I18n = useI18nScope('DateValidator')
 
