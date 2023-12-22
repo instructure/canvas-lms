@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import DateValidator from '@canvas/datetime/DateValidator'
+import DateValidator from '@canvas/grading/DateValidator'
 import DueDateOverrideView from '@canvas/due-dates'
 import fakeENV from 'helpers/fakeENV'
 import StudentGroupStore from '@canvas/due-dates/react/StudentGroupStore'
