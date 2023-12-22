@@ -20,9 +20,9 @@ import {
   getOriginalityData,
   isOriginalityReportVisible,
   originalityReportSubmissionKey,
-} from '../originalityReportHelper'
-import {mockSubmission} from '@canvas/assignments/graphql/studentMocks'
-import type {SubmissionOriginalityData} from '../grading.d'
+} from '@canvas/grading/originalityReportHelper'
+import {mockSubmission} from '../graphql/studentMocks'
+import type {SubmissionOriginalityData} from '@canvas/grading/grading'
 
 function submission(overrides = {}): {
   id: string
