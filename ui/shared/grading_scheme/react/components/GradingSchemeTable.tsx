@@ -28,10 +28,7 @@ import {
   IconArchiveLine,
 } from '@instructure/ui-icons'
 import {IconButton} from '@instructure/ui-buttons'
-import type {
-  GradingScheme,
-  GradingSchemeCardData,
-} from '@canvas/grading_scheme/gradingSchemeApiModel'
+import type {GradingScheme, GradingSchemeCardData} from '../../gradingSchemeApiModel'
 import {Link} from '@instructure/ui-link'
 import {TruncateText} from '@instructure/ui-truncate-text'
 
