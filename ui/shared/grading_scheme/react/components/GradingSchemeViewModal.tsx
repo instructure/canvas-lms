@@ -18,7 +18,7 @@
 import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Modal} from '@instructure/ui-modal'
-import type {GradingScheme} from '@canvas/grading_scheme/gradingSchemeApiModel'
+import type {GradingScheme} from '../../gradingSchemeApiModel'
 import {Heading} from '@instructure/ui-heading'
 import {GradingSchemeView} from './view/GradingSchemeView'
 import {CloseButton, Button} from '@instructure/ui-buttons'

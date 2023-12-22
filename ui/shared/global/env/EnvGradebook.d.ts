@@ -18,7 +18,7 @@
 
 import {EnvCommonNewUserTutorial} from '@canvas/global/env/EnvCommon'
 import {GradebookOptions} from '../../../features/gradebook/react/default_gradebook/gradebook.d'
-import {GradingScheme} from '@canvas/grading_scheme'
+import {GradingScheme} from '@canvas/grading-scheme'
 import {GradeStatus, GradeStatusUnderscore} from '@canvas/grading/accountGradingStatus'
 
 /**
