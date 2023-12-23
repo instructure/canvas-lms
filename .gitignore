@@ -76,7 +76,6 @@ docker-compose/api-gateway.override.yml
 !/packages/babel-plugin-themeable-styles/lib
 /packages/*/coverage/
 /packages/*/coverage-js/
-/packages/canvas-planner/.babel-cache
 
 # pact artifacts
 /reports/
