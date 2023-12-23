@@ -17,7 +17,7 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import tz from '../../timezone'
+import * as tz from '../../index'
 import React from 'react'
 import ReactDOM from 'react-dom'
 
@@ -78,7 +78,7 @@ function renderDatepickerTime($input) {
   )
 
   let meridianSelect = ''
-  if (tz.hasMeridian()) {
+  if (tz.hasMeridiem()) {
     meridianSelect = (
       <select
         defaultValue={data.ampm.toLowerCase()}

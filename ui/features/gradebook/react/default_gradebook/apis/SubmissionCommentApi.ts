@@ -17,7 +17,7 @@
  */
 
 import axios from '@canvas/axios'
-import timezone from '@canvas/datetime/timezone'
+import * as timezone from '@canvas/datetime'
 import type {SubmissionComment, SubmissionCommentData} from '../../../../../api.d'
 import type {SerializedComment} from '../gradebook.d'
 

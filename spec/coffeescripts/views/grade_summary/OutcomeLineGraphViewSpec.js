@@ -21,7 +21,7 @@ import {isUndefined} from 'lodash'
 import Outcome from '@canvas/grade-summary/backbone/models/Outcome'
 import OutcomeResultCollection from 'ui/features/grade_summary/backbone/collections/OutcomeResultCollection'
 import OutcomeLineGraphView from 'ui/features/grade_summary/backbone/views/OutcomeLineGraphView'
-import tz from '@canvas/datetime/timezone'
+import * as tz from '@canvas/datetime'
 import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('OutcomeLineGraphViewSpec', {

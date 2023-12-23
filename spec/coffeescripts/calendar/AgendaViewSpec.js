@@ -21,7 +21,7 @@
 
 import $ from 'jquery'
 import {isArray, isObject, uniq} from 'lodash'
-import tzInTest from '@canvas/datetime/timezone/specHelpers'
+import tzInTest from '@canvas/datetime/specHelpers'
 import timezone from 'timezone'
 import fcUtil from '@canvas/calendar/jquery/fcUtil'
 import denver from 'timezone/America/Denver'

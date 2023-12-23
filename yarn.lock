@@ -20099,14 +20099,14 @@ moment-timezone-data-webpack-plugin@^1.5.0:
     find-cache-dir "^3.0.0"
     make-dir "^3.0.0"
 
-moment-timezone@^0.5, moment-timezone@^0.5.13, moment-timezone@^0.5.43:
+moment-timezone@^0.5, moment-timezone@^0.5.43:
   version "0.5.43"
   resolved "https://registry.yarnpkg.com/moment-timezone/-/moment-timezone-0.5.43.tgz#3dd7f3d0c67f78c23cd1906b9b2137a09b3c4790"
   integrity sha512-72j3aNyuIsDxdF1i7CEgV2FfxM1r6aaqJyLB2vwb33mXYyoyLly+F1zbWqhA3/bVIoJ4szlUoMbUnVdid32NUQ==
   dependencies:
     moment "^2.29.4"
 
-moment@>=1.6.0, moment@>=2.5.0, moment@^2.10.3, moment@^2.10.6, moment@^2.14.1, moment@^2.29.4:
+moment@>=1.6.0, moment@>=2.5.0, moment@^2.10.3, moment@^2.14.1, moment@^2.29.4:
   version "2.29.4"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.29.4.tgz#3dbe052889fe7c1b2ed966fcb3a77328964ef108"
   integrity sha512-5LC9SOxjSc2HF6vO2CyuTDNivEdoz2IvyJJGj6X8DJ0eFyfszE0QiEd+iXmBvUP3WHxSjFH/vIsA0EN00cgr8w==
@@ -26334,10 +26334,6 @@ timezone-mock@^1.3.1:
   version "1.3.1"
   resolved "https://registry.yarnpkg.com/timezone-mock/-/timezone-mock-1.3.1.tgz#750ca001831007be5af7456c78f350812398d947"
   integrity sha512-kWK2liWUaYSLW/B2yJ6/oUbLc26cEbtIjM7BPrRxaX/3TSeqOOQfXQ6N4pNhy05ZBnUs9vywWAthiE9QYGZFwA==
-
-"timezone@https://registry.npmjs.org/@brentburgoyne/timezone/-/timezone-1.0.24.tgz":
-  version "1.0.24"
-  resolved "https://registry.npmjs.org/@brentburgoyne/timezone/-/timezone-1.0.24.tgz#b2e0d85d21b74aed1c7acd460aae38c2f32092e3"
 
 "timezone@npm:@instructure/timezone@1.0.28":
   version "1.0.28"

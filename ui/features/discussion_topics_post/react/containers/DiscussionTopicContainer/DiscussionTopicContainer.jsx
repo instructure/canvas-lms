@@ -17,7 +17,7 @@
  */
 
 import {DiscussionDetails} from '../../components/DiscussionDetails/DiscussionDetails'
-import DateHelper from '../../../../../shared/datetime/dateHelper'
+import DateHelper from '@canvas/datetime/dateHelper'
 import DirectShareUserModal from '../../../../../shared/direct-sharing/react/components/DirectShareUserModal'
 import DirectShareCourseTray from '../../../../../shared/direct-sharing/react/components/DirectShareCourseTray'
 import {Discussion} from '../../../graphql/Discussion'

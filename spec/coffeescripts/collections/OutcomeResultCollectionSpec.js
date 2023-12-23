@@ -20,7 +20,7 @@ import Backbone from '@canvas/backbone'
 import Outcome from '@canvas/grade-summary/backbone/models/Outcome'
 import OutcomeResultCollection from 'ui/features/grade_summary/backbone/collections/OutcomeResultCollection'
 import fakeENV from 'helpers/fakeENV'
-import tz from '@canvas/datetime/timezone'
+import * as tz from '@canvas/datetime'
 
 QUnit.module('OutcomeResultCollectionSpec', {
   setup() {

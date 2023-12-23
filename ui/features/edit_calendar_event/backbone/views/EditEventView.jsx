@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import _ from 'underscore'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import tz from '@canvas/datetime/timezone'
+import * as tz from '@canvas/datetime'
 import moment from 'moment-timezone'
 import Backbone from '@canvas/backbone'
 import React from 'react'

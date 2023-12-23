@@ -61,7 +61,6 @@ exports.webpack5Workaround =
     include: [
       resolve(canvasDir, 'node_modules/graphql'),
       resolve(canvasDir, 'packages/datetime-moment-parser/index.js'),
-      resolve(canvasDir, 'packages/datetime/index.js'),
     ],
     resolve: {
       fullySpecified: false,

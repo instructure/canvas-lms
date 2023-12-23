@@ -17,7 +17,7 @@
  */
 
 import london from 'timezone/Europe/London'
-import tz from '@canvas/datetime/timezone'
+import * as tz from '@canvas/datetime'
 import coupleTimeFields from '@canvas/calendar/jquery/coupleTimeFields'
 import DatetimeField from '@canvas/datetime/jquery/DatetimeField'
 import $ from 'jquery'

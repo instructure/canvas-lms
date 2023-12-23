@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import EditAppointmentGroupDetails from 'ui/features/calendar/jquery/EditAppointmentGroupDetails'
 import fcUtil from '@canvas/calendar/jquery/fcUtil'
-import tz from '@canvas/datetime/timezone'
+import * as tz from '@canvas/datetime'
 
 QUnit.module('EditAppointmentGroupDetails', {
   setup() {

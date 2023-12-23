@@ -39,7 +39,7 @@ import preventDefault from '@canvas/util/preventDefault'
 import unflatten from 'obj-unflatten'
 import registrationErrors from '@canvas/normalize-registration-errors'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
-import TimeZoneSelect from '@canvas/datetime/timezone/TimeZoneSelect'
+import TimeZoneSelect from '@canvas/datetime/react/components/TimeZoneSelect'
 
 const I18n = useI18nScope('account_course_user_search')
 

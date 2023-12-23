@@ -17,7 +17,7 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import tz from './timezone'
+import {parse, format, hasMeridiem} from './index'
 
 const I18n = useI18nScope('instructure_date_and_time')
 
@@ -26,12 +26,12 @@ const I18n = useI18nScope('instructure_date_and_time')
 // of the browser. We want to display times in the timezone of their profile. Use
 // unfudgeDateForProfileTimezone to remove the correction before sending dates back to the server.
 export function fudgeDateForProfileTimezone(date) {
-  date = tz.parse(date)
+  date = parse(date)
   if (!date) return null
-  let year = tz.format(date, '%Y')
+  let year = format(date, '%Y')
   while (year.length < 4) year = '0' + year
 
-  const formatted = tz.format(date, year + '-%m-%d %T')
+  const formatted = format(date, year + '-%m-%d %T')
   let fudgedDate = new Date(formatted)
 
   // In Safari, the return value from new Date(<string>) might be `Invalid Date`.
@@ -49,40 +49,40 @@ export function fudgeDateForProfileTimezone(date) {
 }
 
 export function unfudgeDateForProfileTimezone(date) {
-  date = tz.parse(date)
+  date = parse(date)
   if (!date) return null
   // format fudged date into browser timezone without tz-info, then parse in
   // profile timezone. then, as desired:
-  // tz.format(output, '%Y-%m-%d %H:%M:%S') == input.toString('yyyy-MM-dd hh:mm:ss')
-  return tz.parse(date.toString('yyyy-MM-dd HH:mm:ss'))
+  // format(output, '%Y-%m-%d %H:%M:%S') == input.toString('yyyy-MM-dd hh:mm:ss')
+  return parse(date.toString('yyyy-MM-dd HH:mm:ss'))
 }
 
 // this batch of methods assumes *real* dates passed in (or, really, anything
-// tz.parse() can recognize. so timestamps are cool, too. but not fudged dates).
+// parse() can recognize. so timestamps are cool, too. but not fudged dates).
 // use accordingly
 export function sameYear(d1, d2) {
-  return tz.format(d1, '%Y') === tz.format(d2, '%Y')
+  return format(d1, '%Y') === format(d2, '%Y')
 }
 export function sameDate(d1, d2) {
-  return tz.format(d1, '%F') === tz.format(d2, '%F')
+  return format(d1, '%F') === format(d2, '%F')
 }
 export function dateString(date, options) {
   if (date == null) return ''
   const timezone = options && options.timezone
-  let format = options && options.format
+  let format_ = options && options.format
 
-  if (format === 'full') {
-    format = 'date.formats.full'
-  } else if (format !== 'medium' && sameYear(date, new Date())) {
-    format = 'date.formats.short'
+  if (format_ === 'full') {
+    format_ = 'date.formats.full'
+  } else if (format_ !== 'medium' && sameYear(date, new Date())) {
+    format_ = 'date.formats.short'
   } else {
-    format = 'date.formats.medium'
+    format_ = 'date.formats.medium'
   }
 
   if (typeof timezone === 'string' || timezone instanceof String) {
-    return tz.format(date, format, timezone) || ''
+    return format(date, format_, timezone) || ''
   } else {
-    return tz.format(date, format) || ''
+    return format(date, format_) || ''
   }
 }
 
@@ -93,24 +93,24 @@ export function timeString(date, options) {
   if (typeof timezone === 'string' || timezone instanceof String) {
     // match ruby-side short format on the hour, e.g. `1pm`
     // can't just check getMinutes, cuz not all timezone offsets are on the hour
-    const format =
-      tz.hasMeridian() && tz.format(date, '%M', timezone) === '00'
+    const format_ =
+      hasMeridiem() && format(date, '%M', timezone) === '00'
         ? 'time.formats.tiny_on_the_hour'
         : 'time.formats.tiny'
-    return tz.format(date, format, timezone) || ''
+    return format(date, format_, timezone) || ''
   }
 
   // match ruby-side short format on the hour, e.g. `1pm`
   // can't just check getMinutes, cuz not all timezone offsets are on the hour
-  const format =
-    tz.hasMeridian() && tz.format(date, '%M') === '00'
+  const format_ =
+    hasMeridiem() && format(date, '%M') === '00'
       ? 'time.formats.tiny_on_the_hour'
       : 'time.formats.tiny'
-  return tz.format(date, format) || ''
+  return format(date, format_) || ''
 }
 
 export function datetimeString(datetime, options) {
-  datetime = tz.parse(datetime)
+  datetime = parse(datetime)
   if (datetime == null) return ''
   const dateValue = dateString(datetime, options)
   const timeValue = timeString(datetime, options)
@@ -119,7 +119,7 @@ export function datetimeString(datetime, options) {
 // end batch
 
 export function discussionsDatetimeString(datetime, options) {
-  datetime = tz.parse(datetime)
+  datetime = parse(datetime)
   if (datetime == null) return ''
   const dateValue = dateString(datetime, options)
   const timeValue = timeString(datetime, options)

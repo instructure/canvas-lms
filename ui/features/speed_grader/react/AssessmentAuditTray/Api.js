@@ -17,7 +17,7 @@
  */
 
 import axios from '@canvas/axios'
-import timezone from '@canvas/datetime/timezone'
+import * as timezone from '@canvas/datetime'
 
 export default class Api {
   loadAssessmentAuditTrail(courseId, assignmentId, submissionId) {

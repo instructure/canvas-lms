@@ -16,9 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import timezone from '@canvas/datetime/timezone'
+import * as timezone from '@canvas/datetime'
 import {useScope as useI18nScope} from '@canvas/i18n'
-
 import {auditEventStudentAnonymityStates, overallAnonymityStates} from './AuditTrailHelpers'
 
 const I18n = useI18nScope('speed_grader')

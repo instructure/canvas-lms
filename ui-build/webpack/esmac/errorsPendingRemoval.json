@@ -42,34 +42,10 @@
     "request": "../../../shared/graphql/Error"
   },
   {
-    "name": "SpecifierMismatchError",
-    "source": "ui/features/discussion_topics_post/react/components/DueDateTray/DueDateTray.jsx",
-    "target": "ui/shared/datetime/dateHelper.js",
-    "request": "../../../../../shared/datetime/dateHelper"
-  },
-  {
-    "name": "SpecifierMismatchError",
-    "source": "ui/features/discussion_topics_post/react/components/PeerReview/PeerReview.jsx",
-    "target": "ui/shared/datetime/dateHelper.js",
-    "request": "../../../../../shared/datetime/dateHelper"
-  },
-  {
-    "name": "SpecifierMismatchError",
-    "source": "ui/features/discussion_topics_post/react/components/ReplyPreview/ReplyPreview.jsx",
-    "target": "ui/shared/datetime/dateHelper.js",
-    "request": "../../../../../shared/datetime/dateHelper"
-  },
-  {
     "name": "AccessViolationError",
     "source": "ui/features/discussion_topics_post/react/containers/DiscussionTopicContainer/DiscussionTopicContainer.jsx",
     "target": "ui/features/discussion_topic/jquery/assignmentRubricDialog.js",
     "request": "../../../../discussion_topic/jquery/assignmentRubricDialog"
-  },
-  {
-    "name": "SpecifierMismatchError",
-    "source": "ui/features/discussion_topics_post/react/containers/DiscussionTopicContainer/DiscussionTopicContainer.jsx",
-    "target": "ui/shared/datetime/dateHelper.js",
-    "request": "../../../../../shared/datetime/dateHelper"
   },
   {
     "name": "SpecifierMismatchError",
@@ -88,12 +64,6 @@
     "source": "ui/features/discussion_topics_post/react/containers/DiscussionTopicContainer/DiscussionTopicContainer.jsx",
     "target": "ui/shared/rubrics/jquery/edit_rubric.jsx",
     "request": "../../../../../shared/rubrics/jquery/edit_rubric"
-  },
-  {
-    "name": "SpecifierMismatchError",
-    "source": "ui/features/discussion_topics_post/react/containers/IsolatedThreadsContainer/IsolatedThreadsContainer.jsx",
-    "target": "ui/shared/datetime/dateHelper.js",
-    "request": "../../../../../shared/datetime/dateHelper"
   },
   {
     "name": "AccessViolationError",
@@ -127,12 +97,6 @@
   },
   {
     "name": "SpecifierMismatchError",
-    "source": "ui/shared/datetime/react/components/DateTimeInput.jsx",
-    "target": "ui/shared/datetime/changeTimezone.js",
-    "request": "@canvas/datetime/changeTimezone"
-  },
-  {
-    "name": "SpecifierMismatchError",
     "source": "ui/shared/outcomes/react/hooks/useGroupCreate.js",
     "target": "ui/shared/outcomes/graphql/Management.js",
     "request": "@canvas/outcomes/graphql/Management"
@@ -154,11 +118,5 @@
     "source": "ui/shared/outcomes/react/hooks/useOutcomesImport.js",
     "target": "ui/shared/outcomes/react/hooks/useCanvasContext.js",
     "request": "@canvas/outcomes/react/hooks/useCanvasContext"
-  },
-  {
-    "name": "SpecifierMismatchError",
-    "source": "ui/features/discussion_topics_post/react/components/DiscussionTopicAlertManager/DiscussionTopicAlertManager.jsx",
-    "target": "ui/shared/datetime/dateHelper.js",
-    "request": "../../../../../shared/datetime/dateHelper"
   }
 ]
