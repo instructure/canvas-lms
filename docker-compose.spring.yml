@@ -23,7 +23,6 @@ services:
       - canvas-media_es:/usr/src/app/packages/canvas-media/es
       - canvas-media_lib:/usr/src/app/packages/canvas-media/lib
       - canvas-media_node_modules:/usr/src/app/packages/canvas-media/node_modules
-      - canvas-planner_node_modules:/usr/src/app/packages/canvas-planner/node_modules
       - canvas-rce_canvas:/usr/src/app/packages/canvas-rce/canvas
       - canvas-rce_node_modules:/usr/src/app/packages/canvas-rce/node_modules
       - js-utils_es:/usr/src/app/packages/js-utils/es
