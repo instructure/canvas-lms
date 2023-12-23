@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import timezone from 'timezone'
-import tzInTest from '@canvas/datetime/timezone/specHelpers'
+import tzInTest from '@canvas/datetime/specHelpers'
 import newYork from 'timezone/America/New_York'
 
 import AssessmentSummary from 'ui/features/speed_grader/react/AssessmentAuditTray/components/AssessmentSummary'

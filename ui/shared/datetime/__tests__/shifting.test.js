@@ -16,30 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {
-  parse,
-  format,
-  adjustFormat,
-  shift,
-  hasMeridiem as hasMeridian, // TODO: rename instances of 'meridian' to 'meridiem'
-} from 'datetime'
+import {shift} from '../index'
+import {moonwalk, setup} from './helpers'
 
-import {
-  changeToTheSecondBeforeMidnight,
-  isMidnight,
-  mergeTimeAndDate,
-  setToEndOfMinute,
-} from '../index'
+setup(this)
 
-// TODO: remove this module and redirect callers to @canvas/datetime
-export default {
-  adjustFormat,
-  changeToTheSecondBeforeMidnight,
-  format,
-  hasMeridian,
-  isMidnight,
-  mergeTimeAndDate,
-  parse,
-  setToEndOfMinute,
-  shift,
-}
+test('shift() should add days', () => {
+  expect(shift(moonwalk, '+1 days')).toEqual(new Date(+moonwalk + 86400000))
+})
+
+test('shift() should subtract days', () => {
+  expect(shift(moonwalk, '-1 days')).toEqual(new Date(+moonwalk - 86400000))
+})
+
+test('shift() should add minutes', () => {
+  expect(shift(moonwalk, '+1 minutes')).toEqual(new Date(+moonwalk + 60000))
+})
+
+test('shift() should subtract minutes', () => {
+  expect(shift(moonwalk, '-1 minutes')).toEqual(new Date(+moonwalk - 60000))
+})

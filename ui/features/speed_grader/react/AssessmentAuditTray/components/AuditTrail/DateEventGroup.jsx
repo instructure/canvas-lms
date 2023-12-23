@@ -21,7 +21,7 @@ import {Text} from '@instructure/ui-text'
 import {List} from '@instructure/ui-list'
 import {View} from '@instructure/ui-view'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import timezone from '@canvas/datetime/timezone'
+import * as timezone from '@canvas/datetime'
 
 import AuditEvent from './AuditEvent'
 import * as propTypes from './propTypes'

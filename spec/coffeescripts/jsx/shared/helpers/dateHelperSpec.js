@@ -18,7 +18,7 @@
 
 import DateHelper from '@canvas/datetime/dateHelper'
 import {isDate, isNull, isUndefined} from 'lodash'
-import tzInTest from '@canvas/datetime/timezone/specHelpers'
+import tzInTest from '@canvas/datetime/specHelpers'
 import timezone from 'timezone'
 import detroit from 'timezone/America/Detroit'
 import juneau from 'timezone/America/Juneau'

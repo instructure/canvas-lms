@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import tz from '../../timezone'
+import * as tz from '../../index'
 import _ from 'lodash'
 import $ from 'jquery'
 import '../../jquery/index'

@@ -20,7 +20,7 @@ import React from 'react'
 import TestUtils from 'react-dom/test-utils'
 import TimeBlockSelectRow from 'ui/features/calendar_appointment_group_edit/react/TimeBlockSelectRow'
 import london from 'timezone/Europe/London'
-import tz from '@canvas/datetime/timezone'
+import * as tz from '@canvas/datetime'
 import fakeENV from 'helpers/fakeENV'
 import '@canvas/datetime/jquery'
 

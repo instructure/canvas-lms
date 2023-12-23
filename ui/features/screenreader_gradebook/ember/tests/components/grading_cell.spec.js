@@ -17,7 +17,7 @@
 
 import $ from 'jquery'
 import Ember from 'ember'
-import tz from '@canvas/datetime/timezone'
+import * as tz from '@canvas/datetime'
 import startApp from '../start_app'
 import fixtures from '../ajax_fixtures'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'

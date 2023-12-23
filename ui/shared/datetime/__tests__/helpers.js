@@ -16,23 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { shift } from '../'
-import { moonwalk, setup } from './helpers'
+import {configure} from '../index'
 
-setup(this)
+export {moonwalk, epoch} from '../specHelpers'
+export function setup() {
+  beforeEach(() => {
+    configure({})
+  })
 
-test('shift() should add days', () => {
-  expect(shift(moonwalk, '+1 days')).toEqual(new Date(+moonwalk + 86400000))
-})
+  afterEach(() => {
+    configure({})
+  })
+}
 
-test('shift() should subtract days', () => {
-  expect(shift(moonwalk, '-1 days')).toEqual(new Date(+moonwalk - 86400000))
-})
-
-test('shift() should add minutes', () => {
-  expect(shift(moonwalk, '+1 minutes')).toEqual(new Date(+moonwalk + 60000))
-})
-
-test('shift() should subtract minutes', () => {
-  expect(shift(moonwalk, '-1 minutes')).toEqual(new Date(+moonwalk - 60000))
-})
+export const equal = (a, b) => expect(a).toEqual(b)
+export const ok = a => expect(a).toBeTruthy()

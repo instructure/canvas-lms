@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import tz from '@canvas/datetime/timezone'
+import * as tz from '@canvas/datetime'
 import 'fullcalendar'
 import '@canvas/datetime/jquery'
 

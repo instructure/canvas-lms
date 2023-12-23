@@ -21,7 +21,7 @@
 import {extend} from '@canvas/backbone/utils'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import tz from '@canvas/datetime/timezone'
+import * as tz from '@canvas/datetime'
 import fcUtil from '@canvas/calendar/jquery/fcUtil'
 import calendarEventFilter from '../../CalendarEventFilter'
 import _ from 'underscore'

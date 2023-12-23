@@ -65,7 +65,7 @@ describe('format::', () => {
   it("promotes 12-hour+am/pm into 24-hour if the locale doesn't define am/pm", () => {
     configure({
       tz: timezone(french, 'fr_FR'),
-      momentLocale: 'fr'
+      momentLocale: 'fr',
     })
     window.ENV.LOCALE = 'fr'
 
@@ -81,8 +81,8 @@ describe('format::', () => {
       tz: timezone,
       tzData: {
         'America/Denver': AmericaDenver,
-        'America/Chicago': AmericaChicago
-      }
+        'America/Chicago': AmericaChicago,
+      },
     })
 
     const time = tz.parse('1969-07-21 15:00:00')
@@ -93,8 +93,8 @@ describe('format::', () => {
   it('recognizes date.formats.*', () => {
     configure({
       formats: {
-        'date.formats.short': '%b %-d'
-      }
+        'date.formats.short': '%b %-d',
+      },
     })
 
     expect(tz.format(moonwalk, 'date.formats.short')).toBe('Jul 21')
@@ -103,8 +103,8 @@ describe('format::', () => {
   it('recognizes time.formats.*', () => {
     configure({
       formats: {
-        'time.formats.tiny': '%-l:%M%P'
-      }
+        'time.formats.tiny': '%-l:%M%P',
+      },
     })
 
     expect(tz.format(epoch, 'time.formats.tiny')).toBe('12:00am')
@@ -115,8 +115,8 @@ describe('format::', () => {
       tz: timezone('fr_FR', french),
       momentLocale: 'fr',
       formats: {
-        'date.formats.full': '%-d %b %Y %-l:%M%P'
-      }
+        'date.formats.full': '%-d %b %Y %-l:%M%P',
+      },
     })
     window.ENV.LOCALE = 'fr'
 
@@ -126,8 +126,8 @@ describe('format::', () => {
   it('automatically converts %l to %-l when given a localization key', () => {
     configure({
       formats: {
-        'time.formats.tiny': '%l:%M%P'
-      }
+        'time.formats.tiny': '%l:%M%P',
+      },
     })
 
     expect(tz.format(moonwalk, 'time.formats.tiny')).toBe('2:56am')
@@ -136,8 +136,8 @@ describe('format::', () => {
   it('automatically converts %k to %-k when given a localization key', () => {
     configure({
       formats: {
-        'time.formats.tiny': '%k:%M'
-      }
+        'time.formats.tiny': '%k:%M',
+      },
     })
 
     expect(tz.format(moonwalk, 'time.formats.tiny')).toBe('2:56')
@@ -146,8 +146,8 @@ describe('format::', () => {
   it('automatically converts %e to %-e when given a localization key', () => {
     configure({
       formats: {
-        'date.formats.short': '%b %e'
-      }
+        'date.formats.short': '%b %e',
+      },
     })
 
     expect(tz.format(epoch, 'date.formats.short')).toBe('Jan 1')

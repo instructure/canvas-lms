@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import tz from '@canvas/datetime/timezone'
+import * as tz from '@canvas/datetime'
 import {render} from '@testing-library/react'
 import {mockAssignment, mockOverride} from '../../../test-utils'
 import EveryoneElse from '../EveryoneElse'

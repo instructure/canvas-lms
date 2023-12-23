@@ -19,7 +19,7 @@
 import React from 'react'
 // I18n and tz needed to replicate what FriendlyDatetime does in formatting
 import {useScope as useI18nScope} from '@canvas/i18n'
-import tz from '@canvas/datetime/timezone'
+import * as tz from '@canvas/datetime'
 import {render} from '@testing-library/react'
 import {mockOverride} from '../../../test-utils'
 import OverrideSummary from '../OverrideSummary'

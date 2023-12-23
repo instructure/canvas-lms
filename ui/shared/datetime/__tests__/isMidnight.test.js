@@ -18,7 +18,7 @@
 
 import detroit from 'timezone/America/Detroit'
 import timezone from 'timezone'
-import {configureAndRestoreLater, epoch, moonwalk, restore} from 'datetime/specHelpers'
+import {configureAndRestoreLater, epoch, moonwalk, restore} from '@canvas/datetime/specHelpers'
 import {isMidnight as subject} from '..'
 
 describe('isMidnight', () => {

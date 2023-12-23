@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import EditPlannerNoteDetails from 'ui/features/calendar/backbone/views/EditPlannerNoteDetails'
-import tzInTest from '@canvas/datetime/timezone/specHelpers'
+import tzInTest from '@canvas/datetime/specHelpers'
 import fakeENV from 'helpers/fakeENV'
 import commonEventFactory from '@canvas/calendar/jquery/CommonEvent/index'
 

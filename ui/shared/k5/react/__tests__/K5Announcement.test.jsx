@@ -18,7 +18,7 @@
 
 import React from 'react'
 import fetchMock from 'fetch-mock'
-import tz from '@canvas/datetime/timezone'
+import * as tz from '@canvas/datetime'
 import {act, render, waitFor} from '@testing-library/react'
 import K5Announcement from '../K5Announcement'
 

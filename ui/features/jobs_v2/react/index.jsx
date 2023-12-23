@@ -35,7 +35,7 @@ import {Flex} from '@instructure/ui-flex'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconXSolid} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import tz from '@canvas/datetime/timezone'
+import * as tz from '@canvas/datetime'
 import moment from 'moment-timezone'
 
 const I18n = useI18nScope('jobs_v2')

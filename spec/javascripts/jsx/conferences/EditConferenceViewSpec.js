@@ -19,7 +19,7 @@
 import EditConferenceView from 'ui/features/conferences/backbone/views/EditConferenceView'
 import Conference from 'ui/features/conferences/backbone/models/Conference'
 import timezone from 'timezone'
-import tzInTest from '@canvas/datetime/timezone/specHelpers'
+import tzInTest from '@canvas/datetime/specHelpers'
 import french from 'timezone/fr_FR'
 import fakeENV from 'helpers/fakeENV'
 

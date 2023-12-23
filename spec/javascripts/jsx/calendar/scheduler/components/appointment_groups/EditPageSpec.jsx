@@ -23,7 +23,7 @@ import $ from 'jquery'
 import axios from '@canvas/axios'
 import EditPage from 'ui/features/calendar_appointment_group_edit/react/EditPage'
 import london from 'timezone/Europe/London'
-import tz from '@canvas/datetime/timezone'
+import * as tz from '@canvas/datetime'
 import fakeENV from 'helpers/fakeENV'
 import moxios from 'moxios'
 

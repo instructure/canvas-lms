@@ -30,7 +30,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
-import tz from '@canvas/datetime/timezone'
+import * as tz from '@canvas/datetime'
 import $ from 'jquery'
 
 const I18n = useI18nScope('bounced_emails')

@@ -31,7 +31,7 @@ import genericSelectOptionsTemplate from '../../jst/genericSelectOptions.handleb
 import datePickerFormat from '@canvas/datetime/datePickerFormat'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import withinMomentDates from '../../momentDateHelper'
-import tz from '@canvas/datetime/timezone'
+import * as tz from '@canvas/datetime'
 import fcUtil from '@canvas/calendar/jquery/fcUtil'
 import '@canvas/datetime/jquery'
 import '@canvas/forms/jquery/jquery.instructure_forms'

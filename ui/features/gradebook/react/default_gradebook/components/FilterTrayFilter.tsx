@@ -22,7 +22,7 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
 import moment from 'moment'
 import type {MomentInput} from 'moment-timezone'
-import tz from '@canvas/datetime/timezone'
+import * as tz from '@canvas/datetime'
 import type {CamelizedGradingPeriod} from '@canvas/grading/grading.d'
 import type {Filter, FilterType, SubmissionFilterValue} from '../gradebook.d'
 import type {

@@ -18,7 +18,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import tz from '../timezone'
+import * as tz from '../index'
 import htmlEscape from 'html-escape'
 import * as dateFunctions from '../date-functions'
 import {changeTimezone} from '../changeTimezone'
@@ -123,7 +123,7 @@ $.fn.datepicker = function (options) {
       let numericHr = parseInt(hr || '0', 10)
       const numericMin = parseInt(min || '0', 10)
 
-      if (tz.hasMeridian()) {
+      if (tz.hasMeridiem()) {
         let isPM = numericHr > 12 // definitely PM if the hour value is past noon
         numericHr %= 12
 

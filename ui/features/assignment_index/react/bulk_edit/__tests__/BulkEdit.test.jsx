@@ -19,7 +19,7 @@
 import React from 'react'
 import {render, fireEvent, act} from '@testing-library/react'
 import tz from 'timezone'
-import tzInTest from '@canvas/datetime/timezone/specHelpers'
+import tzInTest from '@canvas/datetime/specHelpers'
 import tokyo from 'timezone/Asia/Tokyo'
 import anchorage from 'timezone/America/Anchorage'
 import moment from 'moment-timezone'

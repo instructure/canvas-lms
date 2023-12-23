@@ -18,7 +18,7 @@
 
 import React, {useCallback, useEffect, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import tz from '@canvas/datetime/timezone'
+import * as tz from '@canvas/datetime'
 import PropTypes from 'prop-types'
 
 import {Heading} from '@instructure/ui-heading'
