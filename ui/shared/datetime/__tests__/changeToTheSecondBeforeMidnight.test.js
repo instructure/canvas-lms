@@ -17,7 +17,7 @@
  */
 
 import {changeToTheSecondBeforeMidnight as subject} from '..'
-import {epoch} from '@canvas/datetime/specHelpers'
+import {epoch} from '../specHelpers'
 
 describe('changeToTheSecondBeforeMidnight', () => {
   it('returns null when no argument given.', () => {

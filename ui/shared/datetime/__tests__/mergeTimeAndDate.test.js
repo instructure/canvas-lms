@@ -17,7 +17,7 @@
  */
 
 import {mergeTimeAndDate as subject} from '..'
-import {moonwalk, epoch} from '@canvas/datetime/specHelpers'
+import {moonwalk, epoch} from '../specHelpers'
 
 test('mergeTimeAndDate() finds the given time of day on the given date.', () => {
   expect(+subject(moonwalk, epoch)).toEqual(+Date.UTC(1970, 0, 1, 2, 56))
