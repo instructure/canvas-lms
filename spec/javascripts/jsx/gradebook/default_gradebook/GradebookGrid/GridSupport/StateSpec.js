@@ -17,7 +17,7 @@
  */
 
 import '@canvas/datetime/jquery'
-import '@canvas/jquery/jquery.keycodes' // used by some SlickGrid editors
+import '@canvas/jquery-keycodes' // used by some SlickGrid editors
 import slickgrid from 'slickgrid'
 import GridSupport from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/GridSupport/index'
 

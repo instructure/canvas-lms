@@ -134,7 +134,7 @@ import 'jqueryui/dialog'
 import 'jqueryui/menu'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, showIf, hasScrollbar */
-import '@canvas/jquery/jquery.keycodes'
+import '@canvas/jquery-keycodes/jquery.keycodes'
 import '@canvas/loading-image'
 import '@canvas/util/templateData'
 import '@canvas/media-comments'
