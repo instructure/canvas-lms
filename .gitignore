@@ -36,7 +36,7 @@ docker-compose.override.yml
 !/log/.keep
 !/log/parallel-runtime-rspec.log
 mkmf.log
-/node_modules
+node_modules
 npm-debug.log
 /public/dist/
 /public/doc/api/
