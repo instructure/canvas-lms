@@ -764,6 +764,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       group.assignments = group.assignments || [] // perhaps unnecessary
       assignmentGroup.assignments.forEach(assignment => {
         assignment.assignment_group = group
+        // @ts-expect-error
         assignment.due_at = tz.parse(assignment.due_at)
         this.updateAssignmentEffectiveDueDates(assignment)
         this.addAssignmentColumnDefinition(assignment)
@@ -1169,6 +1170,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       return true
     }
     return Object.values(assignment.effectiveDueDates || {}).some(
+      // @ts-expect-error
       (effectiveDueDateObject: DueDate) => tz.parse(effectiveDueDateObject.due_at) >= tz.parse(date)
     )
   }
@@ -1181,6 +1183,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return Object.keys(assignment.effectiveDueDates || {}).some(
       (assignmentId: string) =>
         assignment.effectiveDueDates &&
+        // @ts-expect-error
         tz.parse(assignment.effectiveDueDates[assignmentId].due_at) <= tz.parse(date)
     )
   }

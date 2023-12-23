@@ -43,10 +43,7 @@ module.exports = {
       {
         test: /\.(mjs|js|jsx|ts|tsx)$/,
         type: 'javascript/auto',
-        include: [
-          path.resolve(canvasDir, 'node_modules/graphql'),
-          path.resolve(canvasDir, 'packages/datetime-moment-parser/index.js'),
-        ],
+        include: [path.resolve(canvasDir, 'node_modules/graphql')],
         resolve: {
           fullySpecified: false,
         },

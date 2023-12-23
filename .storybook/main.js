@@ -37,7 +37,6 @@ module.exports = {
         type: 'javascript/auto',
         include: [
           path.resolve(canvasDir, 'node_modules/graphql'),
-          path.resolve(canvasDir, 'packages/datetime-moment-parser/index.js'),
         ],
         resolve: {
           fullySpecified: false

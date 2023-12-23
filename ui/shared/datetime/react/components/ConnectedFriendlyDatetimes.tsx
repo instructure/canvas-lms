@@ -36,6 +36,7 @@ type Props = {
 
 function timeFormatting(dateTime: string | Date, format: string | undefined, showTime: boolean) {
   if (!_.isDate(dateTime)) {
+    // @ts-expect-error
     dateTime = tz.parse(dateTime)
   }
 
