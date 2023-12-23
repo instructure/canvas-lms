@@ -33,8 +33,6 @@ exports.instUIWorkaround =
     type: 'javascript/auto',
     include: [
       resolve(canvasDir, 'node_modules/@instructure'),
-      resolve(canvasDir, 'packages/canvas-media/node_modules/@instructure'),
-      resolve(canvasDir, 'packages/canvas-rce/node_modules/@instructure'),
       ...globPlugins('/node_modules/@instructure'),
     ],
   }
@@ -82,14 +80,6 @@ exports.babel = {
   test: /\.(js|ts|jsx|tsx)$/,
   include: [
     resolve(canvasDir, 'ui'),
-    resolve(canvasDir, 'packages/jquery-kyle-menu'),
-    resolve(canvasDir, 'packages/jquery-popover'),
-    resolve(canvasDir, 'packages/jquery-selectmenu'),
-    resolve(canvasDir, 'packages/convert-case'),
-    resolve(canvasDir, 'packages/slickgrid'),
-    resolve(canvasDir, 'packages/with-breakpoints'),
-    resolve(canvasDir, 'spec/javascripts/jsx'),
-    resolve(canvasDir, 'spec/coffeescripts'),
     ...globPlugins('app/{jsx,coffeescripts}/'),
   ],
   exclude: [/node_modules/],
@@ -175,11 +165,6 @@ exports.istanbul = {
   test: /\.(js|ts|tsx)$/,
   include: [
     resolve(canvasDir, 'ui'),
-    resolve(canvasDir, 'packages/jquery-kyle-menu'),
-    resolve(canvasDir, 'packages/jquery-popover'),
-    resolve(canvasDir, 'packages/jquery-selectmenu'),
-    resolve(canvasDir, 'packages/slickgrid'),
-    resolve(canvasDir, 'packages/with-breakpoints'),
     resolve(canvasDir, 'spec/javascripts/jsx'),
     resolve(canvasDir, 'spec/coffeescripts'),
     ...globPlugins('app/{jsx,coffeescripts}/'),

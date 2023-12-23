@@ -57,11 +57,6 @@ module.exports = {
         test: /\.(js|jsx|ts|tsx)$/,
         include: [
           path.join(canvasDir, 'ui'),
-          path.join(canvasDir, 'packages/jquery-kyle-menu'),
-          path.join(canvasDir, 'packages/jquery-popover'),
-          path.join(canvasDir, 'packages/jquery-selectmenu'),
-          path.resolve(canvasDir, 'packages/convert-case'),
-          path.join(canvasDir, 'packages/slickgrid'),
           path.join(canvasDir, 'spec/javascripts/jsx'),
           path.join(canvasDir, 'spec/coffeescripts'),
           /gems\/plugins\/.*\/app\/(jsx|coffeescripts)\//,
