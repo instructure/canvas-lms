@@ -50,18 +50,6 @@
   {
     "name": "SpecifierMismatchError",
     "source": "ui/features/discussion_topics_post/react/containers/DiscussionTopicContainer/DiscussionTopicContainer.jsx",
-    "target": "ui/shared/direct-sharing/react/components/DirectShareCourseTray.jsx",
-    "request": "../../../../../shared/direct-sharing/react/components/DirectShareCourseTray"
-  },
-  {
-    "name": "SpecifierMismatchError",
-    "source": "ui/features/discussion_topics_post/react/containers/DiscussionTopicContainer/DiscussionTopicContainer.jsx",
-    "target": "ui/shared/direct-sharing/react/components/DirectShareUserModal.jsx",
-    "request": "../../../../../shared/direct-sharing/react/components/DirectShareUserModal"
-  },
-  {
-    "name": "SpecifierMismatchError",
-    "source": "ui/features/discussion_topics_post/react/containers/DiscussionTopicContainer/DiscussionTopicContainer.jsx",
     "target": "ui/shared/rubrics/jquery/edit_rubric.jsx",
     "request": "../../../../../shared/rubrics/jquery/edit_rubric"
   },
