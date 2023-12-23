@@ -18,8 +18,8 @@
 
 import {DiscussionDetails} from '../../components/DiscussionDetails/DiscussionDetails'
 import DateHelper from '@canvas/datetime/dateHelper'
-import DirectShareUserModal from '../../../../../shared/direct-sharing/react/components/DirectShareUserModal'
-import DirectShareCourseTray from '../../../../../shared/direct-sharing/react/components/DirectShareCourseTray'
+import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
+import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 import {Discussion} from '../../../graphql/Discussion'
 import {DiscussionEdit} from '../../components/DiscussionEdit/DiscussionEdit'
 import {getSpeedGraderUrl, getReviewLinkUrl, responsiveQuerySizes} from '../../utils'
