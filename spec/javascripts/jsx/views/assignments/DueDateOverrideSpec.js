@@ -21,7 +21,7 @@ import DateValidator from '@canvas/grading/DateValidator'
 import DueDateOverrideView from '@canvas/due-dates'
 import fakeENV from 'helpers/fakeENV'
 import StudentGroupStore from '@canvas/due-dates/react/StudentGroupStore'
-import '@canvas/forms/jquery/jquery.instructure_forms' // errorBox
+import '@canvas/jquery/jquery.instructure_forms' // errorBox
 
 QUnit.module('DueDateOverride#validateTokenInput', {
   setup() {

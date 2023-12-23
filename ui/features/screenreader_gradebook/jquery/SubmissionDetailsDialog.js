@@ -27,7 +27,7 @@ import '../jst/_submission_detail.handlebars' // a partial needed by the Submiss
 import '@canvas/grading/jst/_turnitinScore.handlebars' // a partial needed by the submission_detail partial
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.disableWhileLoading'
-import '@canvas/forms/jquery/jquery.instructure_forms'
+import '@canvas/jquery/jquery.instructure_forms'
 import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 import 'jquery-scroll-to-visible/jquery.scrollTo'

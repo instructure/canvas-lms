@@ -37,7 +37,7 @@ import {loadReactRouter} from './boot/initializers/router'
 // methods or set something up that other code expects to exist at runtime.
 // so they have to be ran before any other app code runs.
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/forms/jquery/jquery.instructure_forms'
+import '@canvas/jquery/jquery.instructure_forms'
 import './boot/initializers/ajax_errors'
 import './boot/initializers/activateKeyClicks'
 import './boot/initializers/activateTooltips'

@@ -25,7 +25,7 @@ import replyAttachmentTemplate from '../jst/_reply_attachment.handlebars'
 import preventDefault from '@canvas/util/preventDefault'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 import {send} from '@canvas/rce/RceCommandShim'
-import '@canvas/forms/jquery/jquery.instructure_forms'
+import '@canvas/jquery/jquery.instructure_forms'
 
 const stripTags = str => {
   const div = document.createElement('div')

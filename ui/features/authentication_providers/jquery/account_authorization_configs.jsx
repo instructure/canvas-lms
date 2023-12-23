@@ -24,7 +24,7 @@ import AuthTypePicker from '../react/AuthTypePicker'
 import authenticationProviders from './index'
 import $ from 'jquery'
 import ready from '@instructure/ready'
-import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit */
+import '@canvas/jquery/jquery.instructure_forms' /* formSubmit */
 import '@canvas/datetime/jquery'
 import '@canvas/jquery-keycodes/jquery.keycodes'
 import '@canvas/loading-image'

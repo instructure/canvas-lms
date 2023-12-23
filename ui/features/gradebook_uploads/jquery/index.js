@@ -25,7 +25,7 @@ import ProcessGradebookUpload from './process_gradebook_upload'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import 'slickgrid' /* global Slick */
 import 'slickgrid/slick.editors' /* global.Slick.Editors */
-import '@canvas/forms/jquery/jquery.instructure_forms' /* errorBox */
+import '@canvas/jquery/jquery.instructure_forms' /* errorBox */
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* /\.detect/ */
 import '@canvas/util/templateData'
 

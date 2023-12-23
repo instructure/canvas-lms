@@ -31,7 +31,7 @@ import RichContentEditor from '@canvas/rce/RichContentEditor'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.toJSON'
 import '@canvas/datetime/jquery' /* friendlyDatetime, friendlyDate */
-import '@canvas/forms/jquery/jquery.instructure_forms' /* getFormData, errorBox */
+import '@canvas/jquery/jquery.instructure_forms' /* getFormData, errorBox */
 import 'jqueryui/dialog'
 import '@canvas/rails-flash-notifications'
 import 'jquery-scroll-to-visible/jquery.scrollTo'

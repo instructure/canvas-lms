@@ -20,7 +20,7 @@ import $ from 'jquery'
 import addLinkRow from '../../jst/addLinkRow.handlebars'
 import AvatarWidget from '@canvas/avatar-dialog-view'
 import Backbone from '@canvas/backbone'
-import '@canvas/forms/jquery/jquery.instructure_forms'
+import '@canvas/jquery/jquery.instructure_forms'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
 

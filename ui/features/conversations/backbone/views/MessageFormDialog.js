@@ -31,7 +31,7 @@ import AutocompleteView from './AutocompleteView'
 import CourseSelectionView from './CourseSelectionView'
 import ContextMessagesView from './ContextMessagesView'
 import 'jquery.elastic'
-import '@canvas/forms/jquery/jquery.instructure_forms'
+import '@canvas/jquery/jquery.instructure_forms'
 
 const I18n = useI18nScope('conversation_dialog')
 

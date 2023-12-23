@@ -32,7 +32,7 @@ import samlDialog from '../jst/samlDialog.handlebars'
 import addPrivacyLinkToDialog from './addPrivacyLinkToDialog'
 import htmlEscape from 'html-escape'
 import './validate'
-import '@canvas/forms/jquery/jquery.instructure_forms'
+import '@canvas/jquery/jquery.instructure_forms'
 import '@canvas/datetime/jquery'
 import '@canvas/util/jquery/fixDialogButtons'
 

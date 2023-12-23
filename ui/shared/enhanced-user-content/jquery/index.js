@@ -29,7 +29,7 @@ import 'jqueryui/draggable'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/doc-previews' /* loadDocPreview */
 import '@canvas/datetime/jquery' /* datetimeString, dateString, fudgeDateForProfileTimezone */
-import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */
+import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */
 import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags, youTubeID */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* ifExists, .dim, confirmDelete, showIf, fillWindowWithMe */
