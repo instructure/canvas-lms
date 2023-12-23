@@ -472,6 +472,7 @@ function mergeStudentsAndSubmission() {
         EG.compareStudentsBy(student => {
           const submittedAt = student && student.submission && student.submission.submitted_at
           if (submittedAt) {
+            // @ts-expect-error
             return +tz.parse(submittedAt)
           } else {
             // puts the unsubmitted assignments at the bottom

@@ -30,9 +30,11 @@ function deserializeComment(comment: SubmissionComment): SerializedComment {
   }
 
   if (!comment.author) {
+    // @ts-expect-error
     return baseComment
   }
 
+  // @ts-expect-error
   return {
     ...baseComment,
     authorId: comment.author.id,

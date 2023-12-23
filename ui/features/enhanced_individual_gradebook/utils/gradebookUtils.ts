@@ -495,6 +495,7 @@ function mapToSortableAssignment(
   gradingPeriodId?: string | null
 ): SortableAssignment {
   // Used sort date logic from screenreader_gradebook_controller.js
+  // @ts-expect-error
   const sortableDueDate = assignment.dueAt ? +tz.parse(assignment.dueAt) / 1000 : Number.MAX_VALUE
   return {
     ...assignment,

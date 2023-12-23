@@ -16,17 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import parseDateTime, { createDateTimeMoment, specifiesTimezone, toRFC3339WithoutTZ } from './index'
 import tz from 'timezone'
 import moment from 'moment'
 import detroit from 'timezone/America/Detroit'
+import {createDateTimeMoment, specifiesTimezone, toRFC3339WithoutTZ} from '../index'
 
 const moonwalk = new Date(Date.UTC(1969, 6, 21, 2, 56))
 const tzDetroit = tz(detroit, 'America/Detroit')
-const I18nStub = {
-  lookup: () => null,
-  t: () => null
-}
 
 let originalMomentLocale
 
@@ -42,28 +38,26 @@ afterEach(() => {
 test('moment(one-arg) complains', () => {
   expect(() => {
     createDateTimeMoment('June 24 at 10:00pm')
-  }).toThrowError(/ only works on /)
+  }).toThrow(/ only works on /)
 })
 
 test('moment(non-string, fmt-string) complains', () => {
   expect(() => {
     createDateTimeMoment(moonwalk, 'MMMM D h:mmA')
-  }).toThrowError(/ only works on /)
+  }).toThrow(/ only works on /)
 })
 
 test('moment(date-string, non-string) complains', () => {
   expect(() => {
     createDateTimeMoment('June 24 at 10:00pm', 123)
-  }).toThrowError(/ only works on /)
+  }).toThrow(/ only works on /)
 })
 
 test('moment(date-string, fmt-string) works', () =>
-  expect(createDateTimeMoment('June 24 at 10:00pm', 'MMMM D h:mmA')).toBeTruthy()
-)
+  expect(createDateTimeMoment('June 24 at 10:00pm', 'MMMM D h:mmA')).toBeTruthy())
 
 test('moment(date-string, [fmt-strings]) works', () =>
-  expect(createDateTimeMoment('June 24 at 10:00pm', ['MMMM D h:mmA', 'L'])).toBeTruthy()
-)
+  expect(createDateTimeMoment('June 24 at 10:00pm', ['MMMM D h:mmA', 'L'])).toBeTruthy())
 
 test('moment passes through invalid results', () => {
   const m = createDateTimeMoment('not a valid date', 'L')
@@ -123,9 +117,7 @@ describe('specifiesTimezone', () => {
 
   it('is false when format contains Z but input has no timezone', () => {
     expect(
-      specifiesTimezone(
-        createDateTimeMoment('June 24, 2015 at 10:00pm', 'MMMM D, YYYY h:mmA Z')
-      )
+      specifiesTimezone(createDateTimeMoment('June 24, 2015 at 10:00pm', 'MMMM D, YYYY h:mmA Z'))
     ).toEqual(false)
   })
 
