@@ -27,7 +27,7 @@ import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, fillFormDa
 import 'jqueryui/dialog'
 import '@canvas/util/jquery/fixDialogButtons'
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, fragmentChange, showIf */
-import '@canvas/jquery/jquery.keycodes'
+import '@canvas/jquery-keycodes/jquery.keycodes'
 import '@canvas/loading-image'
 import '@canvas/rails-flash-notifications'
 import '@canvas/util/templateData' /* fillTemplateData, getTemplateData */
