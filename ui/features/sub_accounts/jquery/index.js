@@ -21,7 +21,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import jQuery from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, fillFormData */
+import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, fillFormData */
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, showIf */
 import '@canvas/datetime/jquery'

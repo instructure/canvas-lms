@@ -24,7 +24,7 @@ import createReactClass from 'create-react-class'
 import BackboneState from './mixins/BackboneState'
 import PaginatedUserCheckList from './PaginatedUserCheckList'
 import InfiniteScroll from './mixins/InfiniteScroll'
-import '@canvas/forms/jquery/jquery.instructure_forms'
+import '@canvas/jquery/jquery.instructure_forms'
 
 const I18n = useI18nScope('student_groups')
 

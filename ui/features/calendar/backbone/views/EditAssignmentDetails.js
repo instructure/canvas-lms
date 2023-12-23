@@ -34,7 +34,7 @@ import withinMomentDates from '../../momentDateHelper'
 import * as tz from '@canvas/datetime'
 import fcUtil from '@canvas/calendar/jquery/fcUtil'
 import '@canvas/datetime/jquery'
-import '@canvas/forms/jquery/jquery.instructure_forms'
+import '@canvas/jquery/jquery.instructure_forms'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import '../../fcMomentHandlebarsHelpers'
 

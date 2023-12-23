@@ -34,7 +34,7 @@ import setDefaultToolValues from '../setDefaultToolValues'
 import {findLinkForService, getUserServices} from '@canvas/services/findLinkForService'
 import '@canvas/datetime/jquery' /* datetime_field */
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, ajaxJSONFiles, getFormData, errorBox */
+import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, ajaxJSONFiles, getFormData, errorBox */
 import 'jqueryui/dialog'
 import '@canvas/util/jquery/fixDialogButtons'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */

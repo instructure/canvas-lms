@@ -20,7 +20,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import addBank from './addBank'
 import '@canvas/jquery/jquery.ajaxJSON' /* ajaxJSON */
-import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, getFormData, formErrors */
+import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, getFormData, formErrors */
 import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, showIf, .dim */

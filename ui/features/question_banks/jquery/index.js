@@ -20,7 +20,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/datetime/jquery' /* datetimeString */
-import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */
+import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete */
 import '@canvas/jquery-keycodes/jquery.keycodes'
 import '@canvas/loading-image'

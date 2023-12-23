@@ -30,7 +30,7 @@ import preventDefault from '@canvas/util/preventDefault'
 import {publish as jqueryPublish} from 'jquery-tinypubsub'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.disableWhileLoading'
-import '@canvas/forms/jquery/jquery.instructure_forms'
+import '@canvas/jquery/jquery.instructure_forms'
 import {CommonEventShowError} from '@canvas/calendar/jquery/CommonEvent/CommonEvent'
 
 const I18n = useI18nScope('EditAppointmentGroupDetails')

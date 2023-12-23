@@ -127,7 +127,7 @@ import vericiteInfoTemplate from '../jst/_vericiteInfo.handlebars'
 import vericiteScoreTemplate from '@canvas/grading/jst/_vericiteScore.handlebars'
 import 'jqueryui/draggable'
 import '@canvas/jquery/jquery.ajaxJSON' /* getJSON, ajaxJSON */
-import '@canvas/forms/jquery/jquery.instructure_forms' /* ajaxJSONFiles */
+import '@canvas/jquery/jquery.instructure_forms' /* ajaxJSONFiles */
 import '@canvas/doc-previews' /* loadDocPreview */
 import '@canvas/datetime/jquery' /* datetimeString */
 import 'jqueryui/dialog'
