@@ -27,7 +27,7 @@ import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, showIf, .dim */
 import '@canvas/datetime/jquery'
-import '@canvas/jquery-keycodes/jquery.keycodes' /* keycodes */
+import '@canvas/jquery-keycodes' /* keycodes */
 import '@canvas/loading-image' /* loadingImage */
 import '@canvas/util/templateData'
 

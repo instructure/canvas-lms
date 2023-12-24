@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import '@canvas/jquery/jquery.serializeForm'
+import '@canvas/serialize-form'
 
 const $sampleForm = $(`
   <form>
