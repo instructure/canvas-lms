@@ -25,7 +25,7 @@ import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, formErrors */
 import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, showIf */
-import '@canvas/jquery-keycodes/jquery.keycodes'
+import '@canvas/jquery-keycodes'
 import '@canvas/loading-image'
 import '@canvas/util/templateData'
 import 'jqueryui/autocomplete'

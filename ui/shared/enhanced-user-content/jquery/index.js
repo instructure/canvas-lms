@@ -33,7 +33,7 @@ import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, fo
 import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags, youTubeID */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* ifExists, .dim, confirmDelete, showIf, fillWindowWithMe */
-import '@canvas/jquery-keycodes/jquery.keycodes'
+import '@canvas/jquery-keycodes'
 import '@canvas/loading-image'
 import '@canvas/rails-flash-notifications'
 import '@canvas/util/templateData'

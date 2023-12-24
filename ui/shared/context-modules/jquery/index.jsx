@@ -46,7 +46,7 @@ import 'jqueryui/dialog'
 import '@canvas/util/jquery/fixDialogButtons'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* /\$\.underscore/ */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* .dim, confirmDelete, fragmentChange, showIf */
-import '@canvas/jquery-keycodes/jquery.keycodes'
+import '@canvas/jquery-keycodes'
 import '@canvas/loading-image'
 import '@canvas/util/templateData' /* fillTemplateData, getTemplateData */
 import 'date-js' /* Date.parse */

@@ -27,7 +27,7 @@
 //     of send action, we use event triggering (see RichContentEditor for the
 //     trigger) to wait until it's loaded and send the event
 //
-import {registerJQueryValueHandler} from '@canvas/jquery/jquery.serializeForm'
+import {registerJQueryValueHandler} from '@canvas/serialize-form'
 
 export const RCELOADED_EVENT_NAME = 'RceLoaded'
 // eslint-disable-next-line import/no-mutable-exports

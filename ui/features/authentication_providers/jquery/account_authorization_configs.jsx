@@ -26,7 +26,7 @@ import $ from 'jquery'
 import ready from '@instructure/ready'
 import '@canvas/jquery/jquery.instructure_forms' /* formSubmit */
 import '@canvas/datetime/jquery'
-import '@canvas/jquery-keycodes/jquery.keycodes'
+import '@canvas/jquery-keycodes'
 import '@canvas/loading-image'
 
 const I18n = useI18nScope('authentication_providers')
