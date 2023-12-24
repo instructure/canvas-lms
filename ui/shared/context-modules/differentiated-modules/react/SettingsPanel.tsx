@@ -33,7 +33,7 @@ import {convertModuleSettingsForApi} from '../utils/miscHelpers'
 import {updateModuleUI} from '../utils/moduleHelpers'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import type {Module, ModuleItem, Requirement} from './types'
-import RelockModulesDialog from '@canvas/context-modules/backbone/views/RelockModulesDialog'
+import RelockModulesDialog from '@canvas/relock-modules-dialog'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import LoadingOverlay from './LoadingOverlay'
 

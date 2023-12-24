@@ -23,7 +23,7 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import ContextModulesPublishIcon from '../react/ContextModulesPublishIcon'
 import {updateModuleItem, itemContentKey} from '../jquery/utils'
-import RelockModulesDialog from '../backbone/views/RelockModulesDialog'
+import RelockModulesDialog from '@canvas/relock-modules-dialog'
 import type {
   CanvasId,
   DoFetchModuleResponse,

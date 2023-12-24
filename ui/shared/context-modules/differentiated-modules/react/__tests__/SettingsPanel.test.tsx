@@ -23,11 +23,11 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import * as miscUtils from '../../utils/miscHelpers'
 import * as moduleUtils from '../../utils/moduleHelpers'
 import * as alerts from '@canvas/alerts/react/FlashAlert'
-import RelockModulesDialog from '@canvas/context-modules/backbone/views/RelockModulesDialog'
+import RelockModulesDialog from '@canvas/relock-modules-dialog'
 import userEvent from '@testing-library/user-event'
 
 jest.mock('@canvas/do-fetch-api-effect')
-jest.mock('@canvas/context-modules/backbone/views/RelockModulesDialog')
+jest.mock('@canvas/relock-modules-dialog')
 
 describe('SettingsPanel', () => {
   const props: SettingsPanelProps = {

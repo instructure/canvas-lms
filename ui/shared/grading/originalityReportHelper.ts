@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {SubmissionOriginalityData, OriginalityData} from '@canvas/grading/grading.d'
+import type {SubmissionOriginalityData, OriginalityData} from './grading.d'
 
 export function originalityReportSubmissionKey(submission: {
   id?: string

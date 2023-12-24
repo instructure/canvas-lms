@@ -19,7 +19,7 @@
 import _ from 'lodash'
 import * as timezone from '@canvas/datetime'
 import GradingPeriodsHelper from './GradingPeriodsHelper'
-import type {CamelizedGradingPeriod} from '@canvas/grading/grading.d'
+import type {CamelizedGradingPeriod} from './grading.d'
 import type {Submission, DueDate, UserDueDateMap, AssignmentUserDueDateMap} from '../../api.d'
 
 export function scopeToUser(

@@ -23,7 +23,7 @@
 //        time around.
 
 import serviceRCELoader from './serviceRCELoader'
-import {RCELOADED_EVENT_NAME, send, destroy, focus} from './RceCommandShim'
+import {RCELOADED_EVENT_NAME, send, destroy, focus} from '@canvas/rce-command-shim/RceCommandShim'
 import $ from 'jquery'
 
 function loadServiceRCE(target, tinyMCEInitOptions, callback) {

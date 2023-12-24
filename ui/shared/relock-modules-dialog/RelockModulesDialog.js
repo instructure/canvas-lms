@@ -18,7 +18,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import DialogBaseView from '@canvas/dialog-base-view'
-import template from '../../jst/RelockModulesDialog.handlebars'
+import template from './RelockModulesDialog.handlebars'
 
 const I18n = useI18nScope('modules')
 
