@@ -16,19 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {EnvCommon} from '@canvas/global/env/EnvCommon'
-import {EnvDeepLinking} from '@canvas/global/env/EnvDeepLinking'
-import {EnvAssignments} from '@canvas/global/env/EnvAssignments'
-import {EnvRce} from '@canvas/global/env/EnvRce'
-import {EnvCourse} from '@canvas/global/env/EnvCourse'
-import {EnvCoursePaces} from '@canvas/global/env/EnvCoursePaces'
-import {EnvGradebook} from '@canvas/global/env/EnvGradebook'
-import {EnvGradingStandards} from '@canvas/global/env/EnvGradingStandards'
-import {EnvPlatformStorage} from '@canvas/global/env/EnvPlatformStorage'
-import {EnvAccounts} from '@canvas/global/env/EnvAccounts'
-import {EnvContextModules} from '@canvas/global/env/EnvContextModules'
-import {EnvWikiPages} from '@canvas/global/env/EnvWikiPages'
-import {EnvContentMigrations} from '@canvas/global/env/ContentMigrations'
+import {EnvCommon} from './EnvCommon'
+import {EnvDeepLinking} from './EnvDeepLinking'
+import {EnvAssignments} from './EnvAssignments'
+import {EnvRce} from './EnvRce'
+import {EnvCourse} from './EnvCourse'
+import {EnvCoursePaces} from './EnvCoursePaces'
+import {EnvGradebook} from './EnvGradebook'
+import {EnvGradingStandards} from './EnvGradingStandards'
+import {EnvPlatformStorage} from './EnvPlatformStorage'
+import {EnvAccounts} from './EnvAccounts'
+import {EnvContextModules} from './EnvContextModules'
+import {EnvWikiPages} from './EnvWikiPages'
+import {EnvContentMigrations} from './ContentMigrations'
 
 /**
  * Top level ENV variable.

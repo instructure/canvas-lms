@@ -20,10 +20,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {max, invert} from 'underscore'
 import {originalityReportSubmissionKey} from './originalityReportHelper'
-import type {
-  SubmissionOriginalityData,
-  SubmissionWithOriginalityReport,
-} from '@canvas/grading/grading.d'
+import type {SubmissionOriginalityData, SubmissionWithOriginalityReport} from './grading.d'
 
 const I18n = useI18nScope('turnitin')
 

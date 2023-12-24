@@ -90,7 +90,6 @@ export default defineConfig({
       'ui/shared/dashboard-card/**/*',
       'ui/shared/datetime/**/*',
       'ui/shared/deep-linking/**/*',
-      'ui/shared/differentiated-modules/**/*',
       'ui/shared/direct-sharing/**/*',
       'ui/shared/discussions/**/*',
       'ui/shared/error-boundary/**/*',

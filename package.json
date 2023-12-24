@@ -372,8 +372,7 @@
     "@storybook/addon-storyshots": "^6.5.9",
     "@storybook/builder-webpack5": "^6.5.9",
     "@storybook/manager-webpack5": "^6.5.9",
-    "@storybook/react": "^6.5.9",
-    "inspect-process": "^0.5"
+    "@storybook/react": "^6.5.9"
   },
   "browserslist": [
     "extends @instructure/browserslist-config-canvas-lms"

@@ -24,8 +24,13 @@ import {Text} from '@instructure/ui-text'
 import {FormField} from '@instructure/ui-form-field'
 import {View} from '@instructure/ui-view'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {positions} from '@canvas/move-item-tray/positions'
-import {itemShape} from '@canvas/move-item-tray/react/propTypes'
+import {positions} from '@canvas/positions'
+
+export const itemShape = shape({
+  id: string.isRequired,
+  title: string.isRequired,
+  groupId: string,
+})
 
 const I18n = useI18nScope('selectPosition')
 

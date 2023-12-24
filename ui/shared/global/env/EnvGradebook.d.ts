@@ -16,10 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {EnvCommonNewUserTutorial} from '@canvas/global/env/EnvCommon'
-import {GradebookOptions} from '../../../features/gradebook/react/default_gradebook/gradebook.d'
-import {GradingScheme} from '@canvas/grading-scheme'
-import {GradeStatus, GradeStatusUnderscore} from '@canvas/grading/accountGradingStatus'
+import {EnvCommonNewUserTutorial} from './EnvCommon'
 
 /**
  * Generic Gradebook environment.
@@ -31,7 +28,7 @@ export type EnvGradebook = EnvCommonNewUserTutorial &
   Partial<EnvGradebookCommon & EnvGradebookSpeedGrader>
 
 export interface EnvGradebookCommon {
-  GRADEBOOK_OPTIONS: GradebookOptions & {
+  GRADEBOOK_OPTIONS: any & {
     proxy_submissions_allowed: boolean
   }
 
@@ -62,7 +59,7 @@ export interface EnvGradebookCommon {
   /**
    * From GradebooksController#load_grade_summary_data
    */
-  course_active_grading_scheme?: GradingScheme
+  course_active_grading_scheme?: any
 
   /**
    * From ApplicationController#set_student_context_cards_js_env
@@ -99,7 +96,7 @@ export interface EnvGradebookSpeedGrader {
   course_id: string
   assignment_id: string
   assignment_title: string
-  custom_grade_statuses: GradeStatus[] | GradeStatusUnderscore[]
+  custom_grade_statuses: any
   rubric: null | unknown
   nonScoringRubrics: boolean
   outcome_extra_credit_enabled: boolean

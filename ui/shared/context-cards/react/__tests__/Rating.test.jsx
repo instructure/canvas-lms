@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {mount} from 'enzyme'
-import Rating from '@canvas/context-cards/react/Rating'
+import Rating from '../Rating'
 import {Rating as InstUIRating} from '@instructure/ui-rating'
 
 describe('StudentContextTray/Rating', () => {

@@ -16,8 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import $ from 'jquery'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
-import * as RceCommandShim from '@canvas/rce/RceCommandShim'
+import * as RceCommandShim from '@canvas/rce-command-shim'
 import RCELoader from '@canvas/rce/serviceRCELoader'
 import Sidebar from '@canvas/rce/Sidebar'
 import fakeENV from 'helpers/fakeENV'
@@ -29,19 +30,19 @@ QUnit.module('RichContentEditor - helper function:')
 test('ensureID gives the element an id when it is missing', () => {
   const $el = $('<div/>')
   RichContentEditor.ensureID($el)
-  ok($el.attr('id') != null)
+  notEqual($el.attr('id'), null)
 })
 
 test('ensureID gives the element an id when it is blank', () => {
   const $el = $('<div id/>')
   RichContentEditor.ensureID($el)
-  ok($el.attr('id') !== '')
+  notEqual($el.attr('id'), '')
 })
 
 test("ensureID doesn't overwrite an existing id", () => {
   const $el = $('<div id="test"/>')
   RichContentEditor.ensureID($el)
-  ok($el.attr('id') === 'test')
+  equal($el.attr('id'), 'test')
 })
 
 test('freshNode returns the given element if the id is missing', () => {

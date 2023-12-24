@@ -25,7 +25,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import '@canvas/jquery/jquery.toJSON'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import '../../jquery/jquery.instructure_forms'
-import {send} from '@canvas/rce/RceCommandShim'
+import {send} from '@canvas/rce-command-shim'
 import {shimGetterShorthand} from '@canvas/util/legacyCoffeesScriptHelpers'
 import sanitizeData from '../../sanitizeData'
 

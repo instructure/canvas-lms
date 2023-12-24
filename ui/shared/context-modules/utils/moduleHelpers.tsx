@@ -25,7 +25,7 @@ import $, * as JQuery from 'jquery'
 import {renderContextModulesPublishIcon} from './publishOneModuleHelper'
 import setupContentIds from '../jquery/setupContentIds'
 import {initPublishButton, overrideModel, setExpandAllButton} from '../jquery/utils'
-import RelockModulesDialog from '../backbone/views/RelockModulesDialog'
+import RelockModulesDialog from '@canvas/relock-modules-dialog'
 
 export function addModuleElement(
   data: Record<string, any>,

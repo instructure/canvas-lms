@@ -18,7 +18,7 @@
 
 import type {SettingsPanelState} from '../react/settingsReducer'
 import type {Module, Requirement} from '../react/types'
-import {updateModulePublishedState} from '@canvas/context-modules/utils/publishAllModulesHelper'
+import {updateModulePublishedState} from '../../utils/publishAllModulesHelper'
 import {datetimeString} from '@canvas/datetime/date-functions'
 import {convertFriendlyDatetimeToUTC} from './miscHelpers'
 import {useScope as useI18nScope} from '@canvas/i18n'
