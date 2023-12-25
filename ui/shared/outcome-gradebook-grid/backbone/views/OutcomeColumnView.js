@@ -21,7 +21,7 @@ import _ from 'underscore'
 import {View} from '@canvas/backbone'
 import Popover from 'jquery-popover'
 import Outcome from '@canvas/grade-summary/backbone/models/Outcome'
-import d3 from 'd3/d3'
+import d3 from 'd3'
 import I18n from '@canvas/i18n'
 import popover_template from '@canvas/outcomes/jst/outcomePopover.handlebars'
 
