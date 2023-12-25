@@ -141,7 +141,6 @@ module.exports = {
   },
   resolve: {
     alias: {
-      d3: 'd3/d3',
       'node_modules-version-of-backbone$': require.resolve('backbone'),
       'node_modules-version-of-react-modal$': require.resolve('react-modal'),
       'spec/jsx': path.join(canvasDir, 'spec/javascripts/jsx'),
