@@ -87,10 +87,13 @@ describe('K5Dashboard Parent Support', () => {
   })
 
   it('prefetches dashboard cards with the correct url param', async () => {
-    moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user_id=4', {
-      status: 200,
-      response: MOCK_CARDS,
-    })
+    moxios.stubRequest(
+      window.location.origin + '/api/v1/dashboard/dashboard_cards?observed_user_id=4',
+      {
+        status: 200,
+        response: MOCK_CARDS,
+      }
+    )
 
     render(
       <K5Dashboard
@@ -108,7 +111,9 @@ describe('K5Dashboard Parent Support', () => {
       {timeout: 5000}
     )
     const preFetchedRequest = moxios.requests.mostRecent()
-    expect(preFetchedRequest.url).toBe('/api/v1/dashboard/dashboard_cards?observed_user_id=4')
+    expect(preFetchedRequest.url).toBe(
+      window.location.origin + '/api/v1/dashboard/dashboard_cards?observed_user_id=4'
+    )
     expect(moxios.requests.count()).toBe(1)
   })
 
