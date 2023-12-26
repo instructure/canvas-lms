@@ -17,10 +17,10 @@
  */
 
 import {createStore, applyMiddleware} from 'redux'
-import ReduxThunk from 'redux-thunk'
+import {thunk} from 'redux-thunk'
 import rootReducer from './reducer'
 
-const createStoreWithMiddleware = applyMiddleware(ReduxThunk)(createStore)
+const createStoreWithMiddleware = applyMiddleware(thunk)(createStore)
 
 function configStore(initialState) {
   return createStoreWithMiddleware(rootReducer, initialState)

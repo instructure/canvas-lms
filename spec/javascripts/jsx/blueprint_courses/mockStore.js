@@ -17,9 +17,9 @@
  */
 
 import {createStore, applyMiddleware} from 'redux'
-import ReduxThunk from 'redux-thunk'
+import {thunk} from 'redux-thunk'
 import rootReducer from '@canvas/blueprint-courses/react/reducer'
 
 export default function mockStore(initialState) {
-  return applyMiddleware(ReduxThunk)(createStore)(rootReducer, initialState)
+  return applyMiddleware(thunk)(createStore)(rootReducer, initialState)
 }

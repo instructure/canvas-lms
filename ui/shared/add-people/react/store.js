@@ -17,10 +17,10 @@
  */
 
 import {applyMiddleware, createStore as reduxCreateStore} from 'redux'
-import ReduxThunk from 'redux-thunk'
+import {thunk} from 'redux-thunk'
 
 // returns createStore(reducer, initialState)
-export const createStore = applyMiddleware(ReduxThunk)(reduxCreateStore)
+export const createStore = applyMiddleware(thunk)(reduxCreateStore)
 
 export const defaultState = {
   courseParams: {

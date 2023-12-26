@@ -17,11 +17,11 @@
  */
 
 import {applyMiddleware, createStore} from 'redux'
-import thunker from 'redux-thunk'
+import {thunk} from 'redux-thunk'
 import promiser from 'redux-promise'
 import {createLogger} from 'redux-logger'
 
-export const middleware = [thunker, promiser]
+export const middleware = [thunk, promiser]
 
 export default function createReduxStore(reducer) {
   const middlewareWithLogger = [...middleware, createLogger({stateTransformer: s => s.toJS()})]
