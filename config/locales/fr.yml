@@ -13735,6 +13735,7 @@ fr:
         out_of: Sur
         score: Note
         submission_progress_status: "État de progression de la soumission"
+        submitted: Envoyé
       icons: 
         turnitin_results: "Voir les résultats de Turnitin"
       labels: 

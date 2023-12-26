@@ -5539,6 +5539,7 @@ nn:
       update_assignment_points: "Vil du endre oppgåvepoeng slik at dei samsvarer med vurderingsskjemaet?"
   change_section_to_sectionname_6e947e90: "Endre seksjon til %{sectionName}"
   change_sis_ids_3a47154d: "Endre SIS-ID-ar"
+  change_to_b757d327: "endre til"
   changed_item_1d16a85f: "Endra element"
   changes_will_still_apply_if_you_leave_this_page_935cedc6: "Endringane gjeld sjølv om du forlèt denne sida."
   changes_you_made_may_not_be_saved_4e8db973: "Endringar blir kanskje ikkje lagra."
@@ -11571,6 +11572,7 @@ nn:
         out_of: Av
         score: Resultat
         submission_progress_status: "Status for innleveringsfremdrift"
+        submitted: Innlevert
       icons: 
         turnitin_results: "Sjå Turnitin-resultat"
       labels: 
@@ -20769,6 +20771,7 @@ nn:
   remove_contact_method_ca890ba3: "Fjern kontaktmåte"
   remove_course_association_name_b760c502: "Fjern emneforbindelse %{name}"
   remove_d83a966c: "Fjern:"
+  remove_dates_5a5a8df2: "Fjern datoar"
   remove_dates_9b9ba2f6: "Fjern datoar"
   remove_delay_for_gradebook_student_search_307b4ecf: "Fjern forsinkelse for studentsøket i Vurderingsoversikta"
   remove_designers_from_courses_42332a57: "Fjern designarar frå emner"
@@ -22678,6 +22681,7 @@ nn:
   shared_secret_892c88f2: "Delt hemmelegheit"
   sharing_a_qr_code_can_give_others_immediate_access_79575158: "Deling av QR-kode kan gi andre umiddelbar tilgang til kontoen din gjennom %{canvas} mobilapplikasjonar."
   she_her_3f459cc2: Ho/Henne
+  shift_dates_746698a5: "Skift datoar"
   shift_dates_b5a7b7a1: "Bytt om på datoar"
   shift_due_dates_and_assignment_availability_dates__c5ad272: "Flytt innleveringsfristar og oppgåvetilgjengelegheit fram eit antal dagar."
   short_name_42f454a1: "Kort namn"
@@ -23598,6 +23602,7 @@ nn:
   subscribe_failed_2eb62de0: "Abonnering mislukkast"
   subscribe_to_title_c7d6bbd2: "Abonner på %{title}"
   subscribed_fe74d22a: Abonnerer
+  substitution_713c65b9: Erstatning
   subtitle_ee60ca78: Undertekst
   subtitles_could_not_be_imported_from_file_5de6da0b: "Undertekstar kunne ikkje importerast frå %{file}"
   success_file_uploaded_8174e93f: "Vellukka: fil lasta opp"
@@ -27017,6 +27022,7 @@ nn:
   you_must_allow_at_least_one_group_to_attend_68531eab: "Du må tillate at minst ei gruppe deltek"
   you_must_attach_a_file_b6041092: "Du må legge ved ei fil"
   you_must_attach_at_least_one_file_to_this_assignme_9f39ce12: "Du må legge ved minst ei fil i oppgåva"
+  you_must_choose_a_content_option_c776bdef: "Du må velje eit innhaldsalternativ"
   you_must_enter_a_date_f8eabfb1: "Du må oppgi ein dato"
   you_must_have_a_student_or_section_selected_a99e45df: "Du må velje ein student eller ein seksjon"
   you_must_input_a_section_b8d370fe: "Du må registrere ein seksjon"
@@ -27027,6 +27033,7 @@ nn:
   you_must_provide_a_value_or_unselect_the_option_3b28b754: "Du må oppgi ein verdi eller fjerne valet av dette alternativet"
   you_must_provide_targetgroupid_or_targetcontextid__dd2bf92: "Du må oppgi targetGroupId eller targetContextId og targetContextType"
   you_must_select_a_course_to_copy_content_from_e7bd9e09: "Du må velje eit emne å kopiere innhald frå"
+  you_must_select_a_file_to_import_content_from_28a242ff: "Du må velje ei fil å importere innhald frå"
   you_must_select_a_folder_to_upload_your_migration__ac7bc7c0: "Du må velje ei mappe å laste opp migrert innhald til"
   you_must_select_an_assignment_group_c16a2168: "Du må velje ei oppgåvegruppe."
   you_must_set_document_usage_rights_b4afa1e9: "Du må spesifisere bruksrettar for dokumentet"

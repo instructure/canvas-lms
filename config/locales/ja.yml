@@ -13726,6 +13726,7 @@ ja:
         out_of: 配点
         score: スコア
         submission_progress_status: 提出進捗状況
+        submitted: 提出済み
       icons: 
         turnitin_results: "Turnitin の結果を参照"
       labels: 

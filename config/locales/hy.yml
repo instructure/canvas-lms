@@ -3431,6 +3431,7 @@ hy:
       update_assignment_points: "Հանձնարարության %{assignmentPoints} ընդհանուր գնահատականի և ռուբրիկի %{rubricPoints}  ընդհանուր գնահատականի սահմանման դեպքում ռուբրիկի շրջանակներում ունկնդրի կողմից ուղարկված աշխատանքի առավելագույն գնահատականը կարող է կազմել %{toPercentage_pointRatio}:   "
     titles: 
       update_assignment_points: "Փոխե՞լ հանձնարարության կետերը ըստ ռուբրիկների:"
+  change_to_b757d327: փոխել
   changes_will_still_apply_if_you_leave_this_page_935cedc6: "Փոփոխությունները կշարունակեն գործել, եթե դուք դուրս գաք այս էջից:"
   child_s_username_dde3aa9: "Երեխա օգտատիրոջ անունը"
   choose_a_course_home_page_8059c7b: "Ընտրել դասընթացի հիմնական էջը"
@@ -7488,6 +7489,7 @@ hy:
         name: Անվանումը
         out_of: "-ից"
         score: Գնահատական
+        submitted: "Ներկայացված է "
       icons: 
         turnitin_results: "Տես Turnitin արդյունքները"
       labels: 
@@ -14245,6 +14247,7 @@ hy:
   remove_avatar_picture_aba765eb: "Հանել ավատարի պատկերը"
   remove_c_name_section_d8eabd3a: "Ջնջել %{c.name} բաժինը"
   remove_contact_method_ca890ba3: "Ջնջել կապ հաստատելու միջոցը"
+  remove_dates_5a5a8df2: "Հանել ամսաթվերը"
   remove_f47dc62a: Հանել
   remove_icon_a4646413: "հանել պատկերը"
   remove_media_comment_f4afdb4b: "Հանել մուլտիմեդիա մեկնաբանությունը"
@@ -15574,6 +15577,7 @@ hy:
       no_points_possible: "Հնարավոր չէ կառուցել կորը առանց հնարավոր միավորների"
       none_to_update: "Թարմացման համար օբյեկտ չկա"
   shared_secret_892c88f2: "Ընդհանուր գաղտնի բանալի"
+  shift_dates_746698a5: "Տեղափոխել ամսաթվերը"
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "պետք է ակնառու լինի, հաշվետու օգտատիրոջ Canvas ID"
   show_and_hide_courses_menu_9e09d1d0: "Ցույց տալ և թաքցնել դասընթացների մենյուն"
   show_by_date_e3967761: "Ցույց տալ ըստ ամսաթվերի"
@@ -16080,6 +16084,7 @@ hy:
   submitting_types_7c5a7096: "Ուղարկվում է. %{types}"
   subscribe_4b301fb7: Բաժանորդագրվել
   subscribed_fe74d22a: "Բաժանորդագրված եք"
+  substitution_713c65b9: Փոխարինում
   success_all_users_on_this_domain_will_now_see_this_4681b85d: "Հաջողություն՝ Բոլոր օգտագործողները այս դոմեյնի այժմ կտեսնեն այս բրենդինգը:"
   success_grades_were_published_to_the_grade_book_da3b4fba: "Գնահատականները հաջողությամբ հրապարկվել են գնահատականների մատյանում"
   successfully_moved_model_to_newgroup_f7b7aa5a: "%{model}-ը հաջողությամբ տեղափոխվել է %{newGroup}"
@@ -17473,9 +17478,11 @@ hy:
   you_may_want_to_assign_some_tas_to_help_you_with_t_702244aa: "Դուք կարող եք նշանակել մի քանի օգնական՝ դասընթացի աշխատանքներում ձեզ օժանդակելու նպատակով: Օգնականները կարող են գնահատել ունկնդիրների ուղարկած ֆայլերը, օգնել ձեզ վարելու քննարկումները և նույնիսկ թարմացնել կատարման ժամկետները և հանձնարարությունների տվյալները:"
   you_must_agree_to_the_terms_99723f97: "Դուք պետք է համաձայնվեք պայմանների հետ"
   you_must_attach_at_least_one_file_to_this_assignme_9f39ce12: "Դուք պետք է այս հանձնարարությանը կցեք առնվազն մեկ ֆայլ"
+  you_must_choose_a_content_option_c776bdef: "Դուք պետք է ընտրեք բովանդակության օպցիան"
   you_must_have_a_student_or_section_selected_a99e45df: "Անհրաժեշտ է ունենալ ընտրված ունկնդիր կամ բաժին"
   you_must_log_in_to_view_replies_9ccd4da0: "Դուք պետք է մուտք գործեք համակարգ պատասխանները դիտելու համար"
   you_must_select_a_course_to_copy_content_from_e7bd9e09: "Դուք պետք է ընտրեք դասընթացը այդտեղից բովանդակություն պատճենելու համար"
+  you_must_select_a_file_to_import_content_from_28a242ff: "Դուք պետք է բովանդակության ներմուծման համար ընտրեք համապատասխան ֆայլը:"
   you_must_set_it_to_a_number_greater_than_or_equal__eb1d9275: "Դուք պետք է սահմանեք մի թիվ, որը մեծ կամ հավասար է %{min}"
   you_must_specify_a_usage_right_5eb57f87: "Դուք պետք է սահմանեք օգտագործման իրավունքը:"
   you_need_to_preview_your_changes_before_applying_t_468d56e4: "Դուք պետք է ընտրեք \"Փոփոխությունների Նախնական դիտումը\" յուրաքանչյուր փոփոխություններ կատարելուց առաջ"
