@@ -17,14 +17,14 @@
  */
 
 import {applyMiddleware, createStore} from 'redux'
-import ReduxThunk from 'redux-thunk'
+import {thunk} from 'redux-thunk'
 
 import buildAssignmentReducer from './assignment/buildAssignmentReducer'
 import gradesReducer from './grades/gradesReducer'
 import studentsReducer from './students/studentsReducer'
 import {composeReducers} from './ReducerHelpers'
 
-const createStoreWithMiddleware = applyMiddleware(ReduxThunk)(createStore)
+const createStoreWithMiddleware = applyMiddleware(thunk)(createStore)
 
 export default function configureStore(env) {
   const reducers = [buildAssignmentReducer(env), gradesReducer, studentsReducer]
