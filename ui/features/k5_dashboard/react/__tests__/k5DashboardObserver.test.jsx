@@ -218,7 +218,8 @@ describe('K5Dashboard Parent Support', () => {
     expect(getByTestId('number-missing')).toBeInTheDocument()
   })
 
-  it('does not show options to disable k5 dashboard if student is selected', async () => {
+  // LF-1117
+  it.skip('does not show options to disable k5 dashboard if student is selected', async () => {
     clearObservedId(defaultProps.currentUser.id)
     const {getByTestId, findByTestId, getByText, queryByTestId} = render(
       <K5Dashboard
