@@ -55,8 +55,8 @@ declare global {
     messageStudents: (options: ReturnType<typeof sendMessageStudentsWho>) => void
     updateGrades: () => void
 
-    bundles: Array<() => void>
-    deferredBundles: Array<() => void>
+    bundles: string[]
+    deferredBundles: string[]
     canvasReadyState?: 'loading' | 'complete'
   }
 

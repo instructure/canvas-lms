@@ -56,8 +56,8 @@ const {
 } = require('./webpack.plugins')
 
 // generates bundles-generated.js with functions that
-// dynamically import each app feature and plugin bundle
-require('./bundles')
+// dynamically import each plugin bundle
+require('./generatePluginBundles')
 
 if (!process.env.NODE_ENV) process.env.NODE_ENV = 'development'
 
