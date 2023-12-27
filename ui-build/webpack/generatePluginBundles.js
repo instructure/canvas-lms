@@ -16,25 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as JQuery from 'jquery'
+const fs = require('fs')
+const {getPluginBundles} = require('./webpack.utils')
 
-export type LoadingImage = {
-  (options?: 'hide' | 'remove' | 'remove_once'): JQuery<HTMLElement>
-  (
-    options: 'register_image',
-    image_size: 'normal' | 'small',
-    imageDef: {url: string; width: number; height: number}
-  ): JQuery<HTMLElement>
-  (options: {
-    paddingTop?: number
-    image_size?: 'normal' | 'small'
-    vertical?: number
-    horizontal?: number
-  }): JQuery<HTMLElement>
+// generates file with functions that dynamically import each plugin bundle
+fs.writeFileSync(
+  './node_modules/plugin-bundles-generated.js',
+  `
+const pluginBundles = {
+${getPluginBundles()
+  .map(
+    ([entryName, entryBundlePath]) =>
+      `  "${entryName}": () => import(/* webpackChunkName: "${entryName}" */ "${entryBundlePath}"),`
+  )
+  .join('\n')
+  .slice(0, -1)}
 }
-
-declare global {
-  declare interface JQuery {
-    loadingImage: LoadingImage
-  }
-}
+export default pluginBundles
+`
+)

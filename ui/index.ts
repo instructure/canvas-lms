@@ -27,11 +27,13 @@ import $ from 'jquery'
 import ready from '@instructure/ready'
 import splitAssetString from '@canvas/util/splitAssetString'
 import {Mathml} from '@instructure/canvas-rce'
-// @ts-expect-error
-import loadBundle from 'bundles-generated'
 import {isolate} from '@canvas/sentry'
 import {Capabilities as C, up} from '@canvas/engine'
 import {loadReactRouter} from './boot/initializers/router'
+import loadLocale from './loadLocale'
+import featureBundles from './featureBundles'
+// @ts-expect-error
+import pluginBundles from 'plugin-bundles-generated'
 
 // these are all things that either define global $.whatever or $.fn.blah
 // methods or set something up that other code expects to exist at runtime.
@@ -42,6 +44,28 @@ import './boot/initializers/ajax_errors'
 import './boot/initializers/activateKeyClicks'
 import './boot/initializers/activateTooltips'
 import './boot/initializers/injectAuthTokenIntoForms'
+
+interface CustomWindow extends Window {
+  bundles: string[]
+  deferredBundles: string[]
+  canvasReadyState: 'loading' | 'complete' | undefined
+}
+
+declare let window: CustomWindow
+
+if (typeof ENV !== 'undefined' && ENV.MOMENT_LOCALE && ENV.MOMENT_LOCALE !== 'en') {
+  loadLocale('moment/locale/' + ENV.MOMENT_LOCALE)
+}
+
+function loadBundle(bundle: string): void {
+  if (typeof featureBundles[bundle] === 'function') {
+    featureBundles[bundle]()
+  } else if (typeof pluginBundles[bundle] === 'function') {
+    pluginBundles[bundle]()
+  } else {
+    throw new Error("couldn't find bundle " + bundle)
+  }
+}
 
 window.canvasReadyState = 'loading'
 window.dispatchEvent(new CustomEvent('canvasReadyStateChange'))
@@ -54,7 +78,10 @@ up({
     // list of all bundles the current page needs
     //   populated by app/helpers/application_helper.rb
     if (!window.bundles) window.bundles = []
-    window.bundles.push = loadBundle
+    window.bundles.push = (...items) => {
+      items.forEach(loadBundle)
+      return items.length
+    }
     window.bundles.forEach(loadBundle)
     ready(afterDocumentReady)
   },
