@@ -21,7 +21,7 @@ import Inflections from './inflections'
 const camelizeStr = Inflections.camelize
 const underscoreStr = Inflections.underscore
 
-const module = {
+const module_ = {
   // Convert all property keys in an object to camelCase
   camelize(props) {
     let prop
@@ -50,6 +50,6 @@ const module = {
   },
 }
 
-export default module
-export const camelize = module.camelize
-export const underscore = module.underscore
+export default module_
+export const camelize = module_.camelize
+export const underscore = module_.underscore
