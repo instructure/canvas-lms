@@ -695,10 +695,13 @@ CanvasRails::Application.routes.draw do
     resources :account_notifications, only: %i[create update destroy]
     concerns :announcements
     resources :submissions
-    delete "authentication_providers" => "authentication_providers#destroy_all", :as => :remove_all_authentication_providers
+
     put "sso_settings" => "authentication_providers#update_sso_settings",
         :as => :update_sso_settings
-
+    delete "authentication_providers" => "authentication_providers#destroy_all", :as => :remove_all_authentication_providers
+    resources :authentication_providers, only: %i[show] do
+      get :refresh_metadata, action: :refresh_saml_metadata
+    end
     resources :authentication_providers, only: %i[index create update destroy] do
       get :debugging, action: :debug_data
       put :debugging, action: :start_debugging
