@@ -157,6 +157,7 @@
     "md5": "^2.2.1",
     "mediaelement": "https://github.com/instructure/mediaelement.git#master",
     "mime": "^4.0.1",
+    "minimatch": "~3.0.4",
     "moment": "^2.29.4",
     "moment-timezone": "^0.5.43",
     "nanoid": "^3.1.10",
