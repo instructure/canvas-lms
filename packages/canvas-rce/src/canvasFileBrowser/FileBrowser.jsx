@@ -286,7 +286,7 @@ class FileBrowser extends React.Component {
     } else {
       itemIcon = getIconFromType(file.type)
     }
-    const containerRef = (node) => {
+    const containerRef = node => {
       if (node && !node.title && props.name) node.title = props.name
     }
 
