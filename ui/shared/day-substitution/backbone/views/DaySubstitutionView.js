@@ -18,6 +18,7 @@
 
 import {extend} from '@canvas/backbone/utils'
 import _ from 'underscore'
+import {map} from 'lodash'
 import Backbone from '@canvas/backbone'
 import I18n from '@canvas/i18n'
 import template from '../../jst/DaySubstitution.handlebars'
@@ -98,7 +99,7 @@ DaySubstitutionView.prototype.toJSON = function () {
 // @api private
 DaySubstitutionView.prototype.weekdays = function () {
   const dayArray = I18n.lookup('date.day_names')
-  return _.map(
+  return map(
     dayArray,
     (function (_this) {
       return function (day) {
