@@ -25,6 +25,7 @@ import * as tz from '@canvas/datetime'
 import fcUtil from '@canvas/calendar/jquery/fcUtil'
 import calendarEventFilter from '../../CalendarEventFilter'
 import _ from 'underscore'
+import {map} from 'lodash'
 import Backbone from '@canvas/backbone'
 import ShowEventDetailsDialog from '../../jquery/ShowEventDetailsDialog'
 import template from '../../jst/agendaView.handlebars'
@@ -288,7 +289,7 @@ AgendaView.prototype.eventBoxToHash = function (events) {
 // Returns an object in the format specified by toJSON.
 AgendaView.prototype.formatResult = function (boxedEvents) {
   return {
-    days: _.map(boxedEvents, this.eventBoxToHash),
+    days: map(boxedEvents, this.eventBoxToHash),
     meta: {
       hasMore: !!this.nextPageDate,
       displayAppointmentEvents: this.viewingGroup,

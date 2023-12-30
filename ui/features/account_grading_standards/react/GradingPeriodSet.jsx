@@ -19,7 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import $ from 'jquery'
-import _ from 'lodash'
+import _, {map} from 'lodash'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconEditLine, IconTrashLine, IconPlusLine} from '@instructure/ui-icons'
 import {Link} from '@instructure/ui-link'
@@ -190,7 +190,7 @@ export default class GradingPeriodSet extends React.Component {
   setTerms = () => _.filter(this.props.terms, {gradingPeriodGroupId: this.props.set.id})
 
   termNames = () => {
-    const names = _.map(this.setTerms(), 'displayName')
+    const names = map(this.setTerms(), 'displayName')
     if (names.length > 0) {
       return I18n.t('Terms: ') + names.join(', ')
     } else {
@@ -368,7 +368,7 @@ export default class GradingPeriodSet extends React.Component {
 
   renderGradingPeriods = () => {
     const actionsDisabled = isActionsDisabled(this.state, this.props)
-    return _.map(this.state.gradingPeriods, period => {
+    return map(this.state.gradingPeriods, period => {
       if (period.id === this.state.editPeriod.id) {
         return (
           <div

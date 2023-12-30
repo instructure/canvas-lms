@@ -20,6 +20,7 @@ import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
 import _ from 'underscore'
+import {map} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import natcompare from '@canvas/util/natcompare'
 import template from '../../../jst/subviews/CourseFindSelect.handlebars'
@@ -167,7 +168,7 @@ CourseFindSelectView.prototype.manageableCourseUrl = function () {
 //   {label: 'Plant Science', value: 'Plant Science', id: '42'}
 // @api private
 CourseFindSelectView.prototype.autocompleteCourses = function () {
-  return _.map(this.courses, function (course) {
+  return map(this.courses, function (course) {
     return {
       label: course.label,
       id: course.id,

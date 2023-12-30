@@ -19,6 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import _ from 'underscore'
+import {map} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import TokenInput, {Option as ComboboxOption} from 'react-tokeninput'
 
@@ -76,7 +77,7 @@ class EnrollmentTermInput extends React.Component {
   }
 
   selectableOptions = type =>
-    _.map(this.filteredTagsForType(type), term => this.selectableOption(term))
+    map(this.filteredTagsForType(type), term => this.selectableOption(term))
 
   selectableOption = term => (
     <ComboboxOption key={term.id} value={term.id}>
@@ -126,7 +127,7 @@ class EnrollmentTermInput extends React.Component {
   }
 
   selectedEnrollmentTerms = () =>
-    _.map(this.props.selectedIDs, id => {
+    map(this.props.selectedIDs, id => {
       const term = _.findWhere(this.props.enrollmentTerms, {id})
       const termForDisplay = {...term}
       termForDisplay.name = term.displayName

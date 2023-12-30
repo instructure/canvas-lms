@@ -20,6 +20,7 @@ import {extend} from '@canvas/backbone/utils'
 import I18n from '@canvas/i18n'
 import $ from 'jquery'
 import _ from 'underscore'
+import {map} from 'lodash'
 import {Model, Collection} from '@canvas/backbone'
 import {formatMessage, plainText} from '@canvas/util/TextHelper'
 
@@ -65,7 +66,7 @@ Message.prototype.parse = function (data) {
       return (message.for_submission = true)
     })
     data.participants = _.uniq(
-      _.map(data.submission_comments, function (m) {
+      map(data.submission_comments, function (m) {
         return {
           name: m.author_name,
         }
