@@ -35,7 +35,7 @@ import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import Spinner from 'spin.js'
 import htmlEscape from '@instructure/html-escape'
-import parseLinkHeader from 'parse-link-header'
+import parseLinkHeader from '@canvas/parse-link-header'
 
 const I18n = useI18nScope('paginated_list')
 
