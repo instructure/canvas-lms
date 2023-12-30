@@ -20,7 +20,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import PropTypes from 'prop-types'
 import $ from 'jquery'
-import _ from 'lodash'
+import _, {map} from 'lodash'
 import preventDefault from '@canvas/util/preventDefault'
 import Progress from '@canvas/progress/backbone/models/Progress'
 import customTypes from '@canvas/theme-editor/react/PropTypes'
@@ -125,7 +125,7 @@ export default class ThemeEditor extends React.Component {
   }
 
   onSubAccountProgress = data => {
-    const newSubAccountProgs = _.map(this.state.activeSubAccountProgresses, progress =>
+    const newSubAccountProgs = map(this.state.activeSubAccountProgresses, progress =>
       progress.tag == data.tag ? data : progress
     )
 

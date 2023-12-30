@@ -18,11 +18,9 @@
 
 import {extend} from '@canvas/backbone/utils'
 import Backbone from '@canvas/backbone'
-
 import _ from 'underscore'
-
+import {map} from 'lodash'
 import AssignmentOverride from '../models/AssignmentOverride'
-
 import Section from '@canvas/sections/backbone/models/Section'
 
 extend(AssignmentOverrideCollection, Backbone.Collection)
@@ -70,7 +68,7 @@ AssignmentOverrideCollection.prototype.toJSON = function () {
   const json = this.reject(function (override) {
     return override.representsDefaultDueDate()
   })
-  return _.map(json, function (override) {
+  return map(json, function (override) {
     return override.toJSON().assignment_override
   })
 }
