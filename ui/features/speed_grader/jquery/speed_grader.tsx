@@ -81,6 +81,7 @@ import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import round from '@canvas/round'
 // @ts-expect-error
 import _ from 'underscore'
+import {map} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import natcompare from '@canvas/util/natcompare'
 import qs from 'qs'
@@ -3069,7 +3070,7 @@ EG = {
           $replacementComment.show()
           commentElement.replaceWith($replacementComment)
 
-          updatedComments = _.map(
+          updatedComments = map(
             that.currentStudent.submission.submission_comments,
             (item: SubmissionComment) => {
               const submissionComment = item.submission_comment || item
