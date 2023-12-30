@@ -18,6 +18,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import _ from 'underscore'
+import {map, each} from 'lodash'
 import $ from 'jquery'
 import React from 'react'
 import createReactClass from 'create-react-class'
@@ -105,7 +106,7 @@ export default createReactClass({
 
   validateConfig() {
     const invalidFields = _.compact(
-      _.map(this.state.fields, (v, k) => {
+      map(this.state.fields, (v, k) => {
         if (v.required && _.isEmpty(v.value)) {
           return k
         }
@@ -132,7 +133,7 @@ export default createReactClass({
 
   configSettings() {
     const queryParams = {}
-    _.map(this.state.fields, (v, k) => {
+    each(this.state.fields, (v, k) => {
       if (v.type === 'checkbox') {
         if (!v.value) return
         queryParams[k] = '1'
@@ -150,7 +151,7 @@ export default createReactClass({
     newTool.on('error', this.onSaveFail, this)
     if (!_.isEmpty(this.state.invalidFields)) {
       const fields = this.state.fields
-      const invalidFieldNames = _.map(this.state.invalidFields, k => fields[k].description).join(
+      const invalidFieldNames = map(this.state.invalidFields, k => fields[k].description).join(
         ', '
       )
       this.setState({
@@ -193,7 +194,7 @@ export default createReactClass({
   },
 
   configOptions() {
-    return _.map(this.state.fields, (v, k) => (
+    return map(this.state.fields, (v, k) => (
       <ConfigOptionField
         name={k}
         type={v.type}

@@ -18,13 +18,13 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import _ from 'underscore'
+import {map} from 'lodash'
 import CourseListItem from './CourseListItem'
 
 export default function CourseList(props) {
   return (
     <ul className="ig-list">
-      {_.map(props.courses, (course, key) => (
+      {map(props.courses, (course, key) => (
         <CourseListItem key={key} course={course} />
       ))}
     </ul>

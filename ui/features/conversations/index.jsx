@@ -19,6 +19,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import _ from 'underscore'
+import {map} from 'lodash'
 import Backbone from '@canvas/backbone'
 import MessageCollection from './backbone/collections/MessageCollection'
 import MessageListView from './backbone/views/MessageListView'
@@ -95,7 +96,7 @@ const ConversationsRouter = Backbone.Router.extend({
   //
   // Returns an array of impacted message IDs.
   batchUpdate(event, fn = $.noop) {
-    const messages = _.map(this.list.selectedMessages, message => {
+    const messages = map(this.list.selectedMessages, message => {
       fn.call(this, message)
       return message.get('id')
     })

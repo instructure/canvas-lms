@@ -18,6 +18,7 @@
 
 import $ from 'jquery'
 import _ from 'underscore'
+import {map} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import FilesCollection from '@canvas/files/backbone/collections/FilesCollection'
 import customPropTypes from '@canvas/files/react/modules/customPropTypes'
@@ -61,11 +62,11 @@ export default {
       : [{message}]
 
     this.setState({errors})
-    $.screenReaderFlashMessageExclusive(_.map(errors, error => error.message).join(' '))
+    $.screenReaderFlashMessageExclusive(map(errors, error => error.message).join(' '))
   },
 
   translateErrors(errors) {
-    return _.map(errors, error => {
+    return map(errors, error => {
       if (error.message === '3 or more characters is required') {
         return {message: I18n.t('Please enter a search term with three or more characters')}
       } else {

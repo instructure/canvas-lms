@@ -17,6 +17,7 @@
 //
 
 import _ from 'underscore'
+import {map} from 'lodash'
 import ajax from 'ic-ajax'
 import startApp from '../start_app'
 import Ember, {ObjectProxy} from 'ember'
@@ -456,7 +457,7 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
         const gradingPeriodSet = srgb.getGradingPeriodSet()
         deepEqual(gradingPeriodSet.id, '1501')
         equal(gradingPeriodSet.gradingPeriods.length, 2)
-        deepEqual(_.map(gradingPeriodSet.gradingPeriods, 'id'), ['701', '702'])
+        deepEqual(map(gradingPeriodSet.gradingPeriods, 'id'), ['701', '702'])
       })
     })
 

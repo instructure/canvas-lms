@@ -18,6 +18,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import _ from 'underscore'
+import {map} from 'lodash'
 import DialogBaseView from '@canvas/dialog-base-view'
 import RosterDialogMixin from './RosterDialogMixin'
 import editSectionsViewTemplate from '../../jst/EditSectionsView.handlebars'
@@ -64,7 +65,7 @@ export default class EditSectionsView extends DialogBaseView {
         baseData: {
           type: 'section',
           context: `course_${ENV.course.id}_sections`,
-          exclude: _.map(
+          exclude: map(
             this.model.sectionEditableEnrollments(),
             e => `section_${e.course_section_id}`
           ).concat(ENV.CONCLUDED_SECTIONS),
@@ -133,8 +134,8 @@ export default class EditSectionsView extends DialogBaseView {
     e.preventDefault()
 
     const enrollment = this.model.findEnrollmentByRole(this.model.currentRole)
-    const currentIds = _.map(this.model.sectionEditableEnrollments(), en => en.course_section_id)
-    const sectionIds = _.map($('#user_sections').find('input'), i => $(i).val().split('_')[1])
+    const currentIds = map(this.model.sectionEditableEnrollments(), en => en.course_section_id)
+    const sectionIds = map($('#user_sections').find('input'), i => $(i).val().split('_')[1])
     const newSections = _.reject(sectionIds, i => _.includes(currentIds, i))
     const newEnrollments = []
     const deferreds = []

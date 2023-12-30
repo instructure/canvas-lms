@@ -19,6 +19,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import _ from 'underscore'
+import {map} from 'lodash'
 import createStore from './createStoreJestCompatible'
 import parseLinkHeader from 'link-header-parsing/parseLinkHeaderFromXHR'
 import '@canvas/rails-flash-notifications'
@@ -215,7 +216,7 @@ store.triggerUpdate = function () {
 
 store.activate = function (tool, success, error) {
   const url = '/api/v1' + ENV.CONTEXT_BASE_URL + '/tool_proxies/' + tool.app_id
-  const tools = _.map(this.getState().externalTools, t => {
+  const tools = map(this.getState().externalTools, t => {
     if (t.app_id === tool.app_id) {
       t.enabled = true
     }
@@ -233,7 +234,7 @@ store.activate = function (tool, success, error) {
 }
 
 store.deactivate = function (tool, success, error) {
-  const tools = _.map(this.getState().externalTools, t => {
+  const tools = map(this.getState().externalTools, t => {
     if (t.app_id === tool.app_id) {
       t.enabled = false
     }

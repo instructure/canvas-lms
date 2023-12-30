@@ -18,6 +18,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import _ from 'underscore'
+import {map} from 'lodash'
 import DialogBaseView from '@canvas/dialog-base-view'
 import RosterDialogMixin from './RosterDialogMixin'
 import template from '../../jst/editRolesView.handlebars'
@@ -42,7 +43,7 @@ export default class EditRolesView extends DialogBaseView {
   toJSON() {
     const json = {}
 
-    const role_ids = _.uniq(_.map(this.model.enrollments(), en => en.role_id))
+    const role_ids = _.uniq(map(this.model.enrollments(), en => en.role_id))
     if (role_ids.length > 1) {
       json.has_multiple_roles = true
     } else {

@@ -21,6 +21,7 @@ import $ from 'jquery'
 import '@canvas/rails-flash-notifications'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import _ from 'underscore'
+import {map} from 'lodash'
 import ValidatorResultsRow from './ValidatorResultsRow'
 
 const I18n = useI18nScope('link_validator')
@@ -70,7 +71,7 @@ export default class ValidatorResults extends React.Component {
       let results = this.props.results
       if (!this.state.showUnpublished) {
         // filter out unpublished results
-        results = _.map(results, result => {
+        results = map(results, result => {
           const new_result = _.clone(result)
           new_result.invalid_links = _.filter(
             result.invalid_links,
