@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import parseLinkHeader from 'parse-link-header'
+import parseLinkHeader from '@canvas/parse-link-header'
 
 import NetworkFake from '../../NetworkFake'
 import {sendGetRequest} from '../../specHelpers'
