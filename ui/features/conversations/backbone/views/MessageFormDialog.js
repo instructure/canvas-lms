@@ -19,6 +19,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import _ from 'underscore'
+import {map} from 'lodash'
 import {Collection} from '@canvas/backbone'
 import DialogBaseView from '@canvas/dialog-base-view'
 import template from '../../jst/MessageFormDialog.handlebars'
@@ -411,7 +412,7 @@ export default class MessageFormDialog extends DialogBaseView {
     if (_.isEmpty(recipientIds) || _.includes(recipientIds, /(teachers|tas|observers)$/)) {
       return this.toggleUserNote(false)
     } else {
-      const canAddNotes = _.map(this.recipientView.tokenModels(), tokenModel =>
+      const canAddNotes = map(this.recipientView.tokenModels(), tokenModel =>
         this.canAddNotesFor(tokenModel)
       )
       return this.toggleUserNote(_.every(canAddNotes))

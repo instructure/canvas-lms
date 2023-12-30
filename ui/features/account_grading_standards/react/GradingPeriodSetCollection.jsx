@@ -19,6 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import _ from 'underscore'
+import {map} from 'lodash'
 import $ from 'jquery'
 import {Button} from '@instructure/ui-buttons'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -36,7 +37,7 @@ import '@canvas/jquery/jquery.instructure_misc_plugins'
 const I18n = useI18nScope('GradingPeriodSetCollection')
 
 const presentEnrollmentTerms = function (enrollmentTerms) {
-  return _.map(enrollmentTerms, term => {
+  return map(enrollmentTerms, term => {
     const newTerm = {...term}
 
     if (newTerm.name) {
@@ -106,7 +107,7 @@ export default class GradingPeriodSetCollection extends React.Component {
   }
 
   associateTermsWithSet = (setID, termIDs) =>
-    _.map(this.state.enrollmentTerms, term => {
+    map(this.state.enrollmentTerms, term => {
       if (_.includes(termIDs, term.id)) {
         const newTerm = {...term}
         newTerm.gradingPeriodGroupId = setID
@@ -151,11 +152,11 @@ export default class GradingPeriodSetCollection extends React.Component {
   }
 
   onSetUpdated = updatedSet => {
-    const sets = _.map(this.state.sets, set =>
+    const sets = map(this.state.sets, set =>
       set.id === updatedSet.id ? {...set, ...updatedSet} : set
     )
 
-    const terms = _.map(this.state.enrollmentTerms, term => {
+    const terms = map(this.state.enrollmentTerms, term => {
       if (_.includes(updatedSet.enrollmentTermIDs, term.id)) {
         return {...term, gradingPeriodGroupId: updatedSet.id}
       } else if (term.gradingPeriodGroupId === updatedSet.id) {
@@ -268,7 +269,7 @@ export default class GradingPeriodSetCollection extends React.Component {
   }
 
   updateSetPeriods = (setID, gradingPeriods) => {
-    const newSets = _.map(this.state.sets, set => {
+    const newSets = map(this.state.sets, set => {
       if (set.id === setID) {
         return {...set, gradingPeriods}
       }
@@ -351,7 +352,7 @@ export default class GradingPeriodSetCollection extends React.Component {
       deleteGradingPeriodURL: this.props.urls.deleteGradingPeriodURL,
     }
 
-    return _.map(this.getVisibleSets(), set => {
+    return map(this.getVisibleSets(), set => {
       if (this.state.editSet.id === set.id) {
         return this.renderEditGradingPeriodSetForm(set)
       } else {

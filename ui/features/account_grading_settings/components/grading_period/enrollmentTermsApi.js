@@ -16,15 +16,15 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import _ from 'underscore'
-
+import {map} from 'lodash'
 import NaiveRequestDispatch from '@canvas/network/NaiveRequestDispatch/index'
 
 const listUrl = () => ENV.ENROLLMENT_TERMS_URL
 
 const deserializeTerms = termGroups =>
   _.flatten(
-    _.map(termGroups, group =>
-      _.map(group.enrollment_terms, term => {
+    map(termGroups, group =>
+      map(group.enrollment_terms, term => {
         const groupID = term.grading_period_group_id
         const newGroupID = _.isNumber(groupID) ? groupID.toString() : groupID
         return {

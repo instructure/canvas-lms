@@ -19,6 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import _ from 'underscore'
+import {map} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('EnrollmentTermsDropdown')
@@ -44,7 +45,7 @@ class EnrollmentTermsDropdown extends React.Component {
         {I18n.t('All Terms')}
       </option>
     )
-    const options = _.map(this.sortedTerms(terms), term => (
+    const options = map(this.sortedTerms(terms), term => (
       <option key={term.id} value={term.id}>
         {term.displayName}
       </option>

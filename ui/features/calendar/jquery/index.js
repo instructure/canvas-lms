@@ -23,6 +23,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import _ from 'underscore'
+import {map} from 'lodash'
 import * as tz from '@canvas/datetime'
 import moment from 'moment'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
@@ -1340,7 +1341,7 @@ export default class Calendar {
     //    !event.calendarEvent.reserved && event.calendarEvent.available_slots > 0
 
     // find the next reservable appointment and report its date
-    const group_ids = _.map(this.findAppointmentModeGroups(), asset_string =>
+    const group_ids = map(this.findAppointmentModeGroups(), asset_string =>
       _.last(asset_string.split('_'))
     )
     if (!(group_ids.length > 0)) return

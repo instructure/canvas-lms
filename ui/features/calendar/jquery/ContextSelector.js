@@ -18,6 +18,7 @@
 
 import $ from 'jquery'
 import _ from 'underscore'
+import {map} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import contextSelectorTemplate from '../jst/contextSelector.handlebars'
 import contextSelectorItemTemplate from '../jst/contextSelectorItem.handlebars'
@@ -138,7 +139,7 @@ class ContextSelectorItem {
     ) {
       return []
     } else {
-      return _.map(checked, cb => cb.value)
+      return map(checked, cb => cb.value)
     }
   }
 }

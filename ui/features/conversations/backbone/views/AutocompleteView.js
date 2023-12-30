@@ -19,6 +19,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
 import _ from 'underscore'
+import {map} from 'lodash'
 import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection'
 import ConversationSearchResult from '../models/ConversationSearchResult'
 import PaginatedCollectionView from '@canvas/pagination/backbone/views/PaginatedCollectionView'
@@ -768,7 +769,7 @@ export default class AutocompleteView extends Backbone.View {
   //
   // Returns an array of context_id strings.
   tokenParams() {
-    return _.map(this.tokens, t => {
+    return map(this.tokens, t => {
       if (t.match) {
         return t
       } else {
@@ -781,7 +782,7 @@ export default class AutocompleteView extends Backbone.View {
   //
   // Returns an array of models.
   tokenModels() {
-    return _.map(this.tokens, this._getModel.bind(this))
+    return map(this.tokens, this._getModel.bind(this))
   }
 
   // Public: Set the current course context.
