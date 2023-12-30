@@ -17,6 +17,7 @@
  */
 
 import _ from 'underscore'
+import {each} from 'lodash'
 import $ from 'jquery'
 
 function CheckingCheckboxesForTree($tree, bindEvents) {
@@ -55,7 +56,7 @@ CheckingCheckboxesForTree.prototype.checkboxEvents = function (event) {
   this.checkSiblingCheckboxes($checkbox)
   this.syncLinkedResource($checkbox)
   if ($checkbox.data('moduleCheckbox')) {
-    _.each(
+    each(
       this.findChildrenCheckboxes(this.getRootCheckbox($checkbox)),
       (function (_this) {
         return function (cb) {
@@ -75,7 +76,7 @@ CheckingCheckboxesForTree.prototype.checkboxEvents = function (event) {
 CheckingCheckboxesForTree.prototype.moduleOptionsEvents = function (event) {
   const $radio = $(event.currentTarget)
   const $checkbox = $radio.parents('.module_options').data('checkbox')
-  return _.each(
+  each(
     this.findChildrenCheckboxes(this.getRootCheckbox($checkbox)),
     (function (_this) {
       return function (cb) {

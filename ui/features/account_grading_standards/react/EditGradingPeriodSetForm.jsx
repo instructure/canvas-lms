@@ -20,6 +20,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import _ from 'underscore'
+import {each} from 'lodash'
 import $ from 'jquery'
 import {Button} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
@@ -110,7 +111,7 @@ class GradingPeriodSetForm extends React.Component {
       if (_.isEmpty(validations)) {
         this.props.onSave(this.state.set)
       } else {
-        _.each(validations, message => {
+        each(validations, message => {
           $.flashError(message)
         })
       }

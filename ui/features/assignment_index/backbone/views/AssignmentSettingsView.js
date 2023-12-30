@@ -24,6 +24,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import round from '@canvas/round'
 import numberHelper from '@canvas/i18n/numberHelper'
 import _ from 'underscore'
+import {each} from 'lodash'
 import DialogFormView, {getResponsiveWidth} from '@canvas/forms/backbone/views/DialogFormView'
 import wrapper from '@canvas/forms/jst/EmptyDialogFormWrapper.handlebars'
 import assignmentSettingsTemplate from '../../jst/AssignmentSettings.handlebars'
@@ -66,7 +67,7 @@ AssignmentSettingsView.prototype.initialize = function () {
 AssignmentSettingsView.prototype.validateFormData = function () {
   const errors = {}
   const weights = this.$el.find('.group_weight_value')
-  _.each(
+  each(
     weights,
     (function (_this) {
       return function (weight) {

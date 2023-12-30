@@ -18,6 +18,7 @@
 
 import {extend} from '@canvas/backbone/utils'
 import _ from 'underscore'
+import {each} from 'lodash'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import DialogFormView, {
   isSmallTablet,
@@ -128,7 +129,7 @@ CreateAssignmentView.prototype.moreOptions = function () {
     data.assignment_group_id = this.assignmentGroup.get('id')
   }
   const dataParams = {}
-  _.each(data, function (value, key) {
+  each(data, function (value, key) {
     if (_.includes(valid, key)) {
       return (dataParams[key] = value)
     }

@@ -22,6 +22,7 @@ import {extend} from '@canvas/backbone/utils'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import _ from 'underscore'
+import {each} from 'lodash'
 import * as tz from '@canvas/datetime'
 import DialogBaseView from '@canvas/dialog-base-view'
 import deparam from 'deparam'
@@ -180,8 +181,8 @@ EditConferenceView.prototype.updateConferenceUserSettingDetailsForConference = f
   conferenceData
 ) {
   // make handlebars comparisons easy
-  _.each(ENV.conference_type_details, function (conferenceInfo) {
-    _.each(conferenceInfo.settings, function (optionObj) {
+  each(ENV.conference_type_details, function (conferenceInfo) {
+    each(conferenceInfo.settings, function (optionObj) {
       let currentVal
       currentVal = conferenceData.user_settings[optionObj.field]
       if (currentVal === void 0) {
@@ -267,7 +268,7 @@ EditConferenceView.prototype.toggleAllUsers = function () {
 }
 
 EditConferenceView.prototype.markInvitedUsers = function () {
-  return _.each(this.model.get('user_ids'), function (id) {
+  each(this.model.get('user_ids'), function (id) {
     const el = $('#members_list .member.user_' + id).find(':checkbox')
     el.attr('checked', true)
     return el.attr('disabled', true)
@@ -275,7 +276,7 @@ EditConferenceView.prototype.markInvitedUsers = function () {
 }
 
 EditConferenceView.prototype.markInvitedSectionsAndGroups = function () {
-  _.each(
+  each(
     ENV.sections,
     (function (_this) {
       return function (section) {
@@ -289,7 +290,7 @@ EditConferenceView.prototype.markInvitedSectionsAndGroups = function () {
       }
     })(this)
   )
-  return _.each(
+  each(
     ENV.groups,
     (function (_this) {
       return function (group) {
@@ -324,13 +325,13 @@ EditConferenceView.prototype.setupGroupAndSectionEventListeners = function () {
     memberEl.attr('checked', checked)
     return memberEl.attr('disabled', checked)
   }
-  _.each(
+  each(
     ENV.groups,
     (function (_this) {
       return function (group) {
         const el = $('#members_list .member.group_' + group.id)
         return el.on('change', function (e) {
-          return _.each(ENV.group_user_ids_map[group.id], function (id) {
+          each(ENV.group_user_ids_map[group.id], function (id) {
             if (e.target.checked) {
               selectedByGroup.push(id)
               return toggleMember(id, e.target.checked)
@@ -348,13 +349,13 @@ EditConferenceView.prototype.setupGroupAndSectionEventListeners = function () {
       }
     })(this)
   )
-  return _.each(
+  each(
     ENV.sections,
     (function (_this) {
       return function (section) {
         const el = $('#members_list .member.section_' + section.id)
         return el.on('change', function (e) {
-          return _.each(ENV.section_user_ids_map[section.id], function (id) {
+          each(ENV.section_user_ids_map[section.id], function (id) {
             if (e.target.checked) {
               selectedBySection.push(id)
               return toggleMember(id, e.target.checked)

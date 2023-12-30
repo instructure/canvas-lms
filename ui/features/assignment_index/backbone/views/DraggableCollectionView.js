@@ -20,6 +20,7 @@ import {extend} from '@canvas/backbone/utils'
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
 import _ from 'underscore'
+import {each} from 'lodash'
 import CollectionView from '@canvas/backbone-collection-view'
 import 'jqueryui/sortable'
 
@@ -257,7 +258,7 @@ DraggableCollectionView.prototype.updateModels = function (model, new_index, inV
   // eslint-disable-next-line prefer-spread
   const models_to_update = this.collection.slice.apply(this.collection, slice_args)
   // update the position on just these models
-  return _.each(models_to_update, function (m) {
+  each(models_to_update, function (m) {
     // if the model gets sliced in here, don't update its
     // position as we'll update it later
     if (m.id !== model.id) {
