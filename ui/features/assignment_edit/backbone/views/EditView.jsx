@@ -24,6 +24,7 @@ import ReactDOM from 'react-dom'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView'
 import _ from 'underscore'
+import {each} from 'lodash'
 import $, {param} from 'jquery'
 import pluralize from '@canvas/util/stringPluralize'
 import numberHelper from '@canvas/i18n/numberHelper'
@@ -526,7 +527,7 @@ EditView.prototype.togglePeerReviewsAndGroupCategoryEnabled = function () {
 EditView.prototype.setDefaultsIfNew = function () {
   if (this.assignment.isNew()) {
     if (userSettings.contextGet('new_assignment_settings')) {
-      _.each(
+      each(
         this.settingsToCache(),
         (function (_this) {
           return function (setting) {

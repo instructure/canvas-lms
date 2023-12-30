@@ -20,6 +20,7 @@ import ReactDOM from 'react-dom'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import _ from 'underscore'
+import {each} from 'lodash'
 import Backbone from '@canvas/backbone'
 import Cache from '../../cache'
 import AssignmentGroup from '@canvas/assignments/backbone/models/AssignmentGroup'
@@ -54,7 +55,7 @@ export default class ToggleShowByView extends Backbone.View {
     const past = []
     const overdue = []
     const upcoming = []
-    _.each(dated, a => {
+    each(dated, a => {
       if (new Date() < Date.parse(a.dueAt())) return upcoming.push(a)
 
       const isOverdue = a.allowedToSubmit() && a.withoutGradedSubmission()
