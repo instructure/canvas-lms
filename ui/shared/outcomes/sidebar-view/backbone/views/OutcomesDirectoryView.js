@@ -19,6 +19,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import _ from 'underscore'
+import {map} from 'lodash'
 import htmlEscape from 'html-escape'
 import PaginatedView from '@canvas/pagination/backbone/views/PaginatedView'
 import OutcomeGroup from '../../../backbone/models/OutcomeGroup'
@@ -295,7 +296,7 @@ ${htmlEscape(I18n.t('Loading more results'))}</span></li>`
 
   // private
   _viewsFor(models, ViewClass) {
-    return _.map(models, model => new ViewClass({model, readOnly: this.readOnly, dir: this}))
+    return map(models, model => new ViewClass({model, readOnly: this.readOnly, dir: this}))
   }
 
   // private

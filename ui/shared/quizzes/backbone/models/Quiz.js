@@ -17,6 +17,7 @@
 
 import $ from 'jquery'
 import _ from 'underscore'
+import {map} from 'lodash'
 import Backbone from '@canvas/backbone'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import DateGroup from '@canvas/date-group/backbone/models/DateGroup'
@@ -346,7 +347,7 @@ export default class Quiz extends Backbone.Model {
   allDates() {
     const groups = this.get('all_dates')
     const models = (groups && groups.models) || []
-    return _.map(models, group => group.toJSON())
+    return map(models, group => group.toJSON())
   }
 
   singleSectionDueDate() {
