@@ -17,6 +17,7 @@
  */
 
 import _ from 'underscore'
+import {map} from 'lodash'
 import createStore from '@canvas/backbone/createStore'
 import $ from 'jquery'
 import DefaultUrlMixin from '@canvas/backbone/DefaultUrlMixin'
@@ -50,7 +51,7 @@ function studentEnrollments(student) {
 }
 
 function sectionIDs(enrollments) {
-  return _.map(enrollments, enrollment => enrollment.course_section_id)
+  return map(enrollments, enrollment => enrollment.course_section_id)
 }
 
 // -------------------
