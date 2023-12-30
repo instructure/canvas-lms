@@ -17,6 +17,7 @@
 
 import $ from 'jquery'
 import _ from 'underscore'
+import {map} from 'lodash'
 import Backbone from '@canvas/backbone'
 import template from '../jst/index.handlebars'
 import htmlEscape from 'html-escape'
@@ -54,7 +55,7 @@ export default class ComboBox {
     this.$menu = $('select', this.$el)
 
     // populate and instantiate the selectmenu
-    const itemList = _.map(this.items, this._buildOption)
+    const itemList = map(this.items, this._buildOption)
     // We can't use a spread here because xsslint doesn't like it.
     // xsslint safeString.identifier itemList
     this.$menu.append.apply(this.$menu, itemList) // eslint-disable-line prefer-spread
