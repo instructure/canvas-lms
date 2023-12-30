@@ -19,6 +19,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import _ from 'underscore'
+import {map} from 'lodash'
 import HeaderFilterView from './backbone/views/HeaderFilterView'
 import OutcomeFilterView from './react/OutcomeFilterView'
 import OutcomeColumnView from './backbone/views/OutcomeColumnView'
@@ -112,7 +113,7 @@ const Grid = {
     // Returns an array of columns.
     toColumns(outcomes, rollups, options = {}) {
       options = _.extend({}, Grid.Util.COLUMN_OPTIONS, options)
-      const columns = _.map(outcomes, function (outcome) {
+      const columns = map(outcomes, function (outcome) {
         return _.extend(
           {
             id: `outcome_${outcome.id}`,
@@ -160,18 +161,18 @@ const Grid = {
     // Returns an array of rows.
     toRows(rollups, _options = {}) {
       const user_ids = _.uniq(
-        _.map(rollups, function (r) {
+        map(rollups, function (r) {
           return r.links.user
         })
       )
       const filtered_rollups = _.groupBy(rollups, function (rollup) {
         return rollup.links.user
       })
-      const ordered_rollups = _.map(user_ids, function (u) {
+      const ordered_rollups = map(user_ids, function (u) {
         return filtered_rollups[u]
       })
       return _.reject(
-        _.map(ordered_rollups, function (rollup) {
+        map(ordered_rollups, function (rollup) {
           return Grid.Util._toRow(rollup)
         }),
         _.isNull
@@ -184,7 +185,7 @@ const Grid = {
     // Returns an object.
     _toRow(rollup) {
       const user = rollup[0].links.user
-      const section_list = _.map(rollup, function (rollup2) {
+      const section_list = map(rollup, function (rollup2) {
         return rollup2.links.section
       })
       const section_enrollment_status = () => {

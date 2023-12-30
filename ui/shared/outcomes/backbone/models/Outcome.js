@@ -21,6 +21,7 @@
 import {extend} from '@canvas/backbone/utils'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import _ from 'underscore'
+import {map} from 'lodash'
 import Backbone from '@canvas/backbone'
 import CalculationMethodContent from '@canvas/grading/CalculationMethodContent'
 
@@ -66,7 +67,7 @@ Outcome.prototype.setMasteryScales = function () {
     // eslint-disable-next-line prefer-spread
     points_possible: Math.max.apply(
       Math,
-      _.map(ratings, function (r) {
+      map(ratings, function (r) {
         return r.points
       })
     ),

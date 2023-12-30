@@ -20,6 +20,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import numberHelper from '@canvas/i18n/numberHelper'
 import $ from 'jquery'
 import _ from 'underscore'
+import {map} from 'lodash'
 import OutcomeContentBase from './OutcomeContentBase'
 import CalculationMethodFormView from './CalculationMethodFormView'
 import outcomeTemplate from '../../jst/outcome.handlebars'
@@ -129,7 +130,7 @@ export default class OutcomeView extends OutcomeContentBase {
       delete data.ratings
     } else {
       data.mastery_points = numberHelper.parse(data.mastery_points)
-      data.ratings = _.map(data.ratings, rating =>
+      data.ratings = map(data.ratings, rating =>
         _.extend(rating, {points: numberHelper.parse(rating.points)})
       )
       if (['highest', 'latest'].includes(data.calculation_method)) {
