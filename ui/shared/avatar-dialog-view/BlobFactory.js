@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-import _ from 'underscore'
+import {map} from 'lodash'
 
 /*
 xsslint xssable.receiver.whitelist builder
@@ -26,7 +26,7 @@ export default {
   fromCanvas(canvas, type = 'image/jpeg') {
     const url = canvas.toDataURL(type)
     const binary = atob(url.split(',')[1])
-    const codes = _.map(binary, char => char.charCodeAt(0))
+    const codes = map(binary, char => char.charCodeAt(0))
     const data = new Uint8Array(codes)
     return this._newBlob(data, type)
   },

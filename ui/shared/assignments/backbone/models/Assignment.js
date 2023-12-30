@@ -21,6 +21,7 @@
 import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
 import _ from 'underscore'
+import {map} from 'lodash'
 import {Model} from '@canvas/backbone'
 import DefaultUrlMixin from '@canvas/backbone/DefaultUrlMixin'
 import TurnitinSettings from '../../TurnitinSettings'
@@ -1076,7 +1077,7 @@ Assignment.prototype.nonBaseDates = function () {
 Assignment.prototype.allDates = function () {
   const groups = this.get('all_dates')
   const models = (groups && groups.models) || []
-  return _.map(models, function (group) {
+  return map(models, function (group) {
     return group.toJSON()
   })
 }
