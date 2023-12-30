@@ -23,7 +23,7 @@
 // returns an array of enrollments meant for display on /courses/:course_id/sections/:id.
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import _ from 'underscore'
+import {map} from 'lodash'
 import {underscoreString} from '@canvas/convert-case'
 
 const I18n = useI18nScope('section')
@@ -76,7 +76,7 @@ const keys = {
 // begin returned function here
 // @param {array} array of enrollments returned from /courses/:course_id/enrollments
 export default data =>
-  _.map(data, enrollment => {
+  map(data, enrollment => {
     const scope = enrollment.limit_privileges_to_course_section ? 'limited' : 'standard'
     const customLimited = I18n.t('enrolled as: %{enrollment_type} with section-only access', {
       enrollment_type: `${enrollment.role}`,
