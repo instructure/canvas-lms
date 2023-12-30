@@ -21,6 +21,7 @@ import Backbone from '@canvas/backbone'
 import ValidatedMixin from './ValidatedMixin'
 import $ from 'jquery'
 import _ from 'underscore'
+import {map} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import '@canvas/jquery/jquery.toJSON'
 import '@canvas/jquery/jquery.disableWhileLoading'
@@ -153,7 +154,7 @@ ValidatedFormView.prototype.submit = function (event, sendFunc) {
     return saveDfd
   } else {
     // focus on the first element with an error for accessibility
-    dateOverrideErrors = _.map(
+    dateOverrideErrors = map(
       $('[data-error-type]'),
       (function (_this) {
         return function (element) {
