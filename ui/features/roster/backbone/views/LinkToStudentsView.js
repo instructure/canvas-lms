@@ -18,6 +18,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import _ from 'underscore'
+import {map} from 'lodash'
 import DialogBaseView from '@canvas/dialog-base-view'
 import RosterDialogMixin from './RosterDialogMixin'
 import linkToStudentsViewTemplate from '../../jst/LinkToStudentsView.handlebars'
@@ -119,7 +120,7 @@ export default class LinkToStudentsView extends DialogBaseView {
       // eslint-disable-next-line no-loop-func
       this.getUserData(id).done(user => {
         const udfds = []
-        const sections = _.map(user.enrollments, en => en.course_section_id)
+        const sections = map(user.enrollments, en => en.course_section_id)
         for (const sId of sections) {
           const url = `/api/v1/sections/${sId}/enrollments`
           const data = {

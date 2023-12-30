@@ -19,6 +19,7 @@
 
 import $ from 'jquery'
 import _ from 'underscore'
+import {map} from 'lodash'
 import '@canvas/backbone/createStore'
 import type {AssignmentWithOverride} from '../default_gradebook/gradebook.d'
 
@@ -344,7 +345,7 @@ const assignmentUtils = {
   ) {
     const url = '/api/v1/' + selected.type + 's/' + selected.id + '/post_grades/'
     const data = {
-      assignments: _.map(assignments, assignment => assignment.id),
+      assignments: map(assignments, assignment => assignment.id),
     }
     $.ajax(url, {
       type: 'POST',

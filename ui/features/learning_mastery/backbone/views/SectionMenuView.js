@@ -19,6 +19,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import _ from 'underscore'
+import {map} from 'lodash'
 import {View} from '@canvas/backbone'
 import template from '../../jst/section_to_show_menu.handlebars'
 import 'jquery-kyle-menu'
@@ -89,7 +90,7 @@ class SectionMenuView extends View {
   }
 
   updateSections() {
-    return _.map(this.sections, section => {
+    return map(this.sections, section => {
       section.checked = section.id === this.currentSection
       return section
     })

@@ -22,6 +22,7 @@ import GradingPeriod from './gradingPeriod'
 import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import _ from 'underscore'
+import {map} from 'lodash'
 import {camelizeProperties} from '@canvas/convert-case'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 
@@ -62,7 +63,7 @@ class GradingPeriodCollection extends React.Component {
   }
 
   deserializePeriods = periods =>
-    _.map(periods.grading_periods, period => {
+    map(periods.grading_periods, period => {
       const newPeriod = camelizeProperties(period)
       newPeriod.startDate = new Date(period.start_date)
       newPeriod.endDate = new Date(period.end_date)
@@ -174,7 +175,7 @@ class GradingPeriodCollection extends React.Component {
   }
 
   serializeDataForSubmission = () => {
-    const periods = _.map(this.state.periods, period => ({
+    const periods = map(this.state.periods, period => ({
       id: period.id,
       title: period.title,
       start_date: period.startDate,
@@ -232,7 +233,7 @@ class GradingPeriodCollection extends React.Component {
 
   renderGradingPeriods = () => {
     if (!this.state.periods) return null
-    return _.map(this.state.periods, period => (
+    return map(this.state.periods, period => (
       <GradingPeriod
         key={period.id}
         ref={`grading_period_${period.id}`}

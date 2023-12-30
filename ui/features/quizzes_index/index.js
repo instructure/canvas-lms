@@ -18,7 +18,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'underscore'
+import {map} from 'lodash'
 import Backbone from '@canvas/backbone'
 import QuizItemGroupView from './backbone/views/QuizItemGroupView'
 import NoQuizzesView from './backbone/views/NoQuizzesView'
@@ -104,7 +104,7 @@ const QuizzesIndexRouter = Backbone.Router.extend({
 
     // get quiz attributes from root container and add options
     return new QuizItemGroupView({
-      collection: new QuizCollection(_.map(collection, quiz => $.extend(quiz, options[quiz.id]))),
+      collection: new QuizCollection(map(collection, quiz => $.extend(quiz, options[quiz.id]))),
       isSurvey: type === 'surveys',
       listId: `${type}-quizzes`,
       title,

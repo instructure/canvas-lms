@@ -18,6 +18,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import _ from 'underscore'
+import {map} from 'lodash'
 import Backbone from '@canvas/backbone'
 import template from '../../jst/rosterUser.handlebars'
 import EditSectionsView from './EditSectionsView'
@@ -137,7 +138,7 @@ export default class RosterUserView extends Backbone.View {
       const observerEnrollments = _.filter(json.enrollments, en => en.type === 'ObserverEnrollment')
       json.enrollments = _.reject(json.enrollments, en => en.type === 'ObserverEnrollment')
 
-      json.sections = _.map(json.enrollments, en => ENV.CONTEXTS.sections[en.course_section_id])
+      json.sections = map(json.enrollments, en => ENV.CONTEXTS.sections[en.course_section_id])
 
       const users = {}
       if (
@@ -286,7 +287,7 @@ export default class RosterUserView extends Backbone.View {
         I18n.t('flash.removeError', 'Unable to remove the user. Please try again later.')
       )
     }
-    const deferreds = _.map(this.model.get('enrollments'), e =>
+    const deferreds = map(this.model.get('enrollments'), e =>
       $.ajaxJSON(`${ENV.COURSE_ROOT_URL}/unenroll/${e.id}`, 'DELETE')
     )
     return $.when(...Array.from(deferreds || [])).then(success, failure)
