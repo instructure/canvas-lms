@@ -271,4 +271,18 @@ describe Lti::IMS::DynamicRegistrationController do
       end
     end
   end
+
+  describe "#registration_token" do
+    subject { get :registration_token }
+
+    before do
+      account_admin_user
+      user_session(@admin)
+    end
+
+    it "returns a 200" do
+      subject
+      expect(response).to have_http_status(:ok)
+    end
+  end
 end
