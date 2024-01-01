@@ -16,9 +16,9 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import Backbone from '@canvas/backbone'
-import _ from 'underscore'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
+import {extend} from 'lodash'
 import Entry from './models/Entry'
 import htmlEscape from 'html-escape'
 import replyAttachmentTemplate from '../jst/_reply_attachment.handlebars'
@@ -262,6 +262,6 @@ class Reply {
   }
 }
 
-_.extend(Reply.prototype, Backbone.Events)
+extend(Reply.prototype, Backbone.Events)
 
 export default Reply

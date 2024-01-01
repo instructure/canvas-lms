@@ -17,7 +17,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'underscore'
+import {debounce, bind, filter, each} from 'lodash'
 import {View} from '@canvas/backbone'
 import SearchableSubmenuView from './SearchableSubmenuView'
 import template from '../../jst/courseOptions.handlebars'
@@ -64,9 +64,9 @@ export default class CourseSelectionView extends View {
     }
     this.options.courses.favorites.on('reset', () => this.render())
     this.options.courses.all.on('reset', () => this.render())
-    this.listenTo(this.options.courses.all, 'add', _.debounce(_.bind(this.render), 200))
+    this.listenTo(this.options.courses.all, 'add', debounce(bind(this.render), 200))
     this.options.courses.groups.on('reset', () => this.render())
-    this.listenTo(this.options.courses.groups, 'add', _.debounce(_.bind(this.render), 200))
+    this.listenTo(this.options.courses.groups, 'add', debounce(bind(this.render), 200))
     this.$picker = this.$el.next()
     return this.render()
   }
@@ -89,7 +89,7 @@ export default class CourseSelectionView extends View {
     let group_json = this.options.courses.groups.toJSON()
 
     if (this.options.messageableOnly) {
-      group_json = _.filter(group_json, g => g.can_message)
+      group_json = filter(group_json, g => g.can_message)
     }
     const data = {
       defaultOption: this.options.defaultOption,
@@ -194,13 +194,13 @@ export default class CourseSelectionView extends View {
   }
 
   truncate_course_name_data(course_data) {
-    return _.each(['favorites', 'more', 'concluded', 'groups'], key =>
+    each(['favorites', 'more', 'concluded', 'groups'], key =>
       this.truncate_course_names(course_data[key])
     )
   }
 
   truncate_course_names(courses) {
-    return _.each(courses, c => this.truncate_course(c))
+    each(courses, c => this.truncate_course(c))
   }
 
   truncate_course(course) {

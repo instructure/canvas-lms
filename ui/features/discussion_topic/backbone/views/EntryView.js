@@ -18,7 +18,7 @@
 
 import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
-import _ from 'underscore'
+import {each, isEmpty, extend as lodashExtend} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import MarkAsReadWatcher from '../MarkAsReadWatcher'
 import walk from '../../array-walk'
@@ -54,24 +54,24 @@ function EntryView() {
 EntryView.instances = {}
 
 EntryView.collapseRootEntries = function () {
-  return _.each(this.instances, function (view) {
+  each(this.instances, function (view) {
     if (!view.model.get('parent')) {
-      return view.collapse()
+      view.collapse()
     }
   })
 }
 
 EntryView.expandRootEntries = function () {
-  return _.each(this.instances, function (view) {
+  each(this.instances, function (view) {
     if (!view.model.get('parent')) {
-      return view.expand()
+      view.expand()
     }
   })
 }
 
 EntryView.setAllReadState = function (newReadState) {
-  return _.each(this.instances, function (view) {
-    return view.model.set('read_state', newReadState)
+  each(this.instances, function (view) {
+    view.model.set('read_state', newReadState)
   })
 }
 
@@ -127,7 +127,7 @@ EntryView.prototype.initialize = function () {
     (function (_this) {
       return function (model, value) {
         _this.$el.toggleClass('no-replies', !_this.model.hasActiveReplies())
-        if (_.isEmpty(value)) {
+        if (isEmpty(value)) {
           return delete _this.treeView
         } else {
           return _this.renderTree()
@@ -464,4 +464,4 @@ EntryView.prototype.handleKeyDown = function (e) {
   return e.stopPropagation()
 }
 
-export default _.extend(EntryView, Backbone.Events)
+export default lodashExtend(EntryView, Backbone.Events)

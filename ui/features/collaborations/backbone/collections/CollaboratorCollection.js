@@ -17,7 +17,7 @@
  */
 
 import {extend as extend1} from '@canvas/backbone/utils'
-import {extend, map} from 'underscore'
+import {extend, map} from 'lodash'
 import {Collection, Model} from '@canvas/backbone'
 
 extend1(CollaboratorCollection, Collection)
