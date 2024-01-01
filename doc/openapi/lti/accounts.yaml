@@ -1,0 +1,2482 @@
+---
+openapi: 3.0.3
+info:
+  title: app
+  version: 1.0.0
+servers: []
+paths:
+  "/api/lti/accounts/{account_id}/data_services":
+    get:
+      summary: index
+      tags:
+      - Lti::DataService
+      parameters:
+      - name: account_id
+        in: path
+        required: true
+        schema:
+          type: string
+        example: 8e3650f3-579f-4388-90f0-71b68ee76a79
+      - name: subscription
+        in: query
+        required: false
+        schema:
+          type: object
+          properties:
+            ContextId:
+              type: string
+            ContextType:
+              type: string
+            EventTypes:
+              type: array
+              items:
+                type: string
+            Format:
+              type: string
+            OwnerId:
+              type: string
+            TransportMetadata:
+              type: object
+              properties:
+                Url:
+                  type: string
+              required:
+              - Url
+            TransportType:
+              type: string
+          required:
+          - ContextId
+          - ContextType
+          - EventTypes
+          - Format
+          - OwnerId
+          - TransportMetadata
+          - TransportType
+        example:
+          ContextId: xCoyrm3KhO7W6h8yizdZrujDf9OATC7AnLKe62DN
+          ContextType: root_account
+          EventTypes:
+          - discussion_topic_created
+          Format: live-event
+          OwnerId: '196495'
+          TransportMetadata:
+            Url: sqs.example
+          TransportType: sqs
+      responses:
+        '200':
+          description: returns 200 success
+          content:
+            application/vnd.canvas.dataservices+json:
+              schema:
+                type: string
+              example: '{"ContextId":"xCoyrm3KhO7W6h8yizdZrujDf9OATC7AnLKe62DN","ContextType":"root_account","EventTypes":["discussion_topic_created"],"Format":"live-event","TransportMetadata":{"Url":"sqs.example"},"TransportType":"sqs"}'
+        '401':
+          description: does not return ims mime_type
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                      message:
+                        type: string
+                    required:
+                    - type
+                    - message
+                required:
+                - errors
+              example:
+                errors:
+                  type: unauthorized
+                  message: Invalid access token format
+        '500':
+          description: adds OwnerId and OwnerType if passed in for a person
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        message:
+                          type: string
+                        error_code:
+                          type: string
+                      required:
+                      - message
+                      - error_code
+                  error_report_id:
+                    type: integer
+                required:
+                - errors
+                - error_report_id
+              example:
+                errors:
+                - message: An error occurred.
+                  error_code: internal_server_error
+                error_report_id: 127940
+        '404':
+          description: raises a 404
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        message:
+                          type: string
+                      required:
+                      - message
+                required:
+                - errors
+              example:
+                errors:
+                - message: The specified resource does not exist.
+        '422':
+          description: raises an unprocessable_entity
+          content:
+            text/html:
+              schema:
+                type: string
+              example: ''
+  "/api/lti/accounts/{account_id}/data_services/{id}":
+    get:
+      summary: show
+      tags:
+      - Lti::DataService
+      parameters:
+      - name: account_id
+        in: path
+        required: true
+        schema:
+          type: string
+        example: 71527019-2da4-49e3-b4e3-de2e55f04a85
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+        example: testid
+      - name: subscription
+        in: query
+        required: false
+        schema:
+          type: object
+          properties:
+            ContextId:
+              type: string
+            ContextType:
+              type: string
+            EventTypes:
+              type: array
+              items:
+                type: string
+            Format:
+              type: string
+            TransportMetadata:
+              type: object
+              properties:
+                Url:
+                  type: string
+              required:
+              - Url
+            TransportType:
+              type: string
+            UpdatedBy:
+              type: string
+          required:
+          - ContextId
+          - ContextType
+          - EventTypes
+          - Format
+          - TransportMetadata
+          - TransportType
+          - UpdatedBy
+        example:
+          ContextId: xCoyrm3KhO7W6h8yizdZrujDf9OATC7AnLKe62DN
+          ContextType: root_account
+          EventTypes:
+          - discussion_topic_created
+          Format: live-event
+          TransportMetadata:
+            Url: sqs.example
+          TransportType: sqs
+          UpdatedBy: '196493'
+      responses:
+        '200':
+          description: returns 200 success
+          content:
+            application/vnd.canvas.dataservices+json:
+              schema:
+                type: string
+              example: '{"ContextId":"xCoyrm3KhO7W6h8yizdZrujDf9OATC7AnLKe62DN","ContextType":"root_account","EventTypes":["discussion_topic_created"],"Format":"live-event","TransportMetadata":{"Url":"sqs.example"},"TransportType":"sqs"}'
+        '401':
+          description: does not return ims mime_type
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                      message:
+                        type: string
+                    required:
+                    - type
+                    - message
+                required:
+                - errors
+              example:
+                errors:
+                  type: unauthorized
+                  message: Invalid access token format
+        '500':
+          description: does not return ims mime_type
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        message:
+                          type: string
+                        error_code:
+                          type: string
+                      required:
+                      - message
+                      - error_code
+                  error_report_id:
+                    type: integer
+                required:
+                - errors
+                - error_report_id
+              example:
+                errors:
+                - message: An error occurred.
+                  error_code: internal_server_error
+                error_report_id: 127908
+        '404':
+          description: raises a 404
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        message:
+                          type: string
+                      required:
+                      - message
+                required:
+                - errors
+              example:
+                errors:
+                - message: The specified resource does not exist.
+        '422':
+          description: raises an unprocessable_entity
+          content:
+            text/html:
+              schema:
+                type: string
+              example: ''
+  "/api/lti/accounts/{account_id}/event_types":
+    get:
+      summary: event_types_index
+      tags:
+      - Lti::DataService
+      parameters:
+      - name: account_id
+        in: path
+        required: true
+        schema:
+          type: string
+        example: f4448a5f-1cb7-4286-8a0a-3b332348c6be
+      - name: id
+        in: query
+        required: false
+        schema:
+          type: string
+        example: testid
+      responses:
+        '200':
+          description: returns 200 success
+          content:
+            application/vnd.canvas.dataservices+json:
+              schema:
+                type: string
+              example: '{"ContextId":"xCoyrm3KhO7W6h8yizdZrujDf9OATC7AnLKe62DN","ContextType":"root_account","EventTypes":["discussion_topic_created"],"Format":"live-event","TransportMetadata":{"Url":"sqs.example"},"TransportType":"sqs"}'
+        '401':
+          description: does not return ims mime_type
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                      message:
+                        type: string
+                    required:
+                    - type
+                    - message
+                required:
+                - errors
+              example:
+                errors:
+                  type: unauthorized
+                  message: Invalid access token format
+        '500':
+          description: does not return ims mime_type
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        message:
+                          type: string
+                        error_code:
+                          type: string
+                      required:
+                      - message
+                      - error_code
+                  error_report_id:
+                    type: integer
+                required:
+                - errors
+                - error_report_id
+              example:
+                errors:
+                - message: An error occurred.
+                  error_code: internal_server_error
+                error_report_id: 127894
+  "/api/lti/accounts/{account_id}":
+    get:
+      summary: show
+      tags:
+      - Lti::AccountLookup
+      parameters:
+      - name: account_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1987650000000008145
+      responses:
+        '200':
+          description: returns id, uuid, and other fields on account
+          content:
+            application/vnd.canvas.accountlookup+json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  workflow_state:
+                    type: string
+                  parent_account_id:
+                    nullable: true
+                  root_account_id:
+                    nullable: true
+                  uuid:
+                    type: string
+                  default_time_zone:
+                    type: string
+                required:
+                - id
+                - name
+                - workflow_state
+                - parent_account_id
+                - root_account_id
+                - uuid
+                - default_time_zone
+              example:
+                id: 8145
+                name: Default Account
+                workflow_state: active
+                parent_account_id:
+                root_account_id:
+                uuid: vYmDAUennzTRV43z1Oo4v0MYaY2pMJ3Dr1GaH3Mn
+                default_time_zone: Etc/UTC
+        '401':
+          description: does not return ims mime_type
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                      message:
+                        type: string
+                    required:
+                    - type
+                    - message
+                required:
+                - errors
+              example:
+                errors:
+                  type: unauthorized
+                  message: Unknown or inactive Developer Key
+        '500':
+          description: does not return ims mime_type
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        message:
+                          type: string
+                        error_code:
+                          type: string
+                      required:
+                      - message
+                      - error_code
+                  error_report_id:
+                    type: integer
+                required:
+                - errors
+                - error_report_id
+              example:
+                errors:
+                - message: An error occurred.
+                  error_code: internal_server_error
+                error_report_id: 127858
+        '404':
+          description: returns a 404
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        message:
+                          type: string
+                      required:
+                      - message
+                required:
+                - errors
+              example:
+                errors:
+                - message: The specified resource does not exist.
+  "/api/lti/accounts/{account_id}/external_tools":
+    get:
+      summary: index
+      tags:
+      - Lti::AccountExternalTool
+      parameters:
+      - name: account_id
+        in: path
+        required: true
+        schema:
+          type: string
+        example: af01ae7a-c877-4297-a581-d63c1a6701de
+      - name: client_id
+        in: query
+        required: false
+        schema:
+          type: string
+        example: bad client id
+      - name: verify_uniqueness
+        in: query
+        required: false
+        schema:
+          type: string
+        example: 'true'
+      responses:
+        '200':
+          description: returns id, domain, and other fields on account
+          content:
+            application/vnd.canvas.contextexternaltools+json:
+              schema:
+                type: array
+                properties:
+                  id:
+                    type: integer
+                  domain:
+                    type: string
+                  url:
+                    type: string
+                  consumer_key:
+                    type: string
+                  name:
+                    type: string
+                  description:
+                    type: string
+                  created_at:
+                    type: string
+                  updated_at:
+                    type: string
+                  privacy_level:
+                    type: string
+                  custom_fields:
+                    type: object
+                    properties:
+                      no_expansion:
+                        type: string
+                      has_expansion:
+                        type: string
+                    required:
+                    - no_expansion
+                    - has_expansion
+                  workflow_state:
+                    type: string
+                  vendor_help_link:
+                    nullable: true
+                  account_navigation:
+                    type: object
+                    properties:
+                      enabled:
+                        type: boolean
+                      text:
+                        type: string
+                      icon_url:
+                        type: string
+                      placement:
+                        type: string
+                      message_type:
+                        type: string
+                      target_link_uri:
+                        type: string
+                      canvas_icon_class:
+                        type: string
+                      label:
+                        type: string
+                      selection_width:
+                        type: integer
+                      selection_height:
+                        type: integer
+                    required:
+                    - enabled
+                    - text
+                    - icon_url
+                    - placement
+                    - message_type
+                    - target_link_uri
+                    - canvas_icon_class
+                    - label
+                    - selection_width
+                    - selection_height
+                  assignment_edit:
+                    nullable: true
+                  assignment_group_menu:
+                    nullable: true
+                  assignment_index_menu:
+                    nullable: true
+                  assignment_menu:
+                    nullable: true
+                  assignment_selection:
+                    nullable: true
+                  assignment_view:
+                    nullable: true
+                  collaboration:
+                    nullable: true
+                  course_assignments_menu:
+                    nullable: true
+                  course_home_sub_navigation:
+                    nullable: true
+                  course_navigation:
+                    type: object
+                    properties:
+                      enabled:
+                        type: boolean
+                      text:
+                        type: string
+                      icon_url:
+                        type: string
+                      placement:
+                        type: string
+                      message_type:
+                        type: string
+                      target_link_uri:
+                        type: string
+                      canvas_icon_class:
+                        type: string
+                      label:
+                        type: string
+                      selection_width:
+                        type: integer
+                      selection_height:
+                        type: integer
+                    required:
+                    - enabled
+                    - text
+                    - icon_url
+                    - placement
+                    - message_type
+                    - target_link_uri
+                    - canvas_icon_class
+                    - label
+                    - selection_width
+                    - selection_height
+                  course_settings_sub_navigation:
+                    nullable: true
+                  discussion_topic_index_menu:
+                    nullable: true
+                  discussion_topic_menu:
+                    nullable: true
+                  file_index_menu:
+                    nullable: true
+                  file_menu:
+                    nullable: true
+                  global_navigation:
+                    nullable: true
+                  homework_submission:
+                    nullable: true
+                  link_selection:
+                    nullable: true
+                  migration_selection:
+                    nullable: true
+                  module_group_menu:
+                    nullable: true
+                  module_index_menu:
+                    nullable: true
+                  module_index_menu_modal:
+                    nullable: true
+                  module_menu_modal:
+                    nullable: true
+                  module_menu:
+                    nullable: true
+                  post_grades:
+                    nullable: true
+                  quiz_index_menu:
+                    nullable: true
+                  quiz_menu:
+                    nullable: true
+                  resource_selection:
+                    nullable: true
+                  similarity_detection:
+                    nullable: true
+                  student_context_card:
+                    nullable: true
+                  submission_type_selection:
+                    nullable: true
+                  tool_configuration:
+                    nullable: true
+                  user_navigation:
+                    nullable: true
+                  wiki_index_menu:
+                    nullable: true
+                  wiki_page_menu:
+                    nullable: true
+                  editor_button:
+                    nullable: true
+                  selection_width:
+                    type: integer
+                  selection_height:
+                    type: integer
+                  icon_url:
+                    type: string
+                  not_selectable:
+                    type: boolean
+                  version:
+                    type: string
+                  developer_key_id:
+                    type: integer
+                  deployment_id:
+                    type: string
+                required:
+                - id
+                - domain
+                - url
+                - consumer_key
+                - name
+                - description
+                - created_at
+                - updated_at
+                - privacy_level
+                - custom_fields
+                - workflow_state
+                - vendor_help_link
+                - account_navigation
+                - assignment_edit
+                - assignment_group_menu
+                - assignment_index_menu
+                - assignment_menu
+                - assignment_selection
+                - assignment_view
+                - collaboration
+                - course_assignments_menu
+                - course_home_sub_navigation
+                - course_navigation
+                - course_settings_sub_navigation
+                - discussion_topic_index_menu
+                - discussion_topic_menu
+                - file_index_menu
+                - file_menu
+                - global_navigation
+                - homework_submission
+                - link_selection
+                - migration_selection
+                - module_group_menu
+                - module_index_menu
+                - module_index_menu_modal
+                - module_menu_modal
+                - module_menu
+                - post_grades
+                - quiz_index_menu
+                - quiz_menu
+                - resource_selection
+                - similarity_detection
+                - student_context_card
+                - submission_type_selection
+                - tool_configuration
+                - user_navigation
+                - wiki_index_menu
+                - wiki_page_menu
+                - editor_button
+                - selection_width
+                - selection_height
+                - icon_url
+                - not_selectable
+                - version
+                - developer_key_id
+                - deployment_id
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    domain:
+                      nullable: true
+                    url:
+                      type: string
+                    consumer_key:
+                      type: string
+                    name:
+                      type: string
+                    description:
+                      nullable: true
+                    created_at:
+                      type: string
+                    updated_at:
+                      type: string
+                    privacy_level:
+                      type: string
+                    custom_fields:
+                      nullable: true
+                    workflow_state:
+                      type: string
+                    vendor_help_link:
+                      nullable: true
+                    account_navigation:
+                      nullable: true
+                    assignment_edit:
+                      nullable: true
+                    assignment_group_menu:
+                      nullable: true
+                    assignment_index_menu:
+                      nullable: true
+                    assignment_menu:
+                      nullable: true
+                    assignment_selection:
+                      nullable: true
+                    assignment_view:
+                      nullable: true
+                    collaboration:
+                      nullable: true
+                    course_assignments_menu:
+                      nullable: true
+                    course_home_sub_navigation:
+                      nullable: true
+                    course_navigation:
+                      nullable: true
+                    course_settings_sub_navigation:
+                      nullable: true
+                    discussion_topic_index_menu:
+                      nullable: true
+                    discussion_topic_menu:
+                      nullable: true
+                    file_index_menu:
+                      nullable: true
+                    file_menu:
+                      nullable: true
+                    global_navigation:
+                      nullable: true
+                    homework_submission:
+                      nullable: true
+                    link_selection:
+                      nullable: true
+                    migration_selection:
+                      nullable: true
+                    module_group_menu:
+                      nullable: true
+                    module_index_menu:
+                      nullable: true
+                    module_index_menu_modal:
+                      nullable: true
+                    module_menu_modal:
+                      nullable: true
+                    module_menu:
+                      nullable: true
+                    post_grades:
+                      nullable: true
+                    quiz_index_menu:
+                      nullable: true
+                    quiz_menu:
+                      nullable: true
+                    resource_selection:
+                      nullable: true
+                    similarity_detection:
+                      nullable: true
+                    student_context_card:
+                      nullable: true
+                    submission_type_selection:
+                      nullable: true
+                    tool_configuration:
+                      nullable: true
+                    user_navigation:
+                      nullable: true
+                    wiki_index_menu:
+                      nullable: true
+                    wiki_page_menu:
+                      nullable: true
+                    editor_button:
+                      nullable: true
+                    not_selectable:
+                      type: boolean
+                    version:
+                      type: string
+                    developer_key_id:
+                      type: integer
+                    deployment_id:
+                      type: string
+                  required:
+                  - id
+                  - domain
+                  - url
+                  - consumer_key
+                  - name
+                  - description
+                  - created_at
+                  - updated_at
+                  - privacy_level
+                  - custom_fields
+                  - workflow_state
+                  - vendor_help_link
+                  - account_navigation
+                  - assignment_edit
+                  - assignment_group_menu
+                  - assignment_index_menu
+                  - assignment_menu
+                  - assignment_selection
+                  - assignment_view
+                  - collaboration
+                  - course_assignments_menu
+                  - course_home_sub_navigation
+                  - course_navigation
+                  - course_settings_sub_navigation
+                  - discussion_topic_index_menu
+                  - discussion_topic_menu
+                  - file_index_menu
+                  - file_menu
+                  - global_navigation
+                  - homework_submission
+                  - link_selection
+                  - migration_selection
+                  - module_group_menu
+                  - module_index_menu
+                  - module_index_menu_modal
+                  - module_menu_modal
+                  - module_menu
+                  - post_grades
+                  - quiz_index_menu
+                  - quiz_menu
+                  - resource_selection
+                  - similarity_detection
+                  - student_context_card
+                  - submission_type_selection
+                  - tool_configuration
+                  - user_navigation
+                  - wiki_index_menu
+                  - wiki_page_menu
+                  - editor_button
+                  - not_selectable
+                  - version
+                  - developer_key_id
+                  - deployment_id
+              example:
+              - id: 407149
+                domain:
+                url: http://www.tool.com/launch
+                consumer_key: key
+                name: test tool
+                description:
+                created_at: '2023-12-15T05:37:54Z'
+                updated_at: '2023-12-15T05:37:54Z'
+                privacy_level: public
+                custom_fields:
+                workflow_state: public
+                vendor_help_link:
+                account_navigation:
+                assignment_edit:
+                assignment_group_menu:
+                assignment_index_menu:
+                assignment_menu:
+                assignment_selection:
+                assignment_view:
+                collaboration:
+                course_assignments_menu:
+                course_home_sub_navigation:
+                course_navigation:
+                course_settings_sub_navigation:
+                discussion_topic_index_menu:
+                discussion_topic_menu:
+                file_index_menu:
+                file_menu:
+                global_navigation:
+                homework_submission:
+                link_selection:
+                migration_selection:
+                module_group_menu:
+                module_index_menu:
+                module_index_menu_modal:
+                module_menu_modal:
+                module_menu:
+                post_grades:
+                quiz_index_menu:
+                quiz_menu:
+                resource_selection:
+                similarity_detection:
+                student_context_card:
+                submission_type_selection:
+                tool_configuration:
+                user_navigation:
+                wiki_index_menu:
+                wiki_page_menu:
+                editor_button:
+                not_selectable: false
+                version: '1.3'
+                developer_key_id: 142141
+                deployment_id: 407149:af01ae7a-c877-4297-a581-d63c1a6701de
+        '401':
+          description: does not return ims mime_type
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                      message:
+                        type: string
+                    required:
+                    - type
+                    - message
+                required:
+                - errors
+              example:
+                errors:
+                  type: unauthorized
+                  message: Missing access token
+            text/html:
+              schema:
+                type: string
+              example: ''
+        '500':
+          description: does not return ims mime_type
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        message:
+                          type: string
+                        error_code:
+                          type: string
+                      required:
+                      - message
+                      - error_code
+                  error_report_id:
+                    type: integer
+                required:
+                - errors
+                - error_report_id
+              example:
+                errors:
+                - message: An error occurred.
+                  error_code: internal_server_error
+                error_report_id: 127850
+        '400':
+          description: return 400
+          content:
+            application/vnd.canvas.contextexternaltools+json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    properties:
+                      tool_currently_installed:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            attribute:
+                              type: string
+                            type:
+                              type: string
+                            message:
+                              type: string
+                          required:
+                          - attribute
+                          - type
+                          - message
+                    required:
+                    - tool_currently_installed
+                required:
+                - errors
+              example:
+                errors:
+                  tool_currently_installed:
+                  - attribute: tool_currently_installed
+                    type: The tool is already installed in this context.
+                    message: The tool is already installed in this context.
+        '404':
+          description: return 404
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        message:
+                          type: string
+                      required:
+                      - message
+                required:
+                - errors
+              example:
+                errors:
+                - message: The specified resource does not exist.
+  "/api/lti/accounts/{account_id}/external_tools/{external_tool_id}":
+    get:
+      summary: show
+      tags:
+      - Lti::AccountExternalTool
+      parameters:
+      - name: account_id
+        in: path
+        required: true
+        schema:
+          type: string
+        example: 37f51bde-5842-4dae-a8e4-4c99ce9e967e
+      - name: external_tool_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 407209
+      responses:
+        '200':
+          description: returns 200 success
+          content:
+            application/vnd.canvas.contextexternaltools+json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  domain:
+                    nullable: true
+                  url:
+                    type: string
+                  consumer_key:
+                    type: string
+                  name:
+                    type: string
+                  description:
+                    nullable: true
+                  created_at:
+                    type: string
+                  updated_at:
+                    type: string
+                  privacy_level:
+                    type: string
+                  custom_fields:
+                    nullable: true
+                  workflow_state:
+                    type: string
+                  vendor_help_link:
+                    nullable: true
+                  account_navigation:
+                    nullable: true
+                  assignment_edit:
+                    nullable: true
+                  assignment_group_menu:
+                    nullable: true
+                  assignment_index_menu:
+                    nullable: true
+                  assignment_menu:
+                    nullable: true
+                  assignment_selection:
+                    nullable: true
+                  assignment_view:
+                    nullable: true
+                  collaboration:
+                    nullable: true
+                  course_assignments_menu:
+                    nullable: true
+                  course_home_sub_navigation:
+                    nullable: true
+                  course_navigation:
+                    nullable: true
+                  course_settings_sub_navigation:
+                    nullable: true
+                  discussion_topic_index_menu:
+                    nullable: true
+                  discussion_topic_menu:
+                    nullable: true
+                  file_index_menu:
+                    nullable: true
+                  file_menu:
+                    nullable: true
+                  global_navigation:
+                    nullable: true
+                  homework_submission:
+                    nullable: true
+                  link_selection:
+                    nullable: true
+                  migration_selection:
+                    nullable: true
+                  module_group_menu:
+                    nullable: true
+                  module_index_menu:
+                    nullable: true
+                  module_index_menu_modal:
+                    nullable: true
+                  module_menu_modal:
+                    nullable: true
+                  module_menu:
+                    nullable: true
+                  post_grades:
+                    nullable: true
+                  quiz_index_menu:
+                    nullable: true
+                  quiz_menu:
+                    nullable: true
+                  resource_selection:
+                    nullable: true
+                  similarity_detection:
+                    nullable: true
+                  student_context_card:
+                    nullable: true
+                  submission_type_selection:
+                    nullable: true
+                  tool_configuration:
+                    nullable: true
+                  user_navigation:
+                    nullable: true
+                  wiki_index_menu:
+                    nullable: true
+                  wiki_page_menu:
+                    nullable: true
+                  editor_button:
+                    nullable: true
+                  not_selectable:
+                    type: boolean
+                  version:
+                    type: string
+                  developer_key_id:
+                    type: integer
+                  deployment_id:
+                    type: string
+                required:
+                - domain
+                - name
+                - url
+                - consumer_key
+                - description
+                - id
+                - created_at
+                - updated_at
+                - privacy_level
+                - custom_fields
+                - workflow_state
+                - vendor_help_link
+                - account_navigation
+                - assignment_edit
+                - assignment_group_menu
+                - assignment_index_menu
+                - assignment_menu
+                - assignment_selection
+                - assignment_view
+                - collaboration
+                - course_assignments_menu
+                - course_home_sub_navigation
+                - course_navigation
+                - course_settings_sub_navigation
+                - discussion_topic_index_menu
+                - discussion_topic_menu
+                - file_index_menu
+                - file_menu
+                - global_navigation
+                - homework_submission
+                - link_selection
+                - migration_selection
+                - module_group_menu
+                - module_index_menu
+                - module_index_menu_modal
+                - module_menu_modal
+                - module_menu
+                - post_grades
+                - quiz_index_menu
+                - quiz_menu
+                - resource_selection
+                - similarity_detection
+                - student_context_card
+                - submission_type_selection
+                - tool_configuration
+                - user_navigation
+                - wiki_index_menu
+                - wiki_page_menu
+                - editor_button
+                - not_selectable
+                - version
+                - developer_key_id
+                - deployment_id
+              example:
+                id: 407190
+                domain:
+                url: http://www.tool.com/launch
+                consumer_key: key
+                name: test tool
+                description:
+                created_at: '2023-12-15T05:37:58Z'
+                updated_at: '2023-12-15T05:37:58Z'
+                privacy_level: deleted
+                custom_fields:
+                workflow_state: deleted
+                vendor_help_link:
+                account_navigation:
+                assignment_edit:
+                assignment_group_menu:
+                assignment_index_menu:
+                assignment_menu:
+                assignment_selection:
+                assignment_view:
+                collaboration:
+                course_assignments_menu:
+                course_home_sub_navigation:
+                course_navigation:
+                course_settings_sub_navigation:
+                discussion_topic_index_menu:
+                discussion_topic_menu:
+                file_index_menu:
+                file_menu:
+                global_navigation:
+                homework_submission:
+                link_selection:
+                migration_selection:
+                module_group_menu:
+                module_index_menu:
+                module_index_menu_modal:
+                module_menu_modal:
+                module_menu:
+                post_grades:
+                quiz_index_menu:
+                quiz_menu:
+                resource_selection:
+                similarity_detection:
+                student_context_card:
+                submission_type_selection:
+                tool_configuration:
+                user_navigation:
+                wiki_index_menu:
+                wiki_page_menu:
+                editor_button:
+                not_selectable: false
+                version: '1.3'
+                developer_key_id: 142141
+                deployment_id: 407190:e77b4d6f-dd33-45b4-945a-4124d3ba646d
+        '500':
+          description: does not return ims mime_type
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        message:
+                          type: string
+                        error_code:
+                          type: string
+                      required:
+                      - message
+                      - error_code
+                  error_report_id:
+                    type: integer
+                required:
+                - errors
+                - error_report_id
+              example:
+                errors:
+                - message: An error occurred.
+                  error_code: internal_server_error
+                error_report_id: 127886
+        '401':
+          description: does not return ims mime_type
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                      message:
+                        type: string
+                    required:
+                    - type
+                    - message
+                required:
+                - errors
+              example:
+                errors:
+                  type: unauthorized
+                  message: Unknown or inactive Developer Key
+  "/api/lti/accounts/{account_id}/developer_keys/tool_configuration":
+    post:
+      summary: create
+      tags:
+      - Lti::ToolConfigurationsApi
+      parameters:
+      - name: account_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 8095
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                developer_key:
+                  type: object
+                  properties:
+                    email:
+                      type: string
+                    name:
+                      type: string
+                    notes:
+                      type: string
+                    public_jwk_url:
+                      type: string
+                    redirect_uris:
+                      type: string
+                    require_scopes:
+                      type: string
+                    scopes:
+                      type: array
+                      items:
+                        type: string
+                    test_cluster_only:
+                      type: string
+                  required:
+                  - email
+                  - name
+                  - notes
+                  - public_jwk_url
+                  - require_scopes
+                  - scopes
+                  - test_cluster_only
+                developer_key_id:
+                  type: string
+                tool_configuration:
+                  type: object
+                  properties:
+                    privacy_level:
+                      type: string
+                    settings:
+                      type: object
+                      properties:
+                        custom_fields:
+                          type: object
+                          properties:
+                            has_expansion:
+                              type: string
+                            no_expansion:
+                              type: string
+                          required:
+                          - has_expansion
+                          - no_expansion
+                        description:
+                          type: string
+                        extensions:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              platform:
+                                type: string
+                              privacy_level:
+                                type: string
+                              tool_id:
+                                type: string
+                              domain:
+                                type: string
+                              settings:
+                                type: object
+                                properties:
+                                  icon_url:
+                                    type: string
+                                  selection_height:
+                                    type: string
+                                  selection_width:
+                                    type: string
+                                  text:
+                                    type: string
+                                  placements:
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        placement:
+                                          type: string
+                                        message_type:
+                                          type: string
+                                        canvas_icon_class:
+                                          type: string
+                                        icon_url:
+                                          type: string
+                                        text:
+                                          type: string
+                                        target_link_uri:
+                                          type: string
+                                        enabled:
+                                          type: string
+                                      required:
+                                      - placement
+                                      - message_type
+                                      - canvas_icon_class
+                                      - icon_url
+                                      - text
+                                      - target_link_uri
+                                      - enabled
+                                required:
+                                - icon_url
+                                - selection_height
+                                - selection_width
+                                - text
+                                - placements
+                            required:
+                            - platform
+                            - privacy_level
+                            - tool_id
+                            - domain
+                            - settings
+                        oidc_initiation_url:
+                          type: string
+                        public_jwk:
+                          type: object
+                          properties:
+                            alg:
+                              type: string
+                            e:
+                              type: string
+                            kid:
+                              type: string
+                            kty:
+                              type: string
+                            "n":
+                              type: string
+                            use:
+                              type: string
+                          required:
+                          - alg
+                          - e
+                          - kid
+                          - kty
+                          - "n"
+                          - use
+                        target_link_uri:
+                          type: string
+                        title:
+                          type: string
+                        public_jwk_url:
+                          type: string
+                      required:
+                      - custom_fields
+                      - description
+                      - extensions
+                      - oidc_initiation_url
+                      - public_jwk
+                      - target_link_uri
+                      - title
+                    custom_fields:
+                      type: string
+                    disabled_placements:
+                      type: array
+                      items:
+                        type: string
+                    settings_url:
+                      type: string
+                  required:
+                  - privacy_level
+              required:
+              - developer_key
+              - tool_configuration
+            example:
+              developer_key:
+                email: test@test.com
+                name: Test Dev Key
+                notes: Some cool notes
+                public_jwk_url: https://www.test.com
+                redirect_uris: "http://www.test.com\r\nhttp://www.anothertest.com"
+                require_scopes: 'true'
+                scopes:
+                - https://purl.imsglobal.org/spec/lti-ags/scope/lineitem
+                test_cluster_only: 'true'
+              developer_key_id: '142196'
+              tool_configuration:
+                privacy_level: public
+                settings:
+                  custom_fields:
+                    has_expansion: "$Canvas.user.id"
+                    no_expansion: foo
+                  description: 1.3 Tool
+                  extensions:
+                  - platform: canvas.instructure.com
+                    privacy_level: public
+                    tool_id: LTI 1.3 Test Tool
+                    domain: http://lti13testtool.docker
+                    settings:
+                      icon_url: https://static.thenounproject.com/png/131630-200.png
+                      selection_height: '500'
+                      selection_width: '500'
+                      text: LTI 1.3 Test Tool Extension text
+                      placements:
+                      - placement: course_navigation
+                        message_type: LtiResourceLinkRequest
+                        canvas_icon_class: icon-pdf
+                        icon_url: https://static.thenounproject.com/png/131630-211.png
+                        text: LTI 1.3 Test Tool Course Navigation
+                        target_link_uri: http://lti13testtool.docker/launch?placement=course_navigation
+                        enabled: 'true'
+                      - placement: account_navigation
+                        message_type: LtiResourceLinkRequest
+                        canvas_icon_class: icon-lti
+                        icon_url: https://static.thenounproject.com/png/131630-211.png
+                        target_link_uri: http://lti13testtool.docker/launch?placement=account_navigation
+                        text: LTI 1.3 Test Tool Course Navigation
+                        enabled: 'true'
+                  oidc_initiation_url: http://lti13testtool.docker/blti_launch
+                  public_jwk:
+                    alg: RS256
+                    e: AQAB
+                    kid: '2018-09-18T21:55:18Z'
+                    kty: RSA
+                    "n": 2YGluUtCi62Ww_TWB38OE6wTaN...
+                    use: sig
+                  target_link_uri: http://lti13testtool.docker/blti_launch
+                  title: LTI 1.3 Tool
+                  public_jwk_url: https://test.com
+                custom_fields: "foo=bar\r\nkey=value"
+                disabled_placements:
+                - course_navigation
+                - account_navigation
+                settings_url: https://www.mytool.com/config/json
+      responses:
+        '200':
+          description: is expected to be nil
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tool_configuration:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      developer_key_id:
+                        type: integer
+                      settings:
+                        type: object
+                        properties:
+                          custom_fields:
+                            type: object
+                            properties:
+                              has_expansion:
+                                type: string
+                              no_expansion:
+                                type: string
+                              foo:
+                                type: string
+                              key:
+                                type: string
+                            required:
+                            - has_expansion
+                            - no_expansion
+                          description:
+                            type: string
+                          extensions:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                platform:
+                                  type: string
+                                privacy_level:
+                                  type: string
+                                tool_id:
+                                  type: string
+                                domain:
+                                  type: string
+                                settings:
+                                  type: object
+                                  properties:
+                                    icon_url:
+                                      type: string
+                                    selection_height:
+                                      type: string
+                                    selection_width:
+                                      type: string
+                                    text:
+                                      type: string
+                                    placements:
+                                      type: array
+                                      items:
+                                        type: object
+                                        properties:
+                                          placement:
+                                            type: string
+                                          message_type:
+                                            type: string
+                                          canvas_icon_class:
+                                            type: string
+                                          icon_url:
+                                            type: string
+                                          text:
+                                            type: string
+                                          target_link_uri:
+                                            type: string
+                                          enabled:
+                                            type: string
+                                        required:
+                                        - placement
+                                        - message_type
+                                        - canvas_icon_class
+                                        - icon_url
+                                        - text
+                                        - target_link_uri
+                                        - enabled
+                                  required:
+                                  - icon_url
+                                  - selection_height
+                                  - selection_width
+                                  - text
+                                  - placements
+                              required:
+                              - platform
+                              - privacy_level
+                              - tool_id
+                              - domain
+                              - settings
+                          oidc_initiation_url:
+                            type: string
+                          public_jwk:
+                            type: object
+                            properties:
+                              alg:
+                                type: string
+                              e:
+                                type: string
+                              kid:
+                                type: string
+                              kty:
+                                type: string
+                              "n":
+                                type: string
+                              use:
+                                type: string
+                            required:
+                            - alg
+                            - e
+                            - kid
+                            - kty
+                            - "n"
+                            - use
+                          target_link_uri:
+                            type: string
+                          title:
+                            type: string
+                          scopes:
+                            type: array
+                            items: {}
+                          public_jwk_url:
+                            type: string
+                        required:
+                        - custom_fields
+                        - description
+                        - extensions
+                        - oidc_initiation_url
+                        - public_jwk
+                        - target_link_uri
+                        - title
+                      created_at:
+                        type: string
+                      updated_at:
+                        type: string
+                      disabled_placements:
+                        nullable: true
+                        type: array
+                        items:
+                          type: string
+                      privacy_level:
+                        type: string
+                    required:
+                    - id
+                    - developer_key_id
+                    - settings
+                    - created_at
+                    - updated_at
+                    - disabled_placements
+                    - privacy_level
+                  developer_key:
+                    type: object
+                    properties:
+                      email:
+                        type: string
+                      user_name:
+                        nullable: true
+                      created_at:
+                        type: string
+                      user_id:
+                        nullable: true
+                      name:
+                        type: string
+                      icon_url:
+                        nullable: true
+                      workflow_state:
+                        type: string
+                      notes:
+                        type: string
+                      scopes:
+                        type: array
+                        items:
+                          type: string
+                      require_scopes:
+                        type: boolean
+                      client_credentials_audience:
+                        nullable: true
+                      api_key:
+                        type: string
+                      redirect_uri:
+                        nullable: true
+                      redirect_uris:
+                        type: string
+                      access_token_count:
+                        type: integer
+                      last_used_at:
+                        nullable: true
+                      vendor_code:
+                        nullable: true
+                      public_jwk:
+                        type: object
+                        properties:
+                          alg:
+                            type: string
+                          e:
+                            type: string
+                          kid:
+                            type: string
+                          kty:
+                            type: string
+                          "n":
+                            type: string
+                          use:
+                            type: string
+                        required:
+                        - alg
+                        - e
+                        - kid
+                        - kty
+                        - "n"
+                        - use
+                      public_jwk_url:
+                        nullable: true
+                        type: string
+                      allow_includes:
+                        type: boolean
+                      developer_key_account_binding:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                          account_id:
+                            type: integer
+                          developer_key_id:
+                            type: integer
+                          workflow_state:
+                            type: string
+                          account_owns_binding:
+                            type: boolean
+                        required:
+                        - id
+                        - account_id
+                        - developer_key_id
+                        - workflow_state
+                        - account_owns_binding
+                      account_name:
+                        type: string
+                      visible:
+                        type: boolean
+                      is_lti_key:
+                        type: boolean
+                      is_lti_registration:
+                        type: boolean
+                      id:
+                        type: integer
+                    required:
+                    - email
+                    - user_name
+                    - created_at
+                    - user_id
+                    - name
+                    - icon_url
+                    - workflow_state
+                    - notes
+                    - scopes
+                    - require_scopes
+                    - client_credentials_audience
+                    - api_key
+                    - redirect_uri
+                    - redirect_uris
+                    - access_token_count
+                    - last_used_at
+                    - vendor_code
+                    - public_jwk
+                    - public_jwk_url
+                    - allow_includes
+                    - developer_key_account_binding
+                    - account_name
+                    - visible
+                    - is_lti_key
+                    - is_lti_registration
+                    - id
+                required:
+                - tool_configuration
+                - developer_key
+              example:
+                tool_configuration:
+                  id: 938667
+                  developer_key_id: 142208
+                  settings:
+                    custom_fields:
+                      has_expansion: "$Canvas.user.id"
+                      no_expansion: foo
+                      foo: bar
+                      key: value
+                    description: 1.3 Tool
+                    extensions:
+                    - platform: canvas.instructure.com
+                      privacy_level: public
+                      tool_id: LTI 1.3 Test Tool
+                      domain: http://lti13testtool.docker
+                      settings:
+                        icon_url: https://static.thenounproject.com/png/131630-200.png
+                        selection_height: '500'
+                        selection_width: '500'
+                        text: LTI 1.3 Test Tool Extension text
+                        placements:
+                        - placement: course_navigation
+                          message_type: LtiResourceLinkRequest
+                          canvas_icon_class: icon-pdf
+                          icon_url: https://static.thenounproject.com/png/131630-211.png
+                          text: LTI 1.3 Test Tool Course Navigation
+                          target_link_uri: http://lti13testtool.docker/launch?placement=course_navigation
+                          enabled: 'true'
+                        - placement: account_navigation
+                          message_type: LtiResourceLinkRequest
+                          canvas_icon_class: icon-lti
+                          icon_url: https://static.thenounproject.com/png/131630-211.png
+                          target_link_uri: http://lti13testtool.docker/launch?placement=account_navigation
+                          text: LTI 1.3 Test Tool Course Navigation
+                          enabled: 'true'
+                    oidc_initiation_url: http://lti13testtool.docker/blti_launch
+                    public_jwk:
+                      alg: RS256
+                      e: AQAB
+                      kid: '2018-09-18T21:55:18Z'
+                      kty: RSA
+                      "n": 2YGluUtCi62Ww_TWB38OE6wTaN...
+                      use: sig
+                    target_link_uri: http://lti13testtool.docker/blti_launch
+                    title: LTI 1.3 Tool
+                    scopes: []
+                    public_jwk_url: https://test.com
+                  created_at: '2023-12-15T05:37:19Z'
+                  updated_at: '2023-12-15T05:37:19Z'
+                  disabled_placements:
+                  privacy_level: public
+                developer_key:
+                  email: test@test.com
+                  user_name:
+                  created_at: '2023-12-15T05:37:19Z'
+                  user_id:
+                  name: Test Dev Key
+                  icon_url:
+                  workflow_state: active
+                  notes: Some cool notes
+                  scopes:
+                  - https://purl.imsglobal.org/spec/lti-ags/scope/lineitem
+                  require_scopes: true
+                  client_credentials_audience:
+                  api_key: HfrL9VimHfBkRdyeAF64iIjxqXFQrF9gpac3MsmUXHRMzRW5lFuF0y8zY1bfwsVB
+                  redirect_uri:
+                  redirect_uris: |-
+                    http://www.test.com
+                    http://www.anothertest.com
+                  access_token_count: 0
+                  last_used_at:
+                  vendor_code:
+                  public_jwk:
+                    alg: RS256
+                    e: AQAB
+                    kid: '2018-09-18T21:55:18Z'
+                    kty: RSA
+                    "n": 2YGluUtCi62Ww_TWB38OE6wTaN...
+                    use: sig
+                  public_jwk_url:
+                  allow_includes: false
+                  developer_key_account_binding:
+                    id: 1037219
+                    account_id: 8095
+                    developer_key_id: 142208
+                    workflow_state: 'off'
+                    account_owns_binding: true
+                  account_name: value for name
+                  visible: true
+                  is_lti_key: true
+                  is_lti_registration: false
+                  id: 142208
+        '401':
+          description: is expected to be unauthorized
+          content:
+            text/html:
+              schema:
+                type: string
+              example: ''
+        '400':
+          description: returns a 400
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        message:
+                          type: string
+                      required:
+                      - message
+                required:
+                - errors
+              example:
+                errors:
+                - message: redirect_uris is missing
+        '422':
+          description: is expected to be present
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        field:
+                          type: string
+                        message:
+                          type: string
+                        error_code:
+                          nullable: true
+                      required:
+                      - field
+                      - message
+                      - error_code
+                required:
+                - errors
+              example:
+                errors:
+                - field: lti_key
+                  message: developer key must have public jwk or public jwk url
+                  error_code:
+  "/api/lti/accounts/{account_id}/developer_keys/{developer_key_id}/tool_configuration":
+    get:
+      summary: show
+      tags:
+      - Lti::ToolConfigurationsApi
+      parameters:
+      - name: account_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 8095
+      - name: developer_key
+        in: query
+        required: false
+        schema:
+          type: object
+          properties:
+            email:
+              type: string
+            name:
+              type: string
+            notes:
+              type: string
+            public_jwk_url:
+              type: string
+            redirect_uris:
+              type: string
+            require_scopes:
+              type: string
+            scopes:
+              type: array
+              items:
+                type: string
+            test_cluster_only:
+              type: string
+          required:
+          - email
+          - name
+          - notes
+          - public_jwk_url
+          - redirect_uris
+          - require_scopes
+          - scopes
+          - test_cluster_only
+        example:
+          email: test@test.com
+          name: Test Dev Key
+          notes: Some cool notes
+          public_jwk_url: https://www.test.com
+          redirect_uris: "http://www.test.com\r\nhttp://www.anothertest.com"
+          require_scopes: 'true'
+          scopes:
+          - https://purl.imsglobal.org/spec/lti-ags/scope/lineitem
+          test_cluster_only: 'true'
+      - name: developer_key_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 142176
+      responses:
+        '401':
+          description: responds with "unauthorized"
+          content:
+            text/html:
+              schema:
+                type: string
+              example: ''
+        '404':
+          description: is expected to be not found
+          content:
+            text/html:
+              schema:
+                type: string
+              example: ''
+        '200':
+          description: renders the tool configuration
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tool_configuration:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      developer_key_id:
+                        type: integer
+                      settings:
+                        type: object
+                        properties:
+                          title:
+                            type: string
+                          scopes:
+                            type: array
+                            items: {}
+                          extensions:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                domain:
+                                  type: string
+                                tool_id:
+                                  type: string
+                                platform:
+                                  type: string
+                                settings:
+                                  type: object
+                                  properties:
+                                    text:
+                                      type: string
+                                    icon_url:
+                                      type: string
+                                    placements:
+                                      type: array
+                                      items:
+                                        type: object
+                                        properties:
+                                          text:
+                                            type: string
+                                          enabled:
+                                            type: boolean
+                                          icon_url:
+                                            type: string
+                                          placement:
+                                            type: string
+                                          message_type:
+                                            type: string
+                                          target_link_uri:
+                                            type: string
+                                          canvas_icon_class:
+                                            type: string
+                                        required:
+                                        - text
+                                        - enabled
+                                        - icon_url
+                                        - placement
+                                        - message_type
+                                        - target_link_uri
+                                        - canvas_icon_class
+                                    selection_width:
+                                      type: integer
+                                    selection_height:
+                                      type: integer
+                                  required:
+                                  - text
+                                  - icon_url
+                                  - placements
+                                  - selection_width
+                                  - selection_height
+                                privacy_level:
+                                  type: string
+                              required:
+                              - domain
+                              - tool_id
+                              - platform
+                              - settings
+                              - privacy_level
+                          public_jwk:
+                            type: object
+                            properties:
+                              e:
+                                type: string
+                              "n":
+                                type: string
+                              alg:
+                                type: string
+                              kid:
+                                type: string
+                              kty:
+                                type: string
+                              use:
+                                type: string
+                            required:
+                            - e
+                            - "n"
+                            - alg
+                            - kid
+                            - kty
+                            - use
+                          description:
+                            type: string
+                          custom_fields:
+                            type: object
+                            properties:
+                              no_expansion:
+                                type: string
+                              has_expansion:
+                                type: string
+                            required:
+                            - no_expansion
+                            - has_expansion
+                          target_link_uri:
+                            type: string
+                          oidc_initiation_url:
+                            type: string
+                        required:
+                        - title
+                        - scopes
+                        - extensions
+                        - public_jwk
+                        - description
+                        - custom_fields
+                        - target_link_uri
+                        - oidc_initiation_url
+                      created_at:
+                        type: string
+                      updated_at:
+                        type: string
+                      disabled_placements:
+                        type: array
+                        items: {}
+                      privacy_level:
+                        type: string
+                    required:
+                    - id
+                    - developer_key_id
+                    - settings
+                    - created_at
+                    - updated_at
+                    - disabled_placements
+                    - privacy_level
+                  developer_key:
+                    type: object
+                    properties:
+                      email:
+                        nullable: true
+                      user_name:
+                        nullable: true
+                      created_at:
+                        type: string
+                      user_id:
+                        nullable: true
+                      name:
+                        nullable: true
+                      icon_url:
+                        nullable: true
+                      workflow_state:
+                        type: string
+                      notes:
+                        nullable: true
+                      scopes:
+                        type: array
+                        items: {}
+                      require_scopes:
+                        type: boolean
+                      client_credentials_audience:
+                        nullable: true
+                      api_key:
+                        type: string
+                      redirect_uri:
+                        nullable: true
+                      redirect_uris:
+                        type: string
+                      access_token_count:
+                        type: integer
+                      last_used_at:
+                        nullable: true
+                      vendor_code:
+                        nullable: true
+                      public_jwk:
+                        nullable: true
+                      public_jwk_url:
+                        nullable: true
+                      allow_includes:
+                        type: boolean
+                      developer_key_account_binding:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                          account_id:
+                            type: integer
+                          developer_key_id:
+                            type: integer
+                          workflow_state:
+                            type: string
+                          account_owns_binding:
+                            type: boolean
+                        required:
+                        - id
+                        - account_id
+                        - developer_key_id
+                        - workflow_state
+                        - account_owns_binding
+                      account_name:
+                        type: string
+                      visible:
+                        type: boolean
+                      is_lti_key:
+                        type: boolean
+                      is_lti_registration:
+                        type: boolean
+                      id:
+                        type: integer
+                    required:
+                    - email
+                    - user_name
+                    - created_at
+                    - user_id
+                    - name
+                    - icon_url
+                    - workflow_state
+                    - notes
+                    - scopes
+                    - require_scopes
+                    - client_credentials_audience
+                    - api_key
+                    - redirect_uri
+                    - redirect_uris
+                    - access_token_count
+                    - last_used_at
+                    - vendor_code
+                    - public_jwk
+                    - public_jwk_url
+                    - allow_includes
+                    - developer_key_account_binding
+                    - account_name
+                    - visible
+                    - is_lti_key
+                    - is_lti_registration
+                    - id
+                required:
+                - tool_configuration
+                - developer_key
+              example:
+                tool_configuration:
+                  id: 938648
+                  developer_key_id: 142176
+                  settings:
+                    title: LTI 1.3 Tool
+                    scopes: []
+                    extensions:
+                    - domain: http://lti13testtool.docker
+                      tool_id: LTI 1.3 Test Tool
+                      platform: canvas.instructure.com
+                      settings:
+                        text: LTI 1.3 Test Tool Extension text
+                        icon_url: https://static.thenounproject.com/png/131630-200.png
+                        placements:
+                        - text: LTI 1.3 Test Tool Course Navigation
+                          enabled: true
+                          icon_url: https://static.thenounproject.com/png/131630-211.png
+                          placement: course_navigation
+                          message_type: LtiResourceLinkRequest
+                          target_link_uri: http://lti13testtool.docker/launch?placement=course_navigation
+                          canvas_icon_class: icon-pdf
+                        - text: LTI 1.3 Test Tool Course Navigation
+                          enabled: true
+                          icon_url: https://static.thenounproject.com/png/131630-211.png
+                          placement: account_navigation
+                          message_type: LtiResourceLinkRequest
+                          target_link_uri: http://lti13testtool.docker/launch?placement=account_navigation
+                          canvas_icon_class: icon-lti
+                        selection_width: 500
+                        selection_height: 500
+                      privacy_level: public
+                    public_jwk:
+                      e: AQAB
+                      "n": 2YGluUtCi62Ww_TWB38OE6wTaN...
+                      alg: RS256
+                      kid: '2018-09-18T21:55:18Z'
+                      kty: RSA
+                      use: sig
+                    description: 1.3 Tool
+                    custom_fields:
+                      no_expansion: foo
+                      has_expansion: "$Canvas.user.id"
+                    target_link_uri: http://lti13testtool.docker/blti_launch
+                    oidc_initiation_url: http://lti13testtool.docker/blti_launch
+                  created_at: '2023-12-15T05:37:07Z'
+                  updated_at: '2023-12-15T05:37:07Z'
+                  disabled_placements: []
+                  privacy_level: public
+                developer_key:
+                  email:
+                  user_name:
+                  created_at: '2023-12-15T05:37:07Z'
+                  user_id:
+                  name:
+                  icon_url:
+                  workflow_state: active
+                  notes:
+                  scopes: []
+                  require_scopes: false
+                  client_credentials_audience:
+                  api_key: SI3SR1KilXPHrjO2lmsBIRcIYuBAzrRjgvpf2Sagt2IHpn40ISOeJYjBPJwg4R3J
+                  redirect_uri:
+                  redirect_uris: ''
+                  access_token_count: 0
+                  last_used_at:
+                  vendor_code:
+                  public_jwk:
+                  public_jwk_url:
+                  allow_includes: false
+                  developer_key_account_binding:
+                    id: 1037187
+                    account_id: 8093
+                    developer_key_id: 142176
+                    workflow_state: 'on'
+                    account_owns_binding: true
+                  account_name: Default Account
+                  visible: true
+                  is_lti_key: false
+                  is_lti_registration: false
+                  id: 142176
