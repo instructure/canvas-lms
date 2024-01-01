@@ -18,8 +18,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'underscore'
-import {map} from 'lodash'
+import {map, pick, keys, filter, find, uniqueId, each, includes, every, isEmpty} from 'lodash'
 import {Collection} from '@canvas/backbone'
 import DialogBaseView from '@canvas/dialog-base-view'
 import template from '../../jst/MessageFormDialog.handlebars'
@@ -123,7 +122,7 @@ export default class MessageFormDialog extends DialogBaseView {
       this.returnFocusTo = options.trigger
     }
     if (options.remoteLaunch) {
-      this.launchParams = _.pick(options, 'context', 'user')
+      this.launchParams = pick(options, 'context', 'user')
     }
 
     this.render()
@@ -236,7 +235,7 @@ export default class MessageFormDialog extends DialogBaseView {
         this.onCourse({id: this.model.get('context_code'), name: this.model.get('context_name')})
       } else {
         this.courseView.on('course', c => this.onCourse(c))
-        this.courseView.setValue(`course_${_.keys(this.model.get('audience_contexts').courses)[0]}`)
+        this.courseView.setValue(`course_${keys(this.model.get('audience_contexts').courses)[0]}`)
       }
       this.recipientView.disable(false)
     } else if (this.launchParams) {
@@ -281,7 +280,7 @@ export default class MessageFormDialog extends DialogBaseView {
       if (this.to === 'replyAll' || ENV.current_user_id === this.message.get('author').id) {
         tokens = tokens.concat(this.message.get('participants'))
         if (tokens.length > 1) {
-          tokens = _.filter(tokens, t => t.id !== ENV.current_user_id)
+          tokens = filter(tokens, t => t.id !== ENV.current_user_id)
         }
       }
       this.recipientView.setTokens(tokens)
@@ -312,7 +311,7 @@ export default class MessageFormDialog extends DialogBaseView {
         messages.filter(
           m =>
             new Date(m.get('created_at')) <= date &&
-            !_.find(participants, p => !_.includes(m.get('participating_user_ids'), p))
+            !find(participants, p => !includes(m.get('participating_user_ids'), p))
         )
       )
       const contextView = new ContextMessagesView({
@@ -409,13 +408,13 @@ export default class MessageFormDialog extends DialogBaseView {
   }
 
   recipientIdsChanged(recipientIds) {
-    if (_.isEmpty(recipientIds) || _.includes(recipientIds, /(teachers|tas|observers)$/)) {
+    if (isEmpty(recipientIds) || includes(recipientIds, /(teachers|tas|observers)$/)) {
       return this.toggleUserNote(false)
     } else {
       const canAddNotes = map(this.recipientView.tokenModels(), tokenModel =>
         this.canAddNotesFor(tokenModel)
       )
-      return this.toggleUserNote(_.every(canAddNotes))
+      return this.toggleUserNote(every(canAddNotes))
     }
   }
 
@@ -478,7 +477,7 @@ export default class MessageFormDialog extends DialogBaseView {
   }
 
   addAttachment() {
-    $('#file_input').attr('id', _.uniqueId('file_input'))
+    $('#file_input').attr('id', uniqueId('file_input'))
     this.appendAddAttachmentTemplate()
     this.updateAttachmentOverflow()
 
@@ -589,7 +588,7 @@ export default class MessageFormDialog extends DialogBaseView {
   }
 
   removeEmptyAttachments() {
-    return _.each(this.$attachments.find('input[value=]'), node => this.removeAttachment(node))
+    each(this.$attachments.find('input[value=]'), node => this.removeAttachment(node))
   }
 
   removeAttachment(node) {

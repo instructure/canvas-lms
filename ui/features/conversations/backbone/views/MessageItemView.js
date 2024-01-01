@@ -19,7 +19,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'underscore'
+import {extend} from 'lodash'
 import * as tz from '@canvas/datetime'
 import {View} from '@canvas/backbone'
 import template from '../../jst/messageItem.handlebars'
@@ -78,7 +78,7 @@ export default class MessageItemView extends View {
   toJSON() {
     const json = this.model.toJSON()
     const fudged = $.fudgeDateForProfileTimezone(tz.parse(json.created_at))
-    return _.extend(json, {created_at: fudged})
+    return extend(json, {created_at: fudged})
   }
 
   // Internal: Update participant lists after render.
