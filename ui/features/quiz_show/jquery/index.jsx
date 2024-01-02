@@ -37,6 +37,7 @@ import '@canvas/message-students-dialog/jquery/message_students' /* messageStude
 import AssignmentExternalTools from '@canvas/assignments/react/AssignmentExternalTools'
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
+import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
 
 const I18n = useI18nScope('quizzes.show')
 
@@ -259,6 +260,45 @@ $(document).ready(function () {
       $(this).find('button').text(I18n.t('buttons.already_published', 'Published!'))
       window.location.reload()
     },
+  })
+
+  function renderItemAssignToTray(open, returnFocusTo, itemProps) {
+    ReactDOM.render(
+      <ItemAssignToTray
+        open={open}
+        onClose={() => {
+          ReactDOM.unmountComponentAtNode(
+            document.getElementById('assign-to-mount-point')
+          )
+        }}
+        onDismiss={() => {
+          renderItemAssignToTray(false, returnFocusTo, itemProps)
+          returnFocusTo.focus()
+        }}
+        itemType='quiz'
+        iconType='quiz'
+        locale={ENV.LOCALE || 'en'}
+        timezone={ENV.TIMEZONE || 'UTC'}
+        {...itemProps}
+      />,
+      document.getElementById('assign-to-mount-point')
+    )
+  }
+
+  $('.assign-to-link').on('click keyclick', function (event) {
+    event.preventDefault()
+    const returnFocusTo = $(event.target).closest('ul').prev('.al-trigger')
+
+    const courseId = event.target.getAttribute('data-quiz-context-id')
+    const itemName = event.target.getAttribute('data-quiz-name')
+    const itemContentId = event.target.getAttribute('data-quiz-id')
+    const pointsPossible = parseFloat(event.target.getAttribute('data-quiz-points-possible')) + ' pts'
+    renderItemAssignToTray(true, returnFocusTo, {
+      courseId,
+      itemName,
+      itemContentId,
+      pointsPossible
+    })
   })
 
   const $el = $('#quiz-publish-link')
