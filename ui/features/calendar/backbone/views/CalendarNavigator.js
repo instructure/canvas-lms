@@ -17,7 +17,7 @@
  */
 
 import {extend} from '@canvas/backbone/utils'
-import _ from 'underscore'
+import {debounce} from 'lodash'
 import Backbone from '@canvas/backbone'
 import template from '../../jst/calendarNavigator.handlebars'
 import '@canvas/datetime/jquery'
@@ -59,7 +59,7 @@ CalendarNavigator.prototype.initialize = function () {
   CalendarNavigator.__super__.initialize.apply(this, arguments)
   this.render()
   // use debounce to make the aria-live updates nicer
-  this._flashDateSuggestion = _.debounce(this._flashDateSuggestion, 1500)
+  this._flashDateSuggestion = debounce(this._flashDateSuggestion, 1500)
   this.$buttons.buttonset()
   // make sure our jquery key handler is called first
   this.$dateField.keydown(this._onDateFieldKey)

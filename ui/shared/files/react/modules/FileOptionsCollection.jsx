@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
+import {defaults} from 'lodash'
 import UploadQueue from './UploadQueue'
 import ReactDOM from 'react-dom'
 import * as CategoryProcessor from '@instructure/canvas-rce/es/rce/plugins/shared/Upload/CategoryProcessor'
@@ -196,7 +196,7 @@ class FileOptionsCollection {
   }
 
   setState(options) {
-    return (this.state = _.defaults(options, this.state))
+    return (this.state = defaults(options, this.state))
   }
 
   getState() {

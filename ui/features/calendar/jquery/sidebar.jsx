@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import _ from 'underscore'
+import {intersection} from 'lodash'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -59,7 +59,7 @@ class VisibleContextManager {
 
     this.enabledAccounts = contexts.filter(c => c.type === 'account').map(dC => dC.asset_string)
 
-    this.contexts = _.intersection(this.contexts, availableContexts)
+    this.contexts = intersection(this.contexts, availableContexts)
     this.contexts = this.contexts.slice(0, ENV.CALENDAR.VISIBLE_CONTEXTS_LIMIT)
 
     this.notify()

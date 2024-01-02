@@ -19,9 +19,9 @@
 /* eslint-disable no-void */
 
 import $ from 'jquery'
+import {omit} from 'lodash'
 import {extend} from '@canvas/backbone/utils'
 import Backbone from '@canvas/backbone'
-import _ from 'underscore'
 import splitAssetString from '@canvas/util/splitAssetString'
 
 extend(FilesystemObject, Backbone.Model)
@@ -117,7 +117,7 @@ FilesystemObject.prototype.copyToContext = function (newFolder, options) {
   attrs['source_' + type + '_id'] = attrs.id
   delete attrs.id
   const clonedModel = new this.constructor(
-    _.omit(attrs, 'id', 'parent_folder_id', 'parent_folder_path')
+    omit(attrs, 'id', 'parent_folder_id', 'parent_folder_path')
   )
   const collection = this.updateCollection(clonedModel, newFolder, options)
   clonedModel.url = collection.url

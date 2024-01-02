@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import _ from 'lodash'
+import {reject, maxBy, isEmpty, partition, minBy} from 'lodash'
 import fcUtil from './fcUtil'
 import commonEventFactory from './CommonEvent/index'
 import '@canvas/jquery/jquery.ajaxJSON'
@@ -136,7 +136,7 @@ export default class EventDataSource {
   removeCachedReservation(event) {
     const cached_ag = this.cache.appointmentGroups[event.appointment_group_id]
     if (cached_ag) {
-      cached_ag.reserved_times = _.reject(
+      cached_ag.reserved_times = reject(
         cached_ag.reserved_times,
         reservation => reservation.id === event.id
       )
@@ -488,12 +488,12 @@ export default class EventDataSource {
           }
         })
 
-        if (!_.isEmpty(dates)) {
-          upperBounds.push(_.max(dates))
+        if (!isEmpty(dates)) {
+          upperBounds.push(maxBy(dates))
         }
       }
-      if (!_.isEmpty(upperBounds)) {
-        nextPageDate = fcUtil.clone(_.min(upperBounds))
+      if (!isEmpty(upperBounds)) {
+        nextPageDate = fcUtil.clone(minBy(upperBounds))
         end = fcUtil.unwrap(nextPageDate)
       }
       contexts.forEach(context => {
@@ -531,7 +531,7 @@ export default class EventDataSource {
     if (ENV.STUDENT_PLANNER_ENABLED) {
       eventDataSources.push(['/api/v1/planner_notes', params])
     }
-    const [admin_contexts, student_contexts] = _.partition(
+    const [admin_contexts, student_contexts] = partition(
       params.context_codes,
       cc => ENV.CALENDAR?.MANAGE_CONTEXTS?.indexOf(cc) >= 0
     )
