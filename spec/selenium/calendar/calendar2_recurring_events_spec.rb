@@ -871,7 +871,7 @@ describe "recurring events" do
 
       events[3].click
       expect(edit_event_rule_text.text).to include("Daily, 6 times")
-      expect(edit_event_rule_text.text).to include("Jul 23, 12am - 1am")
+      expect(edit_event_rule_text.text).to include("Jul 23, 2023, 12am - 1am")
 
       click_edit_event_button
       replace_content(edit_calendar_event_end_input, "12:00 PM")
@@ -889,11 +889,11 @@ describe "recurring events" do
 
       events[0].click
       expect(edit_event_rule_text.text).to include("Daily, 3 times")
-      expect(edit_event_rule_text.text).to include("Jul 20, 12am - 1am")
+      expect(edit_event_rule_text.text).to include("Jul 20, 2023, 12am - 1am")
 
       events[3].click
       expect(edit_event_rule_text.text).to include("Daily, 3 times")
-      expect(edit_event_rule_text.text).to include("Jul 23, 11am - 12pm")
+      expect(edit_event_rule_text.text).to include("Jul 23, 2023, 11am - 12pm")
     end
 
     it "shows all events in list after RRULE split" do
@@ -905,7 +905,7 @@ describe "recurring events" do
 
       events[3].click
       expect(edit_event_rule_text.text).to include("Daily, 6 times")
-      expect(edit_event_rule_text.text).to include("Jul 23, 12am - 1am")
+      expect(edit_event_rule_text.text).to include("Jul 23, 2023, 12am - 1am")
 
       click_edit_event_button
       select_frequency_option("Custom")
@@ -924,11 +924,11 @@ describe "recurring events" do
 
       events[0].click
       expect(edit_event_rule_text.text).to include("Daily, 3 times")
-      expect(edit_event_rule_text.text).to include("Jul 20, 12am - 1am")
+      expect(edit_event_rule_text.text).to include("Jul 20, 2023, 12am - 1am")
 
       events[3].click
       expect(edit_event_rule_text.text).to include("Weekly on Wed, Thu, 6 times")
-      expect(edit_event_rule_text.text).to include("Jul 26, 12am - 1am")
+      expect(edit_event_rule_text.text).to include("Jul 26, 2023, 12am - 1am")
     end
 
     it "shows title change doesn't split series" do
@@ -940,7 +940,7 @@ describe "recurring events" do
 
       events[3].click
       expect(edit_event_rule_text.text).to include("Daily, 6 times")
-      expect(edit_event_rule_text.text).to include("Jul 23, 12am - 1am")
+      expect(edit_event_rule_text.text).to include("Jul 23, 2023, 12am - 1am")
 
       click_edit_event_button
       enter_event_title("updated event title")
@@ -955,7 +955,7 @@ describe "recurring events" do
       expect(events.length).to eq 3
       events[0].click
       expect(edit_event_rule_text.text).to include("Daily, 6 times")
-      expect(edit_event_rule_text.text).to include("Jul 23, 12am - 1am")
+      expect(edit_event_rule_text.text).to include("Jul 23, 2023, 12am - 1am")
     end
   end
 
@@ -1004,11 +1004,11 @@ describe "recurring events" do
       events = events_in_a_series("event in a series")
       events[0].click
       expect(edit_event_rule_text.text).to include("Daily, 1 time")
-      expect(edit_event_rule_text.text).to include("Jul 20, 12am - 1am")
+      expect(edit_event_rule_text.text).to include("Jul 20, 2023, 12am - 1am")
 
       events[1].click
       expect(edit_event_rule_text.text).to include("Daily, 5 times")
-      expect(edit_event_rule_text.text).to include("Jul 21, 11am - 12pm")
+      expect(edit_event_rule_text.text).to include("Jul 21, 2023, 11am - 12pm")
     end
 
     it "shows events series with RRULE change in week view" do
@@ -1040,11 +1040,11 @@ describe "recurring events" do
       events[0].click
 
       expect(edit_event_rule_text.text).to include("Daily, 3 times")
-      expect(edit_event_rule_text.text).to include("Aug 6, 12am - 1am")
+      expect(edit_event_rule_text.text).to include("Aug 6, 2023, 12am - 1am")
 
       events[3].click
       expect(edit_event_rule_text.text).to include("Weekly on Thu, Fri, 6 times")
-      expect(edit_event_rule_text.text).to include("Aug 10, 12am - 1am")
+      expect(edit_event_rule_text.text).to include("Aug 10, 2023, 12am - 1am")
     end
   end
 
@@ -1087,11 +1087,11 @@ describe "recurring events" do
 
       events[0].click
       expect(edit_event_rule_text.text).to include("Daily, 3 times")
-      expect(edit_event_rule_text.text).to include("Jul 20, 12am - 1am")
+      expect(edit_event_rule_text.text).to include("Jul 20, 2023, 12am - 1am")
 
       events[3].click
       expect(edit_event_rule_text.text).to include("Daily, 3 times")
-      expect(edit_event_rule_text.text).to include("Jul 23, 11am - 12pm")
+      expect(edit_event_rule_text.text).to include("Jul 23, 2023, 11am - 12pm")
     end
 
     it "shows events series in agenda view with RRULE change" do
@@ -1118,11 +1118,11 @@ describe "recurring events" do
       events = agenda_events("event in a series")
 
       events[0].click
-      expect(edit_event_rule_text.text).to include("Jul 20, 12am - 1am")
+      expect(edit_event_rule_text.text).to include("Jul 20, 2023, 12am - 1am")
 
       events[3].click
       expect(edit_event_rule_text.text).to include("Weekly on Thu, Fri, 6 times")
-      expect(edit_event_rule_text.text).to include("Jul 27, 12am - 1am")
+      expect(edit_event_rule_text.text).to include("Jul 27, 2023, 12am - 1am")
     end
   end
 end
