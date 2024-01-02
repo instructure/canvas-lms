@@ -18,8 +18,7 @@
  */
 
 import $ from 'jquery'
-import _ from 'underscore'
-import {map} from 'lodash'
+import {map, pick, each, filter, partial} from 'lodash'
 import '@canvas/backbone/createStore'
 import type {AssignmentWithOverride} from '../default_gradebook/gradebook.d'
 
@@ -39,7 +38,7 @@ const assignmentUtils = {
     please_ignore: boolean
     original_error: boolean
   } {
-    const a: PartialAssignment = _.pick(assignment, [
+    const a: PartialAssignment = pick(assignment, [
       'id',
       'name',
       'due_at',
@@ -58,7 +57,7 @@ const assignmentUtils = {
   },
 
   nameTooLong(a: {name: string}) {
-    if (_.unescape(a.name).length > 30) {
+    if (unescape(a.name).length > 30) {
       return true
     } else {
       return false
@@ -74,7 +73,7 @@ const assignmentUtils = {
   },
 
   notUniqueName(assignments: PartialAssignment[], a: AssignmentWithOverride) {
-    const fn = _.partial(assignmentUtils.namesMatch, a)
+    const fn = partial(assignmentUtils.namesMatch, a)
     return assignments.some(fn)
   },
 
@@ -96,7 +95,7 @@ const assignmentUtils = {
     // being viewed for that section. If the override is valid make
     // original error false so that the override is not shown. Vice versa
     // for the invalid override on the assignment.
-    _.each(assignments, (a: AssignmentWithOverride) => {
+    each(assignments, (a: AssignmentWithOverride) => {
       if (
         typeof a.recentlyUpdated === 'boolean' &&
         a.recentlyUpdated &&
@@ -168,23 +167,23 @@ const assignmentUtils = {
         a.original_error = false
       }
     })
-    return _.filter(assignments, a => Boolean(a.original_error && !a.please_ignore))
+    return filter(assignments, a => Boolean(a.original_error && !a.please_ignore))
   },
 
   withOriginalErrorsNotIgnored(assignments: AssignmentWithOverride[]) {
-    return _.filter(assignments, a => (a.original_error || a.hadOriginalErrors) && !a.please_ignore)
+    return filter(assignments, a => (a.original_error || a.hadOriginalErrors) && !a.please_ignore)
   },
 
   withErrors(assignments: AssignmentWithOverride[]) {
-    return _.filter(assignments, a => assignmentUtils.hasError(assignments, a))
+    return filter(assignments, a => assignmentUtils.hasError(assignments, a))
   },
 
   notIgnored(assignments: AssignmentWithOverride[]) {
-    return _.filter(assignments, a => !a.please_ignore)
+    return filter(assignments, a => !a.please_ignore)
   },
 
   needsGrading(assignments: AssignmentWithOverride[]) {
-    return _.filter(assignments, a => a.needs_grading_count > 0)
+    return filter(assignments, a => a.needs_grading_count > 0)
   },
 
   hasError(assignments: PartialAssignment[], a: AssignmentWithOverride) {

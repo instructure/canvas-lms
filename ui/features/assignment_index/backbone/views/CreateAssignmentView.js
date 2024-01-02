@@ -17,8 +17,7 @@
  */
 
 import {extend} from '@canvas/backbone/utils'
-import _ from 'underscore'
-import {each} from 'lodash'
+import {each, isEmpty, includes, extend as lodashExtend} from 'lodash'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import DialogFormView, {
   isSmallTablet,
@@ -54,7 +53,7 @@ CreateAssignmentView.prototype.defaults = {
   height: 380,
 }
 
-CreateAssignmentView.prototype.events = _.extend({}, CreateAssignmentView.prototype.events, {
+CreateAssignmentView.prototype.events = lodashExtend({}, CreateAssignmentView.prototype.events, {
   'click .dialog_closer': 'close',
   'click .save_and_publish': 'saveAndPublish',
   'click .more_options': 'moreOptions',
@@ -130,7 +129,7 @@ CreateAssignmentView.prototype.moreOptions = function () {
   }
   const dataParams = {}
   each(data, function (value, key) {
-    if (_.includes(valid, key)) {
+    if (includes(valid, key)) {
       return (dataParams[key] = value)
     }
   })
@@ -171,7 +170,7 @@ CreateAssignmentView.prototype.toJSON = function () {
   const uniqLabel = this.assignmentGroup
     ? 'ag_' + this.assignmentGroup.get('id')
     : 'assign_' + this.model.get('id')
-  _.extend(json, {
+  lodashExtend(json, {
     canChooseType: this.assignmentGroup != null,
     uniqLabel,
     disableDueAt: this.disableDueAt(),
@@ -199,7 +198,7 @@ CreateAssignmentView.prototype.currentUserIsAdmin = function () {
 }
 
 CreateAssignmentView.prototype.disableDueAt = function () {
-  return _.includes(this.model.frozenAttributes(), 'due_at') || this.model.inClosedGradingPeriod()
+  return includes(this.model.frozenAttributes(), 'due_at') || this.model.inClosedGradingPeriod()
 }
 
 CreateAssignmentView.prototype.openAgain = function () {
@@ -263,7 +262,7 @@ CreateAssignmentView.prototype.validateBeforeSave = function (data, errors) {
 
 CreateAssignmentView.prototype._validateTitle = function (data, errors) {
   let max_name_length
-  if (_.includes(this.model.frozenAttributes(), 'title')) {
+  if (includes(this.model.frozenAttributes(), 'title')) {
     return errors
   }
   const post_to_sis = data.post_to_sis === '1'
@@ -300,7 +299,7 @@ CreateAssignmentView.prototype._validateTitle = function (data, errors) {
 }
 
 CreateAssignmentView.prototype._validatePointsPossible = function (data, errors) {
-  if (_.includes(this.model.frozenAttributes(), 'points_possible')) {
+  if (includes(this.model.frozenAttributes(), 'points_possible')) {
     return errors
   }
   // eslint-disable-next-line no-restricted-globals
@@ -349,13 +348,13 @@ CreateAssignmentView.prototype._validateDueDate = function (data, errors) {
   data.unlock_at = this.model.unlockAt()
   data.persisted = !this._dueAtHasChanged(data.due_at)
   const dateValidator = new DateValidator({
-    date_range: _.extend({}, validRange),
+    date_range: lodashExtend({}, validRange),
     hasGradingPeriods: !!ENV.HAS_GRADING_PERIODS,
     gradingPeriods: GradingPeriodsAPI.deserializePeriods(ENV.active_grading_periods),
     userIsAdmin: this.currentUserIsAdmin(),
   })
   const errs = dateValidator.validateDatetimes(data)
-  if (_.isEmpty(errs)) {
+  if (isEmpty(errs)) {
     return errors
   }
   // need to override default error message to focus only on due date field for quick add/edit

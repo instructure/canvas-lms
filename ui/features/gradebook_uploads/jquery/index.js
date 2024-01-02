@@ -17,7 +17,7 @@
  */
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'underscore'
+import {each, find, every} from 'lodash'
 import htmlEscape from 'html-escape'
 import numberHelper from '@canvas/i18n/numberHelper'
 import {waitForProcessing} from './wait_for_processing'
@@ -440,18 +440,15 @@ const GradebookUploader = {
                   break
                 default: {
                   // merge
-                  const obj = _.find(uploadedGradebook[`${thing}s`], thng => id == thng.id)
+                  const obj = find(uploadedGradebook[`${thing}s`], thng => id == thng.id)
                   obj.id = obj.previous_id = val
                   if (thing === 'assignment') {
                     // find the original grade for this assignment for each student
                     $.each(uploadedGradebook.students, function () {
                       const student = this
-                      const submission = _.find(
-                        student.submissions,
-                        thng => thng.assignment_id == id
-                      )
+                      const submission = find(student.submissions, thng => thng.assignment_id == id)
                       submission.assignment_id = val
-                      const original_submission = _.find(
+                      const original_submission = find(
                         uploadedGradebook.original_submissions,
                         sub => sub.user_id == student.id && sub.assignment_id == val
                       )
@@ -464,7 +461,7 @@ const GradebookUploader = {
                     // find the original grade for each assignment for this student
                     $.each(obj.submissions, function () {
                       const submission = this
-                      const original_submission = _.find(
+                      const original_submission = find(
                         uploadedGradebook.original_submissions,
                         sub =>
                           sub.user_id == obj.id && sub.assignment_id == submission.assignment_id
@@ -484,7 +481,7 @@ const GradebookUploader = {
           $.each(uploadedGradebook.assignments, index => {
             if (
               uploadedGradebook.assignments[index].previous_id &&
-              _.every(uploadedGradebook.students, student => {
+              every(uploadedGradebook.students, student => {
                 const submission = student.submissions[index]
 
                 return (
@@ -496,7 +493,7 @@ const GradebookUploader = {
               indexes_to_delete.push(index)
             }
           })
-          _.each(indexes_to_delete.reverse(), index => {
+          each(indexes_to_delete.reverse(), index => {
             uploadedGradebook.assignments.splice(index, 1)
             $.each(uploadedGradebook.students, function () {
               this.submissions.splice(index, 1)

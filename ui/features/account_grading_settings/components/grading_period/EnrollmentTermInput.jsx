@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {map, groupBy, reject, isEmpty, findWhere, some, union, uniq, includes, isDate} from 'lodash'
+import {map, groupBy, reject, isEmpty, find, some, union, uniq, includes, isDate} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import TokenInput, {Option as ComboboxOption} from 'react-tokeninput'
 
@@ -127,7 +127,7 @@ class EnrollmentTermInput extends React.Component {
 
   selectedEnrollmentTerms = () =>
     map(this.props.selectedIDs, id => {
-      const term = findWhere(this.props.enrollmentTerms, {id})
+      const term = find(this.props.enrollmentTerms, {id})
       const termForDisplay = {...term}
       termForDisplay.name = term.displayName
       return termForDisplay

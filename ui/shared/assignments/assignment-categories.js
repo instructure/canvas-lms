@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
+import {find} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('assignment_categories')
@@ -67,10 +67,10 @@ const Categories = {
 }
 
 Categories.getCategory = assg => {
-  const category = _.find(Categories.list, cat => {
+  const category = find(Categories.list, cat => {
     return (
       assg.submission_types.length &&
-      _.find(assg.submission_types, sub => cat.submissionTypes.indexOf(sub) !== -1)
+      find(assg.submission_types, sub => cat.submissionTypes.indexOf(sub) !== -1)
     )
   })
   return category || OTHER
