@@ -1681,7 +1681,7 @@ sv:
     - nov
     - dec
     formats:
-      date_at_time: "%b %-d at %k:%M"
+      date_at_time: "%b %-d kl. %k:%M"
       default: "%Y-%m-%d"
       full: "%-d %b %Y %k.%M"
       full_with_weekday: "%a den %-d %b %Y %k.%M"
