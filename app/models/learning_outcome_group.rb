@@ -279,8 +279,9 @@ class LearningOutcomeGroup < ActiveRecord::Base
     end
   end
 
-  scope :active, -> { where("learning_outcome_groups.workflow_state<>'deleted'") }
+  scope :active, -> { where("learning_outcome_groups.workflow_state NOT IN ('deleted', 'archived')") }
   scope :active_first, -> { order(Arel.sql("CASE WHEN workflow_state = 'active' THEN 0 ELSE 1 END")) }
+  scope :archived, -> { where("learning_outcome_groups.workflow_state = 'archived' AND learning_outcome_groups.archived_at IS NOT NULL") }
 
   scope :global, -> { where(context_id: nil) }
 
