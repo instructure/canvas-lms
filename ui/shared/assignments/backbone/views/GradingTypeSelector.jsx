@@ -19,9 +19,9 @@
 /* eslint-disable no-void */
 
 import {extend} from '@canvas/backbone/utils'
+import {includes} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import Backbone from '@canvas/backbone'
-import _ from 'underscore'
 import $ from 'jquery'
 import template from '../../jst/GradingTypeSelector.handlebars'
 import '../../jquery/toggleAccessibly'
@@ -152,7 +152,7 @@ GradingTypeSelector.prototype.toJSON = function () {
       this.preventNotGraded ||
       (((ref = this.lockedItems) != null ? ref.points : void 0) && !this.parentModel.isNotGraded()),
     freezeGradingType:
-      _.includes(this.parentModel.frozenAttributes(), 'grading_type') ||
+      includes(this.parentModel.frozenAttributes(), 'grading_type') ||
       this.parentModel.inClosedGradingPeriod() ||
       (((ref1 = this.lockedItems) != null ? ref1.points : void 0) &&
         this.parentModel.isNotGraded()) ||

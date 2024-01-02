@@ -18,8 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import _ from 'underscore'
-import {map} from 'lodash'
+import {map, groupBy, reject, isEmpty, findWhere, some, union, uniq, includes, isDate} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import TokenInput, {Option as ComboboxOption} from 'react-tokeninput'
 
@@ -27,9 +26,9 @@ const I18n = useI18nScope('EnrollmentTermInput')
 
 const groupByTagType = function (options) {
   const now = new Date()
-  return _.groupBy(options, option => {
-    const noStartDate = !_.isDate(option.startAt)
-    const noEndDate = !_.isDate(option.endAt)
+  return groupBy(options, option => {
+    const noStartDate = !isDate(option.startAt)
+    const noEndDate = !isDate(option.endAt)
     const started = option.startAt < now
     const ended = option.endAt < now
 
@@ -56,20 +55,20 @@ class EnrollmentTermInput extends React.Component {
   }
 
   handleSelect = (value, _combobox) => {
-    const termIDs = _.pluck(this.props.enrollmentTerms, 'id')
-    if (_.includes(termIDs, value)) {
-      const selectedIDs = _.uniq(this.props.selectedIDs.concat([value]))
+    const termIDs = map(this.props.enrollmentTerms, 'id')
+    if (includes(termIDs, value)) {
+      const selectedIDs = uniq(this.props.selectedIDs.concat([value]))
       this.handleChange(selectedIDs)
     }
   }
 
   handleRemove = termToRemove => {
-    const selectedTermIDs = _.reject(this.props.selectedIDs, termID => termToRemove.id === termID)
+    const selectedTermIDs = reject(this.props.selectedIDs, termID => termToRemove.id === termID)
     this.handleChange(selectedTermIDs)
   }
 
   selectableTerms = () =>
-    _.reject(this.props.enrollmentTerms, term => _.includes(this.props.selectedIDs, term.id))
+    reject(this.props.enrollmentTerms, term => includes(this.props.selectedIDs, term.id))
 
   filteredTagsForType = type => {
     const groupedTags = groupByTagType(this.selectableTerms())
@@ -86,10 +85,10 @@ class EnrollmentTermInput extends React.Component {
   )
 
   optionsForAllTypes = () => {
-    if (_.isEmpty(this.selectableTerms())) {
+    if (isEmpty(this.selectableTerms())) {
       return [this.headerOption('none')]
     } else {
-      return _.union(
+      return union(
         this.optionsForType('active'),
         this.optionsForType('undated'),
         this.optionsForType('future'),
@@ -101,7 +100,7 @@ class EnrollmentTermInput extends React.Component {
   optionsForType = optionType => {
     const header = this.headerOption(optionType)
     const options = this.selectableOptions(optionType)
-    return _.some(options) ? _.union([header], options) : []
+    return some(options) ? union([header], options) : []
   }
 
   headerOption = heading => {
@@ -128,7 +127,7 @@ class EnrollmentTermInput extends React.Component {
 
   selectedEnrollmentTerms = () =>
     map(this.props.selectedIDs, id => {
-      const term = _.findWhere(this.props.enrollmentTerms, {id})
+      const term = findWhere(this.props.enrollmentTerms, {id})
       const termForDisplay = {...term}
       termForDisplay.name = term.displayName
       return termForDisplay

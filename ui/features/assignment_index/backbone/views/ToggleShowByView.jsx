@@ -19,8 +19,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'underscore'
-import {each} from 'lodash'
+import {each, flatten, filter, difference} from 'lodash'
 import Backbone from '@canvas/backbone'
 import Cache from '../../cache'
 import AssignmentGroup from '@canvas/assignments/backbone/models/AssignmentGroup'
@@ -49,9 +48,9 @@ export default class ToggleShowByView extends Backbone.View {
   }
 
   initializeDateGroups() {
-    const assignments = _.flatten(this.assignmentGroups.map(ag => ag.get('assignments').models))
-    const dated = _.filter(assignments, a => a.dueAt())
-    const undated = _.difference(assignments, dated)
+    const assignments = flatten(this.assignmentGroups.map(ag => ag.get('assignments').models))
+    const dated = filter(assignments, a => a.dueAt())
+    const undated = difference(assignments, dated)
     const past = []
     const overdue = []
     const upcoming = []
@@ -138,7 +137,7 @@ export default class ToggleShowByView extends Backbone.View {
   setAssignmentGroups() {
     let groups = this.showByDate() ? this.groupedByDate : this.groupedByAG
     this.setAssignmentGroupAssociations(groups)
-    groups = _.filter(groups, group => {
+    groups = filter(groups, group => {
       const hasWeight =
         this.course.get('apply_assignment_group_weights') && group.get('group_weight') > 0
       return group.get('assignments').length > 0 || hasWeight

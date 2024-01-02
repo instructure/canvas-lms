@@ -18,8 +18,7 @@
 
 import {extend} from '@canvas/backbone/utils'
 import Backbone from '@canvas/backbone'
-import _ from 'underscore'
-import {map} from 'lodash'
+import {map, difference} from 'lodash'
 import AssignmentOverride from '../models/AssignmentOverride'
 import Section from '@canvas/sections/backbone/models/Section'
 
@@ -80,7 +79,7 @@ AssignmentOverrideCollection.prototype.datesJSON = function () {
 }
 
 AssignmentOverrideCollection.prototype.isSimple = function () {
-  return _.difference(this.courseSectionIDs(), [Section.defaultDueDateSectionID]).length === 0
+  return difference(this.courseSectionIDs(), [Section.defaultDueDateSectionID]).length === 0
 }
 
 export default AssignmentOverrideCollection
