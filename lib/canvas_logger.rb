@@ -24,7 +24,7 @@ class CanvasLogger < ActiveSupport::Logger
     unless File.exist?(log_path)
       FileUtils.mkdir_p(File.dirname(log_path))
     end
-    super(log_path, level)
+    super(log_path, level: level)
     @log_path = log_path
     @skip_thread_context = options[:skip_thread_context]
   end
