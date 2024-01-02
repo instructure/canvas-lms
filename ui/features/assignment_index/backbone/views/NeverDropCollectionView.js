@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import {extend} from '@canvas/backbone/utils'
-import _ from 'underscore'
+import {debounce} from 'lodash'
 import CollectionView from '@canvas/backbone-collection-view'
 import NeverDropView from './NeverDropView'
 import template from '../../jst/NeverDropCollection.handlebars'
@@ -44,7 +44,7 @@ NeverDropCollectionView.prototype.initialize = function () {
   // feed all events that should trigger a render
   // through a custom event so that we only render
   // once per batch of changes
-  this.on('should-render', _.debounce(this.render, 100))
+  this.on('should-render', debounce(this.render, 100))
   return NeverDropCollectionView.__super__.initialize.apply(this, arguments)
 }
 

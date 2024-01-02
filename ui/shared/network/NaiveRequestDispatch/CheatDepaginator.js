@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import _ from 'underscore'
+import {isArray, find} from 'lodash'
 import '@canvas/jquery/jquery.ajaxJSON'
 
 /*
@@ -33,7 +33,7 @@ function consumePagesInOrder(callback, data) {
   const orderedConsumer = (response, page) => {
     if (page === wantedPage) {
       if (callback) callback(response)
-      if (_.isArray(response)) {
+      if (isArray(response)) {
         data.push(...response)
       } else {
         data.push(response)
@@ -43,7 +43,7 @@ function consumePagesInOrder(callback, data) {
       pendingResponses.push([response, page])
     }
 
-    const nextPage = _.find(pendingResponses, ([_pageData, pageNum]) => pageNum === wantedPage)
+    const nextPage = find(pendingResponses, ([_pageData, pageNum]) => pageNum === wantedPage)
     if (nextPage) {
       const [pageData, pageNum] = nextPage
       orderedConsumer(pageData, pageNum)

@@ -18,8 +18,7 @@
 import round from '@canvas/round'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'underscore'
-import {each} from 'lodash'
+import {each, extend as lodashExtend} from 'lodash'
 import numberHelper from '@canvas/i18n/numberHelper'
 import AssignmentGroup from '@canvas/assignments/backbone/models/AssignmentGroup'
 import NeverDropCollection from '../collections/NeverDropCollection'
@@ -170,7 +169,7 @@ class CreateGroupView extends DialogFormView {
 
   toJSON() {
     const data = this.model.toJSON()
-    return _.extend(data, {
+    return lodashExtend(data, {
       show_weight: this.showWeight(),
       can_change_weighting: this.canChangeWeighting(),
       group_weight: this.showWeight() ? data.group_weight : null,
@@ -200,7 +199,7 @@ CreateGroupView.prototype.defaults = {
   height: 500,
 }
 
-CreateGroupView.prototype.events = _.extend({}, CreateGroupView.prototype.events, {
+CreateGroupView.prototype.events = lodashExtend({}, CreateGroupView.prototype.events, {
   'click .dialog_closer': 'close',
   'blur .group_weight': 'roundWeight',
 })

@@ -18,7 +18,7 @@
 import ModuleCollection from '@canvas/modules/backbone/collections/ModuleCollection'
 import {savedObservedId} from '@canvas/observer-picker/ObserverGetObservee'
 import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection'
-import _ from 'underscore'
+import _ from 'lodash'
 import AssignmentGroup from '../models/AssignmentGroup'
 import SubmissionCollection from './SubmissionCollection'
 

@@ -23,8 +23,7 @@ import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import round from '@canvas/round'
 import numberHelper from '@canvas/i18n/numberHelper'
-import _ from 'underscore'
-import {each} from 'lodash'
+import {each, some, extend as lodashExtend} from 'lodash'
 import DialogFormView, {getResponsiveWidth} from '@canvas/forms/backbone/views/DialogFormView'
 import wrapper from '@canvas/forms/jst/EmptyDialogFormWrapper.handlebars'
 import assignmentSettingsTemplate from '../../jst/AssignmentSettings.handlebars'
@@ -47,11 +46,15 @@ AssignmentSettingsView.prototype.defaults = {
   collapsedHeight: 300,
 }
 
-AssignmentSettingsView.prototype.events = _.extend({}, AssignmentSettingsView.prototype.events, {
-  'click .dialog_closer': 'cancel',
-  'click #apply_assignment_group_weights': 'toggleTableByClick',
-  'keyup .group_weight_value': 'updateTotalWeight',
-})
+AssignmentSettingsView.prototype.events = lodashExtend(
+  {},
+  AssignmentSettingsView.prototype.events,
+  {
+    'click .dialog_closer': 'cancel',
+    'click #apply_assignment_group_weights': 'toggleTableByClick',
+    'keyup .group_weight_value': 'updateTotalWeight',
+  }
+)
 
 AssignmentSettingsView.optionProperty('assignmentGroups')
 
@@ -97,7 +100,7 @@ AssignmentSettingsView.prototype.openAgain = function () {
 AssignmentSettingsView.prototype.canChangeWeights = function () {
   return (
     this.userIsAdmin ||
-    !_.some(this.assignmentGroups.models, function (ag) {
+    !some(this.assignmentGroups.models, function (ag) {
       return ag.anyAssignmentInClosedGradingPeriod()
     })
   )

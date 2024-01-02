@@ -19,8 +19,7 @@
 import {extend} from '@canvas/backbone/utils'
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
-import _ from 'underscore'
-import {each} from 'lodash'
+import {each, isEmpty, extend as lodashExtend} from 'lodash'
 import CollectionView from '@canvas/backbone-collection-view'
 import 'jqueryui/sortable'
 
@@ -90,7 +89,7 @@ DraggableCollectionView.prototype.initSort = function (opts) {
   }
   this.$list
     .sortable(
-      _.extend({}, this.sortOptions, opts, {
+      lodashExtend({}, this.sortOptions, opts, {
         scope: this.cid,
       })
     )
@@ -186,7 +185,7 @@ DraggableCollectionView.prototype._removeFromGroup = function (model) {
   old_children.remove(model, {
     silent: true,
   })
-  return (this.empty = _.isEmpty(old_children.models))
+  return (this.empty = isEmpty(old_children.models))
 }
 
 DraggableCollectionView.prototype._addToGroup = function (model) {

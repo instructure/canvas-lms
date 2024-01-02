@@ -15,18 +15,17 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import _ from 'underscore'
-import {map} from 'lodash'
+import {map, flatten, isNumber} from 'lodash'
 import NaiveRequestDispatch from '@canvas/network/NaiveRequestDispatch/index'
 
 const listUrl = () => ENV.ENROLLMENT_TERMS_URL
 
 const deserializeTerms = termGroups =>
-  _.flatten(
+  flatten(
     map(termGroups, group =>
       map(group.enrollment_terms, term => {
         const groupID = term.grading_period_group_id
-        const newGroupID = _.isNumber(groupID) ? groupID.toString() : groupID
+        const newGroupID = isNumber(groupID) ? groupID.toString() : groupID
         return {
           id: term.id.toString(),
           name: term.name,

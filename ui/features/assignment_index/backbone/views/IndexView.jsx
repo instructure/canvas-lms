@@ -19,43 +19,24 @@
 /* eslint-disable no-void */
 
 import {extend} from '@canvas/backbone/utils'
-
+import {debounce} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
-
 import KeyboardNavDialog from '@canvas/keyboard-nav-dialog'
-
 import keyboardNavTemplate from '@canvas/keyboard-nav-dialog/jst/KeyboardNavDialog.handlebars'
-
 import $ from 'jquery'
-
-import _ from 'underscore'
-
 import Backbone from '@canvas/backbone'
-
 import React from 'react'
-
 import ReactDOM from 'react-dom'
-
 import template from '../../jst/IndexView.handlebars'
-
 import NoAssignments from '../../jst/NoAssignmentsSearch.handlebars'
-
 import AssignmentKeyBindingsMixin from '../mixins/AssignmentKeyBindingsMixin'
-
 import userSettings from '@canvas/user-settings'
-
 import GradingPeriodsAPI from '@canvas/grading/jquery/gradingPeriodsApi'
-
 import IndexMenu from '../../react/IndexMenu'
-
 import configureIndexMenuStore from '../../react/stores/indexMenuStore'
-
 import BulkEditIndex from '../../react/bulk_edit/BulkEditIndex'
-
 import '@canvas/rails-flash-notifications'
-
 import easy_student_view from '@canvas/easy-student-view'
-
 import {TextInput} from '@instructure/ui-text-input'
 import {IconSearchLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -246,7 +227,7 @@ IndexView.prototype.clearSearch = function () {
   return this.filterResults()
 }
 
-IndexView.prototype.search = _.debounce(function () {
+IndexView.prototype.search = debounce(function () {
   return this.filterResults()
 }, 200)
 
