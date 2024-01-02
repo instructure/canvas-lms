@@ -266,6 +266,8 @@ describe Rubric do
       expect(result.possible).to be(3.0)
       expect(result.original_score).to be(2.0)
       expect(result.mastery).to be_truthy
+      expect(@rubric.learning_outcome_results).to eq([result])
+      expect(@rubric.learning_outcome_ids_from_results).to eq([result.learning_outcome_id])
     end
 
     it "destroys an outcome link after the assignment using it is destroyed (if it's not used anywhere else)" do
