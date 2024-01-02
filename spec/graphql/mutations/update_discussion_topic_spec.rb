@@ -39,7 +39,8 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     lock_at: nil,
     file_id: nil,
     remove_attachment: nil,
-    assignment: nil
+    assignment: nil,
+    group_category_id: nil
   )
     <<~GQL
       mutation {
@@ -55,6 +56,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
           #{"lockAt: \"#{lock_at}\"" unless lock_at.nil?}
           #{"removeAttachment: #{remove_attachment}" unless remove_attachment.nil?}
           #{"fileId: #{file_id}" unless file_id.nil?}
+          #{"groupCategoryId: #{group_category_id}" unless group_category_id.nil?}
           #{assignment_str(assignment)}
         }) {
           discussionTopic {
@@ -111,6 +113,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     args << "pointsPossible: #{assignment[:pointsPossible]}" if assignment[:pointsPossible]
     args << "postToSis: #{assignment[:postToSis]}" if assignment.key?(:postToSis)
     args << "assignmentGroupId: \"#{assignment[:assignmentGroupId]}\"" if assignment[:assignmentGroupId]
+    args << "groupCategoryId: #{assignment[:groupCategoryId]}" if assignment[:groupCategoryId]
     args << "dueAt: \"#{assignment[:dueAt]}\"" if assignment[:dueAt]
     args << "state: #{assignment[:state]}" if assignment[:state]
     args << "onlyVisibleToOverrides: #{assignment[:onlyVisibleToOverrides]}" if assignment.key?(:onlyVisibleToOverrides)
@@ -412,6 +415,24 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       expect(Assignment.find(@discussion_assignment.id).workflow_state).to eq "deleted"
       expect(@topic.reload.assignment).to be_nil
       expect(@topic.is_section_specific).to be_truthy
+    end
+
+    it "updates the group category id" do
+      group_category_old = @course.group_categories.create!(name: "Old Group Category")
+      group_category_new = @course.group_categories.create!(name: "New Group Category")
+      @topic.update!(group_category: group_category_old)
+      result = run_mutation(id: @topic.id, group_category_id: group_category_new.id, assignment: { groupCategoryId: group_category_new.id })
+      @topic.reload
+      expect(result["errors"]).to be_nil
+      expect(@topic.group_category_id).to eq group_category_new.id
+    end
+
+    it "returns error when the discussion group category id does not match the assignment" do
+      group_category_old = @course.group_categories.create!(name: "Old Group Category")
+      group_category_new = @course.group_categories.create!(name: "New Group Category")
+      @topic.update!(group_category: group_category_old)
+      result = run_mutation(id: @topic.id, group_category_id: group_category_new.id, assignment: { groupCategoryId: group_category_old.id })
+      expect(result["errors"][0]["message"]).to eq "Assignment group category id and discussion topic group category id do not match"
     end
   end
 end
