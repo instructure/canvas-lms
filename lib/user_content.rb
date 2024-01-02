@@ -172,8 +172,9 @@ module UserContent
       @user = user
       @contextless_types = contextless_types
       @context_prefix = "/#{context.class.name.tableize}/#{context.id}"
+      @context_regex = %r{(?:/(#{context.class.name.tableize})/(#{context.id})|/(assessment_questions)/(\d+))}
       @absolute_part = '(https?://[\w-]+(?:\.[\w-]+)*(?:\:\d{1,5})?)?'
-      @toplevel_regex = %r{#{@absolute_part}(#{@context_prefix})?/(\w+)(?:/([^\s"<'?/]*)([^\s"<']*))?}
+      @toplevel_regex = %r{#{@absolute_part}#{@context_regex}?/(\w+)(?:/([^\s"<'?/]*)([^\s"<']*))?}
       @handlers = {}
       @default_handler = nil
       @unknown_handler = nil
@@ -182,7 +183,7 @@ module UserContent
 
     attr_reader :user, :context
 
-    UriMatch = Struct.new(:url, :type, :obj_class, :obj_id, :rest, :prefix) do
+    UriMatch = Struct.new(:url, :type, :obj_class, :obj_id, :rest, :prefix, :context_type, :context_id) do
       def query
         rest && rest[/\?.*/]
       end
@@ -232,7 +233,8 @@ module UserContent
     def replacement(url)
       asset_types = AssetTypes.slice(*@allowed_types)
       matched = url.match(@toplevel_regex)
-      prefix, type, obj_id, rest = [matched[2], matched[3], matched[4], matched[5]]
+      context_type, context_id, type, obj_id, rest = [matched[2] || matched[4], matched[3] || matched[5], matched[6], matched[7], matched[8]]
+      prefix = "/#{context_type}/#{context_id}" if context_type && context_id
       return url if !@contextless_types.include?(type) && prefix != @context_prefix && url.split("?").first != @context_prefix
 
       if type != "wiki" && type != "pages"
@@ -252,7 +254,7 @@ module UserContent
       if asset_types.key?(type)
         klass = asset_types[type]
         klass = klass.to_s.constantize if klass
-        match = UriMatch.new(url, type, klass, obj_id, rest, prefix)
+        match = UriMatch.new(url, type, klass, obj_id, rest, prefix, context_type, context_id)
         handler = @handlers[type] || @default_handler
         converted = handler&.call(match)
       else

@@ -19,8 +19,8 @@
 #
 
 module Factories
-  def assessment_question_bank_model
-    @course ||= course_model(reusable: true)
+  def assessment_question_bank_model(course: nil)
+    @course ||= course || course_model(reusable: true)
     @bank = @course.assessment_question_banks.create!(title: "Test Bank")
   end
 
