@@ -767,6 +767,35 @@ describe Types::DiscussionType do
     end
   end
 
+  context "editing group category id" do
+    it "changing group category id returns only group new group child topics" do
+      course = @course || course_factory(active_all: true)
+
+      discussion = course.discussion_topics.build(title: "topic")
+      discussion.save!
+
+      group_category_a = course.group_categories.create(name: "category_a", context: course, context_type: "Course", account: course.account)
+      group_category_a.groups.create!(name: "group 1a", context: course, context_type: "Course", account: course.account)
+      group_category_a.groups.create!(name: "group 2a", context: course, context_type: "Course", account: course.account)
+
+      group_category_b = course.group_categories.create(name: "category_b", context: course, context_type: "Course", account: course.account)
+      group_category_b.groups.create!(name: "group 1b", context: course, context_type: "Course", account: course.account)
+      group_category_b.groups.create!(name: "group 2b", context: course, context_type: "Course", account: course.account)
+
+      discussion.group_category = group_category_a
+      discussion.save!
+
+      discussion_type = GraphQLTypeTester.new(discussion, current_user: @teacher)
+
+      expect(discussion_type.resolve("childTopics { contextName }")).to match_array(["group 1a", "group 2a"])
+
+      discussion.group_category = group_category_b
+      discussion.save!
+
+      expect(discussion_type.resolve("childTopics { contextName }")).to match_array(["group 1b", "group 2b"])
+    end
+  end
+
   context "group discussion context name sorting" do
     let_once(:discussion) do
       course = @course || course_factory(active_all: true)
