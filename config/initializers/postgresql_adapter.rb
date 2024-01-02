@@ -34,7 +34,8 @@ module PostgreSQLAdapterExtensions
   def configure_connection
     super
 
-    @connection.set_notice_receiver do |result|
+    conn = (Rails.version < "7.1") ? @connection : @raw_connection
+    conn.set_notice_receiver do |result|
       severity = result.result_error_field(PG::PG_DIAG_SEVERITY_NONLOCALIZED)
       rails_severity = case severity
                        when "WARNING", "NOTICE"
@@ -243,7 +244,7 @@ module PostgreSQLAdapterExtensions
     # internal_metadata to exist and this guard isn't really useful there either
     return if ["schema_migrations", "internal_metadata"].include?(table_name)
     # If the function doesn't exist yet it will be backfilled
-    return unless ::ActiveRecord::InternalMetadata[:guard_dangerous_changes_installed]
+    return unless ((Rails.version < "7.1") ? ::ActiveRecord::InternalMetadata : ::ActiveRecord::InternalMetadata.new(self))[:guard_dangerous_changes_installed]
 
     ["UPDATE", "DELETE"].each do |operation|
       trigger_name = "guard_excessive_#{operation.downcase}s"
@@ -452,6 +453,11 @@ module ReferenceDefinitionExtensions
 end
 
 module SchemaStatementsExtensions
+  # TODO: move this to activerecord-pg-extensions
+  def valid_column_definition_options
+    super + [:delay_validation]
+  end
+
   def add_column_for_alter(table_name, column_name, type, **options)
     td = create_table_definition(table_name)
     cd = td.new_column_definition(column_name, type, **options)
