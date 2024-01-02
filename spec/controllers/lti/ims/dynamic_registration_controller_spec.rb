@@ -32,14 +32,10 @@ describe Lti::IMS::DynamicRegistrationController do
   openapi_location = File.join(File.dirname(__FILE__), "openapi", "dynamic_registration.yml")
   openapi_spec = YAML.load_file(openapi_location)
 
-  verifier = OpenApiSpecHelper::SchemaVerifier.new(openapi_spec)
+  include OpenApiSpecHelper
 
   before do
     Account.default.root_account.enable_feature! :lti_dynamic_registration
-  end
-
-  after do
-    verifier.verify(request, response) if response.sent?
   end
 
   it "has openapi documentation for each of our controller routes" do
