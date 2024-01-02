@@ -18,7 +18,7 @@
  */
 
 import $ from 'jquery'
-import _ from 'underscore'
+import {where, isEmpty} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import assignmentUtils from './assignmentUtils'
@@ -103,7 +103,7 @@ class AssignmentCorrectionRow extends React.Component<Props> {
 
   currentSectionforOverride = a => {
     if (
-      _.isEmpty(_.where(a.overrides, {course_section_id: a.currentlySelected.id.toString()})) ||
+      isEmpty(where(a.overrides, {course_section_id: a.currentlySelected.id.toString()})) ||
       a.currentlySelected.type === 'course'
     ) {
       return true
@@ -191,7 +191,7 @@ class AssignmentCorrectionRow extends React.Component<Props> {
             aria-label={I18n.t('Assignment Name')}
             className="input-mlarge assignment-name"
             placeholder={assignment.name ? null : I18n.t('No Assignment Name')}
-            defaultValue={_.unescape(assignment.name)}
+            defaultValue={unescape(assignment.name)}
             onChange={this.updateAssignmentName}
           />
           {nameError ? <div className="hint-text">The assignment name must be unique</div> : ''}

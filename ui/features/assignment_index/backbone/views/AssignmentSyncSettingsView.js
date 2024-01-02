@@ -19,9 +19,9 @@
 /* eslint-disable no-void */
 
 import {extend} from '@canvas/backbone/utils'
+import {extend as lodashExtend} from 'lodash'
 import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import _ from 'underscore'
 import DialogFormView from '@canvas/forms/backbone/views/DialogFormView'
 import wrapper from '@canvas/forms/jst/EmptyDialogFormWrapper.handlebars'
 import assignmentSyncSettingsTemplate from '../../jst/AssignmentSyncSettings.handlebars'
@@ -45,7 +45,7 @@ AssignmentSyncSettingsView.prototype.defaults = {
   collapsedHeight: 300,
 }
 
-AssignmentSyncSettingsView.prototype.events = _.extend(
+AssignmentSyncSettingsView.prototype.events = lodashExtend(
   {},
   AssignmentSyncSettingsView.prototype.events,
   {

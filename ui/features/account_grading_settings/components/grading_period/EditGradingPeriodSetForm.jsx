@@ -19,7 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
-import {each, map, where, isEmpty} from 'lodash'
+import {each, map, filter, isEmpty} from 'lodash'
 import $ from 'jquery'
 import {Button} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
@@ -69,7 +69,7 @@ class GradingPeriodSetForm extends React.Component {
 
   constructor(props) {
     super(props)
-    const associatedEnrollmentTerms = where(props.enrollmentTerms, {
+    const associatedEnrollmentTerms = filter(props.enrollmentTerms, {
       gradingPeriodGroupId: props.set.id,
     })
     const set = {

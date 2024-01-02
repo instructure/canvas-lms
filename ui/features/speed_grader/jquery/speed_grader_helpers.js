@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import _ from 'underscore'
+import {each} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import '@canvas/datetime/jquery'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
@@ -115,7 +115,7 @@ const speedGraderHelpers = {
       '#speech_recognition_button',
     ]
 
-    _.each(elements, element => {
+    each(elements, element => {
       if (isDisabled) {
         $(element).addClass('ui-state-disabled')
         $(element).attr('aria-disabled', true)

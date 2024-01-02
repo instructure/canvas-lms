@@ -22,7 +22,7 @@ import {
   compact,
   difference,
   filter,
-  findWhere,
+  find,
   includes,
   isDate,
   map,
@@ -30,7 +30,6 @@ import {
   some,
   sortBy,
   union,
-  where,
   without,
 } from 'lodash'
 import $ from 'jquery'
@@ -210,9 +209,9 @@ export default class GradingPeriodSetCollection extends React.Component {
   filterSetsBySelectedTerm = (sets, terms, selectedTermID) => {
     if (selectedTermID === '0') return sets
 
-    const activeTerm = findWhere(terms, {id: selectedTermID})
+    const activeTerm = find(terms, {id: selectedTermID})
     const setID = activeTerm.gradingPeriodGroupId
-    return where(sets, {id: setID})
+    return filter(sets, {id: setID})
   }
 
   changeSelectedEnrollmentTerm = event => {
@@ -315,7 +314,7 @@ export default class GradingPeriodSetCollection extends React.Component {
     difference(this.state.enrollmentTerms, this.termsBelongingToActiveSets())
 
   selectableTermsForEditSetForm = setID => {
-    const termsBelongingToThisSet = where(this.termsBelongingToActiveSets(), {
+    const termsBelongingToThisSet = filter(this.termsBelongingToActiveSets(), {
       gradingPeriodGroupId: setID,
     })
     return union(this.termsNotBelongingToActiveSets(), termsBelongingToThisSet)

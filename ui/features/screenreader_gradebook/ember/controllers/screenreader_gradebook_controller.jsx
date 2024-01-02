@@ -27,7 +27,21 @@ import fetchAllPages from '../helpers/xhr/fetch_all_pages'
 import parseLinkHeader from '../helpers/xhr/parse_link_header'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import Ember from 'ember'
-import _ from 'underscore'
+import {
+  compact,
+  extend,
+  filter,
+  flatten,
+  forEach,
+  includes,
+  intersection,
+  isNumber,
+  keyBy,
+  map,
+  reduce,
+  some,
+  uniq,
+} from 'lodash'
 import * as tz from '@canvas/datetime'
 import AssignmentDetailsDialog from '../../jquery/AssignmentDetailsDialog'
 import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
@@ -161,7 +175,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
       id: '0',
       title: I18n.t('all_grading_periods', 'All Grading Periods'),
     }
-    return _.compact([optionForAllPeriods].concat(deserializedPeriods))
+    return compact([optionForAllPeriods].concat(deserializedPeriods))
   })(),
 
   lastGeneratedCsvLabel: (() => {
@@ -221,9 +235,9 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
     const hasSubmittedSubmissions = this.get('selectedAssignment.has_submitted_submissions')
     const allowList = ['online_upload', 'online_text_entry', 'online_url']
     const submissionTypes = this.get('selectedAssignment.submission_types')
-    const submissionTypesOnAllowlist = _.intersection(submissionTypes, allowList)
+    const submissionTypesOnAllowlist = intersection(submissionTypes, allowList)
 
-    return hasSubmittedSubmissions && _.some(submissionTypesOnAllowlist)
+    return hasSubmittedSubmissions && some(submissionTypesOnAllowlist)
   }.property('selectedAssignment'),
 
   hideStudentNames: false,
@@ -561,7 +575,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
       return allSubmissions
     }
 
-    return _.filter(allSubmissions, submission => {
+    return filter(allSubmissions, submission => {
       const studentPeriodInfo = __guard__(
         this.get('effectiveDueDates').get(submission.assignment_id),
         x => x[submission.user_id]
@@ -737,13 +751,13 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
   processLoadingSubmissions(submissionGroups) {
     const submissions = []
 
-    _.forEach(submissionGroups, submissionGroup => {
+    forEach(submissionGroups, submissionGroup => {
       submissions.push(...Array.from(submissionGroup.submissions || []))
     })
 
     this.updateEffectiveDueDatesFromSubmissions(submissions)
-    const assignmentIds = _.uniq(_.pluck(submissions, 'assignment_id'))
-    const assignmentMap = _.keyBy(this.get('assignmentsFromGroups.content'), 'id')
+    const assignmentIds = uniq(map(submissions, 'assignment_id'))
+    const assignmentMap = keyBy(this.get('assignmentsFromGroups.content'), 'id')
     assignmentIds.forEach(assignmentId => {
       const assignment = assignmentMap[assignmentId]
       if (assignment) {
@@ -1010,7 +1024,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
 
   updateEffectiveDueDatesOnAssignment(assignment) {
     assignment.effectiveDueDates = this.get('effectiveDueDates.content')[assignment.id] || {}
-    return (assignment.inClosedGradingPeriod = _.some(
+    return (assignment.inClosedGradingPeriod = some(
       assignment.effectiveDueDates,
       date => date.in_closed_grading_period
     ))
@@ -1052,7 +1066,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
     if (!assignment.only_visible_to_overrides) {
       return true
     }
-    return _.includes(assignment.assignment_visibility, student_id)
+    return includes(assignment.assignment_visibility, student_id)
   },
 
   studentsThatCanSeeAssignment(assignment) {
@@ -1067,7 +1081,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
   },
 
   checkForNoPointsWarning(ag) {
-    const pointsPossible = _.reduce(ag.assignments, (sum, a) => sum + (a.points_possible || 0), 0)
+    const pointsPossible = reduce(ag.assignments, (sum, a) => sum + (a.points_possible || 0), 0)
     return pointsPossible === 0
   },
 
@@ -1113,7 +1127,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
       return
     }
     const assignmentGroups = this.get('assignment_groups')
-    const assignments = _.flatten(assignmentGroups.mapBy('assignments'))
+    const assignments = flatten(assignmentGroups.mapBy('assignments'))
     const assignmentList = []
     assignments.forEach(as => {
       this.processAssignment(as, assignmentGroups)
@@ -1477,7 +1491,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
       'outcome_id',
       this.get('selectedOutcome').id
     )
-    const scores = _.filter(_.pluck(rollups, 'score'), _.isNumber)
+    const scores = filter(map(rollups, 'score'), isNumber)
     return {
       average: outcomeGrid.Math.mean(scores),
       max: outcomeGrid.Math.max(scores),
@@ -1491,7 +1505,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
       return null
     }
     const outcome = this.get('selectedOutcome')
-    return _.extend(
+    return extend(
       {
         calculation_method: outcome.calculation_method,
         calculation_int: outcome.calculation_int,

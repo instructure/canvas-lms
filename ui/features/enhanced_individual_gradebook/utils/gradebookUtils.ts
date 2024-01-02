@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash'
+import {uniq, sortBy} from 'lodash'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import type {
   AssignmentGroupCriteriaMap,
@@ -124,7 +124,7 @@ export function mapAssignmentGroupQueryResults(
         integration_data: {},
         sis_source_id: curr.sisId,
         invalid: totalGroupPoints === 0,
-        gradingPeriodsIds: _.uniq(assignmentGroupGradingPeriods),
+        gradingPeriodsIds: uniq(assignmentGroupGradingPeriods),
       }
 
       return prev
@@ -188,11 +188,11 @@ export function sortAssignments(
 ): SortableAssignment[] {
   switch (sortOrder) {
     case GradebookSortOrder.Alphabetical:
-      return _.sortBy(assignments, 'sortableName')
+      return sortBy(assignments, 'sortableName')
     case GradebookSortOrder.DueDate:
-      return _.sortBy(assignments, ['sortableDueDate', 'sortableName'])
+      return sortBy(assignments, ['sortableDueDate', 'sortableName'])
     case GradebookSortOrder.AssignmentGroup:
-      return _.sortBy(assignments, ['assignmentGroupPosition', 'sortableName'])
+      return sortBy(assignments, ['assignmentGroupPosition', 'sortableName'])
     default:
       return assignments
   }
