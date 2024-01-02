@@ -980,6 +980,24 @@ describe "discussions" do
         expect(fj("body:contains('Groups can only be part of the actively selected group set.')")).to be_present
       end
 
+      it "Post to section validation works correctly" do
+        get "/courses/#{course.id}/discussion_topics/new"
+
+        # Add a title, so that we know that the empty post to field is causing it to not submit
+        title = "Graded Discussion Topic with Peer Reviews"
+        f("input[placeholder='Topic Title']").send_keys title
+
+        fj("button:contains('All Sections')").click
+        # Verify that the error message "A section is required" appears
+        expect(fj("body:contains('A section is required')")).to be_present
+
+        # Verify that you can not submit the form
+        f("button[data-testid='save-and-publish-button']").click
+        wait_for_ajaximations
+        # Verify that no redirect happened
+        expect(driver.current_url).to end_with("/courses/#{course.id}/discussion_topics/new")
+      end
+
       context "assignment overrides" do
         before do
           @section_1 = course.course_sections.create!(name: "section 1")
