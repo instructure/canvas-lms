@@ -512,4 +512,38 @@ describe LearningOutcomeGroup do
       expect(group_d.root_account_id).to eql(@course.resolved_root_account_id)
     end
   end
+
+  describe "scope" do
+    before do
+      @active = @course.learning_outcome_groups.create!(title: "active")
+      @archived = @course.learning_outcome_groups.create!(title: "archived")
+      @archived.archive!
+      @deleted = @course.learning_outcome_groups.create!(title: "deleted")
+      @deleted.destroy!
+    end
+
+    it "active does not include archived or deleted groups" do
+      expect(LearningOutcomeGroup.active.include?(@active)).to be true
+      expect(LearningOutcomeGroup.active.include?(@archived)).to be false
+      expect(LearningOutcomeGroup.active.include?(@deleted)).to be false
+    end
+
+    it "active includes unarchived groups" do
+      expect(LearningOutcomeGroup.active.include?(@archived)).to be false
+      @archived.unarchive!
+      expect(LearningOutcomeGroup.active.include?(@archived)).to be true
+    end
+
+    it "archived only includes archived groups" do
+      expect(LearningOutcomeGroup.archived.include?(@active)).to be false
+      expect(LearningOutcomeGroup.archived.include?(@archived)).to be true
+      expect(LearningOutcomeGroup.archived.include?(@deleted)).to be false
+    end
+
+    it "archived does not include unarchived groups" do
+      expect(LearningOutcomeGroup.archived.include?(@archived)).to be true
+      @archived.unarchive!
+      expect(LearningOutcomeGroup.archived.include?(@archived)).to be false
+    end
+  end
 end

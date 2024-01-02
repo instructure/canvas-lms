@@ -789,6 +789,28 @@ describe LearningOutcome do
       expect(@outcome.workflow_state).to eq("active")
       expect(@outcome.archived_at).to be_nil
     end
+
+    context "scope" do
+      before do
+        @active = @course.created_learning_outcomes.create(title: "active")
+        @archived = @course.created_learning_outcomes.create(title: "archived")
+        @archived.archive!
+        @deleted = @course.created_learning_outcomes.create(title: "deleted")
+        @deleted.destroy
+      end
+
+      it "active scope does not include deleted or archived outcomes" do
+        expect(LearningOutcome.active.include?(@active)).to be true
+        expect(LearningOutcome.active.include?(@archived)).to be false
+        expect(LearningOutcome.active.include?(@deleted)).to be false
+      end
+
+      it "active scope includes unarchived outcomes" do
+        expect(LearningOutcome.active.include?(@archived)).to be false
+        @archived.unarchive!
+        expect(LearningOutcome.active.include?(@archived)).to be true
+      end
+    end
   end
 
   context "Don't create outcomes with illegal values" do

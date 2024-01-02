@@ -457,7 +457,7 @@ class LearningOutcome < ActiveRecord::Base
   end
 
   scope(:for_context_codes, ->(codes) { where(context_code: codes) })
-  scope(:active, -> { where("learning_outcomes.workflow_state<>'deleted'") })
+  scope(:active, -> { where("learning_outcomes.workflow_state NOT IN ('deleted', 'archived')") })
   scope(:active_first, -> { order(Arel.sql("CASE WHEN workflow_state = 'active' THEN 0 ELSE 1 END")) })
   scope(:has_result_for_user,
         lambda do |user|
