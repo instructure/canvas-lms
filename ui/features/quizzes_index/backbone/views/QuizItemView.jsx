@@ -389,6 +389,8 @@ export default class ItemView extends Backbone.View {
     base.isDuplicating = this.model.get('workflow_state') === 'duplicating'
     base.failedToDuplicate = this.model.get('workflow_state') === 'failed_to_duplicate'
     base.isMigrating = this.model.get('workflow_state') === 'migrating'
+    base.isImporting = this.model.get('workflow_state') === 'importing'
+    base.failedToImport = this.model.get('workflow_state') === 'fail_to_import'
     base.isMasterCourseChildContent = this.model.isMasterCourseChildContent()
     base.failedToMigrate = this.model.get('workflow_state') === 'failed_to_migrate'
     base.showAvailability =
