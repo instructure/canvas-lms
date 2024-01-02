@@ -149,7 +149,7 @@ module Types
     def child_topics
       load_association(:child_topics).then do |child_topics|
         Loaders::AssociationLoader.for(DiscussionTopic, :context).load_many(child_topics).then do
-          child_topics = child_topics.select { |ct| ct.context.active? }
+          child_topics = child_topics.select { |ct| ct.active? && ct.context.active? }
           child_topics.sort_by { |ct| ct.context.name }
         end
       end
