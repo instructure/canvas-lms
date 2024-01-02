@@ -151,7 +151,7 @@ module ActiveSupport::Callbacks
           yield if block_given?
         else
           env = Filters::Environment.new(self, false, nil)
-          next_sequence = callbacks.compile
+          next_sequence = (ActiveSupport.version < "7.1") ? callbacks.compile : callbacks.compile(nil)
 
           invoke_sequence = proc do
             skipped = nil

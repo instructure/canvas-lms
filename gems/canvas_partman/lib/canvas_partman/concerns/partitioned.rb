@@ -125,7 +125,7 @@ module CanvasPartman::Concerns
         end
       end
 
-      def _insert_record(values)
+      def _insert_record(values, ...)
         prev_table = @arel_table
         prev_builder = @predicate_builder
         @arel_table = arel_table_from_key_values(values)

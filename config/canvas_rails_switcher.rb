@@ -27,7 +27,7 @@
 # 3. Create a Consul setting private/canvas/rails_version with <supported version> as the contents
 
 # the default version (corresponding to the bare Gemfile.lock) must be listed first
-SUPPORTED_RAILS_VERSIONS = %w[7.0].freeze
+SUPPORTED_RAILS_VERSIONS = %w[7.0 7.1].freeze
 
 unless defined?($canvas_rails)
   file_path = File.expand_path("RAILS_VERSION", __dir__)

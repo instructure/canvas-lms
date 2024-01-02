@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     activesupport-suspend_callbacks (0.0.1)
-      activesupport (>= 3.2, < 7.1)
+      activesupport (>= 3.2, < 7.2)
 
 GEM
   remote: https://rubygems.org/
