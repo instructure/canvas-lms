@@ -451,5 +451,19 @@ describe MissingPolicyApplicator do
         end
       end
     end
+
+    describe "apply missing deduction" do
+      it "double checks and doesn't update submissions if they have been submitted" do
+        late_policy_missing_enabled
+        create_recent_assignment
+        submission = @course.submissions.first
+        submission.update_columns(score: nil, grade: nil, workflow_state: "submitted", submission_type: "online_text_entry")
+        assignment = submission.assignment
+
+        applicator.send(:apply_missing_deduction, assignment, [submission])
+
+        expect(submission.reload.score).to be_nil
+      end
+    end
   end
 end
