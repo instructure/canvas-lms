@@ -206,7 +206,7 @@ module CC
 
     class HtmlContentExporter
       attr_reader :course, :user, :media_object_flavor, :media_object_infos
-      attr_accessor :referenced_files
+      attr_accessor :referenced_files, :referenced_assessment_question_files
 
       def initialize(course, user, opts = {})
         @media_object_flavor = opts[:media_object_flavor]
@@ -220,6 +220,7 @@ module CC
         @for_epub_export = opts[:for_epub_export]
         @key_generator = opts[:key_generator] || CC::CCHelper
         @referenced_files = {}
+        @referenced_assessment_question_files = {}
         @disable_content_rewriting = !!opts[:disable_content_rewriting] || false
 
         @rewriter.set_handler("file_contents") do |match|
@@ -247,21 +248,33 @@ module CC
               "#{COURSE_TOKEN}/files"
             end
           else
-            obj = if @course && match.obj_class == Attachment
-                    @course.attachments.find_by(id: match.obj_id)
+            context = @course
+            current_referenced_files = @referenced_files
+            if match.context_type == "assessment_questions" && !@for_course_copy
+              context = match.context_type.classify.constantize.find_by(id: match.context_id)
+              current_referenced_files = @referenced_assessment_question_files
+            end
+
+            obj = if context && match.obj_class == Attachment
+                    context.attachments.find_by(id: match.obj_id)
                   else
                     match.obj_class.where(id: match.obj_id).first
                   end
             next(match.url) unless obj && (@rewriter.user_can_view_content?(obj) || @for_epub_export)
 
-            @referenced_files[obj.id] = @key_generator.create_key(obj) if @track_referenced_files && !@referenced_files[obj.id]
+            obj.export_id = @key_generator.create_key(obj)
+            current_referenced_files[obj.id] = obj if @track_referenced_files && !current_referenced_files[obj.id]
 
             url = if @for_course_copy
-                    "#{COURSE_TOKEN}/file_ref/#{@key_generator.create_key(obj)}#{match.rest}"
+                    "#{COURSE_TOKEN}/file_ref/#{obj.export_id}#{match.rest}"
                   else
                     # for files in exports, turn it into a relative link by path, rather than by file id
                     # we retain the file query string parameters
-                    folder = obj.folder.full_name.sub(/course( |%20)files/, WEB_CONTENT_TOKEN)
+                    folder = if match.context_type == "assessment_questions"
+                               "#{WEB_CONTENT_TOKEN}/assessment_questions"
+                             else
+                               obj.folder&.full_name&.sub(/course( |%20)files/, WEB_CONTENT_TOKEN)
+                             end
                     folder = folder.split("/").map { |part| URI::DEFAULT_PARSER.escape(part) }.join("/")
                     path = "#{folder}/#{URI::DEFAULT_PARSER.escape(obj.display_name)}"
                     path = HtmlTextHelper.escape_html(path)
@@ -499,6 +512,8 @@ module CC
         end
 
         Rack::Utils.parse_query(uri.query).each do |k, v|
+          next if k == "verifier" || v.nil?
+
           qs << "canvas_qs_#{Rack::Utils.escape(k)}=#{Rack::Utils.escape(v)}"
         end
       rescue URI::Error

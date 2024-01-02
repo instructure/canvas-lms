@@ -52,8 +52,8 @@ class Canvas::Migration::Worker::CourseCopyWorker < Canvas::Migration::Worker::B
         cm.migration_settings[:migration_ids_to_import][:copy][:everything] = true
         # set any attachments referenced in html to be copied
         ce.selected_content["attachments"] ||= {}
-        ce.referenced_files.each_value do |att_mig_id|
-          ce.selected_content["attachments"][att_mig_id] = true
+        ce.referenced_files.each_value do |att|
+          ce.selected_content["attachments"][att.export_id] = true
         end
         ce.save
 

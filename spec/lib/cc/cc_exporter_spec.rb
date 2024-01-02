@@ -248,6 +248,22 @@ describe "Common Cartridge exporting" do
       expect(@manifest_doc.at_css("resource[identifier=#{alt_mig_id2}][type=\"#{CC::CCHelper::LOR}\"]")).not_to be_nil
     end
 
+    it "selectively creates a quizzes-only export" do
+      @q1 = @course.quizzes.create!(title: "quiz1")
+      @q2 = @course.quizzes.create!(title: "quiz2")
+
+      @ce.export_type = ContentExport::QTI
+      @ce.selected_content = {
+        quizzes: { mig_id(@q1) => "1" },
+      }
+      @ce.save!
+
+      run_export
+
+      check_resource_node(@q1, CC::CCHelper::QTI_ASSESSMENT_TYPE)
+      check_resource_node(@q2, CC::CCHelper::QTI_ASSESSMENT_TYPE, false)
+    end
+
     it "exports quizzes with groups that point to external banks" do
       orig_course = @course
       course_with_teacher(user: @user)
@@ -279,23 +295,41 @@ describe "Common Cartridge exporting" do
       expect(selections[1].at_css("selection_extension sourcebank_context").text).to eq bank2.context.asset_string
     end
 
-    it "selectively creates a quizzes-only export" do
-      @q1 = @course.quizzes.create!(title: "quiz1")
-      @q2 = @course.quizzes.create!(title: "quiz2")
+    it "includes files referenced in question bank questions" do
+      attachment_model(uploaded_data: stub_png_data)
+      assessment_question_bank_model
+      question_data = {
+        "name" => "test question",
+        "points_possible" => 10,
+        "answers" => [{ "id" => 1 }, { "id" => 2 }],
+      }
+      question = @bank.assessment_questions.create!(question_data:)
+      question.question_data = question_data.merge("question_text" => %(<p><img src="/courses/#{@course.id}/files/#{@attachment.id}/download"></p>))
+      question.save!
+      att = question.attachments.take
+      quiz_model(course: @course)
+      @quiz.add_assessment_questions([question])
 
       @ce.export_type = ContentExport::QTI
       @ce.selected_content = {
-        quizzes: { mig_id(@q1) => "1" },
+        all_quizzes: "1",
       }
       @ce.save!
 
       run_export
 
-      check_resource_node(@q1, CC::CCHelper::QTI_ASSESSMENT_TYPE)
-      check_resource_node(@q2, CC::CCHelper::QTI_ASSESSMENT_TYPE, false)
+      check_resource_node(@quiz, CC::CCHelper::QTI_ASSESSMENT_TYPE)
+
+      doc = Nokogiri::XML.parse(@zip_file.read("#{mig_id(@quiz)}/#{mig_id(@quiz)}.xml"))
+      expect(doc.at_css("presentation material mattext").text).to match %r{assessment_questions/test%20my%20file\?%20hai!&amp;.png}
+      check_resource_node(att, CC::CCHelper::WEBCONTENT)
+
+      path = @manifest_doc.at_css("resource[identifier=#{mig_id(att)}]")["href"]
+      expect(path).to eq "assessment_questions#{att.full_display_path}"
+      expect(@zip_file.find_entry(path)).not_to be_nil
     end
 
-    it "includes any files referenced in html" do
+    it "includes any files referenced in html for QTI export" do
       @att = Attachment.create!(filename: "first.png", uploaded_data: StringIO.new("ohai"), folder: Folder.unfiled_folder(@course), context: @course)
       @att2 = Attachment.create!(filename: "second.jpg", uploaded_data: StringIO.new("ohais"), folder: Folder.unfiled_folder(@course), context: @course)
       @q1 = @course.quizzes.create(title: "quiz1")
@@ -340,6 +374,67 @@ describe "Common Cartridge exporting" do
 
       path = @manifest_doc.at_css("resource[identifier=#{mig_id(@att)}]")["href"]
       expect(@zip_file.find_entry(path)).not_to be_nil
+    end
+
+    it "includes any files referenced in html for course export" do
+      att1 = Attachment.create!(filename: "first.png", uploaded_data: StringIO.new("ohai"), folder: Folder.unfiled_folder(@course), context: @course)
+      quiz = @course.quizzes.create(title: "quiz1")
+
+      qq = quiz.quiz_questions.create!
+      data = { correct_comments: "",
+               question_type: "multiple_choice_question",
+               question_bank_name: "Quiz",
+               assessment_question_id: "9270",
+               migration_id: "QUE_1014",
+               incorrect_comments: "",
+               question_name: "test fun",
+               name: "test fun",
+               points_possible: 1,
+               question_text: %(Image yo: <img src="/courses/#{@course.id}/files/#{att1.id}/preview">),
+               answers: [{ migration_id: "QUE_1016_A1", text: "True", weight: 100, id: 8080 },
+                         { migration_id: "QUE_1017_A2", text: "False", weight: 0, id: 2279 }] }.with_indifferent_access
+      qq.write_attribute(:question_data, data)
+      qq.save!
+
+      attachment_model(uploaded_data: stub_png_data)
+      assessment_question_bank_model
+      question_data = {
+        name: "test question",
+        points_possible: 10,
+        question_type: "true_false_question",
+        answers: [{ "migration_id" => "QUE_1018_A1", "text" => "True" }, { "migration_id" => "QUE_1019_A2", "text" => "False" }],
+        question_text: %(<img src="/courses/#{@course.id}/files/#{@attachment.id}/download">)
+      }
+      question = @bank.assessment_questions.create!(question_data:)
+      question.question_data = question_data
+      question.save!
+      quiz.add_assessment_questions([question])
+      att2 = question.attachments.take
+
+      @ce.export_type = ContentExport::COMMON_CARTRIDGE
+      @ce.selected_content = {
+        all_quizzes: "1",
+      }
+      @ce.save!
+
+      run_export
+
+      check_resource_node(quiz, CC::CCHelper::ASSESSMENT_TYPE)
+
+      doc = Nokogiri::XML.parse(@zip_file.read("#{mig_id(quiz)}/assessment_qti.xml"))
+      expect(doc.at_css("presentation material mattext").text).to eq %(<div>Image yo: <img src="$IMS-CC-FILEBASE$/unfiled/first.png"></div>)
+      expect(doc.at_css("section").children[3].at_css("presentation material mattext").text).to eq %(<div><img src="$IMS-CC-FILEBASE$/assessment_questions/test%20my%20file?%20hai!&amp;.png?canvas_download=1"></div>)
+
+      check_resource_node(att1, CC::CCHelper::WEBCONTENT)
+      check_resource_node(att2, CC::CCHelper::WEBCONTENT)
+
+      path = @manifest_doc.at_css("resource[identifier=#{mig_id(att1)}]")["href"]
+      expect(@zip_file.find_entry(path)).not_to be_nil
+      path = @manifest_doc.at_css("resource[identifier=#{mig_id(att2)}]")["href"]
+      expect(@zip_file.find_entry(path)).not_to be_nil
+
+      file_meta = Nokogiri::XML.parse(@zip_file.read("course_settings/files_meta.xml"))
+      expect(file_meta.at_css("folders folder[path=assessment_questions] hidden").text).to eq "true"
     end
 
     describe "hidden folders" do

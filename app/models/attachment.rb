@@ -87,7 +87,7 @@ class Attachment < ActiveRecord::Base
   restrict_columns :settings, %i[folder_id locked lock_at unlock_at usage_rights_id]
   restrict_columns :state, [:locked, :file_state]
 
-  attr_accessor :podcast_associated_asset
+  attr_accessor :podcast_associated_asset, :export_id
 
   # this is a gross hack to work around freaking SubmissionComment#attachments=
   attr_accessor :ok_for_submission_comment
