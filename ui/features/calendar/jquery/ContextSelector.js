@@ -17,8 +17,7 @@
  */
 
 import $ from 'jquery'
-import _ from 'underscore'
-import {map} from 'lodash'
+import {map, chain} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import contextSelectorTemplate from '../jst/contextSelector.handlebars'
 import contextSelectorItemTemplate from '../jst/contextSelectorItem.handlebars'
@@ -219,7 +218,7 @@ export default class ContextSelector {
   }
 
   selectedContexts() {
-    const contexts = _.chain(this.contextSelectorItems)
+    const contexts = chain(this.contextSelectorItems)
       .values()
       .filter(c => c.state !== 'off')
       .map(c => c.context.asset_string)
@@ -229,7 +228,7 @@ export default class ContextSelector {
   }
 
   selectedSections() {
-    const sections = _.chain(this.contextSelectorItems)
+    const sections = chain(this.contextSelectorItems)
       .values()
       .map(c => c.sections())
       .reject(ss => ss.length === 0)

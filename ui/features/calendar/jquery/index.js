@@ -22,8 +22,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'underscore'
-import {map} from 'lodash'
+import {map, defaults, filter, omit, each, has, last, includes} from 'lodash'
 import * as tz from '@canvas/datetime'
 import moment from 'moment'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
@@ -227,7 +226,7 @@ export default class Calendar {
   }
 
   initializeFullCalendarParams() {
-    return _.defaults(
+    return defaults(
       {
         header: false,
         editable: true,
@@ -569,8 +568,8 @@ export default class Calendar {
 
   activeContexts() {
     const allowedContexts =
-      userSettings.get('checked_calendar_codes') || _.pluck(this.contexts, 'asset_string')
-    return _.filter(this.contexts, c => _.includes(allowedContexts, c.asset_string))
+      userSettings.get('checked_calendar_codes') || map(this.contexts, 'asset_string')
+    return filter(this.contexts, c => includes(allowedContexts, c.asset_string))
   }
 
   addEventClick = (event, _jsEvent, _view) => {
@@ -637,7 +636,7 @@ export default class Calendar {
 
   updateFragment(opts) {
     const replaceState = !!opts.replaceState
-    opts = _.omit(opts, 'replaceState')
+    opts = omit(opts, 'replaceState')
     const data = this.dataFromDocumentHash()
     let changed = false
     for (const k in opts) {
@@ -1010,7 +1009,7 @@ export default class Calendar {
 
   // When an assignment event is updated, update its related overrides.
   updateOverrides = event => {
-    _.each(this.dataSource.cache.contexts[event.contextCode()].events, (override, key) => {
+    each(this.dataSource.cache.contexts[event.contextCode()].events, (override, key) => {
       if (key.match(/override/) && event.assignment.id === override.assignment.id) {
         override.updateAssignmentTitle(event.title)
       }
@@ -1103,7 +1102,7 @@ export default class Calendar {
   setCurrentView(view) {
     this.updateFragment({
       view_name: view,
-      replaceState: !_.has(this.dataFromDocumentHash(), 'view_name'),
+      replaceState: !has(this.dataFromDocumentHash(), 'view_name'),
     }) // use replaceState if view_name wasn't set before
 
     this.currentView = view
@@ -1342,7 +1341,7 @@ export default class Calendar {
 
     // find the next reservable appointment and report its date
     const group_ids = map(this.findAppointmentModeGroups(), asset_string =>
-      _.last(asset_string.split('_'))
+      last(asset_string.split('_'))
     )
     if (!(group_ids.length > 0)) return
 
