@@ -26,7 +26,7 @@ import GradingTypeSelector from '@canvas/assignments/backbone/views/GradingTypeS
 import GroupCategorySelector from '@canvas/groups/backbone/views/GroupCategorySelector'
 import PeerReviewsSelector from '@canvas/assignments/backbone/views/PeerReviewsSelector'
 import PostToSisSelector from './PostToSisSelector'
-import _ from 'underscore'
+import {uniqueId, defer, includes, isEqual, extend as lodashExtend} from 'lodash'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import template from '../../jst/EditView.handlebars'
@@ -112,7 +112,7 @@ EditView.prototype.els = {
   '#assignment_external_tools': '$AssignmentExternalTools',
 }
 
-EditView.prototype.events = _.extend(EditView.prototype.events, {
+EditView.prototype.events = lodashExtend(EditView.prototype.events, {
   'click .removeAttachment': 'removeAttachment',
   'click .save_and_publish': 'saveAndPublish',
   'click .cancel_button': 'handleCancel',
@@ -147,7 +147,7 @@ EditView.prototype.initialize = function (options) {
         let contextId, contextType, ref, ref1, usageRights
         if (((ref = xhr.attachments) != null ? ref.length : void 0) === 1) {
           usageRights = _this.attachment_model.get('usage_rights')
-          if (usageRights && !_.isEqual(_this.initialUsageRights(), usageRights)) {
+          if (usageRights && !isEqual(_this.initialUsageRights(), usageRights)) {
             ref1 = ENV.context_asset_string.split('_')
             contextType = ref1[0]
             contextId = ref1[1]
@@ -254,7 +254,7 @@ EditView.prototype.canPublish = function () {
 
 EditView.prototype.toJSON = function () {
   const data = EditView.__super__.toJSON.apply(this, arguments)
-  const json = _.extend(data, this.options, {
+  const json = lodashExtend(data, this.options, {
     showAssignment: !!this.assignmentGroupCollection,
     useForGrading: this.model.get('assignment') != null,
     isTopic: this.isTopic(),
@@ -310,10 +310,10 @@ EditView.prototype.loadNewEditor = function ($textarea) {
 EditView.prototype.render = function () {
   EditView.__super__.render.apply(this, arguments)
   this.$textarea = this.$('textarea[name=message]')
-    .attr('id', _.uniqueId('discussion-topic-message'))
+    .attr('id', uniqueId('discussion-topic-message'))
     .css('display', 'none')
   if (!this.lockedItems.content) {
-    _.defer(
+    defer(
       (function (_this) {
         return function () {
           return _this.loadNewEditor(_this.$textarea)
@@ -327,20 +327,20 @@ EditView.prototype.render = function () {
       (this.assignmentGroupFetchDfd = this.assignmentGroupCollection.fetch())
     ).done(this.renderAssignmentGroupOptions)
   }
-  _.defer(this.renderGradingTypeOptions)
+  defer(this.renderGradingTypeOptions)
   if (this.permissions.CAN_SET_GROUP) {
-    _.defer(this.renderGroupCategoryOptions)
+    defer(this.renderGroupCategoryOptions)
   }
-  _.defer(this.renderPeerReviewOptions)
+  defer(this.renderPeerReviewOptions)
   if (ENV.POST_TO_SIS) {
-    _.defer(this.renderPostToSisOptions)
+    defer(this.renderPostToSisOptions)
   }
-  _.defer(this.watchUnload)
+  defer(this.watchUnload)
   if (this.showConditionalRelease()) {
-    _.defer(this.renderTabs)
+    defer(this.renderTabs)
   }
   if (this.showConditionalRelease()) {
-    _.defer(this.loadConditionalRelease)
+    defer(this.loadConditionalRelease)
   }
   this.$('.datetime_field').datetime_field()
   if (!this.model.get('locked')) {
@@ -677,7 +677,7 @@ EditView.prototype.submit = function (event) {
   }
 }
 
-EditView.prototype.fieldSelectors = _.extend(
+EditView.prototype.fieldSelectors = lodashExtend(
   {
     usage_rights_control: '#usage_rights_control button',
   },
@@ -838,7 +838,7 @@ EditView.prototype._validateTitle = function (data, errors) {
 
 EditView.prototype._validatePointsPossible = function (data, errors) {
   const assign = data.assignment
-  const frozenPoints = _.includes(assign.frozenAttributes(), 'points_possible')
+  const frozenPoints = includes(assign.frozenAttributes(), 'points_possible')
   if (!frozenPoints && assign.pointsPossible() && !numberHelper.validate(assign.pointsPossible())) {
     errors['assignment[points_possible]'] = [
       {

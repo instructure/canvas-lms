@@ -20,7 +20,7 @@ import React from 'react'
 
 import ReactDOM from 'react-dom'
 import {Simulate} from 'react-dom/test-utils'
-import _ from 'lodash'
+import {defaults} from 'lodash'
 import setsApi from '@canvas/grading/jquery/gradingPeriodSetsApi'
 import NewSetForm from 'ui/features/account_grading_standards/react/NewGradingPeriodSetForm'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
@@ -59,7 +59,7 @@ QUnit.module('NewGradingPeriodSetForm', {
       },
       readOnly: false,
     }
-    const element = React.createElement(NewSetForm, _.defaults(props, defaultProps))
+    const element = React.createElement(NewSetForm, defaults(props, defaultProps))
     return ReactDOM.render(element, wrapper)
   },
 
