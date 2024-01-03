@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import '@canvas/backbone'
-import _ from 'lodash'
+import {defer} from 'lodash'
 import moment from 'moment-timezone'
 import {fireEvent, within, getByText, waitFor} from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
@@ -64,7 +64,7 @@ describe('EditEventView', () => {
     const promise = new Promise(resolve => {
       rendered = resolve
     })
-    _.defer(() => rendered())
+    defer(() => rendered())
     await promise
   }
 

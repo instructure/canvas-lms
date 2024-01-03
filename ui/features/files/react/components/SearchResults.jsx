@@ -17,7 +17,7 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import _ from 'underscore'
+import {indexOf} from 'lodash'
 import React from 'react'
 import createReactClass from 'create-react-class'
 import SearchResults from '../legacy/components/SearchResults'
@@ -126,7 +126,7 @@ SearchResults.render = function () {
               <FolderChild
                 key={child.cid}
                 model={child}
-                isSelected={_.indexOf(this.props.selectedItems, child) >= 0}
+                isSelected={indexOf(this.props.selectedItems, child) >= 0}
                 toggleSelected={this.props.toggleItemSelected.bind(null, child)}
                 userCanEditFilesForContext={this.props.userCanEditFilesForContext}
                 userCanDeleteFilesForContext={this.props.userCanDeleteFilesForContext}
