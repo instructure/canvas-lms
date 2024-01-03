@@ -24,8 +24,7 @@ import $ from 'jquery'
 import * as tz from '@canvas/datetime'
 import fcUtil from '@canvas/calendar/jquery/fcUtil'
 import calendarEventFilter from '../../CalendarEventFilter'
-import _ from 'underscore'
-import {map} from 'lodash'
+import {map, minBy, includes, first, filter, reduce, isEmpty, last, sortBy} from 'lodash'
 import Backbone from '@canvas/backbone'
 import ShowEventDetailsDialog from '../../jquery/ShowEventDetailsDialog'
 import template from '../../jst/agendaView.handlebars'
@@ -133,7 +132,7 @@ AgendaView.prototype.appendEvents = function (events) {
       (ref = this.calendar) != null ? ref.schedulerState : void 0
     )
   )
-  this.collection = _.sortBy(this.collection, 'originalStart')
+  this.collection = sortBy(this.collection, 'originalStart')
   return this.render()
 }
 
@@ -150,7 +149,7 @@ AgendaView.prototype.loadMoreFinished = function (events) {
 }
 
 AgendaView.prototype.focusFirstNewDate = function (events) {
-  const firstNewEvent = _.min(events, function (e) {
+  const firstNewEvent = minBy(events, function (e) {
     return e.start
   })
   const $firstEvent = this.$("li[data-event-id='" + firstNewEvent.id + "']")
@@ -197,9 +196,9 @@ AgendaView.prototype.manageEvent = function (e) {
   const event = this.dataSource.eventWithId(eventId)
   if (event.can_change_context) {
     allowedContexts =
-      userSettings.get('checked_calendar_codes') || _.pluck(this.contextObjects, 'asset_string')
-    event.allPossibleContexts = _.filter(this.contextObjects, function (c) {
-      return _.include(allowedContexts, c.asset_string)
+      userSettings.get('checked_calendar_codes') || map(this.contextObjects, 'asset_string')
+    event.allPossibleContexts = filter(this.contextObjects, function (c) {
+      return includes(allowedContexts, c.asset_string)
     })
   }
   return new ShowEventDetailsDialog(event, this.dataSource).show(e)
@@ -214,7 +213,7 @@ AgendaView.prototype.render = function () {
   this.$spinner.hide()
   $.publish('Calendar/colorizeContexts')
   this.refocusAfterRender()
-  const lastEvent = _.last(this.collection)
+  const lastEvent = last(this.collection)
   if (!lastEvent) {
     return
   }
@@ -232,14 +231,14 @@ AgendaView.prototype.render = function () {
 //
 // Returns a new boxed array with elemens from the given list.
 AgendaView.prototype.sortedBoxBy = function (list, iterator) {
-  return _.reduce(
+  return reduce(
     list,
     function (result, currentElt) {
-      if (_.isEmpty(result)) {
+      if (isEmpty(result)) {
         return [[currentElt]]
       }
-      const previousBox = _.last(result)
-      const previousElt = _.last(previousBox)
+      const previousBox = last(result)
+      const previousElt = last(previousBox)
       if (iterator(currentElt) === iterator(previousElt)) {
         previousBox.push(currentElt)
       } else {
@@ -272,7 +271,7 @@ AgendaView.prototype.formattedLongDayString = function (event) {
 // Returns an Object with 'date' and 'events' keys.
 AgendaView.prototype.eventBoxToHash = function (events) {
   const now = fcUtil.now()
-  const event = _.first(events)
+  const event = first(events)
   const start = event.originalStart
   const isToday =
     now.date() === start.date() && now.month() === start.month() && now.year() === start.year()
