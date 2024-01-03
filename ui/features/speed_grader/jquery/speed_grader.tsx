@@ -79,9 +79,7 @@ import {
 } from '../SpeedGraderStatusMenuHelpers'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import round from '@canvas/round'
-// @ts-expect-error
-import _ from 'underscore'
-import {map} from 'lodash'
+import {map, keyBy, values, find, includes, reject, some, isEqual, filter} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import natcompare from '@canvas/util/natcompare'
 import qs from 'qs'
@@ -465,7 +463,7 @@ function mergeStudentsAndSubmission() {
     }
   }
 
-  jsonData.studentMap = _.keyBy(jsonData.studentsWithSubmissions, anonymizableId)
+  jsonData.studentMap = keyBy(jsonData.studentsWithSubmissions, anonymizableId)
 
   switch (userSettings.get('eg_sort_by')) {
     case 'submitted_at': {
@@ -1612,7 +1610,7 @@ EG = {
     if ($rubricFull.filter(':visible').length) {
       const $unSavedRubric = $('.save_rubric_button').parents('#rubric_holder').find('.rubric')
       const unSavedData = rubricAssessment.assessmentData($unSavedRubric)
-      return !_.isEqual(unSavedData, originalRubric_)
+      return !isEqual(unSavedData, originalRubric_)
     }
     return false
   },
@@ -1658,7 +1656,8 @@ EG = {
 
     // choose the first ungraded student if the requested one doesn't exist
     if (!window.jsonData.studentMap[String(representativeOrStudentId)]) {
-      const ungradedStudent = _(window.jsonData.studentsWithSubmissions).find(
+      const ungradedStudent = find(
+        window.jsonData.studentsWithSubmissions,
         (s: StudentWithSubmission) =>
           s.submission &&
           s.submission.workflow_state !== 'graded' &&
@@ -1700,7 +1699,7 @@ EG = {
     // calling _.values on a large collection could be slow, that's why we're fetching from studentMap first
     this.currentStudent =
       window.jsonData.studentMap[selectMenuValue] ||
-      _.values(window.jsonData.studentsWithSubmissions)[0]
+      values(window.jsonData.studentsWithSubmissions)[0]
 
     useStore.setState({currentStudentId: this.currentStudent[anonymizableId]})
     EG.resetReassignButton()
@@ -2322,11 +2321,13 @@ EG = {
         (attachment.crocodoc_url || attachment.canvadoc_url) &&
         EG.currentStudent.provisional_crocodoc_urls
       ) {
-        const urlInfo = _.find(
+        const urlInfo = find(
           EG.currentStudent.provisional_crocodoc_urls,
           (url: ProvisionalCrocodocUrl) => url.attachment_id === attachment.id
         )
+        // @ts-expect-error
         attachment.provisional_crocodoc_url = urlInfo.crocodoc_url
+        // @ts-expect-error
         attachment.provisional_canvadoc_url = urlInfo.canvadoc_url
       } else {
         attachment.provisional_crocodoc_url = null
@@ -2439,7 +2440,7 @@ EG = {
     $submission_late_notice.showIf(submission.late)
     $full_width_container.removeClass('with_enrollment_notice')
     $enrollment_inactive_notice.showIf(
-      _.some(
+      some(
         window.jsonData.studentMap[this.currentStudent[anonymizableId]].enrollments,
         (enrollment: {workflow_state: string}) => {
           if (enrollment.workflow_state === 'inactive') {
@@ -2498,7 +2499,7 @@ EG = {
         String($('#submission_to_view').val() || submissionHistory.length - 1),
         10
       )
-      const templateSubmissions = _(submissionHistory).map((o: unknown, i: number) => {
+      const templateSubmissions = map(submissionHistory, (o: unknown, i: number) => {
         // The submission objects nested in the submission_history array
         // can have two different shapes, because the `this.currentStudent.submission`
         // can come from two different API endpoints.
@@ -2680,8 +2681,8 @@ EG = {
 
   totalStudentCount() {
     if (sectionToShow) {
-      return _.filter(window.jsonData.studentsWithSubmissions, (student: StudentWithSubmission) =>
-        _.includes(student.section_ids, sectionToShow)
+      return filter(window.jsonData.studentsWithSubmissions, (student: StudentWithSubmission) =>
+        includes(student.section_ids, sectionToShow)
       ).length
     } else {
       return window.jsonData.studentsWithSubmissions.length
@@ -3029,7 +3030,7 @@ EG = {
                 that.currentStudent.submission &&
                 that.currentStudent.submission.submission_comments
               ) {
-                updatedComments = _.reject(
+                updatedComments = reject(
                   that.currentStudent.submission.submission_comments,
                   (item: SubmissionComment) => {
                     const submissionComment = item.submission_comment || item
@@ -4105,7 +4106,8 @@ function setupSpeedGrader(
   }[]
 ) {
   const speedGraderJSON = speedGraderJsonResponse[0]
-  speedGraderJSON.gradingPeriods = _.keyBy(gradingPeriods, 'id')
+  // @ts-expect-error
+  speedGraderJSON.gradingPeriods = keyBy(gradingPeriods, 'id')
   window.jsonData = speedGraderJSON
   EG.jsonReady()
   EG.setInitiallyLoadedStudent()

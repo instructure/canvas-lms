@@ -23,8 +23,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView'
-import _ from 'underscore'
-import {each} from 'lodash'
+import _, {each, find, keys, includes, forEach, filter} from 'lodash'
 import $, {param} from 'jquery'
 import pluralize from '@canvas/util/stringPluralize'
 import numberHelper from '@canvas/i18n/numberHelper'
@@ -59,7 +58,6 @@ import '../../../../boot/initializers/activateTooltips'
 import {AnnotatedDocumentSelector} from '../../react/EditAssignment'
 import {selectContentDialog} from '@canvas/select-content-dialog'
 import {addDeepLinkingListener} from '@canvas/deep-linking/DeepLinking'
-import {ResourceLinkContentItem} from '@canvas/deep-linking/models/ResourceLinkContentItem'
 
 const I18n = useI18nScope('assignment_editview')
 
@@ -206,10 +204,9 @@ EditView.prototype.template = EditViewTemplate
 
 EditView.prototype.dontRenableAfterSaveSuccess = true
 
-EditView.prototype.els = _.extend(
-  {},
-  EditView.prototype.els,
-  (function () {
+EditView.prototype.els = {
+  ...EditView.prototype.els,
+  ...(function () {
     const els = {}
     els['' + ASSIGNMENT_GROUP_SELECTOR] = '$assignmentGroupSelector'
     els['' + DESCRIPTION] = '$description'
@@ -257,13 +254,12 @@ EditView.prototype.els = _.extend(
     els['' + HIDE_ZERO_POINT_QUIZZES_OPTION] = '$hideZeroPointQuizzesOption'
     els['' + OMIT_FROM_FINAL_GRADE_BOX] = '$omitFromFinalGradeBox'
     return els
-  })()
-)
+  })(),
+}
 
-EditView.prototype.events = _.extend(
-  {},
-  EditView.prototype.events,
-  (function () {
+EditView.prototype.events = {
+  ...EditView.prototype.events,
+  ...(function () {
     const events = {}
     events['click .cancel_button'] = 'handleCancel'
     events['click .save_and_publish'] = 'saveAndPublish'
@@ -286,8 +282,8 @@ EditView.prototype.events = _.extend(
       events.change = 'onChange'
     }
     return events
-  })()
-)
+  })(),
+}
 
 EditView.child('assignmentGroupSelector', '' + ASSIGNMENT_GROUP_SELECTOR)
 
@@ -952,7 +948,7 @@ EditView.prototype.handlePlacementExternalToolSelect = function (selection) {
   const toolId = selection.replace('external_tool_placement_', '')
   this.$externalToolsContentId.val(toolId)
   this.$externalToolsContentType.val('context_external_tool')
-  this.selectedTool = _.find(this.model.submissionTypeSelectionTools(), function (tool) {
+  this.selectedTool = find(this.model.submissionTypeSelectionTools(), function (tool) {
     return toolId === tool.id
   })
 
@@ -1143,7 +1139,7 @@ EditView.prototype.afterRender = function () {
 
 EditView.prototype.toJSON = function () {
   const data = this.assignment.toView()
-  return _.extend(data, {
+  return Object.assign(data, {
     assignment_attempts:
       typeof ENV !== 'undefined' && ENV !== null ? ENV.assignment_attempts_enabled : void 0,
     kalturaEnabled:
@@ -1353,7 +1349,7 @@ EditView.prototype._inferSubmissionTypes = function (assignmentData) {
   if (assignmentData.grading_type === 'not_graded') {
     assignmentData.submission_types = ['not_graded']
   } else if (assignmentData.submission_type === 'online') {
-    types = _.select(_.keys(assignmentData.online_submission_types), function (k) {
+    types = filter(keys(assignmentData.online_submission_types), function (k) {
       return assignmentData.online_submission_types[k] === '1'
     })
     assignmentData.submission_types = types
@@ -1369,7 +1365,7 @@ EditView.prototype._filterAllowedExtensions = function (data) {
   const restrictFileExtensions = data.restrict_file_extensions
   delete data.restrict_file_extensions
   if (restrictFileExtensions === '1') {
-    data.allowed_extensions = _.select(data.allowed_extensions.split(','), function (ext) {
+    data.allowed_extensions = filter(data.allowed_extensions.split(','), function (ext) {
       return $.trim(ext.toString()).length > 0
     })
   } else {
@@ -1386,7 +1382,7 @@ EditView.prototype._unsetGroupsIfExternalTool = function (data) {
 }
 
 // Pre-Save Validations
-EditView.prototype.fieldSelectors = _.extend(
+EditView.prototype.fieldSelectors = Object.assign(
   AssignmentGroupSelector.prototype.fieldSelectors,
   GroupCategorySelector.prototype.fieldSelectors,
   {
@@ -1485,7 +1481,7 @@ EditView.prototype.validateGraderCount = function (data) {
 
 EditView.prototype._validateTitle = function (data, errors) {
   let max_name_length
-  if (_.includes(this.model.frozenAttributes(), 'title')) {
+  if (includes(this.model.frozenAttributes(), 'title')) {
     return errors
   }
   const post_to_sis = data.post_to_sis === '1'
@@ -1534,11 +1530,11 @@ EditView.prototype._validateSubmissionTypes = function (data, errors) {
     ]
   } else if (data.submission_type === 'online' && data.vericite_enabled === '1') {
     allow_vericite = true
-    _.select(_.keys(data.submission_types), function (k) {
-      return (allow_vericite =
+    forEach(keys(data.submission_types), function (k) {
+      allow_vericite =
         allow_vericite &&
         (data.submission_types[k] === 'online_upload' ||
-          data.submission_types[k] === 'online_text_entry'))
+          data.submission_types[k] === 'online_text_entry')
     })
     if (!allow_vericite) {
       errors['online_submission_types[online_text_entry]'] = [
@@ -1579,7 +1575,7 @@ EditView.prototype._validateSubmissionTypes = function (data, errors) {
 EditView.prototype._validateAllowedExtensions = function (data, errors) {
   if (
     data.allowed_extensions &&
-    _.includes(data.submission_types, 'online_upload') &&
+    includes(data.submission_types, 'online_upload') &&
     data.allowed_extensions.length === 0
   ) {
     errors.allowed_extensions = [
@@ -1592,7 +1588,7 @@ EditView.prototype._validateAllowedExtensions = function (data, errors) {
 }
 
 EditView.prototype._validatePointsPossible = function (data, errors) {
-  if (_.includes(this.model.frozenAttributes(), 'points_possible')) {
+  if (includes(this.model.frozenAttributes(), 'points_possible')) {
     return errors
   }
   if (this.lockedItems.points) {

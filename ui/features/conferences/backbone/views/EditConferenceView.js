@@ -21,8 +21,7 @@
 import {extend} from '@canvas/backbone/utils'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'underscore'
-import {each} from 'lodash'
+import {each, filter, intersection, includes, without} from 'lodash'
 import * as tz from '@canvas/datetime'
 import DialogBaseView from '@canvas/dialog-base-view'
 import deparam from 'deparam'
@@ -217,7 +216,7 @@ EditConferenceView.prototype.renderConferenceFormUserSettings = function () {
   const conferenceData = this.toJSON()
   const selectedConferenceType = $('#web_conference_conference_type').val()
   // Grab the selected entry to pass in for rendering the appropriate user setting options
-  let selected = _.select(ENV.conference_type_details, function (conference_settings) {
+  let selected = filter(ENV.conference_type_details, function (conference_settings) {
     return conference_settings.type === selectedConferenceType
   })
   if (selected.length > 0) {
@@ -281,8 +280,8 @@ EditConferenceView.prototype.markInvitedSectionsAndGroups = function () {
     (function (_this) {
       return function (section) {
         const section_user_ids = ENV.section_user_ids_map[section.id]
-        const intersection = _.intersection(section_user_ids, _this.model.get('user_ids'))
-        if (intersection.length === section_user_ids.length) {
+        const intersection_ = intersection(section_user_ids, _this.model.get('user_ids'))
+        if (intersection_.length === section_user_ids.length) {
           const el = $('#members_list .member.section_' + section.id).find(':checkbox')
           el.attr('checked', true)
           return el.attr('disabled', true)
@@ -296,8 +295,8 @@ EditConferenceView.prototype.markInvitedSectionsAndGroups = function () {
       return function (group) {
         let el
         const group_user_ids = ENV.group_user_ids_map[group.id]
-        const intersection = _.intersection(group_user_ids, _this.model.get('user_ids'))
-        if (intersection.length === group_user_ids.length) {
+        const intersection_ = intersection(group_user_ids, _this.model.get('user_ids'))
+        if (intersection_.length === group_user_ids.length) {
           el = $('#members_list .member.group_' + group.id).find(':checkbox')
           el.attr('checked', true)
           return el.attr('disabled', true)
@@ -336,11 +335,8 @@ EditConferenceView.prototype.setupGroupAndSectionEventListeners = function () {
               selectedByGroup.push(id)
               return toggleMember(id, e.target.checked)
             } else {
-              selectedByGroup = _.without(selectedByGroup, id)
-              if (
-                !_.contains(selectedBySection, id) &&
-                !_.contains(_this.model.get('user_ids'), id)
-              ) {
+              selectedByGroup = without(selectedByGroup, id)
+              if (!includes(selectedBySection, id) && !includes(_this.model.get('user_ids'), id)) {
                 return toggleMember(id, e.target.checked)
               }
             }
@@ -360,11 +356,8 @@ EditConferenceView.prototype.setupGroupAndSectionEventListeners = function () {
               selectedBySection.push(id)
               return toggleMember(id, e.target.checked)
             } else {
-              selectedBySection = _.without(selectedBySection, id)
-              if (
-                !_.contains(selectedByGroup, id) &&
-                !_.contains(_this.model.get('user_ids'), id)
-              ) {
+              selectedBySection = without(selectedBySection, id)
+              if (!includes(selectedByGroup, id) && !includes(_this.model.get('user_ids'), id)) {
                 return toggleMember(id, e.target.checked)
               }
             }

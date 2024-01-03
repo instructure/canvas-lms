@@ -18,7 +18,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
-import _ from 'underscore'
+import {debounce, reduce, forEach} from 'lodash'
 import Backbone from '@canvas/backbone'
 import template from '../../jst/IndexView.handlebars'
 import '@canvas/rails-flash-notifications'
@@ -52,7 +52,7 @@ export default class IndexView extends Backbone.View {
       'click .reset-quiz-engine': 'resetQuizEngine',
     }
 
-    this.prototype.keyUpSearch = _.debounce(function () {
+    this.prototype.keyUpSearch = debounce(() => {
       this.filterResults()
       return this.announceCount()
     }, 200)
@@ -76,7 +76,7 @@ export default class IndexView extends Backbone.View {
   }
 
   filterResults() {
-    return _.each(this.views(), view => {
+    forEach(this.views(), view => {
       view.filterResults($('#searchTerm').val())
     })
   }
@@ -85,7 +85,7 @@ export default class IndexView extends Backbone.View {
     const searchTerm = $('#searchTerm').val()
     if (searchTerm === '' || searchTerm === null) return
 
-    const matchingQuizCount = _.reduce(
+    const matchingQuizCount = reduce(
       this.views(),
       (runningCount, view) => {
         return runningCount + view.matchingCount(searchTerm)
