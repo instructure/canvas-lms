@@ -16,8 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-import _ from 'underscore'
-import {map} from 'lodash'
+import {map, find, forEach} from 'lodash'
 import ajax from 'ic-ajax'
 import startApp from '../start_app'
 import Ember, {ObjectProxy} from 'ember'
@@ -105,14 +104,14 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
 
     test('studentsHash returns the expected hash', () =>
       asyncHelper.waitForRequests().then(() => {
-        _.each(srgb.studentsHash(), obj => {
+        forEach(srgb.studentsHash(), obj => {
           strictEqual(srgb.get('students').findBy('id', obj.id), obj)
         })
       }))
 
     test('assignmentGroupsHash retuns the expected hash', () =>
       asyncHelper.waitForRequests().then(() => {
-        _.each(srgb.assignmentGroupsHash(), obj => {
+        forEach(srgb.assignmentGroupsHash(), obj => {
           strictEqual(srgb.get('assignment_groups').findBy('id', obj.id), obj)
         })
       }))
@@ -554,7 +553,7 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
       return asyncHelper.waitForRequests().then(() => {
         Ember.run(() => srgb.set('has_grading_periods', false))
         const submissions = srgb.submissionsForStudent(student)
-        propEqual(_.pluck(submissions, 'assignment_id'), ['1', '2'])
+        propEqual(map(submissions, 'assignment_id'), ['1', '2'])
       })
     })
 
@@ -564,7 +563,7 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
       return asyncHelper.waitForRequests().then(() => {
         Ember.run(() => srgb.set('selectedGradingPeriod', {id: '0'}))
         const submissions = srgb.submissionsForStudent(student)
-        propEqual(_.pluck(submissions, 'assignment_id'), ['1', '2'])
+        propEqual(map(submissions, 'assignment_id'), ['1', '2'])
       })
     })
 
@@ -575,7 +574,7 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
         Ember.run(() => {
           srgb.set('selectedGradingPeriod', {id: '1401'})
           const submissions = srgb.submissionsForStudent(student)
-          propEqual(_.pluck(submissions, 'assignment_id'), ['1'])
+          propEqual(map(submissions, 'assignment_id'), ['1'])
         })
       )
     })
@@ -641,9 +640,9 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
     test('selectedSubmission is computed properly', () =>
       asyncHelper.waitForRequests().then(() => {
         const selectedSubmission = srgb.get('selectedSubmission')
-        const sub = _.find(fixtures.submissions, s => s.user_id === student.id)
-        const submission = _.find(sub.submissions, s => s.assignment_id === assignment.id)
-        _.each(submission, (val, key) => {
+        const sub = find(fixtures.submissions, s => s.user_id === student.id)
+        const submission = find(sub.submissions, s => s.assignment_id === assignment.id)
+        forEach(submission, (val, key) => {
           equal(selectedSubmission[key], val, `${key} is the expected value on selectedSubmission`)
         })
       }))
