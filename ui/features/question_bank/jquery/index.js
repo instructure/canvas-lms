@@ -18,6 +18,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
+import htmlEscape from 'html-escape'
 import moveMultipleQuestionBanks from './moveMultipleQuestionBanks'
 import loadBanks from './loadBanks'
 import addBank from './addBank'
@@ -175,7 +176,7 @@ export function attachPageEvents(_e) {
             hrefValues: ['id'],
           })
           $question.fillTemplateData({
-            data: question.question_data,
+            data: htmlEscape(question.question_data),
             htmlValues: ['question_text'],
           })
           $question.data('question', question)
