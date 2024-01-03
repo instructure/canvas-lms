@@ -19,8 +19,7 @@
 import {extend} from '@canvas/backbone/utils'
 import I18n from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'underscore'
-import {map} from 'lodash'
+import {map, max, find, each, uniqBy} from 'lodash'
 import {Model, Collection} from '@canvas/backbone'
 import {formatMessage, plainText} from '@canvas/util/TextHelper'
 
@@ -60,18 +59,17 @@ Message.prototype.parse = function (data) {
     data.subject_url = data.html_url
     data.messages = data.submission_comments
     data.messages.reverse()
-    _.each(data.messages, function (message) {
+    each(data.messages, message => {
       message.author.name = message.author.display_name
       message.bodyHTML = formatMessage(message.comment)
-      return (message.for_submission = true)
+      message.for_submission = true
     })
-    data.participants = _.uniq(
+    data.participants = uniqBy(
       map(data.submission_comments, function (m) {
         return {
           name: m.author_name,
         }
       }),
-      null,
       function (u) {
         return u.name
       }
@@ -84,11 +82,11 @@ Message.prototype.parse = function (data) {
     data.workflow_state = data.read_state ? 'read' : 'unread'
   } else if (data.messages) {
     findParticipant = function (id) {
-      return _.find(data.participants, {
+      return find(data.participants, {
         id,
       })
     }
-    _.each(data.messages, function (message) {
+    each(data.messages, message => {
       message.author = findParticipant(message.author_id)
       message.participants = []
       message.participantNames = []
@@ -113,7 +111,7 @@ Message.prototype.parse = function (data) {
       message.context_name = data.context_name
       message.has_attachments = message.media_comment || message.attachments.length
       message.bodyHTML = formatMessage(message.body)
-      return (message.text = plainText(message.body))
+      message.text = plainText(message.body)
     })
   }
   return data
@@ -128,7 +126,7 @@ Message.prototype.handleSelection = function (model, value) {
   if (!value) {
     return
   }
-  return this.messageCollection.each(function (m) {
+  return this.messageCollection.each(m => {
     if (m !== model) {
       return m.set({
         selected: false,
@@ -162,16 +160,19 @@ Message.prototype.toggleStarred = function (setStarred) {
 Message.prototype.timestamp = function () {
   const lastMessage = new Date(this.get('last_message_at')).getTime()
   const lastAuthored = new Date(this.get('last_authored_message_at')).getTime()
-  return new Date(_.max([lastMessage, lastAuthored]))
+  return new Date(max([lastMessage, lastAuthored]))
 }
 
 Message.prototype.toJSON = function () {
   return {
-    conversation: _.extend(Message.__super__.toJSON.apply(this, arguments), {
-      unread: this.unread(),
-      starred: this.starred(),
-      timestamp: this.timestamp(),
-    }),
+    conversation: {
+      ...Message.__super__.toJSON.apply(this, arguments),
+      ...{
+        unread: this.unread(),
+        starred: this.starred(),
+        timestamp: this.timestamp(),
+      },
+    },
   }
 }
 
