@@ -18,8 +18,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'underscore'
-import {map} from 'lodash'
+import {map, includes, filter} from 'lodash'
 import Backbone from '@canvas/backbone'
 import MessageCollection from './backbone/collections/MessageCollection'
 import MessageListView from './backbone/views/MessageListView'
@@ -308,11 +307,11 @@ const ConversationsRouter = Backbone.Router.extend({
       model.handleMessages()
       model.set(
         'messages',
-        _.filter(
+        filter(
           model.get('messages'),
           m =>
             m.id === message.id ||
-            (_.includes(m.participating_user_ids, message.author_id) &&
+            (includes(m.participating_user_ids, message.author_id) &&
               m.created_at < message.created_at)
         )
       )

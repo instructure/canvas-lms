@@ -20,8 +20,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
+import {each, isUndefined} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import _ from 'underscore'
 import DateHelper from '@canvas/datetime/dateHelper'
 import '@canvas/datetime/jquery'
 
@@ -66,9 +66,9 @@ class GradingPeriodTemplate extends React.Component {
       }
 
       const invalidProps = []
-      _.each(requiredProps, (propType, propName) => {
+      each(requiredProps, (propType, propName) => {
         // eslint-disable-next-line valid-typeof
-        const invalidProp = _.isUndefined(props[propName]) || typeof props[propName] !== propType
+        const invalidProp = isUndefined(props[propName]) || typeof props[propName] !== propType
         if (invalidProp) invalidProps.push(propName)
       })
 

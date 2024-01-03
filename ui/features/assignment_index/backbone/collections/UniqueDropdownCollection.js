@@ -18,7 +18,7 @@
 
 import {extend} from '@canvas/backbone/utils'
 import Backbone from '@canvas/backbone'
-import _ from 'underscore'
+import {isArray, difference} from 'lodash'
 
 extend(UniqueDropdownCollection, Backbone.Collection)
 
@@ -159,7 +159,7 @@ UniqueDropdownCollection.prototype.calculateTakenValues = function (records) {
       })
     )
   }
-  const ref = _.difference(this.possibleValues, takenValues)
+  const ref = difference(this.possibleValues, takenValues)
   const results = []
   for (j = 0, len1 = ref.length; j < len1; j++) {
     value = ref[j]
@@ -205,7 +205,7 @@ UniqueDropdownCollection.prototype.findNextAvailable = function () {
 }
 
 UniqueDropdownCollection.prototype.add = function (models, _options) {
-  if (!_.isArray(models) && typeof models === 'object' && !(models instanceof Backbone.Model)) {
+  if (!isArray(models) && typeof models === 'object' && !(models instanceof Backbone.Model)) {
     const previouslyAvailableValue = this.findNextAvailable()
     this.availableValues.remove(previouslyAvailableValue)
     this.takenValues.add(previouslyAvailableValue)
