@@ -480,9 +480,17 @@ describe "student planner" do
     end
 
     it "links opportunity to the correct assignment page.", priority: "1" do
+      # Adding this today assignment only so that an alert doesn't come up saying Nothing is Due Today
+      # It interferes with the dropdown in Jenkins
+      @course.assignments.create!(name: "assignment due today",
+                                  description: "we need this so we dont get the popup",
+                                  submission_types: "online_text_entry",
+                                  due_at: Time.zone.now)
       go_to_list_view
       open_opportunities_dropdown
-      expect(fj(".Opportunity-styles__points:contains('132')")).to be_present
+
+      expect(flnpt(@assignment_opportunity.name, opportunities_parent)).to be_present
+
       click_opportunity(@assignment_opportunity.name)
 
       expect(driver.current_url).to include "courses/#{@course.id}/assignments/#{@assignment_opportunity.id}"
