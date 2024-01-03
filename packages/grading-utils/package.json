@@ -1,6 +1,6 @@
 {
   "name": "@instructure/grading-utils",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Grading utilities for Instructure apps.",
   "owner": "EVAL",
   "main": "src/index.js",
