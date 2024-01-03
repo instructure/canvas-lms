@@ -1057,7 +1057,7 @@ describe ExternalToolsController do
           get_page
           expect(launch_hash["https://purl.imsglobal.org/spec/lti/claim/custom"]).to include(
             "abc" => "def",
-            "expans" => @teacher.id
+            "expans" => @teacher.id.to_s
           )
         end
 
@@ -1070,7 +1070,7 @@ describe ExternalToolsController do
 
           expect(launch_hash["https://purl.imsglobal.org/spec/lti/claim/custom"]).to include(
             "abc" => "def",
-            "expans" => @teacher.id
+            "expans" => @teacher.id.to_s
           )
         end
 
@@ -1146,7 +1146,7 @@ describe ExternalToolsController do
           get_page
           expect(
             launch_params["https://purl.imsglobal.org/spec/lti/claim/custom"]
-          ).to eq({ "abc" => "def", "expans" => @teacher.id })
+          ).to eq({ "abc" => "def", "expans" => @teacher.id.to_s })
         end
 
         it "if parent_frame_context is not given it does not include it in lti_message_hint" do

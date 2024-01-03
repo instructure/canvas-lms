@@ -66,12 +66,6 @@ api_auth_error_updates:
     the "status" field will not be localized; it will always be given in
     English.
   applies_to: SiteAdmin
-variable_substitution_numeric_to_string:
-  state: hidden
-  display_name: Returns string values instead of numeric values in variable substitutions
-  description: |-
-    If enabled, variable substitutions will return string values instead of numeric values
-  applies_to: RootAccount
 ags_scores_multiple_files:
   state: hidden
   display_name: Allow multiple file AGS submissions to count as only one submission
