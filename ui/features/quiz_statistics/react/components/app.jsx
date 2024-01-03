@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from '@instructure/lodash-underscore'
+import {extend} from 'lodash'
 import CalculatedRenderer from './questions/calculated'
 import EssayRenderer from './questions/essay'
 import FileUploadRenderer from './questions/file_upload'
@@ -32,7 +32,6 @@ import Summary from './summary/index'
 
 const I18n = useI18nScope('quiz_statistics')
 
-const extend = _.extend
 const Renderers = {
   multiple_choice_question: MultipleChoiceRenderer,
   true_false_question: MultipleChoiceRenderer,

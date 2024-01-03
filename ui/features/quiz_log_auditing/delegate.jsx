@@ -18,13 +18,12 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import _ from '@instructure/lodash-underscore'
+import {extend} from 'lodash'
 import config from './config'
 import initialize from './config/initializers/initializer'
 import Layout from './react/routes'
 import controller from './controller'
 
-const extend = _.extend
 let container
 
 /**

@@ -16,8 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import _ from 'underscore'
-import {map} from 'lodash'
+import {map, find, filter} from 'lodash'
 import Backbone from '@canvas/backbone'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import DateGroup from '@canvas/date-group/backbone/models/DateGroup'
@@ -340,7 +339,7 @@ export default class Quiz extends Backbone.Model {
   nonBaseDates() {
     const dateGroups = this.get('all_dates')
     if (!dateGroups) return false
-    const withouBase = _.filter(dateGroups, dateGroup => dateGroup && !dateGroup.get('base'))
+    const withouBase = filter(dateGroups, dateGroup => dateGroup && !dateGroup.get('base'))
     return withouBase.length > 0
   }
 
@@ -351,7 +350,7 @@ export default class Quiz extends Backbone.Model {
   }
 
   singleSectionDueDate() {
-    return __guard__(_.find(this.allDates(), 'dueAt'), x => x.dueAt.toISOString()) || this.dueAt()
+    return __guard__(find(this.allDates(), 'dueAt'), x => x.dueAt.toISOString()) || this.dueAt()
   }
 
   isOnlyVisibleToOverrides(overrideFlag) {
