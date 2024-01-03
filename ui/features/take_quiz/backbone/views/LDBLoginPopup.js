@@ -15,8 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import _ from 'underscore'
-import {map} from 'lodash'
+import _, {map, isBoolean, extend} from 'lodash'
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
 import Markup from '../../jst/LDBLoginPopup.handlebars'
@@ -96,10 +95,10 @@ export default class LDBLoginPopup extends Backbone.View {
     // captured.
     let $inputSink
 
-    _.extend(this.options, options)
+    extend(this.options, options)
 
     const windowOptions = map(this.options.window, (v, k) =>
-      [k, _.isBoolean(v) ? (v ? 'yes' : 'no') : v].join('=')
+      [k, isBoolean(v) ? (v ? 'yes' : 'no') : v].join('=')
     ).join(',')
 
     // @method on
