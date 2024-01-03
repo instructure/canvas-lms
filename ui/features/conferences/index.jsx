@@ -18,7 +18,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'underscore'
+import {clone} from 'lodash'
 import Backbone from '@canvas/backbone'
 import CollectionView from '@canvas/backbone-collection-view'
 import ConferenceCollection from './backbone/collections/ConferenceCollection'
@@ -111,7 +111,7 @@ const ConferencesRouter = Backbone.Router.extend({
   },
 
   create() {
-    const conference = new Conference(_.clone(ENV.default_conference))
+    const conference = new Conference(clone(ENV.default_conference))
     conference.once('startSync', () => this.currentConferences.unshift(conference))
     if (conference.get('permissions').create) {
       if (ENV.bbb_modal_update) {
