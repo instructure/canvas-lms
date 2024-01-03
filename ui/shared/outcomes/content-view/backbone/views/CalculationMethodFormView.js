@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import _ from 'underscore'
+import {isNaN, isEmpty, extend} from 'lodash'
 
 import Backbone from '@canvas/backbone'
 import template from '../../jst/outcomeCalculationMethodForm.handlebars'
@@ -59,7 +59,7 @@ export default class CalculationMethodFormView extends Backbone.View {
 
   change(e) {
     const val = parseInt(numberHelper.parse($(e.target).val()), 10)
-    if (_.isNaN(val)) return
+    if (isNaN(val)) return
     this.model.set({
       calculation_int: val,
     })
@@ -83,7 +83,7 @@ export default class CalculationMethodFormView extends Backbone.View {
   //     to handle the next round of events.
   render() {
     this.hadFocus =
-      !_.isEmpty(this.$calculation_int) && document.activeElement === this.$calculation_int[0]
+      !isEmpty(this.$calculation_int) && document.activeElement === this.$calculation_int[0]
     if (this.hadFocus) {
       this.selectionStart = document.activeElement.selectionStart
     }
@@ -101,7 +101,7 @@ export default class CalculationMethodFormView extends Backbone.View {
       data = super.toJSON(...arguments)
     }
 
-    return _.extend(data, {
+    return extend(data, {
       state: this.state,
       writeStates: ['add', 'edit'],
     })

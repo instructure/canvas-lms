@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import _ from 'underscore'
+import {extend} from 'lodash'
 import OutcomeContentBase from './OutcomeContentBase'
 import outcomeGroupTemplate from '../../jst/outcomeGroup.handlebars'
 import outcomeGroupFormTemplate from '../../jst/outcomeGroupForm.handlebars'
@@ -36,7 +36,7 @@ export default class OutcomeGroupView extends OutcomeContentBase {
       default: {
         // show
         const canManage = !this.readOnly() && this.model.get('can_edit')
-        this.$el.html(outcomeGroupTemplate(_.extend(data, {canManage})))
+        this.$el.html(outcomeGroupTemplate(extend(data, {canManage})))
       }
     }
     this.$('input:first').focus()

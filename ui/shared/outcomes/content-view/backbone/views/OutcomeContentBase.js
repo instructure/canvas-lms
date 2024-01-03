@@ -18,7 +18,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'underscore'
+import {extend, isEmpty} from 'lodash'
 import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 import '@canvas/rails-flash-notifications'
@@ -34,7 +34,7 @@ export default class OutcomeContentBase extends ValidatedFormView {
     this.prototype.tagName = 'div'
     this.prototype.className = 'wrapper'
 
-    this.prototype.events = _.extend(
+    this.prototype.events = extend(
       {
         'click .edit_button': 'edit',
         'click .cancel_button': 'cancel',
@@ -52,7 +52,7 @@ export default class OutcomeContentBase extends ValidatedFormView {
     // if it is valid.
     this.prototype.validations = {
       title(data) {
-        if (_.isEmpty(data.title)) {
+        if (isEmpty(data.title)) {
           return I18n.t('blank_error', 'Cannot be blank')
         } else if (data.title.length > 255) {
           return I18n.t('length_error', 'Must be 255 characters or less')
@@ -73,7 +73,7 @@ export default class OutcomeContentBase extends ValidatedFormView {
         this.errors[fieldName] = [{message: errorMessage}]
       }
     }
-    return _.isEmpty(this.errors)
+    return isEmpty(this.errors)
   }
 
   // all options are optional
