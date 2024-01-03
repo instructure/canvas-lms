@@ -487,6 +487,43 @@ describe MediaObject do
         end
       end
     end
+
+    context "when context_root_account is nil" do
+      before do
+        @mo = media_object
+        @mo.update!(
+          user: nil,
+          context: nil
+        )
+        @not_logged_in_user = nil
+      end
+
+      context "with granular_permissions_manage_course_content feature flag enabled" do
+        before do
+          @course.root_account.enable_feature!(:granular_permissions_manage_course_content)
+        end
+
+        it "does not error when context_root_account is nil" do
+          expect { @mo.grants_right?(@not_logged_in_user, :add_captions) }.not_to raise_error
+          expect { @mo.grants_right?(@not_logged_in_user, :delete_captions) }.not_to raise_error
+          expect(@mo.grants_right?(@not_logged_in_user, :add_captions)).to be false
+          expect(@mo.grants_right?(@not_logged_in_user, :delete_captions)).to be false
+        end
+      end
+
+      context "with granular_permissions_manage_course_content feature flag disabled" do
+        before do
+          @course.root_account.disable_feature!(:granular_permissions_manage_course_content)
+        end
+
+        it "does not error when context_root_account is nil" do
+          expect { @mo.grants_right?(@not_logged_in_user, :add_captions) }.not_to raise_error
+          expect { @mo.grants_right?(@not_logged_in_user, :delete_captions) }.not_to raise_error
+          expect(@mo.grants_right?(@not_logged_in_user, :add_captions)).to be false
+          expect(@mo.grants_right?(@not_logged_in_user, :delete_captions)).to be false
+        end
+      end
+    end
   end
 
   describe ".add_media_files" do
