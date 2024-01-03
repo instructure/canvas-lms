@@ -17,8 +17,8 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import _ from 'underscore'
 import $ from 'jquery'
+import {without} from 'lodash'
 import React from 'react'
 import createReactClass from 'create-react-class'
 import BackboneState from './mixins/BackboneState'
@@ -66,7 +66,7 @@ const ManageGroupDialog = createReactClass({
     this.setState({
       checked: isChecked
         ? this.state.checked.concat(user.id)
-        : _.without(this.state.checked, user.id),
+        : without(this.state.checked, user.id),
     })
   },
 

@@ -19,8 +19,8 @@
 /* eslint-disable no-void */
 
 import {extend} from '@canvas/backbone/utils'
+import {omit} from 'lodash'
 import $ from 'jquery'
-import _ from 'underscore'
 import Backbone from '@canvas/backbone'
 import GroupCollection from '../collections/GroupCollection'
 import UnassignedGroupUserCollection from '../collections/UnassignedGroupUserCollection'
@@ -229,7 +229,7 @@ GroupCategory.prototype.present = function () {
 }
 
 GroupCategory.prototype.toJSON = function () {
-  return _.omit(GroupCategory.__super__.toJSON.apply(this, arguments), 'self_signup')
+  return omit(GroupCategory.__super__.toJSON.apply(this, arguments), 'self_signup')
 }
 
 GroupCategory.mixin(DefaultUrlMixin)

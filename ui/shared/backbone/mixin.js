@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {extend, flatten} from 'underscore'
+import {extend, flatten} from 'lodash'
 
 // Merges mixins into target, being mindful of certain properties (like
 // events) that need to be merged also.
@@ -56,7 +56,7 @@ export default function (target, ...mixins) {
   }
   for (key of Array.from(Array.from(magicMethods).map(method => `__${method}__`))) {
     if (target[key]) {
-      target[key] = flatten(target[key], true)
+      target[key] = flatten(target[key])
     }
   }
   return target
