@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
+import {each} from 'lodash'
 import createStore from '@canvas/backbone/createStore'
 import $ from 'jquery'
 
@@ -25,7 +25,7 @@ const CourseEpubExportStore = createStore({}),
 
 CourseEpubExportStore.getAll = function () {
   $.getJSON('/api/v1/epub_exports', data => {
-    _.each(data.courses, course => {
+    each(data.courses, course => {
       _courses[course.id] = course
     })
     CourseEpubExportStore.setState(_courses)

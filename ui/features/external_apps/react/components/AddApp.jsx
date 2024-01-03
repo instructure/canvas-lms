@@ -17,8 +17,7 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import _ from 'underscore'
-import {map, each} from 'lodash'
+import {map, each, isEmpty, compact} from 'lodash'
 import $ from 'jquery'
 import React from 'react'
 import createReactClass from 'create-react-class'
@@ -105,9 +104,9 @@ export default createReactClass({
   },
 
   validateConfig() {
-    const invalidFields = _.compact(
+    const invalidFields = compact(
       map(this.state.fields, (v, k) => {
-        if (v.required && _.isEmpty(v.value)) {
+        if (v.required && isEmpty(v.value)) {
           return k
         }
       })
@@ -149,11 +148,9 @@ export default createReactClass({
     const newTool = new ExternalTool()
     newTool.on('sync', this.onSaveSuccess, this)
     newTool.on('error', this.onSaveFail, this)
-    if (!_.isEmpty(this.state.invalidFields)) {
+    if (!isEmpty(this.state.invalidFields)) {
       const fields = this.state.fields
-      const invalidFieldNames = map(this.state.invalidFields, k => fields[k].description).join(
-        ', '
-      )
+      const invalidFieldNames = map(this.state.invalidFields, k => fields[k].description).join(', ')
       this.setState({
         errorMessage: I18n.t('The following fields are invalid: %{fields}', {
           fields: invalidFieldNames,
