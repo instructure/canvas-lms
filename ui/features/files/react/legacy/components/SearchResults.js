@@ -17,8 +17,7 @@
  */
 
 import $ from 'jquery'
-import _ from 'underscore'
-import {map} from 'lodash'
+import {map, isEqual, isArray} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import FilesCollection from '@canvas/files/backbone/collections/FilesCollection'
 import customPropTypes from '@canvas/files/react/modules/customPropTypes'
@@ -55,7 +54,7 @@ export default {
       responseText = {errors: [{message}]}
     }
 
-    const errors = _.isArray(responseText.errors)
+    const errors = isArray(responseText.errors)
       ? this.translateErrors(responseText.errors)
       : responseText.errors && responseText.errors.base
       ? [{message: `${responseText.errors.base}, ${responseText.status}`}]
@@ -88,7 +87,7 @@ export default {
     // Refactor this when given time. Maybe even use setState instead of forceUpdate
     if (
       !this.state.collection.loadedAll ||
-      !_.isEqual(this.props.query.search_term, props.query && props.query.search_term)
+      !isEqual(this.props.query.search_term, props.query && props.query.search_term)
     ) {
       const forceUpdate = () => {
         // eslint-disable-next-line react/no-is-mounted

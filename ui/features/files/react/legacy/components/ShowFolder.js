@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import page from 'page'
-import _ from 'underscore'
+import {debounce} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import filesEnv from '@canvas/files/react/modules/filesEnv'
 import getAllPages from '../util/getAllPages'
@@ -32,7 +32,7 @@ const LEADING_SLASH_TILL_BUT_NOT_INCLUDING_NEXT_SLASH = /^\/[^\/]*/
 export default {
   displayName: 'ShowFolder',
 
-  debouncedForceUpdate: _.debounce(function () {
+  debouncedForceUpdate: debounce(function () {
     // eslint-disable-next-line react/no-is-mounted
     if (this.isMounted()) this.forceUpdate()
   }, 0),

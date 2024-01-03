@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import _ from 'underscore'
+import {omit, defer, pick} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import * as tz from '@canvas/datetime'
 import moment from 'moment-timezone'
@@ -67,7 +67,7 @@ export default class EditCalendarEventView extends Backbone.View {
 
     super.initialize(...arguments)
     this.model.fetch().done(() => {
-      const picked_params = _.pick(
+      const picked_params = pick(
         {...this.model.attributes, ...deparam()},
         'start_at',
         'start_date',
@@ -382,9 +382,9 @@ export default class EditCalendarEventView extends Backbone.View {
     const $textarea = this.$('textarea')
     RichContentEditor.loadNewEditor($textarea, {focus: true, manageParent: true})
 
-    _.defer(this.toggleDuplicateOptions)
-    _.defer(this.renderConferenceWidget)
-    _.defer(this.disableDatePickers)
+    defer(this.toggleDuplicateOptions)
+    defer(this.renderConferenceWidget)
+    defer(this.disableDatePickers)
 
     return this
   }
@@ -618,7 +618,7 @@ export default class EditCalendarEventView extends Backbone.View {
       const end_time = this.$el.find(`[name='${end_time_key}']`).change().data('date')
       if (!start_date) return
 
-      data = _.omit(data, start_date_key, start_time_key, end_time_key)
+      data = omit(data, start_date_key, start_time_key, end_time_key)
 
       let start_at = start_date.toString('yyyy-MM-dd')
       if (start_time && !data.blackout_date) {

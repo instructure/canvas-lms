@@ -25,7 +25,7 @@
 //
 
 import $ from 'jquery'
-import _ from 'underscore'
+import {reduce, each} from 'lodash'
 import Backbone from '@canvas/backbone'
 import template from '../../jst/Syllabus.handlebars'
 
@@ -144,7 +144,7 @@ export default class SyllabusView extends Backbone.View {
       }
 
       let override = null
-      _.each(json.assignment_overrides != null ? json.assignment_overrides : [], ov => {
+      each(json.assignment_overrides != null ? json.assignment_overrides : [], ov => {
         if (override == null) {
           override = {}
         }
@@ -221,7 +221,7 @@ export default class SyllabusView extends Backbone.View {
     }
 
     // Get the dates and events
-    const dates = _.reduce(super.toJSON(...arguments), dateCollator, [])
+    const dates = reduce(super.toJSON(...arguments), dateCollator, [])
 
     // Remove extraneous override information for single events
     let overrides_present = false
