@@ -157,9 +157,7 @@ module Lti
                    v
                  end
 
-        if @root_account&.feature_enabled?(:variable_substitution_numeric_to_string) &&
-           @tool.is_a?(ContextExternalTool) && @tool.use_1_3? &&
-           output.is_a?(Numeric)
+        if @tool.is_a?(ContextExternalTool) && @tool.use_1_3? && output.is_a?(Numeric)
           output&.to_s
         else
           output
