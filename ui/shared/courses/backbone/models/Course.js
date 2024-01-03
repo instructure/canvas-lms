@@ -17,7 +17,7 @@
  */
 
 import {extend} from '@canvas/backbone/utils'
-import _ from 'underscore'
+import {omit} from 'lodash'
 import {Model} from '@canvas/backbone'
 
 extend(Course, Model)
@@ -32,7 +32,7 @@ Course.prototype.resourceName = 'courses'
 
 Course.prototype.toJSON = function () {
   return {
-    course: _.omit(this.attributes, 'id', 'calendar', 'enrollments', 'workflow_state'),
+    course: omit(this.attributes, 'id', 'calendar', 'enrollments', 'workflow_state'),
   }
 }
 

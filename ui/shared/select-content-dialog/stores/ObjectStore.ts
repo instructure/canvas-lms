@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import _ from '@instructure/lodash-underscore'
+import {clone} from 'lodash'
 import createStore, {type CanvasStore} from '@canvas/backbone/createStore'
 import parseLinkHeader from 'link-header-parsing/parseLinkHeaderFromXHR'
 import '@canvas/rails-flash-notifications'
@@ -54,7 +54,8 @@ class ObjectStore {
    */
   constructor(apiEndpoint: string, options: any) {
     // We clone the initialStoreState so it doesn't hang onto a bad reference.
-    this.store = createStore(_.clone(initialStoreState))
+    // @ts-expect-error
+    this.store = createStore(clone(initialStoreState))
     if (options) {
       options.per_page = options.perPage
       delete options.perPage
@@ -84,7 +85,8 @@ class ObjectStore {
    */
   reset() {
     // We clone the initialStoreState so it doesn't hang onto a bad reference.
-    this.store.setState(_.clone(initialStoreState))
+    // @ts-expect-error
+    this.store.setState(clone(initialStoreState))
   }
 
   /**

@@ -21,7 +21,7 @@
 import {extend} from '@canvas/backbone/utils'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-import _ from 'underscore'
+import {assignIn, isNumber} from 'lodash'
 
 import Outcome from '@canvas/outcomes/backbone/models/Outcome'
 
@@ -46,7 +46,7 @@ GradeSummaryOutcome.prototype.parse = function (response) {
   let ref, ref1
   return GradeSummaryOutcome.__super__.parse.call(
     this,
-    _.extend(response, {
+    assignIn(response, {
       submitted_or_assessed_at: tz.parse(response.submitted_or_assessed_at),
       question_bank_result:
         (ref = response.links) != null
@@ -96,7 +96,7 @@ GradeSummaryOutcome.prototype.roundedScore = function () {
 }
 
 GradeSummaryOutcome.prototype.scoreDefined = function () {
-  return _.isNumber(this.get('score'))
+  return isNumber(this.get('score'))
 }
 
 GradeSummaryOutcome.prototype.scaledScore = function () {
@@ -131,7 +131,7 @@ GradeSummaryOutcome.prototype.masteryPercent = function () {
 }
 
 GradeSummaryOutcome.prototype.toJSON = function () {
-  return _.extend(GradeSummaryOutcome.__super__.toJSON.apply(this, arguments), {
+  return assignIn(GradeSummaryOutcome.__super__.toJSON.apply(this, arguments), {
     status: this.status(),
     statusTooltip: this.statusTooltip(),
     roundedScore: this.roundedScore(),
