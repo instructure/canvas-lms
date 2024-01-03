@@ -95,6 +95,12 @@ describe RubricsController do
 
         expect(response).to render_template("layouts/application")
       end
+
+      it "can access rubrics for /create route" do
+        get "index", params: { course_id: "create" }
+
+        expect(response).to render_template("layouts/application")
+      end
     end
   end
 

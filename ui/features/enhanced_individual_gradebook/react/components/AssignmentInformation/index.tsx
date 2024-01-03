@@ -24,7 +24,7 @@ import {IconWarningLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
-import {
+import type {
   AssignmentConnection,
   GradebookOptions,
   SortableStudent,

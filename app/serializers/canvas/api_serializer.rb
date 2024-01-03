@@ -240,9 +240,9 @@ module Canvas
                                   else
                                     instance.empty?
                                   end
-        send("#{name}_url".to_sym) unless instance_does_not_exist
+        send(:"#{name}_url") unless instance_does_not_exist
       elsif instance.present?
-        send("#{name}_url".to_sym)
+        send(:"#{name}_url")
       end
     end
 

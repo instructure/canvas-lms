@@ -793,6 +793,30 @@ describe CoursesController, type: :request do
         expect(course_ids.length).to eq 2
       end
 
+      it "returns courses for a user scoped to specified account" do
+        json = api_call(:get,
+                        "/api/v1/users/#{@me.id}/courses",
+                        { user_id: @me.id,
+                          account_id: @course1.account.id.to_s,
+                          controller: "courses",
+                          action: "user_index",
+                          format: "json" })
+        course_ids = json.select { |c| c["id"] }
+        expect(course_ids.length).to eq 2
+      end
+
+      it "does not return courses if not associated to specified account" do
+        json = api_call(:get,
+                        "/api/v1/users/#{@me.id}/courses",
+                        { user_id: @me.id,
+                          account_id: Account.site_admin.id,
+                          controller: "courses",
+                          action: "user_index",
+                          format: "json" })
+        course_ids = json.select { |c| c["id"] }
+        expect(course_ids.length).to eq 0
+      end
+
       it "returns courses for self" do
         json = api_call_as_user(@me,
                                 :get,

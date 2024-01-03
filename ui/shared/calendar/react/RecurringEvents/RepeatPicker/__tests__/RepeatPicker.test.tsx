@@ -20,11 +20,11 @@ import React from 'react'
 import {render, act, fireEvent, screen} from '@testing-library/react'
 import moment from 'moment-timezone'
 import RepeatPicker, {
-  RepeatPickerProps,
+  type RepeatPickerProps,
   getByMonthdateString,
   getLastWeekdayInMonthString,
 } from '../RepeatPicker'
-import {UnknownSubset} from '../../types'
+import type {UnknownSubset} from '../../types'
 import {cardinalDayInMonth, weekdaysFromMoment} from '../../utils'
 
 export function changeFreq(from: string, to: string): void {

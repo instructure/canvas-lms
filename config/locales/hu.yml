@@ -4875,6 +4875,7 @@ hu:
       update_assignment_points: "Feladat pontjainak módosítása az értékelőtáblához illeszkedően? "
   change_section_to_sectionname_6e947e90: "Szekció módosítása erre: %{sectionName}"
   change_sis_ids_3a47154d: "SIS ID-k megváltoztatása"
+  change_to_b757d327: "módosítás erre:"
   changed_item_1d16a85f: "Módosított elem"
   changes_will_still_apply_if_you_leave_this_page_935cedc6: "A változások az oldal elhagyása esetén is érvényben maradnak. "
   changes_you_made_may_not_be_saved_4e8db973: "Előfordulhat, hogy a végrehajtott módosítások nem menthetők."
@@ -10230,6 +10231,7 @@ hu:
         out_of: "Ennyiből: "
         score: Eredmény
         submission_progress_status: "Bedandó készültségi foka"
+        submitted: Beadva
       labels: 
         final_grade_hidden: "Az összegzések kiszámolása funkció le van tiltva"
         high: Magas
@@ -17592,6 +17594,7 @@ hu:
   remove_avatar_picture_aba765eb: "Avatar kép eltávolítása"
   remove_contact_method_ca890ba3: "Kapcsolatfelvételi mód eltávolítása"
   remove_d83a966c: "Eltávolítás:"
+  remove_dates_5a5a8df2: "Dátumok eltávolítása"
   remove_dates_9b9ba2f6: "Dátumok eltávolítása"
   remove_designers_from_courses_42332a57: "Tervezők eltávolítása a kurzusokból"
   remove_displayname_a2f31aa3: "%{displayName}  eltávolítása"
@@ -18974,6 +18977,7 @@ hu:
   shared_brand_configs_e5d319d7: "Megosztott Márka Konfigurációk"
   shared_content_803ac37b: "Megosztott tartalom"
   shared_secret_892c88f2: "Megosztott titkos kulcs"
+  shift_dates_746698a5: "Dátumok eltolása"
   short_name_42f454a1: "Rövid név"
   short_name_ad9bf84f: "rövid név"
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "Egyértelműnek kell lennie, a Canvas-azonosítója a visszajelzést adó felhasználónak"
@@ -19619,6 +19623,7 @@ hu:
   subscribe_failed_2eb62de0: "Sikertelen feliratkozás"
   subscribe_to_title_c7d6bbd2: "Feliratkozás erre: %{title}"
   subscribed_fe74d22a: Feliratkozva
+  substitution_713c65b9: helyettesítés
   subtitle_ee60ca78: Felirat
   success_file_uploaded_8174e93f: "A fájl felöltése sikeres."
   success_grades_were_published_to_the_grade_book_da3b4fba: "Az értékeléseket sikeresen közzétette a naplóban."
@@ -21427,11 +21432,13 @@ hu:
   you_must_allow_at_least_one_appointment_per_partic_c142139c: "Legalább egy megbeszélést engedélyeznie kell résztvevőnként."
   you_must_allow_at_least_one_group_to_attend_68531eab: "Legalább egy csoportnak engedélyeznie kell a részvételt"
   you_must_attach_at_least_one_file_to_this_assignme_9f39ce12: "Legalább egy fájlt csatolnia kell ehhez a feladathoz"
+  you_must_choose_a_content_option_c776bdef: "Ki kell választania egy tartalomopciót "
   you_must_enter_a_date_f8eabfb1: "Be kell írnia egy dátumot"
   you_must_have_a_student_or_section_selected_a99e45df: "Ki kell választania egy hallgatót vagy egy szekciót"
   you_must_log_in_to_view_replies_9ccd4da0: "Jelentkezzen be a válaszok megtekintéséhez"
   you_must_provide_a_date_and_time_a86839d2: "Meg kell adni a dátumot és az időt"
   you_must_select_a_course_to_copy_content_from_e7bd9e09: "Kurzus kiválasztása a tartalom másolásához"
+  you_must_select_a_file_to_import_content_from_28a242ff: "Ki kell választania egy fájlt a tartalom importálásához"
   you_must_specify_a_usage_right_5eb57f87: "Határozza meg a felhasználói jogokat. "
   you_must_use_a_number_912ce4bd: "Számokat kell megadnia"
   you_must_use_a_positive_number_203b86fe: "Pozitív számot kell megadnia"

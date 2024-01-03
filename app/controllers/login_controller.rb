@@ -56,13 +56,13 @@ class LoginController < ApplicationController
     # deprecated redirect; they should already know the correct type
     params[:authentication_provider] ||= params[:id]
 
-    if @domain_root_account.auth_discovery_url && !params[:authentication_provider]
-      auth_discovery_url = @domain_root_account.auth_discovery_url
+    if @domain_root_account.auth_discovery_url(request) && !params[:authentication_provider]
+      auth_discovery_url = @domain_root_account.auth_discovery_url(request)
       if flash[:delegated_message]
         auth_discovery_url << (URI.parse(auth_discovery_url).query ? "&" : "?")
         auth_discovery_url << "message=#{URI::DEFAULT_PARSER.escape(flash[:delegated_message])}"
       end
-      return redirect_to auth_discovery_url
+      return redirect_to auth_discovery_url, @domain_root_account.auth_discovery_url_options(request)
     end
 
     if params[:authentication_provider]

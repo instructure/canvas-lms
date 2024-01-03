@@ -28,6 +28,7 @@ import {
   IconReviewScreenLine,
   IconTrashLine,
 } from '@instructure/ui-icons'
+import {Img} from '@instructure/ui-img'
 import {Flex} from '@instructure/ui-flex'
 import {Menu} from '@instructure/ui-menu'
 import type {MenuItemProps} from '@instructure/ui-menu'
@@ -35,9 +36,9 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import type {ViewOwnProps} from '@instructure/ui-view'
 
-const CARD_WIDTH = '400px'
-const CARD_HEIGHT = '200px'
-const CARD_IMAGE_HEIGHT = `${200 - 96}px`
+const PORTFOLIO_CARD_WIDTH = '400px'
+const PORTFOLIO_CARD_HEIGHT = '200px'
+const PORTFOLIO_CARD_IMAGE_HEIGHT = `${200 - 96}px`
 
 export type PortfolioCardProps = {
   id: string
@@ -76,28 +77,34 @@ const PortfolioCard = ({id, title, heroImageUrl, onAction}: PortfolioCardProps) 
       id={`portfolio-${id}`}
       as="div"
       background="secondary"
-      width={CARD_WIDTH}
-      height={CARD_HEIGHT}
-      shadow="resting"
+      width={PORTFOLIO_CARD_WIDTH}
+      height={PORTFOLIO_CARD_HEIGHT}
       role="button"
+      cursor="pointer"
       onClick={handleCardClick}
     >
-      <View as="div">
-        <img
-          src={heroImageUrl || undefined}
-          alt=""
-          style={{
-            display: 'block',
-            width: '100%',
-            height: CARD_IMAGE_HEIGHT,
-            background:
-              'repeating-linear-gradient(45deg, #cecece, #cecece 10px, #aeaeae 10px, #aeaeae 20px)',
-          }}
-        />
+      <View as="div" height={PORTFOLIO_CARD_IMAGE_HEIGHT} overflowY="hidden">
+        {heroImageUrl ? (
+          <Img
+            src={heroImageUrl}
+            alt="Cover image"
+            constrain="cover"
+            height={PORTFOLIO_CARD_IMAGE_HEIGHT}
+          />
+        ) : (
+          <div
+            style={{
+              width: '100%',
+              height: PORTFOLIO_CARD_IMAGE_HEIGHT,
+              background:
+                'repeating-linear-gradient(45deg, #cecece, #cecece 10px, #aeaeae 10px, #aeaeae 20px)',
+            }}
+          />
+        )}
       </View>
       <Flex as="div">
         <Flex.Item shouldGrow={true} padding="small small 0 small">
-          <Text weight="bold" size="medium">
+          <Text weight="bold" size="large">
             {title}
           </Text>
         </Flex.Item>
@@ -147,17 +154,5 @@ const PortfolioCard = ({id, title, heroImageUrl, onAction}: PortfolioCardProps) 
   )
 }
 
-const PortfolioCardSkeleton = () => {
-  return (
-    <View
-      as="div"
-      background="secondary"
-      width={CARD_WIDTH}
-      height={CARD_HEIGHT}
-      shadow="resting"
-    />
-  )
-}
-
 export default PortfolioCard
-export {PortfolioCardSkeleton}
+export {PORTFOLIO_CARD_HEIGHT, PORTFOLIO_CARD_WIDTH}

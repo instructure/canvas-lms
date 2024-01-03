@@ -120,6 +120,7 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
                 name="foo"
                 onImageLoaded={[Function]}
                 shape="circle"
+                showBorder="auto"
                 size="small"
                 src="testImageUrl"
               />

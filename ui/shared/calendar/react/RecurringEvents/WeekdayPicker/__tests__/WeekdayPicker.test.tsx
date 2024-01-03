@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import moment, {Locale} from 'moment'
+import moment, {type Locale} from 'moment'
 import {render, act} from '@testing-library/react'
 import WeekdayPicker from '../WeekdayPicker'
 

@@ -26,7 +26,7 @@ import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
-import {BlackoutDate} from '../../shared/types'
+import type {BlackoutDate} from '../../shared/types'
 import {coursePaceDateFormatter} from '../../shared/api/backend_serializer'
 
 // until the icon gets into INSTUI

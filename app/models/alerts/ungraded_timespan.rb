@@ -34,7 +34,7 @@ module Alerts
     end
 
     def should_not_receive_message?(user_id, threshold)
-      (!@ungraded_timespan_for_student[user_id] || @ungraded_timespan_for_student[user_id] + threshold.days > @today)
+      !@ungraded_timespan_for_student[user_id] || @ungraded_timespan_for_student[user_id] + threshold.days > @today
     end
   end
 end

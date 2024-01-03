@@ -18,13 +18,13 @@
 
 import mockGraphqlQuery from '@canvas/graphql-query-mock'
 import {INTERNAL_SETTINGS_QUERY} from '../graphql/Queries'
-import {InternalSettingsData} from '../types'
+import type {InternalSettingsData} from '../types'
 import React from 'react'
 import {InternalSettingsView} from '../InternalSettingsView'
 import {render} from '@testing-library/react'
 import {createCache} from '@canvas/apollo'
 import {MockedProvider} from '@apollo/react-testing'
-import {ExecutionResult} from 'react-apollo'
+import type {ExecutionResult} from 'react-apollo'
 
 const mockInternalSettingsQuery = async () => {
   const queryResult = await mockGraphqlQuery(INTERNAL_SETTINGS_QUERY)

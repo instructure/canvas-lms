@@ -138,7 +138,6 @@ type Getters = {
   listInvalidAssignmentGroups(): ReturnType<Gradebook['listInvalidAssignmentGroups']>
   listHiddenAssignments(studentId: string): Assignment[]
   shouldShowPoints(): boolean
-  pointsBasedGradingSchemesFeatureEnabled(): boolean
 }
 
 export default class TotalGradeCellFormatter {
@@ -146,9 +145,6 @@ export default class TotalGradeCellFormatter {
 
   constructor(gradebook: Gradebook) {
     this.options = {
-      pointsBasedGradingSchemesFeatureEnabled(): boolean {
-        return gradebook.pointsBasedGradingSchemesFeatureEnabled()
-      },
       getTotalPointsPossible() {
         return gradebook.getTotalPointsPossible()
       },
@@ -189,19 +185,17 @@ export default class TotalGradeCellFormatter {
     let scaledScore = NaN
     let scaledPossible = NaN
 
-    if (this.options.pointsBasedGradingSchemesFeatureEnabled()) {
-      if (scheme) {
-        displayAsScaledPoints = scheme.pointsBased
-        const scalingFactor = scheme.scalingFactor
+    if (scheme) {
+      displayAsScaledPoints = scheme.pointsBased
+      const scalingFactor = scheme.scalingFactor
 
-        if (displayAsScaledPoints && grade.possible) {
-          scaledPossible = I18n.n(scalingFactor, {
-            precision: 1,
-          })
-          scaledScore = I18n.n(scoreToScaledPoints(grade.score, grade.possible, scalingFactor), {
-            precision: 1,
-          })
-        }
+      if (displayAsScaledPoints && grade.possible) {
+        scaledPossible = I18n.n(scalingFactor, {
+          precision: 1,
+        })
+        scaledScore = I18n.n(scoreToScaledPoints(grade.score, grade.possible, scalingFactor), {
+          precision: 1,
+        })
       }
     }
 

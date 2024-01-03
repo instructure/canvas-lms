@@ -122,7 +122,7 @@ module Importers
       item.migration_id = hash[:migration_id]
       if new_record || item.deleted? || master_migration
         item.workflow_state = if item.can_unpublish?
-                                (hash[:workflow_state] || "published")
+                                hash[:workflow_state] || "published"
                               else
                                 "published"
                               end

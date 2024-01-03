@@ -1407,6 +1407,23 @@ describe "Module Items API", type: :request do
         expect(json["modules"].size).to be 0
       end
 
+      it "finds a (non-deleted) wiki page by old slug" do
+        @wiki_page.wiki_page_lookups.create!(slug: "an-old-url")
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=Page&asset_id=an-old-url",
+                        controller: "context_module_items_api",
+                        action: "item_sequence",
+                        format: "json",
+                        course_id: @course.to_param,
+                        asset_type: "Page",
+                        asset_id: "an-old-url")
+        expect(json["items"].size).to be 1
+        expect(json["items"][0]["prev"]["id"]).to eq @external_url_tag.id
+        expect(json["items"][0]["current"]["id"]).to eq @wiki_page_tag.id
+        expect(json["items"][0]["next"]["id"]).to eq @attachment_tag.id
+        expect(json["modules"].pluck("id").sort).to eq [@module1.id, @module2.id].sort
+      end
+
       it "skips a deleted module" do
         new_tag = @module3.add_item(id: @attachment.id, type: "attachment")
         @module2.destroy

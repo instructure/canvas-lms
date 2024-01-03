@@ -399,11 +399,11 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
                                     display_name: "attachment.png",
                                     user: student,
                                     uploaded_data: io
-    qs.submission_data["question_#{question.id}".to_sym] = [attach.id.to_s]
+    qs.submission_data[:"question_#{question.id}"] = [attach.id.to_s]
     qs.save!
     Quizzes::SubmissionGrader.new(qs).grade_submission
     qs = q.generate_submission student2
-    qs.submission_data["question_#{question.id}".to_sym] = nil
+    qs.submission_data[:"question_#{question.id}"] = nil
     qs.save!
     Quizzes::SubmissionGrader.new(qs).grade_submission
     # make student2's submission first

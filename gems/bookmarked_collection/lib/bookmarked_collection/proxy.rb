@@ -24,7 +24,7 @@ class BookmarkedCollection::Proxy < PaginatedCollection::Proxy
   def initialize(bookmarker, block)
     @bookmarker = bookmarker
     @depth = 0
-    super block
+    super(block)
   end
 
   def new_pager
@@ -32,6 +32,6 @@ class BookmarkedCollection::Proxy < PaginatedCollection::Proxy
   end
 
   def configure_pager(pager, options)
-    super pager, options.merge(total_entries: nil)
+    super(pager, options.merge(total_entries: nil))
   end
 end

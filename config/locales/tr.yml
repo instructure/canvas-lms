@@ -4376,6 +4376,7 @@ tr:
       update_assignment_points: "Değerlendirme listesi ile eşleşmesi için ödev puanları değiştirilsin mi?"
   change_section_to_sectionname_6e947e90: "%{sectionName} bölümüne değiştirin"
   change_sis_ids_3a47154d: "ÖBS IDleri Değiştir"
+  change_to_b757d327: "şununla değiştir"
   changed_item_1d16a85f: "Değiştirilmiş Öğe"
   changes_will_still_apply_if_you_leave_this_page_935cedc6: "Bu sayfadan ayrılsanız da değişiklikler uygulanacak."
   changes_you_made_may_not_be_saved_4e8db973: "Yaptığınız değişiklikler kaydedilmemiş olabilir."
@@ -9241,6 +9242,7 @@ tr:
         out_of: Üzerinden
         score: Puan
         submission_progress_status: "Gönderi İlerleme Durumu"
+        submitted: Gönderildi
       icons: 
         turnitin_results: "Turnitin sonuçlarına bak"
       labels: 
@@ -16674,6 +16676,7 @@ tr:
   remove_all_group_observer_members_af5675f3: "Tüm Grup Gözlemci Üyelerini Kaldır"
   remove_attachment_ceae0973: "Ekli Dosyayı Kaldır"
   remove_avatar_picture_aba765eb: "Avatar resmini kaldır"
+  remove_dates_5a5a8df2: "Tarihleri sil"
   remove_edf2b8a7: (Kaldır)
   remove_f47dc62a: Kaldır
   remove_image_341340b3: "Görseli sil"
@@ -18072,6 +18075,7 @@ tr:
       none_to_update: "Güncellenecek bir şey yok"
   shared_content_803ac37b: "Paylaşılan İçerik"
   shared_secret_892c88f2: "Paylaşım Anahtarı"
+  shift_dates_746698a5: "Günler arası geçiş yap"
   short_name_ad9bf84f: "kısa isim"
   show_all_details_9879980c: "Tüm Ayrıntıları Göster"
   show_attendance_columns_4d160e16: "Devam Sütununu Göster"
@@ -18635,6 +18639,7 @@ tr:
   subscribe_4b301fb7: "Takip Et"
   subscribe_to_title_c7d6bbd2: "%{title} 'e üye ol"
   subscribed_fe74d22a: "Takip edildi"
+  substitution_713c65b9: Altyazı
   subtitle_ee60ca78: "Alt yazı"
   successfully_added_fb3e6008: "Başarıyla Eklendi"
   successfully_created_a_set_38374719: "Set başarılı bir şekilde oluşturuldu"
@@ -20131,9 +20136,11 @@ tr:
   you_may_want_to_assign_some_tas_to_help_you_with_t_702244aa: "Derste size yardımcı olması için asistan öğretmenler atamak isteyebilirsiniz. Asistan Öğretmenler öğrenci ödevlerini notlandırabilir, tartışmaları yönetmeye yardımcı olabilir ve hatta ödev ayrıntılarını ve teslim tarihlerini sizin için güncelleyebilirler."
   you_must_agree_to_the_terms_99723f97: "Şarları kabul etmelisiniz"
   you_must_attach_at_least_one_file_to_this_assignme_9f39ce12: "Bu ödev için en az bir dosya eklemelisiniz"
+  you_must_choose_a_content_option_c776bdef: "Bir içerik seçeneği seçmelisiniz"
   you_must_enter_a_date_f8eabfb1: "Bir tarih girmelisiniz"
   you_must_have_a_student_or_section_selected_a99e45df: "Bir öğrenci veya kısım seçmelisiniz"
   you_must_select_a_course_to_copy_content_from_e7bd9e09: "İçeriğini kopyalacağınız bir ders seçmelisiniz"
+  you_must_select_a_file_to_import_content_from_28a242ff: "İçeriğini aktarmak istediğiniz dosyayı seçmelisiniz"
   you_must_set_it_to_a_number_greater_than_or_equal__eb1d9275: "%{min} a eşit ya da büyük bir sayıya ayarlamalısınız"
   you_must_specify_a_usage_right_5eb57f87: "Bir kullanım hakkı belirtmelisiniz."
   you_must_use_a_number_912ce4bd: "Sayı kullanmalısınız"

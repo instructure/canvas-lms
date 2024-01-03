@@ -19,7 +19,7 @@
 import React from 'react'
 import {render, waitFor} from '@testing-library/react'
 import DifferentiatedModulesTray, {
-  DifferentiatedModulesTrayProps,
+  type DifferentiatedModulesTrayProps,
 } from '../DifferentiatedModulesTray'
 
 describe('DifferentiatedModulesTray', () => {

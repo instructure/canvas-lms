@@ -20,7 +20,7 @@
 module AddressBook
   class PerformanceTap < AddressBook::MessageableUser
     def initialize(sender)
-      super sender
+      super(sender)
       @service_tap = AddressBook::Service.new(sender, ignore_result: true)
     end
 
@@ -46,7 +46,7 @@ module AddressBook
     class TapProxy < PaginatedCollection::Proxy
       def initialize(source_collection:, tap_collection:)
         @source_collection = source_collection
-        super lambda do |source_pager|
+        super(lambda) do |source_pager|
           tap_pager = tap_collection.configure_pager(
             tap_collection.new_pager,
             per_page: source_pager.per_page,

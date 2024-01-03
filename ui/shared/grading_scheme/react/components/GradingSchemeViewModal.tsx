@@ -18,7 +18,7 @@
 import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Modal} from '@instructure/ui-modal'
-import {GradingScheme} from '@canvas/grading_scheme/gradingSchemeApiModel'
+import type {GradingScheme} from '@canvas/grading_scheme/gradingSchemeApiModel'
 import {Heading} from '@instructure/ui-heading'
 import {GradingSchemeView} from './view/GradingSchemeView'
 import {CloseButton, Button} from '@instructure/ui-buttons'
@@ -32,7 +32,6 @@ type Props = {
   handleClose: () => void
   handleGradingSchemeDelete: (gradingSchemeId: string) => void
   editGradingScheme: (gradingSchemeId: string) => void
-  pointsBasedGradingSchemesEnabled: boolean
   canManageScheme: (gradingScheme: GradingScheme) => boolean
 }
 const GradingSchemeViewModal = ({
@@ -41,7 +40,6 @@ const GradingSchemeViewModal = ({
   handleClose,
   handleGradingSchemeDelete,
   editGradingScheme,
-  pointsBasedGradingSchemesEnabled,
   canManageScheme,
 }: Props) => {
   if (!gradingScheme) {
@@ -67,7 +65,6 @@ const GradingSchemeViewModal = ({
       <Modal.Body>
         <GradingSchemeView
           gradingScheme={gradingScheme}
-          pointsBasedGradingSchemesEnabled={pointsBasedGradingSchemesEnabled}
           archivedGradingSchemesEnabled={true}
           disableDelete={!canManageScheme(gradingScheme)}
           disableEdit={!canManageScheme(gradingScheme)}

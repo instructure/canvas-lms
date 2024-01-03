@@ -66,6 +66,7 @@ export interface EnvCommon {
   COURSE_ROLES: Role[]
   current_user_roles: string[]
   current_user_is_student: boolean
+  current_user_is_admin: boolean
   current_user_types: string[]
   current_user_disabled_inbox: boolean
   current_user_visited_tabs: null | string[]
@@ -75,6 +76,7 @@ export interface EnvCommon {
     id: string
     label: string
   }[]
+  ACCOUNT_ID: string
   DOMAIN_ROOT_ACCOUNT_ID: string
   ROOT_ACCOUNT_ID: string
   k12: false
@@ -226,6 +228,7 @@ export type RootAccountFeatureId =
   | 'granular_permissions_manage_users'
   | 'create_course_subaccount_picker'
   | 'lti_deep_linking_module_index_menu_modal'
+  | 'lti_dynamic_registration'
   | 'lti_multiple_assignment_deep_linking'
   | 'lti_overwrite_user_url_input_select_content_dialog'
   | 'buttons_and_icons_root_account'

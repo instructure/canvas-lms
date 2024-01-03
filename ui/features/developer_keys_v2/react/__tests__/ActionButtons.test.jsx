@@ -39,6 +39,7 @@ const props = ({
     editDeveloperKey: jest.fn(),
     developerKeysModalOpen: jest.fn(),
     ltiKeysSetLtiKey: jest.fn(),
+    contextId: '2',
     developerKey,
     visible: true,
     developerName: 'Unnamed Tool',
@@ -62,7 +63,22 @@ it('renders edit button for non lti keys', () => {
   expect(wrapper.find(IconEditLine).exists()).toBe(true)
 })
 
-it('does render edit button for non lti keys', () => {
+it('renders edit button for lti registration keys', () => {
+  const wrapper = mount(<ActionButtons {...props({
+    developerKey: {
+      id: '1',
+      api_key: 'test',
+      created_at: 'test',
+      is_lti_key: true,
+      is_lti_registration: true,
+      ltiRegistration: {}
+    },
+  })} />)
+  expect(wrapper.find(IconEditLine).exists()).toBe(true)
+  expect(wrapper.find('a').prop('href')).toBe('/accounts/2/developer_keys/1')
+})
+
+it('renders edit button for lti keys', () => {
   const wrapper = mount(
     <ActionButtons
       {...props({

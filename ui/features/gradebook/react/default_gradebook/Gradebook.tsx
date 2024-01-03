@@ -188,6 +188,7 @@ import {
   escapeStudentContent,
   filterAssignmentsBySubmissionsFn,
   filterStudentBySubmissionFn,
+  filterStudentBySectionFn,
   findFilterValuesOfType,
   findSubmissionFilterValue,
   forEachSubmission,
@@ -241,8 +242,8 @@ import {ExportProgressBar} from './components/ExportProgressBar'
 import {ProgressBar} from '@instructure/ui-progress'
 import GradebookExportManager from '../shared/GradebookExportManager'
 import {handleExternalContentMessages} from '@canvas/external-tools/messages'
-import {EnvGradebookCommon} from '@canvas/global/env/EnvGradebook'
-import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import type {EnvGradebookCommon} from '@canvas/global/env/EnvGradebook'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 import {TotalGradeOverrideTrayProvider} from './components/TotalGradeOverrideTray'
 
 const I18n = useI18nScope('gradebook')
@@ -1220,16 +1221,16 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       return students.filter(student => this.searchFilteredStudentIds.includes(student.id))
     }
 
-    const filteredStudents = students.filter(
-      filterStudentBySubmissionFn(
-        this.props.appliedFilters,
-        this.submissionStateMap,
-        this.filteredAssignmentIds,
-        this.options.custom_grade_statuses_enabled ? this.options.custom_grade_statuses : []
+    return students
+      .filter(
+        filterStudentBySubmissionFn(
+          this.props.appliedFilters,
+          this.submissionStateMap,
+          this.filteredAssignmentIds,
+          this.options.custom_grade_statuses_enabled ? this.options.custom_grade_statuses : []
+        )
       )
-    )
-
-    return filteredStudents
+      .filter(filterStudentBySectionFn(this.props.appliedFilters))
   }
 
   updateFilteredStudentIds = () => {
@@ -1578,10 +1579,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     if (currentSection !== sectionId) {
       this.setFilterRowsBySetting('sectionId', sectionId)
       this.props.postGradesStore.setSelectedSection(sectionId)
-      return this.saveSettings({}).then(() => {
-        this.updateSectionFilterVisibility()
-        return this.props.reloadStudentData()
-      })
+      this.saveSettings()
     }
   }
 
@@ -3533,7 +3531,9 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       editedCommentId,
       proxySubmissionsAllowed: ENV.GRADEBOOK_OPTIONS.proxy_submissions_allowed,
       reloadSubmission: proxyDetails => this.reloadSubmission(submission, student, proxyDetails),
-      customGradeStatuses: this.options.custom_grade_statuses,
+      customGradeStatuses: this.options.custom_grade_statuses?.filter(
+        status => status.applies_to_submissions
+      ),
       customGradeStatusesEnabled: this.options.custom_grade_statuses_enabled,
     }
   }
@@ -4218,8 +4218,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   // # Course Settings Access Methods
   getCourseGradingScheme = (): DeprecatedGradingScheme | null =>
     this.courseContent.courseGradingScheme
-
-  pointsBasedGradingSchemesFeatureEnabled = () => !!ENV.POINTS_BASED_GRADING_SCHEMES_ENABLED
 
   getDefaultGradingScheme = () => this.courseContent.defaultGradingScheme
 
@@ -5180,7 +5178,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
               this.gradebookGrid?.grid?.navigateUp()
               this.gradebookGrid?.gridSupport?.helper.commitCurrentEdit()
             }}
-            pointsBasedGradingSchemesFeatureEnabled={!!ENV.POINTS_BASED_GRADING_SCHEMES_ENABLED}
             selectedGradingPeriodId={this.gradingPeriodId}
           />
         )}

@@ -18,7 +18,7 @@
 
 import gql from 'graphql-tag'
 import {executeQuery} from '@canvas/query/graphql'
-import {RubricQueryResponse} from '../types/Rubric'
+import type {RubricQueryResponse} from '../types/Rubric'
 
 const COURSE_RUBRICS_QUERY = gql`
   query CourseRubricsQuery($courseId: ID!) {

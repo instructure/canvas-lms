@@ -26,7 +26,7 @@ import {IconSearchLine} from '@instructure/ui-icons'
 import {Select} from '@instructure/ui-select'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import CommonMigratorControls from './common_migrator_controls'
-import {onSubmitMigrationFormCallback} from '../types'
+import type {onSubmitMigrationFormCallback} from '../types'
 
 const I18n = useI18nScope('content_migrations_redesign')
 

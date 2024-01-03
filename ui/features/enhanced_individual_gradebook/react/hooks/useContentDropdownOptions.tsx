@@ -21,9 +21,9 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {
   GradebookSortOrder,
-  GradebookUserSubmissionDetails,
-  SortableAssignment,
-  SortableStudent,
+  type GradebookUserSubmissionDetails,
+  type SortableAssignment,
+  type SortableStudent,
 } from '../../types'
 import {filterAssignmentsByStudent, sortAssignments} from '../../utils/gradebookUtils'
 

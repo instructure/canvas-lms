@@ -1167,7 +1167,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
     const map = new SubmissionStateMap({
       hasGradingPeriods: !!this.has_grading_periods,
       selectedGradingPeriodID: this.get('selectedGradingPeriod.id') || '0',
-      isAdmin: ENV.current_user_roles && _.includes(ENV.current_user_roles, 'admin'),
+      isAdmin: ENV.current_user_is_admin,
     })
     map.setup(this.get('students').toArray(), this.get('assignmentsFromGroups.content').toArray())
     this.set('submissionStateMap', map)
@@ -1359,7 +1359,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
 
     // Calculate whether the current user is able to grade assignments given their role and the
     // result of the calculations above
-    if (ENV.current_user_roles != null && _.includes(ENV.current_user_roles, 'admin')) {
+    if (ENV.current_user_is_admin) {
       this.set('disableAssignmentGrading', false)
     } else {
       this.set('disableAssignmentGrading', assignment.inClosedGradingPeriod)

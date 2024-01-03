@@ -99,7 +99,7 @@ class StudentEnrollment < Enrollment
     def restore_deleted_scores_for_enrollments(student_enrollments)
       raise ArgumentError, "Cannot call with more than 1000 enrollments" if student_enrollments.count > 1_000
 
-      student_enrollments.group_by(&:course_id).each do |_course_id, students|
+      student_enrollments.group_by(&:course_id).each_value do |students|
         course = students.first.course
         assignment_groups = course.assignment_groups.active.except(:order)
         grading_periods = GradingPeriod.for(course)

@@ -228,6 +228,8 @@ export const DISCUSSION_ENTRY_ALL_ROOT_ENTRIES_QUERY = gql`
   ) {
     legacyNode(_id: $discussionEntryID, type: DiscussionEntry) {
       ... on DiscussionEntry {
+        id
+        _id
         allRootEntries {
           ...DiscussionEntry
           editor(courseId: $courseID, roleTypes: $rolePillTypes) {

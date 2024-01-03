@@ -732,7 +732,8 @@ class ExternalToolsController < ApplicationController
                   expander:,
                   include_storage_target: !in_lti_mobile_webview?,
                   opts: opts.merge(
-                    resource_link: lookup_resource_link(tool)
+                    resource_link: lookup_resource_link(tool),
+                    lti_launch_debug_logger: make_lti_launch_debug_logger(tool)
                   )
                 )
 
@@ -1677,7 +1678,7 @@ class ExternalToolsController < ApplicationController
   end
 
   def placement_from_params
-    params[:placement] || params[:launch_type] || "#{@context.class.base_class.to_s.downcase}_navigation"
+    params[:placement] || params[:launch_type] || "#{@context.class.url_context_class.to_s.downcase}_navigation"
   end
 
   def whitelisted_query_params

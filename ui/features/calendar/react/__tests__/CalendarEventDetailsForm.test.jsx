@@ -341,6 +341,7 @@ describe('CalendarEventDetailsForm', () => {
 
     const errMessage = component.queryByText('This date is invalid.')
     expect(errMessage).not.toBeInTheDocument()
+    expect(component.getByRole('button', {name: 'Submit'})).toBeEnabled()
   })
 
   it('shows an error when user input is an invalid string', () => {
@@ -352,6 +353,20 @@ describe('CalendarEventDetailsForm', () => {
     expect(component.getByRole('button', {name: 'Submit'})).toBeDisabled()
     expect(component.getByText('This date is invalid.')).toBeInTheDocument()
     expect(component.getByTestId('edit-calendar-event-form-date')).toHaveValue('avocado')
+  })
+
+  it('does not show error with when choosing another date time format', () => {
+    jest.spyOn(window.navigator, 'language', 'get').mockReturnValue('en-AU')
+    const component = render(<CalendarEventDetailsForm {...defaultProps} />)
+    userEvent.click(component.getByTestId('edit-calendar-event-form-date'))
+    userEvent.click(component.getByTestId('edit-calendar-event-form-title'))
+    expect(component.getByTestId('edit-calendar-event-form-date').value).toMatch(
+      /^(Sun|Mon|Tue|Wed|Thu|Fri|Sat), \d{1,2} (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{4}$/
+    )
+
+    const errMessage = component.queryByText('This date is invalid.')
+    expect(errMessage).not.toBeInTheDocument()
+    expect(component.getByRole('button', {name: 'Submit'})).toBeEnabled()
   })
 
   it('renders and updates an event with conferencing when it is available', async () => {

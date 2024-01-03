@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useState, useRef, ReactElement} from 'react'
+import React, {useCallback, useEffect, useState, useRef} from 'react'
 import {ProgressBar} from '@instructure/ui-progress'
 import {Text} from '@instructure/ui-text'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {ContentMigrationItem} from './types'
+import type {ContentMigrationItem} from './types'
 import {ContentSelectionModal} from './content_selection_modal'
 
 const I18n = useI18nScope('content_migrations_redesign')

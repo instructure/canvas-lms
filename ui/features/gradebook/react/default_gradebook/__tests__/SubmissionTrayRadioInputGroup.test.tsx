@@ -19,8 +19,8 @@
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
 import SubmissionTrayRadioInputGroup, {
-  SubmissionTrayRadioInputGroupProps,
-  PendingUpdateData,
+  type SubmissionTrayRadioInputGroupProps,
+  type PendingUpdateData,
 } from '../components/SubmissionTrayRadioInputGroup'
 
 describe('SubmissionTrayRadioInputGroup Tests', () => {

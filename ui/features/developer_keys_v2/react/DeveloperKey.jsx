@@ -235,6 +235,7 @@ class DeveloperKey extends React.Component {
           <Table.Cell>
             <DeveloperKeyActionButtons
               ref={this.refActionButtons}
+              contextId={this.props.ctx.params.contextId}
               dispatch={this.props.store.dispatch}
               {...this.props.actions}
               developerKey={this.props.developerKey}

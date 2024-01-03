@@ -251,11 +251,6 @@ grading_scheme_updates:
   applies_to: SiteAdmin
   display_name: Improve Letter Grading Scheme Usability
   description: Teachers and Account Managers will be able to more easily manage letter grading schemes for accounts, courses, and assignments.
-points_based_grading_schemes:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Points Based Letter Grading Schemes
-  description: Teachers and Account Managers will be able to create letter grading schemes that use points instead of percentages for grade book entry and display.
 custom_gradebook_statuses:
   state: hidden
   applies_to: SiteAdmin

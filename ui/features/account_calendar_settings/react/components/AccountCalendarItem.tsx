@@ -18,7 +18,7 @@
 
 import React, {useEffect, useState} from 'react'
 
-import {Spacing} from '@instructure/emotion'
+import type {Spacing} from '@instructure/emotion'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
 import {IconCalendarMonthLine} from '@instructure/ui-icons'
@@ -28,7 +28,7 @@ import {View} from '@instructure/ui-view'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-import {Account, SubscriptionChange, VisibilityChange} from '../types'
+import type {Account, SubscriptionChange, VisibilityChange} from '../types'
 import SubscriptionsDropDown from './SubscriptionDropDown'
 
 const I18n = useI18nScope('account_calendar_settings_account_calendar_item')

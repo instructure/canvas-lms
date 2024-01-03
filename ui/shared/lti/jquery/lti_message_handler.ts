@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ResponseMessages} from './response_messages'
+import type {ResponseMessages} from './response_messages'
 
 export interface LtiMessageHandler<T = unknown> {
   /**

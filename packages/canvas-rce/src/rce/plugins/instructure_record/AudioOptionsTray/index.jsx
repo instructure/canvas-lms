@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import {arrayOf, bool, func, shape, string} from 'prop-types'
 import {Flex} from '@instructure/ui-flex'
 import {Tray} from '@instructure/ui-tray'
@@ -40,8 +40,13 @@ export default function AudioOptionsTray({
   onSave,
   trayProps,
   audioOptions,
+  requestSubtitlesFromIframe,
 }) {
   const [subtitles, setSubtitles] = useState(audioOptions.tracks || [])
+
+  useEffect(() => {
+    if (subtitles.length === 0) requestSubtitlesFromIframe(setSubtitles)
+  }, [])
 
   const handleSave = (e, contentProps) => {
     onSave({
@@ -129,6 +134,7 @@ AudioOptionsTray.propTypes = {
   onDismiss: func,
   onSave: func,
   open: bool.isRequired,
+  requestSubtitlesFromIframe: func,
   trayProps: shape({
     host: string.isRequired,
     jwt: string.isRequired,
@@ -149,4 +155,5 @@ AudioOptionsTray.defaultProps = {
   onExited: null,
   onDismiss: null,
   onSave: null,
+  requestSubtitlesFromIframe: () => {}
 }

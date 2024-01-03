@@ -26,7 +26,7 @@ module CallStackUtils
 
   # (re-)raise the exception while preserving its backtrace
   def self.raise(exception)
-    super exception.class, exception.message, exception.backtrace
+    super(exception.class, exception.message, exception.backtrace)
   end
 
   APP_IGNORE_REGEX = %r{/spec/(support|selenium/test_setup/)}

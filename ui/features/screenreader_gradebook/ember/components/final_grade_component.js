@@ -27,22 +27,20 @@ const FinalGradeComponent = Ember.Component.extend({
     const percent = this.get('student.total_percent')
     let scoreText = I18n.n(percent, {percentage: true})
 
-    if (this.get('pointsBasedGradingSchemesFeatureEnabled')) {
-      if (this.get('gradingStandard') && this.get('gradingStandardPointsBased')) {
-        const scalingFactor = this.get('gradingStandardScalingFactor')
-        const studentTotalGrade = this.get('student.total_grade')
-        if (studentTotalGrade.possible) {
-          const scaledPossible = I18n.n(scalingFactor, {
+    if (this.get('gradingStandard') && this.get('gradingStandardPointsBased')) {
+      const scalingFactor = this.get('gradingStandardScalingFactor')
+      const studentTotalGrade = this.get('student.total_grade')
+      if (studentTotalGrade.possible) {
+        const scaledPossible = I18n.n(scalingFactor, {
+          precision: 1,
+        })
+        const scaledScore = I18n.n(
+          scoreToScaledPoints(studentTotalGrade.score, studentTotalGrade.possible, scalingFactor),
+          {
             precision: 1,
-          })
-          const scaledScore = I18n.n(
-            scoreToScaledPoints(studentTotalGrade.score, studentTotalGrade.possible, scalingFactor),
-            {
-              precision: 1,
-            }
-          )
-          scoreText = `${scaledScore} / ${scaledPossible}`
-        }
+          }
+        )
+        scoreText = `${scaledScore} / ${scaledPossible}`
       }
     }
     return scoreText

@@ -139,7 +139,9 @@ Delayed::Worker.lifecycle.around(:perform) do |worker, job, &block|
   LiveEvents.set_context(job.live_events_context)
 
   Sentry.set_tags({
-                    jobs_cluster: job.current_shard.delayed_jobs_shard&.id
+                    jobs_cluster: job.current_shard.delayed_jobs_shard&.id,
+                    shard: job.current_shard.id,
+                    db_cluster: job.current_shard.database_server.id
                   })
 
   HostUrl.reset_cache!

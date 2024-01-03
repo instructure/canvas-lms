@@ -336,8 +336,8 @@ QUnit.module('SpeedGrader', rootHooks => {
         help_url: 'example.com/support',
         show_help_menu_item: false,
         custom_grade_statuses: [
-          {id: '1', name: 'Custom Status'},
-          {id: '2', name: 'Custom Status 2'},
+          {id: '1', name: 'Custom Status', applies_to_submissions: true},
+          {id: '2', name: 'Custom Status 2', applies_to_submissions: true},
         ],
       })
       setupFixtures('<span id="multiple_submissions"></span>')
@@ -408,7 +408,7 @@ QUnit.module('SpeedGrader', rootHooks => {
   })
 
   test('includes submission time for submissions when the user is an admin', () => {
-    ENV.current_user_roles = ['admin']
+    ENV.current_user_is_admin = true
     window.jsonData.anonymize_students = true
     SpeedGrader.setup()
 
@@ -420,7 +420,7 @@ QUnit.module('SpeedGrader', rootHooks => {
   })
 
   test('omits submission time for submissions when anonymizing and not an admin', () => {
-    ENV.current_user_roles = ['teacher']
+    ENV.current_user_is_admin = false
     SpeedGrader.setup()
 
     window.jsonData.anonymize_students = true
@@ -1796,8 +1796,8 @@ QUnit.module('SpeedGrader', rootHooks => {
         help_url: 'helpUrl',
         show_help_menu_item: false,
         custom_grade_statuses: [
-          {id: '1', name: 'Custom Status One'},
-          {id: '2', name: 'Custom Status Two'},
+          {id: '1', name: 'Custom Status One', applies_to_submissions: true},
+          {id: '2', name: 'Custom Status Two', applies_to_submissions: true},
         ],
       })
       originalWindowJSONData = window.jsonData
@@ -2519,7 +2519,7 @@ QUnit.module('SpeedGrader', rootHooks => {
     })
 
     test('includes last-viewed date for attachments if viewing as an admin', () => {
-      ENV.current_user_roles = ['admin']
+      ENV.current_user_is_admin = true
       finishSetup()
       window.jsonData.anonymize_students = true
       SpeedGrader.EG.handleSubmissionSelectionChange()
@@ -2532,6 +2532,7 @@ QUnit.module('SpeedGrader', rootHooks => {
     })
 
     test('omits last-viewed date and relevant text if anonymizing students and not viewing as an admin', () => {
+      ENV.current_user_is_admin = false
       finishSetup()
       window.jsonData.anonymize_students = true
       SpeedGrader.EG.handleSubmissionSelectionChange()

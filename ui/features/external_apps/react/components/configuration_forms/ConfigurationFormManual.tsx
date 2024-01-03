@@ -19,7 +19,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {TextInput} from '@instructure/ui-text-input'
-import {FormMessage} from '@instructure/ui-form-field'
+import type {FormMessage} from '@instructure/ui-form-field'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 // ui-text-area has types in InstUI 7, but they aren't declared in its package.json
 // so just ignore the error for now. Once we're on InstUI 8, we can remove this.
@@ -28,7 +28,7 @@ import {TextArea} from '@instructure/ui-text-area'
 // so just ignore the error for now. Once we're on InstUI 8, we can remove this.
 import {Grid} from '@instructure/ui-grid'
 import '@canvas/rails-flash-notifications'
-import {I18nType, TextAreaChangeHandler, TextInputChangeHandler} from './types'
+import type {I18nType, TextAreaChangeHandler, TextInputChangeHandler} from './types'
 import MembershipServiceAccess from './MembershipServiceAccess'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 // Doing this to avoid TS2339 errors-- remove once we're on InstUI 8

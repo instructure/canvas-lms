@@ -24,7 +24,7 @@ import {
 } from '../TempEnrollEdit'
 import React from 'react'
 import {fireEvent, render, screen, waitFor} from '@testing-library/react'
-import {Enrollment, PROVIDER, RECIPIENT, User} from '../types'
+import {type Enrollment, PROVIDER, RECIPIENT, type User} from '../types'
 
 describe('TempEnrollEdit component', () => {
   let props: any

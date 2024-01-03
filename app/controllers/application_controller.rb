@@ -34,6 +34,7 @@ class ApplicationController < ActionController::Base
   include LegalInformationHelper
   include FullStoryHelper
   include ObserverEnrollmentsHelper
+  include LtiLaunchDebugLoggerHelper
 
   helper :all
 
@@ -290,6 +291,7 @@ class ApplicationController < ActionController::Base
           canvas_k6_theme: @context.try(:feature_enabled?, :canvas_k6_theme)
         )
         @js_env[:current_user] = @current_user ? Rails.cache.fetch(["user_display_json", @current_user].cache_key, expires_in: 1.hour) { user_display_json(@current_user, :profile, [:avatar_is_fallback]) } : {}
+        @js_env[:current_user_is_admin] = @context.account_membership_allows(@current_user) if @context.is_a?(Course)
         @js_env[:page_view_update_url] = page_view_path(@page_view.id, page_view_token: @page_view.token) if @page_view
         @js_env[:IS_LARGE_ROSTER] = true if !@js_env[:IS_LARGE_ROSTER] && @context.respond_to?(:large_roster?) && @context.large_roster?
         @js_env[:context_asset_string] = @context.try(:asset_string) unless @js_env[:context_asset_string]
@@ -367,6 +369,7 @@ class ApplicationController < ActionController::Base
     granular_permissions_manage_users
     create_course_subaccount_picker
     lti_deep_linking_module_index_menu_modal
+    lti_dynamic_registration
     lti_multiple_assignment_deep_linking
     lti_overwrite_user_url_input_select_content_dialog
     lti_unique_tool_form_ids
@@ -639,7 +642,7 @@ class ApplicationController < ActionController::Base
 
     link_settings = @tag&.link_settings || {}
 
-    tool_dimensions.each do |k, _v|
+    tool_dimensions.each_key do |k|
       # it may happen that we get "link_settings"=>{"selection_width"=>"", "selection_height"=>""}
       if link_settings[k.to_s].present?
         tool_dimensions[k] = link_settings[k.to_s]
@@ -691,7 +694,7 @@ class ApplicationController < ActionController::Base
     if context.is_a?(UserProfile)
       name = name.to_s.sub("context", "profile")
     else
-      klass = context.class.base_class
+      klass = context.class.url_context_class
       name = name.to_s.sub("context", klass.name.underscore)
       opts.unshift(context)
     end
@@ -2141,7 +2144,8 @@ class ApplicationController < ActionController::Base
                       expander: variable_expander,
                       include_storage_target: !in_lti_mobile_webview?,
                       opts: opts.merge(
-                        resource_link: @tag.associated_asset_lti_resource_link
+                        resource_link: @tag.associated_asset_lti_resource_link,
+                        lti_launch_debug_logger: make_lti_launch_debug_logger(@tool)
                       )
                     )
                   else
@@ -2855,7 +2859,7 @@ class ApplicationController < ActionController::Base
         instance_name = instance_symbol.to_s
         obj = instance_variable_get("@#{instance_name}")
         policy = obj.check_policy(@current_user, session) unless obj.nil? || !obj.respond_to?(:check_policy)
-        hash["#{instance_name.upcase}_RIGHTS".to_sym] = ActiveSupport::HashWithIndifferentAccess[policy.map { |right| [right, true] }] unless policy.nil?
+        hash[:"#{instance_name.upcase}_RIGHTS"] = ActiveSupport::HashWithIndifferentAccess[policy.map { |right| [right, true] }] unless policy.nil?
       end
 
       js_env hash

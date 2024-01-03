@@ -19,7 +19,7 @@ import React from 'react'
 import SubmissionCommentsTray from '../SubmissionCommentsTray'
 import * as useState from '../stores'
 import {render, fireEvent} from '@testing-library/react'
-import {SubmissionAttemptsComments} from '../../../../api.d'
+import type {SubmissionAttemptsComments} from '../../../../api.d'
 
 describe('SubmissionCommentsTray', () => {
   const attempts: SubmissionAttemptsComments = {

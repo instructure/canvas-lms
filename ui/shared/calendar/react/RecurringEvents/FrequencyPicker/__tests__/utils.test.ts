@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import moment, {Moment} from 'moment'
+import moment, {type Moment} from 'moment'
 import {
   generateFrequencyOptions,
   generateFrequencyRRULE,

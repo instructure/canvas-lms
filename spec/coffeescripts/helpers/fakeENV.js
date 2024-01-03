@@ -23,6 +23,7 @@ export default {
     window.ENV = {
       current_user_id: '1',
       current_user_roles: ['user', 'teacher', 'admin', 'student'],
+      current_user_is_admin: true,
       current_user_cache_key: 'users/1-20111116001415',
       context_asset_string: 'user_1',
       domain_root_account_cache_key: 'accounts/1-20111117224337',

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Formatter from '../Formatter'
+import type Formatter from '../Formatter'
 
 const MATH_SPAN_QUERY = '.math_equation_latex'
 

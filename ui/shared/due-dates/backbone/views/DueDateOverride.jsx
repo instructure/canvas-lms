@@ -146,7 +146,7 @@ DueDateOverrideView.prototype.validateDatetimes = function (data, errors) {
     date_range: {...ENV.VALID_DATE_RANGE},
     hasGradingPeriods: this.hasGradingPeriods,
     gradingPeriods: this.gradingPeriods,
-    userIsAdmin: (ENV.current_user_roles || []).includes('admin'),
+    userIsAdmin: ENV.current_user_is_admin,
     postToSIS: this.postToSIS(data),
   })
   // Don't validate duplicates

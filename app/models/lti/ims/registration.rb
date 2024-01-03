@@ -70,9 +70,11 @@ class Lti::IMS::Registration < ApplicationRecord
   def canvas_configuration
     config = lti_tool_configuration
 
+    overlay = registration_overlay
+
     {
       title: client_name,
-      scopes:,
+      scopes: scopes.reject { |s| (overlay || {})["disabledScopes"]&.include?(s) || false },
       public_jwk_url: jwks_uri,
       description: config["description"],
       custom_parameters: config["custom_parameters"],
@@ -128,14 +130,14 @@ class Lti::IMS::Registration < ApplicationRecord
           end
 
           placement_name = canvas_placement_name(placement)
-
+          placement_overlay = lookup_placement_overlay(placement) || {}
           {
             placement: placement_name,
-            enabled: true,
+            enabled: !placement_disabled?(placement),
             message_type: message["type"],
             target_link_uri: message["target_link_uri"],
-            text: message["label"],
-            icon_url: message["icon_uri"],
+            text: placement_overlay["label"] || message["label"],
+            icon_url: placement_overlay["icon_url"] || message["icon_uri"],
             custom_fields: message["custom_parameters"],
             display_type:,
             windowTarget: window_target,
@@ -143,6 +145,14 @@ class Lti::IMS::Registration < ApplicationRecord
         end
       end
     end.flatten
+  end
+
+  def lookup_placement_overlay(placement_type)
+    (registration_overlay || {})["placements"]&.find { |p| p["type"] == placement_type }
+  end
+
+  def placement_disabled?(placement_type)
+    (registration_overlay || {})["disabledPlacements"]&.include?(placement_type) || false
   end
 
   def canvas_extensions
@@ -171,6 +181,32 @@ class Lti::IMS::Registration < ApplicationRecord
     tool.workflow_state = "active"
     tool.use_1_3 = true
     tool
+  end
+
+  def as_json(options = {})
+    {
+      id: global_id.to_s,
+      developer_key_id: developer_key.global_id.to_s,
+      overlay: registration_overlay,
+      lti_tool_configuration:,
+      application_type:,
+      grant_types:,
+      response_types:,
+      redirect_uris:,
+      initiate_login_uri:,
+      client_name:,
+      jwks_uri:,
+      logo_uri:,
+      token_endpoint_auth_method:,
+      contacts:,
+      client_uri:,
+      policy_uri:,
+      tos_uri:,
+      scopes:,
+      created_at:,
+      updated_at:,
+      guid:,
+    }.as_json(options)
   end
 
   private

@@ -30,16 +30,8 @@ type Props = {
   possible?: number
   weight?: number | null
   gradingScheme?: DeprecatedGradingScheme | null
-  pointsBasedGradingSchemesFeatureEnabled: boolean
 }
-export default function RowScore({
-  gradingScheme,
-  name,
-  possible,
-  score,
-  weight,
-  pointsBasedGradingSchemesFeatureEnabled,
-}: Props) {
+export default function RowScore({gradingScheme, name, possible, score, weight}: Props) {
   const percentScore = scoreToPercentage(score, possible, 1)
 
   const isPercentInvalid = Number.isNaN(Number(percentScore))
@@ -47,26 +39,22 @@ export default function RowScore({
   let scoreText
 
   let displayAsScaledPoints = false
-  if (pointsBasedGradingSchemesFeatureEnabled) {
-    if (gradingScheme) {
-      displayAsScaledPoints = gradingScheme.pointsBased
-      const scalingFactor = gradingScheme.scalingFactor
+  if (gradingScheme) {
+    displayAsScaledPoints = gradingScheme.pointsBased
+    const scalingFactor = gradingScheme.scalingFactor
 
-      if (displayAsScaledPoints && possible) {
-        const scaledPossible = I18n.n(scalingFactor, {
-          precision: 1,
-        })
-        const scaledScore = I18n.n(scoreToScaledPoints(score || 0, possible, scalingFactor), {
-          precision: 1,
-        })
+    if (displayAsScaledPoints && possible) {
+      const scaledPossible = I18n.n(scalingFactor, {
+        precision: 1,
+      })
+      const scaledScore = I18n.n(scoreToScaledPoints(score || 0, possible, scalingFactor), {
+        precision: 1,
+      })
 
-        scoreText = `${scaledScore} / ${scaledPossible}`
-      } else {
-        scoreText = isPercentInvalid ? '-' : `${percentScore}% (${score} / ${possible})`
-      }
+      scoreText = `${scaledScore} / ${scaledPossible}`
+    } else {
+      scoreText = isPercentInvalid ? '-' : `${percentScore}% (${score} / ${possible})`
     }
-  } else {
-    scoreText = isPercentInvalid ? '-' : `${percentScore}% (${score} / ${possible})`
   }
 
   const letterGradeScore = isPercentInvalid

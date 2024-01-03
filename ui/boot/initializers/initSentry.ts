@@ -17,7 +17,7 @@
  */
 
 import {configureScope, init, BrowserTracing} from '@sentry/react'
-import {Integration} from '@sentry/types'
+import type {Integration} from '@sentry/types'
 import SentryFullStory from '@sentry/fullstory'
 
 export function initSentry() {

@@ -421,6 +421,25 @@ describe "conversations new" do
             expect(fj("div[data-testid='address-book-item']:contains('People: #{@course.users.count}')")).to be_present
           end
 
+          it "opens the addressbook when clicking the address-book icon", priority: "1" do
+            get "/conversations"
+
+            # Open compose modal
+            f("button[data-testid='compose']").click
+
+            # select the only course option
+            f("input[placeholder='Select Course']").click
+            f("li[role='none']").click
+
+            # Open address book using the ICON
+            force_click("button[data-testid='address-button']")
+
+            # all in course, Teachers, Students, Student Groups
+            expect(ff("div[data-testid='address-book-item']").count).to eq(4)
+            expect(fj("div[data-testid='address-book-item']:contains('All in #{@course.name}')")).to be_present
+            expect(fj("div[data-testid='address-book-item']:contains('People: #{@course.users.count}')")).to be_present
+          end
+
           it "correctly shows Teachers option", priority: "1" do
             get "/conversations"
             open_react_compose_modal_addressbook

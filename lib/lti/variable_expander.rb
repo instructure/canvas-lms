@@ -43,7 +43,7 @@ module Lti
 
     def self.register_expansion(name, permission_groups, expansion_proc, *guards, **kwargs)
       @expansions ||= {}
-      @expansions["$#{name}".to_sym] = VariableExpansion.new(
+      @expansions[:"$#{name}"] = VariableExpansion.new(
         name,
         permission_groups,
         expansion_proc,
@@ -53,7 +53,7 @@ module Lti
     end
 
     def self.deregister_expansion(name)
-      @expansions.delete "$#{name}".to_sym
+      @expansions.delete :"$#{name}"
     end
 
     def self.expansions
@@ -169,7 +169,7 @@ module Lti
 
     def enabled_capability_params(enabled_capabilities)
       enabled_capabilities.each_with_object({}) do |capability, hash|
-        if (expansion = capability.respond_to?(:to_sym) && self.class.expansions["$#{capability}".to_sym])
+        if (expansion = capability.respond_to?(:to_sym) && self.class.expansions[:"$#{capability}"])
           value = expansion.expand(self)
           hash[expansion.default_name] = value if expansion.default_name.present? && value != "$#{capability}"
         end
@@ -319,6 +319,7 @@ module Lti
 
     # Returns the RCS Service JWT for the current user
     #
+    # @internal
     # @example
     #   ```
     #   "base64-encoded-service-jwt"
@@ -335,6 +336,7 @@ module Lti
 
     # Returns instui_nav release flag state
     #
+    # @internal
     # @example
     #   ```
     #   "true"

@@ -195,6 +195,9 @@ class ContentMigrationsController < ApplicationController
         js_env(NEW_QUIZZES_MIGRATION_DEFAULT: new_quizzes_migration_default)
         js_env(SHOW_SELECTABLE_OUTCOMES_IN_IMPORT: @domain_root_account.feature_enabled?("selectable_outcomes_in_course_copy"))
         js_env(BLUEPRINT_ELIGIBLE_IMPORT: MasterCourses::MasterTemplate.blueprint_eligible?(@context))
+        js_env(SHOW_BP_SETTINGS_IMPORT_OPTION: MasterCourses::MasterTemplate.blueprint_eligible?(@context) &&
+          @context.account.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin) &&
+          @context.account.grants_right?(@current_user, :manage_master_courses))
         set_tutorial_js_env
       end
     end

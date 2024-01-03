@@ -19,6 +19,20 @@
 
 module ActiveRecord
   describe Base do
+    describe ".serializable_hash" do
+      let(:account) { Account.create! }
+
+      it "returns a hash with indifferent access when the root is included" do
+        hash = account.serializable_hash(include_root: true)
+        expect(hash).to be_a ActiveSupport::HashWithIndifferentAccess
+      end
+
+      it "returns a hash with indifferent access when the root is excluded" do
+        hash = account.serializable_hash(include_root: false)
+        expect(hash).to be_a ActiveSupport::HashWithIndifferentAccess
+      end
+    end
+
     describe ".wildcard" do
       it "produces a useful wildcard sql string" do
         sql = Base.wildcard("users.name", "users.short_name", "Sinatra, Frank", delimiter: ",")
@@ -801,7 +815,7 @@ describe ActiveRecord::Migration::CommandRecorder do
     recorder.revert do
       r.add_column :accounts, :course_template_id, :integer, limit: 8, if_not_exists: true
       r.add_foreign_key :accounts, :courses, column: :course_template_id, if_not_exists: true
-      r.add_index :accounts, :course_template_id, algorithm: :concurrently, if_not_exists: true
+      r.add_index :accounts, :course_template_id, algorithm: :concurrently, if_not_exists: true # rubocop:disable Migration/NonTransactional
 
       r.remove_column :courses, :id, :integer, limit: 8, if_exists: true
       r.remove_foreign_key :enrollments, :users, if_exists: true

@@ -36,6 +36,6 @@ describe('RubricForm Tests', () => {
   it('renders component', () => {
     const {getByText} = renderComponent()
 
-    expect(getByText('Create Rubric')).toBeInTheDocument()
+    expect(getByText('Create New Rubric')).toBeInTheDocument()
   })
 })

@@ -106,8 +106,10 @@ class TemporaryEnrollmentPairingsApiController < ApplicationController
   private
 
   def authorize_action
+    account = api_find(Account.active, params[:account_id])
+
     enforce_granular_permissions(
-      @domain_root_account,
+      account,
       overrides: [],
       actions: {
         index: RoleOverride::MANAGE_TEMPORARY_ENROLLMENT_PERMISSIONS,

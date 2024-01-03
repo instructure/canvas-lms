@@ -39,11 +39,7 @@ class CoursePacing::PaceContextsPresenter
   end
 
   def self.applied_pace_for(pace_context)
-    begin
-      applied_pace = CoursePacing::PaceServiceFactory.for(pace_context).pace_for(pace_context)
-    rescue ActiveRecord::RecordNotFound
-      return nil
-    end
+    applied_pace = CoursePacing::PaceService.for(pace_context).pace_for(pace_context)
 
     return nil unless applied_pace
 

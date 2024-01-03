@@ -23,7 +23,7 @@
 // 2. Parse an RRULE string into an RRuleHelperSpec.
 
 import moment from 'moment-timezone'
-import {FrequencyValue, MonthlyModeValue, SelectedDaysArray, UnknownSubset} from './types'
+import type {FrequencyValue, MonthlyModeValue, SelectedDaysArray, UnknownSubset} from './types'
 
 export const DEFAULT_COUNT = 5
 export const MAX_COUNT = 400 // keep in sync with RECURRING_EVENT_LIMIT in app/helpers/rrule_helper.rb

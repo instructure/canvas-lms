@@ -30,6 +30,7 @@ export const LearnerPassportRoutes = (
         return fetch(`/users/${params.userId}/passport/data/achievements`)
       }}
     />
+
     <Route path="portfolios" lazy={() => import('../pages/Portfolios')}>
       <Route
         path="dashboard"
@@ -40,7 +41,9 @@ export const LearnerPassportRoutes = (
       >
         <Route
           path="duplicate/:portfolioId"
-          loader={async ({params}) => {
+          action={async ({request, params}) => {
+            const fd = await request.formData()
+            const title = fd.get('title')
             await fetch(`/users/${params.userId}/passport/data/portfolios/duplicate`, {
               method: 'PUT',
               cache: 'no-cache',
@@ -50,7 +53,24 @@ export const LearnerPassportRoutes = (
               },
               body: JSON.stringify({portfolio_id: params.portfolioId}),
             })
-            return redirect('..')
+            return redirect(`/users/${params.userId}/passport/portfolios/dashboard?dupe=${title}`)
+          }}
+        />
+        <Route
+          path="delete/:portfolioId"
+          action={async ({request, params}) => {
+            const fd = await request.formData()
+            const title = fd.get('title')
+            await fetch(`/users/${params.userId}/passport/data/portfolios/delete`, {
+              method: 'PUT',
+              cache: 'no-cache',
+              headers: {
+                'X-CSRF-Token': getCookie('_csrf_token'),
+                'Content-type': 'application/json',
+              },
+              body: JSON.stringify({portfolio_id: params.portfolioId}),
+            })
+            return redirect(`/users/${params.userId}/passport/portfolios/dashboard?delete=${title}`)
           }}
         />
         <Route
@@ -73,6 +93,25 @@ export const LearnerPassportRoutes = (
             return redirect(`../../edit/${json.id}`)
           }}
         />
+        <Route
+          path="rename"
+          action={async ({request}) => {
+            const formData = await request.formData()
+            await fetch(
+              `/users/${formData.get('userId')}/passport/data/portfolios/${formData.get('id')}`,
+              {
+                method: 'POST',
+                cache: 'no-cache',
+                headers: {
+                  'X-CSRF-Token': getCookie('_csrf_token'),
+                  'Content-type': 'application/json',
+                },
+                body: JSON.stringify({title: formData.get('title')}),
+              }
+            )
+            return redirect('..')
+          }}
+        />
       </Route>
       <Route
         path="view/:portfolioId"
@@ -86,9 +125,15 @@ export const LearnerPassportRoutes = (
       <Route
         path="edit/:portfolioId"
         loader={async ({params}) => {
-          return fetch(
-            `/users/${params.userId}/passport/data/portfolios/show/${params.portfolioId}`
+          const p1 = fetch(`/users/${params.userId}/passport/data/achievements`).then(res =>
+            res.json()
           )
+          const p2 = fetch(`/users/${params.userId}/passport/data/projects`).then(res => res.json())
+          const p3 = fetch(
+            `/users/${params.userId}/passport/data/portfolios/show/${params.portfolioId}`
+          ).then(res => res.json())
+          const [achievements, projects, portfolio] = await Promise.all([p1, p2, p3])
+          return {achievements, projects, portfolio}
         }}
         action={async ({request, params}) => {
           const formData = await request.formData()
@@ -109,6 +154,126 @@ export const LearnerPassportRoutes = (
         lazy={() => import('../pages/PortfolioEdit')}
       />
     </Route>
-    <Route path="projects" lazy={() => import('../pages/Projects')} />
+
+    <Route path="projects" lazy={() => import('../pages/Projects')}>
+      <Route
+        path="dashboard"
+        lazy={() => import('../pages/ProjectDashboard')}
+        loader={async ({params}) => {
+          return fetch(`/users/${params.userId}/passport/data/projects`)
+        }}
+      >
+        <Route
+          path="duplicate/:projectId"
+          action={async ({request, params}) => {
+            const fd = await request.formData()
+            const title = fd.get('title')
+            await fetch(`/users/${params.userId}/passport/data/projects/duplicate`, {
+              method: 'PUT',
+              cache: 'no-cache',
+              headers: {
+                'X-CSRF-Token': getCookie('_csrf_token'),
+                'Content-type': 'application/json',
+              },
+              body: JSON.stringify({project_id: params.projectId}),
+            })
+            return redirect(`/users/${params.userId}/passport/projects/dashboard?dupe=${title}`)
+          }}
+        />
+        <Route
+          path="delete/:projectId"
+          action={async ({request, params}) => {
+            const fd = await request.formData()
+            const title = fd.get('title')
+            await fetch(`/users/${params.userId}/passport/data/projects/delete`, {
+              method: 'PUT',
+              cache: 'no-cache',
+              headers: {
+                'X-CSRF-Token': getCookie('_csrf_token'),
+                'Content-type': 'application/json',
+              },
+              body: JSON.stringify({project_id: params.projectId}),
+            })
+            return redirect(`/users/${params.userId}/passport/projects/dashboard?delete=${title}`)
+          }}
+        />
+        <Route
+          path="create"
+          action={async ({request}) => {
+            const formData = await request.formData()
+            const response = await fetch(
+              `/users/${formData.get('userId')}/passport/data/projects/create`,
+              {
+                method: 'PUT',
+                cache: 'no-cache',
+                headers: {
+                  'X-CSRF-Token': getCookie('_csrf_token'),
+                  'Content-type': 'application/json',
+                },
+                body: JSON.stringify({title: formData.get('title')}),
+              }
+            )
+            const json = await response.json()
+            return redirect(`../../edit/${json.id}`)
+          }}
+        />
+        <Route
+          path="rename"
+          action={async ({request}) => {
+            const formData = await request.formData()
+            await fetch(
+              `/users/${formData.get('userId')}/passport/data/projects/${formData.get('id')}`,
+              {
+                method: 'POST',
+                cache: 'no-cache',
+                headers: {
+                  'X-CSRF-Token': getCookie('_csrf_token'),
+                  'Content-type': 'application/json',
+                },
+                body: JSON.stringify({title: formData.get('title')}),
+              }
+            )
+            return redirect('..')
+          }}
+        />
+      </Route>
+      <Route
+        path="view/:projectId"
+        loader={async ({params}) => {
+          return fetch(`/users/${params.userId}/passport/data/projects/show/${params.projectId}`)
+        }}
+        lazy={() => import('../pages/ProjectView')}
+      />
+      <Route
+        path="edit/:projectId"
+        loader={async ({params}) => {
+          const p1 = fetch(`/users/${params.userId}/passport/data/achievements`).then(res =>
+            res.json()
+          )
+          const p2 = fetch(
+            `/users/${params.userId}/passport/data/projects/show/${params.projectId}`
+          ).then(res => res.json())
+          const [achievements, project] = await Promise.all([p1, p2])
+          return {achievements, project}
+        }}
+        action={async ({request, params}) => {
+          const formData = await request.formData()
+          const response = await fetch(
+            `/users/${params.userId}/passport/data/projects/${params.projectId}`,
+            {
+              method: 'POST',
+              cache: 'no-cache',
+              headers: {
+                'X-CSRF-Token': getCookie('_csrf_token'),
+              },
+              body: formData,
+            }
+          )
+          const json = await response.json()
+          return redirect(`../view/${json.id}`)
+        }}
+        lazy={() => import('../pages/ProjectEdit')}
+      />
+    </Route>
   </Route>
 )

@@ -37,7 +37,7 @@ module ShardedBookmarkedCollection
   def self.build(bookmarker, relation, always_use_bookmarks: false)
     # automatically make associations multi-shard, since that's definitely what you want if you're
     # using this
-    if (owner = (relation.respond_to?(:proxy_association) && relation.proxy_association&.owner))
+    if (owner = relation.respond_to?(:proxy_association) && relation.proxy_association&.owner)
       relation = relation.shard(owner)
     end
     # not the result of relation.activate because we don't want it to

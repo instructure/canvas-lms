@@ -19,7 +19,7 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import {SourceLink} from '../source_link'
-import {ContentMigrationItem, ContentMigrationItemAttachment} from '../types'
+import type {ContentMigrationItem, ContentMigrationItemAttachment} from '../types'
 
 const item: ContentMigrationItem = {
   id: '1',

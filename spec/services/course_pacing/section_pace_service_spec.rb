@@ -46,10 +46,8 @@ describe CoursePacing::SectionPaceService do
       ).to eq section_pace
     end
 
-    it "raises RecordNotFound when the pace is not found" do
-      expect do
-        CoursePacing::SectionPaceService.pace_in_context(section_two)
-      end.to raise_error ActiveRecord::RecordNotFound
+    it "returns nil" do
+      expect(CoursePacing::SectionPaceService.pace_in_context(section_two)).to be_nil
     end
   end
 

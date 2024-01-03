@@ -444,7 +444,7 @@ class ContextModule < ActiveRecord::Base
   end
 
   def locked_for_tag?(tag, progression)
-    locked = (tag&.context_module_id == id && require_sequential_progress)
+    locked = tag&.context_module_id == id && require_sequential_progress
     locked && (progression.current_position&.< tag.position)
   end
 

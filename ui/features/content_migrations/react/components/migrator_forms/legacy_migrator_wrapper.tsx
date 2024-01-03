@@ -25,7 +25,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import Backbone from '@canvas/backbone'
 import ConverterViewControl from '@canvas/content-migrations/backbone/views/ConverterViewControl'
-import {onSubmitMigrationFormCallback} from '../types'
+import type {onSubmitMigrationFormCallback} from '../types'
 import {humanReadableSize} from '../utils'
 
 const I18n = useI18nScope('content_migrations_redesign')

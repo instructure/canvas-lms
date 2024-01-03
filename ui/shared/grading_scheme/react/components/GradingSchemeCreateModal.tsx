@@ -18,14 +18,17 @@
 import React, {useRef} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Modal} from '@instructure/ui-modal'
-import {GradingScheme, GradingSchemeTemplate} from '@canvas/grading_scheme/gradingSchemeApiModel'
+import type {
+  GradingScheme,
+  GradingSchemeTemplate,
+} from '@canvas/grading_scheme/gradingSchemeApiModel'
 import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {
-  GradingSchemeEditableData,
+  type GradingSchemeEditableData,
   GradingSchemeInput,
-  GradingSchemeInputHandle,
+  type GradingSchemeInputHandle,
 } from './form/GradingSchemeInput'
 
 const I18n = useI18nScope('GradingSchemeViewModal')
@@ -35,14 +38,12 @@ type Props = {
   handleCreateScheme: (gradingSchemeFormInput: GradingSchemeEditableData) => Promise<void>
   defaultGradingSchemeTemplate: GradingScheme
   defaultPointsGradingScheme: GradingSchemeTemplate
-  pointsBasedGradingSchemesEnabled: boolean
   archivedGradingSchemesEnabled: boolean
   handleCancelCreate: () => void
 }
 const GradingSchemeCreateModal = ({
   open,
   handleCreateScheme,
-  pointsBasedGradingSchemesEnabled,
   archivedGradingSchemesEnabled,
   defaultGradingSchemeTemplate,
   defaultPointsGradingScheme,
@@ -88,7 +89,6 @@ const GradingSchemeCreateModal = ({
             },
           }}
           ref={gradingSchemeCreateRef}
-          pointsBasedGradingSchemesFeatureEnabled={pointsBasedGradingSchemesEnabled}
           archivedGradingSchemesEnabled={archivedGradingSchemesEnabled}
           onSave={handleCreateScheme}
         />

@@ -26,7 +26,12 @@ import {px} from '@instructure/ui-utils'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import {AllRRULEDayValues, FrequencyValue, MonthlyModeValue, SelectedDaysArray} from '../types'
+import {
+  AllRRULEDayValues,
+  type FrequencyValue,
+  type MonthlyModeValue,
+  type SelectedDaysArray,
+} from '../types'
 import {
   cardinalDayInMonth,
   getMonthlyMode,

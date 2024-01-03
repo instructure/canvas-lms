@@ -42,7 +42,7 @@ module Api::V1::CalendarEvent
     include = options[:include]
     include ||= excludes.include?("child_events") ? [] : ["child_events"]
 
-    context = (options[:context] || event.context)
+    context = options[:context] || event.context
     duplicates = options.delete(:duplicates) || []
     participant = nil
 

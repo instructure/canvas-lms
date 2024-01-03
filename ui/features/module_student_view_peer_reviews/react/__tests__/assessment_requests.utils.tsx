@@ -17,7 +17,7 @@
  */
 
 import {formatAssessmentRequest, compareByCreatedAt, formatAssignment} from '../../utils/helper'
-import {AssessmentRequest, GraphQLAssesmentRequest, GraphQLAssignment} from '../../types'
+import type {AssessmentRequest, GraphQLAssesmentRequest, GraphQLAssignment} from '../../types'
 
 describe('Assessment Requests', () => {
   it('formats assessment request correctly', () => {

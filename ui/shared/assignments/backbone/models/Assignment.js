@@ -47,7 +47,7 @@ const canManage = function () {
 }
 
 const isAdmin = function () {
-  return _.includes(ENV.current_user_roles, 'admin')
+  return ENV.current_user_is_admin
 }
 
 // must check canManage because current_user_roles will include roles from other enrolled courses

@@ -17,7 +17,7 @@
  */
 
 import type {Rubric} from '@canvas/rubrics/react/types/rubric'
-import {RubricQueryResponse} from 'features/rubrics/types/Rubric'
+import type {RubricQueryResponse} from 'features/rubrics/types/Rubric'
 
 export const RUBRICS_DATA: Rubric[] = [
   {

@@ -56,7 +56,7 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
 
     # Take care of Assignment update information
     if input[:assignment]
-      assignment_id = (discussion_topic&.assignment&.id || discussion_topic.old_assignment_id)
+      assignment_id = discussion_topic&.assignment&.id || discussion_topic.old_assignment_id
 
       if assignment_id
         # If a current or old assignment exists already, then update it

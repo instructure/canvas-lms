@@ -856,6 +856,22 @@ describe "discussions" do
         user_session(teacher)
       end
 
+      it "does not display multiple assignTo options for students in multiple sections" do
+        # create and enroll student into a second section
+        section2 = course.course_sections.create! name: "section2"
+        course.enroll_student(student, enrollment_state: "active", section: section2, allow_multiple_enrollments: true)
+
+        get "/courses/#{course.id}/discussion_topics/new"
+
+        force_click('input[type=checkbox][value="graded"]')
+        wait_for_ajaximations
+
+        f("input[data-testid='assign-to-select']").click
+
+        assign_to_option_count = course.all_accepted_students.count + course.course_sections.active.count + 1
+        expect(ff("span[data-testid='assign-to-select-option']").count).to eq assign_to_option_count
+      end
+
       it "creates a discussion topic with an assignment with peer reviews" do
         get "/courses/#{course.id}/discussion_topics/new"
 
@@ -883,6 +899,53 @@ describe "discussions" do
         expect(dt.assignment.peer_review_count).to be 1
         expect(dt.assignment.peer_reviews).to be true
         expect(dt.assignment.automatic_peer_reviews).to be true
+      end
+
+      it "creates a discussion topic with an assignment with Sync to SIS" do
+        @account = @course.root_account
+        @account.set_feature_flag! "post_grades", "on"
+        get "/courses/#{course.id}/discussion_topics/new"
+
+        title = "Graded Discussion Topic with Sync to SIS"
+        message = "replying to topic"
+
+        f("input[placeholder='Topic Title']").send_keys title
+        type_in_tiny("textarea", message)
+
+        force_click('input[type=checkbox][value="graded"]')
+        wait_for_ajaximations
+
+        f("input[data-testid='points-possible-input']").send_keys "12"
+        force_click('input[type=checkbox][value="post_to_sis"]')
+
+        f("button[data-testid='save-and-publish-button']").click
+        wait_for_ajaximations
+
+        dt = DiscussionTopic.last
+        expect(dt.assignment.post_to_sis).to be true
+        expect(dt.assignment.name).to eq title
+      end
+
+      it "edits a topic with an assignment with sync to sis" do
+        @account = @course.root_account
+        @account.set_feature_flag! "post_grades", "on"
+
+        # topic with assignment
+        dt = @course.discussion_topics.create!(title: "no options enabled - topic", message: "test")
+
+        assignment = dt.context.assignments.build(points_possible: 50, post_to_sis: true)
+        dt.assignment = assignment
+        dt.save!
+        dt.reload
+
+        expect(dt.assignment.post_to_sis).to be true
+
+        get "/courses/#{course.id}/discussion_topics/#{dt.id}/edit"
+        force_click('input[type=checkbox][value="post_to_sis"]')
+        f("button[data-testid='save-button']").click
+        wait_for_ajaximations
+
+        expect(dt.reload.assignment.post_to_sis).to be false
       end
 
       it "does not allow submitting, when groups outside of the selected group category are selected" do
@@ -915,6 +978,315 @@ describe "discussions" do
         wait_for_ajaximations
 
         expect(fj("body:contains('Groups can only be part of the actively selected group set.')")).to be_present
+      end
+
+      context "assignment overrides" do
+        before do
+          @section_1 = course.course_sections.create!(name: "section 1")
+          @section_2 = course.course_sections.create!(name: "section 2")
+          @section_3 = course.course_sections.create!(name: "section 3")
+
+          @group_category = course.group_categories.create!(name: "group category 1")
+          @group_1 = @group_category.groups.create!(name: "group 1", context_type: "Course", context_id: course.id)
+          @group_2 = @group_category.groups.create!(name: "group 2", context_type: "Course", context_id: course.id)
+          @group_3 = @group_category.groups.create!(name: "group 3", context_type: "Course", context_id: course.id)
+
+          @student_1 = User.create!(name: "student 1")
+          @student_2 = User.create!(name: "student 2")
+          @student_3 = User.create!(name: "student 3")
+
+          course.enroll_student(@student_1, enrollment_state: "active", section: @section_1)
+          course.enroll_student(@student_2, enrollment_state: "active", section: @section_2)
+          course.enroll_student(@student_3, enrollment_state: "active", section: @section_3)
+        end
+
+        it "creates a discussion topic with an assignment with a mastery path override" do
+          course.conditional_release = true
+          course.save!
+          get "/courses/#{course.id}/discussion_topics/new"
+
+          title = "Graded Discussion Topic with mastery path override"
+          message = "replying to topic"
+
+          f("input[placeholder='Topic Title']").send_keys title
+          type_in_tiny("textarea", message)
+
+          force_click('input[type=checkbox][value="graded"]')
+          wait_for_ajaximations
+
+          f("input[data-testid='points-possible-input']").send_keys "12"
+
+          assign_to_element = f("input[data-testid='assign-to-select']")
+          assign_to_element.click
+          assign_to_element.send_keys :backspace
+          assign_to_element.send_keys "mastery path"
+          assign_to_element.send_keys :enter
+
+          f("button[data-testid='save-and-publish-button']").click
+          wait_for_ajaximations
+
+          dt = DiscussionTopic.last
+          expect(dt.title).to eq title
+          expect(dt.assignment.name).to eq title
+
+          overrides = dt.assignment.assignment_overrides
+          expect(overrides.length).to be 1
+          expect(overrides[0].title).to eq "Mastery Paths"
+          expect(overrides[0].set_id).to eq 1
+          expect(overrides[0].set_type).to eq "Noop"
+        end
+
+        it "creates a discussion topic with an assignment with section overrides" do
+          get "/courses/#{course.id}/discussion_topics/new"
+
+          title = "Graded Discussion Topic with section overrides"
+          message = "replying to topic"
+
+          f("input[placeholder='Topic Title']").send_keys title
+          type_in_tiny("textarea", message)
+
+          force_click('input[type=checkbox][value="graded"]')
+          wait_for_ajaximations
+
+          f("input[data-testid='points-possible-input']").send_keys "12"
+
+          assign_to_element = f("input[data-testid='assign-to-select']")
+          assign_to_element.click
+          assign_to_element.send_keys :backspace
+          assign_to_element.send_keys "section 1"
+          assign_to_element.send_keys :enter
+          assign_to_element.send_keys "section 2"
+          assign_to_element.send_keys :enter
+          assign_to_element.send_keys "section 3"
+          assign_to_element.send_keys :enter
+
+          f("button[data-testid='save-and-publish-button']").click
+          wait_for_ajaximations
+
+          dt = DiscussionTopic.last
+          expect(dt.title).to eq title
+          expect(dt.assignment.name).to eq title
+
+          overrides = dt.assignment.assignment_overrides
+          expect(overrides.length).to be 3
+          override_titles = overrides.map(&:title)
+          expect(override_titles).to include @section_1.name
+          expect(override_titles).to include @section_2.name
+          expect(override_titles).to include @section_3.name
+        end
+
+        it "creates a discussion topic with an assignment with group overrides" do
+          get "/courses/#{course.id}/discussion_topics/new"
+
+          title = "Graded Discussion Topic with group overrides"
+          message = "replying to topic"
+
+          f("input[placeholder='Topic Title']").send_keys title
+          type_in_tiny("textarea", message)
+
+          force_click('input[type=checkbox][value="graded"]')
+          wait_for_ajaximations
+
+          f("input[data-testid='points-possible-input']").send_keys "12"
+
+          force_click("input[data-testid='group-discussion-checkbox']")
+          group_category_input = f("input[placeholder='Select a group category']")
+          group_category_input.click
+          group_category_input.send_keys :arrow_down
+          group_category_input.send_keys :enter
+
+          assign_to_element = f("input[data-testid='assign-to-select']")
+          assign_to_element.click
+          assign_to_element.send_keys :backspace
+          assign_to_element.send_keys "group 1"
+          assign_to_element.send_keys :enter
+          assign_to_element.send_keys "group 2"
+          assign_to_element.send_keys :enter
+          assign_to_element.send_keys "group 3"
+          assign_to_element.send_keys :enter
+
+          f("button[data-testid='save-and-publish-button']").click
+          wait_for_ajaximations
+
+          dt = Assignment.last.discussion_topic
+          expect(dt.title).to eq title
+          expect(dt.assignment.name).to eq title
+
+          overrides = dt.assignment.assignment_overrides
+          expect(overrides.length).to be 3
+          override_titles = overrides.map(&:title)
+          expect(override_titles).to include @group_1.name
+          expect(override_titles).to include @group_2.name
+          expect(override_titles).to include @group_3.name
+          overrides.each do |override|
+            expect(override.workflow_state).to eq "active"
+          end
+        end
+
+        it "creates a discussion topic with an assignment with student override" do
+          get "/courses/#{course.id}/discussion_topics/new"
+
+          title = "Graded Discussion Topic with student overrides"
+          message = "replying to topic"
+
+          f("input[placeholder='Topic Title']").send_keys title
+          type_in_tiny("textarea", message)
+
+          force_click('input[type=checkbox][value="graded"]')
+          wait_for_ajaximations
+
+          f("input[data-testid='points-possible-input']").send_keys "12"
+
+          assign_to_element = f("input[data-testid='assign-to-select']")
+          assign_to_element.click
+          assign_to_element.send_keys :backspace
+          assign_to_element.send_keys "student 1"
+          assign_to_element.send_keys :enter
+          assign_to_element.send_keys "student 2"
+          assign_to_element.send_keys :enter
+          assign_to_element.send_keys "student 3"
+          assign_to_element.send_keys :enter
+
+          f("button[data-testid='save-and-publish-button']").click
+          wait_for_ajaximations
+
+          dt = DiscussionTopic.last
+          expect(dt.title).to eq title
+          expect(dt.assignment.name).to eq title
+
+          overrides = dt.assignment.assignment_overrides
+          expect(overrides.length).to be 1
+          expect(overrides[0].title).to eq "3 students"
+        end
+
+        it "creates a discussion topic with an assignment with section, group, and student overries as part of one" do
+          get "/courses/#{course.id}/discussion_topics/new"
+
+          title = "Graded Discussion Topic with section, group, and student overries as part of one"
+          message = "replying to topic"
+
+          f("input[placeholder='Topic Title']").send_keys title
+          type_in_tiny("textarea", message)
+
+          force_click('input[type=checkbox][value="graded"]')
+          wait_for_ajaximations
+
+          force_click("input[data-testid='group-discussion-checkbox']")
+          group_category_input = f("input[placeholder='Select a group category']")
+          group_category_input.click
+          group_category_input.send_keys :arrow_down
+          group_category_input.send_keys :enter
+
+          f("input[data-testid='points-possible-input']").send_keys "12"
+
+          assign_to_element = f("input[data-testid='assign-to-select']")
+          assign_to_element.click
+          assign_to_element.send_keys :backspace
+          assign_to_element.send_keys "section 1"
+          assign_to_element.send_keys :enter
+          assign_to_element.send_keys "section 2"
+          assign_to_element.send_keys :enter
+          assign_to_element.send_keys "section 3"
+          assign_to_element.send_keys :enter
+          assign_to_element.send_keys "group 1"
+          assign_to_element.send_keys :enter
+          assign_to_element.send_keys "group 2"
+          assign_to_element.send_keys :enter
+          assign_to_element.send_keys "group 3"
+          assign_to_element.send_keys :enter
+          assign_to_element.send_keys "student 1"
+          assign_to_element.send_keys :enter
+          assign_to_element.send_keys "student 2"
+          assign_to_element.send_keys :enter
+          assign_to_element.send_keys "student 3"
+          assign_to_element.send_keys :enter
+
+          f("button[data-testid='save-and-publish-button']").click
+          wait_for_ajaximations
+
+          dt = Assignment.last.discussion_topic
+          expect(dt.title).to eq title
+          expect(dt.assignment.name).to eq title
+
+          overrides = dt.assignment.assignment_overrides
+          override_titles = overrides.map(&:title)
+          expect(overrides.length).to be 7
+          expect(override_titles).to include "3 students"
+          expect(override_titles).to include @section_1.name
+          expect(override_titles).to include @section_2.name
+          expect(override_titles).to include @section_3.name
+          expect(override_titles).to include @group_1.name
+          expect(override_titles).to include @group_2.name
+          expect(override_titles).to include @group_3.name
+        end
+
+        it "creates a discussion topic with an assignment with section, group, and student overries separately" do
+          get "/courses/#{course.id}/discussion_topics/new"
+
+          title = "Graded Discussion Topic with section, group, and student overries separately"
+          message = "replying to topic"
+
+          f("input[placeholder='Topic Title']").send_keys title
+          type_in_tiny("textarea", message)
+
+          force_click('input[type=checkbox][value="graded"]')
+          wait_for_ajaximations
+
+          force_click("input[data-testid='group-discussion-checkbox']")
+          group_category_input = f("input[placeholder='Select a group category']")
+          group_category_input.click
+          group_category_input.send_keys :arrow_down
+          group_category_input.send_keys :enter
+
+          f("input[data-testid='points-possible-input']").send_keys "12"
+
+          f("button[data-testid='add-assignment-override-seciont-btn']").click
+          f("button[data-testid='add-assignment-override-seciont-btn']").click
+
+          assign_to_elements = ff("input[data-testid='assign-to-select']")
+          assign_to_elements[0].click
+          assign_to_elements[0].send_keys :backspace
+          assign_to_elements[0].send_keys "section 1"
+          assign_to_elements[0].send_keys :enter
+          assign_to_elements[0].send_keys "section 2"
+          assign_to_elements[0].send_keys :enter
+          assign_to_elements[0].send_keys "section 3"
+          assign_to_elements[0].send_keys :enter
+
+          assign_to_elements[1].click
+          assign_to_elements[1].send_keys "group 1"
+          assign_to_elements[1].send_keys :enter
+          assign_to_elements[1].send_keys "group 2"
+          assign_to_elements[1].send_keys :enter
+          assign_to_elements[1].send_keys "group 3"
+          assign_to_elements[1].send_keys :enter
+
+          assign_to_elements[2].click
+          assign_to_elements[2].send_keys "student 1"
+          assign_to_elements[2].send_keys :enter
+          assign_to_elements[2].send_keys "student 2"
+          assign_to_elements[2].send_keys :enter
+          assign_to_elements[2].send_keys "student 3"
+          assign_to_elements[2].send_keys :enter
+
+          f("button[data-testid='save-and-publish-button']").click
+          wait_for_ajaximations
+
+          dt = Assignment.last.discussion_topic
+          expect(dt.title).to eq title
+          expect(dt.assignment.name).to eq title
+
+          overrides = dt.assignment.assignment_overrides
+          override_titles = overrides.map(&:title)
+          expect(overrides.length).to be 7
+          expect(override_titles).to include "3 students"
+          expect(override_titles).to include @section_1.name
+          expect(override_titles).to include @section_2.name
+          expect(override_titles).to include @section_3.name
+          expect(override_titles).to include @group_1.name
+          expect(override_titles).to include @group_2.name
+          expect(override_titles).to include @group_3.name
+        end
       end
     end
 

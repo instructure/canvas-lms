@@ -136,7 +136,7 @@ module Exporters
     def process_file(att)
       if att.grants_right?(@user, mock_session, :download)
         @file_list << att
-        @total_size += (att.size || 0)
+        @total_size += att.size || 0
       end
     end
 

@@ -39,7 +39,7 @@ class Quizzes::QuizQuestion::MultipleAnswersQuestion < Quizzes::QuizQuestion::Ba
       next unless response
 
       total_answers += 1
-      user_answer.answer_details["answer_#{answer[:id]}".to_sym] = response
+      user_answer.answer_details[:"answer_#{answer[:id]}"] = response
 
       # Total possible is divided by the number of correct answers.
       # For every correct answer they correctly select, they get partial

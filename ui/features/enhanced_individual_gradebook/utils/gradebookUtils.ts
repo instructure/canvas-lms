@@ -17,8 +17,8 @@
  */
 
 import _ from 'lodash'
-import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
-import {
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import type {
   AssignmentGroupCriteriaMap,
   CamelizedGradingPeriodSet,
   SubmissionGradeCriteria,
@@ -28,8 +28,8 @@ import round from '@canvas/round'
 import tz from '@canvas/timezone'
 import userSettings from '@canvas/user-settings'
 
-import {
-  ApiCallStatus,
+import {ApiCallStatus, GradebookSortOrder} from '../types'
+import type {
   AssignmentConnection,
   AssignmentDetailCalculationText,
   AssignmentGradingPeriodMap,
@@ -38,7 +38,6 @@ import {
   AssignmentSubmissionsMap,
   EnrollmentConnection,
   GradebookOptions,
-  GradebookSortOrder,
   GradebookStudentDetails,
   GradebookUserSubmissionDetails,
   SortableAssignment,
@@ -46,11 +45,11 @@ import {
   SubmissionConnection,
   SubmissionGradeChange,
 } from '../types'
-import {GradingPeriodSet, Submission, WorkflowState} from '../../../api.d'
+import type {GradingPeriodSet, Submission, WorkflowState} from '../../../api.d'
 import DateHelper from '@canvas/datetime/dateHelper'
 import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
 import {scopeToUser, updateWithSubmissions} from '@canvas/grading/EffectiveDueDates'
-import {scoreToGrade, GradingStandard} from '@instructure/grading-utils'
+import {scoreToGrade, type GradingStandard} from '@instructure/grading-utils'
 import {divide, toNumber} from '@canvas/grading/GradeCalculationHelper'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
@@ -347,7 +346,6 @@ export function gradebookOptionsSetup(env: GlobalEnv) {
     groupWeightingScheme: env.GRADEBOOK_OPTIONS?.group_weighting_scheme,
     lastGeneratedCsvAttachmentUrl: env.GRADEBOOK_OPTIONS?.attachment_url,
     messageAttachmentUploadFolderId: env.GRADEBOOK_OPTIONS?.message_attachment_upload_folder_id,
-    pointsBasedGradingSchemesFeatureEnabled: !!env.POINTS_BASED_GRADING_SCHEMES_ENABLED,
     proxySubmissionEnabled: !!env.GRADEBOOK_OPTIONS?.proxy_submissions_allowed,
     publishToSisEnabled: env.GRADEBOOK_OPTIONS?.publish_to_sis_enabled,
     publishToSisUrl: env.GRADEBOOK_OPTIONS?.publish_to_sis_url,
@@ -508,7 +506,7 @@ function mapToSortableAssignment(
 }
 
 export function isInPastGradingPeriodAndNotAdmin(assignment: AssignmentConnection): boolean {
-  return (assignment.inClosedGradingPeriod ?? false) && !ENV.current_user_roles?.includes('admin')
+  return (assignment.inClosedGradingPeriod ?? false) && !ENV.current_user_is_admin
 }
 
 export function disableGrading(

@@ -28,7 +28,7 @@ describe JwtsController do
     lambda do |resp|
       utf8_token_string = json_parse(resp.body)["token"]
       decoded_crypted_token = Canvas::Security.base64_decode(utf8_token_string)
-      return CanvasSecurity::ServicesJwt.decrypt(decoded_crypted_token)
+      CanvasSecurity::ServicesJwt.decrypt(decoded_crypted_token)
     end
   end
 

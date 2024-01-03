@@ -136,7 +136,7 @@ module ApplicationHelper
   end
 
   def url_helper_context_from_object(context)
-    (context ? context.class.base_class : context.class).name.underscore
+    (context ? context.class.url_context_class : context.class).name.underscore
   end
 
   def message_user_path(user, context = nil)
@@ -943,7 +943,7 @@ module ApplicationHelper
     if ApplicationController.test_cluster_name
       url =
         @domain_root_account.settings[
-          "#{ApplicationController.test_cluster_name}_dashboard_url".to_sym
+          :"#{ApplicationController.test_cluster_name}_dashboard_url"
         ]
     end
     url ||= @domain_root_account.settings[:dashboard_url]
@@ -1220,7 +1220,7 @@ module ApplicationHelper
     else
       # map wiki page url to id
       if asset_type == "WikiPage"
-        page = @context.wiki_pages.not_deleted.where(url: asset_id).first
+        page = @context.wiki.find_page(asset_id)
         asset_id = page.id if page
       else
         asset_id = asset_id.to_i
@@ -1414,5 +1414,13 @@ module ApplicationHelper
 
   def load_heap?
     find_heap_application_id && @domain_root_account&.feature_enabled?(:send_usage_metrics)
+  end
+
+  def load_hotjar?
+    # Only load hotjar UX survey tool for the Learner Passport prototype
+    # Skip it in production and development environments, include it for Beta & CD
+    controller.controller_name == "learner_passport" &&
+      Canvas.environment !~ /(production|development)/ &&
+      @domain_root_account&.feature_enabled?(:learner_passport)
   end
 end

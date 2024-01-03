@@ -4,7 +4,7 @@ class AddSkinnyAuaTables < ActiveRecord::Migration[5.2]
   tag :predeploy
 
   def create_aua_log_partition(index)
-    table_name = "aua_logs_#{index}".to_sym
+    table_name = :"aua_logs_#{index}"
     create_table table_name do |t|
       t.bigint :asset_user_access_id, null: false
       t.datetime :created_at, null: false

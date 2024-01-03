@@ -35,7 +35,7 @@ import type {
   FilterDrilldownMenuItem,
   FilterPreset,
 } from '../gradebook.d'
-import {GradeStatus} from '@canvas/grading/accountGradingStatus'
+import type {GradeStatus} from '@canvas/grading/accountGradingStatus'
 
 const I18n = useI18nScope('gradebook')
 

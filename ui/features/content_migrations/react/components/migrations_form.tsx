@@ -29,7 +29,7 @@ import {completeUpload} from '@canvas/upload-file'
 import CourseCopyImporter from './migrator_forms/course_copy'
 import CanvasCartridgeImporter from './migrator_forms/canvas_cartridge'
 import LegacyMigratorWrapper from './migrator_forms/legacy_migrator_wrapper'
-import {
+import type {
   AttachmentProgressResponse,
   ContentMigrationItem,
   ContentMigrationResponse,

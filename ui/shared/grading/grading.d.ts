@@ -341,7 +341,6 @@ export type DeprecatedGradingScheme = {
 
 export type GradeEntryOptions = {
   gradingScheme?: {data: GradingStandard[]; pointsBased: boolean; scalingFactor: number} | null
-  pointsBasedGradingSchemesFeatureEnabled: boolean
 }
 
 export type ProvisionalGrade = {

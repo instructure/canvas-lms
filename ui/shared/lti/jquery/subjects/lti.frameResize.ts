@@ -18,7 +18,7 @@
 
 import ToolLaunchResizer from '../tool_launch_resizer'
 import {findDomForWindow, findDomForWindowInRCEIframe} from '../util'
-import {LtiMessageHandler} from '../lti_message_handler'
+import type {LtiMessageHandler} from '../lti_message_handler'
 
 const frameResize: LtiMessageHandler<{height: number | string; token: string}> = ({
   message,

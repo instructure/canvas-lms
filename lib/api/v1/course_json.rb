@@ -96,7 +96,7 @@ module Api::V1
     end
 
     def clear_unneeded_fields(hash)
-      hash.reject { |k, v| (OPTIONAL_FIELDS.include?(k) && v.nil?) }
+      hash.reject { |k, v| OPTIONAL_FIELDS.include?(k) && v.nil? }
     end
 
     def description(course)
@@ -149,7 +149,7 @@ module Api::V1
     end
 
     INCLUDE_CHECKERS.each do |key, val|
-      define_method("include_#{key}".to_sym) do
+      define_method(:"include_#{key}") do
         @includes.include?(val.to_sym)
       end
     end

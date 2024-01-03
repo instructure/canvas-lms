@@ -45,6 +45,7 @@ describe ContentMigration do
         tag.use_default_restrictions = index.even? # pretend some items have custom restrictions set via the API
         tag.save!
       end
+      @cm.update(user: account_admin_user)
     end
 
     it "does not copy blueprint settings if not requested" do

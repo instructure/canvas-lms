@@ -21,7 +21,7 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {render} from '@testing-library/react'
 import {
   GradingSchemeViewEditModal,
-  GradingSchemeViewEditModalProps,
+  type GradingSchemeViewEditModalProps,
 } from '../GradingSchemeViewEditModal'
 import {AccountGradingSchemes, DefaultGradingScheme} from './fixtures'
 
@@ -42,7 +42,6 @@ describe('Grading Schemes View Edit Tests', () => {
         contextId="1"
         contextType="Course"
         gradingSchemeId="1"
-        pointsBasedGradingSchemesEnabled={true}
         archivedGradingSchemesEnabled={false}
         onCancel={() => {}}
         onUpdate={() => {}}

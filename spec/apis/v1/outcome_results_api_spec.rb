@@ -88,8 +88,8 @@ describe "Outcome Results API", type: :request do
       assessor: outcome_teacher,
       artifact: submission,
       assessment: {
-        :assessment_type => "grading",
-        "criterion_#{criterion[:id]}".to_sym => {
+        assessment_type: "grading",
+        "criterion_#{criterion[:id]}": {
           points:
         }
       }

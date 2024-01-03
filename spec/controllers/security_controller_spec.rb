@@ -105,7 +105,7 @@ RSpec.describe SecurityController, type: :request do
       messages = Lti::ResourcePlacement::PLACEMENTS_BY_MESSAGE_TYPE.keys.map(&:to_s).map do |message_type|
         {
           "type" => message_type,
-          "placements" => Lti::ResourcePlacement::PLACEMENTS_BY_MESSAGE_TYPE[message_type].map(&:to_s)
+          "placements" => Lti::ResourcePlacement::PLACEMENTS_BY_MESSAGE_TYPE[message_type].reject { |p| p == :resource_selection }.map(&:to_s)
         }
       end
 

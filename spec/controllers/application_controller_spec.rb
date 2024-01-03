@@ -35,7 +35,10 @@ RSpec.describe ApplicationController do
         user_agent: nil,
         remote_ip: "0.0.0.0",
         base_url: "https://canvas.test",
-        referer: nil
+        referer: nil,
+        cookies: {}, # for make_lti_launch_debug_logger
+        cookie_jar: {}, # for make_lti_launch_debug_logger
+        original_fullpath: "/" # for make_lti_launch_debug_logger
       )
       allow(controller).to receive(:request).and_return(request_double)
     end
@@ -183,6 +186,38 @@ RSpec.describe ApplicationController do
           it "for the course where user is enrolled as student" do
             controller.instance_variable_set(:@context, @course_with_user_as_student)
             expect(controller.js_env[:current_user_is_student]).to be_truthy
+          end
+        end
+
+        context "current_user_is_admin" do
+          before do
+            @sub_account = Account.create(name: "sub account from default account", parent_account: Account.default)
+            @teacher_sub_account_admin = user_with_pseudonym(username: "nobody@example.com")
+            @root_account_course = Course.create!(name: "course in root account", account: Account.default)
+            @root_account_course.enroll_user(@teacher_sub_account_admin, "TeacherEnrollment", enrollment_state: "active")
+            @sub_account_course = Course.create!(name: "course in sub account", account: @sub_account)
+            @sub_account.account_users.create!(user: @teacher_sub_account_admin)
+            @admin = user_with_pseudonym(username: "nobody2@example.com")
+            Account.default.account_users.create!(user: @admin)
+            allow(controller).to receive("api_v1_course_ping_url").and_return({})
+          end
+
+          it "is set to false when the user is an account admin of a different account that is not the parent account of the course" do
+            controller.instance_variable_set(:@current_user, @teacher_sub_account_admin)
+            controller.instance_variable_set(:@context, @root_account_course)
+            expect(controller.js_env[:current_user_is_admin]).to be_falsey
+          end
+
+          it "is set to true when the user is an account admin of the account that is the parent account of the course" do
+            controller.instance_variable_set(:@current_user, @teacher_sub_account_admin)
+            controller.instance_variable_set(:@context, @sub_account_course)
+            expect(controller.js_env[:current_user_is_admin]).to be_truthy
+          end
+
+          it "is set to true when the user is an account admin of the root account" do
+            controller.instance_variable_set(:@current_user, @admin)
+            controller.instance_variable_set(:@context, @root_account_course)
+            expect(controller.js_env[:current_user_is_admin]).to be_truthy
           end
         end
       end
@@ -1139,8 +1174,14 @@ RSpec.describe ApplicationController do
               let(:cached_launch) { JSON.parse(Canvas.redis.get(redis_key)) }
 
               before do
+                Lti::LaunchDebugLogger.enable!(account, 1)
+
                 allow(SecureRandom).to receive(:hex).and_return(verifier)
                 controller.send(:content_tag_redirect, course, content_tag, nil)
+              end
+
+              after do
+                Lti::LaunchDebugLogger.disable!(account)
               end
 
               it "caches the LTI 1.3 launch" do
@@ -1198,6 +1239,12 @@ RSpec.describe ApplicationController do
                 it "uses the custom url as the target_link_uri" do
                   expect(assigns[:lti_launch].params["target_link_uri"]).to eq custom_url
                 end
+              end
+
+              it "includes debug_trace in the lti_message_hint (if enabled for the account)" do
+                message_hint = JSON::JWT.decode(assigns[:lti_launch].params["lti_message_hint"], :skip_verification)
+                expect(message_hint["debug_trace"]).to be_a(String)
+                expect(message_hint["debug_trace"]).to_not be_empty
               end
             end
 

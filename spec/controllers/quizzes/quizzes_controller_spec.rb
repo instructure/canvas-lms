@@ -363,7 +363,7 @@ describe Quizzes::QuizzesController do
             expect(controller.js_env[:QUIZZES][:options]).not_to be_nil
             expect(controller.js_env[:QUIZZES][:options].count).to eq(4)
 
-            controller.js_env[:QUIZZES][:options].each do |_, assignment_options|
+            controller.js_env[:QUIZZES][:options].each_value do |assignment_options|
               expect(assignment_options[:can_unpublish]).to be true
             end
           end
@@ -378,7 +378,7 @@ describe Quizzes::QuizzesController do
             expect(controller.js_env[:QUIZZES][:options]).not_to be_nil
             expect(controller.js_env[:QUIZZES][:options].count).to eq(4)
 
-            controller.js_env[:QUIZZES][:options].each do |_, assignment_options|
+            controller.js_env[:QUIZZES][:options].each_value do |assignment_options|
               expect(assignment_options[:can_unpublish]).to be false
             end
           end

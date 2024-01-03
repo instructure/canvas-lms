@@ -19,7 +19,10 @@
 import React from 'react'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {render} from '@testing-library/react'
-import {GradingSchemesManagement, GradingSchemesManagementProps} from '../GradingSchemesManagement'
+import {
+  GradingSchemesManagement,
+  type GradingSchemesManagementProps,
+} from '../GradingSchemesManagement'
 import {AccountGradingSchemes, DefaultGradingScheme} from './fixtures'
 
 jest.mock('@canvas/do-fetch-api-effect')
@@ -39,7 +42,6 @@ describe('Grading Schemes Management Tests', () => {
       <GradingSchemesManagement
         contextId="1"
         contextType="Course"
-        pointsBasedGradingSchemesEnabled={true}
         archivedGradingSchemesEnabled={false}
         onGradingSchemesChanged={() => {}}
         {...props}

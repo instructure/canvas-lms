@@ -17,7 +17,7 @@ GEM
       reline (>= 0.3.1)
     declarative (0.0.20)
     diff-lcs (1.5.0)
-    faraday (2.7.11)
+    faraday (2.7.12)
       base64
       faraday-net_http (>= 2.0, < 3.1)
       ruby2_keywords (>= 0.0.4)
@@ -31,7 +31,7 @@ GEM
       retriable (>= 2.0, < 4.a)
       rexml
       webrick
-    google-apis-drive_v3 (0.44.0)
+    google-apis-drive_v3 (0.45.0)
       google-apis-core (>= 0.11.0, < 2.a)
     googleauth (1.8.1)
       faraday (>= 0.17.3, < 3.a)
@@ -42,7 +42,7 @@ GEM
     hashdiff (1.0.1)
     httpclient (2.8.3)
     io-console (0.6.0)
-    irb (1.9.0)
+    irb (1.10.0)
       rdoc
       reline (>= 0.3.8)
     jwt (2.7.1)
@@ -51,11 +51,11 @@ GEM
     os (1.1.4)
     psych (5.1.1.1)
       stringio
-    public_suffix (5.0.3)
+    public_suffix (5.0.4)
     rake (13.1.0)
     rdoc (6.6.0)
       psych (>= 4.0.0)
-    reline (0.4.0)
+    reline (0.4.1)
       io-console (~> 0.5)
     representable (3.2.0)
       declarative (< 0.1.0)

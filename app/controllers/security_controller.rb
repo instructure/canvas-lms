@@ -101,12 +101,13 @@ class SecurityController < ApplicationController
     {
       product_family_code: "canvas",
       version: canvas_ims_product_version,
-      messages_supported: Lti::ResourcePlacement::PLACEMENTS_BY_MESSAGE_TYPE.keys.map do |message_type|
-        {
-          type: message_type,
-          placements: Lti::ResourcePlacement::PLACEMENTS_BY_MESSAGE_TYPE[message_type]
-        }
-      end,
+      messages_supported: Lti::ResourcePlacement::PLACEMENTS_BY_MESSAGE_TYPE.keys
+                                                                            .map do |message_type|
+                            {
+                              type: message_type,
+                              placements: Lti::ResourcePlacement::PLACEMENTS_BY_MESSAGE_TYPE[message_type].reject { |p| p == :resource_selection }
+                            }
+                          end,
       variables: Lti::VariableExpander.expansion_keys,
       "https://canvas.instructure.com/lti/account_name": account.name,
       "https://canvas.instructure.com/lti/account_lti_guid": account.lti_guid

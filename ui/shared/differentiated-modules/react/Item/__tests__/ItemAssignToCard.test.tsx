@@ -18,9 +18,13 @@
 
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
-import ItemAssignToCard, {ItemAssignToCardProps} from '../ItemAssignToCard'
+import ItemAssignToCard, {type ItemAssignToCardProps} from '../ItemAssignToCard'
 
 const props: ItemAssignToCardProps = {
+  courseId: '1',
+  disabledOptionIds: [],
+  selectedAssigneeIds: [],
+  onCardAssignmentChange: () => {},
   cardId: 'assign-to-card-001',
   due_at: null,
   unlock_at: null,

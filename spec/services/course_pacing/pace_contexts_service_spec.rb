@@ -95,9 +95,8 @@ describe CoursePacing::PaceContextsService do
     end
 
     context "for anything else" do
-      it "captures the invalid type" do
-        expect(Canvas::Errors).to receive(:capture_exception).with(:pace_contexts_service, "Expected a value of 'course', 'section', or 'student_enrollment', got 'foobar'")
-        subject.contexts_of_type("foobar")
+      it "raise for an invalid type" do
+        expect { subject.contexts_of_type("foobar") }.to raise_error(ArgumentError)
       end
     end
   end

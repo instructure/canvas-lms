@@ -199,8 +199,7 @@ class GradebookUserIds
       type: [:StudentEnrollment, :StudentViewEnrollment]
     )
 
-    section_ids = section_id ? [section_id] : nil
-    @course.apply_enrollment_visibility(student_enrollments, @user, section_ids, include: workflow_states)
+    @course.apply_enrollment_visibility(student_enrollments, @user, nil, include: workflow_states)
   end
 
   def students

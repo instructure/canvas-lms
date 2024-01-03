@@ -187,8 +187,6 @@ GradingTypeSelector.prototype.renderGradingSchemeSelector = function () {
     onChange: this.handleGradingStandardIdChanged,
     contextId: ENV.COURSE_ID,
     contextType: 'Course',
-    // TODO: remove after grading_scheme_updates feature flag is turned on globally
-    pointsBasedGradingSchemesEnabled: !!ENV.POINTS_BASED_GRADING_SCHEMES_ENABLED,
   }
   const mountPoint = document.querySelector('#grading_scheme_selector-target')
   // eslint-disable-next-line react/no-render-return-value

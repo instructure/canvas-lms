@@ -4162,6 +4162,7 @@ he:
       update_assignment_points: "לשנות נקודות משימה כדי שיתאימו לרובריקה?"
   change_section_to_sectionname_6e947e90: "שינוי סעיף ל %{sectionName}"
   change_sis_ids_3a47154d: "שינוי מזהי המערכת הבית ספרית SIS"
+  change_to_b757d327: "שינוי ל"
   changed_item_1d16a85f: "פריט ששונה"
   changes_will_still_apply_if_you_leave_this_page_935cedc6: "השינוי ישאר בתוקף גם לאחר עזיבת דף זה."
   changes_you_made_may_not_be_saved_4e8db973: "תיקונים שבצעת יתכן שלא ישמרו"
@@ -9062,6 +9063,7 @@ he:
         name: שם
         out_of: מתוך
         score: ציון
+        submitted: נשלח
       icons: 
         turnitin_results: "ראה/י תוצאות Turnitin "
       labels: 
@@ -16618,6 +16620,7 @@ he:
   remove_c_name_section_d8eabd3a: "הסרת הקבצה %{c.name} "
   remove_contact_method_ca890ba3: "הסרת אופן ההתקשרות"
   remove_course_association_name_b760c502: "הסרת פריט קורס נלווה %{name}"
+  remove_dates_5a5a8df2: "הסרת תאריכים"
   remove_edf2b8a7: (הסרה)
   remove_email_address_b1820820: "הסרת כתובת דוא\"ל"
   remove_empty_attachment_b2aea632: "הסרת תצריף ריק"
@@ -18103,6 +18106,7 @@ he:
       no_points_possible: "אין אפשרות לבנות עקומה ללא ניקוד אפשרי"
       none_to_update: "אין את מי לעדכן"
   shared_secret_892c88f2: "מלה סודית משותפת"
+  shift_dates_746698a5: "הזזת תאריכים"
   short_name_42f454a1: "שם מקוצר"
   short_name_ad9bf84f: "שם מוקצר"
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "צריך להיות מובן מאליו, מזהה הקנבס של המשתמש המדווח"
@@ -18738,6 +18742,7 @@ he:
   submitting_types_7c5a7096: "בהגשה: %{types}"
   subscribe_4b301fb7: הרשמה
   subscribed_fe74d22a: "רשום "
+  substitution_713c65b9: החלפה
   success_grades_were_published_to_the_grade_book_da3b4fba: "הצלחה! ההערכות פורסמו לספר הציונים"
   success_to_do_created_e34ed395: "הצלחה: פריט משימה נוצר"
   successfully_created_a_set_38374719: "אוגדן נוצר בהצלחה"
@@ -20503,11 +20508,13 @@ he:
   you_must_allow_at_least_one_appointment_per_partic_c142139c: "עליכם לאפשר לפחות פגישה אחת לכל משתתף"
   you_must_allow_at_least_one_appointment_per_time_s_76e22300: "עליכם לאפשר לפחות פגישה אחת לכל חלון זמן"
   you_must_attach_at_least_one_file_to_this_assignme_9f39ce12: "יש לצרף לפחות קובץ אחד למשימה זו."
+  you_must_choose_a_content_option_c776bdef: "יש צורך לבחור מתוך אפשרויות סוגי תכנים"
   you_must_have_a_student_or_section_selected_a99e45df: "יש לבחור תלמיד או הקבצה"
   you_must_log_in_to_view_replies_9ccd4da0: "יש להתחבר כדי לעיין בתגובות"
   you_must_provide_a_date_and_time_a86839d2: "עליך לספק תאריך ושעה"
   you_must_provide_a_value_or_unselect_the_option_3b28b754: "יש להקליד ערך או לא לסמן אפשרות זו"
   you_must_select_a_course_to_copy_content_from_e7bd9e09: "יש לבחור קורס כדי להעתיק תוכן ממנו"
+  you_must_select_a_file_to_import_content_from_28a242ff: "יש לבחור קובץ ממנו ייובא התוכן"
   you_must_set_it_to_a_number_greater_than_or_equal__eb1d9275: "יש להגדיר זאת כמספר הגדול או שווה ל %{min}"
   you_must_specify_a_usage_right_5eb57f87: "חובה להגדיר זכויות שימוש"
   you_must_use_a_number_912ce4bd: "יש להשתמש בערך מספרי"

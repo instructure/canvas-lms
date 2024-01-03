@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import RequirementSelector, {RequirementSelectorProps} from '../RequirementSelector'
+import RequirementSelector, {type RequirementSelectorProps} from '../RequirementSelector'
 import {render, fireEvent} from '@testing-library/react'
 
 describe('RequirementSelector', () => {

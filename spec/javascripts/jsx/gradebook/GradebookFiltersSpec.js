@@ -459,22 +459,6 @@ test('includes the selected section when updating the post grades store', functi
   strictEqual(sectionId, '2001')
 })
 
-test('re-renders the section filter', async function () {
-  await this.gradebook.updateCurrentSection('2001')
-  strictEqual(this.gradebook.updateSectionFilterVisibility.callCount, 1)
-})
-
-test('re-renders the section filter after setting the selected section', function () {
-  this.gradebook.updateSectionFilterVisibility.callsFake(() => {
-    strictEqual(
-      this.gradebook.getFilterRowsBySetting('sectionId'),
-      '2001',
-      'section was already updated'
-    )
-  })
-  this.gradebook.updateCurrentSection('2001')
-})
-
 test('saves settings', function () {
   this.gradebook.updateCurrentSection('2001')
   strictEqual(this.gradebook.saveSettings.callCount, 1)

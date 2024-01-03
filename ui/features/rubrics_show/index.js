@@ -21,12 +21,12 @@ import confirmationMessage from '@canvas/rubrics/jquery/rubric_delete_confirmati
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 
 $(document).ready(() => {
-  $('#right-side .edit_rubric_link').click(event => {
+  $('#rubric-action-buttons .edit_rubric_link').click(event => {
     event.preventDefault()
     $('.rubric:visible:first .edit_rubric_link').click()
   })
 
-  $('#right-side .delete_rubric_link').click(event => {
+  $('#rubric-action-buttons .delete_rubric_link').click(event => {
     event.preventDefault()
     const callback = () => (window.location.href = $('.rubrics_url').attr('href'))
 
@@ -37,7 +37,7 @@ $(document).ready(() => {
 
   $(document).fragmentChange((event, hash) => {
     if (hash === '#edit') {
-      $('#right-side .edit_rubric_link').click()
+      $('#rubric-action-buttons .edit_rubric_link').click()
     }
   })
 })

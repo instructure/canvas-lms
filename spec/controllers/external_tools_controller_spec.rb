@@ -178,6 +178,22 @@ describe ExternalToolsController do
         end
       end
 
+      context "when Lti::LaunchDebugLogger is enabled" do
+        before do
+          Lti::LaunchDebugLogger.enable!(@course.root_account, 1)
+          user_session(@teacher)
+          get :show, params: { course_id: @course.id, id: tool.id }
+        end
+
+        after { Lti::LaunchDebugLogger.disable!(@course.root_account) }
+
+        it "includes a debug_trace in lti_message_hint" do
+          message_hint = JSON::JWT.decode(assigns[:lti_launch].params["lti_message_hint"], :skip_verification)
+          expect(message_hint["debug_trace"]).to be_a(String)
+          expect(message_hint["debug_trace"]).to_not be_empty
+        end
+      end
+
       context "with a bad launch url" do
         it "fails gracefully" do
           user_session(@teacher)

@@ -77,9 +77,9 @@ RSpec.shared_context "DiscussionTypeContext" do
         allowed: lambda do |user|
           permission = !discussion.assignment.context.large_roster? && discussion.assignment_id && discussion.assignment.published?
           if discussion.assignment.context.concluded?
-            return permission && discussion.assignment.context.grants_right?(user, :read_as_admin)
+            permission && discussion.assignment.context.grants_right?(user, :read_as_admin)
           else
-            return permission && discussion.assignment.context.grants_any_right?(user, :manage_grades, :view_all_grades)
+            permission && discussion.assignment.context.grants_any_right?(user, :manage_grades, :view_all_grades)
           end
         end
       },

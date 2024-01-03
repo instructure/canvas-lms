@@ -204,7 +204,7 @@ class Message < ActiveRecord::Base
   end
 
   # Named scopes
-  scope :for, ->(context) { where(context_type: context.class.base_class.to_s, context_id: context) }
+  scope :for, ->(context) { where(context:) }
 
   scope :after, ->(date) { where("messages.created_at>?", date) }
   scope :more_recent_than, ->(date) { where("messages.created_at>? AND messages.dispatch_at>?", date, date) }
@@ -733,7 +733,7 @@ self.user,
     if check_acct.feature_enabled?(:notification_service)
       enqueue_to_sqs
     else
-      delivery_method = "deliver_via_#{path_type}".to_sym
+      delivery_method = :"deliver_via_#{path_type}"
       if !delivery_method || !respond_to?(delivery_method, true)
         logger.warn("Could not set delivery_method from #{path_type}")
         return nil

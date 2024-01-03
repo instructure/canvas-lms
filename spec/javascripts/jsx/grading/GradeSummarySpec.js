@@ -410,6 +410,14 @@ QUnit.module('GradeSummary.calculateTotals', suiteHooks => {
     contextHooks.beforeEach(() => {
       exampleGrades = createExampleGrades()
       exampleGrades.current = {score: 23, possible: 100}
+      const gradingSchemeDataRows = [
+        {name: 'A', value: 0.9},
+        {name: 'B', value: 0.8},
+        {name: 'C', value: 0.7},
+        {name: 'D', value: 0.6},
+        {name: 'F', value: 0},
+      ]
+      ENV.course_active_grading_scheme = {data: gradingSchemeDataRows}
       ENV.grading_scheme = [
         ['A', 0.9],
         ['B', 0.8],
@@ -491,6 +499,19 @@ QUnit.module('GradeSummary.calculateTotals', suiteHooks => {
       const $status = $fixtures.find('.final_grade .status').first().children().first()
       ok($status.length)
       ok($status.hasClass('submission-custom-grade-status-pill-42'), 'has class for custom status')
+    })
+
+    test('when the custom status has allow_final_grade_value equal to false it will display the grade as "-"', () => {
+      ENV.final_override_custom_grade_status_id = '42'
+      ENV.effective_final_score = 84
+      ENV.custom_grade_statuses = [
+        {id: '42', title: 'Custom Status', allow_final_grade_value: false},
+      ]
+      GradeSummary.calculateTotals(exampleGrades, 'current', 'percent')
+      const $status = $fixtures.find('.final_grade .status').first().children().first()
+      ok($status.length)
+      const $grade = $fixtures.find('.final_grade .grade').first()
+      strictEqual($grade.text(), '-')
     })
   })
 })

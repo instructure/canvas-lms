@@ -3263,7 +3263,6 @@ describe Submission do
         setup_account_for_turnitin(@assignment.context.account)
         @assignment.submission_types = "online_upload,online_text_entry"
         @assignment.turnitin_enabled = true
-        @assignment.turnitin_settings = @assignment.turnitin_settings
         @assignment.save!
         @submission = @assignment.submit_homework(@user, { body: "hello there", submission_type: "online_text_entry" })
       end
@@ -3410,7 +3409,7 @@ describe Submission do
       before :once do
         @assignment.submission_types = "online_upload,online_text_entry"
         @assignment.turnitin_enabled = true
-        @assignment.turnitin_settings = @assignment.turnitin_settings
+        @assignment.turnitin_settings = @assignment.turnitin_settings # rubocop:disable Lint/SelfAssignment
         @assignment.save!
         @submission = @assignment.submit_homework(@user, { body: "hello there", submission_type: "online_text_entry" })
         @submission.turnitin_data = {
@@ -6601,6 +6600,12 @@ describe Submission do
       @submission.update!(attempt: 4)
       comment = @submission.add_comment(author: @teacher, comment: "42", attempt: 3)
       expect(comment.attempt).to eq 3
+    end
+
+    it "sets the attempt to latest submission attempt when an attempt option is not specified" do
+      @submission.update!(attempt: 5, workflow_state: "graded")
+      comment = @submission.add_comment(author: @teacher, comment: "42")
+      expect(comment.attempt).to eq 5
     end
 
     it "sets comment hidden to false if comment causes posting" do

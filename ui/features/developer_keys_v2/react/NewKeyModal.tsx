@@ -26,51 +26,27 @@ import {Modal} from '@instructure/ui-modal'
 import {View} from '@instructure/ui-view'
 import React from 'react'
 import NewKeyForm from './NewKeyForm'
-import type {DeveloperKey} from './NewKeyForm'
+import type {AvailableScope} from './reducers/listScopesReducer'
+import type {DeveloperKeyCreateOrEditState} from './reducers/createOrEditReducer'
+import actions from './actions/developerKeysActions'
+import type {AnyAction, Dispatch} from 'redux'
+import type {DeveloperKey} from '../model/DeveloperKey'
 
 const I18n = useI18nScope('react_developer_keys')
 
 type Props = {
-  createOrEditDeveloperKeyState: {
-    isLtiKey: boolean
-    developerKeyCreateOrEditSuccessful: boolean
-    developerKeyCreateOrEditFailed: boolean
-    developerKeyCreateOrEditPending: boolean
-    developerKeyModalOpen: boolean
-    developerKey: DeveloperKey
-    editing: boolean
-  }
-  availableScopes: {
-    [key: string]: Array<{
-      resource: string
-      scope: string
-    }>
-  }
+  createOrEditDeveloperKeyState: DeveloperKeyCreateOrEditState
+  availableScopes: Record<string, AvailableScope>
   availableScopesPending: boolean
   store: {
-    dispatch: (action: any) => Promise<any>
+    dispatch: Dispatch
   }
   ctx: {
     params: {
       contextId: string
     }
   }
-  actions: {
-    createOrEditDeveloperKey: (developerKey: any, url: string, method: string) => Promise<any>
-    developerKeysModalClose: () => void
-    editDeveloperKey: () => void
-    listDeveloperKeyScopesSet: (scopes: Array<string>) => void
-    saveLtiToolConfiguration: (toSave: any) => (dispatch: any) => Promise<any>
-    resetLtiState: () => void
-    updateLtiKey: (
-      developerKey: any,
-      scopes: Array<string>,
-      id: string,
-      settings: any,
-      custom_fields: any
-    ) => Promise<any>
-    listDeveloperKeysReplace: (developerKey: any) => void
-  }
+  actions: typeof actions
   selectedScopes: Array<string>
   handleSuccessfulSave: () => void
 }
@@ -211,7 +187,11 @@ export default class DeveloperKeyModal extends React.Component<Props, State> {
     }
 
     return dispatch(
-      createOrEditDeveloperKey({developer_key: toSubmit}, this.developerKeyUrl(), method)
+      createOrEditDeveloperKey(
+        {developer_key: toSubmit},
+        this.developerKeyUrl(),
+        method
+      ) as unknown as AnyAction
     ).then(() => {
       if (this.keySavedSuccessfully) {
         this.props.handleSuccessfulSave()
@@ -225,7 +205,7 @@ export default class DeveloperKeyModal extends React.Component<Props, State> {
       scopes?: any
       custom_fields?: any
     },
-    developerKey: string
+    developerKey: DeveloperKey
   ) {
     const {
       store: {dispatch},
@@ -262,7 +242,7 @@ export default class DeveloperKeyModal extends React.Component<Props, State> {
       return
     }
     let settings: {
-      scopes?: any
+      scopes?: unknown
     } = {}
     if (this.isJsonConfig) {
       if (!this.state.toolConfiguration) {
@@ -285,9 +265,9 @@ export default class DeveloperKeyModal extends React.Component<Props, State> {
     } else {
       const toSave: {
         account_id: string
-        developer_key: string
+        developer_key: DeveloperKey
         settings_url?: string
-        settings?: any
+        settings?: unknown
       } = {
         account_id: this.props.ctx.params.contextId,
         developer_key,

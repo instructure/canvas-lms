@@ -420,6 +420,21 @@ describe Course do
         expect(@course.enable_course_paces).to be false
       end
     end
+
+    describe "import_blueprint_settings" do
+      it "runs blueprint importer if set to do so" do
+        migration = ContentMigration.create!(context: @course, user: account_admin_user, source_course: @course, migration_settings: { import_blueprint_settings: true })
+        expect(Importers::BlueprintSettingsImporter).to receive(:process_migration).once
+        Importers::CourseContentImporter.import_content(@course, {}, nil, migration)
+      end
+
+      it "skips the blueprint importer if the user lacks proper permission" do
+        usr = account_admin_user_with_role_changes(role_changes: { manage_master_courses: false })
+        migration = ContentMigration.create!(context: @course, user: usr, source_course: @course, migration_settings: { import_blueprint_settings: true })
+        expect(Importers::BlueprintSettingsImporter).not_to receive(:process_migration)
+        Importers::CourseContentImporter.import_content(@course, {}, nil, migration)
+      end
+    end
   end
 
   describe "shift_date_options" do

@@ -420,7 +420,7 @@ module QuizzesHelper
   end
 
   def comment_get(hash, field)
-    html = hash_get(hash, "#{field}_html".to_sym)
+    html = hash_get(hash, :"#{field}_html")
 
     if html
       UserContent.escape(Sanitize.clean(html, CanvasSanitize::SANITIZE), nil, controller.try(:use_new_math_equation_handling?))

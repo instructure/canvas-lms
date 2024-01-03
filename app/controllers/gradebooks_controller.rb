@@ -69,7 +69,6 @@ class GradebooksController < ApplicationController
              restrict_quantitative_data: @context.restrict_quantitative_data?(@current_user),
              student_grade_summary_upgrade: Account.site_admin.feature_enabled?(:student_grade_summary_upgrade),
              can_clear_badge_counts: Account.site_admin.grants_right?(@current_user, :manage_students),
-             POINTS_BASED_GRADING_SCHEMES_ENABLED: Account.site_admin.feature_enabled?(:points_based_grading_schemes),
              custom_grade_statuses: @context.custom_grade_statuses.as_json(include_root: false)
            })
     return render :grade_summary_list unless @presenter.student
@@ -189,31 +188,30 @@ class GradebooksController < ApplicationController
       outcome_service_results_to_canvas: outcome_service_results_to_canvas_enabled?
     }
 
-    if Account.site_admin.feature_enabled?(:points_based_grading_schemes)
-      course_active_grading_standard = if @context.grading_standard_id.nil?
-                                         nil
-                                       elsif @context.grading_standard_id == 0
+    course_active_grading_standard = if @context.grading_standard_id.nil?
+                                       if @context.restrict_quantitative_data?(@current_user)
                                          GradingSchemesJsonController.default_canvas_grading_standard(@context)
                                        else
-                                         standard = GradingStandard.for(@context).find_by(id: @context.grading_standard_id)
-                                         if standard.nil?
-                                           # course's grading standard was soft deleted. use canvas default scheme, since grading
-                                           # schemes are enabled for the course (or else course would have a nil grading standard id)
-                                           GradingSchemesJsonController.default_canvas_grading_standard(@context)
-                                         else
-                                           standard
-                                         end
+                                         nil
                                        end
-      course_active_grading_scheme = if course_active_grading_standard
-                                       GradingSchemesJsonController.to_grading_scheme_json(course_active_grading_standard, @current_user)
+                                     elsif @context.grading_standard_id == 0
+                                       GradingSchemesJsonController.default_canvas_grading_standard(@context)
                                      else
-                                       nil
+                                       standard = GradingStandard.for(@context).find_by(id: @context.grading_standard_id)
+                                       if standard.nil?
+                                         # course's grading standard was soft deleted. use canvas default scheme, since grading
+                                         # schemes are enabled for the course (or else course would have a nil grading standard id)
+                                         GradingSchemesJsonController.default_canvas_grading_standard(@context)
+                                       else
+                                         standard
+                                       end
                                      end
-      js_hash[:course_active_grading_scheme] = course_active_grading_scheme
-    else
-      # TODO: remove after points grading scheme feature flag is turned on globally
-      js_hash[:grading_scheme] = @context.grading_standard_or_default.data
-    end
+    course_active_grading_scheme = if course_active_grading_standard
+                                     GradingSchemesJsonController.to_grading_scheme_json(course_active_grading_standard, @current_user)
+                                   else
+                                     nil
+                                   end
+    js_hash[:course_active_grading_scheme] = course_active_grading_scheme
 
     # This really means "if the final grade override feature flag is enabled AND
     # the context in question has enabled the setting in the gradebook"
@@ -225,7 +223,7 @@ class GradebooksController < ApplicationController
                     end
 
       js_hash[:effective_final_score] = total_score.effective_final_score if total_score&.overridden?
-      js_hash[:final_override_custom_grade_status_id] = total_score.custom_grade_status_id if total_score&.overridden? && Account.site_admin.feature_enabled?(:custom_gradebook_statuses)
+      js_hash[:final_override_custom_grade_status_id] = total_score.custom_grade_status_id if total_score&.custom_grade_status_id && Account.site_admin.feature_enabled?(:custom_gradebook_statuses)
     end
 
     js_env(js_hash)
@@ -552,9 +550,8 @@ class GradebooksController < ApplicationController
       post_grades_ltis:,
       post_manually: @context.post_manually?,
       proxy_submissions_allowed: Account.site_admin.feature_enabled?(:proxy_file_uploads) && @context.grants_right?(@current_user, session, :proxy_assignment_submission),
-      publish_to_sis_enabled: (
-        !!@context.sis_source_id && @context.allows_grade_publishing_by(@current_user) && gradebook_is_editable
-      ),
+      publish_to_sis_enabled:
+        !!@context.sis_source_id && @context.allows_grade_publishing_by(@current_user) && gradebook_is_editable,
 
       publish_to_sis_url: context_url(@context, :context_details_url, anchor: "tab-grade-publishing"),
       re_upload_submissions_url: named_context_url(@context, :submissions_upload_context_gradebook_url, "{{ assignment_id }}"),
@@ -581,7 +578,6 @@ class GradebooksController < ApplicationController
     js_env({
              EMOJIS_ENABLED: @context.feature_enabled?(:submission_comment_emojis),
              EMOJI_DENY_LIST: @context.root_account.settings[:emoji_deny_list],
-             POINTS_BASED_GRADING_SCHEMES_ENABLED: Account.site_admin.feature_enabled?(:points_based_grading_schemes),
              GRADEBOOK_OPTIONS: gradebook_options
            })
   end
@@ -622,9 +618,8 @@ class GradebooksController < ApplicationController
       individual_gradebook_enhancements: true,
       outcome_gradebook_enabled: outcome_gradebook_enabled?,
       proxy_submissions_allowed: Account.site_admin.feature_enabled?(:proxy_file_uploads) && @context.grants_right?(@current_user, session, :proxy_assignment_submission),
-      publish_to_sis_enabled: (
-        !!@context.sis_source_id && @context.allows_grade_publishing_by(@current_user) && gradebook_is_editable
-      ),
+      publish_to_sis_enabled:
+        !!@context.sis_source_id && @context.allows_grade_publishing_by(@current_user) && gradebook_is_editable,
       publish_to_sis_url: context_url(@context, :context_details_url, anchor: "tab-grade-publishing"),
       reorder_custom_columns_url: api_v1_custom_gradebook_columns_reorder_url(@context),
       save_view_ungraded_as_zero_to_server: allow_view_ungraded_as_zero?,
@@ -638,7 +633,6 @@ class GradebooksController < ApplicationController
     }
     js_env({
              GRADEBOOK_OPTIONS: gradebook_options,
-             POINTS_BASED_GRADING_SCHEMES_ENABLED: Account.site_admin.feature_enabled?(:points_based_grading_schemes),
            })
   end
 
@@ -727,9 +721,8 @@ class GradebooksController < ApplicationController
       post_grades_feature: post_grades_feature?,
       post_manually: @context.post_manually?,
       proxy_submissions_allowed: Account.site_admin.feature_enabled?(:proxy_file_uploads) && @context.grants_right?(@current_user, session, :proxy_assignment_submission),
-      publish_to_sis_enabled: (
-        !!@context.sis_source_id && @context.allows_grade_publishing_by(@current_user) && gradebook_is_editable
-      ),
+      publish_to_sis_enabled:
+        !!@context.sis_source_id && @context.allows_grade_publishing_by(@current_user) && gradebook_is_editable,
 
       publish_to_sis_url: context_url(@context, :context_details_url, anchor: "tab-grade-publishing"),
       re_upload_submissions_url: named_context_url(@context, :submissions_upload_context_gradebook_url, "{{ assignment_id }}"),
@@ -757,7 +750,6 @@ class GradebooksController < ApplicationController
     js_env({
              GRADEBOOK_OPTIONS: gradebook_options,
              outcome_service_results_to_canvas: outcome_service_results_to_canvas_enabled?,
-             POINTS_BASED_GRADING_SCHEMES_ENABLED: Account.site_admin.feature_enabled?(:points_based_grading_schemes),
            })
   end
 
@@ -1405,19 +1397,11 @@ class GradebooksController < ApplicationController
   private
 
   def active_grading_standard_scaling_factor(grading_standard)
-    if Account.site_admin.feature_enabled?(:points_based_grading_schemes) && grading_standard
-      grading_standard.scaling_factor
-    else
-      1.0
-    end
+    grading_standard.scaling_factor
   end
 
   def active_grading_standard_points_based(grading_standard)
-    if Account.site_admin.feature_enabled?(:points_based_grading_schemes) && grading_standard
-      grading_standard.points_based
-    else
-      false
-    end
+    grading_standard.points_based
   end
 
   def gradebook_group_categories_json

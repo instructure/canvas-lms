@@ -21,7 +21,7 @@ class AssignmentStudentVisibility < ActiveRecord::Base
   include VisibilityPluckingHelper
 
   belongs_to :user
-  belongs_to :assignment
+  belongs_to :assignment, inverse_of: :assignment_student_visibilities
   belongs_to :course
 
   # we are temporarily using a setting here because the feature flag

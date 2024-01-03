@@ -16,14 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {
-  cloneElement,
-  MouseEvent,
-  MouseEventHandler,
-  ReactElement,
-  useEffect,
-  useState,
-} from 'react'
+import React, {cloneElement, useEffect, useState} from 'react'
+import type {MouseEvent, MouseEventHandler, ReactElement} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Modal} from '@instructure/ui-modal'
 import {Button, CloseButton} from '@instructure/ui-buttons'
@@ -32,15 +26,8 @@ import {TempEnrollSearch} from './TempEnrollSearch'
 import {TempEnrollEdit} from './TempEnrollEdit'
 import {TempEnrollAssign} from './TempEnrollAssign'
 import {Flex} from '@instructure/ui-flex'
-import {
-  Enrollment,
-  EnrollmentType,
-  MODULE_NAME,
-  RECIPIENT,
-  Role,
-  TempEnrollPermissions,
-  User,
-} from './types'
+import {MODULE_NAME, RECIPIENT} from './types'
+import type {Enrollment, EnrollmentType, Role, TempEnrollPermissions, User} from './types'
 import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {createAnalyticPropsGenerator, setAnalyticPropsOnRef} from './util/analytics'
 import {Spinner} from '@instructure/ui-spinner'
@@ -301,7 +288,7 @@ export function TempEnrollModal(props: Props) {
           page={page}
           searchFail={handleModalReset}
           searchSuccess={handleSetEnrollmentFromSearch}
-          foundEnroll={enrollment}
+          foundUser={enrollment}
         />
       )
     }
@@ -310,7 +297,7 @@ export function TempEnrollModal(props: Props) {
   const renderButtons = () => {
     if (props.isEditMode) {
       return (
-        <Flex.Item margin="0 small 0 0">
+        <Flex.Item>
           <Button disabled={buttonsDisabled} onClick={handleCloseModal} {...analyticProps('Done')}>
             {I18n.t('Done')}
           </Button>
@@ -318,7 +305,7 @@ export function TempEnrollModal(props: Props) {
       )
     } else {
       return [
-        <Flex.Item key="cancel" margin="0 small 0 0">
+        <Flex.Item key="cancel">
           <Button
             disabled={buttonsDisabled}
             onClick={handleCloseModal}
@@ -329,7 +316,7 @@ export function TempEnrollModal(props: Props) {
         </Flex.Item>,
 
         page === 1 && (
-          <Flex.Item key="startOver" margin="0 small 0 0">
+          <Flex.Item key="startOver">
             <Button
               disabled={buttonsDisabled}
               onClick={handleModalReset}
@@ -341,7 +328,7 @@ export function TempEnrollModal(props: Props) {
         ),
 
         !props.isEditMode && (
-          <Flex.Item key="nextOrSubmit" margin="0 small 0 0">
+          <Flex.Item key="nextOrSubmit">
             <Button
               disabled={buttonsDisabled}
               color="primary"
@@ -399,7 +386,7 @@ export function TempEnrollModal(props: Props) {
         </Modal.Body>
 
         <Modal.Footer>
-          <Flex>{renderButtons()}</Flex>
+          <Flex gap="small">{renderButtons()}</Flex>
         </Modal.Footer>
       </Modal>
 

@@ -23,7 +23,7 @@ import {
   fetchTemporaryEnrollments,
 } from '../../api/enrollment'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {Enrollment, ITEMS_PER_PAGE, User} from '../../types'
+import {type Enrollment, ITEMS_PER_PAGE, type User} from '../../types'
 
 // Mock the API call
 jest.mock('@canvas/do-fetch-api-effect')
