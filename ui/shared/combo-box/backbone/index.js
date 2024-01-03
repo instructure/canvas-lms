@@ -16,8 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import _ from 'underscore'
-import {map} from 'lodash'
+import {assignIn, map} from 'lodash'
 import Backbone from '@canvas/backbone'
 import template from '../jst/index.handlebars'
 import htmlEscape from 'html-escape'
@@ -66,7 +65,7 @@ export default class ComboBox {
     }
 
     // attach event handlers
-    _.extend(this, Backbone.Events)
+    assignIn(this, Backbone.Events)
     this.$menu.change(() => this.trigger('change', this.selected()))
     this.$prev.bind('click', this._previous)
     this.$next.bind('click', this._next)

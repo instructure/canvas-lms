@@ -21,6 +21,7 @@ import $ from 'jquery'
 import {isFunction} from 'lodash'
 import preventDefault from '@canvas/util/preventDefault'
 import ReactModal from '@canvas/react-modal'
+
 import {useScope as useI18nScope} from '@canvas/i18n'
 import ModalContent from './content'
 import ModalButtons from './buttons'
