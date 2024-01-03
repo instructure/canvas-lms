@@ -19,7 +19,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {Spinner} from '@instructure/ui-spinner'
 import $ from 'jquery'
-import _ from 'underscore'
+import _ from 'lodash'
 import Backbone from '@canvas/backbone'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -46,7 +46,7 @@ export default class CalendarEvent extends Backbone.Model {
   dateAttributes = ['created_at', 'end_at', 'start_at', 'updated_at']
 
   _filterAttributes(obj) {
-    const filtered = _(obj).pick(
+    const filtered = _.pick(obj, [
       'start_at',
       'end_at',
       'title',
@@ -60,8 +60,9 @@ export default class CalendarEvent extends Backbone.Model {
       'web_conference',
       'important_dates',
       'blackout_date',
-      'rrule'
-    )
+      'rrule',
+    ])
+
     if (obj.use_section_dates && obj.child_event_data) {
       filtered.child_event_data = _.chain(obj.child_event_data)
         .compact()
