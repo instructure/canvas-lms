@@ -118,7 +118,7 @@ const props: Props = {
 }
 
 const ENROLLMENTS_URI = encodeURI(
-  `/api/v1/users/${props.user.id}/courses?enrollment_state[]=active&enrollment_state[]=completed&include[]=sections&per_page=${MAX_ALLOWED_COURSES_PER_PAGE}&account_id=${enrollmentsByCourse[0].account_id}`
+  `/api/v1/users/${props.user.id}/courses?enrollment_state=active&include[]=sections&per_page=${MAX_ALLOWED_COURSES_PER_PAGE}&account_id=${enrollmentsByCourse[0].account_id}`
 )
 
 // converts local time to UTC time based on a given date and time
