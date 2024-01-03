@@ -17,8 +17,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'underscore'
-import {map} from 'lodash'
+import {map, some, compact, difference, filter, includes} from 'lodash'
 import DialogBaseView from '@canvas/dialog-base-view'
 import RosterDialogMixin from './RosterDialogMixin'
 import linkToStudentsViewTemplate from '../../jst/LinkToStudentsView.handlebars'
@@ -67,7 +66,7 @@ export default class LinkToStudentsView extends DialogBaseView {
     input.$fakeInput.css('width', '100%')
 
     for (const e of this.model.allEnrollmentsByType('ObserverEnrollment')) {
-      if (e.observed_user && _.some(e.observed_user.enrollments)) {
+      if (e.observed_user && some(e.observed_user.enrollments)) {
         input.addToken({
           value: e.observed_user.id,
           text: e.observed_user.name,
@@ -103,9 +102,9 @@ export default class LinkToStudentsView extends DialogBaseView {
     const dfds = []
     const enrollments = this.model.allEnrollmentsByType('ObserverEnrollment')
     const enrollment = enrollments[0]
-    const currentLinks = _.compact(_.pluck(enrollments, 'associated_user_id'))
-    const newLinks = _.difference(this.students, currentLinks)
-    const removeLinks = _.difference(currentLinks, this.students)
+    const currentLinks = compact(map(enrollments, 'associated_user_id'))
+    const newLinks = difference(this.students, currentLinks)
+    const removeLinks = difference(currentLinks, this.students)
     const newEnrollments = []
     let observerObservingObserver = false
 
@@ -174,8 +173,8 @@ export default class LinkToStudentsView extends DialogBaseView {
     }
 
     // delete old links
-    const enrollmentsToRemove = _.filter(enrollments, en =>
-      _.includes(removeLinks, en.associated_user_id)
+    const enrollmentsToRemove = filter(enrollments, en =>
+      includes(removeLinks, en.associated_user_id)
     )
     for (const en of enrollmentsToRemove) {
       const url = `${ENV.COURSE_ROOT_URL}/unenroll/${en.id}`

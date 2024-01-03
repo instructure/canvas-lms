@@ -17,8 +17,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'underscore'
-import {map} from 'lodash'
+import {map, some, every, find, filter, reject, isEmpty} from 'lodash'
 import Backbone from '@canvas/backbone'
 import template from '../../jst/rosterUser.handlebars'
 import EditSectionsView from './EditSectionsView'
@@ -78,7 +77,7 @@ export default class RosterUserView extends Backbone.View {
 
   contextCardJSON(json) {
     let enrollment
-    if ((enrollment = _.find(json.enrollments, e => e.type === 'StudentEnrollment'))) {
+    if ((enrollment = find(json.enrollments, e => e.type === 'StudentEnrollment'))) {
       return (json.course_id = enrollment.course_id)
     }
   }
@@ -90,20 +89,20 @@ export default class RosterUserView extends Backbone.View {
     json.isPending = this.model.pending(this.model.currentRole)
     json.isInactive = this.model.inactive()
     if (!json.isInactive) {
-      json.enrollments = _.reject(json.enrollments, en => en.enrollment_state === 'inactive') // if not _completely_ inactive, treat the inactive enrollments as deleted
+      json.enrollments = reject(json.enrollments, en => en.enrollment_state === 'inactive') // if not _completely_ inactive, treat the inactive enrollments as deleted
     }
 
-    json.canRemoveUsers = _.every(this.model.get('enrollments'), e => e.can_be_removed)
+    json.canRemoveUsers = every(this.model.get('enrollments'), e => e.can_be_removed)
     json.canResendInvitation = !json.isInactive
 
     if (json.canRemoveUsers && !ENV.course.concluded) {
-      json.canEditRoles = !_.some(
+      json.canEditRoles = !some(
         this.model.get('enrollments'),
         e => e.type === 'ObserverEnrollment' && e.associated_user_id
       )
     }
 
-    json.canEditSections = !json.isInactive && !_.isEmpty(this.model.sectionEditableEnrollments())
+    json.canEditSections = !json.isInactive && !isEmpty(this.model.sectionEditableEnrollments())
     json.canLinkStudents = json.isObserver && !ENV.course.concluded
     json.canViewLoginIdColumn = ENV.permissions.view_user_logins
     json.canViewSisIdColumn = ENV.permissions.read_sis
@@ -111,7 +110,7 @@ export default class RosterUserView extends Backbone.View {
 
     const candoAdminActions =
       ENV.permissions.can_allow_course_admin_actions || ENV.permissions.manage_admin_users
-    json.canManage = _.some(['TeacherEnrollment', 'DesignerEnrollment', 'TaEnrollment'], et =>
+    json.canManage = some(['TeacherEnrollment', 'DesignerEnrollment', 'TaEnrollment'], et =>
       this.model.hasEnrollmentType(et)
     )
       ? candoAdminActions
@@ -135,15 +134,15 @@ export default class RosterUserView extends Backbone.View {
   observerJSON(json) {
     if (json.isObserver) {
       let user
-      const observerEnrollments = _.filter(json.enrollments, en => en.type === 'ObserverEnrollment')
-      json.enrollments = _.reject(json.enrollments, en => en.type === 'ObserverEnrollment')
+      const observerEnrollments = filter(json.enrollments, en => en.type === 'ObserverEnrollment')
+      json.enrollments = reject(json.enrollments, en => en.type === 'ObserverEnrollment')
 
       json.sections = map(json.enrollments, en => ENV.CONTEXTS.sections[en.course_section_id])
 
       const users = {}
       if (
         observerEnrollments.length >= 1 &&
-        _.every(observerEnrollments, enrollment => !enrollment.observed_user)
+        every(observerEnrollments, enrollment => !enrollment.observed_user)
       ) {
         users[''] = {name: I18n.t('nobody', 'nobody')}
       } else {
