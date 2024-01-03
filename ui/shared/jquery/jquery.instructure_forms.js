@@ -19,7 +19,7 @@
 import {send} from '@canvas/rce-command-shim'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'underscore'
+import {uniqueId, find, result} from 'lodash'
 import FakeXHR from './FakeXHR'
 import authenticity_token from '@canvas/authenticity-token'
 import htmlEscape from 'html-escape'
@@ -248,7 +248,7 @@ $.fn.formSubmit = function (options) {
         })
       })
     } else if (doUploadFile) {
-      const id = _.uniqueId(formId + '_'),
+      const id = uniqueId(formId + '_'),
         $frame = $(
           "<div style='display: none;' id='box_" +
             htmlEscape(id) +
@@ -562,7 +562,7 @@ $.fileData = function (file_object) {
 }
 
 $.toMultipartForm = function (params, callback) {
-  const boundary = '-----AaB03x' + _.uniqueId()
+  const boundary = '-----AaB03x' + uniqueId()
   const paramsList = []
   const result = {content_type: 'multipart/form-data; boundary=' + boundary}
   let body = '--' + boundary + '\r\n'
@@ -614,7 +614,7 @@ $.toMultipartForm = function (params, callback) {
       value = value[0]
     }
     if (window.FileList && value instanceof FileList) {
-      const innerBoundary = '-----BbC04y' + _.uniqueId(),
+      const innerBoundary = '-----BbC04y' + uniqueId(),
         fileList = []
       body +=
         'Content-Disposition: form-data; name="' +
@@ -950,7 +950,7 @@ $.fn.validateForm = function (options) {
     )
   }
   if (options.required) {
-    const required = _.result(options, 'required')
+    const required = result(options, 'required')
     $.each(required, (i, name) => {
       if (!data[name]) {
         if (!errors[name]) {
@@ -1192,7 +1192,7 @@ $.fn.errorBox = function (message, scroll, override_position) {
 
     const cleanup = function () {
       const $screenReaderErrors = $('#flash_screenreader_holder').find('span')
-      const srError = _.find($screenReaderErrors, node => $(node).text() === $box.text())
+      const srError = find($screenReaderErrors, node => $(node).text() === $box.text())
       $box.remove()
       if (srError) {
         $(srError).remove()
@@ -1281,7 +1281,7 @@ $.fn.hideErrors = function (_options) {
       if ($oldBox_) {
         $oldBox_.remove()
         $obj.data('associated_error_box', null)
-        const srError = _.find($screenReaderErrors, node => $(node).text() === $oldBox_.text())
+        const srError = find($screenReaderErrors, node => $(node).text() === $oldBox_.text())
         if (srError) {
           $(srError).remove()
         }
