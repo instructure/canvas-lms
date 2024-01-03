@@ -136,6 +136,25 @@
                 >{{#t}}Duplicate{{/t}}</a>
               </li>
               {{/if}}
+              {{#if can_update}}
+                {{#if differentiatedModulesFlag}}
+                  <li>
+                    <a
+                      class="assign-to-link icon-permissions"
+                      id="assign_to_{{id}}_link"
+                      href="{{id}}%>"
+                      data-quiz-name="{{name}}"
+                      data-quiz-context-id="{{courseId}}"
+                      data-quiz-id="{{assignment_id}}"
+                      data-is-lti-quiz="{{isQuizzesNext}}"
+                      data-quiz-points-possible="{{points_possible}}"
+                      title="<%= {{#t}}Assign this Quiz{{/t}} %>"
+                      aria-label="{{#t}}Assign To...{{/t}}"
+                      data-focus-returns-to="assign_{{id}}_manage_link"
+                    >{{#t}}Assign To...{{/t}}</a>
+                  </li>
+                {{/if}}
+              {{/if}}
               {{#unless is_locked}}
                 <li role="presentation">
                 {{#if permissions.delete}}
@@ -210,6 +229,25 @@
                 >{{#t}}Duplicate{{/t}}</a>
               </li>
               {{/if}}
+              {{#if can_update}}
+                {{#if differentiatedModulesFlag}}
+                  <li>
+                    <a
+                      class="assign-to-link icon-permissions"
+                      id="assign_to_{{id}}_link"
+                      href="{{id}}%>"
+                      data-quiz-name="{{name}}"
+                      data-quiz-context-id="{{courseId}}"
+                      data-quiz-id="{{assignment_id}}"
+                      data-is-lti-quiz="{{isQuizzesNext}}"
+                      data-quiz-points-possible="{{points_possible}}"
+                      title="<%= {{#t}}Assign this Quiz{{/t}} %>"
+                      aria-label="{{#t}}Assign To...{{/t}}"
+                      data-focus-returns-to="assign_{{id}}_manage_link"
+                    >{{#t}}Assign To...{{/t}}</a>
+                  </li>
+                {{/if}}
+              {{/if}}
               {{#ifAll can_update cyoe.isCyoeAble}}
               <li role="presentation">
                   <a href="{{edit_url}}?return_to={{return_to}}#mastery-paths-editor" class="icon-mastery-path" tabindex="-1" role="menuitem" title="{{#t}}Edit Mastery Paths for {{title_label}}{{/t}}">{{#t}}Mastery Paths{{/t}}</a>
@@ -245,4 +283,5 @@
     {{/if}}
   </div>
 {{/if}}{{/if}}{{/if}}{{/if}}{{/if}}{{/if}}
+<div id="assign-to-mount-point"></div>
 </div>
