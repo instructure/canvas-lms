@@ -20,8 +20,7 @@
 
 import {extend} from '@canvas/backbone/utils'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import _ from 'underscore'
-import {map} from 'lodash'
+import {map, find, extend as lodashExtend} from 'lodash'
 import Backbone from '@canvas/backbone'
 import CalculationMethodContent from '@canvas/grading/CalculationMethodContent'
 
@@ -56,7 +55,7 @@ Outcome.prototype.setMasteryScales = function () {
   const ratings = ENV.MASTERY_SCALE.outcome_proficiency.ratings
   return this.set({
     ratings,
-    mastery_points: _.find(
+    mastery_points: find(
       ratings,
       (function (_this) {
         return function (r) {
@@ -168,7 +167,7 @@ Outcome.prototype.parse = function (resp) {
 }
 
 Outcome.prototype.present = function () {
-  return _.extend({}, this.toJSON(), this.calculationMethodContent().present())
+  return lodashExtend({}, this.toJSON(), this.calculationMethodContent().present())
 }
 
 Outcome.prototype.setUrlTo = function (action) {

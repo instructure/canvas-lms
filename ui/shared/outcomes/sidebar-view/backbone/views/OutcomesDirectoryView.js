@@ -18,8 +18,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'underscore'
-import {map} from 'lodash'
+import {map, each, isEmpty, last} from 'lodash'
 import htmlEscape from 'html-escape'
 import PaginatedView from '@canvas/pagination/backbone/views/PaginatedView'
 import OutcomeGroup from '../../../backbone/models/OutcomeGroup'
@@ -219,7 +218,7 @@ ${htmlEscape(I18n.t('Loading more results'))}</span></li>`
   // Cache the backbone views for outcomes and groups.
   // Groups are shown first.
   views() {
-    if (this._views && !_.isEmpty(this._views)) {
+    if (this._views && !isEmpty(this._views)) {
       return this._views
     }
 
@@ -241,7 +240,7 @@ ${htmlEscape(I18n.t('Loading more results'))}</span></li>`
 
   removeGroup(group) {
     this.reset()
-    if (group === __guard__(_.last(this.sidebar.directories), x => x.outcomeGroup)) {
+    if (group === __guard__(last(this.sidebar.directories), x => x.outcomeGroup)) {
       return this.trigger('select', this, null)
     }
   }
@@ -258,7 +257,7 @@ ${htmlEscape(I18n.t('Loading more results'))}</span></li>`
     }
     this.prevSelectedModel = this.selectedModel
     this.selectedModel = null
-    return _.each(this.views(), v => v.unSelect())
+    each(this.views(), v => v.unSelect())
   }
 
   clearOutcomeSelection() {
@@ -271,7 +270,7 @@ ${htmlEscape(I18n.t('Loading more results'))}</span></li>`
   render() {
     this.$el.empty()
     if (this.needsReset) return this.reset()
-    _.each(this.views(), v => this.$el.append(v.render().el))
+    each(this.views(), v => this.$el.append(v.render().el))
     if (this.inFindDialog) this.handleWarning()
     if (!this.readOnly) this.initDroppable()
     this.startPaginationListener()
@@ -284,9 +283,9 @@ ${htmlEscape(I18n.t('Loading more results'))}</span></li>`
   handleWarning() {
     if (
       !this.parent &&
-      _.isEmpty(this.groups.models) &&
-      _.isEmpty(this.outcomes.models) &&
-      _.isEmpty(this.views())
+      isEmpty(this.groups.models) &&
+      isEmpty(this.outcomes.models) &&
+      isEmpty(this.views())
     ) {
       return publish('renderNoOutcomeWarning')
     } else {
@@ -301,7 +300,7 @@ ${htmlEscape(I18n.t('Loading more results'))}</span></li>`
 
   // private
   _clearViews() {
-    _.each(this._views, v => v.remove())
+    each(this._views, v => v.remove())
     return (this._views = null)
   }
 }

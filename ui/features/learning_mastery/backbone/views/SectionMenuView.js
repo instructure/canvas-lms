@@ -18,8 +18,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'underscore'
-import {map} from 'lodash'
+import {map, find} from 'lodash'
 import {View} from '@canvas/backbone'
 import template from '../../jst/section_to_show_menu.handlebars'
 import 'jquery-kyle-menu'
@@ -106,7 +105,7 @@ class SectionMenuView extends View {
       sections: this.sections,
       showSections: this.showSections,
       currentSection:
-        ((ref = _.findWhere(this.sections, {
+        ((ref = find(this.sections, {
           id: this.currentSection,
         })) != null
           ? ref.name

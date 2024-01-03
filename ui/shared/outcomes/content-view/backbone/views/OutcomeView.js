@@ -19,8 +19,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import numberHelper from '@canvas/i18n/numberHelper'
 import $ from 'jquery'
-import _ from 'underscore'
-import {map} from 'lodash'
+import {map, maxBy, isEqual, isNaN, extend as lodashExtend} from 'lodash'
 import OutcomeContentBase from './OutcomeContentBase'
 import CalculationMethodFormView from './CalculationMethodFormView'
 import outcomeTemplate from '../../jst/outcome.handlebars'
@@ -40,7 +39,7 @@ export default class OutcomeView extends OutcomeContentBase {
   static initClass() {
     this.child('calculationMethodFormView', 'div.outcome-calculation-method-form')
 
-    this.prototype.events = _.extend(
+    this.prototype.events = lodashExtend(
       {
         'click .edit_rating': 'editRating',
         'click .delete_rating_link': 'deleteRating',
@@ -52,7 +51,7 @@ export default class OutcomeView extends OutcomeContentBase {
       OutcomeContentBase.prototype.events
     )
 
-    this.prototype.validations = _.extend(
+    this.prototype.validations = lodashExtend(
       {
         display_name(data) {
           if (data.display_name.length > 255) {
@@ -62,7 +61,7 @@ export default class OutcomeView extends OutcomeContentBase {
         mastery_points(data) {
           if (
             !ENV.ACCOUNT_LEVEL_MASTERY_SCALES &&
-            (_.isNaN(data.mastery_points) || data.mastery_points < 0)
+            (isNaN(data.mastery_points) || data.mastery_points < 0)
           ) {
             return I18n.t('mastery_error', 'Must be greater than or equal to 0')
           }
@@ -89,7 +88,7 @@ export default class OutcomeView extends OutcomeContentBase {
     }
     const newData = this.getFormData()
     return showConfirmOutcomeEdit({
-      changed: !_.isEqual(newData, this.originalConfirmableValues),
+      changed: !isEqual(newData, this.originalConfirmableValues),
       assessed: this.model.get('assessed'),
       hasUpdateableRubrics: this.model.get('has_updateable_rubrics'),
       modifiedFields: this.getModifiedFields(newData),
@@ -131,7 +130,7 @@ export default class OutcomeView extends OutcomeContentBase {
     } else {
       data.mastery_points = numberHelper.parse(data.mastery_points)
       data.ratings = map(data.ratings, rating =>
-        _.extend(rating, {points: numberHelper.parse(rating.points)})
+        lodashExtend(rating, {points: numberHelper.parse(rating.points)})
       )
       if (['highest', 'latest'].includes(data.calculation_method)) {
         delete data.calculation_int
@@ -181,7 +180,7 @@ export default class OutcomeView extends OutcomeContentBase {
     const $showWrapper = $editWrapper.prev()
     $th.find('h5').text($editWrapper.find('input.outcome_rating_description').val())
     let points = numberHelper.parse($editWrapper.find('input.outcome_rating_points').val())
-    if (_.isNaN(points)) {
+    if (isNaN(points)) {
       points = 0
     } else {
       points = I18n.n(points, {precision: 2, strip_insignificant_zeros: true})
@@ -223,7 +222,7 @@ export default class OutcomeView extends OutcomeContentBase {
     }
     return (this.timeout = setTimeout(() => {
       const val = numberHelper.parse($(e.target).val())
-      if (_.isNaN(val)) return
+      if (isNaN(val)) return
       if (val >= 0 && val <= this.model.get('points_possible')) {
         this.model.set({
           mastery_points: val,
@@ -240,7 +239,7 @@ export default class OutcomeView extends OutcomeContentBase {
     for (let index = 0; index < iterable.length; index++) {
       const r = iterable[index]
       const rating = $(r).find('.outcome_rating_points').val() || 0
-      total = _.max([total, numberHelper.parse(rating)])
+      total = maxBy([total, numberHelper.parse(rating)])
       for (const i of Array.from($(r).find('input'))) {
         // reset indices
         $(i).attr('name', i.name.replace(/\[[0-9]+\]/, `[${index}]`))
@@ -272,7 +271,7 @@ export default class OutcomeView extends OutcomeContentBase {
       case 'add':
         this.$el.html(
           outcomeFormTemplate(
-            _.extend(data, {
+            lodashExtend(data, {
               calculationMethods: this.model.calculationMethods(),
               hideMasteryScale: ENV.ACCOUNT_LEVEL_MASTERY_SCALES,
             })
@@ -307,7 +306,7 @@ export default class OutcomeView extends OutcomeContentBase {
             const methodModel = new CalculationMethodContent(
               ENV.MASTERY_SCALE.outcome_calculation_method
             )
-            _.extend(data, ENV.MASTERY_SCALE.outcome_calculation_method, methodModel.present())
+            lodashExtend(data, ENV.MASTERY_SCALE.outcome_calculation_method, methodModel.present())
           }
         }
 
@@ -317,7 +316,7 @@ export default class OutcomeView extends OutcomeContentBase {
 
         this.$el.html(
           outcomeTemplate(
-            _.extend(data, {
+            lodashExtend(data, {
               can_manage,
               can_edit,
               can_unlink,

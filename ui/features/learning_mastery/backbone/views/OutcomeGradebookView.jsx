@@ -21,8 +21,8 @@
 import {extend} from '@canvas/backbone/utils'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'underscore'
 import React from 'react'
+import {filter, uniq, reject, range, extend as lodashExtend} from 'lodash'
 import ReactDOM from 'react-dom'
 import {View} from '@canvas/backbone'
 import Slick from 'slickgrid'
@@ -213,7 +213,7 @@ OutcomeGradebookView.prototype._toggleOutcomesWithNoResults = function (enabled)
   this._setFilterSetting('outcomes_no_results', enabled)
   if (enabled) {
     const columns = [this.columns[0]].concat(
-      _.filter(
+      filter(
         this.columns,
         (function (_this) {
           return function (c) {
@@ -289,7 +289,7 @@ OutcomeGradebookView.prototype._attachGridEvents = function () {
 //
 // Returns an object.
 OutcomeGradebookView.prototype.toJSON = function () {
-  return _.extend(
+  return lodashExtend(
     {},
     {
       checkboxes: this.checkboxes,
@@ -333,8 +333,8 @@ OutcomeGradebookView.prototype.focusFilterKebabIfNeeded = function () {
 //
 // Returns nothing.
 OutcomeGradebookView.prototype.renderGrid = function (response) {
-  Grid.filter = _.filter(
-    _.range(this.checkboxes.length),
+  Grid.filter = filter(
+    range(this.checkboxes.length),
     (function (_this) {
       return function (i) {
         return _this.checkboxes[i].checked
@@ -358,7 +358,7 @@ OutcomeGradebookView.prototype.renderGrid = function (response) {
   this.columns = columns
   if (this.$('#no_results_outcomes:checkbox:checked').length === 1) {
     columns = [columns[0]].concat(
-      _.filter(
+      filter(
         columns,
         (function (_this) {
           return function (c) {
@@ -552,7 +552,7 @@ OutcomeGradebookView.prototype._mergeResponses = function (a, b) {
     return b
   }
   const response = {}
-  response.meta = _.extend({}, a.meta, b.meta)
+  response.meta = lodashExtend({}, a.meta, b.meta)
   response.linked = {
     outcomes: a.linked.outcomes,
     outcome_paths: a.linked.outcome_paths,
@@ -571,8 +571,8 @@ OutcomeGradebookView.prototype._createFilter = function (name) {
   return (function (_this) {
     return function (isChecked) {
       Grid.filter = isChecked
-        ? _.uniq(Grid.filter.concat([name]))
-        : _.reject(Grid.filter, function (o) {
+        ? uniq(Grid.filter.concat([name]))
+        : reject(Grid.filter, function (o) {
             return o === name
           })
       return _this.grid.invalidate()

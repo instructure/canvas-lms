@@ -19,7 +19,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 import $ from 'jquery'
-import _ from 'underscore'
+import {compact} from 'lodash'
 import OutcomesDirectoryView from './OutcomesDirectoryView'
 import AccountDirectoryView from './AccountDirectoryView'
 import StateStandardsDirectoryView from './StateStandardsDirectoryView'
@@ -63,14 +63,14 @@ export default class FindDirectoryView extends OutcomesDirectoryView {
     }
 
     this.outcomes = new OutcomeCollection() // empty - not needed
-    this.groups = new OutcomeGroupCollection(_.compact([account, state, course]))
+    this.groups = new OutcomeGroupCollection(compact([account, state, course]))
     // for PaginatedView
     // @collection starts as @groups but can later change to @outcomes
     this.collection = this.groups
 
     const dfds = (() => {
       const result = []
-      for (const g of _.compact([state])) {
+      for (const g of compact([state])) {
         g.on('change', this.revertTitle)
         result.push(g.fetch())
       }
