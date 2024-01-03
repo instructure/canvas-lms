@@ -33,6 +33,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
+import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
 
 const I18n = useI18nScope('quizzes.index')
 
@@ -61,6 +62,7 @@ export default class ItemView extends Backbone.View {
       'click .duplicate-failed-cancel': 'onDuplicateOrImportFailedCancel',
       'click .import-failed-cancel': 'onDuplicateOrImportFailedCancel',
       'click .migrate-failed-cancel': 'onDuplicateOrImportFailedCancel',
+      'click .assign-to-link': 'onAssign',
     }
 
     this.prototype.messages = {
@@ -167,6 +169,46 @@ export default class ItemView extends Backbone.View {
     if (quizzes) {
       this.addQuizToList(quizzes[0])
     }
+  }
+
+  renderItemAssignToTray(open, returnFocusTo, itemProps) {
+    ReactDOM.render(
+      <ItemAssignToTray
+        open={open}
+        onClose={() => {
+          ReactDOM.unmountComponentAtNode(
+            document.getElementById('assign-to-mount-point')
+          )
+        }}
+        onDismiss={() => {
+          this.renderItemAssignToTray(false, returnFocusTo, itemProps)
+          returnFocusTo.focus()
+        }}
+        itemType='assignment'
+        locale={ENV.LOCALE || 'en'}
+        timezone={ENV.TIMEZONE || 'UTC'}
+        {...itemProps}
+      />,
+      document.getElementById('assign-to-mount-point')
+    )
+  }
+
+  onAssign(e) {
+    e.preventDefault()
+    const returnFocusTo = $(e.target).closest('ul').prev('.al-trigger')
+
+    const courseId = e.target.getAttribute('data-quiz-context-id')
+    const itemName = e.target.getAttribute('data-quiz-name')
+    const itemContentId = e.target.getAttribute('data-quiz-id')
+    const iconType = e.target.getAttribute('data-is-lti-quiz') ? 'lti-quiz' : 'quiz'
+    const pointsPossible = parseFloat(e.target.getAttribute('data-quiz-points-possible')) + ' pts'
+    this.renderItemAssignToTray(true, returnFocusTo, {
+      courseId,
+      itemName,
+      itemContentId,
+      pointsPossible,
+      iconType,
+    })
   }
 
   canDelete() {
@@ -377,6 +419,7 @@ export default class ItemView extends Backbone.View {
       this.model.get('restricted_by_master_course')
 
     base.courseId = ENV.context_asset_string.split('_')[1]
+    base.differentiatedModulesFlag = ENV.FEATURES?.differentiated_modules
     base.showSpeedGraderLinkFlag = ENV.FLAGS?.show_additional_speed_grader_link
     base.showSpeedGraderLink = ENV.SHOW_SPEED_GRADER_LINK
 

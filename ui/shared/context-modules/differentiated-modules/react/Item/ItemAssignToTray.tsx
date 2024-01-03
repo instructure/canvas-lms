@@ -331,7 +331,7 @@ export default function ItemAssignToTray({
   }
 
   function renderItemType() {
-    switch (itemType) {
+    switch (iconType) {
       case 'assignment':
         return I18n.t('Assignment')
       case 'quiz':

@@ -404,6 +404,8 @@ export default AssignmentListItemView = (function () {
       data.DIRECT_SHARE_ENABLED = !!ENV.DIRECT_SHARE_ENABLED
       data.canOpenManageOptions = this.canOpenManageOptions()
 
+      data.item_assignment_type = data.is_quiz_assignment ? 'quiz' : data.isQuizLTIAssignment ? 'lti-quiz' : 'assignment'
+
       if (data.canManage) {
         data.spanWidth = 'span3'
         data.alignTextClass = ''
@@ -542,7 +544,7 @@ export default AssignmentListItemView = (function () {
       const itemName = e.target.getAttribute('data-assignment-name')
       const itemContentId = e.target.getAttribute('data-assignment-id')
       const pointsPossible = parseFloat(e.target.getAttribute('data-assignment-points-possible')) + ' pts'
-      const iconType = e.target.getAttribute('data-assignment-type') ? 'quiz' : 'assignment'
+      const iconType = e.target.getAttribute('data-assignment-type')
       this.renderItemAssignToTray(true, returnFocusTo, {
         courseId,
         itemName,
