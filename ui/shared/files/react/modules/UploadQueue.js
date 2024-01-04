@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
+import {pull} from 'lodash'
 import FileUploader from './FileUploader'
 import ZipUploader from './ZipUploader'
 
@@ -70,7 +70,7 @@ class UploadQueue {
     }
     uploader.cancel = () => {
       uploader.abort()
-      this._queue = _.without(this._queue, uploader)
+      pull(this._queue, uploader)
       if (this.currentUploader === uploader) this.currentUploader = null
       return this.onChange()
     }
@@ -86,7 +86,7 @@ class UploadQueue {
 
   dequeue() {
     const firstNonErroredUpload = this._queue.find(upload => !upload.error)
-    this._queue = _.without(this._queue, firstNonErroredUpload)
+    pull(this._queue, firstNonErroredUpload)
     return firstNonErroredUpload
   }
 
