@@ -297,7 +297,6 @@ export const LearnerPassportRoutes = (
                     'X-CSRF-Token': getCookie('_csrf_token'),
                     'Content-type': 'application/json',
                   },
-                  body: JSON.stringify({title: formData.get('title')}),
                 }
               )
               const json = await response.json()
@@ -311,6 +310,40 @@ export const LearnerPassportRoutes = (
             return fetch(`/users/${params.userId}/passport/data/pathways/show/${params.pathwayId}`)
           }}
           lazy={() => import('../pages/PathwayView')}
+        />
+        <Route
+          path="edit/:pathwayId"
+          loader={async ({params}) => {
+            const p1 = fetch(`/users/${params.userId}/passport/data/achievements`).then(res =>
+              res.json()
+            )
+            const p2 = fetch(
+              `/users/${params.userId}/passport/data/pathways/show/${params.pathwayId}`
+            ).then(res => res.json())
+            const [achievements, pathway] = await Promise.all([p1, p2])
+            return {achievements, pathway}
+          }}
+          action={async ({request, params}) => {
+            const formData = await request.formData()
+            const response = await fetch(
+              `/users/${params.userId}/passport/data/pathways/${params.pathwayId}`,
+              {
+                method: 'POST',
+                cache: 'no-cache',
+                headers: {
+                  'X-CSRF-Token': getCookie('_csrf_token'),
+                },
+                body: formData,
+              }
+            )
+            const json = await response.json()
+            if (formData.get('draft')) {
+              return redirect('.')
+            } else {
+              return redirect(`../view/${json.id}`)
+            }
+          }}
+          lazy={() => import('../pages/PathwayEdit')}
         />
       </Route>
     ) : null}

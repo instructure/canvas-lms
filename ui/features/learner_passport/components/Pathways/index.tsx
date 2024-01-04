@@ -19,5 +19,6 @@
 import PathwayLayout from './PathwayLayout'
 import PathwayDashboard from './PathwayDashboard'
 import PathwayViewPage from './PathwayViewPage'
+import PathwayEdit from './edit/PathwayEdit'
 
-export {PathwayLayout, PathwayDashboard, PathwayViewPage}
+export {PathwayLayout, PathwayDashboard, PathwayViewPage, PathwayEdit}

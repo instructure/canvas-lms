@@ -291,17 +291,23 @@ class LearnerPassportController < ApplicationController
     }
   end
 
+  # A pathway is a tree of milestones
+  # The pathway is at the root, with first_milestones containing the id's of its children
+  # Then each milestone has its data plus next_milestones containing the id's of its children
   def learner_passport_pathway_template
     {
       id: "",
       title: "",
       description: "",
       published: nil,
+      is_private: false,
       enrolled_student_count: 0,
       started_count: 0,
       completed_count: 0,
       first_milestones: [],
       milestones: [],
+      learning_outcomes: [],
+      achievements_earned: [],
     }
   end
 
@@ -311,6 +317,7 @@ class LearnerPassportController < ApplicationController
       title: "Business Foundations Specialization",
       description: "Solve Real Business Problems. Build a foundation of core business skills in marketing, finance, accounting and operations.",
       published: "2024-01-03",
+      is_private: false,
       enrolled_student_count: 63,
       started_count: 42,
       completed_count: 15,
@@ -357,7 +364,8 @@ class LearnerPassportController < ApplicationController
           next_milestones: []
         }
       ],
-
+      learning_outcomes: [],
+      achievements_earned: [],
     }
   end
 
@@ -403,6 +411,10 @@ class LearnerPassportController < ApplicationController
 
   def current_pathways_key
     "lerner_passport_current_pathways #{@current_user.global_id}"
+  end
+
+  def pathway_template_key
+    "learner_passport_pathway_template #{@current_user.global_id}"
   end
 
   def index
@@ -602,6 +614,44 @@ class LearnerPassportController < ApplicationController
       pw
     end
     render json: pathways
+  end
+
+  def pathway_create
+    new_pathway = Rails.cache.fetch(pathway_template_key) { learner_passport_pathway_template }.clone
+    new_pathway[:id] = (Rails.cache.fetch(current_pathways_key) { learner_passport_current_pathways }.length + 1).to_s
+    new_pathway[:title] = params[:title]
+    current_pathways = Rails.cache.fetch(current_pathways_key) { learner_passport_current_pathways }
+    current_pathways << new_pathway
+    Rails.cache.write(current_pathways_key, current_pathways, expires_in: CACHE_EXPIRATION)
+    render json: new_pathway
+  end
+
+  def pathway_update
+    current_pathways = Rails.cache.fetch(current_pathways_key) { learner_passport_current_pathways }
+    pathway = current_pathways.find { |p| p[:id] == params[:pathway_id] }
+    return render json: { message: "Pathway not found" }, status: :not_found if pathway.nil?
+
+    pathway[:learning_outcomes] = []
+    pathway.each_key do |key|
+      next if params[key].nil?
+
+      case key
+      when :is_private
+        pathway[:is_private] = params[key] == "true"
+      when :learning_outcomes
+        params[key].each do |skill|
+          pathway[:learning_outcomes] << JSON.parse(skill)
+        end
+      when :achievements_earned
+        pathway[:achievements_earned] = Rails.cache.fetch(current_achievements_key) { learner_passport_current_achievements }.select { |a| params[key].include?(a[:id]) }
+      else
+        pathway[key] = params[key]
+      end
+    end
+    pathway[:published] = (params[:draft] == "true") ? nil : Date.today.to_s
+    Rails.cache.write(current_pathways_key, current_pathways, expires_in: CACHE_EXPIRATION)
+
+    render json: pathway
   end
 
   def pathway_show

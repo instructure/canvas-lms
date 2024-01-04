@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useState} from 'react'
+import React, {useCallback} from 'react'
 import {useSubmit, useLoaderData, useNavigate} from 'react-router-dom'
 
 import {Button} from '@instructure/ui-buttons'
@@ -28,7 +28,6 @@ import {Text} from '@instructure/ui-text'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {View} from '@instructure/ui-view'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import NamingModal from '../shared/NamingModal'
 import PathwayCard from './PathwayCard'
 import type {PathwayData} from '../types'
 import {showUnimplemented} from '../shared/utils'
@@ -51,10 +50,6 @@ const PathwayDashboard = () => {
   const navigate = useNavigate()
   const submit = useSubmit()
   const pathways = (useLoaderData() as PathwayData[]) || []
-  const [createModalIsOpen, setCreateModalIsOpen] = useState(false)
-  const [renameModalIsOpen, setRenameModalIsOpen] = useState(false)
-  const [actionPathwayId] = useState('')
-
   const url = new URL(window.location.href)
   if (url.searchParams.has('dupe')) {
     const title = url.searchParams.get('dupe') || 'Pathway'
@@ -67,36 +62,20 @@ const PathwayDashboard = () => {
     window.history.replaceState(window.history.state, '', url.pathname)
   }
 
-  const handleDismissCreateModal = useCallback(() => {
-    setCreateModalIsOpen(false)
-    setRenameModalIsOpen(false)
-  }, [])
-
   const handleCreateClick = useCallback(() => {
-    setCreateModalIsOpen(true)
-  }, [])
+    const formData = new FormData()
+    formData.append('userId', ENV.current_user.id)
+    submit(formData, {method: 'PUT', action: 'create'})
+  }, [submit])
 
-  const handleCreateNewPathway = useCallback(
-    (f: HTMLFormElement) => {
-      setCreateModalIsOpen(false)
-      submit(f, {method: 'PUT'})
-    },
-    [submit]
-  )
-
-  const handleRenamePathway = useCallback(
-    (f: HTMLFormElement) => {
-      setRenameModalIsOpen(false)
-      submit(f, {method: 'POST', action: 'rename'})
-    },
-    [submit]
-  )
-
-  const onAction = useCallback(
+  const handleAction = useCallback(
     (pathwayId: string, action: string) => {
       switch (action) {
         case 'view':
           navigate(`../view/${pathwayId}`)
+          break
+        case 'edit':
+          navigate(`../edit/${pathwayId}`)
           break
         default:
           showUnimplemented({currentTarget: {textContent: action}})
@@ -146,7 +125,7 @@ const PathwayDashboard = () => {
             <Table.Body>
               {pathways && pathways.length > 0
                 ? pathways.map(pathway => (
-                    <PathwayCard key={pathway.id} pathway={pathway} onAction={onAction} />
+                    <PathwayCard key={pathway.id} pathway={pathway} onAction={handleAction} />
                   ))
                 : null}
             </Table.Body>
@@ -154,17 +133,6 @@ const PathwayDashboard = () => {
           {pathways?.length > 0 ? null : renderPathwaySkeleton()}
         </View>
       </View>
-      <NamingModal
-        objectType="Pathway"
-        objectId={actionPathwayId}
-        mode={createModalIsOpen ? 'create' : 'rename'}
-        currentName={
-          renameModalIsOpen ? pathways.find(p => p.id === actionPathwayId)?.title : undefined
-        }
-        open={createModalIsOpen || renameModalIsOpen}
-        onDismiss={handleDismissCreateModal}
-        onSubmit={createModalIsOpen ? handleCreateNewPathway : handleRenamePathway}
-      />
     </View>
   )
 }

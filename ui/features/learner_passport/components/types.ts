@@ -132,7 +132,7 @@ export interface MilestoneData {
   description: string
   required?: boolean
   requirements: RequirementData[]
-  next_milestones: MilestoneId[]
+  next_milestones: MilestoneId[] // ids of this milestone's children
 }
 
 // this is the root of the pathway tree
@@ -149,6 +149,14 @@ export interface PathwayData {
 
 export interface PathwayDetailData extends PathwayData {
   description: string
-  first_milestones: MilestoneId[]
-  milestones: MilestoneData[]
+  is_private?: boolean
+  learning_outcomes: SkillData[]
+  achievements_earned: AchievementData[]
+  first_milestones: MilestoneId[] // ids of the milestone children of the root pathway
+  milestones: MilestoneData[] // all the milestones in the pathway
+}
+
+export interface PathwayEditData {
+  pathway: PathwayDetailData
+  achievements: AchievementData[]
 }
