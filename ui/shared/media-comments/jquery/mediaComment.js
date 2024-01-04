@@ -17,11 +17,11 @@
 
 // mediaComment.js
 import {useScope as useI18nScope} from '@canvas/i18n'
-import _ from 'underscore'
 import pubsub from 'jquery-tinypubsub'
 import mejs from '@canvas/mediaelement'
 import MediaElementKeyActionHandler from './MediaElementKeyActionHandler'
 import $ from 'jquery'
+import {map, values} from 'lodash'
 import htmlEscape from 'html-escape'
 import sanitizeUrl from '@canvas/util/sanitizeUrl'
 import {contentMapping} from '@instructure/canvas-rce/src/common/mimeClass'
@@ -118,7 +118,7 @@ export function getSourcesAndTracks(id, attachmentId) {
           />`
       )
 
-    const tracks = _.map(data.media_tracks, track => {
+    const tracks = map(data.media_tracks, track => {
       const languageName = mejs.language.codes[track.locale] || track.locale
       return `<track kind='${htmlEscape(track.kind)}' label='${htmlEscape(
         languageName
@@ -126,7 +126,7 @@ export function getSourcesAndTracks(id, attachmentId) {
       data-inherited-track='${htmlEscape(track.inherited)}' />`
     })
 
-    const types = _.map(data.media_sources, source => source.content_type)
+    const types = map(data.media_sources, source => source.content_type)
     return dfd.resolve({sources, tracks, types, can_add_captions: data.can_add_captions})
   })
   return dfd
@@ -212,7 +212,7 @@ const mediaCommentActions = {
             },
             keyActions: [
               {
-                keys: _.values(MediaElementKeyActionHandler.keyCodes),
+                keys: values(MediaElementKeyActionHandler.keyCodes),
                 action(player, media, keyCode, event) {
                   if (player.isVideo) {
                     player.showControls()
