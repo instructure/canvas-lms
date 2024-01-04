@@ -572,7 +572,60 @@ QUnit.module('Gradebook#filterAssignments', {
         module_ids: ['1'],
       },
     ]
+    const submissionsChunk = [
+      {
+        submissions: [
+          {
+            assignment_id: '2301',
+            id: '2501',
+            posted_at: null,
+            score: 10,
+            user_id: '1101',
+            workflow_state: 'graded',
+          },
+          {
+            assignment_id: '2302',
+            id: '2502',
+            posted_at: null,
+            score: 9,
+            user_id: '1101',
+            missing: true,
+            workflow_state: 'missing',
+          },
+        ],
+        user_id: '1101',
+      },
+    ]
     this.gradebook = createGradebook()
+    this.gradebook.assignments = {
+      2301: this.assignments[0],
+      2302: this.assignments[1],
+      2303: this.assignments[2],
+      2304: this.assignments[3],
+    }
+    this.gradebook.students = {
+      1101: {
+        id: '1101',
+        name: 'Adam Jones',
+        assignment_2301: {
+          assignment_id: '2301',
+          late: false,
+          missing: false,
+          excused: false,
+          seconds_late: 0,
+          user_id: '1101',
+        },
+        assignment_2302: {
+          assignment_id: '2302',
+          late: false,
+          missing: false,
+          excused: false,
+          seconds_late: 0,
+          user_id: '1101',
+        },
+      },
+    }
+    this.gradebook.gotSubmissionsChunk(submissionsChunk)
     this.gradebook.setAssignmentGroups([
       {id: '1', name: 'Assignments', position: 1},
       {id: '2', name: 'Homework', position: 2},
@@ -594,6 +647,8 @@ QUnit.module('Gradebook#filterAssignments', {
     }
     this.gradebook.gridDisplaySettings.showUnpublishedAssignments = true
     this.gradebook.show_attendance = true
+    this.gradebook.setAssignmentsLoaded()
+    this.gradebook.setSubmissionsLoaded(true)
   },
 })
 
@@ -710,6 +765,64 @@ test('excludes assignments from other assignment groups when filtering by an ass
   this.gradebook.setFilterColumnsBySetting('assignmentGroupId', '2')
   const assignments = this.gradebook.filterAssignments(this.assignments)
   deepEqual(map(assignments, 'id'), ['2302'])
+})
+
+test('includes assignments filtered by submissions status', function () {
+  this.gradebook.props.appliedFilters = [
+    {
+      id: '1',
+      type: 'submissions',
+      value: 'missing',
+      created_at: new Date().toISOString(),
+    },
+  ]
+  this.gradebook.setFilterColumnsBySetting('submissions', 'missing')
+  const filteredAssignments = this.gradebook.filterAssignments(this.assignments)
+  deepEqual(map(filteredAssignments, 'id'), ['2302'])
+})
+
+test('includes no assignments when filtered by non existent submissions status', function () {
+  this.gradebook.props.appliedFilters = [
+    {
+      id: '1',
+      type: 'submissions',
+      value: 'extended',
+      created_at: new Date().toISOString(),
+    },
+  ]
+  this.gradebook.setFilterColumnsBySetting('submissions', 'missing')
+  const filteredAssignments = this.gradebook.filterAssignments(this.assignments)
+  deepEqual(map(filteredAssignments, 'id'), [])
+})
+
+test('includes assignments when filtered by existing status and searchFilteredStudentIds matches the submission', function () {
+  this.gradebook.props.appliedFilters = [
+    {
+      id: '1',
+      type: 'submissions',
+      value: 'missing',
+      created_at: new Date().toISOString(),
+    },
+  ]
+  this.gradebook.searchFilteredStudentIds = ['1101']
+  this.gradebook.setFilterColumnsBySetting('submissions', 'missing')
+  const filteredAssignments = this.gradebook.filterAssignments(this.assignments)
+  deepEqual(map(filteredAssignments, 'id'), ['2302'])
+})
+
+test('includes no assignments when filtered by existing status but searchFilteredStudentIds does not match submission', function () {
+  this.gradebook.props.appliedFilters = [
+    {
+      id: '1',
+      type: 'submissions',
+      value: 'missing',
+      created_at: new Date().toISOString(),
+    },
+  ]
+  this.gradebook.searchFilteredStudentIds = ['1102']
+  this.gradebook.setFilterColumnsBySetting('submissions', 'missing')
+  const filteredAssignments = this.gradebook.filterAssignments(this.assignments)
+  deepEqual(map(filteredAssignments, 'id'), [])
 })
 
 QUnit.module('Gradebook#getSelectedEnrollmentFilters')
