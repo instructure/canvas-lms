@@ -2468,6 +2468,12 @@ describe Assignment do
         it "has a version length of one" do
           expect(submission.versions.length).to eq 1
         end
+
+        it "new version is created when current grade is empty and there are previously graded versions" do
+          assignment.grade_student(student, grade: "", grader: teacher)
+          updated_submission = assignment.grade_student(student, grade: "6", grader: teacher)
+          expect(updated_submission[0].versions.length).to eq 3
+        end
       end
 
       context "and the submission is associated with an LTI::Result marked PendingManual" do

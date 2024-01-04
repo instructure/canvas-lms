@@ -2219,6 +2219,15 @@ class AbstractAssignment < ActiveRecord::Base
     actl&.associated_tool_proxy
   end
 
+  def are_previous_versions_graded(submission)
+    submission.versions.each do |versions|
+      if versions.model.grade.present?
+        return true
+      end
+    end
+    false
+  end
+
   def save_grade_to_submission(submission, original_student, group, opts)
     unless submission.grader_can_grade?
       error_details = submission.grading_error_message
@@ -2227,7 +2236,7 @@ class AbstractAssignment < ActiveRecord::Base
 
     submission.skip_grade_calc = opts[:skip_grade_calc]
 
-    previously_graded = submission.grade.present? || submission.excused?
+    previously_graded = submission.grade.present? || submission.excused? || are_previous_versions_graded(submission)
     return if previously_graded && opts[:dont_overwrite_grade]
     return if submission.user != original_student && submission.excused?
 
