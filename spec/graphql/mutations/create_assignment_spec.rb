@@ -400,4 +400,60 @@ describe Mutations::CreateAssignment do
     expect(errors).to_not be_nil
     expect(errors[0]["message"]).to include "invalid course"
   end
+
+  it "gets an error when trying to set a restricted params (pointsPossible) and forCheckpoints is true" do
+    result = execute_with_input <<~GQL
+      name: "Parent Assignment for Checkpoints"
+      courseId: "#{@course.to_param}"
+      pointsPossible: 100
+      forCheckpoints: true
+    GQL
+    errors = result["errors"]
+
+    expect(errors[0]["message"]).to eq "Cannot set points_possible in the parent assignment for checkpoints."
+  end
+
+  it "allows to set a restricted params (pointsPossible) and forCheckpoints is undefined thus false" do
+    result = execute_with_input <<~GQL
+      name: "Regular Assignment"
+      courseId: "#{@course.to_param}"
+      pointsPossible: 100
+    GQL
+    errors = result["errors"]
+
+    expect(errors).to be_nil
+  end
+
+  it "gets an error when trying to set assignmentOverrides and forCheckpoints is true" do
+    result = execute_with_input <<~GQL
+      name: "Parent Assignment for Checkpoints"
+      courseId: "#{@course.to_param}"
+      assignmentOverrides: [
+        {
+          noopId: "1",
+          title: "Mastery Paths"
+        }
+      ]
+      forCheckpoints: true
+    GQL
+    errors = result["errors"]
+
+    expect(errors[0]["message"]).to eq "Assignment overrides are not allowed in the parent assignment for checkpoints."
+  end
+
+  it "allows to set assignmentOverrides and forCheckpoints is undefined thus false" do
+    result = execute_with_input <<~GQL
+      name: "Regular Assignment"
+      courseId: "#{@course.to_param}"
+      assignmentOverrides: [
+        {
+          noopId: "1",
+          title: "Mastery Paths"
+        }
+      ]
+    GQL
+    errors = result["errors"]
+
+    expect(errors).to be_nil
+  end
 end

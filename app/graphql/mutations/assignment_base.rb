@@ -149,6 +149,7 @@ class Mutations::AssignmentBase < Mutations::BaseMutation
            "requires anonymous_marking course feature to be set to true",
            required: false
   argument :module_ids, [ID], required: false
+  argument :for_checkpoints, Boolean, required: false
 
   # the return data if the update is successful
   field :assignment, Types::AssignmentType, null: true
@@ -178,6 +179,10 @@ class Mutations::AssignmentBase < Mutations::BaseMutation
 
   def prepare_overrides!(input_hash, api_proxy)
     if input_hash.key?(:assignment_overrides) && input_hash[:assignment_overrides].present?
+      if input_hash[:for_checkpoints]
+        raise GraphQL::ExecutionError, "Assignment overrides are not allowed in the parent assignment for checkpoints."
+      end
+
       api_proxy.load_root_account
       input_hash[:assignment_overrides].each do |override|
         if override[:id].blank?
@@ -284,5 +289,17 @@ class Mutations::AssignmentBase < Mutations::BaseMutation
     return if @working_assignment.workflow_state != "deleted"
 
     @working_assignment.restore
+  end
+
+  def validate_for_checkpoints(input_hash)
+    return unless input_hash[:for_checkpoints]
+
+    restricted_keys = %i[points_possible due_at lock_at unlock_at].freeze
+
+    restricted_keys.each do |key|
+      if input_hash.key?(key)
+        raise GraphQL::ExecutionError, "Cannot set #{key} in the parent assignment for checkpoints."
+      end
+    end
   end
 end
