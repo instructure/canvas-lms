@@ -561,11 +561,15 @@ describe "discussions" do
 
       context "graded" do
         it "displays graded assignment options correctly when initially opening edit page" do
+          grading_standard = course.grading_standards.create!(title: "Win/Lose", data: [["Winner", 0.94], ["Loser", 0]])
+
+          # Create a grading standard and make sure it is selected
           discussion_assignment_options = {
             name: "assignment",
             points_possible: 10,
-            grading_type: "percent",
+            grading_type: "letter_grade",
             assignment_group: course.assignment_groups.create!(name: "assignment group"),
+            grading_standard_id: grading_standard.id,
           }
 
           discussion_assignment_peer_review_options = {
@@ -589,13 +593,15 @@ describe "discussions" do
           graded_discussion = course.discussion_topics.create!(all_graded_discussion_options)
 
           get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
-
+          # Grading scheme sub menu is selected
+          expect(fj("span:contains('#{grading_standard.title}')").present?).to be_truthy
+          expect(fj("span:contains('Manage All Grading Schemes')").present?).to be_truthy
           # Graded checkbox
           expect(is_checked(f("input[data-testid='graded-checkbox']"))).to be_truthy
           # Points possible
           expect(f("input[data-testid='points-possible-input']").attribute("value")).to eq "10"
           # Grading type
-          expect(f("input[data-testid='display-grade-input']").attribute("value")).to eq "Percentage"
+          expect(f("input[data-testid='display-grade-input']").attribute("value")).to eq "Letter Grade"
           # Assignment Group
           expect(f("input[data-testid='assignment-group-input']").attribute("value")).to eq "assignment group"
           # Peer review checkboxes
