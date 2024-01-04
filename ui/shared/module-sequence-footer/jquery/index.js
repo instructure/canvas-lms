@@ -16,8 +16,8 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
+import {find} from 'lodash'
 import template from '../jst/ModuleSequenceFooter.handlebars'
-import _ from 'underscore'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import htmlEscape from 'html-escape'
 import '@canvas/jquery/jquery.ajaxJSON'
@@ -223,7 +223,7 @@ export default class ModuleSequenceFooter {
       })
     } else {
       // module id is different
-      const module = _.find(this.modules, m => m.id === this.item.prev.module_id)
+      const module = find(this.modules, m => m.id === this.item.prev.module_id)
       this.previous.tooltip = `<strong style='float:left'>${htmlEscape(
         I18n.t('prev_module', 'Previous Module:')
       )}</strong> <br> ${htmlEscape(module.name)}`
@@ -278,7 +278,7 @@ export default class ModuleSequenceFooter {
       this.next.tooltipText = I18n.t('Next: *item*', {wrapper: this.item.next.title})
     } else {
       // module id is different
-      const module = _.find(this.modules, m => m.id === this.item.next.module_id)
+      const module = find(this.modules, m => m.id === this.item.next.module_id)
       this.next.tooltip = `<strong style='float:left'>${htmlEscape(
         I18n.t('next_module', 'Next Module:')
       )}</strong> <br> ${htmlEscape(module.name)}`

@@ -21,7 +21,6 @@
 import {extend} from '@canvas/backbone/utils'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'underscore'
 import Backbone from '@canvas/backbone'
 import template from '../../jst/index.handlebars'
 import {shimGetterShorthand} from '@canvas/util/legacyCoffeesScriptHelpers'
@@ -109,11 +108,12 @@ CollectionView.prototype.render = function () {
 
 // @api public
 CollectionView.prototype.toJSON = function () {
-  return _.extend(this.options, {
+  return {
+    ...this.options,
     emptyMessage: this.emptyMessage,
     listClassName: this.listClassName,
     ENV,
-  })
+  }
 }
 
 // Reorder child views according to current collection ordering.

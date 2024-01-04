@@ -16,15 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
+import {isUndefined, each} from 'lodash'
 import $ from 'jquery'
 import * as tz from './index'
 import './jquery/index'
 
 const DateHelper = {
   parseDates(object, datesToParse) {
-    _.each(datesToParse, dateString => {
-      const propertyExists = !_.isUndefined(object[dateString])
+    each(datesToParse, dateString => {
+      const propertyExists = !isUndefined(object[dateString])
       if (propertyExists) object[dateString] = tz.parse(object[dateString])
     })
     return object
